@@ -100,6 +100,15 @@ import { applyMobileKeyboardViewport } from './game/keyboard_viewport_applier';
 import { shouldUseStaticBackdrop } from './game/landing_backdrop';
 import { createLandingThemeAudio } from './game/landing_theme';
 import {
+  collectLoadSpans,
+  loadPhaseEnd,
+  loadPhaseStart,
+  loadSpan,
+  loadSpanAsync,
+  resetLoadProfile,
+  summarizeLoadProfile,
+} from './game/load_profiler';
+import {
   interfaceModeFromSetting,
   isPhoneTouchDevice,
   MobileControls,
@@ -1308,11 +1317,14 @@ async function startGame(
   // sites) with no .catch, and English is always resident, so a failed fetch must fall back
   // to English and keep booting rather than reject unhandled. Runs concurrently with the
   // deferred asset preloads started just above.
+  loadPhaseStart('locale-fetch');
   try {
     await Promise.all([ensureLocaleLoaded(getLanguage()), ensureDeedLocalesLoaded(getLanguage())]);
   } catch {
     // Soft fallback: English is statically resident; boot in English (the picker can retry).
   }
+  loadPhaseEnd('locale-fetch');
+  loadPhaseStart('assets-ready');
   try {
     await assetsReady((done, total) => setLoadingProgressRange(done, total, 0, 35));
   } catch (err) {
@@ -1327,8 +1339,10 @@ async function startGame(
   // speak to; everything after this is synchronous CPU-bound scene build, so
   // stop watching here rather than leaving it armed through hideLoadingScreen.
   stopSlowConnectionWatch();
+  loadPhaseEnd('assets-ready');
   const spectateBadge = createSpectateBadge();
   setLoadingStatus(t('loading.enteringWorld'));
+  loadPhaseStart('mount-ui');
   // Let the final status + full progress bar paint before the synchronous
   // Renderer/Hud build freezes the main thread for a beat.
   await nextPaint();
@@ -1386,9 +1400,12 @@ async function startGame(
   // The probe was armed before the locale/asset awaits above; mark that the await
   // window ended and the synchronous scene build is what runs next.
   entryDiagnostics.checkpoint('scene-build-start', baseEntryDiagnostics());
+  loadPhaseEnd('mount-ui');
   try {
     setLoadingPercent(37, t('loading.enteringWorld'));
-    await ensureSkyAssetsAt(world.player.pos.x, world.player.pos.z);
+    await loadSpanAsync('sky-assets', () =>
+      ensureSkyAssetsAt(world.player.pos.x, world.player.pos.z),
+    );
     setLoadingPercent(40, t('loading.enteringWorld'));
     // Compose the LOCAL player's body from their authored appearance: every
     // class routes through the modular part library, each via its own
@@ -1403,7 +1420,7 @@ async function startGame(
         ? inWorldLookFor(e.templateId as PlayerClass, e.helmHidden)
         : null,
     );
-    renderer = new Renderer(world, canvas, nameplates);
+    renderer = loadSpan('renderer-ctor', () => new Renderer(world, canvas, nameplates));
     rendererReady = true;
     renderer.setAudioSink(sfx);
     renderer.showDevBadges = settings.get('showDevBadges');
@@ -1429,16 +1446,19 @@ async function startGame(
     // One-time software-rendering notice (WARP/SwiftShader): the Renderer
     // constructor ran initGfxTier, so the adapter verdict is resolved by now.
     initSoftwareRenderNotice(DESKTOP_APP);
+    loadPhaseStart('hud-ctor');
     hud = new Hud(world, renderer, keybinds, {
       dailyRewardsEnabled: NATIVE_APP ? await walletCapabilityReady : true,
       devCommandsEnabled: import.meta.env.DEV,
       constrainedMemory: GFX.constrainedMemory,
     });
+    loadPhaseEnd('hud-ctor');
     perf.setHud(hud);
     // Every zone the renderer makes resident (boot, teleport warmup, or the
     // background streaming lane) also prewarms its world-map background, so
     // opening the map right after a crossing never pays the terrain render.
     renderer.onZonePrepared = (zoneId) => hud.queueMapBgPrewarm(zoneId);
+    loadPhaseStart('icon-plan');
     hydrateIcons(); // swap [data-icon] placeholders (micro-menu, mobile bar, meters) for inline SVG
     applyPerfOrnamentVars(); // Performance Overlay window's gilded corner/edge masks
     applyMinimapOrnamentVars(); // minimap disc's gilded ring
@@ -1485,7 +1505,9 @@ async function startGame(
     });
     const iconPrewarm = defaultIconPrewarmPlan(iconPriorities);
     prewarmIconCache(iconPrewarm.entries, { eagerCount: iconPrewarm.priorityCount });
+    loadPhaseEnd('icon-plan');
     entryDiagnostics.checkpoint('hud-built');
+    loadPhaseStart('wiring');
   } catch (err) {
     // e.g. WebGL context creation failure: surface it instead of leaving the
     // loading screen up forever. A HANDLED failure is not a process kill, so the
@@ -4681,14 +4703,17 @@ async function startGame(
     }
   }
   input.setSuspendMovement(true);
+  loadPhaseEnd('wiring');
   await nextPaint();
   entryDiagnostics.checkpoint('prewarm-start', {
     ...renderEntryDiagnostics(),
     prewarmEntry: 'initial',
   });
   try {
-    await renderer.prepareZoneAt(world.player.pos.x, world.player.pos.z, (done, total) =>
-      setLoadingProgressRange(done, total, 40, 70),
+    await loadSpanAsync('prepare-zone', () =>
+      renderer.prepareZoneAt(world.player.pos.x, world.player.pos.z, (done, total) =>
+        setLoadingProgressRange(done, total, 40, 70),
+      ),
     );
     // A character logged out near a zone border (Thornpeak's south edge sits
     // 40 yd from the Mirefen rectangle) would otherwise enter the world inside
@@ -4697,17 +4722,20 @@ async function startGame(
     // haze for the first minute of every session. Stream the same arrival
     // neighbourhood a teleport gets, behind the loading screen that is already
     // up. Costs nothing when the logout spot is mid-rectangle.
-    await renderer.prepareZonesAround(
-      world.player.pos.x,
-      world.player.pos.z,
-      ARRIVAL_NEIGHBOR_STREAM_RADIUS,
-      (done, total) => setLoadingProgressRange(done, total, 70, 88),
+    await loadSpanAsync('prepare-neighbors', () =>
+      renderer.prepareZonesAround(
+        world.player.pos.x,
+        world.player.pos.z,
+        ARRIVAL_NEIGHBOR_STREAM_RADIUS,
+        (done, total) => setLoadingProgressRange(done, total, 70, 88),
+      ),
     );
   } catch (err) {
     fatalOverlay(t('loading.rendererFailed', { error: technicalErrorMessage(err) }));
     return;
   }
   setLoadingPercent(90, t('loading.enteringWorld'));
+  loadPhaseStart('prewarm-initial');
   try {
     const prewarm = await renderer.prewarmInitialScene({
       onEntryStart: (id, category) =>
@@ -4738,6 +4766,7 @@ async function startGame(
     // has been materialized successfully.
     console.warn('Renderer prewarm failed', err);
   }
+  loadPhaseEnd('prewarm-initial');
   // The entry allocation spike is over: start streaming the mob bodies the
   // iOS WebKit boot gate deliberately excluded (Safari, other iOS browsers, and
   // the packaged app; empty everywhere else). A mob whose GLB is still arriving
@@ -4774,12 +4803,13 @@ async function startGame(
   // frame carries the finished horizon; without this gate a loaded
   // production boot starves the build and the fog lifts tens of seconds
   // into play. On timeout the classic eased flip covers it, as before.
-  const farVistaReady = await renderer.farVistaReady();
+  const farVistaReady = await loadSpanAsync('far-vista-wait', () => renderer.farVistaReady());
   entryDiagnostics.checkpoint('far-vista-ready', {
     ...renderEntryDiagnostics(),
     farVistaReady,
   });
   setLoadingPercent(100, t('loading.enteringWorld'));
+  loadPhaseStart('first-frame-wait');
   await nextPaint();
   last = performance.now();
   // A hidden tab pauses rAF while snapshots keep arriving; reset the pending
@@ -4791,6 +4821,8 @@ async function startGame(
   requestAnimationFrame(() =>
     requestAnimationFrame(() => {
       entryDiagnostics.checkpoint('first-paint');
+      loadPhaseEnd('first-frame-wait');
+      loadPhaseStart('settle-cover');
       // Open the background preload lane now that the first frame is actually on
       // screen: content tagged 'background' (a lazily streamed-in proximity
       // build that tolerates its assets arriving late) never had to share the
@@ -4804,12 +4836,26 @@ async function startGame(
         );
       }
       const revealWorld = (): void => {
+        loadPhaseEnd('settle-cover');
+        loadPhaseStart('curtain-fade');
         hideLoadingScreen();
         // Start the intro clock as the loading screen begins to fade: the camera
         // holds the opening pose until now, so the fade doubles as the cut in.
         if (intro) intro.startedAt = performance.now();
         window.setTimeout(() => {
           gameInputReady = true;
+          loadPhaseEnd('curtain-fade');
+          loadPhaseEnd('entry');
+          const loadProfile = {
+            context: renderEntryDiagnostics(),
+            summary: summarizeLoadProfile(collectLoadSpans(), 'entry'),
+            prewarm: renderer.perfStats().prewarm ?? null,
+          };
+          (window as Window & typeof globalThis & { __loadProfile?: unknown }).__loadProfile =
+            loadProfile;
+          // Dev-channel diagnostic (English on purpose, like [entry-guard]): one
+          // greppable line carrying the whole phase breakdown for probes/devices.
+          console.info(`[load-profile] ${JSON.stringify(loadProfile.summary)}`);
           perf.reset();
           startPerfReporter({
             perf,
@@ -4915,26 +4961,32 @@ async function startOffline(
   seedOverride?: number,
 ): Promise<void> {
   if (!(await prepareWorldEntry())) return;
+  resetLoadProfile();
+  loadPhaseStart('entry');
   enterLoadingState(t('loading.world'));
   // Editor play-test: route terrain + props at the custom world too (the renderer
   // reaches it by module global), in addition to the Sim reading cfg.world.
   if (world) setActiveWorldContent(world);
-  const sim = new Sim({
-    seed: seedOverride ?? WORLD_SEED,
-    playerClass,
-    playerName: name,
-    devCommands: import.meta.env.DEV,
-    // The offline world runs the ranked rift portal scheduler like the live
-    // server (custom editor play-test maps keep it off: their zones differ).
-    riftPortals: world === undefined,
-    valeCupShowcase: true, // idle Sowfield auto-runs a bot exhibition to watch/bet on
-    // Match the live server's proven-safe idle-AI interest throttle. Ordinary
-    // entity rigs are gone by 96 yd and mob aggro caps at 20 yd, so this removes
-    // full-world wilderness AI from the browser's 20 Hz tick without changing
-    // anything visible or interactable.
-    idleMobTickRadius: PLAYER_INTEREST_DROP_RADIUS,
-    world,
-  });
+  const sim = loadSpan(
+    'sim-build',
+    () =>
+      new Sim({
+        seed: seedOverride ?? WORLD_SEED,
+        playerClass,
+        playerName: name,
+        devCommands: import.meta.env.DEV,
+        // The offline world runs the ranked rift portal scheduler like the live
+        // server (custom editor play-test maps keep it off: their zones differ).
+        riftPortals: world === undefined,
+        valeCupShowcase: true, // idle Sowfield auto-runs a bot exhibition to watch/bet on
+        // Match the live server's proven-safe idle-AI interest throttle. Ordinary
+        // entity rigs are gone by 96 yd and mob aggro caps at 20 yd, so this removes
+        // full-world wilderness AI from the browser's 20 Hz tick without changing
+        // anything visible or interactable.
+        idleMobTickRadius: PLAYER_INTEREST_DROP_RADIUS,
+        world,
+      }),
+  );
   sim.setPlayerSkin(sim.playerId, skin);
   // Dev convenience: ?mech drops an offline session straight into the Combat Mech
   // cosmetic body holding a spread of class-usable weapons, to eyeball the held
@@ -6660,6 +6712,9 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
     }
   }
   if (!api.token) throw new Error('online world entry requires an auth token');
+  resetLoadProfile();
+  loadPhaseStart('entry');
+  loadPhaseStart('realm-connect');
   const world = new ClientWorld(api.token, c.id, c.class, api.base, getClientSeed());
   // Wire shareable player cards for this online session: publishing uploads the
   // composited PNG to this realm and returns an absolute public page URL, and
@@ -6684,6 +6739,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
     if (started) return;
     started = true;
     clearInterval(poll);
+    loadPhaseEnd('realm-connect');
     void startGame(world, null, world, `char:${c.id}`, true);
   };
   enterLoadingState(t('loading.connectingRealm'));

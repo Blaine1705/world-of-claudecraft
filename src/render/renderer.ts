@@ -281,6 +281,7 @@ import { ensureDelveInteriorKit } from './interior_kit';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { LightPulses } from './light_pulses';
+import { renderLoadMeasure } from './load_marks';
 import {
   type LocoState,
   type LocoTrack,
@@ -2019,6 +2020,27 @@ export class Renderer {
     this.travelSpeedFx = new TravelSpeedFxPainter(nameplateLayer);
     // biome-ignore format: Keep the established constructor body stable inside the failure guard.
     try {
+    // Dev-channel build-phase telemetry (English, console.info, Release-silent):
+    // the iPhone 17 Pro WebContent kill lands INSIDE this constructor, after
+    // every preload completes, so localizing which build phase tips the memory
+    // ceiling requires a marker between phases. Wall-clock only, no allocation.
+    // Every segment also stamps a 'woc:load:renderer-ctor/<phase>' measure for
+    // the boot profiler (window.__loadProfile), unconditionally: marks are
+    // cheap and the profiler needs them on production-class devices too.
+    const bdStart = performance.now();
+    let bdLast = bdStart;
+    const bd = (phase: string): void => {
+      const now = performance.now();
+      renderLoadMeasure(`renderer-ctor/${phase}`, bdLast, now);
+      // Gated like [load-diag] and the residency table: dev browsers plus the
+      // iOS WebKit profile under diagnosis, never the production web console.
+      if (import.meta.env.DEV || GFX.iosMemoryProfile) {
+        console.info(
+          `[build-diag] ${phase} +${(now - bdLast).toFixed(0)}ms (total ${(now - bdStart).toFixed(0)}ms)`,
+        );
+      }
+      bdLast = now;
+    };
     // The scene root sits at identity forever, but with the default
     // matrixAutoUpdate the root recomposes each frame, which flags
     // matrixWorldNeedsUpdate and FORCE-cascades a matrixWorld multiply through
@@ -2132,6 +2154,7 @@ export class Renderer {
         setGrassGroundBake(null); // headless/stub GL: keep the legacy ground
       }
     }
+    bd('gl-init');
     this.camera = new THREE.PerspectiveCamera(
       CAMERA_BASE_FOV,
       this.viewport.width / this.viewport.height,
@@ -2352,23 +2375,7 @@ export class Renderer {
     // first (a bounded reorder inside each zone build) rather than wherever
     // row-major order happens to reach them. (Sprite clouds are gone: the
     // per-biome HDRI skies carry the cloudscape now.)
-    // Dev-channel build-phase telemetry (English, console.info, Release-silent):
-    // the iPhone 17 Pro WebContent kill now lands INSIDE this constructor, after
-    // every preload completes, so localizing which build phase tips the memory
-    // ceiling requires a marker between phases. Wall-clock only, no allocation.
-    const bdStart = performance.now();
-    let bdLast = bdStart;
-    const bd = (phase: string): void => {
-      const now = performance.now();
-      // Gated like [load-diag] and the residency table: dev browsers plus the
-      // iOS WebKit profile under diagnosis, never the production web console.
-      if (import.meta.env.DEV || GFX.iosMemoryProfile) {
-        console.info(
-          `[build-diag] ${phase} +${(now - bdLast).toFixed(0)}ms (total ${(now - bdStart).toFixed(0)}ms)`,
-        );
-      }
-      bdLast = now;
-    };
+    bd('sky-lights');
     this.terrainView = buildTerrain(this.sim.cfg.seed, {
       x: this.sim.player.pos.x,
       z: this.sim.player.pos.z,
@@ -2850,6 +2857,7 @@ export class Renderer {
       pose.height = v.height * (e?.scale ?? 1);
       return true;
     });
+    bd('scene-misc');
     this.vfx = new Vfx(this.scene, vfxAnchor);
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
     this.bgFx = new BattlegroundFx(this.sim, this.views, this.vfx);
@@ -2970,6 +2978,7 @@ export class Renderer {
       this.lightPulses.pulse(v.group.position, school, intensity, duration, range);
     };
 
+    bd('vfx');
     // Show-jumping racing line: self-scoped course guidance, hidden outside the
     // player's own race (driven per frame from world.mountRaceView() below).
     this.raceLine = new RaceLine(this.scene, this.groundSample);
@@ -2992,6 +3001,7 @@ export class Renderer {
         { gradeOnly: !GFX.composer },
       );
 
+    bd('weather-post');
     window.addEventListener('resize', this.onViewportResize);
     window.addEventListener('orientationchange', this.onOrientationChange);
     window.visualViewport?.addEventListener('resize', this.onViewportResize);
@@ -3460,6 +3470,13 @@ export class Renderer {
       // background prewarm here) piggyback on zone residency, so their own
       // caches are warm before the player can interact with the new zone.
       this.onZonePrepared?.(zone.id);
+      // Boot profiler lanes (aggregated by name across zones, nested under the
+      // caller's phase by containment; the whole-zone span carries the id).
+      renderLoadMeasure(`zone:${zone.id}`, started, prepareDone);
+      renderLoadMeasure('zone-prepare/sky', started, started + skyMs);
+      renderLoadMeasure('zone-prepare/terrain', terrainStarted, terrainDone);
+      renderLoadMeasure('zone-prepare/water', terrainDone, waterDone);
+      renderLoadMeasure('zone-prepare/features', waterDone, featuresDone);
       // On a background prepare skyMs OVERLAPS terrainMs (the lanes run
       // concurrently), so the stages no longer sum to totalMs. Each is still
       // its own lane's wall time, which is what the pacing work reads them for.
