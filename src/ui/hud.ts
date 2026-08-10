@@ -156,6 +156,7 @@ import { ArenaWindow } from './arena_window';
 import { auraDisplayNameFromSource } from './aura_display_name';
 import { type AuraEffectInput, auraEffectDescriptor } from './aura_effect';
 import { auraGainLogKeyFor, findAuraForGainEvent } from './aura_gain_log';
+import { auraIconCssBackground, createAuraIconResolver } from './aura_icon_view';
 import { AuraOverlayController } from './aura_overlay_controller';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AurasDeps, auraCancelNeedsConfirm, createAurasView } from './auras_view';
@@ -233,6 +234,8 @@ import {
   craftOwnsTab,
 } from './crafting_view';
 import { craftCastStripElements, renderCraftingWindow, stationNameText } from './crafting_window';
+import { classCrestId, crestIconUrl } from './crest_icon_art';
+import { hydrateCrestImageFallbacks } from './crest_image_fallback';
 import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow } from './daily_rewards_window';
 import { deathRecapFeedback } from './death_recap_feedback';
@@ -467,7 +470,16 @@ import {
   tOptional,
   tPlural,
 } from './i18n';
-import { hasAuraRecipe, iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
+import {
+  abilityImageUrl,
+  cachedProceduralIconDataUrl,
+  hasAbilityIconIdentity,
+  hasAuraRecipe,
+  iconDataUrl,
+  proceduralIconDataUrl,
+  QUALITY_COLOR,
+  raidMarkerDataUrl,
+} from './icons';
 import { InspectWindow } from './inspect_window';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
@@ -829,6 +841,17 @@ const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.quer
 // painter's repaint gate never fires for it; the constant just pins the key so the
 // gate stays a no-op (target/party pass a per-unit key).
 const PLAYER_PORTRAIT_KEY = 'player';
+const resolveHudAuraIconId = createAuraIconResolver(hasAbilityIconIdentity, hasAuraRecipe);
+const HUD_AURA_STATIC_FALLBACK_URL = crestIconUrl('status_combat');
+if (!HUD_AURA_STATIC_FALLBACK_URL) throw new Error('Missing painted combat-status crest');
+const resolveHudAuraIconUrl = (iconId: string): string =>
+  auraIconCssBackground(
+    iconId,
+    abilityImageUrl,
+    (id) => cachedProceduralIconDataUrl('aura', id),
+    HUD_AURA_STATIC_FALLBACK_URL,
+    (id) => proceduralIconDataUrl('aura', id),
+  );
 // Vale Cup hold-to-charge shoot: full power after this long held, and the charge
 // a NON-held tap (touch / gamepad / a mouse click on the slot) fires at.
 const SHOOT_CHARGE_MS = 850;
@@ -1935,6 +1958,7 @@ export class Hud {
     private keybinds: Keybinds,
     private readonly features: HudFeatures = { dailyRewardsEnabled: true },
   ) {
+    hydrateCrestImageFallbacks(document);
     this.auraOverlayController = new AuraOverlayController({
       writers: this.writerFacet,
       playerClass: this.sim.cfg.playerClass,
@@ -1970,7 +1994,7 @@ export class Hud {
       storage: localStorage,
       isMobileLayout: () => this.isMobileLayout(),
       uiScale: getUiScale,
-      resolveIconUrl: (iconKey) => `url(${iconDataUrl('aura', iconKey)})`,
+      resolveIconUrl: resolveHudAuraIconUrl,
       renderTooltip: (name, remaining, effectHtml) =>
         `<div class="tt-title">${esc(name)}</div>${effectHtml}<div class="tt-sub">${esc(tPlural('hudChrome.plurals.secondsRemaining', Math.ceil(remaining)))}</div>`,
       attachTooltip: (el, html) => this.attachTooltip(el, html),
@@ -2062,7 +2086,7 @@ export class Hud {
         scorePing: (mineScored) => audio.fiestaScorePing(mineScored),
         revive: () => audio.fiestaRevive(),
       },
-      crestIconUrl: (playerClass) => iconDataUrl('crest', playerClass),
+      crestIconUrl: (playerClass) => iconDataUrl('crest', classCrestId(playerClass)),
       random: Math.random,
       schedule: (callback, delayMs) => {
         window.setTimeout(callback, delayMs);
@@ -4156,7 +4180,7 @@ export class Hud {
   // is why the tooltip here is NAME-ONLY: no seconds line, no effect summary.
   private readonly partyAurasDeps: PartyRowAuraDeps = {
     view: {
-      iconId: (a) => (ABILITIES[a.id] || hasAuraRecipe(a.id) ? a.id : `aura_${a.kind}`),
+      iconId: resolveHudAuraIconId,
       auraName: (a) =>
         ABILITIES[a.id] ? abilityDisplayName(ABILITIES[a.id]) : auraDisplayNameFromSource(a.name),
       formatStacks: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
@@ -4169,7 +4193,7 @@ export class Hud {
       isOwn: () => false,
     },
     painter: {
-      resolveIconUrl: (iconKey) => `url(${iconDataUrl('aura', iconKey)})`,
+      resolveIconUrl: resolveHudAuraIconUrl,
       renderTooltip: (name) => `<div class="tt-title">${esc(name)}</div>`,
       attachTooltip: (el, html) => this.attachTooltip(el, html),
     },
@@ -4249,7 +4273,7 @@ export class Hud {
   // switch lands next tick, but the object itself is never reallocated.
   private readonly auraDurationUnits = { s: 's', m: 'm', h: 'h', d: 'd' };
   private readonly aurasViewDeps: AurasDeps = {
-    iconId: (a) => (ABILITIES[a.id] || hasAuraRecipe(a.id) ? a.id : `aura_${a.kind}`),
+    iconId: resolveHudAuraIconId,
     auraName: (a) =>
       ABILITIES[a.id] ? abilityDisplayName(ABILITIES[a.id]) : auraDisplayNameFromSource(a.name),
     formatStacks: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
@@ -4268,7 +4292,7 @@ export class Hud {
     isOwn: (a) => a.sourceId !== undefined && a.sourceId !== 0 && a.sourceId === this.sim.playerId,
   };
   private readonly aurasPainterDeps: AurasPainterDeps = {
-    resolveIconUrl: (iconKey) => `url(${iconDataUrl('aura', iconKey)})`,
+    resolveIconUrl: resolveHudAuraIconUrl,
     // A MODE aura (form, stance, stealth, Ghost Wolf, the carried flag) prints NO
     // seconds-remaining line. The sim backs each with a long finite duration
     // (3600s, or a whole match) purely so nothing can expire it; surfacing that
