@@ -695,9 +695,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // archetype and scene-texture counts; renderer.ts edits only). No capture
 // was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '557c7b28d60232fd18a6343276ad93383ae56ca6b47d8ed86b0645936a2d0c0e';
+  '7a283556fbda69dc6a27d8962bff5c2496d0bfb6f6f38cc5202880894123bc6f';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'a5a84fb2bd4a35b844d7ad47a95304388cd77f485299c670f6997c3a3bc2cf0b';
+  'fa0e09602e492d69fcad8cacc9c1589e1fce36bf836ca95e1d1b4746a1dc4ff5';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1624,10 +1624,16 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
     // archetype and scene-texture counts; renderer.ts edits only). No capture
     // was retaken.
+    // Re-minted for the PR 3159 review-fix wave merged with release/v0.36.0
+    // (post class-overhaul integration): the first-order composite follows
+    // both parents' renderer inputs (composed far-mesh effect overlay,
+    // live-redesign recompose, the sourceGeometries test seam, and the
+    // metamorph/paladin constructor work), then this second-order performance
+    // seal follows the swept evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('ad2b01d1ef2ef83d41ac427152709596b55cca9c4ba5cd2abcf337f0dc72eecd');
+    ).toBe('abd834a3590489a6e988dd118e6d8695b29baaa2e805250fa44e94e738c34a19');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
