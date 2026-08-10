@@ -337,6 +337,9 @@ export const en: EnTranslations = {
       "ruinMeter": "Wrack",
       "ruinStatus": "{value} of {max} Wrack"
     },
+    "comboMeter": {
+      "label": "CP"
+    },
     "spectate": {
       "banner": "Spectating {name}"
     },

@@ -337,6 +337,9 @@ export const de_DE: EnTranslations = {
       "ruinMeter": "Verderben",
       "ruinStatus": "{value} von {max} Verderben"
     },
+    "comboMeter": {
+      "label": "CP"
+    },
     "spectate": {
       "banner": "{name} wird beobachtet"
     },

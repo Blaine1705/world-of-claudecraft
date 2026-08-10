@@ -337,6 +337,9 @@ export const cs_CZ: EnTranslations = {
       "ruinMeter": "Zkáza",
       "ruinStatus": "Zkáza {value} z {max}"
     },
+    "comboMeter": {
+      "label": "CP"
+    },
     "spectate": {
       "banner": "Sleduješ {name}"
     },

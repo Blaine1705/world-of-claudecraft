@@ -28,6 +28,15 @@ export const hudChromeStrings = {
     ruinMeter: 'Wrack',
     ruinStatus: '{value} of {max} Wrack',
   },
+  // Combo Points meter (#combo-row): the 0-5 pip row next to the player frame
+  // for the energy-resource classes. Kept NON-WORDY (no run of four-plus
+  // lowercase after stripping {tokens}) so an English-filled non-Latin locale
+  // does not trip the M16 untranslated-leak guard, the same convention as
+  // unitFrame below. The live "N of max" valuetext reuses the generic
+  // auraEffect.resourceCount status pattern rather than a second wordy key.
+  comboMeter: {
+    label: 'CP',
+  },
   spectate: {
     banner: 'Spectating {name}',
   },

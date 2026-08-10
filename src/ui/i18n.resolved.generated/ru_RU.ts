@@ -337,6 +337,9 @@ export const ru_RU: EnTranslations = {
       "ruinMeter": "Погибель",
       "ruinStatus": "Гибель: {value} из {max}"
     },
+    "comboMeter": {
+      "label": "CP"
+    },
     "spectate": {
       "banner": "Наблюдение за {name}"
     },

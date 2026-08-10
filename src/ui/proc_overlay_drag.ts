@@ -67,7 +67,10 @@ export function serializeOverlayAnchor(a: OverlayAnchor): string {
   return JSON.stringify({ fx: a.fx, fy: a.fy });
 }
 
-/** Move an anchor by a keyboard arrow step and keep the whole overlay on screen. */
+/** Move an anchor by a keyboard arrow step and keep the whole overlay clear of
+ *  the viewport safe area. `safeArea` defaults like clampOverlayAnchor's own
+ *  NO_SAFE_AREA so this stays plain-argument testable; the DOM attacher below
+ *  passes the same safeArea() the pointer-drop path clamps against. */
 export function nudgeOverlayAnchor(
   anchor: OverlayAnchor,
   key: string,
@@ -76,6 +79,7 @@ export function nudgeOverlayAnchor(
   h: number,
   vw: number,
   vh: number,
+  safeArea: OverlaySafeArea = NO_SAFE_AREA,
 ): OverlayAnchor | null {
   let dx = 0;
   let dy = 0;
@@ -84,7 +88,7 @@ export function nudgeOverlayAnchor(
   else if (key === 'ArrowUp') dy = -stepPx;
   else if (key === 'ArrowDown') dy = stepPx;
   else return null;
-  return clampOverlayAnchor(anchor.fx + dx / vw, anchor.fy + dy / vh, w, h, vw, vh);
+  return clampOverlayAnchor(anchor.fx + dx / vw, anchor.fy + dy / vh, w, h, vw, vh, safeArea);
 }
 
 /**
@@ -181,6 +185,7 @@ export function attachOverlayDrag(
       el.offsetHeight || 0,
       window.innerWidth,
       window.innerHeight,
+      safeArea(),
     );
     if (!moved) return;
     anchor = moved;

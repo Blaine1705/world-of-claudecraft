@@ -337,6 +337,9 @@ export const da_DK: EnTranslations = {
       "ruinMeter": "Wrack",
       "ruinStatus": "{value} af {max} Wrack"
     },
+    "comboMeter": {
+      "label": "CP"
+    },
     "spectate": {
       "banner": "Tilskuer til {name}"
     },

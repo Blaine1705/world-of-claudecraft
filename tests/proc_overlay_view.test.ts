@@ -174,7 +174,7 @@ describe('ProcOverlayPainter class mapping', () => {
     const { writers, classes, attrs } = fakeWriters();
     const painter = new ProcOverlayPainter(writers, {} as HTMLElement);
 
-    painter.paintNecromancyCharges(3);
+    painter.paintNecromancyCharges(3, 'Soul Fragments', '3 of 5 Soul Fragments');
     expect(classes.get('necromancy')).toBe(true);
     expect(classes.get('n1')).toBe(true);
     expect(classes.get('n2')).toBe(true);
@@ -187,20 +187,36 @@ describe('ProcOverlayPainter class mapping', () => {
     expect(attrs.get('aria-hidden')).toBe('false');
     expect(attrs.get('aria-valuenow')).toBe('3');
 
-    painter.paintNecromancyCharges(5);
+    painter.paintNecromancyCharges(5, 'Soul Fragments', '5 of 5 Soul Fragments');
     expect(classes.get('n4')).toBe(true);
     expect(classes.get('n5')).toBe(true);
 
-    painter.paintNecromancyCharges(0);
+    painter.paintNecromancyCharges(0, 'Soul Fragments', '0 of 5 Soul Fragments');
     expect(classes.get('necromancy')).toBe(true);
     expect(classes.get('n1')).toBe(false);
     expect(classes.get('n5')).toBe(false);
   });
 
+  it('exposes a live valuetext distinct from the stable meter label', () => {
+    // The regression this pins: aria-valuetext used to be set to the SAME
+    // static label as aria-label, which masked aria-valuenow from screen
+    // readers (the count never changed even as n changed). aria-label must
+    // stay the stable meter name while aria-valuetext tracks n every call.
+    const { writers, attrs } = fakeWriters();
+    const painter = new ProcOverlayPainter(writers, {} as HTMLElement);
+
+    for (let amount = 0; amount <= 5; amount++) {
+      painter.paintNecromancyCharges(amount, 'Soul Fragments', `${amount} of 5 Soul Fragments`);
+      expect(attrs.get('aria-valuenow')).toBe(String(amount));
+      expect(attrs.get('aria-valuetext')).toBe(`${amount} of 5 Soul Fragments`);
+      expect(attrs.get('aria-label')).toBe('Soul Fragments');
+    }
+  });
+
   it('clears every Necromancy class when another theme takes ownership', () => {
     const { writers, classes, attrs } = fakeWriters();
     const painter = new ProcOverlayPainter(writers, {} as HTMLElement);
-    painter.paintNecromancyCharges(5);
+    painter.paintNecromancyCharges(5, 'Soul Fragments', '5 of 5 Soul Fragments');
 
     painter.paintFrostCharges(2);
     expect(classes.get('necromancy')).toBe(false);
@@ -238,14 +254,14 @@ describe('ProcOverlayPainter class mapping', () => {
     const painter = new ProcOverlayPainter(writers, {} as HTMLElement);
     painter.paintDestructionMarks(5, 'Ruin', '5 of 5 Ruin');
 
-    painter.paintNecromancyCharges(2, 'Soul Fragments');
+    painter.paintNecromancyCharges(2, 'Soul Fragments', '2 of 5 Soul Fragments');
     expect(classes.get('destruction')).toBe(false);
     for (let mark = 1; mark <= 5; mark++) {
       expect(classes.get(`r${mark}`)).toBe(false);
     }
     expect(classes.get('necromancy')).toBe(true);
     expect(attrs.get('aria-label')).toBe('Soul Fragments');
-    expect(attrs.get('aria-valuetext')).toBe('Soul Fragments');
+    expect(attrs.get('aria-valuetext')).toBe('2 of 5 Soul Fragments');
   });
 
   it('clears every Destruction mark from each non-Destruction painter path', () => {
@@ -253,7 +269,8 @@ describe('ProcOverlayPainter class mapping', () => {
       (painter: ProcOverlayPainter) => painter.paint('hot'),
       (painter: ProcOverlayPainter) => painter.paintChronoCharges(2),
       (painter: ProcOverlayPainter) => painter.paintFrostCharges(2),
-      (painter: ProcOverlayPainter) => painter.paintNecromancyCharges(2, 'Soul Fragments'),
+      (painter: ProcOverlayPainter) =>
+        painter.paintNecromancyCharges(2, 'Soul Fragments', '2 of 5 Soul Fragments'),
     ];
 
     for (const paintOtherTheme of paintOtherThemes) {

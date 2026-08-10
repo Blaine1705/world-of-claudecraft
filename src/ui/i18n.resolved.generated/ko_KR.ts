@@ -337,6 +337,9 @@ export const ko_KR: EnTranslations = {
       "ruinMeter": "파멸",
       "ruinStatus": "파멸 {value}/{max}"
     },
+    "comboMeter": {
+      "label": "CP"
+    },
     "spectate": {
       "banner": "{name} 관전 중"
     },

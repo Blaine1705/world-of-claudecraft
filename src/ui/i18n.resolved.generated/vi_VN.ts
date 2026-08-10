@@ -337,6 +337,9 @@ export const vi_VN: EnTranslations = {
       "ruinMeter": "Wrack",
       "ruinStatus": "{value} trên {max} Wrack"
     },
+    "comboMeter": {
+      "label": "CP"
+    },
     "spectate": {
       "banner": "Đang xem {name}"
     },

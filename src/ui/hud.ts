@@ -299,6 +299,7 @@ import { blockFctAmountText } from './fct_core';
 import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
 import { FocusManager, type FocusTrapHandle } from './focus_manager';
+import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
 import {
   PARTY_FRAME_POS_KEY,
   PLAYER_FRAME_POS_KEY,
@@ -8209,10 +8210,11 @@ export class Hud {
     bar.style.display = 'flex';
     if (sig === this.lastPetBarSig) return;
     this.lastPetBarSig = sig;
-    const focusedPetAction =
-      document.activeElement instanceof HTMLButtonElement && bar.contains(document.activeElement)
-        ? document.activeElement.dataset.petAction
-        : undefined;
+    // Focus carry-across through the shared helper (focus_restore.ts, #2528):
+    // captureFocusKey owns the activeElement narrowing and the containment
+    // check, so this rebuild never steals focus from another open window that
+    // happens to reuse the same data-focus-key value.
+    const focusedPetActionKey = captureFocusKey(bar);
     bar.innerHTML = '';
     const commands = document.createElement('div');
     commands.className = 'petbar-group';
@@ -8245,7 +8247,7 @@ export class Hud {
     ) => {
       const btn = document.createElement('button');
       btn.className = 'pet-btn';
-      btn.dataset.petAction = opts.focusKey ?? iconId;
+      btn.dataset.focusKey = opts.focusKey ?? iconId;
       if (opts.active) btn.classList.add('active');
       if (opts.autocast) btn.classList.add('autocast');
       if (opts.cooldownText) btn.classList.add('cooldown');
@@ -8396,12 +8398,21 @@ export class Hud {
       parent.appendChild(btn);
     };
     const restorePetBarFocus = () => {
-      if (!focusedPetAction) return;
+      if (!focusedPetActionKey) return;
+      // Finding the rebuilt equivalent stays the caller's own ladder (the
+      // shared helper only owns the walk + disabled skip); the pet bar has no
+      // degradation rungs, just the one exact action the player was on.
       const replacement = [...bar.querySelectorAll<HTMLButtonElement>('.pet-btn')].find(
-        (button) => button.dataset.petAction === focusedPetAction,
+        (button) => button.dataset.focusKey === focusedPetActionKey,
       );
+      // suppressFocusTooltip is attachTooltip's own side channel (below), kept
+      // as a direct write on the resolved button. Dropping the prior
+      // `{ preventScroll: true }` is safe: restoreFirstEnabled's bare focus()
+      // is the seam's policy, and #petbar is fixed HUD chrome outside any
+      // scrollable ancestor, so a re-focused button never needs a scroll
+      // correction.
       if (replacement) replacement.dataset.suppressFocusTooltip = 'true';
-      replacement?.focus({ preventScroll: true });
+      restoreFirstEnabled([replacement]);
     };
     addButton(
       commands,
@@ -8837,11 +8848,21 @@ export class Hud {
     // with their own identity are rendered by dedicated HUD overlays below.
     if (p.resourceType === 'energy') {
       this.setDisplay(this.comboRowEl, 'flex');
-      const secondaryLabel = t('abilityUi.tooltip.requiresCombo');
       this.writerFacet.setAttr(this.comboRowEl, 'aria-hidden', 'false');
       this.writerFacet.setAttr(this.comboRowEl, 'aria-valuenow', String(p.comboPoints));
-      this.writerFacet.setAttr(this.comboRowEl, 'aria-valuetext', secondaryLabel);
-      this.writerFacet.setAttr(this.comboRowEl, 'aria-label', secondaryLabel);
+      // aria-valuetext is the LIVE "N of max" status (the count a screen reader
+      // needs); aria-label is the stable meter name. The two used to be the
+      // same static tooltip-cost sentence ("Consumes combo points"), which
+      // masked aria-valuenow entirely and misnamed the meter.
+      this.writerFacet.setAttr(
+        this.comboRowEl,
+        'aria-valuetext',
+        t('hudChrome.auraEffect.resourceCount', {
+          value: p.comboPoints,
+          max: COMBO_PIP_COUNT,
+        }),
+      );
+      this.writerFacet.setAttr(this.comboRowEl, 'aria-label', t('hudChrome.comboMeter.label'));
       if (this.comboRowEl.children.length !== COMBO_PIP_COUNT) {
         this.comboRowEl.innerHTML = '';
         for (let i = 0; i < COMBO_PIP_COUNT; i++) {
@@ -9180,9 +9201,11 @@ export class Hud {
     // Heating Up / Hot Streak rule. Both routes clear the other's classes, so a
     // spec swap never strands a half-lit bird.
     if (this.sim.talentSpec === 'demonology') {
+      const soulFragments = necromancyOverlayCharges(p.auras);
       this.procOverlayPainter.paintNecromancyCharges(
-        necromancyOverlayCharges(p.auras),
+        soulFragments,
         t('hudChrome.procOverlay.soulFragmentsMeter'),
+        t('hudChrome.auraEffect.resourceCount', { value: soulFragments, max: 5 }),
       );
     } else if (this.sim.talentSpec === 'destruction') {
       const ruinPips = destructionRuinPips(this.sim.talentSpec, p.auras);

@@ -112,15 +112,16 @@ export class ProcOverlayPainter {
   }
 
   // Necromancy variant: keep the empty bank visible as a dim placement guide,
-  // then light one violet crystal per held Soul Fragment.
-  paintNecromancyCharges(n: number, label?: string): void {
+  // then light one violet crystal per held Soul Fragment. `status` is the live
+  // "N of max" valuetext (see paintDestructionMarks below); `label` is the
+  // stable meter name and stays on aria-label only, never duplicated onto
+  // aria-valuetext (that masked aria-valuenow for screen-reader users).
+  paintNecromancyCharges(n: number, label: string, status: string): void {
     this.writers.setAttr(this.root, 'aria-hidden', 'false');
     this.writers.setAttr(this.root, 'tabindex', '0');
     this.writers.setAttr(this.root, 'aria-valuenow', String(n));
-    if (label) {
-      this.writers.setAttr(this.root, 'aria-valuetext', label);
-      this.writers.setAttr(this.root, 'aria-label', label);
-    }
+    this.writers.setAttr(this.root, 'aria-valuetext', status);
+    this.writers.setAttr(this.root, 'aria-label', label);
     this.writers.toggleClass(this.root, 'heating', false);
     this.writers.toggleClass(this.root, 'hot', false);
     this.writers.toggleClass(this.root, 'combustion', false);

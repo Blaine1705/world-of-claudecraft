@@ -337,6 +337,9 @@ export const id_ID: EnTranslations = {
       "ruinMeter": "Wrack",
       "ruinStatus": "{value} dari {max} Wrack"
     },
+    "comboMeter": {
+      "label": "CP"
+    },
     "spectate": {
       "banner": "Menonton {name}"
     },

@@ -337,6 +337,9 @@ export const ja_JP: EnTranslations = {
       "ruinMeter": "破滅",
       "ruinStatus": "破滅 {value}/{max}"
     },
+    "comboMeter": {
+      "label": "CP"
+    },
     "spectate": {
       "banner": "{name}を観戦中"
     },

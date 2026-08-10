@@ -337,6 +337,9 @@ export const en_XA: EnTranslations = {
       "ruinMeter": "[Ŵŕáçķ]",
       "ruinStatus": "[{value} óƒ {max} Ŵŕáçķ]"
     },
+    "comboMeter": {
+      "label": "[ÇÞ]"
+    },
     "spectate": {
       "banner": "[Šþéçţáţíñĝ {name}]"
     },

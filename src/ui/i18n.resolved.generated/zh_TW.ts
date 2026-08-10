@@ -337,6 +337,9 @@ export const zh_TW: EnTranslations = {
       "ruinMeter": "毀滅",
       "ruinStatus": "毀滅 {value}/{max}"
     },
+    "comboMeter": {
+      "label": "CP"
+    },
     "spectate": {
       "banner": "正在觀察 {name}"
     },

@@ -7786,6 +7786,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.claudium.unavailable'
   | 'hudChrome.claudium.usdcBalance'
   | 'hudChrome.claudium.wocBalance'
+  | 'hudChrome.comboMeter.label'
   | 'hudChrome.commissionBoard.acceptButton'
   | 'hudChrome.commissionBoard.accepted'
   | 'hudChrome.commissionBoard.acceptedBy'

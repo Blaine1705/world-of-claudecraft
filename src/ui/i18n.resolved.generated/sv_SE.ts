@@ -337,6 +337,9 @@ export const sv_SE: EnTranslations = {
       "ruinMeter": "Wrack",
       "ruinStatus": "{value} av {max} Wrack"
     },
+    "comboMeter": {
+      "label": "CP"
+    },
     "spectate": {
       "banner": "Åskådar {name}"
     },

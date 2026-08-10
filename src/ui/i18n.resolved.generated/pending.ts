@@ -579,6 +579,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.comboMeter.label",
     "hudChrome.options.showPlaytime",
     "hudChrome.perf.diagnostics.aria.findings",
     "hudChrome.perf.diagnostics.aria.liveMeasurements",
@@ -1306,6 +1307,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.comboMeter.label",
     "hudChrome.options.showPlaytime",
     "hudChrome.perf.diagnostics.aria.findings",
     "hudChrome.perf.diagnostics.aria.liveMeasurements",
@@ -2035,6 +2037,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.comboMeter.label",
     "hudChrome.options.showPlaytime",
     "hudChrome.perf.diagnostics.aria.findings",
     "hudChrome.perf.diagnostics.aria.liveMeasurements",
@@ -2764,6 +2767,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.comboMeter.label",
     "hudChrome.options.showPlaytime",
     "hudChrome.perf.diagnostics.aria.findings",
     "hudChrome.perf.diagnostics.aria.liveMeasurements",
@@ -3493,6 +3497,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.comboMeter.label",
     "hudChrome.options.showPlaytime",
     "hudChrome.perf.diagnostics.aria.findings",
     "hudChrome.perf.diagnostics.aria.liveMeasurements",
@@ -4220,6 +4225,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.comboMeter.label",
     "hudChrome.options.showPlaytime",
     "hudChrome.perf.diagnostics.aria.findings",
     "hudChrome.perf.diagnostics.aria.liveMeasurements",
@@ -4385,7 +4391,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.howToPlay.step0Title",
     "guide.interfacePage.framePetTitle",
     "guide.interfacePage.winBagsTitle",
-    "guide.riftsPage.rankFmt"
+    "guide.riftsPage.rankFmt",
+    "hudChrome.comboMeter.label"
   ],
   "zh_TW": [
     "guide.classPage.formName.form_cat",
@@ -4395,7 +4402,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.howToPlay.step0Title",
     "guide.interfacePage.framePetTitle",
     "guide.interfacePage.winBagsTitle",
-    "guide.riftsPage.rankFmt"
+    "guide.riftsPage.rankFmt",
+    "hudChrome.comboMeter.label"
   ],
   "ko_KR": [
     "guide.classPage.formName.form_cat",
@@ -4405,7 +4413,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.howToPlay.step0Title",
     "guide.interfacePage.framePetTitle",
     "guide.interfacePage.winBagsTitle",
-    "guide.riftsPage.rankFmt"
+    "guide.riftsPage.rankFmt",
+    "hudChrome.comboMeter.label"
   ],
   "ja_JP": [
     "guide.classPage.formName.form_cat",
@@ -4415,7 +4424,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.howToPlay.step0Title",
     "guide.interfacePage.framePetTitle",
     "guide.interfacePage.winBagsTitle",
-    "guide.riftsPage.rankFmt"
+    "guide.riftsPage.rankFmt",
+    "hudChrome.comboMeter.label"
   ],
   "pt_BR": [
     "entities.abilities.intervene.description",
@@ -4987,6 +4997,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.comboMeter.label",
     "hudChrome.options.showPlaytime",
     "hudChrome.perf.diagnostics.aria.findings",
     "hudChrome.perf.diagnostics.aria.liveMeasurements",
@@ -5152,7 +5163,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.howToPlay.step0Title",
     "guide.interfacePage.framePetTitle",
     "guide.interfacePage.winBagsTitle",
-    "guide.riftsPage.rankFmt"
+    "guide.riftsPage.rankFmt",
+    "hudChrome.comboMeter.label"
   ],
   "cs_CZ": [
     "entities.abilities.intervene.description",
@@ -5724,6 +5736,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.comboMeter.label",
     "hudChrome.options.showPlaytime",
     "hudChrome.perf.diagnostics.aria.findings",
     "hudChrome.perf.diagnostics.aria.liveMeasurements",
@@ -6451,6 +6464,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.comboMeter.label",
     "hudChrome.options.showPlaytime",
     "hudChrome.perf.diagnostics.aria.findings",
     "hudChrome.perf.diagnostics.aria.liveMeasurements",
@@ -7178,6 +7192,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.comboMeter.label",
     "hudChrome.options.showPlaytime",
     "hudChrome.perf.diagnostics.aria.findings",
     "hudChrome.perf.diagnostics.aria.liveMeasurements",
@@ -7905,6 +7920,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.comboMeter.label",
     "hudChrome.options.showPlaytime",
     "hudChrome.perf.diagnostics.aria.findings",
     "hudChrome.perf.diagnostics.aria.liveMeasurements",
@@ -8632,6 +8648,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.comboMeter.label",
     "hudChrome.options.showPlaytime",
     "hudChrome.perf.diagnostics.aria.findings",
     "hudChrome.perf.diagnostics.aria.liveMeasurements",
@@ -9359,6 +9376,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.comboMeter.label",
     "hudChrome.options.showPlaytime",
     "hudChrome.perf.diagnostics.aria.findings",
     "hudChrome.perf.diagnostics.aria.liveMeasurements",
@@ -10086,6 +10104,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.comboMeter.label",
     "hudChrome.options.showPlaytime",
     "hudChrome.perf.diagnostics.aria.findings",
     "hudChrome.perf.diagnostics.aria.liveMeasurements",
@@ -10813,6 +10832,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.comboMeter.label",
     "hudChrome.options.showPlaytime",
     "hudChrome.perf.diagnostics.aria.findings",
     "hudChrome.perf.diagnostics.aria.liveMeasurements",

@@ -71,4 +71,48 @@ describe('nudgeOverlayAnchor', () => {
       fy: 0.145,
     });
   });
+
+  it('clamps a nudge into an inset region, mirroring the pointer-drop clamp', () => {
+    // attachOverlayDrag's pointer-drop path (`apply`) already passes safeArea()
+    // to clampOverlayAnchor; the keyboard path must clamp against the same
+    // inset, not the bare viewport edge, or an arrow-key move can park the
+    // overlay under a notch/home-indicator safe-area cutout (#pr3050).
+    const safeArea = { top: 0, right: 44, bottom: 21, left: 12 };
+    const nudgedLeft = nudgeOverlayAnchor(
+      { fx: 0.1, fy: 0.5 },
+      'ArrowLeft',
+      500,
+      72,
+      72,
+      844,
+      390,
+      safeArea,
+    );
+    expect(nudgedLeft?.fx).toBeCloseTo((12 + 36) / 844);
+    const nudgedRight = nudgeOverlayAnchor(
+      { fx: 0.9, fy: 0.5 },
+      'ArrowRight',
+      500,
+      72,
+      72,
+      844,
+      390,
+      safeArea,
+    );
+    expect(nudgedRight?.fx).toBeCloseTo((844 - 44 - 36) / 844);
+  });
+
+  it('defaults to no safe area when the caller omits one', () => {
+    // Backward compatible with every pre-existing call above (none pass a
+    // safeArea argument): the pure function still behaves exactly like the
+    // bare-viewport clamp when there is nothing to avoid.
+    expect(nudgeOverlayAnchor({ fx: 0, fy: 0 }, 'ArrowLeft', 10, 300, 232, 1000, 800)).toEqual(
+      nudgeOverlayAnchor({ fx: 0, fy: 0 }, 'ArrowLeft', 10, 300, 232, 1000, 800, {
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+      }),
+    );
+  });
 });

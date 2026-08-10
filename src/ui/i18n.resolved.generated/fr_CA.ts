@@ -337,6 +337,9 @@ export const fr_CA: EnTranslations = {
       "ruinMeter": "Ruine",
       "ruinStatus": "{value} sur {max} Ruine"
     },
+    "comboMeter": {
+      "label": "CP"
+    },
     "spectate": {
       "banner": "Vous observez {name}"
     },

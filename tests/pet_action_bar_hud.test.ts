@@ -20,6 +20,16 @@ vi.mock('../src/ui/icons', () => ({
   iconDataUrl: (kind: string, id: string) => `mock:${kind}:${id}`,
   QUALITY_COLOR: {},
   raidMarkerDataUrl: vi.fn(() => ''),
+  // hud.ts dereferences these two at MODULE scope (createAuraIconResolver's
+  // call site), not just inside a method, so a mock missing either throws
+  // "No export is defined" the instant hud.ts is imported, before any test
+  // body runs. The other three are only read inside methods this suite never
+  // calls, but are stubbed too so a future call path does not repeat the hunt.
+  abilityImageUrl: vi.fn(() => null),
+  cachedProceduralIconDataUrl: vi.fn((kind: string, id: string) => `mock:${kind}:${id}`),
+  hasAbilityIconIdentity: vi.fn(() => false),
+  hasAuraRecipe: vi.fn(() => false),
+  proceduralIconDataUrl: vi.fn((kind: string, id: string) => `mock:${kind}:${id}`),
 }));
 
 import { Hud } from '../src/ui/hud';
@@ -213,7 +223,7 @@ describe('Hud Warlock pet signature bar', () => {
 
     const replacement = document.querySelector<HTMLButtonElement>('[title="Felbolt"]');
     expect(document.activeElement).toBe(replacement);
-    expect(replacement?.dataset.petAction).toBe('emberkin_felbolt');
+    expect(replacement?.dataset.focusKey).toBe('emberkin_felbolt');
     expect(replacement?.dataset.suppressFocusTooltip).toBe('true');
   });
 

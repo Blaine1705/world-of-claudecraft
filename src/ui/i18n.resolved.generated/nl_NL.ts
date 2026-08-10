@@ -337,6 +337,9 @@ export const nl_NL: EnTranslations = {
       "ruinMeter": "Ruïne",
       "ruinStatus": "{value} van {max} Ruïne"
     },
+    "comboMeter": {
+      "label": "CP"
+    },
     "spectate": {
       "banner": "Toeschouwer bij {name}"
     },

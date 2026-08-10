@@ -337,6 +337,9 @@ export const it_IT: EnTranslations = {
       "ruinMeter": "Rovina",
       "ruinStatus": "{value} su {max} Rovina"
     },
+    "comboMeter": {
+      "label": "CP"
+    },
     "spectate": {
       "banner": "Stai osservando {name}"
     },

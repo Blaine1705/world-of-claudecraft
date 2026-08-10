@@ -337,6 +337,9 @@ export const tr_TR: EnTranslations = {
       "ruinMeter": "Harabiyet",
       "ruinStatus": "{value} / {max} Harabiyet"
     },
+    "comboMeter": {
+      "label": "CP"
+    },
     "spectate": {
       "banner": "{name} izleniyor"
     },
