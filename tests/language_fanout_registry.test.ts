@@ -97,6 +97,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.playerFrameMover.relocalize|',
   'this.partyFrameMover.relocalize|',
   'this.targetAurasWindow.relocalize|',
+  'this.doomMeter.relocalize|',
   'this.questlogWindow.render|this.questlogWindow.isOpen',
   "this.renderBags|$('#bags').style.display !== 'none'",
   // The four service windows (copper vendor, heroic quartermaster, train,

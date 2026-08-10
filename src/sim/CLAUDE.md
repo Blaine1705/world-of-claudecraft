@@ -70,6 +70,14 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `combat/auto_attack.ts` | start/stop/update auto-attack, `meleeSwing`, `rangedSwing` |
 | `combat/equip_procs.ts` + `combat/set_procs.ts` | legendary weapon on-action procs; item-set bonus procs |
 | `combat/empower_next.ts` + `combat/thorns_charge.ts` | next-cast empower/free aura consumption; charge-limited thorns |
+| `combat/paladin_veilbound_march.ts` + `combat/paladin_veilbound_state.ts` | Veilbound March activation, traversal marks, final wave, and its pure active-state predicate |
+| `combat/paladin_valkyrs_calling.ts` + `combat/paladin_valkyrs_calling_state.ts` | Valkyr's Calling ascent, approach flight, descent, immunity window, and landing impact |
+| `combat/paladin_sun_verdict.ts` | Verdict of the Sun God mark ownership, charge progression, detonation, and cleanup |
+| `combat/paladin_radiant_resonance.ts` | Radiant Chorus effective-target gate and the shared Mending Light or Dawn's Embrace proc |
+| `combat/paladin_solar_reprisal.ts` | Protection block/Vowkeeper proc rolls and the shared Sunward Disc, Hammer of Grace, or Mending Light override |
+| `combat/paladin_dawns_wrath.ts` | Retribution auto-attack/Final Edict proc and the stored extra Hammer of Wrath cast |
+| `combat/paladin_sunward_disc.ts` | Sunward Disc local ricochet selection, arrival-time damage, and per-impact Devotion |
+| `combat/warlock_talents.ts` | shared Warlock class-talent state: Leaden Hex, Shadow Credit, Ashen Focus, Unbroken Ritual, Forbidden Reflection, and Sacrilegious March |
 | `projectile_travel.ts` | in-flight homing projectiles: `pendingProjectiles` + the prologue `advancePendingProjectiles` phase |
 | `progression/xp.ts` | `prestige`, rested-XP, `isResting` |
 | `progression/talents.ts` | `applyTalents`/`spendTalent`/`setSpec`/`respec`/loadouts/`recomputeTalents` |
@@ -153,7 +161,9 @@ because `bgEnd` is a personal event),
 oldest-due drain; stamped per-spawn by `rift/runs.ts`, consumed by the
 `runMobAttackMechanics` drivers),
 `lockpick.ts` (the minigame core behind `delves/lockpick_controller.ts`), `map_doc.ts`
-(the custom-map document/validator), `geometry2d.ts`, `market_query.ts`,
+(the custom-map document/validator), `mana_regen.ts` (the Spirit mana-regen formula, full
+out of combat and the "mp5" combat share, shared by the tick, the readout, and the sheet),
+`geometry2d.ts`, `market_query.ts`,
 `market_listing_ids.ts` (the World Market's id allocator: the reserved house band plus
 the load-time reissue that keeps one row per id),
 `vendor_stack.ts`, `vendor_buy_stack.ts` (vendor purchase quantity math: the bulk verb,
