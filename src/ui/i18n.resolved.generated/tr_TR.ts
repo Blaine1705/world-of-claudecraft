@@ -4595,7 +4595,7 @@ export const tr_TR: EnTranslations = {
       "worldBossTerm": "Dünya şefi",
       "worldBossDef": "Açık dünyada düzenli bir ritimle yükselen, akın gücünde bir şef; sabit bir grup yerine, çağrıya toplanan herkesçe dövüşülür.",
       "fiveSecondTerm": "Beş saniye kuralı",
-      "fiveSecondDef": "Manan, en son harcamandan bu yana beş saniye geçmeden kendiliğinden dolmaya başlamaz. Büyücülerin dört bir yandan büyü yağdırmak yerine kendilerini ayarlamalarının nedeni budur.",
+      "fiveSecondDef": "Manan, en son harcamandan bu yana beş saniye geçmeden tam hızıyla dolmaya başlamaz. O ana kadar da büsbütün durmaz, düşük bir hızla dolmayı sürdürür. Büyücülerin dört bir yandan büyü yağdırmak yerine kendilerini ayarlamalarının nedeni budur.",
       "talentRowTerm": "Yetenek sırası",
       "talentRowDef": "Yetenekler altı sıra halinde gelir, biri 5, 8, 11, 14, 17 ve 20. seviyelerin her birinde. Her sıra üç seçenek sunar ve sen bunlardan birini alırsın, yani biriktirilecek ya da harcanacak puan yoktur.",
       "riftTerm": "Yarık",
@@ -5193,7 +5193,8 @@ export const tr_TR: EnTranslations = {
       "resetNote": "Yeteneklerinizi, dövüş dışında olduğunuz ve bir arena maçında olmadığınız her an sıfırlayabilirsiniz, bu yüzden erken bir seçim asla bir tuzak değildir. Bir şeyler deneyin, neyi sevdiğinizi görün ve fikrinizi serbestçe değiştirin.",
       "specsHeading": "Sınıfa göre uzmanlıklar",
       "specsBody": "Her sınıfın, her biri kendi rolüne ve kendine özgü bir odağına sahip birkaç uzmanlığı vardır. Yetenek panelinde birini seçmek, ona özgü bir imza yeteneği ve kalıcı bir ustalık kazandırır. İşte hepsinin genel görünümü. Tam donanımı için bir sınıfı açın.",
-      "loadoutNote": "Tek bir yapıda karar kılmak zorunda değilsiniz. Panelde adlandırılmış bir düzen kaydedin: hem seçimlerinizi hem de eylem çubuğunuzu hatırlar, böylece bir başkasına geçmek tek bir tıklamadır, tıpkı bir sıfırlamadaki gibi aynı kurala bağlı olarak: dövüş dışında olmanız ve bir arena maçında ya da bir savaş alanında bulunmamanız gerekir."
+      "loadoutNote": "Tek bir yapıda karar kılmak zorunda değilsiniz. Panelde adlandırılmış bir düzen kaydedin: hem seçimlerinizi hem de eylem çubuğunuzu hatırlar, böylece bir başkasına geçmek tek bir tıklamadır, tıpkı bir sıfırlamadaki gibi aynı kurala bağlı olarak: dövüş dışında olmanız ve bir arena maçında bulunmamanız gerekir.",
+      "loadoutGearNote": "A layout can carry your gear as well. Save it with the entry that offers to keep your gear too and it also records what you were wearing, which is what makes a PvP set and a dungeon set one click apart instead of sixteen. It remembers the exact piece rather than merely its name, so an enchanted ring is never quietly swapped for the plain twin sitting beside it in your bags. Anything it cannot find when you switch back is simply left alone and reported, so a set that lost a piece to the bank or the market still equips everything else."
     },
     "arenaPage": {
       "heading": "Arena ve PvP",
@@ -5228,6 +5229,9 @@ export const tr_TR: EnTranslations = {
       "respawnBody": "Ölüm klasik töreni korur: bedenin, SEN serbest bırakana kadar düştüğü yerde kalır ve ruh, kalenin yanındaki çevrili mezarlıkta yükselir; orada takımının bir sonraki diriliş dalgasına kadar korunursun. Dalga bekleyen her ruhu birlikte diriltir ve iki takımın dalgaları kasıtlı olarak kaydırılmıştır, böylece dövüş asla bir anda tamamen sıfırlanmaz. Ceset koşusu ya da Ruh Şifacısı pazarlığı yoktur: serbest bırak, dalgayı bekle, dövüş.",
       "carrierHeading": "Sancağı taşımak",
       "carrierBody": "Düşman sancağını çok uzun süre taşıyan bir taşıyıcı gittikçe daha savunmasız hale gelir; sancak ele geçirilene, bırakılana ya da geri dönene kadar giderek artan hasar alır. Sancakla saklanmak kaybettiren bir plandır; onu eve koşturmak ise kazandıran plandır.",
+      "leavingHeading": "Leaving early, and filling an empty seat",
+      "leavingBody": "Quitting a match under way is deserting it, and a rated ladder cannot reward pulling the plug on a losing scoreline: a deserter takes the loss and the rating that goes with it there and then, drops the flag if they were carrying it, and their team fights on a player short. That last part is what the empty seat is for. While a match is short a fighter, the queue can offer the chair to somebody waiting, and it is always an offer you accept or decline rather than a teleport that happens to you; declining costs you nothing and passes it to the next in line. Only solo queuers are asked, so a party that queued together is never split up to fill a hole.",
+      "backfillNote": "Taking a backfill seat is deliberately free of risk: you drop into a scoreline you had no hand in, so the match does not touch your rating either way, win or lose, and leaving one owes nothing. The offer also stops coming once a match is close enough to finished that an arrival could not change it, so you are never seated into somebody else's ending.",
       "ladderHeading": "Merdiven",
       "ladderBody": "Her maç, kazan ya da kaybet, kalıcı bir karakter başı savaş alanı derecesini değiştirir ve tüm zamanlar tablosu diyar şampiyonlarını sıralar. Galibiyetler ve zorlu mağlubiyetler de Harp sistemi üzerinden Onur öder.",
       "rewardsHeading": "Bir maçın ödülleri",

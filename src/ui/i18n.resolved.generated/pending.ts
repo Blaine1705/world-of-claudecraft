@@ -9,25 +9,100 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "guide.talentsPage.loadoutGearNote",
+    "guide.thornhollowPage.backfillNote",
+    "guide.thornhollowPage.leavingBody",
+    "guide.thornhollowPage.leavingHeading"
+  ],
+  "es_ES": [
+    "guide.talentsPage.loadoutGearNote",
+    "guide.thornhollowPage.backfillNote",
+    "guide.thornhollowPage.leavingBody",
+    "guide.thornhollowPage.leavingHeading"
+  ],
+  "fr_FR": [
+    "guide.talentsPage.loadoutGearNote",
+    "guide.thornhollowPage.backfillNote",
+    "guide.thornhollowPage.leavingBody",
+    "guide.thornhollowPage.leavingHeading"
+  ],
+  "fr_CA": [
+    "guide.talentsPage.loadoutGearNote",
+    "guide.thornhollowPage.backfillNote",
+    "guide.thornhollowPage.leavingBody",
+    "guide.thornhollowPage.leavingHeading"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "guide.talentsPage.loadoutGearNote",
+    "guide.thornhollowPage.backfillNote",
+    "guide.thornhollowPage.leavingBody",
+    "guide.thornhollowPage.leavingHeading"
+  ],
+  "de_DE": [
+    "guide.talentsPage.loadoutGearNote",
+    "guide.thornhollowPage.backfillNote",
+    "guide.thornhollowPage.leavingBody",
+    "guide.thornhollowPage.leavingHeading"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "guide.talentsPage.loadoutGearNote",
+    "guide.thornhollowPage.backfillNote",
+    "guide.thornhollowPage.leavingBody",
+    "guide.thornhollowPage.leavingHeading"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "guide.talentsPage.loadoutGearNote",
+    "guide.thornhollowPage.backfillNote",
+    "guide.thornhollowPage.leavingBody",
+    "guide.thornhollowPage.leavingHeading"
+  ],
+  "nl_NL": [
+    "guide.talentsPage.loadoutGearNote",
+    "guide.thornhollowPage.backfillNote",
+    "guide.thornhollowPage.leavingBody",
+    "guide.thornhollowPage.leavingHeading"
+  ],
+  "pl_PL": [
+    "guide.talentsPage.loadoutGearNote",
+    "guide.thornhollowPage.backfillNote",
+    "guide.thornhollowPage.leavingBody",
+    "guide.thornhollowPage.leavingHeading"
+  ],
+  "id_ID": [
+    "guide.talentsPage.loadoutGearNote",
+    "guide.thornhollowPage.backfillNote",
+    "guide.thornhollowPage.leavingBody",
+    "guide.thornhollowPage.leavingHeading"
+  ],
+  "tr_TR": [
+    "guide.talentsPage.loadoutGearNote",
+    "guide.thornhollowPage.backfillNote",
+    "guide.thornhollowPage.leavingBody",
+    "guide.thornhollowPage.leavingHeading"
+  ],
+  "sv_SE": [
+    "guide.talentsPage.loadoutGearNote",
+    "guide.thornhollowPage.backfillNote",
+    "guide.thornhollowPage.leavingBody",
+    "guide.thornhollowPage.leavingHeading"
+  ],
+  "vi_VN": [
+    "guide.talentsPage.loadoutGearNote",
+    "guide.thornhollowPage.backfillNote",
+    "guide.thornhollowPage.leavingBody",
+    "guide.thornhollowPage.leavingHeading"
+  ],
+  "da_DK": [
+    "guide.talentsPage.loadoutGearNote",
+    "guide.thornhollowPage.backfillNote",
+    "guide.thornhollowPage.leavingBody",
+    "guide.thornhollowPage.leavingHeading"
+  ]
 };

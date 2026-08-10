@@ -4595,7 +4595,7 @@ export const vi_VN: EnTranslations = {
       "worldBossTerm": "Trùm Thế Giới",
       "worldBossDef": "Một con trùm mạnh cỡ raid trỗi dậy giữa thế giới mở theo một nhịp đều đặn, được chiến đấu bởi bất kỳ ai tụ lại đáp lời chứ không phải một tổ đội cố định.",
       "fiveSecondTerm": "Quy tắc năm giây",
-      "fiveSecondDef": "Mana của bạn chỉ bắt đầu tự hồi phục một khi đã qua năm giây kể từ lần cuối bạn tiêu bất kỳ lượng mana nào. Đó là lý do vì sao những lớp dùng mana phải điều tiết nhịp độ thay vì niệm phép liên tục hết công suất.",
+      "fiveSecondDef": "Mana của bạn chỉ hồi phục với tốc độ đầy đủ một khi đã qua năm giây kể từ lần cuối bạn tiêu bất kỳ lượng mana nào. Trước đó nó vẫn hồi với tốc độ giảm bớt chứ không dừng hẳn. Đó là lý do vì sao những lớp dùng mana phải điều tiết nhịp độ thay vì niệm phép liên tục.",
       "talentRowTerm": "Hàng tài năng",
       "talentRowDef": "Tài năng đến dưới dạng sáu hàng, mỗi hàng ở các cấp 5, 8, 11, 14, 17 và 20. Mỗi hàng đưa ra ba lựa chọn và bạn chọn lấy một trong số đó, nên không có điểm nào để dành dụm hay tiêu.",
       "riftTerm": "Rạn Nứt",
@@ -5193,7 +5193,8 @@ export const vi_VN: EnTranslations = {
       "resetNote": "Bạn có thể đặt lại tài năng bất cứ khi nào bạn ở ngoài chiến đấu và không ở trong một trận đấu trường, nên một lựa chọn sớm không bao giờ là cái bẫy. Cứ thử, xem bạn thích gì, và đổi ý thoải mái.",
       "specsHeading": "Chuyên môn hóa theo lớp",
       "specsBody": "Mỗi lớp nhân vật có một vài chuyên môn hóa, mỗi cái có vai trò riêng và một trọng tâm đặc trưng. Chọn một chuyên môn trong bảng tài năng sẽ ban một kỹ năng đặc trưng và một tinh thông bền vững của riêng nó. Đây là hình hài của tất cả chúng. Mở một lớp để xem trọn bộ kỹ năng của nó.",
-      "loadoutNote": "Bạn không cần chốt cứng một cấu hình duy nhất. Hãy lưu một bố cục có tên trong bảng, nó sẽ ghi nhớ cả các lựa chọn lẫn thanh hành động của bạn, nên chuyển sang một cấu hình khác chỉ là một cú nhấp, theo đúng quy tắc như khi đặt lại: ngoài chiến đấu, và không ở trong một trận đấu trường hay chiến trường nào."
+      "loadoutNote": "Bạn không cần chốt cứng một cấu hình duy nhất. Hãy lưu một bố cục có tên trong bảng, nó sẽ ghi nhớ cả các lựa chọn lẫn thanh hành động của bạn, nên chuyển sang một cấu hình khác chỉ là một cú nhấp, theo đúng quy tắc như khi đặt lại: ngoài chiến đấu, và không ở trong một trận đấu trường nào.",
+      "loadoutGearNote": "A layout can carry your gear as well. Save it with the entry that offers to keep your gear too and it also records what you were wearing, which is what makes a PvP set and a dungeon set one click apart instead of sixteen. It remembers the exact piece rather than merely its name, so an enchanted ring is never quietly swapped for the plain twin sitting beside it in your bags. Anything it cannot find when you switch back is simply left alone and reported, so a set that lost a piece to the bank or the market still equips everything else."
     },
     "arenaPage": {
       "heading": "Đấu Trường và PvP",
@@ -5228,6 +5229,9 @@ export const vi_VN: EnTranslations = {
       "respawnBody": "Cái chết vẫn giữ nghi thức cổ điển: thi thể bạn nằm lại nơi nó ngã xuống cho đến khi CHÍNH BẠN giải thoát, và linh hồn trỗi dậy tại nghĩa địa có rào cạnh pháo đài của bạn, được bảo vệ ở đó cho tới đợt hồi sinh tiếp theo của đội bạn. Đợt hồi sinh đánh thức mọi linh hồn đang chờ cùng một lúc, và hai đợt hồi sinh của hai đội được cố ý lệch nhịp nhau, để trận đấu không bao giờ hoàn toàn tái lập cùng một lúc. Không có màn chạy xác và không có giao kèo với Người Canh Giữ Nhợt Nhạt: giải thoát, chờ hết đợt, rồi chiến đấu.",
       "carrierHeading": "Mang cờ",
       "carrierBody": "Người mang cờ giữ cờ địch quá lâu sẽ ngày càng dễ tổn thương, nhận sát thương tăng dần cho đến khi cờ được chiếm, bị rơi, hoặc được trả về. Trốn cùng lá cờ là một kế hoạch thua cuộc; chạy mang nó về nhà mới là cách để thắng.",
+      "leavingHeading": "Leaving early, and filling an empty seat",
+      "leavingBody": "Quitting a match under way is deserting it, and a rated ladder cannot reward pulling the plug on a losing scoreline: a deserter takes the loss and the rating that goes with it there and then, drops the flag if they were carrying it, and their team fights on a player short. That last part is what the empty seat is for. While a match is short a fighter, the queue can offer the chair to somebody waiting, and it is always an offer you accept or decline rather than a teleport that happens to you; declining costs you nothing and passes it to the next in line. Only solo queuers are asked, so a party that queued together is never split up to fill a hole.",
+      "backfillNote": "Taking a backfill seat is deliberately free of risk: you drop into a scoreline you had no hand in, so the match does not touch your rating either way, win or lose, and leaving one owes nothing. The offer also stops coming once a match is close enough to finished that an arrival could not change it, so you are never seated into somebody else's ending.",
       "ladderHeading": "Bảng xếp hạng",
       "ladderBody": "Mỗi trận đấu đều làm thay đổi một chỉ số xếp hạng chiến trường bền vững theo từng nhân vật, dù thắng hay thua, và bảng xếp hạng mọi thời đại xếp hạng các Nhà Vô Địch của vương quốc. Chiến thắng và cả những thất bại chiến đấu ngoan cường cũng trả Danh dự qua hệ thống Chiến Tranh.",
       "rewardsHeading": "Một trận đấu trả những gì",
