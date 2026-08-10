@@ -233,12 +233,16 @@ describe('i18n emit determinism + orphan-sweep (I18N_OUT_DIR override)', () => {
       // This exercises the arm the PR made load-bearing (content differs, so still
       // rewrite): an inverted or mis-scoped skip condition would leave this file
       // stale and every other assertion in this test would stay green.
-      const liveFiles = Object.keys(first);
+      // Named explicitly rather than picked as Object.keys(first)[0]: readdirSync order is
+      // filesystem order, not sorted, and on the game leg that set includes
+      // translation_keys.generated.ts (written unconditionally OUTSIDE writeModuleDir, see
+      // above). If that file happened to land first, this assertion would pass without ever
+      // exercising the skip condition it exists to pin. 'pending.ts' is present on both legs.
+      const divergedFile = 'pending.ts';
       expect(
-        liveFiles.length,
-        'the emit produced at least one live slice to diverge',
-      ).toBeGreaterThan(0);
-      const [divergedFile] = liveFiles;
+        Object.hasOwn(first, divergedFile),
+        `the emit produced ${divergedFile} as a live slice to diverge`,
+      ).toBe(true);
       const divergedPath = path.join(scratch, divergedFile);
       writeFileSync(divergedPath, '// diverged: this must be overwritten by the next regen\n');
       runBuild(scriptRel, scratch);
