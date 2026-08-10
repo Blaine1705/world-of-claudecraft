@@ -1054,7 +1054,7 @@ export const pl_PL: EnTranslations = {
       "blurb": "Dwie zrujnowane twierdze stają naprzeciw siebie za otoczoną murem kotliną w cieniu Ciernistego Szczytu: Karmazyn na południu, Lazur na północy, a między nimi starszy Zrujnowany Dziedziniec, którego żadna z nich nigdy nie zdobyła. Po pięciu graczy z każdej strony, po jednym sztandarze, a pierwsza drużyna, która zaniesie do domu trzy z nich, zdobywa pole.",
       "modeTag": "Przechwycenie flagi 5v5",
       "offlineNote": "Pola Ciernistej Kotliny synchronizują się. Kolejka otworzy się, gdy odpowie królestwo.",
-      "ratingSummary": "Ranking. {wins} zwycięstw / {losses} porażek",
+      "ratingSummary": "Ranking. {wins} zwycięstw / {losses} porażek / {draws} remisów",
       "careerCaptures": "Przechwycenia w karierze: {count}",
       "enterQueue": "Dołącz do kolejki",
       "enterQueueParty": "Dołącz do kolejki (grupa {count} os.)",
@@ -3311,6 +3311,8 @@ export const pl_PL: EnTranslations = {
     },
     "bgOffer": {
       "title": "Thornhollow Fields is ready",
+      "backfillTitle": "Thornhollow Fields needs a fighter",
+      "backfillBody": "This battle is already under way. You will join the side that is short, and this match will not change your rating.",
       "accepted": "{accepted} of {size} ready",
       "remaining": "{seconds}s to answer",
       "accept": "Accept",
@@ -7924,6 +7926,7 @@ export const pl_PL: EnTranslations = {
       "outOfRange": "Poza zasięgiem.",
       "noTarget": "Nie masz celu.",
       "tooClose": "Zbyt blisko!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Musisz być zwrócony przodem do celu.",
       "targetHealthBelow": "Ta umiejętność wymaga, by cel miał poniżej {percent}% zdrowia.",
       "dagger": "Musisz dzierżyć sztylet.",
@@ -8166,7 +8169,7 @@ export const pl_PL: EnTranslations = {
       "queueNote": "Zostaniesz dobrany do najbliższego rankingowo przeciwnika online, a potem przeniesiony na piaski. Wygraj, aby się wspiąć; kto pierwszy się podda (1 punkt zdrowia), przegrywa. Wracasz dokładnie tam, gdzie wszedłeś do kolejki.",
       "ladderAllTime": "Drabinka - wszech czasów",
       "ladderOnline": "Drabinka - online",
-      "ratingSummary": "Ranking - {wins} zwycięstw / {losses} porażek",
+      "ratingSummary": "Ranking - {wins} zwycięstw / {losses} porażek / {draws} remisów",
       "statusCountdown": "Przygotuj się...",
       "statusReturning": "Powrót do świata... {seconds}",
       "statusFight": "Walcz aż do poddania!",
@@ -9540,6 +9543,10 @@ export const pl_PL: EnTranslations = {
       "die_by_sword": {
         "name": "Śmierć od miecza",
         "description": "Umiejętność obronna: przez 8 sek. otrzymujesz o 30% mniejsze obrażenia i unikasz znacznie większej liczby ataków."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Brawura",
