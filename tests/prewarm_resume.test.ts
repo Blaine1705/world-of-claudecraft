@@ -165,6 +165,32 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(compiled).toEqual(['a', 'c']);
   });
 
+  it('dedupes across calls through a caller-owned shared store', async () => {
+    // One logical compile pass split over several submissions (the early
+    // manifest entry, the compile entry's live-scene RE-collection, the
+    // resume lane) must not resubmit a root or signature an earlier call
+    // already covered; per-call stores made the re-collection pay every
+    // early root a second time.
+    const sharedDedupe = { seen: new Set<{ id: string; mats: string[] }>(), seenKeys: new Set() };
+    const early = { id: 'a', mats: ['stone'] };
+    const settleAddition = { id: 'b', mats: ['moss'] };
+    const compiled: string[] = [];
+    const compile = async (root: { id: string }): Promise<void> => {
+      compiled.push(root.id);
+    };
+    const firstCall = buildPrewarmCompileUnits([{ id: 'scene', roots: [early] }], compile, {
+      dedupeKeys: (root) => root.mats,
+      sharedDedupe,
+    });
+    const secondCall = buildPrewarmCompileUnits(
+      [{ id: 'scene', roots: [early, settleAddition] }],
+      compile,
+      { dedupeKeys: (root) => root.mats, sharedDedupe },
+    );
+    for (const unit of [...firstCall, ...secondCall]) await unit.run();
+    expect(compiled).toEqual(['a', 'b']);
+  });
+
   it('batches roots into one unit that awaits its compiles together', async () => {
     // r165 compileAsync resolves after N x 10 ms of setTimeout polling: awaited
     // one by one, the floors stack; awaited together, they overlap. The batch
@@ -285,21 +311,47 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(resumeStart).toBeGreaterThan(-1);
     expect(runStart).toBeGreaterThan(resumeStart);
     expect(unitsSlice.match(/buildPrewarmCompileUnits\(/g)).toHaveLength(1);
-    expect(resumeSlice).toContain('return compileEntryUnits()');
+    // The resume lane must exclude groups whose units were already submitted
+    // off-thread (resuming them would double-submit every unit).
+    expect(resumeSlice).toContain(
+      'compileEntryUnits((groupId) => !submittedCompileGroups.has(groupId))',
+    );
     expect(unitsStart).toBeGreaterThan(-1);
     expect(unitsEnd).toBeGreaterThan(unitsStart);
     expect(unitsSlice).toContain('if (visibleOnly) root.traverseVisible(collect)');
     expect(unitsSlice).toContain('else root.traverse(collect)');
     expect(unitsSlice).toContain('roots: compileRoots(group.children, false)');
+    // The mass-submission callback compiles against the lights-only proxy
+    // scene (identical program keys, ~10-node prologue walk instead of the
+    // whole world per call; the live gates keep the live-scene default).
     expect(unitsSlice).toContain('await this.compilePrewarmColorPrograms(root, false)');
     expect(unitsSlice).toContain('await this.compileShadowPrograms(root)');
     expect(compileEntry).not.toContain('compileAsync(this.scene');
-    expect(compileEntry).not.toContain('Promise.race');
+    // The resume lane specifically must never race a scene-wide compileAsync
+    // call away (the old bug this pin guards): resuming already-submitted
+    // units would double-submit their in-flight compileAsync, so resumeUnits
+    // stays a plain bounded-unit selection, never a race.
+    expect(resumeSlice).not.toContain('Promise.race');
+    // run() DOES race now: a bounded await-all against its own reserved
+    // deadline (prewarmCompileAwaitDeadline, see prewarm_policy.test.ts), so
+    // an unbounded await can never push world.initial-frame's start past the
+    // hard deadline. It races only its own reserved cap, never the separate
+    // gpuSubmitDeadline the trailing exempt entries (programs.budget-variants
+    // etc, outside this slice) bound themselves against.
+    const runEnd = compileEntry.indexOf('progress: () =>', runStart);
+    expect(runEnd).toBeGreaterThan(runStart);
+    const runSlice = compileEntry.slice(runStart, runEnd);
+    expect(runSlice).toContain('Promise.race([');
+    expect(runSlice).not.toContain('performance.now() >= gpuSubmitDeadline');
     expect(source).toContain('void settlePrewarmBeforePublish(');
     expect(source).toContain('resumeDroppedPrewarmEntries(resume, {');
+    // releaseTail: a resume unit's wall time is its off-thread links; without
+    // the tail release each unit occupied the whole serial queue for seconds
+    // and live compile gates could not start (the travel-hitch amplifier).
     expect(source).toContain(
-      'this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME, unit.id)',
+      'this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME, unit.id, {',
     );
+    expect(source).toContain('releaseTail: true,');
     expect(source).toContain('const units = entry.resumeUnits?.() ?? [];');
     expect(source).toContain('droppedEntries.push({ id: entry.id, units })');
     expect(resumeSlice).toContain('deferPoolPublication =');
@@ -307,6 +359,46 @@ describe('resumeDroppedPrewarmEntries', () => {
       'cleanupPrewarmArtifacts({ clearVfx: true, publishPools: !deferPoolPublication })',
     );
     expect(source).toContain('cleanupPrewarmArtifacts({ clearVfx: false, publishPools: true })');
+  });
+
+  it('publishes the retained pools even when the compile resume remainder is empty', () => {
+    // Regression for the stranded-pool review finding: the compile entry's
+    // resumeUnits callback can set deferPoolPublication while its OWN
+    // remainder is empty (the shared compile dedupe store already covered
+    // every root through the early 'programs.compile-submit' entry). Gating
+    // the settle-then-publish scheduling on droppedEntries.length alone then
+    // never runs it when nothing else was dropped either, so the withheld
+    // entity/npc pools are silently discarded and the early-submitted units
+    // are never awaited. The gate must also fire on deferPoolPublication alone.
+    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const finallyMarker =
+      'cleanupPrewarmArtifacts({ clearVfx: true, publishPools: !deferPoolPublication });';
+    const blockStart = source.indexOf(finallyMarker);
+    const blockEnd = source.indexOf('// Sky uploads deferred behind a slow prefetch', blockStart);
+    expect(blockStart).toBeGreaterThan(-1);
+    expect(blockEnd).toBeGreaterThan(blockStart);
+    const block = source.slice(blockStart, blockEnd);
+
+    // The settle-then-publish scheduling must run whenever EITHER a real
+    // entry was dropped OR pool publication was withheld, never
+    // droppedEntries.length alone.
+    expect(block).toContain('if (droppedEntries.length > 0 || deferPoolPublication) {');
+    // resumeDroppedPrewarmEntries stays unconditional on `resume` (it is
+    // itself a no-op over an empty array, per resumeDroppedPrewarmEntries'
+    // own 'does nothing for empty entries' contract): gating THIS call on
+    // resume.length instead of widening the outer guard would skip the
+    // Promise.allSettled await of submittedCompileUnits whenever the resume
+    // list is empty, so the in-flight early-submitted units would still
+    // never be awaited for the empty-remainder case.
+    expect(block).toContain('return resumeDroppedPrewarmEntries(resume, {');
+    expect(block).toContain(
+      'await Promise.allSettled(submittedCompileUnits.map((unit) => unit.done));',
+    );
+    // Exactly one publish call backs this whole block: no duplicate
+    // publication path was added alongside the widened guard.
+    expect(
+      block.match(/cleanupPrewarmArtifacts\(\{ clearVfx: false, publishPools: true \}\)/g),
+    ).toHaveLength(1);
   });
 
   it('retains dropped texture uploads as one explicit idle unit per unique texture', () => {
