@@ -111,7 +111,7 @@ export function applyNonPlayerStatAura(
   _ctx: SimContext,
   target: Entity,
   aura: Aura,
-  _direction: 1 | -1,
+  direction: 1 | -1,
 ): void {
   if (target.kind === 'player') return;
   let hpDelta = nonPlayerAuraHp(aura) * direction;
