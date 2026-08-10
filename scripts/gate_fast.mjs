@@ -34,8 +34,10 @@ import {
   parseGateWorkerTier,
   resolveGateWorkerTierCap,
 } from './lib/gate_workers.mjs';
+import { resolveLocalBin } from './lib/resolve_local_bin.mjs';
 
-// npm/npx resolve to .cmd files on Windows, which spawnSync only finds via a shell.
+// npm resolves to a .cmd file on Windows, and the vitest binary resolved below is
+// also a .cmd shim there, both of which spawnSync only finds via a shell.
 const shell = process.platform === 'win32';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -43,12 +45,7 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 // Resolve the vitest binary directly instead of going through `npx --no-install
 // vitest`: npx still pays a real per-invocation startup cost even when it skips
 // the install check, and this file spawns vitest at both call sites below.
-const vitestBin = path.join(
-  repoRoot,
-  'node_modules',
-  '.bin',
-  process.platform === 'win32' ? 'vitest.cmd' : 'vitest',
-);
+const vitestBin = resolveLocalBin(repoRoot, 'vitest');
 
 const tierRaw = process.env.GATE_WORKER_TIER;
 const tier = parseGateWorkerTier(tierRaw);
@@ -119,7 +116,16 @@ if (vitestPlan.mode === 'skip') {
 
 for (const [name, cmd, args] of steps) {
   console.log(`\n[gate:fast] ${name}: ${cmd} ${args.join(' ')}`);
-  const res = spawnSync(cmd, args, { stdio: 'inherit', env: process.env, shell });
+  // On win32 with shell:true, Node joins the command and argv into one cmd.exe
+  // line WITHOUT re-quoting (see scripts/electron-build.mjs "shell mode joins
+  // argv without re-quoting"). vitestBin is an absolute path that can contain
+  // spaces (a checkout under "C:\Users\First Last\..."), so it must be quoted
+  // itself here, unlike the bare npm/npx tokens used elsewhere in this file.
+  const res = spawnSync(shell && /\s/.test(cmd) ? `"${cmd}"` : cmd, args, {
+    stdio: 'inherit',
+    env: process.env,
+    shell,
+  });
   if (res.status !== 0) {
     console.error(`\n[gate:fast] FAIL at "${name}" (exit ${res.status ?? 'killed'})`);
     console.error(
