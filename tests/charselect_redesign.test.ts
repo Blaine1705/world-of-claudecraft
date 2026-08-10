@@ -12,12 +12,16 @@
 // view that evaporates).
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { resetAppearancePanelsForTests } from '../src/ui/appearance_panel_locale';
+import {
+  relocalizeAppearancePanels,
+  resetAppearancePanelsForTests,
+} from '../src/ui/appearance_panel_locale';
 import {
   CharselectRedesignEditor,
   type RedesignEditorDeps,
   type RedesignTarget,
 } from '../src/ui/charselect_redesign';
+import * as i18nModule from '../src/ui/i18n';
 
 const TARGET: RedesignTarget = {
   id: 42,
@@ -182,17 +186,26 @@ describe('mobile and keyboard focus into the panel', () => {
     expect(panel?.contains(document.activeElement)).toBe(true);
   });
 
-  it('scrolls the panel into view when it is not fully visible', () => {
+  // fullyVisible is a four-conjunct AND (top >= 0 && left >= 0 && bottom <=
+  // viewportHeight && right <= viewportWidth); each case below violates
+  // exactly ONE conjunct while keeping the other three inside the bounds the
+  // "already fully visible" test below confirms are safe, so a mutant that
+  // dropped or flipped any single conjunct fails on that case alone.
+  it.each([
+    ['top', { top: -80, left: 0, bottom: 200, right: 320, width: 320, height: 280, x: 0, y: -80 }],
+    ['left', { top: 0, left: -40, bottom: 200, right: 320, width: 360, height: 200, x: -40, y: 0 }],
+    [
+      'bottom',
+      { top: 0, left: 0, bottom: 100_000, right: 320, width: 320, height: 100_000, x: 0, y: 0 },
+    ],
+    [
+      'right',
+      { top: 0, left: 0, bottom: 200, right: 100_000, width: 100_000, height: 200, x: 0, y: 0 },
+    ],
+  ])('scrolls the panel into view when %s is out of the viewport', (_dimension, rect) => {
     const panel = document.getElementById('charselect-reroll') as HTMLElement;
     vi.spyOn(panel, 'getBoundingClientRect').mockReturnValue({
-      top: -80,
-      left: 0,
-      bottom: 200,
-      right: 320,
-      width: 320,
-      height: 280,
-      x: 0,
-      y: -80,
+      ...rect,
       toJSON: () => ({}),
     } as DOMRect);
     // jsdom ships no scrollIntoView; stub one so the call is observable.
@@ -260,6 +273,26 @@ describe('escape', () => {
     // one attached to document, and one Escape would fire close(true) twice.
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 
+    expect(deps.restoreStage).not.toHaveBeenCalled();
+  });
+
+  it('does not double-fire after two open/close(false) cycles either', () => {
+    // close(false) is the selectRow() path (see charselect_redesign.ts
+    // open()): it must remove the Escape listener exactly like close(true)
+    // does. If it did not, two cycles here would leave TWO listeners on
+    // document, so a bare Escape with nothing open would still find (and
+    // call into) a stale one instead of being the no-op it should be.
+    const deps = fakeDeps();
+    const editor = editorWith(deps);
+    editor.open(TARGET);
+    editor.close(false);
+    editor.open({ ...TARGET, id: 43, name: 'Another' });
+    editor.close(false);
+    deps.restoreStage.mockClear();
+
+    expect(() =>
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })),
+    ).not.toThrow();
     expect(deps.restoreStage).not.toHaveBeenCalled();
   });
 });
@@ -377,5 +410,39 @@ describe('drivePreview', () => {
     const deps = fakeDeps();
     editorWith(deps).drivePreview();
     expect(deps.previewModular).not.toHaveBeenCalled();
+  });
+});
+
+describe('title bake (locale-sweep re-mount)', () => {
+  it('re-bakes the reroll title when a locale sweep re-mounts a stale panel', () => {
+    // The title bakes inside mountCustomizer, not open(), so the locale-sweep
+    // rebuild callback (registered via noteAppearancePanelMounted, which
+    // re-invokes mountCustomizer) re-labels it too. Prove that with a real
+    // re-mount rather than a static assertion: clear the baked text, force
+    // the panel to read stale so relocalizeAppearancePanels() actually
+    // rebuilds it, then confirm only that rebuild could have restored it.
+    // Moving the bake back into open() (which a sweep never re-runs) would
+    // leave the cleared text empty here.
+    const deps = fakeDeps();
+    const editor = editorWith(deps);
+    editor.open(TARGET);
+    const titleEl = document.getElementById('charselect-reroll-title') as HTMLElement;
+    expect(titleEl.textContent).toContain(TARGET.name);
+
+    titleEl.textContent = '';
+    const otherLanguage = i18nModule.getLanguage() === 'de_DE' ? 'fr_FR' : 'de_DE';
+    // A changed getLanguage() reading is one of the two real staleness
+    // triggers the probe compares on (appearance_panel_locale.test.ts pins
+    // the other: an unchanged language whose resolved TABLE moved). Spied
+    // across the module boundary the same way player_look_core.test.ts spies
+    // sameAppearance: appearance_panel_locale.ts imports getLanguage from a
+    // different file than this test, so the spy is observed there.
+    const getLanguageSpy = vi
+      .spyOn(i18nModule, 'getLanguage')
+      .mockReturnValue(otherLanguage as ReturnType<typeof i18nModule.getLanguage>);
+    relocalizeAppearancePanels();
+    getLanguageSpy.mockRestore();
+
+    expect(titleEl.textContent).toContain(TARGET.name);
   });
 });

@@ -11,7 +11,7 @@
 //  - a Combat Mech wearer growing a second body inside the mech;
 //  - a hostile or stale wire payload reaching the compose path unclamped.
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { type ArmorSetId, DEFAULT_APPEARANCE } from '../src/render/characters/modular';
 import {
   armorSetSourceFor,
@@ -22,6 +22,7 @@ import {
 } from '../src/render/characters/player_look_core';
 import { createPlayer } from '../src/sim/entity';
 import type { Entity, PlayerClass } from '../src/sim/types';
+import * as appearanceModule from '../src/world_api/appearance';
 
 function playerEntity(over: Partial<Entity> = {}): Entity {
   const e = createPlayer(1, 'mage', { x: 0, y: 0, z: 0 }, 'Tester');
@@ -161,8 +162,18 @@ describe('DEFAULT_APPEARANCE round trip', () => {
 
 describe('modularLookChanged', () => {
   it('returns false for the same reference (the fast path the per-frame diff relies on)', () => {
+    // modularLookChanged imports sameAppearance from a DIFFERENT module
+    // (world_api/appearance.ts), so a namespace spy on it here does observe
+    // this call, unlike a same-module call (see the takeFarBakeBudget note in
+    // modular_far_lod.test.ts for the case where a spy cannot).
+    const sameAppearanceSpy = vi.spyOn(appearanceModule, 'sameAppearance');
     const look = { gender: 'female' };
     expect(modularLookChanged(look, look)).toBe(false);
+    // The reference check must short-circuit before ever reaching the value
+    // comparison: this runs once per entity every frame, and sameAppearance's
+    // JSON.stringify is the cost the fast path exists to skip.
+    expect(sameAppearanceSpy).not.toHaveBeenCalled();
+    sameAppearanceSpy.mockRestore();
   });
 
   it('returns false from null to null', () => {

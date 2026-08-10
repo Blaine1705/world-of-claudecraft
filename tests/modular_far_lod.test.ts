@@ -327,6 +327,9 @@ describe('buildComposedFar catches a fresh far mesh up on effect state', () => {
 
   afterEach(() => vi.restoreAllMocks());
 
+  // This field list is a hand-kept mirror of what CharacterVisual's real
+  // constructor sets: a new constructor field buildComposedFar reads will
+  // read undefined here unless this list tracks it too.
   function fakeVisual(overrides: Record<string, unknown> = {}) {
     // biome-ignore lint/suspicious/noExplicitAny: private-method access, see buildComposedFar
     const fake: any = Object.create(CharacterVisual.prototype);
@@ -444,6 +447,8 @@ describe('attemptComposedFar keeps farBakeTried in step with a refused budget', 
 
   afterEach(() => vi.restoreAllMocks());
 
+  // Same caveat as the fakeVisual above: this field list is a hand-kept
+  // mirror of CharacterVisual's real constructor and must track it.
   function fakeVisual(overrides: Record<string, unknown> = {}) {
     // biome-ignore lint/suspicious/noExplicitAny: private-method access, see attemptComposedFar
     const fake: any = Object.create(CharacterVisual.prototype);
@@ -571,14 +576,34 @@ describe('peekModularFarBake and modularFarBake', () => {
     const minted = assetsModule.modularFarBake(key, DEFAULT_LOOK);
     expect(minted).not.toBeNull();
 
-    const budgetSpy = vi.spyOn(assetsModule, 'takeFarBakeBudget');
-    const peeked = assetsModule.peekModularFarBake(key, DEFAULT_LOOK);
+    // peekModularFarBake and takeFarBakeBudget live in the SAME module, so a
+    // namespace spy (vi.spyOn(assetsModule, 'takeFarBakeBudget')) never
+    // observes a call the peek makes internally: that call resolves through
+    // the module-local binding, not the exported one the spy wraps (proven:
+    // inserting takeFarBakeBudget() into the peek left this test green
+    // against the old spy assertion). Prove "for free" against the budget's
+    // own observable state instead. Take the slot directly, let its window
+    // elapse, peek, then take the slot directly again at that SAME instant:
+    // if the peek had secretly spent the fresh window, this second direct
+    // call would find it already taken.
+    const now = vi.spyOn(performance, 'now');
+    now.mockReturnValue(1_000_000);
+    expect(assetsModule.takeFarBakeBudget()).toBe(true);
 
+    now.mockReturnValue(1_000_010); // still inside the window
+    // The peek must answer correctly whether the budget is fresh or already
+    // spent: it never touches it either way.
+    expect(assetsModule.peekModularFarBake(key, DEFAULT_LOOK)).toBe(minted);
+
+    now.mockReturnValue(1_000_030); // window elapsed: the slot is fresh again
+    const peeked = assetsModule.peekModularFarBake(key, DEFAULT_LOOK);
     // The property the `return null` mutation breaks: an already-baked part
     // set answers from the cache, the SAME object modularFarBake minted.
     expect(peeked).toBe(minted);
-    // ...and for free: the peek must never spend the per-frame bake budget.
-    expect(budgetSpy).not.toHaveBeenCalled();
+    // ...and the fresh slot from 1_000_030 is still unclaimed: a direct call
+    // at the same instant only reads true if the peek above never spent it.
+    expect(assetsModule.takeFarBakeBudget()).toBe(true);
+    now.mockRestore();
 
     // An unrelated key never matches a cached entry.
     expect(assetsModule.peekModularFarBake('does_not_exist_key', DEFAULT_LOOK)).toBeNull();
