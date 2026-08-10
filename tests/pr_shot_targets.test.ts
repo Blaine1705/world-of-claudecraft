@@ -340,8 +340,22 @@ describe('classifyDiff', () => {
     expect(keys).toContain('reliquary-window');
     expect(keys).toContain('reliquary-page');
     for (const key of ['reliquary-window', 'reliquary-page']) {
-      const target = plan.specific.find((candidate: { key: string }) => candidate.key === key);
-      expect(target?.variants, key).toEqual([{ key: 'desktop' }, { key: 'mobile', mobile: true }]);
+      const target = plan.specific.find(
+        (candidate: { key: string; variants: { key: string; mobile?: boolean }[] }) =>
+          candidate.key === key,
+      );
+      expect(
+        target?.variants.map((v: { key: string }) => v.key),
+        key,
+      ).toEqual(['desktop', 'mobile']);
+      expect(target?.variants[1]?.mobile, key).toBe(true);
+      // The capture rule (Phase 22): every reliquary rig seeds the LOW preset
+      // before the document loads, so shots stay comparable across machines.
+      for (const variant of target?.variants ?? []) {
+        expect(String(variant.beforeLoad), `${key} ${variant.key} seeds the low preset`).toContain(
+          'graphicsPreset = 1',
+        );
+      }
     }
   });
 

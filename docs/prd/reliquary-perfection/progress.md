@@ -2767,3 +2767,25 @@ evidence set 4b9cd579cc) plus this docs commit.
   race with the cancelled run), so the phase tip was pushed to give the
   repaired, merged state a real run; the Phase 22 QA still owns the final
   green.
+
+### Phase 22 addendum: the bounded full run and the inherited portrait red
+
+The bounded full vitest run (34,655 passed, 108 skipped, 2 expected-fail)
+surfaced FOUR reds in three files. Two were this phase's own pins made stale
+by its deliberate changes and were updated in-change:
+tests/pr_shot_targets.test.ts (the reliquary variants now carry the low-preset
+beforeLoad; the pin now asserts variant keys plus the graphicsPreset seed) and
+tests/reliquary_window_jump.test.ts (the one-shot pin encoded the pre-Phase-22
+"header carries no focus key" design; it now pins BOTH halves of the new
+contract: a repaint with focus on the header keeps it there, and a MOVED
+position is never yanked back). The other two were
+tests/mob_portrait_source_manifest.test.ts: INHERITED. Attribution ran on a
+throwaway worktree of the pure release tip (a8abfc3a6f, which has ALSO moved
+past this phase's a71841224d sync point, picking up at least the game-music
+refactor): the release's own checkout computes rendererFingerprint 5788f245
+against its own committed acceptance b933c31e, and the merged branch computes
+the identical 5788f245, so the branch contributes zero renderer drift and the
+red is the release's stale acceptance (reported upstream in the state.md
+rider, deliberately NOT re-accepted here: the guard demands a reviewed
+portrait rerender receipt, which is the release's own acceptance process).
+The final Phase 22 QA sync will inherit the release's next acceptance.

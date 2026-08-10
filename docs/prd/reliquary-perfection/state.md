@@ -988,6 +988,20 @@ Update this line as phases complete.
   in tests/professions blob-growth census so the next branch does not
   inherit the same red; the sibling scrape blind spot is recorded at (g) of
   the Phase 21 QA entries.
+  (b2) UPSTREAM FLAG, INHERITED RED (found by the Phase 22 bounded full run,
+  attributed on a pure release-tip probe, reported per the stopping rule and
+  NOT re-pinned here): tests/mob_portrait_source_manifest.test.ts reds on
+  the merged tree because the release's committed portrait-manifest
+  acceptance is stale ON ITS OWN TIP. The pure origin/release/v0.36.0
+  checkout (a8abfc3a6f at probe time) computes rendererFingerprint
+  5788f245... against its own committed b933c31e...; this branch's merged
+  tree computes the IDENTICAL 5788f245... (against the 82b70bcb... the
+  synced older acceptance carries), so the branch adds ZERO renderer drift
+  and the sanctioned repair (a reviewed portrait rerender receipt via
+  PORTRAIT_RECEIPT + --write --receipt) is the release's own process, the
+  same flow its three acceptance commits used this week. Expect the red in
+  any full run and in the CI full-suite shard until the release re-accepts
+  and the branch syncs it; every other suite is green.
   (c) Steam/Epic portal registration: cross-reference, the standing Phase 18
   OPEN entry below is the record (nine achievement ids, the deploy-order
   constraint, HOLD on ACH_RELIQUARY_COMPLETE); nothing new, not duplicated.

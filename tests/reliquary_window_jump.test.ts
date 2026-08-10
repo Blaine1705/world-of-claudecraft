@@ -218,15 +218,21 @@ describe('openWithPage: the chat deep link', () => {
     expect(el.querySelector('[data-filter="missing"]')?.getAttribute('aria-pressed')).toBe('false');
   });
 
-  it('is a ONE-SHOT: a later repaint does not yank the reading position back', () => {
+  it('is a ONE-SHOT: a later repaint does not yank a MOVED reading position back', () => {
     const { w, el } = makeWindow(baseState());
     w.openWithPage(CRYPT_PAGE);
     expect(document.activeElement).toBe(header(el));
-    // A repaint restores focus by data-focus-key, and the header deliberately
-    // carries none (a landing spot is not a control, and a new key would owe
-    // the reliquaryFocusFallbackKey vocabulary an arm), so the window falls
-    // back to its Close park. What must NOT happen is a latched jump grabbing
-    // the header again on every later render.
+    // Phase 22 gave the header a data-focus-key so a rebuild moments after a
+    // deep link (the rarity fetch landing on the slow band) RESTORES the
+    // parked reading position instead of dumping it on Close: while focus
+    // still sits on the header, a repaint keeps it there.
+    w.render();
+    expect(document.activeElement).toBe(header(el));
+    // The one-shot property this pin guards is unchanged: once the player
+    // MOVES, no latched jump grabs the header back on a later render. The
+    // retention above is the generic key restore (it follows wherever focus
+    // actually is), not a re-run of the spotlight.
+    el.querySelector<HTMLElement>('[data-close]')?.focus();
     w.render();
     expect(document.activeElement).toBe(el.querySelector('[data-close]'));
     expect(document.activeElement).not.toBe(header(el));
