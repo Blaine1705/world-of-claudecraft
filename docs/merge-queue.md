@@ -75,7 +75,14 @@ the Checks tab (filter by event: merge_group).
    already failing or still running near the bound, treat it as a real
    failure or a real slowdown, not a stall (a genuinely red shard on a
    runner with a setup spike can die AS a timeout). Otherwise it is a rerun,
-   not a code investigation: re-run the failed jobs and re-queue. If the
+   not a code investigation: re-run the failed jobs and re-queue. Two
+   automatic nets usually get there first: ci.yml's workflow-wide git
+   low-speed abort fails a dead fetch in about two minutes and
+   actions/checkout retries it in-step, and the CI stall auto-rerun
+   workflow (ci-stall-rerun.yml, decision core scripts/lib/ci_stall_rerun.mjs)
+   reruns a run's failed jobs once, on attempt 1 only, when the dead step
+   was a setup step and no test step ran. A stall you meet by hand is
+   therefore usually already on attempt 2. If the
    SAME job times out twice on healthy-looking logs, treat it as a real
    slowdown and investigate before resizing any bound.
 
