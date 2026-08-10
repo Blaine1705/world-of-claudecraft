@@ -4595,7 +4595,7 @@ export const nl_NL: EnTranslations = {
       "worldBossTerm": "Wereldbaas",
       "worldBossDef": "Een baas met de kracht van een raid die in de open wereld verrijst met een vast ritme, bevochten door wie zich verzamelt om de roep te beantwoorden, niet door een vaste groep.",
       "fiveSecondTerm": "De vijfsecondenregel",
-      "fiveSecondDef": "Je mana begint pas vanzelf weer aan te vullen zodra er vijf seconden zijn verstreken sinds je er voor het laatst iets van hebt uitgegeven. Daarom doseren casters zichzelf in plaats van non-stop te casten.",
+      "fiveSecondDef": "Je mana vult zich pas op volle snelheid weer aan zodra er vijf seconden zijn verstreken sinds je er voor het laatst iets van hebt uitgegeven. Tot die tijd blijft het in een lager tempo binnendruppelen in plaats van helemaal te stoppen. Daarom doseren casters zichzelf in plaats van onafgebroken te spreuken.",
       "talentRowTerm": "Talentrij",
       "talentRowDef": "Talenten komen in zes rijen, een op elk van de niveaus 5, 8, 11, 14, 17 en 20. Elke rij biedt drie opties en je kiest er een van, dus er zijn geen punten om op te sparen of uit te geven.",
       "riftTerm": "Rift",
@@ -5193,7 +5193,8 @@ export const nl_NL: EnTranslations = {
       "resetNote": "Je kunt je talenten resetten op elk moment dat je buiten gevecht bent en niet in een arenawedstrijd zit, dus een vroege keuze is nooit een valkuil. Probeer dingen uit, kijk wat je bevalt en verander vrijuit van gedachten.",
       "specsHeading": "Specialisaties per klasse",
       "specsBody": "Elke klasse heeft een handvol specialisaties, elk met een eigen rol en een kenmerkende focus. Er een kiezen in het talentpaneel schenkt een kenmerkende vaardigheid en een blijvend eigen meesterschap. Hier zie je de vorm van allemaal. Open een klasse voor de volledige uitrusting.",
-      "loadoutNote": "Je hoeft je niet vast te leggen op één build. Sla een benoemde opstelling op in het paneel en die onthoudt zowel je keuzes als je actiebalk, zodat overschakelen naar een andere met één klik kan, onder dezelfde regel als een reset: buiten gevecht, en niet tijdens een arenawedstrijd of op een slagveld."
+      "loadoutNote": "Je hoeft je niet vast te leggen op één build. Sla een benoemde opstelling op in het paneel en die onthoudt zowel je keuzes als je actiebalk, zodat overschakelen naar een andere met één klik kan, onder dezelfde regel als een reset: buiten gevecht, en niet tijdens een arenawedstrijd.",
+      "loadoutGearNote": "A layout can carry your gear as well. Save it with the entry that offers to keep your gear too and it also records what you were wearing, which is what makes a PvP set and a dungeon set one click apart instead of sixteen. It remembers the exact piece rather than merely its name, so an enchanted ring is never quietly swapped for the plain twin sitting beside it in your bags. Anything it cannot find when you switch back is simply left alone and reported, so a set that lost a piece to the bank or the market still equips everything else."
     },
     "arenaPage": {
       "heading": "Arena en PvP",
@@ -5228,6 +5229,9 @@ export const nl_NL: EnTranslations = {
       "respawnBody": "De dood houdt vast aan het klassieke ritueel: je lichaam blijft liggen waar het viel totdat JIJ je geest loslaat, en de geest herrijst op de omheinde begraafplaats naast je burcht, beschermd totdat de volgende respawngolf van je team komt. De golf laat elke wachtende geest tegelijk herrijzen, en de golven van de twee teams zijn bewust ongelijk getimed, zodat het gevecht nooit in één keer volledig herbegint. Er is geen lijkenloop en geen ruil met een geestgenezer: geest loslaten, de golf uitzitten, vechten.",
       "carrierHeading": "De vlag dragen",
       "carrierBody": "Een drager die de vlag van de vijand te lang vasthoudt, wordt steeds kwetsbaarder en loopt oplopende schade op totdat de vlag wordt veroverd, laten vallen, of teruggebracht. Je verstoppen met de vlag is een verliezend plan; hem naar huis rennen is het winnende.",
+      "leavingHeading": "Leaving early, and filling an empty seat",
+      "leavingBody": "Quitting a match under way is deserting it, and a rated ladder cannot reward pulling the plug on a losing scoreline: a deserter takes the loss and the rating that goes with it there and then, drops the flag if they were carrying it, and their team fights on a player short. That last part is what the empty seat is for. While a match is short a fighter, the queue can offer the chair to somebody waiting, and it is always an offer you accept or decline rather than a teleport that happens to you; declining costs you nothing and passes it to the next in line. Only solo queuers are asked, so a party that queued together is never split up to fill a hole.",
+      "backfillNote": "Taking a backfill seat is deliberately free of risk: you drop into a scoreline you had no hand in, so the match does not touch your rating either way, win or lose, and leaving one owes nothing. The offer also stops coming once a match is close enough to finished that an arrival could not change it, so you are never seated into somebody else's ending.",
       "ladderHeading": "De ranglijst",
       "ladderBody": "Elke wedstrijd verandert een blijvende rating per personage voor dit slagveld, win of verlies, en het aller-tijden-bord rangschikt de kampioenen van het rijk. Overwinningen en hard bevochten nederlagen betalen ook Eer uit via het Oorlogvoering-systeem.",
       "rewardsHeading": "Wat een wedstrijd oplevert",
