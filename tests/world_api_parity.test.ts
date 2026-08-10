@@ -109,6 +109,7 @@ export const IWORLD_MEMBERS = [
   { name: 'craftSkills', kind: 'data' },
   { name: 'gatheringProficiency', kind: 'data' },
   { name: 'known', kind: 'data' },
+  { name: 'activeConsecrations', kind: 'data' },
   { name: 'activeFrostRings', kind: 'data' },
   { name: 'activeTemporalHourglasses', kind: 'data' },
   { name: 'questLog', kind: 'data' },
@@ -179,9 +180,12 @@ export const IWORLD_MEMBERS = [
   { name: 'revivePet', kind: 'method' },
   { name: 'petAttack', kind: 'method' },
   { name: 'petWaterJet', kind: 'method' },
+  { name: 'petSpecialCommandsSupported', kind: 'data' },
+  { name: 'petSpecial', kind: 'method' },
   { name: 'petTaunt', kind: 'method' },
   { name: 'setPetAutoTaunt', kind: 'method' },
   { name: 'setPetAutoWaterJet', kind: 'method' },
+  { name: 'setPetAutoSpecial', kind: 'method' },
   { name: 'feedPet', kind: 'method' },
   { name: 'healPet', kind: 'method' },
   { name: 'setPetMode', kind: 'method' },
@@ -227,6 +231,7 @@ export const IWORLD_MEMBERS = [
   { name: 'duelAccept', kind: 'method' },
   { name: 'duelDecline', kind: 'method' },
   { name: 'realm', kind: 'data' },
+  { name: 'accountAdmin', kind: 'data' },
   { name: 'socialInfo', kind: 'data' },
   // --- social graph commands + async search ---
   { name: 'friendAdd', kind: 'method' },
@@ -547,30 +552,24 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // commands), leaving 287. The guild bank ACTIVITY LOG adds one read member
     // (guildBankLog, a method because reading it is what requests the cold
     // payload on demand: it has no snapshot key), leaving 288. Thornhollow
-    // Fields adds the four battleground facet members on top of that base:
-    // the bgInfo data member plus the bgQueueJoin / bgQueueLeave / bgFlagAction
-    // commands, leaving 293 (this base tip already carries the Book of Deeds
-    // recent strip's deedsRecent read). The stop-auto-attack-on-target-switch
-    // setting adds setStopAutoAttackOnTargetSwitch (method), leaving 294. This
-    // branch's commission order board (issue #1298) adds commissionOrders
-    // (data) plus openCommissionOrder/cancelCommissionOrder/
-    // acceptCommissionOrder/deliverCommissionOrder (methods), leaving 299.
-    // This branch's paperdoll helmet-visibility eye adds setHelmHidden
-    // (IWorldCosmetics, a method), leaving 300. The bag clean-up button adds
-    // sortInventory (IWorldInventory, a method), leaving 301. The character
-    // sheet's Time Played line adds playtimeSeconds (IWorldProgressionXp,
-    // data), leaving 302. This branch's battleground queue-pop confirmation
-    // adds bgRespond (IWorldBattleground, a method), leaving 303.
-    //
-    // NOTE for the next merge, twice over now: BOTH sides of this pin bumped it
-    // to the same number independently, so git merged the count with no
-    // conflict while the real total was one higher. A counter each branch can
-    // increment is a silent off-by-one at merge time, and the data/method split
-    // can disagree even when the total agrees. Only running the suite says what
-    // these numbers really are; never reconcile them by arithmetic in the diff.
-    expect(IWORLD_MEMBERS.length).toBe(303);
-    expect(DATA_MEMBERS.length).toBe(77);
-    expect(METHOD_MEMBERS.length).toBe(226);
+    // Fields adds the four battleground facet members (bgInfo data plus the
+    // bgQueueJoin / bgQueueLeave / bgFlagAction commands), the
+    // stop-auto-attack-on-target-switch setting adds
+    // setStopAutoAttackOnTargetSwitch (method), the commission order board
+    // (issue #1298) adds commissionOrders (data) plus openCommissionOrder/
+    // cancelCommissionOrder/acceptCommissionOrder/deliverCommissionOrder
+    // (methods), and the paperdoll helmet-visibility eye adds setHelmHidden
+    // (method), leaving 300 on the v0.35.0 base. Composed with the
+    // class-overhauls wave: activeConsecrations, petSpecialCommandsSupported,
+    // and accountAdmin add three data members; the pet's signature-skill
+    // command and autocast toggle add two methods (305). The bag clean-up button adds sortInventory
+    // (IWorldInventory, a method, 306), and the character sheet's Time Played
+    // line adds playtimeSeconds (IWorldProgressionXp, data), leaving 307.
+    // The release's battleground queue-pop confirmation adds bgRespond
+    // (IWorldBattleground, a method), leaving 308.
+    expect(IWORLD_MEMBERS.length).toBe(308);
+    expect(DATA_MEMBERS.length).toBe(80);
+    expect(METHOD_MEMBERS.length).toBe(228);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -586,8 +585,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'acceptCommissionOrder',
       'acceptLinkedQuest',
       'acceptQuest',
+      'accountAdmin',
       'accountCosmetics',
       'accountFlair',
+      'activeConsecrations',
       'activeFrostRings',
       'activeLoadout',
       'activeLootRolls',
@@ -783,6 +784,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyLeave',
       'partyPromote',
       'petAttack',
+      'petSpecial',
+      'petSpecialCommandsSupported',
       'petTaunt',
       'petWaterJet',
       'pickUpObject',
@@ -832,6 +835,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setHelmHidden',
       'setMarker',
       'setPartyLootMaster',
+      'setPetAutoSpecial',
       'setPetAutoTaunt',
       'setPetAutoWaterJet',
       'setPetMode',
@@ -889,7 +893,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
 
   it('the sorted data-kind set is exactly the pinned contract', () => {
     expect(DATA_MEMBERS.map((m) => m.name).sort()).toEqual([
+      'accountAdmin',
       'accountCosmetics',
+      'activeConsecrations',
       'activeFrostRings',
       'activeLoadout',
       'activeMobileStationCraft',
@@ -942,6 +948,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketInfo',
       'moveInput',
       'partyInfo',
+      'petSpecialCommandsSupported',
       'player',
       'playerId',
       'playtimeSeconds',
@@ -1120,6 +1127,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyLeave',
       'partyPromote',
       'petAttack',
+      'petSpecial',
       'petTaunt',
       'petWaterJet',
       'pickUpObject',
@@ -1156,6 +1164,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setHelmHidden',
       'setMarker',
       'setPartyLootMaster',
+      'setPetAutoSpecial',
       'setPetAutoTaunt',
       'setPetAutoWaterJet',
       'setPetMode',
@@ -1262,6 +1271,7 @@ const FACET_ENTITY_ROSTER = [
   'player',
   'moveInput',
   'realm',
+  'accountAdmin',
 ] as const satisfies readonly (keyof IWorldEntityRoster)[];
 type _ExhaustEntityRoster = AssertNever<
   Exclude<keyof IWorldEntityRoster, (typeof FACET_ENTITY_ROSTER)[number]>
@@ -1269,6 +1279,7 @@ type _ExhaustEntityRoster = AssertNever<
 
 const FACET_COMBAT = [
   'known',
+  'activeConsecrations',
   'activeFrostRings',
   'activeTemporalHourglasses',
   'reactiveAbilityWindowRemaining',
@@ -1413,10 +1424,13 @@ const FACET_PET = [
   'renamePet',
   'revivePet',
   'petAttack',
+  'petSpecialCommandsSupported',
+  'petSpecial',
   'petWaterJet',
   'petTaunt',
   'setPetAutoTaunt',
   'setPetAutoWaterJet',
+  'setPetAutoSpecial',
   'feedPet',
   'healPet',
   'setPetMode',
@@ -1778,8 +1792,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(303);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(303);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(308);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(308);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

@@ -195,6 +195,9 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   // never serialized or wired. Its EFFECT (which procs fire) is pinned by the
   // event digest and procState counters.
   'castConsumedEmpower',
+  // In-flight Dawn's Embrace reservation for Radiant Resonance. The observable
+  // cast time, mana spend, aura removal, and heal remain in the parity digest.
+  'castRadiantResonance',
 ]);
 
 // Session-only / presentation / derived PlayerMeta fields. Derived fields

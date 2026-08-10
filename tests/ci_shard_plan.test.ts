@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -14,6 +14,7 @@ import {
   collectedLaneFiles,
   FLOOR_SANITY_MIN,
   parseShardArg,
+  resolveLocalBin,
 } from '../scripts/lib/ci_shard_plan.mjs';
 import { collectSuiteVisibility } from '../scripts/lib/gate_discovery.mjs';
 
@@ -50,6 +51,28 @@ describe('parseShardArg', () => {
     [[], null],
   ])('%j -> %j', (argv, expected) => {
     expect(parseShardArg(argv as string[])).toEqual(expected);
+  });
+});
+
+describe('resolveLocalBin', () => {
+  it('resolves the binary under node_modules/.bin, win32-aware', () => {
+    // Independently computed, not by calling the function under test: the
+    // shard plan's own comparison (below) reuses resolveLocalBin to build its
+    // expectation, which only pins internal consistency, not the resolved
+    // shape.
+    const expected = path.join(
+      process.cwd(),
+      'node_modules',
+      '.bin',
+      process.platform === 'win32' ? 'vitest.cmd' : 'vitest',
+    );
+    expect(resolveLocalBin('vitest')).toBe(expected);
+  });
+
+  it('resolves to a binary that actually exists in this tree', () => {
+    // A wrong suffix or directory would otherwise only surface as an ENOENT
+    // deep inside a real CI spawn, far from this test.
+    expect(existsSync(resolveLocalBin('vitest'))).toBe(true);
   });
 });
 
@@ -158,10 +181,10 @@ describe('buildShardPlan: selective mode', () => {
     expect(floorLeg.args).toContain('--shard=3/8');
     expect(floorLeg.args).toContain('--maxWorkers=2');
     expect(floorLeg.args).not.toContain('--passWithNoTests');
-    expect(relatedLeg.cmd).toBe('npx');
+    // Resolved directly, not through npx: the same binary `npm test` already
+    // uses, without paying npx's extra registry-aware resolution path.
+    expect(relatedLeg.cmd).toBe(resolveLocalBin('vitest'));
     expect(relatedLeg.args).toEqual([
-      '--no-install',
-      'vitest',
       'related',
       'src/ui/unit_portrait.ts',
       '--run',
@@ -291,7 +314,12 @@ describe('the long-sims lane (Phase 4)', () => {
       'tests/audit_conservation_property.test.ts',
       'tests/battleground.test.ts',
       'tests/chronomancy_balance.test.ts',
+      'tests/druid_balance_probe.test.ts',
       'tests/eastbrook_gameplay_integration.test.ts',
+      'tests/hunter_dps_balance.test.ts',
+      'tests/nythraxis_matrix.test.ts',
+      'tests/owned_class_balance_harness.test.ts',
+      'tests/owned_class_raid_balance_harness.test.ts',
     ]);
     // No lane file may be an invariant guard: guards must ride every
     // selective shard's floor leg, and the lane would pull them out of it.
@@ -587,12 +615,15 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     );
   });
 
-  it('lane selective mode runs only the floor lane member for a leaf UI diff', async () => {
-    // Real-tree expectation: tests/battleground.test.ts classifies
-    // blind/partial (floor) today and the other lane files are graph-visible,
-    // so a UI-only diff's lane is exactly the one floor member. If a lane
-    // file's classification changes, this pin fails and the lane cost model
-    // must be re-decided consciously (see the phase notes).
+  it('lane selective mode runs only the floor lane members for a leaf UI diff', async () => {
+    // Real-tree expectation: tests/battleground.test.ts and
+    // tests/nythraxis_matrix.test.ts classify blind/partial (floor) today and
+    // the other lane files are graph-visible, so a UI-only diff's lane is
+    // exactly those two floor members. (nythraxis_matrix already ran on every
+    // selective run as shard floor before it joined the lane, so this is the
+    // same cost relocated, not new cost.) If a lane file's classification
+    // changes, this pin fails and the lane cost model must be re-decided
+    // consciously (see the phase notes).
     const run = await runEntry(['--lane=long-sims', '--plan-only'], {
       TEST_MODE: 'selective',
       TEST_MODE_REASON: 'selective: 1 changed source file(s)',
@@ -600,12 +631,14 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     });
     expect(run.exitCode).toBe(0);
     // The exact reason line closes BOTH directions and the cardinality at
-    // once: "1 of 4" fails if any second lane file joins (whatever its sort
+    // once: "2 of 9" fails if any third lane file joins (whatever its sort
     // position) and if the list total drifts.
     expect(run.log).toContain(
-      'plan: mode=selective (selective: 1 of 4 lane file(s) on the floor or changed)',
+      'plan: mode=selective (selective: 2 of 9 lane file(s) on the floor or changed)',
     );
-    expect(run.log).toContain('lane runs: tests/battleground.test.ts');
+    expect(run.log).toContain(
+      'lane runs: tests/battleground.test.ts, tests/nythraxis_matrix.test.ts',
+    );
     expect(run.log).not.toContain('tests/chronomancy_balance.test.ts');
   });
 
