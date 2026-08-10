@@ -149,6 +149,7 @@ import type {
   MasterworkView,
   SalvageResultView,
 } from '../world_api/professions';
+import { normalizeAccountCosmetics } from './account_cosmetics_wire';
 import { computeBackoffDelay } from './backoff';
 import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log_wire';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
@@ -215,31 +216,6 @@ export interface CharacterSummary {
   /** The account's active Armory weapon skin for this character (server-resolved
    *  per class + mainhand). Optional for back-compat like the fields above. */
   weaponSkinId?: string | null;
-}
-
-function stringList(value: unknown): string[] {
-  return Array.isArray(value)
-    ? value.filter((item): item is string => typeof item === 'string')
-    : [];
-}
-
-function stringRecord(value: unknown): Record<string, string> {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
-  const out: Record<string, string> = {};
-  for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
-    if (typeof entry === 'string' && entry.length > 0) out[key] = entry;
-  }
-  return out;
-}
-
-function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
-  const src = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
-  return {
-    completedQuestIds: stringList(src.completedQuestIds),
-    mechChromaIds: stringList(src.mechChromaIds),
-    weaponSkinIds: stringList(src.weaponSkinIds),
-    weaponSkinLoadout: stringRecord(src.weaponSkinLoadout),
-  };
 }
 
 export function buildWebSocketUrl(protocol: string, host: string): string {
