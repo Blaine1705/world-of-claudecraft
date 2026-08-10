@@ -25,7 +25,7 @@ else. Model categories and their per-category wiring live in `public/models/CLAU
 | Path | Rule |
 |---|---|
 | `basis/` | KTX2/Basis transcoder (`basis_transcoder.js`/`.wasm`, copied from three's addons), fetched by `src/render/assets/ktx2_support.ts`; deliberately NOT media-manifest hashed, served at the literal `/basis/` path |
-| `ui/` | icon art loaded by raw logical path. `skills/<class>/` ability icons are committed WebP gated by `tests/skill_icons.test.ts` (pipeline below); `items/` inventory art follows the `woc-item-icon-v1` contract (below); `mobs/` target portraits are existence-gated BOTH directions by `tests/target_portrait_view.test.ts` (regen: `node scripts/render_finder_portraits.mjs`); `deeds/` crests gated by `tests/deed_icons.test.ts`; `ranks/` emblems pinned by `tests/target_rank_view.test.ts`; `cursors/`/`emotes/` PNG and legacy `weapons/` JPG previews are grandfathered |
+| `ui/` | icon art loaded by raw logical path. `skills/<class>/` ability icons are committed WebP gated by `tests/skill_icons.test.ts` (pipeline below); `items/` inventory art follows the `woc-item-icon-v1` contract (below); `mobs/` target portraits are existence-gated BOTH directions by `tests/target_portrait_view.test.ts` (regen: `node scripts/render_finder_portraits.mjs`); `portraits/` holds reviewed static target art for procedural entities outside the deterministic mob-render ledger; `deeds/` crests gated by `tests/deed_icons.test.ts`; `ranks/` emblems pinned by `tests/target_rank_view.test.ts`; `cursors/`/`emotes/` PNG and legacy `weapons/` JPG previews are grandfathered |
 | `env/` | HDRIs follow the `*_1k.hdr` + `*_2k.hdr` naming, plus `*_backdrop(.webp/_4k.webp)` skies |
 | `guide-stills/` | committed WebP wiki stills; existence-gated BOTH directions by `tests/guide.test.ts`; regenerate with `npm run wiki:stills` (deterministic per machine, never diff-gated) |
 | `map_art/`, `map_bg/` | zone map plates fetched at raw paths (`/map_art/<zoneId>.png` or `.webp` by `src/ui/map_art.ts`; `/map_bg/<zoneId>.webp` by `src/ui/map_bg.ts`); outside `MEDIA_ROOTS`, so never content-hashed; regen map_bg plates with `npm run assets:mapbg` |
@@ -91,9 +91,12 @@ attributes (`data-i18n`/`-alt`/`-html`/`-aria`/`-content` as each page needs).
   (`scripts/convert_skill_icons_webp.mjs`): it converts each non-webp image to WebP
   (`smartSubsample` on) and deletes the original. WebP is the source of truth, there is
   NO build-time conversion (the script is a pre-commit step; `tests/skill_icons.test.ts`
-  fails a committed non-webp under `ui/skills/`). Only `ui/skills/` is auto-converted
-  and gated. Prefer WebP for any new icon art; inventory weapons belong in `ui/items/`
-  by item id.
+  fails a committed non-webp under `ui/skills/`). Every registered skill WebP is a
+  distinct, valid, exact 128x128 sRGB shipping image under the catalog-wide 16 KiB
+  ceiling; fresh converter outputs retain the stricter 15 KiB intake cap, and the gate
+  also rejects missing, orphaned, duplicate, nearly invisible, or wrongly placed art.
+  Only `ui/skills/` is auto-converted and gated. Prefer WebP for any new icon art;
+  inventory weapons belong in `ui/items/` by item id.
 - Every inventory-facing image under `ui/items/` follows the versioned
   `docs/design/item-icon-art-style.md` contract (`woc-item-icon-v1`). New source art
   must be a reviewed square, single-frame, fully opaque sRGB master at 512px or larger
