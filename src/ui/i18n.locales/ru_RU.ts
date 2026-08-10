@@ -8828,6 +8828,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.sellStart': 'Стартовая ставка (USD)',
   'hudChrome.wocMarket.sellReserve': 'Резервная цена (USD, необязательно)',
   'hudChrome.wocMarket.sellBuyNowNote': 'Обязательно. Такой лот продаётся по этой цене без торгов.',
+  'hudChrome.wocMarket.sellBuyNowAuctionNote': 'Необязательно. Цена, заплатив которую покупатель завершит аукцион досрочно; она должна быть выше стартовой и резервной.',
   'hudChrome.wocMarket.sellReserveNote':
     'Скрыта от участников; показывается только достигнута она или нет.',
   'hudChrome.wocMarket.sellBuyNowPrice': 'Цена выкупа (USD)',

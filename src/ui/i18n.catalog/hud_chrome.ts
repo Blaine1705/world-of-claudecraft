@@ -5093,6 +5093,8 @@ export const hudChromeStrings = {
     sellReserve: 'Reserve (USD, optional)',
     sellReserveNote: 'Hidden from bidders; only met or not met is shown.',
     sellBuyNowNote: 'Required. A buy-now listing sells at this price with no bidding.',
+    sellBuyNowAuctionNote:
+      'Optional. Set a price a buyer can pay to end the auction early; it must be above the starting bid and the reserve.',
     sellBuyNowPrice: 'Buy-now price (USD)',
     sellDuration: 'Duration',
     sellDurationHours: '{hours} hours',

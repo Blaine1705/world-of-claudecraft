@@ -3930,6 +3930,7 @@ export const en_XA: EnTranslations = {
       "sellReserve": "[Ŕéšéŕʋé (ÚŠÐ, óþţíóñáļ)]",
       "sellReserveNote": "[Ĥíððéñ ƒŕóɱ ƀíððéŕš; óñļý ɱéţ óŕ ñóţ ɱéţ íš šĥóŵñ.]",
       "sellBuyNowNote": "[Ŕéɋúíŕéð. Á ƀúý-ñóŵ ļíšţíñĝ šéļļš áţ ţĥíš þŕíçé ŵíţĥ ñó ƀíððíñĝ.]",
+      "sellBuyNowAuctionNote": "[Óþţíóñáļ. Šéţ á þŕíçé á ƀúýéŕ çáñ þáý ţó éñð ţĥé áúçţíóñ éáŕļý; íţ ɱúšţ ƀé áƀóʋé ţĥé šţáŕţíñĝ ƀíð áñð ţĥé ŕéšéŕʋé.]",
       "sellBuyNowPrice": "[Ɓúý-ñóŵ þŕíçé (ÚŠÐ)]",
       "sellDuration": "[Ðúŕáţíóñ]",
       "sellDurationHours": "[{hours} ĥóúŕš]",

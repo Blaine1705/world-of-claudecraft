@@ -751,19 +751,24 @@ describe('woc_market_window: the sell tab is an ARIA combobox', () => {
   });
 });
 
-describe('woc_market_window: the combined format is no longer offered', () => {
-  it('drops auction_buy_now from the format selector', () => {
+describe('woc_market_window: a combined listing is opted into by price, not by picker', () => {
+  it('keeps the format selector at two entries', () => {
+    // The combined format is creatable again, but it is deliberately NOT a third
+    // entry here: a seller who wants one fills the buy-now field on an auction.
+    // Three entries would ask them to classify the listing before naming the two
+    // prices that are the actual decision, and would let the picker and the
+    // fields contradict each other.
     const sell = between('private sellHtml(', 'private activityHtml(');
     expect(sell).toContain('value="auction"');
     expect(sell).toContain('value="buy_now"');
-    expect(sell).not.toContain('auction_buy_now');
+    expect(sell).not.toContain('value="auction_buy_now"');
   });
 
-  it('narrows the painter’s format state to the two creatable values', () => {
+  it('keeps the painter’s picker state to the two selectable values', () => {
     expect(painter).toContain("private sellFormat: 'auction' | 'buy_now' = 'auction'");
-    // And the change handler will not accept the retired value back. Matched as
-    // a COMPARISON, not as bare text: the handler's comment names the retired
-    // format to explain why it is absent.
+    // The change handler accepts only what the picker can emit; the third format
+    // is derived at submit, never selected. Matched as a COMPARISON, not as bare
+    // text, since nearby comments name the combined format.
     const onChange = between(
       'private onChange(e: Event): void {',
       'private async reloadBrowseOnly(',
@@ -772,9 +777,22 @@ describe('woc_market_window: the combined format is no longer offered', () => {
     expect(onChange).toContain("value === 'auction' || value === 'buy_now'");
   });
 
-  it('still RENDERS an existing combined listing: read and write differ', () => {
-    // 13 listings already carry the format. Removing creation must not make them
-    // unreadable, so the view model's format union keeps all three.
+  it('submits auction_buy_now exactly when an auction named a price', () => {
+    // The whole mapping, and the reason the picker can stay at two entries. A
+    // submit that forwarded `format` verbatim would send 'auction' with a
+    // buy-now price, which validListingParams refuses as bad_buy_now.
+    const submit = between('private async submitListing(', 'private async payBond(');
+    expect(submit).toContain(
+      "format === 'auction' && buyNowCents !== null ? 'auction_buy_now' : format",
+    );
+    // And the derived value, not the picked one, is what reaches the wire and
+    // decides which of the two price fields is dropped.
+    expect(submit).toContain('format: submitFormat');
+    expect(submit).toContain("reserveCents: submitFormat === 'buy_now' ? null : reserveCents");
+    expect(submit).toContain("buyNowCents: submitFormat === 'auction' ? null : buyNowCents");
+  });
+
+  it('renders all three formats: read and write agree again', () => {
     const view = readFileSync(new URL('../src/ui/woc_market_view.ts', import.meta.url), 'utf8');
     expect(view).toContain("'auction' | 'buy_now' | 'auction_buy_now'");
   });
@@ -1106,13 +1124,16 @@ describe('woc_market_window: bidding pays its own bond', () => {
 describe('woc_market_window: the Sell form offers only what the format permits', () => {
   // What shipped: every field rendered regardless of the chosen format, so an
   // auction showed a Buy Now price box and a buy-now showed a Reserve box. The
-  // server refuses both combinations (bad_buy_now / bad_reserve), so a seller
-  // could fill one in and only learn it was impossible after pressing Submit.
-  // Worse for the auction case: the listing they wanted simply did not have the
-  // buy-now they thought they had set.
-  it('gates the reserve and buy-now fields on the selected format', () => {
+  // server refuses ONE of those combinations (bad_reserve), so a seller could
+  // fill it in and only learn it was impossible after pressing Submit.
+  //
+  // The auction case is no longer a contradiction: a buy-now on an auction is
+  // the combined format, and submitListing maps it. So the asymmetry below is
+  // the point. An auction offers BOTH fields; a pure buy-now still offers only
+  // its price, because a reserve describes nothing on a listing with no bidding.
+  it('gates the reserve field on the selected format, and offers the auction both', () => {
     const form = between('const form = selected', 'private activityHtml(');
-    expect(form, 'the two fields must be on opposite arms').toContain(
+    expect(form, 'the reserve must be on the auction arm alone').toContain(
       "this.sellFormat === 'auction'",
     );
     const auctionArm = form.slice(
@@ -1121,8 +1142,10 @@ describe('woc_market_window: the Sell form offers only what the format permits',
     );
     const [ifTrue, ifFalse] = auctionArm.split(': `<label>');
     expect(ifTrue, 'an auction gets the reserve').toContain('sell-reserve');
-    expect(ifTrue, 'and never a buy-now price').not.toContain('sell-buy-now');
-    expect(ifFalse, 'a buy-now gets its price').toContain('sell-buy-now');
+    expect(ifTrue, 'and the optional buy-now that makes it a combined listing').toContain(
+      'sell-buy-now',
+    );
+    expect(ifFalse, 'a pure buy-now gets its price').toContain('sell-buy-now');
     expect(ifFalse, 'and never a reserve').not.toContain('sell-reserve');
   });
 
@@ -1138,5 +1161,90 @@ describe('woc_market_window: the Sell form offers only what the format permits',
     const read = between('private numberFieldCents(', '/** Typing in the combobox');
     expect(read).toContain('if (!el || el.value.trim()');
     expect(read).toContain('return null');
+  });
+});
+
+describe('woc_market_window: a bond awaiting the chain cannot be paid twice', () => {
+  // What shipped: the Pay Bond button was rendered for every pending_bond bid and
+  // disabled only on `this.busy`. busy covers a call in flight and clears the
+  // moment the server accepts the signature, but the bid legitimately stays
+  // pending_bond until the chain confirms. In that gap the button came back,
+  // enabled, on a bond that was already paid, and pressing it sent a second
+  // payment for the same bond.
+  const bids = between('const bids = a.bids', 'const settlements = a.settlements');
+
+  it('renders progress INSTEAD of the pay control while confirming', () => {
+    // The two arms must be mutually exclusive. A test that only checked the
+    // spinner appears would pass on markup that showed both.
+    const confirmingArm = bids.slice(
+      bids.indexOf('b.bondConfirming'),
+      bids.indexOf('data-action="pay-bond"'),
+    );
+    expect(confirmingArm).toContain('wm-inline-busy');
+    expect(confirmingArm, 'no pay control on the confirming arm').not.toContain('pay-bond');
+    // And the button is what the NOT-confirming arm renders.
+    expect(bids).toContain('data-action="pay-bond"');
+    expect(bids.indexOf('b.bondConfirming')).toBeLessThan(bids.indexOf('data-action="pay-bond"'));
+  });
+
+  it('still gates the pay control on busy, which confirming does not replace', () => {
+    // The two guards answer different questions (a call in flight vs a chain
+    // awaiting), so keeping both is the point; dropping busy would re-open the
+    // double-submit window this fix is about, one layer down.
+    expect(bids).toContain("this.busy ? 'disabled' : ''");
+  });
+
+  it('shows nothing at all for a bid that is not pending a bond', () => {
+    expect(bids).toContain("b.status !== 'pending_bond'");
+  });
+
+  it('announces the wait to a screen reader, not by colour or motion alone', () => {
+    expect(bids).toContain('role="status"');
+  });
+});
+
+describe('woc_market_window: the open window re-asks the server on its own cadence', () => {
+  it('polls from the slow-band entry point, not from a driver of its own', () => {
+    // The no-self-driver contract is pinned separately (and above); this pins
+    // that the poll rides the existing HUD band instead of working around it.
+    const refresh = between('refreshIfChanged(): void {', 'private pollFromServer');
+    expect(refresh).toContain('this.pollFromServer()');
+  });
+
+  it('decides cadence through the pure core rather than a local timer', () => {
+    const poll = between('private pollFromServer(): void {', 'The pending quote');
+    expect(poll).toContain('shouldPollWocMarket');
+    expect(poll).toContain('anyBondAwaitingChain');
+  });
+
+  it('never polls underneath a user action in flight', () => {
+    // A refetch mid-withBusy would swap the state that action's own completion
+    // is about to write.
+    const poll = between('private pollFromServer(): void {', 'The pending quote');
+    expect(poll).toContain('if (this.busy) return;');
+  });
+
+  it('clears the in-flight latch even when the request fails', () => {
+    // Left set, the latch would wedge polling off for the rest of the session,
+    // which is the exact failure the poll exists to prevent.
+    const poll = between('private pollFromServer(): void {', 'The pending quote');
+    expect(poll).toContain('.finally(');
+    expect(poll).toContain('this.pollInFlight = false');
+  });
+
+  it('fetches SILENTLY, so a background blip neither flashes nor erases the list', () => {
+    // browseLoading is in the view digest and browseFailed REPLACES the whole
+    // list with an error, so reusing the foreground path would have made the
+    // window flicker every poll and blank itself on one dropped request.
+    const poll = between('private pollFromServer(): void {', 'The pending quote');
+    expect(poll).toContain('this.loadBrowse(seq, true)');
+    const load = between('private async loadBrowse(', 'private async loadActivity(');
+    expect(load).toContain('if (!silent) this.browseLoading = true');
+    expect(load).toContain('if (!silent) this.browseFailed = true');
+  });
+
+  it('does not repaint by itself: the digest compare stays the one render path', () => {
+    const poll = between('private pollFromServer(): void {', 'The pending quote');
+    expect(poll, 'the poll mutates state only').not.toContain('this.render()');
   });
 });

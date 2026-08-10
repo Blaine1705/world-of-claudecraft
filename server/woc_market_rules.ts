@@ -205,12 +205,12 @@ const isCents = (v: number): boolean =>
 export function validListingParams(
   p: WocListingParams,
 ): { ok: true } | { ok: false; reason: ListingParamsRefusal } {
-  // 'auction_buy_now' is NOT creatable. A combined listing was redundant: an
-  // auction already ends early on a buy-now, and a plain buy-now covers the
-  // fixed-price case. Existing rows keep their format and continue to render,
-  // bid, and settle; only creation is refused, so no data migration is implied
-  // and the database CHECK deliberately stays permissive.
-  if (p.format !== 'auction' && p.format !== 'buy_now') {
+  // All three formats are creatable. 'auction_buy_now' is an auction that also
+  // names a price ending it early: sellers asked for it back, and nothing
+  // downstream ever branched on the format (claimBuyNowLock gates on the PRICE
+  // being non-null, not on the format), so re-allowing it here is the whole
+  // change. The database CHECK has carried all three throughout.
+  if (p.format !== 'auction' && p.format !== 'buy_now' && p.format !== 'auction_buy_now') {
     return { ok: false, reason: 'bad_format' };
   }
   // A directed sale is a fixed price to one named account. It may not be an
@@ -236,8 +236,14 @@ export function validListingParams(
   if (!(WOC_MARKET_DURATION_HOURS as readonly number[]).includes(p.durationHours)) {
     return { ok: false, reason: 'bad_duration' };
   }
-  const wantsBuyNow = p.format === 'buy_now';
+  // Both buy-now-bearing formats REQUIRE a price and a plain auction forbids
+  // one, so the format and the field can never disagree in either direction:
+  // an 'auction_buy_now' with no price is as refused as an 'auction' with one.
+  const wantsBuyNow = p.format === 'buy_now' || p.format === 'auction_buy_now';
   if (wantsBuyNow !== (p.buyNowCents !== null)) return { ok: false, reason: 'bad_buy_now' };
+  // Only a PURE buy-now forbids a reserve: with no bidding there is nothing for
+  // a reserve to describe. The combined format still has an auction underneath
+  // it, so it keeps the reserve, and the buy-now floor below accounts for it.
   if (p.format === 'buy_now' && p.reserveCents !== null)
     return { ok: false, reason: 'bad_reserve' };
   if (p.reserveCents !== null) {

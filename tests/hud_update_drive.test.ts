@@ -1216,7 +1216,7 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: 'this.wocMarketWindow.isOpen',
     surface: 'window',
     guard: { kind: 'module', module: 'woc_market_window.ts', proof: SIG_RETURN },
-    why: 'the $WOC Exchange window; its wocMarketViewSig digest folds second-resolution countdowns in, so open auctions tick on the poll without a self-armed driver',
+    why: 'the $WOC Exchange window; its wocMarketViewSig digest folds second-resolution countdowns in, so open auctions tick on the poll without a self-armed driver. This call ALSO carries the window’s background re-ask (pollFromServer, self-throttled to its own much slower cadence by woc_market_poll_core): a rebuild alone can only repaint data already in hand, and could never show a bond the chain has since confirmed',
   },
   {
     call: 'this.mailboxWindow.refreshIfChanged',

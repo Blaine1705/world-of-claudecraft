@@ -153,6 +153,7 @@ const makeBid = (over: Partial<WocBidView> = {}): WocBidView => ({
   amountCents: 1500,
   status: 'active',
   bondCents: 100,
+  bondConfirming: false,
   bondState: 'confirmed',
   bondReference: null,
   bondQuoteExpiresAtMs: null,

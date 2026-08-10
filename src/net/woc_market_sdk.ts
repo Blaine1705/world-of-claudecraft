@@ -128,6 +128,10 @@ export interface WocBidView {
   bondState: string;
   bondReference: string | null;
   bondQuoteExpiresAtMs: number | null;
+  /** True while a submitted bond payment is still being verified on chain. The
+   *  window shows progress and withholds the pay control on this, because
+   *  neither `status` nor `bondState` moves when the signature is recorded. */
+  bondConfirming: boolean;
   placedAtMs: number;
 }
 
@@ -171,10 +175,11 @@ export interface CreateListingRequest {
   itemIndex: number;
   itemId: string;
   expectInstance: ItemInstancePayload | null;
-  /** No 'auction_buy_now': the combined format is no longer creatable. The READ
-   *  type (WocListingView.format) still carries it, because listings created
-   *  before the change keep rendering, taking bids, and settling. */
-  format: 'auction' | 'buy_now';
+  /** All three are creatable. 'auction_buy_now' is an auction that also names a
+   *  buy-now price, which the seller opts into by filling that field in; the
+   *  form sends it rather than offering a third choice, because it is the same
+   *  auction with one more number on it. */
+  format: 'auction' | 'buy_now' | 'auction_buy_now';
   startCents: number;
   reserveCents: number | null;
   buyNowCents: number | null;

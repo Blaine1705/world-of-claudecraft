@@ -15960,7 +15960,15 @@
   }
   #woc-market-window .wm-banner,
   #woc-market-window .wm-notice,
-  #woc-market-window .wm-busy {
+  /* The busy banner said an operation was running but showed nothing moving, so
+     a signed transaction awaiting the chain was indistinguishable from a wedged
+     panel. The ring is the same one the p2p trade window uses (reused rather
+     than re-invented), and the flex row is what gives it a place to sit. */
+    #woc-market-window
+    .wm-busy {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     margin: 6px 16px 0;
     padding: 6px 10px;
     border: 1px solid var(--gold-dim);
@@ -15968,6 +15976,40 @@
     background: var(--panel-bg);
     color: var(--color-text-light);
     font-size: 13px;
+  }
+  /* Beside a single bid row rather than in the banner: the banner speaks for the
+     window, and this speaks for the one bid whose bond is being verified, which
+     is what tells the player WHICH payment they are waiting on. */
+  #woc-market-window .wm-inline-busy {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+  }
+  #woc-market-window .wm-busy::before,
+  #woc-market-window .wm-inline-busy::before {
+    content: "";
+    flex: 0 0 auto;
+    width: 11px;
+    height: 11px;
+    border: 2px solid var(--gold-dim);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: wm-spin 0.9s linear infinite;
+  }
+  @keyframes wm-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  /* Drop the SPIN, never the ring: the waiting state must still read as waiting
+     for someone who cannot have motion. */
+  @media (prefers-reduced-motion: reduce) {
+    #woc-market-window .wm-busy::before,
+    #woc-market-window .wm-inline-busy::before {
+      animation: none;
+    }
   }
   #woc-market-window .wm-banner-paused,
   #woc-market-window .wm-notice-error {
@@ -16103,6 +16145,11 @@
     display: block;
     width: 100%;
     margin-top: 14px;
+    /* Air UNDER it too, not only above. Both spend-money buttons sat flush
+       against whatever followed (the sales heading, the cancel rule), so the
+       card read as one dense stack and the commit controls had no room of their
+       own. Paired with the bid form's bottom margin below. */
+    margin-bottom: 16px;
   }
   /* Cancel is destructive and belongs to the LISTING, not to the bid form it
      followed; it was butted straight against that content with no separation.
@@ -16128,6 +16175,12 @@
     flex-direction: column;
     gap: 8px;
     margin-top: 8px;
+  }
+  /* The column gap does not apply after the LAST child, so Place Bid sat flush
+     against whatever came next. This is the bid half of the same spacing fix as
+     the buy-now button above. */
+  #woc-market-window .wm-detail .wm-bid-form {
+    margin-bottom: 16px;
   }
   #woc-market-window .wm-bid-form label,
   #woc-market-window .wm-sell-form label {

@@ -246,26 +246,88 @@ describe('validListingParams', () => {
     });
   });
 
-  it('refuses the retired combined format outright', () => {
-    // 'auction_buy_now' is no longer creatable: an auction already ends early on
-    // a buy-now and a plain buy-now covers the fixed-price case. Refused at the
-    // FORMAT gate, before any price check, so the seller is told the format is
-    // gone rather than being sent to fix prices on a listing they cannot make.
+  it('accepts a combined auction that carries a reserve AND a buy-now', () => {
+    // The combined format is creatable again. An auction that also names a
+    // price ending it early is the one listing shape the other two cannot
+    // express, and unlike a pure buy-now it keeps its reserve.
     expect(
       validListingParams(
         params({
-          format: 'auction_buy_now' as never,
+          format: 'auction_buy_now',
           startCents: 1000,
           reserveCents: 2000,
           buyNowCents: 3000,
         }),
       ),
-    ).toEqual({ ok: false, reason: 'bad_format' });
-    // Even a perfectly formed one.
-    expect(validListingParams(params({ format: 'auction_buy_now' as never }))).toEqual({
+    ).toEqual({ ok: true });
+    // And without a reserve, which is the common case.
+    expect(
+      validListingParams(
+        params({ format: 'auction_buy_now', startCents: 1000, buyNowCents: 2000 }),
+      ),
+    ).toEqual({ ok: true });
+  });
+
+  it('refuses a combined listing with no buy-now price', () => {
+    // The format NAMES a buy-now, so omitting the price is the same defect as
+    // a 'buy_now' with none: the format and the field must agree.
+    expect(validListingParams(params({ format: 'auction_buy_now', buyNowCents: null }))).toEqual({
       ok: false,
-      reason: 'bad_format',
+      reason: 'bad_buy_now',
     });
+  });
+
+  it('refuses a combined buy-now at or below the RESERVE, not merely the start', () => {
+    // The floor is max(start, reserve). A buy-now under the reserve would let a
+    // buyer take the item for less than the seller swore they would accept,
+    // which is the whole point of setting one. Only the combined format can hit
+    // this: a pure buy-now has no reserve to sit under.
+    expect(
+      validListingParams(
+        params({
+          format: 'auction_buy_now',
+          startCents: 1000,
+          reserveCents: 2000,
+          buyNowCents: 2000,
+        }),
+      ),
+    ).toEqual({ ok: false, reason: 'bad_buy_now' });
+    expect(
+      validListingParams(
+        params({
+          format: 'auction_buy_now',
+          startCents: 1000,
+          reserveCents: 2000,
+          buyNowCents: 1999,
+        }),
+      ),
+    ).toEqual({ ok: false, reason: 'bad_buy_now' });
+    // A cent above the reserve is the boundary, and it is accepted. Note this
+    // price already clears the START, so a floor that forgot the reserve would
+    // pass all three of these.
+    expect(
+      validListingParams(
+        params({
+          format: 'auction_buy_now',
+          startCents: 1000,
+          reserveCents: 2000,
+          buyNowCents: 2001,
+        }),
+      ),
+    ).toEqual({ ok: true });
+  });
+
+  it('still refuses a reserve BELOW the start on a combined listing', () => {
+    expect(
+      validListingParams(
+        params({
+          format: 'auction_buy_now',
+          startCents: 1000,
+          reserveCents: 500,
+          buyNowCents: 3000,
+        }),
+      ),
+    ).toEqual({ ok: false, reason: 'bad_reserve' });
   });
 
   it('refuses a buy-now price on a plain auction', () => {
@@ -320,17 +382,17 @@ describe('validListingParams', () => {
     ).toEqual({ ok: true });
   });
 
-  it('only auction and buy_now are creatable', () => {
-    // The whole creatable set, pinned. A third format reappearing (or one of
+  it('all three formats are creatable, and nothing else is', () => {
+    // The whole creatable set, pinned. A fourth format appearing (or one of
     // these disappearing) should fail here rather than in a UI review.
-    for (const format of ['auction', 'buy_now'] as const) {
+    for (const format of ['auction', 'buy_now', 'auction_buy_now'] as const) {
       const p =
-        format === 'buy_now'
-          ? params({ format, startCents: 1000, buyNowCents: 2000 })
-          : params({ format, startCents: 1000 });
+        format === 'auction'
+          ? params({ format, startCents: 1000 })
+          : params({ format, startCents: 1000, buyNowCents: 2000 });
       expect(validListingParams(p), format).toEqual({ ok: true });
     }
-    for (const format of ['auction_buy_now', 'dutch', '', 'AUCTION']) {
+    for (const format of ['dutch', '', 'AUCTION', 'buy-now']) {
       expect(validListingParams(params({ format: format as never })), format).toEqual({
         ok: false,
         reason: 'bad_format',
@@ -607,12 +669,13 @@ describe('a directed sale (the p2p trade agreed in the trade window)', () => {
       ok: false,
       reason: 'bad_directed_buyer',
     });
-    // 'auction_buy_now' is refused one step earlier as bad_format, because it is
-    // not creatable in ANY listing. Pinned so the directed rule is never
-    // credited with a refusal the format allowlist was already making.
+    // The combined format has an auction underneath it, so it is refused for the
+    // same reason, and by THIS rule rather than by the format allowlist: it is
+    // creatable in a public listing. A rule that only named 'auction' would let
+    // it through.
     expect(validListingParams(directed({ format: 'auction_buy_now' }))).toEqual({
       ok: false,
-      reason: 'bad_format',
+      reason: 'bad_directed_buyer',
     });
   });
 

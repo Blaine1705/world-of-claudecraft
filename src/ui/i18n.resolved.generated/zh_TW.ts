@@ -3930,6 +3930,7 @@ export const zh_TW: EnTranslations = {
       "sellReserve": "底價（美元，可選）",
       "sellReserveNote": "對出價者隱藏；只顯示已達或未達。",
       "sellBuyNowNote": "必填。一口價商品將以此價格出售，不接受競價。",
+      "sellBuyNowAuctionNote": "選填。設定一個買家可直接支付以提前結束拍賣的價格；該價格必須高於起標價和保留價。",
       "sellBuyNowPrice": "直購價（美元）",
       "sellDuration": "時長",
       "sellDurationHours": "{hours} 小時",

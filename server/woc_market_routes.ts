@@ -270,6 +270,18 @@ function bidView(row: WocBidRow): Record<string, unknown> {
     bondState: row.bondState,
     bondReference: row.bondReference,
     bondQuoteExpiresAtMs: row.bondQuoteExpiresAtMs,
+    // Whether a bond payment is submitted and awaiting the chain. A BOOLEAN, not
+    // the signature: the client needs only to know it must wait, and the
+    // signature is the bidder's own on-chain reference, not a field the window
+    // has any use for.
+    //
+    // Scoped to pending_bond deliberately. The signature stays on the row after
+    // the bond is held, so an unscoped `bondSignature !== null` would report a
+    // long-settled bond as forever confirming. Without this field the client
+    // cannot distinguish "not paid yet" from "paid, verifying": neither status
+    // nor bondState moves when the signature is recorded, which is exactly the
+    // window in which a second Pay Bond press would pay twice.
+    bondConfirming: row.status === 'pending_bond' && row.bondSignature !== null,
     placedAtMs: row.placedAtMs,
   };
 }
@@ -352,11 +364,11 @@ async function statusHandler(ctx: Ctx): Promise<void> {
 }
 
 const BROWSE_SORTS = new Set(['ending', 'newest', 'price_asc', 'price_desc']);
-// Two sets, deliberately different. Browsing must still find the combined
-// listings that already exist; creating one is no longer allowed. Narrowing the
-// browse filter as well would hide live listings from search.
-const BROWSE_FORMATS = new Set(['auction', 'buy_now', 'auction_buy_now']);
-const CREATABLE_FORMATS = new Set(['auction', 'buy_now']);
+// One set: every format that can be browsed can also be created. These were two
+// sets while 'auction_buy_now' was browse-only, and the split is what made
+// re-allowing it a two-place change rather than one. Whatever a seller can make,
+// a buyer can filter for.
+const LISTING_FORMATS = new Set(['auction', 'buy_now', 'auction_buy_now']);
 const QUALITIES = new Set(['epic', 'legendary']);
 
 async function browseHandler(ctx: Ctx): Promise<void> {
@@ -367,7 +379,7 @@ async function browseHandler(ctx: Ctx): Promise<void> {
   const formatRaw = one(ctx.query.format);
   if (!BROWSE_SORTS.has(sortRaw)) invalid();
   if (qualityRaw !== null && !QUALITIES.has(qualityRaw)) invalid();
-  if (formatRaw !== null && !BROWSE_FORMATS.has(formatRaw)) invalid();
+  if (formatRaw !== null && !LISTING_FORMATS.has(formatRaw)) invalid();
   const itemIdsRaw = one(ctx.query.itemIds);
   const itemIds =
     itemIdsRaw === null
@@ -432,7 +444,7 @@ async function createListingHandler(ctx: Ctx): Promise<void> {
       ...(expectInstance === undefined ? {} : { expectInstance }),
     },
     params: {
-      format: CREATABLE_FORMATS.has(String(body.format))
+      format: LISTING_FORMATS.has(String(body.format))
         ? (body.format as WocListingFormat)
         : (invalid() as never),
       startCents: intField(body.startCents, WOC_MARKET_MIN_PRICE_CENTS, WOC_MARKET_MAX_PRICE_CENTS),

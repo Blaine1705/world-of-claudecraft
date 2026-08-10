@@ -61,6 +61,7 @@ const bidView: WocBidView = {
   bondCents: 617,
   bondState: 'pending',
   bondReference: 'WOCB_31',
+  bondConfirming: false,
   bondQuoteExpiresAtMs: 1_000_000,
   placedAtMs: 900_000,
 };

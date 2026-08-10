@@ -21,6 +21,7 @@ process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_woc_marke
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it } from 'vitest';
 import type {
+  WocBidRow,
   WocBrowseQuery,
   WocListingRow,
   WocMarketRefusal,
@@ -259,6 +260,68 @@ describe('the refusal-to-wire mapping', () => {
       handlerFor('POST', '/api/woc-market/listings/:id/cancel')(ctx),
     ).rejects.toMatchObject({ status: 409, code: 'woc_market.stale_item' });
   });
+});
+
+describe('the create-listing format gate', () => {
+  /** Drive the create handler and report the params the service was handed, or
+   *  the HttpError the schema gate raised before the service was reached. */
+  async function createWith(
+    format: string,
+  ): Promise<{ params: Record<string, unknown> } | { status: number; code: string }> {
+    let seen: Record<string, unknown> | null = null;
+    service({
+      createListing: async (req: { params: Record<string, unknown> }) => {
+        seen = req.params;
+        return { ok: true, listing: listingRow({ format: format as WocListingRow['format'] }) };
+      },
+    } as unknown as Partial<WocMarketService>);
+    const ctx = fakeCtx({
+      method: 'POST',
+      url: '/api/woc-market/listings',
+      account: { accountId: VIEWER, scope: 'full' },
+      body: {
+        characterId: 12,
+        itemIndex: 0,
+        itemId: 'deathlord_warplate',
+        format,
+        startCents: 2500,
+        reserveCents: null,
+        buyNowCents: 25_000,
+        durationHours: 24,
+      },
+    });
+    try {
+      await handlerFor('POST', '/api/woc-market/listings')(ctx);
+    } catch (err) {
+      const e = err as { status: number; code: string };
+      return { status: e.status, code: e.code };
+    }
+    if (seen === null) throw new Error('the service was never called');
+    return { params: seen };
+  }
+
+  it('lets a combined listing through to the rules, rather than refusing at the wire', async () => {
+    // The route keeps its OWN format allowlist, so the rules core allowing
+    // 'auction_buy_now' is not enough on its own: this gate runs first and would
+    // have refused it as invalid_params before validListingParams ever saw it.
+    // Pinned because the two lists are in different files and only this proves
+    // they agree.
+    const out = await createWith('auction_buy_now');
+    expect(out).toHaveProperty('params');
+    expect((out as { params: Record<string, unknown> }).params.format).toBe('auction_buy_now');
+  });
+
+  it.each(['auction', 'buy_now'])('still lets %s through', async (format) => {
+    const out = await createWith(format);
+    expect((out as { params: Record<string, unknown> }).params.format).toBe(format);
+  });
+
+  it.each(['dutch', 'AUCTION', '', 'buy-now'])(
+    'still refuses %s at the wire, before the service',
+    async (format) => {
+      expect(await createWith(format)).toEqual({ status: 400, code: 'woc_market.invalid_input' });
+    },
+  );
 });
 
 describe('the public listing view', () => {
@@ -521,5 +584,81 @@ describe('the route table shape', () => {
       expect(block, path).toContain('activeAccount');
       expect(block, path).not.toMatch(/middleware: \[readAccount/);
     }
+  });
+});
+
+describe('the bid view: bond confirmation is visible to the bidder', () => {
+  function bidRow(over: Partial<WocBidRow> = {}): WocBidRow {
+    return {
+      id: 31,
+      listingId: 41,
+      account: VIEWER,
+      characterId: 12,
+      characterName: 'Aurelia',
+      wallet: 'BIDDERWALLETPUBKEY1111111111111111111111111',
+      amountCents: 5000,
+      status: 'pending_bond',
+      bondCents: 500,
+      bondState: 'pending',
+      bondReference: 'bond-ref-1',
+      bondQuoteExpiresAtMs: FAR_FUTURE_MS,
+      bondSignature: null,
+      placedAtMs: 1_799_000_000_000,
+      ...over,
+    };
+  }
+
+  /** Drive the activity handler over one bid and return that bid's public view. */
+  async function bidViewOf(over: Partial<WocBidRow>): Promise<Record<string, unknown>> {
+    service({
+      myActivity: async () => ({
+        listings: [],
+        bids: [bidRow(over)],
+        settlements: [],
+        strikes: null,
+        termsAcceptedAtMs: null,
+        wallet: null,
+      }),
+    } as unknown as Partial<WocMarketService>);
+    const ctx = readCtx({ url: '/api/woc-market/me' });
+    await handlerFor('GET', '/api/woc-market/me')(ctx);
+    const { status, body } = sent(ctx);
+    expect(status).toBe(200);
+    return (body.bids as Record<string, unknown>[])[0];
+  }
+
+  it('reports a submitted-but-unconfirmed bond as confirming', async () => {
+    // The window withholds its Pay Bond control on exactly this. Without the
+    // field the client cannot tell "not paid" from "paid, verifying": neither
+    // status nor bondState moves when the signature is recorded, and that gap is
+    // when a second press would pay the same bond twice.
+    expect(await bidViewOf({ bondSignature: 'sig-1' })).toMatchObject({
+      status: 'pending_bond',
+      bondState: 'pending',
+      bondConfirming: true,
+    });
+  });
+
+  it('reports an unpaid bond as NOT confirming, so the control is offered', async () => {
+    expect(await bidViewOf({ bondSignature: null })).toMatchObject({ bondConfirming: false });
+  });
+
+  it('stops reporting confirming once the bid leaves pending_bond', async () => {
+    // The signature STAYS on the row after the bond is held, so an unscoped
+    // `bondSignature !== null` would report a long-settled bond as forever
+    // confirming, which on the client means a permanent spinner and a fast poll
+    // that never stands down.
+    for (const status of ['active', 'won', 'lapsed', 'cancelled', 'defaulted'] as const) {
+      const view = await bidViewOf({ status, bondSignature: 'sig-1', bondState: 'held' });
+      expect(view.bondConfirming, status).toBe(false);
+    }
+  });
+
+  it('never puts the signature itself on the wire', async () => {
+    // A boolean is all the window needs; the signature is the bidder's on-chain
+    // reference and no part of this view's job.
+    const view = await bidViewOf({ bondSignature: 'sig-1' });
+    expect(Object.keys(view)).not.toContain('bondSignature');
+    expect(JSON.stringify(view)).not.toContain('sig-1');
   });
 });

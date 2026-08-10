@@ -90,6 +90,10 @@ export interface WocBidView {
   bondState: string;
   bondReference: string | null;
   bondQuoteExpiresAtMs: number | null;
+  /** A submitted bond payment is awaiting the chain. Mirrors the field of the
+   *  same name on the net SDK's view; this seam keeps its own copy so the pure
+   *  core stays free of a net/ import. */
+  bondConfirming: boolean;
   placedAtMs: number;
 }
 
@@ -419,8 +423,12 @@ export function wocMarketViewSig(model: WocMarketViewModel): string {
         model.activity.listings.map((l) => `${l.id}:${l.status}:${l.resolution ?? ''}`).join(','),
         model.activity.bids
           .map(
+            // bondConfirming is folded in because NOTHING else here moves when a
+            // bond payment is submitted: the bid stays pending_bond and the bond
+            // stays pending until the chain answers. Without it the progress
+            // spinner would never appear, and once it did it would never clear.
             (b) =>
-              `${b.id}:${b.status}:${b.bondState}:${Math.floor((b.bondQuoteRemainingMs ?? -1000) / 1000)}`,
+              `${b.id}:${b.status}:${b.bondState}:${b.bondConfirming ? 1 : 0}:${Math.floor((b.bondQuoteRemainingMs ?? -1000) / 1000)}`,
           )
           .join(','),
         model.activity.settlements

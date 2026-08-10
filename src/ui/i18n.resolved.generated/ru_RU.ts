@@ -3930,6 +3930,7 @@ export const ru_RU: EnTranslations = {
       "sellReserve": "Резервная цена (USD, необязательно)",
       "sellReserveNote": "Скрыта от участников; показывается только достигнута она или нет.",
       "sellBuyNowNote": "Обязательно. Такой лот продаётся по этой цене без торгов.",
+      "sellBuyNowAuctionNote": "Необязательно. Цена, заплатив которую покупатель завершит аукцион досрочно; она должна быть выше стартовой и резервной.",
       "sellBuyNowPrice": "Цена выкупа (USD)",
       "sellDuration": "Длительность",
       "sellDurationHours": "{hours} ч.",

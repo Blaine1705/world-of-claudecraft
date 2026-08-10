@@ -39,6 +39,7 @@ import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import { svgIcon } from './ui_icons';
 import { verifiedWocBalance } from './wallet_balance';
 import { overWalletBalance } from './woc_affordable_core';
+import { anyBondAwaitingChain, shouldPollWocMarket } from './woc_market_poll_core';
 import {
   buildWocMarketView,
   type WocMarketTab,
@@ -195,6 +196,10 @@ export class WocMarketWindow {
   private busy = false;
   private busyLabel: TranslationKey | null = null;
   private notice: { text: string; error: boolean } | null = null;
+  /** Background-poll bookkeeping. The stamp is when the last poll STARTED (see
+   *  shouldPollWocMarket); both are read only by pollFromServer. */
+  private pollStartedMs: number | null = null;
+  private pollInFlight = false;
   // Item hover targets for the CURRENT DOM, rebuilt with it. An instance payload
   // is an object and cannot ride in a data attribute, so the markup carries a
   // stable key and this maps it back to the row it came from. Cleared at the top
@@ -243,10 +248,21 @@ export class WocMarketWindow {
     this.render();
   }
 
-  private async loadBrowse(seq: number): Promise<void> {
+  /**
+   * @param silent A BACKGROUND refresh: report neither progress nor failure.
+   *
+   * Both halves matter, and both are about not punishing the player for a poll
+   * they did not ask for. The loading flag is IN the view digest, so raising it
+   * every poll would force a full rebuild on a cadence even when the answer was
+   * identical. The failed flag REPLACES the entire list with an error, so one
+   * blipped background request would throw away a list that is still perfectly
+   * good; keeping the stale rows is strictly better than that, and the next poll
+   * repairs it. A refresh the player DID ask for still reports both.
+   */
+  private async loadBrowse(seq: number, silent = false): Promise<void> {
     const hooks = this.deps.hooks();
     if (!hooks) return;
-    this.browseLoading = true;
+    if (!silent) this.browseLoading = true;
     const out = await hooks.client.browse({
       page: this.page,
       quality: null,
@@ -255,9 +271,9 @@ export class WocMarketWindow {
       sort: this.sort,
     });
     if (seq !== this.renderSeq) return;
-    this.browseLoading = false;
+    if (!silent) this.browseLoading = false;
     if (!out.ok) {
-      this.browseFailed = true;
+      if (!silent) this.browseFailed = true;
       return;
     }
     this.browseFailed = false;
@@ -324,9 +340,61 @@ export class WocMarketWindow {
     // would then freeze the browse countdowns for the rest of the session, which
     // is a worse failure than the flicker it prevents.
     if (this.tab === 'sell' && this.sellOpen) return;
+    // Ask the server again on its own cadence, then fall through. The poll only
+    // MUTATES state and never paints: the signature compare below is the one
+    // render path, so a poll that changed nothing costs no rebuild, and one that
+    // did is picked up by the very next tick.
+    this.pollFromServer();
     const sig = `${wocMarketViewSig(this.buildModel())}|${this.quoteCountdownSig()}`;
     if (sig === this.lastSig) return;
     this.render();
+  }
+
+  /**
+   * The background re-ask, driven by the same slow band as the rebuild above.
+   *
+   * Without this the window only ever showed what it fetched when it opened: a
+   * bid someone else outbid, a listing that sold, and above all a bond the chain
+   * had since confirmed all required closing and reopening the panel to see.
+   *
+   * Deliberately NOT reload(): that one bumps renderSeq to cancel in-flight work
+   * and repaints immediately, which is right for a user action and wrong for a
+   * background refresh (it would fight whatever the player is currently doing).
+   * This reuses the same seq FENCE, so if the player does act mid-poll their
+   * action wins and this response is discarded.
+   */
+  private pollFromServer(): void {
+    const hooks = this.deps.hooks();
+    if (!hooks) return;
+    // Never mid-mutation: withBusy is a user action in flight, and refetching
+    // underneath it would swap the state its own completion is about to write.
+    if (this.busy) return;
+    // ONE clock read, used for both the decision and the stamp it writes: two
+    // reads could disagree, which would quietly shorten or lengthen the very
+    // interval this is enforcing.
+    const nowMs = Date.now();
+    if (
+      !shouldPollWocMarket({
+        nowMs,
+        lastFetchStartedMs: this.pollStartedMs,
+        inFlight: this.pollInFlight,
+        awaitingChain: anyBondAwaitingChain(this.activity?.bids ?? []),
+      })
+    ) {
+      return;
+    }
+    this.pollStartedMs = nowMs;
+    this.pollInFlight = true;
+    const seq = this.renderSeq;
+    // The status read is deliberately not repeated here: it carries the feature
+    // and pause configuration, which changes on an operator action rather than
+    // on play, and reload() already refreshes it on every open and tab change.
+    void Promise.all([this.loadBrowse(seq, true), this.loadActivity(seq)]).finally(() => {
+      // Cleared even on a stale or failed response: leaving it set would wedge
+      // the poll off for the rest of the session, which is the failure this
+      // whole method exists to prevent.
+      this.pollInFlight = false;
+    });
   }
 
   /**
@@ -950,9 +1018,17 @@ export class WocMarketWindow {
         // two controls that would be rejected, with the refusal arriving only
         // after they pressed the button. A missing field reads as null, which is
         // exactly what each format requires of the other one.
+        //
+        // An AUCTION now carries an optional buy-now beside its reserve: filling
+        // it in is what turns the listing into the combined format, so the
+        // seller opts in by naming a price rather than by picking a third entry
+        // from the format list. A PURE buy-now still forbids a reserve, which
+        // would describe nothing on a listing with no bidding.
         (this.sellFormat === 'auction'
           ? `<label>${esc(t('hudChrome.wocMarket.sellReserve'))}<input type="number" inputmode="decimal" min="0" step="0.25" data-field="sell-reserve" data-focus-key="wm-sell-reserve" /></label>` +
-            `<p class="wm-note">${esc(t('hudChrome.wocMarket.sellReserveNote'))}</p>`
+            `<p class="wm-note">${esc(t('hudChrome.wocMarket.sellReserveNote'))}</p>` +
+            `<label>${esc(t('hudChrome.wocMarket.sellBuyNowPrice'))}<input type="number" inputmode="decimal" min="0" step="0.25" data-field="sell-buy-now" data-focus-key="wm-sell-buy-now" /></label>` +
+            `<p class="wm-note">${esc(t('hudChrome.wocMarket.sellBuyNowAuctionNote'))}</p>`
           : `<label>${esc(t('hudChrome.wocMarket.sellBuyNowPrice'))}<input type="number" inputmode="decimal" min="0" step="0.25" data-field="sell-buy-now" data-focus-key="wm-sell-buy-now" required /></label>` +
             `<p class="wm-note">${esc(t('hudChrome.wocMarket.sellBuyNowNote'))}</p>`) +
         `<label>${esc(t('hudChrome.wocMarket.sellDuration'))}<select data-field="sell-duration" data-focus-key="wm-sell-duration">${durations}</select></label>` +
@@ -1039,12 +1115,24 @@ export class WocMarketWindow {
       .join('');
     const bids = a.bids
       .map((b) => {
+        // A submitted bond that the chain has not answered yet shows PROGRESS,
+        // never the pay control. `busy` alone could not carry this: it covers
+        // only a call in flight, and it clears the moment the server accepts the
+        // signature, while the bid legitimately stays pending_bond for as long
+        // as confirmation takes. That gap is exactly when a second press would
+        // send a second payment for a bond already paid.
         const payBond =
-          b.status === 'pending_bond'
-            ? ` <button type="button" data-action="pay-bond" data-bid="${b.id}" ${this.busy ? 'disabled' : ''} ` +
-              `aria-label="${esc(t('hudChrome.wocMarket.bidBondPayAria', { id: formatNumber(b.listingId) }))}" data-focus-key="wm-bond-${b.id}">` +
-              `${esc(t('hudChrome.wocMarket.bidBondPay'))}</button>`
-            : '';
+          b.status !== 'pending_bond'
+            ? ''
+            : b.bondConfirming
+              ? // The SHORT key, shared with the busy banner. The bidBondConfirming
+                // sentence beside it is the one-off notice shown when the payment
+                // is first accepted; as a permanent inline label on every affected
+                // row it would be a paragraph per bid.
+                ` <span class="wm-inline-busy" role="status">${esc(t('hudChrome.wocMarket.confirming'))}</span>`
+              : ` <button type="button" data-action="pay-bond" data-bid="${b.id}" ${this.busy ? 'disabled' : ''} ` +
+                `aria-label="${esc(t('hudChrome.wocMarket.bidBondPayAria', { id: formatNumber(b.listingId) }))}" data-focus-key="wm-bond-${b.id}">` +
+                `${esc(t('hudChrome.wocMarket.bidBondPay'))}</button>`;
         return `<li><span>${esc(this.usd(b.amountCents))}</span> <span>${esc(t(bidStatusKey(b.status)))}</span>${payBond}</li>`;
       })
       .join('');
@@ -1670,6 +1758,10 @@ export class WocMarketWindow {
       return;
     }
     if (format !== 'auction' && format !== 'buy_now') return;
+    // Naming a buy-now price on an auction IS the combined format. The seller
+    // opts in by filling that field rather than by picking a third entry from
+    // the format list, so the two prices stay one decision.
+    const submitFormat = format === 'auction' && buyNowCents !== null ? 'auction_buy_now' : format;
     // The buy-now price has to beat the starting bid, and the reserve if one is
     // set. Checked here so the seller is told which field is wrong before a round
     // trip; validListingParams re-checks it server-side, which is the authority.
@@ -1687,10 +1779,14 @@ export class WocMarketWindow {
         itemIndex: this.sellIndex ?? 0,
         itemId: slot.itemId,
         expectInstance: slot.instance ?? null,
-        format,
+        format: submitFormat,
         startCents,
-        reserveCents: format === 'buy_now' ? null : reserveCents,
-        buyNowCents: format === 'auction' ? null : buyNowCents,
+        // A pure buy-now carries no reserve; an auction, combined or not, may.
+        reserveCents: submitFormat === 'buy_now' ? null : reserveCents,
+        // Only a plain auction sends no price. Both buy-now-bearing formats
+        // require one, and validListingParams refuses a format and a price that
+        // disagree in either direction.
+        buyNowCents: submitFormat === 'auction' ? null : buyNowCents,
         durationHours,
         offerNext,
       });
