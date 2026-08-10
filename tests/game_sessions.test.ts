@@ -81,6 +81,17 @@ function expectJoined(result: ClientSession | { error: string }): ClientSession 
   return result;
 }
 
+// Pull the plain notice text out of every 'events' frame a fake ws received,
+// the same shape sendChatNotice emits ({ t: 'events', list: [{ type: 'error', text }] }).
+function noticeTexts(ws: ReturnType<typeof fakeWs>): string[] {
+  return (ws.send.mock.calls as unknown[][])
+    .map((call) => JSON.parse(String(call[0])) as { t?: string; list?: { text?: string }[] })
+    .filter((frame) => frame.t === 'events')
+    .flatMap((frame) => frame.list ?? [])
+    .map((event) => event.text)
+    .filter((text): text is string => typeof text === 'string');
+}
+
 // detectActivity writes into the module-global linked-member change feed, so start
 // every test from an empty queue.
 beforeEach(() => {
@@ -169,6 +180,46 @@ describe('GameServer sessions', () => {
         JSON.stringify({ t: 'cmd', cmd: 'chat', text: '/dev gold 100' }),
       );
       expect(server.sim.meta(player.pid)?.copper ?? 0).toBeGreaterThan(0);
+    } finally {
+      if (previous === undefined) delete process.env.ALLOW_DEV_COMMANDS;
+      else process.env.ALLOW_DEV_COMMANDS = previous;
+    }
+  });
+
+  it('keeps the spawn dev-command gate closed when a leading space hides the slash', () => {
+    const previous = process.env.ALLOW_DEV_COMMANDS;
+    process.env.ALLOW_DEV_COMMANDS = '1';
+    try {
+      const server = new GameServer();
+      const mobCount = () =>
+        [...server.sim.entities.values()].filter((e) => e.templateId === 'forest_wolf').length;
+
+      // The remembered chat channel defaults to "say" on join. A leading space
+      // (or mixed case, or the devspawn alias) must not let a spawn command
+      // slip past the staff-only gate and reach sim.chat's own trim unchecked.
+      const playerWs = fakeWs();
+      const player = expectJoined(server.join(playerWs, 23, 203, 'LeadingSpace', 'warrior', null));
+      const before = mobCount();
+      server.handleMessage(
+        player,
+        JSON.stringify({ t: 'cmd', cmd: 'chat', text: ' /dev spawn forest_wolf 1 5' }),
+      );
+      expect(mobCount(), 'a leading space must not bypass the spawn gate').toBe(before);
+      expect(noticeTexts(playerWs)).toContain(
+        '[dev] Spawn controls require an administrator account.',
+      );
+
+      const staffWs = fakeWs();
+      const staff = expectJoined(
+        server.join(staffWs, 24, 204, 'LeadingSpaceStaff', 'warrior', null, false, {
+          isAdmin: true,
+        }),
+      );
+      server.handleMessage(
+        staff,
+        JSON.stringify({ t: 'cmd', cmd: 'chat', text: ' /dev spawn forest_wolf 1 5' }),
+      );
+      expect(mobCount(), 'an admin keeps spawn controls with a leading space').toBe(before + 1);
     } finally {
       if (previous === undefined) delete process.env.ALLOW_DEV_COMMANDS;
       else process.env.ALLOW_DEV_COMMANDS = previous;

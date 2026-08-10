@@ -264,6 +264,7 @@ describe('Vespers baseline loop', () => {
     vespersEchoDamage(ctx, guardian, target, 0, TITHEFIEND_STRIKE_ID);
     expect(priest.resource).toBe(0);
     vespersEchoDamage(ctx, guardian, target, 10, TITHEFIEND_STRIKE_ID);
+    expect(TITHEFIEND_MANA_RETURN_RATE).toBe(0.01);
     expect(priest.resource).toBe(
       Math.max(1, Math.round(priest.maxResource * TITHEFIEND_MANA_RETURN_RATE)),
     );
@@ -376,6 +377,7 @@ describe('Vespers baseline loop', () => {
 
     vespersEchoDamage(ctx, guardian, primary, 100, TITHEFIEND_STRIKE_ID);
 
+    expect(TITHEFIEND_ECHO_RATE).toBe(0.15);
     expect(before - secondary.hp).toBe(Math.round(100 * TITHEFIEND_ECHO_RATE));
     expect(TITHEFIEND_ECHO_RATE).toBeLessThan(0.3);
   });
@@ -427,10 +429,13 @@ describe('Vespers baseline loop', () => {
     const guardian = [...sim.entities.values()].find(
       (entity) => entity.ownerId === priest.id && entity.guardianState?.key === 'tithefiend',
     );
+    expect(TITHEFIEND_MAX_STACK_SCALE).toBe(1.1);
     expect(guardian?.scale).toBe(TITHEFIEND_MAX_STACK_SCALE);
+    expect(TITHEFIEND_MAX_STACK_DAMAGE_MULT).toBe(1.25);
     expect(guardian?.guardianState?.minDamage).toBe(
       Math.round((12 + 5 * 8) * TITHEFIEND_MAX_STACK_DAMAGE_MULT),
     );
+    expect(TITHEFIEND_BASE_SPELL_POWER_COEFF).toBe(0.15);
     expect(guardian?.guardianState?.spellPowerCoeff).toBe(
       TITHEFIEND_BASE_SPELL_POWER_COEFF * TITHEFIEND_MAX_STACK_DAMAGE_MULT,
     );

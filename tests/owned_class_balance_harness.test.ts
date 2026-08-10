@@ -105,7 +105,7 @@ describe('owned-class level 20 balance harness', () => {
     );
   }, 120_000);
 
-  it('keeps Fieldcraft sustained damage near the ranged Hunter specs and pays Bloodhook', () => {
+  it('pins a Fieldcraft sustained-damage ceiling against the ranged Hunter specs and pays Bloodhook', () => {
     const scenario = OWNED_CLASS_BALANCE_SCENARIOS[1];
     const coldsight = runOwnedClassDpsProbe('coldsight', scenario, 29_902);
     const fieldcraft = runOwnedClassDpsProbe('fieldcraft', scenario, 29_902);
@@ -113,6 +113,8 @@ describe('owned-class level 20 balance harness', () => {
 
     // Band widened for the stacked v0.29 rogue redesign (#2328): its shared
     // combat changes shift this pair a few percent; re-author when it lands.
+    // Ceiling only, deliberately: there is no matching floor here pending the
+    // Hunter kit debt, so a real downside swing is allowed to pass.
     expect(fieldcraft.dps).toBeLessThanOrEqual(coldsight.dps * 1.25);
     expect(woundDamage / fieldcraft.totalDamage).toBeGreaterThanOrEqual(0.05);
   }, 120_000);

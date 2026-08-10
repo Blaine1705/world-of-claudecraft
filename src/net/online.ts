@@ -2953,6 +2953,11 @@ export class ClientWorld implements IWorld {
           blockIcdRemaining: 0,
         };
         e.paladinDevotion.ascensionCharges = ascensionCharges;
+        // Synthetic presence flag, not a real duration: `pasc` carries only the
+        // charge count, never a remaining-seconds value. Every current reader
+        // (paladin_devotion_view, action_bar_view, paladin_ascension_core) only
+        // tests > 0, so 0/1 is enough; a future consumer that reads this as an
+        // actual countdown must not trust it.
         e.paladinDevotion.ascensionRemaining = ascensionCharges > 0 ? 1 : 0;
       }
       e.overheadEmoteId = isOverheadEmoteId(w.emo) ? w.emo : null;

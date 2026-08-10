@@ -47,6 +47,7 @@ const aura = (id: string, timer: Record<string, number>): Record<string, unknown
 
 describe('stable snapshot timer protocol', () => {
   it('negotiates exact v3 only and decodes named cooldown schedules', () => {
+    expect(STABLE_TIMER_WIRE_VERSION).toBe(3);
     expect(snapshotTimerWireMode(undefined)).toBe('legacy');
     expect(snapshotTimerWireMode(STABLE_TIMER_WIRE_VERSION)).toBe('stable');
     expect(snapshotTimerWireMode('3')).toBe('unsupported');

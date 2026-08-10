@@ -47,6 +47,8 @@ describe('talent production save migrations', () => {
     const migrated = migrateCharacterTalentsV2('warrior', before);
 
     expect(migrated).not.toBe(before);
+    // Pinned to a literal: an accidental bump re-migrates every live character.
+    expect(CURRENT_CHARACTER_CONTENT_REVISION).toBe(4);
     expect(migrated.contentRevision).toBe(CURRENT_CHARACTER_CONTENT_REVISION);
     expect(migrated.talents).toEqual({ spec: 'fury', rows: {} });
 

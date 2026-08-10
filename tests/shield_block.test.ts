@@ -45,6 +45,7 @@ describe('shield block', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
     // A fresh warrior now spawns with the buckler already in the offhand.
     expect(sim.player.offhandItemId).toBe('eastbrook_buckler');
+    expect(SHIELD_BLOCK_BASE).toBe(0.05);
     expect(sim.player.blockChance).toBe(SHIELD_BLOCK_BASE);
     expect(sim.player.blockChance).toBeGreaterThan(0);
     expect(sim.player.blockValue).toBe(6);

@@ -24,6 +24,13 @@ describe('PET_SIGNATURE_ATTACK_IDS', () => {
     expect([...PET_SIGNATURE_ATTACK_IDS].sort()).toEqual(petSignatureAbilityIds());
   });
 
+  it('pins the allowlisted ids to literals', () => {
+    expect([...PET_SIGNATURE_ATTACK_IDS].sort()).toEqual([
+      'emberkin_felbolt',
+      'gloomshade_abyssal_chain',
+    ]);
+  });
+
   it('has a manifest attackByAbility clip backing every allowlisted id', () => {
     const authoredIds = new Set<string>();
     for (const visual of Object.values(VISUALS)) {

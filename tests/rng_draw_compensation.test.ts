@@ -8,6 +8,7 @@
 // the edit. This pin turns that deletion into a local red instead.
 import { describe, expect, it } from 'vitest';
 import { runEffects } from '../src/sim/combat/effect_dispatch';
+import { repeatDawnEcho } from '../src/sim/combat/paladin_talents';
 import type { PlayerMeta, ResolvedAbility } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 
@@ -37,5 +38,29 @@ describe('rng draw-order compensations (max-health heal path)', () => {
     // re-derive deliberately, never delete the compensations to make it 2.
     expect(draws).toBe(2);
     expect(p.hp).toBe(p.maxHp);
+  });
+
+  it('a Dawn Echo repeat (the alreadyResolved heal copy) draws zero rng: no compensation needed', () => {
+    // heal.ts's alreadyResolved flag is a SECOND, unrelated skip-draw path: the
+    // crit ternary short-circuits on `!alreadyResolved` before it ever reaches
+    // canCrit, so a repeat copy never rolls and never needs a chance(0) burn
+    // the way the max-health heal path above does. paladin_talents.ts's
+    // repeatDawnEcho is the real caller (Dawn Echo copies an already-resolved
+    // heal at 40%); pin it at zero draws so a future change cannot silently
+    // add a roll (or a needless compensation) and shift the shared stream.
+    const sim = new Sim({ seed: 31, playerClass: 'paladin', autoEquip: true }) as TestSim;
+    sim.setPlayerLevel(20);
+    const p = sim.player;
+    p.hp = Math.floor(p.maxHp / 2);
+
+    let draws = 0;
+    sim.rng.setObserver(() => {
+      draws += 1;
+    });
+    const healed = repeatDawnEcho(sim.ctx, p, { kind: 'healing', target: p, amount: 100 });
+    sim.rng.setObserver(null);
+
+    expect(healed).toBe(true);
+    expect(draws).toBe(0);
   });
 });

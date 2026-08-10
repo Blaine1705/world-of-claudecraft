@@ -100,13 +100,15 @@ describe('owned-class raid-level balance harness', () => {
     // the shard-calibrated wall.
   }, 900_000);
 
-  it('keeps Shaman and Vespers raid sustain and cast cadence stable across five seeds', () => {
+  it('pins a Thundercall raid sustain floor against Vespers and keeps Warspirit in a stable band, cast cadence included, across five seeds', () => {
     for (const scenario of OWNED_CLASS_RAID_SCENARIOS) {
       const thundercall = averageOwnedClassDpsProbe('thundercall', scenario, RAID_BALANCE_SEEDS);
       const warspirit = averageOwnedClassDpsProbe('warspirit', scenario, RAID_BALANCE_SEEDS);
       const vespers = averageOwnedClassDpsProbe('vespers', scenario, RAID_BALANCE_SEEDS);
       // Re-authored on the owned-class stack integration (#2328 landed here):
-      // measured 0.6922 on the integrated tree (margin below).
+      // measured 0.6922 on the integrated tree (margin below). Floor only,
+      // deliberately: Thundercall has no matching ceiling here pending the
+      // Shaman kit-item pass, so a real upside swing is allowed to pass.
       expect(thundercall.dps).toBeGreaterThanOrEqual(vespers.dps * 0.69);
       expect(thundercall.readyIdleSeconds).toBeLessThanOrEqual(15);
       expect(thundercall.buttonsPressed).toBeGreaterThanOrEqual(65);
