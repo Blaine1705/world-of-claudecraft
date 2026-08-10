@@ -13,6 +13,15 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formName.form_cat': '늑대 변신',
+  'guide.gear.slotOffhand': '보조장비',
+  'guide.glossary.claudiumTerm': 'Claudium',
+  'guide.glossary.riftTerm': '균열',
+  'guide.howToPlay.step0Title': '게임 시작하기',
+  'guide.interfacePage.framePetTitle': '내 소환수',
+  'guide.interfacePage.winBagsTitle': '가방 (B)',
+  'guide.riftsPage.rankFmt': '{rank} 등급',
+  'hudChrome.comboMeter.label': '연계',
   'hudChrome.bg.clock': '{minutes}:{seconds}',
   'hudChrome.controller.zoomIn': '확대',
   'hudChrome.controller.zoomOut': '축소',
