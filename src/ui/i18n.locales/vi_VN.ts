@@ -10136,8 +10136,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Sách Kỳ Công là nơi thế giới ghi sổ tất cả những gì bạn đã làm, từ những bước chân đầu tiên rời thung lũng khởi đầu cho đến những trận đánh khó nhất mà vương quốc có thể bày ra. Hãy lập kỳ công khi chơi, mang những danh hiệu chúng ban tặng, và nhìn Danh Vọng của bạn leo cao.',
   'guide.deedsPage.renownHeading': 'Danh Vọng',
   'guide.deedsPage.rewardBorder': 'Viền',
-  'guide.deedsPage.rewardsBody':
-    'Phần thưởng đều chỉ để phô diễn, và đó chính là chủ ý. Một số kỳ công ban danh hiệu để bạn mang hoặc viền để đóng khung tên bạn, và không bao giờ có thứ gì khiến anh hùng của bạn mạnh hơn. Hãy chọn danh hiệu bạn muốn trong Sách Kỳ Công, nó sẽ theo bạn trên bảng tên, trong kênh trò chuyện và trên các bảng xếp hạng cho mọi người cùng thấy.',
   'guide.deedsPage.rewardsHeading': 'Danh hiệu và viền tên',
   'guide.nav.deeds': 'Sách Kỳ Công',
   'hudChrome.deeds.broadcastLine': '{name} vừa lập một kỳ công: {deed}',
@@ -10180,7 +10178,12 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.recentLabel': 'Gần đây:',
   'hudChrome.deeds.renownChip': '{renown} Danh Vọng',
   'hudChrome.deeds.renownLabel': 'Danh Vọng',
-  'hudChrome.deeds.retroSummary': 'Biên niên sử của bạn vừa bắt kịp: đã ghi lại {count} kỳ công.',
+  'hudChrome.plurals.deedsRetroSummary.few':
+    'Biên niên sử của bạn vừa bắt kịp: đã ghi lại {count} kỳ công.',
+  'hudChrome.plurals.deedsRetroSummary.many':
+    'Biên niên sử của bạn vừa bắt kịp: đã ghi lại {count} kỳ công.',
+  'hudChrome.plurals.deedsRetroSummary.other':
+    'Biên niên sử của bạn vừa bắt kịp: đã ghi lại {count} kỳ công.',
   'hudChrome.deeds.searchAria': 'Tìm kỳ công theo tên',
   'hudChrome.deeds.searchPlaceholder': 'Tìm kỳ công',
   'hudChrome.deeds.title': 'Sách Kỳ Công',

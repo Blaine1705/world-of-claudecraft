@@ -9956,8 +9956,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'El Libro de Gestas es donde el mundo lleva la cuenta de todos tus hechos, desde tus primeros pasos fuera del valle inicial hasta los combates más duros que el reino puede ofrecer. Consigue gestas mientras juegas, luce los títulos que otorgan y mira cómo asciende tu Renombre.',
   'guide.deedsPage.renownHeading': 'Renombre',
   'guide.deedsPage.rewardBorder': 'Borde',
-  'guide.deedsPage.rewardsBody':
-    'Las recompensas son pura apariencia, y esa es la gracia. Algunas gestas otorgan un título que puedes lucir o un borde que enmarca tu nombre, y nunca nada que haga más fuerte a tu héroe. Elige el título que quieras desde el Libro de Gestas y te acompañará en tu placa de nombre, en el chat y en las clasificaciones, a la vista de cualquiera.',
   'guide.deedsPage.rewardsHeading': 'Títulos y bordes',
   'guide.nav.deeds': 'Libro de Gestas',
   'hudChrome.deeds.broadcastLine': '{name} ha logrado una gesta: {deed}',
@@ -10000,7 +9998,12 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.recentLabel': 'Recientes:',
   'hudChrome.deeds.renownChip': '{renown} de Renombre',
   'hudChrome.deeds.renownLabel': 'Renombre',
-  'hudChrome.deeds.retroSummary': 'Tu crónica se pone al día: {count} gestas registradas.',
+  'hudChrome.plurals.deedsRetroSummary.few':
+    'Tu crónica se pone al día: {count} gestas registradas.',
+  'hudChrome.plurals.deedsRetroSummary.many':
+    'Tu crónica se pone al día: {count} gestas registradas.',
+  'hudChrome.plurals.deedsRetroSummary.other':
+    'Tu crónica se pone al día: {count} gestas registradas.',
   'hudChrome.deeds.searchAria': 'Buscar gestas por nombre',
   'hudChrome.deeds.searchPlaceholder': 'Buscar gestas',
   'hudChrome.deeds.title': 'Libro de Gestas',

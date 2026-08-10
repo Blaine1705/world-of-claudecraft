@@ -9678,8 +9678,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'In het Boek der Daden houdt de wereld de stand bij van alles wat je hebt verricht, van je eerste stappen buiten het dal waar je begon tot de zwaarste gevechten die het rijk te bieden heeft. Behaal daden terwijl je speelt, draag de titels die ze schenken en zie je Roem stijgen.',
   'guide.deedsPage.renownHeading': 'Roem',
   'guide.deedsPage.rewardBorder': 'Rand',
-  'guide.deedsPage.rewardsBody':
-    'De beloningen zijn puur voor de sier, en dat is precies de bedoeling. Sommige daden schenken een titel die je kunt dragen of een rand die je naam omlijst, en nooit iets dat je held sterker maakt. Kies de titel die je wilt in het Boek der Daden en hij reist mee op je naamplaatje, in de chat en op de ranglijsten, voor iedereen zichtbaar.',
   'guide.deedsPage.rewardsHeading': 'Titels en randen',
   'guide.nav.deeds': 'Boek der Daden',
   'hudChrome.deeds.broadcastLine': '{name} heeft een daad volbracht: {deed}',
@@ -9722,7 +9720,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.recentLabel': 'Recent:',
   'hudChrome.deeds.renownChip': '{renown} Roem',
   'hudChrome.deeds.renownLabel': 'Roem',
-  'hudChrome.deeds.retroSummary': 'Je kroniek is bijgewerkt: {count} daden opgetekend.',
+  'hudChrome.plurals.deedsRetroSummary.few': 'Je kroniek is bijgewerkt: {count} daden opgetekend.',
+  'hudChrome.plurals.deedsRetroSummary.many': 'Je kroniek is bijgewerkt: {count} daden opgetekend.',
+  'hudChrome.plurals.deedsRetroSummary.other':
+    'Je kroniek is bijgewerkt: {count} daden opgetekend.',
   'hudChrome.deeds.searchAria': 'Zoek daden op naam',
   'hudChrome.deeds.searchPlaceholder': 'Daden zoeken',
   'hudChrome.deeds.title': 'Boek der Daden',

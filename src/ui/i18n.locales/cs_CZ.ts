@@ -10291,8 +10291,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Kniha skutků je místo, kde si svět počítá vše, co máš za sebou: od prvních kroků z počátečního údolí až po nejtěžší boje, jaké říše nabízí. Vykonávej skutky při hraní, nos tituly, které ti udělí, a sleduj, jak tvůj věhlas roste.',
   'guide.deedsPage.renownHeading': 'Věhlas',
   'guide.deedsPage.rewardBorder': 'Rámeček',
-  'guide.deedsPage.rewardsBody':
-    'Odměny jsou čistě na parádu, a přesně o to jde. Některé skutky udělují titul, který můžeš nosit, nebo rámeček, jenž orámuje tvé jméno, nikdy však nic, co by tvého hrdinu posílilo. Vyber si v Knize skutků titul, o který stojíš, a ponese se s tebou na jmenovce, v chatu i na žebříčcích, všem na očích.',
   'guide.deedsPage.rewardsHeading': 'Tituly a rámečky',
   'guide.nav.deeds': 'Kniha skutků',
   'hudChrome.deeds.broadcastLine': '{name} završuje skutek: {deed}',
@@ -10335,7 +10333,12 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.recentLabel': 'Nedávné:',
   'hudChrome.deeds.renownChip': 'Věhlas: {renown}',
   'hudChrome.deeds.renownLabel': 'Věhlas',
-  'hudChrome.deeds.retroSummary': 'Tvoje kronika se dopisuje: zaznamenáno {count} skutků.',
+  'hudChrome.plurals.deedsRetroSummary.few':
+    'Tvoje kronika se dopisuje: zaznamenáno {count} skutků.',
+  'hudChrome.plurals.deedsRetroSummary.many':
+    'Tvoje kronika se dopisuje: zaznamenáno {count} skutků.',
+  'hudChrome.plurals.deedsRetroSummary.other':
+    'Tvoje kronika se dopisuje: zaznamenáno {count} skutků.',
   'hudChrome.deeds.searchAria': 'Hledat skutky podle názvu',
   'hudChrome.deeds.searchPlaceholder': 'Hledat skutky',
   'hudChrome.deeds.title': 'Kniha skutků',
