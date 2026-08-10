@@ -63,8 +63,10 @@ const PVP_FEAR_DR_MULTIPLIERS = [1, 0.5, 0.25, 0.125] as const;
  * schedule for polymorph, the duration-scaled fear ladder, the shared
  * 100/50/25/immune multiplier ladder for root/lockout, and null once that
  * ladder is exhausted (DR-immune, apply nothing). `now` and `isHostileTo` are
- * passed in rather than read off a host so the resolver stays a pure function
- * of its arguments.
+ * passed in rather than read off a host: this keeps the resolver a leaf module
+ * with no `SimContext` dependency, so a Vitest can import and exercise it
+ * directly. It is NOT a pure function of its arguments: three of its exits
+ * write the new DR stage to `target.ccDr`.
  *
  * Balance pass (maintainer): player stuns are exempt from PvP diminishing
  * returns. They operate differently from fear: short flat durations behind
