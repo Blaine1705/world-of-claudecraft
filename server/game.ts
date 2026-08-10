@@ -1305,7 +1305,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   // on change), never the per-tick dynamic fields. Render-only, like `mh`.
   if (e.kind === 'player') {
     // The authored modular look (`app`) is NOT built here. It is ~0.6 KB for a
-    // default look (1474 bytes at its hard bound, APPEARANCE_MAX_WIRE_BYTES)
+    // default look (1489 bytes at its hard bound, APPEARANCE_MAX_WIRE_BYTES)
     // and changes at most once a session, and everything in this record is
     // JSON.stringify'd once per entity per TICK (wireCacheFor), so composing it
     // into the object would re-serialize half a kilobyte 20 times a second per
@@ -1612,7 +1612,7 @@ interface EntityWireVariantCache {
 
 interface EntityWireCache {
   tick: number;
-  /** identityFields() as JSON, WITHOUT the authored look — the string actually
+  /** identityFields() as JSON, WITHOUT the authored look: the string actually
    *  diffed for identity changes. Kept beside idJson so the appearance splice
    *  below only re-runs when the rest of the identity moves. */
   baseIdJson: string;
@@ -3884,7 +3884,7 @@ export class GameServer {
     }
     // The freshly-read look, same "absent means keep" contract as the layout
     // above. ws_auth always supplies it on a real reconnect, so a redesign
-    // saved during the linkdead grace window lands here — the join-time value
+    // saved during the linkdead grace window lands here: the join-time value
     // on the entity would otherwise outlive the row for the whole session,
     // with the appearance memo happily serving the stale string (the wipe of
     // lastSent below re-SENDS, but what it re-sends is the memo).
@@ -5406,7 +5406,7 @@ export class GameServer {
    *
    * The appearance redesign writes helm visibility straight into the stored
    * state blob (consumeAppearanceReroll), and a character who is IN WORLD while
-   * that lands still holds the old value in memory — its 30 s autosave would
+   * that lands still holds the old value in memory: its 30 s autosave would
    * write it straight back. So the route mirrors the write onto the session
    * through the same Sim entry the paperdoll's `set_helm` command uses; the
    * value then rides the entity wire to every viewer at once, and the autosave
@@ -5428,7 +5428,7 @@ export class GameServer {
    * The redesign route is allowed while the character is in world, and it used
    * to apply only its helm half live: the look stayed the old body for the
    * player and every peer until relog, while the roster row it was saved from
-   * showed the new one. Setting the entity field is NOT enough on its own —
+   * showed the new one. Setting the entity field is NOT enough on its own:
    * `EntityWireCache.appJson` is minted once per entity and the identity only
    * re-splices when the rest of the identity moves, so the memo would serve
    * the old string for the rest of the session. Busting both (appJson and the
@@ -8391,12 +8391,12 @@ export class GameServer {
    * The authored modular look as JSON, minted at most ONCE per entity.
    *
    * `app` is by far the heaviest identity field (~0.6 KB for a default look,
-   * 1474 bytes at the bound the shared sanitizer enforces) and the only one
+   * 1489 bytes at the bound the shared sanitizer enforces) and the only one
    * that a session normally never changes: it is stamped at join from the
    * character's own column, and the sole thing that moves it is a redesign the
    * player just paid a token for (applyAppearanceForCharacter, which busts this
    * memo explicitly). Both wire paths therefore serialize
-   * it here and reuse the string — the peer path splices it into the cached
+   * it here and reuse the string: the peer path splices it into the cached
    * identity JSON (wireCacheFor), the self path ships it through bcastSelf's
    * `maybeRaw` delta channel. Returns null when the entity has no authored
    * look, which is also what keeps the key sparse for pre-creator characters.

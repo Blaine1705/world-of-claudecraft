@@ -2,7 +2,7 @@
 // cost the server almost nothing to keep sending.
 //
 // `app` is the heaviest identity field by an order of magnitude (~0.6 KB for a
-// default look against a handful of bytes for everything else, and 1474 bytes
+// default look against a handful of bytes for everything else, and 1489 bytes
 // at the shared sanitizer's hard bound) and the only one a session normally
 // never changes: it is stamped at join from the character's own column, and the
 // only thing that moves it is a paid redesign. Composing it into identityFields
@@ -123,7 +123,7 @@ describe('authored look on the wire', () => {
     const entity = server.sim.entities.get(other.pid)!;
     // TICK, not just broadcast. wireCacheFor gates every identity stringify on
     // `cache.tick !== sim.tickCount`, so a loop of bare broadcasts enters the
-    // serializing arm exactly once whatever the code underneath does — the
+    // serializing arm exactly once whatever the code underneath does: the
     // pre-memo version passes that loop too. Advancing the sim is what makes
     // this measure the memo instead of the per-tick cache.
     let serialized = 0;

@@ -62,11 +62,7 @@ export const APPEARANCE_WIRE_KEYS: readonly string[] = [
   'outfit',
 ];
 
-/** The two nested maps (face + body morph sliders). Their KEYS are the slider
- *  allowlists below and their values are numbers. */
-const NESTED_KEYS: readonly string[] = ['face', 'body'];
-
-/** The slider names each nested map may carry — ALLOWLISTED, exactly like the
+/** The slider names each nested map may carry: ALLOWLISTED, exactly like the
  *  top-level key set, and for the same reason the module header gives: a
  *  character row is broadcast to every player in view, so it must never become
  *  a channel for arbitrary attacker-chosen text. Bounding the maps by count and
@@ -101,6 +97,18 @@ export const APPEARANCE_BODY_SLIDER_KEYS: readonly string[] = [
   'feet',
 ];
 
+/** Which slider allowlist a nested map validates against, keyed by its own
+ *  top-level key. A lookup, not a two-way ternary: a ternary over two known
+ *  keys quietly treats anything that is not 'face' as 'body', so a future
+ *  third nested key would validate its sliders against the wrong allowlist
+ *  instead of failing loudly. Here a key with no entry is simply not a nested
+ *  map this module knows how to sanitize, and sanitizeAppearance drops it,
+ *  same as any other value it does not recognize. */
+const NESTED_SLIDER_KEYS: Record<string, readonly string[]> = {
+  face: APPEARANCE_FACE_SLIDER_KEYS,
+  body: APPEARANCE_BODY_SLIDER_KEYS,
+};
+
 /** Every string VALUE a look may carry is a style id: a short bare identifier
  *  the renderer matches against a fixed list ('warriorbraid', 'bloodforged',
  *  'default'). So bound the CHARSET, not just the length.
@@ -128,16 +136,20 @@ const STYLE_ID_RE = /^[a-z0-9_]{1,24}$/;
  * A real ceiling, not an estimate, and tests/appearance_wire_bounds.test.ts
  * builds the maximal document and measures it rather than trusting this
  * constant. It is reachable by construction: every one of the 26 scalar keys
- * carrying a 24-character id (the longest thing a value can be, since the
- * longest JSON number is 24 characters and a string of 24 costs 26 with its
- * quotes), and both slider maps full of worst-case doubles.
+ * carrying a 24-character id (a string of 24 costs 26 with its quotes), and
+ * both slider maps full of worst-case doubles, each 25 characters long. 25 is
+ * the true longest JSON.stringify of any finite double, not 24: JSON uses
+ * fixed notation down to 1e-6 exclusive, so a value just above that boundary
+ * still prints in fixed form yet needs the full 17 significant digits, for
+ * example -0.0000032101548324340437 (sign, "0.", five leading zeros, 17
+ * digits).
  *
  * For scale, a default look is 586 bytes on the wire and a fully randomised one
  * about 911, which is where the "~0.6 KB" the identity-wire reasoning quotes
  * comes from. The gap between that and this is all numeric precision, and the
  * charset bound is what stops the gap being unbounded text.
  */
-export const APPEARANCE_MAX_WIRE_BYTES = 1474;
+export const APPEARANCE_MAX_WIRE_BYTES = 1489;
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -193,11 +205,9 @@ export function sanitizeAppearance(value: unknown): Record<string, unknown> | nu
   for (const key of APPEARANCE_WIRE_KEYS) {
     if (!(key in value)) continue;
     const raw = value[key];
-    if (NESTED_KEYS.includes(key)) {
-      const map = sanitizeSliderMap(
-        raw,
-        key === 'face' ? APPEARANCE_FACE_SLIDER_KEYS : APPEARANCE_BODY_SLIDER_KEYS,
-      );
+    const sliderKeys = NESTED_SLIDER_KEYS[key];
+    if (sliderKeys) {
+      const map = sanitizeSliderMap(raw, sliderKeys);
       if (map !== null) {
         out[key] = map;
         kept++;

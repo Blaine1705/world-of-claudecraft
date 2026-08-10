@@ -126,7 +126,7 @@ describe('sanitizeAppearance bounds', () => {
 
   it('never persists an attacker-chosen key name, even a short numeric one', () => {
     // The old bound was count + value type, which let 32 keys of 48 chars ride
-    // per map — persisted and re-broadcast to everyone in view, outside every
+    // per map, persisted and re-broadcast to everyone in view, outside every
     // chat filter. Key NAMES are the channel, so they are allowlisted.
     const evil = Object.fromEntries(
       Array.from({ length: 40 }, (_, i) => [`ATTACKER TEXT ${i} ${'x'.repeat(30)}`, 1]),
@@ -216,18 +216,25 @@ describe('appearance value charset', () => {
 });
 
 describe('the wire ceiling', () => {
+  // The longest JSON.stringify of any finite double. JSON prints fixed
+  // notation down to 1e-6 exclusive, so a value just above that boundary still
+  // renders in fixed form yet needs the full 17 significant digits: a sign,
+  // "0.", five leading zeros, then the digits. Confirmed by brute-force
+  // sampling across the full double range: nothing finite prints longer than
+  // this, and it round-trips through JSON.parse(JSON.stringify(...)) unchanged.
+  const WORST_NUMBER = -0.0000032101548324340437;
+
   /** The biggest thing sanitizeAppearance can return: every scalar key carrying
-   *  the longest legal value (a 24-character id costs 26 bytes with its quotes,
-   *  where the longest JSON number is 24), and both slider maps full of
-   *  worst-case doubles. */
+   *  the longest legal value (a 24-character id costs 26 bytes with its
+   *  quotes), and both slider maps full of WORST_NUMBER, the longest legal
+   *  JSON number at 25 characters. */
   function maximalDocument(): Record<string, unknown> {
-    const worstNumber = -Number.MAX_VALUE;
     const doc: Record<string, unknown> = {};
     for (const key of APPEARANCE_WIRE_KEYS) {
       if (key === 'face') {
-        doc.face = Object.fromEntries(APPEARANCE_FACE_SLIDER_KEYS.map((k) => [k, worstNumber]));
+        doc.face = Object.fromEntries(APPEARANCE_FACE_SLIDER_KEYS.map((k) => [k, WORST_NUMBER]));
       } else if (key === 'body') {
-        doc.body = Object.fromEntries(APPEARANCE_BODY_SLIDER_KEYS.map((k) => [k, worstNumber]));
+        doc.body = Object.fromEntries(APPEARANCE_BODY_SLIDER_KEYS.map((k) => [k, WORST_NUMBER]));
       } else {
         doc[key] = 'a'.repeat(24);
       }
@@ -245,20 +252,101 @@ describe('the wire ceiling', () => {
     expect(bytes).toBe(APPEARANCE_MAX_WIRE_BYTES);
   });
 
-  it('cannot be exceeded by an attacker document, at any size or charset', () => {
-    // Everything the old bound let through: longer values, multi-byte
-    // characters, control characters (six bytes each once escaped), hundreds of
-    // extra keys, and fat slider maps.
-    for (const fill of ['x'.repeat(4000), '一'.repeat(2000), ''.repeat(2000)]) {
-      const doc: Record<string, unknown> = {};
-      for (const key of APPEARANCE_WIRE_KEYS) doc[key] = fill;
-      for (let i = 0; i < 500; i++) doc[`junk${i}`] = fill;
-      doc.face = Object.fromEntries(Array.from({ length: 500 }, (_, i) => [`s${i}`, 1e300]));
-      doc.body = Object.fromEntries(Array.from({ length: 500 }, (_, i) => [fill + i, 1e300]));
-      const out = sanitizeAppearance(doc);
-      const bytes = out === null ? 0 : Buffer.byteLength(JSON.stringify(out), 'utf8');
-      expect(bytes).toBeLessThanOrEqual(APPEARANCE_MAX_WIRE_BYTES);
+  it('cannot be exceeded by an attacker document layered onto the legitimate maximum', () => {
+    // A version of this test that only threw PURELY hostile documents at the
+    // sanitizer (every value oversized or junk-keyed, nothing legitimate) had
+    // every one of them rejected outright, so `out` was null on every
+    // iteration and "0 <= ceiling" passed no matter what the constant was set
+    // to. To actually exercise the region near the ceiling, every perturbation
+    // below starts from the maximal LEGITIMATE document above (already at the
+    // worst case for every field) and layers ONE additional attack onto it, so
+    // a regression that let any of these grow the sanitized output would be
+    // caught.
+    const oversizedString = 'a'.repeat(500);
+    const multibyteString = '一'.repeat(60);
+    const controlCharString = '\x01\x02\x03'.repeat(20);
+    const extremeNumbers = [
+      Number.MIN_VALUE,
+      Number.MAX_VALUE,
+      -Number.MAX_VALUE,
+      9.999999999999997e-7,
+      -1.0000000000000002e-6,
+      5e-7,
+    ];
+
+    function withScalarsReplaced(value: unknown): Record<string, unknown> {
+      const doc = maximalDocument();
+      for (const key of APPEARANCE_WIRE_KEYS) {
+        if (key === 'face' || key === 'body') continue;
+        doc[key] = value;
+      }
+      return doc;
     }
+
+    function withJunkSliderKeys(): Record<string, unknown> {
+      const doc = maximalDocument();
+      const junk = Object.fromEntries(Array.from({ length: 500 }, (_, i) => [`junk${i}`, 1]));
+      doc.face = { ...(doc.face as Record<string, number>), ...junk };
+      doc.body = { ...(doc.body as Record<string, number>), ...junk };
+      return doc;
+    }
+
+    function withJunkTopLevelKeys(): Record<string, unknown> {
+      const doc = maximalDocument();
+      for (let i = 0; i < 500; i++) doc[`junk${i}`] = oversizedString;
+      return doc;
+    }
+
+    function withExtremeSliderValues(): Record<string, unknown> {
+      const doc = maximalDocument();
+      doc.face = Object.fromEntries(
+        APPEARANCE_FACE_SLIDER_KEYS.map((k, i) => [k, extremeNumbers[i % extremeNumbers.length]]),
+      );
+      doc.body = Object.fromEntries(
+        APPEARANCE_BODY_SLIDER_KEYS.map((k, i) => [
+          k,
+          extremeNumbers[(i + 3) % extremeNumbers.length],
+        ]),
+      );
+      return doc;
+    }
+
+    function withNonFiniteSliderValues(): Record<string, unknown> {
+      const doc = maximalDocument();
+      doc.face = Object.fromEntries(
+        APPEARANCE_FACE_SLIDER_KEYS.map((k) => [k, Number.POSITIVE_INFINITY]),
+      );
+      doc.body = Object.fromEntries(APPEARANCE_BODY_SLIDER_KEYS.map((k) => [k, Number.NaN]));
+      return doc;
+    }
+
+    const perturbations: Record<string, () => Record<string, unknown>> = {
+      'oversized scalar strings': () => withScalarsReplaced(oversizedString),
+      'multibyte scalar strings': () => withScalarsReplaced(multibyteString),
+      'control-character scalar strings': () => withScalarsReplaced(controlCharString),
+      'hundreds of junk keys inside both slider maps': withJunkSliderKeys,
+      'hundreds of junk top-level keys': withJunkTopLevelKeys,
+      'extreme but finite slider values': withExtremeSliderValues,
+      'non-finite slider values': withNonFiniteSliderValues,
+    };
+
+    const distancesFromCeiling: number[] = [];
+    for (const [label, build] of Object.entries(perturbations)) {
+      const out = sanitizeAppearance(build());
+      const bytes = out === null ? 0 : Buffer.byteLength(JSON.stringify(out), 'utf8');
+      expect(bytes, `${label} produced ${bytes} bytes`).toBeLessThanOrEqual(
+        APPEARANCE_MAX_WIRE_BYTES,
+      );
+      distancesFromCeiling.push(APPEARANCE_MAX_WIRE_BYTES - bytes);
+    }
+
+    // Anti-vacuity floor: at least one perturbation has to sanitize to within
+    // 100 bytes of the ceiling, proving this test actually reaches the region
+    // it claims to bound rather than every perturbed document collapsing to
+    // null the way the old one did. Layering junk onto an already-maximal
+    // document is stripped entirely by the allowlists, so it lands exactly on
+    // the ceiling: this floor is provable, not incidental.
+    expect(Math.min(...distancesFromCeiling)).toBeLessThanOrEqual(100);
   });
 
   it('leaves a real authored look far under it', () => {
