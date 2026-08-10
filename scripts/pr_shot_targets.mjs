@@ -223,6 +223,13 @@ async function seedLowGraphicsPreset(page) {
   );
 }
 
+/** The tracker variants need BOTH pre-load seeds: the pin-store wipe and the
+ *  low preset (a variant carries one beforeLoad, so this composes the pair). */
+async function clearPinsOnLowPreset(page) {
+  await clearReliquaryPins(page);
+  await seedLowGraphicsPreset(page);
+}
+
 /** Open The Reliquary on the Conquerors shelf and return its page ids in shelf
  *  order. That shelf is item-only, which is what makes the partial fill below
  *  predictable (marks, mounts, titles and skins live in other stores). */
@@ -4146,8 +4153,12 @@ export const TARGETS = [
       'ui/reliquary_sheet_view',
       'sim/content/reliquary',
       'sim/reliquary',
+      'reliquary_phase22_closeout',
     ],
-    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
     async capture(page) {
       await page.evaluate(() => {
         document.querySelector('#gpu-notice')?.remove();
@@ -4184,7 +4195,10 @@ export const TARGETS = [
     key: 'reliquary-overview-fresh',
     label: 'The Reliquary: fresh-character Overview (strip hints + shelf cards)',
     when: ['ui/reliquary_view', 'ui/reliquary_window'],
-    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
     async capture(page) {
       // Deliberately NO seeding: the acceptance shot is the fresh character's
       // front door (both strip labels with their hints, three shelf cards, the
@@ -4208,8 +4222,12 @@ export const TARGETS = [
       'ui/reliquary_labels',
       'sim/content/reliquary',
       'sim/reliquary',
+      'reliquary_phase22_closeout',
     ],
-    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
     async capture(page) {
       await page.evaluate(() => {
         document.querySelector('#gpu-notice')?.remove();
@@ -4436,18 +4454,22 @@ export const TARGETS = [
     // Scoped to the tracker's own two modules. The window targets above already
     // cover the shelf and page surfaces, and a wider when list would double the
     // capture set of every Reliquary window change.
-    when: ['ui/reliquary_tracker_view', 'ui/reliquary_tracker_painter'],
+    when: [
+      'ui/reliquary_tracker_view',
+      'ui/reliquary_tracker_painter',
+      'reliquary_phase22_closeout',
+    ],
     variants: [
       // The strip itself, expanded, with a line per pinned page.
-      { key: 'desktop', beforeLoad: clearReliquaryPins },
+      { key: 'desktop', beforeLoad: clearPinsOnLowPreset },
       // The same frame uncropped: where the strip actually sits in the HUD,
       // under the quest and deed trackers in #right-tracker-stack.
-      { key: 'hud-desktop', beforeLoad: clearReliquaryPins },
+      { key: 'hud-desktop', beforeLoad: clearPinsOnLowPreset },
       // Compact touch tier (844x390 landscape lands there): the rows fold away
       // and the header becomes a count chip that opens The Reliquary.
-      { key: 'mobile', mobile: true, beforeLoad: clearReliquaryPins },
+      { key: 'mobile', mobile: true, beforeLoad: clearPinsOnLowPreset },
       // The pin control that feeds all of the above, on its shelf rows.
-      { key: 'pin-desktop', beforeLoad: clearReliquaryPins },
+      { key: 'pin-desktop', beforeLoad: clearPinsOnLowPreset },
     ],
     async capture(page, variant) {
       const picks = await pinReliquaryTrackerPages(page);
@@ -4496,7 +4518,13 @@ export const TARGETS = [
   {
     key: 'inspect-curator-standing',
     label: 'Inspect card: Reliquary standing line, border accent, Curator sigil',
-    when: ['ui/inspect_view', 'ui/inspect_window', 'ui/curator_sigil', 'ui/reliquary_sheet_view'],
+    when: [
+      'ui/inspect_view',
+      'ui/inspect_window',
+      'ui/curator_sigil',
+      'ui/reliquary_sheet_view',
+      'reliquary_phase22_closeout',
+    ],
     // SELF-inspect, which is the only arm that renders offline: no server ever
     // stamps the crk/cro/crt wire fields in a single-player world, so a spawned
     // bystander would show an empty standing no matter what is seeded. Hud gates
@@ -4536,6 +4564,80 @@ export const TARGETS = [
       const opened = await pollForSize(page, '#inspect-window');
       if (!opened) throw new Error('inspect window did not open');
       return { clip: '#inspect-window' };
+    },
+  },
+  {
+    key: 'char-sheet-reliquary',
+    label: 'Character sheet framed on the Reliquary progression row',
+    when: ['ui/reliquary_sheet_view', 'ui/char_view', 'reliquary_phase22_closeout'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        // The same three-find seed as the window targets, so the pair reads a
+        // real non-zero completion instead of a fresh 0/N.
+        const sim = window.__game?.sim;
+        if (sim?.primary?.deedStats?.itemsDiscovered) {
+          for (const id of ['cryptbone_helm', 'boundstone_helm', 'cryptbone_pauldrons']) {
+            sim.primary.deedStats.itemsDiscovered.add(id);
+          }
+        }
+        window.__game?.hud?.toggleChar?.();
+      });
+      const opened = await pollForSize(page, '#char-window');
+      if (!opened) throw new Error('char window did not open');
+      // Frame ON the row: the sheet scrolls on small frames and the
+      // progression block sits below the equipment columns.
+      await page.evaluate(() => {
+        document.querySelector('#char-window .cp-reliquary')?.scrollIntoView({ block: 'center' });
+      });
+      await wait(200);
+      const hasRow = await page.evaluate(
+        () => !!document.querySelector('#char-window .cp-reliquary'),
+      );
+      if (!hasRow) throw new Error('char sheet reliquary progression row not found');
+      return { clip: '#char-window' };
+    },
+  },
+  {
+    key: 'nameplate-border',
+    label: 'Rank-5 Curator border on the own nameplate and portrait ring, in world',
+    when: ['ui/deed_border_view', 'render/nameplate_view', 'reliquary_phase22_closeout'],
+    // Desktop only: the plate paints identically on the compact tier and the
+    // full frame is the evidence (a canvas plate cannot be DOM-clipped).
+    variants: [{ key: 'desktop', beforeLoad: seedLowGraphicsPreset }],
+    async capture(page) {
+      const seeded = await page.evaluate(`(async () => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const sim = window.__game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        // Wear the rank-5 border through the REAL validator (the
+        // inspect-curator-standing idiom): earn the catalog, earn the deed,
+        // then pick the border, so the plate shows what a rank-5 Curator
+        // actually gets.
+        const mod = await import('/src/sim/content/reliquary.ts');
+        for (const pageDef of mod.RELIQUARY_PAGES) {
+          for (const relic of pageDef.relics) {
+            if (relic.kind === 'item') sim.primary.deedStats.itemsDiscovered.add(relic.itemId);
+          }
+        }
+        sim.deedsEarned.set('col_reliquary_rank_5', '2026-08-01');
+        sim.setActiveBorder('col_reliquary_rank_5');
+        return { ok: true, border: sim.players?.get?.(sim.playerId)?.activeBorder ?? null };
+      })()`);
+      if (!seeded.ok) throw new Error(`nameplate border seeding failed: ${seeded.reason}`);
+      if (seeded.border !== 'col_reliquary_rank_5') {
+        throw new Error(`activeBorder is ${seeded.border}, expected col_reliquary_rank_5`);
+      }
+      // Let the world render a few frames so the plate and the portrait ring
+      // repaint with the border before the frame is taken.
+      await wait(1200);
+      return {};
     },
   },
   {
