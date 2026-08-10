@@ -165,6 +165,32 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(compiled).toEqual(['a', 'c']);
   });
 
+  it('dedupes across calls through a caller-owned shared store', async () => {
+    // One logical compile pass split over several submissions (the early
+    // manifest entry, the compile entry's live-scene RE-collection, the
+    // resume lane) must not resubmit a root or signature an earlier call
+    // already covered; per-call stores made the re-collection pay every
+    // early root a second time.
+    const sharedDedupe = { seen: new Set<{ id: string; mats: string[] }>(), seenKeys: new Set() };
+    const early = { id: 'a', mats: ['stone'] };
+    const settleAddition = { id: 'b', mats: ['moss'] };
+    const compiled: string[] = [];
+    const compile = async (root: { id: string }): Promise<void> => {
+      compiled.push(root.id);
+    };
+    const firstCall = buildPrewarmCompileUnits([{ id: 'scene', roots: [early] }], compile, {
+      dedupeKeys: (root) => root.mats,
+      sharedDedupe,
+    });
+    const secondCall = buildPrewarmCompileUnits(
+      [{ id: 'scene', roots: [early, settleAddition] }],
+      compile,
+      { dedupeKeys: (root) => root.mats, sharedDedupe },
+    );
+    for (const unit of [...firstCall, ...secondCall]) await unit.run();
+    expect(compiled).toEqual(['a', 'b']);
+  });
+
   it('batches roots into one unit that awaits its compiles together', async () => {
     // r165 compileAsync resolves after N x 10 ms of setTimeout polling: awaited
     // one by one, the floors stack; awaited together, they overlap. The batch
@@ -285,21 +311,32 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(resumeStart).toBeGreaterThan(-1);
     expect(runStart).toBeGreaterThan(resumeStart);
     expect(unitsSlice.match(/buildPrewarmCompileUnits\(/g)).toHaveLength(1);
-    expect(resumeSlice).toContain('return compileEntryUnits()');
+    // The resume lane must exclude groups whose units were already submitted
+    // off-thread (resuming them would double-submit every unit).
+    expect(resumeSlice).toContain(
+      'compileEntryUnits((groupId) => !submittedCompileGroups.has(groupId))',
+    );
     expect(unitsStart).toBeGreaterThan(-1);
     expect(unitsEnd).toBeGreaterThan(unitsStart);
     expect(unitsSlice).toContain('if (visibleOnly) root.traverseVisible(collect)');
     expect(unitsSlice).toContain('else root.traverse(collect)');
     expect(unitsSlice).toContain('roots: compileRoots(group.children, false)');
+    // The mass-submission callback compiles against the lights-only proxy
+    // scene (identical program keys, ~10-node prologue walk instead of the
+    // whole world per call; the live gates keep the live-scene default).
     expect(unitsSlice).toContain('await this.compilePrewarmColorPrograms(root, false)');
     expect(unitsSlice).toContain('await this.compileShadowPrograms(root)');
     expect(compileEntry).not.toContain('compileAsync(this.scene');
     expect(compileEntry).not.toContain('Promise.race');
     expect(source).toContain('void settlePrewarmBeforePublish(');
     expect(source).toContain('resumeDroppedPrewarmEntries(resume, {');
+    // releaseTail: a resume unit's wall time is its off-thread links; without
+    // the tail release each unit occupied the whole serial queue for seconds
+    // and live compile gates could not start (the travel-hitch amplifier).
     expect(source).toContain(
-      'this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME, unit.id)',
+      'this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME, unit.id, {',
     );
+    expect(source).toContain('releaseTail: true,');
     expect(source).toContain('const units = entry.resumeUnits?.() ?? [];');
     expect(source).toContain('droppedEntries.push({ id: entry.id, units })');
     expect(resumeSlice).toContain('deferPoolPublication =');

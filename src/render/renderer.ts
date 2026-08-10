@@ -352,13 +352,14 @@ import {
   constrainedEntryViewCreateBudget,
   interactionLandmarkViewPriority,
   mandatoryLandmarkViewsReady,
+  materialProgramSignature,
   orderedPrewarmIds,
   type PrewarmEntryProgress,
   type PrewarmPolicy,
   partitionMandatoryLandmarkCandidates,
   partitionResidentSkyBiomes,
+  planCompileSubmission,
   prewarmBuildDeadline,
-  prewarmCompileUnitDeadline,
   prewarmEntryResumesAfterSkip,
   prewarmEntryRuns,
   prewarmEntryShouldDefer,
@@ -573,17 +574,11 @@ const PREWARM_TEXTURE_UNIT_BATCH = 2;
 // Reserve at the tail of the view-build budget so the compile + final-frame
 // steps always start before the prewarm deadline (runEntry skips late entries).
 const PREWARM_BUILD_RESERVE_MS = 3000;
-// Reserve at the tail of the compile-unit loop so world.initial-frame (the one
-// whole-scene submit that links whatever compile did not reach) always has room
-// before the GPU-submit guard; see prewarmCompileUnitDeadline.
-const PREWARM_FRAME_RESERVE_MS = 2000;
 // Compile roots per entry unit: one unit launches its batch's compileAsync
 // calls and awaits them together, so r165's 10 ms poll floors overlap instead
 // of stacking (>1000 serial awaits measured 10+ s of pure timer wait). Small
-// enough that a batch's synchronous prologues stay a bounded slice. Coupled
-// to PREWARM_FRAME_RESERVE_MS: the deadline is checked BETWEEN units, so the
-// worst overshoot past the compile wall is one batch's prologues; the 2 s
-// reserve must stay comfortably above that slice.
+// enough that a batch's synchronous submission prologues stay a bounded slice
+// between the yields of the early-submission loop (submitCompileUnits).
 const PREWARM_COMPILE_BATCH_ROOTS = 16;
 const VIEW_PREWARM_MAX_VIEWS_LOW = 48;
 const VIEW_PREWARM_MAX_VIEWS_HIGH = 72;
@@ -5741,14 +5736,6 @@ export class Renderer {
     const deadline = started + maxMs;
     const hardDeadline = started + hardMaxMs;
     const gpuSubmitDeadline = Math.max(started, hardDeadline - PREWARM_GPU_SUBMIT_GUARD_MS);
-    // Stop the compile-unit loop early so world.initial-frame always has room:
-    // an exempt compile that lawfully consumed the whole soft budget used to
-    // leave the frame starting past `deadline`, cancelled outright, and the
-    // initial scene's programs linked at first LIVE draw instead.
-    const compileUnitDeadline = prewarmCompileUnitDeadline(
-      gpuSubmitDeadline,
-      PREWARM_FRAME_RESERVE_MS,
-    );
     // Stop the archetype-build steps early so the later entries, crucially
     // programs.compile, still START before `deadline` (runEntry skips anything
     // that begins past it). Compiling is what kills the in-world freeze.
@@ -5875,7 +5862,38 @@ export class Renderer {
     // loading deadline. Whole entry callbacks are never resumed live.
     const droppedEntries: PrewarmResumeEntry[] = [];
 
-    const compileEntryUnits = (): PrewarmResumeUnit[] => {
+    // One shared dedupe store across EVERY compile collection in this entry
+    // pass (early submission, the compile entry's tail, the live-scene
+    // re-collection, and the resume lane): a root or program signature any
+    // earlier call already submitted is never resubmitted, so re-collecting
+    // the live scene after world.settle-state only picks up what is
+    // genuinely new.
+    const compileDedupe = {
+      seen: new Set<THREE.Object3D>(),
+      seenKeys: new Set<unknown>(),
+    };
+
+    // Read the staged groups FRESH on every call: the group variables are
+    // assigned as their manifest entries run, so a captured snapshot would
+    // freeze the nulls of whenever it was taken.
+    const stagedCompileGroupsNow = (): readonly [string, THREE.Group | null][] => [
+      ['doors', doorPrewarmGroup],
+      ['interiors', interiorPrewarmGroup],
+      ['players', playerPrewarmGroup],
+      ['mobs', entityPrewarmGroup],
+      ['npcs', npcPrewarmGroup],
+      ['objects', objectPrewarmGroup],
+      ['props', propMaterialPrewarmGroup],
+      ['ghost-fade-variants', ghostVariantPrewarmGroup],
+      ['foliage', foliagePrewarmGroup],
+      ['great-tree', greatTreePrewarmGroup],
+      ['weapon-vfx', weaponVfxPrewarmGroup],
+      ['landmark', landmarkPrewarmGroup],
+    ];
+
+    const compileEntryUnits = (
+      includeGroup: (groupId: string) => boolean = () => true,
+    ): PrewarmResumeUnit[] => {
       // One compileAsync call still has a synchronous traversal prologue and its
       // linker cannot be cancelled. Material-bearing leaves keep each unit small
       // enough for the hard-deadline check between units to remain meaningful.
@@ -5894,34 +5912,25 @@ export class Renderer {
         }
         return materialRoots;
       };
-      const stagedGroups: readonly [string, THREE.Group | null][] = [
-        ['doors', doorPrewarmGroup],
-        ['interiors', interiorPrewarmGroup],
-        ['players', playerPrewarmGroup],
-        ['mobs', entityPrewarmGroup],
-        ['npcs', npcPrewarmGroup],
-        ['objects', objectPrewarmGroup],
-        ['props', propMaterialPrewarmGroup],
-        ['ghost-fade-variants', ghostVariantPrewarmGroup],
-        ['foliage', foliagePrewarmGroup],
-        ['great-tree', greatTreePrewarmGroup],
-        ['weapon-vfx', weaponVfxPrewarmGroup],
-        ['landmark', landmarkPrewarmGroup],
-      ];
+      const stagedGroups = stagedCompileGroupsNow();
       const stagedRoots = new Set<THREE.Object3D>(
         stagedGroups.flatMap(([, group]) => (group ? [group] : [])),
       );
       return buildPrewarmCompileUnits(
         [
-          {
-            id: 'scene',
-            roots: compileRoots(
-              this.scene.children.filter((root) => !stagedRoots.has(root)),
-              true,
-            ),
-          },
+          ...(includeGroup('scene')
+            ? [
+                {
+                  id: 'scene',
+                  roots: compileRoots(
+                    this.scene.children.filter((root) => !stagedRoots.has(root)),
+                    true,
+                  ),
+                },
+              ]
+            : []),
           ...stagedGroups.flatMap(([id, group]) =>
-            group ? [{ id, roots: compileRoots(group.children, false) }] : [],
+            group && includeGroup(id) ? [{ id, roots: compileRoots(group.children, false) }] : [],
           ),
         ],
         async (root) => {
@@ -5936,13 +5945,18 @@ export class Renderer {
           // genuinely new programs, not the per-call prologue walk. The
           // driver's own shader disk cache makes that first-entry cost
           // vanish on subsequent sessions.
-          // Program-content keys: two leaves sharing materials AND the shape
-          // bits three keys a program on link the same programs, so the
-          // duplicate costs a unit for nothing. surfaceMat dedupes materials
-          // heavily, so this collapses hundreds of leaves per zone. The key
-          // lives in the policy layer so its fidelity to three's cache key is
-          // pinned by tests (a coarser key measured as 35 of the initial
-          // frame's 64 residual synchronous links).
+          // Program-content keys: two leaves whose materials produce the same
+          // PROGRAM (same defines) and share the shape bits link the same
+          // programs, so the duplicate costs a submission for nothing. The
+          // material half of the key is a program SIGNATURE (type, hook
+          // identity via customProgramCacheKey, map-presence bits, blending
+          // and vertex-color bits), not the uuid: distinct GLB materials by
+          // the hundred share programs, and the uuid key kept 2,725 roots
+          // alive for ~500 unique programs, which made the mass submission
+          // pay ~5,450 compileAsync prologues (~2.3 ms each, measured 12.4 s
+          // behind the curtain). An imperfect signature is fail-soft, not a
+          // freeze: world.initial-frame still runs guaranteed and links any
+          // residue behind the cover.
           dedupeKeys: (root) => {
             const mesh = root as THREE.Mesh & {
               isSkinnedMesh?: boolean;
@@ -5970,12 +5984,61 @@ export class Renderer {
                 vertexColorItemSize: colorAttribute?.itemSize ?? 0,
                 castShadow: mesh.castShadow === true,
               },
-              materials.map((entry) => entry.uuid),
+              materials.map((entry) => materialProgramSignature(entry)),
             );
           },
+          sharedDedupe: compileDedupe,
           batchSize: PREWARM_COMPILE_BATCH_ROOTS,
         },
       );
+    };
+
+    // Early compile submission: compileAsync links settle off-thread, so the
+    // sooner a unit is SUBMITTED the more of its link time overlaps the other
+    // manifest entries (surface-detail plus textures.scene alone are ~4.5 s of
+    // uploads on the reference desktop). The 'programs.compile-submit' entry
+    // fires every early-staged group's units right after those groups exist;
+    // 'programs.compile' submits the remainder (the late-staged weapon-vfx
+    // group, anything that did not exist yet at the early entry such as the
+    // landmark group staged at priority 48, and a RE-collection of the live
+    // scene, which world.settle-state and the entries after the early submit
+    // keep growing; the shared dedupe store keeps a re-collection from
+    // resubmitting what an earlier call already covered) and then awaits
+    // every submitted unit so all of their programs are READY before
+    // world.initial-frame renders; a program that is not ready by then links
+    // synchronously inside that frame, the measured first-draw stall class.
+    // Which groups each call collects and which it may mark as covered is
+    // the pure planCompileSubmission (prewarm_policy.ts), where the null-
+    // group and re-collection rules are pinned by tests.
+    const submittedCompileUnits: { id: string; done: Promise<void> }[] = [];
+    const submittedCompileGroups = new Set<string>();
+    const LATE_COMPILE_GROUPS = new Set(['weapon-vfx']);
+    const RECOLLECT_COMPILE_GROUPS = new Set(['scene']);
+    const submitCompileUnits = async (includeLate: boolean) => {
+      const plan = planCompileSubmission({
+        groups: [
+          { id: 'scene', exists: true },
+          ...stagedCompileGroupsNow().map(([id, group]) => ({ id, exists: group !== null })),
+        ],
+        submitted: submittedCompileGroups,
+        late: LATE_COMPILE_GROUPS,
+        recollect: RECOLLECT_COMPILE_GROUPS,
+        includeLate,
+      });
+      const collect = new Set(plan.collect);
+      const units = compileEntryUnits((groupId) => collect.has(groupId));
+      for (const groupId of plan.mark) submittedCompileGroups.add(groupId);
+      for (const unit of units) {
+        submittedCompileUnits.push({
+          id: unit.id,
+          done: Promise.resolve(unit.run()).catch((err: unknown) => {
+            console.warn(`Renderer async prewarm compile failed: ${unit.id}`, err);
+          }),
+        });
+        // Yield between unit submissions: each carries up to 32 synchronous
+        // compileAsync prologue walks, and links progress off-thread anyway.
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+      }
     };
 
     const runEntry = async (
@@ -6429,6 +6492,24 @@ export class Renderer {
         detail: () => `objects=${greatTreePrewarmGroup?.children.length ?? 0}`,
       },
       {
+        // Early compile submission (see submitCompileUnits above): every
+        // group staged by the entries before this one fires its compileAsync
+        // units NOW, so the driver links them off-thread underneath the
+        // texture-upload entries that follow instead of only starting after
+        // them. Skipped without parallel compile (the submission itself would
+        // link synchronously) and on a deferral, where 'programs.compile'
+        // submits everything itself, exactly as before this entry existed.
+        id: 'programs.compile-submit',
+        category: 'world',
+        priority: 46,
+        required: false,
+        run: async () => {
+          if (policy.skipMonolithCompile || !this.asyncCompileSupported) return;
+          await submitCompileUnits(false);
+        },
+        detail: () => `submitted=${submittedCompileUnits.length}`,
+      },
+      {
         // The worn-stone family maps (normal/AO/rough/displacement/metal) and
         // the canopy clump maps are onBeforeCompile UNIFORMS, so the scene
         // texture sweep below never finds them and they otherwise decode +
@@ -6749,12 +6830,10 @@ export class Renderer {
         // exercises the real live draw path, and dropping it (measured when
         // the exempt compile above consumed the whole budget) makes the
         // initial scene link its programs at first LIVE draw, 102-318 ms
-        // stalls in front of the player. The compile-unit reserve
-        // (PREWARM_FRAME_RESERVE_MS) bounds how late this normally starts;
-        // the deadline is checked between units, so one slow batch (its
-        // awaited link included) can still eat into the reserve, and the
-        // hard deadline remains the unconditional backstop that can cancel
-        // even this entry.
+        // stalls in front of the player. The compile entry awaits every
+        // submitted unit before this one runs, so this frame draws with its
+        // programs already linked, and the hard deadline remains the
+        // unconditional backstop that can cancel even this entry.
         deadlineExempt: true,
         run: () => {
           this.renderPrewarmPass(1 / 60);
@@ -6780,7 +6859,12 @@ export class Renderer {
           deferPoolPublication =
             (entityPrewarmPool.length > 0 && (entityPrewarmGroup?.children.length ?? 0) > 0) ||
             (npcPrewarmPool.length > 0 && (npcPrewarmGroup?.children.length ?? 0) > 0);
-          return compileEntryUnits();
+          // Already-submitted groups are in flight off-thread; resuming them
+          // would double-submit every unit. Only the never-submitted remainder
+          // takes the resume lane.
+          const remainder = compileEntryUnits((groupId) => !submittedCompileGroups.has(groupId));
+          compileUnitsDropped = remainder.length;
+          return remainder;
         },
         run: async () => {
           const compileStart = performance.now();
@@ -6799,40 +6883,38 @@ export class Renderer {
             return;
           }
           compileMode = 'async';
-          const units = compileEntryUnits();
-          compileUnitsPlanned = units.length;
-          for (let index = 0; index < units.length; index++) {
-            if (performance.now() >= compileUnitDeadline) {
-              const remaining = units.slice(index);
-              compileUnitsDropped = remaining.length;
-              if (remaining.length > 0) {
-                droppedEntries.push({ id: 'programs.compile', units: remaining });
-                // Same rule as the whole-entry resumeUnits path above: the
-                // remaining units still reference pooled prewarm visuals, so
-                // pool publication must wait for the resume lane, or gameplay
-                // takes a visual out of the T-pose grid while its compile
-                // unit still swaps materials on it.
-                deferPoolPublication =
-                  deferPoolPublication ||
-                  (entityPrewarmPool.length > 0 &&
-                    (entityPrewarmGroup?.children.length ?? 0) > 0) ||
-                  (npcPrewarmPool.length > 0 && (npcPrewarmGroup?.children.length ?? 0) > 0);
-              }
-              compileTimedOut = true;
-              break;
-            }
-            await Promise.resolve(units[index].run()).catch((err: unknown) => {
-              console.warn(`Renderer async prewarm compile failed: ${units[index].id}`, err);
-            });
-            compileUnitsDone++;
-          }
+          // Submit whatever the early entry did not cover: its own deferral,
+          // the late-staged groups (weapon-vfx stages at priority 61), any
+          // group that did not exist yet back then (landmark stages at 48),
+          // and the live-scene re-collection.
+          await submitCompileUnits(true);
+          compileUnitsPlanned = submittedCompileUnits.length;
+          // Await EVERY submitted unit, deliberately unbounded by the unit
+          // deadline: this entry exists so every submitted program is READY
+          // before world.initial-frame renders (a program still linking by
+          // then links synchronously inside that frame, the measured
+          // first-draw stall class). This is the same accepted
+          // behind-the-cover overrun class as the exempt initial frame
+          // itself, and the links have been progressing off-thread since
+          // submission (most since the early entry), so the residual wait is
+          // the driver's tail, not the whole link cost the old serialized
+          // batches paid here.
+          await Promise.all(
+            submittedCompileUnits.map((unit) =>
+              unit.done.then(() => {
+                compileUnitsDone++;
+              }),
+            ),
+          );
           compileMs = roundMs(performance.now() - compileStart);
           compileTimedOut ||= compileMs > policy.compileMaxMs;
         },
-        // The compile-unit deadline (3219) drops the remaining units to the
-        // resume lane mid-entry; the summary must say so instead of counting a
-        // half-run compile as completed. The skipped-monolith arm plans no
-        // units and keeps the historical completed status.
+        // Units are never trimmed mid-entry anymore (the entry awaits every
+        // submitted unit); the trimmed flag survives for the whole-entry
+        // deferral path, where the never-submitted remainder drops to the
+        // resume lane (resumeUnits above records the count). The
+        // skipped-monolith arm plans no units and keeps the historical
+        // completed status.
         progress: () =>
           compileUnitsPlanned > 0
             ? {
@@ -7004,20 +7086,34 @@ export class Renderer {
         `[entry-guard] prewarm resume scheduled: dropped=[${resume.map((entry) => entry.id).join(',')}]`,
       );
       void settlePrewarmBeforePublish(
-        () =>
-          resumeDroppedPrewarmEntries(resume, {
+        async () => {
+          // If 'programs.compile' itself was deferred past the hard deadline,
+          // its early-submitted units may still be settling off-thread; wait
+          // them out before the resume lane (and pool publication) proceeds,
+          // so the resume lane never overlaps the in-flight submissions.
+          await Promise.allSettled(submittedCompileUnits.map((unit) => unit.done));
+          return resumeDroppedPrewarmEntries(resume, {
             idleSlot: () =>
               idleSlot(IDLE_PREWARM_TIMEOUT_MS, {
                 maxTimeoutDeferrals: 2,
               }),
             runUnit: (unit) =>
-              this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME, unit.id),
+              // releaseTail: a resume unit's wall time is dominated by its
+              // off-thread compileAsync links. Without it each 16-root unit
+              // occupied the whole serial queue for seconds, so live compile
+              // gates (LIVE_VIEW/ACTIONABLE_VIEW, which do declare their
+              // tails) could not START and first-sight content hitched for
+              // minutes after entry (the captured travel-hitch amplifier).
+              this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME, unit.id, {
+                releaseTail: true,
+              }),
             afterEntry: hidePrewarmArtifacts,
             onUnitError: (entry, unit, error) => {
               failedResumeUnits.push(`${entry.id}:${unit.id}`);
               console.warn(`Renderer prewarm resume unit failed: ${entry.id}:${unit.id}`, error);
             },
-          }),
+          });
+        },
         () => cleanupPrewarmArtifacts({ clearVfx: false, publishPools: true }),
       )
         .then(() => {
