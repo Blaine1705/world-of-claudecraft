@@ -14,9 +14,11 @@
 // only when its dry-land fraction clears WATER_GAP_MIN_SHORE_FRACTION.
 
 import { describe, expect, it } from 'vitest';
+import { shoreDepthAt } from '../src/render/water_core';
 import {
   type CoverageZone,
   coveredByOtherSheet,
+  gapDryFraction,
   gapSheetWorthBuilding,
   gapsAdjacentTo,
   rectCovers,
@@ -34,32 +36,27 @@ import {
   WORLD_MIN_Z,
   ZONES,
 } from '../src/sim/data';
-import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 const BOUNDS = { minX: WORLD_MIN_X, maxX: WORLD_MAX_X, minZ: WORLD_MIN_Z, maxZ: WORLD_MAX_Z };
 const gaps = () => waterCoverageGaps(ZONES, BOUNDS, STRIP_MIN_X, STRIP_MAX_X);
 const zoneRects = () => zoneSheetRects(ZONES, STRIP_MIN_X, STRIP_MAX_X);
 
-// Share of a gap rect that scans as dry land, against live terrain, mirroring
-// the render-side decision (water.ts builtGapRects). A coarse lattice is enough
-// to tell a ~1% coastline sliver from a real coast; onStrip flips if ANY dry
-// sample sits on the play strip (x > STRIP_MIN_X), i.e. a coast a skip would
-// strand on the apron.
+// Share of a gap rect that scans as dry land, against live terrain. This calls
+// the SAME gapDryFraction on the SAME stride, with the same shoreDepthAt
+// predicate, that water.ts builtGapRects decides on: the southwest fraction is
+// only a dozen sampled points wide over a 360x360yd rect, so a guard that
+// re-rolled its own lattice here would be reporting a different number than the
+// decision it claims to pin. onStrip flips if ANY dry sample sits on the play
+// strip (x > STRIP_MIN_X), i.e. a coast a skip would strand on the apron.
 const gapDryScan = (gap: WaterSheetRect): { frac: number; onStrip: boolean } => {
-  let dry = 0;
-  let total = 0;
   let onStrip = false;
-  for (let x = gap.xMin; x <= gap.xMax; x += 8) {
-    for (let z = gap.zMin; z <= gap.zMax; z += 8) {
-      total++;
-      if (terrainHeight(x, z, WORLD_SEED) >= WATER_LEVEL) {
-        dry++;
-        if (x > STRIP_MIN_X) onStrip = true;
-      }
-    }
-  }
-  return { frac: total > 0 ? dry / total : 0, onStrip };
+  const frac = gapDryFraction(gap, (x, z) => {
+    if (shoreDepthAt(x, z, WORLD_SEED) > 0) return false;
+    if (x > STRIP_MIN_X) onStrip = true;
+    return true;
+  });
+  return { frac, onStrip };
 };
 // The gaps that actually get a fine sheet (the rest are open sea the apron owns).
 const builtGaps = () => gaps().filter((g) => gapSheetWorthBuilding(gapDryScan(g).frac));
@@ -118,6 +115,15 @@ describe('water sheet coverage', () => {
     // ...but far too little to justify a fine sheet over all that open water.
     expect(frac).toBeLessThan(WATER_GAP_MIN_SHORE_FRACTION);
     expect(gapSheetWorthBuilding(frac)).toBe(false);
+    // Pinned as a RANGE, not just "under the threshold". The shipped grid reads
+    // 1.46% against a 3% gate, a margin of only about 2x, and this PR's own vale
+    // carve already moved it (it submerged part of the sliver: 1.56% before).
+    // A one-sided assert would stay green right up to the moment a future
+    // terrain edit flipped this gap into building a full sheet over open sea and
+    // brought the banding back. These bounds red on the drift instead, while
+    // still leaving room for an ordinary nearby edit.
+    expect(frac).toBeGreaterThan(0.008);
+    expect(frac).toBeLessThan(0.022);
     // The sliver it drops is off the play strip, so no on-strip coast is lost.
     expect(onStrip).toBe(false);
     // On today's grid every un-zoned cell is open-sea-dominated, so nothing
@@ -147,7 +153,7 @@ describe('water sheet coverage', () => {
     expect(WATER_GAP_MIN_SHORE_FRACTION).toBe(0.03);
     // Below the threshold the apron owns the rect; at or above it earns a sheet.
     expect(gapSheetWorthBuilding(0)).toBe(false);
-    expect(gapSheetWorthBuilding(0.0129)).toBe(false); // the southwest sliver
+    expect(gapSheetWorthBuilding(0.0146)).toBe(false); // the measured southwest sliver
     expect(gapSheetWorthBuilding(WATER_GAP_MIN_SHORE_FRACTION - 1e-6)).toBe(false);
     expect(gapSheetWorthBuilding(WATER_GAP_MIN_SHORE_FRACTION)).toBe(true);
     expect(gapSheetWorthBuilding(0.25)).toBe(true);

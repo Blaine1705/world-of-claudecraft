@@ -65,6 +65,38 @@ export function gapSheetWorthBuilding(dryFrac: number): boolean {
   return dryFrac >= WATER_GAP_MIN_SHORE_FRACTION;
 }
 
+/**
+ * Stride the dry-land scan samples a gap rect at. Coarse on purpose: it only has
+ * to separate a ~1% sliver from a real coast, and terrainHeight is deliberately
+ * rich (a full-res scan of the gaps measured ~75ms). It lives here, next to the
+ * threshold it is compared against, so the renderer and the guard measure the
+ * SAME lattice: the southwest fraction is only a dozen sampled points wide over
+ * a 360x360yd rect, so a scan on some other stride reports a different number
+ * than the one the decision is actually made on.
+ */
+export const WATER_GAP_SCAN_STRIDE_YARDS = 12;
+
+/**
+ * Share of `rect` that scans as dry land, on the pinned stride. The caller
+ * supplies the dry test (render-side: `shoreDepthAt(x, z, seed) <= 0`), so this
+ * module owns the lattice while the height sampling stays with the caller and
+ * this core stays pure and Three-free.
+ */
+export function gapDryFraction(
+  rect: WaterSheetRect,
+  isDryAt: (x: number, z: number) => boolean,
+): number {
+  let dry = 0;
+  let total = 0;
+  for (let z = rect.zMin; z <= rect.zMax; z += WATER_GAP_SCAN_STRIDE_YARDS) {
+    for (let x = rect.xMin; x <= rect.xMax; x += WATER_GAP_SCAN_STRIDE_YARDS) {
+      total++;
+      if (isDryAt(x, z)) dry++;
+    }
+  }
+  return total > 0 ? dry / total : 0;
+}
+
 /** The zone fields this module needs; ZoneDef satisfies it structurally. */
 export interface CoverageZone {
   readonly id: string;

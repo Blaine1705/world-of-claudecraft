@@ -37,6 +37,7 @@ import {
 } from './water_core';
 import {
   coveredByOtherSheet,
+  gapDryFraction,
   gapSheetWorthBuilding,
   gapsAdjacentTo,
   type WaterSheetRect,
@@ -1238,24 +1239,15 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
    * an edge, and its neighbour zone feathers its chop to meet the apron there,
    * the way it did before gap sheets existed. Memoized: the coarse terrain scan
    * is paid once during the async zone load, not at module import (a full-res
-   * scan of the gaps measured ~75ms) and not per build. The stride is coarse on
-   * purpose: it only has to separate a ~1% sliver from a real coast.
+   * scan of the gaps measured ~75ms) and not per build. The lattice and the
+   * threshold both live in the core, so the guard measures what this decides.
    */
   let builtGapRectsMemo: WaterSheetRect[] | null = null;
   const builtGapRects = (): WaterSheetRect[] => {
     if (builtGapRectsMemo) return builtGapRectsMemo;
-    const GAP_DECISION_STRIDE_YARDS = 12;
-    builtGapRectsMemo = WATER_GAP_RECTS.filter((rect) => {
-      let dry = 0;
-      let total = 0;
-      for (let z = rect.zMin; z <= rect.zMax; z += GAP_DECISION_STRIDE_YARDS) {
-        for (let x = rect.xMin; x <= rect.xMax; x += GAP_DECISION_STRIDE_YARDS) {
-          total++;
-          if (shoreDepthAt(x, z, seed) <= 0) dry++;
-        }
-      }
-      return gapSheetWorthBuilding(total > 0 ? dry / total : 0);
-    });
+    builtGapRectsMemo = WATER_GAP_RECTS.filter((rect) =>
+      gapSheetWorthBuilding(gapDryFraction(rect, (x, z) => shoreDepthAt(x, z, seed) <= 0)),
+    );
     return builtGapRectsMemo;
   };
   /**
