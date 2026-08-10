@@ -5638,8 +5638,8 @@ export const id_ID: EnTranslations = {
       "chanWhisperBody": "Pesan pribadi kepada satu pemain berdasarkan nama, di mana pun mereka berada. Gunakan untuk percakapan tenang.",
       "chanParty": "Party.",
       "chanPartyBody": "Bicaralah dengan semua orang di kelompokmu, sejauh apa pun kalian terpencar.",
-      "chanBattleground": "Battleground.",
-      "chanBattlegroundBody": "Talk to every fighter in your battleground, both sides. Only while a match is running.",
+      "chanBattleground": "Medan Thornhollow.",
+      "chanBattlegroundBody": "Bicaralah dengan setiap petarung di Medan Thornhollow-mu, dari kedua pihak. Hanya berlaku selama pertandingan sedang berlangsung.",
       "chanGeneral": "Umum.",
       "chanGeneralBody": "Saluran seluruh realm yang selalu aktif dan menjangkau semua orang yang sedang online, cocok untuk bertanya atau mengobrol umum. Tidak seperti World dan Looking for Group, kamu tak pernah perlu memilih untuk ikut serta.",
       "chanWorld": "Dunia.",
@@ -7746,7 +7746,7 @@ export const id_ID: EnTranslations = {
           "say": "Berkata",
           "yell": "Berteriak",
           "party": "Party",
-          "battleground": "Battleground",
+          "battleground": "Medan Thornhollow",
           "general": "Umum",
           "world": "Dunia",
           "lfg": "LFG",
@@ -7908,7 +7908,7 @@ export const id_ID: EnTranslations = {
     "chat": {
       "rightClickName": "Klik kanan {name}",
       "templates": {
-        "battleground": "[Battleground] {name}: {message}",
+        "battleground": "[Medan Thornhollow] {name}: {message}",
         "party": "[Party] {name}: {message}",
         "yell": "{name} berteriak: {message}",
         "whisper": "{name} berbisik: {message}",

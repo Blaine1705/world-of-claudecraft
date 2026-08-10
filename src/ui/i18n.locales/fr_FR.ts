@@ -13,6 +13,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const fr_FR: Partial<Record<TranslationKey, string>> = {
+  'guide.social.chanBattleground': 'Champs de Thornhollow.',
+  'guide.social.chanBattlegroundBody': "Parlez à chaque combattant de votre champ de bataille, des deux côtés. Uniquement pendant qu'un match est en cours.",
+  'hud.chat.templates.battleground': '[Champs de Thornhollow] {name} : {message}',
+  'hud.core.chatChannels.names.battleground': 'Champs de Thornhollow',
   'apiError.character.invalid_appearance': "Cette apparence n'a pas pu être enregistrée. Modifiez-la et réessayez.",
   'apiError.character.reroll_unavailable': "Ce personnage ne dispose pas d'un remodelage gratuit.",
   'entities.abilities.intervene.description': 'Fonce vers un joueur allié, le protégeant de {damage} points de dégâts pendant 6 s.',

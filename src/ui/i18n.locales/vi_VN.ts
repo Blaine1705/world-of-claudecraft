@@ -2,6 +2,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const vi_VN: Partial<Record<TranslationKey, string>> = {
+  'guide.social.chanBattleground': 'Chiến Trường.',
+  'guide.social.chanBattlegroundBody': 'Trò chuyện với mọi người tham chiến trong chiến trường của bạn, cả hai phe. Chỉ trong khi trận đấu đang diễn ra.',
+  'hud.chat.templates.battleground': '[Chiến Trường] {name}: {message}',
+  'hud.core.chatChannels.names.battleground': 'Chiến Trường',
   'apiError.character.invalid_appearance': 'Không thể lưu ngoại hình đó. Hãy chỉnh sửa thiết kế rồi thử lại.',
   'apiError.character.reroll_unavailable': 'Nhân vật này hiện không có lượt làm lại ngoại hình miễn phí nào.',
   'entities.abilities.intervene.description': 'Lao đến một người chơi đồng minh, che chắn họ khỏi {damage} sát thương trong 6 giây.',

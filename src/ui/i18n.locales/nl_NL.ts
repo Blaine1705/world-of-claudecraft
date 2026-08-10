@@ -2,6 +2,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const nl_NL: Partial<Record<TranslationKey, string>> = {
+  'guide.social.chanBattleground': 'Slagveld.',
+  'guide.social.chanBattlegroundBody': 'Praat met elke strijder op je slagveld, aan beide kanten. Alleen terwijl er een wedstrijd bezig is.',
+  'hud.chat.templates.battleground': '[Slagveld] {name}: {message}',
+  'hud.core.chatChannels.names.battleground': 'Slagveld',
   'apiError.character.invalid_appearance': 'Dat uiterlijk kon niet worden opgeslagen. Pas het ontwerp aan en probeer het opnieuw.',
   'apiError.character.reroll_unavailable': 'Dit personage heeft geen gratis herontwerp beschikbaar.',
   'entities.abilities.intervene.description': 'Stormt naar een bevriende speler en beschermt hem 6 sec lang met een schild tegen {damage} schade.',

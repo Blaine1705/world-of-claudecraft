@@ -2,6 +2,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const id_ID: Partial<Record<TranslationKey, string>> = {
+  'guide.social.chanBattleground': 'Medan Thornhollow.',
+  'guide.social.chanBattlegroundBody': 'Bicaralah dengan setiap petarung di Medan Thornhollow-mu, dari kedua pihak. Hanya berlaku selama pertandingan sedang berlangsung.',
+  'hud.chat.templates.battleground': '[Medan Thornhollow] {name}: {message}',
+  'hud.core.chatChannels.names.battleground': 'Medan Thornhollow',
   'apiError.character.invalid_appearance': 'Tampilan itu tidak dapat disimpan. Sesuaikan desainnya, lalu coba lagi.',
   'apiError.character.reroll_unavailable': 'Karakter ini tidak memiliki desain ulang gratis yang tersedia.',
   'entities.abilities.intervene.description': 'Bergegas ke sisi pemain kawan, menyerap {damage} kerusakan untuknya selama 6 detik.',

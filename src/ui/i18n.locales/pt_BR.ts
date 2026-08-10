@@ -13,6 +13,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pt_BR: Partial<Record<TranslationKey, string>> = {
+  'guide.social.chanBattleground': 'Campo de Batalha.',
+  'guide.social.chanBattlegroundBody': 'Fale com todos os lutadores do seu campo de batalha, dos dois lados. Só enquanto uma partida estiver em andamento.',
+  'hud.chat.templates.battleground': '[Campo de batalha] {name}: {message}',
+  'hud.core.chatChannels.names.battleground': 'Campo de Batalha',
   'apiError.character.invalid_appearance': 'Não foi possível salvar essa aparência. Ajuste o visual e tente novamente.',
   'apiError.character.reroll_unavailable': 'Este personagem não tem um redesenho gratuito disponível.',
   'entities.abilities.intervene.description': 'Corre até um jogador aliado, escudando-o de {damage} de dano por 6 s.',

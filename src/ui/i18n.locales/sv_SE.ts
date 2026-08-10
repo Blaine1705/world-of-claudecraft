@@ -2,6 +2,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const sv_SE: Partial<Record<TranslationKey, string>> = {
+  'guide.social.chanBattleground': 'Slagfält.',
+  'guide.social.chanBattlegroundBody': 'Prata med alla stridande i ditt slagfält, båda sidorna. Bara medan en match pågår.',
+  'hud.chat.templates.battleground': '[Slagfält] {name}: {message}',
+  'hud.core.chatChannels.names.battleground': 'Slagfält',
   'apiError.character.invalid_appearance': 'Det utseendet kunde inte sparas. Justera designen och försök igen.',
   'apiError.character.reroll_unavailable': 'Den här karaktären har ingen gratis omformning tillgänglig.',
   'entities.abilities.intervene.description': 'Rusa till en vänlig spelare och skydda dem från {damage} skada i 6 sek.',

@@ -2,6 +2,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const da_DK: Partial<Record<TranslationKey, string>> = {
+  'guide.social.chanBattleground': 'Slagmark.',
+  'guide.social.chanBattlegroundBody': 'Tal med alle stridende i din slagmark, begge sider. Kun mens en kamp er i gang.',
+  'hud.chat.templates.battleground': '[Slagmark] {name}: {message}',
+  'hud.core.chatChannels.names.battleground': 'Slagmark',
   'apiError.character.invalid_appearance': 'Det udseende kunne ikke gemmes. Juster designet, og prøv igen.',
   'apiError.character.reroll_unavailable': 'Denne karakter har ikke et gratis omdesign til rådighed.',
   'entities.abilities.intervene.description': 'Storm hen til en venlig spiller og skjold dem mod {damage} skade i 6 sek.',

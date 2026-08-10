@@ -2,6 +2,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pl_PL: Partial<Record<TranslationKey, string>> = {
+  'guide.social.chanBattleground': 'Pole bitwy.',
+  'guide.social.chanBattlegroundBody': 'Rozmawiaj z każdym walczącym na polu bitwy, po obu stronach. Tylko podczas trwania meczu.',
+  'hud.chat.templates.battleground': '[Pole bitwy] {name}: {message}',
+  'hud.core.chatChannels.names.battleground': 'Pole bitwy',
   'apiError.character.invalid_appearance': 'Nie udało się zapisać tego wyglądu. Popraw projekt i spróbuj ponownie.',
   'apiError.character.reroll_unavailable': 'Ta postać nie ma już dostępnego darmowego przeprojektowania.',
   'entities.abilities.intervene.description': 'Pędzisz do sojuszniczego gracza, osłaniając go przed {damage} obrażeniami przez 6 sek.',

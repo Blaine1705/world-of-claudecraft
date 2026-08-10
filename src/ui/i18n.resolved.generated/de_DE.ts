@@ -5638,8 +5638,8 @@ export const de_DE: EnTranslations = {
       "chanWhisperBody": "Eine private Nachricht an einen Spieler über den Namen, wo immer er sich befindet. Nutze es für ein stilles Wort.",
       "chanParty": "Gruppe.",
       "chanPartyBody": "Sprich mit allen in deiner Gruppe, egal wie weit ihr verstreut seid.",
-      "chanBattleground": "Battleground.",
-      "chanBattlegroundBody": "Talk to every fighter in your battleground, both sides. Only while a match is running.",
+      "chanBattleground": "Schlachtfeld.",
+      "chanBattlegroundBody": "Sprich mit jedem Kämpfer in deinem Schlachtfeld, auf beiden Seiten. Nur während ein Match läuft.",
       "chanGeneral": "Allgemein.",
       "chanGeneralBody": "Ein stets aktiver, reichsweiter Kanal, der jeden erreicht, der online ist, gut, um eine Frage zu stellen oder allgemein zu plaudern. Anders als Welt und Suche nach Gruppe musst du ihm nie beitreten.",
       "chanWorld": "Welt.",
@@ -7746,7 +7746,7 @@ export const de_DE: EnTranslations = {
           "say": "Sagen",
           "yell": "Rufen",
           "party": "Gruppe",
-          "battleground": "Battleground",
+          "battleground": "Schlachtfeld",
           "general": "Allgemein",
           "world": "Welt",
           "lfg": "LFG",
@@ -7908,7 +7908,7 @@ export const de_DE: EnTranslations = {
     "chat": {
       "rightClickName": "Rechtsklick auf {name}",
       "templates": {
-        "battleground": "[Battleground] {name}: {message}",
+        "battleground": "[Schlachtfeld] {name}: {message}",
         "party": "[Gruppe] {name}: {message}",
         "yell": "{name} schreit: {message}",
         "whisper": "{name} flüstert: {message}",

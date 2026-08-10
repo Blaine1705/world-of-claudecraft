@@ -13,6 +13,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const de_DE: Partial<Record<TranslationKey, string>> = {
+  'guide.social.chanBattleground': 'Schlachtfeld.',
+  'guide.social.chanBattlegroundBody': 'Sprich mit jedem Kämpfer in deinem Schlachtfeld, auf beiden Seiten. Nur während ein Match läuft.',
+  'hud.chat.templates.battleground': '[Schlachtfeld] {name}: {message}',
+  'hud.core.chatChannels.names.battleground': 'Schlachtfeld',
   'apiError.character.invalid_appearance': 'Dieses Aussehen konnte nicht gespeichert werden. Passe das Design an und versuche es erneut.',
   'apiError.character.reroll_unavailable': 'Für diesen Charakter ist keine kostenlose Umgestaltung mehr verfügbar.',
   'entities.abilities.intervene.description': 'Eilt zu einem verbündeten Spieler und schirmt ihn 6 Sek. lang vor {damage} Schaden ab.',

@@ -2,6 +2,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const cs_CZ: Partial<Record<TranslationKey, string>> = {
+  'guide.social.chanBattleground': 'Bitevní pole.',
+  'guide.social.chanBattlegroundBody': 'Mluv se všemi bojovníky ve svém bitevním poli, na obou stranách. Jen dokud probíhá zápas.',
+  'hud.chat.templates.battleground': '[Bitevní pole] {name}: {message}',
+  'hud.core.chatChannels.names.battleground': 'Bitevní pole',
   'apiError.character.invalid_appearance': 'Tento vzhled se nepodařilo uložit. Uprav návrh a zkus to znovu.',
   'apiError.character.reroll_unavailable': 'Tato postava nemá k dispozici žádnou volnou změnu vzhledu.',
   'entities.abilities.intervene.description': 'Přispěcháš k přátelskému hráči a ochráníš ho štítem, který pohltí {damage} poškození na 6 s.',

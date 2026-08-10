@@ -2,6 +2,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const tr_TR: Partial<Record<TranslationKey, string>> = {
+  'guide.social.chanBattleground': 'Savaş Alanı.',
+  'guide.social.chanBattlegroundBody': 'Savaş alanındaki iki taraftan da tüm dövüşçülerle konuş. Yalnızca bir maç sürerken işler.',
+  'hud.chat.templates.battleground': '[Savaş Alanı] {name}: {message}',
+  'hud.core.chatChannels.names.battleground': 'Savaş Alanı',
   'apiError.character.invalid_appearance': 'Bu görünüm kaydedilemedi. Tasarımı düzenleyip tekrar deneyin.',
   'apiError.character.reroll_unavailable': 'Bu karakterin kullanılabilir bir ücretsiz yeniden tasarım hakkı yok.',
   'entities.abilities.intervene.description': 'Dost bir oyuncuya atılarak onu kalkanlar ve 6 saniye boyunca {damage} hasarı emer.',
