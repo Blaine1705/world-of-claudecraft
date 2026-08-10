@@ -2451,7 +2451,14 @@ export class Renderer {
     // still clears acne on the low-poly facets
     sun.shadow.normalBias = LOW_GFX ? 0.02 : 0.035;
     sun.shadow.radius = 2.25;
-    this.shadowTexelWorld = shadowTexelWorldSize(2 * S, GFX.shadowMap);
+    // Texel size from the REAL map size three will use: WebGLShadowMap scales
+    // a requested mapSize down to the GPU's maxTextureSize at render time, so
+    // an unclamped derivation would quantize to a fraction of a real texel on
+    // a capped device and quietly lose the anti-swimming property.
+    this.shadowTexelWorld = shadowTexelWorldSize(
+      2 * S,
+      Math.min(GFX.shadowMap, this.webgl.capabilities.maxTextureSize),
+    );
     this.scene.add(sun);
     this.scene.add(sun.target);
     this.sun = sun;
@@ -4343,6 +4350,7 @@ export class Renderer {
     renderScale: number;
     effectiveRenderScale: number;
     renderBudget: RenderBudgetState;
+    shadowCadenceHalfRate: boolean;
     pixelRatio: number;
     width: number;
     height: number;
@@ -4396,6 +4404,10 @@ export class Renderer {
       renderScale: this.renderScale,
       effectiveRenderScale: this.effectiveRenderScale,
       renderBudget,
+      // Whether the budget-governed shadow cadence is currently shedding to
+      // every-other-frame updates: surfaced so the ?perf overlay and capture
+      // artifacts can tell a half-rate sample from a full-rate one.
+      shadowCadenceHalfRate: this.shadowCadence.halfRate,
       pixelRatio: this.webgl.getPixelRatio(),
       width: this.viewport.width,
       height: this.viewport.height,
@@ -4822,10 +4834,14 @@ export class Renderer {
     this.applyShadowCadence();
   }
 
-  /** Write the cadence plan onto three's shadowMap flags. Runs before the
-   *  frame's render; the prewarm and census probes save/restore these same
-   *  flags around their own bounded renders, and the per-frame re-assert
-   *  here makes their restore self-healing either way. */
+  /** Write the cadence plan onto three's shadowMap flags. Runs at the top of
+   *  sync(), before the frame's render; the bounded prewarm saves/restores
+   *  BOTH flags around its renders and the per-frame re-assert here makes
+   *  every restore self-healing. An out-of-band render between this write
+   *  and the frame render (renderPrewarmPass, the census probe's frozen
+   *  pass) can consume a pending needsUpdate; the cost is at most one extra
+   *  frame of shadow staleness on those bounded dev/startup paths, never a
+   *  lost update in steady state. */
   private applyShadowCadence(): void {
     if (!this.sun.castShadow) return;
     const shadowMap = this.webgl.shadowMap;

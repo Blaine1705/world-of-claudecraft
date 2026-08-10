@@ -67,10 +67,14 @@ export function updateShadowCadence(
   pressure: number,
   budgetEnabled: boolean,
 ): ShadowCadenceState {
-  if (!budgetEnabled || !Number.isFinite(dt) || dt <= 0) {
+  if (!budgetEnabled) {
     resetShadowCadence(state);
     return state;
   }
+  // A degenerate frame time (tab restore, stall) holds the plan untouched:
+  // it must neither accumulate dwell nor wipe an engaged half-rate plan.
+  // (The renderer's budget path already filters these before calling in.)
+  if (!Number.isFinite(dt) || dt <= 0) return state;
   if (pressure >= SHADOW_CADENCE_ENTER_PRESSURE) {
     state.overSeconds += dt;
     state.calmSeconds = 0;

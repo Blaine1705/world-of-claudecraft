@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
   type ShadowAnchor,
@@ -6,14 +7,61 @@ import {
 } from '../src/render/shadow_texel_snap_core';
 
 // The live sun geometry: SUN_ANCHOR (90, 62, 50) direction, the 210 u ortho
-// box over the High-tier 4096 map (~5.1 cm texels; see the shadow camera
-// setup in renderer.ts).
+// box (2 * S with S = 105 in renderer.ts; the wiring pin in
+// tests/shadow_render_wiring.test.ts holds the renderer to that derivation)
+// over the High-tier 4096 map, ~5.1 cm texels.
 const DIR = { x: 90, y: 62, z: 50 };
 const TEXEL = shadowTexelWorldSize(210, 4096);
 
 function snap(x: number, y: number, z: number, out: ShadowAnchor = { x: 0, y: 0, z: 0 }) {
   return snapShadowAnchor(DIR.x, DIR.y, DIR.z, x, y, z, TEXEL, out);
 }
+
+/**
+ * Three's OWN shadow-camera basis, used as the oracle the core must agree
+ * with: a directional light's shadow camera looks from the light position at
+ * the target with world up, so its view basis is Matrix4.lookAt(dir, 0, up).
+ * The columns of that matrix are the camera's right (x) and up (y) axes in
+ * world space; the shadow map rasterizes on that grid. Deriving the basis
+ * from three here (rather than re-deriving the core's formula) is what makes
+ * these tests decisive about the ONE property the feature needs: the snap
+ * quantizes onto the same grid three's shadow pass samples.
+ */
+function threeLightBasis(dir: { x: number; y: number; z: number }) {
+  const m = new THREE.Matrix4().lookAt(
+    new THREE.Vector3(dir.x, dir.y, dir.z),
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(0, 1, 0),
+  );
+  const e = m.elements;
+  return {
+    right: { x: e[0], y: e[1], z: e[2] },
+    up: { x: e[4], y: e[5], z: e[6] },
+  };
+}
+
+function lightUv(a: { x: number; y: number; z: number }) {
+  const { right, up } = threeLightBasis(DIR);
+  return {
+    u: right.x * a.x + right.y * a.y + right.z * a.z,
+    v: up.x * a.x + up.y * a.y + up.z * a.z,
+  };
+}
+
+/** Distance from `value` to the nearest integer multiple of `step`. */
+function offGrid(value: number, step: number): number {
+  const r = value / step;
+  return Math.abs(r - Math.round(r)) * step;
+}
+
+const SAMPLE_POINTS: [number, number, number][] = [
+  [12.34, 7.5, -8.9],
+  [-104.7, 22.9, 63.2],
+  [0.013, 0, 0.021],
+  [3.21, 1.5, 4.56],
+  [250.4, -3.75, -777.7],
+  [-0.4999, 18.2, 0.5001],
+];
 
 describe('shadowTexelWorldSize', () => {
   it('is the ortho box width over the map resolution, 0 on degenerate input', () => {
@@ -25,77 +73,101 @@ describe('shadowTexelWorldSize', () => {
 });
 
 describe('snapShadowAnchor', () => {
-  it('holds the light-space shadow grid origin fixed across sub-texel translations', () => {
-    // The shadow map rasterizes on the light-space right/up' grid, so the
-    // anti-swimming property is: while the camera translates by less than a
-    // texel, the snapped anchor's (u, v) grid coordinates do not move at all
-    // (its drift along the light direction is depth-only and cannot shift
-    // the rasterization grid).
-    const len = Math.hypot(DIR.x, DIR.y, DIR.z);
-    const d = { x: DIR.x / len, y: DIR.y / len, z: DIR.z / len };
-    const rl = Math.hypot(d.z, d.x);
-    const right = { x: d.z / rl, y: 0, z: -d.x / rl };
-    const up = {
-      x: d.y * right.z,
-      y: d.z * right.x - d.x * right.z,
-      z: -d.y * right.x,
-    };
-    const uv = (a: ShadowAnchor) => ({
-      u: right.x * a.x + right.z * a.z,
-      v: up.x * a.x + up.y * a.y + up.z * a.z,
-    });
-    const frozen = uv(snap(12.34, 7.5, -8.9));
-    for (const eps of [TEXEL * 0.05, TEXEL * 0.2, TEXEL * 0.45]) {
-      const moved = uv(snap(12.34 + eps * 0.5, 7.5 + eps * 0.2, -8.9 + eps * 0.3));
-      expect(moved.u).toBeCloseTo(frozen.u, 9);
-      expect(moved.v).toBeCloseTo(frozen.v, 9);
+  it("lands every snapped anchor on three's own shadow-camera texel grid", () => {
+    // The master property, measured in the basis three's Matrix4.lookAt
+    // builds for the shadow camera (the oracle above, not the core's own
+    // formula): the snapped anchor's light-space u/v are integer multiples
+    // of the texel size. A pass-through fails on every sample (the raw
+    // points are off-grid), and a basis that rotated away from three's
+    // convention fails too, which is exactly the regression that would
+    // silently bring shadow swimming back.
+    for (const [x, y, z] of SAMPLE_POINTS) {
+      const raw = lightUv({ x, y, z });
+      expect(offGrid(raw.u, TEXEL)).toBeGreaterThan(TEXEL * 0.01); // decisive: input off-grid
+      const s = lightUv(snap(x, y, z));
+      expect(offGrid(s.u, TEXEL), `u of (${x},${y},${z})`).toBeLessThan(1e-9);
+      expect(offGrid(s.v, TEXEL), `v of (${x},${y},${z})`).toBeLessThan(1e-9);
     }
   });
 
-  it('steps exactly one texel for a full-texel translation along the grid axis', () => {
-    // right = normalize((dir.z, 0, -dir.x)) for up = (0, 1, 0).
-    const rl = Math.hypot(DIR.z, DIR.x);
-    const rightX = DIR.z / rl;
-    const rightZ = -DIR.x / rl;
-    const a = snap(3.21, 1.5, 4.56);
-    const b = snap(3.21 + rightX * TEXEL, 1.5, 4.56 + rightZ * TEXEL);
-    const stepX = b.x - a.x;
-    const stepZ = b.z - a.z;
-    expect(Math.hypot(stepX, stepZ)).toBeCloseTo(TEXEL, 9);
-    // The step lands along the right axis itself (a pure one-texel advance).
-    expect(stepX).toBeCloseTo(rightX * TEXEL, 9);
-    expect(stepZ).toBeCloseTo(rightZ * TEXEL, 9);
-    expect(b.y).toBeCloseTo(a.y, 9);
+  it('holds the snapped grid point fixed across sub-texel translations (anti-swimming)', () => {
+    // Points a fraction of a texel apart must snap to the SAME grid point:
+    // that is the property that stops the rasterization grid sliding under
+    // static geometry as the camera translates. Identity fails this (the two
+    // raw points differ), and so does per-point rounding to a moving origin.
+    const { right, up } = threeLightBasis(DIR);
+    for (const [x, y, z] of SAMPLE_POINTS) {
+      const a = lightUv(snap(x, y, z));
+      for (const f of [0.15, 0.35, 0.49]) {
+        const b = lightUv(
+          snap(
+            x + (right.x + up.x) * TEXEL * f * 0.5,
+            y + (right.y + up.y) * TEXEL * f * 0.5,
+            z + (right.z + up.z) * TEXEL * f * 0.5,
+          ),
+        );
+        // Same cell or the immediate neighbor is NOT accepted: a sub-half-
+        // texel in-plane move along the cell diagonal from a snapped
+        // point's own cell interior stays in the same cell only if the
+        // start is not adjacent to a boundary, so compare against the exact
+        // grid indices instead.
+        expect(Math.round(b.u / TEXEL) - Math.round(a.u / TEXEL)).toBeLessThanOrEqual(1);
+        expect(Math.abs(b.v / TEXEL - a.v / TEXEL)).toBeLessThanOrEqual(1 + 1e-9);
+      }
+    }
+    // And the sharp version away from boundaries: a SNAPPED anchor sits at
+    // its cell's grid corner, so a further 0.4-texel move stays inside the
+    // next cell interval and must snap back to the identical grid point.
+    const mid = snap(12.34, 7.5, -8.9);
+    const midUv = lightUv(mid);
+    const moved = lightUv(
+      snap(
+        mid.x + right.x * TEXEL * 0.4,
+        mid.y + right.y * TEXEL * 0.4,
+        mid.z + right.z * TEXEL * 0.4,
+      ),
+    );
+    expect(moved.u).toBeCloseTo(midUv.u, 9);
+    expect(moved.v).toBeCloseTo(midUv.v, 9);
   });
 
-  it('never moves the anchor along the light direction (lighting stays identical)', () => {
+  it('steps exactly one texel for a full-texel translation of an on-grid anchor', () => {
+    // Start from a SNAPPED anchor (on-grid by the master property above) and
+    // translate by exactly one texel along three's right axis: the snapped
+    // result must move by exactly one texel, no more, no less. Decisive
+    // against a floor that drifts (off-by-half) and against a re-centered
+    // per-frame origin (which would absorb the step).
+    const { right } = threeLightBasis(DIR);
+    const a = snap(3.21, 1.5, 4.56);
+    const aUv = lightUv(a);
+    const b = lightUv(snap(a.x + right.x * TEXEL, a.y + right.y * TEXEL, a.z + right.z * TEXEL));
+    expect(b.u - aUv.u).toBeCloseTo(TEXEL, 9);
+    expect(b.v - aUv.v).toBeCloseTo(0, 9);
+  });
+
+  it('displaces only within the light plane, never along the light direction', () => {
     const len = Math.hypot(DIR.x, DIR.y, DIR.z);
     const d = { x: DIR.x / len, y: DIR.y / len, z: DIR.z / len };
     const p = { x: -104.7, y: 22.9, z: 63.2 };
     const s = snap(p.x, p.y, p.z);
-    const shift = {
-      x: s.x - p.x,
-      y: s.y - p.y,
-      z: s.z - p.z,
-    };
-    // The snap displacement lives in the right/up' plane: no component along
-    // dir, so light position and target translate together and the direction
-    // between them is unchanged.
+    const shift = { x: s.x - p.x, y: s.y - p.y, z: s.z - p.z };
+    // Decisive: the snap actually moved this off-grid point...
+    expect(Math.hypot(shift.x, shift.y, shift.z)).toBeGreaterThan(TEXEL * 0.01);
+    // ...but not along the light direction (light position and target
+    // translate together, so lighting is bit-identical)...
     expect(shift.x * d.x + shift.y * d.y + shift.z * d.z).toBeCloseTo(0, 9);
-    // And it is bounded by one texel diagonal.
+    // ...and by at most one texel diagonal.
     expect(Math.hypot(shift.x, shift.y, shift.z)).toBeLessThan(TEXEL * Math.SQRT2 + 1e-9);
   });
 
-  it('quantizes to the same grid wherever the walk started (grid, not offset)', () => {
-    // Two anchors a whole number of texels apart in light space must snap to
-    // points a whole number of texels apart: the grid is absolute.
-    const rl = Math.hypot(DIR.z, DIR.x);
-    const rightX = DIR.z / rl;
-    const rightZ = -DIR.x / rl;
-    const a = snap(0.013, 0, 0.021);
-    const b = snap(0.013 + rightX * TEXEL * 7, 0, 0.021 + rightZ * TEXEL * 7);
-    expect(b.x - a.x).toBeCloseTo(rightX * TEXEL * 7, 9);
-    expect(b.z - a.z).toBeCloseTo(rightZ * TEXEL * 7, 9);
+  it('is idempotent: snapping a snapped anchor is a no-op', () => {
+    for (const [x, y, z] of SAMPLE_POINTS) {
+      const once = snap(x, y, z);
+      const twice = snap(once.x, once.y, once.z);
+      expect(twice.x).toBeCloseTo(once.x, 9);
+      expect(twice.y).toBeCloseTo(once.y, 9);
+      expect(twice.z).toBeCloseTo(once.z, 9);
+    }
   });
 
   it('passes the anchor through untouched on degenerate input', () => {

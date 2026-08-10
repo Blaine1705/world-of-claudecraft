@@ -382,6 +382,18 @@ describe('graphics tier resolution', () => {
     expect(adv({ shadowQuality: 1 }).terrainCastShadows).toBe(true);
     expect(adv({ shadowQuality: 2 }).shadowMap).toBe(4096);
     expect(adv({ shadowQuality: 2 }).terrainCastShadows).toBe(true);
+    // The load-bearing constrained arm: the retired explicit 8192 write used
+    // to OVERRIDE the phone-class 2048 cap; falling through to the base
+    // restores it (dynamicShadows stays off there regardless, so this pins
+    // the allocation, not a visible shadow).
+    const constrainedInsane = gfxInternalsForTest.settingsFor('high', {
+      graphicsPreset: 5,
+      shadowQuality: 2,
+      maxTouchPoints: 5,
+      coarsePointer: true,
+      narrowViewport: true,
+    });
+    expect(constrainedInsane.shadowMap).toBe(2048);
   });
 
   it('sheds the memory-spike knobs on constrained (phone-class) browsers, cosmetics only', () => {

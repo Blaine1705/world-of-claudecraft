@@ -18,6 +18,18 @@ function run(state: ShadowCadenceState, seconds: number, pressure: number): void
 }
 
 describe('shadow cadence core', () => {
+  it('pins the tuning constants and their asymmetry as literals', () => {
+    // The recovery-slower-than-shedding claim and the dead band's existence
+    // live in these values; parameterized assertions alone would stay green
+    // through a retune that silently removed either property.
+    expect(SHADOW_CADENCE_ENTER_PRESSURE).toBe(1);
+    expect(SHADOW_CADENCE_EXIT_PRESSURE).toBe(0.85);
+    expect(SHADOW_CADENCE_ENTER_SECONDS).toBe(1.5);
+    expect(SHADOW_CADENCE_EXIT_SECONDS).toBe(4);
+    expect(SHADOW_CADENCE_EXIT_SECONDS).toBeGreaterThan(SHADOW_CADENCE_ENTER_SECONDS);
+    expect(SHADOW_CADENCE_EXIT_PRESSURE).toBeLessThan(SHADOW_CADENCE_ENTER_PRESSURE);
+  });
+
   it('stays at full rate under calm and dead-band pressure', () => {
     const state = createShadowCadenceState();
     run(state, 10, 0.4);
@@ -103,19 +115,42 @@ describe('shadow cadence core', () => {
     expect(state.overSeconds).toBe(0);
   });
 
-  it('ignores degenerate dt instead of accumulating dwell from it', () => {
+  it('holds the plan untouched on degenerate dt (neither dwell nor a wipe)', () => {
+    // From a fresh state: no dwell accumulates.
     const state = createShadowCadenceState();
     updateShadowCadence(state, Number.NaN, 2, true);
     updateShadowCadence(state, 0, 2, true);
     updateShadowCadence(state, -1, 2, true);
     expect(state.halfRate).toBe(false);
     expect(state.overSeconds).toBe(0);
+    // From an ENGAGED half-rate plan: a single stalled frame must not wipe
+    // the plan or flip the parity.
+    run(state, SHADOW_CADENCE_ENTER_SECONDS + DT * 2, 2);
+    expect(state.halfRate).toBe(true);
+    const before = { ...state };
+    updateShadowCadence(state, Number.NaN, 0.1, true);
+    updateShadowCadence(state, 0, 0.1, true);
+    expect(state).toEqual(before);
+  });
+
+  it('mutates and returns the caller-owned state (per-frame path allocates nothing)', () => {
+    const state = createShadowCadenceState();
+    expect(updateShadowCadence(state, DT, 0.4, true)).toBe(state);
+    expect(updateShadowCadence(state, Number.NaN, 0.4, true)).toBe(state);
   });
 
   it('resetShadowCadence returns to the initial full-rate state', () => {
     const state = createShadowCadenceState();
     run(state, SHADOW_CADENCE_ENTER_SECONDS + DT * 2, 2);
     resetShadowCadence(state);
-    expect(state).toEqual(createShadowCadenceState());
+    // The literal shape, not a factory self-comparison: a bad edit to the
+    // factory must not move both sides of this assertion together.
+    expect(state).toEqual({
+      halfRate: false,
+      renderThisFrame: true,
+      overSeconds: 0,
+      calmSeconds: 0,
+      phase: 0,
+    });
   });
 });

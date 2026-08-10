@@ -71,10 +71,14 @@ export function snapShadowAnchor(
   const upY = dz * rightX - dx * rightZ;
   const upZ = -dy * rightX;
   // Light-space grid coordinates of the anchor (rightY = 0 drops the y term).
+  // Round, not floor: rounding is numerically stable AT grid points (a
+  // re-snapped anchor stays put; floor can drop a whole texel on the k*texel
+  // knife edge from float error), and both quantize onto the same absolute
+  // grid.
   const u = rightX * x + rightZ * z;
   const v = upX * x + upY * y + upZ * z;
-  const du = Math.floor(u / texelWorld) * texelWorld - u;
-  const dv = Math.floor(v / texelWorld) * texelWorld - v;
+  const du = Math.round(u / texelWorld) * texelWorld - u;
+  const dv = Math.round(v / texelWorld) * texelWorld - v;
   out.x = x + rightX * du + upX * dv;
   out.y = y + upY * dv;
   out.z = z + rightZ * du + upZ * dv;
