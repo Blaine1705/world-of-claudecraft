@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "e836976c",
+      "state": "b7e2dc0d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -73,6 +73,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -149,7 +153,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 970,
-      "state": "03895279",
+      "state": "a8006efe",
       "events": "f8f1e8d4",
       "rng": {
         "draws": 56,
@@ -160,7 +164,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 970,
-      "state": "05cd1db5",
+      "state": "38d44f3a",
       "events": "f94bf54b",
       "rng": {
         "draws": 92,
@@ -171,7 +175,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 970,
-      "state": "1aebee45",
+      "state": "71dfbe2a",
       "events": "40b2ed2b",
       "rng": {
         "draws": 326,
@@ -182,7 +186,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 970,
-      "state": "0d24e419",
+      "state": "a9bbfdde",
       "events": "741638a5",
       "rng": {
         "draws": 326,
@@ -262,6 +266,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 30,
           "talents": {
             "rows": {}
@@ -700,7 +708,7 @@
       "tick": 64,
       "time": 3.2,
       "nextId": 970,
-      "state": "5f07f062",
+      "state": "a413e04b",
       "events": "741638a5",
       "rng": {
         "draws": 364,
@@ -780,6 +788,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 30,
           "talents": {
             "rows": {}

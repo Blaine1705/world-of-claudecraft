@@ -6,18 +6,18 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "b65d752917f7c5ed6824718e74a71f8529574315365bec3bfd5b7f224d4d8850",
+  "rendererFingerprint": "9cc1dcc19e82c3c4018d5f092373aea3c8435e879ff03e86c71a444c624f6b77",
   "renderer": {
     "trackedFiles": [
       {
         "path": "scripts/render_finder_portraits.mjs",
-        "bytes": 10612,
-        "sha256": "880ce694cf37f72ef39c4d1932b812e09f2d43fd70eedcae850d40a2544e5709"
+        "bytes": 10988,
+        "sha256": "5f9b0357f3062fee9cc2021a0bfbd43691b2a30b09e90c96d989171c0f89cec7"
       },
       {
         "path": "scripts/lib/mob_portrait_jobs.mjs",
-        "bytes": 7881,
-        "sha256": "ba89e3b40b286bada1f2f2a2d68a8ed1fbab705b69d6d841af71fb04ca6943e7"
+        "bytes": 8547,
+        "sha256": "8811b612d40a20c55800e2f15ab58ee1580a905fa3a8cf81574cfc6e3853077b"
       },
       {
         "path": "scripts/lib/mob_portrait_background.mjs",
@@ -27,8 +27,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 3816639,
-      "sha256": "6f52d4eb47916efe2e502d83c486909955483b3dd7e9c18a743e3400f06fd51a",
+      "bytes": 3817005,
+      "sha256": "728db5157b359cd0d1da13013c69a5d196a2a6eb4eae992dcc770e57a5990c80",
       "esbuildVersion": "0.28.1"
     },
     "output": {

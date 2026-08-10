@@ -12,7 +12,7 @@ import { isRawCookingCatch } from '../sim/content/items';
 import { ABILITIES, ITEMS } from '../sim/data';
 import { crestIconUrl } from './crest_icon_art';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
-import { PROFESSION_IMAGE_IDS, professionImageUrl } from './profession_art';
+import { professionImageUrl } from './profession_art';
 import { ITEM_WEAPON_VARIANTS } from './weapon_variants';
 
 export { PROFESSION_IMAGE_IDS, professionImageUrl } from './profession_art';
@@ -4395,6 +4395,11 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'death_coil',
   'chaos_bolt',
   'cinderhide',
+  // Painted signature actions for the two controllable overhaul demons. These
+  // ids are not player ABILITIES, so abilityImageUrl's class projection below
+  // keeps their Warlock ownership explicit.
+  'emberkin_felbolt',
+  'gloomshade_abyssal_chain',
   // Choice-row talents use their own images instead of borrowing spell art.
   ...WARLOCK_TALENT_IMAGE_IDS,
   // rogue (CraftPix premium "RPG Thief skill icons" pack). garrote/sap/expose_armor/blind
@@ -4768,6 +4773,8 @@ export function abilityImageUrl(id: string): string | null {
           id === 'overflowing_power'
         ? 'mage'
         : WARLOCK_TALENT_IMAGE_IDS.has(id) ||
+            id === 'emberkin_felbolt' ||
+            id === 'gloomshade_abyssal_chain' ||
             id === 'summon_succubus' ||
             id === 'summon_felhunter' ||
             id === 'summon_felguard' ||
@@ -5171,18 +5178,11 @@ export function itemImageUrl(id: string): string | null {
 const DEED_ICON_DIR = '/ui/deeds';
 const DEED_CREST_PREFIX = 'deed_';
 
-// Deeds whose crest art is COMMISSIONED BUT NOT YET COMMITTED, the ITEM_ART_PENDING model one
-// screen up. The Icons authoring rule in docs/design/deeds.md permits this by design ("an artless
-// deed falls back to its procedural category crest, so art can trail the deed"), so the point of
-// the list is not to change behavior (deedImageUrl already declines any id absent from
-// DEED_IMAGE_IDS) but to make the debt ENUMERATED rather than silent, and to give the art tests
-// one name to agree on instead of three copies of the same literal pair.
-// tests/deed_icons.test.ts holds the line from both sides: a stale entry once art lands, and
-// unenumerated debt. Do not add an id here merely to silence that failure; commission the art and
-// file it in docs/achievements/icon-brief.md.
-// Empty after the 2026-08-09 completion wave painted every live deed. Keep the mechanism so a
-// future deed can land safely before its commissioned crest, but do not add debt merely to make
-// the gate green.
+// Exhaustive live-deed art debt ledger, following the ITEM_ART_PENDING model one screen up. The
+// Icons authoring rule in docs/design/deeds.md permits a procedural category fallback while art
+// trails a deed, but every live release deed is painted today. Keep the empty set as the one
+// authoritative ledger: future art debt must be commissioned and filed in
+// docs/achievements/icon-brief.md rather than hidden by an unreviewed fallback.
 export const DEED_ART_PENDING: ReadonlySet<string> = new Set();
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {
@@ -5319,8 +5319,11 @@ function staticIconUrl(kind: IconKind, id: string): string | null {
     if (img) return img;
   }
   // Committed deed, class, family, and status paintings short-circuit to a
-  // static WebP. Unit portraits still paint the procedural recipe immediately,
-  // then replace it after this same crest art decodes.
+  // static WebP (URL-only is sufficient: crest consumers here are <img> sinks,
+  // the Book of Deeds cards and recent strip and the Reliquary title shelf;
+  // the synchronous iconCanvas path stays class-crest portraits only). Unit
+  // portraits still paint the procedural recipe immediately, then replace it
+  // after this same crest art decodes.
   if (kind === 'crest') return deedImageUrl(id) ?? crestIconUrl(id);
   return null;
 }
