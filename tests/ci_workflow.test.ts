@@ -58,6 +58,12 @@ const PNPM_VERSION = (() => {
 const SHARD_N = 8;
 const SHARD_MATRIX = Array.from({ length: SHARD_N }, (_, i) => i + 1).join(', ');
 
+// Typecheck plus the three independent pure builds (env/server/bot), collapsed
+// into one turbo call so CI shares the exact idiom gate.mjs already uses for
+// intra-task cache/parallelism (scripts/lib/gate_task_cache.mjs turboRunArgs).
+const TYPECHECK_BUILDS_TURBO_RUN =
+  'run: npx turbo run check:types build:env build:server build:bot --ui=stream';
+
 // Shared serialized check-run lines for both pr-checks and release-checks (D8).
 // One list so a step added on one arm only fails the other arm's pin.
 const CHECK_RUN_STEPS = [
@@ -65,11 +71,8 @@ const CHECK_RUN_STEPS = [
   'run: node scripts/i18n_coverage_summary.mjs',
   'run: git diff --exit-code -- src/ui/i18n.resolved.generated',
   'run: npm run security:gate',
-  'run: npm run check:types',
-  'run: npm run build:env',
-  'run: npm run build:server',
-  'run: npm run build:bot',
-  'run: npm run build\n',
+  TYPECHECK_BUILDS_TURBO_RUN,
+  'run: npm run wiki:content && npm run build:bundle\n',
 ] as const;
 
 // Exact job-level if line for both release jobs. toContain alone would allow a
@@ -231,16 +234,18 @@ describe('CI workflow parity', () => {
 
   it('runs the canonical game and admin typecheck in CI and the local gate', () => {
     // One occurrence in pr-checks and one in release-checks (the parallel
-    // check jobs). Neither test job typechecks.
-    expect(workflow.match(/run: npm run check:types/g)).toHaveLength(2);
-    expect(jobSource('pr-checks')).toContain('run: npm run check:types');
-    expect(jobSource('release-checks')).toContain('run: npm run check:types');
-    expect(jobSource('pr-gate')).not.toContain('run: npm run check:types');
-    expect(jobSource('release-gate')).not.toContain('run: npm run check:types');
+    // check jobs), collapsed with the env/server/bot builds into one turbo
+    // call. Neither test job typechecks.
+    expect(workflow.match(new RegExp(escapeRe(TYPECHECK_BUILDS_TURBO_RUN), 'g'))).toHaveLength(2);
+    expect(jobSource('pr-checks')).toContain(TYPECHECK_BUILDS_TURBO_RUN);
+    expect(jobSource('release-checks')).toContain(TYPECHECK_BUILDS_TURBO_RUN);
+    expect(jobSource('pr-gate')).not.toContain('check:types');
+    expect(jobSource('release-gate')).not.toContain('check:types');
     expect(workflow).not.toContain('run: npx tsc --noEmit');
-    // Local gate runs typecheck through turbo (Phase 8); CI still uses npm run check:types.
-    // The combined step carries the Discord bot build too (R7: every consumer
-    // of the shared list builds the bot beside the server).
+    // Local gate runs typecheck through turbo (Phase 8); CI now shares that
+    // exact idiom instead of four separate serial npm steps. The combined step
+    // carries the Discord bot build too (R7: every consumer of the shared list
+    // builds the bot beside the server).
     expect(gate).toContain('buildFullGateSteps');
     expect(gateSteps.some((s) => s.name === 'typecheck + env/server/bot builds')).toBe(true);
     expect(gateSteps.find((s) => s.name === 'typecheck + env/server/bot builds')?.args).toEqual(
@@ -308,6 +313,14 @@ describe('CI workflow parity', () => {
       browserGate.indexOf('run: npx playwright install --with-deps chromium'),
     );
     expect(browserGate).toContain('run: npx playwright install --with-deps chromium');
+    // No restore-keys: the key is already exact-version-scoped, so a prefix
+    // fallback could only ever restore a PRIOR Playwright version's binaries
+    // alongside the new install. actions/cache never evicts an old entry, so
+    // every future version bump would silently leave that stale version's
+    // Chromium cached forever instead of a clean version-scoped miss.
+    // Anchored to the YAML key shape (bare, double- or single-quoted) so a
+    // step comment mentioning the phrase cannot satisfy the pin.
+    expect(browserGate).not.toMatch(/\n\s+["']?restore-keys["']?:/);
   });
 
   it('posts the i18n coverage summary and diffs the committed artifacts in both check jobs', () => {
@@ -465,7 +478,7 @@ describe('CI workflow parity', () => {
     expect(prChecks).not.toContain('run: npm test');
     for (const step of CHECK_RUN_STEPS) {
       // Anchored to the start of a step line, so a YAML-commented-out step
-      // (`#        run: npm run build:server`) cannot satisfy it: the substring
+      // (`#        run: npm run build`) cannot satisfy it: the substring
       // survives the comment, the anchored form does not.
       expect(prChecks).toMatch(new RegExp(`\\n {8}${escapeRe(step)}`));
       expect(prGate).not.toContain(step);
@@ -479,7 +492,7 @@ describe('CI workflow parity', () => {
     // ...and a structural count, the same backstop release-gate has: an added
     // or removed pr-checks step must consciously update this test rather than
     // slipping in beside the by-name pins above.
-    expect(prChecks.match(/\n {6}- name: /g)).toHaveLength(14);
+    expect(prChecks.match(/\n {6}- name: /g)).toHaveLength(11);
     // pr-checks is unsharded, so NO step in it may carry a condition: an
     // `if: matrix.shard == 1` copy-pasted here is never true and would disable
     // that step outright.
@@ -507,12 +520,12 @@ describe('CI workflow parity', () => {
       expect(releaseChecks).toMatch(new RegExp(`\\n {8}${escapeRe(step)}`));
       expect(releaseGate).not.toContain(step);
     }
-    // Named-step count: checkout, setup-pnpm, setup-node, pnpm install, plus ten
-    // check steps (i18n gen/summary/freshness, malware, tsc cache, typecheck,
-    // four builds including the Discord bot). An accidental extra step on the
-    // checks job would otherwise stay green.
-    expect(releaseChecks.match(/\n {6}- name: /g)).toHaveLength(14);
-    expect(jobSource('pr-checks').match(/\n {6}- name: /g)).toHaveLength(14);
+    // Named-step count: checkout, setup-pnpm, setup-node, pnpm install, plus
+    // seven check steps (i18n gen/summary/freshness, malware, tsc cache, the
+    // combined typecheck + env/server/bot builds turbo call, client build).
+    // An accidental extra step on the checks job would otherwise stay green.
+    expect(releaseChecks.match(/\n {6}- name: /g)).toHaveLength(11);
+    expect(jobSource('pr-checks').match(/\n {6}- name: /g)).toHaveLength(11);
     // tsc incremental cache (#2758) must land on both check jobs, never on a
     // matrixed test job (would N-way cache thrash or reintroduce shard-1 gates).
     for (const job of [releaseChecks, jobSource('pr-checks')]) {
@@ -782,7 +795,7 @@ describe('CI workflow parity', () => {
     }
   });
 
-  it('bounds the test and browser jobs against the runner-side checkout-stall class', () => {
+  it('bounds every ci.yml job against the runner-side checkout-stall class', () => {
     // Phase 6 of the CI/CD performance packet: on 2026-08-06 thirteen shard,
     // lane, and browser jobs across seven runs sat 9.6 to 24.4 minutes inside
     // actions/checkout before completing (runner-pool-side; healthy checkout
@@ -798,6 +811,12 @@ describe('CI workflow parity', () => {
     // duplicate cannot shadow the pinned one; and job-level, never
     // step-level, because a step bound leaves the rest of the job free to
     // hang toward GitHub's 6 hour default.
+    //
+    // The checks and release lanes were the recorded follow-up from Phase 6's
+    // postmortem note (bounding them was flagged, not forgotten): they now
+    // carry a measured bound too, sized by analogy to their nearest sibling
+    // in shape rather than lifted from the checkout-stall replay directly, so
+    // every job in this file carries a conscious timeout-minutes value.
     const bounds = [
       ['pr-gate', 20],
       ['release-gate', 20],
@@ -807,15 +826,32 @@ describe('CI workflow parity', () => {
       // observed stalls over 8), so it is pinned exactly here beside the
       // single-digit shape check the classifier test keeps.
       ['changes', 8],
+      // lint is an unmatrixed single toolchain-setup-plus-checks job like
+      // browser-gate, but lighter (no browser download): checkout, pnpm
+      // install, a base-ref fetch, one biome pass. 15 keeps a margin over
+      // browser-gate's 10 for the extra base-ref resolution step.
+      ['lint', 15],
+      // pr-checks and release-checks are the same shape as lint but heavier:
+      // i18n generation, the malware gate, a typecheck, and four builds. 20
+      // matches the shard matrices' bound.
+      ['pr-checks', 20],
+      ['release-checks', 20],
+      // release-version-gate and release-i18n are both unsharded jobs whose
+      // own work is fast (one small version-surface check; five test files,
+      // "seconds long" by the release-i18n job comment): toolchain setup
+      // dominates their wall time, so both share the smallest non-classifier
+      // bound.
+      ['release-version-gate', 10],
+      ['release-i18n', 10],
     ] as const;
-    // Both the positive and the negatives run over the full index-based job
-    // span (this job key to the next), never the comment-terminated
-    // jobSource slice, so a stray top-level comment inside a job body can
-    // hide neither a duplicate job-level bound nor a step bound (the fix
-    // round's verifier proved the jobSource form evadable both ways).
-    // Deliberate consequence: a span INCLUDES the 2-space comment block that
-    // documents the NEXT job, so only indentation-anchored patterns belong
-    // on spans; a bare not.toContain would trip on a neighbour's comment.
+    // The positive check runs over the full index-based job span (this job
+    // key to the next), never the comment-terminated jobSource slice, so a
+    // stray top-level comment inside a job body cannot hide a duplicate
+    // job-level bound or a step bound (the fix round's verifier proved the
+    // jobSource form evadable both ways). Deliberate consequence: a span
+    // INCLUDES the 2-space comment block that documents the NEXT job, so
+    // only indentation-anchored patterns belong on spans; a bare
+    // not.toContain would trip on a neighbour's comment.
     const jobSpan = (name: string) => {
       const start = workflow.indexOf(`\n  ${name}:`);
       expect(start).toBeGreaterThanOrEqual(0);
@@ -831,35 +867,19 @@ describe('CI workflow parity', () => {
       // A step bound can also legally sit as the FIRST key of a step item.
       expect(span).not.toMatch(/\n {6}- timeout-minutes:/);
     }
-    // Completeness: every ci.yml job is either in the bounds table above or
-    // the named unbounded-by-design list: the checks and release lanes sit outside
-    // Phase 6's measured pass, and bounding them is a recorded follow-up in
-    // the packet's postmortem note, not an accident. A new job therefore
-    // cannot arrive silently unbounded, and moving a job between the lists
-    // is a conscious edit here. The key regex tolerates a trailing comment
-    // or space after the colon, both valid YAML that would otherwise make an
-    // eleventh job invisible. The nightly workflow's deliberately generous
-    // bounds have their own presence pins in tests/nightly_workflow.test.ts
-    // and stay untouched.
-    const UNBOUNDED_BY_DESIGN = [
-      'release-version-gate',
-      'lint',
-      'pr-checks',
-      'release-i18n',
-      'release-checks',
-    ] as const;
+    // Completeness: every ci.yml job must appear in the bounds table above.
+    // A new job therefore cannot arrive silently unbounded and hang toward
+    // GitHub's 6 hour default; adding one without a matching entry here fails
+    // this equality. The key regex tolerates a trailing comment or space
+    // after the colon, both valid YAML that would otherwise make an eleventh
+    // job invisible. The nightly workflow's deliberately generous bounds
+    // have their own presence pins in tests/nightly_workflow.test.ts and
+    // stay untouched.
     const jobsSection = workflow.slice(workflow.indexOf('\njobs:'));
     const jobKeys = [
       ...jobsSection.matchAll(/\n {2}([A-Za-z][A-Za-z0-9_-]*):[ \t]*(?:#[^\n]*)?\n/g),
     ].map((m) => m[1]);
-    expect([...jobKeys].sort()).toEqual(
-      [...bounds.map(([name]) => name), ...UNBOUNDED_BY_DESIGN].sort(),
-    );
-    // Two-way: a job on the unbounded list must actually BE unbounded, so
-    // the list is an assertion, not documentation that can rot.
-    for (const name of UNBOUNDED_BY_DESIGN) {
-      expect(jobSpan(name).match(/^ {4}timeout-minutes: \d+$/gm) ?? []).toEqual([]);
-    }
+    expect([...jobKeys].sort()).toEqual([...bounds.map(([name]) => name)].sort());
     // The operator triage for a timeout kill is part of the contract: the
     // doc must keep the rejection signature, route it to a rerun, and tell
     // the operator to check for a failing test step first (a genuinely red
@@ -1144,13 +1164,19 @@ describe('CI workflow parity', () => {
   });
 
   it('keeps the bot build a real, ungated failure in both CI check jobs', () => {
-    // Name-to-run adjacency, because `toContain('run: npm run build:bot')` is
-    // also satisfied by `run: npm run build:bot || true` (which can never fail)
-    // and by a copy-pasted `if: matrix.shard == 1` slipped between the two
-    // lines, which in these unsharded jobs is never true and would disable the
-    // build outright. Either would put a broken bundle back on the host.
+    // Name-to-run adjacency, because `toContain(TYPECHECK_BUILDS_TURBO_RUN)` is
+    // also satisfied by an appended `|| true` (which can never fail) and by a
+    // copy-pasted `if: matrix.shard == 1` slipped between the two lines, which
+    // in these unsharded jobs is never true and would disable the build
+    // outright. Either would put a broken bundle back on the host. turbo run
+    // itself fails the step on any task's non-zero exit, so build:bot riding
+    // inside the combined call still fails the whole step, not just its task.
     for (const name of ['pr-checks', 'release-checks'] as const) {
-      expect(jobSource(name)).toMatch(/- name: Build Discord bot\n {8}run: npm run build:bot\n/);
+      expect(jobSource(name)).toMatch(
+        new RegExp(
+          `- name: Typecheck \\+ env/server/bot builds\\n {8}${escapeRe(TYPECHECK_BUILDS_TURBO_RUN)}\\n`,
+        ),
+      );
     }
     // A step that is allowed to fail is not a gate.
     expect(workflow).not.toContain('continue-on-error');
