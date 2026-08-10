@@ -90,6 +90,12 @@ function liveWindupHarness() {
     stunStars: new Map(),
     orbitBandCount: 0,
     applyGlow: null,
+    // The release's CC band sweep in update() reads these; Object.create skips
+    // the class field initializers, so the harness supplies them explicitly.
+    ccBands: new Map(),
+    ccPickIds: [],
+    ccPickKeys: [],
+    ccPickCount: 0,
   });
   return { fx, push, state };
 }
