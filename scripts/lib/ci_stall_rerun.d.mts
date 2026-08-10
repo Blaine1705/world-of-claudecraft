@@ -29,6 +29,8 @@ export interface CiStallDecision {
 
 export const SETUP_STEP_RE: RegExp;
 
+export const CHECKOUT_STEP_RE: RegExp;
+
 export const TIMEOUT_ANNOTATION_FRAGMENT: string;
 
 export function decide(run: CiStallRun): CiStallDecision;

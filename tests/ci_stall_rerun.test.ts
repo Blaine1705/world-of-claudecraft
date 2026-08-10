@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
+  CHECKOUT_STEP_RE,
   decide,
   SETUP_STEP_RE,
   TIMEOUT_ANNOTATION_FRAGMENT,
@@ -228,11 +229,18 @@ describe('ci stall rerun decision core', () => {
     expect(decision.stalledJobs).toEqual(['PR gate (long sims A)']);
   });
 
-  it('refuses a failed job whose failed step is a test or work step', () => {
+  it('refuses a failed job whose failed step is anything but a checkout', () => {
+    // The fast-abort arm is narrower than the bound-kill arm on purpose:
+    // only a checkout can die of the git low-speed abort. A failed install
+    // (a lockfile desync fails identically in every job) or cache step
+    // stays with a human instead of auto-rerunning the whole matrix.
     for (const stepName of [
       'Run tests (PR tier, long-sims lane A)',
       'Biome check (changed files only)',
       'Malicious-code gate',
+      'Install dependencies',
+      'Set up Node.js',
+      'Cache vitest transform cache',
     ]) {
       const run = incidentRun();
       run.runConclusion = 'failure';
@@ -311,6 +319,12 @@ describe('setup-step pattern against the real ci.yml step names', () => {
       'Set up Node.js',
       'Set up pnpm',
     ]);
+    // The fast-abort arm's narrower pattern: exactly the checkout steps,
+    // nothing else, so a failed install or cache step can never ride it.
+    const checkoutMatched = [
+      ...new Set(stepNames.filter((name) => CHECKOUT_STEP_RE.test(name))),
+    ].sort();
+    expect(checkoutMatched).toEqual(['Check out classifier script', 'Check out repository']);
   });
 });
 
@@ -330,21 +344,40 @@ describe('ci-stall-rerun.yml shape', () => {
     expect(workflowCode).not.toContain('secrets.');
     // The departure from the repo's contents: read baseline must stay
     // justified in the header, next to the file it protects.
-    expect(workflow).toContain('every other workflow in this repository runs with');
+    expect(workflow).toContain('every other workflow in this repository declares');
     expect(workflow).toContain('must never check out or run');
     expect(workflow).toContain('PR-authored code');
   });
 
-  it('gates the runner spin on attempt 1 of a killed run', () => {
+  it('gates the runner spin on attempt 1 of a killed non-queue run', () => {
     expect(workflowCode).toContain('github.event.workflow_run.run_attempt == 1');
     expect(workflowCode).toContain("github.event.workflow_run.conclusion == 'cancelled'");
     expect(workflowCode).toContain("github.event.workflow_run.conclusion == 'failure'");
+    // A rejected merge group is already dissolved (ref deleted, PR ejected);
+    // rerunning it cannot re-queue anything, so queue runs stay manual.
+    expect(workflowCode).toContain("github.event.workflow_run.event != 'merge_group'");
   });
 
-  it('checks out the decision scripts at the default branch, credentials dropped', () => {
+  it('serializes duplicate deliveries per triggering run', () => {
+    expect(workflowCode).toMatch(
+      /\nconcurrency:\n {2}group: ci-stall-rerun-\$\{\{ github\.event\.workflow_run\.id \}\}\n {2}cancel-in-progress: false\n/,
+    );
+  });
+
+  it('carries the same dead-transfer floor ci.yml uses for its own checkout', () => {
+    expect(workflowCode).toMatch(
+      /\nenv:\n {2}GIT_HTTP_LOW_SPEED_LIMIT: '1000'\n {2}GIT_HTTP_LOW_SPEED_TIME: '120'\n/,
+    );
+  });
+
+  it('checks out the decision scripts at the default branch, blobless, credentials dropped', () => {
     // workflow_run executes with write-capable permissions: the checkout
-    // must never reference the triggering run's head.
+    // must never reference the triggering run's head. Blobless + sparse is
+    // the nightly.yml script-checkout shape: the reactor needs the scripts
+    // subtree, not the repository's media payload, and it runs on every
+    // killed CI run under a 5 minute bound.
     expect(workflowCode).toContain('ref: ${{ github.event.repository.default_branch }}');
+    expect(workflowCode).toContain('filter: blob:none');
     expect(workflowCode).toContain('sparse-checkout: scripts');
     expect(workflowCode).toContain('persist-credentials: false');
     expect(workflowCode).not.toContain('workflow_run.head');
@@ -368,28 +401,38 @@ describe('ci-stall-rerun.yml shape', () => {
 describe('driver wiring', () => {
   // The driver is fail-closed glue; prove the wiring end to end against a
   // stub gh: it reads the live run, maps jobs and annotations, consults the
-  // core, and POSTs rerun-failed-jobs exactly once, or not at all.
-  function runDriver(runJson: object): { status: number | null; stdout: string; log: string } {
+  // core, and POSTs rerun-failed-jobs exactly once, or not at all. The
+  // stub's failure switches (STUB_FAIL_*) let each fail-closed branch be
+  // exercised for real instead of taken on faith.
+  interface DriverRun {
+    status: number | null;
+    stdout: string;
+    stderr: string;
+    log: string;
+  }
+
+  function runDriver(
+    runJson: object,
+    options: { jobsJson?: object; env?: Record<string, string | undefined> } = {},
+  ): DriverRun {
     const stubDir = mkdtempSync(path.join(os.tmpdir(), 'woc-ci-stall-'));
     try {
       const logPath = path.join(stubDir, 'gh.log');
       writeFileSync(logPath, '');
       writeFileSync(path.join(stubDir, 'run.json'), JSON.stringify(runJson));
-      writeFileSync(
-        path.join(stubDir, 'jobs.json'),
-        JSON.stringify({
-          total_count: 2,
-          jobs: [
-            { id: 1, name: 'PR gate (long sims B)', conclusion: 'success', steps: [] },
-            {
-              id: 93473897038,
-              name: 'PR gate (long sims A)',
-              conclusion: 'cancelled',
-              steps: LANE_A_STALL_STEPS,
-            },
-          ],
-        }),
-      );
+      const jobsJson = options.jobsJson ?? {
+        total_count: 2,
+        jobs: [
+          { id: 1, name: 'PR gate (long sims B)', conclusion: 'success', steps: [] },
+          {
+            id: 93473897038,
+            name: 'PR gate (long sims A)',
+            conclusion: 'cancelled',
+            steps: LANE_A_STALL_STEPS,
+          },
+        ],
+      };
+      writeFileSync(path.join(stubDir, 'jobs.json'), JSON.stringify(jobsJson));
       writeFileSync(
         path.join(stubDir, 'annotations.json'),
         JSON.stringify([{ message: TIMEOUT_ANNOTATION }, { message: CANCEL_ANNOTATION }]),
@@ -398,8 +441,12 @@ describe('driver wiring', () => {
         '#!/bin/bash',
         'printf \'%s\\n\' "$*" >> "$STUB_LOG"',
         'case "$*" in',
-        '  *rerun-failed-jobs*) exit 0 ;;',
-        '  *check-runs*) cat "$STUB_DIR/annotations.json" ;;',
+        '  *rerun-failed-jobs*)',
+        '    if [ -n "$STUB_FAIL_RERUN" ]; then echo "HTTP 403" >&2; exit 1; fi',
+        '    exit 0 ;;',
+        '  *check-runs*)',
+        '    if [ -n "$STUB_FAIL_ANNOTATIONS" ]; then echo "HTTP 500" >&2; exit 1; fi',
+        '    cat "$STUB_DIR/annotations.json" ;;',
         '  *"jobs?per_page=100"*) cat "$STUB_DIR/jobs.json" ;;',
         '  *actions/runs/*) cat "$STUB_DIR/run.json" ;;',
         '  *) echo "unexpected gh call: $*" >&2; exit 64 ;;',
@@ -419,9 +466,17 @@ describe('driver wiring', () => {
           GITHUB_REPOSITORY: 'levy-street/world-of-claudecraft',
           STUB_DIR: stubDir,
           STUB_LOG: logPath,
+          STUB_FAIL_RERUN: undefined,
+          STUB_FAIL_ANNOTATIONS: undefined,
+          ...options.env,
         },
       });
-      return { status: result.status, stdout: result.stdout, log: readFileSync(logPath, 'utf8') };
+      return {
+        status: result.status,
+        stdout: result.stdout,
+        stderr: result.stderr,
+        log: readFileSync(logPath, 'utf8'),
+      };
     } finally {
       // The log is read before this runs; the temp tree never outlives the test.
       rmSync(stubDir, { recursive: true, force: true });
@@ -462,5 +517,52 @@ describe('driver wiring', () => {
     expect(status).toBe(0);
     expect(stdout).toContain('nothing to do');
     expect(log).not.toContain('rerun-failed-jobs');
+  });
+
+  it('refuses a malformed RUN_ID before touching the API at all', () => {
+    const good = { status: 'completed', conclusion: 'cancelled', run_attempt: 1 };
+    for (const runId of ['31392590628/../evil', 'abc', '']) {
+      const { status, log } = runDriver(good, { env: { RUN_ID: runId } });
+      expect(status).toBe(1);
+      expect(log).toBe('');
+    }
+    const { status, log } = runDriver(good, { env: { GITHUB_REPOSITORY: 'no-slash' } });
+    expect(status).toBe(1);
+    expect(log).toBe('');
+  });
+
+  it('refuses a partial jobs page instead of judging a partial run', () => {
+    const { status, stderr, log } = runDriver(
+      { status: 'completed', conclusion: 'cancelled', run_attempt: 1 },
+      {
+        jobsJson: {
+          total_count: 3,
+          jobs: [{ id: 1, name: 'PR gate (long sims B)', conclusion: 'success', steps: [] }],
+        },
+      },
+    );
+    expect(status).toBe(1);
+    expect(stderr).toContain('refusing a partial decision');
+    expect(log).not.toContain('rerun-failed-jobs');
+  });
+
+  it('exits red when the annotations read fails, without rerunning', () => {
+    const { status, log } = runDriver(
+      { status: 'completed', conclusion: 'cancelled', run_attempt: 1 },
+      { env: { STUB_FAIL_ANNOTATIONS: '1' } },
+    );
+    expect(status).toBe(1);
+    expect(log).not.toContain('rerun-failed-jobs');
+  });
+
+  it('exits red when the rerun POST fails, after exactly one attempt', () => {
+    const { status, stderr, log } = runDriver(
+      { status: 'completed', conclusion: 'cancelled', run_attempt: 1 },
+      { env: { STUB_FAIL_RERUN: '1' } },
+    );
+    expect(status).toBe(1);
+    expect(stderr).toContain('rerun-failed-jobs failed');
+    const rerunCalls = log.split('\n').filter((line) => line.includes('rerun-failed-jobs'));
+    expect(rerunCalls).toHaveLength(1);
   });
 });

@@ -78,7 +78,10 @@ const mapped = jobs.map((job) => {
   if (job.conclusion === 'cancelled') {
     // The bound-kill discriminator: only a job the bound killed carries the
     // runner's timeout annotation. Fetched only for cancelled jobs; the
-    // failure arm never consults annotations.
+    // failure arm never consults annotations. Deliberately unpaged (default
+    // 30 rows): a timeout annotation dropped past page one could only make
+    // the core MISS a rerun, never grant a wrong one, so the read fails in
+    // the safe direction.
     const annotations = ghJson(['api', `repos/${repo}/check-runs/${job.id}/annotations`]);
     entry.annotationMessages = (Array.isArray(annotations) ? annotations : [])
       .map((a) => a.message)

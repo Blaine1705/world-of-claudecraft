@@ -9,27 +9,32 @@
 // to "re-run the failed jobs and re-queue". This module is that triage rule
 // as code, so attempt 1 of the rerun no longer needs a human.
 //
-// The crux is the SAFE PREDICATE: a rerun is only allowed when NO test step
-// ran anywhere in the run, so a rerun can never mask a real failure, and
+// The crux is the SAFE PREDICATE: a rerun is only allowed when nothing that
+// ran had failed and nothing after the dead setup step ran (in particular
+// no test step after it), so a rerun can never mask a real failure, and
 // only on attempt 1, so the rerun's own completion can never rerun anything
 // (a second stall of the same job is the doc's "real slowdown, investigate"
-// case and stays with a human). Two stall shapes are recognized, both
-// requiring the dead step to be a SETUP step with every later work step
-// skipped:
+// case and stays with a human). A late setup step can legitimately die with
+// earlier PASSED work steps behind it (ci.yml's tsc cache restore sits
+// after the freshness checks); that reruns green work, never a red. Two
+// stall shapes are recognized:
 //
-//   - bound kill: the job bound cancelled the job mid-setup. Job conclusion
-//     "cancelled" alone cannot be trusted: a superseded run cancelled by
-//     ci.yml's cancel-in-progress concurrency group, or a user cancel, is
-//     step-for-step identical, and resurrecting a superseded run is pure
-//     waste. The discriminator is the runner's own timeout annotation on
-//     the killed job ("The job has exceeded the maximum execution time of
-//     20m0s" in the incident), which only a bound kill carries.
+//   - bound kill: the job bound cancelled the job inside a SETUP step. Job
+//     conclusion "cancelled" alone cannot be trusted: a superseded run
+//     cancelled by ci.yml's cancel-in-progress concurrency group, or a
+//     user cancel, is step-for-step identical, and resurrecting a
+//     superseded run is pure waste. The discriminator is the runner's own
+//     timeout annotation on the killed job ("The job has exceeded the
+//     maximum execution time of 20m0s" in the incident), which only a
+//     bound kill carries.
 //   - fast abort: ci.yml's workflow-wide git low-speed abort ended the dead
 //     transfer early, the in-step checkout retries also stalled, and the
-//     setup step FAILED with everything after it skipped. No annotation is
-//     needed here: a failed setup step with no test step run is rerunnable
-//     regardless of why it failed (a genuinely broken setup fails again on
-//     the rerun; nothing is masked because nothing was tested).
+//     CHECKOUT step FAILED with everything after it skipped. Deliberately
+//     narrower than the bound-kill arm: only a checkout step qualifies,
+//     because the low-speed abort can only kill a git HTTP transfer. A
+//     failed "Install dependencies" stays with a human on purpose: a
+//     lockfile desync fails identically in every job, and auto-rerunning
+//     the whole matrix would delay the definitive red without masking it.
 //
 // Everything else fails closed: any failed step inside a cancelled job, any
 // cancelled or failed TEST step, any job conclusion outside the recognized
@@ -53,6 +58,14 @@ export const SETUP_STEP_RE = /^(Check out |Set up |Install |Cache )/;
  */
 export const TIMEOUT_ANNOTATION_FRAGMENT = 'exceeded the maximum execution time';
 
+/**
+ * The only step names the fast-abort arm accepts as the failed step: the
+ * git low-speed abort can only kill a checkout's HTTP transfer, so a
+ * failure anywhere else (install, cache, any work step) is not this class
+ * and stays with a human.
+ */
+export const CHECKOUT_STEP_RE = /^Check out /;
+
 // Runner housekeeping that legitimately RUNS after a kill: the "Post <setup
 // step>" cleanup phases and the runner's own completion step. Deliberately
 // anchored to the setup-step prefixes so a WORK step that happens to start
@@ -75,21 +88,22 @@ function isHousekeeping(step) {
 
 /**
  * The one dead step of a stall-shaped job, or null when the job does not
- * match: exactly one non-housekeeping step carries `deadConclusion`, its
- * name is a setup step, and every non-housekeeping step after it was
- * skipped (the test step never ran).
+ * match: the first non-housekeeping step carrying `deadConclusion` has a
+ * name matching `nameRe`, and every non-housekeeping step after it was
+ * skipped (nothing after the dead step ran).
  *
  * @param {Array<{ name: string, conclusion: string | null }>} steps
  * @param {'cancelled' | 'failure'} deadConclusion
+ * @param {RegExp} nameRe
  * @returns {{ name: string } | null}
  */
-function findDeadSetupStep(steps, deadConclusion) {
+function findDeadStep(steps, deadConclusion, nameRe) {
   if (!Array.isArray(steps) || steps.length === 0) return null;
   const work = steps.filter((step) => !isHousekeeping(step));
   const deadIndex = work.findIndex((step) => step.conclusion === deadConclusion);
   if (deadIndex === -1) return null;
   const dead = work[deadIndex];
-  if (!SETUP_STEP_RE.test(dead.name)) return null;
+  if (!nameRe.test(dead.name)) return null;
   for (const step of work.slice(deadIndex + 1)) {
     if (step.conclusion !== 'skipped') return null;
   }
@@ -115,16 +129,14 @@ function isBoundKillStall(job) {
     (step) => !isHousekeeping(step) && step.conclusion === 'cancelled',
   ).length;
   if (cancelledCount !== 1) return false;
-  return findDeadSetupStep(steps, 'cancelled') !== null;
+  return findDeadStep(steps, 'cancelled', SETUP_STEP_RE) !== null;
 }
 
 /**
  * Fast-abort stall shape: exactly one failed step in the whole job, it is a
- * non-housekeeping setup step, nothing was cancelled, and everything after
- * it was skipped. Covers the git low-speed abort exhausting the in-step
- * checkout retries, and any other setup-only failure (registry blip): a
- * rerun of a setup failure can never mask a test result because no test
- * ran.
+ * CHECKOUT step (the only step the git low-speed abort can kill), nothing
+ * was cancelled, and everything after it was skipped. A rerun of a dead
+ * checkout can never mask a test result because nothing after it ran.
  *
  * @param {import('./ci_stall_rerun.d.mts').CiStallJob} job
  * @returns {boolean}
@@ -134,8 +146,7 @@ function isFastAbortStall(job) {
   if (steps.some((step) => step.conclusion === 'cancelled')) return false;
   const failedCount = steps.filter((step) => step.conclusion === 'failure').length;
   if (failedCount !== 1) return false;
-  const dead = findDeadSetupStep(steps, 'failure');
-  return dead !== null && !isHousekeeping(dead);
+  return findDeadStep(steps, 'failure', CHECKOUT_STEP_RE) !== null;
 }
 
 /**

@@ -51,8 +51,13 @@ concurrency:
 # git-remote-https). A healthy fetch of this repository runs orders of
 # magnitude above the floor, so a merely slow transfer is never clipped. If
 # every in-step retry stalls too, the step fails, the job dies early, and
-# ci-stall-rerun.yml reruns the run's failed jobs once (no test step has run,
-# so nothing can be masked). Values pinned by tests/ci_workflow.test.ts.
+# ci-stall-rerun.yml reruns the run's failed jobs once (nothing after the
+# dead checkout ran, so nothing can be masked). Accepted tradeoff: the bare
+# git fetches in the lint job's "Determine base ref" step gain the same
+# floor with no retry wrapper and no auto-rerun coverage (not a checkout
+# step), so a stall there now fails the minutes-long lint job fast and takes
+# a manual rerun; that beats the old 15-minute bound ride. Values pinned by
+# tests/ci_workflow.test.ts.
 env:
   GIT_HTTP_LOW_SPEED_LIMIT: '1000'
   GIT_HTTP_LOW_SPEED_TIME: '120'

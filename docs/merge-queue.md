@@ -81,8 +81,11 @@ the Checks tab (filter by event: merge_group).
    actions/checkout retries it in-step, and the CI stall auto-rerun
    workflow (ci-stall-rerun.yml, decision core scripts/lib/ci_stall_rerun.mjs)
    reruns a run's failed jobs once, on attempt 1 only, when the dead step
-   was a setup step and no test step ran. A stall you meet by hand is
-   therefore usually already on attempt 2. If the
+   was a setup step, nothing that ran had failed, and nothing after the
+   dead step ran. The auto-rerun deliberately skips merge_group runs (the
+   queue has already ejected the PR and dissolved the group's ref, so only
+   the manual rerun-and-re-queue above applies there); on pull_request and
+   push runs a stall you meet by hand is usually already on attempt 2. If the
    SAME job times out twice on healthy-looking logs, treat it as a real
    slowdown and investigate before resizing any bound.
 
