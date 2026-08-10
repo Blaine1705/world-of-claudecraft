@@ -96,6 +96,15 @@ export interface SpatialAudioSink {
     z: number,
     self: boolean,
   ): void;
+  /** Lich Form entry, ambient pulse, and a sacrificed soul reaching its owner. */
+  necromancy(
+    kind: 'lichTransform' | 'lichHeartbeat' | 'soulConsume',
+    x: number,
+    y: number,
+    z: number,
+    self: boolean,
+    sourceId?: number,
+  ): void;
   /** Per-frame ambience state around the player; the engine cross-fades loops.
    *  `biome` is the full `BiomeId` union (covers both the grid-world biomes and
    *  the beach/desert/volcano/cave set). `crowd` is the Sowfield crowd-murmur
