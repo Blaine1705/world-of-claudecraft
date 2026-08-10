@@ -2966,6 +2966,11 @@ export class Renderer {
           ability: 'summon_infernal',
         });
       },
+      undefined, // keep the deferred-loaded impact texture default
+      {
+        register: (light) => this.registerBudgetPointLight(light),
+        release: (light) => this.releaseBudgetPointLight(light),
+      },
     );
     this.necromancyGroundFx = new NecromancyGroundFx(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
@@ -9696,7 +9701,19 @@ export class Renderer {
         if (this.bgViews.has(i)) continue;
         const o = battlegroundOrigin(i);
         if (Math.abs(px - o.x) < 220 && Math.abs(pz - o.z) < 200) {
-          const view = buildBattleground(o, this.sim.cfg.seed, { lowGfx: this.lowGfx });
+          // The field's authored point lights ride the shared fire-light budget
+          // (the yumi-maze hook shape above): the field streams in mid-session,
+          // and up to 14 lights appearing outside the rank would change the
+          // pinned visible point-light count and relink every lit material in
+          // view. The build is async, so the registration lands later; the
+          // callback marks the rank dirty whenever it does.
+          const view = buildBattleground(o, this.sim.cfg.seed, {
+            lowGfx: this.lowGfx,
+            fireLights: this.fireLights,
+            onFireLightsChanged: () => {
+              this.lightRankDirty = true;
+            },
+          });
           this.scene.add(view.group);
           this.bgViews.set(i, view);
         }
@@ -12722,6 +12739,32 @@ export class Renderer {
       // stats on composer tiers (covers the throw path too).
       this.discardOutOfBandDraws();
     }
+  }
+
+  // The registration seam for a point light an fx mints mid-session (the
+  // warlock infernal's fall and impact lights). It MUST join the same ranked
+  // budget as fire and view lights: Three counts a light into numPointLights
+  // iff `visible`, that count is part of every lit material's program cache
+  // key, and one unranked light appearing is a synchronous relink of every lit
+  // material in view (the mid-combat stall the pinned count exists to prevent).
+  // Hidden on the way in because the owning fx updates AFTER budgetFireLights
+  // in the frame, so its first budget pass lands next frame and the light must
+  // not count in between; the budget owns `visible` from then on. Dynamic means
+  // the budget only ever ZEROES the intensity and never restores it, so an fx
+  // that wants a light back must re-drive its own level from BEFORE the pass
+  // (weapon_vfx.ts is the other dynamic owner and does exactly that).
+  private registerBudgetPointLight(light: THREE.PointLight): void {
+    light.userData.budgetDynamic = true;
+    light.visible = false;
+    this.viewLights.push(light);
+    this.lightRankDirty = true;
+  }
+
+  private releaseBudgetPointLight(light: THREE.PointLight): void {
+    const index = this.viewLights.indexOf(light);
+    if (index < 0) return;
+    this.viewLights.splice(index, 1);
+    this.lightRankDirty = true;
   }
 
   // Forward-renderer point-light budget: every campfire/torch light exists,

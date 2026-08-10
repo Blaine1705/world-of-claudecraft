@@ -355,6 +355,42 @@ describe('applyPointLightBudget', () => {
     expect(method).not.toContain('pointLightPadCount(ranked.length');
   });
 
+  it('wires mid-session fx lights into the same ranked budget', () => {
+    // An fx that mints a point light mid-session (the warlock infernal) must
+    // hand it to the renderer's registration seam: marked dynamic, hidden until
+    // the first budget pass ranks it, in the SAME viewLights pool with the rank
+    // marked dirty, and spliced back out on release. Any half dropped puts an
+    // unranked visible light in the scene, which changes numPointLights and
+    // relinks every lit material in view.
+    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const registerStart = source.indexOf('private registerBudgetPointLight(');
+    const releaseStart = source.indexOf('private releaseBudgetPointLight(');
+    const budgetStart = source.indexOf('private budgetFireLights(');
+    expect(registerStart).toBeGreaterThan(-1);
+    expect(releaseStart).toBeGreaterThan(registerStart);
+    expect(budgetStart).toBeGreaterThan(releaseStart);
+
+    const register = source.slice(registerStart, releaseStart);
+    expect(register).toContain('light.userData.budgetDynamic = true;');
+    expect(register).toContain('light.visible = false;');
+    expect(register).toContain('this.viewLights.push(light);');
+    expect(register).toContain('this.lightRankDirty = true;');
+
+    const release = source.slice(releaseStart, budgetStart);
+    expect(release).toContain('this.viewLights.indexOf(light)');
+    expect(release).toContain('this.viewLights.splice(index, 1);');
+    expect(release).toContain('this.lightRankDirty = true;');
+
+    // And the warlock meteor fx is actually handed that seam.
+    const fxStart = source.indexOf('this.warlockMeteorFx = new WarlockMeteorFx(');
+    const fxEnd = source.indexOf('this.necromancyGroundFx = new NecromancyGroundFx(', fxStart);
+    expect(fxStart).toBeGreaterThan(-1);
+    expect(fxEnd).toBeGreaterThan(fxStart);
+    const construction = source.slice(fxStart, fxEnd);
+    expect(construction).toContain('register: (light) => this.registerBudgetPointLight(light),');
+    expect(construction).toContain('release: (light) => this.releaseBudgetPointLight(light),');
+  });
+
   it('wires contributor flicker after the renderer completes selection', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const methodStart = source.indexOf('private budgetFireLights(');
