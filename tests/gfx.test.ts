@@ -372,13 +372,16 @@ describe('graphics tier resolution', () => {
     expect(effectsHigh.ao).toBe(true);
     expect(effectsHigh.bloom).toBe(true);
     expect(effectsHigh.smaa).toBe(true);
-    // Shadows: pure map-size steps; terrain-cast joins at High.
+    // Shadows: pure map-size steps; terrain-cast joins at High. The ladder
+    // caps at High's 4096: a historical stored Insane (2) falls through to
+    // the High base instead of the retired ~256 MB-class 8192 map.
     expect(adv({ shadowQuality: 0 }).shadowMap).toBe(1024);
     expect(adv({ shadowQuality: 0 }).terrainCastShadows).toBe(false);
     expect(adv({ shadowQuality: 0.5 }).shadowMap).toBe(2560);
     expect(adv({ shadowQuality: 1 }).shadowMap).toBe(4096);
     expect(adv({ shadowQuality: 1 }).terrainCastShadows).toBe(true);
-    expect(adv({ shadowQuality: 2 }).shadowMap).toBe(8192);
+    expect(adv({ shadowQuality: 2 }).shadowMap).toBe(4096);
+    expect(adv({ shadowQuality: 2 }).terrainCastShadows).toBe(true);
   });
 
   it('sheds the memory-spike knobs on constrained (phone-class) browsers, cosmetics only', () => {
