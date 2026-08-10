@@ -212,6 +212,17 @@ async function clearReliquaryPins(page) {
   );
 }
 
+/** Seed the LOW graphics preset before the document loads (the capture rule:
+ *  every rig shoots the lowest preset so shots stay comparable across
+ *  machines; only deliberate gfx-comparison shots keep their own preset).
+ *  Merges over any existing woc_settings so unrelated persisted options
+ *  survive; graphicsPreset 1 is PRESET_LOW in src/render/gfx.ts. */
+async function seedLowGraphicsPreset(page) {
+  await page.evaluateOnNewDocument(
+    `try { const s = JSON.parse(localStorage.getItem('woc_settings') ?? '{}') || {}; s.graphicsPreset = 1; localStorage.setItem('woc_settings', JSON.stringify(s)); } catch {}`,
+  );
+}
+
 /** Open The Reliquary on the Conquerors shelf and return its page ids in shelf
  *  order. That shelf is item-only, which is what makes the partial fill below
  *  predictable (marks, mounts, titles and skins live in other stores). */
@@ -4262,6 +4273,158 @@ export const TARGETS = [
           // pointerFocusPending.
           cell.focus?.();
         }
+      });
+      await wait(300);
+      return { clip: '#reliquary-window' };
+    },
+  },
+  // ---- Phase 21 catalog-growth surfaces. Each variant seeds the LOW graphics
+  // preset (the capture rule: every rig shoots the lowest preset so shots stay
+  // comparable; only gfx-comparison rigs keep their own). ----
+  {
+    key: 'reliquary-rift-page',
+    label:
+      'The Rift page: dual clear meters (lifetime clears + S-rank clears) over the 16-slot chase',
+    when: ['sim/content/reliquary', 'reliquary_phase21_qa'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const sim = window.__game?.sim;
+        // Both meters non-zero so the header shows the dual readout.
+        if (sim?.primary?.deedStats?.counters) {
+          sim.primary.deedStats.counters.riftClears = 12;
+          sim.primary.deedStats.counters.riftSRankClears = 3;
+        }
+        window.__game?.hud?.openReliquary?.();
+      });
+      const opened = await pollForSize(page, '#reliquary-window');
+      if (!opened) throw new Error('reliquary window did not open');
+      await page.evaluate(() => {
+        const win = document.querySelector('#reliquary-window');
+        win?.querySelector('[data-nav="conquerors"]')?.click();
+        win?.querySelector('[data-page="conquerors_the_rift"]')?.click();
+      });
+      await wait(300);
+      return { clip: '#reliquary-window' };
+    },
+  },
+  {
+    key: 'reliquary-rares-page',
+    label: 'Rares of the Realm: slain kill proofs with the trophy glyph on filled marks',
+    when: ['sim/content/reliquary', 'reliquary_phase21_qa'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const sim = window.__game?.sim;
+        // Three slain proofs through both ledgers, the way the kill site
+        // writes them, so the grid mixes trophy fills and silhouettes.
+        if (sim?.primary) {
+          for (const id of ['slain:old_greyjaw', 'slain:mogger', 'slain:sister_nhalia']) {
+            sim.primary.deedStats?.visited?.add(id);
+            sim.primary.reliquary?.marks?.add(id);
+          }
+        }
+        window.__game?.hud?.openReliquary?.();
+      });
+      const opened = await pollForSize(page, '#reliquary-window');
+      if (!opened) throw new Error('reliquary window did not open');
+      await page.evaluate(() => {
+        const win = document.querySelector('#reliquary-window');
+        win?.querySelector('[data-nav="conquerors"]')?.click();
+        win?.querySelector('[data-page="conquerors_rares_of_the_realm"]')?.click();
+      });
+      await wait(300);
+      return { clip: '#reliquary-window' };
+    },
+  },
+  {
+    key: 'reliquary-vault-shelf',
+    label: 'The Horizons shelf: the Vault of Ages row wearing the muted Retired chip',
+    when: ['sim/content/reliquary', 'reliquary_phase21_qa'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        window.__game?.hud?.openReliquary?.();
+      });
+      const opened = await pollForSize(page, '#reliquary-window');
+      if (!opened) throw new Error('reliquary window did not open');
+      await page.evaluate(() => {
+        document.querySelector('#reliquary-window [data-nav="horizons"]')?.click();
+      });
+      await wait(300);
+      await page.evaluate(() => {
+        document
+          .querySelector('#reliquary-window [data-page="horizons_vault_of_ages"]')
+          ?.scrollIntoView({ block: 'center' });
+      });
+      await wait(200);
+      return { clip: '#reliquary-window' };
+    },
+  },
+  {
+    key: 'reliquary-vault-page',
+    label: 'Vault of Ages page: the Retired chip on the header over the four retired relics',
+    when: ['sim/content/reliquary', 'reliquary_phase21_qa'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        window.__game?.hud?.openReliquary?.();
+      });
+      const opened = await pollForSize(page, '#reliquary-window');
+      if (!opened) throw new Error('reliquary window did not open');
+      await page.evaluate(() => {
+        const win = document.querySelector('#reliquary-window');
+        win?.querySelector('[data-nav="horizons"]')?.click();
+        win?.querySelector('[data-page="horizons_vault_of_ages"]')?.click();
+      });
+      await wait(300);
+      return { clip: '#reliquary-window' };
+    },
+  },
+  {
+    key: 'reliquary-riftbound-page',
+    label: 'Riftbound page: the Personal chip, holding your own band among the three',
+    when: ['sim/content/reliquary', 'reliquary_phase21_qa'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const sim = window.__game?.sim;
+        // The realistic personal holding: exactly ONE band owned (the page can
+        // never fill past 1 of 3 for a single character, which is its point).
+        sim?.primary?.deedStats?.itemsDiscovered?.add('riftbound_band_of_might');
+        window.__game?.hud?.openReliquary?.();
+      });
+      const opened = await pollForSize(page, '#reliquary-window');
+      if (!opened) throw new Error('reliquary window did not open');
+      await page.evaluate(() => {
+        const win = document.querySelector('#reliquary-window');
+        win?.querySelector('[data-nav="horizons"]')?.click();
+        win?.querySelector('[data-page="horizons_riftbound"]')?.click();
       });
       await wait(300);
       return { clip: '#reliquary-window' };
