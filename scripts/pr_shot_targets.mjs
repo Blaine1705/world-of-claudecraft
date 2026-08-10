@@ -4822,6 +4822,34 @@ export const TARGETS = [
     },
   },
   {
+    key: 'graphics-options-shadow-dial',
+    label: 'Graphics options panel (Shadow Quality dial)',
+    when: ['ui/options_view'],
+    variants: [{ key: 'desktop' }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const hud = window.__game?.hud;
+        if (!hud) return;
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
+        hud.toggleOptionsMenu();
+        // Graphics is the third button on the main options menu (offline).
+        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
+        buttons[2]?.click();
+      });
+      const open = await pollForSize(page, '#options-menu .set-rows');
+      if (!open) return {};
+      // Bring the lighting dial card (Shadow Quality row) into the clip.
+      await page.evaluate(() => {
+        document
+          .querySelector('[data-focus-key="shadowQuality:1"]')
+          ?.scrollIntoView({ block: 'center' });
+      });
+      return { clip: '#options-menu' };
+    },
+  },
+  {
     key: 'interface-options-tabs',
     label: 'Interface options panel (four-tab split)',
     when: ['ui/options_window', 'ui/options_view'],
