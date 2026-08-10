@@ -7,6 +7,7 @@ import {
   BG_GRAVEYARDS,
   BG_POWER_RUNES,
   BG_SPEED_RUNES,
+  bgFieldPlanWalls,
 } from '../src/sim/battleground_layout';
 import { resolvePosition } from '../src/sim/colliders';
 import { GREATER_INVISIBILITY_DR_AURA_ID } from '../src/sim/combat/greater_invisibility';
@@ -150,6 +151,26 @@ function inGraveyard(sim: Sim, match: BgMatch, pid: number, team: 0 | 1): boolea
 function expectClearPlayerPosition(sim: Sim, e: Entity): void {
   const resolved = resolvePosition(sim.cfg.seed, e.pos.x, e.pos.z, PLAYER_BODY_RADIUS);
   expect(Math.hypot(resolved.x - e.pos.x, resolved.z - e.pos.z)).toBeLessThanOrEqual(1e-6);
+}
+
+function forceIntoBgWallTrap(sim: Sim, match: BgMatch, pid: number): Entity {
+  const wall = must(
+    bgFieldPlanWalls().find((candidate) => candidate.height >= 3),
+    'battleground wall collider',
+  );
+  const e = must(sim.entities.get(pid), 'entity');
+  const origin = battlegroundOrigin(match.slot);
+  e.pos = sim.ctx.groundPos(origin.x + wall.x, origin.z + wall.z);
+  e.prevPos = { ...e.pos };
+  e.vx = 0.25;
+  e.vy = 0;
+  e.vz = 0;
+  e.onGround = false;
+  e.jumping = true;
+  sim.ctx.rebucket(e);
+  const resolved = resolvePosition(sim.cfg.seed, e.pos.x, e.pos.z, PLAYER_BODY_RADIUS);
+  expect(Math.hypot(resolved.x - e.pos.x, resolved.z - e.pos.z)).toBeGreaterThan(0.01);
+  return e;
 }
 
 function errorTexts(events: SimEvent[]): string[] {
@@ -1157,18 +1178,9 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const pid = match.teams[0][0];
-    const e = must(sim.entities.get(pid), 'entity');
-    const origin = battlegroundOrigin(match.slot);
-    e.pos = sim.ctx.groundPos(origin.x + 50, origin.z);
-    e.prevPos = { ...e.pos };
-    e.vx = 0;
-    e.vy = 0;
-    e.vz = 0;
-    e.onGround = true;
-    e.jumping = false;
+    const e = forceIntoBgWallTrap(sim, match, pid);
     e.facing = Math.PI / 2;
     e.prevFacing = -Math.PI / 2;
-    sim.ctx.rebucket(e);
 
     expect(sim.unstuck(pid)).toBe(true);
     sim.drainEvents();
@@ -1183,6 +1195,30 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     expect(e.facing).toBe(0);
     expect(e.prevFacing).toBe(e.facing);
     expect(e.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
+  });
+
+  it('combat still cancels a battleground wall-trap Unstuck countdown', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const e = forceIntoBgWallTrap(sim, match, pid);
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    e.inCombat = true;
+    e.combatTimer = 0;
+
+    expect(sim.tick()).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'cancelled',
+        reason: 'combat',
+        pid,
+      }),
+    );
+    expect(sim.meta(pid)?.pendingUnstuck).toBeNull();
+    expect(sim.bgMatchFor(pid)).toBe(match);
   });
 
   it('Unstuck falls back to a clear team spawn when the graveyard plot is obstructed', () => {
@@ -1278,14 +1314,9 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     expect(bgCarryingFlag(sim.ctx, carrier)).toBe(true);
 
     const e = must(sim.entities.get(carrier), 'entity');
+    forceIntoBgWallTrap(sim, match, carrier);
     e.inCombat = false;
     e.combatTimer = 999;
-    e.vx = 0;
-    e.vy = 0;
-    e.vz = 0;
-    e.onGround = true;
-    e.jumping = false;
-    const before = { ...e.pos };
 
     expect(sim.unstuck(carrier)).toBe(false);
     expect(sim.meta(carrier)?.pendingUnstuck).toBeNull();
@@ -1305,7 +1336,7 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     );
     expect(sim.bgMatchFor(carrier)).toBe(match);
     expect(flag.carrier).toBe(carrier);
-    expect(e.pos).toEqual(before);
+    expect(inGraveyard(sim, match, carrier, 0)).toBe(false);
   });
 
   it('Unstuck moves a trapped battleground corpse to its graveyard without respawning it', () => {

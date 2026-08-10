@@ -13,6 +13,7 @@
 // to 5 minutes), and neither outcome can be reached by an attempt that started on
 // the other side of the life/death line (see cancelReason).
 
+import { resolvePosition } from './colliders';
 import { isRooted, isStunned } from './combat/cc';
 import {
   bgOriginAt,
@@ -25,6 +26,7 @@ import {
   zoneAt,
 } from './data';
 import { delveModuleZOffset } from './delves/runs';
+import { PLAYER_BODY_RADIUS } from './pathfind';
 import { riftInstanceAtPos } from './rift/runs';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -184,12 +186,11 @@ function hasMoveInput(meta: PlayerMeta): boolean {
   return input.forward || input.back || input.strafeLeft || input.strafeRight || input.jump;
 }
 
-function forcedMovement(p: Entity): boolean {
+function forcedAction(p: Entity): boolean {
   return (
     p.chargeTargetId !== null ||
     p.followTargetId !== null ||
-    p.auras.some((aura) => aura.id === 'fear_incap' && aura.kind === 'incapacitate') ||
-    Math.hypot(p.vx, p.vy, p.vz) > POSITION_EPS
+    p.auras.some((aura) => aura.id === 'fear_incap' && aura.kind === 'incapacitate')
   );
 }
 
@@ -217,10 +218,18 @@ function isFrozenCorpse(p: Entity): boolean {
   return p.dead && !p.ghost;
 }
 
-function motionBlock(p: Entity): UnstuckBlockedReason | null {
+function battlegroundWallTrap(ctx: SimContext, p: Entity): boolean {
+  if (!ctx.bgMatches.has(p.id) || !isBgPos(p.pos.x)) return false;
+  const resolved = resolvePosition(ctx.cfg.seed, p.pos.x, p.pos.z, PLAYER_BODY_RADIUS);
+  return Math.hypot(resolved.x - p.pos.x, resolved.z - p.pos.z) > POSITION_EPS;
+}
+
+function motionBlock(ctx: SimContext, p: Entity): UnstuckBlockedReason | null {
   if (isFrozenCorpse(p)) return null;
+  if (forcedAction(p)) return 'moving';
+  if (battlegroundWallTrap(ctx, p)) return null;
   if (!p.onGround || p.jumping) return 'falling';
-  if (forcedMovement(p)) return 'moving';
+  if (Math.hypot(p.vx, p.vy, p.vz) > POSITION_EPS) return 'moving';
   return null;
 }
 
@@ -228,7 +237,7 @@ function blockedReason(ctx: SimContext, meta: PlayerMeta, p: Entity): UnstuckBlo
   if (p.jailed) return 'jailed';
   if (p.inCombat || p.combatTimer < 5) return 'combat';
   if (isStunned(p) || isRooted(p)) return 'controlled';
-  const motion = motionBlock(p);
+  const motion = motionBlock(ctx, p);
   if (motion) return motion;
   if (p.castingAbility !== null || isConsuming(p) || p.sitting) return 'busy';
   if (bgCarryingFlag(ctx, p.id)) return 'competitive';
@@ -316,7 +325,7 @@ function cancelReason(
     p.jailed ||
     isStunned(p) ||
     isRooted(p) ||
-    motionBlock(p) !== null ||
+    motionBlock(ctx, p) !== null ||
     competitive(ctx, p.id, p) ||
     ctx.tradeFor(p.id)
   )
