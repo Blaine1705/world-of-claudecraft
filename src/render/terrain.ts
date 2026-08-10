@@ -9,7 +9,8 @@ import {
 } from '../sim/data';
 import type { ZoneDef } from '../sim/types';
 import { WATER_LEVEL } from '../sim/world';
-import { loadTexture } from './assets/loader';
+import { ktx2SiblingUrl } from './assets/ktx2_sibling';
+import { loadKtx2Texture, loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import {
   BIOME_HAZE_DECLARATIONS,
@@ -109,8 +110,21 @@ function prepareTerrainTex(key: string, file: string, srgb: boolean): Promise<vo
   if (TERRAIN_TEX[key]) return Promise.resolve();
   const existing = terrainTexTasks.get(key);
   if (existing) return existing;
-  const task = loadTexture(`/textures/terrain/${file}`, { srgb, repeat: true })
-    .then((tex) => {
+  const url = `/textures/terrain/${file}`;
+  // The ambientCG splat JPGs ship a KTX2 sibling and are requested compressed:
+  // they stay GPU-compressed instead of decoding to a full 1024x1024 RGBA
+  // bitmap each. Colorspace and the vertical flip are baked into the container
+  // at compress time, so `srgb` here only still selects the anisotropy budget.
+  // GroundAO_Packed.png is deliberately NOT converted: it is a packed DATA
+  // texture whose measured per-channel statistics are baked into shader
+  // constants (see the "Measured sds" comment below), and a lossy block
+  // encode would shift them.
+  const task = (
+    url.toLowerCase().endsWith('.jpg')
+      ? loadKtx2Texture(ktx2SiblingUrl(url), { repeat: true })
+      : loadTexture(url, { srgb, repeat: true })
+  )
+    .then((tex: THREE.Texture) => {
       tex.anisotropy = srgb ? ALBEDO_ANISOTROPY : NORMAL_ANISOTROPY;
       TERRAIN_TEX[key] = tex;
     })

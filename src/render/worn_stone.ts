@@ -32,7 +32,8 @@
 // must stay SUBTLE: the game's look is cozy low-poly, the detail suggests
 // material, never photoreal.
 import type * as THREE from 'three';
-import { loadTexture } from './assets/loader';
+import { ktx2SiblingUrl } from './assets/ktx2_sibling';
+import { loadKtx2Texture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX, type GfxSettings, type SurfaceMatOpts, surfaceMat } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
@@ -387,9 +388,15 @@ function prepareFamilyTexture(
   const key = `${family}:${channel}`;
   const existing = surfaceTextureTasks.get(key);
   if (existing) return existing;
-  const task = loadTexture(`${fam.dir ?? '/textures/structures/'}${fam.prefix}_${suffix}.jpg`, {
-    repeat: true,
-  })
+  // Every family channel ships a KTX2 sibling and is requested compressed: the
+  // set is up to 5 maps per family across 7 families, and decoding each to a
+  // full 1024x1024 RGBA bitmap is what this pipeline exists to avoid. The
+  // clone below still works on a CompressedTexture (Texture.clone is
+  // constructor + copy, and copy carries source, mipmaps and format across),
+  // and it shares the source with the original exactly as the raw-image path
+  // did.
+  const url = `${fam.dir ?? '/textures/structures/'}${fam.prefix}_${suffix}.jpg`;
+  const task = loadKtx2Texture(ktx2SiblingUrl(url), { repeat: true })
     .then((tex) => {
       const clone = tex.clone();
       clone.anisotropy = 4;

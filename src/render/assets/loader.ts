@@ -439,12 +439,19 @@ export function loadTexture(
  *  stays GPU-compressed in memory instead of decoding to a full RGBA bitmap,
  *  the same win GLB-embedded textures already get. Shares the one ktx2Loader()
  *  transcoder singleton the GLB parse path attaches to GLTFLoader, so this pays
- *  no extra transcoder init. Colorspace and mip levels are baked into the KTX2
- *  container at compress time (scripts/assets/compress_standalone_textures.mjs),
- *  so unlike loadTexture there is no `srgb` option to pass. */
-export function loadKtx2Texture(url: string): Promise<THREE.CompressedTexture> {
+ *  no extra transcoder init. Colorspace, mip levels and the vertical flip are
+ *  baked into the KTX2 container at compress time
+ *  (scripts/assets/compress_standalone_textures.mjs), so unlike loadTexture
+ *  there is no `srgb` option to pass and `flipY` is never honored here; only
+ *  `repeat` remains a runtime choice, and it discriminates the cache key
+ *  exactly as it does in loadTexture. */
+export function loadKtx2Texture(
+  url: string,
+  opts: { repeat?: boolean } = {},
+): Promise<THREE.CompressedTexture> {
   const resolved = assetUrl(url);
-  let p = ktx2TexCache.get(resolved);
+  const cacheKey = `${resolved}|${opts.repeat ? 'r' : 'c'}`;
+  let p = ktx2TexCache.get(cacheKey);
   if (!p) {
     const startedAt = assetLoadStarted();
     p = scheduleLoad(textureQueue, () => {
@@ -468,9 +475,13 @@ export function loadKtx2Texture(url: string): Promise<THREE.CompressedTexture> {
       );
     }).then(
       (tex) => {
+        if (opts.repeat) tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
         // Standalone KTX2 atlases (character skins) draw in the character
         // preview, portrait and armory renderers too, so their CPU mip chains
         // must stay resident: dismiss the stashed restore source, never arm.
+        // The terrain splat and surface-detail sets are world-only and could
+        // ARM the release instead; that is a follow-up, not this change (it
+        // needs the same category audit assets/ktx2_mip_release.ts documents).
         dismissKtx2Source(tex);
         recordAssetLoad('texture', resolved, startedAt);
         return tex;
@@ -480,7 +491,7 @@ export function loadKtx2Texture(url: string): Promise<THREE.CompressedTexture> {
         throw err;
       },
     );
-    ktx2TexCache.set(resolved, p);
+    ktx2TexCache.set(cacheKey, p);
   }
   return p;
 }
