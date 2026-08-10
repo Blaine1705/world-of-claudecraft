@@ -7,6 +7,9 @@ WORKDIR /app
 # .npmrc carries node-linker=hoisted so the install layout matches local/CI.
 RUN npm install -g pnpm@10.34.5
 COPY package.json pnpm-lock.yaml .npmrc ./
+# pnpm patchedDependencies: the lockfile pins patch file hashes, so a frozen
+# install needs the patch files present or it fails with ENOENT.
+COPY patches ./patches
 RUN pnpm install --frozen-lockfile
 COPY .browserslistrc tsconfig.json vite.config.ts svelte.config.js index.html admin.html play.html guide.html editor.html wallet-handoff.html ./
 COPY src ./src
