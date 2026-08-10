@@ -68,6 +68,8 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
     weaponSkinIds: [],
     weaponSkinLoadout: {},
   };
+  c.accountAdmin = false;
+  c.petSpecialCommandsSupported = false;
   c.xp = 0;
   c.lifetimeXp = 0;
   c.prestigeRank = 0;
@@ -164,6 +166,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.eventQueue = [];
   c.activeFrostRings = [];
   c.activeTemporalHourglasses = [];
+  c.activeConsecrations = [];
   c.profanityWords = [];
   c.mouselookFacing = null;
   c.lastInputSentAt = 0;
