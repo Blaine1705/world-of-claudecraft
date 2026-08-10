@@ -629,6 +629,44 @@ describe('combat SFX policy', () => {
     ).toBeNull();
   });
 
+  it('suppresses the generic impact cue for the two rift hazards with their own custom recording', () => {
+    // src/sim/rift/runs.ts fires its own spellfxAt(sfxKey: 'rift_lava_tick'|
+    // 'rift_boulder_impact') on the same damage event; without this the generic
+    // school/material impact would double up alongside the custom one. Keyed
+    // off the stable abilityId ('rift_hazard_molten'/'rift_hazard_boulder'),
+    // never the 'Molten Rift'/'Rolling Boulder' display label, so a
+    // display-only rename can't silently reintroduce the double cue.
+    expect(
+      impactCueForDamage(
+        damage({ school: 'fire', ability: 'Molten Rift', abilityId: 'rift_hazard_molten' }),
+        target('player', 'player'),
+      ),
+    ).toBeNull();
+    expect(
+      impactCueForDamage(
+        damage({
+          school: 'physical',
+          ability: 'Rolling Boulder',
+          abilityId: 'rift_hazard_boulder',
+        }),
+        target('player', 'player'),
+      ),
+    ).toBeNull();
+    // A display-only rename of either hazard label alone (abilityId absent or
+    // different) must NOT suppress the generic cue: the stable id is what
+    // gates this, not the label (review finding, PR #2687).
+    expect(
+      impactCueForDamage(
+        damage({ school: 'fire', ability: 'Molten Rift' }),
+        target('player', 'player'),
+      ),
+    ).toBe('impact_fire');
+    // A real fire spell (not the rift hazard) is unaffected.
+    expect(
+      impactCueForDamage(damage({ school: 'fire', ability: 'fireball' }), target('mob', 'boar')),
+    ).toBe('impact_fire');
+  });
+
   it('preserves v0.25 mob families and loaded subfamily overrides', () => {
     expect(mobVoiceFamily('mudfin_murloc')).toBe('mudfin');
     expect(mobVoiceCue('mudfin_murloc', 'aggro')).toBe('mob_mudfin_aggro');
