@@ -3,7 +3,6 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
-import { MeshoptDecoder } from 'meshoptimizer';
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { AfflictionFamiliar } from '../src/render/affliction_familiar';
@@ -12,12 +11,10 @@ import type { IWorld } from '../src/world_api';
 
 const REPO_ROOT = path.join(__dirname, '..');
 const ASSET_PATH = path.join(REPO_ROOT, 'public/models/props/maledict_eye.glb');
-// Re-pinned twice for scripts/assets/compress_glb_textures.mjs: first for the
-// KTX2 texture conversion (larger on disk, ~8x smaller resident on GPU), then
-// for the geometry pass that gave every shipped GLB quantization + meshopt
-// (issue #3287), which took this file back down from 201_436 bytes.
-const ASSET_BYTES = 165_136;
-const ASSET_SHA256 = 'f221d2b4f54c79d7dff5148b331f454cb878eaa1c619b4ccf8dbb7788d49bab7';
+// Re-pinned for the KTX2 texture conversion (scripts/assets/
+// compress_glb_textures.mjs): larger on disk, ~8x smaller resident on GPU.
+const ASSET_BYTES = 201_436;
+const ASSET_SHA256 = '0c1ad6838925ae4202af8e7cedbfb750e1122daa7c3f3c34d8d2aefeb14531a1';
 
 function afflictionWorld(player: Entity): IWorld {
   return {
@@ -33,19 +30,11 @@ describe('Affliction Maledict Eye familiar', () => {
     const bytes = readFileSync(ASSET_PATH);
     expect(bytes.length).toBe(ASSET_BYTES);
     expect(createHash('sha256').update(bytes).digest('hex')).toBe(ASSET_SHA256);
-    // The budget, as distinct from the exact pins above: it does not move with
-    // a consciously accepted re-encode. 200 KiB accommodated the KTX2 textures
-    // (disk bytes traded for ~8x smaller GPU residency); the geometry pass then
-    // recovered headroom rather than spending it, so the ceiling stands.
+    // 200 KiB, was 150: KTX2 textures trade disk bytes for ~8x smaller GPU
+    // residency (the glb_texture_compression gate requires the conversion).
     expect(bytes.length).toBeLessThanOrEqual(200 * 1024);
 
-    // The geometry is meshopt-encoded, so reading it needs the decoder the
-    // runtime loader also wires (src/render/assets/loader.ts).
-    await MeshoptDecoder.ready;
-    const document = await new NodeIO()
-      .registerExtensions(ALL_EXTENSIONS)
-      .registerDependencies({ 'meshopt.decoder': MeshoptDecoder })
-      .read(ASSET_PATH);
+    const document = await new NodeIO().registerExtensions(ALL_EXTENSIONS).read(ASSET_PATH);
     const root = document.getRoot();
     expect(root.listAnimations()).toHaveLength(0);
     expect(root.listMeshes()).toHaveLength(1);
