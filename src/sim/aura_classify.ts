@@ -46,6 +46,9 @@ export const DEBUFF_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'affliction_fate_threads',
   'affliction_violence',
   'necromancy_harvest_mark',
+  // Cosmetic and mechanically inert (value 0, no stat fold): listed here only so
+  // the countdown sorts into the debuff bar rather than sitting among the buffs.
+  'cheater_mark',
 ]);
 
 // A negative-value stat aura (e.g. a mob's Withering Wail sapping attack power, or
