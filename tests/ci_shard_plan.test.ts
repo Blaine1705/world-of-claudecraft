@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,7 +15,6 @@ import {
   collectedLaneFiles,
   FLOOR_SANITY_MIN,
   parseShardArg,
-  resolveLocalBin,
 } from '../scripts/lib/ci_shard_plan.mjs';
 import { collectSuiteVisibility } from '../scripts/lib/gate_discovery.mjs';
 
@@ -52,28 +51,6 @@ describe('parseShardArg', () => {
     [[], null],
   ])('%j -> %j', (argv, expected) => {
     expect(parseShardArg(argv as string[])).toEqual(expected);
-  });
-});
-
-describe('resolveLocalBin', () => {
-  it('resolves the binary under node_modules/.bin, win32-aware', () => {
-    // Independently computed, not by calling the function under test: the
-    // shard plan's own comparison (below) reuses resolveLocalBin to build its
-    // expectation, which only pins internal consistency, not the resolved
-    // shape.
-    const expected = path.join(
-      process.cwd(),
-      'node_modules',
-      '.bin',
-      process.platform === 'win32' ? 'vitest.cmd' : 'vitest',
-    );
-    expect(resolveLocalBin('vitest')).toBe(expected);
-  });
-
-  it('resolves to a binary that actually exists in this tree', () => {
-    // A wrong suffix or directory would otherwise only surface as an ENOENT
-    // deep inside a real CI spawn, far from this test.
-    expect(existsSync(resolveLocalBin('vitest'))).toBe(true);
   });
 });
 
@@ -182,10 +159,10 @@ describe('buildShardPlan: selective mode', () => {
     expect(floorLeg.args).toContain('--shard=3/8');
     expect(floorLeg.args).toContain('--maxWorkers=2');
     expect(floorLeg.args).not.toContain('--passWithNoTests');
-    // Resolved directly, not through npx: the same binary `npm test` already
-    // uses, without paying npx's extra registry-aware resolution path.
-    expect(relatedLeg.cmd).toBe(resolveLocalBin('vitest'));
+    expect(relatedLeg.cmd).toBe('npx');
     expect(relatedLeg.args).toEqual([
+      '--no-install',
+      'vitest',
       'related',
       'src/ui/unit_portrait.ts',
       '--run',
@@ -474,7 +451,7 @@ describe('the long-sims lane (Phase 4)', () => {
     // alwaysRun above); the one lane member then moves to the lane, so the
     // leg is back at the base figure.
     expect(plan.floorCount).toBe(FLOOR_SANITY_MIN + 25);
-    expect(relatedLeg.args).not.toContain('--exclude=' + LANE_BLIND);
+    expect(relatedLeg.args).not.toContain(`--exclude=${LANE_BLIND}`);
     expect(relatedLeg.args.join(' ')).not.toContain('--exclude');
   });
 

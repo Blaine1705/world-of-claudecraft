@@ -37,8 +37,8 @@ export function isStunDrCategory(category: CrowdControlDrCategory): boolean {
 // PvP-only diminishing-returns tuning for the resolvers below: the reset
 // window per category (how long until a fresh application starts the ladder
 // over), the shared 100/50/25/immune multiplier ladder that root and lockout
-// walk, the fixed staged durations that replace the multiplier ladder for
-// polymorph, and the proportional multiplier ladder for fear.
+// walk, the fixed staged durations for polymorph, and the fear multipliers that
+// scale each ability's authored duration.
 const PVP_ROOT_DR_RESET = 18; // seconds before a repeated PvP root is fresh again
 const PVP_STUN_DR_RESET = 18; // stuns share the root-style 100/50/25/immune scheme
 const PVP_POLYMORPH_DR_RESET = 60;
@@ -60,12 +60,13 @@ const PVP_FEAR_DR_MULTIPLIERS = [1, 0.5, 0.25, 0.125] as const;
 /**
  * The PvP diminishing-returns ladder for one crowd-control category: full
  * duration outside hostile player-versus-player combat, a fixed staged
- * schedule for polymorph, a proportional multiplier ladder for fear, the
- * shared 100/50/25/immune multiplier ladder for root/lockout, and null once
- * that ladder is exhausted (DR-immune, apply nothing). `now` and `isHostileTo` are passed in rather than read off a host:
- * this keeps the resolver a leaf module with no `SimContext` dependency, so a
- * Vitest can import and exercise it directly. It is NOT a pure function of its
- * arguments: three of its exits write the new DR stage to `target.ccDr`.
+ * schedule for polymorph, the duration-scaled fear ladder, the shared
+ * 100/50/25/immune multiplier ladder for root/lockout, and null once that
+ * ladder is exhausted (DR-immune, apply nothing). `now` and `isHostileTo` are
+ * passed in rather than read off a host: this keeps the resolver a leaf module
+ * with no `SimContext` dependency, so a Vitest can import and exercise it
+ * directly. It is NOT a pure function of its arguments: three of its exits
+ * write the new DR stage to `target.ccDr`.
  *
  * Balance pass (maintainer): player stuns are exempt from PvP diminishing
  * returns. They operate differently from fear: short flat durations behind
@@ -102,9 +103,6 @@ export function crowdControlDurationAfterDr(
   }
   if (category === 'fear') {
     target.ccDr.set(category, { stage: stage + 1, resetAt: now + reset });
-    // Scales the ability's OWN duration; see PVP_FEAR_DR_MULTIPLIERS. Like
-    // polymorph and unlike root/stun, fear never reaches full immunity: the
-    // factor clamps at the last rung rather than returning null.
     return duration * PVP_FEAR_DR_MULTIPLIERS[Math.min(stage, PVP_FEAR_DR_MULTIPLIERS.length - 1)];
   }
   if (stage >= PVP_CC_DR_MULTIPLIERS.length) return null;
