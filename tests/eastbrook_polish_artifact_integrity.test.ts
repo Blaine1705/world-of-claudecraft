@@ -712,10 +712,12 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // branch renderer changes. Both parents move renderer.ts, so the
 // rendererIntegration leaf mints a value matching neither parent. No capture
 // was retaken.
+// Re-minted for the release base-health repair after renderer.ts changed. No
+// capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '95659e93c3c338d0092dbd3647616b6b2763be7218d5d14dc8d14bdfa68303f9';
+  '03e925388a2a0baa1155da25aaee9ca79179683d0c66e54b5862c35fd09ac8ed';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '1266e3fb7edd82ad34aebf60956591e40c51ea904e0f62ef88e21b7e21b02f83';
+  '67772cf626bef2e1fb65d9fb534c2cfce328b4d344b7640fc5796b3ff2cca240';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1662,10 +1664,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // branch renderer changes. The first-order composite follows the merged
     // renderer.ts bytes, then this second-order performance seal follows the
     // swept evidence bytes. No capture was retaken.
+    // Re-pinned for the release base-health repair after renderer.ts changed.
+    // No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('dbd7ef61db5550eac3a9c48b0606c67ca8ffae8ee35b1c71b089e7e3933057d3');
+    ).toBe('800b9bcc3e5259fbcbf81ec89d28013c912684458f9ff04d95af72f868c6ca41');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

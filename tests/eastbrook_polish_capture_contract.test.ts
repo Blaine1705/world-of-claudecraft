@@ -134,8 +134,10 @@ interface AttributionTargetFixture {
 // branch renderer changes. Both parents move renderer.ts, so the
 // rendererIntegration leaf mints a value matching neither parent. No capture
 // was retaken.
+// Re-minted for the release base-health repair after renderer.ts changed. No
+// capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '1266e3fb7edd82ad34aebf60956591e40c51ea904e0f62ef88e21b7e21b02f83';
+  '67772cf626bef2e1fb65d9fb534c2cfce328b4d344b7640fc5796b3ff2cca240';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
