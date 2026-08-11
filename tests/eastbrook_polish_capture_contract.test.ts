@@ -116,8 +116,10 @@ interface AttributionTargetFixture {
 // Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
 // archetype and scene-texture counts; renderer.ts edits only). No capture
 // was retaken.
+// Re-minted for the iOS constrained-memory zone-eviction fix
+// (evictFarZoneIfConstrained; renderer.ts edits only). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'a80d71af0295906172fa66def7f89ce704b9e6b0abdf98a1f3c06164537393b1';
+  'a7fc55ef2ff527e0a46d74a72cc105ec65b62d89fe23b476e69fc7dee20a372d';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

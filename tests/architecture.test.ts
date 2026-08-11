@@ -536,6 +536,7 @@ const RENDER_PURE_CORES = [
   'src/render/weapon_vfx_apply_queue_core.ts',
   'src/render/weapon_vfx_emissive_core.ts',
   'src/render/zone_feature_visibility_core.ts',
+  'src/render/zone_eviction_core.ts',
   'src/render/characters/skeleton_update_core.ts',
   'src/render/characters/tinted_material_cache_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',

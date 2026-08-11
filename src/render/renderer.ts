@@ -565,6 +565,7 @@ import { buildWorldAmbientSources, crowdAmbienceAt, footstepSurfaceAt } from './
 import { surfaceDetailPrewarmTextures } from './worn_stone';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
+import { zonesEligibleForEviction } from './zone_eviction_core';
 import {
   type FeatureFootprint,
   hasUnseededInstanceMatrix,
@@ -3879,7 +3880,8 @@ export class Renderer {
   // horizon changed. Runs from sync(), one zone in flight at a time.
   private queueVisibleZonePrepares(horizon: number): void {
     const player = this.sim.player;
-    if (this.fogState !== 'outdoor' || this.zoneIdAt(player.pos.x, player.pos.z) === null) {
+    const currentZoneId = this.zoneIdAt(player.pos.x, player.pos.z);
+    if (this.fogState !== 'outdoor' || currentZoneId === null) {
       this.visibleZonePrepareQueue = [];
       return;
     }
@@ -3896,6 +3898,7 @@ export class Renderer {
     this.visibleZoneCheckX = cameraX;
     this.visibleZoneCheckZ = cameraZ;
     this.visibleZoneCheckFar = horizon;
+    this.evictFarZoneIfConstrained(currentZoneId, player.pos.x, player.pos.z);
     const forwardX = this.cameraLookAt.x - cameraX;
     const forwardZ = this.cameraLookAt.z - cameraZ;
     this.visibleZonePrepareQueue = zonesWithinStreamingHorizon(
@@ -3907,6 +3910,51 @@ export class Renderer {
       forwardZ,
     ).filter((zone) => !this.preparedZones.has(zone.id) && !this.pendingZonePrepares.has(zone.id));
     this.pumpVisibleZonePrepareQueue();
+  }
+
+  /**
+   * Constrained-memory zone eviction (iOS WebKit and other phone-class
+   * hosts, see gfx.ts's constrainedMemory): release the single farthest
+   * prepared zone once it clears ZONE_EVICTION_RADIUS, so a long session
+   * does not retain every zone it has ever passed through. Zone residency
+   * otherwise only grows (see preparedZones), which is fine on
+   * desktop/Android but crosses iOS WebKit's per-process memory ceiling
+   * during ordinary continuous play; see zone_eviction_core.ts. Runs on the
+   * same throttled cadence as the visible-zone streaming recompute, one zone
+   * per call, so a session that keeps moving away sheds zones gradually
+   * instead of in one large disposal spike. No-op on unconstrained hosts.
+   *
+   * Distance is measured from the PLAYER, not the camera: the camera pivot
+   * trails the player on a damped spring (stepCameraBoom) and can sit far
+   * behind for several frames after a teleport, while prepareZonesAround
+   * already streamed in the arrival neighbourhood around the player's exact
+   * landing spot. Measuring from a lagging camera could momentarily rank
+   * that just-finished neighbourhood as "far" and evict what the loading
+   * screen just paid for; the player position has no such lag.
+   *
+   * Deliberately does NOT clear prewarmedZonePrograms: that set tracks
+   * whether this zone's mob/NPC shader PROGRAMS have been compiled, a
+   * one-time cost paid against materials that are shared across zones and
+   * outlive unloadZone (which only releases geometry). Clearing it would
+   * force a full re-compile pass (a measured 100 to 345 ms main-thread unit
+   * per prewarmZoneAt) on re-entry for no benefit, on exactly the device
+   * class this exists to protect.
+   */
+  private evictFarZoneIfConstrained(currentZoneId: string, playerX: number, playerZ: number): void {
+    if (!GFX.constrainedMemory) return;
+    const zoneId = zonesEligibleForEviction(
+      ZONES,
+      this.preparedZones,
+      currentZoneId,
+      playerX,
+      playerZ,
+    )[0];
+    if (!zoneId) return;
+    const zone = ZONES.find((z) => z.id === zoneId);
+    if (!zone) return;
+    this.terrainView.unloadZone(zone);
+    this.waterView.unloadZone(zone.id);
+    this.preparedZones.delete(zoneId);
   }
 
   private pumpVisibleZonePrepareQueue(): void {
