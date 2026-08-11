@@ -893,6 +893,14 @@ export const ko_KR: EnTranslations = {
       "notNow": "나중에",
       "update": "업데이트"
     },
+    "otaUpdate": {
+      "title": "게임 업데이트",
+      "downloading": "업데이트 다운로드 중: {percent}",
+      "applying": "업데이트를 다운로드했습니다. 적용을 위해 게임을 다시 시작합니다.",
+      "incompatible": "플레이하려면 업데이트가 필요합니다. 다운로드가 끝나는 대로 적용됩니다.",
+      "continueAnyway": "업데이트하지 않고 계속",
+      "progressLabel": "업데이트 다운로드 진행률"
+    },
     "cameraPrompt": {
       "title": "카메라 선택",
       "intro": "카메라가 캐릭터를 따라가는 방식을 선택하세요.",
@@ -994,6 +1002,7 @@ export const ko_KR: EnTranslations = {
       "emoteWheel": "감정 표현 휠",
       "targetFriendly": "가장 가까운 아군 대상 지정",
       "targetFriendlyNext": "아군 대상 순환",
+      "targetPrev": "대상 역방향 순환",
       "discord": "Discord",
       "valecup": "베일 컵",
       "bgFlag": "전장 깃발 행동",
@@ -4167,6 +4176,7 @@ export const ko_KR: EnTranslations = {
       "dungeonFinder": "던전 찾기",
       "discord": "Discord",
       "abilities": "행동 단축바 능력 사용 (숫자 키 줄, 두 번째 단축바는 숫자 키패드에 있음)",
+      "targetPrev": "대상 역방향 순환",
       "targetFriendly": "가장 가까운 아군 대상 지정",
       "cycleFriendly": "아군 대상 순환",
       "targetAuras": "대상 강화 및 약화 효과",

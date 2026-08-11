@@ -893,6 +893,14 @@ export const cs_CZ: EnTranslations = {
       "notNow": "Teď ne",
       "update": "Aktualizovat"
     },
+    "otaUpdate": {
+      "title": "Game Update",
+      "downloading": "Downloading update: {percent}",
+      "applying": "Update downloaded. Restarting the game to apply it.",
+      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
+      "continueAnyway": "Continue without updating",
+      "progressLabel": "Update download progress"
+    },
     "cameraPrompt": {
       "title": "Zvolte si kameru",
       "intro": "Zvol, jak kamera sleduje tvou postavu.",
@@ -994,6 +1002,7 @@ export const cs_CZ: EnTranslations = {
       "emoteWheel": "Kruh emotů",
       "targetFriendly": "Zacílit nejbližšího spojence",
       "targetFriendlyNext": "Procházet spojenecké cíle",
+      "targetPrev": "Přepínat cíl zpět",
       "discord": "Discord",
       "valecup": "Pohár údolí",
       "bgFlag": "Akce s vlajkou na bojišti",
@@ -4167,6 +4176,7 @@ export const cs_CZ: EnTranslations = {
       "dungeonFinder": "Hledač dungeonů",
       "discord": "Discord",
       "abilities": "Použít schopnosti na akční liště, číselná řada; druhá lišta je na numpadu",
+      "targetPrev": "Přepínat cíl zpět",
       "targetFriendly": "Zacílit nejbližšího spojence",
       "cycleFriendly": "Přepínat spojenecký cíl",
       "targetAuras": "Zacílit buffy a debuffy",
