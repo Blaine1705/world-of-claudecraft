@@ -421,11 +421,20 @@ A Services ID, website return URL, Sign in with Apple private key, Team ID, and 
 not required for this native-only implementation. Those become necessary if Sign in with
 Apple is later added to the website or another non-native authorization flow.
 
-## Store Updates Only
+## Store releases vs OTA updates
 
-The native apps do not include the Ionic Appflow Capacitor Live Updates SDK and
-must not use Appflow over the air deployments. Every web or native change ships
-in a new App Store and Play Store binary.
+The web layer (JS, CSS, game assets) ships over the air between store releases
+through the self-hosted Capgo pipeline: `docs/ota-updates.md` is the canonical
+runbook, including the visible update gate and the differential (per-file)
+downloads. Third-party update clouds (Ionic Appflow, the Capgo cloud) stay
+unused: the plugin points only at this project's own server and bucket.
+
+A STORE release remains required for anything native: a new or updated
+Capacitor plugin, shell configuration (`capacitor.config.ts` is baked into the
+binary, including the updater's settings), OS target bumps, and the embedded
+web assets a fresh install starts from. After a store release, publish an OTA
+bundle of the same version so the update channel and the store binary agree
+(`docs/ota-updates.md`, "Publishing a bundle").
 
 Always run `npm run native:sync` before creating an archive. This rebuilds the
 native web client and copies the current assets into both platform projects.
