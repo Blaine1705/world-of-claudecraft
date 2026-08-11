@@ -45,6 +45,17 @@ automatically instead of by hand.
   docs/qa-gate.md, "The balance-harness diet").
 - If the queue run is green, GitHub merges automatically. No close/reopen, no
   re-merge of the base: base movement is the queue's job now.
+- The queue gives a candidate **90 minutes** for its checks to report
+  (`check_response_timeout_minutes` on the merge_queue rule; grouping is
+  ALLGREEN, and it builds at most 2 entries at a time). That value is the
+  ceiling every job bound has to fit under, so keep this invariant true when
+  resizing any bound: the `changes` bound, plus the largest REQUIRED job
+  bound, plus runner-acquisition slack (which `timeout-minutes` does not count
+  but the queue's timer does) must stay comfortably under it. Today that is
+  8 + 30, so a required critical path of 38 minutes against a 90 minute
+  ceiling. A candidate that blows the queue timeout is ejected, which blocks
+  the merge rather than merging anything unproven, but it costs a full queue
+  cycle and reads like a mystery without this number written down.
 - The queue merges with one repo-wide method (merge commit). The per-PR
   squash/merge choice does not apply on the protected branches.
 - Direct pushes to the protected branches are blocked by the
@@ -69,13 +80,27 @@ the Checks tab (filter by event: merge_group).
    it greens, re-queue. Judge red CI by clean-runner reruns.
 5. A job that failed with "exceeded the maximum execution time of N minutes"
    hit its checkout-stall bound (the test and browser jobs carry job-level
-   timeout-minutes sized from measured healthy worst cases; the stall class
+   timeout-minutes sized from measured healthy worst cases, or, where a job
+   has repeatedly died before finishing on a slow runner OR has been measured
+   sitting inside its own margin on a healthy one, from its healthy JOB wall
+   scaled by the measured fast-to-slow runner ratio; the stall class
    is runner-side and runs tens of minutes inside actions/checkout, 9.6 to
    24.4 in the incident sample and up to 68 in the 24 hour replay). First open the killed job's log: if a test step was
    already failing or still running near the bound, treat it as a real
    failure or a real slowdown, not a stall (a genuinely red shard on a
    runner with a setup spike can die AS a timeout). Otherwise it is a rerun,
-   not a code investigation: re-run the failed jobs and re-queue. If the
+   not a code investigation: re-run the failed jobs and re-queue. Two
+   automatic nets exist: ci.yml's workflow-wide git low-speed abort catches
+   a fetch that slows to a trickle (the 2026-08-10 hang variant evades it,
+   see the ci.yml env block), and the CI stall auto-rerun
+   workflow (ci-stall-rerun.yml, decision core scripts/lib/ci_stall_rerun.mjs)
+   reruns a run's failed jobs once, on attempt 1 only, when the dead step
+   was a bound-killed setup step or a failed checkout (the two recognized
+   stall shapes), nothing else that ran had failed, and nothing after the
+   dead step ran. The auto-rerun deliberately skips merge_group runs (the
+   queue has already ejected the PR and dissolved the group's ref, so only
+   the manual rerun-and-re-queue above applies there); on pull_request and
+   push runs a stall you meet by hand is usually already on attempt 2. If the
    SAME job times out twice on healthy-looking logs, treat it as a real
    slowdown and investigate before resizing any bound.
 
