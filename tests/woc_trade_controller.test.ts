@@ -26,6 +26,7 @@ interface Rig {
   controller: WocTradeController;
   host: {
     staged: { items: { itemId: string; count: number }[]; copper: number };
+    inventory: { itemId: string; count: number }[];
     tradeInfo: {
       otherName: string;
       myOffer: { items: { itemId: string; count: number }[]; copper: number };
@@ -49,6 +50,7 @@ function rig(marketHooks: WocMarketHooks | null = null): Rig {
     '<div id="trade-window" style="display:none"></div><div id="bags" style="display:none"></div>';
   const host: Rig['host'] = {
     staged: { items: [], copper: 0 },
+    inventory: [],
     tradeInfo: null,
     logs: [],
     pushed: 0,
@@ -63,7 +65,9 @@ function rig(marketHooks: WocMarketHooks | null = null): Rig {
     get tradeInfo() {
       return host.tradeInfo;
     },
-    inventory: [],
+    get inventory() {
+      return host.inventory;
+    },
     tradeConfirm: () => {
       host.confirmed++;
     },
@@ -177,7 +181,14 @@ function fakeHooks(): {
     estimateImpl: (cents: number) => Promise<unknown>;
     buyNowImpl: () => Promise<unknown>;
     acceptOfferImpl: () => Promise<unknown>;
-    calls: { offers: number; estimates: number[]; buyNows: number; acceptOffers: number[] };
+    lastAcceptBody: Record<string, unknown> | null;
+    calls: {
+      offers: number;
+      estimates: number[];
+      buyNows: number;
+      acceptOffers: number[];
+      resolveOffers: [number, string][];
+    };
   };
 } {
   const state = {
@@ -187,7 +198,14 @@ function fakeHooks(): {
     buyNowImpl: (): Promise<unknown> => Promise.resolve({ ok: false, code: 'woc_market.disabled' }),
     // The waiting branch by default: agreed, the other side has not yet.
     acceptOfferImpl: (): Promise<unknown> => Promise.resolve({ ok: true, listing: null }),
-    calls: { offers: 0, estimates: [] as number[], buyNows: 0, acceptOffers: [] as number[] },
+    lastAcceptBody: null as Record<string, unknown> | null,
+    calls: {
+      offers: 0,
+      estimates: [] as number[],
+      buyNows: 0,
+      acceptOffers: [] as number[],
+      resolveOffers: [] as [number, string][],
+    },
   };
   const hooks = {
     client: {
@@ -203,13 +221,17 @@ function fakeHooks(): {
         state.calls.buyNows++;
         return state.buyNowImpl();
       },
-      acceptOffer: (id: number) => {
+      acceptOffer: (id: number, body: Record<string, unknown>) => {
         state.calls.acceptOffers.push(id);
+        state.lastAcceptBody = body;
         return state.acceptOfferImpl();
+      },
+      resolveOffer: (id: number, action: string) => {
+        state.calls.resolveOffers.push([id, action]);
+        return Promise.resolve({ ok: true });
       },
       settlementQuote: () => Promise.resolve({ ok: false, code: 'woc_market.disabled' }),
       confirmSettlement: () => Promise.resolve({ ok: false, code: 'woc_market.disabled' }),
-      resolveOffer: () => Promise.resolve({ ok: true }),
       createOffer: () => Promise.resolve({ ok: false, code: 'woc_market.disabled' }),
       tradePartner: () => Promise.resolve(null),
     },
@@ -569,5 +591,90 @@ describe('the escrow-failed retry face', () => {
     expect(buttons.length).toBe(2);
     expect(buttons[0]?.hidden).toBe(true);
     expect(buttons[0]?.disabled).toBe(true);
+  });
+});
+
+describe('the accept request body (seller escrow)', () => {
+  it('escrows the STAGED copy by its inventory index, or refuses when unfindable', async () => {
+    const h = fakeHooks();
+    const r = rig(h.hooks);
+    // No openTrade here on purpose: the accept path reads staged, inventory,
+    // the held offer and the hooks, never the window, and the open poll's
+    // empty-result callback would clear the planted offer mid-test.
+    // The staged copy sits at inventory index 1: sending the staged POSITION
+    // instead read as 0 and escrowed whatever sat first in the bags, which
+    // refused the sale at the very last step (the shipped shape).
+    r.host.staged.items.push({ itemId: 'worn_sword', count: 1 });
+    r.host.inventory.push({ itemId: 'boar_hide', count: 3 }, { itemId: 'worn_sword', count: 1 });
+    const c = r.controller as unknown as {
+      wocTradeOffer: WocPendingOffer | null;
+      acceptWocTradeOffer(): Promise<void>;
+    };
+    c.wocTradeOffer = heldOffer({ role: 'seller' });
+    await c.acceptWocTradeOffer();
+    expect(h.state.calls.acceptOffers).toEqual([7]);
+    expect(h.state.lastAcceptBody).toMatchObject({
+      characterId: 1,
+      itemIndex: 1,
+      itemId: 'worn_sword',
+    });
+    // The refusal arm: the staged copy is no longer in the bags. Not-found is
+    // NOT index 0; refusing beats escrowing the wrong item.
+    h.state.calls.acceptOffers.length = 0;
+    r.host.inventory.length = 0;
+    await c.acceptWocTradeOffer();
+    expect(h.state.calls.acceptOffers).toEqual([]);
+    expect(r.host.logs.at(-1)).toBe(t('hudChrome.trade.woc.hintAcceptNeedsItem'));
+  });
+});
+
+describe('the close-path recovery (the stale-bag race)', () => {
+  it('resolves a deal that settled after the window closed', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+    const h = fakeHooks();
+    const r = rig(h.hooks);
+    openTrade(r);
+    // The deal both sides held when the window shut; this side's poll never
+    // saw it settle, which is exactly how a seller ended up with a stale bag.
+    (r.controller as unknown as { wocTradeOffer: WocPendingOffer | null }).wocTradeOffer =
+      heldOffer({ role: 'seller', phase: 'awaiting_payment', listingId: 41 });
+    // Server truth at the off-window re-read: the listing resolved sold.
+    h.state.offersResult = {
+      ok: true,
+      offers: [
+        offerRow({
+          status: 'accepted',
+          buyerAccepted: true,
+          sellerAccepted: true,
+          listingId: 41,
+          listingStatus: 'closed',
+          listingResolution: 'sold',
+          itemId: 'wolf_fang',
+        }),
+      ],
+    };
+    r.host.tradeInfo = null;
+    r.controller.updateTradeWindow();
+    await flushAsync();
+    expect(r.host.logs.some((l) => l.includes(itemDisplayName(ITEMS.wolf_fang)))).toBe(true);
+    expect(r.host.balanceRefreshes).toBe(1);
+    expect(r.host.closed).toBe(1);
+  });
+});
+
+describe('withdrawing the standing offer', () => {
+  it('clears the held offer and names the action to the service', async () => {
+    const h = fakeHooks();
+    const r = rig(h.hooks);
+    // No openTrade: same poll-race rationale as the accept-body suite above.
+    const c = r.controller as unknown as {
+      wocTradeOffer: WocPendingOffer | null;
+      cancelWocTradeOffer(action: 'decline' | 'withdraw'): Promise<void>;
+    };
+    c.wocTradeOffer = heldOffer();
+    await c.cancelWocTradeOffer('withdraw');
+    expect(h.state.calls.resolveOffers).toEqual([[7, 'withdraw']]);
+    expect(c.wocTradeOffer).toBeNull();
   });
 });
