@@ -2723,6 +2723,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterBagAll': 'Все сумки',
   'itemUi.market.filterRarity': 'Редкость',
   'itemUi.market.filterRarityAll': 'Все редкости',
+  'itemUi.market.filterSort': 'Сортировка',
+  'itemUi.market.sortName': 'Название (А-Я)',
   'itemUi.market.sortPriceAsc': 'Цена: по возрастанию',
   'itemUi.market.weaponSword': 'Мечи',
   'itemUi.market.weaponDagger': 'Кинжалы',
