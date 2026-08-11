@@ -1,9 +1,16 @@
 # Phase 09: The bond releaser (build it, crash-safe)
 
+SESSION START (do this first in every fresh session): cd into the worktree
+`/Users/fernando/Documents/woc-rewards-service-pr31`; verify `pwd` and
+`git branch --show-current` (must print `integration/woc-market-settlement`). Then
+`git fetch origin` and merge `origin/master` so this session starts current. Packet
+docs (progress.md, state.md) live in the game worktree
+`/Users/fernando/Documents/wocc-marketplace`; commit doc updates there.
+
 Follow the shared workflow in `implementation-plan.md` first; `state.md` has the
-validation matrix and rulings R2, R4, R5. This file is the phase spec. Ask Fernando for
-rulings R2 and the R5 items this phase needs (SOL fee funding and monitor, ATA rent on
-refund) at session start, proposing the defaults below.
+validation matrix. Ruling R2 is RESOLVED (Fernando, 2026-08-11): forfeited bonds follow
+the PRD treasury+burn split. The R5 items this phase needs (SOL fee funding and monitor,
+ATA rent on refund) are still open: propose defaults to Fernando at session start.
 
 - Repo: SERVICE. Worktree `/Users/fernando/Documents/woc-rewards-service-pr31`, branch
   `integration/woc-market-settlement`. Code in `service/`.
@@ -47,9 +54,10 @@ and the service is the single owner of bond amounts and the fee/forfeit split.
    rejects a drifting caller `usdCents`; one clamp policy, service-owned, and the game
    informed via the quote response (game-side render-only change lands in phase 12 if
    needed; note it in state.md). Unify the fee-split computation to one code path.
-4. Forfeit destination per ruling R2 (default: the PRD treasury+burn split), and the R5
-   operational defaults recorded: fee-payer SOL funding with a balance monitor hook, and
-   the ATA-rent-on-refund policy, implemented as ruled.
+4. Forfeit destination per the resolved R2 ruling: the PRD treasury+burn split, one
+   code path shared with the settlement fee split. The R5 operational items (fee-payer
+   SOL funding with a balance monitor hook, the ATA-rent-on-refund policy) implemented
+   as ruled at session start and recorded in state.md.
 
 ## Out of scope
 

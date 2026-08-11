@@ -19,8 +19,9 @@ actually reads.
 
 Pushes: game pushes fast-forward `origin/feature/woc-marketplace`; service pushes go to
 `origin/feature/woc-market-settlement` (updates PR #31); dashboard pushes go to
-`origin/feature/woc-market-trading-controls` (updates PR #13). ALL pushes need Fernando's
-explicit approval (open ruling R4).
+`origin/feature/woc-market-trading-controls` (updates PR #13). Cadence per resolved R4:
+QA sessions push on PASS; implement sessions never push (commands in
+implementation-plan.md).
 
 ## Validation matrix
 
@@ -40,26 +41,34 @@ explicit approval (open ruling R4).
 - Service (in `service/`): `npm run build` then `npm test`.
 - Dashboard: `npm test`, `npm run check`, `npm run build`.
 
-## Open rulings for Fernando (queue; a phase that hits one asks at session start)
+## Rulings
 
-- R1 (phase 13, B6): step-up posture for custody-moving ops (`createListing`,
-  `acceptDirectedOffer`). Recommendation: wallet-signature step-up above a USD threshold
-  (challenge signed by the linked wallet; no new secret infrastructure), and delete the
-  phantom TOTP scaffolding. Alternatives: implement real TOTP, or formally accept the
-  stolen-bearer vector and delete the scaffolding.
-- R2 (phase 09): forfeited-bond destination. PRD says treasury + burn split; code sends
-  100% to treasury. Recommendation: follow the PRD split unless Fernando rules otherwise.
+Resolved (Fernando, 2026-08-11):
+
+- R1 (phase 13, B6): RESOLVED: wallet-signature step-up on custody-moving ops; delete
+  the phantom TOTP scaffolding. Open sub-point for phase 13 session start: threshold
+  posture (recommended: step-up on every custody-moving call).
+- R2 (phase 09): RESOLVED: forfeited bonds follow the PRD treasury + burn split, one
+  code path with the settlement fee split.
+- R4 (all phases): RESOLVED: push after each QA PASS (or PASS-WITH-FOLLOWUPS with fixes
+  applied), repos the pair touched; implement sessions never push; FAIL pushes nothing.
+  Exact push commands live in implementation-plan.md commit rules.
+
+Still open (a phase that hits one asks at session start):
+
 - R3 (phase 11, H3): oracle venue posture. The PRD requires a cross-venue deviation gate
   but Pyth has no $WOC feed. Options: add a second real venue, or revise the claim to
   single-venue with tightened staleness/deviation bounds. Needs a product call.
-- R4 (all phases): push cadence. Default until ruled: commits stay local; each session
-  asks before any push.
-- R5 (phases 09/10/21): the five chain-wiring operational decisions the review lists as
-  open: SOL fee funding and monitor, ATA-rent-on-refund policy, verifier commitment level
-  and confirming timeout, devnet mint choice, forfeited-bond destination (= R2). Phases
-  propose defaults; Fernando confirms.
+- R5 (phases 09/10/21): the remaining chain-wiring operational decisions: SOL fee
+  funding and monitor, ATA-rent-on-refund policy, verifier commitment level and
+  confirming timeout, devnet mint choice. Phases propose defaults; Fernando confirms.
 - R6 (phase 07, B7): counsel owns final Terms language. The phase produces drafts and a
   decision memo; counsel sign-off is a launch gate tracked here, not a packet deliverable.
+- R7 (scope adds, unanswered 2026-08-11): Fernando was offered four deferred
+  nice-to-haves as packet phases and did not select any: dispute-case UI, marketplace
+  player wiki/guide page, game-side audited runtime pause, numeric reserve guard. They
+  stay in the follow-ups queue; if he opts any in later, add it as a new numbered phase
+  before phase 21 and update progress.md and the plan table.
 
 ## Locked decisions
 
@@ -74,8 +83,17 @@ explicit approval (open ruling R4).
 - i18n: English-only via the sanctioned pending mechanism during the packet; release
   fills are maintainer release work. The 3,255 pending Latin fills the review counted are
   NOT packet debt.
-- UI bar: DESIGN.md is the design-language standard; the marketplace surface must meet it
-  (phase 15 is the dedicated pass).
+- UI bar: DESIGN.md is the design-language standard; the marketplace must look like a
+  beautiful classic MMORPG window family (Fernando, 2026-08-11: this is a HUGE part of
+  the game). Phase 15 is the dedicated beautify pass (padding/tokens, no truncation,
+  formatted numbers and times, readable images, stress captures); its QA requires
+  Fernando's eyeball sign-off on the screenshot set.
+- Every session starts by entering its worktree (SESSION START block at the top of every
+  phase and QA file) and syncing: game from the newest `origin/release/**`, service and
+  dashboard from `origin/master`. Prompts pasted into fresh sessions rely on this.
+- CLAUDE.md upkeep: every phase updates the nearest local CLAUDE.md its diff makes stale
+  (concise, anchor rule, no bloat; create a small top-level one in the service or
+  dashboard repo if absent); every QA verifies it.
 
 ## Known gotchas carried from the review session
 

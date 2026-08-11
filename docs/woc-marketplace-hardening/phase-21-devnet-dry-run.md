@@ -1,5 +1,13 @@
 # Phase 21: Devnet dry run (the acceptance-bar proof)
 
+SESSION START (do this first in every fresh session): this session spans two
+repos. cd into `/Users/fernando/Documents/woc-rewards-service-pr31` (branch must be
+`integration/woc-market-settlement`), `git fetch origin`, merge `origin/master`. Then
+in `/Users/fernando/Documents/wocc-marketplace` (branch must be
+`feature/woc-marketplace`), `git fetch origin`, merge the newest `origin/release/**`
+(currently `origin/release/v0.37.0`). Verify `pwd` and the branch before any command
+in either repo.
+
 Follow the shared workflow in `implementation-plan.md` first; `state.md` has the
 validation matrix and the R5 ruling records from phases 09 and 10. This file is the
 phase spec. RULING GATE: the devnet mint choice (R5) must be settled with Fernando

@@ -29,12 +29,12 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 11 QA | phase-11-qa | service | NOT STARTED | | |
 | 12 | wire-completeness | game | NOT STARTED | | |
 | 12 QA | phase-12-qa | game | NOT STARTED | | |
-| 13 | listing-step-up | game | NOT STARTED | | needs ruling R1 |
+| 13 | listing-step-up | game | NOT STARTED | | R1 resolved: wallet signature; confirm threshold posture at start |
 | 13 QA | phase-13-qa | game | NOT STARTED | | |
 | 14 | ux-honesty | game | NOT STARTED | | |
 | 14 QA | phase-14-qa | game | NOT STARTED | | |
 | 15 | ui-polish | game | NOT STARTED | | |
-| 15 QA | phase-15-qa | game | NOT STARTED | | |
+| 15 QA | phase-15-qa | game | NOT STARTED | | PASS requires Fernando's screenshot sign-off |
 | 16 | hot-path-scale | game | NOT STARTED | | |
 | 16 QA | phase-16-qa | game | NOT STARTED | | |
 | 17 | db-retention-indexes | game | NOT STARTED | | |

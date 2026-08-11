@@ -1,5 +1,13 @@
 # Phase 21 QA: Devnet dry run
 
+SESSION START (do this first in every fresh session): this session spans two
+repos. cd into `/Users/fernando/Documents/woc-rewards-service-pr31` (branch must be
+`integration/woc-market-settlement`), `git fetch origin`, merge `origin/master`. Then
+in `/Users/fernando/Documents/wocc-marketplace` (branch must be
+`feature/woc-marketplace`), `git fetch origin`, merge the newest `origin/release/**`
+(currently `origin/release/v0.37.0`). Verify `pwd` and the branch before any command
+in either repo.
+
 Dedicated QA session for phase 21. Canonical QA workflow in `implementation-plan.md`.
 Repos: SERVICE + game; packet docs in the game worktree.
 

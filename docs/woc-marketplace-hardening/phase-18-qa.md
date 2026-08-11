@@ -1,5 +1,12 @@
 # Phase 18 QA: Dashboard guardrails
 
+SESSION START (do this first in every fresh session): cd into the worktree
+`/Users/fernando/Documents/woc-rewards-dashboard-pr13`; verify `pwd` and
+`git branch --show-current` (must print `integration/woc-market-trading`). Then
+`git fetch origin` and merge `origin/master` so this session starts current. Packet
+docs (progress.md, state.md) live in the game worktree
+`/Users/fernando/Documents/wocc-marketplace`; commit doc updates there.
+
 Dedicated QA session for phase 18. Canonical QA workflow in `implementation-plan.md`.
 Repo: DASHBOARD, worktree `/Users/fernando/Documents/woc-rewards-dashboard-pr13`;
 packet docs update in the game worktree.

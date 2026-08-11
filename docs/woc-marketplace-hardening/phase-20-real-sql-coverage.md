@@ -1,5 +1,12 @@
 # Phase 20: Real-SQL coverage for money and security predicates
 
+SESSION START (do this first in every fresh session): cd into the worktree
+`/Users/fernando/Documents/wocc-marketplace`; verify `pwd` and
+`git branch --show-current` (must print `feature/woc-marketplace`). Then
+`git fetch origin` and merge the newest `origin/release/**` branch (currently
+`origin/release/v0.37.0`) so this session starts current; if the merge is
+non-trivial, run the `release-merge-audit` skill on it before continuing.
+
 Follow the shared workflow in `implementation-plan.md` first; `state.md` has the
 validation matrix. Read the `test-pin-traps-index` memory catalog BEFORE this session's
 work; this phase is exactly the terrain it covers. This file is the phase spec.

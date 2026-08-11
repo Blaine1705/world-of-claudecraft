@@ -31,16 +31,22 @@ substitute for the dedicated QA session; both happen.
 ## Shared workflow (every session)
 
 ### Pre-flight
-1. `git status` in the target worktree must be clean; if not, stop and ask Fernando
+1. Enter the worktree FIRST. Every phase and QA file opens with a SESSION START block
+   naming its worktree and branch: cd there and verify `pwd` plus
+   `git branch --show-current` before ANY other command. A restarted or freshly pasted
+   session always re-enters; wrong-directory reads mimic data loss (standing memory
+   rule).
+2. `git status` in that worktree must be clean; if not, stop and ask Fernando
    (concurrent sessions exist).
-2. Sync at phase START (memory rule): game phases merge the latest `origin/release/**`
-   branch (currently `release/v0.37.0`) into `feature/woc-marketplace`; service and
-   dashboard phases merge `origin/master` into their integration branch. If a game merge
-   is non-trivial, run the `release-merge-audit` skill on it before starting the phase.
-3. Memory scan: check MEMORY.md for the domains the phase touches. Always read the
+3. Sync EVERY session at start (implement AND QA): game sessions `git fetch origin` and
+   merge the newest `origin/release/**` branch (currently `release/v0.37.0`) into
+   `feature/woc-marketplace`; service and dashboard sessions merge `origin/master` into
+   their integration branch. If a game merge is non-trivial, run the
+   `release-merge-audit` skill on it before starting the phase.
+4. Memory scan: check MEMORY.md for the domains the phase touches. Always read the
    `reusable-gotchas-index` cluster and, for any test-pin work, the `test-pin-traps-index`
    catalog, before touching that domain.
-4. Load context via an Explore subagent (state.md, progress.md, the phase file, the
+5. Load context via an Explore subagent (state.md, progress.md, the phase file, the
    review.md sections it cites, the target source files). Do not read the coordinator
    monoliths whole in the main loop.
 
@@ -72,6 +78,13 @@ for effort; no prompt in this packet names a model.
   strings consistent English.
 - The dashboard and service repos have no reviewer roster or gate; their phases hold the
   same bar by hand (tests for every fix, constant-time secret compares, parameterized SQL).
+- Keep the CLAUDE.md files current, never bloated: when a phase adds or moves a seam,
+  module, endpoint, env var, monitor, or workflow, update the NEAREST local CLAUDE.md in
+  the SAME change (game: the owning directory's file; service and dashboard: the repo's
+  top-level CLAUDE.md, creating a concise one if the repo lacks it). A line or two per
+  fact, anchor rule (stable paths and symbols, no counts or line numbers), and never
+  restate what the code or an existing doc already says. Every QA session verifies the
+  phase left no CLAUDE.md stale.
 
 ### Commit rules
 - Conventional Commits with scope and a body (2 to 5 commits per phase), EXPLICIT paths
@@ -79,9 +92,17 @@ for effort; no prompt in this packet names a model.
 - Never write the word "phase" (or "phases") in code, comments, commit messages, or PR
   text; it lives only inside these packet files.
 - No em dashes, en dashes, or emojis anywhere.
-- Commits stay LOCAL in all three repos. Do not push from any phase session unless
-  Fernando explicitly approves in that session (pushes update a shared branch and two
-  open PRs). This is open ruling R4 in state.md until he sets a standing policy.
+- Push cadence (ruling R4, resolved 2026-08-11): implement sessions do NOT push. A QA
+  session whose verdict is PASS (or PASS-WITH-FOLLOWUPS with every fix applied) ends by
+  pushing the repos its pair touched, packet-doc commits included:
+  game `git push origin feature/woc-marketplace` (only after this session's release
+  sync); service
+  `git push origin integration/woc-market-settlement:feature/woc-market-settlement`
+  (updates PR #31); dashboard
+  `git push origin integration/woc-market-trading:feature/woc-market-trading-controls`
+  (updates PR #13). A FAIL verdict pushes nothing. Never push any other branch; never
+  force-push; after pushing, glance at the PR checks and note the CI state in
+  progress.md.
 - Biome on changed files only: `npm run ci:changed`, fix with a scoped
   `npx @biomejs/biome check --write <file>`. Gate runs need a COMMITTED tree.
 
@@ -123,9 +144,12 @@ lens (every deliverable met, edge cases, tests decisive), both prompted for cove
    open). When a verifier refutes a finding, judge the refutation yourself with the file
    open; verifiers over-refute.
 4. Re-run the phase's validation matrix. Commit fixes separately from the audit verdict.
-5. Update progress.md (status, deferrals) and state.md; record surprising rules in
-   memory. End with: verdict (PASS / PASS-WITH-FOLLOWUPS / FAIL), counts found and fixed,
-   deferred items, and the next file's full path.
+5. Verify the phase left no CLAUDE.md stale (the upkeep rule above); fix any gap as part
+   of the fix round.
+6. Update progress.md (status, deferrals) and state.md; record surprising rules in
+   memory. On PASS (or PASS-WITH-FOLLOWUPS with fixes applied), push per the commit-rules
+   cadence. End with: verdict (PASS / PASS-WITH-FOLLOWUPS / FAIL), counts found and
+   fixed, what was pushed, deferred items, and the next file's full path.
 
 ### Screenshots
 Any visual change captures before/after desktop AND mobile screenshots at the LOWEST
@@ -150,7 +174,7 @@ eventual PR body (`pr-screenshots` skill owns the recipe).
 | 12 | `phase-12-wire-completeness.md` | game | H8, env docs, health rail |
 | 13 | `phase-13-listing-step-up.md` | game | B6 |
 | 14 | `phase-14-ux-honesty.md` | game | H13, error i18n, currency formatting |
-| 15 | `phase-15-ui-polish.md` | game | design pass, fresh screenshots |
+| 15 | `phase-15-ui-polish.md` | game | the beautify pass: DESIGN.md conformance, formatting, screenshots |
 | 16 | `phase-16-hot-path-scale.md` | game | H11 |
 | 17 | `phase-17-db-retention-indexes.md` | game | DB scale mediums |
 | 18 | `phase-18-dashboard-guardrails.md` | dashboard | H1, H2, release-ref regex, confirm/audit fixes |

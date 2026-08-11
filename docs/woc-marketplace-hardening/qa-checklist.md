@@ -26,6 +26,9 @@ row needs recorded evidence (test file, command output, or screenshot path), not
 - [ ] Real-SQL suites green against Postgres (phases 02 to 06, 17, 20)
 - [ ] Marketplace hot GETs rate-limited and cache-backed (phase 16 evidence)
 - [ ] Fresh desktop + mobile screenshots at lowest preset committed (phase 15)
+- [ ] Beautify bar held (phase 15): DESIGN.md conformance, no silent truncation at
+      stress lengths, all numbers/money/dates/times through the formatters, readable
+      icons and images, and Fernando's sign-off on the screenshot set recorded
 
 ## Service repo
 
@@ -50,3 +53,6 @@ row needs recorded evidence (test file, command output, or screenshot path), not
 - [ ] Doc staleness cluster resolved; docs match shipped behavior (phase 07)
 - [ ] No em dashes, en dashes, or emojis anywhere in the packet's diffs
 - [ ] The word "phase" appears nowhere in code, comments, commit messages, or PR text
+- [ ] Every CLAUDE.md a packet change made stale was updated (concise, anchor rule);
+      spot-check the game server, hud, and sim files plus the service and dashboard
+      top-level docs

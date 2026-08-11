@@ -1,5 +1,15 @@
 # Phase 22 QA: Final packet audit and teardown
 
+SESSION START (do this first in every fresh session): this session spans all
+three repos. In `/Users/fernando/Documents/wocc-marketplace` (branch must be
+`feature/woc-marketplace`): `git fetch origin`, merge the newest `origin/release/**`
+(currently `origin/release/v0.37.0`). In
+`/Users/fernando/Documents/woc-rewards-service-pr31` (branch
+`integration/woc-market-settlement`) and
+`/Users/fernando/Documents/woc-rewards-dashboard-pr13` (branch
+`integration/woc-market-trading`): `git fetch origin`, merge `origin/master`. Verify
+`pwd` and the branch before any command in each repo.
+
 The last session of the packet. Canonical QA workflow in `implementation-plan.md`.
 Repos: all three.
 
