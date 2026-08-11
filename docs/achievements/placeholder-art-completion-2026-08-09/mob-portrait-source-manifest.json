@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "0ca94035dd87c4c5208b959f5384b693b6fc0901ccc5dfbf518bd828c7cbc3de",
+  "rendererFingerprint": "48176a749d47e282a360d0188f068b0a13b5c59c1566a2f93ee6f61d89a14321",
   "renderer": {
     "trackedFiles": [
       {
@@ -27,8 +27,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 3817005,
-      "sha256": "19197db1119d04e96b429e597a0aa01f822251ee357b19974c4c36e275f6a728",
+      "bytes": 3817662,
+      "sha256": "cd9a54b25962edf6ef5bd16fa6c18aff5919b395b33f040447ff84c7b18a6047",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -2758,13 +2758,13 @@
       "id": "grix_the_tunnelking",
       "family": "burrower",
       "finderEncounter": false,
-      "visualKey": "mob_kobold",
+      "visualKey": "mob_grix",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/goblin.glb",
-          "path": "public/models/creatures/goblin.glb",
-          "bytes": 48360,
-          "sha256": "a128051c0b5078e0f76f09ed0e15eafe102ae11ae62e984155ccfefa3b08fb92"
+          "url": "models/creatures/grix.glb",
+          "path": "public/models/creatures/grix.glb",
+          "bytes": 512616,
+          "sha256": "b4031fdefece5f5fa047455b20c29e02e3b6cce46a8407839fff4a55f771d784"
         },
         "idle": "Idle",
         "height": 2.1,
@@ -2773,19 +2773,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#b9770e",
-        "strength": 0.2
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "d5a21a997a39de0cc5a807cbf6b106dd8a8922cacbee1692a2176cd00c3c0517",
+      "sourceFingerprint": "ecc84661fc35ee25a2858ec76693524b4719ec20f7eb20dc41552ccaa3ff9852",
       "output": {
         "path": "public/ui/mobs/grix_the_tunnelking.webp",
-        "bytes": 1718,
-        "sha256": "bbd7a6833942e180b3321941ee9d7ca6afaf3a9ff4cec7ce16c2a87033999f92"
+        "bytes": 2888,
+        "sha256": "ffd461463caa0c6acd86771a1642f9f1db78f430d9d182029154768d6d0943ea"
       }
     },
     {
@@ -7287,13 +7287,13 @@
       "id": "tunnel_rat",
       "family": "burrower",
       "finderEncounter": false,
-      "visualKey": "mob_kobold",
+      "visualKey": "mob_kobold_digger",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/goblin.glb",
-          "path": "public/models/creatures/goblin.glb",
-          "bytes": 48360,
-          "sha256": "a128051c0b5078e0f76f09ed0e15eafe102ae11ae62e984155ccfefa3b08fb92"
+          "url": "models/creatures/kobold.glb",
+          "path": "public/models/creatures/kobold.glb",
+          "bytes": 311564,
+          "sha256": "aa321bc4a329a25053b73d21e7bec0154c606b82b25889d870a633ff6b961b0f"
         },
         "idle": "Idle",
         "height": 2.1,
@@ -7302,19 +7302,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": 0.12
       },
       "tint": {
         "source": "entity",
         "authored": "entity",
         "resolved": "#9c640c",
-        "strength": 0.2
+        "strength": 0.12
       },
-      "sourceFingerprint": "3f718bbf42b7688a9fff0868334d5630791e9b406631168f8d2807899469874a",
+      "sourceFingerprint": "939f93b07ef5260cd856c4d9036327b5b1c0fae437eb3402015d3ccfdce915a4",
       "output": {
         "path": "public/ui/mobs/tunnel_rat.webp",
-        "bytes": 1712,
-        "sha256": "91808491cb1658c2692278ed8d3e915006c7ece53b644991ee164937ba80c322"
+        "bytes": 2590,
+        "sha256": "99b5a443f35ba58552204dea3d07ca4c5c262b2b3ebb0fde481856f1af2a216d"
       }
     },
     {
