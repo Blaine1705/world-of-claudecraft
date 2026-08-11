@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "48176a749d47e282a360d0188f068b0a13b5c59c1566a2f93ee6f61d89a14321",
+  "rendererFingerprint": "0dc1944854b74da6977685921d16f56eac0f88682a99f338198c754e2a5cb778",
   "renderer": {
     "trackedFiles": [
       {
@@ -28,7 +28,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 3817662,
-      "sha256": "cd9a54b25962edf6ef5bd16fa6c18aff5919b395b33f040447ff84c7b18a6047",
+      "sha256": "9e9a6bdd07baf55d0d656454a569c33ec2cf7d32db0413c5ea64a0a5a9902573",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -2763,8 +2763,8 @@
         "model": {
           "url": "models/creatures/grix.glb",
           "path": "public/models/creatures/grix.glb",
-          "bytes": 512616,
-          "sha256": "b4031fdefece5f5fa047455b20c29e02e3b6cce46a8407839fff4a55f771d784"
+          "bytes": 485196,
+          "sha256": "224bc3592577b76dbcaca3e3138acea017919cfabf61bbc012828e0994510bd8"
         },
         "idle": "Idle",
         "height": 2.1,
@@ -2781,11 +2781,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "ecc84661fc35ee25a2858ec76693524b4719ec20f7eb20dc41552ccaa3ff9852",
+      "sourceFingerprint": "8c5f8738f47b14d6552cae1dee2f65e73e948467835d4723f3f2ce7f416af6fb",
       "output": {
         "path": "public/ui/mobs/grix_the_tunnelking.webp",
-        "bytes": 2888,
-        "sha256": "ffd461463caa0c6acd86771a1642f9f1db78f430d9d182029154768d6d0943ea"
+        "bytes": 2830,
+        "sha256": "1478390b23f574f1676e6c4102661ba0cb8620a0bb09be259f911c71e4e7baa3"
       }
     },
     {
@@ -7292,8 +7292,8 @@
         "model": {
           "url": "models/creatures/kobold.glb",
           "path": "public/models/creatures/kobold.glb",
-          "bytes": 311564,
-          "sha256": "aa321bc4a329a25053b73d21e7bec0154c606b82b25889d870a633ff6b961b0f"
+          "bytes": 324000,
+          "sha256": "2fbdca270ba525e38eea5bc9381d7d68d5fd24b2128878e61bb984c4653ed298"
         },
         "idle": "Idle",
         "height": 2.1,
@@ -7310,11 +7310,11 @@
         "resolved": "#9c640c",
         "strength": 0.12
       },
-      "sourceFingerprint": "939f93b07ef5260cd856c4d9036327b5b1c0fae437eb3402015d3ccfdce915a4",
+      "sourceFingerprint": "d5cd94f9f1e3639faabf175d2ec8c0eb668afbd3277ba151ac8235ff46928f85",
       "output": {
         "path": "public/ui/mobs/tunnel_rat.webp",
-        "bytes": 2590,
-        "sha256": "99b5a443f35ba58552204dea3d07ca4c5c262b2b3ebb0fde481856f1af2a216d"
+        "bytes": 2564,
+        "sha256": "54329ab570e0a0dbde0530e22955cf1dc65be72907e8894de831b2c9a504acb2"
       }
     },
     {
