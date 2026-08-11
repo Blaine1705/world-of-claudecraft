@@ -120,6 +120,7 @@ export function orderRootsByDistanceSq<T>(
  *  without this module importing three). */
 export interface CompileRootPlacement {
   matrixWorld: { elements: ArrayLike<number> };
+  boundingSphere?: { center: { x: number; y: number; z: number } } | null;
   geometry?: {
     boundingSphere?: { center: { x: number; y: number; z: number } } | null;
   } | null;
@@ -130,9 +131,10 @@ export interface CompileRootPlacement {
  * matrixWorld translation alone is a trap here: merged and instanced world
  * content bakes its placement into the GEOMETRY and leaves the mesh at the
  * origin, which would tie most of the debt at "distance to world origin".
- * When three has computed a bounding sphere (any root that has been frustum
- * tested, i.e. everything by resume time), its world-transformed centre is
- * the honest position for both shapes; the translation is the fallback for
+ * When three has computed a bounding sphere, its world-transformed centre is
+ * the honest position for both shapes. InstancedMesh stores its aggregate,
+ * instance-aware sphere on the object, so that bound takes precedence over
+ * the primitive-local geometry sphere. The translation is the fallback for
  * spheres not yet computed.
  */
 export function compileRootDistanceSq(
@@ -141,7 +143,7 @@ export function compileRootDistanceSq(
   camZ: number,
 ): number {
   const world = root.matrixWorld.elements;
-  const center = root.geometry?.boundingSphere?.center;
+  const center = root.boundingSphere?.center ?? root.geometry?.boundingSphere?.center;
   let x = world[12];
   let z = world[14];
   if (center) {

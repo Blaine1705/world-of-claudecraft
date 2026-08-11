@@ -1,6 +1,12 @@
 import { readFileSync } from 'node:fs';
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { CONSTRAINED_PREWARM_KEEP, skyAssetInlineWaitMs } from '../src/render/prewarm_policy';
+import {
+  CONSTRAINED_PREWARM_KEEP,
+  materialProgramSignature,
+  prewarmProgramContentKeys,
+  skyAssetInlineWaitMs,
+} from '../src/render/prewarm_policy';
 import {
   buildPrewarmCompileUnits,
   compileRootDistanceSq,
@@ -178,6 +184,51 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(units.map((unit) => unit.id)).toEqual(['scene:0', 'scene:1']);
     for (const unit of units) await unit.run();
     expect(compiled).toEqual(['a', 'c']);
+  });
+
+  it('keeps distinct ShaderMaterial programs under content-key dedupe', async () => {
+    const vertex = 'void main() { gl_Position = vec4(0.0); }';
+    const fragment = 'void main() { gl_FragColor = vec4(1.0); }';
+    const shader = (
+      id: string,
+      overrides: Partial<
+        Pick<THREE.ShaderMaterial, 'vertexShader' | 'fragmentShader' | 'defines'>
+      > = {},
+    ) => ({
+      id,
+      material: new THREE.ShaderMaterial({
+        vertexShader: vertex,
+        fragmentShader: fragment,
+        defines: { MODE: 1 },
+        ...overrides,
+      }),
+    });
+    const roots = [
+      shader('base'),
+      shader('duplicate'),
+      shader('vertex', { vertexShader: `${vertex}\n// vertex variant` }),
+      shader('fragment', { fragmentShader: `${fragment}\n// fragment variant` }),
+      shader('defines', { defines: { MODE: 2 } }),
+    ];
+    expect(roots[0].material.customProgramCacheKey()).toBe(
+      roots[2].material.customProgramCacheKey(),
+    );
+
+    const compiled: string[] = [];
+    const units = buildPrewarmCompileUnits(
+      [{ id: 'weapon-vfx', roots }],
+      async (root) => {
+        compiled.push(root.id);
+      },
+      {
+        dedupeKeys: (root) =>
+          prewarmProgramContentKeys({}, [materialProgramSignature(root.material)]),
+      },
+    );
+
+    expect(units).toHaveLength(4);
+    for (const unit of units) await unit.run();
+    expect(compiled).toEqual(['base', 'vertex', 'fragment', 'defines']);
   });
 
   it('dedupes across calls through a caller-owned shared store', async () => {
@@ -703,6 +754,18 @@ describe('compileRootDistanceSq: the honest position of a compile root', () => {
       geometry: { boundingSphere: { center: { x: 10, y: 0, z: 5 } } },
     };
     expect(compileRootDistanceSq(root, 0, 0)).toBe(110 * 110 + 25 * 25);
+  });
+
+  it('uses an InstancedMesh aggregate sphere instead of its primitive geometry sphere', () => {
+    const geometry = new THREE.BoxGeometry(2, 2, 2);
+    const root = new THREE.InstancedMesh(geometry, new THREE.MeshBasicMaterial(), 1);
+    root.setMatrixAt(0, new THREE.Matrix4().makeTranslation(500, 0, 0));
+    root.computeBoundingSphere();
+    root.updateMatrixWorld(true);
+
+    expect(root.geometry.boundingSphere?.center.x).toBe(0);
+    expect(root.boundingSphere?.center.x).toBe(500);
+    expect(compileRootDistanceSq(root, 0, 0)).toBe(500 * 500);
   });
 
   it('falls back to the matrix translation without a computed sphere', () => {

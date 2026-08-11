@@ -399,15 +399,19 @@ export function prewarmProgramContentKeys(
  * measured 12.4 s behind the loading cover). The signature folds exactly the
  * inputs three keys program defines on that the mesh-shape token does not
  * already carry: material type, hook identity (customProgramCacheKey, whose
- * three default is onBeforeCompile source), the texture-channel presence
- * bits, blending/alpha-test, vertex colors, flat shading, fog opt-out and
- * side. An imperfect signature is fail-soft: world.initial-frame's own
+ * three default is onBeforeCompile source), custom vertex/fragment source,
+ * defines, the texture-channel presence bits, blending/alpha-test, vertex
+ * colors, flat shading, fog opt-out and side. An imperfect signature is
+ * fail-soft: world.initial-frame's own
  * guaranteed submit (its start is bounded ahead of the hard deadline by
  * prewarmCompileAwaitDeadline) links any residue behind the loading cover
  * there, instead of at first live draw. */
 export function materialProgramSignature(material: {
   type?: string;
   customProgramCacheKey?: () => string;
+  vertexShader?: string;
+  fragmentShader?: string;
+  defines?: Record<string, unknown>;
   map?: unknown;
   normalMap?: unknown;
   bumpMap?: unknown;
@@ -429,11 +433,18 @@ export function materialProgramSignature(material: {
   side?: number;
 }): string {
   const bit = (value: unknown): string => (value ? '1' : '0');
+  const source = (value: string | undefined): string =>
+    value === undefined ? '' : `${value.length}:${value}`;
   const hook =
     typeof material.customProgramCacheKey === 'function' ? material.customProgramCacheKey() : '';
+  const defineEntries = Object.entries(material.defines ?? {});
+  const defines = defineEntries.length > 0 ? JSON.stringify(defineEntries) : '';
   return [
     material.type ?? '',
     hook,
+    source(material.vertexShader),
+    source(material.fragmentShader),
+    defines,
     bit(material.map),
     bit(material.normalMap),
     bit(material.bumpMap),
