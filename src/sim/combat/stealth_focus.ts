@@ -25,49 +25,59 @@ import { dropThreat } from '../threat';
 import type { Entity } from '../types';
 
 /**
- * Remove `focusIds` from every hostile MOB's threat table, taunt lock and aggro
+ * Remove `focusIds` from ONE hostile mob's threat table, taunt lock and aggro
  * target, and settle whatever that leaves behind (an owned pet with nothing to
  * hit leaves combat; a wild mob with an empty table evades home).
  *
- * Shared by the Smokestep combat drop and the stealth-entry clear below so the
- * mob-side rules exist once.
+ * Per-entity rather than per-world on purpose: the caller owns the single pass
+ * over the entity map, so nothing here can turn into a second sweep.
  */
-export function dropHostileMobFocus(
-  ctx: SimContext,
-  reference: Entity,
-  focusIds: readonly number[],
-): void {
-  for (const entity of ctx.entities.values()) {
-    if (entity.kind !== 'mob' || entity.dead || !ctx.isHostileTo(reference, entity)) continue;
-    let dropped = false;
-    for (const id of focusIds) {
-      if (entity.threat.has(id) || entity.forcedTargetId === id) dropped = true;
-      dropThreat(entity, id);
-      if (entity.aggroTargetId === id) {
-        entity.aggroTargetId = null;
-        dropped = true;
-      }
+function dropMobFocus(mob: Entity, focusIds: readonly number[]): void {
+  let dropped = false;
+  for (const id of focusIds) {
+    if (mob.threat.has(id) || mob.forcedTargetId === id) dropped = true;
+    dropThreat(mob, id);
+    if (mob.aggroTargetId === id) {
+      mob.aggroTargetId = null;
+      dropped = true;
     }
-    if (!dropped) continue;
-    if (entity.ownerId !== null) {
-      if (entity.aggroTargetId === null) entity.inCombat = false;
-    } else if (entity.threat.size === 0 && entity.aggroTargetId === null) {
-      entity.aiState = 'evade';
-      entity.inCombat = false;
-    }
+  }
+  if (!dropped) return;
+  if (mob.ownerId !== null) {
+    if (mob.aggroTargetId === null) mob.inCombat = false;
+  } else if (mob.threat.size === 0 && mob.aggroTargetId === null) {
+    mob.aiState = 'evade';
+    mob.inCombat = false;
   }
 }
 
 /**
- * Entering stealth: drop the caster out of every hostile's targeting. Covers
- * hostile players as well as mobs and pets, and deliberately leaves the
- * CASTER's own target alone (a rogue slips into Duskveil precisely to open on
- * what they are already looking at).
+ * Drop the caster out of every hostile's targeting. Hostile players lose the
+ * selection, the auto-attack it was feeding, and any swing queued onto it;
+ * hostile mobs and pets lose the hate-table entry, the taunt lock and the
+ * aggro target. The CASTER's own target is deliberately left alone (a rogue
+ * slips into Duskveil precisely to open on what they are already looking at).
+ *
+ * `alsoDropped` carries any EXTRA ids the same entry must shake loose:
+ * Smokestep's combat drop adds the caster's pet, which escapes with its owner.
+ *
+ * One cast, ONE pass. The mob arm and the player arm settle disjoint entity
+ * kinds, and extra ids ride along, so nothing here justifies walking the whole
+ * world a second time.
  */
-export function clearHostileTargetingOnStealth(ctx: SimContext, hidden: Entity): void {
-  dropHostileMobFocus(ctx, hidden, [hidden.id]);
+export function clearHostileTargetingOnStealth(
+  ctx: SimContext,
+  hidden: Entity,
+  alsoDropped: readonly number[] = [],
+): void {
+  const focusIds = alsoDropped.length === 0 ? [hidden.id] : [hidden.id, ...alsoDropped];
   for (const entity of ctx.entities.values()) {
-    if (entity.kind !== 'player' || entity.dead || entity.id === hidden.id) continue;
+    if (entity.dead) continue;
+    if (entity.kind === 'mob') {
+      if (ctx.isHostileTo(hidden, entity)) dropMobFocus(entity, focusIds);
+      continue;
+    }
+    if (entity.kind !== 'player' || entity.id === hidden.id) continue;
     if (entity.targetId !== hidden.id || !ctx.isHostileTo(hidden, entity)) continue;
     entity.targetId = null;
     entity.autoAttack = false;

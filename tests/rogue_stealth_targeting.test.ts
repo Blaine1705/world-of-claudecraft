@@ -21,6 +21,16 @@ const DEMON_TEMPLATE = 'emberkin';
 
 type SimInternals = { rebucket(e: Entity): void; addEntity(e: Entity): void; ctx: SimContext };
 
+/** A live entity map that counts full sweeps, so a cast that walks the world
+ *  twice where once will do is visible from a test. */
+class CountingEntities extends Map<number, Entity> {
+  sweeps = 0;
+  override values(): MapIterator<Entity> {
+    this.sweeps++;
+    return super.values();
+  }
+}
+
 function internals(sim: Sim): SimInternals {
   return sim as unknown as SimInternals;
 }
@@ -122,6 +132,77 @@ describe('entering Duskveil clears every hostile lock on the rogue', () => {
     expect(mob.aggroTargetId).toBeNull();
     expect(mob.forcedTargetId).toBeNull();
     expect(mob.threat.size).toBe(0);
+  });
+
+  it('Smokestep drops the rogue AND settles it in a single sweep of the entity map', () => {
+    // The clear settles hostile mobs AND hostile players, and Smokestep adds
+    // its own combat drop on top. Every one of those walks the whole entity
+    // map, so they all ride ONE pass: a plain Duskveil costs a single sweep,
+    // and Smokestep costs that same sweep plus the pet lookup its combat drop
+    // needs (`petOf`, a shared scan this rule does not own).
+    const sweepsFor = (ability: 'stealth' | 'vanish'): number => {
+      const sim = new Sim({ seed: 17, playerClass: 'rogue', autoEquip: true });
+      sim.setPlayerLevel(20);
+      const rogue = sim.player;
+      teleport(sim, rogue, 0, 0);
+      const mob = createMob(33_100, MOBS.forest_wolf, 10, { x: 0, y: 0, z: 0 });
+      mob.hostile = true;
+      internals(sim).addEntity(mob);
+      teleport(sim, mob, 5, 0);
+      mob.aiState = 'chase';
+      mob.aggroTargetId = rogue.id;
+      addThreat(mob, rogue.id, 40);
+      rogue.inCombat = true;
+      rogue.combatTimer = 99;
+      rogue.gcdRemaining = 0;
+      rogue.resource = rogue.maxResource;
+      if (ability === 'stealth') rogue.inCombat = false;
+
+      const counted = new CountingEntities(sim.entities);
+      (sim as unknown as { entities: Map<number, Entity> }).entities = counted;
+      counted.sweeps = 0;
+      sim.castAbility(ability);
+      // Either cast really did the work the sweeps are being counted for.
+      expect(mob.threat.has(rogue.id)).toBe(false);
+      expect(mob.aggroTargetId).toBeNull();
+      return counted.sweeps;
+    };
+
+    const plain = sweepsFor('stealth');
+    expect(plain).toBe(1);
+    expect(sweepsFor('vanish')).toBe(plain + 1);
+  });
+
+  it('Smokestep still drops the rogue out of combat while it clears the lock', () => {
+    const sim = new Sim({ seed: 17, playerClass: 'rogue', autoEquip: true });
+    sim.setPlayerLevel(20);
+    const rogue = sim.player;
+    teleport(sim, rogue, 0, 0);
+    const mob = createMob(33_200, MOBS.forest_wolf, 10, { x: 0, y: 0, z: 0 });
+    mob.hostile = true;
+    internals(sim).addEntity(mob);
+    teleport(sim, mob, 5, 0);
+    mob.aiState = 'chase';
+    mob.aggroTargetId = rogue.id;
+    mob.forcedTargetId = rogue.id;
+    mob.forcedTargetTimer = 3;
+    addThreat(mob, rogue.id, 40);
+    rogue.inCombat = true;
+    rogue.autoAttack = true;
+    rogue.targetId = mob.id;
+    rogue.gcdRemaining = 0;
+
+    sim.castAbility('vanish');
+
+    // The combat-drop half: the caster leaves the fight and stops swinging.
+    expect(rogue.inCombat).toBe(false);
+    expect(rogue.autoAttack).toBe(false);
+    expect(rogue.targetId).toBeNull();
+    // The stealth-entry half, from the same single pass.
+    expect(mob.aggroTargetId).toBeNull();
+    expect(mob.forcedTargetId).toBeNull();
+    expect(mob.threat.size).toBe(0);
+    expect(mob.aiState).toBe('evade');
   });
 
   it("leaves the rogue's own target alone: Duskveil is an opener, not an escape", () => {

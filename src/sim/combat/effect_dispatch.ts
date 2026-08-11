@@ -233,7 +233,7 @@ import {
   stoneboundThreatMultiplier,
 } from './shaman_warspirit';
 import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
-import { clearHostileTargetingOnStealth, dropHostileMobFocus } from './stealth_focus';
+import { clearHostileTargetingOnStealth } from './stealth_focus';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 import { applyTemporalHourglass } from './temporal_hourglass';
 import { applyBlacktideReturnSpeed } from './warlock_talents';
@@ -271,7 +271,16 @@ function dropsCombatOnStealth(ability: AbilityDef): boolean {
   return ability.id === 'vanish';
 }
 
-function dropSelfFromHostileFocus(ctx: SimContext, p: Entity): void {
+/**
+ * The combat-drop half of Vanish: clear the caster's own combat state (and the
+ * pet's, which escapes with its owner) and report the EXTRA ids the hostile
+ * scan must shake loose beyond the caster itself.
+ *
+ * It deliberately does not run that scan: the caller hands these ids to
+ * `clearHostileTargetingOnStealth`, which every stealth entry already runs, so
+ * the world-wide entity sweep happens once per cast instead of twice.
+ */
+function dropSelfFromCombat(ctx: SimContext, p: Entity): readonly number[] {
   p.combatTimer = 5;
   p.inCombat = false;
   p.autoAttack = false;
@@ -281,17 +290,12 @@ function dropSelfFromHostileFocus(ctx: SimContext, p: Entity): void {
   delete p.queuedOnSwingCostMultiplier;
 
   const pet = ctx.petOf(p.id);
-  const escapeIds = pet ? [p.id, pet.id] : [p.id];
-  if (pet) {
-    pet.combatTimer = 5;
-    pet.inCombat = false;
-    pet.aggroTargetId = null;
-    pet.targetId = null;
-  }
-
-  // The mob-side loop lives in combat/stealth_focus.ts: plain stealth entry
-  // needs the identical rules, so they exist once.
-  dropHostileMobFocus(ctx, p, escapeIds);
+  if (!pet) return [];
+  pet.combatTimer = 5;
+  pet.inCombat = false;
+  pet.aggroTargetId = null;
+  pet.targetId = null;
+  return [pet.id];
 }
 
 // Resolve the exclusiveGroup for an AURA id: either a plain ability id (a
@@ -3493,8 +3497,10 @@ export function runEffects(
           // Concealment drops every hostile's LOCK on the caster, not just what
           // they can newly acquire: a pet that already had the rogue targeted
           // used to keep hitting them right through Duskveil (the PvP report).
-          clearHostileTargetingOnStealth(ctx, p);
-          if (dropsCombatOnStealth(ability)) dropSelfFromHostileFocus(ctx, p);
+          // Vanish also drops the caster (and pet) out of combat first, so both
+          // halves settle in the SAME hostile sweep rather than one each.
+          const alsoDropped = dropsCombatOnStealth(ability) ? dropSelfFromCombat(ctx, p) : [];
+          clearHostileTargetingOnStealth(ctx, p, alsoDropped);
         }
         recalcPlayerStats(
           p,
