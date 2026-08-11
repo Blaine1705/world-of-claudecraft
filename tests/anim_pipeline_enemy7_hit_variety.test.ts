@@ -54,10 +54,18 @@ describe('ENEMY7 hit-reaction stagger (issue #2889 round 2)', () => {
     expect(block).toContain("death: 'Death'");
   });
 
-  it('wires a matching animUrls entry onto both ENEMY7 consumers', () => {
+  it('wires a matching animUrls entry onto every ENEMY7 consumer', () => {
     const consumers: [string, string, string][] = [
       ['mob_kobold', 'goblin_hit_variety_anims.glb', 'clips: KOBOLD_ENEMY7'],
       ['mob_ogre', 'giant_hit_variety_anims.glb', 'clips: ENEMY7'],
+      // The authored kobold body shares the goblin rig's donor: its own drop
+      // authors HitRecieve but not the heavy stagger. It carries plain ENEMY7
+      // (its drop authors Attack), so unlike mob_kobold it takes no override.
+      ['mob_kobold_digger', 'goblin_hit_variety_anims.glb', 'clips: ENEMY7'],
+      // Grix leans on the donor HARDER: his drop authors no hit reaction at all,
+      // so HitRecieve_Heavy out of this GLB is his only hit clip, and his GRIX
+      // ClipMap narrows ENEMY7's hit array to it alone.
+      ['mob_grix', 'goblin_hit_variety_anims.glb', 'clips: GRIX'],
     ];
     for (const [key, file, clipsLine] of consumers) {
       const idx = MANIFEST_SRC.indexOf(`  ${key}: {`);
@@ -73,7 +81,14 @@ describe('ENEMY7 hit-reaction stagger (issue #2889 round 2)', () => {
     // TROLL_BIPED14, etc, issue #2889) independently wire their own
     // hit-variety donors in the same batch and would otherwise break this
     // pin.
-    const occurrences = [...MANIFEST_SRC.matchAll(/(goblin|giant)_hit_variety_anims\.glb/g)].length;
-    expect(occurrences).toBe(2);
+    //
+    // Anchored to the `${CREATURES}/` template prefix every real wiring is
+    // written with, so this counts CODE and not prose: a def whose comment
+    // explains why it does (or does not) take a donor used to inflate the count
+    // and fail the pin, which punished documenting the wiring.
+    const occurrences = [
+      ...MANIFEST_SRC.matchAll(/\$\{CREATURES\}\/(goblin|giant)_hit_variety_anims\.glb/g),
+    ].length;
+    expect(occurrences).toBe(consumers.length);
   });
 });
