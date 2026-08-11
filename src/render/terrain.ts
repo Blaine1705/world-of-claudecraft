@@ -2203,16 +2203,12 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
         const span = Math.max(1, Math.round(chunk.size / CHUNK_SIZE));
         const cx0 = Math.round((chunk.x0 + WORLD_MAX_X) / CHUNK_SIZE);
         const cz0 = Math.round((chunk.z0 - WORLD_MIN_Z) / CHUNK_SIZE);
-        let owned = false;
-        for (let dz = 0; dz < span && !owned; dz++) {
-          for (let dx = 0; dx < span; dx++) {
-            if (ownedCells.has((cz0 + dz) * chunksX + (cx0 + dx))) {
-              owned = true;
-              break;
-            }
-          }
-        }
-        if (!owned) continue;
+        // The origin cell alone decides ownership: attachChunk's superOk gate
+        // only ever forms a super-chunk when all four of its cells already
+        // share one owner (see ensureZone above), so a mixed-ownership
+        // super-chunk cannot exist and scanning the other span cells here
+        // would be redundant.
+        if (!ownedCells.has(cz0 * chunksX + cx0)) continue;
         group.remove(chunk.mesh);
         chunk.mesh.geometry.dispose();
         chunks.splice(i, 1);

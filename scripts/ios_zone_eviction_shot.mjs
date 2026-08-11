@@ -3,15 +3,15 @@
 // Boots an offline world under an iPhone user agent (the same signal
 // mobilePlatformFromNavigator in src/render/gfx.ts reads to set
 // GFX.iosMemoryProfile/constrainedMemory), streams in several real world
-// zones the way ordinary travel would, then walks the player far away and
-// drives the renderer's own evictFarZoneIfConstrained pass directly (a
-// private method, called via bracket access since TS `private` is a
-// compile-time-only restriction) to show it releases the far zones'
-// terrain/water geometry while the CURRENT zone keeps rendering normally.
-// Screenshots the world before and after so a reviewer can see there is no
-// visible difference, which is the whole point: an evicted zone is
-// indistinguishable from one never visited, and rebuilds on return through
-// the ordinary streaming path.
+// zones the way ordinary travel would, then resets the player to the
+// current zone's origin and drives the renderer's own
+// evictFarZoneIfConstrained pass directly (a private method, called via
+// dot access since TS `private` is a compile-time-only restriction) to
+// show it releases the far zones' terrain/water geometry while the
+// CURRENT zone keeps rendering normally. Screenshots the world after
+// eviction so a reviewer can see there is no visible difference, which is
+// the whole point: an evicted zone is indistinguishable from one never
+// visited, and rebuilds on return through the ordinary streaming path.
 //
 // Needs `npm run dev` on :5173 (override with GAME_URL). Writes to tmp/.
 import fs from 'node:fs';

@@ -12,7 +12,7 @@ describe('renderer zone eviction seam', () => {
   const method = (): string => {
     const start = source.indexOf('private evictFarZoneIfConstrained(');
     expect(start).toBeGreaterThan(-1);
-    const end = source.indexOf('\n  // Groups attachZoneFeature added', start);
+    const end = source.indexOf('\n  private pumpVisibleZonePrepareQueue(', start);
     expect(end).toBeGreaterThan(start);
     return source.slice(start, end);
   };
@@ -39,12 +39,16 @@ describe('renderer zone eviction seam', () => {
     expect(body).not.toContain('prewarmedZonePrograms');
   });
 
-  it('is called with the PLAYER position, not the camera, so a post-teleport camera-lag frame cannot evict the arrival neighbourhood prepareZonesAround just streamed in', () => {
+  it("is called with the PLAYER position, not the camera, keeping the boom arm's zoom/free-look state out of a memory-residency decision", () => {
     const start = source.indexOf('private queueVisibleZonePrepares(');
     expect(start).toBeGreaterThan(-1);
     const end = source.indexOf('\n  private evictFarZoneIfConstrained(', start);
     expect(end).toBeGreaterThan(start);
     const callerBody = source.slice(start, end);
+    // Anchoring on the player (not the camera boom's zoom arm) keeps
+    // zoom/free-look state out of a memory-residency decision; see
+    // evictFarZoneIfConstrained's own doc comment for why the camera
+    // was never actually a lag risk here.
     expect(callerBody).toContain(
       'this.evictFarZoneIfConstrained(currentZoneId, player.pos.x, player.pos.z)',
     );

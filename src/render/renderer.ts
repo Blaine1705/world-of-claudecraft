@@ -3913,32 +3913,10 @@ export class Renderer {
   }
 
   /**
-   * Constrained-memory zone eviction (iOS WebKit and other phone-class
-   * hosts, see gfx.ts's constrainedMemory): release the single farthest
-   * prepared zone once it clears ZONE_EVICTION_RADIUS, so a long session
-   * does not retain every zone it has ever passed through. Zone residency
-   * otherwise only grows (see preparedZones), which is fine on
-   * desktop/Android but crosses iOS WebKit's per-process memory ceiling
-   * during ordinary continuous play; see zone_eviction_core.ts. Runs on the
-   * same throttled cadence as the visible-zone streaming recompute, one zone
-   * per call, so a session that keeps moving away sheds zones gradually
-   * instead of in one large disposal spike. No-op on unconstrained hosts.
-   *
-   * Distance is measured from the PLAYER, not the camera: the camera pivot
-   * trails the player on a damped spring (stepCameraBoom) and can sit far
-   * behind for several frames after a teleport, while prepareZonesAround
-   * already streamed in the arrival neighbourhood around the player's exact
-   * landing spot. Measuring from a lagging camera could momentarily rank
-   * that just-finished neighbourhood as "far" and evict what the loading
-   * screen just paid for; the player position has no such lag.
-   *
-   * Deliberately does NOT clear prewarmedZonePrograms: that set tracks
-   * whether this zone's mob/NPC shader PROGRAMS have been compiled, a
-   * one-time cost paid against materials that are shared across zones and
-   * outlive unloadZone (which only releases geometry). Clearing it would
-   * force a full re-compile pass (a measured 100 to 345 ms main-thread unit
-   * per prewarmZoneAt) on re-entry for no benefit, on exactly the device
-   * class this exists to protect.
+   * Thin consumer of zone_eviction_core.ts's zonesEligibleForEviction; see
+   * that module's header for the full rationale (why this exists, the
+   * player-vs-camera anchor, and why prewarmedZonePrograms stays untouched).
+   * No-op on unconstrained hosts (desktop/Android).
    */
   private evictFarZoneIfConstrained(currentZoneId: string, playerX: number, playerZ: number): void {
     if (!GFX.constrainedMemory) return;

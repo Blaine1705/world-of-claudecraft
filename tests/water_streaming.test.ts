@@ -71,14 +71,19 @@ describe('progressive water build', () => {
     const meshCountBefore = water.meshes.length;
     const groupCountBefore = water.group.children.length;
 
+    const disposeSpy = vi.spyOn(mesh.geometry, 'dispose');
+
     water.unloadZone(zone.id);
 
     expect(water.isZoneLoaded(zone.id)).toBe(false);
     expect(water.group.children).not.toContain(mesh);
-    // The front mesh and its underside twin both leave meshes/group; nothing
-    // else built alongside it (the apron, any gap sheet) is touched.
-    expect(water.meshes.length).toBeLessThan(meshCountBefore);
-    expect(water.group.children.length).toBeLessThan(groupCountBefore);
+    // The front mesh AND its underside twin both leave meshes/group (exact
+    // counts, not just "fewer"): a mutation that drops only the front mesh
+    // would leave the twin's disposed geometry referenced by a still-live
+    // Mesh in both collections, and a loose `toBeLessThan` would not catch it.
+    expect(water.meshes.length).toBe(meshCountBefore - 2);
+    expect(water.group.children.length).toBe(groupCountBefore - 2);
+    expect(disposeSpy).toHaveBeenCalledTimes(1);
 
     const second = water.ensureZone(zone, { pace: 'idle' });
     await vi.runAllTimersAsync();
