@@ -431,6 +431,7 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
   'src/render/affliction_familiar_core.ts',
+  'src/render/characters/portrait_prewarm_core.ts',
   'src/render/ability_vfx_core.ts',
   'src/render/characters/player_look_core.ts',
   'src/render/ability_vfx_longbuff_core.ts',
