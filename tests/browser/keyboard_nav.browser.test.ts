@@ -495,7 +495,8 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
     const controls = req(root.querySelector<HTMLElement>('.mkt-controls'), 'market controls');
     const search = req(root.querySelector<HTMLElement>('.mkt-search'), 'market search');
     const fields = Array.from(root.querySelectorAll<HTMLElement>('.mkt-filter'));
-    expect(fields).toHaveLength(5);
+    // itemType, subtype (armorSlot), armorClass, primaryStat, rarity, sort (issue #3102).
+    expect(fields).toHaveLength(6);
 
     const layout = (width: number) => {
       controls.style.width = `${width}px`;
