@@ -2457,7 +2457,7 @@ export const vi_VN: EnTranslations = {
       "lock": "Lock interface",
       "unlockFrame": "Unlock this frame",
       "lockFrame": "Lock this frame",
-      "resizeFrame": "Drag to resize this frame"
+      "resizeFrame": "Resize this frame"
     },
     "itemTooltip": {
       "requiresLevel": "Yêu cầu Cấp {level}",

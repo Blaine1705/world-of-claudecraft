@@ -2868,6 +2868,9 @@ export const hudChromeStrings = {
   // unit and pet frames) so they can be dragged and scaled, and the button
   // relabels itself to the lock action while they are loose. `unlockFrame` /
   // `lockFrame` name each frame's own corner button, `resizeFrame` its SE grip.
+  // `resizeFrame` names an action rather than a gesture because the grip is a
+  // real button driven by pointer drag AND arrow keys, so a screen reader must
+  // not be told to drag something a keyboard player operates with arrows.
   // All wordy (M16), so the five non-Latin fills land in this same change.
   interfaceUnlock: {
     label: 'Interface Frames',
@@ -2875,7 +2878,7 @@ export const hudChromeStrings = {
     lock: 'Lock interface',
     unlockFrame: 'Unlock this frame',
     lockFrame: 'Lock this frame',
-    resizeFrame: 'Drag to resize this frame',
+    resizeFrame: 'Resize this frame',
   },
   // Item tooltip: the minimum character level needed to equip a piece (classic
   // "Requires Level N"). Shown red when the viewer is below it. {level} runs

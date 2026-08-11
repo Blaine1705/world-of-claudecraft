@@ -2,11 +2,14 @@ import { describe, expect, it } from 'vitest';
 import {
   clampFrameScale,
   clampTargetFramePos,
+  FRAME_SCALE_KEY_FINE_STEP,
+  FRAME_SCALE_KEY_STEP,
   FRAME_SCALE_MAX,
   FRAME_SCALE_MIN,
   parseTargetFramePos,
   placeTargetFrame,
   scaleFromGripDrag,
+  scaleFromKeyStep,
   serializeTargetFramePos,
   TARGET_FRAME_MARGIN,
 } from '../src/ui/target_frame_pos';
@@ -181,5 +184,47 @@ describe('scaleFromGripDrag', () => {
     // A frame grabbed while display:none has a 0x0 rect: no ratio exists, and
     // dividing by it would hand the frame a NaN transform.
     expect(scaleFromGripDrag(1.25, { w: 0, h: 0 }, 80, 80)).toBe(1.25);
+  });
+});
+
+// The keyboard half of the grip: the arrow-key resize a keyboard-only player has
+// as their ONLY route to a frame's size (the pointer drag above is unreachable).
+describe('scaleFromKeyStep', () => {
+  it('grows and shrinks by the coarse step, and by the fine step with Shift', () => {
+    expect(scaleFromKeyStep(1, 1, false)).toBeCloseTo(1 + FRAME_SCALE_KEY_STEP, 9);
+    expect(scaleFromKeyStep(1, -1, false)).toBeCloseTo(1 - FRAME_SCALE_KEY_STEP, 9);
+    expect(scaleFromKeyStep(1, 1, true)).toBeCloseTo(1 + FRAME_SCALE_KEY_FINE_STEP, 9);
+    expect(scaleFromKeyStep(1, -1, true)).toBeCloseTo(1 - FRAME_SCALE_KEY_FINE_STEP, 9);
+    // The two steps are genuinely different sizes, so Shift is a real fine mode
+    // rather than a second name for the coarse one.
+    expect(FRAME_SCALE_KEY_FINE_STEP).toBeLessThan(FRAME_SCALE_KEY_STEP);
+  });
+
+  it('clamps at both ends of the legal band instead of running past it', () => {
+    expect(scaleFromKeyStep(FRAME_SCALE_MAX, 1, false)).toBe(FRAME_SCALE_MAX);
+    expect(scaleFromKeyStep(FRAME_SCALE_MIN, -1, false)).toBe(FRAME_SCALE_MIN);
+    // A multiplier already outside the band is pulled back in, not stepped further out.
+    expect(scaleFromKeyStep(FRAME_SCALE_MAX + 3, 1, false)).toBe(FRAME_SCALE_MAX);
+    expect(scaleFromKeyStep(Number.NaN, 1, false)).toBeCloseTo(1 + FRAME_SCALE_KEY_STEP, 9);
+  });
+
+  it('round-trips exactly, so grow-then-shrink returns to the starting size', () => {
+    let scale = 1;
+    for (let i = 0; i < 8; i++) scale = scaleFromKeyStep(scale, 1, false);
+    for (let i = 0; i < 8; i++) scale = scaleFromKeyStep(scale, -1, false);
+    // Strict equality on purpose: an unrounded additive walk drifts into float
+    // dust (0.9999999999999999) and never comes home to its own start value.
+    expect(scale).toBe(1);
+  });
+
+  it('walks the whole band in a bounded number of presses', () => {
+    let scale = FRAME_SCALE_MIN;
+    let presses = 0;
+    while (scale < FRAME_SCALE_MAX && presses < 100) {
+      scale = scaleFromKeyStep(scale, 1, false);
+      presses++;
+    }
+    expect(scale).toBe(FRAME_SCALE_MAX);
+    expect(presses).toBe(Math.round((FRAME_SCALE_MAX - FRAME_SCALE_MIN) / FRAME_SCALE_KEY_STEP));
   });
 });

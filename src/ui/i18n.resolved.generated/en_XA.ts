@@ -2457,7 +2457,7 @@ export const en_XA: EnTranslations = {
       "lock": "[Ļóçķ íñţéŕƒáçé]",
       "unlockFrame": "[Úñļóçķ ţĥíš ƒŕáɱé]",
       "lockFrame": "[Ļóçķ ţĥíš ƒŕáɱé]",
-      "resizeFrame": "[Ðŕáĝ ţó ŕéšížé ţĥíš ƒŕáɱé]"
+      "resizeFrame": "[Ŕéšížé ţĥíš ƒŕáɱé]"
     },
     "itemTooltip": {
       "requiresLevel": "[Ŕéɋúíŕéš Ļéʋéļ {level}]",

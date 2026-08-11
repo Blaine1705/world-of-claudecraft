@@ -626,7 +626,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.lock': '鎖定介面',
   'hudChrome.interfaceUnlock.unlockFrame': '解鎖此框體',
   'hudChrome.interfaceUnlock.lockFrame': '鎖定此框體',
-  'hudChrome.interfaceUnlock.resizeFrame': '拖曳以調整此框體大小',
+  'hudChrome.interfaceUnlock.resizeFrame': '調整此框體大小',
   'hudChrome.options.playerFrameScale': '玩家框縮放',
   'hudChrome.options.targetFrameScale': '目標框縮放',
   'hudChrome.options.aurasOnPlayerFrame': '增益顯示在玩家框',

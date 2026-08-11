@@ -4,10 +4,19 @@
 // unlocked state (aria-pressed + tf-unlocked), a drag only works unlocked and
 // on the desktop layout, a completed drag persists the clamped spot, and the
 // onPositioned hook fires true while a custom position applies on desktop and
-// false on the mobile layout (which also clears the inline position). Per the
-// repo testing convention this drives a small hand-rolled fake DOM stubbed on
-// globalThis (no jsdom).
+// false on the mobile layout (which also clears the inline position). The second
+// describe covers the `scalable` config the "Unlock interface" frames use, whose
+// SE grip is a real button carrying the arrow-key resize (the keyboard path that
+// pairs with the move button's arrow-key positioning). Per the repo testing
+// convention this drives a small hand-rolled fake DOM stubbed on globalThis (no
+// jsdom).
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import {
+  FRAME_SCALE_KEY_FINE_STEP,
+  FRAME_SCALE_KEY_STEP,
+  FRAME_SCALE_MAX,
+  FRAME_SCALE_MIN,
+} from '../src/ui/target_frame_pos';
 
 type Listener = (ev: unknown) => void;
 
@@ -59,6 +68,20 @@ class FakeStyle {
   get bottom(): string {
     return this.props.get('bottom') ?? '';
   }
+  // The scale half of a `scalable` frame: the controller writes both of these
+  // whenever a position applies, and reset() removes them by name.
+  set transform(v: string) {
+    this.props.set('transform', v);
+  }
+  get transform(): string {
+    return this.props.get('transform') ?? '';
+  }
+  set transformOrigin(v: string) {
+    this.props.set('transform-origin', v);
+  }
+  get transformOrigin(): string {
+    return this.props.get('transform-origin') ?? '';
+  }
 }
 
 class FakeEl {
@@ -70,6 +93,7 @@ class FakeEl {
   title = '';
   type = '';
   className = '';
+  hidden = false;
   rect = { left: 40, top: 500, width: 612, height: 84 };
   private listeners = new Map<string, Listener[]>();
 
@@ -160,6 +184,36 @@ function makeFrame(opts: { mobile?: boolean; positioned?: Array<boolean> } = {})
   });
   const btn = frame.children[0];
   return { frame, btn, mover, positioned };
+}
+
+// A frame in the "Unlock interface" shape: no permanent chrome, and the SE grip
+// that carries BOTH resize gestures (pointer drag and arrow keys).
+function makeScalableFrame(opts: { mobile?: boolean } = {}) {
+  const frame = new FakeEl();
+  const mover = new MovableFrame({
+    frame,
+    storageKey: KEY,
+    unlockLabelKey: 'hudChrome.interfaceUnlock.unlockFrame',
+    lockLabelKey: 'hudChrome.interfaceUnlock.lockFrame',
+    resizeLabelKey: 'hudChrome.interfaceUnlock.resizeFrame',
+    draggingBodyClass: 'hud-frame-dragging',
+    fallbackSize: { w: 260, h: 84 },
+    isMobileLayout: () => opts.mobile ?? false,
+    scalable: true,
+    buttonOnlyWhenUnlocked: true,
+  });
+  const btn = frame.children[0];
+  const grip = frame.children[1];
+  return { frame, btn, grip, mover };
+}
+
+function key(k: string, overrides: Record<string, unknown> = {}) {
+  return { key: k, shiftKey: false, preventDefault() {}, stopPropagation() {}, ...overrides };
+}
+
+function scaleOf(frame: FakeEl): number {
+  const m = /scale\(([-\d.]+)\)/.exec(frame.style.transform);
+  return m ? Number(m[1]) : Number.NaN;
 }
 
 function pointer(overrides: Record<string, unknown> = {}) {
@@ -340,5 +394,146 @@ describe('MovableFrame', () => {
     const { frame, positioned } = makeFrame();
     expect(frame.style.props.size).toBe(0);
     expect(positioned).toEqual([]);
+  });
+});
+
+// The resize grip on a `scalable` frame is the ONLY route to a frame's size, so
+// it holds the same keyboard contract the move button does: a real named button,
+// out of the tab order while locked, and arrow-key operable while unlocked. It
+// shipped pointer-only and aria-hidden, which left a keyboard-only or
+// screen-reader player able to unlock and move every HUD frame but resize none.
+describe('MovableFrame resize grip', () => {
+  it('is a real named button, never an aria-hidden pointer-only affordance', () => {
+    const { grip } = makeScalableFrame();
+    expect(grip.className).toBe('panel-resize-grip mf-resize-grip');
+    expect(grip.type).toBe('button');
+    expect(grip.getAttribute('aria-hidden')).toBe(null);
+    // it is announced by a real accessible name, not by the tooltip alone
+    expect(grip.getAttribute('aria-label')).toBe(grip.title);
+    expect((grip.getAttribute('aria-label') ?? '').length).toBeGreaterThan(0);
+    expect(grip.getAttribute('aria-keyshortcuts')).toBe('ArrowUp ArrowDown ArrowLeft ArrowRight');
+  });
+
+  it('leaves the tab order while the frame is locked and rejoins it when unlocked', () => {
+    const { btn, grip } = makeScalableFrame();
+    expect(grip.hidden).toBe(true);
+    btn.dispatch('click', pointer());
+    expect(grip.hidden).toBe(false);
+    btn.dispatch('click', pointer());
+    expect(grip.hidden).toBe(true);
+  });
+
+  it('resizes and persists with arrow keys while unlocked, Shift for the fine step', () => {
+    const { frame, btn, grip } = makeScalableFrame();
+    btn.dispatch('click', pointer());
+
+    let prevented = false;
+    grip.dispatch(
+      'keydown',
+      key('ArrowRight', {
+        preventDefault: () => {
+          prevented = true;
+        },
+      }),
+    );
+    expect(prevented).toBe(true);
+    expect(scaleOf(frame)).toBeCloseTo(1 + FRAME_SCALE_KEY_STEP, 9);
+    expect(frame.style.transformOrigin).toBe('top left');
+    expect(JSON.parse(store.get(KEY) ?? '{}').scale).toBeCloseTo(1 + FRAME_SCALE_KEY_STEP, 9);
+
+    // ArrowDown grows too (the grip travels down-right to grow), ArrowUp/Left shrink
+    grip.dispatch('keydown', key('ArrowDown'));
+    expect(scaleOf(frame)).toBeCloseTo(1 + 2 * FRAME_SCALE_KEY_STEP, 9);
+    grip.dispatch('keydown', key('ArrowLeft'));
+    grip.dispatch('keydown', key('ArrowUp'));
+    expect(scaleOf(frame)).toBeCloseTo(1, 9);
+
+    grip.dispatch('keydown', key('ArrowRight', { shiftKey: true }));
+    expect(scaleOf(frame)).toBeCloseTo(1 + FRAME_SCALE_KEY_FINE_STEP, 9);
+    expect(JSON.parse(store.get(KEY) ?? '{}').scale).toBeCloseTo(1 + FRAME_SCALE_KEY_FINE_STEP, 9);
+  });
+
+  it('keeps the frame position while resizing, and its size while moving', () => {
+    const { frame, btn, grip } = makeScalableFrame();
+    btn.dispatch('click', pointer());
+    btn.dispatch('keydown', key('ArrowRight'));
+    expect(frame.style.left).toBe('50px');
+
+    grip.dispatch('keydown', key('ArrowRight'));
+    // resizing does not walk the frame away from where it was put
+    expect(JSON.parse(store.get(KEY) ?? '{}')).toEqual({
+      left: 50,
+      top: 500,
+      scale: 1 + FRAME_SCALE_KEY_STEP,
+    });
+
+    // and a later move keeps the chosen size rather than resetting it
+    btn.dispatch('keydown', key('ArrowDown'));
+    expect(JSON.parse(store.get(KEY) ?? '{}')).toEqual({
+      left: 50,
+      top: 510,
+      scale: 1 + FRAME_SCALE_KEY_STEP,
+    });
+  });
+
+  it('ignores an arrow key while locked, and on the mobile layout even when unlocked', () => {
+    const locked = makeScalableFrame();
+    locked.grip.dispatch('keydown', key('ArrowRight'));
+    expect(locked.frame.style.props.has('transform')).toBe(false);
+    expect(store.has(KEY)).toBe(false);
+
+    const mobile = makeScalableFrame({ mobile: true });
+    mobile.btn.dispatch('click', pointer()); // unlock
+    mobile.grip.dispatch('keydown', key('ArrowRight'));
+    expect(mobile.frame.style.props.has('transform')).toBe(false);
+    expect(store.has(KEY)).toBe(false);
+  });
+
+  it('ignores a key it does not own, so Tab and Escape still reach the browser', () => {
+    const { frame, btn, grip } = makeScalableFrame();
+    btn.dispatch('click', pointer());
+    for (const k of ['Tab', 'Escape', 'Enter', ' ']) {
+      let prevented = false;
+      grip.dispatch(
+        'keydown',
+        key(k, {
+          preventDefault: () => {
+            prevented = true;
+          },
+        }),
+      );
+      expect(prevented).toBe(false);
+    }
+    expect(frame.style.props.has('transform')).toBe(false);
+  });
+
+  it('a key resize is clamped into the legal band at both ends', () => {
+    const { frame, btn, grip } = makeScalableFrame();
+    btn.dispatch('click', pointer());
+    for (let i = 0; i < 60; i++) grip.dispatch('keydown', key('ArrowRight'));
+    expect(scaleOf(frame)).toBe(FRAME_SCALE_MAX);
+    for (let i = 0; i < 60; i++) grip.dispatch('keydown', key('ArrowLeft'));
+    expect(scaleOf(frame)).toBe(FRAME_SCALE_MIN);
+  });
+
+  it('relocalize() re-resolves the grip name, not only the move button', () => {
+    const { grip, mover } = makeScalableFrame();
+    grip.setAttribute('aria-label', 'stale');
+    grip.title = 'stale';
+    mover.relocalize();
+    expect(grip.getAttribute('aria-label')).not.toBe('stale');
+    expect(grip.title).toBe(grip.getAttribute('aria-label'));
+  });
+
+  it('reset() clears the chosen size along with the position', () => {
+    const { frame, btn, grip, mover } = makeScalableFrame();
+    btn.dispatch('click', pointer());
+    grip.dispatch('keydown', key('ArrowRight'));
+    expect(frame.style.props.has('transform')).toBe(true);
+
+    mover.reset();
+    expect(frame.style.props.size).toBe(0);
+    expect(store.has(KEY)).toBe(false);
+    expect(grip.hidden).toBe(true);
   });
 });

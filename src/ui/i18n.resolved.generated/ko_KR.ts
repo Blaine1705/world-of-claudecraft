@@ -2457,7 +2457,7 @@ export const ko_KR: EnTranslations = {
       "lock": "인터페이스 잠금",
       "unlockFrame": "이 프레임 잠금 해제",
       "lockFrame": "이 프레임 잠금",
-      "resizeFrame": "드래그하여 이 프레임 크기 조절"
+      "resizeFrame": "이 프레임 크기 조절"
     },
     "itemTooltip": {
       "requiresLevel": "필요 레벨 {level}",

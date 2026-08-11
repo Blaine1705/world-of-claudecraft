@@ -639,7 +639,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.lock': 'Заблокировать интерфейс',
   'hudChrome.interfaceUnlock.unlockFrame': 'Разблокировать эту рамку',
   'hudChrome.interfaceUnlock.lockFrame': 'Заблокировать эту рамку',
-  'hudChrome.interfaceUnlock.resizeFrame': 'Потяните, чтобы изменить размер рамки',
+  'hudChrome.interfaceUnlock.resizeFrame': 'Изменить размер этой рамки',
   'hudChrome.options.playerFrameScale': 'Размер рамки игрока',
   'hudChrome.options.targetFrameScale': 'Размер рамки цели',
   'hudChrome.options.aurasOnPlayerFrame': 'Баффы у рамки игрока',

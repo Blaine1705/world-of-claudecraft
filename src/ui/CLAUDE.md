@@ -580,6 +580,12 @@ same file), and each module's header carries its own contract.
   keep an always-visible corner button and move only, while the frames this option governs pass
   `buttonOnlyWhenUnlocked` + `scalable` and so carry no chrome until they are unlocked. It is
   also the SINGLE `relocalize()` fan-out arm for every `MovableFrame` in the HUD.
+  **Both frame gestures are keyboard-operable, and a new one must be:** the corner button takes
+  arrow keys to position and the SE grip (a real named `button`, not a decorative div like the
+  chat box's) takes arrow keys to size, Shift for the fine step, each stepping through a pure
+  helper in `target_frame_pos.ts` (`scaleFromKeyStep`). A frame gesture with no keyboard path is
+  a defect: unlocking is the only route to these frames, so a pointer-only affordance leaves a
+  keyboard-only player unable to reach what it changes at all.
 - **deeds_view.ts** / **deeds_window.ts** (+ **deed_tracker_painter.ts**,
   **deeds_leaderboard_view.ts**, **deed_i18n.ts**, **deed_i18n.locales/**,
   **deed_image_ids.ts**): the Book of Deeds achievements window. The DOM-free core builds

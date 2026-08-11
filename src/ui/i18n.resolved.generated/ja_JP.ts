@@ -2457,7 +2457,7 @@ export const ja_JP: EnTranslations = {
       "lock": "インターフェースをロック",
       "unlockFrame": "このフレームのロックを解除",
       "lockFrame": "このフレームをロック",
-      "resizeFrame": "ドラッグしてこのフレームのサイズを変更"
+      "resizeFrame": "このフレームのサイズを変更"
     },
     "itemTooltip": {
       "requiresLevel": "必要レベル {level}",

@@ -642,7 +642,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.lock': 'インターフェースをロック',
   'hudChrome.interfaceUnlock.unlockFrame': 'このフレームのロックを解除',
   'hudChrome.interfaceUnlock.lockFrame': 'このフレームをロック',
-  'hudChrome.interfaceUnlock.resizeFrame': 'ドラッグしてこのフレームのサイズを変更',
+  'hudChrome.interfaceUnlock.resizeFrame': 'このフレームのサイズを変更',
   'hudChrome.options.playerFrameScale': 'プレイヤーフレームの大きさ',
   'hudChrome.options.targetFrameScale': 'ターゲットフレームの大きさ',
   'hudChrome.options.aurasOnPlayerFrame': 'バフをプレイヤーフレームに表示',

@@ -2457,7 +2457,7 @@ export const ru_RU: EnTranslations = {
       "lock": "Заблокировать интерфейс",
       "unlockFrame": "Разблокировать эту рамку",
       "lockFrame": "Заблокировать эту рамку",
-      "resizeFrame": "Потяните, чтобы изменить размер рамки"
+      "resizeFrame": "Изменить размер этой рамки"
     },
     "itemTooltip": {
       "requiresLevel": "Требуется уровень {level}",

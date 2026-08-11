@@ -2457,7 +2457,7 @@ export const sv_SE: EnTranslations = {
       "lock": "Lock interface",
       "unlockFrame": "Unlock this frame",
       "lockFrame": "Lock this frame",
-      "resizeFrame": "Drag to resize this frame"
+      "resizeFrame": "Resize this frame"
     },
     "itemTooltip": {
       "requiresLevel": "Kräver nivå {level}",

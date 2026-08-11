@@ -28,6 +28,13 @@ export const TARGET_FRAME_MARGIN = 8;
 export const FRAME_SCALE_MIN = 0.6;
 export const FRAME_SCALE_MAX = 2;
 
+// Keyboard resize steps, the arrow-key mirror of a grip drag. The coarse step
+// walks the whole legal band in a handful of presses; the fine (Shift) step is
+// the same one-notch-per-press feel the fine MOVE step has, so both gestures on
+// a frame answer to the same modifier.
+export const FRAME_SCALE_KEY_STEP = 0.05;
+export const FRAME_SCALE_KEY_FINE_STEP = 0.01;
+
 /** Clamp a desired size multiplier into the legal band. A non-finite read (a
  *  corrupt store, a divide by a zero rect) falls back to 1 rather than blanking
  *  the frame with a degenerate transform. */
@@ -61,6 +68,27 @@ export function scaleFromGripDrag(
   if (startSize.h > 0) ratios.push((startSize.h + dy) / startSize.h);
   if (ratios.length === 0) return base;
   return clampFrameScale(base * Math.max(...ratios), min, max);
+}
+
+/** Size multiplier for ONE keyboard resize press: `direction` is +1 to grow and
+ *  -1 to shrink, `fine` picks the Shift step. Additive rather than the drag
+ *  path's ratio because a press has no travel to take a ratio from, and an
+ *  additive step is what makes the band walkable in a predictable press count;
+ *  the result is clamped into the same legal band, so holding a key at either
+ *  end simply stops. */
+export function scaleFromKeyStep(
+  startScale: number,
+  direction: number,
+  fine: boolean,
+  min: number = FRAME_SCALE_MIN,
+  max: number = FRAME_SCALE_MAX,
+): number {
+  const base = clampFrameScale(startScale, min, max);
+  const step = fine ? FRAME_SCALE_KEY_FINE_STEP : FRAME_SCALE_KEY_STEP;
+  // Rounded to the step grid so repeated presses cannot drift into float dust
+  // (0.6000000000000001) and so growing then shrinking returns to where it was.
+  const next = Math.round((base + direction * step) / step) * step;
+  return clampFrameScale(next, min, max);
 }
 
 function clamp(v: number, lo: number, hi: number): number {

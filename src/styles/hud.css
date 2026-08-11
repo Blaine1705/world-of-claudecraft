@@ -1248,12 +1248,22 @@
   /* MovableFrame's own grip carries a second class so this gate cannot reach the
      chat box or the meter panels, whose grips are always live. It only appears on
      a frame that is actually loose, mirroring the target aura panel's
-     .ta-unlocked gate. */
+     .ta-unlocked gate. Unlike those other grips this one is a real <button> (it
+     owns the arrow-key resize a keyboard player has no other route to), so the
+     button chrome is reset back to the shared hatch look. */
   .mf-resize-grip {
     display: none;
+    appearance: none;
+    padding: 0;
+    border: 0;
   }
   .tf-unlocked > .mf-resize-grip {
     display: block;
+  }
+  .mf-resize-grip:focus-visible {
+    opacity: 0.9;
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
   }
   /* The cast bar is hidden except while casting, so unlocking shows it as a
      dimmed placeholder that can be positioned. !important is load-bearing: the

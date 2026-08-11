@@ -643,7 +643,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.lock': '인터페이스 잠금',
   'hudChrome.interfaceUnlock.unlockFrame': '이 프레임 잠금 해제',
   'hudChrome.interfaceUnlock.lockFrame': '이 프레임 잠금',
-  'hudChrome.interfaceUnlock.resizeFrame': '드래그하여 이 프레임 크기 조절',
+  'hudChrome.interfaceUnlock.resizeFrame': '이 프레임 크기 조절',
   'hudChrome.options.playerFrameScale': '플레이어 프레임 크기',
   'hudChrome.options.targetFrameScale': '대상 프레임 크기',
   'hudChrome.options.aurasOnPlayerFrame': '버프를 플레이어 프레임에 표시',

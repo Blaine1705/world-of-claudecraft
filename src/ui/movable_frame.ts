@@ -16,6 +16,9 @@
 // option governs (interface_unlock.ts) pass `buttonOnlyWhenUnlocked` plus
 // `scalable`, so they carry no permanent chrome and gain both gestures the
 // moment the coordinator calls setLockState(true).
+// Both gestures are pointer AND keyboard operable: the move button takes arrow
+// keys to position, and the grip takes arrow keys to size. Neither is a
+// pointer-only affordance, because each is the ONLY route to what it changes.
 
 import { t } from './i18n';
 import type { TranslationKey } from './i18n.catalog';
@@ -24,6 +27,7 @@ import {
   parseTargetFramePos,
   placeTargetFrame,
   scaleFromGripDrag,
+  scaleFromKeyStep,
   serializeTargetFramePos,
   type TargetFramePos,
 } from './target_frame_pos';
@@ -49,7 +53,8 @@ export interface MovableFrameConfig {
    *  so it can be scaled as well as moved. Off by default: the three unit frames
    *  that shipped this controller are sized by their own Interface sliders. */
   scalable?: boolean;
-  /** Tooltip on the resize grip. Required when `scalable` is set. */
+  /** Accessible name / tooltip on the resize grip. Required when `scalable` is
+   *  set: the grip is a real button, so it is never nameless. */
   resizeLabelKey?: TranslationKey;
   /** Hide the corner move button while the frame is LOCKED, so the frame is
    *  movable only through the global "Unlock interface" toggle. The three unit
@@ -73,7 +78,7 @@ export class MovableFrame {
   private unlocked = false;
   private gesture: MoveGesture | ScaleGesture | null = null;
   private readonly btn: HTMLButtonElement;
-  private grip: HTMLElement | null = null;
+  private grip: HTMLButtonElement | null = null;
 
   constructor(private readonly cfg: MovableFrameConfig) {
     // The corner toggle. Built here (like the chat resize grip) so index.html
@@ -85,7 +90,6 @@ export class MovableFrame {
     btn.setAttribute('aria-keyshortcuts', 'ArrowUp ArrowDown ArrowLeft ArrowRight');
     cfg.frame.appendChild(btn);
     this.btn = btn;
-    this.refreshBtn();
     btn.addEventListener('click', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
@@ -96,17 +100,24 @@ export class MovableFrame {
     // The SE-corner grip, built here like the button (and like the chat box's own
     // grip) so index.html stays untouched. CSS keeps it out of the way while the
     // frame is locked; the pointer gate below refuses a locked gesture anyway.
+    // It is a real BUTTON, not the decorative div the chat box uses: this one is
+    // the only path to a frame's size, so it carries its own accessible name and
+    // the arrow-key resize below, exactly as the move button carries arrow-key
+    // positioning. A pointer-only grip would leave a keyboard player able to
+    // unlock and move every frame but resize none of them.
     if (cfg.scalable) {
-      const grip = document.createElement('div');
+      const grip = document.createElement('button');
+      grip.type = 'button';
       // The second class is what scopes the "only while unlocked" CSS gate to
       // this controller's grips, leaving the chat box + meter panel grips alone.
       grip.className = 'panel-resize-grip mf-resize-grip';
-      grip.setAttribute('aria-hidden', 'true');
-      if (cfg.resizeLabelKey) grip.title = t(cfg.resizeLabelKey);
+      grip.setAttribute('aria-keyshortcuts', 'ArrowUp ArrowDown ArrowLeft ArrowRight');
       cfg.frame.appendChild(grip);
       this.grip = grip;
       grip.addEventListener('pointerdown', (ev) => this.onScaleStart(ev));
+      grip.addEventListener('keydown', (ev) => this.onKeyScale(ev));
     }
+    this.refreshChrome();
 
     // touch-action:none (so a drag is not stolen by browser panning) is scoped to
     // the unlocked state in CSS (.unitframe.tf-unlocked), never applied while
@@ -133,8 +144,7 @@ export class MovableFrame {
 
   /** Re-resolve the button's + grip's t() labels in place (language switch). */
   relocalize(): void {
-    this.refreshBtn();
-    if (this.grip && this.cfg.resizeLabelKey) this.grip.title = t(this.cfg.resizeLabelKey);
+    this.refreshChrome();
   }
 
   /** True while the frame accepts a drag / grip gesture. */
@@ -180,7 +190,7 @@ export class MovableFrame {
 
   // The move button's accessible name / tooltip and pressed state track whether the
   // frame is unlocked; the frame gets a class so the cursor + drag affordance show.
-  private refreshBtn(): void {
+  private refreshChrome(): void {
     const label = this.unlocked ? t(this.cfg.lockLabelKey) : t(this.cfg.unlockLabelKey);
     this.btn.setAttribute('aria-pressed', this.unlocked ? 'true' : 'false');
     this.btn.setAttribute('aria-label', label);
@@ -194,11 +204,23 @@ export class MovableFrame {
       this.btn.hidden = !this.unlocked;
     }
     this.cfg.frame.classList.toggle('tf-unlocked', this.unlocked);
+    // The grip is a real control too, so it follows the button out of the tab
+    // order while the frame is locked. CSS already hides it (it is styled off a
+    // .tf-unlocked parent), but `hidden` is what keeps a locked frame's grip
+    // unreachable to a keyboard even before the stylesheet has a say.
+    if (this.grip) {
+      if (this.cfg.resizeLabelKey) {
+        const resizeLabel = t(this.cfg.resizeLabelKey);
+        this.grip.setAttribute('aria-label', resizeLabel);
+        this.grip.title = resizeLabel;
+      }
+      this.grip.hidden = !this.unlocked;
+    }
   }
 
   private setUnlocked(unlocked: boolean): void {
     this.unlocked = unlocked;
-    this.refreshBtn();
+    this.refreshChrome();
   }
 
   // Seed the position from the live rect the first time a drag starts, so a frame
@@ -316,6 +338,32 @@ export class MovableFrame {
       left: (this.pos?.left ?? 0) + direction.left * step,
       top: (this.pos?.top ?? 0) + direction.top * step,
       scale: this.pos?.scale,
+    };
+    this.applyPos();
+    this.persistPos();
+  }
+
+  // The grip's keyboard half, the exact mirror of onKeyMove: arrow keys walk the
+  // size multiplier the pointer drag writes, Shift gives the fine step, and the
+  // result persists like any other grip gesture. Right/Down grow and Left/Up
+  // shrink, matching which way the SE grip travels for the same change.
+  private onKeyScale(ev: KeyboardEvent): void {
+    if (!this.unlocked || this.cfg.isMobileLayout()) return;
+    const directions: Partial<Record<string, number>> = {
+      ArrowLeft: -1,
+      ArrowUp: -1,
+      ArrowRight: 1,
+      ArrowDown: 1,
+    };
+    const direction = directions[ev.key];
+    if (direction === undefined) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    this.ensurePos();
+    this.pos = {
+      left: this.pos?.left ?? 0,
+      top: this.pos?.top ?? 0,
+      scale: scaleFromKeyStep(this.pos?.scale ?? 1, direction, ev.shiftKey),
     };
     this.applyPos();
     this.persistPos();

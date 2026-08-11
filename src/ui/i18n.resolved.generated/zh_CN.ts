@@ -2457,7 +2457,7 @@ export const zh_CN: EnTranslations = {
       "lock": "锁定界面",
       "unlockFrame": "解锁此框体",
       "lockFrame": "锁定此框体",
-      "resizeFrame": "拖动以调整此框体大小"
+      "resizeFrame": "调整此框体大小"
     },
     "itemTooltip": {
       "requiresLevel": "需要等级 {level}",
