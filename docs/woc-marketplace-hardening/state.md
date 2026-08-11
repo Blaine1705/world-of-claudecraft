@@ -5,9 +5,9 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-01-branch-baseline.md`
+- Next file to run: `docs/woc-marketplace-hardening/phase-01-qa.md`
 - Packet created 2026-08-11 from `review.md` (the 2026-08-11 three-repo review).
-- Nothing implemented yet. All 22 phases NOT STARTED (see progress.md).
+- 01 implemented (NOT yet QA'd); see progress.md and the ledger below.
 
 ## Repos and branches
 
@@ -102,9 +102,8 @@ Still open (a phase that hits one asks at session start):
   there again, re-derive from a suite run, never take either side's number.
 - `npm run i18n:build` does NOT run `i18n:scan`; the S3 guard needs `i18n.status.json`
   present (full `npm run i18n:gen` creates it). Bit the review session at push time.
-- `hud.ts` is monolith-RED (20005 > 19600) until phase 01 extracts the p2p controller.
-  Until then `node scripts/gate_select.mjs` carries that known red; run the steps behind
-  it by hand.
+- (RESOLVED by 01) `hud.ts` was monolith-RED until the p2p controller extraction;
+  the gate no longer carries a known red.
 - The marketplace test set on the game branch was 866 passing at packet creation; the
   full suites: game 1524, service 413, dashboard 131.
 - Dashboard `npm audit`: 11 vulnerabilities at review time (phase 19 owns it).
@@ -126,4 +125,23 @@ Still open (a phase that hits one asks at session start):
 
 ## Per-phase ledger (append as phases complete)
 
-(none yet)
+- 01 branch-baseline (2026-08-11, session start e4c3dde956, tip 418f75b876,
+  LOCAL, not pushed per R4): branch was already current with
+  origin/release/v0.37.0 (no sync merge needed). All five coordinator
+  re-reviews of merge a52da32c89 CLEAN; non-drift findings applied (W9_TAGS
+  trade_close row, ClientWorld tradeClose send pin in tests/trade.test.ts,
+  custody facade fix in server/woc_market_custody.ts, two comment fixes). H7
+  closed: the trade window + p2p offer machine now live in
+  src/ui/hud/woc_trade/ (woc_trade_controller.ts in UI_DOM_MODULES,
+  woc_trade_offer_view.ts in UI_PURE_CORES, index.ts barrel) with new
+  view-core transition tests (tests/woc_trade_offer_view.test.ts) and a
+  controller deps-bag suite (tests/woc_trade_controller.test.ts); hud.ts
+  19347 lines, ceiling LOWERED 19600 to 19400. hud_update_drive guard moved
+  to a module row; language fanout has a NOT_A_LANGUAGE_GATE row for
+  lastTradeSig. `node scripts/gate_select.mjs` GREEN on tip 418f75b876; the
+  planner fell back to mode=full (branch-wide diff), so the full vitest
+  suite, browser regressions, typecheck, and all builds ran green: the
+  review's owed full-gate run is discharged. frontend-seam-reviewer and
+  qa-checklist findings ALL applied (1 blocking biome error, dead
+  imports/fields, re-bounded source-pin slices, the controller suite);
+  deferrals recorded in progress.md.
