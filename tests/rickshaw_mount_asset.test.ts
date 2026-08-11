@@ -78,7 +78,12 @@ describe('rickshaw mount asset pipeline', () => {
     // follows (tests/glb_texture_compression.test.ts), verified directly
     // here too so a re-export that skips compress_glb_textures.mjs fails
     // this asset's own contract test, not just the tree-wide sweep.
-    expect(root.listExtensionsRequired().map((e) => e.extensionName).sort()).toEqual([
+    expect(
+      root
+        .listExtensionsRequired()
+        .map((e) => e.extensionName)
+        .sort(),
+    ).toEqual([
       'EXT_meshopt_compression',
       'KHR_mesh_quantization',
       'KHR_texture_basisu',
