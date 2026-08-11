@@ -407,6 +407,7 @@ const UI_PURE_CORES = [
   'src/ui/trade_view.ts',
   'src/ui/trade_woc_view.ts',
   'src/ui/hud/rift/rift_floor_tracker_view.ts',
+  'src/ui/hud/woc_trade/woc_trade_offer_view.ts',
   'src/ui/safe_local_storage.ts',
 ].map((rel) => join(repoRoot, rel));
 
@@ -1836,6 +1837,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/vendor/unbind_window.ts',
   'src/ui/hud/vendor/vendor_window.ts',
   'src/ui/hud/vendor/warfare_vendor_window.ts',
+  'src/ui/hud/woc_trade/woc_trade_controller.ts',
   'src/ui/i18n.ts',
   'src/ui/icon_prewarm.ts',
   'src/ui/icon_prewarm_worker.ts',

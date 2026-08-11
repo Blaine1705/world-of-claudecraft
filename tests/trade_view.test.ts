@@ -100,14 +100,21 @@ describe('buildTradeItemRow (stale-client guard, R34)', () => {
   });
 });
 
-describe('trade window painter wiring (source pins, hud.ts updateTradeWindow)', () => {
+describe('trade window painter wiring (source pins, woc_trade updateTradeWindow)', () => {
   // The pure core decides; these pins hold the painter to consuming it. The
   // method body is comment-stripped first so a comment naming the assignment
-  // cannot satisfy an ordering pin.
-  const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
-  const start = hud.indexOf('private updateTradeWindow(');
-  const end = hud.indexOf('attachOptions(hooks: OptionsHooks)');
-  const body = hud
+  // cannot satisfy an ordering pin. updateTradeWindow is the last member of
+  // WocTradeController, so the slice runs from its signature to end of file.
+  const controller = readFileSync(
+    new URL('../src/ui/hud/woc_trade/woc_trade_controller.ts', import.meta.url),
+    'utf8',
+  );
+  const start = controller.indexOf('updateTradeWindow(): void {');
+  // The method closes at the first two-space-indented brace after its
+  // signature (every nested block closes deeper), so the slice cannot
+  // silently widen if a member ever lands after updateTradeWindow.
+  const end = controller.indexOf('\n  }', start);
+  const body = controller
     .slice(start, end)
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/\/\/[^\n]*/g, '');

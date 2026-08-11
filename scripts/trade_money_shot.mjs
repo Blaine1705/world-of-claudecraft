@@ -53,10 +53,10 @@ const res = await page.evaluate(() => {
     theirAccepted: false,
   };
   Object.defineProperty(sim, 'tradeInfo', { configurable: true, get() { return TI; } });
-  hud.updateTradeWindow();            // opens window, resets stagedTrade to 0
+  hud.wocTrade.updateTradeWindow();   // opens window, resets stagedTrade to 0
   hud.stagedTrade = { items: [], copper: 53245 };
-  hud.lastTradeSig = '';              // force a re-render with the staged amount
-  hud.updateTradeWindow();
+  hud.wocTrade.lastTradeSig = '';     // force a re-render with the staged amount
+  hud.wocTrade.updateTradeWindow();
   const g = document.querySelector('#trade-g');
   const s = document.querySelector('#trade-s');
   const c = document.querySelector('#trade-c');

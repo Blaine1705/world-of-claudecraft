@@ -433,6 +433,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
       'lastChip gates only the header ARIA presence swap (aria-expanded / aria-controls / aria-haspopup), which carries no player-visible text. Every string in this painter goes through the elided writer facet, which compares resolved text, and the fan-out drives it through this.updateReliquaryTracker.',
   },
   {
+    file: 'hud/woc_trade/woc_trade_controller.ts',
+    memos: ['lastTradeSig'],
+    reason:
+      'the trade window repaint signature, moved verbatim off the coordinator by the woc_trade extraction with its posture unchanged: the signature reads no text at all (offer structs, staged items and copper, acceptance flags, partner), so a locale switch cannot move it, and there is deliberately no fan-out arm, exactly as when the method lived on hud.ts. A live trade re-renders in the new locale on the next data motion (either offer, stake, or acceptance change; the standing-offer poll adoption); an idle open trade keeps the previous locale until then, the short-lived two-player surface this window is. Giving it a relocalize() is a player-visible behavior change the extraction must not make; the packet defers that call to its UX pass.',
+  },
+  {
     file: 'hud.ts',
     memos: 'coordinator',
     reason:
@@ -690,7 +696,12 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // no text); fillGrid rebuilds every cell unconditionally and the
       // existing bags fan-out arm repaints the window wholesale on a locale
       // switch.
-    ).toBe(8);
+      // 9 as of the woc_trade extraction: the trade window's `lastTradeSig`
+      // moved verbatim off the coordinator (where the blanket hud.ts row
+      // covered it) into hud/woc_trade/woc_trade_controller.ts, carrying the
+      // coordinator-era posture unchanged; the row states the reasoning and
+      // the deferred relocalize call.
+    ).toBe(9);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {
