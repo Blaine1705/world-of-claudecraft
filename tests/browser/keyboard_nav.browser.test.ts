@@ -467,6 +467,7 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
       rarity: 'all',
       sort: 'name',
       page: 0,
+      collapseLowest: false,
     });
 
     pickItemType(root, 'weapon');
@@ -481,6 +482,7 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
       rarity: 'all',
       sort: 'name',
       page: 0,
+      collapseLowest: false,
     });
 
     // ...and both advanced menus disappear again for a type that has neither.
@@ -591,6 +593,7 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
       rarity: 'all',
       sort: 'name',
       page: 0,
+      collapseLowest: false,
     });
 
     // Leaving the bag category clears the capacity back to 'all' rather than sending a
