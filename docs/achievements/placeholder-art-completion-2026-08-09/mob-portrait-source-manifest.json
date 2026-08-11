@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "0dc1944854b74da6977685921d16f56eac0f88682a99f338198c754e2a5cb778",
+  "rendererFingerprint": "e3ade587f321b68839122d884e2a244e3d031b73e08825e43951f67ee03fa319",
   "renderer": {
     "trackedFiles": [
       {
@@ -28,7 +28,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 3817662,
-      "sha256": "9e9a6bdd07baf55d0d656454a569c33ec2cf7d32db0413c5ea64a0a5a9902573",
+      "sha256": "3f2592c5a4ad39b80090e35379a8ee88e7da57d59c16105fc39ac9a6c315b836",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -7292,8 +7292,8 @@
         "model": {
           "url": "models/creatures/kobold.glb",
           "path": "public/models/creatures/kobold.glb",
-          "bytes": 324000,
-          "sha256": "2fbdca270ba525e38eea5bc9381d7d68d5fd24b2128878e61bb984c4653ed298"
+          "bytes": 324004,
+          "sha256": "1cb4fe6907ed7c03c17150a4af29cc2bc9bba68a30a73ea461f302732fe219c5"
         },
         "idle": "Idle",
         "height": 2.1,
@@ -7310,7 +7310,7 @@
         "resolved": "#9c640c",
         "strength": 0.12
       },
-      "sourceFingerprint": "d5cd94f9f1e3639faabf175d2ec8c0eb668afbd3277ba151ac8235ff46928f85",
+      "sourceFingerprint": "d19ee3b2692349523e7ade48a684084ba842f30fb1c7a51507397787dc8a5030",
       "output": {
         "path": "public/ui/mobs/tunnel_rat.webp",
         "bytes": 2564,
