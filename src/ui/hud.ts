@@ -19266,6 +19266,8 @@ export function abilityRequirementLines(def: AbilityDef, spec?: string | null): 
         return t('abilityUi.tooltip.friendlyTarget');
       case 'enemyTarget':
         return t('abilityUi.tooltip.enemyTarget');
+      case 'anyTarget':
+        return t('abilityUi.tooltip.anyTarget');
       case 'selfOnly':
       default:
         return t('abilityUi.tooltip.selfOnly');

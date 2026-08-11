@@ -2330,6 +2330,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.offGlobalCooldown': '不觸發公共冷卻',
   'abilityUi.tooltip.friendlyTarget': '友方目標',
   'abilityUi.tooltip.enemyTarget': '敵方目標',
+  'abilityUi.tooltip.anyTarget': '敵方或友方目標',
   'abilityUi.tooltip.selfOnly': '僅對自己',
   'abilityUi.tooltip.damageRange': '{min} 到 {max}',
   'abilityUi.tooltip.finisherDamage': '{base} 加每個連擊點 {perCombo}',
