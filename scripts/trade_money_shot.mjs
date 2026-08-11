@@ -5,8 +5,9 @@
 // Boots the offline game headless at max graphics, stubs an open trade so the
 // REAL HUD renders updateTradeWindow(), and captures tmp/trade_money.png.
 // Run with `npm run dev` already up.
-import puppeteer from 'puppeteer-core';
+
 import fs from 'node:fs';
+import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
 
 const URL = (process.env.GAME_URL ?? 'http://localhost:5173') + '/?gfx=ultra';
@@ -14,22 +15,35 @@ const OUT = process.env.SHOT ?? 'tmp/trade_money.png';
 fs.mkdirSync('tmp', { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const fails = [];
-const check = (cond, msg) => { console.log(`${cond ? 'OK  ' : 'FAIL'}  ${msg}`); if (!cond) fails.push(msg); };
+const check = (cond, msg) => {
+  console.log(`${cond ? 'OK  ' : 'FAIL'}  ${msg}`);
+  if (!cond) fails.push(msg);
+};
 
 const browser = await puppeteer.launch({
   executablePath: BROWSER_PATH,
   headless: 'new',
-  args: ['--window-size=1600,1000', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--no-sandbox'],
+  args: [
+    '--window-size=1600,1000',
+    '--use-angle=swiftshader',
+    '--enable-unsafe-swiftshader',
+    '--no-sandbox',
+  ],
   defaultViewport: { width: 1600, height: 1000, deviceScaleFactor: 2 },
 });
 const page = await browser.newPage();
 page.on('pageerror', (e) => fails.push('PAGEERROR: ' + e.message));
-page.on('console', (m) => { if (m.type() === 'error') console.log('CONSOLE-ERR:', m.text()); });
+page.on('console', (m) => {
+  if (m.type() === 'error') console.log('CONSOLE-ERR:', m.text());
+});
 
 await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 40000 });
 await page.waitForSelector('#btn-offline', { visible: true, timeout: 25000 });
 await page.evaluate(() => document.querySelector('#btn-offline').click());
-await page.waitForSelector('#offline-select .mini-class[data-class="warrior"]', { visible: true, timeout: 25000 });
+await page.waitForSelector('#offline-select .mini-class[data-class="warrior"]', {
+  visible: true,
+  timeout: 25000,
+});
 await sleep(200);
 await page.evaluate(() => {
   document.querySelector('#char-name').value = 'Hero';
@@ -37,7 +51,10 @@ await page.evaluate(() => {
   document.querySelector('#btn-start-offline').click();
 });
 // ?gfx=ultra under software rendering boots slowly (~30-40s); poll generously.
-await page.waitForFunction(() => window.__game?.sim?.entities?.size > 5, { timeout: 60000, polling: 300 });
+await page.waitForFunction(() => window.__game?.sim?.entities?.size > 5, {
+  timeout: 60000,
+  polling: 300,
+});
 await sleep(2500); // let max-gfx scene settle
 
 // Stub an open trade and stage a money amount, then drive the real HUD render.
@@ -52,10 +69,15 @@ const res = await page.evaluate(() => {
     myAccepted: false,
     theirAccepted: false,
   };
-  Object.defineProperty(sim, 'tradeInfo', { configurable: true, get() { return TI; } });
-  hud.wocTrade.updateTradeWindow();   // opens window, resets stagedTrade to 0
+  Object.defineProperty(sim, 'tradeInfo', {
+    configurable: true,
+    get() {
+      return TI;
+    },
+  });
+  hud.wocTrade.updateTradeWindow(); // opens window, resets stagedTrade to 0
   hud.stagedTrade = { items: [], copper: 53245 };
-  hud.wocTrade.lastTradeSig = '';     // force a re-render with the staged amount
+  hud.wocTrade.lastTradeSig = ''; // force a re-render with the staged amount
   hud.wocTrade.updateTradeWindow();
   const g = document.querySelector('#trade-g');
   const s = document.querySelector('#trade-s');
@@ -64,15 +86,25 @@ const res = await page.evaluate(() => {
     open: document.querySelector('#trade-window')?.style.display === 'block',
     threeFields: !!(g && s && c),
     legacyField: !!document.querySelector('#trade-copper'),
-    g: g?.value, s: s?.value, c: c?.value,
-    coins: document.querySelectorAll('.trade-coins .coin.g, .trade-coins .coin.s, .trade-coins .coin.c').length,
+    g: g?.value,
+    s: s?.value,
+    c: c?.value,
+    coins: document.querySelectorAll(
+      '.trade-coins .coin.g, .trade-coins .coin.s, .trade-coins .coin.c',
+    ).length,
   };
 });
 check(res.open, 'trade window is open');
 check(res.threeFields, 'trade money has three gold/silver/copper fields');
 check(!res.legacyField, 'the old single #trade-copper field is gone');
-check(res.g === '5' && res.s === '32' && res.c === '45', `53245c seeds 5g 32s 45c (got ${res.g}g ${res.s}s ${res.c}c)`);
-check(res.coins === 3, `each money field shows a gold/silver/copper coin glyph (got ${res.coins}/3)`);
+check(
+  res.g === '5' && res.s === '32' && res.c === '45',
+  `53245c seeds 5g 32s 45c (got ${res.g}g ${res.s}s ${res.c}c)`,
+);
+check(
+  res.coins === 3,
+  `each money field shows a gold/silver/copper coin glyph (got ${res.coins}/3)`,
+);
 
 await sleep(400);
 const win = await page.$('#trade-window');
@@ -80,5 +112,9 @@ await win.screenshot({ path: OUT });
 console.log('wrote ' + OUT);
 
 await browser.close();
-console.log(fails.length === 0 ? '\nALL TRADE-MONEY CHECKS PASSED' : `\n${fails.length} CHECK(S) FAILED:\n - ` + fails.join('\n - '));
+console.log(
+  fails.length === 0
+    ? '\nALL TRADE-MONEY CHECKS PASSED'
+    : `\n${fails.length} CHECK(S) FAILED:\n - ` + fails.join('\n - '),
+);
 process.exit(fails.length === 0 ? 0 : 1);
