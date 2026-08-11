@@ -939,6 +939,14 @@ export const en: EnTranslations = {
       "notNow": "Not now",
       "update": "Update"
     },
+    "otaUpdate": {
+      "title": "Game Update",
+      "downloading": "Downloading update: {percent}",
+      "applying": "Update downloaded. Restarting the game to apply it.",
+      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
+      "continueAnyway": "Continue without updating",
+      "progressLabel": "Update download progress"
+    },
     "cameraPrompt": {
       "title": "Choose Your Camera",
       "intro": "Pick how the camera follows your character.",
@@ -1040,6 +1048,7 @@ export const en: EnTranslations = {
       "emoteWheel": "Emote Wheel",
       "targetFriendly": "Target Nearest Friendly",
       "targetFriendlyNext": "Cycle Friendly Target",
+      "targetPrev": "Cycle Target Backward",
       "discord": "Discord",
       "valecup": "Vale Cup",
       "bgFlag": "Battleground Flag Action",
@@ -4385,6 +4394,7 @@ export const en: EnTranslations = {
       "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Use action bar abilities (the number row; a second bar sits on the numpad)",
+      "targetPrev": "Cycle target backward",
       "targetFriendly": "Target nearest friendly",
       "cycleFriendly": "Cycle friendly target",
       "targetAuras": "Target buffs and debuffs",

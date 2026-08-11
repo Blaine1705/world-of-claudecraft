@@ -939,6 +939,14 @@ export const fr_FR: EnTranslations = {
       "notNow": "Pas maintenant",
       "update": "Mettre à jour"
     },
+    "otaUpdate": {
+      "title": "Game Update",
+      "downloading": "Downloading update: {percent}",
+      "applying": "Update downloaded. Restarting the game to apply it.",
+      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
+      "continueAnyway": "Continue without updating",
+      "progressLabel": "Update download progress"
+    },
     "cameraPrompt": {
       "title": "Choisissez votre caméra",
       "intro": "Choisissez comment la caméra suit votre personnage.",
@@ -1040,6 +1048,7 @@ export const fr_FR: EnTranslations = {
       "emoteWheel": "Roue des emotes",
       "targetFriendly": "Cibler l'allié le plus proche",
       "targetFriendlyNext": "Changer de cible alliée",
+      "targetPrev": "Revenir à la cible précédente",
       "discord": "Discord",
       "valecup": "Coupe du Val",
       "bgFlag": "Champ de bataille : drapeau",
@@ -4385,6 +4394,7 @@ export const fr_FR: EnTranslations = {
       "dungeonFinder": "Chercheur de donjons",
       "discord": "Discord",
       "abilities": "Utiliser les capacités de la barre d'action (la rangée de chiffres ; une seconde barre se trouve sur le pavé numérique)",
+      "targetPrev": "Revenir à la cible précédente",
       "targetFriendly": "Cibler l'allié le plus proche",
       "cycleFriendly": "Cibler l'allié suivant",
       "targetAuras": "Améliorations et affaiblissements de la cible",

@@ -939,6 +939,14 @@ export const it_IT: EnTranslations = {
       "notNow": "Non ora",
       "update": "Aggiorna"
     },
+    "otaUpdate": {
+      "title": "Game Update",
+      "downloading": "Downloading update: {percent}",
+      "applying": "Update downloaded. Restarting the game to apply it.",
+      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
+      "continueAnyway": "Continue without updating",
+      "progressLabel": "Update download progress"
+    },
     "cameraPrompt": {
       "title": "Scegli la Telecamera",
       "intro": "Scegli come la telecamera segue il tuo personaggio.",
@@ -1040,6 +1048,7 @@ export const it_IT: EnTranslations = {
       "emoteWheel": "Ruota emote",
       "targetFriendly": "Bersaglia l'amico più vicino",
       "targetFriendlyNext": "Scorri i bersagli amici",
+      "targetPrev": "Scorri i bersagli indietro",
       "discord": "Discord",
       "valecup": "Coppa della Valle",
       "bgFlag": "Azione Bandiera del Campo di Battaglia",
@@ -4385,6 +4394,7 @@ export const it_IT: EnTranslations = {
       "dungeonFinder": "Cercatore di Dungeon",
       "discord": "Discord",
       "abilities": "Usa le abilità della barra delle azioni (la fila dei numeri; una seconda barra è sul tastierino numerico)",
+      "targetPrev": "Scorri i bersagli indietro",
       "targetFriendly": "Bersaglia l'amico più vicino",
       "cycleFriendly": "Scorri i bersagli amici",
       "targetAuras": "Potenziamenti e malus del bersaglio",

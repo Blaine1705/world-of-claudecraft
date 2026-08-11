@@ -939,6 +939,14 @@ export const tr_TR: EnTranslations = {
       "notNow": "Şimdi Değil",
       "update": "Güncelle"
     },
+    "otaUpdate": {
+      "title": "Game Update",
+      "downloading": "Downloading update: {percent}",
+      "applying": "Update downloaded. Restarting the game to apply it.",
+      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
+      "continueAnyway": "Continue without updating",
+      "progressLabel": "Update download progress"
+    },
     "cameraPrompt": {
       "title": "Kamera Modunu Seç",
       "intro": "Kameranın karakterini nasıl takip edeceğini seç.",
@@ -1040,6 +1048,7 @@ export const tr_TR: EnTranslations = {
       "emoteWheel": "İfade Çarkı",
       "targetFriendly": "En Yakın Dostu Hedefle",
       "targetFriendlyNext": "Dost Hedefler Arasında Geç",
+      "targetPrev": "Hedefler Arasında Geri Geç",
       "discord": "Discord",
       "valecup": "Vadi Kupası",
       "bgFlag": "Savaş Alanı Sancak Eylemi",
@@ -4385,6 +4394,7 @@ export const tr_TR: EnTranslations = {
       "dungeonFinder": "Zindan Bulucu",
       "discord": "Discord",
       "abilities": "Eylem çubuğu yeteneklerini kullan (rakam sırası; ikinci bir çubuk sayı tuş takımında yer alır)",
+      "targetPrev": "Hedefler arasında geri geç",
       "targetFriendly": "En yakın dostu hedefle",
       "cycleFriendly": "Dost hedefler arasında geç",
       "targetAuras": "Hedefin güçlendirme ve zayıflatmaları",

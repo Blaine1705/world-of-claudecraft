@@ -939,6 +939,14 @@ export const nl_NL: EnTranslations = {
       "notNow": "Niet nu",
       "update": "Bijwerken"
     },
+    "otaUpdate": {
+      "title": "Game Update",
+      "downloading": "Downloading update: {percent}",
+      "applying": "Update downloaded. Restarting the game to apply it.",
+      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
+      "continueAnyway": "Continue without updating",
+      "progressLabel": "Update download progress"
+    },
     "cameraPrompt": {
       "title": "Kies je Camera",
       "intro": "Kies hoe de camera je personage volgt.",
@@ -1040,6 +1048,7 @@ export const nl_NL: EnTranslations = {
       "emoteWheel": "Emotewiel",
       "targetFriendly": "Dichtstbijzijnde Bondgenoot Aanwijzen",
       "targetFriendlyNext": "Door Bondgenoten Bladeren",
+      "targetPrev": "Achteruit Door Doelwitten Bladeren",
       "discord": "Discord",
       "valecup": "Dalbeker",
       "bgFlag": "Slagveldvlag-actie",
@@ -4385,6 +4394,7 @@ export const nl_NL: EnTranslations = {
       "dungeonFinder": "Kerkerzoeker",
       "discord": "Discord",
       "abilities": "Actiebalkvaardigheden gebruiken (de cijferrij; een tweede balk staat op het numerieke toetsenblok)",
+      "targetPrev": "Achteruit door doelwitten bladeren",
       "targetFriendly": "Dichtstbijzijnde bondgenoot aanwijzen",
       "cycleFriendly": "Door bondgenoten bladeren",
       "targetAuras": "Buffs en debuffs van het doelwit",

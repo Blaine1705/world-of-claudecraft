@@ -126,6 +126,7 @@ export const IWORLD_MEMBERS = [
   { name: 'cancelAura', kind: 'method' },
   { name: 'targetEntity', kind: 'method' },
   { name: 'tabTarget', kind: 'method' },
+  { name: 'tabTargetPrev', kind: 'method' },
   { name: 'targetNearestFriendly', kind: 'method' },
   { name: 'friendlyTabTarget', kind: 'method' },
   { name: 'setStopAutoAttackOnTargetSwitch', kind: 'method' },
@@ -587,9 +588,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // method being the Phase 22 reliquaryRarity), leaving 317. The fourth data
     // member is reliquaryObtainCounts, the Phase 17 per-relic obtain tally.
     // The Phase 19 nameplate border adds the IWorldDeeds pair activeBorder
-    // (data) + setActiveBorder (method), leaving 319. This branch's neutral
-    // trade close (tradeClose, a sibling of tradeCancel that ends a session
-    // without calling it a cancellation) adds one command member, leaving 320.
+    // (data) + setActiveBorder (method), leaving 319. The v0.37.0 release's
+    // backward target cycle (Shift+Tab) adds tabTargetPrev (IWorldTargeting, a
+    // method), and this branch's neutral trade close (tradeClose, a sibling of
+    // tradeCancel that ends a session without calling it a cancellation) adds one
+    // command member; the merged tree carries both.
     //
     // NOTE for the next merge, four syncs run now: BOTH sides of this pin move
     // it independently every cycle. Twice git merged identical numbers with no
@@ -599,9 +602,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(320);
+    expect(IWORLD_MEMBERS.length).toBe(321);
     expect(DATA_MEMBERS.length).toBe(85);
-    expect(METHOD_MEMBERS.length).toBe(235);
+    expect(METHOD_MEMBERS.length).toBe(236);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -896,6 +899,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'submitLootRoll',
       'switchLoadout',
       'tabTarget',
+      'tabTargetPrev',
       'takeActionBarLayoutRestore',
       'talentPoints',
       'talentRole',
@@ -1235,6 +1239,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'submitLootRoll',
       'switchLoadout',
       'tabTarget',
+      'tabTargetPrev',
       'takeActionBarLayoutRestore',
       'talentPoints',
       'targetEntity',
@@ -1358,6 +1363,7 @@ type _ExhaustCombat = AssertNever<Exclude<keyof IWorldCombat, (typeof FACET_COMB
 const FACET_TARGETING = [
   'targetEntity',
   'tabTarget',
+  'tabTargetPrev',
   'targetNearestFriendly',
   'friendlyTabTarget',
   'setStopAutoAttackOnTargetSwitch',
@@ -1869,8 +1875,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(320);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(320);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(321);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(321);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);
