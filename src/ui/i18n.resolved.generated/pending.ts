@@ -9,25 +9,140 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "abilityUi.tooltip.anyTarget",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name"
+  ],
+  "es_ES": [
+    "abilityUi.tooltip.anyTarget",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name"
+  ],
+  "fr_FR": [
+    "abilityUi.tooltip.anyTarget",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name"
+  ],
+  "fr_CA": [
+    "abilityUi.tooltip.anyTarget",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "abilityUi.tooltip.anyTarget",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name"
+  ],
+  "de_DE": [
+    "abilityUi.tooltip.anyTarget",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name"
+  ],
+  "zh_CN": [
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name"
+  ],
+  "zh_TW": [
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name"
+  ],
+  "ko_KR": [
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name"
+  ],
+  "ja_JP": [
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name"
+  ],
+  "pt_BR": [
+    "abilityUi.tooltip.anyTarget",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name"
+  ],
+  "ru_RU": [
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name"
+  ],
+  "cs_CZ": [
+    "abilityUi.tooltip.anyTarget",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name"
+  ],
+  "nl_NL": [
+    "abilityUi.tooltip.anyTarget",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name"
+  ],
+  "pl_PL": [
+    "abilityUi.tooltip.anyTarget",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name"
+  ],
+  "id_ID": [
+    "abilityUi.tooltip.anyTarget",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name"
+  ],
+  "tr_TR": [
+    "abilityUi.tooltip.anyTarget",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name"
+  ],
+  "sv_SE": [
+    "abilityUi.tooltip.anyTarget",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name"
+  ],
+  "vi_VN": [
+    "abilityUi.tooltip.anyTarget",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name"
+  ],
+  "da_DK": [
+    "abilityUi.tooltip.anyTarget",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name"
+  ]
 };

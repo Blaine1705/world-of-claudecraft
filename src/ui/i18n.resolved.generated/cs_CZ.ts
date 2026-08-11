@@ -8582,6 +8582,7 @@ export const cs_CZ: EnTranslations = {
       "offGlobalCooldown": "Mimo globální dobu obnovy",
       "friendlyTarget": "Přátelský cíl",
       "enemyTarget": "Nepřátelský cíl",
+      "anyTarget": "Enemy or friendly target",
       "selfOnly": "Pouze na sebe",
       "damageRange": "{min} až {max}",
       "finisherDamage": "{base} plus {perCombo} za combo bod"
@@ -9362,6 +9363,14 @@ export const cs_CZ: EnTranslations = {
       "crippling_poison": {
         "name": "Olověný jed",
         "description": "Zasáhne cíl olověným jedem, způsobí {damage} přírodního poškození a zpomalí jeho pohyb o 50 % na 12 s."
+      },
+      "melting_acid": {
+        "name": "Melting Acid",
+        "description": "Splashes the target with a caustic poison, dealing {damage} Nature damage and reducing its armor by 5% for 12 sec."
+      },
+      "nightshade_coating": {
+        "name": "Nightshade Coating",
+        "description": "Coats the target in nightshade, dealing {damage} Nature damage and reducing the healing it receives by 25% for 12 sec."
       },
       "expose_armor": {
         "name": "Průraz zbroje",

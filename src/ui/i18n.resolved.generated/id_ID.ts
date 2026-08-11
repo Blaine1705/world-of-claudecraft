@@ -8582,6 +8582,7 @@ export const id_ID: EnTranslations = {
       "offGlobalCooldown": "Di luar jeda global",
       "friendlyTarget": "Target kawan",
       "enemyTarget": "Target musuh",
+      "anyTarget": "Enemy or friendly target",
       "selfOnly": "Hanya diri sendiri",
       "damageRange": "{min} hingga {max}",
       "finisherDamage": "{base} ditambah {perCombo} per poin kombo"
@@ -9362,6 +9363,14 @@ export const id_ID: EnTranslations = {
       "crippling_poison": {
         "name": "Bisa Timah",
         "description": "Menyerang target dengan bisa timah, memberi {damage} kerusakan Alam dan memperlambat kecepatan geraknya sebesar 50% selama 12 detik."
+      },
+      "melting_acid": {
+        "name": "Melting Acid",
+        "description": "Splashes the target with a caustic poison, dealing {damage} Nature damage and reducing its armor by 5% for 12 sec."
+      },
+      "nightshade_coating": {
+        "name": "Nightshade Coating",
+        "description": "Coats the target in nightshade, dealing {damage} Nature damage and reducing the healing it receives by 25% for 12 sec."
       },
       "expose_armor": {
         "name": "Tembus Zirah",

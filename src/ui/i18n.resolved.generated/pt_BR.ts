@@ -8582,6 +8582,7 @@ export const pt_BR: EnTranslations = {
       "offGlobalCooldown": "Fora da recarga global",
       "friendlyTarget": "Alvo aliado",
       "enemyTarget": "Alvo inimigo",
+      "anyTarget": "Enemy or friendly target",
       "selfOnly": "Apenas em si mesmo",
       "damageRange": "{min} a {max}",
       "finisherDamage": "{base} mais {perCombo} por ponto de combo"
@@ -9362,6 +9363,14 @@ export const pt_BR: EnTranslations = {
       "crippling_poison": {
         "name": "Veneno Plúmbeo",
         "description": "Atinge o alvo com um veneno plúmbeo, causando {damage} de dano de Natureza e reduzindo sua velocidade de movimento em 50% por 12 s."
+      },
+      "melting_acid": {
+        "name": "Melting Acid",
+        "description": "Splashes the target with a caustic poison, dealing {damage} Nature damage and reducing its armor by 5% for 12 sec."
+      },
+      "nightshade_coating": {
+        "name": "Nightshade Coating",
+        "description": "Coats the target in nightshade, dealing {damage} Nature damage and reducing the healing it receives by 25% for 12 sec."
       },
       "expose_armor": {
         "name": "Brecha na Armadura",
