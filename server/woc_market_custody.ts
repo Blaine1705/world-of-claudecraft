@@ -132,7 +132,7 @@ export function createWocMarketCustody(host: WocCustodyGameHost): WocMarketCusto
       // tells them apart.
       if (
         !host.sim.mailSystemParcel(recipient, LETTERS[letter], items, custodyRef) &&
-        !host.sim.postOffice.hasCustodyParcel(custodyRef)
+        !host.sim.hasCustodyParcel(custodyRef)
       ) {
         // Genuine refusal: nothing is booked under this ref. Throwing lands in
         // the caller's failure path (release the claim, retry on a later sweep
