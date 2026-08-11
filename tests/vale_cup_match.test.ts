@@ -619,7 +619,7 @@ describe('Vale Cup: teardown does not grant a free full HP/resource/cooldown res
   it('vcupPracticeStart (the instant solo bot practice) is covered by the same restore', () => {
     // A mage: mana clean-slates to full mid-match, so restoring a drained pool
     // is a meaningful check (rage clean-slates to 0 either way).
-    const sim = new Sim({ seed: 7, playerClass: 'mage', playerName: 'Solo' });
+    const sim = makeWorld({ seed: 7, playerClass: 'mage', playerName: 'Solo', noPlayer: false });
     const pe = sim.entities.get(sim.primaryId)!;
     pe.hp = Math.floor(pe.maxHp * 0.35);
     pe.resource = Math.floor(pe.maxResource * 0.1);
