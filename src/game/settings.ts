@@ -2,6 +2,8 @@
 // Esc options menu. Pure + persisted to localStorage; main.ts applies each
 // value to the live subsystem (Input / GameAudio / MusicDirector / Renderer).
 
+import { parseStoredJson } from './local_storage_json';
+
 // Camera default is 0.7: the old fixed speed (1.0) was near the top of the
 // reasonable range and drew complaints, so out of the box it's calmer while
 // the slider still reaches 1.25 for players who liked it fast.
@@ -461,12 +463,7 @@ export class Settings {
   }
 
   private load(): GameSettings {
-    let stored: unknown = null;
-    try {
-      stored = JSON.parse(localStorage.getItem(STORE_KEY) ?? 'null');
-    } catch {
-      /* corrupt */
-    }
+    const stored = parseStoredJson(STORE_KEY);
     const raw = stored && typeof stored === 'object' ? (stored as Record<string, unknown>) : {};
     const out = {} as GameSettings;
     for (const key of NUMERIC_KEYS) {
