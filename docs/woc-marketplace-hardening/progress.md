@@ -7,7 +7,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 |---|---|---|---|---|---|
 | 01 | branch-baseline | game | DONE (QA PASS) | e4c3dde956 | five re-review verdicts CLEAN (section below); woc_trade extraction landed; gate GREEN at 418f75b876 (full-suite fallback) |
 | 01 QA | phase-01-qa | game | DONE | 07fda3fd46 | PASS-WITH-FOLLOWUPS, all fixes applied (section below); gate GREEN at final tip 1d7bdbafa0; pushed per R4 (no open PR on this branch, so no PR CI; pre-push floor green) |
-| 02 | settlement-state-guards | game | NOT STARTED | | |
+| 02 | settlement-state-guards | game | DONE | 0f029bacf9 | release sync was a no-op (already at v0.37.0 tip); real-SQL suite 27 green vs dev Postgres; reviewer round + deferrals in section below; gate result recorded there too |
 | 02 QA | phase-02-qa | game | NOT STARTED | | |
 | 03 | delivery-exactly-once | game | NOT STARTED | | |
 | 03 QA | phase-03-qa | game | NOT STARTED | | |
@@ -49,6 +49,65 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 21 QA | phase-21-qa | service + game | NOT STARTED | | |
 | 22 | close-out | all three | NOT STARTED | | teardown offer lives in 22 QA |
 | 22 QA | phase-22-qa | all three | NOT STARTED | | |
+
+## 02 implement round (settlement-state guards)
+
+Four reviewers ran over the diff (privacy-security, migration-safety,
+database-performance, test-coverage-auditor), then qa-checklist last; every
+finding was applied except the owned deferrals below. Applied highlights: boot
+pre-flight repair UPDATEs so the two new unique indexes can never brick a boot
+on legacy-corrupt rows (with real-SQL arms seeding the violating shapes and
+proving the repair); the bids-then-listing lock order in suspendListingIfSafe
+and the winner stamp moved ahead of the insert (activateBid's order; a pinned
+interleave test dies 40P01 under the old order); SET LOCAL lock_timeout on
+both guard transactions; a distinct insertSettlement 'listing_closed' return
+(a buyer racing a cancel now hears not_active, not a phantom lock);
+compare-and-set on the new bid-status writes; setSaleExcluded catching 23505;
+the coverage auditor's rework of the interleave test to drive the REAL
+cancelListingIfUnbid, the full five-state index predicate pin, the
+settlement_live suspend arm at service level, the cascade-conflict unwind arm,
+the refund_due intermediate stamp under a stalled refund pipeline, and a
+concurrent double-insert race. Real-SQL suite: 26 tests, run green against the
+dev Postgres (TEST_DATABASE_URL; the suite skips without it). The
+fails-on-old-behavior proof: the first red run against the unfixed code failed
+15 of 19 original tests on their real assertions.
+
+Deferrals and decisions, each with an owner (do NOT re-raise):
+
+- insertSale still throws raw 23505 if a duplicate ever reaches deliverOne,
+  which after the repairs is only possible on data the new guards did not
+  produce; graceful conflict handling belongs to the delivery-finalization
+  transaction and reconcile arm (phase 03), along with per-arm sweep error
+  isolation (one poisoned row currently skips the later arms of that pass).
+- The confirming-stuck escape hatch (phase 04, H15) and ruling R8 (buy-now
+  lock-spam cancel denial, phases 04/06): recorded in state.md; phase 04 is a
+  hard prerequisite for enable.
+- The db-performance reviewer's at-scale proofs (EXPLAIN of the new per-listing
+  lookups on grown tables, index-build timing, pool-wait observability before
+  enable): phases 16/17 and the phase 03 monitor.
+- Cascade arm still reads the full bid list per overdue settlement to derive
+  priorWinners (unbounded per-listing read, pre-existing shape): phase 16/17.
+- Kept against reviewer preference, recorded: the unique indexes stay in boot
+  DDL (rationale comment in the DDL; concurrent builds can leave an INVALID
+  index and the tables are pre-enable empty), and the lock-expiry predicates
+  keep the app clock nowMs (consistent with claimBuyNowLock's own steal
+  predicate, which writes and compares the same clock; the SQL-now()
+  alternative also breaks the future-epoch test fixtures).
+- qa-checklist round (verdict READY, 0 blocking) applied on top: both boot
+  repairs gated on to_regclass so the scans run once per legacy database
+  (the sales table is keep-forever, so ungated it re-scanned every boot); an
+  operator note at the settlements repair (schema_dedupe rows at 'confirming'
+  or beyond were payments that might still land; sweep them by hand after a
+  legacy upgrade); insertSettlement now ABORTS when a named winner left the
+  pickable states, turning "no settlement whose winner holds no claim" from a
+  cross-module coincidence into a statement-level guarantee (test updated to
+  pin the strict behavior); the concrete PgWocMarketDb signature widened to
+  match the interface; a direct pin that a refused cancel rolls its
+  speculative failed-expiry back. Two qa items became owned deferrals: the
+  admin envelope's raw-English strings (both the new 409 line and the
+  pre-existing 404 line beside it) go to the error-i18n surface (phase 14),
+  and a CI job that sets TEST_DATABASE_URL so the pg suite stops being
+  skip-only goes to the real-SQL coverage work (phase 20).
 
 ## Merge re-review verdicts (01, merge a52da32c89)
 

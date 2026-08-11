@@ -5,11 +5,11 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-02-settlement-state-guards.md`
+- Next file to run: `docs/woc-marketplace-hardening/phase-02-qa.md`
 - Packet created 2026-08-11 from `review.md` (the 2026-08-11 three-repo review).
-- 01 implemented AND QA'd (PASS-WITH-FOLLOWUPS, fixes applied, PUSHED); see
-  progress.md and the ledger below. Current game tip: the 01 QA docs commit on
-  top of 1d7bdbafa0.
+- 01 implemented AND QA'd (PASS-WITH-FOLLOWUPS, fixes applied, PUSHED).
+- 02 implemented (settlement-state guards; LOCAL, not pushed per R4); see the
+  ledger below and progress.md for the reviewer round and deferrals.
 
 ## Repos and branches
 
@@ -35,7 +35,10 @@ implementation-plan.md).
   untracked and worktree-local).
 - Game, wire/protocol change: add `npx vitest run tests/snapshots.test.ts tests/env_protocol.test.ts tests/bandwidth.test.ts`.
 - Game, DDL change: boot the dev DB (`npm run db:up`) and run the marketplace real-SQL
-  suites.
+  suites. Since 02 that concretely means
+  `TEST_DATABASE_URL=postgres://eastbrook:<pw>@127.0.0.1:5433/eastbrook npx vitest run tests/woc_market_settlement_pg_integration.test.ts`
+  (the suite creates and drops its own disposable database; without the env var it
+  SKIPS green, so a green default-tier run is not evidence it ran).
 - Game, monolith-listed file: `npx vitest run tests/monolith_budget.test.ts`.
 - Game, pre-merge / end of phase: commit first, then `node scripts/gate_select.mjs`
   (gate needs a committed tree; it stops at the FIRST failure, run later steps by hand if
@@ -71,6 +74,12 @@ Still open (a phase that hits one asks at session start):
   player wiki/guide page, game-side audited runtime pause, numeric reserve guard. They
   stay in the follow-ups queue; if he opts any in later, add it as a new numbered phase
   before phase 21 and update progress.md and the plan table.
+- R8 (raised by the 02 security review, phases 04/06): with cancel now settlement-aware,
+  a wallet-verified buyer can claim the public buy-now lock, abandon it, and re-claim
+  in a loop, keeping a seller's listing un-cancellable at zero cost (public abandons
+  deliberately carry no strike). Options: a per-account claim-then-abandon counter or
+  cooldown, a strike after N public abandons, or accept as-is (the balance gate is the
+  only bar). Needs a product call before enable.
 
 ## Locked decisions
 
@@ -165,3 +174,49 @@ Still open (a phase that hits one asks at session start):
   run flaked on the known heavy-suite timeouts under reviewer load, all green
   in the clean rerun. Deferral list with owners in progress.md (phases 12,
   14, 15, 16). NEXT = phase-02-settlement-state-guards.md fresh session.
+- 02 settlement-state-guards (2026-08-11, session start 0f029bacf9, LOCAL, not
+  pushed per R4): B1, H9, the B2a groundwork, and the sale invariant closed.
+  The registry later phases need:
+  - Error code: `woc_market.settlement_in_flight` (409) with catalog leaf
+    `apiError.woc_market.settlement_in_flight` and five non-Latin fills.
+    Seller cancel maps an unexpired lock to `buy_now_locked` and a live
+    settlement to `settlement_in_flight`; the admin suspend route answers 409
+    with its own admin-envelope English.
+  - Indexes: `woc_market_settlements_open` (UNIQUE partial, state IN offered/
+    confirming/confirmed/delivering/delivered) REPLACED
+    `woc_market_settlements_live`; `woc_market_sales_listing_once` (UNIQUE
+    partial ON woc_market_sales(listing_id) WHERE excluded = false). Both ride
+    boot DDL with idempotent pre-flight repair UPDATEs above them (settlement
+    losers demoted to expired with fail_reason 'schema_dedupe'; later
+    duplicate sales voided excluded = true), a recorded decision AGAINST
+    concurrent_indexes.ts: the tables are pre-enable empty and a CONCURRENTLY
+    build can leave an INVALID carcass that silently drops the invariant.
+  - Db seam: `cancelListingIfUnbid(realm, id, seller, nowMs)` refuses
+    `buy_now_pending` and `settlement_live` and expires 'failed' rows
+    (fail_reason 'listing_cancelled') on success; new `suspendListingIfSafe`
+    proceeds only over offered/failed (the safe path: refuse whenever a
+    signature exists); `insertSettlement` takes `winnerBidId` (won stamped
+    in-tx, CAS from active/outbid) and returns 'listing_closed' distinctly;
+    `nextCascadeBidder` replaced promoteNextBidder (selection only);
+    `markBidStatus` grew an optional `from` CAS; `setSaleExcluded` catches
+    23505 to false.
+  - LOCK ORDER RULE for every multi-row market transaction: bid rows first,
+    listing row second (activateBid's order); the reverse deadlocks. Both
+    guard transactions run `SET LOCAL lock_timeout` (ESCROW_LOCK_TIMEOUT_MS).
+  - Ops caveats for the phase 22 runbook: the deploy is forward-only (an OLD
+    binary against the NEW schema re-opens the settlement-less-won-bid window
+    and its reclaim arm can still reopen delivered-but-unclosed listings; the
+    market must stay disabled through any mixed-fleet window). Detection
+    queries: duplicate open settlements `SELECT listing_id FROM
+    woc_market_settlements WHERE state IN ('offered','confirming','confirmed',
+    'delivering','delivered') GROUP BY listing_id HAVING count(*) > 1`;
+    duplicate sales `SELECT listing_id FROM woc_market_sales WHERE excluded =
+    false GROUP BY listing_id HAVING count(*) > 1`.
+  - HARD PREREQUISITE FOR ENABLE, recorded from the 02 security review: a
+    settlement stuck in 'confirming' now has NO escape hatch at all (cancel,
+    suspend, and reclaim all refuse; the old unsafe suspend arm that could
+    expire it was the B1 dupe vector and is gone). Phase 04 (H15, the bounded
+    confirming resolution) is what restores an exit; it must land before
+    WOC_MARKET_ENABLED is ever set. R8 (lock-spam cancel denial) is the other
+    02-raised ruling.
+  NEXT = phase-02-qa.md fresh session.
