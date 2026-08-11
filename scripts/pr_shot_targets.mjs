@@ -1534,6 +1534,17 @@ export const TARGETS = [
           sim?.addItemInstance?.('wolf_fang', { signer: 'Toralin' });
           sim?.addItemInstance?.('wolf_fang', { signer: 'Toralin' });
         } catch {}
+        // Lock one plain-gear stack (issue 3042, item_lock.ts): the padlock
+        // badge (bottom-left) must be visible in the same grid as the other
+        // instance marks above, composing rather than fighting for a corner.
+        // Resolved by itemId rather than a hardcoded index, since the exact
+        // slot a fresh bag lands an item in is an implementation detail.
+        try {
+          const slotIndex = sim?.inventory?.findIndex((s) => s.itemId === 'cryptbone_helm');
+          if (typeof slotIndex === 'number' && slotIndex >= 0) {
+            sim?.setItemLocked?.('cryptbone_helm', true, { slotIndex });
+          }
+        } catch {}
         // Force-hide then toggle so the open is deterministic regardless of prior state
         // (the same trick the bag_filter screenshot harness uses).
         const el = document.querySelector('#bags');

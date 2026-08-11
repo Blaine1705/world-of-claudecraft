@@ -6772,6 +6772,30 @@
       animation: none;
     }
   }
+  /* Player item lock (issue 3042): a small padlock badge, bottom-left, clear
+     of both the top-left glyph box and the bottom-right count badge, so it
+     composes with any other corner mark instead of competing for it (a locked
+     copy can also be masterwork/enchanted/signed/bound). Always visible on
+     desktop and touch, identical on every graphics preset (no --fx-* gate);
+     aria-hidden, the cell accessible name carries the locked fact. All-surfaces
+     family (item_instance_glyph_mark.ts): bags and both banks share this rule. */
+  .bag-item .bi-lock-seal,
+  .bank-item .bi-lock-seal {
+    position: absolute;
+    left: 2px;
+    bottom: 1px;
+    width: 11px;
+    height: 11px;
+    color: var(--color-bag-lock-seal);
+    pointer-events: none;
+    filter: drop-shadow(0 1px 1px #000);
+  }
+  .bag-item .bi-lock-seal .ui-icon,
+  .bank-item .bi-lock-seal .ui-icon {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
   .bag-item.empty {
     cursor: default;
     background: #0b0906;

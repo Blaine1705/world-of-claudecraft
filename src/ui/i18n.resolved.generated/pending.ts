@@ -10,6 +10,12 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hudChrome.bags.itemAriaLocked",
+    "hudChrome.bags.itemLockedLine",
+    "hudChrome.bags.lockItem",
+    "hudChrome.bags.unlockItem",
+    "hudChrome.crafting.reagentLocked",
+    "hudChrome.enchanting.salvageLocked",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -18,6 +24,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "es_ES": [
+    "hudChrome.bags.itemAriaLocked",
+    "hudChrome.bags.itemLockedLine",
+    "hudChrome.bags.lockItem",
+    "hudChrome.bags.unlockItem",
+    "hudChrome.crafting.reagentLocked",
+    "hudChrome.enchanting.salvageLocked",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -26,6 +38,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "fr_FR": [
+    "hudChrome.bags.itemAriaLocked",
+    "hudChrome.bags.itemLockedLine",
+    "hudChrome.bags.lockItem",
+    "hudChrome.bags.unlockItem",
+    "hudChrome.crafting.reagentLocked",
+    "hudChrome.enchanting.salvageLocked",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -34,6 +52,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "fr_CA": [
+    "hudChrome.bags.itemAriaLocked",
+    "hudChrome.bags.itemLockedLine",
+    "hudChrome.bags.lockItem",
+    "hudChrome.bags.unlockItem",
+    "hudChrome.crafting.reagentLocked",
+    "hudChrome.enchanting.salvageLocked",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -43,6 +67,12 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "hudChrome.bags.itemAriaLocked",
+    "hudChrome.bags.itemLockedLine",
+    "hudChrome.bags.lockItem",
+    "hudChrome.bags.unlockItem",
+    "hudChrome.crafting.reagentLocked",
+    "hudChrome.enchanting.salvageLocked",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -51,6 +81,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "de_DE": [
+    "hudChrome.bags.itemAriaLocked",
+    "hudChrome.bags.itemLockedLine",
+    "hudChrome.bags.lockItem",
+    "hudChrome.bags.unlockItem",
+    "hudChrome.crafting.reagentLocked",
+    "hudChrome.enchanting.salvageLocked",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -58,11 +94,25 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.progressLabel",
     "hudChrome.otaUpdate.title"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.bags.lockItem"
+  ],
+  "zh_TW": [
+    "hudChrome.bags.lockItem"
+  ],
+  "ko_KR": [
+    "hudChrome.bags.lockItem"
+  ],
+  "ja_JP": [
+    "hudChrome.bags.lockItem"
+  ],
   "pt_BR": [
+    "hudChrome.bags.itemAriaLocked",
+    "hudChrome.bags.itemLockedLine",
+    "hudChrome.bags.lockItem",
+    "hudChrome.bags.unlockItem",
+    "hudChrome.crafting.reagentLocked",
+    "hudChrome.enchanting.salvageLocked",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -70,8 +120,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.progressLabel",
     "hudChrome.otaUpdate.title"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.bags.lockItem"
+  ],
   "cs_CZ": [
+    "hudChrome.bags.itemAriaLocked",
+    "hudChrome.bags.itemLockedLine",
+    "hudChrome.bags.lockItem",
+    "hudChrome.bags.unlockItem",
+    "hudChrome.crafting.reagentLocked",
+    "hudChrome.enchanting.salvageLocked",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -80,6 +138,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "nl_NL": [
+    "hudChrome.bags.itemAriaLocked",
+    "hudChrome.bags.itemLockedLine",
+    "hudChrome.bags.lockItem",
+    "hudChrome.bags.unlockItem",
+    "hudChrome.crafting.reagentLocked",
+    "hudChrome.enchanting.salvageLocked",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -88,6 +152,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "pl_PL": [
+    "hudChrome.bags.itemAriaLocked",
+    "hudChrome.bags.itemLockedLine",
+    "hudChrome.bags.lockItem",
+    "hudChrome.bags.unlockItem",
+    "hudChrome.crafting.reagentLocked",
+    "hudChrome.enchanting.salvageLocked",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -96,6 +166,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "id_ID": [
+    "hudChrome.bags.itemAriaLocked",
+    "hudChrome.bags.itemLockedLine",
+    "hudChrome.bags.lockItem",
+    "hudChrome.bags.unlockItem",
+    "hudChrome.crafting.reagentLocked",
+    "hudChrome.enchanting.salvageLocked",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -104,6 +180,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "tr_TR": [
+    "hudChrome.bags.itemAriaLocked",
+    "hudChrome.bags.itemLockedLine",
+    "hudChrome.bags.lockItem",
+    "hudChrome.bags.unlockItem",
+    "hudChrome.crafting.reagentLocked",
+    "hudChrome.enchanting.salvageLocked",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -112,6 +194,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "sv_SE": [
+    "hudChrome.bags.itemAriaLocked",
+    "hudChrome.bags.itemLockedLine",
+    "hudChrome.bags.lockItem",
+    "hudChrome.bags.unlockItem",
+    "hudChrome.crafting.reagentLocked",
+    "hudChrome.enchanting.salvageLocked",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -120,6 +208,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "vi_VN": [
+    "hudChrome.bags.itemAriaLocked",
+    "hudChrome.bags.itemLockedLine",
+    "hudChrome.bags.lockItem",
+    "hudChrome.bags.unlockItem",
+    "hudChrome.crafting.reagentLocked",
+    "hudChrome.enchanting.salvageLocked",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -128,6 +222,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "da_DK": [
+    "hudChrome.bags.itemAriaLocked",
+    "hudChrome.bags.itemLockedLine",
+    "hudChrome.bags.lockItem",
+    "hudChrome.bags.unlockItem",
+    "hudChrome.crafting.reagentLocked",
+    "hudChrome.enchanting.salvageLocked",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",

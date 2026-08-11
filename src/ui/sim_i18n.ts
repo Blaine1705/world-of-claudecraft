@@ -161,6 +161,9 @@ const baseEnTable = {
   // Bind invariant: sellItem refuses a bound (boundTo-stamped) copy so
   // the vendor can never launder the Maker's Bond into a plain buyback copy.
   'error.sellBound': 'That item is bound and cannot be sold.',
+  // Player item lock (issue 3042, src/sim/item_lock.ts): a player-locked
+  // copy, distinct from the Maker's Bond bind above.
+  'error.sellLocked': 'That item is locked and cannot be sold.',
   'error.noBuyback': 'That item is not available for buyback.',
   'error.nailedShut': 'It is nailed shut.',
   'error.enoughOfThose': 'You have enough of those.',
@@ -785,6 +788,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'There is no merchant nearby.',
     'error.noSellQuest': 'You cannot sell quest items.',
     'error.sellBound': 'That item is bound and cannot be sold.',
+    'error.sellLocked': 'That item is locked and cannot be sold.',
     'error.noBuyback': 'That item is not available for buyback.',
     'error.nailedShut': 'It is nailed shut.',
     'error.enoughOfThose': 'You have enough of those.',
