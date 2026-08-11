@@ -234,7 +234,10 @@ describe('renderer sky-residency driver', () => {
     const start = renderer.indexOf('private updateSkyResidency(');
     const end = renderer.indexOf('\n  }', start);
     const body = renderer.slice(start, end);
-    expect(body).toContain('pinned: [...currentDomeBiomes(), this.envBiome, this.envTransition');
+    expect(body).toContain('...currentDomeBiomes(),');
+    expect(body).toContain('this.envTransition.current,');
+    // The pending arm of an in-flight IBL ease is pinned too (review round 1).
+    expect(body).toContain('this.envTransition.pending !== null');
     expect(body).toContain('resident: residentSkyBiomes()');
     // Only a prepared zone's sky is this lane's to restore.
     expect(body).toContain('this.preparedZones.has(zoneId)');
@@ -285,7 +288,8 @@ describe('renderer sky-residency driver', () => {
     // The constrained profile keeps exactly one env RT for the session and it
     // is always the bound one (resolveEnvironmentPrefilterPlan seeds envBiome
     // from it), so these guards are what stop eviction from re-opening the cap.
-    expect(body).toContain('if (biome === this.envBiome || biome === this.envTransition.current)');
+    expect(body).toContain('biome === this.envTransition.current ||');
+    expect(body).toContain('biome === this.envTransition.pending');
     expect(body).toContain('this.scene.environment === target.texture');
     // Aliased sky urls share one PMREM target across biome keys.
     expect(body).toContain('for (const remaining of this.envRTs.values())');

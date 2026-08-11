@@ -83,6 +83,12 @@ export function buildKtxCreateArgs({
   encoding = 'basis-lz',
   transferFunction = 'srgb',
 }) {
+  // Both linear arms encode RGB only: every linear channel today is a JPG
+  // (never alpha). Refuse loudly rather than silently dropping a channel if
+  // a linear source with alpha ever appears (review round 1).
+  if (hasAlpha && transferFunction === 'linear') {
+    throw new Error(`linear arms encode RGB only, but ${srcPath} has alpha`);
+  }
   if (encoding === 'uastc') {
     return [
       'create',

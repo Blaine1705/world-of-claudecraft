@@ -1896,7 +1896,16 @@ export class Renderer {
   // Sky keys that are a ZONE's biome, so the residency lane re-creates exactly
   // what the zone prepare lane would have: prepareZoneSky PMREMs zone.biome, and
   // the two place-keyed skies (farshore, vale_cup) have never had an env RT.
-  private readonly zoneSkyBiomes: ReadonlySet<SkyKey> = new Set(ZONES.map((zone) => zone.biome));
+  // Same LIVE-zones source as the region list below (review round 1): an
+  // editor zone's paint-only biome must also reach the PMREM arm of the
+  // residency ensure, not only its keep region.
+  private zoneSkyBiomesCache: ReadonlySet<SkyKey> | null = null;
+  private zoneSkyBiomes(): ReadonlySet<SkyKey> {
+    this.zoneSkyBiomesCache ??= new Set(
+      (this.sim.cfg.world?.zones ?? ZONES).map((zone) => zone.biome),
+    );
+    return this.zoneSkyBiomesCache;
+  }
   // Derived lazily from the LIVE world's zones, not the static ZONES table: a
   // custom map (the editor) can place a paint-only biome (beach, desert,
   // volcano, cave) that no built-in realm declares, and a resident sky key
@@ -3376,6 +3385,7 @@ export class Renderer {
     // comes through HERE (shutdown -> disposeRendererResources), so the blob
     // pool, texture and material release with the rest of the GPU state.
     bestEffort(() => this.blobShadows?.dispose());
+    this.blobShadows = null;
     bestEffort(() => this.scene.clear());
     const webgl = this.webgl as THREE.WebGLRenderer | undefined;
     if (webgl) {
@@ -3614,7 +3624,13 @@ export class Renderer {
   private evictEnvironmentBiome(biome: SkyKey): void {
     const target = this.envRTs.get(biome);
     if (!target) return;
-    if (biome === this.envBiome || biome === this.envTransition.current) return;
+    if (
+      biome === this.envBiome ||
+      biome === this.envTransition.current ||
+      biome === this.envTransition.pending
+    ) {
+      return;
+    }
     if (this.scene.environment === target.texture) return;
     this.envRTs.delete(biome);
     for (const remaining of this.envRTs.values()) {
@@ -3646,7 +3662,7 @@ export class Renderer {
       // warmed in the meantime costs nothing here.
       await this.prewarmTextureInIdle(this.skyView.envTexture(biome));
       if (!live()) return;
-      if (this.zoneSkyBiomes.has(biome)) {
+      if (this.zoneSkyBiomes().has(biome)) {
         await idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 });
         if (!live()) return;
         await this.backgroundGpuWork.run(
@@ -3696,7 +3712,12 @@ export class Renderer {
       resident: residentSkyBiomes(),
       // The dome's live pair plus whatever the IBL is bound to (or easing
       // toward): releasing either would blank a surface currently on screen.
-      pinned: [...currentDomeBiomes(), this.envBiome, this.envTransition.current],
+      pinned: [
+        ...currentDomeBiomes(),
+        this.envBiome,
+        this.envTransition.current,
+        ...(this.envTransition.pending !== null ? [this.envTransition.pending] : []),
+      ],
     });
     for (const biome of releaseSkyBiomeAssets(plan.evict)) this.evictEnvironmentBiome(biome);
     for (const biome of plan.ensure) this.ensureSkyResidency(biome);
@@ -3762,18 +3783,28 @@ export class Renderer {
     if (this.shutdownStarted) return Promise.resolve();
     const zoneId = this.zoneIdAt(x, z);
     if (zoneId === null || this.preparedZones.has(zoneId)) {
-      onProgress?.(1, 1);
       // The zone build stays skipped, but its SKY may have been released while
       // the player was away (see updateSkyResidency): re-run the sky half only,
       // and return it so a blocking arrival (a teleport landing back in a realm
       // it visited hours ago) waits behind the loading screen for its dome
-      // instead of arriving under the previous realm's frozen sky.
+      // instead of arriving under the previous realm's frozen sky. Gated on
+      // standardMaterials because the shadowless tiers never fetch HDRIs at
+      // all: their stores stay empty by design, the residency predicate is
+      // permanently false there, and this branch would re-run prepareZoneSky
+      // on every arrival forever (review round 1; ensureSkyResidency guards
+      // the same case on the recheck lane). Progress completes only after the
+      // dome work it now awaits, so a blocking arrival's loading bar cannot
+      // sit at 100 percent while the sky loads.
       if (
         zoneId !== null &&
+        GFX.standardMaterials &&
         !skyBiomesAt(x, z).every((biome) => this.skyView.skyBiomeAssetsResident(biome))
       ) {
-        return this.prepareZoneSky(zoneAt(x, z), x, z, opts?.pace === 'idle');
+        return this.prepareZoneSky(zoneAt(x, z), x, z, opts?.pace === 'idle').then(() => {
+          onProgress?.(1, 1);
+        });
       }
+      onProgress?.(1, 1);
       return Promise.resolve();
     }
     const pending = this.pendingZonePrepares.get(zoneId);

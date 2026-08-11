@@ -678,7 +678,10 @@ export function applySurfaceDetail(
   // Captured BEFORE the override below, like addRimGlow: called later it
   // yields whatever key the previous layer composed (the armor dye pins a
   // distinct key per dyed material while its wrapper SOURCE is identical),
-  // which prevSrc alone cannot see.
+  // which prevSrc alone cannot see. Only an EXPLICIT previous key carries
+  // information here: for a default-keyed predecessor the bound prototype
+  // getter re-reads this.onBeforeCompile at call time, i.e. the worn wrapper
+  // itself, a constant across materials; that case is covered by prevSrc.
   const prevProgramKey = mat.customProgramCacheKey.bind(mat);
   mat.onBeforeCompile = (shader, renderer) => {
     prev?.call(mat, shader, renderer);

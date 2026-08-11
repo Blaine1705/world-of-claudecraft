@@ -214,3 +214,56 @@ describe('blob painter', () => {
     expect(source).toContain('this.mesh.visible = this.count > 0;');
   });
 });
+
+describe('blob painter write-elision (behavioral)', () => {
+  // A Float32Array elision cache truncates the float64 slot values, so every
+  // comparison is false and the buffer re-uploads each frame (review round 1).
+  // This is the behavioral pin the source-text assertion above cannot give:
+  // the same slot pushed twice must not mark the buffer dirty again.
+  const fakeCtx = {
+    createRadialGradient: () => ({ addColorStop() {} }),
+    fillStyle: null as unknown,
+    fillRect() {},
+  };
+  const fakeCanvas = { width: 0, height: 0, getContext: () => fakeCtx };
+
+  it('re-uploads on a real change only, at real world coordinates', async () => {
+    (globalThis as Record<string, unknown>).document = {
+      createElement: () => fakeCanvas,
+    };
+    try {
+      const { BlobShadows } = await import('../src/render/blob_shadows');
+      const painter = new BlobShadows();
+      const slot = {
+        x: 137.42318,
+        y: 1.5612348,
+        z: -42.703125e-1 * 13.7,
+        scale: 0.7823411,
+        visible: true,
+      };
+      // BufferAttribute.needsUpdate is a write-only setter that bumps
+      // `version`; the readable signal is the version counter.
+      const v0 = painter.mesh.instanceMatrix.version;
+      painter.begin();
+      painter.push(slot);
+      painter.commit();
+      expect(painter.mesh.count).toBe(1);
+      const v1 = painter.mesh.instanceMatrix.version;
+      expect(v1).toBeGreaterThan(v0);
+
+      painter.begin();
+      painter.push(slot);
+      painter.commit();
+      expect(painter.mesh.count).toBe(1);
+      expect(painter.mesh.instanceMatrix.version).toBe(v1);
+
+      slot.x += 0.25;
+      painter.begin();
+      painter.push(slot);
+      painter.commit();
+      expect(painter.mesh.instanceMatrix.version).toBeGreaterThan(v1);
+    } finally {
+      delete (globalThis as Record<string, unknown>).document;
+    }
+  });
+});

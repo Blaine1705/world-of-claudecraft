@@ -78,8 +78,13 @@ For reference-image reconstruction and procedural GLB authoring, read the living
   atlases; `src/render/terrain.ts` and `src/render/worn_stone.ts` via `ktx2SiblingUrl` for
   their linear maps, with the six splat COLOUR layers and `GroundAO_Packed.png` deliberately
   excluded, see `tests/surface_texture_ktx2.test.ts`), and `base.png` thumbnail sources are
-  skipped. Run it after adding or repainting a standalone source, with `--flip` for
-  flipY-consumed sets.
+  skipped. Run it after adding or repainting a standalone source. The terrain and
+  worn-surface sets are flipY-consumed and MUST be regenerated with the flip baked
+  (`node scripts/assets/compress_standalone_textures.mjs --flip <files>`): a
+  CompressedTexture cannot honor flipY at runtime, there is no downstream
+  correction, and a re-run that drops the flag passes every byte-level check while
+  sampling upside down (`tests/surface_texture_ktx2.test.ts` greps this exact
+  command).
 - **One-shot and maintenance tools**, each with its recipe in its own header: the zone prop
   bakes (`build_willowfen_props.mjs` and its `*_props.mjs` siblings: one-shot weld + bounded
   simplify recipes over maintainer-local source packs; copy the willowfen recipe for a new

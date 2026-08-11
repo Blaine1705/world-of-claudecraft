@@ -65,10 +65,13 @@ export class BlobShadows {
   private readonly texture: THREE.CanvasTexture;
   private readonly matrix = new THREE.Matrix4();
   /** Last uploaded transform per slot, so an unchanged frame uploads nothing. */
-  private readonly lastX = new Float32Array(BLOB_SHADOW_POOL);
-  private readonly lastY = new Float32Array(BLOB_SHADOW_POOL);
-  private readonly lastZ = new Float32Array(BLOB_SHADOW_POOL);
-  private readonly lastScale = new Float32Array(BLOB_SHADOW_POOL);
+  // Float64: the slot values are doubles, and a Float32Array round-trip
+  // truncates them, so every === comparison below would be false for real
+  // world coordinates and the elision would never fire (review round 1).
+  private readonly lastX = new Float64Array(BLOB_SHADOW_POOL);
+  private readonly lastY = new Float64Array(BLOB_SHADOW_POOL);
+  private readonly lastZ = new Float64Array(BLOB_SHADOW_POOL);
+  private readonly lastScale = new Float64Array(BLOB_SHADOW_POOL);
   private count = 0;
   private dirty = false;
 

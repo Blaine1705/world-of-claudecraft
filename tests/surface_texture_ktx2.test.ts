@@ -469,3 +469,20 @@ describe('standalone_texture_compression_core: flip, alignment and CLI parsing',
     expect(() => ktx2SiblingPath('/a/b/alt_a.webp')).toThrow('not a convertible image path');
   });
 });
+
+describe('flip invocation pin', () => {
+  it('keeps the flip-baked regen command greppable in the pipeline doc', () => {
+    // The flip is the one property a regeneration can silently drop: every
+    // byte-level assertion above still passes on an unflipped sibling while
+    // sampling lands upside down (CompressedTexture cannot honor flipY, and
+    // there is no downstream correction). Pin the canonical invocation in the
+    // pipeline doc, and the flag itself in the CLI parser.
+    const doc = fs.readFileSync(path.join(ROOT, 'scripts/assets/CLAUDE.md'), 'utf8');
+    expect(doc).toContain('node scripts/assets/compress_standalone_textures.mjs --flip');
+    const core = fs.readFileSync(
+      path.join(ROOT, 'scripts/assets/lib/standalone_texture_compression_core.mjs'),
+      'utf8',
+    );
+    expect(core).toContain("'--flip'");
+  });
+});

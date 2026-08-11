@@ -326,17 +326,31 @@ export interface HdrLoadOptions {
 
 /** The resolved cache key for one (url, options) pair. loadHdr and releaseHdr
  *  share it so a release can never miss the entry a load created. */
-function hdrCacheKey(url: string, options: HdrLoadOptions): string {
+interface HdrRequest {
+  resolved: string;
+  maxWidth: number | undefined;
+  cacheKey: string;
+}
+
+/** One normalization for url + maxWidth, shared by loadHdr and releaseHdr so
+ *  the pair can never disagree on a cache key (review round 1). */
+function hdrRequest(url: string, options: HdrLoadOptions): HdrRequest {
   const resolved = assetUrl(url);
   const maxWidth = options.maxWidth ? Math.max(1, Math.floor(options.maxWidth)) : undefined;
-  return maxWidth ? `${resolved}#max-width=${maxWidth}` : resolved;
+  return {
+    resolved,
+    maxWidth,
+    cacheKey: maxWidth ? `${resolved}#max-width=${maxWidth}` : resolved,
+  };
+}
+
+function hdrCacheKey(url: string, options: HdrLoadOptions): string {
+  return hdrRequest(url, options).cacheKey;
 }
 
 /** Equirectangular Radiance .hdr for IBL / sky sampling (HalfFloat). */
 export function loadHdr(url: string, options: HdrLoadOptions = {}): Promise<THREE.DataTexture> {
-  const resolved = assetUrl(url);
-  const maxWidth = options.maxWidth ? Math.max(1, Math.floor(options.maxWidth)) : undefined;
-  const cacheKey = hdrCacheKey(url, options);
+  const { resolved, maxWidth, cacheKey } = hdrRequest(url, options);
   let p = hdrCache.get(cacheKey);
   if (!p) {
     const startedAt = assetLoadStarted();
