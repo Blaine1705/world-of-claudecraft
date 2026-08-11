@@ -189,11 +189,16 @@ const RAW_OUT = path.join(ROOT, 'tmp/asset_src/rickshaw_mount/rickshaw_mount.glb
 const PREVIEW_DIR = path.join(ROOT, 'tmp/rickshaw_mount_preview');
 const SPEC = path.join(ROOT, 'scripts/assets/specs/rickshaw_mount.json');
 const BUILD_ASSETS = path.join(ROOT, 'scripts/assets/build_assets.mjs');
-// Reused, not hand-built: the existing enemy character rig, attached at
+// Reused, not hand-built: skel_rickshaw_puller's own rig, attached at
 // Socket_Puller for review renders only. The exported rickshaw_mount.glb
 // itself does NOT embed this character; composing them is a render-layer
-// (src/render/) concern, not something baked into the shipped prop GLB.
-const PULLER_GLB = path.join(ROOT, 'public/models/chars/enemies/skeleton_warrior.glb');
+// (src/render/) concern, not something baked into the shipped prop GLB. Must
+// stay in sync with src/render/characters/manifest.ts's skel_rickshaw_puller
+// VisualDef (skeleton_minion_free.glb, not skeleton_warrior.glb: the game's
+// actual puller since round 1, not this exporter's original placeholder) and
+// export_entry.js's PULLER_TARGET_WORLD_HEIGHT, or this preview reviews a
+// different rig at a different height/offset than what actually ships.
+const PULLER_GLB = path.join(ROOT, 'public/models/chars/enemies/skeleton_minion_free.glb');
 const noPreview = process.argv.includes('--no-preview');
 const rawOnly = process.argv.includes('--raw-only');
 

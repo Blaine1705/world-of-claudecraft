@@ -17,7 +17,7 @@
 // user: real chain-link geometry is a meaningful triangle/complexity cost for a
 // detail that reads as background texture at mount scale, not an identity
 // feature); (2) the art's own invented skeleton pose/geometry, since the mount
-// still composes the game's real skeleton_warrior.glb rig at runtime
+// still composes skel_rickshaw_puller (skeleton_minion_free.glb) at runtime
 // (src/render/rickshaw_mount.ts) in its own idle pose, not the art's hunched one.
 // The shaft/cross-brace grip position (SHAFT_TIP_Y/Z/SIDE_X) is therefore
 // unchanged from v1: it was measured against that same rig and did not move.
@@ -90,7 +90,7 @@ export const RICKSHAW_SOCKET_DEFINITIONS = Object.freeze([
     nodeName: 'Socket_Puller',
     position: Object.freeze([0, 0, 0.55]),
     purpose:
-      "attach point for the existing skeleton_warrior.glb character rig (reused, not hand-built); the shaft handle cross-brace is positioned to match the measured handslot.l/r bone position of the puller's own idle pose (see SHAFT_TIP_Y/Z), not an independent guess. Unchanged from v1: the rig did not change.",
+      "authoring-time reference point only, not the runtime placement (see src/render/rickshaw_mount.ts's RICKSHAW_PULLER_OFFSET_Z/Y, independently tuned after a live look); attach point for skel_rickshaw_puller (skeleton_minion_free.glb, reused, not hand-built). The shaft handle cross-brace is positioned to match the measured handslot.l/r bone position of the puller's own idle pose (see SHAFT_TIP_Y/Z), not an independent guess. Unchanged from v1: the rig did not change.",
   }),
 ]);
 

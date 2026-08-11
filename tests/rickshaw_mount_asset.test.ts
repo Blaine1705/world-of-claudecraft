@@ -1,12 +1,13 @@
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { NodeIO } from '@gltf-transform/core';
+import { getBounds, NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
 import { describe, expect, it } from 'vitest';
 import { RICKSHAW_MATERIAL_CONTRACT } from '../scripts/assets/rickshaw_mount/model.js';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
+import { VISUALS } from '../src/render/characters/manifest';
 
 // Structural contract for the shipped rickshaw_mount.glb, mirroring the tank
 // mount's own asset test (tests/terrorspark_groundshaker_asset.test.ts) minus
@@ -133,5 +134,35 @@ describe('rickshaw mount asset pipeline', () => {
     const nodeNames = root.listNodes().map((n) => n.getName());
     expect(nodeNames).toContain('Wheel_L');
     expect(nodeNames).toContain('Wheel_R');
+  });
+
+  // manifest.ts's own comment on both VisualDefs says a stale height silently
+  // RESCALES the whole model (prepareVisual's normScale = height /
+  // measuredHeight); the rickshaw's own height has already gone stale twice by
+  // that comment's own history. Pin both new GLBs' measured bbox height
+  // against their manifest.ts height field so a future geometry pass that
+  // forgets to update it fails here instead of silently mis-scaling in game.
+  it('pins mount_rickshaw_mount.height against the shipped GLB’s measured bbox', async () => {
+    await MeshoptDecoder.ready;
+    const bytes = readFileSync(ASSET_PATH);
+    const io = new NodeIO()
+      .registerExtensions(ALL_EXTENSIONS)
+      .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
+    const document = await io.readBinary(bytes);
+    const bounds = getBounds(document.getRoot().listScenes()[0]);
+    const measuredHeight = bounds.max[1] - bounds.min[1];
+    expect(measuredHeight).toBeCloseTo(VISUALS.mount_rickshaw_mount.height, 3);
+  });
+
+  it('pins skel_rickshaw_puller.height against the shipped GLB’s measured bbox', async () => {
+    await MeshoptDecoder.ready;
+    const pullerPath = path.join(REPO_ROOT, 'public/models/chars/enemies/skeleton_minion_free.glb');
+    const io = new NodeIO()
+      .registerExtensions(ALL_EXTENSIONS)
+      .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
+    const document = await io.readBinary(readFileSync(pullerPath));
+    const bounds = getBounds(document.getRoot().listScenes()[0]);
+    const measuredHeight = bounds.max[1] - bounds.min[1];
+    expect(measuredHeight).toBeCloseTo(VISUALS.skel_rickshaw_puller.height, 3);
   });
 });

@@ -72,17 +72,22 @@ function modelStats(root) {
   };
 }
 
-// The game's own convention for this exact model: every skeleton_warrior-based
-// character manifest entry (src/render/characters/manifest.ts) uses
-// height: 2.5, not a guessed value.
-const PULLER_TARGET_WORLD_HEIGHT = 2.5;
+// The game's own convention for the SHIPPED puller: manifest.ts's
+// skel_rickshaw_puller VisualDef (skeleton_minion_free.glb) carries the
+// measured height 2.166, not skeleton_warrior.glb's 2.5. Keep these two in
+// sync (and PULLER_GLB in export_rickshaw_mount.mjs), or this preview reviews
+// a different rig at the wrong height.
+const PULLER_TARGET_WORLD_HEIGHT = 2.166;
 
-// Loads the existing skeleton_warrior.glb (reused, not hand-built), scales it
-// to the game's real character height, floor-seats it, and attaches it at
-// Socket_Puller facing the same +Z front axis as the cart. This is a rough
-// PLACEMENT pass, not a re-posed one: the rig keeps its authored rest pose,
-// so the hands are not yet gripping the shaft handles. That re-pose is the
-// next step once the placement itself is confirmed to look right.
+// Loads skel_rickshaw_puller's own rig (reused, not hand-built), scales it to
+// the game's real character height, and attaches it at the same runtime
+// offset src/render/rickshaw_mount.ts actually uses (RICKSHAW_PULLER_OFFSET_Z/
+// Y), not the raw authored Socket_Puller position: those two constants were
+// independently tuned after a live look and no longer match the socket. This
+// is a rough PLACEMENT pass, not a re-posed one: the rig keeps its authored
+// rest pose, so the hands are not yet gripping the shaft handles. That
+// re-pose is the next step once the placement itself is confirmed to look
+// right.
 async function attachPuller(root, pullerB64) {
   if (!pullerB64) return null;
   const gltf = await loadGlbFromBase64(pullerB64);
@@ -106,8 +111,10 @@ async function attachPuller(root, pullerB64) {
   character.position.set(-(box.min.x + box.max.x) / 2, -box.min.y, -(box.min.z + box.max.z) / 2);
   wrapper.scale.setScalar(scale);
 
-  const socketDef = RICKSHAW_SOCKET_DEFINITIONS.find((s) => s.id === 'puller');
-  wrapper.position.fromArray(socketDef.position);
+  // RICKSHAW_PULLER_OFFSET_Z = 1.8, RICKSHAW_PULLER_OFFSET_Y = 0.12
+  // (src/render/rickshaw_mount.ts): the real runtime placement, not
+  // RICKSHAW_SOCKET_DEFINITIONS's authored 'puller' entry.
+  wrapper.position.set(0, 0.12, 1.8);
   root.add(wrapper);
   return wrapper;
 }

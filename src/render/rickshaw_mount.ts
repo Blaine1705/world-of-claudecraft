@@ -20,8 +20,13 @@
 // authoring pipeline (scripts/assets/rickshaw_mount/model.js) places a
 // Socket_Puller marker for preview purposes, but build_assets.mjs's prune
 // pass drops empty non-mesh nodes, so it never survives into the shipped
-// GLB. The offset below is that same authored value (RICKSHAW_SOCKET_DEFINITIONS
-// 'puller': local [0, 0, 0.55]) at RICKSHAW_SCALE (2.0): world (0, 0, 1.1).
+// GLB. The two constants below (RICKSHAW_PULLER_OFFSET_Z/Y) are NOT the raw
+// authored RICKSHAW_SOCKET_DEFINITIONS 'puller' value (local [0, 0, 0.55] at
+// RICKSHAW_SCALE 2.0, i.e. world [0, 0, 1.1]): they were independently
+// measured and tuned against the real skel_rickshaw_puller rig after a live
+// look, and each carries its own history note explaining why it moved. The
+// authored socket stays the model.js-side reference point for the shaft
+// geometry (SHAFT_TIP_Y/Z/SIDE_X); it is not this file's source of truth.
 // Both this mount's root AND the puller's own CharacterVisual root are
 // floor-pivoted, unscaled conventions (see visual.ts, "pivot at feet, faces
 // +Z"), so parenting at that outer level needs no further scale correction:
@@ -114,6 +119,17 @@ export function spinMountWheels(
       // export pipeline rewrites node scale and translation during
       // quantization, so any authored number would be a second source of truth
       // that silently drifts. Half the wheel's world height IS the radius.
+      // Box3.setFromObject only refreshes the target node's own world matrix,
+      // not its ancestors (three's Object3D.updateWorldMatrix(false, false)),
+      // and on the frame this visual is first built, root and its ancestors
+      // may still carry a stale matrix from before this subtree was parented.
+      // Force the whole chain current first so the measured radius reflects
+      // the model's REAL placed scale, not whatever the previous frame left
+      // behind (harmless today since this mount's normScale and every rider's
+      // e.scale are both 1, but the result is cached for the visual's whole
+      // lifetime, so a future scaled rider or a manifest height drift would
+      // otherwise bake in a silently wrong radius).
+      root.updateWorldMatrix(true, false);
       wheelBoundsScratch.setFromObject(found[0]);
       v.mountWheelRadius = (wheelBoundsScratch.max.y - wheelBoundsScratch.min.y) / 2;
     }

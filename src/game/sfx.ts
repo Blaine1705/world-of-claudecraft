@@ -42,18 +42,22 @@ export const MAX_DISTANCE = 46; // hard cutoff: beyond this, sources are silent/
 const POINT_AMBIENCE_GAIN = 0.18;
 const COOLDOWN_ENTRY_TTL = 60;
 const COOLDOWN_PRUNE_INTERVAL = 30;
-// The ceiling the SFX system itself allows for this key. loop() multiplies this
-// by the clip's own manifest gain (1 for this key, i.e. 0dB), and
-// sfx_runtime_pack.ts's maxGainForKey caps it at SFX_GAIN_LIMITS, which is 1
-// here -- so 1 IS the maximum, not an arbitrary choice. Still peak-safe: the
-// conform pass put the file at -6dBFS, so 0dB of gain leaves 6dB of headroom.
-// Nothing about the mix is protecting us above this, so if it ends up too loud
-// against footsteps and ambience, this comes DOWN rather than the ceiling
-// going up.
+// The target loop() multiplies by the clip's own manifest gain (1 for this
+// key, i.e. 0dB) to get the loop's actual gain. This is a tuning CHOICE, not a
+// ceiling-derived maximum: SFX_GAIN_LIMITS['mount_loop_rickshaw_mount'] is
+// 1.778279 (sfx_manifest.generated.ts, from this key's 5dB ceilingDb), and
+// nothing clamps the target a caller passes to loop() against that limit (it
+// only gates the runtime pack's own clip-gain override, sfx_runtime_pack.ts).
+// The conform pass put the file at -6dBFS, so 0dB of gain leaves 6dB of
+// headroom before clipping, well inside SFX_GAIN_LIMITS's own 5dB further on
+// top of that. If this ends up too loud against footsteps and ambience, this
+// comes DOWN; there is real ceiling left above it if it ever needs to come up.
 const MOUNT_LOOP_GAIN = 1;
-// Short enough that letting go of the key reads as the cart stopping, long
-// enough not to click. Deliberately far below the 0.7 the ambiences use, whose
-// job is to disguise a zone boundary rather than track player input.
+// Governs ONLY the dismount/view-removal fade (stopMountLoop -> unloop()).
+// The moving-to-stopped transition (the far more common case, letting go of
+// the movement key mid-ride) never touches this constant: loop() ramps that
+// gain with its own fixed setTargetAtTime(..., 0.25), so "letting go of the
+// key reads as the cart stopping" is governed by that 0.25, not by this value.
 const MOUNT_LOOP_FADE = 0.18;
 // amb_forge's custom recording still reads quiet in-game even with the
 // catalog's keyTrimDb ceiling (scripts/sfx/sfx_gain_map.json) applied at its
@@ -1036,9 +1040,10 @@ class Sfx {
     const key = `mount_loop_${mountKey}`;
     if (!(key in SFX_CLIPS)) {
       // The renderer calls this every frame for every mounted entity in view,
-      // and most mounts have no mount_loop_* clip at all: skip the template
-      // string and the three unloop() Map ops unless a slot could actually be
-      // held (e.g. a mid-ride mount swap from a rolling mount to a walking one).
+      // and most mounts have no mount_loop_* clip at all: skip the three
+      // unloop() Map ops (the key template string above is unavoidable, it is
+      // what the `in` check just used) unless a slot could actually be held
+      // (e.g. a mid-ride mount swap from a rolling mount to a walking one).
       if (this.loops.has(`mountloop_${id}`) || this.pendingLoops.has(`mountloop_${id}`)) {
         this.stopMountLoop(id);
       }

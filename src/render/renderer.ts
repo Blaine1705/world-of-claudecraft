@@ -11714,6 +11714,17 @@ export class Renderer {
       // above. No-op for every mount without a mount_loop_* clip, which is all
       // of them but this one. Stopped explicitly rather than by omission: a loop
       // nobody calls again just keeps playing.
+      //
+      // Deliberately OUTSIDE the SFX_MOVE_RANGE_SQ (42yd) gate above and the
+      // mountEngineReset release branch beside it: those exist because an
+      // engine mount's loop, once started, keeps playing at its LAST polled
+      // position if the rider leaves the gate mid-move, since nothing calls it
+      // again to update or release it. mountLoop has no such failure mode: it
+      // is called here every frame regardless of distance, so a rider anywhere
+      // in interest range (~120yd) always has a fresh position, and
+      // MAX_DISTANCE (46yd, sfx.ts) genuinely silences it well before that.
+      // The cost is node count only (one held BufferSource/GainNode/PannerNode
+      // per far-but-in-range rider), not a frozen or stale sound.
       if (sink) {
         if (logicallyMounted && !visuallyDead) {
           sink.mountLoop(e.id, ax, ay, az, e.mountKey, moving && !airborne);
