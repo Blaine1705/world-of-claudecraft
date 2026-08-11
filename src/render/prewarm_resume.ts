@@ -79,7 +79,9 @@ export async function waitForPrefetch(
 
 export interface PrewarmResumeHooks<T extends PrewarmResumeEntry> {
   idleSlot: () => Promise<unknown>;
-  runUnit?: (unit: PrewarmResumeUnit) => void | Promise<void>;
+  /** The owning entry rides along so the runner can schedule by entry class
+   *  (link/upload debt vs cosmetic warm-up; see prewarmResumeIsDebt). */
+  runUnit?: (unit: PrewarmResumeUnit, entry: T) => void | Promise<void>;
   afterEntry?: (entry: T) => void;
   onUnitError?: (entry: T, unit: PrewarmResumeUnit, error: unknown) => void;
 }
@@ -186,7 +188,7 @@ export async function resumeDroppedPrewarmEntries<T extends PrewarmResumeEntry>(
     for (const unit of entry.units) {
       await hooks.idleSlot();
       try {
-        await (hooks.runUnit ? hooks.runUnit(unit) : unit.run());
+        await (hooks.runUnit ? hooks.runUnit(unit, entry) : unit.run());
       } catch (error) {
         hooks.onUnitError?.(entry, unit, error);
       }

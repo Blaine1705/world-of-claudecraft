@@ -420,6 +420,7 @@ import {
   mandatoryLandmarkViewsReady,
   materialProgramSignature,
   orderedPrewarmIds,
+  orderPrewarmResumeEntries,
   type PrewarmEntryProgress,
   type PrewarmPolicy,
   partitionMandatoryLandmarkCandidates,
@@ -431,6 +432,8 @@ import {
   prewarmEntryRuns,
   prewarmEntryShouldDefer,
   prewarmProgramContentKeys,
+  prewarmResumeIsDebt,
+  prewarmSubmitShouldStop,
   remainingPrewarmViewBudget,
   resolvePrewarmEntryStatus,
   resolvePrewarmPolicy,
@@ -6282,9 +6285,20 @@ export class Renderer {
     // group and re-collection rules are pinned by tests.
     const submittedCompileUnits: { id: string; done: Promise<void> }[] = [];
     const submittedCompileGroups = new Set<string>();
+    // Units built (their roots consumed from the shared dedupe store) but not
+    // yet submitted because the loop below hit the GPU submit deadline. The
+    // roots are marked seen at BUILD time, so these exact unit objects are the
+    // only remaining route to their compiles: the compile entry drains them
+    // first when it runs, and the post-manifest hand-off pushes any leftover
+    // to the resume lane (never dropped, hitch-hunt P1).
+    const deferredSubmitUnits: PrewarmResumeUnit[] = [];
     const LATE_COMPILE_GROUPS = new Set(['weapon-vfx']);
     const RECOLLECT_COMPILE_GROUPS = new Set(['scene']);
-    const submitCompileUnits = async (includeLate: boolean) => {
+    // deadlineMs: the early entry stops at the GPU submit guard; the compile
+    // entry's tail call passes min(gpuSubmitDeadline, compileAwaitDeadline)
+    // so the submit loop can never eat the await reserve that keeps
+    // world.initial-frame's programs linked before it draws.
+    const submitCompileUnits = async (includeLate: boolean, deadlineMs = gpuSubmitDeadline) => {
       const plan = planCompileSubmission({
         groups: [
           { id: 'scene', exists: true },
@@ -6298,7 +6312,33 @@ export class Renderer {
       const collect = new Set(plan.collect);
       const units = compileEntryUnits((groupId) => collect.has(groupId));
       for (const groupId of plan.mark) submittedCompileGroups.add(groupId);
-      for (const unit of units) {
+      // Earlier-deferred units resubmit ahead of the fresh collection; their
+      // groups are already marked, so the plan above never re-collected them.
+      const pending = [...deferredSubmitUnits.splice(0, deferredSubmitUnits.length), ...units];
+      for (let i = 0; i < pending.length; i++) {
+        // Deadline-aware, checked BETWEEN units: one uninterrupted submit loop
+        // measured 22 s of synchronous prologue work in production, sailing
+        // past the 15 s hard deadline and dropping every entry behind it, the
+        // deadline-exempt debt payers included (hitch-hunt S1/S2).
+        if (
+          prewarmSubmitShouldStop(
+            performance.now(),
+            deadlineMs,
+            policy.finishFullManifestBeforeReveal,
+          )
+        ) {
+          deferredSubmitUnits.push(...pending.slice(i));
+          // The deferred units' compiles now settle AFTER the manifest, so
+          // the warm entity/NPC pools must not publish from the manifest's
+          // finally block with unlinked programs: the settle-then-publish
+          // arm below publishes them once the resume lane drains (same
+          // contract as the compile entry's whole-deferral path).
+          deferPoolPublication ||=
+            (entityPrewarmPool.length > 0 && (entityPrewarmGroup?.children.length ?? 0) > 0) ||
+            (npcPrewarmPool.length > 0 && (npcPrewarmGroup?.children.length ?? 0) > 0);
+          return;
+        }
+        const unit = pending[i];
         submittedCompileUnits.push({
           id: unit.id,
           done: Promise.resolve(unit.run()).catch((err: unknown) => {
@@ -6782,7 +6822,10 @@ export class Renderer {
           if (policy.skipMonolithCompile || !this.asyncCompileSupported) return;
           await submitCompileUnits(false);
         },
-        detail: () => `submitted=${submittedCompileUnits.length}`,
+        detail: () =>
+          deferredSubmitUnits.length > 0
+            ? `submitted=${submittedCompileUnits.length};deferred=${deferredSubmitUnits.length}`
+            : `submitted=${submittedCompileUnits.length}`,
       },
       {
         // The worn-stone family maps (normal/AO/rough/displacement/metal) and
@@ -7162,8 +7205,12 @@ export class Renderer {
           // the late-staged groups (weapon-vfx stages at priority 61), any
           // group that did not exist yet back then (landmark stages at 48),
           // and the live-scene re-collection.
-          await submitCompileUnits(true);
-          compileUnitsPlanned = submittedCompileUnits.length;
+          await submitCompileUnits(true, Math.min(gpuSubmitDeadline, compileAwaitDeadline));
+          compileUnitsPlanned = submittedCompileUnits.length + deferredSubmitUnits.length;
+          // Honesty gate: units deferred mid-run went to the resume lane, so
+          // this entry must report 'partial', never 'completed'
+          // (resolvePrewarmEntryStatus reads trimmed via the dropped count).
+          compileUnitsDropped = deferredSubmitUnits.length;
           // Await every submitted unit so all of their programs are READY
           // before world.initial-frame renders (a program still linking by
           // then links synchronously inside that frame, the measured
@@ -7217,7 +7264,8 @@ export class Renderer {
               }
             : null,
         detail: () =>
-          `mode=${compileMode};timedOut=${compileTimedOut};compileRoots=${compiledPrewarmRoots}`,
+          `mode=${compileMode};timedOut=${compileTimedOut};compileRoots=${compiledPrewarmRoots}` +
+          (compileUnitsDropped > 0 ? `;deferred=${compileUnitsDropped}` : ''),
       },
       {
         id: 'programs.budget-variants',
@@ -7370,6 +7418,19 @@ export class Renderer {
       cleanupPrewarmArtifacts({ clearVfx: true, publishPools: !deferPoolPublication });
     }
 
+    // Deferred compile-submit units whose owner never drained them (the
+    // compile entry itself was dropped, or its drain hit the deadline again):
+    // their roots are consumed in the shared dedupe store, so these unit
+    // objects are the only remaining route to those compiles. Hand them to
+    // the resume lane as link debt rather than dropping them (the production
+    // failure this lane exists for, hitch-hunt P1).
+    if (deferredSubmitUnits.length > 0) {
+      droppedEntries.push({
+        id: 'programs.compile-submit',
+        units: deferredSubmitUnits.splice(0, deferredSubmitUnits.length),
+      });
+    }
+
     // Either arm needs the settle-then-publish scheduling below: real dropped
     // work (droppedEntries), or the compile entry's resumeUnits callback
     // withholding pool publication (deferPoolPublication) even though its OWN
@@ -7381,7 +7442,11 @@ export class Renderer {
     if (droppedEntries.length > 0 || deferPoolPublication) {
       // Fire-and-forget: world-entry timing does not depend on this. Every
       // retained item is an explicit small unit, never a whole entry rerun.
-      const resume = droppedEntries.slice();
+      // Debt first: the lane is strictly serial in array order, so the
+      // BOOT_DEBT priority alone cannot reorder it; manifest order would put
+      // the cosmetic entries (which resume BELOW the preview lane) ahead of
+      // the link/upload debt, the exact starvation this lane exists to fix.
+      const resume = orderPrewarmResumeEntries(droppedEntries);
       const failedResumeUnits: string[] = [];
       if (resume.length > 0) {
         console.info(
@@ -7402,16 +7467,33 @@ export class Renderer {
               idleSlot(IDLE_PREWARM_TIMEOUT_MS, {
                 maxTimeoutDeferrals: 2,
               }),
-            runUnit: (unit) =>
-              // releaseTail: a resume unit's wall time is dominated by its
-              // off-thread compileAsync links. Without it each 16-root unit
-              // occupied the whole serial queue for seconds, so live compile
-              // gates (LIVE_VIEW/ACTIONABLE_VIEW, which do declare their
-              // tails) could not START and first-sight content hitched for
-              // minutes after entry (the captured travel-hitch amplifier).
-              this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME, unit.id, {
-                releaseTail: true,
-              }),
+            runUnit: (unit, entry) => {
+              // Link/upload debt runs at BOOT_DEBT so the cosmetic BACKGROUND
+              // warmers (the preview lane) cannot starve it: production
+              // measured minutes of unpaid link debt behind the previews,
+              // surfacing as first-draw stalls (hitch-hunt P1). Debt keeps
+              // its tail HELD (releaseTail false): released tails let every
+              // debt batch's links pile into the driver concurrently, and
+              // with the whole manifest dropped that queue depth made every
+              // first draw block for seconds (measured sub-1-fps for a full
+              // minute locally). Serial, settled-before-next batches keep the
+              // link queue shallow; live gates (LIVE_VIEW/ACTIONABLE_VIEW)
+              // preempt between batches, waiting at most one batch's settle.
+              const debt = prewarmResumeIsDebt(entry.id);
+              return this.backgroundGpuWork.run(
+                unit.run,
+                debt ? GPU_WORK_PRIORITY.BOOT_DEBT : GPU_WORK_PRIORITY.BOOT_RESUME,
+                unit.id,
+                {
+                  // Cosmetic resume keeps the released tail: without it each
+                  // 16-root unit occupied the whole serial queue for seconds,
+                  // so live compile gates could not START and first-sight
+                  // content hitched for minutes after entry (the captured
+                  // travel-hitch amplifier).
+                  releaseTail: !debt,
+                },
+              );
+            },
             afterEntry: hidePrewarmArtifacts,
             onUnitError: (entry, unit, error) => {
               failedResumeUnits.push(`${entry.id}:${unit.id}`);
