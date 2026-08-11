@@ -895,7 +895,7 @@ export const zh_CN: EnTranslations = {
     },
     "otaUpdate": {
       "title": "游戏更新",
-      "downloading": "正在下载更新：{percent}%",
+      "downloading": "正在下载更新：{percent}",
       "applying": "更新已下载。正在重新启动游戏以应用更新。",
       "incompatible": "需要更新后才能进行游戏。下载完成后将立即应用。",
       "continueAnyway": "暂不更新，继续游戏",

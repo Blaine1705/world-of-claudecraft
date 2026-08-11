@@ -12,7 +12,7 @@
 
 import type { OtaOverlayModel } from '../net/ota_update_gate';
 import { markDialogRoot } from './dialog_root';
-import { t } from './i18n';
+import { formatNumber, t } from './i18n';
 
 export interface OtaOverlayActions {
   onContinue(): void;
@@ -91,7 +91,15 @@ export function renderOtaUpdateOverlay(model: OtaOverlayModel, actions: OtaOverl
       ? t('hudChrome.otaUpdate.applying')
       : model.fatal
         ? t('hudChrome.otaUpdate.incompatible')
-        : t('hudChrome.otaUpdate.downloading', { percent: Math.round(model.percent) });
+        : t('hudChrome.otaUpdate.downloading', {
+            // Locale-correct percent (digits and the % sign both localized),
+            // per the i18n formatter rule; the value already carries the sign,
+            // so the catalog string interpolates {percent} without a literal %.
+            percent: formatNumber(Math.max(0, Math.min(100, model.percent)) / 100, {
+              style: 'percent',
+              maximumFractionDigits: 0,
+            }),
+          });
   if (statusText !== lastStatusText) {
     refs.status.textContent = statusText;
     lastStatusText = statusText;

@@ -7698,7 +7698,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': '後で',
   'hudChrome.nativeUpdate.update': '更新',
   'hudChrome.otaUpdate.title': 'ゲームアップデート',
-  'hudChrome.otaUpdate.downloading': 'アップデートをダウンロード中：{percent}%',
+  'hudChrome.otaUpdate.downloading': 'アップデートをダウンロード中：{percent}',
   'hudChrome.otaUpdate.applying':
     'アップデートをダウンロードしました。適用のためゲームを再起動しています。',
   'hudChrome.otaUpdate.incompatible':

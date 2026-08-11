@@ -7397,7 +7397,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': '暫不',
   'hudChrome.nativeUpdate.update': '更新',
   'hudChrome.otaUpdate.title': '遊戲更新',
-  'hudChrome.otaUpdate.downloading': '正在下載更新：{percent}%',
+  'hudChrome.otaUpdate.downloading': '正在下載更新：{percent}',
   'hudChrome.otaUpdate.applying': '更新已下載。正在重新啟動遊戲以套用更新。',
   'hudChrome.otaUpdate.incompatible': '需要更新後才能進行遊戲。下載完成後將立即套用。',
   'hudChrome.otaUpdate.continueAnyway': '暫不更新，繼續遊戲',

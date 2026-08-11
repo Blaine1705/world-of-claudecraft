@@ -631,7 +631,7 @@ export const hudChromeStrings = {
   // in-app bundle downloads, distinct from the store-update prompt above.
   otaUpdate: {
     title: 'Game Update',
-    downloading: 'Downloading update: {percent}%',
+    downloading: 'Downloading update: {percent}',
     applying: 'Update downloaded. Restarting the game to apply it.',
     incompatible:
       'An update is required to play. It will be applied as soon as it finishes downloading.',

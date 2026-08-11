@@ -895,7 +895,7 @@ export const ja_JP: EnTranslations = {
     },
     "otaUpdate": {
       "title": "ゲームアップデート",
-      "downloading": "アップデートをダウンロード中：{percent}%",
+      "downloading": "アップデートをダウンロード中：{percent}",
       "applying": "アップデートをダウンロードしました。適用のためゲームを再起動しています。",
       "incompatible": "プレイするにはアップデートが必要です。ダウンロードが完了すると自動的に適用されます。",
       "continueAnyway": "更新せずに続行",

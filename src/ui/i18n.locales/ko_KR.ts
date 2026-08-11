@@ -7687,7 +7687,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': '나중에',
   'hudChrome.nativeUpdate.update': '업데이트',
   'hudChrome.otaUpdate.title': '게임 업데이트',
-  'hudChrome.otaUpdate.downloading': '업데이트 다운로드 중: {percent}%',
+  'hudChrome.otaUpdate.downloading': '업데이트 다운로드 중: {percent}',
   'hudChrome.otaUpdate.applying': '업데이트를 다운로드했습니다. 적용을 위해 게임을 다시 시작합니다.',
   'hudChrome.otaUpdate.incompatible':
     '플레이하려면 업데이트가 필요합니다. 다운로드가 끝나는 대로 적용됩니다.',

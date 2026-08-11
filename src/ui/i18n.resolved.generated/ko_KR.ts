@@ -895,7 +895,7 @@ export const ko_KR: EnTranslations = {
     },
     "otaUpdate": {
       "title": "게임 업데이트",
-      "downloading": "업데이트 다운로드 중: {percent}%",
+      "downloading": "업데이트 다운로드 중: {percent}",
       "applying": "업데이트를 다운로드했습니다. 적용을 위해 게임을 다시 시작합니다.",
       "incompatible": "플레이하려면 업데이트가 필요합니다. 다운로드가 끝나는 대로 적용됩니다.",
       "continueAnyway": "업데이트하지 않고 계속",

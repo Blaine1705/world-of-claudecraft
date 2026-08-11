@@ -7802,7 +7802,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Не сейчас',
   'hudChrome.nativeUpdate.update': 'Обновить',
   'hudChrome.otaUpdate.title': 'Обновление игры',
-  'hudChrome.otaUpdate.downloading': 'Загрузка обновления: {percent}%',
+  'hudChrome.otaUpdate.downloading': 'Загрузка обновления: {percent}',
   'hudChrome.otaUpdate.applying':
     'Обновление загружено. Игра перезапускается для его применения.',
   'hudChrome.otaUpdate.incompatible':
