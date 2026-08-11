@@ -893,6 +893,14 @@ export const zh_TW: EnTranslations = {
       "notNow": "暫不",
       "update": "更新"
     },
+    "otaUpdate": {
+      "title": "遊戲更新",
+      "downloading": "正在下載更新：{percent}",
+      "applying": "更新已下載。正在重新啟動遊戲以套用更新。",
+      "incompatible": "需要更新後才能進行遊戲。下載完成後將立即套用。",
+      "continueAnyway": "暫不更新，繼續遊戲",
+      "progressLabel": "更新下載進度"
+    },
     "cameraPrompt": {
       "title": "選擇你的鏡頭",
       "intro": "選擇鏡頭跟隨角色的方式。",
@@ -994,6 +1002,7 @@ export const zh_TW: EnTranslations = {
       "emoteWheel": "表情輪盤",
       "targetFriendly": "選取最近友方",
       "targetFriendlyNext": "切換友方目標",
+      "targetPrev": "反向切換目標",
       "discord": "Discord",
       "valecup": "溪谷盃",
       "bgFlag": "戰場奪旗動作",
@@ -4169,6 +4178,7 @@ export const zh_TW: EnTranslations = {
       "dungeonFinder": "地城搜尋器",
       "discord": "Discord",
       "abilities": "使用動作列技能（數字鍵列；第二條動作列位於數字鍵盤上）",
+      "targetPrev": "反向切換目標",
       "targetFriendly": "鎖定最近的友方",
       "cycleFriendly": "切換友方目標",
       "targetAuras": "目標增益與減益效果",

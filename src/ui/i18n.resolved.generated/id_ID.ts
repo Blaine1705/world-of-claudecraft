@@ -893,6 +893,14 @@ export const id_ID: EnTranslations = {
       "notNow": "Jangan sekarang",
       "update": "Perbarui"
     },
+    "otaUpdate": {
+      "title": "Game Update",
+      "downloading": "Downloading update: {percent}",
+      "applying": "Update downloaded. Restarting the game to apply it.",
+      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
+      "continueAnyway": "Continue without updating",
+      "progressLabel": "Update download progress"
+    },
     "cameraPrompt": {
       "title": "Pilih Kameramu",
       "intro": "Pilih cara kamera mengikuti karaktermu.",
@@ -994,6 +1002,7 @@ export const id_ID: EnTranslations = {
       "emoteWheel": "Roda Emote",
       "targetFriendly": "Bidik Sekutu Terdekat",
       "targetFriendlyNext": "Putar Bidikan Sekutu",
+      "targetPrev": "Putar Bidikan Mundur",
       "discord": "Discord",
       "valecup": "Piala Lembah",
       "bgFlag": "Aksi Bendera Medan Pertempuran",
@@ -4169,6 +4178,7 @@ export const id_ID: EnTranslations = {
       "dungeonFinder": "Pencari Dungeon",
       "discord": "Discord",
       "abilities": "Gunakan kemampuan action bar (deretan angka; bilah kedua ada di numpad)",
+      "targetPrev": "Putar target mundur",
       "targetFriendly": "Targetkan kawan terdekat",
       "cycleFriendly": "Putar target kawan",
       "targetAuras": "Targetkan penguat dan pelemah",

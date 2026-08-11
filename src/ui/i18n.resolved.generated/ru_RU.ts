@@ -893,6 +893,14 @@ export const ru_RU: EnTranslations = {
       "notNow": "Не сейчас",
       "update": "Обновить"
     },
+    "otaUpdate": {
+      "title": "Обновление игры",
+      "downloading": "Загрузка обновления: {percent}",
+      "applying": "Обновление загружено. Игра перезапускается для его применения.",
+      "incompatible": "Для игры требуется обновление. Оно будет применено сразу после завершения загрузки.",
+      "continueAnyway": "Продолжить без обновления",
+      "progressLabel": "Ход загрузки обновления"
+    },
     "cameraPrompt": {
       "title": "Выберите камеру",
       "intro": "Выберите, как камера следует за персонажем.",
@@ -994,6 +1002,7 @@ export const ru_RU: EnTranslations = {
       "emoteWheel": "Колесо эмоций",
       "targetFriendly": "Ближайший союзник",
       "targetFriendlyNext": "Следующий союзник",
+      "targetPrev": "Цикл целей назад",
       "discord": "Discord",
       "valecup": "Кубок Долины",
       "bgFlag": "Действие с флагом",
@@ -4169,6 +4178,7 @@ export const ru_RU: EnTranslations = {
       "dungeonFinder": "Поиск подземелий",
       "discord": "Discord",
       "abilities": "Использовать способности панели команд (цифровой ряд; вторая панель — на цифровом блоке)",
+      "targetPrev": "Цикл целей назад",
       "targetFriendly": "Ближайший союзник",
       "cycleFriendly": "Следующий союзник",
       "targetAuras": "Усиления и ослабления цели",

@@ -893,6 +893,14 @@ export const en_XA: EnTranslations = {
       "notNow": "[Ñóţ ñóŵ]",
       "update": "[Úþðáţé]"
     },
+    "otaUpdate": {
+      "title": "[Ĝáɱé Úþðáţé]",
+      "downloading": "[Ðóŵñļóáðíñĝ úþðáţé: {percent}]",
+      "applying": "[Úþðáţé ðóŵñļóáðéð. Ŕéšţáŕţíñĝ ţĥé ĝáɱé ţó áþþļý íţ.]",
+      "incompatible": "[Áñ úþðáţé íš ŕéɋúíŕéð ţó þļáý. Íţ ŵíļļ ƀé áþþļíéð áš šóóñ áš íţ ƒíñíšĥéš ðóŵñļóáðíñĝ.]",
+      "continueAnyway": "[Çóñţíñúé ŵíţĥóúţ úþðáţíñĝ]",
+      "progressLabel": "[Úþðáţé ðóŵñļóáð þŕóĝŕéšš]"
+    },
     "cameraPrompt": {
       "title": "[Çĥóóšé Ýóúŕ Çáɱéŕá]",
       "intro": "[Þíçķ ĥóŵ ţĥé çáɱéŕá ƒóļļóŵš ýóúŕ çĥáŕáçţéŕ.]",
@@ -994,6 +1002,7 @@ export const en_XA: EnTranslations = {
       "emoteWheel": "[Éɱóţé Ŵĥééļ]",
       "targetFriendly": "[Ţáŕĝéţ Ñéáŕéšţ Ƒŕíéñðļý]",
       "targetFriendlyNext": "[Çýçļé Ƒŕíéñðļý Ţáŕĝéţ]",
+      "targetPrev": "[Çýçļé Ţáŕĝéţ Ɓáçķŵáŕð]",
       "discord": "[Ðíšçóŕð]",
       "valecup": "[Ʋáļé Çúþ]",
       "bgFlag": "[Ɓáţţļéĝŕóúñð Ƒļáĝ Áçţíóñ]",
@@ -4169,6 +4178,7 @@ export const en_XA: EnTranslations = {
       "dungeonFinder": "[Ðúñĝéóñ Ƒíñðéŕ]",
       "discord": "[Ðíšçóŕð]",
       "abilities": "[Úšé áçţíóñ ƀáŕ áƀíļíţíéš (ţĥé ñúɱƀéŕ ŕóŵ; á šéçóñð ƀáŕ šíţš óñ ţĥé ñúɱþáð)]",
+      "targetPrev": "[Çýçļé ţáŕĝéţ ƀáçķŵáŕð]",
       "targetFriendly": "[Ţáŕĝéţ ñéáŕéšţ ƒŕíéñðļý]",
       "cycleFriendly": "[Çýçļé ƒŕíéñðļý ţáŕĝéţ]",
       "targetAuras": "[Ţáŕĝéţ ƀúƒƒš áñð ðéƀúƒƒš]",

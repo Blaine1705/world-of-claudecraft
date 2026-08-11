@@ -12,33 +12,69 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.items.reins_rickshaw_mount.name",
     "hudChrome.mounts.desc_rickshaw_mount",
-    "hudChrome.mounts.name_rickshaw_mount"
+    "hudChrome.mounts.name_rickshaw_mount",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "es_ES": [
     "entities.items.reins_rickshaw_mount.name",
     "hudChrome.mounts.desc_rickshaw_mount",
-    "hudChrome.mounts.name_rickshaw_mount"
+    "hudChrome.mounts.name_rickshaw_mount",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "fr_FR": [
     "entities.items.reins_rickshaw_mount.name",
     "hudChrome.mounts.desc_rickshaw_mount",
-    "hudChrome.mounts.name_rickshaw_mount"
+    "hudChrome.mounts.name_rickshaw_mount",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "fr_CA": [
     "entities.items.reins_rickshaw_mount.name",
     "hudChrome.mounts.desc_rickshaw_mount",
-    "hudChrome.mounts.name_rickshaw_mount"
+    "hudChrome.mounts.name_rickshaw_mount",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "en_CA": [],
   "it_IT": [
     "entities.items.reins_rickshaw_mount.name",
     "hudChrome.mounts.desc_rickshaw_mount",
-    "hudChrome.mounts.name_rickshaw_mount"
+    "hudChrome.mounts.name_rickshaw_mount",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "de_DE": [
     "entities.items.reins_rickshaw_mount.name",
     "hudChrome.mounts.desc_rickshaw_mount",
-    "hudChrome.mounts.name_rickshaw_mount"
+    "hudChrome.mounts.name_rickshaw_mount",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -47,47 +83,101 @@ export const pending: Record<string, readonly string[]> = {
   "pt_BR": [
     "entities.items.reins_rickshaw_mount.name",
     "hudChrome.mounts.desc_rickshaw_mount",
-    "hudChrome.mounts.name_rickshaw_mount"
+    "hudChrome.mounts.name_rickshaw_mount",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "entities.items.reins_rickshaw_mount.name",
     "hudChrome.mounts.desc_rickshaw_mount",
-    "hudChrome.mounts.name_rickshaw_mount"
+    "hudChrome.mounts.name_rickshaw_mount",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "nl_NL": [
     "entities.items.reins_rickshaw_mount.name",
     "hudChrome.mounts.desc_rickshaw_mount",
-    "hudChrome.mounts.name_rickshaw_mount"
+    "hudChrome.mounts.name_rickshaw_mount",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "pl_PL": [
     "entities.items.reins_rickshaw_mount.name",
     "hudChrome.mounts.desc_rickshaw_mount",
-    "hudChrome.mounts.name_rickshaw_mount"
+    "hudChrome.mounts.name_rickshaw_mount",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "id_ID": [
     "entities.items.reins_rickshaw_mount.name",
     "hudChrome.mounts.desc_rickshaw_mount",
-    "hudChrome.mounts.name_rickshaw_mount"
+    "hudChrome.mounts.name_rickshaw_mount",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "tr_TR": [
     "entities.items.reins_rickshaw_mount.name",
     "hudChrome.mounts.desc_rickshaw_mount",
-    "hudChrome.mounts.name_rickshaw_mount"
+    "hudChrome.mounts.name_rickshaw_mount",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "sv_SE": [
     "entities.items.reins_rickshaw_mount.name",
     "hudChrome.mounts.desc_rickshaw_mount",
-    "hudChrome.mounts.name_rickshaw_mount"
+    "hudChrome.mounts.name_rickshaw_mount",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "vi_VN": [
     "entities.items.reins_rickshaw_mount.name",
     "hudChrome.mounts.desc_rickshaw_mount",
-    "hudChrome.mounts.name_rickshaw_mount"
+    "hudChrome.mounts.name_rickshaw_mount",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "da_DK": [
     "entities.items.reins_rickshaw_mount.name",
     "hudChrome.mounts.desc_rickshaw_mount",
-    "hudChrome.mounts.name_rickshaw_mount"
+    "hudChrome.mounts.name_rickshaw_mount",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ]
 };

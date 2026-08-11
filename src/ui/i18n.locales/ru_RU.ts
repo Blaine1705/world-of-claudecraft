@@ -1157,6 +1157,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.sheathe': 'Убрать/обнажить оружие',
   'hudChrome.keybinds.targetFriendly': 'Ближайший союзник',
   'hudChrome.keybinds.targetFriendlyNext': 'Следующий союзник',
+  'hudChrome.keybinds.targetPrev': 'Цикл целей назад',
   'hudChrome.petFeed.disabledFullHp': 'Питомец полностью здоров',
   'hudChrome.petFeed.disabledNoFood': 'В ваших сумках нет еды, которая могла бы вылечить питомца',
   'hudChrome.options.clickMoveLeft': 'Левая кнопка',
@@ -5904,6 +5905,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.tagline': 'Классическая MMO, в которую можно играть бесплатно прямо в браузере.',
   'guide.skipToContent': 'Перейти к основному содержимому',
   'guide.loading': 'Загрузка...',
+  'guide.controls.targetPrev': 'Цикл целей назад',
   'guide.controls.targetFriendly': 'Ближайший союзник',
   'guide.deedsPage.cat.chronicle': 'Летописи',
   'guide.deedsPage.cat.collection': 'Коллекция',
@@ -7799,6 +7801,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Доступна версия {version} World of ClaudeCraft. Обновите сейчас, чтобы получить последние исправления и улучшения.',
   'hudChrome.nativeUpdate.notNow': 'Не сейчас',
   'hudChrome.nativeUpdate.update': 'Обновить',
+  'hudChrome.otaUpdate.title': 'Обновление игры',
+  'hudChrome.otaUpdate.downloading': 'Загрузка обновления: {percent}',
+  'hudChrome.otaUpdate.applying':
+    'Обновление загружено. Игра перезапускается для его применения.',
+  'hudChrome.otaUpdate.incompatible':
+    'Для игры требуется обновление. Оно будет применено сразу после завершения загрузки.',
+  'hudChrome.otaUpdate.continueAnyway': 'Продолжить без обновления',
+  'hudChrome.otaUpdate.progressLabel': 'Ход загрузки обновления',
   'hudChrome.cameraPrompt.title': 'Выберите камеру',
   'hudChrome.cameraPrompt.intro': 'Выберите, как камера следует за персонажем.',
   'hudChrome.cameraPrompt.mouseDesc':
