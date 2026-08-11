@@ -832,7 +832,15 @@ describe('CI workflow parity', () => {
     // every job in this file carries a conscious timeout-minutes value.
     const bounds = [
       ['pr-gate', 20],
-      ['release-gate', 20],
+      // release-gate is the one shard matrix that keeps its CI_LONG_SUITES
+      // files in-shard (pr-gate hands them to the lanes), so a single shard
+      // can draw several multi-minute harnesses and the bound has to cover a
+      // slow runner rather than the healthy median. 20 was sized from a 14.63
+      // minute healthy worst case and was bound-killing shard 1 by 2026-08-11
+      // at b160a1ba18; the ci.yml comment carries the run ids, the per-suite
+      // fast/slow measurements, and the note that the slow-runner completion
+      // is an estimate rather than a measurement.
+      ['release-gate', 30],
       // The single-job lane's bound reached 60 after run 31290316610 measured
       // ~4400s aggregate suite time on a slow-quartile runner. The lane-diet
       // PR cut the aggregate several-fold and split the lane in two, so each

@@ -824,14 +824,35 @@ jobs:
     # the label is what an operator reads in the checks list to tell the two reds apart.
     name: Release gate (tests)
     if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))
-    # Same checkout-stall bound as pr-gate (rationale and evidence there).
-    # This matrix keeps the long sims in-shard by design; its slowest
-    # healthy shard observed is 14.63 minutes (run 31117143257, a sample
-    # that also carried a 4.68 minute runner "Set up job" spike, a
-    # component that counts inside the bound), so 20 keeps a 5 minute
-    # margin. The nightly workflow deliberately keeps its own generous
-    # bounds and is untouched.
-    timeout-minutes: 20
+    # Larger than pr-gate's checkout-stall bound BECAUSE this matrix keeps the
+    # long sims in-shard by design: pr-gate hands its CI_LONG_SUITES files to
+    # the lane pair, and release-gate deliberately does not
+    # (scripts/lib/ci_shard_plan.mjs states that ruling), so a release shard
+    # can draw several multi-minute harnesses at once. Default vitest --shard
+    # is sha1-contiguous (vite.config.ts records that the balanced sequencers
+    # were measured and left unwired), so WHICH shard draws them moves with any
+    # change to the collected file set; sizing this bound for the healthy
+    # median is what made it fragile.
+    #
+    # 20 was sized from a 14.63 minute healthy worst case (run 31117143257).
+    # That premise died on 2026-08-11 at b160a1ba18, where shard 1 drew
+    # owned_class_balance_harness, nythraxis_matrix, and hunter_dps_balance
+    # together and was bound-killed four times (run 31443047694 attempts 1
+    # through 3, run 31443040285 attempt 1) while attempt 2 of that same push
+    # run passed the identical scope in 16 minutes. Same commit, same warm
+    # transform cache: the differentiator was runner speed, with
+    # owned_class_balance_harness measured at 527s on the fast runner and 842s
+    # on the slow one. A killed attempt had finished 271 of its 330 files at
+    # 18m53s, so the slow-runner completion is an ESTIMATE near 23 minutes
+    # rather than a measurement (the job never finished); 30 keeps roughly the
+    # proportional margin 20 was chosen with, over that estimate instead of
+    # over the median. Raising it costs stall-kill latency on this job only,
+    # which is the right trade for a post-merge backstop: the stall reactor
+    # (.github/workflows/ci-stall-rerun.yml) is what actually handles hangs,
+    # and pr-gate keeps the tight bound for fast feedback.
+    # The nightly workflow deliberately keeps its own generous bounds and is
+    # untouched.
+    timeout-minutes: 30
     runs-on: ubuntu-latest
 
     # No I18N_RELEASE_TIER here BY DESIGN (D8 revised, issue #2820). This job runs
