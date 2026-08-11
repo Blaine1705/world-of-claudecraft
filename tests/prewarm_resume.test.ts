@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { CONSTRAINED_PREWARM_KEEP, skyAssetInlineWaitMs } from '../src/render/prewarm_policy';
 import {
   buildPrewarmCompileUnits,
+  orderRootsByDistanceSq,
   type PrewarmResumeEntry,
   resumeDroppedPrewarmEntries,
   settlePrewarmBeforePublish,
@@ -626,5 +627,48 @@ describe('waitForPrefetch: a stalled fetch can never starve the compute budget',
     expect(settled).toBe(false);
     resolveTask();
     expect(await wait).toBe('ready');
+  });
+});
+
+describe('orderRootsByDistanceSq: the compile debt pays near-first (hitch-hunt P3a)', () => {
+  it('sorts ascending by distance', () => {
+    const roots = [{ d: 900 }, { d: 4 }, { d: 100 }];
+    expect(orderRootsByDistanceSq(roots, (root) => root.d)).toEqual([
+      { d: 4 },
+      { d: 100 },
+      { d: 900 },
+    ]);
+  });
+
+  it('keeps collection order for ties and puts unknown distances last', () => {
+    const a = { id: 'a', d: 25 as number | null };
+    const b = { id: 'b', d: null as number | null };
+    const c = { id: 'c', d: 25 as number | null };
+    const d = { id: 'd', d: null as number | null };
+    expect(orderRootsByDistanceSq([a, b, c, d], (root) => root.d)).toEqual([a, c, b, d]);
+  });
+
+  it('does not mutate the input array', () => {
+    const roots = [{ d: 2 }, { d: 1 }];
+    const input = [...roots];
+    orderRootsByDistanceSq(roots, (root) => root.d);
+    expect(roots).toEqual(input);
+  });
+
+  it('is wired to the live-scene compile collection with a camera-relative distance', () => {
+    const rendererSource = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    );
+    // The 'scene' group is the world-content collection the resume lane
+    // drains in order; the staged prewarm groups sit next to the player and
+    // gain nothing from sorting.
+    const sceneCollection = rendererSource.slice(
+      rendererSource.indexOf("id: 'scene',"),
+      rendererSource.indexOf('...stagedGroups.flatMap'),
+    );
+    expect(sceneCollection).toContain('roots: orderRootsByDistanceSq(');
+    expect(sceneCollection).toContain('world[12] - this.camera.position.x');
+    expect(sceneCollection).toContain('world[14] - this.camera.position.z');
   });
 });

@@ -96,10 +96,22 @@ export interface PropCellHideable {
 }
 
 export interface PropCellRuntime {
+  /** Reveal-gate key (props.ts uses the far-cell grid key). Cells without a
+   *  key are never gated. */
+  key?: string;
   farMode: boolean;
   visible: boolean;
+  /** Latched once the first far flip was allowed (reveal_gate_core): the
+   *  gate is consulted only until the bake's programs are known linked. */
+  farReady?: boolean;
   meshes: PropCellBakeMesh[];
   hideables: PropCellHideable[];
+}
+
+/** Structural subset of reveal_gate_core's RevealGateCore, so this core
+ *  stays decoupled from the gate module. */
+export interface PropCellRevealGate {
+  allow(key: string): boolean;
 }
 
 /**
@@ -113,9 +125,19 @@ export function updatePropCell(
   camZ: number,
   fogFar: number,
   swapDistance = PROP_FAR_SWAP_DISTANCE,
+  gate?: PropCellRevealGate | null,
 ): void {
   const dist = propCellBoxDistance(cell.bounds, camX, camZ);
-  const farMode = dist >= swapDistance;
+  let farMode = dist >= swapDistance;
+  if (farMode && cell.farReady !== true) {
+    // First far flip: the swap is pixel-identical, so holding the near
+    // representation while the bake's instanced programs link off-thread is
+    // invisible, whereas flipping cold pays a synchronous first-draw link
+    // inside a live frame (hitch-hunt P3a). No gate (or no key) keeps the
+    // historical immediate flip.
+    if (gate && cell.key !== undefined && !gate.allow(cell.key)) farMode = false;
+    else cell.farReady = true;
+  }
   applyPropCellModeFlags(cell, farMode, farMode && dist < fogFar);
 }
 

@@ -442,6 +442,7 @@ import {
 } from './prewarm_policy';
 import {
   buildPrewarmCompileUnits,
+  orderRootsByDistanceSq,
   type PrewarmResumeEntry,
   type PrewarmResumeUnit,
   resumeDroppedPrewarmEntries,
@@ -466,6 +467,7 @@ import {
   type RendererFramePhaseMs,
   type RendererWorldPhaseMs,
 } from './renderer_frame_telemetry_core';
+import { createRevealGate } from './reveal_gate';
 import { collectRiftAmbientSources } from './rift_ambience';
 import { buildRiftRankBadge } from './rift_rank';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
@@ -1856,6 +1858,8 @@ export class Renderer {
       dt: number,
       reducedMotion?: boolean,
     ): void;
+    setFarCellRevealGate(gate: { allow(key: string): boolean } | null): void;
+    farCellRevealRoots(key: string): readonly THREE.Object3D[];
   };
   private eastbrookTownView!: EastbrookTownView;
   private fenbridgeTownView!: FenbridgeTownView;
@@ -2669,6 +2673,24 @@ export class Renderer {
     this.scene.add(this.fenbridgeTownView.group);
     freezeStaticSubtreeMatrices(this.fenbridgeTownView.group);
     bd('fenbridge-town');
+
+    // First-reveal compile gates (hitch-hunt P3a): a cull flipping world
+    // content visible for the first time holds it one representation back
+    // until compileGate links its programs off-thread. Without async compile
+    // the gate itself would be the synchronous stall, so the views stay
+    // ungated there and keep their historical immediate reveal.
+    if (this.asyncCompileSupported) {
+      const revealHost = { compile: (root: object) => this.compileGate(root as THREE.Object3D) };
+      this.propsView.setFarCellRevealGate(
+        createRevealGate(revealHost, (key) => this.propsView.farCellRevealRoots(key)),
+      );
+      this.eastbrookTownView.setRevealGate(
+        createRevealGate(revealHost, () => this.eastbrookTownView.staticRevealRoots()),
+      );
+      this.fenbridgeTownView.setRevealGate(
+        createRevealGate(revealHost, () => this.fenbridgeTownView.staticRevealRoots()),
+      );
+    }
 
     // Map-editor play-test: freely placed GLB models (cosmetic, render-only). Loads
     // async and pops in; absent for the built-in world. The view supports live
@@ -6195,9 +6217,21 @@ export class Renderer {
             ? [
                 {
                   id: 'scene',
-                  roots: compileRoots(
-                    this.scene.children.filter((root) => !stagedRoots.has(root)),
-                    true,
+                  // Near-first: the resume lane drains these in order, and the
+                  // debt the camera can reach first must be the debt paid
+                  // first (hitch-hunt P3a; the S10 632-681 ms submit stalls
+                  // were reveals winning the race against their own compile).
+                  roots: orderRootsByDistanceSq(
+                    compileRoots(
+                      this.scene.children.filter((root) => !stagedRoots.has(root)),
+                      true,
+                    ),
+                    (root) => {
+                      const world = root.matrixWorld.elements;
+                      const dx = world[12] - this.camera.position.x;
+                      const dz = world[14] - this.camera.position.z;
+                      return dx * dx + dz * dz;
+                    },
                   ),
                 },
               ]

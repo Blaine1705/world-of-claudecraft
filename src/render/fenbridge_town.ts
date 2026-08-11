@@ -33,6 +33,7 @@ import { EMISSIVE_GLOW, GFX, surfaceMat } from './gfx';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
+import type { RevealGateCore } from './reveal_gate_core';
 import { modulateEmissiveByVertexColor } from './vertex_color_emissive';
 
 const ROOT_NAME = 'fenbridgeTownRebuild';
@@ -135,6 +136,15 @@ export interface FenbridgeTownView {
     reducedMotion?: boolean,
   ): void;
   setCaptureOverlay(visible: boolean): void;
+  /**
+   * First-reveal compile gating (hitch-hunt P3a): the static batches' first
+   * fog-cull reveal is held hidden until the gate warms the town key, so a
+   * cold approach never links the town's programs inside a live frame. No
+   * gate keeps the historical immediate reveal.
+   */
+  setRevealGate(gate: RevealGateCore | null): void;
+  /** The compile roots behind the town's reveal key (the static batches). */
+  staticRevealRoots(): readonly THREE.Object3D[];
 }
 
 export interface FenbridgeTownDrawStats {
@@ -1192,7 +1202,13 @@ function buildFromTemplates(
       includesQuestObjects: false,
       informationalOnly: true,
     };
-    return { group, update: () => undefined, setCaptureOverlay };
+    return {
+      group,
+      update: () => undefined,
+      setCaptureOverlay,
+      setRevealGate: () => undefined,
+      staticRevealRoots: () => [],
+    };
   }
 
   const hideTargets: BuildingHideTarget[] = [];
@@ -1271,9 +1287,17 @@ function buildFromTemplates(
     informationalOnly: true,
   };
 
+  let revealGate: RevealGateCore | null = null;
+  let staticRevealed = false;
   return {
     group,
     setCaptureOverlay,
+    setRevealGate(gate: RevealGateCore | null): void {
+      revealGate = gate;
+    },
+    staticRevealRoots(): readonly THREE.Object3D[] {
+      return staticCullTargets;
+    },
     update(
       camX: number,
       camY: number,
@@ -1285,7 +1309,7 @@ function buildFromTemplates(
       dt: number,
       reducedMotion = false,
     ): void {
-      const staticVisible = fenbridgeFogVisible(
+      let staticVisible = fenbridgeFogVisible(
         camX,
         camZ,
         FENBRIDGE_LAYOUT.hub.center.x,
@@ -1293,6 +1317,13 @@ function buildFromTemplates(
         fogFar,
         TOWN_CULL_RADIUS,
       );
+      if (staticVisible && !staticRevealed) {
+        // First reveal: hold the batches hidden (they sit at the fog edge)
+        // until their programs are linked off-thread, instead of paying a
+        // synchronous first-draw link inside a live frame (hitch-hunt P3a).
+        if (revealGate && !revealGate.allow('fenbridge-town-static')) staticVisible = false;
+        else staticRevealed = true;
+      }
       for (let index = 0; index < staticCullTargets.length; index++) {
         staticCullTargets[index].visible = staticVisible;
       }

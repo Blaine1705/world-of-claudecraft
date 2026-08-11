@@ -98,6 +98,24 @@ export async function settlePrewarmBeforePublish<T>(
   }
 }
 
+/**
+ * Near-first ordering for compile-debt roots (hitch-hunt P3a). The post-entry
+ * resume lane pays the boot compile debt over tens of seconds, and the roots'
+ * collection order is scene-graph order: a village the player walks toward can
+ * sit behind hundreds of unrelated roots and lose the race to its own reveal.
+ * Sorting by distance to the player makes the debt the camera can reach first
+ * the debt paid first. Stable for ties; roots without a distance sort last.
+ */
+export function orderRootsByDistanceSq<T>(
+  roots: readonly T[],
+  distanceSq: (root: T) => number | null,
+): T[] {
+  return roots
+    .map((root, index) => ({ root, index, dist: distanceSq(root) ?? Infinity }))
+    .sort((a, b) => a.dist - b.dist || a.index - b.index)
+    .map((entry) => entry.root);
+}
+
 export interface PrewarmCompileUnitOptions<T> {
   /** Program-content keys for a root (e.g. material identity plus the mesh
    *  shape bits that pick the program variant). A root whose every key an
