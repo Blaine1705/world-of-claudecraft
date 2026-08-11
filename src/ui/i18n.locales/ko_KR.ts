@@ -2680,6 +2680,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterBagAll': '모든 가방',
   'itemUi.market.filterRarity': '희귀도',
   'itemUi.market.filterRarityAll': '모든 희귀도',
+  'itemUi.market.sortPriceAsc': '가격: 낮은순',
   'itemUi.market.weaponSword': '검',
   'itemUi.market.weaponDagger': '단검',
   'itemUi.market.weaponStaff': '지팡이',

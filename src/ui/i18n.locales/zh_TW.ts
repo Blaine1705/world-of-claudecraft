@@ -2588,6 +2588,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterBagAll': '全部背包',
   'itemUi.market.filterRarity': '稀有度',
   'itemUi.market.filterRarityAll': '全部稀有度',
+  'itemUi.market.sortPriceAsc': '價格：從低到高',
   'itemUi.market.weaponSword': '劍',
   'itemUi.market.weaponDagger': '匕首',
   'itemUi.market.weaponStaff': '法杖',
