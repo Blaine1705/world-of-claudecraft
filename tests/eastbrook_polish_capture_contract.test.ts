@@ -116,8 +116,12 @@ interface AttributionTargetFixture {
 // Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
 // archetype and scene-texture counts; renderer.ts edits only). No capture
 // was retaken.
+// Re-minted for the merge of release/v0.36.0 into the Bonebound Rickshaw
+// mount branch: the release-side changes move the rendererIntegration leaf
+// (mountLoopActive dismount-loop fix), so the merged tree mints a value
+// matching neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'a80d71af0295906172fa66def7f89ce704b9e6b0abdf98a1f3c06164537393b1';
+  '0a603488eb67018908fab5048fd9f2fcfc16579567418f7c896b7ad33c9c7b00';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
