@@ -34,11 +34,29 @@ The plugin itself is MPL-2.0; self-hosting is a documented, supported mode.
 3. `capacitor.config.ts` points the plugin at that endpoint with
    `autoUpdate: true`: the native side checks on launch/foreground (at most
    every 10 minutes), downloads the zip straight from S3/CDN in the
-   background, and applies it on the next backgrounding.
+   background, and applies it on the next backgrounding (unless the visible
+   gate in step 5 pulls the apply forward).
 4. `src/net/native_ota.ts` calls `CapacitorUpdater.notifyAppReady()` once at
    boot (`src/main.ts`). A bundle that never confirms within the plugin's
    ready timeout is rolled back to the previous bundle automatically; that is
-   the crash-safety net, do not remove the call.
+   the crash-safety net, do not remove the call. The same module carries the
+   other two duck-typed plugin calls the gate uses: `watchOtaUpdates`
+   (download progress/complete/failed listeners) and `applyPendingOtaUpdate`
+   (the plugin's `reload()`, an immediate WebView-reload apply).
+5. **The visible update gate.** `src/net/ota_update_gate.ts` (wired in
+   `src/main.ts`, painted by `src/ui/ota_update_overlay.ts`) turns the silent
+   default into a visible flow on the shells. Pre-world, a running download
+   shows a modal with live percent progress and a "continue without
+   updating" escape; when the download completes and the player has neither
+   dismissed the modal nor entered the world, the staged bundle is applied
+   immediately via `reload()` instead of waiting for a backgrounding. When
+   the server rejects a stale bundle's world-layout epoch
+   (`ONLINE_WORLD_INCOMPATIBLE_MESSAGE`) while a download is in flight or
+   staged, the gate replaces the dead-end fatal overlay: progress, then
+   auto-apply, and the resume marker survives so the reload lands back in the
+   world on the new bundle. In-world sessions are never interrupted: the
+   overlay stays hidden and the apply falls back to the plugin's
+   apply-on-background behavior.
 
 Bandwidth economics: the update CHECK is a tiny JSON POST against the game
 server; the heavy zip download is served by the bundle host, so game-server
@@ -249,9 +267,15 @@ feed. Keep it scoped to the one bucket and rotate it on any suspicion.
 
 - `tests/server/ota_updates.test.ts`: the endpoint (offer/no-update/gating,
   cache single-flight, fail-closed env gate, rate limiting, invalid input).
-- `tests/native_ota.test.ts`: the `notifyAppReady` glue plus source pins on
-  the `src/main.ts` wiring, `capacitor.config.ts` plugin block, and the
-  `package.json` dependency.
+- `tests/native_ota.test.ts`: the duck-typed plugin glue (`notifyAppReady`,
+  `watchOtaUpdates`, `applyPendingOtaUpdate`) plus source pins on the
+  `src/main.ts` wiring (boot confirm AND the gate install/disconnect arm),
+  `capacitor.config.ts` plugin block, and the `package.json` dependency.
+- `tests/ota_update_gate.test.ts`: the visible-gate state machine (progress,
+  dismiss, auto-apply, in-world suppression, the incompatible-version
+  takeover and its fatal-mode dead ends).
+- `tests/ota_update_overlay.test.ts`: the overlay painter (mount/update in
+  place, progressbar semantics, continue action, fatal copy).
 - `tests/ota_publish.test.ts`: the publish planner (keys, URLs, manifest
   shape, validation), CLI flag parsing, and the R2 endpoint override.
 - `tests/deploy_ota_updates.test.ts`: the deploy contract, chiefly that
