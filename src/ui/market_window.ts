@@ -34,6 +34,7 @@ import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
+import { marketArmorBadge } from './market_armor_badge';
 import {
   type MarketBuyConfirm,
   marketBuyConfirm,
@@ -631,9 +632,13 @@ export class MarketWindow {
         l.count > 1
           ? ` <span class="stack">${esc(t('itemUi.market.stackCount', { count: formatNumber(l.count, { maximumFractionDigits: 0 }) }))}</span>`
           : '';
+      const armorBadge = marketArmorBadge(item);
+      const badge = armorBadge
+        ? ` <span class="mkt-armor-badge mkt-armor-badge--${armorBadge.armorType}">${esc(t(armorBadge.labelKey))}</span>`
+        : '';
       row.innerHTML =
         `${this.deps.itemIcon(item)}` +
-        `<span class="mkt-name"><span class="nm" style="color:${qColor}">${esc(itemName)}${stack}</span>` +
+        `<span class="mkt-name"><span class="nm" style="color:${qColor}">${esc(itemName)}${stack}${badge}</span>` +
         `<span class="seller${l.house ? ' house' : ''}">${esc(l.house ? t('itemUi.market.merchantStock') : l.sellerName)}</span></span>` +
         `<span class="mkt-price">${this.deps.moneyHtml(l.price)}${each}</span>`;
       const btn = document.createElement('button');
