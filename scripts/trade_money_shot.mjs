@@ -3,7 +3,8 @@
 // gold/silver/copper fields matching the World Market sell form, so a player
 // no longer has to hand-convert (e.g. 5g 32s 45c instead of typing 53245).
 // Boots the offline game headless at max graphics, stubs an open trade so the
-// REAL HUD renders updateTradeWindow(), and captures tmp/trade_money.png.
+// REAL woc_trade controller (hud.wocTrade, src/ui/hud/woc_trade/) renders
+// updateTradeWindow(), and captures tmp/trade_money.png.
 // Run with `npm run dev` already up.
 
 import fs from 'node:fs';

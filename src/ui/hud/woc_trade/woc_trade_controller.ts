@@ -745,7 +745,7 @@ export class WocTradeController {
         input?.addEventListener('change', syncTradeMoney);
       });
     } catch (err) {
-      console.error('[woc_trade] trade window render failed', err);
+      console.error('[hud] trade window render failed', err);
     } finally {
       this.lastTradeSig = sig;
     }
