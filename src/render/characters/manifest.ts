@@ -131,7 +131,7 @@ export interface VisualDef {
   /** This GLB is a modular PART LIBRARY, not a finished character: every body
    *  part, hair style and armour slot piece rides one shared rig and the
    *  visible set is picked per entity (see modular.ts). assembleModel composes
-   *  it instead of cloning the whole scene. */
+    // spinMountWheels (src/render/rickshaw_mount.ts), because crossfading a spin clip out drags the wheel back
   modular?: boolean;
   /** Two-state prop mob (the dragonkin egg): the GLB ships BOTH state meshes
    *  seated at the origin; alive shows `hide` only, and death swaps to `show`
@@ -1717,8 +1717,8 @@ export const VISUALS: Record<string, VisualDef> = {
     // seat back, trimmed throne wings, harness collar, lantern rebuild): 2.8 was
     // stale and was silently rescaling the whole cart.
     height: 4.779,
-    // This GLB ships NO clips: the wheels are spun procedurally by renderer.ts's
-    // spinMountWheels, because crossfading a spin clip out drags the wheel back
+    // This GLB ships NO clips: the wheels are spun procedurally by
+    // rickshaw_mount.ts's spinMountWheels, because crossfading a spin clip out drags the wheel back
     // toward its bind rotation and reads as backwards spin on every stop (full
     // history in scripts/assets/rickshaw_mount/model.js, above WHEEL_NODES).
     // MOUNT_RIGGED's names therefore resolve to nothing, which is already a

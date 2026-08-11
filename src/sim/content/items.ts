@@ -416,7 +416,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   // Developer-only, same treatment as the tank above: no acquisition path, so
   // it stays soulbound rather than tradable. Use /dev give reins_rickshaw_mount
-  // while the leg rig and canopy toggle remain unbuilt.
+  // while the feature remains under development.
   reins_rickshaw_mount: {
     id: 'reins_rickshaw_mount',
     name: 'Bound Reins: Bonebound Rickshaw',

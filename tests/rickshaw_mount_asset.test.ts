@@ -21,7 +21,7 @@ import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 // exporter could otherwise break without any test noticing.
 const REPO_ROOT = path.join(__dirname, '..');
 const ASSET_PATH = path.join(REPO_ROOT, 'public/models/mounts/rickshaw_mount.glb');
-const EXPECTED_ASSET_SHA256 = '66164215368708fdecb1ee971a162a3cb8d38da97e064fa3984c075b587d1885';
+const EXPECTED_ASSET_SHA256 = '5f539e1f2ad40fe41987201673acc0a2977c5bd0a25deb81dffa023ef285d8cd';
 // The four procedural PBR material families this mount ships, plus the
 // untextured emissive lantern-glow material (not in RICKSHAW_MATERIAL_CONTRACT:
 // it has no surface maps, see model.js's makeMaterials).
@@ -73,18 +73,31 @@ describe('rickshaw mount asset pipeline', () => {
 
     expect(root.listMaterials().map((m) => m.getName())).toEqual(EXPECTED_MATERIAL_NAMES);
 
+    // KHR_texture_basisu (real GPU-resident KTX2/Basis, not the raw webp the
+    // exporter emits): the repo-wide invariant every shipped GLB texture
+    // follows (tests/glb_texture_compression.test.ts), verified directly
+    // here too so a re-export that skips compress_glb_textures.mjs fails
+    // this asset's own contract test, not just the tree-wide sweep.
+    expect(root.listExtensionsRequired().map((e) => e.extensionName).sort()).toEqual([
+      'EXT_meshopt_compression',
+      'KHR_mesh_quantization',
+      'KHR_texture_basisu',
+      'KHR_texture_transform',
+    ]);
+
     // Every material but the lantern glow ships a full PBR trio (albedo,
     // normal, ORM), matching RICKSHAW_MATERIAL_CONTRACT's four families.
-    const textureNames = root
-      .listTextures()
-      .map((t) => t.getName())
-      .sort();
+    const textures = root.listTextures();
+    const textureNames = textures.map((t) => t.getName()).sort();
     for (const family of ['wood', 'bronze', 'leather', 'fabric']) {
       expect(textureNames).toContain(`rickshaw_${family}_albedo`);
       expect(textureNames).toContain(`rickshaw_${family}_normal`);
       expect(textureNames).toContain(`rickshaw_${family}_orm`);
     }
     expect(textureNames.filter((n) => n.startsWith('rickshaw_'))).toHaveLength(12);
+    for (const texture of textures) {
+      expect(texture.getMimeType(), texture.getName()).toBe('image/ktx2');
+    }
 
     // Every mesh primitive carries a vertex-baked COLOR_0 (shadeSurfaceInto's
     // output), the load-bearing convention for every procedural asset in this

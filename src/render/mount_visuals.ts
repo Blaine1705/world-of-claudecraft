@@ -82,7 +82,7 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // spines (hence the slight rear shift), gait-rigged Walk/Run cycles.
   drakemaw_raptor: spec('mount_drakemaw_raptor', 2.35, true, undefined, -0.1),
   // Bonebound Rickshaw: ships no baked clips (its wheels roll procedurally from
-  // renderer.ts's spinMountWheels), so the body gets a light procedural jostle
+  // rickshaw_mount.ts's spinMountWheels), so the body gets a light procedural jostle
   // instead of a gait cycle. seat/seatFwd are the authored bench-seat socket
   // at the cart's own RICKSHAW_SCALE (2.0).
   // 2026-08-09: this `seat` value (1.94) was stale, still reflecting the

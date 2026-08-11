@@ -33,6 +33,13 @@
 // the complete set.
 //
 // Run: node scripts/assets/rebuild_kaykit_skeletons_free.mjs
+//
+// MANDATORY final step, every run (scripts/assets/CLAUDE.md, "the mandatory
+// FINAL step after ANY exporter run"): this script does not KTX2-compress
+// its own output, so skipping the next two commands ships an uncompressed
+// GLB.
+//   node scripts/assets/compress_glb_textures.mjs public/models/chars/enemies/skeleton_minion_free.glb
+//   node scripts/build_media_manifest.mjs generate
 import fs from 'node:fs';
 import path from 'node:path';
 import { NodeIO } from '@gltf-transform/core';
@@ -123,12 +130,12 @@ async function build(io, item) {
 
   // Deliberately NO meshopt() and no textureCompress(): the smallest change
   // that produces correct geometry, not a full re-run of the shared
-  // pipeline's optimization stack. TODO: also not KTX2-compressed (no `ktx`
-  // binary was available in the environment that built these; see
-  // scripts/assets/CLAUDE.md), ships plain source textures instead, a real
-  // gap against this repo's own GLB texture-compression invariant;
-  // tests/glb_texture_compression.test.ts will flag it. Re-run
-  // compress_glb_textures.mjs once `ktx` is available.
+  // pipeline's optimization stack. This script alone does not KTX2-compress
+  // the output either, so it ships plain source textures, a real gap
+  // against this repo's own GLB texture-compression invariant that
+  // tests/glb_texture_compression.test.ts will flag. Run
+  // compress_glb_textures.mjs (see the module header) after this script,
+  // every time, the same as after any other exporter.
   await doc.transform(resample(), prune({ keepExtras: false }), dedup());
 
   fs.mkdirSync(path.dirname(outPath), { recursive: true });

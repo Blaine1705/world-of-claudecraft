@@ -4,7 +4,7 @@
 // See docs/design/rickshaw_mount/{reference-metadata,object-sculpt-spec}.json for
 // the reference admission and the component/material/budget contract this factory
 // implements. Ships NO animation clips: the wheels are rolled per-frame by
-// renderer.ts's spinMountWheels (see the note above WHEEL_NODES for why authored
+// rickshaw_mount.ts's spinMountWheels (see the note above WHEEL_NODES for why authored
 // clips were abandoned), and the body's motion is mount_visuals.ts's procedural
 // bob, so the entry stays rigged:false like stalkglider_snail. The puller's own
 // gait comes from its separate character rig (src/render/rickshaw_mount.ts).
@@ -531,7 +531,7 @@ function addWheel(bucket, sideX) {
   }
 }
 
-// Wheel node names are the contract renderer.ts's spinMountWheels looks these up
+// Wheel node names are the contract rickshaw_mount.ts's spinMountWheels looks these up
 // by. Rename one here and the wheels silently stop turning, since that lookup
 // caches its own failure.
 const WHEEL_NODES = Object.freeze([
@@ -1138,7 +1138,7 @@ function addShafts(buckets) {
 }
 
 // NO wheel clips, deliberately -- the renderer spins these nodes procedurally
-// instead (renderer.ts, spinMountWheels). Two authored attempts failed, both
+// instead (src/render/rickshaw_mount.ts, spinMountWheels). Two authored attempts failed, both
 // for the same underlying reason, and the notes are here so nobody rebuilds
 // them:
 //

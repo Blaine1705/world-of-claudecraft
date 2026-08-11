@@ -6,6 +6,14 @@
 //   node scripts/assets/rickshaw_mount/export_rickshaw_mount.mjs
 //   node scripts/assets/rickshaw_mount/export_rickshaw_mount.mjs --no-preview
 //   node scripts/assets/rickshaw_mount/export_rickshaw_mount.mjs --raw-only
+//
+// MANDATORY final step, every run (scripts/assets/CLAUDE.md, "the mandatory
+// FINAL step after ANY exporter run"): this script ends with the surface maps
+// still webp, not KTX2. Skipping the next two commands ships an uncompressed
+// GLB that tests/glb_texture_compression.test.ts will catch, the way this
+// exact PR's own review round caught it once already.
+//   node scripts/assets/compress_glb_textures.mjs public/models/mounts/rickshaw_mount.glb
+//   node scripts/build_media_manifest.mjs generate
 import { spawnSync } from 'node:child_process';
 import {
   createReadStream,

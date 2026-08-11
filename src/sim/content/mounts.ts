@@ -115,7 +115,7 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   // rig, skel_rickshaw_puller in characters/manifest.ts, attached by a fixed
   // offset, see src/render/rickshaw_mount.ts) built into the front, gripping
   // the shafts. The puller runs a real gait, and the wheels roll from
-  // actual per-frame ground travel (renderer.ts's spinMountWheels), so the
+  // actual per-frame ground travel (rickshaw_mount.ts's spinMountWheels), so the
   // moveSpeedPct below needs no matching animation constant anywhere: change it
   // and the wheels simply roll faster. Stays LAST in the catalog
   // alongside the tank; a new player-facing mount lands above both.
