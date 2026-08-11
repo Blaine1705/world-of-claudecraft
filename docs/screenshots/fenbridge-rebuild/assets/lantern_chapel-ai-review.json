@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "assetId": "lantern_chapel",
-  "sourceFingerprint": "9e1180f57921d148c3e02f3f88d83cac90462314dcb168d447d48ef6ef2c159a",
+  "sourceFingerprint": "4ba1b0ffb5265ce9eeec462b331ff5ca0f540bbe4af9291414c6fb8906dc6cf8",
   "reference": "docs/design/fenbridge-rebuild/references/lantern-chapel-turnaround.png",
   "minimumOverallScore": 0.7,
   "requiredViews": [

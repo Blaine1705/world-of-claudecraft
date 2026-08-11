@@ -12,7 +12,11 @@ local CLAUDE.md on top of this file: `props/` (dense per-consumer wiring contrac
   `GLTFLoader.load()` in the browser (`asset load failed: ... (missing file or bad
   GLB)`) and the renderer falls back to the old procedural geometry with no visible
   error to the player. `npx gltf-transform inspect <file>.glb` must show
-  `EXT_meshopt_compression`, not `KHR_draco_mesh_compression`.
+  `EXT_meshopt_compression`, not `KHR_draco_mesh_compression`. Every shipped GLB is
+  also quantized (`KHR_mesh_quantization`); `tests/glb_meshopt_coverage.test.ts` walks
+  the tree and pins both. Two shapes are correct rather than gaps: the animation-only
+  clip banks (`*_anims.glb`) carry no meshes, so they are meshopt-encoded without
+  quantization, and `weapons/` is exempt from the geometry ADD (see the weapons row).
 - **Textures: every embedded texture must be KTX2/Basis (`KHR_texture_basisu`).** The
   loader attaches a KTX2 transcoder and `tests/glb_texture_compression.test.ts` walks
   ALL of `public/models` and fails on any other embedded format (WebP decode
@@ -24,10 +28,13 @@ local CLAUDE.md on top of this file: `props/` (dense per-consumer wiring contrac
   node scripts/assets/compress_glb_textures.mjs && node scripts/build_media_manifest.mjs generate
   ```
 
-  It needs the `ktx` tool (KhronosGroup/KTX-Software 4.3+) on PATH, re-applies meshopt
-  where the source used it, and aborts a file if skins/animations/meshes do not
-  survive the transform. The one sanctioned exception is the `WEAPON_VFX` skin set
-  (see the weapons row below).
+  It needs the `ktx` tool (KhronosGroup/KTX-Software 4.3+) on PATH. It ADDS the
+  geometry codec to a file that never had it, not only re-applies what a read decoded,
+  and its post-transform check is by IDENTITY rather than by count
+  (`geometryPassViolations`): named nodes, meshes, animations and each primitive's
+  POSITION proportions must survive, and every added node must prove it is a wrapper
+  the pass itself introduced. The one sanctioned exception is the `WEAPON_VFX` skin
+  set, and it is TEXTURES only (see the weapons row below).
 - **Never simplify a skinned rig.** `scripts/assets/build_assets.mjs` treats the
   `character` type as geometry-safe for exactly this reason (simplify corrupts skin
   weights); see `public/models/chars/CLAUDE.md`.
@@ -88,8 +95,17 @@ sizes, and iterate texture size down before accepting an oversized static prop.
   (`public/ui/items/<item-id>.webp`) in the same change. EXCEPTION: the `WEAPON_VFX`
   skin GLBs (keys in `src/render/weapon_vfx.ts`) must keep drawable WebP textures,
   never KTX2, because their emissive derivation reads the texture pixels;
-  `compress_glb_textures.mjs` auto-excludes them and
-  `tests/glb_texture_compression.test.ts` pins the exclusion set.
+  `compress_glb_textures.mjs` flags them per file and
+  `tests/glb_texture_compression.test.ts` pins the exclusion set. That exception is
+  TEXTURES only. Separately, the whole directory is exempt from the geometry ADD
+  (`GEOMETRY_ADD_EXCLUDED_DIRS`), narrowly: the pass still RE-APPLIES the codec to a
+  weapon that already carries it. Quantization recentres a mesh onto its bounding box
+  and compensates on the node, but a variant weapon's mesh ORIGIN is its grip point
+  and `flattenWeaponScene` discards the root position, so the compensation is thrown
+  away and the weapon hangs low. Do not repair it by preserving that position: the
+  weapons already shipping compressed all carry a non-zero root translation and render
+  correctly precisely because it is dropped. Lifting the exemption means recalibrating
+  `WEAPON_GRIP_OVERRIDES` first, because the acceptance is visual.
 - **quest/**: `QUEST_OBJECT_URLS` in `src/render/quest_objects.ts` maps quest-object
   templateIds to GLB URLs; a new quest prop needs that entry plus the matching content
   record in `src/sim/content/` (root CLAUDE.md's "New game content" seam).

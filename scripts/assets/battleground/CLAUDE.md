@@ -62,10 +62,16 @@ What stands in for the missing exporter is
 **`tests/battleground_rune_models.test.ts`**, which pins each shipped binary two
 ways: by sha256 of the exact committed bytes, and by parsed GLB shape (container
 header and chunk layout, mesh and primitive counts, node names, material and
-texture counts, the KTX2 / `KHR_texture_basisu` texture encoding the shipping base
-mandates, and a byte-size ceiling). A silent re-export, a recompression, or an
-optimizer pass that changes what the pads actually are therefore fails CI rather
-than landing unnoticed.
+texture counts, the KTX2 / `KHR_texture_basisu` texture encoding and the quantized
+meshopt geometry encoding the shipping base mandates, and a byte-size ceiling). A
+silent re-export, a recompression, or an optimizer pass that changes what the pads
+actually are therefore fails CI rather than landing unnoticed.
+
+The exemption is from having an EXPORTER, never from the shipping base itself:
+these three take the same mandatory `compress_glb_textures.mjs` pass as every
+other GLB, and `tests/glb_meshopt_coverage.test.ts` covers them with no exception.
+When that pass is consciously re-run, the sha256 and parsed-shape pins here move
+with it; that is the suite working, not a reason to weaken it.
 
 **If these are ever regenerated, the exemption ends.** Land a deterministic
 procedural factory plus exporter under `scripts/assets/` per
