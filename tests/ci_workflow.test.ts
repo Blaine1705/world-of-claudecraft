@@ -850,7 +850,9 @@ describe('CI workflow parity', () => {
       // (lane A 13.73 minutes, lane B 12.55, owned_class_balance_harness
       // alone 739268ms in-lane), leaving these REQUIRED checks about one slow
       // runner from bound-killing the merge queue, so both halves take the
-      // same slow-runner sizing as release-gate. Evidence on the ci.yml bound.
+      // same slow-runner sizing METHOD as release-gate (the same formula over
+      // their own healthy job wall, which lands on 30, not on its 35).
+      // Evidence on the ci.yml bound.
       ['pr-long-sims-a', 30],
       ['pr-long-sims-b', 30],
       ['browser-gate', 10],

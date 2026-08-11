@@ -39,18 +39,18 @@ concurrency:
 # to its kill. The runner-side checkout-stall class (the timeout-minutes
 # rationale on each job below) presents as a git fetch at ZERO throughput for
 # tens of minutes: run 31392590628 (2026-08-10) bound-killed the same lane
-# three attempts in a row, 20 minutes each, on fetches that produced nothing
-# and then completed moments after the kill. git's own low-speed abort ends
-# any HTTP transfer whose received payload stays under 1000 bytes per second
-# for 120 consecutive seconds (mechanism proven: a live HTTPS fetch under an
-# absurd floor dies in 2 s with curl 28), and actions/checkout then retries
-# the fetch in-step (3 attempts, 10 to 20 second backoff). HONEST LIMIT,
-# measured, not assumed: the floor polices an in-progress transfer that
-# slows to a trickle, but the hang variant observed on 2026-08-10 (run
-# 31402711619: four fetches sat 19m52s producing NOTHING, WITH this floor
-# confirmed in each step's env) dies in a phase curl's speed timer never
-# polices, so this env block did not catch it. Keep it (it is free and
-# covers the trickle variant); the reliable net for the hang variant is
+# three attempts in a row, at its then-20-minute bound each time, on fetches
+# that produced nothing and then completed moments after the kill. git's own
+# low-speed abort ends any HTTP transfer whose received payload stays under
+# 1000 bytes per second for 120 consecutive seconds (mechanism proven: a live
+# HTTPS fetch under an absurd floor dies in 2 s with curl 28), and
+# actions/checkout then retries the fetch in-step (3 attempts, 10 to 20
+# second backoff). HONEST LIMIT, measured, not assumed: the floor polices an
+# in-progress transfer that slows to a trickle, but the hang variant observed
+# on 2026-08-10 (run 31402711619: four fetches sat 19m52s producing NOTHING,
+# WITH this floor confirmed in each step's env) dies in a phase curl's speed
+# timer never polices, so this env block did not catch it. Keep it (it is
+# free and covers the trickle variant); the reliable net for the hang variant is
 # ci-stall-rerun.yml, which reruns the run's failed jobs once (nothing
 # after the dead checkout ran, so nothing can be masked). Workflow-wide on
 # purpose: it also covers the lint job's base-ref fetch and the changes
@@ -620,20 +620,27 @@ jobs:
     # That projection did not survive CI measurement, and this comment is the
     # re-derivation the lane-diet note asks for whenever a member's cost moves.
     # On run 31450179645 (2026-08-11, a healthy runner, full mode) lane A ran
-    # 13.73 minutes and lane B 12.55, because owned_class_balance_harness alone
-    # measured 739268ms in-lane: the local aggregate for all three half-A files
-    # understates that ONE file by most of a factor of two, and lane isolation
-    # does not shrink it (the same file measured 527s and 842s inside a
-    # release-gate shard, so the harness is simply long, not contended).
+    # a 13.73 minute JOB wall and lane B 12.55, because owned_class_balance_harness
+    # alone measured 739268ms in-lane: the local aggregate for all three half-A
+    # files understates that ONE file by most of a factor of two. Lane A's wall
+    # breaks down as 66s of setup plus a 753s test step, so the job and step
+    # figures are close here only because its caches were warm; size from the
+    # JOB wall regardless, because a setup spike counts inside the bound.
+    # Lane isolation does not reliably shrink the harness either: in-lane it
+    # measured 739s, which sits BETWEEN the two in-shard figures (527s fast,
+    # 842s slow). Those three samples are not controlled against each other,
+    # so read them as runner-to-runner variance dominating, not as a proof
+    # about contention.
     #
-    # 30 applies the same arithmetic as release-gate's bound: healthy wall
+    # 30 applies the same arithmetic as release-gate's bound: healthy JOB wall
     # times the 1.60 fast-to-slow runner ratio measured at b160a1ba18
     # (13.73 x 1.60 = 22.0 for the slower half), then the 1.37x margin the
     # original bounds were chosen with. At 20 this REQUIRED check was roughly
     # one slow runner away from bound-killing and blocking the merge queue,
     # which is the more expensive failure than the release backstop's, so it
     # is raised in the same change. Both halves share one bound so the a/b
-    # assignment can still rebalance freely without re-sizing.
+    # assignment can still rebalance freely without re-sizing. The queue-side
+    # ceiling this has to fit under is recorded in docs/merge-queue.md.
     timeout-minutes: 30
     runs-on: ubuntu-latest
 
@@ -753,7 +760,7 @@ jobs:
     if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code != 'false'
     # Unmatrixed single toolchain-setup-plus-checks job, comparable in shape to
     # browser-gate, but heavier: i18n generation, the malware gate, a
-    # typecheck, and four builds. 20 matches the shard matrices' bound so a
+    # typecheck, and four builds. 20 matches the pr-gate shard bound so a
     # stalled runner here dies and reruns instead of holding a required check
     # for hours.
     timeout-minutes: 20
@@ -861,10 +868,16 @@ jobs:
     # runner speed, with owned_class_balance_harness measured at 527s on the
     # fast runner and 842s on the slow one, a ratio of 1.60.
     #
-    # Sizing, stated as the arithmetic rather than a feel: the healthy wall is
-    # the 16 minute passing attempt, so the slow-runner projection is
-    # 16 x 1.60 = 25.6 minutes, and 35 holds the 1.37x margin the 20 bound was
-    # originally chosen with (20 / 14.63). Do NOT re-derive this from the
+    # Sizing, stated as the arithmetic rather than a feel. Every figure below
+    # is a JOB wall, which is what timeout-minutes actually polices: setup
+    # (checkout, pnpm, node, install, cache restore) counts inside the bound
+    # and can spike on its own, so a base taken from the test STEP alone would
+    # under-size this. Label the kind whenever you re-derive it. The healthy
+    # job wall is the 16 minute passing attempt, so the slow-runner projection
+    # is 16 x 1.60 = 25.6 minutes, and 35 holds the 1.37x margin the 20 bound
+    # was originally chosen with (20 / 14.63). Scaling the whole job wall by a
+    # CPU ratio is deliberately conservative, since setup is I/O bound and does
+    # not scale with it. Do NOT re-derive this from the
     # killed attempt's file count: it had finished 271 of 330 files at 18m53s,
     # but druid_balance_probe was still unfinished, so the remaining time was
     # bounded below by a multi-minute file rather than by a per-file average,
