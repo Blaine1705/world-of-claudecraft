@@ -341,7 +341,10 @@ import {
   shouldShowHealLanding,
 } from './heal_landing_feedback_core';
 import { honorFloatText } from './honor_float_view';
-import { abilityRequirementKeys } from './hud/action_bar/ability_requirement_keys';
+import {
+  type AbilityRequirementResolve,
+  abilityRequirementKeys,
+} from './hud/action_bar/ability_requirement_keys';
 import {
   type ActionBarBindState,
   actionBarBindEnter,
@@ -6577,7 +6580,10 @@ export class Hud {
         });
       }
     }
-    const requirements = abilityRequirementLines(a, this.sim.talents.spec);
+    // Pass the RESOLVED ability, not just its def: a talent that retires a
+    // requirement (Cheap Trick on Gut Punch) must retire its line with it, the
+    // same way the resolved cost / cast / cooldown above beat the def's.
+    const requirements = abilityRequirementLines(a, this.sim.talents.spec, res);
     if (requirements.length) {
       html += requirements.map((line) => `<div class="tt-sub">${esc(line)}</div>`).join('');
     }
@@ -19307,8 +19313,12 @@ function abilityCastLine(known: ResolvedAbility, spellHaste = 0): string {
 
 // Thin i18n mapper over the pure resolver (ability_requirement_keys.ts), which
 // owns the truth table incl. the Skulduggery-only stealth-bypass line.
-export function abilityRequirementLines(def: AbilityDef, spec?: string | null): string[] {
-  return abilityRequirementKeys(def, spec).map((req) => {
+export function abilityRequirementLines(
+  def: AbilityDef,
+  spec?: string | null,
+  resolved?: AbilityRequirementResolve,
+): string[] {
+  return abilityRequirementKeys(def, spec, resolved).map((req) => {
     switch (req.key) {
       case 'requiresForm':
         if (req.form) {
