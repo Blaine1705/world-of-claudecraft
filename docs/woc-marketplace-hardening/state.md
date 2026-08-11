@@ -5,9 +5,11 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-01-qa.md`
+- Next file to run: `docs/woc-marketplace-hardening/phase-02-settlement-state-guards.md`
 - Packet created 2026-08-11 from `review.md` (the 2026-08-11 three-repo review).
-- 01 implemented (NOT yet QA'd); see progress.md and the ledger below.
+- 01 implemented AND QA'd (PASS-WITH-FOLLOWUPS, fixes applied, PUSHED); see
+  progress.md and the ledger below. Current game tip: the 01 QA docs commit on
+  top of 1d7bdbafa0.
 
 ## Repos and branches
 
@@ -144,4 +146,22 @@ Still open (a phase that hits one asks at session start):
   review's owed full-gate run is discharged. frontend-seam-reviewer and
   qa-checklist findings ALL applied (1 blocking biome error, dead
   imports/fields, re-bounded source-pin slices, the controller suite);
-  deferrals recorded in progress.md.
+  deferrals recorded in progress.md. (Figures superseded by the 01 QA entry
+  below: ceiling now 19347, gate re-verified at the QA tip.)
+- 01 QA (2026-08-11, session start 07fda3fd46, verdict PASS-WITH-FOLLOWUPS
+  with every applicable fix applied, tip 1d7bdbafa0 plus this docs commit,
+  PUSHED per R4): seven audit lanes (four workflow lenses, frontend-seam,
+  test-coverage, privacy-security on the custody commit) plus a fresh
+  fix-round auditor and qa-checklist (READY, 0 blocking). All five fix
+  commits are test-or-fidelity work: the move is now byte-identical (log tag
+  reverted), hud.ts imports via the woc_trade barrel, ceiling closed to
+  EXACTLY 19347 (zero headroom, per the phase spec; seam reviewer dissented,
+  recorded in progress.md), controller fake-hooks arm covers every REST-facing
+  guard, pins comment-strip with agreed slice bounds, new guards pin the
+  server trade_close arm, the Hud staged() live binding, E2E reach-through
+  names, language-fanout exemption drift, and a server-wide sim.postOffice
+  facade scan. 41 mutations all failed as expected. Gate GREEN at 07fda3fd46
+  and again at 1d7bdbafa0 (full suite 37278 + browser 117); one intermediate
+  run flaked on the known heavy-suite timeouts under reviewer load, all green
+  in the clean rerun. Deferral list with owners in progress.md (phases 12,
+  14, 15, 16). NEXT = phase-02-settlement-state-guards.md fresh session.

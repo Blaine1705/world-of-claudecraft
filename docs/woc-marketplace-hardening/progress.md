@@ -5,8 +5,8 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 
 | NN | Phase | Repo | Status | Start commit | Notes |
 |---|---|---|---|---|---|
-| 01 | branch-baseline | game | DONE | e4c3dde956 | five re-review verdicts CLEAN (section below); woc_trade extraction landed; gate GREEN at 418f75b876 (full-suite fallback) |
-| 01 QA | phase-01-qa | game | NOT STARTED | | |
+| 01 | branch-baseline | game | DONE (QA PASS) | e4c3dde956 | five re-review verdicts CLEAN (section below); woc_trade extraction landed; gate GREEN at 418f75b876 (full-suite fallback) |
+| 01 QA | phase-01-qa | game | DONE | 07fda3fd46 | PASS-WITH-FOLLOWUPS, all fixes applied (section below); gate GREEN at final tip 1d7bdbafa0; pushed per R4 |
 | 02 | settlement-state-guards | game | NOT STARTED | | |
 | 02 QA | phase-02-qa | game | NOT STARTED | | |
 | 03 | delivery-exactly-once | game | NOT STARTED | | |
@@ -64,6 +64,37 @@ beside its trade siblings instead of at the append tail;
 `server/woc_market_custody.ts` resolves `hasCustodyParcel` through the Sim facade
 its neighboring line already used.
 
+## 01 QA round (verdict PASS-WITH-FOLLOWUPS, every applicable finding applied)
+
+Audit fan-out: four independent lenses (move fidelity both directions,
+deliverables, dangling refs), frontend-seam-reviewer, test-coverage-auditor,
+privacy-security-review on the custody commit, a fresh auditor over the fix
+round, and qa-checklist last (verdict READY, 0 blocking). Roughly 40 findings
+surfaced; all blocking/should-fix/nit items were applied except the deferred
+restructures listed below. Fix commits e49738fbca, f0f9664a62, eeb5596446,
+88fb2146c2, 1d7bdbafa0. Highlights of what the round changed: the one byte
+drift in the move (the render-catch log tag) reverted; hud.ts now imports the
+controller through the domain barrel; the monolith ceiling closed to exactly
+19347 (zero regrow headroom, per the phase spec; the seam reviewer preferred
+keeping the 19400 margin, recorded here so Fernando can overrule); the
+controller suite gained a controllable fake-hooks arm covering the poll
+throttle, estimate last-write-wins, pay re-entry lock, vanished-row clear,
+per-role completion lines with the R34 fallback, side-scoped money rows,
+accept routing plus the accept body/refusal, close-path recovery, withdraw,
+the escrow-failed face, and the live coin-copper write; the trade source pins
+comment-strip and bound their windows at agreed anchors; new guards pin the
+server trade_close dispatch arm, the Hud staged() live binding, the E2E
+reach-through names, exemption-row memo drift in the language fanout, and a
+server-wide sim.postOffice facade scan (every spelling, lap-string carve-out).
+41 mutations were run against the pins; every one failed as expected (one,
+the shallow-copy staged getter, initially survived and exposed the untested
+coin-copper write, closed in the same round). Gate GREEN twice: at 07fda3fd46
+(pre-fix re-verification) and at the final tip 1d7bdbafa0 (all 8 steps, full
+suite 37278 passed, browser 117); one intermediate run flaked on the known
+heavy-suite timeouts (owned_class harnesses, warlock sustain, sfx export)
+while a reviewer agent loaded the machine, and every one of those suites is
+green in the clean final run.
+
 ## Deferrals and follow-ups
 
 - Re-review, noted with no action (pre-existing, documented design): the custody
@@ -91,6 +122,43 @@ its neighboring line already used.
   historical docs (`docs/hud-program-validation-report.md`,
   `docs/ui-architecture-hud-modularization/phase-p2-window-template.md`); both
   are dated point-in-time records, left per the docs staleness policy.
-- Not runnable in this session (need `npm run dev` or a browser): the perf
-  tour, `npm run test:browser`, and the two updated E2E scripts
-  (`scripts/trade_money_shot.mjs`, `scripts/localization_e2e.mjs`).
+- Not runnable in the implement session (need `npm run dev`): the perf tour
+  and the two updated E2E scripts (`scripts/trade_money_shot.mjs`,
+  `scripts/localization_e2e.mjs`); still unexecuted after QA (the browser
+  regression suite itself ran green inside both full gates).
+- QA round deferrals, each with an owner (restructures the faithful-move rule
+  kept out of this diff, plus pre-existing debt the extraction surfaced):
+  - Extract the accept-button state machine (bothAgreed/escrowFailed/
+    wocAccepted/acceptSpent) into the view core with its own cases: the flow
+    phase (14) owns this button. Its behavior is meanwhile pinned by the
+    escrow-face and routing arms in tests/woc_trade_controller.test.ts.
+  - `refreshWocTradeArm` in src/ui/trade_woc_panel.ts is a second hand-rolled
+    write cache in a bare-named module the painter gate cannot see; move it to
+    a `woc_trade_arm_painter.ts` on the writer facet: polish phase (15).
+  - Per-medium-tick `$('#trade-window')` query in updateTradeWindow (a
+    faithful-move artifact; "resolve refs once" wants a cached ref): 15 or 16.
+  - The `#7fdc4f`/`#ff6b6b`/`#ffd100` log-color triple is now its fourth copy
+    across extracted controllers; name the constants once: 15.
+  - `staged()` handing back a live mutable object is the documented contract;
+    the durable shape is a command pair (stageItemDelta/setStagedCopper): 14/15.
+  - The completion line prints a raw item id inside localized prose on the
+    unknown-item arm (deliberate, commented); a wrapped placeholder key: 14.
+  - Trade rows drop the owned-stack instance marks (masterwork seal, glyphs)
+    that bags and banks paint; the all-surfaces rule names only the three
+    grids, so this needs a product call exactly where money meets items: 14.
+  - The '[hud]' render-catch log prefix was deliberately restored for
+    byte-faithfulness and now misattributes the module in dev logs; rename
+    deliberately (with the E2E pins) if desired: 15.
+  - `#trade-window` predates the HUD-chrome dialog contract (no markDialogRoot,
+    no windowFocus trap); pre-existing debt, natural to schedule now: 14/15.
+  - tests/command_facets.test.ts still checks one direction only; a reverse
+    completeness assertion currently reds on 37 pre-existing untagged commands
+    (vendor/quest/professions clusters), so it is program-wide debt, not a
+    trade gap: wire-completeness phase (12).
+  - sendWocTradeOffer's success path and the devsig
+    (`signatureRequired === false`) branch remain source-pinned only; behavior
+    arms via the fake-hooks rig: 14 (the devsig spelling is pinned in
+    tests/trade_woc_panel.test.ts either way).
+  - wocOfferPhase stayed in src/ui/trade_woc_panel.ts while its sibling
+    decisions moved to the pure core; a Node-env suite now imports a DOM
+    adapter for it (safe today, verified no module-scope DOM): 14/15.
