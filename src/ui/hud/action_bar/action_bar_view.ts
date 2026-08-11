@@ -115,6 +115,11 @@ export interface ActionBarAbility {
    *  the sim gate checks, or a running shared clock is invisible while the
    *  button is transformed. */
   cooldownId?: string;
+  /** Talent-resolved drop of the def's stealth requirement (Cheap Trick on Gut
+   *  Punch). Baked by applyTalentMods, so BOTH worlds carry it on `known`, and
+   *  read by the sim's cast gate; the bar must read it too or the talent's one
+   *  button paints unusable while the cast it refuses to advertise succeeds. */
+  ignoreStealthRequirement?: boolean;
 }
 
 /** The aura fields the bar reads to derive proc glows and next-cast empowerment. */
@@ -647,7 +652,7 @@ export function createActionBarView(
           primaryEyeReady &&
           dominionReady &&
           !(maxCharges > 1 && chargesLeft <= 0) &&
-          (!def.requiresStealth || world.stealthed);
+          (!def.requiresStealth || world.stealthed || ability.ignoreStealthRequirement === true);
         slot.outOfRange =
           def.requiresTarget &&
           tgtDist !== null &&
