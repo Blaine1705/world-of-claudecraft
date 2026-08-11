@@ -695,9 +695,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // archetype and scene-texture counts; renderer.ts edits only). No capture
 // was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'af58a0e6d9a6c1f8a76985f31ed9f7fe9496e3697e7930d77a589c85d9f4bc80';
+  'dbc6e6eba154895aa137db8ba0f5d27d049a5dc45e0bbc63b5b196fa8e8934c1';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'aa70883d8d8592f3e3c6eb61a880d35a91c4450ef42a90a13fccaaeba00d7f6f';
+  'aaa9947779dec7f18a6999cf11b3c4b6c829e3a003ba937dad53944648188755';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1624,10 +1624,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // PR 3204) into the creator-appearance branch: both parents move the
     // rendererIntegration leaf, so the merged tree mints a value matching
     // neither parent. No capture was retaken.
+    // Re-minted for the Three.js audit batch (light budget seam, blob
+    // shadows, sky residency lane, splat colour pack-source fix): the
+    // first-order composite follows renderer.ts, then this second-order
+    // performance seal follows the swept evidence bytes. No capture was
+    // retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('4b6b058d75b233dbbc9e1b74e00cdaceb2662903210f2e69646f058a3f85a2a7');
+    ).toBe('7ceb535cda19c0fa4280a6244812d9a7dea53cc9f30e9600620af77bc03856e1');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
