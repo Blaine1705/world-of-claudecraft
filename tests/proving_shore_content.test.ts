@@ -93,12 +93,14 @@ describe('proving shore placement', () => {
     }
   });
 
-  it('the chain pays for the full tier-1 tool set, and the island vendors no tools', () => {
-    // The island vendor stocks provisions ONLY: professions tools stay on the
-    // vale's counters (the R37 rule tests/professions_zone_rollout.test.ts
-    // enforces), and the chain's copper is sized to buy them there.
+  it('the chain pays for the pouch lesson AND the tool set, and vendors no tools', () => {
+    // The island vendor stocks provisions and the bank lesson's Linen Pouch,
+    // NEVER professions tools (the R37 rule
+    // tests/professions_zone_rollout.test.ts enforces): the chain's copper is
+    // sized to buy the pouch mid-chain and the tier-1 tool kit at the vale's
+    // own counters after.
     const stocked = PROVING_SHORE_NPCS.quartermaster_finch.vendorItems ?? [];
-    expect(stocked.length).toBeGreaterThan(0);
+    expect(stocked).toContain('linen_pouch');
     for (const id of stocked) {
       expect(ITEMS[id]?.use?.type === 'gatherTool', `${id} is a professions tool`).toBe(false);
     }
@@ -110,17 +112,36 @@ describe('proving shore placement', () => {
       (sum, id) => sum + PROVING_SHORE_QUESTS[id].copperReward,
       0,
     );
-    // The buy lesson (q_ps_tools_of_the_trade) makes the player SPEND the
-    // draught's price mid-chain, so the spendable total is rewards minus one
-    // draught; it must still cover the whole tool set.
-    const draught = ITEMS.minor_healing_potion?.buyValue ?? 0;
-    expect(draught).toBeGreaterThan(0);
-    expect(totalCopper - draught).toBeGreaterThanOrEqual(toolCost);
-    // And the lesson itself is affordable when it unlocks (quests 1 to 3).
-    const beforeLesson = PROVING_SHORE_QUEST_ORDER.slice(0, 3).reduce(
+    // The bank lesson (q_ps_pouch_and_purse) makes the player SPEND the
+    // pouch's price mid-chain, so the spendable total is rewards minus one
+    // pouch; it must still cover the whole tool set.
+    const pouch = ITEMS.linen_pouch?.buyValue ?? 0;
+    expect(pouch).toBeGreaterThan(0);
+    expect(totalCopper - pouch).toBeGreaterThanOrEqual(toolCost);
+    // And the pouch is affordable from quest rewards alone when its lesson
+    // unlocks: every quest BEFORE q_ps_pouch_and_purse in the rail pays in.
+    const pouchAt = PROVING_SHORE_QUEST_ORDER.indexOf('q_ps_pouch_and_purse');
+    expect(pouchAt).toBeGreaterThan(0);
+    const beforeLesson = PROVING_SHORE_QUEST_ORDER.slice(0, pouchAt).reduce(
       (sum, id) => sum + PROVING_SHORE_QUESTS[id].copperReward,
       0,
     );
-    expect(beforeLesson).toBeGreaterThanOrEqual(draught);
+    expect(beforeLesson).toBeGreaterThanOrEqual(pouch);
+  });
+
+  it('the three mechanics lessons sit on the rail between looting and the crossing', () => {
+    // The rework's contract: talents/specialization, then professions, then
+    // bank-and-bags, all AFTER the two doing-lessons and BEFORE Set Sail.
+    expect(PROVING_SHORE_QUEST_ORDER).toEqual([
+      'q_ps_strike_true',
+      'q_ps_the_wreck_line',
+      'q_ps_a_path_of_your_own',
+      'q_ps_the_wheel_of_trades',
+      'q_ps_pouch_and_purse',
+      'q_ps_set_sail',
+    ]);
+    // The bank lesson's giver is a real banker: the bank window is reachable
+    // from the same NPC whose dialogue teaches it.
+    expect(PROVING_SHORE_NPCS.bursar_wick.banker).toBe(true);
   });
 });

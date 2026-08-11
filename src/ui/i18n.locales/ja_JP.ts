@@ -12254,21 +12254,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.quartermaster_finch.name': '補給係フィンチ',
   'entities.npcs.quartermaster_finch.title': '野営地の商人',
   'entities.npcs.quartermaster_finch.greeting':
-    'パンに水、それに稽古が過ぎたときのための薬。銅貨があれば買えるし、銅貨は働いて稼ぐもの。それが経済のすべてだよ、{playerName}。これ以上難しくはならない。大きくなるだけさ。',
+    'パンに水、稽古が過ぎたときのための薬、それに道すがら拾ったものを入れる予備のポーチ。銅貨があれば買えるし、銅貨は働いて稼ぐもの。それが経済のすべてだよ、{playerName}。これ以上難しくはならない。大きくなるだけさ。',
   'entities.npcs.ferryman_odo.name': '渡し守オド',
   'entities.npcs.ferryman_odo.title': '渡し場の番人',
   'entities.npcs.ferryman_odo.greeting':
     '海峡は穏やかで、船も頑丈だ、{playerName}。渓谷へ行く支度ができたら、桟橋の先の渡しの円環がいつでも運んでくれる。',
-  'entities.quests.q_ps_find_your_feet.title': '第一歩',
-  'entities.quests.q_ps_find_your_feet.text':
-    'ようこそ修練の浜へ、{playerName}。この島では、こちらから手を出さない限り噛みついてくるものはいない。だから静かな今のうちに、野営地を歩いて顔ぶれを覚えておくといい。補給係フィンチが物資を、渡し守オドが帰り道を預かっている。二人を訪ねたら、私のところへ戻っておいで。',
-  'entities.quests.q_ps_find_your_feet.completion':
-    '足も速いし、湯が沸く前に戻ってきたね。これで野営地は頭に入った、{playerName}。つまり、本当に噛みつかれたときにどこへ走ればいいかも分かったということだ。',
-  'entities.quests.q_ps_find_your_feet.objectives.0.label': '補給係フィンチを訪ねる',
-  'entities.quests.q_ps_find_your_feet.objectives.1.label': '渡し守オドを訪ねる',
+  'entities.npcs.bursar_wick.name': '出納係ウィック',
+  'entities.npcs.bursar_wick.title': '金張りの金庫',
+  'entities.npcs.bursar_wick.greeting':
+    '金張りの金庫は、こんな浜にも机を置いているんだよ、{playerName}。私に預けたものは、どの町のどの出納係の後ろにもある同じ金庫で待っている。狼にも、水にも、君自身のまずい思いつきにも手は届かない。',
   'entities.quests.q_ps_strike_true.title': '確かな一撃',
   'entities.quests.q_ps_strike_true.text':
-    '振ったことのない剣は、ただの重い棒だよ、{playerName}。野営地の南西の練習場に立つかかしは、打たれるために作られている。ひとつ選んで、構えて、三体崩れるまで打ち込みなさい。かかしは打ち返してこない。この浜の外にいるものは、打ち返してくる。',
+    'ようこそ修練の浜へ、{playerName}。ここの稽古はどれも同じところから始まる。足を据え、刃を握ること。野営地の南西の練習場に立つかかしは、打たれるために作られている。ひとつ選んで、構えて、三体崩れるまで打ち込みなさい。かかしは打ち返してこない。この浜の外にいるものは、打ち返してくる。',
   'entities.quests.q_ps_strike_true.completion':
     '三体倒して、握りももう確かになってきた。その感覚を忘れないで、{playerName}。足を据え、目を上げ、全身で振り抜く。渓谷の狼は藁より速いが、同じ算術で倒れるものだよ。',
   'entities.quests.q_ps_strike_true.objectives.0.label': '訓練用のかかしを倒す',
@@ -12278,12 +12275,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ps_the_wreck_line.completion':
     'ロープに、タールに、海がなぜか見逃したチーズが半玉。世の中は身をかがめる価値のあるもので満ちているよ、{playerName}。この習慣を続けなさい。見つけて、開けて、頂く。',
   'entities.quests.q_ps_the_wreck_line.objectives.0.label': '漂着した木箱を開ける',
-  'entities.quests.q_ps_tools_of_the_trade.title': '商いの道具',
-  'entities.quests.q_ps_tools_of_the_trade.text':
-    '銅貨は使うためにある、{playerName}。そしてうちは正直な店だ。私から治療薬をひと瓶買ってごらん。授業料としてお代より多く払い戻そう。店を見つけ、値段を量り、釣り銭を数える。渓谷に着いたら、残りはあちらの商人の採集道具に使うといい。鋳られた財産というものは、みんなこれくらい小さく始まったのさ。',
-  'entities.quests.q_ps_tools_of_the_trade.completion':
-    'ひと瓶、きちんと買って、約束どおりの払い戻し。こんな良い取引にはそうそう出会えないよ。まさかの日のために栓をしたまま取っておきなさい、{playerName}。それから、渓谷の商人はまっとうな銅貨を持つ者になら誰にでも、つるはしも斧も鎌も売ってくれることを覚えておいで。',
-  'entities.quests.q_ps_tools_of_the_trade.objectives.0.label': '治療薬を購入する',
+  'entities.quests.q_ps_a_path_of_your_own.title': '自分だけの道',
+  'entities.quests.q_ps_a_path_of_your_own.text':
+    '剣を振るうことと、なぜ振るうのかを知っていることは別物だよ、{playerName}。レベル五になると、世界は君に専門化を選ばせる。君の生業に開かれた三つの道のひとつ、それぞれに持ち味がある。それからは数レベルごとにタレントの段がひとつ開き、三択からひとつを取る。あと二体かかしを倒しながら、藁が舞う間に、どの道を歩むつもりか考えておきなさい。',
+  'entities.quests.q_ps_a_path_of_your_own.completion':
+    'さらに二体。振りの奥に、前より確かなものが宿ってきた。何より覚えておいてほしいのはこれだよ、{playerName}。君の選択はどれも檻ではない。タレントの画面はいつでも開ける。五で選んだあとも、安全な場所に立ってさえいれば、タレントも専門化も無料でいつでもやり直せる。大胆に選び、学び直したらまた選びなさい。',
+  'entities.quests.q_ps_a_path_of_your_own.objectives.0.label': '訓練用のかかしを倒す',
+  'entities.quests.q_ps_the_wheel_of_trades.title': '生業の輪',
+  'entities.quests.q_ps_the_wheel_of_trades.text':
+    '剣は一度しか君を食べさせないが、{playerName}、生業は一生君を食べさせる。冒険者は誰でも剣のかたわらに専門を持っている。採掘、伐採、薬草摘み、釣り、そしてそれらを価値に変える製作の技だ。補給係フィンチは、私が積んだ訓練より多くの店を切り盛りしてきた。生業がどう築かれるものか、彼女に聞いておいで。',
+  'entities.quests.q_ps_the_wheel_of_trades.completion':
+    'マレンがようやく、話す甲斐のある生徒を寄こしたね。一度しか言わないよ、{playerName}。採集は道具から始まる。つるはし、斧、鎌、釣り竿、どれも渓谷の商人が売っている。君の技は輪を成していて、好きなものに励み、隣り合う一対に調律すれば、その二つは上限のない主専攻になり、輪の向こうのひとつが趣味として残り、残りは君が再び手に取るまで眠る。学んだことは決して失われないし、支度ができたら町の職人頭が調律を持ちかけてくれる。',
+  'entities.quests.q_ps_the_wheel_of_trades.objectives.0.label': '補給係フィンチに生業について尋ねる',
+  'entities.quests.q_ps_pouch_and_purse.title': 'ポーチと財布',
+  'entities.quests.q_ps_pouch_and_purse.text':
+    '君の持ち物の話をしよう、{playerName}。背嚢には十六の枠があり、その横に空の鞄留めが四つ待っている。鞄を留めるたびに、その分の空きが全体に加わる仕組みだ。持ちきれないものは金張りの金庫が預かる。どの町のどの出納係も同じ金庫を開けてくれるし、財布が育てば金庫の枠も買い足せる。さあ、習慣づけの練習だ。補給係フィンチから亜麻のポーチを買って、留めてごらん。',
+  'entities.quests.q_ps_pouch_and_purse.completion':
+    '良いポーチだ。厄介ごとを詰める枠が六つ増えたね。値打ち物は金庫へ、鞄には余裕を、{playerName}。狼よりも多くの冒険を終わらせてきたのは、はち切れた背嚢のほうなんだよ。',
+  'entities.quests.q_ps_pouch_and_purse.objectives.0.label': '亜麻のポーチを購入する',
   'entities.quests.q_ps_set_sail.title': '出航',
   'entities.quests.q_ps_set_sail.text':
     'この浜には、君がまだ倒していない、開けていない、買っていないものは何も残っていないよ、{playerName}。準備はできた。イーストブルック渓谷には本物の仕事が待っている。古い桟橋へ下りて、渡し守オドに伝えなさい。マレンが、君は渡りを勝ち取ったと言っていた、とね。',

@@ -341,6 +341,7 @@ const NPC_IDS = [
   'instructor_maren',
   'quartermaster_finch',
   'ferryman_odo',
+  'bursar_wick',
 ] as const;
 
 const QUEST_IDS = [
@@ -542,10 +543,11 @@ const QUEST_IDS = [
   'q_fs_stalkers_off_the_light',
   'q_fs_the_great_break',
   // the Proving Shore (tutorial island)
-  'q_ps_find_your_feet',
   'q_ps_strike_true',
   'q_ps_the_wreck_line',
-  'q_ps_tools_of_the_trade',
+  'q_ps_a_path_of_your_own',
+  'q_ps_the_wheel_of_trades',
+  'q_ps_pouch_and_purse',
   'q_ps_set_sail',
   // the Galecrest
   'q_gc_down_the_windway',

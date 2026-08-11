@@ -1072,6 +1072,9 @@ export const VOICE_ALIAS = {
   // Keeper of the Crossing waiting at his pier: the fogbound-lake
   // ferrymaster's low, careful, water-wise calm.
   ferryman_odo: 'ferrymaster_caddow',
+  // The camp's Gilded Strongbox desk: Eastbrook's own bursar register, the
+  // same institutional voice the brand speaks with in every town.
+  bursar_wick: 'bursar_fernando',
 };
 
 /** Resolve any NPC content id to the id of the voice that should speak for it. */

@@ -13336,12 +13336,17 @@ export const id_ID: EnTranslations = {
       "quartermaster_finch": {
         "name": "Quartermaster Finch",
         "title": "Camp Outfitter",
-        "greeting": "Bread, water, and a draught for when practice gets ahead of you. Coin buys them, and work earns the coin. That is the whole economy, {playerName}, and it never gets more complicated. Only bigger."
+        "greeting": "Bread, water, a draught for when practice gets ahead of you, and a spare pouch for what you pick up along the way. Coin buys them, and work earns the coin. That is the whole economy, {playerName}, and it never gets more complicated. Only bigger."
       },
       "ferryman_odo": {
         "name": "Ferryman Odo",
         "title": "Keeper of the Crossing",
         "greeting": "The strait is calm and the boat is sound, {playerName}. Whenever you are ready for the vale, the crossing circle at the end of my pier will carry you over."
+      },
+      "bursar_wick": {
+        "name": "Bursar Wick",
+        "title": "The Gilded Strongbox",
+        "greeting": "The Gilded Strongbox keeps a desk even here, {playerName}. Whatever you deposit with me waits in the same vault behind every bursar in every town, safe from wolves, water, and your own worse judgment."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -15289,22 +15294,9 @@ export const id_ID: EnTranslations = {
           }
         }
       },
-      "q_ps_find_your_feet": {
-        "title": "Find Your Feet",
-        "text": "Welcome to the Proving Shore, {playerName}. Nothing on this island bites unless you ask it to, so use the quiet: walk the camp and learn its faces. Quartermaster Finch keeps the stores, and Ferryman Odo keeps the way home. Pay each of them a visit, then come back to me.",
-        "completion": "Fast on your feet and back before the kettle boiled. You know the camp now, {playerName}, which means you know where to run when something does bite.",
-        "objectives": {
-          "0": {
-            "label": "Visit Quartermaster Finch"
-          },
-          "1": {
-            "label": "Visit Ferryman Odo"
-          }
-        }
-      },
       "q_ps_strike_true": {
         "title": "Strike True",
-        "text": "A blade you have never swung is just a heavy stick, {playerName}. The effigies on the practice yard southwest of camp were built to be hit: pick one, square up, and strike until three of them give out. They do not hit back. The things beyond this shore will.",
+        "text": "Welcome to the Proving Shore, {playerName}. Every lesson here starts the same way: feet set, blade in hand. The effigies on the practice yard southwest of camp were built to be hit. Pick one, square up, and strike until three of them give out. They do not hit back. The things beyond this shore will.",
         "completion": "Three down, and your grip already surer. Remember the feel of it, {playerName}: feet set, eyes up, swing whole. The vale wolves are faster than straw, but they fall to the same arithmetic.",
         "objectives": {
           "0": {
@@ -15322,13 +15314,33 @@ export const id_ID: EnTranslations = {
           }
         }
       },
-      "q_ps_tools_of_the_trade": {
-        "title": "Tools of the Trade",
-        "text": "Coin is for spending, {playerName}, and mine is an honest stall. Buy a healing draught off me, and I will refund you more than the price for the lesson: find a vendor, weigh a cost, count your change. When you reach the vale, spend what is left on gathering tools at the traders there. Every fortune ever minted started exactly this small.",
-        "completion": "One draught, bought and paid for, and your refund as promised: a bargain you will not often see repeated. Keep it corked for a bad day, {playerName}, and remember that the vale traders sell picks, axes, and sickles to anyone carrying honest coin.",
+      "q_ps_a_path_of_your_own": {
+        "title": "A Path of Your Own",
+        "text": "Swinging a blade is one thing, {playerName}. Knowing why you swing it is another. At your fifth level the world will ask you to choose a specialization: one of three paths for your calling, each with its own strengths. From then on, every few levels opens a row of talents, three choices wide, and you take one. Fell two more effigies, and while the straw flies, think on the path you mean to walk.",
+        "completion": "Two more down, and something steadier behind the swing. Remember this above all, {playerName}: nothing you choose is a cage. Open your talents whenever you like, and once you have chosen at five, both your talents and your specialization can be reset and rechosen any time you stand somewhere safe, at no cost. Choose boldly, and choose again whenever you learn better.",
         "objectives": {
           "0": {
-            "label": "Minor Healing Potion bought"
+            "label": "Training Effigy felled"
+          }
+        }
+      },
+      "q_ps_the_wheel_of_trades": {
+        "title": "The Wheel of Trades",
+        "text": "A blade feeds you once, {playerName}. A trade feeds you for life. Every adventurer works professions beside the sword: mining, logging, herb-picking, fishing, and the crafts that turn all of it into worth. Quartermaster Finch has kept more stalls than I have run drills. Go and ask her how a trade is built.",
+        "completion": "So Maren finally sends me a student worth the breath. Listen once, {playerName}: gathering starts with a tool, a pick, an axe, a sickle, a pole, all sold at the vale traders. Your crafts sit on a wheel: work the ones you love, and when you attune to a neighbouring pair, those two become your uncapped majors, one craft across the wheel stays your hobby, and the rest sleep until you take them up again. Nothing you learn is ever lost, and the craft masters in the towns offer attunement when you are ready.",
+        "objectives": {
+          "0": {
+            "label": "Ask Quartermaster Finch about the trades"
+          }
+        }
+      },
+      "q_ps_pouch_and_purse": {
+        "title": "Pouch and Purse",
+        "text": "A word on what you are carrying, {playerName}. Your backpack holds sixteen slots, and beside it wait four empty bag loops: every bag you buckle on adds its own space to the pool. What you cannot carry, the Gilded Strongbox keeps: any bursar in any town opens the same vault, and more vault space can be bought once your purse grows into it. Now practice the habit: buy a Linen Pouch from Quartermaster Finch and buckle it on.",
+        "completion": "A fine pouch, and six more slots to fill with trouble. Keep your valuables banked and your bags roomy, {playerName}. A full pack has ended more adventures than any wolf ever did.",
+        "objectives": {
+          "0": {
+            "label": "Linen Pouch bought"
           }
         }
       },

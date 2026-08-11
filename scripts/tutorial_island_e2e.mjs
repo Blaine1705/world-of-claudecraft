@@ -82,7 +82,7 @@ const after = await page.evaluate(() => {
   const p = sim.entities.get(sim.playerId);
   return {
     pos: { ...p.pos },
-    questState: sim.questState('q_ps_find_your_feet'),
+    questState: sim.questState('q_ps_strike_true'),
     greetingLatched: sim.players.get(sim.playerId).tutorialGreetingSent,
   };
 });

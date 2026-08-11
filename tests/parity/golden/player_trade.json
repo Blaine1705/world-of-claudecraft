@@ -15,7 +15,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 982,
+      "nextId": 983,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -29,9 +29,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 984,
-      "state": "015f6658",
-      "events": "6260f355",
+      "nextId": 985,
+      "state": "c4a20015",
+      "events": "3d22cc5b",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -69,7 +69,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 982,
+          "entityId": 983,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -127,7 +127,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 983,
+          "entityId": 984,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -167,7 +167,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 982
+              "sourceId": 983
             }
           ],
           "blockChance": 0.05,
@@ -180,7 +180,7 @@
           "fallStartY": -2.954879,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 982,
+          "id": 983,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -229,7 +229,7 @@
           "fallStartY": -2.952174,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 983,
+          "id": 984,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -273,9 +273,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 984,
-      "state": "90855932",
-      "events": "bf549218",
+      "nextId": 985,
+      "state": "56fca50d",
+      "events": "dd6df2c1",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -315,7 +315,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 982,
+          "entityId": 983,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -376,7 +376,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 983,
+          "entityId": 984,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -420,7 +420,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 982
+              "sourceId": 983
             }
           ],
           "blockChance": 0.05,
@@ -433,7 +433,7 @@
           "fallStartY": -2.954879,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 982,
+          "id": 983,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -482,7 +482,7 @@
           "fallStartY": -2.952174,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 983,
+          "id": 984,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -526,9 +526,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 984,
-      "state": "90855932",
-      "events": "4995791e",
+      "nextId": 985,
+      "state": "56fca50d",
+      "events": "7e1e6e07",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -568,7 +568,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 982,
+          "entityId": 983,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -629,7 +629,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 983,
+          "entityId": 984,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -673,7 +673,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 982
+              "sourceId": 983
             }
           ],
           "blockChance": 0.05,
@@ -686,7 +686,7 @@
           "fallStartY": -2.954879,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 982,
+          "id": 983,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -735,7 +735,7 @@
           "fallStartY": -2.952174,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 983,
+          "id": 984,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -779,9 +779,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 984,
-      "state": "90855932",
-      "events": "d60fc4af",
+      "nextId": 985,
+      "state": "56fca50d",
+      "events": "7571a75c",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -821,7 +821,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 982,
+          "entityId": 983,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -882,7 +882,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 983,
+          "entityId": 984,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -926,7 +926,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 982
+              "sourceId": 983
             }
           ],
           "blockChance": 0.05,
@@ -939,7 +939,7 @@
           "fallStartY": -2.954879,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 982,
+          "id": 983,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -988,7 +988,7 @@
           "fallStartY": -2.952174,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 983,
+          "id": 984,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1032,9 +1032,9 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 984,
-      "state": "2637f51b",
-      "events": "3fd4e4b9",
+      "nextId": 985,
+      "state": "6ef28fac",
+      "events": "e64f0783",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1080,7 +1080,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 982,
+          "entityId": 983,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1148,7 +1148,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 983,
+          "entityId": 984,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1193,7 +1193,7 @@
               "name": "Battle Stance",
               "remaining": 3599.95,
               "school": "physical",
-              "sourceId": 982
+              "sourceId": 983
             }
           ],
           "blockChance": 0.05,
@@ -1206,7 +1206,7 @@
           "fallStartY": -2.954879,
           "fiveSecondRule": 99.05,
           "hp": 100,
-          "id": 982,
+          "id": 983,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1255,7 +1255,7 @@
           "fallStartY": 3.446006,
           "fiveSecondRule": 99.05,
           "hp": 54,
-          "id": 983,
+          "id": 984,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1300,8 +1300,8 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 984,
-      "state": "2637f51b",
+      "nextId": 985,
+      "state": "6ef28fac",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1348,7 +1348,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 982,
+          "entityId": 983,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1416,7 +1416,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 983,
+          "entityId": 984,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1461,7 +1461,7 @@
               "name": "Battle Stance",
               "remaining": 3599.95,
               "school": "physical",
-              "sourceId": 982
+              "sourceId": 983
             }
           ],
           "blockChance": 0.05,
@@ -1474,7 +1474,7 @@
           "fallStartY": -2.954879,
           "fiveSecondRule": 99.05,
           "hp": 100,
-          "id": 982,
+          "id": 983,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1523,7 +1523,7 @@
           "fallStartY": 3.446006,
           "fiveSecondRule": 99.05,
           "hp": 54,
-          "id": 983,
+          "id": 984,
           "inCombat": true,
           "kind": "player",
           "level": 1,

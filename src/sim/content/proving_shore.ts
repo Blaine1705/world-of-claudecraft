@@ -5,10 +5,13 @@
 // characters are offered passage here by Wayfarer Bryn at the Eastbrook
 // spawn (the tutorial greeting dialog, src/sim/tutorial/greeting.ts); the
 // island itself is a training camp: an on-rails quest chain that teaches
-// talking, fighting, looting, and buying, pays a pouch of copper (enough to
-// buy the full tier-1 gathering tool set at the vale's own counters with
-// change; the island vendor deliberately stocks NO professions tools, the
-// R37 rule tests/professions_zone_rollout.test.ts enforces) and ZERO quest
+// fighting, looting, then the three mechanics lessons (talents and
+// specialization, the professions wheel, the bank and bag slots, each
+// explained in dialogue with its facts mirrored from the sim), pays enough
+// copper to buy the bank lesson's Linen Pouch mid-chain AND the full tier-1
+// gathering tool set at the vale's own counters after (the island vendor
+// deliberately stocks NO professions tools, the R37 rule
+// tests/professions_zone_rollout.test.ts enforces), and grants ZERO quest
 // experience, so a graduate steps onto the vale at the same level as
 // someone who skipped it. The way back (and back in, for a refresher) is the
 // ferry crossing circle: a portal pair between the Old Pier and the vale's
@@ -48,7 +51,7 @@ export const PROVING_SHORE_ZONE: ZoneDef = {
   ],
   welcome:
     'The Proving Shore asks nothing of you but time. Learn the camp, strike the effigies, walk the wreck line, and when you are ready, Ferryman Odo will see you across to the vale.',
-  welcomeQuestId: 'q_ps_find_your_feet',
+  welcomeQuestId: 'q_ps_strike_true',
 };
 
 export const PROVING_SHORE_ROADS: { x: number; z: number }[][] = [
@@ -162,7 +165,13 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     pos: { x: -300, z: 46 },
     facing: 0,
     color: 0x6b4a8a,
-    questIds: ['q_ps_find_your_feet', 'q_ps_strike_true', 'q_ps_the_wreck_line', 'q_ps_set_sail'],
+    questIds: [
+      'q_ps_strike_true',
+      'q_ps_the_wreck_line',
+      'q_ps_a_path_of_your_own',
+      'q_ps_the_wheel_of_trades',
+      'q_ps_set_sail',
+    ],
     greeting:
       'Every hero the vale has ever thanked stood where you stand now, $C, and not one of them knew which end of a blade to hold. That is what this shore is for. Ask, practice, and fail where failing is free.',
   },
@@ -173,13 +182,28 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     pos: { x: -304, z: 54 },
     facing: -Math.PI / 2,
     color: 0x6b6b3a,
-    // Provisions only, NEVER professions tools (the R37 vendor rule): the
-    // chain's copper is sized so a graduate buys the full tier-1 tool kit
-    // from the vale's own counters on arrival.
-    vendorItems: ['minor_healing_potion', 'baked_bread', 'spring_water'],
-    questIds: ['q_ps_tools_of_the_trade'],
+    // Provisions and a starter bag, NEVER professions tools (the R37 vendor
+    // rule): the chain's copper is sized so a graduate buys the full tier-1
+    // tool kit from the vale's own counters on arrival. The Linen Pouch is
+    // the bank lesson's purchase (q_ps_pouch_and_purse).
+    vendorItems: ['minor_healing_potion', 'baked_bread', 'spring_water', 'linen_pouch'],
+    questIds: ['q_ps_the_wheel_of_trades'],
     greeting:
-      'Bread, water, and a draught for when practice gets ahead of you. Coin buys them, and work earns the coin. That is the whole economy, $N, and it never gets more complicated. Only bigger.',
+      'Bread, water, a draught for when practice gets ahead of you, and a spare pouch for what you pick up along the way. Coin buys them, and work earns the coin. That is the whole economy, $N, and it never gets more complicated. Only bigger.',
+  },
+  // The camp's Gilded Strongbox desk: a real banker (the same vault as every
+  // town bursar), and the voice of the bank-and-bags lesson.
+  bursar_wick: {
+    id: 'bursar_wick',
+    name: 'Bursar Wick',
+    title: 'The Gilded Strongbox',
+    pos: { x: -310, z: 56 },
+    facing: Math.PI / 2,
+    color: 0xc9a227,
+    questIds: ['q_ps_pouch_and_purse'],
+    banker: true,
+    greeting:
+      'The Gilded Strongbox keeps a desk even here, $N. Whatever you deposit with me waits in the same vault behind every bursar in every town, safe from wolves, water, and your own worse judgment.',
   },
   ferryman_odo: {
     id: 'ferryman_odo',
@@ -195,42 +219,20 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
 };
 
 export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
-  q_ps_find_your_feet: {
-    id: 'q_ps_find_your_feet',
-    name: 'Find Your Feet',
-    giverNpcId: 'instructor_maren',
-    turnInNpcId: 'instructor_maren',
-    text: 'Welcome to the Proving Shore, $N. Nothing on this island bites unless you ask it to, so use the quiet: walk the camp and learn its faces. Quartermaster Finch keeps the stores, and Ferryman Odo keeps the way home. Pay each of them a visit, then come back to me.',
-    completionText:
-      'Fast on your feet and back before the kettle boiled. You know the camp now, $N, which means you know where to run when something does bite.',
-    objectives: [
-      {
-        type: 'interact',
-        targetNpcId: 'quartermaster_finch',
-        count: 1,
-        label: 'Visit Quartermaster Finch',
-      },
-      { type: 'interact', targetNpcId: 'ferryman_odo', count: 1, label: 'Visit Ferryman Odo' },
-    ],
-    xpReward: 0,
-    copperReward: 20,
-    itemRewards: {},
-  },
   q_ps_strike_true: {
     id: 'q_ps_strike_true',
     name: 'Strike True',
     giverNpcId: 'instructor_maren',
     turnInNpcId: 'instructor_maren',
-    text: 'A blade you have never swung is just a heavy stick, $N. The effigies on the practice yard southwest of camp were built to be hit: pick one, square up, and strike until three of them give out. They do not hit back. The things beyond this shore will.',
+    text: 'Welcome to the Proving Shore, $N. Every lesson here starts the same way: feet set, blade in hand. The effigies on the practice yard southwest of camp were built to be hit. Pick one, square up, and strike until three of them give out. They do not hit back. The things beyond this shore will.',
     completionText:
       'Three down, and your grip already surer. Remember the feel of it, $N: feet set, eyes up, swing whole. The vale wolves are faster than straw, but they fall to the same arithmetic.',
     objectives: [
       { type: 'kill', targetMobId: 'training_effigy', count: 3, label: 'Training Effigy felled' },
     ],
     xpReward: 0,
-    copperReward: 25,
+    copperReward: 40,
     itemRewards: {},
-    requiresQuest: 'q_ps_find_your_feet',
   },
   q_ps_the_wreck_line: {
     id: 'q_ps_the_wreck_line',
@@ -249,30 +251,77 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
       },
     ],
     xpReward: 0,
-    copperReward: 30,
+    copperReward: 50,
     itemRewards: {},
     requiresQuest: 'q_ps_strike_true',
   },
-  q_ps_tools_of_the_trade: {
-    id: 'q_ps_tools_of_the_trade',
-    name: 'Tools of the Trade',
-    giverNpcId: 'quartermaster_finch',
-    turnInNpcId: 'quartermaster_finch',
-    text: 'Coin is for spending, $N, and mine is an honest stall. Buy a healing draught off me, and I will refund you more than the price for the lesson: find a vendor, weigh a cost, count your change. When you reach the vale, spend what is left on gathering tools at the traders there. Every fortune ever minted started exactly this small.',
+  // The talents and specialization lesson. Facts mirrored from the sim
+  // (content/talents.ts): specialization unlocks at level 5 (SPEC_UNLOCK_LEVEL,
+  // one of three per class), talent rows open at levels 5, 8, 11, 14, 17, and
+  // 20 with three choices each (ROW_LEVELS/OPTIONS_PER_ROW), and both the
+  // rows and the specialization can be reset or changed later at no cost
+  // (progression/talents.ts respecTalents/setTalentSpec).
+  q_ps_a_path_of_your_own: {
+    id: 'q_ps_a_path_of_your_own',
+    name: 'A Path of Your Own',
+    giverNpcId: 'instructor_maren',
+    turnInNpcId: 'instructor_maren',
+    text: 'Swinging a blade is one thing, $N. Knowing why you swing it is another. At your fifth level the world will ask you to choose a specialization: one of three paths for your calling, each with its own strengths. From then on, every few levels opens a row of talents, three choices wide, and you take one. Fell two more effigies, and while the straw flies, think on the path you mean to walk.',
     completionText:
-      'One draught, bought and paid for, and your refund as promised: a bargain you will not often see repeated. Keep it corked for a bad day, $N, and remember that the vale traders sell picks, axes, and sickles to anyone carrying honest coin.',
+      'Two more down, and something steadier behind the swing. Remember this above all, $N: nothing you choose is a cage. Open your talents whenever you like, and once you have chosen at five, both your talents and your specialization can be reset and rechosen any time you stand somewhere safe, at no cost. Choose boldly, and choose again whenever you learn better.',
+    objectives: [
+      { type: 'kill', targetMobId: 'training_effigy', count: 2, label: 'Training Effigy felled' },
+    ],
+    xpReward: 0,
+    copperReward: 70,
+    itemRewards: {},
+    requiresQuest: 'q_ps_the_wreck_line',
+  },
+  // The professions lesson. Facts mirrored from Professions 2.0 (the craft
+  // wheel and attunement: src/sim/professions/, and the tier tutorial copy in
+  // i18n.catalog/hud_chrome.ts): gathering needs a bought tool, crafts sit on
+  // a wheel, attuning to an adjacent pair makes two uncapped majors and one
+  // rare-capped hobby while the rest lie dormant, and nothing learned is lost.
+  q_ps_the_wheel_of_trades: {
+    id: 'q_ps_the_wheel_of_trades',
+    name: 'The Wheel of Trades',
+    giverNpcId: 'instructor_maren',
+    turnInNpcId: 'quartermaster_finch',
+    text: 'A blade feeds you once, $N. A trade feeds you for life. Every adventurer works professions beside the sword: mining, logging, herb-picking, fishing, and the crafts that turn all of it into worth. Quartermaster Finch has kept more stalls than I have run drills. Go and ask her how a trade is built.',
+    completionText:
+      'So Maren finally sends me a student worth the breath. Listen once, $N: gathering starts with a tool, a pick, an axe, a sickle, a pole, all sold at the vale traders. Your crafts sit on a wheel: work the ones you love, and when you attune to a neighbouring pair, those two become your uncapped majors, one craft across the wheel stays your hobby, and the rest sleep until you take them up again. Nothing you learn is ever lost, and the craft masters in the towns offer attunement when you are ready.',
     objectives: [
       {
-        type: 'collect',
-        itemId: 'minor_healing_potion',
+        type: 'interact',
+        targetNpcId: 'quartermaster_finch',
         count: 1,
-        label: 'Minor Healing Potion bought',
+        label: 'Ask Quartermaster Finch about the trades',
       },
     ],
     xpReward: 0,
-    copperReward: 50,
+    copperReward: 100,
     itemRewards: {},
-    requiresQuest: 'q_ps_the_wreck_line',
+    requiresQuest: 'q_ps_a_path_of_your_own',
+  },
+  // The bank and bags lesson. Facts mirrored from the sim: the implicit
+  // 16-slot backpack plus four bag sockets pooling capacity (BAG_SOCKETS,
+  // src/sim/bags.ts), the shared bank vault behind every bursar with
+  // purchasable extra slots (src/sim/bank.ts), and the Linen Pouch as the
+  // cheapest vendor bag (6 slots, content/items.ts). The chain's copper
+  // through quest four is sized to afford the pouch when this unlocks.
+  q_ps_pouch_and_purse: {
+    id: 'q_ps_pouch_and_purse',
+    name: 'Pouch and Purse',
+    giverNpcId: 'bursar_wick',
+    turnInNpcId: 'bursar_wick',
+    text: 'A word on what you are carrying, $N. Your backpack holds sixteen slots, and beside it wait four empty bag loops: every bag you buckle on adds its own space to the pool. What you cannot carry, the Gilded Strongbox keeps: any bursar in any town opens the same vault, and more vault space can be bought once your purse grows into it. Now practice the habit: buy a Linen Pouch from Quartermaster Finch and buckle it on.',
+    completionText:
+      'A fine pouch, and six more slots to fill with trouble. Keep your valuables banked and your bags roomy, $N. A full pack has ended more adventures than any wolf ever did.',
+    objectives: [{ type: 'collect', itemId: 'linen_pouch', count: 1, label: 'Linen Pouch bought' }],
+    xpReward: 0,
+    copperReward: 120,
+    itemRewards: {},
+    requiresQuest: 'q_ps_the_wheel_of_trades',
   },
   q_ps_set_sail: {
     id: 'q_ps_set_sail',
@@ -286,18 +335,21 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
       { type: 'interact', targetNpcId: 'ferryman_odo', count: 1, label: 'Report to Ferryman Odo' },
     ],
     xpReward: 0,
-    copperReward: 30,
+    copperReward: 50,
     itemRewards: {},
-    requiresQuest: 'q_ps_tools_of_the_trade',
+    requiresQuest: 'q_ps_pouch_and_purse',
   },
 };
 
-// Strict chain order: the shore is on rails by design.
+// Strict chain order: the shore is on rails by design. Combat, then looting,
+// then the three mechanics lessons (talents, professions, bank and bags),
+// then the crossing home.
 export const PROVING_SHORE_QUEST_ORDER: string[] = [
-  'q_ps_find_your_feet',
   'q_ps_strike_true',
   'q_ps_the_wreck_line',
-  'q_ps_tools_of_the_trade',
+  'q_ps_a_path_of_your_own',
+  'q_ps_the_wheel_of_trades',
+  'q_ps_pouch_and_purse',
   'q_ps_set_sail',
 ];
 
