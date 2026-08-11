@@ -19249,7 +19249,10 @@ export function abilityRequirementLines(def: AbilityDef, spec?: string | null): 
   return abilityRequirementKeys(def, spec).map((req) => {
     switch (req.key) {
       case 'requiresForm':
-        return t('abilityUi.tooltip.requiresForm', { form: t(FORM_LABEL_KEYS[req.form!]) });
+        if (req.form) {
+          return t('abilityUi.tooltip.requiresForm', { form: t(FORM_LABEL_KEYS[req.form]) });
+        }
+        return t('abilityUi.tooltip.selfOnly');
       case 'requiresStealth':
         return t('abilityUi.tooltip.requiresStealth');
       case 'requiresStealthSkulduggery':
@@ -19261,9 +19264,12 @@ export function abilityRequirementLines(def: AbilityDef, spec?: string | null): 
       case 'requiresOutOfCombat':
         return t('abilityUi.tooltip.requiresOutOfCombat');
       case 'requiresTargetHealthBelow':
-        return t('abilityUi.tooltip.requiresTargetHealthBelow', {
-          percent: formatAbilityNumber(req.percent!),
-        });
+        if (req.percent !== undefined) {
+          return t('abilityUi.tooltip.requiresTargetHealthBelow', {
+            percent: formatAbilityNumber(req.percent),
+          });
+        }
+        return t('abilityUi.tooltip.selfOnly');
       case 'onNextSwing':
         return t('abilityUi.tooltip.onNextSwing');
       case 'offGlobalCooldown':
@@ -19273,6 +19279,7 @@ export function abilityRequirementLines(def: AbilityDef, spec?: string | null): 
       case 'enemyTarget':
         return t('abilityUi.tooltip.enemyTarget');
       case 'selfOnly':
+        return t('abilityUi.tooltip.selfOnly');
       default:
         return t('abilityUi.tooltip.selfOnly');
     }

@@ -893,6 +893,14 @@ export const es: EnTranslations = {
       "notNow": "Ahora no",
       "update": "Actualizar"
     },
+    "otaUpdate": {
+      "title": "Game Update",
+      "downloading": "Downloading update: {percent}",
+      "applying": "Update downloaded. Restarting the game to apply it.",
+      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
+      "continueAnyway": "Continue without updating",
+      "progressLabel": "Update download progress"
+    },
     "cameraPrompt": {
       "title": "Elige tu camara",
       "intro": "Elige como la camara sigue a tu personaje.",
@@ -994,6 +1002,7 @@ export const es: EnTranslations = {
       "emoteWheel": "Rueda de gestos",
       "targetFriendly": "Objetivo amistoso más cercano",
       "targetFriendlyNext": "Objetivo amistoso siguiente",
+      "targetPrev": "Objetivo anterior",
       "discord": "Discord",
       "valecup": "Copa del Valle",
       "bgFlag": "Acción de bandera de campo de batalla",
@@ -4167,6 +4176,7 @@ export const es: EnTranslations = {
       "dungeonFinder": "Buscador de Mazmorras",
       "discord": "Discord",
       "abilities": "Usar las habilidades de la barra de acción (la fila de números; una segunda barra está en el teclado numérico)",
+      "targetPrev": "Objetivo anterior",
       "targetFriendly": "Objetivo amistoso más cercano",
       "cycleFriendly": "Objetivo amistoso siguiente",
       "targetAuras": "Beneficios y perjuicios del objetivo",

@@ -893,6 +893,14 @@ export const sv_SE: EnTranslations = {
       "notNow": "Inte nu",
       "update": "Uppdatera"
     },
+    "otaUpdate": {
+      "title": "Game Update",
+      "downloading": "Downloading update: {percent}",
+      "applying": "Update downloaded. Restarting the game to apply it.",
+      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
+      "continueAnyway": "Continue without updating",
+      "progressLabel": "Update download progress"
+    },
     "cameraPrompt": {
       "title": "Välj din kamera",
       "intro": "Välj hur kameran följer din karaktär.",
@@ -994,6 +1002,7 @@ export const sv_SE: EnTranslations = {
       "emoteWheel": "Gesthjul",
       "targetFriendly": "Måltavla närmaste vänlig",
       "targetFriendlyNext": "Växla vänligt mål",
+      "targetPrev": "Växla mål bakåt",
       "discord": "Discord",
       "valecup": "Dalcupen",
       "bgFlag": "Slagfältets flaggåtgärd",
@@ -4167,6 +4176,7 @@ export const sv_SE: EnTranslations = {
       "dungeonFinder": "Fängelsehålsletaren",
       "discord": "Discord",
       "abilities": "Använd förmågor i handlingsfältet (sifferraden; ett andra fält ligger på det numeriska tangentbordet)",
+      "targetPrev": "Växla mål bakåt",
       "targetFriendly": "Måla in närmaste vänliga",
       "cycleFriendly": "Växla mellan vänliga mål",
       "targetAuras": "Målets buffar och debuffar",

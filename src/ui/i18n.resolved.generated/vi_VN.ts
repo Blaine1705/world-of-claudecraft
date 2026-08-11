@@ -893,6 +893,14 @@ export const vi_VN: EnTranslations = {
       "notNow": "Không phải bây giờ",
       "update": "Cập Nhật"
     },
+    "otaUpdate": {
+      "title": "Game Update",
+      "downloading": "Downloading update: {percent}",
+      "applying": "Update downloaded. Restarting the game to apply it.",
+      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
+      "continueAnyway": "Continue without updating",
+      "progressLabel": "Update download progress"
+    },
     "cameraPrompt": {
       "title": "Chọn Máy Ảnh Của Bạn",
       "intro": "Chọn cách máy ảnh theo dõi nhân vật của bạn.",
@@ -994,6 +1002,7 @@ export const vi_VN: EnTranslations = {
       "emoteWheel": "Vòng Biểu Cảm",
       "targetFriendly": "Chọn Đồng Minh Gần Nhất",
       "targetFriendlyNext": "Luân Phiên Mục Tiêu Đồng Minh",
+      "targetPrev": "Luân Phiên Mục Tiêu Ngược",
       "discord": "Discord",
       "valecup": "Cúp Thung Lũng",
       "bgFlag": "Hành Động Cờ Chiến Trường",
@@ -4167,6 +4176,7 @@ export const vi_VN: EnTranslations = {
       "dungeonFinder": "Tìm Hầm Ngục",
       "discord": "Discord",
       "abilities": "Dùng kỹ năng trên thanh hành động (hàng số; một thanh thứ hai nằm trên bàn phím số)",
+      "targetPrev": "Lần lượt chọn mục tiêu ngược lại",
       "targetFriendly": "Chọn mục tiêu thân thiện gần nhất",
       "cycleFriendly": "Lần lượt chọn mục tiêu thân thiện",
       "targetAuras": "Chọn buff và debuff mục tiêu",
