@@ -80,6 +80,13 @@ import { type BiomeHazePreset, hazeLightLevel } from './biome_haze_field_core';
 import { type BirdsView, buildBirds } from './birds';
 import { type BladeGrassView, buildBladeGrass } from './blade_grass';
 import { type BladeGrassBandView, buildBladeGrassBand } from './blade_grass_band';
+import {
+  type BlobShadowSlot,
+  blobBaseRadius,
+  blobShadowPlanInto,
+  createBlobShadowSlot,
+} from './blob_shadow_core';
+import { BlobShadows } from './blob_shadows';
 import { BurningPactMarkers } from './burning_pact_markers';
 import { createCameraBoom, stepCameraBoom } from './camera_boom_core';
 import {
@@ -485,9 +492,13 @@ import {
   buildSky,
   ensureSkyAssetsAt,
   ensureSkyBiomeAssets,
+  pinSkyBiomeAssets,
   type SkyKey,
   type SkyView,
+  skyBiomesAt,
 } from './sky';
+import { zoneArrivalReady } from './sky_residency_core';
+import { SkyResidencyDriver } from './sky_residency_driver';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { buildSoulwell, disposeSoulwellVisual, syncSoulwellVisual } from './soulwell';
 import { freezeStaticMatrices, freezeStaticSubtreeMatrices } from './static_matrix';
@@ -687,6 +698,15 @@ const SPARKLE_DRAW_RANGE_SQ = 40 * 40;
 // weapons stay readable on low while the 80u draw cap still bounds total cost.
 // The literal lives in `crowd_lod.ts` beside the factors that scale it.
 const ENTITY_LOD_RANGE_SQ = CHARACTER_LOD_RANGE_SQ;
+// Contact-blob grounding range on the tiers with no dynamic shadows. Anchored
+// to the FIXED articulated-rig range for the same reason weapon_vfx_shed_core.ts
+// is (read its header): the live crowd-adaptive band edge swings with one
+// client's visible-rig count, so a cue keyed to it would pulse as unrelated
+// players wander through the frustum and two viewers standing in the same spot
+// would not even agree on where it ends. It also lands just inside the 62yd
+// proxy-shadow band the shadowed tiers ground bodies over, so the two tiers
+// carry the cue about as far as each other.
+const BLOB_SHADOW_RANGE_SQ = CHARACTER_LOD_RANGE_SQ;
 
 // Crowd-adaptive character LOD (articulated-rig + shadow ranges, and the mid-band
 // animation cadence) lives in `crowd_lod.ts`: pure policy, unit-tested there.
@@ -1796,6 +1816,11 @@ export class Renderer {
   private campBraziers: CampBraziersView | null = null;
   private nightAccents: NightAccentsView | null = null;
   private mobNightGlow: MobNightGlowView | null = null;
+  // Contact blobs under nearby bodies, built ONLY on the tiers that cast no
+  // dynamic shadow (null everywhere else), plus the one scratch slot the
+  // entity loop refills per character.
+  private blobShadows: BlobShadows | null = null;
+  private blobShadowSlot: BlobShadowSlot = createBlobShadowSlot();
   // Pooled scratch for the night light field's dynamic entries (the body
   // collector rewrites it each frame; entries past the count are stale).
   private nightBodyLights: NightLightSite[] = [];
@@ -1866,6 +1891,29 @@ export class Renderer {
   // at every biome boundary. Lives as long as the renderer, like the env RTs.
   private pmremGenerator: THREE.PMREMGenerator | null = null;
   private envBiome: SkyKey = 'vale';
+  // The per-biome sky eviction/restore lane. Its host view is read-through, not
+  // a snapshot: skyView is rebuilt by build(), and envBiome / envTransition move
+  // under an IBL ease long after this field initializes.
+  private readonly skyResidency = new SkyResidencyDriver({
+    isShutdown: () => this.shutdownStarted,
+    lifecycleGeneration: () => this.lifecycleGeneration,
+    scene: () => this.scene,
+    skyView: () => this.skyView,
+    envRTs: () => this.envRTs,
+    envBiome: () => this.envBiome,
+    envTransition: () => this.envTransition,
+    preparedZones: () => this.preparedZones,
+    liveZones: () => this.sim.cfg.world?.zones ?? ZONES,
+    zoneIdAt: (x, z) => this.zoneIdAt(x, z),
+    prewarmTextureInIdle: (texture) => this.prewarmTextureInIdle(texture),
+    runPmrem: (biome, label) =>
+      this.backgroundGpuWork.run(
+        () => this.ensureEnvironmentBiome(biome),
+        GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+        label,
+      ),
+    idleSlot: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 }),
+  });
   private envOutdoorIntensity = ENV_INTENSITY;
   private envTransition: EnvironmentMapTransition<SkyKey> = createEnvironmentMapTransition(
     'vale',
@@ -2715,6 +2763,17 @@ export class Renderer {
     this.mobNightGlow = buildMobNightGlow();
     setRenderCategory(this.mobNightGlow.group, 'ui3d');
     this.scene.add(this.mobNightGlow.group);
+    // Contact-blob grounding, and ONLY where the real shadow pass is off: on
+    // those tiers a body has no contact cue whatsoever and reads as floating.
+    // The tier is fixed for this renderer's lifetime (a graphics change tears
+    // the Renderer down and builds a new one, see
+    // src/game/graphics_rebuild_coordinator.ts), so the gate is settled once
+    // here rather than re-read every frame, and there is no live toggle path.
+    if (!GFX.dynamicShadows) {
+      this.blobShadows = new BlobShadows();
+      setRenderCategory(this.blobShadows.mesh, 'ui3d');
+      this.scene.add(this.blobShadows.mesh);
+    }
     // Ember pools at every authored campfire: static, so they bucket per zone
     // and ride the same distance cull as the lamps.
     this.emberPools = buildEmberPools(this.sim.cfg.seed);
@@ -2965,6 +3024,11 @@ export class Renderer {
           sourceId: impact.sourceId,
           ability: 'summon_infernal',
         });
+      },
+      undefined, // keep the deferred-loaded impact texture default
+      {
+        register: (light) => this.registerBudgetPointLight(light),
+        release: (light) => this.releaseBudgetPointLight(light),
       },
     );
     this.necromancyGroundFx = new NecromancyGroundFx(this.scene, (x, z) =>
@@ -3271,6 +3335,9 @@ export class Renderer {
     this.prewarmRenderTarget = null;
     bestEffort(() => this.pmremGenerator?.dispose());
     this.pmremGenerator = null;
+    // Unbind this dome from the sky module's live-binding set, or a replaced
+    // renderer's dome would pin its last biome pair against eviction forever.
+    bestEffort(() => this.skyView?.dispose());
     for (const target of this.envRTs.values()) {
       bestEffort(() => target.dispose());
     }
@@ -3311,6 +3378,11 @@ export class Renderer {
     // batch or any renderer DOM surface added after the explicit maps above.
     bestEffort(() => this.nameplateLayer.replaceChildren());
     bestEffort(() => this.travelSpeedFx?.dispose());
+    // Renderer-owned (not a module singleton): the graphics-rebuild teardown
+    // comes through HERE (shutdown -> disposeRendererResources), so the blob
+    // pool, texture and material release with the rest of the GPU state.
+    bestEffort(() => this.blobShadows?.dispose());
+    this.blobShadows = null;
     bestEffort(() => this.scene.clear());
     const webgl = this.webgl as THREE.WebGLRenderer | undefined;
     if (webgl) {
@@ -3496,7 +3568,16 @@ export class Renderer {
 
   isZoneReadyAt(x: number, z: number): boolean {
     const id = this.zoneIdAt(x, z);
-    return id === null || (this.preparedZones.has(id) && this.prewarmedZonePrograms.has(id));
+    if (id === null) return true;
+    // Sky residency is part of arrival readiness: a false routes the arrival
+    // through prepareZoneAt's sky recovery branch (curtain, or idle pace).
+    return zoneArrivalReady({
+      prepared: this.preparedZones.has(id),
+      programsPrewarmed: this.prewarmedZonePrograms.has(id),
+      standardMaterials: GFX.standardMaterials,
+      skyResident: () =>
+        skyBiomesAt(x, z).every((biome) => this.skyView.skyBiomeAssetsResident(biome)),
+    });
   }
 
   zoneStreamingStats(): {
@@ -3518,7 +3599,10 @@ export class Renderer {
     };
   }
 
-  private ensureEnvironmentBiome(biome: BiomeId): THREE.WebGLRenderTarget | null {
+  // SkyKey, not BiomeId: envRTs, envBiome and skyView.envTexture are all keyed
+  // by the wider sky key. The live callers still pass a zone biome (the two
+  // place-keyed skies have never had a prefiltered environment of their own).
+  private ensureEnvironmentBiome(biome: SkyKey): THREE.WebGLRenderTarget | null {
     if (this.lowGfx) return null;
     const existing = this.envRTs.get(biome);
     if (existing) return existing;
@@ -3552,31 +3636,42 @@ export class Renderer {
     z: number,
     idlePace: boolean,
   ): Promise<void> {
-    await ensureSkyAssetsAt(x, z);
-    const envSource = this.skyView.envTexture(zone.biome);
-    const domeSource = this.skyView.domeTexture(zone.biome);
-    if (!idlePace) {
-      // Initial entry/teleport is already covered by an opaque loading screen.
-      this.ensureEnvironmentBiome(zone.biome);
-      this.prewarmTexture(envSource);
-      this.prewarmTexture(domeSource);
-      return;
+    // Every key the arrival can SEE, not just zone.biome: Farshore and the
+    // Sowfield bowl draw a place-keyed dome whose zone key is another biome,
+    // and warming only that key left the place dome its full 2K upload on
+    // first live bind. PMREM stays on zone.biome (place skies never had one).
+    // The pin holds for the whole warm: an evict mid-warm would dispose a
+    // texture about to be re-uploaded, minting GPU backing no store owns.
+    const skyKeys = skyBiomesAt(x, z);
+    const unpin = pinSkyBiomeAssets(skyKeys);
+    try {
+      await ensureSkyAssetsAt(x, z);
+      if (!idlePace) {
+        // Every non-idle caller (entry, teleport, the blocking sky recovery)
+        // sits behind an opaque loading screen; the walked recovery is idle.
+        this.ensureEnvironmentBiome(zone.biome);
+        this.prewarmTexture(this.skyView.envTexture(zone.biome));
+        for (const key of skyKeys) this.prewarmTexture(this.skyView.domeTexture(key));
+        return;
+      }
+      // A DataTexture upload is synchronous even from requestIdleCallback. Newer
+      // Three runtimes can split HDRIs into row batches; pinned r165 lacks update
+      // ranges and pays one full upload. Either way each atomic WebGL call enters
+      // the shared queue so it cannot overlap a live shader compile.
+      await this.prewarmTextureInIdle(this.skyView.envTexture(zone.biome));
+      // PMREM generation is indivisible in Three r165. Defer two timed-out
+      // callbacks before deliberately paying that single unit under sustained
+      // load, rather than running it on the first forced callback.
+      await idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 });
+      await this.backgroundGpuWork.run(
+        () => this.ensureEnvironmentBiome(zone.biome),
+        GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+        `pmrem:${zone.biome}`,
+      );
+      for (const key of skyKeys) await this.prewarmTextureInIdle(this.skyView.domeTexture(key));
+    } finally {
+      unpin();
     }
-    // A DataTexture upload is synchronous even from requestIdleCallback. Newer
-    // Three runtimes can split HDRIs into row batches; pinned r165 lacks update
-    // ranges and pays one full upload. Either way each atomic WebGL call enters
-    // the shared queue so it cannot overlap a live shader compile.
-    await this.prewarmTextureInIdle(envSource);
-    // PMREM generation is indivisible in Three r165. Defer two timed-out
-    // callbacks before deliberately paying that single unit under sustained
-    // load, rather than running it on the first forced callback.
-    await idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 });
-    await this.backgroundGpuWork.run(
-      () => this.ensureEnvironmentBiome(zone.biome),
-      GPU_WORK_PRIORITY.VISIBLE_PREWARM,
-      `pmrem:${zone.biome}`,
-    );
-    await this.prewarmTextureInIdle(domeSource);
   }
 
   /**
@@ -3598,6 +3693,27 @@ export class Renderer {
     if (this.shutdownStarted) return Promise.resolve();
     const zoneId = this.zoneIdAt(x, z);
     if (zoneId === null || this.preparedZones.has(zoneId)) {
+      // The zone build stays skipped, but its SKY may have been released while
+      // the player was away (see updateSkyResidency): re-run the sky half only,
+      // and return it so a blocking arrival (a teleport landing back in a realm
+      // it visited hours ago) waits behind the loading screen for its dome
+      // instead of arriving under the previous realm's frozen sky. Gated on
+      // standardMaterials because the shadowless tiers never fetch HDRIs at
+      // all: their stores stay empty by design, the residency predicate is
+      // permanently false there, and this branch would re-run prepareZoneSky
+      // on every arrival forever (review round 1; ensureSkyResidency guards
+      // the same case on the recheck lane). Progress completes only after the
+      // dome work it now awaits, so a blocking arrival's loading bar cannot
+      // sit at 100 percent while the sky loads.
+      if (
+        zoneId !== null &&
+        GFX.standardMaterials &&
+        !skyBiomesAt(x, z).every((biome) => this.skyView.skyBiomeAssetsResident(biome))
+      ) {
+        return this.prepareZoneSky(zoneAt(x, z), x, z, opts?.pace === 'idle').then(() => {
+          onProgress?.(1, 1);
+        });
+      }
       onProgress?.(1, 1);
       return Promise.resolve();
     }
@@ -3896,6 +4012,10 @@ export class Renderer {
     this.visibleZoneCheckX = cameraX;
     this.visibleZoneCheckZ = cameraZ;
     this.visibleZoneCheckFar = horizon;
+    // Same cadence, opposite direction: the per-biome sky stores are unbounded
+    // without an eviction pass, and this is the one place that already knows
+    // the camera moved far enough to reconsider zone residency.
+    this.skyResidency.updateSkyResidency(cameraX, cameraZ);
     const forwardX = this.cameraLookAt.x - cameraX;
     const forwardZ = this.cameraLookAt.z - cameraZ;
     this.visibleZonePrepareQueue = zonesWithinStreamingHorizon(
@@ -5098,6 +5218,11 @@ export class Renderer {
     this.frozenOrbFx.update(dt);
     this.mageGroundFx.update(dt);
     this.warlockMeteorFx.update(dt, this.reducedMotion());
+    // The meteor fx registers and releases budget lights AFTER the pass (a
+    // landing frees the visible fall light), which would dip the pinned
+    // visible count for this frame, and numPointLights is in every lit
+    // material's program cache key. Re-run the budget, pads included.
+    if (this.lightRankDirty) this.budgetFireLights(p.pos.x, p.pos.z);
     this.necromancyGroundFx.update(dt, this.reducedMotion());
     this.necromancyArmyPortalFx.update(dt, this.reducedMotion());
     this.abyssalRiftFx.update(dt, this.reducedMotion());
@@ -9696,7 +9821,19 @@ export class Renderer {
         if (this.bgViews.has(i)) continue;
         const o = battlegroundOrigin(i);
         if (Math.abs(px - o.x) < 220 && Math.abs(pz - o.z) < 200) {
-          const view = buildBattleground(o, this.sim.cfg.seed, { lowGfx: this.lowGfx });
+          // The field's authored point lights ride the shared fire-light budget
+          // (the yumi-maze hook shape above): the field streams in mid-session,
+          // and up to 14 lights appearing outside the rank would change the
+          // pinned visible point-light count and relink every lit material in
+          // view. The build is async, so the registration lands later; the
+          // callback marks the rank dirty whenever it does.
+          const view = buildBattleground(o, this.sim.cfg.seed, {
+            lowGfx: this.lowGfx,
+            fireLights: this.fireLights,
+            onFireLightsChanged: () => {
+              this.lightRankDirty = true;
+            },
+          });
           this.scene.add(view.group);
           this.bgViews.set(i, view);
         }
@@ -10599,6 +10736,9 @@ export class Renderer {
     const shadowRangeSq = lodBands.shadowRangeSq;
     const shadowsEnabled = this.sun.castShadow;
     let visibleRigCount = 0;
+    // Contact blobs are refilled from scratch inside the loop below (null on
+    // every tier that casts real shadows).
+    this.blobShadows?.begin();
 
     for (const [id, v] of this.views) {
       const e = sim.entities.get(id);
@@ -11473,6 +11613,37 @@ export class Renderer {
         v.group.position.y = smoothY;
         if (isSelf) selfPos.y = smoothY;
       }
+      // Contact blob (no-dynamic-shadow tiers only; the painter is null on the
+      // rest). Filled here rather than from a walk of its own because
+      // everything it needs has just been settled for this body: the drawn feet
+      // height, whether the body is on a surface at all, the frustum answer,
+      // and the distance. Far-LOD bodies are included on purpose: the blob is
+      // read off the entity, not the rig, so a frozen static mesh keeps its
+      // grounding. A corpse keeps its blob for as long as the body is drawn.
+      //
+      // Ground reference: the DRAWN feet height while the body is on a
+      // surface, which is exact and free, and keeps a blob flush with a dock, a
+      // crate top, or a step the smoother is still easing. Only an airborne or
+      // swimming body pays a terrain sample (a handful per frame at most), and
+      // for a swimmer the lake bed below collapses the blob by height, which is
+      // what should happen to a body that is not touching the ground.
+      if (this.blobShadows) {
+        const onSurface = !airborne && !swimming;
+        const blobGroundY = onSurface ? smoothY : groundHeight(x, z, this.sim.cfg.seed);
+        this.blobShadows.push(
+          blobShadowPlanInto(
+            this.blobShadowSlot,
+            x,
+            smoothY,
+            z,
+            blobGroundY,
+            blobBaseRadius(active.height, v.liveScale),
+            d2,
+            BLOB_SHADOW_RANGE_SQ,
+            v.group.visible && active.root.visible && charOnScreen,
+          ),
+        );
+      }
       // Terrain lean: near bodies tip toward the surface they stand on. The
       // gradient is resampled on a cadence (four terrain samples) and damped
       // in between, so a crowd costs a handful of samples per frame, and a
@@ -12012,6 +12183,7 @@ export class Renderer {
       if (!charOnScreen) v.group.visible = false;
     }
     this.lastVisibleRigCount = visibleRigCount;
+    this.blobShadows?.commit();
     this.drainWeaponSkinApplies();
 
     // Night mob glow: a warm pool of light on the ground under every nearby body
@@ -12280,6 +12452,9 @@ export class Renderer {
     this.frozenOrbFx.update(dt);
     this.mageGroundFx.update(dt);
     this.warlockMeteorFx.update(dt, this.reducedMotion());
+    // Same post-fx budget recovery as the prewarm frame path: a landing or
+    // expiry must not dip the pinned visible count for the frame it lands on.
+    if (this.lightRankDirty) this.budgetFireLights(p.pos.x, p.pos.z, true);
     this.necromancyGroundFx.update(dt, this.reducedMotion());
     this.necromancyArmyPortalFx.update(dt, this.reducedMotion());
     this.abyssalRiftFx.update(dt, this.reducedMotion());
@@ -12724,6 +12899,34 @@ export class Renderer {
     }
   }
 
+  // The registration seam for a point light an fx mints mid-session (the
+  // warlock infernal's fall and impact lights). It MUST join the same ranked
+  // budget as fire and view lights: Three counts a light into numPointLights
+  // iff `visible`, that count is part of every lit material's program cache
+  // key, and one unranked light appearing is a synchronous relink of every lit
+  // material in view (the mid-combat stall the pinned count exists to prevent).
+  // Hidden on the way in because the owning fx updates AFTER budgetFireLights
+  // in the frame, so the light must never count unranked; the post-fx recovery
+  // pass (both frame paths re-run the budget when the rank went dirty) ranks
+  // it before this frame renders, and the budget owns `visible` from then on.
+  // Dynamic means
+  // the budget only ever ZEROES the intensity and never restores it, so an fx
+  // that wants a light back must re-drive its own level from BEFORE the pass
+  // (weapon_vfx.ts is the other dynamic owner and does exactly that).
+  private registerBudgetPointLight(light: THREE.PointLight): void {
+    light.userData.budgetDynamic = true;
+    light.visible = false;
+    this.viewLights.push(light);
+    this.lightRankDirty = true;
+  }
+
+  private releaseBudgetPointLight(light: THREE.PointLight): void {
+    const index = this.viewLights.indexOf(light);
+    if (index < 0) return;
+    this.viewLights.splice(index, 1);
+    this.lightRankDirty = true;
+  }
+
   // Forward-renderer point-light budget: every campfire/torch light exists,
   // but only the nearest GFX.maxPointLights within range shine each frame.
   // Rank entries are pooled (extended only when interiors or view lights change).
@@ -12930,6 +13133,7 @@ export class Renderer {
     this.cancelTerrainStreaming();
     this.nameplatePainter.dispose();
     this.travelSpeedFx.dispose();
+    this.blobShadows?.dispose();
   }
 
   /**
