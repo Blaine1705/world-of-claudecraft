@@ -38,6 +38,13 @@ android {
             buildConfigField "String", "SOLANA_MOBILE_DISTRIBUTION", '"solana-dapp-store"'
         }
     }
+    // The heavy web assets (public/media, public/audio) ride in the
+    // install-time asset pack so the Play base module stays under Google
+    // Play's 500 MB compressed-download cap (the relocation task below moves
+    // them per build shape; docs/mobile-store-release.md has the sizing
+    // recipe). Asset packs only exist in AABs; APK builds get the assets
+    // moved back into the base automatically.
+    assetPacks = [":woc_media_pack"]
     buildTypes {
         release {
             minifyEnabled false
@@ -82,3 +89,49 @@ try {
 } catch(Exception e) {
     logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
 }
+
+// ---------------------------------------------------------------------------
+// Install-time asset pack relocation (Play 500 MB base-module cap).
+//
+// `npx cap sync` always copies the WHOLE dist/ into app/src/main/assets/public,
+// so the split into the woc_media_pack module has to be re-derived per build:
+// - bundle* builds (the Play AAB): public/media and public/audio MOVE into the
+//   asset pack, keeping the base module far under the cap; Play delivers the
+//   pack with the install and Capacitor reads it through the same AssetManager.
+// - every other build (debug APKs, the solanaStore release APK): the
+//   directories MOVE BACK, because asset packs only exist in AABs and an APK
+//   without them would ship a broken app.
+// The moves are same-volume renames (instant) and idempotent in both
+// directions, so alternating bundle and assemble builds always converge on
+// the shape the requested build needs.
+// ---------------------------------------------------------------------------
+def heavyAssetDirs = ['media', 'audio']
+def baseAssetsRoot = file('src/main/assets/public')
+def packAssetsRoot = file('../woc_media_pack/src/main/assets/public')
+
+tasks.register('relocateHeavyWebAssets') {
+    doLast {
+        def wantsBundle = gradle.startParameter.taskNames.any {
+            it.toLowerCase().contains('bundle')
+        }
+        def fromRoot = wantsBundle ? baseAssetsRoot : packAssetsRoot
+        def toRoot = wantsBundle ? packAssetsRoot : baseAssetsRoot
+        heavyAssetDirs.each { name ->
+            def from = new File(fromRoot, name)
+            def to = new File(toRoot, name)
+            if (from.exists()) {
+                project.delete(to)
+                to.parentFile.mkdirs()
+                if (!from.renameTo(to)) {
+                    throw new GradleException("asset pack relocation failed: ${from} -> ${to}")
+                }
+                logger.lifecycle("asset pack: moved ${name} to ${wantsBundle ? 'woc_media_pack' : 'base module'}")
+            } else if (!to.exists() && baseAssetsRoot.exists()) {
+                throw new GradleException(
+                    "asset pack relocation: ${name} missing from both the base assets and the pack; re-run npx cap sync"
+                )
+            }
+        }
+    }
+}
+preBuild.dependsOn tasks.named('relocateHeavyWebAssets')
