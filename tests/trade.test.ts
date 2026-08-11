@@ -6,13 +6,14 @@
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import * as bagsMod from '../src/sim/bags';
 import { ITEMS } from '../src/sim/data';
 import { canStackInstancePayloads } from '../src/sim/item_instance_merge';
 import type { SimContext } from '../src/sim/sim_context';
 import * as tradeMod from '../src/sim/social/trade';
 import { cloneItemInstancePayload } from '../src/sim/types';
+import { bareClient } from './helpers/bare_client';
 
 function makeTradeCtx() {
   const players = new Map<number, any>();
@@ -899,5 +900,27 @@ describe('trade module (direct, no Sim)', () => {
     tradeMod.updateTradesAndInvites(h.ctx);
     expect(h.partyInvites.has(7)).toBe(false);
     expect(tradeMod.tradeFor(h.ctx, 1)).toBe(null);
+  });
+});
+
+// The count pins in command_schema re-derive the send set from source, which
+// cannot say WHICH method emits a token: a swap between tradeClose and
+// tradeCancel keeps every derived set identical and passes everything. Pin the
+// two sends apart at the ClientWorld boundary (the target_echo_client idiom).
+describe('ClientWorld trade sends', () => {
+  it('tradeClose sends trade_close, distinct from tradeCancel', () => {
+    const world = bareClient(1);
+    // Intercept rather than call through: the bare client has no socket, and
+    // the pin is about WHICH token each method hands to the send path.
+    const cmd = vi
+      .spyOn(world as unknown as { cmd: (m: unknown) => void }, 'cmd')
+      .mockImplementation(() => {});
+
+    world.tradeClose();
+    expect(cmd).toHaveBeenCalledWith({ cmd: 'trade_close' });
+
+    cmd.mockClear();
+    world.tradeCancel();
+    expect(cmd).toHaveBeenCalledWith({ cmd: 'trade_cancel' });
   });
 });

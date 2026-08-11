@@ -400,6 +400,10 @@ export const COMMAND_NAMES = [
   'trade_offer',
   'trade_confirm',
   'trade_cancel',
+  // Landed beside its trade siblings rather than appended at the tail; this
+  // list feeds only KNOWN_COMMANDS (a Set) and the CommandName union, and
+  // moving an already-shipped token would be the very reorder the tail rule
+  // forbids, so it stays filed here.
   'trade_close',
   'duel_req',
   'duel_accept',

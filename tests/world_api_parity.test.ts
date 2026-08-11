@@ -1302,8 +1302,8 @@ describe('membership, not equality: world extras do not fail the gate', () => {
   });
 });
 
-// --- W1: aggregate == disjoint union of the 28 facet member sets --------------------
-// After the facet split (W1), `interface IWorld extends` 28 domain facet interfaces
+// --- W1: aggregate == disjoint union of the facet member sets -----------------------
+// After the facet split (W1), `interface IWorld extends` the domain facet interfaces
 // (src/world_api/<facet>.ts; the owner-backed facets plus IWorldTelemetry, the
 // bank-system's IWorldBank, the Book of Deeds' IWorldDeeds, and the Dungeon Finder's
 // IWorldDungeonFinder). This block proves the split dropped nothing and duplicated
