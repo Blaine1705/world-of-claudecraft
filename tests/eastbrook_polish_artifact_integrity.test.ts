@@ -701,10 +701,14 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // memory zone-eviction fix: both parents move renderer.ts, so the
 // rendererIntegration leaf mints a value matching neither parent. No capture
 // was retaken.
+// Re-minted for the merge of PR #3314's rift windup telegraph school tint
+// with the release branch's renderer changes. Both parents move renderer.ts,
+// so the rendererIntegration leaf mints a value matching neither parent. No
+// capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '1b8b7702ab89fab6581a8b4f24af69974615766e05d3db390ef409dde95ef824';
+  'cbba555285eb22afffd4c374471ced7e177bd44562ba07ba75fccba1d04b2c8c';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '3c00c04ebc18912a91dc0e32b44d4fbb353496dd5b98904d764da02c0ee01947';
+  'f3b9128b62c53f320d9083e9a7b6f08b6adbf6ad9671307abb0feed4500a3684';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1638,10 +1642,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // memory zone-eviction fix: the first-order composite follows both
     // parents' renderer.ts edits, then this second-order performance seal
     // follows the swept evidence bytes. No capture was retaken.
+    // Re-pinned for the merge of PR #3314's rift windup telegraph school tint
+    // with the release branch's renderer changes. The first-order composite
+    // follows the merged renderer.ts bytes, then this second-order performance
+    // seal follows the swept evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('a2e6482ac522b26a6dcb9c78a2c0b50f1da66d0c3ce27a6194bcd56b6cadb284');
+    ).toBe('a1be8c50d284aa4b486e81f50e254c6023536335c93963646a65fb007c0e04f4');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

@@ -123,8 +123,12 @@ interface AttributionTargetFixture {
 // memory zone-eviction fix: both parents move renderer.ts, so the
 // rendererIntegration leaf mints a value matching neither parent. No capture
 // was retaken.
+// Re-minted for the merge of PR #3314's rift windup telegraph school tint
+// with the release branch's renderer changes. Both parents move renderer.ts,
+// so the rendererIntegration leaf mints a value matching neither parent. No
+// capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '3c00c04ebc18912a91dc0e32b44d4fbb353496dd5b98904d764da02c0ee01947';
+  'f3b9128b62c53f320d9083e9a7b6f08b6adbf6ad9671307abb0feed4500a3684';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
