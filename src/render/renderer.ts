@@ -575,6 +575,7 @@ import { buildWorldAmbientSources, crowdAmbienceAt, footstepSurfaceAt } from './
 import { surfaceDetailPrewarmTextures } from './worn_stone';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
+import { zonesEligibleForEviction } from './zone_eviction_core';
 import {
   type FeatureFootprint,
   hasUnseededInstanceMatrix,
@@ -3907,7 +3908,8 @@ export class Renderer {
   // horizon changed. Runs from sync(), one zone in flight at a time.
   private queueVisibleZonePrepares(horizon: number): void {
     const player = this.sim.player;
-    if (this.fogState !== 'outdoor' || this.zoneIdAt(player.pos.x, player.pos.z) === null) {
+    const currentZoneId = this.zoneIdAt(player.pos.x, player.pos.z);
+    if (this.fogState !== 'outdoor' || currentZoneId === null) {
       this.visibleZonePrepareQueue = [];
       return;
     }
@@ -3924,6 +3926,7 @@ export class Renderer {
     this.visibleZoneCheckX = cameraX;
     this.visibleZoneCheckZ = cameraZ;
     this.visibleZoneCheckFar = horizon;
+    this.evictFarZoneIfConstrained(currentZoneId, player.pos.x, player.pos.z);
     const forwardX = this.cameraLookAt.x - cameraX;
     const forwardZ = this.cameraLookAt.z - cameraZ;
     this.visibleZonePrepareQueue = zonesWithinStreamingHorizon(
@@ -3935,6 +3938,29 @@ export class Renderer {
       forwardZ,
     ).filter((zone) => !this.preparedZones.has(zone.id) && !this.pendingZonePrepares.has(zone.id));
     this.pumpVisibleZonePrepareQueue();
+  }
+
+  /**
+   * Thin consumer of zone_eviction_core.ts's zonesEligibleForEviction; see
+   * that module's header for the full rationale (why this exists, the
+   * player-vs-camera anchor, and why prewarmedZonePrograms stays untouched).
+   * No-op on unconstrained hosts (desktop/Android).
+   */
+  private evictFarZoneIfConstrained(currentZoneId: string, playerX: number, playerZ: number): void {
+    if (!GFX.constrainedMemory) return;
+    const zoneId = zonesEligibleForEviction(
+      ZONES,
+      this.preparedZones,
+      currentZoneId,
+      playerX,
+      playerZ,
+    )[0];
+    if (!zoneId) return;
+    const zone = ZONES.find((z) => z.id === zoneId);
+    if (!zone) return;
+    this.terrainView.unloadZone(zone);
+    this.waterView.unloadZone(zone.id);
+    this.preparedZones.delete(zoneId);
   }
 
   private pumpVisibleZonePrepareQueue(): void {

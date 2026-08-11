@@ -119,8 +119,12 @@ interface AttributionTargetFixture {
 // Re-minted for the shadow-batch PR (shadow-camera texel snapping and the
 // budget-governed shadow cadence; renderer.ts edits only). No capture was
 // retaken.
+// Re-minted for the merge of the shadow-batch PR with the iOS constrained-
+// memory zone-eviction fix: both parents move renderer.ts, so the
+// rendererIntegration leaf mints a value matching neither parent. No capture
+// was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '2ddc6060fee7edeb2fbabf3dcb9949841baf6afcef29531f4a2057bcc6620469';
+  '3c00c04ebc18912a91dc0e32b44d4fbb353496dd5b98904d764da02c0ee01947';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
