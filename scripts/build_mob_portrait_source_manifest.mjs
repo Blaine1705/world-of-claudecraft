@@ -86,6 +86,7 @@ function withoutBundleFingerprint(manifest) {
 function isBundleOnlyDrift(committed, next) {
   return (
     committed.rendererFingerprint !== next.rendererFingerprint &&
+    committed.renderer?.browserBundle?.sha256 !== next.renderer?.browserBundle?.sha256 &&
     isDeepStrictEqual(withoutBundleFingerprint(committed), withoutBundleFingerprint(next))
   );
 }

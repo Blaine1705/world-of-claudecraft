@@ -303,6 +303,27 @@ describe('mob portrait source manifest', () => {
     }
   });
 
+  it('never treats a fingerprint-only corruption (bundle digest unchanged) as a bookkeeping-only drift', () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'wocc-portrait-manifest-fingerprint-only-'));
+    try {
+      const current = JSON.parse(readFileSync(manifestPath, 'utf8')) as PortraitSourceManifest;
+      const fingerprintOnlyCorrupted = structuredClone(current);
+      fingerprintOnlyCorrupted.rendererFingerprint = '0'.repeat(64);
+      const corruptedManifest = join(tempDir, 'fingerprint-only.json');
+      writeFileSync(corruptedManifest, `${JSON.stringify(fingerprintOnlyCorrupted, null, 2)}\n`);
+
+      const result = spawnSync(
+        process.execPath,
+        [script, '--check', '--manifest', corruptedManifest],
+        { cwd: repoRoot, encoding: 'utf8', timeout: 30_000 },
+      );
+      expect(result.status).toBe(1);
+      expect(result.stdout).not.toContain('bookkeeping-only');
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
   it('never treats a missing or unparseable manifest as a bookkeeping-only drift', () => {
     const tempDir = mkdtempSync(join(tmpdir(), 'wocc-portrait-manifest-missing-'));
     try {
