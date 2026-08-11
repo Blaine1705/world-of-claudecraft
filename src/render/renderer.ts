@@ -471,6 +471,12 @@ import {
   renderBudgetShaderPrewarmLevels,
 } from './render_budget';
 import {
+  emptyRenderDiagnosticsSnapshot,
+  type RenderableDiagnosticObject,
+  RenderDiagnostics,
+  type RenderDiagnosticsSnapshot,
+} from './render_diagnostics';
+import {
   beginRendererFrameTelemetry,
   type RendererFramePhaseMs,
   type RendererWorldPhaseMs,
@@ -894,8 +900,6 @@ const LASTKEEP_SUN_COLOR = 0xffd9a8;
 const LASTKEEP_HEMI_SKY_COLOR = 0xffe4c4;
 const LASTKEEP_HEMI_GROUND_COLOR = 0x4a3826;
 const RENDERER_PHASE_SAMPLE_LIMIT = 720;
-const RENDER_DIAGNOSTICS_SAMPLE_MS = 2000;
-const RENDER_DIAGNOSTICS_IDLE_TIMEOUT_MS = 1000;
 const RENDER_STALL_ATTRIBUTION_MS = 80;
 const PREWARM_MOB_TEMPLATE_IDS = [
   'forest_wolf',
@@ -963,20 +967,6 @@ type RendererPhaseStats = Record<
   RendererPhase,
   { count: number; avg: number; p95: number; max: number }
 >;
-type RenderDiagnosticsCategory = string;
-type RenderableDiagnosticObject = THREE.Object3D & {
-  isMesh?: boolean;
-  isInstancedMesh?: boolean;
-  isSkinnedMesh?: boolean;
-  isPoints?: boolean;
-  isSprite?: boolean;
-  isLine?: boolean;
-  isLineSegments?: boolean;
-  geometry?: THREE.BufferGeometry;
-  material?: THREE.Material | THREE.Material[];
-  count?: number;
-};
-
 type TextureBackedMaterial = THREE.Material & {
   map?: THREE.Texture | null;
   alphaMap?: THREE.Texture | null;
@@ -993,29 +983,6 @@ type TextureBackedMaterial = THREE.Material & {
   gradientMap?: THREE.Texture | null;
 };
 type TextureMaterialKey = keyof Omit<TextureBackedMaterial, keyof THREE.Material>;
-export interface RenderDiagnosticsCategoryStats {
-  objects: number;
-  draws: number;
-  triangles: number;
-  points: number;
-  materials: number;
-  materialSamples: string[];
-}
-
-export interface RenderDiagnosticsSnapshot {
-  enabled: boolean;
-  totalObjects: number;
-  estimatedDraws: number;
-  estimatedTriangles: number;
-  estimatedPoints: number;
-  programs: number;
-  programDelta: number;
-  textures: number;
-  textureDelta: number;
-  newMaterials: string[];
-  firstVisibleObjects: string[];
-  categories: Record<RenderDiagnosticsCategory, RenderDiagnosticsCategoryStats>;
-}
 
 interface RendererFrameStats {
   phaseMs: RendererFramePhaseMs;
@@ -1367,44 +1334,6 @@ function emptyFoliagePerfStats(): FoliagePerfStats {
   };
 }
 
-function emptyRenderDiagnosticsSnapshot(): RenderDiagnosticsSnapshot {
-  return {
-    enabled: false,
-    totalObjects: 0,
-    estimatedDraws: 0,
-    estimatedTriangles: 0,
-    estimatedPoints: 0,
-    programs: 0,
-    programDelta: 0,
-    textures: 0,
-    textureDelta: 0,
-    newMaterials: [],
-    firstVisibleObjects: [],
-    categories: {},
-  };
-}
-
-function loopbackHostname(hostname: string): boolean {
-  return (
-    hostname === 'localhost' ||
-    hostname === '127.0.0.1' ||
-    hostname === '::1' ||
-    hostname === '[::1]'
-  );
-}
-
-function localRenderDiagnosticsEnabled(): boolean {
-  if (!import.meta.env.DEV) return false;
-  if (typeof location === 'undefined') return false;
-  if (!loopbackHostname(location.hostname)) return false;
-  const params = new URLSearchParams(location.search);
-  return (
-    params.get('perfTrace') === '1' ||
-    params.get('perf_trace') === '1' ||
-    params.get('renderTrace') === '1'
-  );
-}
-
 /**
  * The world-space XZ footprint of a static feature group, for the per-frame
  * distance cull (see zone_feature_visibility_core.ts). Measured once, right
@@ -1423,7 +1352,7 @@ function measureFeatureFootprint(root: THREE.Object3D): FeatureFootprint | null 
 // Diagnostics-only label (the census buckets and the renderTrace walker read
 // it); NEVER a behavior or visibility gate, so tagging an actionable object
 // (team rings, corpse beacon) can never become a graphics-fairness break.
-function setRenderCategory(obj: THREE.Object3D, category: RenderDiagnosticsCategory): void {
+function setRenderCategory(obj: THREE.Object3D, category: string): void {
   obj.userData.renderCategory = category;
 }
 
@@ -2161,14 +2090,15 @@ export class Renderer {
     visibleViews: 0,
   };
   private lastPrewarmStats: RendererPrewarmStats | null = null;
-  private readonly renderDiagnosticsEnabled = localRenderDiagnosticsEnabled();
-  private renderDiagnosticsSnapshot = emptyRenderDiagnosticsSnapshot();
-  private renderDiagnosticsNextSampleAt = 0;
-  private renderDiagnosticsSamplePending = false;
-  private renderDiagnosticsKnownMaterials = new Set<string>();
-  private renderDiagnosticsKnownVisibleObjects = new Set<string>();
-  private renderDiagnosticsLastPrograms = 0;
-  private renderDiagnosticsLastTextures = 0;
+  private readonly renderDiagnostics = new RenderDiagnostics({
+    counters: () => ({
+      programs: this.webgl.info.programs?.length ?? 0,
+      textures: this.webgl.info.memory.textures,
+    }),
+    scene: () => this.scene,
+    generation: () => this.lifecycleGeneration,
+    shutdown: () => this.shutdownStarted,
+  });
   private appliedBudgetLevels: RenderBudgetState['levels'] | null = null;
   private lastQualityChange: RendererQualityChangeStats | null = null;
   private visualPool = new CharacterVisualPool<CharacterVisual>();
@@ -4732,192 +4662,6 @@ export class Renderer {
     };
   }
 
-  private materialLabels(material: THREE.Material | THREE.Material[] | undefined): string[] {
-    const mats = Array.isArray(material) ? material : material ? [material] : [];
-    return mats.map((mat) => `${mat.name || mat.type}:${mat.uuid.slice(0, 8)}`);
-  }
-
-  private drawCountFor(
-    material: THREE.Material | THREE.Material[] | undefined,
-    geometry?: THREE.BufferGeometry,
-  ): number {
-    if (!material) return 1;
-    if (Array.isArray(material)) return Math.max(1, geometry?.groups.length || material.length);
-    return Math.max(
-      1,
-      geometry?.groups.length && geometry.groups.length > 0 ? geometry.groups.length : 1,
-    );
-  }
-
-  private triangleCountFor(geometry?: THREE.BufferGeometry): number {
-    if (!geometry) return 0;
-    const drawCount = geometry.index?.count ?? geometry.getAttribute('position')?.count ?? 0;
-    return Math.max(0, Math.floor(drawCount / 3));
-  }
-
-  private objectDiagnosticLabel(
-    obj: THREE.Object3D,
-    category: string,
-    materialLabels: string[],
-  ): string {
-    const name = obj.name || obj.type;
-    const material = materialLabels[0] ?? 'no-material';
-    return `${category}:${name}:${material}`.slice(0, 140);
-  }
-
-  private collectRenderDiagnostics(): RenderDiagnosticsSnapshot {
-    if (!this.renderDiagnosticsEnabled) return this.renderDiagnosticsSnapshot;
-    const info = this.webgl.info;
-    const programs = info.programs?.length ?? 0;
-    const textures = info.memory.textures;
-    const programDelta = programs - this.renderDiagnosticsLastPrograms;
-    const textureDelta = textures - this.renderDiagnosticsLastTextures;
-    this.renderDiagnosticsLastPrograms = programs;
-    this.renderDiagnosticsLastTextures = textures;
-
-    type MutableCategoryStats = RenderDiagnosticsCategoryStats & {
-      materialKeys: Set<string>;
-    };
-    const categories: Record<string, MutableCategoryStats> = {};
-    const totals = { objects: 0, draws: 0, triangles: 0, points: 0 };
-    const newMaterials: string[] = [];
-    const firstVisibleObjects: string[] = [];
-    const categoryStats = (category: string): MutableCategoryStats => {
-      categories[category] ??= {
-        objects: 0,
-        draws: 0,
-        triangles: 0,
-        points: 0,
-        materials: 0,
-        materialSamples: [],
-        materialKeys: new Set<string>(),
-      };
-      return categories[category];
-    };
-    const visit = (
-      obj: THREE.Object3D,
-      inheritedCategory: string,
-      inheritedVisible: boolean,
-    ): void => {
-      const visible = inheritedVisible && obj.visible;
-      const category =
-        typeof obj.userData.renderCategory === 'string'
-          ? (obj.userData.renderCategory as string)
-          : inheritedCategory;
-      if (visible) {
-        const renderable = obj as RenderableDiagnosticObject;
-        const hasMesh = Boolean(
-          renderable.isMesh || renderable.isInstancedMesh || renderable.isSkinnedMesh,
-        );
-        const hasPoints = Boolean(renderable.isPoints);
-        const hasSprite = Boolean(renderable.isSprite);
-        const hasLine = Boolean(renderable.isLine || renderable.isLineSegments);
-        if (hasMesh || hasPoints || hasSprite || hasLine) {
-          const geometry = renderable.geometry;
-          const material = renderable.material;
-          const stat = categoryStats(category);
-          const labels = this.materialLabels(material);
-          const draws = this.drawCountFor(material, geometry);
-          let triangles = 0;
-          let pointCount = 0;
-          if (hasMesh) {
-            const instanceCount = renderable.isInstancedMesh
-              ? Math.max(0, renderable.count ?? 0)
-              : 1;
-            triangles = this.triangleCountFor(geometry) * instanceCount;
-          } else if (hasSprite) {
-            triangles = 2;
-          } else if (hasPoints) {
-            pointCount = geometry?.getAttribute('position')?.count ?? 0;
-          }
-          stat.objects++;
-          stat.draws += draws;
-          stat.triangles += triangles;
-          stat.points += pointCount;
-          totals.objects++;
-          totals.draws += draws;
-          totals.triangles += triangles;
-          totals.points += pointCount;
-          for (const label of labels) {
-            if (!stat.materialKeys.has(label)) {
-              stat.materialKeys.add(label);
-              if (stat.materialSamples.length < 8) stat.materialSamples.push(label);
-            }
-            if (!this.renderDiagnosticsKnownMaterials.has(label)) {
-              this.renderDiagnosticsKnownMaterials.add(label);
-              if (newMaterials.length < 16) newMaterials.push(label);
-            }
-          }
-          const visibleKey = `${category}|${obj.uuid}|${geometry?.uuid ?? ''}|${labels.join('|')}`;
-          if (!this.renderDiagnosticsKnownVisibleObjects.has(visibleKey)) {
-            this.renderDiagnosticsKnownVisibleObjects.add(visibleKey);
-            if (firstVisibleObjects.length < 16)
-              firstVisibleObjects.push(this.objectDiagnosticLabel(obj, category, labels));
-          }
-        }
-      }
-      for (const child of obj.children) visit(child, category, visible);
-    };
-    visit(this.scene, 'unknown', true);
-
-    const outCategories: Record<string, RenderDiagnosticsCategoryStats> = {};
-    for (const [category, stat] of Object.entries(categories)) {
-      outCategories[category] = {
-        objects: stat.objects,
-        draws: stat.draws,
-        triangles: stat.triangles,
-        points: stat.points,
-        materials: stat.materialKeys.size,
-        materialSamples: stat.materialSamples,
-      };
-    }
-    return {
-      enabled: true,
-      totalObjects: totals.objects,
-      estimatedDraws: totals.draws,
-      estimatedTriangles: totals.triangles,
-      estimatedPoints: totals.points,
-      programs,
-      programDelta,
-      textures,
-      textureDelta,
-      newMaterials,
-      firstVisibleObjects,
-      categories: outCategories,
-    };
-  }
-
-  private renderDiagnosticsForFrame(now: number, force = false): RenderDiagnosticsSnapshot {
-    if (!this.renderDiagnosticsEnabled) return this.renderDiagnosticsSnapshot;
-    if (force) {
-      this.renderDiagnosticsSnapshot = this.collectRenderDiagnostics();
-      this.renderDiagnosticsNextSampleAt = now + RENDER_DIAGNOSTICS_SAMPLE_MS;
-      return this.renderDiagnosticsSnapshot;
-    }
-    if (!this.renderDiagnosticsSamplePending && now >= this.renderDiagnosticsNextSampleAt) {
-      this.renderDiagnosticsSamplePending = true;
-      this.renderDiagnosticsNextSampleAt = now + RENDER_DIAGNOSTICS_SAMPLE_MS;
-      const generation = this.lifecycleGeneration;
-      const run = (): void => {
-        if (this.shutdownStarted || generation !== this.lifecycleGeneration) return;
-        try {
-          this.renderDiagnosticsSnapshot = this.collectRenderDiagnostics();
-        } finally {
-          this.renderDiagnosticsSamplePending = false;
-        }
-      };
-      const win = window as Window & {
-        requestIdleCallback?: (callback: () => void, options?: { timeout?: number }) => number;
-      };
-      if (win.requestIdleCallback)
-        win.requestIdleCallback(run, {
-          timeout: RENDER_DIAGNOSTICS_IDLE_TIMEOUT_MS,
-        });
-      else window.setTimeout(run, 100);
-    }
-    return this.renderDiagnosticsSnapshot;
-  }
-
   private updateAdaptiveResolution(dt: number): void {
     if (!Number.isFinite(dt) || dt <= 0) return;
     const frameMs = Math.min(250, dt * 1000);
@@ -6114,10 +5858,10 @@ export class Renderer {
   }
 
   private diagnosticsBaselineForPrewarm(): RendererPrewarmDiagnosticsBaselineStats | null {
-    if (!this.renderDiagnosticsEnabled) return null;
-    this.renderDiagnosticsSnapshot = this.collectRenderDiagnostics();
+    if (!this.renderDiagnostics.enabled) return null;
+    const snapshot = this.renderDiagnostics.collect();
     const categories: RendererPrewarmDiagnosticsBaselineStats['categories'] = {};
-    for (const [name, stat] of Object.entries(this.renderDiagnosticsSnapshot.categories)) {
+    for (const [name, stat] of Object.entries(snapshot.categories)) {
       categories[name] = {
         draws: stat.draws,
         triangles: stat.triangles,
@@ -6125,11 +5869,11 @@ export class Renderer {
       };
     }
     return {
-      programs: this.renderDiagnosticsSnapshot.programs,
-      textures: this.renderDiagnosticsSnapshot.textures,
-      totalObjects: this.renderDiagnosticsSnapshot.totalObjects,
-      estimatedDraws: this.renderDiagnosticsSnapshot.estimatedDraws,
-      estimatedTriangles: this.renderDiagnosticsSnapshot.estimatedTriangles,
+      programs: snapshot.programs,
+      textures: snapshot.textures,
+      totalObjects: snapshot.totalObjects,
+      estimatedDraws: snapshot.estimatedDraws,
+      estimatedTriangles: snapshot.estimatedTriangles,
       categories,
     };
   }
@@ -12930,7 +12674,7 @@ export class Renderer {
     framePhaseMs.total = roundMs(totalMs);
     this.recordRendererPhase('total', totalMs);
     const afterSubmit = performance.now();
-    frameStats.renderDiagnostics = this.renderDiagnosticsForFrame(
+    frameStats.renderDiagnostics = this.renderDiagnostics.forFrame(
       afterSubmit,
       framePhaseMs.submit >= RENDER_STALL_ATTRIBUTION_MS,
     );
