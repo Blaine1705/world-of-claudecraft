@@ -4999,6 +4999,79 @@ export const TARGETS = [
     },
   },
   {
+    // Cheap Trick (rogue row 11) retires Gut Punch's stealth requirement. The
+    // bar's usable gate and the tooltip's requirement line both read the
+    // RESOLVED ability, so this shoots the talented rogue standing in the open,
+    // where the slot must paint live and the tooltip must carry no
+    // "Requires stealth" row. Deliberately never enters Duskveil: out of
+    // stealth is the entire point of the talent.
+    key: 'cheap-trick-gut-punch',
+    label: 'Gut Punch out of Duskveil with Cheap Trick: live slot + stealth-free tooltip',
+    when: ['ui/hud/action_bar/ability_requirement_keys', 'ui/hud/action_bar/action_bar_view.ts'],
+    // Two frames because the two surfaces cannot share one: the tooltip opens
+    // OVER the bar, hiding the very slot whose usable state is the other half
+    // of the fix.
+    variants: [
+      { key: 'slot', charClass: 'rogue', charName: 'Sly', beforeLoad: lowGraphicsSeed },
+      {
+        key: 'tooltip',
+        charClass: 'rogue',
+        charName: 'Sly',
+        hover: true,
+        beforeLoad: lowGraphicsSeed,
+      },
+    ],
+    async capture(page, variant) {
+      await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
+      await dismissEntryOverlays(page);
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const hud = window.__game?.hud;
+        sim?.setPlayerLevel?.(20);
+        sim?.applyTalents?.({ spec: null, rows: { 11: 'rog_r11_cheap_trick' } });
+        hud?.addAbilityToHotbar?.('cheap_shot');
+      });
+      await wait(800);
+      // Levelling to the talent tier fires a run of deed banners over the
+      // scene. They are unrelated to this change and would only obscure it.
+      await page.evaluate(() => {
+        for (const sel of ['#banner', '#quest-banner', '#subzone-banner']) {
+          const el = document.querySelector(sel);
+          if (el) el.style.display = 'none';
+        }
+      });
+      if (!variant?.hover) return { clip: '#bottom-bar' };
+      // Hover through the REAL pointer path so the tooltip is the one a player
+      // sees, not a hand-built string (the stack-size-tooltip precedent).
+      const hovered = await page.evaluate(() => {
+        const slots = [...document.querySelectorAll('#actionbar .action-btn')];
+        const btn = slots.find((b) => (b.getAttribute('aria-label') ?? '').includes('Gut Punch'));
+        if (!btn) return false;
+        const r = btn.getBoundingClientRect();
+        for (const type of [
+          'pointerenter',
+          'pointerover',
+          'mouseenter',
+          'mouseover',
+          'pointermove',
+          'mousemove',
+        ]) {
+          btn.dispatchEvent(
+            new MouseEvent(type, {
+              bubbles: true,
+              clientX: r.left + r.width / 2,
+              clientY: r.top + r.height / 2,
+            }),
+          );
+        }
+        return true;
+      });
+      if (!hovered) throw new Error('Gut Punch never reached the action bar');
+      await wait(800);
+      return { clip: '#tooltip' };
+    },
+  },
+  {
     key: 'guild-roster',
     label: 'Social window: Guild tab roster grouped by online status',
     // Match the SOURCE files (the `.ts` suffix keeps `ui/social_view` from also
