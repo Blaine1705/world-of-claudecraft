@@ -116,8 +116,10 @@ interface AttributionTargetFixture {
 // Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
 // archetype and scene-texture counts; renderer.ts edits only). No capture
 // was retaken.
+// Re-minted for issue #2917 (rift windup telegraph school tint; renderer.ts
+// edits only). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'a80d71af0295906172fa66def7f89ce704b9e6b0abdf98a1f3c06164537393b1';
+  '1467e1b5d246b4aa23db9b4376600834b21f6a36a721d212b6c9b4bf03032afc';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
