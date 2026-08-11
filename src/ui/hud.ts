@@ -457,6 +457,7 @@ import {
   type VendorMultiple,
 } from './hud/vendor/vendor_view';
 import { renderVendorWindow } from './hud/vendor/vendor_window';
+import { visibleVendorStock } from './vendor_stock_gate_core';
 import { buildWarfareVendorView, warfareShopViewer } from './hud/vendor/warfare_vendor_view';
 import { renderWarfareVendorWindow } from './hud/vendor/warfare_vendor_window';
 import { unitFrameCurrentMaxText } from './hud_frames';
@@ -14618,7 +14619,9 @@ export class Hud {
       $('#vendor-window'),
       entityDisplayName(npc),
       buildVendorView(
-        npc.vendorItems,
+        // Quest-gated rows (vendorQuestGates) hide until their quest is in
+        // the log; the sim's buyItem enforces the same gate authoritatively.
+        visibleVendorStock(npc, this.sim.questLog, this.sim.questsDone),
         this.sim.vendorBuyback,
         ITEMS,
         {

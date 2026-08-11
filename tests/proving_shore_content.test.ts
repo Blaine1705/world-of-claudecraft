@@ -58,16 +58,16 @@ describe('proving shore placement', () => {
     expect(dry(bryn.pos.x, bryn.pos.z)).toBe(true);
   });
 
-  it('both ferry portal sides and landings sit on dry ground', () => {
-    for (const portal of PROVING_SHORE_PORTALS) {
-      for (const side of [portal.a, portal.b]) {
-        expect(dry(side.x, side.z), `portal trigger (${side.x}, ${side.z})`).toBe(true);
-        expect(
-          dry(side.landing.x, side.landing.z),
-          `portal landing (${side.landing.x}, ${side.landing.z})`,
-        ).toBe(true);
-      }
-    }
+  it('the crossing is clicked bells on both shores, never a walk-in portal', () => {
+    // The rework's contract: no walk-in portal trigger anywhere near the
+    // island (nobody is teleported by wandering), and exactly one ferry bell
+    // stands on each side of the strait (island pier, vale strand). Their
+    // dryness rides the placement sweep above (bells are ground objects).
+    expect(PROVING_SHORE_PORTALS).toEqual([]);
+    const bells =
+      PROVING_SHORE_OBJECTS.find((o) => o.itemId === 'ps_ferry_bell')?.positions ?? [];
+    expect(bells.filter((b) => b.x < -180)).toHaveLength(1);
+    expect(bells.filter((b) => b.x >= -180)).toHaveLength(1);
   });
 
   it('the strait to the vale is open water (the island is isolated)', () => {
@@ -140,8 +140,17 @@ describe('proving shore placement', () => {
       'q_ps_pouch_and_purse',
       'q_ps_set_sail',
     ]);
-    // The bank lesson's giver is a real banker: the bank window is reachable
-    // from the same NPC whose dialogue teaches it.
+    // The bank lesson's turn-in is a real banker: the bank window is
+    // reachable from the same NPC whose dialogue teaches it, while Maren
+    // gives the quest (the rail stays hers).
     expect(PROVING_SHORE_NPCS.bursar_wick.banker).toBe(true);
+    expect(PROVING_SHORE_QUESTS.q_ps_pouch_and_purse.giverNpcId).toBe('instructor_maren');
+    expect(PROVING_SHORE_QUESTS.q_ps_pouch_and_purse.turnInNpcId).toBe('bursar_wick');
+    // The pouch cannot be bought before the lesson opens (the vendor gate
+    // items.ts buyItem enforces and the vendor window mirrors), so an early
+    // purchase can never strand the lesson's copper.
+    expect(PROVING_SHORE_NPCS.quartermaster_finch.vendorQuestGates).toEqual({
+      linen_pouch: 'q_ps_pouch_and_purse',
+    });
   });
 });

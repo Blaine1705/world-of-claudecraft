@@ -2341,6 +2341,7 @@ export type TranslationKeyFlat =
   | 'entities.items.pristine_silk.name'
   | 'entities.items.pristine_venom_gland.name'
   | 'entities.items.ps_castaway_crate.name'
+  | 'entities.items.ps_ferry_bell.name'
   | 'entities.items.quilted_trousers.name'
   | 'entities.items.raw_bog_eel.name'
   | 'entities.items.raw_frostgill_trout.name'

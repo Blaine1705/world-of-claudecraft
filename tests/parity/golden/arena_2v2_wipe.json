@@ -14,7 +14,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 983,
+      "nextId": 985,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,9 +28,9 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 987,
-      "state": "ec14cb43",
-      "events": "0fd22cc7",
+      "nextId": 989,
+      "state": "c2312e6d",
+      "events": "0480a6af",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -39,9 +39,9 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 987,
-      "state": "aa36143a",
-      "events": "6e65b3b1",
+      "nextId": 989,
+      "state": "b20de374",
+      "events": "99fae391",
       "rng": {
         "draws": 94,
         "digest": "f94836fc"
@@ -50,9 +50,9 @@
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 987,
-      "state": "69a5b3da",
-      "events": "09f50e39",
+      "nextId": 989,
+      "state": "10047830",
+      "events": "9cd23579",
       "rng": {
         "draws": 290,
         "digest": "d5038b1d"
@@ -61,9 +61,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 987,
-      "state": "2f17a41b",
-      "events": "71c2f7c1",
+      "nextId": 989,
+      "state": "3c1bcb49",
+      "events": "26ba6939",
       "rng": {
         "draws": 513,
         "digest": "fbd3b6a8"
@@ -72,9 +72,9 @@
     {
       "tick": 101,
       "time": 5.05,
-      "nextId": 987,
-      "state": "4b9b3c96",
-      "events": "4cbea13d",
+      "nextId": 989,
+      "state": "22619bf4",
+      "events": "5fea9b1d",
       "rng": {
         "draws": 525,
         "digest": "3a6dc8d7"
@@ -128,7 +128,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 983,
+          "entityId": 985,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -202,7 +202,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 984,
+          "entityId": 986,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -278,7 +278,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 985,
+          "entityId": 987,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -352,7 +352,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 986,
+          "entityId": 988,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -395,7 +395,7 @@
               "name": "Battle Stance",
               "remaining": 3595,
               "school": "physical",
-              "sourceId": 983
+              "sourceId": 985
             }
           ],
           "blockChance": 0.05,
@@ -407,7 +407,7 @@
           "dodgeChance": 0.067,
           "fiveSecondRule": 104.05,
           "hp": 632,
-          "id": 983,
+          "id": 985,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -455,7 +455,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 104.05,
           "hp": 308,
-          "id": 984,
+          "id": 986,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -505,7 +505,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
           "hp": 385,
-          "id": 985,
+          "id": 987,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -562,7 +562,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
           "hp": 282,
-          "id": 986,
+          "id": 988,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -605,9 +605,9 @@
     {
       "tick": 102,
       "time": 5.1,
-      "nextId": 987,
-      "state": "57478020",
-      "events": "1c8a6da7",
+      "nextId": 989,
+      "state": "3c37749a",
+      "events": "301c2b49",
       "rng": {
         "draws": 531,
         "digest": "bc30bbc0"
@@ -663,7 +663,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 983,
+          "entityId": 985,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -737,7 +737,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 984,
+          "entityId": 986,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -821,7 +821,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 985,
+          "entityId": 987,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -895,7 +895,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 986,
+          "entityId": 988,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -938,7 +938,7 @@
               "name": "Battle Stance",
               "remaining": 3594.95,
               "school": "physical",
-              "sourceId": 983
+              "sourceId": 985
             }
           ],
           "blockChance": 0.05,
@@ -950,7 +950,7 @@
           "dodgeChance": 0.067,
           "fiveSecondRule": 104.1,
           "hp": 632,
-          "id": 983,
+          "id": 985,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -998,7 +998,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 104.1,
           "hp": 308,
-          "id": 984,
+          "id": 986,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -1048,7 +1048,7 @@
           "dualWielding": true,
           "facing": 3.141593,
           "fiveSecondRule": 104.1,
-          "id": 985,
+          "id": 987,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -1105,7 +1105,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 104.1,
           "hp": 282,
-          "id": 986,
+          "id": 988,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -1148,9 +1148,9 @@
     {
       "tick": 103,
       "time": 5.15,
-      "nextId": 987,
-      "state": "aff93a4e",
-      "events": "60661675",
+      "nextId": 989,
+      "state": "a2c8a3f4",
+      "events": "2998debb",
       "rng": {
         "draws": 538,
         "digest": "989640f4"
@@ -1215,7 +1215,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 983,
+          "entityId": 985,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1307,7 +1307,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 984,
+          "entityId": 986,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1405,7 +1405,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 985,
+          "entityId": 987,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -1492,7 +1492,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 986,
+          "entityId": 988,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1535,7 +1535,7 @@
               "name": "Battle Stance",
               "remaining": 3599.95,
               "school": "physical",
-              "sourceId": 983
+              "sourceId": 985
             }
           ],
           "blockChance": 0.05,
@@ -1547,7 +1547,7 @@
           "dodgeChance": 0.067,
           "fiveSecondRule": 104.15,
           "hp": 632,
-          "id": 983,
+          "id": 985,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -1595,7 +1595,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 104.15,
           "hp": 308,
-          "id": 984,
+          "id": 986,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -1645,7 +1645,7 @@
           "dualWielding": true,
           "facing": 3.141593,
           "fiveSecondRule": 104.15,
-          "id": 985,
+          "id": 987,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -1702,7 +1702,7 @@
           "dodgeChance": 0.0555,
           "facing": 3.141593,
           "fiveSecondRule": 104.15,
-          "id": 986,
+          "id": 988,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -1745,8 +1745,8 @@
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 987,
-      "state": "c99da3d4",
+      "nextId": 989,
+      "state": "dbd2392e",
       "events": "741638a5",
       "rng": {
         "draws": 754,
@@ -1756,8 +1756,8 @@
     {
       "tick": 150,
       "time": 7.5,
-      "nextId": 987,
-      "state": "b8919d72",
+      "nextId": 989,
+      "state": "6c25e05c",
       "events": "741638a5",
       "rng": {
         "draws": 1029,
@@ -1767,8 +1767,8 @@
     {
       "tick": 175,
       "time": 8.75,
-      "nextId": 987,
-      "state": "1d5b7d29",
+      "nextId": 989,
+      "state": "5c7239c3",
       "events": "741638a5",
       "rng": {
         "draws": 1349,
@@ -1778,8 +1778,8 @@
     {
       "tick": 200,
       "time": 10,
-      "nextId": 987,
-      "state": "577870c1",
+      "nextId": 989,
+      "state": "45ddc173",
       "events": "741638a5",
       "rng": {
         "draws": 1668,
@@ -1789,9 +1789,9 @@
     {
       "tick": 225,
       "time": 11.25,
-      "nextId": 987,
-      "state": "8e8ff236",
-      "events": "427a5ee1",
+      "nextId": 989,
+      "state": "4f6c63d0",
+      "events": "1ed7b249",
       "rng": {
         "draws": 1860,
         "digest": "f802c41d"
@@ -1800,8 +1800,8 @@
     {
       "tick": 243,
       "time": 12.15,
-      "nextId": 987,
-      "state": "acd8dd33",
+      "nextId": 989,
+      "state": "e15cf79d",
       "events": "741638a5",
       "rng": {
         "draws": 2000,
@@ -1870,7 +1870,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 983,
+          "entityId": 985,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1965,7 +1965,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 984,
+          "entityId": 986,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2066,7 +2066,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 985,
+          "entityId": 987,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -2156,7 +2156,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 986,
+          "entityId": 988,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2199,7 +2199,7 @@
               "name": "Battle Stance",
               "remaining": 3598,
               "school": "physical",
-              "sourceId": 983
+              "sourceId": 985
             }
           ],
           "blockChance": 0.05,
@@ -2212,7 +2212,7 @@
           "fallStartY": 4.00947,
           "fiveSecondRule": 111.15,
           "hp": 632,
-          "id": 983,
+          "id": 985,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -2261,7 +2261,7 @@
           "fallStartY": 5.258106,
           "fiveSecondRule": 111.15,
           "hp": 308,
-          "id": 984,
+          "id": 986,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -2312,7 +2312,7 @@
           "fallStartY": 5.810025,
           "fiveSecondRule": 111.15,
           "hp": 385,
-          "id": 985,
+          "id": 987,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -2370,7 +2370,7 @@
           "fallStartY": 3.716074,
           "fiveSecondRule": 111.15,
           "hp": 282,
-          "id": 986,
+          "id": 988,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -2414,8 +2414,8 @@
     {
       "tick": 243,
       "time": 12.15,
-      "nextId": 987,
-      "state": "acd8dd33",
+      "nextId": 989,
+      "state": "e15cf79d",
       "events": "741638a5",
       "rng": {
         "draws": 2000,
@@ -2484,7 +2484,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 983,
+          "entityId": 985,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2579,7 +2579,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 984,
+          "entityId": 986,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2680,7 +2680,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 985,
+          "entityId": 987,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -2770,7 +2770,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 986,
+          "entityId": 988,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2813,7 +2813,7 @@
               "name": "Battle Stance",
               "remaining": 3598,
               "school": "physical",
-              "sourceId": 983
+              "sourceId": 985
             }
           ],
           "blockChance": 0.05,
@@ -2826,7 +2826,7 @@
           "fallStartY": 4.00947,
           "fiveSecondRule": 111.15,
           "hp": 632,
-          "id": 983,
+          "id": 985,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -2875,7 +2875,7 @@
           "fallStartY": 5.258106,
           "fiveSecondRule": 111.15,
           "hp": 308,
-          "id": 984,
+          "id": 986,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -2926,7 +2926,7 @@
           "fallStartY": 5.810025,
           "fiveSecondRule": 111.15,
           "hp": 385,
-          "id": 985,
+          "id": 987,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -2984,7 +2984,7 @@
           "fallStartY": 3.716074,
           "fiveSecondRule": 111.15,
           "hp": 282,
-          "id": 986,
+          "id": 988,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",

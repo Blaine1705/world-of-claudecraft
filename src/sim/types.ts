@@ -2719,6 +2719,13 @@ export interface NpcDef {
   // sells its stock for free when the realm has ALLOW_DEV_COMMANDS. Never placed
   // as permanent content; spawned on demand by /dev vendor.
   devVendor?: boolean;
+  // Quest-gated vendor rows: itemId -> the quest that must be in the buyer's
+  // log (or done) before the row is sold OR shown. Validated sim-side in
+  // items.ts buyItem and filtered client-side by ui/vendor_stock_gate_core.ts,
+  // both off this same def, so no wire field is needed. First user: the
+  // tutorial island's Linen Pouch (q_ps_pouch_and_purse), so an early
+  // purchase cannot strand the lesson's copper.
+  vendorQuestGates?: Record<string, string>;
   // The Merchant: talking to this NPC opens the player-driven World Market
   // (auction house) instead of a fixed vendor stock.
   market?: boolean;

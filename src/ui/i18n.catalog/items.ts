@@ -2428,6 +2428,7 @@ const ITEM_ENTITY_IDS = [
   'curved_tusk',
   'pristine_claw',
   'ps_castaway_crate',
+  'ps_ferry_bell',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2554,6 +2555,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   thornhide_boots: 'Thornhide Boots',
   // The Proving Shore (tutorial island), same English-appended treatment.
   ps_castaway_crate: 'Castaway Crate',
+  ps_ferry_bell: 'Ferry Bell',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

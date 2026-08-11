@@ -36,6 +36,7 @@ import {
 } from './encounters/nythraxis';
 import { tryStartEscort } from './escort';
 import { isInRaidInstance } from './instances/dungeons';
+import { FERRY_BELL_OBJECT_ID, tryRingFerryBell } from './interactions/ferry_bell';
 import { HUT_OBJECT_ID, tryBurnHut } from './interactions/firebottle_hut';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
@@ -766,6 +767,11 @@ export function pickUpObject(
   // gating, cooldown, and objective credit) so a bare click never burns one.
   if (objectItemId === HUT_OBJECT_ID) {
     return tryBurnHut(ctx, obj, p, meta);
+  }
+  // The Proving Shore ferry bells travel, never loot: route the click to the
+  // ferry handler before the pickup path so ringing always sails.
+  if (objectItemId === FERRY_BELL_OBJECT_ID) {
+    return tryRingFerryBell(ctx, obj, p);
   }
   const beforeQuestProgress = meta.counters.questProgress;
   const beforeQuestNextId = ctx.nextId;

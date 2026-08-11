@@ -961,6 +961,10 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // EXACT map (log.provingFerry, error.tutorialFromHere,
     // error.tutorialOutleveled); scanning keeps future literal emits guarded.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/tutorial/greeting.ts'), 'utf8'),
+    // The clicked ferry bells (tutorial island): the two crossing lines and
+    // the combat denial are matched by the sim_i18n EXACT map
+    // (log.provingEnter, log.provingLeave, error.tutorialFromHere).
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/interactions/ferry_bell.ts'), 'utf8'),
     // Swim fatigue (the Hollow's open-sea turn-back): the warning literal is
     // variable-routed via FATIGUE_WARNING but matched by the sim_i18n EXACT
     // map (log.seaFatigue); scanning keeps future literal emits guarded.

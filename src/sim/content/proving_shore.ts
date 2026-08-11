@@ -13,10 +13,11 @@
 // deliberately stocks NO professions tools, the R37 rule
 // tests/professions_zone_rollout.test.ts enforces), and grants ZERO quest
 // experience, so a graduate steps onto the vale at the same level as
-// someone who skipped it. The way back (and back in, for a refresher) is the
-// ferry crossing circle: a portal pair between the Old Pier and the vale's
-// west strand. Terrain: the PS_* tables in world.ts (biome 'vale': the
-// island shares the vale's sky, palette, and song).
+// someone who skipped it. The way back is the Old Pier's clicked ferry bell
+// (setting graduates down in Eastbrook town), and the vale west strand's
+// twin bell rings a returning player back in for a refresher. Terrain: the
+// PS_* tables in world.ts (biome 'vale': the island shares the vale's sky,
+// palette, and song).
 
 import type {
   CampDef,
@@ -72,24 +73,18 @@ export const PROVING_SHORE_ROADS: { x: number; z: number }[][] = [
   ], // Dawnrest Camp -> the Wreck Line
 ] as { x: number; z: number }[][];
 
-// The ferry crossing: a portal pair between the Old Pier's crossing circle
-// and the vale's west strand, so a graduate walks out (and a returning
-// player walks back in for a refresher) with no one-way teleport. The
-// tutorial greeting's accept path (sim/tutorial/greeting.ts) lands at
-// PROVING_SHORE_ARRIVAL beside the a-side landing.
-export const PROVING_SHORE_PORTALS: PortalDef[] = [
-  {
-    id: 'portal_proving_shore_ferry',
-    a: { x: -274, z: 0, landing: { x: -282, z: 6, facing: 2.4 } },
-    b: { x: -140, z: -32, landing: { x: -134, z: -28, facing: -0.8 } },
-    radius: 2.5,
-    enterText: 'The crossing takes hold, and Eastbrook Vale spreads out before you.',
-    leaveText: 'The ferry circle flares, and the Proving Shore rises to meet you.',
-  },
-];
+// No walk-in portals: the ferry crossing is a pair of CLICKED bells
+// (PROVING_SHORE_OBJECTS ps_ferry_bell, routed by
+// src/sim/interactions/ferry_bell.ts), so nobody is ever teleported by
+// wandering over a trigger. The island bell sets the player down in
+// Eastbrook TOWN (beside the spawn square); the vale-strand bell rings a
+// returning player back to the island arrival for a refresher. The tutorial
+// greeting's accept path (sim/tutorial/greeting.ts) still lands at
+// PROVING_SHORE_ARRIVAL.
+export const PROVING_SHORE_PORTALS: PortalDef[] = [];
 
 /** Where the tutorial greeting's accept path sets a new adventurer down:
- *  beside the Old Pier's crossing circle, facing up the camp road. */
+ *  beside the Old Pier's ferry bell, facing up the camp road. */
 export const PROVING_SHORE_ARRIVAL = { x: -282, z: 6, facing: 2.4 } as const;
 
 export const PROVING_SHORE_MOBS: Record<string, MobTemplate> = {
@@ -156,7 +151,7 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     color: 0x8a6a9a,
     questIds: [],
     greeting:
-      'Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry circle on the west strand runs both ways, every day of the year.',
+      'Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry bell on the west strand rings both ways, every day of the year.',
   },
   instructor_maren: {
     id: 'instructor_maren',
@@ -170,6 +165,7 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
       'q_ps_the_wreck_line',
       'q_ps_a_path_of_your_own',
       'q_ps_the_wheel_of_trades',
+      'q_ps_pouch_and_purse',
       'q_ps_set_sail',
     ],
     greeting:
@@ -185,8 +181,10 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     // Provisions and a starter bag, NEVER professions tools (the R37 vendor
     // rule): the chain's copper is sized so a graduate buys the full tier-1
     // tool kit from the vale's own counters on arrival. The Linen Pouch is
-    // the bank lesson's purchase (q_ps_pouch_and_purse).
+    // the bank lesson's purchase, quest-gated so an early buy cannot strand
+    // the lesson's copper (types.ts vendorQuestGates).
     vendorItems: ['minor_healing_potion', 'baked_bread', 'spring_water', 'linen_pouch'],
+    vendorQuestGates: { linen_pouch: 'q_ps_pouch_and_purse' },
     questIds: ['q_ps_the_wheel_of_trades'],
     greeting:
       'Bread, water, a draught for when practice gets ahead of you, and a spare pouch for what you pick up along the way. Coin buys them, and work earns the coin. That is the whole economy, $N, and it never gets more complicated. Only bigger.',
@@ -214,7 +212,7 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     color: 0x4a6a8a,
     questIds: ['q_ps_set_sail'],
     greeting:
-      'The strait is calm and the boat is sound, $N. Whenever you are ready for the vale, the crossing circle at the end of my pier will carry you over.',
+      'Fresh off the crossing, $N? Then up the shore road with you: Instructor Maren keeps the drills at Dawnrest Camp, and she will want a word before anything else. When the vale calls you back, ring the bell at the end of my pier and the crossing will set you down in Eastbrook town.',
   },
 };
 
@@ -309,14 +307,17 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
   // purchasable extra slots (src/sim/bank.ts), and the Linen Pouch as the
   // cheapest vendor bag (6 slots, content/items.ts). The chain's copper
   // through quest four is sized to afford the pouch when this unlocks.
+  // Maren gives the bags half; the banker turns it in with the vault half.
+  // The Linen Pouch is quest-gated at Finch's stall (vendorQuestGates above),
+  // so it cannot be bought, equipped, and stranded before this quest opens.
   q_ps_pouch_and_purse: {
     id: 'q_ps_pouch_and_purse',
     name: 'Pouch and Purse',
-    giverNpcId: 'bursar_wick',
+    giverNpcId: 'instructor_maren',
     turnInNpcId: 'bursar_wick',
-    text: 'A word on what you are carrying, $N. Your backpack holds sixteen slots, and beside it wait four empty bag loops: every bag you buckle on adds its own space to the pool. What you cannot carry, the Gilded Strongbox keeps: any bursar in any town opens the same vault, and more vault space can be bought once your purse grows into it. Now practice the habit: buy a Linen Pouch from Quartermaster Finch and buckle it on.',
+    text: 'One more lesson before the vale, $N, and it is the one that keeps adventurers alive: what you carry. Your backpack holds sixteen slots, and beside it wait four empty bag loops; every bag you buckle on adds its own space to the pool. Buy a Linen Pouch from Quartermaster Finch and buckle it on, then take the lesson to Bursar Wick at the strongbox desk. What he keeps is the half of it no bag can hold.',
     completionText:
-      'A fine pouch, and six more slots to fill with trouble. Keep your valuables banked and your bags roomy, $N. A full pack has ended more adventures than any wolf ever did.',
+      'So Maren sends me her students at last. The pouch is yours, and here is the other half of the lesson, $N: what you cannot carry, the Gilded Strongbox keeps. Any bursar in any town opens the same vault, and more vault space can be bought once your purse grows into it. Keep your valuables banked and your bags roomy. A full pack has ended more adventures than any wolf ever did.',
     objectives: [{ type: 'collect', itemId: 'linen_pouch', count: 1, label: 'Linen Pouch bought' }],
     xpReward: 0,
     copperReward: 120,
@@ -330,7 +331,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     turnInNpcId: 'ferryman_odo',
     text: 'There is nothing left on this shore you have not already beaten, opened, or bought, $N. You are ready, and Eastbrook has real work waiting. Walk down to the Old Pier and tell Ferryman Odo I said you have earned your crossing.',
     completionText:
-      'Maren said that, did she? High praise from a woman who once made me practice mooring knots for a week. The circle at the end of my pier will carry you to the vale whenever you walk into it, $N. Mind the wolves.',
+      'Maren said that, did she? High praise from a woman who once made me practice mooring knots for a week. Ring the bell at the end of my pier whenever you are ready, $N, and the crossing will set you down in the middle of Eastbrook town. Mind the wolves.',
     objectives: [
       { type: 'interact', targetNpcId: 'ferryman_odo', count: 1, label: 'Report to Ferryman Odo' },
     ],
@@ -362,6 +363,17 @@ export const PROVING_SHORE_ITEMS: Record<string, ItemDef> = {
     questId: 'q_ps_the_wreck_line',
     noVendorSell: true,
   },
+  // The ferry bells are rung, never looted (interactions/ferry_bell.ts routes
+  // the click before the pickup path); the item record exists so the world
+  // object has a name and the pickup-lines rule stays satisfied defensively,
+  // the gullhaven_watchbell + murloc_hut precedent.
+  ps_ferry_bell: {
+    id: 'ps_ferry_bell',
+    name: 'Ferry Bell',
+    kind: 'quest',
+    sellValue: 0,
+    noVendorSell: true,
+  },
 };
 
 // Every camp draws from its own private rng sub-stream (offStream), so
@@ -382,6 +394,17 @@ export const PROVING_SHORE_OBJECTS: GroundObjectDef[] = [
       { x: -282, z: -12 },
       { x: -292, z: -26 },
       { x: -280, z: -4 },
+    ],
+  },
+  {
+    itemId: 'ps_ferry_bell',
+    name: 'Ferry Bell',
+    // The clicked crossing (interactions/ferry_bell.ts): the Old Pier's bell
+    // rings a player to Eastbrook town, the vale west strand's twin rings a
+    // returning player back to the island arrival.
+    positions: [
+      { x: -274, z: 0 },
+      { x: -140, z: -32 },
     ],
   },
 ];

@@ -12033,12 +12033,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorialGreeting.play': '进行新手教学',
   'hudChrome.tutorialGreeting.skip': '跳过新手教学',
   'entities.items.ps_castaway_crate.name': '漂流货箱',
+  'entities.items.ps_ferry_bell.name': '渡船铃',
   'entities.mobs.training_effigy.name': '训练草人',
   'entities.mobs.shore_scuttler.name': '滩涂掠蟹',
   'entities.npcs.wayfarer_bryn.name': '旅人布琳',
   'entities.npcs.wayfarer_bryn.title': '港口向导',
   'entities.npcs.wayfarer_bryn.greeting':
-    '东溪谷来者不拒，朋友。而对脚下还不稳的人来说，总还有试炼之滨：西岸的渡送法阵一年到头双向通行。',
+    '东溪谷来者不拒，朋友。而对脚下还不稳的人来说，总还有试炼之滨：西岸的渡船铃一年到头两个方向都响。',
   'entities.npcs.instructor_maren.name': '教官玛伦',
   'entities.npcs.instructor_maren.title': '试炼导师',
   'entities.npcs.instructor_maren.greeting':
@@ -12050,7 +12051,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.ferryman_odo.name': '渡船人奥多',
   'entities.npcs.ferryman_odo.title': '渡口看守',
   'entities.npcs.ferryman_odo.greeting':
-    '海峡风平浪静，船也结实，{playerName}。等你准备好去谷地了，码头尽头的渡送法阵随时送你过去。',
+    '刚下渡船吗，{playerName}？那就沿着岸边的路往上走：教官玛伦在晨憩营地主持操练，她想先跟你说上几句。等谷地召唤你回去时，敲响我码头尽头的铃，渡航会把你送到东溪镇上。',
   'entities.npcs.bursar_wick.name': '司库威克',
   'entities.npcs.bursar_wick.title': '镀金保险箱',
   'entities.npcs.bursar_wick.greeting':
@@ -12081,15 +12082,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ps_the_wheel_of_trades.objectives.0.label': '向军需官芬奇请教百业',
   'entities.quests.q_ps_pouch_and_purse.title': '钱囊与背袋',
   'entities.quests.q_ps_pouch_and_purse.text':
-    '说说你身上背的东西，{playerName}。你的背包有十六格，旁边还空着四个袋扣：每系上一只袋子，它的空间就并入总容量。背不下的，交给镀金保险箱：任何城镇的任何司库都为你打开同一座金库，等你的钱袋鼓起来，还能购买更多金库空间。现在来练练这个习惯：去军需官芬奇那里买一只亚麻小袋，把它系上。',
+    '去谷地之前还有最后一课，{playerName}，也是保住冒险者性命的一课：你随身带的东西。你的背包有十六格，旁边还空着四个袋扣；每系上一只袋子，它的空间就并入总容量。去军需官芬奇那里买一只亚麻小袋系上，然后把这一课带去保险箱桌前的司库威克那里。他掌管的，是任何袋子都装不下的另一半。',
   'entities.quests.q_ps_pouch_and_purse.completion':
-    '好袋子，又多出六格用来装麻烦。贵重的存进金库，袋子留出空当，{playerName}。塞满的行囊断送过的冒险，比任何狼都多。',
+    '玛伦总算把她的学生送到我这儿来了。小袋归你了，这一课的另一半在这里，{playerName}：背不下的，交给镀金保险箱。任何城镇的任何司库都为你打开同一座金库，等你的钱袋鼓起来，还能购买更多金库空间。贵重的存进金库，袋子留出空当。塞满的行囊断送过的冒险，比任何狼都多。',
   'entities.quests.q_ps_pouch_and_purse.objectives.0.label': '购买亚麻小袋',
   'entities.quests.q_ps_set_sail.title': '扬帆起航',
   'entities.quests.q_ps_set_sail.text':
     '这片海滨上已经没有你没打倒过、没打开过、没买下过的东西了，{playerName}。你准备好了，而东溪谷有真正的差事在等着。走到旧码头去，告诉渡船人奥多，就说是我说的，你挣到了这趟航程。',
   'entities.quests.q_ps_set_sail.completion':
-    '玛伦这么说了？能从一个曾让我练了一星期系缆绳的女人嘴里说出来，这可是极高的评价。码头尽头的法阵随时送你去谷地，{playerName}，走进去就行。当心狼群。',
+    '玛伦这么说了？能从一个曾让我练了一星期系缆绳的女人嘴里说出来，这可是极高的评价。等你准备好了就敲响我码头尽头的铃，{playerName}，渡航会把你送到东溪镇的正中央。当心狼群。',
   'entities.quests.q_ps_set_sail.objectives.0.label': '向渡船人奥多报到',
   'entities.zones.proving_shore.name': '试炼之滨',
   'entities.zones.proving_shore.welcome':

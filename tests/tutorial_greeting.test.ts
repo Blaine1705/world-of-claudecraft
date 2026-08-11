@@ -4,6 +4,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { PROVING_SHORE_ARRIVAL } from '../src/sim/content/proving_shore';
+import { FERRY_BELL_TOWN_LANDING } from '../src/sim/interactions/ferry_bell';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import {
@@ -164,5 +165,102 @@ describe('startTutorial (the ferry)', () => {
     sim.startTutorial();
     expect(e.pos.x).toBe(before.x);
     expect(e.pos.z).toBe(before.z);
+  });
+});
+
+describe('the ferry bells (the clicked crossing)', () => {
+  function bells(sim: Sim) {
+    const found = [...sim.entities.values()].filter(
+      (e) => e.kind === 'object' && e.objectItemId === 'ps_ferry_bell',
+    );
+    const island = found.find((b) => b.pos.x < -180)!;
+    const vale = found.find((b) => b.pos.x >= -180)!;
+    return { island, vale };
+  }
+
+  it('the island bell sets the player down in Eastbrook town', () => {
+    const sim = makeSim();
+    const { island } = bells(sim);
+    expect(island).toBeTruthy();
+    const p = sim.entities.get(sim.playerId)!;
+    p.pos.x = island.pos.x + 1;
+    p.pos.z = island.pos.z;
+    sim.pickUpObject(island.id);
+    expect(Math.hypot(p.pos.x - FERRY_BELL_TOWN_LANDING.x, p.pos.z - FERRY_BELL_TOWN_LANDING.z))
+      .toBeLessThan(1);
+  });
+
+  it('the vale bell rings a returning player back to the island arrival', () => {
+    const sim = makeSim();
+    const { vale } = bells(sim);
+    expect(vale).toBeTruthy();
+    const p = sim.entities.get(sim.playerId)!;
+    p.pos.x = vale.pos.x + 1;
+    p.pos.z = vale.pos.z;
+    sim.pickUpObject(vale.id);
+    expect(Math.hypot(p.pos.x - PROVING_SHORE_ARRIVAL.x, p.pos.z - PROVING_SHORE_ARRIVAL.z))
+      .toBeLessThan(1);
+  });
+
+  it('refuses in combat and stays put (no bell combat exit)', () => {
+    const sim = makeSim();
+    const { vale } = bells(sim);
+    const p = sim.entities.get(sim.playerId)!;
+    p.pos.x = vale.pos.x + 1;
+    p.pos.z = vale.pos.z;
+    p.inCombat = true;
+    sim.pickUpObject(vale.id);
+    expect(p.pos.x).toBe(vale.pos.x + 1);
+  });
+});
+
+describe('the quest-gated vendor row (the pouch lock-out guard)', () => {
+  function standAtFinch(sim: Sim) {
+    const finch = [...sim.entities.values()].find(
+      (e) => e.kind === 'npc' && e.templateId === 'quartermaster_finch',
+    )!;
+    const p = sim.entities.get(sim.playerId)!;
+    p.pos.x = finch.pos.x + 1;
+    p.pos.z = finch.pos.z;
+    return finch;
+  }
+
+  it('refuses the Linen Pouch before the lesson quest is in the log', () => {
+    const sim = makeSim();
+    const finch = standAtFinch(sim);
+    const meta = sim.players.get(sim.playerId)!;
+    meta.copper = 1000;
+    sim.buyItem(finch.id, 'linen_pouch');
+    expect(sim.countItem('linen_pouch')).toBe(0);
+    expect(meta.copper).toBe(1000);
+  });
+
+  it('sells the Linen Pouch once the lesson quest is active, and after it is done', () => {
+    const sim = makeSim();
+    const finch = standAtFinch(sim);
+    const meta = sim.players.get(sim.playerId)!;
+    meta.copper = 1000;
+    meta.questLog.set('q_ps_pouch_and_purse', {
+      questId: 'q_ps_pouch_and_purse',
+      counts: [0],
+      state: 'active',
+    });
+    sim.buyItem(finch.id, 'linen_pouch');
+    expect(sim.countItem('linen_pouch')).toBe(1);
+    expect(meta.copper).toBe(750);
+    // Done-state keeps the row open: a graduate can buy a second pouch.
+    meta.questLog.delete('q_ps_pouch_and_purse');
+    meta.questsDone.add('q_ps_pouch_and_purse');
+    sim.buyItem(finch.id, 'linen_pouch');
+    expect(sim.countItem('linen_pouch')).toBe(2);
+  });
+
+  it('ungated rows sell as before (the gate narrows nothing else)', () => {
+    const sim = makeSim();
+    const finch = standAtFinch(sim);
+    const meta = sim.players.get(sim.playerId)!;
+    meta.copper = 1000;
+    sim.buyItem(finch.id, 'minor_healing_potion');
+    expect(sim.countItem('minor_healing_potion')).toBe(1);
   });
 });

@@ -94,6 +94,27 @@ if (!after.greetingLatched) throw new Error('greeting one-shot did not latch');
 // Give the streamer a moment to draw the island before the proof shot.
 await sleep(6000);
 await page.screenshot({ path: 'tmp/tutorial-island-arrival.png' });
-console.log('E2E OK: greeting shown, ferry landed, chain head available');
+
+// The return trip: ring the Old Pier's ferry bell (a clicked object, never a
+// walk-in trigger) and assert the crossing sets the player down in Eastbrook
+// town beside the spawn square.
+const returned = await page.evaluate(() => {
+  const sim = window.__game.sim;
+  const p = sim.entities.get(sim.playerId);
+  const bell = [...sim.entities.values()].find(
+    (e) => e.kind === 'object' && e.objectItemId === 'ps_ferry_bell' && e.pos.x < -180,
+  );
+  if (!bell) return { error: 'island ferry bell missing' };
+  p.pos.x = bell.pos.x + 1;
+  p.pos.z = bell.pos.z;
+  sim.pickUpObject(bell.id);
+  return { pos: { ...p.pos } };
+});
+console.log('after bell:', returned);
+if (returned.error) throw new Error(returned.error);
+if (!(Math.abs(returned.pos.x - 4) < 2 && Math.abs(returned.pos.z + 6) < 2)) {
+  throw new Error('ferry bell did not land in Eastbrook town');
+}
+console.log('E2E OK: greeting shown, ferry landed, chain head available, bell rang home');
 
 await browser.close();

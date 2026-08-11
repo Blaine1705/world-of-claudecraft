@@ -12241,12 +12241,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorialGreeting.play': 'チュートリアルを受ける',
   'hudChrome.tutorialGreeting.skip': 'チュートリアルを飛ばす',
   'entities.items.ps_castaway_crate.name': '漂着した木箱',
+  'entities.items.ps_ferry_bell.name': '渡しの鐘',
   'entities.mobs.training_effigy.name': '訓練用のかかし',
   'entities.mobs.shore_scuttler.name': '浜辺ガニ',
   'entities.npcs.wayfarer_bryn.name': '旅人ブリン',
   'entities.npcs.wayfarer_bryn.title': '港の案内人',
   'entities.npcs.wayfarer_bryn.greeting':
-    'イーストブルック渓谷は来る者を拒まないよ、旅の人。まだ足元がおぼつかないなら、修練の浜がある。西の浜の渡しの円環は、年中どちら向きにも通じているからね。',
+    'イーストブルック渓谷は来る者を拒まないよ、旅の人。まだ足元がおぼつかないなら、修練の浜がある。西の浜の渡しの鐘は、年中どちら向きにも鳴るからね。',
   'entities.npcs.instructor_maren.name': '教官マレン',
   'entities.npcs.instructor_maren.title': '修練の師',
   'entities.npcs.instructor_maren.greeting':
@@ -12258,7 +12259,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.ferryman_odo.name': '渡し守オド',
   'entities.npcs.ferryman_odo.title': '渡し場の番人',
   'entities.npcs.ferryman_odo.greeting':
-    '海峡は穏やかで、船も頑丈だ、{playerName}。渓谷へ行く支度ができたら、桟橋の先の渡しの円環がいつでも運んでくれる。',
+    '渡ってきたばかりかい、{playerName}？なら浜の道を上っていきなさい。教官マレンが暁の野営地で稽古を仕切っていて、何よりも先に君と話したがるはずだ。渓谷が君を呼び戻したら、桟橋の先の鐘を鳴らせば、渡しがイーストブルックの町まで送り届けてくれる。',
   'entities.npcs.bursar_wick.name': '出納係ウィック',
   'entities.npcs.bursar_wick.title': '金張りの金庫',
   'entities.npcs.bursar_wick.greeting':
@@ -12289,15 +12290,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ps_the_wheel_of_trades.objectives.0.label': '補給係フィンチに生業について尋ねる',
   'entities.quests.q_ps_pouch_and_purse.title': 'ポーチと財布',
   'entities.quests.q_ps_pouch_and_purse.text':
-    '君の持ち物の話をしよう、{playerName}。背嚢には十六の枠があり、その横に空の鞄留めが四つ待っている。鞄を留めるたびに、その分の空きが全体に加わる仕組みだ。持ちきれないものは金張りの金庫が預かる。どの町のどの出納係も同じ金庫を開けてくれるし、財布が育てば金庫の枠も買い足せる。さあ、習慣づけの練習だ。補給係フィンチから亜麻のポーチを買って、留めてごらん。',
+    '渓谷へ発つ前にもうひとつ、冒険者の命を守る授業だよ、{playerName}。君の持ち物の話だ。背嚢には十六の枠があり、その横に空の鞄留めが四つ待っている。鞄を留めるたびに、その分の空きが全体に加わる。補給係フィンチから亜麻のポーチを買って留めたら、この授業を金庫机の出納係ウィックのところへ持っていきなさい。彼が預かるのは、どんな鞄にも収まらない残り半分だ。',
   'entities.quests.q_ps_pouch_and_purse.completion':
-    '良いポーチだ。厄介ごとを詰める枠が六つ増えたね。値打ち物は金庫へ、鞄には余裕を、{playerName}。狼よりも多くの冒険を終わらせてきたのは、はち切れた背嚢のほうなんだよ。',
+    'マレンがようやく生徒を寄こしたか。ポーチは君のものだ。そして授業の残り半分はこうだよ、{playerName}。持ちきれないものは金張りの金庫が預かる。どの町のどの出納係も同じ金庫を開けてくれるし、財布が育てば金庫の枠も買い足せる。値打ち物は金庫へ、鞄には余裕を。狼よりも多くの冒険を終わらせてきたのは、はち切れた背嚢のほうなんだ。',
   'entities.quests.q_ps_pouch_and_purse.objectives.0.label': '亜麻のポーチを購入する',
   'entities.quests.q_ps_set_sail.title': '出航',
   'entities.quests.q_ps_set_sail.text':
     'この浜には、君がまだ倒していない、開けていない、買っていないものは何も残っていないよ、{playerName}。準備はできた。イーストブルック渓谷には本物の仕事が待っている。古い桟橋へ下りて、渡し守オドに伝えなさい。マレンが、君は渡りを勝ち取ったと言っていた、とね。',
   'entities.quests.q_ps_set_sail.completion':
-    'マレンがそう言ったのかい？私に一週間も舫い結びの稽古をさせた人からの、これは大した誉め言葉だ。桟橋の先の円環に足を踏み入れれば、いつでも渓谷へ運んでくれるよ、{playerName}。狼には気をつけて。',
+    'マレンがそう言ったのかい？私に一週間も舫い結びの稽古をさせた人からの、これは大した誉め言葉だ。支度ができたら桟橋の先の鐘を鳴らしなさい、{playerName}。渡しがイーストブルックの町の真ん中に降ろしてくれる。狼には気をつけて。',
   'entities.quests.q_ps_set_sail.objectives.0.label': '渡し守オドに報告する',
   'entities.zones.proving_shore.name': '修練の浜',
   'entities.zones.proving_shore.welcome':

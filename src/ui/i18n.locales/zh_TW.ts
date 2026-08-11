@@ -12039,12 +12039,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorialGreeting.play': '進行新手教學',
   'hudChrome.tutorialGreeting.skip': '跳過新手教學',
   'entities.items.ps_castaway_crate.name': '漂流貨箱',
+  'entities.items.ps_ferry_bell.name': '渡船鈴',
   'entities.mobs.training_effigy.name': '訓練草人',
   'entities.mobs.shore_scuttler.name': '灘塗掠蟹',
   'entities.npcs.wayfarer_bryn.name': '旅人布琳',
   'entities.npcs.wayfarer_bryn.title': '港口嚮導',
   'entities.npcs.wayfarer_bryn.greeting':
-    '東溪谷來者不拒，朋友。而對腳下還不穩的人來說，總還有試煉之濱：西岸的渡送法陣一年到頭雙向通行。',
+    '東溪谷來者不拒，朋友。而對腳下還不穩的人來說，總還有試煉之濱：西岸的渡船鈴一年到頭兩個方向都響。',
   'entities.npcs.instructor_maren.name': '教官瑪倫',
   'entities.npcs.instructor_maren.title': '試煉導師',
   'entities.npcs.instructor_maren.greeting':
@@ -12056,7 +12057,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.ferryman_odo.name': '渡船人奧多',
   'entities.npcs.ferryman_odo.title': '渡口看守',
   'entities.npcs.ferryman_odo.greeting':
-    '海峽風平浪靜，船也結實，{playerName}。等你準備好去谷地了，碼頭盡頭的渡送法陣隨時送你過去。',
+    '剛下渡船嗎，{playerName}？那就沿著岸邊的路往上走：教官瑪倫在晨憩營地主持操練，她想先跟你說上幾句。等谷地召喚你回去時，敲響我碼頭盡頭的鈴，渡航會把你送到東溪鎮上。',
   'entities.npcs.bursar_wick.name': '司庫威克',
   'entities.npcs.bursar_wick.title': '鍍金保險箱',
   'entities.npcs.bursar_wick.greeting':
@@ -12087,15 +12088,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ps_the_wheel_of_trades.objectives.0.label': '向軍需官芬奇請教百業',
   'entities.quests.q_ps_pouch_and_purse.title': '錢囊與背袋',
   'entities.quests.q_ps_pouch_and_purse.text':
-    '說說你身上背的東西，{playerName}。你的背包有十六格，旁邊還空著四個袋扣：每繫上一只袋子，它的空間就併入總容量。背不下的，交給鍍金保險箱：任何城鎮的任何司庫都為你打開同一座金庫，等你的錢袋鼓起來，還能購買更多金庫空間。現在來練練這個習慣：去軍需官芬奇那裡買一只亞麻小袋，把它繫上。',
+    '去谷地之前還有最後一課，{playerName}，也是保住冒險者性命的一課：你隨身帶的東西。你的背包有十六格，旁邊還空著四個袋扣；每繫上一只袋子，它的空間就併入總容量。去軍需官芬奇那裡買一只亞麻小袋繫上，然後把這一課帶去保險箱桌前的司庫威克那裡。他掌管的，是任何袋子都裝不下的另一半。',
   'entities.quests.q_ps_pouch_and_purse.completion':
-    '好袋子，又多出六格用來裝麻煩。貴重的存進金庫，袋子留出空當，{playerName}。塞滿的行囊斷送過的冒險，比任何狼都多。',
+    '瑪倫總算把她的學生送到我這兒來了。小袋歸你了，這一課的另一半在這裡，{playerName}：背不下的，交給鍍金保險箱。任何城鎮的任何司庫都為你打開同一座金庫，等你的錢袋鼓起來，還能購買更多金庫空間。貴重的存進金庫，袋子留出空當。塞滿的行囊斷送過的冒險，比任何狼都多。',
   'entities.quests.q_ps_pouch_and_purse.objectives.0.label': '購買亞麻小袋',
   'entities.quests.q_ps_set_sail.title': '揚帆起航',
   'entities.quests.q_ps_set_sail.text':
     '這片海濱上已經沒有你沒打倒過、沒打開過、沒買下過的東西了，{playerName}。你準備好了，而東溪谷有真正的差事在等著。走到舊碼頭去，告訴渡船人奧多，就說是我說的，你掙到了這趟航程。',
   'entities.quests.q_ps_set_sail.completion':
-    '瑪倫這麼說了？能從一個曾讓我練了一星期繫纜繩的女人嘴裡說出來，這可是極高的評價。碼頭盡頭的法陣隨時送你去谷地，{playerName}，走進去就行。當心狼群。',
+    '瑪倫這麼說了？能從一個曾讓我練了一星期繫纜繩的女人嘴裡說出來，這可是極高的評價。等你準備好了就敲響我碼頭盡頭的鈴，{playerName}，渡航會把你送到東溪鎮的正中央。當心狼群。',
   'entities.quests.q_ps_set_sail.objectives.0.label': '向渡船人奧多報到',
   'entities.zones.proving_shore.name': '試煉之濱',
   'entities.zones.proving_shore.welcome':

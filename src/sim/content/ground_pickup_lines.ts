@@ -42,6 +42,13 @@ export const GROUND_PICKUP_LINES: Record<string, GroundPickupLines> = {
     deny: 'Barnacles seal the crate shut.',
     enough: 'You already have enough castaway crates.',
   },
+  // The ferry bells are rung, never looted (interaction.ts routes their click
+  // to interactions/ferry_bell.ts before the pickup path); these lines are
+  // defensive coverage of the deny arm, the murloc_hut precedent.
+  ps_ferry_bell: {
+    deny: 'The ferry bell hangs silent.',
+    enough: 'The ferry bell has nothing to give.',
+  },
   lost_caravan_goods: {
     deny: "You aren't authorized to salvage these goods yet.",
     enough: 'You already have enough caravan goods.',

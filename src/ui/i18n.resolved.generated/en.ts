@@ -11399,6 +11399,9 @@ export const en: EnTranslations = {
       "ps_castaway_crate": {
         "name": "Castaway Crate"
       },
+      "ps_ferry_bell": {
+        "name": "Ferry Bell"
+      },
       "conjured_water4": {
         "name": "Conjured Springwater"
       },
@@ -13326,7 +13329,7 @@ export const en: EnTranslations = {
       "wayfarer_bryn": {
         "name": "Wayfarer Bryn",
         "title": "Harbor Guide",
-        "greeting": "Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry circle on the west strand runs both ways, every day of the year."
+        "greeting": "Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry bell on the west strand rings both ways, every day of the year."
       },
       "instructor_maren": {
         "name": "Instructor Maren",
@@ -13341,7 +13344,7 @@ export const en: EnTranslations = {
       "ferryman_odo": {
         "name": "Ferryman Odo",
         "title": "Keeper of the Crossing",
-        "greeting": "The strait is calm and the boat is sound, {playerName}. Whenever you are ready for the vale, the crossing circle at the end of my pier will carry you over."
+        "greeting": "Fresh off the crossing, {playerName}? Then up the shore road with you: Instructor Maren keeps the drills at Dawnrest Camp, and she will want a word before anything else. When the vale calls you back, ring the bell at the end of my pier and the crossing will set you down in Eastbrook town."
       },
       "bursar_wick": {
         "name": "Bursar Wick",
@@ -15336,8 +15339,8 @@ export const en: EnTranslations = {
       },
       "q_ps_pouch_and_purse": {
         "title": "Pouch and Purse",
-        "text": "A word on what you are carrying, {playerName}. Your backpack holds sixteen slots, and beside it wait four empty bag loops: every bag you buckle on adds its own space to the pool. What you cannot carry, the Gilded Strongbox keeps: any bursar in any town opens the same vault, and more vault space can be bought once your purse grows into it. Now practice the habit: buy a Linen Pouch from Quartermaster Finch and buckle it on.",
-        "completion": "A fine pouch, and six more slots to fill with trouble. Keep your valuables banked and your bags roomy, {playerName}. A full pack has ended more adventures than any wolf ever did.",
+        "text": "One more lesson before the vale, {playerName}, and it is the one that keeps adventurers alive: what you carry. Your backpack holds sixteen slots, and beside it wait four empty bag loops; every bag you buckle on adds its own space to the pool. Buy a Linen Pouch from Quartermaster Finch and buckle it on, then take the lesson to Bursar Wick at the strongbox desk. What he keeps is the half of it no bag can hold.",
+        "completion": "So Maren sends me her students at last. The pouch is yours, and here is the other half of the lesson, {playerName}: what you cannot carry, the Gilded Strongbox keeps. Any bursar in any town opens the same vault, and more vault space can be bought once your purse grows into it. Keep your valuables banked and your bags roomy. A full pack has ended more adventures than any wolf ever did.",
         "objectives": {
           "0": {
             "label": "Linen Pouch bought"
@@ -15347,7 +15350,7 @@ export const en: EnTranslations = {
       "q_ps_set_sail": {
         "title": "Set Sail",
         "text": "There is nothing left on this shore you have not already beaten, opened, or bought, {playerName}. You are ready, and Eastbrook has real work waiting. Walk down to the Old Pier and tell Ferryman Odo I said you have earned your crossing.",
-        "completion": "Maren said that, did she? High praise from a woman who once made me practice mooring knots for a week. The circle at the end of my pier will carry you to the vale whenever you walk into it, {playerName}. Mind the wolves.",
+        "completion": "Maren said that, did she? High praise from a woman who once made me practice mooring knots for a week. Ring the bell at the end of my pier whenever you are ready, {playerName}, and the crossing will set you down in the middle of Eastbrook town. Mind the wolves.",
         "objectives": {
           "0": {
             "label": "Report to Ferryman Odo"

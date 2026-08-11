@@ -12246,12 +12246,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorialGreeting.play': '튜토리얼 진행하기',
   'hudChrome.tutorialGreeting.skip': '튜토리얼 건너뛰기',
   'entities.items.ps_castaway_crate.name': '표류 상자',
+  'entities.items.ps_ferry_bell.name': '나룻배 종',
   'entities.mobs.training_effigy.name': '훈련용 허수아비',
   'entities.mobs.shore_scuttler.name': '해변 종종게',
   'entities.npcs.wayfarer_bryn.name': '방랑자 브린',
   'entities.npcs.wayfarer_bryn.title': '항구 안내인',
   'entities.npcs.wayfarer_bryn.greeting':
-    '이스트브룩 골짜기는 오는 사람을 가리지 않아요, 친구. 그리고 아직 발걸음이 불안한 이들에게는 언제나 수련의 해안이 있죠. 서쪽 바닷가의 나룻배 마법진은 일 년 내내 양방향으로 통한답니다.',
+    '이스트브룩 골짜기는 오는 사람을 가리지 않아요, 친구. 그리고 아직 발걸음이 불안한 이들에게는 언제나 수련의 해안이 있죠. 서쪽 바닷가의 나룻배 종은 일 년 내내 양쪽으로 울린답니다.',
   'entities.npcs.instructor_maren.name': '교관 마렌',
   'entities.npcs.instructor_maren.title': '수련 사범',
   'entities.npcs.instructor_maren.greeting':
@@ -12263,7 +12264,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.ferryman_odo.name': '뱃사공 오도',
   'entities.npcs.ferryman_odo.title': '나루터지기',
   'entities.npcs.ferryman_odo.greeting':
-    '해협은 잔잔하고 배는 튼튼해요, {playerName}. 골짜기로 갈 준비가 되면, 부두 끝의 건너기 마법진이 언제든 데려다줄 겁니다.',
+    '방금 건너오셨나요, {playerName}? 그럼 해안길을 따라 올라가세요. 새벽쉼터 야영지에서 교관 마렌이 훈련을 이끌고 있는데, 무엇보다 먼저 당신과 이야기하고 싶어 할 겁니다. 골짜기가 다시 부르거든 부두 끝의 종을 울리세요. 건너기가 이스트브룩 마을에 내려 줄 겁니다.',
   'entities.npcs.bursar_wick.name': '경리관 윅',
   'entities.npcs.bursar_wick.title': '도금 금고',
   'entities.npcs.bursar_wick.greeting':
@@ -12294,15 +12295,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ps_the_wheel_of_trades.objectives.0.label': '보급관 핀치에게 생업에 대해 묻기',
   'entities.quests.q_ps_pouch_and_purse.title': '주머니와 돈주머니',
   'entities.quests.q_ps_pouch_and_purse.text':
-    '지금 지고 있는 짐 얘기를 해 보죠, {playerName}. 배낭에는 열여섯 칸이 있고, 그 옆에 빈 가방 고리 넷이 기다립니다. 가방을 하나 채울 때마다 그 공간이 전체 용량에 더해져요. 들고 다닐 수 없는 것은 도금 금고가 맡습니다. 어느 마을의 어느 경리관이든 같은 금고를 열어 주고, 돈주머니가 두둑해지면 금고 칸도 더 살 수 있죠. 자, 습관을 들이는 연습입니다. 보급관 핀치에게서 아마천 주머니를 사서 채워 보세요.',
+    '골짜기로 떠나기 전 마지막 가르침이에요, {playerName}. 모험가의 목숨을 지켜 주는 가르침이죠. 바로 당신이 지고 다니는 짐 얘기입니다. 배낭에는 열여섯 칸이 있고, 그 옆에 빈 가방 고리 넷이 기다립니다. 가방을 하나 채울 때마다 그 공간이 전체 용량에 더해져요. 보급관 핀치에게서 아마천 주머니를 사서 채운 다음, 이 가르침을 금고 책상의 경리관 윅에게 가져가세요. 그가 맡아 주는 것은 어떤 가방에도 담기지 않는 나머지 절반이니까요.',
   'entities.quests.q_ps_pouch_and_purse.completion':
-    '좋은 주머니군요. 말썽거리를 담을 칸이 여섯 늘었네요. 값진 것은 금고에, 가방에는 여유를, {playerName}. 어떤 늑대보다도 꽉 찬 배낭이 끝장낸 모험이 더 많답니다.',
+    '마렌이 드디어 학생을 보냈군요. 주머니는 당신 것이고, 가르침의 나머지 절반은 이렇습니다, {playerName}. 들고 다닐 수 없는 것은 도금 금고가 맡습니다. 어느 마을의 어느 경리관이든 같은 금고를 열어 주고, 돈주머니가 두둑해지면 금고 칸도 더 살 수 있죠. 값진 것은 금고에, 가방에는 여유를. 어떤 늑대보다도 꽉 찬 배낭이 끝장낸 모험이 더 많답니다.',
   'entities.quests.q_ps_pouch_and_purse.objectives.0.label': '아마천 주머니 구입하기',
   'entities.quests.q_ps_set_sail.title': '출항',
   'entities.quests.q_ps_set_sail.text':
     '이 해안에는 당신이 쓰러뜨리지 않았거나, 열지 않았거나, 사지 않은 것이 하나도 남지 않았어요, {playerName}. 준비는 끝났고, 이스트브룩에는 진짜 일이 기다립니다. 낡은 부두로 내려가 뱃사공 오도에게 전하세요. 내가 당신이 건너갈 자격을 얻었다 했다고요.',
   'entities.quests.q_ps_set_sail.completion':
-    '마렌이 그렇게 말했다고요? 내게 일주일 내내 밧줄 매듭 연습을 시킨 사람의 입에서 나온 말치고는 대단한 칭찬이군요. 부두 끝의 마법진에 걸어 들어가면 언제든 골짜기로 데려다줍니다, {playerName}. 늑대를 조심하세요.',
+    '마렌이 그렇게 말했다고요? 내게 일주일 내내 밧줄 매듭 연습을 시킨 사람의 입에서 나온 말치고는 대단한 칭찬이군요. 준비가 되면 부두 끝의 종을 울리세요, {playerName}. 건너기가 이스트브룩 마을 한복판에 내려 줄 겁니다. 늑대를 조심하세요.',
   'entities.quests.q_ps_set_sail.objectives.0.label': '뱃사공 오도에게 보고',
   'entities.zones.proving_shore.name': '수련의 해안',
   'entities.zones.proving_shore.welcome':
