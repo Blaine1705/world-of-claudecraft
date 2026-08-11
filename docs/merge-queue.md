@@ -69,7 +69,9 @@ the Checks tab (filter by event: merge_group).
    it greens, re-queue. Judge red CI by clean-runner reruns.
 5. A job that failed with "exceeded the maximum execution time of N minutes"
    hit its checkout-stall bound (the test and browser jobs carry job-level
-   timeout-minutes sized from measured healthy worst cases; the stall class
+   timeout-minutes sized from measured healthy worst cases, or, where a job
+   has repeatedly died before finishing on a slow runner, from its healthy
+   wall scaled by the measured fast-to-slow runner ratio; the stall class
    is runner-side and runs tens of minutes inside actions/checkout, 9.6 to
    24.4 in the incident sample and up to 68 in the 24 hour replay). First open the killed job's log: if a test step was
    already failing or still running near the bound, treat it as a real

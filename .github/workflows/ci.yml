@@ -612,13 +612,29 @@ jobs:
     # sibling shard to report around it, so a hang would otherwise hold a
     # required check for GitHub's 6 hour default. The single-job lane's bound
     # was 60 (run 31290316610 measured ~4400s aggregate suite time on a
-    # slow-quartile runner). The lane-diet PR cut the nine suites' aggregate
-    # from 1786s to 901s local-measured and split the list (half A 403s /
-    # half B 498s aggregate; per-suite evidence in the PR body), so each
-    # half's healthy wall projects under 10 minutes on a standard runner; 20
-    # matches the pr-gate shard bound and keeps slow-quartile margin while
-    # killing stalls well before GitHub's default.
-    timeout-minutes: 20
+    # slow-quartile runner). The lane-diet PR then cut the nine suites'
+    # aggregate from 1786s to 901s LOCAL-measured and split the list (half A
+    # 403s / half B 498s aggregate; per-suite evidence in the PR body), and
+    # sized 20 from a projection of under 10 minutes per half.
+    #
+    # That projection did not survive CI measurement, and this comment is the
+    # re-derivation the lane-diet note asks for whenever a member's cost moves.
+    # On run 31450179645 (2026-08-11, a healthy runner, full mode) lane A ran
+    # 13.73 minutes and lane B 12.55, because owned_class_balance_harness alone
+    # measured 739268ms in-lane: the local aggregate for all three half-A files
+    # understates that ONE file by most of a factor of two, and lane isolation
+    # does not shrink it (the same file measured 527s and 842s inside a
+    # release-gate shard, so the harness is simply long, not contended).
+    #
+    # 30 applies the same arithmetic as release-gate's bound: healthy wall
+    # times the 1.60 fast-to-slow runner ratio measured at b160a1ba18
+    # (13.73 x 1.60 = 22.0 for the slower half), then the 1.37x margin the
+    # original bounds were chosen with. At 20 this REQUIRED check was roughly
+    # one slow runner away from bound-killing and blocking the merge queue,
+    # which is the more expensive failure than the release backstop's, so it
+    # is raised in the same change. Both halves share one bound so the a/b
+    # assignment can still rebalance freely without re-sizing.
+    timeout-minutes: 30
     runs-on: ubuntu-latest
 
     steps:
@@ -682,8 +698,9 @@ jobs:
     name: PR gate (long sims B)
     needs: changes
     if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code != 'false'
-    # Sized with pr-long-sims-a (evidence there and in the lane-diet PR).
-    timeout-minutes: 20
+    # Sized with pr-long-sims-a (evidence there, in the lane-diet PR, and in
+    # the run 31450179645 re-derivation the sibling comment carries).
+    timeout-minutes: 30
     runs-on: ubuntu-latest
 
     steps:
@@ -835,24 +852,34 @@ jobs:
     # median is what made it fragile.
     #
     # 20 was sized from a 14.63 minute healthy worst case (run 31117143257).
-    # That premise died on 2026-08-11 at b160a1ba18, where shard 1 drew
-    # owned_class_balance_harness, nythraxis_matrix, and hunter_dps_balance
-    # together and was bound-killed four times (run 31443047694 attempts 1
-    # through 3, run 31443040285 attempt 1) while attempt 2 of that same push
-    # run passed the identical scope in 16 minutes. Same commit, same warm
-    # transform cache: the differentiator was runner speed, with
-    # owned_class_balance_harness measured at 527s on the fast runner and 842s
-    # on the slow one. A killed attempt had finished 271 of its 330 files at
-    # 18m53s, so the slow-runner completion is an ESTIMATE near 23 minutes
-    # rather than a measurement (the job never finished); 30 keeps roughly the
-    # proportional margin 20 was chosen with, over that estimate instead of
-    # over the median. Raising it costs stall-kill latency on this job only,
-    # which is the right trade for a post-merge backstop: the stall reactor
-    # (.github/workflows/ci-stall-rerun.yml) is what actually handles hangs,
-    # and pr-gate keeps the tight bound for fast feedback.
-    # The nightly workflow deliberately keeps its own generous bounds and is
-    # untouched.
-    timeout-minutes: 30
+    # That premise died on 2026-08-11 at b160a1ba18, where shard 1 drew FOUR
+    # of the nine long suites (owned_class_balance_harness, nythraxis_matrix,
+    # hunter_dps_balance, and druid_balance_probe) and was bound-killed four
+    # times (run 31443047694 attempts 1 through 3, run 31443040285 attempt 1)
+    # while attempt 2 of that same push run passed the identical scope in 16
+    # minutes. Same commit, same warm transform cache: the differentiator was
+    # runner speed, with owned_class_balance_harness measured at 527s on the
+    # fast runner and 842s on the slow one, a ratio of 1.60.
+    #
+    # Sizing, stated as the arithmetic rather than a feel: the healthy wall is
+    # the 16 minute passing attempt, so the slow-runner projection is
+    # 16 x 1.60 = 25.6 minutes, and 35 holds the 1.37x margin the 20 bound was
+    # originally chosen with (20 / 14.63). Do NOT re-derive this from the
+    # killed attempt's file count: it had finished 271 of 330 files at 18m53s,
+    # but druid_balance_probe was still unfinished, so the remaining time was
+    # bounded below by a multi-minute file rather than by a per-file average,
+    # and the linear extrapolation that suggests (about 23 minutes) reads low.
+    #
+    # Raising this costs stall-kill latency on this job only, which is the
+    # right trade for a post-merge backstop. Note what does NOT cover it: the
+    # stall reactor (.github/workflows/ci-stall-rerun.yml) reruns a bound-killed
+    # SETUP step or a failed checkout, never a test-step kill like this one, and
+    # it stays inert until its workflow file reaches the default branch. A
+    # test-step kill here is a manual rerun by design. pr-gate keeps the tight
+    # bound for fast feedback; its shards exclude these suites, so this evidence
+    # does not touch it. The nightly workflow deliberately keeps its own
+    # generous bounds and is untouched.
+    timeout-minutes: 35
     runs-on: ubuntu-latest
 
     # No I18N_RELEASE_TIER here BY DESIGN (D8 revised, issue #2820). This job runs
