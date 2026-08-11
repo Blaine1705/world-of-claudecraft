@@ -44,11 +44,13 @@ import {
   MARKET_ITEM_TYPE_FILTERS,
   MARKET_PRIMARY_STAT_FILTERS,
   MARKET_RARITY_FILTERS,
+  MARKET_SORT_OPTIONS,
   type MarketArmorClassFilter,
   type MarketItemTypeFilter,
   type MarketPrimaryStatFilter,
   type MarketQuery,
   type MarketRarityFilter,
+  type MarketSort,
   type MarketSubtypeFilter,
 } from './market_filters';
 import {
@@ -119,6 +121,7 @@ export class MarketWindow {
   private armorClassFilter: MarketArmorClassFilter = 'all';
   private primaryStatFilter: MarketPrimaryStatFilter = 'all';
   private rarityFilter: MarketRarityFilter = 'all';
+  private sortFilter: MarketSort = 'name';
   private browsePage = 0;
   private sellItemId: string | null = null;
   private sellInstance: ItemInstancePayload | null = null;
@@ -157,6 +160,7 @@ export class MarketWindow {
     this.armorClassFilter = 'all';
     this.primaryStatFilter = 'all';
     this.rarityFilter = 'all';
+    this.sortFilter = 'name';
     this.browsePage = 0;
     this.sellItemId = null;
     this.sellInstance = null;
@@ -206,6 +210,7 @@ export class MarketWindow {
       armorClass: this.armorClassFilter,
       primaryStat: this.primaryStatFilter,
       rarity: this.rarityFilter,
+      sort: this.sortFilter,
       page: this.browsePage,
     };
   }
@@ -264,6 +269,7 @@ export class MarketWindow {
       this.armorClassFilter,
       this.primaryStatFilter,
       this.rarityFilter,
+      this.sortFilter,
       this.browsePage,
       info?.listings,
       info?.totalCount,
@@ -441,6 +447,9 @@ export class MarketWindow {
           this.browsePage = 0;
         } else if (key === 'rarity') {
           this.rarityFilter = value as MarketRarityFilter;
+          this.browsePage = 0;
+        } else if (key === 'sort') {
+          this.sortFilter = value as MarketSort;
           this.browsePage = 0;
         } else {
           return;
@@ -945,6 +954,14 @@ export class MarketWindow {
     return t('itemUi.market.filterRarityAll');
   }
 
+  // Reorders the active result set rather than narrowing it, so it has no "all" option:
+  // 'name' (the classic name-then-price default) and 'price' (whole-book cheapest first,
+  // issue 3102) are both always-applicable choices, not filters with an unset state.
+  private marketSortLabel(sort: MarketSort): string {
+    if (sort === 'price') return t('itemUi.market.sortPriceAsc');
+    return t('itemUi.market.sortName');
+  }
+
   // Both label functions switch on the core's subtypeKind, never on the item type:
   // the options and their wording are decided together in marketFilterMenus, so a type
   // that gains a subtype axis cannot get its list from one place and its words from
@@ -999,7 +1016,7 @@ export class MarketWindow {
   }
 
   private renderMarketFilterMenu(
-    menu: 'itemType' | 'subtype' | 'armorClass' | 'primaryStat' | 'rarity',
+    menu: 'itemType' | 'subtype' | 'armorClass' | 'primaryStat' | 'rarity' | 'sort',
     label: string,
     value: string,
     options: readonly string[],
@@ -1072,6 +1089,13 @@ export class MarketWindow {
         this.rarityFilter,
         MARKET_RARITY_FILTERS,
         (filter) => this.marketRarityLabel(filter as MarketRarityFilter),
+      ) +
+      this.renderMarketFilterMenu(
+        'sort',
+        t('itemUi.market.filterSort'),
+        this.sortFilter,
+        MARKET_SORT_OPTIONS,
+        (sort) => this.marketSortLabel(sort as MarketSort),
       ) +
       `</div>`
     );

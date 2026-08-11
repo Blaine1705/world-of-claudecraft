@@ -298,6 +298,19 @@ describe('market_window: behavior preserved through the core', () => {
     expect(painter).toContain("t('itemUi.market.filterValueAria', { label, value: current })");
   });
 
+  // Issue #3102: the browse sort control (name / price ascending) rides the same
+  // shared dropdown chrome as the other filters, always shown (unlike subtype/
+  // armorClass/primaryStat it is not gated on the item type), included in every
+  // pushed query, and reset on open() alongside the rest of the browse state.
+  it('wires the price-ascending sort control through the same shared dropdown chrome (#3102)', () => {
+    expect(painter).toContain('MARKET_SORT_OPTIONS');
+    expect(painter).toMatch(/this\.renderMarketFilterMenu\(\s*'sort'/);
+    expect(painter).toContain('sort: this.sortFilter');
+    expect(painter).toContain("this.sortFilter = 'name'");
+    expect(painter).toMatch(/key === 'sort'/);
+    expect(painter).toContain("t('itemUi.market.filterSort')");
+  });
+
   // Issue #2189. WHICH menus each item type shows is decided in the pure core and pinned
   // behaviorally in tests/market_view.test.ts (marketFilterMenus); the rendered DOM is
   // driven in tests/browser/keyboard_nav.browser.test.ts. What is left for a source pin

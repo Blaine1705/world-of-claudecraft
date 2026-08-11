@@ -2704,6 +2704,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterBagAll': 'すべてのバッグ',
   'itemUi.market.filterRarity': 'レア度',
   'itemUi.market.filterRarityAll': 'すべてのレア度',
+  'itemUi.market.sortPriceAsc': '価格: 安い順',
   'itemUi.market.weaponSword': '剣',
   'itemUi.market.weaponDagger': '短剣',
   'itemUi.market.weaponStaff': '杖',

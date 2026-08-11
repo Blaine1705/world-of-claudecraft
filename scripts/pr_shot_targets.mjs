@@ -3390,6 +3390,28 @@ export const TARGETS = [
     },
   },
   {
+    key: 'market-sort-filter-list',
+    label: 'World Market sort control (name / price ascending, open)',
+    // Same keying as market-type-filter-list above: the shared query module (which
+    // now carries the sort axis, issue #3102) plus the view core, not ui/market_window,
+    // so an unrelated painter layout change does not drag this along.
+    when: ['sim/market_query', 'ui/market_view'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      if (!(await openMarketBrowse(page))) return {};
+      const opened = await page.evaluate(() => {
+        const menu = document.querySelector('[data-market-filter-menu="sort"]');
+        const btn = menu?.querySelector('.mkt-select-btn');
+        if (!btn) return false;
+        btn.click();
+        return true;
+      });
+      if (!opened) return {};
+      await wait(250);
+      return { clip: '#market-window' };
+    },
+  },
+  {
     key: 'market-bag-size-filter',
     label: 'World Market bag capacity filter (Bags selected, sizes open)',
     when: ['sim/market_query', 'ui/market_view'],
