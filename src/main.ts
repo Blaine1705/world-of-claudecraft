@@ -1845,6 +1845,7 @@ async function startGame(
     canvas,
     {
       onTab: () => world.tabTarget(),
+      onTabPrev: () => world.tabTargetPrev(),
       onTargetFriendly: () => world.targetNearestFriendly(),
       onCycleFriendly: () => world.friendlyTabTarget(),
       // Pet bar (Ctrl+1..5 by default): drive the existing IWorld pet commands.
@@ -2138,6 +2139,9 @@ async function startGame(
     switch (id) {
       case 'target':
         world.tabTarget();
+        break;
+      case 'targetPrev':
+        world.tabTargetPrev();
         break;
       case 'targetFriendly':
         world.targetNearestFriendly();
