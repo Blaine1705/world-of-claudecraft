@@ -43,7 +43,12 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/render/renderer.ts',
-    ceiling: 13800,
+    // Raised 13800 -> 13900 absorbing the Three.js audit batch (sky residency
+    // lane, blob shadow fill, dynamic light registry): their pure halves are
+    // already extracted (sky_residency_core.ts, blob_shadow_core.ts) and the
+    // remainder reads the coordinator's private mutable state, the exact
+    // stays-in-the-coordinator criterion of the module-first rule.
+    ceiling: 13900,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
