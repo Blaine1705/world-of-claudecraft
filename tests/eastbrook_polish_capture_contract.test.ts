@@ -120,8 +120,13 @@ interface AttributionTargetFixture {
 // mount branch: the release-side changes move the rendererIntegration leaf
 // (mountLoopActive dismount-loop fix), so the merged tree mints a value
 // matching neither parent. No capture was retaken.
+// Re-minted for that branch's round-6 review fixes: a comment-only edit to
+// renderer.ts (documenting why the mountLoop call sits outside the
+// SFX_MOVE_RANGE_SQ audibility gate) still moves the rendererIntegration
+// leaf, since the seal hashes file bytes rather than behavior. No capture
+// was retaken and no measured value moved.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '0a603488eb67018908fab5048fd9f2fcfc16579567418f7c896b7ad33c9c7b00';
+  '17dd06ef4cd0b643f2a76992d7341ec5dcb27b1972077008ac0059236c0c9445';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
