@@ -11,15 +11,26 @@ import { VISUALS } from '../src/render/characters/manifest';
 
 // Structural contract for the shipped rickshaw_mount.glb, mirroring the tank
 // mount's own asset test (tests/terrorspark_groundshaker_asset.test.ts) minus
-// the source-fingerprint-in-extras half: this GLB was never exported with
-// that stamp (the rickshaw's exporter predates adopting the eastbrook-style
-// fingerprint convention), and re-exporting to add it now would risk
-// reintroducing bugs into geometry that has already been measured, tuned,
-// and live-verified across several passes. What this DOES pin: the exact
-// shipped bytes (so any future re-export is a deliberate, reviewed change,
-// not a silent drift) and the real structural shape (materials, UVs,
-// COLOR_0, wheel nodes, no skin/animation) a change to model.js or the
-// exporter could otherwise break without any test noticing.
+// the source-fingerprint-in-extras half.
+//
+// That omission is a DELIBERATE, OWNER-ACCEPTED gap (ruled 2026-08-11, PR
+// #3293 round-6 review), not an oversight. What it costs: the byte pin below
+// catches a silent re-export, but nothing catches the REVERSE direction, i.e.
+// editing model.js or surface_maps.mjs WITHOUT re-exporting, which leaves
+// source and shipped GLB diverged while every test stays green. What buying
+// the cover would cost: a re-export to stamp the fingerprint into extras,
+// which rewrites geometry already measured, tuned and live-verified across
+// several passes (and whose height/offset constants are pinned against the
+// current bytes further down this file). The drift case has never actually
+// bitten this asset; the re-export risk is concrete. If a future pass
+// re-exports for its own reasons, add the fingerprint pin then, since the
+// cost is already paid at that point.
+//
+// What this DOES pin: the exact shipped bytes (so any future re-export is a
+// deliberate, reviewed change, not a silent drift), the real structural shape
+// (materials, UVs, COLOR_0, wheel nodes, no skin/animation) a change to
+// model.js or the exporter could otherwise break without any test noticing,
+// and both new VisualDefs' height fields against the GLBs they measure.
 const REPO_ROOT = path.join(__dirname, '..');
 const ASSET_PATH = path.join(REPO_ROOT, 'public/models/mounts/rickshaw_mount.glb');
 const EXPECTED_ASSET_SHA256 = '5f539e1f2ad40fe41987201673acc0a2977c5bd0a25deb81dffa023ef285d8cd';
