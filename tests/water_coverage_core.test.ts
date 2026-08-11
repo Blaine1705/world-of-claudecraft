@@ -1,21 +1,30 @@
-// The fine water sheets have to cover every coastline in the world rect.
+// The fine water sheets have to cover every MEANINGFUL coastline in the world
+// rect, and must NOT stretch a fine sheet over a rect that is almost all open
+// sea.
 //
-// The regression: the zone rects do NOT tile the world's bounding box, and each
-// un-zoned cell was left to the horizon apron, whose vertex cells are ~48 x 57
-// yards at the vista tiers. Interpolating depth / seabed slope / alpha across a
-// 48 yard triangle draws hard straight-edged wedges and diagonal colour steps,
-// which is what was reported along the southwest shore: x -540..-180 by
-// z -180..180 was the ONE un-zoned cell carrying a real coastline (the vale's
-// west headland stands ~15 yards over its own beach inside it). The Proving
-// Shore tutorial island now owns that cell, so its coastline is covered by a
-// zone sheet rather than a gap sheet.
+// The zone rects do NOT tile the world's bounding box; each un-zoned cell is
+// otherwise left to the horizon apron, whose vertex cells are ~48 x 57 yards at
+// the vista tiers. Interpolating depth / seabed slope / alpha across a 48 yard
+// triangle draws hard straight-edged wedges, so a cell with a real coastline
+// needs its own fine sheet, while a nearly-all-sea cell must NOT get one (a
+// fine sheet there interpolates its shore attribute across the whole open-sea
+// expanse and bands over the apron, the reported Eastbrook "duplicated water
+// layer"): a gap sheet is built only when its dry-land fraction clears
+// WATER_GAP_MIN_SHORE_FRACTION. The old southwest cell (x -540..-180 by
+// z -180..180) that motivated both rules is no longer a gap at all: the
+// Proving Shore tutorial island owns it, so its coastline (now a real island,
+// not a 1% headland sliver) is covered by a zone sheet.
 
 import { describe, expect, it } from 'vitest';
+import { shoreDepthAt } from '../src/render/water_core';
 import {
   type CoverageZone,
   coveredByOtherSheet,
+  gapDryFraction,
+  gapSheetWorthBuilding,
   gapsAdjacentTo,
   rectCovers,
+  WATER_GAP_MIN_SHORE_FRACTION,
   type WaterSheetRect,
   waterCoverageGaps,
   zoneSheetRects,
@@ -29,12 +38,30 @@ import {
   WORLD_MIN_Z,
   ZONES,
 } from '../src/sim/data';
-import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 const BOUNDS = { minX: WORLD_MIN_X, maxX: WORLD_MAX_X, minZ: WORLD_MIN_Z, maxZ: WORLD_MAX_Z };
 const gaps = () => waterCoverageGaps(ZONES, BOUNDS, STRIP_MIN_X, STRIP_MAX_X);
 const zoneRects = () => zoneSheetRects(ZONES, STRIP_MIN_X, STRIP_MAX_X);
+
+// Share of a gap rect that scans as dry land, against live terrain. This calls
+// the SAME gapDryFraction on the SAME stride, with the same shoreDepthAt
+// predicate, that water.ts builtGapRects decides on: the southwest fraction is
+// only a dozen sampled points wide over a 360x360yd rect, so a guard that
+// re-rolled its own lattice here would be reporting a different number than the
+// decision it claims to pin. onStrip flips if ANY dry sample sits on the play
+// strip (x > STRIP_MIN_X), i.e. a coast a skip would strand on the apron.
+const gapDryScan = (gap: WaterSheetRect): { frac: number; onStrip: boolean } => {
+  let onStrip = false;
+  const frac = gapDryFraction(gap, (x, z) => {
+    if (shoreDepthAt(x, z, WORLD_SEED) > 0) return false;
+    if (x > STRIP_MIN_X) onStrip = true;
+    return true;
+  });
+  return { frac, onStrip };
+};
+// The gaps that actually get a fine sheet (the rest are open sea the apron owns).
+const builtGaps = () => gaps().filter((g) => gapSheetWorthBuilding(gapDryScan(g).frac));
 
 describe('water sheet coverage', () => {
   it('finds no gap that any zone already claims', () => {
@@ -62,7 +89,8 @@ describe('water sheet coverage', () => {
 
   it('covers the southwest coastline cell, the one that drew the wedges', () => {
     // The Proving Shore tutorial island claimed the cell, so it is no longer a
-    // gap: its coastline is covered by the island's own zone sheet instead.
+    // gap (nor the near-all-sea partition cell the v0.37.0 fraction gate was
+    // written around): its coastline is covered by the island's own zone sheet.
     const sw = gaps().find((g) => g.xMin === -540 && g.zMin === -180);
     expect(
       sw,
@@ -78,28 +106,21 @@ describe('water sheet coverage', () => {
     expect(island?.zMax).toBe(180);
   });
 
-  it('pins that every gap holding a coastline is a real gap, against live terrain', () => {
-    // A gap with BOTH wet and dry ground is one the apron cannot represent:
-    // those are exactly the sheets buildSheet(requireShore) builds. The one
-    // coastline gap (gap:-540,-180) became the Proving Shore tutorial island,
-    // a zone in its own right, so the set is now empty: every remaining gap is
-    // open sea. A future grid change that strands a new coast on the apron
-    // still fails here.
-    const withShore = gaps().filter((gap) => {
-      let wet = false;
-      let dry = false;
-      for (let x = gap.xMin + 4; x < gap.xMax; x += 8) {
-        for (let z = gap.zMin + 4; z < gap.zMax; z += 8) {
-          if (terrainHeight(x, z, WORLD_SEED) < WATER_LEVEL) wet = true;
-          else dry = true;
-        }
-      }
-      return wet && dry;
-    });
-    expect(withShore.map((g) => g.id)).toEqual([]);
+  it('pins that no remaining gap earns a sheet, against live terrain', () => {
+    // The one coastline gap (gap:-540,-180) became the Proving Shore tutorial
+    // island, a zone in its own right, so every remaining gap is open sea and
+    // the fraction gate builds no gap sheet anywhere (the same gapDryScan the
+    // live decision uses). A future grid change that strands a REAL on-strip
+    // coast on the apron fails both arms here.
+    for (const gap of gaps()) {
+      const { frac, onStrip } = gapDryScan(gap);
+      expect(gapSheetWorthBuilding(frac), gap.id).toBe(false);
+      expect(onStrip, `${gap.id} strands an on-strip coast on the apron`).toBe(false);
+    }
+    expect(builtGaps().map((g) => g.id)).toEqual([]);
   });
 
-  it('treats a gap as an abutting sheet, so no calm chop stripe forms at the seam', () => {
+  it('treats the island zone sheet as abutting, so no calm chop stripe forms at the seam', () => {
     // The chop feather fires only where the APRON is across an edge. The vale's
     // west edge (x -180) now has the Proving Shore tutorial island's zone
     // sheet across it, so the feather must NOT fire there.
@@ -108,6 +129,27 @@ describe('water sheet coverage', () => {
     // ...while the true outer edge of the world (now the island's west edge)
     // still has only the apron.
     expect(coveredByOtherSheet(sheets, 'proving_shore', -540.5, 0)).toBe(false);
+    // The BUILT set (what water.ts actually passes) reads the same way: the
+    // island's zone sheet abuts the vale even with every gap sheet skipped.
+    const built = [...zoneRects(), ...builtGaps()];
+    expect(coveredByOtherSheet(built, 'eastbrook_vale', -180.5, 0)).toBe(true);
+    // A gap that IS worth building still counts as an abutting sheet, so no
+    // calm chop stripe forms at a real zone/gap seam.
+    const withBuiltGap = [
+      ...zoneRects(),
+      { id: 'gap:built', xMin: -540, xMax: -180, zMin: -180, zMax: 180 },
+    ];
+    expect(coveredByOtherSheet(withBuiltGap, 'eastbrook_vale', -180.5, 0)).toBe(true);
+  });
+
+  it('decides gap sheets on a shore fraction, at the pinned threshold', () => {
+    expect(WATER_GAP_MIN_SHORE_FRACTION).toBe(0.03);
+    // Below the threshold the apron owns the rect; at or above it earns a sheet.
+    expect(gapSheetWorthBuilding(0)).toBe(false);
+    expect(gapSheetWorthBuilding(0.0146)).toBe(false); // the measured southwest sliver
+    expect(gapSheetWorthBuilding(WATER_GAP_MIN_SHORE_FRACTION - 1e-6)).toBe(false);
+    expect(gapSheetWorthBuilding(WATER_GAP_MIN_SHORE_FRACTION)).toBe(true);
+    expect(gapSheetWorthBuilding(0.25)).toBe(true);
   });
 
   it('attaches each gap to a zone that actually touches it', () => {

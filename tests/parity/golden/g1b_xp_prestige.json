@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 986,
-      "state": "0a154300",
+      "state": "9eb8b121",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -74,6 +74,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -150,7 +154,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 986,
-      "state": "eb552a9c",
+      "state": "987e4333",
       "events": "662b7fc6",
       "rng": {
         "draws": 0,
@@ -161,7 +165,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 986,
-      "state": "72d98e95",
+      "state": "c4f6a534",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -172,7 +176,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 986,
-      "state": "0cb02ecc",
+      "state": "8abc57b5",
       "events": "741638a5",
       "rng": {
         "draws": 149,
@@ -183,7 +187,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 986,
-      "state": "0cb02ecc",
+      "state": "8abc57b5",
       "events": "741638a5",
       "rng": {
         "draws": 149,
@@ -246,6 +250,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 5,
           "restedXp": 0.125,
           "talents": {
@@ -325,7 +333,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 986,
-      "state": "f49c29db",
+      "state": "347f054e",
       "events": "1d3cd258",
       "rng": {
         "draws": 149,
@@ -391,6 +399,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 5,
           "restedXp": 920,
           "talents": {
@@ -471,7 +483,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 986,
-      "state": "ba9d2a42",
+      "state": "5eb51655",
       "events": "7bf7d809",
       "rng": {
         "draws": 149,
@@ -538,6 +550,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 5,
           "restedXp": 920,
           "talents": {
@@ -618,7 +634,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 986,
-      "state": "c0a97124",
+      "state": "17965f77",
       "events": "ebf2e067",
       "rng": {
         "draws": 149,
@@ -685,6 +701,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 5,
           "restedXp": 920,
           "talents": {
@@ -765,7 +785,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 986,
-      "state": "8f9c7bad",
+      "state": "27c5f708",
       "events": "4114fffe",
       "rng": {
         "draws": 149,
@@ -833,6 +853,10 @@
           "nodeHarvestReadyAt": {},
           "prestigeRank": 1,
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 5,
           "restedXp": 920,
           "talents": {
@@ -912,7 +936,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 986,
-      "state": "8f9c7bad",
+      "state": "27c5f708",
       "events": "741638a5",
       "rng": {
         "draws": 149,
@@ -980,6 +1004,10 @@
           "nodeHarvestReadyAt": {},
           "prestigeRank": 1,
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 5,
           "restedXp": 920,
           "talents": {
@@ -1059,7 +1087,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 986,
-      "state": "8f9c7bad",
+      "state": "27c5f708",
       "events": "741638a5",
       "rng": {
         "draws": 149,
@@ -1127,6 +1155,10 @@
           "nodeHarvestReadyAt": {},
           "prestigeRank": 1,
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 5,
           "restedXp": 920,
           "talents": {

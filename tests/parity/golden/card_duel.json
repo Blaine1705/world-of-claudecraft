@@ -29,7 +29,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 987,
-      "state": "c65279bb",
+      "state": "fc56b9c1",
       "events": "3bc8e8e1",
       "rng": {
         "draws": 38,
@@ -40,7 +40,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 987,
-      "state": "6fbbf7b8",
+      "state": "8c113a52",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -51,7 +51,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 987,
-      "state": "5b181e1e",
+      "state": "d230d4f8",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -62,7 +62,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 987,
-      "state": "06a1c511",
+      "state": "e2f1fc4d",
       "events": "a31e12c3",
       "rng": {
         "draws": 38,
@@ -73,7 +73,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 987,
-      "state": "72c8fe2a",
+      "state": "fdbae026",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -84,7 +84,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 987,
-      "state": "7b9175c7",
+      "state": "0863933b",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -95,7 +95,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 987,
-      "state": "23bca137",
+      "state": "14b581ab",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -106,7 +106,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 987,
-      "state": "0010bfb6",
+      "state": "de73be62",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -117,7 +117,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 987,
-      "state": "35648237",
+      "state": "72600aab",
       "events": "741638a5",
       "rng": {
         "draws": 44,
@@ -176,6 +176,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -236,6 +240,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },

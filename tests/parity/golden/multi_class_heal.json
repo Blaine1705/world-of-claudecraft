@@ -34,8 +34,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 994,
-      "state": "59f0b5f5",
-      "events": "3a2b1848",
+      "state": "8b5a8a77",
+      "events": "b6800ccc",
       "rng": {
         "draws": 6,
         "digest": "8b798846"
@@ -93,6 +93,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -120,6 +124,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "spring_water",
               "training_mace"
@@ -130,7 +135,8 @@
           "entityId": 986,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "training_mace"
+            "mainhand": "training_mace",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "firstCharacter": true,
@@ -149,6 +155,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -205,6 +215,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -261,6 +275,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -314,6 +332,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -373,6 +395,8 @@
         {
           "aiState": "idle",
           "attackPower": 44,
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.0585,
@@ -380,16 +404,18 @@
           "dodgeChance": 0.0585,
           "fallStartY": 2.412139,
           "fiveSecondRule": 99,
-          "hp": 95,
+          "hp": 105,
           "id": 986,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 95,
+          "maxHp": 105,
           "maxResource": 93,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {},
           "petMode": "defensive",
           "pos": {
             "x": 3,
@@ -407,10 +433,10 @@
           "spellPower": 7,
           "stats": {
             "agi": 17,
-            "armor": 99,
+            "armor": 133,
             "int": 13,
             "spi": 14,
-            "sta": 22,
+            "sta": 23,
             "str": 22
           },
           "templateId": "paladin",
@@ -685,7 +711,7 @@
           "threat": [
             [
               985,
-              115.666667
+              117.333333
             ],
             [
               986,
@@ -745,7 +771,7 @@
           "threat": [
             [
               985,
-              115.666667
+              117.333333
             ],
             [
               986,
@@ -805,7 +831,7 @@
           "threat": [
             [
               985,
-              115.666667
+              117.333333
             ],
             [
               986,
@@ -832,7 +858,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 994,
-      "state": "1aae45fe",
+      "state": "f48115ec",
       "events": "3931026e",
       "rng": {
         "draws": 6,
@@ -891,6 +917,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -918,6 +948,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "spring_water",
               "training_mace"
@@ -928,7 +959,8 @@
           "entityId": 986,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "training_mace"
+            "mainhand": "training_mace",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "firstCharacter": true,
@@ -947,6 +979,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -1008,6 +1044,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -1064,6 +1104,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -1117,6 +1161,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -1176,6 +1224,8 @@
         {
           "aiState": "idle",
           "attackPower": 44,
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.0585,
@@ -1183,16 +1233,18 @@
           "dodgeChance": 0.0585,
           "fallStartY": 2.412139,
           "fiveSecondRule": 99,
-          "hp": 95,
+          "hp": 105,
           "id": 986,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 95,
+          "maxHp": 105,
           "maxResource": 93,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {},
           "petMode": "defensive",
           "pos": {
             "x": 3,
@@ -1210,10 +1262,10 @@
           "spellPower": 7,
           "stats": {
             "agi": 17,
-            "armor": 99,
+            "armor": 133,
             "int": 13,
             "spi": 14,
-            "sta": 22,
+            "sta": 23,
             "str": 22
           },
           "templateId": "paladin",
@@ -1506,7 +1558,7 @@
           "threat": [
             [
               985,
-              115.666667
+              117.333333
             ],
             [
               986,
@@ -1566,7 +1618,7 @@
           "threat": [
             [
               985,
-              115.666667
+              117.333333
             ],
             [
               986,
@@ -1626,7 +1678,7 @@
           "threat": [
             [
               985,
-              115.666667
+              117.333333
             ],
             [
               986,
@@ -1653,7 +1705,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 994,
-      "state": "2e38e20b",
+      "state": "3905af9c",
       "events": "6de528b5",
       "rng": {
         "draws": 10,
@@ -1664,7 +1716,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 994,
-      "state": "21d57600",
+      "state": "71c1d930",
       "events": "6de528b5",
       "rng": {
         "draws": 10,
@@ -1723,6 +1775,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -1750,6 +1806,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "spring_water",
               "training_mace"
@@ -1760,7 +1817,8 @@
           "entityId": 986,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "training_mace"
+            "mainhand": "training_mace",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "firstCharacter": true,
@@ -1779,6 +1837,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -1840,6 +1902,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -1896,6 +1962,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -1949,6 +2019,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -2008,6 +2082,8 @@
         {
           "aiState": "idle",
           "attackPower": 44,
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99.4,
           "comboUntil": -1,
           "critChance": 0.0585,
@@ -2015,16 +2091,20 @@
           "dodgeChance": 0.0585,
           "fallStartY": 2.412139,
           "fiveSecondRule": 99.4,
-          "hp": 95,
+          "hp": 105,
           "id": 986,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 95,
+          "maxHp": 105,
           "maxResource": 93,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {
+            "outOfCombatTime": 0.4
+          },
           "petMode": "defensive",
           "pos": {
             "x": 3,
@@ -2042,10 +2122,10 @@
           "spellPower": 7,
           "stats": {
             "agi": 17,
-            "armor": 99,
+            "armor": 133,
             "int": 13,
             "spi": 14,
-            "sta": 22,
+            "sta": 23,
             "str": 22
           },
           "templateId": "paladin",
@@ -2355,7 +2435,7 @@
           "threat": [
             [
               985,
-              115.666667
+              117.333333
             ],
             [
               986,
@@ -2416,7 +2496,7 @@
           "threat": [
             [
               985,
-              115.666667
+              117.333333
             ],
             [
               986,
@@ -2483,7 +2563,7 @@
           "threat": [
             [
               985,
-              115.666667
+              117.333333
             ],
             [
               986,

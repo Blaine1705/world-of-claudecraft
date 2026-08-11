@@ -18,7 +18,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 986,
-      "state": "0a154300",
+      "state": "9eb8b121",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -75,6 +75,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -151,7 +155,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 986,
-      "state": "5fc6163e",
+      "state": "1167beb1",
       "events": "30fc7f5c",
       "rng": {
         "draws": 2,
@@ -248,6 +252,10 @@
             "ore_mirefen_t2": 242.1
           },
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 15,
           "talents": {
             "rows": {}
@@ -328,7 +336,7 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 986,
-      "state": "a842c3eb",
+      "state": "9a201256",
       "events": "6587080d",
       "rng": {
         "draws": 4,
@@ -434,6 +442,10 @@
             "ore_mirefen_t2": 242.1
           },
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 15,
           "talents": {
             "rows": {}
@@ -514,7 +526,7 @@
       "tick": 157,
       "time": 7.85,
       "nextId": 986,
-      "state": "c4c99402",
+      "state": "5c498bf3",
       "events": "c729ebff",
       "rng": {
         "draws": 6,
@@ -630,6 +642,10 @@
             "ore_mirefen_t2": 242.1
           },
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 15,
           "talents": {
             "rows": {}
@@ -710,7 +726,7 @@
       "tick": 159,
       "time": 7.95,
       "nextId": 986,
-      "state": "4261ec09",
+      "state": "890892da",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -826,6 +842,10 @@
             "ore_mirefen_t2": 242.1
           },
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 15,
           "talents": {
             "rows": {}

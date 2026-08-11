@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 986,
-      "state": "2e551982",
+      "state": "ca874613",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -76,6 +76,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -139,7 +143,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 986,
-      "state": "5f964dd0",
+      "state": "58adc8b5",
       "events": "b7ed6c28",
       "rng": {
         "draws": 0,
@@ -150,7 +154,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 986,
-      "state": "68e7289e",
+      "state": "3733b72b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -161,7 +165,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 986,
-      "state": "dbf91841",
+      "state": "d8dbe41a",
       "events": "741638a5",
       "rng": {
         "draws": 146,
@@ -172,7 +176,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 986,
-      "state": "aad6e7e8",
+      "state": "7e932a4d",
       "events": "741638a5",
       "rng": {
         "draws": 335,
@@ -183,7 +187,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 987,
-      "state": "0dc310a0",
+      "state": "7621a0a5",
       "events": "54ba1ca7",
       "rng": {
         "draws": 487,
@@ -194,8 +198,8 @@
       "tick": 120,
       "time": 6,
       "nextId": 988,
-      "state": "e135547e",
-      "events": "d795971a",
+      "state": "d79c8b07",
+      "events": "d1df065b",
       "rng": {
         "draws": 677,
         "digest": "55e5f1d8"
@@ -205,7 +209,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 988,
-      "state": "8d5ea54b",
+      "state": "25b89850",
       "events": "eebbd538",
       "rng": {
         "draws": 902,
@@ -216,8 +220,8 @@
       "tick": 160,
       "time": 8,
       "nextId": 988,
-      "state": "2253d5f0",
-      "events": "626b35e1",
+      "state": "8a6e306f",
+      "events": "fcfd0b70",
       "rng": {
         "draws": 1146,
         "digest": "10363d4f"
@@ -227,7 +231,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 988,
-      "state": "c189ae8c",
+      "state": "231d415f",
       "events": "6fc54c96",
       "rng": {
         "draws": 1428,
@@ -238,8 +242,8 @@
       "tick": 200,
       "time": 10,
       "nextId": 988,
-      "state": "77642025",
-      "events": "b4b9eea2",
+      "state": "5b5bcc25",
+      "events": "13e94b19",
       "rng": {
         "draws": 1691,
         "digest": "4ab1c4e9"
@@ -249,7 +253,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 988,
-      "state": "0cd8a827",
+      "state": "ff79269f",
       "events": "d5eaa3f4",
       "rng": {
         "draws": 1858,
@@ -260,7 +264,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 988,
-      "state": "9b826398",
+      "state": "949eb39a",
       "events": "741638a5",
       "rng": {
         "draws": 1858,
@@ -343,6 +347,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -382,7 +390,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 845,
+          "resource": 863,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -428,6 +436,7 @@
           "onGround": true,
           "overpowerUntil": -1,
           "ownerId": 981,
+          "petAutoSkill": true,
           "petAutoTaunt": true,
           "petMode": "aggressive",
           "petTauntTimer": 10,
@@ -522,8 +531,8 @@
       "tick": 224,
       "time": 11.2,
       "nextId": 988,
-      "state": "781d7ba2",
-      "events": "f62e06c6",
+      "state": "fdfd4008",
+      "events": "819d89ed",
       "rng": {
         "draws": 1901,
         "digest": "08ad8635"
@@ -605,6 +614,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -644,7 +657,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 845,
+          "resource": 863,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -691,6 +704,7 @@
           "onGround": true,
           "overpowerUntil": -1,
           "ownerId": 981,
+          "petAutoSkill": true,
           "petAutoTaunt": true,
           "petMode": "aggressive",
           "petTauntTimer": 9.8,

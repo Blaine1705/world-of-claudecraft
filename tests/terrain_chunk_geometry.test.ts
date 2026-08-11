@@ -134,12 +134,17 @@ describe('generated chunk geometry is stable', () => {
     // height atlas (tests/terrain_height_parity.test.ts fixture, re-minted
     // in the same commit): the whole ten-node placement fix moves 146 of
     // its 140639 points, 0.1 percent, all inside the moved nodes' pad
-    // footprints. Re-minted again for the Proving Shore tutorial island:
-    // its provingCoast/provingMoat terrain appliers reshape the Vale's west
-    // strand, an intended visual change (digest stable across two runs).
-    expect(digestOf(inRect)).toBe('fa5474c3d8dd0f27a4c4e5220391cda5');
-    // The gap super-chunk digest pin is gone with the gap chunks themselves;
-    // gapFill.length above pins their absence.
+    // footprints. Re-minted again for the Proving Shore tutorial island
+    // (provingCoast/provingMoat reshape the Vale's west strand) and once more
+    // on the v0.37.0 merge, which added the northwest coast spit carve in
+    // applyValeCoast (the low beach shelf under the grey cliff foot submerged
+    // so the bay water meets the cliff; its window x -211.5..-132.5,
+    // z 116.5..145.5 straddles the rect edge into the island's cell, where it
+    // composes with the island appliers). Digest stable across two runs.
+    expect(digestOf(inRect)).toBe('b9545eede4635f3a131d625ccde8cf9a');
+    // The gap super-chunk digest pin is gone with the gap chunks themselves
+    // (the island claims the old vale gap cells); gapFill.length above pins
+    // their absence.
 
     terrain.cancelStreaming();
   });

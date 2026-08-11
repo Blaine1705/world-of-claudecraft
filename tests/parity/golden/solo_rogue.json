@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 986,
-      "state": "3649cf27",
+      "state": "e206e7d0",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -71,6 +71,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -143,8 +147,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 987,
-      "state": "58308458",
-      "events": "feea2a5c",
+      "state": "3f020979",
+      "events": "3a23a4ed",
       "rng": {
         "draws": 12,
         "digest": "f30c489f"
@@ -154,8 +158,8 @@
       "tick": 40,
       "time": 2,
       "nextId": 987,
-      "state": "d4d24893",
-      "events": "592c2d2d",
+      "state": "5f5dbe1c",
+      "events": "60806cd4",
       "rng": {
         "draws": 19,
         "digest": "d68c35cb"
@@ -165,7 +169,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 987,
-      "state": "f5760288",
+      "state": "4dc558f5",
       "events": "03f9dcd6",
       "rng": {
         "draws": 162,
@@ -176,7 +180,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 987,
-      "state": "e213dc42",
+      "state": "b37cdc4f",
       "events": "741638a5",
       "rng": {
         "draws": 249,
@@ -201,14 +205,14 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 106,
+            "damageDealt": 104,
             "damageTaken": 8
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
               "crits": 1,
-              "damageDealt": 106
+              "damageDealt": 104
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -256,6 +260,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -343,7 +351,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 8894,
+          "hp": 8896,
           "id": 986,
           "inCombat": true,
           "kind": "mob",
@@ -380,7 +388,7 @@
           "threat": [
             [
               981,
-              107
+              105
             ]
           ],
           "weapon": {
