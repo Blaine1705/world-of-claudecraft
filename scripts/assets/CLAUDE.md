@@ -71,11 +71,15 @@ For reference-image reconstruction and procedural GLB authoring, read the living
   as needed (the remint tool prints that follow-up path itself).
 - **`compress_standalone_textures.mjs`** (+ `lib/standalone_texture_compression_core.mjs`)
   is the KTX2/Basis step for textures that ship OUTSIDE a GLB (default sweep: the player
-  skin/cosmetic atlases under `public/textures/skins/`), the same decode-amplification win
-  as the GLB step. It emits a `.ktx2` SIBLING next to each PNG and never deletes the source:
-  the runtime opts in per directory (`loadSkinTexInto` in `src/render/characters/assets.ts`
-  requests the sibling only for `textures/skins/` atlases), and `base.png` thumbnail sources
-  are skipped. Run it after adding or repainting a standalone atlas.
+  skin/cosmetic atlases under `public/textures/skins/`, plus the terrain splat and
+  worn-surface detail sets), the same decode-amplification win as the GLB step. It emits a
+  `.ktx2` SIBLING next to each source and never deletes it: the runtime opts in per
+  consumer (`loadSkinTexInto` in `src/render/characters/assets.ts` for `textures/skins/`
+  atlases; `src/render/terrain.ts` and `src/render/worn_stone.ts` via `ktx2SiblingUrl` for
+  their linear maps, with the six splat COLOUR layers and `GroundAO_Packed.png` deliberately
+  excluded, see `tests/surface_texture_ktx2.test.ts`), and `base.png` thumbnail sources are
+  skipped. Run it after adding or repainting a standalone source, with `--flip` for
+  flipY-consumed sets.
 - **One-shot and maintenance tools**, each with its recipe in its own header: the zone prop
   bakes (`build_willowfen_props.mjs` and its `*_props.mjs` siblings: one-shot weld + bounded
   simplify recipes over maintainer-local source packs; copy the willowfen recipe for a new
