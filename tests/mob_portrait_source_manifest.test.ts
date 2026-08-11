@@ -60,13 +60,14 @@ interface PortraitSourceManifest {
 const digestPattern = /^[a-f0-9]{64}$/;
 
 describe('mob portrait source manifest', () => {
-  it('is byte-fresh against the live renderer, visual manifest, models, tints, and outputs', () => {
+  it('is fresh (or at worst a bookkeeping-only bundle drift) against the live renderer, visual manifest, models, tints, and outputs', () => {
     const result = spawnSync(process.execPath, [script, '--check'], {
       cwd: repoRoot,
       encoding: 'utf8',
       timeout: 30_000,
     });
     expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+    expect(result.stdout).toMatch(/is fresh/);
   });
 
   it('covers every live mob and records each render dependency with a content hash', () => {
@@ -257,6 +258,77 @@ describe('mob portrait source manifest', () => {
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as PortraitSourceManifest;
     expect(fromRepoRoot.stdout).toBe(manifest.rendererFingerprint);
   }, 150_000);
+
+  it('treats a bookkeeping-only renderer bundle drift as fresh instead of failing --check', () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'wocc-portrait-manifest-check-'));
+    try {
+      const current = JSON.parse(readFileSync(manifestPath, 'utf8')) as PortraitSourceManifest;
+      const bookkeepingDrifted = structuredClone(current);
+      bookkeepingDrifted.rendererFingerprint = 'stale-bookkeeping-fingerprint';
+      bookkeepingDrifted.renderer.browserBundle = {
+        ...bookkeepingDrifted.renderer.browserBundle,
+        sha256: 'stale-bookkeeping-bundle-hash',
+      };
+      const bookkeepingManifest = join(tempDir, 'bookkeeping.json');
+      writeFileSync(bookkeepingManifest, `${JSON.stringify(bookkeepingDrifted, null, 2)}\n`);
+
+      const bookkeepingResult = spawnSync(
+        process.execPath,
+        [script, '--check', '--manifest', bookkeepingManifest],
+        { cwd: repoRoot, encoding: 'utf8', timeout: 30_000 },
+      );
+      expect(
+        bookkeepingResult.status,
+        `${bookkeepingResult.stdout}\n${bookkeepingResult.stderr}`,
+      ).toBe(0);
+      expect(bookkeepingResult.stdout).toContain('bookkeeping-only');
+
+      const realDrift = structuredClone(bookkeepingDrifted);
+      realDrift.portraits[0] = {
+        ...realDrift.portraits[0],
+        output: { ...realDrift.portraits[0].output, sha256: 'a-real-changed-output-hash' },
+      };
+      const realDriftManifest = join(tempDir, 'real-drift.json');
+      writeFileSync(realDriftManifest, `${JSON.stringify(realDrift, null, 2)}\n`);
+
+      const realDriftResult = spawnSync(
+        process.execPath,
+        [script, '--check', '--manifest', realDriftManifest],
+        { cwd: repoRoot, encoding: 'utf8', timeout: 30_000 },
+      );
+      expect(realDriftResult.status).toBe(1);
+      expect(realDriftResult.stderr).toContain(realDrift.portraits[0].id);
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('never treats a missing or unparseable manifest as a bookkeeping-only drift', () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'wocc-portrait-manifest-missing-'));
+    try {
+      const missingManifest = join(tempDir, 'does-not-exist.json');
+      const missingResult = spawnSync(
+        process.execPath,
+        [script, '--check', '--manifest', missingManifest],
+        { cwd: repoRoot, encoding: 'utf8', timeout: 30_000 },
+      );
+      expect(missingResult.status).toBe(1);
+      expect(missingResult.stderr).toContain('is stale');
+      expect(missingResult.stdout).not.toContain('bookkeeping-only');
+
+      const unparseableManifest = join(tempDir, 'not-json.json');
+      writeFileSync(unparseableManifest, 'not valid json');
+      const unparseableResult = spawnSync(
+        process.execPath,
+        [script, '--check', '--manifest', unparseableManifest],
+        { cwd: repoRoot, encoding: 'utf8', timeout: 30_000 },
+      );
+      expect(unparseableResult.status).toBe(1);
+      expect(unparseableResult.stdout).not.toContain('bookkeeping-only');
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
 
   it('routes the real --write CLI through receipt authorization before touching its target', () => {
     const tempDir = mkdtempSync(join(tmpdir(), 'wocc-portrait-manifest-'));
