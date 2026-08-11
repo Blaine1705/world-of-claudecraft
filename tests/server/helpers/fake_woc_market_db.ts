@@ -45,11 +45,14 @@ export interface FakeWocMarketCharacter {
 type BidRec = WocBidRow & { realm: string };
 type SettlementRec = WocSettlementRow & { realm: string };
 
-const LIVE_SETTLEMENT_STATES: readonly WocSettlementState[] = [
+// Mirrors the woc_market_settlements_open partial unique index: 'delivered'
+// stays open until the listing row closes, so liveness checks keep seeing it.
+const OPEN_SETTLEMENT_STATES: readonly WocSettlementState[] = [
   'offered',
   'confirming',
   'confirmed',
   'delivering',
+  'delivered',
 ];
 
 export class FakeWocMarketDb implements WocMarketDb {
@@ -447,7 +450,16 @@ export class FakeWocMarketDb implements WocMarketDb {
     realm: string,
     id: number,
     sellerAccount: number,
-  ): Promise<WocListingRow | 'not_found' | 'not_yours' | 'has_bids' | 'not_active'> {
+    nowMs: number,
+  ): Promise<
+    | WocListingRow
+    | 'not_found'
+    | 'not_yours'
+    | 'has_bids'
+    | 'not_active'
+    | 'buy_now_pending'
+    | 'settlement_live'
+  > {
     const row = this.listings.get(id);
     if (!row || row.realm !== realm) return 'not_found';
     if (row.sellerAccount !== sellerAccount) return 'not_yours';
@@ -457,8 +469,78 @@ export class FakeWocMarketDb implements WocMarketDb {
         return 'has_bids';
       }
     }
+    if (
+      row.buyNowLockAccount !== null &&
+      row.buyNowLockExpiresMs !== null &&
+      row.buyNowLockExpiresMs > nowMs
+    ) {
+      return 'buy_now_pending';
+    }
+    // The Pg method expires 'failed' rows FIRST and rolls the expiry back via
+    // TxAbort when the open check trips (its ordering exists for row-lock
+    // serialization); single-threaded, check-then-expire is observably
+    // identical because 'failed' is disjoint from the open set.
+    for (const s of this.settlements.values()) {
+      if (s.listingId === id && OPEN_SETTLEMENT_STATES.includes(s.state)) {
+        return 'settlement_live';
+      }
+    }
+    // A leftover 'failed' settlement is expired with the close, so its retry
+    // arm cannot revive a payment against a cancelled listing.
+    for (const s of this.settlements.values()) {
+      if (s.listingId === id && s.state === 'failed') {
+        s.state = 'expired';
+        s.failReason = 'listing_cancelled';
+        this.touchSettlement(s.id);
+      }
+    }
     row.status = 'closed';
     row.resolution = 'cancelled';
+    this.touchListing(id);
+    return this.listingOut(row);
+  }
+
+  async suspendListingIfSafe(
+    realm: string,
+    id: number,
+    nowMs: number,
+  ): Promise<WocListingRow | 'not_found' | 'not_active' | 'buy_now_pending' | 'settlement_live'> {
+    const row = this.listings.get(id);
+    if (!row || row.realm !== realm) return 'not_found';
+    if (row.status === 'closed') return 'not_active';
+    if (
+      row.buyNowLockAccount !== null &&
+      row.buyNowLockExpiresMs !== null &&
+      row.buyNowLockExpiresMs > nowMs
+    ) {
+      return 'buy_now_pending';
+    }
+    for (const s of this.settlements.values()) {
+      if (
+        s.listingId === id &&
+        (s.state === 'confirming' ||
+          s.state === 'confirmed' ||
+          s.state === 'delivering' ||
+          s.state === 'delivered')
+      ) {
+        return 'settlement_live';
+      }
+    }
+    for (const s of this.settlements.values()) {
+      if (s.listingId === id && (s.state === 'offered' || s.state === 'failed')) {
+        s.state = 'expired';
+        s.failReason = 'listing_suspended';
+        this.touchSettlement(s.id);
+      }
+    }
+    for (const bid of this.bids.values()) {
+      if (bid.listingId === id && (bid.status === 'pending_bond' || bid.status === 'active')) {
+        bid.status = 'cancelled';
+        if (bid.bondState === 'held') bid.bondState = 'refund_due';
+      }
+    }
+    row.status = 'closed';
+    row.resolution = 'suspended';
     this.touchListing(id);
     return this.listingOut(row);
   }
@@ -809,11 +891,13 @@ export class FakeWocMarketDb implements WocMarketDb {
       .map((b) => this.bidOut(b));
   }
 
-  async promoteNextBidder(
+  async nextCascadeBidder(
     listingId: number,
     minCents: number,
     excludedAccounts: readonly number[],
   ): Promise<WocBidRow | null> {
+    // Selection only, like the Pg SELECT: the 'won' stamp rides the
+    // settlement insert (insertSettlement winnerBidId).
     const next = [...this.bids.values()]
       .filter(
         (bid) =>
@@ -826,13 +910,14 @@ export class FakeWocMarketDb implements WocMarketDb {
         (a, b) => b.amountCents - a.amountCents || a.placedAtMs - b.placedAtMs || a.id - b.id,
       )[0];
     if (!next) return null;
-    next.status = 'won';
     return this.bidOut(next);
   }
 
-  async markBidStatus(bidId: number, status: WocBidStatus): Promise<void> {
+  async markBidStatus(bidId: number, status: WocBidStatus, from?: WocBidStatus[]): Promise<void> {
     const bid = this.bids.get(bidId);
-    if (bid) bid.status = status;
+    if (!bid) return;
+    if (from && !from.includes(bid.status)) return;
+    bid.status = status;
   }
 
   async setBondState(bidId: number, from: WocBondState[], to: WocBondState): Promise<boolean> {
@@ -883,14 +968,34 @@ export class FakeWocMarketDb implements WocMarketDb {
     amountCents: number;
     deadlineAtMs: number;
     nowMs: number;
-  }): Promise<WocSettlementRow | 'live_settlement_exists'> {
-    const listing = this.listings.get(args.listingId);
-    // Pg mirrors: INSERT..SELECT from a missing listing inserts no row.
-    if (!listing) return 'live_settlement_exists';
-    for (const s of this.settlements.values()) {
-      if (s.listingId === args.listingId && LIVE_SETTLEMENT_STATES.includes(s.state)) {
+    winnerBidId?: number;
+  }): Promise<WocSettlementRow | 'live_settlement_exists' | 'listing_closed'> {
+    // Pg aborts before the INSERT when the named winner left the two pickable
+    // states (a concurrent suspend cancelled it): no settlement may exist
+    // whose winner holds no claim. Checked first, matching the Pg statement
+    // order.
+    if (args.winnerBidId !== undefined) {
+      const winner = this.bids.get(args.winnerBidId);
+      if (!winner || (winner.status !== 'active' && winner.status !== 'outbid')) {
         return 'live_settlement_exists';
       }
+    }
+    const listing = this.listings.get(args.listingId);
+    // Pg mirrors: INSERT..SELECT from a missing listing inserts no row; a
+    // CLOSED listing gets its own value (the guard that stops a cascade
+    // insert landing on a listing an admin suspend just closed).
+    if (!listing) return 'live_settlement_exists';
+    if (listing.status === 'closed') return 'listing_closed';
+    for (const s of this.settlements.values()) {
+      if (s.listingId === args.listingId && OPEN_SETTLEMENT_STATES.includes(s.state)) {
+        // The Pg transaction rolls the winner stamp back with the insert, so
+        // the fake refuses BEFORE touching the bid: same observable order.
+        return 'live_settlement_exists';
+      }
+    }
+    if (args.winnerBidId !== undefined) {
+      const winner = this.bids.get(args.winnerBidId);
+      if (winner) winner.status = 'won';
     }
     const id = this.nextSettlementId++;
     const rec: SettlementRec = {
@@ -937,7 +1042,7 @@ export class FakeWocMarketDb implements WocMarketDb {
 
   async liveSettlementForListing(listingId: number): Promise<WocSettlementRow | null> {
     for (const s of this.settlements.values()) {
-      if (s.listingId === listingId && LIVE_SETTLEMENT_STATES.includes(s.state)) {
+      if (s.listingId === listingId && OPEN_SETTLEMENT_STATES.includes(s.state)) {
         return this.settlementOut(s);
       }
     }
@@ -1041,6 +1146,18 @@ export class FakeWocMarketDb implements WocMarketDb {
   // -------------------------------------------------------------------------
 
   async insertSale(args: Omit<WocSaleRow, 'id' | 'excluded' | 'atMs'>): Promise<number> {
+    // woc_market_sales_listing_once: one non-excluded sale row per listing,
+    // surfaced as the same pg error shape the real INSERT throws.
+    for (const sale of this.sales.values()) {
+      if (sale.listingId === args.listingId && !sale.excluded) {
+        throw Object.assign(
+          new Error(
+            'duplicate key value violates unique constraint "woc_market_sales_listing_once"',
+          ),
+          { code: '23505' },
+        );
+      }
+    }
     const id = this.nextSaleId++;
     const row: WocSaleRow = {
       ...structuredClone(args),
@@ -1063,6 +1180,13 @@ export class FakeWocMarketDb implements WocMarketDb {
   async setSaleExcluded(id: number, excluded: boolean): Promise<boolean> {
     const row = this.sales.get(id);
     if (!row) return false;
+    if (!excluded) {
+      // woc_market_sales_listing_once: re-including while another non-excluded
+      // row stands for the listing refuses (Pg catches its 23505 to false).
+      for (const other of this.sales.values()) {
+        if (other.id !== id && other.listingId === row.listingId && !other.excluded) return false;
+      }
+    }
     row.excluded = excluded;
     return true;
   }

@@ -119,7 +119,7 @@ describe('the refusal-to-wire mapping', () => {
     const rows = Object.entries(REFUSAL_ERRORS);
     // The EXACT count, not a floor. A floor of 35 let four union members vanish
     // silently; tsc catches a deleted Record key but not a shrunken union.
-    expect(rows).toHaveLength(41);
+    expect(rows).toHaveLength(42);
     for (const [reason, mapped] of rows) {
       expect(mapped.code, reason).toMatch(/^woc_market\./);
       expect(mapped.status, reason).toBeGreaterThanOrEqual(400);
@@ -156,6 +156,10 @@ describe('the refusal-to-wire mapping', () => {
     ['not_pending', 409, 'woc_market.not_pending'],
     ['confirm_failed', 409, 'woc_market.confirm_failed'],
     ['buy_now_locked', 409, 'woc_market.buy_now_locked'],
+    // A payment is in flight (buy-now lock claimed or a settlement past
+    // 'offered'): the state resolves on its own, so 409 says retry, and the
+    // seller learns nothing about the buyer beyond "a payment exists".
+    ['settlement_in_flight', 409, 'woc_market.settlement_in_flight'],
     ['cap_reached', 409, 'woc_market.cap_reached'],
     ['signature_reused', 409, 'woc_market.signature_reused'],
     // Bad input the client should have caught.
@@ -259,6 +263,39 @@ describe('the refusal-to-wire mapping', () => {
     await expect(
       handlerFor('POST', '/api/woc-market/listings/:id/cancel')(ctx),
     ).rejects.toMatchObject({ status: 409, code: 'woc_market.stale_item' });
+  });
+
+  it('the admin suspend handler answers settlement-in-flight as 409, other misses as 404', async () => {
+    // 'adminTargetId' is the require_admin middleware's private state key; the
+    // literal doubles as a pin on that contract.
+    service({
+      adminSuspendListing: async () => ({ ok: false, reason: 'settlement_in_flight' }),
+    });
+    const blockedCtx = fakeCtx({
+      method: 'POST',
+      url: '/admin/api/woc-market/listings/41/suspend',
+      params: { id: '41' },
+    });
+    blockedCtx.state.set('adminTargetId', 41);
+    await handlerFor('POST', '/admin/api/woc-market/listings/:id/suspend')(blockedCtx);
+    const blocked = sent(blockedCtx);
+    expect(blocked.status).toBe(409);
+    expect(blocked.body).toEqual({
+      success: false,
+      data: null,
+      error: 'a payment for this listing is settling; retry once it resolves',
+    });
+    service({ adminSuspendListing: async () => ({ ok: false, reason: 'not_found' }) });
+    const missCtx = fakeCtx({
+      method: 'POST',
+      url: '/admin/api/woc-market/listings/41/suspend',
+      params: { id: '41' },
+    });
+    missCtx.state.set('adminTargetId', 41);
+    await handlerFor('POST', '/admin/api/woc-market/listings/:id/suspend')(missCtx);
+    const miss = sent(missCtx);
+    expect(miss.status).toBe(404);
+    expect(miss.body.error).toBe('listing not found or closed');
   });
 });
 

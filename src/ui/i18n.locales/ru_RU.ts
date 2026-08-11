@@ -8723,6 +8723,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Не удалось подтвердить транзакцию. Запросите новую котировку и повторите попытку.',
   'apiError.woc_market.buy_now_locked':
     'Другой покупатель завершает эту покупку. Попробуйте чуть позже.',
+  'apiError.woc_market.settlement_in_flight':
+    'Покупатель оплачивает этот лот. Повторите попытку, когда платёж завершится.',
   'apiError.woc_market.no_buy_now': 'У этого лота нет цены мгновенной покупки.',
   'apiError.woc_market.cap_reached': 'Вы достигли лимита лотов на бирже.',
   'apiError.woc_market.stale_item':

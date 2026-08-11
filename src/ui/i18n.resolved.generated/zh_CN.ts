@@ -4135,6 +4135,7 @@ export const zh_CN: EnTranslations = {
       "not_pending": "该出价已不在等待保证金的状态。",
       "confirm_failed": "交易未能确认。请重新获取报价后再试。",
       "buy_now_locked": "另一位买家正在完成这笔购买，请稍后再试。",
+      "settlement_in_flight": "有买家正在为该挂单付款。请等付款结算完成后再试。",
       "no_buy_now": "该挂单没有一口价。",
       "cap_reached": "你已达到交易所挂单数量上限。",
       "stale_item": "该物品已变动或被移动。请重新选择后再试。",

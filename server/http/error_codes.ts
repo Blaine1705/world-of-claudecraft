@@ -281,6 +281,9 @@ export const ERROR_CODES = deepFreeze({
   'woc_market.confirm_failed': { params: [] },
   // Another buyer holds the short buy-now lock on this listing (409).
   'woc_market.buy_now_locked': { params: [] },
+  // A buyer's payment for this listing is past the point of no return;
+  // cancel/suspend must wait for it to resolve (409).
+  'woc_market.settlement_in_flight': { params: [] },
   // The listing has no buy-now price (400).
   'woc_market.no_buy_now': { params: [] },
   // The per-account active-listing cap is reached (409).

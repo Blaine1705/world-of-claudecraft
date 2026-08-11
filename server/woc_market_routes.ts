@@ -137,6 +137,7 @@ export const REFUSAL_ERRORS: Record<WocMarketRefusal, { status: number; code: Er
   not_pending: { status: 409, code: 'woc_market.not_pending' },
   confirm_failed: { status: 409, code: 'woc_market.confirm_failed' },
   buy_now_locked: { status: 409, code: 'woc_market.buy_now_locked' },
+  settlement_in_flight: { status: 409, code: 'woc_market.settlement_in_flight' },
   no_buy_now: { status: 400, code: 'woc_market.no_buy_now' },
   cap_reached: { status: 409, code: 'woc_market.cap_reached' },
   lease_lost: { status: 409, code: 'woc_market.stale_item' },
@@ -586,6 +587,14 @@ async function adminListingsHandler(ctx: Ctx): Promise<void> {
 async function adminSuspendListingHandler(ctx: Ctx): Promise<void> {
   const out = await useService().adminSuspendListing(adminTargetId(ctx));
   if (!out.ok) {
+    if (out.reason === 'settlement_in_flight') {
+      json(ctx.res, 409, {
+        success: false,
+        data: null,
+        error: 'a payment for this listing is settling; retry once it resolves',
+      });
+      return;
+    }
     json(ctx.res, 404, { success: false, data: null, error: 'listing not found or closed' });
     return;
   }

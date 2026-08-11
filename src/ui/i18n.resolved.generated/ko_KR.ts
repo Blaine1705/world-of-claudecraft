@@ -4135,6 +4135,7 @@ export const ko_KR: EnTranslations = {
       "not_pending": "해당 입찰은 더 이상 보증금을 기다리는 상태가 아닙니다.",
       "confirm_failed": "트랜잭션을 확인할 수 없습니다. 새 견적을 받아 다시 시도하세요.",
       "buy_now_locked": "다른 구매자가 이 구매를 진행 중입니다. 잠시 후 다시 시도하세요.",
+      "settlement_in_flight": "구매자가 이 등록의 대금을 결제하는 중입니다. 결제가 완료된 후 다시 시도하세요.",
       "no_buy_now": "이 등록에는 즉시 구매가가 없습니다.",
       "cap_reached": "거래소 등록 한도에 도달했습니다.",
       "stale_item": "해당 아이템이 변경되었거나 이동했습니다. 다시 선택한 뒤 시도하세요.",

@@ -8219,6 +8219,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.not_pending': '該出價已不在等待保證金的狀態。',
   'apiError.woc_market.confirm_failed': '交易未能確認。請重新取得報價後再試。',
   'apiError.woc_market.buy_now_locked': '另一位買家正在完成這筆購買，請稍後再試。',
+  'apiError.woc_market.settlement_in_flight': '有買家正在為該掛單付款。請等付款結算完成後再試。',
   'apiError.woc_market.no_buy_now': '該掛單沒有直購價。',
   'apiError.woc_market.cap_reached': '你已達到交易所掛單數量上限。',
   'apiError.woc_market.stale_item': '該物品已變動或被移動。請重新選擇後再試。',

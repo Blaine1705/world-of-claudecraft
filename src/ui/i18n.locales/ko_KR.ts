@@ -8575,6 +8575,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '트랜잭션을 확인할 수 없습니다. 새 견적을 받아 다시 시도하세요.',
   'apiError.woc_market.buy_now_locked':
     '다른 구매자가 이 구매를 진행 중입니다. 잠시 후 다시 시도하세요.',
+  'apiError.woc_market.settlement_in_flight':
+    '구매자가 이 등록의 대금을 결제하는 중입니다. 결제가 완료된 후 다시 시도하세요.',
   'apiError.woc_market.no_buy_now': '이 등록에는 즉시 구매가가 없습니다.',
   'apiError.woc_market.cap_reached': '거래소 등록 한도에 도달했습니다.',
   'apiError.woc_market.stale_item':

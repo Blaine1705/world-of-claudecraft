@@ -200,6 +200,7 @@ export type TranslationKeyFlat =
   | 'apiError.woc_market.quote_unavailable'
   | 'apiError.woc_market.recipient_wallet_required'
   | 'apiError.woc_market.self_offer'
+  | 'apiError.woc_market.settlement_in_flight'
   | 'apiError.woc_market.signature_reused'
   | 'apiError.woc_market.stale_item'
   | 'apiError.woc_market.suspended'

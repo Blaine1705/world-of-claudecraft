@@ -81,6 +81,7 @@ const EXPECTED_CODES = [
   'woc_market.wallet_required',
   'woc_market.recipient_wallet_required',
   'woc_market.self_offer',
+  'woc_market.settlement_in_flight',
   'woc_market.offer_expired',
   'woc_market.terms_required',
   'woc_market.totp_required',

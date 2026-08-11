@@ -557,6 +557,47 @@ describe('cancelListing', () => {
     expect(h.custody.parcels).toHaveLength(0);
   });
 
+  it('refuses while a buy-now payment is in flight and never mails the copy home', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+    const buy = unwrap(
+      await h.service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    // Inside the lock window the lock itself refuses the cancel.
+    expect(await h.service.cancelListing(SELLER, listing.id)).toEqual({
+      ok: false,
+      reason: 'buy_now_locked',
+    });
+    // The buyer signs, then the lock expires with the payment still settling.
+    // This is the dupe shape the guard exists for: the old cancel mailed the
+    // copy home here while the broadcast payment went on to deliver it too.
+    expect(await h.db.submitSettlementSignature(buy.settlement.id, 'sig-cancel-race')).toBe('ok');
+    h.setNow(BASE_MS + WOC_MARKET_BUY_NOW_LOCK_SECONDS * 1000 + 1);
+    expect(await h.service.cancelListing(SELLER, listing.id)).toEqual({
+      ok: false,
+      reason: 'settlement_in_flight',
+    });
+    // Delivered-but-unclosed is still in flight: the listing row has not
+    // resolved, so the cancel keeps refusing rather than re-opening custody.
+    await h.db.transitionSettlement(buy.settlement.id, ['confirming'], 'confirmed');
+    await h.db.transitionSettlement(buy.settlement.id, ['confirmed'], 'delivering');
+    await h.db.transitionSettlement(buy.settlement.id, ['delivering'], 'delivered');
+    expect(await h.service.cancelListing(SELLER, listing.id)).toEqual({
+      ok: false,
+      reason: 'settlement_in_flight',
+    });
+    const row = await getListing(h, listing.id);
+    expect(row.status).toBe('active');
+    expect(row.itemDisposed).toBe(false);
+    expect(h.custody.parcels).toHaveLength(0);
+  });
+
   it('refuses not_active on a second cancel and books no second return', async () => {
     const h = makeHarness();
     const listing = await listEpic(h);
@@ -1306,6 +1347,61 @@ describe('sweep close', () => {
     // The copy stays in escrow while the settlement is live.
     expect(h.custody.parcels).toHaveLength(0);
   });
+
+  it('a buy-now landing just before the close wins it: bid outbid, bond refunded, one settlement', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h, { format: 'auction_buy_now', buyNowCents: 8000 });
+    const standing = await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    // The buy-now lands one second before the hammer falls, so its settlement
+    // is live (and not yet overdue) when the close arm reaches the listing.
+    h.setNow(listing.endsAtMs - 1000);
+    const buy = unwrap(
+      await h.service.buyNow({
+        account: BUYER_C,
+        characterId: CHAR_C,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    h.setNow(listing.endsAtMs + 1);
+    await h.service.sweepPass();
+    // Exactly one winner. The standing bid never sits 'won' with no settlement
+    // behind it, and its bond rides the refund pipeline inside the same pass.
+    const bid = await getBid(h, standing.bidId);
+    expect(bid.status).toBe('outbid');
+    expect(bid.bondState).toBe('refunded');
+    const settlement = await liveSettlement(h, listing.id);
+    expect(settlement?.id).toBe(buy.settlement.id);
+    expect((await getListing(h, listing.id)).status).toBe('settling');
+  });
+
+  it('the close race queues the loser bond as refund_due even when the refund cannot settle yet', async () => {
+    const h = makeHarness();
+    // A refund pipeline that cannot finish (chain RPC down) must still show
+    // the close arm's own stamp: the queue entry, not the terminal state.
+    const stalledRefunds = new WocMarketService({
+      ...h.deps,
+      economy: { ...h.economy, refundBond: async () => ({ done: false, reason: 'rpc_down' }) },
+    });
+    const listing = await listEpic(h, { format: 'auction_buy_now', buyNowCents: 8000 });
+    const standing = await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    h.setNow(listing.endsAtMs - 1000);
+    unwrap(
+      await stalledRefunds.buyNow({
+        account: BUYER_C,
+        characterId: CHAR_C,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    h.setNow(listing.endsAtMs + 1);
+    await stalledRefunds.sweepPass();
+    const bid = await getBid(h, standing.bidId);
+    expect(bid.status).toBe('outbid');
+    expect(bid.bondState).toBe('refund_due');
+  });
 });
 
 describe('a bond payment awaiting finality', () => {
@@ -1956,6 +2052,29 @@ describe('adminSuspendListing', () => {
       'buyNow',
     );
 
+    // While the buy-now lock is unexpired a payment may be mid-flight, so the
+    // suspend takes the safe path: refuse and change nothing.
+    const blocked = await h.service.adminSuspendListing(listing.id);
+    expect(blocked).toEqual({ ok: false, reason: 'settlement_in_flight' });
+    expect((await getListing(h, listing.id)).status).toBe('active');
+    expect((await getBid(h, standing.bidId)).status).toBe('active');
+    expect((await getSettlement(h, buy.settlement.id)).state).toBe('offered');
+
+    // Past the lock window with a SIGNED payment still confirming, the other
+    // guard arm takes over: the broadcast may still land, so the suspend
+    // keeps refusing and still changes nothing.
+    expect(await h.db.submitSettlementSignature(buy.settlement.id, 'sig-suspend-race')).toBe('ok');
+    h.setNow(BASE_MS + WOC_MARKET_BUY_NOW_LOCK_SECONDS * 1000 + 1);
+    const confirming = await h.service.adminSuspendListing(listing.id);
+    expect(confirming).toEqual({ ok: false, reason: 'settlement_in_flight' });
+    expect((await getSettlement(h, buy.settlement.id)).state).toBe('confirming');
+    expect((await getBid(h, standing.bidId)).status).toBe('active');
+
+    // The chain refuses the payment: a 'failed' settlement has nothing in
+    // flight any more, which the suspend may safely expire.
+    expect(
+      await h.db.transitionSettlement(buy.settlement.id, ['confirming'], 'failed', 'refused'),
+    ).toBe(true);
     const out = await h.service.adminSuspendListing(listing.id);
     expect(out).toEqual({ ok: true });
     const bid = await getBid(h, standing.bidId);
