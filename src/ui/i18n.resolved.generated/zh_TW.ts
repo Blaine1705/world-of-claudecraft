@@ -9367,12 +9367,12 @@ export const zh_TW: EnTranslations = {
         "description": "用沉鉛之毒攻擊目標，造成 {damage} 點自然傷害，並使其移動速度降低 50%，持續 12 秒。"
       },
       "melting_acid": {
-        "name": "Melting Acid",
-        "description": "Splashes the target with a caustic poison, dealing {damage} Nature damage and reducing its armor by 5% for 12 sec."
+        "name": "熔蝕之酸",
+        "description": "以腐蝕性毒液潑灑目標，造成 {damage} 點自然傷害，並使其護甲降低 5%，持續 12 秒。"
       },
       "nightshade_coating": {
-        "name": "Nightshade Coating",
-        "description": "Coats the target in nightshade, dealing {damage} Nature damage and reducing the healing it receives by 25% for 12 sec."
+        "name": "夜影塗層",
+        "description": "為目標塗上夜影之毒，造成 {damage} 點自然傷害，並使其受到的治療降低 25%，持續 12 秒。"
       },
       "expose_armor": {
         "name": "裂甲",

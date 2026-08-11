@@ -9367,12 +9367,12 @@ export const ko_KR: EnTranslations = {
         "description": "둔중한 독으로 대상을 가격해 {damage}의 자연 피해를 입히고 12초 동안 이동 속도를 50%만큼 감소시킵니다."
       },
       "melting_acid": {
-        "name": "Melting Acid",
-        "description": "Splashes the target with a caustic poison, dealing {damage} Nature damage and reducing its armor by 5% for 12 sec."
+        "name": "녹이는 산",
+        "description": "대상에게 부식성 독을 끼얹어 {damage}의 자연 피해를 입히고 12초 동안 방어도를 5% 감소시킵니다."
       },
       "nightshade_coating": {
-        "name": "Nightshade Coating",
-        "description": "Coats the target in nightshade, dealing {damage} Nature damage and reducing the healing it receives by 25% for 12 sec."
+        "name": "밤그늘 도포",
+        "description": "대상에게 밤그늘 독을 발라 {damage}의 자연 피해를 입히고 12초 동안 받는 치유량을 25% 감소시킵니다."
       },
       "expose_armor": {
         "name": "방어구 돌파",

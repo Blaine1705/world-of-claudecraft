@@ -146,12 +146,13 @@ describe('spec masteries', () => {
         { ability: 'crippling_poison', dmgPct: 0.1 },
       ],
     });
-    // Balance pass: tuned down plus the Duskveil stealth-speed identity.
+    // Balance pass: tuned down plus the Duskveil stealth-speed identity, now the
+    // full removal of the stealth slow (buffPct 1 doubles the 0.5 aura to 1.0).
     expect(TALENTS.rogue?.specs.find((s) => s.id === 'subtlety')?.mastery.effect).toEqual({
       global: { critDmgPhysPct: 0.25 },
       ability: [
-        { ability: 'stealth', buffPct: 0.5 },
-        { ability: 'vanish', buffPct: 0.5 },
+        { ability: 'stealth', buffPct: 1 },
+        { ability: 'vanish', buffPct: 1 },
       ],
     });
     expect(TALENTS.priest?.specs.find((s) => s.id === 'holy')?.mastery.effect).toEqual({

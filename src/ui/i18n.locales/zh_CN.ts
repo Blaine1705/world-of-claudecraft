@@ -2789,6 +2789,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crippling_poison.name': '沉铅毒液',
   'entities.abilities.crippling_poison.description':
     '以沉铅毒液打击目标，造成 {damage} 点自然伤害，并使其移动速度降低 50%，持续 12 秒。',
+  'entities.abilities.melting_acid.name': '熔蚀之酸',
+  'entities.abilities.melting_acid.description':
+    '以腐蚀性毒液泼洒目标，造成 {damage} 点自然伤害，并使其护甲降低 5%，持续 12 秒。',
+  'entities.abilities.nightshade_coating.name': '夜影涂层',
+  'entities.abilities.nightshade_coating.description':
+    '为目标涂上夜影毒，造成 {damage} 点自然伤害，并使其受到的治疗降低 25%，持续 12 秒。',
   'entities.abilities.expose_armor.name': '护甲突破',
   'entities.abilities.expose_armor.description': '终结技，破开目标的防护 30 秒：每消耗 1 点连击点使其护甲降低 2%（5 点连击点：{damage}%）。',
   'entities.abilities.rupture.name': '血流不止',

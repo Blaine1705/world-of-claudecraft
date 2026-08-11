@@ -9367,12 +9367,12 @@ export const ru_RU: EnTranslations = {
         "description": "Поражает цель свинцовым ядом, нанося {damage} ед. урона от сил природы и замедляя ее скорость передвижения на 50% на 12 сек."
       },
       "melting_acid": {
-        "name": "Melting Acid",
-        "description": "Splashes the target with a caustic poison, dealing {damage} Nature damage and reducing its armor by 5% for 12 sec."
+        "name": "Разъедающая кислота",
+        "description": "Обливает цель едким ядом, нанося {damage} ед. урона от сил природы и снижая ее броню на 5% на 12 сек."
       },
       "nightshade_coating": {
-        "name": "Nightshade Coating",
-        "description": "Coats the target in nightshade, dealing {damage} Nature damage and reducing the healing it receives by 25% for 12 sec."
+        "name": "Паслёновая обмазка",
+        "description": "Покрывает цель паслёновым ядом, нанося {damage} ед. урона от сил природы и снижая получаемое ею исцеление на 25% на 12 сек."
       },
       "expose_armor": {
         "name": "Пролом брони",

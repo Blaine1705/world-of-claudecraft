@@ -9367,12 +9367,12 @@ export const ja_JP: EnTranslations = {
         "description": "対象を鉛の毒で攻撃し、{damage}の自然ダメージを与えるとともに、12秒間、移動速度を50%低下させます。"
       },
       "melting_acid": {
-        "name": "Melting Acid",
-        "description": "Splashes the target with a caustic poison, dealing {damage} Nature damage and reducing its armor by 5% for 12 sec."
+        "name": "融解の酸",
+        "description": "対象に腐食性の毒を浴びせ、{damage}の自然ダメージを与えるとともに、12秒間、防御力を5%低下させます。"
       },
       "nightshade_coating": {
-        "name": "Nightshade Coating",
-        "description": "Coats the target in nightshade, dealing {damage} Nature damage and reducing the healing it receives by 25% for 12 sec."
+        "name": "ナイトシェードの塗毒",
+        "description": "対象をナイトシェードの毒で覆い、{damage}の自然ダメージを与えるとともに、12秒間、受ける治癒量を25%低下させます。"
       },
       "expose_armor": {
         "name": "装甲破り",

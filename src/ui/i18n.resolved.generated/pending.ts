@@ -52,30 +52,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.nightshade_coating.description",
     "entities.abilities.nightshade_coating.name"
   ],
-  "zh_CN": [
-    "entities.abilities.melting_acid.description",
-    "entities.abilities.melting_acid.name",
-    "entities.abilities.nightshade_coating.description",
-    "entities.abilities.nightshade_coating.name"
-  ],
-  "zh_TW": [
-    "entities.abilities.melting_acid.description",
-    "entities.abilities.melting_acid.name",
-    "entities.abilities.nightshade_coating.description",
-    "entities.abilities.nightshade_coating.name"
-  ],
-  "ko_KR": [
-    "entities.abilities.melting_acid.description",
-    "entities.abilities.melting_acid.name",
-    "entities.abilities.nightshade_coating.description",
-    "entities.abilities.nightshade_coating.name"
-  ],
-  "ja_JP": [
-    "entities.abilities.melting_acid.description",
-    "entities.abilities.melting_acid.name",
-    "entities.abilities.nightshade_coating.description",
-    "entities.abilities.nightshade_coating.name"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "abilityUi.tooltip.anyTarget",
     "entities.abilities.melting_acid.description",
@@ -83,12 +63,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.nightshade_coating.description",
     "entities.abilities.nightshade_coating.name"
   ],
-  "ru_RU": [
-    "entities.abilities.melting_acid.description",
-    "entities.abilities.melting_acid.name",
-    "entities.abilities.nightshade_coating.description",
-    "entities.abilities.nightshade_coating.name"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "abilityUi.tooltip.anyTarget",
     "entities.abilities.melting_acid.description",

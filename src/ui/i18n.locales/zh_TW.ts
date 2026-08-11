@@ -2791,6 +2791,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crippling_poison.name': '沉鉛之毒',
   'entities.abilities.crippling_poison.description':
     '用沉鉛之毒攻擊目標，造成 {damage} 點自然傷害，並使其移動速度降低 50%，持續 12 秒。',
+  'entities.abilities.melting_acid.name': '熔蝕之酸',
+  'entities.abilities.melting_acid.description':
+    '以腐蝕性毒液潑灑目標，造成 {damage} 點自然傷害，並使其護甲降低 5%，持續 12 秒。',
+  'entities.abilities.nightshade_coating.name': '夜影塗層',
+  'entities.abilities.nightshade_coating.description':
+    '為目標塗上夜影之毒，造成 {damage} 點自然傷害，並使其受到的治療降低 25%，持續 12 秒。',
   'entities.abilities.expose_armor.name': '裂甲',
   'entities.abilities.expose_armor.description': '終結技，破開目標的防護 30 秒：每消耗 1 點連擊點使其護甲降低 2%（5 點連擊點：{damage}%）。',
   'entities.abilities.rupture.name': '血竭',
