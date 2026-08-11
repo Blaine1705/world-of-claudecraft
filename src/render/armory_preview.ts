@@ -517,14 +517,16 @@ export function createArmoryPreview(
     setAppearance(next: PreviewAppearance): void {
       if (disposed) return;
       if (prewarming) {
-        (pendingSelection ??= {}).appearance = next;
+        pendingSelection ??= {};
+        pendingSelection.appearance = next;
         return;
       }
       applyAppearance(next);
     },
     setSkin(next: string | null): void {
       if (prewarming) {
-        (pendingSelection ??= {}).skin = next;
+        pendingSelection ??= {};
+        pendingSelection.skin = next;
         return;
       }
       selectSkin(next);
@@ -532,7 +534,8 @@ export function createArmoryPreview(
     setMode(next: ArmoryPreviewMode): void {
       if (disposed) return;
       if (prewarming) {
-        (pendingSelection ??= {}).mode = next;
+        pendingSelection ??= {};
+        pendingSelection.mode = next;
         return;
       }
       if (next === mode) return;
@@ -542,7 +545,8 @@ export function createArmoryPreview(
     setScene(next: ArmorySceneKey): void {
       if (disposed) return;
       if (prewarming) {
-        (pendingSelection ??= {}).scene = next;
+        pendingSelection ??= {};
+        pendingSelection.scene = next;
         return;
       }
       if (next === sceneKey) return;
