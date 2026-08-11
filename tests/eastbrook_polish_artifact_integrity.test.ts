@@ -705,10 +705,17 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // with the release branch's renderer changes. Both parents move renderer.ts,
 // so the rendererIntegration leaf mints a value matching neither parent. No
 // capture was retaken.
+// Re-minted for the Three.js audit batch (light budget seam, blob shadows, sky
+// residency lane, splat colour pack-source fix): renderer.ts edits only. No
+// capture was retaken.
+// Re-minted for the base sync of the Three.js audit batch with the release
+// branch renderer changes. Both parents move renderer.ts, so the
+// rendererIntegration leaf mints a value matching neither parent. No capture
+// was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'cbba555285eb22afffd4c374471ced7e177bd44562ba07ba75fccba1d04b2c8c';
+  '95659e93c3c338d0092dbd3647616b6b2763be7218d5d14dc8d14bdfa68303f9';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'f3b9128b62c53f320d9083e9a7b6f08b6adbf6ad9671307abb0feed4500a3684';
+  '1266e3fb7edd82ad34aebf60956591e40c51ea904e0f62ef88e21b7e21b02f83';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1646,10 +1653,19 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // with the release branch's renderer changes. The first-order composite
     // follows the merged renderer.ts bytes, then this second-order performance
     // seal follows the swept evidence bytes. No capture was retaken.
+    // Re-minted for the Three.js audit batch (light budget seam, blob
+    // shadows, sky residency lane, splat colour pack-source fix): the
+    // first-order composite follows renderer.ts, then this second-order
+    // performance seal follows the swept evidence bytes. No capture was
+    // retaken.
+    // Re-pinned for the base sync of the Three.js audit batch with the release
+    // branch renderer changes. The first-order composite follows the merged
+    // renderer.ts bytes, then this second-order performance seal follows the
+    // swept evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('a1be8c50d284aa4b486e81f50e254c6023536335c93963646a65fb007c0e04f4');
+    ).toBe('dbd7ef61db5550eac3a9c48b0606c67ca8ffae8ee35b1c71b089e7e3933057d3');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

@@ -127,8 +127,15 @@ interface AttributionTargetFixture {
 // with the release branch's renderer changes. Both parents move renderer.ts,
 // so the rendererIntegration leaf mints a value matching neither parent. No
 // capture was retaken.
+// Re-minted for the Three.js audit batch (light budget seam, blob shadows, sky
+// residency lane, splat colour pack-source fix): renderer.ts edits only. No
+// capture was retaken.
+// Re-minted for the base sync of the Three.js audit batch with the release
+// branch renderer changes. Both parents move renderer.ts, so the
+// rendererIntegration leaf mints a value matching neither parent. No capture
+// was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'f3b9128b62c53f320d9083e9a7b6f08b6adbf6ad9671307abb0feed4500a3684';
+  '1266e3fb7edd82ad34aebf60956591e40c51ea904e0f62ef88e21b7e21b02f83';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
