@@ -934,10 +934,12 @@ describe('ClientWorld trade sends', () => {
     // next case label so the window covers this arm alone.
     const game = readFileSync(join(__dirname, '..', 'server', 'game.ts'), 'utf8')
       .replace(/\/\*[\s\S]*?\*\//g, '')
-      .replace(/\/\/[^\n]*/g, '');
+      // URL-guarded line strip: a :// in this 10k-line file must not eat the
+      // rest of its line (#2499).
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
     const start = game.indexOf("case 'trade_close':");
-    const end = game.indexOf('case ', start + 1);
     expect(start).toBeGreaterThan(-1);
+    const end = game.indexOf('case ', start + 1);
     expect(end).toBeGreaterThan(start);
     const arm = game.slice(start, end);
     expect(arm).toContain('sim.tradeClose(pid)');

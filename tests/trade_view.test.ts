@@ -127,6 +127,11 @@ describe('trade window painter wiring (source pins, woc_trade updateTradeWindow)
     // The tail after the bound is exactly method-close + class-close: the
     // "last member" premise the lastIndexOf bound rests on, checked.
     expect(controller.slice(end).trimEnd()).toBe('\n  }\n}');
+    // BOTH bounds must agree: first-match could only end EARLY (template
+    // content), last-match could only end LATE (a member appended after the
+    // method, whose close keeps the tail shape identical). Either drift makes
+    // them disagree, so the mismatch is loud and forces a re-derived bound.
+    expect(controller.indexOf('\n  }', start)).toBe(end);
   });
 
   it('resolves offer rows through buildTradeItemRow and guards the icon', () => {

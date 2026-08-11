@@ -30,7 +30,13 @@ describe('server stays off sim.postOffice (the Sim mail facade)', () => {
     const offenders: string[] = [];
     for (const f of files) {
       const code = stripComments(readFileSync(f.full, 'utf8'));
-      if (/\.postOffice\b/.test(code)) offenders.push(f.file);
+      // Member access AND the bracket spellings: the deliberate way around a
+      // seam is exactly the spelling a member-only regex cannot see. A bare
+      // /postOffice/ is not usable here: server/game.ts carries the literal
+      // string 'postOffice' as a profiler lap name.
+      if (/\.postOffice\b/.test(code) || /\[\s*['"`]postOffice['"`]\s*\]/.test(code)) {
+        offenders.push(f.file);
+      }
     }
     expect(
       offenders,

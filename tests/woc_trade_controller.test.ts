@@ -9,6 +9,7 @@
 // open and close transitions, and the completion report fires exactly once.
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { WocOfferView } from '../src/net/woc_market_sdk';
 import { ITEMS } from '../src/sim/data';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import {
@@ -112,35 +113,25 @@ function openTrade(r: Rig, myItems: { itemId: string; count: number }[] = []): v
   r.controller.updateTradeWindow();
 }
 
-/** A service offer row in the REST read's shape (superset of WocOfferRowLike,
- *  plus the listing fields wocOfferPhase derives the phase from). */
-type OfferRow = {
-  id: number;
-  status: string;
-  role: 'buyer' | 'seller';
-  buyerName: string;
-  sellerName: string;
-  usdCents: number;
-  listingId: number | null;
-  buyerAccepted: boolean;
-  sellerAccepted: boolean;
-  listingStatus: string | null;
-  listingResolution: string | null;
-};
-
-function offerRow(over: Partial<OfferRow> = {}): OfferRow {
+/** A service offer row, typed as the REAL SDK view so the fixture cannot
+ *  silently drift from the fields the controller actually reads (itemId feeds
+ *  the completion line, settlementState the phase derivation). */
+function offerRow(over: Partial<WocOfferView> = {}): WocOfferView {
   return {
     id: 7,
     status: 'pending',
     role: 'buyer',
     buyerName: 'Aldric',
     sellerName: 'Bree',
+    itemId: null,
     usdCents: 100,
     listingId: null,
     buyerAccepted: false,
     sellerAccepted: false,
     listingStatus: null,
     listingResolution: null,
+    settlementState: null,
+    expiresAtMs: 9_999_999_999_999,
     ...over,
   };
 }
@@ -168,7 +159,10 @@ function deferred<T>(): { promise: Promise<T>; resolve: (v: T) => void } {
 }
 
 /** Drain the microtask chain a floating poll promise walks through (the poll's
- *  then body awaits the estimate internally, so one turn is not enough). */
+ *  then body awaits the estimate internally, so one turn is not enough; the
+ *  deepest traced chain needs four turns, six leaves margin). Keep the count
+ *  ahead of the deepest await chain: an under-drain shows up as the PRESENT
+ *  mid-test assertions failing, not as a silent pass. */
 async function flushAsync(): Promise<void> {
   for (let i = 0; i < 6; i++) await Promise.resolve();
 }
@@ -179,18 +173,21 @@ async function flushAsync(): Promise<void> {
 function fakeHooks(): {
   hooks: WocMarketHooks;
   state: {
-    offersResult: { ok: boolean; offers: OfferRow[] };
+    offersResult: { ok: boolean; offers: WocOfferView[] };
     estimateImpl: (cents: number) => Promise<unknown>;
     buyNowImpl: () => Promise<unknown>;
-    calls: { offers: number; estimates: number[]; buyNows: number };
+    acceptOfferImpl: () => Promise<unknown>;
+    calls: { offers: number; estimates: number[]; buyNows: number; acceptOffers: number[] };
   };
 } {
   const state = {
-    offersResult: { ok: true, offers: [] as OfferRow[] },
+    offersResult: { ok: true, offers: [] as WocOfferView[] },
     estimateImpl: (_cents: number): Promise<unknown> =>
       Promise.resolve({ amount: { tokens: 800 }, split: null }),
     buyNowImpl: (): Promise<unknown> => Promise.resolve({ ok: false, code: 'woc_market.disabled' }),
-    calls: { offers: 0, estimates: [] as number[], buyNows: 0 },
+    // The waiting branch by default: agreed, the other side has not yet.
+    acceptOfferImpl: (): Promise<unknown> => Promise.resolve({ ok: true, listing: null }),
+    calls: { offers: 0, estimates: [] as number[], buyNows: 0, acceptOffers: [] as number[] },
   };
   const hooks = {
     client: {
@@ -205,6 +202,10 @@ function fakeHooks(): {
       buyNow: () => {
         state.calls.buyNows++;
         return state.buyNowImpl();
+      },
+      acceptOffer: (id: number) => {
+        state.calls.acceptOffers.push(id);
+        return state.acceptOfferImpl();
       },
       settlementQuote: () => Promise.resolve({ ok: false, code: 'woc_market.disabled' }),
       confirmSettlement: () => Promise.resolve({ ok: false, code: 'woc_market.disabled' }),
@@ -327,6 +328,8 @@ describe('the completion report', () => {
       t('hudChrome.trade.woc.paidBuyer', { price: wocUsdText(100), item: '' }),
     );
     expect(r.host.logs[0]).not.toBe(r.host.logs[1]);
+    // One literal price so the formatter half is not a self-comparison.
+    expect(r.host.logs[0]).toContain('$1.00');
   });
 
   it('resolves a known item id to its display name and keeps a RAW unknown id (R34)', () => {
@@ -370,7 +373,14 @@ describe('the standing-offer poll ($WOC hooks attached)', () => {
     openTrade(r);
     await flushAsync();
     r.controller.updateTradeWindow();
-    expect(document.querySelector('#trade-window .trade-woc-money')).not.toBeNull();
+    // Side-scoped: a buyer-role offer reads in MY money row (first column),
+    // never the counterparty's. The split is a shipped-bug surface.
+    expect(
+      document.querySelector('#trade-window .trade-col:first-child .trade-woc-money'),
+    ).not.toBeNull();
+    expect(
+      document.querySelector('#trade-window .trade-col:last-child .trade-woc-money'),
+    ).toBeNull();
     // The other side withdrew: the service read no longer returns the row. A
     // held offer that never clears paints a deal that no longer exists.
     h.state.offersResult = { ok: true, offers: [] };
@@ -379,6 +389,24 @@ describe('the standing-offer poll ($WOC hooks attached)', () => {
     await flushAsync();
     r.controller.updateTradeWindow();
     expect(document.querySelector('#trade-window .trade-woc-money')).toBeNull();
+  });
+
+  it("a seller-role offer reads in THEIR money row, not the seller's own", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+    const h = fakeHooks();
+    // The seller's standing offer: the selector matches sellers by buyerName.
+    h.state.offersResult = { ok: true, offers: [offerRow({ role: 'seller', buyerName: 'Bree' })] };
+    const r = rig(h.hooks);
+    openTrade(r);
+    await flushAsync();
+    r.controller.updateTradeWindow();
+    expect(
+      document.querySelector('#trade-window .trade-col:last-child .trade-woc-money'),
+    ).not.toBeNull();
+    expect(
+      document.querySelector('#trade-window .trade-col:first-child .trade-woc-money'),
+    ).toBeNull();
   });
 
   it('a slower earlier estimate never clobbers a newer answer (last write wins)', async () => {
@@ -451,6 +479,24 @@ describe('the two window buttons', () => {
     expect(r.host.confirmed).toBe(1);
   });
 
+  it('with hooks attached, the standing-offer accept really reaches the service', async () => {
+    // The other half of the routing claim: the click must land on
+    // acceptOffer, not merely avoid the sim confirm. A buyer brings only
+    // money, so no staged item is needed.
+    const h = fakeHooks();
+    const r = rig(h.hooks);
+    openTrade(r);
+    (r.controller as unknown as { wocTradeOffer: WocPendingOffer | null }).wocTradeOffer =
+      heldOffer({ role: 'buyer' });
+    const accept = [
+      ...document.querySelectorAll<HTMLButtonElement>('#trade-window button.btn'),
+    ].find((b) => b.textContent === t('hud.trade.accept'));
+    accept?.click();
+    await flushAsync();
+    expect(h.state.calls.acceptOffers).toEqual([7]);
+    expect(r.host.confirmed).toBe(0);
+  });
+
   it('the cancel button routes to sim.tradeCancel, and only there', () => {
     const r = rig();
     openTrade(r);
@@ -509,16 +555,19 @@ describe('the escrow-failed retry face', () => {
     expect(accept?.disabled).toBe(false);
     expect(accept?.hidden).toBe(false);
     // Counter-shape: the goods escrowed (a listing exists, the phase moved), so
-    // there is nothing left to accept and the button hides.
+    // there is nothing left to accept and the button HIDES. Located by
+    // position (the accept button is appended first), because its text reads
+    // Waiting here: a text-based finder would pass on the label alone even if
+    // the hidden flag were dropped.
     c.wocTradeOffer = {
       ...(c.wocTradeOffer as WocPendingOffer),
       listingId: 41,
       phase: 'awaiting_payment',
     };
     r.controller.updateTradeWindow();
-    const visibleAccept = [
-      ...document.querySelectorAll<HTMLButtonElement>('#trade-window button.btn'),
-    ].find((b) => b.textContent === t('hud.trade.accept') && !b.hidden);
-    expect(visibleAccept).toBeUndefined();
+    const buttons = document.querySelectorAll<HTMLButtonElement>('#trade-window > button.btn');
+    expect(buttons.length).toBe(2);
+    expect(buttons[0]?.hidden).toBe(true);
+    expect(buttons[0]?.disabled).toBe(true);
   });
 });

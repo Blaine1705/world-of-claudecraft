@@ -37,6 +37,9 @@ interface MonolithRow {
 // Ceilings set 2026-08-10 at roughly current size + 200 lines of headroom.
 const MONOLITHS: MonolithRow[] = [
   {
+    // Deliberately ZERO headroom (the woc marketplace baseline ratchet): the
+    // next line added here fails, and the fix is extraction behind the seam,
+    // never a raise. A raise stays a maintainer decision, per the header.
     file: 'src/ui/hud.ts',
     ceiling: 19347,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',

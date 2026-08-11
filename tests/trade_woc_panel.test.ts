@@ -32,9 +32,10 @@ const slot = (id: string): InvSlot => ({ itemId: id, count: 1 });
 // Comment-stripped BEFORE any pin reads them: the controller is roughly 40
 // percent prose, so an unstripped pin can be satisfied (or false-red) by a
 // comment quoting the pinned expression (the comment-gameable trap; the
-// sibling tests/trade_view.test.ts strips for the same reason).
+// sibling tests/trade_view.test.ts strips for the same reason). The line strip
+// is the URL-guarded form so a :// never eats the rest of its line (#2499).
 const stripComments = (s: string): string =>
-  s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+  s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 const CONTROLLER = stripComments(
   readFileSync('src/ui/hud/woc_trade/woc_trade_controller.ts', 'utf8'),
 );
@@ -586,6 +587,11 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
     expect(updateStart).toBeGreaterThan(-1);
     expect(updateEnd).toBeGreaterThan(updateStart);
     expect(CONTROLLER.slice(updateEnd).trimEnd()).toBe('\n  }\n}');
+    // BOTH bounds must agree: first-match could only end EARLY (template
+    // content), last-match could only end LATE (an appended member keeps the
+    // tail shape identical). A disagreement is loud instead of a silent
+    // widening or narrowing.
+    expect(CONTROLLER.indexOf('\n  }', updateStart)).toBe(updateEnd);
     const update = CONTROLLER.slice(updateStart, updateEnd);
     expect(update, 'the window-closed branch must invoke it').toContain(
       'this.resolveClosedWocTrade()',
@@ -618,6 +624,9 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
     // And the buyer sees the pending face the instant they commit, not when a
     // poll next happens to notice.
     expect(pay).toContain("phase: 'paying'");
+    // The payment path may never cancel the trade either (coverage the accept
+    // window held incidentally before it was narrowed to accept alone).
+    expect(pay).not.toContain('tradeCancel');
   });
 });
 
@@ -723,10 +732,12 @@ describe('the Hud side of the seam, and the E2E reach-through', () => {
     // wocTrade field or the lastTradeSig latch breaks them silently. The
     // source-side names are pinned by tests/hud_update_drive.test.ts; this
     // pins the SCRIPT side of the same coupling so the two stay linked.
-    const moneyShot = readFileSync('scripts/trade_money_shot.mjs', 'utf8');
+    // Stripped like every other read here: a header comment mentioning the
+    // reach-through must not satisfy the pin.
+    const moneyShot = stripComments(readFileSync('scripts/trade_money_shot.mjs', 'utf8'));
     expect(moneyShot).toContain('hud.wocTrade.updateTradeWindow()');
     expect(moneyShot).toContain('hud.wocTrade.lastTradeSig');
-    const localization = readFileSync('scripts/localization_e2e.mjs', 'utf8');
+    const localization = stripComments(readFileSync('scripts/localization_e2e.mjs', 'utf8'));
     expect(localization).toContain('hud.wocTrade.updateTradeWindow()');
   });
 });
