@@ -11,7 +11,9 @@
 // Output order: one row per distinct item id, in the order that item id FIRST appears
 // in `listings`. Feeding this the market's name-then-price sorted book (see
 // Market.sortedBook) yields an alphabetically-ordered result, matching the uncollapsed
-// Browse list; the function does not depend on that ordering to pick the winner.
+// Browse list; the function does not depend on that ordering to pick the winner. Relies
+// on Map's insertion-order iteration (re-`set`ting an existing key does not move it), so
+// the winners come out in first-seen order without a separate order-tracking array.
 
 export interface CollapsibleListing {
   id: number;
@@ -21,24 +23,15 @@ export interface CollapsibleListing {
 
 export function collapseToLowestPerItem<T extends CollapsibleListing>(listings: readonly T[]): T[] {
   const bestByItem = new Map<string, T>();
-  const order: string[] = [];
   for (const listing of listings) {
     const current = bestByItem.get(listing.itemId);
-    if (!current) {
-      order.push(listing.itemId);
-      bestByItem.set(listing.itemId, listing);
-      continue;
-    }
     if (
+      !current ||
       listing.price < current.price ||
       (listing.price === current.price && listing.id < current.id)
     ) {
       bestByItem.set(listing.itemId, listing);
     }
   }
-  return order.map((itemId) => {
-    const best = bestByItem.get(itemId);
-    if (!best) throw new Error(`collapseToLowestPerItem: missing entry for ${itemId}`);
-    return best;
-  });
+  return [...bestByItem.values()];
 }
