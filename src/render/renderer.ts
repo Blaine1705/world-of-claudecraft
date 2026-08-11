@@ -480,6 +480,16 @@ import { drapeRingLocalY } from './selection_ring';
 import { type SelfMotionFrame, SelfMotionPredictor, updateSelfRenderFallback } from './self_motion';
 import { SentenceVfx } from './sentence_vfx';
 import { sentenceImpactPlan } from './sentence_vfx_core';
+import {
+  createShadowCadenceState,
+  resetShadowCadence,
+  updateShadowCadence,
+} from './shadow_cadence_core';
+import {
+  type ShadowAnchor,
+  shadowTexelWorldSize,
+  snapShadowAnchor,
+} from './shadow_texel_snap_core';
 import { isSharedGeometry, isSharedMaterial } from './shared_resource';
 import {
   buildSky,
@@ -1761,6 +1771,16 @@ export class Renderer {
   private moonDir = new THREE.Vector3(0, -1, 0);
   private lightDir = new THREE.Vector3(); // blended sun/moon dir the key light uses
   private shadowLightDirection = new THREE.Vector3();
+  // World units per shadow-map texel (ortho box width / GFX.shadowMap), set
+  // once beside the shadow camera; 0 disables snapping. shadowSnappedAnchor
+  // is the per-frame scratch shadow_texel_snap_core.ts fills so the frustum
+  // follows the player in whole-texel steps (anti shadow-swimming).
+  private shadowTexelWorld = 0;
+  private readonly shadowSnappedAnchor: ShadowAnchor = { x: 0, y: 0, z: 0 };
+  // Budget-governed shadow cadence (shadow_cadence_core.ts): under sustained
+  // render-budget pressure the shadow map updates every other frame, halving
+  // the second scene draw; applied right after the governor each frame.
+  private readonly shadowCadence = createShadowCadenceState();
   private sunUp = 1;
   private moonUp = 0;
   private starAmt = 0; // 0 day, 1 deep night: star-field strength for the sky dome
@@ -2431,6 +2451,14 @@ export class Renderer {
     // still clears acne on the low-poly facets
     sun.shadow.normalBias = LOW_GFX ? 0.02 : 0.035;
     sun.shadow.radius = 2.25;
+    // Texel size from the REAL map size three will use: WebGLShadowMap scales
+    // a requested mapSize down to the GPU's maxTextureSize at render time, so
+    // an unclamped derivation would quantize to a fraction of a real texel on
+    // a capped device and quietly lose the anti-swimming property.
+    this.shadowTexelWorld = shadowTexelWorldSize(
+      2 * S,
+      Math.min(GFX.shadowMap, this.webgl.capabilities.maxTextureSize),
+    );
     this.scene.add(sun);
     this.scene.add(sun.target);
     this.sun = sun;
@@ -4207,6 +4235,8 @@ export class Renderer {
       this.renderBudgetMaxScale(),
     );
     this.applyRenderBudgetState(this.renderBudgetState);
+    resetShadowCadence(this.shadowCadence);
+    this.applyShadowCadence();
     this.applyResolution();
   }
 
@@ -4320,6 +4350,7 @@ export class Renderer {
     renderScale: number;
     effectiveRenderScale: number;
     renderBudget: RenderBudgetState;
+    shadowCadenceHalfRate: boolean;
     pixelRatio: number;
     width: number;
     height: number;
@@ -4373,6 +4404,10 @@ export class Renderer {
       renderScale: this.renderScale,
       effectiveRenderScale: this.effectiveRenderScale,
       renderBudget,
+      // Whether the budget-governed shadow cadence is currently shedding to
+      // every-other-frame updates: surfaced so the ?perf overlay and capture
+      // artifacts can tell a half-rate sample from a full-rate one.
+      shadowCadenceHalfRate: this.shadowCadence.halfRate,
       pixelRatio: this.webgl.getPixelRatio(),
       width: this.viewport.width,
       height: this.viewport.height,
@@ -4795,6 +4830,27 @@ export class Renderer {
     this.stableFrameTime = state.stableSeconds;
     if (this.adaptiveGrace > 0) this.adaptiveGrace = Math.max(0, this.adaptiveGrace - dt);
     this.applyRenderBudgetState(state);
+    updateShadowCadence(this.shadowCadence, dt, state.pressure, state.enabled);
+    this.applyShadowCadence();
+  }
+
+  /** Write the cadence plan onto three's shadowMap flags. Runs at the top of
+   *  sync(), before the frame's render; the bounded prewarm saves/restores
+   *  BOTH flags around its renders and the per-frame re-assert here makes
+   *  every restore self-healing. An out-of-band render between this write
+   *  and the frame render (renderPrewarmPass, the census probe's frozen
+   *  pass) can consume a pending needsUpdate; the cost is at most one extra
+   *  frame of shadow staleness on those bounded dev/startup paths, never a
+   *  lost update in steady state. */
+  private applyShadowCadence(): void {
+    if (!this.sun.castShadow) return;
+    const shadowMap = this.webgl.shadowMap;
+    const autoUpdate = !this.shadowCadence.halfRate;
+    if (shadowMap.autoUpdate !== autoUpdate) shadowMap.autoUpdate = autoUpdate;
+    // Under half rate three skips the pass when both flags are false and
+    // clears needsUpdate after each rendered pass, so the every-other-frame
+    // arm is exactly this write.
+    if (!autoUpdate && this.shadowCadence.renderThisFrame) shadowMap.needsUpdate = true;
   }
 
   private runtimeViewCreateBudget(dt: number): number {
@@ -10215,8 +10271,32 @@ export class Renderer {
   // day/night is off, so it keeps the fixed anchor for a stable, cheap look.
   private updateKeyLight(pp: THREE.Vector3): void {
     if (this.lowGfx && !this.sun.castShadow) return;
+    // Follow the player in whole shadow-map texel steps, not raw sub-texel
+    // ones: position and target translate together, so the light DIRECTION
+    // is untouched and only the shadow rasterization grid stops sliding
+    // under static geometry (shadow_texel_snap_core.ts). A shadowless key
+    // light has no grid to align to and keeps the raw position.
+    const anchor = this.shadowSnappedAnchor;
+    anchor.x = pp.x;
+    anchor.y = pp.y;
+    anchor.z = pp.z;
     if (this.lowGfx) {
-      this.sun.position.set(pp.x + SUN_ANCHOR.x, pp.y + SUN_ANCHOR.y, pp.z + SUN_ANCHOR.z);
+      if (this.sun.castShadow)
+        snapShadowAnchor(
+          SUN_ANCHOR.x,
+          SUN_ANCHOR.y,
+          SUN_ANCHOR.z,
+          pp.x,
+          pp.y,
+          pp.z,
+          this.shadowTexelWorld,
+          anchor,
+        );
+      this.sun.position.set(
+        anchor.x + SUN_ANCHOR.x,
+        anchor.y + SUN_ANCHOR.y,
+        anchor.z + SUN_ANCHOR.z,
+      );
     } else {
       // the key light hands off from the sun to the moon across the terminator.
       // Blend the two directions smoothly (rather than a hard switch) as the sun
@@ -10226,10 +10306,21 @@ export class Renderer {
       t = t < 0 ? 0 : t > 1 ? 1 : t;
       const blend = t * t * (3 - 2 * t);
       this.lightDir.copy(this.sunDir).lerp(this.moonDir, blend).normalize();
+      if (this.sun.castShadow)
+        snapShadowAnchor(
+          this.lightDir.x,
+          this.lightDir.y,
+          this.lightDir.z,
+          pp.x,
+          pp.y,
+          pp.z,
+          this.shadowTexelWorld,
+          anchor,
+        );
       this.sun.position.set(
-        pp.x + this.lightDir.x * SUN_TRAVEL_DISTANCE,
-        pp.y + this.lightDir.y * SUN_TRAVEL_DISTANCE,
-        pp.z + this.lightDir.z * SUN_TRAVEL_DISTANCE,
+        anchor.x + this.lightDir.x * SUN_TRAVEL_DISTANCE,
+        anchor.y + this.lightDir.y * SUN_TRAVEL_DISTANCE,
+        anchor.z + this.lightDir.z * SUN_TRAVEL_DISTANCE,
       );
       // the unlit water shader follows the same key light and grade: glints
       // track the sun by day and the moon by night, and the surface dims with
@@ -10244,12 +10335,12 @@ export class Renderer {
       // texel (foliage_shadow_core.ts). Push it here, where the light's own
       // direction and target are decided, so the two can never disagree.
       if (this.sun.castShadow) {
-        setFoliageShadowVolume(this.lightDir, pp, this.sun.shadow.camera, SUN_TRAVEL_DISTANCE);
+        setFoliageShadowVolume(this.lightDir, anchor, this.sun.shadow.camera, SUN_TRAVEL_DISTANCE);
       } else {
         clearFoliageShadowVolume();
       }
     }
-    this.sun.target.position.set(pp.x, pp.y, pp.z);
+    this.sun.target.position.set(anchor.x, anchor.y, anchor.z);
   }
 
   // Aim the sun and moon disc sprites along their directions and fade them by how

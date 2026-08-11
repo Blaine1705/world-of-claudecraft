@@ -466,6 +466,8 @@ const RENDER_PURE_CORES = [
   'src/render/umbral_anchor_vfx_core.ts',
   'src/render/foliage_shader_core.ts',
   'src/render/foliage_shadow_core.ts',
+  'src/render/shadow_cadence_core.ts',
+  'src/render/shadow_texel_snap_core.ts',
   'src/render/frost_ice_fields_core.ts',
   'src/render/frost_sky_fade_core.ts',
   'src/render/gfx_aa_policy_core.ts',
