@@ -111,10 +111,19 @@ async function attachPuller(root, pullerB64) {
   character.position.set(-(box.min.x + box.max.x) / 2, -box.min.y, -(box.min.z + box.max.z) / 2);
   wrapper.scale.setScalar(scale);
 
-  // RICKSHAW_PULLER_OFFSET_Z = 1.8, RICKSHAW_PULLER_OFFSET_Y = 0.12
-  // (src/render/rickshaw_mount.ts): the real runtime placement, not
-  // RICKSHAW_SOCKET_DEFINITIONS's authored 'puller' entry.
-  wrapper.position.set(0, 0.12, 1.8);
+  // The real runtime placement (src/render/rickshaw_mount.ts's
+  // RICKSHAW_PULLER_OFFSET_Y/Z, world units), not RICKSHAW_SOCKET_DEFINITIONS's
+  // authored 'puller' entry, which no longer matches what the game does.
+  // Divided by RICKSHAW_SCALE for the same reason `scale` above is: wrapper is
+  // parented under `root`, which already carries it, so a raw world value here
+  // would land at double the intended offset.
+  const PULLER_WORLD_OFFSET_Y = 0.12;
+  const PULLER_WORLD_OFFSET_Z = 1.8;
+  wrapper.position.set(
+    0,
+    PULLER_WORLD_OFFSET_Y / RICKSHAW_SCALE,
+    PULLER_WORLD_OFFSET_Z / RICKSHAW_SCALE,
+  );
   root.add(wrapper);
   return wrapper;
 }

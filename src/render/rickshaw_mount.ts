@@ -119,17 +119,20 @@ export function spinMountWheels(
       // export pipeline rewrites node scale and translation during
       // quantization, so any authored number would be a second source of truth
       // that silently drifts. Half the wheel's world height IS the radius.
-      // Box3.setFromObject only refreshes the target node's own world matrix,
-      // not its ancestors (three's Object3D.updateWorldMatrix(false, false)),
-      // and on the frame this visual is first built, root and its ancestors
-      // may still carry a stale matrix from before this subtree was parented.
-      // Force the whole chain current first so the measured radius reflects
-      // the model's REAL placed scale, not whatever the previous frame left
-      // behind (harmless today since this mount's normScale and every rider's
-      // e.scale are both 1, but the result is cached for the visual's whole
-      // lifetime, so a future scaled rider or a manifest height drift would
-      // otherwise bake in a silently wrong radius).
-      root.updateWorldMatrix(true, false);
+      // Box3.setFromObject refreshes only the target's OWN world matrix from
+      // its parent (three's expandByObject -> updateWorldMatrix(false, false)),
+      // so a stale ancestor silently poisons the result. On the frame this
+      // visual is first built the whole chain can still carry the previous
+      // render's matrices. Walk up from the WHEEL rather than from `root`:
+      // visual.ts parents the model as root > ... > poseWrap > modelWrap >
+      // model > Wheel_*, and modelWrap is the node carrying normScale
+      // (height / measuredHeight), so refreshing only root would leave the
+      // one transform that actually scales this measurement stale. Harmless
+      // today (this mount's normScale and every rider's e.scale are both 1),
+      // but the radius is cached for the visual's whole lifetime, so a scaled
+      // rider or a drifted manifest height would otherwise bake in a silently
+      // wrong radius and the wheels would roll at the wrong rate forever.
+      found[0].updateWorldMatrix(true, false);
       wheelBoundsScratch.setFromObject(found[0]);
       v.mountWheelRadius = (wheelBoundsScratch.max.y - wheelBoundsScratch.min.y) / 2;
     }

@@ -142,7 +142,7 @@ describe('rickshaw mount asset pipeline', () => {
   // that comment's own history. Pin both new GLBs' measured bbox height
   // against their manifest.ts height field so a future geometry pass that
   // forgets to update it fails here instead of silently mis-scaling in game.
-  it('pins mount_rickshaw_mount.height against the shipped GLB’s measured bbox', async () => {
+  it('pins mount_rickshaw_mount.height against the shipped GLB measured bbox', async () => {
     await MeshoptDecoder.ready;
     const bytes = readFileSync(ASSET_PATH);
     const io = new NodeIO()
@@ -154,7 +154,7 @@ describe('rickshaw mount asset pipeline', () => {
     expect(measuredHeight).toBeCloseTo(VISUALS.mount_rickshaw_mount.height, 3);
   });
 
-  it('pins skel_rickshaw_puller.height against the shipped GLB’s measured bbox', async () => {
+  it('pins skel_rickshaw_puller.height against the shipped GLB measured bbox', async () => {
     await MeshoptDecoder.ready;
     const pullerPath = path.join(REPO_ROOT, 'public/models/chars/enemies/skeleton_minion_free.glb');
     const io = new NodeIO()
