@@ -45,6 +45,7 @@ function info(over: Partial<MarketInfo> = {}): MarketInfo {
     primaryStat: 'all',
     rarity: 'all',
     sort: 'name',
+    collapseLowest: false,
     page: 0,
     pageCount: 1,
     collectionCopper: 0,

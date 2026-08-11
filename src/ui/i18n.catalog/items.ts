@@ -226,6 +226,10 @@ const itemStringsEn = {
       filterSort: 'Sort',
       sortName: 'Name (A-Z)',
       sortPriceAsc: 'Price: Low to High',
+      // Browse toggle (issue #3103): collapses other sellers' listings to the cheapest
+      // per distinct item, so scanning for a deal does not mean paging through every
+      // near-duplicate stack.
+      collapseLowest: 'Lowest price only',
       weaponSword: 'Swords',
       weaponDagger: 'Daggers',
       weaponStaff: 'Staves',

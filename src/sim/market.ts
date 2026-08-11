@@ -27,6 +27,7 @@ import {
   sanitizeEscrowSlot,
 } from './item_instance_transfer';
 import { removeVendorSellUnits } from './items';
+import { collapseToLowestPerItem } from './market_collapse';
 import { planListingIds, playerListingIdFloor } from './market_listing_ids';
 import {
   MARKET_PAGE_SIZE,
@@ -983,7 +984,14 @@ export class Market {
     // well under MARKET_WIRE_LIMIT, which remains a hard safety bound on wire size.
     const isMine = (l: MarketListing) => this.marketListingBelongsTo(l, meta);
     const mineSorted = sorted.filter(isMine);
-    const others = sorted.filter((l) => !isMine(l));
+    // The viewer's own listings are never collapsed (their full reclaim set always
+    // wires, filter or no); only OTHER sellers' rows collapse to the cheapest per
+    // item id when the toggle is on (issue #3103). `sorted` is already name-then-
+    // price ordered, so within one item id the rows already run cheapest first;
+    // collapseToLowestPerItem does not depend on that, it re-derives the minimum
+    // itself, so this stays correct even if the book's sort ever changes.
+    const othersSorted = sorted.filter((l) => !isMine(l));
+    const others = query.collapseLowest ? collapseToLowestPerItem(othersSorted) : othersSorted;
     const pageCount = Math.max(1, Math.ceil(others.length / MARKET_PAGE_SIZE));
     const page = Math.max(0, Math.min(pageCount - 1, query.page));
     const othersPage = others.slice(
@@ -1013,8 +1021,13 @@ export class Market {
     return {
       listings,
       // Every listing matching the filter (the viewer's own plus all others), so the
-      // SELL/notes read true counts; `pageCount` below paginates the others.
-      totalCount: sorted.length,
+      // SELL/notes read true counts; `pageCount` below paginates the others. Reads
+      // `others.length`, not `sorted.length`: when collapseLowest folded other
+      // sellers' rows down to one per item, the pager (market_view.ts, which derives
+      // its "N of M" range as totalCount minus the mine-on-page count) must count the
+      // SAME set pageCount/othersPage paginate, or the range and the page count
+      // disagree.
+      totalCount: mineSorted.length + others.length,
       filter: query.search,
       // Echo every filter axis, not just the search text: a fresh join (post-
       // linkdead-grace reconnect) resets this session-only query to default, and
@@ -1027,6 +1040,7 @@ export class Market {
       primaryStat: query.primaryStat,
       rarity: query.rarity,
       sort: query.sort,
+      collapseLowest: query.collapseLowest,
       page,
       pageCount,
       collectionCopper: col?.copper ?? 0,

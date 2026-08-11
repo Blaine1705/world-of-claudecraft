@@ -801,11 +801,6 @@ export const cs_CZ: EnTranslations = {
       "resetAction": "Reset",
       "note": "Tažením lišty karet chatu přesuneš okno, rohovým úchytem změníš velikost. Reset ho vrátí na výchozí pozici a velikost."
     },
-    "chatQuota": {
-      "limitReached": "Byl dosažen limit chatu Obecného. Zkus to znovu za {seconds}.",
-      "pending": "Tvoje předchozí zpráva v chatu Obecném se ještě odesílá. Zkus to za chvíli znovu.",
-      "unavailable": "Chat Obecný je dočasně nedostupný. Zkus to znovu brzy."
-    },
     "swing": {
       "ready": "Úder",
       "seconds": "{seconds} s"
@@ -897,14 +892,6 @@ export const cs_CZ: EnTranslations = {
       "bodyWithVersion": "Je dostupná verze {version} World of ClaudeCraft. Aktualizuj teď pro nejnovější opravy a vylepšení.",
       "notNow": "Teď ne",
       "update": "Aktualizovat"
-    },
-    "otaUpdate": {
-      "title": "Aktualizace hry",
-      "downloading": "Stahování aktualizace: {percent}",
-      "applying": "Aktualizace stažena. Hra se restartuje, aby se použila.",
-      "incompatible": "Ke hraní je nutná aktualizace. Použije se, jakmile se dokončí stahování.",
-      "continueAnyway": "Pokračovat bez aktualizace",
-      "progressLabel": "Průběh stahování aktualizace"
     },
     "cameraPrompt": {
       "title": "Zvolte si kameru",
@@ -2199,10 +2186,6 @@ export const cs_CZ: EnTranslations = {
       "itemAriaBound": "{item}, množství {count}, vázaná kopie",
       "itemAriaMasterwork": "{item}, množství {count}, mistrovské dílo",
       "itemAriaQuest": "{item}, množství {count}, úkolový předmět",
-      "itemAriaLocked": "{item}, počet {count}, zamčeno",
-      "itemLockedLine": "Zamčeno",
-      "lockItem": "Zamknout předmět",
-      "unlockItem": "Odemknout předmět",
       "filterGroupAria": "Filtrovat batohy podle kategorie",
       "filterAll": "Vše",
       "filterWeapon": "Zbraně",
@@ -3233,7 +3216,6 @@ export const cs_CZ: EnTranslations = {
       "craftedToast": "Vyrobeno: {name}",
       "craftedToastQty": "Vyrobeno: {name} x{qty}",
       "insufficientMaterials": "Na to nemáš materiály.",
-      "reagentLocked": "Reagencie pro to je zamčená.",
       "unknownRecipe": "Tento recept neexistuje.",
       "comboRequirementUnmet": "Nemáš obě požadovaná řemesla na potřebné úrovni pro tento recept.",
       "comboRequires": "Ladění: {craftA} + {craftB}, úroveň {tier}.",
@@ -3340,7 +3322,6 @@ export const cs_CZ: EnTranslations = {
       "notHeld": "Tento předmět nemáš.",
       "notDisenchantable": "Toto nelze rozzačarovat.",
       "notSalvageable": "Toto nelze rozebrat.",
-      "salvageLocked": "Tento předmět je zamčený.",
       "disenchantBusy": "Jsi zaneprázdněn(a).",
       "salvageBusy": "Jsi zaneprázdněn(a).",
       "enchantBusy": "Jsi zaneprázdněn(a).",
@@ -8917,9 +8898,7 @@ export const cs_CZ: EnTranslations = {
       "filterPrimaryStatAll": "Libovolný hlavní atribut",
       "filterRarity": "Vzácnost",
       "filterRarityAll": "Všechny vzácnosti",
-      "filterSort": "Řazení",
-      "sortName": "Název (A-Z)",
-      "sortPriceAsc": "Cena: od nejnižší po nejvyšší",
+      "collapseLowest": "Lowest price only",
       "weaponSword": "Meče",
       "weaponDagger": "Dýky",
       "weaponStaff": "Hole",

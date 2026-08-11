@@ -2592,6 +2592,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterSort': '排序',
   'itemUi.market.sortName': '名稱 (A-Z)',
   'itemUi.market.sortPriceAsc': '價格：從低到高',
+  'itemUi.market.collapseLowest': '僅顯示最低價',
   'itemUi.market.weaponSword': '劍',
   'itemUi.market.weaponDagger': '匕首',
   'itemUi.market.weaponStaff': '法杖',

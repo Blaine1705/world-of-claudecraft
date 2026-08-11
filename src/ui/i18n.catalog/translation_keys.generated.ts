@@ -10155,6 +10155,7 @@ export type TranslationKeyFlat =
   | 'itemUi.market.buyConfirmCancel'
   | 'itemUi.market.buyConfirmTitle'
   | 'itemUi.market.close'
+  | 'itemUi.market.collapseLowest'
   | 'itemUi.market.collect'
   | 'itemUi.market.collectAll'
   | 'itemUi.market.collectEmpty'

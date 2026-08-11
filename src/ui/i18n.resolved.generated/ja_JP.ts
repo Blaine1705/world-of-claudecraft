@@ -801,11 +801,6 @@ export const ja_JP: EnTranslations = {
       "resetAction": "リセット",
       "note": "チャットのタブ列をドラッグするとウィンドウを移動でき、右下のグリップをドラッグするとサイズを変更できます。リセットすると既定の位置とサイズに戻ります。"
     },
-    "chatQuota": {
-      "limitReached": "一般チャットの上限に達しました。{seconds}後にもう一度お試しください。",
-      "pending": "直前の一般チャットのメッセージは送信中です。少し待ってからもう一度お試しください。",
-      "unavailable": "一般チャットは一時的に利用できません。しばらくしてからもう一度お試しください。"
-    },
     "swing": {
       "ready": "攻撃",
       "seconds": "{seconds}秒"
@@ -897,14 +892,6 @@ export const ja_JP: EnTranslations = {
       "bodyWithVersion": "World of ClaudeCraft のバージョン {version} が利用可能です。今すぐアップデートして最新の修正と改善を入手しましょう。",
       "notNow": "後で",
       "update": "更新"
-    },
-    "otaUpdate": {
-      "title": "ゲームアップデート",
-      "downloading": "アップデートをダウンロード中：{percent}",
-      "applying": "アップデートをダウンロードしました。適用のためゲームを再起動しています。",
-      "incompatible": "プレイするにはアップデートが必要です。ダウンロードが完了すると自動的に適用されます。",
-      "continueAnyway": "更新せずに続行",
-      "progressLabel": "アップデートのダウンロード進行状況"
     },
     "cameraPrompt": {
       "title": "カメラを選択",
@@ -2199,10 +2186,6 @@ export const ja_JP: EnTranslations = {
       "itemAriaBound": "{item}、数量 {count}、バインド済みの品",
       "itemAriaMasterwork": "{item}、数量 {count}、傑作",
       "itemAriaQuest": "{item}、数量 {count}、クエストアイテム",
-      "itemAriaLocked": "{item}、数量 {count}、ロック済み",
-      "itemLockedLine": "ロック中",
-      "lockItem": "アイテムをロック",
-      "unlockItem": "アイテムのロック解除",
       "filterGroupAria": "バッグをカテゴリーで絞り込む",
       "filterAll": "すべて",
       "filterWeapon": "武器",
@@ -3233,7 +3216,6 @@ export const ja_JP: EnTranslations = {
       "craftedToast": "製作しました:{name}",
       "craftedToastQty": "製作しました:{name} x{qty}",
       "insufficientMaterials": "材料が不足しています。",
-      "reagentLocked": "その素材はロックされています。",
       "unknownRecipe": "そのレシピは存在しません。",
       "comboRequirementUnmet": "その組み合わせレシピに必要な両方の生産スキルの熟練度に達していません。",
       "comboRequires": "調律条件：{craftA} + {craftB}、ティア {tier}。",
@@ -3340,7 +3322,6 @@ export const ja_JP: EnTranslations = {
       "notHeld": "そのアイテムを所持していません。",
       "notDisenchantable": "それは魔力分解できません。",
       "notSalvageable": "それは解体できません。",
-      "salvageLocked": "そのアイテムはロックされています。",
       "disenchantBusy": "手が離せません。",
       "salvageBusy": "手が離せません。",
       "enchantBusy": "手が離せません。",
@@ -8917,9 +8898,7 @@ export const ja_JP: EnTranslations = {
       "filterPrimaryStatAll": "すべてのメイン能力値",
       "filterRarity": "レア度",
       "filterRarityAll": "すべてのレア度",
-      "filterSort": "並べ替え",
-      "sortName": "名前 (A-Z)",
-      "sortPriceAsc": "価格: 安い順",
+      "collapseLowest": "最安値のみ表示",
       "weaponSword": "剣",
       "weaponDagger": "短剣",
       "weaponStaff": "杖",

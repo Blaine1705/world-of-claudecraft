@@ -2684,6 +2684,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterSort': '정렬',
   'itemUi.market.sortName': '이름 (A-Z)',
   'itemUi.market.sortPriceAsc': '가격: 낮은순',
+  'itemUi.market.collapseLowest': '최저가만 표시',
   'itemUi.market.weaponSword': '검',
   'itemUi.market.weaponDagger': '단검',
   'itemUi.market.weaponStaff': '지팡이',

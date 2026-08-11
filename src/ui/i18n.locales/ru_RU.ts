@@ -2726,6 +2726,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterSort': 'Сортировка',
   'itemUi.market.sortName': 'Название (А-Я)',
   'itemUi.market.sortPriceAsc': 'Цена: по возрастанию',
+  'itemUi.market.collapseLowest': 'Только минимальная цена',
   'itemUi.market.weaponSword': 'Мечи',
   'itemUi.market.weaponDagger': 'Кинжалы',
   'itemUi.market.weaponStaff': 'Посохи',

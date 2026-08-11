@@ -15,6 +15,7 @@ describe('ClientWorld market query wire', () => {
       rarity: 'rare',
       sort: 'name',
       page: 2,
+      collapseLowest: true,
     });
 
     expect(sent).toEqual([
@@ -28,6 +29,7 @@ describe('ClientWorld market query wire', () => {
         rarity: 'rare',
         sort: 'name',
         page: 2,
+        collapseLowest: true,
       },
     ]);
   });

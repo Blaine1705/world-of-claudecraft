@@ -119,6 +119,10 @@ export interface MarketQuery {
   rarity: MarketRarityFilter;
   sort: MarketSort;
   page: number;
+  // When true, Browse collapses OTHER sellers' listings to at most one row per distinct
+  // item id (the lowest price among them; see market_collapse.ts). The viewer's own
+  // listings are unaffected: they are always wired in full for reclaim (issue #3103).
+  collapseLowest: boolean;
 }
 
 export function defaultMarketQuery(): MarketQuery {
@@ -131,6 +135,7 @@ export function defaultMarketQuery(): MarketQuery {
     rarity: 'all',
     sort: 'name',
     page: 0,
+    collapseLowest: false,
   };
 }
 
@@ -147,6 +152,7 @@ export function sanitizeMarketQuery(
         rarity?: unknown;
         sort?: unknown;
         page?: unknown;
+        collapseLowest?: unknown;
       }
     | null
     | undefined,
@@ -174,6 +180,7 @@ export function sanitizeMarketQuery(
     rarity: oneOf(MARKET_RARITY_FILTERS, raw?.rarity, 'all'),
     sort: oneOf(MARKET_SORT_OPTIONS, raw?.sort, 'name'),
     page,
+    collapseLowest: raw?.collapseLowest === true,
   };
 }
 

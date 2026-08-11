@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "itemUi.market.collapseLowest"
+  ],
+  "es_ES": [
+    "itemUi.market.collapseLowest"
+  ],
+  "fr_FR": [
+    "itemUi.market.collapseLowest"
+  ],
+  "fr_CA": [
+    "itemUi.market.collapseLowest"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "itemUi.market.collapseLowest"
+  ],
+  "de_DE": [
+    "itemUi.market.collapseLowest"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "itemUi.market.collapseLowest"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "itemUi.market.collapseLowest"
+  ],
+  "nl_NL": [
+    "itemUi.market.collapseLowest"
+  ],
+  "pl_PL": [
+    "itemUi.market.collapseLowest"
+  ],
+  "id_ID": [
+    "itemUi.market.collapseLowest"
+  ],
+  "tr_TR": [
+    "itemUi.market.collapseLowest"
+  ],
+  "sv_SE": [
+    "itemUi.market.collapseLowest"
+  ],
+  "vi_VN": [
+    "itemUi.market.collapseLowest"
+  ],
+  "da_DK": [
+    "itemUi.market.collapseLowest"
+  ]
 };

@@ -49,6 +49,7 @@ function info(listings: MarketListingView[], over: Partial<MarketInfo> = {}): Ma
     primaryStat: 'all',
     rarity: 'all',
     sort: 'name',
+    collapseLowest: false,
     page: 0,
     pageCount: 1,
     collectionCopper: 0,
