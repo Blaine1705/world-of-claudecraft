@@ -3,8 +3,9 @@
   "sourceKind": "user-supplied real-world reference photographs (three, not AI-generated)",
   "sourceRedistributed": false,
   "confirmationDate": "2026-08-07",
+  "scopeNote": "This is the v1 open-frame-cart shape's reference set only. It predates and is separate from the v2 throne-cart rebuild's own reference (a later AI-generated concept sheet, see object-sculpt-spec.json's authoringNote/sourceImage). Only a few v1 measurements (RICKSHAW_SCALE, the wheel hub/spoke fix, the shaft cross-brace position) carry forward into v2 unchanged; the throne, cushion, lantern, and banner design in v2 comes from the concept sheet, not these photographs.",
   "permissionContext": "The user supplied three real photographs of hand-pulled rickshaws in conversation and asked for a new game mount inspired by their shape, to be built as a Halloween/skeleton-puller theme.",
-  "shippingPolicy": "None of the three source images or derived crops are committed or shipped. Only silhouette, proportion, and construction-logic observations are carried into the sculpt spec and factory code.",
+  "shippingPolicy": "None of the three source images or derived crops are committed or shipped. Only silhouette, proportion, and construction-logic observations are carried into the v1 sculpt spec and factory code.",
   "sources": [
     {
       "id": "extended-canopy",
@@ -30,8 +31,6 @@
       "two-wheel hand-pulled cart silhouette: large wire-spoke wheels flanking a low bench seat",
       "sloped footboard/step at the front of the seat, ahead of the wheels",
       "two long, roughly parallel forward-reaching shafts (the puller's handles), meeting the cart body near the wheel axle line",
-      "folding canopy over the seat: thin rib struts fanning up from the seat-back, fabric stretched over them",
-      "canopy sits well forward of the seat back, shading the passenger, not the whole cart",
       "wheel hub and spoke rhythm (evenly spaced thin spokes, a visibly thicker rim)"
     ],
     "excluded": [
@@ -39,13 +38,13 @@
       "the extended-canopy photo's background: barred window, wall, and unrelated posters",
       "any real-world manufacturer name, decal, or plate",
       "the specific upholstery colors (dark green bench, black lacquer body) as a literal palette to copy exactly",
-      "exact heraldry or paint scheme from either photographed unit"
+      "exact heraldry or paint scheme from either photographed unit",
+      "the folding canopy both photographed units show: cut from v1 for real crown-clearance and unsupported-spoke problems and never shipped in any pass, including v2 (see object-sculpt-spec.json's omitOrSimplify)"
     ],
     "originalTreatment": [
-      "the integrated skeleton-torso puller: arms/hands pinned to the shaft handles, seated/standing pose baked into the model, no photo shows this, fully invented",
-      "a Halloween-appropriate material palette: weathered bone, aged dark iron, tattered/patched canopy fabric rather than the photographed gloss-black lacquer and clean upholstery",
-      "project-authored rear and underside geometry (none of the three photos show a clean rear three-quarter; the modern-repro photo's rear view informs proportions only, not exact form)",
-      "the canopy is authored in a single FIXED open pose for this pass (see object-sculpt-spec.json); a raise/lower toggle is a deferred follow-up feature, not part of this asset's geometry contract"
+      "the integrated skeleton-torso puller: arms/hands pinned to the shaft handles, composed as a separate runtime actor rather than baked into this mesh, no photo shows this, fully invented",
+      "a Halloween-appropriate material palette: weathered bone, aged dark iron, rather than the photographed gloss-black lacquer and clean upholstery",
+      "project-authored rear and underside geometry (none of the three photos show a clean rear three-quarter; the modern-repro photo's rear view informs proportions only, not exact form)"
     ]
   },
   "admittedViews": {

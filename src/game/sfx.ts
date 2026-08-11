@@ -1035,7 +1035,13 @@ class Sfx {
   mountLoop(id: number, x: number, y: number, z: number, mountKey: string, moving: boolean): void {
     const key = `mount_loop_${mountKey}`;
     if (!(key in SFX_CLIPS)) {
-      this.stopMountLoop(id);
+      // The renderer calls this every frame for every mounted entity in view,
+      // and most mounts have no mount_loop_* clip at all: skip the template
+      // string and the three unloop() Map ops unless a slot could actually be
+      // held (e.g. a mid-ride mount swap from a rolling mount to a walking one).
+      if (this.loops.has(`mountloop_${id}`) || this.pendingLoops.has(`mountloop_${id}`)) {
+        this.stopMountLoop(id);
+      }
       return;
     }
     // GAIN-only, never stop/start on movement. Stopping the loop when `moving`

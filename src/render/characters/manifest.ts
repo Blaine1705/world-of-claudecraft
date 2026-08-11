@@ -131,7 +131,7 @@ export interface VisualDef {
   /** This GLB is a modular PART LIBRARY, not a finished character: every body
    *  part, hair style and armour slot piece rides one shared rig and the
    *  visible set is picked per entity (see modular.ts). assembleModel composes
-   *  it against the picked part set. */
+   *  it instead of cloning the whole scene. */
   modular?: boolean;
   /** Two-state prop mob (the dragonkin egg): the GLB ships BOTH state meshes
    *  seated at the origin; alive shows `hide` only, and death swaps to `show`

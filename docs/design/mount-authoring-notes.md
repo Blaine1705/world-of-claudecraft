@@ -250,10 +250,6 @@ how this kind of cross-file pinned-count regression slips through unnoticed.
   different test file than the one being edited, caught only by running the whole suite).
   Also true of the item-art audit gates: adding one new icon shifted pinned counts and
   hashes across four separate files, not just the mapping.json entry you'd expect.
-- **Before claiming "no new review," actually fetch the full comment list.** Checking only
-  the last comment on a PR can miss an entire review round sitting earlier in the thread
-  (`gh api repos/<org>/<repo>/issues/<pr>/comments`, read every body, not
-  `gh pr view ... -q '.comments[-1]'`).
 - **Never rebase a feature branch onto the release branch.** Team-wide policy as of
   2026-08-11: merge the release branch INTO your feature branch instead
   (`git merge upstream/release/vX.Y.Z`). Rebasing rewrites history on a branch that may
@@ -264,10 +260,6 @@ how this kind of cross-file pinned-count regression slips through unnoticed.
   the opposite of what those flags mean during a rebase. When in doubt, use an
   unambiguous `git checkout upstream/<branch> -- <file>` instead of relying on
   ours/theirs at all.
-- **A "this isn't available in this environment" claim deserves one real attempt before
-  being accepted.** Both the `ktx` binary and, separately this session, a working
-  Chromium build turned out to be gettable with a direct download when the "just not
-  available" assumption would have blocked real work.
 - **A tool/environment mismatch can look like a code regression.** Re-rendering all 230
   mob portraits with a slightly different Chrome build than whatever produced the
   currently-committed images produces small-but-real pixel drift (about 0.7/channel
