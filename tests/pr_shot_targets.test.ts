@@ -199,7 +199,10 @@ describe('classifyDiff', () => {
       'src/sim/combat/stealth_focus.ts',
     ]) {
       const plan = classifyDiff([file]);
-      expect(plan.specific.map((t: { key: string }) => t.key), file).toContain('ability-tooltip');
+      expect(
+        plan.specific.map((t: { key: string }) => t.key),
+        file,
+      ).toContain('ability-tooltip');
     }
     const target = resolveTargets(['src/sim/incapacitate_dr.ts']).find(
       (candidate: { key: string }) => candidate.key === 'ability-tooltip',
