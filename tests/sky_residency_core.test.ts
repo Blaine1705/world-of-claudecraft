@@ -5,6 +5,7 @@ import {
   SKY_EVICT_RADIUS,
   SKY_KEEP_RADIUS,
   type SkyResidencyRegion,
+  zoneArrivalReady,
 } from '../src/render/sky_residency_core';
 import { INITIAL_SKY_PREWARM_RADIUS, MAX_OUTDOOR_FOG_FAR } from '../src/render/zone_streaming';
 
@@ -358,5 +359,130 @@ describe('renderer sky-residency driver', () => {
     expect(body).toContain('this.host.scene().environment === target.texture');
     // Aliased sky urls share one PMREM target across biome keys.
     expect(body).toContain('for (const remaining of this.host.envRTs().values())');
+  });
+
+  it('sweeps the module HDR stores on the shadowless tiers instead of just returning', () => {
+    // A downgrade rebuild (Medium or higher to Low) reaches this lane with
+    // the sky module's decoded HDRs still resident, and this lane is their
+    // only release path: a bare return would retain them for the whole Low
+    // session (review round 3). The recheck cadence also sweeps a
+    // pre-downgrade fetch that settles after the rebuild.
+    const start = driver.indexOf('  updateSkyResidency(cameraX: number, cameraZ: number): void {');
+    expect(start).toBeGreaterThan(0);
+    const body = driver.slice(start, driver.indexOf('\n  }', start));
+    const gate = body.indexOf('if (!GFX.standardMaterials) {');
+    expect(gate).toBeGreaterThan(-1);
+    const gateBody = body.slice(gate, body.indexOf('return;', gate));
+    expect(gateBody).toContain('releaseSkyBiomeAssets(residentSkyBiomes())');
+    expect(gateBody).toContain('this.evictEnvironmentBiome(biome)');
+  });
+
+  it('pins the ensured biome across the whole warm, not just the fetch', () => {
+    // Fetch protection (skyAssetsInFlight) ends when the fetch settles, but
+    // the warm still hands the decoded texture to idle uploads and PMREM
+    // frames later; an unpinned evict in that window disposes a texture about
+    // to be re-uploaded (review round 3).
+    const start = driver.indexOf('private ensureSkyResidency(biome: SkyKey): void {');
+    expect(start).toBeGreaterThan(0);
+    const body = driver.slice(start, driver.indexOf('\n  }\n', start));
+    const pin = body.indexOf('const unpin = pinSkyBiomeAssets([biome]);');
+    expect(pin).toBeGreaterThan(-1);
+    expect(pin).toBeLessThan(body.indexOf('await ensureSkyBiomeAssets([biome])'));
+    const finallyStart = body.indexOf('.finally(() => {');
+    expect(finallyStart).toBeGreaterThan(-1);
+    const finallyBody = body.slice(finallyStart);
+    expect(finallyBody).toContain('unpin();');
+    expect(finallyBody).toContain('this.skyResidencyEnsuring.delete(biome);');
+  });
+
+  it('gates arrival readiness on sky residency through the shared pure predicate', () => {
+    // main.ts bails on isZoneReadyAt before ever calling prepareZoneAt, so a
+    // revisit after eviction must read NOT ready or the recovery branch above
+    // is unreachable from the arrival path (review round 3).
+    const start = renderer.indexOf('isZoneReadyAt(x: number, z: number): boolean {');
+    expect(start).toBeGreaterThan(0);
+    const body = renderer.slice(start, renderer.indexOf('\n  }', start));
+    expect(body).toContain('zoneArrivalReady({');
+    expect(body).toContain('prepared: this.preparedZones.has(id)');
+    expect(body).toContain('programsPrewarmed: this.prewarmedZonePrograms.has(id)');
+    expect(body).toContain('standardMaterials: GFX.standardMaterials');
+    expect(body).toContain(
+      'skyBiomesAt(x, z).every((biome) => this.skyView.skyBiomeAssetsResident(biome))',
+    );
+  });
+
+  it('the walked background arrival takes the idle sky arm, never the synchronous one', () => {
+    // The background warm branch has no curtain: for a PREPARED zone (the
+    // sky-only recovery) it must pass idle pacing, or prepareZoneSky's fast
+    // arm pays a synchronous PMREM plus full uploads in live play. The
+    // unprepared catch-up build keeps its historic escalating join.
+    const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+    const branch = main.indexOf("zoneWarmupMode(displacement) === 'background'");
+    expect(branch).toBeGreaterThan(0);
+    const body = main.slice(branch, main.indexOf('return;', branch));
+    expect(body).toContain('const skyOnlyRecovery = renderer.isZonePreparedAt(zoneX, zoneZ);');
+    expect(body).toContain(
+      ".prepareZoneAt(zoneX, zoneZ, undefined, skyOnlyRecovery ? { pace: 'idle' } : undefined)",
+    );
+  });
+
+  it('prepareZoneSky pins and warms every place-keyed dome the arrival can see', () => {
+    // Farshore and the Sowfield bowl draw a dome keyed off the zone biome;
+    // warming only zone.biome left that dome to pay its full 2K upload on the
+    // first live bind after the curtain (review round 3). PMREM stays on
+    // zone.biome, and the pin holds until the warm settles either way.
+    const start = renderer.indexOf('private async prepareZoneSky(');
+    expect(start).toBeGreaterThan(0);
+    const body = renderer.slice(start, renderer.indexOf('\n  }\n', start));
+    expect(body).toContain('const skyKeys = skyBiomesAt(x, z);');
+    expect(body).toContain('const unpin = pinSkyBiomeAssets(skyKeys);');
+    expect(body).toContain(
+      'for (const key of skyKeys) this.prewarmTexture(this.skyView.domeTexture(key));',
+    );
+    expect(body).toContain(
+      'for (const key of skyKeys) await this.prewarmTextureInIdle(this.skyView.domeTexture(key));',
+    );
+    expect(body).toContain('} finally {');
+    expect(body).toContain('unpin();');
+  });
+});
+
+describe('zoneArrivalReady', () => {
+  const base = { prepared: true, programsPrewarmed: true, standardMaterials: true };
+
+  it('a revisit whose sky was evicted is NOT ready, so the arrival re-runs the sky half', () => {
+    expect(zoneArrivalReady({ ...base, skyResident: () => false })).toBe(false);
+  });
+
+  it('a fully resident sky arrives ready', () => {
+    expect(zoneArrivalReady({ ...base, skyResident: () => true })).toBe(true);
+  });
+
+  it('terrain and shader programs still gate, and the sky readout never runs for them', () => {
+    // The predicate sits on a per-frame arrival check and the readout
+    // allocates: lazy evaluation is part of the contract, not a style choice.
+    let called = false;
+    const probe = () => {
+      called = true;
+      return true;
+    };
+    expect(zoneArrivalReady({ ...base, prepared: false, skyResident: probe })).toBe(false);
+    expect(zoneArrivalReady({ ...base, programsPrewarmed: false, skyResident: probe })).toBe(false);
+    expect(called).toBe(false);
+  });
+
+  it('shadowless tiers never gate arrival on sky: their stores stay empty by design', () => {
+    let called = false;
+    expect(
+      zoneArrivalReady({
+        ...base,
+        standardMaterials: false,
+        skyResident: () => {
+          called = true;
+          return false;
+        },
+      }),
+    ).toBe(true);
+    expect(called).toBe(false);
   });
 });

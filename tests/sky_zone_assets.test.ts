@@ -309,4 +309,74 @@ describe('zone-scoped sky assets', () => {
     expect(driver).toContain('skyResidencyRegions(this.host.liveZones())');
     expect(driver).toContain('new Set(this.host.liveZones().map((zone) => zone.biome))');
   });
+
+  it('refuses to release a biome a warm lane pinned, until every pin is gone', async () => {
+    // Fetch protection ends when ensureSkyBiomeAssets settles, but a warm
+    // lane (zone prepare, residency ensure) still hands the decoded texture
+    // to idle uploads and PMREM frames later: releasing in that window
+    // disposes a texture about to be re-uploaded, minting GPU backing no
+    // store owns. Pins cover that window, refcounted so overlapping lanes
+    // compose.
+    const sky = await import('../src/render/sky');
+    await sky.ensureSkyBiomeAssets(['marsh']);
+    expect(sky.residentSkyBiomes()).toContain('marsh');
+
+    const unpinPrepare = sky.pinSkyBiomeAssets(['marsh']);
+    const unpinEnsure = sky.pinSkyBiomeAssets(['marsh']);
+    expect(sky.releaseSkyBiomeAssets(['marsh'])).toEqual([]);
+    expect(sky.residentSkyBiomes()).toContain('marsh');
+
+    unpinPrepare();
+    expect(sky.releaseSkyBiomeAssets(['marsh'])).toEqual([]);
+
+    // A double unpin is idempotent: it must not steal the other lane's pin.
+    unpinPrepare();
+    expect(sky.releaseSkyBiomeAssets(['marsh'])).toEqual([]);
+
+    unpinEnsure();
+    expect(sky.releaseSkyBiomeAssets(['marsh'])).toEqual(['marsh']);
+    expect(sky.residentSkyBiomes()).not.toContain('marsh');
+  });
+
+  it('a shadowless recheck sweeps the resident HDR stores and the derived env RTs', async () => {
+    // A downgrade rebuild (Medium or higher to Low) leaves the module stores
+    // populated while the residency lane's ensure arm is gated off; the
+    // shadowless branch must still run the evict half or the decoded HDRs
+    // leak for the whole Low session. Behavioral, through the real driver and
+    // the real stores: only the renderer host is faked.
+    const sky = await import('../src/render/sky');
+    const { SkyResidencyDriver } = await import('../src/render/sky_residency_driver');
+    const { GFX } = await import('../src/render/gfx');
+    await sky.ensureSkyBiomeAssets(['marsh']);
+    expect(sky.residentSkyBiomes()).toContain('marsh');
+    (GFX as { standardMaterials: boolean }).standardMaterials = false;
+
+    const rt = { texture: {}, dispose: vi.fn() };
+    const envRTs = new Map([['marsh', rt]]);
+    const forbidden = (what: string) => () => {
+      throw new Error(`the shadowless arm must not reach ${what}`);
+    };
+    const driver = new SkyResidencyDriver({
+      isShutdown: () => false,
+      lifecycleGeneration: () => 0,
+      scene: () => ({ environment: null }),
+      skyView: forbidden('the sky view'),
+      envRTs: () => envRTs,
+      envBiome: () => 'vale',
+      envTransition: () => ({ current: 'vale', pending: null }),
+      preparedZones: () => new Set<string>(),
+      liveZones: () => [],
+      zoneIdAt: () => null,
+      prewarmTextureInIdle: forbidden('an idle prewarm'),
+      runPmrem: forbidden('pmrem'),
+      idleSlot: forbidden('an idle slot'),
+    } as never);
+
+    driver.updateSkyResidency(0, 0);
+
+    expect(sky.residentSkyBiomes()).not.toContain('marsh');
+    expect(releaseHdr).toHaveBeenCalledWith('/env/marsh_overcast_2k.hdr', undefined);
+    expect(rt.dispose).toHaveBeenCalled();
+    expect(envRTs.size).toBe(0);
+  });
 });

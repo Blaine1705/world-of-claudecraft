@@ -402,6 +402,30 @@ const skyAssetTasks = new Map<string, Promise<void>>();
 // texture into a store the release just cleared, or (through an aliased url)
 // publish one this release disposed.
 const skyAssetsInFlight = new Set<SkyKey>();
+// Biomes a warm lane (a zone prepare, or a residency ensure) is holding across
+// idle-paced GPU work. Fetch protection (skyAssetsInFlight) ends the moment the
+// fetch settles, but the lane still hands the decoded DataTexture to initTexture
+// and PMREM frames later; a release inside that window would dispose a texture
+// about to be re-uploaded, leaving GPU backing no store owns until renderer
+// teardown. Refcounted so overlapping lanes compose.
+const skyAssetPins = new Map<SkyKey, number>();
+
+/** Pin biomes against release for the duration of a warm lane. Returns the
+ *  matching unpin: call it in a finally, exactly once per pin. */
+export function pinSkyBiomeAssets(biomes: readonly SkyKey[]): () => void {
+  const pinned = [...new Set(biomes)];
+  for (const biome of pinned) skyAssetPins.set(biome, (skyAssetPins.get(biome) ?? 0) + 1);
+  let released = false;
+  return () => {
+    if (released) return;
+    released = true;
+    for (const biome of pinned) {
+      const count = skyAssetPins.get(biome) ?? 0;
+      if (count <= 1) skyAssetPins.delete(biome);
+      else skyAssetPins.set(biome, count - 1);
+    }
+  };
+}
 
 /** Every sky key the tables above declare. */
 export const SKY_KEYS = Object.keys(HDRI_TUNE) as SkyKey[];
@@ -547,16 +571,17 @@ function releaseHdrSlot(
  * PMREM source and the backdrop, drop the fetch memo, and drop the loader's
  * cache entries so a later ensureSkyBiomeAssets re-fetches from scratch.
  *
- * Refuses (silently skips) any biome bound into a live dome's uniforms, and any
- * biome whose fetch is still in flight. Returns the biomes actually released,
- * so the caller can evict whatever it derived from them (the renderer's
- * prefiltered environment render targets).
+ * Refuses (silently skips) any biome bound into a live dome's uniforms, any
+ * biome whose fetch is still in flight, and any biome a warm lane pinned
+ * (pinSkyBiomeAssets). Returns the biomes actually released, so the caller can
+ * evict whatever it derived from them (the renderer's prefiltered environment
+ * render targets).
  */
 export function releaseSkyBiomeAssets(biomes: readonly SkyKey[]): SkyKey[] {
   const bound = new Set(currentDomeBiomes());
   const dropping = new Set<SkyKey>();
   for (const biome of biomes) {
-    if (bound.has(biome) || skyAssetsInFlight.has(biome)) continue;
+    if (bound.has(biome) || skyAssetsInFlight.has(biome) || skyAssetPins.has(biome)) continue;
     dropping.add(biome);
   }
   if (dropping.size === 0) return [];

@@ -186,3 +186,117 @@ describe('loadHdr evicts a terminal failure so a later ensure can recover', () =
     expect(calls.length).toBe(failedCalls + 2);
   });
 });
+
+describe('loadKtx2Texture evicts a terminal failure so a later apply can recover', () => {
+  const url = 'textures/terrain/grass_albedo.ktx2';
+
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  it('fail-all then recover, on both the clamp and repeat cache keys', async () => {
+    // Review round 3: a rejected promise left in ktx2TexCache poisoned every
+    // later load for the session. The terrain, surface-detail and stone-normal
+    // owners clear their tasks and a graphics-profile apply rolls back, so a
+    // second Apply is meant to retry, but it was handed the old rejection and
+    // issued no request at all.
+    let failing = true;
+    const calls: string[] = [];
+    vi.doMock('../src/render/assets/ktx2_support', () => ({
+      ktx2Loader: () => ({
+        load: (
+          loaded: string,
+          onLoad: (tex: unknown) => void,
+          _onProgress: unknown,
+          onError: () => void,
+        ): void => {
+          calls.push(loaded);
+          if (failing) {
+            onError();
+            return;
+          }
+          onLoad({ isCompressedTexture: true });
+        },
+      }),
+    }));
+
+    const { loadKtx2Texture } = await import('../src/render/assets/loader');
+    await expect(loadKtx2Texture(url)).rejects.toThrow('ktx2 texture load failed');
+    await expect(loadKtx2Texture(url, { repeat: true })).rejects.toThrow(
+      'ktx2 texture load failed',
+    );
+    const failedCalls = calls.length;
+    expect(failedCalls).toBeGreaterThanOrEqual(2 * MAX_LOAD_ATTEMPTS);
+
+    // The asset comes back: both cache keys must issue fresh attempts (a
+    // poisoned cache would replay the old rejection with zero new calls).
+    failing = false;
+    const clamped = await loadKtx2Texture(url);
+    expect(clamped).toBeTruthy();
+    const repeated = await loadKtx2Texture(url, { repeat: true });
+    expect(repeated.wrapS).toBe(THREE.RepeatWrapping);
+    expect(calls.length).toBe(failedCalls + 2);
+
+    // And the recovered entries cache normally again.
+    expect(await loadKtx2Texture(url)).toBe(clamped);
+    expect(await loadKtx2Texture(url, { repeat: true })).toBe(repeated);
+    expect(calls.length).toBe(failedCalls + 2);
+  });
+});
+
+describe('loadTexture evicts a terminal failure so a later load can recover', () => {
+  const url = '/textures/terrain/grass_albedo.jpg';
+
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  it('fail-all then recover, on distinct srgb and repeat cache keys', async () => {
+    // Review round 3 follow-up: the same poisoned-cache defect fixed in
+    // loadHdr and loadKtx2Texture lived in the third loader cache too.
+    let failing = true;
+    const calls: string[] = [];
+    vi.doMock('three', async (importOriginal) => {
+      const actual = await importOriginal<typeof import('three')>();
+      return {
+        ...actual,
+        TextureLoader: class {
+          load(
+            loaded: string,
+            onLoad: (tex: unknown) => void,
+            _onProgress: unknown,
+            onError: () => void,
+          ): void {
+            calls.push(loaded);
+            if (failing) {
+              onError();
+              return;
+            }
+            onLoad(new actual.Texture());
+          }
+        },
+      };
+    });
+
+    const { loadTexture } = await import('../src/render/assets/loader');
+    await expect(loadTexture(url)).rejects.toThrow('texture load failed');
+    await expect(loadTexture(url, { srgb: true, repeat: true })).rejects.toThrow(
+      'texture load failed',
+    );
+    const failedCalls = calls.length;
+    expect(failedCalls).toBeGreaterThanOrEqual(2 * MAX_LOAD_ATTEMPTS);
+
+    // A later load of the SAME url must issue a fresh attempt on both keys.
+    failing = false;
+    const plain = await loadTexture(url);
+    expect(plain).toBeTruthy();
+    const wrapped = await loadTexture(url, { srgb: true, repeat: true });
+    expect(wrapped.wrapS).toBe(THREE.RepeatWrapping);
+    expect(calls.length).toBe(failedCalls + 2);
+
+    // And the recovered entries memoize normally again.
+    expect(await loadTexture(url)).toBe(plain);
+    expect(await loadTexture(url, { srgb: true, repeat: true })).toBe(wrapped);
+    expect(calls.length).toBe(failedCalls + 2);
+  });
+});

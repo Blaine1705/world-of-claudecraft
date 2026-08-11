@@ -467,6 +467,11 @@ export function loadTexture(
       },
       (err: unknown) => {
         recordAssetLoad('texture', resolved, startedAt, true);
+        // Same terminal-failure eviction as loadHdr, loadGltf and
+        // loadKtx2Texture: a rejected promise left in the cache poisons every
+        // later load of this url for the session. Identity-guarded so a newer
+        // in-flight load is never evicted by an old failure settling.
+        if (texCache.get(key) === p) texCache.delete(key);
         throw err;
       },
     );
@@ -528,6 +533,13 @@ export function loadKtx2Texture(
       },
       (err: unknown) => {
         recordAssetLoad('texture', resolved, startedAt, true);
+        // Same failure eviction as loadHdr (the loadGltf black-void precedent):
+        // a rejected promise left in the cache poisons every later load for the
+        // session, so the second graphics-profile Apply that the terrain,
+        // surface-detail and stone-normal owners retry through would replay the
+        // old rejection instead of issuing a request. Identity-guarded so a
+        // newer in-flight load is never evicted by an old failure settling.
+        if (ktx2TexCache.get(cacheKey) === p) ktx2TexCache.delete(cacheKey);
         throw err;
       },
     );

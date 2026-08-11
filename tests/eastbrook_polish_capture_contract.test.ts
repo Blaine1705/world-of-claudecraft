@@ -117,7 +117,7 @@ interface AttributionTargetFixture {
 // archetype and scene-texture counts; renderer.ts edits only). No capture
 // was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'e4d3f567a24f6192925920aea8cd3ad59f44b829af63d828d6fe619b981a7cc2';
+  'd97aac7c3c60d26598f4f26e1b8e4fe65eeae9a65d6ac5442a6cb9a10120c830';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

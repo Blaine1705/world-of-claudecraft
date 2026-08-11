@@ -4,6 +4,7 @@ import { GFX } from './gfx';
 import {
   currentDomeBiomes,
   ensureSkyBiomeAssets,
+  pinSkyBiomeAssets,
   readySkyBiomes,
   releaseSkyBiomeAssets,
   residentSkyBiomes,
@@ -104,6 +105,11 @@ export class SkyResidencyDriver {
   private ensureSkyResidency(biome: SkyKey): void {
     if (this.host.isShutdown() || this.skyResidencyEnsuring.has(biome)) return;
     this.skyResidencyEnsuring.add(biome);
+    // Pinned for the whole warm, not just the fetch: a later plan on this
+    // same lane could otherwise evict and dispose the decoded texture while
+    // the idle-paced uploads below still hold it, and re-uploading a disposed
+    // texture mints GPU backing no store owns.
+    const unpin = pinSkyBiomeAssets([biome]);
     // Every step below yields, and the fetch can settle long after a graphics
     // rebuild replaced this renderer: guard the lifecycle like the boot resume
     // lane, or ensureEnvironmentBiome would re-mint GPU state on a dead one.
@@ -133,6 +139,7 @@ export class SkyResidencyDriver {
         console.warn(`Sky residency ensure failed: ${biome}`, err);
       })
       .finally(() => {
+        unpin();
         this.skyResidencyEnsuring.delete(biome);
       });
   }
@@ -149,8 +156,22 @@ export class SkyResidencyDriver {
     // The shadowless tiers never fetch sky HDRIs (ensureSkyBiomeAssets
     // early-returns), so nothing can ever become ready there: without this
     // gate the ensure arm would re-enqueue an async no-op for every prepared
-    // biome on every recheck, forever (review round 2).
-    if (!GFX.standardMaterials) return;
+    // biome on every recheck, forever (review round 2). But a DOWNGRADE
+    // rebuild (Medium or higher to Low) arrives here with the module HDR
+    // stores still populated: renderer shutdown unbinds the dome and disposes
+    // its own PMREM targets, while the decoded HDRs and their loader entries
+    // belong to the sky module and this lane is their only release path. So
+    // sweep instead of just returning: on a fresh Low session the resident
+    // set is empty and this is free, and running on the recheck cadence also
+    // catches a pre-downgrade fetch that settles after the rebuild (release
+    // refuses an in-flight biome, so the late completion lands first and is
+    // swept on the next pass).
+    if (!GFX.standardMaterials) {
+      for (const biome of releaseSkyBiomeAssets(residentSkyBiomes())) {
+        this.evictEnvironmentBiome(biome);
+      }
+      return;
+    }
     // Only a PREPARED zone's sky is this lane's to restore: an unprepared one
     // still belongs to the streaming lane, which fetches it inside its own
     // prepare. A region's centre always resolves to the zone that owns it, for

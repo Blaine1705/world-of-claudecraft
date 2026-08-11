@@ -492,10 +492,12 @@ import {
   buildSky,
   ensureSkyAssetsAt,
   ensureSkyBiomeAssets,
+  pinSkyBiomeAssets,
   type SkyKey,
   type SkyView,
   skyBiomesAt,
 } from './sky';
+import { zoneArrivalReady } from './sky_residency_core';
 import { SkyResidencyDriver } from './sky_residency_driver';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { buildSoulwell, disposeSoulwellVisual, syncSoulwellVisual } from './soulwell';
@@ -3566,7 +3568,16 @@ export class Renderer {
 
   isZoneReadyAt(x: number, z: number): boolean {
     const id = this.zoneIdAt(x, z);
-    return id === null || (this.preparedZones.has(id) && this.prewarmedZonePrograms.has(id));
+    if (id === null) return true;
+    // Sky residency is part of arrival readiness: a false routes the arrival
+    // through prepareZoneAt's sky recovery branch (curtain, or idle pace).
+    return zoneArrivalReady({
+      prepared: this.preparedZones.has(id),
+      programsPrewarmed: this.prewarmedZonePrograms.has(id),
+      standardMaterials: GFX.standardMaterials,
+      skyResident: () =>
+        skyBiomesAt(x, z).every((biome) => this.skyView.skyBiomeAssetsResident(biome)),
+    });
   }
 
   zoneStreamingStats(): {
@@ -3625,31 +3636,42 @@ export class Renderer {
     z: number,
     idlePace: boolean,
   ): Promise<void> {
-    await ensureSkyAssetsAt(x, z);
-    const envSource = this.skyView.envTexture(zone.biome);
-    const domeSource = this.skyView.domeTexture(zone.biome);
-    if (!idlePace) {
-      // Initial entry/teleport is already covered by an opaque loading screen.
-      this.ensureEnvironmentBiome(zone.biome);
-      this.prewarmTexture(envSource);
-      this.prewarmTexture(domeSource);
-      return;
+    // Every key the arrival can SEE, not just zone.biome: Farshore and the
+    // Sowfield bowl draw a place-keyed dome whose zone key is another biome,
+    // and warming only that key left the place dome its full 2K upload on
+    // first live bind. PMREM stays on zone.biome (place skies never had one).
+    // The pin holds for the whole warm: an evict mid-warm would dispose a
+    // texture about to be re-uploaded, minting GPU backing no store owns.
+    const skyKeys = skyBiomesAt(x, z);
+    const unpin = pinSkyBiomeAssets(skyKeys);
+    try {
+      await ensureSkyAssetsAt(x, z);
+      if (!idlePace) {
+        // Every non-idle caller (entry, teleport, the blocking sky recovery)
+        // sits behind an opaque loading screen; the walked recovery is idle.
+        this.ensureEnvironmentBiome(zone.biome);
+        this.prewarmTexture(this.skyView.envTexture(zone.biome));
+        for (const key of skyKeys) this.prewarmTexture(this.skyView.domeTexture(key));
+        return;
+      }
+      // A DataTexture upload is synchronous even from requestIdleCallback. Newer
+      // Three runtimes can split HDRIs into row batches; pinned r165 lacks update
+      // ranges and pays one full upload. Either way each atomic WebGL call enters
+      // the shared queue so it cannot overlap a live shader compile.
+      await this.prewarmTextureInIdle(this.skyView.envTexture(zone.biome));
+      // PMREM generation is indivisible in Three r165. Defer two timed-out
+      // callbacks before deliberately paying that single unit under sustained
+      // load, rather than running it on the first forced callback.
+      await idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 });
+      await this.backgroundGpuWork.run(
+        () => this.ensureEnvironmentBiome(zone.biome),
+        GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+        `pmrem:${zone.biome}`,
+      );
+      for (const key of skyKeys) await this.prewarmTextureInIdle(this.skyView.domeTexture(key));
+    } finally {
+      unpin();
     }
-    // A DataTexture upload is synchronous even from requestIdleCallback. Newer
-    // Three runtimes can split HDRIs into row batches; pinned r165 lacks update
-    // ranges and pays one full upload. Either way each atomic WebGL call enters
-    // the shared queue so it cannot overlap a live shader compile.
-    await this.prewarmTextureInIdle(envSource);
-    // PMREM generation is indivisible in Three r165. Defer two timed-out
-    // callbacks before deliberately paying that single unit under sustained
-    // load, rather than running it on the first forced callback.
-    await idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 });
-    await this.backgroundGpuWork.run(
-      () => this.ensureEnvironmentBiome(zone.biome),
-      GPU_WORK_PRIORITY.VISIBLE_PREWARM,
-      `pmrem:${zone.biome}`,
-    );
-    await this.prewarmTextureInIdle(domeSource);
   }
 
   /**
@@ -5196,6 +5218,11 @@ export class Renderer {
     this.frozenOrbFx.update(dt);
     this.mageGroundFx.update(dt);
     this.warlockMeteorFx.update(dt, this.reducedMotion());
+    // The meteor fx registers and releases budget lights AFTER the pass (a
+    // landing frees the visible fall light), which would dip the pinned
+    // visible count for this frame, and numPointLights is in every lit
+    // material's program cache key. Re-run the budget, pads included.
+    if (this.lightRankDirty) this.budgetFireLights(p.pos.x, p.pos.z);
     this.necromancyGroundFx.update(dt, this.reducedMotion());
     this.necromancyArmyPortalFx.update(dt, this.reducedMotion());
     this.abyssalRiftFx.update(dt, this.reducedMotion());
@@ -12425,6 +12452,9 @@ export class Renderer {
     this.frozenOrbFx.update(dt);
     this.mageGroundFx.update(dt);
     this.warlockMeteorFx.update(dt, this.reducedMotion());
+    // Same post-fx budget recovery as the prewarm frame path: a landing or
+    // expiry must not dip the pinned visible count for the frame it lands on.
+    if (this.lightRankDirty) this.budgetFireLights(p.pos.x, p.pos.z, true);
     this.necromancyGroundFx.update(dt, this.reducedMotion());
     this.necromancyArmyPortalFx.update(dt, this.reducedMotion());
     this.abyssalRiftFx.update(dt, this.reducedMotion());
@@ -12876,8 +12906,10 @@ export class Renderer {
   // key, and one unranked light appearing is a synchronous relink of every lit
   // material in view (the mid-combat stall the pinned count exists to prevent).
   // Hidden on the way in because the owning fx updates AFTER budgetFireLights
-  // in the frame, so its first budget pass lands next frame and the light must
-  // not count in between; the budget owns `visible` from then on. Dynamic means
+  // in the frame, so the light must never count unranked; the post-fx recovery
+  // pass (both frame paths re-run the budget when the rank went dirty) ranks
+  // it before this frame renders, and the budget owns `visible` from then on.
+  // Dynamic means
   // the budget only ever ZEROES the intensity and never restores it, so an fx
   // that wants a light back must re-drive its own level from BEFORE the pass
   // (weapon_vfx.ts is the other dynamic owner and does exactly that).

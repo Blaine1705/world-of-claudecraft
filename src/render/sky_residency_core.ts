@@ -90,6 +90,31 @@ export interface SkyResidencyPlan<K extends string> {
   readonly evict: K[];
 }
 
+/**
+ * Whether an ARRIVAL at a zone can skip the zone-warmup path entirely.
+ * Terrain and shader programs are necessary but not sufficient: a prepared
+ * zone's sky may have been evicted while the player was away, and bailing on
+ * terrain alone would make prepareZoneAt's sky recovery branch unreachable
+ * from the arrival path, leaving the residency lane to rebuild the sky during
+ * live play (fetch, upload and PMREM included) under the previous realm's
+ * frozen dome. The shadowless tiers never fetch sky HDRIs, so sky residency
+ * is permanently false there and must not gate arrival (same carve-out as the
+ * recovery branch itself).
+ */
+export function zoneArrivalReady(input: {
+  readonly prepared: boolean;
+  readonly programsPrewarmed: boolean;
+  readonly standardMaterials: boolean;
+  /** Lazily evaluated: the caller sits on a per-frame arrival check and the
+   *  residency readout allocates, so it must only run once every cheap gate
+   *  above it has passed. */
+  readonly skyResident: () => boolean;
+}): boolean {
+  if (!input.prepared || !input.programsPrewarmed) return false;
+  if (!input.standardMaterials) return true;
+  return input.skyResident();
+}
+
 /** Squared XZ distance from a point to a region's rectangle (0 when inside). */
 function distanceSqToRegion<K extends string>(
   region: SkyResidencyRegion<K>,
