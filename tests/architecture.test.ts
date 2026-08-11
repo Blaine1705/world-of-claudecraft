@@ -433,6 +433,7 @@ const RENDER_PURE_CORES = [
   'src/render/affliction_familiar_core.ts',
   'src/render/characters/portrait_prewarm_core.ts',
   'src/render/reveal_gate_core.ts',
+  'src/render/town_reveal_core.ts',
   'src/render/ability_vfx_core.ts',
   'src/render/characters/player_look_core.ts',
   'src/render/ability_vfx_longbuff_core.ts',

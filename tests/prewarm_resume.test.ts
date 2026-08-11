@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { CONSTRAINED_PREWARM_KEEP, skyAssetInlineWaitMs } from '../src/render/prewarm_policy';
 import {
   buildPrewarmCompileUnits,
+  compileRootDistanceSq,
   orderRootsByDistanceSq,
   type PrewarmResumeEntry,
   resumeDroppedPrewarmEntries,
@@ -655,20 +656,78 @@ describe('orderRootsByDistanceSq: the compile debt pays near-first (hitch-hunt P
     expect(roots).toEqual(input);
   });
 
-  it('is wired to the live-scene compile collection with a camera-relative distance', () => {
+  it('handles an empty collection', () => {
+    expect(orderRootsByDistanceSq([], () => null)).toEqual([]);
+  });
+
+  it('is wired to the live-scene compile collection anchored on the player', () => {
     const rendererSource = readFileSync(
       new URL('../src/render/renderer.ts', import.meta.url),
       'utf8',
     );
     // The 'scene' group is the world-content collection the resume lane
     // drains in order; the staged prewarm groups sit next to the player and
-    // gain nothing from sorting.
-    const sceneCollection = rendererSource.slice(
-      rendererSource.indexOf("id: 'scene',"),
-      rendererSource.indexOf('...stagedGroups.flatMap'),
-    );
+    // gain nothing from sorting. Player-anchored on purpose: the early
+    // submit runs before the first updateCamera positions the camera.
+    const sceneAt = rendererSource.indexOf("id: 'scene',");
+    const stagedAt = rendererSource.indexOf('...stagedGroups.flatMap');
+    expect(sceneAt).toBeGreaterThan(-1);
+    expect(stagedAt).toBeGreaterThan(sceneAt);
+    const sceneCollection = rendererSource.slice(sceneAt, stagedAt);
     expect(sceneCollection).toContain('roots: orderRootsByDistanceSq(');
-    expect(sceneCollection).toContain('world[12] - this.camera.position.x');
-    expect(sceneCollection).toContain('world[14] - this.camera.position.z');
+    expect(sceneCollection).toContain(
+      'compileRootDistanceSq(root, this.sim.player.pos.x, this.sim.player.pos.z)',
+    );
+  });
+});
+
+describe('compileRootDistanceSq: the honest position of a compile root', () => {
+  const identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+
+  it('uses the world-transformed bounding-sphere centre when present', () => {
+    // World-baked merged content: mesh at identity, geometry carries the
+    // placement. Translation alone would report (0, 0) for this root.
+    const root = {
+      matrixWorld: { elements: identity },
+      geometry: { boundingSphere: { center: { x: 300, y: 5, z: -40 } } },
+    };
+    expect(compileRootDistanceSq(root, 0, 0)).toBe(300 * 300 + 40 * 40);
+  });
+
+  it('applies the full matrix to the centre, not just the translation', () => {
+    const translated = [...identity];
+    translated[12] = 100;
+    translated[14] = 20;
+    const root = {
+      matrixWorld: { elements: translated },
+      geometry: { boundingSphere: { center: { x: 10, y: 0, z: 5 } } },
+    };
+    expect(compileRootDistanceSq(root, 0, 0)).toBe(110 * 110 + 25 * 25);
+  });
+
+  it('falls back to the matrix translation without a computed sphere', () => {
+    const translated = [...identity];
+    translated[12] = 30;
+    translated[14] = -40;
+    expect(compileRootDistanceSq({ matrixWorld: { elements: translated } }, 0, 0)).toBe(2500);
+    expect(
+      compileRootDistanceSq({ matrixWorld: { elements: translated }, geometry: null }, 0, 0),
+    ).toBe(2500);
+  });
+
+  it('orders a near world-baked bake ahead of a far positioned mesh', () => {
+    const nearBaked = {
+      matrixWorld: { elements: identity },
+      geometry: { boundingSphere: { center: { x: 10, y: 0, z: 0 } } },
+    };
+    const farPositioned = (() => {
+      const translated = [...identity];
+      translated[12] = 500;
+      return { matrixWorld: { elements: translated } };
+    })();
+    const ordered = orderRootsByDistanceSq([farPositioned, nearBaked], (root) =>
+      compileRootDistanceSq(root, 0, 0),
+    );
+    expect(ordered).toEqual([nearBaked, farPositioned]);
   });
 });

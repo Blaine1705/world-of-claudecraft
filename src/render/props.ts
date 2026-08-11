@@ -91,9 +91,10 @@ export interface PropsResult {
   ): void;
   /**
    * First-reveal compile gating for the far-cell bakes (hitch-hunt P3a): a
-   * cell's first near-to-far flip is held in the pixel-identical near
+   * cell's first drawn far swap is held in the pixel-identical near
    * representation until the gate warms its key. No gate keeps the immediate
-   * flip (editor, tests, renderers without async compile).
+   * flip (tests, renderers without async compile; the editor viewport
+   * composes the real Renderer and is therefore gated too).
    */
   setFarCellRevealGate(gate: RevealGateCore | null): void;
   /** The compile roots behind a far-cell gate key (that cell's bake meshes). */

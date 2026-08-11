@@ -163,6 +163,7 @@ describe('updatePropCell first-far reveal gating (hitch-hunt P3a)', () => {
       bounds,
       farMode: false,
       visible: true,
+      farReady: false,
       meshes: [{ visible: true, count: 0 }],
       hideables: [
         {
@@ -189,9 +190,47 @@ describe('updatePropCell first-far reveal gating (hitch-hunt P3a)', () => {
     updatePropCell(cell, farCam.x, farCam.z, 200, undefined, gate);
     expect(consulted).toEqual(['0:0']);
     expect(cell.farMode).toBe(false);
-    expect(cell.farReady).not.toBe(true);
+    expect(cell.farReady).toBe(false);
     expect(cell.meshes[0].count).toBe(0);
     expect(cell.hideables[0].suppressed).toBe(false);
+  });
+
+  it('never consults the gate for a far cell beyond the fog (nothing draws)', () => {
+    // A cold world entry flips essentially every cell to far mode on frame
+    // one; gating there would fire a world-wide compile burst for bakes the
+    // fog hides anyway. The consult belongs to the DRAWN swap only.
+    const cell = makeGatedCell('0:0');
+    let consulted = 0;
+    const gate = {
+      allow: () => {
+        consulted++;
+        return false;
+      },
+    };
+    updatePropCell(cell, farCam.x, farCam.z, 50, undefined, gate);
+    expect(consulted).toBe(0);
+    expect(cell.farMode).toBe(true);
+    expect(cell.farReady).toBe(false);
+    // Bake hidden past the fog, exactly the historical beyond-fog far state.
+    expect(cell.meshes[0].visible).toBe(false);
+    // Walking closer brings the bake inside the fog: NOW the gate holds it.
+    updatePropCell(cell, farCam.x, farCam.z, 200, undefined, gate);
+    expect(consulted).toBe(1);
+    expect(cell.farMode).toBe(false);
+  });
+
+  it('composes with the real reveal gate core end to end', async () => {
+    const { createRevealGateCore } = await import('../src/render/reveal_gate_core');
+    const cell = makeGatedCell('0:0');
+    const requested: string[] = [];
+    const gate = createRevealGateCore((key) => requested.push(key));
+    updatePropCell(cell, farCam.x, farCam.z, 200, undefined, gate);
+    expect(requested).toEqual(['0:0']);
+    expect(cell.farMode).toBe(false);
+    gate.settle('0:0');
+    updatePropCell(cell, farCam.x, farCam.z, 200, undefined, gate);
+    expect(cell.farMode).toBe(true);
+    expect(cell.farReady).toBe(true);
   });
 
   it('flips far once the gate allows, and never consults it again', () => {

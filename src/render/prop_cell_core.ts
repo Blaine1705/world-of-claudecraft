@@ -129,12 +129,15 @@ export function updatePropCell(
 ): void {
   const dist = propCellBoxDistance(cell.bounds, camX, camZ);
   let farMode = dist >= swapDistance;
-  if (farMode && cell.farReady !== true) {
-    // First far flip: the swap is pixel-identical, so holding the near
+  if (farMode && dist < fogFar && cell.farReady !== true) {
+    // First DRAWN far swap: the swap is pixel-identical, so holding the near
     // representation while the bake's instanced programs link off-thread is
     // invisible, whereas flipping cold pays a synchronous first-draw link
-    // inside a live frame (hitch-hunt P3a). No gate (or no key) keeps the
-    // historical immediate flip.
+    // inside a live frame (hitch-hunt P3a). Gated on the bake actually
+    // drawing (inside the fog), not on far mode alone: a beyond-fog cell
+    // draws nothing either way, and consulting there would fire a
+    // world-wide compile burst on the first frame for content nothing can
+    // see. No gate (or no key) keeps the historical immediate flip.
     if (gate && cell.key !== undefined && !gate.allow(cell.key)) farMode = false;
     else cell.farReady = true;
   }

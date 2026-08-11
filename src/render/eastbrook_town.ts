@@ -37,6 +37,7 @@ import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import type { RevealGateCore } from './reveal_gate_core';
+import { townStaticReveal } from './town_reveal_core';
 import { modulateEmissiveByVertexColor } from './vertex_color_emissive';
 
 const ROOT_NAME = 'eastbrookTownRebuild';
@@ -959,14 +960,18 @@ function buildFromTemplates(
       reducedMotion = false,
     ): void {
       updateEastbrookCivicBeaconMotion(microBuild.civicBeaconState, reducedMotion);
-      let staticVisible = eastbrookFogVisible(camX, camZ, 0, 0, fogFar, TOWN_CULL_RADIUS);
-      if (staticVisible && !staticRevealed) {
-        // First reveal: hold the batches hidden (they sit at the fog edge)
-        // until their programs are linked off-thread, instead of paying a
-        // synchronous first-draw link inside a live frame (hitch-hunt P3a).
-        if (revealGate && !revealGate.allow('eastbrook-town-static')) staticVisible = false;
-        else staticRevealed = true;
-      }
+      // Eastbrook is centred on the world origin, so the camera's distance
+      // squared to the town centre is camX^2 + camZ^2.
+      const reveal = townStaticReveal(
+        eastbrookFogVisible(camX, camZ, 0, 0, fogFar, TOWN_CULL_RADIUS),
+        staticRevealed,
+        camX * camX + camZ * camZ,
+        TOWN_CULL_RADIUS,
+        revealGate,
+        'eastbrook-town-static',
+      );
+      if (reveal === 'revealed') staticRevealed = true;
+      const staticVisible = reveal === 'revealed';
       for (let index = 0; index < staticCullTargets.length; index++) {
         staticCullTargets[index].visible = staticVisible;
       }

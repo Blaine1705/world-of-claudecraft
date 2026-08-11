@@ -442,6 +442,7 @@ import {
 } from './prewarm_policy';
 import {
   buildPrewarmCompileUnits,
+  compileRootDistanceSq,
   orderRootsByDistanceSq,
   type PrewarmResumeEntry,
   type PrewarmResumeUnit,
@@ -2676,11 +2677,29 @@ export class Renderer {
 
     // First-reveal compile gates (hitch-hunt P3a): a cull flipping world
     // content visible for the first time holds it one representation back
-    // until compileGate links its programs off-thread. Without async compile
-    // the gate itself would be the synchronous stall, so the views stay
-    // ungated there and keep their historical immediate reveal.
+    // until its programs are linked off-thread. Without async compile the
+    // gate itself would be the synchronous stall, so the views stay ungated
+    // there and keep their historical immediate reveal. Reveal compiles ride
+    // BELOW the live entity gates (VISIBLE_PREWARM, not LIVE_VIEW): a
+    // teleport can queue dozens of far cells at once, and cosmetic scenery
+    // must never delay an actionable mob or player reveal.
     if (this.asyncCompileSupported) {
-      const revealHost = { compile: (root: object) => this.compileGate(root as THREE.Object3D) };
+      const revealHost = {
+        compile: (root: object) => {
+          const target = root as THREE.Object3D;
+          return this.liveCompileGates.run(
+            () =>
+              this.compilePrewarmColorPrograms(target, false).then(() =>
+                this.compileShadowPrograms(target),
+              ),
+            VIEW_COMPILE_GATE_MAX_MS,
+            {
+              priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+              label: `reveal-gate:${target.name || target.type}`,
+            },
+          );
+        },
+      };
       this.propsView.setFarCellRevealGate(
         createRevealGate(revealHost, (key) => this.propsView.farCellRevealRoots(key)),
       );
@@ -6221,17 +6240,16 @@ export class Renderer {
                   // debt the camera can reach first must be the debt paid
                   // first (hitch-hunt P3a; the S10 632-681 ms submit stalls
                   // were reveals winning the race against their own compile).
+                  // Anchored on the PLAYER, not the camera: the early submit
+                  // runs before the first updateCamera, when the camera still
+                  // sits at its constructor default.
                   roots: orderRootsByDistanceSq(
                     compileRoots(
                       this.scene.children.filter((root) => !stagedRoots.has(root)),
                       true,
                     ),
-                    (root) => {
-                      const world = root.matrixWorld.elements;
-                      const dx = world[12] - this.camera.position.x;
-                      const dz = world[14] - this.camera.position.z;
-                      return dx * dx + dz * dz;
-                    },
+                    (root) =>
+                      compileRootDistanceSq(root, this.sim.player.pos.x, this.sim.player.pos.z),
                   ),
                 },
               ]

@@ -34,6 +34,7 @@ import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import type { RevealGateCore } from './reveal_gate_core';
+import { townStaticReveal } from './town_reveal_core';
 import { modulateEmissiveByVertexColor } from './vertex_color_emissive';
 
 const ROOT_NAME = 'fenbridgeTownRebuild';
@@ -1309,21 +1310,25 @@ function buildFromTemplates(
       dt: number,
       reducedMotion = false,
     ): void {
-      let staticVisible = fenbridgeFogVisible(
-        camX,
-        camZ,
-        FENBRIDGE_LAYOUT.hub.center.x,
-        FENBRIDGE_LAYOUT.hub.center.z,
-        fogFar,
+      const hubDx = camX - FENBRIDGE_LAYOUT.hub.center.x;
+      const hubDz = camZ - FENBRIDGE_LAYOUT.hub.center.z;
+      const reveal = townStaticReveal(
+        fenbridgeFogVisible(
+          camX,
+          camZ,
+          FENBRIDGE_LAYOUT.hub.center.x,
+          FENBRIDGE_LAYOUT.hub.center.z,
+          fogFar,
+          TOWN_CULL_RADIUS,
+        ),
+        staticRevealed,
+        hubDx * hubDx + hubDz * hubDz,
         TOWN_CULL_RADIUS,
+        revealGate,
+        'fenbridge-town-static',
       );
-      if (staticVisible && !staticRevealed) {
-        // First reveal: hold the batches hidden (they sit at the fog edge)
-        // until their programs are linked off-thread, instead of paying a
-        // synchronous first-draw link inside a live frame (hitch-hunt P3a).
-        if (revealGate && !revealGate.allow('fenbridge-town-static')) staticVisible = false;
-        else staticRevealed = true;
-      }
+      if (reveal === 'revealed') staticRevealed = true;
+      const staticVisible = reveal === 'revealed';
       for (let index = 0; index < staticCullTargets.length; index++) {
         staticCullTargets[index].visible = staticVisible;
       }

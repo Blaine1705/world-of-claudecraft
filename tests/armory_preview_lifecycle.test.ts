@@ -146,4 +146,14 @@ describe('Armory preview lifecycle', () => {
     expect(finallyBody).toContain('active = requestedActive ?? wasActive;');
     expect(finallyBody).not.toContain('active = wasActive;');
   });
+
+  it('defers every selection setter while prewarming (all four writes present)', () => {
+    // The statement-form rewrite of the (pendingSelection ??= {}).x sites is
+    // otherwise pin-free; a dropped write would silently clobber a card
+    // click landing mid-unit.
+    expect(preview).toContain('pendingSelection.appearance = next;');
+    expect(preview).toContain('pendingSelection.skin = next;');
+    expect(preview).toContain('pendingSelection.mode = next;');
+    expect(preview).toContain('pendingSelection.scene = next;');
+  });
 });

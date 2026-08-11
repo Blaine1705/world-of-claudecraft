@@ -116,6 +116,43 @@ export function orderRootsByDistanceSq<T>(
     .map((entry) => entry.root);
 }
 
+/** Structural shape of a compile root's placement (a three mesh satisfies it
+ *  without this module importing three). */
+export interface CompileRootPlacement {
+  matrixWorld: { elements: ArrayLike<number> };
+  geometry?: {
+    boundingSphere?: { center: { x: number; y: number; z: number } } | null;
+  } | null;
+}
+
+/**
+ * Camera-plane XZ distance-squared proxy for a compile root. The object's
+ * matrixWorld translation alone is a trap here: merged and instanced world
+ * content bakes its placement into the GEOMETRY and leaves the mesh at the
+ * origin, which would tie most of the debt at "distance to world origin".
+ * When three has computed a bounding sphere (any root that has been frustum
+ * tested, i.e. everything by resume time), its world-transformed centre is
+ * the honest position for both shapes; the translation is the fallback for
+ * spheres not yet computed.
+ */
+export function compileRootDistanceSq(
+  root: CompileRootPlacement,
+  camX: number,
+  camZ: number,
+): number {
+  const world = root.matrixWorld.elements;
+  const center = root.geometry?.boundingSphere?.center;
+  let x = world[12];
+  let z = world[14];
+  if (center) {
+    x = world[0] * center.x + world[4] * center.y + world[8] * center.z + world[12];
+    z = world[2] * center.x + world[6] * center.y + world[10] * center.z + world[14];
+  }
+  const dx = x - camX;
+  const dz = z - camZ;
+  return dx * dx + dz * dz;
+}
+
 export interface PrewarmCompileUnitOptions<T> {
   /** Program-content keys for a root (e.g. material identity plus the mesh
    *  shape bits that pick the program variant). A root whose every key an
