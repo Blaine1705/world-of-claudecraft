@@ -39,58 +39,17 @@ For reference-image reconstruction and procedural GLB authoring, read the living
   Both are deterministic and both committed artifacts are freshness-gated by
   `tests/battleground_band.test.ts`: re-run BOTH after any edit under `battleground/`.
 - **`compress_glb_textures.mjs` is the mandatory FINAL step after ANY exporter run.**
-  It carries TWO invariants, each with its own guard suite.
-  - **Textures.** Every embedded texture in a shipped GLB is KTX2/Basis
-    (`KHR_texture_basisu`) so it stays GPU-compressed in memory instead of decoding to a
-    full RGBA bitmap (the decode amplification of the old webp embeds is what got the
-    native iOS client jetsam-killed at world entry). Guarded by
-    `tests/glb_texture_compression.test.ts`. The one sanctioned exception, WEAPON_VFX skin
-    models, keeps drawable webp (their emissive derivation must drawImage the baseColor;
-    see the test header). That exception is TEXTURES ONLY.
-  - **Geometry.** Every shipped GLB is quantized (`KHR_mesh_quantization`) and
-    meshopt-encoded (`EXT_meshopt_compression`); the runtime loader wires MeshoptDecoder
-    unconditionally, so this is a pure download and first-load win. Guarded by
-    `tests/glb_meshopt_coverage.test.ts`. The animation-only clip banks (`*_anims.glb`)
-    carry no meshes, so they are meshopt-encoded without mesh quantization, which is
-    correct rather than a gap.
-    **`public/models/weapons/` is exempt from the geometry ADD** (`GEOMETRY_ADD_EXCLUDED_DIRS`),
-    and the exemption is narrow: the pass still RE-APPLIES the codec to a weapon that
-    already carries it, it may only not introduce it. Quantization recentres each mesh
-    onto its bounding box and compensates on the node, but `src/render/characters/assets.ts`
-    documents that a variant weapon's mesh ORIGIN is its grip point ("we do NOT recenter"),
-    and `flattenWeaponScene` discards the root node's position, so the compensation is
-    thrown away and the weapon hangs low; 36 weapons additionally carry a hand-tuned
-    `WEAPON_GRIP_OVERRIDES` nudge calibrated against the old origin. Lifting this needs
-    those grips recalibrated in the asset-pipeline inspector FIRST, because the acceptance
-    is visual. Do not "fix" it by making `flattenWeaponScene` keep the position: the 38
-    weapons already shipping compressed all carry a non-zero root translation and render
-    correctly precisely because it is dropped.
-  The exporters above still emit raw webp geometry; re-running one and committing its
-  output silently reverts BOTH invariants. Recover with
+  Every embedded texture in a shipped GLB is KTX2/Basis (`KHR_texture_basisu`) so it
+  stays GPU-compressed in memory instead of decoding to a full RGBA bitmap (the decode
+  amplification of the old webp embeds is what got the native iOS client jetsam-killed
+  at world entry). The exporters above still emit webp; re-running one and committing
+  its raw output silently reverts that asset, and `tests/glb_texture_compression.test.ts`
+  turns the drift red. Recover with
   `node scripts/assets/compress_glb_textures.mjs && node scripts/build_media_manifest.mjs generate`.
-  The texture half needs the `ktx` tool from KhronosGroup/KTX-Software 4.3+ on PATH (no
-  sudo: expand the release pkg with `pkgutil --expand-full`, add its `bin/` to PATH); the
-  geometry half needs nothing beyond the installed packages.
-  The script writes a file only when it owes it something, and its post-transform check is
-  by IDENTITY, not by count (`geometryPassViolations`): quantize legitimately inserts an
-  anonymous transform node and copies a shared skin per quantized mesh, so every named
-  node must survive, every mesh must keep a reference, and every addition must prove which
-  of those two shapes it is. A count-only guard refused three legitimate files (issue
-  #3287); a guard merely loosened to "may grow" would stop noticing a REPLACEMENT.
-  **A source that already carries `KHR_mesh_quantization` is dequantized back to float
-  first.** Re-quantizing an integer POSITION accessor in place destroys the model:
-  `rift_portal.glb`, the one shipped file in that state, came out with POSITION
-  `max [0, 32767, 0]`, every x and z collapsed to zero, a 4.7 MB flat line whose meshes,
-  nodes, materials and vertex count were all still correct. That is why the guard also
-  compares each primitive's POSITION PROPORTIONS (2 percent tolerance): a structural
-  check alone cannot see a model that kept its whole graph and lost its shape.
-  **`compress_glb_textures.mjs` is itself a fingerprinted input of the Fenbridge family**
-  (`fenbridge_town/source_fingerprint.mjs`), so editing it moves that fingerprint: re-mint
-  with `remint_lockfile_fingerprints.mjs` (size-preserving, leaves unmoved families
-  byte-identical), then re-pin the printed sha256 literals in
-  `tests/fenbridge_town_assets.test.ts` and the `sourceFingerprint` in the 14
-  `docs/screenshots/fenbridge-rebuild/assets/*-ai-review.json` evidence files, which the
-  tool does not sweep.
+  It needs the `ktx` tool from KhronosGroup/KTX-Software 4.3+ on PATH (no sudo: expand
+  the release pkg with `pkgutil --expand-full`, add its `bin/` to PATH). The one
+  sanctioned exception, WEAPON_VFX skin models, is excluded automatically (their
+  emissive derivation must drawImage the baseColor; see the test header).
 - **Per-asset procedural exporters** author GLBs from reference images. Each is a
   subdirectory here (`banker_chest/`, the `eastbrook_*` family, `fenbridge_town/`,
   `terrorspark_groundshaker/`; `ls` for the live set) holding a deterministic factory
