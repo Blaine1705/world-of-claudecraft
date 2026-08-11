@@ -82,6 +82,15 @@ describe('selectStandingWocOffer', () => {
     const next = row({ id: 8 });
     expect(selectStandingWocOffer([row(), next], 'Bree', new Set([7]))).toBe(next);
   });
+
+  it('two standing rows with the same counterparty: the FIRST wins, by insertion order', () => {
+    // find() takes the first match, so the service response ORDER is the
+    // tie-break contract; a re-sort upstream would silently change which deal
+    // the window adopts.
+    const first = row({ id: 11 });
+    const second = row({ id: 12 });
+    expect(selectStandingWocOffer([first, second], 'Bree', new Set())).toBe(first);
+  });
 });
 
 describe('wocOfferPollStep', () => {
@@ -117,13 +126,17 @@ describe('wocOfferPollStep', () => {
 
 describe('adoptedWocOffer', () => {
   it('projects the service row plus the derived phase and the quoted tokens', () => {
+    // The two acceptance flags deliberately DIFFER: with both true, swapping
+    // the buyerAccepted/sellerAccepted assignments would project cleanly and
+    // make a one-sided acceptance adopt forever (the keep comparison reads
+    // these fields).
     const mine = row({
       id: 9,
       usdCents: 250,
       role: 'seller',
       listingId: 41,
       buyerAccepted: true,
-      sellerAccepted: true,
+      sellerAccepted: false,
     });
     expect(adoptedWocOffer(mine, 'awaiting_payment', 19531.25)).toEqual({
       id: 9,
@@ -133,7 +146,7 @@ describe('adoptedWocOffer', () => {
       phase: 'awaiting_payment',
       listingId: 41,
       buyerAccepted: true,
-      sellerAccepted: true,
+      sellerAccepted: false,
     });
   });
 
@@ -174,5 +187,23 @@ describe('the canonical deal walks review -> awaiting_payment -> paying -> settl
     phase = wocOfferPhase(mine, false);
     expect(phase).toBe('settled');
     expect(wocOfferPollStep(cur, mine, phase)).toEqual({ kind: 'settle' });
+  });
+
+  it("the row's settlementState alone reads as paying: the seller has no local click", () => {
+    // payingLocally covers only the buyer's own Pay press; the seller (and a
+    // buyer whose client rejoined mid-settlement) reaches 'paying' through the
+    // SETTLING_STATES arm. 'offered' stays awaiting_payment on purpose: a
+    // quote nobody signed still needs the Pay button live.
+    const mine = row({
+      status: 'accepted',
+      buyerAccepted: true,
+      sellerAccepted: true,
+      listingId: 41,
+      listingStatus: 'open',
+    });
+    for (const state of ['confirming', 'confirmed', 'delivering']) {
+      expect(wocOfferPhase({ ...mine, settlementState: state }, false), state).toBe('paying');
+    }
+    expect(wocOfferPhase({ ...mine, settlementState: 'offered' }, false)).toBe('awaiting_payment');
   });
 });
