@@ -37,22 +37,32 @@ export function isStunDrCategory(category: CrowdControlDrCategory): boolean {
 // PvP-only diminishing-returns tuning for the resolvers below: the reset
 // window per category (how long until a fresh application starts the ladder
 // over), the shared 100/50/25/immune multiplier ladder that root and lockout
-// walk, and the fixed staged durations that replace the multiplier ladder for
-// polymorph and fear.
+// walk, the fixed staged durations that replace the multiplier ladder for
+// polymorph, and the proportional multiplier ladder for fear.
 const PVP_ROOT_DR_RESET = 18; // seconds before a repeated PvP root is fresh again
 const PVP_STUN_DR_RESET = 18; // stuns share the root-style 100/50/25/immune scheme
 const PVP_POLYMORPH_DR_RESET = 60;
 const PVP_FEAR_DR_RESET = 60;
 const PVP_CC_DR_MULTIPLIERS = [1, 0.5, 0.25] as const;
+// Polymorph keeps an ABSOLUTE ladder on purpose: exactly one ability rides it
+// (mage polymorph, authored 15s), so the 10s first rung reads as a deliberate PvP
+// cap on a longer PvE value rather than an accident.
 const PVP_POLYMORPH_DR_DURATIONS = [10, 5, 1] as const;
-const PVP_FEAR_DR_DURATIONS = [8, 4, 2, 1] as const;
+// Fear is a MULTIPLIER ladder, and must stay one. It was absolute seconds
+// ([8, 4, 2, 1]) returned without reading the ability's authored duration, so in
+// PvP every fear lasted 8s on first application no matter what its tooltip said:
+// Psychic Scream (4s) and Howl of Terror / Death Coil (3s) were all silently
+// doubled or better. Five abilities across three classes share this ladder, so an
+// absolute table can only ever be right for one of them. These factors reproduce
+// the old 8 -> 4 -> 2 -> 1 exactly for an 8s fear.
+const PVP_FEAR_DR_MULTIPLIERS = [1, 0.5, 0.25, 0.125] as const;
 
 /**
  * The PvP diminishing-returns ladder for one crowd-control category: full
  * duration outside hostile player-versus-player combat, a fixed staged
- * schedule for polymorph/fear, the shared 100/50/25/immune multiplier ladder
- * for root/lockout, and null once that ladder is exhausted (DR-immune, apply
- * nothing). `now` and `isHostileTo` are passed in rather than read off a host:
+ * schedule for polymorph, a proportional multiplier ladder for fear, the
+ * shared 100/50/25/immune multiplier ladder for root/lockout, and null once
+ * that ladder is exhausted (DR-immune, apply nothing). `now` and `isHostileTo` are passed in rather than read off a host:
  * this keeps the resolver a leaf module with no `SimContext` dependency, so a
  * Vitest can import and exercise it directly. It is NOT a pure function of its
  * arguments: three of its exits write the new DR stage to `target.ccDr`.
@@ -92,7 +102,10 @@ export function crowdControlDurationAfterDr(
   }
   if (category === 'fear') {
     target.ccDr.set(category, { stage: stage + 1, resetAt: now + reset });
-    return PVP_FEAR_DR_DURATIONS[Math.min(stage, PVP_FEAR_DR_DURATIONS.length - 1)];
+    // Scales the ability's OWN duration; see PVP_FEAR_DR_MULTIPLIERS. Like
+    // polymorph and unlike root/stun, fear never reaches full immunity: the
+    // factor clamps at the last rung rather than returning null.
+    return duration * PVP_FEAR_DR_MULTIPLIERS[Math.min(stage, PVP_FEAR_DR_MULTIPLIERS.length - 1)];
   }
   if (stage >= PVP_CC_DR_MULTIPLIERS.length) return null;
   target.ccDr.set(category, { stage: stage + 1, resetAt: now + reset });
