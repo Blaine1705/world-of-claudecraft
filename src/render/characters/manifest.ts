@@ -131,7 +131,7 @@ export interface VisualDef {
   /** This GLB is a modular PART LIBRARY, not a finished character: every body
    *  part, hair style and armour slot piece rides one shared rig and the
    *  visible set is picked per entity (see modular.ts). assembleModel composes
-    // spinMountWheels (src/render/rickshaw_mount.ts), because crossfading a spin clip out drags the wheel back
+   *  it against the picked part set. */
   modular?: boolean;
   /** Two-state prop mob (the dragonkin egg): the GLB ships BOTH state meshes
    *  seated at the origin; alive shows `hide` only, and death swaps to `show`
