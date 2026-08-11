@@ -6,7 +6,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | NN | Phase | Repo | Status | Start commit | Notes |
 |---|---|---|---|---|---|
 | 01 | branch-baseline | game | DONE (QA PASS) | e4c3dde956 | five re-review verdicts CLEAN (section below); woc_trade extraction landed; gate GREEN at 418f75b876 (full-suite fallback) |
-| 01 QA | phase-01-qa | game | DONE | 07fda3fd46 | PASS-WITH-FOLLOWUPS, all fixes applied (section below); gate GREEN at final tip 1d7bdbafa0; pushed per R4 |
+| 01 QA | phase-01-qa | game | DONE | 07fda3fd46 | PASS-WITH-FOLLOWUPS, all fixes applied (section below); gate GREEN at final tip 1d7bdbafa0; pushed per R4 (no open PR on this branch, so no PR CI; pre-push floor green) |
 | 02 | settlement-state-guards | game | NOT STARTED | | |
 | 02 QA | phase-02-qa | game | NOT STARTED | | |
 | 03 | delivery-exactly-once | game | NOT STARTED | | |
