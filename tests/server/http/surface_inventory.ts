@@ -277,6 +277,18 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: REQUIRE_OWNED.bola404,
   },
+  // Registry-only like deeds-recent, but a MUTATION: active session required
+  // (activeGuard), one-shot reroll spend behind requireOwnedCharacter.
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/characters/:id/appearance-reroll',
+    handler: 'server/characters.ts appearanceRerollHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.bola404,
+  },
   {
     dispatcher: DISPATCH.mainApi,
     method: 'GET',

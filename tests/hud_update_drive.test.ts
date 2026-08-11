@@ -1597,9 +1597,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(byKind, 'a guard kind changed: say why in the PR, not only in the table').toEqual({
       // Reliquary cold window (module) + craft-cast single-surface strip (hud)
       // both land on this pin; keep both counts, do not drop either side.
-      // 24 = both sides of the v0.36.0 sync counted 23 alone (the branch's
-      // reliquary module guard vs the release's new module-guarded row).
-      module: 24,
+      // 25 = the release's 24 (its reliquary module guard plus its new
+      // module-guarded row) plus this branch's woc_market_window row.
+      module: 25,
       // 7 = Phase 20's refreshCharSheetIfChanged. Its latch is a HUD field
       // (lastCharSheetSig), like its profession sibling, because the cold
       // char_window painter holds no signature of its own to diff.
