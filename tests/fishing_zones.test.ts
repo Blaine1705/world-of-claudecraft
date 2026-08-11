@@ -52,7 +52,6 @@ import {
 } from '../src/sim/types';
 import { isInWaterBody, terrainHeight, waterLevel, waterLevelAt } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
-import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // DERIVED from the authored tables' own keys, never a hand list: the
 // shortfall-schedule sweep below must conscript a NEW zone's catch table the
@@ -98,7 +97,7 @@ const surplusFor = (zoneId: string, band: number): number =>
   Math.min(2, Math.max(0, band - requiredBandFor(zoneId)));
 
 function makeSim(seed = 4242): Sim {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: true, world: EMPTY_TEST_WORLD });
+  return new Sim({ seed, playerClass: 'warrior', autoEquip: true });
 }
 
 function teleportTo(sim: Sim, x: number, z: number): void {

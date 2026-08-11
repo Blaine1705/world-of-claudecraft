@@ -31,10 +31,9 @@ import { type ArenaMatch, type CharacterState, Sim } from '../src/sim/sim';
 import * as duelMod from '../src/sim/social/duel';
 import { type Entity, MAX_LEVEL, MILESTONES, type SimEvent } from '../src/sim/types';
 import { runSalvage } from './helpers/enchant_family_cast';
-import { VENDOR_TEST_WORLD } from './sim_shared';
 
 function makeSim(seed = 42): Sim {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: false, world: VENDOR_TEST_WORLD });
+  return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
 }
 
 function primary(sim: Sim) {
@@ -53,12 +52,7 @@ function deedEvents(evs: SimEvent[]): Extract<SimEvent, { type: 'deedUnlocked' }
 // fiesta-takedown arm of dealDamage can be driven directly. Mirrors the
 // startFiesta harness in tests/fiesta.test.ts.
 function startFiestaBout(): { sim: Sim; match: ArenaMatch } {
-  const sim = new Sim({
-    seed: 42,
-    playerClass: 'warrior',
-    noPlayer: true,
-    world: VENDOR_TEST_WORLD,
-  });
+  const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
   const pids = [
     sim.addPlayer('warrior', 'P0'),
     sim.addPlayer('mage', 'P1'),
@@ -79,12 +73,7 @@ function startFiestaBout(): { sim: Sim; match: ArenaMatch } {
 // the yumi player-down arm of dealDamage can be driven directly. Mirrors the
 // startYumi3 harness in tests/yumi_match.test.ts.
 function startYumiBout(): { sim: Sim; match: ArenaMatch } {
-  const sim = new Sim({
-    seed: 42,
-    playerClass: 'warrior',
-    noPlayer: true,
-    world: VENDOR_TEST_WORLD,
-  });
+  const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
   const pids = [
     sim.addPlayer('warrior', 'P0'),
     sim.addPlayer('mage', 'P1'),
@@ -701,8 +690,8 @@ describe('retro on join', () => {
   });
 
   it('the retro pass is a pure function of the loaded state and the catalog', () => {
-    const a = new Sim({ seed: 7, playerClass: 'mage', world: VENDOR_TEST_WORLD });
-    const b = new Sim({ seed: 7, playerClass: 'mage', world: VENDOR_TEST_WORLD });
+    const a = new Sim({ seed: 7, playerClass: 'mage' });
+    const b = new Sim({ seed: 7, playerClass: 'mage' });
     const pa = a.addPlayer('warrior', 'Same', { state: veteranState() });
     const pb = b.addPlayer('warrior', 'Same', { state: veteranState() });
     expect([...a.players.get(pa)!.deedsEarned.keys()].sort()).toEqual(
@@ -1754,12 +1743,7 @@ describe('site wiring (real modules, not direct bumps)', () => {
   });
 
   it('a shared party kill through handleDeath credits kills to every eligible member, not just the tapper', () => {
-    const sim = new Sim({
-      seed: 42,
-      playerClass: 'warrior',
-      noPlayer: true,
-      world: VENDOR_TEST_WORLD,
-    });
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const puller = sim.addPlayer('warrior', 'Puller');
     const healer = sim.addPlayer('priest', 'Healer');
     sim.tick();
@@ -1872,12 +1856,7 @@ describe('active title selection (setActiveTitle)', () => {
     const state = sim.serializeCharacter(sim.playerId)!;
     expect(state.activeTitle).toBe('prog_veteran');
 
-    const sim2 = new Sim({
-      seed: 42,
-      playerClass: 'warrior',
-      noPlayer: true,
-      world: VENDOR_TEST_WORLD,
-    });
+    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const pid = sim2.addPlayer('warrior', 'Loaded', { state });
     expect(sim2.players.get(pid)!.activeTitle).toBe('prog_veteran');
     expect(sim2.entities.get(pid)!.title).toBe('prog_veteran');
@@ -1894,12 +1873,7 @@ describe('active title selection (setActiveTitle)', () => {
     const legacy: CharacterState = { ...state };
     delete legacy.activeTitle;
 
-    const sim2 = new Sim({
-      seed: 42,
-      playerClass: 'warrior',
-      noPlayer: true,
-      world: VENDOR_TEST_WORLD,
-    });
+    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const pid = sim2.addPlayer('warrior', 'Legacy', { state: legacy });
     expect(sim2.players.get(pid)!.activeTitle).toBeNull();
     expect(sim2.entities.get(pid)!.title).toBeNull();
@@ -1917,12 +1891,7 @@ describe('active title selection (setActiveTitle)', () => {
     const state = sim.serializeCharacter(sim.playerId)!;
     const tampered: CharacterState = { ...state, deeds: {} }; // the earned record vanished
 
-    const sim2 = new Sim({
-      seed: 42,
-      playerClass: 'warrior',
-      noPlayer: true,
-      world: VENDOR_TEST_WORLD,
-    });
+    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const pid = sim2.addPlayer('warrior', 'Stale', { state: tampered });
     expect(sim2.players.get(pid)!.activeTitle).toBeNull();
     expect(sim2.entities.get(pid)!.title).toBeNull();
@@ -2234,12 +2203,7 @@ describe('deedsRecent (offline facet arm)', () => {
     const granted = ['dgn_korzul_flawless', 'prog_first_steps', 'cmb_first_blood'];
     for (const id of granted) grantDeed(sim.ctx, meta, id);
     const state = sim.serializeCharacter(sim.playerId);
-    const sim2 = new Sim({
-      seed: 42,
-      playerClass: 'warrior',
-      noPlayer: true,
-      world: VENDOR_TEST_WORLD,
-    });
+    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     // JSON round-trip: exactly what the offline save does, and the step that
     // would destroy the order if key order were not preserved.
     sim2.addPlayer('warrior', 'Reload', { state: JSON.parse(JSON.stringify(state)) });

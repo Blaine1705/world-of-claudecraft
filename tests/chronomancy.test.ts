@@ -11,10 +11,9 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
-import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function chronoMage(level = 20) {
-  const sim = new Sim({ seed: 41, playerClass: 'mage', autoEquip: true, world: EMPTY_TEST_WORLD });
+  const sim = new Sim({ seed: 41, playerClass: 'mage', autoEquip: true });
   sim.setPlayerLevel(level);
   expect(sim.setSpec('arcane')).toBe(true);
   sim.tick();
@@ -289,12 +288,7 @@ describe('persistence and loadouts', () => {
     const { sim } = chronoMage();
     const state = sim.serializeCharacter(sim.playerId);
     expect(state?.talents?.spec).toBe('arcane');
-    const sim2 = new Sim({
-      seed: 42,
-      playerClass: 'warrior',
-      autoEquip: true,
-      world: EMPTY_TEST_WORLD,
-    });
+    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
     const pid = sim2.addPlayer('mage', 'Persistida', { state: state ?? undefined });
     sim2.tick();
     const meta = (

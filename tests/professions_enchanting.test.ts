@@ -26,16 +26,9 @@ import {
 import { Sim } from '../src/sim/sim';
 import { type InvSlot, xpForLevel } from '../src/sim/types';
 import { completeEnchantFamilyCast } from './helpers/enchant_family_cast';
-import { EMPTY_TEST_WORLD } from './sim_shared';
 
-// Every case here drives disenchant/applyEnchant directly against items the
-// test itself grants via addItem/addItemInstance, on the player entity Sim
-// always creates; nothing ever reads a camp, npc, or ground object, and no
-// test ever levels through zone/travel/vendor logic. EMPTY_TEST_WORLD keeps
-// zones/roads/props/services and drops only camps/npcs/groundObjects, so
-// Sim construction skips spawning every built-in camp mob.
 function makeSim(seed = 7) {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: false, world: EMPTY_TEST_WORLD });
+  return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
 }
 
 describe('disenchant', () => {
@@ -532,12 +525,7 @@ describe('applyEnchant', () => {
     expect(state).not.toBeNull();
     expect(state!.equipmentInstance?.mainhand?.rolled?.stats?.str).toBe(2);
 
-    const reloadedSim = new Sim({
-      seed: 7,
-      playerClass: 'warrior',
-      noPlayer: true,
-      world: EMPTY_TEST_WORLD,
-    });
+    const reloadedSim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
     const reloadedPid = reloadedSim.addPlayer('warrior', 'Reload', { state: state! });
     const reloadedMeta = reloadedSim.meta(reloadedPid)!;
     const reloadedEntity = reloadedSim.entities.get(reloadedPid)!;
@@ -553,12 +541,7 @@ describe('applyEnchant', () => {
     // absent entirely, not just empty.
     delete (state as { equipmentInstance?: unknown }).equipmentInstance;
 
-    const reloadedSim = new Sim({
-      seed: 7,
-      playerClass: 'warrior',
-      noPlayer: true,
-      world: EMPTY_TEST_WORLD,
-    });
+    const reloadedSim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
     expect(() => reloadedSim.addPlayer('warrior', 'Legacy', { state })).not.toThrow();
     const reloadedPid = reloadedSim.addPlayer('warrior', 'Legacy2', { state });
     const meta = reloadedSim.meta(reloadedPid)!;
@@ -971,12 +954,7 @@ function wearing(
   itemId: string,
   opts: { cls?: 'warrior' | 'rogue'; dust?: number; instance?: Record<string, unknown> } = {},
 ) {
-  const sim = new Sim({
-    seed: 7,
-    playerClass: opts.cls ?? 'rogue',
-    autoEquip: false,
-    world: EMPTY_TEST_WORLD,
-  });
+  const sim = new Sim({ seed: 7, playerClass: opts.cls ?? 'rogue', autoEquip: false });
   const pid = sim.playerId;
   if (opts.instance) sim.ctx.addItemInstance(itemId, opts.instance as never, pid);
   else sim.addItem(itemId, 1, pid);
@@ -1141,12 +1119,7 @@ describe('apply enchant to WORN gear (in place)', () => {
   it('two rings, identical copies: the ring2 slot enchants ONLY the ring2 copy', () => {
     const RING = 'seal_of_the_nine_oaths'; // slot 'ring', covers ring1 AND ring2
     const RING_ENCHANT = 'enchant_ring_spirit';
-    const sim = new Sim({
-      seed: 7,
-      playerClass: 'rogue',
-      autoEquip: false,
-      world: EMPTY_TEST_WORLD,
-    });
+    const sim = new Sim({ seed: 7, playerClass: 'rogue', autoEquip: false });
     const pid = sim.playerId;
     while (sim.player.level < 20) sim.grantXp(xpForLevel(sim.player.level));
     sim.addItem(RING, 2, pid);
@@ -1188,12 +1161,7 @@ describe('apply enchant to WORN gear (in place)', () => {
     expect(state!.equipmentInstance?.mainhand?.enchant).toBe(WORN_ENCHANT);
     expect(state!.equipmentInstance?.mainhand?.rolled?.stats?.str).toBe(2);
 
-    const reloadedSim = new Sim({
-      seed: 7,
-      playerClass: 'rogue',
-      noPlayer: true,
-      world: EMPTY_TEST_WORLD,
-    });
+    const reloadedSim = new Sim({ seed: 7, playerClass: 'rogue', noPlayer: true });
     const reloadedPid = reloadedSim.addPlayer('rogue', 'Reload', { state: state! });
     expect(reloadedSim.meta(reloadedPid)!.equipmentInstance.mainhand?.enchant).toBe(WORN_ENCHANT);
     expect(reloadedSim.entities.get(reloadedPid)!.stats.str).toBe(boostedStr);
@@ -1674,12 +1642,7 @@ describe('replacing an enchant behind explicit confirmation (#2415)', () => {
     expect(saved?.instance?.signer).toBe('Tester');
     expect(saved?.instance?.bindOnTrade).toBe(true);
 
-    const reloadedSim = new Sim({
-      seed: 7,
-      playerClass: 'warrior',
-      noPlayer: true,
-      world: EMPTY_TEST_WORLD,
-    });
+    const reloadedSim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
     const reloadedPid = reloadedSim.addPlayer('warrior', 'Reload', { state: state! });
     const loaded = reloadedSim.meta(reloadedPid)!.inventory.find((s) => s.itemId === SWORD);
     expect(loaded?.instance?.enchant).toBe(AGILITY);

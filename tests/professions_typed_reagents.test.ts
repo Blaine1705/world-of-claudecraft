@@ -17,7 +17,6 @@ import { disenchantYield, resolveDisenchant } from '../src/sim/professions/encha
 import { Sim } from '../src/sim/sim';
 import * as tradeMod from '../src/sim/social/trade';
 import type { ItemDef, ItemInstancePayload } from '../src/sim/types';
-import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const TYPED_MATERIALS = [
   'resonant_thread',
@@ -28,7 +27,7 @@ const TYPED_MATERIALS = [
 ] as const;
 
 function makeSim(seed = 7) {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: false, world: EMPTY_TEST_WORLD });
+  return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
 }
 
 // Run `fn` with a draw-counting observer installed on the shared rng, returning
@@ -280,13 +279,7 @@ describe('disenchant yield model (professions/enchanting.ts)', () => {
 // inventory hub (unbound counting, the removal skip, and the grantOffer stamp),
 // which a flat-count fake cannot model.
 function makeTradeSim(seed = 42) {
-  const sim = new Sim({
-    seed,
-    playerClass: 'warrior',
-    autoEquip: false,
-    noPlayer: true,
-    world: EMPTY_TEST_WORLD,
-  });
+  const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: false, noPlayer: true });
   const a = sim.addPlayer('warrior', 'Ayla');
   const b = sim.addPlayer('warrior', 'Borin');
   const ea = sim.ctx.entities.get(a)!;

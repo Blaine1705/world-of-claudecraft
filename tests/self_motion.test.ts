@@ -11,7 +11,6 @@ import {
 import { Sim } from '../src/sim/sim';
 import { type Entity, type MoveInput, RUN_SPEED } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
-import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // Policy tests for the online display-only self extrapolator, driven against a
 // REAL lagging authority: a live Sim plays the server (inputs arrive lagMs
@@ -82,12 +81,7 @@ class Lab {
     readonly frameMs = FRAME_MS,
     opts: { start?: { x: number; z: number }; facing?: number } = {},
   ) {
-    this.srv = new Sim({
-      seed: SEED,
-      playerClass: 'warrior',
-      autoEquip: true,
-      world: EMPTY_TEST_WORLD,
-    });
+    this.srv = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
     this.srv.setPlayerLevel(60);
     const start = opts.start ?? { x: 0, z: -80 };
     teleport(this.srv, start.x, start.z);
@@ -191,12 +185,7 @@ describe('SelfMotionPredictor', () => {
   });
 
   it('snaps both predictive and fallback poses on a sub-threshold authoritative recovery', () => {
-    const sim = new Sim({
-      seed: SEED,
-      playerClass: 'warrior',
-      autoEquip: true,
-      world: EMPTY_TEST_WORLD,
-    });
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
     teleport(sim, 0, -40);
     const self = {
       ...sim.player,

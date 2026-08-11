@@ -20,7 +20,6 @@ import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind'
 import { rideSteepnessAt } from '../src/sim/ride_height';
 import { Sim } from '../src/sim/sim';
 import { groundHeight } from '../src/sim/world';
-import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // the live world seed: the reports are seed-pinned castle geometry
 const SEED = 20061;
@@ -222,17 +221,7 @@ function describeWedges(list: Wedge[]): string {
 }
 
 function makeWalker(spot: { x: number; z: number }) {
-  // The Last Keep's grounds are the documented zero-combat keep (no camp,
-  // npc, or ground object sits anywhere near the ward): terrain and colliders
-  // read the module-level BUILTIN_WORLD regardless of this Sim's `world`
-  // option (data.ts getActiveWorldContent), so an empty ambient world cannot
-  // change the physics this file exercises.
-  const sim = new Sim({
-    seed: SEED,
-    playerClass: 'warrior',
-    autoEquip: true,
-    world: EMPTY_TEST_WORLD,
-  });
+  const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
   sim.setPlayerLevel(20);
   const p = sim.player;
   const meta = (

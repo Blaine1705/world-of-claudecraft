@@ -77,7 +77,6 @@ import {
   TH_PLACEMENTS,
 } from '../src/sim/thornhollow_field.generated';
 import { groundHeight, terrainHeight } from '../src/sim/world';
-import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const SEED = 42;
 const ORIGIN = battlegroundOrigin(0);
@@ -847,13 +846,7 @@ describe('Thornhollow Fields layout: the combat shape the dressing is laid over'
   });
 
   it('the perimeter rampart holds a mover inside the field', () => {
-    const sim = new Sim({
-      seed: SEED,
-      playerClass: 'warrior',
-      autoEquip: true,
-      noPlayer: true,
-      world: EMPTY_TEST_WORLD,
-    });
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true, noPlayer: true });
     for (const [dx, dz] of [
       [1, 0],
       [-1, 0],

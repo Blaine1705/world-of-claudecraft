@@ -12,7 +12,6 @@ import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import type { QuestDef, QuestProgress } from '../src/sim/types';
-import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // The Smith pair (weaponcrafting + armorcrafting): the four wave-one masters are
 // the only pairs with tier letters, and this is Forgemistress Darva's.
@@ -35,7 +34,7 @@ function tierSkill(tier: number): number {
 }
 
 function makeSim(seed = 5150): Sim {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: true, world: EMPTY_TEST_WORLD });
+  return new Sim({ seed, playerClass: 'warrior', autoEquip: true });
 }
 
 /** Attune the local player to the Smith pair directly (bypassing the quest), so

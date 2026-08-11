@@ -11,10 +11,8 @@ import {
 } from '../src/sim/social/battleground_proposal';
 import { DT, type SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
-import { EMPTY_TEST_WORLD } from './sim_shared';
 
-const makeWorld = () =>
-  new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: EMPTY_TEST_WORLD });
+const makeWorld = () => new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
 
 function tp(sim: Sim, pid: number, x: number, z: number) {
   const e = sim.entities.get(pid)!;
