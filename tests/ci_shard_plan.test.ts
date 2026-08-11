@@ -775,16 +775,14 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     // If a vitest bump changed either semantic, the lane files would run in
     // both halves (duplicate work, never a gap) and the perf win would vanish
     // silently; this spawn makes that loud. `vitest list --filesOnly` prints
-    // the collected set without running anything.
+    // the collected set without running anything. Spawns the resolved local
+    // binary directly (same helper the real shard planner uses, resolveLocalBin),
+    // never through `npx`: npm's own "npm notice run ..." banner line echoes the
+    // args back onto stdout and, on a config that prints it, that echoed line can
+    // itself end with the excluded path, producing a false match in the parser below.
     const child = spawn(
-      'npx',
-      [
-        '--no-install',
-        'vitest',
-        'list',
-        '--filesOnly',
-        `--exclude=${'tests/battleground.test.ts'}`,
-      ],
+      resolveLocalBin('vitest'),
+      ['list', '--filesOnly', `--exclude=${'tests/battleground.test.ts'}`],
       { cwd: repoRoot, env: { ...process.env } },
     );
     let out = '';
