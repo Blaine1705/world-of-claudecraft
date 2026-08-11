@@ -52,10 +52,17 @@ export interface SkyResidencyInput<K extends string> {
    * Keys holding ANY decoded sky asset right now (dome HDR, PMREM source or
    * backdrop). Deliberately the memory-accurate set rather than the
    * fully-resident one: a key holding half its set is still holding the
-   * expensive half, so it must stay evictable, and its missing half is the
-   * business of the fetch already in flight for it.
+   * expensive half, so it must stay evictable.
    */
   readonly resident: Iterable<K>;
+  /**
+   * Keys whose sky set is FULLY landed (both HDR arms). Only this set may
+   * suppress an ensure: suppressing on `resident` stranded a biome whose dome
+   * arrived while its env arm exhausted retries, with nothing left to enqueue
+   * the missing half (review round 2). Defaults to `resident` when omitted,
+   * which keeps the old behavior for callers without partial-load states.
+   */
+  readonly ready?: Iterable<K>;
   /**
    * Keys that must never be evicted whatever the distance says: the dome
    * blend's live `from`/`to` pair (their textures are bound into live shader
@@ -123,12 +130,13 @@ export function computeSkyResidencyPlan<K extends string>(
   }
 
   const resident = new Set(input.resident);
+  const ready = input.ready === undefined ? resident : new Set(input.ready);
   const pinned = new Set(input.pinned);
   const ensurable = input.ensurable === undefined ? null : new Set(input.ensurable);
 
   const ensure: K[] = [];
   for (const [key, distanceSq] of nearestSq) {
-    if (resident.has(key) || distanceSq > keepSq) continue;
+    if (ready.has(key) || distanceSq > keepSq) continue;
     if (ensurable !== null && !ensurable.has(key)) continue;
     ensure.push(key);
   }

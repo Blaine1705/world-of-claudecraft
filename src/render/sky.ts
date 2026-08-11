@@ -497,6 +497,15 @@ export function residentSkyBiomes(): SkyKey[] {
   );
 }
 
+/** The FULLY-READY subset of residentSkyBiomes: both HDR arms landed. The two
+ *  sets deliberately differ (review round 2): eviction keys on ANY resident
+ *  asset so a half-loaded biome still releases its bytes, but suppressing an
+ *  ENSURE on the same set would strand a biome whose dome arrived while its
+ *  env arm exhausted retries; only full readiness may suppress the re-fetch. */
+export function readySkyBiomes(): SkyKey[] {
+  return SKY_KEYS.filter(skyBiomeAssetsResident);
+}
+
 /** Whether any biome OTHER than the ones being dropped still owns `url` in
  *  `store` (or is still fetching it). The sky tables alias urls across keys
  *  (beach reuses the vale day sky, cave the marsh overcast), and loadHdr hands

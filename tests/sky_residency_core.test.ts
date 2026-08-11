@@ -213,8 +213,49 @@ describe('sky residency plan', () => {
   });
 });
 
+it('suppresses an ensure only on FULL readiness, never on partial residency', () => {
+  // The half-loaded recovery split (review round 2): a biome whose dome
+  // landed while its env arm exhausted retries is resident (evictable) but
+  // not ready, and MUST re-enter the ensure lane.
+  const region = { key: 'vale', minX: 0, maxX: 10, minZ: 0, maxZ: 10 };
+  const plan = computeSkyResidencyPlan({
+    regions: [region],
+    cameraX: 5,
+    cameraZ: 5,
+    resident: ['vale'],
+    ready: [],
+    pinned: [],
+  });
+  expect(plan.ensure).toEqual(['vale']);
+  expect(plan.evict).toEqual([]);
+
+  const done = computeSkyResidencyPlan({
+    regions: [region],
+    cameraX: 5,
+    cameraZ: 5,
+    resident: ['vale'],
+    ready: ['vale'],
+    pinned: [],
+  });
+  expect(done.ensure).toEqual([]);
+
+  // Omitting ready keeps the old resident-suppressed behavior.
+  const legacy = computeSkyResidencyPlan({
+    regions: [region],
+    cameraX: 5,
+    cameraZ: 5,
+    resident: ['vale'],
+    pinned: [],
+  });
+  expect(legacy.ensure).toEqual([]);
+});
+
 describe('renderer sky-residency driver', () => {
   const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+  const driver = readFileSync(
+    new URL('../src/render/sky_residency_driver.ts', import.meta.url),
+    'utf8',
+  );
 
   it('runs the plan on the zone-streaming recheck cadence, not per frame', () => {
     // queueVisibleZonePrepares is the one path that already knows the camera
@@ -223,40 +264,64 @@ describe('renderer sky-residency driver', () => {
     expect(start).toBeGreaterThan(0);
     const end = renderer.indexOf('\n  }', start);
     const body = renderer.slice(start, end);
-    expect(body).toContain('this.updateSkyResidency(cameraX, cameraZ)');
-    expect(body.indexOf('this.updateSkyResidency')).toBeGreaterThan(
+    expect(body).toContain('this.skyResidency.updateSkyResidency(cameraX, cameraZ)');
+    expect(body.indexOf('this.skyResidency.updateSkyResidency')).toBeGreaterThan(
       body.indexOf('this.visibleZoneCheckFar = horizon'),
     );
-    expect(renderer.match(/this\.updateSkyResidency\(/g)?.length).toBe(1);
+    expect(renderer.match(/\.updateSkyResidency\(/g)?.length).toBe(1);
+  });
+
+  it('reads the renderer state it drives through the host, never a snapshot', () => {
+    // The driver lives outside the coordinator, so every member it needs comes
+    // from the host view the renderer builds. Copies would go stale: skyView is
+    // rebuilt by build(), and envBiome / envTransition move under an IBL ease.
+    const start = renderer.indexOf('private readonly skyResidency = new SkyResidencyDriver({');
+    expect(start).toBeGreaterThan(0);
+    const host = renderer.slice(start, renderer.indexOf('\n  });', start));
+    expect(host).toContain('isShutdown: () => this.shutdownStarted');
+    expect(host).toContain('lifecycleGeneration: () => this.lifecycleGeneration');
+    expect(host).toContain('skyView: () => this.skyView');
+    expect(host).toContain('envBiome: () => this.envBiome');
+    expect(host).toContain('envTransition: () => this.envTransition');
+    expect(host).toContain('preparedZones: () => this.preparedZones');
+    // The two renderer-owned lanes the driver borrows rather than reimplements.
+    expect(host).toContain('() => this.ensureEnvironmentBiome(biome)');
+    expect(host).toContain('idleSlot: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS, {');
+    expect(host).toContain('maxTimeoutDeferrals: 2');
   });
 
   it('pins the bound dome pair and the bound IBL out of the evict arm', () => {
-    const start = renderer.indexOf('private updateSkyResidency(');
-    const end = renderer.indexOf('\n  }', start);
-    const body = renderer.slice(start, end);
+    const start = driver.indexOf('  updateSkyResidency(cameraX: number, cameraZ: number): void {');
+    expect(start).toBeGreaterThan(0);
+    const end = driver.indexOf('\n  }', start);
+    const body = driver.slice(start, end);
     expect(body).toContain('...currentDomeBiomes(),');
-    expect(body).toContain('this.envTransition.current,');
+    expect(body).toContain('envTransition.current,');
     // The pending arm of an in-flight IBL ease is pinned too (review round 1).
-    expect(body).toContain('this.envTransition.pending !== null');
+    expect(body).toContain('envTransition.pending !== null');
     expect(body).toContain('resident: residentSkyBiomes()');
     // Only a prepared zone's sky is this lane's to restore.
-    expect(body).toContain('this.preparedZones.has(zoneId)');
+    expect(body).toContain('this.host.preparedZones().has(zoneId)');
     expect(body).toContain('for (const biome of releaseSkyBiomeAssets(plan.evict))');
   });
 
   it('re-ensures on the idle prewarm discipline without re-preparing the zone', () => {
-    const start = renderer.indexOf('private ensureSkyResidency(biome: SkyKey): void {');
+    const start = driver.indexOf('private ensureSkyResidency(biome: SkyKey): void {');
     expect(start).toBeGreaterThan(0);
-    const end = renderer.indexOf('\n  }\n', start);
-    const body = renderer.slice(start, end);
+    const end = driver.indexOf('\n  }\n', start);
+    const body = driver.slice(start, end);
     // Same three steps prepareZoneSky's idle arm takes: chunked idle uploads
     // for both textures with the indivisible PMREM unit on the shared queue.
     expect(body).toContain('await ensureSkyBiomeAssets([biome])');
-    expect(body).toContain('if (!this.skyView.skyBiomeAssetsResident(biome)) return;');
-    expect(body).toContain('await this.prewarmTextureInIdle(this.skyView.envTexture(biome))');
-    expect(body).toContain('await this.prewarmTextureInIdle(this.skyView.domeTexture(biome))');
-    expect(body).toContain('await idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 })');
-    expect(body).toContain('() => this.ensureEnvironmentBiome(biome)');
+    expect(body).toContain('if (!this.host.skyView().skyBiomeAssetsResident(biome)) return;');
+    expect(body).toContain(
+      'await this.host.prewarmTextureInIdle(this.host.skyView().envTexture(biome))',
+    );
+    expect(body).toContain(
+      'await this.host.prewarmTextureInIdle(this.host.skyView().domeTexture(biome))',
+    );
+    expect(body).toContain('await this.host.idleSlot()');
+    expect(body).toMatch(/await this\.host\.runPmrem\(biome, `sky-residency-pmrem:\$\{biome}`\)/);
     // Never the whole-zone lane, and never a preparedZones write.
     expect(body).not.toContain('prepareZoneAt');
     expect(body).not.toContain('preparedZones');
@@ -281,17 +346,17 @@ describe('renderer sky-residency driver', () => {
   });
 
   it('keeps the single-environment cap on constrained memory intact', () => {
-    const start = renderer.indexOf('private evictEnvironmentBiome(biome: SkyKey): void {');
+    const start = driver.indexOf('private evictEnvironmentBiome(biome: SkyKey): void {');
     expect(start).toBeGreaterThan(0);
-    const end = renderer.indexOf('\n  }', start);
-    const body = renderer.slice(start, end);
+    const end = driver.indexOf('\n  }', start);
+    const body = driver.slice(start, end);
     // The constrained profile keeps exactly one env RT for the session and it
     // is always the bound one (resolveEnvironmentPrefilterPlan seeds envBiome
     // from it), so these guards are what stop eviction from re-opening the cap.
-    expect(body).toContain('biome === this.envTransition.current ||');
-    expect(body).toContain('biome === this.envTransition.pending');
-    expect(body).toContain('this.scene.environment === target.texture');
+    expect(body).toContain('biome === this.host.envTransition().current ||');
+    expect(body).toContain('biome === this.host.envTransition().pending');
+    expect(body).toContain('this.host.scene().environment === target.texture');
     // Aliased sky urls share one PMREM target across biome keys.
-    expect(body).toContain('for (const remaining of this.envRTs.values())');
+    expect(body).toContain('for (const remaining of this.host.envRTs().values())');
   });
 });

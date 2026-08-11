@@ -109,8 +109,14 @@ async function convertFile(file, { dryRun, flip }) {
 
   const cls = classifyStandaloneTexture(path.basename(file));
   // The flipped copy is a lossless PNG so the flip itself costs no quality;
-  // only the ktx encode is lossy, exactly as on the unflipped path.
-  const flipped = flip ? flippedSourcePath(file, os.tmpdir()) : null;
+  // only the ktx encode is lossy, exactly as on the unflipped path. It stages
+  // in a PRIVATE per-run mkdtemp directory (mode 0700), never bare os.tmpdir():
+  // a deterministic path in a shared temp is pre-creatable and race-swappable
+  // by any local process, symlink overwrite included (review round 2).
+  const stagingDir = flip
+    ? fs.mkdtempSync(path.join(os.tmpdir(), 'woc-flip-'), { mode: 0o700 })
+    : null;
+  const flipped = stagingDir ? flippedSourcePath(file, stagingDir) : null;
   if (flipped) await sharp(file).flip().png().toFile(flipped);
   try {
     const args = buildKtxCreateArgs({
@@ -125,7 +131,7 @@ async function convertFile(file, { dryRun, flip }) {
       return { file, dst, status: 'failed', reason: stderr.trim(), before, after: before };
     }
   } finally {
-    if (flipped) fs.rmSync(flipped, { force: true });
+    if (stagingDir) fs.rmSync(stagingDir, { recursive: true, force: true });
   }
   const after = fs.statSync(dst).size;
   return { file, dst, status: 'converted', before, after };

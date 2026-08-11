@@ -398,6 +398,12 @@ export function loadHdr(url: string, options: HdrLoadOptions = {}): Promise<THRE
       },
       (err: unknown) => {
         recordAssetLoad('hdr', resolved, startedAt, true);
+        // Same failure eviction as loadGltf (the black-void precedent): a
+        // rejected promise left in the cache poisons every later ensure for
+        // the session, which would defeat the sky evict-and-refetch lane
+        // after an outage outlives the bounded retry. Identity-guarded so a
+        // newer in-flight load is never evicted by an old failure settling.
+        if (hdrCache.get(cacheKey) === p) hdrCache.delete(cacheKey);
         throw err;
       },
     );

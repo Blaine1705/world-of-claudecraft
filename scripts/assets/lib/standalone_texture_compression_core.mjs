@@ -145,7 +145,10 @@ export function buildKtxCreateArgs({
  *  Skin atlases are NOT flipped: they are consumed at `flipY = false`, the
  *  glTF UV convention their rigs are authored against.
  *  The name slugs the WHOLE source path, so two same-named channel maps from
- *  different pack directories cannot collide in one flat temp directory. */
+ *  different pack directories cannot collide in one flat temp directory.
+ *  The tmpDir the converter passes is a PRIVATE per-run mkdtemp (0700), never
+ *  the shared os.tmpdir(): a predictable path in shared temp is pre-creatable
+ *  and race-swappable by any local process (review round 2). */
 export function flippedSourcePath(srcPath, tmpDir) {
   const slug = srcPath.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+/, '');
   return path.join(tmpDir, `${slug}.flip.png`);

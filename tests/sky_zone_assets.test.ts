@@ -249,6 +249,27 @@ describe('zone-scoped sky assets', () => {
     expect(material.vertexShader).toContain('gl_Position.z = gl_Position.w;');
   });
 
+  it('recovers a half-loaded biome: dome lands, env fails terminally, a later ensure completes it', async () => {
+    // Review round 2: the successful arm leaves the biome resident (its dome
+    // bytes are real and evictable) but NOT ready, the failed ensure clears
+    // its task memo, and a later residency pass must re-fetch the missing arm
+    // to full readiness once the loader recovers.
+    const sky = await import('../src/render/sky');
+    loadHdr.mockImplementation(async (url: string) => {
+      if (url.includes('_1k.hdr')) throw new Error('env fetch failed terminally');
+      return new THREE.DataTexture();
+    });
+    await expect(sky.ensureSkyBiomeAssets(['marsh'])).rejects.toThrow('env fetch failed');
+    expect(sky.residentSkyBiomes()).toContain('marsh');
+    expect(sky.readySkyBiomes()).not.toContain('marsh');
+
+    // Connectivity returns: the same ensure entry point (what the residency
+    // lane re-runs) completes the missing arm.
+    loadHdr.mockImplementation(async () => new THREE.DataTexture());
+    await sky.ensureSkyBiomeAssets(['marsh']);
+    expect(sky.readySkyBiomes()).toContain('marsh');
+  });
+
   it('gives every reachable sky key a residency region, so none can become always-evictable', async () => {
     // The residency plan keeps a biome by the distance to its nearest region
     // rectangle; a key with NO region has no distance, is never inside the
@@ -275,11 +296,17 @@ describe('zone-scoped sky assets', () => {
       { id: 'z', biome: 'beach', zMin: 0, zMax: 100, xMin: 0, xMax: 100 },
     ] as never);
     expect(custom.some((r: { key: string }) => r.key === 'beach')).toBe(true);
-    // And the renderer derives its list from the live world, not static ZONES.
-    const renderer = (await import('node:fs')).readFileSync(
-      new URL('../src/render/renderer.ts', import.meta.url),
+    // And the residency lane derives its list from the live world, not static
+    // ZONES: the renderer's host view supplies the zones, the driver passes
+    // exactly those to skyResidencyRegions.
+    const { readFileSync } = await import('node:fs');
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    expect(renderer).toContain('liveZones: () => this.sim.cfg.world?.zones ?? ZONES');
+    const driver = readFileSync(
+      new URL('../src/render/sky_residency_driver.ts', import.meta.url),
       'utf8',
     );
-    expect(renderer).toContain('skyResidencyRegions(this.sim.cfg.world?.zones ?? ZONES)');
+    expect(driver).toContain('skyResidencyRegions(this.host.liveZones())');
+    expect(driver).toContain('new Set(this.host.liveZones().map((zone) => zone.biome))');
   });
 });

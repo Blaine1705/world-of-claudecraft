@@ -429,8 +429,17 @@ describe('standalone_texture_compression_core: flip, alignment and CLI parsing',
     expect(a.startsWith('/tmp/')).toBe(true);
     expect(a.endsWith('.flip.png')).toBe(true);
     expect(path.basename(a)).not.toContain('/');
-    // Deterministic: same input, same temp name.
+    // Name determinism WITHIN a directory is fine and keeps failures legible;
+    // isolation comes from the converter passing a private per-run mkdtemp
+    // directory, pinned below, not from the name (review round 2).
     expect(flippedSourcePath('/p/public/textures/terrain/Rock026_NormalGL.jpg', '/tmp')).toBe(a);
+    const converter = fs.readFileSync(
+      path.join(ROOT, 'scripts/assets/compress_standalone_textures.mjs'),
+      'utf8',
+    );
+    expect(converter).toContain("fs.mkdtempSync(path.join(os.tmpdir(), 'woc-flip-')");
+    expect(converter).toContain('mode: 0o700');
+    expect(converter).toContain('fs.rmSync(stagingDir, { recursive: true, force: true })');
   });
 
   it('blockAlignmentError accepts multiples of 4 and names what is wrong otherwise', () => {
