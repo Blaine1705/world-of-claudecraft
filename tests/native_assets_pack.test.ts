@@ -37,6 +37,14 @@ describe('Play asset pack wiring pins', () => {
     expect(gradle).toContain('missing from both the base assets and the pack');
   });
 
+  it('the restore direction treats the base as authoritative (no stale-pack clobber)', () => {
+    // After a fresh `cap sync` the base holds the current assets and any pack
+    // copy is stale; a non-bundle build must DISCARD the stale pack copy, never
+    // move it over the fresh base. The guard is `if (base.exists()) delete(pack)`.
+    const gradle = read('android/app/build.gradle');
+    expect(gradle).toMatch(/if \(base\.exists\(\)\)\s*\{\s*project\.delete\(pack\)/);
+  });
+
   it('the relocated assets are gitignored like the cap-synced ones', () => {
     expect(read('android/.gitignore')).toContain('woc_media_pack/src/main/assets');
   });
