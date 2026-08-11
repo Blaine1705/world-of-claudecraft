@@ -103,17 +103,19 @@ describe('buildTradeItemRow (stale-client guard, R34)', () => {
 describe('trade window painter wiring (source pins, woc_trade updateTradeWindow)', () => {
   // The pure core decides; these pins hold the painter to consuming it. The
   // method body is comment-stripped first so a comment naming the assignment
-  // cannot satisfy an ordering pin. updateTradeWindow is the last member of
-  // WocTradeController, so the slice runs from its signature to end of file.
+  // cannot satisfy an ordering pin.
   const controller = readFileSync(
     new URL('../src/ui/hud/woc_trade/woc_trade_controller.ts', import.meta.url),
     'utf8',
   );
   const start = controller.indexOf('updateTradeWindow(): void {');
-  // The method closes at the first two-space-indented brace after its
-  // signature (every nested block closes deeper), so the slice cannot
-  // silently widen if a member ever lands after updateTradeWindow.
-  const end = controller.indexOf('\n  }', start);
+  // updateTradeWindow is the LAST member of WocTradeController, so the method
+  // close is the file's LAST two-space-indented brace: a bound that
+  // template-literal content inside the body can never fake (a first-match
+  // bound could end early on a template line that happens to start with two
+  // spaces and a brace). The bracket test below pins the tail shape, so a
+  // member landing after the method fails loudly instead of mis-slicing.
+  const end = controller.lastIndexOf('\n  }');
   const body = controller
     .slice(start, end)
     .replace(/\/\*[\s\S]*?\*\//g, '')
@@ -122,6 +124,9 @@ describe('trade window painter wiring (source pins, woc_trade updateTradeWindow)
   it('brackets the method slice it pins', () => {
     expect(start).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(start);
+    // The tail after the bound is exactly method-close + class-close: the
+    // "last member" premise the lastIndexOf bound rests on, checked.
+    expect(controller.slice(end).trimEnd()).toBe('\n  }\n}');
   });
 
   it('resolves offer rows through buildTradeItemRow and guards the icon', () => {
@@ -152,9 +157,10 @@ describe('trade window painter wiring (source pins, woc_trade updateTradeWindow)
 });
 
 // Issue #2693: hovering an item in the trade window showed no stats tooltip
-// because updateTradeWindow (hud.ts) never wired the trade slots to the
-// shared attachTooltip/itemTooltip infrastructure bag slots use.
-// tradeRowTooltipTarget is the pure lookup hud.ts's wiring resolves through:
+// because updateTradeWindow (then still on hud.ts) never wired the trade slots
+// to the shared attachTooltip/itemTooltip infrastructure bag slots use.
+// tradeRowTooltipTarget is the pure lookup that wiring (now in
+// src/ui/hud/woc_trade/woc_trade_controller.ts) resolves through:
 // same InvSlot shape as a bag row (both offer sides carry it, per
 // src/world_api/trade.ts's TradeOffer), so it must expose the exact item def
 // plus per-instance payload (enchant/masterwork/signature) the bag tooltip

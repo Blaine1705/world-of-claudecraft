@@ -29,6 +29,17 @@ const EPIC: ItemDef = {
 const TABLE: Record<string, ItemDef> = { [EPIC.id]: EPIC };
 const slot = (id: string): InvSlot => ({ itemId: id, count: 1 });
 
+// Comment-stripped BEFORE any pin reads them: the controller is roughly 40
+// percent prose, so an unstripped pin can be satisfied (or false-red) by a
+// comment quoting the pinned expression (the comment-gameable trap; the
+// sibling tests/trade_view.test.ts strips for the same reason).
+const stripComments = (s: string): string =>
+  s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+const CONTROLLER = stripComments(
+  readFileSync('src/ui/hud/woc_trade/woc_trade_controller.ts', 'utf8'),
+);
+const VIEW = stripComments(readFileSync('src/ui/hud/woc_trade/woc_trade_offer_view.ts', 'utf8'));
+
 function deps(over: Partial<WocTradePanelDeps> = {}): WocTradePanelDeps {
   return {
     staged: [],
@@ -222,16 +233,14 @@ describe('the trade window actually applies the gold lock', () => {
   // goldDisabled was computed and never used, so entering $WOC mode left the
   // gold fields live. A source pin is weaker than driving the DOM; it catches
   // deletion, which is how the defect actually occurred.
-  const HUD = readFileSync('src/ui/hud/woc_trade/woc_trade_controller.ts', 'utf8');
-
   it('derives the attribute from the model, not a constant', () => {
-    expect(HUD).toContain("wocModel.goldDisabled ? ' disabled' : ''");
+    expect(CONTROLLER).toContain("wocModel.goldDisabled ? ' disabled' : ''");
   });
 
   it('applies it to ALL THREE coin inputs', () => {
     // One missed field is a full hole: a seller could still type silver.
     for (const coin of ['g', 's', 'c']) {
-      expect(HUD, `#trade-${coin} must honour the lock`).toContain(
+      expect(CONTROLLER, `#trade-${coin} must honour the lock`).toContain(
         `id="trade-${coin}"\${goldAttr}`,
       );
     }
@@ -477,20 +486,20 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
   // the client dropped any offer that was no longer 'pending', and a successful
   // acceptance closed the window. Between them the payment phase was
   // unreachable and both sides were left holding a stale offer id to press.
-  const HUD = readFileSync('src/ui/hud/woc_trade/woc_trade_controller.ts', 'utf8');
-  const VIEW = readFileSync('src/ui/hud/woc_trade/woc_trade_offer_view.ts', 'utf8');
-
   it('polls accepted offers, not only pending ones (the selector decides)', () => {
-    expect(HUD).toContain('selectStandingWocOffer(res.offers, otherName, this.wocTradeFinished)');
+    expect(CONTROLLER).toContain(
+      'selectStandingWocOffer(res.offers, otherName, this.wocTradeFinished)',
+    );
     expect(VIEW).toContain("o.status === 'pending' || o.status === 'accepted'");
   });
 
   it('does not cancel the trade when an acceptance succeeds', () => {
     // The acceptance handler must leave the window open; only the buyer's own
-    // withdraw and the sim's own cancel may close it.
-    const accept = HUD.slice(
-      HUD.indexOf('private async acceptWocTradeOffer'),
-      HUD.indexOf('private async cancelWocTradeOffer'),
+    // withdraw and the sim's own cancel may close it. Bounded at the NEXT
+    // member so the window covers acceptWocTradeOffer alone.
+    const accept = CONTROLLER.slice(
+      CONTROLLER.indexOf('private async acceptWocTradeOffer'),
+      CONTROLLER.indexOf('private async payWocTradeOffer'),
     );
     expect(accept).not.toContain('tradeCancel');
     expect(accept, 'it should advance the phase instead').toContain("phase: 'awaiting_payment'");
@@ -499,8 +508,8 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
   it('drives the Accept button from the OFFER, not the sim trade', () => {
     // A $WOC deal never confirms the sim trade, so info.myAccepted never moves:
     // reading it left the button saying "Accept" after the player had accepted.
-    expect(HUD).toContain('wocModel.pendingOffer.buyerAccepted');
-    expect(HUD).toContain('wocModel.pendingOffer.sellerAccepted');
+    expect(CONTROLLER).toContain('wocModel.pendingOffer.buyerAccepted');
+    expect(CONTROLLER).toContain('wocModel.pendingOffer.sellerAccepted');
   });
 
   it('closes the loop for BOTH sides when the sale completes', () => {
@@ -510,18 +519,18 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
     // The CALL first, then the body. Asserting only on the method's contents
     // passes with nothing invoking it, which is the same silent no-op as the
     // bug: verified by deleting the call and watching this stay green.
-    const poll = HUD.slice(
-      HUD.indexOf('private pollWocTradeOffer'),
-      HUD.indexOf('private finishWocTrade'),
+    const poll = CONTROLLER.slice(
+      CONTROLLER.indexOf('private pollWocTradeOffer'),
+      CONTROLLER.indexOf('private finishWocTrade'),
     );
     expect(poll, 'the poll must act on the settle step').toContain("step.kind === 'settle'");
     expect(poll).toContain('this.finishWocTrade(mine)');
     expect(VIEW, 'and the settled phase is what maps to that step').toContain(
       "if (phase === 'settled') return { kind: 'settle' };",
     );
-    const finish = HUD.slice(
-      HUD.indexOf('private finishWocTrade'),
-      HUD.indexOf('private async acceptWocTradeOffer'),
+    const finish = CONTROLLER.slice(
+      CONTROLLER.indexOf('private finishWocTrade'),
+      CONTROLLER.indexOf('private resolveClosedWocTrade'),
     );
     expect(finish, 'a seller line and a buyer line, not one shared line').toContain(
       'hudChrome.trade.woc.paidSeller',
@@ -539,15 +548,15 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
     // The row lingers server-side for a grace window so both clients can see it
     // complete. Without a retired-id set the poll re-adopts it every 2s: the
     // window reopens, the message repeats, and the pair cannot start a new deal.
-    expect(HUD).toContain('wocTradeFinished');
-    const finish = HUD.slice(
-      HUD.indexOf('private finishWocTrade'),
-      HUD.indexOf('private async acceptWocTradeOffer'),
+    expect(CONTROLLER).toContain('wocTradeFinished');
+    const finish = CONTROLLER.slice(
+      CONTROLLER.indexOf('private finishWocTrade'),
+      CONTROLLER.indexOf('private resolveClosedWocTrade'),
     );
     expect(finish, 'an early return on an already-reported id').toContain(
       'if (this.wocTradeFinished.has(row.id)) return;',
     );
-    expect(HUD, 'and the poll must pass the retired-id set to the selector').toContain(
+    expect(CONTROLLER, 'and the poll must pass the retired-id set to the selector').toContain(
       'selectStandingWocOffer(res.offers, otherName, this.wocTradeFinished)',
     );
     expect(VIEW, 'which skips retired ids').toContain('!finished.has(o.id)');
@@ -559,20 +568,25 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
     // 'settled' second had its window closed out from under it and never ran
     // finishWocTrade at all: no payment line, no balance refresh, a stale bag.
     // The recovery must therefore hang off the CLOSE path, not the poll.
-    const close = HUD.slice(
-      HUD.indexOf('private resolveClosedWocTrade'),
-      HUD.indexOf('private async sendWocTradeOffer'),
+    const close = CONTROLLER.slice(
+      CONTROLLER.indexOf('private resolveClosedWocTrade'),
+      CONTROLLER.indexOf('private async acceptWocTradeOffer'),
     );
     expect(close, 'it re-reads the offer off the window entirely').toContain('client.offers()');
     expect(close).toContain("wocOfferPhase(row) === 'settled'");
     expect(close).toContain('this.finishWocTrade(row)');
     // And the cleanup branch must actually call it, or it is dead code.
-    const updateStart = HUD.indexOf('updateTradeWindow(): void {');
-    // Bounded at the method's own two-space close so the slice cannot widen
-    // if a member ever lands after updateTradeWindow.
-    const updateEnd = HUD.indexOf('\n  }', updateStart);
+    const updateStart = CONTROLLER.indexOf('updateTradeWindow(): void {');
+    // updateTradeWindow is the LAST member, so the method close is the file's
+    // last two-space-indented brace: an end bound template-literal content
+    // inside the body can never fake (it all sits before the close). The tail
+    // assertion fails loudly if a member ever lands after the method, forcing
+    // this bound to be re-derived rather than silently mis-slicing.
+    const updateEnd = CONTROLLER.lastIndexOf('\n  }');
+    expect(updateStart).toBeGreaterThan(-1);
     expect(updateEnd).toBeGreaterThan(updateStart);
-    const update = HUD.slice(updateStart, updateEnd);
+    expect(CONTROLLER.slice(updateEnd).trimEnd()).toBe('\n  }\n}');
+    const update = CONTROLLER.slice(updateStart, updateEnd);
     expect(update, 'the window-closed branch must invoke it').toContain(
       'this.resolveClosedWocTrade()',
     );
@@ -581,20 +595,24 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
   it('ends a COMPLETED trade with a close, never a cancellation', () => {
     // "Trade cancelled." contradicts the payment line printed a moment earlier,
     // and both players saw it.
-    const finish = HUD.slice(
-      HUD.indexOf('private finishWocTrade'),
-      HUD.indexOf('private resolveClosedWocTrade'),
+    const finish = CONTROLLER.slice(
+      CONTROLLER.indexOf('private finishWocTrade'),
+      CONTROLLER.indexOf('private resolveClosedWocTrade'),
     );
     expect(finish).toContain('this.sim.tradeClose()');
     expect(finish).not.toContain('tradeCancel');
+    // Positive control: the scanner CAN see the cancel token where it lives
+    // (the cancel-button wiring), so the absence above is a real absence and
+    // survives a future move of the cancel wiring.
+    expect(CONTROLLER).toContain('this.sim.tradeCancel()');
   });
 
   it('does not announce DELIVERY while the chain is still confirming', () => {
     // The mirror of the loss that cost real money: a correct payment can come
     // back still confirming, and "on its way by mail" is a claim about delivery.
-    const pay = HUD.slice(
-      HUD.indexOf('private async payWocTradeOffer'),
-      HUD.indexOf('private async cancelWocTradeOffer'),
+    const pay = CONTROLLER.slice(
+      CONTROLLER.indexOf('private async payWocTradeOffer'),
+      CONTROLLER.indexOf('private async cancelWocTradeOffer'),
     );
     expect(pay).toContain('wocSettlementInFlight(done.state)');
     // And the buyer sees the pending face the instant they commit, not when a
@@ -604,14 +622,12 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
 });
 
 describe('the wallet is skipped only on explicit server permission', () => {
-  const HUD = readFileSync('src/ui/hud/woc_trade/woc_trade_controller.ts', 'utf8');
-
   it('requires an explicit false, so an absent flag still signs', () => {
     // Fail-safe direction: a service that omits the field is not saying "no
     // signature needed". A truthiness check here would skip signing whenever
     // the field were missing, which is the one mistake that must not happen.
-    expect(HUD).toContain('quoted.quote.signatureRequired === false');
-    expect(HUD).not.toContain('!quoted.quote.signatureRequired');
+    expect(CONTROLLER).toContain('quoted.quote.signatureRequired === false');
+    expect(CONTROLLER).not.toContain('!quoted.quote.signatureRequired');
   });
 
   it('paints the estimate red and kills Send when the wallet is short', () => {
@@ -642,7 +658,7 @@ describe('the wallet is skipped only on explicit server permission', () => {
   it('reads the VERIFIED balance, not a merely-connected wallet', () => {
     // An unverified figure belongs to a wallet that will not be paying, so
     // gating on it would refuse (or permit) the wrong offer.
-    expect(HUD).toContain('walletTokens: verifiedWocBalance()');
+    expect(CONTROLLER).toContain('walletTokens: verifiedWocBalance()');
   });
 
   it('disables the Gold TAB once a $WOC deal stands, for either side', () => {
@@ -677,7 +693,7 @@ describe('the wallet is skipped only on explicit server permission', () => {
   });
 
   it('reads the partner gold from the shared trade state, not a local echo', () => {
-    expect(HUD).toContain('partnerGoldCopper: this.sim.tradeInfo?.theirOffer.copper ?? 0');
+    expect(CONTROLLER).toContain('partnerGoldCopper: this.sim.tradeInfo?.theirOffer.copper ?? 0');
   });
 
   it('hides the coin inputs for BOTH sides once a $WOC deal stands', () => {
@@ -686,6 +702,31 @@ describe('the wallet is skipped only on explicit server permission', () => {
     // not on whose money row shows the figure: the seller's row shows nothing,
     // so the earlier wocMoneyMine test left their coin fields on screen under a
     // deal priced in $WOC.
-    expect(HUD).toContain('class="trade-coins"${wocModel.wocDealStanding');
+    expect(CONTROLLER).toContain('class="trade-coins"${wocModel.wocDealStanding');
+  });
+});
+
+describe('the Hud side of the seam, and the E2E reach-through', () => {
+  it('Hud hands the controller the LIVE staged object, never a copy', () => {
+    // The deps contract (WocTradeControllerDeps.staged) requires the live
+    // object: the unstage click and the coin-input write mutate it in place.
+    // The controller side is pinned behaviorally in
+    // tests/woc_trade_controller.test.ts; this is the HUD side, where a
+    // defensive spread would break item unstaging with every test still green.
+    const HUD_TS = stripComments(readFileSync('src/ui/hud.ts', 'utf8'));
+    const pin = 'staged: () => this.stagedTrade,';
+    expect(HUD_TS.split(pin).length - 1, 'exactly one live-object staged binding').toBe(1);
+  });
+
+  it('the E2E scripts reach the controller under the names the source keeps', () => {
+    // scripts/*.mjs are outside tsc and outside the gate: a rename of the
+    // wocTrade field or the lastTradeSig latch breaks them silently. The
+    // source-side names are pinned by tests/hud_update_drive.test.ts; this
+    // pins the SCRIPT side of the same coupling so the two stay linked.
+    const moneyShot = readFileSync('scripts/trade_money_shot.mjs', 'utf8');
+    expect(moneyShot).toContain('hud.wocTrade.updateTradeWindow()');
+    expect(moneyShot).toContain('hud.wocTrade.lastTradeSig');
+    const localization = readFileSync('scripts/localization_e2e.mjs', 'utf8');
+    expect(localization).toContain('hud.wocTrade.updateTradeWindow()');
   });
 });

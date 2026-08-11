@@ -651,6 +651,21 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
         );
       }
     }
+    // The exempt rows hold the SAME pin: their own doc says the exemption was
+    // granted about specific fields, so a module that grows a second compared
+    // memo must not inherit an answer given about a different one. Without
+    // this arm the new gate would be absorbed silently ('coordinator' rows
+    // are the one shape with no field list to compare).
+    for (const row of NOT_A_LANGUAGE_GATE) {
+      if (row.memos === 'coordinator') continue;
+      const found = discoveredByFile.get(row.file);
+      if (!found) continue; // reported by the stale-row test above
+      if (found.memos.join(',') !== [...row.memos].sort().join(',')) {
+        drift.push(
+          `${row.file}: exemption ${row.memos.join(',')} vs source ${found.memos.join(',')}`,
+        );
+      }
+    }
     expect(
       drift,
       'a classified module gained or lost a repaint memo. A NEW memo is a NEW gate and needs the language question answered about it, not inherited from the answer given about a different field:\n' +

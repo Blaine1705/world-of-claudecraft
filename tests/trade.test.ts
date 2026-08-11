@@ -922,5 +922,28 @@ describe('ClientWorld trade sends', () => {
     cmd.mockClear();
     world.tradeCancel();
     expect(cmd).toHaveBeenCalledWith({ cmd: 'trade_cancel' });
+    // Instance spy on a test-local bareClient, so nothing leaks; restored for
+    // the scoping to be self-evident rather than incidental.
+    cmd.mockRestore();
+  });
+
+  it("the server's trade_close dispatch arm resolves to sim.tradeClose, not tradeCancel", () => {
+    // The server-side mirror of the client pin above: command_schema only
+    // scans for the case LABEL, so a tradeClose/tradeCancel swap inside the
+    // arm keeps every derived set identical. Comment-stripped, bounded at the
+    // next case label so the window covers this arm alone.
+    const game = readFileSync(join(__dirname, '..', 'server', 'game.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\/\/[^\n]*/g, '');
+    const start = game.indexOf("case 'trade_close':");
+    const end = game.indexOf('case ', start + 1);
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const arm = game.slice(start, end);
+    expect(arm).toContain('sim.tradeClose(pid)');
+    expect(arm).not.toContain('tradeCancel');
+    // Positive control for the absence: the cancel arm exists and the scanner
+    // sees its token, so the not.toContain above is a real absence.
+    expect(game).toContain('sim.tradeCancel(pid)');
   });
 });
