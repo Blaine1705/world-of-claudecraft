@@ -383,6 +383,46 @@ describe('market_window: behavior preserved through the core', () => {
   });
 });
 
+describe('market_window: Browse row cloth/leather/mail cue (#3104)', () => {
+  it('resolves the badge from the shared armor-type resolver, not a second classification', () => {
+    expect(painter).toContain("import { marketArmorBadge } from './market_armor_badge';");
+    expect(painter).toContain('const armorBadge = marketArmorBadge(item);');
+  });
+
+  it('shows no mark on non-armor rows (weapons, bags, materials) instead of an empty badge', () => {
+    const badgeAssign = painter.slice(
+      painter.indexOf('const armorBadge = marketArmorBadge(item);'),
+      painter.indexOf('row.innerHTML ='),
+    );
+    expect(badgeAssign).toContain('const badge = armorBadge');
+    expect(badgeAssign).toMatch(/:\s*'';\s*$/);
+  });
+
+  it('escapes the localized armor-type label before it reaches innerHTML', () => {
+    expect(painter).toContain('esc(t(armorBadge.labelKey))');
+  });
+
+  it('reuses the tooltip slot-line vocabulary (hudChrome.itemArmorType), not the filter-menu one', () => {
+    // itemUi.market.armorCloth/Leather/Mail is the filter-menu labels, a distinct string
+    // family; the row badge deliberately reuses item_armor_type.ts's key instead of adding
+    // a third rendering of the same three words (root CLAUDE.md, module-first).
+    const core = readFileSync(new URL('../src/ui/market_armor_badge.ts', import.meta.url), 'utf8');
+    expect(core).toContain("from './item_armor_type'");
+    expect(core).toContain("from '../sim/equipment_rules'");
+  });
+
+  it('is not color-only: the badge always carries real text, distinguished further by a border/background class per type', () => {
+    for (const cls of [
+      'mkt-armor-badge',
+      'mkt-armor-badge--cloth',
+      'mkt-armor-badge--leather',
+      'mkt-armor-badge--mail',
+    ]) {
+      expect(componentsCss, `components.css must define .${cls}`).toContain(`.${cls}`);
+    }
+  });
+});
+
 describe('market_window: stale tooltip on re-filter (#2456)', () => {
   // Typing in the search box, or picking a type/subtype/rarity filter that then narrows
   // the async listings update, drives the signature-checked refresh path
