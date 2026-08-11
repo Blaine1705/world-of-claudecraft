@@ -14,28 +14,52 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
-    "entities.abilities.nightshade_coating.name"
+    "entities.abilities.nightshade_coating.name",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "es_ES": [
     "abilityUi.tooltip.anyTarget",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
-    "entities.abilities.nightshade_coating.name"
+    "entities.abilities.nightshade_coating.name",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "fr_FR": [
     "abilityUi.tooltip.anyTarget",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
-    "entities.abilities.nightshade_coating.name"
+    "entities.abilities.nightshade_coating.name",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "fr_CA": [
     "abilityUi.tooltip.anyTarget",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
-    "entities.abilities.nightshade_coating.name"
+    "entities.abilities.nightshade_coating.name",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "en_CA": [],
   "it_IT": [
@@ -43,14 +67,26 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
-    "entities.abilities.nightshade_coating.name"
+    "entities.abilities.nightshade_coating.name",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "de_DE": [
     "abilityUi.tooltip.anyTarget",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
-    "entities.abilities.nightshade_coating.name"
+    "entities.abilities.nightshade_coating.name",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -61,7 +97,13 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
-    "entities.abilities.nightshade_coating.name"
+    "entities.abilities.nightshade_coating.name",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -69,55 +111,103 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
-    "entities.abilities.nightshade_coating.name"
+    "entities.abilities.nightshade_coating.name",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "nl_NL": [
     "abilityUi.tooltip.anyTarget",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
-    "entities.abilities.nightshade_coating.name"
+    "entities.abilities.nightshade_coating.name",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "pl_PL": [
     "abilityUi.tooltip.anyTarget",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
-    "entities.abilities.nightshade_coating.name"
+    "entities.abilities.nightshade_coating.name",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "id_ID": [
     "abilityUi.tooltip.anyTarget",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
-    "entities.abilities.nightshade_coating.name"
+    "entities.abilities.nightshade_coating.name",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "tr_TR": [
     "abilityUi.tooltip.anyTarget",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
-    "entities.abilities.nightshade_coating.name"
+    "entities.abilities.nightshade_coating.name",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "sv_SE": [
     "abilityUi.tooltip.anyTarget",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
-    "entities.abilities.nightshade_coating.name"
+    "entities.abilities.nightshade_coating.name",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "vi_VN": [
     "abilityUi.tooltip.anyTarget",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
-    "entities.abilities.nightshade_coating.name"
+    "entities.abilities.nightshade_coating.name",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ],
   "da_DK": [
     "abilityUi.tooltip.anyTarget",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
-    "entities.abilities.nightshade_coating.name"
+    "entities.abilities.nightshade_coating.name",
+    "hudChrome.otaUpdate.applying",
+    "hudChrome.otaUpdate.continueAnyway",
+    "hudChrome.otaUpdate.downloading",
+    "hudChrome.otaUpdate.incompatible",
+    "hudChrome.otaUpdate.progressLabel",
+    "hudChrome.otaUpdate.title"
   ]
 };
