@@ -8727,6 +8727,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.not_pending': 'Эта ставка больше не ожидает залога.',
   'apiError.woc_market.confirm_failed':
     'Не удалось подтвердить транзакцию. Запросите новую котировку и повторите попытку.',
+  'apiError.woc_market.confirm_in_flight':
+    'Платеж по залогу ещё подтверждается. Повторите попытку, когда он завершится.',
+  'apiError.woc_market.cancel_pending': 'Продавец отменяет этот лот.',
+  'apiError.woc_market.claim_cooldown':
+    'Вы недавно отказались от быстрой покупки. Повторите попытку позже.',
   'apiError.woc_market.buy_now_locked':
     'Другой покупатель завершает эту покупку. Попробуйте чуть позже.',
   'apiError.woc_market.settlement_in_flight':
@@ -8827,6 +8832,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Покупка завершена. Предмет прибудет почтой Вороньей службы.',
   'hudChrome.wocMarket.listingCreated': 'Ваш лот выставлен.',
   'hudChrome.wocMarket.listingCancelled': 'Лот отменён. Предмет вернётся почтой Вороньей службы.',
+  'hudChrome.wocMarket.listingCancelPending':
+    'Отмена ожидает: покупатель удерживает окно покупки. Если он не заплатит, лот закроется, а предмет вернётся почтой Вороньей службы.',
   'hudChrome.wocMarket.sellTitle': 'Создание лота',
   'hudChrome.wocMarket.sellEmpty':
     'В сумках нет подходящих предметов. Биржа принимает только неприсоединённую экипировку эпического качества и выше.',
@@ -8882,6 +8889,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.bidBondPayAria': 'Оплатить залог по ставке на лот {id}',
   'hudChrome.wocMarket.settlementOffered': 'Ожидает оплаты',
   'hudChrome.wocMarket.settlementConfirming': 'Подтверждается',
+  'hudChrome.wocMarket.settlementReview': 'Платеж на проверке',
   'hudChrome.wocMarket.settlementDelivered': 'Доставлено',
   'hudChrome.wocMarket.settlementExpired': 'Просрочено без оплаты',
   'hudChrome.wocMarket.settlementFailed': 'Оплата не прошла',

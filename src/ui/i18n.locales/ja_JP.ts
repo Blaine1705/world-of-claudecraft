@@ -8610,6 +8610,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.not_pending': 'その入札はもう保証金を待っている状態ではありません。',
   'apiError.woc_market.confirm_failed':
     'トランザクションを確認できませんでした。新しい見積もりを取得して、もう一度お試しください。',
+  'apiError.woc_market.confirm_in_flight':
+    '保証金の支払いはまだ確認中です。完了してからもう一度お試しください。',
+  'apiError.woc_market.cancel_pending': '出品者がこの出品を取り消そうとしています。',
+  'apiError.woc_market.claim_cooldown':
+    '最近、即時購入を途中で放棄しています。しばらくしてからもう一度お試しください。',
   'apiError.woc_market.buy_now_locked':
     '別の買い手がこの購入を進めています。しばらくしてからもう一度お試しください。',
   'apiError.woc_market.settlement_in_flight':
@@ -8714,6 +8719,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.listingCreated': '出品が公開されました。',
   'hudChrome.wocMarket.listingCancelled':
     '出品を取り下げました。アイテムはレイヴンポスト便で戻ります。',
+  'hudChrome.wocMarket.listingCancelPending':
+    '取り下げ待ち: 購入枠を確保している買い手がいます。支払いがなければ出品は閉じられ、アイテムはレイヴンポスト便で戻ります。',
   'hudChrome.wocMarket.sellTitle': '出品を作成',
   'hudChrome.wocMarket.sellEmpty':
     'バッグに出品できるアイテムがありません。取引所はソウルバウンドでないエピック以上の装備のみ扱います。',
@@ -8769,6 +8776,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.bidBondPayAria': '出品 {id} への入札の保証金を支払う',
   'hudChrome.wocMarket.settlementOffered': '支払い待ち',
   'hudChrome.wocMarket.settlementConfirming': '確認中',
+  'hudChrome.wocMarket.settlementReview': '支払いは審査中です',
   'hudChrome.wocMarket.settlementDelivered': '配達済み',
   'hudChrome.wocMarket.settlementExpired': '期限切れ（未払い）',
   'hudChrome.wocMarket.settlementFailed': '支払い失敗',

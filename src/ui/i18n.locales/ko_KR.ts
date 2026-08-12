@@ -8579,6 +8579,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.not_pending': '해당 입찰은 더 이상 보증금을 기다리는 상태가 아닙니다.',
   'apiError.woc_market.confirm_failed':
     '트랜잭션을 확인할 수 없습니다. 새 견적을 받아 다시 시도하세요.',
+  'apiError.woc_market.confirm_in_flight':
+    '보증금 결제가 아직 확인 중입니다. 완료된 후 다시 시도하세요.',
+  'apiError.woc_market.cancel_pending': '판매자가 이 판매글을 취소하는 중입니다.',
+  'apiError.woc_market.claim_cooldown':
+    '최근에 즉시 구매를 중도 포기했습니다. 잠시 후 다시 시도하세요.',
   'apiError.woc_market.buy_now_locked':
     '다른 구매자가 이 구매를 진행 중입니다. 잠시 후 다시 시도하세요.',
   'apiError.woc_market.settlement_in_flight':
@@ -8679,6 +8684,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.listingCreated': '등록이 완료되었습니다.',
   'hudChrome.wocMarket.listingCancelled':
     '등록이 취소되었습니다. 아이템은 레이븐포스트 우편으로 돌아옵니다.',
+  'hudChrome.wocMarket.listingCancelPending':
+    '취소 대기 중: 한 구매자가 구매 창구를 쥐고 있습니다. 그가 결제하지 않으면 등록이 닫히고 아이템은 레이븐포스트 우편으로 돌아옵니다.',
   'hudChrome.wocMarket.sellTitle': '등록 만들기',
   'hudChrome.wocMarket.sellEmpty':
     '가방에 등록 가능한 아이템이 없습니다. 거래소는 귀속되지 않은 영웅 등급 이상의 장비만 취급합니다.',
@@ -8733,6 +8740,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.bidBondPayAria': '등록 {id}에 대한 입찰 보증금 결제',
   'hudChrome.wocMarket.settlementOffered': '결제 대기',
   'hudChrome.wocMarket.settlementConfirming': '확인 중',
+  'hudChrome.wocMarket.settlementReview': '결제 검토 중',
   'hudChrome.wocMarket.settlementDelivered': '전달됨',
   'hudChrome.wocMarket.settlementExpired': '기한 만료(미결제)',
   'hudChrome.wocMarket.settlementFailed': '결제 실패',

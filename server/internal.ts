@@ -807,6 +807,17 @@ export const routes: RouteDef[] = [
     handler: opsP2pTradesHandler,
   },
   {
+    // Operator semantics per class: unbookedClaims / stuckDelivering /
+    // undisposedListings follow the parked-delivery runbook (never delete a
+    // claim row; confirm what the buyer holds before hand-delivering).
+    // reviewSettlements are over-aged 'confirming' rows the sweep parked
+    // (fail_reason confirming_overdue): verify the payment reference on chain
+    // with the service release tooling, then transitionSettlement
+    // review -> confirmed (paid: delivery resumes) or review -> failed
+    // (unpaid: the overdue default pass takes over). stuckBonds are
+    // paid-but-undecided bid bonds past the same bound: still polled, no
+    // automatic void (the money may have landed); verify the signature by
+    // hand and resolve through the same tooling.
     method: 'GET',
     path: '/internal/woc-market/stuck',
     surface: 'internal',

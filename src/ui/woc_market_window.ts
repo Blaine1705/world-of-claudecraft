@@ -1095,6 +1095,11 @@ export class WocMarketWindow {
         case 'confirmed':
         case 'delivering':
           return 'hudChrome.wocMarket.settlementConfirming';
+        // The operator-review park: the payment is being verified by hand.
+        // Deliberately NOT the default arm ('Payment due' would invite a
+        // second payment for money that may already have landed).
+        case 'review':
+          return 'hudChrome.wocMarket.settlementReview';
         case 'delivered':
           return 'hudChrome.wocMarket.settlementDelivered';
         case 'expired':
@@ -1726,7 +1731,13 @@ export class WocMarketWindow {
         this.fail(out.code);
         return;
       }
-      this.ok('hudChrome.wocMarket.listingCancelled');
+      // cancelPending: the cancel was accepted as intent (a buyer holds the
+      // short buy-now window); the listing closes on its own unless they pay.
+      this.ok(
+        out.cancelPending === true
+          ? 'hudChrome.wocMarket.listingCancelPending'
+          : 'hudChrome.wocMarket.listingCancelled',
+      );
       this.selectedId = null;
       this.detail = null;
       await this.reload();

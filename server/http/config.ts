@@ -150,6 +150,10 @@ export interface Config {
   // FK cascade, its bids and settlements) is kept. Sales are the permanent
   // provenance record and never prune. 0 keeps listings forever.
   readonly wocMarketListingsRetentionDays: number;
+  // How many days a buy-now abandon-ledger row (the claim-cooldown evidence)
+  // is kept. Rows are dead once outside every cooldown window; 0 keeps them
+  // forever.
+  readonly wocMarketAbandonsRetentionDays: number;
   // The two sweep knobs follow the maxPlayersPerRealm trimmed-read contract
   // instead, because for them a whitespace-derived 0 is fail-DANGEROUS: hour 0
   // moves the sweep to 00:00 UTC, next to the nightly 03:15 UTC pg_dump window
@@ -211,6 +215,9 @@ const DEFAULT_PLAYER_REPORT_RETENTION_DAYS = 180;
 const DEFAULT_BUG_REPORT_RETENTION_DAYS = 90;
 const DEFAULT_CHAT_VIOLATION_RETENTION_DAYS = 90;
 const DEFAULT_WOC_MARKET_LISTINGS_RETENTION_DAYS = 180;
+// Abandon rows are dead once outside every cooldown window (an hour); 30 days
+// keeps generous forensics for tuning the cooldown numbers.
+const DEFAULT_WOC_MARKET_ABANDONS_RETENTION_DAYS = 30;
 // PROVISIONAL: two hours after the nightly 03:15 UTC pg_dump window, pending real
 // traffic-curve evidence of the quietest hour; revisit when that evidence lands.
 const DEFAULT_RETENTION_SWEEP_UTC_HOUR = 5;
@@ -429,6 +436,10 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     wocMarketListingsRetentionDays: numberOr(
       env.WOC_MARKET_LISTINGS_RETENTION_DAYS,
       DEFAULT_WOC_MARKET_LISTINGS_RETENTION_DAYS,
+    ),
+    wocMarketAbandonsRetentionDays: numberOr(
+      env.WOC_MARKET_ABANDONS_RETENTION_DAYS,
+      DEFAULT_WOC_MARKET_ABANDONS_RETENTION_DAYS,
     ),
     // An hour outside 0..23 is garbage, not a preference; fall back like numberOr does.
     retentionSweepUtcHour:

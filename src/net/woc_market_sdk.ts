@@ -378,12 +378,15 @@ export class WocMarketClient {
     return out.ok ? { ok: true, ...out.data } : out;
   }
 
-  async cancelListing(id: number): Promise<{ ok: true } | WocMarketFail> {
-    const out = await this.request<{ ok: boolean }>(
+  async cancelListing(id: number): Promise<{ ok: true; cancelPending?: boolean } | WocMarketFail> {
+    const out = await this.request<{ ok: boolean; cancelPending?: boolean }>(
       'POST',
       `/api/woc-market/listings/${id}/cancel`,
     );
-    return out.ok ? { ok: true } : out;
+    if (!out.ok) return out;
+    // cancelPending: accepted as INTENT on a locked listing; the listing
+    // stays visible until the buyer's window resolves.
+    return out.data.cancelPending === true ? { ok: true, cancelPending: true } : { ok: true };
   }
 
   async placeBid(

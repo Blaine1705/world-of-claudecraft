@@ -33,7 +33,21 @@ import type {
   WocStuckCustodyClasses,
 } from './woc_market';
 import type { WocBidStatus, WocSettlementState } from './woc_market_rules';
-import { WOC_MARKET_MAX_ACTIVE_LISTINGS } from './woc_market_rules';
+import {
+  WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS,
+  WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR,
+  WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS,
+  WOC_MARKET_MAX_ACTIVE_LISTINGS,
+} from './woc_market_rules';
+
+/** The OPEN settlement states, shared VERBATIM between the one-open-settlement
+ *  unique index predicate and every liveness check (the LIFETIME_XP_EXPR
+ *  shared-text rule). 'review' is open on purpose: an over-aged 'confirming'
+ *  parked for an operator verdict still owns its listing, because the payment
+ *  may have landed on chain, so nothing may re-auction or double-sell around
+ *  it. 'delivered' stays open until the listing row closes (see the index
+ *  comment below). */
+const OPEN_SETTLEMENT_STATES_SQL = `('offered', 'confirming', 'review', 'confirmed', 'delivering', 'delivered')`;
 
 export const WOC_MARKET_SCHEMA = `
 CREATE TABLE IF NOT EXISTS woc_market_listings (
@@ -146,6 +160,45 @@ CREATE INDEX IF NOT EXISTS woc_market_listings_directed_buyer
   ON woc_market_listings(realm, directed_buyer_account, created_at DESC)
   WHERE directed_buyer_account IS NOT NULL AND status <> 'closed';
 
+-- Seller cancel-intent on a LOCKED listing (the abandon-loop ruling's second
+-- arm): instead of refusing, the cancel stamps this and the listing stops
+-- taking new lock claims and new bids; the CURRENT holder keeps their full
+-- window (a paid window proceeds to settlement as usual), and an unpaid
+-- expiry closes the listing cancelled with the return flight home. Bounds the
+-- seller's worst-case cancel denial at exactly one lock window. Additive.
+ALTER TABLE woc_market_listings
+  ADD COLUMN IF NOT EXISTS cancel_requested_at TIMESTAMPTZ;
+-- The converge arm's read: stamped, still-active listings (a tiny set).
+CREATE INDEX IF NOT EXISTS woc_market_listings_cancel_pending
+  ON woc_market_listings(realm, id)
+  WHERE cancel_requested_at IS NOT NULL AND status = 'active';
+
+-- The abandon ledger (the ruling's first arm): one row per abandoned public
+-- buy-now lock window, keyed by the lock instance (lock_expires) so the two
+-- recorders (the overdue sweep's abandon arm, and a claim that steals an
+-- expired lock) dedupe instead of double-counting one abandonment. Directed
+-- locks never record here (they keep their strike instead). lock_expires is
+-- both the dedupe key and the age axis for the two cooldown reads (the moment
+-- the abandon HAPPENED); created_at is forensics only. App clock throughout,
+-- consistent with the lock predicates (the 02 clock decision).
+CREATE TABLE IF NOT EXISTS woc_market_buy_now_abandons (
+  id BIGSERIAL PRIMARY KEY,
+  realm TEXT NOT NULL,
+  listing_id BIGINT NOT NULL REFERENCES woc_market_listings(id) ON DELETE CASCADE,
+  account INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  lock_expires TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+-- Dedupe key; also serves the per-listing cooldown probe and the FK-cascade
+-- scan from the listings prune (listing_id leads).
+CREATE UNIQUE INDEX IF NOT EXISTS woc_market_buy_now_abandons_once
+  ON woc_market_buy_now_abandons(listing_id, account, lock_expires);
+-- The account-wide rolling-window count (realm is a residual filter over one
+-- account's handful of rows) AND the accounts FK-cascade scan: account leads
+-- so both are index probes.
+CREATE INDEX IF NOT EXISTS woc_market_buy_now_abandons_account
+  ON woc_market_buy_now_abandons(account, lock_expires DESC);
+
 CREATE TABLE IF NOT EXISTS woc_market_bids (
   id BIGSERIAL PRIMARY KEY,
   listing_id BIGINT NOT NULL REFERENCES woc_market_listings(id) ON DELETE CASCADE,
@@ -204,7 +257,7 @@ CREATE TABLE IF NOT EXISTS woc_market_settlements (
   buyer_wallet TEXT NOT NULL,
   amount_cents INT NOT NULL,
   state TEXT NOT NULL DEFAULT 'offered'
-    CHECK (state IN ('offered', 'confirming', 'confirmed', 'delivering', 'delivered', 'expired', 'failed')),
+    CHECK (state IN ('offered', 'confirming', 'review', 'confirmed', 'delivering', 'delivered', 'expired', 'failed')),
   quote_reference TEXT,
   quote_expires TIMESTAMPTZ,
   -- Base-unit token amount from the stamped quote, kept for sale provenance.
@@ -215,6 +268,25 @@ CREATE TABLE IF NOT EXISTS woc_market_settlements (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+-- Constraint evolution for a database created before the 'review' state: the
+-- inline CHECK above only applies to a FRESH table, so a legacy table keeps
+-- its old list and the first confirming -> review transition would abort with
+-- a check violation. Gated on the constraint text, so it runs once per legacy
+-- database and never rescans a healthy one; the ADD re-validates the table,
+-- which is the same one-time upgrade cost as the repairs below and safe for
+-- the same reason (pre-enable the table is empty, and post-enable every
+-- standing value is in the wider list by construction).
+DO $woc_settle_state_ck$ BEGIN
+  IF EXISTS (
+    SELECT 1 FROM pg_constraint
+     WHERE conrelid = 'woc_market_settlements'::regclass
+       AND conname = 'woc_market_settlements_state_check'
+       AND pg_get_constraintdef(oid) NOT LIKE '%''review''%') THEN
+    ALTER TABLE woc_market_settlements DROP CONSTRAINT woc_market_settlements_state_check;
+    ALTER TABLE woc_market_settlements ADD CONSTRAINT woc_market_settlements_state_check
+      CHECK (state IN ('offered', 'confirming', 'review', 'confirmed', 'delivering', 'delivered', 'expired', 'failed'));
+  END IF;
+END $woc_settle_state_ck$;
 -- Pre-flight repair for a database that ran the pre-guard code: the old
 -- narrower index legally allowed a 'delivered' settlement to coexist with a
 -- second open one (the reopen-after-delivered double-sell), and the wider
@@ -247,18 +319,18 @@ UPDATE woc_market_settlements
        updated_at = now()
  WHERE NOT EXISTS (
      SELECT 1 FROM pg_index i
-      WHERE i.indexrelid = to_regclass('woc_market_settlements_open')
+      WHERE i.indexrelid = to_regclass('woc_market_settlements_open2')
         AND i.indisvalid)
    AND id IN (
    SELECT id FROM (
      SELECT id, row_number() OVER (
        PARTITION BY listing_id
        ORDER BY CASE state
-         WHEN 'delivered' THEN 5 WHEN 'delivering' THEN 4 WHEN 'confirmed' THEN 3
-         WHEN 'confirming' THEN 2 ELSE 1 END DESC, id ASC
+         WHEN 'delivered' THEN 6 WHEN 'delivering' THEN 5 WHEN 'confirmed' THEN 4
+         WHEN 'review' THEN 3 WHEN 'confirming' THEN 2 ELSE 1 END DESC, id ASC
      ) AS rn
      FROM woc_market_settlements
-     WHERE state IN ('offered', 'confirming', 'confirmed', 'delivering', 'delivered')
+     WHERE state IN ${OPEN_SETTLEMENT_STATES_SQL}
    ) ranked
    WHERE ranked.rn > 1);
 -- Exactly one OPEN settlement per listing: the live payment states plus
@@ -277,17 +349,22 @@ UPDATE woc_market_settlements
 -- only, so a carcass would otherwise be kept and enforce nothing. The same
 -- name-only matching means any future change to this index's predicate needs
 -- a NEW index name (or an explicit DROP); it cannot be edited in place.
+-- open2 IS that rename: it adds 'review' to the predicate (the operator
+-- review state stays open) and replaces woc_market_settlements_open, which
+-- is dropped only AFTER the wider index exists, so uniqueness never lapses
+-- across the swap (the _live -> _open precedent).
 DO $woc_open_idx$ BEGIN
   IF EXISTS (
     SELECT 1 FROM pg_index i
-     WHERE i.indexrelid = to_regclass('woc_market_settlements_open')
+     WHERE i.indexrelid = to_regclass('woc_market_settlements_open2')
        AND NOT i.indisvalid) THEN
-    EXECUTE 'DROP INDEX woc_market_settlements_open';
+    EXECUTE 'DROP INDEX woc_market_settlements_open2';
   END IF;
 END $woc_open_idx$;
-CREATE UNIQUE INDEX IF NOT EXISTS woc_market_settlements_open
+CREATE UNIQUE INDEX IF NOT EXISTS woc_market_settlements_open2
   ON woc_market_settlements(listing_id)
-  WHERE state IN ('offered', 'confirming', 'confirmed', 'delivering', 'delivered');
+  WHERE state IN ${OPEN_SETTLEMENT_STATES_SQL};
+DROP INDEX IF EXISTS woc_market_settlements_open;
 DROP INDEX IF EXISTS woc_market_settlements_live;
 CREATE INDEX IF NOT EXISTS woc_market_settlements_state
   ON woc_market_settlements(realm, state, deadline_at);
@@ -531,7 +608,8 @@ const LISTING_COLS =
   'id, realm, seller_account, seller_character, seller_name, seller_wallet, item, item_id, ' +
   'quality, format, start_cents, reserve_cents, buy_now_cents, offer_next, status, resolution, ' +
   'item_disposed, current_bid_cents, current_bid_id, ends_at, base_ends_at, ' +
-  'buy_now_lock_account, buy_now_lock_expires, created_at, directed_buyer_account';
+  'buy_now_lock_account, buy_now_lock_expires, created_at, directed_buyer_account, ' +
+  'cancel_requested_at';
 
 const OFFER_COLS =
   'id, realm, seller_account, seller_character, seller_name, buyer_account, buyer_name, ' +
@@ -606,6 +684,7 @@ function toListing(row: Row): WocListingRow {
     buyNowLockExpiresMs: msOrNull(row.buy_now_lock_expires),
     createdAtMs: ms(row.created_at),
     directedBuyerAccount: row.directed_buyer_account ?? null,
+    cancelRequestedAtMs: msOrNull(row.cancel_requested_at),
   };
 }
 
@@ -1233,7 +1312,7 @@ export class PgWocMarketDb implements WocMarketDb {
     | 'not_yours'
     | 'has_bids'
     | 'not_active'
-    | 'buy_now_pending'
+    | 'cancel_pending'
     | 'settlement_live'
     | 'contended'
   > {
@@ -1266,16 +1345,42 @@ export class PgWocMarketDb implements WocMarketDb {
         if ((bids.rowCount ?? 0) > 0) return 'has_bids' as const;
         // The row lock above serializes this against claimBuyNowLock (an UPDATE
         // on the same row), and a buy-now settlement is only ever created behind
-        // a claimed lock, so refusing an unexpired lock covers the whole
+        // a claimed lock, so the unexpired-lock branch covers the whole
         // claim-then-insert window: a racer either landed before the lock
-        // (visible here) or blocks on the row and re-checks against the closed
-        // listing.
+        // (visible here) or blocks on the row and re-checks against the
+        // stamped or closed listing.
+        //
+        // CANCEL-INTENT (the abandon-loop ruling's second arm): an unexpired
+        // lock no longer refuses the cancel outright. A PAID window (any
+        // settlement past 'offered': the signature is in and the money may
+        // land) still refuses settlement_live, because cancel-pending must
+        // never tear a live settlement. An UNPAID window stamps the intent:
+        // no new lock claims or bids from this moment, the current holder
+        // keeps their full window, and the converge arm closes the listing
+        // cancelled (return flight home) once the window ends unpaid. This
+        // bounds the seller's worst-case cancel denial at exactly one lock
+        // window.
         if (
           row.buy_now_lock_account !== null &&
           row.buy_now_lock_expires !== null &&
           ms(row.buy_now_lock_expires) > nowMs
         ) {
-          return 'buy_now_pending' as const;
+          const paid = await client.query(
+            `SELECT 1 FROM woc_market_settlements
+              WHERE listing_id = $1
+                AND state IN ('confirming', 'review', 'confirmed', 'delivering', 'delivered')
+              LIMIT 1`,
+            [id],
+          );
+          if ((paid.rowCount ?? 0) > 0) throw new TxAbort('settlement_live' as const);
+          await client.query(
+            `UPDATE woc_market_listings
+                SET cancel_requested_at = COALESCE(cancel_requested_at, to_timestamp($2 / 1000.0)),
+                    updated_at = now()
+              WHERE id = $1`,
+            [id, nowMs],
+          );
+          return 'cancel_pending' as const;
         }
         // Expire-then-check, in that order. A leftover 'failed' settlement is
         // retry-eligible (failed -> offered) and the retry CAS never touches the
@@ -1293,7 +1398,7 @@ export class PgWocMarketDb implements WocMarketDb {
         const open = await client.query(
           `SELECT 1 FROM woc_market_settlements
           WHERE listing_id = $1
-            AND state IN ('offered', 'confirming', 'confirmed', 'delivering', 'delivered')
+            AND state IN ${OPEN_SETTLEMENT_STATES_SQL}
           LIMIT 1`,
           [id],
         );
@@ -1396,7 +1501,7 @@ export class PgWocMarketDb implements WocMarketDb {
         const open = await client.query(
           `SELECT 1 FROM woc_market_settlements
           WHERE listing_id = $1
-            AND state IN ('offered', 'confirming', 'confirmed', 'delivering', 'delivered')
+            AND state IN ${OPEN_SETTLEMENT_STATES_SQL}
           LIMIT 1`,
           [id],
         );
@@ -1404,11 +1509,18 @@ export class PgWocMarketDb implements WocMarketDb {
         // Cancel the open bid book and queue every funded bond for refund in the
         // same statement (the activateBid CASE idiom), so a crash can never
         // leave a suspended listing holding live bids or a stranded bond.
+        // EXCEPT a paid-but-undecided bond (pending_bond, recorded signature,
+        // unheld): it stays with the bond poll rather than being cancelled
+        // out of the polling set with money possibly in flight (the finalize
+        // teardown carries the full rationale). The suspended listing closes
+        // either way; the late verdict resolves against it.
         await client.query(
           `UPDATE woc_market_bids
             SET status = 'cancelled',
                 bond_state = CASE WHEN bond_state = 'held' THEN 'refund_due' ELSE bond_state END
-          WHERE listing_id = $1 AND status IN ('pending_bond', 'active')`,
+          WHERE listing_id = $1 AND status IN ('pending_bond', 'active')
+            AND NOT (status = 'pending_bond' AND bond_signature IS NOT NULL
+              AND bond_state = 'pending')`,
           [id],
         );
         const updated = await client.query(
@@ -1471,7 +1583,7 @@ export class PgWocMarketDb implements WocMarketDb {
         const open = await client.query(
           `SELECT 1 FROM woc_market_settlements
             WHERE listing_id = $1
-              AND state IN ('offered', 'confirming', 'confirmed', 'delivering', 'delivered')
+              AND state IN ${OPEN_SETTLEMENT_STATES_SQL}
             LIMIT 1`,
           [id],
         );
@@ -1566,8 +1678,7 @@ export class PgWocMarketDb implements WocMarketDb {
           AND NOT EXISTS (
             SELECT 1 FROM woc_market_settlements s
              WHERE s.listing_id = woc_market_listings.id
-               AND s.state IN
-                 ('offered', 'confirming', 'confirmed', 'delivering', 'delivered', 'failed'))`,
+               AND (s.state = 'failed' OR s.state IN ${OPEN_SETTLEMENT_STATES_SQL}))`,
       [id],
     );
   }
@@ -1704,6 +1815,7 @@ export class PgWocMarketDb implements WocMarketDb {
     olderThanMs: number,
     sampleLimit: number,
     countCap: number,
+    bondOlderThanMs: number,
   ): Promise<WocStuckCustodyClasses> {
     // Fail CLOSED on a bad cap: a non-finite value would interpolate as NaN
     // and error at runtime; clamping to 1 keeps the read tiny instead.
@@ -1748,6 +1860,33 @@ export class PgWocMarketDb implements WocMarketDb {
       [realm, olderThanMs, sampleLimit],
     );
     const undisposedCount = await count(undisposedWhere, [realm, olderThanMs]);
+    // No age filter: a 'review' row was ALREADY aged by the overdue sweep's
+    // confirming bound before it got here, and every one is operator-owed
+    // now. Ordered and served by woc_market_settlements_state_updated.
+    const reviewWhere = `FROM woc_market_settlements
+        WHERE realm = $1 AND state = 'review'`;
+    const review = await this.pool.query(
+      `SELECT id, listing_id, created_at, updated_at
+         ${reviewWhere}
+        ORDER BY updated_at
+        LIMIT $2`,
+      [realm, sampleLimit],
+    );
+    const reviewCount = await count(reviewWhere, [realm]);
+    // Paid-but-undecided bonds past the bound: still polled, but the verdict
+    // is overdue and an operator should verify the signature by hand. Served
+    // by the woc_market_bids_bond_confirming partial index.
+    const stuckBondsWhere = `FROM woc_market_bids
+        WHERE realm = $1 AND status = 'pending_bond' AND bond_signature IS NOT NULL
+          AND placed_at <= to_timestamp($2 / 1000.0)`;
+    const stuckBonds = await this.pool.query(
+      `SELECT id, listing_id, account, placed_at
+         ${stuckBondsWhere}
+        ORDER BY placed_at
+        LIMIT $3`,
+      [realm, bondOlderThanMs, sampleLimit],
+    );
+    const stuckBondCount = await count(stuckBondsWhere, [realm, bondOlderThanMs]);
     return {
       unbookedClaims: {
         count: claimCount,
@@ -1778,6 +1917,26 @@ export class PgWocMarketDb implements WocMarketDb {
           updatedAtMs: ms(r.updated_at),
         })),
       },
+      reviewSettlements: {
+        count: reviewCount,
+        saturated: reviewCount >= cap,
+        sample: review.rows.map((r) => ({
+          id: Number(r.id),
+          listingId: Number(r.listing_id),
+          createdAtMs: ms(r.created_at),
+          updatedAtMs: ms(r.updated_at),
+        })),
+      },
+      stuckBonds: {
+        count: stuckBondCount,
+        saturated: stuckBondCount >= cap,
+        sample: stuckBonds.rows.map((r) => ({
+          id: Number(r.id),
+          listingId: Number(r.listing_id),
+          account: Number(r.account),
+          placedAtMs: ms(r.placed_at),
+        })),
+      },
     };
   }
 
@@ -1798,40 +1957,240 @@ export class PgWocMarketDb implements WocMarketDb {
     account: number,
     nowMs: number,
     expiresAtMs: number,
-  ): Promise<WocListingRow | 'not_found' | 'not_active' | 'locked' | 'no_buy_now' | 'own_listing'> {
-    const res = await this.pool.query(
-      `UPDATE woc_market_listings
-          SET buy_now_lock_account = $3,
-              buy_now_lock_expires = to_timestamp($5 / 1000.0),
-              updated_at = now()
-        WHERE realm = $1 AND id = $2 AND status = 'active'
-          AND buy_now_cents IS NOT NULL
-          AND seller_account <> $3
-          AND (buy_now_lock_account IS NULL OR buy_now_lock_expires <= to_timestamp($4 / 1000.0))
-        RETURNING ${LISTING_COLS}`,
-      [realm, id, account, nowMs, expiresAtMs],
-    );
-    if (res.rows[0]) return toListing(res.rows[0]);
-    // Diagnose the refusal for a precise client error.
-    const peek = await this.pool.query(
-      'SELECT seller_account, status, buy_now_cents, buy_now_lock_expires FROM woc_market_listings WHERE realm = $1 AND id = $2',
-      [realm, id],
-    );
-    const row = peek.rows[0];
-    if (!row) return 'not_found';
-    if (row.seller_account === account) return 'own_listing';
-    if (row.status !== 'active') return 'not_active';
-    if (row.buy_now_cents === null) return 'no_buy_now';
-    return 'locked';
+  ): Promise<
+    | WocListingRow
+    | 'not_found'
+    | 'not_active'
+    | 'locked'
+    | 'no_buy_now'
+    | 'own_listing'
+    | 'cancel_pending'
+    | 'claim_cooldown'
+    | 'contended'
+  > {
+    try {
+      return await this.withTx(async (client) => {
+        await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
+        // LOCK ORDER carve-out: this transaction takes the LISTING row only
+        // and never a bid row lock (the cancelListingIfUnbid rationale), so
+        // listing-first is deadlock-free here.
+        const res = await client.query(
+          `SELECT ${LISTING_COLS} FROM woc_market_listings
+            WHERE realm = $1 AND id = $2 FOR UPDATE`,
+          [realm, id],
+        );
+        const row = res.rows[0];
+        // The old single-UPDATE's diagnosis order, kept verbatim; the three
+        // new arms (cancel_pending, the abandon recording, claim_cooldown)
+        // slot in after it.
+        if (!row) return 'not_found' as const;
+        if (row.seller_account === account) return 'own_listing' as const;
+        if (row.status !== 'active') return 'not_active' as const;
+        if (row.buy_now_cents === null) return 'no_buy_now' as const;
+        // Cancel-intent blocks NEW claims from the moment it is stamped
+        // (before 'locked': a locked, cancel-pending listing is going away,
+        // and "try again in a moment" would be a lie).
+        if (row.cancel_requested_at !== null) return 'cancel_pending' as const;
+        const lockHeld =
+          row.buy_now_lock_account !== null &&
+          row.buy_now_lock_expires !== null &&
+          ms(row.buy_now_lock_expires) > nowMs;
+        if (lockHeld) return 'locked' as const;
+        // A dead lock still on the row is a recorded abandonment of its
+        // holder: the steal is the first moment anyone LOOKS at an expired
+        // lock, and recording here (not only in the overdue sweep) is what
+        // stops the holder from re-claiming their own expired lock in the
+        // sub-minute window before the sweep sees it. Public only: a directed
+        // buyer's walk-away keeps its strike instead (the resolved ruling).
+        // ON CONFLICT dedupes against the sweep's recording of the same
+        // window (the lock_expires instance key).
+        if (
+          row.buy_now_lock_account !== null &&
+          row.buy_now_lock_expires !== null &&
+          row.directed_buyer_account === null
+        ) {
+          await client.query(
+            `INSERT INTO woc_market_buy_now_abandons (realm, listing_id, account, lock_expires)
+             VALUES ($1, $2, $3, $4)
+             ON CONFLICT (listing_id, account, lock_expires) DO NOTHING`,
+            [realm, id, row.buy_now_lock_account, row.buy_now_lock_expires],
+          );
+        }
+        // The two cooldown guards, CLAIMER-scoped and public-only (a directed
+        // buyer claims the sale their seller addressed to them regardless of
+        // their public-loop history; the directed rail has its own strike).
+        // Both read the abandon ledger under the held listing lock, after the
+        // recording above, so a self-steal refuses in the same transaction.
+        if (row.directed_buyer_account === null) {
+          const cooled = await client.query(
+            `SELECT 1 FROM woc_market_buy_now_abandons
+              WHERE listing_id = $1 AND account = $2
+                AND lock_expires > to_timestamp($3 / 1000.0)
+              LIMIT 1`,
+            [id, account, nowMs - WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS * 1000],
+          );
+          if ((cooled.rowCount ?? 0) > 0) return 'claim_cooldown' as const;
+          // Saturating count (the readout idiom): the cap is tiny, so the
+          // inner LIMIT keeps this O(cap) whatever the ledger holds.
+          const capped = await client.query(
+            `SELECT count(*)::int AS n FROM (
+               SELECT 1 FROM woc_market_buy_now_abandons
+                WHERE account = $1 AND realm = $2
+                  AND lock_expires > to_timestamp($3 / 1000.0)
+                LIMIT ${WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR}) c`,
+            [account, realm, nowMs - WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS * 1000],
+          );
+          if (Number(capped.rows[0]?.n ?? 0) >= WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR) {
+            return 'claim_cooldown' as const;
+          }
+        }
+        const updated = await client.query(
+          `UPDATE woc_market_listings
+              SET buy_now_lock_account = $2,
+                  buy_now_lock_expires = to_timestamp($3 / 1000.0),
+                  updated_at = now()
+            WHERE id = $1
+            RETURNING ${LISTING_COLS}`,
+          [id, account, expiresAtMs],
+        );
+        return toListing(updated.rows[0]);
+      });
+    } catch (err) {
+      if (isLockContention(err)) return 'contended' as const;
+      throw err;
+    }
   }
 
-  async clearBuyNowLock(id: number): Promise<void> {
+  /** Release a buy-now lock, but only the HOLDER'S: the guard makes call-site
+   *  safety local (the 02 handoff). Without it the overdue sweep's abandon
+   *  arm, clearing for a settlement whose window ended long ago, could wipe a
+   *  NEW claimer's live lock that stole the expired one in between. */
+  async clearBuyNowLock(id: number, holderAccount: number): Promise<void> {
     await this.pool.query(
       `UPDATE woc_market_listings
           SET buy_now_lock_account = NULL, buy_now_lock_expires = NULL, updated_at = now()
-        WHERE id = $1`,
-      [id],
+        WHERE id = $1 AND buy_now_lock_account = $2`,
+      [id, holderAccount],
     );
+  }
+
+  /** The overdue sweep's abandon recorder (public buy-now windows that
+   *  expired unpaid). Dedupes against the steal-time recorder on the
+   *  (listing, account, lock_expires) window key. */
+  async recordBuyNowAbandon(
+    realm: string,
+    listingId: number,
+    account: number,
+    lockExpiresAtMs: number,
+  ): Promise<void> {
+    await this.pool.query(
+      `INSERT INTO woc_market_buy_now_abandons (realm, listing_id, account, lock_expires)
+       VALUES ($1, $2, $3, to_timestamp($4 / 1000.0))
+       ON CONFLICT (listing_id, account, lock_expires) DO NOTHING`,
+      [realm, listingId, account, lockExpiresAtMs],
+    );
+  }
+
+  /** The cancel-intent converge read: stamped, still-active listings whose
+   *  lock window has ended (expired or cleared). Tiny by construction (a
+   *  cancel-pending listing takes no new locks), served by the partial
+   *  woc_market_listings_cancel_pending index. */
+  async cancelPendingListings(
+    realm: string,
+    nowMs: number,
+    limit: number,
+  ): Promise<WocListingRow[]> {
+    const res = await this.pool.query(
+      `SELECT ${LISTING_COLS} FROM woc_market_listings
+        WHERE realm = $1 AND status = 'active' AND cancel_requested_at IS NOT NULL
+          AND (buy_now_lock_account IS NULL
+            OR buy_now_lock_expires IS NULL
+            OR buy_now_lock_expires <= to_timestamp($2 / 1000.0))
+        ORDER BY id
+        LIMIT $3`,
+      [realm, nowMs, limit],
+    );
+    return res.rows.map(toListing);
+  }
+
+  /**
+   * Close one cancel-pending listing whose window ended unpaid: the converge
+   * arm's twin of cancelListingIfUnbid's close tail, under the same listing
+   * lock and the same open-settlement guard, so it can NEVER tear a live
+   * settlement (a paid window proceeds to settlement and the finalize closes
+   * the listing 'sold' instead; the stamp dies with the closed row).
+   *
+   * LOCK ORDER carve-out: listing row only; the bid probe is a plain read
+   * (the cancelListingIfUnbid rationale).
+   */
+  async closeCancelPendingListing(
+    realm: string,
+    id: number,
+    nowMs: number,
+  ): Promise<WocListingRow | 'skip' | 'contended'> {
+    try {
+      return await this.withTx(async (client) => {
+        await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
+        const res = await client.query(
+          `SELECT ${LISTING_COLS} FROM woc_market_listings
+            WHERE realm = $1 AND id = $2 FOR UPDATE`,
+          [realm, id],
+        );
+        const row = res.rows[0];
+        if (!row || row.status !== 'active' || row.cancel_requested_at === null) {
+          return 'skip' as const;
+        }
+        // Re-check the window under the lock: a racing claim cannot exist
+        // (claims refuse cancel_pending), but the read above ran unlocked.
+        if (
+          row.buy_now_lock_account !== null &&
+          row.buy_now_lock_expires !== null &&
+          ms(row.buy_now_lock_expires) > nowMs
+        ) {
+          return 'skip' as const;
+        }
+        // Belt: bids cannot land after the stamp (insertPendingBid refuses
+        // cancel_pending) and the seller cancel that stamped it verified the
+        // book was empty, so a live bid here is a hand-moved row.
+        const bids = await client.query(
+          `SELECT 1 FROM woc_market_bids
+            WHERE listing_id = $1 AND status IN ('pending_bond', 'active') LIMIT 1`,
+          [id],
+        );
+        if ((bids.rowCount ?? 0) > 0) return 'skip' as const;
+        // Expire-then-check, exactly the cancelListingIfUnbid shape ('failed'
+        // rows only, ON PURPOSE: the abandoned window's expired-deadline
+        // 'offered' settlement belongs to the overdue arm, which is also the
+        // canonical abandon recorder, so this arm waits a pass rather than
+        // expire it and lose the abandon row). Any OPEN settlement (a paid
+        // window included) aborts the close below.
+        await client.query(
+          `UPDATE woc_market_settlements
+            SET state = 'expired', fail_reason = 'listing_cancelled', updated_at = now()
+          WHERE listing_id = $1 AND state = 'failed'`,
+          [id],
+        );
+        const open = await client.query(
+          `SELECT 1 FROM woc_market_settlements
+          WHERE listing_id = $1
+            AND state IN ${OPEN_SETTLEMENT_STATES_SQL}
+          LIMIT 1`,
+          [id],
+        );
+        if ((open.rowCount ?? 0) > 0) return 'skip' as const;
+        const updated = await client.query(
+          `UPDATE woc_market_listings
+            SET status = 'closed', resolution = 'cancelled', updated_at = now()
+          WHERE id = $1
+          RETURNING ${LISTING_COLS}`,
+          [id],
+        );
+        return toListing(updated.rows[0]);
+      });
+    } catch (err) {
+      if (isLockContention(err)) return 'contended' as const;
+      throw err;
+    }
   }
 
   // ---------------------------------------------------------------------
@@ -1848,13 +2207,18 @@ export class PgWocMarketDb implements WocMarketDb {
     amountCents: number;
     bondCents: number;
     nowMs: number;
-    extendEndsToMs: (row: WocListingRow) => number | null;
     minNext: (row: WocListingRow) => number;
   }): Promise<
     | { ok: true; bid: WocBidRow }
     | {
         ok: false;
-        reason: 'not_found' | 'not_active' | 'own_listing' | 'bid_too_low' | 'already_pending';
+        reason:
+          | 'not_found'
+          | 'not_active'
+          | 'cancel_pending'
+          | 'own_listing'
+          | 'bid_too_low'
+          | 'already_pending';
       }
   > {
     return this.withTx(async (client) => {
@@ -1867,6 +2231,12 @@ export class PgWocMarketDb implements WocMarketDb {
       const listing = toListing(res.rows[0]);
       if (listing.status !== 'active') return { ok: false, reason: 'not_active' as const };
       if (listing.endsAtMs <= args.nowMs) return { ok: false, reason: 'not_active' as const };
+      // Cancel-intent blocks NEW bids too, not only lock claims: a bid landing
+      // after the stamp would re-deny the seller's cancel past the one-window
+      // bound the ruling promises (has_bids refuses the converge close).
+      if (listing.cancelRequestedAtMs !== null) {
+        return { ok: false, reason: 'cancel_pending' as const };
+      }
       if (listing.sellerAccount === args.account) {
         return { ok: false, reason: 'own_listing' as const };
       }
@@ -1901,19 +2271,58 @@ export class PgWocMarketDb implements WocMarketDb {
           args.bondCents,
         ],
       );
-      // Anti-snipe extension applies at PLACEMENT: a pending bid near the
-      // close extends the clock (bounded by the cap) even if its bond never
-      // confirms, so a confirmation in flight can never land after a close.
-      const extended = args.extendEndsToMs(listing);
-      if (extended !== null) {
+      // Placement deliberately does NOT extend the auction any more: an
+      // unpaid pending bid is free to mint, so extending here let wallets
+      // with no money down burn the whole anti-snipe cap. The extension now
+      // rides BOND PROGRESS (extendAuctionForBondProgress, fired when the
+      // signature is recorded), which keeps the in-flight-confirmation
+      // protection while pricing the grief at a real broadcast payment.
+      return { ok: true as const, bid: toBid(inserted.rows[0]) };
+    });
+  }
+
+  /**
+   * Anti-snipe, at BOND PROGRESS: called once when a bid's signature is
+   * recorded (the moment it becomes 'confirming', which held/paid then
+   * follows). The extension math is the caller's injected pure rule; the cap
+   * behavior is unchanged from the old placement-time arm.
+   *
+   * LOCK ORDER carve-out: this transaction takes the LISTING row only and
+   * never a bid row lock (the signature UPDATE it follows is its own
+   * committed single statement), so listing-first is deadlock-free here, the
+   * cancelListingIfUnbid rationale. Best-effort by design: on 'contended' the
+   * signature is already safely recorded and only the extension is lost,
+   * which fails toward a shorter auction, never toward lost money.
+   */
+  async extendAuctionForBondProgress(
+    realm: string,
+    listingId: number,
+    extendEndsToMs: (row: WocListingRow) => number | null,
+  ): Promise<'extended' | 'skip' | 'contended'> {
+    try {
+      return await this.withTx(async (client) => {
+        await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
+        const res = await client.query(
+          `SELECT ${LISTING_COLS} FROM woc_market_listings
+            WHERE realm = $1 AND id = $2 FOR UPDATE`,
+          [realm, listingId],
+        );
+        if (!res.rows[0]) return 'skip' as const;
+        const listing = toListing(res.rows[0]);
+        if (listing.status !== 'active') return 'skip' as const;
+        const extended = extendEndsToMs(listing);
+        if (extended === null) return 'skip' as const;
         await client.query(
           `UPDATE woc_market_listings SET ends_at = to_timestamp($2 / 1000.0), updated_at = now()
             WHERE id = $1`,
-          [args.listingId, extended],
+          [listingId, extended],
         );
-      }
-      return { ok: true as const, bid: toBid(inserted.rows[0]) };
-    });
+        return 'extended' as const;
+      });
+    } catch (err) {
+      if (isLockContention(err)) return 'contended' as const;
+      throw err;
+    }
   }
 
   /**
@@ -1966,13 +2375,19 @@ export class PgWocMarketDb implements WocMarketDb {
     );
   }
 
-  async setBidBondQuote(bidId: number, reference: string, expiresAtMs: number): Promise<void> {
-    await this.pool.query(
+  /** Compare-and-set: a quote applies only to an UNPAID bond. A recorded
+   *  signature means a payment may already be broadcast against the CURRENT
+   *  reference, and the poller re-checks reference and signature as a pair:
+   *  overwriting the reference would read a real payment as refused and lapse
+   *  a funded bond (the H4 awaiting-finality loss). False = nothing written. */
+  async setBidBondQuote(bidId: number, reference: string, expiresAtMs: number): Promise<boolean> {
+    const res = await this.pool.query(
       `UPDATE woc_market_bids
           SET bond_reference = $2, bond_quote_expires = to_timestamp($3 / 1000.0)
-        WHERE id = $1 AND status = 'pending_bond'`,
+        WHERE id = $1 AND status = 'pending_bond' AND bond_signature IS NULL`,
       [bidId, reference, expiresAtMs],
     );
+    return (res.rowCount ?? 0) > 0;
   }
 
   async bidById(id: number): Promise<WocBidRow | null> {
@@ -1992,13 +2407,17 @@ export class PgWocMarketDb implements WocMarketDb {
    * being cancelled out from under an auction that already counts it.
    *
    * Nothing was ever transferred for a pending bond, so the bond goes straight
-   * to 'void' with no refund leg.
+   * to 'void' with no refund leg. The signature arm is what makes that claim
+   * atomic: a bond with a recorded signature may be PAID and merely awaiting
+   * finality, and voiding it here would discard money in flight, so such a
+   * bid stays with its poller until the chain decides.
    */
   async abandonPendingBid(realm: string, bidId: number, account: number): Promise<boolean> {
     const res = await this.pool.query(
       `UPDATE woc_market_bids
           SET status = 'cancelled', bond_state = 'void'
-        WHERE realm = $1 AND id = $2 AND account = $3 AND status = 'pending_bond'`,
+        WHERE realm = $1 AND id = $2 AND account = $3 AND status = 'pending_bond'
+          AND bond_signature IS NULL`,
       [realm, bidId, account],
     );
     return (res.rowCount ?? 0) > 0;
@@ -2327,7 +2746,7 @@ export class PgWocMarketDb implements WocMarketDb {
     const res = await this.pool.query(
       `SELECT ${SETTLEMENT_COLS} FROM woc_market_settlements
         WHERE listing_id = $1
-          AND state IN ('offered', 'confirming', 'confirmed', 'delivering', 'delivered')
+          AND state IN ${OPEN_SETTLEMENT_STATES_SQL}
         LIMIT 1`,
       [listingId],
     );
@@ -2662,11 +3081,20 @@ export class PgWocMarketDb implements WocMarketDb {
         // Every still-open bid cancels with its held bond queued for refund,
         // atomically per row (the markBidOutbidQueueRefund CASE idiom): the
         // old per-bid loop could crash between the cancel and the refund.
+        // EXCEPT a paid-but-undecided bond (pending_bond with a recorded
+        // signature and an unheld bond): cancelling it would drop it out of
+        // the polling set with money possibly in flight and no arm ever able
+        // to move it again. It stays 'pending_bond'; the bond poll resolves
+        // it (a settled verdict activates against the closed listing, whose
+        // supersede arm routes the held bond to refund_due; a verdict against
+        // lapses it), so cancellation can never orphan a bond.
         await client.query(
           `UPDATE woc_market_bids
               SET status = 'cancelled',
                   bond_state = CASE WHEN bond_state = 'held' THEN 'refund_due' ELSE bond_state END
-            WHERE listing_id = $1 AND status IN ('pending_bond', 'active')`,
+            WHERE listing_id = $1 AND status IN ('pending_bond', 'active')
+              AND NOT (status = 'pending_bond' AND bond_signature IS NOT NULL
+                AND bond_state = 'pending')`,
           [args.listingId],
         );
         // The verdict reads the CLOSE CAS alone. A racing close CAN land
@@ -2683,18 +3111,26 @@ export class PgWocMarketDb implements WocMarketDb {
     }
   }
 
+  /** The deadline backlog, plus the H15 bound: a 'confirming' row older than
+   *  the caller's cutoff (aged on updated_at, which nothing re-stamps while
+   *  the poll returns undecided) is overdue too, so the sweep can park it in
+   *  the operator 'review' state instead of polling it forever. The two arms
+   *  ride their own partial paths (woc_market_settlements_state on
+   *  deadline_at, woc_market_settlements_state_updated on updated_at). */
   async overdueSettlements(
     realm: string,
     nowMs: number,
     limit: number,
+    confirmingCutoffMs: number,
   ): Promise<WocSettlementRow[]> {
     const res = await this.pool.query(
       `SELECT ${SETTLEMENT_COLS} FROM woc_market_settlements
-        WHERE realm = $1 AND state IN ('offered', 'failed')
-          AND deadline_at <= to_timestamp($2 / 1000.0)
+        WHERE realm = $1
+          AND ((state IN ('offered', 'failed') AND deadline_at <= to_timestamp($2 / 1000.0))
+            OR (state = 'confirming' AND updated_at <= to_timestamp($4 / 1000.0)))
         ORDER BY deadline_at
         LIMIT $3`,
-      [realm, nowMs, limit],
+      [realm, nowMs, limit, confirmingCutoffMs],
     );
     return res.rows.map(toSettlement);
   }
@@ -2844,6 +3280,29 @@ export class PgWocMarketDb implements WocMarketDb {
 /** Closed, fully-disposed listings older than the window; 0/garbage days =
  *  keep forever (the retention_sweep contract). Bids and settlements ride the
  *  delete via their ON DELETE CASCADE FKs; sales are FK-free and survive. */
+/** Nightly retention for the buy-now abandon ledger: a row is dead once it is
+ *  outside every cooldown window (minutes to an hour), so any positive
+ *  retention is generous forensics headroom. 0 keeps rows forever (the sweep
+ *  contract's fail-safe). No ORDER BY: the cutoff column has no global index
+ *  (lock_expires leads only per account), per the prune rules. */
+export async function pruneWocBuyNowAbandonsBatch(
+  pool: Pool,
+  retentionDays: number,
+  batchSize: number,
+): Promise<number> {
+  if (!Number.isFinite(retentionDays) || retentionDays <= 0) return 0;
+  const days = Math.max(1, Math.floor(retentionDays));
+  const res = await pool.query(
+    `DELETE FROM woc_market_buy_now_abandons
+      WHERE id IN (
+        SELECT id FROM woc_market_buy_now_abandons
+         WHERE lock_expires < now() - ($1 || ' days')::interval
+         LIMIT $2)`,
+    [String(days), Math.max(1, Math.floor(batchSize))],
+  );
+  return res.rowCount ?? 0;
+}
+
 export async function pruneClosedWocListingsBatch(
   pool: Pool,
   retentionDays: number,

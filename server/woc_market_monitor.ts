@@ -27,6 +27,7 @@ export interface WocMarketMonitorDb {
     olderThanMs: number,
     sampleLimit: number,
     countCap: number,
+    bondOlderThanMs: number,
   ): Promise<WocStuckCustodyClasses>;
 }
 
@@ -43,6 +44,11 @@ export interface WocMarketMonitorDeps {
    *  is still actively converging (claims mid-pass, deliveries in flight)
    *  stays out of the readout. */
   stuckAgeMs?: number;
+  /** The stuck-bond age cutoff: a paid-but-undecided bond older than this is
+   *  surfaced for a hand verdict. main.ts wires the same knob that bounds the
+   *  confirming settlements (WOC_MARKET_CONFIRMING_REVIEW_HOURS), so the two
+   *  H15 surfaces age on one policy. */
+  bondStuckAgeMs?: number;
   /** How many rows each class returns beside its count. */
   sampleLimit?: number;
   /** Cadence of the periodic log line. */
@@ -65,6 +71,9 @@ export interface WocMarketMonitor {
 
 export const WOC_MONITOR_TTL_MS = 30_000;
 export const WOC_MONITOR_STUCK_AGE_MS = 10 * 60_000;
+/** Fallback only: production wiring passes the env-derived confirming-review
+ *  bound (see WocMarketMonitorDeps.bondStuckAgeMs); this mirrors its default. */
+export const WOC_MONITOR_BOND_STUCK_AGE_MS = 6 * 3600 * 1000;
 export const WOC_MONITOR_SAMPLE_LIMIT = 20;
 export const WOC_MONITOR_COUNT_CAP = 1000;
 export const WOC_MONITOR_LOG_INTERVAL_MS = 5 * 60_000;
@@ -85,6 +94,8 @@ function freezeReadout(readout: WocStuckCustodyReadout): WocStuckCustodyReadout 
     readout.unbookedClaims,
     readout.stuckDelivering,
     readout.undisposedListings,
+    readout.reviewSettlements,
+    readout.stuckBonds,
   ] as const) {
     for (const row of cls.sample) Object.freeze(row);
     Object.freeze(cls.sample);
@@ -97,6 +108,7 @@ export function createWocMarketMonitor(deps: WocMarketMonitorDeps): WocMarketMon
   const now = deps.now ?? Date.now;
   const ttlMs = deps.ttlMs ?? WOC_MONITOR_TTL_MS;
   const stuckAgeMs = deps.stuckAgeMs ?? WOC_MONITOR_STUCK_AGE_MS;
+  const bondStuckAgeMs = deps.bondStuckAgeMs ?? WOC_MONITOR_BOND_STUCK_AGE_MS;
   const sampleLimit = deps.sampleLimit ?? WOC_MONITOR_SAMPLE_LIMIT;
   const logIntervalMs = deps.logIntervalMs ?? WOC_MONITOR_LOG_INTERVAL_MS;
   const countCap = deps.countCap ?? WOC_MONITOR_COUNT_CAP;
@@ -117,6 +129,7 @@ export function createWocMarketMonitor(deps: WocMarketMonitorDeps): WocMarketMon
           now() - stuckAgeMs,
           sampleLimit,
           countCap,
+          now() - bondStuckAgeMs,
         )),
       }),
     { ttlMs, now },
@@ -189,9 +202,10 @@ export function createWocMarketMonitor(deps: WocMarketMonitorDeps): WocMarketMon
         unbookedClaims: readout.unbookedClaims.count,
         stuckDelivering: readout.stuckDelivering.count,
         undisposedListings: readout.undisposedListings.count,
+        reviewSettlements: readout.reviewSettlements.count,
+        stuckBonds: readout.stuckBonds.count,
       };
-      const stuck =
-        counts.unbookedClaims > 0 || counts.stuckDelivering > 0 || counts.undisposedListings > 0;
+      const stuck = Object.values(counts).some((n) => n > 0);
       if (!stuck) return;
       deps.log(`[woc_market] stuck custody ${JSON.stringify(counts)}`);
     } catch {

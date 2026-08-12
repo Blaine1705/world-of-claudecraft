@@ -279,8 +279,17 @@ export const ERROR_CODES = deepFreeze({
   'woc_market.not_pending': { params: [] },
   // The chain transaction was refused or did not match the quote (409).
   'woc_market.confirm_failed': { params: [] },
+  // A submitted signature is still awaiting the chain's verdict: quote
+  // refreshes and abandons wait for it rather than orphan money in flight (409).
+  'woc_market.confirm_in_flight': { params: [] },
   // Another buyer holds the short buy-now lock on this listing (409).
   'woc_market.buy_now_locked': { params: [] },
+  // The seller stamped cancel-intent: the listing takes no new lock claims or
+  // bids and closes once the current window resolves (409).
+  'woc_market.cancel_pending': { params: [] },
+  // The claimer recently abandoned a buy-now window (per-listing re-claim
+  // cooldown, or the account-wide abandons-per-hour cap) (409).
+  'woc_market.claim_cooldown': { params: [] },
   // A buyer's payment for this listing is past the point of no return;
   // cancel/suspend must wait for it to resolve (409).
   'woc_market.settlement_in_flight': { params: [] },

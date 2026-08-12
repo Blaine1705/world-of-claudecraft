@@ -68,6 +68,24 @@ import {
 /** Deepest browse page a client may request (25 per page). */
 const MAX_BROWSE_PAGE = 400;
 
+/** Default for the H15 confirming-age bound: hours-scale ON PURPOSE. Minutes
+ *  would page an operator for every routine finality delay or short economy
+ *  outage the poll self-heals; much longer re-creates the unbounded hold the
+ *  bound exists to close (the escrowed item sits stuck for its whole life). */
+const WOC_MARKET_CONFIRMING_REVIEW_HOURS_DEFAULT = 6;
+
+/** Positive-hours env knob. Guarded against the empty-string trap
+ *  (Number('') is 0, which would silently turn the bound off by making every
+ *  confirming row instantly overdue) and against non-finite or non-positive
+ *  values, all of which fall back to the default. */
+function confirmingReviewMsFromEnv(): number {
+  const raw = process.env.WOC_MARKET_CONFIRMING_REVIEW_HOURS;
+  const hours = raw !== undefined && raw.trim() !== '' ? Number(raw) : Number.NaN;
+  const safe =
+    Number.isFinite(hours) && hours > 0 ? hours : WOC_MARKET_CONFIRMING_REVIEW_HOURS_DEFAULT;
+  return safe * 3600 * 1000;
+}
+
 export function wocMarketConfig(): WocMarketConfig {
   const excluded = (process.env.WOC_MARKET_EXCLUDED_ITEM_IDS ?? '')
     .split(',')
@@ -80,6 +98,7 @@ export function wocMarketConfig(): WocMarketConfig {
       excluded.length === 0
         ? WOC_MARKET_RESTRICTED_POLICY
         : { ...WOC_MARKET_RESTRICTED_POLICY, excludedItemIds: new Set(excluded) },
+    confirmingReviewMs: confirmingReviewMsFromEnv(),
   };
 }
 
@@ -136,7 +155,10 @@ export const REFUSAL_ERRORS: Record<WocMarketRefusal, { status: number; code: Er
   quote_expired: { status: 409, code: 'woc_market.quote_expired' },
   not_pending: { status: 409, code: 'woc_market.not_pending' },
   confirm_failed: { status: 409, code: 'woc_market.confirm_failed' },
+  confirm_in_flight: { status: 409, code: 'woc_market.confirm_in_flight' },
   buy_now_locked: { status: 409, code: 'woc_market.buy_now_locked' },
+  cancel_pending: { status: 409, code: 'woc_market.cancel_pending' },
+  claim_cooldown: { status: 409, code: 'woc_market.claim_cooldown' },
   settlement_in_flight: { status: 409, code: 'woc_market.settlement_in_flight' },
   contended: { status: 409, code: 'woc_market.contended' },
   sale_conflict: { status: 409, code: 'woc_market.sale_conflict' },
@@ -469,7 +491,9 @@ async function createListingHandler(ctx: Ctx): Promise<void> {
 async function cancelListingHandler(ctx: Ctx): Promise<void> {
   const out = await useService().cancelListing(ctxAccountId(ctx), idParam(ctx));
   if (!out.ok) throwRefusal(out.reason);
-  json(ctx.res, 200, { ok: true });
+  // cancelPending: the cancel was ACCEPTED as intent on a locked listing (no
+  // new claims or bids; it closes when the current window ends unpaid).
+  json(ctx.res, 200, out.cancelPending === true ? { ok: true, cancelPending: true } : { ok: true });
 }
 
 async function placeBidHandler(ctx: Ctx): Promise<void> {

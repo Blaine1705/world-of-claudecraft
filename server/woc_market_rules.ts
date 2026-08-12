@@ -78,6 +78,26 @@ export const WOC_MARKET_MAX_PRICE_CENTS = 100_000;
  *  lifetime on purpose, so an honest buyer whose first quote expires still has
  *  window left to request a fresh one. */
 export const WOC_MARKET_BUY_NOW_LOCK_SECONDS = WOC_MARKET_QUOTE_TTL_SECONDS * 3;
+/**
+ * The buy-now abandon-loop cooldowns (both arms, no strikes, per the resolved
+ * ruling; these NUMBERS are this change's proposal and the QA round re-judges
+ * them). A public buy-now lock is free to claim, so claim-then-abandon in a
+ * loop denied the seller a sale at no cost to the griefer.
+ *
+ * Per-listing: after an account abandons (times out) a public lock, it cannot
+ * re-claim THAT listing for 30 minutes, about seven lock windows, long enough
+ * that a solo looper holds a listing under 14 percent of the time instead of
+ * 100.
+ *
+ * Account-wide: three abandons in a rolling hour refuse ALL further public
+ * claims until the oldest ages out (the "broader claim cooldown": the rolling
+ * window expires on its own, no operator action). An honest buyer who times
+ * out three separate purchases in one hour is rare; a rotation of griefing
+ * accounts pays a verified wallet plus a passing balance check per seat.
+ */
+export const WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS = 1800;
+export const WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR = 3;
+export const WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS = 3600;
 /** How long a listing may sit mid-resolution before the sweep reclaims it. */
 export const WOC_MARKET_STRANDED_RECLAIM_SECONDS = 300;
 /**
@@ -394,6 +414,7 @@ export type WocBidStatus =
 export type WocSettlementState =
   | 'offered' // winner notified, awaiting quote + signature
   | 'confirming' // signature submitted, awaiting finality
+  | 'review' // confirming past the age bound: parked for an operator verdict
   | 'confirmed' // finality reached, delivery owed
   | 'delivering' // delivery claimed by a worker (crash-retry marker)
   | 'delivered' // custody parcel booked and persisted
@@ -403,8 +424,14 @@ export type WocSettlementState =
 const SETTLEMENT_TRANSITIONS: Record<WocSettlementState, readonly WocSettlementState[]> = {
   offered: ['confirming', 'expired'],
   // A refused signature returns to `offered`: the winner may retry with a
-  // fresh quote inside their window.
-  confirming: ['confirmed', 'failed', 'offered'],
+  // fresh quote inside their window. 'review' is the overdue sweep's exit for
+  // a row the chain never decides: it leaves the polling set but stays OPEN
+  // (the payment may have landed, so the listing must not re-auction).
+  confirming: ['confirmed', 'failed', 'offered', 'review'],
+  // Operator arms only (the ops tooling drives these once the chain state is
+  // verified by hand): paid resumes delivery, unpaid rejoins the overdue
+  // sweep's default pass through 'failed'.
+  review: ['confirmed', 'failed'],
   confirmed: ['delivering'],
   delivering: ['delivered'],
   delivered: [],

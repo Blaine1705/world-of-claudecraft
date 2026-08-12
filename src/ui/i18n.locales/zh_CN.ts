@@ -8221,6 +8221,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.quote_expired': '该报价已过期，请重新获取。',
   'apiError.woc_market.not_pending': '该出价已不在等待保证金的状态。',
   'apiError.woc_market.confirm_failed': '交易未能确认。请重新获取报价后再试。',
+  'apiError.woc_market.confirm_in_flight': '你的保证金付款仍在确认中。待其完成后再试。',
+  'apiError.woc_market.cancel_pending': '卖家正在取消该挂单。',
+  'apiError.woc_market.claim_cooldown': '你最近放弃过一次直购。请稍后再试。',
   'apiError.woc_market.buy_now_locked': '另一位买家正在完成这笔购买，请稍后再试。',
   'apiError.woc_market.settlement_in_flight': '有买家正在为该挂单付款。请等付款结算完成后再试。',
   'apiError.woc_market.contended': '交易所正在处理该挂单的其他操作。请稍后再试。',
@@ -8311,6 +8314,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.purchaseComplete': '购买完成。物品将经乌鸦邮局寄达。',
   'hudChrome.wocMarket.listingCreated': '你的挂单已上架。',
   'hudChrome.wocMarket.listingCancelled': '挂单已取消。物品将经乌鸦邮局退回。',
+  'hudChrome.wocMarket.listingCancelPending':
+    '取消待定：一位买家正持有购买窗口。若其未付款，挂单将关闭，物品经乌鸦邮局退回。',
   'hudChrome.wocMarket.sellTitle': '创建挂单',
   'hudChrome.wocMarket.sellEmpty':
     '背包中没有符合条件的物品。交易所只接受未绑定的史诗或更高品质装备。',
@@ -8362,6 +8367,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.bidBondPayAria': '为挂单 {id} 的出价支付保证金',
   'hudChrome.wocMarket.settlementOffered': '待付款',
   'hudChrome.wocMarket.settlementConfirming': '确认中',
+  'hudChrome.wocMarket.settlementReview': '付款审核中',
   'hudChrome.wocMarket.settlementDelivered': '已送达',
   'hudChrome.wocMarket.settlementExpired': '逾期未付',
   'hudChrome.wocMarket.settlementFailed': '付款失败',

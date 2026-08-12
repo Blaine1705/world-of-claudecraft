@@ -5097,6 +5097,8 @@ export const hudChromeStrings = {
     purchaseComplete: 'Purchase complete. Your item arrives by Ravenpost mail.',
     listingCreated: 'Your listing is live.',
     listingCancelled: 'Listing cancelled. Your item returns by Ravenpost mail.',
+    listingCancelPending:
+      'Cancel pending: a buyer holds the purchase window. Unless they pay, the listing closes and your item returns by Ravenpost mail.',
     sellTitle: 'Create a listing',
     sellEmpty:
       'No eligible items in your bags. The Exchange takes non-soulbound equipment of epic quality or better.',
@@ -5145,6 +5147,7 @@ export const hudChromeStrings = {
     bidBondPayAria: 'Pay the bond for your bid on listing {id}',
     settlementOffered: 'Payment due',
     settlementConfirming: 'Confirming',
+    settlementReview: 'Payment under review',
     settlementDelivered: 'Delivered',
     settlementExpired: 'Expired unpaid',
     settlementFailed: 'Payment failed',

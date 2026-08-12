@@ -87,6 +87,10 @@ export interface WocListingRow {
    *  A non-null value means the row is invisible to browse and buyable only by
    *  that account (docs/prd/woc/p2p-woc-trade.md). */
   directedBuyerAccount: number | null;
+  /** Seller cancel-intent stamped on a LOCKED listing: no new lock claims or
+   *  bids from that moment; an unpaid lock expiry closes the listing
+   *  cancelled (the converge arm), a paid window proceeds to settlement. */
+  cancelRequestedAtMs: number | null;
 }
 
 export type WocDirectedOfferStatus =
@@ -316,12 +320,15 @@ export interface WocMarketDb {
     itemRef: ExtractRef | null,
   ): Promise<WocDirectedOfferRow | null>;
   reopenDirectedOffer(realm: string, id: number): Promise<void>;
-  /** Cancel iff still active with no pending/active bid, no unexpired buy-now
-   *  lock, and no settlement in any non-terminal state (offered, confirming,
-   *  confirmed, delivering, delivered), all checked atomically under the
-   *  listing row lock. A leftover 'failed' settlement is expired in the same
-   *  transaction so its retry arm cannot revive a payment against a cancelled
-   *  listing. Returns the row for the return flight. */
+  /** Cancel iff still active with no pending/active bid and no open
+   *  settlement, all checked atomically under the listing row lock. An
+   *  UNEXPIRED buy-now lock over an unpaid window stamps CANCEL-INTENT
+   *  instead of refusing ('cancel_pending': no new claims or bids; the
+   *  converge arm closes the listing once the window ends unpaid); a paid
+   *  window still refuses 'settlement_live'. A leftover 'failed' settlement
+   *  is expired in the same transaction so its retry arm cannot revive a
+   *  payment against a cancelled listing. Returns the row for the return
+   *  flight. */
   cancelListingIfUnbid(
     realm: string,
     id: number,
@@ -333,10 +340,21 @@ export interface WocMarketDb {
     | 'not_yours'
     | 'has_bids'
     | 'not_active'
-    | 'buy_now_pending'
+    | 'cancel_pending'
     | 'settlement_live'
     | 'contended'
   >;
+  /** The cancel-intent converge read: stamped, active listings whose lock
+   *  window ended. */
+  cancelPendingListings(realm: string, nowMs: number, limit: number): Promise<WocListingRow[]>;
+  /** Close one cancel-pending listing whose window ended unpaid (the converge
+   *  arm); 'skip' when anything still rides it. Returns the closed row for
+   *  the return flight. */
+  closeCancelPendingListing(
+    realm: string,
+    id: number,
+    nowMs: number,
+  ): Promise<WocListingRow | 'skip' | 'contended'>;
   /** Admin suspend, atomically and only while no payment can be moving: an
    *  unexpired buy-now lock, a settlement in 'confirming' or beyond (a
    *  signature exists, so the chain may still land it), or an 'offered'
@@ -436,15 +454,18 @@ export interface WocMarketDb {
     bidId: number | null;
     sale: Omit<WocSaleRow, 'id' | 'excluded' | 'atMs'>;
   }): Promise<'finalized' | 'already_final' | 'stale' | 'contended'>;
-  /** The three stuck classes for the ops monitor (unbooked claims, stuck
-   *  'delivering' settlements, closed-but-undisposed listings). Counts
-   *  SATURATE at countCap and samples are capped, so the read is O(cap) even
-   *  at incident-sized backlogs. The monitor stamps asOfMs on top. */
+  /** The stuck classes for the ops monitor (unbooked claims, stuck
+   *  'delivering' settlements, closed-but-undisposed listings, 'review'
+   *  settlements, and over-aged paid-but-undecided bonds). Counts SATURATE at
+   *  countCap and samples are capped, so the read is O(cap) even at
+   *  incident-sized backlogs. The monitor stamps asOfMs on top.
+   *  bondOlderThanMs is the stuck-bond age cutoff (the H15-scale bound). */
   stuckCustodyReadout(
     realm: string,
     olderThanMs: number,
     sampleLimit: number,
     countCap: number,
+    bondOlderThanMs: number,
   ): Promise<WocStuckCustodyClasses>;
   claimBuyNowLock(
     realm: string,
@@ -452,8 +473,27 @@ export interface WocMarketDb {
     account: number,
     nowMs: number,
     expiresAtMs: number,
-  ): Promise<WocListingRow | 'not_found' | 'not_active' | 'locked' | 'no_buy_now' | 'own_listing'>;
-  clearBuyNowLock(id: number): Promise<void>;
+  ): Promise<
+    | WocListingRow
+    | 'not_found'
+    | 'not_active'
+    | 'locked'
+    | 'no_buy_now'
+    | 'own_listing'
+    | 'cancel_pending'
+    | 'claim_cooldown'
+    | 'contended'
+  >;
+  /** Release a lock, HOLDER-guarded: only holderAccount's lock clears. */
+  clearBuyNowLock(id: number, holderAccount: number): Promise<void>;
+  /** Record a public buy-now abandonment (the overdue sweep's recorder;
+   *  dedupes with the steal-time recorder on the lock_expires window key). */
+  recordBuyNowAbandon(
+    realm: string,
+    listingId: number,
+    account: number,
+    lockExpiresAtMs: number,
+  ): Promise<void>;
 
   // Bids
   insertPendingBid(args: {
@@ -466,17 +506,30 @@ export interface WocMarketDb {
     amountCents: number;
     bondCents: number;
     nowMs: number;
-    /** Anti-snipe: the new end when this placement extends the auction. */
-    extendEndsToMs: (row: WocListingRow) => number | null;
     minNext: (row: WocListingRow) => number;
   }): Promise<
     | { ok: true; bid: WocBidRow }
     | {
         ok: false;
-        reason: 'not_found' | 'not_active' | 'own_listing' | 'bid_too_low' | 'already_pending';
+        reason:
+          | 'not_found'
+          | 'not_active'
+          | 'cancel_pending'
+          | 'own_listing'
+          | 'bid_too_low'
+          | 'already_pending';
       }
   >;
-  setBidBondQuote(bidId: number, reference: string, expiresAtMs: number): Promise<void>;
+  /** Anti-snipe at bond progress: extend the auction end for a bid whose
+   *  signature was just recorded. Best-effort (see PgWocMarketDb). */
+  extendAuctionForBondProgress(
+    realm: string,
+    listingId: number,
+    extendEndsToMs: (row: WocListingRow) => number | null,
+  ): Promise<'extended' | 'skip' | 'contended'>;
+  /** CAS: applies only to an unpaid quote (status pending_bond AND no
+   *  recorded signature); false = nothing written. See PgWocMarketDb. */
+  setBidBondQuote(bidId: number, reference: string, expiresAtMs: number): Promise<boolean>;
   /** Record the bidder's signature while the chain is still deciding. */
   submitBondSignature(
     bidId: number,
@@ -606,7 +659,14 @@ export interface WocMarketDb {
   touchSettlementRow(id: number): Promise<void>;
   /** The listing twin, for a parked return in the undisposed backlog. */
   touchListingRow(id: number): Promise<void>;
-  overdueSettlements(realm: string, nowMs: number, limit: number): Promise<WocSettlementRow[]>;
+  /** Deadline-overdue offered/failed rows, plus 'confirming' rows older than
+   *  confirmingCutoffMs (the H15 bound; aged on updated_at). */
+  overdueSettlements(
+    realm: string,
+    nowMs: number,
+    limit: number,
+    confirmingCutoffMs: number,
+  ): Promise<WocSettlementRow[]>;
 
   // Sales, strikes, terms
   /** Raw provenance insert; throws 23505 on a standing non-excluded row for
@@ -737,7 +797,7 @@ export interface WocCustodyRefState {
   mailIntent: boolean;
 }
 
-/** The three stuck classes the ops monitor surfaces (stuckCustodyReadout).
+/** The stuck classes the ops monitor surfaces (stuckCustodyReadout).
  *  Counts SATURATE at the readout's countCap; saturated makes the "cap or
  *  more" case explicit on the wire. Samples are separately capped. */
 export interface WocStuckCustodyClasses {
@@ -763,6 +823,28 @@ export interface WocStuckCustodyClasses {
     count: number;
     saturated: boolean;
     sample: { id: number; resolution: string | null; updatedAtMs: number }[];
+  };
+  /** Settlements the overdue sweep parked in 'review' (the H15 bound): every
+   *  row is operator-actionable NOW, so this class carries no age filter.
+   *  Operator semantics: verify the payment reference on chain (the service
+   *  release tooling), then transitionSettlement review -> confirmed (paid:
+   *  delivery resumes) or review -> failed (unpaid: the overdue default pass
+   *  takes it from there). updatedAtMs is when the row entered review. */
+  reviewSettlements: {
+    count: number;
+    saturated: boolean;
+    sample: { id: number; listingId: number; createdAtMs: number; updatedAtMs: number }[];
+  };
+  /** Paid-but-undecided bonds (pending_bond with a recorded signature) older
+   *  than the same H15-scale bound: the poll still re-checks them, but past
+   *  this age the chain verdict is overdue and an operator should verify the
+   *  signature by hand (the exit paths are the chain deciding, or an operator
+   *  resolving via the service tooling; there is deliberately no automatic
+   *  time-based void, because the money may have landed). */
+  stuckBonds: {
+    count: number;
+    saturated: boolean;
+    sample: { id: number; listingId: number; account: number; placedAtMs: number }[];
   };
 }
 
@@ -807,6 +889,12 @@ export interface WocMarketConfig {
   enabled: boolean;
   realm: string;
   policy: WocEligibilityPolicy;
+  /** H15 bound: how long a settlement may sit in 'confirming' before the
+   *  overdue sweep parks it in the operator 'review' state. Config-read
+   *  (WOC_MARKET_CONFIRMING_REVIEW_HOURS via wocMarketConfig); hours-scale by
+   *  design, so a routine finality delay or a short economy outage self-heals
+   *  through the poll before an operator is ever paged. */
+  confirmingReviewMs: number;
 }
 
 export interface WocMarketDeps {
@@ -852,7 +940,16 @@ export type WocMarketRefusal =
   | 'quote_expired'
   | 'not_pending'
   | 'confirm_failed'
+  // A recorded signature is awaiting the chain's verdict: quote refreshes and
+  // abandons must wait for it rather than orphan or void money in flight.
+  | 'confirm_in_flight'
   | 'buy_now_locked'
+  // The seller stamped cancel-intent on this listing: no new lock claims or
+  // bids; the current window resolves and then the listing closes.
+  | 'cancel_pending'
+  // The claimer recently abandoned a buy-now window (this listing's re-claim
+  // cooldown, or the account-wide abandons-per-hour cap).
+  | 'claim_cooldown'
   // A payment for the listing is past 'offered' (or delivered but unclosed):
   // cancel and suspend must wait for it to resolve, never race it.
   | 'settlement_in_flight'
@@ -898,6 +995,9 @@ export interface WocSweepPassStats {
   reclaimed: number;
   closed: number;
   expired: number;
+  /** Cancel-pending listings whose lock window ended unpaid, closed
+   *  'cancelled' with the return flight home (the cancel-intent converge). */
+  cancelClosed: number;
   polled: number;
   /** Bonds paid but not yet decided by the chain, re-checked this pass. */
   polledBonds: number;
@@ -1436,7 +1536,10 @@ export class WocMarketService {
     return this.deps.db.directedOffersForAccount(this.cfg.realm, account);
   }
 
-  async cancelListing(account: number, listingId: number): Promise<{ ok: true } | Refused> {
+  async cancelListing(
+    account: number,
+    listingId: number,
+  ): Promise<{ ok: true; cancelPending?: boolean } | Refused> {
     if (!this.cfg.enabled) return refuse('disabled');
     const out = await this.deps.db.cancelListingIfUnbid(
       this.cfg.realm,
@@ -1448,10 +1551,14 @@ export class WocMarketService {
     if (out === 'not_yours') return refuse('not_yours');
     if (out === 'has_bids') return refuse('has_bids');
     if (out === 'not_active') return refuse('not_active');
-    // A claimed lock resolves within its window ("try again in a moment"); a
-    // settlement past 'offered' resolves only when the payment does; plain
+    // An unpaid locked window accepted the cancel as INTENT: the current
+    // holder keeps their window, no new claims or bids land, and the converge
+    // arm closes the listing (return flight home) once the window ends
+    // unpaid. Reported ok with the pending flag, not a refusal: the seller's
+    // cancel WILL happen unless the holder pays.
+    if (out === 'cancel_pending') return { ok: true, cancelPending: true };
+    // A settlement past 'offered' resolves only when the payment does; plain
     // row contention retries immediately.
-    if (out === 'buy_now_pending') return refuse('buy_now_locked');
     if (out === 'settlement_live') return refuse('settlement_in_flight');
     if (out === 'contended') return refuse('contended');
     // The return flight rides the sweep's reconciliation (closed, undisposed,
@@ -1501,7 +1608,6 @@ export class WocMarketService {
       amountCents: args.amountCents,
       bondCents: bond,
       nowMs,
-      extendEndsToMs: (row) => antiSnipeExtendedEndMs(nowMs, row.endsAtMs, row.baseEndsAtMs),
       minNext: (row) => minNextBidCents(row.currentBidCents, row.startCents),
     });
     if (!inserted.ok) return refuse(inserted.reason);
@@ -1514,7 +1620,17 @@ export class WocMarketService {
       // The pending bid lapses on its own TTL; nothing was transferred.
       return refuse('quote_unavailable');
     }
-    await this.deps.db.setBidBondQuote(inserted.bid.id, intent.reference, intent.expiresAtMs);
+    const applied = await this.deps.db.setBidBondQuote(
+      inserted.bid.id,
+      intent.reference,
+      intent.expiresAtMs,
+    );
+    if (!applied) {
+      // Only reachable if this brand-new bid left 'pending_bond' (or somehow
+      // gained a signature) in the milliseconds since the insert: answer as
+      // plain contention, retryable, with nothing written.
+      return refuse('contended');
+    }
     return { ok: true, bid: { ...inserted.bid, bondReference: intent.reference }, bond: intent };
   }
 
@@ -1538,10 +1654,22 @@ export class WocMarketService {
     if (!bid) return refuse('not_found');
     if (bid.account !== account) return refuse('not_yours');
     if (bid.status !== 'pending_bond') return refuse('not_pending');
-    // The status is re-checked inside the UPDATE, so a bond that landed between
-    // the read and the write keeps its bid rather than losing it to this call.
+    // A recorded signature means the bidder's money may already be riding
+    // this bond (broadcast, awaiting finality). Abandoning would void a
+    // payment the chain may still land, so the abandon refuses until the
+    // verdict arrives; the poll resolves it either way within its pass.
+    if (bid.bondSignature !== null) return refuse('confirm_in_flight');
+    // The status AND the signature are re-checked inside the UPDATE, so a bond
+    // that landed (or a signature recorded) between the read and the write
+    // keeps its bid rather than losing it to this call.
     const done = await this.deps.db.abandonPendingBid(this.cfg.realm, bidId, account);
-    return done ? { ok: true } : refuse('not_pending');
+    if (done) return { ok: true };
+    const after = await this.deps.db.bidById(bidId);
+    return refuse(
+      after !== null && after.status === 'pending_bond' && after.bondSignature !== null
+        ? 'confirm_in_flight'
+        : 'not_pending',
+    );
   }
 
   /**
@@ -1580,6 +1708,13 @@ export class WocMarketService {
     if (!bid) return refuse('not_found');
     if (bid.account !== account) return refuse('not_yours');
     if (bid.status !== 'pending_bond') return refuse('not_pending');
+    // A recorded signature means the bond may already be PAID and merely
+    // awaiting finality. Its reference must survive: the poller re-checks the
+    // reference and signature as a pair, so overwriting the reference here
+    // would read a real payment as refused and lapse a funded bond. This read
+    // answers the common case without a wasted economy quote; the atomic arm
+    // is the setBidBondQuote compare-and-set below.
+    if (bid.bondSignature !== null) return refuse('confirm_in_flight');
     const intent = await this.deps.economy.bondQuote({
       memoRef: `woc_bond:${bid.id}`,
       usdCents: bid.bondCents,
@@ -1588,7 +1723,20 @@ export class WocMarketService {
     if (!intent.ok || intent.reference === null || intent.expiresAtMs === null) {
       return refuse('quote_unavailable');
     }
-    await this.deps.db.setBidBondQuote(bid.id, intent.reference, intent.expiresAtMs);
+    const applied = await this.deps.db.setBidBondQuote(
+      bid.id,
+      intent.reference,
+      intent.expiresAtMs,
+    );
+    if (!applied) {
+      // The CAS lost a race: a signature landed (or the bid left pending)
+      // between the read above and this write. Re-read for the precise
+      // refusal; the unused economy quote simply expires on its own.
+      const after = await this.deps.db.bidById(bid.id);
+      return refuse(
+        after !== null && after.status === 'pending_bond' ? 'confirm_in_flight' : 'not_pending',
+      );
+    }
     return { ok: true, bond: intent };
   }
 
@@ -1603,17 +1751,29 @@ export class WocMarketService {
     if (bid.account !== account) return refuse('not_yours');
     if (bid.status !== 'pending_bond') return refuse('not_pending');
     if (bid.bondReference === null) return refuse('quote_unavailable');
-    // An expired quote is never accepted for confirmation (the PRD rule, with
-    // no carve-out for the bond leg): the bidder requests a fresh one.
-    if (bid.bondQuoteExpiresAtMs !== null && bid.bondQuoteExpiresAtMs <= this.now()) {
-      return refuse('quote_expired');
-    }
-    // Record the signature BEFORE asking the chain. An undecided verdict has to
-    // leave something behind that the sweep can re-check, or the only available
-    // answer is a refusal with the bidder's money already spent.
+    // Record the signature BEFORE any expiry verdict and BEFORE asking the
+    // chain. The signature is the only trace of a payment that may already be
+    // broadcast, so every refusal past this point would discard money in
+    // flight. An EXPIRED quote is deliberately no exception: the transfer may
+    // have left the wallet moments before expiry, and refusing it here with
+    // no ledger trace was exactly the loss that cost a real settlement its
+    // money. The row lands in the confirming set instead, and the chain's
+    // verdict (here or on the poll) decides between completion and lapse.
     const submitted = await this.deps.db.submitBondSignature(bid.id, signature);
     if (submitted === 'not_pending') return refuse('not_pending');
     if (submitted === 'signature_reused') return refuse('signature_reused');
+    // Anti-snipe rides BOND PROGRESS: the recorded signature is what makes
+    // this bid a real payment claim, so this is the one moment the auction
+    // end extends (placement no longer does; an unpaid bid must not move the
+    // clock). Best-effort ON PURPOSE: the signature above is already durable,
+    // and a contended extension only fails toward a shorter auction, so it
+    // must never turn a recorded payment into a refusal.
+    const nowMs = this.now();
+    await this.deps.db
+      .extendAuctionForBondProgress(this.cfg.realm, bid.listingId, (row) =>
+        antiSnipeExtendedEndMs(nowMs, row.endsAtMs, row.baseEndsAtMs),
+      )
+      .catch(() => {});
     const confirmed = await this.deps.economy.confirm(bid.bondReference, signature);
     if (confirmed.settled) return this.holdBondAndActivate(bid.id);
     if (confirmed.pending) {
@@ -1741,6 +1901,9 @@ export class WocMarketService {
     if (claimed === 'locked') return refuse('buy_now_locked');
     if (claimed === 'no_buy_now') return refuse('no_buy_now');
     if (claimed === 'own_listing') return refuse('own_listing');
+    if (claimed === 'cancel_pending') return refuse('cancel_pending');
+    if (claimed === 'claim_cooldown') return refuse('claim_cooldown');
+    if (claimed === 'contended') return refuse('contended');
 
     const settlement = await this.deps.db.insertSettlement({
       listingId: claimed.id,
@@ -1757,13 +1920,13 @@ export class WocMarketService {
     if (settlement === 'live_settlement_exists' || settlement === 'winner_gone') {
       // winner_gone is unreachable here (no winnerBidId is passed); it rides
       // this arm so the union stays exhaustively narrowed.
-      await this.deps.db.clearBuyNowLock(claimed.id);
+      await this.deps.db.clearBuyNowLock(claimed.id, args.account);
       return refuse('buy_now_locked');
     }
     if (settlement === 'contended') {
       // A guard transaction holds the listing row; nothing was inserted.
       // Release the lock and let the buyer retry immediately.
-      await this.deps.db.clearBuyNowLock(claimed.id);
+      await this.deps.db.clearBuyNowLock(claimed.id, args.account);
       return refuse('contended');
     }
     if (settlement === 'listing_closed') {
@@ -1771,13 +1934,13 @@ export class WocMarketService {
       // unexpired, so this arm needs the listing to close in the sliver
       // between the claim and the insert. Answer honestly rather than with a
       // phantom lock.
-      await this.deps.db.clearBuyNowLock(claimed.id);
+      await this.deps.db.clearBuyNowLock(claimed.id, args.account);
       return refuse('not_active');
     }
     const quote = await this.quoteFor(settlement, claimed.sellerWallet);
     if (!quote.ok) {
       await this.deps.db.transitionSettlement(settlement.id, ['offered'], 'expired');
-      await this.deps.db.clearBuyNowLock(claimed.id);
+      await this.deps.db.clearBuyNowLock(claimed.id, args.account);
       return refuse('quote_unavailable');
     }
     return { ok: true, settlement, quote };
@@ -1854,7 +2017,13 @@ export class WocMarketService {
     if (settlement.quoteReference === null || settlement.quoteExpiresAtMs === null) {
       return refuse('quote_unavailable');
     }
-    if (settlement.quoteExpiresAtMs <= this.now()) return refuse('quote_expired');
+    // No expiry refusal past this point: the signature is recorded FIRST (the
+    // bond leg's rule, and originally this leg's lesson). A payment broadcast
+    // near quote expiry lands in 'confirming' with its ledger trace, and the
+    // chain's verdict decides; refusing an expired quote here would discard
+    // the only trace of money already in flight. Deadline-expired rows are
+    // still bounded: the overdue sweep owns them, and a 'confirming' row that
+    // never resolves ages into the operator review state.
     const submitted = await this.deps.db.submitSettlementSignature(settlement.id, signature);
     if (submitted === 'not_offered') return refuse('not_active');
     if (submitted === 'signature_reused') return refuse('signature_reused');
@@ -1983,6 +2152,10 @@ export class WocMarketService {
       disposed: await this.arm('disposed', () => this.disposeSoldResidue(nowMs, scope)),
       closed: await this.arm('closed', () => this.closeDueAuctions(nowMs)),
       expired: await this.arm('expired', () => this.expireOverdueSettlements(nowMs)),
+      // AFTER the expiry arm on purpose: the overdue arm is the canonical
+      // abandon recorder and expires the abandoned window's settlement, so a
+      // cancel-pending listing converges in the same pass its window dies.
+      cancelClosed: await this.arm('cancelClosed', () => this.closeCancelPendingListings(nowMs)),
       polled: await this.arm('polled', () => this.pollConfirmingSettlements()),
       // BEFORE the lapse arm above would matter: a paid-but-undecided bond is
       // excluded from lapsing by its signature, and this is what resolves it.
@@ -2163,8 +2336,37 @@ export class WocMarketService {
     return reopened;
   }
 
+  /** The cancel-intent converge: stamped listings whose lock window ended
+   *  unpaid close 'cancelled' with the return flight home. 'skip' and
+   *  'contended' rows simply wait for the next pass (a paid window converges
+   *  through settlement instead, and its finalize closes the listing sold). */
+  private async closeCancelPendingListings(nowMs: number): Promise<number> {
+    const pending = await this.deps.db.cancelPendingListings(this.cfg.realm, nowMs, SWEEP_BATCH);
+    let closed = 0;
+    for (const listing of pending) {
+      try {
+        const out = await this.deps.db.closeCancelPendingListing(this.cfg.realm, listing.id, nowMs);
+        if (typeof out === 'string') continue;
+        closed++;
+        // Eager return flight, best-effort: the sweep's undisposed
+        // reconciliation (closed, undisposed, resolution != sold) backstops a
+        // crash right here.
+        await this.returnListingItem(out).catch(() => {});
+      } catch (err) {
+        // Per-row isolation, the sweep-wide rule.
+        this.sweepError('cancelClosed', err);
+      }
+    }
+    return closed;
+  }
+
   private async expireOverdueSettlements(nowMs: number): Promise<number> {
-    const overdue = await this.deps.db.overdueSettlements(this.cfg.realm, nowMs, SWEEP_BATCH);
+    const overdue = await this.deps.db.overdueSettlements(
+      this.cfg.realm,
+      nowMs,
+      SWEEP_BATCH,
+      nowMs - this.cfg.confirmingReviewMs,
+    );
     for (const settlement of overdue) {
       try {
         await this.expireOneOverdueSettlement(settlement, nowMs);
@@ -2182,6 +2384,24 @@ export class WocMarketService {
     settlement: WocSettlementRow,
     nowMs: number,
   ): Promise<void> {
+    if (settlement.state === 'confirming') {
+      // The H15 exit: a signature exists and the chain never decided, so the
+      // row is AMBIGUOUS by construction. It must not default, forfeit,
+      // strike, or cascade (the buyer may have paid), and it must not be
+      // polled forever either. 'review' parks it for an operator verdict:
+      // out of the polling set, still OPEN (the listing cannot re-auction),
+      // surfaced by the stuck readout. The operator resolution arms are
+      // review -> confirmed (payment verified on chain: delivery resumes) and
+      // review -> failed (verified unpaid: the ordinary overdue default pass
+      // takes it from there); the ops tooling drives them.
+      await this.deps.db.transitionSettlement(
+        settlement.id,
+        ['confirming'],
+        'review',
+        'confirming_overdue',
+      );
+      return;
+    }
     const moved = await this.deps.db.transitionSettlement(
       settlement.id,
       ['offered', 'failed'],
@@ -2193,7 +2413,10 @@ export class WocMarketService {
     if (!listing) return;
     if (settlement.bidId !== null) {
       // The close-time winner defaulted: forfeit the held bond, strike them.
-      await this.deps.db.markBidStatus(settlement.bidId, 'defaulted');
+      // CAS from 'won': a bid something else already resolved (a suspend's
+      // CTE cancelled it with its refund queued) must not be re-labelled a
+      // default on top of that resolution.
+      await this.deps.db.markBidStatus(settlement.bidId, 'defaulted', ['won']);
       await this.deps.db.setBondState(settlement.bidId, ['held'], 'forfeit_due');
       const strikes = await this.deps.db.strikeInfo(settlement.buyerAccount);
       const count = (strikes?.strikes ?? 0) + 1;
@@ -2203,19 +2426,34 @@ export class WocMarketService {
         suspension > 0 ? nowMs + suspension : null,
       );
     } else {
-      // An abandoned buy-now. On a PUBLIC listing that costs nobody anything:
-      // the buyer committed to nothing, the lock clears and the listing simply
-      // resumes for the next person, so no strike is warranted.
+      // An abandoned buy-now. On a PUBLIC listing the buyer committed no
+      // money, the lock clears and the listing resumes for the next person,
+      // so no strike is warranted; what it DOES cost them now is a cooldown
+      // (the abandon-loop ruling): the recorded abandonment blocks re-claims
+      // of this listing and counts toward the account-wide hourly cap.
+      // Recorded BEFORE the clear (a crash between the two must not lose the
+      // row), keyed by the window (the settlement deadline IS the lock
+      // expiry), deduped against the steal-time recorder. The clear is
+      // holder-guarded: if a new claimer already stole the expired lock,
+      // their live window survives this arm.
       //
-      // A DIRECTED sale is the opposite case and takes one. Its buyer accepted
-      // a named offer, and that acceptance is what pulled a specific player's
-      // item out of their bags into escrow; walking away leaves that seller
-      // holding an unsellable listing they have to notice and cancel. This is
-      // the requester's rule that strikes apply to p2p non-payment once both
-      // parties have accepted, and acceptance is exactly the moment escrow
-      // happened. There is no bond to forfeit here (a directed sale carries
-      // none), so the strike is the only consequence available.
-      await this.deps.db.clearBuyNowLock(listing.id);
+      // A DIRECTED sale keeps its strike instead (and records no cooldown
+      // row). Its buyer accepted a named offer, and that acceptance is what
+      // pulled a specific player's item out of their bags into escrow;
+      // walking away leaves that seller holding an unsellable listing they
+      // have to notice and cancel. This is the requester's rule that strikes
+      // apply to p2p non-payment once both parties have accepted, and
+      // acceptance is exactly the moment escrow happened. There is no bond
+      // to forfeit here (a directed sale carries none).
+      if (listing.directedBuyerAccount === null) {
+        await this.deps.db.recordBuyNowAbandon(
+          this.cfg.realm,
+          listing.id,
+          settlement.buyerAccount,
+          settlement.deadlineAtMs,
+        );
+      }
+      await this.deps.db.clearBuyNowLock(listing.id, settlement.buyerAccount);
       if (listing.directedBuyerAccount !== null) {
         const strikes = await this.deps.db.strikeInfo(settlement.buyerAccount);
         const count = (strikes?.strikes ?? 0) + 1;

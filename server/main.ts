@@ -374,7 +374,11 @@ import { allowedCorsOrigin, isWebClientRequest } from './web_login_guard';
 import { cachedWocBalance, handleWocBalance, parseWocBalanceQuery } from './woc_balance';
 import { WocMarketService } from './woc_market';
 import { createWocMarketCustody } from './woc_market_custody';
-import { PgWocMarketDb, pruneClosedWocListingsBatch } from './woc_market_db';
+import {
+  PgWocMarketDb,
+  pruneClosedWocListingsBatch,
+  pruneWocBuyNowAbandonsBatch,
+} from './woc_market_db';
 import { createWocMarketMonitor } from './woc_market_monitor';
 import { createDevWocMarketEconomy, createWocMarketEconomyProxy } from './woc_market_proxy';
 import { configureWocMarketRuntime, wocMarketConfig } from './woc_market_routes';
@@ -2807,6 +2811,9 @@ const wocMarketMonitor = createWocMarketMonitor({
   db: wocMarketDb,
   realm: REALM,
   log: (line) => console.warn(line),
+  // The stuck-bond class ages on the same knob that parks over-aged
+  // confirming settlements, so the two H15 surfaces share one policy.
+  bondStuckAgeMs: wocMarketConfig().confirmingReviewMs,
 });
 configureInternalWocMarketStuckRead(() => wocMarketMonitor.read());
 
@@ -3530,6 +3537,13 @@ export async function startServer(): Promise<http.Server> {
         // LIMIT-bounded per account (chatModerationForAccount).
         name: 'chat_violations',
         pruneBatch: (n) => pruneChatViolationsBatch(config.chatViolationRetentionDays, n),
+      },
+      {
+        // The buy-now abandon ledger (claim-cooldown evidence): dead once
+        // outside every cooldown window; kept a month for tuning forensics.
+        name: 'woc_market_buy_now_abandons',
+        pruneBatch: (n) =>
+          pruneWocBuyNowAbandonsBatch(pool, config.wocMarketAbandonsRetentionDays, n),
       },
       {
         // Closed, fully-disposed $WOC Exchange listings (bids + settlements
