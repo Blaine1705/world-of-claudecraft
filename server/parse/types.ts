@@ -25,6 +25,12 @@ export interface RecorderEntityView {
   /** Who the mob is actually swinging at; the threat sampler ships it so the
    * dashboard can show whether the top-threat player is the one being hit. */
   aggroTargetId?: number | null;
+  /** Primary resource pool, read by the resource sampler. A druid's type
+   * changes with form, so it is sampled every tick alongside the value rather
+   * than assumed fixed for the fight. */
+  resource?: number;
+  maxResource?: number;
+  resourceType?: 'rage' | 'mana' | 'energy' | 'focus' | null;
   auras?: readonly { id: string; name: string; sourceId: number; stacks?: number }[];
 }
 

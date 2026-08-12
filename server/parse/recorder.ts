@@ -16,6 +16,7 @@ import type { EventEnrichment, FightParticipant, Surface } from './contract';
 import type { OpenFight, PendingClose } from './fights';
 import type { ParseFlags } from './flags';
 import { DungeonSegmenter } from './instances';
+import { ResourceSampler } from './resource_sampler';
 import { RiftSegmenter } from './rifts';
 import { ThreatSampler } from './threat_sampler';
 import type { RecorderSim, RecordSink, SegmenterHost } from './types';
@@ -50,6 +51,7 @@ export class ParseRecorder {
   private readonly rifts = new RiftSegmenter();
   private readonly bossCasts = new BossCastSynthesizer();
   private readonly threat = new ThreatSampler();
+  private readonly resources = new ResourceSampler();
   private readonly fightsByEntity = new Map<number, OpenFight>();
   private readonly fightsByMob = new Map<number, OpenFight>();
   private readonly openFights = new Set<OpenFight>();
@@ -97,6 +99,7 @@ export class ParseRecorder {
     // After routing, so a mob first seen this tick is already tracked, and
     // before the close pass, so a fight's last second still gets its sample.
     this.threat.observe(this.host, tick, this.openFights);
+    this.resources.observe(this.host, tick, this.openFights);
 
     for (const { fight, outcome } of closing) {
       if (!this.openFights.has(fight)) continue;

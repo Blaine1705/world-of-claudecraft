@@ -52,8 +52,8 @@ fight and per-tick observation only closes them; trash quiets out after
 `TRASH_QUIET_TICKS`, deliberately aligned with the in-game damage meter's
 `ENCOUNTER_END_SECONDS` in `src/ui/meters.ts`), and `rifts.ts` (one fight per
 floor). `boss_casts.ts` synthesizes boss cast timelines from `castingAbility`
-transitions, since mobs never emit cast events. `threat_sampler.ts` samples the
-top of each tracked mob's hate table (see below). Around them: `fights.ts`
+transitions, since mobs never emit cast events. `threat_sampler.ts` and
+`resource_sampler.ts` are the sampled continuous streams (see below). Around them: `fights.ts`
 (open-fight bookkeeping, rollup totals, record emission), `shipper.ts` (batch
 + gzip + POST), `spool.ts` (bounded disk WAL), `flags.ts`, `counters.ts`
 (hot-path counters, prom export via collect()), `build_version.ts` (batch
@@ -82,6 +82,29 @@ event routing and before the close pass, and emits the contract's
 - Samples are NOT counted against `MAX_RAW_EVENTS_PER_FIGHT`: they are a fixed
   low rate, so a long fight that truncates its raw event lines still ships a
   complete threat series.
+
+## Resource sampling (`resource_sampler.ts`)
+Health and the primary resource pool for everyone in a fight, once a second
+(`TICKS_PER_RESOURCE_SAMPLE`, deliberately the same cadence as the threat
+sampler so the two series line up sample-for-sample). Emits the contract's
+`SampleRecord` with `kind: 'res'`, reserved since v1 and previously unused.
+- **Wire layout**, one flat number array per sampled entity:
+  `[entityId, hp, maxHp, resource, maxResource, resourceTypeCode]`, where the
+  code is 0 for no pool and 1..4 for mana/rage/energy/focus
+  (`RESOURCE_TYPE_CODES`). Type is sampled EVERY tick rather than assumed fixed:
+  a druid's pool changes with form.
+- **Every entry is self-contained**, carrying the maxima. That costs two numbers
+  per entity per second and buys a reader that never has to join against a
+  roster which may not cover late joiners, the dead, or a stamina buff that
+  moved maxHp mid-fight.
+- **Participants always sample in full** (raid size is its own bound), including
+  dead ones at hp 0: dropping that row would hide the death and any rez. The
+  HOSTILE side is capped at `MAX_SAMPLED_MOBS` and restricted to boss templates,
+  since boss health over time is the phase-timing and dps-check record while
+  trash would multiply the payload for no analytical value.
+- **This is the balance-facing stream** and it is not derivable after the fact:
+  events carry amounts, never the resulting pools, and the overheal limit below
+  means integrating damage minus healing drifts silently.
 
 ## The daily census exporter (`census.ts` / `census_db.ts`)
 A characters/deeds/playtime snapshot of the realm shipped through the SAME

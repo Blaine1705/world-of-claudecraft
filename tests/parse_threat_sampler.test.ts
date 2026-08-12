@@ -71,7 +71,7 @@ function harness(): Harness {
     fight,
     sim,
     records,
-    samples: () => records.filter((r) => r.t === 'sample'),
+    samples: () => records.filter((r) => r.t === 'sample' && r.kind === 'threat'),
   };
 }
 
@@ -289,7 +289,7 @@ describe('ParseRecorder threat wiring', () => {
     sim.tickCount = 20;
     recorder.observe([]);
 
-    const samples = records.filter((r) => r.t === 'sample');
+    const samples = records.filter((r) => r.t === 'sample' && r.kind === 'threat');
     expect(samples).toHaveLength(1);
     expect(samples[0]).toMatchObject({ fightId: 'fight-0', tick: 20, kind: 'threat' });
     expect(samples[0]?.data).toEqual([[500, 5, 5, 4300]]);
