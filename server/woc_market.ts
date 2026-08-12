@@ -35,7 +35,6 @@ import {
   WOC_MARKET_DIRECTED_OFFER_TTL_SECONDS,
   WOC_MARKET_DURATION_HOURS,
   WOC_MARKET_MAX_ACTIVE_LISTINGS,
-  WOC_MARKET_RESTRICTED_POLICY,
   WOC_MARKET_SETTLEMENT_WINDOW_SECONDS,
   WOC_MARKET_STRANDED_RECLAIM_SECONDS,
   type WocBidStatus,
@@ -336,30 +335,44 @@ export interface WocMarketDb {
     | 'not_active'
     | 'buy_now_pending'
     | 'settlement_live'
+    | 'contended'
   >;
   /** Admin suspend, atomically and only while no payment can be moving: an
-   *  unexpired buy-now lock or a settlement in 'confirming' or beyond (a
-   *  signature exists, so the chain may still land it) refuses the suspend. A
-   *  pre-signature settlement ('offered' or 'failed') is expired, open bids
-   *  cancel with held bonds queued for refund, and the listing closes
-   *  'suspended', all in one transaction. */
+   *  unexpired buy-now lock, a settlement in 'confirming' or beyond (a
+   *  signature exists, so the chain may still land it), or an 'offered'
+   *  settlement holding a live quote (the buyer may already have broadcast
+   *  the transfer; the signature only reaches us at confirm) refuses the
+   *  suspend. A settlement no payment can be riding ('failed', or 'offered'
+   *  with no live quote) is expired, open bids cancel with held bonds queued
+   *  for refund, and the listing closes 'suspended', all in one transaction.
+   *  'contended' is the bounded-lock-wait refusal (55P03/40P01). */
   suspendListingIfSafe(
     realm: string,
     id: number,
     nowMs: number,
-  ): Promise<WocListingRow | 'not_found' | 'not_active' | 'buy_now_pending' | 'settlement_live'>;
+  ): Promise<
+    WocListingRow | 'not_found' | 'not_active' | 'buy_now_pending' | 'settlement_live' | 'contended'
+  >;
   /** Claim due auctions: active AND endsAt <= now become 'ending' (SKIP
    *  LOCKED), returned for resolution. */
   claimDueListings(realm: string, nowMs: number, limit: number): Promise<WocListingRow[]>;
   closeListing(id: number, resolution: WocListingResolution): Promise<void>;
+  /** The no-winner close arms ride this guard: lock the listing, refuse
+   *  (false) when an open settlement rides it, close otherwise. The caller
+   *  parks a refused listing 'settling'. */
+  closeListingIfNoOpenSettlement(id: number, resolution: WocListingResolution): Promise<boolean>;
   markListingSettling(id: number): Promise<void>;
   /** closed && !itemDisposed && resolution != 'sold': the return-flight
    *  reconciliation backlog. */
   undisposedClosedListings(realm: string, limit: number): Promise<WocListingRow[]>;
   /** Listings stuck mid-resolution ('ending' / 'settling') past a grace. */
   strandedListings(realm: string, olderThanMs: number, limit: number): Promise<WocListingRow[]>;
-  /** Re-open a stranded listing so the ordinary close arm resolves it. */
+  /** Re-open a stranded listing so the ordinary close arm resolves it;
+   *  fail-closed no-op while an open settlement rides the listing. */
   reopenListing(id: number): Promise<void>;
+  /** Expire a listing's retry-eligible 'failed' settlements (the reclaim
+   *  arm's sibling of the guards' in-transaction expiry). */
+  expireFailedSettlementsForListing(listingId: number, failReason: string): Promise<void>;
   markItemDisposed(id: number): Promise<void>;
   /** Durable book-once claim: true only for the FIRST claim of this ref. */
   claimCustodyRef(realm: string, custodyRef: string): Promise<boolean>;
@@ -452,17 +465,26 @@ export interface WocMarketDb {
   ): Promise<WocBidRow | null>;
   /** With `from`, a compare-and-set (no-op when the bid left those states). */
   markBidStatus(bidId: number, status: WocBidStatus, from?: WocBidStatus[]): Promise<void>;
+  /** Atomic loser demote: outbid + queue the held bond for refund in one
+   *  statement, compare-and-set from 'active' (a bid a concurrent suspend
+   *  already cancelled is left alone). */
+  markBidOutbidQueueRefund(bidId: number): Promise<void>;
   setBondState(bidId: number, from: WocBondState[], to: WocBondState): Promise<boolean>;
   bondsDue(realm: string, limit: number): Promise<WocBidRow[]>;
   cancelOpenBidsForListing(listingId: number): Promise<WocBidRow[]>;
 
   // Settlements
-  /** Insert the one open settlement for a listing. When `winnerBidId` is set,
-   *  that bid is stamped 'won' in the same transaction as the insert: a
-   *  conflict rolls both back, so no bid can sit 'won' with no settlement.
+  /** Insert the one open settlement for a listing, serialized on the listing
+   *  row lock (bid stamp first, then the listing: the file-wide lock order).
+   *  When `winnerBidId` is set, that bid is stamped 'won' in the same
+   *  transaction as the insert, compare-and-set from `winnerFrom` (default
+   *  active/outbid): a conflict rolls both back, so no bid can sit 'won' with
+   *  no settlement, and a winner that left the pickable states aborts as
+   *  'winner_gone' (treated like 'live_settlement_exists' by every caller).
    *  'listing_closed' means a cancel or suspend closed the listing first
    *  (callers answer not_active); a missing listing keeps the historical
-   *  'live_settlement_exists' conflation. */
+   *  'live_settlement_exists' conflation; 'contended' is the bounded
+   *  lock-wait refusal. */
   insertSettlement(args: {
     listingId: number;
     bidId: number | null;
@@ -475,7 +497,10 @@ export interface WocMarketDb {
     deadlineAtMs: number;
     nowMs: number;
     winnerBidId?: number;
-  }): Promise<WocSettlementRow | 'live_settlement_exists' | 'listing_closed'>;
+    winnerFrom?: WocBidStatus[];
+  }): Promise<
+    WocSettlementRow | 'live_settlement_exists' | 'listing_closed' | 'winner_gone' | 'contended'
+  >;
   settlementById(id: number): Promise<WocSettlementRow | null>;
   settlementsByAccount(realm: string, account: number, limit: number): Promise<WocSettlementRow[]>;
   liveSettlementForListing(listingId: number): Promise<WocSettlementRow | null>;
@@ -490,6 +515,9 @@ export interface WocMarketDb {
     id: number,
     signature: string,
   ): Promise<'ok' | 'not_offered' | 'signature_reused'>;
+  /** False on a CAS miss AND on a 23505 from the one-open-settlement index
+   *  (the failed -> offered revival racing a second open settlement): callers
+   *  must treat false as a typed refusal, never assume the row moved. */
   transitionSettlement(
     id: number,
     from: WocSettlementState[],
@@ -506,7 +534,9 @@ export interface WocMarketDb {
   // Sales, strikes, terms
   insertSale(args: Omit<WocSaleRow, 'id' | 'excluded' | 'atMs'>): Promise<number>;
   salesForItem(realm: string, itemId: string, limit: number): Promise<WocSaleRow[]>;
-  setSaleExcluded(id: number, excluded: boolean): Promise<boolean>;
+  /** 'conflict': re-including a voided row while a standing non-excluded row
+   *  holds the listing's slot (woc_market_sales_listing_once). */
+  setSaleExcluded(id: number, excluded: boolean): Promise<'ok' | 'miss' | 'conflict'>;
   strikeInfo(account: number): Promise<WocStrikeRow | null>;
   addStrike(account: number, suspendedUntilMs: number | null): Promise<WocStrikeRow>;
   clearStrikes(account: number): Promise<void>;
@@ -678,6 +708,12 @@ export type WocMarketRefusal =
   // A payment for the listing is past 'offered' (or delivered but unclosed):
   // cancel and suspend must wait for it to resolve, never race it.
   | 'settlement_in_flight'
+  // The bounded lock wait on a guard transaction expired (55P03) or the
+  // transaction was a deadlock victim (40P01): plain contention, retryable.
+  | 'contended'
+  // An admin sale correction is blocked by a standing non-excluded sale row
+  // for the same listing (woc_market_sales_listing_once).
+  | 'sale_conflict'
   | 'no_buy_now'
   | 'cap_reached'
   | 'lease_lost'
@@ -1157,9 +1193,11 @@ export class WocMarketService {
     if (out === 'has_bids') return refuse('has_bids');
     if (out === 'not_active') return refuse('not_active');
     // A claimed lock resolves within its window ("try again in a moment"); a
-    // settlement past 'offered' resolves only when the payment does.
+    // settlement past 'offered' resolves only when the payment does; plain
+    // row contention retries immediately.
     if (out === 'buy_now_pending') return refuse('buy_now_locked');
     if (out === 'settlement_live') return refuse('settlement_in_flight');
+    if (out === 'contended') return refuse('contended');
     // The return flight rides the sweep's reconciliation (closed, undisposed,
     // resolution != sold), so a crash right here still returns the item.
     await this.returnListingItem(out).catch(() => {});
@@ -1443,9 +1481,17 @@ export class WocMarketService {
       deadlineAtMs: lockExpiresAtMs,
       nowMs,
     });
-    if (settlement === 'live_settlement_exists') {
+    if (settlement === 'live_settlement_exists' || settlement === 'winner_gone') {
+      // winner_gone is unreachable here (no winnerBidId is passed); it rides
+      // this arm so the union stays exhaustively narrowed.
       await this.deps.db.clearBuyNowLock(claimed.id);
       return refuse('buy_now_locked');
+    }
+    if (settlement === 'contended') {
+      // A guard transaction holds the listing row; nothing was inserted.
+      // Release the lock and let the buyer retry immediately.
+      await this.deps.db.clearBuyNowLock(claimed.id);
+      return refuse('contended');
     }
     if (settlement === 'listing_closed') {
       // Belt-and-braces: cancel and suspend refuse while the lock is
@@ -1500,8 +1546,14 @@ export class WocMarketService {
     if (!settlement) return refuse('not_found');
     if (settlement.buyerAccount !== account) return refuse('not_yours');
     if (settlement.state === 'failed') {
-      // A refused confirmation returns to offered for a retry inside the window.
-      await this.deps.db.transitionSettlement(settlement.id, ['failed'], 'offered');
+      // A refused confirmation returns to offered for a retry inside the
+      // window. The revival is a CAS and can also lose to the
+      // one-open-settlement index (a second open settlement raced in over the
+      // retry window; the db layer reports that 23505 as false): a failed
+      // revival must refuse HERE, before any quote is issued, or the buyer
+      // could broadcast a payment no settlement will ever carry.
+      const revived = await this.deps.db.transitionSettlement(settlement.id, ['failed'], 'offered');
+      if (!revived) return refuse('not_active');
     } else if (settlement.state !== 'offered') {
       return refuse('not_active');
     }
@@ -1584,6 +1636,7 @@ export class WocMarketService {
     const out = await this.deps.db.suspendListingIfSafe(this.cfg.realm, listingId, this.now());
     if (out === 'not_found') return refuse('not_found');
     if (out === 'not_active') return refuse('not_active');
+    if (out === 'contended') return refuse('contended');
     if (out === 'buy_now_pending' || out === 'settlement_live') {
       return refuse('settlement_in_flight');
     }
@@ -1592,7 +1645,10 @@ export class WocMarketService {
 
   async adminSetSaleExcluded(saleId: number, excluded: boolean): Promise<{ ok: true } | Refused> {
     const done = await this.deps.db.setSaleExcluded(saleId, excluded);
-    return done ? { ok: true } : refuse('not_found');
+    if (done === 'ok') return { ok: true };
+    // Distinct refusals: a missing row and a correction blocked by a standing
+    // non-excluded sale row are different operator problems.
+    return done === 'conflict' ? refuse('sale_conflict') : refuse('not_found');
   }
 
   async adminClearStrikes(account: number): Promise<{ ok: true }> {
@@ -1647,13 +1703,26 @@ export class WocMarketService {
       const standing = bids.find((b) => b.status === 'active');
       const reserve = listing.reserveCents;
       if (!standing) {
-        await this.deps.db.closeListing(listing.id, 'no_bids');
+        // Guarded close: a buy-now settlement placed inside the closing
+        // window may be riding this listing, and this arm never reaches
+        // insertSettlement's unique-index arbiter, so an unguarded close here
+        // was the item-dupe hole (return sweep mails the escrow home while
+        // the buyer can still pay). A refusal parks the listing 'settling';
+        // the delivery and overdue sweeps resolve the settlement and the
+        // ordinary close paths finish the job.
+        if (!(await this.deps.db.closeListingIfNoOpenSettlement(listing.id, 'no_bids'))) {
+          await this.deps.db.markListingSettling(listing.id);
+        }
         continue;
       }
       if (reserve !== null && standing.amountCents < reserve) {
-        await this.deps.db.markBidStatus(standing.id, 'outbid');
-        await this.deps.db.setBondState(standing.id, ['held'], 'refund_due');
-        await this.deps.db.closeListing(listing.id, 'reserve_not_met');
+        // Atomic demote: outbid plus the held-bond refund ride ONE statement,
+        // so a crash between them can never strand a held bond no sweep arm
+        // reaches. Same guarded close as the no-bids arm above.
+        await this.deps.db.markBidOutbidQueueRefund(standing.id);
+        if (!(await this.deps.db.closeListingIfNoOpenSettlement(listing.id, 'reserve_not_met'))) {
+          await this.deps.db.markListingSettling(listing.id);
+        }
         continue;
       }
       const settlement = await this.deps.db.insertSettlement({
@@ -1668,22 +1737,32 @@ export class WocMarketService {
         deadlineAtMs: nowMs + WOC_MARKET_SETTLEMENT_WINDOW_SECONDS * 1000,
         nowMs,
         // Stamped 'won' inside the insert's transaction, so the race below can
-        // never leave a settlement-less winner.
+        // never leave a settlement-less winner. The close-time winner is
+        // always read as 'active' just above, so the pickable set is exactly
+        // that: a bid something else moved off 'active' meanwhile has lost
+        // its claim and must not be stamped.
         winnerBidId: standing.id,
+        winnerFrom: ['active'],
       });
       if (settlement === 'listing_closed') {
         // A suspend closed the listing under our 'ending' claim; it already
         // resolved the bid book and the bonds, so there is nothing to settle.
         continue;
       }
-      if (settlement === 'live_settlement_exists') {
-        // A buy-now settlement is already in flight: that buyer won the race.
-        // The standing bid loses its claim (the insert and its 'won' stamp
-        // rolled back together) and its bond rides the refund pipeline. The
-        // compare-and-set from 'active' cannot resurrect a bid a concurrent
-        // suspend already cancelled.
-        await this.deps.db.markBidStatus(standing.id, 'outbid', ['active']);
-        await this.deps.db.setBondState(standing.id, ['held'], 'refund_due');
+      if (settlement === 'contended') {
+        // A guard transaction holds the listing row; nothing was written.
+        // Leave the claim as-is: the stranded reclaim re-opens an 'ending'
+        // row after its grace and the next pass retries the close.
+        continue;
+      }
+      if (settlement === 'live_settlement_exists' || settlement === 'winner_gone') {
+        // A buy-now settlement is already in flight (or a concurrent suspend
+        // took the winner off 'active'): that racer won. The standing bid
+        // loses its claim (the insert and its 'won' stamp rolled back
+        // together) and its bond rides the refund pipeline, atomically; the
+        // demote's own compare-and-set from 'active' cannot resurrect a bid
+        // a concurrent suspend already cancelled.
+        await this.deps.db.markBidOutbidQueueRefund(standing.id);
       }
       // Either way the listing leaves 'ending': a claimed row that stays there
       // is unreachable forever (claimDueListings only selects 'active'), which
@@ -1713,6 +1792,11 @@ export class WocMarketService {
     for (const listing of stranded) {
       const live = await this.deps.db.liveSettlementForListing(listing.id);
       if (live) continue; // genuinely settling; leave it alone
+      // A retry-eligible 'failed' settlement must not survive the reopen: its
+      // revival would ride a listing that is being re-bid (both guards expire
+      // these for the same reason). The reopen itself is fail-closed against
+      // an open settlement landing between these statements.
+      await this.deps.db.expireFailedSettlementsForListing(listing.id, 'listing_reclaimed');
       await this.deps.db.reopenListing(listing.id);
       reopened++;
     }
@@ -1796,15 +1880,22 @@ export class WocMarketService {
             amountCents: next.amountCents,
             deadlineAtMs: nowMs + WOC_MARKET_SETTLEMENT_WINDOW_SECONDS * 1000,
             nowMs,
+            // The cascade only ever promotes an 'outbid' runner-up
+            // (nextCascadeBidder's selection), so that is the whole pickable
+            // set here.
             winnerBidId: next.id,
+            winnerFrom: ['outbid'],
           });
-          if (cascaded === 'live_settlement_exists' || cascaded === 'listing_closed') {
-            // Reachable when a cancel or suspend closed the listing between
-            // this arm's listingById read and the insert, or when a second
-            // open settlement raced in over the retry window of the 'failed'
-            // row this arm expired. The insert (and its 'won' stamp) rolled
-            // back; unwind the re-hold so the bond cannot sit held on a bid
-            // with no claim.
+          if (typeof cascaded === 'string') {
+            // live_settlement_exists / listing_closed: a cancel or suspend
+            // closed the listing between this arm's listingById read and the
+            // insert (the insert's own listing lock is what refuses now), or
+            // a second open settlement raced in over the retry window of the
+            // 'failed' row this arm expired. winner_gone: a suspend cancelled
+            // the runner-up under us. contended: a guard holds the listing
+            // row and nothing was written. In every arm the insert (and any
+            // 'won' stamp) rolled back; unwind the re-hold so the bond cannot
+            // sit held on a bid with no claim.
             await this.deps.db.setBondState(next.id, ['held'], 'refund_due');
           }
           continue;

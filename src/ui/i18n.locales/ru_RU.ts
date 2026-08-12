@@ -8725,6 +8725,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Другой покупатель завершает эту покупку. Попробуйте чуть позже.',
   'apiError.woc_market.settlement_in_flight':
     'Покупатель оплачивает этот лот. Повторите попытку, когда платёж завершится.',
+  'apiError.woc_market.contended': 'Биржа занята другой операцией с этим лотом. Повторите попытку через мгновение.',
+  'apiError.woc_market.sale_conflict': 'Для этого лота уже существует другая действующая запись о продаже.',
   'apiError.woc_market.no_buy_now': 'У этого лота нет цены мгновенной покупки.',
   'apiError.woc_market.cap_reached': 'Вы достигли лимита лотов на бирже.',
   'apiError.woc_market.stale_item':

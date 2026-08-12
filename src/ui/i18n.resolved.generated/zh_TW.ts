@@ -4136,6 +4136,8 @@ export const zh_TW: EnTranslations = {
       "confirm_failed": "交易未能確認。請重新取得報價後再試。",
       "buy_now_locked": "另一位買家正在完成這筆購買，請稍後再試。",
       "settlement_in_flight": "有買家正在為該掛單付款。請等付款結算完成後再試。",
+      "contended": "交易所正在處理該掛單的其他操作。請稍後再試。",
+      "sale_conflict": "該掛單已有另一條有效的成交記錄。",
       "no_buy_now": "該掛單沒有直購價。",
       "cap_reached": "你已達到交易所掛單數量上限。",
       "stale_item": "該物品已變動或被移動。請重新選擇後再試。",

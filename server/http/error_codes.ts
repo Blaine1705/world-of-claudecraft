@@ -284,6 +284,12 @@ export const ERROR_CODES = deepFreeze({
   // A buyer's payment for this listing is past the point of no return;
   // cancel/suspend must wait for it to resolve (409).
   'woc_market.settlement_in_flight': { params: [] },
+  // The listing row is briefly held by another market transaction; plain
+  // contention, retry immediately (409).
+  'woc_market.contended': { params: [] },
+  // An admin sale correction is blocked by a standing non-excluded sale row
+  // for the same listing (409).
+  'woc_market.sale_conflict': { params: [] },
   // The listing has no buy-now price (400).
   'woc_market.no_buy_now': { params: [] },
   // The per-account active-listing cap is reached (409).

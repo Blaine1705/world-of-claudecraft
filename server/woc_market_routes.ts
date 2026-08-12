@@ -138,6 +138,8 @@ export const REFUSAL_ERRORS: Record<WocMarketRefusal, { status: number; code: Er
   confirm_failed: { status: 409, code: 'woc_market.confirm_failed' },
   buy_now_locked: { status: 409, code: 'woc_market.buy_now_locked' },
   settlement_in_flight: { status: 409, code: 'woc_market.settlement_in_flight' },
+  contended: { status: 409, code: 'woc_market.contended' },
+  sale_conflict: { status: 409, code: 'woc_market.sale_conflict' },
   no_buy_now: { status: 400, code: 'woc_market.no_buy_now' },
   cap_reached: { status: 409, code: 'woc_market.cap_reached' },
   lease_lost: { status: 409, code: 'woc_market.stale_item' },
@@ -609,6 +611,16 @@ async function adminSaleExcludedHandler(ctx: Ctx): Promise<void> {
   }
   const out = await useService().adminSetSaleExcluded(adminTargetId(ctx), body.excluded);
   if (!out.ok) {
+    // Distinct operator answers: a missing row versus a correction blocked by
+    // a standing non-excluded sale row for the same listing.
+    if (out.reason === 'sale_conflict') {
+      json(ctx.res, 409, {
+        success: false,
+        data: null,
+        error: 'another live sale row stands for this listing; exclude it first',
+      });
+      return;
+    }
     json(ctx.res, 404, { success: false, data: null, error: 'sale not found' });
     return;
   }

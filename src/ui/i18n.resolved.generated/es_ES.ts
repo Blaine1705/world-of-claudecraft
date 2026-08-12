@@ -4136,6 +4136,8 @@ export const es_ES: EnTranslations = {
       "confirm_failed": "The transaction could not be confirmed. Request a fresh quote and try again.",
       "buy_now_locked": "Another buyer is completing this purchase. Try again in a moment.",
       "settlement_in_flight": "A buyer is paying for this listing. Try again once the payment settles.",
+      "contended": "The Exchange is busy with this listing. Try again in a moment.",
+      "sale_conflict": "Another live sale record already stands for this listing.",
       "no_buy_now": "This listing has no buy-now price.",
       "cap_reached": "You have reached your Exchange listing limit.",
       "stale_item": "That item changed or moved. Re-select it and try again.",

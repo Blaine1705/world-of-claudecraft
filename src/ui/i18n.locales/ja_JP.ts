@@ -8608,6 +8608,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '別の買い手がこの購入を進めています。しばらくしてからもう一度お試しください。',
   'apiError.woc_market.settlement_in_flight':
     '買い手がこの出品の支払いを進めています。決済が完了してから、もう一度お試しください。',
+  'apiError.woc_market.contended':
+    '取引所はこの出品の別の処理を実行中です。しばらくしてからもう一度お試しください。',
+  'apiError.woc_market.sale_conflict': 'この出品には別の有効な販売記録がすでに存在します。',
   'apiError.woc_market.no_buy_now': 'この出品には即決価格がありません。',
   'apiError.woc_market.cap_reached': '取引所への出品数の上限に達しています。',
   'apiError.woc_market.stale_item':

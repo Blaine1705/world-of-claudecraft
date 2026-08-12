@@ -200,16 +200,36 @@ CREATE TABLE IF NOT EXISTS woc_market_settlements (
 -- unique index below would abort the WHOLE realm boot on such a pair. Keep
 -- the most-advanced settlement per listing and expire the rest under a
 -- greppable reason. A no-op on healthy databases; idempotent after repair.
--- Gated on the index not existing yet, so the scan runs once per legacy
--- database and never again (to_regclass folds to a constant at plan time).
+-- Gated on a VALID index of that name not existing yet, so the scan runs
+-- once per legacy database and never again. The Var-free qual is not
+-- constant-folded (these catalog reads are STABLE, not IMMUTABLE); the
+-- planner treats it as a pseudoconstant and emits a one-time filter, so the
+-- ranked subquery is planned but never executed on a healthy boot. Validity,
+-- not bare existence: a failed CONCURRENTLY build (an incident-response hand
+-- build; boot DDL itself is transactional and leaves no carcass) satisfies
+-- to_regclass AND the IF NOT EXISTS below while enforcing nothing, which
+-- would silently skip both the repair and the rebuild. Unbatched by design:
+-- safe only while this table is pre-enable empty or scanned once per
+-- upgrade; a re-use of this pattern on a populated table batches it.
+-- The demotion keeps any prior fail_reason behind the greppable marker, and
+-- delivered -> expired here is a deliberate exception to the
+-- SETTLEMENT_TRANSITIONS terminality in woc_market_rules.ts (raw repair SQL,
+-- not the runtime transition path).
 -- Operator note for a legacy upgrade: rows this demoted carry
--- fail_reason = 'schema_dedupe'; any demoted row that had reached
+-- fail_reason LIKE 'schema_dedupe%'; any demoted row that had reached
 -- 'confirming' or beyond was a payment that may still land, so sweep
--- SELECT * FROM woc_market_settlements WHERE fail_reason = 'schema_dedupe'
+-- SELECT * FROM woc_market_settlements WHERE fail_reason LIKE 'schema_dedupe%'
 -- after the first boot and reconcile by hand.
 UPDATE woc_market_settlements
-   SET state = 'expired', fail_reason = 'schema_dedupe', updated_at = now()
- WHERE to_regclass('woc_market_settlements_open') IS NULL
+   SET state = 'expired',
+       fail_reason = 'schema_dedupe' || COALESCE(':' || fail_reason, ''),
+       updated_at = now()
+ WHERE NOT EXISTS (
+     SELECT 1 FROM pg_index i
+       JOIN pg_class c ON c.oid = i.indexrelid
+       JOIN pg_namespace n ON n.oid = c.relnamespace
+      WHERE n.nspname = 'public' AND c.relname = 'woc_market_settlements_open'
+        AND i.indisvalid)
    AND id IN (
    SELECT id FROM (
      SELECT id, row_number() OVER (
@@ -234,6 +254,20 @@ UPDATE woc_market_settlements
 -- correctness authority the insert path relies on from the first request (a
 -- CONCURRENTLY build can leave an INVALID carcass, which would silently drop
 -- the invariant). Any post-launch index work here rides concurrent_indexes.ts.
+-- Drop an INVALID same-named carcass first: IF NOT EXISTS matches on NAME
+-- only, so a carcass would otherwise be kept and enforce nothing. The same
+-- name-only matching means any future change to this index's predicate needs
+-- a NEW index name (or an explicit DROP); it cannot be edited in place.
+DO $woc_open_idx$ BEGIN
+  IF EXISTS (
+    SELECT 1 FROM pg_index i
+      JOIN pg_class c ON c.oid = i.indexrelid
+      JOIN pg_namespace n ON n.oid = c.relnamespace
+     WHERE n.nspname = 'public' AND c.relname = 'woc_market_settlements_open'
+       AND NOT i.indisvalid) THEN
+    EXECUTE 'DROP INDEX public.woc_market_settlements_open';
+  END IF;
+END $woc_open_idx$;
 CREATE UNIQUE INDEX IF NOT EXISTS woc_market_settlements_open
   ON woc_market_settlements(listing_id)
   WHERE state IN ('offered', 'confirming', 'confirmed', 'delivering', 'delivered');
@@ -279,10 +313,17 @@ CREATE INDEX IF NOT EXISTS woc_market_sales_item
 -- double delivery left two non-excluded sale rows for one listing, and the
 -- unique index below would abort the boot on them. Keep the EARLIEST row and
 -- void later duplicates (excluded = true preserves them for audit). The
--- to_regclass gate matters MORE here: sales are keep-forever, so an ungated
--- repair would re-scan the whole provenance table at every boot.
+-- validity gate matters MORE here: sales are keep-forever, so an ungated
+-- repair would re-scan the whole provenance table at every boot (the same
+-- pseudoconstant one-time-filter mechanics as the settlements repair above,
+-- and the same INVALID-carcass reasoning for gating on indisvalid).
 UPDATE woc_market_sales SET excluded = true
- WHERE to_regclass('woc_market_sales_listing_once') IS NULL
+ WHERE NOT EXISTS (
+     SELECT 1 FROM pg_index i
+       JOIN pg_class c ON c.oid = i.indexrelid
+       JOIN pg_namespace n ON n.oid = c.relnamespace
+      WHERE n.nspname = 'public' AND c.relname = 'woc_market_sales_listing_once'
+        AND i.indisvalid)
    AND id IN (
    SELECT id FROM (
      SELECT id, row_number() OVER (PARTITION BY listing_id ORDER BY id ASC) AS rn
@@ -293,6 +334,18 @@ UPDATE woc_market_sales SET excluded = true
 -- One sale row per listing, forever: a double delivery fails closed here
 -- rather than minting a second provenance row. Partial on excluded so an
 -- operator who voids a bogus row (excluded = true) can land its correction.
+-- Same carcass rule as the settlements index: drop an INVALID leftover so
+-- IF NOT EXISTS cannot keep a name-matching index that enforces nothing.
+DO $woc_sale_idx$ BEGIN
+  IF EXISTS (
+    SELECT 1 FROM pg_index i
+      JOIN pg_class c ON c.oid = i.indexrelid
+      JOIN pg_namespace n ON n.oid = c.relnamespace
+     WHERE n.nspname = 'public' AND c.relname = 'woc_market_sales_listing_once'
+       AND NOT i.indisvalid) THEN
+    EXECUTE 'DROP INDEX public.woc_market_sales_listing_once';
+  END IF;
+END $woc_sale_idx$;
 CREATE UNIQUE INDEX IF NOT EXISTS woc_market_sales_listing_once
   ON woc_market_sales(listing_id)
   WHERE excluded = false;
@@ -561,9 +614,22 @@ function toSale(row: Row): WocSaleRow {
 }
 
 /** Control-flow marker: abort the enclosing withTx (ROLLBACK, discarding any
- *  write already made this transaction) and resolve with `value` instead. */
+ *  write already made this transaction) and resolve with `value` instead.
+ *  The payload is NOT type-checked against the enclosing withTx<T> (the catch
+ *  casts), so spell the value exactly; an annotation on the throw would be
+ *  decorative, never write one. */
 class TxAbort<T> {
   constructor(readonly value: T) {}
+}
+
+/** 55P03 (lock_timeout) and 40P01 (deadlock victim): the row set is contended
+ *  by another market transaction. The guards surface these as a typed
+ *  'contended' retry refusal; without the mapping they 500 as internal.error,
+ *  which contradicts the lock_timeout rationale comments and logs contention
+ *  as a server fault. */
+function isLockContention(err: unknown): boolean {
+  const code = (err as { code?: string }).code;
+  return code === '55P03' || code === '40P01';
 }
 
 export class PgWocMarketDb implements WocMarketDb {
@@ -1090,147 +1156,177 @@ export class PgWocMarketDb implements WocMarketDb {
     | 'not_active'
     | 'buy_now_pending'
     | 'settlement_live'
+    | 'contended'
   > {
-    return this.withTx(async (client) => {
-      // Fail fast on a contended row instead of pinning a pooled client for
-      // the 15 s session bound (the escrowInsertListing rationale; a rare
-      // 55P03 surfaces as a retryable error).
-      await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
-      const res = await client.query(
-        `SELECT ${LISTING_COLS} FROM woc_market_listings
+    try {
+      return await this.withTx(async (client) => {
+        // Fail fast on a contended row instead of pinning a pooled client for
+        // the 15 s session bound (the escrowInsertListing rationale; the rare
+        // 55P03 surfaces as the typed 'contended' refusal below).
+        await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
+        // LOCK ORDER note: this transaction takes the LISTING row first and
+        // never acquires any bid row lock (the bid probe below is a plain
+        // read), which is the only reason listing-first is deadlock-free
+        // here. Any future bid-row WRITE in this transaction must first take
+        // the ordered open-bid-set lock the way suspendListingIfSafe and
+        // activateBid do (bids by id, then the listing).
+        const res = await client.query(
+          `SELECT ${LISTING_COLS} FROM woc_market_listings
           WHERE realm = $1 AND id = $2 FOR UPDATE`,
-        [realm, id],
-      );
-      const row = res.rows[0];
-      if (!row) return 'not_found' as const;
-      if (row.seller_account !== sellerAccount) return 'not_yours' as const;
-      if (row.status !== 'active') return 'not_active' as const;
-      const bids = await client.query(
-        `SELECT 1 FROM woc_market_bids
+          [realm, id],
+        );
+        const row = res.rows[0];
+        if (!row) return 'not_found' as const;
+        if (row.seller_account !== sellerAccount) return 'not_yours' as const;
+        if (row.status !== 'active') return 'not_active' as const;
+        const bids = await client.query(
+          `SELECT 1 FROM woc_market_bids
           WHERE listing_id = $1 AND status IN ('pending_bond', 'active') LIMIT 1`,
-        [id],
-      );
-      if ((bids.rowCount ?? 0) > 0) return 'has_bids' as const;
-      // The row lock above serializes this against claimBuyNowLock (an UPDATE
-      // on the same row), and a buy-now settlement is only ever created behind
-      // a claimed lock, so refusing an unexpired lock covers the whole
-      // claim-then-insert window: a racer either landed before the lock
-      // (visible here) or blocks on the row and re-checks against the closed
-      // listing.
-      if (
-        row.buy_now_lock_account !== null &&
-        row.buy_now_lock_expires !== null &&
-        ms(row.buy_now_lock_expires) > nowMs
-      ) {
-        return 'buy_now_pending' as const;
-      }
-      // Expire-then-check, in that order. A leftover 'failed' settlement is
-      // retry-eligible (failed -> offered) and the retry CAS never touches the
-      // listing row, so a plain read here could miss a retry committing
-      // mid-transaction. The expire UPDATE takes the settlement row locks: a
-      // concurrent retry either loses its CAS against the expired row, or won
-      // first and the check below sees the revived 'offered' and aborts,
-      // rolling the expiry back.
-      await client.query(
-        `UPDATE woc_market_settlements
+          [id],
+        );
+        if ((bids.rowCount ?? 0) > 0) return 'has_bids' as const;
+        // The row lock above serializes this against claimBuyNowLock (an UPDATE
+        // on the same row), and a buy-now settlement is only ever created behind
+        // a claimed lock, so refusing an unexpired lock covers the whole
+        // claim-then-insert window: a racer either landed before the lock
+        // (visible here) or blocks on the row and re-checks against the closed
+        // listing.
+        if (
+          row.buy_now_lock_account !== null &&
+          row.buy_now_lock_expires !== null &&
+          ms(row.buy_now_lock_expires) > nowMs
+        ) {
+          return 'buy_now_pending' as const;
+        }
+        // Expire-then-check, in that order. A leftover 'failed' settlement is
+        // retry-eligible (failed -> offered) and the retry CAS never touches the
+        // listing row, so a plain read here could miss a retry committing
+        // mid-transaction. The expire UPDATE takes the settlement row locks: a
+        // concurrent retry either loses its CAS against the expired row, or won
+        // first and the check below sees the revived 'offered' and aborts,
+        // rolling the expiry back.
+        await client.query(
+          `UPDATE woc_market_settlements
             SET state = 'expired', fail_reason = 'listing_cancelled', updated_at = now()
           WHERE listing_id = $1 AND state = 'failed'`,
-        [id],
-      );
-      const open = await client.query(
-        `SELECT 1 FROM woc_market_settlements
+          [id],
+        );
+        const open = await client.query(
+          `SELECT 1 FROM woc_market_settlements
           WHERE listing_id = $1
             AND state IN ('offered', 'confirming', 'confirmed', 'delivering', 'delivered')
           LIMIT 1`,
-        [id],
-      );
-      if ((open.rowCount ?? 0) > 0) throw new TxAbort('settlement_live' as const);
-      const updated = await client.query(
-        `UPDATE woc_market_listings
+          [id],
+        );
+        if ((open.rowCount ?? 0) > 0) throw new TxAbort('settlement_live' as const);
+        const updated = await client.query(
+          `UPDATE woc_market_listings
             SET status = 'closed', resolution = 'cancelled', updated_at = now()
           WHERE id = $1
           RETURNING ${LISTING_COLS}`,
-        [id],
-      );
-      return toListing(updated.rows[0]);
-    });
+          [id],
+        );
+        return toListing(updated.rows[0]);
+      });
+    } catch (err) {
+      if (isLockContention(err)) return 'contended' as const;
+      throw err;
+    }
   }
 
   async suspendListingIfSafe(
     realm: string,
     id: number,
     nowMs: number,
-  ): Promise<WocListingRow | 'not_found' | 'not_active' | 'buy_now_pending' | 'settlement_live'> {
-    return this.withTx(async (client) => {
-      // Fail fast on contention (the escrowInsertListing rationale).
-      await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
-      // Lock order is bids THEN listing, matching activateBid (which locks its
-      // bid row before the listing row): the reverse order deadlocks against a
-      // concurrent bond activation. Bids inserted after this pass block on the
-      // listing lock below (insertPendingBid locks the listing row), and the
-      // cancel UPDATE further down re-scans by listing_id, so none are missed.
-      await client.query(
-        `SELECT id FROM woc_market_bids
+  ): Promise<
+    WocListingRow | 'not_found' | 'not_active' | 'buy_now_pending' | 'settlement_live' | 'contended'
+  > {
+    try {
+      return await this.withTx(async (client) => {
+        // Fail fast on contention (the escrowInsertListing rationale; the rare
+        // 55P03 or 40P01 surfaces as the typed 'contended' refusal below).
+        await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
+        // Lock order is bids THEN listing, matching activateBid (which locks its
+        // bid row before the listing row): the reverse order deadlocks against a
+        // concurrent bond activation. Bids inserted after this pass block on the
+        // listing lock below (insertPendingBid locks the listing row), and the
+        // cancel UPDATE further down re-scans by listing_id, so none are missed.
+        await client.query(
+          `SELECT id FROM woc_market_bids
           WHERE listing_id = $1 AND status IN ('pending_bond', 'active')
           ORDER BY id
           FOR UPDATE`,
-        [id],
-      );
-      const res = await client.query(
-        `SELECT ${LISTING_COLS} FROM woc_market_listings
+          [id],
+        );
+        const res = await client.query(
+          `SELECT ${LISTING_COLS} FROM woc_market_listings
           WHERE realm = $1 AND id = $2 FOR UPDATE`,
-        [realm, id],
-      );
-      const row = res.rows[0];
-      if (!row) return 'not_found' as const;
-      if (row.status === 'closed') return 'not_active' as const;
-      if (
-        row.buy_now_lock_account !== null &&
-        row.buy_now_lock_expires !== null &&
-        ms(row.buy_now_lock_expires) > nowMs
-      ) {
-        return 'buy_now_pending' as const;
-      }
-      // Only a pre-signature settlement ('offered', or 'failed' awaiting a
-      // retry) is safe to expire; 'confirming' and beyond means a signature
-      // exists and the payment may still land no matter what this transaction
-      // does. Expire-then-check: the expire UPDATE locks the settlement rows,
-      // so a buyer's offered -> confirming CAS either loses against the
-      // expired row or won first, in which case the check below sees the open
-      // settlement and aborts, rolling the expiry back.
-      await client.query(
-        `UPDATE woc_market_settlements
+          [realm, id],
+        );
+        const row = res.rows[0];
+        if (!row) return 'not_found' as const;
+        if (row.status === 'closed') return 'not_active' as const;
+        if (
+          row.buy_now_lock_account !== null &&
+          row.buy_now_lock_expires !== null &&
+          ms(row.buy_now_lock_expires) > nowMs
+        ) {
+          return 'buy_now_pending' as const;
+        }
+        // Only a pre-signature settlement ('offered', or 'failed' awaiting a
+        // retry) is safe to expire; 'confirming' and beyond means a signature
+        // exists and the payment may still land no matter what this transaction
+        // does. Expire-then-check: the expire UPDATE locks the settlement rows,
+        // so a buyer's offered -> confirming CAS either loses against the
+        // expired row or won first, in which case the check below sees the open
+        // settlement and aborts, rolling the expiry back.
+        // Only a settlement no payment can be riding is safe to expire: 'failed'
+        // (awaiting a retry), or 'offered' with NO live quote. A stamped,
+        // unexpired quote means the buyer may already have broadcast the
+        // on-chain transfer (the signature only reaches the server at confirm,
+        // which is what moves the row to 'confirming'), so a quoted 'offered'
+        // row refuses the suspend exactly like 'confirming' and beyond.
+        await client.query(
+          `UPDATE woc_market_settlements
             SET state = 'expired', fail_reason = 'listing_suspended', updated_at = now()
-          WHERE listing_id = $1 AND state IN ('offered', 'failed')`,
-        [id],
-      );
-      const open = await client.query(
-        `SELECT 1 FROM woc_market_settlements
+          WHERE listing_id = $1
+            AND (state = 'failed'
+              OR (state = 'offered'
+                AND (quote_reference IS NULL OR quote_expires IS NULL
+                  OR quote_expires <= to_timestamp($2 / 1000.0))))`,
+          [id, nowMs],
+        );
+        const open = await client.query(
+          `SELECT 1 FROM woc_market_settlements
           WHERE listing_id = $1
             AND state IN ('offered', 'confirming', 'confirmed', 'delivering', 'delivered')
           LIMIT 1`,
-        [id],
-      );
-      if ((open.rowCount ?? 0) > 0) throw new TxAbort('settlement_live' as const);
-      // Cancel the open bid book and queue every funded bond for refund in the
-      // same statement (the activateBid CASE idiom), so a crash can never
-      // leave a suspended listing holding live bids or a stranded bond.
-      await client.query(
-        `UPDATE woc_market_bids
+          [id],
+        );
+        if ((open.rowCount ?? 0) > 0) throw new TxAbort('settlement_live' as const);
+        // Cancel the open bid book and queue every funded bond for refund in the
+        // same statement (the activateBid CASE idiom), so a crash can never
+        // leave a suspended listing holding live bids or a stranded bond.
+        await client.query(
+          `UPDATE woc_market_bids
             SET status = 'cancelled',
                 bond_state = CASE WHEN bond_state = 'held' THEN 'refund_due' ELSE bond_state END
           WHERE listing_id = $1 AND status IN ('pending_bond', 'active')`,
-        [id],
-      );
-      const updated = await client.query(
-        `UPDATE woc_market_listings
+          [id],
+        );
+        const updated = await client.query(
+          `UPDATE woc_market_listings
             SET status = 'closed', resolution = 'suspended', updated_at = now()
           WHERE id = $1
           RETURNING ${LISTING_COLS}`,
-        [id],
-      );
-      return toListing(updated.rows[0]);
-    });
+          [id],
+        );
+        return toListing(updated.rows[0]);
+      });
+    } catch (err) {
+      if (isLockContention(err)) return 'contended' as const;
+      throw err;
+    }
   }
 
   async claimDueListings(realm: string, nowMs: number, limit: number): Promise<WocListingRow[]> {
@@ -1246,6 +1342,57 @@ export class PgWocMarketDb implements WocMarketDb {
       [realm, nowMs, limit],
     );
     return res.rows.map(toListing);
+  }
+
+  /** The no-winner close arms (no_bids, reserve_not_met) ride this guarded
+   *  variant: those arms never reach insertSettlement's unique-index arbiter,
+   *  so an unguarded close would land under a live buy-now settlement (a
+   *  buy-now placed inside the closing window; the lock has no ends_at fence
+   *  by design), and the return sweep would mail the escrowed item home while
+   *  the buyer can still pay and be delivered a second copy. Lock first, then
+   *  check, then close: a single guarded UPDATE is NOT enough here, because a
+   *  blocked UPDATE re-checks its qual via EvalPlanQual, whose subquery still
+   *  reads the OLD statement snapshot and can miss a settlement that
+   *  committed while we waited. Under the held row lock, insertSettlement
+   *  (which takes the same lock first) cannot be mid-flight, and a fresh
+   *  statement sees everything committed before the lock was granted. A
+   *  false return means a settlement is riding the listing (or the row is
+   *  contended); the caller parks it 'settling' and the delivery or overdue
+   *  sweeps resolve it. */
+  async closeListingIfNoOpenSettlement(
+    id: number,
+    resolution: WocListingResolution,
+  ): Promise<boolean> {
+    try {
+      return await this.withTx(async (client) => {
+        await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
+        const row = await client.query(
+          `SELECT status FROM woc_market_listings WHERE id = $1 FOR UPDATE`,
+          [id],
+        );
+        if (!row.rows[0] || row.rows[0].status === 'closed') return false;
+        const open = await client.query(
+          `SELECT 1 FROM woc_market_settlements
+            WHERE listing_id = $1
+              AND state IN ('offered', 'confirming', 'confirmed', 'delivering', 'delivered')
+            LIMIT 1`,
+          [id],
+        );
+        if ((open.rowCount ?? 0) > 0) return false;
+        await client.query(
+          `UPDATE woc_market_listings
+              SET status = 'closed', resolution = $2, updated_at = now()
+            WHERE id = $1`,
+          [id, resolution],
+        );
+        return true;
+      });
+    } catch (err) {
+      // Contention here means a settlement insert is landing; treat it like a
+      // live settlement and let the caller park the listing.
+      if (isLockContention(err)) return false;
+      throw err;
+    }
   }
 
   async closeListing(id: number, resolution: WocListingResolution): Promise<void> {
@@ -1293,10 +1440,48 @@ export class PgWocMarketDb implements WocMarketDb {
   }
 
   async reopenListing(id: number): Promise<void> {
+    // Fail-closed twin of the reclaim arm's liveness read: the read and this
+    // write are separate statements, so a settlement that lands between them
+    // (a revived 'failed' row, a buy-now inside the closing window) must
+    // refuse the reopen here rather than re-auction a listing a payment is
+    // riding. The next reclaim pass re-evaluates.
     await this.pool.query(
       `UPDATE woc_market_listings SET status = 'active', updated_at = now()
-        WHERE id = $1 AND status IN ('ending', 'settling')`,
+        WHERE id = $1 AND status IN ('ending', 'settling')
+          AND NOT EXISTS (
+            SELECT 1 FROM woc_market_settlements s
+             WHERE s.listing_id = woc_market_listings.id
+               AND s.state IN ('offered', 'confirming', 'confirmed', 'delivering', 'delivered'))`,
       [id],
+    );
+  }
+
+  /** Reclaim-arm sibling of the guards' expiry statements: a stranded listing
+   *  must not go back to 'active' with a retry-eligible 'failed' settlement
+   *  still attached (its revival would ride a listing that is being re-bid).
+   *  Expiring 'failed' rows is idempotent and safe standalone; the reopen
+   *  above fail-closes if a revival races this. */
+  async expireFailedSettlementsForListing(listingId: number, failReason: string): Promise<void> {
+    await this.pool.query(
+      `UPDATE woc_market_settlements
+          SET state = 'expired', fail_reason = $2, updated_at = now()
+        WHERE listing_id = $1 AND state = 'failed'`,
+      [listingId, failReason],
+    );
+  }
+
+  /** Atomic loser demote: outbid the bid and queue its held bond for refund
+   *  in ONE statement (the activateBid CASE idiom), compare-and-set from
+   *  'active' so a bid a concurrent suspend already cancelled is left alone.
+   *  The old two-statement shape could crash between the status write and the
+   *  bond write, leaving a held bond no sweep arm would ever reach. */
+  async markBidOutbidQueueRefund(bidId: number): Promise<void> {
+    await this.pool.query(
+      `UPDATE woc_market_bids
+          SET status = 'outbid',
+              bond_state = CASE WHEN bond_state = 'held' THEN 'refund_due' ELSE bond_state END
+        WHERE id = $1 AND status = 'active'`,
+      [bidId],
     );
   }
 
@@ -1557,6 +1742,25 @@ export class PgWocMarketDb implements WocMarketDb {
     nowMs: number,
   ): Promise<'activated' | 'superseded' | 'listing_closed' | 'not_pending'> {
     return this.withTx(async (client) => {
+      // Lock the whole open bid set for the listing in id order BEFORE the
+      // listing row (the file-wide order; suspendListingIfSafe scans the same
+      // way). The old shape locked only its own bid here and acquired the
+      // PREVIOUS current bid later, after the listing, which crossed the
+      // suspend guard's ordered scan and deadlocked 40P01 whenever the
+      // previous bid had the lower id. The unlocked peek is only a router: a
+      // bid that changes state before the ordered lock lands is re-read under
+      // the lock below and answered 'not_pending'.
+      const peek = await client.query(`SELECT listing_id FROM woc_market_bids WHERE id = $1`, [
+        bidId,
+      ]);
+      if (!peek.rows[0]) return 'not_pending' as const;
+      await client.query(
+        `SELECT id FROM woc_market_bids
+          WHERE listing_id = $1 AND status IN ('pending_bond', 'active')
+          ORDER BY id
+          FOR UPDATE`,
+        [peek.rows[0].listing_id],
+      );
       const bidRes = await client.query(
         `SELECT ${BID_COLS} FROM woc_market_bids WHERE id = $1 FOR UPDATE`,
         [bidId],
@@ -1734,29 +1938,54 @@ export class PgWocMarketDb implements WocMarketDb {
     deadlineAtMs: number;
     nowMs: number;
     winnerBidId?: number;
-  }): Promise<WocSettlementRow | 'live_settlement_exists' | 'listing_closed'> {
+    winnerFrom?: WocBidStatus[];
+  }): Promise<
+    WocSettlementRow | 'live_settlement_exists' | 'listing_closed' | 'winner_gone' | 'contended'
+  > {
     try {
       return await this.withTx(async (client) => {
-        // The winner stamp comes FIRST so the lock order is bid then listing
-        // (the INSERT's FK takes a key-share lock on the listing row), the
-        // same order activateBid uses; the reverse order deadlocks against a
-        // concurrent bond activation. A conflict or a closed listing aborts
-        // the transaction and rolls the stamp back, so no bid can ever sit
-        // 'won' with no settlement behind it. The compare-and-set holds the
-        // CONVERSE too: a named winner that left the two pickable states (a
-        // concurrent suspend cancelled it) aborts the insert, so no
-        // settlement can exist whose winner holds no claim.
+        // Bounded waits: this transaction takes the listing row lock below,
+        // and the cancel/suspend guards hold theirs across several statements
+        // (the escrowInsertListing rationale); a 55P03 or 40P01 surfaces as
+        // the typed 'contended' refusal.
+        await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
+        // The winner stamp comes FIRST so the lock order is bid then listing,
+        // the same order activateBid and suspendListingIfSafe use; the
+        // reverse order deadlocks against a concurrent bond activation. A
+        // conflict or a closed listing aborts the transaction and rolls the
+        // stamp back, so no bid can ever sit 'won' with no settlement behind
+        // it. The compare-and-set holds the CONVERSE too: a named winner that
+        // left the caller's pickable states (a concurrent suspend cancelled
+        // it) aborts as the distinct 'winner_gone', so no settlement can
+        // exist whose winner holds no claim; callers treat it exactly like
+        // 'live_settlement_exists' (their unwind CAS writes no-op either
+        // way), the label only stops the next reader from misdiagnosing.
         if (args.winnerBidId !== undefined) {
           const stamped = await client.query(
             `UPDATE woc_market_bids SET status = 'won'
-              WHERE id = $1 AND status IN ('active', 'outbid')`,
-            [args.winnerBidId],
+              WHERE id = $1 AND status = ANY($2::text[])`,
+            [args.winnerBidId, args.winnerFrom ?? ['active', 'outbid']],
           );
-          if ((stamped.rowCount ?? 0) === 0) {
-            throw new TxAbort<WocSettlementRow | 'live_settlement_exists' | 'listing_closed'>(
-              'live_settlement_exists',
-            );
-          }
+          if ((stamped.rowCount ?? 0) === 0) throw new TxAbort('winner_gone' as const);
+        }
+        // Serialize against cancel, suspend, and the guarded no-winner close:
+        // the INSERT's own status predicate below is evaluated on the
+        // statement snapshot, and the FK's KEY SHARE lock only DELAYS a
+        // concurrent closer's commit, never refuses it (the FK re-check only
+        // needs the row to EXIST, so a settlement could land on a listing the
+        // closer just closed; reproduced against a real database). The
+        // explicit row lock plus a status re-read under it is what refuses.
+        const lockRow = await client.query(
+          `SELECT status FROM woc_market_listings WHERE id = $1 FOR UPDATE`,
+          [args.listingId],
+        );
+        if (!lockRow.rows[0]) {
+          // A missing listing keeps the historical conflation.
+          throw new TxAbort('live_settlement_exists' as const);
+        }
+        if (lockRow.rows[0].status === 'closed') {
+          // A cancel or suspend landed first (callers answer not_active).
+          throw new TxAbort('listing_closed' as const);
         }
         const res = await client.query(
           `INSERT INTO woc_market_settlements (
@@ -1780,15 +2009,9 @@ export class PgWocMarketDb implements WocMarketDb {
           ],
         );
         if (!res.rows[0]) {
-          // No row means the listing is missing or closed. Closed gets its
-          // own value (a cancel or suspend landed first; callers answer
-          // not_active) instead of riding the historical conflation.
-          const peek = await client.query(`SELECT status FROM woc_market_listings WHERE id = $1`, [
-            args.listingId,
-          ]);
-          throw new TxAbort<WocSettlementRow | 'live_settlement_exists' | 'listing_closed'>(
-            peek.rows[0]?.status === 'closed' ? 'listing_closed' : 'live_settlement_exists',
-          );
+          // Unreachable belt: the row was present and open under the lock
+          // held above, so the INSERT's own status predicate cannot miss.
+          throw new TxAbort('live_settlement_exists' as const);
         }
         return toSettlement(res.rows[0]);
       });
@@ -1797,6 +2020,7 @@ export class PgWocMarketDb implements WocMarketDb {
       // authority; a racer sees 23505 and the whole transaction, winner stamp
       // included, rolls back.
       if ((err as { code?: string }).code === '23505') return 'live_settlement_exists';
+      if (isLockContention(err)) return 'contended';
       throw err;
     }
   }
@@ -1877,13 +2101,24 @@ export class PgWocMarketDb implements WocMarketDb {
     to: WocSettlementState,
     failReason?: string,
   ): Promise<boolean> {
-    const res = await this.pool.query(
-      `UPDATE woc_market_settlements
-          SET state = $3, fail_reason = COALESCE($4, fail_reason), updated_at = now()
-        WHERE id = $1 AND state = ANY($2::text[])`,
-      [id, from, to, failReason ?? null],
-    );
-    return (res.rowCount ?? 0) > 0;
+    try {
+      const res = await this.pool.query(
+        `UPDATE woc_market_settlements
+            SET state = $3, fail_reason = COALESCE($4, fail_reason), updated_at = now()
+          WHERE id = $1 AND state = ANY($2::text[])`,
+        [id, from, to, failReason ?? null],
+      );
+      return (res.rowCount ?? 0) > 0;
+    } catch (err) {
+      // The failed -> offered retry revival is the one transition that moves
+      // a row INTO the one-open-settlement index predicate, and a second open
+      // settlement may legally exist beside a 'failed' row (the cascade
+      // builds exactly that pair). The index refuses the revival with 23505;
+      // report it as an ordinary CAS miss so the caller answers a typed
+      // refusal instead of a 500.
+      if ((err as { code?: string }).code === '23505') return false;
+      throw err;
+    }
   }
 
   async confirmingSettlements(realm: string, limit: number): Promise<WocSettlementRow[]> {
@@ -1976,17 +2211,19 @@ export class PgWocMarketDb implements WocMarketDb {
     return res.rows.map(toSale);
   }
 
-  async setSaleExcluded(id: number, excluded: boolean): Promise<boolean> {
+  async setSaleExcluded(id: number, excluded: boolean): Promise<'ok' | 'miss' | 'conflict'> {
     try {
       const res = await this.pool.query(`UPDATE woc_market_sales SET excluded = $2 WHERE id = $1`, [
         id,
         excluded,
       ]);
-      return (res.rowCount ?? 0) > 0;
+      return (res.rowCount ?? 0) > 0 ? 'ok' : 'miss';
     } catch (err) {
       // Re-including a voided row while its correction stands would violate
-      // woc_market_sales_listing_once; refuse as a typed miss, never a 500.
-      if ((err as { code?: string }).code === '23505') return false;
+      // woc_market_sales_listing_once; refuse as a typed conflict (distinct
+      // from a missing row, so the operator hears what is actually wrong),
+      // never a 500.
+      if ((err as { code?: string }).code === '23505') return 'conflict';
       throw err;
     }
   }

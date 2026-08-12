@@ -163,6 +163,8 @@ export const API_ERROR_KEYS = {
   'woc_market.confirm_failed': 'apiError.woc_market.confirm_failed',
   'woc_market.buy_now_locked': 'apiError.woc_market.buy_now_locked',
   'woc_market.settlement_in_flight': 'apiError.woc_market.settlement_in_flight',
+  'woc_market.contended': 'apiError.woc_market.contended',
+  'woc_market.sale_conflict': 'apiError.woc_market.sale_conflict',
   'woc_market.no_buy_now': 'apiError.woc_market.no_buy_now',
   'woc_market.cap_reached': 'apiError.woc_market.cap_reached',
   'woc_market.stale_item': 'apiError.woc_market.stale_item',
