@@ -742,6 +742,34 @@ describe('cancelListing', () => {
     expect(attemptsAfterTwo, 'backed off, not re-probed').toBe(1);
   });
 
+  it('plain contention retries next pass WITHOUT the 60s park', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+    unwrap(
+      await h.service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    expect(await h.service.cancelListing(SELLER, listing.id)).toEqual({
+      ok: true,
+      cancelPending: true,
+    });
+    h.setNow(BASE_MS + WOC_MARKET_BUY_NOW_LOCK_SECONDS * 1000 + 1);
+    // A transient lock loser is NOT a park: costing a contender the 60s
+    // backoff would delay every legitimate converge behind a blip.
+    h.db.failNextCancelConverge = 'contended';
+    await h.service.sweepPass();
+    expect((await getListing(h, listing.id)).status).toBe('active');
+    h.setNow(BASE_MS + WOC_MARKET_BUY_NOW_LOCK_SECONDS * 1000 + 6_000);
+    const stats = await h.service.sweepPass();
+    expect(stats?.cancelClosed, 'the very next pass converges it').toBe(1);
+    expect((await getListing(h, listing.id)).resolution).toBe('cancelled');
+  });
+
   it('refuses not_active on a second cancel and books no second return', async () => {
     const h = makeHarness();
     const listing = await listEpic(h);
@@ -1417,6 +1445,39 @@ describe('confirmBond', () => {
 });
 
 describe('anti-snipe extension', () => {
+  it('a chain-REFUSED verdict never moves the close (DB-free arm of the verdict gate)', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    // Place inside the final window, then let the QUOTE die (past its TTL,
+    // inside the bond TTL) so the dev economy REFUSES the confirm. The
+    // extension must not fire on the raw submission: a fabricated signature
+    // moving the authoritative clock was the security round's critical.
+    const bidAt = listing.endsAtMs - 100_000;
+    h.setNow(bidAt);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const confirmAt = bidAt + WOC_MARKET_QUOTE_TTL_SECONDS * 1000;
+    h.setNow(confirmAt);
+    // Still inside the anti-snipe window, so a fired extension WOULD move the
+    // close (the vacuity trap: a close outside the window nulls the math and
+    // proves nothing).
+    expect(listing.endsAtMs - confirmAt).toBeLessThan(120_000);
+    expect(await h.service.confirmBond(BUYER_A, placed.bid.id, 'sig-refused-gate')).toEqual({
+      ok: false,
+      reason: 'confirm_failed',
+    });
+    expect((await getListing(h, listing.id)).endsAtMs, 'refused extends nothing').toBe(
+      listing.endsAtMs,
+    );
+  });
+
   it('an unpaid final-window bid no longer moves the close; the signature does', async () => {
     const h = makeHarness();
     const listing = await listEpic(h);
@@ -1592,30 +1653,42 @@ describe('buy-now claim cooldown', () => {
     expect(h.db.buyNowAbandons).toHaveLength(1);
   });
 
-  it('a buyer who TRIED to pay is never stamped an abandoner', async () => {
-    const h = makeHarness();
-    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
-    const bought = unwrap(
-      await h.service.buyNow({
-        account: BUYER_A,
-        characterId: CHAR_A,
-        listingId: listing.id,
-        acceptTerms: true,
-      }),
-      'buyNow',
-    );
-    // The buyer submits a payment and the chain refuses it: the settlement
-    // carries the signature into 'failed', then the window lapses. A refused
-    // transfer (fee balance, flaky RPC, degraded service) is not a walk-away,
-    // so no ledger row and no cooldown.
-    expect(await h.db.submitSettlementSignature(bought.settlement.id, 'sig-tried-and-failed')).toBe(
-      'ok',
-    );
-    await h.db.transitionSettlement(bought.settlement.id, ['confirming'], 'failed', 'refused');
-    h.setNow(bought.settlement.deadlineAtMs + 1);
-    await h.service.sweepPass();
-    expect(h.db.buyNowAbandons).toHaveLength(0);
-    expect((await getListing(h, listing.id)).buyNowLockAccount).toBeNull();
+  it('exempts only chain-plausible refusal classes, never a bare posted signature', async () => {
+    // The exemption keys on the REFUSAL CLASS, not signature presence: a
+    // fabricated 256-char string is recorded and refused in one request, and
+    // exempting on the signature alone let that single request bypass the
+    // whole cooldown arm.
+    const play = async (failReason: string): Promise<number> => {
+      const h = makeHarness();
+      const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+      const bought = unwrap(
+        await h.service.buyNow({
+          account: BUYER_A,
+          characterId: CHAR_A,
+          listingId: listing.id,
+          acceptTerms: true,
+        }),
+        'buyNow',
+      );
+      expect(await h.db.submitSettlementSignature(bought.settlement.id, `sig-${failReason}`)).toBe(
+        'ok',
+      );
+      await h.db.transitionSettlement(bought.settlement.id, ['confirming'], 'failed', failReason);
+      h.setNow(bought.settlement.deadlineAtMs + 1);
+      await h.service.sweepPass();
+      expect(
+        (await getListing(h, listing.id)).buyNowLockAccount,
+        'the lock clears either way',
+      ).toBeNull();
+      return h.db.buyNowAbandons.length;
+    };
+    // quote_expired: the transfer may have LANDED late, real money; exempt.
+    expect(await play('quote_expired')).toBe(0);
+    // service_unavailable: an infrastructure verdict, not the buyer's; exempt.
+    expect(await play('service_unavailable')).toBe(0);
+    // A plain refusal (a fabricated or unknown signature): RECORDS, closing
+    // the griefer's one-request bypass.
+    expect(await play('refused')).toBe(1);
   });
 });
 

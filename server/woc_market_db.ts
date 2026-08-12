@@ -34,6 +34,7 @@ import type {
 } from './woc_market';
 import type { WocBidStatus, WocSettlementState } from './woc_market_rules';
 import {
+  WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS,
   WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS,
   WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR,
   WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS,
@@ -674,6 +675,27 @@ const PARK_ROTATION_ORDER = 'COALESCE(sweep_parked_at, updated_at)';
 /** The bond poll's twin: rotation on poll_parked_at, age on placed_at. */
 const BOND_POLL_ROTATION_ORDER = 'COALESCE(poll_parked_at, placed_at)';
 
+/** ONE abandon-recording statement for BOTH recorders (the overdue sweep and
+ *  the steal arm), so their exempt predicate can never disagree. The NOT
+ *  EXISTS refuses the window when its settlement's refusal class says the
+ *  chain plausibly saw money (WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS: a
+ *  late-landing quote_expired, or an infrastructure verdict); a bare
+ *  signature deliberately does NOT exempt, or one fabricated request would
+ *  bypass the whole cooldown arm. Window key: deadline_at IS the lock
+ *  expiry (buyNow sets them equal), and the unique index dedupes the two
+ *  recorders. Params: $1 realm, $2 listing, $3 account, $4 lockExpiresMs. */
+const RECORD_ABANDON_SQL = `INSERT INTO woc_market_buy_now_abandons (realm, listing_id, account, lock_expires)
+ SELECT $1, $2, $3, to_timestamp($4 / 1000.0)
+  WHERE NOT EXISTS (
+    SELECT 1 FROM woc_market_settlements s
+     WHERE s.listing_id = $2 AND s.buyer_account = $3
+       AND s.deadline_at = to_timestamp($4 / 1000.0)
+       AND s.tx_signature IS NOT NULL
+       AND s.fail_reason = ANY(ARRAY[${WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS.map(
+         (r) => `'${r}'`,
+       ).join(', ')}]))
+ ON CONFLICT (listing_id, account, lock_expires) DO NOTHING`;
+
 const BID_COLS =
   'id, listing_id, account, character_id, character_name, wallet, amount_cents, status, ' +
   'bond_cents, bond_state, bond_reference, bond_quote_expires, bond_signature, placed_at';
@@ -836,6 +858,20 @@ export class PgWocMarketDb implements WocMarketDb {
 
   private async withTx<T>(fn: (client: PoolClient) => Promise<T>): Promise<T> {
     const client = await this.pool.connect();
+    // The idle-in-transaction timeout TERMINATES THE SESSION, and its
+    // SQLSTATE (25P03) arrives asynchronously on the client's 'error' event
+    // while no statement is in flight; the statement that then fails carries
+    // only a generic "not queryable" shell with no code. Capture the first
+    // async error so (a) the catch below can rethrow the REAL error and the
+    // 25P03 contention arm is live rather than dead code, and (b) Node never
+    // sees an 'error' event with zero listeners on the checked-out client,
+    // which is an uncaught exception (pg-pool detaches its own idle listener
+    // while a client is checked out).
+    let asyncErr: unknown = null;
+    const onError = (err: unknown): void => {
+      if (asyncErr === null) asyncErr = err;
+    };
+    client.on('error', onError);
     try {
       await client.query('BEGIN');
       const out = await fn(client);
@@ -844,9 +880,17 @@ export class PgWocMarketDb implements WocMarketDb {
     } catch (err) {
       await client.query('ROLLBACK').catch(() => {});
       if (err instanceof TxAbort) return err.value as T;
-      throw err;
+      // Prefer whichever error carries the SQLSTATE: under an event-loop
+      // stall the buffered 25P03 is parsed into the NEXT query's rejection
+      // and the async event is the codeless close; under an async stall the
+      // ordering flips (both measured). Either way the coded error is the
+      // honest one.
+      const code = (e: unknown): string | undefined => (e as { code?: string }).code;
+      throw code(err) !== undefined ? err : (asyncErr ?? err);
     } finally {
-      client.release();
+      client.removeListener('error', onError);
+      // A terminated session must be DISCARDED, not returned to the pool.
+      client.release(asyncErr !== null ? true : undefined);
     }
   }
 
@@ -2090,20 +2134,21 @@ export class PgWocMarketDb implements WocMarketDb {
         // the overdue sweep) is what stops the holder from re-claiming their
         // own expired lock in the crash window between the sweep's recording
         // and its lock clear. Public only: a directed buyer's walk-away keeps
-        // its strike instead (the resolved ruling). ON CONFLICT dedupes
-        // against the sweep's recording of the same window (the lock_expires
-        // instance key).
+        // its strike instead (the resolved ruling). THE ONE SHARED STATEMENT
+        // (RECORD_ABANDON_SQL): the exempt-window predicate and the dedupe
+        // key are identical to the sweep recorder's by construction, so the
+        // two can never disagree on what counts as a walk-away.
         if (
           row.buy_now_lock_account !== null &&
           row.buy_now_lock_expires !== null &&
           row.directed_buyer_account === null
         ) {
-          await client.query(
-            `INSERT INTO woc_market_buy_now_abandons (realm, listing_id, account, lock_expires)
-             VALUES ($1, $2, $3, $4)
-             ON CONFLICT (listing_id, account, lock_expires) DO NOTHING`,
-            [realm, id, row.buy_now_lock_account, row.buy_now_lock_expires],
-          );
+          await client.query(RECORD_ABANDON_SQL, [
+            realm,
+            id,
+            row.buy_now_lock_account,
+            ms(row.buy_now_lock_expires),
+          ]);
         }
         // The two cooldown guards, CLAIMER-scoped and public-only (a directed
         // buyer claims the sale their seller addressed to them regardless of
@@ -2166,20 +2211,16 @@ export class PgWocMarketDb implements WocMarketDb {
   }
 
   /** The overdue sweep's abandon recorder (public buy-now windows that
-   *  expired unpaid). Dedupes against the steal-time recorder on the
-   *  (listing, account, lock_expires) window key. */
+   *  expired unpaid): the ONE shared statement (RECORD_ABANDON_SQL, also the
+   *  steal arm's), whose exempt predicate refuses windows the chain
+   *  plausibly saw money for and whose window key dedupes the recorders. */
   async recordBuyNowAbandon(
     realm: string,
     listingId: number,
     account: number,
     lockExpiresAtMs: number,
   ): Promise<void> {
-    await this.pool.query(
-      `INSERT INTO woc_market_buy_now_abandons (realm, listing_id, account, lock_expires)
-       VALUES ($1, $2, $3, to_timestamp($4 / 1000.0))
-       ON CONFLICT (listing_id, account, lock_expires) DO NOTHING`,
-      [realm, listingId, account, lockExpiresAtMs],
-    );
+    await this.pool.query(RECORD_ABANDON_SQL, [realm, listingId, account, lockExpiresAtMs]);
   }
 
   /** The cancel-intent converge read: stamped, still-active listings whose

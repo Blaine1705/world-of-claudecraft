@@ -98,6 +98,29 @@ export const WOC_MARKET_BUY_NOW_LOCK_SECONDS = WOC_MARKET_QUOTE_TTL_SECONDS * 3;
 export const WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS = 1800;
 export const WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR = 3;
 export const WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS = 3600;
+/**
+ * The confirm() reason the economy proxy returns when the service itself was
+ * unreachable (an infrastructure verdict, not a chain verdict). Byte-identical
+ * with the proxy's emit ON PURPOSE: the anti-snipe extension and the abandon
+ * exemption both branch on it, and a drifted literal fails open.
+ */
+export const WOC_MARKET_CONFIRM_UNAVAILABLE_REASON = 'service_unavailable';
+/**
+ * Refusal classes that EXEMPT an expired buy-now window from the abandon
+ * ledger. Deliberately NOT "any recorded signature": a signature proves only
+ * that a string was POSTED (one fabricated request would bypass the whole
+ * cooldown arm), so the exemption keys on the refusal class instead:
+ * 'quote_expired' (the transfer may have landed late, real money) and the
+ * infrastructure verdict above. Every OTHER refusal (unknown reference, bad
+ * signature, a plain refusal) records: an honest wallet that fails before
+ * broadcast posts no signature at all, so those classes are the griefer's
+ * vector, not the honest buyer's. Scoped to the service's reason vocabulary:
+ * ruling R5 / the verifier work must keep these two strings stable.
+ */
+export const WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS = [
+  'quote_expired',
+  WOC_MARKET_CONFIRM_UNAVAILABLE_REASON,
+] as const;
 /** How long a listing may sit mid-resolution before the sweep reclaims it. */
 export const WOC_MARKET_STRANDED_RECLAIM_SECONDS = 300;
 /**

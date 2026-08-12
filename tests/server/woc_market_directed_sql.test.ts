@@ -516,7 +516,9 @@ function recordingTxPool(
     }
     return { rows: [], rowCount: 1 };
   };
-  const client = { query, release: () => {} };
+  // on/removeListener: withTx watches the client's async 'error' event for
+  // the session-termination SQLSTATE; the recorder never emits one.
+  const client = { query, release: () => {}, on: () => {}, removeListener: () => {} };
   const pool = { query, connect: async () => client } as unknown as Pool;
   return { pool, sql: () => seen };
 }
@@ -795,6 +797,123 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
     expect(quiet.sql()).toHaveLength(0);
   });
 
+  it('the new guard transactions bound their IDLE holds, not just their waits', async () => {
+    // lock_timeout bounds how long a statement WAITS for a lock; only the
+    // idle-in-transaction bound limits how long a stalled event loop HOLDS
+    // one between statements, which is what amplifies every waiter. Dropping
+    // the statement silently removes the whole P1 rationale.
+    const claimable = {
+      id: 7,
+      realm: REALM,
+      seller_account: 99,
+      status: 'active',
+      buy_now_cents: 1000,
+      cancel_requested_at: null,
+      buy_now_lock_account: null,
+      buy_now_lock_expires: null,
+      directed_buyer_account: null,
+      item: {},
+    };
+    const claim = recordingTxPool((text) =>
+      text.includes('FROM woc_market_listings')
+        ? { rows: [claimable], rowCount: 1 }
+        : text.includes('woc_market_settlements') || text.includes('woc_market_buy_now_abandons')
+          ? { rows: [], rowCount: 0 }
+          : text.includes('UPDATE woc_market_listings')
+            ? { rows: [claimable], rowCount: 1 }
+            : undefined,
+    );
+    await new PgWocMarketDb(claim.pool).claimBuyNowLock(REALM, 7, 3, 1_000, 2_000);
+    expect(
+      claim.sql().some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout')),
+      'claimBuyNowLock',
+    ).toBe(true);
+    const extend = recordingTxPool((text) =>
+      text.includes('FROM woc_market_listings')
+        ? { rows: [{ id: 7, realm: REALM, status: 'active', item: {} }], rowCount: 1 }
+        : undefined,
+    );
+    await new PgWocMarketDb(extend.pool).extendAuctionForBondProgress(REALM, 7, () => null);
+    expect(
+      extend.sql().some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout')),
+      'extendAuctionForBondProgress',
+    ).toBe(true);
+    const converge = recordingTxPool();
+    await new PgWocMarketDb(converge.pool).closeCancelPendingListing(REALM, 7, 1_000);
+    expect(
+      converge.sql().some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout')),
+      'closeCancelPendingListing',
+    ).toBe(true);
+  });
+
+  it('BOTH abandon recorders run the ONE shared statement with its exempt predicate', async () => {
+    // One statement, two callers: the sweep recorder and the steal arm can
+    // never disagree on what counts as a walk-away. The NOT EXISTS exempts a
+    // window whose refusal class says the chain plausibly saw money; a bare
+    // signature deliberately does NOT exempt (one fabricated request would
+    // bypass the cooldown arm).
+    const viaRecorder = recordingPool();
+    await new PgWocMarketDb(viaRecorder.pool).recordBuyNowAbandon(REALM, 7, 3, 1_000);
+    const [recorderText] = viaRecorder.sql();
+    expect(recorderText).toContain('WHERE NOT EXISTS');
+    expect(recorderText).toContain('tx_signature IS NOT NULL');
+    expect(recorderText).toContain("ANY(ARRAY['quote_expired', 'service_unavailable'])");
+    expect(recorderText).toContain('ON CONFLICT (listing_id, account, lock_expires) DO NOTHING');
+    const deadLock = {
+      id: 7,
+      realm: REALM,
+      seller_account: 99,
+      status: 'active',
+      buy_now_cents: 1000,
+      cancel_requested_at: null,
+      buy_now_lock_account: 9,
+      buy_now_lock_expires: new Date(0),
+      directed_buyer_account: null,
+      item: {},
+    };
+    const viaSteal = recordingTxPool((text) =>
+      text.includes('FROM woc_market_listings')
+        ? { rows: [deadLock], rowCount: 1 }
+        : text.includes('FROM woc_market_settlements')
+          ? { rows: [], rowCount: 0 }
+          : text.includes('SELECT 1 FROM woc_market_buy_now_abandons')
+            ? { rows: [], rowCount: 0 }
+            : text.includes('count(*)::int AS n FROM')
+              ? { rows: [{ n: 0 }], rowCount: 1 }
+              : text.includes('UPDATE woc_market_listings')
+                ? { rows: [deadLock], rowCount: 1 }
+                : undefined,
+    );
+    await new PgWocMarketDb(viaSteal.pool).claimBuyNowLock(REALM, 7, 3, 1_000, 2_000);
+    const stealText = viaSteal.sql().find((t) => t.includes('woc_market_buy_now_abandons'));
+    expect(stealText, 'the steal arm records through the same statement').toBe(recorderText);
+  });
+
+  it('the CHECK evolution adds the constraint NOT VALID (catalog-only boot work)', async () => {
+    const { WOC_MARKET_SCHEMA } = await import('../../server/woc_market_db');
+    const schema = WOC_MARKET_SCHEMA.replace(/--[^\n]*/g, ' ').replace(/\s+/g, ' ');
+    // Without NOT VALID the ADD re-validates the whole table under
+    // AccessExclusive inside the unbounded boot transaction; every standing
+    // value is in the wider list by construction, so validation buys nothing.
+    expect(schema).toContain("'failed')) NOT VALID");
+  });
+
+  it('the proxy emits the SAME unavailable reason the gates branch on', async () => {
+    // The extension gate and the abandon exemption both compare against this
+    // string; a proxy emitting a drifted literal fails both open.
+    const { WOC_MARKET_CONFIRM_UNAVAILABLE_REASON } = await import('../../server/woc_market_rules');
+    expect(WOC_MARKET_CONFIRM_UNAVAILABLE_REASON).toBe('service_unavailable');
+    const { readFileSync } = await import('node:fs');
+    const proxy = readFileSync(
+      new URL('../../server/woc_market_proxy.ts', import.meta.url),
+      'utf8',
+    );
+    // The confirm arm references the shared constant, not its own literal.
+    expect(proxy).toContain(
+      'return { settled: false, pending: true, reason: WOC_MARKET_CONFIRM_UNAVAILABLE_REASON }',
+    );
+  });
+
   it('the schema carries the abandon ledger and cancel-intent surfaces additively', async () => {
     const { WOC_MARKET_SCHEMA } = await import('../../server/woc_market_db');
     const schema = WOC_MARKET_SCHEMA.replace(/--[^\n]*/g, ' ').replace(/\s+/g, ' ');
@@ -857,7 +976,7 @@ describe('the atomic save-and-book, in SQL', () => {
       seen.push(text);
       return { rows: [], rowCount: 0 };
     });
-    const client = { query, release: vi.fn() };
+    const client = { query, release: vi.fn(), on: () => {}, removeListener: () => {} };
     const pool = { query, connect: async () => client } as unknown as Pool;
     expect(await new PgWocMarketDb(pool).saveDeliveredCharacterBooked(SAVE, 'ref-1')).toBe(
       'lease_lost',

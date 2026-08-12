@@ -32,6 +32,7 @@ import {
   validListingParams,
   WOC_MARKET_BOND_PENDING_TTL_SECONDS,
   WOC_MARKET_BUY_NOW_LOCK_SECONDS,
+  WOC_MARKET_CONFIRM_UNAVAILABLE_REASON,
   WOC_MARKET_DIRECTED_OFFER_TTL_SECONDS,
   WOC_MARKET_DURATION_HOURS,
   WOC_MARKET_MAX_ACTIVE_LISTINGS,
@@ -1824,9 +1825,12 @@ export class WocMarketService {
       // unfinalized (tens of seconds on mainnet), so the bid stays pending with
       // its signature and pollConfirmingBonds finishes it. Refusing here is the
       // mistake that cost a real settlement its money before the same shape was
-      // found in this leg. The chain has seen the transfer, so the in-flight
-      // confirmation earns its extension here.
-      await extend();
+      // found in this leg. The extension fires ONLY when the pending verdict
+      // came from the chain: the proxy maps an unreachable service to
+      // pending + service_unavailable (correct for money, which must never
+      // fail toward refusal), and extending on THAT arm would hand a
+      // fabricated signature the clock again for the length of any outage.
+      if (confirmed.reason !== WOC_MARKET_CONFIRM_UNAVAILABLE_REASON) await extend();
       return { ok: true, standing: false, pending: true };
     }
     return refuse('confirm_failed');
@@ -2484,11 +2488,16 @@ export class WocMarketService {
       );
       return;
     }
+    // A 'failed' row KEEPS its refusal reason across the expiry (COALESCE in
+    // the transition): the abandon recorders' exempt predicate reads it, and
+    // 'window_elapsed' would erase exactly the fact that distinguishes a
+    // chain-refused try from a walk-away. Offered rows (no refusal ever)
+    // stamp window_elapsed as before.
     const moved = await this.deps.db.transitionSettlement(
       settlement.id,
       ['offered', 'failed'],
       'expired',
-      'window_elapsed',
+      settlement.state === 'failed' ? undefined : 'window_elapsed',
     );
     if (!moved) return;
     const listing = await this.deps.db.listingById(this.cfg.realm, settlement.listingId);
@@ -2527,12 +2536,14 @@ export class WocMarketService {
       // apply to p2p non-payment once both parties have accepted, and
       // acceptance is exactly the moment escrow happened. There is no bond
       // to forfeit here (a directed sale carries none).
-      // txSignature null = the buyer never even submitted a payment: a
-      // genuine walk-away. A window that ended with a signature on it is a
-      // buyer who TRIED (a refused transfer, a flaky chain): stamping them an
-      // abandoner would cool honest accounts down for infrastructure
-      // failures, so no ledger row.
-      if (listing.directedBuyerAccount === null && settlement.txSignature === null) {
+      // The abandon-vs-tried distinction lives in ONE place, the recorder's
+      // own exempt-window predicate (recordBuyNowAbandon refuses windows
+      // whose refusal class says the chain plausibly saw money), shared with
+      // the steal-time recorder so the two can never disagree. A bare
+      // signature does NOT exempt: it proves only that a string was posted,
+      // and exempting on it let one fabricated request bypass the whole
+      // cooldown arm.
+      if (listing.directedBuyerAccount === null) {
         await this.deps.db.recordBuyNowAbandon(
           this.cfg.realm,
           listing.id,

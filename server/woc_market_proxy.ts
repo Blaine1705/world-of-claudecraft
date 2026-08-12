@@ -30,7 +30,10 @@ import type {
   WocPriceInfo,
   WocQuoteIntent,
 } from './woc_market';
-import { WOC_MARKET_QUOTE_TTL_SECONDS } from './woc_market_rules';
+import {
+  WOC_MARKET_CONFIRM_UNAVAILABLE_REASON,
+  WOC_MARKET_QUOTE_TTL_SECONDS,
+} from './woc_market_rules';
 
 const SERVICE_TIMEOUT_MS = 5000;
 const CONFIRM_TIMEOUT_MS = 60_000;
@@ -287,7 +290,10 @@ export function createWocMarketEconomyProxy(): WocMarketEconomy {
         body: { reference, signature },
         timeoutMs: CONFIRM_TIMEOUT_MS,
       });
-      if (!wire) return { settled: false, pending: true, reason: 'service_unavailable' };
+      // The shared constant, not a literal: confirmBond's extension gate and
+      // the abandon exemption both branch on this exact string.
+      if (!wire)
+        return { settled: false, pending: true, reason: WOC_MARKET_CONFIRM_UNAVAILABLE_REASON };
       return {
         settled: wire.settled === true,
         pending: wire.pending === true,

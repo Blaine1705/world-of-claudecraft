@@ -37,6 +37,7 @@ import type {
 } from '../../../server/woc_market';
 import type { WocBidStatus, WocSettlementState } from '../../../server/woc_market_rules';
 import {
+  WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS,
   WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS,
   WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR,
   WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS,
@@ -86,6 +87,9 @@ export class FakeWocMarketDb implements WocMarketDb {
   private readonly bidPollParkedMs = new Map<number, number>();
   /** Every closeCancelPendingListing call's listing id, in order. */
   readonly cancelConvergeAttempts: number[] = [];
+  /** Force the NEXT closeCancelPendingListing to report contention
+   *  (consumed on use), for the park-vs-retry distinction. */
+  failNextCancelConverge: 'contended' | null = null;
   /** Every character save escrowInsertListing received, in order. */
   readonly escrowSaves: CharacterSaveArgs[] = [];
   /** The durable book-once ledger (woc_market_custody_claims), exposed so
@@ -1004,13 +1008,28 @@ export class FakeWocMarketDb implements WocMarketDb {
   }
 
   /** The in-memory abandon ledger, deduped on the (listing, account,
-   *  lock_expires) window key like the real unique index. */
+   *  lock_expires) window key like the real unique index, with the shared
+   *  exempt-window predicate (RECORD_ABANDON_SQL's NOT EXISTS): a window
+   *  whose settlement carries a signature AND a chain-plausible refusal
+   *  class records nothing. A bare signature does NOT exempt. */
   private recordAbandon(
     realm: string,
     listingId: number,
     account: number,
     lockExpiresMs: number,
   ): void {
+    for (const s of this.settlements.values()) {
+      if (
+        s.listingId === listingId &&
+        s.buyerAccount === account &&
+        s.deadlineAtMs === lockExpiresMs &&
+        s.txSignature !== null &&
+        s.failReason !== null &&
+        (WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS as readonly string[]).includes(s.failReason)
+      ) {
+        return;
+      }
+    }
     if (
       this.buyNowAbandons.some(
         (a) =>
@@ -1065,6 +1084,10 @@ export class FakeWocMarketDb implements WocMarketDb {
     // Recorded so tests can see which rows a pass ATTEMPTED (the backoff
     // exclusion is otherwise invisible from outside).
     this.cancelConvergeAttempts.push(id);
+    if (this.failNextCancelConverge !== null) {
+      this.failNextCancelConverge = null;
+      return 'contended';
+    }
     const row = this.listings.get(id);
     if (
       !row ||

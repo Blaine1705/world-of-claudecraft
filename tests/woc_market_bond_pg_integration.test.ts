@@ -781,6 +781,23 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       economy.verdict = { settled: false, pending: false, reason: 'unknown_reference' };
       await service.confirmBond(refusedBuyer, refused, 'sig-fabricated');
       expect(Number((await listingRow(listingId)).ends_ms)).toBe(endsAtMs);
+      // A pending verdict that only says THE SERVICE WAS DOWN extends
+      // nothing either: the proxy maps an unreachable economy to
+      // pending + service_unavailable (correct fail-safe for money), and
+      // extending on that arm would hand a fabricated signature the clock
+      // again for the length of any outage.
+      const outage = await seedBid(realm, listingId, await seedAccount(), {
+        bondReference: `snipe-outage-${seq}`,
+      });
+      economy.verdict = { settled: false, pending: true, reason: 'service_unavailable' };
+      const outageOut = await service.confirmBond(
+        (await pool.query(`SELECT account FROM woc_market_bids WHERE id = $1`, [outage])).rows[0]
+          .account,
+        outage,
+        'sig-during-outage',
+      );
+      expect(outageOut).toEqual({ ok: true, standing: false, pending: true });
+      expect(Number((await listingRow(listingId)).ends_ms)).toBe(endsAtMs);
       // A verdict the chain has SEEN (pending finality) earns the extension.
       const paying = await seedBid(realm, listingId, pendingBuyer, {
         bondReference: `snipe-pending-${seq}`,
@@ -960,6 +977,76 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       );
       expect(ledger.rowCount, 'no unearned abandon row').toBe(0);
     });
+
+    it('the steal recorder shares the exempt-window predicate (no drift with the sweep)', async () => {
+      const realm = `steal-exempt-${++seq}`;
+      const seller = await seedAccount();
+      const holder = await seedAccount();
+      const rival = await seedAccount();
+      const lockExpiresAtMs = BASE_MS - 1_000;
+      const listingId = await seedListing(realm, seller, {
+        lockAccount: holder,
+        lockExpiresAtMs,
+      });
+      // The holder TRIED: their expired window carries a signature and a
+      // chain-plausible refusal (quote_expired), already expired by the
+      // sweep. The rival's steal must not stamp them (the sibling recorder
+      // used to have no exemption at all).
+      const settlement = await marketDb.insertSettlement({
+        listingId,
+        bidId: null,
+        attempt: 0,
+        buyerAccount: holder,
+        buyerCharacter: 7000 + seq,
+        buyerName: `Holder${seq}`,
+        buyerWallet: `wallet-holder-${seq}`,
+        amountCents: 1000,
+        deadlineAtMs: lockExpiresAtMs,
+        nowMs: BASE_MS - 300_000,
+      });
+      if (typeof settlement === 'string') throw new Error(`fixture settlement: ${settlement}`);
+      await pool.query(
+        `UPDATE woc_market_settlements
+            SET state = 'expired', tx_signature = $2, fail_reason = 'quote_expired'
+          WHERE id = $1`,
+        [settlement.id, `steal-exempt-${seq}`],
+      );
+      const stolen = await marketDb.claimBuyNowLock(
+        realm,
+        listingId,
+        rival,
+        BASE_MS,
+        BASE_MS + 270_000,
+      );
+      expect(typeof stolen, 'the dead window is claimable').not.toBe('string');
+      const ledger = await pool.query(
+        `SELECT 1 FROM woc_market_buy_now_abandons WHERE listing_id = $1`,
+        [listingId],
+      );
+      expect(ledger.rowCount, 'the tried holder is not stamped').toBe(0);
+    });
+
+    it('an idle-stalled guard transaction surfaces as contended, never a raw 500', async () => {
+      // The REAL 25P03 path: the idle-in-transaction timeout terminates the
+      // SESSION and the SQLSTATE arrives asynchronously on the client error
+      // event (a synthetic {code:'25P03'} unit stub passes even when this is
+      // broken). The extension callback runs INSIDE the guard transaction,
+      // so a synchronous stall past the timeout reproduces the event-loop
+      // pause the bound exists for.
+      const realm = `idle-stall-${++seq}`;
+      const seller = await seedAccount();
+      const listingId = await seedListing(realm, seller, { endsAtMs: BASE_MS + 60_000 });
+      const out = await marketDb.extendAuctionForBondProgress(realm, listingId, (row) => {
+        const until = Date.now() + 900; // past GUARD_IDLE_TX_TIMEOUT_MS (500)
+        while (Date.now() < until) {
+          // A busy event loop: the session sits idle-in-transaction.
+        }
+        return row.endsAtMs + 60_000;
+      });
+      expect(out, 'typed contention, not an unhandled throw').toBe('contended');
+      // And the pool survives the discarded session: the next read works.
+      expect(Number((await listingRow(listingId)).ends_ms)).toBe(BASE_MS + 60_000);
+    }, 20_000);
 
     it('a directed dead lock records nothing at steal time', async () => {
       const realm = `directed-steal-${++seq}`;
