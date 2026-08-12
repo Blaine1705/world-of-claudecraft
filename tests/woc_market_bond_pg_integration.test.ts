@@ -715,10 +715,9 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       economy.verdict = { settled: false, pending: true, reason: null };
       const service = makeService(realm, economy, () => BASE_MS);
       await service.sweepPass();
-      const stamped = await pool.query(
-        `SELECT poll_parked_at FROM woc_market_bids WHERE id = $1`,
-        [lateSigned],
-      );
+      const stamped = await pool.query(`SELECT poll_parked_at FROM woc_market_bids WHERE id = $1`, [
+        lateSigned,
+      ]);
       expect(stamped.rows[0].poll_parked_at, 'a recently-signed bond is NOT parked').toBeNull();
     });
 
