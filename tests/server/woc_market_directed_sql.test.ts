@@ -407,13 +407,16 @@ describe('the settlement guards ship their DDL (structural floor)', () => {
     const out = await new PgWocMarketDb(pool).cancelListingIfUnbid('realm-1', 7, 3, 1_000);
     expect(out).toBe('cancel_pending');
     const paidProbe = sql().find((t) => t.includes('FROM woc_market_settlements'));
-    expect(paidProbe).toContain(
-      "state IN ('confirming', 'review', 'confirmed', 'delivering', 'delivered')",
+    // DERIVED from the production DDL, not a second literal: parse the open2
+    // predicate and drop 'offered', so the probe can only drift by failing
+    // here (the sibling test owns the open list's own shape).
+    const schema = await strippedSchema();
+    const m = schema.match(
+      /CREATE UNIQUE INDEX IF NOT EXISTS woc_market_settlements_open2 ON woc_market_settlements\(listing_id\) WHERE state IN \(([^)]*)\)/,
     );
-    const { OPEN_SETTLEMENT_STATES } = await import('./helpers/fake_woc_market_db');
-    expect(['offered', 'confirming', 'review', 'confirmed', 'delivering', 'delivered']).toEqual([
-      ...OPEN_SETTLEMENT_STATES,
-    ]);
+    expect(m, 'open2 predicate').not.toBeNull();
+    const open = (m as RegExpMatchArray)[1].split(',').map((s) => s.trim());
+    expect(paidProbe).toContain(`state IN (${open.filter((s) => s !== "'offered'").join(', ')})`);
     expect(sql().some((t) => t.includes('SET LOCAL lock_timeout'))).toBe(true);
     expect(
       sql().some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout = 500')),

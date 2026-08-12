@@ -859,19 +859,22 @@ export class FakeWocMarketDb implements WocMarketDb {
       )
       .sort(this.byTouch(this.listingTouchMs));
     // 'review' rows carry NO age filter (the sweep's bound already aged them);
-    // stuck bonds age on placed_at past the caller's bond cutoff.
+    // stuck bonds age on the signature recording (placement for legacy rows)
+    // past the caller's bond cutoff, the Pg COALESCE mirror.
     const review = [...this.settlements.values()]
       .filter((s) => s.realm === realm && s.state === 'review')
       .sort(this.byTouch(this.settlementTouchMs));
+    const bondStuckSince = (b: { bondSignatureAtMs: number | null; placedAtMs: number }) =>
+      b.bondSignatureAtMs ?? b.placedAtMs;
     const stuckBonds = [...this.bids.values()]
       .filter(
         (b) =>
           b.realm === realm &&
           b.status === 'pending_bond' &&
           b.bondSignature !== null &&
-          b.placedAtMs <= bondOlderThanMs,
+          bondStuckSince(b) <= bondOlderThanMs,
       )
-      .sort((a, b) => a.placedAtMs - b.placedAtMs || a.id - b.id);
+      .sort((a, b) => bondStuckSince(a) - bondStuckSince(b) || a.id - b.id);
     return {
       unbookedClaims: {
         count: Math.min(claims.length, countCap),
@@ -920,6 +923,7 @@ export class FakeWocMarketDb implements WocMarketDb {
           listingId: b.listingId,
           account: b.account,
           placedAtMs: b.placedAtMs,
+          stuckSinceMs: bondStuckSince(b),
         })),
       },
     };
@@ -1237,9 +1241,12 @@ export class FakeWocMarketDb implements WocMarketDb {
     const bid = this.bids.get(bidId);
     if (!bid || bid.status !== 'pending_bond') return 'not_pending';
     if (bid.bondSignature !== null && bid.bondSignature !== signature) return 'not_pending';
+    // COALESCE mirror: the first recording moment wins across resubmits, and
+    // a legacy-shaped row (signature set, stamp null) falls back to
+    // placement, never the resubmit's clock.
+    const hadSignature = bid.bondSignature !== null;
     bid.bondSignature = signature;
-    // COALESCE mirror: the first recording moment wins across resubmits.
-    bid.bondSignatureAtMs = bid.bondSignatureAtMs ?? nowMs;
+    bid.bondSignatureAtMs = bid.bondSignatureAtMs ?? (hadSignature ? bid.placedAtMs : nowMs);
     return { signatureAtMs: bid.bondSignatureAtMs };
   }
 
@@ -1274,13 +1281,14 @@ export class FakeWocMarketDb implements WocMarketDb {
     if (this.bids.has(id)) this.bidPollParkedMs.set(id, this.now());
   }
 
-  async lapseBid(bidId: number): Promise<void> {
+  async lapseBid(bidId: number): Promise<boolean> {
     const bid = this.bids.get(bidId);
     // The held carve-out mirror: a held bond never voids on a late
     // contradictory verdict (see PgWocMarketDb.lapseBid).
-    if (!bid || bid.status !== 'pending_bond' || bid.bondState !== 'pending') return;
+    if (!bid || bid.status !== 'pending_bond' || bid.bondState !== 'pending') return false;
     bid.status = 'lapsed';
     bid.bondState = 'void';
+    return true;
   }
 
   /** Mirrors the real CAS: a quote applies only to an UNPAID bond (status

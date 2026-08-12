@@ -1388,7 +1388,7 @@ describe('confirmBond', () => {
     expect((await getListing(h, listing.id)).currentBidId).toBe(rebid.bid.id);
   });
 
-  it('refuses not_pending when the same bond signature is presented a second time', async () => {
+  it('answers a same-signature replay after activation as idempotent success, with no churn', async () => {
     const h = makeHarness();
     const listing = await listEpic(h);
     const placed = unwrap(
@@ -1406,11 +1406,17 @@ describe('confirmBond', () => {
     );
     expect(first.standing).toBe(true);
     // One signed transfer is one hold. A retried request or a double-clicked
-    // wallet replays the same signature, and the pending-state check is what
-    // stops it re-running hold-and-activate (the transfer's own uniqueness is
-    // the memo reference, which the economy service owns).
+    // wallet replays the same signature; the recorded-signature arm answers
+    // the OUTCOME (the old 'not_pending' refusal read as "bid gone" for a
+    // payment that succeeded) while still never re-running hold-and-activate
+    // (the transfer's own uniqueness is the memo reference, which the
+    // economy service owns). A DIFFERENT caller's string still refuses.
     const replay = await h.service.confirmBond(BUYER_A, placed.bid.id, 'sig-one-bond');
-    expect(replay).toEqual({ ok: false, reason: 'not_pending' });
+    expect(replay).toEqual({ ok: true, standing: true });
+    expect(await h.service.confirmBond(BUYER_A, placed.bid.id, 'sig-other')).toEqual({
+      ok: false,
+      reason: 'not_pending',
+    });
     const bid = await getBid(h, placed.bid.id);
     expect(bid.status).toBe('active');
     expect(bid.bondState).toBe('held');
@@ -1548,6 +1554,73 @@ describe('anti-snipe extension', () => {
     expect((await getListing(h, listing.id)).endsAtMs).toBe(
       firstAt + WOC_MARKET_ANTI_SNIPE_EXTENSION_SECONDS * 1000,
     );
+  });
+
+  it('a SETTLED verdict on a late re-post still extends, from the verdict moment', async () => {
+    // The first-arrival anchor closes the free pending-arm creep; it must
+    // not take away the paid-bond extension. A bond signed well before the
+    // window whose verdict lands seconds from the close extends from the
+    // verdict moment, so its own activation never reads the auction as over.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const bidAt = listing.endsAtMs - 200_000;
+    h.setNow(bidAt);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const verdict = { settled: false, pending: true, reason: null as string | null };
+    const scripted = new WocMarketService({
+      ...h.deps,
+      economy: { ...h.economy, confirm: async () => verdict },
+    });
+    // First arrival OUTSIDE the window: records, pending, extends nothing.
+    h.setNow(listing.endsAtMs - 190_000);
+    unwrap(await scripted.confirmBond(BUYER_A, placed.bid.id, 'sig-late-settle'), 'confirmBond');
+    expect((await getListing(h, listing.id)).endsAtMs).toBe(listing.endsAtMs);
+    // The chain decides seconds from the close: the settled arm anchors on
+    // NOW, not the first arrival, and the close moves before activation.
+    verdict.settled = true;
+    verdict.pending = false;
+    const settleAt = listing.endsAtMs - 10_000;
+    h.setNow(settleAt);
+    const out = unwrap(
+      await scripted.confirmBond(BUYER_A, placed.bid.id, 'sig-late-settle'),
+      'confirmBond',
+    );
+    expect(out.standing).toBe(true);
+    expect((await getListing(h, listing.id)).endsAtMs).toBe(
+      settleAt + WOC_MARKET_ANTI_SNIPE_EXTENSION_SECONDS * 1000,
+    );
+  });
+
+  it('a different signature on a signed pending bond refuses confirm_in_flight (DB-free arm)', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    expect(await h.db.submitBondSignature(placed.bid.id, 'sig-first-claim', h.now())).toEqual({
+      signatureAtMs: h.now(),
+    });
+    // The pg suite pins this against real SQL; this arm is the CI floor (the
+    // pg suite skips without TEST_DATABASE_URL). 'not_pending' misread a
+    // still-pending bid as gone.
+    const res = await h.service.confirmBond(BUYER_A, placed.bid.id, 'sig-second-claim');
+    expect(res).toEqual({ ok: false, reason: 'confirm_in_flight' });
+    const bid = await getBid(h, placed.bid.id);
+    expect(bid.bondSignature).toBe('sig-first-claim');
   });
 
   it('extensions never push the close past baseEndsAtMs plus the cap', async () => {
@@ -2201,6 +2274,37 @@ describe('settlement quote expiry and signature reuse', () => {
     const after = await getSettlement(h, settlement.id);
     expect(after.state).toBe('confirming');
     expect(after.txSignature).toBe('sig-in-flight');
+  });
+
+  it('a same-signature retry after the sale completed answers the outcome, not a refusal', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    h.setNow(listing.endsAtMs + 1);
+    await h.service.sweepPass();
+    const settlement = await liveSettlement(h, listing.id);
+    unwrap(await h.service.settlementQuote(BUYER_A, settlement.id), 'settlementQuote');
+    const done = unwrap(
+      await h.service.confirmSettlement(BUYER_A, settlement.id, 'sig-done-settle'),
+      'confirmSettlement',
+    );
+    expect(done.state).toBe('delivered');
+    const sales = await h.db.salesForItem(REALM, EPIC_ITEM, 10);
+    expect(sales).toHaveLength(1);
+    // The blip retry: the buyer's client never saw the response. 'not_active'
+    // read as "purchase gone" for a COMPLETED sale; the retry answers the
+    // outcome, re-drives nothing, and mints no second sale.
+    const retry = unwrap(
+      await h.service.confirmSettlement(BUYER_A, settlement.id, 'sig-done-settle'),
+      'confirmSettlement',
+    );
+    expect(retry.state).toBe('delivered');
+    expect(await h.db.salesForItem(REALM, EPIC_ITEM, 10)).toHaveLength(1);
+    // A DIFFERENT string against the completed sale still refuses.
+    expect(await h.service.confirmSettlement(BUYER_A, settlement.id, 'sig-other')).toEqual({
+      ok: false,
+      reason: 'not_active',
+    });
   });
 
   it('refuses signature_reused when one transfer is replayed on a second settlement', async () => {

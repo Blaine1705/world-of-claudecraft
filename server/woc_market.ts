@@ -561,9 +561,11 @@ export interface WocMarketDb {
   /** Rotate one bond to the poll tail (writes poll_parked_at only). */
   touchBidPollRow(id: number): Promise<void>;
   /** A bond the chain decided against: the bid lapses and the bond voids.
-   *  No-ops on a HELD bond (see PgWocMarketDb: a reorg-flipped verdict must
-   *  never void held money into an unreachable state). */
-  lapseBid(bidId: number): Promise<void>;
+   *  Returns false without writing on a HELD bond (see PgWocMarketDb: a
+   *  reorg-flipped verdict must never void held money into an unreachable
+   *  state); the poll parks such a row instead of letting it re-own the
+   *  batch head every pass. */
+  lapseBid(bidId: number): Promise<boolean>;
   bidById(id: number): Promise<WocBidRow | null>;
   /** pending_bond -> cancelled for the bidder who never funded it. */
   abandonPendingBid(realm: string, bidId: number, account: number): Promise<boolean>;
@@ -869,7 +871,16 @@ export interface WocStuckCustodyClasses {
   stuckBonds: {
     count: number;
     saturated: boolean;
-    sample: { id: number; listingId: number; account: number; placedAtMs: number }[];
+    /** stuckSinceMs is the class's AGE axis (the signature recording,
+     *  placed_at only for legacy rows): compute stuck age from it, never
+     *  from placedAtMs, which is placement provenance and always older. */
+    sample: {
+      id: number;
+      listingId: number;
+      account: number;
+      placedAtMs: number;
+      stuckSinceMs: number;
+    }[];
   };
 }
 
@@ -1796,7 +1807,18 @@ export class WocMarketService {
     const bid = await this.deps.db.bidById(bidId);
     if (!bid) return refuse('not_found');
     if (bid.account !== account) return refuse('not_yours');
-    if (bid.status !== 'pending_bond') return refuse('not_pending');
+    if (bid.status !== 'pending_bond') {
+      // A retry of the signature that ALREADY decided this bid answers the
+      // outcome, never a refusal: when a network blip swallows the first
+      // response, 'not_pending' reads as "bid gone" for a payment that
+      // SUCCEEDED. Only the recorded signature gets this arm; it extends
+      // nothing (no new bond progress) and re-drives nothing.
+      if (bid.bondSignature === signature) {
+        if (bid.status === 'active' || bid.status === 'won') return { ok: true, standing: true };
+        if (bid.status === 'outbid') return { ok: true, standing: false };
+      }
+      return refuse('not_pending');
+    }
     if (bid.bondReference === null) return refuse('quote_unavailable');
     // Record the signature BEFORE any expiry verdict and BEFORE asking the
     // chain. The signature is the only trace of a payment that may already be
@@ -1809,11 +1831,12 @@ export class WocMarketService {
     // The submission moment: captured BEFORE the chain round trip (or the
     // target drifts with RPC latency and a slow confirm pushes the anchor
     // past the close, nulling the extension the settled arm depends on).
-    // The extension ANCHOR and the poll park axis are both the FIRST
-    // recording (bond_signature_at, which the submit returns): anchoring a
-    // resubmit on a fresh clock let one pending-forever signature re-post its
-    // way to holding the close at now plus the extension, all the way to the
-    // cap.
+    // Anchors are split by arm: the PENDING extension and the poll park axis
+    // both use the FIRST recording (bond_signature_at, which the submit
+    // returns), because a re-post of an undecided signature is free to mint
+    // and a fresh-clock anchor let it hold the close to the cap; the SETTLED
+    // arm anchors on this clock (the verdict moment), the paid-bond
+    // extension the window has always granted.
     const progressAtMs = this.now();
     const submitted = await this.deps.db.submitBondSignature(bid.id, signature, progressAtMs);
     if (submitted === 'not_pending') {
@@ -1841,18 +1864,23 @@ export class WocMarketService {
     // nothing. Best-effort ON PURPOSE: the signature above is already
     // durable, and a contended extension only fails toward a shorter
     // auction, so it must never turn a recorded payment into a refusal.
-    const extend = async (): Promise<void> => {
+    const extend = async (anchor: number): Promise<void> => {
       await this.deps.db
         .extendAuctionForBondProgress(this.cfg.realm, bid.listingId, (row) =>
-          antiSnipeExtendedEndMs(anchorMs, row.endsAtMs, row.baseEndsAtMs),
+          antiSnipeExtendedEndMs(anchor, row.endsAtMs, row.baseEndsAtMs),
         )
         .catch(() => {});
     };
     if (confirmed.settled) {
       // Extend BEFORE activating: a verdict landing seconds from the close
       // must move the end first, or its own activation reads the auction as
-      // already over.
-      await extend();
+      // already over. The SETTLED arm anchors on this request's clock (the
+      // verdict moment): the money provably moved, so this is the paid-bond
+      // extension the window has always granted, and reaching it repeatedly
+      // needs repeated contended activations of a REAL payment, which the
+      // cap already bounds. The creep the first-arrival anchor closes lives
+      // in the PENDING arm below, where re-posting costs nothing.
+      await extend(progressAtMs);
       return this.holdBondAndActivate(bid.id);
     }
     if (confirmed.pending) {
@@ -1865,7 +1893,10 @@ export class WocMarketService {
       // pending + service_unavailable (correct for money, which must never
       // fail toward refusal), and extending on THAT arm would hand a
       // fabricated signature the clock again for the length of any outage.
-      if (confirmed.reason !== WOC_MARKET_CONFIRM_UNAVAILABLE_REASON) await extend();
+      // First-arrival anchor: a re-post of a pending-forever signature must
+      // not re-anchor on a fresh clock, or it holds the close at now plus
+      // the extension continuously to the cap for free.
+      if (confirmed.reason !== WOC_MARKET_CONFIRM_UNAVAILABLE_REASON) await extend(anchorMs);
       return { ok: true, standing: false, pending: true };
     }
     return refuse('confirm_failed');
@@ -1935,8 +1966,16 @@ export class WocMarketService {
           await this.holdBondAndActivate(bid.id);
         } else {
           // Decided AGAINST: the bond never landed, so the bid lapses and its
-          // bond voids. Only a decided verdict may end it.
-          await this.deps.db.lapseBid(bid.id);
+          // bond voids. Only a decided verdict may end it. A HELD bond
+          // refuses the lapse (the reorg carve-out): park THAT row like a
+          // never-decided one, or it re-owns the batch head every pass and
+          // burns one confirm RPC forever, the exact starvation the park
+          // mechanism exists to prevent.
+          const lapsed = await this.deps.db.lapseBid(bid.id);
+          if (!lapsed) {
+            this.parkedBondPolls.set(bid.id, nowMs + WocMarketService.PARK_RETRY_MS);
+            await this.deps.db.touchBidPollRow(bid.id);
+          }
         }
       } catch (err) {
         // Per-row isolation: this backlog returns UNCLAIMED rows in order, so
@@ -2133,6 +2172,18 @@ export class WocMarketService {
     const retryOfRecorded =
       settlement.state === 'confirming' && settlement.txSignature === signature;
     if (settlement.state === 'confirming' && !retryOfRecorded) return refuse('confirm_in_flight');
+    // A retry of the recorded signature AFTER the payment succeeded answers
+    // the outcome (the current state), never not_active: the blip case read
+    // as "purchase gone" for a completed sale. A 'failed' same-signature
+    // retry still refuses below (the settlementQuote revival owns that path).
+    if (
+      settlement.txSignature === signature &&
+      (settlement.state === 'confirmed' ||
+        settlement.state === 'delivering' ||
+        settlement.state === 'delivered')
+    ) {
+      return { ok: true, state: settlement.state };
+    }
     if (!retryOfRecorded && settlement.state !== 'offered') return refuse('not_active');
     if (settlement.quoteReference === null || settlement.quoteExpiresAtMs === null) {
       return refuse('quote_unavailable');

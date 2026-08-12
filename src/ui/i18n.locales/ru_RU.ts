@@ -8728,7 +8728,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.confirm_failed':
     'Не удалось подтвердить транзакцию. Запросите новую котировку и повторите попытку.',
   'apiError.woc_market.confirm_in_flight':
-    'Платеж по залогу ещё подтверждается. Повторите попытку, когда он завершится.',
+    'Платеж ещё подтверждается. Повторите попытку, когда он завершится.',
   'apiError.woc_market.cancel_pending': 'Продавец отменяет этот лот.',
   'apiError.woc_market.claim_cooldown':
     'Вы недавно отказались от быстрой покупки. Повторите попытку позже.',

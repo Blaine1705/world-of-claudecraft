@@ -3,8 +3,9 @@
 // commented-out `case 'review':` must not satisfy a presence pin, and a
 // comment that names Math.random must not trip an absence scan.
 //
-// The implementation is the tests/architecture.test.ts helper (kept there as
-// its own copy: that file is a load-bearing guard and stays self-contained).
+// Same shape as the tests/architecture.test.ts helper, which keeps its own
+// copy by design (a load-bearing guard stays self-contained); the two are not
+// lockstep-pinned and may drift independently.
 // One alternation, so leftmost-first matching decides precedence: a line
 // comment whose text contains /* is consumed AS a line comment instead of
 // opening a bogus block that swallows everything to the next */ elsewhere in

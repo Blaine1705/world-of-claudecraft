@@ -403,6 +403,27 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       expect(retry).toEqual({ signatureAtMs: BASE_MS });
     });
 
+    it('a legacy row without a stamp adopts placement, never the resubmit clock', async () => {
+      const realm = `bond-legacy-stamp-${++seq}`;
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      const placedAt = BASE_MS - 10 * MINUTE_MS;
+      const bidId = await seedBid(realm, listingId, buyer, {
+        bondReference: `legacy-ref-${seq}`,
+        bondSignature: 'sig-legacy',
+        placedAtMs: placedAt,
+      });
+      // The pre-column shape: a signature recorded before bond_signature_at
+      // existed (the seeder auto-stamps, so null it by hand). Its first
+      // re-post must not mint a fresh first-arrival and creep the close.
+      await pool.query(`UPDATE woc_market_bids SET bond_signature_at = NULL WHERE id = $1`, [
+        bidId,
+      ]);
+      const retry = await marketDb.submitBondSignature(bidId, 'sig-legacy', BASE_MS + HOUR_MS);
+      expect(retry).toEqual({ signatureAtMs: placedAt });
+    });
+
     it('a reorg-flipped verdict cannot void a HELD bond', async () => {
       const realm = `bond-held-flip-${++seq}`;
       const seller = await seedAccount();
@@ -432,7 +453,17 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
         bond_state: 'held',
       });
       expect(await bidRow(pendingId)).toMatchObject({ status: 'lapsed', bond_state: 'void' });
-      // Still visible to the poll (and so to the stuckBonds readout class).
+      // Still visible to the poll (and so to the stuckBonds readout class),
+      // but ROTATED: the refused lapse must park the row like a
+      // never-decided one, or it re-owns the batch head and burns one
+      // confirm RPC every pass forever.
+      const parked = await pool.query(`SELECT poll_parked_at FROM woc_market_bids WHERE id = $1`, [
+        heldId,
+      ]);
+      expect(
+        parked.rows[0].poll_parked_at,
+        'held survivor rotates to the poll tail',
+      ).not.toBeNull();
       const polled = await marketDb.confirmingBonds(realm, 10, []);
       expect(polled.map((b) => b.id)).toContain(heldId);
     });

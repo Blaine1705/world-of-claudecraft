@@ -1995,8 +1995,13 @@ export class PgWocMarketDb implements WocMarketDb {
     const stuckBondsWhere = `FROM woc_market_bids
         WHERE realm = $1 AND status = 'pending_bond' AND bond_signature IS NOT NULL
           AND COALESCE(bond_signature_at, placed_at) <= to_timestamp($2 / 1000.0)`;
+    // The COALESCE ORDER BY has no matching expression index (the rotation
+    // index coalesces poll_parked_at), so this sorts the matching set before
+    // the LIMIT: acceptable for a 30s-cached diagnostic read of a small,
+    // alarm-worthy class.
     const stuckBonds = await this.pool.query(
-      `SELECT id, listing_id, account, placed_at
+      `SELECT id, listing_id, account, placed_at,
+              COALESCE(bond_signature_at, placed_at) AS stuck_since
          ${stuckBondsWhere}
         ORDER BY COALESCE(bond_signature_at, placed_at)
         LIMIT $3`,
@@ -2051,6 +2056,7 @@ export class PgWocMarketDb implements WocMarketDb {
           listingId: Number(r.listing_id),
           account: Number(r.account),
           placedAtMs: ms(r.placed_at),
+          stuckSinceMs: ms(r.stuck_since),
         })),
       },
     };
@@ -2547,11 +2553,18 @@ export class PgWocMarketDb implements WocMarketDb {
       // RETURNING hands that moment back so the caller's extension anchors on
       // the first arrival too: a fresh-clock anchor per resubmit let one
       // pending-forever signature hold the close at now plus the extension
-      // continuously up to the cap.
+      // continuously up to the cap. The CASE closes the legacy corner: a
+      // pre-column row (signature set, stamp NULL) must fall back to
+      // placed_at like every reader, never adopt the RESUBMIT's clock as its
+      // first arrival.
       const res = await this.pool.query(
         `UPDATE woc_market_bids
             SET bond_signature = $2,
-                bond_signature_at = COALESCE(bond_signature_at, to_timestamp($3 / 1000.0))
+                bond_signature_at = COALESCE(
+                  bond_signature_at,
+                  CASE WHEN bond_signature IS NOT NULL THEN placed_at
+                       ELSE to_timestamp($3 / 1000.0) END
+                )
           WHERE id = $1 AND status = 'pending_bond'
             AND (bond_signature IS NULL OR bond_signature = $2)
           RETURNING bond_signature_at`,
@@ -2599,13 +2612,16 @@ export class PgWocMarketDb implements WocMarketDb {
    *  (a reorg flip), or held money strands in a state no refund arm reads.
    *  The no-op leaves such a row with confirmingBonds (visible via the
    *  stuckBonds readout class); the exits are a settled re-verdict retrying
-   *  the activation, or operator resolution. */
-  async lapseBid(bidId: number): Promise<void> {
-    await this.pool.query(
+   *  the activation, or operator resolution. Returns whether a row lapsed,
+   *  so the poll can park the held survivor instead of re-polling it at the
+   *  batch head every pass. */
+  async lapseBid(bidId: number): Promise<boolean> {
+    const res = await this.pool.query(
       `UPDATE woc_market_bids SET status = 'lapsed', bond_state = 'void'
         WHERE id = $1 AND status = 'pending_bond' AND bond_state = 'pending'`,
       [bidId],
     );
+    return (res.rowCount ?? 0) > 0;
   }
 
   /** Compare-and-set: a quote applies only to an UNPAID bond. A recorded

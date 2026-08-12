@@ -38,7 +38,10 @@ import type { ItemDef, ItemInstancePayload } from '../src/sim/types';
 import { stripComments } from './helpers/strip_comments';
 
 // Pure, IO-free decision core: every case here is a plain input-to-output pin,
-// no clocks, no DB, no fetch (the module takes injected timestamps).
+// no clocks, no DB, no fetch (the module takes injected timestamps). The one
+// exception: the tunables block reads server/woc_market.ts source for two
+// comment-stripped identity pins, because the park delay's VALUE coincides
+// with the pending TTL and a constant swap is behaviorally invisible.
 
 const DAY_MS = 24 * 3600 * 1000;
 
@@ -73,7 +76,12 @@ describe('tunables: literal pins', () => {
     const poll = stripComments(
       readFileSync(new URL('../server/woc_market.ts', import.meta.url), 'utf8'),
     );
+    // BOTH sides of the comparison: the right operand pins the constant
+    // identity, the left pins the signature-first age source (regressing it
+    // to placement would defeat the late-signer rule while this stayed
+    // green on the right operand alone).
     expect(poll).toContain('> WOC_MARKET_BOND_POLL_PARK_SECONDS * 1000');
+    expect(poll).toContain('signedAtMs = bid.bondSignatureAtMs ?? bid.placedAtMs');
   });
 
   it('pins the abandon-loop cooldown numbers (the QA-judged proposal)', () => {

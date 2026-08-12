@@ -2380,7 +2380,7 @@ describe('the stuck-custody readout: GET /internal/woc-market/stuck', () => {
     stuckBonds: {
       count: 1,
       saturated: false,
-      sample: [{ id: 11, listingId: 4, account: 21, placedAtMs: 1500 }],
+      sample: [{ id: 11, listingId: 4, account: 21, placedAtMs: 1500, stuckSinceMs: 1600 }],
     },
   };
   let reads = 0;

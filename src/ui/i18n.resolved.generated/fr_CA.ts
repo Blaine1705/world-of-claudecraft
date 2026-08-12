@@ -4141,7 +4141,7 @@ export const fr_CA: EnTranslations = {
       "quote_expired": "That quote expired. Request a fresh one.",
       "not_pending": "That bid is no longer awaiting its bond.",
       "confirm_failed": "The transaction could not be confirmed. Request a fresh quote and try again.",
-      "confirm_in_flight": "Your bond payment is still confirming. Try again once it resolves.",
+      "confirm_in_flight": "Your payment is still confirming. Try again once it resolves.",
       "buy_now_locked": "Another buyer is completing this purchase. Try again in a moment.",
       "cancel_pending": "The seller is cancelling this listing.",
       "claim_cooldown": "You recently walked away from a Buy Now. Try again later.",

@@ -8611,7 +8611,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.confirm_failed':
     'トランザクションを確認できませんでした。新しい見積もりを取得して、もう一度お試しください。',
   'apiError.woc_market.confirm_in_flight':
-    '保証金の支払いはまだ確認中です。完了してからもう一度お試しください。',
+    '支払いはまだ確認中です。完了してからもう一度お試しください。',
   'apiError.woc_market.cancel_pending': '出品者がこの出品を取り消そうとしています。',
   'apiError.woc_market.claim_cooldown':
     '最近、即時購入を途中で放棄しています。しばらくしてからもう一度お試しください。',

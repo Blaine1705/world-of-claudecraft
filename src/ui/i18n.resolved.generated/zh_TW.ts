@@ -4141,7 +4141,7 @@ export const zh_TW: EnTranslations = {
       "quote_expired": "該報價已過期，請重新取得。",
       "not_pending": "該出價已不在等待保證金的狀態。",
       "confirm_failed": "交易未能確認。請重新取得報價後再試。",
-      "confirm_in_flight": "你的保證金付款仍在確認中。待其完成後再試。",
+      "confirm_in_flight": "你的付款仍在確認中。待其完成後再試。",
       "buy_now_locked": "另一位買家正在完成這筆購買，請稍後再試。",
       "cancel_pending": "賣家正在取消該掛單。",
       "claim_cooldown": "你最近放棄過一次直購。請稍後再試。",

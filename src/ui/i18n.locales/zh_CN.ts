@@ -8221,7 +8221,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.quote_expired': '该报价已过期，请重新获取。',
   'apiError.woc_market.not_pending': '该出价已不在等待保证金的状态。',
   'apiError.woc_market.confirm_failed': '交易未能确认。请重新获取报价后再试。',
-  'apiError.woc_market.confirm_in_flight': '你的保证金付款仍在确认中。待其完成后再试。',
+  'apiError.woc_market.confirm_in_flight': '你的付款仍在确认中。待其完成后再试。',
   'apiError.woc_market.cancel_pending': '卖家正在取消该挂单。',
   'apiError.woc_market.claim_cooldown': '你最近放弃过一次直购。请稍后再试。',
   'apiError.woc_market.buy_now_locked': '另一位买家正在完成这笔购买，请稍后再试。',

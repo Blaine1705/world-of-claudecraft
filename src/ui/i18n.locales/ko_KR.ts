@@ -8580,7 +8580,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.confirm_failed':
     '트랜잭션을 확인할 수 없습니다. 새 견적을 받아 다시 시도하세요.',
   'apiError.woc_market.confirm_in_flight':
-    '보증금 결제가 아직 확인 중입니다. 완료된 후 다시 시도하세요.',
+    '결제가 아직 확인 중입니다. 완료된 후 다시 시도하세요.',
   'apiError.woc_market.cancel_pending': '판매자가 이 판매글을 취소하는 중입니다.',
   'apiError.woc_market.claim_cooldown':
     '최근에 즉시 구매를 중도 포기했습니다. 잠시 후 다시 시도하세요.',
