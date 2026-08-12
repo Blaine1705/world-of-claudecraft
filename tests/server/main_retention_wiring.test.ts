@@ -153,6 +153,24 @@ describe('retention sweep wiring in server/main.ts', () => {
     expect(MAIN).toContain('prunePlayerReportsBatch(config.playerReportRetentionDays, n)');
     expect(MAIN).toContain('pruneBugReportsBatch(config.bugReportRetentionDays, n)');
     expect(MAIN).toContain('pruneChatViolationsBatch(config.chatViolationRetentionDays, n)');
+    expect(MAIN).toContain(
+      'pruneWocBuyNowAbandonsBatch(pool, config.wocMarketAbandonsRetentionDays, n)',
+    );
+    expect(MAIN).toContain(
+      'pruneClosedWocListingsBatch(pool, config.wocMarketListingsRetentionDays, n)',
+    );
+  });
+
+  it('keeps the woc listings prune LAST in the table array', () => {
+    // The tail is the one position a rebase auto-merge cannot splice a new
+    // entry into the preceding object (it has happened twice; the comment at
+    // the entry records it). The abandon-ledger prune sits directly before it.
+    // The CALL sites (config-threaded), not the import block, whose
+    // alphabetical order says nothing about the table array.
+    const abandons = MAIN.indexOf('pruneWocBuyNowAbandonsBatch(pool, config.');
+    const listings = MAIN.indexOf('pruneClosedWocListingsBatch(pool, config.');
+    expect(abandons).toBeGreaterThan(0);
+    expect(listings).toBeGreaterThan(abandons);
   });
 
   it('sweeps the play-session fold before the association ager', () => {

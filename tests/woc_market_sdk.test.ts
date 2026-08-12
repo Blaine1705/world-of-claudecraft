@@ -245,3 +245,24 @@ describe('estimate()', () => {
     await expect(client().estimate(1000)).resolves.toBeNull();
   });
 });
+
+describe('cancelListing()', () => {
+  it('posts the cancel and passes a plain ok through', async () => {
+    stubFetch(() => ({ status: 200, body: { ok: true } }));
+    await expect(client().cancelListing(41)).resolves.toEqual({ ok: true });
+    expect(calls[0]?.url.endsWith('/api/woc-market/listings/41/cancel')).toBe(true);
+  });
+
+  it('forwards cancelPending so the window can toast the intent outcome', async () => {
+    stubFetch(() => ({ status: 200, body: { ok: true, cancelPending: true } }));
+    await expect(client().cancelListing(41)).resolves.toEqual({ ok: true, cancelPending: true });
+  });
+
+  it('surfaces the stable server code on a refusal', async () => {
+    stubFetch(() => ({ status: 409, body: { code: 'woc_market.settlement_in_flight' } }));
+    await expect(client().cancelListing(41)).resolves.toEqual({
+      ok: false,
+      code: 'woc_market.settlement_in_flight',
+    });
+  });
+});

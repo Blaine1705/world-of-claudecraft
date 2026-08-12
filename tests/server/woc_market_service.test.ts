@@ -707,6 +707,41 @@ describe('cancelListing', () => {
     expect(h.custody.persistCalls).toEqual([listingReturnCustodyRef(listing.id)]);
   });
 
+  it('a paid window PARKS the converge instead of probing it every pass', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+    const bought = unwrap(
+      await h.service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    expect(await h.service.cancelListing(SELLER, listing.id)).toEqual({
+      ok: true,
+      cancelPending: true,
+    });
+    // The buyer PAYS inside their window: the settlement is live, the lock
+    // window then lapses, and the converge must skip WITHOUT closing.
+    expect(await h.db.submitSettlementSignature(bought.settlement.id, 'sig-paid-window')).toBe(
+      'ok',
+    );
+    h.setNow(BASE_MS + WOC_MARKET_BUY_NOW_LOCK_SECONDS * 1000 + 1);
+    await h.service.sweepPass();
+    expect((await getListing(h, listing.id)).status, 'a paid window never tears').toBe('active');
+    const attemptsAfterOne = h.db.cancelConvergeAttempts.filter((id) => id === listing.id).length;
+    expect(attemptsAfterOne, 'the pass probed it once and parked it').toBe(1);
+    // Five seconds later (inside the 60s backoff) the next pass EXCLUDES the
+    // parked row: a settlement can sit unresolved for operator-scale time,
+    // and a standing skip set must cost no batch slots while it waits.
+    h.setNow(BASE_MS + WOC_MARKET_BUY_NOW_LOCK_SECONDS * 1000 + 5_000);
+    await h.service.sweepPass();
+    const attemptsAfterTwo = h.db.cancelConvergeAttempts.filter((id) => id === listing.id).length;
+    expect(attemptsAfterTwo, 'backed off, not re-probed').toBe(1);
+  });
+
   it('refuses not_active on a second cancel and books no second return', async () => {
     const h = makeHarness();
     const listing = await listEpic(h);
@@ -943,6 +978,30 @@ describe('placeBid', () => {
       reason: 'not_pending',
     });
     expect((await getBid(h, first.bid.id)).status, 'the live bid survives').toBe('active');
+  });
+
+  it('refuses confirm_in_flight while a recorded signature awaits its verdict', async () => {
+    // Abandoning a bond whose payment may already be riding the chain would
+    // void money in flight; the abandon waits for the verdict instead.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    expect(await h.db.submitBondSignature(placed.bid.id, 'sig-awaiting-verdict')).toBe('recorded');
+    expect(await h.service.abandonBid(BUYER_A, placed.bid.id)).toEqual({
+      ok: false,
+      reason: 'confirm_in_flight',
+    });
+    const bid = await getBid(h, placed.bid.id);
+    expect(bid.status).toBe('pending_bond');
+    expect(bid.bondState).toBe('pending');
   });
 
   it('refuses insufficient_balance when the wallet cannot cover bid plus bond', async () => {
@@ -1442,7 +1501,10 @@ describe('the confirming review bound', () => {
     expect(parked.failReason).toBe('confirming_overdue');
     // AMBIGUOUS by construction, so none of the overdue default consequences
     // may fire: no defaulted stamp, no forfeit, no strike, and the listing
-    // stays parked behind the still-open settlement.
+    // stays parked behind the still-open settlement. (Belt only: with the
+    // review arm deleted the ['offered','failed'] CAS misses and returns
+    // early, so these pass either way; the state and fail_reason pins above
+    // are the decisive ones.)
     const bid = await getBid(h, standing.bidId);
     expect(bid.status).toBe('won');
     expect(bid.bondState).toBe('held');
@@ -1496,6 +1558,64 @@ describe('buy-now claim cooldown', () => {
       acceptTerms: true,
     });
     expect(other.ok).toBe(true);
+  });
+
+  it('the two recorders dedupe one abandonment on the window key', async () => {
+    // The steal-time recorder and the sweep's canonical one both key on
+    // (listing, account, lock_expires), and the coupling holds only because
+    // buyNow sets the settlement deadline TO the lock expiry. If they ever
+    // diverge, one walk-away writes two ledger rows and the hourly cap
+    // effectively halves.
+    const h = makeHarness();
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+    unwrap(
+      await h.service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    // The window expires; the sweep records (canonical) and clears the lock.
+    h.setNow(BASE_MS + WOC_MARKET_BUY_NOW_LOCK_SECONDS * 1000 + 1);
+    await h.service.sweepPass();
+    expect(h.db.buyNowAbandons).toHaveLength(1);
+    // A steal-shaped second recording of the SAME window (the crash-window
+    // belt path) lands on the dedupe key and writes nothing new.
+    await h.db.recordBuyNowAbandon(
+      REALM,
+      listing.id,
+      BUYER_A,
+      BASE_MS + WOC_MARKET_BUY_NOW_LOCK_SECONDS * 1000,
+    );
+    expect(h.db.buyNowAbandons).toHaveLength(1);
+  });
+
+  it('a buyer who TRIED to pay is never stamped an abandoner', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+    const bought = unwrap(
+      await h.service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    // The buyer submits a payment and the chain refuses it: the settlement
+    // carries the signature into 'failed', then the window lapses. A refused
+    // transfer (fee balance, flaky RPC, degraded service) is not a walk-away,
+    // so no ledger row and no cooldown.
+    expect(await h.db.submitSettlementSignature(bought.settlement.id, 'sig-tried-and-failed')).toBe(
+      'ok',
+    );
+    await h.db.transitionSettlement(bought.settlement.id, ['confirming'], 'failed', 'refused');
+    h.setNow(bought.settlement.deadlineAtMs + 1);
+    await h.service.sweepPass();
+    expect(h.db.buyNowAbandons).toHaveLength(0);
+    expect((await getListing(h, listing.id)).buyNowLockAccount).toBeNull();
   });
 });
 
@@ -3647,6 +3767,9 @@ describe('a directed sale carries the consequences of the rail it rides', () => 
       accountId: BUYER_A,
       strikes: 1,
     });
+    // A directed abandon takes its strike and NOTHING ELSE: no cooldown
+    // ledger row (the cooldowns defend the public loop only).
+    expect(h.db.buyNowAbandons).toHaveLength(0);
   });
 
   it('does NOT strike an abandoned PUBLIC buy-now', async () => {

@@ -217,7 +217,7 @@ describe('the bond finality queue, in SQL', () => {
     // Without one there is nothing to ask the chain about, and the row belongs
     // to the TTL arm instead.
     const { pool, sql } = recordingPool();
-    await new PgWocMarketDb(pool).confirmingBonds(REALM, 50);
+    await new PgWocMarketDb(pool).confirmingBonds(REALM, 50, []);
     const [text] = sql();
     expect(text).toContain("status = 'pending_bond'");
     expect(text).toContain('bond_signature IS NOT NULL');
@@ -657,6 +657,164 @@ describe('the delivery close tail is ONE transaction, in SQL', () => {
     );
     expect(demote).toContain("CASE WHEN bond_state = 'held' THEN 'refund_due' ELSE bond_state END");
     expect(demote).toContain("status IN ('pending_bond', 'active')");
+  });
+
+  it('both teardowns carve out the paid-but-undecided bond, in the statement', async () => {
+    // The payment-loss fix itself: a signed, unheld bond must stay with the
+    // bond poll, so BOTH cancel-everything UPDATEs (the finalize demote and
+    // the suspend teardown) carry the NOT arm. Deleting it from either
+    // orphans money in flight and only a Postgres-gated run would notice.
+    const carveOut =
+      "NOT (status = 'pending_bond' AND bond_signature IS NOT NULL\n              AND bond_state = 'pending')";
+    const finalize = recordingTxPool();
+    await new PgWocMarketDb(finalize.pool).finalizeDeliveredSettlement(
+      structuredClone(FINALIZE_ARGS),
+    );
+    const demote = finalize
+      .sql()
+      .find((t) => t.includes("SET status = 'cancelled'") && t.includes('woc_market_bids'));
+    expect(demote?.replace(/\s+/g, ' ')).toContain(carveOut.replace(/\s+/g, ' '));
+    const suspend = recordingTxPool((text) => {
+      if (text.includes('FROM woc_market_listings') && text.includes('FOR UPDATE')) {
+        return { rows: [{ status: 'active', buy_now_lock_account: null }], rowCount: 1 };
+      }
+      // The open-settlement re-check must find nothing, or the transaction
+      // aborts settlement_live before ever reaching the teardown.
+      if (text.includes('SELECT 1 FROM woc_market_settlements')) {
+        return { rows: [], rowCount: 0 };
+      }
+      // The close RETURNING feeds toListing; a minimal raw row keeps the
+      // transaction completing so every captured statement is committed.
+      if (text.includes('UPDATE woc_market_listings') && text.includes("'suspended'")) {
+        return { rows: [{ id: 7, realm: REALM, item: {} }], rowCount: 1 };
+      }
+      return undefined;
+    });
+    await new PgWocMarketDb(suspend.pool).suspendListingIfSafe(REALM, 7, 1_000);
+    // Narrowed past the expiry CTE (which also cancels, but only 'won' rows):
+    // the teardown is the statement over the open set.
+    const teardown = suspend
+      .sql()
+      .find(
+        (t) =>
+          t.includes("SET status = 'cancelled'") &&
+          t.includes("status IN ('pending_bond', 'active')"),
+      );
+    expect(teardown?.replace(/\s+/g, ' ')).toContain(carveOut.replace(/\s+/g, ' '));
+  });
+});
+
+describe('the bond and lock lifecycle statements, in SQL', () => {
+  it('setBidBondQuote refreshes only an UNPAID quote, in the statement', async () => {
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).setBidBondQuote(3, 'ref', 1_000);
+    const [text] = sql();
+    expect(text).toContain("status = 'pending_bond'");
+    expect(text, 'the signature arm is the CAS').toContain('bond_signature IS NULL');
+  });
+
+  it('abandonPendingBid refuses to void a signed bond, in the statement', async () => {
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).abandonPendingBid(REALM, 3, 4);
+    const [text] = sql();
+    expect(text, 'a signed bond may be riding real money').toContain('bond_signature IS NULL');
+  });
+
+  it('overdueSettlements carries BOTH arms: the deadline and the confirming bound', async () => {
+    const { pool, sql, params } = recordingPool();
+    await new PgWocMarketDb(pool).overdueSettlements(REALM, 2_000, 25, 1_000);
+    const [text] = sql();
+    expect(text).toContain("state IN ('offered', 'failed') AND deadline_at <= to_timestamp($2");
+    expect(text, 'the H15 arm ages confirming on updated_at').toContain(
+      "state = 'confirming' AND updated_at <= to_timestamp($4",
+    );
+    expect(params()[0]).toEqual([REALM, 2_000, 25, 1_000]);
+  });
+
+  it('confirmingBonds rotates on poll_parked_at and honors the backoff exclusion', async () => {
+    const { pool, sql, params } = recordingPool();
+    await new PgWocMarketDb(pool).confirmingBonds(REALM, 25, [7, 9]);
+    const [text] = sql();
+    expect(text).toContain('ORDER BY COALESCE(poll_parked_at, placed_at)');
+    expect(text).toContain('id <> ALL($3::bigint[])');
+    expect(params()[0]).toEqual([REALM, 25, [7, 9]]);
+  });
+
+  it('touchBidPollRow writes the rotation stamp ONLY, never the age column', async () => {
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).touchBidPollRow(7);
+    const [text] = sql();
+    expect(text).toContain('SET poll_parked_at = now()');
+    expect(text).not.toContain('placed_at');
+  });
+
+  it('cancelPendingListings rides the rotation order with the backoff exclusion', async () => {
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).cancelPendingListings(REALM, 1_000, 25, [4]);
+    const [text] = sql();
+    expect(text).toContain('cancel_requested_at IS NOT NULL');
+    expect(text).toContain('ORDER BY COALESCE(sweep_parked_at, updated_at)');
+    expect(text).toContain('id <> ALL($4::bigint[])');
+  });
+
+  it('the abandon prune batches with NO ORDER BY (the unindexed-cutoff rule)', async () => {
+    const { pool, sql } = recordingPool();
+    const { pruneWocBuyNowAbandonsBatch } = await import('../../server/woc_market_db');
+    await pruneWocBuyNowAbandonsBatch(pool, 30, 500);
+    const [text] = sql();
+    expect(text).toContain('DELETE FROM woc_market_buy_now_abandons');
+    expect(text).toContain('LIMIT $2');
+    // lock_expires has no global index, so an ORDER BY would plan a full
+    // sort per batch (the retention prune rule pins the absence).
+    expect(text).not.toContain('ORDER BY');
+  });
+
+  it('the abandon prune keeps forever on a non-positive window', async () => {
+    const { pool, sql } = recordingPool();
+    const { pruneWocBuyNowAbandonsBatch } = await import('../../server/woc_market_db');
+    expect(await pruneWocBuyNowAbandonsBatch(pool, 0, 500)).toBe(0);
+    expect(await pruneWocBuyNowAbandonsBatch(pool, Number.NaN, 500)).toBe(0);
+    expect(sql()).toHaveLength(0);
+  });
+
+  it('the listings prune orders on its indexed cutoff and honors keep-forever', async () => {
+    // The pair's older half, pinned here for the same reason: only a
+    // Postgres-gated run exercised either prune before.
+    const { pool, sql } = recordingPool();
+    const { pruneClosedWocListingsBatch } = await import('../../server/woc_market_db');
+    await pruneClosedWocListingsBatch(pool, 180, 500);
+    const [text] = sql();
+    expect(text).toContain('DELETE FROM woc_market_listings');
+    expect(text).toContain("status = 'closed' AND item_disposed = true");
+    // updated_at IS indexed for this predicate (woc_market_listings_closed_updated),
+    // so oldest-first ordering is a bounded index walk, not a sort.
+    expect(text).toContain('ORDER BY updated_at');
+    expect(text).toContain('LIMIT $2');
+    const quiet = recordingPool();
+    expect(await pruneClosedWocListingsBatch(quiet.pool, 0, 500)).toBe(0);
+    expect(quiet.sql()).toHaveLength(0);
+  });
+
+  it('the schema carries the abandon ledger and cancel-intent surfaces additively', async () => {
+    const { WOC_MARKET_SCHEMA } = await import('../../server/woc_market_db');
+    const schema = WOC_MARKET_SCHEMA.replace(/--[^\n]*/g, ' ').replace(/\s+/g, ' ');
+    expect(schema).toContain('CREATE TABLE IF NOT EXISTS woc_market_buy_now_abandons');
+    // The unique window key IS the dedupe mechanism: the two recorders'
+    // ON CONFLICT target raises 42P10 at runtime without it.
+    expect(schema).toContain(
+      'CREATE UNIQUE INDEX IF NOT EXISTS woc_market_buy_now_abandons_once ON woc_market_buy_now_abandons(listing_id, account, lock_expires)',
+    );
+    expect(schema).toContain(
+      'CREATE INDEX IF NOT EXISTS woc_market_buy_now_abandons_account ON woc_market_buy_now_abandons(account, lock_expires DESC)',
+    );
+    expect(schema).toContain('ADD COLUMN IF NOT EXISTS cancel_requested_at');
+    expect(schema).toContain(
+      "CREATE INDEX IF NOT EXISTS woc_market_listings_cancel_pending ON woc_market_listings(realm, (COALESCE(sweep_parked_at, updated_at))) WHERE cancel_requested_at IS NOT NULL AND status = 'active'",
+    );
+    expect(schema).toContain('ADD COLUMN IF NOT EXISTS poll_parked_at');
+    expect(schema).toContain(
+      'CREATE INDEX IF NOT EXISTS woc_market_bids_bond_confirming_rotation ON woc_market_bids(realm, (COALESCE(poll_parked_at, placed_at)))',
+    );
   });
 });
 

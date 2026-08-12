@@ -163,6 +163,22 @@ describe('woc_market_window: i18n and escaping discipline', () => {
     expect(painter).toContain("t('hudChrome.wocMarket.");
   });
 
+  it('gives the review settlement state its OWN label, never the offered default', () => {
+    // The default arm renders 'Payment due': serving that for a parked
+    // 'review' row would invite a second payment for money that may already
+    // have landed on chain.
+    expect(painter).toContain("case 'review':");
+    expect(painter).toContain("'hudChrome.wocMarket.settlementReview'");
+  });
+
+  it('toasts the cancel-pending outcome distinctly from a completed cancel', () => {
+    // The seller's cancel on a locked window is ACCEPTED as intent; telling
+    // them "Listing cancelled" while it stays live until the buyer's window
+    // resolves would be a lie about custody.
+    expect(painter).toContain("'hudChrome.wocMarket.listingCancelPending'");
+    expect(painter).toContain('out.cancelPending === true');
+  });
+
   it('never writes a plain string literal via textContent or setAttribute(aria-label)', () => {
     // Rendered text must come from t(); these are the two raw-write sinks a
     // template-string painter could otherwise smuggle English through.

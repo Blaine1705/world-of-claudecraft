@@ -13,7 +13,10 @@ import {
   validSettlementTransition,
   WOC_MARKET_BOND_MAX_CENTS,
   WOC_MARKET_BOND_PENDING_TTL_SECONDS,
+  WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS,
+  WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR,
   WOC_MARKET_BUY_NOW_LOCK_SECONDS,
+  WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS,
   WOC_MARKET_DURATION_HOURS,
   WOC_MARKET_MAX_ACTIVE_LISTINGS,
   WOC_MARKET_MAX_PRICE_CENTS,
@@ -50,6 +53,14 @@ describe('tunables: literal pins', () => {
     expect(WOC_MARKET_MIN_PRICE_CENTS).toBe(25);
     expect(WOC_MARKET_MAX_PRICE_CENTS).toBe(100_000);
     expect(WOC_MARKET_STRANDED_RECLAIM_SECONDS).toBe(300);
+  });
+
+  it('pins the abandon-loop cooldown numbers (the QA-judged proposal)', () => {
+    // The production reads import the same constants, so a suite comparing
+    // them against themselves would stay green at any value.
+    expect(WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS).toBe(1800);
+    expect(WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR).toBe(3);
+    expect(WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS).toBe(3600);
   });
 
   it('keeps the price ceiling where the bond ladder stops scaling', () => {
@@ -607,6 +618,10 @@ describe('validSettlementTransition', () => {
     ['confirming', 'confirmed'],
     ['confirming', 'failed'],
     ['confirming', 'offered'],
+    // The H15 park, and its two operator arms.
+    ['confirming', 'review'],
+    ['review', 'confirmed'],
+    ['review', 'failed'],
     ['confirmed', 'delivering'],
     ['delivering', 'delivered'],
     ['failed', 'offered'],
@@ -628,6 +643,14 @@ describe('validSettlementTransition', () => {
     // confirmation cannot be skipped, and expiry is terminal.
     ['offered', 'confirmed'],
     ['expired', 'offered'],
+    // Review is reachable ONLY from an aged confirming row, and it resolves
+    // only through the two operator arms (never straight to delivery, never
+    // expired around the default pass).
+    ['offered', 'review'],
+    ['failed', 'review'],
+    ['review', 'delivering'],
+    ['review', 'expired'],
+    ['review', 'offered'],
   ];
 
   it.each(forbidden)('forbids %s to %s', (from, to) => {

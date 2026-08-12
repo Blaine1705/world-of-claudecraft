@@ -8,6 +8,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { WocStuckCustodyClasses } from '../../server/woc_market';
 import {
   createWocMarketMonitor,
+  WOC_MONITOR_BOND_STUCK_AGE_MS,
   WOC_MONITOR_COLD_FAIL_TTL_MS,
   WOC_MONITOR_COUNT_CAP,
   WOC_MONITOR_LOG_INTERVAL_MS,
@@ -37,6 +38,8 @@ describe('woc market stuck-custody monitor', () => {
     expect(WOC_MONITOR_LOG_INTERVAL_MS).toBe(300_000);
     expect(WOC_MONITOR_COLD_FAIL_TTL_MS).toBe(5_000);
     expect(WOC_MONITOR_STALE_WARN_MS).toBe(300_000);
+    // The fallback only: main.ts wires the env-derived confirming bound.
+    expect(WOC_MONITOR_BOND_STUCK_AGE_MS).toBe(21_600_000);
   });
 
   it('serves every caller through ONE cached refresh per TTL window', async () => {
@@ -70,12 +73,13 @@ describe('woc market stuck-custody monitor', () => {
       olderThanMs: number;
       limit: number;
       countCap: number;
+      bondOlderThanMs: number;
     } | null = null;
     const clock = 5_000_000;
     const monitor = createWocMarketMonitor({
       db: {
-        stuckCustodyReadout: async (realm, olderThanMs, limit, countCap) => {
-          seen = { realm, olderThanMs, limit, countCap };
+        stuckCustodyReadout: async (realm, olderThanMs, limit, countCap, bondOlderThanMs) => {
+          seen = { realm, olderThanMs, limit, countCap, bondOlderThanMs };
           return emptyClasses();
         },
       },
@@ -84,6 +88,7 @@ describe('woc market stuck-custody monitor', () => {
       now: () => clock,
       stuckAgeMs: 600_000,
       sampleLimit: 7,
+      bondStuckAgeMs: 900_000,
     });
     await monitor.read();
     // The default cap is pinned as the LITERAL, not the imported constant:
@@ -93,6 +98,7 @@ describe('woc market stuck-custody monitor', () => {
       olderThanMs: clock - 600_000,
       limit: 7,
       countCap: 1000,
+      bondOlderThanMs: clock - 900_000,
     });
   });
 
@@ -154,9 +160,14 @@ describe('woc market stuck-custody monitor', () => {
     expect(Object.isFrozen(served)).toBe(true);
     expect(Object.isFrozen(served.unbookedClaims.sample)).toBe(true);
     expect(Object.isFrozen(served.unbookedClaims.sample[0])).toBe(true);
+    // Every class is in the freeze walk, the two newest included.
+    expect(Object.isFrozen(served.reviewSettlements)).toBe(true);
+    expect(Object.isFrozen(served.reviewSettlements.sample)).toBe(true);
+    expect(Object.isFrozen(served.stuckBonds)).toBe(true);
+    expect(Object.isFrozen(served.stuckBonds.sample)).toBe(true);
   });
 
-  it('logs ONLY when something is stuck, one line with the three counts', async () => {
+  it('logs ONLY when something is stuck, one line with every class count', async () => {
     const lines: string[] = [];
     let readout = emptyClasses();
     let clock = 0;
@@ -179,12 +190,20 @@ describe('woc market stuck-custody monitor', () => {
     expect(lines[0]).toContain('"unbookedClaims":1');
     expect(lines[0]).toContain('"stuckDelivering":2');
     expect(lines[0]).toContain('"undisposedListings":0');
+    expect(lines[0]).toContain('"reviewSettlements":0');
+    expect(lines[0]).toContain('"stuckBonds":0');
   });
 
   it('logs on each stuck class ALONE: every predicate arm carries the line', async () => {
     // One case per class on purpose: a combined fixture would keep this green
     // with an arm deleted from the stuck predicate.
-    for (const cls of ['unbookedClaims', 'stuckDelivering', 'undisposedListings'] as const) {
+    for (const cls of [
+      'unbookedClaims',
+      'stuckDelivering',
+      'undisposedListings',
+      'reviewSettlements',
+      'stuckBonds',
+    ] as const) {
       const lines: string[] = [];
       const readout = emptyClasses();
       readout[cls] = { count: 3, saturated: false, sample: [] };

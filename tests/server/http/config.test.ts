@@ -305,6 +305,16 @@ describe('loadConfig', () => {
       { key: 'PLAYER_REPORT_RETENTION_DAYS', field: 'playerReportRetentionDays', dflt: 180 },
       { key: 'BUG_REPORT_RETENTION_DAYS', field: 'bugReportRetentionDays', dflt: 90 },
       { key: 'CHAT_VIOLATION_RETENTION_DAYS', field: 'chatViolationRetentionDays', dflt: 90 },
+      {
+        key: 'WOC_MARKET_LISTINGS_RETENTION_DAYS',
+        field: 'wocMarketListingsRetentionDays',
+        dflt: 180,
+      },
+      {
+        key: 'WOC_MARKET_ABANDONS_RETENTION_DAYS',
+        field: 'wocMarketAbandonsRetentionDays',
+        dflt: 30,
+      },
     ] as const;
     for (const { key, field, dflt } of cases) {
       // A set value overrides the default.

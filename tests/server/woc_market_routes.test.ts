@@ -33,6 +33,7 @@ import {
   resetWocMarketGuardDbForTests,
   resetWocMarketRuntimeForTests,
   routes,
+  wocMarketConfig,
 } from '../../server/woc_market_routes';
 import { type FakeCtxOverrides, type FakeRes, fakeCtx } from './helpers';
 
@@ -724,5 +725,40 @@ describe('the bid view: bond confirmation is visible to the bidder', () => {
     const view = await bidViewOf({ bondSignature: 'sig-1' });
     expect(Object.keys(view)).not.toContain('bondSignature');
     expect(JSON.stringify(view)).not.toContain('sig-1');
+  });
+});
+
+describe('the confirming-review bound env knob', () => {
+  const KEY = 'WOC_MARKET_CONFIRMING_REVIEW_HOURS';
+  const HOUR_MS = 3_600_000;
+  afterEach(() => {
+    delete process.env[KEY];
+  });
+
+  it('defaults to six hours when unset', () => {
+    delete process.env[KEY];
+    expect(wocMarketConfig().confirmingReviewMs).toBe(6 * HOUR_MS);
+  });
+
+  it.each([
+    // The empty string is the FAIL-DANGEROUS arm: Number('') is 0, and a
+    // zero bound makes every confirming row instantly overdue, parking every
+    // in-flight payment in the operator review state.
+    [''],
+    ['   '],
+    ['0'],
+    ['-1'],
+    ['abc'],
+    ['Infinity'],
+  ])('falls back to the default on %j', (raw) => {
+    process.env[KEY] = raw;
+    expect(wocMarketConfig().confirmingReviewMs).toBe(6 * HOUR_MS);
+  });
+
+  it('honors a real positive hour value', () => {
+    process.env[KEY] = '2';
+    expect(wocMarketConfig().confirmingReviewMs).toBe(2 * HOUR_MS);
+    process.env[KEY] = '0.5';
+    expect(wocMarketConfig().confirmingReviewMs).toBe(30 * 60_000);
   });
 });

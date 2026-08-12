@@ -345,8 +345,14 @@ export interface WocMarketDb {
     | 'contended'
   >;
   /** The cancel-intent converge read: stamped, active listings whose lock
-   *  window ended. */
-  cancelPendingListings(realm: string, nowMs: number, limit: number): Promise<WocListingRow[]>;
+   *  window ended, on the shared rotation order; excludeIds are the caller's
+   *  backing-off skipped rows. */
+  cancelPendingListings(
+    realm: string,
+    nowMs: number,
+    limit: number,
+    excludeIds: readonly number[],
+  ): Promise<WocListingRow[]>;
   /** Close one cancel-pending listing whose window ended unpaid (the converge
    *  arm); 'skip' when anything still rides it. Returns the closed row for
    *  the return flight. */
@@ -535,8 +541,15 @@ export interface WocMarketDb {
     bidId: number,
     signature: string,
   ): Promise<'recorded' | 'not_pending' | 'signature_reused'>;
-  /** Paid-but-undecided bonds, for the sweep to re-check. */
-  confirmingBonds(realm: string, limit: number): Promise<WocBidRow[]>;
+  /** Paid-but-undecided bonds, for the sweep to re-check, on the poll
+   *  rotation order; excludeIds are the caller's backing-off parked rows. */
+  confirmingBonds(
+    realm: string,
+    limit: number,
+    excludeIds: readonly number[],
+  ): Promise<WocBidRow[]>;
+  /** Rotate one bond to the poll tail (writes poll_parked_at only). */
+  touchBidPollRow(id: number): Promise<void>;
   /** A bond the chain decided against: the bid lapses and the bond voids. */
   lapseBid(bidId: number): Promise<void>;
   bidById(id: number): Promise<WocBidRow | null>;
@@ -1077,6 +1090,17 @@ export class WocMarketService {
    *  parked delivery. */
   private readonly parkedReturns = new Map<number, number>();
 
+  /** Parked cancel-intent converges, same shape, keyed by listing id: a
+   *  stamped listing whose buyer PAID skips the converge until that
+   *  settlement resolves, which can take operator-scale time. */
+  private readonly parkedCancelIntents = new Map<number, number>();
+
+  /** Parked bond polls, keyed by bid id: a signed bond the chain leaves
+   *  undecided past the pending TTL rotates out of the poll head (60s
+   *  backoff) instead of occupying one of the batch's slots every pass
+   *  forever; young confirming bonds keep the full poll cadence. */
+  private readonly parkedBondPolls = new Map<number, number>();
+
   /** Next time the delivered-residue arm may run (minute-scale: it converges
    *  an OLDER binary's crash residue, so every-pass cost bought nothing). */
   private redriveDueAtMs = 0;
@@ -1109,6 +1133,16 @@ export class WocMarketService {
     for (const [id, retryAtMs] of this.parkedDeliveries) {
       if (nowMs - retryAtMs > WocMarketService.LOCAL_LEDGER_TTL_MS) {
         this.parkedDeliveries.delete(id);
+      }
+    }
+    for (const [id, retryAtMs] of this.parkedCancelIntents) {
+      if (nowMs - retryAtMs > WocMarketService.LOCAL_LEDGER_TTL_MS) {
+        this.parkedCancelIntents.delete(id);
+      }
+    }
+    for (const [id, retryAtMs] of this.parkedBondPolls) {
+      if (nowMs - retryAtMs > WocMarketService.LOCAL_LEDGER_TTL_MS) {
+        this.parkedBondPolls.delete(id);
       }
     }
     for (const [id, retryAtMs] of this.parkedReturns) {
@@ -1762,26 +1796,37 @@ export class WocMarketService {
     const submitted = await this.deps.db.submitBondSignature(bid.id, signature);
     if (submitted === 'not_pending') return refuse('not_pending');
     if (submitted === 'signature_reused') return refuse('signature_reused');
-    // Anti-snipe rides BOND PROGRESS: the recorded signature is what makes
-    // this bid a real payment claim, so this is the one moment the auction
-    // end extends (placement no longer does; an unpaid bid must not move the
-    // clock). Best-effort ON PURPOSE: the signature above is already durable,
-    // and a contended extension only fails toward a shorter auction, so it
-    // must never turn a recorded payment into a refusal.
-    const nowMs = this.now();
-    await this.deps.db
-      .extendAuctionForBondProgress(this.cfg.realm, bid.listingId, (row) =>
-        antiSnipeExtendedEndMs(nowMs, row.endsAtMs, row.baseEndsAtMs),
-      )
-      .catch(() => {});
     const confirmed = await this.deps.economy.confirm(bid.bondReference, signature);
-    if (confirmed.settled) return this.holdBondAndActivate(bid.id);
+    // Anti-snipe rides BOND PROGRESS, and progress means the CHAIN has seen
+    // the transfer (settled, or pending finality), never merely that a string
+    // was posted: extending on the raw submission let a fabricated signature
+    // move the authoritative clock for free. A verdict AGAINST extends
+    // nothing. Best-effort ON PURPOSE: the signature above is already
+    // durable, and a contended extension only fails toward a shorter
+    // auction, so it must never turn a recorded payment into a refusal.
+    const extend = async (): Promise<void> => {
+      const nowMs = this.now();
+      await this.deps.db
+        .extendAuctionForBondProgress(this.cfg.realm, bid.listingId, (row) =>
+          antiSnipeExtendedEndMs(nowMs, row.endsAtMs, row.baseEndsAtMs),
+        )
+        .catch(() => {});
+    };
+    if (confirmed.settled) {
+      // Extend BEFORE activating: a verdict landing seconds from the close
+      // must move the end first, or its own activation reads the auction as
+      // already over.
+      await extend();
+      return this.holdBondAndActivate(bid.id);
+    }
     if (confirmed.pending) {
       // UNDECIDED, not refused. The payment may be perfectly good and merely
       // unfinalized (tens of seconds on mainnet), so the bid stays pending with
       // its signature and pollConfirmingBonds finishes it. Refusing here is the
       // mistake that cost a real settlement its money before the same shape was
-      // found in this leg.
+      // found in this leg. The chain has seen the transfer, so the in-flight
+      // confirmation earns its extension here.
+      await extend();
       return { ok: true, standing: false, pending: true };
     }
     return refuse('confirm_failed');
@@ -1814,14 +1859,34 @@ export class WocMarketService {
    * next pass asks again, which is what makes waiting for finality free.
    */
   private async pollConfirmingBonds(): Promise<number> {
-    const bonds = await this.deps.db.confirmingBonds(this.cfg.realm, SWEEP_BATCH);
+    const nowMs = this.now();
+    const bonds = await this.deps.db.confirmingBonds(
+      this.cfg.realm,
+      SWEEP_BATCH,
+      this.backedOffIds(this.parkedBondPolls, nowMs),
+    );
     for (const bid of bonds) {
       try {
         if (bid.bondReference === null || bid.bondSignature === null) continue;
         const confirmed = await this.deps.economy
           .confirm(bid.bondReference, bid.bondSignature)
           .catch(() => null);
-        if (!confirmed || confirmed.pending) continue;
+        if (!confirmed || confirmed.pending) {
+          // Undecided. YOUNG bonds (inside the pending TTL, the normal
+          // finality window) keep the full poll cadence; a bond the chain
+          // still has not decided past it rotates to the poll tail with an
+          // in-process backoff, so a standing set of never-decided
+          // signatures (a fabricated one, a service that answers pending
+          // forever) cannot occupy the batch head and starve fresh bonds.
+          // Rotation only: the money policy is untouched (no automatic
+          // void; the stuckBonds readout carries the visibility).
+          if (nowMs - bid.placedAtMs > WOC_MARKET_BOND_PENDING_TTL_SECONDS * 1000) {
+            this.parkedBondPolls.set(bid.id, nowMs + WocMarketService.PARK_RETRY_MS);
+            await this.deps.db.touchBidPollRow(bid.id);
+          }
+          continue;
+        }
+        this.parkedBondPolls.delete(bid.id);
         if (confirmed.settled) {
           await this.holdBondAndActivate(bid.id);
         } else {
@@ -2341,13 +2406,30 @@ export class WocMarketService {
    *  'contended' rows simply wait for the next pass (a paid window converges
    *  through settlement instead, and its finalize closes the listing sold). */
   private async closeCancelPendingListings(nowMs: number): Promise<number> {
-    const pending = await this.deps.db.cancelPendingListings(this.cfg.realm, nowMs, SWEEP_BATCH);
+    // A 'skip' (a paid window converging through settlement instead, whose
+    // finalize closes the listing sold) PARKS: rotate once on
+    // sweep_parked_at, back off in-process, and stay excluded from the batch
+    // read while waiting, the delivery arms' seam, because a paid window can
+    // sit unresolved for operator-scale time and must not head the batch
+    // every pass. 'contended' just retries next pass.
+    const pending = await this.deps.db.cancelPendingListings(
+      this.cfg.realm,
+      nowMs,
+      SWEEP_BATCH,
+      this.backedOffIds(this.parkedCancelIntents, nowMs),
+    );
     let closed = 0;
     for (const listing of pending) {
       try {
         const out = await this.deps.db.closeCancelPendingListing(this.cfg.realm, listing.id, nowMs);
-        if (typeof out === 'string') continue;
+        if (out === 'skip') {
+          this.parkedCancelIntents.set(listing.id, nowMs + WocMarketService.PARK_RETRY_MS);
+          await this.deps.db.touchListingRow(listing.id);
+          continue;
+        }
+        if (out === 'contended') continue;
         closed++;
+        this.parkedCancelIntents.delete(listing.id);
         // Eager return flight, best-effort: the sweep's undisposed
         // reconciliation (closed, undisposed, resolution != sold) backstops a
         // crash right here.
@@ -2445,7 +2527,12 @@ export class WocMarketService {
       // apply to p2p non-payment once both parties have accepted, and
       // acceptance is exactly the moment escrow happened. There is no bond
       // to forfeit here (a directed sale carries none).
-      if (listing.directedBuyerAccount === null) {
+      // txSignature null = the buyer never even submitted a payment: a
+      // genuine walk-away. A window that ended with a signature on it is a
+      // buyer who TRIED (a refused transfer, a flaky chain): stamping them an
+      // abandoner would cool honest accounts down for infrastructure
+      // failures, so no ledger row.
+      if (listing.directedBuyerAccount === null && settlement.txSignature === null) {
         await this.deps.db.recordBuyNowAbandon(
           this.cfg.realm,
           listing.id,

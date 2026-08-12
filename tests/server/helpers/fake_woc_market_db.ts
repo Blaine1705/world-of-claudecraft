@@ -82,6 +82,10 @@ export class FakeWocMarketDb implements WocMarketDb {
     account: number;
     lockExpiresMs: number;
   }[] = [];
+  /** The bond poll rotation stamps (the Pg poll_parked_at mirror). */
+  private readonly bidPollParkedMs = new Map<number, number>();
+  /** Every closeCancelPendingListing call's listing id, in order. */
+  readonly cancelConvergeAttempts: number[] = [];
   /** Every character save escrowInsertListing received, in order. */
   readonly escrowSaves: CharacterSaveArgs[] = [];
   /** The durable book-once ledger (woc_market_custody_claims), exposed so
@@ -955,6 +959,11 @@ export class FakeWocMarketDb implements WocMarketDb {
       row.buyNowLockExpiresMs !== null &&
       row.buyNowLockExpiresMs > nowMs;
     if (lockHeld) return 'locked';
+    // An OPEN settlement outlives its lock window: refuse and record NOTHING
+    // (the Pg probe's mirror; a rival's claim must not stamp a paying buyer).
+    for (const s of this.settlements.values()) {
+      if (s.listingId === id && OPEN_SETTLEMENT_STATES.includes(s.state)) return 'locked';
+    }
     // Steal-time abandon recording (public only), then the claimer's two
     // cooldown guards, mirroring the Pg transaction's order so a self-steal
     // refuses in the same call.
@@ -1026,18 +1035,24 @@ export class FakeWocMarketDb implements WocMarketDb {
     realm: string,
     nowMs: number,
     limit: number,
+    excludeIds: readonly number[],
   ): Promise<WocListingRow[]> {
+    // Mirrors the Pg read: rotation order (COALESCE(sweep_parked_at,
+    // updated_at) via the parked/touch maps) plus the caller's backoff
+    // exclusion.
+    const excluded = new Set(excludeIds);
     return [...this.listings.values()]
       .filter(
         (l) =>
           l.realm === realm &&
           l.status === 'active' &&
           l.cancelRequestedAtMs !== null &&
+          !excluded.has(l.id) &&
           (l.buyNowLockAccount === null ||
             l.buyNowLockExpiresMs === null ||
             l.buyNowLockExpiresMs <= nowMs),
       )
-      .sort((a, b) => a.id - b.id)
+      .sort(this.byRotation(this.listingParkedMs, this.listingTouchMs))
       .slice(0, limit)
       .map((l) => this.listingOut(l));
   }
@@ -1047,6 +1062,9 @@ export class FakeWocMarketDb implements WocMarketDb {
     id: number,
     nowMs: number,
   ): Promise<WocListingRow | 'skip' | 'contended'> {
+    // Recorded so tests can see which rows a pass ATTEMPTED (the backoff
+    // exclusion is otherwise invisible from outside).
+    this.cancelConvergeAttempts.push(id);
     const row = this.listings.get(id);
     if (
       !row ||
@@ -1068,17 +1086,18 @@ export class FakeWocMarketDb implements WocMarketDb {
         return 'skip';
       }
     }
-    // 'failed' rows expire here (the cancelListingIfUnbid shape); any OPEN
-    // settlement skips (the overdue arm owns the abandoned window's expiry).
+    // The Pg method expires 'failed' rows then rolls the expiry back via
+    // TxAbort when the open check trips; single-threaded, check-then-expire
+    // is observably identical (the cancelListingIfUnbid fake's rationale).
+    for (const s of this.settlements.values()) {
+      if (s.listingId === id && OPEN_SETTLEMENT_STATES.includes(s.state)) return 'skip';
+    }
     for (const s of this.settlements.values()) {
       if (s.listingId === id && s.state === 'failed') {
         s.state = 'expired';
         s.failReason = 'listing_cancelled';
         this.touchSettlement(s.id);
       }
-    }
-    for (const s of this.settlements.values()) {
-      if (s.listingId === id && OPEN_SETTLEMENT_STATES.includes(s.state)) return 'skip';
     }
     row.status = 'closed';
     row.resolution = 'cancelled';
@@ -1193,12 +1212,34 @@ export class FakeWocMarketDb implements WocMarketDb {
     return 'recorded';
   }
 
-  async confirmingBonds(realm: string, limit: number): Promise<WocBidRow[]> {
+  async confirmingBonds(
+    realm: string,
+    limit: number,
+    excludeIds: readonly number[],
+  ): Promise<WocBidRow[]> {
+    // Mirrors the Pg rotation order (COALESCE(poll_parked_at, placed_at))
+    // and the caller's backoff exclusion.
+    const excluded = new Set(excludeIds);
     return [...this.bids.values()]
-      .filter((b) => b.realm === realm && b.status === 'pending_bond' && b.bondSignature !== null)
-      .sort((a, b) => a.placedAtMs - b.placedAtMs || a.id - b.id)
+      .filter(
+        (b) =>
+          b.realm === realm &&
+          b.status === 'pending_bond' &&
+          b.bondSignature !== null &&
+          !excluded.has(b.id),
+      )
+      .sort(
+        (a, b) =>
+          (this.bidPollParkedMs.get(a.id) ?? a.placedAtMs) -
+            (this.bidPollParkedMs.get(b.id) ?? b.placedAtMs) || a.id - b.id,
+      )
       .slice(0, limit)
       .map((b) => this.bidOut(b));
+  }
+
+  /** Rotate one bond to the poll tail (the Pg poll_parked_at mirror). */
+  async touchBidPollRow(id: number): Promise<void> {
+    if (this.bids.has(id)) this.bidPollParkedMs.set(id, this.now());
   }
 
   async lapseBid(bidId: number): Promise<void> {
