@@ -2353,8 +2353,10 @@ describe('the dashboard ops reads: filters and the default window', () => {
 describe('the stuck-custody readout: GET /internal/woc-market/stuck', () => {
   const SECRET = 'dashboard-secret';
   const READOUT = {
+    asOfMs: 5000,
     unbookedClaims: {
       count: 1,
+      saturated: false,
       sample: [
         {
           custodyRef: 'woc_settlement:7',
@@ -2364,8 +2366,12 @@ describe('the stuck-custody readout: GET /internal/woc-market/stuck', () => {
         },
       ],
     },
-    stuckDelivering: { count: 2, sample: [{ id: 7, listingId: 3, createdAtMs: 2000 }] },
-    undisposedListings: { count: 0, sample: [] },
+    stuckDelivering: {
+      count: 2,
+      saturated: false,
+      sample: [{ id: 7, listingId: 3, createdAtMs: 2000 }],
+    },
+    undisposedListings: { count: 0, saturated: false, sample: [] },
   };
   let reads = 0;
 

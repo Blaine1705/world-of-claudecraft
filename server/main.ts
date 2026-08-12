@@ -2780,19 +2780,22 @@ const wocMarketService = new WocMarketService({
     // One line per pass that did work, plus a loud arm-not-draining warning:
     // an idle marketplace and a wedged one are otherwise indistinguishable.
     // elapsedMs makes a slow pass measurable before it turns into pool
-    // contention against the game loop's own saves.
+    // contention against the game loop's own saves; a SLOW pass logs even
+    // when every counter is zero (rows examined and skipped still cost the
+    // queries), so the cost signal survives exactly the wedged case.
     const worked = Object.values(stats).some((n) => n > 0);
+    const slow = elapsedMs > 1_000;
     if (saturated.length > 0) {
       console.warn(
         `[woc_market] sweep backlog not draining: ${saturated.join(',')} ${JSON.stringify(stats)} ${elapsedMs}ms`,
       );
-    } else if (worked) {
+    } else if (worked || slow) {
       console.log(`[woc_market] sweep ${JSON.stringify(stats)} ${elapsedMs}ms`);
     }
   },
-  // Per-arm isolation sink: one poisoned row or one failing arm logs here and
-  // the rest of the pass still runs.
-  onSweepError: (arm, err) => console.error(`[woc_market] sweep arm ${arm} failed:`, err),
+  // The per-arm isolation sink deliberately stays unset: the service's own
+  // default prints the identical line, and wiring a byte-identical copy here
+  // meant every format tweak had to land in two places.
 });
 configureWocMarketRuntime({ service: wocMarketService });
 // The dashboard's read-only ops views. Injected here so internal.ts never
@@ -3586,7 +3589,7 @@ export async function startServer(): Promise<http.Server> {
     // race the pool close below.
     await retentionSweep.stop();
     await wocMarketSweep.stop();
-    wocMarketMonitor.stop();
+    await wocMarketMonitor.stop();
     await generalChatQuotaListener.stop();
     game.stop();
     await game.saveAll('shutdown');

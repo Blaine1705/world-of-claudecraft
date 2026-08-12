@@ -9,8 +9,13 @@
 // a test can never mutate internal state by aliasing a returned row.
 //
 // Test hooks: `failNextEscrow` forces the next escrowInsertListing to refuse
-// (the compensation/restore paths), and `escrowSaves` records every character
-// save the escrow edge received.
+// (the compensation/restore paths); `escrowSaves` records every character
+// save the escrow edge received; `failNextMarkBooked` fails the next
+// markCustodyRefBooked (the written-flag twins); `failNextDeliveredSave`
+// forces the next saveDeliveredCharacterBooked outcome ('lease_lost',
+// 'throw', or 'throw_after_commit') with `deliveredSaves` recording every
+// save it received; `failNextFinalize` forces the next finalize to report
+// contention.
 
 import type {
   CharacterSaveArgs,
@@ -28,7 +33,7 @@ import type {
   WocSaleRow,
   WocSettlementRow,
   WocStrikeRow,
-  WocStuckCustodyReadout,
+  WocStuckCustodyClasses,
 } from '../../../server/woc_market';
 import type { WocBidStatus, WocSettlementState } from '../../../server/woc_market_rules';
 import { WOC_MARKET_MAX_ACTIVE_LISTINGS } from '../../../server/woc_market_rules';
@@ -87,9 +92,15 @@ export class FakeWocMarketDb implements WocMarketDb {
   private readonly strikes = new Map<number, WocStrikeRow>();
   private readonly terms = new Map<number, number>();
 
-  // updated_at mirrors (ordering keys for the sweep queues).
+  // updated_at mirrors (the readout's age signals; stamped on every real
+  // mutation, exactly where the Pg UPDATEs set updated_at = now()).
   private readonly listingTouchMs = new Map<number, number>();
   private readonly settlementTouchMs = new Map<number, number>();
+  // sweep_parked_at mirrors: the rotation column the park writes. Kept apart
+  // from the touch maps so a parked row cycles to the batch tail WITHOUT
+  // refreshing its age (the Pg split this fake must model faithfully).
+  private readonly listingParkedMs = new Map<number, number>();
+  private readonly settlementParkedMs = new Map<number, number>();
 
   private nextListingId = 1;
   private nextBidId = 1;
@@ -132,6 +143,14 @@ export class FakeWocMarketDb implements WocMarketDb {
   private byTouch(map: Map<number, number>) {
     return (a: { id: number }, b: { id: number }): number =>
       (map.get(a.id) ?? 0) - (map.get(b.id) ?? 0) || a.id - b.id;
+  }
+
+  /** The batch order the parked-row rotation feeds: COALESCE(sweep_parked_at,
+   *  updated_at), mirroring PARK_ROTATION_ORDER in the Pg module. */
+  private byRotation(parked: Map<number, number>, touch: Map<number, number>) {
+    return (a: { id: number }, b: { id: number }): number =>
+      (parked.get(a.id) ?? touch.get(a.id) ?? 0) - (parked.get(b.id) ?? touch.get(b.id) ?? 0) ||
+      a.id - b.id;
   }
 
   // -------------------------------------------------------------------------
@@ -624,9 +643,12 @@ export class FakeWocMarketDb implements WocMarketDb {
           row.realm === realm &&
           row.status === 'closed' &&
           !row.itemDisposed &&
-          (row.resolution === null || row.resolution !== 'sold'),
+          // Mirrors the SQL's (resolution IS NULL OR resolution <> 'sold'):
+          // in SQL the IS NULL arm is load-bearing (NULL <> 'sold' is NULL);
+          // in TS the inequality already covers null, so one arm suffices.
+          row.resolution !== 'sold',
       )
-      .sort(this.byTouch(this.listingTouchMs))
+      .sort(this.byRotation(this.listingParkedMs, this.listingTouchMs))
       .slice(0, limit)
       .map((r) => this.listingOut(r));
   }
@@ -755,16 +777,23 @@ export class FakeWocMarketDb implements WocMarketDb {
     olderThanMs: number,
     sampleLimit: number,
     countCap: number,
-  ): Promise<WocStuckCustodyReadout> {
-    // Counts SATURATE at countCap, mirroring the Pg inner-LIMIT subqueries;
-    // the delivering class ages on createdAtMs (rotation touches never move
-    // it), mirroring the Pg created_at predicate.
+  ): Promise<WocStuckCustodyClasses> {
+    // Counts SATURATE at countCap, mirroring the Pg inner-LIMIT subqueries.
+    // Age signals mirror the Pg predicates: rotation (the parked maps) never
+    // moves them, so a permanently parked row still ages into the readout;
+    // the delivering class ages on the updated_at mirror stamped when the
+    // row ENTERED 'delivering'.
     const claims = [...this.custodyClaims.entries()]
       .filter(([, c]) => c.realm === realm && c.bookedAtMs === null && c.claimedAtMs <= olderThanMs)
       .sort((a, b) => a[1].claimedAtMs - b[1].claimedAtMs || a[0].localeCompare(b[0]));
     const delivering = [...this.settlements.values()]
-      .filter((s) => s.realm === realm && s.state === 'delivering' && s.createdAtMs <= olderThanMs)
-      .sort((a, b) => a.createdAtMs - b.createdAtMs || a.id - b.id);
+      .filter(
+        (s) =>
+          s.realm === realm &&
+          s.state === 'delivering' &&
+          (this.settlementTouchMs.get(s.id) ?? 0) <= olderThanMs,
+      )
+      .sort(this.byTouch(this.settlementTouchMs));
     const undisposed = [...this.listings.values()]
       .filter(
         (l) =>
@@ -777,6 +806,7 @@ export class FakeWocMarketDb implements WocMarketDb {
     return {
       unbookedClaims: {
         count: Math.min(claims.length, countCap),
+        saturated: claims.length >= countCap,
         sample: claims.slice(0, sampleLimit).map(([ref, c]) => ({
           custodyRef: ref,
           claimedAtMs: c.claimedAtMs,
@@ -786,6 +816,7 @@ export class FakeWocMarketDb implements WocMarketDb {
       },
       stuckDelivering: {
         count: Math.min(delivering.length, countCap),
+        saturated: delivering.length >= countCap,
         sample: delivering.slice(0, sampleLimit).map((s) => ({
           id: s.id,
           listingId: s.listingId,
@@ -794,6 +825,7 @@ export class FakeWocMarketDb implements WocMarketDb {
       },
       undisposedListings: {
         count: Math.min(undisposed.length, countCap),
+        saturated: undisposed.length >= countCap,
         sample: undisposed.slice(0, sampleLimit).map((l) => ({
           id: l.id,
           resolution: l.resolution,
@@ -1118,18 +1150,21 @@ export class FakeWocMarketDb implements WocMarketDb {
   // Settlements
   // -------------------------------------------------------------------------
 
-  /** Force the NEXT finalize to report contention (consumed on use). */
-  failNextFinalize: 'contended' | null = null;
+  /** Force the NEXT finalize verdict (consumed on use): 'contended' models a
+   *  lock-timeout loser, 'stale' models a hand-moved row vanishing between
+   *  the batch read and the transaction (only an operator can produce it). */
+  failNextFinalize: 'contended' | 'stale' | null = null;
 
   async finalizeDeliveredSettlement(args: {
     settlementId: number;
     listingId: number;
     bidId: number | null;
     sale: Omit<WocSaleRow, 'id' | 'excluded' | 'atMs'>;
-  }): Promise<'finalized' | 'stale' | 'contended'> {
+  }): Promise<'finalized' | 'already_final' | 'stale' | 'contended'> {
     if (this.failNextFinalize) {
+      const forced = this.failNextFinalize;
       this.failNextFinalize = null;
-      return 'contended';
+      return forced;
     }
     const rec = this.settlements.get(args.settlementId);
     const listing = this.listings.get(args.listingId);
@@ -1152,12 +1187,15 @@ export class FakeWocMarketDb implements WocMarketDb {
         atMs: this.now(),
       });
     }
+    // The close is a real compare-and-set (mirrors the Pg WHERE): a listing
+    // already closed AND disposed downgrades the whole run to already_final.
+    const closedNow = listing.status !== 'closed' || !listing.itemDisposed;
     if (listing.status !== 'closed') {
       listing.status = 'closed';
       listing.resolution = 'sold';
     }
     listing.itemDisposed = true;
-    this.touchListing(listing.id);
+    if (closedNow) this.touchListing(listing.id);
     if (args.bidId !== null) {
       const winner = this.bids.get(args.bidId);
       if (winner && winner.bondState === 'held') winner.bondState = 'refund_due';
@@ -1171,7 +1209,7 @@ export class FakeWocMarketDb implements WocMarketDb {
         if (bid.bondState === 'held') bid.bondState = 'refund_due';
       }
     }
-    return 'finalized';
+    return closedNow ? 'finalized' : 'already_final';
   }
 
   async insertSettlement(args: {
@@ -1360,7 +1398,7 @@ export class FakeWocMarketDb implements WocMarketDb {
   async deliveringSettlements(realm: string, limit: number): Promise<WocSettlementRow[]> {
     return [...this.settlements.values()]
       .filter((s) => s.realm === realm && s.state === 'delivering')
-      .sort(this.byTouch(this.settlementTouchMs))
+      .sort(this.byRotation(this.settlementParkedMs, this.settlementTouchMs))
       .slice(0, limit)
       .map((s) => this.settlementOut(s));
   }
@@ -1369,11 +1407,14 @@ export class FakeWocMarketDb implements WocMarketDb {
     realm: string,
     afterListingId: number,
     pageSize: number,
+    maxSettlements: number,
   ): Promise<{ settlements: WocSettlementRow[]; lastListingId: number | null }> {
     // Mirrors the Pg two-statement page: a bounded slice of open listing ids
     // (the same three-status literal the SQL spells; the four-way lifecycle
     // means "not closed", pinned in woc_market_directed_sql.test.ts), then
-    // the delivered settlements riding them.
+    // the delivered settlements riding them, bounded by maxSettlements with
+    // the truncation-cursor semantics (next beat resumes behind the last
+    // RETURNED row instead of skipping the remainder to the wrap).
     const openIds = [...this.listings.values()]
       .filter(
         (l) =>
@@ -1386,16 +1427,25 @@ export class FakeWocMarketDb implements WocMarketDb {
       .slice(0, pageSize);
     if (openIds.length === 0) return { settlements: [], lastListingId: null };
     const idSet = new Set(openIds);
-    const settlements = [...this.settlements.values()]
+    const matched = [...this.settlements.values()]
       .filter((s) => s.realm === realm && s.state === 'delivered' && idSet.has(s.listingId))
-      .sort((a, b) => a.id - b.id)
+      .sort((a, b) => a.listingId - b.listingId)
       .map((s) => this.settlementOut(s));
-    return { settlements, lastListingId: openIds[openIds.length - 1] ?? null };
+    if (matched.length > maxSettlements) {
+      const kept = matched.slice(0, maxSettlements);
+      return {
+        settlements: kept,
+        lastListingId: kept[kept.length - 1]?.listingId ?? null,
+      };
+    }
+    return { settlements: matched, lastListingId: openIds[openIds.length - 1] ?? null };
   }
 
   async disposeSoldResidueListings(realm: string, limit: number): Promise<number> {
     let disposed = 0;
-    for (const listing of this.listings.values()) {
+    // id order, mirroring the SQL's ORDER BY l.id (deterministic lock order).
+    const rows = [...this.listings.values()].sort((a, b) => a.id - b.id);
+    for (const listing of rows) {
       if (disposed >= limit) break;
       if (
         listing.realm !== realm ||
@@ -1417,11 +1467,12 @@ export class FakeWocMarketDb implements WocMarketDb {
   }
 
   async touchSettlementRow(id: number): Promise<void> {
-    if (this.settlements.has(id)) this.touchSettlement(id);
+    // Rotation writes the parked mirror ONLY, never the age signal.
+    if (this.settlements.has(id)) this.settlementParkedMs.set(id, this.now());
   }
 
   async touchListingRow(id: number): Promise<void> {
-    if (this.listings.has(id)) this.touchListing(id);
+    if (this.listings.has(id)) this.listingParkedMs.set(id, this.now());
   }
 
   async overdueSettlements(

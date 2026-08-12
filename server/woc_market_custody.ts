@@ -77,11 +77,14 @@ export function createWocMarketCustody(host: WocCustodyGameHost): WocMarketCusto
       if (!host.sim.grantTradableCopy(session.pid, slot)) return { ok: false, reason: 'no_space' };
       const state = host.sim.serializeCharacter(session.pid);
       if (!state) {
-        // Defensive, and the same shape extractCopy uses: a session that cannot
-        // serialize is one being torn down, so its in-memory bags are never
-        // saved. Nothing is undone because there is nothing durable to undo, and
-        // the caller mails the copy instead.
-        return { ok: false, reason: 'offline' };
+        // Defensive: today resolve() and serializeCharacter share their
+        // preconditions with grantTradableCopy and no await separates them,
+        // so this branch is unreachable, but nothing PINS that coincidence.
+        // If it ever fires, the grant has already mutated the LIVE bags and a
+        // teardown's ordinary flush may still persist them, so this is NOT a
+        // clean refusal the caller may mail over (that would be the second
+        // copy): it is ambiguous, and ambiguity parks.
+        return { ok: false, reason: 'ambiguous' };
       }
       return {
         ok: true,
@@ -156,9 +159,12 @@ export function createWocMarketCustody(host: WocCustodyGameHost): WocMarketCusto
         !host.sim.mailSystemParcel(recipient, LETTERS[letter], items, custodyRef) &&
         !host.sim.hasCustodyParcel(custodyRef)
       ) {
-        // Genuine refusal: nothing is booked under this ref. Throwing lands in
-        // the caller's failure path (release the claim, retry on a later sweep
-        // pass), so the item stays visibly held instead of vanishing.
+        // Genuine refusal: no parcel exists under this ref. Throwing lands in
+        // the caller's failure path, which KEEPS the claim unbooked and
+        // visible for the operator (bookCustodyOnce parks it: the attempt is
+        // already marked written, so only a parcel's own presence in the book
+        // could authorize a retry, and a refused parcel is never in the
+        // book). The item stays visibly held instead of vanishing.
         throw new Error(`woc_market: mail parcel refused for custodyRef ${custodyRef}`);
       }
       // Failure here PROPAGATES too: the caller must not advance its settlement

@@ -17,8 +17,8 @@
 // only delays an operator diagnostic, never enforcement (the cached-read bust
 // rule in server/CLAUDE.md "Hot paths").
 
-import { type CachedRead, createCachedRead } from './cached_read';
-import type { WocStuckCustodyReadout } from './woc_market';
+import { createCachedRead } from './cached_read';
+import type { WocStuckCustodyClasses, WocStuckCustodyReadout } from './woc_market';
 
 /** The one db read the monitor needs (PgWocMarketDb implements it). */
 export interface WocMarketMonitorDb {
@@ -27,7 +27,7 @@ export interface WocMarketMonitorDb {
     olderThanMs: number,
     sampleLimit: number,
     countCap: number,
-  ): Promise<WocStuckCustodyReadout>;
+  ): Promise<WocStuckCustodyClasses>;
 }
 
 export interface WocMarketMonitorDeps {
@@ -47,6 +47,8 @@ export interface WocMarketMonitorDeps {
   sampleLimit?: number;
   /** Cadence of the periodic log line. */
   logIntervalMs?: number;
+  /** Where each class's count saturates ("cap or more"). */
+  countCap?: number;
 }
 
 export interface WocMarketMonitor {
@@ -56,7 +58,9 @@ export interface WocMarketMonitor {
    *  marketplace stays silent; the endpoint answers the affirmative case). */
   logTick(): Promise<void>;
   start(): void;
-  stop(): void;
+  /** Resolves after any in-flight beat finishes, so a shutdown never races a
+   *  beat into the closing pool (the sweep shell's stop() contract). */
+  stop(): Promise<void>;
 }
 
 export const WOC_MONITOR_TTL_MS = 30_000;
@@ -64,6 +68,14 @@ export const WOC_MONITOR_STUCK_AGE_MS = 10 * 60_000;
 export const WOC_MONITOR_SAMPLE_LIMIT = 20;
 export const WOC_MONITOR_COUNT_CAP = 1000;
 export const WOC_MONITOR_LOG_INTERVAL_MS = 5 * 60_000;
+/** How long a COLD-cache failure short-circuits new refresh flights: with no
+ *  prior success there is no stale value to serve, so without this every
+ *  endpoint hit during a DB outage would start a fresh multi-query flight. */
+export const WOC_MONITOR_COLD_FAIL_TTL_MS = 5_000;
+/** A warm cache stale-serves through a DB outage; past this age the beat
+ *  starts warning that its numbers are old (staleness would otherwise be
+ *  invisible on the one surface built for incidents). */
+export const WOC_MONITOR_STALE_WARN_MS = WOC_MONITOR_TTL_MS * 10;
 
 /** Freeze the readout before it is shared: read() hands the SAME object to
  *  every caller for a TTL window, so an in-place sort or redaction by one
@@ -87,31 +99,64 @@ export function createWocMarketMonitor(deps: WocMarketMonitorDeps): WocMarketMon
   const stuckAgeMs = deps.stuckAgeMs ?? WOC_MONITOR_STUCK_AGE_MS;
   const sampleLimit = deps.sampleLimit ?? WOC_MONITOR_SAMPLE_LIMIT;
   const logIntervalMs = deps.logIntervalMs ?? WOC_MONITOR_LOG_INTERVAL_MS;
+  const countCap = deps.countCap ?? WOC_MONITOR_COUNT_CAP;
+  // Scales with the effective TTL so tests with tiny TTLs keep the same
+  // ten-refreshes-missed meaning; at the production TTL this equals
+  // WOC_MONITOR_STALE_WARN_MS.
+  const staleWarnMs = ttlMs * 10;
 
-  const cached: CachedRead<WocStuckCustodyReadout> = createCachedRead(
+  const cached = createCachedRead(
     async () =>
-      freezeReadout(
-        await deps.db.stuckCustodyReadout(
+      freezeReadout({
+        // Stamped INSIDE the refresh: the cached read stale-serves through an
+        // outage, and without an as-of time a stale readout is
+        // indistinguishable from a fresh one on the wire.
+        asOfMs: now(),
+        ...(await deps.db.stuckCustodyReadout(
           deps.realm,
           now() - stuckAgeMs,
           sampleLimit,
-          WOC_MONITOR_COUNT_CAP,
-        ),
-      ),
+          countCap,
+        )),
+      }),
     { ttlMs, now },
   );
 
+  // Negative cache for the COLD-failure case only: after a success the cached
+  // read stale-serves and never rejects, but with no prior success every
+  // caller would otherwise start a fresh multi-query flight against a dead DB.
+  let coldFailAtMs = 0;
+  let coldFailErr: unknown = null;
+  const read = async (): Promise<WocStuckCustodyReadout> => {
+    if (coldFailErr !== null && now() - coldFailAtMs < WOC_MONITOR_COLD_FAIL_TTL_MS) {
+      throw coldFailErr;
+    }
+    try {
+      const readout = await cached.read();
+      coldFailErr = null;
+      return readout;
+    } catch (err) {
+      coldFailAtMs = now();
+      coldFailErr = err;
+      throw err;
+    }
+  };
+
   let timer: ReturnType<typeof setInterval> | null = null;
+  let running: Promise<void> | null = null;
   // Warn once per failure STREAK: the cached read's own stale-serve warning
   // only fires after a first success, so a monitor that fails from boot (a
   // migration lag, a revoked grant) would otherwise be silent forever, which
   // is the one failure mode the visibility module must not have.
   let failStreak = false;
+  // The warm twin: a stale-served readout resolves fine, so track its age and
+  // warn once per STALE streak too, or a warm brownout is silent.
+  let staleStreak = false;
 
   const logTick = async (): Promise<void> => {
     let readout: WocStuckCustodyReadout;
     try {
-      readout = await cached.read();
+      readout = await read();
       failStreak = false;
     } catch (err) {
       if (!failStreak) {
@@ -120,32 +165,60 @@ export function createWocMarketMonitor(deps: WocMarketMonitorDeps): WocMarketMon
       }
       return;
     }
-    const counts = {
-      unbookedClaims: readout.unbookedClaims.count,
-      stuckDelivering: readout.stuckDelivering.count,
-      undisposedListings: readout.undisposedListings.count,
-    };
-    const stuck =
-      counts.unbookedClaims > 0 || counts.stuckDelivering > 0 || counts.undisposedListings > 0;
-    if (!stuck) return;
-    deps.log(`[woc_market] stuck custody ${JSON.stringify(counts)}`);
+    // Nothing below may reject out of the void'ed interval call: the log sink
+    // is console.warn in production, but the contract is beat-never-throws.
+    try {
+      const ageMs = now() - readout.asOfMs;
+      if (ageMs > staleWarnMs) {
+        if (!staleStreak) {
+          staleStreak = true;
+          deps.log(
+            `[woc_market] stuck custody readout is STALE (age ${Math.round(ageMs / 1000)}s): serving the last good value`,
+          );
+        }
+      } else {
+        staleStreak = false;
+      }
+      const counts = {
+        unbookedClaims: readout.unbookedClaims.count,
+        stuckDelivering: readout.stuckDelivering.count,
+        undisposedListings: readout.undisposedListings.count,
+      };
+      const stuck =
+        counts.unbookedClaims > 0 || counts.stuckDelivering > 0 || counts.undisposedListings > 0;
+      if (!stuck) return;
+      deps.log(`[woc_market] stuck custody ${JSON.stringify(counts)}`);
+    } catch {
+      // The log sink threw; there is no safer sink to report that to.
+    }
+  };
+
+  const guardedTick = (): Promise<void> => {
+    const run = logTick().finally(() => {
+      if (running === run) running = null;
+    });
+    running = run;
+    return run;
   };
 
   return {
-    read: () => cached.read(),
-    logTick,
+    read,
+    logTick: guardedTick,
     start(): void {
       if (timer !== null) return;
       timer = setInterval(() => {
-        void logTick();
+        void guardedTick();
       }, logIntervalMs);
       timer.unref?.();
     },
-    stop(): void {
+    async stop(): Promise<void> {
       if (timer !== null) {
         clearInterval(timer);
         timer = null;
       }
+      // Drain a beat that already fired: otherwise it finishes against the
+      // closing pool and logs a phantom incident during a clean shutdown.
+      if (running !== null) await running.catch(() => {});
     },
   };
 }

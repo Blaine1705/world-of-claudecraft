@@ -420,6 +420,8 @@ export interface WocMarketDb {
   /** The delivery close tail as one transaction (delivered CAS, sale row,
    *  listing close + dispose, bond flips). 'stale': the settlement left
    *  delivering/delivered, or the listing row is gone; nothing was written.
+   *  'already_final': the listing was already closed AND disposed, so this
+   *  run converged nothing new (do not count it, do not re-notify).
    *  'contended': the bounded lock wait expired, retry on a later pass.
    *  Re-running it converges (every write is a compare-and-set and the sale
    *  insert dedupes on woc_market_sales_listing_once). */
@@ -428,17 +430,17 @@ export interface WocMarketDb {
     listingId: number;
     bidId: number | null;
     sale: Omit<WocSaleRow, 'id' | 'excluded' | 'atMs'>;
-  }): Promise<'finalized' | 'stale' | 'contended'>;
+  }): Promise<'finalized' | 'already_final' | 'stale' | 'contended'>;
   /** The three stuck classes for the ops monitor (unbooked claims, stuck
    *  'delivering' settlements, closed-but-undisposed listings). Counts
    *  SATURATE at countCap and samples are capped, so the read is O(cap) even
-   *  at incident-sized backlogs. */
+   *  at incident-sized backlogs. The monitor stamps asOfMs on top. */
   stuckCustodyReadout(
     realm: string,
     olderThanMs: number,
     sampleLimit: number,
     countCap: number,
-  ): Promise<WocStuckCustodyReadout>;
+  ): Promise<WocStuckCustodyClasses>;
   claimBuyNowLock(
     realm: string,
     id: number,
@@ -490,7 +492,7 @@ export interface WocMarketDb {
   activateBid(
     bidId: number,
     nowMs: number,
-  ): Promise<'activated' | 'superseded' | 'listing_closed' | 'not_pending'>;
+  ): Promise<'activated' | 'superseded' | 'listing_closed' | 'not_pending' | 'contended'>;
   markBondHeld(bidId: number): Promise<void>;
   lapsePendingBids(realm: string, cutoffMs: number, limit: number): Promise<number>;
   bidsByAccount(realm: string, account: number, limit: number): Promise<WocBidRow[]>;
@@ -571,18 +573,25 @@ export interface WocMarketDb {
   /** One page of 'delivered' settlements whose LISTING never closed: the
    *  residue an older binary's separately-committed close tail leaves behind.
    *  Cursor-paged over open listing ids so the cost is O(page) regardless of
-   *  the planner; lastListingId null means the cycle is exhausted. */
+   *  the planner; the residue fetch is bounded by maxSettlements (each row
+   *  costs the caller a finalize transaction plus a mail-book write), and a
+   *  truncated fetch returns the last RETURNED row's listing as the cursor.
+   *  lastListingId null means the cycle is exhausted. */
   deliveredUnclosedSettlementsPage(
     realm: string,
     afterListingId: number,
     pageSize: number,
+    maxSettlements: number,
   ): Promise<{ settlements: WocSettlementRow[]; lastListingId: number | null }>;
   /** Dispose closed sold listings that carry a STANDING sale row (an older
    *  binary's crash residue between its close and dispose statements);
-   *  returns how many converged. Sold rows with no sale stay parked. */
+   *  returns how many converged. Sold rows with no sale stay parked; a row a
+   *  concurrent transaction holds is skipped (never waited on). */
   disposeSoldResidueListings(realm: string, limit: number): Promise<number>;
-  /** Rotate a parked settlement to the back of the updated_at sweep queues
-   *  (the stuck readout ages on created_at, untouched by this). */
+  /** Rotate a parked settlement to the back of the sweep batch queue. Writes
+   *  the dedicated rotation column ONLY: the stuck readout's age signals
+   *  (updated_at) must never move on a park, or the parked row can never age
+   *  past the stuck threshold and the monitor is blind to it. */
   touchSettlementRow(id: number): Promise<void>;
   /** The listing twin, for a parked return in the undisposed backlog. */
   touchListingRow(id: number): Promise<void>;
@@ -700,7 +709,10 @@ export type WocCustodyExtract =
  */
 export type WocCustodyGrant =
   | { ok: true; save: CharacterSaveArgs }
-  | { ok: false; reason: 'offline' | 'not_yours' | 'no_space' };
+  /** 'ambiguous' is the one refusal that is NOT clean: the grant already
+   *  mutated the live bags and the session state is unprovable, so the
+   *  caller must PARK (never convert to mail; that is a second copy). */
+  | { ok: false; reason: 'offline' | 'not_yours' | 'no_space' | 'ambiguous' };
 
 /** The durable claim row for a custody ref (see custodyRefState). */
 export interface WocCustodyRefState {
@@ -715,11 +727,12 @@ export interface WocCustodyRefState {
 }
 
 /** The three stuck classes the ops monitor surfaces (stuckCustodyReadout).
- *  Counts SATURATE at the readout's countCap (a value equal to the cap means
- *  "cap or more"); samples are separately capped. */
-export interface WocStuckCustodyReadout {
+ *  Counts SATURATE at the readout's countCap; saturated makes the "cap or
+ *  more" case explicit on the wire. Samples are separately capped. */
+export interface WocStuckCustodyClasses {
   unbookedClaims: {
     count: number;
+    saturated: boolean;
     sample: {
       custodyRef: string;
       claimedAtMs: number;
@@ -729,12 +742,21 @@ export interface WocStuckCustodyReadout {
   };
   stuckDelivering: {
     count: number;
+    saturated: boolean;
     sample: { id: number; listingId: number; createdAtMs: number }[];
   };
   undisposedListings: {
     count: number;
+    saturated: boolean;
     sample: { id: number; resolution: string | null; updatedAtMs: number }[];
   };
+}
+
+/** What the monitor serves: the classes plus the refresh stamp. The cached
+ *  read stale-serves through a DB outage, so asOfMs is what lets a consumer
+ *  (and the log beat) tell a fresh readout from an hour-old one. */
+export interface WocStuckCustodyReadout extends WocStuckCustodyClasses {
+  asOfMs: number;
 }
 
 /** The one bridge into the live Sim (game.ts wiring). Every method is
@@ -870,9 +892,23 @@ export interface WocSweepPassStats {
   /** Delivered-but-unclosed settlements whose close tail was re-driven
    *  forward (an older binary's crash residue converging). */
   redriven: number;
+  /** Sold-but-undisposed residue rows whose dispose flag converged (the
+   *  sibling residue class; counted apart from redriven so a page-walk beat
+   *  and a dispose beat cannot trip the saturation signal together). */
+  disposed: number;
   returned: number;
+  /** Rows PARKED this pass (delivery or return refusals rotating to the
+   *  tail). Parked work is real work: without this a fully parked pass
+   *  scored zero everywhere and the pass looked idle exactly when wedged. */
+  parked: number;
   bonds: number;
 }
+
+/** Sweep failure tags: every per-arm stats key, plus the delivery sub-steps
+ *  that report row-level failures from inside an arm (the grant commit and
+ *  the seller notice), which carry their own tags so an operator can tell
+ *  WHERE in the delivery a row is failing. */
+export type WocSweepErrorTag = keyof WocSweepPassStats | 'deliver_grant' | 'deliver_notice';
 
 export class WocMarketService {
   constructor(private readonly deps: WocMarketDeps) {}
@@ -913,8 +949,14 @@ export class WocMarketService {
   /** One 'contended' outcome stops ALL delivery work for the rest of the
    *  pass: the claimed rows a break leaves behind are already 'delivering',
    *  so without this the reconcile arm re-attempts them seconds later in the
-   *  SAME pass and spends the lock_timeout budget the break conserved. */
+   *  SAME pass and spends the lock_timeout budget the break conserved.
+   *  Reset at pass start AND at the eager confirm entry (which runs outside
+   *  any pass and must not inherit a previous pass's contention). */
   private passContended = false;
+
+  /** Park EVENTS this pass (rows newly parked or re-parked after a retry),
+   *  reported in the pass stats so a fully parked pass reads as work. */
+  private passParked = 0;
 
   /** Next time the delivered-residue arm may run (minute-scale: it converges
    *  an OLDER binary's crash residue, so every-pass cost bought nothing). */
@@ -922,6 +964,9 @@ export class WocMarketService {
   /** Listing-id cursor for the residue page walk; resets on an exhausted
    *  cycle. */
   private redriveCursor = 0;
+  /** The dispose arm's own minute gate (same cadence, independent clock so
+   *  the two residue arms cannot hide each other's failures). */
+  private disposeDueAtMs = 0;
 
   /** Entries in the process-local ledgers older than this are dead weight:
    *  a pending grant is only usable while its exact session lives, a pending
@@ -1568,7 +1613,10 @@ export class WocMarketService {
     await this.deps.db.markBondHeld(bidId);
     const activated = await this.deps.db.activateBid(bidId, this.now());
     // A racer confirmed a higher bid first: this bond flips straight to
-    // refund_due inside activateBid's superseded arm.
+    // refund_due inside activateBid's superseded arm. A 'contended' verdict
+    // leaves the bid pending with its bond held, which is safe: the
+    // confirmingBonds select keys on status + signature (not bond_state), so
+    // the next pass re-confirms and retries the activation.
     return { ok: true, standing: activated === 'activated' };
   }
 
@@ -1582,17 +1630,24 @@ export class WocMarketService {
   private async pollConfirmingBonds(): Promise<number> {
     const bonds = await this.deps.db.confirmingBonds(this.cfg.realm, SWEEP_BATCH);
     for (const bid of bonds) {
-      if (bid.bondReference === null || bid.bondSignature === null) continue;
-      const confirmed = await this.deps.economy
-        .confirm(bid.bondReference, bid.bondSignature)
-        .catch(() => null);
-      if (!confirmed || confirmed.pending) continue;
-      if (confirmed.settled) {
-        await this.holdBondAndActivate(bid.id);
-      } else {
-        // Decided AGAINST: the bond never landed, so the bid lapses and its
-        // bond voids. Only a decided verdict may end it.
-        await this.deps.db.lapseBid(bid.id);
+      try {
+        if (bid.bondReference === null || bid.bondSignature === null) continue;
+        const confirmed = await this.deps.economy
+          .confirm(bid.bondReference, bid.bondSignature)
+          .catch(() => null);
+        if (!confirmed || confirmed.pending) continue;
+        if (confirmed.settled) {
+          await this.holdBondAndActivate(bid.id);
+        } else {
+          // Decided AGAINST: the bond never landed, so the bid lapses and its
+          // bond voids. Only a decided verdict may end it.
+          await this.deps.db.lapseBid(bid.id);
+        }
+      } catch (err) {
+        // Per-row isolation: this backlog returns UNCLAIMED rows in order, so
+        // a persistently failing head row would otherwise starve every later
+        // bond of this arm on every pass.
+        this.sweepError('polledBonds', err);
       }
     }
     return bonds.length;
@@ -1781,6 +1836,10 @@ export class WocMarketService {
     if (confirmed.settled) {
       await this.deps.db.transitionSettlement(settlement.id, ['confirming'], 'confirmed');
       // Deliver eagerly; the sweep is the backstop for any failure past here.
+      // Fresh contention scope: this entry runs OUTSIDE any sweep pass, and a
+      // flag left over from an earlier contended pass (or eager call) would
+      // silently claim-and-drop this buyer's settlement.
+      this.passContended = false;
       await this.deliverConfirmedSettlements(this.now()).catch(() => {});
       const after = await this.deps.db.settlementById(settlement.id);
       return { ok: true, state: after?.state ?? 'confirmed' };
@@ -1856,10 +1915,13 @@ export class WocMarketService {
   // -------------------------------------------------------------------------
 
   async sweepPass(): Promise<WocSweepPassStats | null> {
+    // Reset ABOVE the enabled guard: the eager confirm path shares this flag,
+    // and a stale true behind a disabled market would suppress eager
+    // deliveries forever.
+    this.passContended = false;
+    this.passParked = 0;
     if (!this.cfg.enabled) return null;
     const nowMs = this.now();
-    this.pruneLocalLedgers(nowMs);
-    this.passContended = false;
     // Every arm runs through arm(): one failing arm (or one poisoned row
     // inside an arm's own loop) is reported to onSweepError and the REST of
     // the pass still runs. Without this, a single throw skipped every later
@@ -1887,6 +1949,10 @@ export class WocMarketService {
       // converges an OLDER binary's residue, so an every-pass run bought
       // nothing but query load; counts rows ADVANCED, not rows examined.
       redriven: await this.arm('redriven', () => this.redriveDeliveredTails(nowMs)),
+      // The sibling residue class, its own arm so a throw here can never
+      // discard the page walk's count (and vice versa); shares the minute
+      // cadence and honors a contended pass.
+      disposed: await this.arm('disposed', () => this.disposeSoldResidue(nowMs)),
       closed: await this.arm('closed', () => this.closeDueAuctions(nowMs)),
       expired: await this.arm('expired', () => this.expireOverdueSettlements(nowMs)),
       polled: await this.arm('polled', () => this.pollConfirmingSettlements()),
@@ -1896,14 +1962,20 @@ export class WocMarketService {
       delivered: await this.arm('delivered', () => this.deliverConfirmedSettlements(nowMs)),
       reconciled: await this.arm('reconciled', () => this.reconcileDelivering(nowMs)),
       returned: await this.arm('returned', () => this.returnUndisposedItems(nowMs)),
+      // Evaluated AFTER the three arms above (object literals evaluate in
+      // source order), so it sees every park event of this pass. New park
+      // EVENTS only: a row skipped inside its backoff window counts nothing,
+      // so a standing parked set cannot flood this the way counting parked
+      // rows as delivered once flooded the saturation warning.
+      parked: this.passParked,
       bonds: await this.arm('bonds', () => this.processDueBonds()),
     };
     // A FULL batch means the arm did not drain: that is the one signal that
     // separates a healthy idle marketplace from a permanently starved backlog,
     // so it is reported rather than left to look identical. The delivery arms
-    // count rows ADVANCED (parked rows are excluded on purpose: a batch of
-    // parked rows is the monitor's business, and counting them here turned
-    // the saturation warning into a permanent 5-second flood).
+    // count rows ADVANCED; park events ride their own stat so a parked-only
+    // pass still reads as work without turning the saturation warning into a
+    // permanent 5-second flood.
     const saturated = Object.entries(stats)
       .filter(([, n]) => n >= SWEEP_BATCH)
       .map(([arm]) => arm);
@@ -1922,7 +1994,7 @@ export class WocMarketService {
     }
   }
 
-  private sweepError(arm: string, err: unknown): void {
+  private sweepError(arm: WocSweepErrorTag, err: unknown): void {
     if (this.deps.onSweepError) {
       this.deps.onSweepError(arm, err);
       return;
@@ -1933,83 +2005,93 @@ export class WocMarketService {
   private async closeDueAuctions(nowMs: number): Promise<number> {
     const due = await this.deps.db.claimDueListings(this.cfg.realm, nowMs, SWEEP_BATCH);
     for (const listing of due) {
-      const bids = await this.deps.db.bidsForListing(listing.id);
-      const standing = bids.find((b) => b.status === 'active');
-      const reserve = listing.reserveCents;
-      if (!standing) {
-        // Guarded close: a buy-now settlement placed inside the closing
-        // window may be riding this listing, and this arm never reaches
-        // insertSettlement's unique-index arbiter, so an unguarded close here
-        // was the item-dupe hole (return sweep mails the escrow home while
-        // the buyer can still pay). A refusal parks the listing 'settling';
-        // the delivery and overdue sweeps resolve the settlement and the
-        // ordinary close paths finish the job.
-        if (!(await this.deps.db.closeListingIfNoOpenSettlement(listing.id, 'no_bids'))) {
-          await this.deps.db.markListingSettling(listing.id);
-        }
-        continue;
+      try {
+        await this.closeOneDueAuction(listing, nowMs);
+      } catch (err) {
+        // Per-listing isolation: one poisoned row must not strand the rest of
+        // the batch (its own claim is re-opened by the stranded reclaim).
+        this.sweepError('closed', err);
       }
-      if (reserve !== null && standing.amountCents < reserve) {
-        // Atomic demote: outbid plus the held-bond refund ride ONE statement,
-        // so a crash between them can never strand a held bond no sweep arm
-        // reaches. Same guarded close as the no-bids arm above. Demote BEFORE
-        // the close on purpose (a crash between the two must never leave a
-        // closed listing holding an active bid); the known cosmetic edge is a
-        // purely CONTENDED close refusal, where the reclaimed re-run finds no
-        // active bid and records 'no_bids' instead of 'reserve_not_met'.
-        await this.deps.db.markBidOutbidQueueRefund(standing.id);
-        if (!(await this.deps.db.closeListingIfNoOpenSettlement(listing.id, 'reserve_not_met'))) {
-          await this.deps.db.markListingSettling(listing.id);
-        }
-        continue;
-      }
-      const settlement = await this.deps.db.insertSettlement({
-        listingId: listing.id,
-        bidId: standing.id,
-        attempt: 1,
-        buyerAccount: standing.account,
-        buyerCharacter: standing.characterId,
-        buyerName: standing.characterName,
-        buyerWallet: standing.wallet,
-        amountCents: standing.amountCents,
-        deadlineAtMs: nowMs + WOC_MARKET_SETTLEMENT_WINDOW_SECONDS * 1000,
-        nowMs,
-        // Stamped 'won' inside the insert's transaction, so the race below can
-        // never leave a settlement-less winner. The close-time winner is
-        // always read as 'active' just above, so the pickable set is exactly
-        // that: a bid something else moved off 'active' meanwhile has lost
-        // its claim and must not be stamped.
-        winnerBidId: standing.id,
-        winnerFrom: ['active'],
-      });
-      if (settlement === 'listing_closed') {
-        // A suspend closed the listing under our 'ending' claim; it already
-        // resolved the bid book and the bonds, so there is nothing to settle.
-        continue;
-      }
-      if (settlement === 'contended') {
-        // A guard transaction holds the listing row; nothing was written.
-        // Leave the claim as-is: the stranded reclaim re-opens an 'ending'
-        // row after its grace and the next pass retries the close.
-        continue;
-      }
-      if (settlement === 'live_settlement_exists' || settlement === 'winner_gone') {
-        // A buy-now settlement is already in flight (or a concurrent suspend
-        // took the winner off 'active'): that racer won. The standing bid
-        // loses its claim (the insert and its 'won' stamp rolled back
-        // together) and its bond rides the refund pipeline, atomically; the
-        // demote's own compare-and-set from 'active' cannot resurrect a bid
-        // a concurrent suspend already cancelled.
-        await this.deps.db.markBidOutbidQueueRefund(standing.id);
-      }
-      // Either way the listing leaves 'ending': a claimed row that stays there
-      // is unreachable forever (claimDueListings only selects 'active'), which
-      // would strand the escrowed copy and the winner's bond with no
-      // reconciliation path. On the buy-now race above the live settlement is
-      // the one that drives it, and it also becomes 'settling'.
-      await this.deps.db.markListingSettling(listing.id);
     }
     return due.length;
+  }
+
+  private async closeOneDueAuction(listing: WocListingRow, nowMs: number): Promise<void> {
+    const bids = await this.deps.db.bidsForListing(listing.id);
+    const standing = bids.find((b) => b.status === 'active');
+    const reserve = listing.reserveCents;
+    if (!standing) {
+      // Guarded close: a buy-now settlement placed inside the closing
+      // window may be riding this listing, and this arm never reaches
+      // insertSettlement's unique-index arbiter, so an unguarded close here
+      // was the item-dupe hole (return sweep mails the escrow home while
+      // the buyer can still pay). A refusal parks the listing 'settling';
+      // the delivery and overdue sweeps resolve the settlement and the
+      // ordinary close paths finish the job.
+      if (!(await this.deps.db.closeListingIfNoOpenSettlement(listing.id, 'no_bids'))) {
+        await this.deps.db.markListingSettling(listing.id);
+      }
+      return;
+    }
+    if (reserve !== null && standing.amountCents < reserve) {
+      // Atomic demote: outbid plus the held-bond refund ride ONE statement,
+      // so a crash between them can never strand a held bond no sweep arm
+      // reaches. Same guarded close as the no-bids arm above. Demote BEFORE
+      // the close on purpose (a crash between the two must never leave a
+      // closed listing holding an active bid); the known cosmetic edge is a
+      // purely CONTENDED close refusal, where the reclaimed re-run finds no
+      // active bid and records 'no_bids' instead of 'reserve_not_met'.
+      await this.deps.db.markBidOutbidQueueRefund(standing.id);
+      if (!(await this.deps.db.closeListingIfNoOpenSettlement(listing.id, 'reserve_not_met'))) {
+        await this.deps.db.markListingSettling(listing.id);
+      }
+      return;
+    }
+    const settlement = await this.deps.db.insertSettlement({
+      listingId: listing.id,
+      bidId: standing.id,
+      attempt: 1,
+      buyerAccount: standing.account,
+      buyerCharacter: standing.characterId,
+      buyerName: standing.characterName,
+      buyerWallet: standing.wallet,
+      amountCents: standing.amountCents,
+      deadlineAtMs: nowMs + WOC_MARKET_SETTLEMENT_WINDOW_SECONDS * 1000,
+      nowMs,
+      // Stamped 'won' inside the insert's transaction, so the race below can
+      // never leave a settlement-less winner. The close-time winner is
+      // always read as 'active' just above, so the pickable set is exactly
+      // that: a bid something else moved off 'active' meanwhile has lost
+      // its claim and must not be stamped.
+      winnerBidId: standing.id,
+      winnerFrom: ['active'],
+    });
+    if (settlement === 'listing_closed') {
+      // A suspend closed the listing under our 'ending' claim; it already
+      // resolved the bid book and the bonds, so there is nothing to settle.
+      return;
+    }
+    if (settlement === 'contended') {
+      // A guard transaction holds the listing row; nothing was written.
+      // Leave the claim as-is: the stranded reclaim re-opens an 'ending'
+      // row after its grace and the next pass retries the close.
+      return;
+    }
+    if (settlement === 'live_settlement_exists' || settlement === 'winner_gone') {
+      // A buy-now settlement is already in flight (or a concurrent suspend
+      // took the winner off 'active'): that racer won. The standing bid
+      // loses its claim (the insert and its 'won' stamp rolled back
+      // together) and its bond rides the refund pipeline, atomically; the
+      // demote's own compare-and-set from 'active' cannot resurrect a bid
+      // a concurrent suspend already cancelled.
+      await this.deps.db.markBidOutbidQueueRefund(standing.id);
+    }
+    // Either way the listing leaves 'ending': a claimed row that stays there
+    // is unreachable forever (claimDueListings only selects 'active'), which
+    // would strand the escrowed copy and the winner's bond with no
+    // reconciliation path. On the buy-now race above the live settlement is
+    // the one that drives it, and it also becomes 'settling'.
+    await this.deps.db.markListingSettling(listing.id);
   }
 
   /**
@@ -2056,19 +2138,57 @@ export class WocMarketService {
   private async expireOverdueSettlements(nowMs: number): Promise<number> {
     const overdue = await this.deps.db.overdueSettlements(this.cfg.realm, nowMs, SWEEP_BATCH);
     for (const settlement of overdue) {
-      const moved = await this.deps.db.transitionSettlement(
-        settlement.id,
-        ['offered', 'failed'],
-        'expired',
-        'window_elapsed',
+      try {
+        await this.expireOneOverdueSettlement(settlement, nowMs);
+      } catch (err) {
+        // Per-row isolation: this backlog returns UNCLAIMED rows in deadline
+        // order, so a persistently failing head row would otherwise starve
+        // every later expiry (and its bond and strike work) forever.
+        this.sweepError('expired', err);
+      }
+    }
+    return overdue.length;
+  }
+
+  private async expireOneOverdueSettlement(
+    settlement: WocSettlementRow,
+    nowMs: number,
+  ): Promise<void> {
+    const moved = await this.deps.db.transitionSettlement(
+      settlement.id,
+      ['offered', 'failed'],
+      'expired',
+      'window_elapsed',
+    );
+    if (!moved) return;
+    const listing = await this.deps.db.listingById(this.cfg.realm, settlement.listingId);
+    if (!listing) return;
+    if (settlement.bidId !== null) {
+      // The close-time winner defaulted: forfeit the held bond, strike them.
+      await this.deps.db.markBidStatus(settlement.bidId, 'defaulted');
+      await this.deps.db.setBondState(settlement.bidId, ['held'], 'forfeit_due');
+      const strikes = await this.deps.db.strikeInfo(settlement.buyerAccount);
+      const count = (strikes?.strikes ?? 0) + 1;
+      const suspension = strikeSuspensionMs(count);
+      await this.deps.db.addStrike(
+        settlement.buyerAccount,
+        suspension > 0 ? nowMs + suspension : null,
       );
-      if (!moved) continue;
-      const listing = await this.deps.db.listingById(this.cfg.realm, settlement.listingId);
-      if (!listing) continue;
-      if (settlement.bidId !== null) {
-        // The close-time winner defaulted: forfeit the held bond, strike them.
-        await this.deps.db.markBidStatus(settlement.bidId, 'defaulted');
-        await this.deps.db.setBondState(settlement.bidId, ['held'], 'forfeit_due');
+    } else {
+      // An abandoned buy-now. On a PUBLIC listing that costs nobody anything:
+      // the buyer committed to nothing, the lock clears and the listing simply
+      // resumes for the next person, so no strike is warranted.
+      //
+      // A DIRECTED sale is the opposite case and takes one. Its buyer accepted
+      // a named offer, and that acceptance is what pulled a specific player's
+      // item out of their bags into escrow; walking away leaves that seller
+      // holding an unsellable listing they have to notice and cancel. This is
+      // the requester's rule that strikes apply to p2p non-payment once both
+      // parties have accepted, and acceptance is exactly the moment escrow
+      // happened. There is no bond to forfeit here (a directed sale carries
+      // none), so the strike is the only consequence available.
+      await this.deps.db.clearBuyNowLock(listing.id);
+      if (listing.directedBuyerAccount !== null) {
         const strikes = await this.deps.db.strikeInfo(settlement.buyerAccount);
         const count = (strikes?.strikes ?? 0) + 1;
         const suspension = strikeSuspensionMs(count);
@@ -2076,103 +2196,85 @@ export class WocMarketService {
           settlement.buyerAccount,
           suspension > 0 ? nowMs + suspension : null,
         );
-      } else {
-        // An abandoned buy-now. On a PUBLIC listing that costs nobody anything:
-        // the buyer committed to nothing, the lock clears and the listing simply
-        // resumes for the next person, so no strike is warranted.
-        //
-        // A DIRECTED sale is the opposite case and takes one. Its buyer accepted
-        // a named offer, and that acceptance is what pulled a specific player's
-        // item out of their bags into escrow; walking away leaves that seller
-        // holding an unsellable listing they have to notice and cancel. This is
-        // the requester's rule that strikes apply to p2p non-payment once both
-        // parties have accepted, and acceptance is exactly the moment escrow
-        // happened. There is no bond to forfeit here (a directed sale carries
-        // none), so the strike is the only consequence available.
-        await this.deps.db.clearBuyNowLock(listing.id);
-        if (listing.directedBuyerAccount !== null) {
-          const strikes = await this.deps.db.strikeInfo(settlement.buyerAccount);
-          const count = (strikes?.strikes ?? 0) + 1;
-          const suspension = strikeSuspensionMs(count);
-          await this.deps.db.addStrike(
-            settlement.buyerAccount,
-            suspension > 0 ? nowMs + suspension : null,
-          );
-        }
-        continue;
       }
-      // Cascade to the next eligible bidder when the seller opted in.
-      if (listing.offerNext) {
-        const priorWinners = (await this.deps.db.bidsForListing(listing.id))
-          .filter((b) => b.status === 'won' || b.status === 'defaulted')
-          .map((b) => b.account);
-        const next = await this.deps.db.nextCascadeBidder(
-          listing.id,
-          listing.reserveCents ?? listing.startCents,
-          priorWinners,
-        );
-        if (next) {
-          // The promoted bidder's bond was released when they were outbid, so
-          // re-arm it: a cascade winner with nothing at risk cannot be made to
-          // forfeit (PRD "A winner who fails to settle forfeits the bond").
-          // 'refunded' is terminal, so only a still-held or refund-pending bond
-          // is re-held; an already-refunded one is re-quoted by the client
-          // through the ordinary bond flow before the settlement can confirm.
-          await this.deps.db.setBondState(next.id, ['refund_due', 'held'], 'held');
-          const cascaded = await this.deps.db.insertSettlement({
-            listingId: listing.id,
-            bidId: next.id,
-            attempt: settlement.attempt + 1,
-            buyerAccount: next.account,
-            buyerCharacter: next.characterId,
-            buyerName: next.characterName,
-            buyerWallet: next.wallet,
-            amountCents: next.amountCents,
-            deadlineAtMs: nowMs + WOC_MARKET_SETTLEMENT_WINDOW_SECONDS * 1000,
-            nowMs,
-            // The cascade only ever promotes an 'outbid' runner-up
-            // (nextCascadeBidder's selection), so that is the whole pickable
-            // set here.
-            winnerBidId: next.id,
-            winnerFrom: ['outbid'],
-          });
-          if (typeof cascaded === 'string') {
-            // live_settlement_exists / listing_closed: a cancel or suspend
-            // closed the listing between this arm's listingById read and the
-            // insert (the insert's own listing lock is what refuses now), or
-            // a second open settlement raced in over the retry window of the
-            // 'failed' row this arm expired. winner_gone: a suspend cancelled
-            // the runner-up under us. contended: a guard holds the listing
-            // row and nothing was written. In every arm the insert (and any
-            // 'won' stamp) rolled back; unwind the re-hold so the bond cannot
-            // sit held on a bid with no claim.
-            await this.deps.db.setBondState(next.id, ['held'], 'refund_due');
-          }
-          continue;
-        }
-      }
-      await this.deps.db.closeListing(listing.id, 'unsettled');
+      return;
     }
-    return overdue.length;
+    // Cascade to the next eligible bidder when the seller opted in.
+    if (listing.offerNext) {
+      const priorWinners = (await this.deps.db.bidsForListing(listing.id))
+        .filter((b) => b.status === 'won' || b.status === 'defaulted')
+        .map((b) => b.account);
+      const next = await this.deps.db.nextCascadeBidder(
+        listing.id,
+        listing.reserveCents ?? listing.startCents,
+        priorWinners,
+      );
+      if (next) {
+        // The promoted bidder's bond was released when they were outbid, so
+        // re-arm it: a cascade winner with nothing at risk cannot be made to
+        // forfeit (PRD "A winner who fails to settle forfeits the bond").
+        // 'refunded' is terminal, so only a still-held or refund-pending bond
+        // is re-held; an already-refunded one is re-quoted by the client
+        // through the ordinary bond flow before the settlement can confirm.
+        await this.deps.db.setBondState(next.id, ['refund_due', 'held'], 'held');
+        const cascaded = await this.deps.db.insertSettlement({
+          listingId: listing.id,
+          bidId: next.id,
+          attempt: settlement.attempt + 1,
+          buyerAccount: next.account,
+          buyerCharacter: next.characterId,
+          buyerName: next.characterName,
+          buyerWallet: next.wallet,
+          amountCents: next.amountCents,
+          deadlineAtMs: nowMs + WOC_MARKET_SETTLEMENT_WINDOW_SECONDS * 1000,
+          nowMs,
+          // The cascade only ever promotes an 'outbid' runner-up
+          // (nextCascadeBidder's selection), so that is the whole pickable
+          // set here.
+          winnerBidId: next.id,
+          winnerFrom: ['outbid'],
+        });
+        if (typeof cascaded === 'string') {
+          // live_settlement_exists / listing_closed: a cancel or suspend
+          // closed the listing between this arm's listingById read and the
+          // insert (the insert's own listing lock is what refuses now), or
+          // a second open settlement raced in over the retry window of the
+          // 'failed' row this arm expired. winner_gone: a suspend cancelled
+          // the runner-up under us. contended: a guard holds the listing
+          // row and nothing was written. In every arm the insert (and any
+          // 'won' stamp) rolled back; unwind the re-hold so the bond cannot
+          // sit held on a bid with no claim.
+          await this.deps.db.setBondState(next.id, ['held'], 'refund_due');
+        }
+        return;
+      }
+    }
+    await this.deps.db.closeListing(listing.id, 'unsettled');
   }
 
   private async pollConfirmingSettlements(): Promise<number> {
     const confirming = await this.deps.db.confirmingSettlements(this.cfg.realm, SWEEP_BATCH);
     for (const settlement of confirming) {
-      if (settlement.quoteReference === null || settlement.txSignature === null) continue;
-      const confirmed = await this.deps.economy
-        .confirm(settlement.quoteReference, settlement.txSignature)
-        .catch(() => null);
-      if (!confirmed || confirmed.pending) continue;
-      if (confirmed.settled) {
-        await this.deps.db.transitionSettlement(settlement.id, ['confirming'], 'confirmed');
-      } else {
-        await this.deps.db.transitionSettlement(
-          settlement.id,
-          ['confirming'],
-          'failed',
-          confirmed.reason ?? 'refused',
-        );
+      try {
+        if (settlement.quoteReference === null || settlement.txSignature === null) continue;
+        const confirmed = await this.deps.economy
+          .confirm(settlement.quoteReference, settlement.txSignature)
+          .catch(() => null);
+        if (!confirmed || confirmed.pending) continue;
+        if (confirmed.settled) {
+          await this.deps.db.transitionSettlement(settlement.id, ['confirming'], 'confirmed');
+        } else {
+          await this.deps.db.transitionSettlement(
+            settlement.id,
+            ['confirming'],
+            'failed',
+            confirmed.reason ?? 'refused',
+          );
+        }
+      } catch (err) {
+        // Per-row isolation: an unclaimed ordered backlog, same rationale as
+        // the expiry arm.
+        this.sweepError('polled', err);
       }
     }
     return confirming.length;
@@ -2191,10 +2293,21 @@ export class WocMarketService {
     nowMs: number,
   ): Promise<number> {
     if (this.passContended) return 0;
+    // Pruned here rather than only at pass start: the eager confirm path
+    // enters through this method without ever winning the sweep lock, and a
+    // process that persistently lost that lock kept inserting into these
+    // ledgers and never pruned.
+    this.pruneLocalLedgers(nowMs);
     let advanced = 0;
     for (const settlement of batch) {
       const retryAt = this.parkedDeliveries.get(settlement.id);
-      if (retryAt !== undefined && retryAt > nowMs) continue;
+      if (retryAt !== undefined && retryAt > nowMs) {
+        // Still inside its backoff window: rotate it to the tail anyway, or
+        // the standing parked set keeps its old batch-order slots and starves
+        // fresh rows out of every batch until the backoff expires.
+        await this.deps.db.touchSettlementRow(settlement.id);
+        continue;
+      }
       try {
         const out = await this.deliverOne(settlement);
         if (out === 'advanced') {
@@ -2202,7 +2315,19 @@ export class WocMarketService {
           this.parkedDeliveries.delete(settlement.id);
         } else if (out === 'parked') {
           this.parkedDeliveries.set(settlement.id, nowMs + WocMarketService.PARK_RETRY_MS);
+          this.passParked++;
           await this.deps.db.touchSettlementRow(settlement.id);
+        } else if (out === 'skip') {
+          // 'skip' after custody was booked means the settlement or listing
+          // row left the shape only a hand edit can produce: it is invisible
+          // to every monitor class, so the ONE place that saw it must say so.
+          this.parkedDeliveries.delete(settlement.id);
+          this.sweepError(
+            arm,
+            new Error(
+              `settlement ${settlement.id} vanished mid-delivery (listing ${settlement.listingId}): hand-moved row?`,
+            ),
+          );
         } else if (out === 'contended') {
           this.passContended = true;
           break;
@@ -2217,6 +2342,10 @@ export class WocMarketService {
   }
 
   private async deliverConfirmedSettlements(nowMs: number): Promise<number> {
+    // Honor a contended pass BEFORE claiming: the claim UPDATE moves rows
+    // into 'delivering', and claiming a batch this pass will not deliver
+    // only feeds the stuck-delivering readout for nothing.
+    if (this.passContended) return 0;
     const claimed = await this.deps.db.claimDeliverableSettlements(this.cfg.realm, SWEEP_BATCH);
     return this.runDeliveryBatch('delivered', claimed, nowMs);
   }
@@ -2234,9 +2363,12 @@ export class WocMarketService {
    *  and the close arms all refuse over the live settlement). The finalize
    *  transaction converges it to the finished sale exactly once; under the
    *  new binary the tail cannot tear, so this converges a FINITE set and runs
-   *  at minute scale over a bounded id page (a whole cycle covers the open
-   *  set in REDRIVE_PAGE steps). The same beat converges the sibling residue,
-   *  a closed sold listing whose dispose flag never landed. */
+   *  at minute scale over a bounded id page. The FINALIZE work per beat is
+   *  bounded at SWEEP_BATCH like every other arm (each finalized row also
+   *  costs a realm mail-book write on the shared serial writer, and the one
+   *  time residue is plentiful, the first boot after a legacy upgrade, is
+   *  exactly when the realm can least absorb an unbounded burst); a truncated
+   *  page resumes right behind the last processed row on the next beat. */
   private async redriveDeliveredTails(nowMs: number): Promise<number> {
     if (nowMs < this.redriveDueAtMs || this.passContended) return 0;
     this.redriveDueAtMs = nowMs + WocMarketService.REDRIVE_INTERVAL_MS;
@@ -2244,6 +2376,7 @@ export class WocMarketService {
       this.cfg.realm,
       this.redriveCursor,
       WocMarketService.REDRIVE_PAGE,
+      SWEEP_BATCH,
     );
     // The cursor advances past the page even when a break below leaves rows
     // unfinished: those wait for the cursor to wrap (a later beat), which
@@ -2258,6 +2391,11 @@ export class WocMarketService {
         if (!listing) continue;
         const out = await this.finalizeDelivered(settlement, listing);
         if (out === 'finalized') {
+          // Counted and notified ONLY on a real transition: a re-run whose
+          // close already landed reports 'already_final', which keeps this
+          // beat from re-mailing the seller's sold notice (item-free, but a
+          // collected-and-deleted notice would still re-appear) and from
+          // reporting converged work as fresh.
           advanced++;
           await this.notifySellerSold(listing);
         } else if (out === 'contended') {
@@ -2268,10 +2406,17 @@ export class WocMarketService {
         this.sweepError('redriven', err);
       }
     }
-    // Counted into the same stat: both are the old close tail's residue
-    // converging, one unit per row that reached its final shape.
-    advanced += await this.deps.db.disposeSoldResidueListings(this.cfg.realm, SWEEP_BATCH);
     return advanced;
+  }
+
+  /** The sibling residue: a closed sold listing with a STANDING sale row
+   *  whose dispose flag never landed (the old binary crashed between its
+   *  close and dispose statements). Its own arm so a throw or a contended
+   *  pass can never cost the page walk its count. */
+  private async disposeSoldResidue(nowMs: number): Promise<number> {
+    if (nowMs < this.disposeDueAtMs || this.passContended) return 0;
+    this.disposeDueAtMs = nowMs + WocMarketService.REDRIVE_INTERVAL_MS;
+    return this.deps.db.disposeSoldResidueListings(this.cfg.realm, SWEEP_BATCH);
   }
 
   /**
@@ -2379,7 +2524,8 @@ export class WocMarketService {
    *   lost, not that an earlier autosave under the then-valid nonce did, so
    *   only an operator can attribute the item. An unbooked grant claim whose
    *   session is gone parks the same way (visible in the unbooked-claims
-   *   read).
+   *   read), as does an 'ambiguous' grantCopy refusal (the grant touched the
+   *   live bags but the session state is unprovable: never mail over it).
    */
   private async handToBuyer(
     settlement: WocSettlementRow,
@@ -2421,6 +2567,12 @@ export class WocMarketService {
         this.pendingGrants.delete(custodyRef);
         return 'abort';
       }
+      // The proof of resumability is the SESSION IDENTITY plus nonce match,
+      // not the entry's age: refresh the stamp on every provable attempt, or
+      // ten minutes of ordinary lock contention (a slow-database incident)
+      // would expire a still-live, still-provable retry into a permanent
+      // operator-only park.
+      pending.stampMs = this.now();
       return this.commitGrant(custodyRef, snap.save);
     }
     // Fresh claim: stamp the durable grant intent BEFORE touching the bags, so
@@ -2430,6 +2582,10 @@ export class WocMarketService {
     if (!stamped) return 'abort';
     const granted = this.deps.custody.grantCopy(settlement.buyerAccount, target.characterId, item);
     if (!granted.ok) {
+      // 'ambiguous' is NOT a clean refusal: the grant already touched the
+      // live bags and the session state is unprovable, so the claim keeps
+      // its grant intent and PARKS (mailing here is the second-copy rail).
+      if (granted.reason === 'ambiguous') return 'abort';
       // Nothing durable happened (grantCopy declines cleanly), so convert
       // the claim to the mail rail in one statement and record the not-yet-
       // written attempt: that pair is what lets bookCustodyOnce proceed.
@@ -2548,14 +2704,15 @@ export class WocMarketService {
     const finalized = await this.finalizeDelivered(settlement, listing);
     if (finalized === 'stale') return 'skip';
     if (finalized === 'contended') return 'contended';
-    await this.notifySellerSold(listing);
+    // 'already_final' converged with nothing new written: no second notice.
+    if (finalized === 'finalized') await this.notifySellerSold(listing);
     return 'advanced';
   }
 
   private finalizeDelivered(
     settlement: WocSettlementRow,
     listing: WocListingRow,
-  ): Promise<'finalized' | 'stale' | 'contended'> {
+  ): Promise<'finalized' | 'already_final' | 'stale' | 'contended'> {
     return this.deps.db.finalizeDeliveredSettlement({
       settlementId: settlement.id,
       listingId: listing.id,
@@ -2578,20 +2735,29 @@ export class WocMarketService {
   }
 
   /** Best-effort seller notice (no attachment, book-once): it follows a
-   *  finalized sale and must never fail or retry-block the delivery. */
+   *  finalized sale and must never fail or retry-block the delivery. The
+   *  whole body is guarded (the target read included): no arm ever
+   *  re-notifies, so a crash or throw between the finalize and this notice
+   *  loses the notice for good (an ACCEPTED loss: the letter is item-free
+   *  and the sale itself is durable), and the error line below is the only
+   *  trace that it happened. */
   private async notifySellerSold(listing: WocListingRow): Promise<void> {
-    const seller = await this.deps.db.deliveryTarget(
-      this.cfg.realm,
-      listing.sellerAccount,
-      listing.sellerCharacter,
-    );
-    if (!seller) return;
-    await this.bookCustodyOnce(
-      { key: String(seller.characterId), name: seller.name },
-      'sold_notice',
-      [],
-      listingSoldNoticeCustodyRef(listing.id),
-    ).catch(() => {});
+    try {
+      const seller = await this.deps.db.deliveryTarget(
+        this.cfg.realm,
+        listing.sellerAccount,
+        listing.sellerCharacter,
+      );
+      if (!seller) return;
+      await this.bookCustodyOnce(
+        { key: String(seller.characterId), name: seller.name },
+        'sold_notice',
+        [],
+        listingSoldNoticeCustodyRef(listing.id),
+      );
+    } catch (err) {
+      this.sweepError('deliver_notice', err);
+    }
   }
 
   /** True only when the return flight completed and the listing was
@@ -2629,13 +2795,20 @@ export class WocMarketService {
       // to its buyer and must never take the return flight home.
       if (listing.resolution === 'sold') continue;
       const retryAt = this.parkedReturns.get(listing.id);
-      if (retryAt !== undefined && retryAt > nowMs) continue;
+      if (retryAt !== undefined && retryAt > nowMs) {
+        // Rotate even inside the backoff window, or the standing parked set
+        // keeps its batch-order slots and starves fresh rows (the delivery
+        // twin does the same).
+        await this.deps.db.touchListingRow(listing.id);
+        continue;
+      }
       try {
         if (await this.returnListingItem(listing)) {
           advanced++;
           this.parkedReturns.delete(listing.id);
         } else {
           this.parkedReturns.set(listing.id, nowMs + WocMarketService.PARK_RETRY_MS);
+          this.passParked++;
           await this.deps.db.touchListingRow(listing.id);
         }
       } catch (err) {
@@ -2650,17 +2823,25 @@ export class WocMarketService {
   private async processDueBonds(): Promise<number> {
     const due = await this.deps.db.bondsDue(this.cfg.realm, SWEEP_BATCH);
     for (const bid of due) {
-      if (bid.bondReference === null) {
-        // Nothing was ever transferred; close the loop locally.
-        await this.deps.db.setBondState(bid.id, ['refund_due', 'forfeit_due'], 'void');
-        continue;
-      }
-      if (bid.bondState === 'refund_due') {
-        const out = await this.deps.economy.refundBond(bid.bondReference).catch(() => null);
-        if (out?.done) await this.deps.db.setBondState(bid.id, ['refund_due'], 'refunded');
-      } else if (bid.bondState === 'forfeit_due') {
-        const out = await this.deps.economy.forfeitBond(bid.bondReference).catch(() => null);
-        if (out?.done) await this.deps.db.setBondState(bid.id, ['forfeit_due'], 'forfeited');
+      try {
+        if (bid.bondReference === null) {
+          // Nothing was ever transferred; close the loop locally.
+          await this.deps.db.setBondState(bid.id, ['refund_due', 'forfeit_due'], 'void');
+          continue;
+        }
+        if (bid.bondState === 'refund_due') {
+          const out = await this.deps.economy.refundBond(bid.bondReference).catch(() => null);
+          if (out?.done) await this.deps.db.setBondState(bid.id, ['refund_due'], 'refunded');
+        } else if (bid.bondState === 'forfeit_due') {
+          const out = await this.deps.economy.forfeitBond(bid.bondReference).catch(() => null);
+          if (out?.done) await this.deps.db.setBondState(bid.id, ['forfeit_due'], 'forfeited');
+        }
+      } catch (err) {
+        // Per-row isolation: bondsDue returns UNCLAIMED rows in deadline
+        // order, so a persistently failing head row (a pg error out of
+        // setBondState; the economy calls are already caught) would starve
+        // every other player's refund forever.
+        this.sweepError('bonds', err);
       }
     }
     return due.length;

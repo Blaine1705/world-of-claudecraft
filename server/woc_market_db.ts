@@ -30,7 +30,7 @@ import type {
   WocSaleRow,
   WocSettlementRow,
   WocStrikeRow,
-  WocStuckCustodyReadout,
+  WocStuckCustodyClasses,
 } from './woc_market';
 import type { WocBidStatus, WocSettlementState } from './woc_market_rules';
 import { WOC_MARKET_MAX_ACTIVE_LISTINGS } from './woc_market_rules';
@@ -99,9 +99,32 @@ CREATE INDEX IF NOT EXISTS woc_market_listings_seller_live
   ON woc_market_listings(realm, seller_account)
   WHERE status <> 'closed';
 -- The return-flight reconciliation backlog: closed rows still holding a copy.
+-- updated_at is the stuck readout's age signal for this class, so park
+-- rotation never writes it (it writes sweep_parked_at; see the settlements
+-- twin for the full rationale).
 CREATE INDEX IF NOT EXISTS woc_market_listings_undisposed
   ON woc_market_listings(realm, updated_at)
   WHERE status = 'closed' AND item_disposed = false;
+ALTER TABLE woc_market_listings
+  ADD COLUMN IF NOT EXISTS sweep_parked_at TIMESTAMPTZ;
+-- The return arm's batch order: parked rows rotate on sweep_parked_at so a
+-- refused return cycles to the tail without aging the readout column. The
+-- expression is shared verbatim with the query via PARK_ROTATION_ORDER.
+CREATE INDEX IF NOT EXISTS woc_market_listings_undisposed_rotation
+  ON woc_market_listings(realm, (COALESCE(sweep_parked_at, updated_at)))
+  WHERE status = 'closed' AND item_disposed = false;
+-- The sold-residue dispose probe (steady-state EMPTY: only an old binary's
+-- torn close tail populates it); without this the probe walked the whole
+-- undisposed backlog once a minute to learn there was nothing to do.
+CREATE INDEX IF NOT EXISTS woc_market_listings_sold_undisposed
+  ON woc_market_listings(realm, id)
+  WHERE status = 'closed' AND item_disposed = false AND resolution = 'sold';
+-- The redrive page walk pages LIVE listings by id; no other index yields id
+-- order under a realm+status filter, so without this the planner sorts the
+-- whole live set once a minute forever.
+CREATE INDEX IF NOT EXISTS woc_market_listings_live_ids
+  ON woc_market_listings(realm, id)
+  WHERE status <> 'closed';
 -- Retention prune cursor (closed, disposed, oldest first).
 CREATE INDEX IF NOT EXISTS woc_market_listings_closed_updated
   ON woc_market_listings(updated_at)
@@ -268,16 +291,26 @@ CREATE UNIQUE INDEX IF NOT EXISTS woc_market_settlements_open
 DROP INDEX IF EXISTS woc_market_settlements_live;
 CREATE INDEX IF NOT EXISTS woc_market_settlements_state
   ON woc_market_settlements(realm, state, deadline_at);
--- The confirming/delivering backlog arms order by updated_at; without this
--- they scanned the one-open-settlement index and sorted.
+-- The confirming backlog and the stuck readout's delivering class order and
+-- age on updated_at; without this they scanned the one-open-settlement index
+-- and sorted. updated_at is stamped when the row ENTERS 'delivering' (the
+-- claim UPDATE) and park rotation deliberately never moves it (it writes
+-- sweep_parked_at instead), so it is both the batch order for unparked work
+-- and the readout's honest age signal.
 CREATE INDEX IF NOT EXISTS woc_market_settlements_state_updated
   ON woc_market_settlements(realm, state, updated_at);
--- The stuck readout's delivering class ages and orders on created_at (park
--- rotation moves updated_at, so it cannot be the age signal); without this
--- the sample read would sort the whole delivering set during exactly the
--- incident that grows it.
-CREATE INDEX IF NOT EXISTS woc_market_settlements_state_created
-  ON woc_market_settlements(realm, state, created_at);
+-- Park rotation rides its OWN column: rotating the readout's age column made
+-- a permanently parked row invisible to the monitor (re-stamped every retry,
+-- it could never age past the stuck threshold). The delivering reconcile
+-- batch orders on the rotation expression so a parked row still cycles to
+-- the tail; the expression is shared verbatim with the queries through
+-- PARK_ROTATION_ORDER (the hot-path SQL-shape rule).
+ALTER TABLE woc_market_settlements
+  ADD COLUMN IF NOT EXISTS sweep_parked_at TIMESTAMPTZ;
+DROP INDEX IF EXISTS woc_market_settlements_state_created;
+CREATE INDEX IF NOT EXISTS woc_market_settlements_delivering_rotation
+  ON woc_market_settlements(realm, (COALESCE(sweep_parked_at, updated_at)))
+  WHERE state = 'delivering';
 CREATE INDEX IF NOT EXISTS woc_market_settlements_buyer
   ON woc_market_settlements(buyer_account, created_at DESC);
 -- Postgres does not auto-index the referencing side of an FK. Without these,
@@ -350,10 +383,18 @@ CREATE UNIQUE INDEX IF NOT EXISTS woc_market_sales_listing_once
 -- JSONB blob whose per-letter marker a player can delete (an emptied letter is
 -- deletable) and which an older binary's loader would strip, so the blob can
 -- never be the authority for "this parcel was already booked". A worker CLAIMS
--- the ref here first and books the parcel only on a fresh claim: the unique
--- constraint makes a retry a no-op. Failure direction is deliberate: a claim
+-- the ref here first (the primary key makes the claim race single-winner); an
+-- EXISTING claim is consulted, never adopted: booked_at set means delivered,
+-- and an unbooked claim resumes only with rail-attributed proof (the column
+-- comments below), else it PARKS. Failure direction is deliberate: a claim
 -- with no parcel leaves the item held and VISIBLE to the operator (the row's
 -- booked_at stays null), never silently duplicated.
+-- OPERATOR WARNING: NEVER delete an unbooked claim row to unstick a delivery.
+-- The next pass would mint a FRESH claim, and a fresh claim skips the
+-- parcel-in-book check by construction; if the buyer already collected and
+-- deleted the letter, that deletion re-arms the exact duplication this ledger
+-- exists to prevent. Resolve a parked row by hand-delivering (then stamping
+-- booked_at) or by confirming non-delivery before any reset.
 CREATE TABLE IF NOT EXISTS woc_market_custody_claims (
   custody_ref TEXT PRIMARY KEY,
   realm TEXT NOT NULL,
@@ -384,7 +425,7 @@ CREATE TABLE IF NOT EXISTS woc_market_custody_claims (
 -- beside the listing prune (a booked row is one short line per completed
 -- delivery or return, so the growth rate is the sale rate).
 ALTER TABLE woc_market_custody_claims
-  ADD COLUMN IF NOT EXISTS grant_character_id BIGINT;
+  ADD COLUMN IF NOT EXISTS grant_character_id INT;
 ALTER TABLE woc_market_custody_claims
   ADD COLUMN IF NOT EXISTS mail_intent_at TIMESTAMPTZ;
 -- The operator/diagnostic read: claims that never completed their booking.
@@ -502,6 +543,13 @@ const OFFER_COLS =
  * it has shown the outcome, so the window's length is invisible to players.
  */
 export const SETTLED_OFFER_GRACE_MS = 90_000;
+
+/** The parked-row batch order: rotation stamps sweep_parked_at (never the
+ *  readout's age column), and unparked rows keep their updated_at slot. The
+ *  text is shared VERBATIM by the two rotation indexes in the DDL above and
+ *  the batch reads below (the hot-path SQL-shape rule: an expression index
+ *  only serves a query that spells the identical expression). */
+const PARK_ROTATION_ORDER = 'COALESCE(sweep_parked_at, updated_at)';
 
 const BID_COLS =
   'id, listing_id, account, character_id, character_name, wallet, amount_cents, status, ' +
@@ -1464,7 +1512,7 @@ export class PgWocMarketDb implements WocMarketDb {
       `SELECT ${LISTING_COLS} FROM woc_market_listings
         WHERE realm = $1 AND status = 'closed' AND item_disposed = false
           AND (resolution IS NULL OR resolution <> 'sold')
-        ORDER BY updated_at
+        ORDER BY ${PARK_ROTATION_ORDER}
         LIMIT $2`,
       [realm, limit],
     );
@@ -1630,17 +1678,22 @@ export class PgWocMarketDb implements WocMarketDb {
    *  O(stuck set): the counts SATURATE at countCap through an inner LIMIT
    *  subquery (a bare count consumed every stuck row per refresh, measured as
    *  a temp spill at incident-sized backlogs), and the samples are their own
-   *  capped index reads. The delivering class ages on created_at, which the
-   *  park-and-rotate machinery deliberately never touches. */
+   *  capped index reads. Age signals are columns the park-and-rotate
+   *  machinery never touches (rotation writes sweep_parked_at only): the
+   *  delivering class ages on updated_at, stamped when the row entered
+   *  'delivering', so a slow payment leg is not reported stuck the moment
+   *  delivery begins. */
   async stuckCustodyReadout(
     realm: string,
     olderThanMs: number,
     sampleLimit: number,
     countCap: number,
-  ): Promise<WocStuckCustodyReadout> {
+  ): Promise<WocStuckCustodyClasses> {
     // Fail CLOSED on a bad cap: a non-finite value would interpolate as NaN
     // and error at runtime; clamping to 1 keeps the read tiny instead.
     const cap = Number.isFinite(countCap) && countCap >= 1 ? Math.trunc(countCap) : 1;
+    // count === cap means "cap or more" (the LIMIT saturates); saturated makes
+    // that explicit on the wire so 1000 cannot read as "exactly 1000".
     const count = async (body: string, params: unknown[]): Promise<number> => {
       const res = await this.pool.query(
         `SELECT count(*)::int AS n FROM (SELECT 1 ${body} LIMIT ${cap}) capped`,
@@ -1659,11 +1712,11 @@ export class PgWocMarketDb implements WocMarketDb {
     );
     const claimCount = await count(claimsWhere, [realm, olderThanMs]);
     const deliveringWhere = `FROM woc_market_settlements
-        WHERE realm = $1 AND state = 'delivering' AND created_at <= to_timestamp($2 / 1000.0)`;
+        WHERE realm = $1 AND state = 'delivering' AND updated_at <= to_timestamp($2 / 1000.0)`;
     const delivering = await this.pool.query(
       `SELECT id, listing_id, created_at
          ${deliveringWhere}
-        ORDER BY created_at
+        ORDER BY updated_at
         LIMIT $3`,
       [realm, olderThanMs, sampleLimit],
     );
@@ -1682,6 +1735,7 @@ export class PgWocMarketDb implements WocMarketDb {
     return {
       unbookedClaims: {
         count: claimCount,
+        saturated: claimCount >= cap,
         sample: claims.rows.map((r) => ({
           custodyRef: String(r.custody_ref),
           claimedAtMs: ms(r.claimed_at),
@@ -1691,6 +1745,7 @@ export class PgWocMarketDb implements WocMarketDb {
       },
       stuckDelivering: {
         count: deliveringCount,
+        saturated: deliveringCount >= cap,
         sample: delivering.rows.map((r) => ({
           id: Number(r.id),
           listingId: Number(r.listing_id),
@@ -1699,6 +1754,7 @@ export class PgWocMarketDb implements WocMarketDb {
       },
       undisposedListings: {
         count: undisposedCount,
+        saturated: undisposedCount >= cap,
         sample: undisposed.rows.map((r) => ({
           id: Number(r.id),
           resolution: r.resolution === null ? null : String(r.resolution),
@@ -1928,6 +1984,22 @@ export class PgWocMarketDb implements WocMarketDb {
   }
 
   async activateBid(
+    bidId: number,
+    nowMs: number,
+  ): Promise<'activated' | 'superseded' | 'listing_closed' | 'not_pending' | 'contended'> {
+    try {
+      return await this.activateBidTx(bidId, nowMs);
+    } catch (err) {
+      // A deadlock victim or lock-timeout loser (a crossing finalize holds
+      // the listing while re-locking a bid this transaction pre-locked)
+      // retries on the bond poll's next pass instead of surfacing as a raw
+      // sweep-arm failure.
+      if (isLockContention(err)) return 'contended';
+      throw err;
+    }
+  }
+
+  private async activateBidTx(
     bidId: number,
     nowMs: number,
   ): Promise<'activated' | 'superseded' | 'listing_closed' | 'not_pending'> {
@@ -2331,7 +2403,7 @@ export class PgWocMarketDb implements WocMarketDb {
     const res = await this.pool.query(
       `SELECT ${SETTLEMENT_COLS} FROM woc_market_settlements
         WHERE realm = $1 AND state = 'delivering'
-        ORDER BY updated_at
+        ORDER BY ${PARK_ROTATION_ORDER}
         LIMIT $2`,
       [realm, limit],
     );
@@ -2345,11 +2417,21 @@ export class PgWocMarketDb implements WocMarketDb {
    *  table under a LIMIT it could not push down (measured as a parallel seq
    *  scan at realistic listing counts), while this shape is O(page) no matter
    *  what the planner prefers. lastListingId null means the cycle is
-   *  exhausted and the caller's cursor resets. */
+   *  exhausted and the caller's cursor resets.
+   *
+   *  The RESIDUE fetch is bounded separately (maxSettlements): every returned
+   *  row costs the caller a full finalize transaction plus a realm mail-book
+   *  write on the shared serial writer, so an unbounded page (a legacy
+   *  upgrade's backlog, at exactly the boot least able to absorb it) must
+   *  converge over several beats, not one. When the fetch truncates,
+   *  lastListingId is the last RETURNED row's listing so the next beat
+   *  resumes right behind it instead of skipping the remainder to the next
+   *  cursor wrap. */
   async deliveredUnclosedSettlementsPage(
     realm: string,
     afterListingId: number,
     pageSize: number,
+    maxSettlements: number,
   ): Promise<{ settlements: WocSettlementRow[]; lastListingId: number | null }> {
     const ids = await this.pool.query(
       `SELECT id FROM woc_market_listings
@@ -2362,11 +2444,21 @@ export class PgWocMarketDb implements WocMarketDb {
     const listingIds = ids.rows.map((r) => Number(r.id));
     const res = await this.pool.query(
       `SELECT ${SETTLEMENT_COLS} FROM woc_market_settlements
-        WHERE listing_id = ANY($1::bigint[]) AND state = 'delivered'`,
-      [listingIds],
+        WHERE listing_id = ANY($1::bigint[]) AND state = 'delivered'
+        ORDER BY listing_id
+        LIMIT $2`,
+      [listingIds, maxSettlements + 1],
     );
+    const settlements = res.rows.map(toSettlement);
+    if (settlements.length > maxSettlements) {
+      const kept = settlements.slice(0, maxSettlements);
+      return {
+        settlements: kept,
+        lastListingId: kept[kept.length - 1]?.listingId ?? null,
+      };
+    }
     return {
-      settlements: res.rows.map(toSettlement),
+      settlements,
       lastListingId: listingIds[listingIds.length - 1] ?? null,
     };
   }
@@ -2375,7 +2467,10 @@ export class PgWocMarketDb implements WocMarketDb {
    *  listing with a STANDING sale row provably completed its delivery, so the
    *  dispose flag is pure bookkeeping the crashed tail owed. A sold row with
    *  NO standing sale stays parked (the stuck readout carries it; only an
-   *  operator can say what happened). */
+   *  operator can say what happened). Lock-order carve-out: this takes ONLY
+   *  listing rows and SKIP LOCKED means it never waits on one, so it can
+   *  neither deadlock nor stall behind a concurrent finalize; a skipped row
+   *  is the next beat's business. */
   async disposeSoldResidueListings(realm: string, limit: number): Promise<number> {
     const res = await this.pool.query(
       `UPDATE woc_market_listings
@@ -2387,26 +2482,33 @@ export class PgWocMarketDb implements WocMarketDb {
              AND EXISTS (
                SELECT 1 FROM woc_market_sales s
                 WHERE s.listing_id = l.id AND s.excluded = false)
-           LIMIT $2)`,
+           ORDER BY l.id
+           LIMIT $2
+           FOR UPDATE OF l SKIP LOCKED)`,
       [realm, limit],
     );
     return res.rowCount ?? 0;
   }
 
-  /** Rotate a parked settlement to the back of the updated_at queues so it
-   *  cannot own the head of a batch forever (the stuck readout ages on
-   *  created_at, which this deliberately does not touch). */
+  /** Rotate a parked settlement to the back of the batch queue so it cannot
+   *  own the head of a batch forever. Writes sweep_parked_at ONLY: the stuck
+   *  readout ages this class on updated_at (stamped when the row entered
+   *  'delivering'), and rotating that column faster than the stuck threshold
+   *  made a permanently parked row invisible to the monitor by construction. */
   async touchSettlementRow(id: number): Promise<void> {
-    await this.pool.query(`UPDATE woc_market_settlements SET updated_at = now() WHERE id = $1`, [
-      id,
-    ]);
+    await this.pool.query(
+      `UPDATE woc_market_settlements SET sweep_parked_at = now() WHERE id = $1`,
+      [id],
+    );
   }
 
   /** The listing twin, for a parked RETURN: the undisposed backlog orders by
-   *  updated_at too, so a permanently refused return would otherwise own the
-   *  head of its batch forever. */
+   *  the rotation expression, so a permanently refused return still cycles to
+   *  the tail while its updated_at age keeps counting for the readout. */
   async touchListingRow(id: number): Promise<void> {
-    await this.pool.query(`UPDATE woc_market_listings SET updated_at = now() WHERE id = $1`, [id]);
+    await this.pool.query(`UPDATE woc_market_listings SET sweep_parked_at = now() WHERE id = $1`, [
+      id,
+    ]);
   }
 
   /** The delivery close tail as ONE transaction: the 'delivered' transition,
@@ -2417,8 +2519,10 @@ export class PgWocMarketDb implements WocMarketDb {
    *  (whose tail was separately-committed statements) left delivered with the
    *  listing still open, and it makes a re-run of the whole method converge
    *  (the sale insert dedupes on the partial unique index, the close and the
-   *  bond flips are all compare-and-set). Lock order: this transaction touches
-   *  bid rows AND the listing row, so it pre-locks the open bid set plus the
+   *  bond flips are all compare-and-set). A re-run whose close CAS matches
+   *  nothing reports 'already_final', so the caller neither re-counts nor
+   *  re-notifies converged work. Lock order: this transaction touches bid
+   *  rows AND the listing row, so it pre-locks the open bid set plus the
    *  winner bid by id, then the listing, matching every other market guard
    *  (server/CLAUDE.md); 55P03/40P01 surface as 'contended' and the caller
    *  retries on a later pass. */
@@ -2427,10 +2531,14 @@ export class PgWocMarketDb implements WocMarketDb {
     listingId: number;
     bidId: number | null;
     sale: Omit<WocSaleRow, 'id' | 'excluded' | 'atMs'>;
-  }): Promise<'finalized' | 'stale' | 'contended'> {
+  }): Promise<'finalized' | 'already_final' | 'stale' | 'contended'> {
     try {
       return await this.withTx(async (client) => {
         await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
+        // The whole tail holds the listing plus open-bid locks, so its total
+        // hold must be bounded by more than the per-statement pool default:
+        // the same explicit allowance the escrow and delivered-save guards set.
+        await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
         // Bids first (open set plus the winner, in id order), listing second.
         await client.query(
           `SELECT id FROM woc_market_bids
@@ -2444,6 +2552,20 @@ export class PgWocMarketDb implements WocMarketDb {
           [args.listingId],
         );
         if (!listing.rows[0]) throw new TxAbort('stale' as const);
+        // Re-lock the open set now that the listing lock is held: a buy-now
+        // finalize can run while the listing is still 'active', so a bid
+        // inserted between the pre-lock and the listing lock (insertPendingBid
+        // is listing-lock-first) would otherwise reach the cancel UPDATE
+        // below unlocked. With the listing held no further insert can land;
+        // a crossing activateBid surfaces as 40P01 and both sides retry
+        // typed ('contended' here, the bond poll's next pass there).
+        await client.query(
+          `SELECT id FROM woc_market_bids
+            WHERE listing_id = $1 AND status IN ('pending_bond', 'active')
+            ORDER BY id
+            FOR UPDATE`,
+          [args.listingId],
+        );
         const advanced = await client.query(
           `UPDATE woc_market_settlements SET state = 'delivered', updated_at = now()
             WHERE id = $1 AND state IN ('delivering', 'delivered')`,
@@ -2474,14 +2596,17 @@ export class PgWocMarketDb implements WocMarketDb {
         // Close and dispose in ONE statement: two UPDATEs on the same row
         // wrote two row versions (and two sets of entries across this table's
         // many partial indexes) per sale, measured at 64 percent extra churn.
-        // The CASE keeps an already-closed row's resolution.
-        await client.query(
+        // The CASE keeps an already-closed row's resolution, and the WHERE
+        // makes this a real compare-and-set: a row already closed AND
+        // disposed matches nothing, which is what downgrades the whole
+        // re-run to 'already_final' below.
+        const closed = await client.query(
           `UPDATE woc_market_listings
               SET status = 'closed',
                   resolution = CASE WHEN status = 'closed' THEN resolution ELSE $2 END,
                   item_disposed = true,
                   updated_at = now()
-            WHERE id = $1`,
+            WHERE id = $1 AND (status <> 'closed' OR item_disposed = false)`,
           [args.listingId, 'sold'],
         );
         if (args.bidId !== null) {
@@ -2502,7 +2627,7 @@ export class PgWocMarketDb implements WocMarketDb {
             WHERE listing_id = $1 AND status IN ('pending_bond', 'active')`,
           [args.listingId],
         );
-        return 'finalized' as const;
+        return (closed.rowCount ?? 0) > 0 ? ('finalized' as const) : ('already_final' as const);
       });
     } catch (err) {
       if (isLockContention(err)) return 'contended';
