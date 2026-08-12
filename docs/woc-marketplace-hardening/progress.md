@@ -11,7 +11,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 02 QA | phase-02-qa | game | DONE | 20fdcc5288 | PASS-WITH-FOLLOWUPS, every fix applied (section below); release/v0.37.0 synced in (merge b40a178643, one generated-i18n conflict regenerated; merge audit clean except the hud.ts ceiling, fixed by extraction); gate GREEN at 301a8c7c22 (full-suite fallback, all 8 steps); pushed per R4 (no open PR on this branch, so no PR CI; pre-push floor green) |
 | 03 | delivery-exactly-once | game | DONE | e71a8cfd21 | release sync trivial (server/parse samplers only); B2a/B2b/B2c + monitor closed; five-reviewer round + fix round + fresh re-review applied (section below); real-SQL suites 65 green; gate GREEN at tip c3b33f54a7 (full-suite fallback, all 8 steps; the one intermediate red was the internal gate-mount sweep's 20-route count pin, fixed to 21); LOCAL, not pushed per R4 |
 | 03 QA | phase-03-qa | game | DONE | 5ef64c1e11 | PASS-WITH-FOLLOWUPS, every fix applied (section below); release sync 5487531960 (two conflicts: main.ts union + regenerated pending.ts; merge audit CLEAN except the hud ratchet, fixed by the error_text_i18n_core extraction, ceiling 19338 to 19190); AC3 park deviation UPHELD; 21-mutation pass, one survivor closed; pushed per R4 |
-| 04 | bond-payment-lifecycle | game | IN PROGRESS | 3f20375918 | release sync no-op (branch already at origin/release/v0.37.0 tip) |
+| 04 | bond-payment-lifecycle | game | IN PROGRESS | 3f20375918 | release sync no-op (branch already at origin/release/v0.37.0 tip); gate GREEN at dc0a23c674 (full-suite fallback, all 8 steps) |
 | 04 QA | phase-04-qa | game | NOT STARTED | | |
 | 05 | custody-entry-hardening | game | NOT STARTED | | |
 | 05 QA | phase-05-qa | game | NOT STARTED | | |
@@ -49,6 +49,133 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 21 QA | phase-21-qa | service + game | NOT STARTED | | |
 | 22 | close-out | all three | NOT STARTED | | teardown offer lives in 22 QA |
 | 22 QA | phase-22-qa | all three | NOT STARTED | | |
+
+## 04 implement round (bond and payment lifecycle)
+
+Commits f64733145c (source), 2c8931811f (tests), dc0a23c674 (session-start
+row), plus the reviewer fix round and docs commits after them. Release sync
+was a no-op. The registry of what shipped is state.md's 04 ledger entry; the
+round facts and decisions:
+
+- The fails-on-old-behavior proof: eight targeted mutations run AFTER the
+  commits (intake order restored, refresh CAS arm dropped, suspend carve-out
+  dropped, confirming overdue arm dropped, bond-progress extension neutered,
+  steal-time recording inverted, holderless clear restored, paid-window stamp
+  guard bypassed), each reddening exactly its named real-SQL test with the
+  suite provably running. One first-attempt mutant broke compilation (15
+  skipped, proving nothing) and was redone as a semantic one-token flip.
+- Decisions the QA session should re-judge or know:
+  - R8 numbers proposed: 1800s per-listing re-claim cooldown, 3 abandons per
+    rolling hour account-wide (rationale in woc_market_rules.ts).
+  - Cancel-intent blocks NEW BIDS as well as new lock claims. The ruling text
+    names lock claims only; bids are blocked because a bid landing after the
+    stamp would re-deny the cancel past the promised one-window bound
+    (has_bids refuses the converge close). Recorded for re-judgment.
+  - 'confirm_failed' UX wrinkle: a decided-against signature stays recorded,
+    so the bidder cannot refresh or abandon until the poll lapses the bid
+    (about one sweep pass). The catalog copy for confirm_failed still says
+    "request a fresh quote"; the mismatch is a phase 14 UX-honesty item.
+  - Stuck bonds get NO automatic time-based exit this change: routing a
+    never-landed payment to refund_due would pay out through the current
+    blind releaser (B3). Visibility-bounded instead (the stuckBonds readout
+    class); the automatic exit lands with the phase 09 releaser CAS and the
+    phase 10 verifier timeout (R5).
+  - The review park runs BEFORE the poll arm in the same pass, so a row
+    whose economy recovered exactly at the bound parks rather than resolves;
+    deliberate (six hours of polls already failed) and operator-recoverable.
+  - The converge arm expires only 'failed' rows itself: the abandoned
+    window's offered settlement belongs to the overdue arm, which is also
+    the canonical abandon recorder, so convergence waits a pass rather than
+    lose the abandon row.
+- Doc upkeep: server/CLAUDE.md woc_market row rewritten for the new seams;
+  .env.example gained the two knobs; the internal stuck route carries the
+  operator semantics comment.
+
+The three-lane review round (commit 6c89a99dbb, every finding applied or
+recorded; the fix round itself was re-reviewed fresh and mutation-proofed
+with six further spot-proofs, all of which bit):
+
+- Security (1 critical, 2 warnings fixed; the rest recorded): the extension
+  fired on the raw submitted signature (now verdict-gated, settled or
+  pending only); a rival's claim probe could stamp a PAYING holder (now an
+  open-settlement probe refuses as 'locked' with no recording); a refused
+  transfer read as a walk-away (the sweep recorder now skips signed
+  windows). Recorded, not fixed here, each with an owner: the
+  free-to-create immovable signed bond depends on the economy service's
+  verdict for unknown signatures (phase 10, R5; the poll rotation bounds
+  its cost meanwhile); the review state has no in-repo operator endpoint
+  yet (phases 09/19 own driving transitionSettlement; hand SQL bypasses the
+  CAS, so the runbook must forbid it); quote expiry is no longer enforced
+  game-side on either intake, so the stale-reference refusal is now the
+  service's contract to keep (confirm at phase 21's devnet run; the dev
+  economy already refuses expired quotes); stuckBonds is the first readout
+  class carrying a raw account id (dashboardGate-only; kept for the
+  cooldown runbook); the abandon cap is per realm by design.
+- Database (3 P1, 5 P2, all applied): claimBuyNowLock refusals went back to
+  lock-free (measured hundredfold amplification when diagnosed under FOR
+  UPDATE while holding a pooled client); the cancel-intent converge and the
+  bond poll both gained the park-rotate-backoff seam (a paid window or a
+  never-decided signature no longer owns a batch head every pass; the bond
+  arm parks only PAST the 5-minute pending TTL so young bonds keep full
+  cadence); idle_in_transaction_session_timeout=500ms on the three new
+  guard transactions with 25P03 as typed contention (retrofitting the older
+  guards rides phase 16); the CHECK evolution adds NOT VALID; the
+  saturating-count comment now states the honest O(account rows) bound; the
+  repair-gate and readout doc comments were de-staled. The reviewer's
+  runtime-proof asks (economy verdict semantics for unknown signatures, an
+  end-to-end contention run, converge saturation, pool-wait observability)
+  ride phases 10, 16 and 21.
+Round TWO of the re-review (the fix round reviewed as unreviewed code by
+fresh security and database lanes plus a coverage re-audit; every finding
+applied):
+
+- Security round 2 HIGH: my txSignature exemption was a one-request bypass
+  of the whole cooldown arm (post a fabricated string, get refused, walk
+  away unrecorded). Replaced by a refusal-CLASS exemption
+  (WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS) inside ONE shared recorder
+  statement both recorders run, with the failed-row expiry preserving
+  fail_reason so the class survives; the sibling steal recorder inherits
+  the same predicate, closing the round's third finding (the recorders
+  disagreeing in opposite directions). MEDIUM: the extension gate failed
+  open on the proxy's pending+service_unavailable arm during outages; now
+  gated on the shared reason constant.
+- Database round 2 P1: the 25P03 arm was DEAD CODE (the SQLSTATE arrives
+  asynchronously; the unlistened client error event was an uncaught
+  exception surviving only via main.ts's last-resort net). withTx now
+  captures the async error for the transaction's lifetime, prefers
+  whichever error carries a code (the ordering flips between sync and
+  async stalls, both probed), and discards the terminated client; pinned
+  by a REAL idle-stall test in the pg suite (a synthetic {code:'25P03'}
+  stub would have stayed green over the broken path). The lane also
+  measured the fix round: the lock-free claim refusals now beat the
+  original lock-free profile (1.06ms at conc=10 vs 163ms), the converge
+  and poll rotations verified on their indexes, NOT VALID verified
+  once-per-database.
+- Coverage round 2: DB-free arm for the verdict gate (with the vacuity trap
+  the auditor flagged avoided: the case sits INSIDE the anti-snipe window),
+  structural pins for the idle-timeout statements, the shared recorder
+  statement (which immediately caught the steal arm still on its old inline
+  INSERT), NOT VALID, and the proxy-constant lockstep; the
+  contended-never-parks arm via a new fake hook. One recorded decline: the
+  extend-before-activate ordering is unpinnable behaviorally under a fixed
+  test clock (the ordering only matters when real latency advances the
+  clock between the two calls); noted here instead.
+
+- Coverage (4 blocking, 12 should-fix, 5 nits, all applied except one):
+  tunable literal pins, teardown carve-out structural pins, the env-knob
+  parse cases (including the fail-dangerous empty string), the monitor's
+  five-class loop and fifth argument, retention wiring and config rows for
+  BOTH woc prunes, review transition-table arms (noting
+  validSettlementTransition has no production caller: the table is
+  documentation, its test the only enforcement), both-sided cooldown
+  boundaries and aging, the directed exemption on both recorders, the
+  recorder dedupe, the converge rollback case, the paid-probe state loop,
+  abandonBid's confirm_in_flight arm, SDK and window pins, the exact-bound
+  cutoff case, and the new-class freeze and saturation arms. The one
+  accepted decline: the two remaining clearBuyNowLock unwind call sites
+  (live_settlement_exists and quote_unavailable races) have no harness hook
+  to force them cheaply; the holder guard itself and three of five call
+  sites are pinned, phase 20's real-SQL coverage owns the rest.
 
 ## 03 QA round (verdict PASS-WITH-FOLLOWUPS, every fix applied)
 
