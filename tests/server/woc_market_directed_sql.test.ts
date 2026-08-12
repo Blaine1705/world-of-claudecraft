@@ -470,8 +470,14 @@ describe('the delivery close tail is ONE transaction, in SQL', () => {
     expect(inside).toContain('UPDATE woc_market_settlements');
     expect(inside).toContain('INSERT INTO woc_market_sales');
     expect(inside).toContain("SET status = 'closed'");
-    expect(inside).toContain('SET item_disposed = true');
+    expect(inside).toContain('item_disposed = true');
     expect(inside).toContain("SET bond_state = 'refund_due'");
+    // Close and dispose share ONE statement (two UPDATEs on the same row per
+    // sale doubled the version churn), and an already-closed row keeps its
+    // resolution.
+    const closeStmt = seq.find((t) => t.includes("SET status = 'closed'"));
+    expect(closeStmt).toContain('item_disposed = true');
+    expect(closeStmt).toContain("CASE WHEN status = 'closed' THEN resolution ELSE $2 END");
   });
 
   it('locks bids FIRST (open set plus the winner, by id), the listing second', async () => {
@@ -567,11 +573,11 @@ describe('the atomic save-and-book, in SQL', () => {
 });
 
 describe('the custody claim primitives stay monotonic, in SQL', () => {
-  it('books, stamps, and clears ONLY while unbooked', async () => {
+  it('books and stamps ONLY while unbooked', async () => {
     for (const run of [
       (db: PgWocMarketDb) => db.markCustodyRefBooked('ref-1'),
       (db: PgWocMarketDb) => db.markCustodyGrantIntent('ref-1', 21),
-      (db: PgWocMarketDb) => db.clearCustodyGrantIntent('ref-1'),
+      (db: PgWocMarketDb) => db.markCustodyMailIntent('ref-1'),
     ]) {
       const { pool, sql } = recordingPool();
       await run(new PgWocMarketDb(pool));
@@ -579,26 +585,73 @@ describe('the custody claim primitives stay monotonic, in SQL', () => {
     }
   });
 
-  it('reads the claim state (booked flag plus grant intent) from the row', async () => {
+  it('the mail-intent stamp WITHDRAWS the grant intent in the same statement', async () => {
+    // The one legal conversion (a grantCopy refusal proves the bags are
+    // untouched); two statements here would leave a crash window in which a
+    // claim carries both rails.
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).markCustodyMailIntent('ref-1');
+    const [text] = sql();
+    expect(text).toContain('mail_intent_at = now()');
+    expect(text).toContain('grant_character_id = NULL');
+  });
+
+  it('reads the claim state (booked flag plus both rail intents) from the row', async () => {
     const { pool, sql } = recordingPool();
     await new PgWocMarketDb(pool).custodyRefState('ref-1');
     const [text] = sql();
     expect(text).toContain('booked_at IS NOT NULL AS booked');
     expect(text).toContain('grant_character_id');
+    expect(text).toContain('mail_intent_at IS NOT NULL AS mail_intent');
   });
 });
 
 describe('the sweep reads that keep delivery converging, in SQL', () => {
-  it('finds delivered-but-unclosed residue from the OPEN listings side', async () => {
-    // Delivered settlements grow with sale history forever; not-yet-closed
-    // listings are the bounded live set. The join direction is the cost model.
+  it('pages delivered-but-unclosed residue over bounded id slices', async () => {
+    // Delivered settlements grow with sale history forever. The single-join
+    // form let the planner hash-join the WHOLE settlements table under a
+    // LIMIT it could not push down (measured); the page shape is two bounded
+    // statements the planner cannot reorder into a scan.
     const { pool, sql, params } = recordingPool();
-    await new PgWocMarketDb(pool).deliveredUnclosedSettlements(REALM, 25);
+    await new PgWocMarketDb(pool).deliveredUnclosedSettlementsPage(REALM, 40, 500);
+    const seq = sql();
+    // No rows from the id read means the second statement never runs.
+    expect(seq).toHaveLength(1);
+    expect(seq[0]).toContain('FROM woc_market_listings');
+    expect(seq[0]).toContain("status IN ('active', 'ending', 'settling')");
+    expect(seq[0]).toContain('id > $2');
+    expect(seq[0]).toContain('ORDER BY id');
+    expect(seq[0]).toContain('LIMIT $3');
+    expect(params()[0]).toEqual([REALM, 40, 500]);
+  });
+
+  it('probes the settlements ONLY by the page ids, delivered state pinned', async () => {
+    const seen: string[] = [];
+    const bound: unknown[][] = [];
+    const query = vi.fn(async (text: string, values?: unknown[]) => {
+      seen.push(text);
+      bound.push(values ?? []);
+      if (text.includes('SELECT id FROM woc_market_listings')) {
+        return { rows: [{ id: 7 }, { id: 9 }], rowCount: 2 };
+      }
+      return { rows: [], rowCount: 0 };
+    });
+    const pool = { query } as unknown as Pool;
+    const out = await new PgWocMarketDb(pool).deliveredUnclosedSettlementsPage(REALM, 0, 500);
+    expect(seen).toHaveLength(2);
+    expect(seen[1]).toContain('listing_id = ANY($1::bigint[])');
+    expect(seen[1]).toContain("state = 'delivered'");
+    expect(bound[1]).toEqual([[7, 9]]);
+    expect(out.lastListingId, 'the cursor advances to the page tail').toBe(9);
+  });
+
+  it('converges sold residue only over a STANDING sale row, bounded', async () => {
+    const { pool, sql, params } = recordingPool();
+    await new PgWocMarketDb(pool).disposeSoldResidueListings(REALM, 25);
     const [text] = sql();
-    expect(text).toContain('FROM woc_market_listings l');
-    expect(text).toContain('JOIN woc_market_settlements s ON s.listing_id = l.id');
-    expect(text).toContain("s.state = 'delivered'");
-    expect(text).toContain("l.status IN ('active', 'ending', 'settling')");
+    expect(text).toContain('SET item_disposed = true');
+    expect(text).toContain("l.resolution = 'sold'");
+    expect(text).toContain('s.excluded = false');
     expect(text).toContain('LIMIT $2');
     expect(params()[0]).toEqual([REALM, 25]);
   });
@@ -611,23 +664,44 @@ describe('the sweep reads that keep delivery converging, in SQL', () => {
     await new PgWocMarketDb(pool).undisposedClosedListings(REALM, 25);
     expect(sql()[0]).toContain("(resolution IS NULL OR resolution <> 'sold')");
   });
+
+  it('rotates a parked settlement on updated_at only, never created_at', async () => {
+    // The delivering stuck class ages on created_at; a rotation that touched
+    // it would hide parked rows from the monitor forever.
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).touchSettlementRow(7);
+    const [text] = sql();
+    expect(text).toContain('SET updated_at = now()');
+    expect(text).not.toContain('created_at');
+  });
 });
 
-describe('the stuck-custody readout is bounded, in SQL', () => {
-  it('reads three classes, each realm-scoped, aged, counted in-window and capped', async () => {
+describe('the stuck-custody readout saturates, in SQL', () => {
+  it('samples and counts each class separately, counts capped by an inner LIMIT', async () => {
     const { pool, sql, params } = recordingPool();
-    await new PgWocMarketDb(pool).stuckCustodyReadout(REALM, 1_000, 20);
+    await new PgWocMarketDb(pool).stuckCustodyReadout(REALM, 1_000, 20, 1000);
     const seq = sql();
-    expect(seq).toHaveLength(3);
-    for (const [i, text] of seq.entries()) {
-      expect(text, `read ${i} is realm-scoped`).toContain('realm = $1');
-      expect(text, `read ${i} is capped`).toContain('LIMIT $3');
-      // The window count rides the sample query; no second scan per class.
-      expect(text, `read ${i} counts in-window`).toContain('count(*) OVER ()');
-      expect(params()[i]).toEqual([REALM, 1_000, 20]);
+    // Three sample reads and three capped counts, interleaved per class.
+    expect(seq).toHaveLength(6);
+    const samples = [seq[0], seq[2], seq[4]];
+    const counts = [seq[1], seq[3], seq[5]];
+    for (const [i, text] of samples.entries()) {
+      expect(text, `sample ${i} is realm-scoped`).toContain('realm = $1');
+      expect(text, `sample ${i} is capped`).toContain('LIMIT $3');
+      expect(params()[i * 2]).toEqual([REALM, 1_000, 20]);
     }
-    expect(seq[0]).toContain('booked_at IS NULL');
-    expect(seq[1]).toContain("state = 'delivering'");
-    expect(seq[2]).toContain("status = 'closed' AND item_disposed = false");
+    for (const [i, text] of counts.entries()) {
+      // The saturating shape: a bare count consumed the whole stuck set.
+      expect(text, `count ${i} saturates`).toContain('SELECT count(*)::int AS n FROM (SELECT 1');
+      expect(text, `count ${i} caps the inner read`).toContain('LIMIT 1000');
+      expect(params()[i * 2 + 1]).toEqual([REALM, 1_000]);
+    }
+    expect(samples[0]).toContain('booked_at IS NULL');
+    expect(samples[0]).toContain('mail_intent_at');
+    expect(samples[1]).toContain("state = 'delivering'");
+    // Aged on created_at: the park-and-rotate machinery never touches it.
+    expect(samples[1]).toContain('created_at <= to_timestamp($2 / 1000.0)');
+    expect(samples[1]).not.toContain('updated_at');
+    expect(samples[2]).toContain("status = 'closed' AND item_disposed = false");
   });
 });

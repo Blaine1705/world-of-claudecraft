@@ -2767,16 +2767,18 @@ const wocMarketService = new WocMarketService({
   verifiedWallet: async (account) => (await walletForAccount(account))?.pubkey ?? null,
   balanceTokens: (pubkey) => cachedWocBalance(pubkey),
   config: wocMarketConfig(),
-  onSweepPass: (stats, saturated) => {
+  onSweepPass: (stats, saturated, elapsedMs) => {
     // One line per pass that did work, plus a loud arm-not-draining warning:
     // an idle marketplace and a wedged one are otherwise indistinguishable.
+    // elapsedMs makes a slow pass measurable before it turns into pool
+    // contention against the game loop's own saves.
     const worked = Object.values(stats).some((n) => n > 0);
     if (saturated.length > 0) {
       console.warn(
-        `[woc_market] sweep backlog not draining: ${saturated.join(',')} ${JSON.stringify(stats)}`,
+        `[woc_market] sweep backlog not draining: ${saturated.join(',')} ${JSON.stringify(stats)} ${elapsedMs}ms`,
       );
     } else if (worked) {
-      console.log(`[woc_market] sweep ${JSON.stringify(stats)}`);
+      console.log(`[woc_market] sweep ${JSON.stringify(stats)} ${elapsedMs}ms`);
     }
   },
   // Per-arm isolation sink: one poisoned row or one failing arm logs here and

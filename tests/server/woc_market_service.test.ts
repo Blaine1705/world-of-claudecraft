@@ -182,7 +182,10 @@ class FakeCustody implements WocMarketCustody {
       this.failNextPersist = false;
       throw new Error('persist failed');
     }
-    // Book-once by custodyRef: a reconciliation replay never double-mails.
+    // Book-once by custodyRef, LIVE-BOOK semantics: the marker exists only
+    // while the parcel does, exactly like the real post office (a collected
+    // letter forgets its ref, so a replay would re-mail; that hazard is what
+    // the durable mail intent exists to catch).
     if (this.parcels.some((p) => p.custodyRef === custodyRef)) return;
     this.parcels.push({
       recipientKey: recipient.key,
@@ -190,6 +193,17 @@ class FakeCustody implements WocMarketCustody {
       items: structuredClone(items),
       custodyRef,
     });
+  }
+
+  hasParcel(custodyRef: string): boolean {
+    return this.parcels.some((p) => p.custodyRef === custodyRef);
+  }
+
+  /** The buyer collects the attachment and deletes the emptied letter: the
+   *  in-book marker is destroyed, exactly like production. */
+  collect(custodyRef: string): void {
+    const i = this.parcels.findIndex((p) => p.custodyRef === custodyRef);
+    if (i >= 0) this.parcels.splice(i, 1);
   }
 }
 
@@ -1933,17 +1947,20 @@ describe('crash reconciliation', () => {
     // A worker claimed delivery and crashed mid-flight.
     expect(await h.db.transitionSettlement(settlement.id, ['offered'], 'delivering')).toBe(true);
     h.custody.failNextPersist = true;
-    // The failing row is ISOLATED and reported, never thrown out of the pass.
+    // The failing row is ISOLATED and reported, never thrown out of the pass,
+    // and the arm counts rows ADVANCED, so this failing one scores zero.
     const stats = await h.service.sweepPass();
-    expect(stats?.reconciled).toBe(1);
+    expect(stats?.reconciled).toBe(0);
     expect(h.sweepErrors.map(([arm]) => arm)).toContain('reconciled');
     expect((await getSettlement(h, settlement.id)).state).toBe('delivering');
     expect(h.custody.parcels).toHaveLength(0);
     // The claim STAYS, unbooked and visible, for the retry to resume.
     expect(h.db.custodyClaims.get(settlementCustodyRef(settlement.id))?.bookedAtMs).toBeNull();
 
-    // The next pass resumes the stuck row and books the parcel exactly once.
-    await h.service.sweepPass();
+    // The next pass resumes the stuck row and books the parcel exactly once
+    // (a THROWN attempt takes no park backoff: the very next pass retries).
+    const retry = await h.service.sweepPass();
+    expect(retry?.reconciled).toBe(1);
     expect((await getSettlement(h, settlement.id)).state).toBe('delivered');
     const deliveries = h.custody.parcels.filter(
       (p) => p.custodyRef === settlementCustodyRef(settlement.id),
@@ -2014,7 +2031,12 @@ describe('custody book-once claims', () => {
     expect(h.custody.persistCalls).toEqual([ref]);
     expect(h.custody.parcels).toHaveLength(0);
     expect(h.db.custodyClaims.get(ref)?.bookedAtMs).toBeNull();
+    expect(h.db.custodyClaims.get(ref)?.mailIntentAtMs, 'the mail rail owns it').not.toBeNull();
     expect((await getListing(h, listing.id)).itemDisposed).toBe(false);
+    expect(
+      h.sweepErrors.map(([arm]) => arm),
+      'the failure is reported',
+    ).toContain('returned');
 
     await h.service.sweepPass();
     // Two ATTEMPTS, one booking: the ledger is what makes the retry safe.
@@ -2499,28 +2521,33 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     expect(h.custody.parcels.filter((p) => p.letter === 'delivery')).toHaveLength(1);
   });
 
-  it('ABORTS on a lease-fence rejection, then mails on the NEXT pass, exactly once', async () => {
-    // A takeover rotated the nonce: this process no longer owns the character,
-    // so nothing it granted can ever persist. The fence arm aborts with NO
-    // mail in the same breath (the target may re-resolve entirely), clears the
-    // grant intent, and the following pass mails through the resumed claim.
+  it('PARKS on a lease-fence rejection: no mail, ever, without an operator', async () => {
+    // The fence proves THIS write lost, not that an earlier autosave under
+    // the then-valid nonce did: the granted bags may already be durable, so
+    // mailing (the old same-breath fallback, and the first fix round's
+    // next-pass fallback) risks a second copy. The claim keeps its grant
+    // intent and stays visible; only an operator can attribute the item.
     const h = stocked();
     buyerOnline(h);
     h.db.failNextDeliveredSave = 'lease_lost';
     const { listingId } = await settleDirected(h);
+    const ref = settlementCustodyRef((await liveSettlement(h, listingId)).id);
     expect(
       h.custody.parcels.filter((p) => p.letter === 'delivery'),
-      'no mail on the abort pass',
+      'no mail on the fence pass',
     ).toHaveLength(0);
-    const live = await liveSettlement(h, listingId);
-    expect(live.state, 'held visibly, never advanced').toBe('delivering');
+    expect((await liveSettlement(h, listingId)).state).toBe('delivering');
+    // Past the park backoff, and again: still parked, still no mail.
+    h.setNow(h.now() + 61_000);
     await h.service.sweepPass();
-    expect(h.custody.parcels.filter((p) => p.letter === 'delivery')).toHaveLength(1);
+    h.setNow(h.now() + 61_000);
+    await h.service.sweepPass();
+    expect(h.custody.parcels.filter((p) => p.letter === 'delivery')).toHaveLength(0);
     expect(h.custody.grantCalls, 'the zombie grant is never repeated').toBe(1);
-    const listing = await h.db.listingById(REALM, listingId);
-    expect(listing?.status).toBe('closed');
-    expect(listing?.resolution).toBe('sold');
-    expect(listing?.itemDisposed).toBe(true);
+    expect((await liveSettlement(h, listingId)).state).toBe('delivering');
+    expect(h.db.custodyClaims.get(ref)?.grantCharacterId, 'the intent survives').toBe(CHAR_A);
+    const readout = await h.db.stuckCustodyReadout(REALM, h.now() + 1, 10, 1000);
+    expect(readout.unbookedClaims.count, 'visible to the operator').toBe(1);
   });
 
   it('retries a THROWING save on the same custody ref, and never mails (B2b)', async () => {
@@ -2540,14 +2567,23 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     expect((await liveSettlement(h, listingId)).state).toBe('delivering');
     expect(h.db.custodyClaims.get(ref)?.bookedAtMs, 'unbooked and visible').toBeNull();
     expect(h.db.custodyClaims.get(ref)?.grantCharacterId).toBe(CHAR_A);
-    // The next pass retries the SAME ref from the SAME live session: one
+    expect(
+      h.sweepErrors.map(([arm]) => arm),
+      'the throw is reported',
+    ).toContain('deliver_grant');
+    // Past the park backoff, the SAME live session retries the SAME ref: one
     // snapshot save, no second grant, no mail, and the tail completes.
+    h.setNow(h.now() + 61_000);
     await h.service.sweepPass();
     expect(bagsOf(h, CHAR_A), 'one copy').toHaveLength(before + 1);
     expect(h.custody.grantCalls, 'granted once, snapshot-retried after').toBe(1);
     expect(h.custody.parcels.filter((p) => p.letter === 'delivery')).toHaveLength(0);
     expect(h.db.custodyClaims.get(ref)?.bookedAtMs).not.toBeNull();
     expect((await h.db.listingById(REALM, listingId))?.status).toBe('closed');
+    // Both saves crossed the delivery edge for the same session: the grant
+    // save and the snapshot retry, never a third.
+    expect(h.db.deliveredSaves.map((s) => s.characterId)).toEqual([CHAR_A, CHAR_A]);
+    expect(h.db.deliveredSaves.map((s) => s.leaseNonce)).toEqual(['nonce', 'nonce']);
   });
 
   it('resolves an AMBIGUOUS commit (reply lost after booking) without a second copy', async () => {
@@ -2561,7 +2597,9 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     const { listingId } = await settleDirected(h);
     expect((await liveSettlement(h, listingId)).state, 'no blind advance').toBe('delivering');
     expect(h.custody.parcels.filter((p) => p.letter === 'delivery')).toHaveLength(0);
-    // The next pass reads booked_at, sees the commit, and only finalizes.
+    // Past the park backoff, the retry reads booked_at, sees the commit, and
+    // only finalizes.
+    h.setNow(h.now() + 61_000);
     await h.service.sweepPass();
     expect(bagsOf(h, CHAR_A)).toHaveLength(before + 1);
     expect(h.custody.grantCalls).toBe(1);
@@ -2578,6 +2616,7 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     const { listingId } = await settleDirected(h);
     const restarted = new WocMarketService(h.deps);
     await restarted.sweepPass();
+    h.setNow(h.now() + 61_000);
     await restarted.sweepPass();
     expect(
       h.custody.parcels.filter((p) => p.letter === 'delivery'),
@@ -2585,7 +2624,7 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     ).toHaveLength(0);
     expect(h.custody.grantCalls, 'never re-grants').toBe(1);
     expect((await liveSettlement(h, listingId)).state).toBe('delivering');
-    const readout = await h.db.stuckCustodyReadout(REALM, h.now() + 1, 10);
+    const readout = await h.db.stuckCustodyReadout(REALM, h.now() + 1, 10, 1000);
     expect(readout.unbookedClaims.count).toBe(1);
     expect(readout.unbookedClaims.sample[0]?.grantCharacterId).toBe(CHAR_A);
     expect(readout.stuckDelivering.count).toBe(1);
@@ -2599,14 +2638,37 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     // Same process, new session: the lease nonce rotated, so the pending
     // entry no longer matches and the claim parks for the operator.
     h.custody.leaseNonce = 'nonce-after-relog';
+    h.setNow(h.now() + 61_000);
     await h.service.sweepPass();
+    h.setNow(h.now() + 61_000);
     await h.service.sweepPass();
     expect(h.custody.parcels.filter((p) => p.letter === 'delivery')).toHaveLength(0);
     expect(h.custody.grantCalls).toBe(1);
     expect((await liveSettlement(h, listingId)).state).toBe('delivering');
   });
 
-  it('resumes a claim whose pass died BEFORE the mail write: delivers, never destroys (B2c)', async () => {
+  it('PARKS an unbooked grant claim when the buyer logs out before the retry', async () => {
+    // The realistic loss of the resume proof: the session simply ends.
+    // snapshotCopy answers offline, and the claim parks rather than mails.
+    const h = stocked();
+    buyerOnline(h);
+    h.db.failNextDeliveredSave = 'throw';
+    const { listingId } = await settleDirected(h);
+    h.custody.bags.delete(CHAR_A);
+    h.setNow(h.now() + 61_000);
+    await h.service.sweepPass();
+    h.setNow(h.now() + 61_000);
+    await h.service.sweepPass();
+    expect(h.custody.parcels.filter((p) => p.letter === 'delivery')).toHaveLength(0);
+    expect(h.custody.grantCalls).toBe(1);
+    expect((await liveSettlement(h, listingId)).state).toBe('delivering');
+  });
+
+  it('PARKS a bare claim with no rail intent: unattributable, never mailed (B2c)', async () => {
+    // The claim-then-die residue (and every legacy row from before the intent
+    // columns): the OLD code adopted it as booked and advanced with the item
+    // destroyed; the first fix mailed it, which a collected-and-deleted letter
+    // turns into a second copy. Neither is provable, so it parks.
     const h = makeHarness();
     h.custody.bags.set(CHAR_A, []);
     h.custody.owners.set(CHAR_A, BUYER_A);
@@ -2616,22 +2678,84 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     await h.service.sweepPass();
     const settlement = await liveSettlement(h, listing.id);
     const ref = settlementCustodyRef(settlement.id);
-    // A prior pass claimed the ref and died before the durable mail write.
     expect(await h.db.claimCustodyRef(REALM, ref)).toBe(true);
     unwrap(await h.service.settlementQuote(BUYER_A, settlement.id), 'settlementQuote');
     unwrap(
       await h.service.confirmSettlement(BUYER_A, settlement.id, 'sig-resume-1'),
       'confirmSettlement',
     );
-    // The OLD code adopted any existing claim as booked and advanced with the
-    // item destroyed (buyer paid, nothing delivered); the resume writes the
-    // parcel first and only then advances.
+    expect(h.custody.parcels, 'nothing mailed').toHaveLength(0);
+    expect((await liveSettlement(h, listing.id)).state, 'held visibly').toBe('delivering');
+    const readout = await h.db.stuckCustodyReadout(REALM, h.now() + 1, 10, 1000);
+    expect(readout.unbookedClaims.count).toBe(1);
+    expect(readout.unbookedClaims.sample[0]?.mailIntent).toBe(false);
+  });
+
+  it('resumes a mail claim whose pass died before the BOOKING: one parcel, then done (B2c)', async () => {
+    // The provable resume: the intent is stamped AND the parcel still sits in
+    // the live book, so booking it completes the delivery without a re-mail.
+    const h = makeHarness();
+    h.custody.bags.set(CHAR_A, []);
+    h.custody.owners.set(CHAR_A, BUYER_A);
+    const listing = await listEpic(h);
+    await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    h.setNow(listing.endsAtMs + 1);
+    await h.service.sweepPass();
+    const settlement = await liveSettlement(h, listing.id);
+    const ref = settlementCustodyRef(settlement.id);
+    // A prior pass claimed, stamped the mail intent, wrote the parcel, and
+    // died before markCustodyRefBooked (a restart: pendingMail is empty).
+    expect(await h.db.claimCustodyRef(REALM, ref)).toBe(true);
+    expect(await h.db.markCustodyMailIntent(ref)).toBe(true);
+    await h.custody.persistMailParcel(
+      { key: String(CHAR_A), name: 'Aldan' },
+      'delivery',
+      [{ itemId: EPIC_ITEM, count: 1 }],
+      ref,
+    );
+    unwrap(await h.service.settlementQuote(BUYER_A, settlement.id), 'settlementQuote');
+    unwrap(
+      await h.service.confirmSettlement(BUYER_A, settlement.id, 'sig-resume-2'),
+      'confirmSettlement',
+    );
     expect(
       h.custody.parcels.filter((p) => p.custodyRef === ref),
-      'the parcel exists',
+      'exactly one parcel',
     ).toHaveLength(1);
     expect(h.db.custodyClaims.get(ref)?.bookedAtMs).not.toBeNull();
     expect((await h.db.listingById(REALM, listing.id))?.status).toBe('closed');
+  });
+
+  it('PARKS a mail claim whose letter was collected and deleted: never a second copy', async () => {
+    // The regression the durable intent exists to stop: parcel written,
+    // booking lost, buyer takes the item and deletes the emptied letter. The
+    // in-book marker is gone, so a blind resume would mail copy two.
+    const h = makeHarness();
+    h.custody.bags.set(CHAR_A, []);
+    h.custody.owners.set(CHAR_A, BUYER_A);
+    const listing = await listEpic(h);
+    await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    h.setNow(listing.endsAtMs + 1);
+    await h.service.sweepPass();
+    const settlement = await liveSettlement(h, listing.id);
+    const ref = settlementCustodyRef(settlement.id);
+    expect(await h.db.claimCustodyRef(REALM, ref)).toBe(true);
+    expect(await h.db.markCustodyMailIntent(ref)).toBe(true);
+    await h.custody.persistMailParcel(
+      { key: String(CHAR_A), name: 'Aldan' },
+      'delivery',
+      [{ itemId: EPIC_ITEM, count: 1 }],
+      ref,
+    );
+    h.custody.collect(ref);
+    unwrap(await h.service.settlementQuote(BUYER_A, settlement.id), 'settlementQuote');
+    unwrap(
+      await h.service.confirmSettlement(BUYER_A, settlement.id, 'sig-resume-3'),
+      'confirmSettlement',
+    );
+    expect(h.custody.parcels, 'no second copy, ever').toHaveLength(0);
+    expect((await liveSettlement(h, listing.id)).state, 'parked visibly').toBe('delivering');
+    expect(h.db.custodyClaims.get(ref)?.bookedAtMs).toBeNull();
   });
 
   it('keeps a failed mail booking VISIBLE and resumes it: one parcel, then done', async () => {
@@ -2662,7 +2786,7 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     expect((await h.db.listingById(REALM, listing.id))?.status).toBe('closed');
   });
 
-  it('re-drives delivered-but-unclosed residue FORWARD from the reclaim arm', async () => {
+  it('re-drives delivered-but-unclosed residue FORWARD to the finished sale', async () => {
     // The residue shape an older binary's crash leaves: custody booked,
     // settlement 'delivered', close tail never ran. The reclaim arm used to
     // skip it silently forever; it must now converge it to the finished sale.
@@ -2701,10 +2825,50 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     expect(listing?.resolution).toBe('sold');
     expect(listing?.itemDisposed).toBe(true);
     expect(await h.db.salesForItem(REALM, EPIC_ITEM, 10)).toHaveLength(1);
+    // The seller still hears about the completed sale on the re-driven path.
+    expect(h.custody.parcels.map((p) => p.custodyRef)).toContain(
+      listingSoldNoticeCustodyRef(listingId),
+    );
     // A second pass changes nothing: converged, and never counted again.
     const again = await h.service.sweepPass();
     expect(again?.redriven).toBe(0);
     expect(await h.db.salesForItem(REALM, EPIC_ITEM, 10)).toHaveLength(1);
+  });
+
+  it('converges an old sold-but-undisposed residue when its sale row stands', async () => {
+    // The other close-tail residue: closed 'sold', sale row present, dispose
+    // flag never landed. The standing sale proves delivery completed, so the
+    // flag is bookkeeping the redriven beat settles; without a sale row the
+    // row would stay parked for the operator instead.
+    const h = stocked();
+    buyerOnline(h);
+    h.db.failNextFinalize = 'contended';
+    const { listingId } = await settleDirected(h);
+    // Craft the residue the old binary left: sale + close landed, dispose did
+    // not. The sale insert is the primitive the old tail used.
+    await h.db.insertSale({
+      realm: REALM,
+      listingId,
+      itemId: EPIC_ITEM,
+      item: { itemId: EPIC_ITEM, count: 1 },
+      priceCents: 1000,
+      amountBase: null,
+      sellerAccount: SELLER,
+      buyerAccount: BUYER_A,
+      sellerName: 'Selara',
+      buyerName: 'Aldan',
+    });
+    await h.db.transitionSettlement(
+      (await liveSettlement(h, listingId)).id,
+      ['delivering'],
+      'delivered',
+    );
+    const stats = await h.service.sweepPass();
+    expect(stats?.redriven).toBeGreaterThanOrEqual(1);
+    const listing = await h.db.listingById(REALM, listingId);
+    expect(listing?.status).toBe('closed');
+    expect(listing?.itemDisposed).toBe(true);
+    expect(await h.db.salesForItem(REALM, EPIC_ITEM, 10), 'still exactly one sale').toHaveLength(1);
   });
 
   it('refuses to deliver over an already-disposed listing: parked, not duplicated', async () => {
@@ -2721,12 +2885,134 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     const grantsBefore = h.custody.grantCalls;
     const parcelsBefore = h.custody.parcels.length;
     await h.service.sweepPass();
+    h.setNow(h.now() + 61_000);
     await h.service.sweepPass();
     expect((await liveSettlement(h, listingId)).state, 'parked').toBe('delivering');
     expect(h.custody.grantCalls).toBe(grantsBefore);
     expect(h.custody.parcels.length).toBe(parcelsBefore);
-    const readout = await h.db.stuckCustodyReadout(REALM, h.now() + 1, 10);
+    const readout = await h.db.stuckCustodyReadout(REALM, h.now() + 1, 10, 1000);
     expect(readout.stuckDelivering.count).toBe(1);
+  });
+
+  it('refuses a disposed listing on the MAIL route too: zero parcels, decisive', async () => {
+    // The Exchange shape of the same belt, with NO custody claim yet: without
+    // the itemDisposed guard the mail route would write a parcel here, so a
+    // zero-parcel assertion is what actually pins the guard.
+    const h = makeHarness();
+    h.custody.bags.set(CHAR_A, []);
+    h.custody.owners.set(CHAR_A, BUYER_A);
+    const listing = await listEpic(h);
+    await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    h.setNow(listing.endsAtMs + 1);
+    await h.service.sweepPass();
+    const settlement = await liveSettlement(h, listing.id);
+    unwrap(await h.service.settlementQuote(BUYER_A, settlement.id), 'settlementQuote');
+    expect(await h.db.transitionSettlement(settlement.id, ['offered'], 'confirming')).toBe(true);
+    expect(await h.db.transitionSettlement(settlement.id, ['confirming'], 'confirmed')).toBe(true);
+    await h.db.markItemDisposed(listing.id);
+    await h.service.sweepPass();
+    expect(h.custody.parcels, 'no parcel over a disposed listing').toHaveLength(0);
+    expect((await getSettlement(h, settlement.id)).state).toBe('delivering');
+    expect(await h.db.salesForItem(REALM, EPIC_ITEM, 10)).toHaveLength(0);
+  });
+
+  it('PARKS the mail route over a grant-intent claim: the hand-off may have landed', async () => {
+    // A public listing whose ref carries a grant intent (hand intervention or
+    // cross-shape residue): mailing over it risks the second copy, so the
+    // mail rail refuses and the row stays visible.
+    const h = makeHarness();
+    h.custody.bags.set(CHAR_A, []);
+    h.custody.owners.set(CHAR_A, BUYER_A);
+    const listing = await listEpic(h);
+    await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    h.setNow(listing.endsAtMs + 1);
+    await h.service.sweepPass();
+    const settlement = await liveSettlement(h, listing.id);
+    const ref = settlementCustodyRef(settlement.id);
+    expect(await h.db.claimCustodyRef(REALM, ref)).toBe(true);
+    expect(await h.db.markCustodyGrantIntent(ref, CHAR_A)).toBe(true);
+    unwrap(await h.service.settlementQuote(BUYER_A, settlement.id), 'settlementQuote');
+    expect(await h.db.transitionSettlement(settlement.id, ['offered'], 'confirming')).toBe(true);
+    expect(await h.db.transitionSettlement(settlement.id, ['confirming'], 'confirmed')).toBe(true);
+    await h.service.sweepPass();
+    expect(h.custody.parcels, 'never mails over a grant intent').toHaveLength(0);
+    expect((await getSettlement(h, settlement.id)).state).toBe('delivering');
+    expect(h.db.custodyClaims.get(ref)?.bookedAtMs).toBeNull();
+  });
+
+  it('retries a CONTENDED finalize on the next pass and converges, hands off', async () => {
+    // The plain contended story with no surgery: the tail refuses once (a
+    // guard held the listing row), the batch stops, and the very next pass
+    // finishes the sale exactly once.
+    const h = stocked();
+    buyerOnline(h);
+    h.db.failNextFinalize = 'contended';
+    const { listingId } = await settleDirected(h);
+    expect((await liveSettlement(h, listingId)).state).toBe('delivering');
+    const stats = await h.service.sweepPass();
+    expect(stats?.reconciled).toBe(1);
+    const listing = await h.db.listingById(REALM, listingId);
+    expect(listing?.status).toBe('closed');
+    expect(listing?.resolution).toBe('sold');
+    expect(await h.db.salesForItem(REALM, EPIC_ITEM, 10)).toHaveLength(1);
+  });
+
+  it('isolates one poisoned ROW: the rest of the delivery batch still lands', async () => {
+    // Per-row isolation inside the batch loop, distinct from the per-arm
+    // isolation below: the first settlement's listing read throws once and
+    // the second settlement must still deliver in the SAME pass.
+    const h = makeHarness();
+    h.custody.bags.set(CHAR_A, []);
+    h.custody.owners.set(CHAR_A, BUYER_A);
+    h.custody.bags.set(CHAR_B, []);
+    h.custody.owners.set(CHAR_B, BUYER_B);
+    const first = await listEpic(h);
+    // A second seller (the wallet twin) lists its own epic, so two deliveries
+    // share one batch.
+    h.custody.owners.set(CHAR_TWIN, WALLET_TWIN);
+    h.custody.bags.set(CHAR_TWIN, [{ itemId: EPIC_ITEM, count: 1 }]);
+    const second = unwrap(
+      await h.service.createListing({
+        account: WALLET_TWIN,
+        characterId: CHAR_TWIN,
+        itemRef: { index: 0, itemId: EPIC_ITEM },
+        params: listingParams({ startCents: 6000 }),
+      }),
+      'createListing',
+    ).listing;
+    await confirmedBid(h, BUYER_A, CHAR_A, first.id, 5000);
+    await confirmedBid(h, BUYER_B, CHAR_B, second.id, 7000);
+    h.setNow(Math.max(first.endsAtMs, second.endsAtMs) + 1);
+    await h.service.sweepPass();
+    const settlementA = await liveSettlement(h, first.id);
+    const settlementB = await liveSettlement(h, second.id);
+    for (const [buyer, s] of [
+      [BUYER_A, settlementA],
+      [BUYER_B, settlementB],
+    ] as const) {
+      unwrap(await h.service.settlementQuote(buyer, s.id), 'settlementQuote');
+      expect(await h.db.transitionSettlement(s.id, ['offered'], 'confirming')).toBe(true);
+      expect(await h.db.transitionSettlement(s.id, ['confirming'], 'confirmed')).toBe(true);
+    }
+    const original = h.db.listingById.bind(h.db);
+    let poisoned = true;
+    h.db.listingById = async (realm, id) => {
+      if (poisoned && id === first.id) {
+        poisoned = false;
+        throw new Error('poisoned row');
+      }
+      return original(realm, id);
+    };
+    const stats = await h.service.sweepPass();
+    expect(h.sweepErrors.map(([arm]) => arm)).toContain('delivered');
+    expect(stats?.delivered, 'the healthy row advanced past the poison').toBe(1);
+    expect((await getSettlement(h, settlementB.id)).state).toBe('delivered');
+    expect((await h.db.listingById(REALM, second.id))?.status).toBe('closed');
+    // The poisoned row is not lost either: the reconcile arm, later in the
+    // SAME pass, re-reads 'delivering' rows and lands it (poison consumed).
+    expect(stats?.reconciled).toBe(1);
+    expect((await getSettlement(h, settlementA.id)).state).toBe('delivered');
+    expect(await h.db.salesForItem(REALM, EPIC_ITEM, 10), 'both sales, once each').toHaveLength(2);
   });
 
   it('isolates one poisoned sweep arm: later arms still run and the failure is reported', async () => {

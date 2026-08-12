@@ -243,6 +243,7 @@ describeDb('woc market settlement guards against real Postgres', () => {
       },
       restoreCopy: () => {},
       persistMailParcel: async () => {},
+      hasParcel: () => false,
     };
     return new marketMod.WocMarketService({
       db: marketDb,

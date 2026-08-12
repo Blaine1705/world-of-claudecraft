@@ -167,6 +167,14 @@ export function createWocMarketCustody(host: WocCustodyGameHost): WocMarketCusto
       // (this process) or the re-book (after a restart) exactly-once.
       await host.persistMailBlob();
     },
+
+    hasParcel(custodyRef: string): boolean {
+      // Advisory by nature: a collected letter can be deleted, so absence
+      // never proves the parcel was not sent. The resume paths treat
+      // presence as permission and absence as ambiguity (woc_market.ts
+      // bookCustodyOnce).
+      return host.sim.hasCustodyParcel(custodyRef);
+    },
   };
 }
 

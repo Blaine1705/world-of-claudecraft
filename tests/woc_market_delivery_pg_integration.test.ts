@@ -72,6 +72,17 @@ class ParcelCustody implements WocMarketCustody {
     if (this.parcels.some((p) => p.custodyRef === custodyRef)) return;
     this.parcels.push({ recipientKey: recipient.key, letter, custodyRef });
   }
+
+  hasParcel(custodyRef: string): boolean {
+    return this.parcels.some((p) => p.custodyRef === custodyRef);
+  }
+
+  /** The buyer collects the attachment and deletes the emptied letter: the
+   *  in-book marker is destroyed, exactly like production. */
+  collect(custodyRef: string): void {
+    const i = this.parcels.findIndex((p) => p.custodyRef === custodyRef);
+    if (i >= 0) this.parcels.splice(i, 1);
+  }
 }
 
 describeDb('woc market delivery finalization against real Postgres', () => {
@@ -351,11 +362,24 @@ describeDb('woc market delivery finalization against real Postgres', () => {
   // -------------------------------------------------------------------------
 
   describe('delivery crash-point matrix', () => {
-    it('C0: a confirmed settlement delivers end to end in one pass', async () => {
+    it('C0: a confirmed settlement delivers end to end, and a re-run changes nothing', async () => {
       const realm = 'delivery-c0';
       const scene = await seedScene(realm, 'confirmed');
       const custody = new ParcelCustody();
-      await makeService(realm, custody).sweepPass();
+      const service = makeService(realm, custody);
+      await service.sweepPass();
+      await expectDeliveredExactlyOnce({
+        realm,
+        listingId: scene.listingId,
+        settlementId: scene.settlement.id,
+        custody,
+        custodyRef: scene.custodyRef,
+        parcels: 1,
+        winnerBidId: scene.winnerBidId,
+        loserBidId: scene.loserBidId,
+      });
+      // Convergence is idempotent: the whole sweep again, same end state.
+      await service.sweepPass();
       await expectDeliveredExactlyOnce({
         realm,
         listingId: scene.listingId,
@@ -385,36 +409,49 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       });
     }, 20_000);
 
-    it('C2: killed between the custody claim and the mail write (B2c)', async () => {
-      // THE B2c shape: the claim row exists, booked_at is NULL, and no parcel
-      // was ever written. The old bookCustodyOnce adopted the bare claim as
-      // booked and advanced the settlement with the item destroyed; the
-      // resume must write the parcel first.
-      const realm = 'delivery-c2';
+    it('C2a: a bare claim with no rail intent PARKS: unattributable, never mailed', async () => {
+      // The claim-then-die residue, and every legacy row from before the
+      // intent columns. The ORIGINAL code adopted it as booked and advanced
+      // with the item destroyed; a blind mail resume risks the second copy
+      // when the ref belonged to the other rail. Neither is provable: park.
+      const realm = 'delivery-c2a';
       const scene = await seedScene(realm, 'delivering');
       expect(await marketDb.claimCustodyRef(realm, scene.custodyRef)).toBe(true);
       const custody = new ParcelCustody();
       await makeService(realm, custody).sweepPass();
-      await expectDeliveredExactlyOnce({
-        realm,
-        listingId: scene.listingId,
-        settlementId: scene.settlement.id,
-        custody,
-        custodyRef: scene.custodyRef,
-        parcels: 1,
-        winnerBidId: scene.winnerBidId,
-        loserBidId: scene.loserBidId,
-      });
-      // And the parcel write really happened on the resume, not a fresh claim.
-      expect(custody.persistCalls).toContain(scene.custodyRef);
+      expect(custody.parcels, 'nothing mailed').toHaveLength(0);
+      const after = await pool.query(`SELECT state FROM woc_market_settlements WHERE id = $1`, [
+        scene.settlement.id,
+      ]);
+      expect(after.rows[0].state, 'held visibly').toBe('delivering');
+      const readout = await marketDb.stuckCustodyReadout(realm, Date.now() + MINUTE_MS, 10, 1000);
+      expect(readout.unbookedClaims.count).toBe(1);
+      expect(readout.unbookedClaims.sample[0]?.mailIntent).toBe(false);
     }, 20_000);
 
-    it('C3: killed between the mail write and the booking', async () => {
-      // The parcel is durably in the blob, booked_at is NULL. The resume must
-      // dedupe on the ref (one parcel) and complete the booking.
+    it('C2b: killed between the mail intent and the write PARKS (parcel absent)', async () => {
+      // Intent stamped, parcel never became durable: absence cannot be told
+      // apart from collected-and-deleted, so the resume refuses to re-mail.
+      const realm = 'delivery-c2b';
+      const scene = await seedScene(realm, 'delivering');
+      expect(await marketDb.claimCustodyRef(realm, scene.custodyRef)).toBe(true);
+      expect(await marketDb.markCustodyMailIntent(scene.custodyRef)).toBe(true);
+      const custody = new ParcelCustody();
+      await makeService(realm, custody).sweepPass();
+      expect(custody.parcels, 'no blind re-mail').toHaveLength(0);
+      const after = await pool.query(`SELECT state FROM woc_market_settlements WHERE id = $1`, [
+        scene.settlement.id,
+      ]);
+      expect(after.rows[0].state).toBe('delivering');
+    }, 20_000);
+
+    it('C3: killed between the mail write and the booking RESUMES (parcel present)', async () => {
+      // The provable resume: intent stamped AND the parcel still in the book.
+      // The re-run dedupes on the ref (one parcel) and completes the booking.
       const realm = 'delivery-c3';
       const scene = await seedScene(realm, 'delivering');
       expect(await marketDb.claimCustodyRef(realm, scene.custodyRef)).toBe(true);
+      expect(await marketDb.markCustodyMailIntent(scene.custodyRef)).toBe(true);
       const custody = new ParcelCustody();
       await custody.persistMailParcel(
         { key: String(scene.buyerCharacter), name: 'Buyer' },
@@ -433,6 +470,35 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         winnerBidId: scene.winnerBidId,
         loserBidId: scene.loserBidId,
       });
+    }, 20_000);
+
+    it('C3b: the collected-and-deleted letter PARKS: never a second copy', async () => {
+      // The dupe the durable mail intent exists to stop: parcel written and
+      // collected, letter deleted, booking lost. The in-book marker is gone,
+      // so a blind resume would mail copy two; the resume must refuse.
+      const realm = 'delivery-c3b';
+      const scene = await seedScene(realm, 'delivering');
+      expect(await marketDb.claimCustodyRef(realm, scene.custodyRef)).toBe(true);
+      expect(await marketDb.markCustodyMailIntent(scene.custodyRef)).toBe(true);
+      const custody = new ParcelCustody();
+      await custody.persistMailParcel(
+        { key: String(scene.buyerCharacter), name: 'Buyer' },
+        'delivery',
+        [],
+        scene.custodyRef,
+      );
+      custody.collect(scene.custodyRef);
+      await makeService(realm, custody).sweepPass();
+      expect(custody.parcels, 'no second copy, ever').toHaveLength(0);
+      const after = await pool.query(`SELECT state FROM woc_market_settlements WHERE id = $1`, [
+        scene.settlement.id,
+      ]);
+      expect(after.rows[0].state, 'parked visibly').toBe('delivering');
+      const claim = await pool.query(
+        `SELECT booked_at FROM woc_market_custody_claims WHERE custody_ref = $1`,
+        [scene.custodyRef],
+      );
+      expect(claim.rows[0].booked_at).toBeNull();
     }, 20_000);
 
     it('C4: killed between the booking and the close tail', async () => {
@@ -474,8 +540,22 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       expect(await marketDb.claimCustodyRef(realm, scene.custodyRef)).toBe(true);
       await marketDb.markCustodyRefBooked(scene.custodyRef);
       const custody = new ParcelCustody();
-      const stats = await makeService(realm, custody).sweepPass();
+      const service = makeService(realm, custody);
+      const stats = await service.sweepPass();
       expect(stats?.redriven).toBe(1);
+      await expectDeliveredExactlyOnce({
+        realm,
+        listingId: scene.listingId,
+        settlementId: scene.settlement.id,
+        custody,
+        custodyRef: scene.custodyRef,
+        parcels: 0,
+        winnerBidId: scene.winnerBidId,
+        loserBidId: scene.loserBidId,
+      });
+      // A re-run converges to the same end state and re-drives nothing.
+      const again = await service.sweepPass();
+      expect(again?.redriven).toBe(0);
       await expectDeliveredExactlyOnce({
         realm,
         listingId: scene.listingId,
@@ -550,6 +630,51 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       });
     }, 20_000);
 
+    it('C9: sold-but-undisposed residue converges when its sale row stands, parks without one', async () => {
+      // The other close-tail residue of the old binary (crash between its
+      // close and dispose statements). A standing sale row proves delivery
+      // completed, so the flag converges; a sold row with NO sale is a
+      // question only an operator can answer and stays visible.
+      const realm = 'delivery-c9';
+      const seller = await seedAccount();
+      const withSale = await seedListing(realm, seller, { status: 'closed' });
+      const withoutSale = await seedListing(realm, seller, { status: 'closed' });
+      await pool.query(
+        `UPDATE woc_market_listings SET resolution = 'sold' WHERE id = ANY($1::bigint[])`,
+        [[withSale, withoutSale]],
+      );
+      await marketDb.insertSale({
+        realm,
+        listingId: withSale,
+        itemId: 'crown_of_embers',
+        item: { itemId: 'crown_of_embers', count: 1 },
+        priceCents: 1000,
+        amountBase: null,
+        sellerAccount: 1,
+        buyerAccount: 2,
+        sellerName: 'S',
+        buyerName: 'B',
+      });
+      const custody = new ParcelCustody();
+      const stats = await makeService(realm, custody).sweepPass();
+      expect(stats?.redriven).toBe(1);
+      const rows = await pool.query(
+        `SELECT id, item_disposed FROM woc_market_listings WHERE id = ANY($1::bigint[]) ORDER BY id`,
+        [[withSale, withoutSale].sort((a, b) => a - b)],
+      );
+      const byId = new Map(rows.rows.map((r) => [Number(r.id), r.item_disposed]));
+      expect(byId.get(withSale), 'the proven sale converges').toBe(true);
+      expect(byId.get(withoutSale), 'the unproven one parks').toBe(false);
+      // And the parked one is what the readout carries.
+      await pool.query(
+        `UPDATE woc_market_listings SET updated_at = now() - interval '1 hour' WHERE id = $1`,
+        [withoutSale],
+      );
+      const readout = await marketDb.stuckCustodyReadout(realm, Date.now() - 600_000, 10, 1000);
+      expect(readout.undisposedListings.count).toBe(1);
+      expect(readout.undisposedListings.sample[0]?.id).toBe(withoutSale);
+    }, 20_000);
+
     it('C7: refuses to deliver over a disposed listing and stays visible', async () => {
       const realm = 'delivery-c7';
       const seller = await seedAccount();
@@ -589,7 +714,7 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       ]);
       expect(after.rows[0].state).toBe('delivering');
       expect(custody.parcels).toHaveLength(0);
-      const readout = await marketDb.stuckCustodyReadout(realm, Date.now() + MINUTE_MS, 10);
+      const readout = await marketDb.stuckCustodyReadout(realm, Date.now() + MINUTE_MS, 10, 1000);
       expect(readout.unbookedClaims.count).toBe(1);
       expect(readout.unbookedClaims.sample[0]).toMatchObject({
         custodyRef: scene.custodyRef,
@@ -629,6 +754,41 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         [ref],
       );
       expect(claim.rows[0].booked_at, 'and the booking landed with it').not.toBeNull();
+    });
+
+    it('passes the REAL lease fence when this process holds the lease', async () => {
+      // The fenced statement's passing form against real Postgres: a wrong
+      // holder or nonce column in the EXISTS would make every direct hand-off
+      // report lease_lost forever, and only this arm would say so.
+      const realm = 'delivery-book-fenced-ok';
+      const account = await seedAccount();
+      const characterId = await seedCharacter(realm, account);
+      await pool.query(
+        `INSERT INTO character_leases (character_id, realm, holder, nonce, expires_at)
+         VALUES ($1, $2, $3, $4, now() + interval '90 seconds')`,
+        [characterId, realm, db.PROCESS_LEASE_HOLDER, 'live-nonce-1'],
+      );
+      const ref = `woc_delivery_book_fenced_${seq}`;
+      expect(await marketDb.claimCustodyRef(realm, ref)).toBe(true);
+      const out = await marketDb.saveDeliveredCharacterBooked(
+        {
+          characterId,
+          level: 14,
+          state: { questLog: [], questsDone: [], inventory: [] } as never,
+          leaseNonce: 'live-nonce-1',
+        },
+        ref,
+      );
+      expect(out).toBe('booked');
+      const character = await pool.query(`SELECT level FROM characters WHERE id = $1`, [
+        characterId,
+      ]);
+      expect(character.rows[0].level, 'the fenced save landed').toBe(14);
+      const claim = await pool.query(
+        `SELECT booked_at FROM woc_market_custody_claims WHERE custody_ref = $1`,
+        [ref],
+      );
+      expect(claim.rows[0].booked_at).not.toBeNull();
     });
 
     it('rolls BOTH halves back when the lease fence rejects', async () => {
@@ -738,6 +898,50 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       } finally {
         client.release();
       }
+      // The direct finalize (no bond arm ran here) leaves the winner's bond
+      // exactly at refund_due: the precise flip the matrix cannot see because
+      // the same pass's bond arm resolves it further.
+      const winner = await pool.query(
+        `SELECT status, bond_state FROM woc_market_bids WHERE id = $1`,
+        [scene.winnerBidId],
+      );
+      expect(winner.rows[0]).toEqual({ status: 'won', bond_state: 'refund_due' });
+      const loser = await pool.query(
+        `SELECT status, bond_state FROM woc_market_bids WHERE id = $1`,
+        [scene.loserBidId],
+      );
+      expect(loser.rows[0]).toEqual({ status: 'cancelled', bond_state: 'refund_due' });
+    }, 20_000);
+
+    it('finalize and the suspend guard cross without a deadlock hang', async () => {
+      // The lock-cycle shape the widened suspend pre-lock closes: suspend
+      // cancels a dead settlement's 'won' winner, finalize pre-locks that
+      // same winner. Both sides must come back TYPED (refusal or success),
+      // never hang and never 500; the delivered settlement always survives.
+      const realm = 'delivery-il-suspend';
+      const scene = await seedScene(realm, 'delivered');
+      const [suspend, finalize] = await Promise.all([
+        marketDb.suspendListingIfSafe(realm, scene.listingId, BASE_MS),
+        marketDb.finalizeDeliveredSettlement(finalizeArgs(realm, scene)),
+      ]);
+      expect(['settlement_live', 'contended']).toContain(suspend);
+      expect(['finalized', 'contended']).toContain(finalize);
+      // Converge: a plain retry finishes the sale exactly once.
+      if (finalize !== 'finalized') {
+        expect(await marketDb.finalizeDeliveredSettlement(finalizeArgs(realm, scene))).toBe(
+          'finalized',
+        );
+      }
+      const sales = await pool.query(
+        `SELECT count(*)::int AS n FROM woc_market_sales WHERE listing_id = $1 AND excluded = false`,
+        [scene.listingId],
+      );
+      expect(sales.rows[0].n).toBe(1);
+      const listing = await pool.query(
+        `SELECT status, resolution FROM woc_market_listings WHERE id = $1`,
+        [scene.listingId],
+      );
+      expect(listing.rows[0]).toEqual({ status: 'closed', resolution: 'sold' });
     }, 20_000);
 
     it('waits on a held WINNER BID row lock (bids join the lock set first)', async () => {
@@ -836,12 +1040,37 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       const stuck = await seedSettlement(stuckListing, buyer, buyerCharacter, {
         state: 'delivering',
       });
+      // The class ages on CREATED_AT: rotation touches move updated_at only,
+      // so an aged updated_at alone must not count (negative below).
       await pool.query(
-        `UPDATE woc_market_settlements SET updated_at = now() - interval '1 hour' WHERE id = $1`,
+        `UPDATE woc_market_settlements SET created_at = now() - interval '1 hour' WHERE id = $1`,
         [stuck.id],
       );
+      // Per-dimension negatives, all in the SAME realm: a FRESH delivering
+      // settlement (age arm), an aged CONFIRMED one (state arm), and an aged
+      // ROTATED one whose updated_at moved but created_at did not exist aged.
+      const freshListing = await seedListing(realm, seller);
+      await seedSettlement(freshListing, buyer, buyerCharacter, { state: 'delivering' });
+      const confirmedListing = await seedListing(realm, seller);
+      const agedConfirmed = await seedSettlement(confirmedListing, buyer, buyerCharacter, {
+        state: 'confirmed',
+      });
+      await pool.query(
+        `UPDATE woc_market_settlements SET created_at = now() - interval '1 hour' WHERE id = $1`,
+        [agedConfirmed.id],
+      );
+      const rotatedListing = await seedListing(realm, seller);
+      const rotated = await seedSettlement(rotatedListing, buyer, buyerCharacter, {
+        state: 'delivering',
+      });
+      await pool.query(
+        `UPDATE woc_market_settlements SET updated_at = now() - interval '1 hour' WHERE id = $1`,
+        [rotated.id],
+      );
 
-      // Aged closed-undisposed listing (sold residue), and a disposed one out.
+      // Aged closed-undisposed listing (sold residue); a disposed one and a
+      // FRESH closed-undisposed one stay out (flag arm, age arm), and an aged
+      // OPEN listing stays out (status arm).
       const undisposed = await seedListing(realm, seller, { status: 'closed' });
       await pool.query(
         `UPDATE woc_market_listings
@@ -856,18 +1085,42 @@ describeDb('woc market delivery finalization against real Postgres', () => {
           WHERE id = $1`,
         [disposed],
       );
+      const freshClosed = await seedListing(realm, seller, { status: 'closed' });
+      await pool.query(`UPDATE woc_market_listings SET resolution = 'cancelled' WHERE id = $1`, [
+        freshClosed,
+      ]);
+      const agedOpen = await seedListing(realm, seller, { status: 'active' });
+      await pool.query(
+        `UPDATE woc_market_listings SET updated_at = now() - interval '1 hour' WHERE id = $1`,
+        [agedOpen],
+      );
 
       const cutoff = Date.now() - 10 * MINUTE_MS;
-      const readout = await marketDb.stuckCustodyReadout(realm, cutoff, 10);
+      const readout = await marketDb.stuckCustodyReadout(realm, cutoff, 10, 1000);
       expect(readout.unbookedClaims.count).toBe(1);
       expect(readout.unbookedClaims.sample[0]?.custodyRef).toBe('readout-aged');
-      expect(readout.stuckDelivering.count).toBe(1);
+      expect(readout.stuckDelivering.count, 'one per-dimension survivor').toBe(1);
       expect(readout.stuckDelivering.sample[0]?.id).toBe(stuck.id);
       expect(readout.undisposedListings.count).toBe(1);
       expect(readout.undisposedListings.sample[0]).toMatchObject({
         id: undisposed,
         resolution: 'sold',
       });
+    }, 20_000);
+
+    it('saturates the counts at the cap instead of scanning the stuck set', async () => {
+      const realm = 'delivery-readout-cap';
+      for (let i = 0; i < 7; i++) {
+        await marketDb.claimCustodyRef(realm, `cap-claim-${i}`);
+      }
+      await pool.query(
+        `UPDATE woc_market_custody_claims SET claimed_at = now() - interval '1 hour'
+          WHERE realm = $1`,
+        [realm],
+      );
+      const readout = await marketDb.stuckCustodyReadout(realm, Date.now() - 600_000, 3, 5);
+      expect(readout.unbookedClaims.count, 'cap or more, never the true 7').toBe(5);
+      expect(readout.unbookedClaims.sample, 'the sample keeps its own cap').toHaveLength(3);
     }, 20_000);
   });
 });

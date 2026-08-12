@@ -2355,9 +2355,16 @@ describe('the stuck-custody readout: GET /internal/woc-market/stuck', () => {
   const READOUT = {
     unbookedClaims: {
       count: 1,
-      sample: [{ custodyRef: 'woc_settlement:7', claimedAtMs: 1000, grantCharacterId: 21 }],
+      sample: [
+        {
+          custodyRef: 'woc_settlement:7',
+          claimedAtMs: 1000,
+          grantCharacterId: 21,
+          mailIntent: false,
+        },
+      ],
     },
-    stuckDelivering: { count: 2, sample: [{ id: 7, listingId: 3, updatedAtMs: 2000 }] },
+    stuckDelivering: { count: 2, sample: [{ id: 7, listingId: 3, createdAtMs: 2000 }] },
     undisposedListings: { count: 0, sample: [] },
   };
   let reads = 0;
