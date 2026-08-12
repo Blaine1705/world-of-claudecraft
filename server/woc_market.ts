@@ -363,8 +363,13 @@ export interface WocMarketDb {
   closeListingIfNoOpenSettlement(id: number, resolution: WocListingResolution): Promise<boolean>;
   markListingSettling(id: number): Promise<void>;
   /** closed && !itemDisposed && resolution != 'sold': the return-flight
-   *  reconciliation backlog. */
-  undisposedClosedListings(realm: string, limit: number): Promise<WocListingRow[]>;
+   *  reconciliation backlog. excludeIds are rows inside their in-process
+   *  park backoff, excluded in the QUERY (see deliveringSettlements). */
+  undisposedClosedListings(
+    realm: string,
+    limit: number,
+    excludeIds: readonly number[],
+  ): Promise<WocListingRow[]>;
   /** Listings stuck mid-resolution ('ending' / 'settling') past a grace. */
   strandedListings(realm: string, olderThanMs: number, limit: number): Promise<WocListingRow[]>;
   /** Re-open a stranded listing so the ordinary close arm resolves it;
@@ -568,8 +573,14 @@ export interface WocMarketDb {
   confirmingSettlements(realm: string, limit: number): Promise<WocSettlementRow[]>;
   /** confirmed -> delivering (SKIP LOCKED claim). */
   claimDeliverableSettlements(realm: string, limit: number): Promise<WocSettlementRow[]>;
-  /** Stuck 'delivering' rows (crash recovery). */
-  deliveringSettlements(realm: string, limit: number): Promise<WocSettlementRow[]>;
+  /** Stuck 'delivering' rows (crash recovery). excludeIds are rows inside
+   *  their in-process park backoff: excluded in the QUERY so a standing
+   *  parked set costs no batch slots and no per-pass writes. */
+  deliveringSettlements(
+    realm: string,
+    limit: number,
+    excludeIds: readonly number[],
+  ): Promise<WocSettlementRow[]>;
   /** One page of 'delivered' settlements whose LISTING never closed: the
    *  residue an older binary's separately-committed close tail leaves behind.
    *  Cursor-paged over open listing ids so the cost is O(page) regardless of
@@ -743,7 +754,10 @@ export interface WocStuckCustodyClasses {
   stuckDelivering: {
     count: number;
     saturated: boolean;
-    sample: { id: number; listingId: number; createdAtMs: number }[];
+    /** updatedAtMs is the class's age signal (stamped at the delivering
+     *  claim); createdAtMs is kept for provenance (when the settlement
+     *  itself began). */
+    sample: { id: number; listingId: number; createdAtMs: number; updatedAtMs: number }[];
   };
   undisposedListings: {
     count: number;
@@ -910,6 +924,20 @@ export interface WocSweepPassStats {
  *  WHERE in the delivery a row is failing. */
 export type WocSweepErrorTag = keyof WocSweepPassStats | 'deliver_grant' | 'deliver_notice';
 
+/** Contention and park accounting for ONE delivery entry: the sweep pass
+ *  owns one scope across its arm sequence, and the eager confirm entry mints
+ *  its own, so a request-thread delivery can neither clobber a pass's
+ *  contention verdict mid-flight nor inherit a stale one. */
+interface WocDeliveryScope {
+  /** One 'contended' outcome stops all further delivery work in this scope:
+   *  the rows a break leaves behind are already 'delivering', and retrying
+   *  them seconds later only spends the lock_timeout budget the break
+   *  conserved. */
+  contended: boolean;
+  /** Park EVENTS in this scope (rows newly parked or re-parked on a retry). */
+  parked: number;
+}
+
 export class WocMarketService {
   constructor(private readonly deps: WocMarketDeps) {}
 
@@ -936,27 +964,16 @@ export class WocMarketService {
   private readonly pendingMail = new Map<string, { stampMs: number; written: boolean }>();
 
   /** Parked deliveries and their next-retry time: a parked settlement rotates
-   *  to the back of the updated_at queue (touchSettlementRow) AND is skipped
-   *  in-process until its retry, so a full batch of parked rows stops costing
-   *  four queries per row per pass and stops starving fresh rows. */
+   *  ONCE (at park time) onto the sweep_parked_at batch order and is then
+   *  EXCLUDED from the batch reads until its retry, so a standing parked set
+   *  costs no batch slots, no per-pass writes, and cannot starve fresh rows. */
   private readonly parkedDeliveries = new Map<number, number>();
 
   /** Parked returns, same shape, keyed by listing id: the return backlog
-   *  orders by updated_at too, so a permanently refused return would own the
-   *  head of its batch and busy-loop exactly like a parked delivery. */
+   *  shares the rotation order, so a permanently refused return would
+   *  otherwise own the head of its batch and busy-loop exactly like a
+   *  parked delivery. */
   private readonly parkedReturns = new Map<number, number>();
-
-  /** One 'contended' outcome stops ALL delivery work for the rest of the
-   *  pass: the claimed rows a break leaves behind are already 'delivering',
-   *  so without this the reconcile arm re-attempts them seconds later in the
-   *  SAME pass and spends the lock_timeout budget the break conserved.
-   *  Reset at pass start AND at the eager confirm entry (which runs outside
-   *  any pass and must not inherit a previous pass's contention). */
-  private passContended = false;
-
-  /** Park EVENTS this pass (rows newly parked or re-parked after a retry),
-   *  reported in the pass stats so a fully parked pass reads as work. */
-  private passParked = 0;
 
   /** Next time the delivered-residue arm may run (minute-scale: it converges
    *  an OLDER binary's crash residue, so every-pass cost bought nothing). */
@@ -1609,14 +1626,21 @@ export class WocMarketService {
   }
 
   /** The two writes a decided, settled bond owes: hold it, then let it stand. */
-  private async holdBondAndActivate(bidId: number): Promise<{ ok: true; standing: boolean }> {
+  private async holdBondAndActivate(
+    bidId: number,
+  ): Promise<{ ok: true; standing: boolean; pending?: boolean }> {
     await this.deps.db.markBondHeld(bidId);
     const activated = await this.deps.db.activateBid(bidId, this.now());
+    if (activated === 'contended') {
+      // The bond IS held and the activation merely lost a lock race; the bid
+      // stays in the confirmingBonds set (its select keys on status plus
+      // signature, not bond_state), so the next pass retries. Report it as
+      // PENDING: collapsing it into standing:false reads as "outbid" to the
+      // client, the exact false verdict the undecided arm exists to avoid.
+      return { ok: true, standing: false, pending: true };
+    }
     // A racer confirmed a higher bid first: this bond flips straight to
-    // refund_due inside activateBid's superseded arm. A 'contended' verdict
-    // leaves the bid pending with its bond held, which is safe: the
-    // confirmingBonds select keys on status + signature (not bond_state), so
-    // the next pass re-confirms and retries the activation.
+    // refund_due inside activateBid's superseded arm.
     return { ok: true, standing: activated === 'activated' };
   }
 
@@ -1836,11 +1860,13 @@ export class WocMarketService {
     if (confirmed.settled) {
       await this.deps.db.transitionSettlement(settlement.id, ['confirming'], 'confirmed');
       // Deliver eagerly; the sweep is the backstop for any failure past here.
-      // Fresh contention scope: this entry runs OUTSIDE any sweep pass, and a
-      // flag left over from an earlier contended pass (or eager call) would
-      // silently claim-and-drop this buyer's settlement.
-      this.passContended = false;
-      await this.deliverConfirmedSettlements(this.now()).catch(() => {});
+      // A fresh LOCAL scope: this entry runs outside any sweep pass, so it
+      // must neither inherit a pass's contention verdict nor clobber one
+      // mid-flight. Its park count is deliberately discarded (the monitor
+      // still carries the row; only the pass stat line loses the event).
+      await this.deliverConfirmedSettlements(this.now(), { contended: false, parked: 0 }).catch(
+        () => {},
+      );
       const after = await this.deps.db.settlementById(settlement.id);
       return { ok: true, state: after?.state ?? 'confirmed' };
     }
@@ -1915,11 +1941,11 @@ export class WocMarketService {
   // -------------------------------------------------------------------------
 
   async sweepPass(): Promise<WocSweepPassStats | null> {
-    // Reset ABOVE the enabled guard: the eager confirm path shares this flag,
-    // and a stale true behind a disabled market would suppress eager
-    // deliveries forever.
-    this.passContended = false;
-    this.passParked = 0;
+    // Contention and park accounting are SCOPED to this pass: the eager
+    // confirm entry mints its own scope, so a request thread can neither
+    // clobber a pass mid-flight nor inherit a finished pass's verdict (a
+    // shared field raced both ways).
+    const scope: WocDeliveryScope = { contended: false, parked: 0 };
     if (!this.cfg.enabled) return null;
     const nowMs = this.now();
     // Every arm runs through arm(): one failing arm (or one poisoned row
@@ -1948,26 +1974,26 @@ export class WocMarketService {
       // misread it as resolvable. Minute-scale (REDRIVE_INTERVAL_MS): the arm
       // converges an OLDER binary's residue, so an every-pass run bought
       // nothing but query load; counts rows ADVANCED, not rows examined.
-      redriven: await this.arm('redriven', () => this.redriveDeliveredTails(nowMs)),
+      redriven: await this.arm('redriven', () => this.redriveDeliveredTails(nowMs, scope)),
       // The sibling residue class, its own arm so a throw here can never
       // discard the page walk's count (and vice versa); shares the minute
       // cadence and honors a contended pass.
-      disposed: await this.arm('disposed', () => this.disposeSoldResidue(nowMs)),
+      disposed: await this.arm('disposed', () => this.disposeSoldResidue(nowMs, scope)),
       closed: await this.arm('closed', () => this.closeDueAuctions(nowMs)),
       expired: await this.arm('expired', () => this.expireOverdueSettlements(nowMs)),
       polled: await this.arm('polled', () => this.pollConfirmingSettlements()),
       // BEFORE the lapse arm above would matter: a paid-but-undecided bond is
       // excluded from lapsing by its signature, and this is what resolves it.
       polledBonds: await this.arm('polledBonds', () => this.pollConfirmingBonds()),
-      delivered: await this.arm('delivered', () => this.deliverConfirmedSettlements(nowMs)),
-      reconciled: await this.arm('reconciled', () => this.reconcileDelivering(nowMs)),
-      returned: await this.arm('returned', () => this.returnUndisposedItems(nowMs)),
+      delivered: await this.arm('delivered', () => this.deliverConfirmedSettlements(nowMs, scope)),
+      reconciled: await this.arm('reconciled', () => this.reconcileDelivering(nowMs, scope)),
+      returned: await this.arm('returned', () => this.returnUndisposedItems(nowMs, scope)),
       // Evaluated AFTER the three arms above (object literals evaluate in
       // source order), so it sees every park event of this pass. New park
       // EVENTS only: a row skipped inside its backoff window counts nothing,
       // so a standing parked set cannot flood this the way counting parked
       // rows as delivered once flooded the saturation warning.
-      parked: this.passParked,
+      parked: scope.parked,
       bonds: await this.arm('bonds', () => this.processDueBonds()),
     };
     // A FULL batch means the arm did not drain: that is the one signal that
@@ -2281,33 +2307,30 @@ export class WocMarketService {
   }
 
   /** Shared loop for the two delivery arms: per-row isolation, park handling
-   *  (rotate the row to the back of the updated_at queue and skip it
-   *  in-process for PARK_RETRY_MS), and a PASS-WIDE stop on the first
-   *  'contended' outcome (passContended): the rows a break leaves behind are
-   *  already 'delivering', so without the pass-wide flag the reconcile arm
-   *  would re-attempt them seconds later in the same pass and spend the
+   *  (a parked row rotates ONCE, at park time, onto the sweep_parked_at
+   *  batch order; while its backoff runs the batch reads EXCLUDE it, so it
+   *  costs neither a batch slot nor a write per pass), and a SCOPE-WIDE stop
+   *  on the first 'contended' outcome: the rows a break leaves behind are
+   *  already 'delivering', so without the flag the reconcile arm would
+   *  re-attempt them seconds later in the same pass and spend the
    *  lock_timeout budget the break conserved. Returns rows ADVANCED. */
   private async runDeliveryBatch(
     arm: 'delivered' | 'reconciled',
     batch: readonly WocSettlementRow[],
     nowMs: number,
+    scope: WocDeliveryScope,
   ): Promise<number> {
-    if (this.passContended) return 0;
-    // Pruned here rather than only at pass start: the eager confirm path
-    // enters through this method without ever winning the sweep lock, and a
-    // process that persistently lost that lock kept inserting into these
-    // ledgers and never pruned.
+    // Pruned here rather than only at pass start (the eager confirm path
+    // enters through this method without ever winning the sweep lock), and
+    // BEFORE the contended return so a contended pass still ages the ledgers.
     this.pruneLocalLedgers(nowMs);
+    if (scope.contended) return 0;
     let advanced = 0;
     for (const settlement of batch) {
       const retryAt = this.parkedDeliveries.get(settlement.id);
-      if (retryAt !== undefined && retryAt > nowMs) {
-        // Still inside its backoff window: rotate it to the tail anyway, or
-        // the standing parked set keeps its old batch-order slots and starves
-        // fresh rows out of every batch until the backoff expires.
-        await this.deps.db.touchSettlementRow(settlement.id);
-        continue;
-      }
+      // Belt only: the batch reads already exclude rows inside their backoff
+      // window, but a row claimed THIS pass can also carry a fresh park stamp.
+      if (retryAt !== undefined && retryAt > nowMs) continue;
       try {
         const out = await this.deliverOne(settlement);
         if (out === 'advanced') {
@@ -2315,7 +2338,7 @@ export class WocMarketService {
           this.parkedDeliveries.delete(settlement.id);
         } else if (out === 'parked') {
           this.parkedDeliveries.set(settlement.id, nowMs + WocMarketService.PARK_RETRY_MS);
-          this.passParked++;
+          scope.parked++;
           await this.deps.db.touchSettlementRow(settlement.id);
         } else if (out === 'skip') {
           // 'skip' after custody was booked means the settlement or listing
@@ -2329,7 +2352,7 @@ export class WocMarketService {
             ),
           );
         } else if (out === 'contended') {
-          this.passContended = true;
+          scope.contended = true;
           break;
         }
       } catch (err) {
@@ -2341,20 +2364,39 @@ export class WocMarketService {
     return advanced;
   }
 
-  private async deliverConfirmedSettlements(nowMs: number): Promise<number> {
-    // Honor a contended pass BEFORE claiming: the claim UPDATE moves rows
+  private async deliverConfirmedSettlements(
+    nowMs: number,
+    scope: WocDeliveryScope,
+  ): Promise<number> {
+    // Honor a contended scope BEFORE claiming: the claim UPDATE moves rows
     // into 'delivering', and claiming a batch this pass will not deliver
     // only feeds the stuck-delivering readout for nothing.
-    if (this.passContended) return 0;
+    if (scope.contended) return 0;
     const claimed = await this.deps.db.claimDeliverableSettlements(this.cfg.realm, SWEEP_BATCH);
-    return this.runDeliveryBatch('delivered', claimed, nowMs);
+    return this.runDeliveryBatch('delivered', claimed, nowMs, scope);
   }
 
   /** Crash recovery: rows stuck in 'delivering' resume here; the custody
-   *  book-once dedupe makes re-running the whole arm safe. */
-  private async reconcileDelivering(nowMs: number): Promise<number> {
-    const stuck = await this.deps.db.deliveringSettlements(this.cfg.realm, SWEEP_BATCH);
-    return this.runDeliveryBatch('reconciled', stuck, nowMs);
+   *  book-once dedupe makes re-running the whole arm safe. Rows inside their
+   *  in-process backoff window are excluded in the QUERY, so a standing
+   *  parked set consumes no batch slots and costs no writes while it waits. */
+  private async reconcileDelivering(nowMs: number, scope: WocDeliveryScope): Promise<number> {
+    const stuck = await this.deps.db.deliveringSettlements(
+      this.cfg.realm,
+      SWEEP_BATCH,
+      this.backedOffIds(this.parkedDeliveries, nowMs),
+    );
+    return this.runDeliveryBatch('reconciled', stuck, nowMs, scope);
+  }
+
+  /** The ids a batch read should skip: parked rows still inside their
+   *  backoff window. Process-local by design, like the park ledgers. */
+  private backedOffIds(parked: ReadonlyMap<number, number>, nowMs: number): number[] {
+    const out: number[] = [];
+    for (const [id, retryAtMs] of parked) {
+      if (retryAtMs > nowMs) out.push(id);
+    }
+    return out;
   }
 
   /** Drive an older binary's delivered-but-unclosed residue FORWARD: custody
@@ -2369,8 +2411,8 @@ export class WocMarketService {
    *  time residue is plentiful, the first boot after a legacy upgrade, is
    *  exactly when the realm can least absorb an unbounded burst); a truncated
    *  page resumes right behind the last processed row on the next beat. */
-  private async redriveDeliveredTails(nowMs: number): Promise<number> {
-    if (nowMs < this.redriveDueAtMs || this.passContended) return 0;
+  private async redriveDeliveredTails(nowMs: number, scope: WocDeliveryScope): Promise<number> {
+    if (nowMs < this.redriveDueAtMs || scope.contended) return 0;
     this.redriveDueAtMs = nowMs + WocMarketService.REDRIVE_INTERVAL_MS;
     const page = await this.deps.db.deliveredUnclosedSettlementsPage(
       this.cfg.realm,
@@ -2399,7 +2441,7 @@ export class WocMarketService {
           advanced++;
           await this.notifySellerSold(listing);
         } else if (out === 'contended') {
-          this.passContended = true;
+          scope.contended = true;
           break;
         }
       } catch (err) {
@@ -2413,8 +2455,8 @@ export class WocMarketService {
    *  whose dispose flag never landed (the old binary crashed between its
    *  close and dispose statements). Its own arm so a throw or a contended
    *  pass can never cost the page walk its count. */
-  private async disposeSoldResidue(nowMs: number): Promise<number> {
-    if (nowMs < this.disposeDueAtMs || this.passContended) return 0;
+  private async disposeSoldResidue(nowMs: number, scope: WocDeliveryScope): Promise<number> {
+    if (nowMs < this.disposeDueAtMs || scope.contended) return 0;
     this.disposeDueAtMs = nowMs + WocMarketService.REDRIVE_INTERVAL_MS;
     return this.deps.db.disposeSoldResidueListings(this.cfg.realm, SWEEP_BATCH);
   }
@@ -2783,32 +2825,31 @@ export class WocMarketService {
   }
 
   /** Same park treatment as the delivery arms: a return that cannot proceed
-   *  (seller gone, parked claim) rotates to the back of its updated_at queue
-   *  and backs off in-process, and the stat counts rows DISPOSED, so a
-   *  parked backlog can neither own the batch head nor flood the saturation
-   *  warning. */
-  private async returnUndisposedItems(nowMs: number): Promise<number> {
-    const backlog = await this.deps.db.undisposedClosedListings(this.cfg.realm, SWEEP_BATCH);
+   *  (seller gone, parked claim) rotates ONCE onto the sweep_parked_at batch
+   *  order, backs off in-process, and is EXCLUDED from the backlog read
+   *  until its retry; the stat counts rows DISPOSED, so a parked backlog can
+   *  neither own the batch head nor flood the saturation warning. */
+  private async returnUndisposedItems(nowMs: number, scope: WocDeliveryScope): Promise<number> {
+    const backlog = await this.deps.db.undisposedClosedListings(
+      this.cfg.realm,
+      SWEEP_BATCH,
+      this.backedOffIds(this.parkedReturns, nowMs),
+    );
     let advanced = 0;
     for (const listing of backlog) {
       // Belt over the SQL's own resolution filter: a sold listing's copy went
       // to its buyer and must never take the return flight home.
       if (listing.resolution === 'sold') continue;
       const retryAt = this.parkedReturns.get(listing.id);
-      if (retryAt !== undefined && retryAt > nowMs) {
-        // Rotate even inside the backoff window, or the standing parked set
-        // keeps its batch-order slots and starves fresh rows (the delivery
-        // twin does the same).
-        await this.deps.db.touchListingRow(listing.id);
-        continue;
-      }
+      // Belt only: the backlog read already excludes backing-off rows.
+      if (retryAt !== undefined && retryAt > nowMs) continue;
       try {
         if (await this.returnListingItem(listing)) {
           advanced++;
           this.parkedReturns.delete(listing.id);
         } else {
           this.parkedReturns.set(listing.id, nowMs + WocMarketService.PARK_RETRY_MS);
-          this.passParked++;
+          scope.parked++;
           await this.deps.db.touchListingRow(listing.id);
         }
       } catch (err) {

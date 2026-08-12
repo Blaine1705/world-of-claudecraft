@@ -394,7 +394,11 @@ CREATE UNIQUE INDEX IF NOT EXISTS woc_market_sales_listing_once
 -- parcel-in-book check by construction; if the buyer already collected and
 -- deleted the letter, that deletion re-arms the exact duplication this ledger
 -- exists to prevent. Resolve a parked row by hand-delivering (then stamping
--- booked_at) or by confirming non-delivery before any reset.
+-- booked_at) or by confirming non-delivery before any reset. The one class
+-- where hand-delivery is ITSELF the dupe: a parked GRANT claim (non-null
+-- grant_character_id) may mean the item already sits in the buyer's bags
+-- (an ambiguous grant, or an autosave that landed after a fence); confirm
+-- the buyer does NOT have the item before delivering anything by hand.
 CREATE TABLE IF NOT EXISTS woc_market_custody_claims (
   custody_ref TEXT PRIMARY KEY,
   realm TEXT NOT NULL,
@@ -424,6 +428,10 @@ CREATE TABLE IF NOT EXISTS woc_market_custody_claims (
 -- and stay until the dedicated market retention work registers their prune
 -- beside the listing prune (a booked row is one short line per completed
 -- delivery or return, so the growth rate is the sale rate).
+-- INT to match every other character-id column. IF NOT EXISTS makes this a
+-- no-op on a database that already ran an earlier BIGINT build of this ALTER
+-- (dev databases only; the market never shipped): the width difference is
+-- harmless there (no FK, and the reader converts through Number()).
 ALTER TABLE woc_market_custody_claims
   ADD COLUMN IF NOT EXISTS grant_character_id INT;
 ALTER TABLE woc_market_custody_claims
@@ -1501,20 +1509,28 @@ export class PgWocMarketDb implements WocMarketDb {
     );
   }
 
-  async undisposedClosedListings(realm: string, limit: number): Promise<WocListingRow[]> {
+  async undisposedClosedListings(
+    realm: string,
+    limit: number,
+    excludeIds: readonly number[],
+  ): Promise<WocListingRow[]> {
     // Sold rows are excluded HERE, not just by the caller's skip: a sold row
     // that keeps its undisposed flag (an old-binary crash between close and
     // dispose) would otherwise occupy a batch slot on every pass forever and
     // could saturate the return arm; the stuck-custody readout is what
     // surfaces those rows instead. NULL resolution (which no close path
     // writes) stays included: returning an unaccounted close is the fail-safe.
+    // excludeIds are the caller's backing-off parked rows: excluding them in
+    // the query is what lets a parked row cost neither a batch slot nor a
+    // rotation write per pass while it waits.
     const res = await this.pool.query(
       `SELECT ${LISTING_COLS} FROM woc_market_listings
         WHERE realm = $1 AND status = 'closed' AND item_disposed = false
           AND (resolution IS NULL OR resolution <> 'sold')
+          AND id <> ALL($3::bigint[])
         ORDER BY ${PARK_ROTATION_ORDER}
         LIMIT $2`,
-      [realm, limit],
+      [realm, limit, excludeIds],
     );
     return res.rows.map(toListing);
   }
@@ -1714,7 +1730,7 @@ export class PgWocMarketDb implements WocMarketDb {
     const deliveringWhere = `FROM woc_market_settlements
         WHERE realm = $1 AND state = 'delivering' AND updated_at <= to_timestamp($2 / 1000.0)`;
     const delivering = await this.pool.query(
-      `SELECT id, listing_id, created_at
+      `SELECT id, listing_id, created_at, updated_at
          ${deliveringWhere}
         ORDER BY updated_at
         LIMIT $3`,
@@ -1750,6 +1766,7 @@ export class PgWocMarketDb implements WocMarketDb {
           id: Number(r.id),
           listingId: Number(r.listing_id),
           createdAtMs: ms(r.created_at),
+          updatedAtMs: ms(r.updated_at),
         })),
       },
       undisposedListings: {
@@ -1765,8 +1782,12 @@ export class PgWocMarketDb implements WocMarketDb {
   }
 
   async markItemDisposed(id: number): Promise<void> {
+    // The rotation stamp clears with the terminal flag (see the finalize
+    // transaction's settlement CAS for the rationale).
     await this.pool.query(
-      `UPDATE woc_market_listings SET item_disposed = true, updated_at = now() WHERE id = $1`,
+      `UPDATE woc_market_listings
+          SET item_disposed = true, updated_at = now(), sweep_parked_at = NULL
+        WHERE id = $1`,
       [id],
     );
   }
@@ -2399,13 +2420,19 @@ export class PgWocMarketDb implements WocMarketDb {
     return res.rows.map(toSettlement);
   }
 
-  async deliveringSettlements(realm: string, limit: number): Promise<WocSettlementRow[]> {
+  async deliveringSettlements(
+    realm: string,
+    limit: number,
+    excludeIds: readonly number[],
+  ): Promise<WocSettlementRow[]> {
+    // excludeIds: the caller's backing-off parked rows (see the listing twin).
     const res = await this.pool.query(
       `SELECT ${SETTLEMENT_COLS} FROM woc_market_settlements
         WHERE realm = $1 AND state = 'delivering'
+          AND id <> ALL($3::bigint[])
         ORDER BY ${PARK_ROTATION_ORDER}
         LIMIT $2`,
-      [realm, limit],
+      [realm, limit, excludeIds],
     );
     return res.rows.map(toSettlement);
   }
@@ -2452,6 +2479,11 @@ export class PgWocMarketDb implements WocMarketDb {
     const settlements = res.rows.map(toSettlement);
     if (settlements.length > maxSettlements) {
       const kept = settlements.slice(0, maxSettlements);
+      // The cursor lands ON the last kept row's listing, so a further
+      // 'delivered' settlement sharing that listing id is skipped this
+      // cycle. That converges anyway: the kept row's finalize closes the
+      // listing, and a closed listing's delivered settlements are the
+      // terminal shape (they leave this page's id set for good).
       return {
         settlements: kept,
         lastListingId: kept[kept.length - 1]?.listingId ?? null,
@@ -2537,7 +2569,12 @@ export class PgWocMarketDb implements WocMarketDb {
         await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
         // The whole tail holds the listing plus open-bid locks, so its total
         // hold must be bounded by more than the per-statement pool default:
-        // the same explicit allowance the escrow and delivered-save guards set.
+        // the same explicit allowance the escrow and delivered-save guards
+        // set. The cost of the allowance is that a pathologically slow
+        // finalize can refuse bids/cancels/suspends on this one listing for
+        // up to the heavy window (each surfaces as its typed 'contended'
+        // after its own 2s lock_timeout), which is the accepted trade
+        // against aborting a money-path commit mid-flight.
         await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
         // Bids first (open set plus the winner, in id order), listing second.
         await client.query(
@@ -2566,8 +2603,12 @@ export class PgWocMarketDb implements WocMarketDb {
             FOR UPDATE`,
           [args.listingId],
         );
+        // sweep_parked_at clears on the terminal transition so a row that
+        // parked, recovered, and somehow re-entered a rotation class cannot
+        // carry a stale rotation key that outranks its true age.
         const advanced = await client.query(
-          `UPDATE woc_market_settlements SET state = 'delivered', updated_at = now()
+          `UPDATE woc_market_settlements
+              SET state = 'delivered', updated_at = now(), sweep_parked_at = NULL
             WHERE id = $1 AND state IN ('delivering', 'delivered')`,
           [args.settlementId],
         );
@@ -2605,7 +2646,8 @@ export class PgWocMarketDb implements WocMarketDb {
               SET status = 'closed',
                   resolution = CASE WHEN status = 'closed' THEN resolution ELSE $2 END,
                   item_disposed = true,
-                  updated_at = now()
+                  updated_at = now(),
+                  sweep_parked_at = NULL
             WHERE id = $1 AND (status <> 'closed' OR item_disposed = false)`,
           [args.listingId, 'sold'],
         );
@@ -2627,6 +2669,11 @@ export class PgWocMarketDb implements WocMarketDb {
             WHERE listing_id = $1 AND status IN ('pending_bond', 'active')`,
           [args.listingId],
         );
+        // The verdict reads the CLOSE CAS alone: in principle a run could
+        // advance the settlement or insert a sale against an already-final
+        // listing and still report already_final, but deliverOne refuses
+        // disposed listings and the redrive page only returns OPEN listings,
+        // so no live caller can reach that combination.
         return (closed.rowCount ?? 0) > 0 ? ('finalized' as const) : ('already_final' as const);
       });
     } catch (err) {

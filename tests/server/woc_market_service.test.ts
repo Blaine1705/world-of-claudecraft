@@ -4018,10 +4018,10 @@ describe('a parked row rotates to the batch tail without hiding from the monitor
     expect(skipping?.returned).toBe(0);
   });
 
-  it('rotates a parked RETURN on the parking pass AND on the backoff skip after it', async () => {
-    // The starvation half: a parked row that keeps its batch-order slot while it
-    // waits out its backoff owns the head of every batch, and fresh rows behind
-    // it are never read at all.
+  it('rotates a parked RETURN once and then EXCLUDES it from the backlog read', async () => {
+    // The starvation half: a parked row must neither own the head of every
+    // batch (the rotation moves it to the tail) nor keep costing batch slots
+    // and writes while it waits out its backoff (the read excludes it).
     const h = makeHarness();
     const listing = await parkedReturn(h);
     const rotations: number[] = [];
@@ -4030,16 +4030,21 @@ describe('a parked row rotates to the batch tail without hiding from the monitor
       rotations.push(id);
       await rotate(id);
     };
+    const reads: number[][] = [];
+    const backlog = h.db.undisposedClosedListings.bind(h.db);
+    h.db.undisposedClosedListings = async (realm, limit, excludeIds) => {
+      reads.push([...excludeIds]);
+      return backlog(realm, limit, excludeIds);
+    };
     await h.service.sweepPass();
-    expect(rotations, 'the park rotates').toEqual([listing.id]);
+    expect(rotations, 'the park rotates ONCE').toEqual([listing.id]);
+    expect(reads[0], 'nothing was excluded before the park').toEqual([]);
     await h.service.sweepPass();
-    expect(rotations, 'and so does the skip inside the backoff window').toEqual([
-      listing.id,
-      listing.id,
-    ]);
+    expect(rotations, 'the backoff window costs no further writes').toEqual([listing.id]);
+    expect(reads[1], 'the backing-off row is excluded from the read').toEqual([listing.id]);
   });
 
-  it('rotates a parked DELIVERY on the parking pass AND on the backoff skip after it', async () => {
+  it('rotates a parked DELIVERY once and then EXCLUDES it from the reconcile read', async () => {
     const h = twoEpics(makeHarness());
     putBuyerOnline(h);
     h.db.failNextDeliveredSave = 'lease_lost';
@@ -4051,16 +4056,20 @@ describe('a parked row rotates to the batch tail without hiding from the monitor
       rotations.push(id);
       await rotate(id);
     };
+    const reads: number[][] = [];
+    const stuck = h.db.deliveringSettlements.bind(h.db);
+    h.db.deliveringSettlements = async (realm, limit, excludeIds) => {
+      reads.push([...excludeIds]);
+      return stuck(realm, limit, excludeIds);
+    };
     h.setNow(h.now() + PAST_BACKOFF_MS);
     const parking = await h.service.sweepPass();
     expect(rotations).toEqual([settlementId]);
     expect(parking?.reconciled, 'a parked delivery is not a reconciled one').toBe(0);
     expect(parking?.parked).toBe(1);
     const skipping = await h.service.sweepPass();
-    expect(rotations, 'the skip rotates too, or the parked row starves the batch').toEqual([
-      settlementId,
-      settlementId,
-    ]);
+    expect(rotations, 'the backoff window costs no further writes').toEqual([settlementId]);
+    expect(reads[1], 'the backing-off row is excluded from the read').toEqual([settlementId]);
     expect(skipping?.parked, 'a skip is not a new park event').toBe(0);
   });
 });

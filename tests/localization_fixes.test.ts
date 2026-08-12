@@ -186,8 +186,9 @@ describe('B1: server log-type messages localize through the log path', () => {
   it('all three hud matchers call AND return the localizeServerText fallback', () => {
     for (const arm of MATCHER_ARMS) {
       const fn = arm.fn;
+      // matcherArmBody throws (loudly, naming the arm) when the signature is
+      // missing, so the slice below is non-empty by construction.
       const body = matcherArmBody(arm);
-      expect(body.length, `${fn} body not found in ${arm.file}`).toBeGreaterThan(0);
       // Must both compute the fallback and return it (not just mention the symbol).
       expect(body, `${fn} must call localizeServerText`).toContain('localizeServerText(text)');
       expect(

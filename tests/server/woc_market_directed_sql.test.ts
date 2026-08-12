@@ -13,6 +13,7 @@
 import type { Pool } from 'pg';
 import { describe, expect, it, vi } from 'vitest';
 import { PgWocMarketDb, SETTLED_OFFER_GRACE_MS } from '../../server/woc_market_db';
+import type { CharacterState } from '../../src/sim/sim';
 
 const REALM = 'Claudemoon';
 
@@ -465,11 +466,20 @@ describe('the settlement guards ship their DDL (structural floor)', () => {
 
 /** A pool whose transactions run on a recording CLIENT (withTx methods call
  *  pool.connect()). Every statement lands in one sequence; the listing lock
- *  read answers one open row so the tail past it is reachable. */
-function recordingTxPool(): { pool: Pool; sql: () => string[] } {
+ *  read answers one open row so the tail past it is reachable. An optional
+ *  responder overrides the answer for chosen statements (e.g. a close CAS
+ *  that matches nothing, driving the already_final arm). */
+function recordingTxPool(
+  respond?: (text: string) => { rows: unknown[]; rowCount: number } | undefined,
+): {
+  pool: Pool;
+  sql: () => string[];
+} {
   const seen: string[] = [];
   const query = async (text: string) => {
     seen.push(text);
+    const forced = respond?.(text);
+    if (forced) return forced;
     if (text.includes('FROM woc_market_listings') && text.includes('FOR UPDATE')) {
       return { rows: [{ status: 'settling' }], rowCount: 1 };
     }
@@ -529,6 +539,10 @@ describe('the delivery close tail is ONE transaction, in SQL', () => {
     expect(seq[0]).toBe('BEGIN');
     expect(seq.at(-1)).toBe('COMMIT');
     expect(seq[1]).toContain('SET LOCAL lock_timeout');
+    // The whole tail holds the listing plus bid locks, so it carries the
+    // heavy statement allowance too (the pool default would abort a slow
+    // money-path commit mid-flight).
+    expect(seq[2]).toContain('SET LOCAL statement_timeout');
     // Every write the old code committed separately now sits inside the one
     // transaction: the CAS, the sale, the close, the dispose, the bond flips.
     const inside = seq.slice(1, -1).join('\n');
@@ -537,30 +551,57 @@ describe('the delivery close tail is ONE transaction, in SQL', () => {
     expect(inside).toContain("SET status = 'closed'");
     expect(inside).toContain('item_disposed = true');
     expect(inside).toContain("SET bond_state = 'refund_due'");
+    // The settlement CAS clears the rotation stamp on the terminal move.
+    const cas = seq.find((t) => t.includes("SET state = 'delivered'"));
+    expect(cas).toContain('sweep_parked_at = NULL');
     // Close and dispose share ONE statement (two UPDATEs on the same row per
-    // sale doubled the version churn), and an already-closed row keeps its
-    // resolution.
+    // sale doubled the version churn), an already-closed row keeps its
+    // resolution, and the WHERE makes it a real compare-and-set (the
+    // already_final downgrade reads its rowCount).
     const closeStmt = seq.find((t) => t.includes("SET status = 'closed'"));
     expect(closeStmt).toContain('item_disposed = true');
     expect(closeStmt).toContain("CASE WHEN status = 'closed' THEN resolution ELSE $2 END");
+    expect(closeStmt).toContain("(status <> 'closed' OR item_disposed = false)");
+    expect(closeStmt).toContain('sweep_parked_at = NULL');
   });
 
-  it('locks bids FIRST (open set plus the winner, by id), the listing second', async () => {
+  it('reports already_final when the close CAS matches nothing', async () => {
+    // A re-run over a closed-and-disposed listing converges nothing new: the
+    // caller must neither count it as fresh work nor re-send the seller
+    // notice, and the verdict is what carries that.
+    const { pool } = recordingTxPool((text) =>
+      text.includes("SET status = 'closed'") ? { rows: [], rowCount: 0 } : undefined,
+    );
+    expect(
+      await new PgWocMarketDb(pool).finalizeDeliveredSettlement(structuredClone(FINALIZE_ARGS)),
+    ).toBe('already_final');
+  });
+
+  it('locks bids FIRST (open set plus the winner, by id), the listing second, then RE-LOCKS', async () => {
     // The file-wide lock order: the reverse deadlocks against the suspend and
-    // activate guards, which pre-lock the bid set the same way.
+    // activate guards, which pre-lock the bid set the same way. The SECOND
+    // bid lock, after the listing lock is held, is load-bearing on its own: a
+    // buy-now finalize runs while the listing is still 'active', so a bid
+    // inserted between the pre-lock and the listing lock (insertPendingBid is
+    // listing-lock-first) would otherwise reach the cancel UPDATE unlocked.
     const { pool, sql } = recordingTxPool();
     await new PgWocMarketDb(pool).finalizeDeliveredSettlement(structuredClone(FINALIZE_ARGS));
     const seq = sql();
-    const bidLock = seq.findIndex(
-      (t) => t.includes('FROM woc_market_bids') && t.includes('FOR UPDATE'),
-    );
+    const bidLocks = seq
+      .map((t, i) => ({ t, i }))
+      .filter(({ t }) => t.includes('FROM woc_market_bids') && t.includes('FOR UPDATE'));
     const listingLock = seq.findIndex(
       (t) => t.includes('FROM woc_market_listings') && t.includes('FOR UPDATE'),
     );
-    expect(bidLock).toBeGreaterThan(0);
-    expect(listingLock).toBeGreaterThan(bidLock);
-    expect(seq[bidLock]).toContain('ORDER BY id');
-    expect(seq[bidLock], 'the winner bid joins the lock set').toContain('OR id = $2');
+    expect(bidLocks, 'exactly the pre-lock and the re-lock').toHaveLength(2);
+    const [preLock, reLock] = bidLocks;
+    expect(preLock.i).toBeGreaterThan(0);
+    expect(listingLock).toBeGreaterThan(preLock.i);
+    expect(reLock.i, 'the re-lock runs AFTER the listing lock').toBeGreaterThan(listingLock);
+    expect(preLock.t).toContain('ORDER BY id');
+    expect(preLock.t, 'the winner bid joins the pre-lock set').toContain('OR id = $2');
+    expect(reLock.t).toContain('ORDER BY id');
+    expect(reLock.t, 'the re-lock covers only the OPEN set').not.toContain('OR id = $2');
   });
 
   it('accepts delivering AND delivered, which is what makes the re-drive converge', async () => {
@@ -595,7 +636,7 @@ describe('the atomic save-and-book, in SQL', () => {
   const SAVE = {
     characterId: 21,
     level: 10,
-    state: { questLog: [], questsDone: [], inventory: [] } as never,
+    state: { questLog: [], questsDone: [], inventory: [] } as unknown as CharacterState,
     leaseNonce: 'nonce-1',
   };
 
@@ -747,7 +788,7 @@ describe('the sweep reads that keep delivery converging, in SQL', () => {
     expect(out.lastListingId, 'resume right behind the last processed row').toBe(9);
   });
 
-  it('converges sold residue only over a STANDING sale row, bounded', async () => {
+  it('converges sold residue only over a STANDING sale row, bounded, never waiting', async () => {
     const { pool, sql, params } = recordingPool();
     await new PgWocMarketDb(pool).disposeSoldResidueListings(REALM, 25);
     const [text] = sql();
@@ -755,6 +796,11 @@ describe('the sweep reads that keep delivery converging, in SQL', () => {
     expect(text).toContain("l.resolution = 'sold'");
     expect(text).toContain('s.excluded = false');
     expect(text).toContain('LIMIT $2');
+    // Deterministic lock order plus SKIP LOCKED: the arm never waits on (and
+    // so can never deadlock against) a concurrent finalize holding a listing
+    // row; a skipped row is the next beat's business.
+    expect(text).toContain('ORDER BY l.id');
+    expect(text).toContain('FOR UPDATE OF l SKIP LOCKED');
     expect(params()[0]).toEqual([REALM, 25]);
   });
 
@@ -763,7 +809,7 @@ describe('the sweep reads that keep delivery converging, in SQL', () => {
     // must not occupy a return batch slot forever; the stuck readout is what
     // surfaces it instead.
     const { pool, sql } = recordingPool();
-    await new PgWocMarketDb(pool).undisposedClosedListings(REALM, 25);
+    await new PgWocMarketDb(pool).undisposedClosedListings(REALM, 25, []);
     expect(sql()[0]).toContain("(resolution IS NULL OR resolution <> 'sold')");
   });
 
@@ -786,14 +832,19 @@ describe('the sweep reads that keep delivery converging, in SQL', () => {
   it('orders both park-rotated batch reads by the rotation expression', async () => {
     // COALESCE(sweep_parked_at, updated_at), shared verbatim with the two
     // partial indexes: a drifted spelling silently loses the index.
-    const { pool, sql } = recordingPool();
+    const { pool, sql, params } = recordingPool();
     const db = new PgWocMarketDb(pool);
-    await db.deliveringSettlements(REALM, 25);
-    await db.undisposedClosedListings(REALM, 25);
+    await db.deliveringSettlements(REALM, 25, [7, 9]);
+    await db.undisposedClosedListings(REALM, 25, [11]);
     for (const text of sql()) {
       expect(text).toContain('ORDER BY COALESCE(sweep_parked_at, updated_at)');
+      // Backing-off parked rows are excluded in the QUERY, so a standing
+      // parked set costs neither batch slots nor per-pass rotation writes.
+      expect(text).toContain('id <> ALL($3::bigint[])');
     }
     expect(sql()).toHaveLength(2);
+    expect(params()[0]).toEqual([REALM, 25, [7, 9]]);
+    expect(params()[1]).toEqual([REALM, 25, [11]]);
   });
 });
 

@@ -1203,8 +1203,11 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       expect(readout.undisposedListings.count, 'rotation left the age column alone').toBe(1);
       expect(readout.undisposedListings.sample[0]?.id).toBe(parked);
       // The rotation still did its job: the parked row lost the batch head.
-      const batch = await marketDb.undisposedClosedListings(realm, 25);
+      const batch = await marketDb.undisposedClosedListings(realm, 25, []);
       expect(batch.map((r) => r.id)).toEqual([fresher, parked]);
+      // And a backing-off parked row is excluded from the read entirely.
+      const excluded = await marketDb.undisposedClosedListings(realm, 25, [parked]);
+      expect(excluded.map((r) => r.id)).toEqual([fresher]);
     }, 20_000);
 
     it('a rotated DELIVERING settlement keeps aging into the readout and sorts to the batch tail', async () => {
@@ -1238,8 +1241,11 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       );
       expect(readout.stuckDelivering.count, 'rotation left the age column alone').toBe(1);
       expect(readout.stuckDelivering.sample[0]?.id).toBe(parked.id);
-      const batch = await marketDb.deliveringSettlements(realm, 25);
+      const batch = await marketDb.deliveringSettlements(realm, 25, []);
       expect(batch.map((s) => s.id)).toEqual([fresher.id, parked.id]);
+      // And a backing-off parked row is excluded from the read entirely.
+      const excluded = await marketDb.deliveringSettlements(realm, 25, [parked.id]);
+      expect(excluded.map((s) => s.id)).toEqual([fresher.id]);
     }, 20_000);
 
     it('scopes the delivering and undisposed classes to the reading realm', async () => {

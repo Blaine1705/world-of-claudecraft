@@ -634,15 +634,22 @@ export class FakeWocMarketDb implements WocMarketDb {
     }
   }
 
-  async undisposedClosedListings(realm: string, limit: number): Promise<WocListingRow[]> {
+  async undisposedClosedListings(
+    realm: string,
+    limit: number,
+    excludeIds: readonly number[],
+  ): Promise<WocListingRow[]> {
     // Mirrors the Pg predicate: sold rows never enter the return backlog (a
-    // sold undisposed row is stuck residue the readout surfaces instead).
+    // sold undisposed row is stuck residue the readout surfaces instead),
+    // and the caller's backing-off parked rows are excluded in the READ.
+    const excluded = new Set(excludeIds);
     return [...this.listings.values()]
       .filter(
         (row) =>
           row.realm === realm &&
           row.status === 'closed' &&
           !row.itemDisposed &&
+          !excluded.has(row.id) &&
           // Mirrors the SQL's (resolution IS NULL OR resolution <> 'sold'):
           // in SQL the IS NULL arm is load-bearing (NULL <> 'sold' is NULL);
           // in TS the inequality already covers null, so one arm suffices.
@@ -821,6 +828,7 @@ export class FakeWocMarketDb implements WocMarketDb {
           id: s.id,
           listingId: s.listingId,
           createdAtMs: s.createdAtMs,
+          updatedAtMs: this.settlementTouchMs.get(s.id) ?? 0,
         })),
       },
       undisposedListings: {
@@ -840,6 +848,8 @@ export class FakeWocMarketDb implements WocMarketDb {
     if (!row) return;
     row.itemDisposed = true;
     this.touchListing(id);
+    // Terminal transition clears the rotation stamp (mirrors the SQL).
+    this.listingParkedMs.delete(id);
   }
 
   async claimBuyNowLock(
@@ -1174,6 +1184,8 @@ export class FakeWocMarketDb implements WocMarketDb {
     if (rec.state !== 'delivering' && rec.state !== 'delivered') return 'stale';
     rec.state = 'delivered';
     this.touchSettlement(rec.id);
+    // Terminal transition clears the rotation stamp (mirrors the SQL).
+    this.settlementParkedMs.delete(rec.id);
     // ON CONFLICT (listing_id) WHERE excluded = false DO NOTHING.
     const standing = [...this.sales.values()].some(
       (s) => s.listingId === args.listingId && !s.excluded,
@@ -1195,7 +1207,10 @@ export class FakeWocMarketDb implements WocMarketDb {
       listing.resolution = 'sold';
     }
     listing.itemDisposed = true;
-    if (closedNow) this.touchListing(listing.id);
+    if (closedNow) {
+      this.touchListing(listing.id);
+      this.listingParkedMs.delete(listing.id);
+    }
     if (args.bidId !== null) {
       const winner = this.bids.get(args.bidId);
       if (winner && winner.bondState === 'held') winner.bondState = 'refund_due';
@@ -1395,9 +1410,14 @@ export class FakeWocMarketDb implements WocMarketDb {
     return claimed.map((s) => this.settlementOut(s));
   }
 
-  async deliveringSettlements(realm: string, limit: number): Promise<WocSettlementRow[]> {
+  async deliveringSettlements(
+    realm: string,
+    limit: number,
+    excludeIds: readonly number[],
+  ): Promise<WocSettlementRow[]> {
+    const excluded = new Set(excludeIds);
     return [...this.settlements.values()]
-      .filter((s) => s.realm === realm && s.state === 'delivering')
+      .filter((s) => s.realm === realm && s.state === 'delivering' && !excluded.has(s.id))
       .sort(this.byRotation(this.settlementParkedMs, this.settlementTouchMs))
       .slice(0, limit)
       .map((s) => this.settlementOut(s));

@@ -3,8 +3,9 @@
 // method, so every arm could only be reached through a full HUD rig; the deps bag
 // here is the whole of the live state it still needs, which is what makes the
 // lockout arms and the fall-through chain assertable in isolation.
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { type ErrorTextLockoutDeps, localizeErrorText } from '../src/ui/error_text_i18n_core';
+import { ensureLocaleLoaded, formatDuration, setLanguage, t } from '../src/ui/i18n';
 import type { RaidLockout } from '../src/ui/raid_lockout';
 import { localizeServerText } from '../src/ui/server_i18n';
 import { localizeSimText } from '../src/ui/sim_i18n';
@@ -19,6 +20,8 @@ function deps(lockouts: RaidLockout[] = []): ErrorTextLockoutDeps {
 }
 
 describe('localizeErrorText', () => {
+  afterEach(() => setLanguage('en'));
+
   it('localizes the general-chat quota denial with the formatted retry seconds', () => {
     expect(localizeErrorText('General chat limit reached. Try again in 3 seconds.', deps())).toBe(
       'General chat limit reached. Try again in 3 seconds.',
@@ -38,16 +41,34 @@ describe('localizeErrorText', () => {
     expect(localizeErrorText(zero, deps())).toBe(zero);
   });
 
-  it('maps the two exact chat-quota rows to their own keys', () => {
-    expect(
-      localizeErrorText('General chat is temporarily unavailable. Try again shortly.', deps()),
-    ).toBe('General chat is temporarily unavailable. Try again shortly.');
-    expect(
-      localizeErrorText(
-        'Your previous General chat message is still sending. Try again in a moment.',
-        deps(),
-      ),
-    ).toBe('Your previous General chat message is still sending. Try again in a moment.');
+  it('maps the two exact chat-quota rows to their own keys', async () => {
+    // Under 'en' the mapped value is byte-identical to the input, so an
+    // English assertion cannot tell the arm from a fall-through (and neither
+    // fallback matcher claims these lines, so the null-check technique the
+    // zero case uses proves nothing here). A non-Latin locale is the
+    // discriminator: delete either exact row and the raw ENGLISH input comes
+    // back instead of the fill.
+    await ensureLocaleLoaded('zh_CN');
+    setLanguage('zh_CN');
+    const unavailable = 'General chat is temporarily unavailable. Try again shortly.';
+    const outUnavailable = localizeErrorText(unavailable, deps());
+    expect(outUnavailable).not.toBe(unavailable);
+    expect(outUnavailable).toBe(t('hudChrome.chatQuota.unavailable'));
+    const pending = 'Your previous General chat message is still sending. Try again in a moment.';
+    const outPending = localizeErrorText(pending, deps());
+    expect(outPending).not.toBe(pending);
+    expect(outPending).toBe(t('hudChrome.chatQuota.pending'));
+  });
+
+  it('localizes the quota denial through the key under a non-Latin locale', async () => {
+    // The same discriminator for the regex arm: the singular case above is
+    // decisive for the FORMATTER, this one is decisive for the arm itself.
+    await ensureLocaleLoaded('zh_CN');
+    setLanguage('zh_CN');
+    const input = 'General chat limit reached. Try again in 3 seconds.';
+    const out = localizeErrorText(input, deps());
+    expect(out).not.toBe(input);
+    expect(out).toBe(t('hudChrome.chatQuota.limitReached', { seconds: formatDuration(3) }));
   });
 
   it('enriches a raid lockout with the live countdown from the deps bag', () => {
@@ -82,7 +103,11 @@ describe('localizeErrorText', () => {
     expect(cleared).not.toContain('Unlocks in');
   });
 
-  it('falls through to localizeServerText, then localizeSimText, then the input', () => {
+  it('resolves each matcher tier and returns unmatched input verbatim', () => {
+    // The server-before-sim ORDER itself is pinned by the B1 guard in
+    // tests/localization_fixes.test.ts (the arm must call AND return
+    // localizeServerText); these cases prove each tier is reachable, one
+    // string per tier.
     const serverText = 'Mira added to friends.';
     expect(localizeServerText(serverText)).not.toBeNull();
     expect(localizeErrorText(serverText, deps())).toBe(localizeServerText(serverText));

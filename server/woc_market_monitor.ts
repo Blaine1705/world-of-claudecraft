@@ -161,7 +161,13 @@ export function createWocMarketMonitor(deps: WocMarketMonitorDeps): WocMarketMon
     } catch (err) {
       if (!failStreak) {
         failStreak = true;
-        deps.log(`[woc_market] stuck custody readout failing: ${String(err)}`);
+        try {
+          deps.log(`[woc_market] stuck custody readout failing: ${String(err)}`);
+        } catch {
+          // Beat-never-throws covers the failure line too: the interval call
+          // is void'ed, so a throwing sink here would be an unhandled
+          // rejection with no safer sink to report it to.
+        }
       }
       return;
     }
