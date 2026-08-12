@@ -249,7 +249,10 @@ describe('Chronomancy Phase 3 balance targets', () => {
     ].sort((a, b) => a - b);
     expect(ooms[1]).toBeGreaterThanOrEqual(100);
     expect(ooms[1]).toBeLessThanOrEqual(110);
-  });
+    // 60s budget: the seed-trio median runs three 200s-cap rotations in one
+    // case, which outgrows the default 20s under full-suite worker
+    // contention (the raised-timeout idiom the other long sims use).
+  }, 60_000);
 
   it('conservative + reactive heals lasts ~55-72s to OOM', () => {
     // Floor lowered 49.5 -> 48 when main's crit/haste rating rebalance (#2358)
