@@ -894,12 +894,12 @@ export const cs_CZ: EnTranslations = {
       "update": "Aktualizovat"
     },
     "otaUpdate": {
-      "title": "Game Update",
-      "downloading": "Downloading update: {percent}",
-      "applying": "Update downloaded. Restarting the game to apply it.",
-      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
-      "continueAnyway": "Continue without updating",
-      "progressLabel": "Update download progress"
+      "title": "Aktualizace hry",
+      "downloading": "Stahování aktualizace: {percent}",
+      "applying": "Aktualizace stažena. Hra se restartuje, aby ji použila.",
+      "incompatible": "Ke hraní je potřeba aktualizace. Použije se hned po dokončení stahování.",
+      "continueAnyway": "Pokračovat bez aktualizace",
+      "progressLabel": "Průběh stahování aktualizace"
     },
     "cameraPrompt": {
       "title": "Zvolte si kameru",

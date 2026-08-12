@@ -9060,6 +9060,14 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Jetzt nicht',
   'hudChrome.nativeUpdate.title': 'Update verfügbar',
   'hudChrome.nativeUpdate.update': 'Aktualisieren',
+  'hudChrome.otaUpdate.title': 'Spielupdate',
+  'hudChrome.otaUpdate.downloading': 'Update wird heruntergeladen: {percent}',
+  'hudChrome.otaUpdate.applying':
+    'Update heruntergeladen. Das Spiel wird neu gestartet, um es anzuwenden.',
+  'hudChrome.otaUpdate.incompatible':
+    'Zum Spielen ist ein Update erforderlich. Es wird angewendet, sobald der Download abgeschlossen ist.',
+  'hudChrome.otaUpdate.continueAnyway': 'Ohne Update fortfahren',
+  'hudChrome.otaUpdate.progressLabel': 'Downloadfortschritt des Updates',
   'entities.letters.ravenpost_welcome.sender': 'Die Rabenpost',
   'entities.letters.ravenpost_welcome.subject': 'Die Raben fliegen nun für Euch',
   'entities.letters.ravenpost_welcome.body':

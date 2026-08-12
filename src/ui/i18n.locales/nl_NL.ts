@@ -9182,6 +9182,14 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Niet nu',
   'hudChrome.nativeUpdate.title': 'Update beschikbaar',
   'hudChrome.nativeUpdate.update': 'Bijwerken',
+  'hudChrome.otaUpdate.title': 'Game-update',
+  'hudChrome.otaUpdate.downloading': 'Update downloaden: {percent}',
+  'hudChrome.otaUpdate.applying':
+    'Update gedownload. De game wordt opnieuw gestart om de update toe te passen.',
+  'hudChrome.otaUpdate.incompatible':
+    'Er is een update nodig om te spelen. Die wordt toegepast zodra het downloaden klaar is.',
+  'hudChrome.otaUpdate.continueAnyway': 'Doorgaan zonder bij te werken',
+  'hudChrome.otaUpdate.progressLabel': 'Downloadvoortgang van update',
   'entities.letters.ravenpost_welcome.sender': 'De Ravenpost',
   'entities.letters.ravenpost_welcome.subject': 'De raven vliegen nu voor jou',
   'entities.letters.ravenpost_welcome.body':

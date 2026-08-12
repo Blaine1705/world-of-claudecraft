@@ -9165,6 +9165,14 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Agora não',
   'hudChrome.nativeUpdate.title': 'Atualização disponível',
   'hudChrome.nativeUpdate.update': 'Atualizar',
+  'hudChrome.otaUpdate.title': 'Atualização do jogo',
+  'hudChrome.otaUpdate.downloading': 'Baixando atualização: {percent}',
+  'hudChrome.otaUpdate.applying':
+    'Atualização baixada. Reiniciando o jogo para aplicá-la.',
+  'hudChrome.otaUpdate.incompatible':
+    'Uma atualização é necessária para jogar. Ela será aplicada assim que o download terminar.',
+  'hudChrome.otaUpdate.continueAnyway': 'Continuar sem atualizar',
+  'hudChrome.otaUpdate.progressLabel': 'Progresso do download da atualização',
   'entities.letters.ravenpost_welcome.sender': 'O Correio dos Corvos',
   'entities.letters.ravenpost_welcome.subject': 'Os corvos agora voam por você',
   'entities.letters.ravenpost_welcome.body':

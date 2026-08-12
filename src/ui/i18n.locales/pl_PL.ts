@@ -9256,6 +9256,14 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Nie teraz',
   'hudChrome.nativeUpdate.title': 'Dostępna aktualizacja',
   'hudChrome.nativeUpdate.update': 'Aktualizuj',
+  'hudChrome.otaUpdate.title': 'Aktualizacja gry',
+  'hudChrome.otaUpdate.downloading': 'Pobieranie aktualizacji: {percent}',
+  'hudChrome.otaUpdate.applying':
+    'Aktualizacja pobrana. Gra uruchamia się ponownie, aby ją zastosować.',
+  'hudChrome.otaUpdate.incompatible':
+    'Do gry wymagana jest aktualizacja. Zostanie zastosowana po zakończeniu pobierania.',
+  'hudChrome.otaUpdate.continueAnyway': 'Kontynuuj bez aktualizacji',
+  'hudChrome.otaUpdate.progressLabel': 'Postęp pobierania aktualizacji',
   'entities.letters.ravenpost_welcome.sender': 'Krucza Poczta',
   'entities.letters.ravenpost_welcome.subject': 'Kruki latają teraz dla ciebie',
   'entities.letters.ravenpost_welcome.body':

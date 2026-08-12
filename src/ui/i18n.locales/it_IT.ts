@@ -9288,6 +9288,14 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Non ora',
   'hudChrome.nativeUpdate.title': 'Aggiornamento disponibile',
   'hudChrome.nativeUpdate.update': 'Aggiorna',
+  'hudChrome.otaUpdate.title': 'Aggiornamento del gioco',
+  'hudChrome.otaUpdate.downloading': 'Download aggiornamento: {percent}',
+  'hudChrome.otaUpdate.applying':
+    'Aggiornamento scaricato. Riavvio del gioco per applicarlo.',
+  'hudChrome.otaUpdate.incompatible':
+    'È necessario un aggiornamento per giocare. Verrà applicato appena il download sarà completato.',
+  'hudChrome.otaUpdate.continueAnyway': 'Continua senza aggiornare',
+  'hudChrome.otaUpdate.progressLabel': 'Avanzamento download aggiornamento',
   'entities.letters.ravenpost_welcome.sender': 'La Posta dei Corvi',
   'entities.letters.ravenpost_welcome.subject': 'Ora i corvi volano per te',
   'entities.letters.ravenpost_welcome.body':

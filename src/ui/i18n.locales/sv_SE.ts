@@ -9018,6 +9018,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Inte nu',
   'hudChrome.nativeUpdate.title': 'Uppdatering tillgänglig',
   'hudChrome.nativeUpdate.update': 'Uppdatera',
+  'hudChrome.otaUpdate.title': 'Speluppdatering',
+  'hudChrome.otaUpdate.downloading': 'Laddar ner uppdatering: {percent}',
+  'hudChrome.otaUpdate.applying':
+    'Uppdateringen har laddats ner. Spelet startas om för att tillämpa den.',
+  'hudChrome.otaUpdate.incompatible':
+    'En uppdatering krävs för att spela. Den tillämpas så snart nedladdningen är klar.',
+  'hudChrome.otaUpdate.continueAnyway': 'Fortsätt utan att uppdatera',
+  'hudChrome.otaUpdate.progressLabel': 'Nedladdningsförlopp för uppdatering',
   'entities.letters.ravenpost_welcome.sender': 'Korpposten',
   'entities.letters.ravenpost_welcome.subject': 'Korparna flyger nu för dig',
   'entities.letters.ravenpost_welcome.body':

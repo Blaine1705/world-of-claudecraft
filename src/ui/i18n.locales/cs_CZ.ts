@@ -5884,6 +5884,14 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Teď ne',
   'hudChrome.nativeUpdate.title': 'Aktualizace dostupná',
   'hudChrome.nativeUpdate.update': 'Aktualizovat',
+  'hudChrome.otaUpdate.title': 'Aktualizace hry',
+  'hudChrome.otaUpdate.downloading': 'Stahování aktualizace: {percent}',
+  'hudChrome.otaUpdate.applying':
+    'Aktualizace stažena. Hra se restartuje, aby ji použila.',
+  'hudChrome.otaUpdate.incompatible':
+    'Ke hraní je potřeba aktualizace. Použije se hned po dokončení stahování.',
+  'hudChrome.otaUpdate.continueAnyway': 'Pokračovat bez aktualizace',
+  'hudChrome.otaUpdate.progressLabel': 'Průběh stahování aktualizace',
   'hudChrome.widgets.clockTitle': 'Místní čas - kliknutím přepneš 12/24 h',
   'hudChrome.widgets.coordinates': 'Souřadnice',
   'hudChrome.widgets.heading': 'Směr',

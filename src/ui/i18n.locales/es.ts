@@ -9349,6 +9349,14 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Ahora no',
   'hudChrome.nativeUpdate.title': 'Actualización disponible',
   'hudChrome.nativeUpdate.update': 'Actualizar',
+  'hudChrome.otaUpdate.title': 'Actualización del juego',
+  'hudChrome.otaUpdate.downloading': 'Descargando actualización: {percent}',
+  'hudChrome.otaUpdate.applying':
+    'Actualización descargada. Reiniciando el juego para aplicarla.',
+  'hudChrome.otaUpdate.incompatible':
+    'Se requiere una actualización para jugar. Se aplicará en cuanto termine de descargarse.',
+  'hudChrome.otaUpdate.continueAnyway': 'Continuar sin actualizar',
+  'hudChrome.otaUpdate.progressLabel': 'Progreso de descarga de la actualización',
   'entities.letters.ravenpost_welcome.sender': 'El Correo del Cuervo',
   'entities.letters.ravenpost_welcome.subject': 'Los cuervos ya vuelan por ti',
   'entities.letters.ravenpost_welcome.body':

@@ -9679,6 +9679,14 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Không phải bây giờ',
   'hudChrome.nativeUpdate.title': 'Có Bản Cập Nhật',
   'hudChrome.nativeUpdate.update': 'Cập Nhật',
+  'hudChrome.otaUpdate.title': 'Cập Nhật Trò Chơi',
+  'hudChrome.otaUpdate.downloading': 'Đang tải bản cập nhật: {percent}',
+  'hudChrome.otaUpdate.applying':
+    'Đã tải xong bản cập nhật. Trò chơi đang khởi động lại để áp dụng.',
+  'hudChrome.otaUpdate.incompatible':
+    'Cần cập nhật để chơi. Bản cập nhật sẽ được áp dụng ngay khi tải xong.',
+  'hudChrome.otaUpdate.continueAnyway': 'Tiếp tục mà không cập nhật',
+  'hudChrome.otaUpdate.progressLabel': 'Tiến trình tải bản cập nhật',
   'errors.api.desktopCodeInvalid':
     'Mã đăng nhập máy tính không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.',
   'entities.letters.ravenpost_welcome.sender': 'Bưu Quạ',

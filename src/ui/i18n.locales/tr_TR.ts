@@ -9752,6 +9752,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Şimdi Değil',
   'hudChrome.nativeUpdate.title': 'Güncelleme Mevcut',
   'hudChrome.nativeUpdate.update': 'Güncelle',
+  'hudChrome.otaUpdate.title': 'Oyun Güncellemesi',
+  'hudChrome.otaUpdate.downloading': 'Güncelleme indiriliyor: {percent}',
+  'hudChrome.otaUpdate.applying':
+    'Güncelleme indirildi. Uygulamak için oyun yeniden başlatılıyor.',
+  'hudChrome.otaUpdate.incompatible':
+    'Oynamak için güncelleme gerekiyor. İndirme biter bitmez uygulanacak.',
+  'hudChrome.otaUpdate.continueAnyway': 'Güncellemeden devam et',
+  'hudChrome.otaUpdate.progressLabel': 'Güncelleme indirme ilerlemesi',
   'entities.letters.ravenpost_welcome.sender': 'Kuzgun Postası',
   'entities.letters.ravenpost_welcome.subject': 'Kuzgunlar artık senin için uçuyor',
   'entities.letters.ravenpost_welcome.body':

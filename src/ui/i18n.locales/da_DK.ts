@@ -9009,6 +9009,14 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Ikke nu',
   'hudChrome.nativeUpdate.title': 'Opdatering tilgængelig',
   'hudChrome.nativeUpdate.update': 'Opdater',
+  'hudChrome.otaUpdate.title': 'Spilopdatering',
+  'hudChrome.otaUpdate.downloading': 'Downloader opdatering: {percent}',
+  'hudChrome.otaUpdate.applying':
+    'Opdateringen er downloadet. Spillet genstarter for at anvende den.',
+  'hudChrome.otaUpdate.incompatible':
+    'En opdatering kræves for at spille. Den anvendes, så snart downloaden er færdig.',
+  'hudChrome.otaUpdate.continueAnyway': 'Fortsæt uden at opdatere',
+  'hudChrome.otaUpdate.progressLabel': 'Downloadstatus for opdatering',
   'errors.api.desktopCodeInvalid':
     'Desktop-loginkoden er ugyldig eller udløbet. Prøv venligst igen.',
   'entities.letters.ravenpost_welcome.sender': 'Ravneposten',

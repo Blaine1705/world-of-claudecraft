@@ -9773,6 +9773,14 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Pas maintenant',
   'hudChrome.nativeUpdate.title': 'Mise à jour disponible',
   'hudChrome.nativeUpdate.update': 'Mettre à jour',
+  'hudChrome.otaUpdate.title': 'Mise à jour du jeu',
+  'hudChrome.otaUpdate.downloading': 'Téléchargement de la mise à jour : {percent}',
+  'hudChrome.otaUpdate.applying':
+    'Mise à jour téléchargée. Redémarrage du jeu pour l’appliquer.',
+  'hudChrome.otaUpdate.incompatible':
+    'Une mise à jour est requise pour jouer. Elle sera appliquée dès la fin du téléchargement.',
+  'hudChrome.otaUpdate.continueAnyway': 'Continuer sans mettre à jour',
+  'hudChrome.otaUpdate.progressLabel': 'Progression du téléchargement de la mise à jour',
   'entities.letters.ravenpost_welcome.sender': 'La Poste aux Corbeaux',
   'entities.letters.ravenpost_welcome.subject': 'Les corbeaux volent désormais pour vous',
   'entities.letters.ravenpost_welcome.body':

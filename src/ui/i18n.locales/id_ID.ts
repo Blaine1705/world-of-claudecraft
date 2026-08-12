@@ -9800,6 +9800,14 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Jangan sekarang',
   'hudChrome.nativeUpdate.title': 'Pembaruan Tersedia',
   'hudChrome.nativeUpdate.update': 'Perbarui',
+  'hudChrome.otaUpdate.title': 'Pembaruan Game',
+  'hudChrome.otaUpdate.downloading': 'Mengunduh pembaruan: {percent}',
+  'hudChrome.otaUpdate.applying':
+    'Pembaruan sudah diunduh. Game dimulai ulang untuk menerapkannya.',
+  'hudChrome.otaUpdate.incompatible':
+    'Pembaruan diperlukan untuk bermain. Pembaruan akan diterapkan begitu unduhan selesai.',
+  'hudChrome.otaUpdate.continueAnyway': 'Lanjutkan tanpa memperbarui',
+  'hudChrome.otaUpdate.progressLabel': 'Progres unduhan pembaruan',
   'entities.letters.ravenpost_welcome.sender': 'Pos Gagak',
   'entities.letters.ravenpost_welcome.subject': 'Kini para gagak terbang untukmu',
   'entities.letters.ravenpost_welcome.body':
