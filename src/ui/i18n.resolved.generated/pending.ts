@@ -9,130 +9,25 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
-  ],
-  "es_ES": [
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
-  ],
-  "fr_FR": [
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
-  ],
-  "fr_CA": [
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
-  ],
-  "de_DE": [
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
-  ],
+  "it_IT": [],
+  "de_DE": [],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
-  ],
+  "pt_BR": [],
   "ru_RU": [],
-  "cs_CZ": [
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
-  ],
-  "nl_NL": [
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
-  ],
-  "pl_PL": [
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
-  ],
-  "id_ID": [
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
-  ],
-  "tr_TR": [
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
-  ],
-  "sv_SE": [
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
-  ],
-  "vi_VN": [
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
-  ],
-  "da_DK": [
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
-  ]
+  "cs_CZ": [],
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };
