@@ -234,13 +234,13 @@ export async function prewarmPlayerPortrait(
 ): Promise<void> {
   const visualKey = `player_${cls}`;
   const key = `${visualKey}:${skin}:${framing}`;
-  let activeRig: PortraitRig | null = null;
+  let prewarmRig: PortraitRig | null = null;
   await runPortraitPrewarm<CharacterVisual>({
     cached: () => cache.has(key),
     ready: () => assetsAreReady,
     atlasPending: () => trackSkinAtlasPending(visualKey, skin),
     build: () => {
-      activeRig = ensureRig();
+      prewarmRig = ensureRig();
       return new CharacterVisual(visualKey, 0xffffff, skin);
     },
     // This offscreen context is separate from the world renderer, so atlases
@@ -252,15 +252,15 @@ export async function prewarmPlayerPortrait(
     uploadTextures: async (visual) => {
       const textures = new Set<THREE.Texture>();
       collectPrewarmTextures(visual.root, textures);
-      if (!activeRig) return;
-      const prewarmRig = activeRig;
-      await uploadTexturesInSlices(prewarmRig.renderer, textures, {
+      if (!prewarmRig) return;
+      const activeRig = prewarmRig;
+      await uploadTexturesInSlices(activeRig.renderer, textures, {
         yieldToMain: yieldToMainThread,
         // A graphics rebuild mid-sweep disposes the rig (renderer goes null).
-        isCancelled: () => rig !== prewarmRig,
+        isCancelled: () => rig !== activeRig,
       });
     },
-    current: () => rig === activeRig,
+    current: () => rig === prewarmRig,
     // Link this context's programs asynchronously before the draw: the
     // portrait rig never ran a compileAsync, so the first portrait of each
     // cold program set paid the shader link inside its render call (S9
@@ -270,23 +270,23 @@ export async function prewarmPlayerPortrait(
     // concurrent sync capture can render it (see the mount-sharing note
     // above), and the captured material list keeps polling regardless.
     compile: (visual) => {
-      if (!activeRig) return Promise.resolve();
-      const prewarmRig = activeRig;
-      prewarmRig.mount.add(visual.root);
-      const compiled = prewarmRig.renderer.compileAsync(prewarmRig.scene, prewarmRig.camera);
-      prewarmRig.mount.remove(visual.root);
+      if (!prewarmRig) return Promise.resolve();
+      const activeRig = prewarmRig;
+      activeRig.mount.add(visual.root);
+      const compiled = activeRig.renderer.compileAsync(activeRig.scene, activeRig.camera);
+      activeRig.mount.remove(visual.root);
       return compiled.then(() => undefined);
     },
     // Fully synchronous window: renderPortraitFrame re-mounts and renders,
     // and toBlob snapshots the bitmap at call time, so nothing can interleave
     // between the draw and the capture.
     renderAndSnapshot: (visual) => {
-      if (!activeRig) return Promise.resolve(null);
-      renderPortraitFrame(activeRig, visual, visualKey, framing);
-      return encodePortraitPng(activeRig.renderer.domElement);
+      if (!prewarmRig) return Promise.resolve(null);
+      renderPortraitFrame(prewarmRig, visual, visualKey, framing);
+      return encodePortraitPng(prewarmRig.renderer.domElement);
     },
     release: (visual) => {
-      activeRig?.mount.remove(visual.root);
+      prewarmRig?.mount.remove(visual.root);
       visual.dispose();
     },
     commit: (url) => cache.set(key, url),
@@ -339,13 +339,13 @@ export function modularPortraitDataUrl(
  *  toDataURL for the live path, async toBlob for the prewarm path) and the
  *  visual's unmount/dispose. */
 function renderPortraitFrame(
-  activeRig: PortraitRig,
+  rig: PortraitRig,
   visual: CharacterVisual,
   visualKey: string,
   framing: PortraitFraming,
 ) {
-  activeRig.mount.add(visual.root);
-  activeRig.mount.rotation.y = 0;
+  rig.mount.add(visual.root);
+  rig.mount.rotation.y = 0;
   // Settle the rig into a stable idle frame before measuring/capturing.
   visual.update(0.4, PORTRAIT_ANIM_STATE, true);
 
@@ -386,19 +386,15 @@ function renderPortraitFrame(
   // unchanged for every class; only the sideways aim is corrected.
   const bodyCenterX = bodyCenterXOf(visual.root) ?? scratchCenter.x;
   const { fov, targetYFromFeetFrac, extentFrac } = portraitFrameParams(framing);
-  activeRig.camera.fov = fov;
+  rig.camera.fov = fov;
   const targetY = scratchBox.min.y + targetYFromFeetFrac * h;
   const extent = extentFrac * h;
   const dist = extent / 2 / Math.tan((fov * Math.PI) / 180 / 2);
-  activeRig.camera.position.set(
-    bodyCenterX + 0.04 * h,
-    targetY + 0.02 * h,
-    scratchBox.max.z + dist,
-  );
-  activeRig.camera.lookAt(bodyCenterX, targetY, scratchCenter.z);
-  activeRig.camera.updateProjectionMatrix();
+  rig.camera.position.set(bodyCenterX + 0.04 * h, targetY + 0.02 * h, scratchBox.max.z + dist);
+  rig.camera.lookAt(bodyCenterX, targetY, scratchCenter.z);
+  rig.camera.updateProjectionMatrix();
 
-  activeRig.renderer.render(activeRig.scene, activeRig.camera);
+  rig.renderer.render(rig.scene, rig.camera);
 }
 
 /** Render one visual into the offscreen rig and return it as a PNG data URL.
