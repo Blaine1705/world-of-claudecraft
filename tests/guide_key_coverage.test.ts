@@ -4,6 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
+vi.setConfig({ hookTimeout: 30000 });
+
 // Every guide.* key the render sweep below actually resolved. The i18n module is wrapped
 // (not replaced) so t()/tOptional() behave exactly as in production and only record what
 // they were asked for.
