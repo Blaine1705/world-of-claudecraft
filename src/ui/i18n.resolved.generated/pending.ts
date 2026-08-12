@@ -10,6 +10,10 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -18,6 +22,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "es_ES": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -26,6 +34,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "fr_FR": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -34,6 +46,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "fr_CA": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -43,6 +59,10 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -51,6 +71,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "de_DE": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -63,6 +87,10 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -72,6 +100,10 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -80,6 +112,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "nl_NL": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -88,6 +124,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "pl_PL": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -96,6 +136,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "id_ID": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -104,6 +148,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "tr_TR": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -112,6 +160,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "sv_SE": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -120,6 +172,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "vi_VN": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -128,6 +184,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "da_DK": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",

@@ -3923,6 +3923,12 @@ export const tr_TR: EnTranslations = {
       "genesis_token_claimed": "Bu Seeker Genesis Token zaten talep edilmiş.",
       "entitlement_required": "Doğrulanmış bir Seeker hakkı gerekir.",
       "current_ownership_required": "Seeker Genesis Token'a şu anda sahip olmanız gerekir."
+    },
+    "cheater_mark": {
+      "admin_target": "Operator accounts cannot be marked.",
+      "reason_required": "A reason is required.",
+      "invalid_duration": "Enter a mark duration of at least one second.",
+      "not_marked": "That account is not marked."
     }
   },
   "guide": {

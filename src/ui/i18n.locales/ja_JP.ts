@@ -8358,6 +8358,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.seeker.entitlement_required': '検証済みのSeeker資格が必要です。',
   'apiError.seeker.current_ownership_required':
     '現在Seeker Genesis Tokenを所有している必要があります。',
+  'apiError.cheater_mark.admin_target': '管理者アカウントにはマークを付けられません。',
+  'apiError.cheater_mark.reason_required': '理由の入力が必要です。',
+  'apiError.cheater_mark.invalid_duration': 'マークの期間は1秒以上で入力してください。',
+  'apiError.cheater_mark.not_marked': 'そのアカウントはマークされていません。',
   'apiError.steam.invalid_ticket':
     'Steamがこの連携リクエストを確認できませんでした。デスクトップアプリからもう一度お試しください。',
   'apiError.steam.banned': 'そのSteamアカウントは連携できません。',

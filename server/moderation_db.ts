@@ -6,6 +6,11 @@ import {
 // The ONE clamp for a mark's played-second budget, shared with the sim so the
 // route, the database, and the countdown cannot disagree about what is in range.
 import { normalizeCheaterMarkSeconds } from '../src/sim/moderation';
+// The mark's refusal vocabulary. A machine token, never an English sentence:
+// `server/` is language-agnostic, so the admin route has to be able to turn a
+// refused write into a stable error code without parsing prose. The module is a
+// pure leaf (schemas + codes, no db), so importing it here adds no cycle.
+import { CheaterMarkRefused } from './cheater_mark_api';
 import { pool } from './db';
 
 export const REPORT_REASONS = [
@@ -657,11 +662,9 @@ export async function setAccountCheaterMark(input: {
   seconds: unknown;
 }): Promise<void> {
   const reason = cleanText(input.reason, ACTION_REASON_MAX);
-  if (!reason) throw new Error('moderation reason is required');
+  if (!reason) throw new CheaterMarkRefused('reason_required');
   const seconds = normalizeCheaterMarkSeconds(input.seconds);
-  if (seconds <= 0) {
-    throw new Error('cheater mark duration must be a positive number of played seconds');
-  }
+  if (seconds <= 0) throw new CheaterMarkRefused('invalid_duration');
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -693,7 +696,7 @@ export async function liftAccountCheaterMark(input: {
   reason: unknown;
 }): Promise<void> {
   const reason = cleanText(input.reason, ACTION_REASON_MAX);
-  if (!reason) throw new Error('moderation reason is required');
+  if (!reason) throw new CheaterMarkRefused('reason_required');
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -703,7 +706,7 @@ export async function liftAccountCheaterMark(input: {
        WHERE id = $1 AND cheater_mark_seconds > 0`,
       [input.accountId],
     );
-    if ((updated.rowCount ?? 0) === 0) throw new Error('account is not marked');
+    if ((updated.rowCount ?? 0) === 0) throw new CheaterMarkRefused('not_marked');
     await recordModerationAction(client, 'cheater_mark_lift', {
       accountId: input.accountId,
       adminAccountId: input.adminAccountId,

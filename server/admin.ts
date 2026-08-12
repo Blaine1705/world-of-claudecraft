@@ -80,6 +80,12 @@ import {
   updateFilterConfig,
   type WordTier,
 } from './chat_filter_db';
+import {
+  CHEATER_MARK_ADMIN_TARGET_CODE,
+  cheaterMarkBodySchema,
+  liftCheaterMarkBodySchema,
+  rethrowCheaterMarkRefusal,
+} from './cheater_mark_api';
 import { cleanContentModerationReason } from './content_moderation_db';
 import { currentDailyRewardDay } from './daily_rewards';
 import {
@@ -98,7 +104,9 @@ import {
 import { emailSecurityIncident } from './email';
 import type { GameServer } from './game';
 import { ctxAccountId } from './http/context';
+import { HttpError } from './http/errors';
 import { logger } from './http/logger';
+import { withBody } from './http/middleware/body';
 import {
   ADMIN_META,
   type AdminAuthDb,
@@ -114,12 +122,12 @@ import { json, readBody } from './http_util';
 import { addBlockedIp, cleanIp, listBlockedIps, removeBlockedIp } from './ip_block_db';
 import { PgMapsDb } from './maps_db';
 import {
-  addAccountNote,
   accountCheaterMarkSeconds,
+  addAccountNote,
   forceCharacterRename,
   ignoreReport,
-  liftAccountCheaterMark,
   liftAccountChatMute,
+  liftAccountCheaterMark,
   moderateAccount,
   moderationReportsForAccount,
   muteAccountChat,
@@ -2560,50 +2568,81 @@ async function forceRenameHandler(ctx: Ctx): Promise<void> {
 }
 
 /**
+ * Refuse a Cheater mark aimed at an operator account.
+ *
+ * Admin accounts are exempt for the same reason they are exempt from
+ * suspend/ban/chat-mute (the isAdminAccount guards above): an operator must not be
+ * able to brand another operator, deliberately or by mistyping an account id.
+ * Applied to the LIFT arm as well as the mark arm, so the pair states the same
+ * rule; the cost is that an account marked BEFORE being promoted to staff has to
+ * be demoted before its tag can be lifted through the API.
+ */
+async function refuseAdminCheaterMarkTarget(targetAccountId: number): Promise<void> {
+  if (await adminDb().isAdminAccount(targetAccountId)) {
+    throw new HttpError(400, CHEATER_MARK_ADMIN_TARGET_CODE);
+  }
+}
+
+/**
  * POST /admin/api/moderation/accounts/:id/cheater-mark: brand an account with the
  * Cheater tag for a budget of PLAYED seconds, and push it onto the live session.
  *
- * Admin accounts are exempt for the same reason they are exempt from
- * suspend/ban/chat-mute (isAdminAccount above): an operator must not be able to
- * brand another operator, deliberately or by mistyping an account id.
+ * A REGISTRY-ONLY route (no legacy handleAdminApi twin), so it follows the
+ * new-endpoint recipe rather than the chat-mute arm beside it: the body is parsed
+ * by withBody and decoded through a typed schema (a shape failure is the
+ * pipeline's 422 validation.failed), and every refusal is a stable
+ * `cheater_mark.*` code through HttpError, never English prose.
  */
 async function cheaterMarkHandler(ctx: Ctx): Promise<void> {
   const rt = useAdminRuntime();
   const targetAccountId = adminTargetId(ctx);
-  if (await adminDb().isAdminAccount(targetAccountId)) {
-    return fail(ctx.res, 400, 'admin accounts cannot be marked');
-  }
-  const body = await readBody(ctx.req);
+  // Cheap-reject-first: the decode is pure CPU, the operator-target check is a
+  // db read, so a malformed request never buys a query.
+  const decoded = cheaterMarkBodySchema.decode(ctx.body ?? {});
+  if (!decoded.ok) throw decoded;
+  await refuseAdminCheaterMarkTarget(targetAccountId);
   try {
     await adminDb().setAccountCheaterMark({
       accountId: targetAccountId,
       adminAccountId: ctxAccountId(ctx),
-      reason: body.reason,
-      seconds: body.seconds,
+      reason: decoded.value.reason,
+      seconds: decoded.value.seconds,
     });
-    rt.applyCheaterMarkLive(targetAccountId, await adminDb().accountCheaterMarkSeconds(targetAccountId));
-    return ok(ctx.res, { ok: true });
   } catch (err) {
-    return fail(ctx.res, 400, err instanceof Error ? err.message : 'cheater mark failed');
+    rethrowCheaterMarkRefusal(err);
   }
+  // Push the STORED budget, never the requested one: moderation_db clamps to
+  // CHEATER_MARK_MAX_SECONDS, so this read is what the account actually owes and
+  // the live session cannot end up counting down a different number.
+  rt.applyCheaterMarkLive(
+    targetAccountId,
+    await adminDb().accountCheaterMarkSeconds(targetAccountId),
+  );
+  ok(ctx.res, { ok: true });
 }
 
-/** POST /admin/api/moderation/accounts/:id/lift-cheater-mark: clear it early + live push. */
+/**
+ * POST /admin/api/moderation/accounts/:id/lift-cheater-mark: clear the tag early
+ * and push the lift onto the live session. Registry-only, same recipe as its
+ * sibling above; 0 seconds is the wire form of "no mark".
+ */
 async function liftCheaterMarkHandler(ctx: Ctx): Promise<void> {
   const rt = useAdminRuntime();
   const targetAccountId = adminTargetId(ctx);
-  const body = await readBody(ctx.req);
+  const decoded = liftCheaterMarkBodySchema.decode(ctx.body ?? {});
+  if (!decoded.ok) throw decoded;
+  await refuseAdminCheaterMarkTarget(targetAccountId);
   try {
     await adminDb().liftAccountCheaterMark({
       accountId: targetAccountId,
       adminAccountId: ctxAccountId(ctx),
-      reason: body.reason,
+      reason: decoded.value.reason,
     });
-    rt.applyCheaterMarkLive(targetAccountId, 0);
-    return ok(ctx.res, { ok: true });
   } catch (err) {
-    return fail(ctx.res, 400, err instanceof Error ? err.message : 'lifting the mark failed');
+    rethrowCheaterMarkRefusal(err);
   }
+  rt.applyCheaterMarkLive(targetAccountId, 0);
+  ok(ctx.res, { ok: true });
 }
 
 /** POST /admin/api/moderation/accounts/:id/lift-mute: clear a chat mute + live push. */
@@ -3395,11 +3434,15 @@ export const routes: RouteDef[] = [
     meta: adminTargetMeta('account'),
     handler: chatMuteHandler,
   },
+  // The Cheater mark pair. Registry-only (born after the migration, so no legacy
+  // ladder twin), which is why these two are the only admin routes that mount
+  // withBody: the dual-edit parity rule that keeps the migrated handlers
+  // self-reading does not describe a route with nothing to be in parity with.
   {
     method: 'POST',
     path: '/admin/api/moderation/accounts/:id/cheater-mark',
     surface: 'admin',
-    middleware: [requireAdmin, requireAdminTarget('account')],
+    middleware: [requireAdmin, requireAdminTarget('account'), withBody()],
     meta: adminTargetMeta('account'),
     handler: cheaterMarkHandler,
   },
@@ -3407,7 +3450,7 @@ export const routes: RouteDef[] = [
     method: 'POST',
     path: '/admin/api/moderation/accounts/:id/lift-cheater-mark',
     surface: 'admin',
-    middleware: [requireAdmin, requireAdminTarget('account')],
+    middleware: [requireAdmin, requireAdminTarget('account'), withBody()],
     meta: adminTargetMeta('account'),
     handler: liftCheaterMarkHandler,
   },
