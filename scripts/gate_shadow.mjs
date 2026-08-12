@@ -44,8 +44,23 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 const TMP = path.join(repoRoot, 'tmp');
 const LOG = process.env.GATE_SHADOW_LOG ?? path.join(TMP, 'gate-shadow.jsonl');
 
+// git never needs a shell; see the matching comment in gate_select.mjs (#3225):
+// on win32, shell:true routes git through cmd.exe, whose `^` escape character
+// mangles resolveSelectBase's `<ref>^{commit}` probe so no base ever resolves.
 /** @param {string} cmd @param {string[]} args */
-const git = (cmd, args) => spawnSync(cmd, args, { encoding: 'utf8', shell, cwd: repoRoot });
+function git(cmd, args) {
+  const res = spawnSync(cmd, args, { encoding: 'utf8', cwd: repoRoot });
+  if (res.error !== undefined) {
+    // Surface the real spawn failure instead of a bare "status: null"
+    // reaching resolveSelectBase/listChangedPaths (mirrors gate_select.mjs).
+    return {
+      status: res.status,
+      stdout: res.stdout,
+      stderr: `${res.error.message}\n${res.stderr ?? ''}`,
+    };
+  }
+  return { status: res.status, stdout: res.stdout, stderr: res.stderr };
+}
 
 const workers = computeGateWorkers({
   cpuCount: os.availableParallelism(),
