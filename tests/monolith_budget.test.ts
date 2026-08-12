@@ -40,8 +40,10 @@ const MONOLITHS: MonolithRow[] = [
     // Deliberately ZERO headroom (the woc marketplace baseline ratchet): the
     // next line added here fails, and the fix is extraction behind the seam,
     // never a raise. A raise stays a maintainer decision, per the header.
+    // Re-pinned down from 19338 after the error-text matcher moved out to
+    // src/ui/error_text_i18n_core.ts, keeping the zero-headroom posture.
     file: 'src/ui/hud.ts',
-    ceiling: 19338,
+    ceiling: 19190,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
