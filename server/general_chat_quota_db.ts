@@ -45,7 +45,13 @@ const quotaPool = new Pool({
   statement_timeout: GENERAL_CHAT_QUOTA_STATEMENT_TIMEOUT_MS,
   query_timeout: GENERAL_CHAT_QUOTA_STATEMENT_TIMEOUT_MS + GENERAL_CHAT_QUOTA_ACQUIRE_TIMEOUT_MS,
 });
-quotaPool.on('error', (error) => console.error('general chat quota database pool error:', error));
+// The real pg Pool is an EventEmitter, but several server suites mock `pg` with
+// a minimal Pool that omits .on (they reach this module through admin.ts). Guard
+// the registration by capability, exactly as the shared pool does in db.ts,
+// rather than force every such fake to grow the event surface.
+if (typeof quotaPool.on === 'function') {
+  quotaPool.on('error', (error) => console.error('general chat quota database pool error:', error));
+}
 
 export interface GeneralChatRateLimit {
   messages: number;
