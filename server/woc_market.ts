@@ -686,13 +686,17 @@ export interface WocMarketDb {
   touchSettlementRow(id: number): Promise<void>;
   /** The listing twin, for a parked return in the undisposed backlog. */
   touchListingRow(id: number): Promise<void>;
-  /** Deadline-overdue offered/failed rows, plus 'confirming' rows older than
-   *  confirmingCutoffMs (the H15 bound; aged on updated_at). */
-  overdueSettlements(
+  /** Deadline-overdue offered/failed rows, in deadline order. */
+  overdueSettlements(realm: string, nowMs: number, limit: number): Promise<WocSettlementRow[]>;
+  /** 'confirming' rows older than cutoffMs (the H15 bound; aged on
+   *  updated_at, which nothing re-stamps while the poll returns undecided),
+   *  oldest first. Its OWN read on purpose: sharing the overdue batch let a
+   *  confirming backlog (oldest deadlines by construction) occupy the whole
+   *  batch head and starve the offered/failed expiry work behind it. */
+  confirmingOverdueSettlements(
     realm: string,
-    nowMs: number,
+    cutoffMs: number,
     limit: number,
-    confirmingCutoffMs: number,
   ): Promise<WocSettlementRow[]>;
 
   // Sales, strikes, terms
@@ -1030,6 +1034,10 @@ export interface WocSweepPassStats {
   expiredOffers: number;
   reclaimed: number;
   closed: number;
+  /** Over-bound 'confirming' rows parked in the operator 'review' state
+   *  (the H15 exit; its own arm so a confirming backlog cannot starve the
+   *  deadline expiry batch). */
+  reviewed: number;
   expired: number;
   /** Cancel-pending listings whose lock window ended unpaid, closed
    *  'cancelled' with the return flight home (the cancel-intent converge). */
@@ -2334,6 +2342,10 @@ export class WocMarketService {
       // cadence and honors a contended pass.
       disposed: await this.arm('disposed', () => this.disposeSoldResidue(nowMs, scope)),
       closed: await this.arm('closed', () => this.closeDueAuctions(nowMs)),
+      // BEFORE the poll arm (see parkOverdueConfirming) and before the
+      // expiry arm so a just-parked row can never be double-touched by the
+      // same pass's deadline work.
+      reviewed: await this.arm('reviewed', () => this.parkOverdueConfirming(nowMs)),
       expired: await this.arm('expired', () => this.expireOverdueSettlements(nowMs)),
       // AFTER the expiry arm on purpose: the overdue arm is the canonical
       // abandon recorder and expires the abandoned window's settlement, so a
@@ -2560,13 +2572,47 @@ export class WocMarketService {
     return closed;
   }
 
-  private async expireOverdueSettlements(nowMs: number): Promise<number> {
-    const overdue = await this.deps.db.overdueSettlements(
+  /** The H15 exit, its OWN arm with its own batch budget (sharing the
+   *  overdue batch let a confirming backlog, oldest deadlines by
+   *  construction, own the batch head and starve the offered/failed expiry
+   *  work). A signature exists and the chain never decided, so each row is
+   *  AMBIGUOUS by construction. It must not default, forfeit, strike, or
+   *  cascade (the buyer may have paid), and it must not be polled forever
+   *  either. 'review' parks it for an operator verdict: out of the polling
+   *  set, still OPEN (the listing cannot re-auction), surfaced by the stuck
+   *  readout. The operator resolution arms are review -> confirmed (payment
+   *  verified on chain: delivery resumes) and review -> failed (verified
+   *  unpaid: the ordinary overdue default pass takes it from there); the ops
+   *  tooling drives them. Runs BEFORE the poll arm in the pass, so a row
+   *  whose economy recovered exactly at the bound parks rather than
+   *  resolves: deliberate (six hours of polls already failed) and
+   *  operator-recoverable. */
+  private async parkOverdueConfirming(nowMs: number): Promise<number> {
+    const overdue = await this.deps.db.confirmingOverdueSettlements(
       this.cfg.realm,
-      nowMs,
-      SWEEP_BATCH,
       nowMs - this.cfg.confirmingReviewMs,
+      SWEEP_BATCH,
     );
+    let parked = 0;
+    for (const settlement of overdue) {
+      try {
+        const out = await this.deps.db.transitionSettlement(
+          settlement.id,
+          ['confirming'],
+          'review',
+          'confirming_overdue',
+        );
+        if (out) parked++;
+      } catch (err) {
+        // Per-row isolation, the sweep-wide rule.
+        this.sweepError('reviewed', err);
+      }
+    }
+    return parked;
+  }
+
+  private async expireOverdueSettlements(nowMs: number): Promise<number> {
+    const overdue = await this.deps.db.overdueSettlements(this.cfg.realm, nowMs, SWEEP_BATCH);
     for (const settlement of overdue) {
       try {
         await this.expireOneOverdueSettlement(settlement, nowMs);
@@ -2584,24 +2630,6 @@ export class WocMarketService {
     settlement: WocSettlementRow,
     nowMs: number,
   ): Promise<void> {
-    if (settlement.state === 'confirming') {
-      // The H15 exit: a signature exists and the chain never decided, so the
-      // row is AMBIGUOUS by construction. It must not default, forfeit,
-      // strike, or cascade (the buyer may have paid), and it must not be
-      // polled forever either. 'review' parks it for an operator verdict:
-      // out of the polling set, still OPEN (the listing cannot re-auction),
-      // surfaced by the stuck readout. The operator resolution arms are
-      // review -> confirmed (payment verified on chain: delivery resumes) and
-      // review -> failed (verified unpaid: the ordinary overdue default pass
-      // takes it from there); the ops tooling drives them.
-      await this.deps.db.transitionSettlement(
-        settlement.id,
-        ['confirming'],
-        'review',
-        'confirming_overdue',
-      );
-      return;
-    }
     // A 'failed' row KEEPS its refusal reason across the expiry (COALESCE in
     // the transition): the abandon recorders' exempt predicate reads it, and
     // 'window_elapsed' would erase exactly the fact that distinguishes a

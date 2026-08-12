@@ -6,8 +6,10 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { stripComments } from '../helpers/strip_comments';
 
-const MAIN = readFileSync(join(__dirname, '..', '..', 'server', 'main.ts'), 'utf8');
+// Comment-stripped so a commented-out call can never satisfy an order pin.
+const MAIN = stripComments(readFileSync(join(__dirname, '..', '..', 'server', 'main.ts'), 'utf8'));
 const count = (haystack: string, needle: string): number => haystack.split(needle).length - 1;
 
 describe('retention sweep wiring in server/main.ts', () => {

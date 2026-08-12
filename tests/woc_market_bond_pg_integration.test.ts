@@ -534,10 +534,27 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
         bondState: 'held',
         bondReference: `held-${seq}`,
       });
+      // The carve-out's THIRD dimension alone: pending_bond WITH a recorded
+      // signature but bond_state 'held' (the chain already decided). Only the
+      // bond_state conjunct separates this from the preserved bid above, so a
+      // teardown that dropped AND bond_state = 'pending' would wrongly skip
+      // it and strand a decided, refundable bond.
+      const heldBuyer = await seedAccount();
+      const signedHeld = await seedBid(realm, listingId, heldBuyer, {
+        bondReference: `signed-held-${seq}`,
+        bondSignature: `signed-held-sig-${seq}`,
+        bondState: 'held',
+      });
       const out = await marketDb.suspendListingIfSafe(realm, listingId, BASE_MS);
       expect(typeof out).not.toBe('string');
       // The held active bid tore down normally...
       expect(await bidRow(activeHeld)).toMatchObject({
+        status: 'cancelled',
+        bond_state: 'refund_due',
+      });
+      // ...the signed-but-DECIDED pending bid tore down too (its bond rides
+      // the ordinary refund queue, not the poll)...
+      expect(await bidRow(signedHeld)).toMatchObject({
         status: 'cancelled',
         bond_state: 'refund_due',
       });
@@ -650,7 +667,7 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       );
       // The overdue read now carries the confirming arm (the old predicate
       // selected only offered/failed: this row was polled forever).
-      const overdue = await marketDb.overdueSettlements(realm, BASE_MS, 10, BASE_MS - 6 * HOUR_MS);
+      const overdue = await marketDb.confirmingOverdueSettlements(realm, BASE_MS - 6 * HOUR_MS, 10);
       expect(overdue.map((s) => s.id)).toContain(settlement.id);
       // The sweep parks it in 'review' (the real CHECK constraint accepts the
       // state: the DDL evolution under test), with NO default consequences
@@ -726,9 +743,12 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
           WHERE id = $1`,
         [settlement.id, `young-sig-${seq}`, BASE_MS - 1 * HOUR_MS],
       );
-      const overdue = await marketDb.overdueSettlements(realm, BASE_MS, 10, BASE_MS - 6 * HOUR_MS);
       // Past its DEADLINE but inside the confirming bound: the deadline arm
-      // must not catch a confirming row (only offered/failed age on it).
+      // must not catch a confirming row (only offered/failed age on it)...
+      const deadline = await marketDb.overdueSettlements(realm, BASE_MS, 10);
+      expect(deadline.map((s) => s.id)).not.toContain(settlement.id);
+      // ...and the confirming arm's own read must not catch a YOUNG row.
+      const overdue = await marketDb.confirmingOverdueSettlements(realm, BASE_MS - 6 * HOUR_MS, 10);
       expect(overdue.map((s) => s.id)).not.toContain(settlement.id);
     });
 
@@ -799,7 +819,7 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
           WHERE id = $1`,
         [settlement.id, `exact-sig-${seq}`, cutoff],
       );
-      const overdue = await marketDb.overdueSettlements(realm, BASE_MS, 10, cutoff);
+      const overdue = await marketDb.confirmingOverdueSettlements(realm, cutoff, 10);
       expect(
         overdue.map((s) => s.id),
         'updated_at <= cutoff includes the bound',
@@ -1181,7 +1201,7 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       const seller = await seedAccount();
       const listingId = await seedListing(realm, seller, { endsAtMs: BASE_MS + 60_000 });
       const out = await marketDb.extendAuctionForBondProgress(realm, listingId, (row) => {
-        const until = Date.now() + 900; // past GUARD_IDLE_TX_TIMEOUT_MS (500)
+        const until = Date.now() + 2_600; // past GUARD_IDLE_TX_TIMEOUT_MS (2000)
         while (Date.now() < until) {
           // A busy event loop: the session sits idle-in-transaction.
         }
@@ -1190,6 +1210,35 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       expect(out, 'typed contention, not an unhandled throw').toBe('contended');
       // And the pool survives the discarded session: the next read works.
       expect(Number((await listingRow(listingId)).ends_ms)).toBe(BASE_MS + 60_000);
+    }, 20_000);
+
+    it('an ASYNC stall (awaited work between queries) still surfaces the 25P03 code', async () => {
+      // The OTHER measured stall shape (the busy-loop test above covers the
+      // event-loop pause): here the transaction AWAITS real async work while
+      // the session sits idle, so the terminated session's SQLSTATE arrives
+      // on the client error event mid-sleep and the NEXT query rejects with
+      // a codeless not-queryable shell. Only withTx's captured async error
+      // carries 25P03, which is what isLockContention (and so every guard's
+      // typed 'contended') keys on; dropping the capture preference reds
+      // exactly this. Driven through the private withTx seam because every
+      // public guard's callback is synchronous by design.
+      const db = marketDb as unknown as {
+        withTx<T>(fn: (client: { query(sql: string): Promise<unknown> }) => Promise<T>): Promise<T>;
+      };
+      let thrown: unknown = null;
+      try {
+        await db.withTx(async (client) => {
+          await client.query(`SET LOCAL idle_in_transaction_session_timeout = 500`);
+          await new Promise((resolve) => setTimeout(resolve, 900));
+          await client.query('SELECT 1');
+        });
+      } catch (err) {
+        thrown = err;
+      }
+      expect(
+        (thrown as { code?: string } | null)?.code,
+        'the captured async 25P03 must win over the codeless shell',
+      ).toBe('25P03');
     }, 20_000);
 
     it('a directed dead lock records nothing at steal time', async () => {
@@ -1242,6 +1291,35 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
           new Promise<'blocked'>((r) => setTimeout(() => r('blocked'), 500)),
         ]);
         expect(verdict).toBe('locked');
+        await client.query('ROLLBACK');
+      } finally {
+        client.release();
+      }
+    }, 20_000);
+
+    it('a cooled-down claim refuses lock-free too, never behind a held row lock', async () => {
+      // The cooldown probes moved into the advisory pass: a cooled-down
+      // account retrying at the rate limit must not take (or wait on) the
+      // listing FOR UPDATE just to be refused, or the proven-abusive caller
+      // is exactly the one granted a lock that blocks bids and the seller
+      // cancel. The committed ledger row makes the advisory answer safe (only
+      // the 30-day retention removes one, far outside every cooldown window).
+      const realm = `lockfree-cooled-${++seq}`;
+      const seller = await seedAccount();
+      const cooled = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      await marketDb.recordBuyNowAbandon(realm, listingId, cooled, BASE_MS - MINUTE_MS);
+      const client = await pool.connect();
+      try {
+        await client.query('BEGIN');
+        await client.query(`SELECT 1 FROM woc_market_listings WHERE id = $1 FOR UPDATE`, [
+          listingId,
+        ]);
+        const verdict = await Promise.race([
+          marketDb.claimBuyNowLock(realm, listingId, cooled, BASE_MS, BASE_MS + 270_000),
+          new Promise<'blocked'>((r) => setTimeout(() => r('blocked'), 500)),
+        ]);
+        expect(verdict).toBe('claim_cooldown');
         await client.query('ROLLBACK');
       } finally {
         client.release();

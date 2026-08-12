@@ -1386,6 +1386,41 @@ describeDb('woc market settlement guards against real Postgres', () => {
     });
   });
 
+  describe('the overdue default pass respects a prior bid resolution', () => {
+    it('never re-labels a suspend-released bid as defaulted (the [won] CAS)', async () => {
+      // The suspend-race shape the default site's comment describes: the
+      // suspend CTE already cancelled the winner with its refund queued, but
+      // the sweep's overdue read selected the settlement before that commit.
+      // Without the ['won'] CAS on markBidStatus (and the ['held'] CAS on
+      // setBondState) the default pass would stamp defaulted/forfeit_due on
+      // top of the resolution and forfeit a bond whose refund is already
+      // owed.
+      const realm = 'guard-default-cas';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const bidder = await seedAccount();
+      const listingId = await seedListing(realm, seller, { status: 'settling' });
+      const releasedBid = await seedBid(realm, listingId, bidder, {
+        status: 'cancelled',
+        bondState: 'refund_due',
+        bondReference: 'guard-default-cas-ref',
+      });
+      await seedSettlement(realm, listingId, buyer, {
+        state: 'offered',
+        bidId: releasedBid,
+        deadlineAtMs: BASE_MS - MINUTE_MS,
+      });
+      await makeService(realm).sweepPass();
+      // The same pass's release arm may legitimately advance refund_due to
+      // refunded (the dev economy releases immediately); the pin is that the
+      // resolution is never OVERWRITTEN: status stays cancelled (the ['won']
+      // CAS) and the bond is never forfeited (the ['held'] CAS).
+      const after = await bidRow(releasedBid);
+      expect(after.status).toBe('cancelled');
+      expect(after.bondState).not.toBe('forfeit_due');
+    }, 20_000);
+  });
+
   describe('administrative expiry releases the settlement winner', () => {
     it('a suspend over a failed close-time settlement cancels its won bid and queues the bond refund', async () => {
       const realm = 'guard-suspend-winner-release';

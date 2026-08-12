@@ -310,6 +310,62 @@ describe('the refusal-to-wire mapping', () => {
     expect(sent(ctx)).toEqual({ status: 200, body: { ok: true } });
   });
 
+  it.each([
+    ['a newline', 'sig\nforged-log-line'],
+    ['a carriage return', 'sig\rback'],
+    ['an ANSI escape', 'sig[31mred'],
+    ['whitespace', 'sig with spaces'],
+  ])('refuses a signature carrying %s on BOTH confirm intakes', async (_label, signature) => {
+    // The recorded signature is interpolated into an ops warn on the
+    // revived-signature path and forwarded to the economy service, so the
+    // intake shape-checks it: anything outside safe printable characters is
+    // a log-forging vector, refused BEFORE any recording (nothing so shaped
+    // can be a broadcast payment; real Solana signatures are base58).
+    service({});
+    const bond = fakeCtx({
+      method: 'POST',
+      url: '/api/woc-market/bids/7/bond',
+      params: { id: '7' },
+      account: { accountId: VIEWER, scope: 'full' },
+      body: { signature },
+    });
+    await expect(handlerFor('POST', '/api/woc-market/bids/:id/bond')(bond)).rejects.toMatchObject({
+      status: 400,
+      code: 'woc_market.invalid_input',
+    });
+    const settle = fakeCtx({
+      method: 'POST',
+      url: '/api/woc-market/settlements/9/confirm',
+      params: { id: '9' },
+      account: { accountId: VIEWER, scope: 'full' },
+      body: { signature },
+    });
+    await expect(
+      handlerFor('POST', '/api/woc-market/settlements/:id/confirm')(settle),
+    ).rejects.toMatchObject({ status: 400, code: 'woc_market.invalid_input' });
+  });
+
+  it('passes a dev-style tagged signature through the shape check', async () => {
+    // The dev economy and the whole test corpus post plain tagged strings
+    // ('sig-my-bond-1'); the shape bound deliberately admits [A-Za-z0-9_-].
+    let seen: string | null = null;
+    service({
+      confirmBond: async (_a: number, _b: number, sig: string) => {
+        seen = sig;
+        return { ok: true, standing: true };
+      },
+    });
+    const ctx = fakeCtx({
+      method: 'POST',
+      url: '/api/woc-market/bids/7/bond',
+      params: { id: '7' },
+      account: { accountId: VIEWER, scope: 'full' },
+      body: { signature: 'sig-my_bond-1' },
+    });
+    await handlerFor('POST', '/api/woc-market/bids/:id/bond')(ctx);
+    expect(seen).toBe('sig-my_bond-1');
+  });
+
   it('the admin suspend handler answers settlement-in-flight as 409, other misses as 404', async () => {
     // 'adminTargetId' is the require_admin middleware's private state key; the
     // literal doubles as a pin on that contract.
@@ -791,5 +847,17 @@ describe('the confirming-review bound env knob', () => {
     expect(wocMarketConfig().confirmingReviewMs).toBe(2 * HOUR_MS);
     process.env[KEY] = '0.5';
     expect(wocMarketConfig().confirmingReviewMs).toBe(30 * 60_000);
+  });
+
+  it('clamps an over-ceiling value to 720 hours instead of disabling the bound', () => {
+    // A huge value silently disables the H15 park (and past to_timestamp's
+    // range it even breaks the sweep arm with 22008), so the knob clamps at
+    // 30 days: the review bound cannot be configured out of existence.
+    process.env[KEY] = '87600';
+    expect(wocMarketConfig().confirmingReviewMs).toBe(720 * HOUR_MS);
+    process.env[KEY] = '720';
+    expect(wocMarketConfig().confirmingReviewMs).toBe(720 * HOUR_MS);
+    process.env[KEY] = '719';
+    expect(wocMarketConfig().confirmingReviewMs).toBe(719 * HOUR_MS);
   });
 });

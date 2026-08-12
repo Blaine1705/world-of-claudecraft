@@ -1808,20 +1808,41 @@ export class FakeWocMarketDb implements WocMarketDb {
     realm: string,
     nowMs: number,
     limit: number,
-    confirmingCutoffMs: number,
   ): Promise<WocSettlementRow[]> {
-    // Mirrors the real predicate's two arms: deadline-overdue offered/failed,
-    // plus 'confirming' aged on updated_at (the touch mirror) past the H15
-    // cutoff.
+    // Mirrors the real single-arm predicate: deadline-overdue offered/failed
+    // only (the H15 confirming bound is the sibling read below, its own arm
+    // so a confirming backlog cannot own this batch head).
     return [...this.settlements.values()]
       .filter(
         (s) =>
           s.realm === realm &&
-          (((s.state === 'offered' || s.state === 'failed') && s.deadlineAtMs <= nowMs) ||
-            (s.state === 'confirming' &&
-              (this.settlementTouchMs.get(s.id) ?? 0) <= confirmingCutoffMs)),
+          (s.state === 'offered' || s.state === 'failed') &&
+          s.deadlineAtMs <= nowMs,
       )
       .sort((a, b) => a.deadlineAtMs - b.deadlineAtMs || a.id - b.id)
+      .slice(0, limit)
+      .map((s) => this.settlementOut(s));
+  }
+
+  async confirmingOverdueSettlements(
+    realm: string,
+    cutoffMs: number,
+    limit: number,
+  ): Promise<WocSettlementRow[]> {
+    // 'confirming' aged on updated_at (the touch mirror) past the H15
+    // cutoff, oldest first (the Pg ORDER BY updated_at mirror).
+    return [...this.settlements.values()]
+      .filter(
+        (s) =>
+          s.realm === realm &&
+          s.state === 'confirming' &&
+          (this.settlementTouchMs.get(s.id) ?? 0) <= cutoffMs,
+      )
+      .sort(
+        (a, b) =>
+          (this.settlementTouchMs.get(a.id) ?? 0) - (this.settlementTouchMs.get(b.id) ?? 0) ||
+          a.id - b.id,
+      )
       .slice(0, limit)
       .map((s) => this.settlementOut(s));
   }

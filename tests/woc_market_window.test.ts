@@ -171,17 +171,22 @@ describe('woc_market_window: i18n and escaping discipline', () => {
   it('gives the review settlement state its OWN label, never the offered default', () => {
     // The default arm renders 'Payment due': serving that for a parked
     // 'review' row would invite a second payment for money that may already
-    // have landed on chain.
-    expect(code).toContain("case 'review':");
-    expect(code).toContain("'hudChrome.wocMarket.settlementReview'");
+    // have landed on chain. ASSOCIATIVE: the label must sit inside the
+    // review arm itself, so a mis-wired case keeping both tokens elsewhere
+    // still reds.
+    const arm = code.indexOf("case 'review':");
+    expect(arm, "anchor missing: case 'review':").toBeGreaterThanOrEqual(0);
+    expect(code.slice(arm, arm + 200)).toContain("'hudChrome.wocMarket.settlementReview'");
   });
 
   it('toasts the cancel-pending outcome distinctly from a completed cancel', () => {
     // The seller's cancel on a locked window is ACCEPTED as intent; telling
     // them "Listing cancelled" while it stays live until the buyer's window
-    // resolves would be a lie about custody.
-    expect(code).toContain("'hudChrome.wocMarket.listingCancelPending'");
-    expect(code).toContain('out.cancelPending === true');
+    // resolves would be a lie about custody. ASSOCIATIVE: the toast key must
+    // sit inside the cancelPending branch.
+    const arm = code.indexOf('out.cancelPending === true');
+    expect(arm, 'anchor missing: out.cancelPending === true').toBeGreaterThanOrEqual(0);
+    expect(code.slice(arm, arm + 300)).toContain("'hudChrome.wocMarket.listingCancelPending'");
   });
 
   it('never writes a plain string literal via textContent or setAttribute(aria-label)', () => {

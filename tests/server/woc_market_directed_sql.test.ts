@@ -419,7 +419,7 @@ describe('the settlement guards ship their DDL (structural floor)', () => {
     expect(paidProbe).toContain(`state IN (${open.filter((s) => s !== "'offered'").join(', ')})`);
     expect(sql().some((t) => t.includes('SET LOCAL lock_timeout'))).toBe(true);
     expect(
-      sql().some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout = 500')),
+      sql().some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout = 2000')),
     ).toBe(true);
   });
 
@@ -770,15 +770,30 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
     expect(text, 'a signed bond may be riding real money').toContain('bond_signature IS NULL');
   });
 
-  it('overdueSettlements carries BOTH arms: the deadline and the confirming bound', async () => {
+  it('overdueSettlements is single-arm; the H15 bound rides its own sibling read', async () => {
+    // The two arms are SEPARATE reads by ruling: sharing one batch let a
+    // confirming backlog (oldest deadlines by construction) own the batch
+    // head and starve the offered/failed expiry work behind it, and the OR
+    // lost the ordered-index pushdown for both.
     const { pool, sql, params } = recordingPool();
-    await new PgWocMarketDb(pool).overdueSettlements(REALM, 2_000, 25, 1_000);
+    await new PgWocMarketDb(pool).overdueSettlements(REALM, 2_000, 25);
     const [text] = sql();
     expect(text).toContain("state IN ('offered', 'failed') AND deadline_at <= to_timestamp($2");
+    expect(text, 'the confirming arm must NOT share this batch').not.toContain("'confirming'");
+    expect(params()[0]).toEqual([REALM, 2_000, 25]);
+  });
+
+  it('confirmingOverdueSettlements ages on updated_at with its own budget', async () => {
+    const { pool, sql, params } = recordingPool();
+    await new PgWocMarketDb(pool).confirmingOverdueSettlements(REALM, 1_000, 25);
+    const [text] = sql();
     expect(text, 'the H15 arm ages confirming on updated_at').toContain(
-      "state = 'confirming' AND updated_at <= to_timestamp($4",
+      "state = 'confirming' AND updated_at <= to_timestamp($2",
     );
-    expect(params()[0]).toEqual([REALM, 2_000, 25, 1_000]);
+    expect(text, 'ordered on the age axis so the oldest park first').toContain(
+      'ORDER BY updated_at',
+    );
+    expect(params()[0]).toEqual([REALM, 1_000, 25]);
   });
 
   it('confirmingBonds rotates on poll_parked_at and honors the backoff exclusion', async () => {
@@ -904,10 +919,11 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
             : undefined,
     );
     await new PgWocMarketDb(claim.pool).claimBuyNowLock(REALM, 7, 3, 1_000, 2_000);
-    // The literal 500 pins GUARD_IDLE_TX_TIMEOUT_MS itself: a retune must be
+    // The literal 2000 pins GUARD_IDLE_TX_TIMEOUT_MS itself (equal to
+    // ESCROW_LOCK_TIMEOUT_MS by ruling: one story for both bounds): a retune must be
     // a deliberate edit here, not a silent constant change.
     expect(
-      claim.sql().some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout = 500')),
+      claim.sql().some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout = 2000')),
       'claimBuyNowLock',
     ).toBe(true);
     const extend = recordingTxPool((text) =>
@@ -917,13 +933,15 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
     );
     await new PgWocMarketDb(extend.pool).extendAuctionForBondProgress(REALM, 7, () => null);
     expect(
-      extend.sql().some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout = 500')),
+      extend.sql().some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout = 2000')),
       'extendAuctionForBondProgress',
     ).toBe(true);
     const converge = recordingTxPool();
     await new PgWocMarketDb(converge.pool).closeCancelPendingListing(REALM, 7, 1_000);
     expect(
-      converge.sql().some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout = 500')),
+      converge
+        .sql()
+        .some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout = 2000')),
       'closeCancelPendingListing',
     ).toBe(true);
   });
@@ -972,7 +990,11 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
                 : undefined,
     );
     await new PgWocMarketDb(viaSteal.pool).claimBuyNowLock(REALM, 7, 3, 1_000, 2_000);
-    const stealText = viaSteal.sql().find((t) => t.includes('woc_market_buy_now_abandons'));
+    // Find the INSERT specifically: the advisory pass now runs the two
+    // cooldown SELECTs over the same table before the transaction opens.
+    const stealText = viaSteal
+      .sql()
+      .find((t) => t.includes('INSERT INTO woc_market_buy_now_abandons'));
     expect(stealText, 'the steal arm records through the same statement').toBe(recorderText);
   });
 
@@ -991,11 +1013,12 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
     const { WOC_MARKET_CONFIRM_UNAVAILABLE_REASON } = await import('../../server/woc_market_rules');
     expect(WOC_MARKET_CONFIRM_UNAVAILABLE_REASON).toBe('service_unavailable');
     const { readFileSync } = await import('node:fs');
-    const proxy = readFileSync(
-      new URL('../../server/woc_market_proxy.ts', import.meta.url),
-      'utf8',
+    const { stripComments } = await import('../helpers/strip_comments');
+    const proxy = stripComments(
+      readFileSync(new URL('../../server/woc_market_proxy.ts', import.meta.url), 'utf8'),
     );
-    // The confirm arm references the shared constant, not its own literal.
+    // The confirm arm references the shared constant, not its own literal
+    // (comment-stripped, so a commented-out copy cannot satisfy the pin).
     expect(proxy).toContain(
       'return { settled: false, pending: true, reason: WOC_MARKET_CONFIRM_UNAVAILABLE_REASON }',
     );

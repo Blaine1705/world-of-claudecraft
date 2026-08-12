@@ -42,6 +42,7 @@ import {
   WOC_MARKET_ANTI_SNIPE_EXTENSION_SECONDS,
   WOC_MARKET_ANTI_SNIPE_WINDOW_SECONDS,
   WOC_MARKET_BOND_PENDING_TTL_SECONDS,
+  WOC_MARKET_BOND_POLL_PARK_SECONDS,
   WOC_MARKET_BUY_NOW_LOCK_SECONDS,
   WOC_MARKET_MAX_ACTIVE_LISTINGS,
   WOC_MARKET_QUOTE_TTL_SECONDS,
@@ -1035,6 +1036,55 @@ describe('placeBid', () => {
     expect(bid.bondState).toBe('pending');
   });
 
+  it('a CAS-lost abandon re-reads for the truthful refusal', async () => {
+    // abandonPendingBid re-checks status AND signature inside the UPDATE;
+    // when it reports no row, the pre-write reads were stale and the service
+    // must answer from a FRESH read (a signature landed: confirm_in_flight),
+    // never from the stale one (which had no signature and would misreport).
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const realAbandon = h.db.abandonPendingBid.bind(h.db);
+    h.db.abandonPendingBid = async (realm: string, bidId: number, account: number) => {
+      // The race: a signature lands between the service's read and its write.
+      await h.db.submitBondSignature(bidId, 'sig-raced-in', h.now());
+      return realAbandon(realm, bidId, account);
+    };
+    expect(await h.service.abandonBid(BUYER_A, placed.bid.id)).toEqual({
+      ok: false,
+      reason: 'confirm_in_flight',
+    });
+    const bid = await getBid(h, placed.bid.id);
+    expect(bid.status).toBe('pending_bond');
+    expect(bid.bondSignature).toBe('sig-raced-in');
+  });
+
+  it('a placed bid whose quote CAS loses the insert race answers contended', async () => {
+    // placeBid writes the bond reference with the same setBidBondQuote CAS;
+    // a false return on a brand-new bid means it somehow left pending_bond
+    // already, and the caller must hear a retryable contention, not a
+    // success carrying a reference that was never written.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    h.db.setBidBondQuote = async () => false;
+    expect(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+    ).toEqual({ ok: false, reason: 'contended' });
+  });
+
   it('refuses insufficient_balance when the wallet cannot cover bid plus bond', async () => {
     const h = makeHarness();
     const listing = await listEpic(h);
@@ -1386,6 +1436,105 @@ describe('confirmBond', () => {
     expect(confirmed.standing).toBe(true);
     expect((await getBid(h, rebid.bid.id)).bondState).toBe('held');
     expect((await getListing(h, listing.id)).currentBidId).toBe(rebid.bid.id);
+  });
+
+  it('refreshBondQuote stands an unpaid bid on a fresh reference, end to end', async () => {
+    // The SUCCESS arm: the refusal arms above prove what a refresh must not
+    // touch, this proves the refresh actually re-references an unpaid quote
+    // (a refreshBondQuote that wrote nothing, or answered quote_unavailable
+    // unconditionally, would fail here and nowhere else).
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const refreshed = unwrap(
+      await h.service.refreshBondQuote(BUYER_A, placed.bid.id),
+      'refreshBondQuote',
+    );
+    expect(refreshed.bond.reference).not.toBe(placed.bond.reference);
+    expect((await getBid(h, placed.bid.id)).bondReference).toBe(refreshed.bond.reference);
+    // And the refreshed reference is payable: the confirm holds and stands.
+    const confirmed = unwrap(
+      await h.service.confirmBond(BUYER_A, placed.bid.id, 'sig-refreshed-ref'),
+      'confirmBond',
+    );
+    expect(confirmed.standing).toBe(true);
+    expect((await getBid(h, placed.bid.id)).bondState).toBe('held');
+  });
+
+  it('a CAS-lost refresh answers confirm_in_flight, never a false success', async () => {
+    // The setBidBondQuote compare-and-set is the atomic arm behind the
+    // signature-read above; when it reports no row (a signature landed in the
+    // race window) the service must re-read for the truthful refusal instead
+    // of standing the bid on a reference it never wrote.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    h.db.setBidBondQuote = async () => false;
+    expect(await h.service.refreshBondQuote(BUYER_A, placed.bid.id)).toEqual({
+      ok: false,
+      reason: 'confirm_in_flight',
+    });
+    expect((await getBid(h, placed.bid.id)).bondReference).toBe(placed.bond.reference);
+  });
+
+  it('a replay of the recorded signature on an OUTBID bid answers standing false', async () => {
+    // The third outcome arm (active/won are covered above): a superseded
+    // bidder whose confirm response was swallowed retries and must hear the
+    // OUTCOME (outbid, refund queued), never not_pending's "bid gone".
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const low = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    unwrap(await h.service.confirmBond(BUYER_A, low.bid.id, 'sig-low-outbid'), 'confirmBond');
+    const high = unwrap(
+      await placeBid(h, {
+        account: BUYER_B,
+        characterId: CHAR_B,
+        listingId: listing.id,
+        amountCents: 6000,
+      }),
+      'placeBid',
+    );
+    unwrap(await h.service.confirmBond(BUYER_B, high.bid.id, 'sig-high-outbid'), 'confirmBond');
+    expect((await getBid(h, low.bid.id)).status).toBe('outbid');
+    const replay = unwrap(
+      await h.service.confirmBond(BUYER_A, low.bid.id, 'sig-low-outbid'),
+      'confirmBond',
+    );
+    expect(replay.standing).toBe(false);
+    expect(replay.pending).toBeUndefined();
+    // No churn: the demotion and its queued refund survive the replay...
+    const after = await getBid(h, low.bid.id);
+    expect(after.status).toBe('outbid');
+    expect(after.bondState).toBe('refund_due');
+    // ...and a DIFFERENT signature gets no outcome (the negative arm).
+    expect(await h.service.confirmBond(BUYER_A, low.bid.id, 'sig-someone-elses')).toEqual({
+      ok: false,
+      reason: 'not_pending',
+    });
   });
 
   it('answers a same-signature replay after activation as idempotent success, with no churn', async () => {
@@ -1811,6 +1960,33 @@ describe('buy-now claim cooldown', () => {
     // the griefer's one-request bypass.
     expect(await play('refused')).toBe(1);
   });
+
+  it('the exemption also requires a recorded signature, not the reason alone', async () => {
+    // The tx_signature IS NOT NULL conjunct: an exempt-reason row WITHOUT a
+    // recorded signature proves nothing about money in flight, so the window
+    // still records. Dropping the conjunct would widen the exemption to any
+    // failure the service labels service_unavailable, signature or not.
+    const h = makeHarness();
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+    const bought = unwrap(
+      await h.service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    await h.db.transitionSettlement(
+      bought.settlement.id,
+      ['offered'],
+      'failed',
+      'service_unavailable',
+    );
+    h.setNow(bought.settlement.deadlineAtMs + 1);
+    await h.service.sweepPass();
+    expect(h.db.buyNowAbandons.length, 'no signature, no exemption').toBe(1);
+  });
 });
 
 describe('sweep close', () => {
@@ -1975,6 +2151,53 @@ describe('a bond payment awaiting finality', () => {
     const bid = await getBid(h, placed.bid.id);
     expect(bid.status, 'the bid stays alive to be resolved').toBe('pending_bond');
     expect(bid.bondSignature, 'with the signature kept for the re-check').toBe('sig-bond-pending');
+  });
+
+  it('parks an undecided bond past the poll delay and skips it while backing off', async () => {
+    // DB-free mirror of the pg park proof (the CI floor runs without
+    // TEST_DATABASE_URL): the poll keeps full cadence while the bond is
+    // young, rotates it to the tail once its SIGNATURE age passes the park
+    // delay, and the in-process backoff then excludes it from the next
+    // pass's batch read entirely. Confirm-call counting is the observable:
+    // one ask per pass while unparked, none while backing off.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    let confirms = 0;
+    const svc = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        confirm: async () => {
+          confirms++;
+          return { settled: false, pending: true, reason: 'awaiting_finality' };
+        },
+      },
+    });
+    unwrap(await svc.confirmBond(BUYER_A, placed.bid.id, 'sig-park-me'), 'confirmBond');
+    expect(confirms).toBe(1);
+    // Young bond: the next pass still polls it (no park below the delay).
+    await svc.sweepPass();
+    expect(confirms).toBe(2);
+    // Past the park delay (aged on the signature recording): this pass still
+    // polls it (the verdict could have landed), then parks it.
+    h.setNow(h.now() + WOC_MARKET_BOND_POLL_PARK_SECONDS * 1000 + 1);
+    await svc.sweepPass();
+    expect(confirms).toBe(3);
+    // Backing off: the batch read excludes it, so the chain is not asked.
+    await svc.sweepPass();
+    expect(confirms).toBe(3);
+    const bid = await getBid(h, placed.bid.id);
+    expect(bid.status, 'still with the poll, never voided').toBe('pending_bond');
+    expect(bid.bondState).toBe('pending');
   });
 
   it('activates the bid once the sweep sees the chain decide', async () => {
@@ -2158,7 +2381,7 @@ describe('settlement happy path', () => {
 });
 
 describe('settlement quote expiry and signature reuse', () => {
-  it('refuses quote_expired when the settlement quote died inside a still-live window', async () => {
+  it('answers confirm_failed for a dead quote, recording quote_expired as the fail reason', async () => {
     const h = makeHarness();
     const listing = await listEpic(h);
     const standing = await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);

@@ -73,16 +73,34 @@ const MAX_BROWSE_PAGE = 400;
  *  outage the poll self-heals; much longer re-creates the unbounded hold the
  *  bound exists to close (the escrowed item sits stuck for its whole life). */
 const WOC_MARKET_CONFIRMING_REVIEW_HOURS_DEFAULT = 6;
+/** The upper clamp: 30 days. Above this the H15 bound is disabled in
+ *  practice, and an absurd value even breaks it mechanically (nowMs minus
+ *  the bound goes so far negative that to_timestamp raises 22008 and the
+ *  error-isolated sweep arm silently stops parking). An operator who wants
+ *  the review park off has WOC_MARKET_ENABLED=0; a longer legitimate bound
+ *  than 720 hours has no operational story. */
+const WOC_MARKET_CONFIRMING_REVIEW_HOURS_MAX = 720;
+let confirmingReviewClampWarned = false;
 
 /** Positive-hours env knob. Guarded against the empty-string trap
  *  (Number('') is 0, which would silently turn the bound off by making every
  *  confirming row instantly overdue) and against non-finite or non-positive
- *  values, all of which fall back to the default. */
+ *  values, all of which fall back to the default; values above the clamp are
+ *  clamped with a one-time operator warning (dev channel). */
 function confirmingReviewMsFromEnv(): number {
   const raw = process.env.WOC_MARKET_CONFIRMING_REVIEW_HOURS;
   const hours = raw !== undefined && raw.trim() !== '' ? Number(raw) : Number.NaN;
   const safe =
     Number.isFinite(hours) && hours > 0 ? hours : WOC_MARKET_CONFIRMING_REVIEW_HOURS_DEFAULT;
+  if (safe > WOC_MARKET_CONFIRMING_REVIEW_HOURS_MAX) {
+    if (!confirmingReviewClampWarned) {
+      confirmingReviewClampWarned = true;
+      console.warn(
+        `WOC_MARKET_CONFIRMING_REVIEW_HOURS=${safe} exceeds the ${WOC_MARKET_CONFIRMING_REVIEW_HOURS_MAX}h clamp; using ${WOC_MARKET_CONFIRMING_REVIEW_HOURS_MAX}h (the review bound cannot be effectively disabled by configuration)`,
+      );
+    }
+    return WOC_MARKET_CONFIRMING_REVIEW_HOURS_MAX * 3600 * 1000;
+  }
   return safe * 3600 * 1000;
 }
 
@@ -232,6 +250,19 @@ function bodyOf(ctx: Ctx): Record<string, unknown> {
 function stringField(value: unknown, maxLen: number): string {
   if (typeof value !== 'string' || value.length === 0 || value.length > maxLen) invalid();
   return value as string;
+}
+
+/** A submitted transaction signature. Real Solana signatures are base58
+ *  (87-88 chars); the shape bound is looser (the dev economy and its tests
+ *  post plain tagged strings) but refuses anything outside safe printable
+ *  characters: the recorded value is interpolated into an ops warn on the
+ *  revived-signature path and forwarded to the economy service, so a
+ *  newline or ANSI escape smuggled through here is a log-forging vector. */
+const SIGNATURE_SHAPE = /^[A-Za-z0-9_-]{1,256}$/;
+function signatureField(value: unknown): string {
+  const sig = stringField(value, 256);
+  if (!SIGNATURE_SHAPE.test(sig)) invalid();
+  return sig;
 }
 
 function optionalString(value: unknown, maxLen: number): string | null {
@@ -526,7 +557,7 @@ async function confirmBondHandler(ctx: Ctx): Promise<void> {
   const out = await useService().confirmBond(
     ctxAccountId(ctx),
     idParam(ctx),
-    stringField(body.signature, 256),
+    signatureField(body.signature),
   );
   if (!out.ok) throwRefusal(out.reason);
   // `pending` is the honest third answer: paid, but the chain has not decided.
@@ -560,7 +591,7 @@ async function confirmSettlementHandler(ctx: Ctx): Promise<void> {
   const out = await useService().confirmSettlement(
     ctxAccountId(ctx),
     idParam(ctx),
-    stringField(body.signature, 256),
+    signatureField(body.signature),
   );
   if (!out.ok) throwRefusal(out.reason);
   json(ctx.res, 200, { state: out.state });
