@@ -139,6 +139,15 @@ applied):
   disagreeing in opposite directions). MEDIUM: the extension gate failed
   open on the proxy's pending+service_unavailable arm during outages; now
   gated on the shared reason constant.
+- migration-safety (dispatched over the final DDL, the one lane qa-checklist
+  flagged had never seen the schema): PASS, no critical or warning, verified
+  live against real Postgres 16 (constraint name, NOT VALID, once-per-DB
+  gate, create-before-drop ordering, the index rename converging from all
+  three historical shapes reproduced end to end, the repair's
+  planned-but-never-executed one-time filter). Four INFOs; two folded to
+  owners (the overdueSettlements pushdown loss at scale -> 16/17; the
+  rollback stranding of review/cancel-pending rows -> the phase 22 runbook),
+  two restated standing constraints (unbatched repair, convalidated=false).
 - Database round 3 (the lane's own verification of the 25P03 fix): PASS,
   no open findings across the whole chain. Both stall shapes (async await
   and a blocked event loop) measured returning the typed 'contended'

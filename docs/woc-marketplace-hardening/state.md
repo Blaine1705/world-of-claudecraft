@@ -637,10 +637,33 @@ Still open (a phase that hits one asks at session start):
     the teardown carve-outs, the bond/lock statements, both prunes and the
     new DDL. Fourteen mutation spot-proofs bit post-commit (eight on the
     implement round, six on the review-fix round).
+  - Migration-safety verdict (verified live vs Postgres 16, no critical or
+    warning): all DDL additive/idempotent; the 'review' CHECK evolves NOT
+    VALID once per legacy DB (constraint name woc_market_settlements_state_check
+    confirmed auto-named and under the 63-byte limit); the open->open2 swap
+    never gaps uniqueness (single boot transaction, superset predicate); the
+    _cancel_rotation rename converges from all three historical shapes
+    (reproduced the in-place-redefinition failure and the fix); every new
+    predicate index-covered; the exempt-list parameterization closed the one
+    runtime interpolation. TWO actionable INFOs folded to owners: (a) the
+    overdueSettlements OR arm loses the ordered-index/LIMIT pushdown, so a
+    LARGE confirming backlog plans a seq scan + top-N per sweep pass (minute
+    cadence, self-draining into review; a UNION ALL of the two arms restores
+    the pushdown if it ever grows in prod: phases 16/17 EXPLAIN list). (b)
+    ROLLBACK runbook (phase 22): an OLD binary against the new schema fails
+    CLOSED but strands 'review' rows (no transition path; a second settlement
+    takes a raw 23505 from open2, safe-direction no-double-sell, surfaces as
+    internal.error until re-upgrade) and resumes taking lock claims/bids on a
+    cancel_requested_at listing (nothing destroyed). Standing constraints
+    restated: the boot repair is unbatched (safe only pre-enable-empty; the
+    first populated-table repair must batch), and the widened CHECK stays
+    convalidated=false on legacy DBs (cosmetic; an operator may VALIDATE
+    CONSTRAINT out of band).
   - Handoffs: phase 06 (directed rail) inherits the cancel-intent seams and
     the directed exemptions; phase 09 executes review/stuck-bond resolutions
     (releaser CAS is the prerequisite for ANY automatic bond exit); phases
-    16/17 EXPLAIN list gains the overdueSettlements OR arm, the two new
+    16/17 EXPLAIN list gains the overdueSettlements OR arm (and the UNION ALL
+    rewrite option above), the two new
     readout classes, and the claimBuyNowLock ledger reads; phase 12 owns the
     env docs sweep (the two new knobs are already in .env.example); phase 21
     exercises review resolution end to end; phase 22 runbook owes the
