@@ -8950,6 +8950,8 @@ export const zh_TW: EnTranslations = {
       "quantity": "數量",
       "quantityOf": "共 {count}",
       "priceEach": "單價",
+      "lowestPriceLabel": "目前最低上架價格",
+      "lowestPriceNone": "此物品目前沒有在售的上架。",
       "listButton": "上架到世界市場",
       "minPriceError": "價格至少為 1 銅幣。",
       "collectEmpty": "沒有待領取內容。銷售收益和過期上架會在這裡領取。",

@@ -10189,6 +10189,8 @@ export type TranslationKeyFlat =
   | 'itemUi.market.filterWeaponType'
   | 'itemUi.market.filters'
   | 'itemUi.market.listButton'
+  | 'itemUi.market.lowestPriceLabel'
+  | 'itemUi.market.lowestPriceNone'
   | 'itemUi.market.merchantStock'
   | 'itemUi.market.minPriceError'
   | 'itemUi.market.noMerchant'

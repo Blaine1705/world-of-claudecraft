@@ -1508,3 +1508,111 @@ describe('purgeMarketSeller - deleting a character', () => {
     expect(collectionsOf(sim).has('Seller')).toBe(true);
   });
 });
+
+// Issue #3043: the Sell tab shows the item's current lowest active listing price
+// (per unit, matching the "price each" field the player is about to fill in) so
+// they never have to leave the sell flow to check Browse first. The staged item
+// is echoed back alongside the price so a stale snapshot across an item switch
+// never shows a price that no longer belongs to what is on screen.
+describe('sell-tab lowest listing price reference (issue #3043)', () => {
+  it('echoes nothing checked and no price when nothing has been staged yet', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+
+    const info = marketInfo(sim, viewer);
+    expect(info.sellPriceItemId).toBeNull();
+    expect(info.sellLowestPrice).toBeNull();
+  });
+
+  it('reports the lowest PER-UNIT price across multiple stacks, not the lowest stack total', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, viewer);
+    sim.addItem('healing_potion', 8, seller);
+    // 400cp for a stack of 4 is 100cp/unit; 150cp for a single is 150cp/unit.
+    // The single's TOTAL is lower, but its per-unit price is not: the reference
+    // must compare per-unit, matching the "price each" field the player fills in.
+    sim.marketList('healing_potion', 4, 400, seller);
+    sim.marketList('healing_potion', 4, 600, seller);
+    sim.addItem('healing_potion', 1, seller);
+    sim.marketList('healing_potion', 1, 150, seller);
+
+    sim.marketSellPriceCheck('healing_potion', viewer);
+    const info = marketInfo(sim, viewer);
+    expect(info.sellPriceItemId).toBe('healing_potion');
+    expect(info.sellLowestPrice).toBe(100);
+  });
+
+  it('reports null when the checked item has no active listings', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+
+    sim.marketSellPriceCheck('wolf_fang', viewer);
+    const info = marketInfo(sim, viewer);
+    expect(info.sellPriceItemId).toBe('wolf_fang');
+    expect(info.sellLowestPrice).toBeNull();
+  });
+
+  it('refuses an unknown item id: the echo clears rather than naming a bogus item', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+
+    sim.marketSellPriceCheck('not_a_real_item_id', viewer);
+    const info = marketInfo(sim, viewer);
+    expect(info.sellPriceItemId).toBeNull();
+    expect(info.sellLowestPrice).toBeNull();
+  });
+
+  it('clearing the check (null) clears the echoed item and price', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, viewer);
+    sim.addItem('wolf_fang', 1, seller);
+    sim.marketList('wolf_fang', 1, 100, seller);
+
+    sim.marketSellPriceCheck('wolf_fang', viewer);
+    expect(marketInfo(sim, viewer).sellPriceItemId).toBe('wolf_fang');
+
+    sim.marketSellPriceCheck(null, viewer);
+    const info = marketInfo(sim, viewer);
+    expect(info.sellPriceItemId).toBeNull();
+    expect(info.sellLowestPrice).toBeNull();
+  });
+
+  it('a house-stock row counts as real active supply for the reference price', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+    const houseRow = sim.marketListings.find((l) => l.house);
+    if (!houseRow) throw new Error('expected at least one seeded house listing');
+
+    sim.marketSellPriceCheck(houseRow.itemId, viewer);
+    const info = marketInfo(sim, viewer);
+    expect(info.sellLowestPrice).toBe(Math.round(houseRow.price / houseRow.count));
+  });
+
+  it('does not require standing at the Merchant to set the check (a display/query narrowing, like marketSearch)', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, seller);
+    sim.addItem('wolf_fang', 1, seller);
+    sim.marketList('wolf_fang', 1, 100, seller);
+    teleport(sim, viewer, 0, 0); // far from the Merchant
+
+    sim.marketSellPriceCheck('wolf_fang', viewer);
+    expect(sim.marketInfoFor(viewer)).toBeNull(); // no snapshot while away, same as marketSearch
+
+    standAtMerchant(sim, viewer);
+    const info = marketInfo(sim, viewer);
+    expect(info.sellPriceItemId).toBe('wolf_fang');
+    expect(info.sellLowestPrice).toBe(100);
+  });
+});

@@ -8950,6 +8950,8 @@ export const en: EnTranslations = {
       "quantity": "Quantity",
       "quantityOf": "of {count}",
       "priceEach": "Price each",
+      "lowestPriceLabel": "Current lowest listed price",
+      "lowestPriceNone": "No active listings for this item yet.",
       "listButton": "List on the World Market",
       "minPriceError": "Name a price of at least 1 copper.",
       "collectEmpty": "Nothing waiting. Sale proceeds and expired listings collect here.",

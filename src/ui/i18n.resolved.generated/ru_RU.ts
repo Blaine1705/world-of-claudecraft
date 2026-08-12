@@ -8950,6 +8950,8 @@ export const ru_RU: EnTranslations = {
       "quantity": "Количество",
       "quantityOf": "из {count}",
       "priceEach": "Цена за штуку",
+      "lowestPriceLabel": "Текущая минимальная цена лота",
+      "lowestPriceNone": "Активных лотов на этот предмет пока нет.",
       "listButton": "Выставить на мировой рынок",
       "minPriceError": "Назовите цену не меньше 1 меди.",
       "collectEmpty": "Ничего не ждет. Выручка и истекшие лоты собираются здесь.",

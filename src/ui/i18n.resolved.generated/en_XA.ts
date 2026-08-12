@@ -8950,6 +8950,8 @@ export const en_XA: EnTranslations = {
       "quantity": "[Ɋúáñţíţý]",
       "quantityOf": "[óƒ {count}]",
       "priceEach": "[Þŕíçé éáçĥ]",
+      "lowestPriceLabel": "[Çúŕŕéñţ ļóŵéšţ ļíšţéð þŕíçé]",
+      "lowestPriceNone": "[Ñó áçţíʋé ļíšţíñĝš ƒóŕ ţĥíš íţéɱ ýéţ.]",
       "listButton": "[Ļíšţ óñ ţĥé Ŵóŕļð Ɱáŕķéţ]",
       "minPriceError": "[Ñáɱé á þŕíçé óƒ áţ ļéášţ 1 çóþþéŕ.]",
       "collectEmpty": "[Ñóţĥíñĝ ŵáíţíñĝ. Šáļé þŕóçééðš áñð éẋþíŕéð ļíšţíñĝš çóļļéçţ ĥéŕé.]",

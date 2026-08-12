@@ -8950,6 +8950,8 @@ export const vi_VN: EnTranslations = {
       "quantity": "Số lượng",
       "quantityOf": "trong {count}",
       "priceEach": "Giá mỗi món",
+      "lowestPriceLabel": "Current lowest listed price",
+      "lowestPriceNone": "No active listings for this item yet.",
       "listButton": "Rao bán trên Chợ Thế Giới",
       "minPriceError": "Hãy đặt giá ít nhất 1 đồng.",
       "collectEmpty": "Không có gì đang chờ. Tiền bán và mặt hàng hết hạn sẽ được thu về tại đây.",

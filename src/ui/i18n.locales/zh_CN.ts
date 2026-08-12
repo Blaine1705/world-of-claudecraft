@@ -2621,6 +2621,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.quantity': '数量',
   'itemUi.market.quantityOf': '共 {count}',
   'itemUi.market.priceEach': '单价',
+  'itemUi.market.lowestPriceLabel': '当前最低上架价格',
+  'itemUi.market.lowestPriceNone': '该物品目前没有在售的上架。',
   'itemUi.market.listButton': '上架到世界市场',
   'itemUi.market.minPriceError': '价格至少为 1 铜币。',
   'itemUi.market.collectEmpty': '没有待领取内容。销售收益和过期上架会在这里领取。',
