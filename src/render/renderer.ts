@@ -4002,12 +4002,7 @@ export class Renderer {
     this.pumpVisibleZonePrepareQueue();
   }
 
-  /**
-   * Thin consumer of zone_eviction_core.ts's zonesEligibleForEviction; see
-   * that module's header for the full rationale (why this exists, the
-   * player-vs-camera anchor, and why prewarmedZonePrograms stays untouched).
-   * No-op on unconstrained hosts (desktop/Android).
-   */
+  // Thin consumer of zone_eviction_core.ts's zonesEligibleForEviction; no-op on unconstrained hosts.
   private evictFarZoneIfConstrained(currentZoneId: string, playerX: number, playerZ: number): void {
     if (!GFX.constrainedMemory) return;
     const zoneId = zonesEligibleForEviction(
