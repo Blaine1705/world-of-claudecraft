@@ -54,6 +54,7 @@ import {
 import type { PickAction } from '../src/sim/lockpick';
 import { lootHasGoneFfa } from '../src/sim/loot/loot_ffa';
 import { type MarketQuery, sanitizeMarketQuery } from '../src/sim/market_query';
+import { CHEATER_MARK_AURA_ID } from '../src/sim/moderation';
 import { parseMoveInputFrame } from '../src/sim/move_input';
 import {
   partyFrameAbsorb,
@@ -272,7 +273,6 @@ import {
   resetMobScanCaptureAccumulators,
 } from './mob_scan_tick_stats';
 import { parseModerationChatCommand } from './moderation_commands';
-import { CHEATER_MARK_AURA_ID } from '../src/sim/moderation';
 import {
   accountCheaterMarkSeconds,
   burnAccountCheaterMark,
@@ -3190,10 +3190,7 @@ export class GameServer {
    * at apply/restore and is what makes the LAST write, the one that zeroes the
    * row, still happen after the aura has gone.
    */
-  private async persistCheaterMark(
-    session: ClientSession,
-    e: Entity | undefined,
-  ): Promise<void> {
+  private async persistCheaterMark(session: ClientSession, e: Entity | undefined): Promise<void> {
     if (!session.cheaterMarked) return;
     const live = e?.auras.find((a) => a.id === CHEATER_MARK_AURA_ID);
     const remaining = Math.max(0, Math.floor(live?.remaining ?? 0));
