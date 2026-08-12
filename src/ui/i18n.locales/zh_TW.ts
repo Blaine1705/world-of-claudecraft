@@ -12663,7 +12663,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorialGreeting.bellHomeNote':
     '這麼快就從海濱回來了？你剛才敲響的正是渡船鈴。它的孿生兄弟就掛在那邊鴉郵信箱旁：想回試煉之濱，隨時敲響它，渡航就會送你過去。敲錯了也不打緊。',
   'hudChrome.tutorialGreeting.islandArrivalNote':
-    '剛下渡船嗎？歡迎來到試煉之濱。教官瑪倫在我身後這條路盡頭的晨憩營地主持操練：她想先跟你說上幾句。等你準備離開時，敲響我碼頭盡頭的這口鈴，渡航就會送你回東溪鎮。',
+    '剛下渡船嗎？歡迎來到試煉之濱。教官瑪倫在我身後這條路盡頭的晨憩營地主持操練。走到她跟前，直到她的名字顯示出來，然後按 F，或用滑鼠左鍵點擊她，就能與她交談：她會交給你第一件差事。等你準備離開時，敲響立在我碼頭旁的那口鈴，渡航就會送你回東溪鎮。',
   'hudChrome.tutorialGreeting.noteClose': '明白了',
   'entities.items.ps_castaway_crate.name': '漂流貨箱',
   'entities.items.ps_ferry_bell.name': '渡船鈴',
@@ -12684,46 +12684,40 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.ferryman_odo.name': '渡船人奧多',
   'entities.npcs.ferryman_odo.title': '渡口看守',
   'entities.npcs.ferryman_odo.greeting':
-    '剛下渡船嗎，{playerName}？那就沿著岸邊的路往上走：教官瑪倫在晨憩營地主持操練，她想先跟你說上幾句。等谷地召喚你回去時，敲響我碼頭盡頭的鈴，渡航會把你送到東溪鎮上。',
+    '剛下渡船嗎，{playerName}？那就沿著岸邊的路往上走：教官瑪倫在晨憩營地主持操練。走到她跟前，按 F，或用滑鼠左鍵點擊她，她就會交給你第一件差事。等谷地召喚你回去時，敲響立在我碼頭旁的那口鈴，渡航會把你送到東溪鎮上。',
   'entities.npcs.bursar_wick.name': '司庫威克',
   'entities.npcs.bursar_wick.title': '鍍金保險箱',
   'entities.npcs.bursar_wick.greeting':
     '鍍金保險箱連這裡也設了一張桌子，{playerName}。凡是存到我這裡的東西，都躺在每座城鎮每位司庫身後的同一座金庫裡，狼咬不著，水泡不著，連你自己的糊塗決定也碰不著。',
   'entities.quests.q_ps_strike_true.title': '擊中要害',
   'entities.quests.q_ps_strike_true.text':
-    '歡迎來到試煉之濱，{playerName}。這裡的每一課都從同一件事開始：站穩腳，握好刃。營地西南練武場上的草人生來就是挨打的。挑一個，站穩，砍到三個散架為止。它們的還擊不痛不癢。這片海濱之外的東西下手可重得多。',
+    '歡迎來到試煉之濱，{playerName}。這裡的每一課都從同一件事開始：站穩腳，握好刃。以 W、A、S、D 行走，按住滑鼠右鍵轉動視角。營地西南練武場上的草人生來就是挨打的：走到一個草人跟前，按 Tab 或用滑鼠左鍵點擊它，把它設為目標。接著按 1，或點擊畫面底部動作列上的第一個圖示，揮出這一刀。一直打到三個散架為止。它們的還擊不痛不癢。這片海濱之外的東西下手可重得多。',
   'entities.quests.q_ps_strike_true.completion':
-    '三個倒下，你的手也穩多了。記住這種感覺，{playerName}：站穩腳，抬起眼，全力揮出。谷地的狼比稻草快，但同樣的算術也能放倒牠們。',
+    '三個倒下，你的手也穩多了。記住這種感覺，{playerName}：選定目標，揮出一刀，然後一直打下去。谷地的狼比稻草快，但同樣的算術也能放倒牠們。',
   'entities.quests.q_ps_strike_true.objectives.0.label': '擊倒訓練草人',
   'entities.quests.q_ps_the_wreck_line.title': '沉船灘',
   'entities.quests.q_ps_the_wreck_line.text':
-    '潮水用海貨支付這座島：舊沉船上的漂流貨箱，被沖上面向谷地的那片海灘。翻揀它們的掠蟹夾起人來比看上去疼，所以腳下留神。撬開三只貨箱，把大海留給我們的東西帶回來。',
+    '潮水用海貨支付這座島：舊沉船上的漂流貨箱，被沖上營地東南、面向谷地的那片海灘。開箱很簡單，{playerName}。走到貨箱跟前，直到它的名字顯示出來，然後按 F，或用滑鼠左鍵點擊貨箱本身，它就會把裡面的東西交出來。開三只就夠了。翻揀殘骸的掠蟹夾起人來比看上去疼，所以腳下留神；另外記住，你今後遇到的每一只箱子、每一處採集點、每一道門扉，用的都是同一個 F 鍵。',
   'entities.quests.q_ps_the_wreck_line.completion':
-    '繩子、焦油，還有半輪大海竟然放過的乳酪。世上到處都是值得彎腰去撿的東西，{playerName}。保持這個習慣：看見，打開，拿走。',
+    '繩子、焦油，還有半輪大海竟然放過的乳酪。世上到處都是值得彎腰去撿的東西，{playerName}。保持這個習慣：走近，按 F，拿走屬於你的東西。',
   'entities.quests.q_ps_the_wreck_line.objectives.0.label': '開啟漂流貨箱',
-  'entities.quests.q_ps_a_path_of_your_own.title': '專屬之路',
-  'entities.quests.q_ps_a_path_of_your_own.text':
-    '揮劍是一回事，{playerName}，明白為什麼而揮又是另一回事。到了五級，世界會請你選擇一門專精：你這行當的三條道路之一，各有所長。從那以後，每隔幾級就會開啟一排天賦，一排三選一。再擊倒兩個草人，趁稻草飛揚的時候，想想你要走哪一條路。',
-  'entities.quests.q_ps_a_path_of_your_own.completion':
-    '又倒下兩個，揮砍背後也多了幾分沉穩。最要緊的是記住這一點，{playerName}：你的任何選擇都不是牢籠。天賦面板隨時可以打開；等你在五級做出選擇之後，只要站在安全的地方，天賦和專精都可以隨時重置、重新選擇，分文不取。大膽去選，學到了新東西就再選一次。',
-  'entities.quests.q_ps_a_path_of_your_own.objectives.0.label': '擊倒訓練草人',
   'entities.quests.q_ps_the_wheel_of_trades.title': '百業環輪',
   'entities.quests.q_ps_the_wheel_of_trades.text':
-    '一柄劍只能餵飽你一頓，{playerName}，一門手藝卻能餵養你一生。每個冒險者在刀劍之外都操持著專業：採礦、伐木、採藥、釣魚，還有把這一切變成價值的製作技藝。軍需官芬奇擺過的攤子比我帶過的操練還多。去問問她，一門手藝是怎麼立起來的。',
+    '一柄劍只能餵飽你一頓，{playerName}，一門手藝卻能餵養你一生。每個冒險者在刀劍之外都操持著專業：採礦、伐木、採藥、釣魚，還有把這一切變成價值的製作技藝。軍需官芬奇的貨攤就在我這操練場幾步之外，而她擺過的攤子比我帶過的操練還多。走到她跟前，按 F，或用滑鼠左鍵點擊她，就能與她交談：開箱子的那個鍵，同樣也開啟對話。',
   'entities.quests.q_ps_the_wheel_of_trades.completion':
     '瑪倫總算給我送來一個值得費口舌的學生。聽好了，{playerName}，只說一遍：採集從一件工具開始，礦鎬、斧子、鐮刀、釣竿，谷地的商人那裡都有得賣。你的技藝構成一個環輪：鑽研你喜歡的那些，當你調諧到相鄰的一對，這兩門便成為無上限的主修，環輪對面的一門是你的嗜好，其餘的則休眠，直到你重新拾起。你學會的東西永遠不會失去，等你準備好了，城鎮裡的技藝大師會向你提供調諧。',
   'entities.quests.q_ps_the_wheel_of_trades.objectives.0.label': '向軍需官芬奇請教百業',
   'entities.quests.q_ps_pouch_and_purse.title': '錢囊與背袋',
   'entities.quests.q_ps_pouch_and_purse.text':
-    '去谷地之前還有最後一課，{playerName}，也是保住冒險者性命的一課：你隨身帶的東西。你的背包有十六格，旁邊還空著四個袋扣；每繫上一只袋子，它的空間就併入總容量。去軍需官芬奇那裡買一只亞麻小袋，把它繫上，然後回來找我。',
+    '去谷地之前還有最後一課，{playerName}，也是保住冒險者性命的一課：你隨身帶的東西。你的背包有十六格，旁邊還空著四個袋扣；每繫上一只袋子，它的空間就併入總容量。所以：對著軍需官芬奇按 F，打開她的貨攤，在她的貨品裡用滑鼠左鍵點擊亞麻小袋買下它，然後按 B 打開背包，再用滑鼠左鍵點擊袋中的亞麻小袋，把它繫進一個空著的袋扣。等它掛上腰帶，就回來找我。',
   'entities.quests.q_ps_pouch_and_purse.completion':
     '好袋子，又多出六格用來裝麻煩。接下來是任何袋子都裝不下的另一半課，{playerName}：背不下的，交給鍍金保險箱。我身後桌前的司庫威克，為你打開的正是每座城鎮每位司庫共用的同一座金庫，等你的錢袋鼓起來，還能購買更多金庫空間。貴重的存進金庫，袋子留出空當。塞滿的行囊斷送過的冒險，比任何狼都多。',
   'entities.quests.q_ps_pouch_and_purse.objectives.0.label': '購買亞麻小袋',
   'entities.quests.q_ps_set_sail.title': '揚帆起航',
   'entities.quests.q_ps_set_sail.text':
-    '這片海濱上已經沒有你沒打倒過、沒打開過、沒買下過的東西了，{playerName}。你準備好了，而東溪谷有真正的差事在等著。走到舊碼頭去，告訴渡船人奧多，就說是我說的，你掙到了這趟航程。',
+    '這片海濱上已經沒有你沒打倒過、沒打開過、沒買下過的東西了，{playerName}。你準備好了，而東溪谷有真正的差事在等著。沿路走到舊碼頭，對著渡船人奧多按 F，告訴他，就說是我說的，你掙到了這趟航程。什麼時候記不清自己欠了誰什麼，隨時按 L：那是你的任務日誌。',
   'entities.quests.q_ps_set_sail.completion':
-    '瑪倫這麼說了？能從一個曾讓我練了一星期繫纜繩的女人嘴裡說出來，這可是極高的評價。等你準備好了就敲響我碼頭盡頭的鈴，{playerName}，渡航會把你送到東溪鎮的正中央。當心狼群。',
+    '瑪倫這麼說了？能從一個曾讓我練了一星期繫纜繩的女人嘴裡說出來，這可是極高的評價。等你準備好了就敲響立在我碼頭旁的那口鈴，{playerName}，渡航會把你送到東溪鎮的正中央。當心狼群。',
   'entities.quests.q_ps_set_sail.objectives.0.label': '向渡船人奧多報到',
   'entities.zones.proving_shore.name': '試煉之濱',
   'entities.zones.proving_shore.welcome':

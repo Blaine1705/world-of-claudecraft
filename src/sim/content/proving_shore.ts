@@ -5,9 +5,9 @@
 // characters are offered passage here by Wayfarer Bryn at the Eastbrook
 // spawn (the tutorial greeting dialog, src/sim/tutorial/greeting.ts); the
 // island itself is a training camp: an on-rails quest chain that teaches
-// fighting, looting, then the three mechanics lessons (talents and
-// specialization, the professions wheel, the bank and bag slots, each
-// explained in dialogue with its facts mirrored from the sim), pays enough
+// fighting, looting, then the two mechanics lessons (the professions wheel,
+// the bank and bag slots, each explained in dialogue with its facts mirrored
+// from the sim, and each naming the literal key or click it needs), pays enough
 // copper to buy the bank lesson's Linen Pouch mid-chain AND the full tier-1
 // gathering tool set at the vale's own counters after (the island vendor
 // deliberately stocks NO professions tools, the R37 rule
@@ -166,7 +166,6 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     questIds: [
       'q_ps_strike_true',
       'q_ps_the_wreck_line',
-      'q_ps_a_path_of_your_own',
       'q_ps_the_wheel_of_trades',
       'q_ps_pouch_and_purse',
       'q_ps_set_sail',
@@ -218,7 +217,7 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     color: 0x4a6a8a,
     questIds: ['q_ps_set_sail'],
     greeting:
-      'Fresh off the crossing, $N? Then up the shore road with you: Instructor Maren keeps the drills at Dawnrest Camp, and she will want a word before anything else. When the vale calls you back, ring the bell at the end of my pier and the crossing will set you down in Eastbrook town.',
+      'Fresh off the crossing, $N? Then up the shore road with you: Instructor Maren keeps the drills at Dawnrest Camp. Walk up close to her and press F, or left-click her, and she will set you your first task. When the vale calls you back, ring the bell standing beside my pier and the crossing will set you down in Eastbrook town.',
   },
 };
 
@@ -228,14 +227,14 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     name: 'Strike True',
     giverNpcId: 'instructor_maren',
     turnInNpcId: 'instructor_maren',
-    text: 'Welcome to the Proving Shore, $N. Every lesson here starts the same way: feet set, blade in hand. The effigies on the practice yard southwest of camp were built to be hit. Pick one, square up, and strike until three of them give out. Their blows barely sting. The things beyond this shore hit far harder.',
+    text: 'Welcome to the Proving Shore, $N. Every lesson here starts the same way: feet set, blade in hand. Walk with W, A, S and D, and steer your view by holding the right mouse button. The effigies on the practice yard southwest of camp were built to be hit: walk up to one and press Tab, or left-click it, to make it your target. Then press 1, or click the first icon on the action bar along the bottom of your screen, to swing. Keep striking until three of them give out. Their blows barely sting. The things beyond this shore hit far harder.',
     completionText:
-      'Three down, and your grip already surer. Remember the feel of it, $N: feet set, eyes up, swing whole. The vale wolves are faster than straw, but they fall to the same arithmetic.',
+      'Three down, and your grip already surer. Remember the feel of it, $N: target, strike, and keep striking. The vale wolves are faster than straw, but they fall to the same arithmetic.',
     objectives: [
       { type: 'kill', targetMobId: 'training_effigy', count: 3, label: 'Training Effigy felled' },
     ],
     xpReward: 0,
-    copperReward: 40,
+    copperReward: 60,
     itemRewards: {},
   },
   q_ps_the_wreck_line: {
@@ -243,9 +242,9 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     name: 'The Wreck Line',
     giverNpcId: 'instructor_maren',
     turnInNpcId: 'instructor_maren',
-    text: 'The tide pays this island in salvage: castaway crates off old wrecks, washed up along the strand that faces the vale. The scuttlers that pick over them pinch harder than they look, so mind your step. Crack open three crates and bring me whatever the sea left us.',
+    text: 'The tide pays this island in salvage: castaway crates off old wrecks, washed up along the strand southeast of camp, on the shore that faces the vale. Opening one is simple, $N. Walk right up to a crate until its name shows, then press F, or left-click the crate itself, and it will give up what it holds. Three of them will do. The scuttlers that pick over the wrack pinch harder than they look, so mind your step, and remember F is the same key for every chest, node and doorway you will ever meet.',
     completionText:
-      'Rope, tar, and half a wheel of cheese the sea somehow spared. The world is full of things worth stooping for, $N. Keep the habit: look, open, take.',
+      'Rope, tar, and half a wheel of cheese the sea somehow spared. The world is full of things worth stooping for, $N. Keep the habit: walk close, press F, take what is yours.',
     objectives: [
       {
         type: 'interact',
@@ -255,31 +254,9 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
       },
     ],
     xpReward: 0,
-    copperReward: 50,
+    copperReward: 80,
     itemRewards: {},
     requiresQuest: 'q_ps_strike_true',
-  },
-  // The talents and specialization lesson. Facts mirrored from the sim
-  // (content/talents.ts): specialization unlocks at level 5 (SPEC_UNLOCK_LEVEL,
-  // one of three per class), talent rows open at levels 5, 8, 11, 14, 17, and
-  // 20 with three choices each (ROW_LEVELS/OPTIONS_PER_ROW), and both the
-  // rows and the specialization can be reset or changed later at no cost
-  // (progression/talents.ts respecTalents/setTalentSpec).
-  q_ps_a_path_of_your_own: {
-    id: 'q_ps_a_path_of_your_own',
-    name: 'A Path of Your Own',
-    giverNpcId: 'instructor_maren',
-    turnInNpcId: 'instructor_maren',
-    text: 'Swinging a blade is one thing, $N. Knowing why you swing it is another. At your fifth level the world will ask you to choose a specialization: one of three paths for your calling, each with its own strengths. From then on, every few levels opens a row of talents, three choices wide, and you take one. Fell two more effigies, and while the straw flies, think on the path you mean to walk.',
-    completionText:
-      'Two more down, and something steadier behind the swing. Remember this above all, $N: nothing you choose is a cage. Open your talents whenever you like, and once you have chosen at five, both your talents and your specialization can be reset and rechosen any time you stand somewhere safe, at no cost. Choose boldly, and choose again whenever you learn better.',
-    objectives: [
-      { type: 'kill', targetMobId: 'training_effigy', count: 2, label: 'Training Effigy felled' },
-    ],
-    xpReward: 0,
-    copperReward: 70,
-    itemRewards: {},
-    requiresQuest: 'q_ps_the_wreck_line',
   },
   // The professions lesson. Facts mirrored from Professions 2.0 (the craft
   // wheel and attunement: src/sim/professions/, and the tier tutorial copy in
@@ -291,7 +268,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     name: 'The Wheel of Trades',
     giverNpcId: 'instructor_maren',
     turnInNpcId: 'quartermaster_finch',
-    text: 'A blade feeds you once, $N. A trade feeds you for life. Every adventurer works professions beside the sword: mining, logging, herb-picking, fishing, and the crafts that turn all of it into worth. Quartermaster Finch has kept more stalls than I have run drills. Go and ask her how a trade is built.',
+    text: 'A blade feeds you once, $N. A trade feeds you for life. Every adventurer works professions beside the sword: mining, logging, herb-picking, fishing, and the crafts that turn all of it into worth. Quartermaster Finch keeps the stall a few steps from my drill ground, and she has kept more of them than I have run drills. Walk up to her and press F, or left-click her, to talk: the same key that opens a crate opens a conversation.',
     completionText:
       'So Maren finally sends me a student worth the breath. Listen once, $N: gathering starts with a tool, a pick, an axe, a sickle, a pole, all sold at the vale traders. Your crafts sit on a wheel: work the ones you love, and when you attune to a neighbouring pair, those two become your uncapped majors, one craft across the wheel stays your hobby, and the rest sleep until you take them up again. Nothing you learn is ever lost, and the craft masters in the towns offer attunement when you are ready.',
     objectives: [
@@ -303,9 +280,9 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
       },
     ],
     xpReward: 0,
-    copperReward: 100,
+    copperReward: 120,
     itemRewards: {},
-    requiresQuest: 'q_ps_a_path_of_your_own',
+    requiresQuest: 'q_ps_the_wreck_line',
   },
   // The bank and bags lesson. Facts mirrored from the sim: the implicit
   // 16-slot backpack plus four bag sockets pooling capacity (BAG_SOCKETS,
@@ -323,7 +300,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     name: 'Pouch and Purse',
     giverNpcId: 'instructor_maren',
     turnInNpcId: 'instructor_maren',
-    text: 'One more lesson before the vale, $N, and it is the one that keeps adventurers alive: what you carry. Your backpack holds sixteen slots, and beside it wait four empty bag loops; every bag you buckle on adds its own space to the pool. Buy a Linen Pouch from Quartermaster Finch, buckle it on, and come back to me.',
+    text: 'One more lesson before the vale, $N, and it is the one that keeps adventurers alive: what you carry. Your backpack holds sixteen slots, and beside it wait four empty bag loops; every bag you buckle on adds its own space to the pool. So: press F on Quartermaster Finch to open her stall, left-click the Linen Pouch in her wares to buy it, then press B to open your bags and left-click the pouch there to buckle it into a free loop. Come back to me when it is on your belt.',
     completionText:
       'A fine pouch, and six more slots to fill with trouble. Now the half of the lesson no bag can hold, $N: what you cannot carry, the Gilded Strongbox keeps. Bursar Wick at the desk behind me opens the same vault every bursar in every town shares, and more vault space can be bought once your purse grows into it. Keep your valuables banked and your bags roomy. A full pack has ended more adventures than any wolf ever did.',
     objectives: [{ type: 'collect', itemId: 'linen_pouch', count: 1, label: 'Linen Pouch bought' }],
@@ -337,9 +314,9 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     name: 'Set Sail',
     giverNpcId: 'instructor_maren',
     turnInNpcId: 'ferryman_odo',
-    text: 'There is nothing left on this shore you have not already beaten, opened, or bought, $N. You are ready, and Eastbrook has real work waiting. Walk down to the Old Pier and tell Ferryman Odo I said you have earned your crossing.',
+    text: 'There is nothing left on this shore you have not already beaten, opened, or bought, $N. You are ready, and Eastbrook has real work waiting. Walk down the road to the Old Pier, press F on Ferryman Odo, and tell him I said you have earned your crossing. Press L any time you lose track of what you owe whom: that is your quest log.',
     completionText:
-      'Maren said that, did she? High praise from a woman who once made me practice mooring knots for a week. Ring the bell at the end of my pier whenever you are ready, $N, and the crossing will set you down in the middle of Eastbrook town. Mind the wolves.',
+      'Maren said that, did she? High praise from a woman who once made me practice mooring knots for a week. Ring the bell standing beside my pier whenever you are ready, $N, and the crossing will set you down in the middle of Eastbrook town. Mind the wolves.',
     objectives: [
       { type: 'interact', targetNpcId: 'ferryman_odo', count: 1, label: 'Report to Ferryman Odo' },
     ],
@@ -351,12 +328,12 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
 };
 
 // Strict chain order: the shore is on rails by design. Combat, then looting,
-// then the three mechanics lessons (talents, professions, bank and bags),
-// then the crossing home.
+// then the two mechanics lessons (professions, bank and bags), then the
+// crossing home. Every step's text names the exact key or click it needs, so
+// a player who has never held a mouse for this genre is never guessing.
 export const PROVING_SHORE_QUEST_ORDER: string[] = [
   'q_ps_strike_true',
   'q_ps_the_wreck_line',
-  'q_ps_a_path_of_your_own',
   'q_ps_the_wheel_of_trades',
   'q_ps_pouch_and_purse',
   'q_ps_set_sail',
@@ -409,11 +386,16 @@ export const PROVING_SHORE_OBJECTS: GroundObjectDef[] = [
     name: 'Ferry Bell',
     // The clicked crossing (interactions/ferry_bell.ts): the Old Pier's bell
     // rings a player to Eastbrook town, and its twin INSIDE town (beside the
-    // Ravenpost mailbox at (0, -7.5), clear of its posting spot) rings a
+    // Ravenpost mailbox at (0, -7.5), on its far side from the road) rings a
     // returning player back to the island arrival.
+    //
+    // The island bell stands NORTH of the pier head, not on it: the dock at
+    // (-271, 0) rot 1.4 runs its three plank sections out to about
+    // (-276, -1) (dock_layout.ts DOCK_SECTION_LOCAL_Z), so the old (-274, 0)
+    // spot planted the bell frame in the middle of the walkway.
     positions: [
-      { x: -274, z: 0 },
-      { x: -3, z: -7.5 },
+      { x: -274, z: 6 },
+      { x: 3, z: -7.5 },
     ],
   },
 ];

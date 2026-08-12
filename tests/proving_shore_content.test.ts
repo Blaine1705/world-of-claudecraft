@@ -130,13 +130,12 @@ describe('proving shore placement', () => {
     expect(beforeLesson).toBeGreaterThanOrEqual(pouch);
   });
 
-  it('the three mechanics lessons sit on the rail between looting and the crossing', () => {
-    // The rework's contract: talents/specialization, then professions, then
-    // bank-and-bags, all AFTER the two doing-lessons and BEFORE Set Sail.
+  it('the two mechanics lessons sit on the rail between looting and the crossing', () => {
+    // The rework's contract: professions, then bank-and-bags, both AFTER the
+    // two doing-lessons and BEFORE Set Sail.
     expect(PROVING_SHORE_QUEST_ORDER).toEqual([
       'q_ps_strike_true',
       'q_ps_the_wreck_line',
-      'q_ps_a_path_of_your_own',
       'q_ps_the_wheel_of_trades',
       'q_ps_pouch_and_purse',
       'q_ps_set_sail',

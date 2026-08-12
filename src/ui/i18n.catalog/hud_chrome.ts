@@ -595,7 +595,7 @@ export const hudChromeStrings = {
     // Ferryman Odo's island welcome, shown once per device on the first
     // arrival: the greeting ferry lands beside his pier.
     islandArrivalNote:
-      'Fresh off the crossing? Welcome to the Proving Shore. Instructor Maren keeps the drills up at Dawnrest Camp, along the road behind me: she will want a word before anything else. And when you are ready to leave, ring the bell here at the end of my pier and the crossing will carry you home to Eastbrook.',
+      'Fresh off the crossing? Welcome to the Proving Shore. Instructor Maren keeps the drills up at Dawnrest Camp, along the road behind me. Walk right up to her until her name shows, then press F, or left-click her, to talk: she will set you your first task. And when you are ready to leave, ring the bell standing beside my pier and the crossing will carry you home to Eastbrook.',
     noteClose: 'Understood',
   },
   // New-adventurer tutorial copy for the touch interface. The default tutorial

@@ -31,7 +31,10 @@ const browser = await puppeteer.launch({
 const page = await browser.newPage();
 page.on('pageerror', (e) => console.log('PAGEERR', e.message));
 
-await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
+// Generous navigation budget: the first load after an i18n or wiki regen
+// makes Vite re-transform the whole module graph, which outruns puppeteer's
+// 30s default on a cold dev server.
+await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 120_000 });
 // A fresh profile every run, so the greeting one-shot always fires.
 await page.evaluate(() => localStorage.clear());
 // Generous boot budget: under SwiftShader (software GL) plus a cold Vite

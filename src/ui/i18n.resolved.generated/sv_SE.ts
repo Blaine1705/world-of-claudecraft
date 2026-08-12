@@ -874,7 +874,7 @@ export const sv_SE: EnTranslations = {
       "skip": "Skip the tutorial",
       "declineNote": "As you like, friend. Should you ever change your mind, the ferry bell by the Ravenpost mailbox rings you across to the Proving Shore any time, day or night. It will still be here when the wolves are not.",
       "bellHomeNote": "Back from the shore already? That was the ferry bell you rang. Its twin hangs just there by the Ravenpost mailbox: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.",
-      "islandArrivalNote": "Fresh off the crossing? Welcome to the Proving Shore. Instructor Maren keeps the drills up at Dawnrest Camp, along the road behind me: she will want a word before anything else. And when you are ready to leave, ring the bell here at the end of my pier and the crossing will carry you home to Eastbrook.",
+      "islandArrivalNote": "Fresh off the crossing? Welcome to the Proving Shore. Instructor Maren keeps the drills up at Dawnrest Camp, along the road behind me. Walk right up to her until her name shows, then press F, or left-click her, to talk: she will set you your first task. And when you are ready to leave, ring the bell standing beside my pier and the crossing will carry you home to Eastbrook.",
       "noteClose": "Understood"
     },
     "tutorial": {
@@ -14180,7 +14180,7 @@ export const sv_SE: EnTranslations = {
       "ferryman_odo": {
         "name": "Ferryman Odo",
         "title": "Keeper of the Crossing",
-        "greeting": "Fresh off the crossing, {playerName}? Then up the shore road with you: Instructor Maren keeps the drills at Dawnrest Camp, and she will want a word before anything else. When the vale calls you back, ring the bell at the end of my pier and the crossing will set you down in Eastbrook town."
+        "greeting": "Fresh off the crossing, {playerName}? Then up the shore road with you: Instructor Maren keeps the drills at Dawnrest Camp. Walk up close to her and press F, or left-click her, and she will set you your first task. When the vale calls you back, ring the bell standing beside my pier and the crossing will set you down in Eastbrook town."
       },
       "bursar_wick": {
         "name": "Bursar Wick",
@@ -16155,8 +16155,8 @@ export const sv_SE: EnTranslations = {
       },
       "q_ps_strike_true": {
         "title": "Strike True",
-        "text": "Welcome to the Proving Shore, {playerName}. Every lesson here starts the same way: feet set, blade in hand. The effigies on the practice yard southwest of camp were built to be hit. Pick one, square up, and strike until three of them give out. Their blows barely sting. The things beyond this shore hit far harder.",
-        "completion": "Three down, and your grip already surer. Remember the feel of it, {playerName}: feet set, eyes up, swing whole. The vale wolves are faster than straw, but they fall to the same arithmetic.",
+        "text": "Welcome to the Proving Shore, {playerName}. Every lesson here starts the same way: feet set, blade in hand. Walk with W, A, S and D, and steer your view by holding the right mouse button. The effigies on the practice yard southwest of camp were built to be hit: walk up to one and press Tab, or left-click it, to make it your target. Then press 1, or click the first icon on the action bar along the bottom of your screen, to swing. Keep striking until three of them give out. Their blows barely sting. The things beyond this shore hit far harder.",
+        "completion": "Three down, and your grip already surer. Remember the feel of it, {playerName}: target, strike, and keep striking. The vale wolves are faster than straw, but they fall to the same arithmetic.",
         "objectives": {
           "0": {
             "label": "Training Effigy felled"
@@ -16165,27 +16165,17 @@ export const sv_SE: EnTranslations = {
       },
       "q_ps_the_wreck_line": {
         "title": "The Wreck Line",
-        "text": "The tide pays this island in salvage: castaway crates off old wrecks, washed up along the strand that faces the vale. The scuttlers that pick over them pinch harder than they look, so mind your step. Crack open three crates and bring me whatever the sea left us.",
-        "completion": "Rope, tar, and half a wheel of cheese the sea somehow spared. The world is full of things worth stooping for, {playerName}. Keep the habit: look, open, take.",
+        "text": "The tide pays this island in salvage: castaway crates off old wrecks, washed up along the strand southeast of camp, on the shore that faces the vale. Opening one is simple, {playerName}. Walk right up to a crate until its name shows, then press F, or left-click the crate itself, and it will give up what it holds. Three of them will do. The scuttlers that pick over the wrack pinch harder than they look, so mind your step, and remember F is the same key for every chest, node and doorway you will ever meet.",
+        "completion": "Rope, tar, and half a wheel of cheese the sea somehow spared. The world is full of things worth stooping for, {playerName}. Keep the habit: walk close, press F, take what is yours.",
         "objectives": {
           "0": {
             "label": "Castaway Crate opened"
           }
         }
       },
-      "q_ps_a_path_of_your_own": {
-        "title": "A Path of Your Own",
-        "text": "Swinging a blade is one thing, {playerName}. Knowing why you swing it is another. At your fifth level the world will ask you to choose a specialization: one of three paths for your calling, each with its own strengths. From then on, every few levels opens a row of talents, three choices wide, and you take one. Fell two more effigies, and while the straw flies, think on the path you mean to walk.",
-        "completion": "Two more down, and something steadier behind the swing. Remember this above all, {playerName}: nothing you choose is a cage. Open your talents whenever you like, and once you have chosen at five, both your talents and your specialization can be reset and rechosen any time you stand somewhere safe, at no cost. Choose boldly, and choose again whenever you learn better.",
-        "objectives": {
-          "0": {
-            "label": "Training Effigy felled"
-          }
-        }
-      },
       "q_ps_the_wheel_of_trades": {
         "title": "The Wheel of Trades",
-        "text": "A blade feeds you once, {playerName}. A trade feeds you for life. Every adventurer works professions beside the sword: mining, logging, herb-picking, fishing, and the crafts that turn all of it into worth. Quartermaster Finch has kept more stalls than I have run drills. Go and ask her how a trade is built.",
+        "text": "A blade feeds you once, {playerName}. A trade feeds you for life. Every adventurer works professions beside the sword: mining, logging, herb-picking, fishing, and the crafts that turn all of it into worth. Quartermaster Finch keeps the stall a few steps from my drill ground, and she has kept more of them than I have run drills. Walk up to her and press F, or left-click her, to talk: the same key that opens a crate opens a conversation.",
         "completion": "So Maren finally sends me a student worth the breath. Listen once, {playerName}: gathering starts with a tool, a pick, an axe, a sickle, a pole, all sold at the vale traders. Your crafts sit on a wheel: work the ones you love, and when you attune to a neighbouring pair, those two become your uncapped majors, one craft across the wheel stays your hobby, and the rest sleep until you take them up again. Nothing you learn is ever lost, and the craft masters in the towns offer attunement when you are ready.",
         "objectives": {
           "0": {
@@ -16195,7 +16185,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_ps_pouch_and_purse": {
         "title": "Pouch and Purse",
-        "text": "One more lesson before the vale, {playerName}, and it is the one that keeps adventurers alive: what you carry. Your backpack holds sixteen slots, and beside it wait four empty bag loops; every bag you buckle on adds its own space to the pool. Buy a Linen Pouch from Quartermaster Finch, buckle it on, and come back to me.",
+        "text": "One more lesson before the vale, {playerName}, and it is the one that keeps adventurers alive: what you carry. Your backpack holds sixteen slots, and beside it wait four empty bag loops; every bag you buckle on adds its own space to the pool. So: press F on Quartermaster Finch to open her stall, left-click the Linen Pouch in her wares to buy it, then press B to open your bags and left-click the pouch there to buckle it into a free loop. Come back to me when it is on your belt.",
         "completion": "A fine pouch, and six more slots to fill with trouble. Now the half of the lesson no bag can hold, {playerName}: what you cannot carry, the Gilded Strongbox keeps. Bursar Wick at the desk behind me opens the same vault every bursar in every town shares, and more vault space can be bought once your purse grows into it. Keep your valuables banked and your bags roomy. A full pack has ended more adventures than any wolf ever did.",
         "objectives": {
           "0": {
@@ -16205,8 +16195,8 @@ export const sv_SE: EnTranslations = {
       },
       "q_ps_set_sail": {
         "title": "Set Sail",
-        "text": "There is nothing left on this shore you have not already beaten, opened, or bought, {playerName}. You are ready, and Eastbrook has real work waiting. Walk down to the Old Pier and tell Ferryman Odo I said you have earned your crossing.",
-        "completion": "Maren said that, did she? High praise from a woman who once made me practice mooring knots for a week. Ring the bell at the end of my pier whenever you are ready, {playerName}, and the crossing will set you down in the middle of Eastbrook town. Mind the wolves.",
+        "text": "There is nothing left on this shore you have not already beaten, opened, or bought, {playerName}. You are ready, and Eastbrook has real work waiting. Walk down the road to the Old Pier, press F on Ferryman Odo, and tell him I said you have earned your crossing. Press L any time you lose track of what you owe whom: that is your quest log.",
+        "completion": "Maren said that, did she? High praise from a woman who once made me practice mooring knots for a week. Ring the bell standing beside my pier whenever you are ready, {playerName}, and the crossing will set you down in the middle of Eastbrook town. Mind the wolves.",
         "objectives": {
           "0": {
             "label": "Report to Ferryman Odo"
