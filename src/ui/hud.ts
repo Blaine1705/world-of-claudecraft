@@ -25,13 +25,12 @@ import {
   type PreviewFramingName,
 } from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
-import { mechHeldWeaponOverride, skinCount } from '../render/characters/manifest';
+import { mechHeldWeaponOverride } from '../render/characters/manifest';
 import type { ModularLook } from '../render/characters/modular';
 import {
   onPortraitsReady,
   onPortraitUpdate,
   playerPortraitDataUrl,
-  prewarmPlayerPortrait,
 } from '../render/characters/portrait';
 import { currentDayNightPhase } from '../render/day_night_clock';
 import { globalDayness, skyTintForDayness } from '../render/day_night_core';
@@ -113,7 +112,6 @@ import type {
 } from '../sim/types';
 import {
   type AbilityEffect,
-  ALL_CLASSES,
   type AuraKind,
   CONSUME_DURATION,
   CRAFT_CAST_ID,
@@ -619,11 +617,11 @@ import {
 } from './player_tooltip_view';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import {
-  buildPostEntryPreviewPrewarmUnits,
   type PreviewPrewarmHandle,
   type PreviewPrewarmUnit,
   runPreviewPrewarmSchedule,
 } from './preview_prewarm_core';
+import { buildHudPreviewPrewarmUnits } from './preview_prewarm_wiring';
 import { procAuraConsumeSelfNoteText, procAuraGainSelfNoteText } from './proc_fct_notes';
 import { buildProcOverlay } from './proc_overlay_dom';
 import { attachOverlayDrag } from './proc_overlay_drag';
@@ -16651,15 +16649,11 @@ export class Hud {
     this.charWindow.renderIfOpen();
   }
 
-  /** The ordered post-entry preview prewarm plan; the plan itself is the pure
-   *  buildPostEntryPreviewPrewarmUnits (preview_prewarm_core.ts), composed
-   *  here with the real preview thunks. `includeCharFamily` is forwarded
-   *  verbatim; see its doc on `PreviewPrewarmPlanDeps`. */
+  /** The ordered post-entry preview prewarm plan; the composition lives in
+   *  preview_prewarm_wiring.ts, and the Hud supplies only its own thunks. */
   private postEntryPreviewPrewarmUnits(includeCharFamily: boolean): PreviewPrewarmUnit[] {
-    return buildPostEntryPreviewPrewarmUnits<(typeof CARD_POSES)[number]>({
+    return buildHudPreviewPrewarmUnits<(typeof CARD_POSES)[number]>({
       playerClass: this.sim.cfg.playerClass,
-      allClasses: ALL_CLASSES,
-      skinCount,
       cardPoses: CARD_POSES,
       armorySkinIds: this.dailyRewardsWindow.armoryPrewarmSkinIds(),
       includeCharFamily,
@@ -16668,11 +16662,6 @@ export class Hud {
       },
       prewarmCharSkin: (skin) => this.charPreview?.prewarm([skin]),
       prewarmCardPose: (pose) => this.charPreview?.prewarmCloseupPoses([pose]),
-      // The prewarm variant, not the sync playerPortraitDataUrl: uploads are
-      // prepaid in bounded slices and the PNG encode runs off-thread, so the
-      // paced unit never books the 43 to 201 ms cold-capture block.
-      renderPortrait: (portraitClass, skin, framing) =>
-        prewarmPlayerPortrait(portraitClass as PlayerClass, skin, framing),
       prewarmArmorySkin: (skinId, armoryMode) =>
         this.dailyRewardsWindow.prewarmArmoryPreviewSkins([skinId], [armoryMode], {
           keepWarmupBuffer: true,
