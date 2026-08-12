@@ -335,29 +335,60 @@ describe('the settlement guards ship their DDL (structural floor)', () => {
     return WOC_MARKET_SCHEMA.replace(/--[^\n]*/g, ' ').replace(/\s+/g, ' ');
   };
 
-  it('carries both unique indexes and drops the stale live index', async () => {
+  it('carries both unique indexes and drops both stale settlement indexes', async () => {
     const schema = await strippedSchema();
-    expect(schema).toContain('CREATE UNIQUE INDEX IF NOT EXISTS woc_market_settlements_open');
+    expect(schema).toContain('CREATE UNIQUE INDEX IF NOT EXISTS woc_market_settlements_open2');
     expect(schema).toContain('CREATE UNIQUE INDEX IF NOT EXISTS woc_market_sales_listing_once');
+    // The two superseded names: _live (pre-'delivered') and _open
+    // (pre-'review'). Each swap creates the wider index FIRST, so these drops
+    // must sit AFTER the open2 create (pinned by order below).
     expect(schema).toContain('DROP INDEX IF EXISTS woc_market_settlements_live');
+    expect(schema).toContain('DROP INDEX IF EXISTS woc_market_settlements_open;');
+    expect(
+      schema.indexOf('CREATE UNIQUE INDEX IF NOT EXISTS woc_market_settlements_open2'),
+    ).toBeLessThan(schema.indexOf('DROP INDEX IF EXISTS woc_market_settlements_open;'));
     expect(schema).toContain('ON woc_market_sales(listing_id) WHERE excluded = false');
   });
 
-  it('the open-settlement index predicate is exactly the five open states', async () => {
+  it('the open-settlement index predicate is exactly the six open states', async () => {
     const schema = await strippedSchema();
     const m = schema.match(
-      /CREATE UNIQUE INDEX IF NOT EXISTS woc_market_settlements_open ON woc_market_settlements\(listing_id\) WHERE state IN \(([^)]*)\)/,
+      /CREATE UNIQUE INDEX IF NOT EXISTS woc_market_settlements_open2 ON woc_market_settlements\(listing_id\) WHERE state IN \(([^)]*)\)/,
     );
     expect(m, 'index creation shape').not.toBeNull();
     const states = (m as RegExpMatchArray)[1].split(',').map((s) => s.trim().replace(/'/g, ''));
     const { OPEN_SETTLEMENT_STATES } = await import('./helpers/fake_woc_market_db');
     // One list, three holders: the shipped predicate, the fake's mirror, and
-    // the literal spelling here. A sixth state (or a dropped fifth) fails all
-    // three comparisons.
-    expect(states).toEqual(['offered', 'confirming', 'confirmed', 'delivering', 'delivered']);
+    // the literal spelling here. A seventh state (or a dropped sixth) fails
+    // all three comparisons. 'review' is open BY RULING: the payment may have
+    // landed, so its listing must never re-auction around it.
+    expect(states).toEqual([
+      'offered',
+      'confirming',
+      'review',
+      'confirmed',
+      'delivering',
+      'delivered',
+    ]);
     expect([...OPEN_SETTLEMENT_STATES]).toEqual(states);
     expect(states).not.toContain('failed');
     expect(states).not.toContain('expired');
+  });
+
+  it('the settlements state CHECK evolves in place and carries review', async () => {
+    const schema = await strippedSchema();
+    // Fresh tables get the widened inline CHECK; legacy tables get the gated
+    // DROP+ADD (the gate reads the constraint text, so it runs once).
+    expect(schema).toContain(
+      "CHECK (state IN ('offered', 'confirming', 'review', 'confirmed', 'delivering', 'delivered', 'expired', 'failed'))",
+    );
+    expect(schema).toContain("pg_get_constraintdef(oid) NOT LIKE '%''review''%'");
+    expect(schema).toContain(
+      'ALTER TABLE woc_market_settlements DROP CONSTRAINT woc_market_settlements_state_check',
+    );
+    expect(schema).toContain(
+      'ALTER TABLE woc_market_settlements ADD CONSTRAINT woc_market_settlements_state_check',
+    );
   });
 
   it('both boot repairs gate on index VALIDITY, and both creates drop an invalid carcass', async () => {
@@ -367,7 +398,7 @@ describe('the settlement guards ship their DDL (structural floor)', () => {
     // to_regclass house idiom (a hardcoded nspname breaks the runs-once
     // property under a non-public search_path), never bare existence.
     expect(schema).toContain(
-      "WHERE i.indexrelid = to_regclass('woc_market_settlements_open') AND i.indisvalid",
+      "WHERE i.indexrelid = to_regclass('woc_market_settlements_open2') AND i.indisvalid",
     );
     expect(schema).toContain(
       "WHERE i.indexrelid = to_regclass('woc_market_sales_listing_once') AND i.indisvalid",
@@ -375,12 +406,12 @@ describe('the settlement guards ship their DDL (structural floor)', () => {
     // The carcass drops ahead of each CREATE (IF NOT EXISTS matches by name
     // and would keep an index that enforces nothing).
     expect(schema).toContain(
-      "WHERE i.indexrelid = to_regclass('woc_market_settlements_open') AND NOT i.indisvalid",
+      "WHERE i.indexrelid = to_regclass('woc_market_settlements_open2') AND NOT i.indisvalid",
     );
     expect(schema).toContain(
       "WHERE i.indexrelid = to_regclass('woc_market_sales_listing_once') AND NOT i.indisvalid",
     );
-    expect(schema).toContain("EXECUTE 'DROP INDEX woc_market_settlements_open'");
+    expect(schema).toContain("EXECUTE 'DROP INDEX woc_market_settlements_open2'");
     expect(schema).toContain("EXECUTE 'DROP INDEX woc_market_sales_listing_once'");
   });
 
@@ -389,9 +420,9 @@ describe('the settlement guards ship their DDL (structural floor)', () => {
     // The survivor CASE and the index predicate must stay in lockstep: a
     // state added to the predicate but not ranked here would fall to ELSE 1
     // and the repair would prefer to demote it. 'offered' rides ELSE 1 by
-    // construction (the lowest rank), so four WHEN arms cover the other four.
+    // construction (the lowest rank), so five WHEN arms cover the other five.
     expect(schema).toContain(
-      "CASE state WHEN 'delivered' THEN 5 WHEN 'delivering' THEN 4 WHEN 'confirmed' THEN 3 WHEN 'confirming' THEN 2 ELSE 1 END",
+      "CASE state WHEN 'delivered' THEN 6 WHEN 'delivering' THEN 5 WHEN 'confirmed' THEN 4 WHEN 'review' THEN 3 WHEN 'confirming' THEN 2 ELSE 1 END",
     );
     // The forensic demotion marker keeps any prior reason attached.
     expect(schema).toContain("fail_reason = 'schema_dedupe' || COALESCE(':' || fail_reason, '')");
@@ -851,22 +882,26 @@ describe('the sweep reads that keep delivery converging, in SQL', () => {
 describe('the stuck-custody readout saturates, in SQL', () => {
   it('samples and counts each class separately, counts capped by an inner LIMIT', async () => {
     const { pool, sql, params } = recordingPool();
-    await new PgWocMarketDb(pool).stuckCustodyReadout(REALM, 1_000, 20, 1000);
+    await new PgWocMarketDb(pool).stuckCustodyReadout(REALM, 1_000, 20, 1000, 1_000);
     const seq = sql();
-    // Three sample reads and three capped counts, interleaved per class.
-    expect(seq).toHaveLength(6);
-    const samples = [seq[0], seq[2], seq[4]];
-    const counts = [seq[1], seq[3], seq[5]];
+    // Five sample reads and five capped counts, interleaved per class (the
+    // three custody classes, plus review settlements and stuck bonds).
+    expect(seq).toHaveLength(10);
+    const samples = [seq[0], seq[2], seq[4], seq[6], seq[8]];
+    const counts = [seq[1], seq[3], seq[5], seq[7], seq[9]];
     for (const [i, text] of samples.entries()) {
       expect(text, `sample ${i} is realm-scoped`).toContain('realm = $1');
-      expect(text, `sample ${i} is capped`).toContain('LIMIT $3');
+    }
+    // The three age-filtered custody classes share one param shape.
+    for (const i of [0, 1, 2]) {
+      expect(samples[i], `sample ${i} is capped`).toContain('LIMIT $3');
       expect(params()[i * 2]).toEqual([REALM, 1_000, 20]);
+      expect(params()[i * 2 + 1]).toEqual([REALM, 1_000]);
     }
     for (const [i, text] of counts.entries()) {
       // The saturating shape: a bare count consumed the whole stuck set.
       expect(text, `count ${i} saturates`).toContain('SELECT count(*)::int AS n FROM (SELECT 1');
       expect(text, `count ${i} caps the inner read`).toContain('LIMIT 1000');
-      expect(params()[i * 2 + 1]).toEqual([REALM, 1_000]);
     }
     expect(samples[0]).toContain('booked_at IS NULL');
     expect(samples[0]).toContain('mail_intent_at');
@@ -880,5 +915,18 @@ describe('the stuck-custody readout saturates, in SQL', () => {
     expect(samples[2]).toContain("status = 'closed' AND item_disposed = false");
     expect(samples[2]).toContain('updated_at <= to_timestamp($2 / 1000.0)');
     expect(samples[2]).not.toContain('sweep_parked_at');
+    // The review class carries NO age filter (the sweep's confirming bound
+    // already aged it) and orders on updated_at (entry into review).
+    expect(samples[3]).toContain("state = 'review'");
+    expect(samples[3]).not.toContain('to_timestamp');
+    expect(samples[3]).toContain('ORDER BY updated_at');
+    expect(params()[6]).toEqual([REALM, 20]);
+    expect(params()[7]).toEqual([REALM]);
+    // Stuck bonds: the confirming-set predicate (matching its partial index)
+    // plus the caller's bond age cutoff.
+    expect(samples[4]).toContain("status = 'pending_bond' AND bond_signature IS NOT NULL");
+    expect(samples[4]).toContain('placed_at <= to_timestamp($2 / 1000.0)');
+    expect(params()[8]).toEqual([REALM, 1_000, 20]);
+    expect(params()[9]).toEqual([REALM, 1_000]);
   });
 });

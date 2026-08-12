@@ -251,7 +251,12 @@ describeDb('woc market settlement guards against real Postgres', () => {
       custody,
       verifiedWallet: async () => 'wallet-fixture',
       balanceTokens: async () => 1_000_000,
-      config: { enabled: true, realm, policy: rulesMod.WOC_MARKET_RESTRICTED_POLICY },
+      config: {
+        enabled: true,
+        realm,
+        policy: rulesMod.WOC_MARKET_RESTRICTED_POLICY,
+        confirmingReviewMs: 6 * 3600 * 1000,
+      },
       now: () => BASE_MS,
     });
   }
@@ -277,7 +282,7 @@ describeDb('woc market settlement guards against real Postgres', () => {
       }
     });
 
-    it('refuses the cancel while the buy-now lock is claimed, allows it after expiry', async () => {
+    it('accepts a cancel on an unpaid locked window as INTENT, and closes after expiry', async () => {
       const realm = 'guard-cancel-lock';
       const seller = await seedAccount();
       const buyer = await seedAccount();
@@ -290,10 +295,13 @@ describeDb('woc market settlement guards against real Postgres', () => {
         BASE_MS + 2 * MINUTE_MS,
       );
       expect(claimed).toMatchObject({ id: listingId });
+      // The cancel-intent arm: no refusal, no close either; the listing stays
+      // active with the stamp and the holder keeps their window.
       expect(await marketDb.cancelListingIfUnbid(realm, listingId, seller, BASE_MS)).toBe(
-        'buy_now_pending',
+        'cancel_pending',
       );
-      expect((await listingRow(listingId)).status).toBe('active');
+      const stamped = await listingRow(listingId);
+      expect(stamped.status).toBe('active');
       // Past the lock expiry (and with no settlement created) the cancel lands.
       const out = await marketDb.cancelListingIfUnbid(
         realm,
@@ -360,7 +368,8 @@ describeDb('woc market settlement guards against real Postgres', () => {
         ]);
         expect(first).toBe('blocked');
         // The lock holder claims the buy-now lock and commits; the unblocked
-        // cancel re-reads the committed row and must refuse it.
+        // cancel re-reads the committed row and must respect the fresh lock
+        // (cancel-intent, never a close over the racer's window).
         await client.query(
           `UPDATE woc_market_listings
               SET buy_now_lock_account = $2,
@@ -370,8 +379,11 @@ describeDb('woc market settlement guards against real Postgres', () => {
           [listingId, buyer, BASE_MS + MINUTE_MS],
         );
         await client.query('COMMIT');
-        expect(await cancel).toBe('buy_now_pending');
-        expect((await listingRow(listingId)).status).toBe('active');
+        expect(await cancel).toBe('cancel_pending');
+        const row = await listingRow(listingId);
+        expect(row.status).toBe('active');
+        // The racer's window survived the cancel.
+        expect(row.lockAccount).toBe(buyer);
       } finally {
         client.release();
       }
@@ -580,7 +592,7 @@ describeDb('woc market settlement guards against real Postgres', () => {
       expect((await listingRow(deadListing)).status).not.toBe('settling');
     }, 20_000);
 
-    it('the schema swaps the live index for the open one, and re-applies cleanly', async () => {
+    it('the schema swaps both superseded indexes for the open2 one, and re-applies cleanly', async () => {
       const names = async (): Promise<string[]> => {
         const res = await pool.query(
           `SELECT indexname FROM pg_indexes WHERE tablename = 'woc_market_settlements'`,
@@ -588,29 +600,44 @@ describeDb('woc market settlement guards against real Postgres', () => {
         return res.rows.map((r) => r.indexname);
       };
       const first = await names();
-      expect(first).toContain('woc_market_settlements_open');
+      expect(first).toContain('woc_market_settlements_open2');
+      expect(first).not.toContain('woc_market_settlements_open');
       expect(first).not.toContain('woc_market_settlements_live');
       const def = await pool.query(
-        `SELECT indexdef FROM pg_indexes WHERE indexname = 'woc_market_settlements_open'`,
+        `SELECT indexdef FROM pg_indexes WHERE indexname = 'woc_market_settlements_open2'`,
       );
       const indexdef: string = def.rows[0].indexdef;
       expect(indexdef).toContain('UNIQUE');
       expect(indexdef).toContain('(listing_id)');
-      // The whole five-state predicate, member by member: dropping any one of
-      // them would quietly narrow the invariant this index exists to widen.
-      for (const state of ['offered', 'confirming', 'confirmed', 'delivering', 'delivered']) {
+      // The whole six-state predicate, member by member: dropping any one of
+      // them would quietly narrow the invariant this index exists to widen
+      // ('review' is the operator park; its listing must never re-auction).
+      for (const state of [
+        'offered',
+        'confirming',
+        'review',
+        'confirmed',
+        'delivering',
+        'delivered',
+      ]) {
         expect(indexdef, state).toContain(`'${state}'`);
       }
-      // A database created before the swap still carries the stale index; a
-      // re-boot must drop it. Recreate it, re-apply the schema, and re-check.
+      // A database created before either swap still carries a stale index; a
+      // re-boot must drop BOTH generations. Recreate them, re-apply, re-check.
       await pool.query(
         `CREATE UNIQUE INDEX IF NOT EXISTS woc_market_settlements_live
            ON woc_market_settlements(listing_id)
            WHERE state IN ('offered', 'confirming', 'confirmed', 'delivering')`,
       );
+      await pool.query(
+        `CREATE UNIQUE INDEX IF NOT EXISTS woc_market_settlements_open
+           ON woc_market_settlements(listing_id)
+           WHERE state IN ('offered', 'confirming', 'confirmed', 'delivering', 'delivered')`,
+      );
       await pool.query(schemaSql);
       const second = await names();
-      expect(second).toContain('woc_market_settlements_open');
+      expect(second).toContain('woc_market_settlements_open2');
+      expect(second).not.toContain('woc_market_settlements_open');
       expect(second).not.toContain('woc_market_settlements_live');
     }, 20_000);
 
@@ -626,7 +653,7 @@ describeDb('woc market settlement guards against real Postgres', () => {
       // die on the CREATE UNIQUE INDEX. try/finally: a failure between the
       // drop and the re-apply must not leave the rest of the file running
       // without the invariant under test.
-      await pool.query('DROP INDEX woc_market_settlements_open');
+      await pool.query('DROP INDEX woc_market_settlements_open2');
       try {
         const delivered = await seedSettlement(realm, listingId, buyer, { state: 'delivered' });
         const revived = await seedSettlement(realm, listingId, buyer);
@@ -658,7 +685,7 @@ describeDb('woc market settlement guards against real Postgres', () => {
         await pool.query(schemaSql);
       }
       const rebuilt = await pool.query(
-        `SELECT indexname FROM pg_indexes WHERE indexname = 'woc_market_settlements_open'`,
+        `SELECT indexname FROM pg_indexes WHERE indexname = 'woc_market_settlements_open2'`,
       );
       expect(rebuilt.rows).toHaveLength(1);
     }, 20_000);
@@ -668,7 +695,7 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const seller = await seedAccount();
       const buyer = await seedAccount();
       const listingId = await seedListing(realm, seller);
-      await pool.query('DROP INDEX woc_market_settlements_open');
+      await pool.query('DROP INDEX woc_market_settlements_open2');
       try {
         const keep = await seedSettlement(realm, listingId, buyer, { state: 'confirming' });
         const dupe = await seedSettlement(realm, listingId, buyer);
@@ -677,14 +704,14 @@ describeDb('woc market settlement guards against real Postgres', () => {
         // to_regclass and IF NOT EXISTS while enforcing nothing.
         await expect(
           pool.query(
-            `CREATE UNIQUE INDEX CONCURRENTLY woc_market_settlements_open
+            `CREATE UNIQUE INDEX CONCURRENTLY woc_market_settlements_open2
                ON woc_market_settlements(listing_id)
                WHERE state IN ('offered', 'confirming', 'confirmed', 'delivering', 'delivered')`,
           ),
         ).rejects.toMatchObject({ code: '23505' });
         const carcass = await pool.query(
           `SELECT i.indisvalid FROM pg_index i JOIN pg_class c ON c.oid = i.indexrelid
-            WHERE c.relname = 'woc_market_settlements_open'`,
+            WHERE c.relname = 'woc_market_settlements_open2'`,
         );
         expect(carcass.rows).toEqual([{ indisvalid: false }]);
         // The boot must see through the carcass: repair the duplicates, drop
@@ -694,7 +721,7 @@ describeDb('woc market settlement guards against real Postgres', () => {
         expect((await settlementRow(dupe.id)).state).toBe('expired');
         const rebuilt = await pool.query(
           `SELECT i.indisvalid FROM pg_index i JOIN pg_class c ON c.oid = i.indexrelid
-            WHERE c.relname = 'woc_market_settlements_open'`,
+            WHERE c.relname = 'woc_market_settlements_open2'`,
         );
         expect(rebuilt.rows).toEqual([{ indisvalid: true }]);
       } finally {

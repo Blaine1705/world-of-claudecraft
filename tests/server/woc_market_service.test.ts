@@ -227,6 +227,8 @@ class FakeCustody implements WocMarketCustody {
 // ---------------------------------------------------------------------------
 
 const REALM = 'Claudemoon';
+/** The harness's H15 bound: 6 hours, matching the shipped default. */
+const CONFIRMING_REVIEW_MS = 6 * 3600 * 1000;
 const BASE_MS = 1_800_000_000_000;
 const HOUR_MS = 3600 * 1000;
 
@@ -316,6 +318,7 @@ function makeHarness(): Harness {
       enabled: true,
       realm: REALM,
       policy: WOC_MARKET_RESTRICTED_POLICY,
+      confirmingReviewMs: CONFIRMING_REVIEW_MS,
     },
     now,
     onSweepError: (arm, err) => {
@@ -629,15 +632,17 @@ describe('cancelListing', () => {
       }),
       'buyNow',
     );
-    // Inside the lock window the lock itself refuses the cancel.
-    expect(await h.service.cancelListing(SELLER, listing.id)).toEqual({
-      ok: false,
-      reason: 'buy_now_locked',
-    });
     // The buyer signs, then the lock expires with the payment still settling.
     // This is the dupe shape the guard exists for: the old cancel mailed the
     // copy home here while the broadcast payment went on to deliver it too.
     expect(await h.db.submitSettlementSignature(buy.settlement.id, 'sig-cancel-race')).toBe('ok');
+    // Inside the lock window a PAID window refuses even the cancel-intent
+    // stamp: cancel-pending must never tear a live settlement.
+    expect(await h.service.cancelListing(SELLER, listing.id)).toEqual({
+      ok: false,
+      reason: 'settlement_in_flight',
+    });
+    expect((await getListing(h, listing.id)).cancelRequestedAtMs).toBeNull();
     h.setNow(BASE_MS + WOC_MARKET_BUY_NOW_LOCK_SECONDS * 1000 + 1);
     expect(await h.service.cancelListing(SELLER, listing.id)).toEqual({
       ok: false,
@@ -656,6 +661,50 @@ describe('cancelListing', () => {
     expect(row.status).toBe('active');
     expect(row.itemDisposed).toBe(false);
     expect(h.custody.parcels).toHaveLength(0);
+  });
+
+  it('accepts a cancel on an UNPAID locked window as intent, then converges it closed', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+    unwrap(
+      await h.service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    // The unpaid window accepts the cancel as INTENT: no close yet, no return
+    // flight, the holder keeps their window.
+    expect(await h.service.cancelListing(SELLER, listing.id)).toEqual({
+      ok: true,
+      cancelPending: true,
+    });
+    const stamped = await getListing(h, listing.id);
+    expect(stamped.status).toBe('active');
+    expect(stamped.cancelRequestedAtMs).not.toBeNull();
+    expect(stamped.buyNowLockAccount).toBe(BUYER_A);
+    expect(h.custody.parcels).toHaveLength(0);
+    // From the stamp on, NEW claims and NEW bids refuse.
+    expect(
+      await h.service.buyNow({
+        account: BUYER_B,
+        characterId: CHAR_B,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+    ).toEqual({ ok: false, reason: 'cancel_pending' });
+    // The window ends unpaid: the overdue arm expires the settlement and the
+    // converge arm closes the listing cancelled with the return flight home.
+    h.setNow(BASE_MS + WOC_MARKET_BUY_NOW_LOCK_SECONDS * 1000 + 1);
+    const stats = await h.service.sweepPass();
+    expect(stats?.cancelClosed).toBe(1);
+    const closed = await getListing(h, listing.id);
+    expect(closed.status).toBe('closed');
+    expect(closed.resolution).toBe('cancelled');
+    expect(h.custody.parcels).toHaveLength(1);
+    expect(h.custody.persistCalls).toEqual([listingReturnCustodyRef(listing.id)]);
   });
 
   it('refuses not_active on a second cancel and books no second return', async () => {
@@ -1190,7 +1239,7 @@ describe('confirmBond', () => {
     expect(row.currentBidId).toBe(higher.bid.id);
   });
 
-  it('refuses quote_expired past the bond quote TTL, then stands the bid on a refreshed quote', async () => {
+  it('records a signature against an expired quote and lets the chain verdict end the bid', async () => {
     const h = makeHarness();
     const listing = await listEpic(h);
     const placed = unwrap(
@@ -1202,32 +1251,51 @@ describe('confirmBond', () => {
       }),
       'placeBid',
     );
-    // A signature against a dead quote is unpriceable: the token amount the
-    // bidder authorized is no longer what the bond is worth, so accepting it
-    // would hold the wrong amount against the seat.
+    // The intake no longer refuses an expired quote BEFORE recording: the
+    // signature is the only trace of a transfer that may already have left
+    // the wallet, so it lands in the ledger FIRST and the chain decides (the
+    // dev economy refuses a dead quote, the H4 near-expiry loss is the case
+    // where it settles instead).
     h.setNow(BASE_MS + WOC_MARKET_QUOTE_TTL_SECONDS * 1000);
     const stale = await h.service.confirmBond(BUYER_A, placed.bid.id, 'sig-stale-bond');
-    expect(stale).toEqual({ ok: false, reason: 'quote_expired' });
+    expect(stale).toEqual({ ok: false, reason: 'confirm_failed' });
     const pending = await getBid(h, placed.bid.id);
     expect(pending.status).toBe('pending_bond');
     expect(pending.bondState).toBe('pending');
+    // The ledger trace survived the refusal: the poll owns the row now.
+    expect(pending.bondSignature).toBe('sig-stale-bond');
     const untouched = await getListing(h, listing.id);
     expect(untouched.currentBidId).toBeNull();
     expect(untouched.currentBidCents).toBeNull();
-    // The refusal is recoverable, not terminal: the seat survives inside the
-    // bond TTL and a fresh quote confirms it.
-    const refreshed = unwrap(
-      await h.service.refreshBondQuote(BUYER_A, placed.bid.id),
-      'refreshBondQuote',
+    // With a signature awaiting its verdict, a refresh must NOT re-reference
+    // the bond out from under the poll.
+    expect(await h.service.refreshBondQuote(BUYER_A, placed.bid.id)).toEqual({
+      ok: false,
+      reason: 'confirm_in_flight',
+    });
+    expect((await getBid(h, placed.bid.id)).bondReference).toBe(placed.bond.reference);
+    // The poll resolves the decided-against verdict: the bid lapses, the
+    // (never-funded) bond voids, and the seat frees for a fresh bid.
+    await h.service.sweepPass();
+    const lapsed = await getBid(h, placed.bid.id);
+    expect(lapsed.status).toBe('lapsed');
+    expect(lapsed.bondState).toBe('void');
+    const rebid = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
     );
-    expect(refreshed.bond.reference).not.toBe(placed.bond.reference);
     const confirmed = unwrap(
-      await h.service.confirmBond(BUYER_A, placed.bid.id, 'sig-fresh-bond'),
+      await h.service.confirmBond(BUYER_A, rebid.bid.id, 'sig-fresh-bond'),
       'confirmBond',
     );
     expect(confirmed.standing).toBe(true);
-    expect((await getBid(h, placed.bid.id)).bondState).toBe('held');
-    expect((await getListing(h, listing.id)).currentBidId).toBe(placed.bid.id);
+    expect((await getBid(h, rebid.bid.id)).bondState).toBe('held');
+    expect((await getListing(h, listing.id)).currentBidId).toBe(rebid.bid.id);
   });
 
   it('refuses not_pending when the same bond signature is presented a second time', async () => {
@@ -1290,12 +1358,12 @@ describe('confirmBond', () => {
 });
 
 describe('anti-snipe extension', () => {
-  it('a final-window bid extends the close to the bid time plus the extension', async () => {
+  it('an unpaid final-window bid no longer moves the close; the signature does', async () => {
     const h = makeHarness();
     const listing = await listEpic(h);
     const bidAt = listing.endsAtMs - 60_000;
     h.setNow(bidAt);
-    unwrap(
+    const placed = unwrap(
       await placeBid(h, {
         account: BUYER_A,
         characterId: CHAR_A,
@@ -1304,8 +1372,18 @@ describe('anti-snipe extension', () => {
       }),
       'placeBid',
     );
+    // PLACEMENT is free to mint, so it extends nothing (the abandon-loop
+    // ruling's anti-snipe constraint: wallets with no money down must not
+    // burn the extension cap).
+    expect((await getListing(h, listing.id)).endsAtMs).toBe(listing.endsAtMs);
+    // BOND PROGRESS is the extension moment: the recorded signature is a real
+    // payment claim, and this is what keeps an in-flight confirmation from
+    // landing after the close.
+    const confirmAt = listing.endsAtMs - 30_000;
+    h.setNow(confirmAt);
+    unwrap(await h.service.confirmBond(BUYER_A, placed.bid.id, 'sig-snipe-bond'), 'confirmBond');
     const row = await getListing(h, listing.id);
-    expect(row.endsAtMs).toBe(bidAt + WOC_MARKET_ANTI_SNIPE_EXTENSION_SECONDS * 1000);
+    expect(row.endsAtMs).toBe(confirmAt + WOC_MARKET_ANTI_SNIPE_EXTENSION_SECONDS * 1000);
     expect(row.baseEndsAtMs).toBe(listing.endsAtMs);
   });
 
@@ -1313,22 +1391,27 @@ describe('anti-snipe extension', () => {
     const h = makeHarness();
     const listing = await listEpic(h);
     const capMs = listing.baseEndsAtMs + WOC_MARKET_ANTI_SNIPE_CAP_SECONDS * 1000;
-    // Each final-window bid moves the end 60s forward; ride the ladder past
-    // where the cap must clamp it (30 steps reach the cap; 40 overshoots).
+    // Each final-window CONFIRMED bid moves the end forward; ride the ladder
+    // past where the cap must clamp it (the bid amounts ascend so every bond
+    // activates as the new standing bid).
     for (let i = 0; i < SNIPER_COUNT; i++) {
       const account = SNIPER_ACCOUNT_BASE + i;
       h.wallets.set(account, `wallet-snipe-${i}`);
       h.balances.set(`wallet-snipe-${i}`, 100_000_000);
       const before = await getListing(h, listing.id);
       h.setNow(before.endsAtMs - 60_000);
-      unwrap(
+      const placed = unwrap(
         await placeBid(h, {
           account,
           characterId: SNIPER_CHAR_BASE + i,
           listingId: listing.id,
-          amountCents: 5000,
+          amountCents: 5000 + i * 1000,
         }),
         'placeBid',
+      );
+      unwrap(
+        await h.service.confirmBond(account, placed.bid.id, `sig-snipe-cap-${i}`),
+        'confirmBond',
       );
       const after = await getListing(h, listing.id);
       expect(after.endsAtMs).toBeLessThanOrEqual(capMs);
@@ -1336,6 +1419,83 @@ describe('anti-snipe extension', () => {
     const final = await getListing(h, listing.id);
     expect(final.endsAtMs).toBe(capMs);
     expect(final.baseEndsAtMs).toBe(listing.baseEndsAtMs);
+  });
+});
+
+describe('the confirming review bound', () => {
+  it('parks an over-aged confirming settlement in review with NO default consequences', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const standing = await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    h.setNow(listing.endsAtMs + 1);
+    await h.service.sweepPass();
+    const settlement = await liveSettlement(h, listing.id);
+    unwrap(await h.service.settlementQuote(BUYER_A, settlement.id), 'settlementQuote');
+    // The signature lands and the chain stays undecided for seven hours
+    // (past the six-hour bound): driven at the db seam because the dev
+    // economy settles instantly.
+    expect(await h.db.submitSettlementSignature(settlement.id, 'sig-stuck-review')).toBe('ok');
+    h.setNow(listing.endsAtMs + 1 + 7 * 3600 * 1000);
+    await h.service.sweepPass();
+    const parked = await getSettlement(h, settlement.id);
+    expect(parked.state).toBe('review');
+    expect(parked.failReason).toBe('confirming_overdue');
+    // AMBIGUOUS by construction, so none of the overdue default consequences
+    // may fire: no defaulted stamp, no forfeit, no strike, and the listing
+    // stays parked behind the still-open settlement.
+    const bid = await getBid(h, standing.bidId);
+    expect(bid.status).toBe('won');
+    expect(bid.bondState).toBe('held');
+    expect(await h.db.strikeInfo(BUYER_A)).toBeNull();
+    expect((await getListing(h, listing.id)).status).toBe('settling');
+    // Out of the polling set, visible to the ops readout, and the operator
+    // arms are real transitions (review -> confirmed resumes delivery).
+    const readout = await h.db.stuckCustodyReadout(REALM, h.now() + 1, 10, 1000, h.now() + 1);
+    expect(readout.reviewSettlements.count).toBe(1);
+    expect(readout.reviewSettlements.sample[0]).toMatchObject({ id: settlement.id });
+    expect(await h.db.transitionSettlement(settlement.id, ['review'], 'confirmed')).toBe(true);
+  });
+});
+
+describe('buy-now claim cooldown', () => {
+  it('an abandoned window blocks the abandoner from re-claiming the listing', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+    unwrap(
+      await h.service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    // The window expires unpaid: the overdue arm records the abandonment,
+    // clears the lock (holder-guarded), and takes NO strike on a public
+    // listing.
+    h.setNow(BASE_MS + WOC_MARKET_BUY_NOW_LOCK_SECONDS * 1000 + 1);
+    await h.service.sweepPass();
+    expect(h.db.buyNowAbandons).toHaveLength(1);
+    expect(h.db.buyNowAbandons[0]).toMatchObject({ listingId: listing.id, account: BUYER_A });
+    expect(await h.db.strikeInfo(BUYER_A)).toBeNull();
+    expect((await getListing(h, listing.id)).buyNowLockAccount).toBeNull();
+    // The abandoner's re-claim refuses for the cooldown; a different buyer
+    // claims normally.
+    expect(
+      await h.service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+    ).toEqual({ ok: false, reason: 'claim_cooldown' });
+    const other = await h.service.buyNow({
+      account: BUYER_C,
+      characterId: CHAR_C,
+      listingId: listing.id,
+      acceptTerms: true,
+    });
+    expect(other.ok).toBe(true);
   });
 });
 
@@ -1693,26 +1853,39 @@ describe('settlement quote expiry and signature reuse', () => {
     await h.service.sweepPass();
     const settlement = await liveSettlement(h, listing.id);
     unwrap(await h.service.settlementQuote(BUYER_A, settlement.id), 'settlementQuote');
-    // The quote (90s) dies long before the settlement window (600s), so the
-    // winner still has time to re-quote. Honouring the stale signature would
-    // settle at a token amount the oracle no longer stands behind, which is a
-    // direct transfer of the price move onto the seller.
+    // The quote (90s) dies long before the settlement window (600s). The
+    // intake no longer refuses BEFORE recording: the signature is the only
+    // trace of a transfer that may already have left the wallet, so it lands
+    // in the ledger and the CHAIN's verdict decides (the dev economy refuses
+    // a dead quote, so the row fails with that verdict recorded).
     h.setNow(sweepAt + WOC_MARKET_QUOTE_TTL_SECONDS * 1000);
     const res = await h.service.confirmSettlement(BUYER_A, settlement.id, 'sig-stale-settle');
-    expect(res).toEqual({ ok: false, reason: 'quote_expired' });
+    expect(res).toEqual({ ok: false, reason: 'confirm_failed' });
     const after = await getSettlement(h, settlement.id);
-    expect(after.state).toBe('offered');
-    expect(after.txSignature).toBeNull();
+    // The verdict came from the chain, AFTER the ledger write: the signature
+    // stays as the trace, and the row is retry-eligible 'failed', not a
+    // silent bounce back to 'offered' with the evidence discarded.
+    expect(after.state).toBe('failed');
+    expect(after.txSignature).toBe('sig-stale-settle');
+    expect(after.failReason).toBe('quote_expired');
     expect(await h.db.salesForItem(REALM, EPIC_ITEM, 10)).toHaveLength(0);
     const row = await getListing(h, listing.id);
     expect(row.status).toBe('settling');
     expect(row.itemDisposed).toBe(false);
     expect(h.custody.parcels).toHaveLength(0);
-    // The winner keeps their seat: the bond stays held against the live offer,
-    // neither forfeited nor refunded by a refused confirmation.
+    // The winner keeps their seat: the bond stays held, neither forfeited nor
+    // refunded by a refused confirmation.
     const bid = await getBid(h, standing.bidId);
     expect(bid.status).toBe('won');
     expect(bid.bondState).toBe('held');
+    // The refusal is recoverable inside the window: a fresh quote revives the
+    // row and a fresh transfer settles it.
+    unwrap(await h.service.settlementQuote(BUYER_A, settlement.id), 'settlementQuote');
+    const settled = unwrap(
+      await h.service.confirmSettlement(BUYER_A, settlement.id, 'sig-fresh-settle'),
+      'confirmSettlement',
+    );
+    expect(settled.state).toBe('delivered');
   });
 
   it('refuses signature_reused when one transfer is replayed on a second settlement', async () => {
@@ -2562,7 +2735,7 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     expect(h.custody.grantCalls, 'the zombie grant is never repeated').toBe(1);
     expect((await liveSettlement(h, listingId)).state).toBe('delivering');
     expect(h.db.custodyClaims.get(ref)?.grantCharacterId, 'the intent survives').toBe(CHAR_A);
-    const readout = await h.db.stuckCustodyReadout(REALM, h.now() + 1, 10, 1000);
+    const readout = await h.db.stuckCustodyReadout(REALM, h.now() + 1, 10, 1000, 0);
     expect(readout.unbookedClaims.count, 'visible to the operator').toBe(1);
   });
 
@@ -2640,7 +2813,7 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     ).toHaveLength(0);
     expect(h.custody.grantCalls, 'never re-grants').toBe(1);
     expect((await liveSettlement(h, listingId)).state).toBe('delivering');
-    const readout = await h.db.stuckCustodyReadout(REALM, h.now() + 1, 10, 1000);
+    const readout = await h.db.stuckCustodyReadout(REALM, h.now() + 1, 10, 1000, 0);
     expect(readout.unbookedClaims.count).toBe(1);
     expect(readout.unbookedClaims.sample[0]?.grantCharacterId).toBe(CHAR_A);
     expect(readout.stuckDelivering.count).toBe(1);
@@ -2702,7 +2875,7 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     );
     expect(h.custody.parcels, 'nothing mailed').toHaveLength(0);
     expect((await liveSettlement(h, listing.id)).state, 'held visibly').toBe('delivering');
-    const readout = await h.db.stuckCustodyReadout(REALM, h.now() + 1, 10, 1000);
+    const readout = await h.db.stuckCustodyReadout(REALM, h.now() + 1, 10, 1000, 0);
     expect(readout.unbookedClaims.count).toBe(1);
     expect(readout.unbookedClaims.sample[0]?.mailIntent).toBe(false);
   });
@@ -3050,7 +3223,7 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     expect((await liveSettlement(h, listingId)).state, 'parked').toBe('delivering');
     expect(h.custody.grantCalls).toBe(grantsBefore);
     expect(h.custody.parcels.length).toBe(parcelsBefore);
-    const readout = await h.db.stuckCustodyReadout(REALM, h.now() + 1, 10, 1000);
+    const readout = await h.db.stuckCustodyReadout(REALM, h.now() + 1, 10, 1000, 0);
     expect(readout.stuckDelivering.count).toBe(1);
   });
 
@@ -3833,7 +4006,6 @@ describe('the insert refusal arms at the service seam', () => {
         amountCents: amount,
         bondCents: 100,
         nowMs: h.now(),
-        extendEndsToMs: () => null,
         minNext: () => 0,
       });
       if (!out.ok) throw new Error(`fixture bid refused: ${out.reason}`);
@@ -3985,7 +4157,7 @@ async function seedDeliveredResidue(h: Harness): Promise<{ listingId: number }> 
  *  every row, so it would stay green over an age column the park rotation
  *  re-stamped, which is the exact defect this group exists to catch. */
 function stuckReadout(h: Harness) {
-  return h.db.stuckCustodyReadout(REALM, h.now() - STUCK_HORIZON_MS, 10, 1000);
+  return h.db.stuckCustodyReadout(REALM, h.now() - STUCK_HORIZON_MS, 10, 1000, 0);
 }
 
 /** Sweep once a minute until more than the stuck horizon has passed, which is

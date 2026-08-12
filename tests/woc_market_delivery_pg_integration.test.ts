@@ -268,7 +268,12 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       custody,
       verifiedWallet: async () => 'wallet-fixture',
       balanceTokens: async () => 1_000_000,
-      config: { enabled: true, realm, policy: rulesMod.WOC_MARKET_RESTRICTED_POLICY },
+      config: {
+        enabled: true,
+        realm,
+        policy: rulesMod.WOC_MARKET_RESTRICTED_POLICY,
+        confirmingReviewMs: 6 * 3600 * 1000,
+      },
       now: () => clockMs,
       // The matrix asserts convergence; an arm failure must fail the test
       // loudly rather than score a quiet zero.
@@ -443,7 +448,13 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         scene.settlement.id,
       ]);
       expect(after.rows[0].state, 'held visibly').toBe('delivering');
-      const readout = await marketDb.stuckCustodyReadout(realm, Date.now() + MINUTE_MS, 10, 1000);
+      const readout = await marketDb.stuckCustodyReadout(
+        realm,
+        Date.now() + MINUTE_MS,
+        10,
+        1000,
+        0,
+      );
       expect(readout.unbookedClaims.count).toBe(1);
       expect(readout.unbookedClaims.sample[0]?.mailIntent).toBe(false);
     }, 20_000);
@@ -690,7 +701,7 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         `UPDATE woc_market_listings SET updated_at = now() - interval '1 hour' WHERE id = $1`,
         [withoutSale],
       );
-      const readout = await marketDb.stuckCustodyReadout(realm, Date.now() - 600_000, 10, 1000);
+      const readout = await marketDb.stuckCustodyReadout(realm, Date.now() - 600_000, 10, 1000, 0);
       expect(readout.undisposedListings.count).toBe(1);
       expect(readout.undisposedListings.sample[0]?.id).toBe(withoutSale);
     }, 20_000);
@@ -734,7 +745,13 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       ]);
       expect(after.rows[0].state).toBe('delivering');
       expect(custody.parcels).toHaveLength(0);
-      const readout = await marketDb.stuckCustodyReadout(realm, Date.now() + MINUTE_MS, 10, 1000);
+      const readout = await marketDb.stuckCustodyReadout(
+        realm,
+        Date.now() + MINUTE_MS,
+        10,
+        1000,
+        0,
+      );
       expect(readout.unbookedClaims.count).toBe(1);
       expect(readout.unbookedClaims.sample[0]).toMatchObject({
         custodyRef: scene.custodyRef,
@@ -1127,7 +1144,7 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       );
 
       const cutoff = Date.now() - 10 * MINUTE_MS;
-      const readout = await marketDb.stuckCustodyReadout(realm, cutoff, 10, 1000);
+      const readout = await marketDb.stuckCustodyReadout(realm, cutoff, 10, 1000, 0);
       expect(readout.unbookedClaims.count).toBe(1);
       expect(readout.unbookedClaims.sample[0]?.custodyRef).toBe('readout-aged');
       expect(readout.stuckDelivering.count, 'one per-dimension survivor').toBe(1);
@@ -1149,7 +1166,7 @@ describeDb('woc market delivery finalization against real Postgres', () => {
           WHERE realm = $1`,
         [realm],
       );
-      const readout = await marketDb.stuckCustodyReadout(realm, Date.now() - 600_000, 3, 5);
+      const readout = await marketDb.stuckCustodyReadout(realm, Date.now() - 600_000, 3, 5, 0);
       expect(readout.unbookedClaims.count, 'cap or more, never the true 7').toBe(5);
       expect(readout.unbookedClaims.sample, 'the sample keeps its own cap').toHaveLength(3);
       // The flag is what stops a capped count from reading as an exact one on
@@ -1159,7 +1176,7 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       expect(readout.stuckDelivering).toMatchObject({ count: 0, saturated: false });
       expect(readout.undisposedListings).toMatchObject({ count: 0, saturated: false });
       // And below the cap the flag clears while the count becomes the truth.
-      const roomy = await marketDb.stuckCustodyReadout(realm, Date.now() - 600_000, 3, 50);
+      const roomy = await marketDb.stuckCustodyReadout(realm, Date.now() - 600_000, 3, 50, 0);
       expect(roomy.unbookedClaims.count, 'the real backlog, unclamped').toBe(7);
       expect(roomy.unbookedClaims.saturated).toBe(false);
     }, 20_000);
@@ -1199,6 +1216,7 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         Date.now() - 10 * MINUTE_MS,
         10,
         1000,
+        0,
       );
       expect(readout.undisposedListings.count, 'rotation left the age column alone').toBe(1);
       expect(readout.undisposedListings.sample[0]?.id).toBe(parked);
@@ -1238,6 +1256,7 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         Date.now() - 10 * MINUTE_MS,
         10,
         1000,
+        0,
       );
       expect(readout.stuckDelivering.count, 'rotation left the age column alone').toBe(1);
       expect(readout.stuckDelivering.sample[0]?.id).toBe(parked.id);
@@ -1283,12 +1302,12 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         [foreignSettlement.id],
       );
       const cutoff = Date.now() - 10 * MINUTE_MS;
-      const home = await marketDb.stuckCustodyReadout(realm, cutoff, 10, 1000);
+      const home = await marketDb.stuckCustodyReadout(realm, cutoff, 10, 1000, 0);
       expect(home.stuckDelivering.count).toBe(0);
       expect(home.undisposedListings.count).toBe(0);
       // The positive control: both rows really exist and really are aged, so
       // the zeros above are the realm predicate rather than an empty table.
-      const away = await marketDb.stuckCustodyReadout(foreign, cutoff, 10, 1000);
+      const away = await marketDb.stuckCustodyReadout(foreign, cutoff, 10, 1000, 0);
       expect(away.stuckDelivering.sample[0]?.id).toBe(foreignSettlement.id);
       expect(away.undisposedListings.sample[0]?.id).toBe(foreignListing);
     }, 20_000);

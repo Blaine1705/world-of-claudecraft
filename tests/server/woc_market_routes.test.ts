@@ -95,6 +95,7 @@ function listingRow(over: Partial<WocListingRow> = {}): WocListingRow {
     buyNowLockAccount: 1234,
     buyNowLockExpiresMs: FAR_FUTURE_MS,
     createdAtMs: 1_799_000_000_000,
+    cancelRequestedAtMs: null,
     ...over,
   };
 }
@@ -119,7 +120,7 @@ describe('the refusal-to-wire mapping', () => {
     const rows = Object.entries(REFUSAL_ERRORS);
     // The EXACT count, not a floor. A floor of 35 let four union members vanish
     // silently; tsc catches a deleted Record key but not a shrunken union.
-    expect(rows).toHaveLength(44);
+    expect(rows).toHaveLength(47);
     for (const [reason, mapped] of rows) {
       expect(mapped.code, reason).toMatch(/^woc_market\./);
       expect(mapped.status, reason).toBeGreaterThanOrEqual(400);
@@ -155,7 +156,15 @@ describe('the refusal-to-wire mapping', () => {
     ['quote_expired', 409, 'woc_market.quote_expired'],
     ['not_pending', 409, 'woc_market.not_pending'],
     ['confirm_failed', 409, 'woc_market.confirm_failed'],
+    // A recorded signature is awaiting the chain: refresh/abandon wait (409
+    // says retry once the verdict lands, never a terminal refusal).
+    ['confirm_in_flight', 409, 'woc_market.confirm_in_flight'],
     ['buy_now_locked', 409, 'woc_market.buy_now_locked'],
+    // Seller cancel-intent stands on the listing: no new claims or bids.
+    ['cancel_pending', 409, 'woc_market.cancel_pending'],
+    // The claimer's own abandon history refuses the claim; it ages out on its
+    // own (per-listing cooldown or the hourly cap window), so 409 not 403.
+    ['claim_cooldown', 409, 'woc_market.claim_cooldown'],
     // A payment is in flight (buy-now lock claimed or a settlement past
     // 'offered'): the state resolves on its own, so 409 says retry, and the
     // seller learns nothing about the buyer beyond "a payment exists".

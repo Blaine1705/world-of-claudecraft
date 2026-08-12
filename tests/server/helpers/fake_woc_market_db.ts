@@ -36,7 +36,12 @@ import type {
   WocStuckCustodyClasses,
 } from '../../../server/woc_market';
 import type { WocBidStatus, WocSettlementState } from '../../../server/woc_market_rules';
-import { WOC_MARKET_MAX_ACTIVE_LISTINGS } from '../../../server/woc_market_rules';
+import {
+  WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS,
+  WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR,
+  WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS,
+  WOC_MARKET_MAX_ACTIVE_LISTINGS,
+} from '../../../server/woc_market_rules';
 import type { ExtractRef } from '../../../src/sim/inventory_extract';
 
 export interface FakeWocMarketCharacter {
@@ -52,13 +57,16 @@ export interface FakeWocMarketCharacter {
 type BidRec = WocBidRow & { realm: string };
 type SettlementRec = WocSettlementRow & { realm: string };
 
-// Mirrors the woc_market_settlements_open partial unique index: 'delivered'
-// stays open until the listing row closes, so liveness checks keep seeing it.
-// Exported so the DB-free structural pin (woc_market_directed_sql.test.ts) can
-// hold this list and the shipped index predicate to the same five literals.
+// Mirrors the woc_market_settlements_open2 partial unique index: 'delivered'
+// stays open until the listing row closes, so liveness checks keep seeing it,
+// and 'review' (an over-aged confirming parked for the operator) stays open
+// because the payment may have landed. Exported so the DB-free structural pin
+// (woc_market_directed_sql.test.ts) can hold this list and the shipped index
+// predicate to the same literals.
 export const OPEN_SETTLEMENT_STATES: readonly WocSettlementState[] = [
   'offered',
   'confirming',
+  'review',
   'confirmed',
   'delivering',
   'delivered',
@@ -67,6 +75,13 @@ export const OPEN_SETTLEMENT_STATES: readonly WocSettlementState[] = [
 export class FakeWocMarketDb implements WocMarketDb {
   /** Force the NEXT escrowInsertListing to refuse (consumed on use). */
   failNextEscrow: 'lease_lost' | 'cap_reached' | null = null;
+  /** The buy-now abandon ledger (claim cooldowns), the Pg table's mirror. */
+  readonly buyNowAbandons: {
+    realm: string;
+    listingId: number;
+    account: number;
+    lockExpiresMs: number;
+  }[] = [];
   /** Every character save escrowInsertListing received, in order. */
   readonly escrowSaves: CharacterSaveArgs[] = [];
   /** The durable book-once ledger (woc_market_custody_claims), exposed so
@@ -212,6 +227,7 @@ export class FakeWocMarketDb implements WocMarketDb {
       buyNowLockAccount: null,
       buyNowLockExpiresMs: null,
       createdAtMs: this.now(),
+      cancelRequestedAtMs: null,
     };
     this.listings.set(id, row);
     this.touchListing(id);
@@ -486,7 +502,7 @@ export class FakeWocMarketDb implements WocMarketDb {
     | 'not_yours'
     | 'has_bids'
     | 'not_active'
-    | 'buy_now_pending'
+    | 'cancel_pending'
     | 'settlement_live'
     | 'contended'
   > {
@@ -504,7 +520,20 @@ export class FakeWocMarketDb implements WocMarketDb {
       row.buyNowLockExpiresMs !== null &&
       row.buyNowLockExpiresMs > nowMs
     ) {
-      return 'buy_now_pending';
+      // Mirrors the Pg cancel-intent branch: a PAID window (any settlement
+      // past 'offered') refuses; an unpaid one stamps and reports pending.
+      for (const s of this.settlements.values()) {
+        if (
+          s.listingId === id &&
+          OPEN_SETTLEMENT_STATES.includes(s.state) &&
+          s.state !== 'offered'
+        ) {
+          return 'settlement_live';
+        }
+      }
+      row.cancelRequestedAtMs = row.cancelRequestedAtMs ?? nowMs;
+      this.touchListing(id);
+      return 'cancel_pending';
     }
     // The Pg method expires 'failed' rows FIRST and rolls the expiry back via
     // TxAbort when the open check trips (its ordering exists for row-lock
@@ -580,6 +609,16 @@ export class FakeWocMarketDb implements WocMarketDb {
     }
     for (const bid of this.bids.values()) {
       if (bid.listingId === id && (bid.status === 'pending_bond' || bid.status === 'active')) {
+        // Mirrors the real teardown's paid-but-undecided carve-out: a signed,
+        // unheld bond stays with the bond poll instead of being cancelled out
+        // of the polling set.
+        if (
+          bid.status === 'pending_bond' &&
+          bid.bondSignature !== null &&
+          bid.bondState === 'pending'
+        ) {
+          continue;
+        }
         bid.status = 'cancelled';
         if (bid.bondState === 'held') bid.bondState = 'refund_due';
       }
@@ -784,6 +823,7 @@ export class FakeWocMarketDb implements WocMarketDb {
     olderThanMs: number,
     sampleLimit: number,
     countCap: number,
+    bondOlderThanMs: number,
   ): Promise<WocStuckCustodyClasses> {
     // Counts SATURATE at countCap, mirroring the Pg inner-LIMIT subqueries.
     // Age signals mirror the Pg predicates: rotation (the parked maps) never
@@ -810,6 +850,20 @@ export class FakeWocMarketDb implements WocMarketDb {
           (this.listingTouchMs.get(l.id) ?? 0) <= olderThanMs,
       )
       .sort(this.byTouch(this.listingTouchMs));
+    // 'review' rows carry NO age filter (the sweep's bound already aged them);
+    // stuck bonds age on placed_at past the caller's bond cutoff.
+    const review = [...this.settlements.values()]
+      .filter((s) => s.realm === realm && s.state === 'review')
+      .sort(this.byTouch(this.settlementTouchMs));
+    const stuckBonds = [...this.bids.values()]
+      .filter(
+        (b) =>
+          b.realm === realm &&
+          b.status === 'pending_bond' &&
+          b.bondSignature !== null &&
+          b.placedAtMs <= bondOlderThanMs,
+      )
+      .sort((a, b) => a.placedAtMs - b.placedAtMs || a.id - b.id);
     return {
       unbookedClaims: {
         count: Math.min(claims.length, countCap),
@@ -840,6 +894,26 @@ export class FakeWocMarketDb implements WocMarketDb {
           updatedAtMs: this.listingTouchMs.get(l.id) ?? 0,
         })),
       },
+      reviewSettlements: {
+        count: Math.min(review.length, countCap),
+        saturated: review.length >= countCap,
+        sample: review.slice(0, sampleLimit).map((s) => ({
+          id: s.id,
+          listingId: s.listingId,
+          createdAtMs: s.createdAtMs,
+          updatedAtMs: this.settlementTouchMs.get(s.id) ?? 0,
+        })),
+      },
+      stuckBonds: {
+        count: Math.min(stuckBonds.length, countCap),
+        saturated: stuckBonds.length >= countCap,
+        sample: stuckBonds.slice(0, sampleLimit).map((b) => ({
+          id: b.id,
+          listingId: b.listingId,
+          account: b.account,
+          placedAtMs: b.placedAtMs,
+        })),
+      },
     };
   }
 
@@ -858,39 +932,158 @@ export class FakeWocMarketDb implements WocMarketDb {
     account: number,
     nowMs: number,
     expiresAtMs: number,
-  ): Promise<WocListingRow | 'not_found' | 'not_active' | 'locked' | 'no_buy_now' | 'own_listing'> {
+  ): Promise<
+    | WocListingRow
+    | 'not_found'
+    | 'not_active'
+    | 'locked'
+    | 'no_buy_now'
+    | 'own_listing'
+    | 'cancel_pending'
+    | 'claim_cooldown'
+    | 'contended'
+  > {
     const row = this.listings.get(id);
-    const lockFree =
-      row !== undefined &&
-      (row.buyNowLockAccount === null ||
-        (row.buyNowLockExpiresMs !== null && row.buyNowLockExpiresMs <= nowMs));
-    if (
-      row &&
-      row.realm === realm &&
-      row.status === 'active' &&
-      row.buyNowCents !== null &&
-      row.sellerAccount !== account &&
-      lockFree
-    ) {
-      row.buyNowLockAccount = account;
-      row.buyNowLockExpiresMs = expiresAtMs;
-      this.touchListing(id);
-      return this.listingOut(row);
-    }
     // Mirror the Pg diagnosis order for a precise client error.
     if (!row || row.realm !== realm) return 'not_found';
     if (row.sellerAccount === account) return 'own_listing';
     if (row.status !== 'active') return 'not_active';
     if (row.buyNowCents === null) return 'no_buy_now';
-    return 'locked';
+    if (row.cancelRequestedAtMs !== null) return 'cancel_pending';
+    const lockHeld =
+      row.buyNowLockAccount !== null &&
+      row.buyNowLockExpiresMs !== null &&
+      row.buyNowLockExpiresMs > nowMs;
+    if (lockHeld) return 'locked';
+    // Steal-time abandon recording (public only), then the claimer's two
+    // cooldown guards, mirroring the Pg transaction's order so a self-steal
+    // refuses in the same call.
+    if (
+      row.buyNowLockAccount !== null &&
+      row.buyNowLockExpiresMs !== null &&
+      row.directedBuyerAccount === null
+    ) {
+      this.recordAbandon(realm, id, row.buyNowLockAccount, row.buyNowLockExpiresMs);
+    }
+    if (row.directedBuyerAccount === null) {
+      const reclaimCutoff = nowMs - WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS * 1000;
+      const windowCutoff = nowMs - WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS * 1000;
+      const mine = this.buyNowAbandons.filter((a) => a.realm === realm && a.account === account);
+      if (mine.some((a) => a.listingId === id && a.lockExpiresMs > reclaimCutoff)) {
+        return 'claim_cooldown';
+      }
+      if (
+        mine.filter((a) => a.lockExpiresMs > windowCutoff).length >=
+        WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR
+      ) {
+        return 'claim_cooldown';
+      }
+    }
+    row.buyNowLockAccount = account;
+    row.buyNowLockExpiresMs = expiresAtMs;
+    this.touchListing(id);
+    return this.listingOut(row);
   }
 
-  async clearBuyNowLock(id: number): Promise<void> {
+  /** Holder-guarded, mirroring the Pg UPDATE's WHERE. */
+  async clearBuyNowLock(id: number, holderAccount: number): Promise<void> {
     const row = this.listings.get(id);
-    if (!row) return;
+    if (!row || row.buyNowLockAccount !== holderAccount) return;
     row.buyNowLockAccount = null;
     row.buyNowLockExpiresMs = null;
     this.touchListing(id);
+  }
+
+  /** The in-memory abandon ledger, deduped on the (listing, account,
+   *  lock_expires) window key like the real unique index. */
+  private recordAbandon(
+    realm: string,
+    listingId: number,
+    account: number,
+    lockExpiresMs: number,
+  ): void {
+    if (
+      this.buyNowAbandons.some(
+        (a) =>
+          a.listingId === listingId && a.account === account && a.lockExpiresMs === lockExpiresMs,
+      )
+    ) {
+      return;
+    }
+    this.buyNowAbandons.push({ realm, listingId, account, lockExpiresMs });
+  }
+
+  async recordBuyNowAbandon(
+    realm: string,
+    listingId: number,
+    account: number,
+    lockExpiresAtMs: number,
+  ): Promise<void> {
+    this.recordAbandon(realm, listingId, account, lockExpiresAtMs);
+  }
+
+  async cancelPendingListings(
+    realm: string,
+    nowMs: number,
+    limit: number,
+  ): Promise<WocListingRow[]> {
+    return [...this.listings.values()]
+      .filter(
+        (l) =>
+          l.realm === realm &&
+          l.status === 'active' &&
+          l.cancelRequestedAtMs !== null &&
+          (l.buyNowLockAccount === null ||
+            l.buyNowLockExpiresMs === null ||
+            l.buyNowLockExpiresMs <= nowMs),
+      )
+      .sort((a, b) => a.id - b.id)
+      .slice(0, limit)
+      .map((l) => this.listingOut(l));
+  }
+
+  async closeCancelPendingListing(
+    realm: string,
+    id: number,
+    nowMs: number,
+  ): Promise<WocListingRow | 'skip' | 'contended'> {
+    const row = this.listings.get(id);
+    if (
+      !row ||
+      row.realm !== realm ||
+      row.status !== 'active' ||
+      row.cancelRequestedAtMs === null
+    ) {
+      return 'skip';
+    }
+    if (
+      row.buyNowLockAccount !== null &&
+      row.buyNowLockExpiresMs !== null &&
+      row.buyNowLockExpiresMs > nowMs
+    ) {
+      return 'skip';
+    }
+    for (const bid of this.bids.values()) {
+      if (bid.listingId === id && (bid.status === 'pending_bond' || bid.status === 'active')) {
+        return 'skip';
+      }
+    }
+    // 'failed' rows expire here (the cancelListingIfUnbid shape); any OPEN
+    // settlement skips (the overdue arm owns the abandoned window's expiry).
+    for (const s of this.settlements.values()) {
+      if (s.listingId === id && s.state === 'failed') {
+        s.state = 'expired';
+        s.failReason = 'listing_cancelled';
+        this.touchSettlement(s.id);
+      }
+    }
+    for (const s of this.settlements.values()) {
+      if (s.listingId === id && OPEN_SETTLEMENT_STATES.includes(s.state)) return 'skip';
+    }
+    row.status = 'closed';
+    row.resolution = 'cancelled';
+    this.touchListing(id);
+    return this.listingOut(row);
   }
 
   // -------------------------------------------------------------------------
@@ -907,13 +1100,18 @@ export class FakeWocMarketDb implements WocMarketDb {
     amountCents: number;
     bondCents: number;
     nowMs: number;
-    extendEndsToMs: (row: WocListingRow) => number | null;
     minNext: (row: WocListingRow) => number;
   }): Promise<
     | { ok: true; bid: WocBidRow }
     | {
         ok: false;
-        reason: 'not_found' | 'not_active' | 'own_listing' | 'bid_too_low' | 'already_pending';
+        reason:
+          | 'not_found'
+          | 'not_active'
+          | 'cancel_pending'
+          | 'own_listing'
+          | 'bid_too_low'
+          | 'already_pending';
       }
   > {
     const row = this.listings.get(args.listingId);
@@ -922,6 +1120,8 @@ export class FakeWocMarketDb implements WocMarketDb {
     const snapshot = this.listingOut(row);
     if (snapshot.status !== 'active') return { ok: false, reason: 'not_active' };
     if (snapshot.endsAtMs <= args.nowMs) return { ok: false, reason: 'not_active' };
+    // Cancel-intent blocks new bids (mirrors the Pg guard).
+    if (snapshot.cancelRequestedAtMs !== null) return { ok: false, reason: 'cancel_pending' };
     if (snapshot.sellerAccount === args.account) return { ok: false, reason: 'own_listing' };
     // One wallet is one bidder: a seller cannot bid through a second account
     // sharing the payout wallet.
@@ -955,14 +1155,25 @@ export class FakeWocMarketDb implements WocMarketDb {
       placedAtMs: args.nowMs,
     };
     this.bids.set(id, rec);
-    // Anti-snipe extension applies at PLACEMENT (even for a bond that never
-    // confirms), matching the Pg transaction.
-    const extended = args.extendEndsToMs(snapshot);
-    if (extended !== null) {
-      row.endsAtMs = extended;
-      this.touchListing(row.id);
-    }
+    // Placement does NOT extend the auction (the extension moved to bond
+    // progress: extendAuctionForBondProgress below), matching Pg.
     return { ok: true, bid: this.bidOut(rec) };
+  }
+
+  /** Mirrors the Pg arm: the callback sees the listing as read (a copy), and
+   *  only an 'active' listing extends. */
+  async extendAuctionForBondProgress(
+    realm: string,
+    listingId: number,
+    extendEndsToMs: (row: WocListingRow) => number | null,
+  ): Promise<'extended' | 'skip' | 'contended'> {
+    const row = this.listings.get(listingId);
+    if (!row || row.realm !== realm || row.status !== 'active') return 'skip';
+    const extended = extendEndsToMs(this.listingOut(row));
+    if (extended === null) return 'skip';
+    row.endsAtMs = extended;
+    this.touchListing(row.id);
+    return 'extended';
   }
 
   /** Mirrors the real UPDATE: narrowed to pending_bond, idempotent on the same
@@ -997,11 +1208,14 @@ export class FakeWocMarketDb implements WocMarketDb {
     bid.bondState = 'void';
   }
 
-  async setBidBondQuote(bidId: number, reference: string, expiresAtMs: number): Promise<void> {
+  /** Mirrors the real CAS: a quote applies only to an UNPAID bond (status
+   *  pending_bond AND no recorded signature); false = nothing written. */
+  async setBidBondQuote(bidId: number, reference: string, expiresAtMs: number): Promise<boolean> {
     const bid = this.bids.get(bidId);
-    if (!bid || bid.status !== 'pending_bond') return;
+    if (!bid || bid.status !== 'pending_bond' || bid.bondSignature !== null) return false;
     bid.bondReference = reference;
     bid.bondQuoteExpiresAtMs = expiresAtMs;
+    return true;
   }
 
   async bidById(id: number): Promise<WocBidRow | null> {
@@ -1010,13 +1224,15 @@ export class FakeWocMarketDb implements WocMarketDb {
   }
 
   /** Mirrors the real UPDATE's predicate exactly (realm + id + account +
-   *  status). A fake that checked fewer arms would let the service's tests pass
-   *  over SQL that never matched, which this suite has been bitten by before. */
+   *  status + no recorded signature). A fake that checked fewer arms would let
+   *  the service's tests pass over SQL that never matched, which this suite
+   *  has been bitten by before. */
   async abandonPendingBid(realm: string, bidId: number, account: number): Promise<boolean> {
     const bid = this.bids.get(bidId);
     if (!bid || bid.realm !== realm || bid.account !== account || bid.status !== 'pending_bond') {
       return false;
     }
+    if (bid.bondSignature !== null) return false;
     bid.status = 'cancelled';
     bid.bondState = 'void';
     return true;
@@ -1220,6 +1436,16 @@ export class FakeWocMarketDb implements WocMarketDb {
         bid.listingId === args.listingId &&
         (bid.status === 'pending_bond' || bid.status === 'active')
       ) {
+        // Mirrors the real teardown's paid-but-undecided carve-out: a signed,
+        // unheld bond stays with the bond poll instead of being cancelled out
+        // of the polling set.
+        if (
+          bid.status === 'pending_bond' &&
+          bid.bondSignature !== null &&
+          bid.bondState === 'pending'
+        ) {
+          continue;
+        }
         bid.status = 'cancelled';
         if (bid.bondState === 'held') bid.bondState = 'refund_due';
       }
@@ -1499,13 +1725,18 @@ export class FakeWocMarketDb implements WocMarketDb {
     realm: string,
     nowMs: number,
     limit: number,
+    confirmingCutoffMs: number,
   ): Promise<WocSettlementRow[]> {
+    // Mirrors the real predicate's two arms: deadline-overdue offered/failed,
+    // plus 'confirming' aged on updated_at (the touch mirror) past the H15
+    // cutoff.
     return [...this.settlements.values()]
       .filter(
         (s) =>
           s.realm === realm &&
-          (s.state === 'offered' || s.state === 'failed') &&
-          s.deadlineAtMs <= nowMs,
+          (((s.state === 'offered' || s.state === 'failed') && s.deadlineAtMs <= nowMs) ||
+            (s.state === 'confirming' &&
+              (this.settlementTouchMs.get(s.id) ?? 0) <= confirmingCutoffMs)),
       )
       .sort((a, b) => a.deadlineAtMs - b.deadlineAtMs || a.id - b.id)
       .slice(0, limit)

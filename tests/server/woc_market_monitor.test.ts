@@ -21,6 +21,8 @@ const emptyClasses = (): WocStuckCustodyClasses => ({
   unbookedClaims: { count: 0, saturated: false, sample: [] },
   stuckDelivering: { count: 0, saturated: false, sample: [] },
   undisposedListings: { count: 0, saturated: false, sample: [] },
+  reviewSettlements: { count: 0, saturated: false, sample: [] },
+  stuckBonds: { count: 0, saturated: false, sample: [] },
 });
 
 describe('woc market stuck-custody monitor', () => {
