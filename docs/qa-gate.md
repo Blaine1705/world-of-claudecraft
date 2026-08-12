@@ -110,6 +110,20 @@ bounds Vitest workers to avoid load flakes on shared machines. It resolves FFmpe
 (`ffmpeg` and `ffprobe`) from the bundled `ffmpeg-static`/`ffprobe-static` npm packages,
 falling back to PATH, and refuses to run when neither source yields a working binary.
 
+**Full-suite lock across concurrent gates (issue #2808):** per-process worker sizing
+protects a gate run from itself, but does nothing when a second `npm run gate` is
+running in a sibling worktree, which this repo's own per-task-worktree workflow makes
+routine; two gates that each correctly claim half the cores still request the whole
+machine between them. `gate.mjs` acquires an advisory lock (`scripts/lib/gate_lock.mjs`,
+a single JSON file in `os.tmpdir()`, shared by every worktree on the host) around the
+`vitest (full suite)` step only, never the rest of the run. A gate that finds the lock
+held waits and prints who holds it; a lock whose pid is gone, or that has sat far
+longer than any real full suite takes, is reclaimed rather than honored, so a killed or
+crashed gate can never wedge later runs. `GATE_NO_LOCK=1` restores fully concurrent
+behavior for a user who deliberately wants two full suites running at once.
+`gate_select.mjs`/`gate_fast.mjs` never touch this lock; it exists for the one step
+that is actually the shared-host bottleneck.
+
 **Task cache (Turborepo):** pure artifact steps (`i18n:gen`, `wiki:content`, `sfx:check`,
 `check:types`, `build:env`, `build:server`, `build:bot`, `build:bundle`) run through `npx turbo run`
 with inputs/outputs in root `turbo.json`. A warm second gate on an unchanged tree

@@ -42,6 +42,7 @@
     "CROWD_W",
     "GATE_MAX_WORKERS",
     "GATE_FAST_BASE",
+    "GATE_NO_LOCK",
     "GATE_WORKER_TIER",
     "GAME_URL",
     "GFX",
