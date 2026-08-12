@@ -303,8 +303,10 @@ Still open (a phase that hits one asks at session start):
     data = WocStuckCustodyReadout: { asOfMs, unbookedClaims: { count,
     saturated, sample: [{ custodyRef, claimedAtMs, grantCharacterId,
     mailIntent }] }, stuckDelivering: { count, saturated, sample:
-    [{ id, listingId, createdAtMs }] }, undisposedListings: { count,
-    saturated, sample: [{ id, resolution, updatedAtMs }] } }.
+    [{ id, listingId, createdAtMs, updatedAtMs }] } (updatedAtMs is the
+    class's age signal, createdAtMs is settlement provenance: render stuck
+    age from updatedAtMs), undisposedListings: { count, saturated, sample:
+    [{ id, resolution, updatedAtMs }] } }.
     Counts SATURATE at 1000 with the explicit saturated flag (count 1000
     means "1000 or more"); samples cap at 20; rows aged >= 10 min ON
     updated_at for BOTH the delivering class (stamped at the delivering
@@ -351,18 +353,26 @@ Still open (a phase that hits one asks at session start):
     deliveredUnclosedSettlementsPage, disposeSoldResidueListings,
     touchSettlementRow, stuckCustodyReadout.
   - Reconcile semantics (phase 21; as amended by the 03 QA round): deliverOne
-    returns advanced|parked|skip|contended; parked rows rotate on
-    sweep_parked_at (batch order = COALESCE(sweep_parked_at, updated_at),
-    shared verbatim with the two partial rotation indexes) and back off
-    in-process for 60s, rotating again on every backoff skip so a standing
-    parked set cannot starve fresh rows; 'skip' (a hand-moved row, finalize
-    'stale' after custody booked) clears the parked entry and raises
-    sweepError (it is invisible to every monitor class, so the log line is
-    the only trace, and reopenListing could re-auction such a row: never
-    hand-move settlement state). A contended finalize stops the batch, the
-    pass claims nothing further (the check runs BEFORE
-    claimDeliverableSettlements), and the eager confirm entry resets the
-    flag for itself; the next pass retries. Delivery stats count rows
+    returns advanced|parked|skip|contended; parked rows rotate ONCE on
+    sweep_parked_at at park time (batch order = COALESCE(sweep_parked_at,
+    updated_at), shared verbatim with the two partial rotation indexes),
+    back off in-process for 60s, and while backing off are EXCLUDED from the
+    batch reads (deliveringSettlements / undisposedClosedListings take the
+    caller's backed-off id set), so a standing parked set costs no batch
+    slots and no per-pass writes; sweep_parked_at clears on the terminal
+    transitions (finalize, dispose) so a recovered row cannot carry a stale
+    rotation key. 'skip' (a hand-moved row, finalize 'stale' after custody
+    booked) clears the parked entry and raises sweepError (it is invisible
+    to every monitor class, so the log line is the only trace, and
+    reopenListing could re-auction such a row: never hand-move settlement
+    state). A contended finalize stops the batch and the pass claims nothing
+    further (the check runs BEFORE claimDeliverableSettlements); contention
+    is scoped per entry (the sweep pass owns one scope, the eager confirm
+    entry mints its own), so a request-thread delivery can neither clobber
+    a pass mid-flight nor inherit a stale verdict; the next pass retries.
+    activateBid's 'contended' surfaces to the bond-confirm caller as
+    standing:false pending:true (never "outbid": the bond is held and the
+    next poll retries the activation). Delivery stats count rows
     ADVANCED with park EVENTS on the separate 'parked' stat; a slow pass
     (>1s) logs even at zero counts. finalizeDeliveredSettlement
     distinguishes 'finalized' from 'already_final' (re-runs neither
@@ -408,12 +418,21 @@ Still open (a phase that hits one asks at session start):
     re-arming the duplication (warning written at the DDL); resolve parked
     rows by hand-delivering then stamping booked_at, or by confirming
     non-delivery first, and the phase 22 runbook owes the step-by-step
-    re-drive procedure for each parked class (the two permanent-park cases,
-    crash-before-blob-persist and a deterministic parcel refusal, are the
-    ordinary ones). Do not overlap the market-enable rollout with a rolling
-    restart: boot DDL holds AccessExclusive on woc_market_custody_claims
-    for the whole schema transaction, so realm B's boot blocks realm A's
-    custody writes for its duration. onSweepError logs raw pg errors
+    re-drive procedure for each parked class. The permanent-park classes:
+    crash-before-blob-persist and a deterministic parcel refusal (mail rail,
+    hand-delivery is the fix once non-delivery is confirmed), plus the GRANT
+    classes (non-null grant_character_id: an ambiguous grant refusal, a
+    lease fence, or a dead session), where the item may ALREADY be in the
+    buyer's bags and hand-delivering without checking mints the dupe:
+    confirm the buyer does NOT hold the item first. Do not overlap the
+    market-enable rollout with a rolling restart: boot DDL holds
+    AccessExclusive on woc_market_custody_claims, woc_market_settlements,
+    and woc_market_listings (the sweep_parked_at ALTERs) for the whole
+    schema transaction, so realm B's boot blocks realm A's market writes
+    for its duration. During a mixed-fleet window the OLD binary also loses
+    woc_market_settlements_state_created (the new boot drops it), so its
+    readout sample sorts the delivering set unindexed: diagnostic-only and
+    transient, but expect that read to be slower until the fleet converges. onSweepError logs raw pg errors
     (detail/where can echo character names and item JSON; fine today, but
     revisit before any account or wallet column joins those rows). The
     EXPLAIN list for phases 16/17 gains: the redrive page probe

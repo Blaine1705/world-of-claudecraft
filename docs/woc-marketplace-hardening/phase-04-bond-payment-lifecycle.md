@@ -22,18 +22,20 @@ pending: every payment has a ledger trace and a bounded resolution.
 
 ## Findings context (verified 2026-08-11; re-verify line numbers)
 
-- H4 at `server/woc_market.ts:1269, 1243, 1914`: quote expiry is checked BEFORE the
+- H4 (anchors are symbols, not line numbers; the 03 rounds moved the file): the
+  `confirmBond` intake in `server/woc_market.ts` checks quote expiry BEFORE the
   signature is recorded (a near-expiry broadcast payment is refused with no ledger
   trace); `refreshBondQuote` overwrites the reference of a paid, awaiting-finality bond;
-  the open-bid cancellation (now the CASE UPDATE inside `finalizeDeliveredSettlement`,
+  the open-bid cancellation (the CASE UPDATE inside `finalizeDeliveredSettlement`,
   `server/woc_market_db.ts`; the old `cancelOpenBidsForListing` helper is gone since 03)
   can drop paid-but-undecided bonds out of the polling set.
-- H15 at `server/woc_market_db.ts:1693`: `overdueSettlements` selects only `offered` and
+- H15: `overdueSettlements` (`server/woc_market_db.ts`) selects only `offered` and
   `failed`; a settlement stuck in `confirming` is polled forever, the escrowed item held
   indefinitely.
-- Anti-snipe at `server/woc_market_db.ts:1267`: the auction end extends at bid placement,
-  before the bond confirms; multi-account griefers with distinct wallets can burn the
-  30-minute extension cap without ever paying.
+- Anti-snipe: `insertPendingBid`'s `extendEndsToMs` arm (`server/woc_market_db.ts`)
+  extends the auction end at bid placement, before the bond confirms; multi-account
+  griefers with distinct wallets can burn the 30-minute extension cap without ever
+  paying.
 
 ## Deliverables
 
