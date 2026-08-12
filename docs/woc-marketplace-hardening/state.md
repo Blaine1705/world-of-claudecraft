@@ -30,7 +30,9 @@ actually reads.
   the leg-neutral confirm_in_flight copy (five fills refreshed), the
   held-survivor poll park, the split extension anchors (ruling recorded),
   the stuckSinceMs sample field, and the derived paid-subset pin
-  (progress.md carries both rounds). The H15 escape hatch that gated enable
+  (progress.md carries both rounds). Gate GREEN TWICE more (full-suite
+  fallback, all 8 steps) at c7176d730b and at the final code tip
+  6642c6e15b; eleven mutation proofs bit across the session. The H15 escape hatch that gated enable
   exists (the 'review' state). Items the DEDICATED phase-04-qa session still
   owns: re-judge the cooldown NUMBERS, the cancel-intent bid-block
   interpretation, the confirm_in_flight second-signature semantics, the
