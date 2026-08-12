@@ -416,6 +416,7 @@ import {
   reconcileViewPointLights,
 } from './point_light_budget';
 import { buildComposer, type PostPipeline } from './post';
+import { disposePrewarmDepthMaterials, prewarmDepthMaterialFor } from './prewarm_depth_material';
 import {
   boundedPrewarmVisibility,
   runBackgroundPrewarm,
@@ -489,12 +490,14 @@ import {
 } from './renderer_frame_telemetry_core';
 import { createRevealGate } from './reveal_gate';
 import {
-  attachRickshawPuller,
-  createRickshawPullerVisual,
-  preloadRickshawPullerAssets,
-  RICKSHAW_MOUNT_VISUAL_KEY,
-  rickshawPullerAssetsReady,
+  attachPullerIfRickshaw,
+  preloadPullerIfRickshaw,
+  type RickshawMountViewState,
+  releaseRickshawMountState,
+  rickshawMountBuildReady,
   spinMountWheels,
+  updateRickshawPuller,
+  updateRollingMountLoop,
 } from './rickshaw_mount';
 import { collectRiftAmbientSources } from './rift_ambience';
 import { buildRiftRankBadge } from './rift_rank';
@@ -1115,7 +1118,7 @@ function selfSnapshotAlpha(alpha: number, lead: number): number {
   return Math.min(1.25, alpha + Math.max(0, lead));
 }
 
-export interface EntityView {
+export interface EntityView extends RickshawMountViewState {
   group: THREE.Group;
   /** rigged glTF visual for characters; null for object views (doors/crates) */
   visual: CharacterVisual | null;
@@ -1127,22 +1130,6 @@ export interface EntityView {
   travelVisual: CharacterVisual | null; // druid travel form (chicken-cow), built lazily
   mountVisual: CharacterVisual | null; // rideable mount under a player, built lazily
   mountVisualKey: string; // '' = none; diffed each frame for live mount swaps
-  /** Wheel nodes of a mount that rolls (the rickshaw's Wheel_L/Wheel_R), looked
-   *  up once per mount build. `null` = looked up and this mount has none, which
-   *  is every mount but one; `undefined` = not looked up yet. */
-  mountWheels?: THREE.Object3D[] | null;
-  /** Radius of those wheels in world units, measured off the built model rather
-   *  than hardcoded, so a geometry change cannot desync the roll rate. */
-  mountWheelRadius?: number;
-  /** Whether this view has ever called sink.mountLoop (a continuous rolling
-   *  mount). Gates the per-frame stopMountLoop call so it costs nothing for
-   *  the common case (an entity that never had a loop): NOT the same as
-   *  checking mountVisualKey, which the dismount branch above already resets
-   *  to '' in the SAME frame the loop still needs one final stop call. */
-  mountLoopActive?: boolean;
-  // The Bonebound Rickshaw's puller: a second character visual parented at
-  // the cart's Socket_Puller node. Null for every other mount.
-  mountPullerVisual: CharacterVisual | null;
   /** world-unit rider saddle lift while mounted (0 dismounted); the nameplate,
    *  chat-bubble, and sloppy-pick overhead anchors add it (scaled by e.scale) */
   mountLift: number;
@@ -3337,10 +3324,7 @@ export class Renderer {
       bestEffort(() => target.dispose());
     }
     this.envRTs.clear();
-    for (const material of this.prewarmDepthMaterials.values()) {
-      bestEffort(() => material.dispose());
-    }
-    this.prewarmDepthMaterials.clear();
+    disposePrewarmDepthMaterials(this.prewarmDepthMaterials, bestEffort);
     for (const bubble of this.chatBubbles.values()) bestEffort(() => bubble.el.remove());
     this.chatBubbles.clear();
     for (const id of [...this.views.keys()]) bestEffort(() => this.removeView(id, true));
@@ -5598,50 +5582,6 @@ export class Renderer {
     return count;
   }
 
-  private prewarmDepthMaterial(source: THREE.Material): THREE.MeshDepthMaterial {
-    const textured = source as TextureBackedMaterial & {
-      displacementScale?: number;
-      displacementBias?: number;
-      wireframe?: boolean;
-    };
-    const shadowSide =
-      source.shadowSide ??
-      (source.side === THREE.FrontSide
-        ? THREE.BackSide
-        : source.side === THREE.BackSide
-          ? THREE.FrontSide
-          : THREE.DoubleSide);
-    const key = [
-      shadowSide,
-      textured.map ? 1 : 0,
-      textured.alphaMap ? 1 : 0,
-      source.alphaToCoverage || source.alphaTest > 0 ? 1 : 0,
-      textured.displacementMap ? 1 : 0,
-      textured.wireframe ? 1 : 0,
-    ].join('|');
-    let depth = this.prewarmDepthMaterials.get(key);
-    if (depth) return depth;
-    depth = new THREE.MeshDepthMaterial({
-      side: shadowSide,
-      map: textured.map ?? null,
-      alphaMap: textured.alphaMap ?? null,
-      alphaTest: source.alphaToCoverage ? 0.5 : source.alphaTest,
-      displacementMap: textured.displacementMap ?? null,
-      displacementScale: textured.displacementScale ?? 1,
-      displacementBias: textured.displacementBias ?? 0,
-      wireframe: textured.wireframe ?? false,
-      // Match the REAL shadow pass: three's shared shadow depth material uses
-      // RGBADepthPacking and depthPacking sits in the program cache key, so
-      // the default BasicDepthPacking linked a variant the shadow pass never
-      // draws, and every "prewarmed" caster relinked at its first shadow
-      // draw anyway (the residue probe measured all of them).
-      depthPacking: THREE.RGBADepthPacking,
-    });
-    depth.name = `prewarm-depth:${key}`;
-    this.prewarmDepthMaterials.set(key, depth);
-    return depth;
-  }
-
   /**
    * Link a root's exact live colour-program variant before a bounded upload.
    * Three r165 chooses output colour space from the current render target in
@@ -5693,8 +5633,8 @@ export class Renderer {
       const material = mesh.material;
       swaps.push({ mesh, material });
       mesh.material = Array.isArray(material)
-        ? material.map((item) => this.prewarmDepthMaterial(item))
-        : this.prewarmDepthMaterial(material);
+        ? material.map((item) => prewarmDepthMaterialFor(this.prewarmDepthMaterials, item))
+        : prewarmDepthMaterialFor(this.prewarmDepthMaterials, material);
     });
     if (swaps.length === 0) return;
     // Match the real shadow pass's program key exactly. A bare
@@ -10464,11 +10404,7 @@ export class Renderer {
       v.travelVisual?.dispose();
       v.mountVisual?.dispose();
       v.metamorphVisual?.dispose();
-      v.mountPullerVisual?.dispose();
-      // Wheel lookup is cached per built model (see spinMountWheels); leaving
-      // it here would hold references into the just-disposed mountVisual.
-      v.mountWheels = undefined;
-      v.mountWheelRadius = undefined;
+      releaseRickshawMountState(v, true);
       v.fireballTravelVisual?.dispose();
     } else {
       if (!terminal && v.objectPoolKey && v.objectMesh instanceof THREE.Group) {
@@ -11372,26 +11308,13 @@ export class Renderer {
           v.mountVisual.dispose();
           v.mountVisual = null;
         }
-        v.mountPullerVisual?.dispose();
-        v.mountPullerVisual = null;
+        releaseRickshawMountState(v, true);
         v.mountVisualKey = '';
-        // Wheel lookup is cached per built model, so it has to be invalidated
-        // with the model. Leaving it would keep nodes from a disposed visual.
-        v.mountWheels = undefined;
-        v.mountWheelRadius = undefined;
-        // The rickshaw composes a second character visual (the puller): both
-        // assets must be ready before either is built, or the cart pops in
-        // gripless for a frame.
-        const isRickshaw = mountSpec.visualKey === RICKSHAW_MOUNT_VISUAL_KEY;
-        const pullerReady = !isRickshaw || rickshawPullerAssetsReady();
-        if (mountAssetsReady(mountSpec.visualKey) && pullerReady) {
+        if (rickshawMountBuildReady(mountSpec.visualKey, mountAssetsReady(mountSpec.visualKey))) {
           v.mountVisual = createMountVisual(mountSpec.visualKey);
           v.group.add(v.mountVisual.root); // group.scale already carries e.scale
           v.mountVisualKey = mountSpec.visualKey;
-          if (isRickshaw) {
-            v.mountPullerVisual = createRickshawPullerVisual();
-            attachRickshawPuller(v.mountVisual.root, v.mountPullerVisual);
-          }
+          attachPullerIfRickshaw(v, mountSpec.visualKey, v.mountVisual.root);
           // A newly summoned mount is exactly a brand-new rig's materials
           // linking for the first time; gate it like a gear swap instead of
           // freezing the frame the mount lands on (#2571).
@@ -11403,18 +11326,13 @@ export class Renderer {
           void preloadMountAssets(mountSpec.visualKey).catch((err) =>
             console.error('Failed to preload mount model:', err),
           );
-          if (isRickshaw) {
-            void preloadRickshawPullerAssets().catch((err) =>
-              console.error('Failed to preload rickshaw puller model:', err),
-            );
-          }
+          preloadPullerIfRickshaw(mountSpec.visualKey);
         }
       } else if (!mountSpec && v.mountVisual) {
         v.group.remove(v.mountVisual.root);
         v.mountVisual.dispose();
         v.mountVisual = null;
-        v.mountPullerVisual?.dispose();
-        v.mountPullerVisual = null;
+        releaseRickshawMountState(v, true);
         v.mountVisualKey = '';
       }
       if (v.mountVisual) v.mountVisual.root.visible = mountShown && !v.mountCompilePending;
@@ -11839,36 +11757,17 @@ export class Renderer {
         // state (an ordinary mount, or the loop already stopped).
         sink.mountEngineReset(e.id);
       }
-      // A rolling mount (the rickshaw's cart bed) is CONTINUOUS, so it is driven
-      // by movement state every frame rather than by the stride accumulator
-      // above. No-op for every mount without a mount_loop_* clip, which is all
-      // of them but this one. Stopped explicitly rather than by omission: a loop
-      // nobody calls again just keeps playing.
-      //
-      // Deliberately OUTSIDE the SFX_MOVE_RANGE_SQ (42yd) gate above and the
-      // mountEngineReset release branch beside it: those exist because an
-      // engine mount's loop, once started, keeps playing at its LAST polled
-      // position if the rider leaves the gate mid-move, since nothing calls it
-      // again to update or release it. mountLoop has no such failure mode: it
-      // is called here every frame regardless of distance, so a rider anywhere
-      // in interest range (~120yd) always has a fresh position, and
-      // MAX_DISTANCE (46yd, sfx.ts) genuinely silences it well before that.
-      // The cost is node count only (one held BufferSource/GainNode/PannerNode
-      // per far-but-in-range rider), not a frozen or stale sound.
-      if (sink) {
-        if (logicallyMounted && !visuallyDead) {
-          sink.mountLoop(e.id, ax, ay, az, e.mountKey, moving && !airborne);
-          v.mountLoopActive = true;
-        } else if (v.mountLoopActive) {
-          // Gated on "this view actually started a loop", not just "not
-          // mounted": that makes the call free for the common case (an
-          // entity that never had a loop) instead of three Map operations a
-          // frame for everyone in view, while still firing exactly once on
-          // the dismount frame that needs it.
-          sink.stopMountLoop(e.id);
-          v.mountLoopActive = false;
-        }
-      }
+      updateRollingMountLoop(
+        sink,
+        v,
+        e.id,
+        e.mountKey,
+        ax,
+        ay,
+        az,
+        logicallyMounted && !visuallyDead,
+        moving && !airborne,
+      );
       // Capture the flight's peak fall speed before the landing reset: the
       // water-entry splash below scales with how hard the body came down.
       const entryFallSpeed = v.fallSpeed;
@@ -12100,18 +11999,7 @@ export class Renderer {
         } else {
           v.mountVisual.advanceOffscreen(dt);
         }
-        if (v.mountPullerVisual) {
-          if (runCharacterPresentation) {
-            // Same locomotion state the cart's own mountVisual just got (mst,
-            // built above from the rider's real speed/moving/running/
-            // backwards/swimming): the puller walks/runs with the rider instead
-            // of always idling in place, which is what a fixed idle constant
-            // here used to make it do.
-            v.mountPullerVisual.update(dt, mst, animate);
-          } else {
-            v.mountPullerVisual.advanceOffscreen(dt);
-          }
-        }
+        updateRickshawPuller(v, dt, mst, animate, runCharacterPresentation);
       }
 
       const emoteId =

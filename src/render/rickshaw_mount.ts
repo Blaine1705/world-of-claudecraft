@@ -159,3 +159,150 @@ export function spinMountWheels(
   const delta = ((backwards ? -speed : speed) * dt) / radius;
   for (const wheel of wheels) wheel.rotateX(delta);
 }
+
+/** The audio sink surface the rolling loop drives. Structural so this module
+ *  needs no import from the renderer's own sink type. */
+export interface MountLoopSink {
+  mountLoop(id: number, x: number, y: number, z: number, mountKey: string, moving: boolean): void;
+  stopMountLoop(id: number): void;
+}
+
+/** Drives a rolling mount's CONTINUOUS loop for one frame.
+ *
+ *  A rolling mount (the rickshaw's cart bed) is driven by movement state every
+ *  frame rather than by the renderer's stride accumulator. No-op for every
+ *  mount without a mount_loop_* clip, which is all of them but this one.
+ *  Stopped explicitly rather than by omission: a loop nobody calls again just
+ *  keeps playing.
+ *
+ *  Called OUTSIDE the renderer's SFX_MOVE_RANGE_SQ (42yd) audibility gate and
+ *  the mountEngineReset release branch beside it, deliberately. Those exist
+ *  because an engine mount's loop, once started, keeps playing at its LAST
+ *  polled position if the rider leaves the gate mid-move, since nothing calls
+ *  it again to update or release it. This has no such failure mode: it is
+ *  called every frame regardless of distance, so a rider anywhere in interest
+ *  range (~120yd) always has a fresh position, and MAX_DISTANCE (46yd, sfx.ts)
+ *  genuinely silences it well before that. The cost is node count only (one
+ *  held BufferSource/GainNode/PannerNode per far-but-in-range rider), never a
+ *  frozen or stale sound.
+ *
+ *  `view.mountLoopActive` gates the stop call on "this view actually started a
+ *  loop", not merely "not mounted", so the common case (an entity that never
+ *  had a loop) costs nothing instead of three Map operations a frame for
+ *  everyone in view, while still firing exactly once on the dismount frame
+ *  that needs it. */
+export function updateRollingMountLoop(
+  sink: MountLoopSink | null | undefined,
+  view: { mountLoopActive?: boolean },
+  entityId: number,
+  mountKey: string,
+  x: number,
+  y: number,
+  z: number,
+  mounted: boolean,
+  rolling: boolean,
+): void {
+  if (!sink) return;
+  if (mounted) {
+    sink.mountLoop(entityId, x, y, z, mountKey, rolling);
+    view.mountLoopActive = true;
+  } else if (view.mountLoopActive) {
+    sink.stopMountLoop(entityId);
+    view.mountLoopActive = false;
+  }
+}
+
+/** True when the mount visual about to be built is the rickshaw cart. */
+export function isRickshawMount(visualKey: string): boolean {
+  return visualKey === RICKSHAW_MOUNT_VISUAL_KEY;
+}
+
+/** Whether BOTH halves of a mount are decoded and safe to build together.
+ *
+ *  The rickshaw composes a second character visual (the puller), and both
+ *  assets must be ready before either is built, or the cart pops in gripless
+ *  for a frame. Every other mount answers on its own asset alone. */
+export function rickshawMountBuildReady(visualKey: string, cartReady: boolean): boolean {
+  if (!cartReady) return false;
+  return !isRickshawMount(visualKey) || rickshawPullerAssetsReady();
+}
+
+/** Builds and attaches the puller onto a freshly built cart, if this is one. */
+export function attachPullerIfRickshaw(
+  view: { mountPullerVisual: CharacterVisual | null },
+  visualKey: string,
+  cartRoot: THREE.Object3D,
+): void {
+  if (!isRickshawMount(visualKey)) return;
+  view.mountPullerVisual = createRickshawPullerVisual();
+  attachRickshawPuller(cartRoot, view.mountPullerVisual);
+}
+
+/** Kicks the puller's own preload alongside the cart's, if this is one. */
+export function preloadPullerIfRickshaw(visualKey: string): void {
+  if (!isRickshawMount(visualKey)) return;
+  void preloadRickshawPullerAssets().catch((err) =>
+    console.error('Failed to preload rickshaw puller model:', err),
+  );
+}
+
+/** Advances the puller's own rig for one frame, if this view has one.
+ *
+ *  `mst` is the SAME locomotion state the cart's own mountVisual just got
+ *  (built from the rider's real speed/moving/running/backwards/swimming), so
+ *  the puller walks and runs with the rider instead of always idling in place,
+ *  which is what a fixed idle constant here used to make it do. */
+export function updateRickshawPuller(
+  view: { mountPullerVisual: CharacterVisual | null },
+  dt: number,
+  mst: Parameters<CharacterVisual['update']>[1],
+  animate: boolean,
+  presenting: boolean,
+): void {
+  const puller = view.mountPullerVisual;
+  if (!puller) return;
+  if (presenting) puller.update(dt, mst, animate);
+  else puller.advanceOffscreen(dt);
+}
+
+/** Tears down the puller and invalidates the wheel-lookup cache.
+ *
+ *  The wheel cache holds references INTO the mount visual, so it has to be
+ *  invalidated with the model; leaving it would keep nodes from a disposed
+ *  visual alive and hand the next lookup stale objects. */
+export function releaseRickshawMountState(
+  view: {
+    mountPullerVisual: CharacterVisual | null;
+    mountWheels?: THREE.Object3D[] | null;
+    mountWheelRadius?: number;
+  },
+  dispose: boolean,
+): void {
+  if (dispose) view.mountPullerVisual?.dispose();
+  view.mountPullerVisual = null;
+  view.mountWheels = undefined;
+  view.mountWheelRadius = undefined;
+}
+
+/** The per-view state this mount owns, mixed into the renderer's EntityView.
+ *
+ *  Kept here rather than spelled out in renderer.ts so the fields, their
+ *  invariants, and the functions that maintain them live together, and so the
+ *  coordinator carries one name instead of four field declarations. */
+export interface RickshawMountViewState {
+  /** Wheel nodes of a mount that rolls (Wheel_L/Wheel_R), looked up once per
+   *  mount build. `null` = looked up and this mount has none, which is every
+   *  mount but one; `undefined` = not looked up yet. */
+  mountWheels?: THREE.Object3D[] | null;
+  /** Radius of those wheels in world units, measured off the built model rather
+   *  than hardcoded, so a geometry change cannot desync the roll rate. */
+  mountWheelRadius?: number;
+  /** Whether this view has ever called sink.mountLoop. Gates the per-frame
+   *  stopMountLoop call so it costs nothing for an entity that never had a
+   *  loop: NOT the same as checking mountVisualKey, which the dismount branch
+   *  resets to '' in the SAME frame the loop still needs its final stop. */
+  mountLoopActive?: boolean;
+  /** The puller: a second character visual parented under the cart's root.
+   *  Null for every other mount. */
+  mountPullerVisual: CharacterVisual | null;
+}
