@@ -2840,6 +2840,47 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     expect(h.db.custodyClaims.get(ref)?.bookedAtMs).toBeNull();
   });
 
+  it('PARKS after a blob-half throw once the letter was collected: written flips BEFORE the call', async () => {
+    // The interleaving the flip-before-persist rule exists for: the persist
+    // THREW after the parcel entered the live book (the blob half failing),
+    // so the attempt never returned, and the buyer collected and deleted the
+    // letter before the retry. Only an entry marked written AT ATTEMPT TIME
+    // parks here; an entry flipped after the call would still read unwritten
+    // and authorize the re-mail, which is copy two. The booking twins above
+    // cannot see this: their persist SUCCEEDS, so the flip order is
+    // indistinguishable there.
+    const h = makeHarness();
+    h.custody.bags.set(CHAR_A, []);
+    h.custody.owners.set(CHAR_A, BUYER_A);
+    const listing = await listEpic(h);
+    await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    h.setNow(listing.endsAtMs + 1);
+    await h.service.sweepPass();
+    const settlement = await liveSettlement(h, listing.id);
+    const ref = settlementCustodyRef(settlement.id);
+    unwrap(await h.service.settlementQuote(BUYER_A, settlement.id), 'settlementQuote');
+    h.custody.failNextPersist = true;
+    unwrap(
+      await h.service.confirmSettlement(BUYER_A, settlement.id, 'sig-blobhalf-1'),
+      'confirmSettlement',
+    );
+    expect(
+      h.custody.parcels.filter((p) => p.custodyRef === ref),
+      'the parcel reached the live book before the throw',
+    ).toHaveLength(1);
+    expect(h.db.custodyClaims.get(ref)?.bookedAtMs).toBeNull();
+    h.custody.collect(ref);
+    await h.service.sweepPass();
+    await h.service.sweepPass();
+    expect(
+      h.custody.persistCalls.filter((r) => r === ref),
+      'exactly one attempt ever reached the post office',
+    ).toHaveLength(1);
+    expect(h.custody.parcels.filter((p) => p.custodyRef === ref)).toHaveLength(0);
+    expect((await liveSettlement(h, listing.id)).state, 'parked visibly').toBe('delivering');
+    expect(h.db.custodyClaims.get(ref)?.bookedAtMs).toBeNull();
+  });
+
   it('resumes a same-process retry while the written letter stays uncollected', async () => {
     // The positive twin: booking threw, nobody collected, so the parcel in
     // the book authorizes the resume and the booking completes, exactly once.
