@@ -5890,14 +5890,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Teď ne',
   'hudChrome.nativeUpdate.title': 'Aktualizace dostupná',
   'hudChrome.nativeUpdate.update': 'Aktualizovat',
-  'hudChrome.otaUpdate.title': 'Aktualizace hry',
-  'hudChrome.otaUpdate.downloading': 'Stahování aktualizace: {percent}',
-  'hudChrome.otaUpdate.applying':
-    'Aktualizace stažena. Hra se restartuje, aby ji použila.',
-  'hudChrome.otaUpdate.incompatible':
-    'Ke hraní je potřeba aktualizace. Použije se hned po dokončení stahování.',
-  'hudChrome.otaUpdate.continueAnyway': 'Pokračovat bez aktualizace',
-  'hudChrome.otaUpdate.progressLabel': 'Průběh stahování aktualizace',
   'hudChrome.widgets.clockTitle': 'Místní čas - kliknutím přepneš 12/24 h',
   'hudChrome.widgets.coordinates': 'Souřadnice',
   'hudChrome.widgets.heading': 'Směr',
@@ -12997,4 +12989,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.backfillNote': 'Vzít si náhradnické místo je záměrně bez rizika: naskočíš do skóre, na kterém jsi neměl podíl, takže zápas se tvého hodnocení nedotkne ani v jednom směru, ať vyhraješ nebo prohraješ, a odejít z něj nic nedlužíš. Nabídka navíc přestane chodit, jakmile je zápas dost blízko konce na to, aby příchod už nic nezměnil, takže tě nikdy neposadí do cizího konce.',
   'guide.thornhollowPage.leavingBody': 'Opustit probíhající zápas znamená dezertovat z něj a hodnocený žebřík nemůže odměňovat vytažení zástrčky u prohrávajícího skóre: dezertér si na místě odnese porážku i hodnocení, které k ní patří, upustí vlajku, pokud ji nesl, a jeho tým bojuje dál o hráče slabší. Právě k tomu je prázdné místo. Dokud zápasu chybí bojovník, může fronta nabídnout židli někomu, kdo čeká, a vždy je to nabídka, kterou přijmeš nebo odmítneš, ne teleport, který se ti prostě stane; odmítnutí tě nic nestojí a posune ji dalšímu v řadě. Ptají se jen těch, kdo se přihlásili sólo, takže skupina, která se přihlásila společně, se nikdy nerozdělí, aby zaplnila díru.',
   'guide.thornhollowPage.leavingHeading': 'Odejít dřív a zaplnit prázdné místo',
+  'hudChrome.bags.itemAriaLocked': '{item}, počet {count}, zamčeno',
+  'hudChrome.bags.itemLockedLine': 'Zamčeno',
+  'hudChrome.bags.lockItem': 'Zamknout předmět',
+  'hudChrome.bags.unlockItem': 'Odemknout předmět',
+  'hudChrome.crafting.reagentLocked': 'Reagencie pro to je zamčená.',
+  'hudChrome.enchanting.salvageLocked': 'Tento předmět je zamčený.',
 };

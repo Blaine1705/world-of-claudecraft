@@ -2196,7 +2196,7 @@ export const zh_TW: EnTranslations = {
       "itemAriaQuest": "{item}，數量 {count}，任務物品",
       "itemAriaLocked": "{item}，數量 {count}，已鎖定",
       "itemLockedLine": "已鎖定",
-      "lockItem": "Lock Item",
+      "lockItem": "鎖定物品",
       "unlockItem": "解鎖物品",
       "filterGroupAria": "依類別篩選背包",
       "filterAll": "全部",

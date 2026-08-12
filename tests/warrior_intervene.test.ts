@@ -157,7 +157,7 @@ describe('Intervene (level-5 warrior mobility row)', () => {
       const absorb = known
         .find((a) => a.def.id === 'intervene')
         ?.effects.find((e) => e.type === 'absorb');
-      if (!absorb || absorb.type !== 'absorb') throw new Error('no absorb effect');
+      if (absorb?.type !== 'absorb') throw new Error('no absorb effect');
       return absorb.amount / p.maxHp;
     };
 
@@ -177,9 +177,9 @@ describe('Intervene (level-5 warrior mobility row)', () => {
     // moves this test.
     const psalmRanks = ABILITIES.power_word_shield.ranks ?? [];
     const psalmAtCap = psalmRanks[psalmRanks.length - 1]?.effects?.find((e) => e.type === 'absorb');
-    if (!psalmAtCap || psalmAtCap.type !== 'absorb') throw new Error('no healer shield fixture');
+    if (psalmAtCap?.type !== 'absorb') throw new Error('no healer shield fixture');
     const intervene = ABILITIES.intervene.ranks?.at(-1)?.effects.find((e) => e.type === 'absorb');
-    if (!intervene || intervene.type !== 'absorb') throw new Error('no intervene rank 3');
+    if (intervene?.type !== 'absorb') throw new Error('no intervene rank 3');
     expect(intervene.amount).toBeLessThan(psalmAtCap.amount / 3);
   });
 

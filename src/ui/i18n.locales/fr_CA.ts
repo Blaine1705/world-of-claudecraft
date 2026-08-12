@@ -300,4 +300,16 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.guildInviteCancelled':
     'Une invitation de guilde en attente a été annulée parce que la guilde a été renommée.',
   'hud.prompts.guildRenamed': "Votre guilde a été renommée en {name} par l'équipe de modération.",
+  'hudChrome.bags.itemAriaLocked': '{item}, quantité {count}, verrouillé',
+  'hudChrome.bags.itemLockedLine': 'Verrouillé',
+  'hudChrome.bags.lockItem': 'Verrouiller l\'objet',
+  'hudChrome.bags.unlockItem': 'Déverrouiller l\'objet',
+  'hudChrome.crafting.reagentLocked': 'Un composant pour cela est verrouillé.',
+  'hudChrome.enchanting.salvageLocked': 'Cet objet est verrouillé.',
+  'hudChrome.otaUpdate.applying': 'Actualización descargada. Reiniciando el juego para aplicarla.',
+  'hudChrome.otaUpdate.continueAnyway': 'Continuar sin actualizar',
+  'hudChrome.otaUpdate.downloading': 'Descargando actualización: {percent}',
+  'hudChrome.otaUpdate.incompatible': 'Se necesita una actualización para jugar. Se aplicará en cuanto termine la descarga.',
+  'hudChrome.otaUpdate.progressLabel': 'Progreso de descarga de la actualización',
+  'hudChrome.otaUpdate.title': 'Actualización del juego',
 };

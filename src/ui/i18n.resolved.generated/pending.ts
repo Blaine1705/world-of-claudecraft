@@ -9,140 +9,25 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "hudChrome.bags.itemAriaLocked",
-    "hudChrome.bags.itemLockedLine",
-    "hudChrome.bags.lockItem",
-    "hudChrome.bags.unlockItem",
-    "hudChrome.crafting.reagentLocked",
-    "hudChrome.enchanting.salvageLocked"
-  ],
-  "es_ES": [
-    "hudChrome.bags.itemAriaLocked",
-    "hudChrome.bags.itemLockedLine",
-    "hudChrome.bags.lockItem",
-    "hudChrome.bags.unlockItem",
-    "hudChrome.crafting.reagentLocked",
-    "hudChrome.enchanting.salvageLocked"
-  ],
-  "fr_FR": [
-    "hudChrome.bags.itemAriaLocked",
-    "hudChrome.bags.itemLockedLine",
-    "hudChrome.bags.lockItem",
-    "hudChrome.bags.unlockItem",
-    "hudChrome.crafting.reagentLocked",
-    "hudChrome.enchanting.salvageLocked"
-  ],
-  "fr_CA": [
-    "hudChrome.bags.itemAriaLocked",
-    "hudChrome.bags.itemLockedLine",
-    "hudChrome.bags.lockItem",
-    "hudChrome.bags.unlockItem",
-    "hudChrome.crafting.reagentLocked",
-    "hudChrome.enchanting.salvageLocked"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "hudChrome.bags.itemAriaLocked",
-    "hudChrome.bags.itemLockedLine",
-    "hudChrome.bags.lockItem",
-    "hudChrome.bags.unlockItem",
-    "hudChrome.crafting.reagentLocked",
-    "hudChrome.enchanting.salvageLocked"
-  ],
-  "de_DE": [
-    "hudChrome.bags.itemAriaLocked",
-    "hudChrome.bags.itemLockedLine",
-    "hudChrome.bags.lockItem",
-    "hudChrome.bags.unlockItem",
-    "hudChrome.crafting.reagentLocked",
-    "hudChrome.enchanting.salvageLocked"
-  ],
-  "zh_CN": [
-    "hudChrome.bags.lockItem"
-  ],
-  "zh_TW": [
-    "hudChrome.bags.lockItem"
-  ],
-  "ko_KR": [
-    "hudChrome.bags.lockItem"
-  ],
-  "ja_JP": [
-    "hudChrome.bags.lockItem"
-  ],
-  "pt_BR": [
-    "hudChrome.bags.itemAriaLocked",
-    "hudChrome.bags.itemLockedLine",
-    "hudChrome.bags.lockItem",
-    "hudChrome.bags.unlockItem",
-    "hudChrome.crafting.reagentLocked",
-    "hudChrome.enchanting.salvageLocked"
-  ],
-  "ru_RU": [
-    "hudChrome.bags.lockItem"
-  ],
-  "cs_CZ": [
-    "hudChrome.bags.itemAriaLocked",
-    "hudChrome.bags.itemLockedLine",
-    "hudChrome.bags.lockItem",
-    "hudChrome.bags.unlockItem",
-    "hudChrome.crafting.reagentLocked",
-    "hudChrome.enchanting.salvageLocked"
-  ],
-  "nl_NL": [
-    "hudChrome.bags.itemAriaLocked",
-    "hudChrome.bags.itemLockedLine",
-    "hudChrome.bags.lockItem",
-    "hudChrome.bags.unlockItem",
-    "hudChrome.crafting.reagentLocked",
-    "hudChrome.enchanting.salvageLocked"
-  ],
-  "pl_PL": [
-    "hudChrome.bags.itemAriaLocked",
-    "hudChrome.bags.itemLockedLine",
-    "hudChrome.bags.lockItem",
-    "hudChrome.bags.unlockItem",
-    "hudChrome.crafting.reagentLocked",
-    "hudChrome.enchanting.salvageLocked"
-  ],
-  "id_ID": [
-    "hudChrome.bags.itemAriaLocked",
-    "hudChrome.bags.itemLockedLine",
-    "hudChrome.bags.lockItem",
-    "hudChrome.bags.unlockItem",
-    "hudChrome.crafting.reagentLocked",
-    "hudChrome.enchanting.salvageLocked"
-  ],
-  "tr_TR": [
-    "hudChrome.bags.itemAriaLocked",
-    "hudChrome.bags.itemLockedLine",
-    "hudChrome.bags.lockItem",
-    "hudChrome.bags.unlockItem",
-    "hudChrome.crafting.reagentLocked",
-    "hudChrome.enchanting.salvageLocked"
-  ],
-  "sv_SE": [
-    "hudChrome.bags.itemAriaLocked",
-    "hudChrome.bags.itemLockedLine",
-    "hudChrome.bags.lockItem",
-    "hudChrome.bags.unlockItem",
-    "hudChrome.crafting.reagentLocked",
-    "hudChrome.enchanting.salvageLocked"
-  ],
-  "vi_VN": [
-    "hudChrome.bags.itemAriaLocked",
-    "hudChrome.bags.itemLockedLine",
-    "hudChrome.bags.lockItem",
-    "hudChrome.bags.unlockItem",
-    "hudChrome.crafting.reagentLocked",
-    "hudChrome.enchanting.salvageLocked"
-  ],
-  "da_DK": [
-    "hudChrome.bags.itemAriaLocked",
-    "hudChrome.bags.itemLockedLine",
-    "hudChrome.bags.lockItem",
-    "hudChrome.bags.unlockItem",
-    "hudChrome.crafting.reagentLocked",
-    "hudChrome.enchanting.salvageLocked"
-  ]
+  "it_IT": [],
+  "de_DE": [],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
+  "pt_BR": [],
+  "ru_RU": [],
+  "cs_CZ": [],
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };

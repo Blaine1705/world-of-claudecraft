@@ -2196,7 +2196,7 @@ export const ru_RU: EnTranslations = {
       "itemAriaQuest": "{item}, количество {count}, предмет задания",
       "itemAriaLocked": "{item}, количество {count}, заблокированный экземпляр",
       "itemLockedLine": "Заблокировано",
-      "lockItem": "Lock Item",
+      "lockItem": "Заблокировать предмет",
       "unlockItem": "Разблокировать предмет",
       "filterGroupAria": "Фильтровать сумки по категории",
       "filterAll": "Все",

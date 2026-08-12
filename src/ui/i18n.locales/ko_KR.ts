@@ -7690,13 +7690,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     'World of ClaudeCraft 버전 {version}을(를) 사용할 수 있습니다. 지금 업데이트하여 최신 수정 사항과 개선 사항을 받으세요.',
   'hudChrome.nativeUpdate.notNow': '나중에',
   'hudChrome.nativeUpdate.update': '업데이트',
-  'hudChrome.otaUpdate.title': '게임 업데이트',
-  'hudChrome.otaUpdate.downloading': '업데이트 다운로드 중: {percent}',
-  'hudChrome.otaUpdate.applying': '업데이트를 다운로드했습니다. 적용을 위해 게임을 다시 시작합니다.',
-  'hudChrome.otaUpdate.incompatible':
-    '플레이하려면 업데이트가 필요합니다. 다운로드가 끝나는 대로 적용됩니다.',
-  'hudChrome.otaUpdate.continueAnyway': '업데이트하지 않고 계속',
-  'hudChrome.otaUpdate.progressLabel': '업데이트 다운로드 진행률',
   'hudChrome.cameraPrompt.title': '카메라 선택',
   'hudChrome.cameraPrompt.intro': '카메라가 캐릭터를 따라가는 방식을 선택하세요.',
   'hudChrome.cameraPrompt.mouseDesc': '버튼을 누르지 않고 마우스를 움직여 시점을 돌립니다.',
@@ -12899,4 +12892,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '진행 중인 경기에서 나가는 것은 이탈이며, 레이팅이 걸린 사다리에서 지고 있을 때 접속을 끊는 행위에 보상을 줄 수는 없습니다. 이탈한 사람은 그 자리에서 패배와 그에 따르는 레이팅 하락을 떠안고, 깃발을 들고 있었다면 깃발을 떨어뜨리며, 그 팀은 한 명이 모자란 채로 계속 싸웁니다. 바로 이 마지막 대목이 빈자리가 있는 이유입니다. 경기에 인원이 모자란 동안 대기열은 기다리던 사람에게 그 자리를 제안할 수 있는데, 이는 언제나 받아들이거나 거절할 수 있는 제안이지 멋대로 이루어지는 전송이 아닙니다. 거절해도 아무런 손해가 없고 자리는 다음 사람에게 넘어갑니다. 제안을 받는 것은 혼자 대기한 사람뿐이므로, 함께 대기한 파티가 빈자리를 메우려고 갈라지는 일은 없습니다.',
   'guide.thornhollowPage.backfillNote':
     '보충 자리는 의도적으로 위험이 없습니다. 당신이 들어가는 것은 당신과 무관한 점수판이므로 이기든 지든 이 경기가 당신의 전장 레이팅을 건드리지 않으며, 도중에 떠나도 아무것도 물지 않습니다. 경기가 충분히 끝나가서 새로 온 사람이 결과를 바꿀 수 없는 시점이 되면 제안 자체가 오지 않으므로, 남의 마무리에 앉혀지는 일은 없습니다.',
+  'hudChrome.bags.lockItem': '아이템 잠그기',
+  'hudChrome.otaUpdate.applying': '업데이트를 다운로드했습니다. 적용을 위해 게임을 다시 시작합니다.',
+  'hudChrome.otaUpdate.continueAnyway': '업데이트하지 않고 계속',
+  'hudChrome.otaUpdate.downloading': '업데이트 다운로드 중: {percent}',
+  'hudChrome.otaUpdate.incompatible': '플레이하려면 업데이트가 필요합니다. 다운로드가 끝나는 대로 적용됩니다.',
+  'hudChrome.otaUpdate.progressLabel': '업데이트 다운로드 진행률',
+  'hudChrome.otaUpdate.title': '게임 업데이트',
 };

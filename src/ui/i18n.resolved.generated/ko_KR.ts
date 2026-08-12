@@ -2196,7 +2196,7 @@ export const ko_KR: EnTranslations = {
       "itemAriaQuest": "{item}, 수량 {count}, 퀘스트 아이템",
       "itemAriaLocked": "{item}, 수량 {count}, 잠김",
       "itemLockedLine": "잠김",
-      "lockItem": "Lock Item",
+      "lockItem": "아이템 잠그기",
       "unlockItem": "아이템 잠금 해제",
       "filterGroupAria": "가방을 분류별로 필터링",
       "filterAll": "전체",

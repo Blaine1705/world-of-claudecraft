@@ -894,12 +894,12 @@ export const de_DE: EnTranslations = {
       "update": "Aktualisieren"
     },
     "otaUpdate": {
-      "title": "Spielupdate",
+      "title": "Spiel-Update",
       "downloading": "Update wird heruntergeladen: {percent}",
       "applying": "Update heruntergeladen. Das Spiel wird neu gestartet, um es anzuwenden.",
       "incompatible": "Zum Spielen ist ein Update erforderlich. Es wird angewendet, sobald der Download abgeschlossen ist.",
       "continueAnyway": "Ohne Update fortfahren",
-      "progressLabel": "Downloadfortschritt des Updates"
+      "progressLabel": "Fortschritt des Update-Downloads"
     },
     "cameraPrompt": {
       "title": "Kamera wahlen",
@@ -2194,10 +2194,10 @@ export const de_DE: EnTranslations = {
       "itemAriaBound": "{item}, Menge {count}, gebundene Kopie",
       "itemAriaMasterwork": "{item}, Menge {count}, Meisterwerk",
       "itemAriaQuest": "{item}, Menge {count}, Questgegenstand",
-      "itemAriaLocked": "{item}, quantity {count}, locked",
-      "itemLockedLine": "Locked",
-      "lockItem": "Lock Item",
-      "unlockItem": "Unlock Item",
+      "itemAriaLocked": "{item}, Anzahl {count}, gesperrt",
+      "itemLockedLine": "Gesperrt",
+      "lockItem": "Gegenstand sperren",
+      "unlockItem": "Gegenstand entsperren",
       "filterGroupAria": "Taschen nach Kategorie filtern",
       "filterAll": "Alle",
       "filterWeapon": "Waffen",
@@ -3228,7 +3228,7 @@ export const de_DE: EnTranslations = {
       "craftedToast": "Hergestellt: {name}",
       "craftedToastQty": "Hergestellt: {name} x{qty}",
       "insufficientMaterials": "Dafür fehlen Ihnen die Materialien.",
-      "reagentLocked": "A reagent for that is locked.",
+      "reagentLocked": "Ein Reagenz dafür ist gesperrt.",
       "unknownRecipe": "Dieses Rezept existiert nicht.",
       "comboRequirementUnmet": "Ihr besitzt nicht beide erforderlichen Berufe auf der nötigen Stufe für dieses Rezept.",
       "comboRequires": "Abstimmung: {craftA} + {craftB}, Stufe {tier}.",
@@ -3335,7 +3335,7 @@ export const de_DE: EnTranslations = {
       "notHeld": "Du hast diesen Gegenstand nicht.",
       "notDisenchantable": "Du kannst das nicht entzaubern.",
       "notSalvageable": "Du kannst das nicht zerlegen.",
-      "salvageLocked": "That item is locked.",
+      "salvageLocked": "Dieser Gegenstand ist gesperrt.",
       "disenchantBusy": "Du bist beschäftigt.",
       "salvageBusy": "Du bist beschäftigt.",
       "enchantBusy": "Du bist beschäftigt.",

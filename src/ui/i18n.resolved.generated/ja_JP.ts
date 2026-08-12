@@ -2196,7 +2196,7 @@ export const ja_JP: EnTranslations = {
       "itemAriaQuest": "{item}、数量 {count}、クエストアイテム",
       "itemAriaLocked": "{item}、数量 {count}、ロック済み",
       "itemLockedLine": "ロック中",
-      "lockItem": "Lock Item",
+      "lockItem": "アイテムをロック",
       "unlockItem": "アイテムのロック解除",
       "filterGroupAria": "バッグをカテゴリーで絞り込む",
       "filterAll": "すべて",
