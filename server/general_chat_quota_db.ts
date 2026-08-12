@@ -197,8 +197,11 @@ function validateSetInput(input: {
   rateLimit: GeneralChatRateLimit | null;
   reason: string;
 }): string {
+  // An unsafe or nonpositive id can never name an account: the same semantic
+  // failure as a well-formed-but-missing account, so the same error class
+  // (callers map it to 404, not the 400 a validation error maps to).
   if (!Number.isSafeInteger(input.accountId) || input.accountId <= 0) {
-    throw new GeneralChatQuotaValidationError('account not found');
+    throw new GeneralChatQuotaAccountNotFoundError();
   }
   if (!Number.isSafeInteger(input.adminAccountId) || input.adminAccountId <= 0) {
     throw new GeneralChatQuotaValidationError('administrator account is required');

@@ -102,7 +102,7 @@ import {
 } from './db';
 import { emailSecurityIncident } from './email';
 import type { GameServer } from './game';
-import { setGeneralChatRateLimit } from './general_chat_quota_db';
+import { type GeneralChatRateLimit, setGeneralChatRateLimit } from './general_chat_quota_db';
 import { ctxAccountId } from './http/context';
 import { logger } from './http/logger';
 import {
@@ -218,6 +218,7 @@ const GUILD_BANK_PURGE_REFUSED = 'the guild bank change was refused';
 
 const realAdminGeneralChatRateLimitDeps: AdminGeneralChatRateLimitDeps = {
   set: setGeneralChatRateLimit,
+  isAdminAccount,
 };
 let adminGeneralChatRateLimitService: AdminGeneralChatRateLimitService =
   createAdminGeneralChatRateLimitService(realAdminGeneralChatRateLimitDeps);
@@ -234,6 +235,30 @@ export function resetAdminGeneralChatRateLimitDepsForTests(): void {
   adminGeneralChatRateLimitService = createAdminGeneralChatRateLimitService(
     realAdminGeneralChatRateLimitDeps,
   );
+}
+
+/**
+ * The one general-chat-rate-limit endpoint body, shared verbatim by the legacy
+ * handleAdminApi arm and the routes-table handler. The service validates
+ * bounds, refuses admin targets, and calls the atomic persistence seam once;
+ * that transaction owns the audit row, window reset, and NOTIFY, so no live
+ * state can apply before the durable commit. Applying synchronously afterward
+ * closes the response-to-NOTIFY window for sessions on the handling realm;
+ * LISTEN remains authoritative elsewhere.
+ */
+async function respondGeneralChatRateLimit(
+  res: http.ServerResponse,
+  input: { targetAccountId: number; adminAccountId: number; body: unknown },
+  applyLive: (accountId: number, after: GeneralChatRateLimit | null) => void,
+): Promise<void> {
+  const outcome = await adminGeneralChatRateLimitService.update({
+    accountId: input.targetAccountId,
+    adminAccountId: input.adminAccountId,
+    body: input.body,
+  });
+  if (!outcome.ok) return fail(res, outcome.status, outcome.error);
+  applyLive(input.targetAccountId, outcome.value.after);
+  return ok(res, { ok: true });
 }
 
 function guildRenameFailure(error: AdminGuildRenameError): { status: number; message: string } {
@@ -1158,18 +1183,17 @@ export async function handleAdminApi(
     const generalChatRateLimitMatch =
       /^\/admin\/api\/accounts\/(\d+)\/general-chat-rate-limit$/.exec(path);
     if (req.method === 'POST' && generalChatRateLimitMatch) {
-      const targetAccountId = Number(generalChatRateLimitMatch[1]);
-      const outcome = await adminGeneralChatRateLimitService.update({
-        accountId: targetAccountId,
-        adminAccountId: accountId,
-        body: await readBody(req),
-      });
-      if (!outcome.ok) return fail(res, outcome.status, outcome.error);
-      // Persistence, audit, and transactional NOTIFY committed before this local
-      // realm changes. Applying synchronously closes the response-to-NOTIFY window
-      // for sessions on the handling realm; LISTEN remains authoritative elsewhere.
-      game.applyGeneralChatRateLimitLive(targetAccountId, outcome.value.after);
-      return ok(res, { ok: true });
+      // `await`, not a bare returned promise: a rejected setter must land in
+      // this function's own catch (the 500 'internal error' boundary).
+      return await respondGeneralChatRateLimit(
+        res,
+        {
+          targetAccountId: Number(generalChatRateLimitMatch[1]),
+          adminAccountId: accountId,
+          body: await readBody(req),
+        },
+        (id, after) => game.applyGeneralChatRateLimitLive(id, after),
+      );
     }
 
     // Account flair: the AI-operated mark and an official streamer's links. Both
@@ -2843,20 +2867,21 @@ async function resetPasswordHandler(ctx: Ctx): Promise<void> {
 
 /**
  * POST /admin/api/accounts/:id/general-chat-rate-limit: set or clear the account's
- * General-channel-only quota. The shared service validates the exact integer bounds
- * and calls the atomic persistence seam once. That transaction owns the audit row,
- * window reset, and NOTIFY, so no live state can apply before the durable commit.
+ * General-channel-only quota. Same moderation family as suspend/ban/chat-mute, so
+ * the shared service refuses admin targets (clearing stays allowed); the full
+ * endpoint body lives in respondGeneralChatRateLimit, shared with the legacy arm.
  */
 async function generalChatRateLimitHandler(ctx: Ctx): Promise<void> {
-  const targetAccountId = adminTargetId(ctx);
-  const outcome = await adminGeneralChatRateLimitService.update({
-    accountId: targetAccountId,
-    adminAccountId: ctxAccountId(ctx),
-    body: await readBody(ctx.req),
-  });
-  if (!outcome.ok) return fail(ctx.res, outcome.status, outcome.error);
-  useAdminRuntime().applyGeneralChatRateLimitLive(targetAccountId, outcome.value.after);
-  return ok(ctx.res, { ok: true });
+  const rt = useAdminRuntime();
+  return respondGeneralChatRateLimit(
+    ctx.res,
+    {
+      targetAccountId: adminTargetId(ctx),
+      adminAccountId: ctxAccountId(ctx),
+      body: await readBody(ctx.req),
+    },
+    (id, after) => rt.applyGeneralChatRateLimitLive(id, after),
+  );
 }
 
 /**

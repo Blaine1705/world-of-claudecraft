@@ -908,6 +908,7 @@ export const ja_JP: AdminTranslations = {
   "chatMod.resetChatStrikes": "違反回数をリセット",
   "report.confirmIgnore": "報告の却下を確認する",
   "error.cannotChatMuteAdmin": "管理者アカウントはチャットミュートにできません",
+  "error.cannotRateLimitAdmin": "admin accounts cannot be rate limited",
   "error.invalidWordTier": "区分は「soft」または「hard」である必要があります",
   "error.wordEmptyAfterNormalization": "正規化後に単語が空になりました",
   "error.wordNotFound": "単語が見つかりません",

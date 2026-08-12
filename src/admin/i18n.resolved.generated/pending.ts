@@ -11,6 +11,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "error.cannotRateLimitAdmin",
     "error.generalChatRateLimitMessages",
     "error.generalChatRateLimitReasonInvalid",
     "error.generalChatRateLimitRequired",
@@ -34,6 +35,7 @@ export const pending: Record<string, readonly string[]> = {
     "moderationHistory.actionGeneralChatRateLimit"
   ],
   "es_ES": [
+    "error.cannotRateLimitAdmin",
     "error.generalChatRateLimitMessages",
     "error.generalChatRateLimitReasonInvalid",
     "error.generalChatRateLimitRequired",
@@ -57,6 +59,7 @@ export const pending: Record<string, readonly string[]> = {
     "moderationHistory.actionGeneralChatRateLimit"
   ],
   "fr_FR": [
+    "error.cannotRateLimitAdmin",
     "error.generalChatRateLimitMessages",
     "error.generalChatRateLimitReasonInvalid",
     "error.generalChatRateLimitRequired",
@@ -80,6 +83,7 @@ export const pending: Record<string, readonly string[]> = {
     "moderationHistory.actionGeneralChatRateLimit"
   ],
   "fr_CA": [
+    "error.cannotRateLimitAdmin",
     "error.generalChatRateLimitMessages",
     "error.generalChatRateLimitReasonInvalid",
     "error.generalChatRateLimitRequired",
@@ -104,6 +108,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "error.cannotRateLimitAdmin",
     "error.generalChatRateLimitMessages",
     "error.generalChatRateLimitReasonInvalid",
     "error.generalChatRateLimitRequired",
@@ -127,6 +132,7 @@ export const pending: Record<string, readonly string[]> = {
     "moderationHistory.actionGeneralChatRateLimit"
   ],
   "de_DE": [
+    "error.cannotRateLimitAdmin",
     "error.generalChatRateLimitMessages",
     "error.generalChatRateLimitReasonInvalid",
     "error.generalChatRateLimitRequired",
@@ -150,6 +156,7 @@ export const pending: Record<string, readonly string[]> = {
     "moderationHistory.actionGeneralChatRateLimit"
   ],
   "zh_CN": [
+    "error.cannotRateLimitAdmin",
     "error.generalChatRateLimitMessages",
     "error.generalChatRateLimitReasonInvalid",
     "error.generalChatRateLimitRequired",
@@ -173,6 +180,7 @@ export const pending: Record<string, readonly string[]> = {
     "moderationHistory.actionGeneralChatRateLimit"
   ],
   "zh_TW": [
+    "error.cannotRateLimitAdmin",
     "error.generalChatRateLimitMessages",
     "error.generalChatRateLimitReasonInvalid",
     "error.generalChatRateLimitRequired",
@@ -196,6 +204,7 @@ export const pending: Record<string, readonly string[]> = {
     "moderationHistory.actionGeneralChatRateLimit"
   ],
   "ko_KR": [
+    "error.cannotRateLimitAdmin",
     "error.generalChatRateLimitMessages",
     "error.generalChatRateLimitReasonInvalid",
     "error.generalChatRateLimitRequired",
@@ -219,6 +228,7 @@ export const pending: Record<string, readonly string[]> = {
     "moderationHistory.actionGeneralChatRateLimit"
   ],
   "ja_JP": [
+    "error.cannotRateLimitAdmin",
     "error.generalChatRateLimitMessages",
     "error.generalChatRateLimitReasonInvalid",
     "error.generalChatRateLimitRequired",
@@ -242,6 +252,7 @@ export const pending: Record<string, readonly string[]> = {
     "moderationHistory.actionGeneralChatRateLimit"
   ],
   "pt_BR": [
+    "error.cannotRateLimitAdmin",
     "error.generalChatRateLimitMessages",
     "error.generalChatRateLimitReasonInvalid",
     "error.generalChatRateLimitRequired",
@@ -265,6 +276,7 @@ export const pending: Record<string, readonly string[]> = {
     "moderationHistory.actionGeneralChatRateLimit"
   ],
   "ru_RU": [
+    "error.cannotRateLimitAdmin",
     "error.generalChatRateLimitMessages",
     "error.generalChatRateLimitReasonInvalid",
     "error.generalChatRateLimitRequired",
@@ -288,6 +300,7 @@ export const pending: Record<string, readonly string[]> = {
     "moderationHistory.actionGeneralChatRateLimit"
   ],
   "cs_CZ": [
+    "error.cannotRateLimitAdmin",
     "error.generalChatRateLimitMessages",
     "error.generalChatRateLimitReasonInvalid",
     "error.generalChatRateLimitRequired",
@@ -311,6 +324,7 @@ export const pending: Record<string, readonly string[]> = {
     "moderationHistory.actionGeneralChatRateLimit"
   ],
   "nl_NL": [
+    "error.cannotRateLimitAdmin",
     "error.generalChatRateLimitMessages",
     "error.generalChatRateLimitReasonInvalid",
     "error.generalChatRateLimitRequired",
@@ -334,6 +348,7 @@ export const pending: Record<string, readonly string[]> = {
     "moderationHistory.actionGeneralChatRateLimit"
   ],
   "pl_PL": [
+    "error.cannotRateLimitAdmin",
     "error.generalChatRateLimitMessages",
     "error.generalChatRateLimitReasonInvalid",
     "error.generalChatRateLimitRequired",
@@ -357,6 +372,7 @@ export const pending: Record<string, readonly string[]> = {
     "moderationHistory.actionGeneralChatRateLimit"
   ],
   "id_ID": [
+    "error.cannotRateLimitAdmin",
     "error.generalChatRateLimitMessages",
     "error.generalChatRateLimitReasonInvalid",
     "error.generalChatRateLimitRequired",
@@ -380,6 +396,7 @@ export const pending: Record<string, readonly string[]> = {
     "moderationHistory.actionGeneralChatRateLimit"
   ],
   "tr_TR": [
+    "error.cannotRateLimitAdmin",
     "error.generalChatRateLimitMessages",
     "error.generalChatRateLimitReasonInvalid",
     "error.generalChatRateLimitRequired",
@@ -403,6 +420,7 @@ export const pending: Record<string, readonly string[]> = {
     "moderationHistory.actionGeneralChatRateLimit"
   ],
   "sv_SE": [
+    "error.cannotRateLimitAdmin",
     "error.generalChatRateLimitMessages",
     "error.generalChatRateLimitReasonInvalid",
     "error.generalChatRateLimitRequired",
@@ -426,6 +444,7 @@ export const pending: Record<string, readonly string[]> = {
     "moderationHistory.actionGeneralChatRateLimit"
   ],
   "vi_VN": [
+    "error.cannotRateLimitAdmin",
     "error.generalChatRateLimitMessages",
     "error.generalChatRateLimitReasonInvalid",
     "error.generalChatRateLimitRequired",
@@ -449,6 +468,7 @@ export const pending: Record<string, readonly string[]> = {
     "moderationHistory.actionGeneralChatRateLimit"
   ],
   "da_DK": [
+    "error.cannotRateLimitAdmin",
     "error.generalChatRateLimitMessages",
     "error.generalChatRateLimitReasonInvalid",
     "error.generalChatRateLimitRequired",

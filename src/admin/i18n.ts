@@ -226,6 +226,7 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'guild list busy, try again': 'guilds.loadFailed',
   'invalid streamer link': 'error.invalidStreamerLink',
   'admin accounts cannot be chat muted': 'error.cannotChatMuteAdmin',
+  'admin accounts cannot be rate limited': 'error.cannotRateLimitAdmin',
   'tier must be "soft" or "hard"': 'error.invalidWordTier',
   'word is empty after normalization': 'error.wordEmptyAfterNormalization',
   'word not found': 'error.wordNotFound',

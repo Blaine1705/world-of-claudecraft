@@ -233,6 +233,7 @@ beforeEach(() => {
   resetAdminDbForTests();
   setAdminGeneralChatRateLimitDepsForTests({
     set: async (input) => ({ before: null, after: input.rateLimit, changed: true }),
+    isAdminAccount: async () => false,
   });
 });
 

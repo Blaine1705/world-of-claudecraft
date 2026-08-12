@@ -15,6 +15,7 @@ export const GENERAL_CHAT_RATE_LIMIT_WINDOW_MINUTES_MIN = GENERAL_CHAT_QUOTA_MIN
 export const GENERAL_CHAT_RATE_LIMIT_WINDOW_MINUTES_MAX = GENERAL_CHAT_QUOTA_MAX_WINDOW_MINUTES;
 
 export const GENERAL_CHAT_RATE_LIMIT_REQUIRED = 'a general chat rate limit or null is required';
+export const GENERAL_CHAT_RATE_LIMIT_ADMIN_TARGET = 'admin accounts cannot be rate limited';
 export const GENERAL_CHAT_RATE_LIMIT_MESSAGES_INVALID =
   'messages must be an integer from 1 to 1000';
 export const GENERAL_CHAT_RATE_LIMIT_WINDOW_INVALID =
@@ -33,6 +34,7 @@ export interface AdminGeneralChatRateLimitDeps {
     after: GeneralChatRateLimit | null;
     changed: boolean;
   }>;
+  isAdminAccount(accountId: number): Promise<boolean>;
 }
 
 export type AdminGeneralChatRateLimitOutcome =
@@ -100,6 +102,19 @@ export function createAdminGeneralChatRateLimitService(deps: AdminGeneralChatRat
     }): Promise<AdminGeneralChatRateLimitOutcome> {
       const parsed = parseBody(input.body);
       if (typeof parsed === 'string') return { ok: false, status: 400, error: parsed };
+      // A malformed id (unsafe integer from the legacy \d+ route match) is the
+      // same semantic failure as a well-formed-but-missing account: 404, not
+      // the 400 the persistence layer's defensive validation would map to.
+      if (!Number.isSafeInteger(input.accountId) || input.accountId <= 0) {
+        return { ok: false, status: 404, error: 'account not found' };
+      }
+      // Same moderation family as suspend/ban/chat-mute, so the same staff
+      // shield: one moderation.act operator must not be able to throttle
+      // another admin's (or the owner's) General chat. Clearing stays allowed
+      // so a quota set before a promotion to staff can still be lifted.
+      if (parsed.rateLimit !== null && (await deps.isAdminAccount(input.accountId))) {
+        return { ok: false, status: 400, error: GENERAL_CHAT_RATE_LIMIT_ADMIN_TARGET };
+      }
       try {
         const value = await deps.set({
           accountId: input.accountId,

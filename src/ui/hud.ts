@@ -12626,7 +12626,7 @@ export class Hud {
         case 'error': {
           const quota = generalChatQuotaView(ev);
           if (quota) {
-            this.showError(quota.text, quota.channel, quota.announceWhenFiltered);
+            this.showLocalizedError(quota.text, quota.channel, quota.announceWhenFiltered);
           } else {
             this.showError(this.localizeErrorText(ev.text));
           }
@@ -14569,6 +14569,8 @@ export class Hud {
     const exact: Record<string, TranslationKey> = {
       'General chat is temporarily unavailable. Try again shortly.':
         'hudChrome.chatQuota.unavailable',
+      'Your previous General chat message is still sending. Try again in a moment.':
+        'hudChrome.chatQuota.pending',
       'You are stunned!': 'hud.errors.stunned',
       'You are silenced!': 'hud.errors.silenced',
       // The rooted-charge refusal. Reuses the existing combat key rather than
@@ -15077,7 +15079,20 @@ export class Hud {
   }
 
   showError(text: string, logChannel = ERROR_LOG_CHAN, announceWhenFiltered = false): void {
-    const localized = this.localizeErrorText(text);
+    this.showLocalizedError(this.localizeErrorText(text), logChannel, announceWhenFiltered);
+  }
+
+  /**
+   * showError for text that is ALREADY localized (a structured-event view
+   * result): never re-runs the English error matcher, so a localized string
+   * that happens to match one of its English patterns cannot round-trip
+   * through the matcher twice.
+   */
+  showLocalizedError(
+    localized: string,
+    logChannel = ERROR_LOG_CHAN,
+    announceWhenFiltered = false,
+  ): void {
     this.errorEl.textContent = localized;
     this.errorEl.style.opacity = '1';
     clearTimeout(this.errorTimer);

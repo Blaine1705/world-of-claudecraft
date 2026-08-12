@@ -803,6 +803,7 @@ export const zh_CN: EnTranslations = {
     },
     "chatQuota": {
       "limitReached": "综合聊天已达到限额。请在 {seconds} 后重试。",
+      "pending": "上一条综合聊天消息仍在发送中。请稍候再试。",
       "unavailable": "综合聊天暂时不可用。请稍后再试。"
     },
     "swing": {

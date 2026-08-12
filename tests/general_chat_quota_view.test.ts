@@ -60,6 +60,31 @@ describe('generalChatQuotaView', () => {
     });
   });
 
+  it('localizes the same-account pending code only with its exact structured data', () => {
+    expect(
+      generalChatQuotaView({
+        type: 'error',
+        text: 'old-server fallback',
+        code: 'general_chat_quota_pending',
+        channel: 'general',
+        retryAfterSeconds: 1,
+      }),
+    ).toEqual({
+      text: t('hudChrome.chatQuota.pending'),
+      channel: 'general',
+      announceWhenFiltered: true,
+    });
+    expect(
+      generalChatQuotaView({
+        type: 'error',
+        text: 'old-server fallback',
+        code: 'general_chat_quota_pending',
+        channel: 'general',
+        retryAfterSeconds: 2,
+      }),
+    ).toBeNull();
+  });
+
   it.each([undefined, 0, -1, 1.5, Number.NaN, Number.POSITIVE_INFINITY])(
     'rejects a quota retry value that is not a positive integer: %s',
     (retryAfterSeconds) => {
@@ -192,8 +217,10 @@ describe('structured General chat quota UI routing', () => {
       hudSource.indexOf("case 'questAccepted':"),
     );
     expect(errorCase).toContain('const quota = generalChatQuotaView(ev)');
+    // The view result is ALREADY localized, so it must take the localized
+    // sink; re-running showError's English matcher on it would double-localize.
     expect(errorCase).toContain(
-      'this.showError(quota.text, quota.channel, quota.announceWhenFiltered)',
+      'this.showLocalizedError(quota.text, quota.channel, quota.announceWhenFiltered)',
     );
     expect(errorCase).toContain('this.showError(this.localizeErrorText(ev.text))');
   });

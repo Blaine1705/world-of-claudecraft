@@ -32,7 +32,17 @@ import type { FishingBandLabel } from '../fishing_telemetry';
 /** The two directions a ws frame is counted under: client-to-server or server-to-client. */
 export type WsMessageDirection = 'in' | 'out';
 
-export const GENERAL_CHAT_QUOTA_OUTCOMES = ['allowed', 'denied', 'busy', 'error'] as const;
+// 'pending' is a refused same-account overlap (a consume already in flight);
+// 'dropped' is an allowed consume whose session went stale before broadcast,
+// so a spent quota unit reached nobody. Labels sum to admission attempts.
+export const GENERAL_CHAT_QUOTA_OUTCOMES = [
+  'allowed',
+  'denied',
+  'pending',
+  'busy',
+  'error',
+  'dropped',
+] as const;
 export type GeneralChatQuotaOutcome = (typeof GENERAL_CHAT_QUOTA_OUTCOMES)[number];
 export const GENERAL_CHAT_QUOTA_DB_OUTCOMES = [
   'allowed',
@@ -188,7 +198,7 @@ export interface GameMetricsCounters {
   riftForgeRefused(): void;
   /** One player chat message routed to other players (any channel). */
   chatMessage(): void;
-  /** One configured General quota decision, under a fixed four-value label. */
+  /** One configured General quota decision, under a fixed six-value label. */
   generalChatQuota(outcome: GeneralChatQuotaOutcome): void;
   /** One dedicated quota database call and its end-to-end duration. */
   generalChatQuotaDbCall(outcome: GeneralChatQuotaDbOutcome, durationSeconds: number): void;

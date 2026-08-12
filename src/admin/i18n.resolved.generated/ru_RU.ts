@@ -908,6 +908,7 @@ export const ru_RU: AdminTranslations = {
   "chatMod.resetChatStrikes": "Сбросить нарушения чата",
   "report.confirmIgnore": "Подтвердить отклонение отчета",
   "error.cannotChatMuteAdmin": "аккаунтам администраторов нельзя выдать мьют чата",
+  "error.cannotRateLimitAdmin": "admin accounts cannot be rate limited",
   "error.invalidWordTier": "уровень должен быть «soft» или «hard»",
   "error.wordEmptyAfterNormalization": "после нормализации слово оказалось пустым",
   "error.wordNotFound": "слово не найдено",

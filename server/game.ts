@@ -226,9 +226,11 @@ import { assembleEventsFrame, serializeEventFragments } from './event_frame';
 import { fishingBandLabel, isKoi, isRodFeeRecipe } from './fishing_telemetry';
 import {
   classifyOnlineGeneralChat,
+  GENERAL_CHAT_QUOTA_MAX_IN_FLIGHT,
   GeneralChatQuotaCoordinator,
   type GeneralChatRateLimitHydration,
   GeneralChatRateLimitLiveState,
+  resolveGeneralChatAdmission,
 } from './general_chat_quota';
 import { consumeGeneralChatQuota, type GeneralChatRateLimit } from './general_chat_quota_db';
 import { mergedPrsForLogin } from './github_contributors';
@@ -989,7 +991,10 @@ export interface ClientSession {
   chatLastRateError: number;
   chatRateViolations: number;
   chatCooldownUntil: number;
-  chatSequence: number;
+  // Advances only when rememberedChat is written (rememberChatChannel), so the
+  // async General quota path can fence its sticky-channel set against a NEWER
+  // channel selection without unrelated commands (/who, /unstuck) tripping it.
+  chatChannelSequence: number;
   generalChatRateLimit: GeneralChatRateLimit | null;
   // Pre-parse inbound gate state (#978): the frame and byte token buckets
   // plus the windowed abuse score, covering every frame (input, cast, cmd,
@@ -2089,7 +2094,7 @@ export class GameServer {
   private readonly riftUpgrader: RiftUpgradeCoordinator;
   private readonly riftAssets: RiftAssetCoordinator;
 
-  constructor(generalChatQuotaMaxInFlight = 2) {
+  constructor(generalChatQuotaMaxInFlight = GENERAL_CHAT_QUOTA_MAX_IN_FLIGHT) {
     this.generalChatQuota = new GeneralChatQuotaCoordinator({
       consume: consumeGeneralChatQuota,
       maxInFlight: generalChatQuotaMaxInFlight,
@@ -3898,7 +3903,7 @@ export class GameServer {
       chatLastRateError: 0,
       chatRateViolations: 0,
       chatCooldownUntil: 0,
-      chatSequence: 0,
+      chatChannelSequence: 0,
       generalChatRateLimit: meta.generalChatRateLimit ?? null,
       msgRate: createMsgRateBucket(Date.now() / 1000),
       msgLanes: createMsgLanes(Date.now() / 1000),
@@ -7259,7 +7264,6 @@ export class GameServer {
       case 'chat': {
         if (typeof msg.text !== 'string') break;
         const text = msg.text.trim();
-        const chatSequence = ++session.chatSequence;
         // Staff moderation is COMMAND work riding the chat case (target
         // resolution plus an audited DB write per action): a claimed
         // moderation text pays the command lane exactly like /unstuck
@@ -7331,7 +7335,11 @@ export class GameServer {
         // Discord, then stop (not normal chat).
         if (text.startsWith('!') && this.handleRelayCommand(session, text)) break;
         if (configuredGeneral && generalCandidate) {
-          this.admitGeneralChat(session, generalCandidate.canonicalText, chatSequence);
+          this.admitGeneralChat(
+            session,
+            generalCandidate.canonicalText,
+            session.chatChannelSequence,
+          );
           break;
         }
         // guild and officer chat are persistent + cross-zone, so they live in
@@ -7344,7 +7352,7 @@ export class GameServer {
           const match = gm ?? om;
           if (!match) break;
           const body = match[1];
-          session.rememberedChat = { channel };
+          this.rememberChatChannel(session, { channel });
           const route = gm
             ? this.social.guildChat(this.actorFor(session), body)
             : this.social.officerChat(this.actorFor(session), body);
@@ -7374,7 +7382,10 @@ export class GameServer {
             });
             break;
           }
-          session.rememberedChat = { channel: 'whisper', target: session.lastWhisperFrom };
+          this.rememberChatChannel(session, {
+            channel: 'whisper',
+            target: session.lastWhisperFrom,
+          });
           this.logChat(session, sim.chat(`/w ${session.lastWhisperFrom} ${rm[1]}`, pid));
           break;
         }
@@ -10148,7 +10159,7 @@ export class GameServer {
               // every fighter after every match into "You are not in a
               // battleground." Drop back to say, and only from bg.
               if (ev.type === 'bgEnd' && session.rememberedChat.channel === 'battleground') {
-                session.rememberedChat = { channel: 'say' };
+                this.rememberChatChannel(session, { channel: 'say' });
               }
               // remember the last person to whisper us, for /r reply (the
               // recipient copy of a whisper has no `to`; the sender echo does)
@@ -10380,12 +10391,20 @@ export class GameServer {
     const sent = this.sim.chat(text, pid);
     if (sent) {
       if (sent.channel === 'whisper') {
-        if (sent.target) session.rememberedChat = { channel: 'whisper', target: sent.target };
+        if (sent.target) {
+          this.rememberChatChannel(session, { channel: 'whisper', target: sent.target });
+        }
       } else {
-        session.rememberedChat = { channel: sent.channel };
+        this.rememberChatChannel(session, { channel: sent.channel });
       }
     }
     return sent;
+  }
+
+  /** Every sticky-channel write advances the fence the async General path checks. */
+  private rememberChatChannel(session: ClientSession, value: RememberedChat): void {
+    session.chatChannelSequence++;
+    session.rememberedChat = value;
   }
 
   private logChat(session: ClientSession, sent: import('../src/sim/sim').SentChat | null): void {
@@ -10403,69 +10422,35 @@ export class GameServer {
   private admitGeneralChat(
     session: ClientSession,
     canonicalText: string,
-    chatSequence: number,
+    channelSequence: number,
   ): void {
-    const accountId = session.accountId;
-    const characterId = session.characterId;
-    const pid = session.pid;
-    const ws = session.ws;
-    const policy = session.generalChatRateLimit;
-    void this.generalChatQuota.admit(accountId, policy).then((admission) => {
-      // Capture and fence the whole authority context before the await. A
-      // reconnect changes ws, a leave changes membership, and any later chat
-      // advances chatSequence, so no stale completion can broadcast or rewrite
-      // the sticky channel selected by a newer command.
-      if (
-        session.left ||
-        session.linkdead ||
-        this.clients.get(pid) !== session ||
-        session.ws !== ws ||
-        session.characterId !== characterId
-      ) {
-        this.refundChatToken(session);
-        return;
-      }
-      if (admission.status === 'allowed') {
-        const sent = this.sim.chat(canonicalText, pid);
-        if (sent && session.chatSequence === chatSequence) {
-          session.rememberedChat = { channel: 'general' };
-        }
-        this.logChat(session, sent);
-        gameMetricsCounters().generalChatQuota('allowed');
-        return;
-      }
-      this.refundChatToken(session);
-      gameMetricsCounters().generalChatQuota(admission.status);
-      if (!admission.notify) return;
-      if (admission.status === 'denied') {
-        const retryAfterSeconds = Math.max(1, Math.ceil(admission.retryAfterSeconds));
-        this.send(session, {
-          t: 'events',
-          list: [
-            {
-              type: 'error',
-              text: `General chat limit reached. Try again in ${retryAfterSeconds} seconds.`,
-              code: 'general_chat_quota',
-              channel: 'general',
-              retryAfterSeconds,
-            },
-          ],
-        });
-        return;
-      }
-      this.send(session, {
-        t: 'events',
-        list: [
-          {
-            type: 'error',
-            text: 'General chat is temporarily unavailable. Try again shortly.',
-            code: 'general_chat_quota_unavailable',
-            channel: 'general',
-            retryAfterSeconds: 1,
-          },
-        ],
-      });
-    });
+    // Capture the whole authority context before the await. A reconnect
+    // changes ws, a leave changes membership, and any newer channel selection
+    // advances chatChannelSequence, so no stale completion can broadcast or
+    // rewrite the sticky channel a later command chose. Resolution semantics
+    // (refunds, dropped accounting, refusal events) live in the quota module.
+    const { accountId, characterId, pid, ws } = session;
+    void resolveGeneralChatAdmission(
+      this.generalChatQuota.admit(accountId, session.generalChatRateLimit),
+      {
+        sessionCurrent: () =>
+          !session.left &&
+          !session.linkdead &&
+          this.clients.get(pid) === session &&
+          session.ws === ws &&
+          session.characterId === characterId,
+        refundChatToken: () => this.refundChatToken(session),
+        deliver: () => {
+          const sent = this.sim.chat(canonicalText, pid);
+          if (sent && session.chatChannelSequence === channelSequence) {
+            this.rememberChatChannel(session, { channel: 'general' });
+          }
+          this.logChat(session, sent);
+        },
+        notify: (event) => this.send(session, { t: 'events', list: [event] }),
+        recordOutcome: (outcome) => gameMetricsCounters().generalChatQuota(outcome),
+      },
+    );
   }
 
   // One-off, player-facing chat notice (reuses the generic error event path the

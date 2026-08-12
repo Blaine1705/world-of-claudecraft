@@ -908,6 +908,7 @@ export const cs_CZ: AdminTranslations = {
   "chatMod.resetChatStrikes": "Resetovat chatová napomenutí",
   "report.confirmIgnore": "Potvrdit odmítnutí hlášení",
   "error.cannotChatMuteAdmin": "admin účtům nelze umlčet chat",
+  "error.cannotRateLimitAdmin": "admin accounts cannot be rate limited",
   "error.invalidWordTier": "stupeň musí být \"soft\" nebo \"hard\"",
   "error.wordEmptyAfterNormalization": "slovo je po normalizaci prázdné",
   "error.wordNotFound": "slovo nenalezeno",

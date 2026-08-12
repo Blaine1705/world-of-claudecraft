@@ -803,6 +803,7 @@ export const de_DE: EnTranslations = {
     },
     "chatQuota": {
       "limitReached": "General chat limit reached. Try again in {seconds}.",
+      "pending": "Your previous General chat message is still sending. Try again in a moment.",
       "unavailable": "General chat is temporarily unavailable. Try again shortly."
     },
     "swing": {

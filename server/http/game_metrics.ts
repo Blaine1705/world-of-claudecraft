@@ -437,6 +437,8 @@ export function registerGameStateMetrics(
   });
   for (const outcome of GENERAL_CHAT_QUOTA_DB_OUTCOMES) {
     generalChatQuotaDbCalls.inc({ outcome }, 0);
+    // Pre-seed the histogram series too, so the first post-boot scrape has it.
+    generalChatQuotaDbDuration.zero({ outcome });
   }
 
   new Gauge({

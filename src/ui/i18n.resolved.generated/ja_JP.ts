@@ -803,6 +803,7 @@ export const ja_JP: EnTranslations = {
     },
     "chatQuota": {
       "limitReached": "一般チャットの上限に達しました。{seconds}後にもう一度お試しください。",
+      "pending": "直前の一般チャットのメッセージは送信中です。少し待ってからもう一度お試しください。",
       "unavailable": "一般チャットは一時的に利用できません。しばらくしてからもう一度お試しください。"
     },
     "swing": {

@@ -908,6 +908,7 @@ export const tr_TR: AdminTranslations = {
   "chatMod.resetChatStrikes": "Sohbet ihtarlarını sıfırla",
   "report.confirmIgnore": "Raporun reddedilmesini onaylayın",
   "error.cannotChatMuteAdmin": "yönetici hesaplarının sohbeti susturulamaz",
+  "error.cannotRateLimitAdmin": "admin accounts cannot be rate limited",
   "error.invalidWordTier": "seviye \"soft\" veya \"hard\" olmalı",
   "error.wordEmptyAfterNormalization": "sözcük normalleştirmeden sonra boş kaldı",
   "error.wordNotFound": "sözcük bulunamadı",

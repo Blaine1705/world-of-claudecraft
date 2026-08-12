@@ -37,6 +37,13 @@ export function generalChatQuotaView(
       announceWhenFiltered: true,
     };
   }
+  if (event.code === 'general_chat_quota_pending' && seconds === 1) {
+    return {
+      text: t('hudChrome.chatQuota.pending'),
+      channel: 'general',
+      announceWhenFiltered: true,
+    };
+  }
   if (event.code === 'general_chat_quota_unavailable' && seconds === 1) {
     return {
       text: t('hudChrome.chatQuota.unavailable'),

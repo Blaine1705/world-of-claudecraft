@@ -5,6 +5,8 @@ import {
   GENERAL_CHAT_QUOTA_MAX_IN_FLIGHT,
   GeneralChatQuotaCoordinator,
   GeneralChatRateLimitLiveState,
+  generalChatQuotaRefusalEvent,
+  resolveGeneralChatAdmission,
 } from '../server/general_chat_quota';
 import {
   GENERAL_CHAT_QUOTA_ACQUIRE_TIMEOUT_MS,
@@ -60,7 +62,7 @@ describe('GeneralChatQuotaCoordinator', () => {
     expect(consume).not.toHaveBeenCalled();
   });
 
-  it('keeps one consume in flight for one account without queueing another', async () => {
+  it('refuses a same-account overlap as pending without arming the unavailable cache', async () => {
     const releases: Array<(value: { status: 'allowed' }) => void> = [];
     const consume = vi.fn(
       () => new Promise<{ status: 'allowed' }>((resolve) => releases.push(resolve)),
@@ -69,11 +71,18 @@ describe('GeneralChatQuotaCoordinator', () => {
 
     const first = quota.admit(7, policy);
     const second = quota.admit(7, policy);
-    await expect(second).resolves.toEqual({ status: 'busy', notify: true });
+    await expect(second).resolves.toEqual({ status: 'pending', notify: true });
     await vi.waitFor(() => expect(consume).toHaveBeenCalledTimes(1));
     releases.shift()?.({ status: 'allowed' });
     await expect(first).resolves.toEqual({ status: 'allowed', notify: false });
     expect(quota.inFlight).toBe(0);
+    // The healthy overlap refusal must not poison the account: the very next
+    // send reaches PostgreSQL immediately instead of being shed by the
+    // 1-second unavailable cache the busy/error paths arm.
+    const third = quota.admit(7, policy);
+    await vi.waitFor(() => expect(consume).toHaveBeenCalledTimes(2));
+    releases.shift()?.({ status: 'allowed' });
+    await expect(third).resolves.toEqual({ status: 'allowed', notify: false });
   });
 
   it('caches denials and throttles their sender notice without another query', async () => {
@@ -183,6 +192,96 @@ describe('GeneralChatQuotaCoordinator', () => {
     });
     await expect(quota.admit(1, policy)).resolves.toEqual({ status: 'allowed', notify: false });
     expect(observeDbCall).toHaveBeenCalledWith('allowed', 0.25);
+  });
+});
+
+describe('generalChatQuotaRefusalEvent', () => {
+  it('maps each refusal to its stable code with the exact English fallback text', () => {
+    expect(
+      generalChatQuotaRefusalEvent({ status: 'denied', retryAfterSeconds: 41.2, notify: true }),
+    ).toEqual({
+      type: 'error',
+      text: 'General chat limit reached. Try again in 42 seconds.',
+      code: 'general_chat_quota',
+      channel: 'general',
+      retryAfterSeconds: 42,
+    });
+    expect(generalChatQuotaRefusalEvent({ status: 'pending', notify: true })).toEqual({
+      type: 'error',
+      text: 'Your previous General chat message is still sending. Try again in a moment.',
+      code: 'general_chat_quota_pending',
+      channel: 'general',
+      retryAfterSeconds: 1,
+    });
+    expect(generalChatQuotaRefusalEvent({ status: 'busy', notify: true })).toEqual({
+      type: 'error',
+      text: 'General chat is temporarily unavailable. Try again shortly.',
+      code: 'general_chat_quota_unavailable',
+      channel: 'general',
+      retryAfterSeconds: 1,
+    });
+    expect(generalChatQuotaRefusalEvent({ status: 'error', notify: true })).toMatchObject({
+      code: 'general_chat_quota_unavailable',
+    });
+  });
+});
+
+describe('resolveGeneralChatAdmission', () => {
+  function makeHost(current = true) {
+    return {
+      sessionCurrent: vi.fn(() => current),
+      refundChatToken: vi.fn(),
+      deliver: vi.fn(),
+      notify: vi.fn(),
+      recordOutcome: vi.fn(),
+    };
+  }
+
+  it('delivers an allowed admission without refunding', async () => {
+    const host = makeHost();
+    await resolveGeneralChatAdmission(Promise.resolve({ status: 'allowed', notify: false }), host);
+    expect(host.deliver).toHaveBeenCalledOnce();
+    expect(host.refundChatToken).not.toHaveBeenCalled();
+    expect(host.recordOutcome).toHaveBeenCalledWith('allowed');
+    expect(host.notify).not.toHaveBeenCalled();
+  });
+
+  it('records a stale-session allowed admission as dropped so labels sum to attempts', async () => {
+    const host = makeHost(false);
+    await resolveGeneralChatAdmission(Promise.resolve({ status: 'allowed', notify: false }), host);
+    expect(host.deliver).not.toHaveBeenCalled();
+    expect(host.refundChatToken).toHaveBeenCalledOnce();
+    expect(host.recordOutcome).toHaveBeenCalledWith('dropped');
+    expect(host.notify).not.toHaveBeenCalled();
+  });
+
+  it('keeps the real refusal outcome for a stale session and never notifies it', async () => {
+    const host = makeHost(false);
+    await resolveGeneralChatAdmission(
+      Promise.resolve({ status: 'denied', retryAfterSeconds: 5, notify: true }),
+      host,
+    );
+    expect(host.refundChatToken).toHaveBeenCalledOnce();
+    expect(host.recordOutcome).toHaveBeenCalledWith('denied');
+    expect(host.notify).not.toHaveBeenCalled();
+  });
+
+  it('refunds a live refusal and notifies only when the admission says to', async () => {
+    const host = makeHost();
+    await resolveGeneralChatAdmission(Promise.resolve({ status: 'pending', notify: true }), host);
+    expect(host.refundChatToken).toHaveBeenCalledOnce();
+    expect(host.recordOutcome).toHaveBeenCalledWith('pending');
+    expect(host.notify).toHaveBeenCalledWith(
+      expect.objectContaining({ code: 'general_chat_quota_pending' }),
+    );
+
+    const throttled = makeHost();
+    await resolveGeneralChatAdmission(
+      Promise.resolve({ status: 'busy', notify: false }),
+      throttled,
+    );
+    expect(throttled.recordOutcome).toHaveBeenCalledWith('busy');
+    expect(throttled.notify).not.toHaveBeenCalled();
   });
 });
 

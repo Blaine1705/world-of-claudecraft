@@ -908,6 +908,7 @@ export const en: AdminTranslations = {
   "chatMod.resetChatStrikes": "Reset chat strikes",
   "report.confirmIgnore": "Confirm report dismissal",
   "error.cannotChatMuteAdmin": "admin accounts cannot be chat muted",
+  "error.cannotRateLimitAdmin": "admin accounts cannot be rate limited",
   "error.invalidWordTier": "tier must be \"soft\" or \"hard\"",
   "error.wordEmptyAfterNormalization": "word is empty after normalization",
   "error.wordNotFound": "word not found",

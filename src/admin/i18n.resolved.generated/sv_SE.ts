@@ -908,6 +908,7 @@ export const sv_SE: AdminTranslations = {
   "chatMod.resetChatStrikes": "Återställ chattprickar",
   "report.confirmIgnore": "Bekräfta anmälan avvisande",
   "error.cannotChatMuteAdmin": "administratörskonton kan inte chatt-tystas",
+  "error.cannotRateLimitAdmin": "admin accounts cannot be rate limited",
   "error.invalidWordTier": "nivån måste vara \"soft\" eller \"hard\"",
   "error.wordEmptyAfterNormalization": "ordet är tomt efter normalisering",
   "error.wordNotFound": "ordet hittades inte",

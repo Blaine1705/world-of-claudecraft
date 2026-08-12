@@ -31,6 +31,7 @@ import { accountDetail } from '../../server/admin_db';
 import {
   type AdminGeneralChatRateLimitDeps,
   createAdminGeneralChatRateLimitService,
+  GENERAL_CHAT_RATE_LIMIT_ADMIN_TARGET,
   GENERAL_CHAT_RATE_LIMIT_MESSAGES_INVALID,
   GENERAL_CHAT_RATE_LIMIT_REASON_REQUIRED,
   GENERAL_CHAT_RATE_LIMIT_REQUIRED,
@@ -47,13 +48,18 @@ import type { Method, Middleware } from '../../server/http/types';
 import { adminRolesForAccount } from '../../server/staff_db';
 import { type FakeRes, fakeCtx } from './helpers';
 
-function makeService() {
+function makeService({ adminTarget = false } = {}) {
   const set = vi.fn(async (input) => ({
     before: null,
     after: input.rateLimit,
     changed: true,
   }));
-  return { set, service: createAdminGeneralChatRateLimitService({ set }) };
+  const isAdminAccount = vi.fn(async () => adminTarget);
+  return {
+    set,
+    isAdminAccount,
+    service: createAdminGeneralChatRateLimitService({ set, isAdminAccount }),
+  };
 }
 
 describe('admin General chat rate limit service', () => {
@@ -176,6 +182,54 @@ describe('admin General chat rate limit service', () => {
     expect(set).not.toHaveBeenCalled();
   });
 
+  it('refuses configuring a quota on an admin target, matching the chat-mute staff shield', async () => {
+    const { service, set, isAdminAccount } = makeService({ adminTarget: true });
+
+    await expect(
+      service.update({
+        accountId: 42,
+        adminAccountId: 7,
+        body: { rateLimit: { messages: 3, windowMinutes: 5 }, reason: 'reviewed' },
+      }),
+    ).resolves.toEqual({
+      ok: false,
+      status: 400,
+      error: GENERAL_CHAT_RATE_LIMIT_ADMIN_TARGET,
+    });
+    expect(isAdminAccount).toHaveBeenCalledWith(42);
+    expect(set).not.toHaveBeenCalled();
+  });
+
+  it('still clears a quota from an admin target, so a pre-promotion policy can be lifted', async () => {
+    const { service, set } = makeService({ adminTarget: true });
+
+    await expect(
+      service.update({
+        accountId: 42,
+        adminAccountId: 7,
+        body: { rateLimit: null, reason: 'promoted to staff' },
+      }),
+    ).resolves.toEqual({
+      ok: true,
+      value: { before: null, after: null, changed: true },
+    });
+    expect(set).toHaveBeenCalledOnce();
+  });
+
+  it('maps an unrepresentable account id to the same 404 as a missing account', async () => {
+    const { service, set, isAdminAccount } = makeService();
+
+    await expect(
+      service.update({
+        accountId: Number.MAX_SAFE_INTEGER + 1,
+        adminAccountId: 7,
+        body: { rateLimit: { messages: 3, windowMinutes: 5 }, reason: 'reviewed' },
+      }),
+    ).resolves.toEqual({ ok: false, status: 404, error: 'account not found' });
+    expect(isAdminAccount).not.toHaveBeenCalled();
+    expect(set).not.toHaveBeenCalled();
+  });
+
   it('maps defensive domain errors but lets an unexpected DB failure reach the 500 boundary', async () => {
     const { service, set } = makeService();
     const input = {
@@ -289,6 +343,7 @@ async function runLegacy(options: { method?: string; url?: string; body?: unknow
 }
 
 let setPolicy: ReturnType<typeof vi.fn<AdminGeneralChatRateLimitDeps['set']>>;
+let isAdminTarget: ReturnType<typeof vi.fn<AdminGeneralChatRateLimitDeps['isAdminAccount']>>;
 let applyGeneralChatRateLimitLive: ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
@@ -305,7 +360,8 @@ beforeEach(() => {
     after: input.rateLimit,
     changed: true,
   }));
-  setAdminGeneralChatRateLimitDepsForTests({ set: setPolicy });
+  isAdminTarget = vi.fn<AdminGeneralChatRateLimitDeps['isAdminAccount']>(async () => false);
+  setAdminGeneralChatRateLimitDepsForTests({ set: setPolicy, isAdminAccount: isAdminTarget });
   applyGeneralChatRateLimitLive = vi.fn();
   configureAdminRuntime({
     liveAccountIds: vi.fn(() => new Set([ACCOUNT_ID])),
@@ -371,6 +427,42 @@ describe('General chat rate limit admin endpoint integration', () => {
     expect(setPolicy.mock.invocationCallOrder[1]).toBeLessThan(
       applyGeneralChatRateLimitLive.mock.invocationCallOrder[0],
     );
+  });
+
+  it('refuses configuring a quota on an admin target through both arms', async () => {
+    isAdminTarget.mockResolvedValue(true);
+    const body = {
+      rateLimit: { messages: 3, windowMinutes: 5 },
+      reason: 'reviewed',
+    };
+
+    const legacy = await runLegacy({ body });
+    const routed = await runRoute({ body });
+
+    const refused = {
+      success: false,
+      data: null,
+      error: GENERAL_CHAT_RATE_LIMIT_ADMIN_TARGET,
+    };
+    expect(legacy).toEqual({ status: 400, body: refused });
+    expect(routed).toEqual({ status: 400, body: refused });
+    expect(setPolicy).not.toHaveBeenCalled();
+    expect(applyGeneralChatRateLimitLiveLegacy).not.toHaveBeenCalled();
+    expect(applyGeneralChatRateLimitLive).not.toHaveBeenCalled();
+  });
+
+  it('maps an unrepresentable legacy-arm account id to 404, matching a missing account', async () => {
+    const legacy = await runLegacy({
+      url: '/admin/api/accounts/9007199254740993/general-chat-rate-limit',
+      body: { rateLimit: { messages: 3, windowMinutes: 5 }, reason: 'reviewed' },
+    });
+
+    expect(legacy).toEqual({
+      status: 404,
+      body: { success: false, data: null, error: 'account not found' },
+    });
+    expect(setPolicy).not.toHaveBeenCalled();
+    expect(applyGeneralChatRateLimitLiveLegacy).not.toHaveBeenCalled();
   });
 
   it('enforces moderation.act through both central permission gates', async () => {

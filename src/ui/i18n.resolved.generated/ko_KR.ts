@@ -803,6 +803,7 @@ export const ko_KR: EnTranslations = {
     },
     "chatQuota": {
       "limitReached": "일반 채팅 한도에 도달했습니다. {seconds} 후에 다시 시도하세요.",
+      "pending": "이전 일반 채팅 메시지를 아직 보내는 중입니다. 잠시 후 다시 시도하세요.",
       "unavailable": "일반 채팅은 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도하세요."
     },
     "swing": {

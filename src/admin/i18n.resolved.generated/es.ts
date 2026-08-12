@@ -908,6 +908,7 @@ export const es: AdminTranslations = {
   "chatMod.resetChatStrikes": "Reiniciar faltas del chat",
   "report.confirmIgnore": "Confirmar desestimación del informe",
   "error.cannotChatMuteAdmin": "las cuentas de administrador no pueden ser silenciadas en el chat",
+  "error.cannotRateLimitAdmin": "admin accounts cannot be rate limited",
   "error.invalidWordTier": "el nivel debe ser \"soft\" o \"hard\"",
   "error.wordEmptyAfterNormalization": "la palabra queda vacía tras la normalización",
   "error.wordNotFound": "palabra no encontrada",

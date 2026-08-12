@@ -284,6 +284,7 @@ beforeEach(() => {
   resetAdminGeneralChatRateLimitDepsForTests();
   setAdminGeneralChatRateLimitDepsForTests({
     set: async (input) => ({ before: null, after: input.rateLimit, changed: true }),
+    isAdminAccount: async () => false,
   });
   // The per-account failed-login throttle (server/ratelimit.ts) is real, module-level
   // state; reset it so one test's failures never leak into the next.

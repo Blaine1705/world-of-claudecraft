@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { consumeQuota } = vi.hoisted(() => ({ consumeQuota: vi.fn() }));
@@ -132,17 +134,109 @@ describe('GameServer General quota authority', () => {
     const sender = joinConfigured(server, 11, 'Aleph');
     const simChat = vi.spyOn(server.sim, 'chat');
     const chatLog = vi.spyOn(server.chatLog, 'log').mockImplementation(() => {});
+    const generalChatQuota = vi.fn();
+    setGameMetricsCounters({ ...noopGameMetricsCounters, generalChatQuota });
 
     send(server, sender.session, '/general pending');
     await vi.waitFor(() => expect(consumeQuota).toHaveBeenCalledOnce());
     sender.session.linkdead = true;
     resolve({ status: 'allowed' });
-    await Promise.resolve();
-    await Promise.resolve();
+    // The consume already spent a quota unit that reached nobody, so the
+    // outcome is recorded as 'dropped' and the labels still sum to attempts.
+    await vi.waitFor(() => expect(generalChatQuota).toHaveBeenCalledWith('dropped'));
 
     expect(simChat).not.toHaveBeenCalled();
     expect(chatLog).not.toHaveBeenCalled();
     expect(sender.session.chatTokens).toBe(5);
+  });
+
+  it('refuses an overlapping same-account send as pending without the unavailable lockout', async () => {
+    const resolvers: Array<(result: { status: 'allowed' }) => void> = [];
+    consumeQuota.mockImplementation(() => new Promise((done) => resolvers.push(done)));
+    const server = new GameServer();
+    const sender = joinConfigured(server, 11, 'Aleph');
+    const simChat = vi.spyOn(server.sim, 'chat');
+    vi.spyOn(server.chatLog, 'log').mockImplementation(() => {});
+    sender.client.sent.length = 0;
+
+    send(server, sender.session, '/general first');
+    await vi.waitFor(() => expect(consumeQuota).toHaveBeenCalledOnce());
+    send(server, sender.session, '/general second');
+    await vi.waitFor(() =>
+      expect(sender.client.sent).toContainEqual({
+        t: 'events',
+        list: [
+          {
+            type: 'error',
+            text: 'Your previous General chat message is still sending. Try again in a moment.',
+            code: 'general_chat_quota_pending',
+            channel: 'general',
+            retryAfterSeconds: 1,
+          },
+        ],
+      }),
+    );
+    expect(consumeQuota).toHaveBeenCalledOnce();
+
+    resolvers.shift()?.({ status: 'allowed' });
+    await vi.waitFor(() =>
+      expect(simChat).toHaveBeenCalledWith('/general first', sender.session.pid),
+    );
+    // The healthy overlap refusal never arms the 1-second unavailable cache:
+    // the very next send reaches the quota database immediately.
+    send(server, sender.session, '/general third');
+    await vi.waitFor(() => expect(consumeQuota).toHaveBeenCalledTimes(2));
+    resolvers.shift()?.({ status: 'allowed' });
+    await vi.waitFor(() =>
+      expect(simChat).toHaveBeenCalledWith('/general third', sender.session.pid),
+    );
+  });
+
+  it('still sets the General sticky channel when an unrelated command ran mid-flight', async () => {
+    let resolve!: (result: { status: 'allowed' }) => void;
+    consumeQuota.mockReturnValue(
+      new Promise((done) => {
+        resolve = done;
+      }),
+    );
+    const server = new GameServer();
+    const sender = joinConfigured(server, 11, 'Aleph');
+    vi.spyOn(server.chatLog, 'log').mockImplementation(() => {});
+
+    send(server, sender.session, '/general hello');
+    await vi.waitFor(() => expect(consumeQuota).toHaveBeenCalledOnce());
+    // /who is command work, not a channel selection: it must not trip the
+    // sticky-channel fence the way it advanced the old whole-case counter.
+    send(server, sender.session, '/who');
+    resolve({ status: 'allowed' });
+
+    await vi.waitFor(() => expect(sender.session.rememberedChat).toEqual({ channel: 'general' }));
+  });
+
+  it('does not rewrite a newer sticky channel selected while the send was in flight', async () => {
+    let resolve!: (result: { status: 'allowed' }) => void;
+    consumeQuota.mockReturnValue(
+      new Promise((done) => {
+        resolve = done;
+      }),
+    );
+    const server = new GameServer();
+    const sender = joinConfigured(server, 11, 'Aleph');
+    joinConfigured(server, 22, 'Bet');
+    const simChat = vi.spyOn(server.sim, 'chat');
+    vi.spyOn(server.chatLog, 'log').mockImplementation(() => {});
+
+    send(server, sender.session, '/general hello');
+    await vi.waitFor(() => expect(consumeQuota).toHaveBeenCalledOnce());
+    send(server, sender.session, '/w Bet newer selection');
+    expect(sender.session.rememberedChat).toMatchObject({ channel: 'whisper' });
+    resolve({ status: 'allowed' });
+    await vi.waitFor(() =>
+      expect(simChat).toHaveBeenCalledWith('/general hello', sender.session.pid),
+    );
+
+    // The broadcast still went out, but the newer whisper selection survives.
+    expect(sender.session.rememberedChat).toMatchObject({ channel: 'whisper' });
   });
 
   it('does no quota database work when the ordinary chat limiter already refuses', () => {
@@ -182,5 +276,22 @@ describe('GameServer General quota authority', () => {
       messages: 1,
       windowMinutes: 1,
     });
+  });
+
+  it('pins rememberChatChannel as the only sticky-channel writer, keeping the fence sound', () => {
+    const source = readFileSync(resolve(process.cwd(), 'server/game.ts'), 'utf8');
+    // The async General path is fenced by chatChannelSequence, which only
+    // rememberChatChannel advances. A direct `session.rememberedChat = ...`
+    // write anywhere else would move the sticky channel without advancing the
+    // fence, silently breaking the newer-selection guarantee, so the single
+    // permitted assignment is the one inside the helper (the session literal
+    // initializer uses `rememberedChat:` and is not an assignment).
+    const writes = [...source.matchAll(/rememberedChat\s*=[^=]/g)];
+    expect(writes).toHaveLength(1);
+    const helperStart = source.indexOf('private rememberChatChannel(');
+    expect(helperStart).toBeGreaterThan(-1);
+    expect(source.slice(helperStart, helperStart + 300)).toContain(
+      'session.rememberedChat = value',
+    );
   });
 });

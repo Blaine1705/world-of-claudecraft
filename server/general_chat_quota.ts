@@ -1,5 +1,6 @@
 import { GENERAL_CHAT_QUOTA_MAX_IN_FLIGHT } from './general_chat_quota_config';
 import type { GeneralChatQuotaConsumeResult, GeneralChatRateLimit } from './general_chat_quota_db';
+import type { GeneralChatQuotaOutcome } from './http/game_signals';
 
 export { GENERAL_CHAT_QUOTA_MAX_IN_FLIGHT } from './general_chat_quota_config';
 
@@ -36,6 +37,10 @@ export function classifyOnlineGeneralChat(
 export type GeneralChatQuotaAdmission =
   | { status: 'allowed'; notify: false }
   | { status: 'denied'; retryAfterSeconds: number; notify: boolean }
+  // 'pending': this same account already has a healthy consume in flight; the
+  // send is refused without arming the unavailable cache, so the next attempt
+  // reaches PostgreSQL as soon as the active call resolves.
+  | { status: 'pending'; notify: boolean }
   | { status: 'busy' | 'error'; notify: boolean };
 
 export interface GeneralChatRateLimitHydration {
@@ -119,9 +124,15 @@ export interface GeneralChatQuotaCoordinatorDeps {
 
 /**
  * Bounded, account-serialized coordination around the atomic PostgreSQL
- * consume. A second same-account send is refused while the first is pending,
- * so it cannot overtake or create a PostgreSQL waiter; known-unlimited accounts
- * never call `consume`.
+ * consume. A second same-account send is refused while the first is pending
+ * (status 'pending', never cached), so it cannot overtake or create a
+ * PostgreSQL waiter; known-unlimited accounts never call `consume`.
+ *
+ * Failure policy: a `consume` throw fails CLOSED. The send is refused (status
+ * 'error') and the short unavailable cache arms, so a database outage silences
+ * configured accounts rather than lifting their quota; that is the intended
+ * tradeoff for an anti-spam control. Operators should alert on
+ * woc_general_chat_quota_total{outcome="error"}.
  */
 export class GeneralChatQuotaCoordinator {
   readonly #consume: GeneralChatQuotaCoordinatorDeps['consume'];
@@ -142,7 +153,10 @@ export class GeneralChatQuotaCoordinator {
     this.#observeDbCall = deps.observeDbCall ?? (() => {});
     this.#maxInFlight = Math.max(
       0,
-      Math.min(GENERAL_CHAT_QUOTA_MAX_IN_FLIGHT, Math.floor(deps.maxInFlight ?? 2)),
+      Math.min(
+        GENERAL_CHAT_QUOTA_MAX_IN_FLIGHT,
+        Math.floor(deps.maxInFlight ?? GENERAL_CHAT_QUOTA_MAX_IN_FLIGHT),
+      ),
     );
   }
 
@@ -163,7 +177,11 @@ export class GeneralChatQuotaCoordinator {
   }
 
   get cachedAccounts(): number {
-    return Math.max(this.#localRefusals.size, this.#lastNoticeAt.size);
+    // The union, not the max: the refusal and notice maps can hold disjoint
+    // accounts (an allowed-then-denied account notices without a live refusal).
+    const union = new Set(this.#localRefusals.keys());
+    for (const accountId of this.#lastNoticeAt.keys()) union.add(accountId);
+    return union.size;
   }
 
   admit(
@@ -176,10 +194,22 @@ export class GeneralChatQuotaCoordinator {
     if (cached) return Promise.resolve(cached);
 
     const accountPending = this.#pendingByAccount.get(accountId) ?? 0;
-    if (
-      accountPending >= GENERAL_CHAT_QUOTA_MAX_PENDING_PER_ACCOUNT ||
-      this.#inFlight >= this.#maxInFlight
-    ) {
+    if (accountPending >= GENERAL_CHAT_QUOTA_MAX_PENDING_PER_ACCOUNT) {
+      // A healthy same-account consume is already in flight (agent accounts
+      // send back-to-back by construction). Refuse only this send and never
+      // arm the unavailable cache: the database is fine, so the next attempt
+      // should go straight to PostgreSQL once the active call resolves.
+      return Promise.resolve({
+        status: 'pending',
+        notify: this.#invalidatedPendingAccounts.has(accountId)
+          ? true
+          : this.#shouldNotify(accountId),
+      });
+    }
+    if (this.#inFlight >= this.#maxInFlight) {
+      // The realm-global consume slots are saturated (see the ceiling note in
+      // general_chat_quota_config.ts): every configured account shares this
+      // fate, and the short unavailable cache sheds the burst.
       if (this.#invalidatedPendingAccounts.has(accountId)) {
         return Promise.resolve({ status: 'busy', notify: true });
       }
@@ -281,4 +311,92 @@ export class GeneralChatQuotaCoordinator {
       map.delete(oldest);
     }
   }
+}
+
+export interface GeneralChatQuotaRefusalEvent {
+  type: 'error';
+  text: string;
+  code: 'general_chat_quota' | 'general_chat_quota_pending' | 'general_chat_quota_unavailable';
+  channel: 'general';
+  retryAfterSeconds: number;
+}
+
+/**
+ * Map a refused admission to its sender-only structured error event. The
+ * English `text` is the mixed-release fallback; current clients resolve the
+ * stable `code` through src/ui/general_chat_quota_view.ts, and the Hud English
+ * matcher re-localizes each exact `text` for older event payloads, so any
+ * wording change here must update both in the same change.
+ */
+export function generalChatQuotaRefusalEvent(
+  admission: Exclude<GeneralChatQuotaAdmission, { status: 'allowed' }>,
+): GeneralChatQuotaRefusalEvent {
+  if (admission.status === 'denied') {
+    const retryAfterSeconds = Math.max(1, Math.ceil(admission.retryAfterSeconds));
+    return {
+      type: 'error',
+      text: `General chat limit reached. Try again in ${retryAfterSeconds} seconds.`,
+      code: 'general_chat_quota',
+      channel: 'general',
+      retryAfterSeconds,
+    };
+  }
+  if (admission.status === 'pending') {
+    return {
+      type: 'error',
+      text: 'Your previous General chat message is still sending. Try again in a moment.',
+      code: 'general_chat_quota_pending',
+      channel: 'general',
+      retryAfterSeconds: 1,
+    };
+  }
+  return {
+    type: 'error',
+    text: 'General chat is temporarily unavailable. Try again shortly.',
+    code: 'general_chat_quota_unavailable',
+    channel: 'general',
+    retryAfterSeconds: 1,
+  };
+}
+
+/**
+ * The host seam admitGeneralChat resolution needs from the game server: every
+ * callback closes over the live session, so this module never holds one.
+ */
+export interface GeneralChatAdmissionHost {
+  /** Whether the sending session is still the authoritative one for its pid. */
+  sessionCurrent(): boolean;
+  /** Return the ordinary chat-lane token reserved before admission. */
+  refundChatToken(): void;
+  /** Broadcast the admitted canonical text through the sim and log it. */
+  deliver(): void;
+  /** Send the sender-only refusal event. */
+  notify(event: GeneralChatQuotaRefusalEvent): void;
+  recordOutcome(outcome: GeneralChatQuotaOutcome): void;
+}
+
+/**
+ * Resolve one admission against the live session. A session that went stale
+ * during the await refunds and records instead of broadcasting; an allowed
+ * admission that lands on a stale session records 'dropped' (the consume
+ * already spent a quota unit), so the outcome labels still sum to attempts.
+ */
+export async function resolveGeneralChatAdmission(
+  admission: Promise<GeneralChatQuotaAdmission>,
+  host: GeneralChatAdmissionHost,
+): Promise<void> {
+  const result = await admission;
+  if (!host.sessionCurrent()) {
+    host.refundChatToken();
+    host.recordOutcome(result.status === 'allowed' ? 'dropped' : result.status);
+    return;
+  }
+  if (result.status === 'allowed') {
+    host.deliver();
+    host.recordOutcome('allowed');
+    return;
+  }
+  host.refundChatToken();
+  host.recordOutcome(result.status);
+  if (result.notify) host.notify(generalChatQuotaRefusalEvent(result));
 }
