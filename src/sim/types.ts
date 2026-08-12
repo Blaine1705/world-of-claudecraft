@@ -6459,6 +6459,11 @@ export type SimEvent = { pid?: number } & (
   // `firstCharacter` (a server-recomputed account fact, never persisted).
   // The persisted one-shot flag guarantees it never re-fires.
   | { type: 'tutorialGreeting'; pid: number; firstCharacter: boolean }
+  // Ferry bell homecoming (tutorial island): fired every time the island's
+  // bell sets a player down in Eastbrook town (interactions/ferry_bell.ts).
+  // Personal and text-free: the client decides ONCE per device (localStorage)
+  // to point out the town's twin bell, in case the ride was a misclick.
+  | { type: 'ferryBellHome'; pid: number }
   // Attunement celebration, personal copy (Professions 2.0): a
   // quest-validated pair attunement (new OR return) landed for this player
   // (professions/attunement_events.ts). Personal (pid = the celebrant) and

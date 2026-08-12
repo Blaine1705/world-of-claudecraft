@@ -12652,6 +12652,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '又换了一副新面孔回来了？那你知道该怎么做。不过，出发前若想温习一遍，试炼之滨从不拒绝回炉的学生，渡船随时候着你。',
   'hudChrome.tutorialGreeting.play': '进行新手教学',
   'hudChrome.tutorialGreeting.skip': '跳过新手教学',
+  'hudChrome.tutorialGreeting.declineNote':
+    '随你的意，朋友。哪天改了主意，我身旁这口铃随时都能送你去试炼之滨，不分昼夜。狼群不等人，它等。',
+  'hudChrome.tutorialGreeting.bellHomeNote':
+    '这么快就从海滨回来了？你刚才敲响的正是渡船铃。它的孪生兄弟就立在我身旁：想回试炼之滨，随时敲响它，渡航就会送你过去。敲错了也不打紧。',
+  'hudChrome.tutorialGreeting.noteClose': '明白了',
   'entities.items.ps_castaway_crate.name': '漂流货箱',
   'entities.items.ps_ferry_bell.name': '渡船铃',
   'entities.mobs.training_effigy.name': '训练草人',
@@ -12659,7 +12664,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.wayfarer_bryn.name': '旅人布琳',
   'entities.npcs.wayfarer_bryn.title': '港口向导',
   'entities.npcs.wayfarer_bryn.greeting':
-    '东溪谷来者不拒，朋友。而对脚下还不稳的人来说，总还有试炼之滨：西岸的渡船铃一年到头两个方向都响。',
+    '东溪谷来者不拒，朋友。而对脚下还不稳的人来说，总还有试炼之滨：我身旁这口铃一年到头随时送你过去，岛上那口孪生铃再送你回家。',
   'entities.npcs.instructor_maren.name': '教官玛伦',
   'entities.npcs.instructor_maren.title': '试炼导师',
   'entities.npcs.instructor_maren.greeting':
@@ -12702,9 +12707,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ps_the_wheel_of_trades.objectives.0.label': '向军需官芬奇请教百业',
   'entities.quests.q_ps_pouch_and_purse.title': '钱囊与背袋',
   'entities.quests.q_ps_pouch_and_purse.text':
-    '去谷地之前还有最后一课，{playerName}，也是保住冒险者性命的一课：你随身带的东西。你的背包有十六格，旁边还空着四个袋扣；每系上一只袋子，它的空间就并入总容量。去军需官芬奇那里买一只亚麻小袋系上，然后把这一课带去保险箱桌前的司库威克那里。他掌管的，是任何袋子都装不下的另一半。',
+    '去谷地之前还有最后一课，{playerName}，也是保住冒险者性命的一课：你随身带的东西。你的背包有十六格，旁边还空着四个袋扣；每系上一只袋子，它的空间就并入总容量。去军需官芬奇那里买一只亚麻小袋，把它系上，然后回来找我。',
   'entities.quests.q_ps_pouch_and_purse.completion':
-    '玛伦总算把她的学生送到我这儿来了。小袋归你了，这一课的另一半在这里，{playerName}：背不下的，交给镀金保险箱。任何城镇的任何司库都为你打开同一座金库，等你的钱袋鼓起来，还能购买更多金库空间。贵重的存进金库，袋子留出空当。塞满的行囊断送过的冒险，比任何狼都多。',
+    '好袋子，又多出六格用来装麻烦。接下来是任何袋子都装不下的另一半课，{playerName}：背不下的，交给镀金保险箱。我身后桌前的司库威克，为你打开的正是每座城镇每位司库共用的同一座金库，等你的钱袋鼓起来，还能购买更多金库空间。贵重的存进金库，袋子留出空当。塞满的行囊断送过的冒险，比任何狼都多。',
   'entities.quests.q_ps_pouch_and_purse.objectives.0.label': '购买亚麻小袋',
   'entities.quests.q_ps_set_sail.title': '扬帆起航',
   'entities.quests.q_ps_set_sail.text':

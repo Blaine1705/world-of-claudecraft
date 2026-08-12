@@ -115,6 +115,18 @@ if (returned.error) throw new Error(returned.error);
 if (!(Math.abs(returned.pos.x - 4) < 2 && Math.abs(returned.pos.z + 6) < 2)) {
   throw new Error('ferry bell did not land in Eastbrook town');
 }
-console.log('E2E OK: greeting shown, ferry landed, chain head available, bell rang home');
+
+// The first homecoming points out the town's twin bell (a possible misclick
+// ride): Bryn's one-button note opens off the ferryBellHome event.
+await page.waitForFunction(
+  () => {
+    const el = document.getElementById('tutorial-greeting');
+    return !!el && /bell/i.test(el.innerText);
+  },
+  { timeout: 10000, polling: 200 },
+);
+await sleep(1200);
+await page.screenshot({ path: 'tmp/tutorial-bell-home-hint.png' });
+console.log('E2E OK: greeting, ferry, chain head, bell home, twin-bell hint shown');
 
 await browser.close();

@@ -737,8 +737,13 @@ import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_fo
 import { renderTownFocusWindow } from './town_focus_window';
 import { buildTradeItemRow, tradeOfferCeiling, tradeRowTooltipTarget } from './trade_view';
 import { TutorialOverlay } from './tutorial';
-import { buildTutorialGreetingModel } from './tutorial_greeting_view';
-import { renderTutorialGreeting } from './tutorial_greeting_window';
+import {
+  buildFerryBellHomeNote,
+  buildTutorialDeclineNote,
+  buildTutorialGreetingModel,
+  type TutorialGreetingNote,
+} from './tutorial_greeting_view';
+import { renderTutorialGreeting, renderTutorialGreetingNote } from './tutorial_greeting_window';
 import { svgIcon } from './ui_icons';
 import { getUiScale } from './ui_scale';
 import { newUnitFrameBuffer, type UnitFrameDescriptor, unitFrameViewInto } from './unit_frame';
@@ -12170,6 +12175,19 @@ export class Hud {
           // first-character vs refresher copy the event decided.
           this.openTutorialGreeting(ev.firstCharacter);
           break;
+        case 'ferryBellHome':
+          // The island bell just set this player down in town: point out the
+          // town's twin bell ONCE per device (the ride may have been a
+          // misclick), the woc.tutorial.v1 presentation-only one-shot idiom.
+          try {
+            if (localStorage.getItem('woc.ferrybellhint.v1') !== 'seen') {
+              localStorage.setItem('woc.ferrybellhint.v1', 'seen');
+              this.openTutorialGreetingNote(buildFerryBellHomeNote());
+            }
+          } catch {
+            /* private mode: skip the hint rather than throw */
+          }
+          break;
         case 'profTrendNudge':
         case 'profTierTutorial':
         case 'attuned':
@@ -14075,7 +14093,9 @@ export class Hud {
         this.sim.startTutorial();
         this.closeTutorialGreeting();
       },
-      onSkip: () => this.closeTutorialGreeting(),
+      // Declining gets a follow-up note: the bell beside Bryn still rings
+      // the crossing any time, so a "no" is never a locked door.
+      onSkip: () => this.openTutorialGreetingNote(buildTutorialDeclineNote()),
     });
     this.bringWindowToFront(el);
     // Above the mobile sheet (z-95) and the armory inspect overlay (z-90):
@@ -14089,6 +14109,21 @@ export class Hud {
     this.tutorialGreetingTrap?.release();
     this.tutorialGreetingTrap = null;
     document.getElementById('tutorial-greeting')?.remove();
+  }
+
+  // The greeting dialog's single-button note variant (decline follow-up,
+  // first bell homecoming): same shell, trap, and z-index floor as the
+  // two-choice dialog, so the managed-close registry covers it unchanged.
+  private openTutorialGreetingNote(note: TutorialGreetingNote): void {
+    this.tutorialGreetingTrap?.release(false);
+    this.tutorialGreetingTrap = null;
+    const el = renderTutorialGreetingNote(note, {
+      onClose: () => this.closeTutorialGreeting(),
+    });
+    this.bringWindowToFront(el);
+    el.style.zIndex = String(Math.max(Number(el.style.zIndex) || 0, 96));
+    this.tutorialGreetingTrap = this.focusManager.open({ root: () => el });
+    el.querySelector<HTMLElement>('.cd-ok')?.focus();
   }
 
   // Reliquary catalog fill: planned purely (buildReliquaryUnlockPlan). Each

@@ -4,6 +4,8 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  buildFerryBellHomeNote,
+  buildTutorialDeclineNote,
   buildTutorialGreetingModel,
   TUTORIAL_GREETER_NPC_ID,
 } from '../src/ui/tutorial_greeting_view';
@@ -22,5 +24,15 @@ describe('tutorial greeting view', () => {
     expect(later.bodyKey).not.toBe(first.bodyKey);
     expect(later.playKey).toBe(first.playKey);
     expect(later.skipKey).toBe(first.skipKey);
+  });
+
+  it('the two notes share the greeter and the close key, with distinct bodies', () => {
+    const decline = buildTutorialDeclineNote();
+    const bellHome = buildFerryBellHomeNote();
+    expect(decline.speakerNpcId).toBe(TUTORIAL_GREETER_NPC_ID);
+    expect(bellHome.speakerNpcId).toBe(TUTORIAL_GREETER_NPC_ID);
+    expect(decline.bodyKey).toBe('hudChrome.tutorialGreeting.declineNote');
+    expect(bellHome.bodyKey).toBe('hudChrome.tutorialGreeting.bellHomeNote');
+    expect(decline.closeKey).toBe(bellHome.closeKey);
   });
 });

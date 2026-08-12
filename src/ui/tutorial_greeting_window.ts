@@ -15,7 +15,7 @@ import { markDialogRoot } from './dialog_root';
 import { tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { t } from './i18n';
-import type { TutorialGreetingModel } from './tutorial_greeting_view';
+import type { TutorialGreetingModel, TutorialGreetingNote } from './tutorial_greeting_view';
 
 export interface TutorialGreetingDeps {
   onPlay(): void;
@@ -55,6 +55,33 @@ export function renderTutorialGreeting(
   document.body.appendChild(el);
   el.querySelector<HTMLElement>('[data-play]')?.addEventListener('click', () => deps.onPlay());
   el.querySelector<HTMLElement>('[data-skip]')?.addEventListener('click', () => deps.onSkip());
+  bindDialogKeyActivation(el);
+  return el;
+}
+
+/** The single-button note variant: the same #tutorial-greeting shell (so the
+ *  managed-close registry and mobile CSS cover it unchanged), one closing
+ *  affordance. Used for the decline follow-up and the first bell homecoming. */
+export function renderTutorialGreetingNote(
+  note: TutorialGreetingNote,
+  deps: { onClose(): void },
+): HTMLElement {
+  document.getElementById('tutorial-greeting')?.remove();
+  const el = document.createElement('div');
+  el.id = 'tutorial-greeting';
+  el.className = 'window panel';
+  el.style.display = 'block';
+  markDialogRoot(el, { labelledBy: TITLE_ID, modal: true });
+
+  const speaker = tEntity({ kind: 'npc', id: note.speakerNpcId, field: 'name' });
+  const speakerTitle = tEntity({ kind: 'npc', id: note.speakerNpcId, field: 'title' });
+  el.innerHTML =
+    `<div class="panel-title"><span id="${TITLE_ID}">${esc(speaker)}<span class="quest-muted"> &lt;${esc(speakerTitle)}&gt;</span></span></div>` +
+    `<div class="cd-body"><p class="cd-para">${esc(t(note.bodyKey))}</p></div>` +
+    `<div class="cd-actions"><button type="button" class="btn cd-ok" data-close>${esc(t(note.closeKey))}</button></div>`;
+
+  document.body.appendChild(el);
+  el.querySelector<HTMLElement>('[data-close]')?.addEventListener('click', () => deps.onClose());
   bindDialogKeyActivation(el);
   return el;
 }

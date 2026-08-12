@@ -38,3 +38,29 @@ export function buildTutorialGreetingModel(firstCharacter: boolean): TutorialGre
     skipKey: 'hudChrome.tutorialGreeting.skip',
   };
 }
+
+/** The single-button note variant of the greeting dialog: the same speaker
+ *  and chrome, one closing affordance. Two notes exist: the decline
+ *  follow-up (skip pressed: the bell still stands) and the first bell
+ *  homecoming (the town's twin bell pointed out after a possible misclick). */
+export interface TutorialGreetingNote {
+  speakerNpcId: string;
+  bodyKey: TranslationKey;
+  closeKey: TranslationKey;
+}
+
+export function buildTutorialDeclineNote(): TutorialGreetingNote {
+  return {
+    speakerNpcId: TUTORIAL_GREETER_NPC_ID,
+    bodyKey: 'hudChrome.tutorialGreeting.declineNote',
+    closeKey: 'hudChrome.tutorialGreeting.noteClose',
+  };
+}
+
+export function buildFerryBellHomeNote(): TutorialGreetingNote {
+  return {
+    speakerNpcId: TUTORIAL_GREETER_NPC_ID,
+    bodyKey: 'hudChrome.tutorialGreeting.bellHomeNote',
+    closeKey: 'hudChrome.tutorialGreeting.noteClose',
+  };
+}

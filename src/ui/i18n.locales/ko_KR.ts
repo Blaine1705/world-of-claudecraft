@@ -12887,6 +12887,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorialGreeting.bodyRefresher':
     '새 얼굴로 또 오셨군요? 그럼 어떻게 돌아가는지 아시겠네요. 그래도 떠나기 전에 복습을 원하신다면, 수련의 해안은 돌아온 학생을 내치는 법이 없답니다. 나룻배는 언제든 준비되어 있어요.',
   'hudChrome.tutorialGreeting.play': '튜토리얼 진행하기',
+  'hudChrome.tutorialGreeting.declineNote':
+    '뜻대로 하세요, 친구. 언제든 마음이 바뀌면, 제 곁의 이 종이 밤낮없이 수련의 해안으로 데려다줍니다. 늑대는 기다려 주지 않지만, 이 종은 기다려 준답니다.',
+  'hudChrome.tutorialGreeting.bellHomeNote':
+    '벌써 해안에서 돌아오셨나요? 방금 울리신 것이 나룻배 종입니다. 그 쌍둥이가 바로 제 곁에 서 있죠. 언제든 울리면 건너기가 수련의 해안으로 다시 데려다줍니다. 실수로 울리셨더라도 손해 볼 것 없어요.',
+  'hudChrome.tutorialGreeting.noteClose': '알겠어요',
   'hudChrome.tutorialGreeting.skip': '튜토리얼 건너뛰기',
   'entities.items.ps_castaway_crate.name': '표류 상자',
   'entities.items.ps_ferry_bell.name': '나룻배 종',
@@ -12895,7 +12900,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.wayfarer_bryn.name': '방랑자 브린',
   'entities.npcs.wayfarer_bryn.title': '항구 안내인',
   'entities.npcs.wayfarer_bryn.greeting':
-    '이스트브룩 골짜기는 오는 사람을 가리지 않아요, 친구. 그리고 아직 발걸음이 불안한 이들에게는 언제나 수련의 해안이 있죠. 서쪽 바닷가의 나룻배 종은 일 년 내내 양쪽으로 울린답니다.',
+    '이스트브룩 골짜기는 오는 사람을 가리지 않아요, 친구. 그리고 아직 발걸음이 불안한 이들에게는 언제나 수련의 해안이 있죠. 제 곁의 이 종이 일 년 내내 언제든 건너다 주고, 섬의 쌍둥이 종이 다시 집으로 울려 보내 준답니다.',
   'entities.npcs.instructor_maren.name': '교관 마렌',
   'entities.npcs.instructor_maren.title': '수련 사범',
   'entities.npcs.instructor_maren.greeting':
@@ -12938,9 +12943,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ps_the_wheel_of_trades.objectives.0.label': '보급관 핀치에게 생업에 대해 묻기',
   'entities.quests.q_ps_pouch_and_purse.title': '주머니와 돈주머니',
   'entities.quests.q_ps_pouch_and_purse.text':
-    '골짜기로 떠나기 전 마지막 가르침이에요, {playerName}. 모험가의 목숨을 지켜 주는 가르침이죠. 바로 당신이 지고 다니는 짐 얘기입니다. 배낭에는 열여섯 칸이 있고, 그 옆에 빈 가방 고리 넷이 기다립니다. 가방을 하나 채울 때마다 그 공간이 전체 용량에 더해져요. 보급관 핀치에게서 아마천 주머니를 사서 채운 다음, 이 가르침을 금고 책상의 경리관 윅에게 가져가세요. 그가 맡아 주는 것은 어떤 가방에도 담기지 않는 나머지 절반이니까요.',
+    '골짜기로 떠나기 전 마지막 가르침이에요, {playerName}. 모험가의 목숨을 지켜 주는 가르침이죠. 바로 당신이 지고 다니는 짐 얘기입니다. 배낭에는 열여섯 칸이 있고, 그 옆에 빈 가방 고리 넷이 기다립니다. 가방을 하나 채울 때마다 그 공간이 전체 용량에 더해져요. 보급관 핀치에게서 아마천 주머니를 사서 채운 다음, 내게 돌아오세요.',
   'entities.quests.q_ps_pouch_and_purse.completion':
-    '마렌이 드디어 학생을 보냈군요. 주머니는 당신 것이고, 가르침의 나머지 절반은 이렇습니다, {playerName}. 들고 다닐 수 없는 것은 도금 금고가 맡습니다. 어느 마을의 어느 경리관이든 같은 금고를 열어 주고, 돈주머니가 두둑해지면 금고 칸도 더 살 수 있죠. 값진 것은 금고에, 가방에는 여유를. 어떤 늑대보다도 꽉 찬 배낭이 끝장낸 모험이 더 많답니다.',
+    '좋은 주머니군요. 말썽거리를 담을 칸이 여섯 늘었네요. 이제 어떤 가방에도 담기지 않는 나머지 절반의 가르침입니다, {playerName}. 들고 다닐 수 없는 것은 도금 금고가 맡습니다. 내 뒤 책상의 경리관 윅이 열어 주는 금고는 어느 마을의 어느 경리관과도 같은 금고이고, 돈주머니가 두둑해지면 금고 칸도 더 살 수 있죠. 값진 것은 금고에, 가방에는 여유를. 어떤 늑대보다도 꽉 찬 배낭이 끝장낸 모험이 더 많답니다.',
   'entities.quests.q_ps_pouch_and_purse.objectives.0.label': '아마천 주머니 구입하기',
   'entities.quests.q_ps_set_sail.title': '출항',
   'entities.quests.q_ps_set_sail.text':

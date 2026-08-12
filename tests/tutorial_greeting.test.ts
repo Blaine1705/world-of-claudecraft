@@ -178,39 +178,47 @@ describe('the ferry bells (the clicked crossing)', () => {
     return { island, vale };
   }
 
-  it('the island bell sets the player down in Eastbrook town', () => {
+  it('the island bell sets the player down in Eastbrook town and marks the homecoming', () => {
     const sim = makeSim();
     const { island } = bells(sim);
     expect(island).toBeTruthy();
     const p = sim.entities.get(sim.playerId)!;
     p.pos.x = island.pos.x + 1;
     p.pos.z = island.pos.z;
+    sim.events = [];
     sim.pickUpObject(island.id);
     expect(Math.hypot(p.pos.x - FERRY_BELL_TOWN_LANDING.x, p.pos.z - FERRY_BELL_TOWN_LANDING.z))
       .toBeLessThan(1);
+    // The text-free homecoming marker the HUD keys its one-time twin-bell
+    // pointer off (a possible misclick ride).
+    expect(sim.events).toContainEqual({ type: 'ferryBellHome', pid: sim.playerId });
   });
 
-  it('the vale bell rings a returning player back to the island arrival', () => {
+  it('the town bell rings a returning player back to the island arrival', () => {
     const sim = makeSim();
-    const { vale } = bells(sim);
-    expect(vale).toBeTruthy();
+    const { vale: town } = bells(sim);
+    expect(town).toBeTruthy();
     const p = sim.entities.get(sim.playerId)!;
-    p.pos.x = vale.pos.x + 1;
-    p.pos.z = vale.pos.z;
-    sim.pickUpObject(vale.id);
+    p.pos.x = town.pos.x + 1;
+    p.pos.z = town.pos.z;
+    sim.events = [];
+    sim.pickUpObject(town.id);
     expect(Math.hypot(p.pos.x - PROVING_SHORE_ARRIVAL.x, p.pos.z - PROVING_SHORE_ARRIVAL.z))
       .toBeLessThan(1);
+    // No homecoming marker on the OUTBOUND ride: the pointer is only for
+    // arrivals in town.
+    expect(sim.events.filter((e) => e.type === 'ferryBellHome')).toEqual([]);
   });
 
   it('refuses in combat and stays put (no bell combat exit)', () => {
     const sim = makeSim();
-    const { vale } = bells(sim);
+    const { vale: town } = bells(sim);
     const p = sim.entities.get(sim.playerId)!;
-    p.pos.x = vale.pos.x + 1;
-    p.pos.z = vale.pos.z;
+    p.pos.x = town.pos.x + 1;
+    p.pos.z = town.pos.z;
     p.inCombat = true;
-    sim.pickUpObject(vale.id);
-    expect(p.pos.x).toBe(vale.pos.x + 1);
+    sim.pickUpObject(town.id);
+    expect(p.pos.x).toBe(town.pos.x + 1);
   });
 });
 

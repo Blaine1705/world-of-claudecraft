@@ -12879,6 +12879,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorialGreeting.bodyRefresher':
     '新しい顔でまた来たのかい？なら勝手は分かっているね。それでも旅立つ前におさらいがしたければ、修練の浜は出戻りの生徒を追い返したりしない。渡し船はいつでも出せるよ。',
   'hudChrome.tutorialGreeting.play': 'チュートリアルを受ける',
+  'hudChrome.tutorialGreeting.declineNote':
+    'お好きにどうぞ、旅の人。気が変わったら、私のそばのこの鐘がいつでも修練の浜へ運んでくれる。昼でも夜でもね。狼は待ってくれないが、この鐘は待っていてくれるよ。',
+  'hudChrome.tutorialGreeting.bellHomeNote':
+    'もう浜から戻ったのかい？さっき鳴らしたのが渡しの鐘だよ。その双子がちょうど私のそばに立っている。いつでも鳴らせば、渡しが修練の浜へ運び直してくれる。間違って鳴らしたのなら、それはそれで構わないさ。',
+  'hudChrome.tutorialGreeting.noteClose': 'わかった',
   'hudChrome.tutorialGreeting.skip': 'チュートリアルを飛ばす',
   'entities.items.ps_castaway_crate.name': '漂着した木箱',
   'entities.items.ps_ferry_bell.name': '渡しの鐘',
@@ -12887,7 +12892,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.wayfarer_bryn.name': '旅人ブリン',
   'entities.npcs.wayfarer_bryn.title': '港の案内人',
   'entities.npcs.wayfarer_bryn.greeting':
-    'イーストブルック渓谷は来る者を拒まないよ、旅の人。まだ足元がおぼつかないなら、修練の浜がある。西の浜の渡しの鐘は、年中どちら向きにも鳴るからね。',
+    'イーストブルック渓谷は来る者を拒まないよ、旅の人。まだ足元がおぼつかないなら、修練の浜がある。私のそばのこの鐘が年中いつでも向こうへ運んでくれるし、島の双子の鐘が帰り道を鳴らしてくれる。',
   'entities.npcs.instructor_maren.name': '教官マレン',
   'entities.npcs.instructor_maren.title': '修練の師',
   'entities.npcs.instructor_maren.greeting':
@@ -12930,9 +12935,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ps_the_wheel_of_trades.objectives.0.label': '補給係フィンチに生業について尋ねる',
   'entities.quests.q_ps_pouch_and_purse.title': 'ポーチと財布',
   'entities.quests.q_ps_pouch_and_purse.text':
-    '渓谷へ発つ前にもうひとつ、冒険者の命を守る授業だよ、{playerName}。君の持ち物の話だ。背嚢には十六の枠があり、その横に空の鞄留めが四つ待っている。鞄を留めるたびに、その分の空きが全体に加わる。補給係フィンチから亜麻のポーチを買って留めたら、この授業を金庫机の出納係ウィックのところへ持っていきなさい。彼が預かるのは、どんな鞄にも収まらない残り半分だ。',
+    '渓谷へ発つ前にもうひとつ、冒険者の命を守る授業だよ、{playerName}。君の持ち物の話だ。背嚢には十六の枠があり、その横に空の鞄留めが四つ待っている。鞄を留めるたびに、その分の空きが全体に加わる。補給係フィンチから亜麻のポーチを買って留めたら、私のところへ戻っておいで。',
   'entities.quests.q_ps_pouch_and_purse.completion':
-    'マレンがようやく生徒を寄こしたか。ポーチは君のものだ。そして授業の残り半分はこうだよ、{playerName}。持ちきれないものは金張りの金庫が預かる。どの町のどの出納係も同じ金庫を開けてくれるし、財布が育てば金庫の枠も買い足せる。値打ち物は金庫へ、鞄には余裕を。狼よりも多くの冒険を終わらせてきたのは、はち切れた背嚢のほうなんだ。',
+    '良いポーチだ。厄介ごとを詰める枠が六つ増えたね。ここからは、どんな鞄にも収まらない残り半分の授業だよ、{playerName}。持ちきれないものは金張りの金庫が預かる。私の後ろの机にいる出納係ウィックが開けてくれるのは、どの町のどの出納係とも共通の金庫で、財布が育てば金庫の枠も買い足せる。値打ち物は金庫へ、鞄には余裕を。狼よりも多くの冒険を終わらせてきたのは、はち切れた背嚢のほうなんだ。',
   'entities.quests.q_ps_pouch_and_purse.objectives.0.label': '亜麻のポーチを購入する',
   'entities.quests.q_ps_set_sail.title': '出航',
   'entities.quests.q_ps_set_sail.text':

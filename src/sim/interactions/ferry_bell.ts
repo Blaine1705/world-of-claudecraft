@@ -37,6 +37,10 @@ export function tryRingFerryBell(ctx: SimContext, obj: Entity, p: Entity): boole
       FERRY_BELL_TOWN_LANDING,
       'The crossing takes hold, and Eastbrook Vale spreads out before you.',
     );
+    // Text-free homecoming marker: the HUD points out the town's twin bell
+    // the first time (its own localStorage one-shot), in case the ride was a
+    // misclick. Emitted every ride; the one-shot is presentation-only.
+    ctx.emit({ type: 'ferryBellHome', pid: p.id });
   } else {
     displacePlayer(
       ctx,

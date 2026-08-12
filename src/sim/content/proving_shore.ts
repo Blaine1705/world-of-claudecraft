@@ -151,7 +151,7 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     color: 0x8a6a9a,
     questIds: [],
     greeting:
-      'Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry bell on the west strand rings both ways, every day of the year.',
+      'Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: this bell beside me rings you across any day of the year, and its twin on the island rings you home.',
   },
   instructor_maren: {
     id: 'instructor_maren',
@@ -198,7 +198,10 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     pos: { x: -310, z: 56 },
     facing: Math.PI / 2,
     color: 0xc9a227,
-    questIds: ['q_ps_pouch_and_purse'],
+    // No questIds ON PURPOSE: clicking a banker opens the bank window, not
+    // the quest gossip, so no quest can give or hand in at him. His teaching
+    // rides q_ps_pouch_and_purse's completion at Maren, which points here.
+    questIds: [],
     banker: true,
     greeting:
       'The Gilded Strongbox keeps a desk even here, $N. Whatever you deposit with me waits in the same vault behind every bursar in every town, safe from wolves, water, and your own worse judgment.',
@@ -307,17 +310,19 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
   // purchasable extra slots (src/sim/bank.ts), and the Linen Pouch as the
   // cheapest vendor bag (6 slots, content/items.ts). The chain's copper
   // through quest four is sized to afford the pouch when this unlocks.
-  // Maren gives the bags half; the banker turns it in with the vault half.
-  // The Linen Pouch is quest-gated at Finch's stall (vendorQuestGates above),
-  // so it cannot be bought, equipped, and stranded before this quest opens.
+  // Maren gives AND takes the hand-in (a banker's click opens the bank, not
+  // the quest gossip, so Bursar Wick cannot hold a turn-in); her completion
+  // carries the vault half of the lesson and points at his desk. The Linen
+  // Pouch is quest-gated at Finch's stall (vendorQuestGates above), so it
+  // cannot be bought, equipped, and stranded before this quest opens.
   q_ps_pouch_and_purse: {
     id: 'q_ps_pouch_and_purse',
     name: 'Pouch and Purse',
     giverNpcId: 'instructor_maren',
-    turnInNpcId: 'bursar_wick',
-    text: 'One more lesson before the vale, $N, and it is the one that keeps adventurers alive: what you carry. Your backpack holds sixteen slots, and beside it wait four empty bag loops; every bag you buckle on adds its own space to the pool. Buy a Linen Pouch from Quartermaster Finch and buckle it on, then take the lesson to Bursar Wick at the strongbox desk. What he keeps is the half of it no bag can hold.',
+    turnInNpcId: 'instructor_maren',
+    text: 'One more lesson before the vale, $N, and it is the one that keeps adventurers alive: what you carry. Your backpack holds sixteen slots, and beside it wait four empty bag loops; every bag you buckle on adds its own space to the pool. Buy a Linen Pouch from Quartermaster Finch, buckle it on, and come back to me.',
     completionText:
-      'So Maren sends me her students at last. The pouch is yours, and here is the other half of the lesson, $N: what you cannot carry, the Gilded Strongbox keeps. Any bursar in any town opens the same vault, and more vault space can be bought once your purse grows into it. Keep your valuables banked and your bags roomy. A full pack has ended more adventures than any wolf ever did.',
+      'A fine pouch, and six more slots to fill with trouble. Now the half of the lesson no bag can hold, $N: what you cannot carry, the Gilded Strongbox keeps. Bursar Wick at the desk behind me opens the same vault every bursar in every town shares, and more vault space can be bought once your purse grows into it. Keep your valuables banked and your bags roomy. A full pack has ended more adventures than any wolf ever did.',
     objectives: [{ type: 'collect', itemId: 'linen_pouch', count: 1, label: 'Linen Pouch bought' }],
     xpReward: 0,
     copperReward: 120,
@@ -400,11 +405,12 @@ export const PROVING_SHORE_OBJECTS: GroundObjectDef[] = [
     itemId: 'ps_ferry_bell',
     name: 'Ferry Bell',
     // The clicked crossing (interactions/ferry_bell.ts): the Old Pier's bell
-    // rings a player to Eastbrook town, the vale west strand's twin rings a
-    // returning player back to the island arrival.
+    // rings a player to Eastbrook town, and its twin INSIDE town (beside
+    // Wayfarer Bryn and the town landing) rings a returning player back to
+    // the island arrival.
     positions: [
       { x: -274, z: 0 },
-      { x: -140, z: -32 },
+      { x: 11, z: -7 },
     ],
   },
 ];

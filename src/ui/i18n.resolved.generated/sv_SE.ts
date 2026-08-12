@@ -871,7 +871,10 @@ export const sv_SE: EnTranslations = {
       "bodyFirst": "I have not seen you around before, friend. If this is your first time on these roads, there is a place you can go to hone your skills and get used to the world before you take on its challenges: the Proving Shore, a quiet island across the strait. The ferry runs both ways, and no one will think less of you either way.",
       "bodyRefresher": "Back again with a fresh face, are you? You know how this goes, then. Still, if you would like a refresher before you set out, the Proving Shore never turns away a returning student, and the ferry is ready when you are.",
       "play": "Take the tutorial",
-      "skip": "Skip the tutorial"
+      "skip": "Skip the tutorial",
+      "declineNote": "As you like, friend. Should you ever change your mind, this bell beside me rings you across to the Proving Shore any time, day or night. It will still be here when the wolves are not.",
+      "bellHomeNote": "Back from the shore already? That was the ferry bell you rang. Its twin stands right here beside me: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.",
+      "noteClose": "Understood"
     },
     "tutorial": {
       "moveBodyTouch": "Använd rörelsespaken för att gå och dra på skärmen för att se dig omkring. Ta några steg för att börja.",
@@ -14161,7 +14164,7 @@ export const sv_SE: EnTranslations = {
       "wayfarer_bryn": {
         "name": "Wayfarer Bryn",
         "title": "Harbor Guide",
-        "greeting": "Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry bell on the west strand rings both ways, every day of the year."
+        "greeting": "Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: this bell beside me rings you across any day of the year, and its twin on the island rings you home."
       },
       "instructor_maren": {
         "name": "Instructor Maren",
@@ -16191,8 +16194,8 @@ export const sv_SE: EnTranslations = {
       },
       "q_ps_pouch_and_purse": {
         "title": "Pouch and Purse",
-        "text": "One more lesson before the vale, {playerName}, and it is the one that keeps adventurers alive: what you carry. Your backpack holds sixteen slots, and beside it wait four empty bag loops; every bag you buckle on adds its own space to the pool. Buy a Linen Pouch from Quartermaster Finch and buckle it on, then take the lesson to Bursar Wick at the strongbox desk. What he keeps is the half of it no bag can hold.",
-        "completion": "So Maren sends me her students at last. The pouch is yours, and here is the other half of the lesson, {playerName}: what you cannot carry, the Gilded Strongbox keeps. Any bursar in any town opens the same vault, and more vault space can be bought once your purse grows into it. Keep your valuables banked and your bags roomy. A full pack has ended more adventures than any wolf ever did.",
+        "text": "One more lesson before the vale, {playerName}, and it is the one that keeps adventurers alive: what you carry. Your backpack holds sixteen slots, and beside it wait four empty bag loops; every bag you buckle on adds its own space to the pool. Buy a Linen Pouch from Quartermaster Finch, buckle it on, and come back to me.",
+        "completion": "A fine pouch, and six more slots to fill with trouble. Now the half of the lesson no bag can hold, {playerName}: what you cannot carry, the Gilded Strongbox keeps. Bursar Wick at the desk behind me opens the same vault every bursar in every town shares, and more vault space can be bought once your purse grows into it. Keep your valuables banked and your bags roomy. A full pack has ended more adventures than any wolf ever did.",
         "objectives": {
           "0": {
             "label": "Linen Pouch bought"

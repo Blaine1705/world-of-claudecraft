@@ -61,8 +61,9 @@ describe('proving shore placement', () => {
   it('the crossing is clicked bells on both shores, never a walk-in portal', () => {
     // The rework's contract: no walk-in portal trigger anywhere near the
     // island (nobody is teleported by wandering), and exactly one ferry bell
-    // stands on each side of the strait (island pier, vale strand). Their
-    // dryness rides the placement sweep above (bells are ground objects).
+    // stands on each side of the strait (island pier, Eastbrook town beside
+    // the greeter). Their dryness rides the placement sweep above (bells are
+    // ground objects).
     expect(PROVING_SHORE_PORTALS).toEqual([]);
     const bells =
       PROVING_SHORE_OBJECTS.find((o) => o.itemId === 'ps_ferry_bell')?.positions ?? [];
@@ -140,12 +141,14 @@ describe('proving shore placement', () => {
       'q_ps_pouch_and_purse',
       'q_ps_set_sail',
     ]);
-    // The bank lesson's turn-in is a real banker: the bank window is
-    // reachable from the same NPC whose dialogue teaches it, while Maren
-    // gives the quest (the rail stays hers).
+    // The bank lesson lives entirely at Maren: a banker's click opens the
+    // bank window, not the quest gossip, so Bursar Wick can hold NO quest
+    // (give or hand-in) and stays questIds-empty by design; Maren's
+    // completion points at his desk instead.
     expect(PROVING_SHORE_NPCS.bursar_wick.banker).toBe(true);
+    expect(PROVING_SHORE_NPCS.bursar_wick.questIds).toEqual([]);
     expect(PROVING_SHORE_QUESTS.q_ps_pouch_and_purse.giverNpcId).toBe('instructor_maren');
-    expect(PROVING_SHORE_QUESTS.q_ps_pouch_and_purse.turnInNpcId).toBe('bursar_wick');
+    expect(PROVING_SHORE_QUESTS.q_ps_pouch_and_purse.turnInNpcId).toBe('instructor_maren');
     // The pouch cannot be bought before the lesson opens (the vendor gate
     // items.ts buyItem enforces and the vendor window mirrors), so an early
     // purchase can never strand the lesson's copper.

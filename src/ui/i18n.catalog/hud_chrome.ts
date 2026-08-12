@@ -585,6 +585,14 @@ export const hudChromeStrings = {
       'Back again with a fresh face, are you? You know how this goes, then. Still, if you would like a refresher before you set out, the Proving Shore never turns away a returning student, and the ferry is ready when you are.',
     play: 'Take the tutorial',
     skip: 'Skip the tutorial',
+    // The decline follow-up: skipping is never a locked door.
+    declineNote:
+      'As you like, friend. Should you ever change your mind, this bell beside me rings you across to the Proving Shore any time, day or night. It will still be here when the wolves are not.',
+    // The first bell homecoming: the ride may have been a misclick, so the
+    // town's twin bell is pointed out once.
+    bellHomeNote:
+      'Back from the shore already? That was the ferry bell you rang. Its twin stands right here beside me: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.',
+    noteClose: 'Understood',
   },
   // New-adventurer tutorial copy for the touch interface. The default tutorial
   // bodies (hud.tutorial.*Body) reference keyboard/mouse ("W/A/S/D", "press F"),
