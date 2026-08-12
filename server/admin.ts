@@ -115,8 +115,10 @@ import { addBlockedIp, cleanIp, listBlockedIps, removeBlockedIp } from './ip_blo
 import { PgMapsDb } from './maps_db';
 import {
   addAccountNote,
+  accountCheaterMarkSeconds,
   forceCharacterRename,
   ignoreReport,
+  liftAccountCheaterMark,
   liftAccountChatMute,
   moderateAccount,
   moderationReportsForAccount,
@@ -126,6 +128,7 @@ import {
   recordProfessionsRestore,
   resetChatStrikesAudited,
   setAccountAiFlag,
+  setAccountCheaterMark,
   setAccountStreamerFlair,
   setDailyRewardsBan,
   setDailyRewardsIpBan,
@@ -1706,6 +1709,10 @@ export type AdminRuntime = Pick<
   // Push an operator's account-flair edit onto the account's live session, so the
   // AI mark / streamer links change without a reconnect.
   | 'applyAccountFlairLive'
+  // Push a Cheater mark change onto the account's live session. Without it a
+  // sanction applied to a logged-in player does nothing until their next login,
+  // which is the session it is most needed in.
+  | 'applyCheaterMarkLive'
   | 'reloadChatFilter'
   | 'reloadBlockedIps'
   | 'disconnectByIp'
@@ -1858,6 +1865,11 @@ function makeRealAdminDb() {
     moderationQueue: readModerationQueue,
     moderationReportsForAccount,
     muteAccountChat,
+    // The Cheater mark: apply/re-length, lift early, and the read the live push
+    // and the world-join restore both resolve the remaining budget through.
+    setAccountCheaterMark,
+    liftAccountCheaterMark,
+    accountCheaterMarkSeconds,
     accountAndScopeForToken,
     accountMailTarget,
     findAccount,
@@ -2544,6 +2556,53 @@ async function forceRenameHandler(ctx: Ctx): Promise<void> {
     return ok(ctx.res, { ok: true });
   } catch (err) {
     return fail(ctx.res, 400, err instanceof Error ? err.message : 'force rename failed');
+  }
+}
+
+/**
+ * POST /admin/api/moderation/accounts/:id/cheater-mark: brand an account with the
+ * Cheater tag for a budget of PLAYED seconds, and push it onto the live session.
+ *
+ * Admin accounts are exempt for the same reason they are exempt from
+ * suspend/ban/chat-mute (isAdminAccount above): an operator must not be able to
+ * brand another operator, deliberately or by mistyping an account id.
+ */
+async function cheaterMarkHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const targetAccountId = adminTargetId(ctx);
+  if (await adminDb().isAdminAccount(targetAccountId)) {
+    return fail(ctx.res, 400, 'admin accounts cannot be marked');
+  }
+  const body = await readBody(ctx.req);
+  try {
+    await adminDb().setAccountCheaterMark({
+      accountId: targetAccountId,
+      adminAccountId: ctxAccountId(ctx),
+      reason: body.reason,
+      seconds: body.seconds,
+    });
+    rt.applyCheaterMarkLive(targetAccountId, await adminDb().accountCheaterMarkSeconds(targetAccountId));
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'cheater mark failed');
+  }
+}
+
+/** POST /admin/api/moderation/accounts/:id/lift-cheater-mark: clear it early + live push. */
+async function liftCheaterMarkHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const targetAccountId = adminTargetId(ctx);
+  const body = await readBody(ctx.req);
+  try {
+    await adminDb().liftAccountCheaterMark({
+      accountId: targetAccountId,
+      adminAccountId: ctxAccountId(ctx),
+      reason: body.reason,
+    });
+    rt.applyCheaterMarkLive(targetAccountId, 0);
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'lifting the mark failed');
   }
 }
 
@@ -3335,6 +3394,22 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('account')],
     meta: adminTargetMeta('account'),
     handler: chatMuteHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/cheater-mark',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: cheaterMarkHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/lift-cheater-mark',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: liftCheaterMarkHandler,
   },
   {
     method: 'POST',

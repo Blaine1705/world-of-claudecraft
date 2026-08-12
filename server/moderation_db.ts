@@ -3,6 +3,9 @@ import {
   STREAMER_PLATFORMS,
   type StreamerLinks,
 } from '../src/sim/account_flair';
+// The ONE clamp for a mark's played-second budget, shared with the sim so the
+// route, the database, and the countdown cannot disagree about what is in range.
+import { normalizeCheaterMarkSeconds } from '../src/sim/moderation';
 import { pool } from './db';
 
 export const REPORT_REASONS = [
@@ -53,6 +56,13 @@ export const MODERATION_ACTIONS = [
   // folded into the stored reason text.
   'restore_item',
   'restore_slot',
+  // The Cheater mark (src/sim/moderation/). Punitive and visible to every player
+  // in range, so the reason is REQUIRED on both arms: who branded an account, for
+  // how long, and why has to be recoverable long after the tag has worn off.
+  // Only the operator arms are audited; the sim burning the budget down is a
+  // tick, not a decision, and would otherwise write an audit row per save.
+  'cheater_mark',
+  'cheater_mark_lift',
 ] as const;
 export type ModerationActionKind = (typeof MODERATION_ACTIONS)[number];
 
@@ -630,6 +640,113 @@ export async function muteAccountChat(input: {
     client.release();
   }
   fireOnModerationQueueChanged();
+}
+
+/**
+ * Apply or re-length the Cheater mark: `seconds` of PLAYED time the account owes
+ * before the tag lifts. Re-applying replaces the budget rather than adding to
+ * it, so an operator correcting a fat-fingered duration sets the value they
+ * meant instead of having to lift and re-apply.
+ *
+ * Validated here rather than at the route so the ceiling holds for every caller.
+ */
+export async function setAccountCheaterMark(input: {
+  accountId: number;
+  adminAccountId: number;
+  reason: unknown;
+  seconds: unknown;
+}): Promise<void> {
+  const reason = cleanText(input.reason, ACTION_REASON_MAX);
+  if (!reason) throw new Error('moderation reason is required');
+  const seconds = normalizeCheaterMarkSeconds(input.seconds);
+  if (seconds <= 0) {
+    throw new Error('cheater mark duration must be a positive number of played seconds');
+  }
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query(
+      `UPDATE accounts
+       SET cheater_mark_seconds = $2, cheater_mark_reason = $3, cheater_mark_set_at = now()
+       WHERE id = $1`,
+      [input.accountId, seconds, reason],
+    );
+    await recordModerationAction(client, 'cheater_mark', {
+      accountId: input.accountId,
+      adminAccountId: input.adminAccountId,
+      reason,
+    });
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+/** Clear a live Cheater mark early. Refuses when the account is not marked, so a
+ *  double-click cannot write an audit row claiming a sanction was lifted twice. */
+export async function liftAccountCheaterMark(input: {
+  accountId: number;
+  adminAccountId: number;
+  reason: unknown;
+}): Promise<void> {
+  const reason = cleanText(input.reason, ACTION_REASON_MAX);
+  if (!reason) throw new Error('moderation reason is required');
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const updated = await client.query(
+      `UPDATE accounts
+       SET cheater_mark_seconds = 0, cheater_mark_reason = NULL, cheater_mark_set_at = NULL
+       WHERE id = $1 AND cheater_mark_seconds > 0`,
+      [input.accountId],
+    );
+    if ((updated.rowCount ?? 0) === 0) throw new Error('account is not marked');
+    await recordModerationAction(client, 'cheater_mark_lift', {
+      accountId: input.accountId,
+      adminAccountId: input.adminAccountId,
+      reason,
+    });
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+/** The remaining played-second budget, 0 when unmarked. Read at world join. */
+export async function accountCheaterMarkSeconds(accountId: number): Promise<number> {
+  const res = await pool.query<{ cheater_mark_seconds: number }>(
+    'SELECT cheater_mark_seconds FROM accounts WHERE id = $1',
+    [accountId],
+  );
+  return normalizeCheaterMarkSeconds(res.rows[0]?.cheater_mark_seconds);
+}
+
+/**
+ * Write the sim's remaining budget back to the account (the session save path).
+ *
+ * NOT audited and NOT an operator action: this is the countdown ticking, so an
+ * audit row per save would bury the two decisions that matter under thousands of
+ * mechanical ones. The `> 0` guard keeps an unmarked account's row untouched, so
+ * the common case costs zero writes.
+ */
+export async function burnAccountCheaterMark(
+  accountId: number,
+  secondsRemaining: number,
+): Promise<void> {
+  await pool.query(
+    `UPDATE accounts
+     SET cheater_mark_seconds = $2,
+         cheater_mark_reason = CASE WHEN $2 = 0 THEN NULL ELSE cheater_mark_reason END,
+         cheater_mark_set_at = CASE WHEN $2 = 0 THEN NULL ELSE cheater_mark_set_at END
+     WHERE id = $1 AND cheater_mark_seconds > 0`,
+    [accountId, normalizeCheaterMarkSeconds(secondsRemaining)],
+  );
 }
 
 export async function liftAccountChatMute(input: {
