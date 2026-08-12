@@ -569,18 +569,24 @@ export const abilityStrings = {
 abilityStrings.es_ES = abilityStrings.es as typeof abilityStringsEn;
 abilityStrings.fr_CA = abilityStrings.fr_FR as typeof abilityStringsEn;
 
-type AbilityEntityTranslation = { name: string; description: string } & Partial<
-  Record<`specNote_${string}`, string>
->;
+type AbilityEntityTranslation = {
+  name: string;
+  description: string;
+  // Talent-conditional description shown when a talent has retired a stated
+  // requirement (Cheap Trick lifting Gut Punch's stealth gate). UI-layer only,
+  // resolved by tEntity when the resolved ability drops the requirement.
+  descriptionNoStealth?: string;
+} & Partial<Record<`specNote_${string}`, string>>;
 
 type AbilityEntityTranslations = Record<string, AbilityEntityTranslation>;
 
 function abilityTranslations(
-  entries: readonly (readonly [string, string, string, Record<string, string>?])[],
+  entries: readonly (readonly [string, string, string, Record<string, string>?, string?])[],
 ): AbilityEntityTranslations {
   const translations: AbilityEntityTranslations = {};
-  for (const [id, name, description, specNotes] of entries) {
+  for (const [id, name, description, specNotes, descriptionNoStealth] of entries) {
     const row: AbilityEntityTranslation = { name, description };
+    if (descriptionNoStealth) row.descriptionNoStealth = descriptionNoStealth;
     for (const [spec, note] of Object.entries(specNotes ?? {})) {
       row[`specNote_${spec}`] = note;
     }
@@ -1012,6 +1018,10 @@ const classAbilityNamesEn = {
           subtlety:
             'Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil.',
         },
+        // Shown when Cheap Trick has retired the stealth requirement: same prose
+        // with the "Must be stealthed." sentence dropped, so the tooltip no longer
+        // contradicts the requirement line.
+        'Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.',
       ],
       [
         'sap',

@@ -71,6 +71,7 @@ export function itemSetBonusField(pieces: number): ItemSetBonusField {
 export type EntityTranslationField =
   | 'name'
   | 'description'
+  | 'descriptionNoStealth'
   | 'title'
   | 'text'
   | 'completion'
@@ -101,7 +102,7 @@ export type EntityTranslationRequest =
   | {
       kind: 'ability';
       id: string;
-      field: 'name' | 'description' | AbilitySpecNoteField;
+      field: 'name' | 'description' | 'descriptionNoStealth' | AbilitySpecNoteField;
       values?: InterpolationValues;
     }
   | { kind: 'item'; id: string; field: 'name'; values?: InterpolationValues }
@@ -458,6 +459,16 @@ export function tEntity(request: EntityTranslationRequest): string {
   const fallback = interpolateSource(canonicalEntityText(request), request.values);
   recordFallback(request, fallback);
   return fallback;
+}
+
+/** Bundle-only entity resolution: the localized string for the active locale, or
+ *  null when the key is absent from that locale's bundle, WITHOUT falling back to
+ *  the canonical English source. For an OPTIONAL entity variant a caller resolves
+ *  a different base field on a miss (e.g. a talent-conditional ability
+ *  description that falls back to the plain description) instead of surfacing raw
+ *  content placeholders in a locale that has not filled the variant yet. */
+export function tEntityOptional(request: EntityTranslationRequest): string | null {
+  return tOptional(cachedEntityTranslationKey(request), request.values);
 }
 
 export function itemDisplayName(item: ItemDef): string {

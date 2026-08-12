@@ -298,6 +298,7 @@ import {
   knownLetterId,
   riftFloorLabel,
   tEntity,
+  tEntityOptional,
   zoneDisplayName,
   zonePoiLabel,
 } from './entity_i18n';
@@ -19113,28 +19114,34 @@ function abilityDisplayDescription(
     0,
   );
   const rageText = rageGained > 0 ? formatAbilityNumber(rageGained) : '';
-  const text = tEntity({
-    kind: 'ability',
-    id: res.def.id,
-    field: 'description',
-    values: {
-      damage: damageText,
-      overTime: abilityOverTimeText(res, scaling),
-      buff: buff === null ? '' : formatAbilityNumber(buff),
-      duration: duration === null ? '' : formatAbilityNumber(duration),
-      healing: hourglass === null ? '' : formatAbilityNumber(hourglass.healing),
-      selfCooldownRecovery:
-        hourglass === null ? '' : formatAbilityNumber(hourglass.selfCooldownRecovery),
-      allyCooldownRecovery:
-        hourglass === null ? '' : formatAbilityNumber(hourglass.allyCooldownRecovery),
-      hostilePveDuration:
-        hourglass === null ? '' : formatAbilityNumber(hourglass.hostilePveDuration),
-      hostilePvpDuration:
-        hourglass === null ? '' : formatAbilityNumber(hourglass.hostilePvpDuration),
-      groundDuration: hourglass === null ? '' : formatAbilityNumber(hourglass.groundDuration),
-      rage: rageText,
-    },
-  });
+  const values = {
+    damage: damageText,
+    overTime: abilityOverTimeText(res, scaling),
+    buff: buff === null ? '' : formatAbilityNumber(buff),
+    duration: duration === null ? '' : formatAbilityNumber(duration),
+    healing: hourglass === null ? '' : formatAbilityNumber(hourglass.healing),
+    selfCooldownRecovery:
+      hourglass === null ? '' : formatAbilityNumber(hourglass.selfCooldownRecovery),
+    allyCooldownRecovery:
+      hourglass === null ? '' : formatAbilityNumber(hourglass.allyCooldownRecovery),
+    hostilePveDuration: hourglass === null ? '' : formatAbilityNumber(hourglass.hostilePveDuration),
+    hostilePvpDuration: hourglass === null ? '' : formatAbilityNumber(hourglass.hostilePvpDuration),
+    groundDuration: hourglass === null ? '' : formatAbilityNumber(hourglass.groundDuration),
+    rage: rageText,
+  };
+  // Cheap Trick retires Gut Punch's stealth requirement. When the RESOLVED ability
+  // has dropped it, prefer the stealth-free description variant so the prose stops
+  // contradicting the (talent-aware) requirement line, the same way the cost/cast
+  // lines already prefer resolved values. Falls back to the base description for
+  // any locale that has not filled the variant yet, so no raw content placeholder
+  // can surface.
+  const stealthFreeVariant =
+    res.ignoreStealthRequirement === true && res.def.requiresStealth === true
+      ? tEntityOptional({ kind: 'ability', id: res.def.id, field: 'descriptionNoStealth', values })
+      : null;
+  const text =
+    stealthFreeVariant ??
+    tEntity({ kind: 'ability', id: res.def.id, field: 'description', values });
   // Spec-aware teaching line: a shared button explains its interaction ONLY
   // for the player's current spec, so a new player never reads another
   // spec's rules on their own tooltip.
