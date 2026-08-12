@@ -265,11 +265,6 @@ function signatureField(value: unknown): string {
   return sig;
 }
 
-function optionalString(value: unknown, maxLen: number): string | null {
-  if (value === null || value === undefined) return null;
-  return stringField(value, maxLen);
-}
-
 /** An instance payload from the client is opaque JSON the sim compares
  *  structurally; only its container shape is checked here. */
 function optionalInstance(value: unknown): ItemInstancePayload | null | undefined {

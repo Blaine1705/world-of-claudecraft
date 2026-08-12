@@ -41,7 +41,8 @@
 //   (3) Domain feature-config getters that own their own env (discord.ts, github.ts
 //       OAuth, oauth.ts, native_attestation.ts, email/, auth.ts banlist,
 //       chat_filter_db.ts, woc_balance.ts, perf_report.ts, TRUSTED_PROXY_IPS in
-//       ratelimit.ts), plus daily_rewards.ts's module-load cache-TTL test knob
+//       ratelimit.ts, and woc_market_routes.ts's wocMarketConfig with its
+//       clamped WOC_MARKET_CONFIRMING_REVIEW_HOURS read), plus daily_rewards.ts's module-load cache-TTL test knob
 //       WOC_DAILY_REWARD_CONFIG_TTL_MS (a garbage value degrades to cache-off,
 //       never breaks a request).
 //   (4) The security-header / enforce-flag middlewares keep their own
@@ -104,7 +105,7 @@ export interface Config {
   readonly githubToken: string;
   readonly chatLogRetentionDays: number;
   readonly perfReportRetentionDays: number;
-  // The six retention keys below follow the chatLogRetentionDays contract: 0 =
+  // The retention keys below follow the chatLogRetentionDays contract: 0 =
   // keep forever, and the read is deliberately UNTRIMMED, so a whitespace-only
   // value falls to 0, the SAFE side for a destructive delete (keep, never prune).
   readonly dailyRewardEventsRetentionDays: number;

@@ -1438,6 +1438,71 @@ describe('confirmBond', () => {
     expect((await getListing(h, listing.id)).currentBidId).toBe(rebid.bid.id);
   });
 
+  it('refuses a refresh whose quote would outlive the lapse deadline', async () => {
+    // The straddle hole: a refresh in the seat's last quote-lifetime mints a
+    // quote valid PAST placed_at plus the pending TTL, inviting a broadcast
+    // whose signature arrives against a lapsed bid, where nothing can record
+    // it (the one loss shape signature-first recording cannot reach). The
+    // refresh refuses instead, the settlement leg's deadline-guard sibling.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const placedAtMs = h.now();
+    // Inside the safe window (quote expiry lands before the lapse): allowed.
+    h.setNow(
+      placedAtMs + (WOC_MARKET_BOND_PENDING_TTL_SECONDS - WOC_MARKET_QUOTE_TTL_SECONDS) * 1000,
+    );
+    unwrap(await h.service.refreshBondQuote(BUYER_A, placed.bid.id), 'refreshBondQuote');
+    // One tick later the quote would straddle the lapse: refused.
+    h.setNow(
+      placedAtMs + (WOC_MARKET_BOND_PENDING_TTL_SECONDS - WOC_MARKET_QUOTE_TTL_SECONDS) * 1000 + 1,
+    );
+    expect(await h.service.refreshBondQuote(BUYER_A, placed.bid.id)).toEqual({
+      ok: false,
+      reason: 'quote_expired',
+    });
+  });
+
+  it('a poll winning the activation race still answers the confirmer standing true', async () => {
+    // The recording commits, the sweep's poll confirms and activates while
+    // this request sits in the chain round trip, and activateBid then
+    // answers not_pending. The service must answer from the row's REAL
+    // status: a bare standing:false read as "outbid" to the very bidder
+    // whose payment just stood.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const realActivate = h.db.activateBid.bind(h.db);
+    h.db.activateBid = async (bidId: number, nowMs: number) => {
+      // The poll got there first: the activation really happened, and THIS
+      // caller's own attempt finds the bid no longer pending.
+      await realActivate(bidId, nowMs);
+      return 'not_pending' as const;
+    };
+    const confirmed = unwrap(
+      await h.service.confirmBond(BUYER_A, placed.bid.id, 'sig-race-won'),
+      'confirmBond',
+    );
+    expect(confirmed.standing, 'the bid really stands; say so').toBe(true);
+    expect((await getBid(h, placed.bid.id)).status).toBe('active');
+  });
+
   it('refreshBondQuote stands an unpaid bid on a fresh reference, end to end', async () => {
     // The SUCCESS arm: the refusal arms above prove what a refresh must not
     // touch, this proves the refresh actually re-references an unpaid quote
@@ -1842,6 +1907,34 @@ describe('the confirming review bound', () => {
     expect(readout.reviewSettlements.count).toBe(1);
     expect(readout.reviewSettlements.sample[0]).toMatchObject({ id: settlement.id });
     expect(await h.db.transitionSettlement(settlement.id, ['review'], 'confirmed')).toBe(true);
+  });
+
+  it('a recorded-signature retry against a review-parked row answers the state', async () => {
+    // The H15 park can land between a recording and its retry (an in-flight
+    // request, a wallet resubmit): "purchase gone" (not_active) is exactly
+    // wrong for money under review. The outcome arm answers the state and
+    // the window renders it honestly; a DIFFERENT signature still gets no
+    // outcome.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    h.setNow(listing.endsAtMs + 1);
+    await h.service.sweepPass();
+    const settlement = await liveSettlement(h, listing.id);
+    unwrap(await h.service.settlementQuote(BUYER_A, settlement.id), 'settlementQuote');
+    expect(await h.db.submitSettlementSignature(settlement.id, 'sig-review-retry')).toBe('ok');
+    h.setNow(listing.endsAtMs + 1 + 7 * 3600 * 1000);
+    await h.service.sweepPass();
+    expect((await getSettlement(h, settlement.id)).state).toBe('review');
+    const retry = unwrap(
+      await h.service.confirmSettlement(BUYER_A, settlement.id, 'sig-review-retry'),
+      'confirmSettlement',
+    );
+    expect(retry.state).toBe('review');
+    expect(await h.service.confirmSettlement(BUYER_A, settlement.id, 'sig-other-string')).toEqual({
+      ok: false,
+      reason: 'not_active',
+    });
   });
 });
 

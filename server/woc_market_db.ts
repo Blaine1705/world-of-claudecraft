@@ -271,8 +271,10 @@ CREATE INDEX IF NOT EXISTS woc_market_bids_bond_confirming
 -- an in-process backoff, so a standing set of never-decided signatures
 -- cannot occupy the poll batch's head every pass and starve fresh bonds of
 -- their finality checks. Rotation never touches placed_at (the readout's
--- age signal, the sweep_parked_at lesson); the expression is shared
--- verbatim with confirmingBonds via BOND_POLL_ROTATION_ORDER. A stale
+-- age signal, the sweep_parked_at lesson); this DDL spells the expression
+-- as its own literal (a template constant cannot reach this SQL string) and
+-- confirmingBonds orders on BOND_POLL_ROTATION_ORDER, with the structural
+-- floor pinning BOTH texts so drift fails a test rather than an index. A stale
 -- poll_parked_at on a bid that left 'pending_bond' is inert: the partial
 -- predicate drops the row from the queue, and no path re-enters it.
 ALTER TABLE woc_market_bids
@@ -928,6 +930,10 @@ export class PgWocMarketDb implements WocMarketDb {
     listing: NewWocListing,
   ): Promise<{ ok: true; id: number } | { ok: false; reason: 'lease_lost' | 'cap_reached' }> {
     return this.withTx(async (client) => {
+      // LOCK ORDER carve-out: no bid row lock and no listing row lock is
+      // taken here (this transaction locks the ACCOUNTS row, then only
+      // INSERTs a listing), so it can never close a cycle with the
+      // bids-then-listing order the market transactions follow.
       // A logout-race save should wait out a slow database, not lose the
       // escrow halves (the saveCharacterAndMarketState rationale). The LOCK
       // wait is bounded separately and tightly: without lock_timeout, ten
@@ -2478,6 +2484,10 @@ export class PgWocMarketDb implements WocMarketDb {
       }
   > {
     return this.withTx(async (client) => {
+      // LOCK ORDER carve-out: no EXISTING bid row lock is ever taken here
+      // (the INSERT below mints a fresh row), so listing-first is
+      // deadlock-free; a crossing finalize re-locks the open set AFTER its
+      // listing lock precisely because this path can commit a new bid.
       const res = await client.query(
         `SELECT ${LISTING_COLS} FROM woc_market_listings
           WHERE realm = $1 AND id = $2 FOR UPDATE`,
@@ -3047,7 +3057,7 @@ export class PgWocMarketDb implements WocMarketDb {
   }
 
   async liveSettlementForListing(listingId: number): Promise<WocSettlementRow | null> {
-    // The state list mirrors the woc_market_settlements_open partial unique
+    // The state list mirrors the woc_market_settlements_open2 partial unique
     // index: 'delivered' stays open until the listing row closes, so the
     // reclaim/cancel/suspend liveness checks keep seeing it.
     const res = await this.pool.query(
@@ -3602,9 +3612,6 @@ export class PgWocMarketDb implements WocMarketDb {
 // ON DELETE CASCADE FKs.
 // ---------------------------------------------------------------------------
 
-/** Closed, fully-disposed listings older than the window; 0/garbage days =
- *  keep forever (the retention_sweep contract). Bids and settlements ride the
- *  delete via their ON DELETE CASCADE FKs; sales are FK-free and survive. */
 /** Nightly retention for the buy-now abandon ledger: a row is dead once it is
  *  outside every cooldown window (minutes to an hour), so any positive
  *  retention is generous forensics headroom. 0 keeps rows forever (the sweep

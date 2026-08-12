@@ -812,9 +812,13 @@ export const routes: RouteDef[] = [
     // claim row; confirm what the buyer holds before hand-delivering).
     // reviewSettlements are over-aged 'confirming' rows the sweep parked
     // (fail_reason confirming_overdue): verify the payment reference on chain
-    // with the service release tooling, then transitionSettlement
-    // review -> confirmed (paid: delivery resumes) or review -> failed
-    // (unpaid: the overdue default pass takes over). stuckBonds are
+    // with the service release tooling, then drive the resolution
+    // transitions, review -> confirmed (paid: delivery resumes) or
+    // review -> failed (unpaid: the overdue default pass takes over). NO
+    // in-repo route drives them yet: the operator arms ARRIVE with the
+    // service-side release tooling (phases 09/19 of the hardening program);
+    // until then a review row waits, visibly, and hand SQL is FORBIDDEN
+    // (it bypasses the transition CAS). stuckBonds are
     // paid-but-undecided bid bonds past the same bound: still polled, no
     // automatic void (the money may have landed); verify the signature by
     // hand and resolve through the same tooling.

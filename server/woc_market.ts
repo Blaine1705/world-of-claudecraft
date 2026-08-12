@@ -37,6 +37,7 @@ import {
   WOC_MARKET_DIRECTED_OFFER_TTL_SECONDS,
   WOC_MARKET_DURATION_HOURS,
   WOC_MARKET_MAX_ACTIVE_LISTINGS,
+  WOC_MARKET_QUOTE_TTL_SECONDS,
   WOC_MARKET_SETTLEMENT_WINDOW_SECONDS,
   WOC_MARKET_STRANDED_RECLAIM_SECONDS,
   type WocBidStatus,
@@ -1781,6 +1782,17 @@ export class WocMarketService {
     // answers the common case without a wasted economy quote; the atomic arm
     // is the setBidBondQuote compare-and-set below.
     if (bid.bondSignature !== null) return refuse('confirm_in_flight');
+    // The refresh must never mint a quote whose life outlives the SEAT: the
+    // bid lapses at placed_at plus the pending TTL, and a quote straddling
+    // that deadline invites a broadcast whose signature arrives against a
+    // lapsed bid, where the intake can no longer record it (the one H4 loss
+    // shape the signature-first recording cannot reach; the settlement leg's
+    // deadline guard is the sibling rule). The residual is the sweep-cadence
+    // race at the boundary itself, seconds instead of a quote lifetime.
+    const lapseAtMs = bid.placedAtMs + WOC_MARKET_BOND_PENDING_TTL_SECONDS * 1000;
+    if (this.now() + WOC_MARKET_QUOTE_TTL_SECONDS * 1000 > lapseAtMs) {
+      return refuse('quote_expired');
+    }
     const intent = await this.deps.economy.bondQuote({
       memoRef: `woc_bond:${bid.id}`,
       usdCents: bid.bondCents,
@@ -1923,6 +1935,19 @@ export class WocMarketService {
       // PENDING: collapsing it into standing:false reads as "outbid" to the
       // client, the exact false verdict the undecided arm exists to avoid.
       return { ok: true, standing: false, pending: true };
+    }
+    if (activated === 'not_pending') {
+      // The bid already left pending_bond, and the overwhelmingly common way
+      // is the POLL winning the race: the recording committed, the sweep's
+      // pass confirmed and activated while this request sat in the chain
+      // round trip. Answer from the row's REAL status, the idempotent-retry
+      // arm's shape: a bare standing:false here read as "outbid" to the very
+      // bidder whose confirm just succeeded.
+      const after = await this.deps.db.bidById(bidId);
+      if (after && (after.status === 'active' || after.status === 'won')) {
+        return { ok: true, standing: true };
+      }
+      return { ok: true, standing: false };
     }
     // A racer confirmed a higher bid first: this bond flips straight to
     // refund_due inside activateBid's superseded arm.
@@ -2182,13 +2207,17 @@ export class WocMarketService {
     if (settlement.state === 'confirming' && !retryOfRecorded) return refuse('confirm_in_flight');
     // A retry of the recorded signature AFTER the payment succeeded answers
     // the outcome (the current state), never not_active: the blip case read
-    // as "purchase gone" for a completed sale. A 'failed' same-signature
-    // retry still refuses below (the settlementQuote revival owns that path).
+    // as "purchase gone" for a completed sale. 'review' joins the outcome
+    // arm (the H15 park can land between a recording and its retry, and
+    // "purchase gone" is exactly wrong for money under review; the client
+    // renders the state honestly). A 'failed' same-signature retry still
+    // refuses below (the settlementQuote revival owns that path).
     if (
       settlement.txSignature === signature &&
       (settlement.state === 'confirmed' ||
         settlement.state === 'delivering' ||
-        settlement.state === 'delivered')
+        settlement.state === 'delivered' ||
+        settlement.state === 'review')
     ) {
       return { ok: true, state: settlement.state };
     }

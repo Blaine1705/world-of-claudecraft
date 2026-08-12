@@ -62,7 +62,9 @@ function onDiskCores(dir: string): string[] {
 
 // Blank out comments while preserving line count and column positions, so prose
 // (a code comment that names Math.random, or "the search window") cannot create a
-// false positive. String literals are left intact: the dotted patterns matched
+// false positive. A shared twin lives at tests/helpers/strip_comments.ts; this
+// copy stays local ON PURPOSE (a load-bearing guard stays self-contained) and
+// the two may drift independently. String literals are left intact: the dotted patterns matched
 // below (Math.random, window., ...) do not appear inside the sim's player text.
 // One alternation, so leftmost-first matching decides precedence: a line comment
 // whose text contains /* is consumed AS a line comment instead of opening a
