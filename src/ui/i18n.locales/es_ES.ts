@@ -490,7 +490,8 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.applying': 'Actualización descargada. Reiniciando el juego para aplicarla.',
   'hudChrome.otaUpdate.continueAnyway': 'Continuar sin actualizar',
   'hudChrome.otaUpdate.downloading': 'Descargando actualización: {percent}',
-  'hudChrome.otaUpdate.incompatible': 'Se necesita una actualización para jugar. Se aplicará en cuanto termine la descarga.',
+  'hudChrome.otaUpdate.incompatible':
+    'Se necesita una actualización para jugar. Se aplicará en cuanto termine la descarga.',
   'hudChrome.otaUpdate.progressLabel': 'Progreso de descarga de la actualización',
   'hudChrome.otaUpdate.title': 'Actualización del juego',
 };
