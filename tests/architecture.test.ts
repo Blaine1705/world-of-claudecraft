@@ -431,6 +431,9 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
   'src/render/affliction_familiar_core.ts',
+  'src/render/characters/portrait_prewarm_core.ts',
+  'src/render/reveal_gate_core.ts',
+  'src/render/town_reveal_core.ts',
   'src/render/ability_vfx_core.ts',
   'src/render/characters/player_look_core.ts',
   'src/render/ability_vfx_longbuff_core.ts',
@@ -441,6 +444,7 @@ const RENDER_PURE_CORES = [
   'src/render/battleground_lantern_fx_core.ts',
   'src/render/battleground_rune_vfx_core.ts',
   'src/render/blade_grass_dense_core.ts',
+  'src/render/blob_shadow_core.ts',
   'src/render/camera_boom_core.ts',
   'src/render/compile_gate.ts',
   'src/render/camera_director_core.ts',
@@ -528,6 +532,7 @@ const RENDER_PURE_CORES = [
   'src/render/prewarm_policy.ts',
   'src/render/prewarm_resume.ts',
   'src/render/resident_scenery_core.ts',
+  'src/render/sky_residency_core.ts',
   'src/render/player_aura_rings_core.ts',
   'src/render/warrior_cast_fx_core.ts',
   'src/render/characters/form_visual_selection_core.ts',
@@ -1798,6 +1803,7 @@ const UI_DOM_MODULES = [
   'src/ui/movable_frame.ts',
   'src/ui/native_update_prompt.ts',
   'src/ui/options_window.ts',
+  'src/ui/ota_update_overlay.ts',
   'src/ui/perf_metrics_sampler.ts',
   'src/ui/perf_nudge_toast.ts',
   'src/ui/perf_ornament_svg.ts',

@@ -694,13 +694,15 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
 // archetype and scene-texture counts; renderer.ts edits only). No capture
 // was retaken.
-// Re-minted for the iOS constrained-memory zone-eviction fix review response
+// Re-minted after the custom-shader dedupe signature fix changed
+// prewarm_policy.ts. No capture was retaken.
+// Re-minted for the merge of the iOS constrained-memory zone-eviction fix
 // (evictFarZoneIfConstrained's rationale moved into zone_eviction_core.ts;
-// renderer.ts edits only). No capture was retaken.
+// renderer.ts edits only) into release/v0.37.0. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'e4490adddc857bcbcb617ac06f83dbaedb4c5ee2db232feb034464d8b228b093';
+  '0539d7aae4d3739f58ec97a2238145ab9f60d0d3da26750e56b06d691d89ce34';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '98796795f552c3729c71617f8aea85002fe7bc2b90c6504cebd693b6ffca37be';
+  '3255c571f8cc9ee50f962f7e0ac9e6f01676243d5b221ee51ba94eb3690b757e';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1627,19 +1629,23 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // PR 3204) into the creator-appearance branch: both parents move the
     // rendererIntegration leaf, so the merged tree mints a value matching
     // neither parent. No capture was retaken.
-    // Re-pinned for the iOS constrained-memory zone-eviction fix: the
-    // first-order composite follows renderer.ts's evictFarZoneIfConstrained
-    // addition, then this second-order performance seal follows the swept
-    // evidence bytes. No capture was retaken.
-    // Re-pinned for the review response on the same PR: the first-order
-    // composite follows renderer.ts's shrunk evictFarZoneIfConstrained
-    // jsdoc (moved to zone_eviction_core.ts) plus its corrected
-    // player-vs-camera rationale, then this second-order performance seal
-    // follows the swept evidence bytes. No capture was retaken.
+    // Re-minted for the Three.js audit batch (light budget seam, blob
+    // shadows, sky residency lane, splat colour pack-source fix): the
+    // first-order composite follows renderer.ts, then this second-order
+    // performance seal follows the swept evidence bytes. No capture was
+    // retaken.
+    // Re-minted after the custom-shader dedupe signature fix changed
+    // prewarm_policy.ts. No capture was retaken.
+    // Re-minted for the merge of the iOS constrained-memory zone-eviction fix
+    // (evictFarZoneIfConstrained's rationale moved into zone_eviction_core.ts;
+    // renderer.ts edits only) into release/v0.37.0: the first-order composite
+    // follows both parents' renderer.ts inputs, then this second-order
+    // performance seal follows the swept evidence bytes. No capture was
+    // retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('2aa67a931df2aa8a0ab823398621d9d7e1577a6fee0835f8443abfbaad5e0b30');
+    ).toBe('600bb1d8a078eeb7528730ebaf9175540c8911e4b0fb30b6f5bd5693c455e617');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
