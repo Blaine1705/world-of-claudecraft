@@ -12653,9 +12653,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorialGreeting.play': '进行新手教学',
   'hudChrome.tutorialGreeting.skip': '跳过新手教学',
   'hudChrome.tutorialGreeting.declineNote':
-    '随你的意，朋友。哪天改了主意，我身旁这口铃随时都能送你去试炼之滨，不分昼夜。狼群不等人，它等。',
+    '随你的意，朋友。哪天改了主意，鸦邮信箱旁的渡船铃随时都能送你去试炼之滨，不分昼夜。狼群不等人，它等。',
   'hudChrome.tutorialGreeting.bellHomeNote':
-    '这么快就从海滨回来了？你刚才敲响的正是渡船铃。它的孪生兄弟就立在我身旁：想回试炼之滨，随时敲响它，渡航就会送你过去。敲错了也不打紧。',
+    '这么快就从海滨回来了？你刚才敲响的正是渡船铃。它的孪生兄弟就挂在那边鸦邮信箱旁：想回试炼之滨，随时敲响它，渡航就会送你过去。敲错了也不打紧。',
+  'hudChrome.tutorialGreeting.islandArrivalNote':
+    '刚下渡船吗？欢迎来到试炼之滨。教官玛伦在我身后这条路尽头的晨憩营地主持操练：她想先跟你说上几句。等你准备离开时，敲响我码头尽头的这口铃，渡航就会送你回东溪镇。',
   'hudChrome.tutorialGreeting.noteClose': '明白了',
   'entities.items.ps_castaway_crate.name': '漂流货箱',
   'entities.items.ps_ferry_bell.name': '渡船铃',
@@ -12664,7 +12666,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.wayfarer_bryn.name': '旅人布琳',
   'entities.npcs.wayfarer_bryn.title': '港口向导',
   'entities.npcs.wayfarer_bryn.greeting':
-    '东溪谷来者不拒，朋友。而对脚下还不稳的人来说，总还有试炼之滨：我身旁这口铃一年到头随时送你过去，岛上那口孪生铃再送你回家。',
+    '东溪谷来者不拒，朋友。而对脚下还不稳的人来说，总还有试炼之滨：鸦邮信箱旁的渡船铃一年到头随时送你过去，岛上那口孪生铃再送你回家。',
   'entities.npcs.instructor_maren.name': '教官玛伦',
   'entities.npcs.instructor_maren.title': '试炼导师',
   'entities.npcs.instructor_maren.greeting':
@@ -12683,7 +12685,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '镀金保险箱连这里也设了一张桌子，{playerName}。凡是存到我这里的东西，都躺在每座城镇每位司库身后的同一座金库里，狼咬不着，水泡不着，连你自己的糊涂决定也碰不着。',
   'entities.quests.q_ps_strike_true.title': '击中要害',
   'entities.quests.q_ps_strike_true.text':
-    '欢迎来到试炼之滨，{playerName}。这里的每一课都从同一件事开始：站稳脚，握好刃。营地西南练武场上的草人生来就是挨打的。挑一个，站稳，砍到三个散架为止。它们不会还手。这片海滨之外的东西可会。',
+    '欢迎来到试炼之滨，{playerName}。这里的每一课都从同一件事开始：站稳脚，握好刃。营地西南练武场上的草人生来就是挨打的。挑一个，站稳，砍到三个散架为止。它们的还击不痛不痒。这片海滨之外的东西下手可重得多。',
   'entities.quests.q_ps_strike_true.completion':
     '三个倒下，你的手也稳多了。记住这种感觉，{playerName}：站稳脚，抬起眼，全力挥出。谷地的狼比稻草快，但同样的算术也能放倒它们。',
   'entities.quests.q_ps_strike_true.objectives.0.label': '击倒训练草人',

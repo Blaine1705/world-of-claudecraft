@@ -6464,6 +6464,11 @@ export type SimEvent = { pid?: number } & (
   // Personal and text-free: the client decides ONCE per device (localStorage)
   // to point out the town's twin bell, in case the ride was a misclick.
   | { type: 'ferryBellHome'; pid: number }
+  // Ferry island arrival (tutorial island): fired every time a ride sets a
+  // player down at the Proving Shore arrival (the greeting ferry and the town
+  // bell alike). Personal and text-free: the client answers ONCE per device
+  // with Ferryman Odo's welcome note directing the player up to Maren.
+  | { type: 'ferryIslandArrival'; pid: number }
   // Attunement celebration, personal copy (Professions 2.0): a
   // quest-validated pair attunement (new OR return) landed for this player
   // (professions/attunement_events.ts). Personal (pid = the celebrant) and

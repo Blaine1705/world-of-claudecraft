@@ -64,3 +64,13 @@ export function buildFerryBellHomeNote(): TutorialGreetingNote {
     closeKey: 'hudChrome.tutorialGreeting.noteClose',
   };
 }
+
+/** Ferryman Odo's island welcome: shown once per device on the first arrival
+ *  at the Proving Shore, directing the newcomer up the road to Maren. */
+export function buildFerryIslandArrivalNote(): TutorialGreetingNote {
+  return {
+    speakerNpcId: 'ferryman_odo',
+    bodyKey: 'hudChrome.tutorialGreeting.islandArrivalNote',
+    closeKey: 'hudChrome.tutorialGreeting.noteClose',
+  };
+}

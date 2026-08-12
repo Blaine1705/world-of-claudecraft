@@ -48,6 +48,10 @@ export function tryRingFerryBell(ctx: SimContext, obj: Entity, p: Entity): boole
       PROVING_SHORE_ARRIVAL,
       'The ferry bell tolls, and the Proving Shore rises to meet you.',
     );
+    // Same arrival marker the greeting ferry emits (sim/tutorial/greeting.ts):
+    // Odo's welcome note is a per-device one-shot, so a bell refresher only
+    // sees it if the greeting ferry never fired it on this device.
+    ctx.emit({ type: 'ferryIslandArrival', pid: p.id });
   }
   return true;
 }

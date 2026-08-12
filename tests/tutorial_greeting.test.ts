@@ -120,13 +120,16 @@ describe('tutorial greeting one-shot', () => {
 });
 
 describe('startTutorial (the ferry)', () => {
-  it('teleports a level-1 character to the Proving Shore arrival', () => {
+  it('teleports a level-1 character to the Proving Shore arrival and marks it', () => {
     const sim = makeSim();
+    sim.events = [];
     sim.startTutorial();
     const e = sim.entities.get(sim.playerId)!;
     expect(Math.hypot(e.pos.x - PROVING_SHORE_ARRIVAL.x, e.pos.z - PROVING_SHORE_ARRIVAL.z))
       .toBeLessThan(1);
     expect(e.facing).toBe(PROVING_SHORE_ARRIVAL.facing);
+    // The text-free arrival marker Odo's per-device welcome note keys off.
+    expect(sim.events).toContainEqual({ type: 'ferryIslandArrival', pid: sim.playerId });
   });
 
   it('refuses a character above level 1 and leaves them in place', () => {
@@ -205,9 +208,10 @@ describe('the ferry bells (the clicked crossing)', () => {
     sim.pickUpObject(town.id);
     expect(Math.hypot(p.pos.x - PROVING_SHORE_ARRIVAL.x, p.pos.z - PROVING_SHORE_ARRIVAL.z))
       .toBeLessThan(1);
-    // No homecoming marker on the OUTBOUND ride: the pointer is only for
-    // arrivals in town.
+    // No homecoming marker on the OUTBOUND ride (the pointer is only for
+    // arrivals in town); the island-arrival marker fires instead.
     expect(sim.events.filter((e) => e.type === 'ferryBellHome')).toEqual([]);
+    expect(sim.events).toContainEqual({ type: 'ferryIslandArrival', pid: sim.playerId });
   });
 
   it('refuses in combat and stays put (no bell combat exit)', () => {

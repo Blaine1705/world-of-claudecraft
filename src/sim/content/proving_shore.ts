@@ -89,8 +89,9 @@ export const PROVING_SHORE_ARRIVAL = { x: -282, z: 6, facing: 2.4 } as const;
 
 export const PROVING_SHORE_MOBS: Record<string, MobTemplate> = {
   // Built to be hit: the practice yard's straw-and-timber targets. They
-  // neither move nor aggro (moveSpeed 0, aggroRadius 0), fight back for
-  // nothing, and stand back up fast so a class never queues for a target.
+  // neither move nor aggro (moveSpeed 0, aggroRadius 0), swat back for a
+  // token 1 damage, and stand back up fast so a class never queues for a
+  // target.
   training_effigy: {
     id: 'training_effigy',
     name: 'Training Effigy',
@@ -147,11 +148,13 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     name: 'Wayfarer Bryn',
     title: 'Harbor Guide',
     pos: { x: 6, z: -7 },
-    facing: Math.PI,
+    // Facing the town square's middle from her spot southeast of it
+    // (forward = (-sin f, cos f), so 0.7 rad points toward (0, 0)).
+    facing: 0.7,
     color: 0x8a6a9a,
     questIds: [],
     greeting:
-      'Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: this bell beside me rings you across any day of the year, and its twin on the island rings you home.',
+      'Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry bell by the Ravenpost mailbox rings you across any day of the year, and its twin on the island rings you home.',
   },
   instructor_maren: {
     id: 'instructor_maren',
@@ -225,7 +228,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     name: 'Strike True',
     giverNpcId: 'instructor_maren',
     turnInNpcId: 'instructor_maren',
-    text: 'Welcome to the Proving Shore, $N. Every lesson here starts the same way: feet set, blade in hand. The effigies on the practice yard southwest of camp were built to be hit. Pick one, square up, and strike until three of them give out. They do not hit back. The things beyond this shore will.',
+    text: 'Welcome to the Proving Shore, $N. Every lesson here starts the same way: feet set, blade in hand. The effigies on the practice yard southwest of camp were built to be hit. Pick one, square up, and strike until three of them give out. Their blows barely sting. The things beyond this shore hit far harder.',
     completionText:
       'Three down, and your grip already surer. Remember the feel of it, $N: feet set, eyes up, swing whole. The vale wolves are faster than straw, but they fall to the same arithmetic.',
     objectives: [
@@ -405,12 +408,12 @@ export const PROVING_SHORE_OBJECTS: GroundObjectDef[] = [
     itemId: 'ps_ferry_bell',
     name: 'Ferry Bell',
     // The clicked crossing (interactions/ferry_bell.ts): the Old Pier's bell
-    // rings a player to Eastbrook town, and its twin INSIDE town (beside
-    // Wayfarer Bryn and the town landing) rings a returning player back to
-    // the island arrival.
+    // rings a player to Eastbrook town, and its twin INSIDE town (beside the
+    // Ravenpost mailbox at (0, -7.5), clear of its posting spot) rings a
+    // returning player back to the island arrival.
     positions: [
       { x: -274, z: 0 },
-      { x: 11, z: -7 },
+      { x: -3, z: -7.5 },
     ],
   },
 ];

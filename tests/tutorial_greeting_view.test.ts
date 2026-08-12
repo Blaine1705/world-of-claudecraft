@@ -5,6 +5,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildFerryBellHomeNote,
+  buildFerryIslandArrivalNote,
   buildTutorialDeclineNote,
   buildTutorialGreetingModel,
   TUTORIAL_GREETER_NPC_ID,
@@ -34,5 +35,12 @@ describe('tutorial greeting view', () => {
     expect(decline.bodyKey).toBe('hudChrome.tutorialGreeting.declineNote');
     expect(bellHome.bodyKey).toBe('hudChrome.tutorialGreeting.bellHomeNote');
     expect(decline.closeKey).toBe(bellHome.closeKey);
+  });
+
+  it('the island welcome speaks as Ferryman Odo (the arrival lands at his pier)', () => {
+    const arrival = buildFerryIslandArrivalNote();
+    expect(arrival.speakerNpcId).toBe('ferryman_odo');
+    expect(arrival.bodyKey).toBe('hudChrome.tutorialGreeting.islandArrivalNote');
+    expect(arrival.closeKey).toBe(buildTutorialDeclineNote().closeKey);
   });
 });

@@ -587,11 +587,15 @@ export const hudChromeStrings = {
     skip: 'Skip the tutorial',
     // The decline follow-up: skipping is never a locked door.
     declineNote:
-      'As you like, friend. Should you ever change your mind, this bell beside me rings you across to the Proving Shore any time, day or night. It will still be here when the wolves are not.',
+      'As you like, friend. Should you ever change your mind, the ferry bell by the Ravenpost mailbox rings you across to the Proving Shore any time, day or night. It will still be here when the wolves are not.',
     // The first bell homecoming: the ride may have been a misclick, so the
     // town's twin bell is pointed out once.
     bellHomeNote:
-      'Back from the shore already? That was the ferry bell you rang. Its twin stands right here beside me: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.',
+      'Back from the shore already? That was the ferry bell you rang. Its twin hangs just there by the Ravenpost mailbox: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.',
+    // Ferryman Odo's island welcome, shown once per device on the first
+    // arrival: the greeting ferry lands beside his pier.
+    islandArrivalNote:
+      'Fresh off the crossing? Welcome to the Proving Shore. Instructor Maren keeps the drills up at Dawnrest Camp, along the road behind me: she will want a word before anything else. And when you are ready to leave, ring the bell here at the end of my pier and the crossing will carry you home to Eastbrook.',
     noteClose: 'Understood',
   },
   // New-adventurer tutorial copy for the touch interface. The default tutorial

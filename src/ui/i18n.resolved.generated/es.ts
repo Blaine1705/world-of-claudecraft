@@ -872,8 +872,9 @@ export const es: EnTranslations = {
       "bodyRefresher": "Back again with a fresh face, are you? You know how this goes, then. Still, if you would like a refresher before you set out, the Proving Shore never turns away a returning student, and the ferry is ready when you are.",
       "play": "Take the tutorial",
       "skip": "Skip the tutorial",
-      "declineNote": "As you like, friend. Should you ever change your mind, this bell beside me rings you across to the Proving Shore any time, day or night. It will still be here when the wolves are not.",
-      "bellHomeNote": "Back from the shore already? That was the ferry bell you rang. Its twin stands right here beside me: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.",
+      "declineNote": "As you like, friend. Should you ever change your mind, the ferry bell by the Ravenpost mailbox rings you across to the Proving Shore any time, day or night. It will still be here when the wolves are not.",
+      "bellHomeNote": "Back from the shore already? That was the ferry bell you rang. Its twin hangs just there by the Ravenpost mailbox: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.",
+      "islandArrivalNote": "Fresh off the crossing? Welcome to the Proving Shore. Instructor Maren keeps the drills up at Dawnrest Camp, along the road behind me: she will want a word before anything else. And when you are ready to leave, ring the bell here at the end of my pier and the crossing will carry you home to Eastbrook.",
       "noteClose": "Understood"
     },
     "tutorial": {
@@ -14164,7 +14165,7 @@ export const es: EnTranslations = {
       "wayfarer_bryn": {
         "name": "Wayfarer Bryn",
         "title": "Harbor Guide",
-        "greeting": "Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: this bell beside me rings you across any day of the year, and its twin on the island rings you home."
+        "greeting": "Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry bell by the Ravenpost mailbox rings you across any day of the year, and its twin on the island rings you home."
       },
       "instructor_maren": {
         "name": "Instructor Maren",
@@ -16154,7 +16155,7 @@ export const es: EnTranslations = {
       },
       "q_ps_strike_true": {
         "title": "Strike True",
-        "text": "Welcome to the Proving Shore, {playerName}. Every lesson here starts the same way: feet set, blade in hand. The effigies on the practice yard southwest of camp were built to be hit. Pick one, square up, and strike until three of them give out. They do not hit back. The things beyond this shore will.",
+        "text": "Welcome to the Proving Shore, {playerName}. Every lesson here starts the same way: feet set, blade in hand. The effigies on the practice yard southwest of camp were built to be hit. Pick one, square up, and strike until three of them give out. Their blows barely sting. The things beyond this shore hit far harder.",
         "completion": "Three down, and your grip already surer. Remember the feel of it, {playerName}: feet set, eyes up, swing whole. The vale wolves are faster than straw, but they fall to the same arithmetic.",
         "objectives": {
           "0": {

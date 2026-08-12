@@ -75,6 +75,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.tutorialGreeting.bodyFirst",
     "hudChrome.tutorialGreeting.bodyRefresher",
     "hudChrome.tutorialGreeting.declineNote",
+    "hudChrome.tutorialGreeting.islandArrivalNote",
     "hudChrome.tutorialGreeting.noteClose",
     "hudChrome.tutorialGreeting.play",
     "hudChrome.tutorialGreeting.skip"
@@ -145,6 +146,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.tutorialGreeting.bodyFirst",
     "hudChrome.tutorialGreeting.bodyRefresher",
     "hudChrome.tutorialGreeting.declineNote",
+    "hudChrome.tutorialGreeting.islandArrivalNote",
     "hudChrome.tutorialGreeting.noteClose",
     "hudChrome.tutorialGreeting.play",
     "hudChrome.tutorialGreeting.skip"
@@ -215,6 +217,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.tutorialGreeting.bodyFirst",
     "hudChrome.tutorialGreeting.bodyRefresher",
     "hudChrome.tutorialGreeting.declineNote",
+    "hudChrome.tutorialGreeting.islandArrivalNote",
     "hudChrome.tutorialGreeting.noteClose",
     "hudChrome.tutorialGreeting.play",
     "hudChrome.tutorialGreeting.skip"
@@ -285,6 +288,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.tutorialGreeting.bodyFirst",
     "hudChrome.tutorialGreeting.bodyRefresher",
     "hudChrome.tutorialGreeting.declineNote",
+    "hudChrome.tutorialGreeting.islandArrivalNote",
     "hudChrome.tutorialGreeting.noteClose",
     "hudChrome.tutorialGreeting.play",
     "hudChrome.tutorialGreeting.skip"
@@ -356,6 +360,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.tutorialGreeting.bodyFirst",
     "hudChrome.tutorialGreeting.bodyRefresher",
     "hudChrome.tutorialGreeting.declineNote",
+    "hudChrome.tutorialGreeting.islandArrivalNote",
     "hudChrome.tutorialGreeting.noteClose",
     "hudChrome.tutorialGreeting.play",
     "hudChrome.tutorialGreeting.skip"
@@ -426,6 +431,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.tutorialGreeting.bodyFirst",
     "hudChrome.tutorialGreeting.bodyRefresher",
     "hudChrome.tutorialGreeting.declineNote",
+    "hudChrome.tutorialGreeting.islandArrivalNote",
     "hudChrome.tutorialGreeting.noteClose",
     "hudChrome.tutorialGreeting.play",
     "hudChrome.tutorialGreeting.skip"
@@ -500,6 +506,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.tutorialGreeting.bodyFirst",
     "hudChrome.tutorialGreeting.bodyRefresher",
     "hudChrome.tutorialGreeting.declineNote",
+    "hudChrome.tutorialGreeting.islandArrivalNote",
     "hudChrome.tutorialGreeting.noteClose",
     "hudChrome.tutorialGreeting.play",
     "hudChrome.tutorialGreeting.skip"
@@ -571,6 +578,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.tutorialGreeting.bodyFirst",
     "hudChrome.tutorialGreeting.bodyRefresher",
     "hudChrome.tutorialGreeting.declineNote",
+    "hudChrome.tutorialGreeting.islandArrivalNote",
     "hudChrome.tutorialGreeting.noteClose",
     "hudChrome.tutorialGreeting.play",
     "hudChrome.tutorialGreeting.skip"
@@ -641,6 +649,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.tutorialGreeting.bodyFirst",
     "hudChrome.tutorialGreeting.bodyRefresher",
     "hudChrome.tutorialGreeting.declineNote",
+    "hudChrome.tutorialGreeting.islandArrivalNote",
     "hudChrome.tutorialGreeting.noteClose",
     "hudChrome.tutorialGreeting.play",
     "hudChrome.tutorialGreeting.skip"
@@ -711,6 +720,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.tutorialGreeting.bodyFirst",
     "hudChrome.tutorialGreeting.bodyRefresher",
     "hudChrome.tutorialGreeting.declineNote",
+    "hudChrome.tutorialGreeting.islandArrivalNote",
     "hudChrome.tutorialGreeting.noteClose",
     "hudChrome.tutorialGreeting.play",
     "hudChrome.tutorialGreeting.skip"
@@ -781,6 +791,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.tutorialGreeting.bodyFirst",
     "hudChrome.tutorialGreeting.bodyRefresher",
     "hudChrome.tutorialGreeting.declineNote",
+    "hudChrome.tutorialGreeting.islandArrivalNote",
     "hudChrome.tutorialGreeting.noteClose",
     "hudChrome.tutorialGreeting.play",
     "hudChrome.tutorialGreeting.skip"
@@ -851,6 +862,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.tutorialGreeting.bodyFirst",
     "hudChrome.tutorialGreeting.bodyRefresher",
     "hudChrome.tutorialGreeting.declineNote",
+    "hudChrome.tutorialGreeting.islandArrivalNote",
     "hudChrome.tutorialGreeting.noteClose",
     "hudChrome.tutorialGreeting.play",
     "hudChrome.tutorialGreeting.skip"
@@ -921,6 +933,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.tutorialGreeting.bodyFirst",
     "hudChrome.tutorialGreeting.bodyRefresher",
     "hudChrome.tutorialGreeting.declineNote",
+    "hudChrome.tutorialGreeting.islandArrivalNote",
     "hudChrome.tutorialGreeting.noteClose",
     "hudChrome.tutorialGreeting.play",
     "hudChrome.tutorialGreeting.skip"
@@ -991,6 +1004,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.tutorialGreeting.bodyFirst",
     "hudChrome.tutorialGreeting.bodyRefresher",
     "hudChrome.tutorialGreeting.declineNote",
+    "hudChrome.tutorialGreeting.islandArrivalNote",
     "hudChrome.tutorialGreeting.noteClose",
     "hudChrome.tutorialGreeting.play",
     "hudChrome.tutorialGreeting.skip"
@@ -1061,6 +1075,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.tutorialGreeting.bodyFirst",
     "hudChrome.tutorialGreeting.bodyRefresher",
     "hudChrome.tutorialGreeting.declineNote",
+    "hudChrome.tutorialGreeting.islandArrivalNote",
     "hudChrome.tutorialGreeting.noteClose",
     "hudChrome.tutorialGreeting.play",
     "hudChrome.tutorialGreeting.skip"

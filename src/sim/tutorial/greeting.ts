@@ -71,4 +71,7 @@ export function resolveStartTutorial(ctx: SimContext, p: Entity): void {
     return;
   }
   displacePlayer(ctx, p, PROVING_SHORE_ARRIVAL, 'The ferry sets you down on the Proving Shore.');
+  // Text-free arrival marker: the HUD answers the first one per device with
+  // Ferryman Odo's welcome note pointing the newcomer up to Maren.
+  ctx.emit({ type: 'ferryIslandArrival', pid: p.id });
 }

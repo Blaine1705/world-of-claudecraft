@@ -68,15 +68,27 @@ await page.evaluate(() => {
 });
 
 // The ferry is a sim-side teleport: wait for the player to stand on the
-// island column (x < -180) with the dialog gone.
+// island column (x < -180). The dialog element cannot be required gone:
+// Odo's welcome note reuses the same #tutorial-greeting shell and opens
+// within a frame of arrival, so the empty gap is never observable.
 await page.waitForFunction(
   () => {
-    if (document.getElementById('tutorial-greeting')) return false;
     const sim = window.__game.sim;
     return sim.entities.get(sim.playerId).pos.x < -180;
   },
   { timeout: 15000, polling: 200 },
 );
+// Ferryman Odo's per-device welcome note opens on the first island arrival,
+// directing the newcomer up the road to Maren.
+await page.waitForFunction(
+  () => {
+    const el = document.getElementById('tutorial-greeting');
+    return !!el && /Maren/i.test(el.innerText);
+  },
+  { timeout: 10000, polling: 200 },
+);
+console.log('island arrival: Odo welcome note shown');
+
 const after = await page.evaluate(() => {
   const sim = window.__game.sim;
   const p = sim.entities.get(sim.playerId);
@@ -117,11 +129,12 @@ if (!(Math.abs(returned.pos.x - 4) < 2 && Math.abs(returned.pos.z + 6) < 2)) {
 }
 
 // The first homecoming points out the town's twin bell (a possible misclick
-// ride): Bryn's one-button note opens off the ferryBellHome event.
+// ride): Bryn's one-button note opens off the ferryBellHome event. Matched
+// on the mailbox landmark so a stale Odo note can never satisfy this wait.
 await page.waitForFunction(
   () => {
     const el = document.getElementById('tutorial-greeting');
-    return !!el && /bell/i.test(el.innerText);
+    return !!el && /mailbox/i.test(el.innerText);
   },
   { timeout: 10000, polling: 200 },
 );

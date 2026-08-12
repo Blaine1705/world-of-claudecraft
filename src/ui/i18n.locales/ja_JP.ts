@@ -12880,9 +12880,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '新しい顔でまた来たのかい？なら勝手は分かっているね。それでも旅立つ前におさらいがしたければ、修練の浜は出戻りの生徒を追い返したりしない。渡し船はいつでも出せるよ。',
   'hudChrome.tutorialGreeting.play': 'チュートリアルを受ける',
   'hudChrome.tutorialGreeting.declineNote':
-    'お好きにどうぞ、旅の人。気が変わったら、私のそばのこの鐘がいつでも修練の浜へ運んでくれる。昼でも夜でもね。狼は待ってくれないが、この鐘は待っていてくれるよ。',
+    'お好きにどうぞ、旅の人。気が変わったら、レイヴンポストの郵便柱のそばの渡しの鐘がいつでも修練の浜へ運んでくれる。昼でも夜でもね。狼は待ってくれないが、あの鐘は待っていてくれるよ。',
   'hudChrome.tutorialGreeting.bellHomeNote':
-    'もう浜から戻ったのかい？さっき鳴らしたのが渡しの鐘だよ。その双子がちょうど私のそばに立っている。いつでも鳴らせば、渡しが修練の浜へ運び直してくれる。間違って鳴らしたのなら、それはそれで構わないさ。',
+    'もう浜から戻ったのかい？さっき鳴らしたのが渡しの鐘だよ。その双子がすぐそこ、レイヴンポストの郵便柱のそばに掛かっている。いつでも鳴らせば、渡しが修練の浜へ運び直してくれる。間違って鳴らしたのなら、それはそれで構わないさ。',
+  'hudChrome.tutorialGreeting.islandArrivalNote':
+    '渡ってきたばかりかい？ようこそ修練の浜へ。教官マレンが私の後ろの道の先、暁の野営地で稽古を仕切っている。何よりも先に君と話したがるはずだ。発つ支度ができたら、この桟橋の先の鐘を鳴らしなさい。渡しがイーストブルックの町まで送り届けてくれる。',
   'hudChrome.tutorialGreeting.noteClose': 'わかった',
   'hudChrome.tutorialGreeting.skip': 'チュートリアルを飛ばす',
   'entities.items.ps_castaway_crate.name': '漂着した木箱',
@@ -12892,7 +12894,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.wayfarer_bryn.name': '旅人ブリン',
   'entities.npcs.wayfarer_bryn.title': '港の案内人',
   'entities.npcs.wayfarer_bryn.greeting':
-    'イーストブルック渓谷は来る者を拒まないよ、旅の人。まだ足元がおぼつかないなら、修練の浜がある。私のそばのこの鐘が年中いつでも向こうへ運んでくれるし、島の双子の鐘が帰り道を鳴らしてくれる。',
+    'イーストブルック渓谷は来る者を拒まないよ、旅の人。まだ足元がおぼつかないなら、修練の浜がある。レイヴンポストの郵便柱のそばの渡しの鐘が年中いつでも向こうへ運んでくれるし、島の双子の鐘が帰り道を鳴らしてくれる。',
   'entities.npcs.instructor_maren.name': '教官マレン',
   'entities.npcs.instructor_maren.title': '修練の師',
   'entities.npcs.instructor_maren.greeting':
@@ -12911,7 +12913,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '金張りの金庫は、こんな浜にも机を置いているんだよ、{playerName}。私に預けたものは、どの町のどの出納係の後ろにもある同じ金庫で待っている。狼にも、水にも、君自身のまずい思いつきにも手は届かない。',
   'entities.quests.q_ps_strike_true.title': '確かな一撃',
   'entities.quests.q_ps_strike_true.text':
-    'ようこそ修練の浜へ、{playerName}。ここの稽古はどれも同じところから始まる。足を据え、刃を握ること。野営地の南西の練習場に立つかかしは、打たれるために作られている。ひとつ選んで、構えて、三体崩れるまで打ち込みなさい。かかしは打ち返してこない。この浜の外にいるものは、打ち返してくる。',
+    'ようこそ修練の浜へ、{playerName}。ここの稽古はどれも同じところから始まる。足を据え、刃を握ること。野営地の南西の練習場に立つかかしは、打たれるために作られている。ひとつ選んで、構えて、三体崩れるまで打ち込みなさい。かかしの打ち返しなど、かすり傷にもならない。この浜の外にいるものは、はるかに強く打ってくる。',
   'entities.quests.q_ps_strike_true.completion':
     '三体倒して、握りももう確かになってきた。その感覚を忘れないで、{playerName}。足を据え、目を上げ、全身で振り抜く。渓谷の狼は藁より速いが、同じ算術で倒れるものだよ。',
   'entities.quests.q_ps_strike_true.objectives.0.label': '訓練用のかかしを倒す',

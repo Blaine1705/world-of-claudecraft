@@ -80,6 +80,7 @@ import {
   ZONES,
   zoneAt,
 } from '../sim/data';
+import { PROVING_SHORE_ARRIVAL } from '../sim/content/proving_shore';
 import { specialRoleColor } from '../sim/discord_roles';
 import { canEquipItem, isUniqueEquipped, weaponHand } from '../sim/equipment_rules';
 import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
@@ -739,6 +740,7 @@ import { buildTradeItemRow, tradeOfferCeiling, tradeRowTooltipTarget } from './t
 import { TutorialOverlay } from './tutorial';
 import {
   buildFerryBellHomeNote,
+  buildFerryIslandArrivalNote,
   buildTutorialDeclineNote,
   buildTutorialGreetingModel,
   type TutorialGreetingNote,
@@ -12188,6 +12190,19 @@ export class Hud {
             /* private mode: skip the hint rather than throw */
           }
           break;
+        case 'ferryIslandArrival':
+          // First landing on the Proving Shore: Ferryman Odo's welcome note
+          // directs the newcomer up the road to Maren. Same per-device
+          // one-shot idiom as the homecoming hint above.
+          try {
+            if (localStorage.getItem('woc.odowelcome.v1') !== 'seen') {
+              localStorage.setItem('woc.odowelcome.v1', 'seen');
+              this.openTutorialGreetingNote(buildFerryIslandArrivalNote());
+            }
+          } catch {
+            /* private mode: skip the note rather than throw */
+          }
+          break;
         case 'profTrendNudge':
         case 'profTierTutorial':
         case 'attuned':
@@ -14083,6 +14098,21 @@ export class Hud {
   private openTutorialGreeting(firstCharacter: boolean): void {
     this.tutorialGreetingTrap?.release(false);
     this.tutorialGreetingTrap = null;
+    // Warm the island WHILE the choice is read: main.ts skips the blocking
+    // loading screen entirely once renderer.isZoneReadyAt is true at the
+    // arrival, so the seconds a player spends on this dialog buy a seamless
+    // ferry ride. Fire-and-forget; an instant click degrades to the classic
+    // screen rather than a void drop.
+    void this.renderer
+      .prepareZoneAt(PROVING_SHORE_ARRIVAL.x, PROVING_SHORE_ARRIVAL.z)
+      .then(() =>
+        this.renderer.prewarmZoneAt(PROVING_SHORE_ARRIVAL.x, PROVING_SHORE_ARRIVAL.z, {
+          background: true,
+        }),
+      )
+      .catch(() => {
+        /* offline asset hiccup: the arrival falls back to the loading screen */
+      });
     const el = renderTutorialGreeting(buildTutorialGreetingModel(firstCharacter), {
       onPlay: () => {
         // Fire-and-forget by design: the server re-validates and the >30 yd

@@ -12888,9 +12888,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '새 얼굴로 또 오셨군요? 그럼 어떻게 돌아가는지 아시겠네요. 그래도 떠나기 전에 복습을 원하신다면, 수련의 해안은 돌아온 학생을 내치는 법이 없답니다. 나룻배는 언제든 준비되어 있어요.',
   'hudChrome.tutorialGreeting.play': '튜토리얼 진행하기',
   'hudChrome.tutorialGreeting.declineNote':
-    '뜻대로 하세요, 친구. 언제든 마음이 바뀌면, 제 곁의 이 종이 밤낮없이 수련의 해안으로 데려다줍니다. 늑대는 기다려 주지 않지만, 이 종은 기다려 준답니다.',
+    '뜻대로 하세요, 친구. 언제든 마음이 바뀌면, 레이븐포스트 우편함 옆의 나룻배 종이 밤낮없이 수련의 해안으로 데려다줍니다. 늑대는 기다려 주지 않지만, 그 종은 기다려 준답니다.',
   'hudChrome.tutorialGreeting.bellHomeNote':
-    '벌써 해안에서 돌아오셨나요? 방금 울리신 것이 나룻배 종입니다. 그 쌍둥이가 바로 제 곁에 서 있죠. 언제든 울리면 건너기가 수련의 해안으로 다시 데려다줍니다. 실수로 울리셨더라도 손해 볼 것 없어요.',
+    '벌써 해안에서 돌아오셨나요? 방금 울리신 것이 나룻배 종입니다. 그 쌍둥이가 바로 저기 레이븐포스트 우편함 옆에 걸려 있죠. 언제든 울리면 건너기가 수련의 해안으로 다시 데려다줍니다. 실수로 울리셨더라도 손해 볼 것 없어요.',
+  'hudChrome.tutorialGreeting.islandArrivalNote':
+    '방금 건너오셨나요? 수련의 해안에 온 것을 환영합니다. 제 뒤 길 끝의 새벽쉼터 야영지에서 교관 마렌이 훈련을 이끌고 있어요. 무엇보다 먼저 당신과 이야기하고 싶어 할 겁니다. 떠날 준비가 되면 이 부두 끝의 종을 울리세요. 건너기가 이스트브룩 마을까지 데려다줄 겁니다.',
   'hudChrome.tutorialGreeting.noteClose': '알겠어요',
   'hudChrome.tutorialGreeting.skip': '튜토리얼 건너뛰기',
   'entities.items.ps_castaway_crate.name': '표류 상자',
@@ -12900,7 +12902,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.wayfarer_bryn.name': '방랑자 브린',
   'entities.npcs.wayfarer_bryn.title': '항구 안내인',
   'entities.npcs.wayfarer_bryn.greeting':
-    '이스트브룩 골짜기는 오는 사람을 가리지 않아요, 친구. 그리고 아직 발걸음이 불안한 이들에게는 언제나 수련의 해안이 있죠. 제 곁의 이 종이 일 년 내내 언제든 건너다 주고, 섬의 쌍둥이 종이 다시 집으로 울려 보내 준답니다.',
+    '이스트브룩 골짜기는 오는 사람을 가리지 않아요, 친구. 그리고 아직 발걸음이 불안한 이들에게는 언제나 수련의 해안이 있죠. 레이븐포스트 우편함 옆의 나룻배 종이 일 년 내내 언제든 건너다 주고, 섬의 쌍둥이 종이 다시 집으로 울려 보내 준답니다.',
   'entities.npcs.instructor_maren.name': '교관 마렌',
   'entities.npcs.instructor_maren.title': '수련 사범',
   'entities.npcs.instructor_maren.greeting':
@@ -12919,7 +12921,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '도금 금고는 이런 곳에도 책상 하나를 두고 있답니다, {playerName}. 내게 맡긴 것은 모든 마을 모든 경리관 뒤에 있는 같은 금고에서 기다립니다. 늑대도, 바닷물도, 당신 자신의 섣부른 판단도 손대지 못하죠.',
   'entities.quests.q_ps_strike_true.title': '정확한 일격',
   'entities.quests.q_ps_strike_true.text':
-    '수련의 해안에 온 걸 환영해요, {playerName}. 이곳의 모든 가르침은 같은 것에서 시작합니다. 발을 딛고, 칼자루를 쥐는 것. 야영지 남서쪽 수련장의 허수아비들은 맞으라고 만든 것들입니다. 하나를 골라 자세를 잡고, 셋이 쓰러질 때까지 내리치세요. 허수아비는 반격하지 않아요. 이 해안 너머의 것들은 반격하죠.',
+    '수련의 해안에 온 걸 환영해요, {playerName}. 이곳의 모든 가르침은 같은 것에서 시작합니다. 발을 딛고, 칼자루를 쥐는 것. 야영지 남서쪽 수련장의 허수아비들은 맞으라고 만든 것들입니다. 하나를 골라 자세를 잡고, 셋이 쓰러질 때까지 내리치세요. 허수아비의 반격은 따끔한 정도죠. 이 해안 너머의 것들은 훨씬 세게 때린답니다.',
   'entities.quests.q_ps_strike_true.completion':
     '셋을 쓰러뜨렸고, 손아귀도 벌써 단단해졌네요. 그 감각을 기억하세요, {playerName}. 발을 딛고, 시선을 들고, 온몸으로 휘두르기. 골짜기의 늑대는 짚보다 빠르지만, 같은 산수에 쓰러진답니다.',
   'entities.quests.q_ps_strike_true.objectives.0.label': '훈련용 허수아비 쓰러뜨리기',

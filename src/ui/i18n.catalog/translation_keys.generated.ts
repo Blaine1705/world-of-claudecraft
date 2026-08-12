@@ -9751,6 +9751,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.tutorialGreeting.bodyFirst'
   | 'hudChrome.tutorialGreeting.bodyRefresher'
   | 'hudChrome.tutorialGreeting.declineNote'
+  | 'hudChrome.tutorialGreeting.islandArrivalNote'
   | 'hudChrome.tutorialGreeting.noteClose'
   | 'hudChrome.tutorialGreeting.play'
   | 'hudChrome.tutorialGreeting.skip'
