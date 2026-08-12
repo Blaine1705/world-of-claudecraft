@@ -139,8 +139,10 @@ interface AttributionTargetFixture {
 // Re-minted for the v0.37.0 base sync with the login-storm base commit. The
 // merged renderer/prewarm/source bytes mint a value matching neither parent.
 // No capture was retaken.
+// Re-minted after organizing renderer imports changed the provenance inputs.
+// No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '3601ceef553078afc54539399f3a33bce060e7639f35967090d58b9168363694';
+  '9e1468a2f6d238da9641e900d8ff028fc171afbae477cc1383e5ff7324d2fe13';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
