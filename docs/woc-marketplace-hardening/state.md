@@ -297,17 +297,29 @@ Still open (a phase that hits one asks at session start):
 - 03 delivery-exactly-once (2026-08-12, session start e71a8cfd21, commits
   1196e2bb28 + 9f8097c1fb + a08653dbd2, LOCAL, not pushed per R4): B2a, B2b,
   B2c and the stuck-custody monitor closed. What later phases consume:
-  - Monitor endpoint (phase 19 dashboard view): GET /internal/woc-market/stuck,
-    dashboardGate (DASHBOARD_INTERNAL_SECRET), admin envelope, parameter-free.
-    data = WocStuckCustodyReadout: { unbookedClaims: { count, sample:
-    [{ custodyRef, claimedAtMs, grantCharacterId, mailIntent }] },
-    stuckDelivering: { count, sample: [{ id, listingId, createdAtMs }] },
-    undisposedListings: { count, sample: [{ id, resolution, updatedAtMs }] } }.
-    Counts SATURATE at 1000 (a count equal to 1000 means "1000 or more");
-    samples cap at 20; rows aged >= 10 min; served from a 30s cached read
-    (single-flight, frozen object, deliberately non-busted). The 5-minute log
-    beat prints only when something is stuck and warns once per failure
-    streak; it runs even when WOC_MARKET_ENABLED=0.
+  - Monitor endpoint (phase 19 dashboard view; shape as amended by the 03 QA
+    round): GET /internal/woc-market/stuck, dashboardGate
+    (DASHBOARD_INTERNAL_SECRET), admin envelope, parameter-free.
+    data = WocStuckCustodyReadout: { asOfMs, unbookedClaims: { count,
+    saturated, sample: [{ custodyRef, claimedAtMs, grantCharacterId,
+    mailIntent }] }, stuckDelivering: { count, saturated, sample:
+    [{ id, listingId, createdAtMs }] }, undisposedListings: { count,
+    saturated, sample: [{ id, resolution, updatedAtMs }] } }.
+    Counts SATURATE at 1000 with the explicit saturated flag (count 1000
+    means "1000 or more"); samples cap at 20; rows aged >= 10 min ON
+    updated_at for BOTH the delivering class (stamped at the delivering
+    claim, so a slow payment leg is not instantly "stuck") and the
+    undisposed class; park rotation writes the dedicated sweep_parked_at
+    column and NEVER the age columns (the 03 QA round's blocking find: the
+    old rotation re-stamped updated_at faster than the stuck threshold, so
+    a parked return could never surface). asOfMs is stamped per refresh:
+    the cached read stale-serves through an outage, and the dashboard must
+    render age from it. Served from a 30s cached read (single-flight,
+    frozen object, deliberately non-busted; cold failures negative-cached
+    5s). The 5-minute log beat prints only when something is stuck, warns
+    once per failure streak AND once per staleness streak (age > 10x TTL),
+    and runs even when WOC_MARKET_ENABLED=0; monitor stop() drains an
+    in-flight beat before the pool closes.
   - Custody rail attribution (phases 04/05/21/22): every claim carries at
     most one intent, grant_character_id (direct rail, stamped BEFORE the bag
     grant) or mail_intent_at (mail rail, stamped BEFORE the parcel exists;
@@ -324,7 +336,13 @@ Still open (a phase that hits one asks at session start):
     skip the ledger entirely: they cannot duplicate and nothing re-notifies,
     so a durable claim only polluted the readout. A lease fence proves only that THIS write lost, never
     that an earlier autosave did: that reasoning is load-bearing, do not
-    weaken it. unclaimCustodyRef, clearCustodyGrantIntent,
+    weaken it. Since the 03 QA round: a provable grant resume refreshes its
+    pendingGrants stamp on every attempt (the proof is session identity plus
+    nonce, not entry age, so sustained lock contention cannot expire a live
+    retry into a park; an entry with NO attempts for 10 minutes still prunes
+    and parks), and grantCopy has a fourth refusal, 'ambiguous' (the grant
+    touched the live bags but the session state is unprovable), which PARKS
+    instead of converting to mail. unclaimCustodyRef, clearCustodyGrantIntent,
     saveDeliveredCharacter and cancelOpenBidsForListing are GONE from the db
     seam; new members: custodyRefState, markCustodyMailIntent,
     markCustodyGrantIntent, saveDeliveredCharacterBooked (atomic fenced
@@ -332,21 +350,50 @@ Still open (a phase that hits one asks at session start):
     carve-out from the market lock order), finalizeDeliveredSettlement,
     deliveredUnclosedSettlementsPage, disposeSoldResidueListings,
     touchSettlementRow, stuckCustodyReadout.
-  - Reconcile semantics (phase 21): deliverOne returns
-    advanced|parked|skip|contended; parked rows rotate to the updated_at tail
-    and back off in-process for 60s (monitor ages on created_at, which
-    rotation never touches); a contended finalize stops the batch and the
-    next pass retries; delivery stats count rows ADVANCED (a parked batch is
-    the monitor's business, not a saturation flood). The redriven beat runs
-    once per minute over 500-listing id pages (cursor resets on an exhausted
-    cycle) and converges delivered-unclosed residue AND sold-undisposed
-    residue with a standing sale row; sold-undisposed WITHOUT a sale row
-    parks forever (operator-only exit, on purpose).
+  - Reconcile semantics (phase 21; as amended by the 03 QA round): deliverOne
+    returns advanced|parked|skip|contended; parked rows rotate on
+    sweep_parked_at (batch order = COALESCE(sweep_parked_at, updated_at),
+    shared verbatim with the two partial rotation indexes) and back off
+    in-process for 60s, rotating again on every backoff skip so a standing
+    parked set cannot starve fresh rows; 'skip' (a hand-moved row, finalize
+    'stale' after custody booked) clears the parked entry and raises
+    sweepError (it is invisible to every monitor class, so the log line is
+    the only trace, and reopenListing could re-auction such a row: never
+    hand-move settlement state). A contended finalize stops the batch, the
+    pass claims nothing further (the check runs BEFORE
+    claimDeliverableSettlements), and the eager confirm entry resets the
+    flag for itself; the next pass retries. Delivery stats count rows
+    ADVANCED with park EVENTS on the separate 'parked' stat; a slow pass
+    (>1s) logs even at zero counts. finalizeDeliveredSettlement
+    distinguishes 'finalized' from 'already_final' (re-runs neither
+    re-count nor re-send the seller notice) and sets both lock_timeout and
+    the heavy statement_timeout; after the listing lock it re-locks the
+    open-bid set (buy-now finalize can race insertPendingBid), and
+    activateBid maps 40P01/55P03 to a typed 'contended' the bond poll
+    retries. The redriven beat runs once per minute over 500-listing id
+    pages (partial index woc_market_listings_live_ids) but finalizes at
+    most SWEEP_BATCH rows per beat (each costs a realm mail-book write on
+    the shared serial writer); a truncated fetch resumes behind the last
+    processed row, an exhausted cycle resets the cursor. Sold-undisposed
+    residue converges in its own 'disposed' arm (same minute cadence, own
+    error isolation, FOR UPDATE SKIP LOCKED); WITHOUT a standing sale row
+    it parks forever (operator-only exit, on purpose). The seller sold
+    notice is best-effort by decision: a crash between finalize and the
+    notice loses it for good (item-free, sale durable, pinned by test);
+    notice failures log under the 'deliver_notice' tag.
   - Lock order registry update: suspendListingIfSafe now pre-locks
     ('pending_bond','active','won') because its expiry CTE cancels a dead
     settlement's winner; finalizeDeliveredSettlement pre-locks the open set
-    plus the winner. Both sides of that former cycle are pinned by a live
-    concurrency test in tests/woc_market_delivery_pg_integration.test.ts.
+    plus the winner, and (since the 03 QA round) RE-LOCKS the open set after
+    taking the listing lock, because a buy-now finalize runs while the
+    listing is still 'active' and insertPendingBid (listing-lock-first) can
+    commit a new bid in the window between the pre-lock and the listing
+    lock; a crossing activateBid surfaces as 40P01 and both sides retry
+    typed ('contended' from finalize, and activateBid itself now maps
+    40P01/55P03 to a typed 'contended' the bond poll retries instead of a
+    raw arm failure). Both sides of the former suspend cycle are pinned by
+    a live concurrency test in
+    tests/woc_market_delivery_pg_integration.test.ts.
   - Ops caveats for the phase 22 runbook, appended to the 02 list: BEFORE
     upgrading a realm that ever ran the market, verify
     `SELECT count(*) FROM woc_market_custody_claims WHERE booked_at IS NULL`
@@ -356,11 +403,39 @@ Still open (a phase that hits one asks at session start):
     `SELECT custody_ref FROM woc_market_custody_claims WHERE booked_at IS
     NULL AND grant_character_id IS NOT NULL` to zero: the OLD binary adopts
     any bare claim as booked and completes the sale with nothing delivered.
-    The EXPLAIN list for phases 16/17 gains: the redrive page probe
-    (listing_id = ANY page), the three readout sample+capped-count pairs,
-    and the disposeSoldResidueListings subquery. Claims-table retention
-    (phase 17): booked rows are prune-eligible provenance; unbooked rows are
-    the operator queue and MUST NOT be pruned.
+    NEVER delete an unbooked claim row to unstick a delivery: the next pass
+    mints a FRESH claim that skips the parcel-in-book gate by construction,
+    re-arming the duplication (warning written at the DDL); resolve parked
+    rows by hand-delivering then stamping booked_at, or by confirming
+    non-delivery first, and the phase 22 runbook owes the step-by-step
+    re-drive procedure for each parked class (the two permanent-park cases,
+    crash-before-blob-persist and a deterministic parcel refusal, are the
+    ordinary ones). Do not overlap the market-enable rollout with a rolling
+    restart: boot DDL holds AccessExclusive on woc_market_custody_claims
+    for the whole schema transaction, so realm B's boot blocks realm A's
+    custody writes for its duration. onSweepError logs raw pg errors
+    (detail/where can echo character names and item JSON; fine today, but
+    revisit before any account or wallet column joins those rows). The
+    EXPLAIN list for phases 16/17 gains: the redrive page probe
+    (listing_id = ANY page, now behind woc_market_listings_live_ids), the
+    three readout sample+capped-count pairs, the two COALESCE rotation-order
+    batch reads against their partial indexes, and the
+    disposeSoldResidueListings subquery (now behind
+    woc_market_listings_sold_undisposed). Claims-table retention (phase 17):
+    booked rows are prune-eligible provenance; unbooked rows are the
+    operator queue and MUST NOT be pruned; the listings prune leaves booked
+    claim rows behind (no FK), so age booked rows on booked_at, never on
+    referent. Release-merge premises recorded by the 03 QA sync audit:
+    steady per-realm DB connections are now 13, not 10 (the chat-quota
+    feature's dedicated 2-client pool + 1 LISTEN connection; phase 16/22
+    capacity math must count them); the repo now has its first pg
+    LISTEN/NOTIFY exemplar (createGeneralChatQuotaListener) and a second
+    dedicated-Pool idiom, relevant to phases 16/19/22 (advisory-lock
+    namespaces verified disjoint); the quota admin write locks the accounts
+    row FOR NO KEY UPDATE and can contend briefly with escrowInsertListing's
+    FOR UPDATE (no deadlock cycle; phase 22 lock-registry note); phase 14
+    must NOT scope-creep into the release's quota admin-envelope English
+    (release-side domain, not packet debt).
 - 02 QA (2026-08-11, session start 20fdcc5288, verdict PASS-WITH-FOLLOWUPS
   with every fix applied, gate GREEN at tip 301a8c7c22, PUSHED per R4):
   release/v0.37.0 synced (merge b40a178643; generated-i18n conflict

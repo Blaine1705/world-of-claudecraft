@@ -25,7 +25,9 @@ pending: every payment has a ledger trace and a bounded resolution.
 - H4 at `server/woc_market.ts:1269, 1243, 1914`: quote expiry is checked BEFORE the
   signature is recorded (a near-expiry broadcast payment is refused with no ledger
   trace); `refreshBondQuote` overwrites the reference of a paid, awaiting-finality bond;
-  `cancelOpenBidsForListing` drops paid-but-undecided bonds out of the polling set.
+  the open-bid cancellation (now the CASE UPDATE inside `finalizeDeliveredSettlement`,
+  `server/woc_market_db.ts`; the old `cancelOpenBidsForListing` helper is gone since 03)
+  can drop paid-but-undecided bonds out of the polling set.
 - H15 at `server/woc_market_db.ts:1693`: `overdueSettlements` selects only `offered` and
   `failed`; a settlement stuck in `confirming` is polled forever, the escrowed item held
   indefinitely.
@@ -41,8 +43,11 @@ pending: every payment has a ledger trace and a bounded resolution.
    refusal path may discard a known signature.
 2. `refreshBondQuote` CAS: a bond that is paid or awaiting finality keeps its reference;
    refresh applies only to unpaid quotes, enforced atomically.
-3. `cancelOpenBidsForListing` keeps every paid-but-undecided bond in the polling set
-   until it reaches refund or forfeit; cancellation never orphans a bond.
+3. Open-bid cancellation keeps every paid-but-undecided bond in the polling set until it
+   reaches refund or forfeit; cancellation never orphans a bond. Since 03 that
+   cancellation lives inside `finalizeDeliveredSettlement`'s CASE UPDATE (the standalone
+   `cancelOpenBidsForListing` helper no longer exists); the suspend-expiry CTE and the
+   demote paths are the other writers to audit.
 4. H15: bound the `confirming` age: `overdueSettlements` includes `confirming` past a
    configurable bound; past the bound the settlement enters a defined resolution state
    the ops surface can act on (works with the phase 03 monitor and the phase 09/21
