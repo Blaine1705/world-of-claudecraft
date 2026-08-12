@@ -198,6 +198,11 @@ import { daisVisualLift } from './dais_lift';
 import { buildDawnholdFeatures, type DawnholdFeaturesView } from './dawnhold_features';
 import { currentDayNightPhase, currentLunarPhase, dayNightPhaseOverride } from './day_night_clock';
 import {
+  applyInteriorLightRig,
+  applyRiftLightRig,
+  type FogSceneState,
+} from './interior_light_rig';
+import {
   aboveHorizon,
   DAY_ONLY,
   type DayNightGrade,
@@ -825,21 +830,9 @@ const hemiOutdoorIntensity = (): number =>
 
 const SUN_INTENSITY = 3.5;
 const ENV_INTENSITY = 0.37;
-// dungeon interiors: kill the daylight so torchlight carries the scene
-// (env at 0.15 still lit rigs sky-blue against the pitch-dark crypt)
-const DUNGEON_SUN_INTENSITY = 0.34;
-const DUNGEON_ENV_INTENSITY = 0.05;
-// The authored Infernal Citadel is larger than a procedural floor and carries
-// real budgeted brazier lights. A stronger ambient floor preserves the black-red
-// infernal grade while keeping its loops, bosses, and doors readable between pools.
-const INFERNAL_SUN_INTENSITY = 0.54;
-const INFERNAL_HEMI_INTENSITY = 0.32;
-const INFERNAL_ENV_INTENSITY = 0.1;
-const INFERNAL_RIM_BOOST = 2.15;
 // raw HDRI PMREMs integrate the real sun the dome shader clamps away,
 // rescale so ambient matches the dome-capture look (see lookdev-hookup.md)
 const IBL_RAW_SCALE = 0.55;
-const DUNGEON_HEMI_INTENSITY = 0.22; // floor of readability — bosses crushed to black at 0.14
 // day/night: at night the key sun and sky bounce cool toward moonlight. These
 // are the fully-night blend weights (scaled each frame by the grade's nightAmt).
 const MOON_SUN_COLOR = 0x9fb2e0; // pale cool moonlight the warm sun eases toward
@@ -864,43 +857,6 @@ const DAY_HEMI_SKY_WARMTH = 0.3;
 const DAY_HEMI_GROUND_WARMTH = 0.22;
 // the moving sun/moon key light rides at the same distance the fixed anchor did
 const SUN_TRAVEL_DISTANCE = SUN_ANCHOR.length();
-// character rim glow scales up underground so silhouettes split from the murk
-const DUNGEON_RIM_BOOST = 2.4;
-// The Protect Yumi maze is a torch-lit NIGHT ARENA, not a crypt: a moon-key
-// plus a healthy hemisphere keep the whole competitive space readable, with
-// the braziers/torches adding warmth rather than carrying the scene alone.
-const YUMI_MAZE_SUN_INTENSITY = 1.32;
-const YUMI_MAZE_HEMI_INTENSITY = 0.38;
-const YUMI_MAZE_ENV_INTENSITY = 0.25;
-const YUMI_MAZE_RIM_BOOST = 1.7;
-const WILDHEART_SUN_INTENSITY = 1.75;
-const WILDHEART_HEMI_INTENSITY = 0.59;
-const WILDHEART_ENV_INTENSITY = 0.28;
-const WILDHEART_RIM_BOOST = 1.5;
-// The Last Keep is a LIVED-IN castle interior, not a crypt: a higher, warmed
-// ambient floor (over the candle-orange torch lights the interior itself
-// carries) so its halls read golden and inhabited while staying indoors-dim.
-// Scoped to interior 'lastkeep' only; every other underground interior keeps
-// the DUNGEON_* rig.
-const LASTKEEP_SUN_INTENSITY = 0.66;
-const LASTKEEP_HEMI_INTENSITY = 0.46;
-const LASTKEEP_ENV_INTENSITY = 0.14;
-const LASTKEEP_RIM_BOOST = 1.9;
-const LASTKEEP_SUN_COLOR = 0xffd9a8;
-const LASTKEEP_HEMI_SKY_COLOR = 0xffe4c4;
-const LASTKEEP_HEMI_GROUND_COLOR = 0x4a3826;
-// Dawnhold Castle: the Evergarden garden palace. BRIGHTER and greener-warm
-// than the Last Keep's rig: this is daylight through a garden palace, not
-// torchlit stone, so the key and ambient sit well above the keep's and the
-// bounce reads off sunlit lawn instead of dark timber. Scoped to interior
-// 'dawnhold' only.
-const DAWNHOLD_SUN_INTENSITY = 0.95;
-const DAWNHOLD_HEMI_INTENSITY = 0.72;
-const DAWNHOLD_ENV_INTENSITY = 0.26;
-const DAWNHOLD_RIM_BOOST = 1.6;
-const DAWNHOLD_SUN_COLOR = 0xffe4b0;
-const DAWNHOLD_HEMI_SKY_COLOR = 0xf2fadc;
-const DAWNHOLD_HEMI_GROUND_COLOR = 0x53603a;
 const RENDERER_PHASE_SAMPLE_LIMIT = 720;
 const RENDER_DIAGNOSTICS_SAMPLE_MS = 2000;
 const RENDER_DIAGNOSTICS_IDLE_TIMEOUT_MS = 1000;
@@ -9401,20 +9357,7 @@ export class Renderer {
   // Cached with riftFogKey: whether the current rift floor is an authored set
   // piece, so the per-frame lighting read avoids regenerating the floor.
   private riftFogAuthored = false;
-  private fogState:
-    | 'outdoor'
-    | 'dungeon'
-    | 'temple'
-    | 'nythraxis'
-    | 'delve'
-    | 'yumiMaze'
-    | 'battleground'
-    | 'underwater'
-    | 'rift'
-    | 'practice'
-    | 'wildheartField'
-    | 'lastkeep'
-    | 'dawnhold' = 'outdoor';
+  private fogState: FogSceneState = 'outdoor';
 
   /** Drop a retired interior's scene nodes and prune its lights/flames out of
    * the per-frame registries. See riftInteriorGroups for why nothing here
@@ -9608,6 +9551,27 @@ export class Renderer {
   private outdoorFogPreset(): { color: number; near: number; far: number } {
     if (this.lowGfx) return Renderer.LOW_FOG;
     return Renderer.BIOME_FOG[zoneBiomeAt(this.sim.player.pos.x, this.sim.player.pos.z)];
+  }
+
+  /** Settle the light rig for a fog state (interior_light_rig.ts owns the
+   * per-state numbers; the outdoor legs carry this frame's day/night grade,
+   * so leaving an interior at night stays night). */
+  private applyStateLightRig(state: FogSceneState): void {
+    const targets = {
+      sun: this.sun,
+      hemi: this.hemi,
+      scene: this.scene,
+      rim: sharedUniforms.uRimBoost,
+    };
+    if (state === 'rift') {
+      applyRiftLightRig(this.riftFogAuthored, targets);
+      return;
+    }
+    applyInteriorLightRig(state, targets, {
+      sunIntensity: SUN_INTENSITY * this.dnGrade.lightScale,
+      hemiIntensity: hemiOutdoorIntensity() * this.dnGrade.ambientScale,
+      envIntensity: this.envOutdoorIntensity * this.dnGrade.ambientScale,
+    });
   }
 
   /**
@@ -9996,11 +9960,7 @@ export class Renderer {
       }
       this.fogState = 'rift';
       if (!this.lowGfx) {
-        const authored = this.riftFogAuthored;
-        this.sun.intensity = authored ? INFERNAL_SUN_INTENSITY : DUNGEON_SUN_INTENSITY;
-        this.hemi.intensity = authored ? INFERNAL_HEMI_INTENSITY : DUNGEON_HEMI_INTENSITY;
-        this.scene.environmentIntensity = authored ? INFERNAL_ENV_INTENSITY : DUNGEON_ENV_INTENSITY;
-        sharedUniforms.uRimBoost.value = authored ? INFERNAL_RIM_BOOST : DUNGEON_RIM_BOOST;
+        this.applyStateLightRig('rift');
       }
       return;
     }
@@ -10088,80 +10048,9 @@ export class Renderer {
       // interiors must not leak daylight: drop sun + sky ambient + IBL
       // underground so the torch point lights own the scene; restore outside.
       // The rim glow cranks up instead, silhouettes must split from the murk.
+      // Which numbers each state means is interior_light_rig.ts's to own.
       if (!this.lowGfx) {
-        const mazeNight = desired === 'yumiMaze';
-        const wildheartSun = desired === 'wildheartField';
-        const keepHearth = desired === 'lastkeep';
-        const dawnholdDay = desired === 'dawnhold';
-        const underground =
-          desired === 'dungeon' ||
-          desired === 'temple' ||
-          desired === 'nythraxis' ||
-          desired === 'delve';
-        // The maze runs its own night rig; otherwise returning outdoors restores the
-        // full daylight rig scaled by the current day/night grade, so stepping out
-        // of a cave at night stays night.
-        this.sun.intensity = mazeNight
-          ? YUMI_MAZE_SUN_INTENSITY
-          : wildheartSun
-            ? WILDHEART_SUN_INTENSITY
-            : keepHearth
-              ? LASTKEEP_SUN_INTENSITY
-              : dawnholdDay
-                ? DAWNHOLD_SUN_INTENSITY
-                : underground
-                  ? DUNGEON_SUN_INTENSITY
-                  : SUN_INTENSITY * this.dnGrade.lightScale;
-        this.hemi.intensity = mazeNight
-          ? YUMI_MAZE_HEMI_INTENSITY
-          : wildheartSun
-            ? WILDHEART_HEMI_INTENSITY
-            : keepHearth
-              ? LASTKEEP_HEMI_INTENSITY
-              : dawnholdDay
-                ? DAWNHOLD_HEMI_INTENSITY
-                : underground
-                  ? DUNGEON_HEMI_INTENSITY
-                  : hemiOutdoorIntensity() * this.dnGrade.ambientScale;
-        this.scene.environmentIntensity = mazeNight
-          ? YUMI_MAZE_ENV_INTENSITY
-          : wildheartSun
-            ? WILDHEART_ENV_INTENSITY
-            : keepHearth
-              ? LASTKEEP_ENV_INTENSITY
-              : dawnholdDay
-                ? DAWNHOLD_ENV_INTENSITY
-                : underground
-                  ? DUNGEON_ENV_INTENSITY
-                  : this.envOutdoorIntensity * this.dnGrade.ambientScale;
-        sharedUniforms.uRimBoost.value = mazeNight
-          ? YUMI_MAZE_RIM_BOOST
-          : wildheartSun
-            ? WILDHEART_RIM_BOOST
-            : keepHearth
-              ? LASTKEEP_RIM_BOOST
-              : dawnholdDay
-                ? DAWNHOLD_RIM_BOOST
-                : underground
-                  ? DUNGEON_RIM_BOOST
-                  : 1;
-        if (wildheartSun) {
-          this.sun.color.setHex(0xffd48c);
-          this.hemi.color.setHex(0xd8ebca);
-          this.hemi.groundColor.setHex(0x5b4a2d);
-        } else if (keepHearth) {
-          // hearth-gold key and bounce; the outdoor path re-grades these
-          // colors every frame once the player steps back outside
-          this.sun.color.setHex(LASTKEEP_SUN_COLOR);
-          this.hemi.color.setHex(LASTKEEP_HEMI_SKY_COLOR);
-          this.hemi.groundColor.setHex(LASTKEEP_HEMI_GROUND_COLOR);
-        } else if (dawnholdDay) {
-          // garden daylight: gold key over a pale green sky bounce and a
-          // lawn-green ground bounce; re-graded outdoors the same way
-          this.sun.color.setHex(DAWNHOLD_SUN_COLOR);
-          this.hemi.color.setHex(DAWNHOLD_HEMI_SKY_COLOR);
-          this.hemi.groundColor.setHex(DAWNHOLD_HEMI_GROUND_COLOR);
-        }
+        this.applyStateLightRig(desired);
       }
       return;
     }
