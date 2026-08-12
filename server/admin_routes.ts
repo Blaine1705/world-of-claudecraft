@@ -88,6 +88,11 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
     pattern: /^\/admin\/api\/accounts\/(\d+)\/reset-password$/,
     permission: 'accounts.password',
   },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/accounts\/(\d+)\/general-chat-rate-limit$/,
+    permission: 'moderation.act',
+  },
   { method: 'GET', pattern: '/admin/api/shared-ips', permission: 'moderation.read' },
 
   // $WOC Exchange moderation (server/woc_market_routes.ts operator arms).

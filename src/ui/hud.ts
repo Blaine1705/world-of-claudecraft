@@ -296,7 +296,7 @@ import {
   zoneDisplayName,
   zonePoiLabel,
 } from './entity_i18n';
-import { ERROR_LOG_COLOR, shouldMirrorErrorToast } from './error_toast_log';
+import { ERROR_LOG_CHAN, ERROR_LOG_COLOR, shouldMirrorErrorToast } from './error_toast_log';
 import { esc } from './esc';
 import { blockFctAmountText } from './fct_core';
 import { fctSpawnShape } from './fct_event';
@@ -320,6 +320,7 @@ import {
   gatherRareTierFor,
   gatherToolNoNodeKey,
 } from './gathering_view';
+import { generalChatQuotaView } from './general_chat_quota_view';
 import {
   craftedLineKey,
   gatherLineKey,
@@ -476,6 +477,7 @@ import { afflictionFateThreadCount, createDoomMeter, destructionRuinPips } from 
 import { WocTradeController } from './hud/woc_trade';
 import { unitFrameCurrentMaxText } from './hud_frames';
 import {
+  formatDuration,
   formatMoney as formatLocalizedMoney,
   formatNumber,
   getLanguage,
@@ -12668,9 +12670,15 @@ export class Hud {
           }
           break;
         }
-        case 'error':
-          this.showError(this.localizeErrorText(ev.text));
+        case 'error': {
+          const quota = generalChatQuotaView(ev);
+          if (quota) {
+            this.showLocalizedError(quota.text, quota.channel, quota.announceWhenFiltered);
+          } else {
+            this.showError(this.localizeErrorText(ev.text));
+          }
           break;
+        }
         case 'questAccepted':
           sfx.playUi('quest_accept');
           this.questDialog.refresh();
@@ -14316,8 +14324,24 @@ export class Hud {
     }
   }
 
-  log(text: string, color = '#ccc', decorativeIconUrl?: string): void {
-    this.appendLog(this.chatLogEl, text, color, true, 'system', decorativeIconUrl);
+  log(
+    text: string,
+    color = '#ccc',
+    decorativeIconUrl?: string,
+    channel = ERROR_LOG_CHAN,
+    announceWhenFiltered = false,
+  ): void {
+    this.appendLog(
+      this.chatLogEl,
+      text,
+      color,
+      true,
+      channel,
+      decorativeIconUrl,
+      false,
+      undefined,
+      announceWhenFiltered,
+    );
   }
 
   /** A chat-pane system line whose body is pre-built NODES (the deed-link
@@ -14553,6 +14577,13 @@ export class Hud {
   }
 
   private localizeErrorText(text: string): string {
+    const generalChatQuota =
+      /^General chat limit reached\. Try again in ([1-9]\d*) seconds\.$/.exec(text);
+    if (generalChatQuota) {
+      return t('hudChrome.chatQuota.limitReached', {
+        seconds: formatDuration(Number(generalChatQuota[1])),
+      });
+    }
     // Raid entry while locked: enrich the toast with the live unlock countdown
     // from the mirrored lockout state. Falls through to the base sim_i18n message
     // (still recognized there) if the lockout already cleared client-side.
@@ -14583,6 +14614,10 @@ export class Hud {
       return t('hudChrome.raidLockout.heroicLocked', { name });
     }
     const exact: Record<string, TranslationKey> = {
+      'General chat is temporarily unavailable. Try again shortly.':
+        'hudChrome.chatQuota.unavailable',
+      'Your previous General chat message is still sending. Try again in a moment.':
+        'hudChrome.chatQuota.pending',
       'You are stunned!': 'hud.errors.stunned',
       'You are silenced!': 'hud.errors.silenced',
       // The rooted-charge refusal. Reuses the existing combat key rather than
@@ -15007,8 +15042,8 @@ export class Hud {
   // coalesces + throttles a burst. Both chat append paths (appendLog's chat case and
   // chatLogFrom) call this so player chat and system chat announce alike, as #chatlog's
   // implicit-polite log did before the decouple.
-  private announceChatLine(div: HTMLElement): void {
-    if (div.classList.contains('chat-hidden')) return;
+  private announceChatLine(div: HTMLElement, announceWhenFiltered = false): void {
+    if (!announceWhenFiltered && div.classList.contains('chat-hidden')) return;
     this.chatAnnouncer.push(div.textContent ?? '', performance.now());
   }
 
@@ -15027,6 +15062,9 @@ export class Hud {
     // item links in chat either).
     plainText = false,
     bodyNodes?: readonly Node[],
+    // Sender-only command feedback must still reach the tab-independent live
+    // region when its durable channel line is filtered by another active tab.
+    announceWhenFiltered = false,
   ): void {
     const wasNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 24;
     const div = document.createElement('div');
@@ -15061,7 +15099,7 @@ export class Hud {
     }
     el.appendChild(div);
     // Announce chat-pane lines through #chat-live (the combat pane has its own announcer).
-    if (el === this.chatLogEl) this.announceChatLine(div);
+    if (el === this.chatLogEl) this.announceChatLine(div, announceWhenFiltered);
     while (el.children.length > 200) {
       const first = el.firstChild;
       if (!first) break;
@@ -15088,8 +15126,21 @@ export class Hud {
     this.combatAnnouncer.push(text, performance.now());
   }
 
-  showError(text: string): void {
-    const localized = this.localizeErrorText(text);
+  showError(text: string, logChannel = ERROR_LOG_CHAN, announceWhenFiltered = false): void {
+    this.showLocalizedError(this.localizeErrorText(text), logChannel, announceWhenFiltered);
+  }
+
+  /**
+   * showError for text that is ALREADY localized (a structured-event view
+   * result): never re-runs the English error matcher, so a localized string
+   * that happens to match one of its English patterns cannot round-trip
+   * through the matcher twice.
+   */
+  showLocalizedError(
+    localized: string,
+    logChannel = ERROR_LOG_CHAN,
+    announceWhenFiltered = false,
+  ): void {
     this.errorEl.textContent = localized;
     this.errorEl.style.opacity = '1';
     clearTimeout(this.errorTimer);
@@ -15103,8 +15154,14 @@ export class Hud {
     // repeats (mashing a key while an error condition persists) are suppressed
     // so the channel does not flood; a different error still logs normally.
     if (shouldMirrorErrorToast(localized, this.lastMirroredErrorText)) {
-      this.log(localized, ERROR_LOG_COLOR);
+      this.log(localized, ERROR_LOG_COLOR, undefined, logChannel, announceWhenFiltered);
       this.lastMirroredErrorText = localized;
+    } else if (announceWhenFiltered && localized.trim()) {
+      // Durable chat history still dedupes identical consecutive errors, but
+      // sender-only quota feedback must reach the independent throttled live
+      // region on later retries. ChatAnnouncer owns coalescing and uses its
+      // reannounce marker for byte-identical text.
+      this.chatAnnouncer.push(localized, performance.now());
     }
   }
 
