@@ -159,7 +159,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/biome/hex_tile_water.glb": "/media/models/biome/hex_tile_water.adff3634fe24.glb",
   "models/biome/hex_tower.glb": "/media/models/biome/hex_tower.7fe85c0f9ab5.glb",
   "models/biome/hex_tower_cannon.glb": "/media/models/biome/hex_tower_cannon.9b2c6ff681e7.glb",
-  "models/biome/hex_tower_catapult.glb": "/media/models/biome/hex_tower_catapult.69d661c3bf78.glb",
+  "models/biome/hex_tower_catapult.glb": "/media/models/biome/hex_tower_catapult.a343ca730a6c.glb",
   "models/biome/hex_trough.glb": "/media/models/biome/hex_trough.076a44122d49.glb",
   "models/biome/hex_wall.glb": "/media/models/biome/hex_wall.9591ad1772c1.glb",
   "models/biome/hex_watchtower.glb": "/media/models/biome/hex_watchtower.5d7fd1f14b1a.glb",
