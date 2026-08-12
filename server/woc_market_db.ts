@@ -49,6 +49,10 @@ import {
  *  it. 'delivered' stays open until the listing row closes (see the index
  *  comment below). */
 const OPEN_SETTLEMENT_STATES_SQL = `('offered', 'confirming', 'review', 'confirmed', 'delivering', 'delivered')`;
+/** The PAID subset: OPEN minus 'offered' (a recorded signature is in and the
+ *  money may land). The cancel-intent probe reads this, and the structural
+ *  floor pins the subset relationship so the two lists cannot drift apart. */
+const PAID_SETTLEMENT_STATES_SQL = `('confirming', 'review', 'confirmed', 'delivering', 'delivered')`;
 
 export const WOC_MARKET_SCHEMA = `
 CREATE TABLE IF NOT EXISTS woc_market_listings (
@@ -263,7 +267,7 @@ CREATE INDEX IF NOT EXISTS woc_market_bids_bond_confirming
   ON woc_market_bids(realm, placed_at)
   WHERE status = 'pending_bond' AND bond_signature IS NOT NULL;
 -- Poll rotation for the awaiting-finality queue: a bond the chain leaves
--- undecided past the pending TTL rotates to the tail (poll_parked_at) with
+-- undecided past the poll park delay rotates to the tail (poll_parked_at) with
 -- an in-process backoff, so a standing set of never-decided signatures
 -- cannot occupy the poll batch's head every pass and starve fresh bonds of
 -- their finality checks. Rotation never touches placed_at (the readout's
@@ -899,9 +903,10 @@ export class PgWocMarketDb implements WocMarketDb {
       // stall the buffered 25P03 is parsed into the NEXT query's rejection
       // and the async event is the codeless close; under an async stall the
       // ordering flips (both measured). Either way the coded error is the
-      // honest one.
+      // honest one. When NEITHER carries a code, the thrown error (fn's own
+      // bug) stays primary: a codeless connection close must not mask it.
       const code = (e: unknown): string | undefined => (e as { code?: string }).code;
-      throw code(err) !== undefined ? err : (asyncErr ?? err);
+      throw code(err) !== undefined ? err : code(asyncErr) !== undefined ? asyncErr : err;
     } finally {
       client.removeListener('error', onError);
       // A terminated session must be DISCARDED, not returned to the pool.
@@ -1420,8 +1425,15 @@ export class PgWocMarketDb implements WocMarketDb {
       return await this.withTx(async (client) => {
         // Fail fast on a contended row instead of pinning a pooled client for
         // the 15 s session bound (the escrowInsertListing rationale; the rare
-        // 55P03 surfaces as the typed 'contended' refusal below).
+        // 55P03 surfaces as the typed 'contended' refusal below). The idle
+        // bound joined when the cancel-intent work grew this transaction two
+        // extra round trips inside the FOR UPDATE window (the paid-window
+        // probe and the intent stamp): the guard-transaction rule, not the
+        // older-guard retrofit deferral.
         await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
+        await client.query(
+          `SET LOCAL idle_in_transaction_session_timeout = ${GUARD_IDLE_TX_TIMEOUT_MS}`,
+        );
         // LOCK ORDER note: this transaction takes the LISTING row first and
         // never acquires any bid row lock (the bid probe below is a plain
         // read), which is the only reason listing-first is deadlock-free
@@ -1468,7 +1480,7 @@ export class PgWocMarketDb implements WocMarketDb {
           const paid = await client.query(
             `SELECT 1 FROM woc_market_settlements
               WHERE listing_id = $1
-                AND state IN ('confirming', 'review', 'confirmed', 'delivering', 'delivered')
+                AND state IN ${PAID_SETTLEMENT_STATES_SQL}
               LIMIT 1`,
             [id],
           );
@@ -1974,15 +1986,19 @@ export class PgWocMarketDb implements WocMarketDb {
     );
     const reviewCount = await count(reviewWhere, [realm]);
     // Paid-but-undecided bonds past the bound: still polled, but the verdict
-    // is overdue and an operator should verify the signature by hand. Served
-    // by the woc_market_bids_bond_confirming partial index.
+    // is overdue and an operator should verify the signature by hand. Aged on
+    // the SIGNATURE recording (placed_at only for legacy rows), the same axis
+    // the poll park uses: placement age says nothing about how long the chain
+    // has had the transfer. The partial-index predicate (status + signature)
+    // narrows the candidate set; the age filter applies after it, fine for a
+    // 30s-cached diagnostic read.
     const stuckBondsWhere = `FROM woc_market_bids
         WHERE realm = $1 AND status = 'pending_bond' AND bond_signature IS NOT NULL
-          AND placed_at <= to_timestamp($2 / 1000.0)`;
+          AND COALESCE(bond_signature_at, placed_at) <= to_timestamp($2 / 1000.0)`;
     const stuckBonds = await this.pool.query(
       `SELECT id, listing_id, account, placed_at
          ${stuckBondsWhere}
-        ORDER BY placed_at
+        ORDER BY COALESCE(bond_signature_at, placed_at)
         LIMIT $3`,
       [realm, bondOlderThanMs, sampleLimit],
     );
@@ -2141,9 +2157,13 @@ export class PgWocMarketDb implements WocMarketDb {
         await client.query(
           `SET LOCAL idle_in_transaction_session_timeout = ${GUARD_IDLE_TX_TIMEOUT_MS}`,
         );
-        // LOCK ORDER carve-out: this transaction takes the LISTING row only
-        // and never a bid row lock (the cancelListingIfUnbid rationale), so
-        // listing-first is deadlock-free here.
+        // LOCK ORDER carve-out: no bid row lock is ever taken here (the
+        // cancelListingIfUnbid rationale), so listing-first is deadlock-free.
+        // Beyond the listing row this transaction also takes the settlement
+        // reads (plain) and, on the recorder arm, the abandons INSERT's FK
+        // share locks (accounts, listings): a new non-cyclic blocking edge, a
+        // claim can briefly wait on the previous abandoner's accounts row,
+        // bounded by lock_timeout and retryable.
         const res = await client.query(
           `SELECT ${LISTING_COLS} FROM woc_market_listings
             WHERE realm = $1 AND id = $2 FOR UPDATE`,
@@ -2290,8 +2310,11 @@ export class PgWocMarketDb implements WocMarketDb {
    * settlement (a paid window proceeds to settlement and the finalize closes
    * the listing 'sold' instead; the stamp dies with the closed row).
    *
-   * LOCK ORDER carve-out: listing row only; the bid probe is a plain read
-   * (the cancelListingIfUnbid rationale).
+   * LOCK ORDER carve-out: no bid row lock (the cancelListingIfUnbid
+   * rationale; the bid probe is a plain read). The failed-settlement expiry
+   * UPDATE does take settlement row locks after the listing lock, the same
+   * listing-then-settlements order every settlement-touching transaction
+   * uses.
    */
   async closeCancelPendingListing(
     realm: string,
@@ -2516,20 +2539,26 @@ export class PgWocMarketDb implements WocMarketDb {
     bidId: number,
     signature: string,
     nowMs: number,
-  ): Promise<'recorded' | 'not_pending' | 'signature_reused'> {
+  ): Promise<{ signatureAtMs: number } | 'not_pending' | 'signature_reused'> {
     try {
       // COALESCE: an idempotent resubmission of the same signature keeps the
       // FIRST recording moment (the poll park axis and the extension anchor
       // both mean "when the payment claim arrived", not "the latest retry").
+      // RETURNING hands that moment back so the caller's extension anchors on
+      // the first arrival too: a fresh-clock anchor per resubmit let one
+      // pending-forever signature hold the close at now plus the extension
+      // continuously up to the cap.
       const res = await this.pool.query(
         `UPDATE woc_market_bids
             SET bond_signature = $2,
                 bond_signature_at = COALESCE(bond_signature_at, to_timestamp($3 / 1000.0))
           WHERE id = $1 AND status = 'pending_bond'
-            AND (bond_signature IS NULL OR bond_signature = $2)`,
+            AND (bond_signature IS NULL OR bond_signature = $2)
+          RETURNING bond_signature_at`,
         [bidId, signature, nowMs],
       );
-      return (res.rowCount ?? 0) > 0 ? 'recorded' : 'not_pending';
+      const row = res.rows[0];
+      return row ? { signatureAtMs: ms(row.bond_signature_at) } : 'not_pending';
     } catch (err) {
       // 23505: the unique index caught this signature against ANOTHER bid.
       if ((err as { code?: string }).code === '23505') return 'signature_reused';
@@ -2564,11 +2593,17 @@ export class PgWocMarketDb implements WocMarketDb {
   }
 
   /** One bond the chain decided against. Narrowed to pending_bond so a bid that
-   *  activated in the meantime is never torn down by a late verdict. */
+   *  activated in the meantime is never torn down by a late verdict, AND to an
+   *  unheld bond: a HELD bond (a settled verdict whose activation is still
+   *  retrying its lock race) must never void on a later contradictory verdict
+   *  (a reorg flip), or held money strands in a state no refund arm reads.
+   *  The no-op leaves such a row with confirmingBonds (visible via the
+   *  stuckBonds readout class); the exits are a settled re-verdict retrying
+   *  the activation, or operator resolution. */
   async lapseBid(bidId: number): Promise<void> {
     await this.pool.query(
       `UPDATE woc_market_bids SET status = 'lapsed', bond_state = 'void'
-        WHERE id = $1 AND status = 'pending_bond'`,
+        WHERE id = $1 AND status = 'pending_bond' AND bond_state = 'pending'`,
       [bidId],
     );
   }
@@ -3312,9 +3347,11 @@ export class PgWocMarketDb implements WocMarketDb {
   /** The deadline backlog, plus the H15 bound: a 'confirming' row older than
    *  the caller's cutoff (aged on updated_at, which nothing re-stamps while
    *  the poll returns undecided) is overdue too, so the sweep can park it in
-   *  the operator 'review' state instead of polling it forever. The two arms
-   *  ride their own partial paths (woc_market_settlements_state on
-   *  deadline_at, woc_market_settlements_state_updated on updated_at). */
+   *  the operator 'review' state instead of polling it forever. Plan shape:
+   *  the OR across the two arms plans as a BitmapOr plus a sort before the
+   *  LIMIT, losing the ordered-index pushdown; fine while both backlogs are
+   *  sweep-bounded, and a UNION ALL of the arms restores the pushdown if a
+   *  large confirming backlog ever grows in prod (the recorded 16/17 item). */
   async overdueSettlements(
     realm: string,
     nowMs: number,

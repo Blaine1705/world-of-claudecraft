@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   antiSnipeExtendedEndMs,
@@ -11,8 +12,12 @@ import {
   strikeSuspensionMs,
   validListingParams,
   validSettlementTransition,
+  WOC_MARKET_ANTI_SNIPE_CAP_SECONDS,
+  WOC_MARKET_ANTI_SNIPE_EXTENSION_SECONDS,
+  WOC_MARKET_ANTI_SNIPE_WINDOW_SECONDS,
   WOC_MARKET_BOND_MAX_CENTS,
   WOC_MARKET_BOND_PENDING_TTL_SECONDS,
+  WOC_MARKET_BOND_POLL_PARK_SECONDS,
   WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS,
   WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR,
   WOC_MARKET_BUY_NOW_LOCK_SECONDS,
@@ -30,6 +35,7 @@ import {
   type WocSettlementState,
 } from '../server/woc_market_rules';
 import type { ItemDef, ItemInstancePayload } from '../src/sim/types';
+import { stripComments } from './helpers/strip_comments';
 
 // Pure, IO-free decision core: every case here is a plain input-to-output pin,
 // no clocks, no DB, no fetch (the module takes injected timestamps).
@@ -53,6 +59,21 @@ describe('tunables: literal pins', () => {
     expect(WOC_MARKET_MIN_PRICE_CENTS).toBe(25);
     expect(WOC_MARKET_MAX_PRICE_CENTS).toBe(100_000);
     expect(WOC_MARKET_STRANDED_RECLAIM_SECONDS).toBe(300);
+  });
+
+  it('pins the bond poll park delay and the anti-snipe trio to their literals', () => {
+    expect(WOC_MARKET_BOND_POLL_PARK_SECONDS).toBe(300);
+    expect(WOC_MARKET_ANTI_SNIPE_WINDOW_SECONDS).toBe(120);
+    expect(WOC_MARKET_ANTI_SNIPE_EXTENSION_SECONDS).toBe(120);
+    expect(WOC_MARKET_ANTI_SNIPE_CAP_SECONDS).toBe(1800);
+    // The park delay VALUE coincides with the bond pending TTL (both 300), so
+    // regressing the poll's park age onto the TTL constant is behaviorally
+    // invisible while they coincide: pin the constant IDENTITY at the one
+    // comparison site instead (comment-stripped, so prose cannot satisfy it).
+    const poll = stripComments(
+      readFileSync(new URL('../server/woc_market.ts', import.meta.url), 'utf8'),
+    );
+    expect(poll).toContain('> WOC_MARKET_BOND_POLL_PARK_SECONDS * 1000');
   });
 
   it('pins the abandon-loop cooldown numbers (the QA-judged proposal)', () => {

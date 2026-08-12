@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { stripComments } from './helpers/strip_comments';
 
 // The $WOC Exchange window painter is a cold DOM module; driving its live DOM
 // belongs to the opt-in browser suite. This is the no-DOM source-scan
@@ -16,6 +17,10 @@ const between = (start: string, end: string): string => {
   expect(to, `anchor missing after ${start}: ${end}`).toBeGreaterThan(from);
   return painter.slice(from, to);
 };
+
+// Presence pins scan the comment-stripped text, so a commented-out
+// `case 'review':` cannot satisfy them.
+const code = stripComments(painter);
 
 describe('woc_market_window: no magic color values', () => {
   it('carries no raw hex color literal (QUALITY_COLOR + var(--...) are the only channels)', () => {
@@ -167,16 +172,16 @@ describe('woc_market_window: i18n and escaping discipline', () => {
     // The default arm renders 'Payment due': serving that for a parked
     // 'review' row would invite a second payment for money that may already
     // have landed on chain.
-    expect(painter).toContain("case 'review':");
-    expect(painter).toContain("'hudChrome.wocMarket.settlementReview'");
+    expect(code).toContain("case 'review':");
+    expect(code).toContain("'hudChrome.wocMarket.settlementReview'");
   });
 
   it('toasts the cancel-pending outcome distinctly from a completed cancel', () => {
     // The seller's cancel on a locked window is ACCEPTED as intent; telling
     // them "Listing cancelled" while it stays live until the buyer's window
     // resolves would be a lie about custody.
-    expect(painter).toContain("'hudChrome.wocMarket.listingCancelPending'");
-    expect(painter).toContain('out.cancelPending === true');
+    expect(code).toContain("'hudChrome.wocMarket.listingCancelPending'");
+    expect(code).toContain('out.cancelPending === true');
   });
 
   it('never writes a plain string literal via textContent or setAttribute(aria-label)', () => {

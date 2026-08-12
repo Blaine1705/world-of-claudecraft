@@ -542,12 +542,15 @@ export interface WocMarketDb {
    *  recorded signature); false = nothing written. See PgWocMarketDb. */
   setBidBondQuote(bidId: number, reference: string, expiresAtMs: number): Promise<boolean>;
   /** Record the bidder's signature while the chain is still deciding;
-   *  nowMs stamps bond_signature_at (first recording wins). */
+   *  nowMs stamps bond_signature_at (first recording wins). Success returns
+   *  the STAMPED moment (the first arrival, not this retry), the extension
+   *  anchor; 'not_pending' also covers a DIFFERENT signature against a
+   *  signed pending bond (the caller re-reads for the precise refusal). */
   submitBondSignature(
     bidId: number,
     signature: string,
     nowMs: number,
-  ): Promise<'recorded' | 'not_pending' | 'signature_reused'>;
+  ): Promise<{ signatureAtMs: number } | 'not_pending' | 'signature_reused'>;
   /** Paid-but-undecided bonds, for the sweep to re-check, on the poll
    *  rotation order; excludeIds are the caller's backing-off parked rows. */
   confirmingBonds(
@@ -557,7 +560,9 @@ export interface WocMarketDb {
   ): Promise<WocBidRow[]>;
   /** Rotate one bond to the poll tail (writes poll_parked_at only). */
   touchBidPollRow(id: number): Promise<void>;
-  /** A bond the chain decided against: the bid lapses and the bond voids. */
+  /** A bond the chain decided against: the bid lapses and the bond voids.
+   *  No-ops on a HELD bond (see PgWocMarketDb: a reorg-flipped verdict must
+   *  never void held money into an unreachable state). */
   lapseBid(bidId: number): Promise<void>;
   bidById(id: number): Promise<WocBidRow | null>;
   /** pending_bond -> cancelled for the bidder who never funded it. */
@@ -1103,9 +1108,10 @@ export class WocMarketService {
   private readonly parkedCancelIntents = new Map<number, number>();
 
   /** Parked bond polls, keyed by bid id: a signed bond the chain leaves
-   *  undecided past the pending TTL rotates out of the poll head (60s
-   *  backoff) instead of occupying one of the batch's slots every pass
-   *  forever; young confirming bonds keep the full poll cadence. */
+   *  undecided past the poll park delay (WOC_MARKET_BOND_POLL_PARK_SECONDS,
+   *  deliberately its own tunable, not the pending TTL) rotates out of the
+   *  poll head (60s backoff) instead of occupying one of the batch's slots
+   *  every pass forever; young confirming bonds keep the full poll cadence. */
   private readonly parkedBondPolls = new Map<number, number>();
 
   /** Next time the delivered-residue arm may run (minute-scale: it converges
@@ -1800,14 +1806,33 @@ export class WocMarketService {
     // no ledger trace was exactly the loss that cost a real settlement its
     // money. The row lands in the confirming set instead, and the chain's
     // verdict (here or on the poll) decides between completion and lapse.
-    // The submission moment: the extension ANCHOR (captured BEFORE the chain
-    // round trip, or the target drifts with RPC latency and a slow confirm
-    // pushes the anchor past the close, nulling the extension the settled
-    // arm depends on) and the poll park axis (bond_signature_at).
+    // The submission moment: captured BEFORE the chain round trip (or the
+    // target drifts with RPC latency and a slow confirm pushes the anchor
+    // past the close, nulling the extension the settled arm depends on).
+    // The extension ANCHOR and the poll park axis are both the FIRST
+    // recording (bond_signature_at, which the submit returns): anchoring a
+    // resubmit on a fresh clock let one pending-forever signature re-post its
+    // way to holding the close at now plus the extension, all the way to the
+    // cap.
     const progressAtMs = this.now();
     const submitted = await this.deps.db.submitBondSignature(bid.id, signature, progressAtMs);
-    if (submitted === 'not_pending') return refuse('not_pending');
+    if (submitted === 'not_pending') {
+      // Zero rows can mean the bid left pending_bond, OR a DIFFERENT
+      // signature is already recorded and being decided. Re-read for the
+      // truthful refusal: 'not_pending' on a still-pending bid misreads as
+      // "bid gone" when the honest answer is "a payment is already in
+      // flight; wait for its verdict". The second signature has no ledger
+      // slot (one column, first claim wins); the reference-scoped service
+      // verdict is the backstop for a genuine double broadcast.
+      const after = await this.deps.db.bidById(bid.id);
+      return refuse(
+        after !== null && after.status === 'pending_bond' && after.bondSignature !== null
+          ? 'confirm_in_flight'
+          : 'not_pending',
+      );
+    }
     if (submitted === 'signature_reused') return refuse('signature_reused');
+    const anchorMs = submitted.signatureAtMs;
     const confirmed = await this.deps.economy.confirm(bid.bondReference, signature);
     // Anti-snipe rides BOND PROGRESS, and progress means the CHAIN has seen
     // the transfer (settled, or pending finality), never merely that a string
@@ -1819,7 +1844,7 @@ export class WocMarketService {
     const extend = async (): Promise<void> => {
       await this.deps.db
         .extendAuctionForBondProgress(this.cfg.realm, bid.listingId, (row) =>
-          antiSnipeExtendedEndMs(progressAtMs, row.endsAtMs, row.baseEndsAtMs),
+          antiSnipeExtendedEndMs(anchorMs, row.endsAtMs, row.baseEndsAtMs),
         )
         .catch(() => {});
     };
@@ -2097,20 +2122,43 @@ export class WocMarketService {
     const settlement = await this.deps.db.settlementById(settlementId);
     if (!settlement) return refuse('not_found');
     if (settlement.buyerAccount !== account) return refuse('not_yours');
-    if (settlement.state !== 'offered') return refuse('not_active');
+    // Idempotent retry (the bond leg's rule): resubmitting the RECORDED
+    // signature against a 'confirming' row re-asks the chain instead of
+    // refusing, so a network blip between the recording and the response
+    // cannot strand the buyer behind a false refusal. The retry skips the
+    // recording write entirely: nothing new to record, and re-stamping
+    // updated_at would push out the confirming-age review bound, re-opening
+    // the unbounded hold that bound exists to close. A DIFFERENT signature
+    // on a confirming row refuses typed: a payment is already being decided.
+    const retryOfRecorded =
+      settlement.state === 'confirming' && settlement.txSignature === signature;
+    if (settlement.state === 'confirming' && !retryOfRecorded) return refuse('confirm_in_flight');
+    if (!retryOfRecorded && settlement.state !== 'offered') return refuse('not_active');
     if (settlement.quoteReference === null || settlement.quoteExpiresAtMs === null) {
       return refuse('quote_unavailable');
     }
-    // No expiry refusal past this point: the signature is recorded FIRST (the
-    // bond leg's rule, and originally this leg's lesson). A payment broadcast
-    // near quote expiry lands in 'confirming' with its ledger trace, and the
-    // chain's verdict decides; refusing an expired quote here would discard
-    // the only trace of money already in flight. Deadline-expired rows are
-    // still bounded: the overdue sweep owns them, and a 'confirming' row that
-    // never resolves ages into the operator review state.
-    const submitted = await this.deps.db.submitSettlementSignature(settlement.id, signature);
-    if (submitted === 'not_offered') return refuse('not_active');
-    if (submitted === 'signature_reused') return refuse('signature_reused');
+    if (!retryOfRecorded) {
+      // No expiry refusal past this point: the signature is recorded FIRST (the
+      // bond leg's rule, and originally this leg's lesson). A payment broadcast
+      // near quote expiry lands in 'confirming' with its ledger trace, and the
+      // chain's verdict decides; refusing an expired quote here would discard
+      // the only trace of money already in flight. Deadline-expired rows are
+      // still bounded: the overdue sweep owns them, and a 'confirming' row that
+      // never resolves ages into the operator review state.
+      if (settlement.txSignature !== null && settlement.txSignature !== signature) {
+        // A revived row (failed -> offered) still carries its refused
+        // attempt's signature, and the new recording replaces it. The refusal
+        // reason survives on fail_reason and the economy service's own ledger
+        // keeps the refused transfer; this line is the game-side trace of the
+        // replacement (dev-channel, deliberately not player text).
+        console.warn(
+          `[woc_market] settlement ${settlement.id} records a new payment attempt over refused signature ${settlement.txSignature}`,
+        );
+      }
+      const submitted = await this.deps.db.submitSettlementSignature(settlement.id, signature);
+      if (submitted === 'not_offered') return refuse('not_active');
+      if (submitted === 'signature_reused') return refuse('signature_reused');
+    }
     const confirmed = await this.deps.economy.confirm(settlement.quoteReference, signature);
     if (confirmed.settled) {
       await this.deps.db.transitionSettlement(settlement.id, ['confirming'], 'confirmed');

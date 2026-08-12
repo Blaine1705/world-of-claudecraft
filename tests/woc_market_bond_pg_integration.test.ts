@@ -358,6 +358,84 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       await service.sweepPass();
       expect(await bidRow(bidId)).toMatchObject({ status: 'lapsed', bond_state: 'void' });
     });
+
+    it('a SECOND, different signature refuses typed while the first is being decided', async () => {
+      const realm = `bond-second-sig-${++seq}`;
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      // Captured BEFORE seeding: seq moves inside the seeders.
+      const firstSig = `sig-first-${seq}`;
+      const bidId = await seedBid(realm, listingId, buyer, {
+        bondReference: `first-claim-${seq}`,
+        bondSignature: firstSig,
+      });
+      const economy = new ScriptedEconomy(() => BASE_MS);
+      const service = makeService(realm, economy, () => BASE_MS);
+      const out = await service.confirmBond(buyer, bidId, `sig-second-${seq}`);
+      // 'not_pending' here misread a still-pending bid as gone; the honest
+      // answer is that a payment is already in flight awaiting its verdict.
+      expect(out).toEqual({ ok: false, reason: 'confirm_in_flight' });
+      // The FIRST claim stays the ledger trace, and the chain is never asked
+      // about the discarded second string.
+      expect(await bidRow(bidId)).toMatchObject({
+        status: 'pending_bond',
+        bond_signature: firstSig,
+      });
+      expect(economy.confirms).toHaveLength(0);
+    });
+
+    it('a resubmit returns the FIRST recording moment as the anchor', async () => {
+      const realm = `bond-anchor-${++seq}`;
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      const bidId = await seedBid(realm, listingId, buyer, {
+        bondReference: `anchor-ref-${seq}`,
+        bondSignature: null,
+      });
+      const first = await marketDb.submitBondSignature(bidId, 'sig-anchor', BASE_MS);
+      expect(first).toEqual({ signatureAtMs: BASE_MS });
+      // The retry an hour later hands back the ORIGINAL arrival, not its own
+      // clock: the extension anchor must not advance with retries, or one
+      // pending-forever signature re-posts its way to holding the close.
+      const retry = await marketDb.submitBondSignature(bidId, 'sig-anchor', BASE_MS + HOUR_MS);
+      expect(retry).toEqual({ signatureAtMs: BASE_MS });
+    });
+
+    it('a reorg-flipped verdict cannot void a HELD bond', async () => {
+      const realm = `bond-held-flip-${++seq}`;
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      // The activation-retry shape: settled verdict held the bond, the
+      // activate lost its lock race, and the row stayed with the poll. A
+      // LATER contradictory verdict (a reorg flip) must not void it: a
+      // voided held bond strands money where no refund arm reads.
+      const heldId = await seedBid(realm, listingId, buyer, {
+        bondState: 'held',
+        bondReference: `held-ref-${seq}`,
+        bondSignature: `sig-held-${seq}`,
+      });
+      // Positive control in the same pass: an ordinary pending-bond refusal
+      // still lapses, so the carve-out is proven narrow, not a dead poll.
+      const pendingId = await seedBid(realm, listingId, await seedAccount(), {
+        bondReference: `plain-ref-${seq}`,
+        bondSignature: `sig-plain-${seq}`,
+      });
+      const economy = new ScriptedEconomy(() => BASE_MS);
+      const service = makeService(realm, economy, () => BASE_MS);
+      economy.verdict = { settled: false, pending: false, reason: 'refused' };
+      await service.sweepPass();
+      expect(await bidRow(heldId)).toMatchObject({
+        status: 'pending_bond',
+        bond_state: 'held',
+      });
+      expect(await bidRow(pendingId)).toMatchObject({ status: 'lapsed', bond_state: 'void' });
+      // Still visible to the poll (and so to the stuckBonds readout class).
+      const polled = await marketDb.confirmingBonds(realm, 10, []);
+      expect(polled.map((b) => b.id)).toContain(heldId);
+    });
   });
 
   // -------------------------------------------------------------------------

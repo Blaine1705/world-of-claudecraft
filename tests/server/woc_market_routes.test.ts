@@ -280,6 +280,36 @@ describe('the refusal-to-wire mapping', () => {
     ).rejects.toMatchObject({ status: 409, code: 'woc_market.stale_item' });
   });
 
+  it('forwards cancelPending to the wire when the cancel was accepted as intent', async () => {
+    // The wire hop itself: the service arm and the SDK arm each pin their own
+    // side, so only this handler decides whether the seller hears "cancelled"
+    // or "cancel pending". A regression to a bare { ok: true } body stays
+    // green everywhere else.
+    service({ cancelListing: async () => ({ ok: true, cancelPending: true }) });
+    const ctx = fakeCtx({
+      method: 'POST',
+      url: '/api/woc-market/listings/41/cancel',
+      params: { id: '41' },
+      account: { accountId: VIEWER, scope: 'full' },
+    });
+    await handlerFor('POST', '/api/woc-market/listings/:id/cancel')(ctx);
+    expect(sent(ctx)).toEqual({ status: 200, body: { ok: true, cancelPending: true } });
+  });
+
+  it('omits cancelPending entirely on a plain completed cancel', async () => {
+    service({ cancelListing: async () => ({ ok: true }) });
+    const ctx = fakeCtx({
+      method: 'POST',
+      url: '/api/woc-market/listings/41/cancel',
+      params: { id: '41' },
+      account: { accountId: VIEWER, scope: 'full' },
+    });
+    await handlerFor('POST', '/api/woc-market/listings/:id/cancel')(ctx);
+    // toEqual on the WHOLE body: the plain arm must not leak a cancelPending
+    // key (false would read as intent-refused to a client checking presence).
+    expect(sent(ctx)).toEqual({ status: 200, body: { ok: true } });
+  });
+
   it('the admin suspend handler answers settlement-in-flight as 409, other misses as 404', async () => {
     // 'adminTargetId' is the require_admin middleware's private state key; the
     // literal doubles as a pin on that contract.

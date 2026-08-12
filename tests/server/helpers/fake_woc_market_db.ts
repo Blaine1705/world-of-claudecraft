@@ -1224,12 +1224,13 @@ export class FakeWocMarketDb implements WocMarketDb {
 
   /** Mirrors the real UPDATE: narrowed to pending_bond, idempotent on the same
    *  signature, and refusing one already recorded against a DIFFERENT bid (the
-   *  unique index's 23505). */
+   *  unique index's 23505). Success returns the STAMPED first-arrival moment
+   *  (the RETURNING mirror), the caller's extension anchor. */
   async submitBondSignature(
     bidId: number,
     signature: string,
     nowMs: number,
-  ): Promise<'recorded' | 'not_pending' | 'signature_reused'> {
+  ): Promise<{ signatureAtMs: number } | 'not_pending' | 'signature_reused'> {
     for (const [id, other] of this.bids) {
       if (id !== bidId && other.bondSignature === signature) return 'signature_reused';
     }
@@ -1239,7 +1240,7 @@ export class FakeWocMarketDb implements WocMarketDb {
     bid.bondSignature = signature;
     // COALESCE mirror: the first recording moment wins across resubmits.
     bid.bondSignatureAtMs = bid.bondSignatureAtMs ?? nowMs;
-    return 'recorded';
+    return { signatureAtMs: bid.bondSignatureAtMs };
   }
 
   async confirmingBonds(
@@ -1275,7 +1276,9 @@ export class FakeWocMarketDb implements WocMarketDb {
 
   async lapseBid(bidId: number): Promise<void> {
     const bid = this.bids.get(bidId);
-    if (!bid || bid.status !== 'pending_bond') return;
+    // The held carve-out mirror: a held bond never voids on a late
+    // contradictory verdict (see PgWocMarketDb.lapseBid).
+    if (!bid || bid.status !== 'pending_bond' || bid.bondState !== 'pending') return;
     bid.status = 'lapsed';
     bid.bondState = 'void';
   }

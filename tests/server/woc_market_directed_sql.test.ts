@@ -231,17 +231,23 @@ describe('the bond finality queue, in SQL', () => {
     // Idempotent on a retry of the SAME signature, so a client re-send is not
     // mistaken for a reuse.
     expect(text).toContain('bond_signature IS NULL OR bond_signature = $2');
+    // RETURNING hands back the FIRST recording moment: the caller's extension
+    // anchor, so a resubmit cannot re-anchor on a fresh clock.
+    expect(text).toContain('RETURNING bond_signature_at');
   });
 
-  it('lapses a decided-against bond only while it is still pending', async () => {
+  it('lapses a decided-against bond only while it is still pending AND unheld', async () => {
     // A bid that activated in the meantime must not be torn down by a late
-    // verdict arriving after the fact.
+    // verdict arriving after the fact, and a HELD bond (settled verdict whose
+    // activation is retrying) must never void on a reorg-flipped verdict: a
+    // voided held bond strands money where no refund arm reads.
     const { pool, sql } = recordingPool();
     await new PgWocMarketDb(pool).lapseBid(7);
     const [text] = sql();
     expect(text).toContain("status = 'lapsed'");
     expect(text).toContain("bond_state = 'void'");
     expect(text).toContain("status = 'pending_bond'");
+    expect(text).toContain("AND bond_state = 'pending'");
   });
 });
 
@@ -373,6 +379,45 @@ describe('the settlement guards ship their DDL (structural floor)', () => {
     expect([...OPEN_SETTLEMENT_STATES]).toEqual(states);
     expect(states).not.toContain('failed');
     expect(states).not.toContain('expired');
+  });
+
+  it('the cancel-intent paid probe reads exactly OPEN minus offered, under the idle bound', async () => {
+    // The probe's subset is a second spelling of the open-states list: pin
+    // the relationship (paid = OPEN without 'offered') so the two cannot
+    // drift apart, and pin that the cancel guard runs under BOTH transaction
+    // bounds now that the intent work added round trips inside its lock
+    // window.
+    const { pool, sql } = recordingTxPool((text) =>
+      text.includes('FROM woc_market_listings') && text.includes('FOR UPDATE')
+        ? {
+            rows: [
+              {
+                seller_account: 3,
+                status: 'active',
+                buy_now_lock_account: 9,
+                buy_now_lock_expires: new Date(2_000),
+              },
+            ],
+            rowCount: 1,
+          }
+        : text.includes('FROM woc_market_settlements') || text.includes('FROM woc_market_bids')
+          ? { rows: [], rowCount: 0 }
+          : undefined,
+    );
+    const out = await new PgWocMarketDb(pool).cancelListingIfUnbid('realm-1', 7, 3, 1_000);
+    expect(out).toBe('cancel_pending');
+    const paidProbe = sql().find((t) => t.includes('FROM woc_market_settlements'));
+    expect(paidProbe).toContain(
+      "state IN ('confirming', 'review', 'confirmed', 'delivering', 'delivered')",
+    );
+    const { OPEN_SETTLEMENT_STATES } = await import('./helpers/fake_woc_market_db');
+    expect(['offered', 'confirming', 'review', 'confirmed', 'delivering', 'delivered']).toEqual([
+      ...OPEN_SETTLEMENT_STATES,
+    ]);
+    expect(sql().some((t) => t.includes('SET LOCAL lock_timeout'))).toBe(true);
+    expect(
+      sql().some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout = 500')),
+    ).toBe(true);
   });
 
   it('the settlements state CHECK evolves in place and carries review', async () => {
@@ -856,8 +901,10 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
             : undefined,
     );
     await new PgWocMarketDb(claim.pool).claimBuyNowLock(REALM, 7, 3, 1_000, 2_000);
+    // The literal 500 pins GUARD_IDLE_TX_TIMEOUT_MS itself: a retune must be
+    // a deliberate edit here, not a silent constant change.
     expect(
-      claim.sql().some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout')),
+      claim.sql().some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout = 500')),
       'claimBuyNowLock',
     ).toBe(true);
     const extend = recordingTxPool((text) =>
@@ -867,13 +914,13 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
     );
     await new PgWocMarketDb(extend.pool).extendAuctionForBondProgress(REALM, 7, () => null);
     expect(
-      extend.sql().some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout')),
+      extend.sql().some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout = 500')),
       'extendAuctionForBondProgress',
     ).toBe(true);
     const converge = recordingTxPool();
     await new PgWocMarketDb(converge.pool).closeCancelPendingListing(REALM, 7, 1_000);
     expect(
-      converge.sql().some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout')),
+      converge.sql().some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout = 500')),
       'closeCancelPendingListing',
     ).toBe(true);
   });
@@ -973,8 +1020,10 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
     expect(schema).toContain('DROP INDEX IF EXISTS woc_market_listings_cancel_pending');
     expect(schema).toContain('ADD COLUMN IF NOT EXISTS bond_signature_at');
     expect(schema).toContain('ADD COLUMN IF NOT EXISTS poll_parked_at');
+    // The WHERE predicate is part of the pin: predicate drift would quietly
+    // widen or empty the partial queue while the name and expression held.
     expect(schema).toContain(
-      'CREATE INDEX IF NOT EXISTS woc_market_bids_bond_confirming_rotation ON woc_market_bids(realm, (COALESCE(poll_parked_at, placed_at)))',
+      "CREATE INDEX IF NOT EXISTS woc_market_bids_bond_confirming_rotation ON woc_market_bids(realm, (COALESCE(poll_parked_at, placed_at))) WHERE status = 'pending_bond' AND bond_signature IS NOT NULL",
     );
   });
 });
@@ -1242,9 +1291,13 @@ describe('the stuck-custody readout saturates, in SQL', () => {
     expect(params()[6]).toEqual([REALM, 20]);
     expect(params()[7]).toEqual([REALM]);
     // Stuck bonds: the confirming-set predicate (matching its partial index)
-    // plus the caller's bond age cutoff.
+    // plus the caller's bond age cutoff, aged on the SIGNATURE recording
+    // (placed_at only for legacy rows): the same axis the poll park uses, so
+    // the readout reports on the mechanism it describes.
     expect(samples[4]).toContain("status = 'pending_bond' AND bond_signature IS NOT NULL");
-    expect(samples[4]).toContain('placed_at <= to_timestamp($2 / 1000.0)');
+    expect(samples[4]).toContain(
+      'COALESCE(bond_signature_at, placed_at) <= to_timestamp($2 / 1000.0)',
+    );
     expect(params()[8]).toEqual([REALM, 1_000, 20]);
     expect(params()[9]).toEqual([REALM, 1_000]);
   });

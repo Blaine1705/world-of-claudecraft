@@ -40,6 +40,7 @@ import {
   settlementCustodyRef,
   WOC_MARKET_ANTI_SNIPE_CAP_SECONDS,
   WOC_MARKET_ANTI_SNIPE_EXTENSION_SECONDS,
+  WOC_MARKET_ANTI_SNIPE_WINDOW_SECONDS,
   WOC_MARKET_BOND_PENDING_TTL_SECONDS,
   WOC_MARKET_BUY_NOW_LOCK_SECONDS,
   WOC_MARKET_MAX_ACTIVE_LISTINGS,
@@ -1022,9 +1023,9 @@ describe('placeBid', () => {
       }),
       'placeBid',
     );
-    expect(await h.db.submitBondSignature(placed.bid.id, 'sig-awaiting-verdict', h.now())).toBe(
-      'recorded',
-    );
+    expect(await h.db.submitBondSignature(placed.bid.id, 'sig-awaiting-verdict', h.now())).toEqual({
+      signatureAtMs: h.now(),
+    });
     expect(await h.service.abandonBid(BUYER_A, placed.bid.id)).toEqual({
       ok: false,
       reason: 'confirm_in_flight',
@@ -1469,8 +1470,9 @@ describe('anti-snipe extension', () => {
     h.setNow(confirmAt);
     // Still inside the anti-snipe window, so a fired extension WOULD move the
     // close (the vacuity trap: a close outside the window nulls the math and
-    // proves nothing).
-    expect(listing.endsAtMs - confirmAt).toBeLessThan(120_000);
+    // proves nothing). The guard reads the REAL window constant so a shrunk
+    // window cannot quietly hollow it out.
+    expect(listing.endsAtMs - confirmAt).toBeLessThan(WOC_MARKET_ANTI_SNIPE_WINDOW_SECONDS * 1000);
     expect(await h.service.confirmBond(BUYER_A, placed.bid.id, 'sig-refused-gate')).toEqual({
       ok: false,
       reason: 'confirm_failed',
@@ -1507,6 +1509,45 @@ describe('anti-snipe extension', () => {
     const row = await getListing(h, listing.id);
     expect(row.endsAtMs).toBe(confirmAt + WOC_MARKET_ANTI_SNIPE_EXTENSION_SECONDS * 1000);
     expect(row.baseEndsAtMs).toBe(listing.endsAtMs);
+  });
+
+  it('a re-posted pending signature cannot creep the close past its first anchor', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const bidAt = listing.endsAtMs - 60_000;
+    h.setNow(bidAt);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const pendingChain = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        confirm: async () => ({ settled: false, pending: true, reason: null }),
+      },
+    });
+    const firstAt = listing.endsAtMs - 30_000;
+    h.setNow(firstAt);
+    unwrap(await pendingChain.confirmBond(BUYER_A, placed.bid.id, 'sig-creep'), 'confirmBond');
+    expect((await getListing(h, listing.id)).endsAtMs).toBe(
+      firstAt + WOC_MARKET_ANTI_SNIPE_EXTENSION_SECONDS * 1000,
+    );
+    // A minute later the SAME string is re-posted, verdict still pending.
+    // The extension anchors on the FIRST recording (the submit returns it),
+    // so the close does not move again: a fresh-clock anchor per resubmit
+    // let one pending-forever signature hold the close at now plus the
+    // extension continuously to the cap.
+    h.setNow(firstAt + 60_000);
+    unwrap(await pendingChain.confirmBond(BUYER_A, placed.bid.id, 'sig-creep'), 'confirmBond');
+    expect((await getListing(h, listing.id)).endsAtMs).toBe(
+      firstAt + WOC_MARKET_ANTI_SNIPE_EXTENSION_SECONDS * 1000,
+    );
   });
 
   it('extensions never push the close past baseEndsAtMs plus the cap', async () => {
@@ -2086,6 +2127,80 @@ describe('settlement quote expiry and signature reuse', () => {
       'confirmSettlement',
     );
     expect(settled.state).toBe('delivered');
+  });
+
+  it('a same-signature retry on a confirming settlement re-asks the chain instead of refusing', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    h.setNow(listing.endsAtMs + 1);
+    await h.service.sweepPass();
+    const settlement = await liveSettlement(h, listing.id);
+    unwrap(await h.service.settlementQuote(BUYER_A, settlement.id), 'settlementQuote');
+    const pendingChain = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        confirm: async () => ({ settled: false, pending: true, reason: null }),
+      },
+    });
+    // Spy on the recording write: the retry must SKIP it (nothing new to
+    // record, and re-stamping updated_at would push out the confirming-age
+    // review bound, re-opening the unbounded hold it exists to close).
+    const record = h.db.submitSettlementSignature.bind(h.db);
+    let recordings = 0;
+    h.db.submitSettlementSignature = async (id: number, sig: string) => {
+      recordings++;
+      return record(id, sig);
+    };
+    const first = unwrap(
+      await pendingChain.confirmSettlement(BUYER_A, settlement.id, 'sig-retry-settle'),
+      'confirmSettlement',
+    );
+    expect(first.state).toBe('confirming');
+    // The network-blip retry: same signature, still undecided. The old
+    // offered-only precondition refused this as not_active, stranding the
+    // buyer behind a false dead-row verdict while their payment confirmed.
+    const retry = unwrap(
+      await pendingChain.confirmSettlement(BUYER_A, settlement.id, 'sig-retry-settle'),
+      'confirmSettlement',
+    );
+    expect(retry.state).toBe('confirming');
+    expect(recordings).toBe(1);
+    // The decided verdict completes the SAME retry path end to end.
+    const done = unwrap(
+      await h.service.confirmSettlement(BUYER_A, settlement.id, 'sig-retry-settle'),
+      'confirmSettlement',
+    );
+    expect(done.state).toBe('delivered');
+  });
+
+  it('a DIFFERENT signature on a confirming settlement refuses typed, never as a dead row', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    h.setNow(listing.endsAtMs + 1);
+    await h.service.sweepPass();
+    const settlement = await liveSettlement(h, listing.id);
+    unwrap(await h.service.settlementQuote(BUYER_A, settlement.id), 'settlementQuote');
+    const pendingChain = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        confirm: async () => ({ settled: false, pending: true, reason: null }),
+      },
+    });
+    unwrap(
+      await pendingChain.confirmSettlement(BUYER_A, settlement.id, 'sig-in-flight'),
+      'confirmSettlement',
+    );
+    // The bond leg's rule on this leg: 'not_active' misread a live confirming
+    // row as gone; the honest refusal is that a payment is being decided.
+    const res = await pendingChain.confirmSettlement(BUYER_A, settlement.id, 'sig-usurper');
+    expect(res).toEqual({ ok: false, reason: 'confirm_in_flight' });
+    const after = await getSettlement(h, settlement.id);
+    expect(after.state).toBe('confirming');
+    expect(after.txSignature).toBe('sig-in-flight');
   });
 
   it('refuses signature_reused when one transfer is replayed on a second settlement', async () => {
