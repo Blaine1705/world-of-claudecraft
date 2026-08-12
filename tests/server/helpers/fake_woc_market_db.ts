@@ -1112,6 +1112,9 @@ export class FakeWocMarketDb implements WocMarketDb {
     // The Pg method expires 'failed' rows then rolls the expiry back via
     // TxAbort when the open check trips; single-threaded, check-then-expire
     // is observably identical (the cancelListingIfUnbid fake's rationale).
+    // That equivalence DEPENDS on 'failed' staying outside
+    // OPEN_SETTLEMENT_STATES: if that set ever gained 'failed', Pg would
+    // expire-and-proceed where this skips, silently.
     for (const s of this.settlements.values()) {
       if (s.listingId === id && OPEN_SETTLEMENT_STATES.includes(s.state)) return 'skip';
     }
@@ -1194,6 +1197,7 @@ export class FakeWocMarketDb implements WocMarketDb {
       bondReference: null,
       bondQuoteExpiresAtMs: null,
       bondSignature: null,
+      bondSignatureAtMs: null,
       placedAtMs: args.nowMs,
     };
     this.bids.set(id, rec);
@@ -1224,6 +1228,7 @@ export class FakeWocMarketDb implements WocMarketDb {
   async submitBondSignature(
     bidId: number,
     signature: string,
+    nowMs: number,
   ): Promise<'recorded' | 'not_pending' | 'signature_reused'> {
     for (const [id, other] of this.bids) {
       if (id !== bidId && other.bondSignature === signature) return 'signature_reused';
@@ -1232,6 +1237,8 @@ export class FakeWocMarketDb implements WocMarketDb {
     if (!bid || bid.status !== 'pending_bond') return 'not_pending';
     if (bid.bondSignature !== null && bid.bondSignature !== signature) return 'not_pending';
     bid.bondSignature = signature;
+    // COALESCE mirror: the first recording moment wins across resubmits.
+    bid.bondSignatureAtMs = bid.bondSignatureAtMs ?? nowMs;
     return 'recorded';
   }
 
@@ -1241,7 +1248,8 @@ export class FakeWocMarketDb implements WocMarketDb {
     excludeIds: readonly number[],
   ): Promise<WocBidRow[]> {
     // Mirrors the Pg rotation order (COALESCE(poll_parked_at, placed_at))
-    // and the caller's backoff exclusion.
+    // and the caller's backoff exclusion. The id tiebreak is the fake's own
+    // determinism aid; the Pg ORDER BY has none (ties are planner order).
     const excluded = new Set(excludeIds);
     return [...this.bids.values()]
       .filter(

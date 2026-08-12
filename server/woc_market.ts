@@ -31,6 +31,7 @@ import {
   strikeSuspensionMs,
   validListingParams,
   WOC_MARKET_BOND_PENDING_TTL_SECONDS,
+  WOC_MARKET_BOND_POLL_PARK_SECONDS,
   WOC_MARKET_BUY_NOW_LOCK_SECONDS,
   WOC_MARKET_CONFIRM_UNAVAILABLE_REASON,
   WOC_MARKET_DIRECTED_OFFER_TTL_SECONDS,
@@ -162,6 +163,9 @@ export interface WocBidRow {
   /** The signature the bidder handed back, recorded before the chain decides so
    *  an undecided bond can be re-checked instead of refused. */
   bondSignature: string | null;
+  /** When the signature was recorded (null on legacy rows: age falls back
+   *  to placedAtMs). The poll park axis and nothing else. */
+  bondSignatureAtMs: number | null;
   placedAtMs: number;
 }
 
@@ -537,10 +541,12 @@ export interface WocMarketDb {
   /** CAS: applies only to an unpaid quote (status pending_bond AND no
    *  recorded signature); false = nothing written. See PgWocMarketDb. */
   setBidBondQuote(bidId: number, reference: string, expiresAtMs: number): Promise<boolean>;
-  /** Record the bidder's signature while the chain is still deciding. */
+  /** Record the bidder's signature while the chain is still deciding;
+   *  nowMs stamps bond_signature_at (first recording wins). */
   submitBondSignature(
     bidId: number,
     signature: string,
+    nowMs: number,
   ): Promise<'recorded' | 'not_pending' | 'signature_reused'>;
   /** Paid-but-undecided bonds, for the sweep to re-check, on the poll
    *  rotation order; excludeIds are the caller's backing-off parked rows. */
@@ -1794,7 +1800,12 @@ export class WocMarketService {
     // no ledger trace was exactly the loss that cost a real settlement its
     // money. The row lands in the confirming set instead, and the chain's
     // verdict (here or on the poll) decides between completion and lapse.
-    const submitted = await this.deps.db.submitBondSignature(bid.id, signature);
+    // The submission moment: the extension ANCHOR (captured BEFORE the chain
+    // round trip, or the target drifts with RPC latency and a slow confirm
+    // pushes the anchor past the close, nulling the extension the settled
+    // arm depends on) and the poll park axis (bond_signature_at).
+    const progressAtMs = this.now();
+    const submitted = await this.deps.db.submitBondSignature(bid.id, signature, progressAtMs);
     if (submitted === 'not_pending') return refuse('not_pending');
     if (submitted === 'signature_reused') return refuse('signature_reused');
     const confirmed = await this.deps.economy.confirm(bid.bondReference, signature);
@@ -1806,10 +1817,9 @@ export class WocMarketService {
     // durable, and a contended extension only fails toward a shorter
     // auction, so it must never turn a recorded payment into a refusal.
     const extend = async (): Promise<void> => {
-      const nowMs = this.now();
       await this.deps.db
         .extendAuctionForBondProgress(this.cfg.realm, bid.listingId, (row) =>
-          antiSnipeExtendedEndMs(nowMs, row.endsAtMs, row.baseEndsAtMs),
+          antiSnipeExtendedEndMs(progressAtMs, row.endsAtMs, row.baseEndsAtMs),
         )
         .catch(() => {});
     };
@@ -1876,15 +1886,20 @@ export class WocMarketService {
           .confirm(bid.bondReference, bid.bondSignature)
           .catch(() => null);
         if (!confirmed || confirmed.pending) {
-          // Undecided. YOUNG bonds (inside the pending TTL, the normal
-          // finality window) keep the full poll cadence; a bond the chain
+          // Undecided. YOUNG bonds (inside the park window, the normal
+          // finality span) keep the full poll cadence; a bond the chain
           // still has not decided past it rotates to the poll tail with an
           // in-process backoff, so a standing set of never-decided
           // signatures (a fabricated one, a service that answers pending
           // forever) cannot occupy the batch head and starve fresh bonds.
-          // Rotation only: the money policy is untouched (no automatic
-          // void; the stuckBonds readout carries the visibility).
-          if (nowMs - bid.placedAtMs > WOC_MARKET_BOND_PENDING_TTL_SECONDS * 1000) {
+          // Aged from the SIGNATURE recording (placed_at only for legacy
+          // rows): placement age says nothing about how long the chain has
+          // had the transfer, and a bidder who signs late in their window
+          // must not be parked twenty seconds after submitting. Rotation
+          // only: the money policy is untouched (no automatic void; the
+          // stuckBonds readout carries the visibility).
+          const signedAtMs = bid.bondSignatureAtMs ?? bid.placedAtMs;
+          if (nowMs - signedAtMs > WOC_MARKET_BOND_POLL_PARK_SECONDS * 1000) {
             this.parkedBondPolls.set(bid.id, nowMs + WocMarketService.PARK_RETRY_MS);
             await this.deps.db.touchBidPollRow(bid.id);
           }

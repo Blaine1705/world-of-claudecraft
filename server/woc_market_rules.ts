@@ -23,6 +23,11 @@ export const WOC_MARKET_QUOTE_TTL_SECONDS = 90;
 export const WOC_MARKET_SETTLEMENT_WINDOW_SECONDS = 600;
 /** A bid whose bond is not confirmed within this window lapses. */
 export const WOC_MARKET_BOND_PENDING_TTL_SECONDS = 300;
+/** How long the chain may leave a SIGNED bond undecided (aged from the
+ *  signature recording) before the poll parks it into the 60s rotation. Its
+ *  own knob, deliberately not the lapse TTL above: changing the unsigned
+ *  lapse deadline must not silently retune poll cadence. */
+export const WOC_MARKET_BOND_POLL_PARK_SECONDS = 300;
 /** Bid bond: 5% of the bid, clamped to $1 .. $50, never above the bid. */
 export const WOC_MARKET_BOND_RATE_BPS = 500;
 export const WOC_MARKET_BOND_MIN_CENTS = 100;
@@ -107,18 +112,21 @@ export const WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS = 3600;
 export const WOC_MARKET_CONFIRM_UNAVAILABLE_REASON = 'service_unavailable';
 /**
  * Refusal classes that EXEMPT an expired buy-now window from the abandon
- * ledger. Deliberately NOT "any recorded signature": a signature proves only
- * that a string was POSTED (one fabricated request would bypass the whole
- * cooldown arm), so the exemption keys on the refusal class instead:
- * 'quote_expired' (the transfer may have landed late, real money) and the
- * infrastructure verdict above. Every OTHER refusal (unknown reference, bad
- * signature, a plain refusal) records: an honest wallet that fails before
- * broadcast posts no signature at all, so those classes are the griefer's
- * vector, not the honest buyer's. Scoped to the service's reason vocabulary:
- * ruling R5 / the verifier work must keep these two strings stable.
+ * ledger. Deliberately NOT "any recorded signature" (a signature proves only
+ * that a string was POSTED; one fabricated request would bypass the whole
+ * cooldown arm), and deliberately NOT 'quote_expired' either: that verdict
+ * is ATTACKER-MINTABLE by waiting out the 90s quote TTL and posting any
+ * string (the signature-first intake records it, the service answers
+ * quote_expired, and the wait costs a griefer nothing since burning the
+ * window is the point). Only the infrastructure verdict remains: a real
+ * outage is not mintable on demand. The cost is that a genuinely late honest
+ * buyer eats ONE recoverable abandon row (a 30-minute block on that listing,
+ * one of three hourly slots); the alternative was a cooldown arm any griefer
+ * bypassed unconditionally. Restoring a late-payment exemption requires a
+ * verdict that distinguishes a real transfer from a posted string: ruling
+ * R5 / the verifier work owns that, and must keep this string stable.
  */
 export const WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS = [
-  'quote_expired',
   WOC_MARKET_CONFIRM_UNAVAILABLE_REASON,
 ] as const;
 /** How long a listing may sit mid-resolution before the sweep reclaims it. */

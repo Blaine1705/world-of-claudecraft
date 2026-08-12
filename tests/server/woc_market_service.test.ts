@@ -1022,7 +1022,9 @@ describe('placeBid', () => {
       }),
       'placeBid',
     );
-    expect(await h.db.submitBondSignature(placed.bid.id, 'sig-awaiting-verdict')).toBe('recorded');
+    expect(await h.db.submitBondSignature(placed.bid.id, 'sig-awaiting-verdict', h.now())).toBe(
+      'recorded',
+    );
     expect(await h.service.abandonBid(BUYER_A, placed.bid.id)).toEqual({
       ok: false,
       reason: 'confirm_in_flight',
@@ -1682,10 +1684,15 @@ describe('buy-now claim cooldown', () => {
       ).toBeNull();
       return h.db.buyNowAbandons.length;
     };
-    // quote_expired: the transfer may have LANDED late, real money; exempt.
-    expect(await play('quote_expired')).toBe(0);
-    // service_unavailable: an infrastructure verdict, not the buyer's; exempt.
+    // service_unavailable: an infrastructure verdict, not mintable on
+    // demand; exempt.
     expect(await play('service_unavailable')).toBe(0);
+    // quote_expired RECORDS: that verdict is attacker-mintable by waiting
+    // out the 90s quote TTL and posting any string (the signature-first
+    // intake records it), so exempting it re-opened the loop. The genuinely
+    // late honest buyer eats one recoverable abandon row until R5 provides
+    // a chain-true verdict.
+    expect(await play('quote_expired')).toBe(1);
     // A plain refusal (a fabricated or unknown signature): RECORDS, closing
     // the griefer's one-request bypass.
     expect(await play('refused')).toBe(1);

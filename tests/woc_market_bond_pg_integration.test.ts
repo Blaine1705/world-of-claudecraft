@@ -248,11 +248,12 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       `INSERT INTO woc_market_bids (
          listing_id, realm, account, character_id, character_name, wallet,
          amount_cents, status, bond_cents, bond_state, placed_at,
-         bond_reference, bond_signature, bond_quote_expires
+         bond_reference, bond_signature, bond_quote_expires, bond_signature_at
        ) VALUES (
          $1, $2, $3, $4, $5, $6, $7, $8, 70, $9, to_timestamp($10 / 1000.0),
          $11, $12,
-         CASE WHEN $13::bigint IS NULL THEN NULL ELSE to_timestamp($13::bigint / 1000.0) END
+         CASE WHEN $13::bigint IS NULL THEN NULL ELSE to_timestamp($13::bigint / 1000.0) END,
+         CASE WHEN $12::text IS NULL THEN NULL ELSE to_timestamp($10 / 1000.0) END
        ) RETURNING id`,
       [
         listingId,
@@ -988,10 +989,11 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
         lockAccount: holder,
         lockExpiresAtMs,
       });
-      // The holder TRIED: their expired window carries a signature and a
-      // chain-plausible refusal (quote_expired), already expired by the
-      // sweep. The rival's steal must not stamp them (the sibling recorder
-      // used to have no exemption at all).
+      // The holder TRIED during an OUTAGE: their expired window carries a
+      // signature and the infrastructure verdict (the one exempt class:
+      // quote_expired was removed as attacker-mintable), already expired by
+      // the sweep. The rival's steal must not stamp them (the sibling
+      // recorder used to have no exemption at all).
       const settlement = await marketDb.insertSettlement({
         listingId,
         bidId: null,
@@ -1007,9 +1009,9 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       if (typeof settlement === 'string') throw new Error(`fixture settlement: ${settlement}`);
       await pool.query(
         `UPDATE woc_market_settlements
-            SET state = 'expired', tx_signature = $2, fail_reason = 'quote_expired'
+            SET state = 'expired', tx_signature = $2, fail_reason = 'service_unavailable'
           WHERE id = $1`,
-        [settlement.id, `steal-exempt-${seq}`],
+        [settlement.id, `steal-exempt-`],
       );
       const stolen = await marketDb.claimBuyNowLock(
         realm,

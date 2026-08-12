@@ -668,6 +668,7 @@ describe('the bid view: bond confirmation is visible to the bidder', () => {
       bondReference: 'bond-ref-1',
       bondQuoteExpiresAtMs: FAR_FUTURE_MS,
       bondSignature: null,
+      bondSignatureAtMs: null,
       placedAtMs: 1_799_000_000_000,
       ...over,
     };

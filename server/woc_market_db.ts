@@ -173,10 +173,15 @@ ALTER TABLE woc_market_listings
 -- whose buyer PAID skips every pass until that settlement resolves, which
 -- can be operator-scale time; rotation plus the caller's backoff exclusion
 -- is what keeps a standing skip set from occupying the batch head forever,
--- the delivering/undisposed arms' seam).
-CREATE INDEX IF NOT EXISTS woc_market_listings_cancel_pending
+-- the delivering/undisposed arms' seam). _rotation REPLACES the short-lived
+-- (realm, id) shape that briefly shipped under the _cancel_pending name:
+-- IF NOT EXISTS matches on NAME only, so an in-place redefinition would
+-- leave any database that booted the old shape sorting forever (this
+-- file's own predicate-change rule).
+CREATE INDEX IF NOT EXISTS woc_market_listings_cancel_rotation
   ON woc_market_listings(realm, (COALESCE(sweep_parked_at, updated_at)))
   WHERE cancel_requested_at IS NOT NULL AND status = 'active';
+DROP INDEX IF EXISTS woc_market_listings_cancel_pending;
 
 -- The abandon ledger (the ruling's first arm): one row per abandoned public
 -- buy-now lock window, keyed by the lock instance (lock_expires) so the two
@@ -241,6 +246,13 @@ CREATE INDEX IF NOT EXISTS woc_market_bids_pending
 -- one thing, and a replayed signature must not fund a second bond.
 ALTER TABLE woc_market_bids
   ADD COLUMN IF NOT EXISTS bond_signature TEXT;
+-- WHEN the signature was recorded: the bond poll's park threshold ages on
+-- this (falling back to placed_at for legacy rows), because placement age
+-- says nothing about how long the CHAIN has had the transfer: a bidder who
+-- signs late in their window must still get the full poll cadence for
+-- finality, not an instant park.
+ALTER TABLE woc_market_bids
+  ADD COLUMN IF NOT EXISTS bond_signature_at TIMESTAMPTZ;
 CREATE UNIQUE INDEX IF NOT EXISTS woc_market_bids_bond_signature
   ON woc_market_bids(bond_signature)
   WHERE bond_signature IS NOT NULL;
@@ -677,13 +689,15 @@ const BOND_POLL_ROTATION_ORDER = 'COALESCE(poll_parked_at, placed_at)';
 
 /** ONE abandon-recording statement for BOTH recorders (the overdue sweep and
  *  the steal arm), so their exempt predicate can never disagree. The NOT
- *  EXISTS refuses the window when its settlement's refusal class says the
- *  chain plausibly saw money (WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS: a
- *  late-landing quote_expired, or an infrastructure verdict); a bare
- *  signature deliberately does NOT exempt, or one fabricated request would
- *  bypass the whole cooldown arm. Window key: deadline_at IS the lock
- *  expiry (buyNow sets them equal), and the unique index dedupes the two
- *  recorders. Params: $1 realm, $2 listing, $3 account, $4 lockExpiresMs. */
+ *  EXISTS refuses the window only for a refusal class that is NOT mintable
+ *  on demand (WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS, currently the
+ *  infrastructure verdict alone; the rules constant carries the full
+ *  rationale incl. why quote_expired and bare signatures do NOT exempt).
+ *  The list rides a BOUND parameter ($5), never interpolation, so a future
+ *  reason string cannot break or inject. Window key: deadline_at IS the
+ *  lock expiry (buyNow sets them equal), and the unique index dedupes the
+ *  two recorders. Params: $1 realm, $2 listing, $3 account,
+ *  $4 lockExpiresMs, $5 the exempt reason list. */
 const RECORD_ABANDON_SQL = `INSERT INTO woc_market_buy_now_abandons (realm, listing_id, account, lock_expires)
  SELECT $1, $2, $3, to_timestamp($4 / 1000.0)
   WHERE NOT EXISTS (
@@ -691,14 +705,14 @@ const RECORD_ABANDON_SQL = `INSERT INTO woc_market_buy_now_abandons (realm, list
      WHERE s.listing_id = $2 AND s.buyer_account = $3
        AND s.deadline_at = to_timestamp($4 / 1000.0)
        AND s.tx_signature IS NOT NULL
-       AND s.fail_reason = ANY(ARRAY[${WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS.map(
-         (r) => `'${r}'`,
-       ).join(', ')}]))
+       AND s.fail_reason = ANY($5::text[]))
  ON CONFLICT (listing_id, account, lock_expires) DO NOTHING`;
+const ABANDON_EXEMPT_REASONS: readonly string[] = WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS;
 
 const BID_COLS =
   'id, listing_id, account, character_id, character_name, wallet, amount_cents, status, ' +
-  'bond_cents, bond_state, bond_reference, bond_quote_expires, bond_signature, placed_at';
+  'bond_cents, bond_state, bond_reference, bond_quote_expires, bond_signature, ' +
+  'bond_signature_at, placed_at';
 
 const SETTLEMENT_COLS =
   'id, listing_id, bid_id, attempt, buyer_account, buyer_character, buyer_name, buyer_wallet, ' +
@@ -786,6 +800,7 @@ function toBid(row: Row): WocBidRow {
     bondReference: row.bond_reference ?? null,
     bondQuoteExpiresAtMs: msOrNull(row.bond_quote_expires),
     bondSignature: row.bond_signature ?? null,
+    bondSignatureAtMs: msOrNull(row.bond_signature_at),
     placedAtMs: ms(row.placed_at),
   };
 }
@@ -2101,13 +2116,25 @@ export class PgWocMarketDb implements WocMarketDb {
       );
       return (open.rowCount ?? 0) > 0;
     };
-    const peek = await this.pool.query(
-      `SELECT ${LISTING_COLS} FROM woc_market_listings WHERE realm = $1 AND id = $2`,
-      [realm, id],
-    );
-    const advisory = diagnose(peek.rows[0]);
-    if (advisory !== null) return advisory;
-    if (await openSettlement(this.pool)) return 'locked' as const;
+    // The advisory reads share the transaction path's contention mapping: a
+    // plain SELECT can still block on boot DDL's AccessExclusive hold, and
+    // an asymmetric raw throw here would 500 exactly the callers the
+    // lock-free path exists to protect. Note the advisory pass answers six
+    // of the SEVEN refusals; claim_cooldown is deliberately excluded (the
+    // steal-time recording it depends on must be authoritative), so a
+    // cooled-down claimer does pay the transaction cost.
+    try {
+      const peek = await this.pool.query(
+        `SELECT ${LISTING_COLS} FROM woc_market_listings WHERE realm = $1 AND id = $2`,
+        [realm, id],
+      );
+      const advisory = diagnose(peek.rows[0]);
+      if (advisory !== null) return advisory;
+      if (await openSettlement(this.pool)) return 'locked' as const;
+    } catch (err) {
+      if (isLockContention(err)) return 'contended' as const;
+      throw err;
+    }
     try {
       return await this.withTx(async (client) => {
         await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
@@ -2148,6 +2175,7 @@ export class PgWocMarketDb implements WocMarketDb {
             id,
             row.buy_now_lock_account,
             ms(row.buy_now_lock_expires),
+            ABANDON_EXEMPT_REASONS,
           ]);
         }
         // The two cooldown guards, CLAIMER-scoped and public-only (a directed
@@ -2220,12 +2248,18 @@ export class PgWocMarketDb implements WocMarketDb {
     account: number,
     lockExpiresAtMs: number,
   ): Promise<void> {
-    await this.pool.query(RECORD_ABANDON_SQL, [realm, listingId, account, lockExpiresAtMs]);
+    await this.pool.query(RECORD_ABANDON_SQL, [
+      realm,
+      listingId,
+      account,
+      lockExpiresAtMs,
+      ABANDON_EXEMPT_REASONS,
+    ]);
   }
 
   /** The cancel-intent converge read: stamped, still-active listings whose
    *  lock window has ended (expired or cleared). Served by the partial
-   *  woc_market_listings_cancel_pending index on the shared rotation order;
+   *  woc_market_listings_cancel_rotation index on the shared rotation order;
    *  excludeIds are the caller's backing-off skipped rows (a paid window
    *  converges through settlement, not here, so its listing would otherwise
    *  head the batch every pass until that settlement resolves). */
@@ -2481,13 +2515,19 @@ export class PgWocMarketDb implements WocMarketDb {
   async submitBondSignature(
     bidId: number,
     signature: string,
+    nowMs: number,
   ): Promise<'recorded' | 'not_pending' | 'signature_reused'> {
     try {
+      // COALESCE: an idempotent resubmission of the same signature keeps the
+      // FIRST recording moment (the poll park axis and the extension anchor
+      // both mean "when the payment claim arrived", not "the latest retry").
       const res = await this.pool.query(
-        `UPDATE woc_market_bids SET bond_signature = $2
+        `UPDATE woc_market_bids
+            SET bond_signature = $2,
+                bond_signature_at = COALESCE(bond_signature_at, to_timestamp($3 / 1000.0))
           WHERE id = $1 AND status = 'pending_bond'
             AND (bond_signature IS NULL OR bond_signature = $2)`,
-        [bidId, signature],
+        [bidId, signature, nowMs],
       );
       return (res.rowCount ?? 0) > 0 ? 'recorded' : 'not_pending';
     } catch (err) {

@@ -225,7 +225,7 @@ describe('the bond finality queue, in SQL', () => {
 
   it('records a signature only against a still-pending bid', async () => {
     const { pool, sql } = recordingPool();
-    await new PgWocMarketDb(pool).submitBondSignature(7, 'sig');
+    await new PgWocMarketDb(pool).submitBondSignature(7, 'sig', 1_000);
     const [text] = sql();
     expect(text).toContain("status = 'pending_bond'");
     // Idempotent on a retry of the SAME signature, so a client re-send is not
@@ -797,6 +797,38 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
     expect(quiet.sql()).toHaveLength(0);
   });
 
+  it('a refused claim opens NO transaction: the advisory refusal is lock-free', async () => {
+    // The db-lane P1 in one line: refusing under FOR UPDATE serialized every
+    // hopeful behind the holder while pinning a pooled client. A refused
+    // claim must never even BEGIN; a refactor re-inlining the diagnosis into
+    // the guard would stay green on every behavioral test but not this one.
+    const refused = recordingTxPool((text) =>
+      text.includes('FROM woc_market_listings')
+        ? {
+            rows: [
+              {
+                id: 7,
+                realm: REALM,
+                seller_account: 99,
+                status: 'active',
+                buy_now_cents: 1000,
+                cancel_requested_at: null,
+                buy_now_lock_account: 9,
+                buy_now_lock_expires: new Date(9_999_999_999_999),
+                directed_buyer_account: null,
+                item: {},
+              },
+            ],
+            rowCount: 1,
+          }
+        : undefined,
+    );
+    expect(await new PgWocMarketDb(refused.pool).claimBuyNowLock(REALM, 7, 3, 1_000, 2_000)).toBe(
+      'locked',
+    );
+    expect(refused.sql()).not.toContain('BEGIN');
+  });
+
   it('the new guard transactions bound their IDLE holds, not just their waits', async () => {
     // lock_timeout bounds how long a statement WAITS for a lock; only the
     // idle-in-transaction bound limits how long a stalled event loop HOLDS
@@ -857,7 +889,12 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
     const [recorderText] = viaRecorder.sql();
     expect(recorderText).toContain('WHERE NOT EXISTS');
     expect(recorderText).toContain('tx_signature IS NOT NULL');
-    expect(recorderText).toContain("ANY(ARRAY['quote_expired', 'service_unavailable'])");
+    // The exempt list rides a BOUND parameter (no interpolation), and its
+    // one member is the infrastructure verdict: quote_expired was removed
+    // as attacker-mintable (wait out the TTL, post any string), and a
+    // re-added member must consciously red this literal.
+    expect(recorderText).toContain('ANY($5::text[])');
+    expect(viaRecorder.params()[0]?.[4]).toEqual(['service_unavailable']);
     expect(recorderText).toContain('ON CONFLICT (listing_id, account, lock_expires) DO NOTHING');
     const deadLock = {
       id: 7,
@@ -927,9 +964,14 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
       'CREATE INDEX IF NOT EXISTS woc_market_buy_now_abandons_account ON woc_market_buy_now_abandons(account, lock_expires DESC)',
     );
     expect(schema).toContain('ADD COLUMN IF NOT EXISTS cancel_requested_at');
+    // _rotation replaced the short-lived (realm, id) shape that shipped under
+    // the _cancel_pending name: same-name redefinition is invisible to
+    // IF NOT EXISTS, so the swap needs the new name AND the old drop.
     expect(schema).toContain(
-      "CREATE INDEX IF NOT EXISTS woc_market_listings_cancel_pending ON woc_market_listings(realm, (COALESCE(sweep_parked_at, updated_at))) WHERE cancel_requested_at IS NOT NULL AND status = 'active'",
+      "CREATE INDEX IF NOT EXISTS woc_market_listings_cancel_rotation ON woc_market_listings(realm, (COALESCE(sweep_parked_at, updated_at))) WHERE cancel_requested_at IS NOT NULL AND status = 'active'",
     );
+    expect(schema).toContain('DROP INDEX IF EXISTS woc_market_listings_cancel_pending');
+    expect(schema).toContain('ADD COLUMN IF NOT EXISTS bond_signature_at');
     expect(schema).toContain('ADD COLUMN IF NOT EXISTS poll_parked_at');
     expect(schema).toContain(
       'CREATE INDEX IF NOT EXISTS woc_market_bids_bond_confirming_rotation ON woc_market_bids(realm, (COALESCE(poll_parked_at, placed_at)))',

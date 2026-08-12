@@ -531,9 +531,18 @@ Still open (a phase that hits one asks at session start):
     rotation column and partial index; confirmingBonds orders on
     COALESCE(poll_parked_at, placed_at) and takes the caller's backoff
     exclusion), so a standing never-decided set cannot occupy the batch
-    head; young confirming bonds keep the full 5s cadence. After a restart
-    the in-process backoff is empty but the rotation stamps persist, so the
-    first pass re-polls parked rows once and re-parks them.
+    head; young confirming bonds keep the full 5s cadence. The park AGES ON
+    THE SIGNATURE RECORDING (bond_signature_at, stamped by
+    submitBondSignature with the caller's clock, first recording wins;
+    legacy rows fall back to placed_at), on its own knob
+    (WOC_MARKET_BOND_POLL_PARK_SECONDS): placement age says nothing about
+    how long the chain has had the transfer, and a bidder signing late in
+    their window must not be parked seconds after submitting. After a
+    restart the in-process backoff is empty but the rotation stamps persist,
+    so the first pass re-polls parked rows once and re-parks them. The
+    anti-snipe extension anchors on the SAME submission moment (captured
+    before the chain round trip: anchoring after it drifted with RPC
+    latency and a slow confirm could null the settled arm's own extension).
   - Anti-snipe: insertPendingBid no longer extends (extendEndsToMs param
     GONE from the db seam and the fake); the one extension point is
     extendAuctionForBondProgress (listing-lock-only carve-out, best-effort:
@@ -567,16 +576,23 @@ Still open (a phase that hits one asks at session start):
     order kept). An OPEN settlement refuses the claim as 'locked' BEFORE any
     recording (a buy-now listing stays 'active' through confirming and
     delivery, so a rival's probe must never stamp a PAYING holder). BOTH
-    recorders run ONE shared statement (RECORD_ABANDON_SQL) whose exempt
-    predicate refuses a window only for a chain-plausible refusal class
-    (WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS = quote_expired,
-    service_unavailable; the round-2 security re-review: a bare posted
-    signature must NOT exempt, or one fabricated request bypasses the whole
-    cooldown arm). The failed-row expiry now PRESERVES fail_reason (offered
-    rows still stamp window_elapsed): ops note, an expired-from-failed row
-    reads its refusal reason, not window_elapsed. The exempt strings are a
-    wire-shaped coupling with the service's reason vocabulary (pinned
-    against the proxy; R5/phase 10 keeps them stable). The new guard
+    recorders run ONE shared statement (RECORD_ABANDON_SQL, exempt list as a
+    BOUND parameter) whose exempt predicate refuses a window only for a
+    refusal class that is NOT mintable on demand:
+    WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS = service_unavailable ONLY. The
+    round-2 security re-review removed the bare-signature exemption (one
+    fabricated request bypassed the arm); round 3 removed quote_expired too
+    (attacker-mintable: wait out the 90s TTL, post any string, the
+    signature-first intake records it and the service answers
+    quote_expired). Cost accepted: a genuinely late honest buyer eats ONE
+    recoverable abandon row. The failed-row expiry PRESERVES fail_reason
+    (offered rows still stamp window_elapsed): ops note, an
+    expired-from-failed row reads its refusal reason, not window_elapsed.
+    The exempt string is a wire-shaped coupling with the service's reason
+    vocabulary (pinned against the proxy); R5/phase 10 note, now THREE
+    dependents: bond residency, the extension gate, and restoring any
+    late-payment exemption, which is UNSOUND until a verdict can distinguish
+    a real transfer from a posted string. The new guard
     transactions bound idle-in-transaction holds (GUARD_IDLE_TX_TIMEOUT_MS);
     25P03 arrives ASYNCHRONOUSLY (the session is terminated, the SQLSTATE
     lands on the client error event or the next query depending on stall

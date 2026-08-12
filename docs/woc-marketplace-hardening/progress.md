@@ -139,6 +139,13 @@ applied):
   disagreeing in opposite directions). MEDIUM: the extension gate failed
   open on the proxy's pending+service_unavailable arm during outages; now
   gated on the shared reason constant.
+- Database round 3 (the lane's own verification of the 25P03 fix): PASS,
+  no open findings across the whole chain. Both stall shapes (async await
+  and a blocked event loop) measured returning the typed 'contended'
+  against the real withTx with ZERO uncaught exceptions, and the pool
+  counts confirm terminated clients are discarded, not returned. The lane
+  also corrected its own round-2 report: its probe had measured only the
+  async ordering; the coded-error preference covers both.
 - Database round 2 P1: the 25P03 arm was DEAD CODE (the SQLSTATE arrives
   asynchronously; the unlistened client error event was an uncaught
   exception surviving only via main.ts's last-resort net). withTx now
@@ -160,6 +167,49 @@ applied):
   extend-before-activate ordering is unpinnable behaviorally under a fixed
   test clock (the ordering only matters when real latency advances the
   clock between the two calls); noted here instead.
+
+Round THREE (the qa-checklist gate, the fix-round reviewer's residuals, and
+the security lane's third pass; every finding applied or owned):
+
+- qa-checklist verdict NOT READY on one blocking item, fixed this round:
+  the cancel-pending index had been redefined IN PLACE under its old name
+  (invisible to IF NOT EXISTS); it is now woc_market_listings_cancel_rotation
+  with a DROP of the old name, per the file's own predicate-change rule, and
+  the structural pin asserts both. Its two upheld judgments: the cooldown
+  NUMBERS (duty-cycle arithmetic verified) and the cancel-intent BID block
+  (required, not scope creep: a post-stamp bid would make the converge skip
+  forever and break the one-window bound).
+- Security round 3 HIGH: 'quote_expired' was attacker-mintable (wait out the
+  90s TTL, post any string; D1's signature-first recording is what makes the
+  class reachable), so the exempt list is now the infrastructure verdict
+  ALONE, bound as a parameter, with the honest-late-buyer cost accepted as
+  one recoverable abandon row. R5 now carries THREE dependents (bond
+  residency, the extension gate, restoring any late-payment exemption).
+- Fix-round reviewer residuals: the extension anchor is captured BEFORE the
+  chain round trip (RPC latency no longer drifts the target or nulls the
+  settled arm's extension); the bond-poll park axis moved to the new
+  bond_signature_at stamp (own knob WOC_MARKET_BOND_POLL_PARK_SECONDS;
+  placement age said nothing about chain age, and a late signer was parked
+  seconds after submitting); the advisory claim reads share the contention
+  mapping; a no-BEGIN pin holds the lock-free refusal property; comments
+  record the claim_cooldown advisory exclusion, the fake's
+  failed-outside-open dependency, and the fake-only id tiebreak. Recorded
+  declines: the excludeIds array growth matches the parkedDeliveries house
+  shape (phase 16 owns scale); the extend-before-activate ordering is
+  unpinnable under a fixed clock (noted in round two).
+- qa-checklist should-fixes, deferred WITH OWNERS: the anti-snipe rule
+  change has a PLAYER-FACING consequence (a bid placed inside the last
+  wallet round trip before the close can no longer extend and cannot win;
+  the money path is safe, the bond refunds) that phase 14 owes a product
+  line and a client affordance for; cancel-intent is invisible to clients
+  (no DTO field; a reloading seller sees plain Active, buyers learn only
+  via the refusal), the seller-side marker rides phase 14 with the
+  cancel-pending browse posture deliberately unchanged (seller intent is
+  not leaked to buyers); the claim_cooldown copy surfaces no remaining
+  time, phase 14. The "do not count never-quoted windows" idea was REJECTED
+  with reasoning: buyNow always issues a quote at claim, so a no-quote
+  window cannot arise from the real flow, and exempting quote-less windows
+  would exempt the griefer's cheapest path.
 
 - Coverage (4 blocking, 12 should-fix, 5 nits, all applied except one):
   tunable literal pins, teardown carve-out structural pins, the env-knob
