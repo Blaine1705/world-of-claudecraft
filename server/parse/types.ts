@@ -22,6 +22,9 @@ export interface RecorderEntityView {
   castTotal?: number;
   castTargetId?: number | null;
   threat?: ReadonlyMap<number, number>;
+  /** Who the mob is actually swinging at; the threat sampler ships it so the
+   * dashboard can show whether the top-threat player is the one being hit. */
+  aggroTargetId?: number | null;
   auras?: readonly { id: string; name: string; sourceId: number; stacks?: number }[];
 }
 
