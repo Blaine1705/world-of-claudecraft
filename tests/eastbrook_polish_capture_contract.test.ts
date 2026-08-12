@@ -141,8 +141,12 @@ interface AttributionTargetFixture {
 // No capture was retaken.
 // Re-minted after organizing renderer imports changed the provenance inputs.
 // No capture was retaken.
+// Re-minted for the merge of the iOS constrained-memory zone-eviction fix
+// (evictFarZoneIfConstrained) with the release branch's organized renderer
+// imports. Both parents move renderer.ts, so the rendererIntegration leaf
+// mints a value matching neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '9e1468a2f6d238da9641e900d8ff028fc171afbae477cc1383e5ff7324d2fe13';
+  'decde6de14371817605eb651a7f0450148057e922e1ff81e7169521591704ecd';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
