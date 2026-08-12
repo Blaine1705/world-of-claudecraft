@@ -2570,9 +2570,24 @@ export const VISUALS: Record<string, VisualDef> = {
   // The Bonebound Rickshaw's puller ONLY: a separate key on its own rebuilt
   // rig (see RICKSHAW_PULLER_CLIPS above for why it is a separate GLB from
   // skeleton_minion.glb, which skel_minion above still uses unchanged, no
-  // regression to any of its own consumers). Height is MEASURED off the
-  // rebuilt GLB, not the old blanket 2.5: prepareVisual derives normScale
-  // from it, so a stale value silently rescales the whole puller.
+  // regression to any of its own consumers).
+  //
+  // 2.166 is a DELIBERATE ART CHOICE, not a measurement, and it is the one
+  // value in this entry that is not free to change. `height` is a TARGET:
+  // prepareVisual poses a throwaway clone mid-idle, measures that, and
+  // derives normScale = height / posedHeight, so whatever goes here IS the
+  // puller's rendered size. The rest of this skeleton family stands at the
+  // 2.5 convention (skel_minion, skel_warrior), so this puller is
+  // deliberately about 13% shorter than the identical rig walking around as
+  // a mob: it reads as a hunched grunt harnessed to a cart rather than a
+  // soldier, and it keeps the crown clear of the cart's own canopy line.
+  //
+  // Changing it is a geometry change, not a number change. The shaft
+  // cross-brace (model.js SHAFT_TIP_Y/Z/SIDE_X) is positioned against this
+  // rig's measured handslot bones AT THIS SIZE, and RICKSHAW_PULLER_OFFSET_Z
+  // /_Y (src/render/rickshaw_mount.ts) were tuned live against it. Scaling
+  // to 2.5 moves the hand bones and breaks the grip alignment; re-tune all
+  // three together and retake the screenshots if you ever do.
   skel_rickshaw_puller: {
     url: `${ENEMIES}/skeleton_minion_free.glb`,
     height: 2.166,
