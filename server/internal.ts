@@ -41,7 +41,7 @@ import {
 } from './http/middleware/require_internal_secret';
 import type { Ctx, RouteDef, RouteHandler, RouteMeta } from './http/types';
 import { json, readBody } from './http_util';
-import type { WocMarketService } from './woc_market';
+import type { WocMarketService, WocStuckCustodyReadout } from './woc_market';
 
 function ok(res: http.ServerResponse, data: unknown): void {
   json(res, 200, { success: true, data, error: null });
@@ -165,6 +165,15 @@ async function opsP2pTradesHandler(ctx: Ctx): Promise<void> {
   const { query, page, pageSize } = opsQuery(ctx);
   const status = readEnum(param(query, 'status'), OFFER_STATUSES, 'all');
   ok(ctx.res, await service.opsP2pTrades({ status, ...readRange(query), page, pageSize }));
+}
+
+async function opsStuckHandler(ctx: Ctx): Promise<void> {
+  const read = wocMarketStuckRead;
+  // An unwired monitor is a 404, matching how an unset secret reads.
+  if (!read) return fail(ctx.res, 404, 'unknown endpoint');
+  // Deliberately parameter-free: every caller gets the same bounded readout,
+  // which is what lets the monitor's cached read serve all of them.
+  ok(ctx.res, await read());
 }
 
 // Secret-gated server<->bot channel. The Discord bot (a separate process) reads
@@ -722,6 +731,7 @@ export function configureInternalRuntime(runtime: InternalRuntime): void {
 export function resetInternalRuntimeForTests(): void {
   internalRuntime = null;
   wocMarketOpsReads = null;
+  wocMarketStuckRead = null;
 }
 
 /**
@@ -738,6 +748,17 @@ let wocMarketOpsReads: WocMarketOpsReads | null = null;
 
 export function configureInternalWocMarketReads(reads: WocMarketOpsReads): void {
   wocMarketOpsReads = reads;
+}
+
+/** The stuck-custody readout behind GET /internal/woc-market/stuck, injected
+ *  as a thunk over the monitor's CACHED read (server/woc_market_monitor.ts):
+ *  this surface must never learn about the db or grow a per-request query. */
+let wocMarketStuckRead: (() => Promise<WocStuckCustodyReadout>) | null = null;
+
+export function configureInternalWocMarketStuckRead(
+  read: () => Promise<WocStuckCustodyReadout>,
+): void {
+  wocMarketStuckRead = read;
 }
 
 /** The injected runtime, or a loud failure if a request somehow beat boot wiring. */
@@ -784,6 +805,14 @@ export const routes: RouteDef[] = [
     meta: INTERNAL_META,
     middleware: [dashboardGate],
     handler: opsP2pTradesHandler,
+  },
+  {
+    method: 'GET',
+    path: '/internal/woc-market/stuck',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [dashboardGate],
+    handler: opsStuckHandler,
   },
   {
     method: 'POST',

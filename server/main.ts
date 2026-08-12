@@ -255,6 +255,7 @@ import {
 import {
   configureInternalRuntime,
   configureInternalWocMarketReads,
+  configureInternalWocMarketStuckRead,
   handleInternalApi,
 } from './internal';
 import { isConnectionRefused } from './ip_block';
@@ -369,6 +370,7 @@ import { cachedWocBalance, handleWocBalance, parseWocBalanceQuery } from './woc_
 import { WocMarketService } from './woc_market';
 import { createWocMarketCustody } from './woc_market_custody';
 import { PgWocMarketDb, pruneClosedWocListingsBatch } from './woc_market_db';
+import { createWocMarketMonitor } from './woc_market_monitor';
 import { createDevWocMarketEconomy, createWocMarketEconomyProxy } from './woc_market_proxy';
 import { configureWocMarketRuntime, wocMarketConfig } from './woc_market_routes';
 import { createWocMarketSweep } from './woc_market_sweep';
@@ -2751,8 +2753,9 @@ const wocMarketEconomy =
   process.env.ALLOW_DEV_COMMANDS === '1' && process.env.WOC_MARKET_DEV_SERVICE === '1'
     ? createDevWocMarketEconomy()
     : createWocMarketEconomyProxy();
+const wocMarketDb = new PgWocMarketDb(pool);
 const wocMarketService = new WocMarketService({
-  db: new PgWocMarketDb(pool),
+  db: wocMarketDb,
   economy: wocMarketEconomy,
   custody: createWocMarketCustody({
     get sim() {
@@ -2776,11 +2779,22 @@ const wocMarketService = new WocMarketService({
       console.log(`[woc_market] sweep ${JSON.stringify(stats)}`);
     }
   },
+  // Per-arm isolation sink: one poisoned row or one failing arm logs here and
+  // the rest of the pass still runs.
+  onSweepError: (arm, err) => console.error(`[woc_market] sweep arm ${arm} failed:`, err),
 });
 configureWocMarketRuntime({ service: wocMarketService });
 // The dashboard's read-only ops views. Injected here so internal.ts never
 // imports the market route module (and admin/account behind it).
 configureInternalWocMarketReads(wocMarketService);
+// The stuck-custody monitor: one cached read serving both the secret-gated
+// ops endpoint and the periodic log line below (started after listen).
+const wocMarketMonitor = createWocMarketMonitor({
+  db: wocMarketDb,
+  realm: REALM,
+  log: (line) => console.warn(line),
+});
+configureInternalWocMarketStuckRead(() => wocMarketMonitor.read());
 
 // Inject the main.ts runtime the ported auth handlers (server/auth_routes.ts) need
 // but cannot import without a cycle: the live IP-block gate off the GameServer, the
@@ -3520,6 +3534,11 @@ export async function startServer(): Promise<http.Server> {
     onError: (err) => console.error('[woc_market] sweep pass failed:', err),
   });
   if (wocMarketConfig().enabled) wocMarketSweep.start();
+  // The stuck-custody log beat starts even when the marketplace is DISABLED:
+  // an operator who disables the market mid-incident still needs its parked
+  // custody states to stay loud, and the read is minutes-scale over indexes
+  // that are empty until the market has ever run.
+  wocMarketMonitor.start();
 
   const shutdown = async () => {
     // Flip readiness to draining FIRST so /readyz answers 503 and a load balancer
@@ -3536,6 +3555,7 @@ export async function startServer(): Promise<http.Server> {
     // race the pool close below.
     await retentionSweep.stop();
     await wocMarketSweep.stop();
+    wocMarketMonitor.stop();
     game.stop();
     await game.saveAll('shutdown');
     await game.saveMarket();

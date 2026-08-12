@@ -2550,7 +2550,7 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
-  // The ops dashboard's two Exchange reads. Registry-only (no legacy ladder
+  // The ops dashboard's Exchange reads. Registry-only (no legacy ladder
   // twin): they postdate the frozen ladders, so there is nothing to reproduce.
   {
     dispatcher: DISPATCH.internal,
@@ -2567,6 +2567,16 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     method: 'GET',
     path: '/internal/woc-market/p2p-trades',
     handler: 'internal.ts RouteDef: /internal/woc-market/p2p-trades',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.secretDashboard,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.internal,
+    method: 'GET',
+    path: '/internal/woc-market/stuck',
+    handler: 'internal.ts RouteDef: /internal/woc-market/stuck',
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.secretDashboard,
     limiter: null,

@@ -115,6 +115,7 @@ import type { Method, Middleware } from '../../server/http/types';
 import {
   configureInternalRuntime,
   configureInternalWocMarketReads,
+  configureInternalWocMarketStuckRead,
   handleInternalApi,
   type InternalRuntime,
   resetInternalRuntimeForTests,
@@ -151,6 +152,8 @@ const EXPECTED_ROUTES: ReadonlyArray<readonly [Method, string]> = [
   // ladder arm), on their own secret gate rather than the Discord bot's.
   ['GET', '/internal/woc-market/listings'],
   ['GET', '/internal/woc-market/p2p-trades'],
+  // The stuck-custody monitor readout (woc_market_monitor.ts), same gate.
+  ['GET', '/internal/woc-market/stuck'],
 ];
 
 /** Read status/body/content-type/headers off the fakeCtx's FakeRes. */
@@ -297,8 +300,8 @@ afterEach(() => {
 // ---------------------------------------------------------------------------
 
 describe('internal route registration', () => {
-  it('registers exactly 13 routes: the legacy ladder, the RouteDef-only pair, and the dashboard reads', () => {
-    expect(routes).toHaveLength(13);
+  it('registers exactly 14 routes: the legacy ladder, the RouteDef-only pair, and the dashboard reads', () => {
+    expect(routes).toHaveLength(14);
     const actual = routes.map((r) => `${r.method} ${r.path}`).sort();
     const expected = EXPECTED_ROUTES.map(([m, p]) => `${m} ${p}`).sort();
     expect(actual).toEqual(expected);
@@ -2344,5 +2347,62 @@ describe('the dashboard ops reads: filters and the default window', () => {
     resetInternalRuntimeForTests();
     const res = await hit('/internal/woc-market/listings');
     expect(res.status).toBe(404);
+  });
+});
+
+describe('the stuck-custody readout: GET /internal/woc-market/stuck', () => {
+  const SECRET = 'dashboard-secret';
+  const READOUT = {
+    unbookedClaims: {
+      count: 1,
+      sample: [{ custodyRef: 'woc_settlement:7', claimedAtMs: 1000, grantCharacterId: 21 }],
+    },
+    stuckDelivering: { count: 2, sample: [{ id: 7, listingId: 3, updatedAtMs: 2000 }] },
+    undisposedListings: { count: 0, sample: [] },
+  };
+  let reads = 0;
+
+  beforeEach(() => {
+    reads = 0;
+    process.env.DASHBOARD_INTERNAL_SECRET = SECRET;
+    configureInternalWocMarketStuckRead(async () => {
+      reads++;
+      return structuredClone(READOUT);
+    });
+  });
+
+  afterEach(() => {
+    delete process.env.DASHBOARD_INTERNAL_SECRET;
+    resetInternalRuntimeForTests();
+  });
+
+  const hit = (headers: Record<string, string> = { 'x-woc-dashboard-secret': SECRET }) =>
+    runRoute('GET', '/internal/woc-market/stuck', { headers });
+
+  it('serves the injected readout verbatim in the admin envelope', async () => {
+    const res = await hit();
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ success: true, data: READOUT, error: null });
+    expect(reads, 'one thunk call per request; caching lives in the monitor').toBe(1);
+  });
+
+  it('answers 401 on a wrong dashboard secret without touching the readout', async () => {
+    const res = await hit({ 'x-woc-dashboard-secret': 'wrong' });
+    expect(res.status).toBe(401);
+    expect(reads).toBe(0);
+  });
+
+  it('answers 404 with the secret UNSET, indistinguishable from an unknown path', async () => {
+    delete process.env.DASHBOARD_INTERNAL_SECRET;
+    const res = await hit();
+    expect(res.status).toBe(404);
+    expect(reads).toBe(0);
+  });
+
+  it('answers 404 when the monitor is not wired, the same as an unset secret', async () => {
+    resetInternalRuntimeForTests();
+    const res = await hit();
+    expect(res.status).toBe(404);
+    expect(reads).toBe(0);
   });
 });
