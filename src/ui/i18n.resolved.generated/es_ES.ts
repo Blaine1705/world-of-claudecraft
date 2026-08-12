@@ -801,6 +801,10 @@ export const es_ES: EnTranslations = {
       "resetAction": "Restablecer",
       "note": "Arrastra la pestaña del chat para mover la ventana, o el tirador de la esquina para cambiar su tamaño. Restablecer la devuelve a su posición y tamaño predeterminados."
     },
+    "chatQuota": {
+      "limitReached": "General chat limit reached. Try again in {seconds}.",
+      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+    },
     "swing": {
       "ready": "Golpe",
       "seconds": "{seconds} s"

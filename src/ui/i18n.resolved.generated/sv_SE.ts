@@ -801,6 +801,10 @@ export const sv_SE: EnTranslations = {
       "resetAction": "Återställ",
       "note": "Dra chattflikraden för att flytta fönstret, eller hörnhandtaget för att ändra storlek. Återställ sätter det till standardläge och -storlek."
     },
+    "chatQuota": {
+      "limitReached": "General chat limit reached. Try again in {seconds}.",
+      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+    },
     "swing": {
       "ready": "Sving",
       "seconds": "{seconds}s"

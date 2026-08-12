@@ -32,6 +32,18 @@ import type { FishingBandLabel } from '../fishing_telemetry';
 /** The two directions a ws frame is counted under: client-to-server or server-to-client. */
 export type WsMessageDirection = 'in' | 'out';
 
+export const GENERAL_CHAT_QUOTA_OUTCOMES = ['allowed', 'denied', 'busy', 'error'] as const;
+export type GeneralChatQuotaOutcome = (typeof GENERAL_CHAT_QUOTA_OUTCOMES)[number];
+export const GENERAL_CHAT_QUOTA_DB_OUTCOMES = [
+  'allowed',
+  'denied',
+  'unlimited',
+  'acquire_timeout',
+  'query_timeout',
+  'error',
+] as const;
+export type GeneralChatQuotaDbOutcome = (typeof GENERAL_CHAT_QUOTA_DB_OUTCOMES)[number];
+
 /**
  * The fixed eight causes an inbound ws frame can be dropped for: the two
  * pre-parse gate causes (server/msg_rate_limit.ts), the three post-parse
@@ -176,6 +188,10 @@ export interface GameMetricsCounters {
   riftForgeRefused(): void;
   /** One player chat message routed to other players (any channel). */
   chatMessage(): void;
+  /** One configured General quota decision, under a fixed four-value label. */
+  generalChatQuota(outcome: GeneralChatQuotaOutcome): void;
+  /** One dedicated quota database call and its end-to-end duration. */
+  generalChatQuotaDbCall(outcome: GeneralChatQuotaDbOutcome, durationSeconds: number): void;
   /** One character successfully created. */
   characterCreated(): void;
   /**
@@ -260,6 +276,8 @@ export const noopGameMetricsCounters: GameMetricsCounters = {
   wsInputSeqGap() {},
   riftForgeRefused() {},
   chatMessage() {},
+  generalChatQuota() {},
+  generalChatQuotaDbCall() {},
   characterCreated() {},
   guildBankIncident() {},
   copperCredited() {},

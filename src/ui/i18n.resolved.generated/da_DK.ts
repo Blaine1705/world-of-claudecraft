@@ -801,6 +801,10 @@ export const da_DK: EnTranslations = {
       "resetAction": "Nulstil",
       "note": "Træk chatfanestriben for at flytte vinduet, eller hjørnegrebet for at ændre størrelse. Nulstil sætter det tilbage til standardposition og -størrelse."
     },
+    "chatQuota": {
+      "limitReached": "General chat limit reached. Try again in {seconds}.",
+      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+    },
     "swing": {
       "ready": "Slag",
       "seconds": "{seconds}s"

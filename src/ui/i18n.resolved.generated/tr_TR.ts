@@ -801,6 +801,10 @@ export const tr_TR: EnTranslations = {
       "resetAction": "Sıfırla",
       "note": "Pencereyi taşımak için sohbet sekme şeridini, yeniden boyutlandırmak için köşe tutamacını sürükleyin. Sıfırla, onu varsayılan konum ve boyutuna döndürür."
     },
+    "chatQuota": {
+      "limitReached": "General chat limit reached. Try again in {seconds}.",
+      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+    },
     "swing": {
       "ready": "Vuruş",
       "seconds": "{seconds}sn"

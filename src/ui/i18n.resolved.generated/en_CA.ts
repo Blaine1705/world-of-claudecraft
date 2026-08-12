@@ -801,6 +801,10 @@ export const en_CA: EnTranslations = {
       "resetAction": "Reset",
       "note": "Drag the chat tab strip to move the window, or the corner grip to resize it. Reset returns it to the default position and size."
     },
+    "chatQuota": {
+      "limitReached": "General chat limit reached. Try again in {seconds}.",
+      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+    },
     "swing": {
       "ready": "Swing",
       "seconds": "{seconds}s"

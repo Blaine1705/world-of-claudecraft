@@ -7769,6 +7769,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.charSheet.playtimeUnderMinute'
   | 'hudChrome.charSheet.showPlaytimeAria'
   | 'hudChrome.character.modelPreview'
+  | 'hudChrome.chatQuota.limitReached'
+  | 'hudChrome.chatQuota.unavailable'
   | 'hudChrome.chatTimestamps.clock12h'
   | 'hudChrome.chatTimestamps.clock24h'
   | 'hudChrome.chatTimestamps.format'

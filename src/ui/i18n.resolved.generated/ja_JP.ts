@@ -801,6 +801,10 @@ export const ja_JP: EnTranslations = {
       "resetAction": "リセット",
       "note": "チャットのタブ列をドラッグするとウィンドウを移動でき、右下のグリップをドラッグするとサイズを変更できます。リセットすると既定の位置とサイズに戻ります。"
     },
+    "chatQuota": {
+      "limitReached": "一般チャットの上限に達しました。{seconds}後にもう一度お試しください。",
+      "unavailable": "一般チャットは一時的に利用できません。しばらくしてからもう一度お試しください。"
+    },
     "swing": {
       "ready": "攻撃",
       "seconds": "{seconds}秒"

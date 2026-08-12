@@ -224,6 +224,13 @@ import { reconcileOnLogin as reconcileEpicOnLogin } from './epic/mirror';
 import { shouldDeliverCombatEventToViewer } from './event_delivery';
 import { assembleEventsFrame, serializeEventFragments } from './event_frame';
 import { fishingBandLabel, isKoi, isRodFeeRecipe } from './fishing_telemetry';
+import {
+  classifyOnlineGeneralChat,
+  GeneralChatQuotaCoordinator,
+  type GeneralChatRateLimitHydration,
+  GeneralChatRateLimitLiveState,
+} from './general_chat_quota';
+import { consumeGeneralChatQuota, type GeneralChatRateLimit } from './general_chat_quota_db';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
 import { forEachGuarded, runGuarded } from './guarded_iter';
@@ -982,6 +989,8 @@ export interface ClientSession {
   chatLastRateError: number;
   chatRateViolations: number;
   chatCooldownUntil: number;
+  chatSequence: number;
+  generalChatRateLimit: GeneralChatRateLimit | null;
   // Pre-parse inbound gate state (#978): the frame and byte token buckets
   // plus the windowed abuse score, covering every frame (input, cast, cmd,
   // ...), separate from the chat-only bucket above, so a client flooding
@@ -1878,6 +1887,8 @@ export class GameServer {
   // a throw.
   private readonly guildBankDeleteWindows = new Set<number>();
   private readonly moderation: ModerationService<ClientSession>;
+  private readonly generalChatQuota: GeneralChatQuotaCoordinator;
+  private readonly generalChatRateLimitLiveState = new GeneralChatRateLimitLiveState();
   private wireCache = new Map<number, EntityWireCache>();
   // partyFrameAggroTargets / partyFrameIncomingHeals scan the whole entity set and
   // are GLOBAL (identical for every grouped session), yet partyWire runs once for
@@ -2078,7 +2089,13 @@ export class GameServer {
   private readonly riftUpgrader: RiftUpgradeCoordinator;
   private readonly riftAssets: RiftAssetCoordinator;
 
-  constructor() {
+  constructor(generalChatQuotaMaxInFlight = 2) {
+    this.generalChatQuota = new GeneralChatQuotaCoordinator({
+      consume: consumeGeneralChatQuota,
+      maxInFlight: generalChatQuotaMaxInFlight,
+      observeDbCall: (outcome, durationSeconds) =>
+        gameMetricsCounters().generalChatQuotaDbCall(outcome, durationSeconds),
+    });
     this.sim = new Sim({
       seed: WORLD_SEED,
       playerClass: 'warrior',
@@ -3194,6 +3211,44 @@ export class GameServer {
     }
   }
 
+  /** Apply a committed cross-process policy notification to live sessions. */
+  applyGeneralChatRateLimitLive(accountId: number, rateLimit: GeneralChatRateLimit | null): void {
+    this.generalChatRateLimitLiveState.policyChanged(accountId, rateLimit);
+    this.generalChatQuota.policyChanged(accountId);
+    for (const session of this.clients.values()) {
+      if (session.accountId === accountId) session.generalChatRateLimit = rateLimit;
+    }
+  }
+
+  /** Replace active-session policy state after the LISTEN connection resynchronizes. */
+  resyncGeneralChatRateLimits(
+    accountIds: readonly number[],
+    policies: ReadonlyMap<number, GeneralChatRateLimit>,
+  ): void {
+    const queried = new Set(accountIds);
+    for (const session of this.clients.values()) {
+      if (!queried.has(session.accountId)) continue;
+      session.generalChatRateLimit = policies.get(session.accountId) ?? null;
+    }
+    for (const accountId of queried) {
+      this.generalChatRateLimitLiveState.policyChanged(accountId, policies.get(accountId) ?? null);
+      this.generalChatQuota.policyChanged(accountId);
+    }
+  }
+
+  /** Fence an auth-query policy snapshot against later LISTEN notifications. */
+  beginGeneralChatRateLimitHydration(accountId: number): GeneralChatRateLimitHydration {
+    return this.generalChatRateLimitLiveState.beginHydration(accountId);
+  }
+
+  generalChatQuotaInFlight(): number {
+    return this.generalChatQuota.inFlight;
+  }
+
+  generalChatQuotaCachedAccounts(): number {
+    return this.generalChatQuota.cachedAccounts;
+  }
+
   /** The chat flair of the session at `pid`, read from the SESSION, never an entity. */
   private chatFlairForPid(pid: number): ChatSenderFlair | undefined {
     return this.clients.get(pid)?.chatFlair;
@@ -3712,6 +3767,7 @@ export class GameServer {
         leaseNonce?: string;
         timerWireVersion?: 1 | StableTimerWireVersion;
         petSpecialWireVersion?: 0 | PetSpecialWireVersion;
+        generalChatRateLimit?: GeneralChatRateLimit | null;
         // Server-recomputed bank bonus slots (ws_auth.ts, fresh-join arm) stamped into
         // the character state via addPlayer. Absent on a resume and for callers that
         // pass no meta (tests, the bot-detector overlay), which keep the saved value.
@@ -3842,6 +3898,8 @@ export class GameServer {
       chatLastRateError: 0,
       chatRateViolations: 0,
       chatCooldownUntil: 0,
+      chatSequence: 0,
+      generalChatRateLimit: meta.generalChatRateLimit ?? null,
       msgRate: createMsgRateBucket(Date.now() / 1000),
       msgLanes: createMsgLanes(Date.now() / 1000),
       listReadGuard: createListReadGuard(Date.now() / 1000),
@@ -4053,6 +4111,8 @@ export class GameServer {
     session.chatMutedUntil = meta.mutedUntil ? new Date(meta.mutedUntil).getTime() : null;
     session.chatMuteReason = meta.reason ?? '';
     session.chatStrikes = meta.chatStrikes ?? session.chatStrikes;
+    session.generalChatRateLimit = meta.generalChatRateLimit ?? null;
+    this.generalChatQuota.policyChanged(session.accountId);
     session.isAdmin = meta.isAdmin ?? false;
     session.adminPermissions = new Set(meta.adminPermissions ?? []);
     // Re-validate the freshly-read layout (untrusted at rest), same as a fresh
@@ -4248,6 +4308,9 @@ export class GameServer {
     this.cancelAndRecordUnstuck(session);
     session.left = true;
     this.clients.delete(session.pid);
+    if (![...this.clients.values()].some((live) => live.accountId === session.accountId)) {
+      this.generalChatQuota.forgetAccount(session.accountId);
+    }
     this.botDetector.releaseTrackingContext(session.botTrackingContext);
     this.releaseIpSession(session.ip);
     void this.recordOnlineSnapshot();
@@ -7196,6 +7259,7 @@ export class GameServer {
       case 'chat': {
         if (typeof msg.text !== 'string') break;
         const text = msg.text.trim();
+        const chatSequence = ++session.chatSequence;
         // Staff moderation is COMMAND work riding the chat case (target
         // resolution plus an audited DB write per action): a claimed
         // moderation text pays the command lane exactly like /unstuck
@@ -7236,6 +7300,13 @@ export class GameServer {
         // generous than the ladder, the ladder's cooldown messaging still
         // fires on the subset the lane passes.
         if (!this.consumeLane(session, 'chat', receivedAtMs / 1000)) break;
+        const generalCandidate = classifyOnlineGeneralChat(text, session.rememberedChat.channel);
+        const configuredGeneral =
+          generalCandidate !== null && session.generalChatRateLimit !== null;
+        // Reserve the ordinary chat token before any quota DB work. This sheds
+        // attempts already in the generic cooldown without touching Postgres;
+        // a quota refusal refunds the reservation, so it cannot escalate that
+        // independent all-chat limiter.
         if (!this.consumeChatToken(session)) break;
         const whoMatch = /^\/who(?:\s+([\s\S]+))?$/i.exec(text);
         if (whoMatch) {
@@ -7259,6 +7330,10 @@ export class GameServer {
         // "!" community commands (lfg/wts/...): broadcast in-world + cross-post to
         // Discord, then stop (not normal chat).
         if (text.startsWith('!') && this.handleRelayCommand(session, text)) break;
+        if (configuredGeneral && generalCandidate) {
+          this.admitGeneralChat(session, generalCandidate.canonicalText, chatSequence);
+          break;
+        }
         // guild and officer chat are persistent + cross-zone, so they live in
         // the server's SocialService rather than the sim (no guild concept).
         // MMO convention: /g is guild; /general remains world chat.
@@ -10325,6 +10400,74 @@ export class GameServer {
     });
   }
 
+  private admitGeneralChat(
+    session: ClientSession,
+    canonicalText: string,
+    chatSequence: number,
+  ): void {
+    const accountId = session.accountId;
+    const characterId = session.characterId;
+    const pid = session.pid;
+    const ws = session.ws;
+    const policy = session.generalChatRateLimit;
+    void this.generalChatQuota.admit(accountId, policy).then((admission) => {
+      // Capture and fence the whole authority context before the await. A
+      // reconnect changes ws, a leave changes membership, and any later chat
+      // advances chatSequence, so no stale completion can broadcast or rewrite
+      // the sticky channel selected by a newer command.
+      if (
+        session.left ||
+        session.linkdead ||
+        this.clients.get(pid) !== session ||
+        session.ws !== ws ||
+        session.characterId !== characterId
+      ) {
+        this.refundChatToken(session);
+        return;
+      }
+      if (admission.status === 'allowed') {
+        const sent = this.sim.chat(canonicalText, pid);
+        if (sent && session.chatSequence === chatSequence) {
+          session.rememberedChat = { channel: 'general' };
+        }
+        this.logChat(session, sent);
+        gameMetricsCounters().generalChatQuota('allowed');
+        return;
+      }
+      this.refundChatToken(session);
+      gameMetricsCounters().generalChatQuota(admission.status);
+      if (!admission.notify) return;
+      if (admission.status === 'denied') {
+        const retryAfterSeconds = Math.max(1, Math.ceil(admission.retryAfterSeconds));
+        this.send(session, {
+          t: 'events',
+          list: [
+            {
+              type: 'error',
+              text: `General chat limit reached. Try again in ${retryAfterSeconds} seconds.`,
+              code: 'general_chat_quota',
+              channel: 'general',
+              retryAfterSeconds,
+            },
+          ],
+        });
+        return;
+      }
+      this.send(session, {
+        t: 'events',
+        list: [
+          {
+            type: 'error',
+            text: 'General chat is temporarily unavailable. Try again shortly.',
+            code: 'general_chat_quota_unavailable',
+            channel: 'general',
+            retryAfterSeconds: 1,
+          },
+        ],
+      });
+    });
+  }
+
   // One-off, player-facing chat notice (reuses the generic error event path the
   // client already renders for rate-limit / cooldown messages).
   private sendChatNotice(session: ClientSession, text: string): void {
@@ -10554,6 +10697,10 @@ export class GameServer {
       });
     }
     return false;
+  }
+
+  private refundChatToken(session: ClientSession): void {
+    session.chatTokens = Math.min(CHAT_RATE_BURST, session.chatTokens + 1);
   }
 
   private isChatMuted(session: ClientSession): boolean {

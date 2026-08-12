@@ -199,12 +199,15 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'chat unmute failed': 'error.chatUnmuteFailed',
   'account is not chat muted': 'error.accountNotChatMuted',
   'moderation reason is required': 'error.moderationReasonRequired',
+  'a general chat rate limit or null is required': 'error.generalChatRateLimitRequired',
+  'messages must be an integer from 1 to 1000': 'error.generalChatRateLimitMessages',
+  'windowminutes must be an integer from 1 to 1440': 'error.generalChatRateLimitWindowMinutes',
   'suspension expiry must be in the future': 'error.moderationExpiryFuture',
   'character not found': 'error.characterNotFound',
   'guild not found': 'error.guildNotFound',
   'guild name is already taken': 'error.guildNameTaken',
   'guild name must change': 'error.guildNameUnchanged',
-  'a moderation reason is required (500 chars max)': 'error.guildReasonInvalid',
+  'a moderation reason is required (500 chars max)': 'error.generalChatRateLimitReasonInvalid',
   'guild member limit exceeded': 'error.guildMemberLimit',
   // The guild bank dormant-slot escape hatch (server/admin.ts).
   'a slot index is required': 'error.guildBankSlotRequired',
@@ -275,7 +278,23 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
 };
 export function localizeAdminError(message: string): string {
   const key = ADMIN_ERROR_KEYS[message.trim().toLowerCase()];
-  return key ? t(key) : message;
+  if (!key) return message;
+  if (key === 'error.generalChatRateLimitMessages') {
+    return t(key, {
+      min: new Intl.NumberFormat(adminLanguageTag()).format(1),
+      max: new Intl.NumberFormat(adminLanguageTag()).format(1_000),
+    });
+  }
+  if (key === 'error.generalChatRateLimitWindowMinutes') {
+    return t(key, {
+      min: new Intl.NumberFormat(adminLanguageTag()).format(1),
+      max: new Intl.NumberFormat(adminLanguageTag()).format(1_440),
+    });
+  }
+  if (key === 'error.generalChatRateLimitReasonInvalid') {
+    return t(key, { max: new Intl.NumberFormat(adminLanguageTag()).format(500) });
+  }
+  return t(key);
 }
 
 // Operator-facing class label for the dashboard tables/charts. The class id is the

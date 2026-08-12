@@ -801,6 +801,10 @@ export const pt_BR: EnTranslations = {
       "resetAction": "Redefinir",
       "note": "Arraste a faixa de abas do chat para mover a janela, ou a alça do canto para redimensioná-la. Redefinir devolve a janela à posição e ao tamanho padrão."
     },
+    "chatQuota": {
+      "limitReached": "General chat limit reached. Try again in {seconds}.",
+      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+    },
     "swing": {
       "ready": "Golpe",
       "seconds": "{seconds}s"

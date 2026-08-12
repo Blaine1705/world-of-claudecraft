@@ -801,6 +801,10 @@ export const id_ID: EnTranslations = {
       "resetAction": "Atur Ulang",
       "note": "Seret bilah tab obrolan untuk memindahkan jendela, atau pegangan sudut untuk mengubah ukurannya. Atur Ulang mengembalikannya ke posisi dan ukuran bawaan."
     },
+    "chatQuota": {
+      "limitReached": "General chat limit reached. Try again in {seconds}.",
+      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+    },
     "swing": {
       "ready": "Ayun",
       "seconds": "{seconds}d"

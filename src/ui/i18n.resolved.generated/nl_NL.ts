@@ -801,6 +801,10 @@ export const nl_NL: EnTranslations = {
       "resetAction": "Resetten",
       "note": "Sleep de chattabbladstrook om het venster te verplaatsen, of de hoekgreep om het te vergroten of verkleinen. Resetten zet het terug naar de standaardpositie en -grootte."
     },
+    "chatQuota": {
+      "limitReached": "General chat limit reached. Try again in {seconds}.",
+      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+    },
     "swing": {
       "ready": "Slag",
       "seconds": "{seconds}s"
