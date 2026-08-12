@@ -13,17 +13,14 @@
 import type { Pool, PoolClient } from 'pg';
 import type { ExtractRef } from '../src/sim/inventory_extract';
 import type { InvSlot } from '../src/sim/types';
-import {
-  DB_HEAVY_STATEMENT_TIMEOUT_MS,
-  saveCharacterState,
-  saveCharacterStateOnClient,
-} from './db';
+import { DB_HEAVY_STATEMENT_TIMEOUT_MS, saveCharacterStateOnClient } from './db';
 import type {
   CharacterSaveArgs,
   NewWocListing,
   WocBidRow,
   WocBondState,
   WocBrowseQuery,
+  WocCustodyRefState,
   WocDirectedOfferRow,
   WocDirectedOfferStatus,
   WocListingResolution,
@@ -33,6 +30,7 @@ import type {
   WocSaleRow,
   WocSettlementRow,
   WocStrikeRow,
+  WocStuckCustodyReadout,
 } from './woc_market';
 import type { WocBidStatus, WocSettlementState } from './woc_market_rules';
 import { WOC_MARKET_MAX_ACTIVE_LISTINGS } from './woc_market_rules';
@@ -356,6 +354,17 @@ CREATE TABLE IF NOT EXISTS woc_market_custody_claims (
   claimed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   booked_at TIMESTAMPTZ
 );
+-- Durable grant intent for the DIRECT hand-off rail: stamped on the claim row
+-- BEFORE the in-memory bag grant, cleared only when the grant provably left
+-- nothing behind (an ordinary refusal, or a lease fence rejection, both of
+-- which mean no fenced save can ever land it). An unbooked claim still
+-- carrying this marker means a grant MAY have persisted (an autosave can land
+-- the granted bags even when the explicit save threw), so no automatic path
+-- may mail or re-grant under this ref: it parks, visible in the
+-- unbooked-claims read, for the operator to resolve by hand. Additive and
+-- idempotent: legacy rows read NULL, meaning no grant was in flight.
+ALTER TABLE woc_market_custody_claims
+  ADD COLUMN IF NOT EXISTS grant_character_id BIGINT;
 -- The operator/diagnostic read: claims that never completed their booking.
 CREATE INDEX IF NOT EXISTS woc_market_custody_claims_unbooked
   ON woc_market_custody_claims(realm, claimed_at)
@@ -1419,9 +1428,16 @@ export class PgWocMarketDb implements WocMarketDb {
   }
 
   async undisposedClosedListings(realm: string, limit: number): Promise<WocListingRow[]> {
+    // Sold rows are excluded HERE, not just by the caller's skip: a sold row
+    // that keeps its undisposed flag (an old-binary crash between close and
+    // dispose) would otherwise occupy a batch slot on every pass forever and
+    // could saturate the return arm; the stuck-custody readout is what
+    // surfaces those rows instead. NULL resolution (which no close path
+    // writes) stays included: returning an unaccounted close is the fail-safe.
     const res = await this.pool.query(
       `SELECT ${LISTING_COLS} FROM woc_market_listings
         WHERE realm = $1 AND status = 'closed' AND item_disposed = false
+          AND (resolution IS NULL OR resolution <> 'sold')
         ORDER BY updated_at
         LIMIT $2`,
       [realm, limit],
@@ -1499,19 +1515,139 @@ export class PgWocMarketDb implements WocMarketDb {
     );
   }
 
-  /** The buyer's bags after a hand-to-hand delivery, lease-fenced like every
-   *  other character write here: false means a takeover rotated the nonce and
-   *  this process must not claim the delivery landed. */
-  async saveDeliveredCharacter(save: CharacterSaveArgs): Promise<boolean> {
-    return saveCharacterState(save.characterId, save.level, save.state, save.leaseNonce);
+  async custodyRefState(custodyRef: string): Promise<WocCustodyRefState | null> {
+    const res = await this.pool.query(
+      `SELECT booked_at IS NOT NULL AS booked, grant_character_id
+         FROM woc_market_custody_claims
+        WHERE custody_ref = $1`,
+      [custodyRef],
+    );
+    const row = res.rows[0];
+    if (!row) return null;
+    return {
+      booked: Boolean(row.booked),
+      grantCharacterId: row.grant_character_id === null ? null : Number(row.grant_character_id),
+    };
   }
 
-  async unclaimCustodyRef(custodyRef: string): Promise<void> {
+  async markCustodyGrantIntent(custodyRef: string, characterId: number): Promise<boolean> {
+    const res = await this.pool.query(
+      `UPDATE woc_market_custody_claims SET grant_character_id = $2
+        WHERE custody_ref = $1 AND booked_at IS NULL`,
+      [custodyRef, characterId],
+    );
+    return (res.rowCount ?? 0) > 0;
+  }
+
+  async clearCustodyGrantIntent(custodyRef: string): Promise<void> {
     await this.pool.query(
-      `DELETE FROM woc_market_custody_claims
+      `UPDATE woc_market_custody_claims SET grant_character_id = NULL
         WHERE custody_ref = $1 AND booked_at IS NULL`,
       [custodyRef],
     );
+  }
+
+  /** The buyer's bags after a hand-to-hand delivery, lease-fenced like every
+   *  other character write here, PLUS the booking, in ONE transaction: the
+   *  granted bags and the "this ref is delivered" record can never tear apart,
+   *  so an ambiguous throw (a commit whose reply was lost) is resolvable
+   *  afterwards by reading booked_at. 'lease_lost' means the fence matched no
+   *  row (a takeover rotated the nonce): NOTHING landed, and this process must
+   *  not claim the delivery happened. 'claim_missing' means the claim row was
+   *  gone or already booked under us, which only hand intervention can cause;
+   *  the character half rolls back with it (fail toward stuck, never toward an
+   *  unaccounted grant). No bid or listing row is locked here: the transaction
+   *  touches only the characters row and the claim row, so the market lock
+   *  order does not apply (carve-out, see server/CLAUDE.md).
+   */
+  async saveDeliveredCharacterBooked(
+    save: CharacterSaveArgs,
+    custodyRef: string,
+  ): Promise<'booked' | 'lease_lost' | 'claim_missing'> {
+    return this.withTx(async (client) => {
+      // A delivery save should wait out a slow database rather than lose the
+      // grant (the saveCharacterState rationale); still bounded by the heavy
+      // allowance so a sweep pass cannot hang past the container stop grace.
+      await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
+      const saved = await saveCharacterStateOnClient(
+        client,
+        save.characterId,
+        save.level,
+        save.state,
+        save.leaseNonce,
+      );
+      if (!saved) throw new TxAbort('lease_lost' as const);
+      const booked = await client.query(
+        `UPDATE woc_market_custody_claims SET booked_at = now()
+          WHERE custody_ref = $1 AND booked_at IS NULL`,
+        [custodyRef],
+      );
+      if ((booked.rowCount ?? 0) === 0) throw new TxAbort('claim_missing' as const);
+      return 'booked' as const;
+    });
+  }
+
+  /** The three stuck classes the ops monitor reads, each one bounded: the
+   *  window count rides the sample query (count(*) OVER () runs before LIMIT),
+   *  so each class costs one indexed read over rows that are stuck BY
+   *  DEFINITION (the partial unbooked index, the state index on 'delivering',
+   *  the partial undisposed index), never a scan that grows with history. */
+  async stuckCustodyReadout(
+    realm: string,
+    olderThanMs: number,
+    sampleLimit: number,
+  ): Promise<WocStuckCustodyReadout> {
+    const claims = await this.pool.query(
+      `SELECT custody_ref, claimed_at, grant_character_id, count(*) OVER ()::int AS total
+         FROM woc_market_custody_claims
+        WHERE realm = $1 AND booked_at IS NULL AND claimed_at <= to_timestamp($2 / 1000.0)
+        ORDER BY claimed_at
+        LIMIT $3`,
+      [realm, olderThanMs, sampleLimit],
+    );
+    const delivering = await this.pool.query(
+      `SELECT id, listing_id, updated_at, count(*) OVER ()::int AS total
+         FROM woc_market_settlements
+        WHERE realm = $1 AND state = 'delivering' AND updated_at <= to_timestamp($2 / 1000.0)
+        ORDER BY updated_at
+        LIMIT $3`,
+      [realm, olderThanMs, sampleLimit],
+    );
+    const undisposed = await this.pool.query(
+      `SELECT id, resolution, updated_at, count(*) OVER ()::int AS total
+         FROM woc_market_listings
+        WHERE realm = $1 AND status = 'closed' AND item_disposed = false
+          AND updated_at <= to_timestamp($2 / 1000.0)
+        ORDER BY updated_at
+        LIMIT $3`,
+      [realm, olderThanMs, sampleLimit],
+    );
+    return {
+      unbookedClaims: {
+        count: Number(claims.rows[0]?.total ?? 0),
+        sample: claims.rows.map((r) => ({
+          custodyRef: String(r.custody_ref),
+          claimedAtMs: ms(r.claimed_at),
+          grantCharacterId: r.grant_character_id === null ? null : Number(r.grant_character_id),
+        })),
+      },
+      stuckDelivering: {
+        count: Number(delivering.rows[0]?.total ?? 0),
+        sample: delivering.rows.map((r) => ({
+          id: Number(r.id),
+          listingId: Number(r.listing_id),
+          updatedAtMs: ms(r.updated_at),
+        })),
+      },
+      undisposedListings: {
+        count: Number(undisposed.rows[0]?.total ?? 0),
+        sample: undisposed.rows.map((r) => ({
+          id: Number(r.id),
+          resolution: r.resolution === null ? null : String(r.resolution),
+          updatedAtMs: ms(r.updated_at),
+        })),
+      },
+    };
   }
 
   async markItemDisposed(id: number): Promise<void> {
@@ -1908,16 +2044,6 @@ export class PgWocMarketDb implements WocMarketDb {
     return res.rows.map(toBid);
   }
 
-  async cancelOpenBidsForListing(listingId: number): Promise<WocBidRow[]> {
-    const res = await this.pool.query(
-      `UPDATE woc_market_bids SET status = 'cancelled'
-        WHERE listing_id = $1 AND status IN ('pending_bond', 'active')
-        RETURNING ${BID_COLS}`,
-      [listingId],
-    );
-    return res.rows.map(toBid);
-  }
-
   // ---------------------------------------------------------------------
   // Settlements
   // ---------------------------------------------------------------------
@@ -2152,6 +2278,124 @@ export class PgWocMarketDb implements WocMarketDb {
       [realm, limit],
     );
     return res.rows.map(toSettlement);
+  }
+
+  async deliveredUnclosedSettlements(realm: string, limit: number): Promise<WocSettlementRow[]> {
+    // Driven from the OPEN listings side on purpose: 'delivered' rows grow
+    // with sale history forever, while not-yet-closed listings are the small
+    // live set (the realm_status_ends index), each probed once through the
+    // settlements listing_id index.
+    const cols = SETTLEMENT_COLS.split(', ')
+      .map((c) => `s.${c}`)
+      .join(', ');
+    const res = await this.pool.query(
+      `SELECT ${cols}
+         FROM woc_market_listings l
+         JOIN woc_market_settlements s ON s.listing_id = l.id AND s.state = 'delivered'
+        WHERE l.realm = $1 AND l.status IN ('active', 'ending', 'settling')
+        ORDER BY s.updated_at
+        LIMIT $2`,
+      [realm, limit],
+    );
+    return res.rows.map(toSettlement);
+  }
+
+  /** The delivery close tail as ONE transaction: the 'delivered' transition,
+   *  the sale row, the listing close + dispose, and every bond flip commit
+   *  together or not at all, so no crash point between them can exist. The
+   *  compare-and-set accepts 'delivered' as well as 'delivering' on purpose:
+   *  that is what lets the reclaim arm re-drive a settlement an older binary
+   *  (whose tail was separately-committed statements) left delivered with the
+   *  listing still open, and it makes a re-run of the whole method converge
+   *  (the sale insert dedupes on the partial unique index, the close and the
+   *  bond flips are all compare-and-set). Lock order: this transaction touches
+   *  bid rows AND the listing row, so it pre-locks the open bid set plus the
+   *  winner bid by id, then the listing, matching every other market guard
+   *  (server/CLAUDE.md); 55P03/40P01 surface as 'contended' and the caller
+   *  retries on a later pass. */
+  async finalizeDeliveredSettlement(args: {
+    settlementId: number;
+    listingId: number;
+    bidId: number | null;
+    sale: Omit<WocSaleRow, 'id' | 'excluded' | 'atMs'>;
+  }): Promise<'finalized' | 'stale' | 'contended'> {
+    try {
+      return await this.withTx(async (client) => {
+        await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
+        // Bids first (open set plus the winner, in id order), listing second.
+        await client.query(
+          `SELECT id FROM woc_market_bids
+            WHERE listing_id = $1 AND (status IN ('pending_bond', 'active') OR id = $2)
+            ORDER BY id
+            FOR UPDATE`,
+          [args.listingId, args.bidId],
+        );
+        const listing = await client.query(
+          `SELECT status FROM woc_market_listings WHERE id = $1 FOR UPDATE`,
+          [args.listingId],
+        );
+        if (!listing.rows[0]) throw new TxAbort('stale' as const);
+        const advanced = await client.query(
+          `UPDATE woc_market_settlements SET state = 'delivered', updated_at = now()
+            WHERE id = $1 AND state IN ('delivering', 'delivered')`,
+          [args.settlementId],
+        );
+        if ((advanced.rowCount ?? 0) === 0) throw new TxAbort('stale' as const);
+        // Dedupe on the provenance invariant, not an error path: a re-driven
+        // tail (or an admin correction race) leaves the standing row alone.
+        await client.query(
+          `INSERT INTO woc_market_sales (
+             realm, listing_id, item_id, item, price_cents, amount_base,
+             seller_account, buyer_account, seller_name, buyer_name
+           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+           ON CONFLICT (listing_id) WHERE excluded = false DO NOTHING`,
+          [
+            args.sale.realm,
+            args.sale.listingId,
+            args.sale.itemId,
+            JSON.stringify(args.sale.item),
+            args.sale.priceCents,
+            args.sale.amountBase,
+            args.sale.sellerAccount,
+            args.sale.buyerAccount,
+            args.sale.sellerName,
+            args.sale.buyerName,
+          ],
+        );
+        await client.query(
+          `UPDATE woc_market_listings
+              SET status = 'closed', resolution = $2, updated_at = now()
+            WHERE id = $1 AND status <> 'closed'`,
+          [args.listingId, 'sold'],
+        );
+        await client.query(
+          `UPDATE woc_market_listings SET item_disposed = true, updated_at = now() WHERE id = $1`,
+          [args.listingId],
+        );
+        if (args.bidId !== null) {
+          // The winner's held bond flows home after a completed settlement.
+          await client.query(
+            `UPDATE woc_market_bids SET bond_state = 'refund_due'
+              WHERE id = $1 AND bond_state = 'held'`,
+            [args.bidId],
+          );
+        }
+        // Every still-open bid cancels with its held bond queued for refund,
+        // atomically per row (the markBidOutbidQueueRefund CASE idiom): the
+        // old per-bid loop could crash between the cancel and the refund.
+        await client.query(
+          `UPDATE woc_market_bids
+              SET status = 'cancelled',
+                  bond_state = CASE WHEN bond_state = 'held' THEN 'refund_due' ELSE bond_state END
+            WHERE listing_id = $1 AND status IN ('pending_bond', 'active')`,
+          [args.listingId],
+        );
+        return 'finalized' as const;
+      });
+    } catch (err) {
+      if (isLockContention(err)) return 'contended';
+      throw err;
+    }
   }
 
   async overdueSettlements(

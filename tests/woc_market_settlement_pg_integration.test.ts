@@ -238,6 +238,9 @@ describeDb('woc market settlement guards against real Postgres', () => {
       grantCopy: () => {
         throw new Error('custody not exercised by this suite');
       },
+      snapshotCopy: () => {
+        throw new Error('custody not exercised by this suite');
+      },
       restoreCopy: () => {},
       persistMailParcel: async () => {},
     };
@@ -539,7 +542,7 @@ describeDb('woc market settlement guards against real Postgres', () => {
       expect(second).toBe('live_settlement_exists');
     });
 
-    it('the reclaim sweep leaves a delivered-but-unclosed listing alone and still reopens a dead one', async () => {
+    it('the sweep drives a delivered-but-unclosed listing FORWARD and still reopens a dead one', async () => {
       const realm = 'guard-delivered-reclaim';
       const seller = await seedAccount();
       const buyer = await seedAccount();
@@ -548,7 +551,9 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const deadListing = await seedListing(realm, seller, { status: 'settling' });
       const dead = await seedSettlement(realm, deadListing, buyer, { state: 'failed' });
       // The failed settlement is past its retry window, so its listing really
-      // is stranded; the delivered one is mid-custody and must not reopen.
+      // is stranded; the delivered one is mid-close and must never REOPEN
+      // (re-auctioning a delivered item was the dupe): it converges to the
+      // finished sale through the redriven arm instead.
       await pool.query(
         `UPDATE woc_market_settlements SET deadline_at = to_timestamp($2 / 1000.0) WHERE id = $1`,
         [dead.id, BASE_MS - 60 * MINUTE_MS],
@@ -559,14 +564,18 @@ describeDb('woc market settlement guards against real Postgres', () => {
       );
       const service = makeService(realm);
       await service.sweepPass();
-      // Pass 1: the reclaim refuses while the failed row still rides the
+      // Pass 1: the reclaim refuses while the failed row still rides the dead
       // listing (its deadline belongs to the overdue arm, which expires it
       // later in the same pass; expiring it from the reclaim would skip the
-      // default consequences). Pass 2: with the row terminal, the reclaim
-      // reopens the genuinely dead listing.
+      // default consequences), and the delivered listing converges FORWARD.
       expect((await listingRow(deadListing)).status).toBe('settling');
+      const delivered = await listingRow(deliveredListing);
+      expect(delivered.status).toBe('closed');
+      expect(delivered.resolution).toBe('sold');
+      // Pass 2: with the failed row terminal, the reclaim reopens the
+      // genuinely dead listing; the converged one never reopens.
       await service.sweepPass();
-      expect((await listingRow(deliveredListing)).status).toBe('settling');
+      expect((await listingRow(deliveredListing)).status).toBe('closed');
       expect((await listingRow(deadListing)).status).not.toBe('settling');
     }, 20_000);
 

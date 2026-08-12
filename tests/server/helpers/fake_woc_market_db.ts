@@ -18,6 +18,7 @@ import type {
   WocBidRow,
   WocBondState,
   WocBrowseQuery,
+  WocCustodyRefState,
   WocDirectedOfferRow,
   WocDirectedOfferStatus,
   WocListingResolution,
@@ -27,6 +28,7 @@ import type {
   WocSaleRow,
   WocSettlementRow,
   WocStrikeRow,
+  WocStuckCustodyReadout,
 } from '../../../server/woc_market';
 import type { WocBidStatus, WocSettlementState } from '../../../server/woc_market_rules';
 import { WOC_MARKET_MAX_ACTIVE_LISTINGS } from '../../../server/woc_market_rules';
@@ -63,10 +65,15 @@ export class FakeWocMarketDb implements WocMarketDb {
   /** Every character save escrowInsertListing received, in order. */
   readonly escrowSaves: CharacterSaveArgs[] = [];
   /** The durable book-once ledger (woc_market_custody_claims), exposed so
-   *  tests can assert claim/book/unclaim lifecycles directly. */
+   *  tests can assert claim/book/grant-intent lifecycles directly. */
   readonly custodyClaims = new Map<
     string,
-    { realm: string; claimedAtMs: number; bookedAtMs: number | null }
+    {
+      realm: string;
+      claimedAtMs: number;
+      bookedAtMs: number | null;
+      grantCharacterId: number | null;
+    }
   >();
 
   private readonly characters: FakeWocMarketCharacter[];
@@ -608,8 +615,16 @@ export class FakeWocMarketDb implements WocMarketDb {
   }
 
   async undisposedClosedListings(realm: string, limit: number): Promise<WocListingRow[]> {
+    // Mirrors the Pg predicate: sold rows never enter the return backlog (a
+    // sold undisposed row is stuck residue the readout surfaces instead).
     return [...this.listings.values()]
-      .filter((row) => row.realm === realm && row.status === 'closed' && !row.itemDisposed)
+      .filter(
+        (row) =>
+          row.realm === realm &&
+          row.status === 'closed' &&
+          !row.itemDisposed &&
+          (row.resolution === null || row.resolution !== 'sold'),
+      )
       .sort(this.byTouch(this.listingTouchMs))
       .slice(0, limit)
       .map((r) => this.listingOut(r));
@@ -657,7 +672,12 @@ export class FakeWocMarketDb implements WocMarketDb {
   async claimCustodyRef(realm: string, custodyRef: string): Promise<boolean> {
     // ON CONFLICT (custody_ref) DO NOTHING: only the FIRST claim inserts.
     if (this.custodyClaims.has(custodyRef)) return false;
-    this.custodyClaims.set(custodyRef, { realm, claimedAtMs: this.now(), bookedAtMs: null });
+    this.custodyClaims.set(custodyRef, {
+      realm,
+      claimedAtMs: this.now(),
+      bookedAtMs: null,
+      grantCharacterId: null,
+    });
     return true;
   }
 
@@ -666,18 +686,102 @@ export class FakeWocMarketDb implements WocMarketDb {
     if (claim && claim.bookedAtMs === null) claim.bookedAtMs = this.now();
   }
 
-  /** Lease-fenced in the real db; the fake honours the same contract by
-   *  letting a test refuse a save, which is what drives the mail fallback. */
-  failDeliveredSave = false;
-  async saveDeliveredCharacter(_save: CharacterSaveArgs): Promise<boolean> {
-    return !this.failDeliveredSave;
+  async custodyRefState(custodyRef: string): Promise<WocCustodyRefState | null> {
+    const claim = this.custodyClaims.get(custodyRef);
+    if (!claim) return null;
+    return { booked: claim.bookedAtMs !== null, grantCharacterId: claim.grantCharacterId };
   }
 
-  async unclaimCustodyRef(custodyRef: string): Promise<void> {
-    // The Pg DELETE is guarded on booked_at IS NULL: a booked claim is the
-    // durable record of a delivered parcel and is never released.
+  async markCustodyGrantIntent(custodyRef: string, characterId: number): Promise<boolean> {
+    // The Pg UPDATE is guarded on booked_at IS NULL, and matching no row is
+    // the caller's park signal.
     const claim = this.custodyClaims.get(custodyRef);
-    if (claim && claim.bookedAtMs === null) this.custodyClaims.delete(custodyRef);
+    if (!claim || claim.bookedAtMs !== null) return false;
+    claim.grantCharacterId = characterId;
+    return true;
+  }
+
+  async clearCustodyGrantIntent(custodyRef: string): Promise<void> {
+    const claim = this.custodyClaims.get(custodyRef);
+    if (claim && claim.bookedAtMs === null) claim.grantCharacterId = null;
+  }
+
+  /** Outcome forcing for the atomic save-and-book edge, consumed on use.
+   *  'lease_lost' models the fence (nothing lands); 'throw' models a
+   *  transient failure whose transaction never committed; 'throw_after_commit'
+   *  models the ambiguous case (the booking COMMITTED, then the reply was
+   *  lost), which is exactly what booked_at exists to resolve. */
+  failNextDeliveredSave: 'lease_lost' | 'throw' | 'throw_after_commit' | null = null;
+  /** Every atomic save-and-book the delivery edge received, in order. */
+  readonly deliveredSaves: CharacterSaveArgs[] = [];
+
+  async saveDeliveredCharacterBooked(
+    save: CharacterSaveArgs,
+    custodyRef: string,
+  ): Promise<'booked' | 'lease_lost' | 'claim_missing'> {
+    this.deliveredSaves.push(structuredClone(save));
+    const forced = this.failNextDeliveredSave;
+    this.failNextDeliveredSave = null;
+    if (forced === 'lease_lost') return 'lease_lost';
+    if (forced === 'throw') throw new Error('delivered save failed');
+    const claim = this.custodyClaims.get(custodyRef);
+    if (!claim || claim.bookedAtMs !== null) return 'claim_missing';
+    claim.bookedAtMs = this.now();
+    if (forced === 'throw_after_commit') throw new Error('delivered save reply lost');
+    return 'booked';
+  }
+
+  async stuckCustodyReadout(
+    realm: string,
+    olderThanMs: number,
+    sampleLimit: number,
+  ): Promise<WocStuckCustodyReadout> {
+    const claims = [...this.custodyClaims.entries()]
+      .filter(([, c]) => c.realm === realm && c.bookedAtMs === null && c.claimedAtMs <= olderThanMs)
+      .sort((a, b) => a[1].claimedAtMs - b[1].claimedAtMs || a[0].localeCompare(b[0]));
+    const delivering = [...this.settlements.values()]
+      .filter(
+        (s) =>
+          s.realm === realm &&
+          s.state === 'delivering' &&
+          (this.settlementTouchMs.get(s.id) ?? 0) <= olderThanMs,
+      )
+      .sort(this.byTouch(this.settlementTouchMs));
+    const undisposed = [...this.listings.values()]
+      .filter(
+        (l) =>
+          l.realm === realm &&
+          l.status === 'closed' &&
+          !l.itemDisposed &&
+          (this.listingTouchMs.get(l.id) ?? 0) <= olderThanMs,
+      )
+      .sort(this.byTouch(this.listingTouchMs));
+    return {
+      unbookedClaims: {
+        count: claims.length,
+        sample: claims.slice(0, sampleLimit).map(([ref, c]) => ({
+          custodyRef: ref,
+          claimedAtMs: c.claimedAtMs,
+          grantCharacterId: c.grantCharacterId,
+        })),
+      },
+      stuckDelivering: {
+        count: delivering.length,
+        sample: delivering.slice(0, sampleLimit).map((s) => ({
+          id: s.id,
+          listingId: s.listingId,
+          updatedAtMs: this.settlementTouchMs.get(s.id) ?? 0,
+        })),
+      },
+      undisposedListings: {
+        count: undisposed.length,
+        sample: undisposed.slice(0, sampleLimit).map((l) => ({
+          id: l.id,
+          resolution: l.resolution,
+          updatedAtMs: this.listingTouchMs.get(l.id) ?? 0,
+        })),
+      },
+    };
   }
 
   async markItemDisposed(id: number): Promise<void> {
@@ -991,23 +1095,65 @@ export class FakeWocMarketDb implements WocMarketDb {
       .map((b) => this.bidOut(b));
   }
 
-  async cancelOpenBidsForListing(listingId: number): Promise<WocBidRow[]> {
-    const cancelled: WocBidRow[] = [];
-    for (const bid of this.bids.values()) {
-      if (
-        bid.listingId === listingId &&
-        (bid.status === 'pending_bond' || bid.status === 'active')
-      ) {
-        bid.status = 'cancelled';
-        cancelled.push(this.bidOut(bid));
-      }
-    }
-    return cancelled;
-  }
-
   // -------------------------------------------------------------------------
   // Settlements
   // -------------------------------------------------------------------------
+
+  /** Force the NEXT finalize to report contention (consumed on use). */
+  failNextFinalize: 'contended' | null = null;
+
+  async finalizeDeliveredSettlement(args: {
+    settlementId: number;
+    listingId: number;
+    bidId: number | null;
+    sale: Omit<WocSaleRow, 'id' | 'excluded' | 'atMs'>;
+  }): Promise<'finalized' | 'stale' | 'contended'> {
+    if (this.failNextFinalize) {
+      this.failNextFinalize = null;
+      return 'contended';
+    }
+    const rec = this.settlements.get(args.settlementId);
+    const listing = this.listings.get(args.listingId);
+    if (!rec || !listing) return 'stale';
+    // The CAS accepts 'delivered' too: that is what makes the re-drive and a
+    // re-run converge (mirrors the Pg transaction).
+    if (rec.state !== 'delivering' && rec.state !== 'delivered') return 'stale';
+    rec.state = 'delivered';
+    this.touchSettlement(rec.id);
+    // ON CONFLICT (listing_id) WHERE excluded = false DO NOTHING.
+    const standing = [...this.sales.values()].some(
+      (s) => s.listingId === args.listingId && !s.excluded,
+    );
+    if (!standing) {
+      const id = this.nextSaleId++;
+      this.sales.set(id, {
+        ...structuredClone(args.sale),
+        id,
+        excluded: false,
+        atMs: this.now(),
+      });
+    }
+    if (listing.status !== 'closed') {
+      listing.status = 'closed';
+      listing.resolution = 'sold';
+    }
+    listing.itemDisposed = true;
+    this.touchListing(listing.id);
+    if (args.bidId !== null) {
+      const winner = this.bids.get(args.bidId);
+      if (winner && winner.bondState === 'held') winner.bondState = 'refund_due';
+    }
+    for (const bid of this.bids.values()) {
+      if (
+        bid.listingId === args.listingId &&
+        (bid.status === 'pending_bond' || bid.status === 'active')
+      ) {
+        bid.status = 'cancelled';
+        if (bid.bondState === 'held') bid.bondState = 'refund_due';
+      }
+    }
+    return 'finalized';
+  }
 
   async insertSettlement(args: {
     listingId: number;
@@ -1195,6 +1341,19 @@ export class FakeWocMarketDb implements WocMarketDb {
   async deliveringSettlements(realm: string, limit: number): Promise<WocSettlementRow[]> {
     return [...this.settlements.values()]
       .filter((s) => s.realm === realm && s.state === 'delivering')
+      .sort(this.byTouch(this.settlementTouchMs))
+      .slice(0, limit)
+      .map((s) => this.settlementOut(s));
+  }
+
+  async deliveredUnclosedSettlements(realm: string, limit: number): Promise<WocSettlementRow[]> {
+    // Mirrors the Pg join: delivered settlements riding a NOT-closed listing.
+    return [...this.settlements.values()]
+      .filter((s) => {
+        if (s.realm !== realm || s.state !== 'delivered') return false;
+        const listing = this.listings.get(s.listingId);
+        return listing !== undefined && listing.status !== 'closed';
+      })
       .sort(this.byTouch(this.settlementTouchMs))
       .slice(0, limit)
       .map((s) => this.settlementOut(s));

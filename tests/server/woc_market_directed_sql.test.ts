@@ -395,4 +395,239 @@ describe('the settlement guards ship their DDL (structural floor)', () => {
     // The forensic demotion marker keeps any prior reason attached.
     expect(schema).toContain("fail_reason = 'schema_dedupe' || COALESCE(':' || fail_reason, '')");
   });
+
+  it('carries the grant-intent column additively, plus the unbooked-claims index', async () => {
+    const schema = await strippedSchema();
+    // Same additive rule as directed_buyer_account: the claims table exists on
+    // deployed realms, so the column must ride ALTER, never only CREATE TABLE.
+    expect(schema).toContain('ADD COLUMN IF NOT EXISTS grant_character_id');
+    // The stuck-custody readout's index: the monitor reads unbooked claims
+    // through it, so its predicate is load-bearing, not decorative.
+    expect(schema).toContain(
+      'CREATE INDEX IF NOT EXISTS woc_market_custody_claims_unbooked ' +
+        'ON woc_market_custody_claims(realm, claimed_at) WHERE booked_at IS NULL',
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The delivery close tail and the custody claim primitives. The real-Postgres
+// crash-matrix suite (tests/woc_market_delivery_pg_integration.test.ts) skips
+// green without TEST_DATABASE_URL, so the statement shapes that make delivery
+// exactly-once are ALSO pinned here, where ordinary CI always runs.
+// ---------------------------------------------------------------------------
+
+/** A pool whose transactions run on a recording CLIENT (withTx methods call
+ *  pool.connect()). Every statement lands in one sequence; the listing lock
+ *  read answers one open row so the tail past it is reachable. */
+function recordingTxPool(): { pool: Pool; sql: () => string[]; params: () => unknown[][] } {
+  const seen: string[] = [];
+  const bound: unknown[][] = [];
+  const query = vi.fn(async (text: string, values?: unknown[]) => {
+    seen.push(text);
+    bound.push(values ?? []);
+    if (text.includes('FROM woc_market_listings') && text.includes('FOR UPDATE')) {
+      return { rows: [{ status: 'settling' }], rowCount: 1 };
+    }
+    return { rows: [], rowCount: 1 };
+  });
+  const client = { query, release: vi.fn() };
+  const pool = { query, connect: async () => client } as unknown as Pool;
+  return { pool, sql: () => seen, params: () => bound };
+}
+
+const FINALIZE_ARGS = {
+  settlementId: 5,
+  listingId: 9,
+  bidId: 3,
+  sale: {
+    realm: REALM,
+    listingId: 9,
+    itemId: 'sword',
+    item: { itemId: 'sword', count: 1 },
+    priceCents: 5000,
+    amountBase: null,
+    sellerAccount: 1,
+    buyerAccount: 2,
+    sellerName: 'S',
+    buyerName: 'B',
+  },
+} as const;
+
+describe('the delivery close tail is ONE transaction, in SQL', () => {
+  it('runs the whole tail between one BEGIN and one COMMIT, waits bounded', async () => {
+    const { pool, sql } = recordingTxPool();
+    expect(
+      await new PgWocMarketDb(pool).finalizeDeliveredSettlement(structuredClone(FINALIZE_ARGS)),
+    ).toBe('finalized');
+    const seq = sql();
+    expect(seq[0]).toBe('BEGIN');
+    expect(seq.at(-1)).toBe('COMMIT');
+    expect(seq[1]).toContain('SET LOCAL lock_timeout');
+    // Every write the old code committed separately now sits inside the one
+    // transaction: the CAS, the sale, the close, the dispose, the bond flips.
+    const inside = seq.slice(1, -1).join('\n');
+    expect(inside).toContain('UPDATE woc_market_settlements');
+    expect(inside).toContain('INSERT INTO woc_market_sales');
+    expect(inside).toContain("SET status = 'closed'");
+    expect(inside).toContain('SET item_disposed = true');
+    expect(inside).toContain("SET bond_state = 'refund_due'");
+  });
+
+  it('locks bids FIRST (open set plus the winner, by id), the listing second', async () => {
+    // The file-wide lock order: the reverse deadlocks against the suspend and
+    // activate guards, which pre-lock the bid set the same way.
+    const { pool, sql } = recordingTxPool();
+    await new PgWocMarketDb(pool).finalizeDeliveredSettlement(structuredClone(FINALIZE_ARGS));
+    const seq = sql();
+    const bidLock = seq.findIndex(
+      (t) => t.includes('FROM woc_market_bids') && t.includes('FOR UPDATE'),
+    );
+    const listingLock = seq.findIndex(
+      (t) => t.includes('FROM woc_market_listings') && t.includes('FOR UPDATE'),
+    );
+    expect(bidLock).toBeGreaterThan(0);
+    expect(listingLock).toBeGreaterThan(bidLock);
+    expect(seq[bidLock]).toContain('ORDER BY id');
+    expect(seq[bidLock], 'the winner bid joins the lock set').toContain('OR id = $2');
+  });
+
+  it('accepts delivering AND delivered, which is what makes the re-drive converge', async () => {
+    const { pool, sql } = recordingTxPool();
+    await new PgWocMarketDb(pool).finalizeDeliveredSettlement(structuredClone(FINALIZE_ARGS));
+    const cas = sql().find((t) => t.includes('UPDATE woc_market_settlements'));
+    expect(cas).toContain("state IN ('delivering', 'delivered')");
+  });
+
+  it('dedupes the sale on the provenance index, never by throwing', async () => {
+    const { pool, sql } = recordingTxPool();
+    await new PgWocMarketDb(pool).finalizeDeliveredSettlement(structuredClone(FINALIZE_ARGS));
+    const insert = sql().find((t) => t.includes('INSERT INTO woc_market_sales'));
+    expect(insert).toContain('ON CONFLICT (listing_id) WHERE excluded = false DO NOTHING');
+  });
+
+  it('demotes every still-open loser in ONE statement, bond flip included', async () => {
+    const { pool, sql } = recordingTxPool();
+    await new PgWocMarketDb(pool).finalizeDeliveredSettlement(structuredClone(FINALIZE_ARGS));
+    const demote = sql().find(
+      (t) => t.includes("SET status = 'cancelled'") && t.includes('woc_market_bids'),
+    );
+    expect(demote).toContain("CASE WHEN bond_state = 'held' THEN 'refund_due' ELSE bond_state END");
+    expect(demote).toContain("status IN ('pending_bond', 'active')");
+  });
+});
+
+describe('the atomic save-and-book, in SQL', () => {
+  // The save path sanitizes the state (the removed-zone strip walks questLog,
+  // questsDone and the bags), so the fixture carries those, unlike the
+  // service fakes whose db never touches the blob.
+  const SAVE = {
+    characterId: 21,
+    level: 10,
+    state: { questLog: [], questsDone: [], inventory: [] } as never,
+    leaseNonce: 'nonce-1',
+  };
+
+  it('persists the fenced character write and the booking in one transaction', async () => {
+    const { pool, sql } = recordingTxPool();
+    expect(await new PgWocMarketDb(pool).saveDeliveredCharacterBooked(SAVE, 'ref-1')).toBe(
+      'booked',
+    );
+    const seq = sql();
+    expect(seq[0]).toBe('BEGIN');
+    expect(seq.at(-1)).toBe('COMMIT');
+    const character = seq.findIndex((t) => t.includes('UPDATE characters'));
+    const booking = seq.findIndex((t) => t.includes('UPDATE woc_market_custody_claims'));
+    expect(character).toBeGreaterThan(0);
+    expect(booking).toBeGreaterThan(character);
+    // The character half carries the in-statement lease fence, and the
+    // booking half is monotonic (unbooked rows only).
+    expect(seq[character]).toContain('character_leases');
+    expect(seq[booking]).toContain('SET booked_at = now()');
+    expect(seq[booking]).toContain('booked_at IS NULL');
+  });
+
+  it('rolls the WHOLE transaction back when the lease fence matches no row', async () => {
+    // The recording client answers rowCount 0 for the fenced UPDATE here, so
+    // the booking must never run and the transaction must end in ROLLBACK:
+    // a displaced session can neither persist the grant nor book the ref.
+    const seen: string[] = [];
+    const query = vi.fn(async (text: string) => {
+      seen.push(text);
+      return { rows: [], rowCount: 0 };
+    });
+    const client = { query, release: vi.fn() };
+    const pool = { query, connect: async () => client } as unknown as Pool;
+    expect(await new PgWocMarketDb(pool).saveDeliveredCharacterBooked(SAVE, 'ref-1')).toBe(
+      'lease_lost',
+    );
+    expect(seen.some((t) => t.includes('woc_market_custody_claims'))).toBe(false);
+    expect(seen.at(-1)).toBe('ROLLBACK');
+  });
+});
+
+describe('the custody claim primitives stay monotonic, in SQL', () => {
+  it('books, stamps, and clears ONLY while unbooked', async () => {
+    for (const run of [
+      (db: PgWocMarketDb) => db.markCustodyRefBooked('ref-1'),
+      (db: PgWocMarketDb) => db.markCustodyGrantIntent('ref-1', 21),
+      (db: PgWocMarketDb) => db.clearCustodyGrantIntent('ref-1'),
+    ]) {
+      const { pool, sql } = recordingPool();
+      await run(new PgWocMarketDb(pool));
+      expect(sql()[0]).toContain('booked_at IS NULL');
+    }
+  });
+
+  it('reads the claim state (booked flag plus grant intent) from the row', async () => {
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).custodyRefState('ref-1');
+    const [text] = sql();
+    expect(text).toContain('booked_at IS NOT NULL AS booked');
+    expect(text).toContain('grant_character_id');
+  });
+});
+
+describe('the sweep reads that keep delivery converging, in SQL', () => {
+  it('finds delivered-but-unclosed residue from the OPEN listings side', async () => {
+    // Delivered settlements grow with sale history forever; not-yet-closed
+    // listings are the bounded live set. The join direction is the cost model.
+    const { pool, sql, params } = recordingPool();
+    await new PgWocMarketDb(pool).deliveredUnclosedSettlements(REALM, 25);
+    const [text] = sql();
+    expect(text).toContain('FROM woc_market_listings l');
+    expect(text).toContain('JOIN woc_market_settlements s ON s.listing_id = l.id');
+    expect(text).toContain("s.state = 'delivered'");
+    expect(text).toContain("l.status IN ('active', 'ending', 'settling')");
+    expect(text).toContain('LIMIT $2');
+    expect(params()[0]).toEqual([REALM, 25]);
+  });
+
+  it('keeps SOLD rows out of the return backlog read', async () => {
+    // A sold listing whose dispose flag never landed (old-binary residue)
+    // must not occupy a return batch slot forever; the stuck readout is what
+    // surfaces it instead.
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).undisposedClosedListings(REALM, 25);
+    expect(sql()[0]).toContain("(resolution IS NULL OR resolution <> 'sold')");
+  });
+});
+
+describe('the stuck-custody readout is bounded, in SQL', () => {
+  it('reads three classes, each realm-scoped, aged, counted in-window and capped', async () => {
+    const { pool, sql, params } = recordingPool();
+    await new PgWocMarketDb(pool).stuckCustodyReadout(REALM, 1_000, 20);
+    const seq = sql();
+    expect(seq).toHaveLength(3);
+    for (const [i, text] of seq.entries()) {
+      expect(text, `read ${i} is realm-scoped`).toContain('realm = $1');
+      expect(text, `read ${i} is capped`).toContain('LIMIT $3');
+      // The window count rides the sample query; no second scan per class.
+      expect(text, `read ${i} counts in-window`).toContain('count(*) OVER ()');
+      expect(params()[i]).toEqual([REALM, 1_000, 20]);
+    }
+    expect(seq[0]).toContain('booked_at IS NULL');
+    expect(seq[1]).toContain("state = 'delivering'");
+    expect(seq[2]).toContain("status = 'closed' AND item_disposed = false");
+  });
 });

@@ -94,6 +94,28 @@ export function createWocMarketCustody(host: WocCustodyGameHost): WocMarketCusto
       };
     },
 
+    snapshotCopy(accountId: number, characterId: number): WocCustodyGrant {
+      // Re-serialize a live session WITHOUT granting anything: the resume arm
+      // of a direct hand-off whose atomic save threw mid-flight. The caller
+      // has proven (via its pendingGrants session identity) that these live
+      // bags already hold the earlier grant, so persisting this snapshot
+      // retries the delivery without minting a second copy.
+      const session = host.wocCustodySession(characterId);
+      if (!session) return { ok: false, reason: 'offline' };
+      if (session.accountId !== accountId) return { ok: false, reason: 'not_yours' };
+      const state = host.sim.serializeCharacter(session.pid);
+      if (!state) return { ok: false, reason: 'offline' };
+      return {
+        ok: true,
+        save: {
+          characterId,
+          level: state.level,
+          state,
+          leaseNonce: session.leaseNonce,
+        },
+      };
+    },
+
     restoreCopy(characterId: number, slot: InvSlot): void {
       const session = host.wocCustodySession(characterId);
       if (session) {
