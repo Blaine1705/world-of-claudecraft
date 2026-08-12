@@ -714,10 +714,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // was retaken.
 // Re-minted for the release base-health repair after renderer.ts changed. No
 // capture was retaken.
+// Re-minted for the v0.37.0 base sync with the login-storm base commit. The
+// merged renderer/prewarm/source bytes mint a value matching neither parent.
+// No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '03e925388a2a0baa1155da25aaee9ca79179683d0c66e54b5862c35fd09ac8ed';
+  '032ff770b1ea43c5d255f6f8978affd7ec0946fd7071acd0c9fa4efc2a1e68ce';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '67772cf626bef2e1fb65d9fb534c2cfce328b4d344b7640fc5796b3ff2cca240';
+  '3601ceef553078afc54539399f3a33bce060e7639f35967090d58b9168363694';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1666,10 +1669,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // swept evidence bytes. No capture was retaken.
     // Re-pinned for the release base-health repair after renderer.ts changed.
     // No capture was retaken.
+    // Re-pinned for the v0.37.0 base sync with the login-storm base commit.
+    // The first-order composite follows the merged input bytes, then this
+    // second-order performance seal follows the swept evidence bytes. No
+    // capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('800b9bcc3e5259fbcbf81ec89d28013c912684458f9ff04d95af72f868c6ca41');
+    ).toBe('aa51563d668ab077e7204e006bf376f24f67cd237600d594b536b05446156ed1');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

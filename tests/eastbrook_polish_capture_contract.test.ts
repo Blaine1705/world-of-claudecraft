@@ -136,8 +136,11 @@ interface AttributionTargetFixture {
 // was retaken.
 // Re-minted for the release base-health repair after renderer.ts changed. No
 // capture was retaken.
+// Re-minted for the v0.37.0 base sync with the login-storm base commit. The
+// merged renderer/prewarm/source bytes mint a value matching neither parent.
+// No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '67772cf626bef2e1fb65d9fb534c2cfce328b4d344b7640fc5796b3ff2cca240';
+  '3601ceef553078afc54539399f3a33bce060e7639f35967090d58b9168363694';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
