@@ -43,6 +43,15 @@ export const RICKSHAW_PULLER_VISUAL_KEY = 'skel_rickshaw_puller';
 // 1.8 (world units) alongside that file's SHAFT_TIP_Z extending 0.743 ->
 // 0.943 local: a live look with the real skel_rickshaw_puller flagged the
 // poles as too short and the puller standing too close to the rider.
+//
+// MIRRORED, so change both: the authoring preview
+// (scripts/assets/rickshaw_mount/export_entry.js) hardcodes this value and
+// RICKSHAW_PULLER_OFFSET_Y to place its stand-in puller, since the authored
+// Socket_Puller no longer matches what the game does. It has no way to read
+// these constants (it runs in a browser page under the exporter, not the
+// game bundle), so a change here that skips it silently leaves the preview
+// reviewing a different pose than the one that ships. That drift is exactly
+// how the preview went stale against skeleton_warrior.glb for six rounds.
 const RICKSHAW_PULLER_OFFSET_Z = 1.8;
 // 2026-08-08: a live look flagged the puller as standing too low. Both this
 // mount's root and the puller's own CharacterVisual root are floor-pivoted

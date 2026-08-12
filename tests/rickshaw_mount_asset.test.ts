@@ -165,15 +165,39 @@ describe('rickshaw mount asset pipeline', () => {
     expect(measuredHeight).toBeCloseTo(VISUALS.mount_rickshaw_mount.height, 3);
   });
 
-  it('pins skel_rickshaw_puller.height against the shipped GLB measured bbox', async () => {
+  // Deliberately NOT a bbox-equality pin, unlike the cart above. `height` on a
+  // CHARACTER is a TARGET, not a measurement: prepareVisual poses a throwaway
+  // clone mid-idle and derives normScale = height / posedHeight, so this value
+  // IS the puller's rendered size. 2.166 is an art choice, about 13% under the
+  // 2.5 standing-skeleton convention the rest of the family uses
+  // (skel_minion, skel_warrior), chosen so the puller reads as a hunched grunt
+  // harnessed to a cart. Asserting it equals the static bbox would pin a
+  // coincidence and, worse, point the next person at `height` (the in-game
+  // size, tuned against the shaft grip and both runtime offsets) as the thing
+  // to "fix" after a re-export moved the bbox by a hair.
+  it('keeps the puller at its authored size, deliberately under the family standard', () => {
+    expect(VISUALS.skel_rickshaw_puller.height).toBeCloseTo(2.166, 3);
+    expect(VISUALS.skel_rickshaw_puller.height).toBeLessThan(VISUALS.skel_minion.height);
+  });
+
+  // Separate from the size ruling above: this rig is one of the few unquantized
+  // GLBs under public/models/chars/enemies (rebuild_kaykit_skeletons_free.mjs
+  // skips meshopt because it corrupts this shape), so its static bbox is real
+  // world units. Most siblings carry KHR_mesh_quantization, where the same
+  // measurement returns normalized junk, so nobody should copy the cart's
+  // bbox-equality pin onto another character rig without checking this first.
+  it('ships the puller rig unquantized, which is what makes any bbox read of it meaningful', async () => {
     await MeshoptDecoder.ready;
     const pullerPath = path.join(REPO_ROOT, 'public/models/chars/enemies/skeleton_minion_free.glb');
     const io = new NodeIO()
       .registerExtensions(ALL_EXTENSIONS)
       .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
     const document = await io.readBinary(readFileSync(pullerPath));
-    const bounds = getBounds(document.getRoot().listScenes()[0]);
-    const measuredHeight = bounds.max[1] - bounds.min[1];
-    expect(measuredHeight).toBeCloseTo(VISUALS.skel_rickshaw_puller.height, 3);
+    const root = document.getRoot();
+    expect(root.listExtensionsRequired().map((e) => e.extensionName)).not.toContain(
+      'KHR_mesh_quantization',
+    );
+    const bounds = getBounds(root.listScenes()[0]);
+    expect(bounds.max[1] - bounds.min[1]).toBeCloseTo(2.166, 3);
   });
 });

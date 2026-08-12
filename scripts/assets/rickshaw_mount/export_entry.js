@@ -24,7 +24,8 @@ function base64ToArrayBuffer(base64) {
 
 const gltfLoader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
 let ktx2Ready = false;
-// public/models GLBs (skeleton_warrior.glb included) carry KTX2/Basis
+// public/models GLBs (skeleton_minion_free.glb, this preview's puller,
+// included) carry KTX2/Basis
 // compressed textures, matching the game's own assets/ktx2_support.ts
 // convention. This preview harness is served from ROOT (see
 // export_rickshaw_mount.mjs), so the plain '/basis/' path resolves the same
