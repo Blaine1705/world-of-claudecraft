@@ -3,11 +3,20 @@
 // residue each crash between two delivery steps would leave (a claim with no
 // parcel, a parcel with no booking, a booking with no close tail, a delivered
 // settlement with an open listing), then runs the REAL sweep and asserts the
-// converged end state: exactly one parcel, exactly one sale row, the listing
-// closed and disposed once, every bond flipped once. Two-connection
-// interleaves pin the finalize transaction's lock participation (a snapshot
-// predicate alone provably cannot refuse a concurrent closer; see the guard
-// suite beside this one).
+// converged end state.
+//
+// Convergence has TWO postures and the matrix asserts both, because "exactly
+// once" is as much about the deliveries that must NOT happen:
+//   - CONVERGED (C0, C1, C3, C4, C5, C5b, C6): exactly one parcel, exactly one
+//     sale row, the listing closed and disposed once, every bond flipped once.
+//   - PARKED (C2a, C2b, C3b, C7, C8): no parcel at all, the settlement still
+//     'delivering', and the row visible in the stuck-custody readout. A resume
+//     that cannot PROVE the item was not already delivered is required to stop
+//     here and wait for an operator.
+// Two-connection interleaves pin the finalize transaction's lock participation
+// (a snapshot predicate alone provably cannot refuse a concurrent closer; see
+// the guard suite beside this one), and a rotation group pins that parking a
+// row never hides it from the readout.
 //
 // Gate: TEST_DATABASE_URL (an admin URL on the dev Postgres from npm run
 // db:up). The suite creates and drops its own database and never touches the
@@ -21,6 +30,7 @@ import type {
   WocSettlementRow,
 } from '../server/woc_market';
 import type { PgWocMarketDb } from '../server/woc_market_db';
+import type { CharacterState } from '../src/sim/sim';
 import type { InvSlot } from '../src/sim/types';
 
 const ADMIN_URL = process.env.TEST_DATABASE_URL;
@@ -47,8 +57,9 @@ const delay = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms
  *  custodyRef dedupe the live post office applies (the direct-grant rail has
  *  its own fake-db suite and the atomic save-and-book tests below). */
 class ParcelCustody implements WocMarketCustody {
-  readonly parcels: { recipientKey: string; letter: string; custodyRef: string }[] = [];
-  /** Every ATTEMPT, failures and dedupes included. */
+  readonly parcels: { letter: 'delivery' | 'return' | 'sold_notice'; custodyRef: string }[] = [];
+  /** Every persistMailParcel CALL, in order: the parcel book above dedupes on
+   *  the ref, so only this can say whether a second write was attempted. */
   readonly persistCalls: string[] = [];
 
   extractCopy(): never {
@@ -63,14 +74,14 @@ class ParcelCustody implements WocMarketCustody {
   }
   restoreCopy(): void {}
   async persistMailParcel(
-    recipient: { key: string; name: string },
+    _recipient: { key: string; name: string },
     letter: 'delivery' | 'return' | 'sold_notice',
     _items: InvSlot[],
     custodyRef: string,
   ): Promise<void> {
     this.persistCalls.push(custodyRef);
     if (this.parcels.some((p) => p.custodyRef === custodyRef)) return;
-    this.parcels.push({ recipientKey: recipient.key, letter, custodyRef });
+    this.parcels.push({ letter, custodyRef });
   }
 
   hasParcel(custodyRef: string): boolean {
@@ -240,15 +251,25 @@ describeDb('woc market delivery finalization against real Postgres', () => {
     return out;
   }
 
+  /** The service clock. MUTABLE on purpose: the minute-gated residue beats
+   *  (redriven, disposed) return 0 without doing anything while the clock
+   *  stands still, so a re-run assertion under a frozen clock passes over a
+   *  beat that never ran. makeService rebases it, and a test advances it. */
+  let clockMs = BASE_MS;
+  const setNow = (ms: number): void => {
+    clockMs = ms;
+  };
+
   function makeService(realm: string, custody: ParcelCustody): WocMarketService {
+    clockMs = BASE_MS;
     return new marketMod.WocMarketService({
       db: marketDb,
-      economy: proxyMod.createDevWocMarketEconomy(() => BASE_MS),
+      economy: proxyMod.createDevWocMarketEconomy(() => clockMs),
       custody,
       verifiedWallet: async () => 'wallet-fixture',
       balanceTokens: async () => 1_000_000,
       config: { enabled: true, realm, policy: rulesMod.WOC_MARKET_RESTRICTED_POLICY },
-      now: () => BASE_MS,
+      now: () => clockMs,
       // The matrix asserts convergence; an arm failure must fail the test
       // loudly rather than score a quiet zero.
       onSweepError: (arm, err) => {
@@ -259,7 +280,6 @@ describeDb('woc market delivery finalization against real Postgres', () => {
 
   /** The full delivered end state, asserted after every crash point. */
   async function expectDeliveredExactlyOnce(opts: {
-    realm: string;
     listingId: number;
     settlementId: number;
     custody: ParcelCustody;
@@ -291,10 +311,12 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       [opts.custodyRef],
     );
     expect(claim.rows[0]?.booked_at, 'the claim is booked').not.toBeNull();
-    expect(
-      opts.custody.parcels.filter((p) => p.custodyRef === opts.custodyRef),
-      'exactly the expected parcel count',
-    ).toHaveLength(opts.parcels);
+    const booked = opts.custody.parcels.filter((p) => p.custodyRef === opts.custodyRef);
+    expect(booked, 'exactly the expected parcel count').toHaveLength(opts.parcels);
+    // The ref alone does not say WHICH letter went out, and the three letters
+    // are addressed to different people: a delivery ref carrying the return
+    // letter would post the buyer's item back to the seller.
+    for (const parcel of booked) expect(parcel.letter).toBe('delivery');
     // Bond invariants that survive the SAME pass's bond arm (which resolves a
     // reference-less refund_due to 'void' right after the finalize flips it):
     // never stranded 'held', never forfeited. The precise refund_due flip is
@@ -369,7 +391,6 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       const service = makeService(realm, custody);
       await service.sweepPass();
       await expectDeliveredExactlyOnce({
-        realm,
         listingId: scene.listingId,
         settlementId: scene.settlement.id,
         custody,
@@ -381,7 +402,6 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       // Convergence is idempotent: the whole sweep again, same end state.
       await service.sweepPass();
       await expectDeliveredExactlyOnce({
-        realm,
         listingId: scene.listingId,
         settlementId: scene.settlement.id,
         custody,
@@ -398,7 +418,6 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       const custody = new ParcelCustody();
       await makeService(realm, custody).sweepPass();
       await expectDeliveredExactlyOnce({
-        realm,
         listingId: scene.listingId,
         settlementId: scene.settlement.id,
         custody,
@@ -461,7 +480,6 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       );
       await makeService(realm, custody).sweepPass();
       await expectDeliveredExactlyOnce({
-        realm,
         listingId: scene.listingId,
         settlementId: scene.settlement.id,
         custody,
@@ -517,7 +535,6 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       await marketDb.markCustodyRefBooked(scene.custodyRef);
       await makeService(realm, custody).sweepPass();
       await expectDeliveredExactlyOnce({
-        realm,
         listingId: scene.listingId,
         settlementId: scene.settlement.id,
         custody,
@@ -544,7 +561,6 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       const stats = await service.sweepPass();
       expect(stats?.redriven).toBe(1);
       await expectDeliveredExactlyOnce({
-        realm,
         listingId: scene.listingId,
         settlementId: scene.settlement.id,
         custody,
@@ -553,11 +569,14 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         winnerBidId: scene.winnerBidId,
         loserBidId: scene.loserBidId,
       });
-      // A re-run converges to the same end state and re-drives nothing.
+      // A re-run converges to the same end state and re-drives nothing. The
+      // clock MUST advance past the beat interval first: the residue arm is
+      // minute-gated, so a second pass on a frozen clock returns 0 before
+      // reading anything and the assertion below would pin nothing at all.
+      setNow(BASE_MS + MINUTE_MS + 1_000);
       const again = await service.sweepPass();
       expect(again?.redriven).toBe(0);
       await expectDeliveredExactlyOnce({
-        realm,
         listingId: scene.listingId,
         settlementId: scene.settlement.id,
         custody,
@@ -587,7 +606,6 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       const stats = await makeService(realm, custody).sweepPass();
       expect(stats?.redriven).toBe(1);
       await expectDeliveredExactlyOnce({
-        realm,
         listingId,
         settlementId: settlement.id,
         custody,
@@ -619,7 +637,6 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       const stats = await makeService(realm, custody).sweepPass();
       expect(stats?.redriven).toBe(1);
       await expectDeliveredExactlyOnce({
-        realm,
         listingId: scene.listingId,
         settlementId: scene.settlement.id,
         custody,
@@ -657,7 +674,10 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       });
       const custody = new ParcelCustody();
       const stats = await makeService(realm, custody).sweepPass();
-      expect(stats?.redriven).toBe(1);
+      // The dispose arm's own stat: it is counted apart from the page walk so
+      // a throw in one residue class can never be read as the other draining.
+      expect(stats?.disposed).toBe(1);
+      expect(stats?.redriven, 'no delivered-but-unclosed residue exists here').toBe(0);
       const rows = await pool.query(
         `SELECT id, item_disposed FROM woc_market_listings WHERE id = ANY($1::bigint[]) ORDER BY id`,
         [[withSale, withoutSale].sort((a, b) => a - b)],
@@ -739,7 +759,7 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         {
           characterId,
           level: 11,
-          state: { questLog: [], questsDone: [], inventory: [] } as never,
+          state: { questLog: [], questsDone: [], inventory: [] } as unknown as CharacterState,
           leaseNonce: undefined,
         },
         ref,
@@ -774,7 +794,7 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         {
           characterId,
           level: 14,
-          state: { questLog: [], questsDone: [], inventory: [] } as never,
+          state: { questLog: [], questsDone: [], inventory: [] } as unknown as CharacterState,
           leaseNonce: 'live-nonce-1',
         },
         ref,
@@ -803,7 +823,7 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         {
           characterId,
           level: 12,
-          state: { questLog: [], questsDone: [], inventory: [] } as never,
+          state: { questLog: [], questsDone: [], inventory: [] } as unknown as CharacterState,
           leaseNonce: 'a-nonce-nobody-holds',
         },
         ref,
@@ -831,7 +851,7 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         {
           characterId,
           level: 13,
-          state: { questLog: [], questsDone: [], inventory: [] } as never,
+          state: { questLog: [], questsDone: [], inventory: [] } as unknown as CharacterState,
           leaseNonce: undefined,
         },
         ref,
@@ -865,7 +885,7 @@ describeDb('woc market delivery finalization against real Postgres', () => {
           realm,
           listingId: scene.listingId,
           itemId: 'crown_of_embers',
-          item: { itemId: 'crown_of_embers', count: 1 } as InvSlot,
+          item: { itemId: 'crown_of_embers', count: 1 },
           priceCents: 1000,
           amountBase: null,
           sellerAccount: 1,
@@ -1002,8 +1022,14 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         marketDb.finalizeDeliveredSettlement(finalizeArgs(realm, scene)),
         marketDb.finalizeDeliveredSettlement(finalizeArgs(realm, scene)),
       ]);
-      expect([a, b].filter((r) => r === 'finalized').length).toBeGreaterThanOrEqual(1);
-      expect([a, b].every((r) => r === 'finalized' || r === 'contended')).toBe(true);
+      // Exactly ONE reports the transition. The close is a compare-and-set, so
+      // the loser (which waited out the winner's listing row lock) sees a row
+      // already closed and disposed and reports 'already_final': that is what
+      // keeps the seller from being notified twice for one sale.
+      expect([a, b].filter((r) => r === 'finalized')).toHaveLength(1);
+      expect(
+        [a, b].every((r) => r === 'finalized' || r === 'already_final' || r === 'contended'),
+      ).toBe(true);
       const sales = await pool.query(
         `SELECT count(*)::int AS n FROM woc_market_sales WHERE listing_id = $1 AND excluded = false`,
         [scene.listingId],
@@ -1040,15 +1066,19 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       const stuck = await seedSettlement(stuckListing, buyer, buyerCharacter, {
         state: 'delivering',
       });
-      // The class ages on CREATED_AT: rotation touches move updated_at only,
-      // so an aged updated_at alone must not count (negative below).
+      // The class ages on UPDATED_AT, stamped when the row entered
+      // 'delivering', so a slow payment leg is not reported stuck the moment
+      // delivery begins. Park rotation writes sweep_parked_at instead, which
+      // is why the rotated negative below must stay OUT.
       await pool.query(
-        `UPDATE woc_market_settlements SET created_at = now() - interval '1 hour' WHERE id = $1`,
+        `UPDATE woc_market_settlements SET updated_at = now() - interval '1 hour' WHERE id = $1`,
         [stuck.id],
       );
       // Per-dimension negatives, all in the SAME realm: a FRESH delivering
-      // settlement (age arm), an aged CONFIRMED one (state arm), and an aged
-      // ROTATED one whose updated_at moved but created_at did not exist aged.
+      // settlement (age arm), an aged CONFIRMED one (state arm), and one whose
+      // aged value sits in the ROTATION column only (the readout must not read
+      // COALESCE(sweep_parked_at, updated_at), or every parked row would age in
+      // on its rotation rather than on its real standing time).
       const freshListing = await seedListing(realm, seller);
       await seedSettlement(freshListing, buyer, buyerCharacter, { state: 'delivering' });
       const confirmedListing = await seedListing(realm, seller);
@@ -1056,7 +1086,7 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         state: 'confirmed',
       });
       await pool.query(
-        `UPDATE woc_market_settlements SET created_at = now() - interval '1 hour' WHERE id = $1`,
+        `UPDATE woc_market_settlements SET updated_at = now() - interval '1 hour' WHERE id = $1`,
         [agedConfirmed.id],
       );
       const rotatedListing = await seedListing(realm, seller);
@@ -1064,7 +1094,8 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         state: 'delivering',
       });
       await pool.query(
-        `UPDATE woc_market_settlements SET updated_at = now() - interval '1 hour' WHERE id = $1`,
+        `UPDATE woc_market_settlements SET sweep_parked_at = now() - interval '1 hour'
+          WHERE id = $1`,
         [rotated.id],
       );
 
@@ -1121,6 +1152,131 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       const readout = await marketDb.stuckCustodyReadout(realm, Date.now() - 600_000, 3, 5);
       expect(readout.unbookedClaims.count, 'cap or more, never the true 7').toBe(5);
       expect(readout.unbookedClaims.sample, 'the sample keeps its own cap').toHaveLength(3);
+      // The flag is what stops a capped count from reading as an exact one on
+      // the operator dashboard.
+      expect(readout.unbookedClaims.saturated).toBe(true);
+      // An EMPTY class must never claim saturation: zero rows is zero rows.
+      expect(readout.stuckDelivering).toMatchObject({ count: 0, saturated: false });
+      expect(readout.undisposedListings).toMatchObject({ count: 0, saturated: false });
+      // And below the cap the flag clears while the count becomes the truth.
+      const roomy = await marketDb.stuckCustodyReadout(realm, Date.now() - 600_000, 3, 50);
+      expect(roomy.unbookedClaims.count, 'the real backlog, unclamped').toBe(7);
+      expect(roomy.unbookedClaims.saturated).toBe(false);
+    }, 20_000);
+  });
+
+  // -------------------------------------------------------------------------
+  // Park rotation: a parked row cycles to the back of its batch WITHOUT
+  // refreshing the age the readout watches. Rotating the age column instead
+  // (the shape this pins against) hid every permanently parked row from the
+  // monitor by construction, because the retry cadence is a minute and the
+  // stuck threshold is ten.
+  // -------------------------------------------------------------------------
+
+  describe('park rotation stays visible to the readout', () => {
+    it('a rotated RETURN keeps aging into the readout and sorts to the batch tail', async () => {
+      const realm = 'delivery-rotation-listing';
+      const seller = await seedAccount();
+      const parked = await seedListing(realm, seller, { status: 'closed' });
+      const fresher = await seedListing(realm, seller, { status: 'closed' });
+      await pool.query(
+        `UPDATE woc_market_listings
+            SET resolution = 'cancelled', updated_at = now() - interval '1 hour'
+          WHERE id = $1`,
+        [parked],
+      );
+      await pool.query(
+        `UPDATE woc_market_listings
+            SET resolution = 'cancelled', updated_at = now() - interval '5 minutes'
+          WHERE id = $1`,
+        [fresher],
+      );
+      // Several minutes of retries, which is what a permanently refused return
+      // actually gets before an operator ever looks at it.
+      for (let i = 0; i < 3; i++) await marketDb.touchListingRow(parked);
+      const readout = await marketDb.stuckCustodyReadout(
+        realm,
+        Date.now() - 10 * MINUTE_MS,
+        10,
+        1000,
+      );
+      expect(readout.undisposedListings.count, 'rotation left the age column alone').toBe(1);
+      expect(readout.undisposedListings.sample[0]?.id).toBe(parked);
+      // The rotation still did its job: the parked row lost the batch head.
+      const batch = await marketDb.undisposedClosedListings(realm, 25);
+      expect(batch.map((r) => r.id)).toEqual([fresher, parked]);
+    }, 20_000);
+
+    it('a rotated DELIVERING settlement keeps aging into the readout and sorts to the batch tail', async () => {
+      const realm = 'delivery-rotation-settlement';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const buyerCharacter = await seedCharacter(realm, buyer);
+      const parked = await seedSettlement(await seedListing(realm, seller), buyer, buyerCharacter, {
+        state: 'delivering',
+      });
+      const fresher = await seedSettlement(
+        await seedListing(realm, seller),
+        buyer,
+        buyerCharacter,
+        { state: 'delivering' },
+      );
+      await pool.query(
+        `UPDATE woc_market_settlements SET updated_at = now() - interval '1 hour' WHERE id = $1`,
+        [parked.id],
+      );
+      await pool.query(
+        `UPDATE woc_market_settlements SET updated_at = now() - interval '5 minutes' WHERE id = $1`,
+        [fresher.id],
+      );
+      for (let i = 0; i < 3; i++) await marketDb.touchSettlementRow(parked.id);
+      const readout = await marketDb.stuckCustodyReadout(
+        realm,
+        Date.now() - 10 * MINUTE_MS,
+        10,
+        1000,
+      );
+      expect(readout.stuckDelivering.count, 'rotation left the age column alone').toBe(1);
+      expect(readout.stuckDelivering.sample[0]?.id).toBe(parked.id);
+      const batch = await marketDb.deliveringSettlements(realm, 25);
+      expect(batch.map((s) => s.id)).toEqual([fresher.id, parked.id]);
+    }, 20_000);
+
+    it('scopes the delivering and undisposed classes to the reading realm', async () => {
+      // The claims class already has a foreign-realm negative; these two did
+      // not, so a dropped realm predicate on either would have shown up only
+      // as another realm's rows quietly joining this operator's queue.
+      const realm = 'delivery-realm-scope';
+      const foreign = 'delivery-realm-scope-other';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const foreignCharacter = await seedCharacter(foreign, buyer);
+      const foreignListing = await seedListing(foreign, seller, { status: 'closed' });
+      const foreignSettlement = await seedSettlement(
+        await seedListing(foreign, seller),
+        buyer,
+        foreignCharacter,
+        { state: 'delivering' },
+      );
+      await pool.query(
+        `UPDATE woc_market_listings
+            SET resolution = 'cancelled', updated_at = now() - interval '1 hour'
+          WHERE id = $1`,
+        [foreignListing],
+      );
+      await pool.query(
+        `UPDATE woc_market_settlements SET updated_at = now() - interval '1 hour' WHERE id = $1`,
+        [foreignSettlement.id],
+      );
+      const cutoff = Date.now() - 10 * MINUTE_MS;
+      const home = await marketDb.stuckCustodyReadout(realm, cutoff, 10, 1000);
+      expect(home.stuckDelivering.count).toBe(0);
+      expect(home.undisposedListings.count).toBe(0);
+      // The positive control: both rows really exist and really are aged, so
+      // the zeros above are the realm predicate rather than an empty table.
+      const away = await marketDb.stuckCustodyReadout(foreign, cutoff, 10, 1000);
+      expect(away.stuckDelivering.sample[0]?.id).toBe(foreignSettlement.id);
+      expect(away.undisposedListings.sample[0]?.id).toBe(foreignListing);
     }, 20_000);
   });
 });

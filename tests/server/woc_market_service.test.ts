@@ -129,6 +129,10 @@ class FakeCustody implements WocMarketCustody {
   /** Characters whose bags are full: grantCopy refuses them, so a test can
    *  drive the mail fallback without modelling real capacity. */
   readonly fullBags = new Set<number>();
+  /** Force the NEXT grantCopy to report the AMBIGUOUS refusal (consumed on
+   *  use): the copy reaches the LIVE bags and only the re-serialize fails, so
+   *  the caller may neither mail over it nor treat the grant as refused. */
+  failNextGrantAmbiguous = false;
 
   grantCopy(accountId: number, characterId: number, slot: InvSlot): WocCustodyGrant {
     const inventory = this.bags.get(characterId);
@@ -139,6 +143,12 @@ class FakeCustody implements WocMarketCustody {
     if (this.fullBags.has(characterId)) return { ok: false, reason: 'no_space' };
     inventory.push(slot);
     this.grantCalls++;
+    if (this.failNextGrantAmbiguous) {
+      this.failNextGrantAmbiguous = false;
+      // Mirrors the real bridge's ordering: grantTradableCopy already mutated
+      // the bags above, and only serializeCharacter came back empty.
+      return { ok: false, reason: 'ambiguous' };
+    }
     return {
       ok: true,
       save: {
@@ -2935,7 +2945,10 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     expect(h.custody.parcels.map((p) => p.custodyRef)).toContain(
       listingSoldNoticeCustodyRef(listingId),
     );
-    // A second pass changes nothing: converged, and never counted again.
+    // A second pass changes nothing: converged, and never counted again. The
+    // clock has to cross the beat interval first, or the arm returns 0 from
+    // its minute gate without reading anything and this pins nothing.
+    h.setNow(h.now() + 61_000);
     const again = await h.service.sweepPass();
     expect(again?.redriven).toBe(0);
     expect(await h.db.salesForItem(REALM, EPIC_ITEM, 10)).toHaveLength(1);
@@ -3795,5 +3808,545 @@ describe('the insert refusal arms at the service seam', () => {
     // Equal amount AND time: the lowest id wins (a total, deterministic order).
     expect((await h.db.nextCascadeBidder(listing.id, 0, [BUYER_A]))?.id).toBe(late);
     expect(lateTwin).toBeGreaterThan(late);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Park rotation, the residue beats, and the resume ledgers.
+//
+// The shared theme: work that CANNOT proceed must stay visible and stay
+// bounded. A parked row rotates out of the batch head without refreshing the
+// age the monitor watches, the residue beats converge over resumable pages
+// rather than one unbounded burst, and a resume that cannot prove the item is
+// undelivered stops instead of guessing. The directed-offer block above scopes
+// its own copies of these fixtures; they are re-stated here so each block reads
+// on its own.
+// ---------------------------------------------------------------------------
+
+/** The stuck-custody horizon the operator readout is queried with. */
+const STUCK_HORIZON_MS = 600_000;
+/** One tick past the in-process park backoff (PARK_RETRY_MS). */
+const PAST_BACKOFF_MS = 61_000;
+
+/** Two epics in the seller's bags, so one harness can stage a directed sale
+ *  and still have a copy left for a second listing. */
+function twoEpics(h: Harness): Harness {
+  h.custody.bags.set(SELLER_CHAR, [
+    { itemId: EPIC_ITEM, count: 1 },
+    { itemId: EPIC_ITEM, count: 1 },
+  ]);
+  return h;
+}
+
+/** The buyer online with room to spare. Without it every hand-off refuses as
+ *  'offline' and the park assertions below pass for the wrong reason. */
+function putBuyerOnline(h: Harness): void {
+  h.custody.bags.set(CHAR_A, []);
+  h.custody.owners.set(CHAR_A, BUYER_A);
+}
+
+/** A directed p2p deal driven from offer to a delivery attempt: both sides
+ *  accept (buyer first, so the SELLER's acceptance escrows), the buyer takes
+ *  the buy-now price, and confirmSettlement delivers eagerly. */
+async function directedSale(h: Harness, signature: string): Promise<{ listingId: number }> {
+  const offer = unwrap(
+    await h.service.createDirectedOffer({
+      account: BUYER_A,
+      characterId: CHAR_A,
+      sellerCharacterName: 'Selara',
+      usdCents: 5000,
+    }),
+    'createDirectedOffer',
+  );
+  unwrap(
+    await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id, null, CHAR_A),
+    'buyer accept',
+  );
+  const accepted = unwrap(
+    await h.service.acceptDirectedOffer(
+      SELLER,
+      offer.offer.id,
+      { index: 0, itemId: EPIC_ITEM },
+      SELLER_CHAR,
+    ),
+    'seller accept',
+  );
+  if (!accepted.listing) throw new Error('the seller acceptance produced no listing');
+  const listingId = accepted.listing.id;
+  const bought = unwrap(
+    await h.service.buyNow({ account: BUYER_A, characterId: CHAR_A, listingId, acceptTerms: true }),
+    'buyNow',
+  );
+  unwrap(await h.service.settlementQuote(BUYER_A, bought.settlement.id), 'settlementQuote');
+  unwrap(
+    await h.service.confirmSettlement(BUYER_A, bought.settlement.id, signature),
+    'confirmSettlement',
+  );
+  return { listingId };
+}
+
+/** Take a closed public auction's settlement to 'confirmed' WITHOUT
+ *  confirmSettlement, whose eager arm would deliver it in the same breath. */
+async function confirmedAwaitingDelivery(h: Harness, listingId: number): Promise<number> {
+  const settlement = await liveSettlement(h, listingId);
+  unwrap(await h.service.settlementQuote(BUYER_A, settlement.id), 'settlementQuote');
+  expect(await h.db.transitionSettlement(settlement.id, ['offered'], 'confirming')).toBe(true);
+  expect(await h.db.transitionSettlement(settlement.id, ['confirming'], 'confirmed')).toBe(true);
+  return settlement.id;
+}
+
+/** One delivered-but-unclosed residue row, the shape an older binary left when
+ *  it died between its delivered CAS and its close tail. Written straight
+ *  through the db primitives: the current binary cannot produce this state, and
+ *  a DIRECTED listing is exempt from the per-seller active cap, which is the
+ *  only way to stage more residue than a seller may hold public listings. */
+async function seedDeliveredResidue(h: Harness): Promise<{ listingId: number }> {
+  const inserted = await h.db.escrowInsertListing(
+    {
+      characterId: SELLER_CHAR,
+      level: 10,
+      state: {} as unknown as CharacterState,
+      leaseNonce: 'nonce',
+    },
+    {
+      realm: REALM,
+      sellerAccount: SELLER,
+      sellerCharacter: SELLER_CHAR,
+      sellerName: 'Selara',
+      sellerWallet: 'wallet-seller',
+      item: { itemId: EPIC_ITEM, count: 1 },
+      itemId: EPIC_ITEM,
+      quality: 'epic',
+      params: listingParams({ directedBuyerAccount: BUYER_A, buyNowCents: 5000 }),
+      endsAtMs: h.now() + 24 * HOUR_MS,
+    },
+  );
+  if (!inserted.ok) throw new Error(`residue listing refused: ${inserted.reason}`);
+  const settlement = await h.db.insertSettlement({
+    listingId: inserted.id,
+    bidId: null,
+    attempt: 0,
+    buyerAccount: BUYER_A,
+    buyerCharacter: CHAR_A,
+    buyerName: 'Aldan',
+    buyerWallet: 'wallet-a',
+    amountCents: 5000,
+    deadlineAtMs: h.now() + HOUR_MS,
+    nowMs: h.now(),
+  });
+  if (typeof settlement === 'string') throw new Error(`residue settlement refused: ${settlement}`);
+  expect(await h.db.transitionSettlement(settlement.id, ['offered'], 'delivered')).toBe(true);
+  return { listingId: inserted.id };
+}
+
+/** The readout an operator actually gets: a cutoff BEHIND now by the stuck
+ *  horizon. A cutoff in the FUTURE (now + 1) satisfies the age predicate for
+ *  every row, so it would stay green over an age column the park rotation
+ *  re-stamped, which is the exact defect this group exists to catch. */
+function stuckReadout(h: Harness) {
+  return h.db.stuckCustodyReadout(REALM, h.now() - STUCK_HORIZON_MS, 10, 1000);
+}
+
+/** Sweep once a minute until more than the stuck horizon has passed, which is
+ *  what a permanently parked row really lives through before anyone looks. */
+async function rotatePastStuckHorizon(h: Harness): Promise<void> {
+  const start = h.now();
+  while (h.now() - start <= STUCK_HORIZON_MS) {
+    h.setNow(h.now() + PAST_BACKOFF_MS);
+    await h.service.sweepPass();
+  }
+}
+
+/** Stage a return that can never proceed: a claim already attributed to the
+ *  grant rail refuses the return rail forever, so the backlog parks it on
+ *  every pass. Returns the suspended listing. */
+async function parkedReturn(h: Harness): Promise<WocListingRow> {
+  const listing = await listEpic(h);
+  const ref = listingReturnCustodyRef(listing.id);
+  expect(await h.db.claimCustodyRef(REALM, ref)).toBe(true);
+  expect(await h.db.markCustodyGrantIntent(ref, CHAR_A)).toBe(true);
+  expect(await h.service.adminSuspendListing(listing.id)).toEqual({ ok: true });
+  return listing;
+}
+
+describe('a parked row rotates to the batch tail without hiding from the monitor', () => {
+  it('keeps a parked RETURN visible in the readout across ten minutes of rotations', async () => {
+    // The rotation column and the age column are deliberately different
+    // columns. Rotating the AGE column instead re-stamped every parked row once
+    // a minute against a ten-minute threshold, so the operator queue read empty
+    // forever precisely while nothing was being delivered.
+    const h = makeHarness();
+    const listing = await parkedReturn(h);
+    await rotatePastStuckHorizon(h);
+    const readout = await stuckReadout(h);
+    expect(readout.undisposedListings.count, 'still standing, still visible').toBe(1);
+    expect(readout.undisposedListings.sample[0]?.id).toBe(listing.id);
+    expect((await getListing(h, listing.id)).itemDisposed, 'and nothing was disposed').toBe(false);
+    expect(h.custody.persistCalls, 'and nothing was ever mailed').toHaveLength(0);
+  });
+
+  it('keeps a parked DELIVERY visible in the readout across ten minutes of rotations', async () => {
+    // The delivering twin, aged on the updated_at stamped when the row entered
+    // 'delivering'. Same hazard, same proof.
+    const h = twoEpics(makeHarness());
+    putBuyerOnline(h);
+    h.db.failNextDeliveredSave = 'lease_lost';
+    const { listingId } = await directedSale(h, 'sig-rotate-delivery-1');
+    const settlementId = (await liveSettlement(h, listingId)).id;
+    await rotatePastStuckHorizon(h);
+    const readout = await stuckReadout(h);
+    expect(readout.stuckDelivering.count).toBe(1);
+    expect(readout.stuckDelivering.sample[0]?.id).toBe(settlementId);
+    expect(
+      h.custody.parcels.filter((p) => p.letter === 'delivery'),
+      'a fenced grant is never mailed over',
+    ).toHaveLength(0);
+  });
+
+  it('counts park EVENTS as work, and counts a backoff skip as none', async () => {
+    const h = makeHarness();
+    await parkedReturn(h);
+    const parking = await h.service.sweepPass();
+    // A pass that parks everything used to score zero on every arm and read as
+    // idle exactly when the marketplace was wedged.
+    expect(parking?.returned, 'a parked row is not a returned row').toBe(0);
+    expect(parking?.parked).toBe(1);
+    // The very next pass is inside the backoff window: nothing NEW parked, so a
+    // standing parked set cannot flood the saturation warning either.
+    const skipping = await h.service.sweepPass();
+    expect(skipping?.parked).toBe(0);
+    expect(skipping?.returned).toBe(0);
+  });
+
+  it('rotates a parked RETURN on the parking pass AND on the backoff skip after it', async () => {
+    // The starvation half: a parked row that keeps its batch-order slot while it
+    // waits out its backoff owns the head of every batch, and fresh rows behind
+    // it are never read at all.
+    const h = makeHarness();
+    const listing = await parkedReturn(h);
+    const rotations: number[] = [];
+    const rotate = h.db.touchListingRow.bind(h.db);
+    h.db.touchListingRow = async (id) => {
+      rotations.push(id);
+      await rotate(id);
+    };
+    await h.service.sweepPass();
+    expect(rotations, 'the park rotates').toEqual([listing.id]);
+    await h.service.sweepPass();
+    expect(rotations, 'and so does the skip inside the backoff window').toEqual([
+      listing.id,
+      listing.id,
+    ]);
+  });
+
+  it('rotates a parked DELIVERY on the parking pass AND on the backoff skip after it', async () => {
+    const h = twoEpics(makeHarness());
+    putBuyerOnline(h);
+    h.db.failNextDeliveredSave = 'lease_lost';
+    const { listingId } = await directedSale(h, 'sig-rotate-spy-1');
+    const settlementId = (await liveSettlement(h, listingId)).id;
+    const rotations: number[] = [];
+    const rotate = h.db.touchSettlementRow.bind(h.db);
+    h.db.touchSettlementRow = async (id) => {
+      rotations.push(id);
+      await rotate(id);
+    };
+    h.setNow(h.now() + PAST_BACKOFF_MS);
+    const parking = await h.service.sweepPass();
+    expect(rotations).toEqual([settlementId]);
+    expect(parking?.reconciled, 'a parked delivery is not a reconciled one').toBe(0);
+    expect(parking?.parked).toBe(1);
+    const skipping = await h.service.sweepPass();
+    expect(rotations, 'the skip rotates too, or the parked row starves the batch').toEqual([
+      settlementId,
+      settlementId,
+    ]);
+    expect(skipping?.parked, 'a skip is not a new park event').toBe(0);
+  });
+});
+
+describe('the residue beats converge over bounded, resumable pages', () => {
+  it('finalizes at most one batch per beat and resumes behind the last row it took', async () => {
+    // Every converged row costs a finalize transaction plus a realm mail-book
+    // write on the shared serial writer, and the one moment residue is
+    // plentiful (the first boot after a legacy upgrade) is exactly when the
+    // realm can least absorb an unbounded burst.
+    const h = makeHarness();
+    const listingIds: number[] = [];
+    for (let i = 0; i < 27; i++) listingIds.push((await seedDeliveredResidue(h)).listingId);
+    const first = await h.service.sweepPass();
+    expect(first?.redriven, 'one batch, never the whole backlog').toBe(25);
+    // The truncated page's cursor sits on the last RETURNED row, so the two it
+    // could not reach are the very next beat's work rather than waiting out a
+    // full cursor wrap.
+    h.setNow(h.now() + PAST_BACKOFF_MS);
+    const second = await h.service.sweepPass();
+    expect(second?.redriven).toBe(2);
+    for (const id of listingIds) {
+      const listing = await getListing(h, id);
+      expect(listing.status, `listing ${id} converged`).toBe('closed');
+      expect(listing.resolution).toBe('sold');
+      expect(listing.itemDisposed).toBe(true);
+    }
+  });
+
+  it('never re-notifies a seller once the residue beat converged its sale', async () => {
+    // 'already_final' exists so a converged tail is neither re-counted nor
+    // re-mailed. The notice is item-free, but a seller who read and deleted it
+    // would still watch it re-appear on every beat.
+    const h = makeHarness();
+    const { listingId } = await seedDeliveredResidue(h);
+    const noticeRef = listingSoldNoticeCustodyRef(listingId);
+    const first = await h.service.sweepPass();
+    expect(first?.redriven).toBe(1);
+    expect(
+      h.custody.persistCalls.filter((r) => r === noticeRef),
+      'the seller hears exactly once',
+    ).toHaveLength(1);
+    // The seller reads it and deletes the emptied letter, so the in-book marker
+    // is gone: nothing but the beat's own honesty stops a second one.
+    h.custody.collect(noticeRef);
+    h.setNow(h.now() + PAST_BACKOFF_MS);
+    const second = await h.service.sweepPass();
+    expect(second?.redriven, 'a beat that really ran, and found nothing left').toBe(0);
+    expect(h.custody.persistCalls.filter((r) => r === noticeRef)).toHaveLength(1);
+    expect(h.custody.parcels.filter((p) => p.custodyRef === noticeRef)).toHaveLength(0);
+  });
+});
+
+describe('one contended finalize stops every later delivery arm from claiming', () => {
+  it('leaves a confirmed settlement unclaimed when the residue beat hit contention first', async () => {
+    // The claim UPDATE moves rows into 'delivering'. Claiming a batch this pass
+    // will not deliver only feeds the stuck-delivering readout for nothing, so
+    // the check has to happen BEFORE the claim rather than inside the loop.
+    const h = makeHarness();
+    putBuyerOnline(h);
+    const listing = await listEpic(h);
+    await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    h.setNow(listing.endsAtMs + 1);
+    await h.service.sweepPass();
+    const settlementId = await confirmedAwaitingDelivery(h, listing.id);
+    await seedDeliveredResidue(h);
+    // Past the beat gate, so the residue arm (which runs BEFORE the delivery
+    // arms) really reaches its finalize and really contends.
+    h.setNow(h.now() + PAST_BACKOFF_MS);
+    h.db.failNextFinalize = 'contended';
+    const stats = await h.service.sweepPass();
+    expect(stats?.redriven).toBe(0);
+    expect(stats?.delivered).toBe(0);
+    expect(stats?.reconciled).toBe(0);
+    expect((await getSettlement(h, settlementId)).state, 'never claimed').toBe('confirmed');
+    // The next pass, with nothing contending, claims and delivers.
+    h.setNow(h.now() + PAST_BACKOFF_MS);
+    const converge = await h.service.sweepPass();
+    expect(converge?.delivered).toBe(1);
+    // The residue waits one beat longer BY DESIGN: the contended beat had
+    // already advanced its cursor past the page it broke on, so that page comes
+    // back around only when the cursor wraps. Slower than the beat interval on
+    // a contended cycle, and still convergent.
+    expect(converge?.redriven, 'the cursor sits past the broken page').toBe(0);
+    h.setNow(h.now() + PAST_BACKOFF_MS);
+    expect((await h.service.sweepPass())?.redriven, 'and wraps on the beat after').toBe(1);
+  });
+
+  it('clears the contention flag at the eager confirm entry, which runs outside any pass', async () => {
+    // The flag is pass-scoped but confirmSettlement is not: a true left over
+    // from the previous pass would silently claim-and-drop the buyer who just
+    // paid, and the sweep would only pick it up a beat later.
+    const h = twoEpics(makeHarness());
+    putBuyerOnline(h);
+    await seedDeliveredResidue(h);
+    h.db.failNextFinalize = 'contended';
+    const contended = await h.service.sweepPass();
+    expect(contended?.redriven, 'the pass really ended contended').toBe(0);
+    const { listingId } = await directedSale(h, 'sig-eager-reset-1');
+    expect(
+      (await h.db.listingById(REALM, listingId))?.status,
+      'the buyer gets their item in the same breath',
+    ).toBe('closed');
+    expect(bagsOf(h, CHAR_A).map((s) => s.itemId)).toContain(EPIC_ITEM);
+  });
+
+  it('reports a settlement that vanished mid-delivery rather than skipping it in silence', async () => {
+    // A 'stale' finalize AFTER custody was booked means the row left the shape
+    // only a hand edit can produce. It is invisible to every monitor class, so
+    // the one pass that saw it is the only chance anyone has to hear about it.
+    const h = twoEpics(makeHarness());
+    putBuyerOnline(h);
+    h.db.failNextFinalize = 'contended';
+    const { listingId } = await directedSale(h, 'sig-vanish-1');
+    expect((await liveSettlement(h, listingId)).state).toBe('delivering');
+    h.db.failNextFinalize = 'stale';
+    await h.service.sweepPass();
+    const vanished = h.sweepErrors.filter(([, err]) =>
+      String(err).includes('vanished mid-delivery'),
+    );
+    expect(vanished, 'reported once, by the arm that saw it').toHaveLength(1);
+    expect(vanished[0]?.[0]).toBe('reconciled');
+    // The skip CLEARS the park entry instead of backing the row off: on the
+    // same clock the next pass looks again rather than waiting out a minute.
+    h.db.failNextFinalize = 'stale';
+    await h.service.sweepPass();
+    expect(
+      h.sweepErrors.filter(([, err]) => String(err).includes('vanished mid-delivery')),
+    ).toHaveLength(2);
+  });
+});
+
+describe('an unprovable hand-off parks instead of mailing a second copy', () => {
+  it('PARKS an AMBIGUOUS grant refusal, which is not a refusal at all', async () => {
+    // grantCopy declining cleanly (offline, full bags) proves the bags are
+    // untouched and mail is safe. 'ambiguous' proves the opposite: the copy
+    // reached the live bags and an ordinary teardown flush may still persist it,
+    // so mailing here is the second copy.
+    const h = twoEpics(makeHarness());
+    putBuyerOnline(h);
+    h.custody.failNextGrantAmbiguous = true;
+    const { listingId } = await directedSale(h, 'sig-ambiguous-1');
+    const ref = settlementCustodyRef((await liveSettlement(h, listingId)).id);
+    expect((await liveSettlement(h, listingId)).state).toBe('delivering');
+    expect(h.custody.parcels, 'never converts an ambiguous grant to mail').toHaveLength(0);
+    expect(h.db.custodyClaims.get(ref)?.grantCharacterId, 'the claim keeps its rail').toBe(CHAR_A);
+    expect(h.db.custodyClaims.get(ref)?.bookedAtMs).toBeNull();
+    // With the hook off it STILL parks: grantCopy refused before any
+    // pendingGrants entry existed, so this process has no session memory to
+    // resume from and only an operator can attribute the copy.
+    for (let i = 0; i < 2; i++) {
+      h.setNow(h.now() + PAST_BACKOFF_MS);
+      await h.service.sweepPass();
+    }
+    expect(h.custody.parcels).toHaveLength(0);
+    expect(h.custody.grantCalls, 'and never grants a second time').toBe(1);
+    expect((await liveSettlement(h, listingId)).state).toBe('delivering');
+    expect(await h.db.strikeInfo(BUYER_A), 'the buyer did nothing wrong').toBeNull();
+    await rotatePastStuckHorizon(h);
+    const readout = await stuckReadout(h);
+    expect(readout.unbookedClaims.count, 'visible to the operator').toBe(1);
+    expect(readout.unbookedClaims.sample[0]).toMatchObject({
+      custodyRef: ref,
+      grantCharacterId: CHAR_A,
+      mailIntent: false,
+    });
+  });
+
+  it('refreshes a provable resume on every attempt, so long contention cannot expire it', async () => {
+    // The proof of resumability is the session identity plus its nonce, not the
+    // ledger entry's age: without the refresh, a slow-database incident longer
+    // than the ledger horizon turned a still-live, still-provable retry into a
+    // permanent operator-only park.
+    const h = twoEpics(makeHarness());
+    putBuyerOnline(h);
+    const before = bagsOf(h, CHAR_A).length;
+    h.db.failNextDeliveredSave = 'throw';
+    const { listingId } = await directedSale(h, 'sig-sustained-1');
+    expect((await liveSettlement(h, listingId)).state).toBe('delivering');
+    for (let i = 0; i < 11; i++) {
+      h.setNow(h.now() + PAST_BACKOFF_MS);
+      h.db.failNextDeliveredSave = 'throw';
+      await h.service.sweepPass();
+    }
+    // Eleven minutes later the database comes back.
+    h.setNow(h.now() + PAST_BACKOFF_MS);
+    await h.service.sweepPass();
+    expect(bagsOf(h, CHAR_A), 'one copy, delivered by the resume').toHaveLength(before + 1);
+    expect(h.custody.grantCalls, 'granted once; every retry was a snapshot').toBe(1);
+    expect(h.custody.parcels.filter((p) => p.letter === 'delivery')).toHaveLength(0);
+    expect((await h.db.listingById(REALM, listingId))?.status).toBe('closed');
+  });
+
+  it('PARKS a resume whose session memory aged out of the local ledger', async () => {
+    // The other side of the same ledger rule. A process that kept losing the
+    // sweep lock makes no attempts at all, so nothing refreshes the entry and
+    // the horizon prunes it; from then on the retry is unprovable and parks.
+    const h = twoEpics(makeHarness());
+    putBuyerOnline(h);
+    h.db.failNextDeliveredSave = 'throw';
+    const { listingId } = await directedSale(h, 'sig-pruned-1');
+    const ref = settlementCustodyRef((await liveSettlement(h, listingId)).id);
+    h.setNow(h.now() + 11 * 60_000);
+    await h.service.sweepPass();
+    expect(h.custody.parcels, 'never mails over a grant intent').toHaveLength(0);
+    expect(h.custody.grantCalls).toBe(1);
+    expect((await liveSettlement(h, listingId)).state).toBe('delivering');
+    expect(h.db.custodyClaims.get(ref)?.bookedAtMs).toBeNull();
+    const readout = await stuckReadout(h);
+    expect(readout.unbookedClaims.sample[0]).toMatchObject({
+      custodyRef: ref,
+      grantCharacterId: CHAR_A,
+    });
+  });
+});
+
+describe('the seller notice can fail or be lost without touching the sale', () => {
+  it('reports a failed notice under its own tag and still finishes the delivery', async () => {
+    // A directed hand-off writes NO delivery parcel, so the only persist in this
+    // flow is the notice: this is the blob half failing after the letter already
+    // entered the live book, and the delivery must not care.
+    const h = twoEpics(makeHarness());
+    putBuyerOnline(h);
+    h.custody.failNextPersist = true;
+    const { listingId } = await directedSale(h, 'sig-notice-fail-1');
+    const listing = await getListing(h, listingId);
+    expect(listing.status, 'the sale is finished regardless').toBe('closed');
+    expect(listing.resolution).toBe('sold');
+    expect(await h.db.salesForItem(REALM, EPIC_ITEM, 10)).toHaveLength(1);
+    expect(
+      h.sweepErrors.map(([arm]) => arm),
+      'tagged apart from the delivery arms, so an operator can tell WHERE it failed',
+    ).toContain('deliver_notice');
+    expect(
+      bagsOf(h, CHAR_A).map((s) => s.itemId),
+      'the buyer has their item',
+    ).toContain(EPIC_ITEM);
+  });
+
+  it('loses the notice for good when a crash lands between the finalize and the letter', async () => {
+    // Pins the ACCEPTED loss rather than leaving it to be re-discovered: no arm
+    // re-notifies, so this seller never hears about the sale. The letter is
+    // item-free and the sale itself is durable, which is what makes it
+    // acceptable; a silent regression into item loss would not be.
+    const h = twoEpics(makeHarness());
+    putBuyerOnline(h);
+    h.db.failNextFinalize = 'contended';
+    const { listingId } = await directedSale(h, 'sig-notice-loss-1');
+    const settlement = await liveSettlement(h, listingId);
+    expect(
+      await h.db.finalizeDeliveredSettlement({
+        settlementId: settlement.id,
+        listingId,
+        bidId: settlement.bidId,
+        sale: {
+          realm: REALM,
+          listingId,
+          itemId: EPIC_ITEM,
+          item: { itemId: EPIC_ITEM, count: 1 },
+          priceCents: settlement.amountCents,
+          amountBase: null,
+          sellerAccount: SELLER,
+          buyerAccount: BUYER_A,
+          sellerName: 'Selara',
+          buyerName: 'Aldan',
+        },
+      }),
+      'the close tail commits, then the process dies before the notice',
+    ).toBe('finalized');
+    const noticeRef = listingSoldNoticeCustodyRef(listingId);
+    for (let i = 0; i < 3; i++) {
+      h.setNow(h.now() + PAST_BACKOFF_MS);
+      await h.service.sweepPass();
+    }
+    expect(
+      h.custody.persistCalls.filter((r) => r === noticeRef),
+      'nothing ever re-notifies',
+    ).toHaveLength(0);
+    const listing = await getListing(h, listingId);
+    expect(listing.status).toBe('closed');
+    expect(listing.resolution).toBe('sold');
+    expect(listing.itemDisposed).toBe(true);
+    expect((await getSettlement(h, settlement.id)).state).toBe('delivered');
+    expect(
+      await h.db.salesForItem(REALM, EPIC_ITEM, 10),
+      'exactly one sale, unharmed',
+    ).toHaveLength(1);
   });
 });

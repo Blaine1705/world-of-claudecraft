@@ -137,3 +137,89 @@ describe('extractCopy requires the seller live in this realm process', () => {
     });
   });
 });
+
+/** Put a real live player behind the host's session lookup and return its pid,
+ *  so the session-gated arms below run against genuine sim state. */
+function liveSession(
+  host: WocCustodyGameHost,
+  over: { accountId?: number; leaseNonce?: string | undefined } = {},
+): number {
+  const pid = host.sim.addPlayer('warrior', 'Live');
+  host.wocCustodySession = () => ({
+    pid,
+    accountId: over.accountId ?? 7,
+    name: 'Live',
+    leaseNonce: 'leaseNonce' in over ? over.leaseNonce : 'live-nonce',
+  });
+  return pid;
+}
+
+/** The two sim calls the grant arms make, reachable for stubbing without
+ *  widening anything on Sim itself. */
+type SimGrantSurface = {
+  grantTradableCopy: (pid: number | undefined, slot: InvSlot) => boolean;
+  serializeCharacter: (pid: number) => unknown;
+};
+
+describe('snapshotCopy re-serializes a live session without granting anything', () => {
+  // The resume arm of a direct hand-off whose atomic save threw: it must apply
+  // exactly the session checks grantCopy does, and mint nothing, or the retry
+  // it authorizes becomes the second copy.
+  it('refuses offline when nothing holds the character in this process', () => {
+    const { host } = makeHost();
+    const custody = createWocMarketCustody(host);
+    expect(custody.snapshotCopy(1, 2)).toEqual({ ok: false, reason: 'offline' });
+  });
+
+  it('refuses not_yours when the live session belongs to another account', () => {
+    const { host } = makeHost();
+    liveSession(host, { accountId: 99 });
+    const custody = createWocMarketCustody(host);
+    expect(custody.snapshotCopy(7, 2)).toEqual({ ok: false, reason: 'not_yours' });
+  });
+
+  it('carries the session lease nonce, grants nothing, and leaves the bags alone', () => {
+    const { host } = makeHost();
+    const pid = liveSession(host);
+    const sim = host.sim as unknown as SimGrantSurface;
+    const realGrant = sim.grantTradableCopy.bind(host.sim);
+    let grants = 0;
+    sim.grantTradableCopy = (target, slot) => {
+      grants++;
+      return realGrant(target, slot);
+    };
+    const before = JSON.stringify(host.sim.serializeCharacter(pid)?.inventory);
+    const custody = createWocMarketCustody(host);
+    const out = custody.snapshotCopy(7, 2);
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    // The fence nonce is what makes the retried save land on the same session,
+    // so losing it here would turn every resume into a lease_lost park.
+    expect(out.save.leaseNonce).toBe('live-nonce');
+    expect(out.save.characterId, 'the caller names the row, not the pid').toBe(2);
+    expect(grants, 'a snapshot mints nothing').toBe(0);
+    expect(JSON.stringify(host.sim.serializeCharacter(pid)?.inventory)).toBe(before);
+  });
+});
+
+describe('grantCopy separates a clean refusal from an AMBIGUOUS one', () => {
+  it('reports ambiguous when the state will not serialize after the bags were touched', () => {
+    // The one refusal the caller may not mail over: grantTradableCopy already
+    // mutated the live bags, so an ordinary teardown flush may still persist
+    // them. Mailing here is the second copy; ambiguity parks instead.
+    const { host } = makeHost();
+    liveSession(host);
+    const sim = host.sim as unknown as SimGrantSurface;
+    let granted = 0;
+    sim.grantTradableCopy = () => {
+      granted++;
+      return true;
+    };
+    sim.serializeCharacter = () => null;
+    const custody = createWocMarketCustody(host);
+    expect(custody.grantCopy(7, 2, GOOD)).toEqual({ ok: false, reason: 'ambiguous' });
+    // The ordering is the whole reason this is not 'offline': the grant landed
+    // first, which is what makes the outcome unprovable rather than clean.
+    expect(granted).toBe(1);
+  });
+});

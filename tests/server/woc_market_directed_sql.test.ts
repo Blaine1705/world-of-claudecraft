@@ -396,24 +396,63 @@ describe('the settlement guards ship their DDL (structural floor)', () => {
     expect(schema).toContain("fail_reason = 'schema_dedupe' || COALESCE(':' || fail_reason, '')");
   });
 
-  it('carries the intent columns additively, plus the two readout indexes', async () => {
+  it('carries the intent columns additively, plus the readout and rotation indexes', async () => {
     const schema = await strippedSchema();
     // Same additive rule as directed_buyer_account: the claims table exists on
     // deployed realms, so the columns must ride ALTER, never only CREATE TABLE.
     expect(schema).toContain('ADD COLUMN IF NOT EXISTS grant_character_id');
     expect(schema).toContain('ADD COLUMN IF NOT EXISTS mail_intent_at');
+    // The rotation column is additive on BOTH rotated tables.
+    expect(schema).toContain(
+      'ALTER TABLE woc_market_settlements ADD COLUMN IF NOT EXISTS sweep_parked_at TIMESTAMPTZ',
+    );
+    expect(schema).toContain(
+      'ALTER TABLE woc_market_listings ADD COLUMN IF NOT EXISTS sweep_parked_at TIMESTAMPTZ',
+    );
     // The stuck-custody readout's indexes: the monitor reads unbooked claims
     // and aged delivering settlements through them, so their predicates are
     // load-bearing, not decorative (the delivering class ages and orders on
-    // created_at, which park rotation never touches).
+    // updated_at, stamped at the delivering claim; park rotation writes only
+    // sweep_parked_at, so the age signal never moves on a park).
     expect(schema).toContain(
       'CREATE INDEX IF NOT EXISTS woc_market_custody_claims_unbooked ' +
         'ON woc_market_custody_claims(realm, claimed_at) WHERE booked_at IS NULL',
     );
     expect(schema).toContain(
-      'CREATE INDEX IF NOT EXISTS woc_market_settlements_state_created ' +
-        'ON woc_market_settlements(realm, state, created_at)',
+      'CREATE INDEX IF NOT EXISTS woc_market_settlements_state_updated ' +
+        'ON woc_market_settlements(realm, state, updated_at)',
     );
+    // The batch-rotation partials spell PARK_ROTATION_ORDER verbatim (an
+    // expression index only serves a query with the identical text), and the
+    // superseded full created_at index is dropped, not left to rot.
+    expect(schema).toContain(
+      'CREATE INDEX IF NOT EXISTS woc_market_settlements_delivering_rotation ' +
+        "ON woc_market_settlements(realm, (COALESCE(sweep_parked_at, updated_at))) WHERE state = 'delivering'",
+    );
+    expect(schema).toContain(
+      'CREATE INDEX IF NOT EXISTS woc_market_listings_undisposed_rotation ' +
+        'ON woc_market_listings(realm, (COALESCE(sweep_parked_at, updated_at))) ' +
+        "WHERE status = 'closed' AND item_disposed = false",
+    );
+    expect(schema).toContain('DROP INDEX IF EXISTS woc_market_settlements_state_created');
+    // The redrive page walk and the sold-residue probe get their partials.
+    expect(schema).toContain(
+      'CREATE INDEX IF NOT EXISTS woc_market_listings_live_ids ' +
+        "ON woc_market_listings(realm, id) WHERE status <> 'closed'",
+    );
+    expect(schema).toContain(
+      'CREATE INDEX IF NOT EXISTS woc_market_listings_sold_undisposed ' +
+        'ON woc_market_listings(realm, id) ' +
+        "WHERE status = 'closed' AND item_disposed = false AND resolution = 'sold'",
+    );
+  });
+
+  it('makes custody_ref the claims table PRIMARY KEY, which is what makes a claim unique', async () => {
+    // The book-once ledger's whole guarantee rests on ONE row per ref: without
+    // the key, claimCustodyRef's ON CONFLICT arm has nothing to conflict on and
+    // two passes both read fresh, both stamp an intent, and both deliver.
+    const schema = await strippedSchema();
+    expect(schema).toContain('custody_ref TEXT PRIMARY KEY');
   });
 });
 
@@ -427,21 +466,40 @@ describe('the settlement guards ship their DDL (structural floor)', () => {
 /** A pool whose transactions run on a recording CLIENT (withTx methods call
  *  pool.connect()). Every statement lands in one sequence; the listing lock
  *  read answers one open row so the tail past it is reachable. */
-function recordingTxPool(): { pool: Pool; sql: () => string[]; params: () => unknown[][] } {
+function recordingTxPool(): { pool: Pool; sql: () => string[] } {
   const seen: string[] = [];
-  const bound: unknown[][] = [];
-  const query = vi.fn(async (text: string, values?: unknown[]) => {
+  const query = async (text: string) => {
     seen.push(text);
-    bound.push(values ?? []);
     if (text.includes('FROM woc_market_listings') && text.includes('FOR UPDATE')) {
       return { rows: [{ status: 'settling' }], rowCount: 1 };
     }
     return { rows: [], rowCount: 1 };
-  });
-  const client = { query, release: vi.fn() };
+  };
+  const client = { query, release: () => {} };
   const pool = { query, connect: async () => client } as unknown as Pool;
-  return { pool, sql: () => seen, params: () => bound };
+  return { pool, sql: () => seen };
 }
+
+/** A raw settlements row (snake_case, as pg returns it) for page fixtures. */
+const settlementRowFixture = (id: number, listingId: number) => ({
+  id,
+  listing_id: listingId,
+  bid_id: null,
+  attempt: 1,
+  buyer_account: 1,
+  buyer_character: 1,
+  buyer_name: 'b',
+  buyer_wallet: 'w',
+  amount_cents: 100,
+  state: 'delivered',
+  quote_reference: null,
+  quote_expires: null,
+  settled_amount_base: null,
+  tx_signature: null,
+  fail_reason: null,
+  deadline_at: new Date(0),
+  created_at: new Date(0),
+});
 
 const FINALIZE_ARGS = {
   settlementId: 5,
@@ -603,6 +661,19 @@ describe('the custody claim primitives stay monotonic, in SQL', () => {
     expect(text).toContain('grant_character_id = NULL');
   });
 
+  it('claims a ref with an INSERT that loses the race rather than raising', async () => {
+    // The claim IS the mutual exclusion: two passes racing the same ref must
+    // leave exactly one holder, and the loser must learn it lost (rowCount 0)
+    // instead of taking a 23505 through the sweep's error path. The conflict
+    // target names the primary key column pinned in the DDL floor above.
+    const { pool, sql, params } = recordingPool();
+    await new PgWocMarketDb(pool).claimCustodyRef(REALM, 'ref-1');
+    const [text] = sql();
+    expect(text).toContain('INSERT INTO woc_market_custody_claims');
+    expect(text).toContain('ON CONFLICT (custody_ref) DO NOTHING');
+    expect(params()[0]).toEqual([REALM, 'ref-1']);
+  });
+
   it('reads the claim state (booked flag plus both rail intents) from the row', async () => {
     const { pool, sql } = recordingPool();
     await new PgWocMarketDb(pool).custodyRefState('ref-1');
@@ -620,7 +691,7 @@ describe('the sweep reads that keep delivery converging, in SQL', () => {
     // LIMIT it could not push down (measured); the page shape is two bounded
     // statements the planner cannot reorder into a scan.
     const { pool, sql, params } = recordingPool();
-    await new PgWocMarketDb(pool).deliveredUnclosedSettlementsPage(REALM, 40, 500);
+    await new PgWocMarketDb(pool).deliveredUnclosedSettlementsPage(REALM, 40, 500, 25);
     const seq = sql();
     // No rows from the id read means the second statement never runs.
     expect(seq).toHaveLength(1);
@@ -632,7 +703,7 @@ describe('the sweep reads that keep delivery converging, in SQL', () => {
     expect(params()[0]).toEqual([REALM, 40, 500]);
   });
 
-  it('probes the settlements ONLY by the page ids, delivered state pinned', async () => {
+  it('probes the settlements ONLY by the page ids, delivered state pinned and BOUNDED', async () => {
     const seen: string[] = [];
     const bound: unknown[][] = [];
     const query = vi.fn(async (text: string, values?: unknown[]) => {
@@ -644,12 +715,36 @@ describe('the sweep reads that keep delivery converging, in SQL', () => {
       return { rows: [], rowCount: 0 };
     });
     const pool = { query } as unknown as Pool;
-    const out = await new PgWocMarketDb(pool).deliveredUnclosedSettlementsPage(REALM, 0, 500);
+    const out = await new PgWocMarketDb(pool).deliveredUnclosedSettlementsPage(REALM, 0, 500, 25);
     expect(seen).toHaveLength(2);
     expect(seen[1]).toContain('listing_id = ANY($1::bigint[])');
     expect(seen[1]).toContain("state = 'delivered'");
-    expect(bound[1]).toEqual([[7, 9]]);
+    expect(seen[1]).toContain('ORDER BY listing_id');
+    // Bounded residue fetch: every returned row costs a finalize transaction
+    // plus a mail-book write, so the LIMIT (maxSettlements + 1, the +1 being
+    // the truncation probe) is load-bearing, not cosmetic.
+    expect(seen[1]).toContain('LIMIT $2');
+    expect(bound[1]).toEqual([[7, 9], 26]);
     expect(out.lastListingId, 'the cursor advances to the page tail').toBe(9);
+  });
+
+  it('a truncated residue fetch moves the cursor to the last RETURNED row', async () => {
+    const query = vi.fn(async (text: string) => {
+      if (text.includes('SELECT id FROM woc_market_listings')) {
+        return { rows: [{ id: 7 }, { id: 9 }, { id: 11 }], rowCount: 3 };
+      }
+      // Three delivered rows against maxSettlements = 2: the third is the
+      // truncation probe and must be dropped, with the cursor at row two.
+      return {
+        rows: [7, 9, 11].map((listingId, i) => settlementRowFixture(100 + i, listingId)),
+        rowCount: 3,
+      };
+    });
+    const pool = { query } as unknown as Pool;
+    const out = await new PgWocMarketDb(pool).deliveredUnclosedSettlementsPage(REALM, 0, 500, 2);
+    expect(out.settlements).toHaveLength(2);
+    expect(out.settlements.map((s) => s.listingId)).toEqual([7, 9]);
+    expect(out.lastListingId, 'resume right behind the last processed row').toBe(9);
   });
 
   it('converges sold residue only over a STANDING sale row, bounded', async () => {
@@ -672,14 +767,33 @@ describe('the sweep reads that keep delivery converging, in SQL', () => {
     expect(sql()[0]).toContain("(resolution IS NULL OR resolution <> 'sold')");
   });
 
-  it('rotates a parked settlement on updated_at only, never created_at', async () => {
-    // The delivering stuck class ages on created_at; a rotation that touched
-    // it would hide parked rows from the monitor forever.
+  it('rotates a parked row on sweep_parked_at ONLY, never the age signal', async () => {
+    // The stuck classes age on updated_at; a rotation that touched it would
+    // re-stamp a parked row every retry and hide it from the monitor forever
+    // (the retry cadence is far inside the stuck threshold).
     const { pool, sql } = recordingPool();
-    await new PgWocMarketDb(pool).touchSettlementRow(7);
-    const [text] = sql();
-    expect(text).toContain('SET updated_at = now()');
-    expect(text).not.toContain('created_at');
+    const db = new PgWocMarketDb(pool);
+    await db.touchSettlementRow(7);
+    await db.touchListingRow(9);
+    for (const text of sql()) {
+      expect(text).toContain('SET sweep_parked_at = now()');
+      expect(text).not.toContain('updated_at');
+      expect(text).not.toContain('created_at');
+    }
+    expect(sql()).toHaveLength(2);
+  });
+
+  it('orders both park-rotated batch reads by the rotation expression', async () => {
+    // COALESCE(sweep_parked_at, updated_at), shared verbatim with the two
+    // partial indexes: a drifted spelling silently loses the index.
+    const { pool, sql } = recordingPool();
+    const db = new PgWocMarketDb(pool);
+    await db.deliveringSettlements(REALM, 25);
+    await db.undisposedClosedListings(REALM, 25);
+    for (const text of sql()) {
+      expect(text).toContain('ORDER BY COALESCE(sweep_parked_at, updated_at)');
+    }
+    expect(sql()).toHaveLength(2);
   });
 });
 
@@ -706,9 +820,14 @@ describe('the stuck-custody readout saturates, in SQL', () => {
     expect(samples[0]).toContain('booked_at IS NULL');
     expect(samples[0]).toContain('mail_intent_at');
     expect(samples[1]).toContain("state = 'delivering'");
-    // Aged on created_at: the park-and-rotate machinery never touches it.
-    expect(samples[1]).toContain('created_at <= to_timestamp($2 / 1000.0)');
-    expect(samples[1]).not.toContain('updated_at');
+    // Aged on updated_at (stamped at the delivering claim): rotation writes
+    // sweep_parked_at, so a parked row's age keeps counting, and a slow
+    // payment leg is not reported stuck the moment delivery begins.
+    expect(samples[1]).toContain('updated_at <= to_timestamp($2 / 1000.0)');
+    expect(samples[1]).not.toContain('created_at <=');
+    expect(samples[1]).not.toContain('sweep_parked_at');
     expect(samples[2]).toContain("status = 'closed' AND item_disposed = false");
+    expect(samples[2]).toContain('updated_at <= to_timestamp($2 / 1000.0)');
+    expect(samples[2]).not.toContain('sweep_parked_at');
   });
 });
