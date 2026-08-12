@@ -409,6 +409,8 @@ export const da_DK: AdminTranslations = {
   "moderationHistory.actionResetChatStrikes": "Chat-anmærkninger nulstillet",
   "moderationHistory.actionRestoreItem": "Vare gendannet",
   "moderationHistory.actionRestoreSlot": "Plads gendannet",
+  "moderationHistory.actionCheaterMark": "Cheater mark applied",
+  "moderationHistory.actionCheaterMarkLift": "Cheater mark lifted",
   "moderationHistory.actionGuildRename": "Laug omdøbt",
   "moderationHistory.actionGuildBankPurge": "Fjernelse fra laugsbank",
   "moderationHistory.actionUnknown": "Anden handling",

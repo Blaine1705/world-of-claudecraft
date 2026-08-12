@@ -409,6 +409,8 @@ export const en_XA: AdminTranslations = {
   "moderationHistory.actionResetChatStrikes": "[Çĥáţ šţŕíķéš ŕéšéţ]",
   "moderationHistory.actionRestoreItem": "[Íţéɱ ŕéšţóŕé]",
   "moderationHistory.actionRestoreSlot": "[Šļóţ ŕéšţóŕé]",
+  "moderationHistory.actionCheaterMark": "[Çĥéáţéŕ ɱáŕķ áþþļíéð]",
+  "moderationHistory.actionCheaterMarkLift": "[Çĥéáţéŕ ɱáŕķ ļíƒţéð]",
   "moderationHistory.actionGuildRename": "[Ĝúíļð ŕéñáɱé]",
   "moderationHistory.actionGuildBankPurge": "[Ĝúíļð ƀáñķ þúŕĝé]",
   "moderationHistory.actionUnknown": "[Óţĥéŕ áçţíóñ]",

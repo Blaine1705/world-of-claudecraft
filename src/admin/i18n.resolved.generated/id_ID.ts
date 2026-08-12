@@ -409,6 +409,8 @@ export const id_ID: AdminTranslations = {
   "moderationHistory.actionResetChatStrikes": "Peringatan obrolan disetel ulang",
   "moderationHistory.actionRestoreItem": "Barang dipulihkan",
   "moderationHistory.actionRestoreSlot": "Slot dipulihkan",
+  "moderationHistory.actionCheaterMark": "Cheater mark applied",
+  "moderationHistory.actionCheaterMarkLift": "Cheater mark lifted",
   "moderationHistory.actionGuildRename": "Ganti nama guild",
   "moderationHistory.actionGuildBankPurge": "Penghapusan bank guild",
   "moderationHistory.actionUnknown": "Tindakan lainnya",

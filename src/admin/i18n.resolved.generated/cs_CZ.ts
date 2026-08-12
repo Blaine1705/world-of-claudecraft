@@ -409,6 +409,8 @@ export const cs_CZ: AdminTranslations = {
   "moderationHistory.actionResetChatStrikes": "Chatové přestupky vynulovány",
   "moderationHistory.actionRestoreItem": "Obnovení předmětu",
   "moderationHistory.actionRestoreSlot": "Obnovení slotu",
+  "moderationHistory.actionCheaterMark": "Cheater mark applied",
+  "moderationHistory.actionCheaterMarkLift": "Cheater mark lifted",
   "moderationHistory.actionGuildRename": "Přejmenování cechu",
   "moderationHistory.actionGuildBankPurge": "Vyčištění cechovní banky",
   "moderationHistory.actionUnknown": "Jiná akce",

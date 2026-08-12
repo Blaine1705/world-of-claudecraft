@@ -409,6 +409,8 @@ export const es: AdminTranslations = {
   "moderationHistory.actionResetChatStrikes": "Infracciones de chat reiniciadas",
   "moderationHistory.actionRestoreItem": "Objeto restaurado",
   "moderationHistory.actionRestoreSlot": "Ranura restaurada",
+  "moderationHistory.actionCheaterMark": "Cheater mark applied",
+  "moderationHistory.actionCheaterMarkLift": "Cheater mark lifted",
   "moderationHistory.actionGuildRename": "Cambio de nombre de hermandad",
   "moderationHistory.actionGuildBankPurge": "Purga del banco de la hermandad",
   "moderationHistory.actionUnknown": "Otra acción",
