@@ -901,8 +901,7 @@ export const en = {
   'generalChatRateLimit.messagesError': 'Enter a whole number from {min} to {max}.',
   'generalChatRateLimit.windowMinutesError': 'Enter a whole number from {min} to {max}.',
   'generalChatRateLimit.reasonRequired': 'Enter a moderation reason.',
-  'generalChatRateLimit.reasonTooLong':
-    'Use no more than {max} characters for the reason.',
+  'generalChatRateLimit.reasonTooLong': 'Use no more than {max} characters for the reason.',
   'error.generalChatRateLimitRequired': 'Choose a valid General chat limit or remove it.',
   'error.generalChatRateLimitMessages': 'Enter {min} to {max} messages.',
   'error.generalChatRateLimitWindowMinutes': 'Enter a window from {min} to {max} minutes.',

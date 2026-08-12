@@ -49,14 +49,10 @@ describe('GeneralChatRateLimitControls', () => {
     expect(messages).toHaveAttribute('aria-invalid', 'true');
     expect(windowMinutes).toHaveAttribute('aria-invalid', 'true');
     expect(
-      screen.getByText(
-        t('generalChatRateLimit.messagesError', { min: '1', max: '1,000' }),
-      ),
+      screen.getByText(t('generalChatRateLimit.messagesError', { min: '1', max: '1,000' })),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(
-        t('generalChatRateLimit.windowMinutesError', { min: '1', max: '1,440' }),
-      ),
+      screen.getByText(t('generalChatRateLimit.windowMinutesError', { min: '1', max: '1,440' })),
     ).toBeInTheDocument();
     expect(screen.getByText(t('generalChatRateLimit.reasonRequired'))).toBeInTheDocument();
     expect(messages).toHaveFocus();
@@ -100,9 +96,7 @@ describe('GeneralChatRateLimitControls', () => {
       screen.queryByLabelText(t('generalChatRateLimit.messagesLabel')),
     ).not.toBeInTheDocument();
     expect(
-      screen.getByText(
-        t('generalChatRateLimit.current', { messages: '8', minutes: '3' }),
-      ),
+      screen.getByText(t('generalChatRateLimit.current', { messages: '8', minutes: '3' })),
     ).toBeInTheDocument();
     expect(onSubmit).not.toHaveBeenCalled();
   });

@@ -3104,17 +3104,16 @@ export async function startServer(): Promise<http.Server> {
   const game = liveGame();
   const generalChatQuotaListener = createGeneralChatQuotaListener({
     activeAccountIds: () => [...game.liveAccountIds()],
-    onResync: (accountIds, policies) =>
-      game.resyncGeneralChatRateLimits(accountIds, policies),
+    onResync: (accountIds, policies) => game.resyncGeneralChatRateLimits(accountIds, policies),
     onChange: (accountId, policy) => game.applyGeneralChatRateLimitLive(accountId, policy),
     onError: (error) => console.error('general chat quota listener failed:', error),
   });
   // LISTEN commits before the initial bounded resync, so no policy edit can be
   // lost between boot state and notifications. A boot failure is non-fatal:
   // joins still carry fresh policy, and the listener owns its reconnect loop.
-  await generalChatQuotaListener.start().catch((error) =>
-    console.error('general chat quota listener start failed:', error),
-  );
+  await generalChatQuotaListener
+    .start()
+    .catch((error) => console.error('general chat quota listener start failed:', error));
   // Inject the game-session methods the ported admin routes (server/admin.ts) call
   // for their live reads + side effects (adminStats/liveSessions/disconnectAccount/
   // muteAccountChat/reloadChatFilter/reloadBlockedIps/disconnectByIp/...), and the

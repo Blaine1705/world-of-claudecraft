@@ -183,15 +183,11 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     expect(labelValues(text, 'outcome', WOC_GENERAL_CHAT_QUOTA_DB_CALLS_TOTAL)).toEqual(
       new Set(GENERAL_CHAT_QUOTA_DB_OUTCOMES),
     );
-    expect(sampleValue(text, /^woc_general_chat_quota_db_pool\{state="total"\} (\d+)$/m)).toBe(
-      '2',
+    expect(sampleValue(text, /^woc_general_chat_quota_db_pool\{state="total"\} (\d+)$/m)).toBe('2');
+    expect(sampleValue(text, /^woc_general_chat_quota_db_pool\{state="idle"\} (\d+)$/m)).toBe('1');
+    expect(sampleValue(text, /^woc_general_chat_quota_db_pool\{state="waiting"\} (\d+)$/m)).toBe(
+      '0',
     );
-    expect(sampleValue(text, /^woc_general_chat_quota_db_pool\{state="idle"\} (\d+)$/m)).toBe(
-      '1',
-    );
-    expect(
-      sampleValue(text, /^woc_general_chat_quota_db_pool\{state="waiting"\} (\d+)$/m),
-    ).toBe('0');
     expect(labelValues(text, 'state', WOC_GENERAL_CHAT_QUOTA_DB_POOL)).toEqual(
       new Set(['total', 'idle', 'waiting']),
     );
@@ -217,9 +213,7 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     expect(WOC_GENERAL_CHAT_QUOTA_DB_DURATION_SECONDS).toBe(
       'woc_general_chat_quota_db_duration_seconds',
     );
-    expect(WOC_GENERAL_CHAT_QUOTA_CACHE_ACCOUNTS).toBe(
-      'woc_general_chat_quota_cache_accounts',
-    );
+    expect(WOC_GENERAL_CHAT_QUOTA_CACHE_ACCOUNTS).toBe('woc_general_chat_quota_cache_accounts');
   });
 
   it('reflects a fresh source read on every scrape (no drift)', async () => {

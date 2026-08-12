@@ -63,10 +63,10 @@ import {
   rodFeeForRecipe,
 } from '../fishing_telemetry';
 import {
-  GENERAL_CHAT_QUOTA_DB_OUTCOMES,
-  type GeneralChatQuotaDbOutcome,
-  GENERAL_CHAT_QUOTA_OUTCOMES,
   type GameMetricsCounters,
+  GENERAL_CHAT_QUOTA_DB_OUTCOMES,
+  GENERAL_CHAT_QUOTA_OUTCOMES,
+  type GeneralChatQuotaDbOutcome,
   type GeneralChatQuotaOutcome,
   GUILD_BANK_INCIDENTS,
   type GuildBankIncident,
@@ -690,10 +690,7 @@ export function registerGameStateMetrics(
         // Drop the sample rather than propagate into the chat path.
       }
     },
-    generalChatQuotaDbCall(
-      outcome: GeneralChatQuotaDbOutcome,
-      durationSeconds: number,
-    ): void {
+    generalChatQuotaDbCall(outcome: GeneralChatQuotaDbOutcome, durationSeconds: number): void {
       try {
         if (!GENERAL_CHAT_QUOTA_DB_OUTCOMES.includes(outcome)) return;
         generalChatQuotaDbCalls.inc({ outcome });

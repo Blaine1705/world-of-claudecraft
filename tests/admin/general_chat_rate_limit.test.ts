@@ -76,18 +76,14 @@ describe('General chat rate limit request builders', () => {
 
   it('formats client and server bounds with the operator locale', () => {
     setAdminLanguage('de_DE');
-    expect(
-      localizeAdminError('messages must be an integer from 1 to 1000'),
-    ).toContain('1.000');
-    expect(
-      localizeAdminError('windowMinutes must be an integer from 1 to 1440'),
-    ).toContain('1.440');
-    expect(
-      localizeAdminError('a moderation reason is required (500 chars max)'),
-    ).toContain('500');
-    expect(
-      t('error.generalChatRateLimitReasonInvalid', { max: 'formatted-limit' }),
-    ).toContain('formatted-limit');
+    expect(localizeAdminError('messages must be an integer from 1 to 1000')).toContain('1.000');
+    expect(localizeAdminError('windowMinutes must be an integer from 1 to 1440')).toContain(
+      '1.440',
+    );
+    expect(localizeAdminError('a moderation reason is required (500 chars max)')).toContain('500');
+    expect(t('error.generalChatRateLimitReasonInvalid', { max: 'formatted-limit' })).toContain(
+      'formatted-limit',
+    );
     setAdminLanguage('en');
   });
 });

@@ -1,6 +1,5 @@
 import { normalizeAccountFlair, type StreamerLinks } from '../src/sim/account_flair';
 import type { AdminAccountSort, AdminAccountSortDirection } from './admin_accounts_sort';
-import type { GeneralChatRateLimit } from './general_chat_quota_db';
 import {
   type ClientPerfSummaryBuckets,
   cleanHours,
@@ -16,6 +15,7 @@ import {
   runWithStatementTimeout,
   saveWorldState,
 } from './db';
+import type { GeneralChatRateLimit } from './general_chat_quota_db';
 import { REALM } from './realm';
 
 // Read-side queries for the admin dashboard. All inputs are parameterized;

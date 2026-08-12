@@ -34,13 +34,13 @@ import type { RankedDeedsAccount } from './deeds_board';
 import { DISCORD_SCHEMA } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
 import { bustDiscordStatus } from './discord_status_cache';
-import { GITHUB_SCHEMA } from './github_db';
-import type { GeneralChatRateLimit } from './general_chat_quota_db';
 import {
   GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS,
   GENERAL_CHAT_QUOTA_LISTENER_CONNECTIONS,
 } from './general_chat_quota_config';
+import type { GeneralChatRateLimit } from './general_chat_quota_db';
 import { GENERAL_CHAT_QUOTA_SCHEMA } from './general_chat_quota_schema';
+import { GITHUB_SCHEMA } from './github_db';
 import {
   GuildBankEscrowRefused,
   type GuildBankSave,
