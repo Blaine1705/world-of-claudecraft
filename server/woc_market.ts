@@ -368,11 +368,10 @@ export interface WocMarketDb {
   /** Listings stuck mid-resolution ('ending' / 'settling') past a grace. */
   strandedListings(realm: string, olderThanMs: number, limit: number): Promise<WocListingRow[]>;
   /** Re-open a stranded listing so the ordinary close arm resolves it;
-   *  fail-closed no-op while an open settlement rides the listing. */
+   *  fail-closed no-op while an open OR retry-eligible 'failed' settlement
+   *  rides the listing (the failed row belongs to the overdue sweep's
+   *  default/forfeit/strike/cascade pass, never to a reopen). */
   reopenListing(id: number): Promise<void>;
-  /** Expire a listing's retry-eligible 'failed' settlements (the reclaim
-   *  arm's sibling of the guards' in-transaction expiry). */
-  expireFailedSettlementsForListing(listingId: number, failReason: string): Promise<void>;
   markItemDisposed(id: number): Promise<void>;
   /** Durable book-once claim: true only for the FIRST claim of this ref. */
   claimCustodyRef(realm: string, custodyRef: string): Promise<boolean>;
@@ -1545,6 +1544,10 @@ export class WocMarketService {
     const settlement = await this.deps.db.settlementById(settlementId);
     if (!settlement) return refuse('not_found');
     if (settlement.buyerAccount !== account) return refuse('not_yours');
+    // Deadline first, BEFORE any revival: a past-deadline 'failed' row must
+    // stay 'failed' for the overdue sweep's default pass, never be revived
+    // into an open row this method then refuses anyway.
+    if (settlement.deadlineAtMs <= this.now()) return refuse('quote_expired');
     if (settlement.state === 'failed') {
       // A refused confirmation returns to offered for a retry inside the
       // window. The revival is a CAS and can also lose to the
@@ -1557,7 +1560,6 @@ export class WocMarketService {
     } else if (settlement.state !== 'offered') {
       return refuse('not_active');
     }
-    if (settlement.deadlineAtMs <= this.now()) return refuse('quote_expired');
     const listing = await this.deps.db.listingById(this.cfg.realm, settlement.listingId);
     if (!listing) return refuse('not_found');
     const quote = await this.quoteFor({ ...settlement, state: 'offered' }, listing.sellerWallet);
@@ -1718,7 +1720,11 @@ export class WocMarketService {
       if (reserve !== null && standing.amountCents < reserve) {
         // Atomic demote: outbid plus the held-bond refund ride ONE statement,
         // so a crash between them can never strand a held bond no sweep arm
-        // reaches. Same guarded close as the no-bids arm above.
+        // reaches. Same guarded close as the no-bids arm above. Demote BEFORE
+        // the close on purpose (a crash between the two must never leave a
+        // closed listing holding an active bid); the known cosmetic edge is a
+        // purely CONTENDED close refusal, where the reclaimed re-run finds no
+        // active bid and records 'no_bids' instead of 'reserve_not_met'.
         await this.deps.db.markBidOutbidQueueRefund(standing.id);
         if (!(await this.deps.db.closeListingIfNoOpenSettlement(listing.id, 'reserve_not_met'))) {
           await this.deps.db.markListingSettling(listing.id);
@@ -1792,11 +1798,14 @@ export class WocMarketService {
     for (const listing of stranded) {
       const live = await this.deps.db.liveSettlementForListing(listing.id);
       if (live) continue; // genuinely settling; leave it alone
-      // A retry-eligible 'failed' settlement must not survive the reopen: its
-      // revival would ride a listing that is being re-bid (both guards expire
-      // these for the same reason). The reopen itself is fail-closed against
-      // an open settlement landing between these statements.
-      await this.deps.db.expireFailedSettlementsForListing(listing.id, 'listing_reclaimed');
+      // A 'failed' settlement is NOT reclaimable either, and must not be
+      // expired here: it is still inside the overdue sweep's jurisdiction,
+      // whose deadline pass is what defaults the winner, forfeits the bond,
+      // records the strike, and runs the offerNext cascade. Expiring it from
+      // this arm would silently drop all four (a bond left 'held' is
+      // unreachable by every sweep arm). The reopen statement itself refuses
+      // while any open OR failed settlement rides the listing, so a row that
+      // lands between the read above and the write stays parked.
       await this.deps.db.reopenListing(listing.id);
       reopened++;
     }

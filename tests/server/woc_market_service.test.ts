@@ -2997,6 +2997,34 @@ describe('the insert refusal arms at the service seam', () => {
     expect(await h.db.submitSettlementSignature(other.id, 'sig-retry-1')).toBe('signature_reused');
   });
 
+  it('the reclaim parks a failed settlement for the overdue pass instead of expiring it', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const standing = await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    h.setNow(listing.endsAtMs + 1);
+    await h.service.sweepPass();
+    const settled = await liveSettlement(h, listing.id);
+    expect(settled.bidId).toBe(standing.bidId);
+    // The buyer's confirmation is refused inside the window: retry-eligible.
+    await h.db.transitionSettlement(settled.id, ['offered'], 'failed', 'refused');
+    // Past the stranded grace but INSIDE the settlement deadline: the reclaim
+    // must leave everything alone (expiring here would skip the deadline
+    // pass's default, forfeit, strike, and cascade, stranding the held bond).
+    h.setNow(listing.endsAtMs + 1 + WOC_MARKET_STRANDED_RECLAIM_SECONDS * 1000 + 1000);
+    await h.service.sweepPass();
+    expect((await getListing(h, listing.id)).status).toBe('settling');
+    const parked = await getBid(h, standing.bidId);
+    expect(parked.status).toBe('won');
+    expect(parked.bondState).toBe('held');
+    // At the deadline the overdue pass runs its FULL consequence set.
+    h.setNow(settled.deadlineAtMs + 1);
+    await h.service.sweepPass();
+    const defaulted = await getBid(h, standing.bidId);
+    expect(defaulted.status).toBe('defaulted');
+    expect(defaulted.bondState).not.toBe('held');
+    expect((await getListing(h, listing.id)).status).toBe('closed');
+  });
+
   it('the cascade pick breaks ties by placement time, then by id', async () => {
     const h = makeHarness();
     const listing = await listEpic(h);

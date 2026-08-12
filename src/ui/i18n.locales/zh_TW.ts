@@ -8221,7 +8221,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.buy_now_locked': '另一位買家正在完成這筆購買，請稍後再試。',
   'apiError.woc_market.settlement_in_flight': '有買家正在為該掛單付款。請等付款結算完成後再試。',
   'apiError.woc_market.contended': '交易所正在處理該掛單的其他操作。請稍後再試。',
-  'apiError.woc_market.sale_conflict': '該掛單已有另一條有效的成交記錄。',
+  'apiError.woc_market.sale_conflict': '該掛單已有另一條有效的成交記錄。請先將其排除。',
   'apiError.woc_market.no_buy_now': '該掛單沒有直購價。',
   'apiError.woc_market.cap_reached': '你已達到交易所掛單數量上限。',
   'apiError.woc_market.stale_item': '該物品已變動或被移動。請重新選擇後再試。',

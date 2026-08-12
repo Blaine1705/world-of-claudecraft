@@ -41,7 +41,7 @@ const MONOLITHS: MonolithRow[] = [
     // next line added here fails, and the fix is extraction behind the seam,
     // never a raise. A raise stays a maintainer decision, per the header.
     file: 'src/ui/hud.ts',
-    ceiling: 19342,
+    ceiling: 19338,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

@@ -538,6 +538,17 @@ export class FakeWocMarketDb implements WocMarketDb {
         s.state = 'expired';
         s.failReason = 'listing_suspended';
         this.touchSettlement(s.id);
+        // The Pg CTE releases the expired settlement's close-time WINNER in
+        // the same statement: cancelled, held bond queued for refund (an
+        // administrative expiry is not the buyer's fault; the deadline pass
+        // is the one that defaults and forfeits).
+        if (s.bidId !== null) {
+          const winner = this.bids.get(s.bidId);
+          if (winner && winner.status === 'won') {
+            winner.status = 'cancelled';
+            if (winner.bondState === 'held') winner.bondState = 'refund_due';
+          }
+        }
       }
     }
     for (const bid of this.bids.values()) {
@@ -626,24 +637,20 @@ export class FakeWocMarketDb implements WocMarketDb {
   async reopenListing(id: number): Promise<void> {
     const row = this.listings.get(id);
     if (!row) return;
-    // Fail-closed: an open settlement refuses the reopen (the Pg statement
-    // carries the same NOT EXISTS predicate).
+    // Fail-closed: an open OR retry-eligible 'failed' settlement refuses the
+    // reopen (the Pg statement carries the same NOT EXISTS predicate; the
+    // failed row belongs to the overdue sweep's default pass).
     for (const s of this.settlements.values()) {
-      if (s.listingId === id && OPEN_SETTLEMENT_STATES.includes(s.state)) return;
+      if (
+        s.listingId === id &&
+        (OPEN_SETTLEMENT_STATES.includes(s.state) || s.state === 'failed')
+      ) {
+        return;
+      }
     }
     if (row.status === 'ending' || row.status === 'settling') {
       row.status = 'active';
       this.touchListing(id);
-    }
-  }
-
-  async expireFailedSettlementsForListing(listingId: number, failReason: string): Promise<void> {
-    for (const s of this.settlements.values()) {
-      if (s.listingId === listingId && s.state === 'failed') {
-        s.state = 'expired';
-        s.failReason = failReason;
-        this.touchSettlement(s.id);
-      }
     }
   }
 

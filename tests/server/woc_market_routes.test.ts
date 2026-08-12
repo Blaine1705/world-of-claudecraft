@@ -290,6 +290,19 @@ describe('the refusal-to-wire mapping', () => {
       data: null,
       error: 'a payment for this listing is settling; retry once it resolves',
     });
+    // Plain contention is a retryable 409, never the 404 that would read as
+    // "gone" and stop the operator retrying.
+    service({ adminSuspendListing: async () => ({ ok: false, reason: 'contended' }) });
+    const busyCtx = fakeCtx({
+      method: 'POST',
+      url: '/admin/api/woc-market/listings/41/suspend',
+      params: { id: '41' },
+    });
+    busyCtx.state.set('adminTargetId', 41);
+    await handlerFor('POST', '/admin/api/woc-market/listings/:id/suspend')(busyCtx);
+    const busy = sent(busyCtx);
+    expect(busy.status).toBe(409);
+    expect(busy.body.error).toBe('the listing is busy with another operation; retry now');
     service({ adminSuspendListing: async () => ({ ok: false, reason: 'not_found' }) });
     const missCtx = fakeCtx({
       method: 'POST',

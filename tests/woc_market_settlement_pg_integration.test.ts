@@ -557,7 +557,15 @@ describeDb('woc market settlement guards against real Postgres', () => {
         `UPDATE woc_market_listings SET updated_at = to_timestamp($2 / 1000.0) WHERE realm = $1`,
         [realm, BASE_MS - 24 * 60 * MINUTE_MS],
       );
-      await makeService(realm).sweepPass();
+      const service = makeService(realm);
+      await service.sweepPass();
+      // Pass 1: the reclaim refuses while the failed row still rides the
+      // listing (its deadline belongs to the overdue arm, which expires it
+      // later in the same pass; expiring it from the reclaim would skip the
+      // default consequences). Pass 2: with the row terminal, the reclaim
+      // reopens the genuinely dead listing.
+      expect((await listingRow(deadListing)).status).toBe('settling');
+      await service.sweepPass();
       expect((await listingRow(deliveredListing)).status).toBe('settling');
       expect((await listingRow(deadListing)).status).not.toBe('settling');
     }, 20_000);
@@ -1296,32 +1304,74 @@ describeDb('woc market settlement guards against real Postgres', () => {
   });
 
   describe('the stranded reclaim arm', () => {
-    it('expires a leftover failed settlement and reopens the listing', async () => {
+    it('leaves a failed settlement parked for the overdue default pass, never expires it', async () => {
       const realm = 'guard-reclaim-failed';
       const seller = await seedAccount();
       const buyer = await seedAccount();
+      const bidder = await seedAccount();
       const listingId = await seedListing(realm, seller, { status: 'settling' });
-      const failed = await seedSettlement(realm, listingId, buyer, { state: 'failed' });
+      // The close-time shape: a won bid with a held bond behind the failed
+      // settlement. Reclaiming (and expiring) here would silently skip the
+      // deadline pass that defaults the winner, forfeits the bond, records
+      // the strike, and runs the cascade; the bond would sit 'held' forever.
+      const wonBid = await seedBid(realm, listingId, bidder, {
+        status: 'won',
+        bondState: 'held',
+      });
+      const failed = await seedSettlement(realm, listingId, buyer, {
+        state: 'failed',
+        bidId: wonBid,
+      });
       await makeService(realm).sweepPass();
       const after = await settlementRow(failed.id);
-      expect(after.state).toBe('expired');
-      expect(after.failReason).toBe('listing_reclaimed');
-      expect((await listingRow(listingId)).status).toBe('active');
+      expect(after.state).toBe('failed');
+      expect((await listingRow(listingId)).status).toBe('settling');
+      expect(await bidRow(wonBid)).toEqual({ status: 'won', bondState: 'held' });
     }, 20_000);
 
-    it('the reopen statement itself refuses while an open settlement rides the listing', async () => {
+    it('the reopen statement itself refuses while an open or failed settlement rides the listing', async () => {
       const realm = 'guard-reclaim-reopen-belt';
       const seller = await seedAccount();
       const buyer = await seedAccount();
       const listingId = await seedListing(realm, seller, { status: 'settling' });
       const settlement = await seedSettlement(realm, listingId, buyer);
       // The belt under the read-then-act arm: a direct reopen with an open
-      // settlement present must not move the row.
+      // settlement present must not move the row; a retry-eligible 'failed'
+      // row refuses too (it belongs to the overdue default pass).
+      await marketDb.reopenListing(listingId);
+      expect((await listingRow(listingId)).status).toBe('settling');
+      await setSettlementState(settlement.id, 'failed');
       await marketDb.reopenListing(listingId);
       expect((await listingRow(listingId)).status).toBe('settling');
       await setSettlementState(settlement.id, 'expired');
       await marketDb.reopenListing(listingId);
       expect((await listingRow(listingId)).status).toBe('active');
+    });
+  });
+
+  describe('administrative expiry releases the settlement winner', () => {
+    it('a suspend over a failed close-time settlement cancels its won bid and queues the bond refund', async () => {
+      const realm = 'guard-suspend-winner-release';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const bidder = await seedAccount();
+      const listingId = await seedListing(realm, seller, { status: 'settling' });
+      const wonBid = await seedBid(realm, listingId, bidder, {
+        status: 'won',
+        bondState: 'held',
+      });
+      const failed = await seedSettlement(realm, listingId, buyer, {
+        state: 'failed',
+        bidId: wonBid,
+      });
+      const out = await marketDb.suspendListingIfSafe(realm, listingId, BASE_MS);
+      expect(out).toMatchObject({ id: listingId, status: 'closed', resolution: 'suspended' });
+      const after = await settlementRow(failed.id);
+      expect(after.state).toBe('expired');
+      expect(after.failReason).toBe('listing_suspended');
+      // The CTE released the winner in the same statement: without it the
+      // bid sits 'won' with a held bond no sweep arm can ever reach.
+      expect(await bidRow(wonBid)).toEqual({ status: 'cancelled', bondState: 'refund_due' });
     });
   });
 });

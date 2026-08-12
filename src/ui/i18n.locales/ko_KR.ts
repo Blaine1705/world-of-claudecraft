@@ -8578,7 +8578,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.settlement_in_flight':
     '구매자가 이 등록의 대금을 결제하는 중입니다. 결제가 완료된 후 다시 시도하세요.',
   'apiError.woc_market.contended': '거래소가 이 등록의 다른 작업을 처리하고 있습니다. 잠시 후 다시 시도하세요.',
-  'apiError.woc_market.sale_conflict': '이 등록에는 이미 다른 유효한 판매 기록이 있습니다.',
+  'apiError.woc_market.sale_conflict':
+    '이 등록에는 이미 다른 유효한 판매 기록이 있습니다. 먼저 해당 기록을 제외하세요.',
   'apiError.woc_market.no_buy_now': '이 등록에는 즉시 구매가가 없습니다.',
   'apiError.woc_market.cap_reached': '거래소 등록 한도에 도달했습니다.',
   'apiError.woc_market.stale_item':

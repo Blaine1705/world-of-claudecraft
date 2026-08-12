@@ -4137,7 +4137,7 @@ export const it_IT: EnTranslations = {
       "buy_now_locked": "Another buyer is completing this purchase. Try again in a moment.",
       "settlement_in_flight": "A buyer is paying for this listing. Try again once the payment settles.",
       "contended": "The Exchange is busy with this listing. Try again in a moment.",
-      "sale_conflict": "Another live sale record already stands for this listing.",
+      "sale_conflict": "Another live sale record stands for this listing. Exclude it first.",
       "no_buy_now": "This listing has no buy-now price.",
       "cap_reached": "You have reached your Exchange listing limit.",
       "stale_item": "That item changed or moved. Re-select it and try again.",

@@ -27,11 +27,7 @@ import {
 import { preloadMechAssets } from '../render/characters/assets';
 import { mechHeldWeaponOverride } from '../render/characters/manifest';
 import type { ModularLook } from '../render/characters/modular';
-import {
-  onPortraitsReady,
-  onPortraitUpdate,
-  playerPortraitDataUrl,
-} from '../render/characters/portrait';
+import { onPortraitsReady, onPortraitUpdate } from '../render/characters/portrait';
 import { currentDayNightPhase } from '../render/day_night_clock';
 import { globalDayness, skyTintForDayness } from '../render/day_night_core';
 import { isFriendlyPet, mobTooltipConColor } from '../render/reaction';

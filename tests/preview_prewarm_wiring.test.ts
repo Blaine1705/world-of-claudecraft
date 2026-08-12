@@ -22,10 +22,10 @@ type Calls = {
   finish: number;
 };
 
-function makeDeps(includeCharFamily: boolean) {
+function makeDeps(includeCharFamily: boolean, playerClass: 'warrior' | 'paladin' = 'warrior') {
   const calls: Calls = { shell: 0, skins: [], poses: [], armory: [], finish: 0 };
   const units = buildHudPreviewPrewarmUnits<string>({
-    playerClass: 'warrior',
+    playerClass,
     cardPoses: ['poseA', 'poseB'],
     armorySkinIds: ['skin_x', 'skin_y'],
     includeCharFamily,
@@ -63,9 +63,12 @@ describe('buildHudPreviewPrewarmUnits', () => {
     for (const u of portraitUnits) u.run();
     expect(vi.mocked(prewarmPlayerPortrait).mock.calls.length).toBe(expected);
     // The wiring routes portrait units at the module level (no Hud state): the
-    // first warrior headshot goes straight to prewarmPlayerPortrait.
+    // first warrior headshot goes straight to prewarmPlayerPortrait, and the
+    // roster covers every class, never only the deps-supplied one (a
+    // hardcoded playerClass inside the wiring would fail the mage arm).
     expect(vi.mocked(prewarmPlayerPortrait).mock.calls).toContainEqual(['warrior', 0, 'headshot']);
     expect(vi.mocked(prewarmPlayerPortrait).mock.calls).toContainEqual(['warrior', 0, 'body']);
+    expect(vi.mocked(prewarmPlayerPortrait).mock.calls).toContainEqual(['mage', 0, 'headshot']);
   });
 
   it('routes every Hud thunk verbatim and forwards includeCharFamily', () => {
@@ -83,6 +86,17 @@ describe('buildHudPreviewPrewarmUnits', () => {
       ['skin_y', 'weapon'],
     ]);
     expect(calls.finish).toBe(1);
+  });
+
+  it('forwards the deps playerClass into the char-skin count, never a hardcoded class', () => {
+    const { calls, units } = makeDeps(true, 'paladin');
+    for (const u of units) u.run();
+    // Guard the arm's own premise: the two classes must differ in skin count
+    // for this to be decisive.
+    expect(skinCount('player_paladin')).not.toBe(skinCount('player_warrior'));
+    expect(calls.skins).toEqual(
+      Array.from({ length: skinCount('player_paladin') }, (_, index) => index),
+    );
   });
 
   it('excludes the char-family units when includeCharFamily is false', () => {

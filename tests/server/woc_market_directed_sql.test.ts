@@ -362,19 +362,25 @@ describe('the settlement guards ship their DDL (structural floor)', () => {
   it('both boot repairs gate on index VALIDITY, and both creates drop an invalid carcass', async () => {
     const schema = await strippedSchema();
     // The repair gates: an INVALID carcass must re-open the repair, so the
-    // gate reads pg_index.indisvalid, never bare existence.
+    // gate reads pg_index.indisvalid through the search_path-aware
+    // to_regclass house idiom (a hardcoded nspname breaks the runs-once
+    // property under a non-public search_path), never bare existence.
     expect(schema).toContain(
-      "WHERE n.nspname = 'public' AND c.relname = 'woc_market_settlements_open' AND i.indisvalid",
+      "WHERE i.indexrelid = to_regclass('woc_market_settlements_open') AND i.indisvalid",
     );
     expect(schema).toContain(
-      "WHERE n.nspname = 'public' AND c.relname = 'woc_market_sales_listing_once' AND i.indisvalid",
+      "WHERE i.indexrelid = to_regclass('woc_market_sales_listing_once') AND i.indisvalid",
     );
     // The carcass drops ahead of each CREATE (IF NOT EXISTS matches by name
     // and would keep an index that enforces nothing).
-    expect(schema).toContain("c.relname = 'woc_market_settlements_open' AND NOT i.indisvalid");
-    expect(schema).toContain("c.relname = 'woc_market_sales_listing_once' AND NOT i.indisvalid");
-    expect(schema).toContain("EXECUTE 'DROP INDEX public.woc_market_settlements_open'");
-    expect(schema).toContain("EXECUTE 'DROP INDEX public.woc_market_sales_listing_once'");
+    expect(schema).toContain(
+      "WHERE i.indexrelid = to_regclass('woc_market_settlements_open') AND NOT i.indisvalid",
+    );
+    expect(schema).toContain(
+      "WHERE i.indexrelid = to_regclass('woc_market_sales_listing_once') AND NOT i.indisvalid",
+    );
+    expect(schema).toContain("EXECUTE 'DROP INDEX woc_market_settlements_open'");
+    expect(schema).toContain("EXECUTE 'DROP INDEX woc_market_sales_listing_once'");
   });
 
   it('the settlements repair ranks every open state above the ELSE arm', async () => {

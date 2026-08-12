@@ -187,7 +187,11 @@ Still open (a phase that hits one asks at session start):
     `woc_market.sale_conflict` (409, an admin sale correction blocked by a
     standing non-excluded row), both with catalog leaves and five non-Latin
     fills; the admin sale route answers the conflict with its own 409
-    envelope line.
+    envelope line, and the admin suspend route answers contention with a 409
+    envelope line too. The phase 14 admin-envelope conversion (the owned
+    raw-English deferral) also owns switching those two bespoke lines to the
+    registered codes, which are wired end to end and filled but reach the
+    wire today only on the player-facing routes.
   - Indexes: `woc_market_settlements_open` (UNIQUE partial, state IN offered/
     confirming/confirmed/delivering/delivered) REPLACED
     `woc_market_settlements_live`; `woc_market_sales_listing_once` (UNIQUE
@@ -220,18 +224,23 @@ Still open (a phase that hits one asks at session start):
     (outbid + held-bond refund in one statement, CAS from 'active');
     `closeListingIfNoOpenSettlement` guards the no-winner close arms (refusal
     parks the listing 'settling'); `reopenListing` fail-closes against open
-    settlements and the reclaim arm expires 'failed' rows first
-    (`expireFailedSettlementsForListing`, fail_reason 'listing_reclaimed');
-    `transitionSettlement` reports the revival-vs-open-index 23505 as false
+    AND retry-eligible 'failed' settlements (the reclaim arm never expires a
+    failed row: its deadline belongs to the overdue sweep's
+    default/forfeit/strike/cascade pass, and the suspend expiry's CTE
+    releases a dead settlement's 'won' bid to cancelled/refund_due so no bond
+    can strand); `transitionSettlement` reports the revival-vs-open-index
+    23505 as false
     (settlementQuote refuses instead of 500ing); `setSaleExcluded` returns
     'ok' | 'miss' | 'conflict'.
-  - LOCK ORDER RULE for every multi-row market transaction: bid rows first
-    (the whole open set, by id: activateBid pre-locks it since the 02 QA
-    round, the reproduced 40P01 fix), listing row second; the reverse
-    deadlocks. Guard transactions run `SET LOCAL lock_timeout`
-    (ESCROW_LOCK_TIMEOUT_MS) and surface 55P03/40P01 as the typed
-    'contended' refusal. Now also recorded in server/CLAUDE.md (the
-    woc_market Key-files row).
+  - LOCK ORDER RULE for a market transaction touching bid rows AND the
+    listing row: bids first (the whole open set, by id: activateBid pre-locks
+    it since the 02 QA round, the reproduced 40P01 fix; insertSettlement
+    stamps its one winner bid), listing second; the reverse deadlocks.
+    Transactions that take no bid row lock carry documented carve-outs in
+    place (cancelListingIfUnbid, insertPendingBid, escrowInsertListing).
+    Guard transactions run `SET LOCAL lock_timeout` (ESCROW_LOCK_TIMEOUT_MS)
+    and surface 55P03/40P01 as the typed 'contended' refusal. Now also
+    recorded in server/CLAUDE.md (the woc_market Key-files row).
   - Ops caveats for the phase 22 runbook: the deploy is forward-only (an OLD
     binary against the NEW schema re-opens the settlement-less-won-bid window
     and its reclaim arm can still reopen delivered-but-unclosed listings; the
@@ -243,8 +252,8 @@ Still open (a phase that hits one asks at session start):
     THROWS at insertSale (23505) instead of minting a silent duplicate: the
     safer direction, but a new old-binary failure mode. Never hand-drop
     `woc_market_settlements_open` or `woc_market_sales_listing_once` during
-    an incident: the validity gate re-arms and the next boot demotes live
-    settlements as schema_dedupe. Detection queries, PRE-upgrade only (after
+    an incident: the validity gate re-arms and the next boot demotes any
+    surviving duplicate open settlements as schema_dedupe. Detection queries, PRE-upgrade only (after
     a successful boot both return zero by construction): duplicate open
     settlements `SELECT listing_id FROM woc_market_settlements WHERE state IN
     ('offered','confirming','confirmed','delivering','delivered') GROUP BY

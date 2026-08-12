@@ -597,6 +597,16 @@ async function adminSuspendListingHandler(ctx: Ctx): Promise<void> {
       });
       return;
     }
+    if (out.reason === 'contended') {
+      // Plain row contention (a guard transaction briefly holds the listing):
+      // a 404 here would read as "gone" and stop the operator retrying.
+      json(ctx.res, 409, {
+        success: false,
+        data: null,
+        error: 'the listing is busy with another operation; retry now',
+      });
+      return;
+    }
     json(ctx.res, 404, { success: false, data: null, error: 'listing not found or closed' });
     return;
   }

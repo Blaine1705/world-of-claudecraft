@@ -226,9 +226,7 @@ UPDATE woc_market_settlements
        updated_at = now()
  WHERE NOT EXISTS (
      SELECT 1 FROM pg_index i
-       JOIN pg_class c ON c.oid = i.indexrelid
-       JOIN pg_namespace n ON n.oid = c.relnamespace
-      WHERE n.nspname = 'public' AND c.relname = 'woc_market_settlements_open'
+      WHERE i.indexrelid = to_regclass('woc_market_settlements_open')
         AND i.indisvalid)
    AND id IN (
    SELECT id FROM (
@@ -261,11 +259,9 @@ UPDATE woc_market_settlements
 DO $woc_open_idx$ BEGIN
   IF EXISTS (
     SELECT 1 FROM pg_index i
-      JOIN pg_class c ON c.oid = i.indexrelid
-      JOIN pg_namespace n ON n.oid = c.relnamespace
-     WHERE n.nspname = 'public' AND c.relname = 'woc_market_settlements_open'
+     WHERE i.indexrelid = to_regclass('woc_market_settlements_open')
        AND NOT i.indisvalid) THEN
-    EXECUTE 'DROP INDEX public.woc_market_settlements_open';
+    EXECUTE 'DROP INDEX woc_market_settlements_open';
   END IF;
 END $woc_open_idx$;
 CREATE UNIQUE INDEX IF NOT EXISTS woc_market_settlements_open
@@ -320,9 +316,7 @@ CREATE INDEX IF NOT EXISTS woc_market_sales_item
 UPDATE woc_market_sales SET excluded = true
  WHERE NOT EXISTS (
      SELECT 1 FROM pg_index i
-       JOIN pg_class c ON c.oid = i.indexrelid
-       JOIN pg_namespace n ON n.oid = c.relnamespace
-      WHERE n.nspname = 'public' AND c.relname = 'woc_market_sales_listing_once'
+      WHERE i.indexrelid = to_regclass('woc_market_sales_listing_once')
         AND i.indisvalid)
    AND id IN (
    SELECT id FROM (
@@ -339,11 +333,9 @@ UPDATE woc_market_sales SET excluded = true
 DO $woc_sale_idx$ BEGIN
   IF EXISTS (
     SELECT 1 FROM pg_index i
-      JOIN pg_class c ON c.oid = i.indexrelid
-      JOIN pg_namespace n ON n.oid = c.relnamespace
-     WHERE n.nspname = 'public' AND c.relname = 'woc_market_sales_listing_once'
+     WHERE i.indexrelid = to_regclass('woc_market_sales_listing_once')
        AND NOT i.indisvalid) THEN
-    EXECUTE 'DROP INDEX public.woc_market_sales_listing_once';
+    EXECUTE 'DROP INDEX woc_market_sales_listing_once';
   END IF;
 END $woc_sale_idx$;
 CREATE UNIQUE INDEX IF NOT EXISTS woc_market_sales_listing_once
@@ -1286,14 +1278,28 @@ export class PgWocMarketDb implements WocMarketDb {
         // on-chain transfer (the signature only reaches the server at confirm,
         // which is what moves the row to 'confirming'), so a quoted 'offered'
         // row refuses the suspend exactly like 'confirming' and beyond.
+        // The CTE releases each expired settlement's close-time WINNER in the
+        // same statement: a 'won' bid whose settlement dies administratively
+        // must go 'cancelled' with its held bond queued for refund, or the
+        // bond is stranded forever (bondsDue only reads refund_due and
+        // forfeit_due; the pending/active teardown below never touches 'won'
+        // rows, and the deadline path is the one that defaults and forfeits).
         await client.query(
-          `UPDATE woc_market_settlements
-            SET state = 'expired', fail_reason = 'listing_suspended', updated_at = now()
-          WHERE listing_id = $1
-            AND (state = 'failed'
-              OR (state = 'offered'
-                AND (quote_reference IS NULL OR quote_expires IS NULL
-                  OR quote_expires <= to_timestamp($2 / 1000.0))))`,
+          `WITH expired AS (
+            UPDATE woc_market_settlements
+               SET state = 'expired', fail_reason = 'listing_suspended', updated_at = now()
+             WHERE listing_id = $1
+               AND (state = 'failed'
+                 OR (state = 'offered'
+                   AND (quote_reference IS NULL OR quote_expires IS NULL
+                     OR quote_expires <= to_timestamp($2 / 1000.0))))
+             RETURNING bid_id
+          )
+          UPDATE woc_market_bids b
+             SET status = 'cancelled',
+                 bond_state = CASE WHEN b.bond_state = 'held' THEN 'refund_due' ELSE b.bond_state END
+            FROM expired e
+           WHERE b.id = e.bid_id AND b.status = 'won'`,
           [id, nowMs],
         );
         const open = await client.query(
@@ -1442,31 +1448,21 @@ export class PgWocMarketDb implements WocMarketDb {
   async reopenListing(id: number): Promise<void> {
     // Fail-closed twin of the reclaim arm's liveness read: the read and this
     // write are separate statements, so a settlement that lands between them
-    // (a revived 'failed' row, a buy-now inside the closing window) must
-    // refuse the reopen here rather than re-auction a listing a payment is
-    // riding. The next reclaim pass re-evaluates.
+    // (a buy-now inside the closing window) must refuse the reopen here
+    // rather than re-auction a listing a payment is riding. 'failed' is in
+    // the refusal set alongside the five open states: a retry-eligible row
+    // belongs to the overdue sweep's deadline pass (default, forfeit, strike,
+    // cascade), and reopening around it would let that pass be skipped. The
+    // next reclaim pass re-evaluates.
     await this.pool.query(
       `UPDATE woc_market_listings SET status = 'active', updated_at = now()
         WHERE id = $1 AND status IN ('ending', 'settling')
           AND NOT EXISTS (
             SELECT 1 FROM woc_market_settlements s
              WHERE s.listing_id = woc_market_listings.id
-               AND s.state IN ('offered', 'confirming', 'confirmed', 'delivering', 'delivered'))`,
+               AND s.state IN
+                 ('offered', 'confirming', 'confirmed', 'delivering', 'delivered', 'failed'))`,
       [id],
-    );
-  }
-
-  /** Reclaim-arm sibling of the guards' expiry statements: a stranded listing
-   *  must not go back to 'active' with a retry-eligible 'failed' settlement
-   *  still attached (its revival would ride a listing that is being re-bid).
-   *  Expiring 'failed' rows is idempotent and safe standalone; the reopen
-   *  above fail-closes if a revival races this. */
-  async expireFailedSettlementsForListing(listingId: number, failReason: string): Promise<void> {
-    await this.pool.query(
-      `UPDATE woc_market_settlements
-          SET state = 'expired', fail_reason = $2, updated_at = now()
-        WHERE listing_id = $1 AND state = 'failed'`,
-      [listingId, failReason],
     );
   }
 
