@@ -5,17 +5,21 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-03-qa.md`
+- Next file to run: `docs/woc-marketplace-hardening/phase-04-bond-payment-lifecycle.md`
 - Packet created 2026-08-11 from `review.md` (the 2026-08-11 three-repo review).
 - 01 implemented AND QA'd (PASS-WITH-FOLLOWUPS, fixes applied, PUSHED).
 - 02 implemented AND QA'd (PASS-WITH-FOLLOWUPS, every fix applied, PUSHED at
   the QA tip; gate GREEN at 301a8c7c22); see the ledger below and progress.md
   for the QA round, the reasoned resolutions, and the phase 03/04 handoffs.
-- 03 implemented (B2a/B2b/B2c + monitor; five-reviewer round + fix round
-  applied; LOCAL, not pushed per R4); ledger entry below carries the seams
-  and ops caveats later phases need, progress.md the full round. ONE spec
-  deviation flagged for the QA session to re-judge (AC3: unprovable mail
-  claims PARK instead of auto-resuming; a security ruling, see progress.md).
+- 03 implemented AND QA'd (PASS-WITH-FOLLOWUPS, every fix applied, PUSHED per
+  R4). The AC3 park deviation is UPHELD (no integrity hole; Fernando can
+  overrule, rationale in progress.md). The QA round's blocking finds (park
+  rotation blinding the monitor; the unbounded redrive beat) are fixed; the
+  03 ledger entry below was AMENDED IN PLACE for the changed seams (rotation
+  column + exclusion, readout shape with asOfMs/saturated/updatedAtMs,
+  per-entry contention scope, finalize re-lock + already_final, typed
+  activateBid contention, ambiguous grantCopy refusal). Phase 04 consumes
+  the amended entry, not the original.
 
 ## Repos and branches
 

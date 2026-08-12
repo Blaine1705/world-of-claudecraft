@@ -309,8 +309,9 @@ then drives handlers via `routes` + `configureLeaderboardRuntime` + `fakeCtx`). 
   events), via `sendChatNotice(session, text)`, and via `broadcastSystem(text)`. The
   client re-localizes at the boundary: most
   strings through `src/ui/server_i18n.ts` (`localizeServerText`: an `EXACT` map + ordered
-  `RULES` + a `RESTART_MESSAGES` table), a few (chat-rate limit, etc.) through the hud's
-  own `localizeErrorText`/`localizeSystemText` arms. Durations re-localize via
+  `RULES` + a `RESTART_MESSAGES` table), a few (chat-rate limit, etc.) through the
+  `localizeErrorText` arm (`src/ui/error_text_i18n_core.ts`, delegated by the hud) or the
+  hud's own `localizeSystemText` arm. Durations re-localize via
   `localizeServerDuration`, which maps `formatDuration` output (`"5 minutes"`, `"1 hour"`,
   ...) onto the `time.*` keys. **Add the matcher entry in the same change** as a new emit.
 - The **S3 guard** (`tests/localization_fixes.test.ts`) scans `game.ts` emit literals

@@ -10,7 +10,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 02 | settlement-state-guards | game | DONE | 0f029bacf9 | release sync was a no-op (already at v0.37.0 tip); real-SQL suite 27 green vs dev Postgres; reviewer round + deferrals in section below; gate GREEN at tip 6916bd6944 (full-suite fallback; first run flaked on the known heavy-suite timeouts while external load averaged 40+, clean on the rerun) |
 | 02 QA | phase-02-qa | game | DONE | 20fdcc5288 | PASS-WITH-FOLLOWUPS, every fix applied (section below); release/v0.37.0 synced in (merge b40a178643, one generated-i18n conflict regenerated; merge audit clean except the hud.ts ceiling, fixed by extraction); gate GREEN at 301a8c7c22 (full-suite fallback, all 8 steps); pushed per R4 (no open PR on this branch, so no PR CI; pre-push floor green) |
 | 03 | delivery-exactly-once | game | DONE | e71a8cfd21 | release sync trivial (server/parse samplers only); B2a/B2b/B2c + monitor closed; five-reviewer round + fix round + fresh re-review applied (section below); real-SQL suites 65 green; gate GREEN at tip c3b33f54a7 (full-suite fallback, all 8 steps; the one intermediate red was the internal gate-mount sweep's 20-route count pin, fixed to 21); LOCAL, not pushed per R4 |
-| 03 QA | phase-03-qa | game | IN PROGRESS | 5ef64c1e11 | QA audit round underway |
+| 03 QA | phase-03-qa | game | DONE | 5ef64c1e11 | PASS-WITH-FOLLOWUPS, every fix applied (section below); release sync 5487531960 (two conflicts: main.ts union + regenerated pending.ts; merge audit CLEAN except the hud ratchet, fixed by the error_text_i18n_core extraction, ceiling 19338 to 19190); AC3 park deviation UPHELD; 21-mutation pass, one survivor closed; pushed per R4 |
 | 04 | bond-payment-lifecycle | game | NOT STARTED | | |
 | 04 QA | phase-04-qa | game | NOT STARTED | | |
 | 05 | custody-entry-hardening | game | NOT STARTED | | |
@@ -49,6 +49,90 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 21 QA | phase-21-qa | service + game | NOT STARTED | | |
 | 22 | close-out | all three | NOT STARTED | | teardown offer lives in 22 QA |
 | 22 QA | phase-22-qa | all three | NOT STARTED | | |
+
+## 03 QA round (verdict PASS-WITH-FOLLOWUPS, every fix applied)
+
+Session start 5ef64c1e11; release/v0.37.0 synced in (merge 5487531960: the
+chat-quota feature; conflicts were a clean shutdown union in server/main.ts
+and the regenerated pending.ts). The release-merge audit ran as seven lanes:
+every merge intent preserved on both sides (diff-of-diffs identity on
+hud.ts, exact unions elsewhere, db-mock trap did not fire, i18n regen
+deterministic), ONE merge-created red: hud.ts 19395 over the zero-headroom
+19338 ceiling, fixed by extracting localizeErrorText VERBATIM into the
+registered pure core src/ui/error_text_i18n_core.ts (Hud keeps a thin
+delegator; S3/B1 retargeted through a shared per-arm file table; ceiling
+now EXACTLY 19190; the extraction deliberately avoided the entity-display
+slice another branch used for the same fallout). Merge premises recorded in
+state.md: 13 steady DB connections per realm, the first pg LISTEN/NOTIFY
+exemplar, the quota-vs-escrow accounts-row contention note.
+
+Six audit lanes ran over e71a8cfd21..5ef64c1e11 (privacy-security,
+database-performance, server-hot-path, test-coverage-auditor, correctness,
+dead-code/cleanup): roughly 60 findings, ALL applied or recorded with
+owners. The lanes' verdicts: security no criticals and the exactly-once
+model sound against every constructed dupe path; correctness PASS on all
+four deliverable items with the crash matrix 11/12 pairs pinned; db BLOCK
+on two P1s, both fixed this round.
+
+The AC3 deviation is UPHELD: the park posture has no integrity hole (both
+judging lanes and my own read of C2a/C2b/C3/C3b concur that a collected
+letter makes absence-from-book genuinely ambiguous while the common
+post-write crash window still auto-resumes via the in-book proof). Costs
+quantified and recorded; Fernando can overrule, but the automatic-resume
+alternative is a provable dupe rail.
+
+Reproduced-and-fixed, the blocking class: park rotation re-stamped the
+readout's own age column, so a parked return could NEVER age into the
+monitor (and the commonest park, seller-gone, was invisible in all three
+classes); rotation moved to a dedicated sweep_parked_at column with the
+readout aging on updated_at, backing-off rows now EXCLUDED from the batch
+reads entirely. The unbounded redrive beat (500 finalizes plus realm
+mail-book writes per beat, worst at the legacy-upgrade boot) is bounded at
+SWEEP_BATCH with a truncation cursor. Also fixed: activateBid's raw 40P01
+became a typed 'contended' that reports PENDING to the bidder (the interim
+fix collapsed it to a false "outbid", caught by the fix-round re-review);
+finalize re-locks the open bid set after the listing lock and distinguishes
+'already_final' (re-runs neither re-count nor re-notify); the finalize
+transaction carries the heavy statement allowance; per-row error isolation
+reached the five remaining arms; contention and park stats moved into a
+per-entry scope (the eager confirm entry mints its own, closing a
+request-vs-pass race); ambiguous grantCopy refusals park instead of
+converting to mail; provable grant resumes refresh their ledger stamp so
+sustained contention cannot expire them; the monitor gained asOfMs,
+saturated flags, a stale-streak warning, a cold-failure negative cache,
+and a draining stop(); the sold-notice loss window after finalize is an
+ACCEPTED, test-documented cost. Three fix rounds, each re-reviewed as
+unreviewed code (the round-2 reviewer verified the exclusion mechanics
+against the real pg driver and found the false-outbid regression; round 3
+was comment/docs/one-pin scope).
+
+Deep mutation pass: 21 mutations over the headline pins (the named
+booked_at revert, both resume rails, the written flag, hasParcel gate,
+nonce proof, fence adoption, finalize shape/CAS/re-lock/already_final,
+park counters, rotation-age split, redrive bound, exclusion, skip
+reporting, contended claim-freeze, quota matcher rows, monitor staleness
+and gate). 20 killed outright; the one survivor exposed a REAL hole (every
+written-flag pin injected failures after a SUCCESSFUL persist, where flip
+order is indistinguishable), closed with a blob-half-throw-then-collect
+twin that provably reds under the flipped order.
+
+Validation: 913 DB-free market/guard tests green plus 68 real-SQL against
+dev Postgres (both suites demonstrably RAN); tsc, ci:changed, biome on
+changed files green; gate run recorded in the row above. Doc upkeep: the
+matcher-location sentences in src/ui/CLAUDE.md and server/CLAUDE.md
+retargeted to the new core; the bond-lifecycle spec's dead symbol and
+rotted line anchors replaced; implement-round ledger lines the fixes
+falsified amended in place.
+
+Deferrals recorded with owners (beyond the implement round's list, do NOT
+re-raise): EXPLAIN plan evidence for the two new rotation-order reads and
+the two new partial probes rides the phases 16/17 list; the claims-prune
+orphan note (age booked rows on booked_at) rides phase 17; the operator
+re-drive procedure per parked class (including the ambiguous-grant class
+where hand-delivery without checking the buyer's bags IS the dupe) rides
+the phase 22 runbook; the pg-harness extraction (third suite trigger)
+rides phase 20; the phase 19 dashboard consumes the amended readout shape
+(asOfMs, saturated, updatedAtMs) from state.md.
 
 ## 03 implement round (delivery exactly-once)
 
