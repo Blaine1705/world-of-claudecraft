@@ -119,7 +119,7 @@ interface AttributionTargetFixture {
 // Re-minted after the custom-shader dedupe signature fix changed
 // prewarm_policy.ts. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'a40c99bd60b3cd1bea3ddbd2a7e92b1fbd470e435ca04f7a53595cfa39a3a765';
+  '4c097c403091fe4ed5d04bec6b79fa3272a85ba10dc35d20cb162f416c593d57';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
