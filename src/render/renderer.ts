@@ -198,11 +198,6 @@ import { daisVisualLift } from './dais_lift';
 import { buildDawnholdFeatures, type DawnholdFeaturesView } from './dawnhold_features';
 import { currentDayNightPhase, currentLunarPhase, dayNightPhaseOverride } from './day_night_clock';
 import {
-  applyInteriorLightRig,
-  applyRiftLightRig,
-  type FogSceneState,
-} from './interior_light_rig';
-import {
   aboveHorizon,
   DAY_ONLY,
   type DayNightGrade,
@@ -321,6 +316,7 @@ import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
 import { buildImpactSite, type ImpactSiteView, MIREFEN_IMPACT_SITE } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
+import { applyInteriorLightRig, applyRiftLightRig, type FogSceneState } from './interior_light_rig';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { stepLichHeartbeat } from './lich_audio_state_core';
