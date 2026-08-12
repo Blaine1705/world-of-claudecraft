@@ -124,9 +124,9 @@ interface AttributionTargetFixture {
 // rendererIntegration leaf mints a value matching neither parent. No capture
 // was retaken.
 // Re-minted for the merge of PR #3314's rift windup telegraph school tint
-// with the release branch's renderer changes. Both parents move renderer.ts,
-// so the rendererIntegration leaf mints a value matching neither parent. No
-// capture was retaken.
+// (issue #2917) with the release branch's renderer changes. Both parents move
+// renderer.ts, so the rendererIntegration leaf mints a value matching neither
+// parent. No capture was retaken.
 // Re-minted for the Three.js audit batch (light budget seam, blob shadows, sky
 // residency lane, splat colour pack-source fix): renderer.ts edits only. No
 // capture was retaken.

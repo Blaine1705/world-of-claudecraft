@@ -702,9 +702,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // rendererIntegration leaf mints a value matching neither parent. No capture
 // was retaken.
 // Re-minted for the merge of PR #3314's rift windup telegraph school tint
-// with the release branch's renderer changes. Both parents move renderer.ts,
-// so the rendererIntegration leaf mints a value matching neither parent. No
-// capture was retaken.
+// (issue #2917) with the release branch's renderer changes. Both parents move
+// renderer.ts, so the rendererIntegration leaf mints a value matching neither
+// parent. No capture was retaken.
 // Re-minted for the Three.js audit batch (light budget seam, blob shadows, sky
 // residency lane, splat colour pack-source fix): renderer.ts edits only. No
 // capture was retaken.
@@ -1662,9 +1662,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // parents' renderer.ts edits, then this second-order performance seal
     // follows the swept evidence bytes. No capture was retaken.
     // Re-pinned for the merge of PR #3314's rift windup telegraph school tint
-    // with the release branch's renderer changes. The first-order composite
-    // follows the merged renderer.ts bytes, then this second-order performance
-    // seal follows the swept evidence bytes. No capture was retaken.
+    // (issue #2917) with the release branch's renderer changes. The
+    // first-order composite follows the merged renderer.ts bytes, then this
+    // second-order performance seal follows the swept evidence bytes. No
+    // capture was retaken.
     // Re-minted for the Three.js audit batch (light budget seam, blob
     // shadows, sky residency lane, splat colour pack-source fix): the
     // first-order composite follows renderer.ts, then this second-order
