@@ -1048,6 +1048,22 @@ describeDb('woc market settlement guards against real Postgres', () => {
   // retry revival, the quoted-offered suspend, and the CAS floor
   // -------------------------------------------------------------------------
 
+  describe('a due no-bid auction under a live buy-now settlement', () => {
+    it('parks settling instead of closing no_bids over the payment', async () => {
+      const realm = 'guard-close-nobids-live';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const listingId = await seedListing(realm, seller, { endsAtMs: BASE_MS - MINUTE_MS });
+      await seedSettlement(realm, listingId, buyer);
+      await makeService(realm).sweepPass();
+      // The unguarded close was the dupe hole: 'no_bids' would mail the
+      // escrow home while the settlement can still pay and deliver.
+      const row = await listingRow(listingId);
+      expect(row.status).toBe('settling');
+      expect(row.resolution).toBeNull();
+    }, 20_000);
+  });
+
   describe('settlement insert versus a concurrent close', () => {
     it('an insert blocked by a concurrent closer aborts instead of landing on the closed listing', async () => {
       const realm = 'guard-insert-vs-close';

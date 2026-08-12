@@ -2861,6 +2861,31 @@ describe('the insert refusal arms at the service seam', () => {
     expect((await getListing(h, listing.id)).buyNowLockAccount).toBeNull();
   });
 
+  it('a due auction with no bids parks settling instead of closing under a live buy-now settlement', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+    const inserted = await h.db.insertSettlement({
+      listingId: listing.id,
+      bidId: null,
+      attempt: 0,
+      buyerAccount: BUYER_A,
+      buyerCharacter: CHAR_A,
+      buyerName: 'Aldan',
+      buyerWallet: 'wallet-a',
+      amountCents: 8000,
+      deadlineAtMs: listing.endsAtMs + 60_000,
+      nowMs: h.now(),
+    });
+    if (typeof inserted === 'string') throw new Error(`fixture refused: ${inserted}`);
+    h.setNow(listing.endsAtMs + 1);
+    await h.service.sweepPass();
+    // The old unguarded close here was the item-dupe hole: closed 'no_bids'
+    // mails the escrow home while the buyer can still pay and be delivered.
+    const row = await getListing(h, listing.id);
+    expect(row.status).toBe('settling');
+    expect(row.resolution).toBeNull();
+  });
+
   it('the close arm leaves a claimed listing alone when a suspend closed it underneath', async () => {
     const h = makeHarness();
     const listing = await listEpic(h);
