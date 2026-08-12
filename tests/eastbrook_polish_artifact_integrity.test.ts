@@ -694,12 +694,15 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
 // archetype and scene-texture counts; renderer.ts edits only). No capture
 // was retaken.
+// Re-minted after the custom-shader dedupe signature fix changed
+// prewarm_policy.ts. No capture was retaken.
 // Re-minted for issue #2917 (rift windup telegraph school tint; renderer.ts
-// edits only). No capture was retaken.
+// edits only, merged on top of the prewarm_policy.ts remint above). No
+// capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '17bd7586baf799ac5a2f37f8e99b285f16bbe46492c0721ef1453f845361d176';
+  'c81ac102ec924605594c21244b555261a567085e633f9962dc385253cdeda199';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '1467e1b5d246b4aa23db9b4376600834b21f6a36a721d212b6c9b4bf03032afc';
+  'fba7a4dca14f388b9501019fbace0d79dd949a43dce471eade7a488cf3b7445a';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1626,14 +1629,21 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // PR 3204) into the creator-appearance branch: both parents move the
     // rendererIntegration leaf, so the merged tree mints a value matching
     // neither parent. No capture was retaken.
-    // Re-minted for issue #2917 (rift windup telegraph school tint; the
-    // first-order composite follows the renderer.ts edit, then this
-    // second-order seal follows the swept evidence bytes). No capture was
+    // Re-minted for the Three.js audit batch (light budget seam, blob
+    // shadows, sky residency lane, splat colour pack-source fix): the
+    // first-order composite follows renderer.ts, then this second-order
+    // performance seal follows the swept evidence bytes. No capture was
     // retaken.
+    // Re-minted after the custom-shader dedupe signature fix changed
+    // prewarm_policy.ts. No capture was retaken.
+    // Re-minted for issue #2917 (rift windup telegraph school tint; the
+    // first-order composite follows the renderer.ts edit, merged on top of
+    // the prewarm_policy.ts remint above, then this second-order seal
+    // follows the swept evidence bytes). No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('0eec5e382a41bc7e99b0f5c9e18fce27eac766c27856351b19201a44a67b8250');
+    ).toBe('a825036d96897b6ebad3418f28bad08ba4b3906aa4b674cb6e0261ebccb1ca6b');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

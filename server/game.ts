@@ -310,6 +310,7 @@ import { nextRaidResetMs, resetDayKey } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
+import { refusedRiftForgeCommand } from './rift_forge_gate';
 import { RiftUpgradeCoordinator, riftUpgraderConfigFromEnv } from './rift_upgrader';
 import { createSerialWriter } from './serial_writer';
 import {
@@ -6603,6 +6604,19 @@ export class GameServer {
       this.sendCommandOutcome(session, msg, false);
       return;
     }
+    // The Rift forge trio shipped sim+wire complete with no client UI, so the
+    // arms stay closed until the realm explicitly opts in (RIFT_FORGE_ENABLED=1;
+    // rationale in server/rift_forge_gate.ts): a crafted frame must not buy
+    // progression the stock client cannot reach. Refused ABOVE the heavy-self
+    // dirty flag below, so a blocked command cannot force a re-diff either.
+    if (refusedRiftForgeCommand(msg.cmd)) {
+      // Label-free by contract (game_signals.ts): the stock client never sends
+      // these, so the counter is the ops signal that a modified client probes
+      // the closed forge (and that a realm forgot the flag once the UI ships).
+      gameMetricsCounters().riftForgeRefused();
+      this.sendCommandOutcome(session, msg, false);
+      return;
+    }
     // A command that can change a heavy self field forces the next snapshot to
     // re-diff those fields (combat-only commands like cast/target/attack do not,
     // which is what keeps the gating a win during a fight).
@@ -6663,6 +6677,9 @@ export class GameServer {
         break;
       case 'tab':
         sim.tabTarget(pid);
+        break;
+      case 'tabPrev':
+        sim.tabTargetPrev(pid);
         break;
       case 'targetNearest':
         sim.targetNearestEnemy(pid);

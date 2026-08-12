@@ -31,6 +31,7 @@ import {
   onPortraitsReady,
   onPortraitUpdate,
   playerPortraitDataUrl,
+  prewarmPlayerPortrait,
 } from '../render/characters/portrait';
 import { currentDayNightPhase } from '../render/day_night_clock';
 import { globalDayness, skyTintForDayness } from '../render/day_night_core';
@@ -16613,11 +16614,16 @@ export class Hud {
       },
       prewarmCharSkin: (skin) => this.charPreview?.prewarm([skin]),
       prewarmCardPose: (pose) => this.charPreview?.prewarmCloseupPoses([pose]),
-      renderPortrait: (portraitClass, skin, framing) => {
-        playerPortraitDataUrl(portraitClass as PlayerClass, skin, framing);
-      },
+      // The prewarm variant, not the sync playerPortraitDataUrl: uploads are
+      // prepaid in bounded slices and the PNG encode runs off-thread, so the
+      // paced unit never books the 43 to 201 ms cold-capture block.
+      renderPortrait: (portraitClass, skin, framing) =>
+        prewarmPlayerPortrait(portraitClass as PlayerClass, skin, framing),
       prewarmArmorySkin: (skinId, armoryMode) =>
-        this.dailyRewardsWindow.prewarmArmoryPreviewSkins([skinId], [armoryMode]),
+        this.dailyRewardsWindow.prewarmArmoryPreviewSkins([skinId], [armoryMode], {
+          keepWarmupBuffer: true,
+        }),
+      finishArmoryPrewarm: () => this.dailyRewardsWindow.finishArmoryPreviewPrewarm(),
     });
   }
 
@@ -19243,7 +19249,10 @@ export function abilityRequirementLines(def: AbilityDef, spec?: string | null): 
   return abilityRequirementKeys(def, spec).map((req) => {
     switch (req.key) {
       case 'requiresForm':
-        return t('abilityUi.tooltip.requiresForm', { form: t(FORM_LABEL_KEYS[req.form!]) });
+        if (req.form) {
+          return t('abilityUi.tooltip.requiresForm', { form: t(FORM_LABEL_KEYS[req.form]) });
+        }
+        return t('abilityUi.tooltip.selfOnly');
       case 'requiresStealth':
         return t('abilityUi.tooltip.requiresStealth');
       case 'requiresStealthSkulduggery':
@@ -19255,9 +19264,12 @@ export function abilityRequirementLines(def: AbilityDef, spec?: string | null): 
       case 'requiresOutOfCombat':
         return t('abilityUi.tooltip.requiresOutOfCombat');
       case 'requiresTargetHealthBelow':
-        return t('abilityUi.tooltip.requiresTargetHealthBelow', {
-          percent: formatAbilityNumber(req.percent!),
-        });
+        if (req.percent !== undefined) {
+          return t('abilityUi.tooltip.requiresTargetHealthBelow', {
+            percent: formatAbilityNumber(req.percent),
+          });
+        }
+        return t('abilityUi.tooltip.selfOnly');
       case 'onNextSwing':
         return t('abilityUi.tooltip.onNextSwing');
       case 'offGlobalCooldown':
@@ -19267,6 +19279,7 @@ export function abilityRequirementLines(def: AbilityDef, spec?: string | null): 
       case 'enemyTarget':
         return t('abilityUi.tooltip.enemyTarget');
       case 'selfOnly':
+        return t('abilityUi.tooltip.selfOnly');
       default:
         return t('abilityUi.tooltip.selfOnly');
     }

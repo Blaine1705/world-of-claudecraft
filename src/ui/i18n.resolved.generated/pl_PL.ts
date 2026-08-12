@@ -893,6 +893,14 @@ export const pl_PL: EnTranslations = {
       "notNow": "Nie teraz",
       "update": "Aktualizuj"
     },
+    "otaUpdate": {
+      "title": "Game Update",
+      "downloading": "Downloading update: {percent}",
+      "applying": "Update downloaded. Restarting the game to apply it.",
+      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
+      "continueAnyway": "Continue without updating",
+      "progressLabel": "Update download progress"
+    },
     "cameraPrompt": {
       "title": "Wybierz Kamerę",
       "intro": "Wybierz, jak kamera podąża za twoją postacią.",
@@ -994,6 +1002,7 @@ export const pl_PL: EnTranslations = {
       "emoteWheel": "Koło emotek",
       "targetFriendly": "Obierz najbliższego sojusznika",
       "targetFriendlyNext": "Przełączaj przyjazny cel",
+      "targetPrev": "Przełączaj cel wstecz",
       "discord": "Discord",
       "valecup": "Puchar Doliny",
       "bgFlag": "Akcja flagi pola bitwy",
@@ -4167,6 +4176,7 @@ export const pl_PL: EnTranslations = {
       "dungeonFinder": "Wyszukiwarka lochów",
       "discord": "Discord",
       "abilities": "Używaj zdolności z paska akcji (rząd cyfr; drugi pasek znajduje się na klawiaturze numerycznej)",
+      "targetPrev": "Przełączaj cel wstecz",
       "targetFriendly": "Namierz najbliższy przyjazny cel",
       "cycleFriendly": "Przełączaj przyjazny cel",
       "targetAuras": "Wzmocnienia i osłabienia celu",

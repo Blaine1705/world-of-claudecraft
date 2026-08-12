@@ -893,6 +893,14 @@ export const ja_JP: EnTranslations = {
       "notNow": "後で",
       "update": "更新"
     },
+    "otaUpdate": {
+      "title": "ゲームアップデート",
+      "downloading": "アップデートをダウンロード中：{percent}",
+      "applying": "アップデートをダウンロードしました。適用のためゲームを再起動しています。",
+      "incompatible": "プレイするにはアップデートが必要です。ダウンロードが完了すると自動的に適用されます。",
+      "continueAnyway": "更新せずに続行",
+      "progressLabel": "アップデートのダウンロード進行状況"
+    },
     "cameraPrompt": {
       "title": "カメラを選択",
       "intro": "カメラがキャラクターを追う方法を選びましょう。",
@@ -994,6 +1002,7 @@ export const ja_JP: EnTranslations = {
       "emoteWheel": "エモートホイール",
       "targetFriendly": "最も近い味方をターゲット",
       "targetFriendlyNext": "味方ターゲットを順に切り替え",
+      "targetPrev": "ターゲットを逆順に切り替え",
       "discord": "Discord",
       "valecup": "ヴェイルカップ",
       "bgFlag": "戦場フラッグアクション",
@@ -4167,6 +4176,7 @@ export const ja_JP: EnTranslations = {
       "dungeonFinder": "ダンジョンファインダー",
       "discord": "Discord",
       "abilities": "アクションバーのアビリティを使用（数字キーの列。二つ目のバーはテンキーにあります）",
+      "targetPrev": "ターゲットを逆順に切り替え",
       "targetFriendly": "最も近い友好的な対象をターゲット",
       "cycleFriendly": "友好的なターゲットを順に切り替え",
       "targetAuras": "ターゲットのバフとデバフ",

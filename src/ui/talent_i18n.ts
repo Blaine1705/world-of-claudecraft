@@ -332,7 +332,7 @@ const localeTextByBase = {
   fr_FR: {
     masteryDescriptions: {
       destruction:
-        'Conflagration confère Désolation, qui raccourcit considérablement l\'incantation de votre prochain Trait de ruine ou fait tomber immédiatement la première vague de Pluie de feu.',
+        "Conflagration confère Désolation, qui raccourcit considérablement l'incantation de votre prochain Trait de ruine ou fait tomber immédiatement la première vague de Pluie de feu.",
       arms: 'Lorsque vous maniez une arme à deux mains, tous les dégâts que vous infligez sont augmentés de 10 %.',
     },
     statLabels: {
@@ -11247,7 +11247,12 @@ export function tTalent(request: TalentTranslationRequest): string {
     );
   }
   if (request.kind === 'talentChoice') {
-    if (request.field === 'name') return translateTitle(request.choice.name, lang);
+    if (request.field === 'name') {
+      if (request.choice.id === 'war_row_double_charge') {
+        return RETAINED_ROW_TITLE_OVERRIDES[lang]?.['Double Charge'] ?? request.choice.name;
+      }
+      return translateTitle(request.choice.name, lang);
+    }
     const retainedDescriptions = RETAINED_ROW_DESCRIPTION_OVERRIDES[lang] as
       | Readonly<Record<string, string>>
       | undefined;
