@@ -7,18 +7,33 @@ actually reads.
 
 - Next file to run: `docs/woc-marketplace-hardening/phase-04-qa.md`
 - Packet created 2026-08-11 from `review.md` (the 2026-08-11 three-repo review).
-- 04 implemented AND reviewed THIS session (LOCAL, not pushed per R4): H4,
-  H15, the anti-snipe medium, R8 both arms, and the 02 clearBuyNowLock
-  handoff; ledger entry below. Six reviewer lanes ran (privacy-security,
+- 04 implemented AND reviewed (LOCAL, not pushed per R4): H4, H15, the
+  anti-snipe medium, R8 both arms, and the 02 clearBuyNowLock handoff;
+  ledger entry below. Six reviewer lanes ran (privacy-security,
   database-performance, test-coverage each TWICE; qa-checklist READY;
   migration-safety no critical/warning), every finding applied or owned
   across THREE fix rounds; 17 mutation spot-proofs bit; gate GREEN at
-  0afdaa71a5 (full-suite fallback). The H15 escape hatch that gated enable
+  0afdaa71a5 (full-suite fallback). A dedicated VERIFICATION session then
+  re-ran the phase over the committed tree (fresh deliverables and
+  test-coverage audit lanes, all three pg suites re-run green, three
+  committed-round mutations re-bitten) and applied its findings as a
+  further fix round: the route-level cancelPending wire pin (the one
+  unpinned hop), typed confirm_in_flight on second/different signatures
+  (both legs), the idempotent confirming-settlement retry, the lapseBid
+  held-bond carve-out, the first-arrival extension anchor (kills the
+  re-post creep), the cancelListingIfUnbid idle bound, the stuckBonds
+  signature age axis, comment-stripped window pins via the extracted
+  tests/helpers/strip_comments.ts, tunable literal pins (park delay and the
+  anti-snipe trio), and the ledger corrections recorded in place
+  (progress.md carries the round). The H15 escape hatch that gated enable
   exists (the 'review' state). Items the DEDICATED phase-04-qa session still
-  owns: re-judge the cooldown NUMBERS and the cancel-intent bid-block
-  interpretation (recorded in progress.md), and the R4 push. Deferred to
+  owns: re-judge the cooldown NUMBERS, the cancel-intent bid-block
+  interpretation, the confirm_in_flight second-signature semantics, the
+  stuckBonds axis change, and the confirming-hours no-upper-clamp posture
+  (recorded in progress.md), and the R4 push. Deferred to
   phase 14 with owners: the anti-snipe deadline player-copy consequence, the
-  cancel-intent client marker, the claim_cooldown remaining-time copy.
+  cancel-intent client marker, the claim_cooldown remaining-time copy, and
+  the after-close no-extension behavior note.
 - 01 implemented AND QA'd (PASS-WITH-FOLLOWUPS, fixes applied, PUSHED).
 - 02 implemented AND QA'd (PASS-WITH-FOLLOWUPS, every fix applied, PUSHED at
   the QA tip; gate GREEN at 301a8c7c22); see the ledger below and progress.md
@@ -494,16 +509,31 @@ Still open (a phase that hits one asks at session start):
     poll lapses it; the recorded signature blocks refresh and abandon with the
     new 409 `woc_market.confirm_in_flight` (catalog leaf + five non-Latin
     fills). setBidBondQuote is a CAS (pending_bond AND bond_signature IS NULL,
-    returns boolean); abandonPendingBid adds the same signature arm.
+    returns boolean); abandonPendingBid adds the same signature arm. From the
+    verification round: a SECOND, DIFFERENT signature against a signed
+    pending bid refuses confirm_in_flight on both legs (was not_pending /
+    not_active, a false dead-row verdict; the second string has no ledger
+    slot by design, the reference-scoped service verdict is the double-spend
+    backstop); a SAME-signature retry on a confirming settlement re-asks the
+    chain instead of refusing, skipping the recording write so the retry
+    never re-stamps updated_at (the H15 age axis); a revived failed row's
+    replaced signature is logged (dev channel) since the new recording
+    overwrites it (the refusal survives on fail_reason and in the service
+    ledger); and lapseBid gained AND bond_state = 'pending', so a
+    reorg-flipped verdict can never void a HELD bond into a state no refund
+    arm reads (the row stays with the poll, visible via stuckBonds).
   - Paid-but-undecided carve-out: the suspend and finalize bid teardowns skip
     (status pending_bond AND bond_signature IS NOT NULL AND bond_state
     'pending') rows; such a bid stays in confirmingBonds until the chain
     decides, and a settled verdict against a closed listing routes the held
     bond to refund_due through activateBid's supersede arm. The overdue
-    default arm's markBidStatus('defaulted') gained a CAS from ['won'].
+    default arm's markBidStatus('defaulted') call now passes a ['won'] CAS
+    (the optional from parameter itself predates this work).
   - H15 knob and state: WOC_MARKET_CONFIRMING_REVIEW_HOURS (env, default 6,
     empty/non-positive falls back; cfg.confirmingReviewMs via
-    wocMarketConfig(); documented in .env.example). overdueSettlements gained
+    wocMarketConfig(); documented in .env.example; the parse cases incl. the
+    fail-dangerous empty string are pinned in
+    tests/server/woc_market_routes.test.ts, not the config suite). overdueSettlements gained
     the confirming arm (aged on updated_at, which nothing re-stamps while the
     poll returns undecided); the sweep parks over-bound rows in the NEW
     settlement state 'review' (fail_reason confirming_overdue) with NO
@@ -526,7 +556,10 @@ Still open (a phase that hits one asks at session start):
     reviewSettlements { count, saturated, sample: [{id, listingId,
     createdAtMs, updatedAtMs}] } (no age filter) and stuckBonds { count,
     saturated, sample: [{id, listingId, account, placedAtMs}] } (aged on the
-    same confirming bound; main.ts wires bondStuckAgeMs from the knob).
+    same confirming bound; since the verification round the age AXIS is
+    COALESCE(bond_signature_at, placed_at), the poll park's own axis, so the
+    readout reports on the mechanism it describes; the sample field stays
+    placedAtMs; main.ts wires bondStuckAgeMs from the knob).
     stuckCustodyReadout now takes bondOlderThanMs; the log beat counts both
     new classes. Bonds have NO automatic time-based exit (a refund_due on a
     never-landed payment would pay out through today's blind releaser, B3);
@@ -541,8 +574,10 @@ Still open (a phase that hits one asks at session start):
     head; young confirming bonds keep the full 5s cadence. The park AGES ON
     THE SIGNATURE RECORDING (bond_signature_at, stamped by
     submitBondSignature with the caller's clock, first recording wins;
-    legacy rows fall back to placed_at), on its own knob
-    (WOC_MARKET_BOND_POLL_PARK_SECONDS): placement age says nothing about
+    legacy rows fall back to placed_at), on its own tunable
+    (WOC_MARKET_BOND_POLL_PARK_SECONDS, a rules CONSTANT, not an env knob;
+    its value coincides with the pending TTL, so the rules suite also pins
+    the constant identity at the comparison site): placement age says nothing about
     how long the chain has had the transfer, and a bidder signing late in
     their window must not be parked seconds after submitting. After a
     restart the in-process backoff is empty but the rotation stamps persist,
@@ -555,13 +590,23 @@ Still open (a phase that hits one asks at session start):
     extendAuctionForBondProgress (listing-lock-only carve-out, best-effort:
     contended loses only the extension, never the recorded signature), fired
     by confirmBond AFTER the chain verdict and only when it is settled or
-    pending (the security round: extending on the raw submission let a
-    fabricated string move the clock; a refused verdict extends nothing; on
-    settled the extension runs BEFORE activation so a last-seconds verdict
-    is not read as past the close). Cap math unchanged
-    (antiSnipeExtendedEndMs). Residual, service-contract-dependent: if the
-    economy reports a fabricated signature as pending, the extension still
-    fires; phase 10 (R5 verifier semantics) owns closing that.
+    pending, and never on the proxy's pending+service_unavailable outage arm
+    (the security round: extending on the raw submission let a fabricated
+    string move the clock; a refused verdict extends nothing; on settled the
+    extension runs BEFORE activation so a last-seconds verdict is not read
+    as past the close). The anchor is the FIRST recording moment
+    (bond_signature_at, which submitBondSignature RETURNS): the verification
+    round found a fresh-clock anchor per resubmit let one pending-forever
+    signature re-post its way (rate limit 60/min) to holding the close at
+    now plus the extension continuously to the cap; anchored on first
+    arrival, a re-post extends nothing. Cap math unchanged
+    (antiSnipeExtendedEndMs). BEHAVIOR NOTE for phase 14 copy: a signature
+    whose verdict lands at or after the close now gets NO extension and the
+    bond routes to refund_due via the supersede arm (money-safe; the old
+    "an in-flight confirmation can never land after a close" guarantee is
+    deliberately gone). Residual, service-contract-dependent: if the economy
+    reports a fabricated signature as pending, the extension still fires
+    ONCE; phase 10 (R5 verifier semantics) owns closing that.
   - R8 arm one (numbers PROPOSED here, QA re-judges): per-listing re-claim
     cooldown WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS = 1800; account cap
     WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR = 3 per rolling
@@ -574,13 +619,15 @@ Still open (a phase that hits one asks at session start):
     (closes the crash-window gap between the sweep's recording and its lock
     clear; the immediate self-steal is closed by the open-settlement probe
     below). Directed listings record nothing and are exempt from both guards
-    (they keep the strike). claimBuyNowLock diagnoses every REFUSAL from a
-    LOCK-FREE advisory read (the db round: refusing under FOR UPDATE
-    serialized every hopeful behind the holder at a measured hundredfold
-    amplification) and enters the guard transaction only when the row looks
-    claimable, re-running every check authoritatively under the lock (typed
-    refusals cancel_pending / claim_cooldown / contended; old diagnosis
-    order kept). An OPEN settlement refuses the claim as 'locked' BEFORE any
+    (they keep the strike). claimBuyNowLock diagnoses six of the SEVEN
+    refusal classes from a LOCK-FREE advisory read (the db round: refusing
+    under FOR UPDATE serialized every hopeful behind the holder at a
+    measured hundredfold amplification); claim_cooldown is deliberately
+    excluded from the advisory pass, so a cooled-down claimer does pay the
+    guard transaction (the self-steal case records its abandon inside it),
+    and every advisory answer is re-run authoritatively under the lock
+    (typed refusals cancel_pending / claim_cooldown / contended; old
+    diagnosis order kept). An OPEN settlement refuses the claim as 'locked' BEFORE any
     recording (a buy-now listing stays 'active' through confirming and
     delivery, so a rival's probe must never stamp a PAYING holder). BOTH
     recorders run ONE shared statement (RECORD_ABANDON_SQL, exempt list as a
@@ -600,7 +647,10 @@ Still open (a phase that hits one asks at session start):
     dependents: bond residency, the extension gate, and restoring any
     late-payment exemption, which is UNSOUND until a verdict can distinguish
     a real transfer from a posted string. The new guard
-    transactions bound idle-in-transaction holds (GUARD_IDLE_TX_TIMEOUT_MS);
+    transactions bound idle-in-transaction holds (GUARD_IDLE_TX_TIMEOUT_MS),
+    and the verification round extended the bound to cancelListingIfUnbid,
+    which this work grew two round trips inside its lock window (the older
+    untouched guards still ride the phase 16 retrofit);
     25P03 arrives ASYNCHRONOUSLY (the session is terminated, the SQLSTATE
     lands on the client error event or the next query depending on stall
     shape, both measured), so withTx captures the async error, prefers
@@ -609,7 +659,9 @@ Still open (a phase that hits one asks at session start):
     registered in the nightly sweep, WOC_MARKET_ABANDONS_RETENTION_DAYS
     (default 30, .env.example).
   - R8 arm two: cancel_requested_at on listings (additive; partial index
-    woc_market_listings_cancel_pending). cancelListingIfUnbid on an unexpired
+    woc_market_listings_cancel_rotation, the round-three rename; the paid
+    probe reads the shared PAID_SETTLEMENT_STATES_SQL, OPEN minus
+    'offered', pinned to the open list). cancelListingIfUnbid on an unexpired
     lock: a PAID window (any settlement past 'offered') still refuses
     settlement_live; an unpaid one stamps and returns 'cancel_pending', which
     the service maps to { ok: true, cancelPending: true } (route sends
@@ -636,14 +688,18 @@ Still open (a phase that hits one asks at session start):
     woc_market.claim_cooldown. Snapshots updated (error_codes.test.ts,
     api_error_code_parity.test.ts); REFUSAL_ERRORS is 47 rows.
   - Tests: new real-SQL suite tests/woc_market_bond_pg_integration.test.ts
-    (25 tests after the review round; its rig is the third copy, the
+    (28 tests after the round-three additions; its rig is the third copy, the
     pg-harness extraction still rides phase 20); settlement suite retargeted
     to open2 and cancel-intent; service suite has DB-free arms for the
     review park, the claim cooldown, the tried-buyer skip, the recorder
     dedupe and the converge park (the CI floor); the structural floor pins
     the teardown carve-outs, the bond/lock statements, both prunes and the
-    new DDL. Fourteen mutation spot-proofs bit post-commit (eight on the
-    implement round, six on the review-fix round).
+    new DDL. Seventeen mutation spot-proofs bit post-commit (eight on the
+    implement round, six on the review-fix round, three on the round-three
+    residuals), and a follow-up verification session independently re-ran
+    three headline mutations (park axis to placement, holderless clear,
+    confirming arm dropped) at the final tip: each bit its named tests with
+    the suites provably running.
   - Migration-safety verdict (verified live vs Postgres 16, no critical or
     warning): all DDL additive/idempotent; the 'review' CHECK evolves NOT
     VALID once per legacy DB (constraint name woc_market_settlements_state_check
@@ -668,11 +724,19 @@ Still open (a phase that hits one asks at session start):
     CONSTRAINT out of band).
   - Handoffs: phase 06 (directed rail) inherits the cancel-intent seams and
     the directed exemptions; phase 09 executes review/stuck-bond resolutions
-    (releaser CAS is the prerequisite for ANY automatic bond exit); phases
+    (releaser CAS is the prerequisite for ANY automatic bond exit, and the
+    held-bond reorg carve-out in lapseBid means a held+refused row waits for
+    phase 09 tooling or an operator); phases
     16/17 EXPLAIN list gains the overdueSettlements OR arm (and the UNION ALL
     rewrite option above), the two new
-    readout classes, and the claimBuyNowLock ledger reads; phase 12 owns the
-    env docs sweep (the two new knobs are already in .env.example); phase 21
+    readout classes, and the claimBuyNowLock ledger reads; the abandons FK
+    adds a non-cyclic blocking edge (a claim can briefly wait on the previous
+    abandoner's accounts row when that account is in escrowInsertListing;
+    bounded by lock_timeout, phase 16/22 lock-registry note); phase 12 owns
+    the env docs sweep (the two new knobs are already in .env.example; note
+    WOC_MARKET_CONFIRMING_REVIEW_HOURS has no upper clamp, so a huge value
+    silently disables the H15 park and the stuckBonds class, a posture the
+    QA session should judge); phase 21
     exercises review resolution end to end; phase 22 runbook owes the
     review-state operator procedure (verify on chain, then the transition).
 - 02 QA (2026-08-11, session start 20fdcc5288, verdict PASS-WITH-FOLLOWUPS

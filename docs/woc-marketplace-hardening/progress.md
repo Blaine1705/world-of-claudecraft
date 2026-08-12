@@ -50,6 +50,91 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 22 | close-out | all three | NOT STARTED | | teardown offer lives in 22 QA |
 | 22 QA | phase-22-qa | all three | NOT STARTED | | |
 
+## 04 verification round (re-run of the implement session over its committed tree)
+
+A dedicated session re-executed the phase prompt to verify the implement
+round (which had run over context) left nothing incomplete. Verified
+directly: branch synced with the newest origin/release tip (no-op),
+phase-start commit recorded, all three real-SQL suites green under
+TEST_DATABASE_URL (96 tests, demonstrably run), tsc green, server/CLAUDE.md
+current, .env.example knobs present, REFUSAL_ERRORS at its pinned count, the
+five non-Latin fills symmetric, operator semantics documented at the stuck
+route, and three committed-round mutations independently re-bitten (park
+axis to placement, holderless clear, confirming arm dropped: each reddened
+exactly its named tests with the suites provably running). Two fresh audit
+lanes then ran over the committed diff (a deliverables-vs-claims audit and
+a test-coverage audit); every finding was applied, each behavior fix with a
+test that fails on the old behavior:
+
+- Route-level cancelPending forward was the ONE unpinned wire hop (blocking):
+  two handler-driven cases now pin both bodies; a mutation to a bare
+  { ok: true } reddens the new pin (proven).
+- Typed second-signature refusals: a DIFFERENT signature against a signed
+  pending bid answered not_pending (bond leg) / not_active (settlement leg),
+  a false dead-row verdict that also discarded the event silently; both legs
+  now answer confirm_in_flight, the first claim stays the trace, and the
+  chain is never asked about the discarded string. Residual, recorded: the
+  second string has no ledger slot of its own (single-column model); the
+  reference-scoped service verdict is the double-broadcast backstop (phases
+  09/10).
+- Idempotent settlement retry: resubmitting the RECORDED signature against a
+  confirming row re-asks the chain instead of refusing not_active; the retry
+  skips the recording write, so it cannot re-stamp updated_at (the H15 age
+  axis; a spy pins the single write). A revived failed row's replaced
+  signature is logged on the dev channel before the overwrite.
+- lapseBid held-bond carve-out: a reorg-flipped (settled-then-refused)
+  verdict could void a HELD bond into a state no refund arm reads (bondsDue
+  selects refund_due/forfeit_due only): the exact loss class this phase
+  closes. lapseBid now requires bond_state 'pending'; the held row stays
+  with the poll, visible via stuckBonds, and the positive control in the
+  same test proves ordinary lapses still fire. Exit rides phase 09 tooling
+  or operator resolution (recorded in the handoffs).
+- First-arrival extension anchor: re-posting one pending-forever signature
+  (rate limit 60/min) re-anchored the anti-snipe extension on a fresh clock
+  each time, holding the close at now plus the extension continuously to the
+  cap; submitBondSignature now RETURNS the first recording moment and
+  confirmBond anchors on it, so a re-post extends nothing (service arm pins
+  no-creep; a pg arm pins the returned stamp across a one-hour retry).
+- cancelListingIfUnbid gained the idle-in-transaction bound: the
+  cancel-intent work had grown it two round trips inside its FOR UPDATE
+  window without one (the constant's retrofit scoping predated that growth).
+- stuckBonds now ages on COALESCE(bond_signature_at, placed_at), the poll
+  park's own axis (the readout described a mechanism it did not measure;
+  divergence was bounded but the axis is now honest). Wire shape unchanged.
+- Pin hardening: the window test's new presence pins scan comment-stripped
+  source (tests/helpers/strip_comments.ts, extracted on the rule of three
+  with its own suite; architecture.test.ts deliberately keeps its original
+  copy, being a self-contained load-bearing guard); the bond rotation index
+  pin now includes its WHERE predicate; the idle-bound pins assert the
+  literal 500; WOC_MARKET_BOND_POLL_PARK_SECONDS and the anti-snipe trio are
+  literal-pinned, plus a comment-stripped identity pin on the park
+  comparison site (its value coincides with the pending TTL, so a constant
+  swap was behaviorally invisible); the paid-subset probe rides the new
+  shared PAID_SETTLEMENT_STATES_SQL with a subset-relationship pin; the
+  anti-vacuity window guard reads the real constant.
+- Docs truth-ups in state.md: 17 (not fourteen) mutation spot-proofs, the
+  28-test bond suite, the cancel_rotation index name in the arm-two bullet,
+  the six-of-seven lock-free wording, the markBidStatus CAS attribution, the
+  wocMarketConfig parse-case location (routes suite, and the file lives in
+  woc_market_routes.ts), the service_unavailable extension gate, the
+  after-close behavior note, the abandons FK blocking edge, and the
+  confirming-hours no-upper-clamp QA item. In-code comment corrections:
+  the two park-constant comments, the overdueSettlements plan-shape comment,
+  two lock-carve-out comments, and withTx now prefers a CODED async error
+  but never lets a codeless connection close mask fn's own bug.
+- Verified with no action needed: the strike after the defaulted CAS is
+  guarded by its moved check; the exempt service_unavailable arm is
+  defense-in-depth (a local outage cannot write that fail_reason; only a
+  remote non-pending verdict can); the sub-millisecond revival-race abandon
+  residual is bounded and never stamps a paying holder.
+
+Items the phase-04-qa session must re-judge, beyond the implement round's
+list: the confirm_in_flight second-signature semantics (both legs), the
+idempotent-retry arm, the held-bond no-automatic-exit posture, the stuckBonds
+axis change, the first-arrival anchor (a laggy honest signer now gets at most
+one extension per recording, not per retry), and the confirming-hours upper
+clamp question.
+
 ## 04 implement round (bond and payment lifecycle)
 
 Commits f64733145c (source), 2c8931811f (tests), dc0a23c674 (session-start
