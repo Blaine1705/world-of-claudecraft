@@ -36,6 +36,7 @@ const baseEnTable = {
   'error.bagSocketsFull': 'All your bag slots are full.',
   'error.bagSwapTooManyItems': 'You have too many items to swap to that bag.',
   'error.bagRemoveTooManyItems': 'You have too many items to remove that bag.',
+  'error.bagEquipHasProperty': 'That bag cannot be equipped while it carries a special property.',
   'error.tradeBagSpace': 'Trade failed: not enough bag space.',
   'log.bagsMigrated': 'Your belongings have been packed into new bags.',
   // Bank (guild-bank-ready pooled bank; src/sim/bank.ts). The error.* lines are the
