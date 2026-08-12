@@ -1,3 +1,9 @@
+// format.ts imports adminLanguageTag/t from here, so this pair is a deliberate
+// ESM cycle: both sides use the other only inside function bodies (hoisted
+// declarations, live bindings), never at module-evaluation time. Keeping the
+// Intl construction in format.ts is what the centralization guard
+// (tests/i18n_extra_tables.test.ts) requires.
+import { fmtNumber } from './format';
 import { en_XA, pending, translations } from './i18n.resolved.generated';
 import { LOCALE_LOADERS } from './i18n.resolved.generated/loaders';
 
@@ -280,20 +286,18 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
 export function localizeAdminError(message: string): string {
   const key = ADMIN_ERROR_KEYS[message.trim().toLowerCase()];
   if (!key) return message;
+  // The quota-bound proses carry locale-grouped numbers. Formatting lives in
+  // src/admin/format.ts (the admin's one sanctioned Intl home, mirroring the
+  // game's src/ui/i18n.ts formatNumber), so the bounds are formatted there and
+  // this module stays free of ad-hoc Intl construction.
   if (key === 'error.generalChatRateLimitMessages') {
-    return t(key, {
-      min: new Intl.NumberFormat(adminLanguageTag()).format(1),
-      max: new Intl.NumberFormat(adminLanguageTag()).format(1_000),
-    });
+    return t(key, { min: fmtNumber(1), max: fmtNumber(1_000) });
   }
   if (key === 'error.generalChatRateLimitWindowMinutes') {
-    return t(key, {
-      min: new Intl.NumberFormat(adminLanguageTag()).format(1),
-      max: new Intl.NumberFormat(adminLanguageTag()).format(1_440),
-    });
+    return t(key, { min: fmtNumber(1), max: fmtNumber(1_440) });
   }
   if (key === 'error.generalChatRateLimitReasonInvalid') {
-    return t(key, { max: new Intl.NumberFormat(adminLanguageTag()).format(500) });
+    return t(key, { max: fmtNumber(500) });
   }
   return t(key);
 }
