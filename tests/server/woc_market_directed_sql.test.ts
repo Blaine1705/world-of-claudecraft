@@ -396,16 +396,23 @@ describe('the settlement guards ship their DDL (structural floor)', () => {
     expect(schema).toContain("fail_reason = 'schema_dedupe' || COALESCE(':' || fail_reason, '')");
   });
 
-  it('carries the grant-intent column additively, plus the unbooked-claims index', async () => {
+  it('carries the intent columns additively, plus the two readout indexes', async () => {
     const schema = await strippedSchema();
     // Same additive rule as directed_buyer_account: the claims table exists on
-    // deployed realms, so the column must ride ALTER, never only CREATE TABLE.
+    // deployed realms, so the columns must ride ALTER, never only CREATE TABLE.
     expect(schema).toContain('ADD COLUMN IF NOT EXISTS grant_character_id');
-    // The stuck-custody readout's index: the monitor reads unbooked claims
-    // through it, so its predicate is load-bearing, not decorative.
+    expect(schema).toContain('ADD COLUMN IF NOT EXISTS mail_intent_at');
+    // The stuck-custody readout's indexes: the monitor reads unbooked claims
+    // and aged delivering settlements through them, so their predicates are
+    // load-bearing, not decorative (the delivering class ages and orders on
+    // created_at, which park rotation never touches).
     expect(schema).toContain(
       'CREATE INDEX IF NOT EXISTS woc_market_custody_claims_unbooked ' +
         'ON woc_market_custody_claims(realm, claimed_at) WHERE booked_at IS NULL',
+    );
+    expect(schema).toContain(
+      'CREATE INDEX IF NOT EXISTS woc_market_settlements_state_created ' +
+        'ON woc_market_settlements(realm, state, created_at)',
     );
   });
 });

@@ -584,6 +584,8 @@ export interface WocMarketDb {
   /** Rotate a parked settlement to the back of the updated_at sweep queues
    *  (the stuck readout ages on created_at, untouched by this). */
   touchSettlementRow(id: number): Promise<void>;
+  /** The listing twin, for a parked return in the undisposed backlog. */
+  touchListingRow(id: number): Promise<void>;
   overdueSettlements(realm: string, nowMs: number, limit: number): Promise<WocSettlementRow[]>;
 
   // Sales, strikes, terms
@@ -887,18 +889,32 @@ export class WocMarketService {
     { characterId: number; leaseNonce: string | undefined; stampMs: number }
   >();
 
-  /** Mail attempts THIS process has stamped an intent for: while an entry is
-   *  live, the parcel state is continuous knowledge (not yet written, or
-   *  written by us) and the mail rail may proceed without consulting the
-   *  advisory in-book marker. Lost on restart, at which point only a parcel
-   *  still IN the book authorizes a resume (bookCustodyOnce). */
-  private readonly pendingMail = new Map<string, number>();
+  /** Mail attempts THIS process has stamped an intent for. `written` flips
+   *  the moment an attempt REACHES the post office (set before the call, so
+   *  a throw anywhere inside still counts): an unwritten entry proves no
+   *  parcel can exist yet and authorizes the first write; a WRITTEN entry
+   *  proves nothing about collection, so from then on only the parcel still
+   *  being IN the book authorizes a re-attempt (a collected letter re-mails
+   *  a second copy otherwise). Lost on restart, at which point the in-book
+   *  check is the only evidence (bookCustodyOnce). */
+  private readonly pendingMail = new Map<string, { stampMs: number; written: boolean }>();
 
   /** Parked deliveries and their next-retry time: a parked settlement rotates
    *  to the back of the updated_at queue (touchSettlementRow) AND is skipped
    *  in-process until its retry, so a full batch of parked rows stops costing
    *  four queries per row per pass and stops starving fresh rows. */
   private readonly parkedDeliveries = new Map<number, number>();
+
+  /** Parked returns, same shape, keyed by listing id: the return backlog
+   *  orders by updated_at too, so a permanently refused return would own the
+   *  head of its batch and busy-loop exactly like a parked delivery. */
+  private readonly parkedReturns = new Map<number, number>();
+
+  /** One 'contended' outcome stops ALL delivery work for the rest of the
+   *  pass: the claimed rows a break leaves behind are already 'delivering',
+   *  so without this the reconcile arm re-attempts them seconds later in the
+   *  SAME pass and spends the lock_timeout budget the break conserved. */
+  private passContended = false;
 
   /** Next time the delivered-residue arm may run (minute-scale: it converges
    *  an OLDER binary's crash residue, so every-pass cost bought nothing). */
@@ -921,11 +937,20 @@ export class WocMarketService {
     for (const [ref, entry] of this.pendingGrants) {
       if (entry.stampMs <= cutoff) this.pendingGrants.delete(ref);
     }
-    for (const [ref, stampMs] of this.pendingMail) {
-      if (stampMs <= cutoff) this.pendingMail.delete(ref);
+    for (const [ref, entry] of this.pendingMail) {
+      if (entry.stampMs <= cutoff) this.pendingMail.delete(ref);
     }
+    // The park maps store RETRY times, not stamps: prune once the retry
+    // itself has been stale for the ledger horizon.
     for (const [id, retryAtMs] of this.parkedDeliveries) {
-      if (retryAtMs <= cutoff) this.parkedDeliveries.delete(id);
+      if (nowMs - retryAtMs > WocMarketService.LOCAL_LEDGER_TTL_MS) {
+        this.parkedDeliveries.delete(id);
+      }
+    }
+    for (const [id, retryAtMs] of this.parkedReturns) {
+      if (nowMs - retryAtMs > WocMarketService.LOCAL_LEDGER_TTL_MS) {
+        this.parkedReturns.delete(id);
+      }
     }
   }
 
@@ -1834,6 +1859,7 @@ export class WocMarketService {
     if (!this.cfg.enabled) return null;
     const nowMs = this.now();
     this.pruneLocalLedgers(nowMs);
+    this.passContended = false;
     // Every arm runs through arm(): one failing arm (or one poisoned row
     // inside an arm's own loop) is reported to onSweepError and the REST of
     // the pass still runs. Without this, a single throw skipped every later
@@ -1869,7 +1895,7 @@ export class WocMarketService {
       polledBonds: await this.arm('polledBonds', () => this.pollConfirmingBonds()),
       delivered: await this.arm('delivered', () => this.deliverConfirmedSettlements(nowMs)),
       reconciled: await this.arm('reconciled', () => this.reconcileDelivering(nowMs)),
-      returned: await this.arm('returned', () => this.returnUndisposedItems()),
+      returned: await this.arm('returned', () => this.returnUndisposedItems(nowMs)),
       bonds: await this.arm('bonds', () => this.processDueBonds()),
     };
     // A FULL batch means the arm did not drain: that is the one signal that
@@ -2007,7 +2033,8 @@ export class WocMarketService {
       try {
         const live = await this.deps.db.liveSettlementForListing(listing.id);
         // Genuinely settling: every live state has its own arm (a stranded
-        // 'delivered' converges through the redriven arm, which runs first).
+        // 'delivered' converges through the redriven beat; this arm's only
+        // job is to never REOPEN over it, which the live check guarantees).
         if (live) continue;
         // A 'failed' settlement is NOT reclaimable either, and must not be
         // expired here: it is still inside the overdue sweep's jurisdiction,
@@ -2153,14 +2180,17 @@ export class WocMarketService {
 
   /** Shared loop for the two delivery arms: per-row isolation, park handling
    *  (rotate the row to the back of the updated_at queue and skip it
-   *  in-process for PARK_RETRY_MS), and a break on the first 'contended'
-   *  outcome so a lock-contended batch cannot spend minutes of lock_timeout
-   *  budget inside one pass. Returns rows ADVANCED. */
+   *  in-process for PARK_RETRY_MS), and a PASS-WIDE stop on the first
+   *  'contended' outcome (passContended): the rows a break leaves behind are
+   *  already 'delivering', so without the pass-wide flag the reconcile arm
+   *  would re-attempt them seconds later in the same pass and spend the
+   *  lock_timeout budget the break conserved. Returns rows ADVANCED. */
   private async runDeliveryBatch(
     arm: 'delivered' | 'reconciled',
     batch: readonly WocSettlementRow[],
     nowMs: number,
   ): Promise<number> {
+    if (this.passContended) return 0;
     let advanced = 0;
     for (const settlement of batch) {
       const retryAt = this.parkedDeliveries.get(settlement.id);
@@ -2174,6 +2204,7 @@ export class WocMarketService {
           this.parkedDeliveries.set(settlement.id, nowMs + WocMarketService.PARK_RETRY_MS);
           await this.deps.db.touchSettlementRow(settlement.id);
         } else if (out === 'contended') {
+          this.passContended = true;
           break;
         }
       } catch (err) {
@@ -2207,13 +2238,16 @@ export class WocMarketService {
    *  set in REDRIVE_PAGE steps). The same beat converges the sibling residue,
    *  a closed sold listing whose dispose flag never landed. */
   private async redriveDeliveredTails(nowMs: number): Promise<number> {
-    if (nowMs < this.redriveDueAtMs) return 0;
+    if (nowMs < this.redriveDueAtMs || this.passContended) return 0;
     this.redriveDueAtMs = nowMs + WocMarketService.REDRIVE_INTERVAL_MS;
     const page = await this.deps.db.deliveredUnclosedSettlementsPage(
       this.cfg.realm,
       this.redriveCursor,
       WocMarketService.REDRIVE_PAGE,
     );
+    // The cursor advances past the page even when a break below leaves rows
+    // unfinished: those wait for the cursor to wrap (a later beat), which
+    // converges, just slower than the beat interval on a contended cycle.
     this.redriveCursor = page.lastListingId ?? 0;
     let advanced = 0;
     for (const settlement of page.settlements) {
@@ -2227,12 +2261,15 @@ export class WocMarketService {
           advanced++;
           await this.notifySellerSold(listing);
         } else if (out === 'contended') {
+          this.passContended = true;
           break;
         }
       } catch (err) {
         this.sweepError('redriven', err);
       }
     }
+    // Counted into the same stat: both are the old close tail's residue
+    // converging, one unit per row that reached its final shape.
     advanced += await this.deps.db.disposeSoldResidueListings(this.cfg.realm, SWEEP_BATCH);
     return advanced;
   }
@@ -2246,18 +2283,27 @@ export class WocMarketService {
    * An existing claim is CONSULTED, never adopted: booked means a prior pass
    * really delivered (done). An unbooked claim may resume the write under the
    * SAME ref only with evidence the parcel was not already collected: either
-   * this process stamped the mail intent itself (pendingMail, continuous
-   * knowledge), or the parcel is still IN the live book (presence is
-   * permission). An unbooked claim that fails both is ambiguous, the mailed
-   * item may already sit in the buyer's bags with its letter deleted, so it
-   * PARKS (false), as do a grant-intent claim (the hand-off may have landed)
-   * and a claim with no intent at all (a legacy row, or a claim whose process
-   * died before stamping): visible in the unbooked-claims read, never
-   * duplicated.
+   * this process stamped the intent and has NOT yet handed a parcel to the
+   * post office (an UNWRITTEN pendingMail entry: nothing exists to collect),
+   * or the parcel is still IN the live book (presence is permission). Once an
+   * attempt has reached the post office, in-process memory proves nothing
+   * about collection, so only the in-book check authorizes from then on. An
+   * unbooked claim that fails both is ambiguous, the mailed item may already
+   * sit in the buyer's bags with its letter deleted, so it PARKS (false), as
+   * do a grant-intent claim (the hand-off may have landed) and a claim with
+   * no intent at all (a legacy row, or a claim whose process died before
+   * stamping): visible in the unbooked-claims read, never duplicated.
    *
    * A booking failure KEEPS the claim, unbooked and visible: releasing it
    * made a repeatedly failing mail write invisible to the operator, and the
    * resume above makes the kept claim converge once the write succeeds.
+   *
+   * An ITEM-FREE letter (the seller's sold notice) never touches the ledger
+   * at all: it can duplicate nothing and destroy nothing, its only writer
+   * runs once per finalized sale, and a durable claim for it would park
+   * forever on a transient failure (no arm ever re-notifies), polluting the
+   * one readout the operator watches. The in-book dedupe still absorbs
+   * same-process retries.
    */
   private async bookCustodyOnce(
     recipient: { key: string; name: string },
@@ -2265,12 +2311,16 @@ export class WocMarketService {
     items: InvSlot[],
     custodyRef: string,
   ): Promise<boolean> {
+    if (items.length === 0) {
+      await this.deps.custody.persistMailParcel(recipient, letter, items, custodyRef);
+      return true;
+    }
     const fresh = await this.deps.db.claimCustodyRef(this.cfg.realm, custodyRef);
     if (fresh) {
       // Stamp the durable mail intent BEFORE the parcel exists anywhere, so a
       // crash at any later point leaves a claim that says which rail owns it.
       if (!(await this.deps.db.markCustodyMailIntent(custodyRef))) return false;
-      this.pendingMail.set(custodyRef, this.now());
+      this.pendingMail.set(custodyRef, { stampMs: this.now(), written: false });
     } else {
       const state = await this.deps.db.custodyRefState(custodyRef);
       if (state === null) {
@@ -2285,13 +2335,20 @@ export class WocMarketService {
       }
       if (state.grantCharacterId !== null) return false;
       if (!state.mailIntent) return false;
-      if (!this.pendingMail.has(custodyRef) && !this.deps.custody.hasParcel(custodyRef)) {
+      const attempt = this.pendingMail.get(custodyRef);
+      const unwritten = attempt !== undefined && !attempt.written;
+      if (!unwritten && !this.deps.custody.hasParcel(custodyRef)) {
         return false;
       }
       // Attributed to the mail rail with the parcel provably uncollected:
       // fall through and resume the durable write (the in-book dedupe makes
       // the re-mail idempotent, and booked_at still gates the advance).
     }
+    // Flip written BEFORE the call: a throw anywhere inside persistMailParcel
+    // can still leave the parcel in the LIVE book (the blob half failing),
+    // so from this line on only the in-book check may authorize a retry.
+    const attempt = this.pendingMail.get(custodyRef);
+    if (attempt) attempt.written = true;
     await this.deps.custody.persistMailParcel(recipient, letter, items, custodyRef);
     await this.deps.db.markCustodyRefBooked(custodyRef);
     this.pendingMail.delete(custodyRef);
@@ -2374,10 +2431,10 @@ export class WocMarketService {
     const granted = this.deps.custody.grantCopy(settlement.buyerAccount, target.characterId, item);
     if (!granted.ok) {
       // Nothing durable happened (grantCopy declines cleanly), so convert
-      // the claim to the mail rail in one statement and record the live
-      // attempt: that pair is what lets bookCustodyOnce proceed.
+      // the claim to the mail rail in one statement and record the not-yet-
+      // written attempt: that pair is what lets bookCustodyOnce proceed.
       if (!(await this.deps.db.markCustodyMailIntent(custodyRef))) return 'abort';
-      this.pendingMail.set(custodyRef, this.now());
+      this.pendingMail.set(custodyRef, { stampMs: this.now(), written: false });
       return 'mail';
     }
     this.pendingGrants.set(custodyRef, {
@@ -2537,36 +2594,57 @@ export class WocMarketService {
     ).catch(() => {});
   }
 
-  private async returnListingItem(listing: WocListingRow): Promise<void> {
+  /** True only when the return flight completed and the listing was
+   *  disposed; false is the caller's park signal (seller unresolvable, or a
+   *  parked return claim, which must NOT dispose: the flag is what keeps the
+   *  backlog retrying, and the claim stays visible meanwhile). */
+  private async returnListingItem(listing: WocListingRow): Promise<boolean> {
     const target = await this.deps.db.deliveryTarget(
       this.cfg.realm,
       listing.sellerAccount,
       listing.sellerCharacter,
     );
-    if (!target) return;
+    if (!target) return false;
     const booked = await this.bookCustodyOnce(
       { key: String(target.characterId), name: target.name },
       'return',
       [listing.item],
       listingReturnCustodyRef(listing.id),
     );
-    // A parked return claim must NOT dispose the listing: the flag is what
-    // keeps the backlog arm retrying, and the claim stays visible meanwhile.
-    if (!booked) return;
+    if (!booked) return false;
     await this.deps.db.markItemDisposed(listing.id);
+    return true;
   }
 
-  private async returnUndisposedItems(): Promise<number> {
+  /** Same park treatment as the delivery arms: a return that cannot proceed
+   *  (seller gone, parked claim) rotates to the back of its updated_at queue
+   *  and backs off in-process, and the stat counts rows DISPOSED, so a
+   *  parked backlog can neither own the batch head nor flood the saturation
+   *  warning. */
+  private async returnUndisposedItems(nowMs: number): Promise<number> {
     const backlog = await this.deps.db.undisposedClosedListings(this.cfg.realm, SWEEP_BATCH);
+    let advanced = 0;
     for (const listing of backlog) {
       // Belt over the SQL's own resolution filter: a sold listing's copy went
       // to its buyer and must never take the return flight home.
       if (listing.resolution === 'sold') continue;
-      // Per-listing isolation, now REPORTED rather than swallowed: a return
-      // that fails every pass was invisible before.
-      await this.returnListingItem(listing).catch((err) => this.sweepError('returned', err));
+      const retryAt = this.parkedReturns.get(listing.id);
+      if (retryAt !== undefined && retryAt > nowMs) continue;
+      try {
+        if (await this.returnListingItem(listing)) {
+          advanced++;
+          this.parkedReturns.delete(listing.id);
+        } else {
+          this.parkedReturns.set(listing.id, nowMs + WocMarketService.PARK_RETRY_MS);
+          await this.deps.db.touchListingRow(listing.id);
+        }
+      } catch (err) {
+        // Per-listing isolation, REPORTED rather than swallowed: a return
+        // that fails every pass was invisible before.
+        this.sweepError('returned', err);
+      }
     }
-    return backlog.length;
+    return advanced;
   }
 
   private async processDueBonds(): Promise<number> {

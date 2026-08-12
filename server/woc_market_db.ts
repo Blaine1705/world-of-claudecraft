@@ -272,6 +272,12 @@ CREATE INDEX IF NOT EXISTS woc_market_settlements_state
 -- they scanned the one-open-settlement index and sorted.
 CREATE INDEX IF NOT EXISTS woc_market_settlements_state_updated
   ON woc_market_settlements(realm, state, updated_at);
+-- The stuck readout's delivering class ages and orders on created_at (park
+-- rotation moves updated_at, so it cannot be the age signal); without this
+-- the sample read would sort the whole delivering set during exactly the
+-- incident that grows it.
+CREATE INDEX IF NOT EXISTS woc_market_settlements_state_created
+  ON woc_market_settlements(realm, state, created_at);
 CREATE INDEX IF NOT EXISTS woc_market_settlements_buyer
   ON woc_market_settlements(buyer_account, created_at DESC);
 -- Postgres does not auto-index the referencing side of an FK. Without these,
@@ -372,9 +378,11 @@ CREATE TABLE IF NOT EXISTS woc_market_custody_claims (
 -- it parks, never mails. Legacy NULLs mean UNKNOWN, not "no attempt"; the
 -- pre-enable deploy note is that woc_market_custody_claims must be empty (or
 -- fully booked) before the first boot of this schema.
--- Retention: unbooked rows are the operator's queue and KEEP FOREVER by
--- design; booked rows are provenance and their prune registration is owed by
--- the market retention pass alongside the listing prune.
+-- Retention: KEEP FOREVER for now, deliberately. Unbooked rows are the
+-- operator's queue and are NEVER pruned; booked rows are delivery provenance
+-- and stay until the dedicated market retention work registers their prune
+-- beside the listing prune (a booked row is one short line per completed
+-- delivery or return, so the growth rate is the sale rate).
 ALTER TABLE woc_market_custody_claims
   ADD COLUMN IF NOT EXISTS grant_character_id BIGINT;
 ALTER TABLE woc_market_custody_claims
@@ -1630,9 +1638,12 @@ export class PgWocMarketDb implements WocMarketDb {
     sampleLimit: number,
     countCap: number,
   ): Promise<WocStuckCustodyReadout> {
+    // Fail CLOSED on a bad cap: a non-finite value would interpolate as NaN
+    // and error at runtime; clamping to 1 keeps the read tiny instead.
+    const cap = Number.isFinite(countCap) && countCap >= 1 ? Math.trunc(countCap) : 1;
     const count = async (body: string, params: unknown[]): Promise<number> => {
       const res = await this.pool.query(
-        `SELECT count(*)::int AS n FROM (SELECT 1 ${body} LIMIT ${Math.trunc(countCap)}) capped`,
+        `SELECT count(*)::int AS n FROM (SELECT 1 ${body} LIMIT ${cap}) capped`,
         params,
       );
       return Number(res.rows[0]?.n ?? 0);
@@ -2389,6 +2400,13 @@ export class PgWocMarketDb implements WocMarketDb {
     await this.pool.query(`UPDATE woc_market_settlements SET updated_at = now() WHERE id = $1`, [
       id,
     ]);
+  }
+
+  /** The listing twin, for a parked RETURN: the undisposed backlog orders by
+   *  updated_at too, so a permanently refused return would otherwise own the
+   *  head of its batch forever. */
+  async touchListingRow(id: number): Promise<void> {
+    await this.pool.query(`UPDATE woc_market_listings SET updated_at = now() WHERE id = $1`, [id]);
   }
 
   /** The delivery close tail as ONE transaction: the 'delivered' transition,

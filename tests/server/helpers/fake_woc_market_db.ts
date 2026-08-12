@@ -683,7 +683,15 @@ export class FakeWocMarketDb implements WocMarketDb {
     return true;
   }
 
+  /** Throw ONCE on the next booking (the crash window between the mail write
+   *  and the booking; consumed on use). */
+  failNextMarkBooked = false;
+
   async markCustodyRefBooked(custodyRef: string): Promise<void> {
+    if (this.failNextMarkBooked) {
+      this.failNextMarkBooked = false;
+      throw new Error('booking failed');
+    }
     const claim = this.custodyClaims.get(custodyRef);
     if (claim && claim.bookedAtMs === null) claim.bookedAtMs = this.now();
   }
@@ -1410,6 +1418,10 @@ export class FakeWocMarketDb implements WocMarketDb {
 
   async touchSettlementRow(id: number): Promise<void> {
     if (this.settlements.has(id)) this.touchSettlement(id);
+  }
+
+  async touchListingRow(id: number): Promise<void> {
+    if (this.listings.has(id)) this.touchListing(id);
   }
 
   async overdueSettlements(
