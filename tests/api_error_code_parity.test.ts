@@ -144,6 +144,8 @@ const KNOWN_CODES = [
   'woc_market.confirm_failed',
   'woc_market.buy_now_locked',
   'woc_market.settlement_in_flight',
+  'woc_market.contended',
+  'woc_market.sale_conflict',
   'woc_market.no_buy_now',
   'woc_market.cap_reached',
   'woc_market.stale_item',

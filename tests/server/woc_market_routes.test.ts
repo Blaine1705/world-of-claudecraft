@@ -119,7 +119,7 @@ describe('the refusal-to-wire mapping', () => {
     const rows = Object.entries(REFUSAL_ERRORS);
     // The EXACT count, not a floor. A floor of 35 let four union members vanish
     // silently; tsc catches a deleted Record key but not a shrunken union.
-    expect(rows).toHaveLength(42);
+    expect(rows).toHaveLength(44);
     for (const [reason, mapped] of rows) {
       expect(mapped.code, reason).toMatch(/^woc_market\./);
       expect(mapped.status, reason).toBeGreaterThanOrEqual(400);
@@ -160,6 +160,11 @@ describe('the refusal-to-wire mapping', () => {
     // 'offered'): the state resolves on its own, so 409 says retry, and the
     // seller learns nothing about the buyer beyond "a payment exists".
     ['settlement_in_flight', 409, 'woc_market.settlement_in_flight'],
+    // Plain row contention (bounded lock wait expired or deadlock victim):
+    // retry immediately, nothing about the listing is disclosed.
+    ['contended', 409, 'woc_market.contended'],
+    // An admin sale correction blocked by a standing non-excluded row.
+    ['sale_conflict', 409, 'woc_market.sale_conflict'],
     ['cap_reached', 409, 'woc_market.cap_reached'],
     ['signature_reused', 409, 'woc_market.signature_reused'],
     // Bad input the client should have caught.

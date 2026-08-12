@@ -17,7 +17,7 @@
 // the requireOwned 404. Every scenario asserts BOTH the returned values and
 // the resulting fake-db/custody state.
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import type {
   Refused,
   WocBidRow,
@@ -2826,5 +2826,181 @@ describe('the sweep expires unanswered directed offers', () => {
     );
     expect(res.ok).toBe(false);
     expect(bagsOf(h, SELLER_CHAR), 'nothing may leave the bags').toHaveLength(1);
+  });
+});
+
+describe('the insert refusal arms at the service seam', () => {
+  it('buyNow answers not_active and releases the lock when the listing closed under the claim', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+    vi.spyOn(h.db, 'insertSettlement').mockResolvedValueOnce('listing_closed');
+    const out = await h.service.buyNow({
+      account: BUYER_A,
+      characterId: CHAR_A,
+      listingId: listing.id,
+      acceptTerms: true,
+    });
+    // Honest answer, no phantom lock: the refusal names the closed listing,
+    // and the claimed lock is released so the seller-side resolution can run.
+    expect(out).toEqual({ ok: false, reason: 'not_active' });
+    const row = await getListing(h, listing.id);
+    expect(row.buyNowLockAccount).toBeNull();
+  });
+
+  it('buyNow answers contended and releases the lock on plain row contention', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+    vi.spyOn(h.db, 'insertSettlement').mockResolvedValueOnce('contended');
+    const out = await h.service.buyNow({
+      account: BUYER_A,
+      characterId: CHAR_A,
+      listingId: listing.id,
+      acceptTerms: true,
+    });
+    expect(out).toEqual({ ok: false, reason: 'contended' });
+    expect((await getListing(h, listing.id)).buyNowLockAccount).toBeNull();
+  });
+
+  it('the close arm leaves a claimed listing alone when a suspend closed it underneath', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const standing = await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    h.setNow(listing.endsAtMs + 1);
+    vi.spyOn(h.db, 'insertSettlement').mockResolvedValueOnce('listing_closed');
+    await h.service.sweepPass();
+    // The arm must CONTINUE: the suspend that closed the listing already
+    // resolved the bid book, so there is nothing to settle and the claim must
+    // not be flipped to 'settling' (the fall-through would do exactly that).
+    expect((await getListing(h, listing.id)).status).toBe('ending');
+    const bid = await getBid(h, standing.bidId);
+    expect(bid.status).toBe('active');
+    expect(bid.bondState).toBe('held');
+  });
+
+  it('the cascade unwinds its bond re-hold when the listing closed under it', async () => {
+    const h = makeHarness();
+    // Refunds that cannot settle keep the runner-up's queue entry visible, so
+    // the re-hold and its unwind are observable states rather than a blur.
+    const stalledRefunds = new WocMarketService({
+      ...h.deps,
+      economy: { ...h.economy, refundBond: async () => ({ done: false, reason: 'rpc_down' }) },
+    });
+    const listing = await listEpic(h);
+    const runnerUp = await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    const winner = await confirmedBid(h, BUYER_C, CHAR_C, listing.id, 6000);
+    h.setNow(listing.endsAtMs + 1);
+    await stalledRefunds.sweepPass();
+    // The close-time winner defaults; the cascade re-holds the runner-up's
+    // bond and tries to insert the next settlement, which loses to a
+    // concurrent close.
+    const settled = await liveSettlement(h, listing.id);
+    expect(settled.bidId).toBe(winner.bidId);
+    h.setNow(settled.deadlineAtMs + 1);
+    vi.spyOn(h.db, 'insertSettlement').mockResolvedValueOnce('listing_closed');
+    await stalledRefunds.sweepPass();
+    const after = await getBid(h, runnerUp.bidId);
+    // The unwind: never 'held' on a bid with no claim, and never 'won'.
+    expect(after.status).toBe('outbid');
+    expect(after.bondState).toBe('refund_due');
+  });
+
+  it('an admin suspend refuses a delivered-but-unclosed listing', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+    const inserted = await h.db.insertSettlement({
+      listingId: listing.id,
+      bidId: null,
+      attempt: 0,
+      buyerAccount: BUYER_A,
+      buyerCharacter: CHAR_A,
+      buyerName: 'Aldan',
+      buyerWallet: 'wallet-a',
+      amountCents: 8000,
+      deadlineAtMs: h.now() + 60_000,
+      nowMs: h.now(),
+    });
+    if (typeof inserted === 'string') throw new Error(`fixture refused: ${inserted}`);
+    await h.db.transitionSettlement(inserted.id, ['offered'], 'confirming');
+    await h.db.transitionSettlement(inserted.id, ['confirming'], 'confirmed');
+    await h.db.transitionSettlement(inserted.id, ['confirmed'], 'delivering');
+    await h.db.transitionSettlement(inserted.id, ['delivering'], 'delivered');
+    const out = await h.service.adminSuspendListing(listing.id);
+    expect(out).toEqual({ ok: false, reason: 'settlement_in_flight' });
+    expect((await getListing(h, listing.id)).status).toBe('active');
+  });
+
+  it('a buyer may retry the SAME signature after a failed confirmation', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+    const inserted = await h.db.insertSettlement({
+      listingId: listing.id,
+      bidId: null,
+      attempt: 0,
+      buyerAccount: BUYER_A,
+      buyerCharacter: CHAR_A,
+      buyerName: 'Aldan',
+      buyerWallet: 'wallet-a',
+      amountCents: 8000,
+      deadlineAtMs: h.now() + 60_000,
+      nowMs: h.now(),
+    });
+    if (typeof inserted === 'string') throw new Error(`fixture refused: ${inserted}`);
+    expect(await h.db.submitSettlementSignature(inserted.id, 'sig-retry-1')).toBe('ok');
+    // A refused confirm sends the row failed, the retry revives it, and the
+    // SAME signature must be accepted: the unique index adds no new entry for
+    // re-writing the same value onto the same row. Only ANOTHER settlement
+    // carrying the signature refuses.
+    await h.db.transitionSettlement(inserted.id, ['confirming'], 'failed', 'refused');
+    await h.db.transitionSettlement(inserted.id, ['failed'], 'offered');
+    expect(await h.db.submitSettlementSignature(inserted.id, 'sig-retry-1')).toBe('ok');
+    // listEpic extracts by bag index 0, so the replacement copy goes FIRST.
+    h.custody.bags.get(SELLER_CHAR)?.unshift({ itemId: EPIC_ITEM, count: 1 });
+    const secondListing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+    const other = await h.db.insertSettlement({
+      listingId: secondListing.id,
+      bidId: null,
+      attempt: 0,
+      buyerAccount: BUYER_C,
+      buyerCharacter: CHAR_C,
+      buyerName: 'Corvo',
+      buyerWallet: 'wallet-c',
+      amountCents: 8000,
+      deadlineAtMs: h.now() + 60_000,
+      nowMs: h.now(),
+    });
+    if (typeof other === 'string') throw new Error(`fixture refused: ${other}`);
+    expect(await h.db.submitSettlementSignature(other.id, 'sig-retry-1')).toBe('signature_reused');
+  });
+
+  it('the cascade pick breaks ties by placement time, then by id', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const place = async (account: number, characterId: number, name: string, amount: number) => {
+      const out = await h.db.insertPendingBid({
+        realm: REALM,
+        listingId: listing.id,
+        account,
+        characterId,
+        characterName: name,
+        wallet: `wallet-${name}`,
+        amountCents: amount,
+        bondCents: 100,
+        nowMs: h.now(),
+        extendEndsToMs: () => null,
+        minNext: () => 0,
+      });
+      if (!out.ok) throw new Error(`fixture bid refused: ${out.reason}`);
+      await h.db.markBidStatus(out.bid.id, 'outbid');
+      return out.bid.id;
+    };
+    const early = await place(BUYER_A, CHAR_A, 'Aldan', 5000);
+    h.setNow(BASE_MS + 60_000);
+    const late = await place(BUYER_B, CHAR_B, 'Brint', 5000);
+    const lateTwin = await place(BUYER_C, CHAR_C, 'Corvo', 5000);
+    // Equal amounts: the EARLIEST placement wins the cascade pick.
+    expect((await h.db.nextCascadeBidder(listing.id, 0, []))?.id).toBe(early);
+    // Equal amount AND time: the lowest id wins (a total, deterministic order).
+    expect((await h.db.nextCascadeBidder(listing.id, 0, [BUYER_A]))?.id).toBe(late);
+    expect(lateTwin).toBeGreaterThan(late);
   });
 });

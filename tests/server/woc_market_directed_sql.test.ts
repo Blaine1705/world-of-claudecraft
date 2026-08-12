@@ -318,3 +318,75 @@ describe('the operator reads behind the internal dashboard', () => {
     expect(sql()[0]).toContain('o.status = $4');
   });
 });
+
+// ---------------------------------------------------------------------------
+// DB-free structural pins for the settlement-state guards: the real-Postgres
+// suite skips green without TEST_DATABASE_URL, so these hold the shipped DDL
+// text (and the fake's mirror of it) in ordinary CI, where the fake-backed
+// suites would stay green over a reverted predicate.
+// ---------------------------------------------------------------------------
+
+describe('the settlement guards ship their DDL (structural floor)', () => {
+  // Strip SQL line comments FIRST (the rationale comments name the same
+  // keywords), then collapse whitespace so the pins survive reflowing.
+  const strippedSchema = async (): Promise<string> => {
+    const { WOC_MARKET_SCHEMA } = await import('../../server/woc_market_db');
+    return WOC_MARKET_SCHEMA.replace(/--[^\n]*/g, ' ').replace(/\s+/g, ' ');
+  };
+
+  it('carries both unique indexes and drops the stale live index', async () => {
+    const schema = await strippedSchema();
+    expect(schema).toContain('CREATE UNIQUE INDEX IF NOT EXISTS woc_market_settlements_open');
+    expect(schema).toContain('CREATE UNIQUE INDEX IF NOT EXISTS woc_market_sales_listing_once');
+    expect(schema).toContain('DROP INDEX IF EXISTS woc_market_settlements_live');
+    expect(schema).toContain('ON woc_market_sales(listing_id) WHERE excluded = false');
+  });
+
+  it('the open-settlement index predicate is exactly the five open states', async () => {
+    const schema = await strippedSchema();
+    const m = schema.match(
+      /CREATE UNIQUE INDEX IF NOT EXISTS woc_market_settlements_open ON woc_market_settlements\(listing_id\) WHERE state IN \(([^)]*)\)/,
+    );
+    expect(m, 'index creation shape').not.toBeNull();
+    const states = (m as RegExpMatchArray)[1].split(',').map((s) => s.trim().replace(/'/g, ''));
+    const { OPEN_SETTLEMENT_STATES } = await import('./helpers/fake_woc_market_db');
+    // One list, three holders: the shipped predicate, the fake's mirror, and
+    // the literal spelling here. A sixth state (or a dropped fifth) fails all
+    // three comparisons.
+    expect(states).toEqual(['offered', 'confirming', 'confirmed', 'delivering', 'delivered']);
+    expect([...OPEN_SETTLEMENT_STATES]).toEqual(states);
+    expect(states).not.toContain('failed');
+    expect(states).not.toContain('expired');
+  });
+
+  it('both boot repairs gate on index VALIDITY, and both creates drop an invalid carcass', async () => {
+    const schema = await strippedSchema();
+    // The repair gates: an INVALID carcass must re-open the repair, so the
+    // gate reads pg_index.indisvalid, never bare existence.
+    expect(schema).toContain(
+      "WHERE n.nspname = 'public' AND c.relname = 'woc_market_settlements_open' AND i.indisvalid",
+    );
+    expect(schema).toContain(
+      "WHERE n.nspname = 'public' AND c.relname = 'woc_market_sales_listing_once' AND i.indisvalid",
+    );
+    // The carcass drops ahead of each CREATE (IF NOT EXISTS matches by name
+    // and would keep an index that enforces nothing).
+    expect(schema).toContain("c.relname = 'woc_market_settlements_open' AND NOT i.indisvalid");
+    expect(schema).toContain("c.relname = 'woc_market_sales_listing_once' AND NOT i.indisvalid");
+    expect(schema).toContain("EXECUTE 'DROP INDEX public.woc_market_settlements_open'");
+    expect(schema).toContain("EXECUTE 'DROP INDEX public.woc_market_sales_listing_once'");
+  });
+
+  it('the settlements repair ranks every open state above the ELSE arm', async () => {
+    const schema = await strippedSchema();
+    // The survivor CASE and the index predicate must stay in lockstep: a
+    // state added to the predicate but not ranked here would fall to ELSE 1
+    // and the repair would prefer to demote it. 'offered' rides ELSE 1 by
+    // construction (the lowest rank), so four WHEN arms cover the other four.
+    expect(schema).toContain(
+      "CASE state WHEN 'delivered' THEN 5 WHEN 'delivering' THEN 4 WHEN 'confirmed' THEN 3 WHEN 'confirming' THEN 2 ELSE 1 END",
+    );
+    // The forensic demotion marker keeps any prior reason attached.
+    expect(schema).toContain("fail_reason = 'schema_dedupe' || COALESCE(':' || fail_reason, '')");
+  });
+});

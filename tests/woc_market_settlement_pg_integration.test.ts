@@ -187,7 +187,7 @@ describeDb('woc market settlement guards against real Postgres', () => {
       deadlineAtMs: over.deadlineAtMs ?? BASE_MS + 15 * MINUTE_MS,
       nowMs: BASE_MS,
     });
-    if (out === 'live_settlement_exists' || out === 'listing_closed') {
+    if (typeof out === 'string') {
       throw new Error(`fixture settlement refused: ${out}`);
     }
     if (over.state && over.state !== 'offered') await setSettlementState(out.id, over.state);
@@ -601,22 +601,87 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const seller = await seedAccount();
       const buyer = await seedAccount();
       const listingId = await seedListing(realm, seller);
+      const rankedListing = await seedListing(realm, seller);
       // Recreate the legacy shape: with the wide index dropped, a delivered
       // row and a later revived one can coexist, exactly what the pre-guard
       // reclaim/re-auction bug produced. The next boot must repair it, not
-      // die on the CREATE UNIQUE INDEX.
+      // die on the CREATE UNIQUE INDEX. try/finally: a failure between the
+      // drop and the re-apply must not leave the rest of the file running
+      // without the invariant under test.
       await pool.query('DROP INDEX woc_market_settlements_open');
-      const delivered = await seedSettlement(realm, listingId, buyer, { state: 'delivered' });
-      const revived = await seedSettlement(realm, listingId, buyer);
-      await pool.query(schemaSql);
-      expect((await settlementRow(delivered.id)).state).toBe('delivered');
-      const demoted = await settlementRow(revived.id);
-      expect(demoted.state).toBe('expired');
-      expect(demoted.failReason).toBe('schema_dedupe');
+      try {
+        const delivered = await seedSettlement(realm, listingId, buyer, { state: 'delivered' });
+        const revived = await seedSettlement(realm, listingId, buyer);
+        // The ranking arm: the ADVANCED row is inserted SECOND (higher id),
+        // so a survivor chosen by state rank differs from keep-earliest; a
+        // repair degraded to ORDER BY id would demote the confirming payment
+        // and keep the idle offered row, exactly the wrong survivor. The
+        // offered row also carries a prior fail_reason, pinning the forensic
+        // append (the marker stays greppable, the history stays attached).
+        const rankedOffered = await seedSettlement(realm, rankedListing, buyer);
+        await pool.query(`UPDATE woc_market_settlements SET fail_reason = $2 WHERE id = $1`, [
+          rankedOffered.id,
+          'quote_lapsed',
+        ]);
+        const rankedConfirming = await seedSettlement(realm, rankedListing, buyer, {
+          state: 'confirming',
+        });
+        expect(rankedConfirming.id).toBeGreaterThan(rankedOffered.id);
+        await pool.query(schemaSql);
+        expect((await settlementRow(delivered.id)).state).toBe('delivered');
+        const demoted = await settlementRow(revived.id);
+        expect(demoted.state).toBe('expired');
+        expect(demoted.failReason).toBe('schema_dedupe');
+        expect((await settlementRow(rankedConfirming.id)).state).toBe('confirming');
+        const rankedDemoted = await settlementRow(rankedOffered.id);
+        expect(rankedDemoted.state).toBe('expired');
+        expect(rankedDemoted.failReason).toBe('schema_dedupe:quote_lapsed');
+      } finally {
+        await pool.query(schemaSql);
+      }
       const rebuilt = await pool.query(
         `SELECT indexname FROM pg_indexes WHERE indexname = 'woc_market_settlements_open'`,
       );
       expect(rebuilt.rows).toHaveLength(1);
+    }, 20_000);
+
+    it('an INVALID index carcass re-opens the repair gate and is rebuilt valid', async () => {
+      const realm = 'guard-repair-carcass';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      await pool.query('DROP INDEX woc_market_settlements_open');
+      try {
+        const keep = await seedSettlement(realm, listingId, buyer, { state: 'confirming' });
+        const dupe = await seedSettlement(realm, listingId, buyer);
+        // A failed CONCURRENTLY build (the incident-response hand build the
+        // DDL comment names) leaves an INVALID carcass that satisfies both
+        // to_regclass and IF NOT EXISTS while enforcing nothing.
+        await expect(
+          pool.query(
+            `CREATE UNIQUE INDEX CONCURRENTLY woc_market_settlements_open
+               ON woc_market_settlements(listing_id)
+               WHERE state IN ('offered', 'confirming', 'confirmed', 'delivering', 'delivered')`,
+          ),
+        ).rejects.toMatchObject({ code: '23505' });
+        const carcass = await pool.query(
+          `SELECT i.indisvalid FROM pg_index i JOIN pg_class c ON c.oid = i.indexrelid
+            WHERE c.relname = 'woc_market_settlements_open'`,
+        );
+        expect(carcass.rows).toEqual([{ indisvalid: false }]);
+        // The boot must see through the carcass: repair the duplicates, drop
+        // the invalid leftover, and rebuild a VALID index.
+        await pool.query(schemaSql);
+        expect((await settlementRow(keep.id)).state).toBe('confirming');
+        expect((await settlementRow(dupe.id)).state).toBe('expired');
+        const rebuilt = await pool.query(
+          `SELECT i.indisvalid FROM pg_index i JOIN pg_class c ON c.oid = i.indexrelid
+            WHERE c.relname = 'woc_market_settlements_open'`,
+        );
+        expect(rebuilt.rows).toEqual([{ indisvalid: true }]);
+      } finally {
+        await pool.query(schemaSql);
+      }
     }, 20_000);
 
     it('a closed listing refuses a new settlement distinctly from a missing one', async () => {
@@ -752,7 +817,9 @@ describeDb('woc market settlement guards against real Postgres', () => {
         nowMs: BASE_MS,
         winnerBidId: cancelledBid,
       });
-      expect(out).toBe('live_settlement_exists');
+      // The distinct label: the winner left the pickable states, which is not
+      // the same operator story as a live settlement standing in the way.
+      expect(out).toBe('winner_gone');
       expect((await bidRow(cancelledBid)).status).toBe('cancelled');
       const none = await pool.query(
         `SELECT count(*)::int AS n FROM woc_market_settlements WHERE listing_id = $1`,
@@ -925,10 +992,18 @@ describeDb('woc market settlement guards against real Postgres', () => {
       // re-applying the schema must keep the earliest and void the rest, not
       // die on the CREATE UNIQUE INDEX.
       await pool.query('DROP INDEX woc_market_sales_listing_once');
-      const args = await saleArgs(realm, listingId, seller, buyer);
-      const firstId = await marketDb.insertSale(args);
-      const secondId = await marketDb.insertSale(args);
-      await pool.query(schemaSql);
+      let firstId: number;
+      let secondId: number;
+      try {
+        const args = await saleArgs(realm, listingId, seller, buyer);
+        firstId = await marketDb.insertSale(args);
+        secondId = await marketDb.insertSale(args);
+        await pool.query(schemaSql);
+      } finally {
+        // A failure above must not leave the rest of the file running without
+        // the invariant under test.
+        await pool.query(schemaSql);
+      }
       const rows = await pool.query(
         `SELECT id, excluded FROM woc_market_sales WHERE listing_id = $1 ORDER BY id`,
         [listingId],
@@ -950,7 +1025,7 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const listingId = await seedListing(realm, seller);
       const args = await saleArgs(realm, listingId, seller, buyer);
       const firstId = await marketDb.insertSale(args);
-      expect(await marketDb.setSaleExcluded(firstId, true)).toBe(true);
+      expect(await marketDb.setSaleExcluded(firstId, true)).toBe('ok');
       const secondId = await marketDb.insertSale(args);
       expect(secondId).not.toBe(firstId);
       const rows = await pool.query(
@@ -960,9 +1035,277 @@ describeDb('woc market settlement guards against real Postgres', () => {
       expect(rows.rows.map((r) => r.excluded)).toEqual([true, false]);
       // Re-including the voided row while its correction stands refuses as a
       // typed miss, never a thrown 23505.
-      expect(await marketDb.setSaleExcluded(firstId, false)).toBe(false);
-      expect(await marketDb.setSaleExcluded(secondId, true)).toBe(true);
-      expect(await marketDb.setSaleExcluded(firstId, false)).toBe(true);
+      // A refused re-include is a distinct 'conflict' (the operator hears
+      // what is actually in the way), never conflated with a missing row.
+      expect(await marketDb.setSaleExcluded(firstId, false)).toBe('conflict');
+      expect(await marketDb.setSaleExcluded(secondId, true)).toBe('ok');
+      expect(await marketDb.setSaleExcluded(firstId, false)).toBe('ok');
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // The QA round's race pins: insert-vs-close, the ordered bid locks, the
+  // retry revival, the quoted-offered suspend, and the CAS floor
+  // -------------------------------------------------------------------------
+
+  describe('settlement insert versus a concurrent close', () => {
+    it('an insert blocked by a concurrent closer aborts instead of landing on the closed listing', async () => {
+      const realm = 'guard-insert-vs-close';
+      const seller = await seedAccount();
+      const bidder = await seedAccount();
+      const listingId = await seedListing(realm, seller, { status: 'settling' });
+      const bidId = await seedBid(realm, listingId, bidder, {
+        status: 'outbid',
+        bondState: 'held',
+      });
+      const client = await pool.connect();
+      try {
+        // Hold the listing row the way suspend/cancel do, then fire the REAL
+        // insertSettlement: its statement snapshot still sees the open
+        // listing, so only the explicit row lock plus the re-read can refuse.
+        await client.query('BEGIN');
+        await client.query(`SELECT 1 FROM woc_market_listings WHERE id = $1 FOR UPDATE`, [
+          listingId,
+        ]);
+        const insert = marketDb.insertSettlement({
+          listingId,
+          bidId,
+          attempt: 2,
+          buyerAccount: bidder,
+          buyerCharacter: 7900,
+          buyerName: 'RaceBuyer',
+          buyerWallet: 'wallet-race',
+          amountCents: 900,
+          deadlineAtMs: BASE_MS + 15 * MINUTE_MS,
+          nowMs: BASE_MS,
+          winnerBidId: bidId,
+          winnerFrom: ['outbid'],
+        });
+        const first = await Promise.race([
+          insert.then(() => 'resolved'),
+          delay(200).then(() => 'blocked'),
+        ]);
+        expect(first).toBe('blocked');
+        await client.query(
+          `UPDATE woc_market_listings
+              SET status = 'closed', resolution = 'suspended', updated_at = now()
+            WHERE id = $1`,
+          [listingId],
+        );
+        await client.query('COMMIT');
+        expect(await insert).toBe('listing_closed');
+        // The winner stamp rolled back with the refused insert, and nothing
+        // landed on the closed listing.
+        expect((await bidRow(bidId)).status).toBe('outbid');
+        const none = await pool.query(
+          `SELECT count(*)::int AS n FROM woc_market_settlements WHERE listing_id = $1`,
+          [listingId],
+        );
+        expect(none.rows[0].n).toBe(0);
+      } finally {
+        client.release();
+      }
+    }, 20_000);
+  });
+
+  describe('bond activation versus suspend, with a standing bid in the book', () => {
+    it('the crossing lock shape resolves without a deadlock', async () => {
+      const realm = 'guard-activate-deadlock';
+      const seller = await seedAccount();
+      const standingBidder = await seedAccount();
+      const pendingBidder = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      // The standing 'active' bid has the LOWER id and is the listing's
+      // current bid: the exact fixture where the old activateBid (own bid,
+      // then listing, then the PREVIOUS bid) crossed the suspend guard's
+      // ordered scan and one side died 40P01.
+      const standingBid = await seedBid(realm, listingId, standingBidder, { amountCents: 700 });
+      const pendingBid = await seedBid(realm, listingId, pendingBidder, {
+        status: 'pending_bond',
+        bondState: 'pending',
+        amountCents: 900,
+      });
+      await pool.query(
+        `UPDATE woc_market_listings SET current_bid_cents = 700, current_bid_id = $2 WHERE id = $1`,
+        [listingId, standingBid],
+      );
+      const client = await pool.connect();
+      try {
+        // Park the standing bid's row lock, queue the REAL suspend on it
+        // first and the REAL activation behind it, then release: under the
+        // old lock order the activation held its own bid plus the listing and
+        // then asked for the standing bid, completing the cycle the moment
+        // the suspend acquired it.
+        await client.query('BEGIN');
+        await client.query(`SELECT 1 FROM woc_market_bids WHERE id = $1 FOR UPDATE`, [standingBid]);
+        const suspend = marketDb.suspendListingIfSafe(realm, listingId, BASE_MS);
+        await delay(150);
+        const activate = marketDb.activateBid(pendingBid, BASE_MS);
+        await delay(150);
+        await client.query('COMMIT');
+        const [suspendOut, activateOut] = await Promise.all([suspend, activate]);
+        // Deterministic winner: the suspend queued first on the standing bid.
+        expect(suspendOut).toMatchObject({
+          id: listingId,
+          status: 'closed',
+          resolution: 'suspended',
+        });
+        expect(activateOut).toBe('not_pending');
+        expect(await bidRow(standingBid)).toEqual({
+          status: 'cancelled',
+          bondState: 'refund_due',
+        });
+        expect((await bidRow(pendingBid)).status).toBe('cancelled');
+      } finally {
+        client.release();
+      }
+    }, 20_000);
+  });
+
+  describe('the failed-settlement retry revival', () => {
+    it('cannot revive over a second open settlement: a typed refusal, never a 500', async () => {
+      const realm = 'guard-quote-revive';
+      const seller = await seedAccount();
+      const buyerA = await seedAccount();
+      const buyerB = await seedAccount();
+      const listingId = await seedListing(realm, seller, { status: 'settling' });
+      const failed = await seedSettlement(realm, listingId, buyerA, { state: 'failed' });
+      // Legal coexistence: 'failed' sits outside the open-set index, so a
+      // second open settlement can stand beside it (the cascade builds
+      // exactly this pair).
+      const live = await seedSettlement(realm, listingId, buyerB);
+      const service = makeService(realm);
+      const out = await service.settlementQuote(buyerA, failed.id);
+      expect(out).toMatchObject({ ok: false, reason: 'not_active' });
+      expect((await settlementRow(failed.id)).state).toBe('failed');
+      expect((await settlementRow(live.id)).state).toBe('offered');
+    });
+
+    it('a lone failed settlement still revives for its retry', async () => {
+      const realm = 'guard-quote-revive-ok';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const listingId = await seedListing(realm, seller, { status: 'settling' });
+      const failed = await seedSettlement(realm, listingId, buyer, { state: 'failed' });
+      const service = makeService(realm);
+      const out = await service.settlementQuote(buyer, failed.id);
+      expect(out).toMatchObject({ ok: true });
+      expect((await settlementRow(failed.id)).state).toBe('offered');
+    });
+  });
+
+  describe('suspend versus a quoted offered settlement', () => {
+    it('refuses while the quote is live: the buyer may already have broadcast payment', async () => {
+      const realm = 'guard-suspend-quoted';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      const settlement = await seedSettlement(realm, listingId, buyer);
+      await pool.query(
+        `UPDATE woc_market_settlements
+            SET quote_reference = 'quote-live-1', quote_expires = to_timestamp($2 / 1000.0)
+          WHERE id = $1`,
+        [settlement.id, BASE_MS + 5 * MINUTE_MS],
+      );
+      expect(await marketDb.suspendListingIfSafe(realm, listingId, BASE_MS)).toBe(
+        'settlement_live',
+      );
+      expect((await settlementRow(settlement.id)).state).toBe('offered');
+      expect((await listingRow(listingId)).status).toBe('active');
+    });
+
+    it('proceeds once the quote expired: no payment can ride it any more', async () => {
+      const realm = 'guard-suspend-quote-expired';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      const settlement = await seedSettlement(realm, listingId, buyer);
+      await pool.query(
+        `UPDATE woc_market_settlements
+            SET quote_reference = 'quote-stale-1', quote_expires = to_timestamp($2 / 1000.0)
+          WHERE id = $1`,
+        [settlement.id, BASE_MS - MINUTE_MS],
+      );
+      const out = await marketDb.suspendListingIfSafe(realm, listingId, BASE_MS);
+      expect(out).toMatchObject({ id: listingId, status: 'closed', resolution: 'suspended' });
+      const after = await settlementRow(settlement.id);
+      expect(after.state).toBe('expired');
+      expect(after.failReason).toBe('listing_suspended');
+    });
+  });
+
+  describe('bid status compare-and-set floor', () => {
+    it('markBidStatus with a from set refuses a bid outside it; the bare form moves it', async () => {
+      const realm = 'guard-bid-cas';
+      const seller = await seedAccount();
+      const bidder = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      const bidId = await seedBid(realm, listingId, bidder, { status: 'cancelled' });
+      await marketDb.markBidStatus(bidId, 'outbid', ['active']);
+      expect((await bidRow(bidId)).status).toBe('cancelled');
+      await marketDb.markBidStatus(bidId, 'outbid');
+      expect((await bidRow(bidId)).status).toBe('outbid');
+    });
+
+    it('the atomic demote outbids an active bid and queues its held bond in one call', async () => {
+      const realm = 'guard-bid-demote';
+      const seller = await seedAccount();
+      const bidder = await seedAccount();
+      const cancelledBidder = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      const activeBid = await seedBid(realm, listingId, bidder);
+      const cancelledBid = await seedBid(realm, listingId, cancelledBidder, {
+        status: 'cancelled',
+        bondState: 'held',
+      });
+      await marketDb.markBidOutbidQueueRefund(activeBid);
+      expect(await bidRow(activeBid)).toEqual({ status: 'outbid', bondState: 'refund_due' });
+      // The CAS from 'active': a cancelled bid (and its bond) is left alone.
+      await marketDb.markBidOutbidQueueRefund(cancelledBid);
+      expect(await bidRow(cancelledBid)).toEqual({ status: 'cancelled', bondState: 'held' });
+    });
+  });
+
+  describe('terminal states stay outside the liveness surface', () => {
+    it('an expired settlement is invisible to liveSettlementForListing and no bar to suspend', async () => {
+      const realm = 'guard-terminal-negatives';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      await seedSettlement(realm, listingId, buyer, { state: 'expired' });
+      expect(await marketDb.liveSettlementForListing(listingId)).toBeNull();
+      const out = await marketDb.suspendListingIfSafe(realm, listingId, BASE_MS);
+      expect(out).toMatchObject({ id: listingId, status: 'closed', resolution: 'suspended' });
+    });
+  });
+
+  describe('the stranded reclaim arm', () => {
+    it('expires a leftover failed settlement and reopens the listing', async () => {
+      const realm = 'guard-reclaim-failed';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const listingId = await seedListing(realm, seller, { status: 'settling' });
+      const failed = await seedSettlement(realm, listingId, buyer, { state: 'failed' });
+      await makeService(realm).sweepPass();
+      const after = await settlementRow(failed.id);
+      expect(after.state).toBe('expired');
+      expect(after.failReason).toBe('listing_reclaimed');
+      expect((await listingRow(listingId)).status).toBe('active');
+    }, 20_000);
+
+    it('the reopen statement itself refuses while an open settlement rides the listing', async () => {
+      const realm = 'guard-reclaim-reopen-belt';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const listingId = await seedListing(realm, seller, { status: 'settling' });
+      const settlement = await seedSettlement(realm, listingId, buyer);
+      // The belt under the read-then-act arm: a direct reopen with an open
+      // settlement present must not move the row.
+      await marketDb.reopenListing(listingId);
+      expect((await listingRow(listingId)).status).toBe('settling');
+      await setSettlementState(settlement.id, 'expired');
+      await marketDb.reopenListing(listingId);
+      expect((await listingRow(listingId)).status).toBe('active');
     });
   });
 });
