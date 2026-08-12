@@ -801,6 +801,11 @@ export const nl_NL: EnTranslations = {
       "resetAction": "Resetten",
       "note": "Sleep de chattabbladstrook om het venster te verplaatsen, of de hoekgreep om het te vergroten of verkleinen. Resetten zet het terug naar de standaardpositie en -grootte."
     },
+    "chatQuota": {
+      "limitReached": "General chat limit reached. Try again in {seconds}.",
+      "pending": "Your previous General chat message is still sending. Try again in a moment.",
+      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+    },
     "swing": {
       "ready": "Slag",
       "seconds": "{seconds}s"
@@ -894,12 +899,12 @@ export const nl_NL: EnTranslations = {
       "update": "Bijwerken"
     },
     "otaUpdate": {
-      "title": "Game Update",
-      "downloading": "Downloading update: {percent}",
-      "applying": "Update downloaded. Restarting the game to apply it.",
-      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
-      "continueAnyway": "Continue without updating",
-      "progressLabel": "Update download progress"
+      "title": "Spelupdate",
+      "downloading": "Update downloaden: {percent}",
+      "applying": "Update gedownload. Het spel wordt opnieuw gestart om de update toe te passen.",
+      "incompatible": "Er is een update vereist om te spelen. Deze wordt toegepast zodra het downloaden klaar is.",
+      "continueAnyway": "Doorgaan zonder bijwerken",
+      "progressLabel": "Voortgang van het downloaden van de update"
     },
     "cameraPrompt": {
       "title": "Kies je Camera",
@@ -2196,6 +2201,10 @@ export const nl_NL: EnTranslations = {
       "itemAriaBound": "{item}, aantal {count}, gebonden exemplaar",
       "itemAriaMasterwork": "{item}, hoeveelheid {count}, meesterwerk",
       "itemAriaQuest": "{item}, aantal {count}, questvoorwerp",
+      "itemAriaLocked": "{item}, aantal {count}, vergrendeld",
+      "itemLockedLine": "Vergrendeld",
+      "lockItem": "Voorwerp vergrendelen",
+      "unlockItem": "Voorwerp ontgrendelen",
       "filterGroupAria": "Tassen filteren op categorie",
       "filterAll": "Alle",
       "filterWeapon": "Wapens",
@@ -3226,6 +3235,7 @@ export const nl_NL: EnTranslations = {
       "craftedToast": "Gemaakt: {name}",
       "craftedToastQty": "Gemaakt: {name} x{qty}",
       "insufficientMaterials": "Daar heb je de materialen niet voor.",
+      "reagentLocked": "Een reagens daarvoor is vergrendeld.",
       "unknownRecipe": "Dat recept bestaat niet.",
       "comboRequirementUnmet": "Je hebt niet beide vereiste ambachten op het vereiste niveau voor dat recept.",
       "comboRequires": "Afstemming: {craftA} + {craftB}, rang {tier}.",
@@ -3332,6 +3342,7 @@ export const nl_NL: EnTranslations = {
       "notHeld": "Je hebt dat voorwerp niet.",
       "notDisenchantable": "Je kunt dat niet onbetoveren.",
       "notSalvageable": "Je kunt dat niet salvagen.",
+      "salvageLocked": "Dat voorwerp is vergrendeld.",
       "disenchantBusy": "Je bent bezig.",
       "salvageBusy": "Je bent bezig.",
       "enchantBusy": "Je bent bezig.",
@@ -8908,6 +8919,9 @@ export const nl_NL: EnTranslations = {
       "filterPrimaryStatAll": "Elke eigenschap",
       "filterRarity": "Zeldzaamheid",
       "filterRarityAll": "Alle zeldzaamheden",
+      "filterSort": "Sorteren",
+      "sortName": "Naam (A-Z)",
+      "sortPriceAsc": "Prijs: laag naar hoog",
       "weaponSword": "Zwaarden",
       "weaponDagger": "Dolken",
       "weaponStaff": "Staven",

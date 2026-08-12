@@ -801,6 +801,11 @@ export const pt_BR: EnTranslations = {
       "resetAction": "Redefinir",
       "note": "Arraste a faixa de abas do chat para mover a janela, ou a alça do canto para redimensioná-la. Redefinir devolve a janela à posição e ao tamanho padrão."
     },
+    "chatQuota": {
+      "limitReached": "General chat limit reached. Try again in {seconds}.",
+      "pending": "Your previous General chat message is still sending. Try again in a moment.",
+      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+    },
     "swing": {
       "ready": "Golpe",
       "seconds": "{seconds}s"
@@ -894,12 +899,12 @@ export const pt_BR: EnTranslations = {
       "update": "Atualizar"
     },
     "otaUpdate": {
-      "title": "Game Update",
-      "downloading": "Downloading update: {percent}",
-      "applying": "Update downloaded. Restarting the game to apply it.",
-      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
-      "continueAnyway": "Continue without updating",
-      "progressLabel": "Update download progress"
+      "title": "Atualização do jogo",
+      "downloading": "Baixando atualização: {percent}",
+      "applying": "Atualização baixada. Reiniciando o jogo para aplicá-la.",
+      "incompatible": "É necessária uma atualização para jogar. Ela será aplicada assim que o download terminar.",
+      "continueAnyway": "Continuar sem atualizar",
+      "progressLabel": "Progresso do download da atualização"
     },
     "cameraPrompt": {
       "title": "Escolha Sua Câmera",
@@ -2196,6 +2201,10 @@ export const pt_BR: EnTranslations = {
       "itemAriaBound": "{item}, quantidade {count}, cópia vinculada",
       "itemAriaMasterwork": "{item}, quantidade {count}, obra-prima",
       "itemAriaQuest": "{item}, quantidade {count}, item de missão",
+      "itemAriaLocked": "{item}, quantidade {count}, bloqueado",
+      "itemLockedLine": "Bloqueado",
+      "lockItem": "Bloquear item",
+      "unlockItem": "Desbloquear item",
       "filterGroupAria": "Filtrar bolsas por categoria",
       "filterAll": "Todos",
       "filterWeapon": "Armas",
@@ -3226,6 +3235,7 @@ export const pt_BR: EnTranslations = {
       "craftedToast": "Feito: {name}",
       "craftedToastQty": "Feito: {name} x{qty}",
       "insufficientMaterials": "Você não tem os materiais para isso.",
+      "reagentLocked": "Um reagente para isso está bloqueado.",
       "unknownRecipe": "Essa receita não existe.",
       "comboRequirementUnmet": "Você não possui os dois ofícios exigidos no nível necessário para essa receita.",
       "comboRequires": "Afinidade: {craftA} + {craftB}, nível {tier}.",
@@ -3332,6 +3342,7 @@ export const pt_BR: EnTranslations = {
       "notHeld": "Você não tem esse item.",
       "notDisenchantable": "Você não pode desencantar isso.",
       "notSalvageable": "Você não pode recuperar isso.",
+      "salvageLocked": "Esse item está bloqueado.",
       "disenchantBusy": "Você está ocupado.",
       "salvageBusy": "Você está ocupado.",
       "enchantBusy": "Você está ocupado.",
@@ -8908,6 +8919,9 @@ export const pt_BR: EnTranslations = {
       "filterPrimaryStatAll": "Qualquer atributo primário",
       "filterRarity": "Raridade",
       "filterRarityAll": "Todas as raridades",
+      "filterSort": "Ordenar",
+      "sortName": "Nome (A-Z)",
+      "sortPriceAsc": "Preço: menor para maior",
       "weaponSword": "Espadas",
       "weaponDagger": "Adagas",
       "weaponStaff": "Cajados",

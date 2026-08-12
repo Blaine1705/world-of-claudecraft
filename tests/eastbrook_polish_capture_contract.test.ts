@@ -116,17 +116,41 @@ interface AttributionTargetFixture {
 // Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
 // archetype and scene-texture counts; renderer.ts edits only). No capture
 // was retaken.
-// Re-minted for the merge of release/v0.36.0 into the Bonebound Rickshaw
-// mount branch: the release-side changes move the rendererIntegration leaf
-// (mountLoopActive dismount-loop fix), so the merged tree mints a value
-// matching neither parent. No capture was retaken.
-// Re-minted for that branch's round-6 review fixes: a comment-only edit to
-// renderer.ts (documenting why the mountLoop call sits outside the
-// SFX_MOVE_RANGE_SQ audibility gate) still moves the rendererIntegration
-// leaf, since the seal hashes file bytes rather than behavior. No capture
-// was retaken and no measured value moved.
+// Re-minted for the shadow-batch PR (shadow-camera texel snapping and the
+// budget-governed shadow cadence; renderer.ts edits only). No capture was
+// retaken.
+// Re-minted for the merge of the shadow-batch PR with the iOS constrained-
+// memory zone-eviction fix: both parents move renderer.ts, so the
+// rendererIntegration leaf mints a value matching neither parent. No capture
+// was retaken.
+// Re-minted for the merge of PR #3314's rift windup telegraph school tint
+// (issue #2917) with the release branch's renderer changes. Both parents move
+// renderer.ts, so the rendererIntegration leaf mints a value matching neither
+// parent. No capture was retaken.
+// Re-minted for the Three.js audit batch (light budget seam, blob shadows, sky
+// residency lane, splat colour pack-source fix): renderer.ts edits only. No
+// capture was retaken.
+// Re-minted for the base sync of the Three.js audit batch with the release
+// branch renderer changes. Both parents move renderer.ts, so the
+// rendererIntegration leaf mints a value matching neither parent. No capture
+// was retaken.
+// Re-minted for the release base-health repair after renderer.ts changed. No
+// capture was retaken.
+// Re-minted for the v0.37.0 base sync with the login-storm base commit. The
+// merged renderer/prewarm/source bytes mint a value matching neither parent.
+// No capture was retaken.
+// Re-minted after organizing renderer imports changed the provenance inputs.
+// No capture was retaken.
+// Re-minted for the merge of the iOS constrained-memory zone-eviction fix
+// (evictFarZoneIfConstrained) with the release branch's organized renderer
+// imports. Both parents move renderer.ts, so the rendererIntegration leaf
+// mints a value matching neither parent. No capture was retaken.
+// Re-minted for the merge of release/v0.37.0 into the Bonebound Rickshaw
+// mount branch: both parents move renderer.ts (the release's shadow-batch
+// and reveal-gate work, this branch's mount wiring), so the merged tree
+// mints a value matching neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '17dd06ef4cd0b643f2a76992d7341ec5dcb27b1972077008ac0059236c0c9445';
+  'e73275f2a91eb88fc0bc20162d2a2f608a265b6bb3950be2cbfb4f792259302c';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

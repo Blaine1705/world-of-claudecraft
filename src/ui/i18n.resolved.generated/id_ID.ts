@@ -801,6 +801,11 @@ export const id_ID: EnTranslations = {
       "resetAction": "Atur Ulang",
       "note": "Seret bilah tab obrolan untuk memindahkan jendela, atau pegangan sudut untuk mengubah ukurannya. Atur Ulang mengembalikannya ke posisi dan ukuran bawaan."
     },
+    "chatQuota": {
+      "limitReached": "General chat limit reached. Try again in {seconds}.",
+      "pending": "Your previous General chat message is still sending. Try again in a moment.",
+      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+    },
     "swing": {
       "ready": "Ayun",
       "seconds": "{seconds}d"
@@ -894,12 +899,12 @@ export const id_ID: EnTranslations = {
       "update": "Perbarui"
     },
     "otaUpdate": {
-      "title": "Game Update",
-      "downloading": "Downloading update: {percent}",
-      "applying": "Update downloaded. Restarting the game to apply it.",
-      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
-      "continueAnyway": "Continue without updating",
-      "progressLabel": "Update download progress"
+      "title": "Pembaruan Game",
+      "downloading": "Mengunduh pembaruan: {percent}",
+      "applying": "Pembaruan telah diunduh. Game dimulai ulang untuk menerapkannya.",
+      "incompatible": "Pembaruan diperlukan untuk bermain. Pembaruan akan diterapkan segera setelah unduhan selesai.",
+      "continueAnyway": "Lanjutkan tanpa memperbarui",
+      "progressLabel": "Progres unduhan pembaruan"
     },
     "cameraPrompt": {
       "title": "Pilih Kameramu",
@@ -2196,6 +2201,10 @@ export const id_ID: EnTranslations = {
       "itemAriaBound": "{item}, jumlah {count}, salinan terikat",
       "itemAriaMasterwork": "{item}, jumlah {count}, karya master",
       "itemAriaQuest": "{item}, jumlah {count}, barang misi",
+      "itemAriaLocked": "{item}, jumlah {count}, terkunci",
+      "itemLockedLine": "Terkunci",
+      "lockItem": "Kunci Barang",
+      "unlockItem": "Buka Kunci Barang",
       "filterGroupAria": "Saring tas menurut kategori",
       "filterAll": "Semua",
       "filterWeapon": "Senjata",
@@ -3226,6 +3235,7 @@ export const id_ID: EnTranslations = {
       "craftedToast": "Dibuat: {name}",
       "craftedToastQty": "Dibuat: {name} x{qty}",
       "insufficientMaterials": "Anda tidak memiliki bahan untuk itu.",
+      "reagentLocked": "Reagen untuk itu terkunci.",
       "unknownRecipe": "Resep itu tidak ada.",
       "comboRequirementUnmet": "Kamu tidak memiliki kedua keahlian yang diperlukan pada tingkat yang disyaratkan untuk resep itu.",
       "comboRequires": "Penyelarasan: {craftA} + {craftB}, tingkat {tier}.",
@@ -3332,6 +3342,7 @@ export const id_ID: EnTranslations = {
       "notHeld": "Kamu tidak memiliki barang itu.",
       "notDisenchantable": "Kamu tidak bisa menghancurkan pemantraan itu.",
       "notSalvageable": "Kamu tidak bisa menyalvasi itu.",
+      "salvageLocked": "Barang itu terkunci.",
       "disenchantBusy": "Kamu sedang sibuk.",
       "salvageBusy": "Kamu sedang sibuk.",
       "enchantBusy": "Kamu sedang sibuk.",
@@ -8908,6 +8919,9 @@ export const id_ID: EnTranslations = {
       "filterPrimaryStatAll": "Stat utama apa pun",
       "filterRarity": "Kelangkaan",
       "filterRarityAll": "Semua kelangkaan",
+      "filterSort": "Urutkan",
+      "sortName": "Nama (A-Z)",
+      "sortPriceAsc": "Harga: rendah ke tinggi",
       "weaponSword": "Pedang",
       "weaponDagger": "Belati",
       "weaponStaff": "Tongkat Sihir",
