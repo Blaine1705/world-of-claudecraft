@@ -471,17 +471,17 @@ import {
   renderBudgetShaderPrewarmLevels,
 } from './render_budget';
 import {
-  measureFeatureFootprint,
-  setRenderCategory,
-  type TextureBackedMaterial,
-  type TextureMaterialKey,
-} from './renderer_diagnostics';
-import {
   emptyRenderDiagnosticsSnapshot,
   type RenderableDiagnosticObject,
   RenderDiagnostics,
   type RenderDiagnosticsSnapshot,
 } from './render_diagnostics';
+import {
+  measureFeatureFootprint,
+  setRenderCategory,
+  type TextureBackedMaterial,
+  type TextureMaterialKey,
+} from './renderer_diagnostics';
 import {
   beginRendererFrameTelemetry,
   type RendererFramePhaseMs,
