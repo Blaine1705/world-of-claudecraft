@@ -448,21 +448,34 @@ jobs:
     # runs sat 9.6 to 24.4 minutes inside actions/checkout before completing
     # (healthy checkout is under 3 minutes; worst stalled wall 32.8 minutes,
     # run 31111919431 attempt 1), and the stall, not any test, set those
-    # runs' tails. Sized from the measured healthy worst case plus margin:
-    # the slowest healthy GREEN shard observed is 13.6 minutes (the Phase 2
-    # content-only selective drill, PR #2991) and the slowest healthy RED
-    # one 18.6 minutes (run 31067745370, a 17.8 minute failing test step),
-    # so 20 kills only stalled jobs. Two independent 24 hour replays (the
-    # review's and its verifier's, different windows and counting bases)
-    # both found ZERO healthy jobs over their bound, and 21 to 31
-    # stalled-but-green jobs per day these bounds convert into reds needing
-    # a manual failed-jobs rerun: the buy is bounding the unbounded worst
-    # case (the pre-Phase-1 90 minute wedges) and making stalls visible as
-    # failures for the runner escalation, not the average tail. Full
-    # evidence: the CI/CD performance packet's detect-wedge postmortem note
-    # (an internal, untracked packet record; the run ids above are the
-    # in-repo anchors).
-    timeout-minutes: 20
+    # runs' tails. The original 20 was sized from a 13.6 minute healthy
+    # GREEN worst case (the Phase 2 content-only selective drill, PR #2991)
+    # and an 18.6 minute healthy RED one (run 31067745370), and two
+    # independent 24 hour replays then found zero healthy jobs over that
+    # bound. That zero did not survive sim-deep selective PRs: a selective
+    # run whose changed files sit deep in the sim import graph collects
+    # nearly the full suite (917 files on PR #3342 against 782 on a
+    # comparable net-only PR, the extras being the expensive sim suites),
+    # and the sha1-contiguous packs can concentrate several of those in one
+    # shard. On 2026-08-12 shard 1 of PR #3342 was bound-killed at a 20.25
+    # minute wall on two attempts, both with the test step at 19.0 minutes
+    # and still running (deterministic workload, not runner variance), and
+    # fix/item-provenance-boundaries died the same way at 20.08; sibling
+    # GREEN shards on the same run walked 16 to 17 minutes against the 13.6
+    # prior baseline, so that runner set ran about 1.25x slow. 40 applies
+    # release-gate's slow-runner arithmetic to this workload: the projected
+    # completed shard 1 wall is about 22 minutes on those runners, about 18
+    # fast-runner-equivalent, and 18 x 1.60 (the fast-to-slow runner ratio
+    # measured at b160a1ba18) x 1.37 (the margin the original bounds were
+    # chosen with) is 39.5. The stall-detection buy survives the raise: the
+    # stall class dies in checkout or setup, where ci-stall-rerun.yml's
+    # nothing-ran-after-it predicate reruns it regardless of the bound's
+    # value, and the git low-speed abort still ends trickle transfers in
+    # about 2 minutes; a healthy long test step, which both 2026-08-12
+    # kills interrupted, is exactly what this bound must not kill. The
+    # queue-side ceiling this has to fit under is recorded in
+    # docs/merge-queue.md.
+    timeout-minutes: 40
     runs-on: ubuntu-latest
 
     # fail-fast stays off: shards pass or fail independently, so one red shard
@@ -760,9 +773,12 @@ jobs:
     if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code != 'false'
     # Unmatrixed single toolchain-setup-plus-checks job, comparable in shape to
     # browser-gate, but heavier: i18n generation, the malware gate, a
-    # typecheck, and four builds. 20 matches the pr-gate shard bound so a
-    # stalled runner here dies and reruns instead of holding a required check
-    # for hours.
+    # typecheck, and four builds. 20 was sized beside the shard matrices'
+    # original bound and still fits this job's serialized check list;
+    # pr-gate's own bound has since moved for its sim-heavy selective test
+    # packs, which this job does not run, so the two values parted on
+    # purpose. A stalled runner here still dies and reruns instead of
+    # holding a required check for hours.
     timeout-minutes: 20
     runs-on: ubuntu-latest
 
