@@ -85,12 +85,6 @@ export function bagCapacity(bags: readonly (string | null)[]): number {
   return total;
 }
 
-/** Slots in use. Each InvSlot entry occupies one slot regardless of count
- *  (pre-bag saves may carry overstacked entries; they are tolerated as-is). */
-export function usedBagSlots(inventory: readonly InvSlot[]): number {
-  return inventory.length;
-}
-
 /** How many of `count` copies of an item would fit: existing stacks absorb up
  *  to their stackSize, then each free slot holds one fresh stack. `instance`
  *  is the payload of the copies being added (absent for a plain fungible
@@ -151,22 +145,6 @@ export function canGrantItemInstance(
   count = 1,
 ): boolean {
   return countFit(inventory, capacity, itemId, count, instance) >= count;
-}
-
-/** How many of a `count`-unit instanced grant actually fit: the same
- *  countFit room model canGrantItemInstance boolean-gates, surfaced as a
- *  number. A signed-grant call site that owns a rolled quantity larger than
- *  one (the corpse-harvest signed grant, mirroring the node-harvest signed
- *  grant's own countFit call) uses this to size its addItemInstance call
- *  instead of truncating an available multi-unit fit down to one. */
-export function fitForItemInstance(
-  inventory: readonly InvSlot[],
-  capacity: number,
-  itemId: string,
-  count: number,
-  instance: ItemInstancePayload,
-): number {
-  return countFit(inventory, capacity, itemId, count, instance);
 }
 
 /** True when all `count` copies fit. */

@@ -145,8 +145,13 @@ interface AttributionTargetFixture {
 // (evictFarZoneIfConstrained) with the release branch's organized renderer
 // imports. Both parents move renderer.ts, so the rendererIntegration leaf
 // mints a value matching neither parent. No capture was retaken.
+// Re-minted for the rebase of the dead-code removal pass (which changed
+// eastbrook_civic_beacon.ts, dropping its unused *PreloadInternalsForTest
+// hook) onto release/v0.38.0. Both parents move renderer.ts, so the
+// rendererIntegration leaf mints a value matching neither parent. No capture
+// was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'decde6de14371817605eb651a7f0450148057e922e1ff81e7169521591704ecd';
+  'b63cd2cd81b70d61b0c05310c66c8c47ffbd6d9d39d4400ea0ab399f7eafd31a';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
