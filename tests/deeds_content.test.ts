@@ -582,7 +582,7 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // exp_dawnhold_castle), which appends last; no shipped trigger or renown
   // changed (the pair is new, every prior row reproduces the previous
   // literal exactly).
-  const FROZEN_CATALOG_SHA256 = 'e372e3f95f7b6063f461b9f00561eecf97849300f543dc88ddda97e487afe683';
+  const FROZEN_CATALOG_SHA256 = '36e9f3077709035c6f617f355572d5d911a0bde1ff6dd2676aace5505dd70a21';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
