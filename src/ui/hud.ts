@@ -11887,10 +11887,10 @@ export class Hud {
                           ? 'hudChrome.crafting.busy'
                           : ev.reason === 'recipe_not_learned'
                             ? 'hudChrome.crafting.recipeNotLearned'
-                            : ev.reason === 'no_bag_space'
-                              ? 'hudChrome.crafting.noBagSpace'
-                              : ev.reason === 'locked'
-                                ? 'hudChrome.crafting.reagentLocked'
+                            : ev.reason === 'locked'
+                              ? 'hudChrome.crafting.reagentLocked'
+                              : ev.reason === 'no_bag_space'
+                                ? 'hudChrome.crafting.noBagSpace'
                                 : 'hudChrome.crafting.insufficientMaterials',
                   ),
               '#ff6b6b',
