@@ -241,6 +241,10 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       bondReference?: string | null;
       bondSignature?: string | null;
       bondQuoteExpiresAtMs?: number | null;
+      // Explicit ONLY to decouple the signature-recording moment from
+      // placement (the late-signer case); default couples them, like the
+      // real first-recording stamp on a promptly-signed bond.
+      bondSignatureAtMs?: number | null;
     } = {},
   ): Promise<number> {
     seq++;
@@ -253,7 +257,11 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
          $1, $2, $3, $4, $5, $6, $7, $8, 70, $9, to_timestamp($10 / 1000.0),
          $11, $12,
          CASE WHEN $13::bigint IS NULL THEN NULL ELSE to_timestamp($13::bigint / 1000.0) END,
-         CASE WHEN $12::text IS NULL THEN NULL ELSE to_timestamp($10 / 1000.0) END
+         CASE
+           WHEN $14::bigint IS NOT NULL THEN to_timestamp($14::bigint / 1000.0)
+           WHEN $12::text IS NULL THEN NULL
+           ELSE to_timestamp($10 / 1000.0)
+         END
        ) RETURNING id`,
       [
         listingId,
@@ -269,6 +277,7 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
         over.bondReference ?? `seed-ref-${seq}`,
         over.bondSignature ?? null,
         over.bondQuoteExpiresAtMs ?? null,
+        over.bondSignatureAtMs ?? null,
       ],
     );
     return Number(res.rows[0].id);
@@ -686,6 +695,31 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
         overdue.map((s) => s.id),
         'updated_at <= cutoff includes the bound',
       ).toContain(settlement.id);
+    });
+
+    it('a LATE signer keeps the full poll cadence (park ages on the signature, not placement)', async () => {
+      const realm = `late-signer-${++seq}`;
+      const seller = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      // Placed 10 minutes ago (well past the park window) but signed only 1
+      // minute ago: aging on placement would park this bond instantly, aging
+      // on the signature keeps it in the fast poll. This is the fixture the
+      // fix-round reviewer flagged the old test could not distinguish.
+      const lateSigned = await seedBid(realm, listingId, await seedAccount(), {
+        bondReference: `late-ref-${seq}`,
+        bondSignature: `late-sig-${seq}`,
+        placedAtMs: BASE_MS - 10 * MINUTE_MS,
+        bondSignatureAtMs: BASE_MS - 1 * MINUTE_MS,
+      });
+      const economy = new ScriptedEconomy(() => BASE_MS);
+      economy.verdict = { settled: false, pending: true, reason: null };
+      const service = makeService(realm, economy, () => BASE_MS);
+      await service.sweepPass();
+      const stamped = await pool.query(
+        `SELECT poll_parked_at FROM woc_market_bids WHERE id = $1`,
+        [lateSigned],
+      );
+      expect(stamped.rows[0].poll_parked_at, 'a recently-signed bond is NOT parked').toBeNull();
     });
 
     it('over-aged signed bonds surface in the stuck readout', async () => {
