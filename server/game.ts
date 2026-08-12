@@ -808,6 +808,7 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'unequip_bag',
   'use',
   'discard',
+  'lock_item',
   'buy',
   'sell',
   'buyback',
@@ -6820,6 +6821,15 @@ export class GameServer {
             pid,
             slot,
           );
+        }
+        break;
+      case 'lock_item':
+        // Always a named slot (issue 3042): a lock toggle mutates ONE specific
+        // bag copy in place, never an id-only bulk action, so a missing/invalid
+        // slot is simply refused inside the sim (selectedInventorySlot).
+        if (typeof msg.item === 'string' && typeof msg.locked === 'boolean') {
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          sim.setItemLocked(msg.item, msg.locked, pid, slot);
         }
         break;
       case 'buy':
