@@ -99,41 +99,48 @@ await page.evaluateOnNewDocument(
   `localStorage.setItem('claudecraft_admin_token', ${JSON.stringify(adminToken)});
    localStorage.setItem('claudecraft_admin_name', ${JSON.stringify(adminUser)});`,
 );
-await page.goto(`${GAME_URL}/admin.html?page=accounts`, { waitUntil: 'networkidle2' });
-
-// Search for the target and open its modal through the real table row.
-await page.waitForSelector('#account-search', { timeout: 30000 });
-await page.type('#account-search', targetUser);
-await page.waitForFunction(
-  (user) =>
-    [...document.querySelectorAll('tr.clickable td')].some((td) => td.textContent?.includes(user)),
-  { timeout: 30000 },
-  targetUser,
-);
-await page.evaluate((user) => {
-  const row = [...document.querySelectorAll('tr.clickable')].find((tr) =>
-    tr.textContent?.includes(user),
-  );
-  row?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-}, targetUser);
-
 const panel = '.cheater-mark-controls';
-await page.waitForSelector(panel, { visible: true, timeout: 30000 });
-await page.evaluate(
-  (sel) => document.querySelector(sel)?.scrollIntoView({ block: 'center' }),
-  panel,
-);
-await sleep(400);
+
+// A viewport change resets the accounts page and closes the modal, so every
+// framing (and every viewport) walks the real path again: search the table,
+// click the row, wait for the panel.
+async function openAccountModal() {
+  await page.goto(`${GAME_URL}/admin.html?page=accounts`, { waitUntil: 'networkidle2' });
+  await page.waitForSelector('#account-search', { timeout: 30000 });
+  await page.type('#account-search', targetUser);
+  await page.waitForFunction(
+    (user) =>
+      [...document.querySelectorAll('tr.clickable td')].some((td) =>
+        td.textContent?.includes(user),
+      ),
+    { timeout: 30000 },
+    targetUser,
+  );
+  await page.evaluate((user) => {
+    const row = [...document.querySelectorAll('tr.clickable')].find((tr) =>
+      tr.textContent?.includes(user),
+    );
+    row?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  }, targetUser);
+  await page.waitForSelector(panel, { visible: true, timeout: 30000 });
+  await page.evaluate(
+    (sel) => document.querySelector(sel)?.scrollIntoView({ block: 'center' }),
+    panel,
+  );
+  await sleep(400);
+}
+
+await openAccountModal();
 await page.screenshot({ path: `${OUT}/panel-unmarked.png`, fullPage: true });
 console.log(`${OUT}/panel-unmarked.png`);
 
 // Mobile of the same state: the controls stack single-column.
 await page.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true });
-await sleep(500);
+await openAccountModal();
 await page.screenshot({ path: `${OUT}/panel-unmarked-mobile.png`, fullPage: true });
 console.log(`${OUT}/panel-unmarked-mobile.png`);
 await page.setViewport({ width: 1440, height: 900 });
-await sleep(300);
+await openAccountModal();
 
 // The apply flow, left exactly as an operator would just before committing:
 // budget typed, reason typed, confirm enabled.
@@ -172,7 +179,7 @@ await page.screenshot({ path: `${OUT}/panel-marked.png`, fullPage: true });
 console.log(`${OUT}/panel-marked.png`);
 
 await page.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true });
-await sleep(500);
+await openAccountModal();
 await page.screenshot({ path: `${OUT}/panel-marked-mobile.png`, fullPage: true });
 console.log(`${OUT}/panel-marked-mobile.png`);
 
