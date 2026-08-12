@@ -381,8 +381,13 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(postCommitTimeoutOff).toBeLessThan(sessionLock);
 
     // The invalid-carcass check runs under the session lock, before the create
-    // it protects; on a healthy boot (no carcass) nothing is dropped.
-    const carcassCheck = h.calls.findIndex((sql) => sql.includes('indisvalid'));
+    // it protects; on a healthy boot (no carcass) nothing is dropped. Scoped
+    // past the session lock because the boot-DDL schema strings legitimately
+    // carry their own validity gates (the woc_market repair gates) inside the
+    // boot transaction; a -1 (no post-lock check at all) still fails below.
+    const carcassCheck = h.calls.findIndex(
+      (sql, i) => i > sessionLock && sql.includes('indisvalid'),
+    );
     expect(carcassCheck).toBeGreaterThan(sessionLock);
     expect(carcassCheck).toBeLessThan(concurrentIndex);
     expect(h.calls.some((sql) => sql.includes('DROP INDEX CONCURRENTLY'))).toBe(false);

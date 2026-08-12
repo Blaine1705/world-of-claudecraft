@@ -82,11 +82,19 @@ describe('Armory preview lifecycle', () => {
     );
     expect(hudStart).toBeGreaterThan(-1);
     const compose = hud.slice(hudStart, hud.indexOf('startPostEntryPreviewPrewarm(', hudStart));
-    expect(compose).toContain('buildPostEntryPreviewPrewarmUnits');
+    // The Hud composes through the stateless wiring module (the monolith
+    // ratchet extraction), which is where the plan call and the async portrait
+    // routing now live.
+    expect(compose).toContain('buildHudPreviewPrewarmUnits');
+    const wiring = readFileSync(
+      new URL('../src/ui/preview_prewarm_wiring.ts', import.meta.url),
+      'utf8',
+    );
+    expect(wiring).toContain('buildPostEntryPreviewPrewarmUnits');
     // The prewarm variant, not the sync playerPortraitDataUrl: uploads prepaid
     // in bounded slices and the PNG encode off-thread (the sync capture books
     // 43 to 201 ms per cold portrait); a later sync call is a cache hit.
-    expect(compose).toContain('prewarmPlayerPortrait(portraitClass as PlayerClass, skin, framing)');
+    expect(wiring).toContain('prewarmPlayerPortrait(portraitClass as PlayerClass, skin, framing)');
   });
 
   it('prewarms player-card poses and never resizes the live preview to capture them', () => {
