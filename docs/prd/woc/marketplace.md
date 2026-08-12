@@ -214,7 +214,11 @@ refused at escrow, or never be offered in the picker at all.
 - Sellers cannot bid on their own auctions (account and linked-wallet checks).
 - Bids cannot be withdrawn; there is deliberately no endpoint for it.
 - Sellers cannot cancel after the first confirmed bid except through support
-  (admin action that returns the item and refunds bonds).
+  (admin action that returns the item and refunds bonds). The support path is
+  itself settlement-aware: while a payment may already be moving (a live buy-now
+  quote, or a settlement in confirming and beyond), the admin suspend refuses
+  too, and the resolution waits for the settlement to reach a terminal state
+  (the bounded confirming resolution is what restores an operator exit there).
 - Every settled sale lands in a public, per-item sales history (provenance);
   admins can exclude suspicious sales from public price statistics.
 - Marketplace strikes and progressive suspensions are account-scoped and

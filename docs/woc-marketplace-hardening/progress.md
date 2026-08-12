@@ -67,7 +67,7 @@ the coverage auditor's rework of the interleave test to drive the REAL
 cancelListingIfUnbid, the full five-state index predicate pin, the
 settlement_live suspend arm at service level, the cascade-conflict unwind arm,
 the refund_due intermediate stamp under a stalled refund pipeline, and a
-concurrent double-insert race. Real-SQL suite: 26 tests, run green against the
+concurrent double-insert race. Real-SQL suite: 27 tests, run green against the
 dev Postgres (TEST_DATABASE_URL; the suite skips without it). The
 fails-on-old-behavior proof: the first red run against the unfixed code failed
 15 of 19 original tests on their real assertions.

@@ -177,41 +177,89 @@ Still open (a phase that hits one asks at session start):
 - 02 settlement-state-guards (2026-08-11, session start 0f029bacf9, LOCAL, not
   pushed per R4): B1, H9, the B2a groundwork, and the sale invariant closed.
   The registry later phases need:
-  - Error code: `woc_market.settlement_in_flight` (409) with catalog leaf
+  - Error codes: `woc_market.settlement_in_flight` (409) with catalog leaf
     `apiError.woc_market.settlement_in_flight` and five non-Latin fills.
     Seller cancel maps an unexpired lock to `buy_now_locked` and a live
     settlement to `settlement_in_flight`; the admin suspend route answers 409
-    with its own admin-envelope English.
+    with its own admin-envelope English. The 02 QA round added
+    `woc_market.contended` (409, the bounded lock-wait or deadlock-victim
+    refusal on cancel/suspend/buy-now; retry immediately) and
+    `woc_market.sale_conflict` (409, an admin sale correction blocked by a
+    standing non-excluded row), both with catalog leaves and five non-Latin
+    fills; the admin sale route answers the conflict with its own 409
+    envelope line.
   - Indexes: `woc_market_settlements_open` (UNIQUE partial, state IN offered/
     confirming/confirmed/delivering/delivered) REPLACED
     `woc_market_settlements_live`; `woc_market_sales_listing_once` (UNIQUE
     partial ON woc_market_sales(listing_id) WHERE excluded = false). Both ride
     boot DDL with idempotent pre-flight repair UPDATEs above them (settlement
-    losers demoted to expired with fail_reason 'schema_dedupe'; later
+    losers demoted to expired with fail_reason 'schema_dedupe' plus any prior
+    reason appended after a colon, so sweep with LIKE 'schema_dedupe%'; later
     duplicate sales voided excluded = true), a recorded decision AGAINST
     concurrent_indexes.ts: the tables are pre-enable empty and a CONCURRENTLY
     build can leave an INVALID carcass that silently drops the invariant.
+    Since the 02 QA round the repair gates read pg_index VALIDITY (not
+    to_regclass), and each CREATE is preceded by a drop of an INVALID
+    same-named carcass: a failed hand-run CONCURRENTLY build can no longer
+    satisfy IF NOT EXISTS while enforcing nothing (proven by a real carcass
+    test). DB-free structural pins for the whole DDL surface live in
+    `tests/server/woc_market_directed_sql.test.ts`.
   - Db seam: `cancelListingIfUnbid(realm, id, seller, nowMs)` refuses
-    `buy_now_pending` and `settlement_live` and expires 'failed' rows
-    (fail_reason 'listing_cancelled') on success; new `suspendListingIfSafe`
-    proceeds only over offered/failed (the safe path: refuse whenever a
-    signature exists); `insertSettlement` takes `winnerBidId` (won stamped
-    in-tx, CAS from active/outbid) and returns 'listing_closed' distinctly;
-    `nextCascadeBidder` replaced promoteNextBidder (selection only);
-    `markBidStatus` grew an optional `from` CAS; `setSaleExcluded` catches
-    23505 to false.
-  - LOCK ORDER RULE for every multi-row market transaction: bid rows first,
-    listing row second (activateBid's order); the reverse deadlocks. Both
-    guard transactions run `SET LOCAL lock_timeout` (ESCROW_LOCK_TIMEOUT_MS).
+    `buy_now_pending`, `settlement_live`, and `contended`, and expires
+    'failed' rows (fail_reason 'listing_cancelled') on success; new
+    `suspendListingIfSafe` proceeds only over failed or UNQUOTED offered (a
+    stamped, unexpired quote refuses like confirming: the buyer may already
+    have broadcast payment); `insertSettlement` takes `winnerBidId` +
+    `winnerFrom` (won stamped in-tx, CAS from the caller's pickable set:
+    close arm ['active'], cascade ['outbid']), locks the LISTING row and
+    re-checks status under it (the snapshot predicate alone provably lets a
+    settlement land on a just-closed listing), and returns 'listing_closed',
+    'winner_gone', and 'contended' distinctly; `nextCascadeBidder` replaced
+    promoteNextBidder (selection only); `markBidStatus` grew an optional
+    `from` CAS; `markBidOutbidQueueRefund` is the atomic loser demote
+    (outbid + held-bond refund in one statement, CAS from 'active');
+    `closeListingIfNoOpenSettlement` guards the no-winner close arms (refusal
+    parks the listing 'settling'); `reopenListing` fail-closes against open
+    settlements and the reclaim arm expires 'failed' rows first
+    (`expireFailedSettlementsForListing`, fail_reason 'listing_reclaimed');
+    `transitionSettlement` reports the revival-vs-open-index 23505 as false
+    (settlementQuote refuses instead of 500ing); `setSaleExcluded` returns
+    'ok' | 'miss' | 'conflict'.
+  - LOCK ORDER RULE for every multi-row market transaction: bid rows first
+    (the whole open set, by id: activateBid pre-locks it since the 02 QA
+    round, the reproduced 40P01 fix), listing row second; the reverse
+    deadlocks. Guard transactions run `SET LOCAL lock_timeout`
+    (ESCROW_LOCK_TIMEOUT_MS) and surface 55P03/40P01 as the typed
+    'contended' refusal. Now also recorded in server/CLAUDE.md (the
+    woc_market Key-files row).
   - Ops caveats for the phase 22 runbook: the deploy is forward-only (an OLD
     binary against the NEW schema re-opens the settlement-less-won-bid window
     and its reclaim arm can still reopen delivered-but-unclosed listings; the
-    market must stay disabled through any mixed-fleet window). Detection
-    queries: duplicate open settlements `SELECT listing_id FROM
-    woc_market_settlements WHERE state IN ('offered','confirming','confirmed',
-    'delivering','delivered') GROUP BY listing_id HAVING count(*) > 1`;
-    duplicate sales `SELECT listing_id FROM woc_market_sales WHERE excluded =
-    false GROUP BY listing_id HAVING count(*) > 1`.
+    market must stay disabled through any mixed-fleet window). The disable is
+    also load-bearing for BOOT AVAILABILITY: an old binary writing between
+    the repair scan and the CREATE INDEX makes the new boot's index build
+    fail, roll back, and exit; the retry self-heals but a persistent writer
+    is a boot loop. Under the new schema an old binary's double delivery now
+    THROWS at insertSale (23505) instead of minting a silent duplicate: the
+    safer direction, but a new old-binary failure mode. Never hand-drop
+    `woc_market_settlements_open` or `woc_market_sales_listing_once` during
+    an incident: the validity gate re-arms and the next boot demotes live
+    settlements as schema_dedupe. Detection queries, PRE-upgrade only (after
+    a successful boot both return zero by construction): duplicate open
+    settlements `SELECT listing_id FROM woc_market_settlements WHERE state IN
+    ('offered','confirming','confirmed','delivering','delivered') GROUP BY
+    listing_id HAVING count(*) > 1`; duplicate sales `SELECT listing_id FROM
+    woc_market_sales WHERE excluded = false GROUP BY listing_id HAVING
+    count(*) > 1`. POST-upgrade audits: repaired settlements `SELECT * FROM
+    woc_market_settlements WHERE fail_reason LIKE 'schema_dedupe%'` (any that
+    reached confirming may still land on chain: reconcile by hand, and check
+    their bids for a stranded 'won' + 'held' bond pair, which no sweep arm
+    reaches); repaired sales `SELECT s.* FROM woc_market_sales s WHERE
+    s.excluded = true AND EXISTS (SELECT 1 FROM woc_market_sales t WHERE
+    t.listing_id = s.listing_id AND t.excluded = false)` (also matches
+    legitimate operator voids with a standing correction). Before enable,
+    EXPLAIN the two repair quals against the grown tables (rides the phase
+    16/17 EXPLAIN list).
   - HARD PREREQUISITE FOR ENABLE, recorded from the 02 security review: a
     settlement stuck in 'confirming' now has NO escape hatch at all (cancel,
     suspend, and reclaim all refuse; the old unsafe suspend arm that could
@@ -219,4 +267,16 @@ Still open (a phase that hits one asks at session start):
     confirming resolution) is what restores an exit; it must land before
     WOC_MARKET_ENABLED is ever set. R8 (lock-spam cancel denial) is the other
     02-raised ruling.
+  - Handed to phase 03 by the 02 QA round (delivery/reconcile scope): a
+    settlement that reaches 'delivered' without its close tail (crash between
+    the delivered CAS and closeListing, or the deferred insertSale 23505)
+    leaves the listing in 'settling' FOREVER with no sweep arm reading
+    'delivered' and no operator escape (cancel, suspend, reclaim all refuse):
+    the reconcile arm needs a delivered-re-drive, and deliverOne should
+    refuse when listing.itemDisposed is already true (belt against the
+    return-then-deliver dupe shape).
+  - Handed to phase 04 (buy-now lock lifecycle): `clearBuyNowLock` carries no
+    holder guard (any caller clears whoever's lock); safe at every current
+    call site, but a guarded variant would make the safety local. Rides
+    beside R8.
   NEXT = phase-02-qa.md fresh session.
