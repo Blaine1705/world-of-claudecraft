@@ -290,13 +290,6 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.dieBySword': 'Diminue les dégâts subis de {pct}%',
   'hudChrome.auraEffect.victoryRush': 'Élan de victoire est prêt',
   'hudChrome.auraEffect.maxHpPct': 'Accroît les points de vie maximum de {pct}%',
-  'hudChrome.otaUpdate.title': 'Mise à jour du jeu',
-  'hudChrome.otaUpdate.downloading': 'Téléchargement de la mise à jour : {percent}',
-  'hudChrome.otaUpdate.applying': "Mise à jour téléchargée. Le jeu redémarre pour l'appliquer.",
-  'hudChrome.otaUpdate.incompatible':
-    'Une mise à jour est nécessaire pour jouer. Elle sera appliquée dès la fin du téléchargement.',
-  'hudChrome.otaUpdate.continueAnyway': 'Continuer sans mettre à jour',
-  'hudChrome.otaUpdate.progressLabel': 'Progression du téléchargement de la mise à jour',
   'hudChrome.statInfo.desc.parry':
     'Vos chances de parer entièrement une attaque de mêlée de front, sans subir de dégâts. Un coup porté dans le dos ne peut pas être paré.',
   'hudChrome.interfaceTabs.chat': 'Clavardage',
