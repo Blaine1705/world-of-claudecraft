@@ -220,6 +220,7 @@ import {
   mobVoiceCueWithFallback,
   novaAbilityCue,
   playerSwingCueForDamage,
+  playerVoiceCue,
   shouldPlayCombatImpactForTarget,
   shouldPlayCritSfxForTarget,
   shouldPlayMobVoiceSfxForEntity,
@@ -1258,6 +1259,12 @@ function appendChildSpan(parent: HTMLElement, className: string): HTMLElement {
 
 function availableMobVoiceCue(templateId: string, action: MobVoiceAction): string | null {
   return mobVoiceCue(templateId, action, (key) => sfx.hasVariants(key));
+}
+
+/** The `hasCue` probe playerVoiceCue resolves its gendered key against, same
+ *  injection the mob resolver above uses. */
+function sfxHasCue(key: string): boolean {
+  return sfx.hasVariants(key);
 }
 
 // Stable voice-clip key for a spoken yell line. MUST match the generator slug in
@@ -11142,12 +11149,12 @@ export class Hud {
         }
         if (ev.crit && shouldPlayCritSfxForTarget(tgt))
           this.combat('combat_crit', tp.x, tp.y, tp.z, 1.0);
-        // pain vocalization only on a crit — never on ordinary hits.
-        // player_hurt_female_1..5 exist under public/audio/sfx but are unwired: no
-        // gender field exists on PlayerMeta yet. Once the model swap defines one,
-        // resolve here via the mobVoiceCue hasCue-fallback pattern (src/ui/combat_sfx.ts).
+        // pain vocalization only on a crit, never on ordinary hits. Voiced per
+        // the target's own authored gender (playerVoiceCue): a female look gets
+        // the female takes, everything else keeps the shipped male ones.
         if (ev.crit && ev.targetId === sim.playerId) {
-          this.combat('player_hurt', tp.x, tp.y, tp.z, 1.0, { cooldown: 0.3 });
+          const cue = playerVoiceCue(tgt?.modularAppearance, 'hurt', sfxHasCue);
+          this.combat(cue, tp.x, tp.y, tp.z, 1.0, { cooldown: 0.3 });
         } else {
           const mobAction = mobVoiceActionForDamage(ev, tgt);
           if (mobAction && shouldPlayMobVoiceSfxForEntity(tgt)) {
@@ -11301,11 +11308,13 @@ export class Hud {
           const voice = availableMobVoiceCue(ent.templateId, 'death');
           if (voice && shouldPlayMobVoiceSfxForEntity(ent)) this.combat(voice, p.x, p.y, p.z, 1.0);
         } else if (ent.kind === 'player' && ev.entityId !== sim.playerId) {
-          // player_death_female_1..3 exist under public/audio/sfx but are unwired,
-          // see the player_hurt note above. This branch is OTHER players dying;
-          // your OWN character's death sound is a separate trigger site,
-          // audio.playerDeath() in src/game/audio.ts.
-          this.combat('player_death', p.x, p.y, p.z, 1.0);
+          // This branch is OTHER players dying; your OWN character's death
+          // sound is a separate trigger site, audio.playerDeath() in
+          // src/game/audio.ts. Voiced per the dying player's own authored
+          // gender, which rides their identity wire, so a female character you
+          // watch die sounds female to you.
+          const cue = playerVoiceCue(ent.modularAppearance, 'death', sfxHasCue);
+          this.combat(cue, p.x, p.y, p.z, 1.0);
         }
         return;
       }
@@ -13712,7 +13721,11 @@ export class Hud {
             : undefined;
           const feedback = deathRecapFeedback(killerName, ev.killerAbility, abilityName);
           this.log(t(feedback.key, feedback.values), '#ff4444');
-          audio.playerDeath();
+          // Your OWN death cry, voiced by your authored gender. Resolved here
+          // rather than in audio.ts because picking it needs the appearance,
+          // which that host-agnostic cue facade has no access to.
+          const self = sim.entities.get(sim.playerId);
+          audio.playerDeath(playerVoiceCue(self?.modularAppearance, 'death', sfxHasCue));
           break;
         }
         case 'respawn':
