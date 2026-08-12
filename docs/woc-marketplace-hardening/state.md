@@ -68,6 +68,22 @@ Resolved (Fernando, 2026-08-11):
 - R4 (all phases): RESOLVED: push after each QA PASS (or PASS-WITH-FOLLOWUPS with fixes
   applied), repos the pair touched; implement sessions never push; FAIL pushes nothing.
   Exact push commands live in implementation-plan.md commit rules.
+- R8 (phases 04/06, resolved Fernando 2026-08-12): the public buy-now
+  claim-then-abandon loop gets BOTH arms, no strikes:
+  - Cooldown: after an account abandons (or times out) a public buy-now lock,
+    it cannot re-claim THAT listing for a cooldown, plus a small account-wide
+    abandons-per-hour cap that triggers a broader claim cooldown. The phase
+    proposes the numbers; QA re-judges them. Public abandons still carry no
+    strike (strikes stay reserved for real payment defaults; directed-sale
+    abandons keep their existing strike).
+  - Cancel-intent: a seller's cancel on a LOCKED listing marks it
+    cancel-pending instead of refusing: no NEW lock claims from that moment,
+    the current holder keeps their full window, and an unpaid expiry closes
+    the listing cancelled (return flight home) instead of relisting. Bounds
+    the seller's worst-case cancel denial at exactly one lock window. Compose
+    with the 02 liveness guards (a PAID window proceeds to settlement as
+    usual; cancel-pending must never tear a live settlement) and the 02
+    handoff that clearBuyNowLock carries no holder guard.
 
 Still open (a phase that hits one asks at session start):
 
@@ -84,12 +100,6 @@ Still open (a phase that hits one asks at session start):
   player wiki/guide page, game-side audited runtime pause, numeric reserve guard. They
   stay in the follow-ups queue; if he opts any in later, add it as a new numbered phase
   before phase 21 and update progress.md and the plan table.
-- R8 (raised by the 02 security review, phases 04/06): with cancel now settlement-aware,
-  a wallet-verified buyer can claim the public buy-now lock, abandon it, and re-claim
-  in a loop, keeping a seller's listing un-cancellable at zero cost (public abandons
-  deliberately carry no strike). Options: a per-account claim-then-abandon counter or
-  cooldown, a strike after N public abandons, or accept as-is (the balance gate is the
-  only bar). Needs a product call before enable.
 
 ## Locked decisions
 
