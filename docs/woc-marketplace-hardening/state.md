@@ -7,11 +7,18 @@ actually reads.
 
 - Next file to run: `docs/woc-marketplace-hardening/phase-04-qa.md`
 - Packet created 2026-08-11 from `review.md` (the 2026-08-11 three-repo review).
-- 04 implemented (LOCAL, not pushed per R4): H4, H15, the anti-snipe medium,
-  R8 both arms, and the 02 clearBuyNowLock handoff; ledger entry below. The
-  H15 escape hatch that gated enable now exists (the 'review' state); the
-  cooldown NUMBERS and the cancel-intent bid-block interpretation await the
-  QA re-judgment.
+- 04 implemented AND reviewed THIS session (LOCAL, not pushed per R4): H4,
+  H15, the anti-snipe medium, R8 both arms, and the 02 clearBuyNowLock
+  handoff; ledger entry below. Six reviewer lanes ran (privacy-security,
+  database-performance, test-coverage each TWICE; qa-checklist READY;
+  migration-safety no critical/warning), every finding applied or owned
+  across THREE fix rounds; 17 mutation spot-proofs bit; gate GREEN at
+  0afdaa71a5 (full-suite fallback). The H15 escape hatch that gated enable
+  exists (the 'review' state). Items the DEDICATED phase-04-qa session still
+  owns: re-judge the cooldown NUMBERS and the cancel-intent bid-block
+  interpretation (recorded in progress.md), and the R4 push. Deferred to
+  phase 14 with owners: the anti-snipe deadline player-copy consequence, the
+  cancel-intent client marker, the claim_cooldown remaining-time copy.
 - 01 implemented AND QA'd (PASS-WITH-FOLLOWUPS, fixes applied, PUSHED).
 - 02 implemented AND QA'd (PASS-WITH-FOLLOWUPS, every fix applied, PUSHED at
   the QA tip; gate GREEN at 301a8c7c22); see the ledger below and progress.md
