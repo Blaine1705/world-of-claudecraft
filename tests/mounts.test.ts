@@ -224,7 +224,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
     // Deriving the expectation from MOUNTS[key].rarity rather than a hand-listed
     // table is what makes a future re-tier impossible to land half-done: move a
     // mount's rarity without moving its drop and this reds immediately.
-    const nyth = HEROIC_BOSS_LOOT['nythraxis_scourge_of_thornpeak'] ?? [];
+    const nyth = HEROIC_BOSS_LOOT.nythraxis_scourge_of_thornpeak ?? [];
     const CHANCE_FOR_RARITY: Record<string, number> = { uncommon: 0.005, rare: 0.001 };
     // The FIVE-MAN bosses carrying each drop-tier mount, pinned explicitly (the
     // heroic raid carries all four on top of these). Listed rather than counted
