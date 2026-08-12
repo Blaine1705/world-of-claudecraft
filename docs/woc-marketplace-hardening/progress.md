@@ -8,7 +8,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 01 | branch-baseline | game | DONE (QA PASS) | e4c3dde956 | five re-review verdicts CLEAN (section below); woc_trade extraction landed; gate GREEN at 418f75b876 (full-suite fallback) |
 | 01 QA | phase-01-qa | game | DONE | 07fda3fd46 | PASS-WITH-FOLLOWUPS, all fixes applied (section below); gate GREEN at final tip 1d7bdbafa0; pushed per R4 (no open PR on this branch, so no PR CI; pre-push floor green) |
 | 02 | settlement-state-guards | game | DONE | 0f029bacf9 | release sync was a no-op (already at v0.37.0 tip); real-SQL suite 27 green vs dev Postgres; reviewer round + deferrals in section below; gate GREEN at tip 6916bd6944 (full-suite fallback; first run flaked on the known heavy-suite timeouts while external load averaged 40+, clean on the rerun) |
-| 02 QA | phase-02-qa | game | NOT STARTED | | |
+| 02 QA | phase-02-qa | game | DONE | 20fdcc5288 | PASS-WITH-FOLLOWUPS, every fix applied (section below); release/v0.37.0 synced in (merge b40a178643, one generated-i18n conflict regenerated; merge audit clean except the hud.ts ceiling, fixed by extraction); gate GREEN at 301a8c7c22 (full-suite fallback, all 8 steps); pushed per R4 |
 | 03 | delivery-exactly-once | game | NOT STARTED | | |
 | 03 QA | phase-03-qa | game | NOT STARTED | | |
 | 04 | bond-payment-lifecycle | game | NOT STARTED | | |
@@ -108,6 +108,78 @@ Deferrals and decisions, each with an owner (do NOT re-raise):
   pre-existing 404 line beside it) go to the error-i18n surface (phase 14),
   and a CI job that sets TEST_DATABASE_URL so the pg suite stops being
   skip-only goes to the real-SQL coverage work (phase 20).
+
+## 02 QA round (verdict PASS-WITH-FOLLOWUPS, every fix applied)
+
+Session start synced release/v0.37.0 (merge b40a178643; the one conflict, the
+generated resolved-i18n pending slice, regenerated per the content-union
+rule). The release-merge audit ran as six lanes: every coordinator clean, the
+one real break the zero-headroom hud.ts ceiling (release added prewarm lines),
+fixed by extracting src/ui/preview_prewarm_wiring.ts with its own suite and
+lowering the ceiling. Seven audit lanes then ran over the phase diff
+(correctness, test-coverage, dead-code/cleanup, privacy-security,
+migration-safety, database-performance, and a fake-vs-Postgres fidelity
+audit), and the whole fix round was re-reviewed by a fresh reviewer as
+unreviewed code. Roughly 70 findings surfaced; ALL were applied except the
+reasoned resolutions recorded below. The reproduced-and-fixed defects:
+
+- The audit-blocking dupe holes: a settlement could land on a listing a
+  concurrent suspend or cancel just closed (the INSERT's snapshot predicate
+  passes the FK re-check; reproduced against real Postgres, fixed with an
+  explicit listing row lock inside insertSettlement), and the no-winner close
+  arms could close no_bids or reserve_not_met under a live buy-now settlement
+  (attacker-timeable item dupe; fixed with the lock-then-check
+  closeListingIfNoOpenSettlement that parks the listing 'settling').
+- The reproduced 40P01: activateBid's third lock (the previous current bid,
+  taken after the listing) crossed the suspend guard's ordered scan; fixed by
+  pre-locking the whole open bid set in id order, with a deterministic
+  three-client interleave pin that reds under the old order.
+- The retry revival racing a second open settlement threw an uncaught 23505
+  (a 500 on a money path); transitionSettlement reports it as a CAS miss and
+  settlementQuote refuses BEFORE issuing any quote.
+- The fresh fix-round review then caught the fix round's own regression: the
+  reclaim arm expiring a 'failed' settlement at the stranded grace (half the
+  settlement window) silently skipped the overdue deadline pass (default,
+  forfeit, strike, cascade) and stranded the held bond. Fixed by parking
+  instead (the reopen refuses over failed rows; the deadline pass keeps its
+  jurisdiction), plus a CTE in the suspend expiry that releases a dead
+  settlement's won bid to cancelled/refund_due.
+- Hardening from the lanes: suspend leaves a quoted, unexpired 'offered'
+  settlement alone (the buyer may already have broadcast payment); both boot
+  repairs gate on pg_index VALIDITY through the to_regclass house idiom with
+  invalid-carcass drops ahead of each CREATE (a real carcass test proves the
+  boot sees through it); the atomic one-statement loser demote; per-caller
+  winner pickable sets with the distinct 'winner_gone'; typed 'contended'
+  (55P03/40P01) end to end with catalog fills, answered 409 on cancel,
+  buy-now, and both admin envelope arms; setSaleExcluded's distinct
+  'conflict'; the forensic schema_dedupe fail_reason append; the DB-free
+  structural floor in woc_market_directed_sql.test.ts (indexes, five-state
+  predicate, validity gates, repair ranking, and the fake's state list, which
+  now derives its suspend blocking set); fake fidelity fixes (transition
+  open-refusal so the fake cannot reach a two-open state, signature
+  self-match skip, cascade tie-break pins both dimensions).
+- Twelve mutations were run against the new pins after committing; every one
+  failed its named test with the suites demonstrably running (the deadlock
+  pin dies on the literal 'deadlock detected' under the old order).
+- Validation: real-SQL suite grew 27 to 41, green against dev Postgres; the
+  DDL apply-twice/thrice probe is a byte-identical no-op with both indexes
+  valid; S3 guard, i18n gates, tsc, ci:changed green; the full gate ran three
+  times (the first red found the merged-tree fallout: two pins of mine to
+  re-anchor, redundant dialect OTA rows the release's base fills created, and
+  the stale-node_modules class where the release's three.js patch bump also
+  explained the portrait-manifest fingerprint; a receipt rerender reproduced
+  all 230 portraits byte for byte) and PASSED at 301a8c7c22.
+
+Reasoned resolutions (not silent declines): woc_market.sale_conflict stays
+registered though the admin envelope pre-empts it today (the Record type and
+parity gate require the row; phase 14's admin-envelope conversion switches
+the bespoke 409 lines to the registered codes, recorded in state.md); the
+reserve-arm's contended-refusal can later record 'no_bids' instead of
+'reserve_not_met' (cosmetic, documented at the arm; the demote-before-close
+crash posture is load-bearing); the fake's createdAtMs uses the injected
+clock where Pg uses now() (harmless, noted by two lanes); the suspend
+guard's 'offered' open-check member is unreachable single-threaded but is a
+real concurrency arm (kept, per the coverage lane's own verdict).
 
 ## Merge re-review verdicts (01, merge a52da32c89)
 

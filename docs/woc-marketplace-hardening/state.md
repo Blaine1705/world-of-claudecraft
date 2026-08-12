@@ -5,11 +5,12 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-02-qa.md`
+- Next file to run: `docs/woc-marketplace-hardening/phase-03-delivery-exactly-once.md`
 - Packet created 2026-08-11 from `review.md` (the 2026-08-11 three-repo review).
 - 01 implemented AND QA'd (PASS-WITH-FOLLOWUPS, fixes applied, PUSHED).
-- 02 implemented (settlement-state guards; LOCAL, not pushed per R4); see the
-  ledger below and progress.md for the reviewer round and deferrals.
+- 02 implemented AND QA'd (PASS-WITH-FOLLOWUPS, every fix applied, PUSHED at
+  the QA tip; gate GREEN at 301a8c7c22); see the ledger below and progress.md
+  for the QA round, the reasoned resolutions, and the phase 03/04 handoffs.
 
 ## Repos and branches
 
@@ -288,4 +289,19 @@ Still open (a phase that hits one asks at session start):
     holder guard (any caller clears whoever's lock); safe at every current
     call site, but a guarded variant would make the safety local. Rides
     beside R8.
-  NEXT = phase-02-qa.md fresh session.
+- 02 QA (2026-08-11, session start 20fdcc5288, verdict PASS-WITH-FOLLOWUPS
+  with every fix applied, gate GREEN at tip 301a8c7c22, PUSHED per R4):
+  release/v0.37.0 synced (merge b40a178643; generated-i18n conflict
+  regenerated; merge audit clean except the hud.ts ceiling, fixed by the
+  preview_prewarm_wiring extraction, ceiling now EXACTLY 19338). Seven audit
+  lanes plus a fresh fix-round re-review; the registry bullets above were
+  updated in place and progress.md carries the full round. The db-seam facts
+  phase 03 inherits: insertSettlement locks the LISTING row (snapshot
+  predicate alone was proven insufficient against a concurrent closer);
+  closeListingIfNoOpenSettlement guards the no-winner close arms; the
+  reclaim PARKS failed settlements for the overdue default pass (never
+  expires them; reopen refuses over failed rows); the suspend expiry
+  releases a dead settlement's won bid via its CTE; 'contended' and
+  'sale_conflict' are registered refusals; the boot repairs gate on index
+  VALIDITY via to_regclass. Twelve mutation proofs all bit. Real-SQL suite
+  41 green. NEXT = phase-03-delivery-exactly-once.md fresh session.
