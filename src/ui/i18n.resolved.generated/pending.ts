@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hudChrome.nameplate.cheaterTag",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -18,6 +19,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "es_ES": [
+    "hudChrome.nameplate.cheaterTag",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -26,6 +28,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "fr_FR": [
+    "hudChrome.nameplate.cheaterTag",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -34,6 +37,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "fr_CA": [
+    "hudChrome.nameplate.cheaterTag",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -43,6 +47,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "hudChrome.nameplate.cheaterTag",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -51,6 +56,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "de_DE": [
+    "hudChrome.nameplate.cheaterTag",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -63,6 +69,7 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "hudChrome.nameplate.cheaterTag",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -72,6 +79,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "hudChrome.nameplate.cheaterTag",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -80,6 +88,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "nl_NL": [
+    "hudChrome.nameplate.cheaterTag",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -88,6 +97,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "pl_PL": [
+    "hudChrome.nameplate.cheaterTag",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -96,6 +106,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "id_ID": [
+    "hudChrome.nameplate.cheaterTag",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -104,6 +115,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "tr_TR": [
+    "hudChrome.nameplate.cheaterTag",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -112,6 +124,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "sv_SE": [
+    "hudChrome.nameplate.cheaterTag",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -120,6 +133,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "vi_VN": [
+    "hudChrome.nameplate.cheaterTag",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -128,6 +142,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "da_DK": [
+    "hudChrome.nameplate.cheaterTag",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",

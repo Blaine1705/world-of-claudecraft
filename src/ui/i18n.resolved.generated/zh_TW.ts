@@ -2453,7 +2453,8 @@ export const zh_TW: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "暫離"
+      "afkTag": "暫離",
+      "cheaterTag": "< 作弊者 >"
     },
     "mobTooltip": {
       "levelFamily": "等級 {level} {family}",

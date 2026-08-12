@@ -2453,7 +2453,8 @@ export const cs_CZ: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "PRYČ"
+      "afkTag": "PRYČ",
+      "cheaterTag": "< Cheater >"
     },
     "mobTooltip": {
       "levelFamily": "Úroveň {level} {family}",
