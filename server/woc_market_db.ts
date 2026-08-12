@@ -2669,11 +2669,12 @@ export class PgWocMarketDb implements WocMarketDb {
             WHERE listing_id = $1 AND status IN ('pending_bond', 'active')`,
           [args.listingId],
         );
-        // The verdict reads the CLOSE CAS alone: in principle a run could
-        // advance the settlement or insert a sale against an already-final
-        // listing and still report already_final, but deliverOne refuses
-        // disposed listings and the redrive page only returns OPEN listings,
-        // so no live caller can reach that combination.
+        // The verdict reads the CLOSE CAS alone. A racing close CAN land
+        // between deliverOne's itemDisposed read and this transaction, in
+        // which case the settlement CAS matches while the close does not and
+        // the run reports already_final; that is benign (the racing finalize
+        // already counted and notified, and deliverOne treats both verdicts
+        // as advanced), so the close verdict stays the single source.
         return (closed.rowCount ?? 0) > 0 ? ('finalized' as const) : ('already_final' as const);
       });
     } catch (err) {

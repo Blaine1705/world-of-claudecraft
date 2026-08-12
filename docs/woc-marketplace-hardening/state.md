@@ -432,7 +432,8 @@ Still open (a phase that hits one asks at session start):
     for its duration. During a mixed-fleet window the OLD binary also loses
     woc_market_settlements_state_created (the new boot drops it), so its
     readout sample sorts the delivering set unindexed: diagnostic-only and
-    transient, but expect that read to be slower until the fleet converges. onSweepError logs raw pg errors
+    transient, but expect that read to be slower until the fleet converges.
+    onSweepError logs raw pg errors
     (detail/where can echo character names and item JSON; fine today, but
     revisit before any account or wallet column joins those rows). The
     EXPLAIN list for phases 16/17 gains: the redrive page probe

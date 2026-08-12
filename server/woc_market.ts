@@ -929,10 +929,12 @@ export type WocSweepErrorTag = keyof WocSweepPassStats | 'deliver_grant' | 'deli
  *  its own, so a request-thread delivery can neither clobber a pass's
  *  contention verdict mid-flight nor inherit a stale one. */
 interface WocDeliveryScope {
-  /** One 'contended' outcome stops all further delivery work in this scope:
+  /** One 'contended' outcome stops the scope's remaining SETTLEMENT work
+   *  (the claim, both runDeliveryBatch arms, and the two residue beats):
    *  the rows a break leaves behind are already 'delivering', and retrying
    *  them seconds later only spends the lock_timeout budget the break
-   *  conserved. */
+   *  conserved. The return arm deliberately ignores it: it writes different
+   *  listings and only contributes park events here. */
   contended: boolean;
   /** Park EVENTS in this scope (rows newly parked or re-parked on a retry). */
   parked: number;
@@ -2323,13 +2325,19 @@ export class WocMarketService {
     // Pruned here rather than only at pass start (the eager confirm path
     // enters through this method without ever winning the sweep lock), and
     // BEFORE the contended return so a contended pass still ages the ledgers.
+    // A pass where BOTH delivery arms throw before reaching here skips one
+    // prune beat, which is harmless: backedOffIds filters on retryAtMs, so a
+    // stale entry can never exclude a row, only linger until the next prune.
     this.pruneLocalLedgers(nowMs);
     if (scope.contended) return 0;
     let advanced = 0;
     for (const settlement of batch) {
       const retryAt = this.parkedDeliveries.get(settlement.id);
       // Belt only: the batch reads already exclude rows inside their backoff
-      // window, but a row claimed THIS pass can also carry a fresh park stamp.
+      // window. The reachable case is an EAGER-confirm park landing between
+      // the reconcile arm's read and this row's turn in the loop (a freshly
+      // claimed 'confirmed' row can never be parked: parks live in
+      // 'delivering').
       if (retryAt !== undefined && retryAt > nowMs) continue;
       try {
         const out = await this.deliverOne(settlement);
@@ -2841,7 +2849,9 @@ export class WocMarketService {
       // to its buyer and must never take the return flight home.
       if (listing.resolution === 'sold') continue;
       const retryAt = this.parkedReturns.get(listing.id);
-      // Belt only: the backlog read already excludes backing-off rows.
+      // Belt only, and unlike the delivery twin's belt this one is currently
+      // UNREACHABLE (nothing but this serialized arm writes parkedReturns and
+      // the backlog read excludes backing-off rows): pure defense in depth.
       if (retryAt !== undefined && retryAt > nowMs) continue;
       try {
         if (await this.returnListingItem(listing)) {

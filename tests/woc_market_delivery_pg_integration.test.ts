@@ -1241,6 +1241,14 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       );
       expect(readout.stuckDelivering.count, 'rotation left the age column alone').toBe(1);
       expect(readout.stuckDelivering.sample[0]?.id).toBe(parked.id);
+      // The sample's updatedAtMs is the AGE SIGNAL the dashboard renders, and
+      // created_at sits one line above it in the same SELECT: pin the value
+      // to the hour-old stamp so a copy-paste swap cannot mis-report incident
+      // ages on the one surface built for incidents.
+      const sample = readout.stuckDelivering.sample[0];
+      expect(sample?.updatedAtMs).toBeLessThan(Date.now() - 55 * MINUTE_MS);
+      expect(sample?.updatedAtMs).toBeGreaterThan(Date.now() - 65 * MINUTE_MS);
+      expect(sample?.updatedAtMs).not.toBe(sample?.createdAtMs);
       const batch = await marketDb.deliveringSettlements(realm, 25, []);
       expect(batch.map((s) => s.id)).toEqual([fresher.id, parked.id]);
       // And a backing-off parked row is excluded from the read entirely.

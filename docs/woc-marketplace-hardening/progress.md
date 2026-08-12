@@ -72,8 +72,11 @@ listings); the atomic saveDeliveredCharacterBooked commits the fenced bags
 write and the booking together; the minute-scale redriven beat converges the
 old binary's delivered-unclosed and sold-undisposed residue over bounded id
 pages; sweep arms are error-isolated per arm AND per row with a break on
-contention; parked rows rotate (updated_at) with a 60s in-process backoff
-while the monitor ages on created_at; woc_market_monitor.ts serves the
+contention; parked rows rotate with a 60s in-process backoff (AMENDED by
+the 03 QA round: rotation moved to a dedicated sweep_parked_at column,
+the monitor ages on updated_at, and backing-off rows are EXCLUDED from
+the batch reads; the original rotate-updated_at/age-created_at shape was
+the QA round's blocking find); woc_market_monitor.ts serves the
 three stuck classes (saturating counts) through createCachedRead behind
 GET /internal/woc-market/stuck (dashboard secret) plus an
 only-when-stuck 5-minute log beat that warns once per failure streak.
@@ -113,10 +116,13 @@ that round: item-free letters (the seller sold notice) skip the claims
 ledger entirely (they can duplicate nothing, nothing ever re-notifies, and
 a parked notice polluted the readout forever); the returned arm got the same
 park-rotate-backoff-count-advanced treatment as the delivery arms; one
-contended finalize now stops ALL delivery work for the rest of the pass; a
-new (realm, state, created_at) index carries the delivering sample read;
-the readout count cap fails closed on a non-finite value; and the stale
-comments the fixes invalidated were rewritten.
+contended finalize stops the delivery work of its OWN scope (AMENDED by the
+03 QA round: contention became a per-entry scope, the sweep pass owning one
+and the eager confirm entry minting its own); the delivering sample read is
+carried by woc_market_settlements_state_updated (AMENDED: the QA round
+dropped the created_at index when the class's age signal moved to
+updated_at); the readout count cap fails closed on a non-finite value; and
+the stale comments the fixes invalidated were rewritten.
 
 Deferrals and decisions, each with an owner (do NOT re-raise):
 
