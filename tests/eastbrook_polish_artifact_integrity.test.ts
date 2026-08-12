@@ -699,10 +699,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the merge of the iOS constrained-memory zone-eviction fix
 // (evictFarZoneIfConstrained's rationale moved into zone_eviction_core.ts;
 // renderer.ts edits only) into release/v0.37.0. No capture was retaken.
+// Re-minted for the fix/ios-crash-reload-runtime-leak renderer.ts trim
+// (fix(render): trim renderer.ts under the monolith line ceiling). No
+// capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '0539d7aae4d3739f58ec97a2238145ab9f60d0d3da26750e56b06d691d89ce34';
+  'd1777df4935d7470befacfc3ee7e60b7ccee1accffef0826c654946454cf3006';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '3255c571f8cc9ee50f962f7e0ac9e6f01676243d5b221ee51ba94eb3690b757e';
+  '9c441b93cc263e42f3a06f808582561ebf348aa103556d5c30206a1d72318ba5';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1642,10 +1645,13 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // follows both parents' renderer.ts inputs, then this second-order
     // performance seal follows the swept evidence bytes. No capture was
     // retaken.
+    // Re-minted for the fix/ios-crash-reload-runtime-leak renderer.ts trim
+    // (fix(render): trim renderer.ts under the monolith line ceiling). No
+    // capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('600bb1d8a078eeb7528730ebaf9175540c8911e4b0fb30b6f5bd5693c455e617');
+    ).toBe('7c16664ecbe9711dc9e292daa57202c29e86852d0e3ba40a29d73b8a4b702a78');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

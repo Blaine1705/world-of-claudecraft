@@ -121,8 +121,11 @@ interface AttributionTargetFixture {
 // Re-minted for the merge of the iOS constrained-memory zone-eviction fix
 // (evictFarZoneIfConstrained; renderer.ts edits only) into release/v0.37.0.
 // No capture was retaken.
+// Re-minted for the fix/ios-crash-reload-runtime-leak renderer.ts trim
+// (fix(render): trim renderer.ts under the monolith line ceiling). No
+// capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '3255c571f8cc9ee50f962f7e0ac9e6f01676243d5b221ee51ba94eb3690b757e';
+  '9c441b93cc263e42f3a06f808582561ebf348aa103556d5c30206a1d72318ba5';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
