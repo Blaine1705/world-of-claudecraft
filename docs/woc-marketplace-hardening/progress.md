@@ -9,7 +9,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 01 QA | phase-01-qa | game | DONE | 07fda3fd46 | PASS-WITH-FOLLOWUPS, all fixes applied (section below); gate GREEN at final tip 1d7bdbafa0; pushed per R4 (no open PR on this branch, so no PR CI; pre-push floor green) |
 | 02 | settlement-state-guards | game | DONE | 0f029bacf9 | release sync was a no-op (already at v0.37.0 tip); real-SQL suite 27 green vs dev Postgres; reviewer round + deferrals in section below; gate GREEN at tip 6916bd6944 (full-suite fallback; first run flaked on the known heavy-suite timeouts while external load averaged 40+, clean on the rerun) |
 | 02 QA | phase-02-qa | game | DONE | 20fdcc5288 | PASS-WITH-FOLLOWUPS, every fix applied (section below); release/v0.37.0 synced in (merge b40a178643, one generated-i18n conflict regenerated; merge audit clean except the hud.ts ceiling, fixed by extraction); gate GREEN at 301a8c7c22 (full-suite fallback, all 8 steps); pushed per R4 (no open PR on this branch, so no PR CI; pre-push floor green) |
-| 03 | delivery-exactly-once | game | NOT STARTED | | |
+| 03 | delivery-exactly-once | game | DONE | e71a8cfd21 | release sync trivial (server/parse samplers only); B2a/B2b/B2c + monitor closed; five-reviewer round + fix round applied (section below); real-SQL suites 65 green; LOCAL, not pushed per R4 |
 | 03 QA | phase-03-qa | game | NOT STARTED | | |
 | 04 | bond-payment-lifecycle | game | NOT STARTED | | |
 | 04 QA | phase-04-qa | game | NOT STARTED | | |
@@ -49,6 +49,100 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 21 QA | phase-21-qa | service + game | NOT STARTED | | |
 | 22 | close-out | all three | NOT STARTED | | teardown offer lives in 22 QA |
 | 22 QA | phase-22-qa | all three | NOT STARTED | | |
+
+## 03 implement round (delivery exactly-once)
+
+Commits 1196e2bb28 (core), 9f8097c1fb (monitor + endpoint), a08653dbd2 (the
+five-reviewer fix round). Five reviewers ran over the committed diff
+(privacy-security, migration-safety, database-performance with measured
+EXPLAIN evidence on a throwaway Postgres, server-hot-path,
+test-coverage-auditor), then a fresh reviewer over the fix round and
+qa-checklist last. Four mutation spot-proofs bit before the fix round (the
+QA session owns the deep mutation pass).
+
+What shipped: the delivery close tail is ONE transaction
+(finalizeDeliveredSettlement: bids-then-listing pre-lock, delivered CAS
+accepting delivering|delivered, ON CONFLICT sale dedupe, merged
+close+dispose UPDATE, bond flips); custody claims carry rail attribution
+(grant_character_id, mail_intent_at) and a resume needs PROOF (this
+process's pendingMail/pendingGrants continuity, or the parcel still in the
+live book, or booked_at); everything unattributable PARKS visibly (bare
+claims, collected letters, lease fences, restarts, relogs, disposed
+listings); the atomic saveDeliveredCharacterBooked commits the fenced bags
+write and the booking together; the minute-scale redriven beat converges the
+old binary's delivered-unclosed and sold-undisposed residue over bounded id
+pages; sweep arms are error-isolated per arm AND per row with a break on
+contention; parked rows rotate (updated_at) with a 60s in-process backoff
+while the monitor ages on created_at; woc_market_monitor.ts serves the
+three stuck classes (saturating counts) through createCachedRead behind
+GET /internal/woc-market/stuck (dashboard secret) plus an
+only-when-stuck 5-minute log beat that warns once per failure streak.
+
+Security criticals found by review and closed in the fix round (both were in
+MY first-round design, found because the fix round was re-reviewed):
+
+- The mail resume trusted the deletable in-blob marker: a buyer collecting
+  the item and deleting the emptied letter revived the ref into a SECOND
+  mailed copy. Closed by the durable mail intent + resume-only-on-proof.
+- The lease-fence arm cleared the grant intent and mailed next pass, but the
+  fence only proves THIS write lost, not that an earlier autosave under the
+  then-valid nonce did: the granted bags may be durable. The fence now parks.
+
+Spec deviation, needs the QA session (and Fernando) to re-judge: the phase
+file's AC3 says "kill before mail write, sweep resumes and delivers exactly
+once". After the mail-rail security finding the safe subset is: resume when
+the parcel is provably uncollected (still in the live book, or this
+process's own attempt), PARK when it is not (bare claim, intent-with-absent
+parcel, collected letter). The parked cases are sub-second crash windows,
+visible in the readout, and operator-resolvable; the automatic-resume
+version was a provable dupe rail. Pinned by C2a/C2b/C3/C3b in the delivery
+pg suite and the fake-level twins.
+
+The fix round itself was re-reviewed as unreviewed code (a fresh reviewer
+over the fix commit, plus qa-checklist over the whole diff, verdict READY
+with three should-fixes). That second round found ONE blocking hole in the
+first fix: the process-local pendingMail entry authorized a re-mail across
+the written-but-unbooked window, where a collected letter still dupes.
+Closed: the entry now carries a written flag (set at ATTEMPT time, so a
+blob-half throw still counts), and once written only the parcel still being
+in the live book authorizes a retry; pinned by same-process collected and
+uncollected twins driven through a new failNextMarkBooked fake hook, with
+the custody fake corrected to live-book semantics (a transient persist
+failure leaves the parcel LIVE, exactly like the real bridge). Also from
+that round: item-free letters (the seller sold notice) skip the claims
+ledger entirely (they can duplicate nothing, nothing ever re-notifies, and
+a parked notice polluted the readout forever); the returned arm got the same
+park-rotate-backoff-count-advanced treatment as the delivery arms; one
+contended finalize now stops ALL delivery work for the rest of the pass; a
+new (realm, state, created_at) index carries the delivering sample read;
+the readout count cap fails closed on a non-finite value; and the stale
+comments the fixes invalidated were rewritten.
+
+Deferrals and decisions, each with an owner (do NOT re-raise):
+
+- EXPLAIN-based plan pins and a worst-case pass-duration timing pin (the db
+  reviewer's remaining runtime proofs): the hot-path scale and db-retention
+  work own the EXPLAIN list (state.md ops caveats name the reads to prove:
+  the redrive page probe, the readout classes, the sold-residue subquery).
+- woc_market_custody_claims retention registration: the db-retention work
+  owns pruning BOOKED rows; unbooked rows are the operator queue and are
+  never pruned (DDL comment records this).
+- The internal surface still carries no rate limiter (family-wide,
+  pre-existing; the secret compare is constant-time): the listing step-up
+  work owns server-side posture questions.
+- Endpoint response re-stringifies per request (reasoned decline): the
+  admin-envelope serializer owns the wire shape; pre-serializing would fork
+  the envelope contract for a secret-gated, human-cadence dashboard read of
+  at most sixty rows.
+- SETTLEMENT_COLS derived-prefix coupling died with the paged rewrite (the
+  probe reads settlements only); no action left.
+- The fake's deliveredUnclosedSettlementsPage spells the same three-status
+  literal as the SQL; the four-way lifecycle union is pinned in
+  woc_market_directed_sql.test.ts, so a fifth status fails the DDL pin
+  first.
+- pendingGrants/pendingMail/parkedDeliveries are process-local with a
+  10-minute TTL prune at each pass start (the reviewers' leak findings);
+  entries that die unresumed park their claims, which the monitor carries.
 
 ## 02 implement round (settlement-state guards)
 

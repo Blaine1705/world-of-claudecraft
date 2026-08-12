@@ -5,12 +5,17 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-03-delivery-exactly-once.md`
+- Next file to run: `docs/woc-marketplace-hardening/phase-03-qa.md`
 - Packet created 2026-08-11 from `review.md` (the 2026-08-11 three-repo review).
 - 01 implemented AND QA'd (PASS-WITH-FOLLOWUPS, fixes applied, PUSHED).
 - 02 implemented AND QA'd (PASS-WITH-FOLLOWUPS, every fix applied, PUSHED at
   the QA tip; gate GREEN at 301a8c7c22); see the ledger below and progress.md
   for the QA round, the reasoned resolutions, and the phase 03/04 handoffs.
+- 03 implemented (B2a/B2b/B2c + monitor; five-reviewer round + fix round
+  applied; LOCAL, not pushed per R4); ledger entry below carries the seams
+  and ops caveats later phases need, progress.md the full round. ONE spec
+  deviation flagged for the QA session to re-judge (AC3: unprovable mail
+  claims PARK instead of auto-resuming; a security ruling, see progress.md).
 
 ## Repos and branches
 
@@ -289,6 +294,73 @@ Still open (a phase that hits one asks at session start):
     holder guard (any caller clears whoever's lock); safe at every current
     call site, but a guarded variant would make the safety local. Rides
     beside R8.
+- 03 delivery-exactly-once (2026-08-12, session start e71a8cfd21, commits
+  1196e2bb28 + 9f8097c1fb + a08653dbd2, LOCAL, not pushed per R4): B2a, B2b,
+  B2c and the stuck-custody monitor closed. What later phases consume:
+  - Monitor endpoint (phase 19 dashboard view): GET /internal/woc-market/stuck,
+    dashboardGate (DASHBOARD_INTERNAL_SECRET), admin envelope, parameter-free.
+    data = WocStuckCustodyReadout: { unbookedClaims: { count, sample:
+    [{ custodyRef, claimedAtMs, grantCharacterId, mailIntent }] },
+    stuckDelivering: { count, sample: [{ id, listingId, createdAtMs }] },
+    undisposedListings: { count, sample: [{ id, resolution, updatedAtMs }] } }.
+    Counts SATURATE at 1000 (a count equal to 1000 means "1000 or more");
+    samples cap at 20; rows aged >= 10 min; served from a 30s cached read
+    (single-flight, frozen object, deliberately non-busted). The 5-minute log
+    beat prints only when something is stuck and warns once per failure
+    streak; it runs even when WOC_MARKET_ENABLED=0.
+  - Custody rail attribution (phases 04/05/21/22): every claim carries at
+    most one intent, grant_character_id (direct rail, stamped BEFORE the bag
+    grant) or mail_intent_at (mail rail, stamped BEFORE the parcel exists;
+    markCustodyMailIntent is also the one legal grant-to-mail conversion,
+    only after a grantCopy refusal). Resume rules: booked = done; grant
+    intent resumes ONLY via this process's pendingGrants session continuity
+    (same characterId + lease nonce, snapshotCopy, never a second grantCopy);
+    mail intent resumes ONLY via an UNWRITTEN pendingMail entry (no parcel
+    can exist yet) or hasParcel (the parcel still in the live book); once an
+    attempt reached the post office, in-process memory proves nothing about
+    collection, so only the in-book check authorizes. EVERYTHING else parks
+    visibly (bare claims incl. all pre-upgrade rows, collected letters,
+    lease fences, restarts, relogs). ITEM-FREE letters (the sold notice)
+    skip the ledger entirely: they cannot duplicate and nothing re-notifies,
+    so a durable claim only polluted the readout. A lease fence proves only that THIS write lost, never
+    that an earlier autosave did: that reasoning is load-bearing, do not
+    weaken it. unclaimCustodyRef, clearCustodyGrantIntent,
+    saveDeliveredCharacter and cancelOpenBidsForListing are GONE from the db
+    seam; new members: custodyRefState, markCustodyMailIntent,
+    markCustodyGrantIntent, saveDeliveredCharacterBooked (atomic fenced
+    bags+booking, lock_timeout + heavy statement timeout, characters-row
+    carve-out from the market lock order), finalizeDeliveredSettlement,
+    deliveredUnclosedSettlementsPage, disposeSoldResidueListings,
+    touchSettlementRow, stuckCustodyReadout.
+  - Reconcile semantics (phase 21): deliverOne returns
+    advanced|parked|skip|contended; parked rows rotate to the updated_at tail
+    and back off in-process for 60s (monitor ages on created_at, which
+    rotation never touches); a contended finalize stops the batch and the
+    next pass retries; delivery stats count rows ADVANCED (a parked batch is
+    the monitor's business, not a saturation flood). The redriven beat runs
+    once per minute over 500-listing id pages (cursor resets on an exhausted
+    cycle) and converges delivered-unclosed residue AND sold-undisposed
+    residue with a standing sale row; sold-undisposed WITHOUT a sale row
+    parks forever (operator-only exit, on purpose).
+  - Lock order registry update: suspendListingIfSafe now pre-locks
+    ('pending_bond','active','won') because its expiry CTE cancels a dead
+    settlement's winner; finalizeDeliveredSettlement pre-locks the open set
+    plus the winner. Both sides of that former cycle are pinned by a live
+    concurrency test in tests/woc_market_delivery_pg_integration.test.ts.
+  - Ops caveats for the phase 22 runbook, appended to the 02 list: BEFORE
+    upgrading a realm that ever ran the market, verify
+    `SELECT count(*) FROM woc_market_custody_claims WHERE booked_at IS NULL`
+    is zero (legacy NULL intents are UNKNOWN, not "no attempt": the new
+    binary parks them, which is safe but each parked row is a delivery an
+    operator must finish). BEFORE a binary ROLLBACK, drain
+    `SELECT custody_ref FROM woc_market_custody_claims WHERE booked_at IS
+    NULL AND grant_character_id IS NOT NULL` to zero: the OLD binary adopts
+    any bare claim as booked and completes the sale with nothing delivered.
+    The EXPLAIN list for phases 16/17 gains: the redrive page probe
+    (listing_id = ANY page), the three readout sample+capped-count pairs,
+    and the disposeSoldResidueListings subquery. Claims-table retention
+    (phase 17): booked rows are prune-eligible provenance; unbooked rows are
+    the operator queue and MUST NOT be pruned.
 - 02 QA (2026-08-11, session start 20fdcc5288, verdict PASS-WITH-FOLLOWUPS
   with every fix applied, gate GREEN at tip 301a8c7c22, PUSHED per R4):
   release/v0.37.0 synced (merge b40a178643; generated-i18n conflict
