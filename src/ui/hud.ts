@@ -236,6 +236,7 @@ import {
   type CraftTierUp,
   observeCraftSkillsForTierUps,
 } from './craft_celebration_view';
+import { craftDenyMessage } from './crafting_deny_core';
 import { parseCraftingTab, serializeCraftingTab } from './crafting_tab_pref';
 import {
   buildCraftingView,
@@ -11920,33 +11921,13 @@ export class Hud {
             // event (see src/sim/types.ts), so this one check covers both.
             if (ev.masterwork) audio.masterwork();
           } else if (!ev.ok) {
-            // station_required names WHICH station: no station field
-            // rides the event, the type resolves from the recipe content
-            // (identical in both worlds). An unresolvable recipe id (cannot
-            // happen from a well-formed server) falls through to the generic
-            // materials line rather than rendering a broken name.
-            const deniedStationType =
-              ev.reason === 'station_required' ? recipeById(ev.recipeId)?.stationType : undefined;
+            const deny = craftDenyMessage(ev.reason, ev.recipeId);
             this.log(
-              deniedStationType
+              deny.stationType
                 ? t('hudChrome.crafting.stationRequired', {
-                    station: stationNameText(deniedStationType),
+                    station: stationNameText(deny.stationType),
                   })
-                : t(
-                    ev.reason === 'unknown_recipe'
-                      ? 'hudChrome.crafting.unknownRecipe'
-                      : ev.reason === 'combo_requirement_unmet'
-                        ? 'hudChrome.crafting.comboRequirementUnmet'
-                        : ev.reason === 'busy' || ev.reason === 'throttled'
-                          ? 'hudChrome.crafting.busy'
-                          : ev.reason === 'recipe_not_learned'
-                            ? 'hudChrome.crafting.recipeNotLearned'
-                            : ev.reason === 'locked'
-                              ? 'hudChrome.crafting.reagentLocked'
-                              : ev.reason === 'no_bag_space'
-                                ? 'hudChrome.crafting.noBagSpace'
-                                : 'hudChrome.crafting.insufficientMaterials',
-                  ),
+                : t(deny.key),
               '#ff6b6b',
             );
           }

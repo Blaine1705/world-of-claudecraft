@@ -41,9 +41,11 @@ const MONOLITHS: MonolithRow[] = [
     // next line added here fails, and the fix is extraction behind the seam,
     // never a raise. A raise stays a maintainer decision, per the header.
     // Re-pinned down from 19338 after the error-text matcher moved out to
-    // src/ui/error_text_i18n_core.ts, keeping the zero-headroom posture.
+    // src/ui/error_text_i18n_core.ts, then from 19190 after the craft-deny
+    // message table moved to src/ui/crafting_deny_core.ts (the v0.37.0 sync
+    // merge had pushed the file over), keeping the zero-headroom posture.
     file: 'src/ui/hud.ts',
-    ceiling: 19190,
+    ceiling: 19177,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

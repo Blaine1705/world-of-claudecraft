@@ -303,6 +303,7 @@ const UI_PURE_CORES = [
   'src/ui/skill_level_toast_view.ts',
   'src/ui/grant_line_view.ts',
   'src/ui/crafting_view.ts',
+  'src/ui/crafting_deny_core.ts',
   'src/ui/commission_order_view.ts',
   'src/ui/craft_cast_view.ts',
   'src/ui/profession_event_lines_core.ts',
