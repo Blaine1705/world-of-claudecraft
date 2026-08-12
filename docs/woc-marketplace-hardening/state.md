@@ -24,8 +24,13 @@ actually reads.
   re-post creep), the cancelListingIfUnbid idle bound, the stuckBonds
   signature age axis, comment-stripped window pins via the extracted
   tests/helpers/strip_comments.ts, tunable literal pins (park delay and the
-  anti-snipe trio), and the ledger corrections recorded in place
-  (progress.md carries the round). The H15 escape hatch that gated enable
+  anti-snipe trio), and the ledger corrections recorded in place. The fix
+  round was re-reviewed fresh, which drove a second pass:
+  outcome-answering retries of already-succeeded signatures on both legs,
+  the leg-neutral confirm_in_flight copy (five fills refreshed), the
+  held-survivor poll park, the split extension anchors (ruling recorded),
+  the stuckSinceMs sample field, and the derived paid-subset pin
+  (progress.md carries both rounds). The H15 escape hatch that gated enable
   exists (the 'review' state). Items the DEDICATED phase-04-qa session still
   owns: re-judge the cooldown NUMBERS, the cancel-intent bid-block
   interpretation, the confirm_in_flight second-signature semantics, the
@@ -519,9 +524,16 @@ Still open (a phase that hits one asks at session start):
     never re-stamps updated_at (the H15 age axis); a revived failed row's
     replaced signature is logged (dev channel) since the new recording
     overwrites it (the refusal survives on fail_reason and in the service
-    ledger); and lapseBid gained AND bond_state = 'pending', so a
-    reorg-flipped verdict can never void a HELD bond into a state no refund
-    arm reads (the row stays with the poll, visible via stuckBonds).
+    ledger); lapseBid gained AND bond_state = 'pending' and returns whether
+    it lapsed, so a reorg-flipped verdict can never void a HELD bond into a
+    state no refund arm reads, and the poll PARKS the held survivor
+    (rotation + backoff, visible via stuckBonds) instead of letting it
+    re-own the batch head every pass; and a retry of the signature that
+    already SUCCEEDED answers the outcome, not a refusal, on both legs
+    (bond: standing for active/won, not standing for outbid, no re-drive,
+    no churn; settlement: the current state for
+    confirmed/delivering/delivered, no second sale; a 'failed'
+    same-signature retry still refuses, the revival owns it).
   - Paid-but-undecided carve-out: the suspend and finalize bid teardowns skip
     (status pending_bond AND bond_signature IS NOT NULL AND bond_state
     'pending') rows; such a bid stays in confirmingBonds until the chain
@@ -558,8 +570,9 @@ Still open (a phase that hits one asks at session start):
     saturated, sample: [{id, listingId, account, placedAtMs}] } (aged on the
     same confirming bound; since the verification round the age AXIS is
     COALESCE(bond_signature_at, placed_at), the poll park's own axis, so the
-    readout reports on the mechanism it describes; the sample field stays
-    placedAtMs; main.ts wires bondStuckAgeMs from the knob).
+    readout reports on the mechanism it describes, and the sample carries
+    stuckSinceMs (render stuck age from IT; placedAtMs stays as placement
+    provenance); main.ts wires bondStuckAgeMs from the knob).
     stuckCustodyReadout now takes bondOlderThanMs; the log beat counts both
     new classes. Bonds have NO automatic time-based exit (a refund_due on a
     never-landed payment would pay out through today's blind releaser, B3);
@@ -594,14 +607,19 @@ Still open (a phase that hits one asks at session start):
     (the security round: extending on the raw submission let a fabricated
     string move the clock; a refused verdict extends nothing; on settled the
     extension runs BEFORE activation so a last-seconds verdict is not read
-    as past the close). The anchor is the FIRST recording moment
-    (bond_signature_at, which submitBondSignature RETURNS): the verification
-    round found a fresh-clock anchor per resubmit let one pending-forever
-    signature re-post its way (rate limit 60/min) to holding the close at
-    now plus the extension continuously to the cap; anchored on first
-    arrival, a re-post extends nothing. Cap math unchanged
-    (antiSnipeExtendedEndMs). BEHAVIOR NOTE for phase 14 copy: a signature
-    whose verdict lands at or after the close now gets NO extension and the
+    as past the close). Anchors are SPLIT BY ARM (the verification round,
+    two passes): the PENDING arm anchors on the FIRST recording moment
+    (bond_signature_at, which submitBondSignature RETURNS; a legacy no-stamp
+    row falls back to placed_at even on resubmit), because a fresh-clock
+    anchor per resubmit let one pending-forever signature re-post its way
+    (rate limit 60/min) to holding the close at now plus the extension
+    continuously to the cap; the SETTLED arm anchors on the verdict moment
+    (the paid-bond extension the window always granted; repeating it needs
+    repeated contended activations of a REAL payment, which the cap
+    bounds). Cap math unchanged
+    (antiSnipeExtendedEndMs). BEHAVIOR NOTE for phase 14 copy: a PENDING
+    signature first recorded outside the window cannot extend on re-posts,
+    and a signature
     bond routes to refund_due via the supersede arm (money-safe; the old
     "an in-flight confirmation can never land after a close" guarantee is
     deliberately gone). Residual, service-contract-dependent: if the economy
@@ -685,7 +703,10 @@ Still open (a phase that hits one asks at session start):
     the settlement buyer).
   - New error codes (all 409, catalog leaves + five non-Latin fills each):
     woc_market.confirm_in_flight, woc_market.cancel_pending,
-    woc_market.claim_cooldown. Snapshots updated (error_codes.test.ts,
+    woc_market.claim_cooldown. confirm_in_flight's copy is LEG-NEUTRAL
+    ("Your payment is still confirming."): the settlement leg answers it
+    too since the verification round, so bond-specific wording lied there
+    (the reword refreshed the five non-Latin fills in the same change). Snapshots updated (error_codes.test.ts,
     api_error_code_parity.test.ts); REFUSAL_ERRORS is 47 rows.
   - Tests: new real-SQL suite tests/woc_market_bond_pg_integration.test.ts
     (28 tests after the round-three additions; its rig is the third copy, the

@@ -128,12 +128,63 @@ test that fails on the old behavior:
   remote non-pending verdict can); the sub-millisecond revival-race abandon
   residual is bounded and never stamps a paying holder.
 
+The fix round was itself re-reviewed as unreviewed code by a fresh lane,
+which found the far side of two fixes missing plus a starvation regression;
+every finding was applied (round two, same session):
+
+- Already-succeeded retries now answer the OUTCOME on both legs: after the
+  first fix, a blip retry of a signature that SUCCEEDED still refused
+  (not_pending read as "bid gone" for an active standing bid; not_active as
+  "purchase gone" for a delivered sale). The recorded-signature arm returns
+  standing for active/won and not-standing for outbid on the bond leg, and
+  the current state for confirmed/delivering/delivered on the settlement
+  leg, never re-running hold-and-activate and never minting a second sale
+  (both pinned with different-signature negative arms; the old
+  refuses-not_pending replay test was deliberately retargeted, keeping its
+  no-churn assertions). A same-signature retry on a 'failed' row still
+  refuses; the settlementQuote revival owns that path (QA may re-judge).
+- confirm_in_flight's copy was bond-specific while the settlement leg now
+  answers it too: reworded leg-neutral ("Your payment is still confirming.")
+  with the five non-Latin fills refreshed in the same change and the
+  resolved artifacts regenerated.
+- The lapseBid carve-out had traded the money bug for a starvation shape:
+  the held survivor was deleted from the parked set on any decided verdict
+  and never rotated, so it re-owned the batch head and burned one confirm
+  RPC every pass forever. lapseBid now reports whether it lapsed and the
+  poll parks the refused-lapse survivor (rotation + backoff); the pg test
+  asserts the rotation stamp instead of treating the stuck head as the goal.
+- The single first-arrival anchor took away the paid-bond extension for an
+  early signer whose verdict lands seconds from the close (the settled arm's
+  own activation could then read the auction as over). RULING (this
+  session): anchors split by arm, pending on first arrival (the creep is
+  pending-driven; re-posts are free), settled on the verdict moment (needs a
+  REAL payment plus repeated contended activations, cap-bounded). A new
+  test pins the restored settled-arm extension; the no-creep pin stands.
+- The bond leg's typed second-signature refusal gained its DB-free arm (the
+  pg pin skips without TEST_DATABASE_URL and the CI floor is DB-free).
+- Nits, all applied: stuckBonds sample carries stuckSinceMs (the age axis;
+  placedAtMs alone overstated stuck duration) and the fake mirrors the
+  axis; the paid-subset pin now DERIVES its expectation from the production
+  open2 DDL predicate; the park identity pin covers BOTH sides of the
+  comparison (the left operand could regress to placement unseen) and the
+  rules-test header owns its two source-pin exceptions; the legacy
+  no-stamp row falls back to placed_at on resubmit instead of adopting the
+  resubmit clock (pg-pinned); the strip_comments header no longer claims
+  unenforced byte-identity with the architecture guard's copy.
+- Recorded, not changed: five older suites still hand-roll comment-strip
+  variants (action_bar_painter, arena_window, bags_window twice with the
+  weaker no-protocol-guard form, cast_bar_painter, char_sheet_sig_core);
+  consolidating them is unrelated-suite churn for a later cleanup pass.
+  The request-path console.warn on the revived-signature overwrite is
+  deliberate (no request-path log seam exists; rate-limited by the confirm
+  policy).
+
 Items the phase-04-qa session must re-judge, beyond the implement round's
 list: the confirm_in_flight second-signature semantics (both legs), the
-idempotent-retry arm, the held-bond no-automatic-exit posture, the stuckBonds
-axis change, the first-arrival anchor (a laggy honest signer now gets at most
-one extension per recording, not per retry), and the confirming-hours upper
-clamp question.
+already-succeeded retry arms, the held-bond no-automatic-exit posture (now
+parked, still no automatic exit), the stuckBonds axis change and the new
+stuckSinceMs sample field, the split extension anchors (the ruling above),
+and the confirming-hours upper clamp question.
 
 ## 04 implement round (bond and payment lifecycle)
 
