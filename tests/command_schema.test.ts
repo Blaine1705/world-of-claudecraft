@@ -55,7 +55,8 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // tabPrev as a send + dispatch pair (the backward half of the Tab target cycle,
 // Shift+Tab by default; no payload, the sim walks the same ordered list in
 // reverse), and this branch's neutral trade close adds trade_close as a send +
-// dispatch pair, the sibling of trade_cancel. NOTE (merge trap): both
+// dispatch pair, the sibling of trade_cancel. The release's player item lock
+// (issue 3042) adds lock_item as a send + dispatch pair. NOTE (merge trap): both
 // sides of every v0.36.0 sync bump these counts independently, and git has
 // auto-merged identical numbers before while the real total was higher; the
 // merged tree carries BOTH sides' pairs. Only the suite says what they really

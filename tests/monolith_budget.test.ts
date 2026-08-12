@@ -64,8 +64,12 @@ const MONOLITHS: MonolithRow[] = [
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
+    // Ratcheted 10900 to the exact merged size after the v0.37.0 sync: the
+    // release's entity_update_cadence extraction shrank the file without
+    // lowering the ceiling, and banking that slack would let the next growth
+    // ride in unnoticed.
     file: 'server/game.ts',
-    ceiling: 10900,
+    ceiling: 10859,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

@@ -27,7 +27,13 @@ import {
 /** True when this copy is locked out of the anonymous exchange pipes (market
  *  listing, mail attachment): armed (bindOnTrade) or bound (boundTo). The
  *  def-level rules (soulbound/quest/noMarketList) stay with each pipe; this is
- *  only the per-copy lock. A plain copy is never locked. */
+ *  only the per-copy lock. A plain copy is never locked. NOT the same axis as
+ *  the PLAYER item lock (item_lock.ts `locked`, issue 3042): that one is the
+ *  owner's own salvage/craft/vendor safety mark and is deliberately not
+ *  consulted by the pipes, matching the gold market's treatment; whether
+ *  exchange listings should honor it is an open design call (recorded for the
+ *  listing step-up phase). This module's Unlocked/Locked helper names refer to
+ *  the TRANSFER lock only. */
 export function isTransferLockedInstance(instance: ItemInstancePayload | undefined): boolean {
   return (
     instance !== undefined && (instance.bindOnTrade === true || instance.boundTo !== undefined)
