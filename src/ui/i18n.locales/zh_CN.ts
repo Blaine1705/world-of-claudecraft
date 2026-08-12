@@ -12657,7 +12657,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorialGreeting.bellHomeNote':
     '这么快就从海滨回来了？你刚才敲响的正是渡船铃。它的孪生兄弟就挂在那边鸦邮信箱旁：想回试炼之滨，随时敲响它，渡航就会送你过去。敲错了也不打紧。',
   'hudChrome.tutorialGreeting.islandArrivalNote':
-    '刚下渡船吗？欢迎来到试炼之滨。教官玛伦在我身后这条路尽头的晨憩营地主持操练。走到她跟前，直到她的名字显示出来，然后按 F，或者用鼠标左键点击她，就能与她交谈：她会交给你第一件差事。等你准备离开时，敲响立在我码头旁的那口铃，渡航就会送你回东溪镇。',
+    '刚下渡船吗？欢迎来到试炼之滨。用 W、A、S、D 走路，按住鼠标右键转动视角。教官玛伦在我身后这条路尽头的晨憩营地主持操练：走到她跟前，直到她的名字显示出来，然后按 F，或者用鼠标左键点击她，就能与她交谈，她会交给你第一件差事。等你准备离开时，敲响立在我码头旁的那口铃，渡航就会送你回东溪镇。',
   'hudChrome.tutorialGreeting.noteClose': '明白了',
   'entities.items.ps_castaway_crate.name': '漂流货箱',
   'entities.items.ps_ferry_bell.name': '渡船铃',
@@ -12685,7 +12685,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '镀金保险箱连这里也设了一张桌子，{playerName}。凡是存到我这里的东西，都躺在每座城镇每位司库身后的同一座金库里，狼咬不着，水泡不着，连你自己的糊涂决定也碰不着。',
   'entities.quests.q_ps_strike_true.title': '击中要害',
   'entities.quests.q_ps_strike_true.text':
-    '欢迎来到试炼之滨，{playerName}。这里的每一课都从同一件事开始：站稳脚，握好刃。用 W、A、S、D 行走，按住鼠标右键转动视角。营地西南练武场上的草人生来就是挨打的：走到一个草人跟前，按 Tab 或用鼠标左键点击它，把它设为目标。然后按 1，或者点击屏幕底部动作条上的第一个图标，挥出这一刀。一直打到三个散架为止。它们的还击不痛不痒。这片海滨之外的东西下手可重得多。',
+    '欢迎来到试炼之滨，{playerName}。这里的每一课都从同一件事开始：站稳脚，握好刃。营地西南练武场上的草人生来就是挨打的。要是找不到练武场，按 M 打开地图：你身上的每件差事都会标在上面，用不着乱转。走到一个草人跟前，按 Tab 或用鼠标左键点击它，把它设为目标，然后按 1，或者点击屏幕底部动作条上的第一个图标，挥出这一刀。一直打到三个散架为止。它们的还击不痛不痒。这片海滨之外的东西下手可重得多。',
   'entities.quests.q_ps_strike_true.completion':
     '三个倒下，你的手也稳多了。记住这种感觉，{playerName}：选定目标，挥出一刀，然后一直打下去。谷地的狼比稻草快，但同样的算术也能放倒它们。',
   'entities.quests.q_ps_strike_true.objectives.0.label': '击倒训练草人',

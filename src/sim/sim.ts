@@ -9266,7 +9266,7 @@ export class Sim {
     if (refusedWhileDead(this.ctx, pid)) return;
     const r = this.ctx.resolve(pid);
     if (!r) return;
-    resolveStartTutorial(this.ctx, r.e);
+    resolveStartTutorial(this.ctx, r.e, r.meta);
   }
 
   // Mobile crafting station command (Professions 2.0, wiring #1134):

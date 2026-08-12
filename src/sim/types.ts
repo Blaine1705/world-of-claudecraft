@@ -6466,9 +6466,12 @@ export type SimEvent = { pid?: number } & (
   | { type: 'ferryBellHome'; pid: number }
   // Ferry island arrival (tutorial island): fired every time a ride sets a
   // player down at the Proving Shore arrival (the greeting ferry and the town
-  // bell alike). Personal and text-free: the client answers ONCE per device
-  // with Ferryman Odo's welcome note directing the player up to Maren.
-  | { type: 'ferryIslandArrival'; pid: number }
+  // bell alike). Personal and text-free: the client renders Ferryman Odo's
+  // welcome note, which carries the walk and talk controls, whenever
+  // `firstVisit` says this character has not started the shore's rail yet
+  // (interactions/ferry_bell.ts isFirstIslandVisit). Per CHARACTER, not per
+  // device: a new character on a browser that has seen it still gets taught.
+  | { type: 'ferryIslandArrival'; pid: number; firstVisit: boolean }
   // Attunement celebration, personal copy (Professions 2.0): a
   // quest-validated pair attunement (new OR return) landed for this player
   // (professions/attunement_events.ts). Personal (pid = the celebrant) and

@@ -803,7 +803,7 @@ export function pickUpObject(
   // The Proving Shore ferry bells travel, never loot: route the click to the
   // ferry handler before the pickup path so ringing always sails.
   if (objectItemId === FERRY_BELL_OBJECT_ID) {
-    return tryRingFerryBell(ctx, obj, p);
+    return tryRingFerryBell(ctx, obj, p, meta);
   }
   const beforeQuestProgress = meta.counters.questProgress;
   const beforeQuestNextId = ctx.nextId;

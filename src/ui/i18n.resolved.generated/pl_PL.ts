@@ -874,7 +874,7 @@ export const pl_PL: EnTranslations = {
       "skip": "Skip the tutorial",
       "declineNote": "As you like, friend. Should you ever change your mind, the ferry bell by the Ravenpost mailbox rings you across to the Proving Shore any time, day or night. It will still be here when the wolves are not.",
       "bellHomeNote": "Back from the shore already? That was the ferry bell you rang. Its twin hangs just there by the Ravenpost mailbox: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.",
-      "islandArrivalNote": "Fresh off the crossing? Welcome to the Proving Shore. Instructor Maren keeps the drills up at Dawnrest Camp, along the road behind me. Walk right up to her until her name shows, then press F, or left-click her, to talk: she will set you your first task. And when you are ready to leave, ring the bell standing beside my pier and the crossing will carry you home to Eastbrook.",
+      "islandArrivalNote": "Fresh off the crossing? Welcome to the Proving Shore. Walk with W, A, S and D, and hold the right mouse button to steer your view. Instructor Maren keeps the drills up at Dawnrest Camp, along the road behind me: walk right up to her until her name shows, then press F, or left-click her, to talk, and she will set you your first task. When you are ready to leave, ring the bell standing beside my pier and the crossing will carry you home to Eastbrook.",
       "noteClose": "Understood"
     },
     "tutorial": {
@@ -16155,7 +16155,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_ps_strike_true": {
         "title": "Strike True",
-        "text": "Welcome to the Proving Shore, {playerName}. Every lesson here starts the same way: feet set, blade in hand. Walk with W, A, S and D, and steer your view by holding the right mouse button. The effigies on the practice yard southwest of camp were built to be hit: walk up to one and press Tab, or left-click it, to make it your target. Then press 1, or click the first icon on the action bar along the bottom of your screen, to swing. Keep striking until three of them give out. Their blows barely sting. The things beyond this shore hit far harder.",
+        "text": "Welcome to the Proving Shore, {playerName}. Every lesson here starts the same way: feet set, blade in hand. The effigies stand on the practice yard southwest of camp, and they were built to be hit. If you cannot find the yard, press M to open the map: every task you carry is marked on it, so you never need to wander. Walk up to an effigy and press Tab, or left-click it, to make it your target, then press 1, or click the first icon on the action bar along the bottom of your screen, to swing. Keep striking until three of them give out. Their blows barely sting. The things beyond this shore hit far harder.",
         "completion": "Three down, and your grip already surer. Remember the feel of it, {playerName}: target, strike, and keep striking. The vale wolves are faster than straw, but they fall to the same arithmetic.",
         "objectives": {
           "0": {

@@ -12191,17 +12191,12 @@ export class Hud {
           }
           break;
         case 'ferryIslandArrival':
-          // First landing on the Proving Shore: Ferryman Odo's welcome note
-          // directs the newcomer up the road to Maren. Same per-device
-          // one-shot idiom as the homecoming hint above.
-          try {
-            if (localStorage.getItem('woc.odowelcome.v1') !== 'seen') {
-              localStorage.setItem('woc.odowelcome.v1', 'seen');
-              this.openTutorialGreetingNote(buildFerryIslandArrivalNote());
-            }
-          } catch {
-            /* private mode: skip the note rather than throw */
-          }
+          // Landing on the Proving Shore with the rail not yet started:
+          // Ferryman Odo's welcome note teaches walking and talking and points
+          // up the road to Maren. Gated by the SIM's per-character firstVisit
+          // (interactions/ferry_bell.ts), not a per-device flag, so every new
+          // character is taught even on a browser that has seen it before.
+          if (ev.firstVisit) this.openTutorialGreetingNote(buildFerryIslandArrivalNote());
           break;
         case 'profTrendNudge':
         case 'profTierTutorial':

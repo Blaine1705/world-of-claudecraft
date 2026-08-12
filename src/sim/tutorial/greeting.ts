@@ -20,6 +20,7 @@
 import { PROVING_SHORE_ARRIVAL } from '../content/proving_shore';
 import { DUNGEON_X_THRESHOLD } from '../data';
 import { displacePlayer } from '../displacement';
+import { emitIslandArrival } from '../interactions/ferry_bell';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
@@ -61,7 +62,7 @@ export function updateTutorialGreeting(ctx: SimContext): void {
  *  gate), out of combat, overworld only. The persisted flag guards only the
  *  greeting EMIT, so this command-side gate set is what keeps the wire token
  *  from doubling as an unmetered combat exit. */
-export function resolveStartTutorial(ctx: SimContext, p: Entity): void {
+export function resolveStartTutorial(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   if (p.pos.x > DUNGEON_X_THRESHOLD || p.inCombat) {
     ctx.error(p.id, 'You cannot set sail from here.');
     return;
@@ -71,7 +72,7 @@ export function resolveStartTutorial(ctx: SimContext, p: Entity): void {
     return;
   }
   displacePlayer(ctx, p, PROVING_SHORE_ARRIVAL, 'The ferry sets you down on the Proving Shore.');
-  // Text-free arrival marker: the HUD answers the first one per device with
-  // Ferryman Odo's welcome note pointing the newcomer up to Maren.
-  ctx.emit({ type: 'ferryIslandArrival', pid: p.id });
+  // Text-free arrival marker: the HUD renders Ferryman Odo's welcome note,
+  // which teaches walking and talking, for a character new to the shore.
+  emitIslandArrival(ctx, p, meta);
 }

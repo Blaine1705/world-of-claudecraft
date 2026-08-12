@@ -128,8 +128,13 @@ describe('startTutorial (the ferry)', () => {
     expect(Math.hypot(e.pos.x - PROVING_SHORE_ARRIVAL.x, e.pos.z - PROVING_SHORE_ARRIVAL.z))
       .toBeLessThan(1);
     expect(e.facing).toBe(PROVING_SHORE_ARRIVAL.facing);
-    // The text-free arrival marker Odo's per-device welcome note keys off.
-    expect(sim.events).toContainEqual({ type: 'ferryIslandArrival', pid: sim.playerId });
+    // The text-free arrival marker Odo's welcome note keys off: a character
+    // who has not started the rail is taught, whatever this device has seen.
+    expect(sim.events).toContainEqual({
+      type: 'ferryIslandArrival',
+      pid: sim.playerId,
+      firstVisit: true,
+    });
   });
 
   it('refuses a character above level 1 and leaves them in place', () => {
@@ -211,7 +216,31 @@ describe('the ferry bells (the clicked crossing)', () => {
     // No homecoming marker on the OUTBOUND ride (the pointer is only for
     // arrivals in town); the island-arrival marker fires instead.
     expect(sim.events.filter((e) => e.type === 'ferryBellHome')).toEqual([]);
-    expect(sim.events).toContainEqual({ type: 'ferryIslandArrival', pid: sim.playerId });
+    expect(sim.events).toContainEqual({
+      type: 'ferryIslandArrival',
+      pid: sim.playerId,
+      firstVisit: true,
+    });
+  });
+
+  it('a returning student rides in with firstVisit false (no repeat lecture)', () => {
+    // Per CHARACTER, not per device: once any Proving Shore quest is in the
+    // log or done, the welcome note stops. This is what makes a fresh
+    // character on a veteran's browser still get taught.
+    const sim = makeSim();
+    const { vale: town } = bells(sim);
+    const meta = sim.players.get(sim.playerId)!;
+    meta.questsDone.add('q_ps_strike_true');
+    const p = sim.entities.get(sim.playerId)!;
+    p.pos.x = town.pos.x + 1;
+    p.pos.z = town.pos.z;
+    sim.events = [];
+    sim.pickUpObject(town.id);
+    expect(sim.events).toContainEqual({
+      type: 'ferryIslandArrival',
+      pid: sim.playerId,
+      firstVisit: false,
+    });
   });
 
   it('refuses in combat and stays put (no bell combat exit)', () => {

@@ -227,7 +227,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     name: 'Strike True',
     giverNpcId: 'instructor_maren',
     turnInNpcId: 'instructor_maren',
-    text: 'Welcome to the Proving Shore, $N. Every lesson here starts the same way: feet set, blade in hand. Walk with W, A, S and D, and steer your view by holding the right mouse button. The effigies on the practice yard southwest of camp were built to be hit: walk up to one and press Tab, or left-click it, to make it your target. Then press 1, or click the first icon on the action bar along the bottom of your screen, to swing. Keep striking until three of them give out. Their blows barely sting. The things beyond this shore hit far harder.',
+    text: 'Welcome to the Proving Shore, $N. Every lesson here starts the same way: feet set, blade in hand. The effigies stand on the practice yard southwest of camp, and they were built to be hit. If you cannot find the yard, press M to open the map: every task you carry is marked on it, so you never need to wander. Walk up to an effigy and press Tab, or left-click it, to make it your target, then press 1, or click the first icon on the action bar along the bottom of your screen, to swing. Keep striking until three of them give out. Their blows barely sting. The things beyond this shore hit far harder.',
     completionText:
       'Three down, and your grip already surer. Remember the feel of it, $N: target, strike, and keep striking. The vale wolves are faster than straw, but they fall to the same arithmetic.',
     objectives: [

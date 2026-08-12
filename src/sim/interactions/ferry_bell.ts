@@ -10,8 +10,9 @@
 // Draws ZERO rng (displacePlayer only moves and emits), so the click's tick
 // position cannot fork the deterministic draw order. `src/sim`-pure.
 
-import { PROVING_SHORE_ARRIVAL } from '../content/proving_shore';
+import { PROVING_SHORE_ARRIVAL, PROVING_SHORE_QUEST_ORDER } from '../content/proving_shore';
 import { displacePlayer } from '../displacement';
+import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 
@@ -21,11 +22,35 @@ export const FERRY_BELL_OBJECT_ID = 'ps_ferry_bell';
  *  off the spawn square so an arrival never stacks on a fresh spawn. */
 export const FERRY_BELL_TOWN_LANDING = { x: 4, z: -6, facing: 0.6 } as const;
 
+/** Whether this character has never worked the shore: no Proving Shore quest
+ *  in the log and none turned in. The arrival note is a TEACHING moment (it
+ *  carries the walk and talk controls), so it belongs to a character who has
+ *  not started the rail, not to a device that has seen it once. A veteran
+ *  riding back for a refresher keeps their screen clear. */
+export function isFirstIslandVisit(meta: PlayerMeta): boolean {
+  for (const questId of PROVING_SHORE_QUEST_ORDER) {
+    if (meta.questLog.has(questId) || meta.questsDone.has(questId)) return false;
+  }
+  return true;
+}
+
+/** The shared island-arrival marker, emitted by BOTH ferry routes (the
+ *  greeting's accept in sim/tutorial/greeting.ts and the town bell below).
+ *  Text-free: the client renders Odo's welcome note off `firstVisit`. */
+export function emitIslandArrival(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
+  ctx.emit({ type: 'ferryIslandArrival', pid: p.id, firstVisit: isFirstIslandVisit(meta) });
+}
+
 /** Ring a ferry bell: travel to the OTHER shore, decided by which side of
  *  the strait the clicked bell stands on. In combat the crossing refuses
  *  (the startTutorial gate's wording), so the bell can never be a combat
  *  exit. Always returns true: the click was the bell's, even when refused. */
-export function tryRingFerryBell(ctx: SimContext, obj: Entity, p: Entity): boolean {
+export function tryRingFerryBell(
+  ctx: SimContext,
+  obj: Entity,
+  p: Entity,
+  meta: PlayerMeta,
+): boolean {
   if (p.inCombat) {
     ctx.error(p.id, 'You cannot set sail from here.');
     return true;
@@ -49,9 +74,9 @@ export function tryRingFerryBell(ctx: SimContext, obj: Entity, p: Entity): boole
       'The ferry bell tolls, and the Proving Shore rises to meet you.',
     );
     // Same arrival marker the greeting ferry emits (sim/tutorial/greeting.ts):
-    // Odo's welcome note is a per-device one-shot, so a bell refresher only
-    // sees it if the greeting ferry never fired it on this device.
-    ctx.emit({ type: 'ferryIslandArrival', pid: p.id });
+    // a returning veteran carries quest history, so firstVisit is false and
+    // their screen stays clear.
+    emitIslandArrival(ctx, p, meta);
   }
   return true;
 }
