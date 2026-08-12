@@ -173,6 +173,7 @@ import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
+import { isInputSendBackpressured } from './send_backpressure';
 import {
   type SnapshotTimerWireMode,
   STABLE_TIMER_WIRE_VERSION,
@@ -2244,6 +2245,13 @@ export class ClientWorld implements IWorld {
       !this.connected ||
       this.ws.readyState !== WebSocket.OPEN
     ) {
+      return false;
+    }
+    // Shed this input send if the local socket is already backed up
+    // (send_backpressure.ts): movement intent is idempotent-latest, so the
+    // next timer beat resends current state and nothing is lost. `cmd`
+    // frames (rawCmd) are NOT gated: they are not idempotent.
+    if (isInputSendBackpressured(this.ws.bufferedAmount)) {
       return false;
     }
     const sig = this.inputSignature();
