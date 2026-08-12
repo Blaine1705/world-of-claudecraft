@@ -54,9 +54,10 @@ automatically instead of by hand.
   but the queue's timer does) must stay comfortably under it. Today that is
   8 + 40 (the `changes` bound plus the pr-gate shard bound, the largest
   required one), so a required critical path of 48 minutes against a 90
-  minute ceiling. A candidate that blows the queue timeout is ejected, which blocks
-  the merge rather than merging anything unproven, but it costs a full queue
-  cycle and reads like a mystery without this number written down.
+  minute ceiling. A candidate that blows the queue timeout is ejected,
+  which blocks the merge rather than merging anything unproven, but it
+  costs a full queue cycle and reads like a mystery without this number
+  written down.
 - The queue merges with one repo-wide method (merge commit). The per-PR
   squash/merge choice does not apply on the protected branches.
 - Direct pushes to the protected branches are blocked by the

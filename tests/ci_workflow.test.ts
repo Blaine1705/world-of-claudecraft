@@ -833,8 +833,9 @@ describe('CI workflow parity', () => {
     const bounds = [
       // pr-gate's 20 was sized when two 24 hour replays found zero healthy
       // jobs over it. Sim-deep selective PRs broke that zero: their runs
-      // collect nearly the full suite and the sha1-contiguous packs can
-      // concentrate the expensive sim suites in one shard (PR #3342's
+      // stack the expensive sim suites on top of the always-run
+      // blind/partial floor, and the sha1-contiguous packs can
+      // concentrate several in one shard (PR #3342's
       // shard 1 bound-killed at a 20.25 minute wall on two attempts with a
       // healthy 19 minute test step still running; fix/item-provenance-
       // boundaries died the same way at 20.08). 40 is release-gate's
