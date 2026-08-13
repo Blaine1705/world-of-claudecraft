@@ -32,7 +32,7 @@ describe('gpu hitch runtime receipt', () => {
   it('publishes the pacing values consumed by the renderer after prewarm', () => {
     (globalThis as unknown as { window: Record<string, unknown> }).window = {};
     const receipt = publishGpuHitchRuntimeReceipt({
-      search: '?linkrate=12&linkburst=4',
+      search: '?perf&linkrate=12&linkburst=4',
       renderer: {
         prewarm: {
           prewarmPacing: {

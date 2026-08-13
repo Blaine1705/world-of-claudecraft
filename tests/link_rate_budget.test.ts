@@ -3,7 +3,6 @@ import {
   awaitSubmissionBudget,
   createLinkRateBudget,
   createPrewarmPacing,
-  EXPERIMENTAL_PREWARM_LINK_BURST,
   type LinkRateBudgetClock,
   parseSubmissionPacingKnobs,
 } from '../src/render/link_rate_budget';
@@ -78,27 +77,30 @@ describe('link rate budget', () => {
   });
 });
 
-describe('experimental pacing knobs', () => {
-  it('keeps an absent rate unlimited instead of promoting an unmeasured default', () => {
+describe('submission pacing knobs', () => {
+  it('defaults to adaptive lifecycle pacing', () => {
     const knobs = parseSubmissionPacingKnobs('');
     expect(knobs.source).toBe('default');
+    expect(knobs.mode).toBe('adaptive');
     expect(knobs.linksPerSecond).toBe(Number.POSITIVE_INFINITY);
-    expect(knobs.burst).toBe(EXPERIMENTAL_PREWARM_LINK_BURST);
+    expect(knobs.burst).toBe(8);
   });
 
   it('distinguishes an explicit unpaced control from positive candidate rates', () => {
     expect(parseSubmissionPacingKnobs('?perf&linkrate=0')).toMatchObject({
       source: 'query',
+      mode: 'unlimited',
       linksPerSecond: Number.POSITIVE_INFINITY,
     });
     expect(parseSubmissionPacingKnobs('?perf&linkrate=12&linkburst=4')).toMatchObject({
       source: 'query',
+      mode: 'limited',
       linksPerSecond: 12,
       burst: 4,
     });
   });
 
-  it('selects adaptive lifecycle pacing only behind the perf gate', () => {
+  it('keeps adaptive pacing as the default outside the perf gate', () => {
     expect(parseSubmissionPacingKnobs('?perf&linkmode=adaptive')).toMatchObject({
       source: 'query',
       mode: 'adaptive',
@@ -106,18 +108,26 @@ describe('experimental pacing knobs', () => {
     });
     expect(parseSubmissionPacingKnobs('?linkmode=adaptive')).toMatchObject({
       source: 'default',
-      mode: 'unlimited',
+      mode: 'adaptive',
+    });
+    expect(parseSubmissionPacingKnobs('?perf')).toMatchObject({
+      source: 'default',
+      mode: 'adaptive',
+    });
+    expect(parseSubmissionPacingKnobs('?perf&linkmode=adaptive&linkrate=24')).toMatchObject({
+      source: 'query',
+      mode: 'adaptive',
     });
   });
 
-  it('keeps experimental knobs at release defaults without ?perf', () => {
+  it('ignores experimental overrides without ?perf', () => {
     expect(
       parseSubmissionPacingKnobs('?linkrate=12&linkburst=4&compileroots=2&prewarmdeadline=1'),
     ).toEqual({
       source: 'default',
-      mode: 'unlimited',
+      mode: 'adaptive',
       linksPerSecond: Number.POSITIVE_INFINITY,
-      burst: EXPERIMENTAL_PREWARM_LINK_BURST,
+      burst: 8,
       compileBatchRoots: null,
       hardMaxMs: null,
     });
@@ -133,25 +143,37 @@ describe('experimental pacing knobs', () => {
     expect(
       parseSubmissionPacingKnobs('?perf&linkrate=12&linkburst=0&compileroots=0'),
     ).toMatchObject({
-      burst: EXPERIMENTAL_PREWARM_LINK_BURST,
+      burst: 8,
       compileBatchRoots: null,
     });
   });
 
-  it('does not claim query pacing was applied when ?perf is absent', () => {
-    const pacing = createPrewarmPacing('?linkrate=24&linkburst=2&compileroots=0.5', virtualClock());
+  it('runs lifecycle feedback by default without claiming ignored query pacing', async () => {
+    const clock = virtualClock();
+    const pacing = createPrewarmPacing('?linkrate=24&linkburst=2&compileroots=0.5', clock);
+    pacing.markSubmitted('scene:0');
+    pacing.markSyncEnd('scene:0', 8);
+    await clock.sleep(800);
+    pacing.markSettled('scene:0');
     expect(pacing.receipt(4.9, 15_000)).toMatchObject({
       source: 'default',
-      mode: 'unlimited',
+      mode: 'adaptive',
       linksPerSecond: null,
-      burst: EXPERIMENTAL_PREWARM_LINK_BURST,
+      burst: null,
       compileBatchRoots: 4,
+      scope: 'compile-unit-lifecycle',
+      adaptive: {
+        state: 'ramp',
+        settledUnits: 1,
+        inFlightUnits: 0,
+      },
     });
   });
 
   it('publishes the effective controlled scope and final renderer values', () => {
     const pacing = createPrewarmPacing('?perf&linkrate=24&compileroots=4', virtualClock());
-    pacing.budget.charge(17);
+    pacing.markSubmitted('scene:0');
+    pacing.markSyncEnd('scene:0', 17);
     expect(pacing.receipt(4, 15_000)).toEqual({
       available: true,
       source: 'query',

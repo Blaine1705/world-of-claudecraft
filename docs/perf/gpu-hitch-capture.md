@@ -70,17 +70,18 @@ is therefore part of A/B comparability. `capture.totalElapsedMs` preserves the
 complete probe span, including variable boot and entry time, for timeline
 reconstruction without making equivalent measurement windows incomparable.
 
-`effective` comes from the running application, not from parsing the URL. This
-v0.38 experimental branch exposes link-rate pacing at the renderer consumption
-seam: `linkrate=0` is the unlimited control and a positive value is the limited
-candidate. `linkmode=adaptive` selects the lifecycle controller: it admits
-whole compile units against a window measured in observed program links, grows
-that window after fast settlements, halves it after slow settlements or
-failures, and stops new entry work after a bounded no-progress interval. Its
-receipt reports `compile-unit-lifecycle`, the effective window and congestion
-counters without inventing a fixed links-per-second value. The static receipt
-reports `compile-unit-sync-prologue`; continuations that link later in async
-tails are observed but are not completely governed by that static budget.
+`effective` comes from the running application, not from parsing the URL. The
+renderer uses the lifecycle controller by default: it admits whole compile
+units against a window measured in observed program links, grows that window
+after fast settlements, halves it after slow settlements or failures, and
+stops new entry work after a bounded no-progress interval. Its receipt reports
+`compile-unit-lifecycle`, the effective window and congestion counters without
+inventing a fixed links-per-second value. The `?perf` capture seam retains
+explicit controls: `linkrate=0` selects unlimited submission, a positive value
+selects a static candidate, and `linkmode=adaptive` explicitly selects the
+shipping controller for A/B attribution. The static receipt reports
+`compile-unit-sync-prologue`; continuations that link later in async tails are
+observed but are not completely governed by that static budget.
 Modular self/peer
 flags remain unavailable, so requesting them fails closed instead of silently
 measuring a no-op.
@@ -101,9 +102,11 @@ query parameters are not written to the artifact.
 ## Comparison rules
 
 Use `areComparable(left, right, { varying: ['linkrate'] })` for a static sweep,
-or `areComparable(left, right, { varying: ['linkmode'] })` for unlimited versus
-adaptive. Dynamic adaptive counters are observed results, not comparability
-keys. Every campaign capture supplies `--group-id`, `--leg`,
+or `areComparable(left, right, { varying: ['linkrate', 'linkmode'] })` for an
+explicit `linkrate=0` unlimited control versus `linkmode=adaptive`. Omitting
+both knobs now selects adaptive and is not an unlimited control. Dynamic
+adaptive counters are observed results, not comparability keys. Every campaign
+capture supplies `--group-id`, `--leg`,
 `--repetition`, and `--order` together. The comparator rejects
 changes to the source/served build, probe/analyzer/schema, profile, browser
 flags/version, shader cache, GL vendor/renderer, viewport/DPR, graphics knob,

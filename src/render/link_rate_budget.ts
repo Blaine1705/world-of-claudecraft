@@ -142,17 +142,18 @@ export function parseSubmissionPacingKnobs(search: string): SubmissionPacingKnob
   const params = new URLSearchParams(search);
   const experimental = params.has('perf');
   const rawRate = experimental ? params.get('linkrate') : null;
-  const adaptive = experimental && params.get('linkmode') === 'adaptive';
+  const adaptiveRequested = experimental && params.get('linkmode') === 'adaptive';
+  const adaptive = adaptiveRequested || rawRate === null;
   const parsedRate = rawRate === null ? Number.NaN : Number(rawRate);
   const linksPerSecond =
     rawRate !== null && Number.isFinite(parsedRate) && parsedRate > 0
       ? parsedRate
       : Number.POSITIVE_INFINITY;
   return {
-    source: rawRate === null && !adaptive ? 'default' : 'query',
+    source: rawRate === null && !adaptiveRequested ? 'default' : 'query',
     mode: adaptive ? 'adaptive' : Number.isFinite(linksPerSecond) ? 'limited' : 'unlimited',
-    // Experimental branch: absent and non-positive both preserve the release
-    // behavior. No candidate silently becomes a shipping default.
+    // Adaptive pacing is the release default. The perf-only static rate stays
+    // available for calibration, with zero retaining the unlimited control.
     linksPerSecond: adaptive ? Number.POSITIVE_INFINITY : linksPerSecond,
     burst: experimental
       ? (positiveIntegerParam(params, 'linkburst') ?? EXPERIMENTAL_PREWARM_LINK_BURST)

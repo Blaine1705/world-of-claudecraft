@@ -258,7 +258,7 @@ describe('gpu hitch metrics', () => {
 
   it('validates and compares adaptive pacing without treating feedback as configuration', () => {
     const control = capture({
-      requested: { ...capture().requested, linkmode: null },
+      requested: { ...capture().requested, linkmode: null, linkrate: 0 },
       effective: {
         ...capture().effective,
         prewarmPacing: {
@@ -291,7 +291,8 @@ describe('gpu hitch metrics', () => {
 
     expect(validateCapture(adaptive).valid).toBe(true);
     expect(areComparable(control, adaptive)).toBe(false);
-    expect(areComparable(control, adaptive, { varying: ['linkmode'] })).toBe(true);
+    expect(areComparable(control, adaptive, { varying: ['linkmode'] })).toBe(false);
+    expect(areComparable(control, adaptive, { varying: ['linkrate', 'linkmode'] })).toBe(true);
 
     const anotherAdaptive = structuredClone(adaptive);
     anotherAdaptive.effective.prewarmPacing.adaptive = {
