@@ -670,20 +670,26 @@ export const GUARD_IDLE_TX_TIMEOUT_MS = ESCROW_LOCK_TIMEOUT_MS;
  *  autosave chain, a saveAll worker slot, and leave/takeover, and it must
  *  stay well under the 30s autosave period even across all four real
  *  statements. Measured against Postgres 16 with a 27KB character blob:
- *  p50 3.5ms, max 8.3ms over 25 passes (the delivery pg suite's escrow-cost
- *  test re-measures and asserts p99 stays under a twenty-fifth of this
- *  allowance, 200ms), so 5s is orders of magnitude of headroom PER STATEMENT while
- *  a genuinely wedged statement can no longer hold the FIFO for the 60s
- *  heavy allowance. Honest ceiling accounting: this allowance bounds the
- *  FOUR workload statements (the tunables relation pins exactly those, plus
- *  the lock wait and the pool checkout, about 27s); BEGIN and the SET LOCAL
- *  that installs the allowance necessarily run under the 15s session
- *  default, and COMMIT's only hard bound is the 65s driver query_timeout
- *  backstop, so a genuinely wedged transaction can exceed one 30s autosave
- *  interval. What bounds the player-facing impact in that tail is the queue
- *  wait deadline plus the depth cap (later requests refuse typed instead of
- *  stacking); tightening the tail itself rides the hot-path follow-up with
- *  the guild-flush 60s term. The heavy allowance remains correct for the
+ *  p50 3.5ms, max 8.3ms over 25 passes, whole-transaction timings (the
+ *  delivery pg suite's escrow-cost test re-measures and asserts the
+ *  observed MAX stays under a twenty-fifth of this allowance, 200ms; an
+ *  env-gated local gate per tests/CLAUDE.md, not a CI floor), so 5s is
+ *  orders of magnitude of headroom while a genuinely wedged statement can
+ *  no longer hold the FIFO for the 60s heavy allowance. Honest ceiling
+ *  accounting: this allowance bounds the FOUR workload statements (the
+ *  tunables relation pins exactly those, plus the lock wait and the pool
+ *  checkout, about 27s; the two later SET LOCALs also run under it but are
+ *  protocol statements with no locks, IO, or planning, excluded from the
+ *  worst-case sum on that ground); BEGIN and the SET LOCAL that installs
+ *  the allowance necessarily run under the 15s session default, and
+ *  COMMIT's only hard bound is the 65s driver query_timeout backstop
+ *  (measured: statement_timeout does not bound COMMIT), so a genuinely
+ *  wedged transaction can exceed one 30s autosave interval, and reaching
+ *  the driver backstop also costs the DISCARDED connection (withTx's
+ *  codeless-failure rule below). What bounds the player-facing impact in
+ *  that tail is the queue wait deadline plus the depth cap (later requests
+ *  refuse typed instead of stacking); tightening the tail itself rides the
+ *  hot-path follow-up with the guild-flush 60s term. The heavy allowance remains correct for the
  *  LOGOUT-shaped saves (losing one is data loss; losing a listing attempt
  *  is a refusal the player retries). */
 export const ESCROW_STATEMENT_TIMEOUT_MS = 5_000;
@@ -945,6 +951,7 @@ export class PgWocMarketDb implements WocMarketDb {
     client.on('error', onError);
     let beginFailed = false;
     let rollbackFailed = false;
+    let codelessFailure = false;
     try {
       // BEGIN rides the never-started tag too: a pooled client whose socket
       // died since its last use (a NAT idle-reap, a Postgres restart the
@@ -1000,15 +1007,25 @@ export class PgWocMarketDb implements WocMarketDb {
       // stack) with a TypeError from this very line.
       const code = (e: unknown): string | undefined =>
         (e as { code?: string } | null | undefined)?.code;
-      throw code(err) !== undefined ? err : code(asyncErr) !== undefined ? asyncErr : err;
+      const chosen = code(err) !== undefined ? err : code(asyncErr) !== undefined ? asyncErr : err;
+      // A failure with NO SQLSTATE means no server verdict reached us, so the
+      // connection's protocol state is unknown: the driver-side query_timeout
+      // in particular rejects with a codeless error, cancels nothing
+      // server-side, and leaves the response outstanding; a best-effort
+      // ROLLBACK can then consume THAT response and "succeed", handing the
+      // pool a desynchronized client whose stale reply would be attributed
+      // to the next borrower. Codeless therefore always discards.
+      if (code(chosen) === undefined) codelessFailure = true;
+      throw chosen;
     } finally {
       client.removeListener('error', onError);
-      // A terminated, begin-broken, or rollback-swallowed session must be
-      // DISCARDED, not returned to the pool: a swallowed ROLLBACK (a
-      // black-holed statement rejecting at the driver backstop with no
-      // 'error' event) would otherwise hand the next checkout a client with
-      // an open transaction still aboard.
-      client.release(asyncErr !== null || beginFailed || rollbackFailed ? true : undefined);
+      // A terminated, begin-broken, rollback-swallowed, or codeless-failed
+      // session must be DISCARDED, not returned to the pool: any of them can
+      // hand the next checkout a client with an open transaction or an
+      // outstanding response still aboard.
+      client.release(
+        asyncErr !== null || beginFailed || rollbackFailed || codelessFailure ? true : undefined,
+      );
     }
   }
 
@@ -1050,7 +1067,13 @@ export class PgWocMarketDb implements WocMarketDb {
         // Lock ORDER is accounts-then-characters, matching every established
         // capped-insert path (db.ts createCharacterCapped, maps_db, user_assets_db),
         // so no future accounts-first path can deadlock against this one. The cap
-        // is counted under the lock and NOT re-counted outside it.
+        // is counted under the lock and NOT re-counted outside it. Blast radius,
+        // honestly: FOR UPDATE conflicts with the FOR KEY SHARE every FK-child
+        // INSERT takes on this row, so while the transaction runs the account
+        // cannot insert into ANY table referencing accounts(id); that width is
+        // what the 2s idle bound is really protecting (a NO KEY UPDATE
+        // narrowing is recorded follow-up work, measured to preserve the cap
+        // serialization).
         await client.query('SELECT 1 FROM accounts WHERE id = $1 FOR UPDATE', [
           listing.sellerAccount,
         ]);

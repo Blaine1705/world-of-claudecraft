@@ -1266,36 +1266,35 @@ describe('the escrow listing transaction, in SQL', () => {
     expect(release).toHaveBeenCalledWith(true);
   });
 
-  it('DISCARDS a client whose ROLLBACK was swallowed; an ordinary rollback returns it', async () => {
-    // A black-holed statement rejects at the driver backstop with no 'error'
-    // event; the catch's best-effort ROLLBACK then times out silently too.
-    // Returning that client would hand the pool an open transaction and a
-    // dead active query, so the swallowed rollback must force the discard.
+  it('DISCARDS a client after ANY codeless failure; a coded failure with a clean rollback returns it', async () => {
+    // A codeless rejection means no server verdict reached us (the driver
+    // backstop in particular cancels nothing and leaves its response
+    // outstanding, so even a "successful" best-effort ROLLBACK may have
+    // consumed the stale reply): the connection state is unknown and the
+    // client must be destroyed. A CODED failure is a server verdict, so a
+    // rollback that lands keeps that client poolable.
     const rolledBack: string[] = [];
-    const makePool = (rollbackThrows: boolean) => {
+    const makePool = (statementError: Error) => {
       const release = vi.fn();
       const query = async (text: string) => {
-        if (text.includes('FOR UPDATE')) throw new Error('Connection terminated unexpectedly');
-        if (text === 'ROLLBACK') {
-          rolledBack.push(text);
-          if (rollbackThrows) throw new Error('Connection terminated unexpectedly');
-        }
+        if (text.includes('FOR UPDATE')) throw statementError;
+        if (text === 'ROLLBACK') rolledBack.push(text);
         return { rows: [], rowCount: 1 };
       };
       const client = { query, release, on: () => {}, removeListener: () => {} };
       return { pool: { query, connect: async () => client } as unknown as Pool, release };
     };
-    const broken = makePool(true);
-    await expect(new PgWocMarketDb(broken.pool).escrowInsertListing(SAVE, LISTING)).rejects.toThrow(
-      'Connection terminated unexpectedly',
-    );
-    expect(broken.release).toHaveBeenCalledWith(true);
-    // The control: a rollback that lands keeps the client poolable.
-    const healthy = makePool(false);
+    const codeless = makePool(new Error('Connection terminated unexpectedly'));
     await expect(
-      new PgWocMarketDb(healthy.pool).escrowInsertListing(SAVE, LISTING),
+      new PgWocMarketDb(codeless.pool).escrowInsertListing(SAVE, LISTING),
     ).rejects.toThrow('Connection terminated unexpectedly');
-    expect(healthy.release).toHaveBeenCalledWith(undefined);
+    expect(codeless.release).toHaveBeenCalledWith(true);
+    // The control: a coded server verdict with a landed rollback stays poolable.
+    const coded = makePool(Object.assign(new Error('duplicate key'), { code: '23505' }));
+    await expect(new PgWocMarketDb(coded.pool).escrowInsertListing(SAVE, LISTING)).rejects.toThrow(
+      'duplicate key',
+    );
+    expect(coded.release).toHaveBeenCalledWith(undefined);
     expect(rolledBack.length).toBe(2);
   });
 

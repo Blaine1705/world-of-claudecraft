@@ -520,11 +520,13 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     // FOUR workload statements plus the lock wait plus the pool checkout, kept
     // under one autosave period so a listing does not stall a saveAll worker
     // across a whole wave. It is NOT the whole worst case: BEGIN and the SET
-    // LOCAL that installs the allowance run under the 15s session default, and
-    // COMMIT's only hard bound is the 65s driver query_timeout backstop, so a
-    // genuinely wedged job CAN exceed one autosave interval. What bounds the
-    // player-facing impact there is the queue wait deadline plus the depth cap,
-    // not this sum.
+    // LOCAL that installs the allowance run under the 15s session default, the
+    // two LATER SET LOCALs run under the 5s allowance but are protocol
+    // statements with no locks, IO, or planning (excluded from the sum on
+    // that ground), and COMMIT's only hard bound is the 65s driver
+    // query_timeout backstop, so a genuinely wedged job CAN exceed one
+    // autosave interval. What bounds the player-facing impact there is the
+    // queue wait deadline plus the depth cap, not this sum.
     // AUTOSAVE_SECONDS is a game.ts MODULE-PRIVATE const, so a re-typed 30_000
     // here would stay green after a re-tuned save cadence; scrape it (comments
     // stripped first, the file's own idiom) and let the relation follow it.
