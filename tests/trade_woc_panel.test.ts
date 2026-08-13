@@ -328,6 +328,34 @@ describe('a standing offer becomes a REVIEW surface for both sides', () => {
     );
   });
 
+  it('renders the accept WHY from the AUTHORITATIVE table, not the compose list', () => {
+    // The pass-through pin: dropping stagedAuthoritative from
+    // wocTradeModelFrom (or feeding it the compose list) renders '' here,
+    // which is exactly the shipped wrong-WHY bug coming back. The compose
+    // list is a clean single slot on purpose, so only the authoritative
+    // two-slot table can produce the one_item copy.
+    const root = paint(
+      deps({
+        pendingOffer: { ...offer, role: 'seller' },
+        staged: [slot(EPIC.id)],
+        stagedAuthoritative: [slot(EPIC.id), slot(EPIC.id)],
+      }),
+    );
+    expect(root.querySelector('[data-woc-hint]')?.textContent).toBe(
+      t('hudChrome.trade.woc.hintOneItem'),
+    );
+  });
+
+  it('the controller feeds the accept arm the same authoritative-first read as the belt', () => {
+    // Source pin on the ONE line that makes the model judge the table the
+    // player is looking at; losing it silently reverts the hint to the
+    // compose list while every behavioral suite stays green (the panel
+    // tests above drive the model directly).
+    expect(CONTROLLER).toContain(
+      'stagedAuthoritative: this.sim.tradeInfo?.myOffer.items ?? this.stagedTrade.items,',
+    );
+  });
+
   it('reports a withdraw press', () => {
     const buyer = deps({ pendingOffer: offer });
     paint(buyer).querySelector<HTMLElement>('[data-woc-cancel]')?.click();

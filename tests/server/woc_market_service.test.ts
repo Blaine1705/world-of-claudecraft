@@ -3673,10 +3673,12 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
       SELLER_CHAR,
     );
     expect(out).toEqual({ ok: false, reason: 'not_pending' });
-    expect(bagsOf(h, SELLER_CHAR), 'the copy restored').toContainEqual({
-      itemId: EPIC_ITEM,
-      count: 1,
-    });
+    // COUNT, not presence: this describe's stocked() seeds TWO identical
+    // copies, so a presence check passes with or without the restore.
+    expect(
+      bagsOf(h, SELLER_CHAR).filter((s) => s.itemId === EPIC_ITEM),
+      'the copy restored',
+    ).toHaveLength(2);
     expect((await h.db.directedOfferById(REALM, made.offer.id))?.status).toBe('pending');
   });
 
@@ -3701,10 +3703,11 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
       SELLER_CHAR,
     );
     expect(out).toEqual({ ok: false, reason: 'not_pending' });
-    expect(bagsOf(h, SELLER_CHAR), 'the copy restored').toContainEqual({
-      itemId: EPIC_ITEM,
-      count: 1,
-    });
+    // COUNT, not presence: see the sibling above.
+    expect(
+      bagsOf(h, SELLER_CHAR).filter((s) => s.itemId === EPIC_ITEM),
+      'the copy restored',
+    ).toHaveLength(2);
     expect((await h.db.directedOfferById(REALM, made.offer.id))?.status).toBe('accepted');
     expect(h.sweepErrors.map(([arm]) => arm)).toContain('offer_reopen');
   });
@@ -3730,10 +3733,12 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
         SELLER_CHAR,
       ),
     ).rejects.toThrow('unique violation');
-    expect(bagsOf(h, SELLER_CHAR), 'the rollback restore still ran').toContainEqual({
-      itemId: EPIC_ITEM,
-      count: 1,
-    });
+    // COUNT, not presence: deleting the proved-rollback restoreCopy call
+    // must fail this line (this describe's stocked() seeds TWO copies).
+    expect(
+      bagsOf(h, SELLER_CHAR).filter((s) => s.itemId === EPIC_ITEM),
+      'the rollback restore still ran',
+    ).toHaveLength(2);
     expect((await h.db.directedOfferById(REALM, made.offer.id))?.status).toBe('accepted');
     expect(h.sweepErrors.map(([arm]) => arm)).toContain('offer_reopen');
   });

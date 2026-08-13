@@ -109,7 +109,9 @@ export interface WocTradeInput {
    *  its WHY can never contradict the visible table; `staged` stays the
    *  compose-time source for everything pre-push (wocDisabled, the
    *  clear-your-items hint). Absent means no live mirror: the compose list
-   *  IS the truth and the accept arm falls back to it. */
+   *  IS the truth and the accept arm falls back to it (defensive: the live
+   *  controller always supplies this while the trade window is open, so the
+   *  fallback is a test-and-future-host path, not a production one). */
   stagedAuthoritative?: readonly InvSlot[];
   /** What the OTHER player has staged, which is what you are paying for. */
   theirStaged: readonly InvSlot[];

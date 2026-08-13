@@ -480,6 +480,11 @@ describe('a standing offer changes what each side may do', () => {
     expect(asSeller([{ itemId: EPIC.id, count: 2 }]).acceptHint).toBe(
       'hudChrome.trade.woc.hintOneItem',
     );
+    // The accept-side and send-side one_item stay ONE key: repointing either
+    // alone would show two different copies for the same rule.
+    expect(asSeller([slot(EPIC.id), slot(EPIC.id)]).acceptHint).toBe(
+      buildWocTradeModel(input({ theirStaged: [slot(EPIC.id), slot(EPIC.id)] })).sendHint,
+    );
     // The AUTHORITATIVE table wins over the compose list in BOTH directions:
     // the sim can clean a pushed offer into a different shape, and the hint
     // must describe the table the player is actually looking at (which is
