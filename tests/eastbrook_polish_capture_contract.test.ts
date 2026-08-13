@@ -145,8 +145,14 @@ interface AttributionTargetFixture {
 // (evictFarZoneIfConstrained) with the release branch's organized renderer
 // imports. Both parents move renderer.ts, so the rendererIntegration leaf
 // mints a value matching neither parent. No capture was retaken.
+// Re-minted after the point-light adoption seam moved the fire-light budget
+// pass out of renderer.ts into fire_light_registry.ts. renderer.ts is a
+// provenance input, so its bytes move the composite. No capture was retaken.
+// Re-minted again for the review fixes on the same PR: the stranded-light
+// reparent moved out of renderer.ts too, and the budget-pass descriptor became
+// a pooled field. renderer.ts bytes only. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'decde6de14371817605eb651a7f0450148057e922e1ff81e7169521591704ecd';
+  '1c04866fbf189d69d6c1b7e27e9f29d2884e2a7b91f119549df644da44fecf00';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
