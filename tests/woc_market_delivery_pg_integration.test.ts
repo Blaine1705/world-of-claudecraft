@@ -1448,8 +1448,10 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         expect(await marketDb.claimCustodyRef(realm, ref)).toBe(true);
         const [escrow, booked] = await Promise.all([
           marketDb.escrowInsertListing(
+            // The PUBLIC arm (cap-counting COUNT included): five rounds stay
+            // under the 12-listing cap, and this is the fuller lock graph.
             { characterId, level: 12, state: SAVE_STATE, leaseNonce: 'escrow-nonce-live' },
-            escrowListing(realm, account, characterId, { directedBuyerAccount: account }),
+            escrowListing(realm, account, characterId),
           ),
           marketDb.saveDeliveredCharacterBooked(
             { characterId, level: 13, state: SAVE_STATE, leaseNonce: 'escrow-nonce-live' },

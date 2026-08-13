@@ -5,7 +5,20 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-05-custody-entry-hardening.md`
+- Next file to run: `docs/woc-marketplace-hardening/phase-05-qa.md`
+- 05 implemented AND reviewed (LOCAL, not pushed per R4): H5, H6, the
+  coordinator-drift medium (broker custody extraction + the firewall
+  tighten) closed; ledger entry below. A database-performance
+  PRE-implementation checkpoint (BLOCK, five amendments) reshaped the
+  design before any code; the three-reviewer round found three critical
+  defects in MY fix (the EPIPE rollback-proof hole, the ownership-order
+  IDOR, the inverted restore-mail premise) plus two blocking test gaps,
+  every finding applied and the fix round re-reviewed fresh. Items the
+  DEDICATED phase-05-qa session still owns: re-judge the 5s/2s escrow
+  queue bounds and the 30s warn throttle numbers, the quarantine-kick
+  posture on the ambiguous arm (player-visible disconnect), the
+  commitGrant FIFO carve-out (recorded, source-pinned, filed as
+  follow-up), and the residual list in progress.md.
 - 04 QA COMPLETE (PASS-WITH-FOLLOWUPS, every fix applied, PUSHED per R4;
   gate GREEN at the final tip 8c1028e89d, full-suite fallback, all 8
   steps).
@@ -824,6 +837,105 @@ Still open (a phase that hits one asks at session start):
     (both intakes refuse before recording and the sweep freezes recorded
     rows), and the boot dedupe can demote a 'review' loser to failed only
     when open2 never built (edge, safe-direction, reconcile by hand).
+- 05 custody-entry-hardening (2026-08-13, session start f07ca88278 = the
+  trivial release sync merge, LOCAL, not pushed per R4): H5, H6, and the
+  coordinator-drift medium closed. The registry later sessions need:
+  - THE ESCROW FIFO (H5): createListing's whole custody critical section
+    (extract, authoritative re-check, escrowInsertListing, compensation)
+    runs as ONE job on GameServer's per-character save queue
+    (WocMarketCustody.runSerialized over GameServer.enqueueCharacterWrite;
+    the keyed FIFO itself is serial_writer.ts createKeyedSerialWriter, and
+    the weapon-skin/hotbar queues plus the market depth-warn wrapper now
+    ride the same module). Commit order is enqueue order across ALL of a
+    character's writers, so a stale pre-extraction autosave always commits
+    BEFORE the escrow write and can never resurrect an escrowed item.
+    Ownership resolves BEFORE the job (ownsLiveCharacter, zero side
+    effects: a foreign character id must never occupy the victim's escrow
+    slot or force their guild-book flush). The job is depth-capped at ONE
+    per character and deadline-bounded (ESCROW_QUEUE_WAIT_MS 5s, covering
+    the guild-book flush; a cancelled job has extracted nothing; a job
+    that STARTED answers its real outcome, never contended; waits past
+    ESCROW_QUEUE_WARN_MS 2s warn, throttled 30s). Dirty guild books flush
+    atomically FIRST and an in-job re-check refuses 'contended' (a
+    character row must never carry book-paired deltas without its book
+    half). Every custody blob (extract, grant, snapshot) serializes
+    through GameServer.serializeCharacterForPersist: the session save
+    fixups ride every durable write (a raw sim.serializeCharacter was a
+    jail escape; character_save_fixups.ts owns the rationale, extracted
+    from saveCharacter). wocCustodySession refuses left AND quarantined
+    sessions for every custody op.
+  - COMPENSATION SPLIT ON PROOF: server/pg_rollback_proof.ts
+    throwProvedRollback is an ALLOWLIST of proven-abort SQLSTATE classes
+    (22/23/25/40/42/53/54/55 + 57014); Node errnos (EPIPE et al, five
+    uppercase chars) and connection-class codes classify AMBIGUOUS. A
+    proven-rollback throw or typed refusal restores via
+    restoreCopy(pid, characterId, slot): into the LIVE bags while the
+    extraction pid's player entity exists (every teardown flush queues
+    BEHIND the job, so the restored copy rides it to durability), by
+    return parcel only once the player is gone. lease_lost ALSO fires
+    escrowSessionLost('fenced') (kick, saveCharacter's own displaced-
+    zombie signal). An AMBIGUOUS throw restores NOTHING and fires
+    escrowSessionLost('ambiguous'): quarantine + kick, so the session
+    reloads from the durable row, which is correct in BOTH branches of an
+    unknown COMMIT (committed: item-free blob + listing; rolled back: the
+    item still in the bags); the full extracted slot is logged
+    (escrow_outcome_unknown) for the operator.
+  - escrowInsertListing: workload-scoped ESCROW_STATEMENT_TIMEOUT_MS (5s,
+    exported + ladder-pinned in tunables; measured p50 3.5ms / max 8.3ms
+    on a 27KB blob, re-measured and asserted by the delivery pg suite's
+    escrow-cost test), the idle-in-transaction bound, and 55P03/40P01/
+    25P03 mapped to the typed 'contended' (return union widened; the
+    service restores and answers woc_market.contended). ESCROW_LOCK_
+    TIMEOUT_MS and GUARD_IDLE_TX_TIMEOUT_MS are now exported and
+    literal-pinned.
+  - RECORDED CARVE-OUT: commitGrant (the delivery twin) deliberately does
+    NOT ride the FIFO yet: its stale-autosave direction is buyer item
+    LOSS, operator-recoverable through the claims-ledger park subset, and
+    FIFO-routing sweep grants needs a head-of-line bound first. Recorded
+    at the method, source-pinned (exactly one runSerialized call site in
+    the service; no enqueueCharacterWrite reference), filed as packet
+    follow-up work, NOT silently deferred.
+  - H6: exchangeHardLock consumes the shared per-copy transfer-lock
+    predicate, so the woc rail refuses exactly what the gold market,
+    mail, and guild bank refuse; the ARMED state reports its own
+    'bind_armed' reason (joins the woc_market.not_eligible wire group,
+    REFUSAL_ERRORS is 49 rows; no new catalog leaf). The predicate body
+    moved to the dependency-free src/sim/transfer_lock.ts leaf
+    (item_instance_transfer re-exports it; exchange_eligibility keeps an
+    empty runtime import graph). Both client pre-filters (Sell picker,
+    trade-window exchange arm) inherit the refusal SILENTLY (no per-lock
+    copy exists; phases 14/15 own explanatory copy if wanted). An
+    unbind returns a commission piece to the ARMED state, covered.
+  - EXTRACTION: src/sim/broker_custody.ts (extractTradableCopyImpl with
+    the mount-dismount arm, grantTradableCopyImpl on the one-call
+    canGrantCopies/grantCopies pair; thin same-named Sim delegates stay
+    for the server bridge; grantTradableCopy finally has tests incl. the
+    #2139 per-dimension refusals and a zero-rng pin with positive
+    control). src/sim/daily_rewards_stub.ts holds the offline
+    daily-rewards readout (value-pinned by its own suite). Monolith
+    ceilings ratcheted to EXACT: sim.ts 12660 -> 12428, game.ts 10859 ->
+    10857 (the FIFO/fixups/depth-warn extractions paid for the new host
+    members).
+  - FIREWALL: FIREWALL_ALLOWED is exactly ['src/sim/daily_rewards_stub.ts']
+    with an existence + pattern-hit + read-only-projection shape pin (one
+    export function, no control flow, type-only imports); sim.ts,
+    types.ts, holder_tier.ts are fully scanned. The pattern set is
+    calibrated against the REAL server corpus: lamports, base58, bs58,
+    keypair, secret/private key, blockhash, spl-token, send/sign
+    transaction, woc-amount shapes, money-affixed signature compounds
+    (tx/txn/bond/settlement/burn/transfer/der/escrow/payer/seller/mint +
+    signature_reused/required/field/header/verified/atMs/bytes), treasury
+    suffixes + base/cut/fee/account. Bare 'signature' and 'token' stay
+    out (49 measured content false positives; riftToken/chatTokens).
+    Non-vacuity floor 440 of 474 files.
+  - Handoffs: phase 06 opens with the acceptDirectedOffer throw-arm
+    question (an escrow THROW leaves the offer 'accepted' with no
+    listing; conservative, operator-resolvable; judge an unwind); phase
+    16 owns the escrow-queue metrics counter and the saveAll-wave
+    suppression measurement; phase 22's pre-enable audit gains one line
+    (scan standing listings' item payloads for bindOnTrade-armed copies
+    that entered before H6). The 04 ledger's "REFUSAL_ERRORS is 48 rows"
+    is superseded: 49 since bind_armed.
 - 02 QA (2026-08-11, session start 20fdcc5288, verdict PASS-WITH-FOLLOWUPS
   with every fix applied, gate GREEN at tip 301a8c7c22, PUSHED per R4):
   release/v0.37.0 synced (merge b40a178643; generated-i18n conflict

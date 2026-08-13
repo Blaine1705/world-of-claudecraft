@@ -1930,8 +1930,8 @@ export class GameServer {
   private saveTimer = 0;
   private socialPosTimer = 0;
   private saveAllInFlight: Promise<void> | null = null;
-  // One FIFO per character id: EVERY durable character write rides it
-  // (saveCharacter and enqueueCharacterWrite), so commit order is enqueue order.
+  // One FIFO per character id: EVERY durable character write rides it, so
+  // commit order is enqueue order (saveCharacter, enqueueCharacterWrite).
   private readonly characterSaveQueues = createKeyedSerialWriter<number>();
   // Weapon-skin loadouts are whole-record replacements in their dedicated paid
   // state row. Keep one FIFO per account so rapid apply/detach commands cannot
@@ -3683,8 +3683,8 @@ export class GameServer {
     weaponSkinLoadout: Record<string, string>,
   ): void {
     const snapshot = { ...weaponSkinLoadout };
-    // Fire and forget BY CONTRACT for this queue: a failed loadout save is a
-    // cosmetic loss the next apply overwrites, so it swallows to the log.
+    // Fire and forget BY CONTRACT: a failed save is a cosmetic loss the next
+    // apply overwrites, so it swallows to the log.
     void this.weaponSkinLoadoutSaveQueues
       .enqueue(accountId, () => setAccountWeaponSkinLoadout(accountId, snapshot))
       .catch((err) => {
@@ -3693,7 +3693,6 @@ export class GameServer {
   }
 
   private enqueueHotbarLayoutSave(characterId: number, layout: ActionBarLayout): void {
-    // Same fire-and-forget contract as the loadout queue above.
     void this.hotbarLayoutSaveQueues
       .enqueue(characterId, () => setCharacterHotbarLayout(characterId, layout))
       .catch((err) => {
@@ -4680,24 +4679,27 @@ export class GameServer {
   }
 
   /** An out-of-band durable character write (the marketplace escrow persist)
-   *  on the SAME per-character FIFO as saveCharacter. The job must not await
-   *  another enqueue for the same character (FIFO self-deadlock; the
-   *  kickSession note inside saveCharacter is the same rule). */
+   *  on the SAME per-character FIFO as saveCharacter. A job must not await
+   *  another same-character enqueue (FIFO self-deadlock). */
   enqueueCharacterWrite<T>(characterId: number, job: () => Promise<T>): Promise<T> {
     return this.characterSaveQueues.enqueue(characterId, job);
   }
 
-  /** Terminal escrow-job arms, fire and forget from inside the job (awaiting
-   *  a same-character enqueue there deadlocks). 'fenced' kicks the displaced
-   *  zombie (saveCharacter's own fence-out signal); 'ambiguous' quarantines
-   *  so the durable row decides, which converges BOTH branches of an unknown
-   *  COMMIT. Dirty book deltas revert like every abandoned session's. */
-  escrowSessionLost(characterId: number, kind: 'fenced' | 'ambiguous'): void {
+  /** Terminal escrow-job arms, fire and forget from inside the job. 'fenced'
+   *  kicks the displaced zombie; 'ambiguous' quarantines so the durable row
+   *  decides both branches of an unknown COMMIT. The pid is the extraction
+   *  identity (a turned-over session is left alone). A MID-LEAVE session
+   *  still quarantines: its queued leave flush re-checks the flag, which is
+   *  what stops it committing bags-without-the-copy over a rollback; only
+   *  the kick is skipped. Book deltas revert like any abandoned session's. */
+  escrowSessionLost(pid: number, characterId: number, kind: 'fenced' | 'ambiguous'): void {
     const session = this.sessionByCharacterId(characterId);
-    if (!session || session.left) return;
+    if (!session || session.pid !== pid) return;
     if (kind === 'ambiguous') session.escrowQuarantined = true;
     this.revertOwnGuildBookOps(session, [...session.dirtyGuildBanks.keys()]);
-    void this.kickSession(session, `market escrow ${kind}`, 'character taken over');
+    if (!session.left) {
+      void this.kickSession(session, `market escrow ${kind}`, 'character taken over');
+    }
   }
 
   async saveAll(reason: string): Promise<void> {
@@ -6094,15 +6096,15 @@ export class GameServer {
 
   hasDirtyGuildBooks(characterId: number): boolean {
     const session = this.sessionByCharacterId(characterId);
-    // A quarantined session's marks can never flush clear (its saves refuse),
-    // so reporting them dirty would refuse 'contended' (a retry hint) forever.
+    // Quarantined marks can never flush clear (saves refuse), so reporting
+    // them dirty would refuse 'contended' (a retry hint) forever.
     if (!session || session.left || session.escrowQuarantined) return false;
     return session.dirtyGuildBanks.size > 0;
   }
 
   // One ordinary save to flush a seller's dirty guild books BEFORE the escrow
-  // critical section (the escrow write persists the character row ALONE, so a
-  // blob carrying unflushed book-paired deltas would tear the guild-bank
+  // critical section (that write persists the character row ALONE, so a blob
+  // carrying unflushed book-paired deltas would tear the guild-bank
   // atomicity). Never call from inside a queued character write: deadlock.
   async flushDirtyGuildBooks(characterId: number): Promise<void> {
     const session = this.sessionByCharacterId(characterId);

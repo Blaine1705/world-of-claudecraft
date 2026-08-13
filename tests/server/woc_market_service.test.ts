@@ -113,7 +113,7 @@ class FakeCustody implements WocMarketCustody {
     return this.bags.has(characterId) && this.owners.get(characterId) === accountId;
   }
 
-  escrowSessionLost(characterId: number, kind: 'fenced' | 'ambiguous'): void {
+  escrowSessionLost(_pid: number, characterId: number, kind: 'fenced' | 'ambiguous'): void {
     this.sessionLost.push({ characterId, kind });
   }
 

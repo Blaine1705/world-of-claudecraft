@@ -46,8 +46,9 @@ export interface WocCustodyGameHost {
   flushDirtyGuildBooks(characterId: number): Promise<void>;
   /** Terminal escrow-job signals (game.ts owns the semantics: 'fenced' kicks
    *  the displaced zombie, 'ambiguous' quarantines so the durable row
-   *  decides). Fire and forget; never awaited from inside a job. */
-  escrowSessionLost(characterId: number, kind: 'fenced' | 'ambiguous'): void;
+   *  decides; the pid asserts the session is the one the job mutated).
+   *  Fire and forget; never awaited from inside a job. */
+  escrowSessionLost(pid: number, characterId: number, kind: 'fenced' | 'ambiguous'): void;
 }
 
 /** How long a listing request may WAIT for its turn on the character's save
@@ -56,8 +57,10 @@ export interface WocCustodyGameHost {
  *  connect deadline: past that, something is wedged and holding the HTTP
  *  request open only invites a retry pile-up. */
 export const ESCROW_QUEUE_WAIT_MS = 5_000;
-/** Queue waits past this warn, throttled to one line per burst (the market
- *  writer's depth-warn idiom): the observability for the new FIFO coupling. */
+/** Queue waits past this warn. The throttle (30s, realm-global across every
+ *  character on purpose: the signal is "escrow waits are slow", one line per
+ *  burst carries it) is this coupling's observability floor; the metrics
+ *  counter rides the hot-path work. */
 export const ESCROW_QUEUE_WARN_MS = 2_000;
 
 const LETTERS = {
@@ -128,6 +131,10 @@ export function createWocMarketCustody(
       try {
         const enqueuedAt = Date.now();
         const work = (async (): Promise<T | 'contended'> => {
+          // (The depth-cap slot is released when THIS settles, not when the
+          // waiter returns: a deadline refusal may abandon a flush still
+          // queued on the FIFO, and releasing the slot then would let 5s
+          // retries stack flushes onto an already-wedged queue.)
           // The guild-book flush rides INSIDE the deadline: it waits its own
           // turn on the same FIFO, so a wedged queue would otherwise hold
           // the HTTP request (and this character's depth-cap slot) unbounded
@@ -155,6 +162,10 @@ export function createWocMarketCustody(
             return job();
           });
         })();
+        const releaseSlot = (): void => {
+          escrowJobsInFlight.delete(characterId);
+        };
+        void work.then(releaseSlot, releaseSlot);
         const timeout = new Promise<'timeout'>((resolve) => {
           timer = setTimeout(() => resolve('timeout'), escrowWaitMs);
         });
@@ -170,7 +181,6 @@ export function createWocMarketCustody(
         return 'contended';
       } finally {
         if (timer !== undefined) clearTimeout(timer);
-        escrowJobsInFlight.delete(characterId);
       }
     },
 
@@ -240,7 +250,9 @@ export function createWocMarketCustody(
       // rail. A QUARANTINED session never reaches here: extraction refuses
       // it up front, and quarantine cannot be set mid-job (it is only
       // assigned inside a saveCharacter thunk on this same FIFO).
-      if (host.sim.players.has(pid)) {
+      // Both maps, the same presence rule Sim.resolve applies: a divergence
+      // would otherwise drop the copy silently inside the add helpers.
+      if (host.sim.players.has(pid) && host.sim.entities.has(pid)) {
         restoreInto(host, pid, slot);
         return;
       }
@@ -261,8 +273,8 @@ export function createWocMarketCustody(
       return session !== null && session.accountId === accountId;
     },
 
-    escrowSessionLost(characterId: number, kind: 'fenced' | 'ambiguous'): void {
-      host.escrowSessionLost(characterId, kind);
+    escrowSessionLost(pid: number, characterId: number, kind: 'fenced' | 'ambiguous'): void {
+      host.escrowSessionLost(pid, characterId, kind);
     },
 
     async persistMailParcel(

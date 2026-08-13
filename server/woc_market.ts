@@ -933,8 +933,10 @@ export interface WocMarketCustody {
    *  a foreign character id must never reach the flush or the depth cap. */
   ownsLiveCharacter(accountId: number, characterId: number): boolean;
   /** Terminal escrow-job signals: 'fenced' kicks the displaced zombie,
-   *  'ambiguous' quarantines so the durable row decides. Fire and forget. */
-  escrowSessionLost(characterId: number, kind: 'fenced' | 'ambiguous'): void;
+   *  'ambiguous' quarantines so the durable row decides. The pid is the
+   *  extraction identity; a turned-over session is left alone. Fire and
+   *  forget. */
+  escrowSessionLost(pid: number, characterId: number, kind: 'fenced' | 'ambiguous'): void;
   extractCopy(accountId: number, characterId: number, ref: ExtractRef): WocCustodyExtract;
   /** Hand a held copy straight to a live buyer's bags. Returns the save the
    *  caller must persist before treating the delivery as done. */
@@ -1459,12 +1461,15 @@ export class WocMarketService {
           if (throwProvedRollback(err)) {
             this.deps.custody.restoreCopy(extract.pid, args.characterId, extract.extracted);
           } else {
+            // code+message only, never the raw error: an ambiguous class that
+            // carries a detail (XX000, 08P01) can echo row values.
             console.error(
               `[woc_market] escrow_outcome_unknown: listing persist for character ${args.characterId} ` +
-                `threw without rollback proof; session quarantined, slot ${JSON.stringify(extract.extracted)}`,
-              err,
+                `threw without rollback proof; abandoning the session so the durable row decides, ` +
+                `slot ${JSON.stringify(extract.extracted)}`,
+              { code: (err as { code?: string }).code, message: String(err) },
             );
-            this.deps.custody.escrowSessionLost(args.characterId, 'ambiguous');
+            this.deps.custody.escrowSessionLost(extract.pid, args.characterId, 'ambiguous');
           }
           throw err;
         }
@@ -1474,16 +1479,11 @@ export class WocMarketService {
             // (same signal as saveCharacter's fence-out arm). Restore the
             // copy for the durable-truth reload, then kick.
             this.deps.custody.restoreCopy(extract.pid, args.characterId, extract.extracted);
-            this.deps.custody.escrowSessionLost(args.characterId, 'fenced');
+            this.deps.custody.escrowSessionLost(extract.pid, args.characterId, 'fenced');
             return { refusal: 'lease_lost' as const };
           }
           this.deps.custody.restoreCopy(extract.pid, args.characterId, extract.extracted);
-          return {
-            refusal:
-              inserted.reason === 'cap_reached' || inserted.reason === 'contended'
-                ? inserted.reason
-                : ('lease_lost' as const),
-          };
+          return { refusal: inserted.reason };
         }
         return { id: inserted.id };
       },

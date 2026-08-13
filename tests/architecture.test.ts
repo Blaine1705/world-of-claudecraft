@@ -1161,8 +1161,20 @@ describe('the $WOC token firewall over src/sim', () => {
       const src = readFileSync(join(repoRoot, rel), 'utf8');
       const stripped = stripComments(src);
       expect(FIREWALL_RE.test(stripped), `${rel} no longer trips the pattern`).toBe(true);
-      expect(stripped.match(/export function /g), `${rel} export count`).toHaveLength(1);
+      expect(
+        stripped.match(/export\s+(?:async\s+)?function /g),
+        `${rel} export count`,
+      ).toHaveLength(1);
+      // No other export FORM either (a const arrow or a class would dodge the
+      // count above), and no control flow including ternaries: the exemption
+      // is for a constant projection, nothing that computes.
+      expect(stripped, `${rel} grew a non-function export`).not.toMatch(
+        /export\s+(?:default|const|let|var|class)\b/,
+      );
       expect(stripped, `${rel} grew control flow`).not.toMatch(/\b(?:if|for|while|switch)\s*\(/);
+      expect(stripped.includes('?'), `${rel} grew a ternary or optional`).toBe(false);
+      // Inline type imports (import { type X }) are deliberately refused too:
+      // write them as import type so the pin stays one regex.
       expect(stripped, `${rel} grew a value import`).not.toMatch(/^import (?!type )/m);
     }
     // Both compound shapes must bite, and ordinary custody vocabulary must not.

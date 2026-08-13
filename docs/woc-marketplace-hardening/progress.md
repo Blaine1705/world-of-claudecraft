@@ -13,7 +13,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 03 QA | phase-03-qa | game | DONE | 5ef64c1e11 | PASS-WITH-FOLLOWUPS, every fix applied (section below); release sync 5487531960 (two conflicts: main.ts union + regenerated pending.ts; merge audit CLEAN except the hud ratchet, fixed by the error_text_i18n_core extraction, ceiling 19338 to 19190); AC3 park deviation UPHELD; 21-mutation pass, one survivor closed; pushed per R4 |
 | 04 | bond-payment-lifecycle | game | DONE | 3f20375918 | release sync no-op; three review rounds (security/db/coverage x2, qa-checklist, migration-safety) all applied; 17 mutation spot-proofs bit; gate GREEN at 0afdaa71a5. A follow-up verification session (sections below) re-ran the whole phase, applied two further audited fix rounds (commits 60034033f1, a938c410f3 plus docs), re-bit 11 mutations (3 re-proofs + 8 on the new fixes), and re-gated GREEN TWICE (full-suite fallback, all 8 steps, at c7176d730b and 6642c6e15b); LOCAL, not pushed per R4; final docs commit on top |
 | 04 QA | phase-04-qa | game | DONE | e4ae9d1602 | PASS-WITH-FOLLOWUPS, every fix applied (section below); release/v0.37.0 synced (merge a43a1e8b52: the count-pin trap fired FOR REAL, both sides at 321 with different members, re-derived 322/85/237 + sends 199 dispatches 212 from runs; hud.ts over ceiling, fixed by the crafting_deny_core extraction, ceiling 19190 to 19177; game.ts ceiling banked to 10859); five audit lanes + fresh fix-round re-reviews; deep mutation pass incl. one REAL hole closed (the async-stall withTx shape); three correctness fixes proven red-on-old (lapse-straddle refresh, poll-race standing, review retry); a THIRD round from the fresh re-review (review-state client honesty, the devsig colon, the at-cap self-steal recording, bond_window_closed); gate GREEN at 8c1028e89d (full-suite fallback, all 8 steps; the first run caught the extraction's stale station pins in profession_identity_card, retargeted to the core); pushed per R4 (no open PR on this branch, so no PR CI) |
-| 05 | custody-entry-hardening | game | NOT STARTED | | |
+| 05 | custody-entry-hardening | game | DONE | f07ca88278 | release sync trivial (one locale-fill commit; generated pending.ts regenerated); H5/H6/extraction/firewall closed; dbperf pre-checkpoint BLOCK folded in; three-reviewer round + fresh fix-round re-review + qa-checklist (sections below); real-SQL suites 114 green incl. the new escrow set; LOCAL, not pushed per R4 |
 | 05 QA | phase-05-qa | game | NOT STARTED | | |
 | 06 | directed-rail-integrity | game | NOT STARTED | | |
 | 06 QA | phase-06-qa | game | NOT STARTED | | |
@@ -49,6 +49,124 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 21 QA | phase-21-qa | service + game | NOT STARTED | | |
 | 22 | close-out | all three | NOT STARTED | | teardown offer lives in 22 QA |
 | 22 QA | phase-22-qa | all three | NOT STARTED | | |
+
+## 05 implement round (custody entry hardening)
+
+Release sync: merge f07ca88278 (origin/release/v0.37.0, ONE locale-fill
+commit; the only conflict was the generated pending.ts, resolved by
+regeneration; no count-pin surface touched, so no re-derivation was
+owed and the release-merge-audit skill was not warranted).
+
+Recon corrected the packet premise twice before any code: only
+grantTradableCopy's body sat on sim.ts (extractTradableCopy was already
+the inventory_extract.ts leaf plus a facade whose real behavior is the
+mount-dismount arm), and a bare `signature` firewall arm would have
+flagged 49 measured false positives, all the game's own vocabulary.
+
+A database-performance PRE-IMPLEMENTATION checkpoint (per the
+extract-and-test rule for DB-backed changes) returned BLOCK with five
+design amendments, every one folded into the build: the whole custody
+critical section (extract, authoritative re-check, escrowInsertListing,
+compensation) became ONE job on the per-character save FIFO (which also
+deleted the planned extraction-time-snapshot fallback, F8); every
+custody blob serializes through the save fixups (a raw serialize
+dropped the jail flag: a moderation escape, F1); dirty guild books
+flush atomically before the job with an in-job re-check (F2);
+quarantined sessions are refused at wocCustodySession for every custody
+op (F3); the HTTP wait got a depth cap and a deadline (F5); and the
+transaction traded the 60s heavy allowance for a workload-scoped 5s
+statement timeout plus the idle bound (F6; measured p50 3.5ms / max
+8.3ms on a 27KB blob, printed and asserted by the pg cost test).
+
+The H5 interleave suite was written FIRST and run RED against the
+pre-fix code (scratchpad h5-red.txt: the escrow write committed while a
+stale pre-extraction autosave was held open, and the escrow blob
+replayed the request-time snapshot); post-commit, bypassing
+runSerialized in createListing redded 8 tests including the headline
+interleave pin.
+
+Reviewer round (architecture, privacy-security, test-coverage, all
+prompted for coverage), every finding applied:
+- Security C1: the rollback-proof classifier's SQLSTATE shape check
+  passed Node socket errnos (EPIPE is five uppercase characters), and
+  withTx prefers coded errors, so the one ambiguous class classified as
+  proof of rollback: the double-mint H5 exists to prevent. Now an
+  ALLOWLIST of proven-abort classes with a table-driven suite over real
+  SQLSTATEs and errnos (the null-input case caught a crash in my own
+  first rewrite).
+- Security C2 (IDOR): runSerialized ran side effects (guild-book flush,
+  the depth-cap slot) before any ownership check; a foreign character
+  id could occupy a victim's escrow slot and force their flush at the
+  route rate limit. Ownership now resolves through the side-effect-free
+  ownsLiveCharacter BEFORE the job; the in-job extractCopy re-check
+  stays as depth defense.
+- Security C3: the H5 reordering inverted restoreCopy's mail-arm
+  premise (the leave flush now runs BEHIND the job, so the durable row
+  still holds the item at refusal time and mailing risked two copies).
+  Compensation now follows the extraction pid: restore into the live
+  bags while the player entity exists (the queued teardown flush
+  persists it), mail only once it is truly gone; pinned by the
+  mid-leave restore test plus a positive control on the mail arm.
+- Security W-set: the wait deadline now covers the guild-book flush
+  (the wedged case it was sized for) and a flush throw refuses typed;
+  the ambiguous park QUARANTINES the session (reload from the durable
+  row converges both branches of an unknown COMMIT) with the full
+  extracted slot logged; a lease-fenced write kicks the displaced
+  zombie (saveCharacter's own signal); the queue-wait warn throttles.
+- Coverage B1/B2: the classifier had zero tests (closed with the
+  table-driven suite plus fake-db throw hooks driving both service
+  arms); the depth-cap pin passed with the cap removed because the
+  deadline answers the identical literal (closed with an unreachable
+  deadline plus an elapsed bound). Also closed: the started-job arm,
+  the re-dirty-during-wait arm, grant/snapshot fixups coverage, the
+  stub-file allowlist shape pin, the direct serializeCharacterForPersist
+  quarantine arm, the drained-cancelled-job asserts, the non-null
+  stowed-pet fixups arm, the commitGrant carve-out source pin, DB-free
+  contended/rethrow SQL pins, and the tunables ladder pins (both db
+  constants now exported and literal-pinned).
+- Architecture: both moves proven token-identical; parity goldens green
+  and unregenerated; the firewall pattern recalibrated against the REAL
+  server corpus (treasuryBase, derSignature, signatureAtMs, bs58,
+  keypair, blockhash, the woc-amount shapes); the vacuity floor raised
+  to the real tree size (440 of 474); the facade-delegate describe
+  moved beside its module; the shared transfer-lock predicate moved to
+  its own dependency-free leaf (transfer_lock.ts) so
+  exchange_eligibility keeps an empty runtime import graph; the
+  dailyRewards stub got a value pin. The market writer's depth-warn
+  wrapper moved to serial_writer.ts (createDepthWarnedSerialWriter) to
+  pay for the new game.ts host members under the zero-headroom ratchet.
+
+Residuals accepted this round (owners; do not re-raise):
+- acceptDirectedOffer leaves the offer 'accepted' with no listing when
+  the escrow write THROWS (only the typed-refusal arm reopens). The
+  conservative direction (an operator resolves; reopening could pair a
+  live listing with a reopened offer). Owner: 06 (the directed-rail
+  session judges an unwind or a park note).
+- Armed bindOnTrade copies already sitting in escrow in a live database
+  would still deliver anonymously (H6 gates entry only). Vacuous while
+  WOC_MARKET_ENABLED=0; owner: 22 (a pre-enable audit line: scan
+  listings' item payloads for bindOnTrade without boundTo).
+- The escrow-queue observability is the throttled wait warn plus the
+  typed contended refusals; the full metrics-counter treatment (dbperf
+  F15) rides 16 with the p99.9 measurements already owed there, as does
+  the saveAll-wave suppression measurement (dbperf proof 3).
+- The behavior ripple from H6's shared predicate: armed commission
+  pieces now vanish silently from the Sell picker and the trade
+  window's exchange arm (both filters are reason-blind by design).
+  Owner: 14/15 if explanatory copy is wanted.
+- A left-mid-job seller whose teardown flush later FAILS terminally
+  loses the restored copy with the durable row keeping it (item safe,
+  bags stale until next login); double-failure shape, db-down class.
+- The pg contended-ceiling timing bounds (1s..5s around the 2s
+  lock_timeout) are generous but not saturation-proof; judged
+  acceptable for an env-gated suite.
+
+Validation: tsc clean; the 20-suite DB-free set 1078 green; all three
+pg suites 109 green under TEST_DATABASE_URL (zero skips, demonstrably
+ran) plus the 5-test escrow set (fence both ways, the 55P03 ceiling
+with elapsed bounds, the lock-graph probe now looped 5x, the measured
+cost distribution asserted under a fifth of the allowance);
+ci:changed exit 0.
 
 ## 04 QA round (verdict PASS-WITH-FOLLOWUPS, every fix applied)
 

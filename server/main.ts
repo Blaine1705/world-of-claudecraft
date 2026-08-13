@@ -2781,7 +2781,8 @@ const wocMarketService = new WocMarketService({
       liveGame().serializeCharacterForPersist(characterId),
     hasDirtyGuildBooks: (characterId) => liveGame().hasDirtyGuildBooks(characterId),
     flushDirtyGuildBooks: (characterId) => liveGame().flushDirtyGuildBooks(characterId),
-    escrowSessionLost: (characterId, kind) => liveGame().escrowSessionLost(characterId, kind),
+    escrowSessionLost: (pid, characterId, kind) =>
+      liveGame().escrowSessionLost(pid, characterId, kind),
   }),
   verifiedWallet: async (account) => (await walletForAccount(account))?.pubkey ?? null,
   balanceTokens: (pubkey) => cachedWocBalance(pubkey),

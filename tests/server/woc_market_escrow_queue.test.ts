@@ -133,7 +133,8 @@ function makeRig(opts: { escrowWaitMs?: number } = {}): Rig {
         server.serializeCharacterForPersist(characterId),
       hasDirtyGuildBooks: (characterId) => server.hasDirtyGuildBooks(characterId),
       flushDirtyGuildBooks: (characterId) => server.flushDirtyGuildBooks(characterId),
-      escrowSessionLost: (characterId, kind) => server.escrowSessionLost(characterId, kind),
+      escrowSessionLost: (pid, characterId, kind) =>
+        server.escrowSessionLost(pid, characterId, kind),
     },
     opts,
   );

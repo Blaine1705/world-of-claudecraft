@@ -32,5 +32,9 @@ export function throwProvedRollback(err: unknown): boolean {
   // shutdowns whose in-flight COMMIT outcome is unknowable, so the class is
   // not allowlisted wholesale.
   if (code === '57014') return true;
+  // 40003 statement_completion_unknown is the one member of class 40 that
+  // MEANS the ambiguity this module refuses: core Postgres never raises it,
+  // but a pooler or proxy can, and it must park, not restore.
+  if (code === '40003') return false;
   return ROLLBACK_PROOF_CLASSES.has(code.slice(0, 2));
 }

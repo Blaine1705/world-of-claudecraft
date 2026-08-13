@@ -34,6 +34,7 @@ describe('throwProvedRollback', () => {
     ['57P01', 'admin shutdown: in-flight COMMIT unknowable'],
     ['57P02', 'crash shutdown'],
     ['57P03', 'cannot connect now: not an allowlisted proof'],
+    ['40003', 'statement_completion_unknown: class 40, but literally the ambiguity'],
     ['XX000', 'internal error'],
   ])('treats %s as ambiguous (%s)', (code) => {
     expect(throwProvedRollback({ code })).toBe(false);
