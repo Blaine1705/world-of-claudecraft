@@ -737,10 +737,12 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     const second = await createListing(rig);
     const secondElapsed = Date.now() - startedAt;
     expect(second).toEqual({ ok: false, reason: 'contended' });
-    // Both discriminators for the same claim: the counter names the arm, and
-    // the clock rules out a second trip through the 300ms deadline.
+    // Both discriminators for the same claim: the counter names the arm (the
+    // decisive one), and the clock rules out a second trip through the 300ms
+    // deadline. The bound is generous on purpose: a loaded gate box can stall
+    // wall time, and the counter already discriminates the arm.
     expect(kinds).toEqual(['deadline_refused', 'depth_refused']);
-    expect(secondElapsed).toBeLessThan(150);
+    expect(secondElapsed).toBeLessThan(250);
 
     releaseQueue();
     await wedge;

@@ -36,10 +36,11 @@ const OFFLINE_READOUT = {
 
 describe('the offline daily-rewards stub', () => {
   it('resolves the whole constant disabled-wallet readout, field for field', async () => {
-    // toEqual over the WHOLE object, not a handful of fields: a new field on
-    // the allowlisted file is exactly the drive-by edit this suite exists to
-    // catch, and a partial pin would wave it through.
-    expect(await dailyRewardsStub()).toEqual(OFFLINE_READOUT);
+    // toStrictEqual over the WHOLE object, not a handful of fields: a new
+    // field on the allowlisted file is exactly the drive-by edit this suite
+    // exists to catch, and a partial pin would wave it through (strict, so a
+    // field retyped to an explicit undefined fails too).
+    expect(await dailyRewardsStub()).toStrictEqual(OFFLINE_READOUT);
   });
 
   it('answers a fresh object per call, never a shared mutable constant', async () => {
@@ -56,6 +57,6 @@ describe('the offline daily-rewards stub', () => {
 
   it('is what the Sim facade resolves for an offline world', async () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
-    expect(await sim.dailyRewards()).toEqual(OFFLINE_READOUT);
+    expect(await sim.dailyRewards()).toStrictEqual(OFFLINE_READOUT);
   });
 });

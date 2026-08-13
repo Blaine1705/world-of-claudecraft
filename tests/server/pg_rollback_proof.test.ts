@@ -19,10 +19,10 @@ describe('throwProvedRollback', () => {
     ['53200', 'out of memory'],
     ['54000', 'program limit'],
     ['55P03', 'lock_timeout'],
-    // Documented assumption: every row here is a STATEMENT-phase code. 57014
+    // Documented assumption: every row here arises mid-statement. 57014
     // during COMMIT's critical section would be misclassified as proof, but
     // Postgres holds off cancellation there (the cancel lands before the
-    // critical section or not at all), so the statement-phase reading is the
+    // critical section or not at all), so the mid-statement reading is the
     // only one reachable in practice.
     ['57014', 'query_canceled (statement_timeout)'],
   ])('proves rollback for %s (%s)', (code) => {

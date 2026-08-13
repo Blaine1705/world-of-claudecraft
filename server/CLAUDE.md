@@ -101,9 +101,9 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
   so two processes can never double-load one character. The steal predicate has three arms
   (expiry, same holder, same AUTHENTICATED account), so a player whose old process died
   reclaims their own character immediately instead of waiting out the TTL; rows with a NULL
-  `account_id` fail that arm closed. Character saves are lease-fenced: every fenced character-write path
-  (the `db.ts` save pair plus `saveCharacterStateOnClient` inside the marketplace escrow and
-  delivered-save transactions)
+  `account_id` fail that arm closed. Character saves are lease-fenced: every fenced
+  character-write path (the `db.ts` save pair plus `saveCharacterStateOnClient` inside the
+  marketplace escrow and delivered-save transactions)
   takes the session's lease nonce and lands only while the row still carries it (an in-statement
   EXISTS fence, never check-then-write), and a fenced-out session is kicked with the existing
   takeover signal, so a displaced zombie can never overwrite live state. `bank_ledger` is the
@@ -119,8 +119,9 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
   persist, and every write's blob carries the session save fixups (`character_save_fixups.ts`:
   jail/spectate position, stowed pet, the jail flag). Recorded exceptions: the marketplace
   delivered-save twin (`commitGrant`, carve-out recorded at the method) and the offline
-  admin/boost writers, which never race a live session. Cross-queue order is the character FIFO first, THEN the market serial writer; never
-  enqueue from inside a market thunk, an open transaction, or another job for the same character.
+  admin/boost writers, which never race a live session. Cross-queue order is the character
+  FIFO first, THEN the market serial writer; never enqueue from inside a market thunk, an
+  open transaction, or another job for the same character.
 - Save cadence: autosave every **30 s** (`AUTOSAVE_SECONDS`), on `leave`, and on
   `SIGINT`/`SIGTERM` shutdown (`saveAll`). World Market is a per-realm JSONB row (`world_state`
   key `market:<realm>`), realm-scoped like everything else; the one-shot legacy `'market'` row

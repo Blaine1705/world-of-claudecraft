@@ -1124,7 +1124,7 @@ describe('the $WOC token firewall over src/sim', () => {
     ['a try or catch', /\b(?:try|catch)\b/],
     ['a logical operator', /&&|\|\||\?\?/],
     ['a ternary or optional', /\?/],
-    ['a value import', /^import (?!type )/m],
+    ['a value import', /^import\b(?!\s+type\s)/m],
     ['a dynamic import', /\bimport\s*\(/],
   ];
   const projectionViolations = (src: string): string[] =>
@@ -1270,6 +1270,8 @@ describe('the $WOC token firewall over src/sim', () => {
     ['treasuryCut', 'const cut = split.treasuryCut;'],
     ['treasuryFee', 'const fee = split.treasuryFee;'],
     ['treasuryAccount', 'const acct = cfg.treasuryAccount;'],
+    ['txnSignature', 'const sig = row.txnSignature;'],
+    ['derSignature', 'const sig = row.derSignature;'],
     ['bondSignature', 'const sig = row.bondSignature;'],
     ['settlementSignature', 'const sig = row.settlementSignature;'],
     ['burnSignature', 'const sig = row.burnSignature;'],

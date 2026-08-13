@@ -671,8 +671,8 @@ export const GUARD_IDLE_TX_TIMEOUT_MS = ESCROW_LOCK_TIMEOUT_MS;
  *  stay well under the 30s autosave period even across all four real
  *  statements. Measured against Postgres 16 with a 27KB character blob:
  *  p50 3.5ms, max 8.3ms over 25 passes (the delivery pg suite's escrow-cost
- *  test re-measures and asserts the max stays under a fifth of this
- *  allowance), so 5s is orders of magnitude of headroom PER STATEMENT while
+ *  test re-measures and asserts p99 stays under a twenty-fifth of this
+ *  allowance, 200ms), so 5s is orders of magnitude of headroom PER STATEMENT while
  *  a genuinely wedged statement can no longer hold the FIFO for the 60s
  *  heavy allowance. Honest ceiling accounting: this allowance bounds the
  *  FOUR workload statements (the tunables relation pins exactly those, plus
@@ -899,7 +899,9 @@ class TxAbort<T> {
  *  compensation logic map it to their typed retry refusal. */
 export class TxNeverStarted extends Error {
   constructor(readonly reason: unknown) {
-    super(`transaction never started: ${String(reason)}`);
+    // cause keeps the real pg error and its stack in default Node error
+    // formatting; .reason predates it and stays for existing readers.
+    super(`transaction never started: ${String(reason)}`, { cause: reason });
   }
 }
 
@@ -942,6 +944,7 @@ export class PgWocMarketDb implements WocMarketDb {
     };
     client.on('error', onError);
     let beginFailed = false;
+    let rollbackFailed = false;
     try {
       // BEGIN rides the never-started tag too: a pooled client whose socket
       // died since its last use (a NAT idle-reap, a Postgres restart the
@@ -965,9 +968,19 @@ export class PgWocMarketDb implements WocMarketDb {
       // A never-started transaction owes no ROLLBACK, and it must skip the
       // code-preference below: a coded async close arriving on the same dead
       // socket would replace the tag and re-park a provably-nothing-ran
-      // failure as ambiguous.
-      if (err instanceof TxNeverStarted) throw err;
-      await client.query('ROLLBACK').catch(() => {});
+      // failure as ambiguous. If fn itself ever minted the tag (none does
+      // today), a transaction IS open, so that arm still rolls back.
+      if (err instanceof TxNeverStarted) {
+        if (!beginFailed) {
+          await client.query('ROLLBACK').catch(() => {
+            rollbackFailed = true;
+          });
+        }
+        throw err;
+      }
+      await client.query('ROLLBACK').catch(() => {
+        rollbackFailed = true;
+      });
       if (err instanceof TxAbort) return err.value as T;
       // Prefer whichever error carries the SQLSTATE: under an event-loop
       // stall the buffered 25P03 is parsed into the NEXT query's rejection
@@ -990,9 +1003,12 @@ export class PgWocMarketDb implements WocMarketDb {
       throw code(err) !== undefined ? err : code(asyncErr) !== undefined ? asyncErr : err;
     } finally {
       client.removeListener('error', onError);
-      // A terminated or begin-broken session must be DISCARDED, not returned
-      // to the pool.
-      client.release(asyncErr !== null || beginFailed ? true : undefined);
+      // A terminated, begin-broken, or rollback-swallowed session must be
+      // DISCARDED, not returned to the pool: a swallowed ROLLBACK (a
+      // black-holed statement rejecting at the driver backstop with no
+      // 'error' event) would otherwise hand the next checkout a client with
+      // an open transaction still aboard.
+      client.release(asyncErr !== null || beginFailed || rollbackFailed ? true : undefined);
     }
   }
 

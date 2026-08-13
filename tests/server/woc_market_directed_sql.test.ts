@@ -1247,6 +1247,58 @@ describe('the escrow listing transaction, in SQL', () => {
     expect(sql()).toEqual(['BEGIN']);
   });
 
+  it('DISCARDS a begin-broken client instead of returning it to the pool', async () => {
+    // The load-bearing half of the tag: pg's driver-side query_timeout fires
+    // WITHOUT flipping the client unqueryable and WITHOUT an 'error' event,
+    // so on the black-holed-socket case nothing else stops pg-pool from
+    // handing the next checkout a client with a BEGIN still in flight.
+    // release(true) destroys the session; this is the only pin on it.
+    const release = vi.fn();
+    const query = async (text: string) => {
+      if (text === 'BEGIN') throw new Error('Connection terminated unexpectedly');
+      return { rows: [], rowCount: 1 };
+    };
+    const client = { query, release, on: () => {}, removeListener: () => {} };
+    const pool = { query, connect: async () => client } as unknown as Pool;
+    const out = await new PgWocMarketDb(pool).escrowInsertListing(SAVE, LISTING);
+    expect(out).toEqual({ ok: false, reason: 'contended' });
+    expect(release).toHaveBeenCalledTimes(1);
+    expect(release).toHaveBeenCalledWith(true);
+  });
+
+  it('DISCARDS a client whose ROLLBACK was swallowed; an ordinary rollback returns it', async () => {
+    // A black-holed statement rejects at the driver backstop with no 'error'
+    // event; the catch's best-effort ROLLBACK then times out silently too.
+    // Returning that client would hand the pool an open transaction and a
+    // dead active query, so the swallowed rollback must force the discard.
+    const rolledBack: string[] = [];
+    const makePool = (rollbackThrows: boolean) => {
+      const release = vi.fn();
+      const query = async (text: string) => {
+        if (text.includes('FOR UPDATE')) throw new Error('Connection terminated unexpectedly');
+        if (text === 'ROLLBACK') {
+          rolledBack.push(text);
+          if (rollbackThrows) throw new Error('Connection terminated unexpectedly');
+        }
+        return { rows: [], rowCount: 1 };
+      };
+      const client = { query, release, on: () => {}, removeListener: () => {} };
+      return { pool: { query, connect: async () => client } as unknown as Pool, release };
+    };
+    const broken = makePool(true);
+    await expect(new PgWocMarketDb(broken.pool).escrowInsertListing(SAVE, LISTING)).rejects.toThrow(
+      'Connection terminated unexpectedly',
+    );
+    expect(broken.release).toHaveBeenCalledWith(true);
+    // The control: a rollback that lands keeps the client poolable.
+    const healthy = makePool(false);
+    await expect(
+      new PgWocMarketDb(healthy.pool).escrowInsertListing(SAVE, LISTING),
+    ).rejects.toThrow('Connection terminated unexpectedly');
+    expect(healthy.release).toHaveBeenCalledWith(undefined);
+    expect(rolledBack.length).toBe(2);
+  });
+
   it('does NOT widen the never-started tag past BEGIN: a later codeless throw rejects', async () => {
     // The companion negative. Once a statement has run, a codeless failure
     // proves nothing about what committed, so it must stay a rejection for

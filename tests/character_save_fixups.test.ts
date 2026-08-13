@@ -107,8 +107,38 @@ describe('a jail VISIT persists the visitor position, facing and stowed pet', ()
       () => JAIL_SPAWN,
     );
     expect(out.pos).toEqual({ x: -5, z: 7 });
+    // Same 3D-narrowing pin as the spectating arm: savedPos.y must not leak
+    // into the 2D blob position.
+    expect(Object.keys(out.pos).sort()).toEqual(['x', 'z']);
     expect(out.facing).toBe(2.25);
     expect(out.pet).toEqual(PET);
+  });
+
+  it('wins the position over a spectate saved on the same session', () => {
+    // The middle rung of the precedence order (jail > jailVisit > spectate):
+    // a moderator who visits the cage while also spectating persists the
+    // VISIT record, facing included.
+    const out = applyCharacterSaveFixups(
+      session({
+        jailVisit: {
+          savedPos: { x: -5, y: 3, z: 7 },
+          savedFacing: 2.25,
+          priorGm: true,
+          stowedPet: PET,
+        },
+        spectating: {
+          characterId: 9,
+          name: 'Watched',
+          savedPos: { x: 111, y: 0, z: 222 },
+          priorGm: false,
+          stowedPet: null,
+        },
+      }),
+      blob({ pos: { x: -12_000, z: -12_000 }, facing: 0, pet: null }),
+      () => JAIL_SPAWN,
+    );
+    expect(out.pos).toEqual({ x: -5, z: 7 });
+    expect(out.facing).toBe(2.25);
   });
 });
 
