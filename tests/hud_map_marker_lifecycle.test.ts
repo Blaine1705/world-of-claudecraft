@@ -445,6 +445,7 @@ describe('Hud zone-map marker interaction', () => {
   it('converts client coordinates to backing pixels and passes each marker array in draw order', () => {
     const canvas = canvasFixture();
     const { hud, paint, calls } = markerHarness();
+    hud.mapMarkerInteraction.refreshGeometry(canvas);
 
     expect(hud.showMapTipAt(canvas, 170, 150)).toBe(true);
 
@@ -466,6 +467,7 @@ describe('Hud zone-map marker interaction', () => {
   it('uses backing-scaled touch radius while hover keeps the glyph radius', () => {
     const canvas = canvasFixture();
     const { hud, paint } = markerHarness();
+    hud.mapMarkerInteraction.refreshGeometry(canvas);
     hud.mapNpcMarkers = [];
     hud.mapStations = [];
     hud.mapServices = [];
@@ -481,6 +483,7 @@ describe('Hud zone-map marker interaction', () => {
   it('fills the Hud-owned quest scratch only when quest areas can answer the pointer', () => {
     const canvas = canvasFixture();
     const { hud, paint } = markerHarness();
+    hud.mapMarkerInteraction.refreshGeometry(canvas);
     const objective: QuestObjectiveRef = { questId: 'quest', objectiveIndex: 0 };
     const area = { ...QUEST_AREA, objectives: [objective] };
     const areaTip = vi.fn((_refs: QuestObjectiveRef[], activeCount?: number) =>
@@ -515,6 +518,7 @@ describe('Hud zone-map marker interaction', () => {
   it('lets the globally nearest point marker win before category tie priority', () => {
     const canvas = canvasFixture();
     const { hud, calls } = markerHarness();
+    hud.mapMarkerInteraction.refreshGeometry(canvas);
     hud.mapNpcMarkers = [{ ...NPC, mx: 148 }];
     hud.mapStations = [{ ...STATION, mx: 146 }];
     hud.mapServices = [{ ...SERVICE, mx: 144 }];
@@ -531,6 +535,7 @@ describe('Hud zone-map marker interaction', () => {
   it('gives an exact-distance navigation painting priority over lower landmark layers', () => {
     const canvas = canvasFixture();
     const { hud, calls, paint } = markerHarness();
+    hud.mapMarkerInteraction.refreshGeometry(canvas);
     hud.mapNavigationMarkers = [NAVIGATION];
     hud.navigationMapTooltipHtml = () => {
       calls.push('navigation');
@@ -572,6 +577,7 @@ describe('Hud zone-map marker interaction', () => {
   it('uses the same localized state and location copy for instance hover and touch tips', () => {
     const canvas = canvasFixture();
     const { hud, paint } = markerHarness();
+    hud.mapMarkerInteraction.refreshGeometry(canvas);
     hud.mapNpcMarkers = [];
     hud.mapGatherNodes = [];
     hud.mapStations = [];
@@ -642,6 +648,7 @@ describe('Hud zone-map marker interaction', () => {
     (state) => {
       const canvas = canvasFixture();
       const { hud, paint } = markerHarness();
+      hud.mapMarkerInteraction.refreshGeometry(canvas);
       hud.mapNpcMarkers = [];
       hud.mapGatherNodes = [];
       hud.mapStations = [];
@@ -673,6 +680,45 @@ describe('Hud zone-map marker interaction', () => {
       );
     },
   );
+
+  it('reuses cached projection geometry until a bounded map-paint refresh', () => {
+    const canvas = canvasFixture();
+    let left = 100;
+    let size = 280;
+    const readRect = vi.fn(
+      () =>
+        ({
+          x: left,
+          y: 50,
+          left,
+          top: 50,
+          width: size,
+          height: size,
+          right: left + size,
+          bottom: 50 + size,
+          toJSON: () => ({}),
+        }) as DOMRect,
+    );
+    canvas.getBoundingClientRect = readRect;
+    const { hud } = markerHarness();
+
+    expect(hud.showMapTipAt(canvas, 170, 150)).toBe(false);
+    expect(readRect).not.toHaveBeenCalled();
+
+    hud.mapMarkerInteraction.refreshGeometry(canvas);
+    expect(hud.showMapTipAt(canvas, 170, 150)).toBe(true);
+    expect(hud.showMapTipAt(canvas, 170, 150)).toBe(true);
+    expect(readRect).toHaveBeenCalledTimes(1);
+
+    left = 30;
+    size = 140;
+    expect(hud.showMapTipAt(canvas, 65, 100)).toBe(false);
+    expect(readRect).toHaveBeenCalledTimes(1);
+
+    hud.mapMarkerInteraction.refreshGeometry(canvas);
+    expect(hud.showMapTipAt(canvas, 65, 100)).toBe(true);
+    expect(readRect).toHaveBeenCalledTimes(2);
+  });
 });
 
 describe('Hud zone-map marker lifecycle', () => {

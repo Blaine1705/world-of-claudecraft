@@ -5,6 +5,7 @@
 
 import type { QuestObjectiveRef } from '../../../sim/quest_targets';
 import {
+  type MapMarkerTooltipGeometry,
   type MapMarkerTooltipResolvers,
   showMapMarkerTooltipAt,
 } from '../../map_marker_tooltip_adapter';
@@ -47,6 +48,15 @@ export class MapMarkerInteractionController {
   readonly semantics: MapSemanticAccessibilityCore;
   readonly pointHits: MapPointMarkerHit[] = [];
   readonly questObjectives: QuestObjectiveRef[] = [];
+  private readonly geometry: MapMarkerTooltipGeometry = {
+    ready: false,
+    clientLeft: 0,
+    clientTop: 0,
+    backingPerClientX: 0,
+    backingPerClientY: 0,
+    backingPerCssPx: 0,
+  };
+  private geometryCanvas: HTMLCanvasElement | null = null;
   private readonly tooltipResolvers: MapMarkerTooltipResolvers;
   private readonly clearMemo: () => void;
 
@@ -64,9 +74,24 @@ export class MapMarkerInteractionController {
     };
   }
 
+  refreshGeometry(canvas: HTMLCanvasElement): void {
+    const rect = canvas.getBoundingClientRect();
+    this.geometry.ready = rect.width > 0 && rect.height > 0;
+    this.geometry.clientLeft = rect.left;
+    this.geometry.clientTop = rect.top;
+    this.geometry.backingPerClientX = canvas.width / Math.max(1, rect.width);
+    this.geometry.backingPerClientY = canvas.height / Math.max(1, rect.height);
+    this.geometry.backingPerCssPx = Math.max(
+      this.geometry.backingPerClientX,
+      this.geometry.backingPerClientY,
+    );
+    this.geometryCanvas = canvas;
+  }
+
   showAt(canvas: HTMLCanvasElement, clientX: number, clientY: number, touch = false): boolean {
+    if (canvas !== this.geometryCanvas) return false;
     return showMapMarkerTooltipAt(
-      canvas,
+      this.geometry,
       clientX,
       clientY,
       touch,

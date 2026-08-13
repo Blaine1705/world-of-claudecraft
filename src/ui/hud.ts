@@ -10861,6 +10861,7 @@ export class Hud {
     const canvas = $('#map-canvas') as unknown as HTMLCanvasElement;
     const ctx = require2dContext(canvas);
     const S = canvas.width;
+    this.mapMarkerInteraction.refreshGeometry(canvas);
     const p = this.sim.player;
     const summaryEl = $('#map-summary');
     const markerSummaryEl = $('#map-marker-summary');

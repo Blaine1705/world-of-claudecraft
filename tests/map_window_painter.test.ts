@@ -611,7 +611,9 @@ describe('map_window_painter: cadence + cached background preserved', () => {
     expect(tooltipAdapter).toContain('resolvers.questArea(questObjectives, objectiveCount)');
     // Touch passes through the same resolver with a finger-sized radius in CSS
     // pixels converted to the map's backing coordinates.
-    expect(tooltipAdapter).toContain('MAP_TOUCH_POINT_HIT_RADIUS_CSS_PX * backingPerCssPx');
+    expect(tooltipAdapter).toContain(
+      'MAP_TOUCH_POINT_HIT_RADIUS_CSS_PX * geometry.backingPerCssPx',
+    );
     expect(hud).toContain('showMapTipAt(clientX, clientY, true)');
     expect(tooltipAdapter).toContain('resolvers.service(hit.marker)');
     expect(markerTooltipContent).toContain("marker.kind === 'mailbox'");
@@ -626,11 +628,20 @@ describe('map_window_painter: cadence + cached background preserved', () => {
       markerInteraction.indexOf('clear(): void', markerInteraction.indexOf('showAt(')),
     );
     expect(method).not.toContain('=>');
+    expect(method).not.toContain('new ');
+    expect(method).not.toContain(' = {');
+    expect(method).not.toContain(' = [');
     expect(method).not.toContain('const state =');
     expect(method).not.toContain('const resolvers =');
     expect(method).toContain('this.pointHits');
     expect(method).toContain('this.questObjectives');
     expect(method).toContain('this.tooltipResolvers');
+    expect(method).not.toContain('getBoundingClientRect');
+    const pointerPath = tooltipAdapter.slice(tooltipAdapter.indexOf('showMapMarkerTooltipAt('));
+    expect(pointerPath).not.toContain('getBoundingClientRect');
+    expect(tooltipAdapter).not.toContain('getBoundingClientRect');
+    expect(markerInteraction.match(/\.getBoundingClientRect\(/g)).toHaveLength(1);
+    expect(hud).toContain('this.mapMarkerInteraction.refreshGeometry(canvas);');
     // The gather arm resolves through the shared world-hover pair (behind the
     // tested memo seam), so the map tip and the 3D node tip cannot disagree.
     expect(markerTooltipContent).toContain('resolveGatherTipMemo(this.gatherMemo, marker.nodeId');

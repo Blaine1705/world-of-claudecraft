@@ -1,6 +1,6 @@
-// Thin DOM adapter for world-map marker hit-testing. The accepted-hit slots and
-// quest-objective refs are caller-owned reusable pools; semantic copy comes
-// from the accessibility core so pointer, touch, and screen-reader text agree.
+// Host-free world-map marker hit-testing adapter. Projection geometry, accepted-hit
+// slots, and quest-objective refs are caller-owned reusable state; semantic copy
+// comes from the accessibility core so pointer, touch, and screen-reader text agree.
 
 import type { QuestObjectiveRef } from '../sim/quest_targets';
 import { esc } from './esc';
@@ -29,8 +29,17 @@ export interface MapMarkerTooltipResolvers {
   paint(html: string, clientX: number, clientY: number): void;
 }
 
+export interface MapMarkerTooltipGeometry {
+  ready: boolean;
+  clientLeft: number;
+  clientTop: number;
+  backingPerClientX: number;
+  backingPerClientY: number;
+  backingPerCssPx: number;
+}
+
 export function showMapMarkerTooltipAt(
-  canvas: HTMLCanvasElement,
+  geometry: MapMarkerTooltipGeometry,
   clientX: number,
   clientY: number,
   touchTarget: boolean,
@@ -55,15 +64,11 @@ export function showMapMarkerTooltipAt(
     semantics.instanceMarkers.length === 0
   )
     return false;
-  const rect = canvas.getBoundingClientRect();
-  const cx = ((clientX - rect.left) * canvas.width) / rect.width;
-  const cy = ((clientY - rect.top) * canvas.height) / rect.height;
-  const backingPerCssPx = Math.max(
-    canvas.width / Math.max(1, rect.width),
-    canvas.height / Math.max(1, rect.height),
-  );
+  if (!geometry.ready) return false;
+  const cx = (clientX - geometry.clientLeft) * geometry.backingPerClientX;
+  const cy = (clientY - geometry.clientTop) * geometry.backingPerClientY;
   const radius = touchTarget
-    ? MAP_TOUCH_POINT_HIT_RADIUS_CSS_PX * backingPerCssPx
+    ? MAP_TOUCH_POINT_HIT_RADIUS_CSS_PX * geometry.backingPerCssPx
     : MAP_NPC_GLYPH_HIT_RADIUS;
   const semanticText = semantics.tooltipAt(cx, cy, radius);
   let html = semanticText ? `<div class="tt-title">${esc(semanticText)}</div>` : '';

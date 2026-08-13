@@ -888,6 +888,14 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     },
     driverAllow: {},
   },
+  // One map-canvas projection read at the bounded map-paint boundary. Pointer hover and
+  // touch hit tests consume only the controller-owned cache, so no pointer event can force
+  // layout.
+  {
+    file: 'hud/map/map_marker_interaction_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 1 },
+    driverAllow: {},
+  },
   { file: 'hud/fiesta/fiesta_controller.ts', reflowAllow: { '.offsetWidth': 1 }, driverAllow: {} },
   { file: 'hud/vendor/heroic_vendor_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'hud/vendor/train_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
@@ -1315,6 +1323,7 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     const controllers = ON_DISK_PAINTERS.filter((f) => f.endsWith('_controller.ts'));
     expect(controllers.length, 'the HUD controllers vanished from the sweep').toBeGreaterThan(10);
     expect(controllers).toContain('hud/chat/chat_geometry_controller.ts');
+    expect(COLD_PAINTERS).toContain('hud/map/map_marker_interaction_controller.ts');
     expect(COLD_PAINTERS).toContain('hud/fiesta/fiesta_controller.ts');
   });
 
