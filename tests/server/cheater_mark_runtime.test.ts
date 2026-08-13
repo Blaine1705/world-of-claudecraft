@@ -84,6 +84,28 @@ describe('refreshCheaterMark', () => {
     expect(gone.cheaterMarked).toBe(false);
     expect(sim.setCheaterMark).not.toHaveBeenCalled();
   });
+
+  it('evaluates the leave guard AFTER the row fetch, not before', async () => {
+    // The guard exists for the player who disconnects DURING the db read, so a
+    // regression that hoists it above the await passes a constant-closure test.
+    // This one flips to "gone" only when the fetch resolves, so hoisting fails.
+    let current = true;
+    vi.mocked(accountCheaterMarkSeconds).mockImplementation(async () => {
+      current = false;
+      return 7200;
+    });
+    const sim = fakeSim();
+    const leaving = session(41858, 7);
+    await refreshCheaterMark(leaving, sim, () => current);
+    expect(leaving.cheaterMarked).toBe(false);
+    expect(sim.setCheaterMark).not.toHaveBeenCalled();
+  });
+
+  it('reads the row for the session account', async () => {
+    vi.mocked(accountCheaterMarkSeconds).mockResolvedValue(60);
+    await refreshCheaterMark(session(25817, 3), fakeSim(), () => true);
+    expect(accountCheaterMarkSeconds).toHaveBeenCalledWith(25817);
+  });
 });
 
 describe('persistCheaterMark', () => {
@@ -94,9 +116,20 @@ describe('persistCheaterMark', () => {
 
   it('burns the floored live-aura remainder and keeps the latch while serving', async () => {
     const marked = session(41858, 7, true);
-    await persistCheaterMark(marked, [{ id: CHEATER_MARK_AURA_ID, remaining: 5400.9 }]);
+    // The decoy pins the find-by-id: matching auras[0] instead would burn 999.
+    await persistCheaterMark(marked, [
+      { id: 'regen', remaining: 999 },
+      { id: CHEATER_MARK_AURA_ID, remaining: 5400.9 },
+    ]);
     expect(burnAccountCheaterMark).toHaveBeenCalledWith(41858, 5400);
     expect(marked.cheaterMarked).toBe(true);
+  });
+
+  it('clamps a non-positive live remainder to the zeroing write and clears the latch', async () => {
+    const edge = session(41858, 7, true);
+    await persistCheaterMark(edge, [{ id: CHEATER_MARK_AURA_ID, remaining: -3 }]);
+    expect(burnAccountCheaterMark).toHaveBeenCalledWith(41858, 0);
+    expect(edge.cheaterMarked).toBe(false);
   });
 
   it('burns 0 and clears the latch once the aura is gone (the zeroing write)', async () => {
