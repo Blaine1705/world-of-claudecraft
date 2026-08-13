@@ -8609,6 +8609,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.confirm_in_flight':
     '支払いはまだ確認中です。完了してからもう一度お試しください。',
   'apiError.woc_market.cancel_pending': '出品者がこの出品を取り消そうとしています。',
+  'apiError.woc_market.item_mismatch':
+    '買い手が同意したアイテムと一致しません。改めて取引をやり直してください。',
   'apiError.woc_market.bond_window_closed':
     'この入札はもう支払えません。支払い期間が終了しています。もう一度入札して新しい期間を得てください。',
   'apiError.woc_market.claim_cooldown':
@@ -13138,6 +13140,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.hintClearYourItems':
     '自分のアイテムを外してください。$WOC の提示は相手の出品を買うためのものです。',
   'hudChrome.trade.woc.hintAwaitTheirItems': '$WOC で売却できるものを相手が出すのを待っています。',
+  'hudChrome.trade.woc.hintOneItem':
+    '$WOC の取引はアイテム1点のみが対象です。売る1点だけを出してください。',
   'hudChrome.trade.woc.sendOffer': '$WOC を提示',
   'hudChrome.trade.woc.incomingAccept': '{name} があなたのアイテムに {price} を提示しています。',
   'hudChrome.trade.woc.hintAcceptNeedsItem': '承諾する前に、売却するアイテムを入れてください。',

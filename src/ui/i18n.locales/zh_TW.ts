@@ -8221,6 +8221,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.confirm_failed': '交易未能確認。請重新取得報價後再試。',
   'apiError.woc_market.confirm_in_flight': '你的付款仍在確認中。待其完成後再試。',
   'apiError.woc_market.cancel_pending': '賣家正在取消該掛單。',
+  'apiError.woc_market.item_mismatch': '這不是買家同意購買的那件物品。請重新發起一筆交易。',
   'apiError.woc_market.bond_window_closed': '該出價已無法支付：付款視窗已關閉。請重新出價以取得新的付款視窗。',
   'apiError.woc_market.claim_cooldown': '你最近放棄過一次直購。請稍後再試。',
   'apiError.woc_market.buy_now_locked': '另一位買家正在完成這筆購買，請稍後再試。',
@@ -12878,6 +12879,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.hintClearYourItems':
     '請先移出你自己的物品：$WOC 報價用於購買對方出售的物品。',
   'hudChrome.trade.woc.hintAwaitTheirItems': '正在等待對方拿出可用 $WOC 出售的物品。',
+  'hudChrome.trade.woc.hintOneItem': '$WOC 交易一次只包含一件物品。請只保留要出售的那一件。',
   'hudChrome.trade.woc.sendOffer': '出價 $WOC',
   'hudChrome.trade.woc.incomingAccept': '{name} 出價 {price} 購買你的物品。',
   'hudChrome.trade.woc.hintAcceptNeedsItem': '接受前請先放入你要出售的物品。',

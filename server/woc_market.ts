@@ -17,8 +17,9 @@
 
 import { ITEMS } from '../src/sim/data';
 import type { ExtractRef, ExtractRefusal } from '../src/sim/inventory_extract';
+import { itemCopyPin } from '../src/sim/item_copy_ref';
 import type { CharacterState } from '../src/sim/sim';
-import type { InvSlot } from '../src/sim/types';
+import type { InvSlot, ItemInstancePayload } from '../src/sim/types';
 import { throwProvedRollback } from './pg_rollback_proof';
 import {
   antiSnipeExtendedEndMs,
@@ -35,9 +36,11 @@ import {
   WOC_MARKET_BOND_POLL_PARK_SECONDS,
   WOC_MARKET_BUY_NOW_LOCK_SECONDS,
   WOC_MARKET_CONFIRM_UNAVAILABLE_REASON,
+  WOC_MARKET_DIRECTED_HOLD_SECONDS,
   WOC_MARKET_DIRECTED_OFFER_TTL_SECONDS,
   WOC_MARKET_DURATION_HOURS,
   WOC_MARKET_MAX_ACTIVE_LISTINGS,
+  WOC_MARKET_OFFER_CONVERGE_SECONDS,
   WOC_MARKET_QUOTE_TTL_SECONDS,
   WOC_MARKET_SETTLEMENT_WINDOW_SECONDS,
   WOC_MARKET_STRANDED_RECLAIM_SECONDS,
@@ -112,10 +115,16 @@ export interface WocDirectedOfferRow {
   sellerName: string;
   buyerAccount: number;
   buyerName: string;
-  /** The copy the SELLER named when accepting, or null while the offer is still
-   *  just a price. The buyer opens the deal, so the item is unknown until then. */
+  /** The copy the SELLER named when accepting, or null until they do. */
   itemRef: ExtractRef | null;
+  /** The agreed item's id, stamped at CREATION since H10 (legacy rows: at
+   *  acceptance, or null). */
   itemId: string | null;
+  /** The agreed copy's fingerprint (itemCopyPin), stamped at CREATION: the
+   *  buyer opens the deal naming the exact copy they saw, and acceptance
+   *  escrows only a copy whose pin matches (H10). Null on rows that predate
+   *  the pin, whose acceptance refuses item_mismatch (safe direction). */
+  itemPin: string | null;
   usdCents: number;
   status: WocDirectedOfferStatus;
   listingId: number | null;
@@ -240,6 +249,12 @@ export interface NewWocListing {
   quality: string;
   params: WocListingParams;
   endsAtMs: number;
+  /** The directed offer this listing consummates, or null for a public
+   *  listing. Non-null makes the escrow transaction stamp the offer's
+   *  listing_id atomically with the insert (listing exists IFF the offer is
+   *  stamped), the invariant the accepted-offer converge arm proves rollback
+   *  by; a zero-row stamp CAS aborts the whole transaction 'not_pending'. */
+  directedOfferId: number | null;
 }
 
 export interface CharacterSaveArgs {
@@ -260,7 +275,8 @@ export interface WocMarketDb {
     save: CharacterSaveArgs,
     listing: NewWocListing,
   ): Promise<
-    { ok: true; id: number } | { ok: false; reason: 'lease_lost' | 'cap_reached' | 'contended' }
+    | { ok: true; id: number }
+    | { ok: false; reason: 'lease_lost' | 'cap_reached' | 'contended' | 'not_pending' }
   >;
   listingById(realm: string, id: number): Promise<WocListingRow | null>;
   /** A has-more PROBE, never a full count: the window count forced a read of
@@ -283,6 +299,8 @@ export interface WocMarketDb {
     buyerName: string;
     usdCents: number;
     expiresAtMs: number;
+    itemId: string;
+    itemPin: string;
   }): Promise<WocDirectedOfferRow>;
   directedOfferById(realm: string, id: number): Promise<WocDirectedOfferRow | null>;
   /** Pending offers this account may act on, both directions. */
@@ -299,10 +317,25 @@ export interface WocMarketDb {
     realm: string,
     id: number,
     to: Exclude<WocDirectedOfferStatus, 'pending'>,
-    opts?: { listingId?: number },
   ): Promise<WocDirectedOfferRow | null>;
   /** Expire pending offers past their TTL. Returns how many were expired. */
   expireDueDirectedOffers(realm: string, nowMs: number, limit: number): Promise<number>;
+  /** The converge arm's read: 'accepted' offers with NO stamped listing older
+   *  than the safety age. With the atomic stamp, such a row proves its escrow
+   *  rolled back (or never ran). Ordered oldest-first, batch-bounded. */
+  acceptedUnstampedOffers(
+    realm: string,
+    olderThanMs: number,
+    limit: number,
+  ): Promise<WocDirectedOfferRow[]>;
+  /** The converge arm's terminal write for a proven-rolled-back offer already
+   *  past its TTL: same accepted-and-unstamped CAS as reopenDirectedOffer. */
+  expireDirectedOfferIfUnstamped(realm: string, id: number): Promise<boolean>;
+  /** Whether ANY settlement row (open OR terminal) was ever opened against
+   *  this listing: the directed close arm's strike gate. 'failed' is not an
+   *  OPEN state, so gating the never-claimed strike on the open probe alone
+   *  double-strikes a buyer the overdue arm also strikes. */
+  everSettledForListing(listingId: number): Promise<boolean>;
   /**
    * Resolve a character NAME to its character and owning account, or null.
    *
@@ -1049,7 +1082,8 @@ export type WocMarketRefusal =
   | 'stale_copy'
   // Directed p2p offers
   | 'recipient_wallet_required' // the named buyer has no verified wallet
-  | 'self_offer' // seller and buyer are the same account
+  | 'self_offer' // seller and buyer are the same account OR the same wallet
+  | 'item_mismatch' // the copy offered at acceptance is not the pinned agreed copy
   | 'offer_expired'
   | ExtractRefusal
   | WocEligibilityRefusal
@@ -1075,6 +1109,10 @@ export interface WocSweepPassStats {
   lapsedBids: number;
   /** Directed p2p offers that timed out unanswered. */
   expiredOffers: number;
+  /** Accepted offers whose escrow provably rolled back (aged, no stamped
+   *  listing), converged back to pending or straight to expired. The unwind
+   *  half of the atomic listing stamp. */
+  convergedOffers: number;
   reclaimed: number;
   closed: number;
   /** Over-bound 'confirming' rows parked in the operator 'review' state
@@ -1369,6 +1407,10 @@ export class WocMarketService {
     characterId: number;
     itemRef: ExtractRef;
     params: WocListingParams;
+    /** Set only by acceptDirectedOffer: the offer being consummated plus the
+     *  agreed copy's fingerprint. The escrow stamps the offer atomically and
+     *  the in-job re-check refuses a copy whose pin does not match (H10). */
+    directed?: { offerId: number; itemPin: string | null };
   }): Promise<{ ok: true; listing: WocListingRow } | Refused> {
     // A suspended defaulter cannot list either, not just bid: the suspension is
     // a marketplace-wide hold (PRD "Integrity").
@@ -1385,14 +1427,14 @@ export class WocMarketService {
       this.cfg.policy,
     );
     if (!eligible.ok) return refuse(eligible.reason);
-    // The cap governs PUBLIC listings only, in both directions: a directed offer
-    // neither counts toward it (see countActiveBySeller) nor is blocked by it. A
-    // private deal with a named friend must not be refused because the seller
-    // happens to have twelve auctions running.
-    if (args.params.directedBuyerAccount === null) {
-      const active = await this.deps.db.countActiveBySeller(this.cfg.realm, args.account);
-      if (active >= WOC_MARKET_MAX_ACTIVE_LISTINGS) return refuse('cap_reached');
-    }
+    // The cap counts EVERY non-closed listing, directed included (H12): both
+    // kinds escrow a real copy, and the old directed exemption let an
+    // accomplice pair lock unbounded escrow outside the cap. This pre-check
+    // races (the authoritative count runs inside the escrow transaction under
+    // the accounts row lock, same predicate); its job is refusing a capped
+    // seller BEFORE the extract pays the FIFO job.
+    const active = await this.deps.db.countActiveBySeller(this.cfg.realm, args.account);
+    if (active >= WOC_MARKET_MAX_ACTIVE_LISTINGS) return refuse('cap_reached');
 
     // Custody edge, the WHOLE critical section as one job on the seller's
     // per-character save FIFO (H5): the copy leaves the live bags, the
@@ -1431,6 +1473,15 @@ export class WocMarketService {
           this.deps.custody.restoreCopy(extract.pid, args.characterId, extract.extracted);
           return { refusal: eligibleReal.reason };
         }
+        // The agreed-item fingerprint (H10), checked against the AUTHORITATIVE
+        // extracted copy, never the claimed ref: a seller accepting with a
+        // different item, or a re-rolled instance of the same id, refuses
+        // here and the copy restores. A null pin (an offer that predates the
+        // pin column) refuses too: an unverifiable agreement must not escrow.
+        if (args.directed && itemCopyPin(extract.extracted) !== args.directed.itemPin) {
+          this.deps.custody.restoreCopy(extract.pid, args.characterId, extract.extracted);
+          return { refusal: 'item_mismatch' as const };
+        }
         const nowMs = this.now();
         const listing: NewWocListing = {
           realm: this.cfg.realm,
@@ -1442,7 +1493,15 @@ export class WocMarketService {
           itemId: extract.extracted.itemId,
           quality: extract.extracted.instance?.rolled?.quality ?? def?.quality ?? 'common',
           params: args.params,
-          endsAtMs: nowMs + args.params.durationHours * 3600 * 1000,
+          // A directed hold is the settlement window, not an auction duration
+          // (H12): the named buyer pays now or the item flies home. The
+          // params keep a valid durationHours for shape validation only; it
+          // is deliberately inert on this arm.
+          endsAtMs:
+            args.params.directedBuyerAccount !== null
+              ? nowMs + WOC_MARKET_DIRECTED_HOLD_SECONDS * 1000
+              : nowMs + args.params.durationHours * 3600 * 1000,
+          directedOfferId: args.directed?.offerId ?? null,
         };
         let inserted: Awaited<ReturnType<WocMarketDb['escrowInsertListing']>>;
         try {
@@ -1510,9 +1569,11 @@ export class WocMarketService {
       startCents: usdCents,
       reserveCents: null,
       buyNowCents: usdCents,
-      // The shortest duration on the allowlist. A directed listing is bought
-      // immediately or not at all, and this is only the backstop that returns
-      // the item if the buyer never pays.
+      // Shape validation only: createListing overrides a directed listing's
+      // ends time with WOC_MARKET_DIRECTED_HOLD_SECONDS (the settlement
+      // window, H12), so this duration never reaches the row. It stays the
+      // shortest allowlist entry purely so validListingParams accepts the
+      // params acceptance will use.
       durationHours: WOC_MARKET_DURATION_HOURS[0],
       offerNext: false,
       directedBuyerAccount: buyerAccount,
@@ -1533,6 +1594,11 @@ export class WocMarketService {
      *  Resolved here so no account id crosses the wire. */
     sellerCharacterName: string;
     usdCents: number;
+    /** The agreed copy, exactly as the buyer's trade window shows it (H10).
+     *  Client-supplied by necessity, and safe to be: the pin computed from it
+     *  only ever REFUSES the seller's acceptance, so a forged snapshot hurts
+     *  only the forger's own deal. */
+    item: { itemId: string; instance?: ItemInstancePayload; craftedRecipeId?: string };
   }): Promise<{ ok: true; offer: WocDirectedOfferRow } | Refused> {
     const gate = (await this.guardEnabledHealthy()) ?? (await this.guardSuspended(args.account));
     if (gate) return gate;
@@ -1544,19 +1610,41 @@ export class WocMarketService {
     // consumed escrow and settlement machinery.
     if (sellerAccount === args.account) return refuse('self_offer');
     // The BUYER's wallet: they are the one about to pay.
-    if (!(await this.deps.verifiedWallet(args.account))) return refuse('wallet_required');
+    const buyerWallet = await this.deps.verifiedWallet(args.account);
+    if (!buyerWallet) return refuse('wallet_required');
     // The SELLER's wallet: they cannot be PAID in $WOC without one. This is the
     // refusal the buyer's trade window turns into "that player must connect a
     // wallet". Re-checked at acceptance, since a wallet can be unlinked between.
-    if (!(await this.deps.verifiedWallet(sellerAccount))) {
+    const sellerWallet = await this.deps.verifiedWallet(sellerAccount);
+    if (!sellerWallet) {
       return refuse('recipient_wallet_required');
     }
+    // Same WALLET is the same beneficial owner even across accounts (H14).
+    // Defense in depth: pubkey is UNIQUE so two live links can never collide
+    // today, but this predicate must not depend on that constraint surviving.
+    if (buyerWallet === sellerWallet) return refuse('self_offer');
     // Validate the params acceptance WILL use, not a looser approximation, so an
-    // offer can never be created that its own acceptance would refuse. The ITEM
-    // is not checked here because there is not one yet: eligibility is the
-    // seller's to satisfy when they stage goods and accept.
+    // offer can never be created that its own acceptance would refuse. The
+    // agreed ITEM gets the same treatment since H10: the buyer names the exact
+    // copy, so its eligibility is checkable NOW, and an armed commission piece
+    // (bind_armed) refuses here exactly as its acceptance would. The escrow
+    // lifecycle is why the directed rail keeps that refusal: every
+    // compensation exit (return flight, restore, mail, operator park) would
+    // otherwise need its own binding decision (the recorded judgment).
     const params = validListingParams(this.directedParams(args.usdCents, args.account));
     if (!params.ok) return refuse(params.reason);
+    const eligible = listingEligibility(
+      ITEMS[args.item.itemId],
+      args.item.instance,
+      this.cfg.policy,
+    );
+    if (!eligible.ok) return refuse(eligible.reason);
+    // A plausibility gate on the money side too (the guardBalance medium):
+    // the auction paths refuse an implausible bid at placement, and a
+    // directed offer is a bid in everything but name. Fail-closed on an
+    // unreadable estimate, per the helper's contract.
+    const balanceGate = await this.guardBalance(buyerWallet, args.usdCents);
+    if (balanceGate) return balanceGate;
     const buyer = await this.deps.db.deliveryTarget(this.cfg.realm, args.account, args.characterId);
     if (!buyer || buyer.characterId !== args.characterId) return refuse('character_invalid');
 
@@ -1569,6 +1657,17 @@ export class WocMarketService {
       buyerName: buyer.name,
       usdCents: args.usdCents,
       expiresAtMs: this.now() + WOC_MARKET_DIRECTED_OFFER_TTL_SECONDS * 1000,
+      itemId: args.item.itemId,
+      // The fingerprint acceptance will demand of the extracted copy: item
+      // id, instance payload, crafted provenance (the itemCopyPin 3-tuple).
+      itemPin: itemCopyPin({
+        itemId: args.item.itemId,
+        count: 1,
+        ...(args.item.instance === undefined ? {} : { instance: args.item.instance }),
+        ...(args.item.craftedRecipeId === undefined
+          ? {}
+          : { craftedRecipeId: args.item.craftedRecipeId }),
+      }),
     });
     return { ok: true, offer };
   }
@@ -1626,23 +1725,50 @@ export class WocMarketService {
     if (!after.buyerAccepted || !after.sellerAccepted) return { ok: true, listing: null };
     if (!after.itemRef) return refuse('character_invalid');
 
+    // Same WALLET twins refuse at the moment of consummation too (H14):
+    // both wallets re-read live, so an unlink-relink between creation and
+    // this second acceptance still refuses. Defense in depth beside the
+    // claim-SQL guard the pay path runs (pubkey is UNIQUE, so two live links
+    // can never collide today).
+    const [buyerWallet, sellerWallet] = await Promise.all([
+      this.deps.verifiedWallet(after.buyerAccount),
+      this.deps.verifiedWallet(after.sellerAccount),
+    ]);
+    if (buyerWallet !== null && buyerWallet === sellerWallet) return refuse('self_offer');
+
     // Both agreed. Claim the offer BEFORE escrowing, so two simultaneous second
     // acceptances cannot both reach createListing and extract two copies.
     const claimed = await this.deps.db.resolveDirectedOffer(this.cfg.realm, offerId, 'accepted');
     if (!claimed) return refuse('not_pending');
-    const created = await this.createListing({
-      account: after.sellerAccount,
-      characterId: side === 'seller' ? characterId : after.sellerCharacter,
-      itemRef: after.itemRef,
-      params: this.directedParams(after.usdCents, after.buyerAccount),
-    });
+    let created: Awaited<ReturnType<WocMarketService['createListing']>>;
+    try {
+      created = await this.createListing({
+        account: after.sellerAccount,
+        characterId: side === 'seller' ? characterId : after.sellerCharacter,
+        itemRef: after.itemRef,
+        params: this.directedParams(after.usdCents, after.buyerAccount),
+        directed: { offerId, itemPin: after.itemPin },
+      });
+    } catch (err) {
+      // The escrow THREW past the typed-refusal rail. With rollback PROOF the
+      // listing provably does not exist, so reopening cannot pair a live
+      // listing with a reopened offer and the deal stays retryable; without
+      // proof NOTHING is written here (an unknowable COMMIT may have stamped
+      // the offer atomically), and the accepted-offer converge arm settles it
+      // from the durable truth. The seller-side quarantine and the parked
+      // copy are the escrow arms' own business, unchanged.
+      if (throwProvedRollback(err)) {
+        await this.deps.db.reopenDirectedOffer(this.cfg.realm, offerId);
+      }
+      throw err;
+    }
     if (!created.ok) {
       await this.deps.db.reopenDirectedOffer(this.cfg.realm, offerId);
       return created;
     }
-    await this.deps.db.resolveDirectedOffer(this.cfg.realm, offerId, 'accepted', {
-      listingId: created.listing.id,
-    });
+    // No post-acceptance stamp: the escrow transaction stamped listing_id
+    // atomically with the insert (listing exists IFF the offer is stamped),
+    // which is the invariant the converge arm proves rollback by.
     return { ok: true, listing: created.listing };
   }
 
@@ -2167,6 +2293,13 @@ export class WocMarketService {
     if (gate) return gate;
     const wallet = await this.deps.verifiedWallet(args.account);
     if (!wallet) return refuse('wallet_required');
+    // Same WALLET is the same beneficial owner (H14): seller_account alone
+    // missed the relink dance (list under wallet W, unlink, relink W on a
+    // second account, buy the own listing into the public sales history).
+    // This is the cheap fast refusal from values already in hand; the
+    // AUTHORITATIVE guard is inside claimBuyNowLock, re-read under the
+    // listing row lock and asserted again in the claiming UPDATE itself.
+    if (listingPeek.sellerWallet === wallet) return refuse('own_listing');
     const target = await this.deps.db.deliveryTarget(
       this.cfg.realm,
       args.account,
@@ -2466,6 +2599,10 @@ export class WocMarketService {
       expiredOffers: await this.arm('expiredOffers', () =>
         this.deps.db.expireDueDirectedOffers(this.cfg.realm, nowMs, SWEEP_BATCH),
       ),
+      // Offer housekeeping's sibling, no ordering dependency on any other
+      // arm: it touches only accepted offers with NO listing, a set the
+      // listing arms never read.
+      convergedOffers: await this.arm('convergedOffers', () => this.convergeUnstampedOffers(nowMs)),
       reclaimed: await this.arm('reclaimed', () => this.reclaimStrandedListings(nowMs)),
       // BEFORE the close/expiry arms on purpose: a delivered-but-unclosed
       // listing must converge to its finished sale before anything else can
@@ -2533,6 +2670,55 @@ export class WocMarketService {
     console.error(`[woc_market] sweep arm ${arm} failed:`, err);
   }
 
+  /**
+   * Converge 'accepted' offers whose escrow never stamped a listing.
+   *
+   * With the atomic stamp (escrowInsertListing), an AGED accepted-unstamped
+   * offer proves its escrow rolled back: the acceptance threw past the
+   * typed-refusal rail without rollback proof, so the request wrote nothing
+   * (the three-legged residual: offer stuck 'accepted', seller quarantined,
+   * copy parked). The durable truth has since settled, so this arm finishes
+   * the unwind: reopen the deal (the pair retries by accepting again), or
+   * expire it when its TTL already passed. Both writes are the
+   * accepted-and-unstamped CAS, so a pathologically late COMMIT that lands
+   * the stamp mid-arm makes the write miss harmlessly (EvalPlanQual
+   * re-checks the row's own columns). One pass resolves every row, so there
+   * is no park machinery here; per-row isolation keeps a poisoned row from
+   * stranding the batch.
+   */
+  private async convergeUnstampedOffers(nowMs: number): Promise<number> {
+    const due = await this.deps.db.acceptedUnstampedOffers(
+      this.cfg.realm,
+      nowMs - WOC_MARKET_OFFER_CONVERGE_SECONDS * 1000,
+      SWEEP_BATCH,
+    );
+    let advanced = 0;
+    for (const offer of due) {
+      try {
+        if (offer.expiresAtMs <= nowMs) {
+          await this.deps.db.expireDirectedOfferIfUnstamped(this.cfg.realm, offer.id);
+        } else {
+          await this.deps.db.reopenDirectedOffer(this.cfg.realm, offer.id);
+        }
+        advanced++;
+      } catch (err) {
+        this.sweepError('convergedOffers', err);
+      }
+    }
+    return advanced;
+  }
+
+  /** One strike, with the ladder's escalating suspension. Non-idempotent by
+   *  nature (an increment), so every caller gates it on a write that can
+   *  happen at most once per offense (a settlement expiry CAS, a close CAS
+   *  plus the never-settled probe). */
+  private async strikeAccount(account: number, nowMs: number): Promise<void> {
+    const strikes = await this.deps.db.strikeInfo(account);
+    const count = (strikes?.strikes ?? 0) + 1;
+    const suspension = strikeSuspensionMs(count);
+    await this.deps.db.addStrike(account, suspension > 0 ? nowMs + suspension : null);
+  }
+
   private async closeDueAuctions(nowMs: number): Promise<number> {
     const due = await this.deps.db.claimDueListings(this.cfg.realm, nowMs, SWEEP_BATCH);
     for (const listing of due) {
@@ -2552,6 +2738,38 @@ export class WocMarketService {
     const standing = bids.find((b) => b.status === 'active');
     const reserve = listing.reserveCents;
     if (!standing) {
+      // A DIRECTED hold that ran out: the named buyer accepted the deal
+      // (acceptance is what created this listing and escrowed the copy) and
+      // then never paid, so the walk-away earns the directed strike (H12)
+      // beside the ordinary close-and-return.
+      if (listing.directedBuyerAccount !== null) {
+        // An UNEXPIRED claim lock is a buyer mid-flight, not a walk-away:
+        // the 270s lock window can outlive the 600s hold, and closing over
+        // it would return the escrow while a payment request is in the air.
+        // The settlement rails own that window's outcome; this arm retries
+        // after it resolves.
+        if (
+          listing.buyNowLockAccount !== null &&
+          listing.buyNowLockExpiresMs !== null &&
+          listing.buyNowLockExpiresMs > nowMs
+        ) {
+          return;
+        }
+        // The strike gate reads EVER-settled, not open-settled: a buyer
+        // whose payment attempt landed a settlement row (even a failed one)
+        // is the overdue arm's to strike, and striking here too would be a
+        // second strike for one walk-away. Probed BEFORE the close; the
+        // strike itself runs only AFTER the close CAS reports success
+        // (addStrike is a non-idempotent increment, and a contended close
+        // re-runs this row from durable state next pass).
+        const everSettled = await this.deps.db.everSettledForListing(listing.id);
+        if (!(await this.deps.db.closeListingIfNoOpenSettlement(listing.id, 'unsettled'))) {
+          await this.deps.db.markListingSettling(listing.id);
+          return;
+        }
+        if (!everSettled) await this.strikeAccount(listing.directedBuyerAccount, nowMs);
+        return;
+      }
       // Guarded close: a buy-now settlement placed inside the closing
       // window may be riding this listing, and this arm never reaches
       // insertSettlement's unique-index arbiter, so an unguarded close here
@@ -2787,13 +3005,7 @@ export class WocMarketService {
       // default on top of that resolution.
       await this.deps.db.markBidStatus(settlement.bidId, 'defaulted', ['won']);
       await this.deps.db.setBondState(settlement.bidId, ['held'], 'forfeit_due');
-      const strikes = await this.deps.db.strikeInfo(settlement.buyerAccount);
-      const count = (strikes?.strikes ?? 0) + 1;
-      const suspension = strikeSuspensionMs(count);
-      await this.deps.db.addStrike(
-        settlement.buyerAccount,
-        suspension > 0 ? nowMs + suspension : null,
-      );
+      await this.strikeAccount(settlement.buyerAccount, nowMs);
     } else {
       // An abandoned buy-now. On a PUBLIC listing the buyer committed no
       // money, the lock clears and the listing resumes for the next person,
@@ -2831,13 +3043,22 @@ export class WocMarketService {
       }
       await this.deps.db.clearBuyNowLock(listing.id, settlement.buyerAccount);
       if (listing.directedBuyerAccount !== null) {
-        const strikes = await this.deps.db.strikeInfo(settlement.buyerAccount);
-        const count = (strikes?.strikes ?? 0) + 1;
-        const suspension = strikeSuspensionMs(count);
-        await this.deps.db.addStrike(
-          settlement.buyerAccount,
-          suspension > 0 ? nowMs + suspension : null,
-        );
+        // The strike is gated by the expiry transition CAS above (`moved`),
+        // which fires at most once per settlement, so a re-run of this row
+        // cannot strike twice.
+        await this.strikeAccount(settlement.buyerAccount, nowMs);
+        // AUTO-CLOSE (H12): a directed listing has exactly one permitted
+        // buyer, so an expired unpaid settlement is the end of the deal, not
+        // a return to the shelf. Closing here (instead of leaving the row
+        // active until the hold expires or the seller notices) returns the
+        // item on the next return-flight pass. The guard refuses only if a
+        // RACING fresh claim opened a new settlement in this sliver; that
+        // window then owns the outcome and a later expiry converges the
+        // close. The close-arm strike stays mutually exclusive with this one
+        // through its ever-settled gate (this settlement row exists).
+        if (!(await this.deps.db.closeListingIfNoOpenSettlement(listing.id, 'unsettled'))) {
+          await this.deps.db.markListingSettling(listing.id);
+        }
       }
       return;
     }

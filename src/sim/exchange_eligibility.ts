@@ -76,6 +76,18 @@ export function exchangeItemCategory(def: ItemDef): ExchangeItemCategory {
  * be. Unbinding clears `boundTo` and leaves `bindOnTrade`, so a peeled copy
  * returns to the armed state rather than to a plain one.
  *
+ * The DIRECTED $WOC rail keeps the bind_armed refusal too, on a DIFFERENT
+ * ground (judged in the directed-rail hardening; the gold trade window's
+ * named-recipient exception deliberately does NOT extend to it). A directed
+ * deal has a named recipient, so the anonymity premise above does not apply;
+ * what does is the ESCROW LIFECYCLE: an armed copy admitted into escrow makes
+ * every exit rail a binding decision (the delivery grant would have to stamp,
+ * the expiry return flight, the compensation restore, the mail parcel, and
+ * the operator claims park must each NOT), and the mail rail refuses armed
+ * copies for every other sender. Lifting the refusal for named deals means
+ * building and testing a stamp-at-delivery arm across all of those first; it
+ * is recorded as an offered product follow-up, not a hardening change.
+ *
  * `soulbound` and `no_market_list` are absolute only for the categories that do
  * not tolerate them, which is where the two collectible categories differ from
  * everything else:

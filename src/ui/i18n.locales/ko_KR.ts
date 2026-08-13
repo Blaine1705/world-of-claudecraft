@@ -8579,6 +8579,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.confirm_in_flight':
     '결제가 아직 확인 중입니다. 완료된 후 다시 시도하세요.',
   'apiError.woc_market.cancel_pending': '판매자가 이 판매글을 취소하는 중입니다.',
+  'apiError.woc_market.item_mismatch':
+    '구매자가 동의한 아이템과 일치하지 않습니다. 거래를 새로 시작하세요.',
   'apiError.woc_market.bond_window_closed':
     '이 입찰은 더 이상 결제할 수 없습니다. 결제 기간이 끝났습니다. 다시 입찰하여 새 기간을 받으세요.',
   'apiError.woc_market.claim_cooldown':
@@ -13138,6 +13140,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '내 아이템을 내려주세요. $WOC 제안은 상대가 파는 물건을 사는 것입니다.',
   'hudChrome.trade.woc.hintAwaitTheirItems':
     '상대가 $WOC로 판매 가능한 물건을 올리기를 기다리는 중입니다.',
+  'hudChrome.trade.woc.hintOneItem':
+    '$WOC 거래는 아이템 하나만 다룹니다. 판매할 하나만 올려 두세요.',
   'hudChrome.trade.woc.sendOffer': '$WOC 제안',
   'hudChrome.trade.woc.incomingAccept': '{name} 님이 당신의 아이템에 {price}을(를) 제안했습니다.',
   'hudChrome.trade.woc.hintAcceptNeedsItem': '수락하기 전에 판매할 아이템을 올려주세요.',

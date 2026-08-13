@@ -90,6 +90,7 @@ export type WocArmBlock =
 export type WocSendHint =
   | 'clear_your_items' // you are BUYING, so your own side must be empty
   | 'await_their_items' // they have staged nothing eligible to buy yet
+  | 'one_item' // a directed deal pins EXACTLY one copy; more than one is ambiguous
   | 'enter_price'
   | 'gold_offered'
   | 'insufficient_balance'; // the quote is more $WOC than the wallet holds
@@ -195,6 +196,10 @@ export interface WocTradeModel {
   canSend: boolean;
   /** The i18n key explaining why it may not, or null when it may. */
   sendHint: TranslationKey | null;
+  /** The exact copy the offer pins (H10): the partner's ONE eligible staged
+   *  item, or null while the table is empty or ambiguous. Non-null whenever
+   *  canSend is true, by the hint ladder's one_item arm. */
+  agreedItem: InvSlot | null;
   /**
    * What the standing deal is doing, in words, for the VIEWER's side. Null when
    * there is nothing to say (no offer, or the offer is theirs to act on and the
@@ -227,6 +232,7 @@ const BLOCK_KEYS: Record<WocArmBlock, TranslationKey> = {
 const SEND_HINT_KEYS: Record<WocSendHint, TranslationKey> = {
   clear_your_items: 'hudChrome.trade.woc.hintClearYourItems',
   await_their_items: 'hudChrome.trade.woc.hintAwaitTheirItems',
+  one_item: 'hudChrome.trade.woc.hintOneItem',
   enter_price: 'hudChrome.trade.woc.hintEnterPrice',
   gold_offered: 'hudChrome.trade.woc.hintGoldOffered',
   insufficient_balance: 'hudChrome.trade.woc.hintInsufficientBalance',
@@ -311,11 +317,17 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
       ? 'clear_your_items'
       : eligible.length === 0
         ? 'await_their_items'
-        : input.usdCents === null || input.usdCents <= 0
-          ? 'enter_price'
-          : shortfall
-            ? 'insufficient_balance'
-            : null;
+        : // An offer pins EXACTLY ONE copy (H10: the server refuses acceptance
+          // of any copy but the pinned one), so a table holding several
+          // eligible items is ambiguous about which the price buys. Silently
+          // pinning the first would be the bait-and-switch surface inverted.
+          eligible.length > 1
+          ? 'one_item'
+          : input.usdCents === null || input.usdCents <= 0
+            ? 'enter_price'
+            : shortfall
+              ? 'insufficient_balance'
+              : null;
 
   return {
     // The arm stays VISIBLE while blocked: hiding it would leave a player who
@@ -364,6 +376,7 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
     // A standing offer replaces the form: you cannot send a second one over it.
     canSend: wocMode && hint === null && input.pendingOffer === null,
     sendHint: wocMode && hint !== null ? SEND_HINT_KEYS[hint] : null,
+    agreedItem: eligible.length === 1 ? eligible[0] : null,
     statusKey:
       input.pendingOffer === null
         ? null

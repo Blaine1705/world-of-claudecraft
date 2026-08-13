@@ -377,6 +377,7 @@ import { createWocMarketCustody } from './woc_market_custody';
 import {
   PgWocMarketDb,
   pruneClosedWocListingsBatch,
+  pruneResolvedWocOffersBatch,
   pruneWocBuyNowAbandonsBatch,
 } from './woc_market_db';
 import { createWocMarketMonitor } from './woc_market_monitor';
@@ -3551,6 +3552,14 @@ export async function startServer(): Promise<http.Server> {
         name: 'woc_market_buy_now_abandons',
         pruneBatch: (n) =>
           pruneWocBuyNowAbandonsBatch(pool, config.wocMarketAbandonsRetentionDays, n),
+      },
+      {
+        // Resolved directed p2p offers (inbox history; sales carry the
+        // durable deal provenance). Pending rows never prune: the sweep
+        // expires them first.
+        name: 'woc_market_directed_offers',
+        pruneBatch: (n) =>
+          pruneResolvedWocOffersBatch(pool, config.wocMarketOffersRetentionDays, n),
       },
       {
         // Closed, fully-disposed $WOC Exchange listings (bids + settlements

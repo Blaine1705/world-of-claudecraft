@@ -503,6 +503,7 @@ export const zh_CN: EnTranslations = {
         "blockRecipientNoWallet": "该玩家必须先连接钱包，才能接受 $WOC 付款。",
         "hintClearYourItems": "请先移出你自己的物品：$WOC 报价用于购买对方出售的物品。",
         "hintAwaitTheirItems": "正在等待对方拿出可用 $WOC 出售的物品。",
+        "hintOneItem": "$WOC 交易一次只包含一件物品。请只保留要出售的那一件。",
         "hintEnterPrice": "请输入美元价格。",
         "hintAcceptNeedsItem": "接受前请先放入你要出售的物品。",
         "hintGoldOffered": "请先移除你的金币报价：一笔交易只能用金币或 $WOC，不能兼有。",
@@ -4158,6 +4159,7 @@ export const zh_CN: EnTranslations = {
       "no_buy_now": "该挂单没有一口价。",
       "cap_reached": "你已达到交易所挂单数量上限。",
       "stale_item": "该物品已变动或被移动。请重新选择后再试。",
+      "item_mismatch": "这不是买家同意购买的那件物品。请重新发起一笔交易。",
       "not_eligible": "该物品不能在 $WOC 交易所挂单。",
       "invalid_params": "请检查起拍价、底价、一口价与拍卖时长。",
       "signature_reused": "该交易已提交过。"

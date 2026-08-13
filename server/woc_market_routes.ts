@@ -186,6 +186,10 @@ export const REFUSAL_ERRORS: Record<WocMarketRefusal, { status: number; code: Er
   lease_lost: { status: 409, code: 'woc_market.stale_item' },
   signature_reused: { status: 409, code: 'woc_market.signature_reused' },
   stale_copy: { status: 409, code: 'woc_market.stale_item' },
+  // The directed bait-and-switch guard: the accepted copy's fingerprint does
+  // not match the one the buyer agreed to at offer time (H10). Its own code,
+  // not a stale_item collapse: the fix is a fresh DEAL, not a re-select.
+  item_mismatch: { status: 409, code: 'woc_market.item_mismatch' },
   // Custody extraction refusals: a stale reference re-selects; the rest are
   // eligibility shapes the client pre-filters but the server owns.
   soulbound: { status: 400, code: 'woc_market.not_eligible' },
@@ -784,14 +788,24 @@ function offerView(offer: WocDirectedOfferRow, viewer: number | null) {
 }
 
 async function createOfferHandler(ctx: Ctx): Promise<void> {
-  // The BUYER opens the deal: a price named to one seller, with no item. The
-  // goods arrive when that seller accepts.
+  // The BUYER opens the deal: a price named to one seller, for the EXACT copy
+  // their trade window shows (H10). The item snapshot is required: an offer
+  // with no pinned item is the bait-and-switch surface this intake closed.
+  // The seller's acceptance escrows only a copy matching the pin.
   const body = bodyOf(ctx);
+  const instance = optionalInstance(body.itemInstance);
+  const craftedRecipeId =
+    body.itemCraftedRecipeId === undefined ? undefined : stringField(body.itemCraftedRecipeId, 128);
   const out = await useService().createDirectedOffer({
     account: ctxAccountId(ctx),
     characterId: intField(body.characterId, 1, Number.MAX_SAFE_INTEGER),
     sellerCharacterName: stringField(body.sellerCharacterName, 64),
     usdCents: intField(body.usdCents, WOC_MARKET_MIN_PRICE_CENTS, WOC_MARKET_MAX_PRICE_CENTS),
+    item: {
+      itemId: stringField(body.itemId, 128),
+      ...(instance == null ? {} : { instance }),
+      ...(craftedRecipeId === undefined ? {} : { craftedRecipeId }),
+    },
   });
   if (!out.ok) throwRefusal(out.reason);
   json(ctx.res, 200, { offer: offerView(out.offer, ctxAccountId(ctx)) });

@@ -308,6 +308,9 @@ export const ERROR_CODES = deepFreeze({
   'woc_market.cap_reached': { params: [] },
   // The referenced inventory copy changed or moved; re-select it (409).
   'woc_market.stale_item': { params: [] },
+  // A directed acceptance offered a copy whose fingerprint does not match
+  // the one the buyer agreed to at offer time (bait-and-switch guard) (409).
+  'woc_market.item_mismatch': { params: [] },
   // The item is not eligible for the $WOC Exchange under this server's
   // policy (soulbound, bound, quest, below the quality floor, excluded) (400).
   'woc_market.not_eligible': { params: [] },

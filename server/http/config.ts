@@ -155,6 +155,10 @@ export interface Config {
   // is kept. Rows are dead once outside every cooldown window; 0 keeps them
   // forever.
   readonly wocMarketAbandonsRetentionDays: number;
+  // How many days a RESOLVED directed p2p offer (accepted, declined,
+  // withdrawn, expired) is kept. Pending offers never prune (they expire
+  // through the sweep first); 0 keeps resolved rows forever.
+  readonly wocMarketOffersRetentionDays: number;
   // The two sweep knobs follow the maxPlayersPerRealm trimmed-read contract
   // instead, because for them a whitespace-derived 0 is fail-DANGEROUS: hour 0
   // moves the sweep to 00:00 UTC, next to the nightly 03:15 UTC pg_dump window
@@ -219,6 +223,10 @@ const DEFAULT_WOC_MARKET_LISTINGS_RETENTION_DAYS = 180;
 // Abandon rows are dead once outside every cooldown window (an hour); 30 days
 // keeps generous forensics for tuning the cooldown numbers.
 const DEFAULT_WOC_MARKET_ABANDONS_RETENTION_DAYS = 30;
+// A resolved directed offer is inbox history (the SALE rows carry the durable
+// deal provenance); half a year matches the listings window so a deal's offer
+// and listing rows age out together.
+const DEFAULT_WOC_MARKET_OFFERS_RETENTION_DAYS = 180;
 // PROVISIONAL: two hours after the nightly 03:15 UTC pg_dump window, pending real
 // traffic-curve evidence of the quietest hour; revisit when that evidence lands.
 const DEFAULT_RETENTION_SWEEP_UTC_HOUR = 5;
@@ -441,6 +449,10 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     wocMarketAbandonsRetentionDays: numberOr(
       env.WOC_MARKET_ABANDONS_RETENTION_DAYS,
       DEFAULT_WOC_MARKET_ABANDONS_RETENTION_DAYS,
+    ),
+    wocMarketOffersRetentionDays: numberOr(
+      env.WOC_MARKET_OFFERS_RETENTION_DAYS,
+      DEFAULT_WOC_MARKET_OFFERS_RETENTION_DAYS,
     ),
     // An hour outside 0..23 is garbage, not a preference; fall back like numberOr does.
     retentionSweepUtcHour:

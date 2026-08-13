@@ -8726,6 +8726,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.confirm_in_flight':
     'Платеж ещё подтверждается. Повторите попытку, когда он завершится.',
   'apiError.woc_market.cancel_pending': 'Продавец отменяет этот лот.',
+  'apiError.woc_market.item_mismatch':
+    'Это не тот предмет, на который согласился покупатель. Начните новую сделку.',
   'apiError.woc_market.bond_window_closed':
     'Эту ставку больше нельзя оплатить: окно оплаты закрылось. Сделайте ставку заново, чтобы получить новое.',
   'apiError.woc_market.claim_cooldown':
@@ -13294,6 +13296,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.blockRecipientNoWallet': 'Этот игрок должен подключить кошелёк, чтобы принимать платежи в $WOC.',
   'hudChrome.trade.woc.hintClearYourItems': 'Уберите свои предметы: предложение $WOC покупает то, что продают вам.',
   'hudChrome.trade.woc.hintAwaitTheirItems': 'Ждём, когда они выставят что-то, что можно продать за $WOC.',
+  'hudChrome.trade.woc.hintOneItem':
+    'Сделка за $WOC охватывает ровно один предмет. Оставьте только тот, который продаётся.',
   'hudChrome.trade.woc.sendOffer': 'Предложить $WOC',
   'hudChrome.trade.woc.incomingAccept': '{name} предлагает {price} за ваши предметы.',
   'hudChrome.trade.woc.hintAcceptNeedsItem': 'Прежде чем принять, добавьте предмет, который продаёте.',

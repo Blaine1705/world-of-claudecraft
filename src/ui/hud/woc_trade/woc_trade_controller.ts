@@ -479,12 +479,22 @@ export class WocTradeController {
     const hooks = this.wocMarketHooks;
     const model = wocTradeModelFrom(this.wocTradeDeps(otherName));
     if (!hooks || !model.canSend || this.wocTradeUsdCents === null) return;
-    // The buyer names a price to one seller; the goods arrive when that seller
-    // accepts, so nothing about the item travels here.
+    // The offer names the EXACT copy on the table (H10): the server pins its
+    // fingerprint at creation and refuses acceptance of any other copy, so a
+    // seller cannot swap in a re-rolled instance after the price is agreed.
+    // canSend guarantees agreedItem (the one_item hint arm); the null check is
+    // a belt for a raced model rebuild.
+    const agreed = model.agreedItem;
+    if (agreed === null) return;
     const res = await hooks.client.createOffer({
       characterId: hooks.characterId() ?? 0,
       sellerCharacterName: otherName,
       usdCents: this.wocTradeUsdCents,
+      itemId: agreed.itemId,
+      ...(agreed.instance === undefined ? {} : { itemInstance: agreed.instance }),
+      ...(agreed.craftedRecipeId === undefined
+        ? {}
+        : { itemCraftedRecipeId: agreed.craftedRecipeId }),
     });
     if (res.ok) {
       // The window STAYS OPEN. The offer now sits in it for both players to

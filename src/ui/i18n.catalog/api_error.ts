@@ -252,6 +252,7 @@ export const apiErrorStrings = {
     no_buy_now: 'This listing has no buy-now price.',
     cap_reached: 'You have reached your Exchange listing limit.',
     stale_item: 'That item changed or moved. Re-select it and try again.',
+    item_mismatch: 'That is not the exact item the buyer agreed to. Start a fresh deal for it.',
     not_eligible: 'That item cannot be listed on the $WOC Exchange.',
     invalid_params: 'Check the starting bid, reserve, buy-now price, and duration.',
     signature_reused: 'That transaction was already submitted.',

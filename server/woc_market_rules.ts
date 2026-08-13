@@ -143,6 +143,31 @@ export const WOC_MARKET_STRANDED_RECLAIM_SECONDS = 300;
  */
 export const WOC_MARKET_DIRECTED_OFFER_TTL_SECONDS = 600;
 
+/**
+ * How long an ACCEPTED directed deal holds the escrowed item waiting for its
+ * named buyer to start paying.
+ *
+ * Equal to the settlement window BY RULING (H12): a directed sale is bought
+ * immediately or not at all, so the hold is the same promise the settlement
+ * window makes, and the worst-case escrow occupancy is one hold plus one
+ * settlement window (a last-moment claim). The 12-hour auction backstop it
+ * replaces was the cap-exemption's stated mitigation inverted: the exemption
+ * assumed a settlement-window hold while the code granted the shortest
+ * auction duration. The identity (not a copied literal) keeps the two windows
+ * from drifting apart silently; the rules suite pins it at the definition.
+ */
+export const WOC_MARKET_DIRECTED_HOLD_SECONDS = WOC_MARKET_SETTLEMENT_WINDOW_SECONDS;
+
+/**
+ * How old an 'accepted' offer with NO stamped listing must be before the
+ * sweep converges it (reopen when the escrow provably rolled back, expire
+ * when past its TTL). Comfortably past every bound an in-flight acceptance
+ * can ride (the 65s COMMIT driver backstop plus the escrow FIFO wait), so
+ * the converge arm can never race a live escrow transaction; the stamp CAS
+ * is the belt if one ever does.
+ */
+export const WOC_MARKET_OFFER_CONVERGE_SECONDS = 300;
+
 // ---------------------------------------------------------------------------
 // Bidding math
 // ---------------------------------------------------------------------------

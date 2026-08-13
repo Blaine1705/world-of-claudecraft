@@ -316,11 +316,16 @@ export class WocMarketClient {
     return out.ok ? { ok: true, ...out.data } : out;
   }
 
-  /** The BUYER opens the deal: a price named to one seller, no item. */
+  /** The BUYER opens the deal: a price named to one seller for the EXACT copy
+   *  their trade window shows (H10). The item identity is required; the server
+   *  pins its fingerprint and refuses acceptance of any other copy. */
   async createOffer(req: {
     characterId: number;
     sellerCharacterName: string;
     usdCents: number;
+    itemId: string;
+    itemInstance?: unknown;
+    itemCraftedRecipeId?: string;
   }): Promise<{ ok: true; offer: WocOfferView } | WocMarketFail> {
     const out = await this.request<{ offer: WocOfferView }>('POST', '/api/woc-market/offers', req);
     return out.ok ? { ok: true, ...out.data } : out;

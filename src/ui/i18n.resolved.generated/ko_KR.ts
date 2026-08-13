@@ -503,6 +503,7 @@ export const ko_KR: EnTranslations = {
         "blockRecipientNoWallet": "해당 플레이어가 $WOC 결제를 받으려면 지갑을 연결해야 합니다.",
         "hintClearYourItems": "내 아이템을 내려주세요. $WOC 제안은 상대가 파는 물건을 사는 것입니다.",
         "hintAwaitTheirItems": "상대가 $WOC로 판매 가능한 물건을 올리기를 기다리는 중입니다.",
+        "hintOneItem": "$WOC 거래는 아이템 하나만 다룹니다. 판매할 하나만 올려 두세요.",
         "hintEnterPrice": "USD 가격을 입력하세요.",
         "hintAcceptNeedsItem": "수락하기 전에 판매할 아이템을 올려주세요.",
         "hintGoldOffered": "먼저 골드 제안을 취소하세요. 거래는 골드 또는 $WOC 중 하나만 가능합니다.",
@@ -4158,6 +4159,7 @@ export const ko_KR: EnTranslations = {
       "no_buy_now": "이 등록에는 즉시 구매가가 없습니다.",
       "cap_reached": "거래소 등록 한도에 도달했습니다.",
       "stale_item": "해당 아이템이 변경되었거나 이동했습니다. 다시 선택한 뒤 시도하세요.",
+      "item_mismatch": "구매자가 동의한 아이템과 일치하지 않습니다. 거래를 새로 시작하세요.",
       "not_eligible": "해당 아이템은 $WOC 거래소에 등록할 수 없습니다.",
       "invalid_params": "시작가, 최저가, 즉시 구매가, 기간을 확인하세요.",
       "signature_reused": "해당 트랜잭션은 이미 제출되었습니다."

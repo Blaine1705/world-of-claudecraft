@@ -641,6 +641,26 @@ ALTER TABLE woc_market_directed_offers
   ADD COLUMN IF NOT EXISTS buyer_accepted BOOLEAN NOT NULL DEFAULT false;
 ALTER TABLE woc_market_directed_offers
   ADD COLUMN IF NOT EXISTS seller_accepted BOOLEAN NOT NULL DEFAULT false;
+-- The agreed copy's fingerprint, stamped at CREATION (H10): the buyer opens
+-- the deal naming the exact copy they saw, and acceptance escrows only a copy
+-- whose pin matches. Nullable TEXT with no default (no table rewrite; a
+-- pre-existing row keeps NULL and its acceptance refuses item_mismatch, the
+-- safe direction for an offer that predates the pin).
+ALTER TABLE woc_market_directed_offers
+  ADD COLUMN IF NOT EXISTS item_pin TEXT;
+-- The FK referent side of listing_id: Postgres does not index it, and the
+-- nightly closed-listing prune pays a sequential scan of this table per
+-- deleted listing to satisfy ON DELETE SET NULL without it (the same
+-- rationale as the settlements/bids listing indexes above). Boot DDL, not
+-- concurrent_indexes.ts: pre-enable the table is empty.
+CREATE INDEX IF NOT EXISTS woc_market_directed_offers_listing
+  ON woc_market_directed_offers(listing_id);
+-- The converge arm's read: accepted offers whose escrow never stamped a
+-- listing (the acceptance transaction threw). Tiny partial set by
+-- construction; realm leads, updated_at ranges. Boot DDL, same rationale.
+CREATE INDEX IF NOT EXISTS woc_market_offers_accepted_unstamped
+  ON woc_market_directed_offers(realm, updated_at)
+  WHERE status = 'accepted' AND listing_id IS NULL;
 `;
 
 /** Lock-wait ceiling for the escrow transaction's accounts row. Short on
@@ -668,17 +688,21 @@ export const GUARD_IDLE_TX_TIMEOUT_MS = ESCROW_LOCK_TIMEOUT_MS;
  *  wait ceiling and the session default: the transaction now runs inside the
  *  per-character save FIFO, so its worst case bounds the seller's own
  *  autosave chain, a saveAll worker slot, and leave/takeover, and it must
- *  stay well under the 30s autosave period even across all four real
+ *  stay well under the 30s autosave period even across all five real
  *  statements. Measured against Postgres 16 with a 27KB character blob:
  *  p50 3.5ms, max 8.3ms over 25 passes, whole-transaction timings (the
  *  delivery pg suite's escrow-cost test re-measures and asserts the
- *  observed MAX stays under a twenty-fifth of this allowance, 200ms; an
- *  env-gated local gate per tests/CLAUDE.md, not a CI floor), so 5s is
+ *  observed MAX stays under a twenty-fifth of this allowance, 160ms; an
+ *  env-gated local gate per tests/CLAUDE.md, not a CI floor), so 4s is
  *  orders of magnitude of headroom while a genuinely wedged statement can
- *  no longer hold the FIFO for the 60s heavy allowance. Honest ceiling
- *  accounting: this allowance bounds the FOUR workload statements (the
+ *  no longer hold the FIFO for the 60s heavy allowance. 4000, down from the
+ *  original 5000, BECAUSE the statement count grew: the directed rail added
+ *  the offer-stamp CAS and stopped skipping the cap count, and five 5s
+ *  allowances would put the pinned worst-case sum past one autosave period.
+ *  Honest ceiling
+ *  accounting: this allowance bounds the FIVE workload statements (the
  *  tunables relation pins exactly those, plus the lock wait and the pool
- *  checkout, about 27s; the two later SET LOCALs also run under it but are
+ *  checkout, 27s; the two later SET LOCALs also run under it but are
  *  protocol statements with no locks, IO, or planning, excluded from the
  *  worst-case sum on that ground); BEGIN and the SET LOCAL that installs
  *  the allowance necessarily run under the 15s session default, and
@@ -692,7 +716,7 @@ export const GUARD_IDLE_TX_TIMEOUT_MS = ESCROW_LOCK_TIMEOUT_MS;
  *  hot-path follow-up with the guild-flush 60s term. The heavy allowance remains correct for the
  *  LOGOUT-shaped saves (losing one is data loss; losing a listing attempt
  *  is a refusal the player retries). */
-export const ESCROW_STATEMENT_TIMEOUT_MS = 5_000;
+export const ESCROW_STATEMENT_TIMEOUT_MS = 4_000;
 
 const LISTING_COLS =
   'id, realm, seller_account, seller_character, seller_name, seller_wallet, item, item_id, ' +
@@ -703,7 +727,7 @@ const LISTING_COLS =
 
 const OFFER_COLS =
   'id, realm, seller_account, seller_character, seller_name, buyer_account, buyer_name, ' +
-  'item_ref, item_id, usd_cents, status, listing_id, created_at, expires_at, ' +
+  'item_ref, item_id, item_pin, usd_cents, status, listing_id, created_at, expires_at, ' +
   'buyer_accepted, seller_accepted';
 
 /**
@@ -814,6 +838,7 @@ function toOffer(row: Row): WocDirectedOfferRow {
     buyerName: row.buyer_name,
     itemRef: (row.item_ref ?? null) as ExtractRef | null,
     itemId: row.item_id ?? null,
+    itemPin: row.item_pin ?? null,
     usdCents: row.usd_cents,
     status: row.status as WocDirectedOfferStatus,
     listingId: row.listing_id === null ? null : Number(row.listing_id),
@@ -1077,21 +1102,22 @@ export class PgWocMarketDb implements WocMarketDb {
         await client.query('SELECT 1 FROM accounts WHERE id = $1 FOR UPDATE', [
           listing.sellerAccount,
         ]);
-        // The cap is PUBLIC-listing-only in both directions, matching the service's
-        // pre-check: a directed offer is exempt from it and invisible to it. This
-        // is the AUTHORITATIVE half (the pre-check races; this runs under the row
-        // lock), so the exemption has to be spelled here too or a directed offer
-        // would pass the pre-check and abort in the transaction.
-        if (listing.params.directedBuyerAccount === null) {
-          const count = await client.query(
-            `SELECT COUNT(*)::int AS n FROM woc_market_listings
-            WHERE realm = $1 AND seller_account = $2 AND status <> 'closed'
-              AND directed_buyer_account IS NULL`,
-            [listing.realm, listing.sellerAccount],
-          );
-          if ((count.rows[0]?.n ?? 0) >= WOC_MARKET_MAX_ACTIVE_LISTINGS) {
-            throw new TxAbort({ ok: false as const, reason: 'cap_reached' as const });
-          }
+        // The cap counts EVERY non-closed listing, directed included (H12),
+        // matching the service's pre-check byte for byte. Directed rows used
+        // to be exempt and invisible on the stated ground that a directed
+        // hold lasts only a settlement window; the code granted 12 hours, so
+        // the exemption was an unbounded-escrow hole (an accomplice pair
+        // could lock arbitrarily many items outside the cap). This is the
+        // AUTHORITATIVE half (the pre-check races; this runs under the row
+        // lock), so the predicate has to be spelled here too or a racing pair
+        // of creates could land past the cap.
+        const count = await client.query(
+          `SELECT COUNT(*)::int AS n FROM woc_market_listings
+            WHERE realm = $1 AND seller_account = $2 AND status <> 'closed'`,
+          [listing.realm, listing.sellerAccount],
+        );
+        if ((count.rows[0]?.n ?? 0) >= WOC_MARKET_MAX_ACTIVE_LISTINGS) {
+          throw new TxAbort({ ok: false as const, reason: 'cap_reached' as const });
         }
         const saved = await saveCharacterStateOnClient(
           client,
@@ -1129,7 +1155,30 @@ export class PgWocMarketDb implements WocMarketDb {
             listing.params.directedBuyerAccount,
           ],
         );
-        return { ok: true as const, id: Number(inserted.rows[0].id) };
+        const listingId = Number(inserted.rows[0].id);
+        if (listing.directedOfferId !== null) {
+          // The atomic stamp: listing row exists IFF the offer carries its
+          // id, in ONE transaction, so a thrown escrow can never strand an
+          // 'accepted' offer whose listing silently committed (the converge
+          // arm relies on exactly this invariant to prove a rollback). The
+          // CAS refuses an offer the converge arm reopened or expired while
+          // this transaction was in flight; aborting here rolls the insert
+          // and the character save back together and the copy restores
+          // through the typed-refusal arm. Lock order: accounts, then the
+          // new listing row, then the offers row; no other transaction takes
+          // offers-then-listings (the post-hoc stamp hop that did was
+          // deleted with this write), so no cycle can form.
+          const stamped = await client.query(
+            `UPDATE woc_market_directed_offers
+                SET listing_id = $1, updated_at = now()
+              WHERE realm = $2 AND id = $3 AND status = 'accepted' AND listing_id IS NULL`,
+            [listingId, listing.realm, listing.directedOfferId],
+          );
+          if ((stamped.rowCount ?? 0) === 0) {
+            throw new TxAbort({ ok: false as const, reason: 'not_pending' as const });
+          }
+        }
+        return { ok: true as const, id: listingId };
       });
     } catch (err) {
       // TxNeverStarted joins the contention codes: nothing ran, so the typed
@@ -1329,24 +1378,23 @@ export class PgWocMarketDb implements WocMarketDb {
   }
 
   /**
-   * The 12-listing cap counts PUBLIC listings only.
+   * The 12-listing cap counts EVERY non-closed listing, directed included.
    *
-   * The cap exists to bound two things: how much of one seller's inventory sits
-   * in escrow, and how far one seller can flood the public browse. A directed
-   * offer is addressed to a single named account and never appears in browse, so
-   * it cannot flood anything, and the requester chose to exempt it: a private
-   * deal with a friend should not be blocked because the seller happens to have
-   * twelve auctions running.
-   *
-   * The escrow half of the bound is genuinely loosened by that, and the
-   * mitigation is elsewhere: a directed offer holds its item only for the
-   * settlement window, which is far shorter than an auction's 12 to 48 hours.
+   * The cap bounds how much of one seller's inventory sits in escrow, and a
+   * directed listing escrows a real copy exactly like a public one. Directed
+   * rows used to be exempt on the stated ground that a directed hold lasts
+   * only a settlement window; the code granted the shortest auction duration
+   * instead, so the exemption let an accomplice pair lock unbounded escrow
+   * outside the cap (H12). Now the hold really is the settlement window
+   * (WOC_MARKET_DIRECTED_HOLD_SECONDS) AND the row counts. This is the racing
+   * pre-check half; the authoritative count runs inside escrowInsertListing
+   * under the accounts row lock with the SAME predicate, byte for byte:
+   * loosening one without the other reopens the race.
    */
   async countActiveBySeller(realm: string, account: number): Promise<number> {
     const res = await this.pool.query(
       `SELECT COUNT(*)::int AS n FROM woc_market_listings
-        WHERE realm = $1 AND seller_account = $2 AND status <> 'closed'
-          AND directed_buyer_account IS NULL`,
+        WHERE realm = $1 AND seller_account = $2 AND status <> 'closed'`,
       [realm, account],
     );
     return res.rows[0]?.n ?? 0;
@@ -1363,12 +1411,17 @@ export class PgWocMarketDb implements WocMarketDb {
     buyerName: string;
     usdCents: number;
     expiresAtMs: number;
+    itemId: string;
+    itemPin: string;
   }): Promise<WocDirectedOfferRow> {
+    // item_id and item_pin are stamped at CREATION (H10): the offer names the
+    // exact copy the buyer agreed to, and acceptance validates the extracted
+    // copy against the pin before anything escrows.
     const res = await this.pool.query(
       `INSERT INTO woc_market_directed_offers (
          realm, seller_account, seller_character, seller_name,
-         buyer_account, buyer_name, usd_cents, expires_at
-       ) VALUES ($1, $2, $3, $4, $5, $6, $7, to_timestamp($8 / 1000.0))
+         buyer_account, buyer_name, usd_cents, expires_at, item_id, item_pin
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, to_timestamp($8 / 1000.0), $9, $10)
        RETURNING ${OFFER_COLS}`,
       [
         offer.realm,
@@ -1379,6 +1432,8 @@ export class PgWocMarketDb implements WocMarketDb {
         offer.buyerName,
         offer.usdCents,
         offer.expiresAtMs,
+        offer.itemId,
+        offer.itemPin,
       ],
     );
     return toOffer(res.rows[0]);
@@ -1446,31 +1501,20 @@ export class PgWocMarketDb implements WocMarketDb {
     realm: string,
     id: number,
     to: Exclude<WocDirectedOfferStatus, 'pending'>,
-    opts: { listingId?: number } = {},
   ): Promise<WocDirectedOfferRow | null> {
-    // Two arms, and the second one is easy to lose.
-    //
     // The 'pending' predicate is the compare-and-set: two concurrent accepts
-    // both read 'pending', only one UPDATE matches, so only one reaches escrow.
-    //
-    // The service then calls back a SECOND time to stamp the listing id onto the
-    // offer it just created, and by then the row is 'accepted', not 'pending'.
-    // Narrowed to the first arm alone that write matched zero rows and the offer
-    // never learned its listing, so both windows saw a deal stuck at "review"
-    // forever and the buyer was never offered the chance to pay. The stamp is
-    // therefore allowed on an accepted row that has no listing yet, which cannot
-    // resurrect anything: it changes no status and refuses once one is set.
+    // both read 'pending', only one UPDATE matches, so only one reaches
+    // escrow. The listing id is NOT stamped here: since the atomic-stamp
+    // change, escrowInsertListing writes listing_id inside the escrow
+    // transaction itself (listing exists IFF the offer is stamped), so the
+    // old second-call stamp arm this method carried is gone rather than
+    // left as a dead reachable write.
     const res = await this.pool.query(
       `UPDATE woc_market_directed_offers
-          SET status = $3, listing_id = COALESCE($4, listing_id), updated_at = now()
-        WHERE realm = $1 AND id = $2
-          AND (
-            status = 'pending'
-            OR ($3 = 'accepted' AND status = 'accepted'
-                AND listing_id IS NULL AND $4::bigint IS NOT NULL)
-          )
+          SET status = $3, updated_at = now()
+        WHERE realm = $1 AND id = $2 AND status = 'pending'
         RETURNING ${OFFER_COLS}`,
-      [realm, id, to, opts.listingId ?? null],
+      [realm, id, to],
     );
     return res.rows[0] ? toOffer(res.rows[0]) : null;
   }
@@ -1529,17 +1573,77 @@ export class PgWocMarketDb implements WocMarketDb {
   }
 
   async expireDueDirectedOffers(realm: string, nowMs: number, limit: number): Promise<number> {
+    // The OUTER status qual is load-bearing beside the escrow stamp: the
+    // subselect's snapshot can predate a racing acceptance, and EvalPlanQual
+    // re-evaluates only the id-membership against the ORIGINAL snapshot, so
+    // without it this statement could expire an offer whose listing just
+    // committed (breaking the listing-exists-IFF-stamped invariant). SKIP
+    // LOCKED keeps the sweep from parking a pool client behind an escrow
+    // transaction holding the offer row (claimDueListings' idiom).
     const res = await this.pool.query(
       `UPDATE woc_market_directed_offers
           SET status = 'expired', updated_at = now()
-        WHERE id IN (
+        WHERE status = 'pending'
+          AND id IN (
           SELECT id FROM woc_market_directed_offers
            WHERE realm = $1 AND status = 'pending' AND expires_at <= to_timestamp($2 / 1000.0)
            LIMIT $3
+           FOR UPDATE SKIP LOCKED
         )`,
       [realm, nowMs, limit],
     );
     return res.rowCount ?? 0;
+  }
+
+  /**
+   * The converge arm's read: offers claimed 'accepted' whose escrow never
+   * stamped a listing. With the atomic stamp, an aged row here PROVES the
+   * escrow rolled back (or never ran), so the sweep can reopen or expire it;
+   * the age bound keeps a still-in-flight acceptance out of the batch and the
+   * reopen/expire CAS is the belt if one ever straddles it. Rides the
+   * woc_market_offers_accepted_unstamped partial index; ORDER BY updated_at
+   * keeps the batch deterministic and on the ordered path.
+   */
+  async acceptedUnstampedOffers(
+    realm: string,
+    olderThanMs: number,
+    limit: number,
+  ): Promise<WocDirectedOfferRow[]> {
+    const res = await this.pool.query(
+      `SELECT ${OFFER_COLS} FROM woc_market_directed_offers
+        WHERE realm = $1 AND status = 'accepted' AND listing_id IS NULL
+          AND updated_at <= to_timestamp($2 / 1000.0)
+        ORDER BY updated_at
+        LIMIT $3`,
+      [realm, olderThanMs, limit],
+    );
+    return res.rows.map(toOffer);
+  }
+
+  /** The converge arm's terminal write for an offer already past its TTL:
+   *  same CAS as reopenDirectedOffer (a raced late stamp fails the qual
+   *  harmlessly), landing on 'expired' instead of 'pending'. */
+  async expireDirectedOfferIfUnstamped(realm: string, id: number): Promise<boolean> {
+    const res = await this.pool.query(
+      `UPDATE woc_market_directed_offers
+          SET status = 'expired', updated_at = now()
+        WHERE realm = $1 AND id = $2 AND status = 'accepted' AND listing_id IS NULL`,
+      [realm, id],
+    );
+    return (res.rowCount ?? 0) > 0;
+  }
+
+  /** Whether ANY settlement row was ever opened against this listing, open or
+   *  terminal. The directed close arm's strike gate: 'failed' is not an OPEN
+   *  state, so gating the never-claimed strike on the open check alone would
+   *  strike a buyer the overdue arm is about to strike again for the same
+   *  walk-away. Rides the settlements listing index. */
+  async everSettledForListing(listingId: number): Promise<boolean> {
+    const res = await this.pool.query(
+      `SELECT EXISTS(SELECT 1 FROM woc_market_settlements WHERE listing_id = $1) AS x`,
+      [listingId],
+    );
+    return res.rows[0]?.x === true;
   }
 
   /** The buyer's side: directed offers addressed to this account. Rides the
@@ -2401,6 +2505,32 @@ export class PgWocMarketDb implements WocMarketDb {
         const row = res.rows[0];
         const verdict = diagnose(row);
         if (verdict !== null) return verdict;
+        // The same-WALLET self-deal guard (H14). seller_account alone missed
+        // the relink dance: the listing records seller_wallet at creation,
+        // and pubkey is UNIQUE, so the twin is sequential (list under wallet
+        // W, unlink, relink W on a second account, buy-now the own listing
+        // into the public sales history). Compared here as a FRESH statement
+        // under the held row lock (lock-first-then-check: the snapshot sees
+        // every relink committed before the lock was granted), and again as
+        // a predicate inside the claiming UPDATE itself, so no interleaving
+        // between these two statements can slip a twin through. wallet_links
+        // is a plain PK read, no row lock: no new lock-order edge. NULL
+        // semantics: pubkey is NOT NULL and a claimer with no wallet row
+        // matches nothing, so the guard fires only on proven equality (the
+        // route's wallet_required guard refuses no-wallet buyers upstream).
+        const claimerWallet = await client.query(
+          `SELECT pubkey FROM wallet_links WHERE account_id = $1`,
+          [account],
+        );
+        // PROVEN string equality only: a missing wallet row (undefined) must
+        // neither fire the guard against a null seller_wallet nor slip an
+        // undefined === undefined match through (the NULL = NULL class).
+        if (
+          typeof row.seller_wallet === 'string' &&
+          claimerWallet.rows[0]?.pubkey === row.seller_wallet
+        ) {
+          return 'own_listing' as const;
+        }
         if (await openSettlement(client)) return 'locked' as const;
         // A dead lock still on the row (with no live settlement) is a
         // recorded abandonment of its holder: the steal is the first moment
@@ -2434,15 +2564,29 @@ export class PgWocMarketDb implements WocMarketDb {
         if (row.directed_buyer_account === null && (await cooldownRefused(client))) {
           return 'claim_cooldown' as const;
         }
+        // The wallet-twin predicate rides the claim itself too (the atomic
+        // half of H14): the row lock is already held by this transaction, so
+        // this UPDATE never blocks and its subplan snapshot is at least as
+        // fresh as the re-check above; defense in depth against any future
+        // reordering of the statements, coverable only by a real-SQL
+        // interleave (no unit arm can commit a relink between them).
         const updated = await client.query(
           `UPDATE woc_market_listings
               SET buy_now_lock_account = $2,
                   buy_now_lock_expires = to_timestamp($3 / 1000.0),
                   updated_at = now()
             WHERE id = $1
+              AND NOT EXISTS (
+                SELECT 1 FROM wallet_links w
+                 WHERE w.account_id = $2
+                   AND w.pubkey IS NOT DISTINCT FROM woc_market_listings.seller_wallet)
             RETURNING ${LISTING_COLS}`,
           [id, account, expiresAtMs],
         );
+        // Zero rows here means the twin predicate refused (nothing else can:
+        // the row is locked); answering typed instead of dereferencing an
+        // absent row, which would surface as a 500.
+        if ((updated.rowCount ?? 0) === 0) return 'own_listing' as const;
         return toListing(updated.rows[0]);
       });
     } catch (err) {
@@ -3785,6 +3929,30 @@ export async function pruneWocBuyNowAbandonsBatch(
       WHERE id IN (
         SELECT id FROM woc_market_buy_now_abandons
          WHERE lock_expires < now() - ($1 || ' days')::interval
+         LIMIT $2)`,
+    [String(days), Math.max(1, Math.floor(batchSize))],
+  );
+  return res.rowCount ?? 0;
+}
+
+/** Resolved directed offers (anything not pending) past the retention
+ *  window, oldest first behind woc_market_offers_resolved_updated. Sales
+ *  rows keep the durable deal provenance; a resolved offer is inbox
+ *  history. The table's DDL promised this prune from the day it shipped;
+ *  the registration finally arrived with the directed-rail hardening. */
+export async function pruneResolvedWocOffersBatch(
+  pool: Pool,
+  retentionDays: number,
+  batchSize: number,
+): Promise<number> {
+  if (!Number.isFinite(retentionDays) || retentionDays <= 0) return 0;
+  const days = Math.max(1, Math.floor(retentionDays));
+  const res = await pool.query(
+    `DELETE FROM woc_market_directed_offers
+      WHERE id IN (
+        SELECT id FROM woc_market_directed_offers
+         WHERE status <> 'pending' AND updated_at < now() - ($1 || ' days')::interval
+         ORDER BY updated_at
          LIMIT $2)`,
     [String(days), Math.max(1, Math.floor(batchSize))],
   );

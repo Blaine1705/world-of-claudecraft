@@ -503,6 +503,7 @@ export const ja_JP: EnTranslations = {
         "blockRecipientNoWallet": "そのプレイヤーが $WOC の支払いを受け取るには、ウォレットを接続する必要があります。",
         "hintClearYourItems": "自分のアイテムを外してください。$WOC の提示は相手の出品を買うためのものです。",
         "hintAwaitTheirItems": "$WOC で売却できるものを相手が出すのを待っています。",
+        "hintOneItem": "$WOC の取引はアイテム1点のみが対象です。売る1点だけを出してください。",
         "hintEnterPrice": "USD で価格を入力してください。",
         "hintAcceptNeedsItem": "承諾する前に、売却するアイテムを入れてください。",
         "hintGoldOffered": "先にゴールドの提示を取り消してください。取引はゴールドか $WOC のどちらか一方です。",
@@ -4158,6 +4159,7 @@ export const ja_JP: EnTranslations = {
       "no_buy_now": "この出品には即決価格がありません。",
       "cap_reached": "取引所への出品数の上限に達しています。",
       "stale_item": "そのアイテムは変更または移動されました。選び直してから、もう一度お試しください。",
+      "item_mismatch": "買い手が同意したアイテムと一致しません。改めて取引をやり直してください。",
       "not_eligible": "そのアイテムは $WOC 取引所に出品できません。",
       "invalid_params": "開始価格、最低落札価格、即決価格、期間を確認してください。",
       "signature_reused": "そのトランザクションは既に送信されています。"

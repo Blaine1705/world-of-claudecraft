@@ -246,6 +246,7 @@ export const hudChromeStrings = {
       // These say so, rather than leaving a disabled button unexplained.
       hintClearYourItems: 'Remove your own items: a $WOC offer buys what they are selling.',
       hintAwaitTheirItems: 'Waiting for them to offer something that can be sold for $WOC.',
+      hintOneItem: 'A $WOC deal covers exactly one item. Leave only the one being sold.',
       hintEnterPrice: 'Enter a price in USD.',
       hintAcceptNeedsItem: 'Add the item you are selling before accepting.',
       hintGoldOffered: 'Remove your gold offer first: a trade is gold or $WOC, not both.',
