@@ -78,17 +78,35 @@ export async function refreshCheaterMark(
  * truth, not meta.cheaterMark, because the aura is what ticks
  * (src/sim/moderation/CLAUDE.md): its absence means the sanction is served, and
  * burn(0) is what clears the account row.
+ *
+ * `auras` therefore carries THREE distinct meanings, and the two absent-looking
+ * ones must never be collapsed:
+ *  - `undefined`: there was no entity to read at save time, so nothing is known.
+ *    NOT a served sanction. The write is skipped and the latch kept, and the
+ *    next save that does see the entity performs it.
+ *  - an existing list WITHOUT the aura: the sanction is served, burn(0).
+ *  - an existing list WITH the aura: burn the floored remainder.
  */
 export async function persistCheaterMark(
   session: CheaterMarkSession,
   auras: readonly { id: string; remaining: number }[] | undefined,
 ): Promise<void> {
   if (!session.cheaterMarked) return;
-  const live = auras?.find((a) => a.id === CHEATER_MARK_AURA_ID);
+  // Absence of a list is absence of EVIDENCE, never evidence the mark expired:
+  // the call site reads `entities.get(pid)?.auras`, so a save that lands while
+  // the character is not in the sim (a respawn, an arena or fiesta swap) hands
+  // us undefined. Zeroing on that would wipe a budget the player still owes.
+  if (auras === undefined) return;
+  const live = auras.find((a) => a.id === CHEATER_MARK_AURA_ID);
   const remaining = Math.max(0, Math.floor(live?.remaining ?? 0));
-  if (remaining <= 0) session.cheaterMarked = false;
   try {
     await burnAccountCheaterMark(session.accountId, remaining);
+    // Released only AFTER the zeroing write is CONFIRMED. Clearing it before
+    // the await meant a transient db failure on that final write silently
+    // disabled the write-back for every later save, and the next login restored
+    // a budget the player had already served. Retrying once per save is exactly
+    // the cost the latch is designed to absorb.
+    if (remaining <= 0) session.cheaterMarked = false;
   } catch (err) {
     console.error('cheater mark write-back failed:', err);
   }
