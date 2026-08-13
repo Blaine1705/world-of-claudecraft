@@ -594,10 +594,16 @@ FUTURE run (upstream v0.37/v0.38 landed a large perf body: shadow cadence and
 texel snap, first-reveal compile gates, early prewarm submission, texture
 residency prewarm, character far LOD + variant eviction, sky HDR eviction);
 the phase 6 baseline-vs-after TABLE remains valid historical evidence of the
-three-train delta. Baselines must be RE-FROZEN on the merged tree (quiet
-machine: other Claude sessions and workflow fan-outs poison the numbers; a
-contaminated first attempt on 2026-08-13 read low at 41.7 overall and was
-reverted uncommitted) before any new baseline-gated comparison. The r181
+three-train delta. RE-FROZEN 2026-08-13 on the merged tree (quiet machine;
+commits 8bc24d2fe8..the medium retry; low x4 + medium/high/ultra x2, all
+dirty:false): these files are now the forward reference. METHODOLOGY RULE
+from the same session: the machine itself drifts (the pre-train control
+tree benched the same day read -12 percent vs its own era freeze, with
+halved 1 percent lows), so NEVER compare fresh rows against era rows
+directly; run a same-day control (worktree ~/Documents/woc-r165-before at
+519f1c328d) beside any cross-era claim. Same-day low picture on the merged
+tree: open-run -18.8 / combat -17.4 vs the old tree, 1 percent lows
+halve-to-third everywhere (full table in the progress.md interim record). The r181
 frozen showcase pairs in tmp/r181-showcase-frozen/ remain INTERNALLY VALID
 for user decision #2 (both sides captured on the same pre-merge base, so they
 isolate the three-train lighting delta); NEVER diff post-merge captures
