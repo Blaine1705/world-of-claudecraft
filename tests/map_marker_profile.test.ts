@@ -8,9 +8,12 @@ describe('map marker responsive profile', () => {
     ['touch portrait', true, false, 390, 844, 'standard'],
     ['touch landscape', true, false, 844, 390, 'compact'],
     ['compact touch portrait', true, true, 390, 844, 'compact'],
-  ] as const)('%s resolves %s', (_name, touch, compact, viewportWidth, viewportHeight, expected) => {
-    expect(mapMarkerProfileFor({ touch, compact, viewportWidth, viewportHeight })).toBe(expected);
-  });
+  ] as const)(
+    '%s resolves %s',
+    (_name, touch, compact, viewportWidth, viewportHeight, expected) => {
+      expect(mapMarkerProfileFor({ touch, compact, viewportWidth, viewportHeight })).toBe(expected);
+    },
+  );
 
   it('offers the same allocation-free flag policy to the Hud adapter', () => {
     expect(mapMarkerProfileForFlags(false, true, true)).toBe('standard');
