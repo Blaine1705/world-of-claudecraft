@@ -1334,3 +1334,31 @@ b393f17057 formatting; tree clean, LOCAL-ONLY intact):
   decision, recorded OPEN in state.md gotchas. Gate aborts at the vitest
   step by design; post-abort turbo proofs green 5/5 (check:types build:env
   build:server build:bot) + 3/3 (build:bundle).
+- PERF RE-FREEZE completed 2026-08-13 after the user quieted the machine
+  (commits 8bc24d2fe8..72bdef085a + the medium retry; all rows dirty:false,
+  commit-per-run; low x4, medium/high/ultra x2; the first medium baseline
+  attempt died at the known Profiler.enter flake and was retried). Fresh
+  frozen targets (medians, 1280x720 iGPU ANGLE): low 97.8/91.9/172.1/198.2/
+  177.2 (town-idle/town-look/open-run/east-run/combat-vfx), medium 49.5/
+  51.0/59.0/72.5/57.5, high 33.5/29.8/37.2/52.5/35.4, ultra 29.0/28.1/31.1/
+  41.2/29.6.
+- CROSS-ERA MACHINE CONTROL (the load-bearing methodology finding): the
+  pre-train tree at 519f1c328d (worktree ~/Documents/woc-r165-before,
+  benched today on 5174, two runs, reverted after) reads overall ~168.7 vs
+  its own era freeze 190.8: THE MACHINE ITSELF DRIFTED about -12 percent on
+  means and to roughly half the 1 percent lows since 2026-08-09/10. Any
+  fresh-vs-era comparison overstates code effects by about that much; the
+  honest instrument is the SAME-DAY pair (old tree vs merged tree, both
+  benched today). Same-day low deltas (control medians -> merged medians):
+  town-idle 104.8 -> 97.8 (-6.7), town-look 96.9 -> 91.9 (-5.2), open-run
+  212.0 -> 172.1 (-18.8), east-run 215.4 -> 198.2 (-8.0), combat-vfx 214.6
+  -> 177.2 (-17.4); 1 percent lows halve-to-third on the merged tree
+  (14.2/12.0/29.2/19.2/35.8 -> 3.5/4.0/13.8/7.7/14.6). The same-day
+  open-run delta reproduces the phase 6 QA train attribution figure
+  (-18.8) exactly; combat is now -17.4 (the era's upstream buy-back to
+  -7.3 did not survive into the v0.38 stack, and upstream's own additions
+  incl. contact blob shadows on shadowless tiers are inside the delta,
+  inseparable from the train's share in these runs); the era's +106
+  percent open-run 1-percent-low improvement is REVERSED on the merged
+  stack (merged-tree worst-frames are consistently worse than the old
+  tree same-day across all five scenarios and five runs).
