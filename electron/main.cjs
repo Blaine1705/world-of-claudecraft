@@ -91,7 +91,14 @@ const desktopPrefs = loadDesktopPrefs(desktopPrefsPath);
 // set up in this soon-to-exit process), and it must run before app 'ready'. log: console
 // because file logging is deliberately not initialized yet in this soon-to-exit process; the
 // durable main.log evidence is the relaunched-child line the child writes below.
-if (relaunchForLinuxPrime({ log: console })) {
+//
+// The player can opt out of the whole discrete-GPU force (Options > Interface, persisted in
+// the prefs read above). Opting out means NOT CALLING this: the relaunch spawns a second
+// process and pins the X11 Ozone backend, both of which the opt-out exists to avoid, and
+// there is no gentler dial inside the function to reach for.
+if (desktopPrefs.gpuForceOptOut === true) {
+  console.log('[gpu] player opted out of the GPU force; skipping the Linux PRIME relaunch');
+} else if (relaunchForLinuxPrime({ log: console })) {
   // process.exit stops the main script before any statement below runs, so this
   // soon-to-be-replaced process never sets up crash reporting, logging, or a window
   // (app.exit would also exit promptly, but process.exit depends on nothing).
@@ -178,7 +185,16 @@ if (process.platform === 'linux' && process.env[PRIME_RELAUNCH_MARKER] === '1') 
 // window (so the Windows per-app preference beats the GPU process this launch). See
 // electron/gpu_preference.cjs for the two levers and why the client-side
 // powerPreference:'high-performance' hint is not enough on Windows.
-forceHighPerformanceGpu({ app, log });
+//
+// Same opt-out as the Linux relaunch above: the function appends its Chromium switches on
+// every platform before its own win32 gates, so honoring the preference means skipping the
+// CALL, not adding a condition inside it. The value is read from the prefs file at launch,
+// so a mid-session toggle takes effect the next time the game starts.
+if (desktopPrefs.gpuForceOptOut === true) {
+  log.info('[gpu] player opted out of the discrete-GPU force; no switches or per-app preference');
+} else {
+  forceHighPerformanceGpu({ app, log });
+}
 
 // Player-visible strings for main-process dialogs (crash recovery): the
 // renderer pushes t()-localized values via 'desktop-set-strings'
@@ -834,6 +850,30 @@ ipcMain.handle('desktop-set-strings', (event, strings) => {
   if (!trustedSender(event)) return null;
   shellStrings = sanitizeShellStrings(strings, shellStrings);
   return null;
+});
+
+// The player's opt-out of the discrete-GPU force (Options > Interface). Stored, not applied
+// live: both levers run before Electron's own startup (see the two call sites at the top of
+// this file), so a toggle takes effect at the NEXT launch. The renderer gets true only when
+// the value actually reached disk, and the in-memory record is updated only then, so what
+// the getter reports is always what the next launch will read.
+ipcMain.handle('desktop-set-gpu-force-opt-out', (event, optOut) => {
+  if (!trustedSender(event)) return false;
+  // Strictly boolean: anything else is a bug or a probe, and neither may write.
+  if (optOut !== true && optOut !== false) return false;
+  if (!saveDesktopPrefs(desktopPrefsPath, { ...desktopPrefs, gpuForceOptOut: optOut })) {
+    log.warn('[gpu] could not persist the GPU force preference');
+    return false;
+  }
+  desktopPrefs.gpuForceOptOut = optOut;
+  return true;
+});
+
+// What the NEXT launch will do, which is what the settings control shows: the stored value,
+// not a reading of this launch's GPU state.
+ipcMain.handle('desktop-get-gpu-force-opt-out', (event) => {
+  if (!trustedSender(event)) return false;
+  return desktopPrefs.gpuForceOptOut === true;
 });
 
 // Uncaught renderer errors forwarded by the preload. The preload clamps and

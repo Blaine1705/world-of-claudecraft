@@ -197,6 +197,11 @@ export interface OptionsEnv {
   touch: boolean;
   /** isNativeAppShell(): hides the Interface Mode picker (the shell forces touch). */
   nativeShell: boolean;
+  /** desktopGpuPrefSupported(): reveals the desktop GPU preference row. A BRIDGE
+   *  CAPABILITY, deliberately not nativeShell (which is also true in the mobile
+   *  shells, and is true for a desktop shell too old to have the preference).
+   *  Absent (the web/offline callers) means the row never renders. */
+  desktopGpuPref?: boolean;
 }
 
 const slider = (
@@ -613,31 +618,45 @@ export const INTERFACE_TAB_LABEL_KEY: Record<InterfaceTab, TranslationKey> = {
 const tag = (category: InterfaceTab, controls: OptionsControl[]): OptionsControl[] =>
   controls.map((c): OptionsControl => ({ ...c, category }));
 
-export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl[] {
+export function buildInterfaceControls(
+  s: OptionsSettingsSource,
+  env?: OptionsEnv,
+): OptionsControl[] {
+  const general: OptionsControl[] = [
+    // uiScale commits on release: applying it live rescales the whole UI (the
+    // options window included), which shoves the slider under the cursor and
+    // makes the value hard to land (issue 1558).
+    { ...slider(s, 'uiScale', 'hudChrome.options.uiScale'), commitOnChange: true },
+    slider(s, 'hudOpacity', 'hud.options.hudOpacity'),
+    slider(s, 'tooltipScale', 'hud.options.tooltipScale'),
+    boolToggle(s, 'frostedPanels', 'hud.options.frostedPanels'),
+    boolToggle(s, 'highContrastText', 'hud.options.highContrastText'),
+    boolToggle(s, 'reduceMotion', 'hud.options.reduceMotion'),
+    // Camera comfort (mouse-look direction), so it sits with the comfort
+    // toggles rather than the Combat tab's attack/action-bar cluster.
+    boolToggle(s, 'invertLookY', 'hud.options.invertLookY'),
+    boolToggle(s, 'landingHighContrast', 'hudChrome.options.highContrastBackground'),
+    boolToggle(s, 'showDevBadges', 'hudChrome.options.showDevBadges'),
+    boolToggle(s, 'showWalletOnCharacterScreen', 'hudChrome.options.showWalletOnCharacterScreen'),
+    boolToggle(s, 'showWalletOnPlayerCard', 'hudChrome.options.showWalletOnPlayerCard'),
+    boolToggle(s, 'showPlaytime', 'hudChrome.options.showPlaytime'),
+    boolToggle(s, 'showDailyRewardsChest', 'hudChrome.options.showDailyRewardsChest'),
+    boolToggle(s, 'showItemLevel', 'hudChrome.options.showItemLevel'),
+    boolToggle(s, 'showOwnNameplate', 'hudChrome.options.showOwnNameplate'),
+    boolToggle(s, 'showPlayerNameplates', 'hudChrome.options.showPlayerNameplates'),
+  ];
+  // The desktop shell's GPU preference, last in the tab so the web arm's row
+  // order is untouched. Gated on the bridge CAPABILITY, so it renders only in a
+  // desktop shell that actually exposes the preference; its note carries the
+  // next-launch caveat (the shell applies the choice at startup, not live).
+  if (env?.desktopGpuPref) {
+    general.push(
+      boolToggle(s, 'forceHighPerfGpu', 'hudChrome.options.forceHighPerfGpu'),
+      note('hudChrome.options.forceHighPerfGpuNote'),
+    );
+  }
   return [
-    ...tag('general', [
-      // uiScale commits on release: applying it live rescales the whole UI (the
-      // options window included), which shoves the slider under the cursor and
-      // makes the value hard to land (issue 1558).
-      { ...slider(s, 'uiScale', 'hudChrome.options.uiScale'), commitOnChange: true },
-      slider(s, 'hudOpacity', 'hud.options.hudOpacity'),
-      slider(s, 'tooltipScale', 'hud.options.tooltipScale'),
-      boolToggle(s, 'frostedPanels', 'hud.options.frostedPanels'),
-      boolToggle(s, 'highContrastText', 'hud.options.highContrastText'),
-      boolToggle(s, 'reduceMotion', 'hud.options.reduceMotion'),
-      // Camera comfort (mouse-look direction), so it sits with the comfort
-      // toggles rather than the Combat tab's attack/action-bar cluster.
-      boolToggle(s, 'invertLookY', 'hud.options.invertLookY'),
-      boolToggle(s, 'landingHighContrast', 'hudChrome.options.highContrastBackground'),
-      boolToggle(s, 'showDevBadges', 'hudChrome.options.showDevBadges'),
-      boolToggle(s, 'showWalletOnCharacterScreen', 'hudChrome.options.showWalletOnCharacterScreen'),
-      boolToggle(s, 'showWalletOnPlayerCard', 'hudChrome.options.showWalletOnPlayerCard'),
-      boolToggle(s, 'showPlaytime', 'hudChrome.options.showPlaytime'),
-      boolToggle(s, 'showDailyRewardsChest', 'hudChrome.options.showDailyRewardsChest'),
-      boolToggle(s, 'showItemLevel', 'hudChrome.options.showItemLevel'),
-      boolToggle(s, 'showOwnNameplate', 'hudChrome.options.showOwnNameplate'),
-      boolToggle(s, 'showPlayerNameplates', 'hudChrome.options.showPlayerNameplates'),
-    ]),
+    ...tag('general', general),
     ...tag('frames', [
       slider(s, 'playerFrameScale', 'hudChrome.options.playerFrameScale'),
       slider(s, 'targetFrameScale', 'hudChrome.options.targetFrameScale'),

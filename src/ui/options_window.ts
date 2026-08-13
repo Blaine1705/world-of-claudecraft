@@ -21,6 +21,7 @@
 
 import { syncAppViewport } from '../game/app_viewport';
 import { audio } from '../game/audio';
+import { desktopGpuPrefSupported } from '../game/desktop_gpu_pref_sync';
 import {
   GAMEPAD_NONE,
   GAMEPAD_ZOOM_IN,
@@ -51,6 +52,7 @@ import {
   normalizeClickMoveButton,
   SETTING_RANGES,
 } from '../game/settings';
+import { desktopBridge } from '../runtime';
 import type { IWorld } from '../world_api';
 import { appVersionInfo } from './app_version';
 import { type AuraOverlayHooks, AuraOverlaySettingsPanel } from './aura_overlay_settings';
@@ -87,6 +89,7 @@ import {
   type InterfaceTab,
   interfaceControlsForTab,
   type OptionsControl,
+  type OptionsEnv,
   type OptionsPanelId,
   type OptionsSettingsSource,
   optionsControlKeys,
@@ -1380,7 +1383,15 @@ export class OptionsWindow {
     // footer's Reset to Defaults must restore every Interface setting the panel
     // governs, not just whichever tab happens to be open when the player clicks
     // it, so switching tabs never changes what the shared button resets.
-    const controls = hooks ? buildInterfaceControls(this.settingsSource(hooks)) : [];
+    // The desktop GPU preference row is gated on the shell BRIDGE CAPABILITY,
+    // never on nativeShell: that flag is true in the mobile shells too, and a
+    // desktop shell installed before the preference shipped cannot serve it.
+    const env: OptionsEnv = {
+      touch: useTouchInterface(),
+      nativeShell: isNativeAppShell(),
+      desktopGpuPref: desktopGpuPrefSupported(desktopBridge()),
+    };
+    const controls = hooks ? buildInterfaceControls(this.settingsSource(hooks), env) : [];
 
     const stripHost = document.createElement('div');
     stripHost.innerHTML = tabStripHtml(

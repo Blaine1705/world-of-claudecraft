@@ -242,6 +242,22 @@ describe('Settings', () => {
     expect(new Settings().get('showPlaytime')).toBe(false);
   });
 
+  it('defaults the dedicated-GPU preference on and persists an opt-out across instances', () => {
+    // Default true preserves today's shipped behavior (the desktop shell forces
+    // the dedicated GPU). The stored shell field is the INVERSE opt-out, so this
+    // key reads false exactly when the shell is told to opt out; the boot
+    // reflection and the options write arm each invert once.
+    const fresh = new Settings();
+    expect(fresh.get('forceHighPerfGpu')).toBe(true);
+
+    fresh.set('forceHighPerfGpu', false);
+    expect(new Settings().get('forceHighPerfGpu')).toBe(false);
+
+    // and back: an opt-out is not sticky once the player re-enables the row
+    new Settings().set('forceHighPerfGpu', true);
+    expect(new Settings().get('forceHighPerfGpu')).toBe(true);
+  });
+
   it('defaults other-player nameplates off for fresh mobile sessions', () => {
     installTouchDefault(true);
 

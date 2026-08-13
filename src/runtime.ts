@@ -149,6 +149,13 @@ export interface DesktopBridge {
   // older shells: feature-check before use, like the other post-trio methods.
   onPresentationChanged?(callback: (state: DesktopPresentationState) => void): () => void;
   onDisplayChanged?(callback: (change: DesktopDisplayChange) => void): () => void;
+  // The persisted GPU-force opt-out (the MUXless-panel escape hatch). The shell
+  // prefs store is the source of truth; the getter returns the STORED value
+  // (what the next launch will do), and the setter persists for the next
+  // launch, never the running one. Absent on older shells: feature-check
+  // before use, like the other post-trio methods.
+  getGpuForceOptOut?(): Promise<boolean>;
+  setGpuForceOptOut?(optOut: boolean): Promise<boolean>;
 }
 
 export function desktopBridge(): DesktopBridge | null {

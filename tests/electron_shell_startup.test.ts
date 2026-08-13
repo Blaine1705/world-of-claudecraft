@@ -239,6 +239,31 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     expect(loadAt, 'the prefs read must precede the GPU force call').toBeLessThan(forceAt);
   });
 
+  it('skips a GPU-force lever only when the stored opt-out is exactly true', () => {
+    // Polarity, both sites: an inverted or truthy test would disable the force
+    // for every player (the default record carries gpuForceOptOut: false) and
+    // reintroduce the 13-FPS hybrid-laptop bug the levers exist for.
+    expect(
+      count(code, 'if (desktopPrefs.gpuForceOptOut === true) {'),
+      'expected the strict-true guard at both lever call sites',
+    ).toBe(2);
+    // Skipping means NOT CALLING: the relaunch spawns a process and the force
+    // appends its switches on every platform before its own internal gates, so
+    // each call must sit in the else arm of its guard.
+    expect(
+      /if \(desktopPrefs\.gpuForceOptOut === true\) \{\n[^\n]*\n\} else if \(relaunchForLinuxPrime\(\{ log: console \}\)\) \{/.test(
+        code,
+      ),
+      'the PRIME relaunch must be the else arm of the opt-out guard',
+    ).toBe(true);
+    expect(
+      /if \(desktopPrefs\.gpuForceOptOut === true\) \{\n[^\n]*\n\} else \{\n {2}forceHighPerformanceGpu\(\{ app, log \}\);\n\}/.test(
+        code,
+      ),
+      'the GPU force must be the else arm of the opt-out guard',
+    ).toBe(true);
+  });
+
   it('constructs the window at the restored geometry rather than resizing it after', () => {
     // Applying saved bounds after construction would create the window at the
     // default size first, so the reveal on 'ready-to-show' could catch a resize

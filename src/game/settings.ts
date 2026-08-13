@@ -392,6 +392,15 @@ export const BOOL_SETTINGS = {
   // on by default: keep the Daily Rewards chest launcher visible on the HUD. Hiding
   // it only removes the shortcut; rewards, eligibility, and the panel remain available.
   showDailyRewardsChest: { def: true },
+  // on by default (today's behavior, unchanged out of the box): mirrors the desktop
+  // shell's GPU preference store, whose stored field is the INVERSE opt-out. The
+  // shell asks the OS for the dedicated gaming GPU at launch; a MUXless laptop panel
+  // cannot always drive it, so the row is an escape hatch. Desktop-only: the options
+  // row renders only when the installed shell exposes the preference over the bridge
+  // (see game/desktop_gpu_pref_sync.ts), and the shell store, not this key, is the
+  // source of truth: this value is reflected from it at boot and takes effect on the
+  // next launch, never the running one.
+  forceHighPerfGpu: { def: true },
   // internal, never shown in the options UI: set true once main.ts has persisted a
   // device-appropriate graphicsPreset on a player's first run (a CONCLUSIVE detection).
   // It gates firstRunGraphicsPreset so a recognized device is classified at most once and

@@ -8995,6 +8995,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.options.clickMoveLeft'
   | 'hudChrome.options.clickMoveRight'
   | 'hudChrome.options.footstepSounds'
+  | 'hudChrome.options.forceHighPerfGpu'
+  | 'hudChrome.options.forceHighPerfGpuNote'
   | 'hudChrome.options.gfxAmbientOcclusion'
   | 'hudChrome.options.gfxAntiAliasing'
   | 'hudChrome.options.gfxBloom'

@@ -26,8 +26,10 @@ describe('electron IPC channel contract (preload <-> main)', () => {
         'desktop-epic-capability',
         'desktop-epic-link-proof',
         'desktop-epic-link-settled',
+        'desktop-get-gpu-force-opt-out',
         'desktop-login-open-browser',
         'desktop-login-take-code',
+        'desktop-set-gpu-force-opt-out',
         'desktop-set-strings',
         'desktop-steam-capability',
         'desktop-steam-link-settled',
@@ -114,6 +116,31 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     expect(body).toContain('await openDesktopWalletHandoff(code)');
   });
 
+  it('the gpu-force-opt-out setter takes only a strict boolean and reports the write', () => {
+    // The stored value decides whether the next launch re-execs itself (Linux
+    // PRIME) and writes a Windows per-app preference, so a junk value must not
+    // reach the file, and the renderer must learn when the write failed rather
+    // than showing a toggle the next launch will not honor.
+    const main = read('electron/main.cjs');
+    const start = main.indexOf("ipcMain.handle('desktop-set-gpu-force-opt-out'");
+    expect(start).toBeGreaterThan(-1);
+    const body = main.slice(start, main.indexOf('\n});', start));
+    expect(body).toContain('if (optOut !== true && optOut !== false) return false;');
+    expect(body).toContain('saveDesktopPrefs(desktopPrefsPath,');
+    // The in-memory mirror is updated only after a successful save, so the
+    // getter can never report a value the next launch would not read.
+    const saveAt = body.indexOf('saveDesktopPrefs(desktopPrefsPath,');
+    const commitAt = body.indexOf('desktopPrefs.gpuForceOptOut = optOut;');
+    expect(commitAt).toBeGreaterThan(saveAt);
+
+    const getterAt = main.indexOf("ipcMain.handle('desktop-get-gpu-force-opt-out'");
+    expect(getterAt).toBeGreaterThan(-1);
+    const getter = main.slice(getterAt, main.indexOf('\n});', getterAt));
+    expect(getter, 'the getter must report the STORED value, not a live GPU reading').toContain(
+      'return desktopPrefs.gpuForceOptOut === true;',
+    );
+  });
+
   it('activates the macOS app when the browser returns a wallet handoff', () => {
     const main = read('electron/main.cjs');
     const start = main.indexOf('function deliverWalletHandoffCode');
@@ -134,6 +161,8 @@ describe('electron IPC channel contract (preload <-> main)', () => {
       'onGpuStatus',
       'onPresentationChanged',
       'onDisplayChanged',
+      'getGpuForceOptOut',
+      'setGpuForceOptOut',
       'steamLinkTicket',
       'steamLinkSupported',
       'steamLinkSettled',

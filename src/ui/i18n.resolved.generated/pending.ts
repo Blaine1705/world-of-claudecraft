@@ -10,54 +10,84 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "gpuNotice.bodyDiscreteInactive"
+    "gpuNotice.bodyDiscreteInactive",
+    "hudChrome.options.forceHighPerfGpu",
+    "hudChrome.options.forceHighPerfGpuNote"
   ],
   "es_ES": [
-    "gpuNotice.bodyDiscreteInactive"
+    "gpuNotice.bodyDiscreteInactive",
+    "hudChrome.options.forceHighPerfGpu",
+    "hudChrome.options.forceHighPerfGpuNote"
   ],
   "fr_FR": [
-    "gpuNotice.bodyDiscreteInactive"
+    "gpuNotice.bodyDiscreteInactive",
+    "hudChrome.options.forceHighPerfGpu",
+    "hudChrome.options.forceHighPerfGpuNote"
   ],
   "fr_CA": [
-    "gpuNotice.bodyDiscreteInactive"
+    "gpuNotice.bodyDiscreteInactive",
+    "hudChrome.options.forceHighPerfGpu",
+    "hudChrome.options.forceHighPerfGpuNote"
   ],
   "en_CA": [],
   "it_IT": [
-    "gpuNotice.bodyDiscreteInactive"
+    "gpuNotice.bodyDiscreteInactive",
+    "hudChrome.options.forceHighPerfGpu",
+    "hudChrome.options.forceHighPerfGpuNote"
   ],
   "de_DE": [
-    "gpuNotice.bodyDiscreteInactive"
+    "gpuNotice.bodyDiscreteInactive",
+    "hudChrome.options.forceHighPerfGpu",
+    "hudChrome.options.forceHighPerfGpuNote"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "gpuNotice.bodyDiscreteInactive"
+    "gpuNotice.bodyDiscreteInactive",
+    "hudChrome.options.forceHighPerfGpu",
+    "hudChrome.options.forceHighPerfGpuNote"
   ],
   "ru_RU": [],
   "cs_CZ": [
-    "gpuNotice.bodyDiscreteInactive"
+    "gpuNotice.bodyDiscreteInactive",
+    "hudChrome.options.forceHighPerfGpu",
+    "hudChrome.options.forceHighPerfGpuNote"
   ],
   "nl_NL": [
-    "gpuNotice.bodyDiscreteInactive"
+    "gpuNotice.bodyDiscreteInactive",
+    "hudChrome.options.forceHighPerfGpu",
+    "hudChrome.options.forceHighPerfGpuNote"
   ],
   "pl_PL": [
-    "gpuNotice.bodyDiscreteInactive"
+    "gpuNotice.bodyDiscreteInactive",
+    "hudChrome.options.forceHighPerfGpu",
+    "hudChrome.options.forceHighPerfGpuNote"
   ],
   "id_ID": [
-    "gpuNotice.bodyDiscreteInactive"
+    "gpuNotice.bodyDiscreteInactive",
+    "hudChrome.options.forceHighPerfGpu",
+    "hudChrome.options.forceHighPerfGpuNote"
   ],
   "tr_TR": [
-    "gpuNotice.bodyDiscreteInactive"
+    "gpuNotice.bodyDiscreteInactive",
+    "hudChrome.options.forceHighPerfGpu",
+    "hudChrome.options.forceHighPerfGpuNote"
   ],
   "sv_SE": [
-    "gpuNotice.bodyDiscreteInactive"
+    "gpuNotice.bodyDiscreteInactive",
+    "hudChrome.options.forceHighPerfGpu",
+    "hudChrome.options.forceHighPerfGpuNote"
   ],
   "vi_VN": [
-    "gpuNotice.bodyDiscreteInactive"
+    "gpuNotice.bodyDiscreteInactive",
+    "hudChrome.options.forceHighPerfGpu",
+    "hudChrome.options.forceHighPerfGpuNote"
   ],
   "da_DK": [
-    "gpuNotice.bodyDiscreteInactive"
+    "gpuNotice.bodyDiscreteInactive",
+    "hudChrome.options.forceHighPerfGpu",
+    "hudChrome.options.forceHighPerfGpuNote"
   ]
 };

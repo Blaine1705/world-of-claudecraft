@@ -1257,6 +1257,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnCharacterScreen': '在角色界面显示钱包',
   'hudChrome.options.showPlaytime': '在角色界面显示游戏时长',
   'hudChrome.options.showWalletOnPlayerCard': '在玩家卡片显示钱包',
+  'hudChrome.options.forceHighPerfGpu': '使用独立游戏显卡',
+  'hudChrome.options.forceHighPerfGpuNote':
+    '默认开启：桌面版会向本机申请使用独立游戏显卡。如果游戏无法启动、启动后黑屏，或笔记本屏幕没有画面，请关闭此选项。该设置将在下次启动游戏时生效。',
   'hudChrome.options.showDevBadges': '显示开发者徽章',
   'hudChrome.options.showOwnNameplate': '显示我的姓名板',
   'hudChrome.options.showPlayerNameplates': '显示玩家姓名板',

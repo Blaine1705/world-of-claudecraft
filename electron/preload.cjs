@@ -167,6 +167,13 @@ contextBridge.exposeInMainWorld('wocDesktop', {
     ipcRenderer.on('desktop-gpu-status', listener);
     return () => ipcRenderer.removeListener('desktop-gpu-status', listener);
   },
+  // Whether the player has opted out of the shell forcing the discrete GPU.
+  // Both are about the NEXT launch: the force levers run before Electron's own
+  // startup, so the shell stores the choice rather than applying it live. The
+  // setter answers whether the value actually reached disk.
+  getGpuForceOptOut: () => ipcRenderer.invoke('desktop-get-gpu-force-opt-out'),
+  setGpuForceOptOut: (optOut) =>
+    ipcRenderer.invoke('desktop-set-gpu-force-opt-out', optOut === true),
   // Whether the shell's window is minimized or hidden, pushed from the main
   // process because the page cannot see it: the window sets
   // backgroundThrottling:false, which keeps document.visibilityState at
