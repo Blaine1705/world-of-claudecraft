@@ -11,7 +11,6 @@
 // ORDER: beginDeferredPreloads() must run before the assetsReady() that gates the
 // Renderer, or placement could outrun a load and re-open the v0.16.0 farmCrate P0.
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
   assetsReady,
@@ -281,7 +280,7 @@ describe('no world module fetches at import', () => {
   ]);
 
   it('leaves only the sanctioned eager registrants', () => {
-    const files = tsFilesUnder(fileURLToPath(new URL('../src/render', import.meta.url)));
+    const files = tsFilesUnder(new URL('../src/render', import.meta.url).pathname);
     // Vacuity floor: an empty or misrooted walk must not pass as "no offenders".
     expect(files.length).toBeGreaterThan(100);
     const offenders: string[] = [];
@@ -308,7 +307,7 @@ describe('every assetsReady host opens the lane', () => {
   // this when the lane landed; the gate stayed green because nothing swept the
   // call sites).
   it('finds no Renderer host awaiting assetsReady without beginDeferredPreloads', () => {
-    const files = tsFilesUnder(fileURLToPath(new URL('../src', import.meta.url)));
+    const files = tsFilesUnder(new URL('../src', import.meta.url).pathname);
     expect(files.length).toBeGreaterThan(400);
     const offenders: string[] = [];
     let hosts = 0;

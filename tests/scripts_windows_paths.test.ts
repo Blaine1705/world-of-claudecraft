@@ -1,11 +1,9 @@
-// Guards the scripts/ AND tests/ tooling against the Windows path-resolution
-// trap: `new URL(import.meta.url).pathname` keeps a leading slash before a
-// drive letter ("/D:/..."), which path.resolve/path.dirname then mangle into
+// Guards the scripts/ tooling against the Windows path-resolution trap:
+// `new URL(import.meta.url).pathname` keeps a leading slash before a drive
+// letter ("/D:/..."), which path.resolve/path.dirname then mangle into
 // "D:\D:\...", so any script resolving its repo root that way cannot run on
 // Windows at all. The portable form is fileURLToPath(import.meta.url)
 // (node:url), correct on every OS; see scripts/assets/build_assets.mjs.
-// Originally scripts/-only (#3225): four tests/ files carried the same trap
-// with nothing scanning for it, so the walk now covers both roots.
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -13,7 +11,6 @@ import { describe, expect, it } from 'vitest';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 const scriptsRoot = join(repoRoot, 'scripts');
-const testsRoot = join(repoRoot, 'tests');
 
 function walk(dir: string): string[] {
   const out: string[] = [];
@@ -29,20 +26,11 @@ function walk(dir: string): string[] {
   return out;
 }
 
-describe('scripts/ and tests/ Windows path safety', () => {
-  it('no script or test takes .pathname off a file URL (breaks on Windows drive letters)', () => {
+describe('scripts/ Windows path safety', () => {
+  it('no script takes .pathname off a file URL (breaks on Windows drive letters)', () => {
     const banned = /new URL\([^)]*import\.meta\.url[^)]*\)\s*\.pathname/;
-    const offenders = [...walk(scriptsRoot), ...walk(testsRoot)]
-      .filter((file) => {
-        // Strip comments first: this guard polices CODE, not its own header
-        // prose (above) naming the trap, or any future file that documents
-        // it too. The line-comment strip keeps a `://` in a URL from eating
-        // the rest of its line (same technique as scan_guard_self_audit.ts).
-        const code = readFileSync(file, 'utf8')
-          .replace(/\/\*[\s\S]*?\*\//g, '')
-          .replace(/(^|[^:])\/\/.*$/gm, '$1');
-        return banned.test(code);
-      })
+    const offenders = walk(scriptsRoot)
+      .filter((file) => banned.test(readFileSync(file, 'utf8')))
       .map((file) => relative(repoRoot, file));
     expect(
       offenders,

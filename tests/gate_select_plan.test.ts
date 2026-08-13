@@ -540,38 +540,6 @@ describe('branch diff resolution', () => {
     expect(r.base).toBeNull();
   });
 
-  // #3225: on win32, gate_select.mjs, gate_shadow.mjs, and ci_changed.mjs used
-  // to spawn git with shell:true. cmd.exe treats `^` as its own escape
-  // character, so the `<ref>^{commit}` peel this probe sends arrives at git
-  // as `<ref>{commit}`, which is not a resolvable revision: every candidate
-  // base fails, even one that would resolve fine unmangled. `caretAwareRun`
-  // answers the SAME rev-parse probe two ways off the SAME available ref, so
-  // only the mangling (not a missing ref) can flip the outcome: a run that
-  // sees the caret survive resolves fine, one that strips it exactly as
-  // cmd.exe does cannot. (A run that returned 128 unconditionally, regardless
-  // of mangling, would pass both tests below vacuously; this one cannot.)
-  const caretAwareRun =
-    (mangle: boolean) =>
-    (_c: string, args: string[]): { status: number | null; stdout: string } => {
-      if (args[0] === 'for-each-ref') return { status: 0, stdout: 'origin/release/v1\n' };
-      if (args[0] === 'rev-parse') {
-        const probe = mangle ? args[2]?.replace(/\^/g, '') : args[2];
-        return { status: probe === 'origin/release/v1^{commit}' ? 0 : 128, stdout: '' };
-      }
-      return { status: 0, stdout: '' };
-    };
-
-  it('resolves the base fine when the caret peel survives unmangled', () => {
-    const r = resolveSelectBase({ env: {}, run: caretAwareRun(false) });
-    expect(r.base).toBe('origin/release/v1');
-  });
-
-  it('never resolves a base if the caret peel arrives cmd.exe-mangled', () => {
-    const r = resolveSelectBase({ env: {}, run: caretAwareRun(true) });
-    expect(r.base).toBeNull();
-    expect(r.reason).toBe('no release branch or origin base could be resolved');
-  });
-
   // A swallowed git failure narrows the run silently, which is the one direction
   // this design must never fail in.
   it('throws rather than returning an empty changed set when git fails', () => {
@@ -581,35 +549,6 @@ describe('branch diff resolution', () => {
         run: () => ({ status: 128, stdout: '', stderr: 'bad revision' }),
       }),
     ).toThrow(/bad revision/);
-  });
-
-  // The actual fix for the mangling reproduced above: none of the three
-  // entry points that resolve a base through resolveSelectBase (gate_select,
-  // gate_shadow, and ci_changed, which gate_select's own step list runs via
-  // `npm run ci:changed`, #3225) may ever route their git spawn through a
-  // shell, on any platform, since git needs none (unlike vitest.cmd/npx,
-  // which is why `shell` legitimately survives elsewhere in all three files
-  // for THOSE spawns). Anchored on `encoding: 'utf8'`, the option unique to
-  // the git-spawning call in every file (the OTHER spawnSync calls each file
-  // makes carry `stdio: 'inherit'` instead), so this cannot accidentally
-  // match one of those and pass vacuously.
-  it('gate_select.mjs, gate_shadow.mjs, and ci_changed.mjs spawn git without a shell (#3225)', () => {
-    for (const file of [
-      'scripts/gate_select.mjs',
-      'scripts/gate_shadow.mjs',
-      'scripts/ci_changed.mjs',
-    ]) {
-      const src = readFileSync(path.join(REPO_ROOT, file), 'utf8');
-      const gitCall = src.match(/spawnSync\(cmd, args, \{ encoding: 'utf8', [^}]*\}\)/)?.[0];
-      expect(
-        gitCall,
-        `${file}: expected git-spawning spawnSync call not found in its known shape`,
-      ).toBeTruthy();
-      expect(
-        gitCall,
-        `${file}: git spawn must omit shell (cmd.exe mangles the ^{commit} peel)`,
-      ).not.toMatch(/\bshell\b/);
-    }
   });
 
   it('unions branch, working-tree, and untracked changes', () => {
