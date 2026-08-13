@@ -29,6 +29,7 @@ import {
   skyAssetInlineWaitMs,
   withRestoredPrewarmState,
 } from '../src/render/prewarm_policy';
+import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 // The real desktop constants (renderer.ts), injected so the test pins the actual
 // numbers the renderer uses rather than duplicating magic values.
@@ -46,9 +47,12 @@ const BASE: PrewarmPolicyInput = {
   maxViewsConstrained: 2,
 };
 
-const MAIN_SOURCE = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').replace(
-  /\r\n/g,
-  '\n',
+// Full-line // comments are stripped first, the tests/loopback_guard.test.ts
+// rule: the reveal ordering below is explained in prose right beside the code,
+// so a commented-out markGpuHitchReveal call must neither satisfy the pin nor
+// break the whitespace-only assertion between the mark and the reveal.
+const MAIN_SOURCE = codeWithoutLineComments(
+  readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').replace(/\r\n/g, '\n'),
 );
 
 // The full manifest id order the renderer builds, for the reorder tests.

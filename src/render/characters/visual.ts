@@ -2171,6 +2171,14 @@ export class CharacterVisual {
    * Those own their renderer and scene and have NO budget, so nothing would ever
    * turn the light back on: the skin's cast glow is the product on a cosmetics
    * surface, and it must light immediately.
+   *
+   * A FIELD rather than a constructor argument, so it must be set before the
+   * rig attaches a weapon. That holds today because `buildWeaponVfx` is only
+   * reached from `finishWeaponAttach`, which runs from async model-load
+   * continuations and the runtime re-attach paths, never synchronously from the
+   * constructor. A future synchronous attach in the constructor would silently
+   * miss the flag; the ordering at the one world call site is pinned by
+   * tests/weapon_vfx_rig_build.test.ts.
    */
   budgetedWeaponLight = false;
 

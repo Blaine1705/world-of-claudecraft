@@ -14,21 +14,21 @@ import {
   type RankedPointLight,
 } from '../src/render/point_light_budget';
 import { freezeStaticMatrices } from '../src/render/static_matrix';
+import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 const RANGE_SQ = 100 * 100;
 
-function rendererSource(): string {
-  return readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+/** Every source read in this file strips full-line // comments first, the
+ *  tests/loopback_guard.test.ts rule: the code these pins name is explained in
+ *  prose right beside itself, so a commented-out line must neither satisfy a
+ *  pin nor break one. Comment out the guarded prune statement and the pins
+ *  below go red, which is the whole point of pinning it. */
+function sourceOf(relativePath: string): string {
+  return codeWithoutLineComments(readFileSync(new URL(relativePath, import.meta.url), 'utf8'));
 }
 
-/** Full-line // comments removed, the same rule tests/loopback_guard.test.ts
- *  applies: the code these pins name is explained in prose right beside itself,
- *  so a commented-out line must neither satisfy a pin nor break one. */
-function codeWithoutLineComments(source: string): string {
-  return source
-    .split('\n')
-    .filter((line) => !/^\s*\/\//.test(line))
-    .join('\n');
+function rendererSource(): string {
+  return sourceOf('../src/render/renderer.ts');
 }
 
 /** The `budgetFireLights` body alone. Several pins below are ordinary lines to
@@ -335,7 +335,7 @@ describe('applyPointLightBudget', () => {
     // state, pad up to the same pinned total the compile lane linked against
     // BEFORE rendering, and restore the live pad state afterwards. Dropping
     // any half silently reinstates the synchronous mid-unit program links.
-    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const source = rendererSource();
     const methodStart = source.indexOf('private renderBoundedPrewarmRoot(');
     const methodEnd = source.indexOf('private renderPrewarmPass(', methodStart);
     expect(methodStart).toBeGreaterThan(-1);
@@ -356,8 +356,8 @@ describe('applyPointLightBudget', () => {
     expect(sceneMaskIndex).toBeGreaterThan(-1);
     expect(groupMaskIndex).toBeGreaterThan(sceneMaskIndex);
     expect(countIndex).toBeGreaterThan(groupMaskIndex);
-    // The pad WRITE must land between the recount and the render: pinned
-    // separately because the count/pad substrings also appear in comments.
+    // The pad WRITE must land between the recount and the render, pinned as
+    // its own ordering step rather than folded into the recount pin.
     expect(padWriteIndex).toBeGreaterThan(countIndex);
     expect(renderIndex).toBeGreaterThan(padWriteIndex);
     // The pad restore must live in the finally: restored only after the render
@@ -374,10 +374,7 @@ describe('applyPointLightBudget', () => {
     // The pass moved out of renderer.ts into fire_light_registry.ts under the
     // monolith ratchet; the two halves are pinned where they now live, and the
     // renderer half is pinned to the scene it hands in.
-    const source = readFileSync(
-      new URL('../src/render/fire_light_registry.ts', import.meta.url),
-      'utf8',
-    );
+    const source = sourceOf('../src/render/fire_light_registry.ts');
     const methodStart = source.indexOf('export function runFireLightBudgetPass(');
     const methodEnd = source.indexOf('pass.pads[i].visible = i < padCount;', methodStart);
     // A renamed end marker must fail here, never silently widen the slice to
@@ -405,7 +402,7 @@ describe('applyPointLightBudget', () => {
     // marked dirty, and spliced back out on release. Any half dropped puts an
     // unranked visible light in the scene, which changes numPointLights and
     // relinks every lit material in view.
-    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const source = rendererSource();
     const registerStart = source.indexOf('private registerBudgetPointLight(');
     const releaseStart = source.indexOf('private releaseBudgetPointLight(');
     const budgetStart = source.indexOf('private budgetFireLights(');
@@ -486,7 +483,7 @@ describe('applyPointLightBudget', () => {
     // The meteor fx is the one budget-light owner updating after the pass: a
     // landing or expiry frame must re-run the budget before rendering, or the
     // pinned visible total dips for exactly that frame.
-    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const source = rendererSource();
     const sites = [
       ...source.matchAll(/this\.warlockMeteorFx\.update\(dt, this\.reducedMotion\(\)\);/g),
     ];
@@ -508,10 +505,7 @@ describe('applyPointLightBudget', () => {
   });
 
   it('wires contributor flicker after the renderer completes selection', () => {
-    const source = readFileSync(
-      new URL('../src/render/fire_light_registry.ts', import.meta.url),
-      'utf8',
-    );
+    const source = sourceOf('../src/render/fire_light_registry.ts');
     const methodStart = source.indexOf('export function runFireLightBudgetPass(');
     const methodEnd = source.indexOf('pass.pads[i].visible = i < padCount;', methodStart);
     const method = source.slice(methodStart, methodEnd);
@@ -526,7 +520,7 @@ describe('applyPointLightBudget', () => {
     expect(flickerCall).toBeGreaterThan(flickerGate);
     // The flicker arm is only reached because the renderer asks for it on the
     // live frame path; pin that call where it lives.
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const renderer = rendererSource();
     expect(renderer).toContain('this.budgetFireLights(p.pos.x, p.pos.z, true);');
   });
 });
@@ -578,6 +572,23 @@ describe('fire-light adoption sink', () => {
     expect(lights.every((light) => light.visible === false)).toBe(true);
     expect(registry).toEqual(lights);
     expect(dirtyCount()).toBe(3);
+  });
+
+  it('wires the renderer adopter to the live registry and the real dirty flag', () => {
+    // The cases here drive the factory with test doubles, so both arguments
+    // could be wrong in renderer.ts with every one of them green: a captured
+    // array instead of the getter (the registry is REASSIGNED in the
+    // constructor, see the case below) or a callback that dirties nothing.
+    // Neither is reachable without a WebGL context, so the construction site
+    // is pinned where it lives.
+    const renderer = rendererSource();
+    const start = renderer.indexOf('private readonly fireLightAdopter = createFireLightAdopter(');
+    expect(start, 'the adopter field moved; re-anchor this pin').toBeGreaterThan(-1);
+    const end = renderer.indexOf('\n  );', start);
+    expect(end).toBeGreaterThan(start);
+    const construction = renderer.slice(start, end);
+    expect(construction).toContain('() => this.fireLights,');
+    expect(construction).toContain('this.lightRankDirty = true;');
   });
 
   it('reads the registry through the getter, so a reassigned array still adopts', () => {
@@ -653,17 +664,54 @@ describe('fire-light adoption sink', () => {
     // Comments are stripped first: this file's subject matter means the phrase
     // appears in prose right beside the code, and a commented-out call must
     // neither satisfy nor break the pin (the tests/loopback_guard.test.ts rule).
-    const renderer = codeWithoutLineComments(rendererSource());
-    const massHide = renderer.indexOf(
-      'for (const light of this.fireLights) light.visible = false;',
-    );
+    const renderer = rendererSource();
+    const MASS_HIDE = 'for (const light of this.fireLights) light.visible = false;';
+    const massHide = renderer.indexOf(MASS_HIDE);
     expect(massHide, 'the constructor mass hide moved; re-anchor this guard').toBeGreaterThan(-1);
-    // Every membership-changing form, not just `.push(`: unshift, splice and a
-    // bare index assignment bypass the seam exactly as well. Removal travels
-    // through pruneFireLights, which the retire case above pins by name.
-    expect(renderer.slice(massHide)).not.toMatch(
-      /this\.fireLights(?:\.(?:push|unshift|splice|pop|shift)\(|\s*\[[^\]]*\]\s*=[^=])/,
-    );
+
+    // ALLOWLIST, not a list of forbidden mutators. A scan that only forbade
+    // `this.fireLights.push(` and friends left four ways past the seam open:
+    // a positional argument (`buildX(this.fireLights)`), a differently named
+    // property (`lights: this.fireLights`), a local alias
+    // (`const lights = this.fireLights;` followed by an ordinary push), and a
+    // destructure (`const { fireLights } = this;`). The scan therefore matches
+    // the BARE name, not `this.fireLights`, and every line carrying it after
+    // the hide has to be one of these sanctioned READS, so a new reach fails by
+    // default and arrives here to be declared.
+    const SANCTIONED_READS = [
+      /^\s*if \(pruneFireLights\(this\.fireLights,/,
+      /^\s*fireLights: this\.fireLights,$/,
+      /^\s*fireLights: this\.fireLightAdopter\.sink,$/,
+      /^\s*for \(const light of [\w.]*\bfireLights\b\) this\.fireLightAdopter\.adopt\(light\);$/,
+    ];
+    const isSanctioned = (line: string): boolean =>
+      SANCTIONED_READS.some((form) => form.test(line));
+    // Positive control: nothing above proves the patterns REJECT anything, and
+    // a pattern loose enough to accept a push would fail silently in exactly
+    // the case this guard exists for.
+    for (const bypass of [
+      '      this.fireLights.push(light);',
+      '      const lights = this.fireLights;',
+      '      const { fireLights } = this;',
+      '      buildSomething(this.fireLights);',
+      '      lights: this.fireLights,',
+    ]) {
+      expect(isSanctioned(bypass), `the scan accepts a bypass: ${bypass.trim()}`).toBe(false);
+    }
+
+    const reaches = renderer
+      .slice(massHide + MASS_HIDE.length)
+      .split('\n')
+      .filter((line) => /\bfireLights\b/.test(line));
+    // The prune, the two raw handoffs (battleground, budget pass), the sink
+    // handoff, and the station-props adoption loop. A floor keeps the loop from
+    // passing vacuously if the name ever moves wholesale.
+    expect(reaches).toHaveLength(5);
+    for (const line of reaches) {
+      expect(isSanctioned(line), `unsanctioned reach past the adoption seam: ${line.trim()}`).toBe(
+        true,
+      );
+    }
 
     // And the raw array escapes the seam exactly once, to the battleground:
     // buildBgFieldLights hides its own lights and its release path SPLICES,
@@ -692,7 +740,7 @@ describe('fire-light adoption sink', () => {
     // numPointLights whenever the jail came into camera range. Adoption also
     // puts it under the fire flicker, which centres on userData.baseIntensity
     // (11 when unset), so the authored 9 has to travel with it.
-    const jail = readFileSync(new URL('../src/render/jail_scene.ts', import.meta.url), 'utf8');
+    const jail = sourceOf('../src/render/jail_scene.ts');
     expect(jail).toContain('glowLights: THREE.PointLight[];');
     expect(jail).toContain('light.userData.baseIntensity = 9;');
     expect(jail).toContain('glowLights.push(light);');
@@ -808,7 +856,7 @@ describe('fire-light adoption sink', () => {
     // builder that parents a glow into its own group must not be able to
     // reintroduce the stall. These two are the whole set today (the generic
     // zone-feature attach and the jail, which is added directly).
-    const renderer = codeWithoutLineComments(rendererSource());
+    const renderer = rendererSource();
     expect(renderer).toContain('reparentStrandedLightsToScene(this.scene, view.group);');
     expect(renderer).toContain('reparentStrandedLightsToScene(this.scene, this.jailScene.group);');
   });

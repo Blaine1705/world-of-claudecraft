@@ -55,8 +55,16 @@ export function reparentStrandedLightsToScene(
     // carries an orientation and a SEPARATE `target` object that would stay
     // behind in the group, and a hemisphere light has no position at all.
     // Those are the same cache-key hazard on numSpotLights / numDirLights (see
-    // the Wildheart caldera interior), but each needs its own handling, so say
-    // so loudly rather than move one silently wrong.
+    // the Wildheart caldera interior), but each needs its own handling, so
+    // report and skip rather than move one silently wrong.
+    //
+    // Report, not throw, deliberately: this runs inside world build on a live
+    // client, and a throw here would turn a cosmetic light in the wrong group
+    // into a failed world entry. The consequence is stated rather than hidden:
+    // in production the message goes to a console nobody reads, so the count
+    // stays unpinned for that group until someone runs the dev build. The
+    // enforcement that does not depend on a reader is the attach-point scan in
+    // tests/point_light_budget.test.ts.
     console.error(
       `reparentStrandedLightsToScene: "${root.name}" holds a ${light.type} inside a ` +
         'cull-toggled group; this lift only covers point lights, so its light count is unpinned',

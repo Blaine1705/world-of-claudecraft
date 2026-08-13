@@ -98,6 +98,46 @@ describe('adaptive link budget core', () => {
     });
   });
 
+  it('holds the window steady for a settlement between the two thresholds', () => {
+    // The mid band is a THIRD arm, not the tail of either threshold. Without a
+    // case here, an implementation that halved on anything past
+    // fastSettlementMs passed the whole suite while pinning a mid-tier GPU at
+    // the window floor for the entire boot, and one that grew on anything
+    // under slowSettlementMs passed it too.
+    const clock = virtualClock();
+    const budget = createAdaptiveLinkBudget({ ...CONFIG, initialWindowLinks: 24 }, clock);
+    budget.markSubmitted('scene:0');
+    budget.markSyncEnd('scene:0', 8);
+
+    // 1_600 ms: past fast (1_200), short of slow (2_000).
+    clock.advance(1_600);
+    budget.markSettled('scene:0');
+
+    expect(budget.snapshot()).toMatchObject({
+      state: 'steady',
+      windowLinks: 24,
+      backoffCount: 0,
+      settledUnits: 1,
+      lastSettlementMs: 1_600,
+    });
+
+    // The thresholds themselves are inclusive on both ends, so the band is
+    // exactly the open interval between them.
+    const edge = createAdaptiveLinkBudget({ ...CONFIG, initialWindowLinks: 24 }, clock);
+    edge.markSubmitted('scene:1');
+    edge.markSyncEnd('scene:1', 8);
+    clock.advance(1_200);
+    edge.markSettled('scene:1');
+    expect(edge.snapshot()).toMatchObject({ state: 'ramp', windowLinks: 28 });
+
+    const slowEdge = createAdaptiveLinkBudget({ ...CONFIG, initialWindowLinks: 24 }, clock);
+    slowEdge.markSubmitted('scene:2');
+    slowEdge.markSyncEnd('scene:2', 8);
+    clock.advance(2_000);
+    slowEdge.markSettled('scene:2');
+    expect(slowEdge.snapshot()).toMatchObject({ state: 'backoff', windowLinks: 12 });
+  });
+
   it('never halves the window below the configured floor', () => {
     // The clamp is the only thing keeping repeated backoffs from driving the
     // window to zero links, which would stall entry as surely as the backlog

@@ -10,6 +10,7 @@
 //   3. the memo is BOUNDED (the C2 memory ratchet): idle derivations past the
 //      idle cap evict and dispose, live wearers pin theirs, and an evicted
 //      derivation rebuilds byte-identically on its next wearer.
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { isSharedTexture } from '../src/render/shared_resource';
@@ -23,6 +24,7 @@ import {
   type WeaponVfxSpec,
 } from '../src/render/weapon_vfx';
 import { WEAPON_EMISSIVE_IDLE_CACHE_MAX } from '../src/render/weapon_vfx_emissive_cache_core';
+import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 interface StubCanvas {
   width: number;
@@ -187,6 +189,35 @@ describe('createWeaponVfx point-light visibility ownership', () => {
     const worldDefault = createWeaponVfx(weaponRoot(), EPIC_SPEC, { grounded: false });
     expect(worldDefault.light.visible).toBe(true);
     worldDefault.dispose();
+  });
+
+  it('wires the world path to ask for the budgeted light', () => {
+    // The two cases above pin both ARMS of the option; nothing pins that the
+    // world factory actually asks for the budgeted one, and that half is
+    // unreachable from a unit test (createCharacterVisual needs preloaded
+    // GLBs). Drop the flag and every case here stays green while a visible
+    // unranked light rides every entity that spawns holding a rarity weapon.
+    const characters = codeWithoutLineComments(
+      readFileSync(new URL('../src/render/characters/index.ts', import.meta.url), 'utf8'),
+    );
+    const factoryStart = characters.indexOf('export function createCharacterVisual(');
+    expect(factoryStart, 'createCharacterVisual was renamed; re-anchor this pin').toBeGreaterThan(
+      -1,
+    );
+    const construction = characters.indexOf('new CharacterVisual(', factoryStart);
+    const flag = characters.indexOf('visual.budgetedWeaponLight = true;', construction);
+    const returned = characters.indexOf('return visual;', construction);
+    expect(construction).toBeGreaterThan(factoryStart);
+    // Set before the visual escapes the factory: a rig handed out first could
+    // build its weapon vfx with the flag still false.
+    expect(flag).toBeGreaterThan(construction);
+    expect(returned).toBeGreaterThan(flag);
+
+    // And the visual hands that flag to this factory rather than to nothing.
+    const visual = codeWithoutLineComments(
+      readFileSync(new URL('../src/render/characters/visual.ts', import.meta.url), 'utf8'),
+    );
+    expect(visual).toContain('budgetedLight: this.budgetedWeaponLight,');
   });
 });
 

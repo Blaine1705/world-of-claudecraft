@@ -8,6 +8,7 @@ import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { assertLoopbackDatabaseUrl, assertLoopbackUrl } from '../scripts/lib/loopback_guard.mjs';
+import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 
@@ -172,11 +173,8 @@ const URL_GUARDED_SCRIPTS = [
 // Full-line // comments are stripped before the scan: this file's own subject
 // matter means the phrase "assertLoopbackUrl" appears in prose inside these
 // scripts, and a commented-out call must never satisfy the pin.
-function codeWithoutLineComments(relPath: string): string {
-  return readFileSync(join(ROOT, relPath), 'utf8')
-    .split('\n')
-    .filter((line) => !/^\s*\/\//.test(line))
-    .join('\n');
+function scriptCode(relPath: string): string {
+  return codeWithoutLineComments(readFileSync(join(ROOT, relPath), 'utf8'));
 }
 
 function scriptSources(dir: string): string[] {
@@ -199,7 +197,7 @@ function expectedGuardImport(relPath: string): string {
 
 describe('loopback guard call sites', () => {
   it.each(GUARDED_SCRIPTS)('%s imports the shared guard and calls BOTH arms', (relPath) => {
-    const code = codeWithoutLineComments(relPath);
+    const code = scriptCode(relPath);
     expect(code).toContain(expectedGuardImport(relPath));
     // The two call literals are distinct substrings (the import line carries
     // neither, because it has no open paren), so each proves its own arm.
@@ -208,7 +206,7 @@ describe('loopback guard call sites', () => {
   });
 
   it.each(URL_GUARDED_SCRIPTS)('%s imports the shared guard and calls the URL arm', (relPath) => {
-    const code = codeWithoutLineComments(relPath);
+    const code = scriptCode(relPath);
     expect(code).toContain("from './lib/loopback_guard.mjs'");
     expect(code).toContain('assertLoopbackUrl(');
     // No pg import means no database arm; the discovery arm below enforces
@@ -218,7 +216,7 @@ describe('loopback guard call sites', () => {
 
   it('pins the guarded set exhaustively so a new adopter joins the scan', () => {
     const importers = scriptSources(join(ROOT, 'scripts'))
-      .filter((relPath) => codeWithoutLineComments(relPath).includes('loopback_guard.mjs'))
+      .filter((relPath) => scriptCode(relPath).includes('loopback_guard.mjs'))
       .sort();
     expect(importers).toEqual([...GUARDED_SCRIPTS, ...URL_GUARDED_SCRIPTS].sort());
   });
@@ -242,7 +240,7 @@ describe('loopback guard call sites', () => {
     ] as const;
     const pgImporters = scriptSources(join(ROOT, 'scripts'))
       .filter((relPath) => {
-        const code = codeWithoutLineComments(relPath);
+        const code = scriptCode(relPath);
         return code.includes("from 'pg'") || code.includes("require('pg')");
       })
       .sort();
