@@ -195,6 +195,292 @@ describe('createBackgroundGpuQueue', () => {
     expect(stats.worstSyncMs).toBe(30);
   });
 
+  // The syncMs blind spot (measured 13 August 2026): armory prewarm units
+  // reported 9 to 12 ms of syncMs while costing live frames 200 to 550 ms,
+  // because syncMs stops at the work function's FIRST await and everything the
+  // unit blocks afterwards books in no unit at all. A lane whose whole purpose
+  // is "never cost a live frame" cannot be validated by a metric that cannot
+  // see the frames. These pin the frame-gap attribution that replaces it.
+  it('attributes a frame gap that opens after the work function first await', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    queue.noteFrame(clock);
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    const unit = queue.run(
+      () => {
+        clock += 10;
+        return gate;
+      },
+      GPU_WORK_PRIORITY.BACKGROUND,
+      'armory-skin',
+    );
+    await Promise.resolve();
+    await Promise.resolve();
+    // A live frame lands while the tail is still off-thread: nothing lost yet.
+    clock += 16;
+    queue.noteFrame(clock);
+    // Then the tail blocks the main thread outright, so no frame runs until it
+    // settles. This is the span syncMs cannot see.
+    clock += 550;
+    release();
+    await unit;
+
+    const stats = queue.stats();
+    expect(stats.slowest[0].label).toBe('armory-skin');
+    expect(stats.slowest[0].syncMs).toBe(10);
+    expect(stats.slowest[0].frameGapMs).toBe(550);
+    expect(stats.worstFrameGapMs).toBe(550);
+  });
+
+  it('ranks the blockiest units by frame gap, not by the sync slice', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    queue.noteFrame(clock);
+    // A big synchronous prologue that costs one frame.
+    await queue.run(
+      () => {
+        clock += 40;
+      },
+      GPU_WORK_PRIORITY.BACKGROUND,
+      'fat-prologue',
+    );
+    clock += 2;
+    queue.noteFrame(clock);
+    // A tiny prologue whose tail then blocks far longer.
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    const sneaky = queue.run(
+      () => {
+        clock += 5;
+        return gate;
+      },
+      GPU_WORK_PRIORITY.BACKGROUND,
+      'sneaky-tail',
+    );
+    await Promise.resolve();
+    await Promise.resolve();
+    clock += 300;
+    release();
+    await sneaky;
+
+    const stats = queue.stats();
+    expect(stats.slowest[0].label).toBe('fat-prologue');
+    expect(stats.blockiest[0].label).toBe('sneaky-tail');
+    expect(stats.blockiest[0].frameGapMs).toBe(305);
+    expect(stats.blockiest[0].syncMs).toBe(5);
+  });
+
+  it('attributes only the part of a frame gap that overlaps the unit', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    queue.noteFrame(clock);
+    // 200 ms of ambient stall BEFORE any unit exists: not this unit's doing.
+    clock += 200;
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    const unit = queue.run(() => gate, GPU_WORK_PRIORITY.BACKGROUND, 'late-arrival');
+    await Promise.resolve();
+    await Promise.resolve();
+    clock += 60;
+    queue.noteFrame(clock);
+    release();
+    await unit;
+
+    const stats = queue.stats();
+    expect(stats.slowest[0].frameGapMs).toBe(60);
+  });
+
+  // Clamped, not dropped. Dropping was tried and made the metric non-monotone in
+  // badness: the worst block in a session reported 0, fell out of `blockiest`
+  // (whose membership is a positive gap), and left a smaller earlier span holding
+  // the record, i.e. the worse a unit behaved the better it looked.
+  it('clamps a frame gap beyond the discontinuity cap instead of dropping it', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock, frameGapIgnoreMs: 1000 });
+    queue.noteFrame(clock);
+    let releaseSmall!: () => void;
+    const small = new Promise<void>((resolve) => (releaseSmall = resolve));
+    const earlier = queue.run(() => small, GPU_WORK_PRIORITY.BACKGROUND, 'ordinary-unit');
+    await Promise.resolve();
+    await Promise.resolve();
+    clock += 400;
+    releaseSmall();
+    await earlier;
+    clock += 5;
+    queue.noteFrame(clock);
+
+    let releaseHuge!: () => void;
+    const huge = new Promise<void>((resolve) => (releaseHuge = resolve));
+    const worst = queue.run(() => huge, GPU_WORK_PRIORITY.BACKGROUND, 'hidden-tab');
+    await Promise.resolve();
+    await Promise.resolve();
+    clock += 5000;
+    releaseHuge();
+    await worst;
+
+    const stats = queue.stats();
+    const byLabel = Object.fromEntries(stats.slowest.map((unit) => [unit.label, unit]));
+    expect(byLabel['ordinary-unit'].frameGapMs).toBe(400);
+    expect(byLabel['hidden-tab'].frameGapMs).toBe(1000);
+    expect(stats.worstFrameGapMs).toBe(1000);
+    expect(stats.blockiest[0].label).toBe('hidden-tab');
+  });
+
+  // World entry pushes dozens of units through the queue before the frame loop
+  // is armed at all, so the first noteFrame has to reset the overlap counter or
+  // every boot unit stays folded into it for the whole session and every later
+  // charge reads as shared. Boot is the window the prewarm hitches live in.
+  it('resets the overlap counter on the first frame, so boot units do not poison it', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    // Five units drain before any frame is ever noted.
+    for (let index = 0; index < 5; index++) {
+      await queue.run(() => {
+        clock += 2;
+      });
+    }
+    queue.noteFrame(clock);
+
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    const alone = queue.run(() => gate, GPU_WORK_PRIORITY.BACKGROUND, 'first-live-unit');
+    await Promise.resolve();
+    await Promise.resolve();
+    clock += 300;
+    release();
+    await alone;
+
+    const stats = queue.stats();
+    const unit = stats.slowest.find((entry) => entry.label === 'first-live-unit');
+    expect(unit?.frameGapMs).toBe(300);
+    expect(unit?.sharedFrameGap).toBe(1);
+  });
+
+  // A running max only moves on a record, and the forensics vector diffs values,
+  // so a max goes silent on the second and every later occurrence of the same
+  // cost: the exact empty diff this metric exists to remove.
+  it('accumulates a total frame gap that keeps moving after the worst is set', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    queue.noteFrame(clock);
+    for (const ms of [300, 120, 120]) {
+      let release!: () => void;
+      const gate = new Promise<void>((resolve) => (release = resolve));
+      const unit = queue.run(() => gate);
+      await Promise.resolve();
+      await Promise.resolve();
+      clock += ms;
+      release();
+      await unit;
+      clock += 5;
+      queue.noteFrame(clock);
+    }
+
+    const stats = queue.stats();
+    expect(stats.worstFrameGapMs).toBe(300);
+    // 300 + 120 + 120: the two later units move the total while leaving the max
+    // untouched, which is the whole point of carrying both.
+    expect(stats.totalFrameGapMs).toBe(540);
+  });
+
+  // A released tail IS charged, and the exclusion that was briefly tried here is
+  // the wrong fix: the preview prewarm lane releases its tail while doing its
+  // real main-thread work there, so a tail-blind metric goes silent on the very
+  // misuse it exists to expose. The ambiguity that motivated the exclusion is
+  // carried by sharedFrameGap instead (pinned by the test below).
+  it('charges a released tail that blocks, since its work is still main-thread', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    queue.noteFrame(clock);
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    const unit = queue.run(
+      () => {
+        clock += 3;
+        return gate;
+      },
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+      'released-gate',
+      { releaseTail: true },
+    );
+    await Promise.resolve();
+    await Promise.resolve();
+    // 400 frameless milliseconds pass while only this released tail is in
+    // flight, so the charge is unambiguous: nothing else could have caused it.
+    clock += 400;
+    release();
+    await unit;
+
+    const stats = queue.stats();
+    // 403, not 400: the unit started at 0 alongside the last frame, so the whole
+    // frameless span it was in flight for counts, its 3 ms prologue included.
+    expect(stats.slowest[0].label).toBe('released-gate');
+    expect(stats.slowest[0].frameGapMs).toBe(403);
+    expect(stats.slowest[0].sharedFrameGap).toBe(1);
+  });
+
+  // The passenger case, and the one a live capture got wrong before this pin
+  // existed: a long released tail is charged a gap another unit caused, and on
+  // frameGapMs alone it outranks the culprit. sharedFrameGap is what separates
+  // them, and it must count a unit that started AND settled inside the span,
+  // which is precisely the shape of the real culprit.
+  it('marks a gap shared by several in-flight units, culprit and passenger alike', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    queue.noteFrame(clock);
+    let releaseLink!: () => void;
+    const link = new Promise<void>((resolve) => (releaseLink = resolve));
+    const gate = queue.run(
+      () => {
+        clock += 1;
+        return link;
+      },
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+      'live-gate',
+      { releaseTail: true },
+    );
+    await Promise.resolve();
+    await Promise.resolve();
+    // A second unit starts and blocks outright while the link is still settling.
+    const heavy = queue.run(
+      () => {
+        clock += 500;
+      },
+      GPU_WORK_PRIORITY.BACKGROUND,
+      'heavy-prewarm',
+    );
+    await heavy;
+    clock += 5;
+    queue.noteFrame(clock);
+    releaseLink();
+    await gate;
+
+    const stats = queue.stats();
+    const byLabel = Object.fromEntries(stats.slowest.map((unit) => [unit.label, unit]));
+    // Both are charged, and both say the charge is shared, so neither can be
+    // read as proven. The sync slices then separate them: 500 against 1.
+    expect(byLabel['heavy-prewarm'].frameGapMs).toBe(500);
+    expect(byLabel['heavy-prewarm'].sharedFrameGap).toBe(2);
+    expect(byLabel['live-gate'].sharedFrameGap).toBe(2);
+    expect(byLabel['heavy-prewarm'].syncMs).toBe(500);
+    expect(byLabel['live-gate'].syncMs).toBe(1);
+  });
+
+  it('reports a zero frame gap when the host never feeds the frame clock', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    await queue.run(() => {
+      clock += 90;
+    });
+
+    const stats = queue.stats();
+    expect(stats.slowest[0].syncMs).toBe(90);
+    expect(stats.slowest[0].frameGapMs).toBe(0);
+    expect(stats.worstFrameGapMs).toBe(0);
+    expect(stats.blockiest).toEqual([]);
+  });
+
   it('exposes the running unit with its age and reports none while idle', async () => {
     let clock = 0;
     const queue = createBackgroundGpuQueue({ now: () => clock });
@@ -565,6 +851,11 @@ describe('createBackgroundGpuQueue', () => {
       syncMs: 3,
       wallMs: 7003,
       atMs: 0,
+      // Zero because this suite never feeds the frame clock, which is the
+      // honest reading: nothing here observed a frame to lose, so nothing was
+      // charged and no span was shared.
+      frameGapMs: 0,
+      sharedFrameGap: 0,
     });
     // A multi-second link is still a recorded stall, settled: the release
     // changes who waits behind it, not whether it is worth seeing.
@@ -722,5 +1013,17 @@ describe('createBackgroundGpuQueue', () => {
     // `const debt = false` (or the wrong id) every priority claim above
     // silently degrades to BOOT_RESUME with the suite green (QA finding B1).
     expect(initial).toContain('const debt = prewarmResumeIsDebt(entry.id);');
+    // The frame clock is a SINGLE call site whose failure mode is silent good
+    // news: drop it, or let an early return get in front of it, and every unit
+    // reports frameGapMs 0 and an empty blockiest, which reads as "the lane cost
+    // no frames" rather than as "nobody measured". Nothing else in the suite can
+    // see that, because every behavior test drives noteFrame by hand.
+    const sync = method('  sync(\n', '\n    const frameStats = this.lastFrameStats;');
+    expect(sync).toContain('this.backgroundGpuWork.noteFrame(');
+    // After the shutdown guard: a torn-down renderer must stop the frame clock
+    // rather than keep charging units that settle during teardown.
+    expect(sync.indexOf('if (this.shutdownStarted) return;')).toBeLessThan(
+      sync.indexOf('this.backgroundGpuWork.noteFrame('),
+    );
   });
 });

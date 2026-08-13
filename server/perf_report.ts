@@ -291,11 +291,24 @@ function sanitizeGpuQueueSummary(value: unknown): Record<string, unknown> | unde
     : null;
   const stalls = Array.isArray(value.stalls) ? value.stalls : [];
   const slowest = Array.isArray(value.slowest) ? value.slowest : [];
+  const blockiest = Array.isArray(value.blockiest) ? value.blockiest : [];
   const waitingTails = Array.isArray(value.waitingTails) ? value.waitingTails : [];
   return {
     units: intIn(value.units, 0, 10_000_000, 0),
     totalSyncMs: numberIn(value.totalSyncMs, 0, GPU_QUEUE_RAW_AGE_MS_MAX, 0),
     worstSyncMs: numberIn(value.worstSyncMs, 0, GPU_QUEUE_RAW_MS_MAX, 0),
+    // The frame-cost half of the client's queue readout. This sanitizer
+    // REBUILDS the block from a fixed key set rather than merging, so a field
+    // the client adds and this list omits is dropped silently: adding one here
+    // is part of adding it there.
+    totalFrameGapMs: numberIn(value.totalFrameGapMs, 0, GPU_QUEUE_RAW_AGE_MS_MAX, 0),
+    worstFrameGapMs: numberIn(value.worstFrameGapMs, 0, GPU_QUEUE_RAW_AGE_MS_MAX, 0),
+    worstUnsharedFrameGapMs: numberIn(
+      value.worstUnsharedFrameGapMs,
+      0,
+      GPU_QUEUE_RAW_AGE_MS_MAX,
+      0,
+    ),
     pending: intIn(value.pending, 0, 1_000_000, 0),
     stallCount: intIn(value.stallCount, 0, 1_000_000, 0),
     active,
@@ -316,15 +329,25 @@ function sanitizeGpuQueueSummary(value: unknown): Record<string, unknown> | unde
         ageMs: numberIn(stall.ageMs, 0, GPU_QUEUE_RAW_AGE_MS_MAX, 0),
         settled: Boolean(stall.settled),
       })),
-    slowest: slowest
+    slowest: slowest.slice(0, GPU_QUEUE_RAW_SLOWEST_MAX).filter(isRecord).map(sanitizeGpuQueueUnit),
+    // Ranked by frame cost rather than sync slice: the units this metric exists
+    // to surface report single-digit syncMs, so a sync-ordered list alone can
+    // never carry them to the fleet.
+    blockiest: blockiest
       .slice(0, GPU_QUEUE_RAW_SLOWEST_MAX)
       .filter(isRecord)
-      .map((unit) => ({
-        label: gpuQueueUnitLabel(unit.label),
-        priority: gpuQueuePriority(unit.priority),
-        syncMs: numberIn(unit.syncMs, 0, GPU_QUEUE_RAW_MS_MAX, 0),
-        wallMs: numberIn(unit.wallMs, 0, GPU_QUEUE_RAW_AGE_MS_MAX, 0),
-      })),
+      .map(sanitizeGpuQueueUnit),
+  };
+}
+
+function sanitizeGpuQueueUnit(unit: Record<string, unknown>): Record<string, unknown> {
+  return {
+    label: gpuQueueUnitLabel(unit.label),
+    priority: gpuQueuePriority(unit.priority),
+    syncMs: numberIn(unit.syncMs, 0, GPU_QUEUE_RAW_MS_MAX, 0),
+    wallMs: numberIn(unit.wallMs, 0, GPU_QUEUE_RAW_AGE_MS_MAX, 0),
+    frameGapMs: numberIn(unit.frameGapMs, 0, GPU_QUEUE_RAW_AGE_MS_MAX, 0),
+    sharedFrameGap: intIn(unit.sharedFrameGap, 0, 1_000_000, 0),
   };
 }
 

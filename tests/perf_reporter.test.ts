@@ -232,9 +232,51 @@ function snapshot(): PerfSnapshot {
         units: 2,
         totalSyncMs: 18.4,
         worstSyncMs: 12.1,
+        // The texture unit is the cheap-looking one that actually cost the
+        // frame: 6.3 ms of sync, 310 ms of lost frame. That inversion is why
+        // the beacon carries both rankings.
+        totalFrameGapMs: 329.2,
+        worstFrameGapMs: 310.5,
+        worstUnsharedFrameGapMs: 18.7,
         slowest: [
-          { label: 'live-view-compile', priority: 30, syncMs: 12.1, wallMs: 40.2, atMs: 5000 },
-          { label: 'texture-chunk', priority: 10, syncMs: 6.3, wallMs: 6.3, atMs: 5200 },
+          {
+            label: 'live-view-compile',
+            priority: 30,
+            syncMs: 12.1,
+            wallMs: 40.2,
+            atMs: 5000,
+            frameGapMs: 18.7,
+            sharedFrameGap: 1,
+          },
+          {
+            label: 'texture-chunk',
+            priority: 10,
+            syncMs: 6.3,
+            wallMs: 6.3,
+            atMs: 5200,
+            frameGapMs: 310.5,
+            sharedFrameGap: 2,
+          },
+        ],
+        blockiest: [
+          {
+            label: 'texture-chunk',
+            priority: 10,
+            syncMs: 6.3,
+            wallMs: 6.3,
+            atMs: 5200,
+            frameGapMs: 310.5,
+            sharedFrameGap: 2,
+          },
+          {
+            label: 'live-view-compile',
+            priority: 30,
+            syncMs: 12.1,
+            wallMs: 40.2,
+            atMs: 5000,
+            frameGapMs: 18.7,
+            sharedFrameGap: 1,
+          },
         ],
         pending: 0,
         active: null,
@@ -485,14 +527,51 @@ describe('perf reporter payload', () => {
       units: 2,
       totalSyncMs: 18.4,
       worstSyncMs: 12.1,
+      totalFrameGapMs: 329.2,
+      worstFrameGapMs: 310.5,
+      worstUnsharedFrameGapMs: 18.7,
       pending: 0,
       stallCount: 0,
       active: null,
       stalls: [],
     });
     expect(settledQueue?.slowest).toEqual([
-      { label: 'live-view-compile', priority: 30, syncMs: 12.1, wallMs: 40.2 },
-      { label: 'texture-chunk', priority: 10, syncMs: 6.3, wallMs: 6.3 },
+      {
+        label: 'live-view-compile',
+        priority: 30,
+        syncMs: 12.1,
+        wallMs: 40.2,
+        frameGapMs: 18.7,
+        sharedFrameGap: 1,
+      },
+      {
+        label: 'texture-chunk',
+        priority: 10,
+        syncMs: 6.3,
+        wallMs: 6.3,
+        frameGapMs: 310.5,
+        sharedFrameGap: 2,
+      },
+    ]);
+    // The frame-cost ranking inverts the sync ranking, which is the whole point
+    // of shipping both: a sync-ordered beacon would bury the unit that hurt.
+    expect(settledQueue?.blockiest).toEqual([
+      {
+        label: 'texture-chunk',
+        priority: 10,
+        syncMs: 6.3,
+        wallMs: 6.3,
+        frameGapMs: 310.5,
+        sharedFrameGap: 2,
+      },
+      {
+        label: 'live-view-compile',
+        priority: 30,
+        syncMs: 12.1,
+        wallMs: 40.2,
+        frameGapMs: 18.7,
+        sharedFrameGap: 1,
+      },
     ]);
 
     const snap = snapshot();
@@ -500,7 +579,11 @@ describe('perf reporter payload', () => {
       units: 2,
       totalSyncMs: 18.4,
       worstSyncMs: 12.1,
+      totalFrameGapMs: 0,
+      worstFrameGapMs: 0,
+      worstUnsharedFrameGapMs: 0,
       slowest: [],
+      blockiest: [],
       pending: 7,
       active: { label: 'wedged-compile', priority: 40, ageMs: 91_000, atMs: 12_000 },
       waitingTails: [{ label: 'released-gate', priority: 30, ageMs: 5000, atMs: 11_000 }],

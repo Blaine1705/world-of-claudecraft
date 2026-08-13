@@ -10578,6 +10578,8 @@ export class Renderer {
   ): void {
     if (this.shutdownStarted) return;
     const totalStart = performance.now();
+    // Feed the background lane the live frame clock (see its header).
+    this.backgroundGpuWork.noteFrame(totalStart);
     let phaseStart = totalStart;
     const frameStats = this.lastFrameStats;
     const framePhaseMs = frameStats.phaseMs;

@@ -258,6 +258,13 @@ function rendererGpuQueueSummary(gpuQueue: RendererGpuQueueSnapshot): Record<str
     units: gpuQueue.units,
     totalSyncMs: gpuQueue.totalSyncMs,
     worstSyncMs: gpuQueue.worstSyncMs,
+    // The frame-cost half. syncMs stops at a unit's first await, so a lane that
+    // blocks after one reads as free on the sync numbers alone; these carry what
+    // the live frame actually paid. The cumulative one rides beside the maxima
+    // because a max says nothing about how OFTEN the lane cost a frame.
+    totalFrameGapMs: gpuQueue.totalFrameGapMs,
+    worstFrameGapMs: gpuQueue.worstFrameGapMs,
+    worstUnsharedFrameGapMs: gpuQueue.worstUnsharedFrameGapMs,
     pending: gpuQueue.pending,
     stallCount: gpuQueue.stallCount,
     active: gpuQueue.active
@@ -279,12 +286,31 @@ function rendererGpuQueueSummary(gpuQueue: RendererGpuQueueSnapshot): Record<str
       ageMs: stall.ageMs,
       settled: stall.settled,
     })),
-    slowest: gpuQueue.slowest.slice(0, GPU_QUEUE_REPORT_SLOWEST).map((unit) => ({
-      label: unit.label,
-      priority: unit.priority,
-      syncMs: unit.syncMs,
-      wallMs: unit.wallMs,
-    })),
+    slowest: gpuQueue.slowest.slice(0, GPU_QUEUE_REPORT_SLOWEST).map(reportGpuQueueUnit),
+    // Ranked by frame cost rather than sync slice, so the unit that hurt is in
+    // the beacon even when its sync slice is single-digit milliseconds.
+    blockiest: gpuQueue.blockiest.slice(0, GPU_QUEUE_REPORT_SLOWEST).map(reportGpuQueueUnit),
+  };
+}
+
+function reportGpuQueueUnit(unit: RendererGpuQueueSnapshot['slowest'][number]): {
+  label: string;
+  priority: number;
+  syncMs: number;
+  wallMs: number;
+  frameGapMs: number;
+  sharedFrameGap: number;
+} {
+  return {
+    label: unit.label,
+    priority: unit.priority,
+    syncMs: unit.syncMs,
+    wallMs: unit.wallMs,
+    frameGapMs: unit.frameGapMs,
+    // Without this a beacon reader repeats the mistake the metric already made
+    // once: a long released tail shares a gap it did not cause and tops the
+    // ranking on someone else's block.
+    sharedFrameGap: unit.sharedFrameGap,
   };
 }
 

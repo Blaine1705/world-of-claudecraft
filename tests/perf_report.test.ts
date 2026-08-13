@@ -766,16 +766,41 @@ describe('perf report ingestion', () => {
       GPU_QUEUE_RAW_STALLS_MAX,
       GPU_QUEUE_RAW_TAILS_MAX,
     } = perfReportInternalsForTest;
+    // The frame-cost fields ride here too. This sanitizer REBUILDS the block
+    // from a fixed key set rather than filtering it, so a client field the
+    // allowlist omits is dropped silently: this round-trip is what catches that.
     const wedged = {
       units: 12,
       totalSyncMs: 240.5,
       worstSyncMs: 88.2,
+      totalFrameGapMs: 910.6,
+      worstFrameGapMs: 604.1,
+      worstUnsharedFrameGapMs: 306.5,
       pending: 6,
       stallCount: 1,
       active: { label: 'wedged-compile', priority: 40, ageMs: 91_000 },
       waitingTails: [{ label: 'released-gate', priority: 30, ageMs: 5000 }],
       stalls: [{ label: 'wedged-compile', priority: 40, ageMs: 91_000, settled: false }],
-      slowest: [{ label: 'live-view-compile', priority: 30, syncMs: 88.2, wallMs: 120.4 }],
+      slowest: [
+        {
+          label: 'live-view-compile',
+          priority: 30,
+          syncMs: 88.2,
+          wallMs: 120.4,
+          frameGapMs: 306.5,
+          sharedFrameGap: 1,
+        },
+      ],
+      blockiest: [
+        {
+          label: 'preview:armory:skin',
+          priority: 10,
+          syncMs: 9.4,
+          wallMs: 740.2,
+          frameGapMs: 604.1,
+          sharedFrameGap: 2,
+        },
+      ],
     };
     const stored = fakeRes();
 

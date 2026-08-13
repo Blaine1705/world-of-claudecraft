@@ -26,6 +26,39 @@
 // waiting up to one debt batch's settle before it starts; the canvas
 // nameplate carries the actionable channel through that wait.
 
+// Frame cost (the metric a pacing decision is actually made on): syncMs stops
+// at the work function's FIRST await, so everything a unit blocks afterwards
+// books in no unit at all. That blind spot shipped: armory prewarm units
+// reported 9 to 12 ms of syncMs while costing live frames 200 to 550 ms, and
+// the lane read as gentle in every report while the frame said otherwise. So
+// the host feeds noteFrame() once per rendered frame and each unit carries the
+// longest FRAMELESS span it was in flight for, clipped to its own window. Read
+// it as a coincidence measure, not a proof of cause: an ambient stall while a
+// unit is HELD is charged to that unit. For a lane whose contract is "never
+// cost a live frame" that is the right default, and the sync/wall pair stays
+// beside it to separate a unit that blocked from one that merely spanned a bad
+// moment.
+//
+// RELEASED TAILS are charged too, and sharedFrameGap is what keeps that honest.
+// Two wrong designs were tried live before this one. Charging tails with no
+// ambiguity marker put 1832 ms of frame on a live-gate unit with 1.4 ms of sync:
+// released tails are the LONGEST units (seconds of driver link), so they absorb
+// every unrelated block landing in their window. Excluding them instead went
+// blind on the case that motivated the whole metric: the preview prewarm lane
+// releases its tail while doing its REAL main-thread work there (renderer.ts
+// queueSecondaryPreviewPrewarm), which is itself a misdeclaration of the
+// releaseTail contract above. So every in-flight unit is charged, and each stat
+// carries how many units shared the span. Read the trio (frameGapMs, syncMs,
+// sharedFrameGap), never the gap alone.
+//
+// What this CANNOT tell you, stated plainly so nobody reads more into a number
+// than it holds. The host feeds the boundary at frame START (renderer.ts sync),
+// so a charged span is a whole frame PERIOD: the renderer's own work is inside
+// it, the floor is one frame rather than zero, and sharedFrameGap counts only
+// QUEUE units, so it can never mark a renderer-caused or GC-caused stall as
+// ambiguous. `sharedFrameGap === 1` therefore means "no other queue unit was in
+// flight", NOT "this unit did it". Proving cause needs an exclusive run, which
+// is what a probe driving one unit at a time is for.
 export const GPU_WORK_PRIORITY = {
   BOOT_RESUME: 0,
   BACKGROUND: 10,
@@ -72,6 +105,21 @@ export interface GpuWorkUnitStat {
   syncMs: number;
   wallMs: number;
   atMs: number;
+  /** Longest span this unit was in flight with NO live frame, i.e. what it
+   *  actually cost the frame the lane exists to protect. Zero when the host
+   *  never fed `noteFrame`. See the frame-gap note in the header for why this,
+   *  and not syncMs, is the number a pacing decision is made on. */
+  frameGapMs: number;
+  /** Units, this one included, that were in flight at any point since the frame
+   *  boundary the worst gap was measured from. Read it as "how alone was this
+   *  charge", never as proof: 1 means no OTHER QUEUE UNIT was in flight, which
+   *  still leaves the renderer's own frame work, GC, and any non-queue task on
+   *  the main thread unaccounted for. It also inflates on a serial burst, since
+   *  it counts units that started and settled before this one began (deliberate:
+   *  that is how a culprit which starts AND settles inside one frameless span
+   *  gets counted at all). Read the trio (frameGapMs, syncMs, sharedFrameGap)
+   *  together, never frameGapMs alone. */
+  sharedFrameGap: number;
 }
 
 /** The unit the drain loop is awaiting right now. Every pending unit waits
@@ -101,8 +149,31 @@ export interface BackgroundGpuQueueStats {
   units: number;
   totalSyncMs: number;
   worstSyncMs: number;
+  /** Frame-gap milliseconds charged across every settled unit. CUMULATIVE on
+   *  purpose: the two scalars below are running maxima, and a max only moves on
+   *  a record, so a diff-based readout (the hitch forensics vector) goes silent
+   *  on the second and every later occurrence of the same cost. That silence is
+   *  the exact "empty diff" the metric exists to remove, so a diff consumer
+   *  watches this one. */
+  totalFrameGapMs: number;
+  /** Worst frame gap any settled unit was in flight for, shared or not. */
+  worstFrameGapMs: number;
+  /** The same, restricted to gaps NO other unit shared. This is the arm an
+   *  attribution readout should watch: the shared one rises whenever anything
+   *  at all stalls a frame while any unit happens to be in flight, so a diff
+   *  built on it prints a queue dimension moving for hitches the queue did not
+   *  cause, inside the very tool used to find the cause. */
+  worstUnsharedFrameGapMs: number;
   /** Slowest units by sync slice, worst first, bounded. */
   slowest: GpuWorkUnitStat[];
+  /** Units in flight across a frame boundary, worst frame gap first, bounded.
+   *  A SEPARATE ranking from `slowest` on purpose: the units that motivated
+   *  this metric reported 9 to 12 ms of syncMs while costing 200 to 550 ms of
+   *  frame, so they could never surface in a sync-ordered list. Note the
+   *  membership rule is "cost a frame boundary", not "cost a frame": the host
+   *  feeds `noteFrame` at frame START, so the measured span includes the frame
+   *  PERIOD and the floor is one frame (about 16.7 ms at 60 Hz), not zero. */
+  blockiest: GpuWorkUnitStat[];
   /** Units not started yet, waiting on the running unit or on the
    *  released-tail cap: the backlog a wedge accumulates. */
   pending: number;
@@ -128,6 +199,11 @@ export interface BackgroundGpuQueue {
     label?: string,
     options?: GpuWorkRunOptions,
   ): Promise<T>;
+  /** Feed the LIVE FRAME clock, once per rendered frame. Without it the queue
+   *  can only measure itself; with it, every unit carries what it cost the
+   *  frame. Cheap by design (one subtraction plus the in-flight set), and
+   *  entirely optional: a headless host that never calls it just reports zero. */
+  noteFrame(atMs: number): void;
   /** Per-unit timing plus the running unit: names which lane's units block the
    *  main thread, and which one is currently blocking the whole queue. */
   stats(): BackgroundGpuQueueStats;
@@ -149,14 +225,33 @@ const DEFAULT_STALL_LIMIT = 8;
 // snapshot-burst bound: with the running unit's own prologue, at most 3 units'
 // driver work can be in flight at any instant, never one per streamed view.
 const DEFAULT_TAIL_LIMIT = 2;
+// A frame-to-frame span longer than this is a DISCONTINUITY, not a cost: a
+// hidden tab (rAF stops entirely), a paused debugger, a machine suspend. Set
+// above the stall threshold on purpose, so nothing real is lost by ignoring it:
+// a unit that genuinely holds the main thread this long is already reported by
+// the stall machinery, which has no such cap.
+const DEFAULT_FRAME_GAP_IGNORE_MS = 5000;
 
 interface RunningGpuWork {
   entry: PendingGpuWork<unknown>;
   startedAt: number;
   stall: GpuWorkStallStat | null;
+  /** Worst frameless span observed while this unit was in flight. */
+  worstFrameGapMs: number;
+  /** Units in flight when that worst span was charged, this one included. */
+  worstFrameGapShared: number;
 }
 
 const round1 = (value: number): number => Math.round(value * 10) / 10;
+
+const reportUnit = (stat: GpuWorkUnitStat): GpuWorkUnitStat => ({
+  ...stat,
+  syncMs: round1(stat.syncMs),
+  wallMs: round1(stat.wallMs),
+  atMs: Math.round(stat.atMs),
+  frameGapMs: round1(stat.frameGapMs),
+  sharedFrameGap: stat.sharedFrameGap,
+});
 
 export function createBackgroundGpuQueue(opts?: {
   now?: () => number;
@@ -164,19 +259,31 @@ export function createBackgroundGpuQueue(opts?: {
   stallMs?: number;
   stallLimit?: number;
   tailLimit?: number;
+  frameGapIgnoreMs?: number;
 }): BackgroundGpuQueue {
   const now = opts?.now ?? ((): number => performance.now());
   const slowestLimit = Math.max(1, opts?.slowestLimit ?? DEFAULT_SLOWEST_LIMIT);
   const stallMs = Math.max(1, opts?.stallMs ?? DEFAULT_STALL_MS);
   const stallLimit = Math.max(1, opts?.stallLimit ?? DEFAULT_STALL_LIMIT);
   const tailLimit = Math.max(1, opts?.tailLimit ?? DEFAULT_TAIL_LIMIT);
+  const frameGapIgnoreMs = Math.max(1, opts?.frameGapIgnoreMs ?? DEFAULT_FRAME_GAP_IGNORE_MS);
   const pending: PendingGpuWork<unknown>[] = [];
   const slowest: GpuWorkUnitStat[] = [];
+  const blockiest: GpuWorkUnitStat[] = [];
   const stalls: GpuWorkStallStat[] = [];
   const waitingTails = new Set<RunningGpuWork>();
   let units = 0;
   let totalSyncMs = 0;
   let worstSyncMs = 0;
+  let worstFrameGapMs = 0;
+  let worstUnsharedFrameGapMs = 0;
+  let totalFrameGapMs = 0;
+  let lastFrameAt: number | null = null;
+  // Distinct units in flight at ANY point since the last frame, which is what
+  // sharedFrameGap must report: counting at the instant of the charge instead
+  // misses a unit that started AND settled inside the span, and that unit is
+  // exactly the one likeliest to have caused it.
+  let overlappingUnits = 0;
   let stallCount = 0;
   let running: RunningGpuWork | null = null;
   let active = false;
@@ -208,11 +315,37 @@ export function createBackgroundGpuQueue(opts?: {
     if (stalls.length > stallLimit) stalls.shift();
   };
 
+  /** Widen a unit's worst frameless span to cover [from, to], clipped to the
+   *  part it was actually in flight for, so a stall that began before it
+   *  started is not charged to it. */
+  const widenFrameGap = (unit: RunningGpuWork, from: number, to: number, shared: number): void => {
+    const raw = to - Math.max(from, unit.startedAt);
+    if (raw <= 0) return;
+    // CLAMPED past the cap, never dropped. Dropping made the metric non-monotone
+    // in badness: a genuine 6 s block reported 0, stayed out of `blockiest`
+    // entirely, and left a smaller 400 ms span holding the record. Clamping stops
+    // a discontinuity inventing minutes of frame cost without ever turning the
+    // worst offender into the best-looking one.
+    const overlap = Math.min(raw, frameGapIgnoreMs);
+    if (overlap <= unit.worstFrameGapMs) return;
+    unit.worstFrameGapMs = overlap;
+    unit.worstFrameGapShared = shared;
+  };
+
   const recordUnit = (unit: RunningGpuWork, syncMs: number): void => {
     units++;
     totalSyncMs += syncMs;
     if (syncMs > worstSyncMs) worstSyncMs = syncMs;
-    const wallMs = now() - unit.startedAt;
+    const settledAt = now();
+    const wallMs = settledAt - unit.startedAt;
+    // The settle-time term, and the one that catches the common shape: a unit
+    // blocks the main thread and finishes BEFORE the next frame runs, so no
+    // noteFrame call ever lands inside its window and the mid-flight term above
+    // sees nothing at all. `overlappingUnits` already counts this
+    // unit: it was incremented at start and is only reset per frame. (Not "the
+    // unit is off both lists": on the detachTail path with a synchronously
+    // settling thenable, `running` still points at it here.)
+    if (lastFrameAt !== null) widenFrameGap(unit, lastFrameAt, settledAt, overlappingUnits);
     noteStall(unit, wallMs);
     if (unit.stall) unit.stall.settled = true;
     const stat: GpuWorkUnitStat = {
@@ -221,11 +354,26 @@ export function createBackgroundGpuQueue(opts?: {
       syncMs,
       wallMs,
       atMs: unit.startedAt,
+      frameGapMs: unit.worstFrameGapMs,
+      sharedFrameGap: unit.worstFrameGapShared,
     };
+    totalFrameGapMs += stat.frameGapMs;
+    if (stat.frameGapMs > worstFrameGapMs) worstFrameGapMs = stat.frameGapMs;
+    if (stat.sharedFrameGap <= 1 && stat.frameGapMs > worstUnsharedFrameGapMs) {
+      worstUnsharedFrameGapMs = stat.frameGapMs;
+    }
     let index = slowest.length;
     while (index > 0 && slowest[index - 1].syncMs < stat.syncMs) index--;
     slowest.splice(index, 0, stat);
     if (slowest.length > slowestLimit) slowest.length = slowestLimit;
+    // A unit that cost no frame is not "the least blocking one", it is simply
+    // not a member: keeping it out is what makes a short list readable.
+    if (round1(stat.frameGapMs) > 0) {
+      let blockIndex = blockiest.length;
+      while (blockIndex > 0 && blockiest[blockIndex - 1].frameGapMs < stat.frameGapMs) blockIndex--;
+      blockiest.splice(blockIndex, 0, stat);
+      if (blockiest.length > slowestLimit) blockiest.length = slowestLimit;
+    }
   };
 
   const settleShutdownIfIdle = (): void => {
@@ -290,7 +438,14 @@ export function createBackgroundGpuQueue(opts?: {
         }
       }
       const [next] = pending.splice(selectedIndex, 1);
-      const unit: RunningGpuWork = { entry: next, startedAt: now(), stall: null };
+      const unit: RunningGpuWork = {
+        entry: next,
+        startedAt: now(),
+        stall: null,
+        worstFrameGapMs: 0,
+        worstFrameGapShared: 0,
+      };
+      overlappingUnits++;
       running = unit;
       let syncMs = 0;
       let released = false;
@@ -353,6 +508,36 @@ export function createBackgroundGpuQueue(opts?: {
       scheduleDrain();
       return result;
     },
+    noteFrame(atMs: number): void {
+      const previous = lastFrameAt;
+      lastFrameAt = atMs;
+      const inFlight = (running ? 1 : 0) + waitingTails.size;
+      if (previous === null) {
+        // The FIRST frame still resets the counter. World entry pushes dozens of
+        // units through the queue before requestAnimationFrame is ever armed
+        // (src/main.ts arms it at the end of startGame), so returning early here
+        // left every one of them folded into `overlappingUnits` for the rest of
+        // the session and made every later charge read as shared. Boot is the
+        // window the prewarm hitches actually live in.
+        overlappingUnits = inFlight;
+        return;
+      }
+      if (inFlight === 0) {
+        overlappingUnits = 0;
+        return;
+      }
+      // Charged to EVERY unit in flight, released tails included, and the
+      // sharedFrameGap count is what keeps that honest. Excluding tails was
+      // tried and is wrong: the preview prewarm lane releases its tail while
+      // doing its real work there (renderer.ts queueSecondaryPreviewPrewarm),
+      // so tail-blind attribution goes silent on the exact misuse this metric
+      // exists to expose.
+      const shared = overlappingUnits;
+      if (running) widenFrameGap(running, previous, atMs, shared);
+      for (const tail of waitingTails) widenFrameGap(tail, previous, atMs, shared);
+      // Whatever is still in flight carries into the next interval.
+      overlappingUnits = inFlight;
+    },
     stats(): BackgroundGpuQueueStats {
       let activeUnit: GpuWorkActiveUnit | null = null;
       if (running) {
@@ -380,12 +565,11 @@ export function createBackgroundGpuQueue(opts?: {
         units,
         totalSyncMs: round1(totalSyncMs),
         worstSyncMs: round1(worstSyncMs),
-        slowest: slowest.map((stat) => ({
-          ...stat,
-          syncMs: round1(stat.syncMs),
-          wallMs: round1(stat.wallMs),
-          atMs: Math.round(stat.atMs),
-        })),
+        totalFrameGapMs: round1(totalFrameGapMs),
+        worstFrameGapMs: round1(worstFrameGapMs),
+        worstUnsharedFrameGapMs: round1(worstUnsharedFrameGapMs),
+        slowest: slowest.map(reportUnit),
+        blockiest: blockiest.map(reportUnit),
         pending: pending.length,
         active: activeUnit,
         waitingTails: tailUnits,
