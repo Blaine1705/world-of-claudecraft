@@ -262,9 +262,14 @@ describe('options_window: interface tab split', () => {
     const start = painter.indexOf('private renderInterface(): void {');
     const rest = painter.slice(start);
     const body = rest.slice(0, rest.indexOf('\n  }\n'));
-    expect(body).toContain(
-      'const env: OptionsEnv = {\n      touch: useTouchInterface(),\n      nativeShell: isNativeAppShell(),\n      desktopGpuPref: desktopGpuPrefSupported(desktopBridge()),\n    };',
-    );
+    // Two independent claims rather than one whole-literal match, which a
+    // reformat would red for no behavioral reason: the flag comes from the
+    // bridge probe, and never from the shell flag it is easily confused with.
+    expect(body).toContain('desktopGpuPref: desktopGpuPrefSupported(desktopBridge())');
+    expect(body).not.toContain('desktopGpuPref: isNativeAppShell(');
+    // the other two env fields keep their own probes
+    expect(body).toContain('touch: useTouchInterface(),');
+    expect(body).toContain('nativeShell: isNativeAppShell(),');
   });
 
   it('places the bespoke rows into their approved tab', () => {

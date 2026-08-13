@@ -742,6 +742,8 @@ describe('options_view: interface tab taxonomy', () => {
       // while the showAttackButton duplicate is present and GREEN once deduped.
       // (the desktop arm's next-launch note is the one keyless control; every
       // other row must still carry a key, so a keyless toggle still fails here)
+      // the audio panel's bespoke music toggle never belongs to this panel
+      expect(all.some((c) => c.control === 'musicToggle')).toBe(false);
       const keyed = all.filter((c) => c.control !== 'note' && c.control !== 'musicToggle');
       expect(keyed).toHaveLength(all.length - all.filter((c) => c.control === 'note').length);
       const keys = keyed.map((c) => c.key);

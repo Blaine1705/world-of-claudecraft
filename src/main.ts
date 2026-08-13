@@ -41,7 +41,7 @@ import { localPartyMemberIds } from './game/corpse_loot_availability';
 import { shouldClearAutorunOnDeath } from './game/death_input_reset';
 import { setDisplayChangeTarget } from './game/desktop_display_change';
 import { initDesktopDownload } from './game/desktop_download';
-import { syncDesktopGpuPrefSetting } from './game/desktop_gpu_pref_sync';
+import { pushDesktopGpuPref, syncDesktopGpuPrefSetting } from './game/desktop_gpu_pref_sync';
 import { desktopPresentationHidden } from './game/desktop_presentation';
 import { initDesktopShellIntegration } from './game/desktop_shell_integration';
 import { installDevTeleports } from './game/dev_shortcuts';
@@ -506,7 +506,10 @@ if (DESKTOP_APP) initDesktopShellIntegration();
 // Reflect the shell's STORED GPU preference into the local setting, so the
 // desktop-only options row shows what the next launch will do rather than a
 // local guess. Writes nothing without the bridge method (older shell, browser).
-if (DESKTOP_APP) void syncDesktopGpuPrefSetting(desktopBridge(), new Settings());
+// The store is built by the factory AFTER the bridge answers: a snapshot taken
+// before the round trip would rewrite the whole settings blob over any write
+// that landed while it was in flight.
+if (DESKTOP_APP) void syncDesktopGpuPrefSetting(desktopBridge(), () => new Settings());
 // Free every WebGL context (game renderer, character preview, portrait rig) when
 // the page is torn down, so logout/login reload cycles don't exhaust the GPU
 // context pool and break the next renderer with "Error creating WebGL context".
@@ -2553,14 +2556,10 @@ async function startGame(
       return;
     }
     if (key === 'forceHighPerfGpu') {
-      const force = settings.set('forceHighPerfGpu', !!value);
-      // The setting is "force the dedicated GPU"; the shell stores the INVERSE
-      // opt-out, so the crossing inverts exactly once here. The shell applies it
-      // at startup, so nothing changes in the running session, and a failed
-      // write must never throw into the options window.
-      void desktopBridge()
-        ?.setGpuForceOptOut?.(!force)
-        ?.catch(() => {});
+      // The push owns the inversion (the shell stores the opt-out) and swallows
+      // a failed write; the shell applies it at its next launch, so nothing in
+      // the running session changes.
+      pushDesktopGpuPref(desktopBridge(), settings.set('forceHighPerfGpu', !!value));
       return;
     }
     if (key === 'showDevBadges') {

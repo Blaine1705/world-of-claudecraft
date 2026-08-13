@@ -9,8 +9,9 @@
 //
 // The renderer setting (forceHighPerfGpu, default true) and the shell store
 // field (gpuForceOptOut, default false) are INVERSES: forcing the GPU on means
-// opting out is off. Every crossing inverts exactly once: here on the way in,
-// and in the options write arm (main.ts applySetting) on the way out.
+// opting out is off. BOTH crossings live here, one inversion each (the boot
+// read below and the options write push), so main.ts stays a thin consumer and
+// a Vitest can pin either polarity without a DOM or a live shell.
 //
 // Lives in src/game so main.ts stays a firewall (composition only), beside the
 // other bridge consumers (desktop_gpu_status.ts, desktop_presentation.ts).
@@ -36,6 +37,29 @@ export function desktopGpuPrefSupported(bridge: DesktopBridge | null | undefined
 }
 
 /**
+ * Push a player's choice to the shell store, inverting once: the row reads
+ * "force the dedicated GPU", the shell stores the opt-out. Fire and forget by
+ * design, since the shell applies it at the NEXT launch and nothing in the
+ * running session depends on the answer, and total: an older shell without the
+ * setter, a dead IPC channel that throws synchronously, and a rejected write
+ * all leave the options window undisturbed.
+ */
+export function pushDesktopGpuPref(
+  bridge: DesktopBridge | null | undefined,
+  forceHighPerfGpu: boolean,
+): void {
+  const write = bridge?.setGpuForceOptOut;
+  if (typeof write !== 'function') return;
+  try {
+    // Promise.resolve also covers a shell that answers synchronously; without
+    // the catch a rejected write would surface as an unhandled rejection.
+    void Promise.resolve(write.call(bridge, !forceHighPerfGpu)).catch(() => {});
+  } catch {
+    /* the shell's channel is gone; the stored setting is still the player's */
+  }
+}
+
+/**
  * Reflect the shell's stored GPU preference into the local setting at boot, so
  * the options row reads what the next launch will do rather than a local guess.
  *
@@ -44,10 +68,16 @@ export function desktopGpuPrefSupported(bridge: DesktopBridge | null | undefined
  * the reflection through it would echo the shell's own value straight back at
  * it. Absent method (older shell or plain browser), a rejected read, or a
  * non-boolean answer all write nothing and leave the stored value alone.
+ *
+ * Takes a settings FACTORY, not a store: Settings snapshots localStorage in its
+ * constructor and save() rewrites the whole blob, so a store built before the
+ * bridge round trip would revert every write that landed during it (the
+ * first-run graphics preset, the entry-crash safe-preset step-down). Building
+ * it after the read shrinks that window to a single microtask.
  */
 export async function syncDesktopGpuPrefSetting(
   bridge: DesktopBridge | null | undefined,
-  settings: DesktopGpuPrefSettings,
+  createSettings: () => DesktopGpuPrefSettings,
 ): Promise<void> {
   const read = bridge?.getGpuForceOptOut;
   if (typeof read !== 'function') return;
@@ -60,5 +90,5 @@ export async function syncDesktopGpuPrefSetting(
     return;
   }
   if (typeof optOut !== 'boolean') return;
-  settings.set('forceHighPerfGpu', !optOut);
+  createSettings().set('forceHighPerfGpu', !optOut);
 }
