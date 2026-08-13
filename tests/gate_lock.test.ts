@@ -198,6 +198,51 @@ describe('acquireFullSuiteLock: stale reclaim', () => {
     expect(sleepCalls).toBe(0);
     release();
   });
+
+  it('does not remove a newer holder created between the stale read and the reclaim unlink', async () => {
+    // Two waiters both observe the same stale holder (pid 999_999_999). Between this
+    // waiter's initial stale-read and its reclaim unlink, a second (faster) waiter
+    // races ahead, removes the stale lock, and installs its own fresh one. The
+    // re-read immediately before unlinking must see that swap and skip the unlink,
+    // rather than deleting the second waiter's brand new lock out from under it.
+    fs.writeFileSync(lockPath(), JSON.stringify({ pid: 999_999_999, startedAt: 0 }));
+    let readCalls = 0;
+    const readFile = (p: fs.PathOrFileDescriptor, enc: BufferEncoding) => {
+      readCalls++;
+      if (readCalls === 2) {
+        // The re-read right before unlink: simulate the second waiter's race here.
+        fs.writeFileSync(lockPath(), JSON.stringify({ pid: 5555, startedAt: 1_000 }));
+      }
+      return fs.readFileSync(p, enc);
+    };
+    let unlinkCalls = 0;
+    const unlink = (p: fs.PathLike) => {
+      unlinkCalls++;
+      fs.unlinkSync(p);
+    };
+
+    let nowMs = 1_000;
+    await acquireFullSuiteLock({
+      lockDir,
+      lockFileName: LOCK_FILE_NAME,
+      pid: 4242,
+      now: () => nowMs,
+      sleep: () => {
+        nowMs += 10; // advance the clock so the bounded wait below actually terminates
+        return Promise.resolve();
+      },
+      isAlive: (pid) => pid === 5555, // the raced-in holder is alive, so the wait ends there
+      readFile,
+      unlink,
+      maxWaitMs: 1,
+    });
+
+    expect(unlinkCalls).toBe(0);
+    expect(JSON.parse(fs.readFileSync(lockPath(), 'utf8'))).toEqual({
+      pid: 5555,
+      startedAt: 1_000,
+    });
+  });
 });
 
 describe('acquireFullSuiteLock: opt-out', () => {

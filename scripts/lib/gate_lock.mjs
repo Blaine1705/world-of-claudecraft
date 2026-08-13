@@ -182,7 +182,28 @@ export async function acquireFullSuiteLock(opts = {}) {
       const holder = readHolder(lockPath, readFile);
       if (isStale(holder, now, staleMs, isAlive)) {
         try {
-          unlink(lockPath);
+          // Re-read immediately before unlinking and only remove the file if it still
+          // names the exact holder just judged stale (same pid and startedAt). Without
+          // this, two waiters that both observed the same stale holder could otherwise
+          // race: the first unlinks the stale file and creates its own fresh lock, then
+          // the second (still acting on its earlier read) unlinks that fresh lock too,
+          // letting a third waiter (or the second itself) acquire while the first still
+          // believes it holds the lock. A holder that no longer matches means someone
+          // else already reclaimed it, so this waiter loops back and re-evaluates rather
+          // than removing a lock it never actually observed as stale.
+          const current = readHolder(lockPath, readFile);
+          const stillSameHolder = holder
+            ? current && current.pid === holder.pid && current.startedAt === holder.startedAt
+            : !current; // originally corrupt/missing: still safe to reclaim iff still so
+          if (stillSameHolder) {
+            try {
+              unlink(lockPath);
+            } catch (err) {
+              // someone else already removed the exact file we just re-verified: fine,
+              // the goal (this stale holder no longer blocks anyone) already holds
+              if (!(err && err.code === 'ENOENT')) throw err;
+            }
+          }
           consecutiveReclaimFailures = 0;
         } catch {
           consecutiveReclaimFailures++;
