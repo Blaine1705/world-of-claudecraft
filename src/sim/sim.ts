@@ -24,13 +24,13 @@ import {
   BAG_SOCKETS,
   bagCapacity,
   canAddItem,
-  canGrantCopies,
   instancedCountCap,
   migrationBagsFor,
   stackSizeOf,
 } from './bags';
 import * as bankMod from './bank';
 import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
+import { extractTradableCopyImpl, grantTradableCopyImpl } from './broker_custody';
 import { campSpawnOffset } from './camp_scatter';
 import { advanceClimb, tryStartClimb } from './climb';
 import {
@@ -184,6 +184,7 @@ import {
   type SavedCooldowns,
   serializeCooldowns,
 } from './cooldown_persist';
+import { dailyRewardsStub } from './daily_rewards_stub';
 import type { DelveShopGate, DelveShopOffer } from './data';
 import {
   ABILITIES,
@@ -265,14 +266,13 @@ import { formatMoney } from './format_money';
 import type { GuildBankState, GuildMembership } from './guild_bank';
 import * as guildBankMod from './guild_bank';
 import * as interaction from './interaction';
-import { type ExtractOutcome, type ExtractRef, extractTradableCopy } from './inventory_extract';
+import type { ExtractOutcome, ExtractRef } from './inventory_extract';
 import {
   boundCraftedRecipeIdOnLoad,
   sanitizeItemInstancePayloadOnLoad,
   warnDroppedInstanceKeys,
 } from './item_instance_load';
 import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
-import { grantCopies } from './item_instance_transfer';
 import { meetsLevelRequirement } from './item_level_req';
 import { setItemLocked as setItemLockedCmd } from './item_lock';
 import * as items from './items';
@@ -339,7 +339,6 @@ import {
 } from './mount_race';
 import {
   forceDismount as forceDismountImpl,
-  mountOwned,
   ownedMounts as ownedMountsImpl,
   toggleMount as toggleMountImpl,
   updateMountTransition,
@@ -4765,31 +4764,10 @@ export class Sim {
     return Promise.resolve(paginateDeedsLeaderboard([], page, pageSize));
   }
 
+  // The offline constant readout (#1307) lives in daily_rewards_stub.ts, the
+  // one file the $WOC token firewall allows to name chain vocabulary.
   dailyRewards(): Promise<DailyRewardStatus> {
-    const day = '1970-01-01';
-    return Promise.resolve({
-      enabled: true,
-      day,
-      resetAt: '1970-01-02T00:00:00.000Z',
-      prizePoolUsd: 0,
-      prizePoolSol: null,
-      eligibility: {
-        eligible: false,
-        reason: 'no_wallet',
-        banReason: null,
-        walletPubkey: null,
-        wocBalance: null,
-        wocUsdPrice: null,
-        usdValue: null,
-        minUsd: 20,
-      },
-      score: 0,
-      rank: null,
-      spin: { claimed: false, points: null, outcomeKey: null, claimedAt: null },
-      tasks: [],
-      leaderboard: [],
-      leaderboardTotal: 0,
-    });
+    return dailyRewardsStub();
   }
 
   dailyRewardLeaderboard(
@@ -8890,77 +8868,15 @@ export class Sim {
     this.ctx.onInventoryChangedForQuests(meta);
   }
 
-  // Exact-copy escrow extraction for a broker (the server's $WOC marketplace
-  // listing flow): one unit of the referenced slot leaves the bags, instance
-  // payload intact. The legality gates and the stale-reference checks live in
-  // the pure leaf (inventory_extract.ts); this is the thin facade delegate a
-  // foreign caller resolves, matching the inventory hub's shape. The sim stays
-  // currency-blind here: what the broker does with the copy is server business.
+  // The broker custody pair (extraction into escrow, grant back) lives in
+  // broker_custody.ts; these stay as the delegates server/woc_market_custody.ts
+  // resolves on the Sim facade.
   extractTradableCopy(pid: number | undefined, ref: ExtractRef): ExtractOutcome {
-    const r = this.resolve(pid);
-    if (!r) return { ok: false, reason: 'not_found' };
-    const def = ITEMS[ref.itemId];
-    const out = extractTradableCopy(r.meta.inventory, ref, def);
-    if (out.ok) {
-      this.ctx.onInventoryChangedForQuests(r.meta);
-      // Ownership is derived from HOLDING the item (mountOwned reads the bags and
-      // the bank), but a live ride is never re-validated once it has started. So
-      // a seller who lists the mount they are riding would keep its speed for the
-      // rest of the session while the buyer owned it. Dismount at the point
-      // ownership actually ends.
-      //
-      // This was the only ownership-loss path when it was written, because reins
-      // were soulbound and noDiscard. v0.35.0 un-soulbound the player reins, so
-      // trade, mail and the guild bank can now move a mount too, and none of
-      // those dismount the rider (social/trade.ts and mail/post_office.ts make no
-      // mention of mountKey). That is a gap in those paths rather than this one,
-      // and it is the same shape: the fix belongs at each point ownership ends.
-      if (def?.kind === 'mount' && r.e.mountKey === def.mount && !mountOwned(r.meta, def.mount)) {
-        forceDismountImpl(this.ctx, r.e);
-      }
-    }
-    return out;
+    return extractTradableCopyImpl(this.ctx, pid, ref);
   }
 
-  /**
-   * The inverse of extractTradableCopy: put an escrowed copy back INTO a
-   * player's bags, or refuse when it does not fit.
-   *
-   * Checked and granted in ONE call through the shared canGrantCopies /
-   * grantCopies pair, deliberately. Splitting them across the seam is how the
-   * overflow class in #2139 re-opens: a caller that pre-checks with a different
-   * shape than it grants with (payload-blind, or missing the craftedRecipeId
-   * that decides which stack a plain grant merges into) can see room the grant
-   * cannot use, and overfill the recipient past the modelled cap.
-   *
-   * Returns whether the copy landed, so a broker holding the only copy can fall
-   * back to a delivery it can still complete rather than dropping it.
-   */
   grantTradableCopy(pid: number | undefined, slot: InvSlot): boolean {
-    const r = this.resolve(pid);
-    if (!r) return false;
-    const { meta } = r;
-    if (
-      !canGrantCopies(
-        meta.inventory,
-        bagCapacity(meta.bags),
-        slot.itemId,
-        slot.count,
-        slot.instance,
-        slot.craftedRecipeId,
-      )
-    ) {
-      return false;
-    }
-    grantCopies(
-      this.ctx,
-      meta.entityId,
-      slot.itemId,
-      slot.count,
-      slot.instance,
-      slot.craftedRecipeId,
-    );
-    return true;
+    return grantTradableCopyImpl(this.ctx, pid, slot);
   }
 
   // Enchanting-eligible count for `itemId` (#1712 review): a plain fungible

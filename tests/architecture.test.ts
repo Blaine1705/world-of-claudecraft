@@ -65,7 +65,9 @@ function onDiskCores(dir: string): string[] {
 // false positive. A shared twin lives at tests/helpers/strip_comments.ts; this
 // copy stays local ON PURPOSE (a load-bearing guard stays self-contained) and
 // the two may drift independently. String literals are left intact: the dotted patterns matched
-// below (Math.random, window., ...) do not appear inside the sim's player text.
+// below (Math.random, window., ...) do not appear inside the sim's player text, and neither does
+// the $WOC firewall's vocabulary, whose two words the game DOES use of its own accord (treasury,
+// signature) are matched only in their money-affixed compound forms for exactly that reason.
 // One alternation, so leftmost-first matching decides precedence: a line comment
 // whose text contains /* is consumed AS a line comment instead of opening a
 // bogus block that swallows everything to the next */ elsewhere in the file
@@ -1089,21 +1091,18 @@ describe('server host-layer import invariants', () => {
 // The $WOC token firewall (docs/prd/woc/marketplace.md "Constraints"): no
 // wallet, token, or settlement code may live in src/sim. The PRD names this
 // scan as the mechanical enforcement, so it exists here rather than as prose.
-// The allowlist is the ONE pre-existing tenant: holder_tier.ts is the cosmetic
-// holder-tier ladder (a pure threshold function over a number), plus the
-// PlayerMeta holder fields it feeds.
+// The allowlist is read-only projections of chain state, never money logic.
 describe('the $WOC token firewall over src/sim', () => {
-  // The three PRE-EXISTING tenants, each a read-only projection of chain state
-  // rather than money logic: holder_tier.ts is the cosmetic holder ladder (a
-  // pure threshold function over a number), types.ts declares the holder fields
-  // and the daily-rewards readout shape it feeds, and sim.ts carries the
-  // offline daily-rewards stub for that readout (#1307). A NEW file wanting on
-  // this list is the signal the firewall is being breached, not extended.
-  const FIREWALL_ALLOWED = new Set([
-    'src/sim/holder_tier.ts',
-    'src/sim/types.ts',
-    'src/sim/sim.ts',
-  ]);
+  // The ONE tenant: daily_rewards_stub.ts, the offline daily-rewards readout
+  // (#1307), which is a constant literal with no logic behind it. It was carved
+  // out of sim.ts precisely so the coordinator is scanned like every other
+  // file. holder_tier.ts and types.ts came OFF this list when they were
+  // measured against the pattern: the cosmetic holder ladder and the holder
+  // field declarations name none of this vocabulary outside comments, and an
+  // allowlist entry that is not covering a real hit only hides the next one.
+  // A NEW file wanting on this list is the signal the firewall is being
+  // breached, not extended.
+  const FIREWALL_ALLOWED = new Set(['src/sim/daily_rewards_stub.ts']);
   // Identifier-shaped money/chain vocabulary. Deliberately NOT matched inside
   // comments (the escrow prose in market.ts and inventory_extract.ts is fine):
   // the scan strips comments first, exactly like the sibling purity scans.
@@ -1116,8 +1115,14 @@ describe('the $WOC token firewall over src/sim', () => {
   // is a place on a map, not a fee destination. Every shape this firewall exists
   // to catch is compound anyway (treasuryWallet, treasuryBps), and the bare word
   // was the one token here that could flag ordinary content.
+  // `signature` is narrowed the same way and for the same reason: the bare word
+  // is the game's own vocabulary (the talent-spec `signature` field, ability and
+  // reliquary descriptions calling something a signature move), while every leak
+  // shape is a money-affixed compound (txSignature, signature_reused,
+  // signatureRequired). Bare `token` is left out entirely on the same grounds
+  // (riftToken, chatTokens).
   const FIREWALL_RE =
-    /(?:wallet|pubkey|solana|usdcents|pricecents|amountbase|settlementquote|bondcents|treasury[_-]?(?:wallet|pubkey|address|bps|cents|leg|share)|custodyclaim)/i;
+    /(?:wallet|pubkey|solana|usdcents|pricecents|amountbase|settlementquote|bondcents|treasury[_-]?(?:wallet|pubkey|address|bps|cents|leg|share)|custodyclaim|lamports|base58|(?:tx|txn|bond|settlement|burn|transfer)[_-]?signature|signature[_-]?(?:reused|required|field))/i;
 
   it('keeps wallet, token, and settlement identifiers out of every sim file', () => {
     const offenders: string[] = [];
@@ -1142,6 +1147,19 @@ describe('the $WOC token firewall over src/sim', () => {
     expect(FIREWALL_RE.test('const dest = cfg.treasuryWallet;')).toBe(true);
     expect(FIREWALL_RE.test('const bps = TREASURY_BPS;')).toBe(true);
     expect(FIREWALL_RE.test("{ id: 'treasury', x0: 32, x1: 42 }")).toBe(false);
+    // The chain-settlement arms: an on-chain amount, an address encoding, and
+    // both compound signature shapes.
+    expect(FIREWALL_RE.test('const sig = row.txSignature;')).toBe(true);
+    expect(FIREWALL_RE.test('const b = toBase58(pk);')).toBe(true);
+    expect(FIREWALL_RE.test('const fee = LAMPORTS_PER_SOL / 2;')).toBe(true);
+    expect(FIREWALL_RE.test("if (reason === 'signature_reused') {")).toBe(true);
+    // ...and the game's own `signature`, which the narrowing must leave alone:
+    // player copy, the talent-spec field, and an ordinary derived-key helper.
+    expect(
+      FIREWALL_RE.test("description: 'Blasts nearby enemies with frost. (Frost signature)'"),
+    ).toBe(false);
+    expect(FIREWALL_RE.test("signature: 'mortal_strike',")).toBe(false);
+    expect(FIREWALL_RE.test('stationTypesSignature(types)')).toBe(false);
   });
 });
 
