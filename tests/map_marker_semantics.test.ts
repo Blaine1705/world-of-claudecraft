@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   classifyMapObjectMarker,
-  mapMarkerSemanticLayer,
   type MapMarkerSemantic,
   type MapMarkerSemanticContext,
+  mapMarkerSemanticLayer,
 } from '../src/ui/map_marker_semantics_core';
 
 const BASE_CONTEXT: MapMarkerSemanticContext = {

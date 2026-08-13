@@ -4,9 +4,9 @@ import {
   MAP_MARKER_SIZES,
   type MapMarkerArtId,
   type MapMarkerSize,
-  type SemanticMapMarkerArt,
   mapMarkerSizeForSemantic,
   mapMarkerSizesFor,
+  type SemanticMapMarkerArt,
   semanticMapMarkerArt,
 } from '../src/ui/map_marker_icon_art';
 import { createMapMarkerArt } from '../src/ui/map_marker_icon_loader';

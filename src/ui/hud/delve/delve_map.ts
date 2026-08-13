@@ -2,12 +2,12 @@
 // takes plain data in, returns draw primitives or strings.
 // Imported by hud.ts; tested by tests/delve_map.test.ts.
 
+import { delveModuleZOffset } from '../../../sim/data';
 import {
   isLitanyModuleId,
   litanyModuleGeometry,
   litanyModuleMapPrimitives,
 } from '../../../sim/delve_litany_layout';
-import { delveModuleZOffset } from '../../../sim/data';
 import type { DungeonLayout } from '../../../sim/dungeon_layout';
 
 export type DelveMapFit = 'rect' | 'circle';
@@ -224,11 +224,9 @@ export function delveSchematicStatic(
         });
       } else if (prim.kind === 'circle') {
         const { cx, cy } = delveLocalToCanvas(prim.x, prim.z, layout, canvasSize, pad, fit);
-        if (prim.role === 'exit') {
+        if (prim.role !== 'exit') {
           // Authored layout exits describe topology, not live availability.
           // The entity overlay owns sealed/open/finale truth.
-          continue;
-        } else {
           // World-space rx/rz (an authored ellipse, e.g. the apse moat) win over
           // the uniform r on each axis independently, before the canvas's own
           // per-axis scale (sx/sz) is applied.

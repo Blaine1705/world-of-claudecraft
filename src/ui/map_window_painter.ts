@@ -61,8 +61,8 @@ import {
 import type { MapMarkerProfile } from './map_marker_profile_core';
 import {
   buildOverworldMapModel,
-  type MapDetail,
   type MapAllyMarker,
+  type MapDetail,
   type MapGatherNodeMarker,
   type MapNavigationMarker,
   type MapNpcMarker,
