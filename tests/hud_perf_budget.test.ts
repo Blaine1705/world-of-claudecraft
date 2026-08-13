@@ -662,6 +662,7 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
 const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'continent_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'hud/delve/delve_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
+  { file: 'hud/rift/rift_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'hud/battleground/battleground_atlas_marks_painter.ts', allow: {}, reflowAllow: {} },
   // the M-map Thornhollow Fields plan: canvas-only, redrawn on the map cadence;
   // like minimap it caches its one --color-* group resolve for the session
