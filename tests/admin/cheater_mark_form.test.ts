@@ -5,6 +5,8 @@ import {
   cheaterMarkHoursToSeconds,
   liftCheaterMark,
 } from '../../src/admin/cheater_mark_form';
+import { t } from '../../src/admin/i18n';
+import { en } from '../../src/admin/i18n.en';
 import { CHEATER_MARK_MAX_SECONDS } from '../../src/sim/moderation';
 
 // Pure validation + endpoint/body shaping for the Cheater mark panel. Runs in the
@@ -33,6 +35,18 @@ describe('cheater_mark_form', () => {
     // 100-hour bound is restated in cheater_mark_form.ts. This pin fails loudly
     // if either side moves alone.
     expect(CHEATER_MARK_MAX_HOURS * 3600).toBe(CHEATER_MARK_MAX_SECONDS);
+  });
+
+  it('parameterizes the duration alert with the shared ceiling, not a literal', () => {
+    // Same contract as alert.restoreCountRange: the prose carries {max} and the
+    // call site (CheaterMarkControls) threads CHEATER_MARK_MAX_HOURS in, so moving
+    // the ceiling can never leave a stale number in front of an operator.
+    const template = (en as Record<string, string>)['alert.cheaterMarkDurationInvalid'];
+    expect(template).toContain('{max}');
+    expect(template).not.toContain(String(CHEATER_MARK_MAX_HOURS));
+    expect(t('alert.cheaterMarkDurationInvalid', { max: CHEATER_MARK_MAX_HOURS })).toContain(
+      String(CHEATER_MARK_MAX_HOURS),
+    );
   });
 
   it('requires a note for both actions', () => {
