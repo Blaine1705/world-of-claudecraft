@@ -36,9 +36,10 @@ needs a maintainer decision:
 An ACCOUNT-scoped tag every character on the account wears until a budget of
 PLAYED seconds is burned down.
 
-- **Account-scoped, not character-scoped.** The mark lives on `accounts`, is
-  pushed onto `PlayerMeta` at world join by the server, and the remaining budget
-  is written back on save. Rolling an alt does not escape it.
+- **Account-scoped, not character-scoped.** The mark lives on `accounts`; the
+  server pushes the remaining budget into the world at join through
+  `Sim.setCheaterMark`, which puts it on the aura (the sim keeps no other copy),
+  and reads it back off that aura on save. Rolling an alt does not escape it.
 - **Played seconds, never wall clock.** A wall-clock sanction expires while the
   account is logged out, which is precisely the window a sanctioned player waits
   out. The budget burns only while in world.
