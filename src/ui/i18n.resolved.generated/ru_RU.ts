@@ -6550,6 +6550,7 @@ export const ru_RU: EnTranslations = {
     "email": "Эл. почта",
     "emailPlaceholder": "ivan@example.com",
     "emailError": "Введите корректный адрес эл. почты.",
+    "marketingOptIn": "Присылайте мне новости и обновления игры (необязательно)",
     "showPassword": "Показать пароль",
     "hidePassword": "Скрыть пароль",
     "logIn": "Войти",

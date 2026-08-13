@@ -341,6 +341,7 @@ export type TranslationKeyFlat =
   | 'auth.loadingRealms'
   | 'auth.logIn'
   | 'auth.makeupNone'
+  | 'auth.marketingOptIn'
   | 'auth.mouth'
   | 'auth.mouthAwe'
   | 'auth.mouthFrown'

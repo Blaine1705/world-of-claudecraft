@@ -6550,6 +6550,7 @@ export const nl_NL: EnTranslations = {
     "email": "E-mail",
     "emailPlaceholder": "jij@voorbeeld.nl",
     "emailError": "Voer een geldig e-mailadres in.",
+    "marketingOptIn": "Email me game news and updates (optional)",
     "showPassword": "Wachtwoord tonen",
     "hidePassword": "Wachtwoord verbergen",
     "logIn": "Inloggen",

@@ -1465,6 +1465,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'auth.passwordPlaceholder': '请输入密码',
   'auth.email': '邮箱',
   'auth.emailError': '请输入有效的邮箱地址。',
+  'auth.marketingOptIn': '向我发送游戏新闻和更新邮件（可选）',
   'auth.recovery.title': '添加找回邮箱',
   'auth.recovery.body':
     '设置一个邮箱地址，以便您可以找回自己的账户。我们仅在您需要重置密码时，用它来确认您是本账户的所有者。',

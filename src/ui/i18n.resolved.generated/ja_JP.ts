@@ -6550,6 +6550,7 @@ export const ja_JP: EnTranslations = {
     "email": "メールアドレス",
     "emailPlaceholder": "mail@example.com",
     "emailError": "有効なメールアドレスを入力してください。",
+    "marketingOptIn": "ゲームのニュースやアップデートをメールで受け取る（任意）",
     "showPassword": "パスワードを表示",
     "hidePassword": "パスワードを非表示",
     "logIn": "ログイン",
