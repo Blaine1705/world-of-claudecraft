@@ -1420,20 +1420,25 @@ describe('actionBarView: the aria-label is resolved in the core via the injected
     expect(view.tick(world()).slots[0].ariaLabel).not.toContain('abilityUi.actionBar');
   });
 
-  it('the proc aria key exists in the real catalog and announces the ready state', () => {
+  it('the proc aria description key exists in the real catalog and announces the ready state', () => {
     const view = createActionBarView(
       descriptor(slot(0, { ability: ability('arcane_missiles', { cost: 105 }) })),
       { ...fakeDeps(), t: realT },
     );
-    const label = view.tick(world({ auras: [{ kind: 'arcane_charge', value: 4, stacks: 4 }] }))
-      .slots[0].ariaLabel;
-    expect(label).toBe(
-      realT('abilityUi.actionBar.procSlotAria', {
+    const procSlot = view.tick(
+      world({ auras: [{ kind: 'arcane_charge', value: 4, stacks: 4 }] }),
+    ).slots[0];
+    // The proc state keeps the stable slot label and announces readiness via
+    // the aria-description channel (the shared glossary term), so the label
+    // itself never churns mid-combat.
+    expect(procSlot.ariaLabel).toBe(
+      realT('abilityUi.actionBar.slotAria', {
         slot: '1',
         ability: 'ability:arcane_missiles',
       }),
     );
-    expect(label).toContain('special effect active');
+    expect(procSlot.ariaDescription).toBe(realT('guide.glossary.procTerm'));
+    expect(procSlot.ariaDescription).not.toContain('guide.glossary');
   });
 });
 

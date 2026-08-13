@@ -236,8 +236,11 @@ describe('mobile action ring: proc state remains perceptible', () => {
     );
     expect(steadyRule).toContain('border-color: #ffd97a;');
     expect(steadyRule).toMatch(/box-shadow:\s*[\s\S]*#ffcf40e6/);
+    // The override may share its block with other selectors (button.empowered
+    // groups with it upstream): [^{]* spans the rest of the selector list, so
+    // this still proves button.proc itself receives animation: none.
     expect(MOBILE_HUD_CSS).toMatch(
-      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?body\.mobile-touch #mobile-action-ring button\.proc\s*\{[^}]*animation:\s*none/,
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?body\.mobile-touch #mobile-action-ring button\.proc[^{]*\{[^}]*animation:\s*none/,
     );
   });
 });
