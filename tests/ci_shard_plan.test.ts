@@ -326,9 +326,11 @@ describe('the long-sims lane (Phase 4)', () => {
       'tests/owned_class_balance_healer_contract.test.ts',
       'tests/owned_class_raid_sustain_bands.test.ts',
     ]);
-    // Exact partition of the union the shard legs exclude: a lane file in
-    // neither half would be excluded from every shard but run by no lane job,
-    // a silent coverage hole; a file in both would double-run.
+    // Exact partition of the union the shard legs exclude. Half b is DERIVED
+    // (union minus half a), so "in neither half" and "in both halves" are
+    // structurally impossible now; what this still catches is a half-a entry
+    // that is not a union member (which would double-run a file the shards
+    // do not exclude) and any ordering drift in the parent list.
     expect(Object.keys(CI_LONG_SUITE_HALVES).sort()).toEqual(['a', 'b']);
     expect([...CI_LONG_SUITE_HALVES.a, ...CI_LONG_SUITE_HALVES.b].sort()).toEqual([
       ...CI_LONG_SUITES,
@@ -585,6 +587,26 @@ describe('the long-sims lane (Phase 4)', () => {
     expect(none.mode).toBe('selective');
     expect(none.laneFiles).toEqual([]);
     expect(none.legs).toEqual([]);
+    // Half b's selective floor-intersection path, with a real half-b member
+    // on the floor: on the current tree half b has no floor-classified file,
+    // so the real-tree subprocess case can only ever see its zero-leg shape;
+    // this fixture keeps the non-empty b path asserted.
+    const LANE_B_FLOOR = 'tests/druid_balance_probe.test.ts';
+    const planB = buildLanePlan({
+      ...LANE_BASE,
+      alwaysRun: [...ALWAYS, LANE_B_FLOOR],
+      testFiles: [...COLLECTED, LANE_B_FLOOR],
+      half: 'b' as const,
+    });
+    expect(planB.mode).toBe('selective');
+    expect(planB.laneFiles).toEqual([LANE_B_FLOOR]);
+    expect(planB.legs).toEqual([
+      {
+        name: 'npm test (long-sims-b lane, 1 file(s))',
+        cmd: 'npm',
+        args: ['test', '--', LANE_B_FLOOR, '--maxWorkers=2'],
+      },
+    ]);
   });
 
   it('shards plus the two lanes partition the collected suite in both modes', () => {
@@ -728,14 +750,13 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
   });
 
   it('lane selective mode runs only the floor lane members of each half for a leaf UI diff', async () => {
-    // Real-tree expectation: tests/battleground.test.ts (half a) and
-    // tests/nythraxis_matrix.test.ts (half b) classify blind/partial (floor)
-    // today and the other lane files are graph-visible, so a UI-only diff's
-    // lanes are exactly those two floor members, one per half.
-    // (nythraxis_matrix already ran on every selective run as shard floor
-    // before it joined the lane, so this is the same cost relocated, not new
-    // cost.) If a lane file's classification changes, this pin fails and the
-    // lane cost model must be re-decided consciously (see the phase notes).
+    // Real-tree expectation: tests/nythraxis_matrix.test.ts (half a) is the
+    // only lane file that classifies blind/partial (floor) today; every other
+    // lane file, half b's entire membership included, is graph-visible. So a
+    // UI-only diff's lane a runs exactly that one floor member and lane b
+    // takes the documented zero-leg path. If a lane file's classification
+    // changes, this pin fails and the lane cost model must be re-decided
+    // consciously.
     const env = {
       TEST_MODE: 'selective',
       TEST_MODE_REASON: 'selective: 1 changed source file(s)',
@@ -761,7 +782,9 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
       'plan: mode=selective (selective: 0 of 7 lane file(s) on the floor or changed)',
     );
     expect(runB.log).toContain('lane runs: nothing');
-    expect(runB.log).not.toContain('tests/nythraxis_matrix.test.ts');
+    // Binding negative: zero legs means no npm test invocation is printed at
+    // all (a filename negative would be vacuous against the "nothing" line).
+    expect(runB.log).not.toContain('npm test');
   });
 
   async function listVitestFilesExcluding(

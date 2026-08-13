@@ -88,12 +88,17 @@ export const CI_GUARD_PREFIXES = Object.freeze(['tests/parity/']);
  * whole suite in their 8 shards, so the post-merge backstop is untouched.
  */
 export const CI_LONG_SUITES = Object.freeze([
-  // 2026-08-13 remeasure (run 31732244215, both lanes fully loaded):
-  // battleground (14.4 s) and audit_conservation_property (55.1 s) had drifted
-  // far under the 90 second rule and left for the shard pool; the chronomancy
-  // suite split three ways and only its balance-targets file still clears the
-  // rule (the heal-parity and Cascada pieces shard); the warlock sustain suite
-  // split per spec and its pieces shard pending an in-shard measurement.
+  // 2026-08-13 remeasure (run 31732244215, both lanes fully loaded; figures
+  // are IN-LANE and stay far under 90 even at the recorded 1.6x runner
+  // ratio): battleground (14.4 s) and audit_conservation_property (55.1 s)
+  // left for the shard pool. Eviction safety is structural, not
+  // classification-dependent: lane membership only changes WHERE a file runs,
+  // never WHETHER (a floor member like battleground rides the selective floor
+  // leg instead of the lane; a graph member like audit_conservation runs via
+  // the unfiltered related leg either way). The chronomancy
+  // suite split three ways and only its balance-targets file stays lane-listed
+  // (the heal-parity and Cascada pieces shard, like the warlock sustain
+  // suite's per-spec pieces, both pending a per-piece in-shard measurement).
   // druid_balance_probe stays WHOLE: its cost is one matrix test whose
   // bestDruidBuilds assertions are an argmax across capstones, so a
   // per-capstone split would weaken the winner selection it pins.

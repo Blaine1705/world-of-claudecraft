@@ -36,7 +36,11 @@ describe('balance diet helper', () => {
   it('keeps all three raid levels on the sweep arm and only level 24 on the diet', () => {
     expect(raidScenariosUnderTest(true).map((s) => s.targetLevel)).toEqual([22, 23, 24]);
     expect(raidScenariosUnderTest(false).map((s) => s.targetLevel)).toEqual([24]);
-    for (const scenario of raidScenariosUnderTest(true)) {
+    // BOTH arms keep the 120 s window and the real boss template: the raid
+    // diet reduces levels and seeds only, never the window (the helper's
+    // contract; a diet member quietly halving its window would hollow out the
+    // long-fight guards while this file stayed green on the sweep arm alone).
+    for (const scenario of [...raidScenariosUnderTest(true), ...raidScenariosUnderTest(false)]) {
       expect(scenario.seconds).toBe(120);
       expect(scenario.targetTemplateId).toBe('nythraxis_scourge_of_thornpeak');
     }

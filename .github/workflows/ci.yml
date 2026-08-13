@@ -616,7 +616,7 @@ jobs:
   # two parallel jobs by the lane-diet PR). The pair runs the CI_LONG_SUITES
   # files (scripts/lib/ci_shard_plan.mjs) that every pr-gate shard leg
   # excludes, one CI_LONG_SUITE_HALVES half per job, so the lane's wall clock
-  # is the slower half instead of the whole nine-suite list. Same event
+  # is the slower half instead of the whole list. Same event
   # routing and code path filter as pr-gate, so each job reports (or
   # docs-only-skips) on every pull_request AND merge_group run, which is the
   # bar docs/merge-queue.md sets for a REQUIRED check; both jobs are required
