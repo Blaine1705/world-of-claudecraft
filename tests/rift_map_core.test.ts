@@ -147,16 +147,16 @@ function populatedDynamicWorld(delta: number): IWorld {
       {
         x: VIEW.origin.x + 8 + delta,
         z: VIEW.origin.z + 8 + delta,
-        radius: 3,
+        radius: 3 + delta,
         remaining: 2 - delta * 0.1,
-        total: 4,
+        total: 4 + delta,
       },
       {
         x: VIEW.origin.x + 9 + delta,
         z: VIEW.origin.z + 9 + delta,
-        radius: 5,
+        radius: 5 + delta,
         remaining: 3 - delta * 0.1,
-        total: 6,
+        total: 6 + delta,
       },
     ],
   ) as unknown as {
@@ -671,6 +671,7 @@ describe('rift map live model', () => {
     };
     const semantics = slots.objects.map((marker) => marker.semantic);
     const firstMobCx = slots.mobs[0].cx;
+    const firstDeathZone = { ...slots.deathZones[0] };
     const firstCorpseCx = slots.corpse.cx;
     const firstPlayerCx = slots.player.cx;
 
@@ -697,6 +698,10 @@ describe('rift map live model', () => {
     expect(second.corpse).toBe(slots.corpse);
     expect(second.player).toBe(slots.player);
     expect(second.mobs[0].cx).not.toBe(firstMobCx);
+    expect(second.deathZones[0]).toMatchObject({ remaining: 1.9, total: 5 });
+    expect(second.deathZones[0].cx).not.toBe(firstDeathZone.cx);
+    expect(second.deathZones[0].cy).not.toBe(firstDeathZone.cy);
+    expect(second.deathZones[0].radius).not.toBe(firstDeathZone.radius);
     expect(second.corpse.cx).not.toBe(firstCorpseCx);
     expect(second.player.cx).not.toBe(firstPlayerCx);
     expect(second.mobs[0].aggro).toBe(false);
