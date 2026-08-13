@@ -287,6 +287,7 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
             marketInfo: null,
             copper: 0,
             marketSearch: (query: MarketQuery) => queries.push(query),
+            marketSellPriceCheck: () => undefined,
             inventory: [],
           }) as never,
         closeOthers: () => undefined,

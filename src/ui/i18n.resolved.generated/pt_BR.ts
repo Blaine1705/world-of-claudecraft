@@ -8950,6 +8950,8 @@ export const pt_BR: EnTranslations = {
       "quantity": "Quantidade",
       "quantityOf": "de {count}",
       "priceEach": "Preço unitário",
+      "lowestPriceLabel": "Current lowest listed price",
+      "lowestPriceNone": "No active listings for this item yet.",
       "listButton": "Listar no Mercado Mundial",
       "minPriceError": "Informe um preço de pelo menos 1 cobre.",
       "collectEmpty": "Nada esperando. Receitas de venda e listagens expiradas ficam aqui.",

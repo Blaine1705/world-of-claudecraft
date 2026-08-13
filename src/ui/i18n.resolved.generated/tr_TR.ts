@@ -8950,6 +8950,8 @@ export const tr_TR: EnTranslations = {
       "quantity": "Miktar",
       "quantityOf": "/ {count}",
       "priceEach": "Adet fiyatı",
+      "lowestPriceLabel": "Current lowest listed price",
+      "lowestPriceNone": "No active listings for this item yet.",
       "listButton": "Dünya Pazarı'na koy",
       "minPriceError": "En az 1 bakır bir fiyat belirleyin.",
       "collectEmpty": "Bekleyen bir şey yok. Satış gelirleri ve süresi dolan ilanlar burada toplanır.",
