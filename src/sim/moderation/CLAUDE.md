@@ -44,15 +44,39 @@ PLAYED seconds is burned down.
   out. The budget burns only while in world.
 - **The aura IS the timer.** While a character is in world, one second of sim
   time is one second of played time, so the ordinary aura tick is already the
-  correct countdown. Do not add a second timer; two clocks drift.
+  correct countdown. Do not add a second timer, and do not keep a second copy of
+  the remaining budget on `PlayerMeta` or the entity: two clocks drift. The only
+  companion state is `Entity.cheaterMark`, a bare BOOLEAN the wire carries so a
+  nearby client can render the tag without being told the wearer's countdown.
 - **The tag is not a deed.** `WireEntity.title` carries a deed id resolved
   through `DEEDS`. Routing the tag there would put a punishment in a cosmetic
   reward catalogue AND make it removable through the ordinary title picker
   (`setActiveTitle` accepts `null` from the player). It rides its own wire field
   so no player-driven command can reach it.
-- **`undispellable`.** Same reason the recovery sicknesses carry it (see
-  `applySickness` in `../spirit.ts`): a penalty a dispel, a cleanse, or a
-  right-click can shed is not a penalty. Only its own timer clears it.
+- **Two guards against being shed, not one.** `undispellable` for the same reason
+  the recovery sicknesses carry it (see `applySickness` in `../spirit.ts`): a
+  penalty a dispel, a cleanse, or a right-click can shed is not a penalty. AND the
+  PHYSICAL school, which `isDispellableAura` (`../aura_classify.ts`) refuses
+  independently of that flag, the way the repo's other inert markers
+  (`flag_carried`, `internal_cd`) already do. One boolean is one careless edit
+  away from making the tag dispel food; the school is the guard that holds
+  without it.
+- **Nothing but the sanction ending takes it off.** Exactly three things clear the
+  mark: its own countdown reaching zero (the natural-expiry hook in
+  `../combat/auras.ts`, which also drops the wire flag), an operator lift
+  (`Sim.setCheaterMark(0)`, which emits the ordinary aura fade), and the budget
+  being written back at logout for the next session to resume. Every wipe a
+  player can trigger preserves it: death and every respawn/resurrect path
+  (`aurasSurvivingDeath`), arena entry and Fiesta down (`aurasSurvivingCleanSlate`),
+  both in `../resurrection.ts`. `tests/cheater_mark_lifecycle.test.ts` pins all of
+  them, because a sanction with an escape hatch is not a sanction.
+- **Not on a party or raid frame.** Those frames cap how many auras they draw and
+  sort harmful ones first, so a marked raider's tag would push a real dispellable
+  debuff off their healer's frame. That is an information handicap, which the one
+  rule above forbids as squarely as a stat change would be, so
+  `isPartyFrameRelevantAura` excludes the kind. The tag's render surfaces are the
+  nameplate and the target frame.
 
 Absent-when-empty throughout: an unmarked account's save and wire stay
-byte-identical to what they were before this system existed.
+byte-identical to what they were before this system existed, and every flag write
+uses the absent form (`undefined`), never `false`.
