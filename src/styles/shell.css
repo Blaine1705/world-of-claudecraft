@@ -3664,7 +3664,7 @@
     cursor: pointer;
   }
 
-  .auth-panel-premium .auth-optin input[type='checkbox'] {
+  .auth-panel-premium .auth-optin input[type="checkbox"] {
     display: inline-block;
     width: auto;
     margin-top: 2px;

@@ -108,12 +108,8 @@ describe('locale parsing', () => {
 describe('country parsing', () => {
   it('reads the configured geo header and validates the shape', () => {
     expect(geoCountryHeaderName({} as NodeJS.ProcessEnv)).toBe('cf-ipcountry');
-    expect(
-      parseSignupCountry({ 'cf-ipcountry': 'nz' }, {} as NodeJS.ProcessEnv),
-    ).toBe('NZ');
-    expect(
-      parseSignupCountry({ 'cf-ipcountry': 'NZL' }, {} as NodeJS.ProcessEnv),
-    ).toBeNull();
+    expect(parseSignupCountry({ 'cf-ipcountry': 'nz' }, {} as NodeJS.ProcessEnv)).toBe('NZ');
+    expect(parseSignupCountry({ 'cf-ipcountry': 'NZL' }, {} as NodeJS.ProcessEnv)).toBeNull();
     expect(parseSignupCountry({}, {} as NodeJS.ProcessEnv)).toBeNull();
   });
 

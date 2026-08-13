@@ -14,20 +14,16 @@
 // ({ success, data, error }) like every /admin/api route.
 
 import {
-  type AdminAuthDb,
-  ADMIN_META,
-  createRequireAdmin,
-} from './http/middleware/require_admin';
-import type { Ctx, RouteDef } from './http/types';
-import { json, readBody } from './http_util';
-import { accountAndScopeForToken, pool } from './db';
-import {
   type AdSpendRow,
   deleteAdSpend,
   listAdSpend,
   type UpsertAdSpendInput,
   upsertAdSpend,
 } from './ad_spend_db';
+import { accountAndScopeForToken, pool } from './db';
+import { ADMIN_META, type AdminAuthDb, createRequireAdmin } from './http/middleware/require_admin';
+import type { Ctx, RouteDef } from './http/types';
+import { json, readBody } from './http_util';
 import { adminRolesForAccount } from './staff_db';
 
 // ---------------------------------------------------------------------------
@@ -64,7 +60,8 @@ const requireAdmin = createRequireAdmin(
   }),
 );
 
-const ok = (ctx: Ctx, data: unknown): void => json(ctx.res, 200, { success: true, data, error: null });
+const ok = (ctx: Ctx, data: unknown): void =>
+  json(ctx.res, 200, { success: true, data, error: null });
 const failBody = (ctx: Ctx, status: number, error: string): void =>
   json(ctx.res, status, { success: false, data: null, error });
 

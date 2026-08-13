@@ -303,7 +303,10 @@ describe('register handler', () => {
   });
 
   it('captures the signup context (attribution, locale, opt-in) fire-and-forget', async () => {
-    const captures: Array<{ id: number; profile: { locale: string | null; marketingOptIn: boolean } }> = [];
+    const captures: Array<{
+      id: number;
+      profile: { locale: string | null; marketingOptIn: boolean };
+    }> = [];
     installDb({
       captureSignupContext: (id, _req, _body, profile) => {
         captures.push({ id, profile });

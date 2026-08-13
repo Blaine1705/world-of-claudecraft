@@ -275,7 +275,6 @@ import {
   type ListReadGuardState,
 } from './list_read_guard';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
-import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
 import {
   applyMobScanTick,
   createMobScanTickStats,
@@ -335,6 +334,7 @@ import { PgSocialDb } from './social_db';
 import { reconcileOnLogin as reconcileSteamOnLogin } from './steam/mirror';
 import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
+import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
 import { recordUnstuckEvent } from './unstuck_records';
 import { holderInfoForPubkey } from './woc_balance';
 import { isBackpressureExceeded } from './ws_backpressure';
@@ -9734,7 +9734,13 @@ export class GameServer {
       if ((ev.type === 'questAccepted' || ev.type === 'questDone') && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
         const level = this.sim.entities.get(ev.pid)?.level ?? 1;
-        if (s) recordFtueQuest(s, ev.type === 'questAccepted' ? 'quest_accepted' : 'quest_done', ev.questId, level);
+        if (s)
+          recordFtueQuest(
+            s,
+            ev.type === 'questAccepted' ? 'quest_accepted' : 'quest_done',
+            ev.questId,
+            level,
+          );
       }
       if (ev.type === 'death' && this.clients.has(ev.entityId)) {
         const s = this.clients.get(ev.entityId);

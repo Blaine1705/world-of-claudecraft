@@ -10,11 +10,7 @@ vi.mock('../../server/db', () => ({
   accountAndScopeForToken: vi.fn(async () => null),
 }));
 
-import {
-  resetAdSpendDbForTests,
-  routes,
-  setAdSpendDbForTests,
-} from '../../server/ad_spend';
+import { resetAdSpendDbForTests, routes, setAdSpendDbForTests } from '../../server/ad_spend';
 import type { AdSpendRow } from '../../server/ad_spend_db';
 import { upsertAdSpend } from '../../server/ad_spend_db';
 import { fakeCtx } from './helpers';

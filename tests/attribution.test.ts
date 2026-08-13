@@ -137,9 +137,9 @@ describe('stored record round trip', () => {
       'https://www.facebook.com/',
     );
     captureFirstTouch();
-    const raw = (globalThis as { localStorage: { getItem(k: string): string | null } }).localStorage.getItem(
-      FIRST_TOUCH_KEY,
-    );
+    const raw = (
+      globalThis as { localStorage: { getItem(k: string): string | null } }
+    ).localStorage.getItem(FIRST_TOUCH_KEY);
     expect(raw).toBeTruthy();
     expect(JSON.parse(raw as string)).toMatchObject({ fbclid: 'abc', utmMedium: 'paid' });
   });

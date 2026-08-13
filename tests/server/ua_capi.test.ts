@@ -9,7 +9,11 @@ vi.mock('../../server/db', () => ({
   accountMailTarget: vi.fn(async () => null),
 }));
 
-import { maybeTrackDay7Retained, trackLevelMilestoneCapi, type UaCapiDeps } from '../../server/ua_capi';
+import {
+  maybeTrackDay7Retained,
+  trackLevelMilestoneCapi,
+  type UaCapiDeps,
+} from '../../server/ua_capi';
 
 const session = {
   accountId: 7,

@@ -9951,7 +9951,8 @@ function wireStartScreens(): void {
         }
       } else {
         const email = ($('#login-email') as unknown as HTMLInputElement).value.trim();
-        const optIn = ($('#login-marketing') as unknown as HTMLInputElement | null)?.checked === true;
+        const optIn =
+          ($('#login-marketing') as unknown as HTMLInputElement | null)?.checked === true;
         const registered = await api.register(
           username,
           password,
@@ -9959,7 +9960,11 @@ function wireStartScreens(): void {
           token,
           REFERRAL_SLUG,
           nativeAttestation,
-          { attribution: registerAttributionPayload(), marketingOptIn: optIn, locale: getLanguage() },
+          {
+            attribution: registerAttributionPayload(),
+            marketingOptIn: optIn,
+            locale: getLanguage(),
+          },
         );
         trackMetaPixel(
           'AccountCreated',

@@ -18,8 +18,6 @@ vi.mock('../../server/progress_events_db', async (importOriginal) => {
   };
 });
 
-import { zoneAt } from '../../src/sim/data';
-import type { Entity } from '../../src/sim/types';
 import {
   progressEventsIdle,
   recordFtueDeath,
@@ -31,6 +29,8 @@ import {
   insertFtueEvent,
   insertLevelUpEvent,
 } from '../../server/progress_events_db';
+import { zoneAt } from '../../src/sim/data';
+import type { Entity } from '../../src/sim/types';
 
 const insertLevelUpMock = vi.mocked(insertLevelUpEvent);
 const insertFtueMock = vi.mocked(insertFtueEvent);

@@ -63,7 +63,6 @@ import { turnstile } from './http/middleware/turnstile';
 import type { Ctx, Middleware, RouteDef } from './http/types';
 import { isUniqueViolation, json, moderationErrorBody } from './http_util';
 import { metaEventSourceUrl, metaRequestUserData, trackAccountCreated } from './meta_capi';
-import { captureSignupContext, parseSignupProfile } from './signup_attribution';
 import { createSuspiciousRegistrationReport } from './moderation_db';
 import { createNativeAttestationChallenge } from './native_attestation';
 import { boostAccountCharacters, pbeBoostEnabled } from './pbe_boost';
@@ -75,6 +74,7 @@ import {
   recordAuthFailure,
   requestIp,
 } from './ratelimit';
+import { captureSignupContext, parseSignupProfile } from './signup_attribution';
 import { isWebClientRequest, webLoginEnforced } from './web_login_guard';
 
 // ---------------------------------------------------------------------------
