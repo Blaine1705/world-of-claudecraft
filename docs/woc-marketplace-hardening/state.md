@@ -5,20 +5,30 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-05-qa.md`
-- 05 implemented AND reviewed (LOCAL, not pushed per R4): H5, H6, the
-  coordinator-drift medium (broker custody extraction + the firewall
-  tighten) closed; ledger entry below. A database-performance
-  PRE-implementation checkpoint (BLOCK, five amendments) reshaped the
-  design before any code; the three-reviewer round found three critical
-  defects in MY fix (the EPIPE rollback-proof hole, the ownership-order
-  IDOR, the inverted restore-mail premise) plus two blocking test gaps,
-  every finding applied and the fix round re-reviewed fresh. Items the
-  DEDICATED phase-05-qa session still owns: re-judge the 5s/2s escrow
-  queue bounds and the 30s warn throttle numbers, the quarantine-kick
-  posture on the ambiguous arm (player-visible disconnect), the
-  commitGrant FIFO carve-out (recorded, source-pinned, filed as
-  follow-up), and the residual list in progress.md.
+- Next file to run: `docs/woc-marketplace-hardening/phase-06-directed-rail-integrity.md`
+- 05 QA COMPLETE (PASS-WITH-FOLLOWUPS, every fix applied, PUSHED per R4).
+  Release/v0.38.0 synced (merge b9e937c075, trivial: seven commits, no
+  marketplace overlap, no count-pin surface). All four owed re-judgments
+  UPHELD with their justifications repaired (the numbers, the
+  quarantine-kick posture, 57014-stays-500, the carve-out, now owned by 16
+  and sequenced after the honest occupancy bound). Five audit lanes plus a
+  fresh fix-round re-review and qa-checklist; the QA round found and fixed
+  one CRITICAL (TxNeverStarted stopped at the pool checkout: a stale
+  socket failing at BEGIN still quarantine-kicked the seller) and one
+  critical-class evidence destroyer (withTx's null asyncErr deref replaced
+  every codeless failure with a TypeError), plus the kick-argument swap
+  that sent untranslated jargon on the wire. The 05 ledger below is
+  AMENDED IN PLACE for the changed seams; phase 06 consumes the amended
+  entry and OPENS with two directed-rail judgments (the three-legged THROW
+  residual; whether directed delivery should stamp boundTo). Full round in
+  progress.md.
+- 05 implemented AND reviewed: H5, H6, the coordinator-drift medium
+  (broker custody extraction + the firewall tighten) closed; ledger entry
+  below. A database-performance PRE-implementation checkpoint (BLOCK, five
+  amendments) reshaped the design before any code; the three-reviewer
+  round found three critical defects in the fix (the EPIPE rollback-proof
+  hole, the ownership-order IDOR, the inverted restore-mail premise) plus
+  two blocking test gaps, every finding applied and re-reviewed fresh.
 - 04 QA COMPLETE (PASS-WITH-FOLLOWUPS, every fix applied, PUSHED per R4;
   gate GREEN at the final tip 8c1028e89d, full-suite fallback, all 8
   steps).
@@ -863,11 +873,36 @@ Still open (a phase that hits one asks at session start):
     fixups ride every durable write (a raw sim.serializeCharacter was a
     jail escape; character_save_fixups.ts owns the rationale, extracted
     from saveCharacter). wocCustodySession refuses left AND quarantined
-    sessions for every custody op.
+    sessions for every custody op. QA amendments: the warn threshold and
+    its throttle are injectable (createWocMarketCustody opts) and
+    ESCROW_QUEUE_WARN_THROTTLE_MS (30s) is exported and ladder-pinned;
+    kickSession sends its SECOND argument on the wire, so both escrow
+    terminal arms send the matcher-covered 'character taken over' literal
+    with the cause in the leave reason (the implement round had them
+    swapped); the depth-cap slot follows the WORK settling (now pinned);
+    saveCharacter's post-commit steps (lastSave, deed publish, level
+    feed) deliberately do not run on the escrow write and catch up one
+    ordinary save later.
   - COMPENSATION SPLIT ON PROOF: server/pg_rollback_proof.ts
     throwProvedRollback is an ALLOWLIST of proven-abort SQLSTATE classes
     (22/23/25/40/42/53/54/55 + 57014); Node errnos (EPIPE et al, five
-    uppercase chars) and connection-class codes classify AMBIGUOUS. A
+    uppercase chars) and connection-class codes classify AMBIGUOUS. QA
+    amendments: TxNeverStarted also tags a BEGIN failure (a stale pooled
+    socket fails there, not at connect, in the same correlated volume;
+    nothing can commit before BEGIN returns; the tag skips withTx's
+    code-preference and the client is discarded), and the preference
+    helper is null-safe (a codeless failure used to be REPLACED by a
+    TypeError dereferencing the null asyncErr: evidence destroyed,
+    classification unchanged; the pin asserts the original message
+    survives). withTx DISCARDS the client on ANY codeless failure (the
+    db-perf P1: a COMMIT at the 65s driver backstop rejects codeless
+    with its response outstanding, and a best-effort ROLLBACK can
+    consume that stale reply, so a "returned" client would answer the
+    next borrower with it; coded failures with a landed rollback stay
+    poolable, both arms pinned). restoreCopy's premise is restated truthfully: quarantined
+    sessions never reach it because BOTH quarantine arms are terminal.
+    restoreInto stays deliberately uncapped (compensation must never be
+    refusable; overfill beats losing the only copy). A
     proven-rollback throw or typed refusal restores via
     restoreCopy(pid, characterId, slot): into the LIVE bags while the
     extraction pid's player entity exists (every teardown flush queues
@@ -887,14 +922,24 @@ Still open (a phase that hits one asks at session start):
     25P03 mapped to the typed 'contended' (return union widened; the
     service restores and answers woc_market.contended). ESCROW_LOCK_
     TIMEOUT_MS and GUARD_IDLE_TX_TIMEOUT_MS are now exported and
-    literal-pinned.
+    literal-pinned. QA amendment, the honest occupancy ceiling: the 5s
+    allowance bounds the FOUR workload statements (the tunables relation
+    pins exactly those plus the lock wait and pool checkout, scraping
+    AUTOSAVE_SECONDS from source); BEGIN and the installing SET LOCAL
+    ride the 15s session default and COMMIT the 65s driver backstop, so a
+    wedged transaction CAN exceed one autosave interval (the wait
+    deadline and depth cap bound the player-facing impact; the tail rides
+    16 with the guild-flush 60s term).
   - RECORDED CARVE-OUT: commitGrant (the delivery twin) deliberately does
     NOT ride the FIFO yet: its stale-autosave direction is buyer item
     LOSS, operator-recoverable through the claims-ledger park subset, and
     FIFO-routing sweep grants needs a head-of-line bound first. Recorded
     at the method, source-pinned (exactly one runSerialized call site in
-    the service; no enqueueCharacterWrite reference), filed as packet
-    follow-up work, NOT silently deferred.
+    the service; no enqueueCharacterWrite reference; the pin now ALSO
+    sweeps the sweep and monitor siblings). QA judgment: STANDS as
+    follow-up, owner 16, SEQUENCED after the honest occupancy bound
+    (closing it first would import the unbounded hold into the sweep) and
+    gated on the park subset staying intact.
   - H6: exchangeHardLock consumes the shared per-copy transfer-lock
     predicate, so the woc rail refuses exactly what the gold market,
     mail, and guild bank refuse; the ARMED state reports its own
@@ -927,25 +972,55 @@ Still open (a phase that hits one asks at session start):
     signature_reused/required/field/header/verified/atMs/bytes), treasury
     suffixes + base/cut/fee/account. Bare 'signature' and 'token' stay
     out (49 measured content false positives; riftToken/chatTokens).
-    Non-vacuity floor 440 of 474 files.
+    QA amendments: non-vacuity floor 460 of the real 475 files (the
+    recorded 474 was wrong at write time); FIREWALL_ALLOWED membership
+    pinned exactly; the projection shape pin refuses re-exports,
+    generator exports, enum/interface/default, dynamic import, try, and
+    the logical operators, each with a named offender case; every
+    pattern alternative has a positive control; the compound arms'
+    missing LEFT boundary is documented as deliberate over-match.
   - OBSERVABILITY: the wocEscrowQueue counter (game-signals seam, kinds
     started / deadline_refused / depth_refused / books_dirty_refused /
     flush_failed, zero-backfilled) plus a 30s-throttled realm-global
-    queue-wait warn. A checkout-failed transaction is tagged
-    TxNeverStarted (exported from woc_market_db) and maps to 'contended'
-    on the escrow write ONLY.
-  - Handoffs: phase 06 opens with the acceptDirectedOffer throw-arm
-    question (an escrow THROW leaves the offer 'accepted' with no
-    listing; conservative, operator-resolvable; judge an unwind); phase
-    16 owns the escrow-queue additions from the hot-path round (the
-    guild-book flush still rides the 60s logout allowance inside the
-    deadline, the dominant occupancy term; a pendingKeys FIFO gauge;
-    widening TxNeverStarted -> contended to the other guards; the
-    per-listing serialize cost attribution) plus the saveAll-wave
-    suppression measurement; phase 22's pre-enable audit gains one line
-    (scan standing listings' item payloads for bindOnTrade-armed copies
-    that entered before H6). The 04 ledger's "REFUSAL_ERRORS is 48 rows"
-    is superseded: 49 since bind_armed.
+    queue-wait warn. A checkout-failed OR begin-failed transaction is
+    tagged TxNeverStarted (exported from woc_market_db, import-pinned)
+    and maps to 'contended' on the escrow write ONLY. QA amendment: the
+    counter is fully pinned (name literal, closed vocabulary both
+    directions, zero pre-registration, per-kind increment per refusal
+    arm, never-throws).
+  - Handoffs: phase 06 opens with TWO directed-rail judgments: (a) the
+    acceptDirectedOffer throw-arm residual, now THREE-legged since the
+    ambiguous park arm (offer stuck 'accepted' with no listing, the
+    seller quarantined and kicked, the copy parked out of the bags; the
+    acceptance predates the park arm, so re-judge the acceptance itself);
+    (b) whether directed delivery should stamp boundTo on hand-off and
+    inherit the trade-window named-recipient exception (today a
+    commission piece passes the gold trade window but is refused by the
+    $WOC arm beside it; refusing is the safe direction, recorded at
+    exchange_eligibility.ts). Phase 16 owns the escrow-queue additions
+    from the hot-path round (the guild-book flush still rides the 60s
+    logout allowance inside the deadline, the dominant occupancy term; a
+    pendingKeys FIFO gauge; widening TxNeverStarted -> contended to the
+    other guards, commitGrant's park arm now explicitly included; a
+    completed/terminal sibling kind for the wocEscrowQueue counter; the
+    per-listing serialize cost attribution; the gold-World-Market
+    straddle: the escrow write persists the character row alone, the
+    same crash window the 30s autosave has, pre-existing realm-wide;
+    from the db-perf close-out: a realm-global escrow in-flight
+    semaphore, a contention-class label on the 'contended' path, a
+    draining refusal on createListing, and the FOR NO KEY UPDATE
+    narrowing of the accounts lock)
+    plus the saveAll-wave suppression measurement; phase 22's pre-enable
+    audit gains one line (scan standing listings' item payloads for
+    bindOnTrade-armed copies that entered before H6). The 04 ledger's
+    "REFUSAL_ERRORS is 48 rows" is superseded: 49 since bind_armed.
+    Accepted without code change (QA round; do not re-raise): the FIFO
+    self-deadlock rule stays comment-enforced (a runtime guard would
+    false-positive the sanctioned void-kick-from-job pattern); the
+    escrow write skips saveCharacter's post-commit steps by design; the
+    guild-bank deficit ladder is reachable at listing rate
+    (self-inflicted only); architecture.test.ts's hand-rolled walker is
+    pre-existing repo-wide debt.
 - 02 QA (2026-08-11, session start 20fdcc5288, verdict PASS-WITH-FOLLOWUPS
   with every fix applied, gate GREEN at tip 301a8c7c22, PUSHED per R4):
   release/v0.37.0 synced (merge b40a178643; generated-i18n conflict
