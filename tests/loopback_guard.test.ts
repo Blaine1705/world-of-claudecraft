@@ -4,7 +4,7 @@
 // DATABASE arm must agree with what node-postgres actually resolves,
 // including the ?host= query override a WHATWG-hostname check misses.
 import { readdirSync, readFileSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { assertLoopbackDatabaseUrl, assertLoopbackUrl } from '../scripts/lib/loopback_guard.mjs';
@@ -158,12 +158,16 @@ const GUARDED_SCRIPTS = [
   'scripts/load_professions.mjs',
   'scripts/mob_stall_repro.mjs',
   'scripts/profile_recent_finds_shot.mjs',
+  'scripts/profiler/geared_arrival_roster.mjs',
 ] as const;
 
 // Scripts that drive /dev cheats over the wire but never open Postgres: they
 // guard the server target only. A script that grows a pg import graduates to
 // GUARDED_SCRIPTS (the discovery arm below reddens until it does).
-const URL_GUARDED_SCRIPTS = ['scripts/crowd_fps_bench.mjs'] as const;
+const URL_GUARDED_SCRIPTS = [
+  'scripts/crowd_fps_bench.mjs',
+  'scripts/gpu_hitch_capture.mjs',
+] as const;
 
 // Full-line // comments are stripped before the scan: this file's own subject
 // matter means the phrase "assertLoopbackUrl" appears in prose inside these
@@ -185,14 +189,18 @@ function scriptSources(dir: string): string[] {
   return found;
 }
 
+function expectedGuardImport(relPath: string): string {
+  const importPath = relative(dirname(relPath), 'scripts/lib/loopback_guard.mjs').replaceAll(
+    '\\',
+    '/',
+  );
+  return `from '${importPath.startsWith('.') ? importPath : `./${importPath}`}'`;
+}
+
 describe('loopback guard call sites', () => {
   it.each(GUARDED_SCRIPTS)('%s imports the shared guard and calls BOTH arms', (relPath) => {
     const code = codeWithoutLineComments(relPath);
-    expect(code).toContain(
-      relPath.startsWith('scripts/lib/')
-        ? "from './loopback_guard.mjs'"
-        : "from './lib/loopback_guard.mjs'",
-    );
+    expect(code).toContain(expectedGuardImport(relPath));
     // The two call literals are distinct substrings (the import line carries
     // neither, because it has no open paren), so each proves its own arm.
     expect(code).toContain('assertLoopbackUrl(');
