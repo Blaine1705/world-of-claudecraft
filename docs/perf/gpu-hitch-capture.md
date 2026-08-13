@@ -54,16 +54,61 @@ size remains the comparability source of truth in the artifact.
 Profiles are intentionally not interchangeable:
 
 - `shader` (default): links, completion status, active uniforms, active
-  attributes, phases, and renderer compile-unit lifecycle;
+  attributes, the value each of those queries returned, per-program Three
+  identity, the draw context of each link and reflection query, phases, and
+  renderer compile-unit lifecycle;
 - `upload`: sparse 100 ms texture-upload buckets;
 - `full`: both sets of wrappers.
 
+`--observer X,Z` moves the observer AND the geared crowd to another world spot.
+It changes WHAT is measured, not how: a different town streams different
+content, so a leg there is only ever a control for another leg at the same spot.
+The spot is recorded in `capture.observer` and is a comparability key, so the
+comparator refuses a pair that drifted.
+
 ## Artifact contract
 
-The JSON has schema version `1` and retains the raw `timeline` before deriving
+The JSON has schema version `3` and retains the raw `timeline` before deriving
 the summary. Query windows are anchored on `query.startMs`; links after the
 blocking call returns cannot be attributed to it. Upload attribution reports
 `certain` and `possible` bounds because edge buckets are partial.
+
+An artifact from an earlier schema is rejected by name rather than read on a
+best-effort basis: schema `1` carries no completion-status return value, so the
+reflection families below cannot be derived from it at all, and schema `2` has
+no `variantDiff`, where a missing field is not the same claim as "this program
+had no variant". A mixed pair must never look comparable. The meaning of the
+earlier fields is unchanged.
+
+## Program variants
+
+A material that was already compiled can link a SECOND program: three keys its
+program cache on the material PLUS the render conditions baked into it, and the
+condition list is in `THREE_CACHE_KEY_PARAMETERS`. Change one and every warm
+program carrying the old value is invalid, so the next draw links a fresh one
+and blocks on it. This applies to EVERY material, including unlit
+`MeshBasicMaterial` and the shadow pass's `MeshDepthMaterial`: three pushes the
+light counts into the key whether or not the shader reads them.
+
+`timeline.programs[].variantDiff` records what changed, and the comparison
+happens in the page so no key is serialized: `getProgramCacheKey` ends with
+`array.join()`, and its last element is `customProgramCacheKey`, which for a
+patched material IS the `onBeforeCompile` source. Only the differing segment
+leaves, and a segment that is not a short plain token is replaced by a
+`#<hash>:<length>` stand-in.
+
+`cacheKeyVariance(capture)` groups those diffs. One before/after pair shared by
+many unrelated materials is a GLOBAL condition flip; one pair per material is
+content arriving. `variantDiffParameter` names the position by counting back
+from the fixed trailers (two boolean masks, then the output colour space, then
+the custom key), because the `defines` block in front is variable length.
+
+The naming has one honest limit, and reading around it matters. The join
+separator is a comma and the `onBeforeCompile` source contains commas of its
+own, so for a HOOKED material the position is shifted by an unknown amount and
+the reported name is wrong. The before/after VALUES are unaffected. Read the
+exact name off materials with no hook (a small `cacheKeyLength`), then match the
+value pair across the hooked ones.
 
 `capture.durationMs` is the requested measurement window after world entry and
 is therefore part of A/B comparability. `capture.totalElapsedMs` preserves the
@@ -93,6 +138,58 @@ and `statusAtReveal` (`settled`, `pending`, `deferred`, or `failed`) sampled
 immediately before the loading curtain starts to fade. This is not
 an internal driver-pending counter; it is the strongest pending-at-initial-frame
 evidence available from the renderer.
+
+## Reflection attribution
+
+Three r165 links asynchronously under `KHR_parallel_shader_compile`, so
+`linkProgram` itself always measures near zero. The wait surfaces on the first
+call that needs the link result, which is the `ACTIVE_UNIFORMS` query inside
+`WebGLProgram.onFirstUse`. Reading that query as a reflection cost is a
+misattribution: `reflectionAttribution` therefore classifies every reflection
+query by what the program's link had actually done when the query was issued.
+
+The discriminator is the completion-status RETURN VALUE, not a timestamp
+ordering. A program can be polled again after it is ready, so "the query came
+before the last poll" would misclassify a settled program as racing.
+
+- `never-compiled`: no completion poll preceded the query, so the program was
+  never submitted to `compileAsync`. The link and the first use happen in one
+  instruction stream and the query absorbs the whole link.
+- `raced-pending-link`: polls preceded the query but none had returned true. A
+  draw reached a material whose compile was still in flight and paid whatever
+  link time remained.
+- `settled-first`: a poll observed true strictly before the query started. This
+  is the only family that measures reflection itself.
+
+`timeline.programs` gives each program its Three identity: the material class
+and name, three's own program id, and a HASH of the cache key with its length.
+The raw cache key is never written, because three's default
+`customProgramCacheKey` returns the `onBeforeCompile` source. Comparing a live
+link's cache-key hash against the set linked under the curtain separates a
+duplicate variant the prewarm dedupe missed (`liveLinkedKnownKey`) from a
+variant prewarm never built at all (`liveLinkedNewKey`).
+
+Both reflection queries and every link also carry a `draw` context, taken from
+an instance-level hook on `WebGLRenderer.renderBufferDirect`: material and
+object class, the skinned/instanced/morph/cast-shadow shape bits, the scene-root
+index, and `shadowPass`. The last is exact rather than heuristic:
+`WebGLShadowMap` draws with a null scene. `timeline.sceneRoots` (index, class,
+name, child count, visibility) resolves a root index to a subsystem, and it is
+the census of the container the index actually indexes, never of the last scene
+drawn: the post chain draws its own quad scenes, so those are different objects.
+Each draw carries `rootCount` alongside `rootIndex` so a mismatch between the
+two is visible rather than silent. Completion polls deliberately carry no draw
+context: a capture holds tens of thousands of them.
+
+Two coverage limits are recorded rather than assumed. `timeline.programs` is
+resolved through `window.__game`, which `main.ts` only assembles around the
+reveal; programs linked under the curtain resolve retroactively from the first
+reachable pass, and only a program disposed before then stays unattributed.
+The draw context has no such retroactive path, so
+`diagnostics.rendererHook.attachedAtMs` states when it became available: a link
+before that timestamp could not be attributed to a draw, which is a different
+claim from "that link happened outside any draw". `draws` and `scenedDraws`
+report how much the hook actually saw.
 
 `provenance` records the source HEAD, dirty-worktree content hash, served build
 ID, probe hash, analyzer hash, worktree name, and dirty state. URLs are reduced

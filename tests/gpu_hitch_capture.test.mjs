@@ -5,6 +5,77 @@ import {
   prepareOnlineGearedRoster,
 } from '../scripts/gpu_hitch_capture.mjs';
 
+describe('gpu hitch capture program attribution', () => {
+  const snapshotWith = (extra) => ({
+    captureId: 'capture-2',
+    startedAtEpochMs: Date.parse('2026-08-13T10:00:00.000Z'),
+    startedAtPerformanceMs: 0,
+    elapsedMs: 1_000,
+    stopReason: 'duration',
+    visible: true,
+    visibilityTransitions: [],
+    contextLost: 0,
+    transitions: [],
+    links: [],
+    queries: [],
+    controls: {},
+    running: false,
+    uploadBucketWidthMs: 100,
+    uploadBuckets: [],
+    ...extra,
+  });
+  const build = (snapshot) =>
+    buildCapture({
+      args: { mode: 'offline', profile: 'shader', durationMs: 1_000 },
+      url: 'http://localhost:5173/?perf',
+      snapshot,
+      browserVersion: 'Chrome test',
+      flags: [],
+      provenance: {},
+    });
+
+  it('carries the program identities and the scene root census onto the timeline', () => {
+    const raw = build(
+      snapshotWith({
+        programs: [
+          {
+            programId: 3,
+            threeId: 9,
+            materialType: 'MeshDepthMaterial',
+            materialName: '',
+            cacheKeyHash: 'abcd1234',
+            cacheKeyLength: 412,
+            variantDiff: null,
+            resolvedAtMs: 12.5,
+          },
+        ],
+        sceneRoots: [{ index: 0, type: 'Group', name: 'props', children: 8, visible: true }],
+      }),
+    );
+    expect(raw.timeline.programs).toEqual([
+      {
+        programId: 3,
+        threeId: 9,
+        materialType: 'MeshDepthMaterial',
+        materialName: '',
+        cacheKeyHash: 'abcd1234',
+        cacheKeyLength: 412,
+        variantDiff: null,
+        resolvedAtMs: 12.5,
+      },
+    ]);
+    expect(raw.timeline.sceneRoots).toEqual([
+      { index: 0, type: 'Group', name: 'props', children: 8, visible: true },
+    ]);
+  });
+
+  it('defaults both to an empty array so a probe that resolved nothing still validates', () => {
+    const raw = build(snapshotWith({}));
+    expect(raw.timeline.programs).toEqual([]);
+    expect(raw.timeline.sceneRoots).toEqual([]);
+  });
+});
+
 describe('gpu hitch capture CLI', () => {
   it('parses the supported capture modes and profiles', () => {
     expect(
@@ -108,7 +179,7 @@ describe('gpu hitch capture CLI', () => {
         uploadBucketWidthMs: 100,
         uploadBuckets: [],
         runtimeReceipt: {
-          schemaVersion: 1,
+          schemaVersion: 3,
           buildId: 'served-build',
           effective: {
             prewarmPacing: { available: true, deadlineMs: 12 },
@@ -139,7 +210,7 @@ describe('gpu hitch capture CLI', () => {
       browserVersion: 'Chrome test',
       flags: ['--headless=new'],
       provenance: {
-        schemaVersion: 1,
+        schemaVersion: 3,
         sourceBuildId: 'source-build',
         probeSha256: 'probe-sha',
         analyzerSha256: 'analyzer-sha',
@@ -161,7 +232,7 @@ describe('gpu hitch capture CLI', () => {
       servedBuildId: 'served-build',
     });
     expect(raw.effective).toEqual({
-      schemaVersion: 1,
+      schemaVersion: 3,
       prewarmPacing: { available: true, deadlineMs: 12 },
       modular: { available: true },
       renderer: { tier: 'ultra' },

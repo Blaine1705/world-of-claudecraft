@@ -42,3 +42,43 @@ export function summarizeCapture(
 ): Record<string, unknown>;
 export function makeProvenance(input: Record<string, unknown>): Record<string, unknown>;
 export function requestedValueForKey(requested: unknown, key: string): unknown;
+
+export const THREE_CACHE_KEY_PARAMETERS: readonly string[];
+export const THREE_CACHE_KEY_TRAILERS: readonly string[];
+export const REFLECTION_FAMILIES: readonly string[];
+
+export interface GpuHitchVariantDiff {
+  segmentIndex: number;
+  segmentsBefore: number;
+  segmentsAfter: number;
+  before: string;
+  after: string;
+}
+
+export function variantDiffParameter(diff: GpuHitchVariantDiff | null | undefined): string | null;
+export function cacheKeyVariance(capture: unknown): {
+  programsAttributed: number;
+  variantPrograms: number;
+  groups: Array<{
+    parameter: string | null;
+    fromEnd: number;
+    before: string;
+    after: string;
+    programs: number;
+    materials: string[];
+    firstLinkAtMs: number | null;
+    lastLinkAtMs: number | null;
+  }>;
+};
+export function reflectionAttribution(capture: unknown): {
+  revealAtMs: number | null;
+  families: Record<string, Record<string, Record<string, number>>>;
+  programsAttributed: number;
+  linksTotal: number;
+  linksCover: number;
+  linksLive: number;
+  liveLinkedKnownKey: number;
+  liveLinkedNewKey: number;
+  liveLinkedUnattributed: number;
+  rows: Array<Record<string, unknown>>;
+};

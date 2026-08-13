@@ -1,15 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import {
   areComparable,
+  cacheKeyVariance,
   comparabilityMismatches,
   countEventsInWindow,
   GPU_HITCH_SCHEMA_VERSION,
   linksBeforeQuery,
   measurementParams,
+  reflectionAttribution,
   sanitizeCaptureUrl,
   summarizeCapture,
   uploadBucketsBeforeQuery,
   validateCapture,
+  variantDiffParameter,
 } from '../scripts/profiler/gpu_hitch_metrics.mjs';
 
 function capture(overrides = {}) {
@@ -55,6 +58,8 @@ function capture(overrides = {}) {
       phases: [],
       links: [],
       queries: [],
+      programs: [],
+      sceneRoots: [],
       compileUnits: [],
       uploadBucketWidthMs: 100,
       uploadBuckets: [],
@@ -161,12 +166,14 @@ describe('gpu hitch metrics', () => {
             startMs: 2_000,
             endMs: 2_500,
             durationMs: 500,
+            value: false,
           },
           {
             kind: 'active-attributes',
             startMs: 3_000,
             endMs: 3_100,
             durationMs: 100,
+            value: 12,
           },
         ],
         compileUnits: [
@@ -425,5 +432,327 @@ describe('gpu hitch metrics', () => {
       evidenceKind: 'performance',
     });
     expect(result.warnings).toEqual([]);
+  });
+
+  it('refuses two legs captured at different world spots', () => {
+    // A different town streams different content, so a leg elsewhere is not a
+    // control however well the rest of the protocol matches.
+    const left = capture({ capture: { ...capture().capture, observer: { x: 0, z: 0 } } });
+    const right = capture({ capture: { ...capture().capture, observer: { x: 0, z: 660 } } });
+    expect(comparabilityMismatches(left, right)).toEqual(['observer']);
+    expect(areComparable(left, left)).toBe(true);
+  });
+
+  it('rejects an artifact from the previous schema by name instead of reading it', () => {
+    const result = validateCapture(capture({ schemaVersion: 1 }));
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain('capture schemaVersion 1 is not the supported version 3');
+  });
+
+  it('refuses a program row that carries a raw cache key or a duplicate ordinal', () => {
+    const raw = capture({
+      timeline: {
+        ...capture().timeline,
+        programs: [
+          {
+            programId: 1,
+            cacheKeyHash: 'deadbeef',
+            materialType: 'Mesh',
+            materialName: '',
+            variantDiff: null,
+          },
+          {
+            programId: 1,
+            cacheKeyHash: 'lights,fog,customProgramCacheKey',
+            materialType: 'Mesh',
+            materialName: '',
+            variantDiff: null,
+          },
+        ],
+      },
+    });
+    const result = validateCapture(raw);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toEqual(
+      expect.arrayContaining([
+        'timeline.programs[1].programId is duplicated',
+        'timeline.programs[1].cacheKeyHash must be an 8 character hex digest',
+      ]),
+    );
+  });
+
+  it('refuses a completion status without its boolean return value', () => {
+    const raw = capture({
+      timeline: {
+        ...capture().timeline,
+        queries: [{ kind: 'completion-status', startMs: 1, endMs: 2, durationMs: 1 }],
+      },
+    });
+    const result = validateCapture(raw);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain(
+      'timeline.queries[0].value must be the boolean completion status',
+    );
+  });
+});
+
+describe('gpu hitch reflection attribution', () => {
+  const reflect = (programId, startMs, durationMs) => ({
+    kind: 'active-uniforms',
+    programId,
+    startMs,
+    endMs: startMs + durationMs,
+    durationMs,
+    value: 100,
+    phaseAtStart: 'live',
+  });
+  const poll = (programId, startMs, value) => ({
+    kind: 'completion-status',
+    programId,
+    startMs,
+    endMs: startMs,
+    durationMs: 0,
+    value,
+    phaseAtStart: 'live',
+  });
+
+  it('separates a link never submitted to compileAsync from one drawn before it settled', () => {
+    const attribution = reflectionAttribution({
+      timeline: {
+        phases: [{ event: 'reveal', atMs: 500 }],
+        links: [],
+        programs: [],
+        queries: [
+          // Never polled at all: the draw both linked and reflected.
+          reflect(1, 1_000, 200),
+          // Polled and still pending when the draw reached it.
+          poll(2, 900, false),
+          reflect(2, 1_000, 120),
+          // Polled ready before the draw: this is reflection itself.
+          poll(3, 800, false),
+          poll(3, 900, true),
+          reflect(3, 1_000, 0.4),
+        ],
+      },
+    });
+    expect(attribution.families['never-compiled'].live).toMatchObject({
+      calls: 1,
+      totalMs: 200,
+      maxMs: 200,
+      programs: 1,
+    });
+    expect(attribution.families['raced-pending-link'].live).toMatchObject({
+      calls: 1,
+      totalMs: 120,
+    });
+    expect(attribution.families['settled-first'].live).toMatchObject({
+      calls: 1,
+      totalMs: 0.4,
+    });
+  });
+
+  it('does not credit a poll that only reported ready after the reflection query', () => {
+    const attribution = reflectionAttribution({
+      timeline: {
+        phases: [],
+        links: [],
+        programs: [],
+        queries: [poll(1, 900, false), reflect(1, 1_000, 90), poll(1, 1_100, true)],
+      },
+    });
+    expect(attribution.families['raced-pending-link'].all.calls).toBe(1);
+    expect(attribution.families['settled-first'].all.calls).toBe(0);
+  });
+
+  it('keeps a settled program settled when a later poll re-reports it', () => {
+    const attribution = reflectionAttribution({
+      timeline: {
+        phases: [],
+        links: [],
+        programs: [],
+        queries: [poll(1, 800, true), reflect(1, 1_000, 0.2), poll(1, 1_200, true)],
+      },
+    });
+    expect(attribution.families['settled-first'].all.calls).toBe(1);
+    expect(attribution.families['raced-pending-link'].all.calls).toBe(0);
+  });
+
+  it('treats a poll that did not precede the query as no evidence of a compile', () => {
+    const attribution = reflectionAttribution({
+      timeline: {
+        phases: [],
+        links: [],
+        programs: [],
+        queries: [reflect(1, 1_000, 150), poll(1, 1_000, true)],
+      },
+    });
+    expect(attribution.families['never-compiled'].all.calls).toBe(1);
+  });
+
+  it('splits live links into a variant prewarm already built and one it never built', () => {
+    const attribution = reflectionAttribution({
+      timeline: {
+        phases: [{ event: 'reveal', atMs: 500 }],
+        links: [
+          { programId: 1, startMs: 100, endMs: 100, lane: 'submit-sync', phaseAtStart: 'cover' },
+          { programId: 2, startMs: 600, endMs: 600, lane: 'first-draw', phaseAtStart: 'live' },
+          { programId: 3, startMs: 700, endMs: 700, lane: 'first-draw', phaseAtStart: 'live' },
+          { programId: 4, startMs: 800, endMs: 800, lane: 'first-draw', phaseAtStart: 'live' },
+        ],
+        programs: [
+          {
+            programId: 1,
+            cacheKeyHash: 'aaaaaaaa',
+            materialType: 'Mesh',
+            materialName: '',
+            variantDiff: null,
+          },
+          // Same key as a program already linked under the curtain.
+          {
+            programId: 2,
+            cacheKeyHash: 'aaaaaaaa',
+            materialType: 'Mesh',
+            materialName: '',
+            variantDiff: null,
+          },
+          {
+            programId: 3,
+            cacheKeyHash: 'bbbbbbbb',
+            materialType: 'Mesh',
+            materialName: '',
+            variantDiff: null,
+          },
+        ],
+        queries: [],
+      },
+    });
+    expect(attribution).toMatchObject({
+      revealAtMs: 500,
+      linksCover: 1,
+      linksLive: 3,
+      liveLinkedKnownKey: 1,
+      liveLinkedNewKey: 1,
+      liveLinkedUnattributed: 1,
+    });
+  });
+
+  it('carries the three identity and draw context onto the costliest rows', () => {
+    const attribution = reflectionAttribution({
+      timeline: {
+        phases: [],
+        links: [
+          { programId: 1, startMs: 999.9, endMs: 1_000, lane: 'first-draw', phaseAtStart: 'live' },
+        ],
+        programs: [
+          {
+            programId: 1,
+            cacheKeyHash: 'abcd1234',
+            materialType: 'MeshStandardMaterial',
+            materialName: 'bark',
+            variantDiff: null,
+          },
+        ],
+        queries: [
+          {
+            ...reflect(1, 1_000, 210.8),
+            draw: { objectType: 'SkinnedMesh', shadowPass: false, rootIndex: 4 },
+          },
+        ],
+      },
+    });
+    expect(attribution.rows[0]).toMatchObject({
+      programId: 1,
+      family: 'never-compiled',
+      materialType: 'MeshStandardMaterial',
+      materialName: 'bark',
+      cacheKeyHash: 'abcd1234',
+      activeCount: 100,
+      linkLane: 'first-draw',
+      draw: { objectType: 'SkinnedMesh', rootIndex: 4 },
+    });
+    expect(attribution.rows[0].linkToReflectionMs).toBeCloseTo(0.1, 5);
+  });
+
+  it('names the changed cache-key parameter by counting back from the fixed trailers', () => {
+    // Tail layout: 48 parameters, two boolean masks, output colour space, then
+    // customProgramCacheKey. depthPacking is the last parameter, so it sits at
+    // position 5 from the end.
+    const at = (fromEnd) =>
+      variantDiffParameter({ segmentIndex: 100 - fromEnd, segmentsBefore: 100 });
+    expect(at(1)).toBe('customProgramCacheKey');
+    expect(at(2)).toBe('outputColorSpace');
+    expect(at(3)).toBe('programLayersMask2');
+    expect(at(4)).toBe('programLayersMask1');
+    expect(at(5)).toBe('depthPacking');
+    expect(at(19)).toBe('numPointLights');
+    expect(at(52)).toBe('precision');
+    // Past the front of the parameter block there is a variable-length defines
+    // section, so nothing can be named there.
+    expect(at(53)).toBeNull();
+  });
+
+  it('groups variants by what changed so a global flip is distinguishable from streaming', () => {
+    const program = (id, name, before, after) => ({
+      programId: id,
+      cacheKeyHash: 'aaaaaaaa',
+      materialType: 'MeshStandardMaterial',
+      materialName: name,
+      variantDiff:
+        before === null
+          ? null
+          : { segmentIndex: 81, segmentsBefore: 100, segmentsAfter: 100, before, after },
+    });
+    const variance = cacheKeyVariance({
+      timeline: {
+        links: [
+          { programId: 2, startMs: 1_000, endMs: 1_000, lane: 'first-draw', phaseAtStart: 'live' },
+          { programId: 3, startMs: 1_400, endMs: 1_400, lane: 'first-draw', phaseAtStart: 'live' },
+          { programId: 4, startMs: 9_000, endMs: 9_000, lane: 'first-draw', phaseAtStart: 'live' },
+        ],
+        programs: [
+          program(1, 'streetlamp', null, null),
+          program(2, 'streetlamp', '4', '5'),
+          program(3, 'nature', '4', '5'),
+          program(4, 'pirate', '0', '1'),
+        ],
+      },
+    });
+    expect(variance.programsAttributed).toBe(4);
+    expect(variance.variantPrograms).toBe(3);
+    expect(variance.groups[0]).toMatchObject({
+      parameter: 'numPointLights',
+      before: '4',
+      after: '5',
+      programs: 2,
+      materials: ['nature', 'streetlamp'],
+      firstLinkAtMs: 1_000,
+      lastLinkAtMs: 1_400,
+    });
+    expect(variance.groups[1]).toMatchObject({ before: '0', after: '1', programs: 1 });
+  });
+
+  it('refuses a program row that omits the variant field entirely', () => {
+    const raw = capture({
+      timeline: {
+        ...capture().timeline,
+        programs: [{ programId: 1, cacheKeyHash: '', materialType: 'Mesh', materialName: '' }],
+      },
+    });
+    const result = validateCapture(raw);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain(
+      'timeline.programs[0].variantDiff must be present (null when the program had no variant)',
+    );
+  });
+
+  it('bounds the reflection rows the summary carries without losing the count', () => {
+    const queries = [];
+    for (let index = 0; index < 12; index++) queries.push(reflect(index + 1, 1_000 + index, index));
+    const raw = capture({ timeline: { ...capture().timeline, queries } });
+    const summary = summarizeCapture(raw, { reflectionRows: 3 });
+    expect(summary.reflection.rows).toHaveLength(3);
+    expect(summary.reflection.rowsTotal).toBe(12);
+    expect(summary.reflection.rows[0].durationMs).toBe(11);
+    expect(summary.reflection.families['never-compiled'].all.calls).toBe(12);
   });
 });

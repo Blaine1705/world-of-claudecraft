@@ -2,8 +2,89 @@
 // Browser orchestration belongs in gpu_hitch_capture.mjs; this module has no
 // DOM, Puppeteer, or application imports so its temporal rules stay testable.
 
-export const GPU_HITCH_SCHEMA_VERSION = 1;
-export const GPU_HITCH_PROBE_VERSION = 1;
+// Schema 2 adds per-program Three identity (timeline.programs), the value each
+// program query returned, a draw context on the two reflection queries, and the
+// scene-root census. A schema 1 artifact is REJECTED rather than read on a
+// best-effort basis: its queries carry no completion-status return value, so
+// the reflection families below cannot be derived from it at all, and a mixed
+// pair must never look comparable. The schema 1 meaning is unchanged.
+// Schema 3 adds timeline.programs[].variantDiff: when a material that was
+// already compiled links a SECOND program, the differing cache-key segment.
+// Schema 2 artifacts have no such field, and a missing field is not the same
+// claim as "this program had no variant", so schema 2 is rejected rather than
+// read with the field treated as absent.
+export const GPU_HITCH_SCHEMA_VERSION = 3;
+export const GPU_HITCH_PROBE_VERSION = 3;
+
+/**
+ * The order three r165 pushes into the program cache key, from
+ * getProgramCacheKeyParameters. Counting from the END of the parameter block is
+ * what makes a position nameable: the preceding `defines` section is variable
+ * length, while everything after these is fixed (the boolean mask, then the
+ * renderer output colour space, then customProgramCacheKey).
+ * Pinned against the installed build by tests/three_reflection_contract.test.ts.
+ */
+export const THREE_CACHE_KEY_PARAMETERS = Object.freeze([
+  'precision',
+  'outputColorSpace',
+  'envMapMode',
+  'envMapCubeUVHeight',
+  'mapUv',
+  'alphaMapUv',
+  'lightMapUv',
+  'aoMapUv',
+  'bumpMapUv',
+  'normalMapUv',
+  'displacementMapUv',
+  'emissiveMapUv',
+  'metalnessMapUv',
+  'roughnessMapUv',
+  'anisotropyMapUv',
+  'clearcoatMapUv',
+  'clearcoatNormalMapUv',
+  'clearcoatRoughnessMapUv',
+  'iridescenceMapUv',
+  'iridescenceThicknessMapUv',
+  'sheenColorMapUv',
+  'sheenRoughnessMapUv',
+  'specularMapUv',
+  'specularColorMapUv',
+  'specularIntensityMapUv',
+  'transmissionMapUv',
+  'thicknessMapUv',
+  'combine',
+  'fogExp2',
+  'sizeAttenuation',
+  'morphTargetsCount',
+  'morphAttributeCount',
+  'numDirLights',
+  'numPointLights',
+  'numSpotLights',
+  'numSpotLightMaps',
+  'numHemiLights',
+  'numRectAreaLights',
+  'numDirLightShadows',
+  'numPointLightShadows',
+  'numSpotLightShadows',
+  'numSpotLightShadowsWithMaps',
+  'numLightProbes',
+  'shadowMapType',
+  'toneMapping',
+  'numClippingPlanes',
+  'numClipIntersection',
+  'depthPacking',
+]);
+
+/**
+ * The fixed segments three appends after the parameter block, in push order.
+ * getProgramCacheKeyBooleans pushes the layer mask TWICE (two 32-bit boolean
+ * sets), then getProgramCacheKey appends the renderer output colour space.
+ */
+export const THREE_CACHE_KEY_TRAILERS = Object.freeze([
+  'programLayersMask1',
+  'programLayersMask2',
+  'outputColorSpace',
+]);
 export const GPU_HITCH_UPLOAD_BUCKET_MS = 100;
 
 const MEASUREMENT_KEYS = Object.freeze([
@@ -34,6 +115,7 @@ const COMPARABILITY_KEYS = Object.freeze([
   'gfx',
   'scenario',
   'zone',
+  'observer',
   'groupId',
   'fixture',
   'durationMs',
@@ -268,6 +350,77 @@ function validateCompileUnitArray(errors, units, label) {
   });
 }
 
+/**
+ * A program identity row carries only technical fields: an ordinal, three's own
+ * program id, the material class and name, and a HASH of the cache key. The raw
+ * cache key never appears, because three's default customProgramCacheKey is an
+ * onBeforeCompile source string.
+ */
+function validateProgramIdentityArray(errors, programs, label) {
+  if (!Array.isArray(programs)) {
+    error(errors, `${label} must be an array`);
+    return;
+  }
+  const seen = new Set();
+  programs.forEach((program, index) => {
+    const prefix = `${label}[${index}]`;
+    if (!Number.isInteger(program?.programId) || program.programId <= 0)
+      error(errors, `${prefix}.programId must be a positive integer`);
+    else if (seen.has(program.programId)) error(errors, `${prefix}.programId is duplicated`);
+    else seen.add(program.programId);
+    if (typeof program?.cacheKeyHash !== 'string')
+      error(errors, `${prefix}.cacheKeyHash must be a string`);
+    else if (program.cacheKeyHash !== '' && !/^[0-9a-f]{8}$/.test(program.cacheKeyHash))
+      error(errors, `${prefix}.cacheKeyHash must be an 8 character hex digest`);
+    if (own(program ?? {}, 'cacheKeyLength'))
+      validateNumber(errors, program.cacheKeyLength, `${prefix}.cacheKeyLength`, {
+        integer: true,
+        nonNegative: true,
+      });
+    for (const key of ['materialType', 'materialName']) {
+      if (typeof program?.[key] !== 'string') error(errors, `${prefix}.${key} must be a string`);
+    }
+    if (!own(program ?? {}, 'variantDiff')) {
+      error(errors, `${prefix}.variantDiff must be present (null when the program had no variant)`);
+    } else if (program.variantDiff !== null) {
+      const diff = program.variantDiff;
+      for (const key of ['segmentIndex', 'segmentsBefore', 'segmentsAfter']) {
+        validateNumber(errors, diff?.[key], `${prefix}.variantDiff.${key}`, {
+          integer: true,
+          nonNegative: true,
+        });
+      }
+      for (const key of ['before', 'after']) {
+        if (typeof diff?.[key] !== 'string')
+          error(errors, `${prefix}.variantDiff.${key} must be a string`);
+        else if (diff[key].length > 40)
+          error(errors, `${prefix}.variantDiff.${key} is longer than a bounded segment`);
+      }
+      if (
+        Number.isInteger(diff?.segmentIndex) &&
+        Number.isInteger(diff?.segmentsBefore) &&
+        diff.segmentIndex >= diff.segmentsBefore
+      )
+        error(errors, `${prefix}.variantDiff.segmentIndex is outside the key`);
+    }
+  });
+}
+
+function validateQueryValues(errors, queries, label) {
+  if (!Array.isArray(queries)) return;
+  queries.forEach((query, index) => {
+    const prefix = `${label}[${index}]`;
+    if (query?.kind === 'completion-status') {
+      if (typeof query.value !== 'boolean')
+        error(errors, `${prefix}.value must be the boolean completion status`);
+      return;
+    }
+    if (query?.kind !== 'active-uniforms' && query?.kind !== 'active-attributes') return;
+    if (query.value !== null && !finite(query.value))
+      error(errors, `${prefix}.value must be the active cardinality or null`);
+  });
+}
+
 function validateReceipt(errors, capture) {
   const receipt = capture.effective;
   if (!receipt || typeof receipt !== 'object') {
@@ -412,7 +565,10 @@ export function validateCapture(capture, expected = {}) {
   else if (requiresPerformanceEvidence && evidence.softwareRenderer)
     error(errors, 'software renderer cannot be used as performance evidence');
   if (capture.schemaVersion !== GPU_HITCH_SCHEMA_VERSION)
-    error(errors, 'capture schemaVersion mismatch');
+    error(
+      errors,
+      `capture schemaVersion ${capture.schemaVersion} is not the supported version ${GPU_HITCH_SCHEMA_VERSION}`,
+    );
   if (capture.capture?.complete !== true) error(errors, 'capture is incomplete');
   const campaign = capture.capture ?? {};
   if (own(campaign, 'durationMs'))
@@ -471,9 +627,12 @@ export function validateCapture(capture, expected = {}) {
   } else {
     validateEventArray(errors, timeline.links, 'timeline.links');
     validateEventArray(errors, timeline.queries, 'timeline.queries');
+    validateQueryValues(errors, timeline.queries, 'timeline.queries');
+    validateProgramIdentityArray(errors, timeline.programs, 'timeline.programs');
     validateCompileUnitArray(errors, timeline.compileUnits ?? [], 'timeline.compileUnits');
     if (!Array.isArray(timeline.uploadBuckets))
       error(errors, 'timeline.uploadBuckets must be an array');
+    if (!Array.isArray(timeline.sceneRoots)) error(errors, 'timeline.sceneRoots must be an array');
   }
   if (capture.environment?.contextLost > 0) error(errors, 'WebGL context was lost');
   if (capture.environment?.visible !== true) error(errors, 'capture page was not visible');
@@ -554,6 +713,10 @@ function comparableValue(capture, key, varying = new Set()) {
         capture?.environment?.currentZoneId ??
         null
       );
+    case 'observer':
+      // Two legs at different world spots stream different content, so they are
+      // not one another's control however well every other key matches.
+      return captureInfo.observer ?? null;
     case 'groupId':
       return captureInfo.groupId ?? null;
     case 'fixture':
@@ -663,8 +826,241 @@ export function areComparable(left, right, options = {}) {
   return comparabilityMismatches(left, right, options).length === 0;
 }
 
+/**
+ * Best-effort name for the cache-key segment a variant changed.
+ *
+ * Position is counted from the END, because the `defines` block before the
+ * parameters is variable length. The tail is
+ * `... parameters(48), programLayersMask, outputColorSpace, customProgramCacheKey`.
+ *
+ * The catch, stated rather than hidden: `array.join()` uses a comma and
+ * `customProgramCacheKey` is the onBeforeCompile SOURCE for a patched material,
+ * so it contributes its own commas and shifts the count. A name is therefore
+ * returned only when the position lands inside the parameter block under the
+ * assumption of a single trailing segment (a material with no hook). Otherwise
+ * the caller gets `null` and must read the before/after VALUES, which are not
+ * affected by the shift.
+ */
+export function variantDiffParameter(diff) {
+  if (!diff || !Number.isInteger(diff.segmentIndex) || !Number.isInteger(diff.segmentsBefore))
+    return null;
+  const trailers = THREE_CACHE_KEY_TRAILERS.length;
+  const fromEnd = diff.segmentsBefore - diff.segmentIndex;
+  if (fromEnd === 1) return 'customProgramCacheKey';
+  if (fromEnd >= 2 && fromEnd <= trailers + 1)
+    return THREE_CACHE_KEY_TRAILERS[trailers + 1 - fromEnd];
+  const parameterIndex = THREE_CACHE_KEY_PARAMETERS.length + trailers + 1 - fromEnd;
+  if (parameterIndex < 0 || parameterIndex >= THREE_CACHE_KEY_PARAMETERS.length) return null;
+  return THREE_CACHE_KEY_PARAMETERS[parameterIndex];
+}
+
+/**
+ * Group every observed variant by what actually changed. A condition that flips
+ * globally shows up as ONE before/after pair shared by many materials, which is
+ * what separates it from content arriving one subsystem at a time.
+ */
+export function cacheKeyVariance(capture) {
+  const programs = Array.isArray(capture?.timeline?.programs) ? capture.timeline.programs : [];
+  const linkAt = new Map();
+  for (const link of Array.isArray(capture?.timeline?.links) ? capture.timeline.links : []) {
+    const previous = linkAt.get(link.programId);
+    if (previous === undefined || link.startMs < previous.startMs) linkAt.set(link.programId, link);
+  }
+  const groups = new Map();
+  let variantPrograms = 0;
+  for (const program of programs) {
+    const diff = program.variantDiff;
+    if (!diff) continue;
+    variantPrograms++;
+    const parameter = variantDiffParameter(diff);
+    const key = `${parameter ?? `segment@-${diff.segmentsBefore - diff.segmentIndex}`}|${diff.before}->${diff.after}`;
+    let row = groups.get(key);
+    if (!row) {
+      row = {
+        parameter,
+        fromEnd: diff.segmentsBefore - diff.segmentIndex,
+        before: diff.before,
+        after: diff.after,
+        programs: 0,
+        materials: new Set(),
+        firstLinkAtMs: null,
+        lastLinkAtMs: null,
+      };
+      groups.set(key, row);
+    }
+    row.programs++;
+    row.materials.add(program.materialName || program.materialType || '(unnamed)');
+    const link = linkAt.get(program.programId);
+    if (link) {
+      if (row.firstLinkAtMs === null || link.startMs < row.firstLinkAtMs)
+        row.firstLinkAtMs = link.startMs;
+      if (row.lastLinkAtMs === null || link.startMs > row.lastLinkAtMs)
+        row.lastLinkAtMs = link.startMs;
+    }
+  }
+  return {
+    programsAttributed: programs.length,
+    variantPrograms,
+    groups: [...groups.values()]
+      .map((row) => ({ ...row, materials: [...row.materials].sort() }))
+      .sort((left, right) => right.programs - left.programs),
+  };
+}
+
+export const REFLECTION_FAMILIES = Object.freeze([
+  // Never submitted to compileAsync: linkProgram and the first use happen in
+  // the same instruction stream, so the query absorbs the whole link.
+  'never-compiled',
+  // Submitted, but drawn before any completion poll returned true. The draw
+  // raced its own pending link and pays whatever link time remained.
+  'raced-pending-link',
+  // A completion poll had already returned true when the first use arrived.
+  // This is the only family that measures reflection itself.
+  'settled-first',
+]);
+
+const REFLECTION_KINDS = Object.freeze(['active-uniforms', 'active-attributes']);
+
+function emptyFamilyRow() {
+  return { calls: 0, totalMs: 0, maxMs: 0, programs: 0 };
+}
+
+/**
+ * Classify every reflection query by what the program's link had actually done
+ * by the time the query was issued.
+ *
+ * The discriminator is the completion-status RETURN VALUE, not a timestamp
+ * ordering: a program can be polled again after it is ready, so "the query came
+ * before the last poll" would misclassify. A program counts as settled only
+ * once a poll observed true strictly before the reflection query started.
+ */
+export function reflectionAttribution(capture) {
+  const timeline = capture?.timeline ?? {};
+  const queries = Array.isArray(timeline.queries) ? timeline.queries : [];
+  const links = Array.isArray(timeline.links) ? timeline.links : [];
+  const identities = new Map(
+    (Array.isArray(timeline.programs) ? timeline.programs : []).map((program) => [
+      program.programId,
+      program,
+    ]),
+  );
+  const revealAtMs =
+    (Array.isArray(timeline.phases) ? timeline.phases : []).find(
+      (phase) => phase?.event === 'reveal',
+    )?.atMs ?? null;
+
+  const polls = new Map();
+  for (const query of queries) {
+    if (query?.kind !== 'completion-status') continue;
+    let row = polls.get(query.programId);
+    if (!row) {
+      row = { first: null, readyAt: null };
+      polls.set(query.programId, row);
+    }
+    if (row.first === null || query.startMs < row.first) row.first = query.startMs;
+    if (query.value === true && (row.readyAt === null || query.startMs < row.readyAt))
+      row.readyAt = query.startMs;
+  }
+
+  const firstLink = new Map();
+  for (const link of links) {
+    if (!finite(link?.startMs)) continue;
+    const previous = firstLink.get(link.programId);
+    if (previous === undefined || link.startMs < previous.startMs)
+      firstLink.set(link.programId, link);
+  }
+
+  const familyOf = (query) => {
+    const poll = polls.get(query.programId);
+    if (!poll || !finite(poll.first) || poll.first >= query.startMs) return 'never-compiled';
+    if (poll.readyAt !== null && poll.readyAt < query.startMs) return 'settled-first';
+    return 'raced-pending-link';
+  };
+
+  const families = {};
+  for (const family of REFLECTION_FAMILIES) {
+    families[family] = { cover: emptyFamilyRow(), live: emptyFamilyRow(), all: emptyFamilyRow() };
+  }
+  const seenPrograms = { cover: new Set(), live: new Set(), all: new Set() };
+  const rows = [];
+  for (const query of queries) {
+    if (!REFLECTION_KINDS.includes(query?.kind)) continue;
+    const family = familyOf(query);
+    const phase = query.phaseAtStart === 'live' ? 'live' : 'cover';
+    for (const bucket of [phase, 'all']) {
+      const row = families[family][bucket];
+      row.calls++;
+      row.totalMs += query.durationMs;
+      row.maxMs = Math.max(row.maxMs, query.durationMs);
+      const key = `${family}:${query.programId}`;
+      if (!seenPrograms[bucket].has(key)) {
+        seenPrograms[bucket].add(key);
+        row.programs++;
+      }
+    }
+    if (query.kind !== 'active-uniforms') continue;
+    const identity = identities.get(query.programId) ?? null;
+    const link = firstLink.get(query.programId) ?? null;
+    rows.push({
+      programId: query.programId,
+      family,
+      phase,
+      kind: query.kind,
+      startMs: query.startMs,
+      durationMs: query.durationMs,
+      activeCount: finite(query.value) ? query.value : null,
+      preControlMs: finite(query.preControlMs) ? query.preControlMs : null,
+      materialType: identity?.materialType ?? '',
+      materialName: identity?.materialName ?? '',
+      cacheKeyHash: identity?.cacheKeyHash ?? '',
+      linkAtMs: link?.startMs ?? null,
+      linkLane: link?.lane ?? null,
+      linkPhase: link?.phaseAtStart ?? null,
+      linkToReflectionMs: link && finite(link.startMs) ? query.startMs - link.startMs : null,
+      draw: query.draw ?? null,
+    });
+  }
+
+  // A live variant whose cache key was already linked under the curtain is a
+  // DUPLICATE the prewarm dedupe missed; one that never appears under cover is
+  // a variant prewarm never built. The two need different fixes, so they are
+  // counted apart rather than lumped into one "missed by prewarm" number.
+  const coverCacheKeys = new Set();
+  for (const link of links) {
+    if (link.phaseAtStart === 'live') continue;
+    const hash = identities.get(link.programId)?.cacheKeyHash;
+    if (hash) coverCacheKeys.add(hash);
+  }
+  let liveLinkedKnownKey = 0;
+  let liveLinkedNewKey = 0;
+  let liveLinkedUnattributed = 0;
+  for (const link of links) {
+    if (link.phaseAtStart !== 'live') continue;
+    const hash = identities.get(link.programId)?.cacheKeyHash;
+    if (!hash) liveLinkedUnattributed++;
+    else if (coverCacheKeys.has(hash)) liveLinkedKnownKey++;
+    else liveLinkedNewKey++;
+  }
+
+  return {
+    revealAtMs,
+    families,
+    programsAttributed: identities.size,
+    linksTotal: links.length,
+    linksCover: links.filter((link) => link.phaseAtStart !== 'live').length,
+    linksLive: links.filter((link) => link.phaseAtStart === 'live').length,
+    liveLinkedKnownKey,
+    liveLinkedNewKey,
+    liveLinkedUnattributed,
+    rows: rows.sort((left, right) => right.durationMs - left.durationMs),
+  };
+}
+
 /** Derive a compact summary only after raw validation has succeeded. */
-export function summarizeCapture(capture, { slowMs = 100, windowMs = 8_000 } = {}) {
+export function summarizeCapture(
+  capture,
+  { slowMs = 100, windowMs = 8_000, reflectionRows = 40 } = {},
+) {
   const validation = validateCapture(capture);
   if (!validation.valid)
     throw new Error(`cannot summarize invalid capture: ${validation.errors.join('; ')}`);
@@ -693,8 +1089,18 @@ export function summarizeCapture(capture, { slowMs = 100, windowMs = 8_000 } = {
     row.totalMs += query.durationMs;
     row.maxMs = Math.max(row.maxMs, query.durationMs);
   }
+  const attribution = reflectionAttribution(capture);
   return {
     schemaVersion: GPU_HITCH_SCHEMA_VERSION,
+    // The full per-program rows stay derivable from the raw timeline; the
+    // summary keeps only the most expensive ones so the artifact does not carry
+    // a second copy of the reflection timeline.
+    reflection: {
+      ...attribution,
+      rows: attribution.rows.slice(0, reflectionRows),
+      rowsTotal: attribution.rows.length,
+    },
+    cacheKeyVariance: cacheKeyVariance(capture),
     linksTotal: links.length,
     linksByLane: links.reduce((out, link) => {
       out[link.lane] = (out[link.lane] ?? 0) + 1;

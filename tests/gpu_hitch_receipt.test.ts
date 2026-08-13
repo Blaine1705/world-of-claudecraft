@@ -18,7 +18,7 @@ describe('gpu hitch runtime receipt', () => {
       },
     });
     expect(receipt).toMatchObject({
-      schemaVersion: 1,
+      schemaVersion: 3,
       requested: { linkrate: 24, modularpeers: 'off' },
       effective: {
         prewarmPacing: { available: false, mode: 'unsupported' },

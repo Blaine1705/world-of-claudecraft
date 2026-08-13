@@ -58,6 +58,10 @@ const usage = `GPU hitch capture
   --profile shader|upload|full  instrumentation profile (default shader)
   --duration-ms N        capture duration after world entry (default ${DEFAULT_DURATION_MS})
   --viewport WIDTHxHEIGHT  CSS viewport at DPR 1 (default 1600x900)
+  --observer X,Z         world spot the observer AND the geared crowd occupy
+                         (default 0,0). Changing it changes what is measured:
+                         a different town streams different content, so a leg
+                         here is only comparable with another at the same spot.
   --out FILE             JSON output (default tmp/gpu-hitch_<stamp>.json)
   --group-id TOKEN       A/B campaign identifier (requires leg/repetition/order)
   --leg TOKEN            leg label inside the A/B campaign
@@ -81,6 +85,15 @@ function campaignToken(value, label) {
   return value;
 }
 
+function observerSpot(value) {
+  const match = /^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/.exec(value);
+  const x = Number(match?.[1]);
+  const z = Number(match?.[2]);
+  if (!Number.isFinite(x) || !Number.isFinite(z))
+    throw new Error('--observer must use X,Z with finite numbers');
+  return { x, z };
+}
+
 function viewport(value) {
   const match = /^(\d+)x(\d+)$/i.exec(value);
   const width = Number(match?.[1]);
@@ -100,6 +113,7 @@ export function parseArgs(argv) {
     profile: 'shader',
     durationMs: DEFAULT_DURATION_MS,
     viewport: { ...DEFAULT_VIEWPORT },
+    observer: null,
     out: null,
     groupId: null,
     leg: null,
@@ -133,6 +147,7 @@ export function parseArgs(argv) {
         throw new Error('--profile must be shader, upload, or full');
     } else if (option === '--duration-ms') args.durationMs = integer(next(), '--duration-ms');
     else if (option === '--viewport') args.viewport = viewport(next());
+    else if (option === '--observer') args.observer = observerSpot(next());
     else if (option === '--out') args.out = next();
     else if (option === '--group-id') args.groupId = campaignToken(next(), '--group-id');
     else if (option === '--leg') args.leg = campaignToken(next(), '--leg');
@@ -299,6 +314,7 @@ export function buildCapture({ args, url, snapshot, browserVersion, flags, prove
       complete: snapshot.stopReason === 'duration',
       url: sanitizedUrl,
       zone: snapshot.rendererStats?.currentZoneId ?? null,
+      observer: args.observer ?? null,
       fixture: args.fixtureEvidence ?? null,
     },
     provenance: {
@@ -312,6 +328,8 @@ export function buildCapture({ args, url, snapshot, browserVersion, flags, prove
       phases: snapshot.transitions,
       links: snapshot.links,
       queries: snapshot.queries,
+      programs: snapshot.programs ?? [],
+      sceneRoots: snapshot.sceneRoots ?? [],
       compileUnits: compileUnitsOnProbeTimeline(
         snapshot.rendererStats?.prewarm?.compileUnits,
         snapshot.startedAtPerformanceMs,
@@ -321,6 +339,7 @@ export function buildCapture({ args, url, snapshot, browserVersion, flags, prove
     },
     diagnostics: {
       controls: snapshot.controls,
+      rendererHook: snapshot.rendererHook ?? null,
       runtimeReceipt: receipt,
       rendererStats: snapshot.rendererStats,
       probeRunningAtStop: snapshot.running,
@@ -364,16 +383,17 @@ async function enterOnlineGearedGame(page, args, runId) {
     },
   );
   await dismissEntryOverlays(page);
+  const observer = args.observer ?? GEARED_ARRIVAL_OBSERVER;
   await page.evaluate(({ x, z }) => {
     window.__game.online.devCmd({ cmd: 'dev_teleport', x, z });
-  }, GEARED_ARRIVAL_OBSERVER);
+  }, observer);
   await page.waitForFunction(
     ({ x, z }) => {
       const position = window.__game?.world?.player?.pos;
       return position && Math.hypot(position.x - x, position.z - z) < 2;
     },
     { timeout: 10_000, polling: 100 },
-    GEARED_ARRIVAL_OBSERVER,
+    observer,
   );
 }
 
@@ -397,7 +417,10 @@ export async function prepareOnlineGearedRoster({
     count: args.bots,
     runId,
   });
-  await roster.prepare();
+  // The geared crowd rides with the observer: measuring a different town with
+  // the bots left behind at the default spot would silently change the scenario
+  // (no nearby geared players) as well as the location.
+  await roster.prepare({ center: args.observer ?? GEARED_ARRIVAL_OBSERVER });
   return roster;
 }
 

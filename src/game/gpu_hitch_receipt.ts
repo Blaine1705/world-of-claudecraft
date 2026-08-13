@@ -5,7 +5,11 @@
 
 declare const __APP_BUILD_ID__: string;
 
-export const GPU_HITCH_RECEIPT_VERSION = 1;
+// Tracks GPU_HITCH_SCHEMA_VERSION in scripts/profiler/gpu_hitch_metrics.mjs:
+// the analyzer rejects a receipt whose version does not match the schema it
+// validates, so a served build older than the capture tooling cannot pass as a
+// comparable leg.
+export const GPU_HITCH_RECEIPT_VERSION = 3;
 
 export interface GpuHitchRuntimeReceipt {
   schemaVersion: number;
