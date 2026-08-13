@@ -291,7 +291,9 @@ function optionalInstance(value: unknown): ItemInstancePayload | null | undefine
   if (value === undefined) return undefined;
   if (value === null) return null;
   if (typeof value !== 'object' || Array.isArray(value)) invalid();
-  if (JSON.stringify(value).length > INSTANCE_MAX_JSON_BYTES) invalid();
+  // Real BYTES, not UTF-16 code units: .length undercounts non-ASCII payloads
+  // by up to 3x, which would quietly triple the budget the constant names.
+  if (Buffer.byteLength(JSON.stringify(value), 'utf8') > INSTANCE_MAX_JSON_BYTES) invalid();
   return value as ItemInstancePayload;
 }
 

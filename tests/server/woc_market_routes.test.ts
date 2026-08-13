@@ -302,6 +302,28 @@ describe('the refusal-to-wire mapping', () => {
       status: 400,
     });
     expect(reached).toBe(0);
+    // The bound counts BYTES, not UTF-16 code units: this payload sits under
+    // 2048 in .length but over it in utf8 bytes, so a code-unit measure
+    // would quietly triple the budget for non-ASCII payloads.
+    const wide = { rolled: { stats: { str: 'あ'.repeat(900) } } };
+    expect(JSON.stringify(wide).length).toBeLessThan(2048);
+    expect(Buffer.byteLength(JSON.stringify(wide), 'utf8')).toBeGreaterThan(2048);
+    const wideCtx = fakeCtx({
+      method: 'POST',
+      url: '/api/woc-market/offers',
+      account: { accountId: VIEWER, scope: 'full' },
+      body: {
+        characterId: 1,
+        sellerCharacterName: 'Selara',
+        usdCents: 5000,
+        itemId: 'crown_of_embers',
+        itemInstance: wide,
+      },
+    });
+    await expect(handlerFor('POST', '/api/woc-market/offers')(wideCtx)).rejects.toMatchObject({
+      status: 400,
+    });
+    expect(reached).toBe(0);
     // The positive direction: a realistic worst-case payload (a rift piece
     // with rolled stats, an enchant, a signer, charges, and provenance) sits
     // WELL under the bound and must reach the service, or a legitimate

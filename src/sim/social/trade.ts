@@ -378,17 +378,11 @@ function removeOffer(ctx: SimContext, items: InvSlot[], fromPid: number): Pendin
     }
     grants.push({ itemId: s.itemId, units });
   }
-  // ONE quest-hook fire per distinct ITEM ID, the pre-preview cadence
-  // exactly (the old merged offer held one line per id; per-copy staging can
-  // split an id across slots, and firing per SLOT multiplied the recompute).
-  if (meta) {
-    const fired = new Set<string>();
-    for (const s of items) {
-      if (fired.has(s.itemId)) continue;
-      fired.add(s.itemId);
-      ctx.onInventoryChangedForQuests?.(meta);
-    }
-  }
+  // ONE quest-hook fire per removal batch: the hook is a whole-log recompute
+  // that emits only deltas, and every fire here would see the same final
+  // state, so a single call carries exactly what N per-id (or per-slot)
+  // calls would, minus the wasted walks. Zero staged lines means zero fires.
+  if (meta && items.length > 0) ctx.onInventoryChangedForQuests?.(meta);
   return grants;
 }
 

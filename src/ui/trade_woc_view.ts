@@ -374,12 +374,19 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
     tokens: wocMode ? input.tokens : null,
     split: wocMode ? input.split : null,
     pendingOffer: input.pendingOffer,
-    // Only the seller accepts, and only with something eligible on the table:
-    // acceptance is what escrows the goods, so there must be goods.
+    // Only the seller accepts, and only with the agreed shape on the table:
+    // acceptance is what escrows the goods, so there must be goods, and the
+    // deal covers ONE pinned copy, so the seller's WHOLE table must be one
+    // eligible single-unit slot (the send-side one_item rule, mirrored). A
+    // second staged slot or a stack makes the accept's slot resolution
+    // ambiguous, and the server's pin digest could only refuse the surplus
+    // as item_mismatch after the fact.
     canAccept:
       input.pendingOffer?.phase === 'review' &&
       input.pendingOffer.role === 'seller' &&
-      input.staged.filter((s) => wocTradableSlot(s, input.items)).length > 0,
+      input.staged.length === 1 &&
+      input.staged[0].count === 1 &&
+      wocTradableSlot(input.staged[0], input.items),
     // Only the buyer pays, and only once the goods are actually in escrow: a pay
     // button before that would take money for an item still in someone's bags.
     canPay:

@@ -310,6 +310,18 @@ export class WocTradeController {
     // item_mismatch), while the cleaned offer carries the per-copy payload the
     // staging preview pinned. The local list stays as the pre-send fallback.
     const stagedAuthoritative = this.sim.tradeInfo?.myOffer.items ?? this.stagedTrade.items;
+    if (
+      offer.role === 'seller' &&
+      (stagedAuthoritative.length > 1 || (stagedAuthoritative[0]?.count ?? 1) !== 1)
+    ) {
+      // The model already disables accept for this shape (the whole-table
+      // one_item rule), but the button can be stale against the sim's
+      // cleaned offer, so the send path refuses with the same WHY rather
+      // than resolving an ambiguous first-eligible slot into a server-side
+      // item_mismatch.
+      this.log(t('hudChrome.trade.woc.hintOneItem'), '#ff6b6b');
+      return;
+    }
     const first =
       offer.role === 'seller'
         ? stagedAuthoritative.find((sl) => wocTradableSlot(sl, ITEMS))

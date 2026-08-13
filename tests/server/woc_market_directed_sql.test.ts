@@ -779,28 +779,31 @@ describe('the settlement guards ship their DDL (structural floor)', () => {
     );
   });
 
-  it('both boot repairs gate on index VALIDITY, and both creates drop an invalid carcass', async () => {
+  it('every boot repair gates on index VALIDITY, and every create drops an invalid carcass', async () => {
     const schema = await strippedSchema();
     // The repair gates: an INVALID carcass must re-open the repair, so the
     // gate reads pg_index.indisvalid through the search_path-aware
     // to_regclass house idiom (a hardcoded nspname breaks the runs-once
     // property under a non-public search_path), never bare existence.
-    expect(schema).toContain(
-      "WHERE i.indexrelid = to_regclass('woc_market_settlements_open2') AND i.indisvalid",
-    );
-    expect(schema).toContain(
-      "WHERE i.indexrelid = to_regclass('woc_market_sales_listing_once') AND i.indisvalid",
-    );
-    // The carcass drops ahead of each CREATE (IF NOT EXISTS matches by name
-    // and would keep an index that enforces nothing).
-    expect(schema).toContain(
-      "WHERE i.indexrelid = to_regclass('woc_market_settlements_open2') AND NOT i.indisvalid",
-    );
-    expect(schema).toContain(
-      "WHERE i.indexrelid = to_regclass('woc_market_sales_listing_once') AND NOT i.indisvalid",
-    );
-    expect(schema).toContain("EXECUTE 'DROP INDEX woc_market_settlements_open2'");
-    expect(schema).toContain("EXECUTE 'DROP INDEX woc_market_sales_listing_once'");
+    // One arm per repair-plus-unique-index pair; a NEW pair joins this list
+    // in the same change or this pin is exactly how its omission hides.
+    const guardedIndexes = [
+      'woc_market_settlements_open2',
+      'woc_market_sales_listing_once',
+      'woc_market_offers_pair_pending',
+    ];
+    for (const name of guardedIndexes) {
+      expect(schema).toContain(`WHERE i.indexrelid = to_regclass('${name}') AND i.indisvalid`);
+      // The carcass drop ahead of each CREATE (IF NOT EXISTS matches by name
+      // and would keep an index that enforces nothing).
+      expect(schema).toContain(`WHERE i.indexrelid = to_regclass('${name}') AND NOT i.indisvalid`);
+      expect(schema).toContain(`EXECUTE 'DROP INDEX ${name}'`);
+    }
+    // The list itself is pinned against the schema: every partial UNIQUE
+    // index created after a repair must appear above.
+    for (const name of guardedIndexes) {
+      expect(schema).toContain(`CREATE UNIQUE INDEX IF NOT EXISTS ${name}`);
+    }
   });
 
   it('the settlements repair ranks every open state above the ELSE arm', async () => {

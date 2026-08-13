@@ -2729,9 +2729,12 @@ export class WocMarketService {
    * expire it when its TTL already passed. Both writes are the
    * accepted-and-unstamped CAS, so a pathologically late COMMIT that lands
    * the stamp mid-arm makes the write miss harmlessly (EvalPlanQual
-   * re-checks the row's own columns). One pass resolves every row, so there
-   * is no park machinery here; per-row isolation keeps a poisoned row from
-   * stranding the batch.
+   * re-checks the row's own columns). Nearly every row resolves in one
+   * pass; the exception is a reopen BLOCKED by an occupied pair slot, which
+   * keeps its updated_at and re-enters at the batch head each pass until
+   * its own TTL flips it to the expire arm, a bounded few minutes, so there
+   * is still no park machinery here; per-row isolation keeps a poisoned row
+   * from stranding the batch.
    */
   private async convergeUnstampedOffers(nowMs: number): Promise<number> {
     const due = await this.deps.db.acceptedUnstampedOffers(

@@ -758,6 +758,56 @@ describeDb('woc market directed rail against real Postgres', () => {
         false,
       );
     });
+
+    it('the 23505 race belt swallows a concurrent pair insert by CONSTRAINT name', async () => {
+      // The NOT EXISTS subquery reads its snapshot before the index write, so
+      // a pair offer committing in between raises 23505 from the partial
+      // unique index; the belt keys on err.constraint carrying the index
+      // name. Staged deterministically: the racer's INSERT sits uncommitted
+      // (invisible to the subquery), the reopen proceeds to the index write
+      // and blocks on the racer's transaction, and the COMMIT turns the
+      // block into 23505. A renamed index or a driver that stopped naming
+      // the constraint would rethrow here and fail this test.
+      const realm = 'directed-reopen-race';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const stuck = await seedOffer(realm, seller, buyer, {
+        status: 'accepted',
+        buyerAccepted: true,
+        sellerAccepted: true,
+      });
+      const racer = await pool.connect();
+      try {
+        await racer.query('BEGIN');
+        await racer.query(
+          `INSERT INTO woc_market_directed_offers (
+             realm, seller_account, seller_character, seller_name, buyer_account,
+             buyer_name, usd_cents, status, listing_id, expires_at, updated_at,
+             buyer_accepted, seller_accepted, item_id, item_pin
+           ) VALUES ($1, $2, 9500, 'RaceSeller', $3, 'RaceBuyer', 1000, 'pending', NULL,
+                     to_timestamp($4 / 1000.0), now(), false, false,
+                     'amber_crimson_armor_plate', 'pin')`,
+          [realm, seller, buyer, BASE_MS + 10 * MINUTE_MS],
+        );
+        const reopen = marketDb.reopenDirectedOffer(realm, stuck);
+        // Commit only after the reopen backend reports it is blocked on the
+        // racer's transaction, so the 23505 path (not the visible-row guard)
+        // is deterministically the one under test.
+        for (let i = 0; i < 200; i++) {
+          const waiting = await racer.query(
+            `SELECT 1 FROM pg_stat_activity
+              WHERE wait_event_type = 'Lock' AND query LIKE '%woc_market_directed_offers o%'`,
+          );
+          if (waiting.rows.length > 0) break;
+          await new Promise((resolve) => setTimeout(resolve, 10));
+        }
+        await racer.query('COMMIT');
+        expect(await reopen, 'swallowed as the pair-occupied no-op').toBe(false);
+      } finally {
+        racer.release();
+      }
+      expect((await offerRow(stuck)).status).toBe('accepted');
+    });
   });
 
   describe('the offer-expiry sweep against a concurrent stamp, in real SQL', () => {

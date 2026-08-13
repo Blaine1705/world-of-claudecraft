@@ -1014,11 +1014,13 @@ describe('trade module (direct, no Sim)', () => {
     }
   });
 
-  it('fires the quest hook once per distinct item id on transfer, not per staged slot', () => {
-    // The recompute cadence is the pre-preview contract: per-copy staging can
-    // split one id across several slots, and a per-slot fire multiplied the
-    // whole-log quest recompute (the hook recomputes everything, so the call
-    // COUNT is the only observable). Staging itself is a preview: no fire.
+  it('fires the quest hook ONCE per transfer batch, not per staged slot or per id', () => {
+    // The hook is a whole-log recompute that emits only deltas, and every
+    // fire after the removal loop sees the same final state, so one call
+    // carries everything and the call COUNT is the only observable. Per-copy
+    // staging can split one id across several slots; neither the slot count
+    // nor the id count may multiply the recompute. Staging itself is a
+    // preview: no fire.
     const instance = { signer: 'Ayla' };
     const { ctx, players } = makeInstancedTradeCtx(
       [
@@ -1045,7 +1047,7 @@ describe('trade module (direct, no Sim)', () => {
     tradeMod.tradeConfirm(ctx, 1);
     tradeMod.tradeConfirm(ctx, 2);
     expect(players.get(2).inventory).toHaveLength(3);
-    expect(fired, 'two distinct ids across three staged slots').toBe(2);
+    expect(fired, 'one batch fire for two ids across three staged slots').toBe(1);
   });
 
   it('updateTradesAndInvites expires stale invites and cancels drifted trades', () => {

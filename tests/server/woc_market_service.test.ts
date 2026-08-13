@@ -3721,7 +3721,9 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     expect(claimed).not.toBeNull();
     const second = await h.service.createDirectedOffer(offerArgs({ usdCents: 6000 }));
     expect(second.ok, 'the accepted first offer frees the pair slot').toBe(true);
-    await h.db.reopenDirectedOffer(REALM, first.offer.id);
+    expect(await h.db.reopenDirectedOffer(REALM, first.offer.id), 'a blocked reopen says so').toBe(
+      false,
+    );
     expect((await h.db.directedOfferById(REALM, first.offer.id))?.status).toBe('accepted');
     // Past the TTL the converge arm expires the blocked row (the pending
     // sweep cannot see an 'accepted' row, so only converge can have done
@@ -3734,6 +3736,31 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     if (second.ok) {
       expect((await h.db.directedOfferById(REALM, second.offer.id))?.status).toBe('expired');
     }
+  });
+
+  it('the converge REOPEN branch no-ops while the pair is occupied and never counts it as progress', async () => {
+    // The stat honesty pin: a blocked reopen moves nothing, so the sweep must
+    // not report it converged (the stuck monitor reads this number); once the
+    // pair frees, the SAME row reopens and counts. The clock sits 1s before
+    // the offer TTL so the reopen branch, not the expire branch, is under
+    // test.
+    const h = stocked();
+    const first = await h.service.createDirectedOffer(offerArgs());
+    if (!first.ok) throw new Error('offer refused');
+    await h.service.acceptDirectedOffer(BUYER_A, first.offer.id, null, CHAR_A);
+    const claimed = await h.db.resolveDirectedOffer(REALM, first.offer.id, 'accepted');
+    expect(claimed).not.toBeNull();
+    const second = await h.service.createDirectedOffer(offerArgs({ usdCents: 6000 }));
+    if (!second.ok) throw new Error('pair offer refused');
+    h.setNow(first.offer.expiresAtMs - 1000);
+    const blocked = await h.service.sweepPass();
+    expect(blocked?.convergedOffers, 'a blocked no-op is not progress').toBe(0);
+    expect((await h.db.directedOfferById(REALM, first.offer.id))?.status).toBe('accepted');
+    const freed = await h.service.resolveDirectedOffer(SELLER, second.offer.id, 'decline');
+    expect(freed.ok).toBe(true);
+    const after = await h.service.sweepPass();
+    expect(after?.convergedOffers).toBe(1);
+    expect((await h.db.directedOfferById(REALM, first.offer.id))?.status).toBe('pending');
   });
 
   it('spares the strike when the recorded refusal is the exempt service outage class', async () => {

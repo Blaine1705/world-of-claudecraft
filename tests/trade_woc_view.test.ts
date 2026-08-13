@@ -400,7 +400,7 @@ describe('a disabled send button always says WHY', () => {
   });
 });
 
-describe('sending is gated on a real, positive price', () => {
+describe('sending is gated on a real, positive price and an eligible table', () => {
   it.each([
     ['empty', null],
     ['zero', 0],
@@ -447,13 +447,20 @@ describe('a standing offer changes what each side may do', () => {
     expect(m.canSend, 'a standing offer must not be stackable').toBe(false);
   });
 
-  it('lets only the SELLER accept, and only with eligible goods staged', () => {
+  it('lets only the SELLER accept, and only with EXACTLY the agreed shape staged', () => {
     const asSeller = (staged: InvSlot[]) =>
       buildWocTradeModel(input({ pendingOffer: { ...offer, role: 'seller' }, staged }));
     expect(asSeller([slot(EPIC.id)]).canAccept).toBe(true);
     // Acceptance escrows the goods, so there must be goods, and eligible ones.
     expect(asSeller([]).canAccept).toBe(false);
     expect(asSeller([slot(QUEST.id)]).canAccept).toBe(false);
+    // The whole-table one_item rule, mirrored from the send side: a SECOND
+    // staged slot (eligible or not) or a stacked count makes the accept's
+    // first-eligible slot resolution ambiguous, and the server could only
+    // refuse the surplus as item_mismatch after the fact.
+    expect(asSeller([slot(EPIC.id), slot(EPIC.id)]).canAccept).toBe(false);
+    expect(asSeller([slot(EPIC.id), slot(QUEST.id)]).canAccept).toBe(false);
+    expect(asSeller([{ itemId: EPIC.id, count: 2 }]).canAccept).toBe(false);
   });
 
   it('never lets the BUYER accept their own offer', () => {

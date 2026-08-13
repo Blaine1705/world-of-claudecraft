@@ -689,6 +689,19 @@ UPDATE woc_market_directed_offers o SET status = 'expired', updated_at = now()
    SELECT 1 FROM woc_market_directed_offers n
     WHERE n.realm = o.realm AND n.buyer_account = o.buyer_account
       AND n.seller_account = o.seller_account AND n.status = 'pending' AND n.id > o.id);
+-- Same carcass rule as the settlements and sales indexes: drop an INVALID
+-- leftover so IF NOT EXISTS cannot keep a name-matching index that enforces
+-- nothing. Without this, an invalid carcass would also hold the repair's
+-- validity gate open forever (the repair re-scans every boot while the
+-- index it repairs for never gets built).
+DO $woc_pair_idx$ BEGIN
+  IF EXISTS (
+    SELECT 1 FROM pg_index i
+     WHERE i.indexrelid = to_regclass('woc_market_offers_pair_pending')
+       AND NOT i.indisvalid) THEN
+    EXECUTE 'DROP INDEX woc_market_offers_pair_pending';
+  END IF;
+END $woc_pair_idx$;
 CREATE UNIQUE INDEX IF NOT EXISTS woc_market_offers_pair_pending
   ON woc_market_directed_offers(realm, buyer_account, seller_account)
   WHERE status = 'pending';
