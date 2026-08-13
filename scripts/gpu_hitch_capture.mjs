@@ -33,9 +33,9 @@ import {
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const DEFAULT_URL = 'http://localhost:5173/?perf';
 const DEFAULT_DURATION_MS = 180_000;
+const DEFAULT_VIEWPORT = Object.freeze({ width: 1600, height: 900, deviceScaleFactor: 1 });
 const PROFILE_PREFIX = 'woc-gpu-hitch-';
 const BROWSER_ARGS = Object.freeze([
-  '--window-size=1620,960',
   '--ignore-gpu-blocklist',
   '--enable-gpu',
   '--disable-gpu-shader-disk-cache',
@@ -57,6 +57,7 @@ const usage = `GPU hitch capture
   --bots N               deterministic geared crowd size for online-geared (default 20)
   --profile shader|upload|full  instrumentation profile (default shader)
   --duration-ms N        capture duration after world entry (default ${DEFAULT_DURATION_MS})
+  --viewport WIDTHxHEIGHT  CSS viewport at DPR 1 (default 1600x900)
   --out FILE             JSON output (default tmp/gpu-hitch_<stamp>.json)
   --group-id TOKEN       A/B campaign identifier (requires leg/repetition/order)
   --leg TOKEN            leg label inside the A/B campaign
@@ -80,6 +81,16 @@ function campaignToken(value, label) {
   return value;
 }
 
+function viewport(value) {
+  const match = /^(\d+)x(\d+)$/i.exec(value);
+  const width = Number(match?.[1]);
+  const height = Number(match?.[2]);
+  if (!Number.isInteger(width) || width <= 0 || !Number.isInteger(height) || height <= 0) {
+    throw new Error('--viewport must use WIDTHxHEIGHT with positive integers');
+  }
+  return { width, height, deviceScaleFactor: 1 };
+}
+
 export function parseArgs(argv) {
   const args = {
     url: DEFAULT_URL,
@@ -88,6 +99,7 @@ export function parseArgs(argv) {
     bots: 20,
     profile: 'shader',
     durationMs: DEFAULT_DURATION_MS,
+    viewport: { ...DEFAULT_VIEWPORT },
     out: null,
     groupId: null,
     leg: null,
@@ -120,6 +132,7 @@ export function parseArgs(argv) {
       if (!['shader', 'upload', 'full'].includes(args.profile))
         throw new Error('--profile must be shader, upload, or full');
     } else if (option === '--duration-ms') args.durationMs = integer(next(), '--duration-ms');
+    else if (option === '--viewport') args.viewport = viewport(next());
     else if (option === '--out') args.out = next();
     else if (option === '--group-id') args.groupId = campaignToken(next(), '--group-id');
     else if (option === '--leg') args.leg = campaignToken(next(), '--leg');
@@ -196,10 +209,14 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function browserFlags(headless) {
+function browserArgs(viewportSize) {
+  return [`--window-size=${viewportSize.width + 20},${viewportSize.height + 60}`, ...BROWSER_ARGS];
+}
+
+function browserFlags(headless, viewportSize) {
   return [
     '--user-data-dir=<temporary-profile>',
-    ...BROWSER_ARGS,
+    ...browserArgs(viewportSize),
     ...(headless ? ['--headless=new'] : []),
   ];
 }
@@ -393,7 +410,7 @@ export async function capture(args) {
   const profileDir = fs.mkdtempSync(path.join(os.tmpdir(), PROFILE_PREFIX));
   fs.mkdirSync(path.join(ROOT, 'tmp'), { recursive: true });
   const captureId = `${new Date().toISOString()}-${Math.random().toString(36).slice(2, 8)}`;
-  const flags = browserFlags(args.headless);
+  const flags = browserFlags(args.headless, args.viewport);
   const provenance = makeProvenance({
     gitHead: git(['rev-parse', '--short=12', 'HEAD']),
     branch: git(['rev-parse', '--abbrev-ref', 'HEAD']),
@@ -416,8 +433,8 @@ export async function capture(args) {
       executablePath: BROWSER_PATH,
       headless: args.headless ? 'new' : false,
       userDataDir: profileDir,
-      args: BROWSER_ARGS,
-      defaultViewport: { width: 1600, height: 900, deviceScaleFactor: 1 },
+      args: browserArgs(args.viewport),
+      defaultViewport: args.viewport,
     });
     // Reuse Chrome's initially focused tab. Opening a second tab makes Chrome
     // briefly mark the instrumented document hidden while focus transfers,

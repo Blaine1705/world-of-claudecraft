@@ -25,6 +25,7 @@ leg uses the same stable display configuration.
 node scripts/gpu_hitch_capture.mjs \
   --url 'http://localhost:5173/?perf&gfx=ultra' \
   --profile shader \
+  --viewport 1920x1080 \
   --duration-ms 180000 \
   --out tmp/gpu-hitch/example.json
 ```
@@ -44,6 +45,11 @@ hash is recorded. The tool uses a temporary browser profile and disables the
 shader disk cache. Chrome's sub-second initial target-focus handoff is
 normalized only while no application or GPU event exists. Any later hidden
 transition invalidates the capture.
+
+The default viewport is 1600 x 900 at DPR 1. Use `--viewport WIDTHxHEIGHT` to
+qualify another render resolution. The requested viewport is applied both to
+Puppeteer's page and to Chrome's outer-window flag, and the effective renderer
+size remains the comparability source of truth in the artifact.
 
 Profiles are intentionally not interchangeable:
 

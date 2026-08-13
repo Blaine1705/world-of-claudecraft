@@ -17,6 +17,8 @@ describe('gpu hitch capture CLI', () => {
         'full',
         '--duration-ms',
         '5000',
+        '--viewport',
+        '1920x1080',
         '--headless',
         '--allow-dirty',
         '--group-id',
@@ -32,6 +34,7 @@ describe('gpu hitch capture CLI', () => {
       mode: 'manual',
       profile: 'full',
       durationMs: 5000,
+      viewport: { width: 1920, height: 1080, deviceScaleFactor: 1 },
       headless: true,
       allowDirty: true,
       groupId: 'linkrate-v38-a1',
@@ -54,6 +57,16 @@ describe('gpu hitch capture CLI', () => {
     expect(() =>
       parseArgs(['--mode', 'online-geared', '--url', 'https://capture.example/?perf']),
     ).toThrow(/non-loopback --url/);
+    expect(() => parseArgs(['--viewport', '1920'])).toThrow(
+      '--viewport must use WIDTHxHEIGHT with positive integers',
+    );
+    expect(() => parseArgs(['--viewport', '1920x0'])).toThrow(
+      '--viewport must use WIDTHxHEIGHT with positive integers',
+    );
+  });
+
+  it('defaults to the reference 1600x900 viewport', () => {
+    expect(parseArgs([]).viewport).toEqual({ width: 1600, height: 900, deviceScaleFactor: 1 });
   });
 
   it('requires complete, safe A/B metadata', () => {
