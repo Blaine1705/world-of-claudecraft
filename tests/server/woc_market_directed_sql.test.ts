@@ -825,11 +825,25 @@ describe('the settlement guards ship their DDL (structural floor)', () => {
       expect(schema).toContain(`WHERE i.indexrelid = to_regclass('${name}') AND NOT i.indisvalid`);
       expect(schema).toContain(`EXECUTE 'DROP INDEX ${name}'`);
     }
-    // The list itself is pinned against the schema: every partial UNIQUE
-    // index created after a repair must appear above.
-    for (const name of guardedIndexes) {
-      expect(schema).toContain(`CREATE UNIQUE INDEX IF NOT EXISTS ${name}`);
-    }
+    // The REVERSE sweep, parsed from the schema itself: every unique index
+    // the boot DDL creates is either repair-backed (guardedIndexes) or
+    // named below with the reason it legitimately rides NO repair. A new
+    // repair-plus-unique-index pair cannot land outside guardedIndexes, and
+    // a new repairless unique index must state its reason here.
+    const repairlessUniqueIndexes = new Map([
+      [
+        'woc_market_buy_now_abandons_once',
+        'append-only abandon recorder: no historical duplicates to repair',
+      ],
+      [
+        'woc_market_bids_bond_signature',
+        'signature replay bound on a fresh column: nothing predates it',
+      ],
+    ]);
+    const created = [...schema.matchAll(/CREATE UNIQUE INDEX IF NOT EXISTS (\w+)/g)]
+      .map((m) => m[1])
+      .sort();
+    expect(created).toEqual([...guardedIndexes, ...repairlessUniqueIndexes.keys()].sort());
   });
 
   it('the settlements repair ranks every open state above the ELSE arm', async () => {

@@ -463,6 +463,37 @@ describe('a standing offer changes what each side may do', () => {
     expect(asSeller([{ itemId: EPIC.id, count: 2 }]).canAccept).toBe(false);
   });
 
+  it('names the RIGHT accept obstacle: needs-item vs one_item, per what is staged', () => {
+    const asSeller = (staged: InvSlot[]) =>
+      buildWocTradeModel(input({ pendingOffer: { ...offer, role: 'seller' }, staged }));
+    // Nothing sellable staged, table empty or not: "add the item" is true.
+    expect(asSeller([]).acceptHint).toBe('hudChrome.trade.woc.hintAcceptNeedsItem');
+    expect(asSeller([slot(QUEST.id)]).acceptHint).toBe('hudChrome.trade.woc.hintAcceptNeedsItem');
+    // Something sellable IS staged but the shape is wrong: "add the item"
+    // would contradict the visible table, so the WHY is the one_item rule.
+    expect(asSeller([slot(EPIC.id), slot(EPIC.id)]).acceptHint).toBe(
+      'hudChrome.trade.woc.hintOneItem',
+    );
+    expect(asSeller([slot(EPIC.id), slot(QUEST.id)]).acceptHint).toBe(
+      'hudChrome.trade.woc.hintOneItem',
+    );
+    expect(asSeller([{ itemId: EPIC.id, count: 2 }]).acceptHint).toBe(
+      'hudChrome.trade.woc.hintOneItem',
+    );
+    // The agreed shape clears it, the buyer never sees one, and a phase past
+    // review (goods escrowed, table CORRECTLY empty) names no obstacle.
+    expect(asSeller([slot(EPIC.id)]).acceptHint).toBeNull();
+    expect(buildWocTradeModel(input({ pendingOffer: offer, staged: [] })).acceptHint).toBeNull();
+    expect(
+      buildWocTradeModel(
+        input({
+          pendingOffer: { ...offer, role: 'seller', phase: 'awaiting_payment' },
+          staged: [],
+        }),
+      ).acceptHint,
+    ).toBeNull();
+  });
+
   it('never lets the BUYER accept their own offer', () => {
     const m = buildWocTradeModel(input({ pendingOffer: offer, staged: [slot(EPIC.id)] }));
     expect(m.canAccept).toBe(false);

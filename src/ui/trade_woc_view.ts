@@ -191,6 +191,11 @@ export interface WocTradeModel {
   pendingOffer: WocPendingOffer | null;
   /** Whether the SELLER may accept the standing offer (they hold the goods). */
   canAccept: boolean;
+  /** The i18n key explaining why the seller may NOT accept yet, or null when
+   *  they may (or when no review-phase offer points at them). Distinguishes
+   *  the two refusal shapes: nothing sellable staged versus a table holding
+   *  more than the one agreed copy. */
+  acceptHint: TranslationKey | null;
   /** Whether the BUYER may start paying: escrow is done and it is their turn. */
   canPay: boolean;
   /** Whether "Send offer" may be pressed. */
@@ -342,6 +347,20 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
               ? 'insufficient_balance'
               : null;
 
+  // Only the seller accepts, and only with the agreed shape on the table:
+  // acceptance is what escrows the goods, so there must be goods, and the
+  // deal covers ONE pinned copy, so the seller's WHOLE table must be one
+  // eligible single-unit slot (the send-side one_item rule, mirrored). A
+  // second staged slot or a stack makes the accept's slot resolution
+  // ambiguous, and the server's pin digest could only refuse the surplus as
+  // item_mismatch after the fact.
+  const canAccept =
+    input.pendingOffer?.phase === 'review' &&
+    input.pendingOffer.role === 'seller' &&
+    input.staged.length === 1 &&
+    input.staged[0].count === 1 &&
+    wocTradableSlot(input.staged[0], input.items);
+
   return {
     // The arm stays VISIBLE while blocked: hiding it would leave a player who
     // expected to trade for $WOC with no explanation of why they cannot, which
@@ -374,19 +393,20 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
     tokens: wocMode ? input.tokens : null,
     split: wocMode ? input.split : null,
     pendingOffer: input.pendingOffer,
-    // Only the seller accepts, and only with the agreed shape on the table:
-    // acceptance is what escrows the goods, so there must be goods, and the
-    // deal covers ONE pinned copy, so the seller's WHOLE table must be one
-    // eligible single-unit slot (the send-side one_item rule, mirrored). A
-    // second staged slot or a stack makes the accept's slot resolution
-    // ambiguous, and the server's pin digest could only refuse the surplus
-    // as item_mismatch after the fact.
-    canAccept:
-      input.pendingOffer?.phase === 'review' &&
-      input.pendingOffer.role === 'seller' &&
-      input.staged.length === 1 &&
-      input.staged[0].count === 1 &&
-      wocTradableSlot(input.staged[0], input.items),
+    canAccept,
+    // The WHY beside the (absent) accept affordance: the panel renders this
+    // key verbatim, so it must name the RIGHT obstacle. With something
+    // sellable staged but a wrong table shape, "add the item" would
+    // contradict the visible table; only a table with nothing sellable earns
+    // that copy. Scoped to the review phase: after acceptance the goods are
+    // escrowed and an empty table is the CORRECT state, not a problem to
+    // name.
+    acceptHint:
+      input.pendingOffer?.phase === 'review' && input.pendingOffer.role === 'seller' && !canAccept
+        ? input.staged.some((s) => wocTradableSlot(s, input.items))
+          ? SEND_HINT_KEYS.one_item
+          : 'hudChrome.trade.woc.hintAcceptNeedsItem'
+        : null,
     // Only the buyer pays, and only once the goods are actually in escrow: a pay
     // button before that would take money for an item still in someone's bags.
     canPay:

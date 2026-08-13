@@ -10,6 +10,7 @@
 import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { InvSlot, ItemDef } from '../src/sim/types';
+import { t } from '../src/ui/i18n';
 import {
   refreshWocTradeArm,
   type WocTradePanelDeps,
@@ -306,7 +307,25 @@ describe('a standing offer becomes a REVIEW surface for both sides', () => {
 
   it('still tells the seller when they have nothing staged to accept with', () => {
     const root = paint(deps({ pendingOffer: { ...offer, role: 'seller' }, staged: [] }));
-    expect(root.querySelector('[data-woc-hint]')?.textContent ?? '').not.toBe('');
+    expect(root.querySelector('[data-woc-hint]')?.textContent).toBe(
+      t('hudChrome.trade.woc.hintAcceptNeedsItem'),
+    );
+  });
+
+  it('tells the seller to leave ONE item when the table holds the sword plus a stack', () => {
+    // The wrong-WHY repro: with the agreed item plainly staged beside a
+    // companion, "add the item you are selling" contradicts the visible
+    // table; the model's acceptHint picks the one_item copy instead and the
+    // panel renders it verbatim.
+    const root = paint(
+      deps({
+        pendingOffer: { ...offer, role: 'seller' },
+        staged: [slot(EPIC.id), slot(EPIC.id)],
+      }),
+    );
+    expect(root.querySelector('[data-woc-hint]')?.textContent).toBe(
+      t('hudChrome.trade.woc.hintOneItem'),
+    );
   });
 
   it('reports a withdraw press', () => {

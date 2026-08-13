@@ -789,20 +789,42 @@ describeDb('woc market directed rail against real Postgres', () => {
                      'amber_crimson_armor_plate', 'pin')`,
           [realm, seller, buyer, BASE_MS + 10 * MINUTE_MS],
         );
-        const reopen = marketDb.reopenDirectedOffer(realm, stuck);
-        // Commit only after the reopen backend reports it is blocked on the
-        // racer's transaction, so the 23505 path (not the visible-row guard)
-        // is deterministically the one under test.
+        // Settle-capture at creation: round 3's foreign-constraint rethrow
+        // (or a lock timeout) rejecting inside the wait window must fail the
+        // assertion below, never crash the process as an unhandled
+        // rejection.
+        const reopen = marketDb
+          .reopenDirectedOffer(realm, stuck)
+          .then((flipped) => ({ flipped }))
+          .catch((err: unknown) => ({ err }));
+        // Commit only after the reopen backend is OBSERVED blocked on the
+        // racer's transaction, so the 23505 path (not the visible-row
+        // guard) is deterministically under test. The poll runs on the
+        // POOL, not the racer's connection: a transaction freezes its
+        // pg_stat_activity snapshot at first read, so the racer could never
+        // see a wait that began after it. Scoped to this database and to
+        // OTHER backends so a busy sibling suite on the cluster cannot
+        // satisfy it.
+        let observedWaitAt = -1;
         for (let i = 0; i < 200; i++) {
-          const waiting = await racer.query(
+          const waiting = await pool.query(
             `SELECT 1 FROM pg_stat_activity
-              WHERE wait_event_type = 'Lock' AND query LIKE '%woc_market_directed_offers o%'`,
+              WHERE datname = current_database() AND pid <> pg_backend_pid()
+                AND wait_event_type = 'Lock'
+                AND query LIKE '%woc_market_directed_offers o%'`,
           );
-          if (waiting.rows.length > 0) break;
+          if (waiting.rows.length > 0) {
+            observedWaitAt = i;
+            break;
+          }
           await new Promise((resolve) => setTimeout(resolve, 10));
         }
+        expect(
+          observedWaitAt,
+          'the reopen was observed blocked on the racer',
+        ).toBeGreaterThanOrEqual(0);
         await racer.query('COMMIT');
-        expect(await reopen, 'swallowed as the pair-occupied no-op').toBe(false);
+        expect(await reopen, 'swallowed as the pair-occupied no-op').toEqual({ flipped: false });
       } finally {
         racer.release();
       }

@@ -628,13 +628,29 @@ describe('the accept request body (seller escrow)', () => {
   });
 
   it('refuses a stale accept over a MULTI-SLOT staged table with the one_item WHY', async () => {
-    // The model disables accept for this shape (the whole-table one_item
-    // rule), but the button can be stale against the sim's cleaned offer:
+    // This belt is the accept-time enforcement of the whole-table one_item
+    // rule (the trade window's Accept button never consults the model):
     // resolving an ambiguous first-eligible slot could only turn into a
     // server-side item_mismatch, so the send path refuses locally instead.
+    // The HUD-local list holds ONE slot while the sim's cleaned offer holds
+    // two, so this also pins that the belt reads the AUTHORITATIVE list.
     const h = fakeHooks();
     const r = rig(h.hooks);
-    r.host.staged.items.push({ itemId: 'worn_sword', count: 1 }, { itemId: 'boar_hide', count: 1 });
+    r.host.staged.items.push({ itemId: 'worn_sword', count: 1 });
+    r.host.tradeInfo = {
+      otherPid: 2,
+      otherName: 'Borin',
+      myOffer: {
+        items: [
+          { itemId: 'worn_sword', count: 1 },
+          { itemId: 'boar_hide', count: 1 },
+        ],
+        copper: 0,
+      },
+      theirOffer: { items: [], copper: 0 },
+      myAccepted: false,
+      theirAccepted: false,
+    } as unknown as typeof r.host.tradeInfo;
     r.host.inventory.push({ itemId: 'worn_sword', count: 1 }, { itemId: 'boar_hide', count: 1 });
     const c = r.controller as unknown as {
       wocTradeOffer: WocPendingOffer | null;

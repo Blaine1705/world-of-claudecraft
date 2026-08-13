@@ -3709,6 +3709,31 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     expect(h.sweepErrors.map(([arm]) => arm)).toContain('offer_reopen');
   });
 
+  it('a THROWING reopen on the proven-rollback path keeps the escrow root cause, and reports', async () => {
+    // The sibling arm: the rethrow must stay the ESCROW's own error (a
+    // reopen transport failure replacing it destroyed the root-cause trace,
+    // the original defect), the swallow reports offer_reopen, and the
+    // converge arm owns recovering the still-accepted row.
+    const h = stocked();
+    const made = await h.service.createDirectedOffer(offerArgs());
+    if (!made.ok) throw new Error('offer refused');
+    await h.service.acceptDirectedOffer(BUYER_A, made.offer.id, null, CHAR_A);
+    h.db.failNextEscrowThrow = Object.assign(new Error('unique violation'), { code: '23505' });
+    h.db.reopenDirectedOffer = async () => {
+      throw new Error('timeout exceeded when trying to connect');
+    };
+    await expect(
+      h.service.acceptDirectedOffer(
+        SELLER,
+        made.offer.id,
+        { index: 0, itemId: EPIC_ITEM },
+        SELLER_CHAR,
+      ),
+    ).rejects.toThrow('unique violation');
+    expect((await h.db.directedOfferById(REALM, made.offer.id))?.status).toBe('accepted');
+    expect(h.sweepErrors.map(([arm]) => arm)).toContain('offer_reopen');
+  });
+
   it('bounds the pair to ONE pending offer (the strike-farming bound), and frees it on resolve', async () => {
     const h = stocked();
     const first = await h.service.createDirectedOffer(offerArgs());

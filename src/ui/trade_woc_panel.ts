@@ -274,14 +274,16 @@ export function refreshWocTradeArm(root: ParentNode, model: WocTradeModel): void
           count: formatNumber(model.ineligible.length, { maximumFractionDigits: 0 }),
         }),
   );
-  // A disabled button always says why: the hint rides beside it and clears the
-  // moment the offer becomes sendable.
+  // A disabled affordance always says why: the hint rides beside it and
+  // clears the moment the action becomes available. The model picks the
+  // accept-side key (nothing sellable staged vs a table holding more than
+  // the one agreed copy), so the panel renders it verbatim.
   setText(
     '[data-woc-hint]',
     model.pendingOffer !== null
-      ? model.pendingOffer.role === 'seller' && !model.canAccept
-        ? t('hudChrome.trade.woc.hintAcceptNeedsItem')
-        : ''
+      ? model.acceptHint === null
+        ? ''
+        : t(model.acceptHint)
       : model.sendHint === null
         ? ''
         : t(model.sendHint),

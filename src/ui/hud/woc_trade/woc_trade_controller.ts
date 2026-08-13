@@ -310,24 +310,27 @@ export class WocTradeController {
     // item_mismatch), while the cleaned offer carries the per-copy payload the
     // staging preview pinned. The local list stays as the pre-send fallback.
     const stagedAuthoritative = this.sim.tradeInfo?.myOffer.items ?? this.stagedTrade.items;
-    if (
-      offer.role === 'seller' &&
-      (stagedAuthoritative.length > 1 || (stagedAuthoritative[0]?.count ?? 1) !== 1)
-    ) {
-      // The model already disables accept for this shape (the whole-table
-      // one_item rule), but the button can be stale against the sim's
-      // cleaned offer, so the send path refuses with the same WHY rather
-      // than resolving an ambiguous first-eligible slot into a server-side
-      // item_mismatch.
-      this.log(t('hudChrome.trade.woc.hintOneItem'), '#ff6b6b');
-      return;
-    }
     const first =
       offer.role === 'seller'
         ? stagedAuthoritative.find((sl) => wocTradableSlot(sl, ITEMS))
         : undefined;
     if (offer.role === 'seller' && !first) {
       this.log(t('hudChrome.trade.woc.hintAcceptNeedsItem'), '#ff6b6b');
+      return;
+    }
+    if (
+      offer.role === 'seller' &&
+      (stagedAuthoritative.length > 1 || (stagedAuthoritative[0]?.count ?? 1) !== 1)
+    ) {
+      // This belt IS the accept-time enforcement of the whole-table one_item
+      // rule, not a redundant second line: the woc panel renders no accept
+      // button of its own (agreement rides the trade window's Accept, whose
+      // disabled state never consults the model), so deleting this check
+      // reopens the ambiguous-slot resolution. The model's acceptHint names
+      // the same WHY beside the panel, and the arm ORDER here mirrors its
+      // ladder: nothing sellable answers needs-item above, a wrong shape
+      // answers one_item here.
+      this.log(t('hudChrome.trade.woc.hintOneItem'), '#ff6b6b');
       return;
     }
     // The extraction keys on an INVENTORY index. Sending the staged position
