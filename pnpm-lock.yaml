@@ -20,7 +20,7 @@ overrides:
 
 patchedDependencies:
   three@0.185.1:
-    hash: 7b0b670b470698f15510b91e85d6b2f73bf5bc8addbcf7f3aa464eb2bf87c791
+    hash: ba497d92f1d2a0ccee9c0f8963a8eed8a93c08cd7772cf89b942014b549b5c20
     path: patches/three@0.185.1.patch
 
 importers:
@@ -74,7 +74,7 @@ importers:
         version: 6.8.9
       n8ao:
         specifier: ^2.0.0
-        version: 2.0.0(postprocessing@6.39.4(three@0.185.1(patch_hash=7b0b670b470698f15510b91e85d6b2f73bf5bc8addbcf7f3aa464eb2bf87c791)))(three@0.185.1(patch_hash=7b0b670b470698f15510b91e85d6b2f73bf5bc8addbcf7f3aa464eb2bf87c791))
+        version: 2.0.0(postprocessing@6.39.4(three@0.185.1(patch_hash=ba497d92f1d2a0ccee9c0f8963a8eed8a93c08cd7772cf89b942014b549b5c20)))(three@0.185.1(patch_hash=ba497d92f1d2a0ccee9c0f8963a8eed8a93c08cd7772cf89b942014b549b5c20))
       obscenity:
         specifier: ^0.4.6
         version: 0.4.6
@@ -83,13 +83,13 @@ importers:
         version: 8.22.0
       postprocessing:
         specifier: 6.39.4
-        version: 6.39.4(three@0.185.1(patch_hash=7b0b670b470698f15510b91e85d6b2f73bf5bc8addbcf7f3aa464eb2bf87c791))
+        version: 6.39.4(three@0.185.1(patch_hash=ba497d92f1d2a0ccee9c0f8963a8eed8a93c08cd7772cf89b942014b549b5c20))
       prom-client:
         specifier: 15.1.3
         version: 15.1.3
       three:
         specifier: 0.185.1
-        version: 0.185.1(patch_hash=7b0b670b470698f15510b91e85d6b2f73bf5bc8addbcf7f3aa464eb2bf87c791)
+        version: 0.185.1(patch_hash=ba497d92f1d2a0ccee9c0f8963a8eed8a93c08cd7772cf89b942014b549b5c20)
       tweetnacl:
         specifier: 1.0.3
         version: 1.0.3
@@ -2174,6 +2174,7 @@ packages:
   '@xmldom/xmldom@0.8.13':
     resolution: {integrity: sha512-KRYzxepc14G/CEpEGc3Yn+JKaAeT63smlDr+vjB8jRfgTBBI9wRj/nkQEO+ucV8p8I9bfKLWp37uHgFrbntPvw==}
     engines: {node: '>=10.0.0'}
+    deprecated: this version has critical issues, please update to the latest version
 
   '@xmldom/xmldom@0.9.10':
     resolution: {integrity: sha512-A9gOqLdi6cV4ibazAjcQufGj0B1y/vDqYrcuP6d/6x8P27gRS8643Dj9o1dEKtB6O7fwxb2FgBmJS2mX7gpvdw==}
@@ -9200,10 +9201,10 @@ snapshots:
 
   multiformats@9.9.0: {}
 
-  n8ao@2.0.0(postprocessing@6.39.4(three@0.185.1(patch_hash=7b0b670b470698f15510b91e85d6b2f73bf5bc8addbcf7f3aa464eb2bf87c791)))(three@0.185.1(patch_hash=7b0b670b470698f15510b91e85d6b2f73bf5bc8addbcf7f3aa464eb2bf87c791)):
+  n8ao@2.0.0(postprocessing@6.39.4(three@0.185.1(patch_hash=ba497d92f1d2a0ccee9c0f8963a8eed8a93c08cd7772cf89b942014b549b5c20)))(three@0.185.1(patch_hash=ba497d92f1d2a0ccee9c0f8963a8eed8a93c08cd7772cf89b942014b549b5c20)):
     dependencies:
-      postprocessing: 6.39.4(three@0.185.1(patch_hash=7b0b670b470698f15510b91e85d6b2f73bf5bc8addbcf7f3aa464eb2bf87c791))
-      three: 0.185.1(patch_hash=7b0b670b470698f15510b91e85d6b2f73bf5bc8addbcf7f3aa464eb2bf87c791)
+      postprocessing: 6.39.4(three@0.185.1(patch_hash=ba497d92f1d2a0ccee9c0f8963a8eed8a93c08cd7772cf89b942014b549b5c20))
+      three: 0.185.1(patch_hash=ba497d92f1d2a0ccee9c0f8963a8eed8a93c08cd7772cf89b942014b549b5c20)
 
   nanoid@3.3.18: {}
 
@@ -9550,9 +9551,9 @@ snapshots:
       commander: 9.5.0
     optional: true
 
-  postprocessing@6.39.4(three@0.185.1(patch_hash=7b0b670b470698f15510b91e85d6b2f73bf5bc8addbcf7f3aa464eb2bf87c791)):
+  postprocessing@6.39.4(three@0.185.1(patch_hash=ba497d92f1d2a0ccee9c0f8963a8eed8a93c08cd7772cf89b942014b549b5c20)):
     dependencies:
-      three: 0.185.1(patch_hash=7b0b670b470698f15510b91e85d6b2f73bf5bc8addbcf7f3aa464eb2bf87c791)
+      three: 0.185.1(patch_hash=ba497d92f1d2a0ccee9c0f8963a8eed8a93c08cd7772cf89b942014b549b5c20)
 
   preact@10.24.2:
     optional: true
@@ -10045,7 +10046,7 @@ snapshots:
     dependencies:
       real-require: 0.2.0
 
-  three@0.185.1(patch_hash=7b0b670b470698f15510b91e85d6b2f73bf5bc8addbcf7f3aa464eb2bf87c791): {}
+  three@0.185.1(patch_hash=ba497d92f1d2a0ccee9c0f8963a8eed8a93c08cd7772cf89b942014b549b5c20): {}
 
   through2@4.0.2:
     dependencies:

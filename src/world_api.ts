@@ -17,7 +17,7 @@
 //   entity_roster.ts    IWorldEntityRoster   cfg/entities/player/moveInput/realm reads
 //   combat.ts           IWorldCombat         ability casts, auto-attack, spirit release
 //   targeting.ts        IWorldTargeting      target selection + tab cycling
-//   interaction.ts      IWorldInteraction    interact / lootCorpse / pickUpObject
+//   interaction.ts      IWorldInteraction    civic-service readout + interact / loot / pickup
 //   loot.ts             IWorldLoot           need/greed loot rolls
 //   inventory.ts        IWorldInventory      bags, equipment, vendor, copper
 //   cosmetics.ts        IWorldCosmetics      account skins + mech chroma
@@ -50,6 +50,7 @@
 //   dungeon_finder.ts   IWorldDungeonFinder  Dungeon Finder queue/proposals/premade board
 //   deeds.ts            IWorldDeeds          earned deeds, lifetime stats, renown, active title,
 //                                            rarity + the account-Renown leaderboard reads
+//   reliquary.ts        IWorldReliquary      sparse firstFind / marks / recent + pure completion
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
 // pinned THERE and re-stale here, so this prose stays count-free):
@@ -88,6 +89,7 @@ import type { IWorldPet } from './world_api/pet';
 import type { IWorldProfessions } from './world_api/professions';
 import type { IWorldProgressionXp } from './world_api/progression_xp';
 import type { IWorldQuests } from './world_api/quests';
+import type { IWorldReliquary } from './world_api/reliquary';
 import type { IWorldSocialGraph } from './world_api/social_graph';
 import type { IWorldTalents } from './world_api/talents';
 import type { IWorldTargeting } from './world_api/targeting';
@@ -118,7 +120,9 @@ export type {
 // discriminator. Changing the authoritative town layout requires a new epoch:
 // the strict discriminator makes both rolling-deploy directions fail closed
 // before either binary loads a character into a differently shaped world.
-export const ONLINE_WORLD_LAYOUT_VERSION = 5 as const;
+// 6 = the class-overhauls integration layout on top of the v0.35.0 base layout
+// (both sides of the 2026-08 base merge bumped independently: 4 and 5).
+export const ONLINE_WORLD_LAYOUT_VERSION = 6 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
@@ -128,8 +132,14 @@ export const ONLINE_WORLD_INCOMPATIBLE_MESSAGE =
 
 // Snapshot timer wire capability shared by the browser mirror and authoritative
 // server. Keep the version exact so rolling deploys can negotiate fail-closed.
-export const STABLE_TIMER_WIRE_VERSION = 2 as const;
+export const STABLE_TIMER_WIRE_VERSION = 3 as const;
 export type StableTimerWireVersion = typeof STABLE_TIMER_WIRE_VERSION;
+
+// Warlock pet-bar signature command capability. It is negotiated independently
+// from the world-layout epoch so rolling deploys fail closed for this optional
+// behavior without disconnecting otherwise compatible clients.
+export const PET_SPECIAL_WIRE_VERSION = 1 as const;
+export type PetSpecialWireVersion = typeof PET_SPECIAL_WIRE_VERSION;
 
 // Absolute cooldown schedule in server simulation seconds. A number is the
 // expiry for 1x recovery. The tuple adds a temporary recovery-rate segment;
@@ -157,7 +167,11 @@ export type {
 } from './world_api/battleground';
 export type { CardMinigameInfo } from './world_api/card_minigame';
 export { isOverheadEmoteId, OVERHEAD_EMOTES } from './world_api/chat';
-export type { ActiveFrostRing, ActiveTemporalHourglass } from './world_api/combat';
+export type {
+  ActiveConsecration,
+  ActiveFrostRing,
+  ActiveTemporalHourglass,
+} from './world_api/combat';
 export type { AccountCosmetics } from './world_api/cosmetics';
 export type {
   DailyRewardEligibilityView,
@@ -208,7 +222,11 @@ export {
   type GuildBankLogOp,
   type GuildBankLogView,
 } from './world_api/guild_bank';
-export type { WorldInteractionOutcome } from './world_api/interaction';
+export type {
+  CivicServiceKind,
+  CivicServicePlacement,
+  WorldInteractionOutcome,
+} from './world_api/interaction';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
 export { queryDiffersFromEcho, searchDiffersFromEcho } from './world_api/market';
@@ -227,6 +245,12 @@ export type {
   GuildLeaderboardEntry,
   LeaderboardEntry,
 } from './world_api/progression_xp';
+export type {
+  ReliquaryCatalogCompletion,
+  ReliquaryFirstFindView,
+  ReliquaryPageCompletion,
+  ReliquaryRarity,
+} from './world_api/reliquary';
 export type {
   CharacterProfile,
   CharacterSearchResult,
@@ -288,6 +312,7 @@ export interface IWorld
     IWorldDungeonFinder,
     IWorldActionBar,
     IWorldDeeds,
+    IWorldReliquary,
     IWorldMounts {}
 
 // ---------------------------------------------------------------------------
@@ -334,6 +359,7 @@ export const COMMAND_NAMES = [
   'unequip_item',
   'use',
   'discard',
+  'lock_item',
   'buy',
   'sell',
   'buyback',
@@ -522,6 +548,10 @@ export const COMMAND_NAMES = [
   // Guild billboard: set (or clear, with '') the officer-editable message
   // pinned atop the social window's Guild tab (SocialService.guildSetMotd).
   'guild_set_motd',
+  // Template-authored active on a controlled pet (Abyssal Chain, Felbolt)
+  // plus its pet-bar autocast toggle.
+  'pet_special',
+  'pet_auto_special',
   // Commission order board (Professions 2.0, issue #1298): open/cancel a
   // commission request, or accept/deliver one as a crafter (Sim.
   // openCommissionOrder/cancelCommissionOrder/acceptCommissionOrder/
@@ -575,6 +605,14 @@ export const COMMAND_NAMES = [
   // sim consolidates and restamps cell hints deterministically. Appended
   // because wire tokens are never reordered.
   'inv_sort',
+  // Book of Deeds nameplate border selection, the sibling of 'deed_set_title'.
+  // Appended rather than filed beside its twin because wire tokens are never
+  // reordered.
+  'deed_set_border',
+  // The backward half of the Tab cycle (IWorldTargeting.tabTargetPrev): no
+  // payload, the sim resolves the previous enemy in the same ordered list Tab
+  // walks forward. Appended because wire tokens are never reordered.
+  'tabPrev',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -656,6 +694,7 @@ export type WorldFacet =
   | 'IWorldDungeonFinder'
   | 'IWorldActionBar'
   | 'IWorldDeeds'
+  | 'IWorldReliquary'
   | 'IWorldMounts';
 
 export const COMMAND_FACETS = {
@@ -677,6 +716,7 @@ export const COMMAND_FACETS = {
   // IWorldTargeting: target selection + tab cycling.
   target: 'IWorldTargeting',
   tab: 'IWorldTargeting',
+  tabPrev: 'IWorldTargeting',
   targetNearestFriendly: 'IWorldTargeting',
   tabFriendly: 'IWorldTargeting',
   stopAutoAttackOnTargetSwitch: 'IWorldTargeting',
@@ -724,6 +764,8 @@ export const COMMAND_FACETS = {
   pet_taunt: 'IWorldPet',
   pet_auto_taunt: 'IWorldPet',
   pet_auto_water_jet: 'IWorldPet',
+  pet_special: 'IWorldPet',
+  pet_auto_special: 'IWorldPet',
   pet_feed: 'IWorldPet',
   pet_heal: 'IWorldPet',
   pet_mode: 'IWorldPet',
@@ -882,10 +924,12 @@ export const COMMAND_FACETS = {
   df_apply: 'IWorldDungeonFinder',
   df_apply_cancel: 'IWorldDungeonFinder',
   df_app_respond: 'IWorldDungeonFinder',
-  // IWorldDeeds: the Book of Deeds title selection (snake_case wire string, by
-  // design). deedsEarned/deedStats/renown/activeTitle are snapshot reads (no
-  // send, untagged).
+  // IWorldDeeds: the Book of Deeds cosmetic selections, title and nameplate
+  // border (snake_case wire strings, by design).
+  // deedsEarned/deedStats/renown/activeTitle/activeBorder are snapshot reads
+  // (no send, untagged).
   deed_set_title: 'IWorldDeeds',
+  deed_set_border: 'IWorldDeeds',
   // IWorldActionBar: the debounced action-bar layout upload. takeActionBarLayoutRestore
   // is a login-time read (no send, untagged).
   save_hotbar_layout: 'IWorldActionBar',

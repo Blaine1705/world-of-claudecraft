@@ -344,6 +344,8 @@ describe('pooled VFX cloud', () => {
     expect(source.match(/this\.vfx\.prepareDraw\(this\.camera\);/g)).toHaveLength(2);
     expect(source).toContain(`this.vfx.update(dt);
     this.vfx.prepareDraw(this.camera);
+    this.needleOfFateVfx.update(dt, this.reducedMotion());
+    this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);`);
     // The restore handler re-captures identity, rebinds the draw-stats
     // session (three replaces webgl.info on restore; see
