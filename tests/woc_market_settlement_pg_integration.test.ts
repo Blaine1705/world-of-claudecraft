@@ -235,6 +235,8 @@ describeDb('woc market settlement guards against real Postgres', () => {
       runSerialized: () => {
         throw new Error('custody not exercised by this suite');
       },
+      ownsLiveCharacter: () => true,
+      escrowSessionLost: () => {},
       extractCopy: () => {
         throw new Error('custody not exercised by this suite');
       },

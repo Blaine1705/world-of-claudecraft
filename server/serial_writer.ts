@@ -41,6 +41,30 @@ export interface KeyedSerialWriter<K> {
   pendingKeys(): number;
 }
 
+// createSerialWriter with a depth watch: counts writes queued-or-running and
+// warns (rate-limited to once a minute) past `warnDepth`. GameServer's shared
+// market writer rides this so a dirty-book autosave pile-up is loud before it
+// becomes save latency; the message is the wrapper's one behavior, so it is
+// caller-supplied and unchanged by this move.
+export function createDepthWarnedSerialWriter(
+  warnDepth: number,
+  message: (depth: number) => string,
+): <T>(write: () => Promise<T>) => Promise<T> {
+  const writer = createSerialWriter();
+  let depth = 0;
+  let lastWarnMs = 0;
+  return <T>(write: () => Promise<T>): Promise<T> => {
+    depth++;
+    if (depth > warnDepth && Date.now() - lastWarnMs > 60_000) {
+      lastWarnMs = Date.now();
+      console.warn(message(depth));
+    }
+    return writer(write).finally(() => {
+      depth--;
+    });
+  };
+}
+
 export function createKeyedSerialWriter<K>(): KeyedSerialWriter<K> {
   const tails = new Map<K, Promise<unknown>>();
   return {

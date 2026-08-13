@@ -97,6 +97,8 @@ class FakeCustody implements WocMarketCustody {
   /** Force the NEXT runSerialized to answer 'contended' without running the
    *  job (the queue-wait deadline / depth-cap refusal). */
   failNextRunSerialized = false;
+  /** Every escrowSessionLost signal, in order (the terminal-arm pins). */
+  readonly sessionLost: Array<{ characterId: number; kind: 'fenced' | 'ambiguous' }> = [];
 
   async runSerialized<T>(characterId: number, job: () => Promise<T>): Promise<T | 'contended'> {
     this.serializedRuns.push(characterId);
@@ -105,6 +107,14 @@ class FakeCustody implements WocMarketCustody {
       return 'contended';
     }
     return job();
+  }
+
+  ownsLiveCharacter(accountId: number, characterId: number): boolean {
+    return this.bags.has(characterId) && this.owners.get(characterId) === accountId;
+  }
+
+  escrowSessionLost(characterId: number, kind: 'fenced' | 'ambiguous'): void {
+    this.sessionLost.push({ characterId, kind });
   }
 
   readonly bags = new Map<number, InvSlot[]>();
@@ -132,6 +142,8 @@ class FakeCustody implements WocMarketCustody {
     if (!out.ok) return out;
     return {
       ok: true,
+      // The fake has no sim pids; the characterId doubles as one.
+      pid: characterId,
       extracted: out.extracted,
       characterName: this.names.get(characterId) ?? `char-${characterId}`,
       save: {
@@ -195,7 +207,7 @@ class FakeCustody implements WocMarketCustody {
     };
   }
 
-  restoreCopy(characterId: number, slot: InvSlot): void {
+  restoreCopy(_pid: number, characterId: number, slot: InvSlot): void {
     this.bags.get(characterId)?.push(slot);
   }
 
@@ -531,6 +543,76 @@ describe('createListing', () => {
     // (a direct db call outside it would leave this recorder empty).
     expect(h.custody.serializedRuns).toEqual([SELLER_CHAR]);
     expect(h.db.escrowSaves).toHaveLength(1);
+  });
+
+  it('a proven-rollback escrow throw restores the copy to the bags', async () => {
+    const h = makeHarness();
+    // 57014 (statement_timeout cancel) aborts the transaction before COMMIT,
+    // so the compensation split must take the restore arm.
+    h.db.failNextEscrowThrow = Object.assign(new Error('canceling statement'), { code: '57014' });
+    await expect(
+      h.service.createListing({
+        account: SELLER,
+        characterId: SELLER_CHAR,
+        itemRef: { index: 0, itemId: EPIC_ITEM },
+        params: listingParams(),
+      }),
+    ).rejects.toThrow('canceling statement');
+    expect(bagsOf(h, SELLER_CHAR)).toHaveLength(2);
+    expect(h.custody.sessionLost).toEqual([]);
+  });
+
+  it('an ambiguous escrow throw parks: no restore, the session is abandoned', async () => {
+    const h = makeHarness();
+    // EPIPE is a Node socket errno, not a SQLSTATE: the COMMIT may have
+    // reached the server, so restoring here could mint the copy twice. The
+    // durable row decides instead (quarantine + reload).
+    h.db.failNextEscrowThrow = Object.assign(new Error('broken pipe'), { code: 'EPIPE' });
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await expect(
+      h.service.createListing({
+        account: SELLER,
+        characterId: SELLER_CHAR,
+        itemRef: { index: 0, itemId: EPIC_ITEM },
+        params: listingParams(),
+      }),
+    ).rejects.toThrow('broken pipe');
+    const logged = errSpy.mock.calls.some(
+      (args) => typeof args[0] === 'string' && args[0].includes('escrow_outcome_unknown'),
+    );
+    errSpy.mockRestore();
+    expect(logged).toBe(true);
+    expect(bagsOf(h, SELLER_CHAR)).toHaveLength(1);
+    expect(h.custody.sessionLost).toEqual([{ characterId: SELLER_CHAR, kind: 'ambiguous' }]);
+  });
+
+  it('a lease-fenced escrow write kicks the displaced zombie after restoring', async () => {
+    const h = makeHarness();
+    h.db.failNextEscrow = 'lease_lost';
+    const res = await h.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams(),
+    });
+    expect(res).toEqual({ ok: false, reason: 'lease_lost' });
+    expect(bagsOf(h, SELLER_CHAR)).toHaveLength(2);
+    expect(h.custody.sessionLost).toEqual([{ characterId: SELLER_CHAR, kind: 'fenced' }]);
+  });
+
+  it('a foreign character id refuses with ZERO serialized side effects', async () => {
+    const h = makeHarness();
+    // CHAR_A belongs to BUYER_A: the seller naming it must not reach the
+    // FIFO, the flush, or the depth cap (that slot belongs to the victim).
+    h.custody.bags.set(CHAR_A, [{ itemId: EPIC_ITEM, count: 1 }]);
+    const res = await h.service.createListing({
+      account: SELLER,
+      characterId: CHAR_A,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams(),
+    });
+    expect(res).toEqual({ ok: false, reason: 'character_invalid' });
+    expect(h.custody.serializedRuns).toEqual([]);
   });
 
   it("a db-level 'contended' escrow refusal restores the copy and answers the typed refusal", async () => {

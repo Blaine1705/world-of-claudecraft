@@ -1103,6 +1103,12 @@ describe('the $WOC token firewall over src/sim', () => {
   // A NEW file wanting on this list is the signal the firewall is being
   // breached, not extended.
   const FIREWALL_ALLOWED = new Set(['src/sim/daily_rewards_stub.ts']);
+  // The shape every allowlisted file must keep to stay exempt: a read-only
+  // projection, meaning a single exported function, no control flow, no value
+  // imports. Money LOGIC growing inside the exemption is exactly what this
+  // pin refuses; the non-vacuity check below additionally requires each entry
+  // to still carry a real pattern hit, so a stale entry cannot linger as a
+  // whole-file blind spot.
   // Identifier-shaped money/chain vocabulary. Deliberately NOT matched inside
   // comments (the escrow prose in market.ts and inventory_extract.ts is fine):
   // the scan strips comments first, exactly like the sibling purity scans.
@@ -1121,8 +1127,14 @@ describe('the $WOC token firewall over src/sim', () => {
   // shape is a money-affixed compound (txSignature, signature_reused,
   // signatureRequired). Bare `token` is left out entirely on the same grounds
   // (riftToken, chatTokens).
+  // The affix sets are calibrated against the REAL identifier corpus of the
+  // excluded modules (server/woc_market_*, claudium_proxy, native_attestation,
+  // woc_balance), not invented examples: treasuryBase, signatureAtMs,
+  // derSignature, signatureHeader, bs58 (the npm package name, which the
+  // literal 'base58' misses), keypair/secretKey/privateKey/blockhash and the
+  // transaction verbs are all shapes that exist server-side today.
   const FIREWALL_RE =
-    /(?:wallet|pubkey|solana|usdcents|pricecents|amountbase|settlementquote|bondcents|treasury[_-]?(?:wallet|pubkey|address|bps|cents|leg|share)|custodyclaim|lamports|base58|(?:tx|txn|bond|settlement|burn|transfer)[_-]?signature|signature[_-]?(?:reused|required|field))/i;
+    /(?:wallet|pubkey|solana|usdcents|pricecents|amountbase|settlementquote|bondcents|treasury[_-]?(?:wallet|pubkey|address|bps|cents|leg|share|base|cut|fee|account)|custodyclaim|lamports|base58|bs58|keypair|secret[_-]?key|private[_-]?key|blockhash|spl[_-]?token|(?:send|sign)[_-]?transaction|woc[_-]?(?:balance|price|amount|payout|transfer)|(?:tx|txn|bond|settlement|burn|transfer|der|escrow|payer|seller|mint)[_-]?signature|signature[_-]?(?:reused|required|field|header|verified|at[_-]?ms|bytes))/i;
 
   it('keeps wallet, token, and settlement identifiers out of every sim file', () => {
     const offenders: string[] = [];
@@ -1137,7 +1149,22 @@ describe('the $WOC token firewall over src/sim', () => {
   });
 
   it('is non-vacuous: the scan sees the sim tree and its own pattern bites', () => {
-    expect(simFiles.length).toBeGreaterThan(80);
+    // Near the real count (474 today) per the tests/CLAUDE.md floor rule: a
+    // walk that quietly lost most of the tree must fail here, because with
+    // sim.ts off the allowlist the corpus IS the firewall.
+    expect(simFiles.length).toBeGreaterThan(440);
+    // Every allowlisted file still exists, still trips the pattern (a stale
+    // entry is a whole-file blind spot), and still has the read-only
+    // projection shape: one exported function, no control flow, only
+    // type-only imports.
+    for (const rel of FIREWALL_ALLOWED) {
+      const src = readFileSync(join(repoRoot, rel), 'utf8');
+      const stripped = stripComments(src);
+      expect(FIREWALL_RE.test(stripped), `${rel} no longer trips the pattern`).toBe(true);
+      expect(stripped.match(/export function /g), `${rel} export count`).toHaveLength(1);
+      expect(stripped, `${rel} grew control flow`).not.toMatch(/\b(?:if|for|while|switch)\s*\(/);
+      expect(stripped, `${rel} grew a value import`).not.toMatch(/^import (?!type )/m);
+    }
     // Both compound shapes must bite, and ordinary custody vocabulary must not.
     expect(FIREWALL_RE.test('const w = walletForAccount(id);')).toBe(true);
     expect(FIREWALL_RE.test('const k = row.sellerWallet;')).toBe(true);

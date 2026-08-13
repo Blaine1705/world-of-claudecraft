@@ -646,7 +646,7 @@ ALTER TABLE woc_market_directed_offers
 /** Lock-wait ceiling for the escrow transaction's accounts row. Short on
  *  purpose: a blocked escrow holds a pooled client, and the pool is shared
  *  with the game loop's autosave and the WS handshake. */
-const ESCROW_LOCK_TIMEOUT_MS = 2_000;
+export const ESCROW_LOCK_TIMEOUT_MS = 2_000;
 
 /** How long one of the NEW guard transactions may sit IDLE inside its
  *  transaction before the server terminates the session (25P03, surfaced as
@@ -661,7 +661,7 @@ const ESCROW_LOCK_TIMEOUT_MS = 2_000;
  *  a shared four-core box under load the tighter bound was the riskier
  *  one). Applied to the guards this change introduced; retrofitting the
  *  older guards rides the hot-path work. */
-const GUARD_IDLE_TX_TIMEOUT_MS = ESCROW_LOCK_TIMEOUT_MS;
+export const GUARD_IDLE_TX_TIMEOUT_MS = ESCROW_LOCK_TIMEOUT_MS;
 
 /** Per-statement allowance for the escrow listing transaction, WORKLOAD
  *  scoped (exported for the tunables-ladder pin). It sits between the lock
@@ -672,11 +672,13 @@ const GUARD_IDLE_TX_TIMEOUT_MS = ESCROW_LOCK_TIMEOUT_MS;
  *  statements. Measured against Postgres 16 with a 27KB character blob:
  *  p50 3.5ms, max 8.3ms over 25 passes (the delivery pg suite's escrow-cost
  *  test re-measures and asserts the max stays under a fifth of this
- *  allowance), so 5s is orders of magnitude of headroom while a genuinely
- *  wedged statement can no longer hold the FIFO for the 60s heavy
- *  allowance. The heavy allowance remains correct for the LOGOUT-shaped
- *  saves (losing one is data loss; losing a listing attempt is a refusal
- *  the player retries). */
+ *  allowance), so 5s is orders of magnitude of headroom PER STATEMENT while
+ *  a genuinely wedged statement can no longer hold the FIFO for the 60s
+ *  heavy allowance (whole-transaction worst case: four statements plus the
+ *  2s lock wait, roughly 22s, still under the 30s autosave period, which is
+ *  the bound that matters). The heavy allowance remains correct for the
+ *  LOGOUT-shaped saves (losing one is data loss; losing a listing attempt
+ *  is a refusal the player retries). */
 export const ESCROW_STATEMENT_TIMEOUT_MS = 5_000;
 
 const LISTING_COLS =

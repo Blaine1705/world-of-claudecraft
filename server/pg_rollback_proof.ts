@@ -3,15 +3,34 @@
 // the service layer can consult it for compensation decisions without
 // importing the pg-backed db module (whose load reads DATABASE_URL).
 //
-// A statement-level SQLSTATE (a constraint violation, a statement_timeout
-// cancel, a data fault) aborts the whole transaction before COMMIT, so a
-// compensating restore is safe. A connection-class failure (08xxx, the
-// 57P01/57P02 shutdowns) or a driver-side error with no SQLSTATE at all (a
-// query_timeout, a socket reset) can arrive AFTER a COMMIT reached the
-// server, so nothing is proven: compensating there can duplicate the work
-// the transaction already committed.
+// The question is one-directional: may the caller COMPENSATE (e.g. restore an
+// escrowed copy to the live bags) because the transaction provably rolled
+// back? Only a statement-level SQLSTATE from a class that aborts before
+// COMMIT proves that. Everything else is treated as ambiguous, including
+// shapes that merely LOOK like SQLSTATEs: Node socket errnos (EPIPE, EBADF,
+// EBUSY) are five characters of [A-Z] too, and EPIPE is precisely the
+// write-to-a-dead-socket case where a COMMIT may have reached the server. So
+// this is an ALLOWLIST of proven-abort classes, never a shape check with
+// exclusions: an unknown code fails toward ambiguity, and ambiguity parks.
+const ROLLBACK_PROOF_CLASSES = new Set([
+  '22', // data exception
+  '23', // integrity constraint violation (23505 and friends)
+  '25', // invalid transaction state (25P03 idle-in-transaction kill)
+  '40', // transaction rollback (40P01 deadlock victim)
+  '42', // syntax error or access rule violation
+  '53', // insufficient resources
+  '54', // program limit exceeded
+  '55', // object not in prerequisite state (55P03 lock_timeout)
+]);
+
 export function throwProvedRollback(err: unknown): boolean {
+  if (typeof err !== 'object' || err === null) return false;
   const code = (err as { code?: string }).code;
   if (typeof code !== 'string' || !/^[0-9A-Z]{5}$/.test(code)) return false;
-  return !code.startsWith('08') && code !== '57P01' && code !== '57P02';
+  // 57014 (query_canceled: our own statement_timeout) aborts the statement
+  // and with it the transaction; its class siblings 57P01/57P02 are server
+  // shutdowns whose in-flight COMMIT outcome is unknowable, so the class is
+  // not allowlisted wholesale.
+  if (code === '57014') return true;
+  return ROLLBACK_PROOF_CLASSES.has(code.slice(0, 2));
 }

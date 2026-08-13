@@ -7,6 +7,8 @@
 // it, no crash needed). Drives the REAL GameServer + Sim + custody bridge +
 // WocMarketService with the db layer mocked (the guild_bank_persistence
 // idiom) and the marketplace db faked.
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const dbMock = vi.hoisted(() => ({
@@ -49,6 +51,7 @@ import type { WocListingParams } from '../../server/woc_market_rules';
 import { WOC_MARKET_RESTRICTED_POLICY } from '../../server/woc_market_rules';
 import { ITEMS } from '../../src/sim/data';
 import type { CharacterState } from '../../src/sim/sim';
+import { stripComments } from '../helpers/strip_comments';
 import { FakeWocMarketDb } from './helpers/fake_woc_market_db';
 
 const REALM = 'test-realm';
@@ -130,6 +133,7 @@ function makeRig(opts: { escrowWaitMs?: number } = {}): Rig {
         server.serializeCharacterForPersist(characterId),
       hasDirtyGuildBooks: (characterId) => server.hasDirtyGuildBooks(characterId),
       flushDirtyGuildBooks: (characterId) => server.flushDirtyGuildBooks(characterId),
+      escrowSessionLost: (characterId, kind) => server.escrowSessionLost(characterId, kind),
     },
     opts,
   );
@@ -270,18 +274,45 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     // A spectating seller: the ordinary save persists the SAVED position and
     // the stowed pet, never the spectator body. The escrow write must apply
     // the same fixups or a listing while spectating corrupts the blob.
+    const stowedPet = { name: 'Stowed', kind: 'wolf' } as unknown as NonNullable<
+      ClientSession['spectating']
+    >['stowedPet'];
     rig.session.spectating = {
       characterId: 999,
       name: 'Watched',
       savedPos: { x: 111, y: 0, z: 222 },
       priorGm: false,
-      stowedPet: null,
+      stowedPet,
     };
     const listed = await createListing(rig);
     if (!listed.ok) throw new Error(`createListing refused: ${listed.reason}`);
     const blob = rig.db.escrowSaves[0]?.state;
     expect(blob?.pos).toEqual({ x: 111, z: 222 });
-    expect(blob?.pet).toBeNull();
+    // Non-null on purpose: a null pet also serializes as null with the fixups
+    // dropped, so only a real stowed pet can catch the regression.
+    expect(blob?.pet).toEqual(stowedPet);
+  });
+
+  it('grant and snapshot blobs carry the fixups too', () => {
+    const rig = makeRig();
+    const stowedPet = { name: 'Stowed', kind: 'wolf' } as unknown as NonNullable<
+      ClientSession['spectating']
+    >['stowedPet'];
+    rig.session.spectating = {
+      characterId: 999,
+      name: 'Watched',
+      savedPos: { x: 31, y: 0, z: 64 },
+      priorGm: false,
+      stowedPet,
+    };
+    const grant = rig.custody.grantCopy(SELLER, SELLER_CHAR, { itemId: EPIC_ITEM, count: 1 });
+    if (!grant.ok) throw new Error(`grantCopy refused: ${grant.reason}`);
+    expect(grant.save.state.pos).toEqual({ x: 31, z: 64 });
+    expect(grant.save.state.pet).toEqual(stowedPet);
+    const snap = rig.custody.snapshotCopy(SELLER, SELLER_CHAR);
+    if (!snap.ok) throw new Error(`snapshotCopy refused: ${snap.reason}`);
+    expect(snap.save.state.pos).toEqual({ x: 31, z: 64 });
+    expect(snap.save.state.pet).toEqual(stowedPet);
   });
 
   it('a quarantined session cannot enter custody at all', async () => {
@@ -292,12 +323,69 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     const mailBefore = rig.server.sim.postOffice.mail.length;
     rig.session.escrowQuarantined = true;
     expect(rig.server.wocCustodySession(SELLER_CHAR)).toBeNull();
+    // The persist snapshot refuses on its own predicate too, not only through
+    // the wrappers that consult wocCustodySession first.
+    expect(rig.server.serializeCharacterForPersist(SELLER_CHAR)).toBeNull();
     const res = await createListing(rig);
     expect(res).toEqual({ ok: false, reason: 'character_invalid' });
     expect(rig.db.escrowSaves).toHaveLength(0);
     // No compensation parcel either: mailing over a durable blob that still
     // holds the item would mint the second copy.
     expect(rig.server.sim.postOffice.mail).toHaveLength(mailBefore);
+    // Positive control for that absence: the return-parcel arm is real and
+    // fires when the extraction pid is genuinely gone from the sim.
+    rig.custody.restoreCopy(999_999, SELLER_CHAR, { itemId: EPIC_ITEM, count: 1 });
+    expect(rig.server.sim.postOffice.mail).toHaveLength(mailBefore + 1);
+  });
+
+  it('a refusal mid-leave restores the LIVE bags, never a second rail', async () => {
+    const rig = makeRig();
+    const mailBefore = rig.server.sim.postOffice.mail.length;
+    // The session flips to left while the escrow write is in flight (a leave
+    // begun mid-request). Its teardown flush is queued BEHIND this job, so
+    // the durable row still holds the item: restoring the live bags lets the
+    // flush persist them, while mailing here would risk two copies.
+    rig.db.failNextEscrow = 'cap_reached';
+    const origEscrow = rig.db.escrowInsertListing.bind(rig.db);
+    rig.db.escrowInsertListing = async (save, listing) => {
+      rig.session.left = true;
+      return origEscrow(save, listing);
+    };
+    const res = await createListing(rig);
+    expect(res).toEqual({ ok: false, reason: 'cap_reached' });
+    expect(rig.bagsHold(EPIC_ITEM)).toBe(true);
+    expect(rig.server.sim.postOffice.mail).toHaveLength(mailBefore);
+  });
+
+  it('a lease-fenced write restores the copy and kicks the displaced zombie', async () => {
+    const rig = makeRig();
+    rig.db.failNextEscrow = 'lease_lost';
+    const res = await createListing(rig);
+    expect(res).toEqual({ ok: false, reason: 'lease_lost' });
+    expect(rig.bagsHold(EPIC_ITEM)).toBe(true);
+    // The fence-out signal is the same one saveCharacter sends: the zombie is
+    // torn down rather than left playing an unsaveable session.
+    await vi.waitFor(() => expect(rig.session.left).toBe(true));
+  });
+
+  it('an ambiguous escrow throw quarantines instead of restoring', async () => {
+    const rig = makeRig();
+    const mailBefore = rig.server.sim.postOffice.mail.length;
+    const restores = vi.fn(rig.custody.restoreCopy);
+    rig.custody.restoreCopy = restores;
+    rig.db.failNextEscrowThrow = Object.assign(new Error('broken pipe'), { code: 'EPIPE' });
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await expect(createListing(rig)).rejects.toThrow('broken pipe');
+    errSpy.mockRestore();
+    // No compensation path ran (the COMMIT may have landed, so a restore
+    // could mint the copy twice) and no mail either: the quarantined session
+    // is torn down and reloads from the durable row, correct in both
+    // branches. The live player may already be gone by now (the kick), which
+    // is why the pin is on the restore call, not the abandoned bags.
+    expect(restores).not.toHaveBeenCalled();
+    expect(rig.session.escrowQuarantined).toBe(true);
+    expect(rig.server.sim.postOffice.mail).toHaveLength(mailBefore);
+    await vi.waitFor(() => expect(rig.session.left).toBe(true));
   });
 
   it('flushes dirty guild books BEFORE the escrow write, atomically with their character half', async () => {
@@ -347,19 +435,46 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     const wedge = rig.server.enqueueCharacterWrite(SELLER_CHAR, async () => {
       await held;
     });
+    const startedAt = Date.now();
     const res = await createListing(rig);
+    // Within the injected 50ms deadline (generous margin), not the 5s
+    // default: this is what pins that opts.escrowWaitMs is actually plumbed.
+    expect(Date.now() - startedAt).toBeLessThan(2_000);
     expect(res).toEqual({ ok: false, reason: 'contended' });
     expect(rig.bagsHold(EPIC_ITEM)).toBe(true);
     expect(rig.db.escrowSaves).toHaveLength(0);
     releaseQueue();
     await wedge;
-    // The cancelled job drains as a no-op: a later listing still works.
+    await settle();
+    // The cancelled job drained as a strict no-op (still nothing extracted,
+    // still no write); a later listing works.
+    expect(rig.bagsHold(EPIC_ITEM)).toBe(true);
+    expect(rig.db.escrowSaves).toHaveLength(0);
     const retry = await createListing(rig);
     expect(retry.ok).toBe(true);
   });
 
+  it('a job that STARTED before the deadline answers its real outcome, never contended', async () => {
+    // The deadline may fire while the transaction is already running; its
+    // runtime is bounded by the transaction's own timeouts, and answering
+    // 'contended' for a write that may commit would lie to the seller.
+    const rig = makeRig({ escrowWaitMs: 30 });
+    const origEscrow = rig.db.escrowInsertListing.bind(rig.db);
+    rig.db.escrowInsertListing = async (save, listing) => {
+      await new Promise((resolve) => setTimeout(resolve, 120));
+      return origEscrow(save, listing);
+    };
+    const res = await createListing(rig);
+    if (!res.ok) throw new Error(`createListing refused: ${res.reason}`);
+    expect(rig.db.escrowSaves).toHaveLength(1);
+    expect(rig.bagsHold(EPIC_ITEM)).toBe(false);
+  });
+
   it('caps queued escrow jobs at one per character', async () => {
-    const rig = makeRig();
+    // A wait deadline the test can never reach: only the depth cap can
+    // produce this refusal (the deadline path answers the identical literal,
+    // which let a cap-less build pass an earlier version of this pin).
+    const rig = makeRig({ escrowWaitMs: 60_000 });
     let releaseQueue!: () => void;
     const held = new Promise<void>((resolve) => {
       releaseQueue = resolve;
@@ -371,12 +486,49 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     await settle();
     // The second request refuses IMMEDIATELY (depth cap), while the first is
     // still waiting for the wedge.
+    const startedAt = Date.now();
     const second = await createListing(rig);
+    expect(Date.now() - startedAt).toBeLessThan(2_000);
     expect(second).toEqual({ ok: false, reason: 'contended' });
     releaseQueue();
     await wedge;
     const firstOut = await first;
     expect(firstOut.ok).toBe(true);
+  });
+
+  it('refuses contended when the books re-dirty during the queue wait', async () => {
+    const rig = makeRig({ escrowWaitMs: 10_000 });
+    rig.server.sim.loadGuildBank(GUILD, { treasury: 1000, inventory: [], purchasedSlots: 24 });
+    let releaseQueue!: () => void;
+    const held = new Promise<void>((resolve) => {
+      releaseQueue = resolve;
+    });
+    const wedge = rig.server.enqueueCharacterWrite(SELLER_CHAR, async () => {
+      await held;
+    });
+    const listingDone = createListing(rig);
+    await settle();
+    // The flush ran clean at entry; a book op lands while the job is queued.
+    // The in-job re-check must refuse rather than commit a character row
+    // whose book-paired deltas have no book half in the same transaction.
+    rig.session.dirtyGuildBanks.set(999, 1);
+    releaseQueue();
+    await wedge;
+    const res = await listingDone;
+    expect(res).toEqual({ ok: false, reason: 'contended' });
+    expect(rig.bagsHold(EPIC_ITEM)).toBe(true);
+    expect(rig.db.escrowSaves).toHaveLength(0);
+  });
+
+  it('the delivered-save twin keeps its recorded FIFO carve-out', () => {
+    // The carve-out is a decision, not an accident: exactly ONE runSerialized
+    // call site exists in the service (createListing), and commitGrant stays
+    // off the FIFO until its head-of-line bound is designed (recorded at the
+    // method). This pin dates the decision; widening or closing it must land
+    // here in the same change.
+    const src = stripComments(readFileSync(resolve(process.cwd(), 'server/woc_market.ts'), 'utf8'));
+    expect(src.match(/\.runSerialized\(/g)).toHaveLength(1);
+    expect(src).not.toContain('enqueueCharacterWrite');
   });
 
   it('wocCustodySession refuses a quarantined session for every custody op', () => {

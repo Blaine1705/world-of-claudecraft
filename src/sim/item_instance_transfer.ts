@@ -17,6 +17,7 @@ import { sanitizeItemInstancePayloadOnLoad } from './item_instance_load';
 import { itemInstancePayloadsEqual } from './item_instance_merge';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { isTransferLockedInstance } from './transfer_lock';
 import {
   cloneItemInstancePayload,
   type InventoryUnit,
@@ -24,21 +25,11 @@ import {
   type ItemInstancePayload,
 } from './types';
 
-/** True when this copy is locked out of the anonymous exchange pipes (market
- *  listing, mail attachment): armed (bindOnTrade) or bound (boundTo). The
- *  def-level rules (soulbound/quest/noMarketList) stay with each pipe; this is
- *  only the per-copy lock. A plain copy is never locked. NOT the same axis as
- *  the PLAYER item lock (item_lock.ts `locked`, issue 3042): that one is the
- *  owner's own salvage/craft/vendor safety mark and is deliberately not
- *  consulted by the pipes, matching the gold market's treatment; whether
- *  exchange listings should honor it is an open design call (recorded for the
- *  listing step-up phase). This module's Unlocked/Locked helper names refer to
- *  the TRANSFER lock only. */
-export function isTransferLockedInstance(instance: ItemInstancePayload | undefined): boolean {
-  return (
-    instance !== undefined && (instance.bindOnTrade === true || instance.boundTo !== undefined)
-  );
-}
+// The per-copy lock predicate lives in its own leaf (transfer_lock.ts, its
+// docblock owns the rule) and is re-exported here so every pipe keeps its
+// import; this module's Unlocked/Locked helper names refer to that TRANSFER
+// lock only.
+export { isTransferLockedInstance };
 
 /** The public display projection of a payload, for wire surfaces other players
  *  see (market browse rows, letter attachment chips). The allowlist is the eqi

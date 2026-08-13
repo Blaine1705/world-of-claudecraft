@@ -95,6 +95,10 @@ const inertCustody: WocMarketCustody = {
   runSerialized() {
     throw new Error('not exercised');
   },
+  ownsLiveCharacter() {
+    return true;
+  },
+  escrowSessionLost() {},
   extractCopy() {
     throw new Error('not exercised');
   },

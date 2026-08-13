@@ -806,7 +806,16 @@ export interface WocMarketEconomy {
 }
 
 export type WocCustodyExtract =
-  | { ok: true; extracted: InvSlot; characterName: string; save: CharacterSaveArgs }
+  | {
+      ok: true;
+      /** The live pid the extraction mutated: the compensation paths restore
+       *  through it, never through a session lookup (a mid-leave session
+       *  resolves to null while its player entity still holds the bags). */
+      pid: number;
+      extracted: InvSlot;
+      characterName: string;
+      save: CharacterSaveArgs;
+    }
   | { ok: false; reason: ExtractRefusal | 'offline' | 'not_yours' };
 
 /**
@@ -915,8 +924,17 @@ export interface WocMarketCustody {
    *  for this character, the wait deadline fired first, or the seller's
    *  dirty guild books could not be flushed clear): nothing was extracted
    *  and the request simply retries. The job must not await another
-   *  character write for the same character (FIFO self-deadlock). */
+   *  character write for the same character (FIFO self-deadlock). The
+   *  refusal is a string sentinel sharing the job's return channel: safe
+   *  while every caller's T is an object (as here), so a future caller
+   *  whose T could itself be a string must wrap its result first. */
   runSerialized<T>(characterId: number, job: () => Promise<T>): Promise<T | 'contended'>;
+  /** Ownership probe with ZERO side effects, consulted before runSerialized:
+   *  a foreign character id must never reach the flush or the depth cap. */
+  ownsLiveCharacter(accountId: number, characterId: number): boolean;
+  /** Terminal escrow-job signals: 'fenced' kicks the displaced zombie,
+   *  'ambiguous' quarantines so the durable row decides. Fire and forget. */
+  escrowSessionLost(characterId: number, kind: 'fenced' | 'ambiguous'): void;
   extractCopy(accountId: number, characterId: number, ref: ExtractRef): WocCustodyExtract;
   /** Hand a held copy straight to a live buyer's bags. Returns the save the
    *  caller must persist before treating the delivery as done. */
@@ -926,8 +944,10 @@ export interface WocMarketCustody {
    *  the returned save already hold the earlier grant (same live session), so
    *  persisting it retries the delivery without minting a second copy. */
   snapshotCopy(accountId: number, characterId: number): WocCustodyGrant;
-  /** Compensation for a failed escrow persist: the copy goes straight back. */
-  restoreCopy(characterId: number, slot: InvSlot): void;
+  /** Compensation for a failed escrow persist: the copy goes back into the
+   *  extraction pid's live bags while that player exists (a queued teardown
+   *  flush then persists it), or home by return parcel once it is gone. */
+  restoreCopy(pid: number, characterId: number, slot: InvSlot): void;
   /** Book-once (by custodyRef) + persist. 'booked' covers the already-booked
    *  reconciliation case too: after this resolves, the parcel is durably in
    *  the realm mail blob. */
@@ -1378,6 +1398,14 @@ export class WocMarketService {
     // commits before the escrow write, and the escrow blob (serialized at
     // extraction, inside the job) is fresher than every committed one, so no
     // stale snapshot can ever resurrect the escrowed item.
+    // Ownership resolves BEFORE the serialized job: a foreign character id
+    // must be a pure refusal with zero side effects (it must never occupy the
+    // victim's escrow slot nor force their guild-book flush). The job's own
+    // extractCopy re-checks under the queue, so a session that drops between
+    // this probe and the job still refuses.
+    if (!this.deps.custody.ownsLiveCharacter(args.account, args.characterId)) {
+      return refuse('character_invalid');
+    }
     type ListingJobOutcome = { refusal: WocMarketRefusal } | { id: number };
     const outcome = await this.deps.custody.runSerialized(
       args.characterId,
@@ -1396,7 +1424,7 @@ export class WocMarketService {
         // below its def quality must not slip through on the def alone.
         const eligibleReal = listingEligibility(def, extract.extracted.instance, this.cfg.policy);
         if (!eligibleReal.ok) {
-          this.deps.custody.restoreCopy(args.characterId, extract.extracted);
+          this.deps.custody.restoreCopy(extract.pid, args.characterId, extract.extracted);
           return { refusal: eligibleReal.reason };
         }
         const nowMs = this.now();
@@ -1419,23 +1447,37 @@ export class WocMarketService {
           // Restore ONLY on proof the transaction rolled back. A throw that
           // proves nothing (a connection-class failure, a driver timeout with
           // no SQLSTATE) may follow a COMMIT that landed, and restoring there
-          // mints the copy twice: once in the listing, once in the bags. That
-          // ambiguous copy PARKS instead (kept out of the live bags, logged
-          // with its ids for the operator, who checks whether the listing row
-          // exists and hand-restores when it does not).
+          // mints the copy twice: once in the listing, once in the bags. The
+          // ambiguous arm QUARANTINES the session instead: it reloads from
+          // the durable row, which is correct in BOTH branches (committed:
+          // item-free blob plus the listing; rolled back: the item still in
+          // the bags). The log carries the full extracted slot so an
+          // operator can reconstruct an instanced copy if anything else
+          // interferes; the error itself is connection-class here, but keep
+          // err.detail out of any future widening (constraint details echo
+          // row values).
           if (throwProvedRollback(err)) {
-            this.deps.custody.restoreCopy(args.characterId, extract.extracted);
+            this.deps.custody.restoreCopy(extract.pid, args.characterId, extract.extracted);
           } else {
             console.error(
               `[woc_market] escrow_outcome_unknown: listing persist for character ${args.characterId} ` +
-                `item ${extract.extracted.itemId} threw without rollback proof; copy parked out of bags`,
+                `threw without rollback proof; session quarantined, slot ${JSON.stringify(extract.extracted)}`,
               err,
             );
+            this.deps.custody.escrowSessionLost(args.characterId, 'ambiguous');
           }
           throw err;
         }
         if (!inserted.ok) {
-          this.deps.custody.restoreCopy(args.characterId, extract.extracted);
+          if (inserted.reason === 'lease_lost') {
+            // The fence matched no row: this session is a displaced zombie
+            // (same signal as saveCharacter's fence-out arm). Restore the
+            // copy for the durable-truth reload, then kick.
+            this.deps.custody.restoreCopy(extract.pid, args.characterId, extract.extracted);
+            this.deps.custody.escrowSessionLost(args.characterId, 'fenced');
+            return { refusal: 'lease_lost' as const };
+          }
+          this.deps.custody.restoreCopy(extract.pid, args.characterId, extract.extracted);
           return {
             refusal:
               inserted.reason === 'cap_reached' || inserted.reason === 'contended'

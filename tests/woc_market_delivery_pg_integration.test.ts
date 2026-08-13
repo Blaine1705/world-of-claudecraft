@@ -65,6 +65,10 @@ class ParcelCustody implements WocMarketCustody {
   runSerialized(): never {
     throw new Error('escrow extraction is not exercised by this suite');
   }
+  ownsLiveCharacter(): boolean {
+    return true;
+  }
+  escrowSessionLost(): void {}
   extractCopy(): never {
     throw new Error('escrow extraction is not exercised by this suite');
   }
@@ -1436,21 +1440,26 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       const account = await seedAccount();
       const characterId = await seedCharacter(realm, account);
       await seedLease(realm, characterId, 'escrow-nonce-live');
-      const ref = `escrow_lock_graph_${seq}`;
-      expect(await marketDb.claimCustodyRef(realm, ref)).toBe(true);
-      const [escrow, booked] = await Promise.all([
-        marketDb.escrowInsertListing(
-          { characterId, level: 12, state: SAVE_STATE, leaseNonce: 'escrow-nonce-live' },
-          escrowListing(realm, account, characterId),
-        ),
-        marketDb.saveDeliveredCharacterBooked(
-          { characterId, level: 13, state: SAVE_STATE, leaseNonce: 'escrow-nonce-live' },
-          ref,
-        ),
-      ]);
-      expect(escrow.ok).toBe(true);
-      expect(booked).toBe('booked');
-    }, 20_000);
+      // Repeated so the two transactions genuinely overlap at least once:
+      // one Promise.all pair can serialize by accident and prove nothing.
+      for (let round = 0; round < 5; round++) {
+        seq++;
+        const ref = `escrow_lock_graph_${seq}_${round}`;
+        expect(await marketDb.claimCustodyRef(realm, ref)).toBe(true);
+        const [escrow, booked] = await Promise.all([
+          marketDb.escrowInsertListing(
+            { characterId, level: 12, state: SAVE_STATE, leaseNonce: 'escrow-nonce-live' },
+            escrowListing(realm, account, characterId, { directedBuyerAccount: account }),
+          ),
+          marketDb.saveDeliveredCharacterBooked(
+            { characterId, level: 13, state: SAVE_STATE, leaseNonce: 'escrow-nonce-live' },
+            ref,
+          ),
+        ]);
+        expect(escrow.ok).toBe(true);
+        expect(booked).toBe('booked');
+      }
+    }, 30_000);
 
     it('measures the transaction cost against its statement allowance', async () => {
       // The workload-scoped 5s statement_timeout replaced the 60s heavy

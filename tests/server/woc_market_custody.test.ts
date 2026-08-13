@@ -47,6 +47,7 @@ function makeHost(over: Partial<WocCustodyGameHost> = {}): {
     },
     hasDirtyGuildBooks: () => false,
     flushDirtyGuildBooks: async () => {},
+    escrowSessionLost: () => {},
     ...over,
   };
   return { host, persists: () => persists };

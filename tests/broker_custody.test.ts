@@ -8,9 +8,11 @@
 
 import { describe, expect, it } from 'vitest';
 import { bagCapacity, stackSizeOf } from '../src/sim/bags';
+import { extractTradableCopyImpl } from '../src/sim/broker_custody';
 import { ITEMS } from '../src/sim/data';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
+import type { SimContext } from '../src/sim/sim_context';
 import type { InvSlot } from '../src/sim/types';
 
 const freshSim = (): Sim => new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
@@ -192,5 +194,126 @@ describe('the broker custody pair draws NO rng (the module-header claim)', () =>
 
     sim.rng.setObserver(null);
     expect(draws).toBe(0);
+  });
+});
+
+// Moved beside the module that owns the behavior (the facade and its
+// mount-dismount arm live in broker_custody.ts, not the inventory_extract
+// leaf): the tests/CLAUDE.md paired-file rule.
+describe('Sim.extractTradableCopy (facade delegate)', () => {
+  it('extracts a live instanced copy from a real player and mutates the live inventory', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Escrow');
+    const meta = sim.players.get(pid)!;
+    const itemId = Object.keys(ITEMS).find((id) => {
+      const d = ITEMS[id];
+      return d.kind === 'weapon' && !d.soulbound && !d.noMarketList;
+    })!;
+    sim.addItemInstance(itemId, { signer: 'Escrow' }, pid);
+    const index = meta.inventory.findIndex((s) => s.itemId === itemId && s.instance);
+    expect(index).toBeGreaterThanOrEqual(0);
+    const before = meta.inventory.length;
+    const out = sim.extractTradableCopy(pid, {
+      index,
+      itemId,
+      expectInstance: { signer: 'Escrow' },
+    });
+    if (!out.ok) throw new Error(`expected ok, got ${out.reason}`);
+    expect(out.extracted).toEqual({ itemId, count: 1, instance: { signer: 'Escrow' } });
+    expect(meta.inventory.length).toBe(before - 1);
+    expect(meta.inventory.some((s) => s.itemId === itemId && s.instance)).toBe(false);
+  });
+
+  it('refuses an unresolved player as not_found', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
+    expect(sim.extractTradableCopy(9999, { index: 0, itemId: 'anything' })).toEqual({
+      ok: false,
+      reason: 'not_found',
+    });
+  });
+
+  // Escrow is the first way a mount can leave a player at all: reins are
+  // soulbound AND noDiscard, so nothing could remove one before the Exchange
+  // traded them. A live ride is never re-validated once started, so without this
+  // the seller keeps the mount's speed for the rest of the session.
+  const mountFixture = (): { itemId: string; key: string } => {
+    const itemId = Object.keys(ITEMS).find((id) => ITEMS[id].kind === 'mount');
+    if (!itemId) throw new Error('no mount item in ITEMS');
+    const mount = (ITEMS[itemId] as { mount?: string }).mount;
+    if (!mount) throw new Error('mount item carries no mount key');
+    return { itemId, key: mount };
+  };
+
+  it('dismounts a seller who escrows the mount they are RIDING', () => {
+    const { itemId, key } = mountFixture();
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Rider');
+    const meta = sim.players.get(pid)!;
+    const entity = sim.entities.get(pid)!;
+    sim.addItem(itemId, 1, pid);
+    entity.mountKey = key;
+    const index = meta.inventory.findIndex((s) => s.itemId === itemId);
+    const out = sim.extractTradableCopy(pid, { index, itemId });
+    expect(out.ok).toBe(true);
+    expect(entity.mountKey).toBe('');
+  });
+
+  it('leaves the rider mounted when a BANK copy still confers ownership', () => {
+    // mountOwned reads the bags AND the bank, so a seller listing one of two
+    // copies still owns the mount and must keep riding it. Dismounting on any
+    // mount extraction would punish exactly the player who did nothing wrong.
+    const { itemId, key } = mountFixture();
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Rider');
+    const meta = sim.players.get(pid)!;
+    const entity = sim.entities.get(pid)!;
+    sim.addItem(itemId, 1, pid);
+    meta.bank.inventory.push({ itemId, count: 1 });
+    entity.mountKey = key;
+    const index = meta.inventory.findIndex((s) => s.itemId === itemId);
+    expect(sim.extractTradableCopy(pid, { index, itemId }).ok).toBe(true);
+    expect(entity.mountKey).toBe(key);
+  });
+
+  it('does not touch the ride when the escrowed item is a DIFFERENT mount', () => {
+    const { itemId, key } = mountFixture();
+    const other = Object.keys(ITEMS).find(
+      (id) => ITEMS[id].kind === 'mount' && (ITEMS[id] as { mount?: string }).mount !== key,
+    );
+    if (!other) throw new Error('need a second mount item');
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Rider');
+    const meta = sim.players.get(pid)!;
+    const entity = sim.entities.get(pid)!;
+    sim.addItem(other, 1, pid);
+    entity.mountKey = key;
+    const index = meta.inventory.findIndex((s) => s.itemId === other);
+    expect(sim.extractTradableCopy(pid, { index, itemId: other }).ok).toBe(true);
+    expect(entity.mountKey).toBe(key);
+  });
+});
+
+describe('the extraction facade side effects', () => {
+  it('notifies the quest system exactly on a successful extraction, never on a refusal', () => {
+    // A hand-rolled ctx recorder (the item_instance_transfer test idiom):
+    // resolve serves a minimal player and the quest callback counts calls.
+    const weapon = tradableWeaponId();
+    let notified = 0;
+    const meta = { inventory: [{ itemId: weapon, count: 1 }] } as unknown as PlayerMeta;
+    const e = { mountKey: '' };
+    const ctx = {
+      resolve: (pid?: number) => (pid === 5 ? { meta, e } : null),
+      onInventoryChangedForQuests: () => {
+        notified++;
+      },
+    } as unknown as SimContext;
+    const ok = extractTradableCopyImpl(ctx, 5, { index: 0, itemId: weapon });
+    expect(ok.ok).toBe(true);
+    expect(notified).toBe(1);
+    // The slot is gone now, so the same ref refuses, and a refusal must not
+    // report an inventory change that never happened.
+    const refused = extractTradableCopyImpl(ctx, 5, { index: 0, itemId: weapon });
+    expect(refused.ok).toBe(false);
+    expect(notified).toBe(1);
   });
 });

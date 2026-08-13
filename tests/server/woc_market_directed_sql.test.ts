@@ -1188,6 +1188,31 @@ describe('the escrow listing transaction, in SQL', () => {
     expect(seq.at(-1)).toBe('ROLLBACK');
   });
 
+  it("maps a lock-contention throw to the typed 'contended' refusal", async () => {
+    const { pool } = recordingTxPool((text) => {
+      if (text.includes('FOR UPDATE')) {
+        throw Object.assign(new Error('canceling statement due to lock timeout'), {
+          code: '55P03',
+        });
+      }
+      return undefined;
+    });
+    const out = await new PgWocMarketDb(pool).escrowInsertListing(SAVE, LISTING);
+    expect(out).toEqual({ ok: false, reason: 'contended' });
+  });
+
+  it('rethrows a non-contention failure instead of eating it as a refusal', async () => {
+    const { pool } = recordingTxPool((text) => {
+      if (text.includes('INSERT INTO woc_market_listings')) {
+        throw Object.assign(new Error('duplicate key'), { code: '23505' });
+      }
+      return undefined;
+    });
+    await expect(new PgWocMarketDb(pool).escrowInsertListing(SAVE, LISTING)).rejects.toThrow(
+      'duplicate key',
+    );
+  });
+
   it('refuses cap_reached under the accounts lock BEFORE any character write', async () => {
     const { pool, sql } = recordingTxPool((text) =>
       text.includes('COUNT(*)') ? { rows: [{ n: 12 }], rowCount: 1 } : undefined,

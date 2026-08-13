@@ -14,7 +14,7 @@
 //
 // The per-copy half is shared one level further out: the locks that depend on
 // the INSTANCE rather than the def come from isTransferLockedInstance
-// (item_instance_transfer.ts), the same predicate the gold market, Ravenpost
+// (transfer_lock.ts, re-exported by item_instance_transfer.ts), the same predicate the gold market, Ravenpost
 // mail and the guild bank gate on. Every one of those is an anonymous pipe with
 // nobody for a bind-on-trade stamp to land on, so a state one of them refuses
 // and this rail accepts would be a laundering route rather than a difference of
@@ -35,7 +35,7 @@
 // (tests/architecture.test.ts) still holds with this file inside it.
 // ---------------------------------------------------------------------------
 
-import { isTransferLockedInstance } from './item_instance_transfer';
+import { isTransferLockedInstance } from './transfer_lock';
 import type { ItemDef, ItemInstancePayload } from './types';
 
 /**

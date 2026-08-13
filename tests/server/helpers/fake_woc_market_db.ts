@@ -76,6 +76,10 @@ export const OPEN_SETTLEMENT_STATES: readonly WocSettlementState[] = [
 export class FakeWocMarketDb implements WocMarketDb {
   /** Force the NEXT escrowInsertListing to refuse (consumed on use). */
   failNextEscrow: 'lease_lost' | 'cap_reached' | 'contended' | null = null;
+  /** THROW from the next escrowInsertListing (after recording the save args,
+   *  which still cross the edge when a real transaction dies): the error's
+   *  .code drives the caller's rollback-proof compensation split. */
+  failNextEscrowThrow: Error | null = null;
   /** The buy-now abandon ledger (claim cooldowns), the Pg table's mirror. */
   readonly buyNowAbandons: {
     realm: string;
@@ -190,6 +194,11 @@ export class FakeWocMarketDb implements WocMarketDb {
     // the fake records the save it received either way (a refused escrow rolls
     // the save back in Pg, but the SAVE ARGS still crossed the edge).
     this.escrowSaves.push(structuredClone(save));
+    if (this.failNextEscrowThrow !== null) {
+      const err = this.failNextEscrowThrow;
+      this.failNextEscrowThrow = null;
+      throw err;
+    }
     if (this.failNextEscrow !== null) {
       const reason = this.failNextEscrow;
       this.failNextEscrow = null;

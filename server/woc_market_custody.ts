@@ -44,6 +44,10 @@ export interface WocCustodyGameHost {
   ): { level: number; state: CharacterState } | null;
   hasDirtyGuildBooks(characterId: number): boolean;
   flushDirtyGuildBooks(characterId: number): Promise<void>;
+  /** Terminal escrow-job signals (game.ts owns the semantics: 'fenced' kicks
+   *  the displaced zombie, 'ambiguous' quarantines so the durable row
+   *  decides). Fire and forget; never awaited from inside a job. */
+  escrowSessionLost(characterId: number, kind: 'fenced' | 'ambiguous'): void;
 }
 
 /** How long a listing request may WAIT for its turn on the character's save
@@ -52,8 +56,8 @@ export interface WocCustodyGameHost {
  *  connect deadline: past that, something is wedged and holding the HTTP
  *  request open only invites a retry pile-up. */
 export const ESCROW_QUEUE_WAIT_MS = 5_000;
-/** Queue waits past this warn (rate-unlimited by design: one line per slow
- *  listing attempt is the observability for the new FIFO coupling). */
+/** Queue waits past this warn, throttled to one line per burst (the market
+ *  writer's depth-warn idiom): the observability for the new FIFO coupling. */
 export const ESCROW_QUEUE_WARN_MS = 2_000;
 
 const LETTERS = {
@@ -69,6 +73,9 @@ export function createWocMarketCustody(
   const escrowWaitMs = opts.escrowWaitMs ?? ESCROW_QUEUE_WAIT_MS;
   /** Depth cap 1 per character: the ids with an escrow job queued or running. */
   const escrowJobsInFlight = new Set<number>();
+  /** The queue-wait warn throttles like the market writer's depth warn: the
+   *  signal is "waits are slow", one line per burst carries it. */
+  let lastQueueWarnMs = 0;
   return {
     extractCopy(accountId: number, characterId: number, ref: ExtractRef): WocCustodyExtract {
       const session = host.wocCustodySession(characterId);
@@ -88,6 +95,7 @@ export function createWocMarketCustody(
       }
       return {
         ok: true,
+        pid: session.pid,
         extracted: out.extracted,
         characterName: session.name,
         save: {
@@ -118,28 +126,46 @@ export function createWocMarketCustody(
       let started = false;
       let timer: NodeJS.Timeout | undefined;
       try {
-        await host.flushDirtyGuildBooks(characterId);
         const enqueuedAt = Date.now();
-        const run = host.enqueueCharacterWrite(characterId, async (): Promise<T | 'contended'> => {
-          if (cancelled) return 'contended';
-          started = true;
-          const waited = Date.now() - enqueuedAt;
-          if (waited > ESCROW_QUEUE_WARN_MS) {
-            console.warn(`[woc_market] escrow queue wait ${waited}ms for character ${characterId}`);
+        const work = (async (): Promise<T | 'contended'> => {
+          // The guild-book flush rides INSIDE the deadline: it waits its own
+          // turn on the same FIFO, so a wedged queue would otherwise hold
+          // the HTTP request (and this character's depth-cap slot) unbounded
+          // through the very wait the deadline exists to bound. A flush
+          // failure is the bounded, typed refusal too, never a 500: the
+          // books are simply not provably clean, and the request retries.
+          try {
+            await host.flushDirtyGuildBooks(characterId);
+          } catch (err) {
+            console.error(`[woc_market] guild-book flush failed for character ${characterId}`, err);
+            return 'contended';
           }
-          if (host.hasDirtyGuildBooks(characterId)) return 'contended';
-          return job();
-        });
+          if (cancelled) return 'contended';
+          return host.enqueueCharacterWrite(characterId, async (): Promise<T | 'contended'> => {
+            if (cancelled) return 'contended';
+            started = true;
+            const waited = Date.now() - enqueuedAt;
+            if (waited > ESCROW_QUEUE_WARN_MS && Date.now() - lastQueueWarnMs > 30_000) {
+              lastQueueWarnMs = Date.now();
+              console.warn(
+                `[woc_market] escrow queue wait ${waited}ms for character ${characterId}`,
+              );
+            }
+            if (host.hasDirtyGuildBooks(characterId)) return 'contended';
+            return job();
+          });
+        })();
         const timeout = new Promise<'timeout'>((resolve) => {
           timer = setTimeout(() => resolve('timeout'), escrowWaitMs);
         });
-        const winner = await Promise.race([run, timeout]);
+        const winner = await Promise.race([work, timeout]);
         if (winner !== 'timeout') return winner;
         // The deadline fired. If the job already started, its runtime is
         // bounded by the transaction's own timeouts and its outcome is the
         // truth (returning 'contended' for a write that may commit would lie
-        // to the seller); only a job still WAITING is cancelled.
-        if (started) return await run;
+        // to the seller); only work that has not reached the job is
+        // cancelled, and a cancelled job extracts nothing.
+        if (started) return await work;
         cancelled = true;
         return 'contended';
       } finally {
@@ -202,22 +228,41 @@ export function createWocMarketCustody(
       };
     },
 
-    restoreCopy(characterId: number, slot: InvSlot): void {
-      const session = host.wocCustodySession(characterId);
-      if (session) {
-        restoreInto(host, session.pid, slot);
+    restoreCopy(pid: number, characterId: number, slot: InvSlot): void {
+      // The extraction pid decides the rail. While the player still exists
+      // in the sim, restore the LIVE bags even if the session is mid-leave:
+      // every teardown flush for this character is queued BEHIND the escrow
+      // job on the same FIFO, so the restored copy rides that flush to
+      // durability (mailing here instead risked two copies, because the
+      // durable row still holds the item until the flush lands). Only when
+      // the player is already gone (removePlayer ran, so the leave flush
+      // committed bags without the copy) is the return parcel the right
+      // rail. A QUARANTINED session never reaches here: extraction refuses
+      // it up front, and quarantine cannot be set mid-job (it is only
+      // assigned inside a saveCharacter thunk on this same FIFO).
+      if (host.sim.players.has(pid)) {
+        restoreInto(host, pid, slot);
         return;
       }
-      // The seller logged out between extraction and the refused persist (a
-      // narrow race): the leave flush already saved bags without the copy, so
-      // hand it back by return parcel instead. Best-effort persist; the
-      // parcel also rides the next ordinary mail save.
       host.sim.mailSystemParcel(
         { key: String(characterId), name: String(characterId) },
         WOC_MARKET_RETURN_LETTER,
         [slot],
       );
       void host.persistMailBlob().catch(() => {});
+    },
+
+    ownsLiveCharacter(accountId: number, characterId: number): boolean {
+      // The pure ownership probe the service consults BEFORE any serialized
+      // side effect: a foreign character id must be a refusal with zero side
+      // effects (naming a victim's character could otherwise occupy their
+      // escrow slot and force their guild-book flush).
+      const session = host.wocCustodySession(characterId);
+      return session !== null && session.accountId === accountId;
+    },
+
+    escrowSessionLost(characterId: number, kind: 'fenced' | 'ambiguous'): void {
+      host.escrowSessionLost(characterId, kind);
     },
 
     async persistMailParcel(

@@ -484,8 +484,21 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     const { DB_STATEMENT_TIMEOUT_MS, DB_HEAVY_STATEMENT_TIMEOUT_MS } = await import(
       '../../server/db'
     );
-    const { ESCROW_STATEMENT_TIMEOUT_MS } = await import('../../server/woc_market_db');
+    const { ESCROW_STATEMENT_TIMEOUT_MS, ESCROW_LOCK_TIMEOUT_MS, GUARD_IDLE_TX_TIMEOUT_MS } =
+      await import('../../server/woc_market_db');
+    const { ESCROW_QUEUE_WAIT_MS, ESCROW_QUEUE_WARN_MS } = await import(
+      '../../server/woc_market_custody'
+    );
     expect(ESCROW_STATEMENT_TIMEOUT_MS).toBe(5_000);
+    expect(ESCROW_LOCK_TIMEOUT_MS).toBe(2_000);
+    // Equal BY RULING (the idle bound and the lock wait tell one story).
+    expect(GUARD_IDLE_TX_TIMEOUT_MS).toBe(2_000);
+    expect(GUARD_IDLE_TX_TIMEOUT_MS).toBe(ESCROW_LOCK_TIMEOUT_MS);
+    // The HTTP-side queue bounds: the wait deadline mirrors the pool's own
+    // 5s checkout deadline, and slow waits warn before they refuse.
+    expect(ESCROW_QUEUE_WAIT_MS).toBe(5_000);
+    expect(ESCROW_QUEUE_WARN_MS).toBe(2_000);
+    expect(ESCROW_QUEUE_WAIT_MS).toBeGreaterThan(ESCROW_QUEUE_WARN_MS);
     // The escrow transaction heads a character's save FIFO (the H5 custody
     // entry), so its allowance must sit under the ordinary session default
     // and far under the 30s autosave period; the 60s heavy allowance stays
@@ -494,7 +507,7 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     // the typed 55P03 refusal, never as a statement cancel.
     expect(ESCROW_STATEMENT_TIMEOUT_MS).toBeLessThan(DB_STATEMENT_TIMEOUT_MS);
     expect(ESCROW_STATEMENT_TIMEOUT_MS).toBeLessThan(DB_HEAVY_STATEMENT_TIMEOUT_MS);
-    expect(ESCROW_STATEMENT_TIMEOUT_MS).toBeGreaterThan(2_000);
+    expect(ESCROW_STATEMENT_TIMEOUT_MS).toBeGreaterThan(ESCROW_LOCK_TIMEOUT_MS);
   });
 
   it('runWithStatementTimeout rejects a non-integer or negative timeout before touching the pool', async () => {

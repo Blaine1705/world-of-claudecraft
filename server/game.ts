@@ -323,7 +323,11 @@ import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
 import { refusedRiftForgeCommand } from './rift_forge_gate';
 import { RiftUpgradeCoordinator, riftUpgraderConfigFromEnv } from './rift_upgrader';
-import { createKeyedSerialWriter, createSerialWriter } from './serial_writer';
+import {
+  createDepthWarnedSerialWriter,
+  createKeyedSerialWriter,
+  createSerialWriter,
+} from './serial_writer';
 import {
   jsonWithField,
   StableAuraWireCache,
@@ -1926,10 +1930,8 @@ export class GameServer {
   private saveTimer = 0;
   private socialPosTimer = 0;
   private saveAllInFlight: Promise<void> | null = null;
-  // One FIFO per character id (a drained key's entry is dropped). EVERY
-  // durable character write rides it: saveCharacter, and the out-of-band
-  // enqueueCharacterWrite the marketplace escrow persist uses, so commit
-  // order across all of a character's writers is enqueue order.
+  // One FIFO per character id: EVERY durable character write rides it
+  // (saveCharacter and enqueueCharacterWrite), so commit order is enqueue order.
   private readonly characterSaveQueues = createKeyedSerialWriter<number>();
   // Weapon-skin loadouts are whole-record replacements in their dedicated paid
   // state row. Keep one FIFO per account so rapid apply/detach commands cannot
@@ -1952,24 +1954,11 @@ export class GameServer {
   // queue a leave flush behind an autosave batch. The depth watch below makes
   // that collapse loud; if the warn fires in production, the escalation path
   // is a per-guild serializer for the autosave arm (state.md records it).
-  private readonly marketSerialWriter = createSerialWriter();
-  private marketWriteQueueDepth = 0;
-  private lastMarketQueueWarnMs = 0;
-  private readonly enqueueMarketWrite = <T>(write: () => Promise<T>): Promise<T> => {
-    this.marketWriteQueueDepth++;
-    if (
-      this.marketWriteQueueDepth > MARKET_WRITE_QUEUE_WARN_DEPTH &&
-      Date.now() - this.lastMarketQueueWarnMs > 60_000
-    ) {
-      this.lastMarketQueueWarnMs = Date.now();
-      console.warn(
-        `market serial writer queue depth ${this.marketWriteQueueDepth}: dirty-book autosaves are queueing behind the shared writer; escrow save latency is rising`,
-      );
-    }
-    return this.marketSerialWriter(write).finally(() => {
-      this.marketWriteQueueDepth--;
-    });
-  };
+  private readonly enqueueMarketWrite = createDepthWarnedSerialWriter(
+    MARKET_WRITE_QUEUE_WARN_DEPTH,
+    (depth) =>
+      `market serial writer queue depth ${depth}: dirty-book autosaves are queueing behind the shared writer; escrow save latency is rising`,
+  );
   private readonly enqueueRiftWrite = createSerialWriter();
   private restartCountdownStartedAt: number | null = null;
   private readonly restartCountdownTimers: NodeJS.Timeout[] = [];
@@ -4691,13 +4680,24 @@ export class GameServer {
   }
 
   /** An out-of-band durable character write (the marketplace escrow persist)
-   *  rides the SAME per-character FIFO as saveCharacter, so its commit order
-   *  against the autosaves is enqueue order and a snapshot serialized before
-   *  it can never commit after it. The job must not await another enqueue for
-   *  the same character: the FIFO makes that a deadlock (the kickSession note
-   *  inside saveCharacter is the same rule). */
+   *  on the SAME per-character FIFO as saveCharacter. The job must not await
+   *  another enqueue for the same character (FIFO self-deadlock; the
+   *  kickSession note inside saveCharacter is the same rule). */
   enqueueCharacterWrite<T>(characterId: number, job: () => Promise<T>): Promise<T> {
     return this.characterSaveQueues.enqueue(characterId, job);
+  }
+
+  /** Terminal escrow-job arms, fire and forget from inside the job (awaiting
+   *  a same-character enqueue there deadlocks). 'fenced' kicks the displaced
+   *  zombie (saveCharacter's own fence-out signal); 'ambiguous' quarantines
+   *  so the durable row decides, which converges BOTH branches of an unknown
+   *  COMMIT. Dirty book deltas revert like every abandoned session's. */
+  escrowSessionLost(characterId: number, kind: 'fenced' | 'ambiguous'): void {
+    const session = this.sessionByCharacterId(characterId);
+    if (!session || session.left) return;
+    if (kind === 'ambiguous') session.escrowQuarantined = true;
+    this.revertOwnGuildBookOps(session, [...session.dirtyGuildBanks.keys()]);
+    void this.kickSession(session, `market escrow ${kind}`, 'character taken over');
   }
 
   async saveAll(reason: string): Promise<void> {
@@ -6067,10 +6067,8 @@ export class GameServer {
     leaseNonce: string | undefined;
   } | null {
     const session = this.sessionByCharacterId(characterId);
-    // A quarantined session's live state was abandoned when its guild-bank
-    // escrow rolled back (the saveCharacter refusal above): its bags are not
-    // truth for ANY custody op, so extraction, grant, snapshot, and restore
-    // all treat it as absent rather than read or mutate abandoned state.
+    // A quarantined session's live state is abandoned: not truth for ANY
+    // custody op, so every custody wrapper treats it as absent.
     if (!session || session.left || session.escrowQuarantined) return null;
     return {
       pid: session.pid,
@@ -6081,9 +6079,8 @@ export class GameServer {
   }
 
   // The save-shaped snapshot every marketplace custody persist must use: the
-  // live serialization PLUS the session fixups an ordinary save applies
-  // (character_save_fixups.ts owns the rationale; skipping them is a jail
-  // escape and a stowed-pet loss, not cosmetics).
+  // live serialization PLUS the session save fixups (character_save_fixups.ts
+  // owns the rationale; skipping them is a jail escape, not cosmetics).
   serializeCharacterForPersist(
     characterId: number,
   ): { level: number; state: import('../src/sim/sim').CharacterState } | null {
@@ -6097,14 +6094,16 @@ export class GameServer {
 
   hasDirtyGuildBooks(characterId: number): boolean {
     const session = this.sessionByCharacterId(characterId);
-    return !!session && !session.left && session.dirtyGuildBanks.size > 0;
+    // A quarantined session's marks can never flush clear (its saves refuse),
+    // so reporting them dirty would refuse 'contended' (a retry hint) forever.
+    if (!session || session.left || session.escrowQuarantined) return false;
+    return session.dirtyGuildBanks.size > 0;
   }
 
   // One ordinary save to flush a seller's dirty guild books BEFORE the escrow
-  // critical section: the escrow write persists the character row ALONE, and
-  // a blob carrying unflushed book-paired deltas would tear the guild-bank
-  // escrow atomicity (the character half durable without its book half).
-  // Never call from inside a queued character write: self-deadlock.
+  // critical section (the escrow write persists the character row ALONE, so a
+  // blob carrying unflushed book-paired deltas would tear the guild-bank
+  // atomicity). Never call from inside a queued character write: deadlock.
   async flushDirtyGuildBooks(characterId: number): Promise<void> {
     const session = this.sessionByCharacterId(characterId);
     if (!session || session.left || session.dirtyGuildBanks.size === 0) return;
