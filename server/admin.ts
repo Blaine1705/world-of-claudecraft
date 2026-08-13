@@ -128,7 +128,6 @@ import { json, readBody } from './http_util';
 import { addBlockedIp, cleanIp, listBlockedIps, removeBlockedIp } from './ip_block_db';
 import { PgMapsDb } from './maps_db';
 import {
-  accountCheaterMarkSeconds,
   addAccountNote,
   forceCharacterRename,
   ignoreReport,
@@ -1941,11 +1940,12 @@ function makeRealAdminDb() {
     moderationQueue: readModerationQueue,
     moderationReportsForAccount,
     muteAccountChat,
-    // The Cheater mark: apply/re-length, lift early, and the read the live push
-    // and the world-join restore both resolve the remaining budget through.
+    // The Cheater mark: apply/re-length and lift early. Deliberately NO
+    // remaining-budget read here: the apply arm returns what its own transaction
+    // stored, and a second read could be overtaken by a save-path burn and push
+    // a stale budget onto the live session.
     setAccountCheaterMark,
     liftAccountCheaterMark,
-    accountCheaterMarkSeconds,
     accountAndScopeForToken,
     accountMailTarget,
     findAccount,
@@ -2669,8 +2669,9 @@ async function cheaterMarkHandler(ctx: Ctx): Promise<void> {
   const decoded = cheaterMarkBodySchema.decode(ctx.body ?? {});
   if (!decoded.ok) throw decoded;
   await refuseAdminCheaterMarkTarget(targetAccountId);
+  let storedSeconds = 0;
   try {
-    await adminDb().setAccountCheaterMark({
+    storedSeconds = await adminDb().setAccountCheaterMark({
       accountId: targetAccountId,
       adminAccountId: ctxAccountId(ctx),
       reason: decoded.value.reason,
@@ -2679,13 +2680,13 @@ async function cheaterMarkHandler(ctx: Ctx): Promise<void> {
   } catch (err) {
     rethrowCheaterMarkRefusal(err);
   }
-  // Push the STORED budget, never the requested one: moderation_db clamps to
-  // CHEATER_MARK_MAX_SECONDS, so this read is what the account actually owes and
-  // the live session cannot end up counting down a different number.
-  rt.applyCheaterMarkLive(
-    targetAccountId,
-    await adminDb().accountCheaterMarkSeconds(targetAccountId),
-  );
+  // Push the budget the WRITE ITSELF returned, never the requested one (
+  // moderation_db clamps to CHEATER_MARK_MAX_SECONDS) and never a follow-up
+  // read: the unaudited save-path burn is guarded only by
+  // `cheater_mark_seconds > 0`, so it can land between the COMMIT and a second
+  // SELECT. Re-lengthening a live mark would then push the OLD remaining while
+  // the API answered ok, and the operator's correction would silently vanish.
+  rt.applyCheaterMarkLive(targetAccountId, storedSeconds);
   ok(ctx.res, { ok: true });
 }
 
