@@ -96,36 +96,54 @@ export const CI_LONG_SUITES = Object.freeze([
   'tests/eastbrook_gameplay_integration.test.ts',
   'tests/hunter_dps_balance.test.ts',
   'tests/nythraxis_matrix.test.ts',
-  'tests/owned_class_balance_harness.test.ts',
-  'tests/owned_class_raid_balance_harness.test.ts',
+  // The owned-class harness pair was split into single-responsibility files
+  // (2026-08-13) so no lane or shard chain carries a 13-minute single file:
+  // the level-20 harness measured 788 to 842 s as ONE file and pinned a
+  // whole worker wherever it ran. Every split file stays lane-owned; the
+  // duration ledger for the halves below is in the split-change PR.
+  'tests/owned_class_balance_dps_metrics.test.ts',
+  'tests/owned_class_balance_dps_probes.test.ts',
+  'tests/owned_class_balance_druid_bands.test.ts',
+  'tests/owned_class_balance_groveheart.test.ts',
+  'tests/owned_class_balance_healer_contract.test.ts',
+  'tests/owned_class_balance_healer_probes.test.ts',
+  'tests/owned_class_balance_role_bands.test.ts',
+  'tests/owned_class_raid_armor_avoidance.test.ts',
+  'tests/owned_class_raid_sustain_bands.test.ts',
 ]);
 
 /**
  * The two parallel lane jobs ("PR gate (long sims A)" / "PR gate (long sims
  * B)" in ci.yml): a literal partition of CI_LONG_SUITES, so the pair's wall
  * clock is roughly half of the single-job lane's. Halves are balanced by
- * MEASURED post-diet suite duration, not file count: half A is the level-20
- * owned-class harness (the single longest suite) plus the shortest members,
- * half B carries everything else (the balance is recorded in the lane-diet
- * PR and re-derived from the lane job logs whenever a member's cost moves).
- * The shard legs keep excluding the full CI_LONG_SUITES union, so the a/b
- * assignment can rebalance freely without touching the shard side.
- * tests/ci_shard_plan.test.ts pins the halves as an exact partition of
- * CI_LONG_SUITES.
+ * MEASURED post-diet suite duration, not file count (re-balanced 2026-08-13
+ * from the per-file durations in the harness-split PR after the owned-class
+ * pair became nine single-responsibility files; re-derive from the lane job
+ * logs whenever a member's cost moves). The shard legs keep excluding the
+ * full CI_LONG_SUITES union, so the a/b assignment can rebalance freely
+ * without touching the shard side. tests/ci_shard_plan.test.ts pins the
+ * halves as an exact partition of CI_LONG_SUITES.
  */
 export const CI_LONG_SUITE_HALVES = Object.freeze({
   a: Object.freeze([
     'tests/battleground.test.ts',
     'tests/chronomancy_balance.test.ts',
-    'tests/owned_class_balance_harness.test.ts',
+    'tests/druid_balance_probe.test.ts',
+    'tests/owned_class_balance_dps_probes.test.ts',
+    'tests/owned_class_balance_groveheart.test.ts',
+    'tests/owned_class_balance_role_bands.test.ts',
+    'tests/owned_class_raid_armor_avoidance.test.ts',
   ]),
   b: Object.freeze([
     'tests/audit_conservation_property.test.ts',
-    'tests/druid_balance_probe.test.ts',
     'tests/eastbrook_gameplay_integration.test.ts',
     'tests/hunter_dps_balance.test.ts',
     'tests/nythraxis_matrix.test.ts',
-    'tests/owned_class_raid_balance_harness.test.ts',
+    'tests/owned_class_balance_dps_metrics.test.ts',
+    'tests/owned_class_balance_druid_bands.test.ts',
+    'tests/owned_class_balance_healer_contract.test.ts',
+    'tests/owned_class_balance_healer_probes.test.ts',
+    'tests/owned_class_raid_sustain_bands.test.ts',
   ]),
 });
 
