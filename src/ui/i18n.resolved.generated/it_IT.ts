@@ -801,6 +801,11 @@ export const it_IT: EnTranslations = {
       "resetAction": "Ripristina",
       "note": "Trascina la barra delle schede della chat per spostare la finestra, oppure l'angolo per ridimensionarla. Ripristina la riporta a posizione e dimensioni predefinite."
     },
+    "chatQuota": {
+      "limitReached": "Limite della chat Generale raggiunto. Riprova tra {seconds}.",
+      "pending": "Il tuo messaggio precedente nella chat Generale si sta ancora inviando. Riprova tra un momento.",
+      "unavailable": "La chat Generale è temporaneamente non disponibile. Riprova tra poco."
+    },
     "swing": {
       "ready": "Attacco",
       "seconds": "{seconds}s"
@@ -894,12 +899,12 @@ export const it_IT: EnTranslations = {
       "update": "Aggiorna"
     },
     "otaUpdate": {
-      "title": "Game Update",
-      "downloading": "Downloading update: {percent}",
-      "applying": "Update downloaded. Restarting the game to apply it.",
-      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
-      "continueAnyway": "Continue without updating",
-      "progressLabel": "Update download progress"
+      "title": "Aggiornamento del gioco",
+      "downloading": "Download aggiornamento in corso: {percent}",
+      "applying": "Aggiornamento scaricato. Il gioco si riavvia per applicarlo.",
+      "incompatible": "È necessario un aggiornamento per giocare. Verrà applicato non appena il download sarà completato.",
+      "continueAnyway": "Continua senza aggiornare",
+      "progressLabel": "Avanzamento download aggiornamento"
     },
     "cameraPrompt": {
       "title": "Scegli la Telecamera",
@@ -2194,6 +2199,10 @@ export const it_IT: EnTranslations = {
       "itemAriaBound": "{item}, quantita {count}, copia vincolata",
       "itemAriaMasterwork": "{item}, quantita {count}, capolavoro",
       "itemAriaQuest": "{item}, quantita {count}, oggetto missione",
+      "itemAriaLocked": "{item}, quantità {count}, bloccato",
+      "itemLockedLine": "Bloccato",
+      "lockItem": "Blocca oggetto",
+      "unlockItem": "Sblocca oggetto",
       "filterGroupAria": "Filtra le borse per categoria",
       "filterAll": "Tutti",
       "filterWeapon": "Armi",
@@ -3224,6 +3233,7 @@ export const it_IT: EnTranslations = {
       "craftedToast": "Realizzato: {name}",
       "craftedToastQty": "Realizzato: {name} x{qty}",
       "insufficientMaterials": "Non hai i materiali per quello.",
+      "reagentLocked": "Un reagente per questo è bloccato.",
       "unknownRecipe": "Quella ricetta non esiste.",
       "comboRequirementUnmet": "Non possiedi entrambe le professioni richieste al livello necessario per quella ricetta.",
       "comboRequires": "Attunement: {craftA} + {craftB}, livello {tier}.",
@@ -3330,6 +3340,7 @@ export const it_IT: EnTranslations = {
       "notHeld": "Non possiedi quell'oggetto.",
       "notDisenchantable": "Non puoi disincantare quello.",
       "notSalvageable": "Non puoi smantellare quello.",
+      "salvageLocked": "Quell'oggetto è bloccato.",
       "disenchantBusy": "Sei occupato.",
       "salvageBusy": "Sei occupato.",
       "enchantBusy": "Sei occupato.",
@@ -8906,6 +8917,9 @@ export const it_IT: EnTranslations = {
       "filterPrimaryStatAll": "Qualsiasi statistica principale",
       "filterRarity": "Rarità",
       "filterRarityAll": "Tutte le rarità",
+      "filterSort": "Ordina",
+      "sortName": "Nome (A-Z)",
+      "sortPriceAsc": "Prezzo: dal più basso al più alto",
       "weaponSword": "Spade",
       "weaponDagger": "Pugnali",
       "weaponStaff": "Bastoni",
