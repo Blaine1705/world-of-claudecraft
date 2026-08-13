@@ -269,7 +269,11 @@ import {
 } from './render/characters/portrait';
 import { type RecycledRendererContext, recycleWebGL2Context } from './render/context_recycle';
 import { installWebGLContextRelease } from './render/context_release';
-import { setDayNightPhaseOverride, setLunarPhaseOverride } from './render/day_night_clock';
+import {
+  setDayNightPhaseOverride,
+  setLegacyNightLighting,
+  setLunarPhaseOverride,
+} from './render/day_night_clock';
 import {
   activateGfxProfile,
   captureGfxCapabilities,
@@ -1732,6 +1736,19 @@ async function startGame(
     if (!arg) {
       hud.log('[dev] usage: /daynight night|dawn|day|dusk|<0..1>|auto', '#ffcf6a');
       hud.log('[dev]        /daynight moon new|crescent|half|full|<0..1>|auto', '#ffcf6a');
+      hud.log('[dev]        /daynight legacy|new  (A/B the night-lighting overhaul)', '#ffcf6a');
+      return true;
+    }
+    // A/B the night-lighting overhaul: `legacy` grades night with the old flat,
+    // darker, moon-less floors; `new` restores the readable moon-lit look.
+    if (['legacy', 'old', 'classic', 'before'].includes(arg)) {
+      setLegacyNightLighting(true);
+      hud.log('[dev] night lighting: LEGACY (pre-overhaul, darker, no moon swing)', '#ffcf6a');
+      return true;
+    }
+    if (['new', 'modern', 'current', 'after'].includes(arg)) {
+      setLegacyNightLighting(false);
+      hud.log('[dev] night lighting: NEW (readable, moon-lit)', '#8fd0ff');
       return true;
     }
     const moonArg = arg.match(/^moon\s*(.*)$/);

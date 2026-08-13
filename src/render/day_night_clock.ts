@@ -53,3 +53,19 @@ export function currentLunarPhase(): number {
   if (moonOverride !== null) return moonOverride;
   return lunarPhase(Date.now());
 }
+
+// Dev A/B for the night-lighting overhaul: while set, the renderer grades night
+// with the pre-overhaul flat floors (LEGACY_NIGHT_FLOORS) so the old darker look
+// can be compared in place. Client-render only, like the phase overrides above;
+// the `/daynight legacy` command flips it. Ships false; remove with the command.
+let legacyNight = false;
+
+/** Turn the pre-overhaul (darker, moon-less) night lighting on or off. */
+export function setLegacyNightLighting(on: boolean): void {
+  legacyNight = on;
+}
+
+/** Whether the dev legacy-night A/B is active. */
+export function legacyNightLightingEnabled(): boolean {
+  return legacyNight;
+}

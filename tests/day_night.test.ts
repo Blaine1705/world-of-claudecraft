@@ -15,14 +15,17 @@ import {
   effectiveDayness,
   fullDayGrade,
   globalDayness,
+  LEGACY_NIGHT_FLOORS,
   LUNAR_CYCLE_MS,
   lunarPhase,
   MIN_DAYNIGHT_AMPLITUDE,
   moonDirection,
+  moonNightFloors,
   moonTerminator,
   NEUTRAL_DAY_GRADE,
-  NIGHT_BASE_LIGHT,
+  NIGHT_AMBIENT_FLOOR,
   NIGHT_IBL_REFERENCE,
+  NIGHT_LIGHT_FLOOR,
   nightIblScale,
   nightSkyDesat,
   nightStarAmount,
@@ -44,12 +47,12 @@ import type { BiomeId } from '../src/sim/types';
 // sun/hemi/IBL/fog/sky; here we drive any moment of the cycle deterministically.
 
 describe('the live cycle contract', () => {
-  it('runs a twenty-minute cycle, epoch-anchored so it is identical for every player', () => {
-    // Literal pin: twenty minutes, not a derived expression, so a period change
-    // is a deliberate act here too. Epoch anchoring (cyclePhase of an absolute
-    // ms) is what makes the phase global; there is no per-client or per-zone
-    // term.
-    expect(DAY_NIGHT_CYCLE_MS).toBe(1_200_000);
+  it('runs a forty-five-minute cycle, epoch-anchored so it is identical for every player', () => {
+    // Literal pin: forty-five minutes, not a derived expression, so a period
+    // change is a deliberate act here too. Epoch anchoring (cyclePhase of an
+    // absolute ms) is what makes the phase global; there is no per-client or
+    // per-zone term.
+    expect(DAY_NIGHT_CYCLE_MS).toBe(2_700_000);
   });
 
   it('ships with the cycle LIVE (DAY_ONLY off): the sun and moon move', () => {
@@ -472,7 +475,9 @@ describe('fullDayGrade', () => {
 
 describe('per-realm night palettes (region style survives the dark)', () => {
   it('holds the raised moonlit floor for the neutral night', () => {
-    expect(dayNightGrade(0).lightScale).toBeCloseTo(NIGHT_BASE_LIGHT * 0.46, 12);
+    // The default grade is a half moon (the lunar-cycle average), so a deep-night
+    // key light lands exactly on the reference key floor.
+    expect(dayNightGrade(0).lightScale).toBeCloseTo(NIGHT_LIGHT_FLOOR, 12);
   });
 
   it('keeps realms without a palette on the global deep-blue night', () => {
@@ -523,7 +528,7 @@ describe('the night ambient floor (readable silhouettes at deep night)', () => {
     // that keeps terrain shape and bodies legible. Pinning both to one floor is
     // what made night read as a black cutout.
     expect(g.ambientScale).toBeGreaterThan(g.lightScale);
-    expect(g.ambientScale).toBeCloseTo(NIGHT_BASE_LIGHT, 12);
+    expect(g.ambientScale).toBeCloseTo(NIGHT_AMBIENT_FLOOR, 12);
     // The CONTRAST between the two halves is the night cue, not the absolute
     // level: the ambient may be walked up for readability, but if it ever
     // reaches the key light the moon stops casting and the frame reads as an
@@ -642,6 +647,97 @@ describe('lunarPhase / moonTerminator (the moon runs real phases)', () => {
     const waningCrescent = moonTerminator(0.9);
     expect(waningCrescent.shadowSide).toBe(1);
     expect(waningCrescent.bulgeSide).toBe(-1);
+  });
+});
+
+describe('the moon phase lifts the night floor (brighter nights under a fuller moon)', () => {
+  it('centers on the half-moon reference, so the average night is the authored floor', () => {
+    // litFrac 0.5 is the lunar-cycle average, so a half moon reproduces the plain
+    // reference floors exactly; the phase only ever departs from here.
+    expect(moonNightFloors(0.5).ambient).toBeCloseTo(NIGHT_AMBIENT_FLOOR, 12);
+    expect(moonNightFloors(0.5).key).toBeCloseTo(NIGHT_LIGHT_FLOOR, 12);
+  });
+
+  it('makes a full moon brighter than a new moon on both floors', () => {
+    const full = moonNightFloors(1);
+    const dark = moonNightFloors(0);
+    expect(full.ambient).toBeGreaterThan(dark.ambient);
+    expect(full.key).toBeGreaterThan(dark.key);
+  });
+
+  it('swings the moonlight key light far more than the readability ambient', () => {
+    // The moon is FELT as cast light and shadow length, not as flatter fill, so
+    // the key carries the phase while the ambient (navigability) barely moves.
+    const full = moonNightFloors(1);
+    const dark = moonNightFloors(0);
+    expect(full.key - dark.key).toBeGreaterThan(full.ambient - dark.ambient);
+  });
+
+  it('keeps even a new moon navigable: the ambient never falls to the old cutout', () => {
+    // The pre-split world sat the whole night at 0.30 ambient (LEGACY_NIGHT_FLOORS),
+    // which read as a black cutout off the lit roads. The darkest night here stays
+    // clear of it.
+    expect(moonNightFloors(0).ambient).toBeGreaterThan(0.35);
+    expect(moonNightFloors(0).ambient).toBeGreaterThan(LEGACY_NIGHT_FLOORS.ambient);
+  });
+
+  it('swings the night NOTICEABLY from new to full, not a token amount', () => {
+    // The first cut moved the readability ambient only 0.08 across the whole
+    // month, which played as no change at all; a full moon has to read as a
+    // visibly brighter night than a new one.
+    const full = moonNightFloors(1);
+    const dark = moonNightFloors(0);
+    expect(full.ambient - dark.ambient).toBeGreaterThan(0.15);
+  });
+
+  it('clamps an out-of-range illumination', () => {
+    expect(moonNightFloors(-1)).toEqual(moonNightFloors(0));
+    expect(moonNightFloors(2)).toEqual(moonNightFloors(1));
+  });
+
+  it('carries the moon into the deep-night grade, brighter under a fuller moon', () => {
+    const full = dayNightGrade(0, undefined, 1);
+    const dark = dayNightGrade(0, undefined, 0);
+    expect(full.lightScale).toBeGreaterThan(dark.lightScale);
+    expect(full.ambientScale).toBeGreaterThan(dark.ambientScale);
+  });
+
+  it('still reads as night at a full moon: the ambient stays above the moon key', () => {
+    // Brighter, but the contrast between the two halves (the night cue) survives,
+    // so a full-moon night never flattens into a dim overcast day.
+    const full = dayNightGrade(0, undefined, 1);
+    expect(full.ambientScale).toBeGreaterThan(full.lightScale);
+  });
+
+  it('leaves DAY untouched at every moon phase, so the moon only shapes the dip', () => {
+    expect(dayNightGrade(1, undefined, 0)).toEqual(NEUTRAL_DAY_GRADE);
+    expect(dayNightGrade(1, undefined, 1)).toEqual(NEUTRAL_DAY_GRADE);
+  });
+});
+
+describe('the legacy night A/B (dev before/after comparison)', () => {
+  it('grades a deep night with the old flat floors when legacy is on', () => {
+    const g = dayNightGrade(0, undefined, 0.5, true);
+    expect(g.ambientScale).toBeCloseTo(LEGACY_NIGHT_FLOORS.ambient, 12);
+    expect(g.lightScale).toBeCloseTo(LEGACY_NIGHT_FLOORS.key, 12);
+  });
+
+  it('is darker than the new night at every moon phase (that is the whole point)', () => {
+    for (const lit of [0, 0.5, 1]) {
+      const legacy = dayNightGrade(0, undefined, lit, true);
+      const modern = dayNightGrade(0, undefined, lit, false);
+      expect(legacy.ambientScale, `ambient at lit=${lit}`).toBeLessThan(modern.ambientScale);
+    }
+  });
+
+  it('ignores the moon phase, because the old world had no moon swing', () => {
+    expect(dayNightGrade(0, undefined, 0, true).ambientScale).toBe(
+      dayNightGrade(0, undefined, 1, true).ambientScale,
+    );
+  });
+
+  it('still lands day on the identity grade, legacy or not', () => {
+    expect(dayNightGrade(1, undefined, 0.5, true)).toEqual(NEUTRAL_DAY_GRADE);
   });
 });
 

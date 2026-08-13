@@ -194,7 +194,12 @@ import {
   showsStaticFarMesh,
 } from './crowd_lod';
 import { daisVisualLift } from './dais_lift';
-import { currentDayNightPhase, currentLunarPhase, dayNightPhaseOverride } from './day_night_clock';
+import {
+  currentDayNightPhase,
+  currentLunarPhase,
+  dayNightPhaseOverride,
+  legacyNightLightingEnabled,
+} from './day_night_clock';
 import {
   aboveHorizon,
   DAY_ONLY,
@@ -205,6 +210,7 @@ import {
   fullDayGrade,
   globalDayness,
   moonDirection,
+  moonTerminator,
   NEUTRAL_DAY_GRADE,
   nightIblScale,
   nightSkyDesat,
@@ -9697,11 +9703,19 @@ export class Renderer {
         this.sunUp = aboveHorizon(sd[1]) * amp;
         this.moonUp = aboveHorizon(md[1]) * Math.max(amp, 0.6);
         this.starAmt = nightStarAmount(gday);
+        // The moon's illuminated fraction lifts the night floor: a full moon
+        // reads brighter with longer moon shadows, a new moon settles toward the
+        // darkest (still readable) night. Epoch-anchored like the day itself, so
+        // every player sees the same moon and the same night depth at any instant.
+        const moonLit = moonTerminator(currentLunarPhase()).litFrac;
+        // dev A/B: the /daynight legacy command grades night with the old flat
+        // floors so the pre-overhaul darkness can be compared in place.
+        const legacyNight = legacyNightLightingEnabled();
         // the whole grade warms as the sun crosses the horizon, so the fog,
         // sky dome, and water all take the sunrise/sunset orange rather than
         // just the key light
         this.dnGrade = warmDuskGrade(
-          dayNightGrade(effectiveDayness(gday, biome), biome),
+          dayNightGrade(effectiveDayness(gday, biome), biome, moonLit, legacyNight),
           duskWarmAmount(sd[1]),
         );
         // The night-visibility layers read the world clock, not the realm's
