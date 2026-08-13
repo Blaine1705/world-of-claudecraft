@@ -110,6 +110,21 @@ const PARTY_FRAME_HELPFUL_IDS: ReadonlySet<string> = new Set([
   'priest_doctrine',
 ]);
 
+// Kinds a party/raid frame never shows, ahead of the debuff arm that would
+// otherwise pull them in and sort them tier 0 in partyAuraPriority
+// (combat/chronomancy.ts). A raid frame caps the auras it draws, so anything
+// listed here would push a real dispellable debuff off a healer's frame:
+//  - 'sated': the Bloodlust exhaustion lockout, which no healer acts on.
+//  - 'cheater_mark': the operator-applied sanction. It is deliberately
+//    power-neutral (src/sim/moderation/CLAUDE.md), and costing the marked
+//    player's healer a raid-frame slot is exactly the kind of information
+//    handicap that rule forbids. Its render surfaces are the nameplate and the
+//    target frame, which is where the tag is meant to be read.
+const PARTY_FRAME_EXCLUDED_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
+  'sated',
+  'cheater_mark',
+]);
+
 /** Effects worth surfacing on a compact party/raid frame. Generic maintenance
  * buffs, forms, stances, and personal damage procs remain on the normal aura UI. */
 export function isPartyFrameRelevantAura(aura: {
@@ -118,7 +133,7 @@ export function isPartyFrameRelevantAura(aura: {
   value?: number;
   neg?: 1;
 }): boolean {
-  if (aura.kind === 'sated') return false;
+  if (PARTY_FRAME_EXCLUDED_KINDS.has(aura.kind)) return false;
   const value = aura.neg ? -1 : (aura.value ?? 1);
   return (
     isDebuffAura(aura.kind, value) ||
