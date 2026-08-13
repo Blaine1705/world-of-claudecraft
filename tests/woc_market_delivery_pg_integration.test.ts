@@ -1357,6 +1357,7 @@ describeDb('woc market delivery finalization against real Postgres', () => {
           offerNext: false,
         },
         endsAtMs: BASE_MS + 12 * 60 * MINUTE_MS,
+        directedOfferId: null,
       };
     }
 

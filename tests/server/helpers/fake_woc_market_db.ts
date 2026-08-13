@@ -188,7 +188,8 @@ export class FakeWocMarketDb implements WocMarketDb {
     save: CharacterSaveArgs,
     listing: NewWocListing,
   ): Promise<
-    { ok: true; id: number } | { ok: false; reason: 'lease_lost' | 'cap_reached' | 'contended' }
+    | { ok: true; id: number }
+    | { ok: false; reason: 'lease_lost' | 'cap_reached' | 'contended' | 'not_pending' }
   > {
     // The Pg transaction runs the character save first, then the cap check;
     // the fake records the save it received either way (a refused escrow rolls
@@ -209,15 +210,29 @@ export class FakeWocMarketDb implements WocMarketDb {
       if (
         row.realm === listing.realm &&
         row.sellerAccount === listing.sellerAccount &&
-        row.status !== 'closed' &&
-        row.directedBuyerAccount === null
+        row.status !== 'closed'
       ) {
         active += 1;
       }
     }
-    // Public-listing-only in both directions, mirroring the real transaction.
-    if (listing.params.directedBuyerAccount === null && active >= WOC_MARKET_MAX_ACTIVE_LISTINGS) {
+    // EVERY non-closed listing counts, directed included, mirroring the real
+    // transaction's widened cap predicate (H12).
+    if (active >= WOC_MARKET_MAX_ACTIVE_LISTINGS) {
       return { ok: false, reason: 'cap_reached' };
+    }
+    // The atomic offer stamp's CAS, checked BEFORE the insert lands in the
+    // fake (one memory step models one atomic transaction: a miss leaves no
+    // listing behind, exactly like the real TxAbort rollback).
+    if (listing.directedOfferId !== null) {
+      const offer = this.offers.get(listing.directedOfferId);
+      if (
+        !offer ||
+        offer.realm !== listing.realm ||
+        offer.status !== 'accepted' ||
+        offer.listingId !== null
+      ) {
+        return { ok: false, reason: 'not_pending' };
+      }
     }
     const id = this.nextListingId++;
     const row: WocListingRow = {
@@ -250,7 +265,27 @@ export class FakeWocMarketDb implements WocMarketDb {
     };
     this.listings.set(id, row);
     this.touchListing(id);
+    if (listing.directedOfferId !== null) {
+      const offer = this.offers.get(listing.directedOfferId);
+      if (offer) {
+        offer.listingId = id;
+        this.offerUpdatedMs.set(offer.id, this.now());
+      }
+    }
     return { ok: true, id };
+  }
+
+  /** Test seam: write a listing row DIRECTLY, bypassing the escrow
+   *  transaction's cap count and offer stamp; the fake's twin of the pg
+   *  suites' raw-SQL seeding. For staging state an OLDER binary left behind
+   *  (delivered-but-unclosed residue, rows that predate the widened cap),
+   *  which the current binary's own paths can no longer produce; never a
+   *  shortcut around a rule a test means to exercise. */
+  seedListingRow(row: Omit<WocListingRow, 'id'>): number {
+    const id = this.nextListingId++;
+    this.listings.set(id, { ...structuredClone(row), id } as WocListingRow);
+    this.touchListing(id);
+    return id;
   }
 
   async listingById(realm: string, id: number): Promise<WocListingRow | null> {
@@ -377,6 +412,9 @@ export class FakeWocMarketDb implements WocMarketDb {
   // accepted offer with no listing.
   readonly offers = new Map<number, WocDirectedOfferRow>();
   private nextOfferId = 1;
+  /** The updated_at mirror, the converge arm's age axis: stamped on every
+   *  offer write like the real column. */
+  readonly offerUpdatedMs = new Map<number, number>();
 
   async insertDirectedOffer(offer: {
     realm: string;
@@ -385,16 +423,15 @@ export class FakeWocMarketDb implements WocMarketDb {
     sellerName: string;
     buyerAccount: number;
     buyerName: string;
-    itemRef: ExtractRef;
-    itemId: string;
     usdCents: number;
     expiresAtMs: number;
+    itemId: string;
+    itemPin: string;
   }): Promise<WocDirectedOfferRow> {
     const row: WocDirectedOfferRow = {
       id: this.nextOfferId++,
       ...offer,
       itemRef: null,
-      itemId: null,
       status: 'pending',
       listingId: null,
       createdAtMs: 0,
@@ -405,6 +442,7 @@ export class FakeWocMarketDb implements WocMarketDb {
       settlementState: null,
     };
     this.offers.set(row.id, row);
+    this.offerUpdatedMs.set(row.id, this.now());
     return row;
   }
 
@@ -426,24 +464,16 @@ export class FakeWocMarketDb implements WocMarketDb {
     realm: string,
     id: number,
     to: Exclude<WocDirectedOfferStatus, 'pending'>,
-    opts: { listingId?: number } = {},
   ): Promise<WocDirectedOfferRow | null> {
     const row = this.offers.get(id);
     if (!row || row.realm !== realm) return null;
     // The compare-and-set. Without this the fake would let a second accept
     // through and the double-escrow test would pass against a fake that cannot
-    // reproduce the race it is meant to prove is closed.
-    if (row.status !== 'pending') {
-      // An accepted offer being stamped with its listing id is the one legal
-      // non-pending write (the service's second call after createListing).
-      if (to === 'accepted' && row.status === 'accepted' && opts.listingId !== undefined) {
-        row.listingId = opts.listingId;
-        return row;
-      }
-      return null;
-    }
+    // reproduce the race it is meant to prove is closed. The listing id is
+    // NOT stamped here: escrowInsertListing owns the atomic stamp.
+    if (row.status !== 'pending') return null;
     row.status = to;
-    if (opts.listingId !== undefined) row.listingId = opts.listingId;
+    this.offerUpdatedMs.set(id, this.now());
     return row;
   }
 
@@ -478,6 +508,7 @@ export class FakeWocMarketDb implements WocMarketDb {
     const row = this.offers.get(id);
     if (row && row.realm === realm && row.status === 'accepted' && row.listingId === null) {
       row.status = 'pending';
+      this.offerUpdatedMs.set(id, this.now());
     }
   }
 
@@ -487,23 +518,54 @@ export class FakeWocMarketDb implements WocMarketDb {
       if (n >= limit) break;
       if (row.realm === realm && row.status === 'pending' && row.expiresAtMs <= nowMs) {
         row.status = 'expired';
+        this.offerUpdatedMs.set(row.id, this.now());
         n += 1;
       }
     }
     return n;
   }
 
+  async acceptedUnstampedOffers(
+    realm: string,
+    olderThanMs: number,
+    limit: number,
+  ): Promise<WocDirectedOfferRow[]> {
+    return [...this.offers.values()]
+      .filter(
+        (o) =>
+          o.realm === realm &&
+          o.status === 'accepted' &&
+          o.listingId === null &&
+          (this.offerUpdatedMs.get(o.id) ?? 0) <= olderThanMs,
+      )
+      .sort((a, b) => (this.offerUpdatedMs.get(a.id) ?? 0) - (this.offerUpdatedMs.get(b.id) ?? 0))
+      .slice(0, limit)
+      .map((o) => ({ ...o }));
+  }
+
+  async expireDirectedOfferIfUnstamped(realm: string, id: number): Promise<boolean> {
+    const row = this.offers.get(id);
+    if (row && row.realm === realm && row.status === 'accepted' && row.listingId === null) {
+      row.status = 'expired';
+      this.offerUpdatedMs.set(id, this.now());
+      return true;
+    }
+    return false;
+  }
+
+  async everSettledForListing(listingId: number): Promise<boolean> {
+    for (const s of this.settlements.values()) {
+      if (s.listingId === listingId) return true;
+    }
+    return false;
+  }
+
   async countActiveBySeller(realm: string, account: number): Promise<number> {
     let n = 0;
     for (const row of this.listings.values()) {
-      // Directed offers are exempt from the cap (see countActiveBySeller in
-      // server/woc_market_db.ts); the fake must exempt them too.
-      if (
-        row.realm === realm &&
-        row.sellerAccount === account &&
-        row.status !== 'closed' &&
-        row.directedBuyerAccount === null
-      ) {
+      // EVERY non-closed row counts, directed included, mirroring the widened
+      // predicate in server/woc_market_db.ts (H12).
+      if (row.realm === realm && row.sellerAccount === account && row.status !== 'closed') {
         n += 1;
       }
     }

@@ -72,11 +72,16 @@ describe('the public browse query excludes directed sales in SQL', () => {
   });
 });
 
-describe('the seller listing cap counts public listings only, in SQL', () => {
-  it('excludes directed rows from the count', async () => {
+describe('the seller listing cap counts EVERY non-closed listing, in SQL', () => {
+  it('carries no directed exemption in the count predicate', async () => {
+    // The exemption was the unbounded-escrow hole (H12): a directed listing
+    // escrows a real copy exactly like a public one, so it counts. The
+    // authoritative in-transaction copy of this predicate is pinned by the
+    // escrow-transaction block below; the two must stay byte-identical.
     const { pool, sql } = recordingPool();
     await new PgWocMarketDb(pool).countActiveBySeller(REALM, 7);
-    expect(sql()[0]).toContain('directed_buyer_account IS NULL');
+    expect(sql()[0]).toContain("status <> 'closed'");
+    expect(sql()[0]).not.toContain('directed_buyer_account');
   });
 });
 
@@ -91,33 +96,142 @@ describe('the schema carries the directed column additively', () => {
   });
 });
 
-describe('the listing-id stamp is reachable on an already-accepted offer', () => {
-  // The bug this pins cost a full test cycle to find, and every existing test
-  // passed through it, because FakeWocMarketDb modelled the arm that the real
-  // SQL was missing. The service claims the offer ('pending' -> 'accepted'),
-  // creates the listing, then calls back to stamp the id. By then the row is
-  // 'accepted', so a WHERE narrowed to 'pending' matched zero rows: the offer
-  // never learned its listing, both windows sat at "review" forever, and the
-  // buyer was never offered the chance to pay.
+describe('the listing-id stamp rides the escrow transaction, atomically', () => {
+  const SAVE = {
+    characterId: 21,
+    level: 10,
+    state: { questLog: [], questsDone: [], inventory: [] } as unknown as CharacterState,
+    leaseNonce: 'nonce',
+  };
+  const LISTING = {
+    realm: REALM,
+    sellerAccount: 4,
+    sellerCharacter: 21,
+    sellerName: 'Selara',
+    sellerWallet: 'wallet-seller',
+    item: { itemId: 'crown_of_embers', count: 1 },
+    itemId: 'crown_of_embers',
+    quality: 'epic' as const,
+    params: {
+      format: 'buy_now' as const,
+      directedBuyerAccount: 9,
+      startCents: 5000,
+      reserveCents: null,
+      buyNowCents: 5000,
+      durationHours: 12,
+      offerNext: false,
+    },
+    endsAtMs: 1_820_000_000_000,
+    directedOfferId: null,
+  };
+  // The stamp's home moved TWICE, and each home fixed the previous one's bug.
+  // First the stamp was a WHERE narrowed to 'pending' that matched zero rows
+  // (the offer never learned its listing). Then it was a second service call
+  // after createListing, which a thrown escrow skipped: the listing could
+  // exist with the offer stuck 'accepted' and unstamped, an unknowable state.
+  // Now escrowInsertListing writes listing_id INSIDE the escrow transaction,
+  // so "listing exists IFF the offer is stamped" holds through any throw, and
+  // the accepted-offer converge arm proves rollback by exactly that.
   //
   // Asserted on the STATEMENT, because that is the half the fake cannot vouch
   // for and the half that actually ships.
-  it('accepts a stamp when the row is accepted with no listing yet', async () => {
-    const { pool, sql } = recordingPool();
-    await new PgWocMarketDb(pool).resolveDirectedOffer(REALM, 3, 'accepted', { listingId: 41 });
-    const [text] = sql();
-    expect(text).toContain("status = 'pending'");
-    expect(text, 'the stamp arm must exist at all').toContain("status = 'accepted'");
-    expect(text, 'and only while no listing is set').toContain('listing_id IS NULL');
+  it('stamps under the accepted-and-unstamped CAS inside the transaction', async () => {
+    const { pool, sql } = recordingTxPool((text) =>
+      text.includes('RETURNING id')
+        ? { rows: [{ id: 41 }], rowCount: 1 }
+        : text.includes('woc_market_directed_offers')
+          ? { rows: [], rowCount: 1 }
+          : undefined,
+    );
+    const out = await new PgWocMarketDb(pool).escrowInsertListing(SAVE, {
+      ...LISTING,
+      directedOfferId: 9,
+    });
+    expect(out).toEqual({ ok: true, id: 41 });
+    const stamp = sql().find((t) => t.includes('woc_market_directed_offers'));
+    expect(stamp, 'the stamp statement must exist inside the transaction').toBeDefined();
+    expect(stamp).toContain('SET listing_id = $1');
+    expect(stamp, 'CAS: only a still-accepted row').toContain("status = 'accepted'");
+    expect(stamp, 'CAS: only an unstamped row').toContain('listing_id IS NULL');
+    const seq = sql();
+    expect(seq.indexOf(stamp as string), 'stamp before COMMIT').toBeLessThan(seq.indexOf('COMMIT'));
   });
 
-  it('still compare-and-sets on pending, so two accepts cannot both escrow', () => {
-    // The stamp arm must not weaken the claim: it changes no status and refuses
-    // once a listing is present, so it can never resurrect a resolved offer.
+  it('aborts the WHOLE transaction typed when the stamp CAS misses', async () => {
+    // Zero rows means the converge arm reopened or expired the offer while
+    // the escrow was in flight: the insert and the character save must roll
+    // back together (the copy restores through the typed-refusal arm), never
+    // land a listing no offer points at.
+    const { pool, sql } = recordingTxPool((text) =>
+      text.includes('RETURNING id')
+        ? { rows: [{ id: 41 }], rowCount: 1 }
+        : text.includes('woc_market_directed_offers')
+          ? { rows: [], rowCount: 0 }
+          : undefined,
+    );
+    const out = await new PgWocMarketDb(pool).escrowInsertListing(SAVE, {
+      ...LISTING,
+      directedOfferId: 9,
+    });
+    expect(out).toEqual({ ok: false, reason: 'not_pending' });
+    expect(sql().at(-1)).toBe('ROLLBACK');
+  });
+
+  it('a PUBLIC listing issues no offer statement at all', async () => {
+    const { pool, sql } = recordingTxPool((text) =>
+      text.includes('RETURNING id') ? { rows: [{ id: 7 }], rowCount: 1 } : undefined,
+    );
+    await new PgWocMarketDb(pool).escrowInsertListing(SAVE, {
+      ...LISTING,
+      params: { ...LISTING.params, directedBuyerAccount: null },
+    });
+    expect(sql().some((t) => t.includes('woc_market_directed_offers'))).toBe(false);
+  });
+
+  it('issues exactly FIVE workload statements on the directed arm, FOUR on the public arm', async () => {
+    // The tunables relation prices ESCROW_STATEMENT_TIMEOUT_MS * 5 against
+    // the autosave period, so the statement count is a pinned input to that
+    // arithmetic, not an implementation detail: a sixth statement silently
+    // stretches the honest occupancy ceiling past what the relation claims.
+    const workload = (seq: string[]): string[] =>
+      seq.filter(
+        (t) => t !== 'BEGIN' && t !== 'COMMIT' && t !== 'ROLLBACK' && !t.startsWith('SET LOCAL'),
+      );
+    const directed = recordingTxPool((text) =>
+      text.includes('RETURNING id')
+        ? { rows: [{ id: 41 }], rowCount: 1 }
+        : text.includes('woc_market_directed_offers')
+          ? { rows: [], rowCount: 1 }
+          : undefined,
+    );
+    await new PgWocMarketDb(directed.pool).escrowInsertListing(SAVE, {
+      ...LISTING,
+      directedOfferId: 9,
+    });
+    expect(workload(directed.sql())).toHaveLength(5);
+    const publicArm = recordingTxPool((text) =>
+      text.includes('RETURNING id') ? { rows: [{ id: 7 }], rowCount: 1 } : undefined,
+    );
+    await new PgWocMarketDb(publicArm.pool).escrowInsertListing(SAVE, {
+      ...LISTING,
+      params: { ...LISTING.params, directedBuyerAccount: null },
+    });
+    expect(workload(publicArm.sql())).toHaveLength(4);
+  });
+
+  it('resolveDirectedOffer compare-and-sets on pending and never writes listing_id', () => {
+    // The claim must stay narrow: two concurrent accepts both read 'pending',
+    // only one UPDATE matches, so only one reaches escrow. The old stamp arm
+    // (an accepted-row listing_id write) is deliberately GONE from this
+    // statement: reintroducing it would put a second stamp writer beside the
+    // atomic one.
     const { pool, sql } = recordingPool();
     return new PgWocMarketDb(pool).resolveDirectedOffer(REALM, 3, 'declined').then(() => {
       const [text] = sql();
       expect(text).toContain("status = 'pending'");
+      // No listing_id WRITE (RETURNING still projects the column).
+      expect(text).not.toContain('listing_id =');
+      expect(text).not.toContain('listing_id IS NULL');
     });
   });
 });
@@ -984,6 +1098,7 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
       id: 7,
       realm: REALM,
       seller_account: 99,
+      seller_wallet: 'wallet-steal-seller',
       status: 'active',
       buy_now_cents: 1000,
       cancel_requested_at: null,
@@ -993,17 +1108,19 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
       item: {},
     };
     const viaSteal = recordingTxPool((text) =>
-      text.includes('FROM woc_market_listings')
-        ? { rows: [deadLock], rowCount: 1 }
-        : text.includes('FROM woc_market_settlements')
-          ? { rows: [], rowCount: 0 }
-          : text.includes('SELECT 1 FROM woc_market_buy_now_abandons')
+      text.includes('FROM wallet_links')
+        ? { rows: [], rowCount: 0 }
+        : text.includes('FROM woc_market_listings')
+          ? { rows: [deadLock], rowCount: 1 }
+          : text.includes('FROM woc_market_settlements')
             ? { rows: [], rowCount: 0 }
-            : text.includes('count(*)::int AS n FROM')
-              ? { rows: [{ n: 0 }], rowCount: 1 }
-              : text.includes('UPDATE woc_market_listings')
-                ? { rows: [deadLock], rowCount: 1 }
-                : undefined,
+            : text.includes('SELECT 1 FROM woc_market_buy_now_abandons')
+              ? { rows: [], rowCount: 0 }
+              : text.includes('count(*)::int AS n FROM')
+                ? { rows: [{ n: 0 }], rowCount: 1 }
+                : text.includes('UPDATE woc_market_listings')
+                  ? { rows: [deadLock], rowCount: 1 }
+                  : undefined,
     );
     await new PgWocMarketDb(viaSteal.pool).claimBuyNowLock(REALM, 7, 3, 1_000, 2_000);
     // Find the INSERT specifically: the advisory pass now runs the two
@@ -1166,6 +1283,7 @@ describe('the escrow listing transaction, in SQL', () => {
       offerNext: false,
     },
     endsAtMs: 1_820_000_000_000,
+    directedOfferId: null,
   };
 
   it('bounds itself, locks accounts THEN writes the fenced character, then inserts', async () => {
@@ -1181,7 +1299,7 @@ describe('the escrow listing transaction, in SQL', () => {
     // statement allowance (the transaction heads a character's save FIFO, so
     // it must never hold it for the 60s heavy allowance), the lock-wait
     // ceiling, and the idle-in-transaction kill its guard siblings carry.
-    expect(seq.some((t) => t.includes('SET LOCAL statement_timeout = 5000'))).toBe(true);
+    expect(seq.some((t) => t.includes('SET LOCAL statement_timeout = 4000'))).toBe(true);
     expect(seq.some((t) => t.includes('SET LOCAL lock_timeout = 2000'))).toBe(true);
     expect(
       seq.some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout = 2000')),

@@ -321,6 +321,33 @@ describe('a disabled send button always says WHY', () => {
     expect(m.block, 'an empty other side must not hide the price field').toBeNull();
   });
 
+  it('demands EXACTLY one eligible item on the table, and pins that copy (H10)', () => {
+    // The offer fingerprints one copy at creation and the server refuses
+    // acceptance of any other, so a table with several eligible items is
+    // ambiguous about which one the price buys. Silently pinning the first
+    // would be the bait-and-switch surface inverted.
+    const two = buildWocTradeModel(input({ theirStaged: [slot(EPIC.id), slot(EPIC.id)] }));
+    expect(two.canSend).toBe(false);
+    expect(two.sendHint).toBe('hudChrome.trade.woc.hintOneItem');
+    expect(two.agreedItem).toBeNull();
+    // With one eligible item the model pins EXACTLY it, instance payload and
+    // all, because that identity is what the wire will carry.
+    const pinned: InvSlot = {
+      itemId: EPIC.id,
+      count: 1,
+      instance: { signer: 'Aldan' },
+      craftedRecipeId: 'recipe_epic',
+    };
+    const one = buildWocTradeModel(input({ theirStaged: [pinned] }));
+    expect(one.canSend).toBe(true);
+    expect(one.agreedItem).toBe(pinned);
+    // Ineligible extras do not make the table ambiguous: the quest item can
+    // never be part of the deal, so the one eligible copy still pins.
+    const mixed = buildWocTradeModel(input({ theirStaged: [pinned, slot(QUEST.id)] }));
+    expect(mixed.canSend).toBe(true);
+    expect(mixed.agreedItem).toBe(pinned);
+  });
+
   it('disables the $WOC tab entirely while you hold items', () => {
     // Holding items means you are the SELLER here, so the tab is not yours to
     // use: the requester's rule that the button is disabled once you offer one.

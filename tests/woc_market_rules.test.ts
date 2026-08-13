@@ -22,10 +22,12 @@ import {
   WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR,
   WOC_MARKET_BUY_NOW_LOCK_SECONDS,
   WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS,
+  WOC_MARKET_DIRECTED_HOLD_SECONDS,
   WOC_MARKET_DURATION_HOURS,
   WOC_MARKET_MAX_ACTIVE_LISTINGS,
   WOC_MARKET_MAX_PRICE_CENTS,
   WOC_MARKET_MIN_PRICE_CENTS,
+  WOC_MARKET_OFFER_CONVERGE_SECONDS,
   WOC_MARKET_QUOTE_TTL_SECONDS,
   WOC_MARKET_RESTRICTED_POLICY,
   WOC_MARKET_SETTLEMENT_WINDOW_SECONDS,
@@ -62,6 +64,18 @@ describe('tunables: literal pins', () => {
     expect(WOC_MARKET_MIN_PRICE_CENTS).toBe(25);
     expect(WOC_MARKET_MAX_PRICE_CENTS).toBe(100_000);
     expect(WOC_MARKET_STRANDED_RECLAIM_SECONDS).toBe(300);
+  });
+
+  it('the directed hold IS the settlement window, by identity, and the converge age clears every transaction bound', () => {
+    // Identity, not a copied literal (the H12 ruling): a directed sale is
+    // bought immediately or not at all, so the hold makes the same promise the
+    // settlement window makes, and retuning one must retune the other.
+    expect(WOC_MARKET_DIRECTED_HOLD_SECONDS).toBe(WOC_MARKET_SETTLEMENT_WINDOW_SECONDS);
+    // The converge arm may only touch an accepted-unstamped offer after every
+    // bound an in-flight acceptance can ride has passed: the 65s COMMIT driver
+    // backstop plus the escrow FIFO wait. 300s is comfortably past both and
+    // pinned exactly so a retune is a conscious re-derivation.
+    expect(WOC_MARKET_OFFER_CONVERGE_SECONDS).toBe(300);
   });
 
   it('pins the bond poll park delay and the anti-snipe trio to their literals', () => {

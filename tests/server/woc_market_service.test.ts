@@ -45,6 +45,7 @@ import {
   WOC_MARKET_BOND_POLL_PARK_SECONDS,
   WOC_MARKET_BUY_NOW_LOCK_SECONDS,
   WOC_MARKET_MAX_ACTIVE_LISTINGS,
+  WOC_MARKET_OFFER_CONVERGE_SECONDS,
   WOC_MARKET_QUOTE_TTL_SECONDS,
   WOC_MARKET_RESTRICTED_POLICY,
   WOC_MARKET_SETTLEMENT_WINDOW_SECONDS,
@@ -3431,7 +3432,10 @@ describe('a directed sale is visible and buyable only to its two parties', () =>
     expect((res as { reason: string }).reason).toBe('not_found');
   });
 
-  it('does not count against the seller 12-listing cap', async () => {
+  it('counts against the seller 12-listing cap in BOTH directions (H12)', async () => {
+    // The old exemption let an accomplice pair lock unbounded escrow outside
+    // the cap; a directed listing escrows a real copy exactly like a public
+    // one, so it counts and is counted.
     const h = stocked();
     for (let i = 0; i < WOC_MARKET_MAX_ACTIVE_LISTINGS; i += 1) await listEpic(h);
     const blocked = await h.service.createListing({
@@ -3450,7 +3454,48 @@ describe('a directed sale is visible and buyable only to its two parties', () =>
       itemRef: { index: 0, itemId: EPIC_ITEM },
       params: directedParams(),
     });
-    expect(directed.ok, 'a directed offer must be exempt from the cap').toBe(true);
+    expect(directed, 'a directed listing is inside the cap too').toEqual({
+      ok: false,
+      reason: 'cap_reached',
+    });
+    // And the inverse direction: directed rows OCCUPY cap slots. A seller at
+    // cap purely on directed sales cannot open a public listing over them.
+    const h2 = stocked();
+    for (let i = 0; i < WOC_MARKET_MAX_ACTIVE_LISTINGS; i += 1) {
+      h2.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
+      const row = await h2.service.createListing({
+        account: SELLER,
+        characterId: SELLER_CHAR,
+        itemRef: { index: 0, itemId: EPIC_ITEM },
+        params: directedParams(),
+      });
+      expect(row.ok, `directed listing ${i} under the cap`).toBe(true);
+    }
+    h2.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
+    const publicBlocked = await h2.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams(),
+    });
+    expect(publicBlocked, 'directed rows occupy cap slots').toEqual({
+      ok: false,
+      reason: 'cap_reached',
+    });
+  });
+
+  it('buyNow refuses the wallet twin from values already in hand (H14 fast path)', async () => {
+    const h = stocked();
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+    h.custody.owners.set(CHAR_TWIN, WALLET_TWIN);
+    h.custody.bags.set(CHAR_TWIN, []);
+    const res = await h.service.buyNow({
+      account: WALLET_TWIN,
+      characterId: CHAR_TWIN,
+      listingId: listing.id,
+      acceptTerms: true,
+    });
+    expect(res).toEqual({ ok: false, reason: 'own_listing' });
   });
 
   it('leaves a PUBLIC buy-now buyable by any account', async () => {
@@ -3488,6 +3533,9 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     characterId: CHAR_A,
     sellerCharacterName: 'Selara',
     usdCents: 5000,
+    // The agreed copy (H10): the plain stocked EPIC_ITEM the seller's accept
+    // will extract, so the pin matches unless a test deliberately diverges.
+    item: { itemId: EPIC_ITEM },
     ...over,
   });
   /** The seller's half: names the copy. */
@@ -3553,6 +3601,177 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     // One agreed price, carried onto both price fields.
     expect(accepted.listing?.buyNowCents).toBe(5000);
     expect(accepted.listing?.startCents).toBe(5000);
+  });
+
+  it('refuses an offer whose buyer wallet cannot plausibly pay (guardBalance)', async () => {
+    // The auction paths refuse an implausible bid at placement; a directed
+    // offer is a bid in everything but name. A wallet the balance read cannot
+    // resolve refuses closed.
+    const h = stocked();
+    h.wallets.set(BUYER_A, 'wallet-with-no-balance');
+    expect(await h.service.createDirectedOffer(offerArgs())).toEqual({
+      ok: false,
+      reason: 'insufficient_balance',
+    });
+  });
+
+  it('refuses an offer at CREATION for an item its acceptance would refuse (bind_armed)', async () => {
+    // The create-time invariant widened to the item (H10 pins it, so it is
+    // checkable now): an armed commission piece refuses at offer time exactly
+    // as its acceptance would, instead of wasting both players' agreement.
+    const h = stocked();
+    const res = await h.service.createDirectedOffer(
+      offerArgs({
+        item: { itemId: EPIC_ITEM, instance: { signer: 'Aldan', bindOnTrade: true } },
+      }),
+    );
+    expect(res).toEqual({ ok: false, reason: 'bind_armed' });
+  });
+
+  it('refuses wallet twins on the directed rail, at creation AND at completion (H14)', async () => {
+    // WALLET_TWIN shares the seller payout wallet: same beneficial owner even
+    // across accounts, so the deal is a self-deal in everything but account id.
+    const h = stocked();
+    const atCreate = await h.service.createDirectedOffer(
+      offerArgs({ account: WALLET_TWIN, characterId: CHAR_TWIN }),
+    );
+    expect(atCreate).toEqual({ ok: false, reason: 'self_offer' });
+    // The completion re-check: wallets re-read LIVE at the second acceptance,
+    // so a relink between creation and completion still refuses.
+    const made = await h.service.createDirectedOffer(offerArgs());
+    if (!made.ok) throw new Error('offer refused');
+    const first = await h.service.acceptDirectedOffer(BUYER_A, made.offer.id, null, CHAR_A);
+    expect(first.ok).toBe(true);
+    h.wallets.set(BUYER_A, 'wallet-seller');
+    const second = await h.service.acceptDirectedOffer(
+      SELLER,
+      made.offer.id,
+      { index: 0, itemId: EPIC_ITEM },
+      SELLER_CHAR,
+    );
+    expect(second).toEqual({ ok: false, reason: 'self_offer' });
+    expect(bagsOf(h, SELLER_CHAR), 'nothing escrowed on the refusal').toContainEqual({
+      itemId: EPIC_ITEM,
+      count: 1,
+    });
+  });
+
+  it('refuses item_mismatch when the accepted copy is not the pinned one, and restores it', async () => {
+    // The bait-and-switch guard (H10) against the AUTHORITATIVE extracted
+    // copy: the buyer pinned the plain copy, the seller swapped a re-rolled
+    // instance of the same id into the same bag slot.
+    const h = stocked();
+    const offer = await h.service.createDirectedOffer(offerArgs());
+    if (!offer.ok) throw new Error('offer refused');
+    const first = await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id, null, CHAR_A);
+    expect(first.ok).toBe(true);
+    const swapped: InvSlot = {
+      itemId: EPIC_ITEM,
+      count: 1,
+      instance: { rolled: { stats: { str: 3 } } } as InvSlot['instance'],
+    };
+    h.custody.bags.set(SELLER_CHAR, [swapped]);
+    const second = await h.service.acceptDirectedOffer(
+      SELLER,
+      offer.offer.id,
+      { index: 0, itemId: EPIC_ITEM, expectInstance: swapped.instance },
+      SELLER_CHAR,
+    );
+    expect(second).toEqual({ ok: false, reason: 'item_mismatch' });
+    expect(bagsOf(h, SELLER_CHAR), 'the copy restored to the bags').toHaveLength(1);
+    // The offer reopened (the typed-refusal arm), so the pair can retry with
+    // the right copy or walk away cleanly.
+    expect((await h.db.directedOfferById(REALM, offer.offer.id))?.status).toBe('pending');
+  });
+
+  it('a proven-rollback escrow throw REOPENS the offer; an ambiguous one parks it accepted', async () => {
+    // Judgment (a)'s in-request half: with rollback proof the listing provably
+    // does not exist, so reopening cannot pair a live listing with a reopened
+    // offer; without proof nothing is written and the converge arm below owns
+    // the unwind from durable truth.
+    const h = stocked();
+    const proven = await h.service.createDirectedOffer(offerArgs());
+    if (!proven.ok) throw new Error('offer refused');
+    await h.service.acceptDirectedOffer(BUYER_A, proven.offer.id, null, CHAR_A);
+    h.db.failNextEscrowThrow = Object.assign(new Error('unique violation'), { code: '23505' });
+    await expect(
+      h.service.acceptDirectedOffer(
+        SELLER,
+        proven.offer.id,
+        { index: 0, itemId: EPIC_ITEM },
+        SELLER_CHAR,
+      ),
+    ).rejects.toThrow('unique violation');
+    expect((await h.db.directedOfferById(REALM, proven.offer.id))?.status).toBe('pending');
+
+    const ambiguous = await h.service.createDirectedOffer(offerArgs());
+    if (!ambiguous.ok) throw new Error('offer refused');
+    await h.service.acceptDirectedOffer(BUYER_A, ambiguous.offer.id, null, CHAR_A);
+    h.db.failNextEscrowThrow = new Error('socket died mid-commit');
+    await expect(
+      h.service.acceptDirectedOffer(
+        SELLER,
+        ambiguous.offer.id,
+        { index: 0, itemId: EPIC_ITEM },
+        SELLER_CHAR,
+      ),
+    ).rejects.toThrow('socket died mid-commit');
+    expect((await h.db.directedOfferById(REALM, ambiguous.offer.id))?.status).toBe('accepted');
+    expect(h.custody.sessionLost.at(-1)?.kind).toBe('ambiguous');
+  });
+
+  it('the converge arm reopens an aged unstamped acceptance, expires one past its TTL, and skips a stamped one', async () => {
+    const h = stocked();
+    // A stamped (completed) deal, as the control: the converge read must
+    // never touch it however old it gets.
+    const done = await h.service.createDirectedOffer(offerArgs());
+    if (!done.ok) throw new Error('offer refused');
+    await h.service.acceptDirectedOffer(BUYER_A, done.offer.id, null, CHAR_A);
+    const completed = await h.service.acceptDirectedOffer(
+      SELLER,
+      done.offer.id,
+      { index: 0, itemId: EPIC_ITEM },
+      SELLER_CHAR,
+    );
+    expect(completed.ok).toBe(true);
+    // An ambiguous-thrown acceptance: stuck 'accepted' with no listing.
+    h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
+    const stuck = await h.service.createDirectedOffer(offerArgs());
+    if (!stuck.ok) throw new Error('offer refused');
+    await h.service.acceptDirectedOffer(BUYER_A, stuck.offer.id, null, CHAR_A);
+    h.db.failNextEscrowThrow = new Error('socket died mid-commit');
+    await expect(
+      h.service.acceptDirectedOffer(
+        SELLER,
+        stuck.offer.id,
+        { index: 0, itemId: EPIC_ITEM },
+        SELLER_CHAR,
+      ),
+    ).rejects.toThrow();
+    // Too young: the converge age keeps a possibly-in-flight acceptance out
+    // of the batch entirely.
+    let stats = await h.service.sweepPass();
+    expect(stats?.convergedOffers).toBe(0);
+    // Aged past the converge bound but inside the TTL: the deal reopens.
+    h.setNow(BASE_MS + (WOC_MARKET_OFFER_CONVERGE_SECONDS + 1) * 1000);
+    stats = await h.service.sweepPass();
+    expect(stats?.convergedOffers).toBe(1);
+    expect((await h.db.directedOfferById(REALM, stuck.offer.id))?.status).toBe('pending');
+    expect((await h.db.directedOfferById(REALM, done.offer.id))?.status).toBe('accepted');
+    // Wedge the SAME deal again (both accept flags survived the reopen, so
+    // one buyer accept re-completes it), and this time let its TTL lapse:
+    // the converge arm expires a dead deal instead of reopening it.
+    const lapsed = await h.db.directedOfferById(REALM, stuck.offer.id);
+    if (!lapsed) throw new Error('offer vanished');
+    h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
+    h.db.failNextEscrowThrow = new Error('socket died again');
+    await expect(
+      h.service.acceptDirectedOffer(BUYER_A, stuck.offer.id, null, CHAR_A),
+    ).rejects.toThrow();
+    h.setNow(lapsed.expiresAtMs + (WOC_MARKET_OFFER_CONVERGE_SECONDS + 1) * 1000);
+    stats = await h.service.sweepPass();
+    expect(stats?.convergedOffers).toBe(1);
+    expect((await h.db.directedOfferById(REALM, stuck.offer.id))?.status).toBe('expired');
   });
 
   /** Put the buyer online with room to spare. Without this every hand-off
@@ -4565,6 +4784,7 @@ describe('a directed sale carries the consequences of the rail it rides', () => 
       characterId: CHAR_A,
       sellerCharacterName: 'Selara',
       usdCents: 5000,
+      item: { itemId: EPIC_ITEM },
     });
     if (!offer.ok) throw new Error('offer refused');
     const first = await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id, null, CHAR_A);
@@ -4701,6 +4921,7 @@ describe('the trade window asks whether a counterparty can be paid in $WOC', () 
       characterId: SELLER_CHAR,
       sellerCharacterName: 'Selara Alt',
       usdCents: 5000,
+      item: { itemId: EPIC_ITEM },
     });
     expect(res).toEqual({ ok: false, reason: 'self_offer' });
   });
@@ -4719,6 +4940,7 @@ describe('the sweep expires unanswered directed offers', () => {
       characterId: CHAR_A,
       sellerCharacterName: 'Selara',
       usdCents: 5000,
+      item: { itemId: EPIC_ITEM },
     });
     if (!made.ok) throw new Error('offer refused');
 
@@ -4740,6 +4962,7 @@ describe('the sweep expires unanswered directed offers', () => {
       characterId: CHAR_A,
       sellerCharacterName: 'Selara',
       usdCents: 5000,
+      item: { itemId: EPIC_ITEM },
     });
     if (!made.ok) throw new Error('offer refused');
     h.setNow(made.offer.expiresAtMs + 1);
@@ -5027,6 +5250,7 @@ async function directedSale(h: Harness, signature: string): Promise<{ listingId:
       characterId: CHAR_A,
       sellerCharacterName: 'Selara',
       usdCents: 5000,
+      item: { itemId: EPIC_ITEM },
     }),
     'createDirectedOffer',
   );
@@ -5068,32 +5292,41 @@ async function confirmedAwaitingDelivery(h: Harness, listingId: number): Promise
 }
 
 /** One delivered-but-unclosed residue row, the shape an older binary left when
- *  it died between its delivered CAS and its close tail. Written straight
- *  through the db primitives: the current binary cannot produce this state, and
- *  a DIRECTED listing is exempt from the per-seller active cap, which is the
- *  only way to stage more residue than a seller may hold public listings. */
+ *  it died between its delivered CAS and its close tail. Seeded through the
+ *  fake's DIRECT row seam (the pg suites' raw-SQL twin): the current binary
+ *  cannot produce this state, and since the cap widened to count directed
+ *  rows (H12), no live path can stage more residue than the cap either;
+ *  residue rows predate that rule by definition. */
 async function seedDeliveredResidue(h: Harness): Promise<{ listingId: number }> {
-  const inserted = await h.db.escrowInsertListing(
-    {
-      characterId: SELLER_CHAR,
-      level: 10,
-      state: {} as unknown as CharacterState,
-      leaseNonce: 'nonce',
-    },
-    {
-      realm: REALM,
-      sellerAccount: SELLER,
-      sellerCharacter: SELLER_CHAR,
-      sellerName: 'Selara',
-      sellerWallet: 'wallet-seller',
-      item: { itemId: EPIC_ITEM, count: 1 },
-      itemId: EPIC_ITEM,
-      quality: 'epic',
-      params: listingParams({ directedBuyerAccount: BUYER_A, buyNowCents: 5000 }),
-      endsAtMs: h.now() + 24 * HOUR_MS,
-    },
-  );
-  if (!inserted.ok) throw new Error(`residue listing refused: ${inserted.reason}`);
+  const params = listingParams({ directedBuyerAccount: BUYER_A, buyNowCents: 5000 });
+  const listingId = h.db.seedListingRow({
+    realm: REALM,
+    directedBuyerAccount: BUYER_A,
+    sellerAccount: SELLER,
+    sellerCharacter: SELLER_CHAR,
+    sellerName: 'Selara',
+    sellerWallet: 'wallet-seller',
+    item: { itemId: EPIC_ITEM, count: 1 },
+    itemId: EPIC_ITEM,
+    quality: 'epic',
+    format: params.format,
+    startCents: params.startCents,
+    reserveCents: params.reserveCents,
+    buyNowCents: params.buyNowCents,
+    offerNext: params.offerNext,
+    status: 'active',
+    resolution: null,
+    itemDisposed: false,
+    currentBidCents: null,
+    currentBidId: null,
+    endsAtMs: h.now() + 24 * HOUR_MS,
+    baseEndsAtMs: h.now() + 24 * HOUR_MS,
+    buyNowLockAccount: null,
+    buyNowLockExpiresMs: null,
+    createdAtMs: h.now(),
+    cancelRequestedAtMs: null,
+  });
+  const inserted = { ok: true as const, id: listingId };
   const settlement = await h.db.insertSettlement({
     listingId: inserted.id,
     bidId: null,

@@ -540,8 +540,13 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     // asserts for itself first.
     const autosaveMs = Number(autosaveMatch?.[1]) * 1000;
     expect(autosaveMs).toBeGreaterThan(0);
+    // FIVE workload statements since the directed-rail work: the accounts
+    // lock, the cap count (no longer skipped for directed rows), the fenced
+    // character save, the listing insert, and the offer-stamp CAS. The
+    // allowance dropped 5000 -> 4000 in the same change, because five 5s
+    // allowances would put this sum past one autosave period.
     expect(
-      ESCROW_STATEMENT_TIMEOUT_MS * 4 + ESCROW_LOCK_TIMEOUT_MS + DB_POOL_CONNECT_TIMEOUT_MS,
+      ESCROW_STATEMENT_TIMEOUT_MS * 5 + ESCROW_LOCK_TIMEOUT_MS + DB_POOL_CONNECT_TIMEOUT_MS,
     ).toBeLessThan(autosaveMs);
   });
 

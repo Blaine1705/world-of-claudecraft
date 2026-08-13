@@ -159,6 +159,9 @@ describe('retention sweep wiring in server/main.ts', () => {
       'pruneWocBuyNowAbandonsBatch(pool, config.wocMarketAbandonsRetentionDays, n)',
     );
     expect(MAIN).toContain(
+      'pruneResolvedWocOffersBatch(pool, config.wocMarketOffersRetentionDays, n)',
+    );
+    expect(MAIN).toContain(
       'pruneClosedWocListingsBatch(pool, config.wocMarketListingsRetentionDays, n)',
     );
   });
