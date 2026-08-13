@@ -14,7 +14,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 04 | bond-payment-lifecycle | game | DONE | 3f20375918 | release sync no-op; three review rounds (security/db/coverage x2, qa-checklist, migration-safety) all applied; 17 mutation spot-proofs bit; gate GREEN at 0afdaa71a5. A follow-up verification session (sections below) re-ran the whole phase, applied two further audited fix rounds (commits 60034033f1, a938c410f3 plus docs), re-bit 11 mutations (3 re-proofs + 8 on the new fixes), and re-gated GREEN TWICE (full-suite fallback, all 8 steps, at c7176d730b and 6642c6e15b); LOCAL, not pushed per R4; final docs commit on top |
 | 04 QA | phase-04-qa | game | DONE | e4ae9d1602 | PASS-WITH-FOLLOWUPS, every fix applied (section below); release/v0.37.0 synced (merge a43a1e8b52: the count-pin trap fired FOR REAL, both sides at 321 with different members, re-derived 322/85/237 + sends 199 dispatches 212 from runs; hud.ts over ceiling, fixed by the crafting_deny_core extraction, ceiling 19190 to 19177; game.ts ceiling banked to 10859); five audit lanes + fresh fix-round re-reviews; deep mutation pass incl. one REAL hole closed (the async-stall withTx shape); three correctness fixes proven red-on-old (lapse-straddle refresh, poll-race standing, review retry); a THIRD round from the fresh re-review (review-state client honesty, the devsig colon, the at-cap self-steal recording, bond_window_closed); gate GREEN at 8c1028e89d (full-suite fallback, all 8 steps; the first run caught the extraction's stale station pins in profession_identity_card, retargeted to the core); pushed per R4 (no open PR on this branch, so no PR CI) |
 | 05 | custody-entry-hardening | game | DONE | f07ca88278 | release sync trivial (one locale-fill commit; generated pending.ts regenerated); H5/H6/extraction/firewall closed; dbperf pre-checkpoint BLOCK folded in; three-reviewer round + fresh fix-round re-review + qa-checklist READY + hot-path round (sections below); real-SQL suites green incl. the new escrow set; gate GREEN (full-suite fallback, all 8 steps; the one intermediate red was the malware scanner flagging the firewall comment's own key-shape prose, reworded); LOCAL, not pushed per R4 |
-| 05 QA | phase-05-qa | game | DONE | b9e937c075 | PASS-WITH-FOLLOWUPS, every fix applied (section below); release sync origin/release/v0.38.0 trivial (7 commits, no marketplace overlap, no count-pin surface); five audit lanes + a fresh fix-round re-review + qa-checklist; real-SQL suites 109 green TWICE (before and after the fix round, zero skips); the three named mutation probes plus the agents' per-pin mutation matrices all bit; one NEW critical-class defect found and fixed in the round (the withTx null-deref); gate result stamped in the section; pushed per R4 |
+| 05 QA | phase-05-qa | game | DONE | b9e937c075 | PASS-WITH-FOLLOWUPS, every fix applied (section below); release sync origin/release/v0.38.0 trivial (7 commits, no marketplace overlap, no count-pin surface); five audit lanes + a fresh fix-round re-review + qa-checklist READY + a db-perf close-out; real-SQL suites 109 green THREE times (zero skips); the three named mutation probes plus the agents' per-pin mutation matrices all bit; the round found and fixed the BEGIN-outside-TxNeverStarted critical, the withTx null-deref evidence destroyer, both kick argument swaps, and the db-perf codeless-discard P1; gate GREEN at eeaa137e5c (full-suite fallback, all 8 steps, 38196 tests + 118 browser); pushed per R4 |
 | 06 | directed-rail-integrity | game | NOT STARTED | | |
 | 06 QA | phase-06-qa | game | NOT STARTED | | |
 | 07 | policy-terms-drafts | game | NOT STARTED | | |
@@ -127,12 +127,16 @@ correctness-vs-criteria, dead-code/doc-staleness), every finding applied:
   (no code line touched beyond the two swaps), landing at exactly 10859.
 
 Validation: tsc clean; 1182 green across the 27 touched suites plus the
-always-run guards; the three pg suites 109 green TWICE (before and after
-the fix round) under TEST_DATABASE_URL, zero skips; ci:changed exit 0
-(warnings only); the three phase-file probes bit exactly their targets
-(the lamports plant fired the firewall naming the file; the eligibility
-revert redded 8 tests across all five enforcement-point suites; the
-disabled ownership hoist redded exactly the zero-side-effects pin).
+always-run guards; the three pg suites 109 green THREE times (before the
+fix round, after it, and after the db-perf P1 fix) under
+TEST_DATABASE_URL, zero skips; ci:changed exit 0 (warnings only); the
+three phase-file probes bit exactly their targets (the lamports plant
+fired the firewall naming the file; the eligibility revert redded 8
+tests across all five enforcement-point suites; the disabled ownership
+hoist redded exactly the zero-side-effects pin). Gate GREEN at
+eeaa137e5c: full-suite fallback, all 8 steps, 2707 test files / 38196
+tests, the browser suite 118, typecheck and all builds, malware scan
+PASS (the docs stamp commit lands on top of the gated tip).
 
 Residuals recorded this round (owners; do not re-raise):
 - 06 opens with two directed-rail judgments: the accepted THROW residual
