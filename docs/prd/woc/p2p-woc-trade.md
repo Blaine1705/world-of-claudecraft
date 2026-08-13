@@ -247,11 +247,16 @@ unguarded today, independent of this feature. It belongs to the exchange rather 
 to p2p trades, so it is noted here and tracked separately.
 
 **3. Does a directed offer count against the 12-listing cap?**
-`WOC_MARKET_MAX_ACTIVE_LISTINGS` is 12 active listings per account, realm-scoped,
-enforced in `createListing` via `countActiveBySeller`. A directed offer holds an item
-in custody escrow exactly as a listing does, so it should count, otherwise it is a way
-around both the escrow bound and the browse-flood bound the cap exists for. Still
-unconfirmed.
+RESOLVED by the directed-rail hardening (H12): a directed LISTING counts against the
+shared 12-listing cap in both directions (`countActiveBySeller` and the authoritative
+in-transaction count both dropped the exemption), because it holds an item in custody
+escrow exactly as a public listing does. A pending OFFER still escrows nothing and
+counts toward nothing. The directed hold is the settlement window
+(`WOC_MARKET_DIRECTED_HOLD_SECONDS`, identical to `WOC_MARKET_SETTLEMENT_WINDOW_SECONDS`
+by a pinned identity), not an auction duration; an accepting buyer who never pays is
+struck and the listing auto-closes with the item returned. The agreed copy is
+fingerprinted at offer time (`item_pin`, the `itemCopyPin` 3-tuple) and acceptance
+refuses `item_mismatch` for any other copy.
 
 ## Sequencing
 
