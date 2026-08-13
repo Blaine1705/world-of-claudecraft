@@ -150,7 +150,7 @@ interface AttributionTargetFixture {
 // and reveal-gate work, this branch's mount wiring), so the merged tree
 // mints a value matching neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'e73275f2a91eb88fc0bc20162d2a2f608a265b6bb3950be2cbfb4f792259302c';
+  'fda98b795a2fc075243293cab0a4b6a9a3a6c1e5568185b2793da9421e789c04';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
