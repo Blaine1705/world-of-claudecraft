@@ -100,7 +100,11 @@ STEP 3 - VALIDATION + REVIEW:
 - Review dispatch per the implementation-plan.md matrix: privacy-security-review
   (electron writes OS state + new IPC + the untrusted store) AND frontend-seam-reviewer
   (options surface). COVERAGE prompts, ~30-call budgets.
-- `node scripts/gate_select.mjs`.
+- `node scripts/gate_select.mjs` (BROWSER_PATH exported; NO biome pin needed since
+  the v0.38.0 reconcile: ci_changed resolves --since to the newest origin/release/*
+  itself). ACCEPTED RED on a full-suite fallback: the 9 seal suites (14 tests) plus
+  tests/monolith_budget.test.ts (2 tests, the OPEN ratchet decision in state.md
+  gotchas); anything else red is this phase's regression.
 
 STEP 4 - COMMITS:
 - feat(desktop): add a validated desktop preferences store
