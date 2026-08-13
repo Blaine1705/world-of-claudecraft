@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { DungeonLayout } from '../src/sim/dungeon_layout';
 import type { RiftFloorPlan } from '../src/sim/rift/types';
@@ -96,6 +97,107 @@ function worldWith(
     riftFloor: view,
     riftBossDeathZones: () => deathZones,
   } as unknown as IWorld;
+}
+
+function populatedDynamicWorld(delta: number): IWorld {
+  const active = worldWith(
+    [
+      {
+        id: 2,
+        kind: 'mob',
+        templateId: 'rift_mob',
+        hostile: true,
+        dead: false,
+        lootable: false,
+        aggroTargetId: delta === 0 ? 1 : null,
+        pos: { x: VIEW.origin.x + 2 + delta, y: 0, z: VIEW.origin.z + 2 + delta },
+      },
+      {
+        id: 3,
+        kind: 'mob',
+        templateId: 'rift_mob',
+        hostile: true,
+        dead: true,
+        lootable: true,
+        aggroTargetId: null,
+        pos: { x: VIEW.origin.x + 3 + delta, y: 0, z: VIEW.origin.z + 3 + delta },
+      },
+      {
+        id: 4,
+        kind: 'object',
+        templateId: 'rift_gate_open',
+        pos: { x: VIEW.origin.x + 4 + delta, y: 0, z: VIEW.origin.z + 4 + delta },
+      },
+      {
+        id: 5,
+        kind: 'object',
+        templateId: 'rift_treasure',
+        pos: { x: VIEW.origin.x + 5 + delta, y: 0, z: VIEW.origin.z + 5 + delta },
+      },
+      {
+        id: 6,
+        kind: 'object',
+        templateId: 'rift_exit',
+        riftTier: 'B',
+        pos: { x: VIEW.origin.x + 6 + delta, y: 0, z: VIEW.origin.z + 6 + delta },
+      },
+    ],
+    VIEW,
+    [
+      {
+        x: VIEW.origin.x + 8 + delta,
+        z: VIEW.origin.z + 8 + delta,
+        radius: 3,
+        remaining: 2 - delta * 0.1,
+        total: 4,
+      },
+      {
+        x: VIEW.origin.x + 9 + delta,
+        z: VIEW.origin.z + 9 + delta,
+        radius: 5,
+        remaining: 3 - delta * 0.1,
+        total: 6,
+      },
+    ],
+  ) as unknown as {
+    player: {
+      pos: { x: number; y: number; z: number };
+      facing: number;
+      ghost: boolean;
+      corpsePos: { x: number; z: number } | null;
+    };
+    partyInfo: unknown;
+  };
+  active.player.pos = {
+    x: VIEW.origin.x + delta,
+    y: 0,
+    z: VIEW.origin.z + delta,
+  };
+  active.player.facing = 0.75 + delta * 0.1;
+  active.player.ghost = true;
+  active.player.corpsePos = {
+    x: VIEW.origin.x + 10 + delta,
+    z: VIEW.origin.z + 10 + delta,
+  };
+  active.partyInfo = {
+    members: [
+      {
+        pid: 7,
+        cls: 'mage',
+        dead: delta === 0 ? 0 : 1,
+        x: VIEW.origin.x + 7 + delta,
+        z: VIEW.origin.z + 7 + delta,
+      },
+      {
+        pid: 8,
+        cls: 'priest',
+        dead: 0,
+        x: VIEW.origin.x + 8 + delta,
+        z: VIEW.origin.z + 7 + delta,
+      },
+    ],
+  };
+  return active as unknown as IWorld;
 }
 
 describe('rift map geometry', () => {
@@ -534,6 +636,151 @@ describe('rift map live model', () => {
     expect(c?.objects).toEqual([]);
     const priorStatic = c?.staticGeometry;
     const changed = view.build(worldWith([], { ...VIEW, contentHash: 'hash-new' }), 162, 8, 'C');
+    expect(changed).toBe(c);
     expect(changed?.staticGeometry).not.toBe(priorStatic);
+  });
+
+  it('reuses every accepted dynamic marker slot across changed-coordinate rebuilds', () => {
+    const view = createRiftMapView();
+    const first = view.build(populatedDynamicWorld(0), 162, 8, 'A');
+    expect(first).not.toBeNull();
+    if (!first?.corpse) throw new Error('expected a populated Rift model');
+
+    expect(first.mobs.map((marker) => marker.state)).toEqual(['hostile', 'loot']);
+    expect(first.objects.map((marker) => marker.semantic.kind)).toEqual([
+      'rift-mechanic',
+      'rift-reward',
+      'rift-return',
+    ]);
+    expect(first.party).toHaveLength(2);
+    expect(first.deathZones).toHaveLength(2);
+
+    const arrays = {
+      mobs: first.mobs,
+      objects: first.objects,
+      party: first.party,
+      deathZones: first.deathZones,
+    };
+    const slots = {
+      mobs: [...first.mobs],
+      objects: [...first.objects],
+      party: [...first.party],
+      deathZones: [...first.deathZones],
+      corpse: first.corpse,
+      player: first.player,
+    };
+    const semantics = slots.objects.map((marker) => marker.semantic);
+    const firstMobCx = slots.mobs[0].cx;
+    const firstCorpseCx = slots.corpse.cx;
+    const firstPlayerCx = slots.player.cx;
+
+    const second = view.build(populatedDynamicWorld(1), 162, 8, 'B');
+    expect(second).toBe(first);
+    if (!second?.corpse) throw new Error('expected a rebuilt Rift model');
+    expect(second.mobs).toBe(arrays.mobs);
+    expect(second.objects).toBe(arrays.objects);
+    expect(second.party).toBe(arrays.party);
+    expect(second.deathZones).toBe(arrays.deathZones);
+    second.mobs.forEach((marker, index) => {
+      expect(marker).toBe(slots.mobs[index]);
+    });
+    second.objects.forEach((marker, index) => {
+      expect(marker).toBe(slots.objects[index]);
+      expect(marker.semantic).toBe(semantics[index]);
+    });
+    second.party.forEach((marker, index) => {
+      expect(marker).toBe(slots.party[index]);
+    });
+    second.deathZones.forEach((marker, index) => {
+      expect(marker).toBe(slots.deathZones[index]);
+    });
+    expect(second.corpse).toBe(slots.corpse);
+    expect(second.player).toBe(slots.player);
+    expect(second.mobs[0].cx).not.toBe(firstMobCx);
+    expect(second.corpse.cx).not.toBe(firstCorpseCx);
+    expect(second.player.cx).not.toBe(firstPlayerCx);
+    expect(second.mobs[0].aggro).toBe(false);
+    expect(second.party[0].dead).toBe(true);
+
+    const visibleMarkers = [
+      ...second.mobs,
+      ...second.objects,
+      ...second.party,
+      ...second.deathZones,
+      second.corpse,
+      second.player,
+    ];
+    expect(new Set(visibleMarkers).size).toBe(visibleMarkers.length);
+
+    const empty = view.build(worldWith(), 162, 8, 'C');
+    expect(empty).toBe(first);
+    expect(empty?.mobs).toHaveLength(0);
+    expect(empty?.objects).toHaveLength(0);
+    expect(empty?.party).toHaveLength(0);
+    expect(empty?.deathZones).toHaveLength(0);
+    expect(empty?.corpse).toBeNull();
+
+    const restored = view.build(populatedDynamicWorld(2), 162, 8, 'D');
+    if (!restored?.corpse) throw new Error('expected restored Rift markers');
+    expect(restored.mobs).toHaveLength(2);
+    expect(restored.objects).toHaveLength(3);
+    expect(restored.party).toHaveLength(2);
+    expect(restored.deathZones).toHaveLength(2);
+    restored.mobs.forEach((marker, index) => {
+      expect(marker).toBe(slots.mobs[index]);
+    });
+    restored.objects.forEach((marker, index) => {
+      expect(marker).toBe(slots.objects[index]);
+      expect(marker.semantic).toBe(semantics[index]);
+    });
+    restored.party.forEach((marker, index) => {
+      expect(marker).toBe(slots.party[index]);
+    });
+    restored.deathZones.forEach((marker, index) => {
+      expect(marker).toBe(slots.deathZones[index]);
+    });
+    expect(restored.corpse).toBe(slots.corpse);
+    expect(restored.player).toBe(slots.player);
+  });
+
+  it('caches rift exit semantics independently for each rank', () => {
+    const exitWorld = (riftTier: 'A' | 'B', delta: number) =>
+      worldWith([
+        {
+          id: 2,
+          kind: 'object',
+          templateId: 'rift_exit',
+          riftTier,
+          pos: { x: VIEW.origin.x + delta, y: 0, z: VIEW.origin.z + 3 + delta },
+        },
+      ]);
+    const view = createRiftMapView();
+    const rankB = view.build(exitWorld('B', 0), 162, 8, 'B');
+    expect(rankB?.objects).toHaveLength(1);
+    const marker = rankB?.objects[0];
+    const rankBSemantic = marker?.semantic;
+    expect(rankBSemantic).toEqual({ kind: 'rift-return', route: 'egress', rank: 'B' });
+
+    const rankA = view.build(exitWorld('A', 1), 162, 8, 'A');
+    expect(rankA?.objects[0]).toBe(marker);
+    expect(rankA?.objects[0].semantic).not.toBe(rankBSemantic);
+    expect(rankA?.objects[0].semantic).toEqual({
+      kind: 'rift-return',
+      route: 'egress',
+      rank: 'A',
+    });
+
+    const rankBAgain = view.build(exitWorld('B', 2), 162, 8, 'B again');
+    expect(rankBAgain?.objects[0]).toBe(marker);
+    expect(rankBAgain?.objects[0].semantic).toBe(rankBSemantic);
+  });
+
+  it('does not allocate a fallback party array for solo rebuilds', () => {
+    const source = readFileSync(
+      new URL('../src/ui/hud/rift/rift_map_core.ts', import.meta.url),
+      'utf8',
+    );
+    expect(source).toContain('const partyMembers = world.partyInfo?.members;');
+    expect(source).not.toContain('world.partyInfo?.members ?? []');
   });
 });

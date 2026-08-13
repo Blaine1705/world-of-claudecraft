@@ -18,15 +18,18 @@ import {
 import { authoredWallSegments, doorRampHalf } from '../../../sim/rift/authored';
 import { generateRiftFloor } from '../../../sim/rift/rift_gen';
 import type { RiftFloorPlan } from '../../../sim/rift/types';
+import type { RiftTier } from '../../../sim/types';
 import type { IWorld, RiftFloorView } from '../../../world_api';
 import {
   classifyMapObjectMarker,
   type MapMarkerSemantic,
+  type MapMarkerSemanticEntity,
   mapMarkerSemanticLayer,
 } from '../../map_marker_semantics_core';
 import { isInstanceMapEntityDisclosed } from '../instance_map_disclosure_core';
 
 const MIN_SPAN = 1;
+const RIFT_SEMANTIC_CACHE_LIMIT = 32;
 const RIFT_SEMANTIC_CONTEXT = Object.freeze({ delveRun: null });
 
 export interface RiftMapBounds {
@@ -222,9 +225,17 @@ export function riftLocalToCanvas(
   transform: RiftMapTransform,
 ): RiftMapPoint {
   return {
-    cx: transform.left + (transform.maxX - localX) * transform.scale,
-    cy: transform.top + (transform.maxZ - localZ) * transform.scale,
+    cx: riftLocalCanvasX(localX, transform),
+    cy: riftLocalCanvasY(localZ, transform),
   };
+}
+
+function riftLocalCanvasX(localX: number, transform: RiftMapTransform): number {
+  return transform.left + (transform.maxX - localX) * transform.scale;
+}
+
+function riftLocalCanvasY(localZ: number, transform: RiftMapTransform): number {
+  return transform.top + (transform.maxZ - localZ) * transform.scale;
 }
 
 function polygon(
@@ -484,19 +495,144 @@ export function buildRiftStaticGeometry(
   return { walkable, structures, clipped };
 }
 
-function isInsideCanvas(point: RiftMapPoint, canvasSize: number): boolean {
-  return point.cx >= 0 && point.cx <= canvasSize && point.cy >= 0 && point.cy <= canvasSize;
+function isInsideCanvas(cx: number, cy: number, canvasSize: number): boolean {
+  return cx >= 0 && cx <= canvasSize && cy >= 0 && cy <= canvasSize;
+}
+
+function isRiftObjectSemantic(semantic: MapMarkerSemantic | null): semantic is RiftObjectSemantic {
+  return (
+    semantic?.kind === 'rift-descent' ||
+    semantic?.kind === 'rift-return' ||
+    semantic?.kind === 'rift-reward' ||
+    semantic?.kind === 'rift-mechanic'
+  );
+}
+
+function cachedRiftObjectSemantic(
+  entity: MapMarkerSemanticEntity,
+  semanticCache: Map<string, MapMarkerSemantic | null>,
+  riftExitCache: Map<RiftTier | null, MapMarkerSemantic | null>,
+): RiftObjectSemantic | null {
+  if (entity.templateId === 'rift_exit') {
+    const rank = entity.riftTier ?? null;
+    const cached = riftExitCache.get(rank);
+    if (cached !== undefined) return isRiftObjectSemantic(cached) ? cached : null;
+    const classified = classifyMapObjectMarker(entity, RIFT_SEMANTIC_CONTEXT);
+    if (riftExitCache.size >= RIFT_SEMANTIC_CACHE_LIMIT) riftExitCache.clear();
+    riftExitCache.set(rank, classified);
+    return isRiftObjectSemantic(classified) ? classified : null;
+  }
+
+  const cached = semanticCache.get(entity.templateId);
+  if (cached !== undefined) return isRiftObjectSemantic(cached) ? cached : null;
+  const classified = classifyMapObjectMarker(entity, RIFT_SEMANTIC_CONTEXT);
+  if (semanticCache.size >= RIFT_SEMANTIC_CACHE_LIMIT) semanticCache.clear();
+  semanticCache.set(entity.templateId, classified);
+  return isRiftObjectSemantic(classified) ? classified : null;
+}
+
+function writeMobMarker(
+  slots: RiftMobMarker[],
+  index: number,
+  cx: number,
+  cy: number,
+  state: RiftMobMarker['state'],
+  aggro: boolean,
+): RiftMobMarker {
+  let marker = slots[index];
+  if (!marker) {
+    marker = { cx, cy, state, aggro };
+    slots[index] = marker;
+    return marker;
+  }
+  marker.cx = cx;
+  marker.cy = cy;
+  marker.state = state;
+  marker.aggro = aggro;
+  return marker;
+}
+
+function writeObjectMarker(
+  slots: RiftObjectMarker[],
+  index: number,
+  cx: number,
+  cy: number,
+  semantic: RiftObjectSemantic,
+): RiftObjectMarker {
+  let marker = slots[index];
+  if (!marker) {
+    marker = { cx, cy, semantic };
+    slots[index] = marker;
+    return marker;
+  }
+  marker.cx = cx;
+  marker.cy = cy;
+  marker.semantic = semantic;
+  return marker;
+}
+
+function writePartyMarker(
+  slots: RiftPartyMarker[],
+  index: number,
+  cx: number,
+  cy: number,
+  cls: string,
+  dead: boolean,
+): RiftPartyMarker {
+  let marker = slots[index];
+  if (!marker) {
+    marker = { cx, cy, cls, dead };
+    slots[index] = marker;
+    return marker;
+  }
+  marker.cx = cx;
+  marker.cy = cy;
+  marker.cls = cls;
+  marker.dead = dead;
+  return marker;
+}
+
+function writeDeathZoneMarker(
+  slots: RiftDeathZoneMarker[],
+  index: number,
+  cx: number,
+  cy: number,
+  radius: number,
+  remaining: number,
+  total: number,
+): RiftDeathZoneMarker {
+  let marker = slots[index];
+  if (!marker) {
+    marker = { cx, cy, radius, remaining, total };
+    slots[index] = marker;
+    return marker;
+  }
+  marker.cx = cx;
+  marker.cy = cy;
+  marker.radius = radius;
+  marker.remaining = remaining;
+  marker.total = total;
+  return marker;
 }
 
 /** Reused dynamic model for both minimap and M-map surfaces. */
 export function createRiftMapView(fit: RiftMapFit = 'rect'): RiftMapView {
   const mobs: RiftMobMarker[] = [];
   const objects: RiftObjectMarker[] = [];
-  const mechanicObjects: RiftObjectMarker[] = [];
-  const rewardObjects: RiftObjectMarker[] = [];
-  const navigationObjects: RiftObjectMarker[] = [];
   const party: RiftPartyMarker[] = [];
   const deathZones: RiftDeathZoneMarker[] = [];
+  // Active arrays retain their public identity while these private high-water
+  // pools retain each accepted marker slot across rebuilds and empty frames.
+  const mobSlots: RiftMobMarker[] = [];
+  const mechanicObjectSlots: RiftObjectMarker[] = [];
+  const rewardObjectSlots: RiftObjectMarker[] = [];
+  const navigationObjectSlots: RiftObjectMarker[] = [];
+  const partySlots: RiftPartyMarker[] = [];
+  const deathZoneSlots: RiftDeathZoneMarker[] = [];
+  const semanticCache = new Map<string, MapMarkerSemantic | null>();
+  const riftExitCache = new Map<RiftTier | null, MapMarkerSemantic | null>();
+  const playerMarker: RiftPlayerMarker = { cx: 0, cy: 0, angle: 0 };
+  let corpseMarker: RiftMapPoint | null = null;
   let model: RiftMapModel | null = null;
   let staticSurfaceKey = '';
 
@@ -504,9 +640,6 @@ export function createRiftMapView(fit: RiftMapFit = 'rect'): RiftMapView {
     build(world, canvasSize, pad, areaLabel): RiftMapModel | null {
       mobs.length = 0;
       objects.length = 0;
-      mechanicObjects.length = 0;
-      rewardObjects.length = 0;
-      navigationObjects.length = 0;
       party.length = 0;
       deathZones.length = 0;
       const view = world.riftFloor;
@@ -517,18 +650,24 @@ export function createRiftMapView(fit: RiftMapFit = 'rect'): RiftMapView {
       if (!model || staticSurfaceKey !== nextSurfaceKey) {
         const floor = generateRiftFloor(view.seed, view.baseLevel, view.floorIndex, view.upgrade);
         const transform = riftMapTransform(riftLayoutBounds(floor.layout), canvasSize, pad, fit);
-        model = {
-          staticKey: floorKey,
-          staticGeometry: buildRiftStaticGeometry(floor, transform),
-          transform,
-          mobs,
-          objects,
-          party,
-          deathZones,
-          corpse: null,
-          player: { cx: 0, cy: 0, angle: 0 },
-          areaLabel,
-        };
+        const staticGeometry = buildRiftStaticGeometry(floor, transform);
+        if (!model) {
+          model = {
+            staticKey: floorKey,
+            staticGeometry,
+            transform,
+            mobs,
+            objects,
+            party,
+            deathZones,
+            corpse: null,
+            player: playerMarker,
+            areaLabel,
+          };
+        } else {
+          model.staticGeometry = staticGeometry;
+          model.transform = transform;
+        }
         staticSurfaceKey = nextSurfaceKey;
       }
 
@@ -539,6 +678,9 @@ export function createRiftMapView(fit: RiftMapFit = 'rect'): RiftMapView {
       const origin = view.origin;
       const player = world.player;
       const companionId = world.companionState?.entityId;
+      let mechanicObjectCount = 0;
+      let rewardObjectCount = 0;
+      let navigationObjectCount = 0;
 
       for (const entity of world.entities.values()) {
         if (entity.id === player.id || entity.id === companionId) continue;
@@ -546,87 +688,97 @@ export function createRiftMapView(fit: RiftMapFit = 'rect'): RiftMapView {
           continue;
         let semantic: RiftObjectSemantic | null = null;
         if (entity.kind === 'object') {
-          const classified = classifyMapObjectMarker(entity, RIFT_SEMANTIC_CONTEXT);
-          if (
-            classified &&
-            (classified.kind === 'rift-descent' ||
-              classified.kind === 'rift-return' ||
-              classified.kind === 'rift-reward' ||
-              classified.kind === 'rift-mechanic')
-          )
-            semantic = classified;
-          else continue;
+          semantic = cachedRiftObjectSemantic(entity, semanticCache, riftExitCache);
+          if (!semantic) continue;
         } else if (
           !(entity.kind === 'mob' && entity.hostile && (!entity.dead || entity.lootable))
         ) {
           continue;
         }
-        const projected = riftLocalToCanvas(
-          entity.pos.x - origin.x,
-          entity.pos.z - origin.z,
-          transform,
-        );
-        if (!isInsideCanvas(projected, canvasSize)) continue;
+        // Project to primitives first so an off-canvas candidate never consumes
+        // or allocates a marker slot.
+        const cx = riftLocalCanvasX(entity.pos.x - origin.x, transform);
+        const cy = riftLocalCanvasY(entity.pos.z - origin.z, transform);
+        if (!isInsideCanvas(cx, cy, canvasSize)) continue;
         if (!semantic) {
-          if (entity.hostile && !entity.dead)
-            mobs.push({
-              ...projected,
-              state: 'hostile',
-              aggro: entity.aggroTargetId === player.id,
-            });
-          else if (entity.hostile && entity.lootable)
-            mobs.push({ ...projected, state: 'loot', aggro: false });
+          if (entity.hostile && !entity.dead) {
+            const index = mobs.length;
+            mobs[index] = writeMobMarker(
+              mobSlots,
+              index,
+              cx,
+              cy,
+              'hostile',
+              entity.aggroTargetId === player.id,
+            );
+          } else if (entity.hostile && entity.lootable) {
+            const index = mobs.length;
+            mobs[index] = writeMobMarker(mobSlots, index, cx, cy, 'loot', false);
+          }
           continue;
         }
-        const marker = { ...projected, semantic };
         const layer = mapMarkerSemanticLayer(semantic);
-        if (layer === 'mechanic') mechanicObjects.push(marker);
-        else if (layer === 'reward') rewardObjects.push(marker);
-        else navigationObjects.push(marker);
+        if (layer === 'mechanic') {
+          writeObjectMarker(mechanicObjectSlots, mechanicObjectCount++, cx, cy, semantic);
+        } else if (layer === 'reward') {
+          writeObjectMarker(rewardObjectSlots, rewardObjectCount++, cx, cy, semantic);
+        } else {
+          writeObjectMarker(navigationObjectSlots, navigationObjectCount++, cx, cy, semantic);
+        }
       }
 
       // Stable semantic z-order without a per-redraw sort: mechanics, then
       // rewards, then the route the party must be able to find above both.
-      for (let index = 0; index < mechanicObjects.length; index++)
-        objects.push(mechanicObjects[index]);
-      for (let index = 0; index < rewardObjects.length; index++) objects.push(rewardObjects[index]);
-      for (let index = 0; index < navigationObjects.length; index++)
-        objects.push(navigationObjects[index]);
+      for (let index = 0; index < mechanicObjectCount; index++)
+        objects.push(mechanicObjectSlots[index]);
+      for (let index = 0; index < rewardObjectCount; index++)
+        objects.push(rewardObjectSlots[index]);
+      for (let index = 0; index < navigationObjectCount; index++)
+        objects.push(navigationObjectSlots[index]);
 
-      for (const member of world.partyInfo?.members ?? []) {
-        if (member.pid === player.id) continue;
-        const projected = riftLocalToCanvas(member.x - origin.x, member.z - origin.z, transform);
-        if (!isInsideCanvas(projected, canvasSize)) continue;
-        party.push({ ...projected, cls: member.cls, dead: member.dead !== 0 });
+      const partyMembers = world.partyInfo?.members;
+      if (partyMembers) {
+        for (const member of partyMembers) {
+          if (member.pid === player.id) continue;
+          const cx = riftLocalCanvasX(member.x - origin.x, transform);
+          const cy = riftLocalCanvasY(member.z - origin.z, transform);
+          if (!isInsideCanvas(cx, cy, canvasSize)) continue;
+          const index = party.length;
+          party[index] = writePartyMarker(partySlots, index, cx, cy, member.cls, member.dead !== 0);
+        }
       }
 
       for (const zone of world.riftBossDeathZones()) {
         if (!isInstanceMapEntityDisclosed(player.pos.x, player.pos.z, zone.x, zone.z)) continue;
-        const projected = riftLocalToCanvas(zone.x - origin.x, zone.z - origin.z, transform);
-        if (!isInsideCanvas(projected, canvasSize)) continue;
-        deathZones.push({
-          ...projected,
-          radius: zone.radius * transform.scale,
-          remaining: zone.remaining,
-          total: zone.total,
-        });
+        const cx = riftLocalCanvasX(zone.x - origin.x, transform);
+        const cy = riftLocalCanvasY(zone.z - origin.z, transform);
+        if (!isInsideCanvas(cx, cy, canvasSize)) continue;
+        const index = deathZones.length;
+        deathZones[index] = writeDeathZoneMarker(
+          deathZoneSlots,
+          index,
+          cx,
+          cy,
+          zone.radius * transform.scale,
+          zone.remaining,
+          zone.total,
+        );
       }
 
       if (player.ghost && player.corpsePos) {
-        const corpse = riftLocalToCanvas(
-          player.corpsePos.x - origin.x,
-          player.corpsePos.z - origin.z,
-          transform,
-        );
-        if (isInsideCanvas(corpse, canvasSize)) model.corpse = corpse;
+        const cx = riftLocalCanvasX(player.corpsePos.x - origin.x, transform);
+        const cy = riftLocalCanvasY(player.corpsePos.z - origin.z, transform);
+        if (isInsideCanvas(cx, cy, canvasSize)) {
+          if (!corpseMarker) corpseMarker = { cx, cy };
+          else {
+            corpseMarker.cx = cx;
+            corpseMarker.cy = cy;
+          }
+          model.corpse = corpseMarker;
+        }
       }
-      const projectedPlayer = riftLocalToCanvas(
-        player.pos.x - origin.x,
-        player.pos.z - origin.z,
-        transform,
-      );
-      model.player.cx = projectedPlayer.cx;
-      model.player.cy = projectedPlayer.cy;
+      model.player.cx = riftLocalCanvasX(player.pos.x - origin.x, transform);
+      model.player.cy = riftLocalCanvasY(player.pos.z - origin.z, transform);
       model.player.angle = -player.facing;
       return model;
     },
