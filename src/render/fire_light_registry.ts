@@ -5,7 +5,9 @@
 // never change for the renderer's lifetime: one changed count relinks every
 // material drawn in that frame, a measured 100 to 200 ms synchronous stall
 // each. `renderer.ts` keeps the registries and the pads; this module owns the
-// two operations that must not be open-coded per call site.
+// operations that must not be open-coded per call site: adoption into the
+// budget, the reparent that keeps a light out of a cull-toggled group, and the
+// pass itself.
 //
 // Extracted from `renderer.ts` under the monolith ratchet (tests/monolith_budget).
 import * as THREE from 'three';
@@ -16,6 +18,42 @@ import {
   pointLightPadCount,
   type RankedPointLight,
 } from './point_light_budget';
+
+const reparentScratch = new THREE.Vector3();
+
+/**
+ * Lift every light under `root` up to `scene`, preserving its world position.
+ *
+ * A point light rides the budget, NEVER a cull-toggled group (the Sowfield
+ * brazier rule). A light left inside such a group leaves the render light list
+ * the moment the toggle hides its ancestor, and the budget cannot compensate on
+ * that frame: it ranks against the ancestry it sees, while the cull sweeps run
+ * AFTER the frame's budget pass. So a group flipping from shown to hidden while
+ * one of its lights holds a counted slot drops numPointLights for that frame and
+ * relinks every lit material drawn in it.
+ *
+ * Applied mechanically at attach, so the NEXT builder that parents a glow into
+ * its own group cannot reintroduce the stall.
+ */
+export function reparentStrandedLightsToScene(
+  scene: THREE.Object3D,
+  root: THREE.Object3D,
+): THREE.Light[] {
+  const stranded: THREE.Light[] = [];
+  root.traverse((obj) => {
+    if ((obj as THREE.Light).isLight) stranded.push(obj as THREE.Light);
+  });
+  for (const light of stranded) {
+    light.getWorldPosition(reparentScratch);
+    scene.add(light); // add() detaches from the old parent
+    light.position.copy(reparentScratch);
+    // The subtree may already be frozen (freezeStaticMatrices clears
+    // matrixAutoUpdate), in which case the new local position would never reach
+    // the matrix and the light would keep drawing at the old world spot.
+    if (!light.matrixAutoUpdate) light.updateMatrix();
+  }
+  return stranded;
+}
 
 export interface FireLightAdopter {
   /** Take a light into the budget: hide it, register it, dirty the rank. */

@@ -263,7 +263,12 @@ import {
 import { buildFarshoreFeatures } from './farshore_features';
 import { buildFenFeatures, type FenFeaturesView } from './fen_features';
 import { buildFenbridgeTownView, type FenbridgeTownView } from './fenbridge_town';
-import { createFireLightAdopter, runFireLightBudgetPass } from './fire_light_registry';
+import {
+  createFireLightAdopter,
+  type FireLightBudgetPass,
+  reparentStrandedLightsToScene,
+  runFireLightBudgetPass,
+} from './fire_light_registry';
 import { type FireballTravelVisual, syncFireballTravelVisual } from './fireball_travel_visual';
 import { buildFish, type FishView } from './fish';
 import { FishingBobberVisual } from './fishing_bobber';
@@ -1728,6 +1733,9 @@ export class Renderer {
   // it hides the light AND dirties the rank, which are only correct together
   // (fire_light_registry.ts explains why). Subsystems get `sink`, which is the
   // same operation shaped like Array.push, so they cannot bypass it.
+  // Pooled budget-pass descriptor, filled in place by budgetFireLights.
+  private fireLightPass: FireLightBudgetPass | null = null;
+
   private readonly fireLightAdopter = createFireLightAdopter(
     () => this.fireLights,
     () => {
@@ -2652,7 +2660,10 @@ export class Renderer {
     setRenderCategory(this.jailScene.group, 'props');
     this.scene.add(this.jailScene.group);
     // updateVisibility toggles this group every frame AFTER the budget pass, so
-    // its light has to ride the budget rather than stand permanently visible.
+    // its light has to ride the budget rather than stand permanently visible,
+    // AND has to leave the group: a counted light whose ancestor the sweep hides
+    // later in the same frame drops numPointLights for that frame.
+    reparentStrandedLightsToScene(this.scene, this.jailScene.group);
     for (const light of this.jailScene.glowLights) this.fireLightAdopter.adopt(light);
 
     this.gatherNodes = buildGatherNodes(this.sim.cfg.seed);
@@ -4055,21 +4066,8 @@ export class Renderer {
       : undefined;
     const attached = attachSceneGroupGated(this.scene, view.group, gate);
     // Point lights ride the fireLights budget, NEVER the cull-toggled group
-    // (the Sowfield brazier rule). A light left inside the group leaves the
-    // render light list whenever the distance cull hides its ancestor, so the
-    // pinned numPointLights changes and every lit material recompiles: the
-    // open-world travel freeze the budget exists to prevent. Reparent every
-    // PointLight descendant to the scene mechanically, so the NEXT feature
-    // builder that parents a glow into its group cannot reintroduce it.
-    const strandedLights: THREE.PointLight[] = [];
-    view.group.traverse((obj) => {
-      if ((obj as THREE.PointLight).isLight) strandedLights.push(obj as THREE.PointLight);
-    });
-    for (const light of strandedLights) {
-      light.getWorldPosition(this.tmpV);
-      this.scene.add(light); // add() detaches from the old parent
-      light.position.copy(this.tmpV);
-    }
+    // (the Sowfield brazier rule; fire_light_registry.ts carries the why).
+    reparentStrandedLightsToScene(this.scene, view.group);
     if (freeze) freezeStaticMatrices(view.group);
     // adoptFireLight, not a bare push: a feature attaches from a zone-prepare
     // continuation, so its glow lights would otherwise be visible and unranked
@@ -12893,26 +12891,38 @@ export class Renderer {
   // but only the nearest GFX.maxPointLights within range shine each frame.
   // Rank entries are pooled (extended only when interiors or view lights change).
   // Static world positions stay cached; moving weapon VFX refresh into their
-  // existing vectors, so this hot loop allocates nothing.
+  // existing vectors, so the pass allocates nothing per frame. The descriptor
+  // is pooled for the same reason (the caller-owned-plan convention). The
+  // fireLights binding is refreshed every pass rather than captured, because
+  // the constructor REBINDS it once the props are built.
   private budgetFireLights(px: number, pz: number, flicker = false): void {
     // The pass itself lives in fire_light_registry.ts; the renderer only owns
     // the registries, the pads and the clock it reads from.
-    runFireLightBudgetPass({
+    this.fireLightPass ??= {
       rank: this.lightRank,
-      rankDirty: this.lightRankDirty,
+      rankDirty: false,
       fireLights: this.fireLights,
       viewLights: this.viewLights,
       pads: this.lightPads,
-      px,
-      pz,
-      // maxPointLights is the per-tier constant, so the live governor
-      // (effectivePointLights) only changes how many SHINE, not the count.
-      visibleCount: GFX.maxPointLights,
-      liveBudget: this.effectivePointLights || GFX.maxPointLights,
+      px: 0,
+      pz: 0,
+      visibleCount: 0,
+      liveBudget: 0,
       rangeSq: LIGHT_BUDGET_RANGE_SQ,
       scene: this.scene,
-      flickerTime: flicker ? this.time : null,
-    });
+      flickerTime: null,
+    };
+    const pass = this.fireLightPass;
+    pass.rankDirty = this.lightRankDirty;
+    pass.fireLights = this.fireLights;
+    pass.px = px;
+    pass.pz = pz;
+    // maxPointLights is the per-tier constant, so the live governor
+    // (effectivePointLights) only changes how many SHINE, not the count.
+    pass.visibleCount = GFX.maxPointLights;
+    pass.liveBudget = this.effectivePointLights || GFX.maxPointLights;
+    pass.flickerTime = flicker ? this.time : null;
+    runFireLightBudgetPass(pass);
     // A completed pass always leaves the rank current.
     this.lightRankDirty = false;
   }

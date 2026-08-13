@@ -1,7 +1,10 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { createFireLightAdopter } from '../src/render/fire_light_registry';
+import {
+  createFireLightAdopter,
+  reparentStrandedLightsToScene,
+} from '../src/render/fire_light_registry';
 import {
   applyPointLightBudget,
   countDrawnPointLights,
@@ -9,8 +12,24 @@ import {
   pointLightPadCount,
   type RankedPointLight,
 } from '../src/render/point_light_budget';
+import { freezeStaticMatrices } from '../src/render/static_matrix';
 
 const RANGE_SQ = 100 * 100;
+
+function rendererSource(): string {
+  return readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+}
+
+/** The `budgetFireLights` body alone. Several pins below are ordinary lines to
+ *  write anywhere in a 13k-line coordinator, so they are anchored here rather
+ *  than matched against the whole file. */
+function budgetFireLightsBody(renderer: string): string {
+  const start = renderer.indexOf('  private budgetFireLights(');
+  expect(start, 'budgetFireLights was renamed; re-anchor these pins').toBeGreaterThan(-1);
+  const end = renderer.indexOf('\n  private ', start + 1);
+  expect(end).toBeGreaterThan(start);
+  return renderer.slice(start, end);
+}
 
 function rankedLight(x: number, z: number, base: number | null = 5): RankedPointLight {
   const light = new THREE.PointLight(0xffffff, base ?? 5, 10, 2);
@@ -362,9 +381,10 @@ describe('applyPointLightBudget', () => {
     expect(method).not.toContain('pointLightPadCount(ranked.length');
 
     // The renderer must still hand its OWN scene in, so ancestry is checked
-    // against the real root rather than a detached one.
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
-    expect(renderer).toContain('scene: this.scene,');
+    // against the real root rather than a detached one. Anchored to the budget
+    // method: `scene: this.scene,` is an ordinary line to write anywhere in a
+    // 13k-line coordinator, so a whole-file match would pass on an unrelated one.
+    expect(budgetFireLightsBody(rendererSource())).toContain('scene: this.scene,');
   });
 
   it('wires mid-session fx lights into the same ranked budget', () => {
@@ -570,7 +590,7 @@ describe('fire-light adoption sink', () => {
     // Source-scan, because no unit case can see whether a CALL SITE bypassed the
     // seam. A bare `this.fireLights.push` after the constructor's mass hide, or a
     // retire that forgets the dirty mark, reinstates the relink bug.
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const renderer = rendererSource();
     expect(renderer).toContain(
       'for (const light of view.glowLights ?? []) this.fireLightAdopter.adopt(light)',
     );
@@ -578,14 +598,51 @@ describe('fire-light adoption sink', () => {
       'for (const light of this.jailScene.glowLights) this.fireLightAdopter.adopt(light)',
     );
     // retireInteriorGroup must dirty the rank on REMOVAL: the guard is a count,
-    // so an add and a remove of equal size would leave the rank stale.
+    // so an add and a remove of equal size would leave the rank stale. The mark
+    // has to sit on the SPLICE path, not merely somewhere in the method: a mark
+    // outside the loop would be skipped on the retire that removes nothing.
     const retireStart = renderer.indexOf('private retireInteriorGroup(');
     const retireEnd = renderer.indexOf('private ensureDungeons(', retireStart);
     expect(retireStart).toBeGreaterThan(-1);
     expect(retireEnd).toBeGreaterThan(retireStart);
     const retire = renderer.slice(retireStart, retireEnd);
-    expect(retire).toContain('this.fireLights.splice(i, 1);');
-    expect(retire).toContain('this.lightRankDirty = true;');
+    const spliceIndex = retire.indexOf('this.fireLights.splice(i, 1);');
+    const markIndex = retire.indexOf('this.lightRankDirty = true;', spliceIndex);
+    const loopEnd = retire.indexOf('for (let i = this.flames.length', spliceIndex);
+    expect(spliceIndex).toBeGreaterThan(-1);
+    expect(markIndex).toBeGreaterThan(spliceIndex);
+    expect(markIndex).toBeLessThan(loopEnd);
+  });
+
+  it('lets nothing reach the raw registry after the constructor hides it', () => {
+    // The omission half of the seam. The cases above pin that the KNOWN call
+    // sites adopt; this one pins that a NEW one cannot skip it, which is the
+    // failure mode the seam exists for (three sites got it wrong by hand).
+    //
+    // The constructor's mass hide is the boundary: everything pushed before it
+    // is swept visible=false by that line, so a bare push there is harmless,
+    // while one after it puts a visible, unranked light in the scene.
+    const renderer = rendererSource();
+    const massHide = renderer.indexOf(
+      'for (const light of this.fireLights) light.visible = false;',
+    );
+    expect(massHide, 'the constructor mass hide moved; re-anchor this guard').toBeGreaterThan(-1);
+    expect(renderer.slice(massHide)).not.toContain('this.fireLights.push(');
+
+    // And the raw array escapes the seam exactly once, to the battleground:
+    // buildBgFieldLights hides its own lights and its release path SPLICES,
+    // which an append-only sink cannot express. Every other subsystem takes
+    // `fireLightAdopter.sink`. The budget pass reads the registry too, so its
+    // own method is excluded rather than counted.
+    const budget = budgetFireLightsBody(renderer);
+    const outsideBudget = renderer.replace(budget, '');
+    const handoffs = [...outsideBudget.matchAll(/fireLights: this\.fireLights/g)];
+    expect(handoffs).toHaveLength(1);
+    const bgStart = outsideBudget.indexOf('const view = buildBattleground(');
+    const bgEnd = outsideBudget.indexOf('});', bgStart);
+    expect(bgStart).toBeGreaterThan(-1);
+    expect(handoffs[0].index).toBeGreaterThan(bgStart);
+    expect(handoffs[0].index).toBeLessThan(bgEnd);
   });
 
   it('gives the jail gate light to the budget with its authored intensity', () => {
@@ -604,5 +661,67 @@ describe('fire-light adoption sink', () => {
       -1,
     );
     expect(jail.indexOf('light.userData.baseIntensity = 9;')).toBeGreaterThan(declaration);
+  });
+
+  it('lifts the jail gate light out of the group the cull sweep toggles', () => {
+    // Adoption alone was not enough. The budget ranks against the ancestry it
+    // SEES, and updateVisibility writes jailScene.group.visible AFTER the
+    // frame's budget pass, so on the frame the group flips from shown to hidden
+    // a counted light silently leaves the render light list and numPointLights
+    // moves. The renderer half is pinned below; this is the mechanism.
+    const scene = new THREE.Scene();
+    const group = new THREE.Group();
+    group.position.set(100, 5, -40);
+    const light = new THREE.PointLight(0x86b4ff, 9, 24, 2);
+    light.position.set(2, 6, 3);
+    group.add(light);
+    scene.add(group);
+    const ranked: RankedPointLight[] = [
+      { light, d2: 0, worldPos: new THREE.Vector3(), base: 9, dynamic: false },
+    ];
+
+    // Inside the group, the cull toggle takes the light out of the count.
+    group.visible = false;
+    expect(countDrawnPointLights(ranked, scene)).toBe(0);
+    group.visible = true;
+
+    const moved = reparentStrandedLightsToScene(scene, group);
+
+    expect(moved).toEqual([light]);
+    expect(light.parent).toBe(scene);
+    // Same place in the world, so the gate still glows where it was authored.
+    expect(light.getWorldPosition(new THREE.Vector3()).toArray()).toEqual([102, 11, -37]);
+    group.visible = false;
+    expect(countDrawnPointLights(ranked, scene)).toBe(1);
+  });
+
+  it('recomposes the matrix of an already frozen light it lifts', () => {
+    // buildJailScene calls freezeStaticMatrices before the renderer ever sees
+    // the group, and that clears matrixAutoUpdate. Without an explicit
+    // recompose the new local position never reaches the matrix and the light
+    // keeps lighting the spot it used to occupy.
+    const scene = new THREE.Scene();
+    const group = new THREE.Group();
+    group.position.set(100, 5, -40);
+    const light = new THREE.PointLight(0x86b4ff, 9, 24, 2);
+    light.position.set(2, 6, 3);
+    group.add(light);
+    scene.add(group);
+    freezeStaticMatrices(group);
+    expect(light.matrixAutoUpdate).toBe(false);
+
+    reparentStrandedLightsToScene(scene, group);
+    scene.updateMatrixWorld(true);
+
+    expect(light.getWorldPosition(new THREE.Vector3()).toArray()).toEqual([102, 11, -37]);
+  });
+
+  it('reparents every attached zone feature the same mechanical way', () => {
+    // The rule is applied at the two attach points, not left to each builder:
+    // a feature builder that parents a glow into its own group must not be able
+    // to reintroduce the stall.
+    const renderer = rendererSource();
+    expect(renderer).toContain('reparentStrandedLightsToScene(this.scene, view.group);');
+    expect(renderer).toContain('reparentStrandedLightsToScene(this.scene, this.jailScene.group);');
   });
 });
