@@ -370,7 +370,10 @@ export interface WocMarketDb {
     side: 'buyer' | 'seller',
     itemRef: ExtractRef | null,
   ): Promise<WocDirectedOfferRow | null>;
-  reopenDirectedOffer(realm: string, id: number): Promise<void>;
+  /** True when the row really flipped back to pending; false when the CAS
+   *  missed or the pair bound blocked it, so the converge stat never counts
+   *  a blocked no-op as progress. */
+  reopenDirectedOffer(realm: string, id: number): Promise<boolean>;
   /** Cancel iff still active with no pending/active bid and no open
    *  settlement, all checked atomically under the listing row lock. An
    *  UNEXPIRED buy-now lock over an unpaid window stamps CANCEL-INTENT
@@ -1790,12 +1793,24 @@ export class WocMarketService {
       // from the durable truth. The seller-side quarantine and the parked
       // copy are the escrow arms' own business, unchanged.
       if (throwProvedRollback(err)) {
-        await this.deps.db.reopenDirectedOffer(this.cfg.realm, offerId);
+        try {
+          await this.deps.db.reopenDirectedOffer(this.cfg.realm, offerId);
+        } catch {
+          // A reopen that fails in transport (pool timeout, reset) must never
+          // REPLACE the escrow root cause below: the row simply stays
+          // accepted-and-unstamped and the converge arm settles it from
+          // durable truth, so swallowing here loses nothing.
+        }
       }
       throw err;
     }
     if (!created.ok) {
-      await this.deps.db.reopenDirectedOffer(this.cfg.realm, offerId);
+      try {
+        await this.deps.db.reopenDirectedOffer(this.cfg.realm, offerId);
+      } catch {
+        // Same rationale: the typed refusal is the caller-facing truth, and
+        // the converge arm recovers the still-accepted row.
+      }
       return created;
     }
     // No post-acceptance stamp: the escrow transaction stamped listing_id
@@ -2728,12 +2743,11 @@ export class WocMarketService {
     let advanced = 0;
     for (const offer of due) {
       try {
-        if (offer.expiresAtMs <= nowMs) {
-          await this.deps.db.expireDirectedOfferIfUnstamped(this.cfg.realm, offer.id);
-        } else {
-          await this.deps.db.reopenDirectedOffer(this.cfg.realm, offer.id);
-        }
-        advanced++;
+        const moved =
+          offer.expiresAtMs <= nowMs
+            ? await this.deps.db.expireDirectedOfferIfUnstamped(this.cfg.realm, offer.id)
+            : await this.deps.db.reopenDirectedOffer(this.cfg.realm, offer.id);
+        if (moved) advanced++;
       } catch (err) {
         this.sweepError('convergedOffers', err);
       }

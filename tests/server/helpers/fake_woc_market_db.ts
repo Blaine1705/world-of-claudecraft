@@ -516,9 +516,11 @@ export class FakeWocMarketDb implements WocMarketDb {
     return { ...row };
   }
 
-  async reopenDirectedOffer(realm: string, id: number): Promise<void> {
+  async reopenDirectedOffer(realm: string, id: number): Promise<boolean> {
     const row = this.offers.get(id);
-    if (!row || row.realm !== realm || row.status !== 'accepted' || row.listingId !== null) return;
+    if (!row || row.realm !== realm || row.status !== 'accepted' || row.listingId !== null) {
+      return false;
+    }
     // The pair-bound guard: a reopen is an insert into the pair-pending
     // unique index, and a fresh offer may occupy the pair; the blocked
     // reopen NO-OPS and the converge arm expires the row at its TTL.
@@ -530,11 +532,12 @@ export class FakeWocMarketDb implements WocMarketDb {
         o.buyerAccount === row.buyerAccount &&
         o.sellerAccount === row.sellerAccount
       ) {
-        return;
+        return false;
       }
     }
     row.status = 'pending';
     this.offerUpdatedMs.set(id, this.now());
+    return true;
   }
 
   async expireDueDirectedOffers(realm: string, nowMs: number, limit: number): Promise<number> {

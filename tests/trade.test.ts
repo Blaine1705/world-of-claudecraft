@@ -1014,6 +1014,40 @@ describe('trade module (direct, no Sim)', () => {
     }
   });
 
+  it('fires the quest hook once per distinct item id on transfer, not per staged slot', () => {
+    // The recompute cadence is the pre-preview contract: per-copy staging can
+    // split one id across several slots, and a per-slot fire multiplied the
+    // whole-log quest recompute (the hook recomputes everything, so the call
+    // COUNT is the only observable). Staging itself is a preview: no fire.
+    const instance = { signer: 'Ayla' };
+    const { ctx, players } = makeInstancedTradeCtx(
+      [
+        { itemId: 'wolf_fang', count: 1 },
+        { itemId: 'wolf_fang', count: 1, instance },
+        { itemId: 'baked_bread', count: 1 },
+      ],
+      [],
+    );
+    let fired = 0;
+    (ctx as any).onInventoryChangedForQuests = () => fired++;
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    tradeMod.tradeSetOffer(
+      ctx,
+      [
+        { itemId: 'wolf_fang', count: 2 },
+        { itemId: 'baked_bread', count: 1 },
+      ],
+      0,
+      1,
+    );
+    expect(fired, 'staging is a preview, not an inventory change').toBe(0);
+    tradeMod.tradeConfirm(ctx, 1);
+    tradeMod.tradeConfirm(ctx, 2);
+    expect(players.get(2).inventory).toHaveLength(3);
+    expect(fired, 'two distinct ids across three staged slots').toBe(2);
+  });
+
   it('updateTradesAndInvites expires stale invites and cancels drifted trades', () => {
     const h = makeTradeCtx();
     h.addPlayer(1, 'Ayla', 0, 0);

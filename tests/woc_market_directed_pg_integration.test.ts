@@ -730,6 +730,34 @@ describeDb('woc market directed rail against real Postgres', () => {
       });
       expect(second, 'the unique index answers typed').toBe('offer_pending');
     });
+
+    it('a reopen NO-OPS while a fresh pending offer occupies the pair, then lands once it frees', async () => {
+      // The conditional UPDATE's own behavior in real SQL (the service-level
+      // arc is proven against the fake; this is what keeps the fake honest):
+      // a blocked reopen touches nothing and reports so, a freed pair
+      // reopens, and the CAS refuses the now-pending row on a re-call.
+      const realm = 'directed-reopen-pair';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const stuck = await seedOffer(realm, seller, buyer, {
+        status: 'accepted',
+        buyerAccepted: true,
+        sellerAccepted: true,
+      });
+      const fresh = await seedOffer(realm, seller, buyer, { status: 'pending' });
+      expect(await marketDb.reopenDirectedOffer(realm, stuck), 'the occupied pair blocks').toBe(
+        false,
+      );
+      expect((await offerRow(stuck)).status).toBe('accepted');
+      await pool.query(`UPDATE woc_market_directed_offers SET status = 'expired' WHERE id = $1`, [
+        fresh,
+      ]);
+      expect(await marketDb.reopenDirectedOffer(realm, stuck), 'the freed pair reopens').toBe(true);
+      expect((await offerRow(stuck)).status).toBe('pending');
+      expect(await marketDb.reopenDirectedOffer(realm, stuck), 'the CAS refuses pending').toBe(
+        false,
+      );
+    });
   });
 
   describe('the offer-expiry sweep against a concurrent stamp, in real SQL', () => {

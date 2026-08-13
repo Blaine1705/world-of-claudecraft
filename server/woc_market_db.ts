@@ -675,10 +675,17 @@ CREATE INDEX IF NOT EXISTS woc_market_offers_accepted_unstamped
 -- ran before the bound (duplicate pending pairs would fail the unique index
 -- build and with it the whole boot): all but the newest pending offer per
 -- pair expire, unbatched like the open2 repair (safe pre-enable; the first
--- populated-table repair must batch). Idempotent: zero rows once the index
--- rules.
+-- populated-table repair must batch). Gated on the index's own validity,
+-- open2's one-time pseudoconstant shape: the planner emits a one-time
+-- filter, so a healthy boot (index already built) never executes the scan,
+-- and dropping the index re-arms the repair. Idempotent either way: zero
+-- rows once the index rules.
 UPDATE woc_market_directed_offers o SET status = 'expired', updated_at = now()
- WHERE o.status = 'pending' AND EXISTS (
+ WHERE NOT EXISTS (
+     SELECT 1 FROM pg_index i
+      WHERE i.indexrelid = to_regclass('woc_market_offers_pair_pending')
+        AND i.indisvalid)
+   AND o.status = 'pending' AND EXISTS (
    SELECT 1 FROM woc_market_directed_offers n
     WHERE n.realm = o.realm AND n.buyer_account = o.buyer_account
       AND n.seller_account = o.seller_account AND n.status = 'pending' AND n.id > o.id);
@@ -1601,7 +1608,7 @@ export class PgWocMarketDb implements WocMarketDb {
     return res.rows[0] ? toOffer(res.rows[0]) : null;
   }
 
-  async reopenDirectedOffer(realm: string, id: number): Promise<void> {
+  async reopenDirectedOffer(realm: string, id: number): Promise<boolean> {
     // listing_id IS NULL is the safety: an offer that genuinely became a listing
     // must never be reopened, or the item could be escrowed a second time.
     // The NOT EXISTS arm is the pair-bound guard: flipping to 'pending' is an
@@ -1614,7 +1621,7 @@ export class PgWocMarketDb implements WocMarketDb {
     // statement's subquery snapshot and its index write still raises 23505,
     // which means exactly "the pair is occupied", the same no-op.
     try {
-      await this.pool.query(
+      const res = await this.pool.query(
         `UPDATE woc_market_directed_offers o
             SET status = 'pending', updated_at = now()
           WHERE o.realm = $1 AND o.id = $2 AND o.status = 'accepted' AND o.listing_id IS NULL
@@ -1624,8 +1631,14 @@ export class PgWocMarketDb implements WocMarketDb {
                  AND p.seller_account = o.seller_account AND p.status = 'pending')`,
         [realm, id],
       );
+      return (res.rowCount ?? 0) > 0;
     } catch (err) {
-      if ((err as { code?: string }).code !== '23505') throw err;
+      // Keyed on the CONSTRAINT, not the SQLSTATE alone: this catch is a
+      // silent no-op, so a future second unique index on this table must not
+      // have its violations swallowed as "the pair is occupied".
+      const pg = err as { code?: string; constraint?: string };
+      if (pg.code !== '23505' || pg.constraint !== 'woc_market_offers_pair_pending') throw err;
+      return false;
     }
   }
 

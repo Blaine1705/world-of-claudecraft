@@ -321,7 +321,17 @@ describe('a disabled send button always says WHY', () => {
     expect(m.block, 'an empty other side must not hide the price field').toBeNull();
   });
 
-  it('demands EXACTLY one eligible item on the table, and pins that copy (H10)', () => {
+  it('keeps an ALL-ineligible multi-slot table on the await hint, never one_item', () => {
+    // Ladder precedence pin: the whole-table one_item rule made these two
+    // arms overlap (two staged slots now satisfies the one_item predicate),
+    // and only arm ORDER keeps a table with nothing sellable on the await
+    // message, which is the right one (the ineligibleNote carries the WHY).
+    const m = buildWocTradeModel(input({ theirStaged: [slot(QUEST.id), slot(QUEST.id)] }));
+    expect(m.canSend).toBe(false);
+    expect(m.sendHint).toBe('hudChrome.trade.woc.hintAwaitTheirItems');
+  });
+
+  it('demands EXACTLY one item on the whole table, eligible or not, and pins that copy (H10)', () => {
     // The offer fingerprints one copy at creation and the server refuses
     // acceptance of any other, so a table with several eligible items is
     // ambiguous about which one the price buys. Silently pinning the first
@@ -486,6 +496,18 @@ describe('a staged slot resolves to its INVENTORY index', () => {
     };
     const both: InvSlot[] = [{ itemId: EPIC.id, count: 1 }, enchanted];
     expect(inventoryIndexOfStaged(both, enchanted)).toBe(1);
+    expect(inventoryIndexOfStaged(both, slot(EPIC.id))).toBe(0);
+  });
+
+  it('does not resolve a staged CRAFTED copy to its unmarked twin at a lower index', () => {
+    // Copy identity is the itemCopyPin triple (id, instance, crafted marker).
+    // Matching on id plus instance alone resolved a staged plain-but-crafted
+    // copy to the unmarked twin sitting earlier in the bags, and the server's
+    // pin digest then refused the whole sale as item_mismatch until the
+    // player rearranged their bags.
+    const crafted: InvSlot = { itemId: EPIC.id, count: 1, craftedRecipeId: 'recipe_epic' };
+    const both: InvSlot[] = [{ itemId: EPIC.id, count: 1 }, crafted];
+    expect(inventoryIndexOfStaged(both, crafted)).toBe(1);
     expect(inventoryIndexOfStaged(both, slot(EPIC.id))).toBe(0);
   });
 });

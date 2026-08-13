@@ -3723,8 +3723,11 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     expect(second.ok, 'the accepted first offer frees the pair slot').toBe(true);
     await h.db.reopenDirectedOffer(REALM, first.offer.id);
     expect((await h.db.directedOfferById(REALM, first.offer.id))?.status).toBe('accepted');
-    // Past the TTL the converge arm expires the blocked row; the fresh deal
-    // stands untouched.
+    // Past the TTL the converge arm expires the blocked row (the pending
+    // sweep cannot see an 'accepted' row, so only converge can have done
+    // it). The same clock jump also passes the FRESH offer's own pending
+    // TTL, so the ordinary expiry arm takes that one in the same pass:
+    // both read 'expired', each by its own arm.
     h.setNow(first.offer.expiresAtMs + (WOC_MARKET_OFFER_CONVERGE_SECONDS + 1) * 1000);
     await h.service.sweepPass();
     expect((await h.db.directedOfferById(REALM, first.offer.id))?.status).toBe('expired');

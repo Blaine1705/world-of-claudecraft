@@ -16,7 +16,7 @@
 
 import { exchangeHardLock, exchangeItemCategory } from '../sim/exchange_eligibility';
 import { itemInstancePayloadsEqual } from '../sim/item_instance_merge';
-import type { InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
+import type { InvSlot, ItemDef } from '../sim/types';
 import type { TranslationKey } from './i18n.catalog';
 import { overWalletBalance } from './woc_affordable_core';
 
@@ -267,21 +267,23 @@ export function wocTradableSlot(slot: InvSlot, items: Readonly<Record<string, It
  * reads as index 0, which extracts whatever happens to sit first in the bags,
  * and the mismatch refuses the whole sale.
  *
- * Matched on id AND per-instance payload through the sim's ORDER-INDEPENDENT
- * structural comparator, never a JSON.stringify key: since staged slots carry
- * real payloads (the per-copy staging), this comparison decides whether an
- * instanced directed sale can resolve at all, and stringify would silently
- * depend on key insertion order surviving every clone and wire hop. Returns
- * -1 when the slot cannot be found, which the caller must treat as "do not
- * send", never as index 0.
+ * Matched on the FULL copy identity itemCopyPin fingerprints: id, the
+ * crafted-recipe marker, and the per-instance payload through the sim's
+ * ORDER-INDEPENDENT structural comparator, never a JSON.stringify key. Since
+ * staged slots carry real payloads (the per-copy staging), this comparison
+ * decides whether an instanced directed sale can resolve at all, and
+ * stringify would silently depend on key insertion order surviving every
+ * clone and wire hop; dropping craftedRecipeId would resolve a staged
+ * crafted copy to an unmarked twin at a lower bag index and refuse the sale
+ * as item_mismatch. Returns -1 when the slot cannot be found, which the
+ * caller must treat as "do not send", never as index 0.
  */
 export function inventoryIndexOfStaged(inventory: readonly InvSlot[], staged: InvSlot): number {
   return inventory.findIndex(
     (s) =>
       s.itemId === staged.itemId &&
-      (s.instance === undefined) === (staged.instance === undefined) &&
-      (s.instance === undefined ||
-        itemInstancePayloadsEqual(s.instance, staged.instance as ItemInstancePayload)),
+      s.craftedRecipeId === staged.craftedRecipeId &&
+      itemInstancePayloadsEqual(s.instance, staged.instance),
   );
 }
 

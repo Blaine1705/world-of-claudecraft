@@ -263,7 +263,7 @@ describe('the refusal-to-wire mapping', () => {
     ]);
   });
 
-  it('refuses an offer creation with NO item id at the schema, before the service', async () => {
+  it('gates offer creation at the schema: no item id and oversized payloads refuse before the service, a realistic heavy payload reaches it', async () => {
     // The agreed-item identity became REQUIRED wire contract (H10): an old
     // cached client posting the pre-pin body must get a 400, never an offer
     // with nothing pinned (which was the bait-and-switch surface itself).
