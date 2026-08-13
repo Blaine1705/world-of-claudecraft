@@ -15,7 +15,8 @@
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
 import { exchangeHardLock, exchangeItemCategory } from '../sim/exchange_eligibility';
-import type { InvSlot, ItemDef } from '../sim/types';
+import { itemInstancePayloadsEqual } from '../sim/item_instance_merge';
+import type { InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { TranslationKey } from './i18n.catalog';
 import { overWalletBalance } from './woc_affordable_core';
 
@@ -266,15 +267,22 @@ export function wocTradableSlot(slot: InvSlot, items: Readonly<Record<string, It
  * reads as index 0, which extracts whatever happens to sit first in the bags,
  * and the mismatch refuses the whole sale.
  *
- * Matched on id AND per-instance payload, canonically, so an enchanted or
- * signed copy is never confused with a plain one sitting in the same bags.
- * Returns -1 when the slot cannot be found, which the caller must treat as
- * "do not send", never as index 0.
+ * Matched on id AND per-instance payload through the sim's ORDER-INDEPENDENT
+ * structural comparator, never a JSON.stringify key: since staged slots carry
+ * real payloads (the per-copy staging), this comparison decides whether an
+ * instanced directed sale can resolve at all, and stringify would silently
+ * depend on key insertion order surviving every clone and wire hop. Returns
+ * -1 when the slot cannot be found, which the caller must treat as "do not
+ * send", never as index 0.
  */
 export function inventoryIndexOfStaged(inventory: readonly InvSlot[], staged: InvSlot): number {
-  const key = (s: InvSlot): string => JSON.stringify(s.instance ?? null);
-  const want = key(staged);
-  return inventory.findIndex((s) => s.itemId === staged.itemId && key(s) === want);
+  return inventory.findIndex(
+    (s) =>
+      s.itemId === staged.itemId &&
+      (s.instance === undefined) === (staged.instance === undefined) &&
+      (s.instance === undefined ||
+        itemInstancePayloadsEqual(s.instance, staged.instance as ItemInstancePayload)),
+  );
 }
 
 /** The trade window's $WOC arm, as a function of its inputs. */
@@ -318,13 +326,13 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
       : eligible.length === 0
         ? 'await_their_items'
         : // An offer pins EXACTLY ONE copy (H10: the server refuses acceptance
-          // of any copy but the pinned one), so a table holding several
-          // eligible items, or one STACK of several units, is ambiguous about
-          // what the price buys: acceptance escrows exactly one unit, and a
-          // buyer looking at a stack of three would pay the stack price for
-          // one. Silently pinning the first would be the bait-and-switch
-          // surface inverted.
-          eligible.length > 1 || (eligible[0]?.count ?? 1) !== 1
+          // of any copy but the pinned one), so the WHOLE table must hold
+          // exactly one single-unit slot: a second eligible item, a stack of
+          // several units, or even an ineligible companion beside the real
+          // one is ambiguous about what the price buys (the buyer sees a
+          // full table while the deal covers one copy). Silently pinning
+          // one slot would be the bait-and-switch surface inverted.
+          input.theirStaged.length > 1 || (eligible[0]?.count ?? 1) !== 1
           ? 'one_item'
           : input.usdCents === null || input.usdCents <= 0
             ? 'enter_price'
@@ -379,7 +387,10 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
     // A standing offer replaces the form: you cannot send a second one over it.
     canSend: wocMode && hint === null && input.pendingOffer === null,
     sendHint: wocMode && hint !== null ? SEND_HINT_KEYS[hint] : null,
-    agreedItem: eligible.length === 1 && eligible[0].count === 1 ? eligible[0] : null,
+    agreedItem:
+      input.theirStaged.length === 1 && eligible.length === 1 && eligible[0].count === 1
+        ? eligible[0]
+        : null,
     statusKey:
       input.pendingOffer === null
         ? null

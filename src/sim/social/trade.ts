@@ -222,15 +222,26 @@ export function tradeSetOffer(
   // entirely when none is unbound). The def-level quest/soulbound silent drop
   // above stays exactly as-is.
   let boundDenied = false;
+  // The preview can only enrich units the INVENTORY ARRAY attributes; a
+  // decoupled hub (a ctx that models counts off meta.inventory, the
+  // boundCount contract above) validates a count the array cannot cover, and
+  // the remainder must keep the old id-plus-count shape rather than vanish
+  // from the offer the count checks just proved valid.
+  const stagedLine = (itemId: string, count: number): InvSlot[] => {
+    const staged = stagedOfferSlots(r.meta, itemId, count);
+    const attributed = staged.reduce((n, s) => n + s.count, 0);
+    if (attributed < count) staged.push({ itemId, count: count - attributed });
+    return staged;
+  };
   for (const [itemId, count] of merged) {
     if (ctx.countItem(itemId, r.meta.entityId) < count) continue;
     const unbound = offerableCount(ctx, r.meta, itemId);
     if (unbound < count) {
       boundDenied = true;
-      if (unbound > 0) cleaned.push(...stagedOfferSlots(r.meta, itemId, unbound));
+      if (unbound > 0) cleaned.push(...stagedLine(itemId, unbound));
       continue;
     }
-    cleaned.push(...stagedOfferSlots(r.meta, itemId, count));
+    cleaned.push(...stagedLine(itemId, count));
   }
   if (boundDenied) ctx.error(r.meta.entityId, 'That item is bound and cannot be traded.');
   const offer = {
@@ -364,10 +375,19 @@ function removeOffer(ctx: SimContext, items: InvSlot[], fromPid: number): Pendin
           ),
         );
       }
-      // ONE quest-hook fire per staged line, the pre-preview cadence.
-      ctx.onInventoryChangedForQuests?.(meta);
     }
     grants.push({ itemId: s.itemId, units });
+  }
+  // ONE quest-hook fire per distinct ITEM ID, the pre-preview cadence
+  // exactly (the old merged offer held one line per id; per-copy staging can
+  // split an id across slots, and firing per SLOT multiplied the recompute).
+  if (meta) {
+    const fired = new Set<string>();
+    for (const s of items) {
+      if (fired.has(s.itemId)) continue;
+      fired.add(s.itemId);
+      ctx.onInventoryChangedForQuests?.(meta);
+    }
   }
   return grants;
 }

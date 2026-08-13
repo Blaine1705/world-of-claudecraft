@@ -13,6 +13,7 @@ import type { PoolClient } from 'pg';
 import { Pool } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { ADMIN_GUILDS_SCHEMA } from '../server/admin_guilds_schema';
+import { GENERAL_CHAT_QUOTA_SCHEMA } from '../server/general_chat_quota_schema';
 import {
   GUILD_NAME_ADVISORY_LOCK_SQL,
   GUILD_NAME_COLLISION_SQL,
@@ -339,6 +340,13 @@ describeDb('admin guild production SQL (real Postgres)', () => {
       await client.query(db.DAILY_REWARD_EXCLUDED_ACCOUNTS_VIEW_SQL);
       await client.query(social.SOCIAL_SCHEMA);
       await client.query(ADMIN_GUILDS_SCHEMA);
+      // accountDetail LEFT JOINs the general-chat quota table since the
+      // account-quota work; this rig hand-picks its boot modules, so the
+      // sibling schema rides along (its deps, accounts and
+      // account_moderation_actions, come from db.SCHEMA above) or the read
+      // fails on a missing relation: an env-gated red CI never sees,
+      // inherited by the branch from the release tip and repaired here.
+      await client.query(GENERAL_CHAT_QUOTA_SCHEMA);
 
       const admin = await client.query(
         'INSERT INTO accounts (username, password_hash) VALUES ($1, $2) RETURNING id',

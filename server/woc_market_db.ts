@@ -670,7 +670,18 @@ CREATE INDEX IF NOT EXISTS woc_market_offers_accepted_unstamped
 -- with one live deal per pair, each hold needs a FRESH offer from the buyer
 -- after the last one resolved. The database is the authority (two concurrent
 -- creates race the service pre-read); the insert maps 23505 to the typed
--- already_pending. Boot DDL, pre-enable-empty rationale as above.
+-- offer_pending. Boot DDL, pre-enable-empty rationale as above; the repair
+-- UPDATE below it exists for NON-empty developer and staging databases that
+-- ran before the bound (duplicate pending pairs would fail the unique index
+-- build and with it the whole boot): all but the newest pending offer per
+-- pair expire, unbatched like the open2 repair (safe pre-enable; the first
+-- populated-table repair must batch). Idempotent: zero rows once the index
+-- rules.
+UPDATE woc_market_directed_offers o SET status = 'expired', updated_at = now()
+ WHERE o.status = 'pending' AND EXISTS (
+   SELECT 1 FROM woc_market_directed_offers n
+    WHERE n.realm = o.realm AND n.buyer_account = o.buyer_account
+      AND n.seller_account = o.seller_account AND n.status = 'pending' AND n.id > o.id);
 CREATE UNIQUE INDEX IF NOT EXISTS woc_market_offers_pair_pending
   ON woc_market_directed_offers(realm, buyer_account, seller_account)
   WHERE status = 'pending';
@@ -1593,12 +1604,29 @@ export class PgWocMarketDb implements WocMarketDb {
   async reopenDirectedOffer(realm: string, id: number): Promise<void> {
     // listing_id IS NULL is the safety: an offer that genuinely became a listing
     // must never be reopened, or the item could be escrowed a second time.
-    await this.pool.query(
-      `UPDATE woc_market_directed_offers
-          SET status = 'pending', updated_at = now()
-        WHERE realm = $1 AND id = $2 AND status = 'accepted' AND listing_id IS NULL`,
-      [realm, id],
-    );
+    // The NOT EXISTS arm is the pair-bound guard: flipping to 'pending' is an
+    // INSERT into the pair-pending unique index, and the buyer may have opened
+    // a fresh offer to the same seller while this one sat 'accepted' (its
+    // pair slot reads free). A blocked reopen deliberately NO-OPS: the row
+    // stays accepted-and-unstamped, and the converge arm expires it once its
+    // TTL passes (at most 600s from creation), so nothing strands. The catch
+    // is the race belt: a fresh pair offer committing between this
+    // statement's subquery snapshot and its index write still raises 23505,
+    // which means exactly "the pair is occupied", the same no-op.
+    try {
+      await this.pool.query(
+        `UPDATE woc_market_directed_offers o
+            SET status = 'pending', updated_at = now()
+          WHERE o.realm = $1 AND o.id = $2 AND o.status = 'accepted' AND o.listing_id IS NULL
+            AND NOT EXISTS (
+              SELECT 1 FROM woc_market_directed_offers p
+               WHERE p.realm = o.realm AND p.buyer_account = o.buyer_account
+                 AND p.seller_account = o.seller_account AND p.status = 'pending')`,
+        [realm, id],
+      );
+    } catch (err) {
+      if ((err as { code?: string }).code !== '23505') throw err;
+    }
   }
 
   async expireDueDirectedOffers(realm: string, nowMs: number, limit: number): Promise<number> {

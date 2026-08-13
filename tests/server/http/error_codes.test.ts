@@ -113,6 +113,8 @@ const EXPECTED_CODES = [
   'woc_market.not_eligible',
   'woc_market.invalid_params',
   'woc_market.signature_reused',
+  'woc_market.item_mismatch',
+  'woc_market.offer_pending',
   'deeds.invalid_input',
   'steam.disabled',
   'steam.invalid_ticket',

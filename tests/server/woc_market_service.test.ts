@@ -3705,6 +3705,34 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     return out.listing;
   }
 
+  it('a blocked reopen NO-OPS when a fresh offer occupies the pair, and the converge arm expires it', async () => {
+    // The qa round's blocker: flipping an accepted row back to pending is an
+    // INSERT into the pair-pending unique index, and the buyer may have
+    // opened a fresh deal while the old one sat accepted. The reopen must
+    // no-op (never a 500 over the typed refusal, never a lost root-cause
+    // trace), and the stuck row expires through the converge arm at its TTL.
+    const h = stocked();
+    const first = await h.service.createDirectedOffer(offerArgs());
+    if (!first.ok) throw new Error('offer refused');
+    await h.service.acceptDirectedOffer(BUYER_A, first.offer.id, null, CHAR_A);
+    // Drive the row into accepted-and-unstamped directly (the state every
+    // reopen caller sees), then occupy the pair with a fresh offer.
+    const claimed = await h.db.resolveDirectedOffer(REALM, first.offer.id, 'accepted');
+    expect(claimed).not.toBeNull();
+    const second = await h.service.createDirectedOffer(offerArgs({ usdCents: 6000 }));
+    expect(second.ok, 'the accepted first offer frees the pair slot').toBe(true);
+    await h.db.reopenDirectedOffer(REALM, first.offer.id);
+    expect((await h.db.directedOfferById(REALM, first.offer.id))?.status).toBe('accepted');
+    // Past the TTL the converge arm expires the blocked row; the fresh deal
+    // stands untouched.
+    h.setNow(first.offer.expiresAtMs + (WOC_MARKET_OFFER_CONVERGE_SECONDS + 1) * 1000);
+    await h.service.sweepPass();
+    expect((await h.db.directedOfferById(REALM, first.offer.id))?.status).toBe('expired');
+    if (second.ok) {
+      expect((await h.db.directedOfferById(REALM, second.offer.id))?.status).toBe('expired');
+    }
+  });
+
   it('spares the strike when the recorded refusal is the exempt service outage class', async () => {
     // The public rail's abandon recorder exempts exactly this class from even
     // a cooldown; a directed buyer whose payment died in a service outage

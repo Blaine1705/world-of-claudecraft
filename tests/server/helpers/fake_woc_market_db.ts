@@ -518,10 +518,23 @@ export class FakeWocMarketDb implements WocMarketDb {
 
   async reopenDirectedOffer(realm: string, id: number): Promise<void> {
     const row = this.offers.get(id);
-    if (row && row.realm === realm && row.status === 'accepted' && row.listingId === null) {
-      row.status = 'pending';
-      this.offerUpdatedMs.set(id, this.now());
+    if (!row || row.realm !== realm || row.status !== 'accepted' || row.listingId !== null) return;
+    // The pair-bound guard: a reopen is an insert into the pair-pending
+    // unique index, and a fresh offer may occupy the pair; the blocked
+    // reopen NO-OPS and the converge arm expires the row at its TTL.
+    for (const o of this.offers.values()) {
+      if (
+        o.id !== id &&
+        o.realm === realm &&
+        o.status === 'pending' &&
+        o.buyerAccount === row.buyerAccount &&
+        o.sellerAccount === row.sellerAccount
+      ) {
+        return;
+      }
     }
+    row.status = 'pending';
+    this.offerUpdatedMs.set(id, this.now());
   }
 
   async expireDueDirectedOffers(realm: string, nowMs: number, limit: number): Promise<number> {

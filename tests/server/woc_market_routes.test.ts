@@ -302,6 +302,34 @@ describe('the refusal-to-wire mapping', () => {
       status: 400,
     });
     expect(reached).toBe(0);
+    // The positive direction: a realistic worst-case payload (a rift piece
+    // with rolled stats, an enchant, a signer, charges, and provenance) sits
+    // WELL under the bound and must reach the service, or a legitimate
+    // listing refuses as invalid input.
+    const heavy = {
+      signer: 'Aurelia the Unbroken',
+      craftedBy: 'Aurelia the Unbroken',
+      charges: { rift_surge: 3, ember_ward: 2 },
+      enchant: { id: 'ench_greater_flame_ward', power: 42 },
+      rolled: { quality: 'epic', masterwork: true, stats: { str: 18, sta: 22, crit: 7 } },
+      rift: { tier: 4, floor: 12, seed: 991_223, forge: { level: 3, sockets: ['ruby', 'ruby'] } },
+      bindOnTrade: false,
+    };
+    expect(JSON.stringify(heavy).length).toBeLessThan(2048);
+    const ok = fakeCtx({
+      method: 'POST',
+      url: '/api/woc-market/offers',
+      account: { accountId: VIEWER, scope: 'full' },
+      body: {
+        characterId: 1,
+        sellerCharacterName: 'Selara',
+        usdCents: 5000,
+        itemId: 'crown_of_embers',
+        itemInstance: heavy,
+      },
+    });
+    await expect(handlerFor('POST', '/api/woc-market/offers')(ok)).rejects.toThrow('unreachable');
+    expect(reached).toBe(1);
   });
 
   it('surfaces a service refusal through a real handler as that status and code', async () => {

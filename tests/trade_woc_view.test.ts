@@ -341,11 +341,13 @@ describe('a disabled send button always says WHY', () => {
     const one = buildWocTradeModel(input({ theirStaged: [pinned] }));
     expect(one.canSend).toBe(true);
     expect(one.agreedItem).toBe(pinned);
-    // Ineligible extras do not make the table ambiguous: the quest item can
-    // never be part of the deal, so the one eligible copy still pins.
+    // An ineligible COMPANION blocks the send too (the qa round's widening):
+    // the buyer sees a full table while the price would pin one copy, and
+    // that visual ambiguity is the same class as two eligible slots.
     const mixed = buildWocTradeModel(input({ theirStaged: [pinned, slot(QUEST.id)] }));
-    expect(mixed.canSend).toBe(true);
-    expect(mixed.agreedItem).toBe(pinned);
+    expect(mixed.canSend).toBe(false);
+    expect(mixed.sendHint).toBe('hudChrome.trade.woc.hintOneItem');
+    expect(mixed.agreedItem).toBeNull();
     // A single STACK is just as ambiguous as two slots: acceptance escrows
     // exactly one unit, and a buyer looking at a stack of three would pay
     // the stack price for one.
@@ -405,7 +407,12 @@ describe('sending is gated on a real, positive price', () => {
     const m = buildWocTradeModel(input({ theirStaged: [slot(EPIC.id), slot(QUEST.id)] }));
     expect(m.eligible.map((s) => s.itemId)).toEqual([EPIC.id]);
     expect(m.ineligible.map((s) => s.itemId)).toEqual([QUEST.id]);
-    expect(m.canSend, 'a partly-eligible stage can still send the eligible part').toBe(true);
+    // Since the whole-table one-item rule (the qa round), a partly-eligible
+    // stage no longer sends: the offer pins ONE copy, and a companion on the
+    // table (eligible or not) leaves the buyer looking at more than the deal
+    // covers. The split above still drives the window's which-is-which copy.
+    expect(m.canSend).toBe(false);
+    expect(m.sendHint).toBe('hudChrome.trade.woc.hintOneItem');
   });
 });
 
