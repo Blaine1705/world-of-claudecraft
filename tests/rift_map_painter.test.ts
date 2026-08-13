@@ -749,6 +749,30 @@ describe('RiftMapPainter', () => {
     expect(ctx.measureText).not.toHaveBeenCalled();
   });
 
+  it('drops localized title sprites once and re-latches the translated title', () => {
+    const created = installBrowser();
+    const ctx = fakeContext();
+    let title = 'The Ember Test';
+    const painter = new RiftMapPainter(
+      writers,
+      () => 'class',
+      () => title,
+      markerArt,
+    );
+
+    painter.paintWorldMap(ctx as unknown as CanvasRenderingContext2D, world(), 560);
+    const canvasCountAfterFirstTitle = created.length;
+    painter.paintWorldMap(ctx as unknown as CanvasRenderingContext2D, world(), 560);
+    expect(created).toHaveLength(canvasCountAfterFirstTitle);
+
+    title = 'Prueba de la Ascua';
+    painter.relocalize();
+    painter.paintWorldMap(ctx as unknown as CanvasRenderingContext2D, world(), 560);
+    expect(created).toHaveLength(canvasCountAfterFirstTitle + 1);
+    painter.paintWorldMap(ctx as unknown as CanvasRenderingContext2D, world(), 560);
+    expect(created).toHaveLength(canvasCountAfterFirstTitle + 1);
+  });
+
   it('returns the already-painted reusable M-map model for zero-scan accessibility output', () => {
     installBrowser();
     const ctx = fakeContext();

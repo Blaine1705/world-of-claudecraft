@@ -1193,7 +1193,7 @@ describe('map marker painted art', () => {
     expect(canvases).toHaveLength(5);
   });
 
-  it('creates, preloads, and shares one Hud-owned marker cache across both painters', () => {
+  it('creates, preloads, and shares one Hud-owned marker cache across every painter', () => {
     const hud = readFileSync(path.join(repoRoot, 'src/ui/hud.ts'), 'utf8');
     expect(hud.match(/createMapMarkerArt\(document\)/g)).toHaveLength(1);
     expect(hud.match(/this\.mapMarkerArt\.preload\(\);/g)).toHaveLength(1);
@@ -1203,5 +1203,14 @@ describe('map marker painted art', () => {
     expect(hud).toMatch(
       /new MinimapPainter\([\s\S]*?this\.mapMarkerArt,\s*this\.mapMarkerProfile,\s*\)/,
     );
+    expect(hud).toMatch(
+      /new DelveMapPainter\(\s*this\.writerFacet,\s*classCss,\s*this\.mapMarkerArt,\s*this\.mapMarkerProfile,\s*\)/,
+    );
+    expect(hud).toMatch(
+      /new RiftMapPainter\([\s\S]*?this\.mapMarkerArt,\s*this\.mapMarkerProfile,\s*\)/,
+    );
+    expect(hud).toContain("classes.contains('mobile-touch')");
+    expect(hud).toContain("classes.contains('hud-mobile-compact')");
+    expect(hud).toContain("classes.contains('hud-mobile-landscape')");
   });
 });

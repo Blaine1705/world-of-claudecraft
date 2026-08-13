@@ -14,7 +14,6 @@ beforeEach(async () => {
   await page.viewport(VIEWPORT.width, VIEWPORT.height);
   document.documentElement.style.setProperty('--app-vw', `${VIEWPORT.width}px`);
   document.documentElement.style.setProperty('--app-vh', `${VIEWPORT.height}px`);
-  document.documentElement.style.setProperty('--ui-scale', '1');
   document.body.className = 'mobile-touch game-active mobile-map-quest-open';
 });
 
@@ -51,19 +50,23 @@ function mountWindows(): { quest: HTMLElement; map: HTMLElement; canvas: HTMLCan
 }
 
 describe('mobile map and quest layout', () => {
-  it('computes two non-overlapping side-by-side windows at 844x390', () => {
-    const { quest, map, canvas } = mountWindows();
-    const questRect = quest.getBoundingClientRect();
-    const mapRect = map.getBoundingClientRect();
-    const canvasRect = canvas.getBoundingClientRect();
+  it.each([0.85, 1, 1.4])(
+    'computes two non-overlapping side-by-side windows at 844x390 and UI scale %s',
+    (uiScale) => {
+      document.documentElement.style.setProperty('--ui-scale', String(uiScale));
+      const { quest, map, canvas } = mountWindows();
+      const questRect = quest.getBoundingClientRect();
+      const mapRect = map.getBoundingClientRect();
+      const canvasRect = canvas.getBoundingClientRect();
 
-    expect(getComputedStyle(document.body).getPropertyValue('--mobile-map-rail').trim()).toBe(
-      '58px',
-    );
-    expect(questRect.width).toBeGreaterThanOrEqual(220 - EPSILON);
-    expect(questRect.width).toBeLessThanOrEqual(300 + EPSILON);
-    expect(canvasRect.width).toBeGreaterThanOrEqual(272 - EPSILON);
-    expect(questRect.right + 8).toBeLessThanOrEqual(mapRect.left + EPSILON);
-    expect(mapRect.right).toBeLessThanOrEqual(VIEWPORT.width + EPSILON);
-  });
+      expect(getComputedStyle(document.body).getPropertyValue('--mobile-map-rail').trim()).toBe(
+        '58px',
+      );
+      expect(questRect.width).toBeGreaterThanOrEqual(220 * uiScale - EPSILON);
+      expect(questRect.width).toBeLessThanOrEqual(300 * uiScale + EPSILON);
+      expect(canvasRect.width).toBeGreaterThanOrEqual(272 - EPSILON);
+      expect(questRect.right + 8).toBeLessThanOrEqual(mapRect.left + EPSILON);
+      expect(mapRect.right).toBeLessThanOrEqual(VIEWPORT.width + EPSILON);
+    },
+  );
 });
