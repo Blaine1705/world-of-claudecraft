@@ -783,6 +783,22 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
     expect(params()[0]).toEqual([REALM, 2_000, 25]);
   });
 
+  it('the stuckBonds sample orders on the INDEXED placed_at, never the age COALESCE', async () => {
+    // The COALESCE ORDER has no matching expression index, so it top-N
+    // sorted every signed pending bond in the realm per 30s refresh
+    // (measured about 4,000 buffers at 5k confirming bonds), degrading
+    // exactly during the incident the readout reports. placed_at is served
+    // ordered by the partial bond_confirming index; stuck_since stays the
+    // honest per-row age projection.
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).stuckCustodyReadout(REALM, 1_000, 20, 1_000, 2_000);
+    const sample = sql().find((t) => t.includes('AS stuck_since'));
+    expect(sample, 'the bond sample query exists').toBeDefined();
+    expect(sample).toContain('ORDER BY placed_at');
+    expect(sample).not.toContain('ORDER BY COALESCE');
+    expect(sample).toContain('COALESCE(bond_signature_at, placed_at) AS stuck_since');
+  });
+
   it('confirmingOverdueSettlements ages on updated_at with its own budget', async () => {
     const { pool, sql, params } = recordingPool();
     await new PgWocMarketDb(pool).confirmingOverdueSettlements(REALM, 1_000, 25);

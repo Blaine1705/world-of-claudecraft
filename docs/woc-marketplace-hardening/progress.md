@@ -78,12 +78,13 @@ cancel-intent bid block: entailed by the one-window bound, the converge
 belt proves it; confirm_in_flight second-signature semantics; the
 already-succeeded retry arms; the held-bond posture; the stuckBonds axis;
 the split anchors). One AMENDED: the confirming-hours no-upper-clamp
-posture is REJECTED; the knob now clamps at 720 hours with a one-time boot
-warn (a huge value silently disabled the H15 park, and past to_timestamp's
-range it 22008'd the sweep arm into silence), parse cases pinned.
+posture is REJECTED; the knob now clamps at 720 hours with a one-time
+first-read warn (a huge value silently disabled the H15 park, and past
+to_timestamp's range it 22008'd the sweep arm into silence), parse cases
+pinned.
 
 Real-SQL: all three pg suites under TEST_DATABASE_URL, 100 tests at
-session start, 103 at the final tip, zero skipped (demonstrably ran).
+session start, 104 at the final tip, zero skipped (demonstrably ran).
 
 Deep mutation pass (isolated scratch worktree, baseline 137 green), aimed
 at the windows the prior 28 spot-proofs did not cover:
@@ -196,6 +197,50 @@ Residuals accepted THIS round (do not re-raise; owners):
   come: phase 14 copy item beside the recorded confirm_failed mismatch.
 - Cancel-intent is irreversible by design (no un-stamp path); phase 14
   owns whether the seller-side marker needs an undo affordance.
+
+A THIRD fix round followed the fresh re-review of rounds one and two
+(the review-the-review rule paying out twice more; every finding applied):
+
+- BLOCKING: the review outcome arm was server-honest and client-dishonest,
+  BOTH clients rendered a review-parked payment as a completed purchase
+  (the market window toasted purchaseComplete on any ok; the trade
+  controller's SETTLING_STATES lacked 'review' so it logged settled in
+  green). 'review' joined SETTLING_STATES and the window's confirm toast
+  branches on the state; both pinned (a behavioral in-flight arm and an
+  associative toast pin).
+- BLOCKING: the signature shape check refused the trade controller's
+  devsig:<reference> arm (references themselves carry colons), so the p2p
+  settle 400'd whenever the service answered signatureRequired false. The
+  shape admits ':' (still no control characters) with a colon-bearing
+  positive route pin.
+- The advisory cooldown shortcut skipped the steal-time recording for an
+  at-cap self-steal (that window's abandon never booked, its per-listing
+  cooldown never started): the shortcut now applies only when the peek row
+  carries no recordable expired lock, pg-pinned (the fourth abandon is
+  recorded before the refusal).
+- The straddle guard compared a PREDICTED expiry; the authoritative check
+  now also compares the service-minted expiresAtMs against the lapse
+  (service-stub pinned). And the refusal got its own typed code,
+  woc_market.bond_window_closed (409, catalog leaf + five non-Latin
+  fills, REFUSAL_ERRORS 48 rows): quote_expired's copy told the player to
+  request the exact thing that had just refused and would keep refusing.
+- Coverage: the not_pending re-read's FALSE arm (superseded stays not
+  standing); stats.reviewed pinned; the stuckBonds ORDER BY placed_at
+  structurally pinned beside its sibling; the craft-deny table
+  exhaustiveness-pinned via satisfies plus a station-recipe negative arm;
+  the placeBid CAS refusal pins nothing-written; the raw ESC byte in the
+  routes fixture became its escape sequence.
+- Docs: the stale six-refusals sentence, the parkOverdueConfirming
+  docblock tense, the inert arm-order clause, disposeSoldResidueListings
+  dropped from the carve-out list (not a transaction), the boot-warn
+  wording corrected to first-read, and the resolved migration INFO noted
+  in the ledger.
+
+qa-checklist verdict READY (0 blocking; its three should-fixes are the
+stale comment, the missing ORDER BY pin, and the copy-honesty gap, all
+applied above; its nits recorded: the 2.6s busy-loop stall cost is the
+accepted price of the idle-bound retune, and the turbo.json
+noUndeclaredEnvVars warning is tree-consistent).
 
 Deferred proofs with owners: standing planner assertions for the two
 rotation indexes in the pg suite (phase 20); the p99.9 inter-statement

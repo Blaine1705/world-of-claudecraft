@@ -8726,6 +8726,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.confirm_in_flight':
     'Платеж ещё подтверждается. Повторите попытку, когда он завершится.',
   'apiError.woc_market.cancel_pending': 'Продавец отменяет этот лот.',
+  'apiError.woc_market.bond_window_closed':
+    'Эту ставку больше нельзя оплатить: окно оплаты закрылось. Сделайте ставку заново, чтобы получить новое.',
   'apiError.woc_market.claim_cooldown':
     'Вы недавно отказались от быстрой покупки. Повторите попытку позже.',
   'apiError.woc_market.buy_now_locked':

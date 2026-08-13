@@ -179,6 +179,18 @@ describe('woc_market_window: i18n and escaping discipline', () => {
     expect(code.slice(arm, arm + 200)).toContain("'hudChrome.wocMarket.settlementReview'");
   });
 
+  it('never toasts purchase-complete for a review-parked confirm outcome', () => {
+    // The outcome arm can answer state 'review' on a recorded-signature
+    // retry, and "purchase complete" for money awaiting an operator verdict
+    // is the custody lie the row label rule bans. ASSOCIATIVE: the branch
+    // must pick settlementReview, with purchaseComplete as its else.
+    const arm = code.indexOf("out.state === 'review'");
+    expect(arm, "anchor missing: out.state === 'review'").toBeGreaterThanOrEqual(0);
+    const window = code.slice(arm, arm + 300);
+    expect(window).toContain("'hudChrome.wocMarket.settlementReview'");
+    expect(window).toContain("'hudChrome.wocMarket.purchaseComplete'");
+  });
+
   it('toasts the cancel-pending outcome distinctly from a completed cancel', () => {
     // The seller's cancel on a locked window is ACCEPTED as intent; telling
     // them "Listing cancelled" while it stays live until the buyer's window

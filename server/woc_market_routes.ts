@@ -177,6 +177,7 @@ export const REFUSAL_ERRORS: Record<WocMarketRefusal, { status: number; code: Er
   buy_now_locked: { status: 409, code: 'woc_market.buy_now_locked' },
   cancel_pending: { status: 409, code: 'woc_market.cancel_pending' },
   claim_cooldown: { status: 409, code: 'woc_market.claim_cooldown' },
+  bond_window_closed: { status: 409, code: 'woc_market.bond_window_closed' },
   settlement_in_flight: { status: 409, code: 'woc_market.settlement_in_flight' },
   contended: { status: 409, code: 'woc_market.contended' },
   sale_conflict: { status: 409, code: 'woc_market.sale_conflict' },
@@ -254,11 +255,13 @@ function stringField(value: unknown, maxLen: number): string {
 
 /** A submitted transaction signature. Real Solana signatures are base58
  *  (87-88 chars); the shape bound is looser (the dev economy and its tests
- *  post plain tagged strings) but refuses anything outside safe printable
- *  characters: the recorded value is interpolated into an ops warn on the
- *  revived-signature path and forwarded to the economy service, so a
- *  newline or ANSI escape smuggled through here is a log-forging vector. */
-const SIGNATURE_SHAPE = /^[A-Za-z0-9_-]{1,256}$/;
+ *  post plain tagged strings, and the trade controller's dev-chain arm
+ *  posts devsig:<reference> where references themselves carry colons) but
+ *  refuses anything outside safe printable characters: the recorded value
+ *  is interpolated into an ops warn on the revived-signature path and
+ *  forwarded to the economy service, so a newline or ANSI escape smuggled
+ *  through here is a log-forging vector. */
+const SIGNATURE_SHAPE = /^[A-Za-z0-9_:-]{1,256}$/;
 function signatureField(value: unknown): string {
   const sig = stringField(value, 256);
   if (!SIGNATURE_SHAPE.test(sig)) invalid();

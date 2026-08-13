@@ -580,9 +580,11 @@ Still open (a phase that hits one asks at session start):
     confirming backlog own the batch head and starve the offered/failed
     expiry work, and the split RESOLVES the recorded 16/17 UNION ALL item.
     overdueSettlements is single-arm again (offered/failed on deadline_at).
-    The knob CLAMPS at 720 hours with a one-time boot warn (the QA
+    The knob CLAMPS at 720 hours with a one-time first-read warn (the QA
     judgment superseding the no-upper-clamp posture: a huge value silently
-    disabled the park and could 22008 the arm). The sweep parks over-bound
+    disabled the park and could 22008 the arm), and the lapse-straddle
+    refresh refusal is the typed woc_market.bond_window_closed (409,
+    catalog leaf + five non-Latin fills; REFUSAL_ERRORS is 48 rows). The sweep parks over-bound
     rows in the NEW settlement state 'review' (fail_reason
     confirming_overdue) with NO default/forfeit/strike/cascade. 'review' is OPEN: it rides the renamed
     unique index woc_market_settlements_open2 (six states; the old _open is
@@ -751,7 +753,8 @@ Still open (a phase that hits one asks at session start):
     ("Your payment is still confirming."): the settlement leg answers it
     too since the verification round, so bond-specific wording lied there
     (the reword refreshed the five non-Latin fills in the same change). Snapshots updated (error_codes.test.ts,
-    api_error_code_parity.test.ts); REFUSAL_ERRORS is 47 rows.
+    api_error_code_parity.test.ts); REFUSAL_ERRORS is 48 rows since the 04
+    QA round added woc_market.bond_window_closed.
   - Tests: new real-SQL suite tests/woc_market_bond_pg_integration.test.ts
     (34 tests after the 04 QA round; its rig is the third copy, the
     pg-harness extraction still rides phase 20); settlement suite retargeted
@@ -774,10 +777,8 @@ Still open (a phase that hits one asks at session start):
     (reproduced the in-place-redefinition failure and the fix); every new
     predicate index-covered; the exempt-list parameterization closed the one
     runtime interpolation. TWO actionable INFOs folded to owners: (a) the
-    overdueSettlements OR arm loses the ordered-index/LIMIT pushdown, so a
-    LARGE confirming backlog plans a seq scan + top-N per sweep pass (minute
-    cadence, self-draining into review; a UNION ALL of the two arms restores
-    the pushdown if it ever grows in prod: phases 16/17 EXPLAIN list). (b)
+    overdueSettlements OR arm's pushdown loss (RESOLVED by the 04 QA round:
+    the confirming park is its own read and arm now, both arms index-served). (b)
     ROLLBACK runbook (phase 22): an OLD binary against the new schema fails
     CLOSED but strands 'review' rows (no transition path; a second settlement
     takes a raw 23505 from open2, safe-direction no-double-sell, surfaces as

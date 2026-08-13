@@ -165,6 +165,7 @@ export const API_ERROR_KEYS = {
   'woc_market.buy_now_locked': 'apiError.woc_market.buy_now_locked',
   'woc_market.cancel_pending': 'apiError.woc_market.cancel_pending',
   'woc_market.claim_cooldown': 'apiError.woc_market.claim_cooldown',
+  'woc_market.bond_window_closed': 'apiError.woc_market.bond_window_closed',
   'woc_market.settlement_in_flight': 'apiError.woc_market.settlement_in_flight',
   'woc_market.contended': 'apiError.woc_market.contended',
   'woc_market.sale_conflict': 'apiError.woc_market.sale_conflict',

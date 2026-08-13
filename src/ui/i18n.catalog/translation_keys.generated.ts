@@ -178,6 +178,7 @@ export type TranslationKeyFlat =
   | 'apiError.wallet.handoff_invalid'
   | 'apiError.woc_market.already_pending'
   | 'apiError.woc_market.bid_too_low'
+  | 'apiError.woc_market.bond_window_closed'
   | 'apiError.woc_market.buy_now_locked'
   | 'apiError.woc_market.cancel_pending'
   | 'apiError.woc_market.cap_reached'

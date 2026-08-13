@@ -1083,6 +1083,10 @@ describe('placeBid', () => {
         amountCents: 5000,
       }),
     ).toEqual({ ok: false, reason: 'contended' });
+    // "Nothing written" (the source's claim): the orphaned seat carries no
+    // reference and lapses on the pending TTL.
+    const seats = await h.db.bidsByAccount(REALM, BUYER_A, 10);
+    expect(seats.every((b) => b.bondReference === null)).toBe(true);
   });
 
   it('refuses insufficient_balance when the wallet cannot cover bid plus bond', async () => {
@@ -1467,8 +1471,50 @@ describe('confirmBond', () => {
     );
     expect(await h.service.refreshBondQuote(BUYER_A, placed.bid.id)).toEqual({
       ok: false,
-      reason: 'quote_expired',
+      reason: 'bond_window_closed',
     });
+  });
+
+  it('refuses a SERVICE-minted quote that straddles the lapse, whatever the local TTL says', async () => {
+    // The expiry actually stored is the service's, not the local constant
+    // the pre-quote check predicts with: a service answering a longer TTL
+    // than WOC_MARKET_QUOTE_TTL_SECONDS would straddle the lapse anyway,
+    // so the authoritative check compares the MINTED expiry. The unused
+    // quote expires on its own (the CAS-loss shape).
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const longQuote = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        bondQuote: async () => ({
+          ok: true,
+          reference: 'ref-overlong',
+          transactionBase64: null,
+          signatureRequired: true,
+          amount: null,
+          seller: null,
+          burn: null,
+          treasury: null,
+          reason: null,
+          expiresAtMs: h.now() + WOC_MARKET_BOND_PENDING_TTL_SECONDS * 1000 + 60_000,
+        }),
+      },
+    });
+    expect(await longQuote.refreshBondQuote(BUYER_A, placed.bid.id)).toEqual({
+      ok: false,
+      reason: 'bond_window_closed',
+    });
+    expect((await getBid(h, placed.bid.id)).bondReference).toBe(placed.bond.reference);
   });
 
   it('a poll winning the activation race still answers the confirmer standing true', async () => {
@@ -1501,6 +1547,38 @@ describe('confirmBond', () => {
     );
     expect(confirmed.standing, 'the bid really stands; say so').toBe(true);
     expect((await getBid(h, placed.bid.id)).status).toBe('active');
+  });
+
+  it('the not_pending re-read answers standing false for a genuinely superseded bid', async () => {
+    // The FALSE arm of the same re-read: when the row really was outbid
+    // (activateBid's supersede left it 'outbid'), the answer must stay
+    // standing:false; an unconditional standing:true would lie the other way.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const realActivate = h.db.activateBid.bind(h.db);
+    h.db.activateBid = async (bidId: number, nowMs: number) => {
+      const bid = await h.db.bidById(bidId);
+      if (bid) {
+        await h.db.markBidStatus(bid.id, 'outbid');
+      }
+      void realActivate;
+      void nowMs;
+      return 'not_pending' as const;
+    };
+    const confirmed = unwrap(
+      await h.service.confirmBond(BUYER_A, placed.bid.id, 'sig-race-lost'),
+      'confirmBond',
+    );
+    expect(confirmed.standing, 'genuinely superseded stays not standing').toBe(false);
   });
 
   it('refreshBondQuote stands an unpaid bid on a fresh reference, end to end', async () => {
@@ -1886,7 +1964,8 @@ describe('the confirming review bound', () => {
     // economy settles instantly.
     expect(await h.db.submitSettlementSignature(settlement.id, 'sig-stuck-review')).toBe('ok');
     h.setNow(listing.endsAtMs + 1 + 7 * 3600 * 1000);
-    await h.service.sweepPass();
+    const stats = await h.service.sweepPass();
+    expect(stats?.reviewed, 'the reviewed arm counts its park').toBe(1);
     const parked = await getSettlement(h, settlement.id);
     expect(parked.state).toBe('review');
     expect(parked.failReason).toBe('confirming_overdue');

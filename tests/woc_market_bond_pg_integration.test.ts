@@ -1326,6 +1326,34 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       }
     }, 20_000);
 
+    it('an at-cap self-steal still records its own abandon before refusing', async () => {
+      // The advisory shortcut must NOT answer over a recordable expired
+      // lock: an account already at the hourly cap, re-claiming its own
+      // expired window, would otherwise be refused lock-free with THAT
+      // abandon never booked, so its per-listing cooldown never started and
+      // the same listing was re-claimable the moment the hourly window
+      // rolled off.
+      const realm = `atcap-selfsteal-${++seq}`;
+      const seller = await seedAccount();
+      const abuser = await seedAccount();
+      for (let i = 0; i < 3; i++) {
+        const otherListing = await seedListing(realm, seller);
+        await marketDb.recordBuyNowAbandon(realm, otherListing, abuser, BASE_MS - (i + 1) * 1000);
+      }
+      const listingId = await seedListing(realm, seller, {
+        lockAccount: abuser,
+        lockExpiresAtMs: BASE_MS - MINUTE_MS,
+      });
+      expect(
+        await marketDb.claimBuyNowLock(realm, listingId, abuser, BASE_MS, BASE_MS + 270_000),
+      ).toBe('claim_cooldown');
+      const booked = await pool.query(
+        `SELECT 1 FROM woc_market_buy_now_abandons WHERE listing_id = $1 AND account = $2`,
+        [listingId, abuser],
+      );
+      expect(booked.rowCount, 'the fourth abandon was recorded').toBe(1);
+    });
+
     it('a directed buyer is exempt from the public-loop cooldowns', async () => {
       const realm = `directed-${++seq}`;
       const seller = await seedAccount();

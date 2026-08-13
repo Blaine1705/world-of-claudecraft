@@ -12,6 +12,7 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
+    "apiError.woc_market.bond_window_closed",
     "apiError.woc_market.buy_now_locked",
     "apiError.woc_market.cancel_pending",
     "apiError.woc_market.cap_reached",
@@ -242,6 +243,7 @@ export const pending: Record<string, readonly string[]> = {
   "es_ES": [
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
+    "apiError.woc_market.bond_window_closed",
     "apiError.woc_market.buy_now_locked",
     "apiError.woc_market.cancel_pending",
     "apiError.woc_market.cap_reached",
@@ -472,6 +474,7 @@ export const pending: Record<string, readonly string[]> = {
   "fr_FR": [
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
+    "apiError.woc_market.bond_window_closed",
     "apiError.woc_market.buy_now_locked",
     "apiError.woc_market.cancel_pending",
     "apiError.woc_market.cap_reached",
@@ -702,6 +705,7 @@ export const pending: Record<string, readonly string[]> = {
   "fr_CA": [
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
+    "apiError.woc_market.bond_window_closed",
     "apiError.woc_market.buy_now_locked",
     "apiError.woc_market.cancel_pending",
     "apiError.woc_market.cap_reached",
@@ -933,6 +937,7 @@ export const pending: Record<string, readonly string[]> = {
   "it_IT": [
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
+    "apiError.woc_market.bond_window_closed",
     "apiError.woc_market.buy_now_locked",
     "apiError.woc_market.cancel_pending",
     "apiError.woc_market.cap_reached",
@@ -1163,6 +1168,7 @@ export const pending: Record<string, readonly string[]> = {
   "de_DE": [
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
+    "apiError.woc_market.bond_window_closed",
     "apiError.woc_market.buy_now_locked",
     "apiError.woc_market.cancel_pending",
     "apiError.woc_market.cap_reached",
@@ -1413,6 +1419,7 @@ export const pending: Record<string, readonly string[]> = {
   "pt_BR": [
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
+    "apiError.woc_market.bond_window_closed",
     "apiError.woc_market.buy_now_locked",
     "apiError.woc_market.cancel_pending",
     "apiError.woc_market.cap_reached",
@@ -1648,6 +1655,7 @@ export const pending: Record<string, readonly string[]> = {
   "cs_CZ": [
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
+    "apiError.woc_market.bond_window_closed",
     "apiError.woc_market.buy_now_locked",
     "apiError.woc_market.cancel_pending",
     "apiError.woc_market.cap_reached",
@@ -1878,6 +1886,7 @@ export const pending: Record<string, readonly string[]> = {
   "nl_NL": [
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
+    "apiError.woc_market.bond_window_closed",
     "apiError.woc_market.buy_now_locked",
     "apiError.woc_market.cancel_pending",
     "apiError.woc_market.cap_reached",
@@ -2108,6 +2117,7 @@ export const pending: Record<string, readonly string[]> = {
   "pl_PL": [
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
+    "apiError.woc_market.bond_window_closed",
     "apiError.woc_market.buy_now_locked",
     "apiError.woc_market.cancel_pending",
     "apiError.woc_market.cap_reached",
@@ -2338,6 +2348,7 @@ export const pending: Record<string, readonly string[]> = {
   "id_ID": [
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
+    "apiError.woc_market.bond_window_closed",
     "apiError.woc_market.buy_now_locked",
     "apiError.woc_market.cancel_pending",
     "apiError.woc_market.cap_reached",
@@ -2568,6 +2579,7 @@ export const pending: Record<string, readonly string[]> = {
   "tr_TR": [
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
+    "apiError.woc_market.bond_window_closed",
     "apiError.woc_market.buy_now_locked",
     "apiError.woc_market.cancel_pending",
     "apiError.woc_market.cap_reached",
@@ -2798,6 +2810,7 @@ export const pending: Record<string, readonly string[]> = {
   "sv_SE": [
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
+    "apiError.woc_market.bond_window_closed",
     "apiError.woc_market.buy_now_locked",
     "apiError.woc_market.cancel_pending",
     "apiError.woc_market.cap_reached",
@@ -3028,6 +3041,7 @@ export const pending: Record<string, readonly string[]> = {
   "vi_VN": [
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
+    "apiError.woc_market.bond_window_closed",
     "apiError.woc_market.buy_now_locked",
     "apiError.woc_market.cancel_pending",
     "apiError.woc_market.cap_reached",
@@ -3258,6 +3272,7 @@ export const pending: Record<string, readonly string[]> = {
   "da_DK": [
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
+    "apiError.woc_market.bond_window_closed",
     "apiError.woc_market.buy_now_locked",
     "apiError.woc_market.cancel_pending",
     "apiError.woc_market.cap_reached",

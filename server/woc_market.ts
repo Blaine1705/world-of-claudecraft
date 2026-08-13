@@ -979,6 +979,7 @@ export type WocMarketRefusal =
   | 'insufficient_balance'
   | 'quote_unavailable'
   | 'quote_expired'
+  | 'bond_window_closed'
   | 'not_pending'
   | 'confirm_failed'
   // A recorded signature is awaiting the chain's verdict: quote refreshes and
@@ -1786,12 +1787,15 @@ export class WocMarketService {
     // bid lapses at placed_at plus the pending TTL, and a quote straddling
     // that deadline invites a broadcast whose signature arrives against a
     // lapsed bid, where the intake can no longer record it (the one H4 loss
-    // shape the signature-first recording cannot reach; the settlement leg's
-    // deadline guard is the sibling rule). The residual is the sweep-cadence
-    // race at the boundary itself, seconds instead of a quote lifetime.
+    // shape the signature-first recording cannot reach; stricter than the
+    // settlement leg, which refuses only once its window has already
+    // ended). The residual is the sweep-cadence race at the boundary
+    // itself, seconds instead of a quote lifetime. Typed as its own
+    // refusal: quote_expired's copy says to request a fresh quote, which is
+    // exactly what cannot help here (the seat itself is closing; re-bid).
     const lapseAtMs = bid.placedAtMs + WOC_MARKET_BOND_PENDING_TTL_SECONDS * 1000;
     if (this.now() + WOC_MARKET_QUOTE_TTL_SECONDS * 1000 > lapseAtMs) {
-      return refuse('quote_expired');
+      return refuse('bond_window_closed');
     }
     const intent = await this.deps.economy.bondQuote({
       memoRef: `woc_bond:${bid.id}`,
@@ -1800,6 +1804,13 @@ export class WocMarketService {
     });
     if (!intent.ok || intent.reference === null || intent.expiresAtMs === null) {
       return refuse('quote_unavailable');
+    }
+    // The AUTHORITATIVE straddle check: the expiry actually stored is the
+    // SERVICE's, not the local constant the pre-quote check predicted with,
+    // and a service answering a longer TTL would straddle the lapse anyway.
+    // The unused quote simply expires on its own (the CAS-loss shape).
+    if (intent.expiresAtMs > lapseAtMs) {
+      return refuse('bond_window_closed');
     }
     const applied = await this.deps.db.setBidBondQuote(
       bid.id,
@@ -2371,9 +2382,8 @@ export class WocMarketService {
       // cadence and honors a contended pass.
       disposed: await this.arm('disposed', () => this.disposeSoldResidue(nowMs, scope)),
       closed: await this.arm('closed', () => this.closeDueAuctions(nowMs)),
-      // BEFORE the poll arm (see parkOverdueConfirming) and before the
-      // expiry arm so a just-parked row can never be double-touched by the
-      // same pass's deadline work.
+      // BEFORE the poll arm (see parkOverdueConfirming) and before
+      // cancelClosed (the abandon-recording order rule).
       reviewed: await this.arm('reviewed', () => this.parkOverdueConfirming(nowMs)),
       expired: await this.arm('expired', () => this.expireOverdueSettlements(nowMs)),
       // AFTER the expiry arm on purpose: the overdue arm is the canonical
@@ -2611,8 +2621,9 @@ export class WocMarketService {
    *  set, still OPEN (the listing cannot re-auction), surfaced by the stuck
    *  readout. The operator resolution arms are review -> confirmed (payment
    *  verified on chain: delivery resumes) and review -> failed (verified
-   *  unpaid: the ordinary overdue default pass takes it from there); the ops
-   *  tooling drives them. Runs BEFORE the poll arm in the pass, so a row
+   *  unpaid: the ordinary overdue default pass takes it from there); NO
+   *  in-repo route drives them yet, the arms arrive with the service-side
+   *  release tooling. Runs BEFORE the poll arm in the pass, so a row
    *  whose economy recovered exactly at the bound parks rather than
    *  resolves: deliberate (six hours of polls already failed) and
    *  operator-recoverable. */

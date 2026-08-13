@@ -15,6 +15,7 @@ import {
   type WocTradePanelDeps,
   wireWocTradeArm,
   wocOfferPhase,
+  wocSettlementInFlight,
   wocTradeArmHtml,
   wocTradeModelFrom,
   wocTradeMoneyText,
@@ -627,6 +628,17 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
     // The payment path may never cancel the trade either (coverage the accept
     // window held incidentally before it was narrowed to accept alone).
     expect(pay).not.toContain('tradeCancel');
+  });
+
+  it('treats an operator-parked review payment as still in flight, never settled', () => {
+    // A review-parked settlement is neither settled nor lost; announcing
+    // "settled" for money awaiting an operator verdict is the custody-lie
+    // class the row-label rule already bans. The behavioral arm below is
+    // what fails if 'review' leaves the set.
+    expect(wocSettlementInFlight('review')).toBe(true);
+    expect(wocSettlementInFlight('confirming')).toBe(true);
+    expect(wocSettlementInFlight('delivered')).toBe(false);
+    expect(wocSettlementInFlight('offered')).toBe(false);
   });
 });
 

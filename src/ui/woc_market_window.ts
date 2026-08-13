@@ -1941,7 +1941,16 @@ export class WocMarketWindow {
           this.fail(out.code);
           return;
         }
-        this.ok('hudChrome.wocMarket.purchaseComplete');
+        // A review-parked payment is neither settled nor lost: the outcome
+        // arm answers its state on a recorded-signature retry, and toasting
+        // "purchase complete" for money awaiting an operator verdict is the
+        // custody lie the row label rule already bans. The row itself
+        // renders the same key.
+        this.ok(
+          out.state === 'review'
+            ? 'hudChrome.wocMarket.settlementReview'
+            : 'hudChrome.wocMarket.purchaseComplete',
+        );
       }
       this.pendingQuote = null;
       await this.reload();

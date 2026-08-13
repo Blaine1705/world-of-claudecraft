@@ -4151,6 +4151,7 @@ export const zh_CN: EnTranslations = {
       "buy_now_locked": "另一位买家正在完成这笔购买，请稍后再试。",
       "cancel_pending": "卖家正在取消该挂单。",
       "claim_cooldown": "你最近放弃过一次直购。请稍后再试。",
+      "bond_window_closed": "该出价已无法支付：支付窗口已关闭。请重新出价以获得新的支付窗口。",
       "settlement_in_flight": "有买家正在为该挂单付款。请等付款结算完成后再试。",
       "contended": "交易所正在处理该挂单的其他操作。请稍后再试。",
       "sale_conflict": "该挂单已有另一条有效的成交记录。请先将其排除。",

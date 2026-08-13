@@ -4151,6 +4151,7 @@ export const id_ID: EnTranslations = {
       "buy_now_locked": "Another buyer is completing this purchase. Try again in a moment.",
       "cancel_pending": "The seller is cancelling this listing.",
       "claim_cooldown": "You recently walked away from a Buy Now. Try again later.",
+      "bond_window_closed": "This bid can no longer be paid: its payment window has closed. Bid again for a fresh one.",
       "settlement_in_flight": "A buyer is paying for this listing. Try again once the payment settles.",
       "contended": "The Exchange is busy with this listing. Try again in a moment.",
       "sale_conflict": "Another live sale record stands for this listing. Exclude it first.",

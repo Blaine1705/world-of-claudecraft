@@ -113,8 +113,12 @@ export function wocOfferPhase(
  * 'offered' is deliberately ABSENT: a quote exists but nothing has been signed,
  * so the buyer still has to act and their button must stay live. Treating it as
  * in-flight would show a spinner to a player whose next move is to press Pay.
+ * 'review' is PRESENT: an operator-parked payment is not settled and not lost,
+ * and announcing delivery for it would tell the buyer of money under review
+ * that the purchase completed (the custody-lie class the row label rule
+ * already covers); the poll finishes the deal when the resolution does.
  */
-const SETTLING_STATES = new Set(['confirming', 'confirmed', 'delivering']);
+const SETTLING_STATES = new Set(['confirming', 'confirmed', 'delivering', 'review']);
 
 /** Whether a settlement state means the payment is still in flight. Exported so
  *  the HUD does not announce delivery while the chain is still confirming. */

@@ -8579,6 +8579,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.confirm_in_flight':
     '결제가 아직 확인 중입니다. 완료된 후 다시 시도하세요.',
   'apiError.woc_market.cancel_pending': '판매자가 이 판매글을 취소하는 중입니다.',
+  'apiError.woc_market.bond_window_closed':
+    '이 입찰은 더 이상 결제할 수 없습니다. 결제 기간이 끝났습니다. 다시 입찰하여 새 기간을 받으세요.',
   'apiError.woc_market.claim_cooldown':
     '최근에 즉시 구매를 중도 포기했습니다. 잠시 후 다시 시도하세요.',
   'apiError.woc_market.buy_now_locked':

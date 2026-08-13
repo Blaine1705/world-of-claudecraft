@@ -142,6 +142,7 @@ const KNOWN_CODES = [
   'woc_market.quote_expired',
   'woc_market.not_pending',
   'woc_market.claim_cooldown',
+  'woc_market.bond_window_closed',
   'woc_market.confirm_failed',
   'woc_market.confirm_in_flight',
   'woc_market.buy_now_locked',

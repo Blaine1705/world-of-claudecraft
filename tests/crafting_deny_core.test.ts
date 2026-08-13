@@ -28,6 +28,38 @@ describe('craftDenyMessage', () => {
     }
   });
 
+  it('covers the reason union exhaustively, so a new reason cannot fall through silently', () => {
+    // A tenth member added to the craftResult reason union would fall to the
+    // generic materials line with no red test; this table is the pin that
+    // forces the mapping decision. `satisfies` makes tsc the enforcer.
+    const table = {
+      unknown_recipe: 'hudChrome.crafting.unknownRecipe',
+      insufficient_materials: 'hudChrome.crafting.insufficientMaterials',
+      locked: 'hudChrome.crafting.reagentLocked',
+      combo_requirement_unmet: 'hudChrome.crafting.comboRequirementUnmet',
+      recipe_not_learned: 'hudChrome.crafting.recipeNotLearned',
+      throttled: 'hudChrome.crafting.busy',
+      busy: 'hudChrome.crafting.busy',
+      station_required: 'hudChrome.crafting.stationRequired',
+      no_bag_space: 'hudChrome.crafting.noBagSpace',
+    } satisfies Record<CraftDenyReason, string>;
+    for (const [reason, key] of Object.entries(table)) {
+      if (reason === 'station_required') continue;
+      expect(craftDenyMessage(reason as CraftDenyReason, 'not-a-recipe').key, reason).toBe(key);
+    }
+  });
+
+  it('a non-station reason on a REAL station recipe never claims a station is required', () => {
+    // The guard's reason conjunct alone separates this from station_required:
+    // without it, every refusal on a station recipe would say "requires a
+    // station" whatever actually refused the craft.
+    const stationRecipe = ALL_RECIPES.find((r) => r.stationType);
+    if (!stationRecipe) throw new Error('content invariant: no station recipe exists');
+    const msg = craftDenyMessage('locked', stationRecipe.id);
+    expect(msg.key).toBe('hudChrome.crafting.reagentLocked');
+    expect(msg.stationType).toBeUndefined();
+  });
+
   it('station_required resolves the recipe station and falls back when unresolvable', () => {
     const stationRecipe = ALL_RECIPES.find((r) => r.stationType);
     if (!stationRecipe) throw new Error('content invariant: no station recipe exists');

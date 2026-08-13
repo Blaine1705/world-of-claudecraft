@@ -290,6 +290,9 @@ export const ERROR_CODES = deepFreeze({
   // The claimer recently abandoned a buy-now window (per-listing re-claim
   // cooldown, or the account-wide abandons-per-hour cap) (409).
   'woc_market.claim_cooldown': { params: [] },
+  // This bid's payment window is closing: a fresh quote would outlive the
+  // bid's own lapse deadline, inviting a payment nothing could record (409).
+  'woc_market.bond_window_closed': { params: [] },
   // A buyer's payment for this listing is past the point of no return;
   // cancel/suspend must wait for it to resolve (409).
   'woc_market.settlement_in_flight': { params: [] },

@@ -121,7 +121,7 @@ describe('the refusal-to-wire mapping', () => {
     const rows = Object.entries(REFUSAL_ERRORS);
     // The EXACT count, not a floor. A floor of 35 let four union members vanish
     // silently; tsc catches a deleted Record key but not a shrunken union.
-    expect(rows).toHaveLength(47);
+    expect(rows).toHaveLength(48);
     for (const [reason, mapped] of rows) {
       expect(mapped.code, reason).toMatch(/^woc_market\./);
       expect(mapped.status, reason).toBeGreaterThanOrEqual(400);
@@ -166,6 +166,9 @@ describe('the refusal-to-wire mapping', () => {
     // The claimer's own abandon history refuses the claim; it ages out on its
     // own (per-listing cooldown or the hourly cap window), so 409 not 403.
     ['claim_cooldown', 409, 'woc_market.claim_cooldown'],
+    // The bond seat itself is closing: a fresh quote would outlive the
+    // lapse deadline, so re-bidding (not re-quoting) is the recovery.
+    ['bond_window_closed', 409, 'woc_market.bond_window_closed'],
     // A payment is in flight (buy-now lock claimed or a settlement past
     // 'offered'): the state resolves on its own, so 409 says retry, and the
     // seller learns nothing about the buyer beyond "a payment exists".
@@ -313,7 +316,7 @@ describe('the refusal-to-wire mapping', () => {
   it.each([
     ['a newline', 'sig\nforged-log-line'],
     ['a carriage return', 'sig\rback'],
-    ['an ANSI escape', 'sig[31mred'],
+    ['an ANSI escape', 'sig\u001b[31mred'],
     ['whitespace', 'sig with spaces'],
   ])('refuses a signature carrying %s on BOTH confirm intakes', async (_label, signature) => {
     // The recorded signature is interpolated into an ops warn on the
@@ -347,7 +350,7 @@ describe('the refusal-to-wire mapping', () => {
 
   it('passes a dev-style tagged signature through the shape check', async () => {
     // The dev economy and the whole test corpus post plain tagged strings
-    // ('sig-my-bond-1'); the shape bound deliberately admits [A-Za-z0-9_-].
+    // ('sig-my-bond-1'); the shape bound deliberately admits [A-Za-z0-9_:-].
     let seen: string | null = null;
     service({
       confirmBond: async (_a: number, _b: number, sig: string) => {
@@ -364,6 +367,28 @@ describe('the refusal-to-wire mapping', () => {
     });
     await handlerFor('POST', '/api/woc-market/bids/:id/bond')(ctx);
     expect(seen).toBe('sig-my_bond-1');
+  });
+
+  it('passes the trade controller devsig form, colons included', async () => {
+    // The dev-chain arm posts devsig:<reference>, and references themselves
+    // carry colons (woc_bond:<id>); refusing the colon broke the p2p trade
+    // settle whenever the service answered signatureRequired false.
+    let seen: string | null = null;
+    service({
+      confirmSettlement: async (_a: number, _b: number, sig: string) => {
+        seen = sig;
+        return { ok: true, state: 'delivered' };
+      },
+    });
+    const ctx = fakeCtx({
+      method: 'POST',
+      url: '/api/woc-market/settlements/9/confirm',
+      params: { id: '9' },
+      account: { accountId: VIEWER, scope: 'full' },
+      body: { signature: 'devsig:woc_settle:9:1' },
+    });
+    await handlerFor('POST', '/api/woc-market/settlements/:id/confirm')(ctx);
+    expect(seen).toBe('devsig:woc_settle:9:1');
   });
 
   it('the admin suspend handler answers settlement-in-flight as 409, other misses as 404', async () => {

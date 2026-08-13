@@ -2123,10 +2123,10 @@ export class PgWocMarketDb implements WocMarketDb {
     // on a hot listing the refusal is the common path, and diagnosing it
     // under FOR UPDATE serialized every hopeful behind the holder while each
     // held a pooled client (measured at two orders of magnitude of latency
-    // amplification). This advisory pre-read answers the six refusals from a
-    // plain SELECT; every check is RE-RUN under the row lock below, so a
-    // stale advisory verdict only ever tells a caller to retry, never
-    // corrupts a claim.
+    // amplification). This advisory pre-read answers every refusal class from
+    // plain SELECTs (diagnose() owns six, cooldownRefused the seventh);
+    // every check is RE-RUN under the row lock below, so a stale advisory
+    // verdict only ever tells a caller to retry, never corrupts a claim.
     const diagnose = (
       row: Row | undefined,
     ):
@@ -2217,7 +2217,19 @@ export class PgWocMarketDb implements WocMarketDb {
       const advisory = diagnose(peek.rows[0]);
       if (advisory !== null) return advisory;
       if (await openSettlement(this.pool)) return 'locked' as const;
-      if (peek.rows[0].directed_buyer_account === null && (await cooldownRefused(this.pool))) {
+      // The lock-free cooldown answer applies ONLY when the row carries no
+      // recordable expired lock: past diagnose(), any standing lock here is
+      // EXPIRED, and refusing lock-free over one would skip the steal-time
+      // recording (an at-cap account self-stealing its own expired window
+      // would never book THAT abandon, so its per-listing cooldown never
+      // started). With a dead lock present the claim pays the transaction
+      // once, records, and every later retry is answered lock-free off the
+      // committed row.
+      if (
+        peek.rows[0].directed_buyer_account === null &&
+        peek.rows[0].buy_now_lock_account === null &&
+        (await cooldownRefused(this.pool))
+      ) {
         return 'claim_cooldown' as const;
       }
     } catch (err) {
