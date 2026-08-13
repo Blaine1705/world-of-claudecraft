@@ -5849,8 +5849,16 @@ export class Sim {
     if (!r) return;
     const mark = moderationMod.normalizeCheaterMark(seconds);
     if (mark) {
-      r.e.cheaterMark = true;
       this.ctx.applyAura(r.e, moderationMod.cheaterMarkAura(mark, r.e.id));
+      // Derive the flag from the POST-CONDITION, not from the intent. No
+      // applyAura guard can refuse this aura today (they gate on npc/mob kinds,
+      // or on control kinds from a foreign source, and the mark is inert and
+      // self-sourced), but an intent-set flag would survive one of them
+      // widening, and the result is a tag with no countdown: the natural-expiry
+      // hook cannot fire without an aura, so only an operator lift would clear
+      // it. Reading back costs one scan on an operator action, never per tick.
+      r.e.cheaterMark =
+        r.e.auras.some((a) => a.id === moderationMod.CHEATER_MARK_AURA_ID) || undefined;
       return;
     }
     const live = r.e.auras.findIndex((a) => a.id === moderationMod.CHEATER_MARK_AURA_ID);

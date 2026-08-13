@@ -166,6 +166,25 @@ describe('Cheater mark: the three ways it legitimately ends', () => {
     expect(p.cheaterMark).toBeUndefined();
   });
 
+  it('pauses while dead, so a parked corpse serves no sanction time', () => {
+    // updateAuras returns early for a dead entity, so no aura's remaining
+    // decrements while the wearer is a corpse or a ghost. That is deliberate and
+    // matches the recovery sicknesses: the point of the tag is being WORN in
+    // front of other players, which a parked corpse is not doing. It also means
+    // the aura clock is the ALIVE-in-world clock, not raw /played, which is what
+    // src/sim/moderation/CLAUDE.md now says.
+    const { sim, p } = rig();
+    sim.setCheaterMark(600);
+    sim.ctx.handleDeath(p, null);
+    const atDeath = markAura(p)?.remaining;
+    expect(atDeath).toBe(600);
+
+    for (let i = 0; i < 40; i++) sim.tick(); // 2s of sim time spent dead
+
+    expect(markAura(p)?.remaining).toBe(atDeath);
+    expect(p.cheaterMark).toBe(true);
+  });
+
   it('does not clear the flag early, while budget remains', () => {
     const { sim, p } = rig();
     sim.setCheaterMark(10);
@@ -205,6 +224,30 @@ describe('Cheater mark: the three ways it legitimately ends', () => {
 
     expect(p.cheaterMark).toBeUndefined();
     expect(events.some((e) => e.type === 'aura')).toBe(false);
+  });
+});
+
+describe('Cheater mark: the wire flag tracks the aura, never the intent', () => {
+  it('sets the flag only because the aura actually landed', () => {
+    // setCheaterMark reads the flag back off e.auras rather than assuming the
+    // apply succeeded. No applyAura guard can refuse this aura today, but a flag
+    // set on intent would survive one of them widening, and a tag with no aura
+    // has no countdown to expire: only an operator lift could ever clear it.
+    const { sim, p } = rig();
+
+    sim.setCheaterMark(MARK_SECONDS);
+
+    expect(markAura(p)).toBeDefined();
+    expect(p.cheaterMark).toBe(true);
+  });
+
+  it('leaves an absent flag absent when the budget normalizes to nothing', () => {
+    const { sim, p } = rig();
+
+    sim.setCheaterMark(Number.NaN); // garbage budget: normalizes to no mark
+
+    expect(markAura(p)).toBeUndefined();
+    expect(p.cheaterMark).toBeUndefined();
   });
 });
 

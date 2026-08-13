@@ -42,13 +42,22 @@ PLAYED seconds is burned down.
   and reads it back off that aura on save. Rolling an alt does not escape it.
 - **Played seconds, never wall clock.** A wall-clock sanction expires while the
   account is logged out, which is precisely the window a sanctioned player waits
-  out. The budget burns only while in world.
-- **The aura IS the timer.** While a character is in world, one second of sim
-  time is one second of played time, so the ordinary aura tick is already the
+  out. The budget burns only while the character is ALIVE in world.
+- **The aura IS the timer.** While a character is alive in world, one second of
+  sim time is one second of played time, so the ordinary aura tick is already the
   correct countdown. Do not add a second timer, and do not keep a second copy of
   the remaining budget on `PlayerMeta` or the entity: two clocks drift. The only
   companion state is `Entity.cheaterMark`, a bare BOOLEAN the wire carries so a
   nearby client can render the tag without being told the wearer's countdown.
+  - **It pauses while dead**, corpse and ghost alike, because `updateAuras`
+    (`../combat/auras.ts`) returns early for a dead entity and no aura's
+    `remaining` decrements. That is deliberate and matches the recovery
+    sicknesses (`../types.ts`, `cauterize_fatigue`): a sanction whose point is
+    being WORN in front of other players is not served by a parked corpse, so
+    the aura clock is intentionally the alive-in-world clock and runs slower
+    than raw `/played`. Never "fix" this by special-casing the mark above that
+    early return: it is a tick-phase change and needs a fresh parity run.
+    `tests/cheater_mark_lifecycle.test.ts` pins the pause.
 - **The tag is not a deed.** `WireEntity.title` carries a deed id resolved
   through `DEEDS`. Routing the tag there would put a punishment in a cosmetic
   reward catalogue AND make it removable through the ordinary title picker

@@ -89,7 +89,7 @@ export function unstuckSicknessDuration(level: number): number {
 // The Cheater mark is here for the same reason the sicknesses are: its aura IS
 // the played-seconds countdown, so a wipe that dropped it would end the sanction
 // early and hand a marked player a one-keypress way out of it.
-export function aurasSurvivingDeath(auras: Aura[]): Aura[] {
+export function aurasSurvivingDeath(auras: readonly Aura[]): Aura[] {
   return auras.filter(
     (a) =>
       SICKNESS_AURA_IDS.has(a.id) ||

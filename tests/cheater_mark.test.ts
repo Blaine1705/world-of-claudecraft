@@ -17,42 +17,21 @@ import {
   normalizeCheaterMark,
   normalizeCheaterMarkSeconds,
 } from '../src/sim/moderation';
-import { partyFrameAuras } from '../src/sim/party_frame_info';
+import {
+  partyFrameAuras,
+  partyFrameAurasForViewer,
+  preparePartyFrameAuras,
+} from '../src/sim/party_frame_info';
 import { type Aura, type Entity, PARTY_MEMBER_AURA_CAP } from '../src/sim/types';
 
-// The derived block recalcPlayerStats writes onto a player: every number a
-// combat formula later reads. Snapshotted whole so a stat fold that learned to
-// read the mark's kind moves SOMETHING here, whichever field it picked.
-const DERIVED_STAT_KEYS = [
-  'attackPower',
-  'rangedPower',
-  'spellPower',
-  'critRating',
-  'hasteRating',
-  'hitRating',
-  'hitBonus',
-  'meleeHaste',
-  'rangedHaste',
-  'spellHaste',
-  'critChance',
-  'sharedCritBonus',
-  'critDmgSpellBonus',
-  'critDmgPhysBonus',
-  'critDmgHealBonus',
-  'castPushbackReduction',
-  'knockbackResistance',
-  'ccDurationReduction',
-  'dodgeChance',
-  'blockChance',
-  'blockValue',
-  'maxHp',
-  'maxResource',
-] as const;
-
-function derivedStats(e: Entity): Record<string, unknown> {
-  const out: Record<string, unknown> = { stats: { ...e.stats } };
-  for (const key of DERIVED_STAT_KEYS) out[key] = (e as unknown as Record<string, unknown>)[key];
-  return out;
+// EVERY field of the entity except its aura list. Deliberately not a curated
+// list of derived stat names: the two players compared below are built from
+// identical arguments and differ only by the aura, so any field that moves is
+// the aura's doing, and a derived field added to recalcPlayerStats later is
+// covered the day it appears rather than silently escaping a hand-kept roster.
+function entityExceptAuras(e: Entity): Record<string, unknown> {
+  const { auras: _auras, ...rest } = e as unknown as Record<string, unknown> & { auras: unknown };
+  return rest;
 }
 
 // A real dispellable magic debuff, the negative control for the party-frame and
@@ -212,7 +191,7 @@ describe('cheaterMarkAura', () => {
     recalcPlayerStats(marked, 'warrior', {}, undefined, {});
 
     expect(marked.auras.some((a) => a.id === CHEATER_MARK_AURA_ID)).toBe(true);
-    expect(derivedStats(marked)).toEqual(derivedStats(bare));
+    expect(entityExceptAuras(marked)).toEqual(entityExceptAuras(bare));
   });
 
   test('POWER-NEUTRAL: the derived snapshot is sensitive enough to catch a real fold', () => {
@@ -234,7 +213,7 @@ describe('cheaterMarkAura', () => {
     recalcPlayerStats(bare, 'warrior', {}, undefined, {});
     recalcPlayerStats(drained, 'warrior', {}, undefined, {});
 
-    expect(derivedStats(drained)).not.toEqual(derivedStats(bare));
+    expect(entityExceptAuras(drained)).not.toEqual(entityExceptAuras(bare));
   });
 
   test('no player counter can shed it', () => {
@@ -284,6 +263,23 @@ describe('cheaterMarkAura: never on a party or raid frame', () => {
     // have kept it ahead of the tier-0 debuffs and evicted the last one.
     const shown = partyFrameAuras([aura, ...debuffs]);
 
+    expect(shown).toHaveLength(PARTY_MEMBER_AURA_CAP);
+    expect(shown.some((row) => row.id === CHEATER_MARK_AURA_ID)).toBe(false);
+    for (const debuff of debuffs) {
+      expect(shown.some((row) => row.id === debuff.id)).toBe(true);
+    }
+  });
+
+  test('takes no slot on the SERVER path either, prepare plus per-viewer cap', () => {
+    // The offline strip calls partyFrameAuras; the server snapshot builder calls
+    // preparePartyFrameAuras once and then partyFrameAurasForViewer per viewer.
+    // Both filter through isPartyFrameRelevantAura, so pin both rather than
+    // assuming the pair agrees.
+    const debuffs = Array.from({ length: PARTY_MEMBER_AURA_CAP }, (_, i) => magicDebuff(i));
+    const prepared = preparePartyFrameAuras([aura, ...debuffs]);
+    const shown = partyFrameAurasForViewer(prepared, aura.sourceId);
+
+    expect(prepared.some((row) => row.summary.id === CHEATER_MARK_AURA_ID)).toBe(false);
     expect(shown).toHaveLength(PARTY_MEMBER_AURA_CAP);
     expect(shown.some((row) => row.id === CHEATER_MARK_AURA_ID)).toBe(false);
     for (const debuff of debuffs) {
