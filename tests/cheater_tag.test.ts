@@ -326,14 +326,15 @@ describe('the Cheater tag on the HUD target frame', () => {
 
 // --- the two surfaces stay one tag -----------------------------------------
 
+// The rel arg must stay a VARIABLE under happy-dom (its web transform rewrites
+// a literal new URL(..., import.meta.url) to an http URL readFileSync rejects).
+const read = (rel: string): string => readFileSync(new URL(rel, import.meta.url), 'utf8');
+
 describe('both Cheater-tag surfaces resolve through the shared label', () => {
   // The drift this closes is silent: either surface could grow its own inline
   // t('hudChrome.nameplate.cheaterTag') and stay green, and then a change to the
   // player-gate or the key would move one surface and not the other. The same
   // source-pin idiom tests/nameplate_ai_tag.test.ts uses for the guild writer.
-  // The rel arg must stay a VARIABLE under happy-dom (its web transform rewrites
-  // a literal new URL(..., import.meta.url) to an http URL readFileSync rejects).
-  const read = (rel: string): string => readFileSync(new URL(rel, import.meta.url), 'utf8');
 
   it('neither surface reaches for the catalog key itself', () => {
     for (const rel of ['../src/render/nameplate_painter.ts', '../src/ui/hud.ts']) {
@@ -345,5 +346,53 @@ describe('both Cheater-tag surfaces resolve through the shared label', () => {
         'nameplate.cheaterTag',
       );
     }
+  });
+});
+
+describe('both Cheater-tag surfaces brand in the same red', () => {
+  // The colour is duplicated by necessity: the overhead plate strokes it onto a
+  // canvas from a TS style record, the target frame colours a span from a CSS
+  // custom property, and neither host can read the other's value. What held them
+  // together was a comment on each side, which no recolour has to obey. Pin the
+  // equality instead, the idiom tests/ctx_menu_picker_sizing.test.ts uses for
+  // --color-stat-bonus against QUALITY_COLOR.uncommon: a retheme now has to move
+  // both literals or red here.
+  const HEX = /#[0-9a-fA-F]{3,8}/;
+
+  const captured = (source: string, re: RegExp, what: string): string => {
+    const m = source.match(re);
+    expect(m, `${what} not found`).not.toBeNull();
+    return String(m?.[1]).toLowerCase();
+  };
+
+  it('pins the nameplate CHEATER_STYLE fill equal to the --color-cheater-tag token', () => {
+    // Take the whole style record first, then its fill, so the pin survives a
+    // field reorder inside the record and can never drift onto a NEIGHBOURING
+    // style's fill (the block ends at the first line-initial `};`).
+    const style = captured(
+      read('../src/render/nameplate_canvas.ts'),
+      /(const CHEATER_STYLE: TextSpriteStyle = \{[\s\S]*?\n\};)/,
+      'the CHEATER_STYLE record in src/render/nameplate_canvas.ts',
+    );
+    const plate = captured(
+      style,
+      new RegExp(`fill: '(${HEX.source})'`),
+      'CHEATER_STYLE.fill in src/render/nameplate_canvas.ts',
+    );
+    const token = captured(
+      read('../src/styles/tokens.css'),
+      new RegExp(`--color-cheater-tag:\\s*(${HEX.source})\\s*;`),
+      '--color-cheater-tag in src/styles/tokens.css',
+    );
+    expect(plate, 'the plate and the frame must brand a player the same red').toBe(token);
+  });
+
+  it('colours the frame span FROM that token, so the equality is not vacuous', () => {
+    // The other half of the pin: without it the frame side could grow a literal
+    // of its own and the equality above would govern nothing it paints.
+    const rule = read('../src/styles/hud.css').match(/\.uf-name \.uf-cheater\s*\{[^}]*\}/)?.[0];
+    expect(rule, 'the .uf-name .uf-cheater rule is missing from src/styles/hud.css').toBeTruthy();
+    expect(rule).toContain('var(--color-cheater-tag)');
+    expect(rule, 'the frame tag reads the token, never a second literal').not.toMatch(HEX);
   });
 });
