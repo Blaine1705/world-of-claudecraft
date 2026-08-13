@@ -339,6 +339,61 @@ describe('map semantic accessibility core', () => {
     expect(chinese).toContain('可采集矿点');
   });
 
+  it('relocalizes cached tooltips for groups omitted from a crowded summary', () => {
+    const view = core();
+    const semantics: MapInstanceSemantic[] = [
+      { kind: 'rift-reward', reward: 'treasure', state: 'available' },
+      { kind: 'rift-reward', reward: 'treasure', state: 'locked' },
+      { kind: 'rift-reward', reward: 'treasure', state: 'opened' },
+      { kind: 'rift-reward', reward: 'treasure', state: 'jammed' },
+      { kind: 'rift-reward', reward: 'cache', state: 'available' },
+      { kind: 'rift-reward', reward: 'cache', state: 'locked' },
+      { kind: 'rift-reward', reward: 'cache', state: 'opened' },
+      { kind: 'rift-reward', reward: 'cache', state: 'jammed' },
+      { kind: 'rift-mechanic', mechanic: 'pylon', state: 'unlit' },
+      { kind: 'rift-mechanic', mechanic: 'pylon', state: 'lit' },
+      { kind: 'rift-mechanic', mechanic: 'sequence-rune', state: 'unlit' },
+      { kind: 'rift-mechanic', mechanic: 'sequence-rune', state: 'lit' },
+      { kind: 'rift-mechanic', mechanic: 'ice-goal', state: 'target' },
+      { kind: 'rift-mechanic', mechanic: 'boulder-pad', state: 'target' },
+      { kind: 'rift-mechanic', mechanic: 'boulder', state: 'movable' },
+      { kind: 'rift-mechanic', mechanic: 'gate', state: 'sealed' },
+      { kind: 'rift-mechanic', mechanic: 'boulder', state: 'placed' },
+    ];
+    const objects = semantics.map((semantic, index) => ({
+      cx: index + 1 === semantics.length ? 500 : 100,
+      cy: index + 1 === semantics.length ? 500 : 100,
+      semantic,
+    }));
+    const model = {
+      staticKey: 'test',
+      staticGeometry: {},
+      transform: {},
+      mobs: [],
+      objects,
+      party: [],
+      deathZones: [],
+      corpse: null,
+      player: { cx: 280, cy: 280, angle: 0 },
+      areaLabel: 'Test Rift',
+    } as unknown as RiftMapModel;
+
+    setLanguage('en');
+    view.updateRift(model, 560);
+    expect(view.tooltipAt(500, 500, 20)).toBe('Placed boulder: southeast, far.');
+
+    model.objects.push({
+      cx: 400,
+      cy: 400,
+      semantic: { kind: 'rift-descent' },
+    });
+    model.mobs.push({ cx: 200, cy: 200, aggro: false } as never);
+    view.updateRift(model, 560);
+    setLanguage('zh_CN');
+    view.updateRift(model, 560);
+    expect(view.tooltipAt(500, 500, 20)).toBe('已就位的巨石：东南方，远处。');
+  });
+
   it('describes only disclosure-safe battleground markers plus both static flag objectives', () => {
     const model: BgMapModel = {
       active: true,

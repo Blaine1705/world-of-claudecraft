@@ -867,8 +867,12 @@ export class MapSemanticAccessibilityCore {
     }
     const language = getLanguage();
     if (hash === this.lastHash && language === this.lastLanguage) return this.description;
+    const languageChanged = language !== this.lastLanguage;
     this.lastHash = hash;
     this.lastLanguage = language;
+    if (languageChanged) {
+      for (let i = 0; i < this.groupCount; i++) this.groups[i].singleText = '';
+    }
     this.selectVisibleGroups();
     let markers = '';
     for (let visibleIndex = 0; visibleIndex < this.visibleGroupIndices.length; visibleIndex++) {
@@ -1099,10 +1103,14 @@ export class MapSemanticAccessibilityCore {
         group.rank === rank &&
         group.bountiful === bountiful &&
         group.direction === hit.direction &&
-        group.distance === hit.distance &&
-        group.singleText
-      )
+        group.distance === hit.distance
+      ) {
+        if (!group.singleText) {
+          const label = this.labelText(labelId, 'none', '', rank, bountiful);
+          group.singleText = this.locatedText(label, hit.direction, hit.distance);
+        }
         return group.singleText;
+      }
     }
     const label = this.labelText(labelId, 'none', '', rank, bountiful);
     return this.locatedText(label, hit.direction, hit.distance);
