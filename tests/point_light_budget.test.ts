@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
   createFireLightAdopter,
+  pruneFireLights,
   reparentStrandedLightsToScene,
 } from '../src/render/fire_light_registry';
 import {
@@ -18,6 +19,16 @@ const RANGE_SQ = 100 * 100;
 
 function rendererSource(): string {
   return readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+}
+
+/** Full-line // comments removed, the same rule tests/loopback_guard.test.ts
+ *  applies: the code these pins name is explained in prose right beside itself,
+ *  so a commented-out line must neither satisfy a pin nor break one. */
+function codeWithoutLineComments(source: string): string {
+  return source
+    .split('\n')
+    .filter((line) => !/^\s*\/\//.test(line))
+    .join('\n');
 }
 
 /** The `budgetFireLights` body alone. Several pins below are ordinary lines to
@@ -598,20 +609,37 @@ describe('fire-light adoption sink', () => {
       'for (const light of this.jailScene.glowLights) this.fireLightAdopter.adopt(light)',
     );
     // retireInteriorGroup must dirty the rank on REMOVAL: the guard is a count,
-    // so an add and a remove of equal size would leave the rank stale. The mark
-    // has to sit on the SPLICE path, not merely somewhere in the method: a mark
-    // outside the loop would be skipped on the retire that removes nothing.
+    // so an add and a remove of equal size would leave the rank stale. The
+    // prune now ANSWERS whether it removed anything (pruneFireLights, covered
+    // behaviourally below), so the renderer half is a single guarded statement
+    // instead of a mark buried in a loop whose position a scan could only
+    // approximate.
     const retireStart = renderer.indexOf('private retireInteriorGroup(');
     const retireEnd = renderer.indexOf('private ensureDungeons(', retireStart);
     expect(retireStart).toBeGreaterThan(-1);
     expect(retireEnd).toBeGreaterThan(retireStart);
-    const retire = renderer.slice(retireStart, retireEnd);
-    const spliceIndex = retire.indexOf('this.fireLights.splice(i, 1);');
-    const markIndex = retire.indexOf('this.lightRankDirty = true;', spliceIndex);
-    const loopEnd = retire.indexOf('for (let i = this.flames.length', spliceIndex);
-    expect(spliceIndex).toBeGreaterThan(-1);
-    expect(markIndex).toBeGreaterThan(spliceIndex);
-    expect(markIndex).toBeLessThan(loopEnd);
+    expect(renderer.slice(retireStart, retireEnd)).toContain(
+      'if (pruneFireLights(this.fireLights, doomed)) this.lightRankDirty = true;',
+    );
+  });
+
+  it('reports whether a prune actually removed a light', () => {
+    // The behavioural half of the retire rule. The return value is the whole
+    // point: a prune that removed nothing must NOT dirty the rank (that is just
+    // churn), and one that removed something must, because the rebuild guard
+    // compares a count and a balanced add-and-remove leaves it stale.
+    const doomedLight = new THREE.PointLight(0xffffff, 5, 10, 2);
+    const keptLight = new THREE.PointLight(0xffffff, 5, 10, 2);
+    const registry = [keptLight, doomedLight];
+
+    expect(pruneFireLights(registry, new Set())).toBe(false);
+    expect(registry).toEqual([keptLight, doomedLight]);
+
+    expect(pruneFireLights(registry, new Set([doomedLight]))).toBe(true);
+    expect(registry).toEqual([keptLight]);
+
+    // A second prune over the same doomed set is a no-op and says so.
+    expect(pruneFireLights(registry, new Set([doomedLight]))).toBe(false);
   });
 
   it('lets nothing reach the raw registry after the constructor hides it', () => {
@@ -622,25 +650,37 @@ describe('fire-light adoption sink', () => {
     // The constructor's mass hide is the boundary: everything pushed before it
     // is swept visible=false by that line, so a bare push there is harmless,
     // while one after it puts a visible, unranked light in the scene.
-    const renderer = rendererSource();
+    // Comments are stripped first: this file's subject matter means the phrase
+    // appears in prose right beside the code, and a commented-out call must
+    // neither satisfy nor break the pin (the tests/loopback_guard.test.ts rule).
+    const renderer = codeWithoutLineComments(rendererSource());
     const massHide = renderer.indexOf(
       'for (const light of this.fireLights) light.visible = false;',
     );
     expect(massHide, 'the constructor mass hide moved; re-anchor this guard').toBeGreaterThan(-1);
-    expect(renderer.slice(massHide)).not.toContain('this.fireLights.push(');
+    // Every membership-changing form, not just `.push(`: unshift, splice and a
+    // bare index assignment bypass the seam exactly as well. Removal travels
+    // through pruneFireLights, which the retire case above pins by name.
+    expect(renderer.slice(massHide)).not.toMatch(
+      /this\.fireLights(?:\.(?:push|unshift|splice|pop|shift)\(|\s*\[[^\]]*\]\s*=[^=])/,
+    );
 
     // And the raw array escapes the seam exactly once, to the battleground:
     // buildBgFieldLights hides its own lights and its release path SPLICES,
     // which an append-only sink cannot express. Every other subsystem takes
     // `fireLightAdopter.sink`. The budget pass reads the registry too, so its
     // own method is excluded rather than counted.
+    // Whitespace-tolerant on both halves: a Biome reflow that wraps the
+    // property or moves the call's closing brace must not turn this red, since
+    // no seam was crossed. Only a genuinely NEW handoff should.
     const budget = budgetFireLightsBody(renderer);
     const outsideBudget = renderer.replace(budget, '');
-    const handoffs = [...outsideBudget.matchAll(/fireLights: this\.fireLights/g)];
+    const handoffs = [...outsideBudget.matchAll(/fireLights:\s*this\.fireLights\b/g)];
     expect(handoffs).toHaveLength(1);
-    const bgStart = outsideBudget.indexOf('const view = buildBattleground(');
-    const bgEnd = outsideBudget.indexOf('});', bgStart);
+    const bgStart = outsideBudget.search(/const view =\s*buildBattleground\(/);
+    const bgEnd = outsideBudget.indexOf('this.scene.add(view.group);', bgStart);
     expect(bgStart).toBeGreaterThan(-1);
+    expect(bgEnd).toBeGreaterThan(bgStart);
     expect(handoffs[0].index).toBeGreaterThan(bgStart);
     expect(handoffs[0].index).toBeLessThan(bgEnd);
   });
@@ -672,9 +712,16 @@ describe('fire-light adoption sink', () => {
     const scene = new THREE.Scene();
     const group = new THREE.Group();
     group.position.set(100, 5, -40);
+    // NESTED, not a direct child: the rule the helper states is about the next
+    // builder parenting a glow into a holder of its own, so a scan of
+    // group.children alone would pass every case here while leaving that light
+    // stranded. The nesting also makes the world-position arithmetic non-trivial.
+    const holder = new THREE.Group();
+    holder.position.set(1, 0, 1);
     const light = new THREE.PointLight(0x86b4ff, 9, 24, 2);
-    light.position.set(2, 6, 3);
-    group.add(light);
+    light.position.set(1, 6, 2);
+    holder.add(light);
+    group.add(holder);
     scene.add(group);
     const ranked: RankedPointLight[] = [
       { light, d2: 0, worldPos: new THREE.Vector3(), base: 9, dynamic: false },
@@ -693,6 +740,46 @@ describe('fire-light adoption sink', () => {
     expect(light.getWorldPosition(new THREE.Vector3()).toArray()).toEqual([102, 11, -37]);
     group.visible = false;
     expect(countDrawnPointLights(ranked, scene)).toBe(1);
+  });
+
+  it('refuses a light a world position cannot describe, instead of moving it wrong', () => {
+    // The lift preserves POSITION only, which is the whole of a point light and
+    // not the whole of the others: a directional light's `target` would stay
+    // behind in the group, and a hemisphere light has no position at all. Those
+    // carry the same cache-key hazard on numDirLights / numHemiLights (the
+    // Wildheart caldera interior builds exactly this pair), so the helper has
+    // to say so rather than lift one silently wrong.
+    const scene = new THREE.Scene();
+    const group = new THREE.Group();
+    group.name = 'wildheartField';
+    group.position.set(100, 5, -40);
+    const sun = new THREE.DirectionalLight(0xffe0a6, 0.88);
+    sun.target.position.set(0, 2, 135);
+    const point = new THREE.PointLight(0xffffff, 5, 20, 2);
+    group.add(sun, sun.target, new THREE.HemisphereLight(0xdff4da, 0x6d5131, 0.9), point);
+    scene.add(group);
+    const errors: string[] = [];
+    const realError = console.error;
+    console.error = (message: string) => errors.push(message);
+
+    let moved: THREE.PointLight[];
+    try {
+      moved = reparentStrandedLightsToScene(scene, group);
+    } finally {
+      console.error = realError;
+    }
+
+    // The point light still moves; the others stay put and are named.
+    expect(moved).toEqual([point]);
+    expect(sun.parent).toBe(group);
+    expect(sun.target.parent).toBe(group);
+    expect(errors).toHaveLength(2);
+    for (const message of errors) {
+      expect(message).toContain('wildheartField');
+      expect(message).toContain('only covers point lights');
+    }
+    expect(errors.join(' ')).toContain('DirectionalLight');
+    expect(errors.join(' ')).toContain('HemisphereLight');
   });
 
   it('recomposes the matrix of an already frozen light it lifts', () => {
@@ -716,11 +803,12 @@ describe('fire-light adoption sink', () => {
     expect(light.getWorldPosition(new THREE.Vector3()).toArray()).toEqual([102, 11, -37]);
   });
 
-  it('reparents every attached zone feature the same mechanical way', () => {
-    // The rule is applied at the two attach points, not left to each builder:
-    // a feature builder that parents a glow into its own group must not be able
-    // to reintroduce the stall.
-    const renderer = rendererSource();
+  it('applies the lift at both light-bearing attach points', () => {
+    // The rule lives at the attach points, not with each builder: a feature
+    // builder that parents a glow into its own group must not be able to
+    // reintroduce the stall. These two are the whole set today (the generic
+    // zone-feature attach and the jail, which is added directly).
+    const renderer = codeWithoutLineComments(rendererSource());
     expect(renderer).toContain('reparentStrandedLightsToScene(this.scene, view.group);');
     expect(renderer).toContain('reparentStrandedLightsToScene(this.scene, this.jailScene.group);');
   });

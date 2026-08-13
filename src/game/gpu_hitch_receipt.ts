@@ -88,9 +88,14 @@ function finiteQueryNumber(value: string | null): number | null {
 // run used and has no business being recorded as one.
 const QUERY_FLAG_PATTERN = /^[A-Za-z0-9_.,:-]{1,32}$/;
 
+/** Recorded in place of a value that failed the bound. Distinct from `null`,
+ *  which means the flag was not passed at all: a misconfigured leg has to read
+ *  as misconfigured rather than as a clean default run. */
+export const GPU_HITCH_REJECTED_FLAG = 'rejected';
+
 function queryFlag(value: string | null): string | null {
   if (value === null) return null;
-  return QUERY_FLAG_PATTERN.test(value) ? value : null;
+  return QUERY_FLAG_PATTERN.test(value) ? value : GPU_HITCH_REJECTED_FLAG;
 }
 
 function requestedFromSearch(search: string): GpuHitchRuntimeReceipt['requested'] {

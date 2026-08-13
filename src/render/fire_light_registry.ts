@@ -22,7 +22,8 @@ import {
 const reparentScratch = new THREE.Vector3();
 
 /**
- * Lift every light under `root` up to `scene`, preserving its world position.
+ * Lift every POINT light under `root` up to `scene`, preserving its world
+ * position.
  *
  * A point light rides the budget, NEVER a cull-toggled group (the Sowfield
  * brazier rule). A light left inside such a group leaves the render light list
@@ -30,7 +31,9 @@ const reparentScratch = new THREE.Vector3();
  * that frame: it ranks against the ancestry it sees, while the cull sweeps run
  * AFTER the frame's budget pass. So a group flipping from shown to hidden while
  * one of its lights holds a counted slot drops numPointLights for that frame and
- * relinks every lit material drawn in it.
+ * relinks every lit material drawn in it. Distance does not save it either: the
+ * budget counts the nearest `visibleCount` ELIGIBLE lights whatever their range,
+ * which only gates whether they shine.
  *
  * Applied mechanically at attach, so the NEXT builder that parents a glow into
  * its own group cannot reintroduce the stall.
@@ -38,10 +41,26 @@ const reparentScratch = new THREE.Vector3();
 export function reparentStrandedLightsToScene(
   scene: THREE.Object3D,
   root: THREE.Object3D,
-): THREE.Light[] {
-  const stranded: THREE.Light[] = [];
+): THREE.PointLight[] {
+  const stranded: THREE.PointLight[] = [];
   root.traverse((obj) => {
-    if ((obj as THREE.Light).isLight) stranded.push(obj as THREE.Light);
+    const light = obj as THREE.Light;
+    if (!light.isLight) return;
+    if ((light as THREE.PointLight).isPointLight) {
+      stranded.push(light as THREE.PointLight);
+      return;
+    }
+    // A world POSITION is the whole of what describes a point light, and the
+    // whole of what this lift preserves. A spot or directional light also
+    // carries an orientation and a SEPARATE `target` object that would stay
+    // behind in the group, and a hemisphere light has no position at all.
+    // Those are the same cache-key hazard on numSpotLights / numDirLights (see
+    // the Wildheart caldera interior), but each needs its own handling, so say
+    // so loudly rather than move one silently wrong.
+    console.error(
+      `reparentStrandedLightsToScene: "${root.name}" holds a ${light.type} inside a ` +
+        'cull-toggled group; this lift only covers point lights, so its light count is unpinned',
+    );
   });
   for (const light of stranded) {
     light.getWorldPosition(reparentScratch);
@@ -98,6 +117,30 @@ export function createFireLightAdopter(
       },
     },
   };
+}
+
+/**
+ * Drop every registered light that belongs to a retiring subtree, and say
+ * whether the registry actually changed.
+ *
+ * The caller uses the answer to dirty the rank, and it MUST: the rebuild guard
+ * compares `rank.length` against a count, so a retire that removes as many
+ * lights as a same-microtask build added leaves a stale rank holding the
+ * retired floor and missing the new one. Returning the fact, rather than
+ * leaving the caller to set a flag somewhere inside a loop, is what makes that
+ * testable at all.
+ */
+export function pruneFireLights(
+  fireLights: THREE.PointLight[],
+  doomed: ReadonlySet<THREE.Object3D>,
+): boolean {
+  let removed = false;
+  for (let i = fireLights.length - 1; i >= 0; i--) {
+    if (!doomed.has(fireLights[i])) continue;
+    fireLights.splice(i, 1);
+    removed = true;
+  }
+  return removed;
 }
 
 export interface FireLightBudgetPass {

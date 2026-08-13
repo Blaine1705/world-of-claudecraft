@@ -1,5 +1,8 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { publishGpuHitchRuntimeReceipt } from '../src/game/gpu_hitch_receipt';
+import {
+  GPU_HITCH_REJECTED_FLAG,
+  publishGpuHitchRuntimeReceipt,
+} from '../src/game/gpu_hitch_receipt';
 
 afterEach(() => {
   delete (globalThis as { window?: unknown }).window;
@@ -41,22 +44,34 @@ describe('gpu hitch runtime receipt', () => {
       search: `?modular=${long}&modularpeers=${encodeURIComponent('tok en/with spaces')}&gfx=${encodeURIComponent('<script>')}`,
       renderer: null,
     });
+    // A rejected value is recorded as rejected, NOT as null: null means the
+    // flag was never passed, and a misconfigured leg reading as a clean default
+    // run is how a bad capture gets compared as if it were good.
     expect(receipt?.requested).toMatchObject({
-      modular: null,
-      modularpeers: null,
-      gfx: null,
+      modular: GPU_HITCH_REJECTED_FLAG,
+      modularpeers: GPU_HITCH_REJECTED_FLAG,
+      gfx: GPU_HITCH_REJECTED_FLAG,
     });
     const serialized = JSON.stringify(receipt);
     expect(serialized).not.toContain(long);
     expect(serialized).not.toContain('script');
 
+    // An absent flag stays null, so the two states remain distinguishable.
+    const absent = publishGpuHitchRuntimeReceipt({ search: '?perf', renderer: null });
+    expect(absent?.requested).toMatchObject({ modular: null, modularpeers: null, gfx: null });
+
     // A real flag still travels: bounding must not silently blank the knobs the
-    // A/B comparator keys on.
+    // A/B comparator keys on. The 32-character case pins the bound from BELOW
+    // too, so a tightening to a shorter limit cannot pass silently.
     const kept = publishGpuHitchRuntimeReceipt({
-      search: '?modular=off&modularpeers=on&gfx=ultra',
+      search: `?modular=off&modularpeers=on&gfx=${'a'.repeat(32)}`,
       renderer: null,
     });
-    expect(kept?.requested).toMatchObject({ modular: 'off', modularpeers: 'on', gfx: 'ultra' });
+    expect(kept?.requested).toMatchObject({
+      modular: 'off',
+      modularpeers: 'on',
+      gfx: 'a'.repeat(32),
+    });
   });
 
   it('publishes the pacing values consumed by the renderer after prewarm', () => {

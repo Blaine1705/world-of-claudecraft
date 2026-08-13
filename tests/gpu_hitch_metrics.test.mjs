@@ -231,6 +231,26 @@ describe('gpu hitch metrics', () => {
     expect(comparabilityMismatches(left, right)).toEqual(['probeSha256', 'glRenderer']);
   });
 
+  // The base for the mutation cases below carries a REAL value for every
+  // dimension, unlike the plain fixture: with a field absent, a case only
+  // exercises absent-against-present, which a comparator degraded to a presence
+  // test would still pass while two genuinely different zones compared equal.
+  // Kept separate from capture() so the fallback-chain cases above, which
+  // deliberately supply zone from a different surface, keep working.
+  const comparabilityBase = (overrides = {}) =>
+    capture({
+      capture: {
+        ...capture().capture,
+        zone: 'eastbrook_vale',
+        observer: { x: 120, z: -40 },
+        groupId: 'linkrate-v38-a1',
+        fixture: { kind: 'geared-arrival-v1', count: 20 },
+        durationMs: 90_000,
+      },
+      effective: { ...capture().effective, renderer: { tier: 'ultra' } },
+      ...overrides,
+    });
+
   // One mutation per comparability dimension, spelled out rather than derived
   // from COMPARABILITY_KEYS: the two lists are diffed below, so a dimension
   // dropped from the analyzer cannot quietly drop its own case here too.
@@ -257,10 +277,12 @@ describe('gpu hitch metrics', () => {
     gfx: (base) => ({ requested: { ...base.requested, gfx: 'high' } }),
     scenario: (base) => ({ capture: { ...base.capture, scenario: 'online-geared-entry' } }),
     zone: (base) => ({ capture: { ...base.capture, zone: 'fenbridge' } }),
-    observer: (base) => ({ capture: { ...base.capture, observer: { x: 10, z: 20 } } }),
-    groupId: (base) => ({ capture: { ...base.capture, groupId: 'other-group' } }),
-    fixture: (base) => ({ capture: { ...base.capture, fixture: { bots: 20 } } }),
-    durationMs: (base) => ({ capture: { ...base.capture, durationMs: 90_000 } }),
+    observer: (base) => ({ capture: { ...base.capture, observer: { x: 900, z: 1_400 } } }),
+    groupId: (base) => ({ capture: { ...base.capture, groupId: 'linkrate-v38-b2' } }),
+    fixture: (base) => ({
+      capture: { ...base.capture, fixture: { kind: 'geared-arrival-v1', count: 8 } },
+    }),
+    durationMs: (base) => ({ capture: { ...base.capture, durationMs: 180_000 } }),
     'requested.linkmode': (base) => ({ requested: { ...base.requested, linkmode: 'adaptive' } }),
     'requested.linkrate': (base) => ({ requested: { ...base.requested, linkrate: 24 } }),
     'requested.linkburst': (base) => ({ requested: { ...base.requested, linkburst: 8 } }),
@@ -286,8 +308,8 @@ describe('gpu hitch metrics', () => {
   it.each(Object.keys(COMPARABILITY_MUTATIONS))(
     'refuses an A/B pair that drifted on %s and nothing else',
     (key) => {
-      const left = capture();
-      const right = capture(COMPARABILITY_MUTATIONS[key](left));
+      const left = comparabilityBase();
+      const right = comparabilityBase(COMPARABILITY_MUTATIONS[key](left));
       // A leg is always its own control, so a comparator that just returned the
       // whole key list could not pass this pair of assertions.
       expect(comparabilityMismatches(left, left)).toEqual([]);
@@ -500,6 +522,8 @@ describe('gpu hitch metrics', () => {
     for (const glRenderer of [
       'ANGLE (Microsoft, Microsoft Basic Render Driver Direct3D11 vs_5_0 ps_5_0)',
       'Mesa/X.org llvmpipe (LLVM 15.0.6, 256 bits)',
+      'Mesa softpipe',
+      'Generic Software Renderer',
     ]) {
       const raw = capture({ environment: { ...capture().environment, glRenderer } });
       const smoke = validateCapture(raw);

@@ -1,5 +1,16 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+
+/** Full-line // comments removed, the tests/loopback_guard.test.ts rule: the
+ *  lines these pins name are explained in prose right beside themselves, so a
+ *  commented-out copy must not satisfy a pin. */
+function codeWithoutLineComments(source) {
+  return source
+    .split('\n')
+    .filter((line) => !/^\s*\/\//.test(line))
+    .join('\n');
+}
+
 import {
   buildCapture,
   parseArgs,
@@ -175,13 +186,21 @@ describe('gpu hitch capture CLI', () => {
     // covered below, but perfStats() is where the value is DERIVED, and it
     // cannot run in Node: regressing it to a literal null would silently
     // disable the analyzer's zone check with every other test still green.
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
-    expect(renderer).toContain(
+    // Comments stripped, and the renderer half anchored to the perfStats body:
+    // a raw whole-file scan is satisfied by leaving the old line commented out
+    // above a `currentZoneId: null,`, which is exactly the regression named.
+    const renderer = codeWithoutLineComments(
+      readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8'),
+    );
+    const statsStart = renderer.indexOf('  perfStats(): {');
+    const statsEnd = renderer.indexOf('\n  private ', statsStart);
+    expect(statsStart, 'perfStats was renamed; re-anchor this pin').toBeGreaterThan(-1);
+    expect(statsEnd).toBeGreaterThan(statsStart);
+    expect(renderer.slice(statsStart, statsEnd)).toContain(
       'currentZoneId: this.zoneIdAt(this.sim.player.pos.x, this.sim.player.pos.z),',
     );
-    const capture = readFileSync(
-      new URL('../scripts/gpu_hitch_capture.mjs', import.meta.url),
-      'utf8',
+    const capture = codeWithoutLineComments(
+      readFileSync(new URL('../scripts/gpu_hitch_capture.mjs', import.meta.url), 'utf8'),
     );
     expect(capture).toContain('zone: snapshot.rendererStats?.currentZoneId ?? null,');
   });
@@ -345,6 +364,30 @@ describe('gpu hitch capture CLI', () => {
       }),
     ).rejects.toThrow('bot 7 failed to enter the world');
     expect(events).toEqual(['prepare', 'close']);
+  });
+
+  it('surfaces the prepare failure even when the cleanup close also fails', () => {
+    // The cleanup must not become the error the operator sees: a close that
+    // rejects (a pg client already gone, a socket half-open) would otherwise
+    // replace "bot 7 failed to enter the world" with a teardown message and
+    // send the diagnosis in the wrong direction.
+    const roster = {
+      prepare: async () => {
+        throw new Error('bot 7 failed to enter the world');
+      },
+      close: async () => {
+        throw new Error('pg client already ended');
+      },
+    };
+    return expect(
+      prepareOnlineGearedRoster({
+        args: { url: 'http://localhost:5173/?perf', serverUrl: 'http://localhost:8787', bots: 20 },
+        runId: 'capture-1',
+        databaseUrl: 'postgres://localhost/test',
+        checkCapability: async () => {},
+        rosterFactory: () => roster,
+      }),
+    ).rejects.toThrow('bot 7 failed to enter the world');
   });
 
   it('rejects a remote page before capability checks or roster mutation', async () => {

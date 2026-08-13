@@ -265,7 +265,7 @@ import { buildFenFeatures, type FenFeaturesView } from './fen_features';
 import { buildFenbridgeTownView, type FenbridgeTownView } from './fenbridge_town';
 import {
   createFireLightAdopter,
-  type FireLightBudgetPass,
+  pruneFireLights,
   reparentStrandedLightsToScene,
   runFireLightBudgetPass,
 } from './fire_light_registry';
@@ -1733,9 +1733,6 @@ export class Renderer {
   // it hides the light AND dirties the rank, which are only correct together
   // (fire_light_registry.ts explains why). Subsystems get `sink`, which is the
   // same operation shaped like Array.push, so they cannot bypass it.
-  // Pooled budget-pass descriptor, filled in place by budgetFireLights.
-  private fireLightPass: FireLightBudgetPass | null = null;
-
   private readonly fireLightAdopter = createFireLightAdopter(
     () => this.fireLights,
     () => {
@@ -9315,14 +9312,11 @@ export class Renderer {
     this.scene.remove(group);
     const doomed = new Set<THREE.Object3D>();
     group.traverse((o) => doomed.add(o));
-    for (let i = this.fireLights.length - 1; i >= 0; i--) {
-      if (!doomed.has(this.fireLights[i])) continue;
-      this.fireLights.splice(i, 1);
-      // The rebuild guard compares ranked.length against a COUNT, so a retire
-      // that removes as many lights as a same-microtask build added would leave
-      // a stale rank holding the retired floor and missing the new one.
-      this.lightRankDirty = true;
-    }
+    // pruneFireLights answers whether the registry changed, and the rank MUST
+    // follow: the rebuild guard compares ranked.length against a COUNT, so a
+    // retire that removes as many lights as a same-microtask build added would
+    // leave a stale rank holding the retired floor and missing the new one.
+    if (pruneFireLights(this.fireLights, doomed)) this.lightRankDirty = true;
     for (let i = this.flames.length - 1; i >= 0; i--) {
       if (doomed.has(this.flames[i])) this.flames.splice(i, 1);
     }
@@ -12891,38 +12885,31 @@ export class Renderer {
   // but only the nearest GFX.maxPointLights within range shine each frame.
   // Rank entries are pooled (extended only when interiors or view lights change).
   // Static world positions stay cached; moving weapon VFX refresh into their
-  // existing vectors, so the pass allocates nothing per frame. The descriptor
-  // is pooled for the same reason (the caller-owned-plan convention). The
-  // fireLights binding is refreshed every pass rather than captured, because
-  // the constructor REBINDS it once the props are built.
+  // existing vectors, so the per-light work allocates nothing. The one
+  // allocation is the pass descriptor below, one small object per frame,
+  // deliberately not pooled: a pooled descriptor would have to re-read every
+  // registry each pass anyway (the constructor rebinds fireLights once the
+  // props are built), and one that captured them instead would rank a dead
+  // array while numPointLights moves, which is the stall this prevents.
   private budgetFireLights(px: number, pz: number, flicker = false): void {
     // The pass itself lives in fire_light_registry.ts; the renderer only owns
     // the registries, the pads and the clock it reads from.
-    this.fireLightPass ??= {
+    runFireLightBudgetPass({
       rank: this.lightRank,
-      rankDirty: false,
+      rankDirty: this.lightRankDirty,
       fireLights: this.fireLights,
       viewLights: this.viewLights,
       pads: this.lightPads,
-      px: 0,
-      pz: 0,
-      visibleCount: 0,
-      liveBudget: 0,
+      px,
+      pz,
+      // maxPointLights is the per-tier constant, so the live governor
+      // (effectivePointLights) only changes how many SHINE, not the count.
+      visibleCount: GFX.maxPointLights,
+      liveBudget: this.effectivePointLights || GFX.maxPointLights,
       rangeSq: LIGHT_BUDGET_RANGE_SQ,
       scene: this.scene,
-      flickerTime: null,
-    };
-    const pass = this.fireLightPass;
-    pass.rankDirty = this.lightRankDirty;
-    pass.fireLights = this.fireLights;
-    pass.px = px;
-    pass.pz = pz;
-    // maxPointLights is the per-tier constant, so the live governor
-    // (effectivePointLights) only changes how many SHINE, not the count.
-    pass.visibleCount = GFX.maxPointLights;
-    pass.liveBudget = this.effectivePointLights || GFX.maxPointLights;
-    pass.flickerTime = flicker ? this.time : null;
-    runFireLightBudgetPass(pass);
+      flickerTime: flicker ? this.time : null,
+    });
     // A completed pass always leaves the rank current.
     this.lightRankDirty = false;
   }
