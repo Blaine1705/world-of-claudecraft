@@ -54,7 +54,6 @@ import {
 import type { PickAction } from '../src/sim/lockpick';
 import { lootHasGoneFfa } from '../src/sim/loot/loot_ffa';
 import { type MarketQuery, sanitizeMarketQuery } from '../src/sim/market_query';
-import { CHEATER_MARK_AURA_ID } from '../src/sim/moderation';
 import { parseMoveInputFrame } from '../src/sim/move_input';
 import {
   partyFrameAbsorb,
@@ -162,6 +161,11 @@ import {
 } from './chat_filter_commands';
 import { applyChatStrike, loadChatFilterState, recordChatViolation } from './chat_filter_db';
 import { ChatLogger } from './chat_log';
+import {
+  applyCheaterMarkLive as applyCheaterMarkLiveRuntime,
+  persistCheaterMark,
+  refreshCheaterMark,
+} from './cheater_mark_runtime';
 import {
   type CosmeticOpGuardState,
   consumeCosmeticOpToken,
@@ -284,8 +288,6 @@ import {
 } from './mob_scan_tick_stats';
 import { parseModerationChatCommand } from './moderation_commands';
 import {
-  accountCheaterMarkSeconds,
-  burnAccountCheaterMark,
   forceCharacterRename,
   moderateAccount,
   muteAccountChat,
@@ -3169,41 +3171,6 @@ export class GameServer {
     this.stampAccountFlair(session, flair);
   }
 
-  // Restore the account's Cheater mark onto the joining character: the tag is
-  // account-scoped, so every alt wears whatever budget the account still owes.
-  // Same best-effort shape as the flair refresh above, including the guard
-  // against the player leaving mid-fetch. Rides its own read rather than the
-  // flair one because flair is cosmetic self-expression and this is a sanction:
-  // they are written by different operators for different reasons and neither
-  // should be able to break the other's restore by failing.
-  /**
-   * Write the live Cheater budget back to the account, from the session save.
-   *
-   * Skips entirely when the session was never marked, so an unmarked account (the
-   * overwhelming majority) costs zero writes: `session.cheaterMarked` latches on
-   * at apply/restore and is what makes the LAST write, the one that zeroes the
-   * row, still happen after the aura has gone.
-   */
-  private async persistCheaterMark(session: ClientSession, e: Entity | undefined): Promise<void> {
-    if (!session.cheaterMarked) return;
-    const live = e?.auras.find((a) => a.id === CHEATER_MARK_AURA_ID);
-    const remaining = Math.max(0, Math.floor(live?.remaining ?? 0));
-    if (remaining <= 0) session.cheaterMarked = false;
-    try {
-      await burnAccountCheaterMark(session.accountId, remaining);
-    } catch (err) {
-      console.error('cheater mark write-back failed:', err);
-    }
-  }
-
-  private async refreshCheaterMark(session: ClientSession): Promise<void> {
-    const seconds = await accountCheaterMarkSeconds(session.accountId);
-    if (seconds <= 0) return;
-    if (this.clients.get(session.pid) !== session) return;
-    session.cheaterMarked = true;
-    this.sim.setCheaterMark(seconds, session.pid);
-  }
-
   /**
    * Apply an account's flair to one live session: the entity fields the wire encodes
    * (the identity diff re-broadcasts them to nearby players on the next snapshot) and
@@ -3234,22 +3201,10 @@ export class GameServer {
     }
   }
 
-  /**
-   * Push a Cheater mark change onto every live session of that account, so a
-   * sanction lands in the session it was applied in rather than at the next
-   * login. `seconds` is the remaining PLAYED-second budget; 0 lifts the tag.
-   *
-   * A no-op when the account is offline: the join restore below reads the row.
-   */
+  /** Push a Cheater mark change onto every live session of that account
+   *  (server/cheater_mark_runtime.ts owns the behavior and its contract). */
   applyCheaterMarkLive(accountId: number, seconds: number): void {
-    for (const live of this.clients.values()) {
-      if (live.accountId !== accountId) continue;
-      // Latched even on a LIFT (seconds = 0): the next save is the one that has
-      // to zero the account row, and skipping it would leave the budget behind
-      // for the next login to restore.
-      live.cheaterMarked = true;
-      this.sim.setCheaterMark(seconds, live.pid);
-    }
+    applyCheaterMarkLiveRuntime(this.clients.values(), this.sim, accountId, seconds);
   }
 
   /** Apply a committed cross-process policy notification to live sessions. */
@@ -4120,9 +4075,11 @@ export class GameServer {
     // player out of a game they paid for over a cosmetic sanction; the budget is
     // not burned while the tag is absent, so a missed restore delays the sanction
     // rather than cancelling it.
-    void this.refreshCheaterMark(session).catch((err) =>
-      console.error('cheater mark refresh failed:', err),
-    );
+    void refreshCheaterMark(
+      session,
+      this.sim,
+      () => this.clients.get(session.pid) === session,
+    ).catch((err) => console.error('cheater mark refresh failed:', err));
     // Stamp the Curator standing off the just-loaded meta so an inspect landing
     // before the first 60s cycle already reads the true rank. Synchronous (pure
     // CPU), so the try/catch is what keeps the same "a flair stamp must never
@@ -4500,7 +4457,7 @@ export class GameServer {
       // The live aura is the source of truth, not meta.cheaterMark, because the
       // aura is what ticks (see src/sim/moderation/CLAUDE.md). Its absence means
       // the sanction is served, and burn(0) is what clears the account row.
-      void this.persistCheaterMark(session, e);
+      void persistCheaterMark(session, e?.auras);
       // Captured at serialize time: only unlocks already inside THIS blob may
       // publish when it lands. An unlock granted while the write is in flight
       // stays pending for the save queued behind it, so the character_deeds
