@@ -488,7 +488,11 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
       await import('../../server/woc_market_db');
     const { ESCROW_QUEUE_WAIT_MS, ESCROW_QUEUE_WARN_MS, ESCROW_QUEUE_WARN_THROTTLE_MS } =
       await import('../../server/woc_market_custody');
-    expect(ESCROW_STATEMENT_TIMEOUT_MS).toBe(5_000);
+    // 4000 since the directed-rail work: FIVE workload statements now share
+    // the occupancy relation (the cap count stopped skipping directed rows
+    // and the offer stamp joined), and five 5s allowances would price the
+    // pinned sum past one autosave period.
+    expect(ESCROW_STATEMENT_TIMEOUT_MS).toBe(4_000);
     expect(ESCROW_LOCK_TIMEOUT_MS).toBe(2_000);
     // Equal BY RULING (the idle bound and the lock wait tell one story).
     expect(GUARD_IDLE_TX_TIMEOUT_MS).toBe(2_000);
@@ -517,11 +521,11 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     expect(ESCROW_STATEMENT_TIMEOUT_MS).toBeLessThan(DB_HEAVY_STATEMENT_TIMEOUT_MS);
     expect(ESCROW_STATEMENT_TIMEOUT_MS).toBeGreaterThan(ESCROW_LOCK_TIMEOUT_MS);
     // The escrow FIFO-occupancy relation, and it bounds exactly this much: the
-    // FOUR workload statements plus the lock wait plus the pool checkout, kept
+    // FIVE workload statements plus the lock wait plus the pool checkout, kept
     // under one autosave period so a listing does not stall a saveAll worker
     // across a whole wave. It is NOT the whole worst case: BEGIN and the SET
     // LOCAL that installs the allowance run under the 15s session default, the
-    // two LATER SET LOCALs run under the 5s allowance but are protocol
+    // two LATER SET LOCALs run under the 4s allowance but are protocol
     // statements with no locks, IO, or planning (excluded from the sum on
     // that ground), and COMMIT's only hard bound is the 65s driver
     // query_timeout backstop, so a genuinely wedged job CAN exceed one

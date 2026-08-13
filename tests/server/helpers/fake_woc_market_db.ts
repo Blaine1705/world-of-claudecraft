@@ -75,7 +75,7 @@ export const OPEN_SETTLEMENT_STATES: readonly WocSettlementState[] = [
 
 export class FakeWocMarketDb implements WocMarketDb {
   /** Force the NEXT escrowInsertListing to refuse (consumed on use). */
-  failNextEscrow: 'lease_lost' | 'cap_reached' | 'contended' | null = null;
+  failNextEscrow: 'lease_lost' | 'cap_reached' | 'contended' | 'not_pending' | null = null;
   /** THROW from the next escrowInsertListing (after recording the save args,
    *  which still cross the edge when a real transaction dies): the error's
    *  .code drives the caller's rollback-proof compensation split. */
@@ -427,7 +427,19 @@ export class FakeWocMarketDb implements WocMarketDb {
     expiresAtMs: number;
     itemId: string;
     itemPin: string;
-  }): Promise<WocDirectedOfferRow> {
+  }): Promise<WocDirectedOfferRow | 'already_pending'> {
+    // The pair-pending unique index's mirror: one live deal per
+    // (buyer, seller) pair (the strike-farming bound).
+    for (const o of this.offers.values()) {
+      if (
+        o.realm === offer.realm &&
+        o.status === 'pending' &&
+        o.buyerAccount === offer.buyerAccount &&
+        o.sellerAccount === offer.sellerAccount
+      ) {
+        return 'already_pending';
+      }
+    }
     const row: WocDirectedOfferRow = {
       id: this.nextOfferId++,
       ...offer,
@@ -497,10 +509,10 @@ export class FakeWocMarketDb implements WocMarketDb {
     if (!row || row.realm !== realm || row.status !== 'pending') return null;
     if (side === 'buyer') row.buyerAccepted = true;
     else row.sellerAccepted = true;
-    if (itemRef !== null) {
-      row.itemRef = itemRef;
-      row.itemId = itemRef.itemId;
-    }
+    // item_id stays the BUYER's agreed item (stamped at creation); only the
+    // seller's claimed extraction ref is recorded, mirroring the real UPDATE.
+    if (itemRef !== null) row.itemRef = itemRef;
+    this.offerUpdatedMs.set(id, this.now());
     return { ...row };
   }
 
@@ -528,19 +540,21 @@ export class FakeWocMarketDb implements WocMarketDb {
   async acceptedUnstampedOffers(
     realm: string,
     olderThanMs: number,
+    oldestAllowedMs: number,
     limit: number,
-  ): Promise<WocDirectedOfferRow[]> {
+  ): Promise<{ id: number; expiresAtMs: number }[]> {
     return [...this.offers.values()]
       .filter(
         (o) =>
           o.realm === realm &&
           o.status === 'accepted' &&
           o.listingId === null &&
-          (this.offerUpdatedMs.get(o.id) ?? 0) <= olderThanMs,
+          (this.offerUpdatedMs.get(o.id) ?? 0) <= olderThanMs &&
+          (this.offerUpdatedMs.get(o.id) ?? 0) > oldestAllowedMs,
       )
       .sort((a, b) => (this.offerUpdatedMs.get(a.id) ?? 0) - (this.offerUpdatedMs.get(b.id) ?? 0))
       .slice(0, limit)
-      .map((o) => ({ ...o }));
+      .map((o) => ({ id: o.id, expiresAtMs: o.expiresAtMs }));
   }
 
   async expireDirectedOfferIfUnstamped(realm: string, id: number): Promise<boolean> {

@@ -168,6 +168,25 @@ export const WOC_MARKET_DIRECTED_HOLD_SECONDS = WOC_MARKET_SETTLEMENT_WINDOW_SEC
  */
 export const WOC_MARKET_OFFER_CONVERGE_SECONDS = 300;
 
+/**
+ * The converge arm's UPPER age bound: accepted-unstamped rows older than this
+ * are left alone entirely.
+ *
+ * The young bound above keeps an IN-FLIGHT acceptance out of the batch; this
+ * one keeps out rows that stopped being evidence of anything. The proof
+ * "accepted with no stamped listing means the escrow rolled back" holds only
+ * while listing_id is escrow-written truth, and the nightly listings prune
+ * falsifies it in bulk: deleting a pruned deal's listing SET-NULLs the
+ * surviving offer's listing_id (the FK's ON DELETE), which would hand the
+ * converge arm a long-COMPLETED sale dressed as a rolled-back escrow and let
+ * it relabel real history 'expired'. A genuine residual is minutes old (it
+ * ages only across the sweep's own downtime), so a generous day covers any
+ * realistic outage; a residual older than that stays visible in both trade
+ * windows (the pre-hardening shape) for an operator, which is the safe
+ * failure direction against rewriting completed deals.
+ */
+export const WOC_MARKET_OFFER_CONVERGE_MAX_AGE_SECONDS = 24 * 3600;
+
 // ---------------------------------------------------------------------------
 // Bidding math
 // ---------------------------------------------------------------------------

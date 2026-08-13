@@ -275,10 +275,22 @@ function signatureField(value: unknown): string {
 
 /** An instance payload from the client is opaque JSON the sim compares
  *  structurally; only its container shape is checked here. */
+/** A real instance payload (rolled stats, enchant, signer, provenance)
+ *  serializes to a few hundred bytes; 2 KiB is generous headroom. The bound
+ *  is load-bearing twice over: it caps what a caller can persist through the
+ *  instance-carrying intakes, and, because JSON depth costs at least two
+ *  serialized bytes per level, it bounds nesting depth for the RECURSIVE
+ *  consumers downstream (the sim's sortedJson fingerprint serializer and
+ *  itemInstancePayloadsEqual), which a ~30000-level object inside the 64 KiB
+ *  body cap can otherwise overflow into a 500. JSON.stringify itself is
+ *  iterative and safe at any depth the body cap admits. */
+const INSTANCE_MAX_JSON_BYTES = 2048;
+
 function optionalInstance(value: unknown): ItemInstancePayload | null | undefined {
   if (value === undefined) return undefined;
   if (value === null) return null;
   if (typeof value !== 'object' || Array.isArray(value)) invalid();
+  if (JSON.stringify(value).length > INSTANCE_MAX_JSON_BYTES) invalid();
   return value as ItemInstancePayload;
 }
 

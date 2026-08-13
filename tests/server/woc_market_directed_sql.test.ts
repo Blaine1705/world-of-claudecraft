@@ -93,6 +93,232 @@ describe('the schema carries the directed column additively', () => {
     const { WOC_MARKET_SCHEMA } = await import('../../server/woc_market_db');
     expect(WOC_MARKET_SCHEMA).toContain('ADD COLUMN IF NOT EXISTS directed_buyer_account');
     expect(WOC_MARKET_SCHEMA).toContain('woc_market_listings_directed_buyer');
+    // The agreed-copy fingerprint column is in the same
+    // deployed-realm-needs-the-ALTER class, and the three integrity indexes
+    // must exist by name (IF NOT EXISTS matches on the NAME alone).
+    expect(WOC_MARKET_SCHEMA).toContain('ADD COLUMN IF NOT EXISTS item_pin');
+    expect(WOC_MARKET_SCHEMA).toContain('woc_market_directed_offers_listing');
+    expect(WOC_MARKET_SCHEMA).toContain('woc_market_offers_accepted_unstamped');
+    expect(WOC_MARKET_SCHEMA).toContain('woc_market_offers_pair_pending');
+  });
+});
+
+describe('the directed-rail integrity statements, in SQL', () => {
+  it('the offer insert stamps the agreed item and pin at creation, and maps the pair bound typed', async () => {
+    const seenSql: string[] = [];
+    const seenParams: unknown[][] = [];
+    const okPool = {
+      query: vi.fn(async (text: string, params?: unknown[]) => {
+        seenSql.push(text);
+        seenParams.push(params ?? []);
+        return {
+          rows: [
+            {
+              id: 1,
+              realm: REALM,
+              seller_account: 4,
+              seller_character: 21,
+              seller_name: 'Selara',
+              buyer_account: 9,
+              buyer_name: 'Aldan',
+              item_ref: null,
+              item_id: 'crown_of_embers',
+              item_pin: 'a'.repeat(64),
+              usd_cents: 5000,
+              status: 'pending',
+              listing_id: null,
+              created_at: new Date(0),
+              expires_at: new Date(0),
+              buyer_accepted: false,
+              seller_accepted: false,
+            },
+          ],
+          rowCount: 1,
+        };
+      }),
+    };
+    await new PgWocMarketDb(okPool as unknown as Pool).insertDirectedOffer({
+      realm: REALM,
+      sellerAccount: 4,
+      sellerCharacter: 21,
+      sellerName: 'Selara',
+      buyerAccount: 9,
+      buyerName: 'Aldan',
+      usdCents: 5000,
+      expiresAtMs: 1_820_000_000_000,
+      itemId: 'crown_of_embers',
+      itemPin: 'a'.repeat(64),
+    });
+    const [text] = seenSql;
+    expect(text).toContain('item_id, item_pin');
+    expect(seenParams[0]).toContain('crown_of_embers');
+    expect(seenParams[0]).toContain('a'.repeat(64));
+    // The pair-pending unique violation answers typed instead of throwing:
+    // the strike-farming bound must be a refusal the client can render.
+    const dup = {
+      query: vi.fn(async () => {
+        throw Object.assign(new Error('duplicate key'), { code: '23505' });
+      }),
+    };
+    const out = await new PgWocMarketDb(dup as unknown as Pool).insertDirectedOffer({
+      realm: REALM,
+      sellerAccount: 4,
+      sellerCharacter: 21,
+      sellerName: 'Selara',
+      buyerAccount: 9,
+      buyerName: 'Aldan',
+      usdCents: 5000,
+      expiresAtMs: 1_820_000_000_000,
+      itemId: 'crown_of_embers',
+      itemPin: 'a'.repeat(64),
+    });
+    expect(out).toBe('already_pending');
+  });
+
+  it('the seller acceptance records the claimed ref but never rewrites the agreed item_id', async () => {
+    // item_id is the BUYER's agreed item, stamped at creation beside the
+    // pin; letting the seller's claimed ref overwrite it would show the
+    // buyer an item they never agreed to while the deal awaits payment.
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).acceptDirectedOfferSide(REALM, 3, 'seller', {
+      index: 0,
+      itemId: 'other_item',
+    });
+    const [text] = sql();
+    expect(text).toContain('item_ref = COALESCE');
+    expect(text).not.toContain('item_id =');
+  });
+
+  it('the converge read is a two-sided window over the partial index, ordered, narrow', async () => {
+    const { pool, sql, params } = recordingPool();
+    await new PgWocMarketDb(pool).acceptedUnstampedOffers(REALM, 1_000, 2_000, 25);
+    const [text] = sql();
+    // The predicate must match the woc_market_offers_accepted_unstamped
+    // partial index text and carry BOTH age bounds: the young side keeps an
+    // in-flight acceptance out, the old side keeps out rows the listings
+    // prune un-stamped long after their deal completed (ON DELETE SET NULL),
+    // which are not rollback evidence.
+    expect(text).toContain("status = 'accepted'");
+    expect(text).toContain('listing_id IS NULL');
+    expect(text).toContain('updated_at <= to_timestamp($2 / 1000.0)');
+    expect(text).toContain('updated_at > to_timestamp($3 / 1000.0)');
+    expect(text).toContain('ORDER BY updated_at');
+    // Narrow projection: the arm consumes only the id and the TTL verdict
+    // input; item_ref and item_pin must not be detoasted per pass.
+    expect(text).toContain('SELECT id, expires_at');
+    expect(text).not.toContain('item_ref');
+    expect(params()[0]).toEqual([REALM, 1_000, 2_000, 25]);
+  });
+
+  it('the converge expire write carries the accepted-and-unstamped CAS', async () => {
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).expireDirectedOfferIfUnstamped(REALM, 3);
+    const [text] = sql();
+    expect(text).toContain("SET status = 'expired'");
+    expect(text).toContain("status = 'accepted'");
+    expect(text).toContain('listing_id IS NULL');
+  });
+
+  it('the offer expiry sweep carries the outer status qual and SKIP LOCKED', async () => {
+    // The outer qual is the EvalPlanQual guard beside the escrow stamp: the
+    // subselect snapshot can predate a racing acceptance, EPQ re-evaluates
+    // only the target row's own columns, and without the qual the sweep
+    // could expire an offer whose listing just committed. SKIP LOCKED keeps
+    // the sweep from parking a pool client behind the escrow transaction's
+    // offer-row lock. Pinned structurally BECAUSE no unit interleave can
+    // exercise it: the subselect's own locked re-check shares the predicate,
+    // so the outer qual is reachable only through a real snapshot race.
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).expireDueDirectedOffers(REALM, 1_000, 25);
+    const [text] = sql();
+    expect(text).toContain("WHERE status = 'pending'");
+    expect(text).toContain('FOR UPDATE SKIP LOCKED');
+  });
+
+  it('the ever-settled strike gate reads bare existence, no state filter', async () => {
+    // 'failed' is not an OPEN state, so a state-filtered probe would strike
+    // a buyer twice for one walk-away (once from the close arm, once from
+    // the overdue arm expiring the failed row).
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).everSettledForListing(7);
+    const [text] = sql();
+    expect(text).toContain('SELECT EXISTS');
+    expect(text).toContain('woc_market_settlements');
+    expect(text).not.toContain('state');
+  });
+
+  it('a directed listing refuses every bid as not_found, before any other verdict', async () => {
+    // Anti-enumeration AND close-arm integrity in one refusal: browse hides
+    // directed rows but ids are guessable, and a stranger's ACTIVE bid would
+    // divert the directed close arm into the ordinary auction close, where
+    // the bidder can win the escrowed copy.
+    const directedRow = {
+      id: 7,
+      realm: REALM,
+      seller_account: 99,
+      seller_wallet: 'wallet-x',
+      status: 'active',
+      directed_buyer_account: 12,
+      item: {},
+      start_cents: 1000,
+      ends_at: new Date(1_820_000_600_000),
+    };
+    const { pool } = recordingPool();
+    const tx = recordingTxPool((text) =>
+      text.includes('FROM woc_market_listings') ? { rows: [directedRow], rowCount: 1 } : undefined,
+    );
+    void pool;
+    const out = await new PgWocMarketDb(tx.pool).insertPendingBid({
+      realm: REALM,
+      listingId: 7,
+      account: 12,
+      characterId: 1,
+      characterName: 'Aldan',
+      wallet: 'wallet-a',
+      amountCents: 5000,
+      bondCents: 250,
+      nowMs: 1_820_000_000_000,
+      minNext: () => 1000,
+    });
+    expect(out).toEqual({ ok: false, reason: 'not_found' });
+  });
+
+  it('the resolved-offer prune orders behind its partial index and keeps forever on a non-positive window', async () => {
+    const { pruneResolvedWocOffersBatch } = await import('../../server/woc_market_db');
+    const { pool, sql, params } = recordingPool();
+    await pruneResolvedWocOffersBatch(pool as unknown as Pool, 180, 100);
+    const [text] = sql();
+    expect(text).toContain("status <> 'pending'");
+    expect(text).toContain('ORDER BY updated_at');
+    expect(text).toContain("($1 || ' days')::interval");
+    expect(params()[0]).toEqual(['180', 100]);
+    // The keep-forever arm: zero, negative, and NaN windows must not delete.
+    const untouched = recordingPool();
+    expect(await pruneResolvedWocOffersBatch(untouched.pool as unknown as Pool, 0, 100)).toBe(0);
+    expect(await pruneResolvedWocOffersBatch(untouched.pool as unknown as Pool, -5, 100)).toBe(0);
+    expect(
+      await pruneResolvedWocOffersBatch(untouched.pool as unknown as Pool, Number.NaN, 100),
+    ).toBe(0);
+    expect(untouched.sql()).toHaveLength(0);
+  });
+
+  it('the claiming UPDATE carries the same-wallet NOT EXISTS predicate', async () => {
+    // Defense in depth with NO reachable behavioral arm: the locked re-check
+    // three statements above shares the predicate and answers first, and no
+    // unit rig can commit a relink between two statements of one
+    // transaction, so this pin (plus the real-SQL relink test) is the
+    // coverage, recorded here rather than silently claimed as a tested arm.
+    const { readFileSync } = await import('node:fs');
+    const { stripComments } = await import('../helpers/strip_comments');
+    const src = stripComments(
+      readFileSync(new URL('../../server/woc_market_db.ts', import.meta.url), 'utf8'),
+    );
+    const updateStart = src.indexOf('SET buy_now_lock_account');
+    expect(updateStart).toBeGreaterThan(-1);
+    const updateText = src.slice(updateStart, src.indexOf('RETURNING', updateStart));
+    expect(updateText).toContain('NOT EXISTS');
+    expect(updateText).toContain('wallet_links');
+    expect(updateText).toContain('IS NOT DISTINCT FROM');
   });
 });
 

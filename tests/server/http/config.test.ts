@@ -315,6 +315,11 @@ describe('loadConfig', () => {
         field: 'wocMarketAbandonsRetentionDays',
         dflt: 30,
       },
+      {
+        key: 'WOC_MARKET_OFFERS_RETENTION_DAYS',
+        field: 'wocMarketOffersRetentionDays',
+        dflt: 180,
+      },
     ] as const;
     for (const { key, field, dflt } of cases) {
       // A set value overrides the default.

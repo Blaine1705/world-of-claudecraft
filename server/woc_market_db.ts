@@ -643,7 +643,10 @@ ALTER TABLE woc_market_directed_offers
   ADD COLUMN IF NOT EXISTS seller_accepted BOOLEAN NOT NULL DEFAULT false;
 -- The agreed copy's fingerprint, stamped at CREATION (H10): the buyer opens
 -- the deal naming the exact copy they saw, and acceptance escrows only a copy
--- whose pin matches. Nullable TEXT with no default (no table rewrite; a
+-- whose pin matches. Stored as the fixed-width sha256 hex DIGEST of the sim's
+-- canonical itemCopyPin string (the identity rule stays the sim's; the digest
+-- caps a client-derived value that would otherwise ride every offer row at up
+-- to the body cap). Nullable TEXT with no default (no table rewrite; a
 -- pre-existing row keeps NULL and its acceptance refuses item_mismatch, the
 -- safe direction for an offer that predates the pin).
 ALTER TABLE woc_market_directed_offers
@@ -661,6 +664,16 @@ CREATE INDEX IF NOT EXISTS woc_market_directed_offers_listing
 CREATE INDEX IF NOT EXISTS woc_market_offers_accepted_unstamped
   ON woc_market_directed_offers(realm, updated_at)
   WHERE status = 'accepted' AND listing_id IS NULL;
+-- ONE pending offer per (buyer, seller) pair: the strike-farming bound. A
+-- seller who could hold N of a victim's offers open and accept them all near
+-- the TTL edge would earn the victim N strikes for one lapse of judgment;
+-- with one live deal per pair, each hold needs a FRESH offer from the buyer
+-- after the last one resolved. The database is the authority (two concurrent
+-- creates race the service pre-read); the insert maps 23505 to the typed
+-- already_pending. Boot DDL, pre-enable-empty rationale as above.
+CREATE UNIQUE INDEX IF NOT EXISTS woc_market_offers_pair_pending
+  ON woc_market_directed_offers(realm, buyer_account, seller_account)
+  WHERE status = 'pending';
 `;
 
 /** Lock-wait ceiling for the escrow transaction's accounts row. Short on
@@ -1062,7 +1075,8 @@ export class PgWocMarketDb implements WocMarketDb {
     save: CharacterSaveArgs,
     listing: NewWocListing,
   ): Promise<
-    { ok: true; id: number } | { ok: false; reason: 'lease_lost' | 'cap_reached' | 'contended' }
+    | { ok: true; id: number }
+    | { ok: false; reason: 'lease_lost' | 'cap_reached' | 'contended' | 'not_pending' }
   > {
     try {
       return await this.withTx(async (client) => {
@@ -1413,30 +1427,38 @@ export class PgWocMarketDb implements WocMarketDb {
     expiresAtMs: number;
     itemId: string;
     itemPin: string;
-  }): Promise<WocDirectedOfferRow> {
+  }): Promise<WocDirectedOfferRow | 'already_pending'> {
     // item_id and item_pin are stamped at CREATION (H10): the offer names the
     // exact copy the buyer agreed to, and acceptance validates the extracted
     // copy against the pin before anything escrows.
-    const res = await this.pool.query(
-      `INSERT INTO woc_market_directed_offers (
-         realm, seller_account, seller_character, seller_name,
-         buyer_account, buyer_name, usd_cents, expires_at, item_id, item_pin
-       ) VALUES ($1, $2, $3, $4, $5, $6, $7, to_timestamp($8 / 1000.0), $9, $10)
-       RETURNING ${OFFER_COLS}`,
-      [
-        offer.realm,
-        offer.sellerAccount,
-        offer.sellerCharacter,
-        offer.sellerName,
-        offer.buyerAccount,
-        offer.buyerName,
-        offer.usdCents,
-        offer.expiresAtMs,
-        offer.itemId,
-        offer.itemPin,
-      ],
-    );
-    return toOffer(res.rows[0]);
+    try {
+      const res = await this.pool.query(
+        `INSERT INTO woc_market_directed_offers (
+           realm, seller_account, seller_character, seller_name,
+           buyer_account, buyer_name, usd_cents, expires_at, item_id, item_pin
+         ) VALUES ($1, $2, $3, $4, $5, $6, $7, to_timestamp($8 / 1000.0), $9, $10)
+         RETURNING ${OFFER_COLS}`,
+        [
+          offer.realm,
+          offer.sellerAccount,
+          offer.sellerCharacter,
+          offer.sellerName,
+          offer.buyerAccount,
+          offer.buyerName,
+          offer.usdCents,
+          offer.expiresAtMs,
+          offer.itemId,
+          offer.itemPin,
+        ],
+      );
+      return toOffer(res.rows[0]);
+    } catch (err) {
+      // The pair-pending unique index is the strike-farming bound's
+      // authority: one live deal per (buyer, seller) pair. 23505 here can
+      // only be that index (the table's PK is a bigserial).
+      if ((err as { code?: string }).code === '23505') return 'already_pending';
+      throw err;
+    }
   }
 
   async directedOfferById(realm: string, id: number): Promise<WocDirectedOfferRow | null> {
@@ -1548,15 +1570,18 @@ export class PgWocMarketDb implements WocMarketDb {
     itemRef: ExtractRef | null,
   ): Promise<WocDirectedOfferRow | null> {
     const col = side === 'buyer' ? 'buyer_accepted' : 'seller_accepted';
+    // item_id is deliberately NOT touched here: it is the BUYER's agreed item,
+    // stamped at creation beside the pin, and the seller's claimed ref must
+    // not rewrite what the buyer's window shows (the pin refuses the escrow
+    // on a real mismatch either way; this keeps the display honest too).
     const res = await this.pool.query(
       `UPDATE woc_market_directed_offers
           SET ${col} = true,
               item_ref = COALESCE($3::jsonb, item_ref),
-              item_id = COALESCE($4, item_id),
               updated_at = now()
         WHERE realm = $1 AND id = $2 AND status = 'pending'
         RETURNING ${OFFER_COLS}`,
-      [realm, id, itemRef === null ? null : JSON.stringify(itemRef), itemRef?.itemId ?? null],
+      [realm, id, itemRef === null ? null : JSON.stringify(itemRef)],
     );
     return res.rows[0] ? toOffer(res.rows[0]) : null;
   }
@@ -1597,27 +1622,32 @@ export class PgWocMarketDb implements WocMarketDb {
 
   /**
    * The converge arm's read: offers claimed 'accepted' whose escrow never
-   * stamped a listing. With the atomic stamp, an aged row here PROVES the
-   * escrow rolled back (or never ran), so the sweep can reopen or expire it;
-   * the age bound keeps a still-in-flight acceptance out of the batch and the
-   * reopen/expire CAS is the belt if one ever straddles it. Rides the
+   * stamped a listing, inside a TWO-SIDED age window. The young bound keeps a
+   * still-in-flight acceptance out of the batch (the reopen/expire CAS is the
+   * belt if one straddles it); the OLD bound keeps out rows the listings
+   * prune's ON DELETE SET NULL un-stamped long after their deal completed,
+   * which are not rollback evidence at all (the constant's docblock in
+   * woc_market_rules.ts carries the full rationale). Rides the
    * woc_market_offers_accepted_unstamped partial index; ORDER BY updated_at
-   * keeps the batch deterministic and on the ordered path.
+   * keeps the batch deterministic and on the ordered path. Projects only what
+   * the arm consumes: the row id and the TTL verdict input.
    */
   async acceptedUnstampedOffers(
     realm: string,
     olderThanMs: number,
+    oldestAllowedMs: number,
     limit: number,
-  ): Promise<WocDirectedOfferRow[]> {
+  ): Promise<{ id: number; expiresAtMs: number }[]> {
     const res = await this.pool.query(
-      `SELECT ${OFFER_COLS} FROM woc_market_directed_offers
+      `SELECT id, expires_at FROM woc_market_directed_offers
         WHERE realm = $1 AND status = 'accepted' AND listing_id IS NULL
           AND updated_at <= to_timestamp($2 / 1000.0)
+          AND updated_at > to_timestamp($3 / 1000.0)
         ORDER BY updated_at
-        LIMIT $3`,
-      [realm, olderThanMs, limit],
+        LIMIT $4`,
+      [realm, olderThanMs, oldestAllowedMs, limit],
     );
-    return res.rows.map(toOffer);
+    return res.rows.map((row) => ({ id: Number(row.id), expiresAtMs: ms(row.expires_at) }));
   }
 
   /** The converge arm's terminal write for an offer already past its TTL:
@@ -2788,6 +2818,18 @@ export class PgWocMarketDb implements WocMarketDb {
       );
       if (!res.rows[0]) return { ok: false, reason: 'not_found' as const };
       const listing = toListing(res.rows[0]);
+      // A directed sale is addressed to ONE account and is buy-now-only: it
+      // accepts NO bids from anyone (its designated buyer pays through the
+      // buy-now claim, never an auction bid). 'not_found' before any other
+      // verdict, for the same anti-enumeration reason the buyNow guard
+      // documents: browse hides these rows, ids are guessable, and any more
+      // specific refusal would confirm a private trade is in flight. Without
+      // this a stranger's bid could divert the directed close arm (it only
+      // strikes-and-returns when no ACTIVE bid stands) into the ordinary
+      // auction close and win the escrowed copy.
+      if (listing.directedBuyerAccount !== null) {
+        return { ok: false, reason: 'not_found' as const };
+      }
       if (listing.status !== 'active') return { ok: false, reason: 'not_active' as const };
       if (listing.endsAtMs <= args.nowMs) return { ok: false, reason: 'not_active' as const };
       // Cancel-intent blocks NEW bids too, not only lock claims: a bid landing

@@ -260,6 +260,47 @@ describe('the refusal-to-wire mapping', () => {
     ]);
   });
 
+  it('refuses an offer creation with NO item id at the schema, before the service', async () => {
+    // The agreed-item identity became REQUIRED wire contract (H10): an old
+    // cached client posting the pre-pin body must get a 400, never an offer
+    // with nothing pinned (which was the bait-and-switch surface itself).
+    let reached = 0;
+    service({
+      createDirectedOffer: (async () => {
+        reached += 1;
+        throw new Error('unreachable');
+      }) as unknown as WocMarketService['createDirectedOffer'],
+    });
+    const ctx = fakeCtx({
+      method: 'POST',
+      url: '/api/woc-market/offers',
+      account: { accountId: VIEWER, scope: 'full' },
+      body: { characterId: 1, sellerCharacterName: 'Selara', usdCents: 5000 },
+    });
+    await expect(handlerFor('POST', '/api/woc-market/offers')(ctx)).rejects.toMatchObject({
+      status: 400,
+    });
+    expect(reached).toBe(0);
+    // An oversized instance payload refuses the same way (the recursive
+    // fingerprint serializer downstream must never see unbounded nesting).
+    const deep = fakeCtx({
+      method: 'POST',
+      url: '/api/woc-market/offers',
+      account: { accountId: VIEWER, scope: 'full' },
+      body: {
+        characterId: 1,
+        sellerCharacterName: 'Selara',
+        usdCents: 5000,
+        itemId: 'crown_of_embers',
+        itemInstance: { rolled: { stats: { str: 'x'.repeat(3000) } } },
+      },
+    });
+    await expect(handlerFor('POST', '/api/woc-market/offers')(deep)).rejects.toMatchObject({
+      status: 400,
+    });
+    expect(reached).toBe(0);
+  });
+
   it('surfaces a service refusal through a real handler as that status and code', async () => {
     // Proof the table is actually WIRED, not just well shaped: the pins above
     // would all pass over a map no handler consulted.

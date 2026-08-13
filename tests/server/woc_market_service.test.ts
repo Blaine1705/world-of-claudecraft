@@ -3593,6 +3593,9 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     const h = stocked();
     const offer = await h.service.createDirectedOffer(offerArgs());
     if (!offer.ok) throw new Error('offer refused');
+    // The stored fingerprint is the fixed-width digest, never the raw
+    // client-derived serialization (which would bank kilobytes per row).
+    expect(offer.offer.itemPin).toMatch(/^[0-9a-f]{64}$/);
     const before = bagsOf(h, SELLER_CHAR).length;
     const accepted = await acceptWith(h, offer.offer.id);
     if (!accepted.ok) throw new Error(`accept refused: ${(accepted as { reason: string }).reason}`);
@@ -3601,6 +3604,244 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     // One agreed price, carried onto both price fields.
     expect(accepted.listing?.buyNowCents).toBe(5000);
     expect(accepted.listing?.startCents).toBe(5000);
+    // The hold is the settlement window, not an auction duration (H12): a
+    // DB-free pin, so regressing the ends computation back to durationHours
+    // reds without a database.
+    expect(accepted.listing?.endsAtMs).toBe(BASE_MS + WOC_MARKET_SETTLEMENT_WINDOW_SECONDS * 1000);
+  });
+
+  it('refuses item_mismatch when the seller accepts with a DIFFERENT eligible item id', async () => {
+    // The other half of the bait-and-switch criterion beside the re-rolled
+    // instance: the pin's itemId component is load-bearing, so the refusal
+    // must be item_mismatch (the deal is wrong), never not_eligible (the
+    // item is fine, it is just not the agreed one).
+    const otherEpic = Object.keys(ITEMS).find((id) => {
+      const def = ITEMS[id];
+      return (
+        id !== EPIC_ITEM &&
+        def.quality === 'epic' &&
+        !def.soulbound &&
+        def.slot !== undefined &&
+        !def.noMarketList &&
+        def.kind !== 'quest'
+      );
+    });
+    if (!otherEpic) throw new Error('content should ship a second eligible epic');
+    const h = stocked();
+    const made = await h.service.createDirectedOffer(offerArgs());
+    if (!made.ok) throw new Error('offer refused');
+    const first = await h.service.acceptDirectedOffer(BUYER_A, made.offer.id, null, CHAR_A);
+    expect(first.ok).toBe(true);
+    h.custody.bags.set(SELLER_CHAR, [{ itemId: otherEpic, count: 1 }]);
+    const second = await h.service.acceptDirectedOffer(
+      SELLER,
+      made.offer.id,
+      { index: 0, itemId: otherEpic },
+      SELLER_CHAR,
+    );
+    expect(second).toEqual({ ok: false, reason: 'item_mismatch' });
+    expect(bagsOf(h, SELLER_CHAR), 'the copy restored').toHaveLength(1);
+    expect((await h.db.directedOfferById(REALM, made.offer.id))?.status).toBe('pending');
+  });
+
+  it('refuses item_mismatch for a legacy offer with NO stored pin (the safe direction)', async () => {
+    const h = stocked();
+    const made = await h.service.createDirectedOffer(offerArgs());
+    if (!made.ok) throw new Error('offer refused');
+    // A row that predates the pin column: NULL survives the read path.
+    const row = h.db.offers.get(made.offer.id);
+    if (!row) throw new Error('offer vanished');
+    row.itemPin = null;
+    const out = await acceptWith(h, made.offer.id);
+    expect(out).toEqual({ ok: false, reason: 'item_mismatch' });
+    expect(bagsOf(h, SELLER_CHAR), 'nothing escrowed').toContainEqual({
+      itemId: EPIC_ITEM,
+      count: 1,
+    });
+  });
+
+  it('an escrow not_pending refusal (the converge raced the acceptance) reopens the deal', async () => {
+    const h = stocked();
+    const made = await h.service.createDirectedOffer(offerArgs());
+    if (!made.ok) throw new Error('offer refused');
+    await h.service.acceptDirectedOffer(BUYER_A, made.offer.id, null, CHAR_A);
+    h.db.failNextEscrow = 'not_pending';
+    const out = await h.service.acceptDirectedOffer(
+      SELLER,
+      made.offer.id,
+      { index: 0, itemId: EPIC_ITEM },
+      SELLER_CHAR,
+    );
+    expect(out).toEqual({ ok: false, reason: 'not_pending' });
+    expect(bagsOf(h, SELLER_CHAR), 'the copy restored').toContainEqual({
+      itemId: EPIC_ITEM,
+      count: 1,
+    });
+    expect((await h.db.directedOfferById(REALM, made.offer.id))?.status).toBe('pending');
+  });
+
+  it('bounds the pair to ONE pending offer (the strike-farming bound), and frees it on resolve', async () => {
+    const h = stocked();
+    const first = await h.service.createDirectedOffer(offerArgs());
+    expect(first.ok).toBe(true);
+    expect(await h.service.createDirectedOffer(offerArgs())).toEqual({
+      ok: false,
+      reason: 'already_pending',
+    });
+    if (!first.ok) throw new Error('unreachable');
+    // Resolving the standing deal frees the pair for a fresh one.
+    const declined = await h.service.resolveDirectedOffer(SELLER, first.offer.id, 'decline');
+    expect(declined.ok).toBe(true);
+    expect((await h.service.createDirectedOffer(offerArgs())).ok).toBe(true);
+  });
+
+  /** One directed deal driven to its escrowed listing, local to this
+   *  describe (the consequences describe has its own richer twin). */
+  async function acceptedOffer(h: Harness): Promise<WocListingRow> {
+    const made = await h.service.createDirectedOffer(offerArgs());
+    if (!made.ok) throw new Error('offer refused');
+    const out = await acceptWith(h, made.offer.id);
+    if (!out.ok || !out.listing) throw new Error('accept refused');
+    return out.listing;
+  }
+
+  it('spares the strike when the recorded refusal is the exempt service outage class', async () => {
+    // The public rail's abandon recorder exempts exactly this class from even
+    // a cooldown; a directed buyer whose payment died in a service outage
+    // must not eat a real strike for it. The listing still auto-closes and
+    // the item still flies home: only the penalty is spared.
+    const h = stocked();
+    const listing = await acceptedOffer(h);
+    unwrap(
+      await h.service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    const settlement = await liveSettlement(h, listing.id);
+    expect(await h.db.submitSettlementSignature(settlement.id, 'sig-outage')).toBe('ok');
+    expect(
+      await h.db.transitionSettlement(
+        settlement.id,
+        ['confirming'],
+        'failed',
+        'service_unavailable',
+      ),
+    ).toBe(true);
+    h.setNow(settlement.deadlineAtMs + 1);
+    await h.service.sweepPass();
+    expect((await h.db.strikeInfo(BUYER_A))?.strikes ?? 0).toBe(0);
+    expect((await h.db.listingById(REALM, listing.id))?.status).toBe('closed');
+    expect((await h.db.listingById(REALM, listing.id))?.resolution).toBe('unsettled');
+  });
+
+  it('still strikes on a non-exempt refusal class (the exemption positive control)', async () => {
+    const h = stocked();
+    const listing = await acceptedOffer(h);
+    unwrap(
+      await h.service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    const settlement = await liveSettlement(h, listing.id);
+    expect(await h.db.submitSettlementSignature(settlement.id, 'sig-refused')).toBe('ok');
+    expect(
+      await h.db.transitionSettlement(settlement.id, ['confirming'], 'failed', 'confirm_failed'),
+    ).toBe(true);
+    h.setNow(settlement.deadlineAtMs + 1);
+    await h.service.sweepPass();
+    expect((await h.db.strikeInfo(BUYER_A))?.strikes ?? 0).toBe(1);
+  });
+
+  it('spares the never-claim strike while the price oracle is unhealthy, and still returns the item', async () => {
+    // The sweep keeps closing and returning holds through an outage; only
+    // the penalty pauses, because the buyer could not have paid (buyNow
+    // refuses market_paused in the same window).
+    const h = stocked();
+    const listing = await acceptedOffer(h);
+    const healthyPrice = h.economy.price.bind(h.economy);
+    h.economy.price = (async () => ({
+      available: false,
+      healthy: false,
+    })) as unknown as typeof h.economy.price;
+    h.setNow(BASE_MS + (WOC_MARKET_SETTLEMENT_WINDOW_SECONDS + 1) * 1000);
+    await h.service.sweepPass();
+    expect((await h.db.listingById(REALM, listing.id))?.status).toBe('closed');
+    expect((await h.db.strikeInfo(BUYER_A))?.strikes ?? 0).toBe(0);
+    h.economy.price = healthyPrice;
+  });
+
+  it('strikes the never-claiming buyer once the hold lapses under a HEALTHY oracle', async () => {
+    const h = stocked();
+    const listing = await acceptedOffer(h);
+    h.setNow(BASE_MS + (WOC_MARKET_SETTLEMENT_WINDOW_SECONDS + 1) * 1000);
+    await h.service.sweepPass();
+    expect((await h.db.listingById(REALM, listing.id))?.status).toBe('closed');
+    expect((await h.db.listingById(REALM, listing.id))?.resolution).toBe('unsettled');
+    expect((await h.db.strikeInfo(BUYER_A))?.strikes ?? 0).toBe(1);
+    // Durable-state re-run control: a second pass cannot strike again.
+    await h.service.sweepPass();
+    expect((await h.db.strikeInfo(BUYER_A))?.strikes ?? 0).toBe(1);
+  });
+
+  it('leaves a mid-flight claim alone at hold expiry (the unexpired-lock early return)', async () => {
+    // The 270s claim lock routinely outlives the 600s hold. Closing over a
+    // paying buyer would return the escrow while their payment request is in
+    // the air; the settlement rails own that window's outcome. The retry
+    // latency is the stranded-reclaim grace (the early return leaves the row
+    // 'ending'), which is fine because the settlement arms resolve first.
+    const h = stocked();
+    const listing = await acceptedOffer(h);
+    h.setNow(BASE_MS + 400_000);
+    unwrap(
+      await h.service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    const settlement = await liveSettlement(h, listing.id);
+    h.setNow(BASE_MS + 601_000);
+    await h.service.sweepPass();
+    expect((await h.db.listingById(REALM, listing.id))?.status).not.toBe('closed');
+    expect((await h.db.strikeInfo(BUYER_A))?.strikes ?? 0).toBe(0);
+    // The window then expires unpaid: ONE strike and the auto-close.
+    h.setNow(settlement.deadlineAtMs + 1);
+    await h.service.sweepPass();
+    expect((await h.db.strikeInfo(BUYER_A))?.strikes ?? 0).toBe(1);
+    expect((await h.db.listingById(REALM, listing.id))?.status).toBe('closed');
+    expect((await h.db.listingById(REALM, listing.id))?.resolution).toBe('unsettled');
+  });
+
+  it('never strikes when the close is refused over a live payment (the close-CAS-miss arm)', async () => {
+    const h = stocked();
+    const listing = await acceptedOffer(h);
+    unwrap(
+      await h.service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    const settlement = await liveSettlement(h, listing.id);
+    expect(await h.db.submitSettlementSignature(settlement.id, 'sig-live')).toBe('ok');
+    // Past the hold with the claim lock long expired but the payment OPEN:
+    // the close arm must park the row for the settlement rails, not strike.
+    h.setNow(BASE_MS + 601_000);
+    await h.service.sweepPass();
+    expect((await h.db.strikeInfo(BUYER_A))?.strikes ?? 0).toBe(0);
+    expect((await h.db.listingById(REALM, listing.id))?.resolution).not.toBe('unsettled');
   });
 
   it('refuses an offer whose buyer wallet cannot plausibly pay (guardBalance)', async () => {
@@ -3704,6 +3945,9 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     ).rejects.toThrow('unique violation');
     expect((await h.db.directedOfferById(REALM, proven.offer.id))?.status).toBe('pending');
 
+    // The pair-pending bound allows one live deal per pair: resolve the
+    // reopened deal before staging the ambiguous arm.
+    unwrap(await h.service.resolveDirectedOffer(SELLER, proven.offer.id, 'decline'), 'decline');
     const ambiguous = await h.service.createDirectedOffer(offerArgs());
     if (!ambiguous.ok) throw new Error('offer refused');
     await h.service.acceptDirectedOffer(BUYER_A, ambiguous.offer.id, null, CHAR_A);
@@ -4741,10 +4985,11 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
   });
 
   it('lets the seller decline and the buyer withdraw, but not the reverse', async () => {
+    // Sequential offers (the pair-pending bound allows one live deal per
+    // pair): each is exercised and resolved before the next exists.
     const h = stocked();
     const a = await h.service.createDirectedOffer(offerArgs());
-    const b = await h.service.createDirectedOffer(offerArgs({ usdCents: 6000 }));
-    if (!a.ok || !b.ok) throw new Error('offer refused');
+    if (!a.ok) throw new Error('offer refused');
     // The verbs belong to opposite sides: the SELLER declines an offer made to
     // them, the BUYER withdraws one they made. Using the other side's verb reads
     // as not_found, the same anti-enumeration shape as everything else here.
@@ -4752,12 +4997,14 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
       ok: false,
       reason: 'not_found',
     });
+    expect(await h.service.resolveDirectedOffer(SELLER, a.offer.id, 'decline')).toEqual({
+      ok: true,
+    });
+    const b = await h.service.createDirectedOffer(offerArgs({ usdCents: 6000 }));
+    if (!b.ok) throw new Error('offer refused');
     expect(await h.service.resolveDirectedOffer(SELLER, b.offer.id, 'withdraw')).toEqual({
       ok: false,
       reason: 'not_found',
-    });
-    expect(await h.service.resolveDirectedOffer(SELLER, a.offer.id, 'decline')).toEqual({
-      ok: true,
     });
     expect(await h.service.resolveDirectedOffer(BUYER_A, b.offer.id, 'withdraw')).toEqual({
       ok: true,

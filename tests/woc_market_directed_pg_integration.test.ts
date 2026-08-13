@@ -319,7 +319,7 @@ describeDb('woc market directed rail against real Postgres', () => {
       expect(typeof ok).toBe('object');
     });
 
-    it('a null seller wallet never reads as the claimer wallet (no NULL twin)', async () => {
+    it('a claimer with NO wallet row never trips the twin guard', async () => {
       const realm = 'directed-wallet-null';
       const seller = await seedAccount();
       const buyer = await seedAccount();
@@ -635,20 +635,123 @@ describeDb('woc market directed rail against real Postgres', () => {
       expect(stats?.convergedOffers).toBe(0);
       expect((await offerRow(young)).status).toBe('accepted');
     });
+
+    it('leaves a row OLDER than the max age alone (the prune-fallout guard)', async () => {
+      // Past the upper window bound the accepted-unstamped shape stops being
+      // rollback evidence (the listings prune's ON DELETE SET NULL produces
+      // it for completed deals); the arm must not touch it.
+      const realm = 'directed-converge-ancient';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const ancient = await seedOffer(realm, seller, buyer, {
+        status: 'accepted',
+        updatedAtMs: BASE_MS - 25 * 3600 * 1000,
+        expiresAtMs: BASE_MS - 24 * 3600 * 1000,
+        buyerAccepted: true,
+        sellerAccepted: true,
+      });
+      const service = makeService(realm, { wallets: new Map() });
+      const stats = await service.sweepPass();
+      expect(stats?.convergedOffers).toBe(0);
+      expect((await offerRow(ancient)).status).toBe('accepted');
+    });
+
+    it('never relabels a COMPLETED deal whose listing the retention prune deleted', async () => {
+      // The end-to-end F3 regression: a stamped offer survives its pruned
+      // listing with listing_id SET-NULLed by the FK, and the converge arm
+      // must leave its status and updated_at untouched.
+      const realm = 'directed-converge-pruned';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const listingId = await seedListing(realm, seller, {
+        directedBuyerAccount: buyer,
+        status: 'closed',
+      });
+      await pool.query(
+        `UPDATE woc_market_listings SET item_disposed = true, resolution = 'sold' WHERE id = $1`,
+        [listingId],
+      );
+      const done = await seedOffer(realm, seller, buyer, {
+        status: 'accepted',
+        listingId,
+        // A completed deal from months ago: outside the converge window.
+        updatedAtMs: BASE_MS - 30 * 24 * 3600 * 1000,
+        expiresAtMs: BASE_MS - 30 * 24 * 3600 * 1000,
+        buyerAccepted: true,
+        sellerAccepted: true,
+      });
+      // The prune's FK effect, applied directly (the prune itself keys on the
+      // real wall clock while this suite's fixtures ride BASE_MS).
+      await pool.query(`DELETE FROM woc_market_listings WHERE id = $1`, [listingId]);
+      expect((await offerRow(done)).listingId, 'the FK SET-NULLed the stamp').toBeNull();
+      const before = await pool.query(
+        `SELECT updated_at FROM woc_market_directed_offers WHERE id = $1`,
+        [done],
+      );
+      const service = makeService(realm, { wallets: new Map() });
+      const stats = await service.sweepPass();
+      expect(stats?.convergedOffers).toBe(0);
+      expect((await offerRow(done)).status).toBe('accepted');
+      const after = await pool.query(
+        `SELECT updated_at FROM woc_market_directed_offers WHERE id = $1`,
+        [done],
+      );
+      expect(after.rows[0].updated_at).toEqual(before.rows[0].updated_at);
+    });
+
+    it('bounds a pair to ONE pending offer at the database (the unique index)', async () => {
+      const realm = 'directed-pair-bound';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const first = await marketDb.insertDirectedOffer({
+        realm,
+        sellerAccount: seller,
+        sellerCharacter: 1,
+        sellerName: 'PairSeller',
+        buyerAccount: buyer,
+        buyerName: 'PairBuyer',
+        usdCents: 1000,
+        expiresAtMs: BASE_MS + 10 * MINUTE_MS,
+        itemId: 'amber_crimson_armor_plate',
+        itemPin: 'p'.repeat(64),
+      });
+      expect(typeof first).toBe('object');
+      const second = await marketDb.insertDirectedOffer({
+        realm,
+        sellerAccount: seller,
+        sellerCharacter: 1,
+        sellerName: 'PairSeller',
+        buyerAccount: buyer,
+        buyerName: 'PairBuyer',
+        usdCents: 2000,
+        expiresAtMs: BASE_MS + 10 * MINUTE_MS,
+        itemId: 'amber_crimson_armor_plate',
+        itemPin: 'p'.repeat(64),
+      });
+      expect(second, 'the unique index answers typed').toBe('already_pending');
+    });
   });
 
   describe('the offer-expiry sweep against a concurrent stamp, in real SQL', () => {
-    it('SKIP LOCKED walks past a row an escrow transaction holds, and the status qual refuses a raced acceptance', async () => {
+    it('SKIP LOCKED walks past a row a concurrent transaction holds', async () => {
+      // The OUTER status qual (the EvalPlanQual guard beside the escrow
+      // stamp) is deliberately NOT exercised here: the subselect's own
+      // locked re-check shares the predicate, so only a genuine snapshot
+      // race can reach it, and no test rig can schedule one. Its presence
+      // is pinned structurally in woc_market_directed_sql.test.ts.
       const realm = 'directed-expiry-race';
       const seller = await seedAccount();
       const buyer = await seedAccount();
-      // Both rows are pending and past their TTL: one gets locked by a
-      // concurrent transaction (the escrow stamp holding the row), the other
-      // is free. The sweep must expire ONLY the free one, without blocking.
+      const buyerTwo = await seedAccount();
+      // Both rows are pending and past their TTL (distinct buyers: the
+      // pair-pending unique index allows one live deal per pair): one gets
+      // locked by a concurrent transaction (the escrow stamp holding the
+      // row), the other is free. The sweep must expire ONLY the free one,
+      // without blocking.
       const held = await seedOffer(realm, seller, buyer, {
         expiresAtMs: BASE_MS - MINUTE_MS,
       });
-      const free = await seedOffer(realm, seller, buyer, {
+      const free = await seedOffer(realm, seller, buyerTwo, {
         expiresAtMs: BASE_MS - MINUTE_MS,
       });
       const holder = await pool.connect();
@@ -668,8 +771,15 @@ describeDb('woc market directed rail against real Postgres', () => {
     });
   });
 
-  describe('concurrent escrow and offer writers, deadlock probe', () => {
-    it('the accounts-listings-offers lock order closes no cycle (zero 40P01 over repeated interleaves)', async () => {
+  describe('concurrent escrow and offer writers, interleave smoke', () => {
+    // Honesty note: three of the four concurrent participants are
+    // single-statement autocommit writes that cannot hold one lock while
+    // waiting on another, so this CANNOT deadlock by construction; the
+    // lock-order safety argument is static (no transaction takes
+    // offers-then-listings since the post-hoc stamp hop was deleted). What
+    // this run does prove live: the stamp CAS, the racing expiry, and the
+    // sibling writers compose without errors or lost writes.
+    it('the stamp, the expiry, and the sibling offer writers compose cleanly under concurrency', async () => {
       const realm = 'directed-deadlock';
       const seller = await seedAccount();
       const buyer = await seedAccount();
@@ -680,7 +790,11 @@ describeDb('woc market directed rail against real Postgres', () => {
           buyerAccepted: true,
           sellerAccepted: true,
         });
-        const sibling = await seedOffer(realm, seller, buyer, {});
+        // A FRESH buyer each round: the pair-pending unique index binds one
+        // live deal per pair, and whether the racing expiry below resolves
+        // the sibling before the next round is exactly the nondeterminism
+        // this smoke run exists to exercise.
+        const sibling = await seedOffer(realm, seller, await seedAccount(), {});
         const results = await Promise.allSettled([
           marketDb.escrowInsertListing(
             { characterId, level: 10, state: SAVE_STATE, leaseNonce: undefined },

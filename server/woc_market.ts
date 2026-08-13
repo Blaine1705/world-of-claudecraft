@@ -15,6 +15,7 @@
 // down while paused; only irreversible steps (new bids, buy-now, quotes,
 // confirmations) suspend, per the PRD's "Price source and health".
 
+import { createHash } from 'node:crypto';
 import { ITEMS } from '../src/sim/data';
 import type { ExtractRef, ExtractRefusal } from '../src/sim/inventory_extract';
 import { itemCopyPin } from '../src/sim/item_copy_ref';
@@ -32,6 +33,7 @@ import {
   settlementCustodyRef,
   strikeSuspensionMs,
   validListingParams,
+  WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS,
   WOC_MARKET_BOND_PENDING_TTL_SECONDS,
   WOC_MARKET_BOND_POLL_PARK_SECONDS,
   WOC_MARKET_BUY_NOW_LOCK_SECONDS,
@@ -40,6 +42,7 @@ import {
   WOC_MARKET_DIRECTED_OFFER_TTL_SECONDS,
   WOC_MARKET_DURATION_HOURS,
   WOC_MARKET_MAX_ACTIVE_LISTINGS,
+  WOC_MARKET_OFFER_CONVERGE_MAX_AGE_SECONDS,
   WOC_MARKET_OFFER_CONVERGE_SECONDS,
   WOC_MARKET_QUOTE_TTL_SECONDS,
   WOC_MARKET_SETTLEMENT_WINDOW_SECONDS,
@@ -301,7 +304,7 @@ export interface WocMarketDb {
     expiresAtMs: number;
     itemId: string;
     itemPin: string;
-  }): Promise<WocDirectedOfferRow>;
+  }): Promise<WocDirectedOfferRow | 'already_pending'>;
   directedOfferById(realm: string, id: number): Promise<WocDirectedOfferRow | null>;
   /** Pending offers this account may act on, both directions. */
   directedOffersForAccount(realm: string, account: number): Promise<WocDirectedOfferRow[]>;
@@ -320,14 +323,17 @@ export interface WocMarketDb {
   ): Promise<WocDirectedOfferRow | null>;
   /** Expire pending offers past their TTL. Returns how many were expired. */
   expireDueDirectedOffers(realm: string, nowMs: number, limit: number): Promise<number>;
-  /** The converge arm's read: 'accepted' offers with NO stamped listing older
-   *  than the safety age. With the atomic stamp, such a row proves its escrow
-   *  rolled back (or never ran). Ordered oldest-first, batch-bounded. */
+  /** The converge arm's read: 'accepted' offers with NO stamped listing,
+   *  inside the two-sided age window (older than the in-flight bound, newer
+   *  than the max age past which an un-stamp is prune fallout rather than
+   *  rollback evidence). Ordered oldest-first, batch-bounded; projects only
+   *  the id and the TTL verdict input. */
   acceptedUnstampedOffers(
     realm: string,
     olderThanMs: number,
+    oldestAllowedMs: number,
     limit: number,
-  ): Promise<WocDirectedOfferRow[]>;
+  ): Promise<{ id: number; expiresAtMs: number }[]>;
   /** The converge arm's terminal write for a proven-rolled-back offer already
    *  past its TTL: same accepted-and-unstamped CAS as reopenDirectedOffer. */
   expireDirectedOfferIfUnstamped(realm: string, id: number): Promise<boolean>;
@@ -1388,6 +1394,22 @@ export class WocMarketService {
    *  the enforcement). Compares service-computed token estimates against the
    *  cached chain read; when either side is unreadable the gate refuses
    *  closed. */
+  /** The stored form of the agreed-copy fingerprint: a fixed-width sha256 of
+   *  the sim's canonical itemCopyPin string, never the raw serialization. The
+   *  identity RULE stays the sim's (one pin definition for every exchange
+   *  pipe); the digest is a storage decision: item_pin rides every offer row,
+   *  is re-read by the offer views and the converge arm, and a raw
+   *  client-derived serialization would let one account bank tens of
+   *  kilobytes per row against the retention window. */
+  private itemPinDigest(slot: {
+    itemId: string;
+    count: number;
+    instance?: ItemInstancePayload;
+    craftedRecipeId?: string;
+  }): string {
+    return createHash('sha256').update(itemCopyPin(slot)).digest('hex');
+  }
+
   private async guardBalance(wallet: string, usdCents: number): Promise<Refused | null> {
     const [estimate, balance] = await Promise.all([
       this.deps.economy.estimate(usdCents),
@@ -1478,7 +1500,7 @@ export class WocMarketService {
         // different item, or a re-rolled instance of the same id, refuses
         // here and the copy restores. A null pin (an offer that predates the
         // pin column) refuses too: an unverifiable agreement must not escrow.
-        if (args.directed && itemCopyPin(extract.extracted) !== args.directed.itemPin) {
+        if (args.directed && this.itemPinDigest(extract.extracted) !== args.directed.itemPin) {
           this.deps.custody.restoreCopy(extract.pid, args.characterId, extract.extracted);
           return { refusal: 'item_mismatch' as const };
         }
@@ -1623,21 +1645,25 @@ export class WocMarketService {
     // Defense in depth: pubkey is UNIQUE so two live links can never collide
     // today, but this predicate must not depend on that constraint surviving.
     if (buyerWallet === sellerWallet) return refuse('self_offer');
-    // Validate the params acceptance WILL use, not a looser approximation, so an
-    // offer can never be created that its own acceptance would refuse. The
-    // agreed ITEM gets the same treatment since H10: the buyer names the exact
-    // copy, so its eligibility is checkable NOW, and an armed commission piece
-    // (bind_armed) refuses here exactly as its acceptance would. The escrow
-    // lifecycle is why the directed rail keeps that refusal: every
-    // compensation exit (return flight, restore, mail, operator park) would
-    // otherwise need its own binding decision (the recorded judgment).
+    // Validate the params acceptance WILL use, not a looser approximation, so
+    // an offer can never be created that its own acceptance would refuse on a
+    // STATIC fact. The agreed ITEM gets the same treatment since H10: the
+    // buyer names the exact copy, so its eligibility is checkable NOW, and an
+    // armed commission piece (bind_armed) refuses here exactly as its
+    // acceptance would. The escrow lifecycle is why the directed rail keeps
+    // that refusal: every compensation exit (return flight, restore, mail,
+    // operator park) would otherwise need its own binding decision (the
+    // recorded judgment). The invariant deliberately does NOT cover MOVING
+    // facts: the shared listing cap is the seller's live count at acceptance
+    // time, so a capped seller's offers are creatable and refuse cap_reached
+    // (typed, reopening the deal) when accepted.
     const params = validListingParams(this.directedParams(args.usdCents, args.account));
     if (!params.ok) return refuse(params.reason);
-    const eligible = listingEligibility(
-      ITEMS[args.item.itemId],
-      args.item.instance,
-      this.cfg.policy,
-    );
+    // Own-property lookup: 'constructor' and friends would resolve prototype
+    // members, and while the taxonomy's closed default refuses them anyway,
+    // an honest miss is better than a lucky one.
+    const agreedDef = Object.hasOwn(ITEMS, args.item.itemId) ? ITEMS[args.item.itemId] : undefined;
+    const eligible = listingEligibility(agreedDef, args.item.instance, this.cfg.policy);
     if (!eligible.ok) return refuse(eligible.reason);
     // A plausibility gate on the money side too (the guardBalance medium):
     // the auction paths refuse an implausible bid at placement, and a
@@ -1659,8 +1685,9 @@ export class WocMarketService {
       expiresAtMs: this.now() + WOC_MARKET_DIRECTED_OFFER_TTL_SECONDS * 1000,
       itemId: args.item.itemId,
       // The fingerprint acceptance will demand of the extracted copy: item
-      // id, instance payload, crafted provenance (the itemCopyPin 3-tuple).
-      itemPin: itemCopyPin({
+      // id, instance payload, crafted provenance (the itemCopyPin 3-tuple),
+      // stored as its fixed-width digest.
+      itemPin: this.itemPinDigest({
         itemId: args.item.itemId,
         count: 1,
         ...(args.item.instance === undefined ? {} : { instance: args.item.instance }),
@@ -1669,6 +1696,9 @@ export class WocMarketService {
           : { craftedRecipeId: args.item.craftedRecipeId }),
       }),
     });
+    // ONE pending offer per pair (the strike-farming bound): the unique
+    // partial index is the authority, surfaced typed.
+    if (offer === 'already_pending') return refuse('already_pending');
     return { ok: true, offer };
   }
 
@@ -2690,6 +2720,7 @@ export class WocMarketService {
     const due = await this.deps.db.acceptedUnstampedOffers(
       this.cfg.realm,
       nowMs - WOC_MARKET_OFFER_CONVERGE_SECONDS * 1000,
+      nowMs - WOC_MARKET_OFFER_CONVERGE_MAX_AGE_SECONDS * 1000,
       SWEEP_BATCH,
     );
     let advanced = 0;
@@ -2717,6 +2748,43 @@ export class WocMarketService {
     const count = (strikes?.strikes ?? 0) + 1;
     const suspension = strikeSuspensionMs(count);
     await this.deps.db.addStrike(account, suspension > 0 ? nowMs + suspension : null);
+  }
+
+  /**
+   * The DIRECTED buyer's non-payment strike, with the two fairness gates a
+   * strike presumes.
+   *
+   * A strike punishes a payment DEFAULT, so it presumes payment was possible:
+   * while the price oracle or economy service is unhealthy, buyNow and
+   * confirmSettlement refuse market_paused, so the sweep closing a hold in
+   * that window would strike a buyer for an OUTAGE (the sweep deliberately
+   * keeps closing and returning items while unhealthy; only the penalty
+   * pauses). The health read here is the same one guardEnabledHealthy makes,
+   * probed at STRIKE time: a blip earlier inside the window is not visible
+   * from here and is accepted (recorded residual; the buyer had the rest of
+   * the window).
+   *
+   * And a recorded refusal class that says the chain plausibly saw money
+   * spares the strike on the SAME vocabulary the public rail's abandon
+   * recorder exempts (WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS, one member,
+   * service_unavailable, deliberately non-mintable): a directed buyer whose
+   * payment died in a service outage must not eat a strike the public buyer
+   * would not even eat a cooldown for.
+   */
+  private async strikeDirectedBuyer(
+    account: number,
+    nowMs: number,
+    failReason: string | null,
+  ): Promise<void> {
+    if (
+      failReason !== null &&
+      (WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS as readonly string[]).includes(failReason)
+    ) {
+      return;
+    }
+    const price = await this.deps.economy.price();
+    if (!price.available || !price.healthy) return;
+    await this.strikeAccount(account, nowMs);
   }
 
   private async closeDueAuctions(nowMs: number): Promise<number> {
@@ -2758,16 +2826,20 @@ export class WocMarketService {
         // The strike gate reads EVER-settled, not open-settled: a buyer
         // whose payment attempt landed a settlement row (even a failed one)
         // is the overdue arm's to strike, and striking here too would be a
-        // second strike for one walk-away. Probed BEFORE the close; the
-        // strike itself runs only AFTER the close CAS reports success
-        // (addStrike is a non-idempotent increment, and a contended close
-        // re-runs this row from durable state next pass).
-        const everSettled = await this.deps.db.everSettledForListing(listing.id);
+        // second strike for one walk-away. Probed AFTER the close CAS
+        // succeeds, which closes the once-theoretical sliver where a
+        // settlement lands and dies between a pre-close probe and the close
+        // (insertSettlement refuses on a closed listing, so nothing can land
+        // after the CAS); the strike also only runs after that CAS because
+        // addStrike is a non-idempotent increment and a contended close
+        // re-runs this row from durable state next pass.
         if (!(await this.deps.db.closeListingIfNoOpenSettlement(listing.id, 'unsettled'))) {
           await this.deps.db.markListingSettling(listing.id);
           return;
         }
-        if (!everSettled) await this.strikeAccount(listing.directedBuyerAccount, nowMs);
+        if (!(await this.deps.db.everSettledForListing(listing.id))) {
+          await this.strikeDirectedBuyer(listing.directedBuyerAccount, nowMs, null);
+        }
         return;
       }
       // Guarded close: a buy-now settlement placed inside the closing
@@ -3045,8 +3117,9 @@ export class WocMarketService {
       if (listing.directedBuyerAccount !== null) {
         // The strike is gated by the expiry transition CAS above (`moved`),
         // which fires at most once per settlement, so a re-run of this row
-        // cannot strike twice.
-        await this.strikeAccount(settlement.buyerAccount, nowMs);
+        // cannot strike twice. The failReason rides along so a chain-outage
+        // refusal spares the strike on the shared exempt vocabulary.
+        await this.strikeDirectedBuyer(settlement.buyerAccount, nowMs, settlement.failReason);
         // AUTO-CLOSE (H12): a directed listing has exactly one permitted
         // buyer, so an expired unpaid settlement is the end of the deal, not
         // a return to the shelf. Closing here (instead of leaving the row
