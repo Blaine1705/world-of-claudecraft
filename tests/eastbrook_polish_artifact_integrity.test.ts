@@ -694,12 +694,40 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
 // archetype and scene-texture counts; renderer.ts edits only). No capture
 // was retaken.
-// Re-minted after the custom-shader dedupe signature fix changed
-// prewarm_policy.ts. No capture was retaken.
+// Re-minted for the shadow-batch PR (shadow-camera texel snapping and the
+// budget-governed shadow cadence; renderer.ts edits only). No capture was
+// retaken.
+// Re-minted for the merge of the shadow-batch PR with the iOS constrained-
+// memory zone-eviction fix: both parents move renderer.ts, so the
+// rendererIntegration leaf mints a value matching neither parent. No capture
+// was retaken.
+// Re-minted for the merge of PR #3314's rift windup telegraph school tint
+// (issue #2917) with the release branch's renderer changes. Both parents move
+// renderer.ts, so the rendererIntegration leaf mints a value matching neither
+// parent. No capture was retaken.
+// Re-minted for the Three.js audit batch (light budget seam, blob shadows, sky
+// residency lane, splat colour pack-source fix): renderer.ts edits only. No
+// capture was retaken.
+// Re-minted for the base sync of the Three.js audit batch with the release
+// branch renderer changes. Both parents move renderer.ts, so the
+// rendererIntegration leaf mints a value matching neither parent. No capture
+// was retaken.
+// Re-minted for the release base-health repair after renderer.ts changed. No
+// capture was retaken.
+// Re-minted for the v0.37.0 base sync with the login-storm base commit. The
+// merged renderer/prewarm/source bytes mint a value matching neither parent.
+// No capture was retaken.
+// Re-minted after organizing renderer imports changed the provenance inputs.
+// No capture was retaken.
+// Re-minted for the merge of the iOS constrained-memory zone-eviction fix
+// (evictFarZoneIfConstrained's rationale moved into zone_eviction_core.ts)
+// with the release branch's organized renderer imports. Both parents move
+// renderer.ts, so the rendererIntegration leaf mints a value matching neither
+// parent. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '84f98d0fbd94bfd3175e855d91f491c3fc565a204fad2034c1e062b4a0a8c482';
+  'fbf399d77b9c8bc20c360499996629d0ceac63131eaa338acab169d15b1f3b23';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '4c097c403091fe4ed5d04bec6b79fa3272a85ba10dc35d20cb162f416c593d57';
+  '4e463395ae6cf03c4af917a8e895973c39bccdc81c938bbc4efe07769a531296';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1626,17 +1654,44 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // PR 3204) into the creator-appearance branch: both parents move the
     // rendererIntegration leaf, so the merged tree mints a value matching
     // neither parent. No capture was retaken.
+    // Re-minted for the shadow-batch PR (shadow-camera texel snapping and the
+    // budget-governed shadow cadence; renderer.ts edits only). No capture was
+    // retaken.
+    // Re-pinned for the merge of the shadow-batch PR with the iOS constrained-
+    // memory zone-eviction fix: the first-order composite follows both
+    // parents' renderer.ts edits, then this second-order performance seal
+    // follows the swept evidence bytes. No capture was retaken.
+    // Re-pinned for the merge of PR #3314's rift windup telegraph school tint
+    // (issue #2917) with the release branch's renderer changes. The
+    // first-order composite follows the merged renderer.ts bytes, then this
+    // second-order performance seal follows the swept evidence bytes. No
+    // capture was retaken.
     // Re-minted for the Three.js audit batch (light budget seam, blob
     // shadows, sky residency lane, splat colour pack-source fix): the
     // first-order composite follows renderer.ts, then this second-order
     // performance seal follows the swept evidence bytes. No capture was
     // retaken.
-    // Re-minted after the custom-shader dedupe signature fix changed
-    // prewarm_policy.ts. No capture was retaken.
+    // Re-pinned for the base sync of the Three.js audit batch with the release
+    // branch renderer changes. The first-order composite follows the merged
+    // renderer.ts bytes, then this second-order performance seal follows the
+    // swept evidence bytes. No capture was retaken.
+    // Re-pinned for the release base-health repair after renderer.ts changed.
+    // No capture was retaken.
+    // Re-pinned for the v0.37.0 base sync with the login-storm base commit.
+    // The first-order composite follows the merged input bytes, then this
+    // second-order performance seal follows the swept evidence bytes. No
+    // capture was retaken.
+    // Re-pinned after organizing renderer imports changed the provenance
+    // inputs. No capture was retaken.
+    // Re-pinned for the merge of the iOS constrained-memory zone-eviction fix
+    // with the release branch's organized renderer imports. The first-order
+    // composite follows the merged renderer.ts bytes, then this second-order
+    // performance seal follows the swept evidence bytes. No capture was
+    // retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('c509e7c1d81710c7e5c8397449af7b8da06fb4531e98b8f9132279a62f4d4d1e');
+    ).toBe('e5580f487e60f0c77d312a264ad9a1dc1e11b793a4380187a209132ff8cc4412');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
