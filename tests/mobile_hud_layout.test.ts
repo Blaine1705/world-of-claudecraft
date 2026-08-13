@@ -85,6 +85,9 @@ describe('resolveMobileHudLayout: menu/chat state classes', () => {
     expect(resolveMobileHudLayout(input({ width: 390, height: 844 })).classes).not.toContain(
       'hud-mobile-landscape',
     );
+    expect(resolveMobileHudLayout(input({ width: 390, height: 390 })).classes).not.toContain(
+      'hud-mobile-landscape',
+    );
   });
 
   it('adds hud-chat-open iff chatOpen', () => {

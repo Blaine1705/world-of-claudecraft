@@ -6,6 +6,7 @@ describe('map marker responsive profile', () => {
     ['desktop landscape', false, false, 1600, 900, 'standard'],
     ['desktop portrait', false, false, 900, 1600, 'standard'],
     ['touch portrait', true, false, 390, 844, 'standard'],
+    ['touch square', true, false, 390, 390, 'standard'],
     ['touch landscape', true, false, 844, 390, 'compact'],
     ['compact touch portrait', true, true, 390, 844, 'compact'],
   ] as const)(

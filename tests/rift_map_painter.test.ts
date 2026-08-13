@@ -749,14 +749,13 @@ describe('RiftMapPainter', () => {
     expect(ctx.measureText).not.toHaveBeenCalled();
   });
 
-  it('drops localized title sprites once and re-latches the translated title', () => {
+  it('drops title sprites once on relocalize and re-latches the same rendered title', () => {
     const created = installBrowser();
     const ctx = fakeContext();
-    let title = 'The Ember Test';
     const painter = new RiftMapPainter(
       writers,
       () => 'class',
-      () => title,
+      () => 'The Ember Test',
       markerArt,
     );
 
@@ -765,7 +764,6 @@ describe('RiftMapPainter', () => {
     painter.paintWorldMap(ctx as unknown as CanvasRenderingContext2D, world(), 560);
     expect(created).toHaveLength(canvasCountAfterFirstTitle);
 
-    title = 'Prueba de la Ascua';
     painter.relocalize();
     painter.paintWorldMap(ctx as unknown as CanvasRenderingContext2D, world(), 560);
     expect(created).toHaveLength(canvasCountAfterFirstTitle + 1);

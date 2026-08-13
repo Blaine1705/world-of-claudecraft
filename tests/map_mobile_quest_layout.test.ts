@@ -31,6 +31,18 @@ describe('wide landscape map and quest layout', () => {
       'body.mobile-touch.mobile-map-quest-open {\n        /* Shared by the sibling quest sheet and map window.',
     );
     expect(css).toContain('--mobile-map-rail: 58px;');
+    expect(css).toContain(
+      '--mobile-map-dual-edge-left: calc(\n          max(10px, env(safe-area-inset-left)) /\n          var(--ui-scale, 1)\n        );',
+    );
+    expect(css).toContain(
+      '--mobile-map-dual-edge-right: calc(\n          max(10px, env(safe-area-inset-right)) /\n          var(--ui-scale, 1)\n        );',
+    );
+    expect(css).toContain(
+      '--mobile-map-dual-edge-top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));',
+    );
+    expect(css).toContain(
+      '--mobile-map-dual-edge-bottom: calc(\n          max(10px, env(safe-area-inset-bottom)) /\n          var(--ui-scale, 1)\n        );',
+    );
     expect(css).toContain('--mobile-map-dual-available-width: calc(');
     expect(css).toContain('calc((var(--app-vh) - 104px) / var(--ui-scale, 1))');
     expect(css).toContain('left: var(--mobile-map-dual-edge-left);');

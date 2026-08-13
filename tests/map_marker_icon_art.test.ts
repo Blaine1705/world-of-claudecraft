@@ -412,6 +412,86 @@ describe('map marker painted art', () => {
     expect(executableLoader.match(/\brgba?\s*\(/g)).toBeNull();
   });
 
+  it('resolves the production default palette once and applies it to cached state rasters', () => {
+    const images: FakeImage[] = [];
+    const canvases: FakeCanvas[] = [];
+    const root = {};
+    const reads: string[] = [];
+    const resolvedColors = Object.fromEntries(
+      Object.keys(RASTER_COLORS).map((key) => [key, `resolved-${key}`]),
+    ) as unknown as MapMarkerRasterColors;
+    const style = {
+      getPropertyValue: vi.fn((token: string) => {
+        reads.push(token);
+        const key = Object.entries(MAP_MARKER_RASTER_COLOR_TOKENS).find(
+          ([, expectedToken]) => expectedToken === token,
+        )?.[0] as keyof MapMarkerRasterColors | undefined;
+        return key ? `  ${resolvedColors[key]}  ` : '';
+      }),
+    } as Pick<CSSStyleDeclaration, 'getPropertyValue'>;
+    const getComputedStyleMock = vi.fn(() => style);
+    vi.stubGlobal('getComputedStyle', getComputedStyleMock);
+
+    try {
+      const hostDocument = {
+        documentElement: root,
+        createElement: vi.fn((tag: string) => {
+          expect(tag).toBe('canvas');
+          const canvas = new FakeCanvas();
+          canvases.push(canvas);
+          return canvas;
+        }),
+      };
+      const art = createMapMarkerArt(hostDocument as unknown as Document, () => {
+        const image = new FakeImage();
+        images.push(image);
+        return image as unknown as HTMLImageElement;
+      });
+
+      expect(getComputedStyleMock).toHaveBeenCalledTimes(1);
+      expect(getComputedStyleMock).toHaveBeenCalledWith(root);
+      expect(reads).toEqual(Object.values(MAP_MARKER_RASTER_COLOR_TOKENS));
+      expect(style.getPropertyValue).toHaveBeenCalledTimes(reads.length);
+
+      expect(art.sprite('gather-ore', 'minimapGatherCooldownLocked')).toBeNull();
+      images[0].onload?.();
+      expect(art.sprite('gather-ore', 'minimapGatherCooldownLocked')).not.toBeNull();
+
+      expect(art.sprite('rift-entrance', 'minimapNavigationRankS')).toBeNull();
+      images[1].onload?.();
+      expect(art.sprite('rift-entrance', 'minimapNavigationRankS')).not.toBeNull();
+
+      const fillColors = new Set(
+        canvases.flatMap((canvas) => canvas.fills.map((fill) => fill.style)),
+      );
+      const strokeColors = new Set(
+        canvases.flatMap((canvas) => canvas.strokes.map((stroke) => stroke.style)),
+      );
+      for (const color of [
+        resolvedColors.keyline,
+        resolvedColors.lockDark,
+        resolvedColors.lockBronze,
+        resolvedColors.lockHighlight,
+        resolvedColors.semanticDark,
+        resolvedColors.semanticGold,
+      ]) {
+        expect(fillColors).toContain(color);
+      }
+      for (const color of [
+        resolvedColors.cooldownArcDark,
+        resolvedColors.cooldownArcLight,
+        resolvedColors.lockDark,
+        resolvedColors.lockBronze,
+        resolvedColors.semanticDark,
+        resolvedColors.semanticGold,
+      ]) {
+        expect(strokeColors).toContain(color);
+      }
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it('keeps the closed catalog, URL routes, and committed WebPs in exact bijection', () => {
     const expectedIds = [
       'dungeon-entrance',
@@ -1201,16 +1281,16 @@ describe('map marker painted art', () => {
       /new MapWindowPainter\(\s*classCss,\s*this\.mapMarkerArt,\s*this\.mapMarkerProfile,\s*\)/,
     );
     expect(hud).toMatch(
-      /new MinimapPainter\([\s\S]*?this\.mapMarkerArt,\s*this\.mapMarkerProfile,\s*\)/,
+      /new MinimapPainter\((?:(?!\n  \);)[\s\S])*?this\.mapMarkerArt,\s*this\.mapMarkerProfile,\s*\n  \);/,
     );
     expect(hud).toMatch(
       /new DelveMapPainter\(\s*this\.writerFacet,\s*classCss,\s*this\.mapMarkerArt,\s*this\.mapMarkerProfile,\s*\)/,
     );
     expect(hud).toMatch(
-      /new RiftMapPainter\([\s\S]*?this\.mapMarkerArt,\s*this\.mapMarkerProfile,\s*\)/,
+      /new RiftMapPainter\((?:(?!\n  \);)[\s\S])*?this\.mapMarkerArt,\s*this\.mapMarkerProfile,\s*\n  \);/,
     );
-    expect(hud).toContain("classes.contains('mobile-touch')");
-    expect(hud).toContain("classes.contains('hud-mobile-compact')");
-    expect(hud).toContain("classes.contains('hud-mobile-landscape')");
+    expect(hud).toMatch(
+      /mapMarkerProfileForFlags\(\s*classes\.contains\('mobile-touch'\),\s*classes\.contains\('hud-mobile-compact'\),\s*classes\.contains\('hud-mobile-landscape'\),?\s*\)/,
+    );
   });
 });

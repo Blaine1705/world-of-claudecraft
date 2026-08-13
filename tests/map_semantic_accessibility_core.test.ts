@@ -139,6 +139,62 @@ describe('map semantic accessibility core', () => {
       direction: 'east',
       distance: 'far',
     });
+
+    const center = 280;
+    const radius = 140;
+    const directions = [
+      ['east', 0],
+      ['southeast', 45],
+      ['south', 90],
+      ['southwest', 135],
+      ['west', 180],
+      ['northwest', 225],
+      ['north', 270],
+      ['northeast', 315],
+    ] as const;
+    for (const [direction, degrees] of directions) {
+      const radians = (degrees * Math.PI) / 180;
+      expect(
+        quantizeMapMarkerLocation(
+          center + Math.cos(radians) * radius,
+          center + Math.sin(radians) * radius,
+          center,
+          center,
+          560,
+        ),
+        direction,
+      ).toEqual({ direction, distance: 'medium' });
+    }
+
+    const beforeNortheast = (22.49 * Math.PI) / 180;
+    const atNortheast = (22.5 * Math.PI) / 180;
+    expect(
+      quantizeMapMarkerLocation(
+        center + Math.cos(beforeNortheast) * radius,
+        center + Math.sin(beforeNortheast) * radius,
+        center,
+        center,
+        560,
+      ).direction,
+    ).toBe('east');
+    expect(
+      quantizeMapMarkerLocation(
+        center + Math.cos(atNortheast) * radius,
+        center + Math.sin(atNortheast) * radius,
+        center,
+        center,
+        560,
+      ).direction,
+    ).toBe('southeast');
+
+    expect(quantizeMapMarkerLocation(center + 112, center, center, center, 560).distance).toBe(
+      'near',
+    );
+    expect(quantizeMapMarkerLocation(center + 112.01, center, center, center, 560).distance).toBe(
+      'medium',
+    );
+    expect(quantizeMapMarkerLocation(235.19, 0, 0, 0, 560).distance).toBe('medium');
+    expect(quantizeMapMarkerLocation(235.21, 0, 0, 0, 560).distance).toBe('far');
   });
 
   it('reuses accepted hit slots and resolves exact ties navigation before reward before mechanic', () => {
