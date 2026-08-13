@@ -50,9 +50,10 @@ import { bareClient } from './helpers/bare_client';
 // "no budget on the identity record" assertion below cannot pass by coincidence.
 const MARK_SECONDS = 4217;
 
-// Sim.setCheaterMark is server-side only, so build the marked entity the way the
-// server does rather than hand-stamping the flag: the encode under test must see
-// the same entity the real sanction path produces.
+// setCheaterMark is the one entry point that applies a mark (the offline Sim
+// never calls it), so build the marked entity through it rather than
+// hand-stamping the flag: the encode under test must see the entity a real
+// sanction produces, its aura included.
 function markedPlayerSim(seconds = MARK_SECONDS): Sim {
   const sim = new Sim({ seed: 7, playerClass: 'warrior' });
   sim.setCheaterMark(seconds);
@@ -66,13 +67,18 @@ describe('the Cheater mark over the wire', () => {
     expect(e.cheaterMark).toBe(true);
 
     const wire = wireEntity(e);
-    // The wire key IS the protocol: `chm`, encoded as the sparse 1, and NEVER
-    // the remaining budget (a nearby client renders the tag, only the wearer
-    // needs the countdown and they already have it on the aura).
+    // The wire key IS the protocol: `chm`, encoded as the sparse 1 and never a
+    // duration, because a nearby client only has to decide WHETHER to draw the
+    // tag.
     expect(wire.chm).toBe(1);
-    // The BUDGET rides the aura array (the aura is the countdown) and nothing
-    // else: no identity field leaks a marked player's remaining sanction to
-    // every client that can see them.
+    // What the next assertion pins is the SHAPE of the identity record, not
+    // privacy: the budget rides the aura array and nothing else, so the identity
+    // fields every entity in interest scope re-sends stay one flag wide. The
+    // countdown itself is ordinary visible aura state, exactly like any other
+    // debuff timer (wireAura ships `rem` for every aura it sends, to every
+    // client that can see the wearer), and that is by design: a public sanction
+    // with a public clock. Were that ever to become a privacy requirement, the
+    // fix is filtering the aura to the wearer server-side, not this assertion.
     const identityOnly: Record<string, unknown> = { ...wire };
     delete identityOnly.auras;
     expect(JSON.stringify(identityOnly)).not.toContain(String(MARK_SECONDS));
