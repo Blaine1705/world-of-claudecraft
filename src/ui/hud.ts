@@ -94,7 +94,7 @@ import {
 } from '../sim/professions/focus';
 import { inRangeStationTypes, stationTypesSignature } from '../sim/professions/stations';
 import { TIER_SKILL_STEP, tierForSkill } from '../sim/professions/wheel';
-import { type QuestObjectiveRef, questObjectivesForMob } from '../sim/quest_targets';
+import { questObjectivesForMob } from '../sim/quest_targets';
 import type { ResolvedAbility } from '../sim/sim';
 import type {
   AbilityDef,
@@ -129,7 +129,6 @@ import {
   MAX_LEVEL,
   MELEE_RANGE,
   MILESTONES,
-  questObjectiveRequired,
   SALVAGE_CAST_ID,
   type SimEvent,
   SUNDER_ARMOR_PCT_PER_STACK,
@@ -314,12 +313,10 @@ import {
   resetFramePositionsOnce,
   TARGET_FRAME_POS_KEY,
 } from './frame_pos_reset';
-import { gatherNodeTooltipHtml } from './gather_node_tooltip_controller';
 import { gatherToolTooltipLines } from './gather_tool_tooltip';
 import { gatheringProfessionNameKey } from './gathering_profession_name';
 import {
   buildGatheringProficiencyRows,
-  buildGatherNodeTooltip,
   gatherDeniedLineKey,
   gatherDowngradeLineKey,
   gatherRareTierFor,
@@ -454,6 +451,7 @@ import { LootRollController } from './hud/loot/loot_roll_controller';
 import { lootSettingsView } from './hud/loot/loot_settings_view';
 import { renderLootSettingsWindow } from './hud/loot/loot_settings_window';
 import { LootWindowController } from './hud/loot/loot_window_controller';
+import { MapMarkerInteractionController, MapMarkerTooltipContent } from './hud/map';
 import { CARD_POSES } from './hud/player_card/player_card';
 import { PlayerCardController } from './hud/player_card/player_card_controller';
 import { QuestDialogController } from './hud/quest/quest_dialog_controller';
@@ -531,20 +529,14 @@ import { mailIndicatorView } from './mailbox_view';
 import { MailboxWindow } from './mailbox_window';
 import { onMapArtReady } from './map_art';
 import { bakedMapBgEligible, loadBakedMapBg } from './map_bg';
-import { type MapGatherTipMemo, resolveGatherTipMemo } from './map_gather_tip_memo';
 import { createMapMarkerArt } from './map_marker_icon_loader';
 import { mapMarkerProfileForFlags } from './map_marker_profile_core';
-import {
-  type MapMarkerTooltipResolvers,
-  showMapMarkerTooltipAt,
-} from './map_marker_tooltip_adapter';
 import { bindMapPinchZoom, finishMapTap, mapTapReleaseFromPointer } from './map_pinch_zoom';
 import {
   MAP_TAP_MOVE_TOLERANCE_PX,
   nextMapZoom,
   zoomOutExitsZoneLevel,
 } from './map_pinch_zoom_core';
-import { MapSemanticAccessibilityCore } from './map_semantic_accessibility_core';
 import { shouldResetMapPanOnZoneCross, showOnMapPanState } from './map_show_on_map_core';
 import {
   type MapRegion,
@@ -554,18 +546,7 @@ import {
   paintTerrainRows,
 } from './map_terrain';
 import { MapWindowPainter } from './map_window_painter';
-import {
-  MAP_OPEN_ZOOM,
-  type MapGatherNodeMarker,
-  type MapNavigationMarker,
-  type MapNpcMarker,
-  type MapPointMarkerHit,
-  type MapQuestAreaMarker,
-  type MapServiceMarker,
-  type MapStationMarker,
-  type MapWindowMode,
-  mapWindowMode,
-} from './map_window_view';
+import { MAP_OPEN_ZOOM, type MapWindowMode, mapWindowMode } from './map_window_view';
 import { marketCollectIndicatorView } from './market_view';
 import { MarketWindow } from './market_window';
 import { materialHintLine } from './material_hint_view';
@@ -662,7 +643,6 @@ import {
   questItemTooltipModel,
   questItemTooltipRelatedKey,
 } from './quest_item_tooltip_view';
-import { questMarkerTooltipTag } from './quest_marker_tags';
 import { questProgressEventText } from './quest_progress_text';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
@@ -1945,33 +1925,8 @@ export class Hud {
     minZ: number;
     maxZ: number;
   } | null = null;
-  private mapQuestAreas: MapQuestAreaMarker[] = [];
-  private mapNpcMarkers: MapNpcMarker[] = [];
-  private mapGatherNodes: MapGatherNodeMarker[] = [];
-  private mapStations: MapStationMarker[] = [];
-  private mapServices: MapServiceMarker[] = [];
-  private mapNavigationMarkers: MapNavigationMarker[] = [];
-  private readonly mapPointHitsScratch: MapPointMarkerHit[] = [];
-  private readonly mapQuestObjectiveScratch: QuestObjectiveRef[] = [];
-  private readonly mapSemanticAccessibility = new MapSemanticAccessibilityCore({
-    zone: zoneDisplayName,
-    dungeon: dungeonDisplayName,
-    delve: delveDisplayName,
-    station: stationNameText,
-    poi: zonePoiLabel,
-    rift: riftFloorLabel,
-  });
-  private readonly mapMarkerTooltipResolvers: MapMarkerTooltipResolvers = {
-    npc: (m) => this.questGiverTooltipHtml(m),
-    navigation: (m) => this.navigationMapTooltipHtml(m),
-    station: (m) => this.stationMapTooltipHtml(m),
-    service: (m) => this.serviceMapTooltipHtml(m),
-    gather: (m) => this.gatherNodeMapTooltipHtml(m),
-    questArea: (refs, count) => this.questAreaTooltipHtml(refs, count),
-    paint: (html, x, y) => this.paintTooltipAt(html, x, y),
-  };
-  // Last gather-tip resolve. Reset with mapGatherNodes so visual and tip state agree.
-  private mapGatherTipMemo: MapGatherTipMemo | null = null;
+  private readonly mapMarkerTooltipContent: MapMarkerTooltipContent;
+  private readonly mapMarkerInteraction: MapMarkerInteractionController;
   private mapLevel: 'zone' | 'continent' = 'zone';
   // The zone id under the cursor on the continent overview (drives the highlight
   // + hover tooltip), and the last paint's clickable zone regions for hit-testing.
@@ -2068,6 +2023,28 @@ export class Hud {
     private readonly features: HudFeatures = { dailyRewardsEnabled: true },
   ) {
     hydrateCrestImageFallbacks(document);
+    this.mapMarkerTooltipContent = new MapMarkerTooltipContent(this.sim);
+    this.mapMarkerInteraction = new MapMarkerInteractionController({
+      names: {
+        zone: zoneDisplayName,
+        dungeon: dungeonDisplayName,
+        delve: delveDisplayName,
+        station: stationNameText,
+        poi: zonePoiLabel,
+        rift: riftFloorLabel,
+      },
+      npc: (marker) => this.mapMarkerTooltipContent.npc(marker),
+      navigation: (marker) =>
+        this.mapMarkerTooltipContent.navigation(
+          this.mapMarkerInteraction.semantics.navigationText(marker),
+        ),
+      station: (marker) => this.mapMarkerTooltipContent.station(marker),
+      service: (marker) => this.mapMarkerTooltipContent.service(marker),
+      gather: (marker) => this.mapMarkerTooltipContent.gather(marker),
+      questArea: (refs, count) => this.mapMarkerTooltipContent.questArea(refs, count),
+      paint: (html, x, y) => this.paintTooltipAt(html, x, y),
+      clearMemo: () => this.mapMarkerTooltipContent.clearMemo(),
+    });
     this.mapMarkerArt.preload();
     this.auraOverlayController = new AuraOverlayController({
       writers: this.writerFacet,
@@ -10850,22 +10827,7 @@ export class Hud {
   }
 
   private showMapTipAt(canvas: HTMLCanvasElement, x: number, y: number, touch = false): boolean {
-    return showMapMarkerTooltipAt(
-      canvas,
-      x,
-      y,
-      touch,
-      this.mapQuestAreas,
-      this.mapNpcMarkers,
-      this.mapGatherNodes,
-      this.mapStations,
-      this.mapServices,
-      this.mapNavigationMarkers,
-      this.mapPointHitsScratch,
-      this.mapQuestObjectiveScratch,
-      this.mapSemanticAccessibility,
-      this.mapMarkerTooltipResolvers,
-    );
+    return this.mapMarkerInteraction.showAt(canvas, x, y, touch);
   }
 
   // The map window shows the zone band the player is standing in (each band is a
@@ -10875,15 +10837,7 @@ export class Hud {
   // delve_map_painter (paintWorldMapDelve), the overworld branch by
   // map_window_painter; the pure geometry lives in map_window_view.ts.
   private clearMapHitState(canvas: HTMLCanvasElement): void {
-    this.mapQuestAreas.length = 0;
-    this.mapNpcMarkers.length = 0;
-    this.mapGatherNodes.length = 0;
-    this.mapStations.length = 0;
-    this.mapServices.length = 0;
-    this.mapNavigationMarkers.length = 0;
-    this.mapSemanticAccessibility.clear();
-    this.mapPointHitsScratch.length = 0;
-    this.mapGatherTipMemo = null;
+    this.mapMarkerInteraction.clear();
     this.mapView = null;
     this.continentRegions.length = 0;
     this.setStyleProp(canvas, 'cursor', 'default');
@@ -10924,7 +10878,7 @@ export class Hud {
       const model = this.riftPainter.paintWorldMap(ctx, this.sim, S);
       const area = model?.areaLabel ?? '';
       this.setText(summaryEl, t('hud.core.mapSummary', { zone: area }));
-      this.setText(markerSummaryEl, this.mapSemanticAccessibility.updateRift(model, S));
+      this.setText(markerSummaryEl, this.mapMarkerInteraction.semantics.updateRift(model, S));
       return;
     }
     if (inBattleground) {
@@ -10935,7 +10889,7 @@ export class Hud {
       this.setText(summaryEl, t('hud.core.mapSummary', { zone: area }));
       this.setText(
         markerSummaryEl,
-        this.mapSemanticAccessibility.updateBattleground(model, area, S),
+        this.mapMarkerInteraction.semantics.updateBattleground(model, area, S),
       );
       return;
     }
@@ -10945,7 +10899,7 @@ export class Hud {
       const model = this.delvePainter.paintWorldMapDelve(ctx, this.sim, S);
       const area = model?.areaLabel ?? '';
       this.setText(summaryEl, t('hud.core.mapSummary', { zone: area }));
-      this.setText(markerSummaryEl, this.mapSemanticAccessibility.updateDelve(model, S));
+      this.setText(markerSummaryEl, this.mapMarkerInteraction.semantics.updateDelve(model, S));
       return;
     }
 
@@ -10969,7 +10923,7 @@ export class Hud {
       this.setText(summaryEl, t('hudChrome.continentMap.summary'));
       this.setText(
         markerSummaryEl,
-        this.mapSemanticAccessibility.updateSimple(t('hudChrome.continentMap.title'), S),
+        this.mapMarkerInteraction.semantics.updateSimple(t('hudChrome.continentMap.title'), S),
       );
       return;
     }
@@ -11009,13 +10963,7 @@ export class Hud {
       ping: this.mapPing,
     });
     this.mapView = result.view;
-    this.mapQuestAreas = result.questAreas;
-    this.mapNpcMarkers = result.npcs;
-    this.mapGatherNodes = result.gatherNodes;
-    this.mapStations = result.stations;
-    this.mapServices = result.services;
-    this.mapNavigationMarkers = result.navigation;
-    this.mapGatherTipMemo = null;
+    this.mapMarkerInteraction.setOverworld(result);
     if (!this.mapDrag) canvas.style.cursor = result.cursor;
     const riftFloor = this.sim.riftFloor;
     const zoneLabel = riftFloor
@@ -11024,7 +10972,7 @@ export class Hud {
     this.setText(summaryEl, t('hud.core.mapSummary', { zone: zoneLabel }));
     this.setText(
       markerSummaryEl,
-      this.mapSemanticAccessibility.updateOverworld(result, zoneLabel, S),
+      this.mapMarkerInteraction.semantics.updateOverworld(result, zoneLabel, S),
     );
   }
 
@@ -11040,89 +10988,6 @@ export class Hud {
           max: this.questNumber(region.levelMax),
         }),
       )}</div>`;
-    }
-    return html;
-  }
-
-  // Tooltip body for a hovered gather node on the zone map: reuses the world
-  // hover's pure model + HTML (name, tool gate, ready/cooldown, fine preview)
-  // so the map and the 3D node tip never disagree. Memoized per node id (see
-  // mapGatherTipMemo) so a pointer sweeping across one icon resolves once.
-  private gatherNodeMapTooltipHtml(marker: MapGatherNodeMarker): string {
-    this.mapGatherTipMemo = resolveGatherTipMemo(this.mapGatherTipMemo, marker.nodeId, (nodeId) => {
-      const model = buildGatherNodeTooltip(this.sim, nodeId);
-      return model ? gatherNodeTooltipHtml(model) : '';
-    });
-    return this.mapGatherTipMemo.html;
-  }
-
-  private stationMapTooltipHtml(marker: MapStationMarker): string {
-    return `<div class="tt-title">${esc(stationNameText(marker.type))}</div>`;
-  }
-
-  private serviceMapTooltipHtml(marker: MapServiceMarker): string {
-    const key =
-      marker.kind === 'mailbox' ? 'worldContent.mailboxName' : 'worldContent.noticeboardName';
-    return `<div class="tt-title">${esc(t(key))}</div>`;
-  }
-
-  private navigationMapTooltipHtml(marker: MapNavigationMarker): string {
-    return `<div class="tt-title">${esc(this.mapSemanticAccessibility.navigationText(marker))}</div>`;
-  }
-
-  // Tooltip body for a hovered quest-giver glyph on the world map: each quest
-  // behind the glyph shows its title, tagged by its marker kind through the
-  // pure questMarkerTooltipTag table (ready, repeatable, available-again-soon;
-  // the plain offer stays untagged), plus its level requirement when the
-  // quest declares one, all through questUi keys.
-  private questGiverTooltipHtml(marker: MapNpcMarker): string {
-    let html = '';
-    for (const ref of marker.quests) {
-      const quest = QUESTS[ref.questId];
-      if (!quest) continue;
-      const tag = questMarkerTooltipTag(ref.kind);
-      const tagHtml = tag ? ` <span class="${tag.cls}">(${esc(t(tag.key))})</span>` : '';
-      html += `<div class="tt-title">${esc(questTitle(ref.questId))}${tagHtml}</div>`;
-      if (quest.minLevel) {
-        html += `<div class="tt-quest-req">${esc(
-          t('questUi.detail.requiresLevel', {
-            level: this.questNumber(quest.minLevel),
-          }),
-        )}</div>`;
-      }
-    }
-    return html;
-  }
-
-  // Tooltip body for hovered quest-objective areas on the world map: per quest,
-  // its title plus each hovered objective's tracker-style "label current/total"
-  // line, all through the existing questUi keys + formatters (no new i18n
-  // surface). Empty string when nothing under the cursor resolves.
-  private questAreaTooltipHtml(
-    refs: readonly QuestObjectiveRef[],
-    activeCount = refs.length,
-  ): string {
-    const byQuest = new Map<string, number[]>();
-    for (let refIndex = 0; refIndex < activeCount; refIndex++) {
-      const ref = refs[refIndex];
-      const list = byQuest.get(ref.questId);
-      if (list) list.push(ref.objectiveIndex);
-      else byQuest.set(ref.questId, [ref.objectiveIndex]);
-    }
-    let html = '';
-    for (const [questId, objectiveIndexes] of byQuest) {
-      const quest = QUESTS[questId];
-      const qp = this.sim.questLog.get(questId);
-      if (!quest || !qp) continue;
-      let lines = '';
-      for (const i of objectiveIndexes) {
-        const obj = quest.objectives[i];
-        if (!obj) continue;
-        const required = questObjectiveRequired(quest, qp, i);
-        const current = Math.min(qp.counts[i] ?? 0, required);
-        lines += `<div>${esc(this.questProgressText(questObjectiveLabel(questId, i), current, required))}</div>`;
-      }
-      if (lines) html += `<div class="tt-title">${esc(questTitle(questId))}</div>${lines}`;
     }
     return html;
   }

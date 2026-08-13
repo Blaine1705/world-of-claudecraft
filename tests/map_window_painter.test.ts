@@ -51,6 +51,18 @@ const tooltipAdapter = readFileSync(
 )
   .replace(/\/\*[\s\S]*?\*\//g, '')
   .replace(/(^|[^:])\/\/.*$/gm, '$1');
+const markerInteraction = readFileSync(
+  new URL('../src/ui/hud/map/map_marker_interaction_controller.ts', import.meta.url),
+  'utf8',
+)
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .replace(/(^|[^:])\/\/.*$/gm, '$1');
+const markerTooltipContent = readFileSync(
+  new URL('../src/ui/hud/map/map_marker_tooltip_content.ts', import.meta.url),
+  'utf8',
+)
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .replace(/(^|[^:])\/\/.*$/gm, '$1');
 // Comment-stripped like `code`: a commented-out token declaration must not
 // satisfy the design-token pins below.
 const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8')
@@ -560,19 +572,16 @@ describe('map_window_painter: cadence + cached background preserved', () => {
   it('wires landmark and gather hit targets: stores, clears, memos, and tooltip priority', () => {
     // The overworld paint stores this paint's hit-test markers; the delve and
     // non-zone branches clear them so no stale zone icon answers a tap.
-    expect(hud).toContain('this.mapGatherNodes = result.gatherNodes;');
-    expect(hud).toContain('this.mapStations = result.stations;');
-    expect(hud).toContain('this.mapServices = result.services;');
-    expect(hud).toContain('this.mapNavigationMarkers = result.navigation;');
-    expect(hud).toContain('this.mapGatherNodes.length = 0;');
-    expect(hud).toContain('this.mapStations.length = 0;');
-    expect(hud).toContain('this.mapServices.length = 0;');
-    expect(hud).toContain('this.mapNavigationMarkers.length = 0;');
+    expect(hud).toContain('this.mapMarkerInteraction.setOverworld(result);');
+    expect(markerInteraction).toContain('this.gatherNodes = EMPTY_MARKERS;');
+    expect(markerInteraction).toContain('this.stations = EMPTY_MARKERS;');
+    expect(markerInteraction).toContain('this.services = EMPTY_MARKERS;');
+    expect(markerInteraction).toContain('this.navigation = EMPTY_MARKERS;');
     expect(hud.match(/this\.clearMapHitState\(canvas\);/g)).toHaveLength(4);
     // The gather-tip resolve memo resets inside the shared clear and beside the
     // overworld store, bounding its staleness at the same
     // mediumHud repaint that refreshes the painted icon.
-    expect(hud.match(/this\.mapGatherTipMemo = null;/g)).toHaveLength(2);
+    expect(markerInteraction.match(/this\.clearMemo\(\);/g)).toHaveLength(2);
     expect(hud.match(/this\.mapView = null;/g)).toHaveLength(1);
     expect(hud).toContain('this.continentRegions.length = 0;');
     // Point markers resolve globally by distance. Exact-distance ties follow
@@ -605,28 +614,28 @@ describe('map_window_painter: cadence + cached background preserved', () => {
     expect(tooltipAdapter).toContain('MAP_TOUCH_POINT_HIT_RADIUS_CSS_PX * backingPerCssPx');
     expect(hud).toContain('showMapTipAt(clientX, clientY, true)');
     expect(tooltipAdapter).toContain('resolvers.service(hit.marker)');
-    expect(hud).toContain("marker.kind === 'mailbox'");
-    expect(hud).toContain("'worldContent.mailboxName'");
-    expect(hud).toContain("'worldContent.noticeboardName'");
-    expect(hud).toContain('stationNameText(marker.type)');
+    expect(markerTooltipContent).toContain("marker.kind === 'mailbox'");
+    expect(markerTooltipContent).toContain("'worldContent.mailboxName'");
+    expect(markerTooltipContent).toContain("'worldContent.noticeboardName'");
+    expect(markerTooltipContent).toContain('stationNameText(marker.type)');
     expect(tooltipAdapter).toContain('resolvers.station(hit.marker)');
     // Pointer motion must not mint resolver closures or input bags. Both are
     // stable Hud-owned fields passed straight through the tiny hot-path method.
-    const method = hud.slice(
-      hud.indexOf('private showMapTipAt('),
-      hud.indexOf('private clearMapHitState(', hud.indexOf('private showMapTipAt(')),
+    const method = markerInteraction.slice(
+      markerInteraction.indexOf('showAt('),
+      markerInteraction.indexOf('clear(): void', markerInteraction.indexOf('showAt(')),
     );
     expect(method).not.toContain('=>');
     expect(method).not.toContain('const state =');
     expect(method).not.toContain('const resolvers =');
-    expect(method).toContain('this.mapPointHitsScratch');
-    expect(method).toContain('this.mapQuestObjectiveScratch');
-    expect(method).toContain('this.mapMarkerTooltipResolvers');
+    expect(method).toContain('this.pointHits');
+    expect(method).toContain('this.questObjectives');
+    expect(method).toContain('this.tooltipResolvers');
     // The gather arm resolves through the shared world-hover pair (behind the
     // tested memo seam), so the map tip and the 3D node tip cannot disagree.
-    expect(hud).toContain('resolveGatherTipMemo(this.mapGatherTipMemo, marker.nodeId');
-    expect(hud).toContain('buildGatherNodeTooltip(this.sim, nodeId)');
-    expect(hud).toContain('gatherNodeTooltipHtml(model)');
+    expect(markerTooltipContent).toContain('resolveGatherTipMemo(this.gatherMemo, marker.nodeId');
+    expect(markerTooltipContent).toContain('buildGatherNodeTooltip(this.world, nodeId)');
+    expect(markerTooltipContent).toContain('gatherNodeTooltipHtml(model)');
   });
 
   it('accepts only the current Hud-owned zone background and never prewarms all zones', () => {

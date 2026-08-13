@@ -5,8 +5,8 @@ import type { StationType } from '../src/sim/types';
 import type { ContinentZoneRegion } from '../src/ui/continent_map_view';
 import { Hud } from '../src/ui/hud';
 import type { DelveDrawModel } from '../src/ui/hud/delve/delve_map_painter';
+import { MapMarkerInteractionController, MapMarkerTooltipContent } from '../src/ui/hud/map';
 import type { RiftMapModel } from '../src/ui/hud/rift/rift_map_core';
-import type { MapMarkerTooltipResolvers } from '../src/ui/map_marker_tooltip_adapter';
 import { MapSemanticAccessibilityCore } from '../src/ui/map_semantic_accessibility_core';
 import type {
   MapGatherNodeMarker,
@@ -95,7 +95,7 @@ interface MapHudHarness {
   mapPointHitsScratch: MapPointMarkerHit[];
   mapQuestObjectiveScratch: QuestObjectiveRef[];
   mapSemanticAccessibility: MapSemanticAccessibilityCore;
-  mapMarkerTooltipResolvers: MapMarkerTooltipResolvers;
+  mapMarkerInteraction: MapMarkerInteractionController;
   mapGatherTipMemo: unknown;
   continentRegions: ContinentZoneRegion[];
   questGiverTooltipHtml(marker: MapNpcMarker): string;
@@ -142,7 +142,15 @@ function semanticCore(): MapSemanticAccessibilityCore {
 }
 
 function wireTooltipResolvers(hud: MapHudHarness): void {
-  hud.mapMarkerTooltipResolvers = {
+  const controller = new MapMarkerInteractionController({
+    names: {
+      zone: (id) => ZONES.find((zone) => zone.id === id)?.name ?? id,
+      dungeon: (id) => id,
+      delve: (id) => DELVE_LIST.find((delve) => delve.id === id)?.name ?? id,
+      station: (type) => type,
+      poi: (zoneId, index) => `${zoneId}/${index}`,
+      rift: (name, rank) => `${name}${rank ? ` (${rank})` : ''}`,
+    },
     npc: (marker) => hud.questGiverTooltipHtml(marker),
     navigation: (marker) => hud.navigationMapTooltipHtml(marker),
     station: (marker) => hud.stationMapTooltipHtml(marker),
@@ -150,7 +158,47 @@ function wireTooltipResolvers(hud: MapHudHarness): void {
     gather: (marker) => hud.gatherNodeMapTooltipHtml(marker),
     questArea: (refs, count) => hud.questAreaTooltipHtml(refs, count),
     paint: (html, x, y) => hud.paintTooltipAt(html, x, y),
+    clearMemo: () => {
+      hud.mapGatherTipMemo = null;
+    },
+  });
+  controller.questAreas = hud.mapQuestAreas;
+  controller.npcs = hud.mapNpcMarkers;
+  controller.gatherNodes = hud.mapGatherNodes;
+  controller.stations = hud.mapStations;
+  controller.services = hud.mapServices;
+  controller.navigation = hud.mapNavigationMarkers;
+  hud.mapMarkerInteraction = controller;
+  const proxy = <K extends keyof MapMarkerInteractionController>(
+    legacy: keyof MapHudHarness,
+    key: K,
+  ): void => {
+    Object.defineProperty(hud, legacy, {
+      configurable: true,
+      get: () => controller[key],
+      set: (value) => {
+        controller[key] = value;
+      },
+    });
   };
+  proxy('mapQuestAreas', 'questAreas');
+  proxy('mapNpcMarkers', 'npcs');
+  proxy('mapGatherNodes', 'gatherNodes');
+  proxy('mapStations', 'stations');
+  proxy('mapServices', 'services');
+  proxy('mapNavigationMarkers', 'navigation');
+  Object.defineProperty(hud, 'mapPointHitsScratch', {
+    configurable: true,
+    get: () => controller.pointHits,
+  });
+  Object.defineProperty(hud, 'mapQuestObjectiveScratch', {
+    configurable: true,
+    get: () => controller.questObjectives,
+  });
+  Object.defineProperty(hud, 'mapSemanticAccessibility', {
+    configurable: true,
+    get: () => controller.semantics,
+  });
 }
 
 const NPC: MapNpcMarker = {
@@ -495,11 +543,13 @@ describe('Hud zone-map marker interaction', () => {
   });
 
   it('uses content names for route tooltips and escapes generated Rift names', () => {
-    const hud = Object.create(Hud.prototype) as unknown as MapHudHarness;
-    hud.mapSemanticAccessibility = semanticCore();
-    expect(hud.navigationMapTooltipHtml(NAVIGATION)).toContain(DELVE_LIST[0].name);
+    const semantics = semanticCore();
+    const content = new MapMarkerTooltipContent({} as IWorld);
+    const navigationHtml = (marker: MapNavigationMarker): string =>
+      content.navigation(semantics.navigationText(marker));
+    expect(navigationHtml(NAVIGATION)).toContain(DELVE_LIST[0].name);
     expect(
-      hud.navigationMapTooltipHtml({
+      navigationHtml({
         kind: 'world-passage',
         mx: 0,
         my: 0,
@@ -507,7 +557,7 @@ describe('Hud zone-map marker interaction', () => {
         destinationZoneId: ZONES[1].id,
       }),
     ).toContain(ZONES[1].name);
-    const rift = hud.navigationMapTooltipHtml({
+    const rift = navigationHtml({
       kind: 'rift-entrance',
       mx: 0,
       my: 0,
