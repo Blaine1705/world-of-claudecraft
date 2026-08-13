@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+  GPU_HITCH_RECEIPT_VERSION,
   GPU_HITCH_REJECTED_FLAG,
   publishGpuHitchRuntimeReceipt,
 } from '../src/game/gpu_hitch_receipt';
@@ -21,7 +22,7 @@ describe('gpu hitch runtime receipt', () => {
       },
     });
     expect(receipt).toMatchObject({
-      schemaVersion: 3,
+      schemaVersion: GPU_HITCH_RECEIPT_VERSION,
       requested: { linkrate: 24, modularpeers: 'off' },
       effective: {
         prewarmPacing: { available: false, mode: 'unsupported' },

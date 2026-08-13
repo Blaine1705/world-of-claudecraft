@@ -17,8 +17,16 @@ with headed legs in one A/B campaign.
 The analyzer refuses any software rasterizer as performance evidence, not just
 SwiftShader: it reads the adapter string through `SOFTWARE_RENDERER_PATTERN`
 (`src/render/software_renderer.ts`), which also names llvmpipe and the D3D11
-WARP fallback that Windows now uses in place of SwiftShader. Such a capture
-still validates, as a `smoke` artifact.
+WARP fallback that Windows now uses in place of SwiftShader.
+
+What a capture CLAIMS decides whether that is an error or a warning, and the
+claim is written into the artifact as `capture.performanceEvidence`, so
+re-reading a capture through the analyzer alone reproduces the verdict it
+embedded. A headed run claims the real GPU: finding llvmpipe or WARP on one
+fails validation and the command exits 1, because the machine did not do what
+the run said it was doing. A `--headless` run claims smoke only, so the same
+adapter is a warning on a valid `smoke` artifact. To keep a software-rasterizer
+capture as smoke evidence, run it with `--headless`.
 
 For headed evidence, inhibit automatic sleep/DPMS for the complete command and
 keep the browser foregrounded. A physical HDMI switch can remove the display's
@@ -37,7 +45,9 @@ node scripts/gpu_hitch_capture.mjs \
 ```
 
 `--mode offline` enters the local game fixture automatically. `--mode manual`
-opens the page and waits for the operator to enter the world.
+opens the page and waits for the operator to enter the world; it needs an
+interactive terminal and refuses to start without one, rather than waiting
+forever on a stdin nobody can type into.
 `--mode online-geared` is the controlled local-online boot scenario: it creates
 up to 40 disposable bots, gives every bot a deterministic complete authored
 appearance (including face/body morphs, hair, eyes, skin and outfit), varied
@@ -74,17 +84,39 @@ comparator refuses a pair that drifted.
 
 ## Artifact contract
 
-The JSON has schema version `3` and retains the raw `timeline` before deriving
+The JSON has schema version `4` and retains the raw `timeline` before deriving
 the summary. Query windows are anchored on `query.startMs`; links after the
 blocking call returns cannot be attributed to it. Upload attribution reports
 `certain` and `possible` bounds because edge buckets are partial.
 
+Upload bytes are read from the overload that was actually called, never from
+fixed argument positions. The DOM-source overloads three r165 uses for image
+uploads carry no dimensions at all: in
+`texImage2D(target, level, internalformat, format, type, source)` the two
+arguments the pixel overload spends on width and height hold GL enums, and the
+source states its own size (read as a PAIR from one source kind, so a
+half-decoded image cannot contribute an intrinsic width with a layout height).
+The bytes per texel come from the format and type pair, including the packed
+types that size a whole texel at once. An upload whose overload states neither
+dimensions nor a source size is counted in the bucket's `unsized` rather than
+guessed at, and `uploadBucketsBeforeQuery` carries `unsizedCertain` /
+`unsizedPossible` beside the byte totals: a byte total is only readable next to
+how many uploads it leaves out.
+
+The wrapped surface is the four 2D entry points (`texImage2D`,
+`texSubImage2D`, and their compressed forms). The 3D forms are NOT wrapped, so
+`DataArrayTexture` / `Data3DTexture` uploads appear in neither `count` nor
+`unsized`; the `unsized` honesty claim covers the 2D calls the estimator saw,
+not every upload the GPU received.
+
 An artifact from an earlier schema is rejected by name rather than read on a
 best-effort basis: schema `1` carries no completion-status return value, so the
-reflection families below cannot be derived from it at all, and schema `2` has
+reflection families below cannot be derived from it at all, schema `2` has
 no `variantDiff`, where a missing field is not the same claim as "this program
-had no variant". A mixed pair must never look comparable. The meaning of the
-earlier fields is unchanged.
+had no variant", and schema `3` sized every DOM-source upload from two GL enums
+read as width and height (about 131 MB per image upload), so its byte totals
+are not a smaller version of the same claim. A mixed pair must never look
+comparable. The meaning of the earlier fields is unchanged.
 
 ## Program variants
 
@@ -108,6 +140,20 @@ many unrelated materials is a GLOBAL condition flip; one pair per material is
 content arriving. `variantDiffParameter` names the position by counting back
 from the fixed trailers (two boolean masks, then the output colour space, then
 the custom key), because the `defines` block in front is variable length.
+
+Variant identity has a limit of its own. The link happens inside the
+`WebGLProgram` constructor, which three reaches from `compileAsync` with no
+draw context, so the material INSTANCE is unreachable and the retention key is
+the material class plus name: two unnamed `MeshStandardMaterial`s share it. A
+difference is therefore only claimed as a variant when it is ONE
+comma-separated segment wide on the shorter side and at most one segment wider
+on the other, which is what a single render condition produces: a value
+replaced in place, or the one `defines` entry appearing or disappearing that
+makes the key a segment longer. A wider difference is two materials that shared
+a family key and is recorded as `variantAmbiguous`, counted by
+`cacheKeyVariance` as `ambiguousPrograms`. Two materials differing in exactly
+one segment still collide, so a group holding a single program is weak evidence
+and a before/after pair shared by many materials is the strong signal.
 
 The naming has one honest limit, and reading around it matters. The join
 separator is a comma and the `onBeforeCompile` source contains commas of its
@@ -158,14 +204,27 @@ The discriminator is the completion-status RETURN VALUE, not a timestamp
 ordering. A program can be polled again after it is ready, so "the query came
 before the last poll" would misclassify a settled program as racing.
 
-- `never-compiled`: no completion poll preceded the query, so the program was
-  never submitted to `compileAsync`. The link and the first use happen in one
-  instruction stream and the query absorbs the whole link.
-- `raced-pending-link`: polls preceded the query but none had returned true. A
-  draw reached a material whose compile was still in flight and paid whatever
-  link time remained.
+- `never-compiled`: the program has NO completion poll anywhere in the capture,
+  so it was never submitted to `compileAsync`. The link and the first use happen
+  in one instruction stream and the query absorbs the whole link.
+  `WebGLProgram.isReady` is the only `COMPLETION_STATUS_KHR` caller in three
+  r165 and only the `compileAsync` poll pass calls it, so the presence of a
+  poll, even one that starts after the query, is proof of submission.
+- `raced-pending-link`: the program was submitted, and no poll had returned true
+  before the query started. A draw reached a material whose compile was still in
+  flight and paid whatever link time remained. This includes a program drawn in
+  the same frame it was submitted, before its first poll.
 - `settled-first`: a poll observed true strictly before the query started. This
   is the only family that measures reflection itself.
+
+Two limits of that split, worth reading before quoting a family count. Without
+`KHR_parallel_shader_compile` three flags a program ready on construction and
+never polls at all, so every program lands in `never-compiled`:
+`polledPrograms` travels with the families, and a capture reporting zero of
+them is evidence about the extension, not about compilation. And a program
+first linked synchronously at a draw, then swept up by a LATER `compileAsync`
+pass over the same cached program, reads as `raced-pending-link`. The families
+are a population readout, not a per-program verdict.
 
 `timeline.programs` gives each program its Three identity: the material class
 and name, three's own program id, and a HASH of the cache key with its length.

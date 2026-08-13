@@ -108,15 +108,23 @@ describe('gpu hitch metrics', () => {
     const result = uploadBucketsBeforeQuery(
       { startMs: 1_050 },
       [
-        { startMs: 200, count: 10, bytes: 100 },
-        { startMs: 300, count: 20, bytes: 200 },
-        { startMs: 900, count: 30, bytes: 300 },
-        { startMs: 1_000, count: 40, bytes: 400 },
+        { startMs: 200, count: 10, bytes: 100, unsized: 1 },
+        { startMs: 300, count: 20, bytes: 200, unsized: 0 },
+        { startMs: 900, count: 30, bytes: 300, unsized: 2 },
+        { startMs: 1_000, count: 40, bytes: 400, unsized: 5 },
       ],
       800,
       100,
     );
     expect(result).toMatchObject({ startMs: 250, endMs: 1_050, certain: 50, possible: 100 });
+    // An upload the estimator could not size contributes no bytes, so the byte
+    // totals are only readable next to how many uploads they leave out.
+    expect(result).toMatchObject({
+      bytesCertain: 500,
+      bytesPossible: 1_000,
+      unsizedCertain: 2,
+      unsizedPossible: 8,
+    });
   });
 
   it('rejects an effective pacing mismatch instead of accepting a silent no-op', () => {
@@ -231,10 +239,11 @@ describe('gpu hitch metrics', () => {
     expect(comparabilityMismatches(left, right)).toEqual(['probeSha256', 'glRenderer']);
   });
 
-  // The base for the mutation cases below carries a REAL value for every
+  // The base for the mutation cases below carries a REAL value for EVERY
   // dimension, unlike the plain fixture: with a field absent, a case only
   // exercises absent-against-present, which a comparator degraded to a presence
-  // test would still pass while two genuinely different zones compared equal.
+  // test would still pass while two legs at linkburst 4 and 8 compared as a
+  // valid A/B pair. Every mutation below is therefore value-against-value.
   // Kept separate from capture() so the fallback-chain cases above, which
   // deliberately supply zone from a different surface, keep working.
   const comparabilityBase = (overrides = {}) =>
@@ -247,7 +256,34 @@ describe('gpu hitch metrics', () => {
         fixture: { kind: 'geared-arrival-v1', count: 20 },
         durationMs: 90_000,
       },
-      effective: { ...capture().effective, renderer: { tier: 'ultra' } },
+      requested: {
+        linkmode: 'fixed',
+        linkrate: 12,
+        linkburst: 4,
+        compileroots: 8,
+        prewarmdeadline: 9_000,
+        modular: 'on',
+        modularpeers: 'on',
+        gfx: 'ultra',
+      },
+      // A stated requested knob nulls its own effective readback for the
+      // comparison (the request already carries that dimension), so the two
+      // effective blocks are mutated on a field that is always compared.
+      effective: {
+        schemaVersion: GPU_HITCH_SCHEMA_VERSION,
+        prewarmPacing: {
+          available: true,
+          mode: 'compile-unit-sync-prologue',
+          linksPerSecond: 12,
+          burst: 4,
+          compileBatchRoots: 8,
+          hardMaxMs: 9_000,
+          scope: 'self',
+          reason: 'query',
+        },
+        modular: { available: true, self: 'on', peers: 'on', reason: 'query' },
+        renderer: { tier: 'ultra' },
+      },
       ...overrides,
     });
 
@@ -293,16 +329,90 @@ describe('gpu hitch metrics', () => {
     'requested.modular': (base) => ({ requested: { ...base.requested, modular: 'off' } }),
     'requested.modularpeers': (base) => ({ requested: { ...base.requested, modularpeers: 'off' } }),
     'effective.prewarmPacing': (base) => ({
-      effective: { ...base.effective, prewarmPacing: { available: true } },
+      effective: {
+        ...base.effective,
+        prewarmPacing: { ...base.effective.prewarmPacing, reason: 'default' },
+      },
     }),
     'effective.modular': (base) => ({
-      effective: { ...base.effective, modular: { available: true } },
+      effective: {
+        ...base.effective,
+        modular: { ...base.effective.modular, reason: 'unsupported' },
+      },
     }),
     rendererTier: (base) => ({ effective: { ...base.effective, renderer: { tier: 'low' } } }),
   };
 
   it('covers every comparability dimension with a mutation case', () => {
     expect([...COMPARABILITY_KEYS]).toEqual(Object.keys(COMPARABILITY_MUTATIONS));
+  });
+
+  /** Every leaf that differs between two captures, as `path: [left, right]`.
+   *  Arrays recurse by index rather than being compared whole, so an element
+   *  going absent inside one reads as the absent value it is. */
+  function changedLeaves(left, right, path = '') {
+    const bothArrays = Array.isArray(left) && Array.isArray(right);
+    if (bothArrays) {
+      const changed = {};
+      for (let index = 0; index < Math.max(left.length, right.length); index++) {
+        Object.assign(changed, changedLeaves(left[index], right[index], `${path}[${index}]`));
+      }
+      return changed;
+    }
+    if (
+      left === null ||
+      right === null ||
+      typeof left !== 'object' ||
+      typeof right !== 'object' ||
+      Array.isArray(left) ||
+      Array.isArray(right)
+    ) {
+      return JSON.stringify(left) === JSON.stringify(right) ? {} : { [path]: [left, right] };
+    }
+    const changed = {};
+    for (const key of new Set([...Object.keys(left), ...Object.keys(right)])) {
+      Object.assign(changed, changedLeaves(left[key], right[key], path ? `${path}.${key}` : key));
+    }
+    return changed;
+  }
+
+  /** Every leaf of a capture, as `path: value`. */
+  function leavesOf(value, path = '') {
+    if (value === null || typeof value !== 'object') return { [path]: value };
+    const leaves = {};
+    for (const [key, child] of Object.entries(value)) {
+      Object.assign(leaves, leavesOf(child, path ? `${path}.${key}` : key));
+    }
+    return leaves;
+  }
+
+  it('states a real value on every leg field, so no mutation starts from absent', () => {
+    // The base itself, checked directly rather than only through the leaves a
+    // mutation happens to touch: the two effective blocks are mutated on one
+    // field each, so reverting any of their OTHER fields to null would slip
+    // past the per-mutation check below while quietly returning those
+    // dimensions to absent-against-present.
+    for (const [path, value] of Object.entries(leavesOf(comparabilityBase()))) {
+      expect(value ?? null, `${path} is absent in the comparability base`).not.toBeNull();
+    }
+  });
+
+  it('mutates every dimension from one stated value to another, never from absent', () => {
+    // The teeth behind the case list below. A base leaving a knob null makes a
+    // case prove only that the comparator notices absent-against-present, which
+    // a comparator degraded to a presence check passes: two legs at linkburst 4
+    // and 8 would then compare as a valid A/B pair. Read from the captures
+    // themselves rather than from a second copy of the analyzer's key mapping.
+    for (const [key, mutate] of Object.entries(COMPARABILITY_MUTATIONS)) {
+      const left = comparabilityBase();
+      const right = comparabilityBase(mutate(left));
+      const changed = changedLeaves(left, right);
+      expect(Object.keys(changed), `${key} mutated nothing`).not.toHaveLength(0);
+      for (const [path, [before, after]] of Object.entries(changed)) {
+        expect(before ?? null, `${key} mutates ${path} from an absent value`).not.toBeNull();
+        expect(after ?? null, `${key} mutates ${path} to an absent value`).not.toBeNull();
+      }
+    }
   });
 
   it.each(Object.keys(COMPARABILITY_MUTATIONS))(
@@ -571,7 +681,7 @@ describe('gpu hitch metrics', () => {
   it('rejects an artifact from the previous schema by name instead of reading it', () => {
     const result = validateCapture(capture({ schemaVersion: 1 }));
     expect(result.valid).toBe(false);
-    expect(result.errors).toContain('capture schemaVersion 1 is not the supported version 3');
+    expect(result.errors).toContain('capture schemaVersion 1 is not the supported version 4');
   });
 
   it('refuses a program row that carries a raw cache key or a duplicate ordinal', () => {
@@ -702,7 +812,12 @@ describe('gpu hitch reflection attribution', () => {
     expect(attribution.families['raced-pending-link'].all.calls).toBe(0);
   });
 
-  it('treats a poll that did not precede the query as no evidence of a compile', () => {
+  it('counts a program drawn before its first poll as raced, not never-compiled', () => {
+    // WebGLProgram.isReady is the only COMPLETION_STATUS_KHR caller in three
+    // r165 and only the compileAsync poll pass calls it, so a poll that starts
+    // after the query still proves the program was submitted: it was drawn in
+    // the same frame it was submitted, before that first poll. Calling it
+    // never-compiled overstates the family the A/B verdict keys on.
     const attribution = reflectionAttribution({
       timeline: {
         phases: [],
@@ -711,7 +826,37 @@ describe('gpu hitch reflection attribution', () => {
         queries: [reflect(1, 1_000, 150), poll(1, 1_000, true)],
       },
     });
+    expect(attribution.families['raced-pending-link'].all.calls).toBe(1);
+    expect(attribution.families['never-compiled'].all.calls).toBe(0);
+  });
+
+  it('keeps never-compiled for a program with no completion poll at all', () => {
+    const attribution = reflectionAttribution({
+      timeline: {
+        phases: [],
+        links: [],
+        programs: [],
+        queries: [reflect(1, 1_000, 150)],
+      },
+    });
     expect(attribution.families['never-compiled'].all.calls).toBe(1);
+    expect(attribution.families['raced-pending-link'].all.calls).toBe(0);
+    // ...and says how many programs were polled AT ALL, because a capture on a
+    // context without KHR_parallel_shader_compile never polls and would put
+    // every program in this family for a reason that is not about compilation.
+    expect(attribution.polledPrograms).toBe(0);
+  });
+
+  it('reports how many programs were polled, so a zero is readable as a zero', () => {
+    const attribution = reflectionAttribution({
+      timeline: {
+        phases: [],
+        links: [],
+        programs: [],
+        queries: [poll(1, 900, false), reflect(1, 1_000, 90), poll(2, 1_100, true)],
+      },
+    });
+    expect(attribution.polledPrograms).toBe(2);
   });
 
   it('splits live links into a variant prewarm already built and one it never built', () => {
@@ -854,6 +999,138 @@ describe('gpu hitch reflection attribution', () => {
       lastLinkAtMs: 1_400,
     });
     expect(variance.groups[1]).toMatchObject({ before: '0', after: '1', programs: 1 });
+  });
+
+  it('counts the family keys that collided apart from the variants it grouped', () => {
+    // The probe cannot reach the material instance a link belongs to, so two
+    // unnamed materials of one class share a retention key. A difference wider
+    // than one cache-key segment is reported as ambiguous rather than grouped,
+    // and the count of those travels with the verdict.
+    const variance = cacheKeyVariance({
+      timeline: {
+        links: [],
+        programs: [
+          { programId: 1, cacheKeyHash: 'aaaaaaaa', variantDiff: null, variantAmbiguous: false },
+          { programId: 2, cacheKeyHash: 'bbbbbbbb', variantDiff: null, variantAmbiguous: true },
+          { programId: 3, cacheKeyHash: 'cccccccc', variantDiff: null, variantAmbiguous: true },
+          // A real variant in the same capture: the two counters answer for
+          // different programs, so neither can be the other's total.
+          {
+            programId: 4,
+            cacheKeyHash: 'dddddddd',
+            materialType: 'MeshStandardMaterial',
+            materialName: 'streetlamp',
+            variantAmbiguous: false,
+            variantDiff: {
+              segmentIndex: 81,
+              segmentsBefore: 100,
+              segmentsAfter: 100,
+              spanBefore: 1,
+              spanAfter: 1,
+              before: '4',
+              after: '5',
+            },
+          },
+        ],
+      },
+    });
+    expect(variance.programsAttributed).toBe(4);
+    expect(variance.variantPrograms).toBe(1);
+    expect(variance.ambiguousPrograms).toBe(2);
+    expect(variance.groups).toHaveLength(1);
+    expect(variance.groups[0]).toMatchObject({ before: '4', after: '5', programs: 1 });
+  });
+
+  it('refuses a variant claim spanning several cache-key segments', () => {
+    const raw = capture({
+      timeline: {
+        ...capture().timeline,
+        programs: [
+          {
+            programId: 1,
+            cacheKeyHash: '',
+            materialType: 'Mesh',
+            materialName: '',
+            variantDiff: {
+              segmentIndex: 1,
+              segmentsBefore: 10,
+              segmentsAfter: 10,
+              spanBefore: 4,
+              spanAfter: 4,
+              before: 'a',
+              after: 'b',
+            },
+          },
+        ],
+      },
+    });
+    const result = validateCapture(raw);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toEqual(
+      expect.arrayContaining([
+        'timeline.programs[0].variantDiff claims a variant spanning several segments',
+      ]),
+    );
+  });
+
+  it('refuses an upload bucket that leaves its unsized count unsaid', () => {
+    // The bucket half of the same rule: uploadBucketsBeforeQuery reads a
+    // missing `unsized` as zero, so an artifact that omits it would hand back
+    // a byte total that reads as complete when it is not.
+    const raw = capture({
+      timeline: {
+        ...capture().timeline,
+        uploadBuckets: [
+          { startMs: 0, count: 3, bytes: 128 },
+          { startMs: 100, count: 1, bytes: 0, unsized: 4 },
+        ],
+      },
+    });
+    const result = validateCapture(raw);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toEqual(
+      expect.arrayContaining([
+        'timeline.uploadBuckets[0].unsized must be a finite number',
+        "timeline.uploadBuckets[1].unsized exceeds the bucket's own upload count",
+      ]),
+    );
+  });
+
+  it('refuses a program row that leaves the new variant fields unsaid', () => {
+    // Same rule the variantDiff case below applies, and the same rule the
+    // schema bump rests on: an absent field is not the claim "nothing
+    // collided" or "this span is one segment", it is the producer not saying.
+    // Optional fields would let a producer skip the multi-segment rejection
+    // entirely and have cacheKeyVariance read the silence as a zero.
+    const raw = capture({
+      timeline: {
+        ...capture().timeline,
+        programs: [
+          {
+            programId: 1,
+            cacheKeyHash: '',
+            materialType: 'Mesh',
+            materialName: '',
+            variantDiff: {
+              segmentIndex: 1,
+              segmentsBefore: 10,
+              segmentsAfter: 10,
+              before: 'a',
+              after: 'b',
+            },
+          },
+        ],
+      },
+    });
+    const result = validateCapture(raw);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toEqual(
+      expect.arrayContaining([
+        'timeline.programs[0].variantAmbiguous must be a boolean',
+        'timeline.programs[0].variantDiff.spanBefore must be a non-negative integer',
+        'timeline.programs[0].variantDiff.spanAfter must be a non-negative integer',
+      ]),
+    );
   });
 
   it('refuses a program row that omits the variant field entirely', () => {

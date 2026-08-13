@@ -237,10 +237,20 @@ function browserFlags(headless, viewportSize) {
 }
 
 async function waitForManualEntry(page) {
+  // The TTY refusal itself lives in capture(), before anything is launched.
+  // Here the rule is only that the listener is always released: a resumed
+  // stdin holds the event loop open after the artifact is written.
   process.stdout.write(
     '\nBrowser opened. Complete login and enter the world manually, then press Enter here to start the timed window.\n',
   );
-  await new Promise((resolve) => process.stdin.once('data', resolve));
+  try {
+    await new Promise((resolve) => {
+      process.stdin.resume();
+      process.stdin.once('data', resolve);
+    });
+  } finally {
+    process.stdin.pause();
+  }
   await page.waitForFunction(() => Boolean(window.__game?.renderer), {
     timeout: 120_000,
     polling: 250,
@@ -303,6 +313,11 @@ export function buildCapture({ args, url, snapshot, browserVersion, flags, prove
       order: args.order,
       profile: args.profile,
       headless: args.headless === true,
+      // What this run CLAIMS, written into the artifact so a standalone
+      // analyzer re-run reproduces the same verdict. A headed run claims the
+      // real GPU, so a software rasterizer found on one is an error rather
+      // than a warning; a --headless run claims smoke only.
+      performanceEvidence: args.headless !== true,
       scenario: scenarioName(args.mode),
       startedAtUtc: new Date(snapshot.startedAtEpochMs).toISOString(),
       // The timed window starts after world entry. Keep its requested duration
@@ -449,6 +464,12 @@ function requireBrowserPath() {
 export async function capture(args) {
   const requestedUrl = new URL(args.url);
   if (args.mode === 'online-geared') assertLoopbackUrl(args.url, '--url');
+  // Refused here, before a browser, a temp profile and possibly 40 bot
+  // accounts exist: manual mode waits for an operator to press Enter, and
+  // without a TTY there is nobody to press it. Checked here rather than in
+  // parseArgs so the parser stays pure and testable off a terminal.
+  if (args.mode === 'manual' && !process.stdin.isTTY)
+    throw new Error('--mode manual needs an interactive terminal; use --mode offline instead');
   const dirty = git(['status', '--porcelain'], '') !== '';
   if (dirty && !args.allowDirty)
     throw new Error('worktree is dirty; pass --allow-dirty to record it explicitly');
@@ -532,6 +553,8 @@ export async function capture(args) {
       probeSha256: provenance.probeSha256,
       analyzerSha256: provenance.analyzerSha256,
       worktreeName: provenance.worktreeName,
+      // The demand also travels in capture.performanceEvidence above, so this
+      // verdict is reproducible from the artifact alone.
       performanceEvidence: !args.headless,
     });
     if (raw.validation.valid) raw.summary = summarizeCapture(raw);

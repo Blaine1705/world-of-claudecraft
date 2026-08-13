@@ -1,21 +1,15 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-
-/** Full-line // comments removed, the tests/loopback_guard.test.ts rule: the
- *  lines these pins name are explained in prose right beside themselves, so a
- *  commented-out copy must not satisfy a pin. */
-function codeWithoutLineComments(source) {
-  return source
-    .split('\n')
-    .filter((line) => !/^\s*\/\//.test(line))
-    .join('\n');
-}
-
 import {
   buildCapture,
   parseArgs,
   prepareOnlineGearedRoster,
 } from '../scripts/gpu_hitch_capture.mjs';
+import {
+  GPU_HITCH_SCHEMA_VERSION,
+  validateCapture,
+} from '../scripts/profiler/gpu_hitch_metrics.mjs';
+import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 describe('gpu hitch capture program attribution', () => {
   const snapshotWith = (extra) => ({
@@ -235,7 +229,7 @@ describe('gpu hitch capture CLI', () => {
         uploadBucketWidthMs: 100,
         uploadBuckets: [],
         runtimeReceipt: {
-          schemaVersion: 3,
+          schemaVersion: GPU_HITCH_SCHEMA_VERSION,
           buildId: 'served-build',
           effective: {
             prewarmPacing: { available: true, deadlineMs: 12 },
@@ -266,7 +260,7 @@ describe('gpu hitch capture CLI', () => {
       browserVersion: 'Chrome test',
       flags: ['--headless=new'],
       provenance: {
-        schemaVersion: 3,
+        schemaVersion: GPU_HITCH_SCHEMA_VERSION,
         sourceBuildId: 'source-build',
         probeSha256: 'probe-sha',
         analyzerSha256: 'analyzer-sha',
@@ -288,7 +282,7 @@ describe('gpu hitch capture CLI', () => {
       servedBuildId: 'served-build',
     });
     expect(raw.effective).toEqual({
-      schemaVersion: 3,
+      schemaVersion: GPU_HITCH_SCHEMA_VERSION,
       prewarmPacing: { available: true, deadlineMs: 12 },
       modular: { available: true },
       renderer: { tier: 'ultra' },
@@ -311,6 +305,96 @@ describe('gpu hitch capture CLI', () => {
       visible: true,
     });
     expect(raw.diagnostics.runtimeReceipt.buildId).toBe('served-build');
+  });
+
+  it('writes the evidence claim into the artifact so a re-run reaches the same verdict', () => {
+    // The CLI demands performance evidence of any headed run, so a headed
+    // software rasterizer is an error rather than a warning. That demand has to
+    // travel IN the artifact: reading it back through the analyzer alone must
+    // reproduce the verdict the capture embedded, not soften it to a smoke pass.
+    const softwareStats = {
+      width: 1600,
+      height: 900,
+      pixelRatio: 1,
+      glVendor: 'Mesa',
+      glRenderer: 'llvmpipe (LLVM 17.0.6, 256 bits)',
+      tier: 'low',
+    };
+    const snapshot = {
+      captureId: 'capture-3',
+      startedAtEpochMs: Date.parse('2026-08-13T10:00:00.000Z'),
+      startedAtPerformanceMs: 0,
+      elapsedMs: 1_000,
+      stopReason: 'duration',
+      visible: true,
+      visibilityTransitions: [],
+      contextLost: 0,
+      transitions: [],
+      links: [],
+      queries: [],
+      controls: {},
+      running: false,
+      uploadBucketWidthMs: 100,
+      uploadBuckets: [],
+      rendererStats: softwareStats,
+    };
+    const headed = buildCapture({
+      args: { mode: 'offline', profile: 'shader', durationMs: 1_000, headless: false },
+      url: 'http://localhost:5173/?perf',
+      snapshot,
+      browserVersion: 'Chrome test',
+      flags: [],
+      provenance: {},
+    });
+    expect(headed.capture.performanceEvidence).toBe(true);
+    const headedVerdict = validateCapture(headed);
+    expect(headedVerdict.valid).toBe(false);
+    expect(headedVerdict.errors).toContain(
+      'software renderer cannot be used as performance evidence',
+    );
+
+    // A --headless run claims smoke only, and the same rasterizer is then a
+    // warning on a valid artifact.
+    const headless = buildCapture({
+      args: { mode: 'offline', profile: 'shader', durationMs: 1_000, headless: true },
+      url: 'http://localhost:5173/?perf',
+      snapshot,
+      browserVersion: 'Chrome test',
+      flags: ['--headless=new'],
+      provenance: {},
+    });
+    expect(headless.capture.performanceEvidence).toBe(false);
+    const headlessVerdict = validateCapture(headless);
+    expect(headlessVerdict.errors).not.toContain(
+      'software renderer cannot be used as performance evidence',
+    );
+    expect(headlessVerdict.warnings).toContain(
+      'software renderer is smoke-only and cannot be used as performance evidence',
+    );
+  });
+
+  it('refuses manual mode without a terminal, before launching anything', async () => {
+    // The behaviour the doc states as a contract. capture() is not drivable
+    // from a unit test (it launches a real browser), so the two halves are
+    // pinned where they live: the refusal must sit in capture() ahead of the
+    // launch, and the stdin wait must always release. Comments are stripped, so
+    // a commented-out guard cannot satisfy either pin.
+    const source = codeWithoutLineComments(
+      readFileSync(new URL('../scripts/gpu_hitch_capture.mjs', import.meta.url), 'utf8'),
+    );
+    const captureStart = source.indexOf('export async function capture(args) {');
+    const refusal = source.indexOf(
+      "if (args.mode === 'manual' && !process.stdin.isTTY)",
+      captureStart,
+    );
+    const launch = source.indexOf('await puppeteer.launch(', captureStart);
+    expect(captureStart).toBeGreaterThan(-1);
+    expect(refusal).toBeGreaterThan(captureStart);
+    expect(launch).toBeGreaterThan(refusal);
+    expect(source).toContain(
+      "throw new Error('--mode manual needs an interactive terminal; use --mode offline instead')",
+    );
+    expect(source).toContain('} finally {\n    process.stdin.pause();\n  }');
   });
 
   it('checks capability before constructing or preparing the mutable roster', async () => {

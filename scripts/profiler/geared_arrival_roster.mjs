@@ -188,6 +188,8 @@ export class GearedArrivalRoster {
     );
     this.fixtureSha256 = gearedArrivalFixtureSha256(count);
     this.observerUsername = `gpu_cam_${this.runId.slice(-10)}`;
+    // Overwritten by prepare/placeAll with the spot actually used.
+    this.center = GEARED_ARRIVAL_OBSERVER;
     const wsUrl = `${this.serverUrl.replace(/^http/, 'ws')}/ws`;
     this.bots = Array.from(
       { length: count },
@@ -197,6 +199,7 @@ export class GearedArrivalRoster {
   }
 
   async prepare({ center = GEARED_ARRIVAL_OBSERVER } = {}) {
+    this.center = center;
     this.db = new pg.Client({
       connectionString: this.databaseUrl,
       connectionTimeoutMillis: 5_000,
@@ -217,6 +220,7 @@ export class GearedArrivalRoster {
   }
 
   placeAll(center = GEARED_ARRIVAL_OBSERVER) {
+    this.center = center;
     for (const bot of this.bots) bot.place(center);
   }
 
@@ -239,7 +243,11 @@ export class GearedArrivalRoster {
       kind: 'geared-arrival-v1',
       count: this.count,
       fixtureSha256: this.fixtureSha256,
-      center: GEARED_ARRIVAL_OBSERVER,
+      // The center the crowd was actually placed around, not the default: a
+      // capture at --observer X,Z streams different content, and fixture
+      // evidence that always named the default spot would describe a crowd
+      // that is not the one measured.
+      center: this.center,
     };
   }
 }

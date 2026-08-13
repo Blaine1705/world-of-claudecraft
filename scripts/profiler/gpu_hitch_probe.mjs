@@ -1,10 +1,10 @@
 // Browser-side WebGL probe. The exported function is serialization-safe so
 // Puppeteer can install it with page.evaluateOnNewDocument before navigation.
 
-export const GPU_HITCH_PROBE_VERSION = 3;
+export const GPU_HITCH_PROBE_VERSION = 4;
 
 export function installGpuHitchProbe(options = {}) {
-  const PROBE_VERSION = 3;
+  const PROBE_VERSION = 4;
   const ROOT = window;
   if (ROOT.__wocGpuHitchProbe?.version === PROBE_VERSION) return;
 
@@ -194,6 +194,23 @@ export function installGpuHitchProbe(options = {}) {
   // the last element is customProgramCacheKey, which for a patched material IS
   // the onBeforeCompile source. Retaining the first key per material costs some
   // page memory and is never serialized.
+  //
+  // The retention key is the material CLASS plus name, not the instance: the
+  // link happens inside the WebGLProgram constructor, which three reaches from
+  // compileAsync with no draw context, so the material object is simply not
+  // reachable from here. Unnamed materials of one class therefore share a key,
+  // and two ordinary MeshStandardMaterials would otherwise report each other as
+  // a variant. A difference is only claimed when it is ONE segment wide on the
+  // shorter side and at most one segment longer on the other, which is what a
+  // single render condition produces: a value replaced in place, or the one
+  // `defines` entry appearing or disappearing that makes the key a segment
+  // longer. Two materials with different feature sets differ across many
+  // segments at once and are recorded as `variantAmbiguous` instead, which says
+  // "the family key collided" rather than "this program had no variant". The
+  // residual limit, stated rather than hidden: two materials differing in
+  // exactly one segment (the boolean feature mask alone) still collide, so a
+  // single-program group is weak evidence and a group shared by many materials
+  // is the strong signal.
   const MAX_RETAINED_KEYS = 512;
   const retainedKeys = new Map();
 
@@ -222,12 +239,22 @@ export function installGpuHitchProbe(options = {}) {
     let afterEnd = after.indexOf(',', afterEndRaw);
     if (afterEnd === -1) afterEnd = after.length;
     const commasBefore = before.slice(0, segmentStart).split(',').length - 1;
+    const beforeSpan = before.slice(segmentStart, beforeEnd);
+    const afterSpan = after.slice(segmentStart, afterEnd);
     return {
       segmentIndex: commasBefore,
       segmentsBefore: before.split(',').length,
       segmentsAfter: after.split(',').length,
-      before: safeSegment(before.slice(segmentStart, beforeEnd)),
-      after: safeSegment(after.slice(segmentStart, afterEnd)),
+      // How many whole segments the differing span covers on each side. The
+      // two always differ by exactly the key's own segment-count change, so a
+      // replacement reads 1 and 1 while a one-segment insertion reads 1 and 2;
+      // two unrelated materials differ across many segments at once, which is
+      // what separates a real variant from a family key that collided (see the
+      // retention comment above).
+      spanBefore: beforeSpan === '' ? 0 : beforeSpan.split(',').length,
+      spanAfter: afterSpan === '' ? 0 : afterSpan.split(',').length,
+      before: safeSegment(beforeSpan),
+      after: safeSegment(afterSpan),
     };
   };
 
@@ -266,15 +293,22 @@ export function installGpuHitchProbe(options = {}) {
       }
       const cacheKey = typeof wrapper.cacheKey === 'string' ? wrapper.cacheKey : '';
       // Identity of the VARIANT FAMILY: same material, different conditions.
-      const family = `${wrapper.type ?? ''} ${wrapper.name ?? ''}`;
+      const family = `${wrapper.type ?? ''}\0${wrapper.name ?? ''}`;
       const retained = retainedKeys.get(family);
       let variantDiff = null;
+      let variantAmbiguous = false;
       if (cacheKey === '') {
         // nothing to compare
       } else if (retained === undefined) {
         if (retainedKeys.size < MAX_RETAINED_KEYS) retainedKeys.set(family, cacheKey);
       } else if (retained !== cacheKey) {
-        variantDiff = diffCacheKeys(retained, cacheKey);
+        const diff = diffCacheKeys(retained, cacheKey);
+        if (
+          Math.min(diff.spanBefore, diff.spanAfter) <= 1 &&
+          Math.abs(diff.spanAfter - diff.spanBefore) <= 1
+        )
+          variantDiff = diff;
+        else variantAmbiguous = true;
       }
       state.programs.set(entry.programId, {
         programId: entry.programId,
@@ -284,6 +318,7 @@ export function installGpuHitchProbe(options = {}) {
         cacheKeyHash: cacheKey === '' ? '' : hashString(cacheKey),
         cacheKeyLength: cacheKey.length,
         variantDiff,
+        variantAmbiguous,
         resolvedAtMs: since(),
       });
     }
@@ -345,21 +380,135 @@ export function installGpuHitchProbe(options = {}) {
     const startMs = Math.floor(atMs / uploadBucketWidthMs) * uploadBucketWidthMs;
     let bucket = state.uploadBuckets.get(startMs);
     if (!bucket) {
-      bucket = { startMs, count: 0, bytes: 0 };
+      bucket = { startMs, count: 0, bytes: 0, unsized: 0 };
       state.uploadBuckets.set(startMs, bucket);
     }
     return bucket;
   };
 
+  // Bytes per component, for the non-packed pixel types.
+  const GL_TYPE_BYTES = new Map([
+    [0x1400, 1], // BYTE
+    [0x1401, 1], // UNSIGNED_BYTE
+    [0x1402, 2], // SHORT
+    [0x1403, 2], // UNSIGNED_SHORT
+    [0x1404, 4], // INT
+    [0x1405, 4], // UNSIGNED_INT
+    [0x1406, 4], // FLOAT
+    [0x140b, 2], // HALF_FLOAT
+    [0x8d61, 2], // HALF_FLOAT_OES
+  ]);
+  // A packed type carries every component in one unit, so it sizes the whole
+  // texel and the component count must NOT be multiplied in.
+  const GL_PACKED_TEXEL_BYTES = new Map([
+    [0x8033, 2], // UNSIGNED_SHORT_4_4_4_4
+    [0x8034, 2], // UNSIGNED_SHORT_5_5_5_1
+    [0x8363, 2], // UNSIGNED_SHORT_5_6_5
+    [0x8368, 4], // UNSIGNED_INT_2_10_10_10_REV
+    [0x8c3b, 4], // UNSIGNED_INT_10F_11F_11F_REV
+    [0x8c3e, 4], // UNSIGNED_INT_5_9_9_9_REV
+    [0x84fa, 4], // UNSIGNED_INT_24_8
+    [0x8dad, 8], // FLOAT_32_UNSIGNED_INT_24_8_REV
+  ]);
+  const GL_FORMAT_COMPONENTS = new Map([
+    [0x1903, 1], // RED
+    [0x8d94, 1], // RED_INTEGER
+    [0x8227, 2], // RG
+    [0x8228, 2], // RG_INTEGER
+    [0x1907, 3], // RGB
+    [0x8d98, 3], // RGB_INTEGER
+    [0x1908, 4], // RGBA
+    [0x8d99, 4], // RGBA_INTEGER
+    [0x1906, 1], // ALPHA
+    [0x1909, 1], // LUMINANCE
+    [0x190a, 2], // LUMINANCE_ALPHA
+    [0x1902, 1], // DEPTH_COMPONENT
+    [0x84f9, 1], // DEPTH_STENCIL
+    [0x8c40, 3], // SRGB
+    [0x8c42, 4], // SRGB_ALPHA
+  ]);
+
+  const texelBytes = (format, type) => {
+    const packed = GL_PACKED_TEXEL_BYTES.get(type);
+    if (packed !== undefined) return packed;
+    const componentBytes = GL_TYPE_BYTES.get(type);
+    const components = GL_FORMAT_COMPONENTS.get(format);
+    if (componentBytes === undefined || components === undefined) return null;
+    return componentBytes * components;
+  };
+
+  const positiveInteger = (value) => (Number.isInteger(value) && value > 0 ? value : null);
+
+  // Every DOM source three can hand to the texture-source overloads states its
+  // own size under a different property name, and an <img> reports its LAYOUT
+  // size in `width` while the upload is the intrinsic one. The axes are read as
+  // a PAIR from one source kind at a time: resolving them independently pairs
+  // the intrinsic width of a half-decoded image with its layout height, which
+  // is a plausible-looking size that was never uploaded.
+  const SOURCE_EXTENT_PAIRS = [
+    ['naturalWidth', 'naturalHeight'],
+    ['videoWidth', 'videoHeight'],
+    // A VideoFrame uploads at its DISPLAY size; coded is the padded buffer.
+    ['displayWidth', 'displayHeight'],
+    ['codedWidth', 'codedHeight'],
+    ['width', 'height'],
+  ];
+  const sourceSize = (source) => {
+    if (!source || typeof source !== 'object') return null;
+    for (const [widthName, heightName] of SOURCE_EXTENT_PAIRS) {
+      const width = positiveInteger(Number(source[widthName]));
+      const height = positiveInteger(Number(source[heightName]));
+      if (width !== null && height !== null) return { width, height };
+    }
+    return null;
+  };
+
+  const byteLengthOf = (value) =>
+    value && typeof value === 'object' && Number.isFinite(value.byteLength)
+      ? value.byteLength
+      : null;
+
+  /**
+   * Bytes for one texture upload, read from the overload that was ACTUALLY
+   * called rather than from fixed argument positions.
+   *
+   * The DOM-source forms are the ones three r165 uses for ordinary image
+   * uploads, and they carry no dimensions at all:
+   * `texImage2D(target, level, internalformat, format, type, source)` puts GL
+   * enums exactly where the 9-argument pixel form puts width and height, so a
+   * positional read of args[3]/args[4] sized every image upload as
+   * 6408 x 5121 texels (about 131 MB). `texSubImage2D` has the same trap one
+   * position over, where args[3] is yoffset.
+   *
+   * A size the arguments cannot support is reported as `unsized` rather than
+   * guessed at, so a bucket's byte total is never quietly part fiction.
+   */
   const uploadBytes = (method, args) => {
-    const last = args[args.length - 1];
-    if (last && Number.isFinite(last.byteLength)) return last.byteLength;
-    if (method.includes('compressed')) return 0;
-    const width = Number(args[3]);
-    const height = Number(args[4]);
-    if (Number.isFinite(width) && Number.isFinite(height) && width > 0 && height > 0)
-      return width * height * 4;
-    return 0;
+    if (method === 'compressedTexImage2D' || method === 'compressedTexSubImage2D') {
+      const dataIndex = method === 'compressedTexImage2D' ? 6 : 7;
+      const byteLength = byteLengthOf(args[dataIndex]);
+      if (byteLength !== null) return byteLength;
+      // The WebGL2 pixel-unpack-buffer form states the size instead.
+      const imageSize = positiveInteger(Number(args[dataIndex]));
+      return imageSize ?? null;
+    }
+    const subImage = method === 'texSubImage2D';
+    // Both sized overloads take 9 arguments (10 with a srcOffset), and both
+    // source overloads take fewer: 6 for texImage2D, 7 for texSubImage2D.
+    // Only the pixel positions differ, which is the trap this reads around.
+    if (args.length >= 9) {
+      const width = positiveInteger(Number(args[subImage ? 4 : 3]));
+      const height = positiveInteger(Number(args[subImage ? 5 : 4]));
+      const texel = texelBytes(Number(args[6]), Number(args[7]));
+      if (width !== null && height !== null && texel !== null) return width * height * texel;
+      // A view was handed in but the format/type pair is one this table does
+      // not name: its own length is still an exact upper bound.
+      return byteLengthOf(args[8]);
+    }
+    const size = sourceSize(args[subImage ? 6 : 5]);
+    const texel = texelBytes(Number(args[subImage ? 4 : 3]), Number(args[subImage ? 5 : 4]));
+    if (size === null || texel === null) return null;
+    return size.width * size.height * texel;
   };
 
   const GL2 = globalThis.WebGL2RenderingContext?.prototype;
@@ -488,7 +637,9 @@ export function installGpuHitchProbe(options = {}) {
               } finally {
                 const bucket = bucketFor(atMs);
                 bucket.count++;
-                bucket.bytes += uploadBytes(name, args);
+                const bytes = uploadBytes(name, args);
+                if (bytes === null) bucket.unsized++;
+                else bucket.bytes += bytes;
               }
             },
         );

@@ -9,7 +9,7 @@ declare const __APP_BUILD_ID__: string;
 // the analyzer rejects a receipt whose version does not match the schema it
 // validates, so a served build older than the capture tooling cannot pass as a
 // comparable leg.
-export const GPU_HITCH_RECEIPT_VERSION = 3;
+export const GPU_HITCH_RECEIPT_VERSION = 4;
 
 export interface GpuHitchRuntimeReceipt {
   schemaVersion: number;
@@ -134,6 +134,11 @@ export function publishGpuHitchRuntimeReceipt({
   renderer?: GpuHitchReceiptRendererStats | null;
 } = {}): GpuHitchRuntimeReceipt | null {
   if (typeof window === 'undefined') return null;
+  // Held BY REFERENCE, not copied, and the renderer relies on that: its
+  // markGpuHitchReveal Object.assigns the post-reveal pacing readout onto this
+  // very object so the published receipt carries the settled congestion
+  // counters rather than whatever prewarm finished with. Cloning here would
+  // freeze the receipt at publish time and silently lose that update.
   const effectivePacing = renderer?.prewarm?.prewarmPacing;
   const receipt: GpuHitchRuntimeReceipt = {
     schemaVersion: GPU_HITCH_RECEIPT_VERSION,

@@ -3,6 +3,22 @@ import { installGpuHitchProbe } from '../scripts/profiler/gpu_hitch_probe.mjs';
 
 const originalGlobals = new Map();
 
+// The GL enums the upload estimator reads, by their real values: the whole
+// point of the overload cases below is that 0x1908 and 0x1401 are NOT a width
+// and a height.
+const GL = {
+  TEXTURE_2D: 0x0de1,
+  RGB: 0x1907,
+  RGBA: 0x1908,
+  U8: 0x1401,
+  HALF_FLOAT: 0x140b,
+  // UNSIGNED_SHORT_5_6_5: a PACKED type, two bytes for the whole texel.
+  U565: 0x8363,
+  ETC1: 0x8d64,
+};
+
+const view = (bytes) => new Uint8Array(bytes);
+
 function setGlobal(name, value) {
   if (!originalGlobals.has(name)) originalGlobals.set(name, globalThis[name]);
   globalThis[name] = value;
@@ -114,10 +130,105 @@ describe('gpu hitch browser probe', () => {
     const { FakeGL } = installFakeBrowser();
     FakeGL.prototype.texSubImage2D = () => 'uploaded';
     installGpuHitchProbe({ profile: 'upload' });
-    const result = new FakeGL().texSubImage2D(0, 0, 0, 2, 2, new Uint8Array(16));
+    // The 9-argument pixel overload: width and height are args[4] and args[5].
+    const result = new FakeGL().texSubImage2D(
+      GL.TEXTURE_2D,
+      0,
+      0,
+      0,
+      2,
+      2,
+      GL.RGBA,
+      GL.U8,
+      view(16),
+    );
     expect(result).toBe('uploaded');
     expect(globalThis.__wocGpuHitchProbe.snapshot().uploadBuckets).toEqual([
-      expect.objectContaining({ count: 1, bytes: 16 }),
+      expect.objectContaining({ count: 1, bytes: 16, unsized: 0 }),
+    ]);
+    globalThis.__wocGpuHitchProbe.stop('test');
+  });
+
+  it('sizes each texture upload from the overload that was actually called', () => {
+    const { FakeGL } = installFakeBrowser();
+    for (const name of [
+      'texImage2D',
+      'texSubImage2D',
+      'compressedTexImage2D',
+      'compressedTexSubImage2D',
+    ])
+      FakeGL.prototype[name] = () => {};
+    installGpuHitchProbe({ profile: 'full' });
+    const gl = new FakeGL();
+
+    // The DOM-source overloads three r165 uses for image uploads carry NO
+    // dimensions: reading args[3]/args[4] positionally read the RGBA and
+    // UNSIGNED_BYTE enums as a 6408 x 5121 texture, about 131 MB per upload.
+    gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.U8, { width: 256, height: 128 });
+    // An <img> reports its layout size in width; the upload is the intrinsic one.
+    gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.U8, {
+      width: 1,
+      height: 1,
+      naturalWidth: 64,
+      naturalHeight: 32,
+    });
+    // A VideoFrame states neither: its axes are codedWidth / codedHeight.
+    gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.U8, { codedWidth: 16, codedHeight: 8 });
+    // args[3] is yoffset in the 7-argument texSubImage2D source overload.
+    gl.texSubImage2D(GL.TEXTURE_2D, 0, 0, 0, GL.RGBA, GL.U8, { width: 8, height: 4 });
+    // Sized overloads keep their dimensions, and the type decides the texel.
+    // The VIEW is deliberately far larger than the texture: with a view whose
+    // length happens to equal the region, the whole width x height x texel
+    // computation is indistinguishable from returning the view's own length,
+    // and deleting it leaves the suite green.
+    gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, 4, 2, 0, GL.RGBA, GL.HALF_FLOAT, view(1_024));
+    // A packed type carries the WHOLE texel in one unit: 2 bytes here, not 2
+    // per component. Multiplying the component count back in is the mistake
+    // this table exists to prevent.
+    gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGB, 8, 8, 0, GL.RGB, GL.U565, view(4_096));
+    // An exotic format/type pair this table does not name: the view's own
+    // length is still an exact upper bound, so the upload is sized, not lost.
+    gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, 2, 2, 0, GL.RGBA, 0x9999, view(48));
+    gl.compressedTexImage2D(GL.TEXTURE_2D, 0, GL.ETC1, 64, 64, 0, view(4_096));
+    // The compressed sub-image data sits one position further along (args[7]).
+    gl.compressedTexSubImage2D(GL.TEXTURE_2D, 0, 0, 0, 32, 32, GL.ETC1, view(1_024));
+    // The WebGL2 pixel-unpack-buffer form states an imageSize instead of data.
+    gl.compressedTexImage2D(GL.TEXTURE_2D, 0, GL.ETC1, 64, 64, 0, 2_048, 0);
+
+    const [bucket] = globalThis.__wocGpuHitchProbe.snapshot().uploadBuckets;
+    expect(bucket.count).toBe(10);
+    expect(bucket.unsized).toBe(0);
+    expect(bucket.bytes).toBe(
+      256 * 128 * 4 +
+        64 * 32 * 4 +
+        16 * 8 * 4 +
+        8 * 4 * 4 +
+        4 * 2 * 8 +
+        8 * 8 * 2 +
+        48 +
+        4_096 +
+        1_024 +
+        2_048,
+    );
+    globalThis.__wocGpuHitchProbe.stop('test');
+  });
+
+  it('counts an upload it cannot size instead of guessing at its bytes', () => {
+    const { FakeGL } = installFakeBrowser();
+    FakeGL.prototype.texImage2D = () => {};
+    FakeGL.prototype.compressedTexImage2D = () => {};
+    installGpuHitchProbe({ profile: 'upload' });
+    const gl = new FakeGL();
+    // A video frame that has not reported a size yet: a byte total is only
+    // readable next to how many uploads it could not describe.
+    gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.U8, {});
+    // A sized upload whose format/type this table does not name AND which hands
+    // in no view at all (an allocation from a pixel-unpack buffer).
+    gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, 4, 4, 0, GL.RGBA, 0x9999, 0);
+    // And a compressed upload with neither data nor a stated size.
+    gl.compressedTexImage2D(GL.TEXTURE_2D, 0, GL.ETC1, 8, 8, 0, null);
+    expect(globalThis.__wocGpuHitchProbe.snapshot().uploadBuckets).toEqual([
+      expect.objectContaining({ count: 3, bytes: 0, unsized: 3 }),
     ]);
     globalThis.__wocGpuHitchProbe.stop('test');
   });
@@ -209,6 +320,7 @@ describe('gpu hitch browser probe', () => {
         cacheKeyHash: expect.stringMatching(/^[0-9a-f]{8}$/),
         cacheKeyLength: cacheKey.length,
         variantDiff: null,
+        variantAmbiguous: false,
         resolvedAtMs: expect.any(Number),
       },
     ]);
@@ -251,12 +363,98 @@ describe('gpu hitch browser probe', () => {
       segmentIndex: 3,
       segmentsBefore: 10,
       segmentsAfter: 10,
+      spanBefore: 1,
+      spanAfter: 1,
       before: '4',
       after: '5',
     });
     const serialized = JSON.stringify(snapshot.programs);
     expect(serialized).not.toContain('SECRET');
     expect(serialized).not.toContain('onBeforeCompile');
+    globalThis.__wocGpuHitchProbe.stop('test');
+  });
+
+  it('refuses to call two unrelated materials of one class a variant', async () => {
+    // The retention key is the material class plus name, because the link
+    // happens with no reachable material instance: two ordinary unnamed
+    // MeshStandardMaterials share it. One render condition flipping moves a
+    // SINGLE cache-key segment, while two different materials differ across
+    // many, so the wide difference is recorded as an ambiguous family key
+    // rather than seeded into cacheKeyVariance as a bogus variant group.
+    const { FakeGL } = installFakeBrowser();
+    const gl = new FakeGL();
+    const first = { handle: 'material-a' };
+    const second = { handle: 'material-b' };
+    const programs = [];
+    setGlobal('__game', { renderer: { webgl: { info: { programs } } } });
+    installGpuHitchProbe({ profile: 'shader' });
+
+    programs.push({
+      program: first,
+      id: 1,
+      type: 'MeshStandardMaterial',
+      name: '',
+      cacheKey: 'physical,USE_MAP,1,USE_NORMALMAP,1,highp,4,0,2,srgb',
+    });
+    gl.linkProgram(first);
+    await Promise.resolve();
+    programs.push({
+      program: second,
+      id: 2,
+      type: 'MeshStandardMaterial',
+      name: '',
+      cacheKey: 'physical,USE_INSTANCING,1,USE_SKINNING,1,highp,4,0,2,srgb',
+    });
+    gl.linkProgram(second);
+    await Promise.resolve();
+
+    const snapshot = globalThis.__wocGpuHitchProbe.snapshot();
+    expect(snapshot.programs[1].variantDiff).toBeNull();
+    expect(snapshot.programs[1].variantAmbiguous).toBe(true);
+    globalThis.__wocGpuHitchProbe.stop('test');
+  });
+
+  // One segment appearing or disappearing is still ONE condition: three's
+  // getProgramCacheKey emits a variable-length `defines` block, so a material
+  // gaining a single define makes the key one segment longer. The two spans
+  // always differ by exactly that segment-count change, so the rule is "one
+  // segment on the shorter side, at most one more on the other", and each half
+  // of it gets a case.
+  it.each([
+    ['a single-segment insertion is a variant', 'p,q,d', 'p,x,y,d', false],
+    ['a two-segment insertion is not', 'p,q,d', 'p,x,y,z,d', true],
+  ])('%s', async (_name, beforeKey, afterKey, ambiguous) => {
+    const { FakeGL } = installFakeBrowser();
+    const gl = new FakeGL();
+    const first = { handle: 'narrow' };
+    const second = { handle: 'wide' };
+    const programs = [];
+    setGlobal('__game', { renderer: { webgl: { info: { programs } } } });
+    installGpuHitchProbe({ profile: 'shader' });
+
+    programs.push({
+      program: first,
+      id: 1,
+      type: 'MeshBasicMaterial',
+      name: '',
+      cacheKey: beforeKey,
+    });
+    gl.linkProgram(first);
+    await Promise.resolve();
+    programs.push({
+      program: second,
+      id: 2,
+      type: 'MeshBasicMaterial',
+      name: '',
+      cacheKey: afterKey,
+    });
+    gl.linkProgram(second);
+    await Promise.resolve();
+
+    const [, program] = globalThis.__wocGpuHitchProbe.snapshot().programs;
+    expect(program.variantAmbiguous).toBe(ambiguous);
+    if (ambiguous) expect(program.variantDiff).toBeNull();
+    else expect(program.variantDiff).toMatchObject({ spanBefore: 1, spanAfter: 2 });
     globalThis.__wocGpuHitchProbe.stop('test');
   });
 

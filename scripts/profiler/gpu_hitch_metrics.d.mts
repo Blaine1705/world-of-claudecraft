@@ -53,6 +53,8 @@ export interface GpuHitchVariantDiff {
   segmentIndex: number;
   segmentsBefore: number;
   segmentsAfter: number;
+  spanBefore: number;
+  spanAfter: number;
   before: string;
   after: string;
 }
@@ -61,6 +63,7 @@ export function variantDiffParameter(diff: GpuHitchVariantDiff | null | undefine
 export function cacheKeyVariance(capture: unknown): {
   programsAttributed: number;
   variantPrograms: number;
+  ambiguousPrograms: number;
   groups: Array<{
     parameter: string | null;
     fromEnd: number;
@@ -75,6 +78,7 @@ export function cacheKeyVariance(capture: unknown): {
 export function reflectionAttribution(capture: unknown): {
   revealAtMs: number | null;
   families: Record<string, Record<string, Record<string, number>>>;
+  polledPrograms: number;
   programsAttributed: number;
   linksTotal: number;
   linksCover: number;

@@ -5,6 +5,7 @@ import {
   GearedArrivalRoster,
   gearedArrivalPosition,
 } from '../scripts/profiler/geared_arrival_roster.mjs';
+import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 describe('geared arrival roster geometry', () => {
   it('places every fixture deterministically inside the observer interest area', () => {
@@ -44,18 +45,41 @@ describe('geared arrival roster geometry', () => {
     ).toThrow(/1 to 40/);
   });
 
+  it('records the center the crowd was actually placed around', () => {
+    const roster = new GearedArrivalRoster({
+      serverUrl: 'http://127.0.0.1:8787',
+      databaseUrl: 'postgres://user:password@127.0.0.1:5432/woc',
+      count: 4,
+      runId: 'fixture-run',
+    });
+    expect(roster.evidence().center).toEqual(GEARED_ARRIVAL_OBSERVER);
+
+    // --observer moves the crowd, and fixture evidence naming the default spot
+    // would describe a crowd that is not the one measured. placeAll is the
+    // reachable half of the same assignment prepare() makes (prepare needs a
+    // live server and database); the bots' own teleport goes over a socket, so
+    // the placement each bot is given is captured instead.
+    const moved = { x: 1_100, z: -240 };
+    const placed = [];
+    for (const bot of roster.bots) bot.place = (center) => placed.push(center);
+    roster.placeAll(moved);
+
+    expect(placed).toEqual([moved, moved, moved, moved]);
+    expect(roster.evidence().center).toEqual(moved);
+    expect(roster.evidence()).toMatchObject({ kind: 'geared-arrival-v1', count: 4 });
+  });
+
   it('bounds direct database work and tears down exact fixture accounts', () => {
     // Full-line // comments are stripped first, the same rule
     // tests/loopback_guard.test.ts applies: this module explains its own
     // timeouts and teardown in prose right beside them, so a raw-text scan
     // would be satisfied by a commented-out or merely described setting.
-    const source = readFileSync(
-      new URL('../scripts/profiler/geared_arrival_roster.mjs', import.meta.url),
-      'utf8',
-    )
-      .split('\n')
-      .filter((line) => !/^\s*\/\//.test(line))
-      .join('\n');
+    const source = codeWithoutLineComments(
+      readFileSync(
+        new URL('../scripts/profiler/geared_arrival_roster.mjs', import.meta.url),
+        'utf8',
+      ),
+    );
     expect(source).toContain('connectionTimeoutMillis: 5_000');
     expect(source).toContain('query_timeout: DB_TIMEOUT_MS');
     expect(source).toContain('statement_timeout: DB_TIMEOUT_MS');

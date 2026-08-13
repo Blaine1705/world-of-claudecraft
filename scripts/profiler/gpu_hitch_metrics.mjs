@@ -13,8 +13,15 @@
 // Schema 2 artifacts have no such field, and a missing field is not the same
 // claim as "this program had no variant", so schema 2 is rejected rather than
 // read with the field treated as absent.
-export const GPU_HITCH_SCHEMA_VERSION = 3;
-export const GPU_HITCH_PROBE_VERSION = 3;
+// Schema 4 rewrites the upload byte estimator to read the texImage2D /
+// texSubImage2D overload that was actually called, and adds
+// timeline.uploadBuckets[].unsized. A schema 3 upload artifact sized every
+// DOM-source upload from two GL enums read as width and height (about 131 MB
+// per image upload), so its byte totals are not a smaller version of the same
+// claim, and its missing `unsized` count is not the same claim as "every
+// upload in this bucket was sized".
+export const GPU_HITCH_SCHEMA_VERSION = 4;
+export const GPU_HITCH_PROBE_VERSION = 4;
 
 /**
  * The order three r165 pushes into the program cache key, from
@@ -243,6 +250,11 @@ export function linksBeforeQuery(query, links, windowMs = 8_000) {
 /**
  * Aggregate sparse upload buckets with honest boundary bounds. A bucket is
  * exact only when the complete bucket lies inside the requested interval.
+ *
+ * `unsized` travels alongside the byte totals rather than being folded into
+ * them: an upload whose overload states neither dimensions nor a source size
+ * contributes zero bytes, and a byte total is only readable next to how many
+ * uploads it could not describe.
  */
 export function uploadBucketsBeforeQuery(
   query,
@@ -265,6 +277,8 @@ export function uploadBucketsBeforeQuery(
       possible: 0,
       bytesCertain: 0,
       bytesPossible: 0,
+      unsizedCertain: 0,
+      unsizedPossible: 0,
     };
   }
   const endMs = query.startMs;
@@ -273,6 +287,8 @@ export function uploadBucketsBeforeQuery(
   let possible = 0;
   let bytesCertain = 0;
   let bytesPossible = 0;
+  let unsizedCertain = 0;
+  let unsizedPossible = 0;
   for (const bucket of Array.isArray(buckets) ? buckets : []) {
     if (!finite(bucket?.startMs) || !finite(bucket?.count) || bucket.count < 0) continue;
     const bucketStart = bucket.startMs;
@@ -280,10 +296,13 @@ export function uploadBucketsBeforeQuery(
     if (bucketEnd <= startMs || bucketStart >= endMs) continue;
     possible += bucket.count;
     const bytes = finite(bucket.bytes) && bucket.bytes >= 0 ? bucket.bytes : 0;
+    const unsized = finite(bucket.unsized) && bucket.unsized >= 0 ? bucket.unsized : 0;
     bytesPossible += bytes;
+    unsizedPossible += unsized;
     if (bucketStart >= startMs && bucketEnd <= endMs) {
       certain += bucket.count;
       bytesCertain += bytes;
+      unsizedCertain += unsized;
     }
   }
   return {
@@ -294,6 +313,8 @@ export function uploadBucketsBeforeQuery(
     possible,
     bytesCertain,
     bytesPossible,
+    unsizedCertain,
+    unsizedPossible,
   };
 }
 
@@ -377,6 +398,36 @@ function validateCompileUnitArray(errors, units, label) {
  * cache key never appears, because three's default customProgramCacheKey is an
  * onBeforeCompile source string.
  */
+/**
+ * Upload buckets, with `unsized` required rather than defaulted.
+ *
+ * Same rule the program rows follow: an absent `unsized` is not the claim
+ * "every upload in this bucket was sized", it is the producer not saying, and
+ * uploadBucketsBeforeQuery would read that silence as a zero and hand back a
+ * byte total that looks complete.
+ */
+function validateUploadBucketArray(errors, buckets, label) {
+  if (!Array.isArray(buckets)) {
+    error(errors, `${label} must be an array`);
+    return;
+  }
+  buckets.forEach((bucket, index) => {
+    const prefix = `${label}[${index}]`;
+    for (const key of ['startMs', 'count', 'bytes', 'unsized']) {
+      validateNumber(errors, bucket?.[key], `${prefix}.${key}`, {
+        integer: key !== 'startMs',
+        nonNegative: true,
+      });
+    }
+    if (
+      Number.isInteger(bucket?.unsized) &&
+      Number.isInteger(bucket?.count) &&
+      bucket.unsized > bucket.count
+    )
+      error(errors, `${prefix}.unsized exceeds the bucket's own upload count`);
+  });
+}
+
 function validateProgramIdentityArray(errors, programs, label) {
   if (!Array.isArray(programs)) {
     error(errors, `${label} must be an array`);
@@ -401,10 +452,34 @@ function validateProgramIdentityArray(errors, programs, label) {
     for (const key of ['materialType', 'materialName']) {
       if (typeof program?.[key] !== 'string') error(errors, `${prefix}.${key} must be a string`);
     }
+    // Required present, on the same rule as variantDiff below: an absent flag
+    // is not the claim "no family key collided here", it is the producer not
+    // saying, and cacheKeyVariance would read the silence as a zero.
+    if (typeof program?.variantAmbiguous !== 'boolean')
+      error(errors, `${prefix}.variantAmbiguous must be a boolean`);
     if (!own(program ?? {}, 'variantDiff')) {
       error(errors, `${prefix}.variantDiff must be present (null when the program had no variant)`);
     } else if (program.variantDiff !== null) {
       const diff = program.variantDiff;
+      // A claimed variant is a SINGLE render condition: one segment replaced,
+      // or one appearing or disappearing (which makes the key a segment
+      // longer). A wider difference means the two keys belong to different
+      // materials that shared a family key, which the probe records as
+      // variantAmbiguous instead. Required present too: without them the
+      // rejection below never runs.
+      for (const key of ['spanBefore', 'spanAfter']) {
+        if (!(Number.isInteger(diff?.[key]) && diff[key] >= 0))
+          error(errors, `${prefix}.variantDiff.${key} must be a non-negative integer`);
+      }
+      if (
+        Number.isInteger(diff?.spanBefore) &&
+        Number.isInteger(diff?.spanAfter) &&
+        !(
+          Math.min(diff.spanBefore, diff.spanAfter) <= 1 &&
+          Math.abs(diff.spanAfter - diff.spanBefore) <= 1
+        )
+      )
+        error(errors, `${prefix}.variantDiff claims a variant spanning several segments`);
       for (const key of ['segmentIndex', 'segmentsBefore', 'segmentsAfter']) {
         validateNumber(errors, diff?.[key], `${prefix}.variantDiff.${key}`, {
           integer: true,
@@ -651,8 +726,7 @@ export function validateCapture(capture, expected = {}) {
     validateQueryValues(errors, timeline.queries, 'timeline.queries');
     validateProgramIdentityArray(errors, timeline.programs, 'timeline.programs');
     validateCompileUnitArray(errors, timeline.compileUnits ?? [], 'timeline.compileUnits');
-    if (!Array.isArray(timeline.uploadBuckets))
-      error(errors, 'timeline.uploadBuckets must be an array');
+    validateUploadBucketArray(errors, timeline.uploadBuckets, 'timeline.uploadBuckets');
     if (!Array.isArray(timeline.sceneRoots)) error(errors, 'timeline.sceneRoots must be an array');
   }
   if (capture.environment?.contextLost > 0) error(errors, 'WebGL context was lost');
@@ -889,7 +963,12 @@ export function cacheKeyVariance(capture) {
   }
   const groups = new Map();
   let variantPrograms = 0;
+  // Programs whose family key collided rather than varying: the probe's
+  // retention key is the material class plus name, so it reports a difference
+  // spanning several cache-key segments as ambiguous instead of as a variant.
+  let ambiguousPrograms = 0;
   for (const program of programs) {
+    if (program?.variantAmbiguous === true) ambiguousPrograms++;
     const diff = program.variantDiff;
     if (!diff) continue;
     variantPrograms++;
@@ -922,6 +1001,7 @@ export function cacheKeyVariance(capture) {
   return {
     programsAttributed: programs.length,
     variantPrograms,
+    ambiguousPrograms,
     groups: [...groups.values()]
       .map((row) => ({ ...row, materials: [...row.materials].sort() }))
       .sort((left, right) => right.programs - left.programs),
@@ -991,9 +1071,26 @@ export function reflectionAttribution(capture) {
       firstLink.set(link.programId, link);
   }
 
+  // A completion poll EXISTS only for a program three submitted through
+  // compileAsync: WebGLProgram.isReady is the sole COMPLETION_STATUS_KHR caller
+  // in r165 and only the compileAsync poll pass calls it. So a poll that starts
+  // AFTER the query still proves submission, and the program was drawn in the
+  // same frame it was submitted, before its first poll: that is a raced pending
+  // link, not a program that was never compiled asynchronously. Only the total
+  // absence of a poll says never-compiled.
+  //
+  // Two limits of that reading, stated rather than assumed. Without
+  // KHR_parallel_shader_compile three flags a program ready on construction and
+  // never queries at all, so EVERY program looks never-compiled: `polledPrograms`
+  // travels with the result and a capture reporting zero is not evidence about
+  // these families, it is evidence the extension was missing. And a program
+  // first linked synchronously at a draw, then swept up by a LATER compileAsync
+  // pass over the same cached program, reads as raced rather than
+  // never-compiled; the families are a population readout, not a per-program
+  // verdict.
   const familyOf = (query) => {
     const poll = polls.get(query.programId);
-    if (!poll || !finite(poll.first) || poll.first >= query.startMs) return 'never-compiled';
+    if (!poll || !finite(poll.first)) return 'never-compiled';
     if (poll.readyAt !== null && poll.readyAt < query.startMs) return 'settled-first';
     return 'raced-pending-link';
   };
@@ -1066,6 +1163,11 @@ export function reflectionAttribution(capture) {
   return {
     revealAtMs,
     families,
+    // Zero here means no program was ever polled for completion, which on this
+    // renderer means KHR_parallel_shader_compile was unavailable rather than
+    // that nothing compiled asynchronously. The families below are unreadable
+    // in that case, so the count travels with them.
+    polledPrograms: polls.size,
     programsAttributed: identities.size,
     linksTotal: links.length,
     linksCover: links.filter((link) => link.phaseAtStart !== 'live').length,
