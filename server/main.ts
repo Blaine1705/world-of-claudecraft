@@ -305,6 +305,7 @@ import {
 } from './player_card';
 import { prunePlayerActivityDailyBatch } from './player_metrics_db';
 import { handleAvatar, handleCharacterSitemap, handleProfilePage } from './profile_page';
+import { pruneFtueEventsBatch, pruneLevelUpEventsBatch } from './progress_events_db';
 import { recordUsageCacheEvent, recordUsageMetric, setUsageCacheSize } from './provider_usage';
 import {
   assetUploadRateLimited,
@@ -3458,6 +3459,18 @@ export async function startServer(): Promise<http.Server> {
         // LIMIT-bounded per account (chatModerationForAccount).
         name: 'chat_violations',
         pruneBatch: (n) => pruneChatViolationsBatch(config.chatViolationRetentionDays, n),
+      },
+      {
+        // One row per player level-up (the UA friction map); append-only,
+        // observer-written (server/progress_events.ts).
+        name: 'level_up_events',
+        pruneBatch: (n) => pruneLevelUpEventsBatch(pool, config.levelUpEventsRetentionDays, n),
+      },
+      {
+        // New-player quest/death events, level-gated at write time to the
+        // FTUE window (server/progress_events_db.ts FTUE_MAX_LEVEL).
+        name: 'ftue_events',
+        pruneBatch: (n) => pruneFtueEventsBatch(pool, config.ftueEventsRetentionDays, n),
       },
     ],
     // The fold precondition makes sample pruning lossless; skip the whole group

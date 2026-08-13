@@ -65,6 +65,7 @@ import {
   PLAYER_METRICS_SCHEMA,
   recordCharacterCreation,
 } from './player_metrics_db';
+import { PROGRESS_EVENTS_SCHEMA } from './progress_events_db';
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM, REALM_DIRECTORY } from './realm';
 import { chooseArchiveName } from './reclaim_name';
@@ -1247,6 +1248,10 @@ export async function ensureSchema(): Promise<void> {
     // association arm, so it is created after the retention schema above; on a
     // fresh database SCHEMA alone could not create it.
     await client.query(DAILY_REWARD_EXCLUDED_ACCOUNTS_VIEW_SQL);
+    // Progression analytics event logs (level_up_events, ftue_events).
+    // FK-references accounts(id) and characters(id), so they run after SCHEMA.
+    // Applied unconditionally (idempotent), like the other schema modules.
+    await client.query(PROGRESS_EVENTS_SCHEMA);
     await client.query(SOCIAL_SCHEMA);
     await client.query(ADMIN_GUILDS_SCHEMA);
     await client.query(SEEKER_ENTITLEMENT_SCHEMA);

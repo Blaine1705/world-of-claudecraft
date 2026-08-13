@@ -316,6 +316,7 @@ import {
 } from './parse';
 import { PartyFrameProjectionCache } from './party_frame_projection';
 import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
+import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
 import { nextRaidResetMs, resetDayKey } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
@@ -9724,7 +9725,17 @@ export class GameServer {
           // carries the old level until the next save, which enqueues again from
           // saveCharacter, so an early drain re-reads once the row catches up.
           enqueueLinkChange({ accountId: session.accountId, kinds: ['flex'] }, now);
+          recordLevelUp(session, ev.level);
         }
+      }
+      if ((ev.type === 'questAccepted' || ev.type === 'questDone') && ev.pid !== undefined) {
+        const s = this.clients.get(ev.pid);
+        const level = this.sim.entities.get(ev.pid)?.level ?? 1;
+        if (s) recordFtueQuest(s, ev.type === 'questAccepted' ? 'quest_accepted' : 'quest_done', ev.questId, level);
+      }
+      if (ev.type === 'death' && this.clients.has(ev.entityId)) {
+        const s = this.clients.get(ev.entityId);
+        if (s) recordFtueDeath(s, this.sim, ev.entityId, ev.killerId);
       }
       if (ev.type === 'levelup' && ev.level === 5 && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
