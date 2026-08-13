@@ -12,7 +12,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 03 | delivery-exactly-once | game | DONE | e71a8cfd21 | release sync trivial (server/parse samplers only); B2a/B2b/B2c + monitor closed; five-reviewer round + fix round + fresh re-review applied (section below); real-SQL suites 65 green; gate GREEN at tip c3b33f54a7 (full-suite fallback, all 8 steps; the one intermediate red was the internal gate-mount sweep's 20-route count pin, fixed to 21); LOCAL, not pushed per R4 |
 | 03 QA | phase-03-qa | game | DONE | 5ef64c1e11 | PASS-WITH-FOLLOWUPS, every fix applied (section below); release sync 5487531960 (two conflicts: main.ts union + regenerated pending.ts; merge audit CLEAN except the hud ratchet, fixed by the error_text_i18n_core extraction, ceiling 19338 to 19190); AC3 park deviation UPHELD; 21-mutation pass, one survivor closed; pushed per R4 |
 | 04 | bond-payment-lifecycle | game | DONE | 3f20375918 | release sync no-op; three review rounds (security/db/coverage x2, qa-checklist, migration-safety) all applied; 17 mutation spot-proofs bit; gate GREEN at 0afdaa71a5. A follow-up verification session (sections below) re-ran the whole phase, applied two further audited fix rounds (commits 60034033f1, a938c410f3 plus docs), re-bit 11 mutations (3 re-proofs + 8 on the new fixes), and re-gated GREEN TWICE (full-suite fallback, all 8 steps, at c7176d730b and 6642c6e15b); LOCAL, not pushed per R4; final docs commit on top |
-| 04 QA | phase-04-qa | game | NOT STARTED | | |
+| 04 QA | phase-04-qa | game | DONE | e4ae9d1602 | PASS-WITH-FOLLOWUPS, every fix applied (section below); release/v0.37.0 synced (merge a43a1e8b52: the count-pin trap fired FOR REAL, both sides at 321 with different members, re-derived 322/85/237 + sends 199 dispatches 212 from runs; hud.ts over ceiling, fixed by the crafting_deny_core extraction, ceiling 19190 to 19177; game.ts ceiling banked to 10859); five audit lanes + fresh fix-round re-reviews; deep mutation pass incl. one REAL hole closed (the async-stall withTx shape); three correctness fixes proven red-on-old (lapse-straddle refresh, poll-race standing, review retry); pushed per R4 |
 | 05 | custody-entry-hardening | game | NOT STARTED | | |
 | 05 QA | phase-05-qa | game | NOT STARTED | | |
 | 06 | directed-rail-integrity | game | NOT STARTED | | |
@@ -49,6 +49,158 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 21 QA | phase-21-qa | service + game | NOT STARTED | | |
 | 22 | close-out | all three | NOT STARTED | | teardown offer lives in 22 QA |
 | 22 QA | phase-22-qa | all three | NOT STARTED | | |
+
+## 04 QA round (verdict PASS-WITH-FOLLOWUPS, every fix applied)
+
+Release sync: merge a43a1e8b52 (origin/release/v0.37.0, 147 commits, seven
+conflicted files). The count-pin merge trap FIRED for real: both sides
+pinned IWorld 321 (ours via tradeClose, the release via setItemLocked) and
+git auto-merged the identical numbers while the merged tree carries 322;
+all five pins re-derived from suite runs (IWorld 322 / data 85 / method
+237, sends 199, dispatches 212), never arithmetic. The release's hud.ts
+additions broke the zero-headroom ceiling: fixed by extracting the
+craft-deny message table to src/ui/crafting_deny_core.ts (registered pure
+core, own suite; ceiling 19190 to 19177, zero headroom kept). The five
+non-Latin overlay conflicts resolved as unions; i18n regenerated with ZERO
+drift vs the auto-merge. Seven-lane merge audit: both sides survived as
+exact unions everywhere; the release's player item lock (issue 3042) does
+NOT gate the $WOC listing path, judged PARITY with the gold market (the
+lock gates only salvage/craft/vendor by its own design) and recorded as a
+phase 13 session-start design question, with a disambiguating comment at
+the transfer-lock predicate; game.ts ceiling ratcheted 10900 to 10859 (the
+release's cadence extraction never banked its slack); lock_item joined the
+command-history narrative.
+
+Re-judge list (all eight items): seven UPHELD with the reasoning re-run
+against the code (R8 numbers: duty-cycle arithmetic re-verified, one
+account bounded to about 13 minutes per hour of market-wide denial;
+cancel-intent bid block: entailed by the one-window bound, the converge
+belt proves it; confirm_in_flight second-signature semantics; the
+already-succeeded retry arms; the held-bond posture; the stuckBonds axis;
+the split anchors). One AMENDED: the confirming-hours no-upper-clamp
+posture is REJECTED; the knob now clamps at 720 hours with a one-time boot
+warn (a huge value silently disabled the H15 park, and past to_timestamp's
+range it 22008'd the sweep arm into silence), parse cases pinned.
+
+Real-SQL: all three pg suites under TEST_DATABASE_URL, 100 tests at
+session start, 103 at the final tip, zero skipped (demonstrably ran).
+
+Deep mutation pass (isolated scratch worktree, baseline 137 green), aimed
+at the windows the prior 28 spot-proofs did not cover:
+- recorder dedupe key: BIT (three window-mapped cooldown reds)
+- exempt-list bound parameter: BIT (six reds incl. the structural pin)
+- converge TxAbort rollback: FALSE survivor, then BIT; the pin lives in
+  the BOND suite, not the settlement suite the harness first targeted
+  (lesson recorded as memory mutation-survivor-wrong-suite)
+- withTx idle-stall coded-error preference: REAL survivor; the busy-loop
+  test covers only the sync stall shape. Closed with a private-seam
+  async-stall pin proven red-on-mutant and green-on-real.
+- open2 create-before-drop ordering: BIT (order-sensitive structural pin)
+Plus two fix-round proofs: dropping the reviewed arm reds the H15 pins;
+dropping the advisory cooldown answer reds the lock-free pin.
+
+Five audit lanes over the two-session diff (privacy-security,
+database-performance, test-coverage, correctness, cleanup/staleness), all
+prompted for coverage; every finding applied or reasoned, the fix rounds
+re-reviewed fresh. The applied set:
+
+- Security (0 blocking, 5 should-fix): signature charset bound on BOTH
+  intake routes (^[A-Za-z0-9_-]{1,256}$; the recorded string feeds an ops
+  warn and the service, so control characters were a log-forging vector;
+  five refusal pins + a dev-style pass-through pin); the confirming-hours
+  clamp above; comment truth-ups (the db-file exempt prose overstated the
+  predicate, the FK-edge comment overstated the risk, the paid-probe race
+  gained its cosmetic-outcome note). Residuals accepted and recorded
+  below: the exemption unreachable through the in-repo proxy, outage
+  abandons against no-signature buyers, signature squatting, the
+  service pending-contract dependency, the rotation-denial arithmetic.
+- Database performance (six P2, measured with disposable-instance
+  EXPLAIN): the H15 confirming park SPLIT into its own reviewed sweep arm
+  with its own read and budget (confirmingOverdueSettlements; a confirming
+  backlog carries the oldest deadlines by construction and owned the
+  shared batch head, starving the offered/failed expiry work; the split
+  also restores ordered-index pushdown for both arms, RESOLVING the
+  recorded 16/17 UNION ALL item); the cooldown probes moved into
+  claimBuyNowLock's lock-free advisory pass (a cooled-down account's
+  retries at 20/min each took the listing FOR UPDATE just to be refused;
+  the self-steal still pays the transaction where its abandon is recorded;
+  proven lock-free by a new pg pin racing a held row lock);
+  GUARD_IDLE_TX_TIMEOUT_MS raised to equal ESCROW_LOCK_TIMEOUT_MS (2000ms;
+  500ms was four times tighter than the lock-wait tolerance with no
+  measurement, and a false fire discards a pool client); the stuckBonds
+  sample orders on the indexed placed_at (the COALESCE order top-N sorted
+  every signed pending bond per refresh, about 4,000 buffers at 5k rows;
+  divergence is minutes on an hours-scale readout and stuckSinceMs stays
+  the honest per-row axis; the O(cap) docblock gained its honest
+  exception); the rotation write cost and the abandons-prune plan recorded
+  as measured comments beside their code.
+- Coverage (5 should-fix, 6 nits): refreshBondQuote success-path test; the
+  outbid replay outcome test; the teardown carve-out's third-dimension
+  negative arm (a signed-but-HELD pending bid IS torn down to
+  refund_due); the overdue default pass's ['won'] CAS pinned against a
+  suspend-released bid; three CAS-lost re-read arms (placeBid contended,
+  refresh confirm_in_flight, abandon re-read); the proxy scrape and the
+  retention-wiring pins comment-stripped; the window pins made associative;
+  the stale retry-test title; the DB-free bond-poll park arm
+  (confirm-call counting across four passes); the no-signature exemption
+  conjunct arm. Declined as recorded before: the LOCAL_LEDGER_TTL_MS
+  eviction arms match the accepted parkedDeliveries gap (phase 16).
+- Correctness (0 blocking, 3 should-fix; all five deliverables and the
+  02/03 guarantees verified, 11 bid-status writers traced): the
+  lapse-straddle hole CLOSED (refreshBondQuote could mint a quote
+  outliving the bid's 300s lapse deadline, and a signature broadcast in
+  the straddle arrived against a lapsed bid where NOTHING recorded it,
+  the one H4 loss shape signature-first recording cannot reach; the
+  refresh now refuses quote_expired when the quote would outlive the
+  seat, the settlement leg's deadline-guard sibling; residual: the
+  sweep-cadence boundary race, seconds instead of a quote lifetime); a
+  confirm whose activation the POLL won answered standing:false (read as
+  outbid by the very bidder whose payment stood; now answers from the
+  row's real status); a recorded-signature retry against a review-parked
+  settlement answered not_active (purchase gone) for money under review
+  (review joins the outcome arm). All three pinned with tests proven RED
+  on the pre-fix code.
+- Cleanup/staleness (1 should-fix + doc round, hygiene sweep CLEAN): the
+  misattributed prune docblock; the stale open-index comment; the missing
+  lock-order carve-out comments (insertPendingBid, escrowInsertListing)
+  plus disposeSoldResidueListings joining the CLAUDE.md list; the
+  strip_comments header now states its string-literal limit and the
+  architecture guard's copy points back; the unreachable-operator-arm
+  wording fixed at the stuck route and in server/CLAUDE.md (the
+  review -> confirmed/failed arms ARRIVE with phases 09/19; hand SQL
+  forbidden); the config exception ledger gained wocMarketConfig; the
+  count-rot sentences went count-free; the dead optionalString removed.
+
+Residuals accepted THIS round (do not re-raise; owners):
+- The abandon exemption is unreachable through the in-repo proxy (its
+  unavailable arm always answers pending), so it guards only a remote
+  DECIDED service_unavailable verdict: defense-in-depth as recorded by
+  the implement round; phases 10/21 confirm the service contract.
+- An economy outage can mint ONE recoverable abandon row against a buyer
+  whose window elapsed unsigned (the exemption requires a signature);
+  bounded by guardEnabledHealthy refusing new claims while unhealthy and
+  by the rolling window; phase 12 health rail and phase 14 copy soften it.
+- Signature squatting: both signature columns are globally UNIQUE and a
+  rival can burn a victim's observed signature (refusal signature_reused,
+  no recording); pre-existing, and this phase's TTL-long recording window
+  widened the bond-leg exposure. Owner: R5/phase 10, the verifier must be
+  able to clear a signature whose chain contents pay a different
+  reference; the service-side reconciliation is the recovery meanwhile.
+- The anti-snipe pending arm still trusts the service's pending contract
+  for unknown signatures (recorded before; phase 21 owes a contract test).
+- About seven rotating funded accounts can still deny one listing near
+  100 percent (each seat costs a verified wallet plus balance); the
+  cooldown is a partial defense by design, recorded.
+- quote_expired's catalog copy ("request a fresh quote") is now also the
+  lapse-straddle refresh refusal's answer, where no fresh quote will
+  come: phase 14 copy item beside the recorded confirm_failed mismatch.
+- Cancel-intent is irreversible by design (no un-stamp path); phase 14
+  owns whether the seller-side marker needs an undo affordance.
+
+Deferred proofs with owners: standing planner assertions for the two
+rotation indexes in the pg suite (phase 20); the p99.9 inter-statement
+event-loop gap measurement behind the idle bound (phase 16); an at-scale
+advisory-cooldown concurrency proof (phase 16/20).
 
 ## 04 verification round (re-run of the implement session over its committed tree)
 
