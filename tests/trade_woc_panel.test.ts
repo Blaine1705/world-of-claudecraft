@@ -312,7 +312,7 @@ describe('a standing offer becomes a REVIEW surface for both sides', () => {
     );
   });
 
-  it('tells the seller to leave ONE item when the table holds the sword plus a stack', () => {
+  it('tells the seller to leave ONE item when the table holds the sword plus a companion', () => {
     // The wrong-WHY repro: with the agreed item plainly staged beside a
     // companion, "add the item you are selling" contradicts the visible
     // table; the model's acceptHint picks the one_item copy instead and the
@@ -422,6 +422,11 @@ describe('the payment phase, in the window rather than elsewhere', () => {
       root.querySelector('[data-woc-cancel]'),
       'escrow is done; no withdrawing now',
     ).toBeNull();
+    // And no accept hint either: the goods are escrowed, so the table is
+    // CORRECTLY empty and the old add-the-item copy here was a lie. Only
+    // this panel-level pin keeps a re-inlined hint expression from quietly
+    // restoring it (the model-level null alone would not).
+    expect(root.querySelector('[data-woc-hint]')?.textContent ?? '').toBe('');
   });
 
   it('shows both sides the settled state once paid', () => {

@@ -826,14 +826,19 @@ describe('the settlement guards ship their DDL (structural floor)', () => {
       expect(schema).toContain(`EXECUTE 'DROP INDEX ${name}'`);
     }
     // The REVERSE sweep, parsed from the schema itself: every unique index
-    // the boot DDL creates is either repair-backed (guardedIndexes) or
-    // named below with the reason it legitimately rides NO repair. A new
-    // repair-plus-unique-index pair cannot land outside guardedIndexes, and
-    // a new repairless unique index must state its reason here.
+    // the boot DDL creates IN THE CREATE UNIQUE INDEX FORM is either
+    // repair-backed (guardedIndexes) or named below with the reason it
+    // legitimately rides NO repair. A new repair-plus-unique-index pair
+    // cannot land outside guardedIndexes, and a new repairless unique index
+    // of this form must state its reason here. Column-level UNIQUE
+    // constraints (bond_reference, tx_signature) are outside this sweep's
+    // reach: they cannot carry a carcass-drop convention and their names are
+    // minted by Postgres, so the pin deliberately covers only the named
+    // form.
     const repairlessUniqueIndexes = new Map([
       [
         'woc_market_buy_now_abandons_once',
-        'append-only abandon recorder: no historical duplicates to repair',
+        'shipped in the same commit as its table: no rows predate the bound',
       ],
       [
         'woc_market_bids_bond_signature',

@@ -480,6 +480,28 @@ describe('a standing offer changes what each side may do', () => {
     expect(asSeller([{ itemId: EPIC.id, count: 2 }]).acceptHint).toBe(
       'hudChrome.trade.woc.hintOneItem',
     );
+    // The AUTHORITATIVE table wins over the compose list in BOTH directions:
+    // the sim can clean a pushed offer into a different shape, and the hint
+    // must describe the table the player is actually looking at (which is
+    // rendered from the sim's offer), or it contradicts the screen.
+    const authoritativeWins = buildWocTradeModel(
+      input({
+        pendingOffer: { ...offer, role: 'seller' },
+        staged: [slot(EPIC.id), slot(EPIC.id)],
+        stagedAuthoritative: [slot(EPIC.id)],
+      }),
+    );
+    expect(authoritativeWins.canAccept).toBe(true);
+    expect(authoritativeWins.acceptHint).toBeNull();
+    expect(
+      buildWocTradeModel(
+        input({
+          pendingOffer: { ...offer, role: 'seller' },
+          staged: [slot(EPIC.id)],
+          stagedAuthoritative: [slot(EPIC.id), slot(EPIC.id)],
+        }),
+      ).acceptHint,
+    ).toBe('hudChrome.trade.woc.hintOneItem');
     // The agreed shape clears it, the buyer never sees one, and a phase past
     // review (goods escrowed, table CORRECTLY empty) names no obstacle.
     expect(asSeller([slot(EPIC.id)]).acceptHint).toBeNull();

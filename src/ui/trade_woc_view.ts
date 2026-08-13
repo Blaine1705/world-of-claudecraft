@@ -103,6 +103,14 @@ export interface WocTradeInput {
   /** YOUR own staged items. Offering $WOC means buying, so this must be empty:
    *  items go one way and $WOC the other. */
   staged: readonly InvSlot[];
+  /** The SIM's cleaned own-side offer when a live session mirrors one, which
+   *  is the table the player actually sees rendered and the list the accept
+   *  path escrows from. The ACCEPT arm (canAccept, acceptHint) reads this so
+   *  its WHY can never contradict the visible table; `staged` stays the
+   *  compose-time source for everything pre-push (wocDisabled, the
+   *  clear-your-items hint). Absent means no live mirror: the compose list
+   *  IS the truth and the accept arm falls back to it. */
+  stagedAuthoritative?: readonly InvSlot[];
   /** What the OTHER player has staged, which is what you are paying for. */
   theirStaged: readonly InvSlot[];
   items: Readonly<Record<string, ItemDef>>;
@@ -189,7 +197,11 @@ export interface WocTradeModel {
   split: WocTradeSplit | null;
   /** The live offer to review, or null while none is standing. */
   pendingOffer: WocPendingOffer | null;
-  /** Whether the SELLER may accept the standing offer (they hold the goods). */
+  /** Whether the SELLER may accept the standing offer (they hold the goods).
+   *  Deliberately unconsumed by the panel: it renders no accept affordance of
+   *  its own (agreement rides the trade window's Accept, whose disabled state
+   *  never consults this model), so acceptHint carries the player-facing
+   *  meaning and this boolean stays the tested truth it derives from. */
   canAccept: boolean;
   /** The i18n key explaining why the seller may NOT accept yet, or null when
    *  they may (or when no review-phase offer points at them). Distinguishes
@@ -353,13 +365,18 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
   // eligible single-unit slot (the send-side one_item rule, mirrored). A
   // second staged slot or a stack makes the accept's slot resolution
   // ambiguous, and the server's pin digest could only refuse the surplus as
-  // item_mismatch after the fact.
+  // item_mismatch after the fact. Judged over the AUTHORITATIVE table (see
+  // stagedAuthoritative): the sim can clean a pushed offer into a different
+  // shape than the compose list, and a hint derived from the list the
+  // player is NOT looking at is the wrong-WHY class this arm exists to
+  // close.
+  const acceptTable = input.stagedAuthoritative ?? input.staged;
   const canAccept =
     input.pendingOffer?.phase === 'review' &&
     input.pendingOffer.role === 'seller' &&
-    input.staged.length === 1 &&
-    input.staged[0].count === 1 &&
-    wocTradableSlot(input.staged[0], input.items);
+    acceptTable.length === 1 &&
+    acceptTable[0].count === 1 &&
+    wocTradableSlot(acceptTable[0], input.items);
 
   return {
     // The arm stays VISIBLE while blocked: hiding it would leave a player who
@@ -403,8 +420,8 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
     // name.
     acceptHint:
       input.pendingOffer?.phase === 'review' && input.pendingOffer.role === 'seller' && !canAccept
-        ? input.staged.some((s) => wocTradableSlot(s, input.items))
-          ? SEND_HINT_KEYS.one_item
+        ? acceptTable.some((s) => wocTradableSlot(s, input.items))
+          ? 'hudChrome.trade.woc.hintOneItem'
           : 'hudChrome.trade.woc.hintAcceptNeedsItem'
         : null,
     // Only the buyer pays, and only once the goods are actually in escrow: a pay

@@ -3730,6 +3730,10 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
         SELLER_CHAR,
       ),
     ).rejects.toThrow('unique violation');
+    expect(bagsOf(h, SELLER_CHAR), 'the rollback restore still ran').toContainEqual({
+      itemId: EPIC_ITEM,
+      count: 1,
+    });
     expect((await h.db.directedOfferById(REALM, made.offer.id))?.status).toBe('accepted');
     expect(h.sweepErrors.map(([arm]) => arm)).toContain('offer_reopen');
   });

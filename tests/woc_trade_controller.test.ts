@@ -662,6 +662,38 @@ describe('the accept request body (seller escrow)', () => {
     expect(r.host.logs.at(-1)).toBe(t('hudChrome.trade.woc.hintOneItem'));
   });
 
+  it('answers needs-item, never one_item, over a table with NOTHING sellable (arm order)', async () => {
+    // The ladder-order pin: with no eligible slot at all, "leave only the one
+    // being sold" would point at a table holding nothing sellable, so the
+    // needs-item arm must win even though the two-slot shape also satisfies
+    // the one_item predicate. Mirrors the model's acceptHint ladder.
+    const h = fakeHooks();
+    const r = rig(h.hooks);
+    r.host.staged.items.push({ itemId: 'worn_sword', count: 1 });
+    r.host.tradeInfo = {
+      otherPid: 2,
+      otherName: 'Borin',
+      myOffer: {
+        items: [
+          { itemId: 'boar_hide', count: 1 },
+          { itemId: 'boar_hide', count: 1 },
+        ],
+        copper: 0,
+      },
+      theirOffer: { items: [], copper: 0 },
+      myAccepted: false,
+      theirAccepted: false,
+    } as unknown as typeof r.host.tradeInfo;
+    const c = r.controller as unknown as {
+      wocTradeOffer: WocPendingOffer | null;
+      acceptWocTradeOffer(): Promise<void>;
+    };
+    c.wocTradeOffer = heldOffer({ role: 'seller' });
+    await c.acceptWocTradeOffer();
+    expect(h.state.calls.acceptOffers).toEqual([]);
+    expect(r.host.logs.at(-1)).toBe(t('hudChrome.trade.woc.hintAcceptNeedsItem'));
+  });
+
   it('resolves an INSTANCED staged copy through the sim offer, index and payload both', async () => {
     // The fix-round blocker: the HUD-local compose list is id-plus-count
     // only, so resolving from it could only match a PLAIN bag copy; an

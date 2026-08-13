@@ -30,6 +30,10 @@ import {
 
 export interface WocTradePanelDeps {
   staged: readonly InvSlot[];
+  /** The sim's cleaned own-side offer when a session mirrors one; the accept
+   *  arm judges over THIS table (the one the player sees rendered), never the
+   *  compose list. Absent means no live mirror. */
+  stagedAuthoritative?: readonly InvSlot[];
   theirStaged: readonly InvSlot[];
   goldCopper: number;
   /** The OTHER player's staged gold. Read because the currencies are exclusive
@@ -133,6 +137,7 @@ export function wocTradeModelFrom(deps: WocTradePanelDeps): WocTradeModel {
     partner: deps.partner,
     partnerResolved: deps.partnerResolved,
     staged: deps.staged,
+    stagedAuthoritative: deps.stagedAuthoritative,
     theirStaged: deps.theirStaged,
     items: deps.items,
     mode: deps.mode,

@@ -156,6 +156,10 @@ export class WocTradeController {
   private wocTradeDeps(otherName: string): WocTradePanelDeps {
     return {
       staged: this.stagedTrade.items,
+      // The accept arm's table: the same authoritative-first read the accept
+      // belt and the rendered offer table use, so the hint, the belt, and
+      // what the player sees can never disagree about the table's shape.
+      stagedAuthoritative: this.sim.tradeInfo?.myOffer.items ?? this.stagedTrade.items,
       theirStaged: this.sim.tradeInfo?.theirOffer.items ?? [],
       goldCopper: this.stagedTrade.copper,
       // Server truth for the other side, not a local echo: their coin closes
