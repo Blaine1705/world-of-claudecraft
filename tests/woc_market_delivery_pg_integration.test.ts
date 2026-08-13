@@ -1489,12 +1489,17 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         const startedAt = performance.now();
         const out = await marketDb.escrowInsertListing(
           { characterId, level: 12, state: heavyState, leaseNonce: 'escrow-nonce-live' },
-          // Directed listings are exempt from the active cap, so the loop
-          // never trips it.
-          escrowListing(realm, account, characterId, { directedBuyerAccount: account }),
+          escrowListing(realm, account, characterId),
         );
         samples.push(performance.now() - startedAt);
         if (!out.ok) throw new Error(`escrow refused on pass ${i}: ${out.reason}`);
+        // The cap counts every non-closed row since the directed-rail
+        // hardening (the old directed exemption this loop leaned on was the
+        // H12 hole), so each measured row closes outside the sample.
+        await pool.query(
+          `UPDATE woc_market_listings SET status = 'closed', resolution = 'cancelled' WHERE id = $1`,
+          [out.id],
+        );
       }
       samples.sort((a, b) => a - b);
       const p50 = samples[Math.floor(samples.length / 2)] ?? 0;
