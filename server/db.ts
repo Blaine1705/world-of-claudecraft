@@ -65,6 +65,7 @@ import {
   PLAYER_METRICS_SCHEMA,
   recordCharacterCreation,
 } from './player_metrics_db';
+import { ACCOUNT_ATTRIBUTION_SCHEMA } from './attribution_db';
 import { PROGRESS_EVENTS_SCHEMA } from './progress_events_db';
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM, REALM_DIRECTORY } from './realm';
@@ -415,6 +416,10 @@ ALTER TABLE accounts ADD COLUMN IF NOT EXISTS created_ip TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS created_user_agent TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS last_login_ip TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS last_login_user_agent TEXT;
+-- ISO 3166-1 alpha-2 country at signup, resolved from a trusted edge geo
+-- header (GEOIP_COUNTRY_HEADER; see server/signup_attribution.ts). Analytics
+-- only, never authorization.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS created_country TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cosmetics JSONB NOT NULL DEFAULT '{}'::jsonb;
 -- Paid weapon ownership and loadouts live outside accounts.cosmetics. Older game
 -- binaries replace that JSON document wholesale, so keeping paid state there would
@@ -1252,6 +1257,9 @@ export async function ensureSchema(): Promise<void> {
     // FK-references accounts(id) and characters(id), so they run after SCHEMA.
     // Applied unconditionally (idempotent), like the other schema modules.
     await client.query(PROGRESS_EVENTS_SCHEMA);
+    // First-touch signup attribution (one row per account, written at
+    // registration). FK-references accounts(id), so it runs after SCHEMA.
+    await client.query(ACCOUNT_ATTRIBUTION_SCHEMA);
     await client.query(SOCIAL_SCHEMA);
     await client.query(ADMIN_GUILDS_SCHEMA);
     await client.query(SEEKER_ENTITLEMENT_SCHEMA);

@@ -331,6 +331,7 @@ import { resolveReportTarget } from './report_target';
 import { BUG_REPORT_MAX_BODY_BYTES, configureReportsRuntime } from './reports';
 import { createRetentionSweep, RETENTION_SWEEP_BATCH_SIZE } from './retention_sweep';
 import { resolveSfxOverlayFile } from './sfx_overlay';
+import { captureSignupContext, parseSignupProfile } from './signup_attribution';
 import { handleSitePresenceHeartbeat } from './site_presence';
 import { adminRolesForAccount } from './staff_db';
 import {
@@ -1516,15 +1517,21 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const token = newToken();
       await saveToken(token, account.id);
       // Store the mandatory signup email and send the welcome mail. Validated above,
-      // so this always runs for a fresh registration.
+      // so this always runs for a fresh registration. The profile parse is
+      // synchronous so the welcome mail already carries the signup locale and
+      // opt-in state; the capture below persists them (plus attribution).
+      const signupProfile = parseSignupProfile(req, body);
       await setAccountEmail(account.id, signupEmail);
       emailAccountCreated({
         id: account.id,
         username: account.username,
         email: signupEmail,
-        locale: null,
-        marketing_opt_in: false,
+        locale: signupProfile.locale,
+        marketing_opt_in: signupProfile.marketingOptIn,
       });
+      // First-touch attribution + locale/country/opt-in persistence
+      // (fire-and-forget; must never block or fail registration).
+      captureSignupContext(account.id, req, body, signupProfile);
       void trackAccountCreated(
         account.id,
         {
