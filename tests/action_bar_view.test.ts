@@ -1425,9 +1425,8 @@ describe('actionBarView: the aria-label is resolved in the core via the injected
       descriptor(slot(0, { ability: ability('arcane_missiles', { cost: 105 }) })),
       { ...fakeDeps(), t: realT },
     );
-    const procSlot = view.tick(
-      world({ auras: [{ kind: 'arcane_charge', value: 4, stacks: 4 }] }),
-    ).slots[0];
+    const procSlot = view.tick(world({ auras: [{ kind: 'arcane_charge', value: 4, stacks: 4 }] }))
+      .slots[0];
     // The proc state keeps the stable slot label and announces readiness via
     // the aria-description channel (the shared glossary term), so the label
     // itself never churns mid-combat.

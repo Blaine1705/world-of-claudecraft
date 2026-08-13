@@ -2715,7 +2715,6 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .action-btn.proc,
-    body.mobile-touch #mobile-action-ring button.proc,
     .action-btn.empowered,
     .action-btn.fate-consume-ready,
     .action-btn.fate-sentence-ready,
