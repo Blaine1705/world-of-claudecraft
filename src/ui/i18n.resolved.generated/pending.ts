@@ -9,100 +9,25 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "itemUi.market.filterSort",
-    "itemUi.market.sortName",
-    "itemUi.market.sortPriceAsc"
-  ],
-  "es_ES": [
-    "itemUi.market.filterSort",
-    "itemUi.market.sortName",
-    "itemUi.market.sortPriceAsc"
-  ],
-  "fr_FR": [
-    "itemUi.market.filterSort",
-    "itemUi.market.sortName",
-    "itemUi.market.sortPriceAsc"
-  ],
-  "fr_CA": [
-    "itemUi.market.filterSort",
-    "itemUi.market.sortName",
-    "itemUi.market.sortPriceAsc"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "itemUi.market.filterSort",
-    "itemUi.market.sortName",
-    "itemUi.market.sortPriceAsc"
-  ],
-  "de_DE": [
-    "itemUi.market.filterSort",
-    "itemUi.market.sortName",
-    "itemUi.market.sortPriceAsc"
-  ],
-  "zh_CN": [
-    "itemUi.market.filterSort",
-    "itemUi.market.sortName"
-  ],
-  "zh_TW": [
-    "itemUi.market.filterSort",
-    "itemUi.market.sortName"
-  ],
-  "ko_KR": [
-    "itemUi.market.filterSort",
-    "itemUi.market.sortName"
-  ],
-  "ja_JP": [
-    "itemUi.market.filterSort",
-    "itemUi.market.sortName"
-  ],
-  "pt_BR": [
-    "itemUi.market.filterSort",
-    "itemUi.market.sortName",
-    "itemUi.market.sortPriceAsc"
-  ],
-  "ru_RU": [
-    "itemUi.market.filterSort",
-    "itemUi.market.sortName"
-  ],
-  "cs_CZ": [
-    "itemUi.market.filterSort",
-    "itemUi.market.sortName",
-    "itemUi.market.sortPriceAsc"
-  ],
-  "nl_NL": [
-    "itemUi.market.filterSort",
-    "itemUi.market.sortName",
-    "itemUi.market.sortPriceAsc"
-  ],
-  "pl_PL": [
-    "itemUi.market.filterSort",
-    "itemUi.market.sortName",
-    "itemUi.market.sortPriceAsc"
-  ],
-  "id_ID": [
-    "itemUi.market.filterSort",
-    "itemUi.market.sortName",
-    "itemUi.market.sortPriceAsc"
-  ],
-  "tr_TR": [
-    "itemUi.market.filterSort",
-    "itemUi.market.sortName",
-    "itemUi.market.sortPriceAsc"
-  ],
-  "sv_SE": [
-    "itemUi.market.filterSort",
-    "itemUi.market.sortName",
-    "itemUi.market.sortPriceAsc"
-  ],
-  "vi_VN": [
-    "itemUi.market.filterSort",
-    "itemUi.market.sortName",
-    "itemUi.market.sortPriceAsc"
-  ],
-  "da_DK": [
-    "itemUi.market.filterSort",
-    "itemUi.market.sortName",
-    "itemUi.market.sortPriceAsc"
-  ]
+  "it_IT": [],
+  "de_DE": [],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
+  "pt_BR": [],
+  "ru_RU": [],
+  "cs_CZ": [],
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };
