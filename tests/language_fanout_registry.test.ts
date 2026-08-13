@@ -94,6 +94,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.partyFramesPainter.relocalize|',
   'this.mapPainter.relocalize|',
   'this.delvePainter.relocalize|',
+  'this.riftPainter.relocalize|',
   'this.targetFrameMover.relocalize|',
   'this.playerFrameMover.relocalize|',
   'this.partyFrameMover.relocalize|',
@@ -390,6 +391,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
   readonly memos: readonly string[] | 'coordinator';
   readonly reason: string;
 }> = [
+  {
+    file: 'map_semantic_accessibility_core.ts',
+    memos: ['lastHash', 'lastLanguage'],
+    reason:
+      'lastHash retains the text-independent marker summary signature, while lastLanguage is compared against getLanguage() in the same early-return guard. A locale switch always moves lastLanguage and rebuilds every localized label on the next map paint, so the gate is explicitly locale-aware rather than a stale-language hazard.',
+  },
   {
     file: 'claudium_window.ts',
     memos: ['paintedWalletMarkup'],
@@ -716,7 +723,13 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // covered it) into hud/woc_trade/woc_trade_controller.ts, carrying the
       // coordinator-era posture unchanged; the row states the reasoning and
       // the deferred relocalize call.
-    ).toBe(9);
+      // 10 as of the v0.38.0 sync merge, which brought in map semantic
+      // accessibility: lastHash is paired with lastLanguage in the same
+      // guard, so getLanguage() changing explicitly invalidates the
+      // localized summary without a separate fan-out arm. Each side of the
+      // merge had added one row (woc_trade above, the map core here), so the
+      // merged list carries both.
+    ).toBe(10);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {

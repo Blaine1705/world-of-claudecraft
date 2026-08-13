@@ -44,8 +44,11 @@ const MONOLITHS: MonolithRow[] = [
     // src/ui/error_text_i18n_core.ts, then from 19190 after the craft-deny
     // message table moved to src/ui/crafting_deny_core.ts (the v0.37.0 sync
     // merge had pushed the file over), keeping the zero-headroom posture.
+    // Re-pinned from 19177 after the v0.38.0 sync merge: the release's map
+    // overhaul extracted marker interaction out of the coordinator, so the
+    // merged file landed SMALLER and the ratchet follows it down.
     file: 'src/ui/hud.ts',
-    ceiling: 19177,
+    ceiling: 19160,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -57,9 +60,11 @@ const MONOLITHS: MonolithRow[] = [
     // Zero headroom, ratcheted down from 12660 after the broker custody pair
     // moved to src/sim/broker_custody.ts and the offline daily-rewards readout
     // to src/sim/daily_rewards_stub.ts (which also took sim.ts off the $WOC
-    // firewall allowlist in tests/architecture.test.ts).
+    // firewall allowlist in tests/architecture.test.ts). Re-pinned to the
+    // merged size after the v0.38.0 sync merge landed the release's civic
+    // service placements in the sim; still under the release's own 12660.
     file: 'src/sim/sim.ts',
-    ceiling: 12428,
+    ceiling: 12436,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
