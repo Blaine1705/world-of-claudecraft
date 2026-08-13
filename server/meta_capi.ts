@@ -177,3 +177,41 @@ export function trackReachedLevel5(
     customData: { milestone: 'level_5' },
   });
 }
+
+/** Level 2 fires inside the first session for most players (median 18 min vs
+ *  2.2 h for level 5), at roughly 3.4x the volume: a much denser optimization
+ *  signal for the ad platform's learning phase, with ReachedLevel5 retained
+ *  as the quality backstop. */
+export function trackReachedLevel2(
+  characterId: number | string,
+  userData: CapiUserData,
+  sourceUrl?: string,
+): Promise<void> {
+  const id = String(characterId);
+  return sendCapiEvent({
+    eventName: 'ReachedLevel2',
+    eventId: `lvl2_${id}`,
+    eventSourceUrl: sourceUrl,
+    userData: { externalId: id, ...userData },
+    customData: { milestone: 'level_2' },
+  });
+}
+
+/** Fired once per account, on the first session opened during day seven
+ *  after signup (the claim lives in ua_capi_db.ts). Not an optimization
+ *  event at current volumes: it exists so Ads Manager can report which
+ *  campaigns and creatives produce players who LAST. */
+export function trackDay7Retained(
+  accountId: number | string,
+  userData: CapiUserData,
+  sourceUrl?: string,
+): Promise<void> {
+  const id = String(accountId);
+  return sendCapiEvent({
+    eventName: 'D7Retained',
+    eventId: `d7_${id}`,
+    eventSourceUrl: sourceUrl,
+    userData: { externalId: id, ...userData },
+    customData: { milestone: 'day_7_retained' },
+  });
+}

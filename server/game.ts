@@ -275,7 +275,7 @@ import {
   type ListReadGuardState,
 } from './list_read_guard';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
-import { trackReachedLevel5 } from './meta_capi';
+import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
 import {
   applyMobScanTick,
   createMobScanTickStats,
@@ -3988,6 +3988,9 @@ export class GameServer {
         reconcileEpicOnLogin(accountId);
       })
       .catch(() => {});
+    // D7Retained ad conversion: fires once per account when a session opens
+    // during day seven after signup (atomic claim inside; fire-and-forget).
+    maybeTrackDay7Retained(session);
     openPlaySession(accountId, characterId, name, meta, initialLevel)
       .then((id) => {
         session.dbSessionId = id;
@@ -9737,20 +9740,11 @@ export class GameServer {
         const s = this.clients.get(ev.entityId);
         if (s) recordFtueDeath(s, this.sim, ev.entityId, ev.killerId);
       }
-      if (ev.type === 'levelup' && ev.level === 5 && ev.pid !== undefined) {
+      if (ev.type === 'levelup' && (ev.level === 2 || ev.level === 5) && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
-        if (s) {
-          void trackReachedLevel5(
-            s.characterId,
-            {
-              clientIp: s.ip,
-              clientUserAgent: s.userAgent,
-              fbp: s.fbp,
-              fbc: s.fbc,
-            },
-            s.sourceUrl,
-          );
-        }
+        // Level 2 and 5 ad conversions, email-enriched for match quality
+        // (ua_capi.ts); other levels no-op inside the module.
+        if (s) trackLevelMilestoneCapi(s, ev.level);
       }
       if (ev.type === 'levelup' && ev.level === MAX_LEVEL && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
