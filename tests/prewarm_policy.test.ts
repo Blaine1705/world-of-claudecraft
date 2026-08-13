@@ -46,6 +46,11 @@ const BASE: PrewarmPolicyInput = {
   maxViewsConstrained: 2,
 };
 
+const MAIN_SOURCE = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').replace(
+  /\r\n/g,
+  '\n',
+);
+
 // The full manifest id order the renderer builds, for the reorder tests.
 // Kept in lockstep with the renderer by the "matches the renderer's real
 // manifest" case below, which parses the source.
@@ -81,6 +86,33 @@ const MANIFEST_IDS = [
   'render.settle-passes',
   'diagnostics.baseline',
 ];
+
+describe('graphics rebuild reveal wiring', () => {
+  it('marks the published renderer immediately before recoverable rebuild reveal', () => {
+    const coordinatorAt = MAIN_SOURCE.indexOf(
+      'const graphicsRebuild = new GraphicsRebuildCoordinator',
+    );
+    const hideCallbackAt = MAIN_SOURCE.indexOf('hideOpaqueCurtain: () => {', coordinatorAt);
+    const markAt = MAIN_SOURCE.indexOf('renderer.markGpuHitchReveal();', hideCallbackAt);
+    const hideAt = MAIN_SOURCE.indexOf('hideLoadingScreen();', markAt);
+    expect(coordinatorAt).toBeGreaterThan(-1);
+    expect(hideCallbackAt).toBeGreaterThan(coordinatorAt);
+    expect(markAt).toBeGreaterThan(hideCallbackAt);
+    expect(hideAt).toBeGreaterThan(markAt);
+    expect(MAIN_SOURCE.slice(markAt + 'renderer.markGpuHitchReveal();'.length, hideAt)).toMatch(
+      /^\s*$/,
+    );
+
+    // The coordinator uses this callback for both the committed target and the
+    // recoverable rollback. Keep the initial world reveal on its existing path.
+    const initialRevealAt = MAIN_SOURCE.indexOf('const revealWorld = (): void => {');
+    const initialMarkAt = MAIN_SOURCE.indexOf('renderer.markGpuHitchReveal();', initialRevealAt);
+    const initialHideAt = MAIN_SOURCE.indexOf('hideLoadingScreen();', initialMarkAt);
+    expect(initialRevealAt).toBeGreaterThan(-1);
+    expect(initialMarkAt).toBeGreaterThan(initialRevealAt);
+    expect(initialHideAt).toBeGreaterThan(initialMarkAt);
+  });
+});
 
 /** The renderer's manifest entries parsed from source: id, and whether the
  *  literal carries required / deadlineExempt properties. */
@@ -325,7 +357,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     // could eat the whole await reserve and leave world.initial-frame drawing
     // still-linking programs (QA finding, hitch-hunt P1).
     expect(compileEntry).toContain(
-      'await submitCompileUnits(true, Math.min(gpuSubmitDeadline, compileAwaitDeadline));',
+      "await submitCompileUnits(\n            true,\n            Math.min(gpuSubmitDeadline, compileAwaitDeadline),\n            'programs.compile',\n          );",
     );
     // Deferred units count into the honesty gate: planned includes them and
     // the dropped count marks the entry partial, never completed.
@@ -349,7 +381,11 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     // wiring the 22 s production overrun comes back with every unit test
     // green (QA finding B2).
     expect(renderer).toContain(
-      'prewarmSubmitShouldStop(\n            performance.now(),\n            deadlineMs,\n            policy.finishFullManifestBeforeReveal,\n          )',
+      'prewarmSubmitShouldStop(\n          performance.now(),\n          deadlineMs,\n          policy.finishFullManifestBeforeReveal,\n        )',
+    );
+    expect(renderer).toContain('if (!(await pacing.awaitSlot(outOfTime))) {');
+    expect(renderer).toContain(
+      'submitPrewarmCompileUnit(unit, lane, {\n            lifecycle: compileLifecycle,\n            pacing,',
     );
     // The deferral lifecycle, pinned end to end (QA finding B3): stopped
     // units are retained, drained FIRST by the next submission (their groups
@@ -376,7 +412,9 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       '...stagedCompileGroupsNow().map(([id, group]) => ({ id, exists: group !== null })),',
     );
     expect(renderer).toContain('sharedDedupe: compileDedupe,');
-    expect(renderer).toContain('await submitCompileUnits(false)');
+    expect(renderer).toContain(
+      "await submitCompileUnits(false, gpuSubmitDeadline, 'programs.compile-submit');",
+    );
   });
 
   it('reserves await-all room so the initial frame always starts before the hard deadline', () => {

@@ -431,6 +431,7 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
+  'src/render/adaptive_link_budget_core.ts',
   'src/render/affliction_familiar_core.ts',
   'src/render/characters/portrait_prewarm_core.ts',
   'src/render/reveal_gate_core.ts',
@@ -498,6 +499,7 @@ const RENDER_PURE_CORES = [
   'src/render/net_interp_core.ts',
   'src/render/paladin_ascension_core.ts',
   'src/render/paladin_sun_verdict_core.ts',
+  'src/render/prewarm_compile_submission_core.ts',
   'src/render/prewarm_policy.ts',
   'src/render/camp_brazier_placement_core.ts',
   'src/render/night_accents_core.ts',

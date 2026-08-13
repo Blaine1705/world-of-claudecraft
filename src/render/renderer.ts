@@ -318,6 +318,7 @@ import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { stepLichHeartbeat } from './lich_audio_state_core';
 import { LightPulses } from './light_pulses';
+import { createPrewarmPacing, type PrewarmPacing } from './link_rate_budget';
 import { renderLoadMeasure } from './load_marks';
 import {
   type LocoState,
@@ -416,6 +417,15 @@ import {
   reconcileViewPointLights,
 } from './point_light_budget';
 import { buildComposer, type PostPipeline } from './post';
+import {
+  createPrewarmCompileLifecycle,
+  type PrewarmCompileLifecycle,
+  type RendererPrewarmCategory,
+  type RendererPrewarmDiagnosticsBaselineStats,
+  type RendererPrewarmManifestEntryStats,
+  type RendererPrewarmStats,
+} from './prewarm_compile_lifecycle';
+import { submitPrewarmCompileUnit } from './prewarm_compile_submission_core';
 import {
   boundedPrewarmVisibility,
   runBackgroundPrewarm,
@@ -1009,82 +1019,6 @@ interface RendererQualityChangeStats {
   reason: RenderBudgetState['reason'];
   previousLevels: RenderBudgetState['levels'];
   levels: RenderBudgetState['levels'];
-}
-
-type RendererPrewarmCategory =
-  | 'views'
-  | 'world'
-  | 'sky'
-  | 'props'
-  | 'entities'
-  | 'objects'
-  | 'vfx'
-  | 'post'
-  | 'diagnostics';
-
-interface RendererPrewarmManifestEntryStats {
-  id: string;
-  category: RendererPrewarmCategory;
-  priority: number;
-  required: boolean;
-  /** 'partial': ran, but a deadline (or a pending asset prefetch) trimmed the
-   *  planned work; the counts below say how much actually happened. An entry
-   *  that did zero or partial work must never read 'completed'. */
-  status: 'completed' | 'partial' | 'skipped' | 'timed-out' | 'failed';
-  elapsedMs: number;
-  remainingMsAfter: number;
-  passes: number;
-  programsBefore: number;
-  programsAfter: number;
-  programDelta: number;
-  texturesBefore: number;
-  texturesAfter: number;
-  textureDelta: number;
-  /** Work units actually done / planned, for entries that track progress. */
-  workDone?: number;
-  workPlanned?: number;
-  detail?: string;
-}
-
-interface RendererPrewarmDiagnosticsBaselineStats {
-  programs: number;
-  textures: number;
-  totalObjects: number;
-  estimatedDraws: number;
-  estimatedTriangles: number;
-  categories: Record<string, { draws: number; triangles: number; materials: number }>;
-}
-
-export interface RendererPrewarmStats {
-  elapsedMs: number;
-  maxMs: number;
-  createdViews: number;
-  candidateViews: number;
-  renderPasses: number;
-  programsBefore: number;
-  programsAfter: number;
-  texturesBefore: number;
-  texturesAfter: number;
-  textureUploads: number;
-  compileMode: 'async' | 'sync' | 'none';
-  compileMs: number;
-  compileTimedOut: boolean;
-  timedOut: boolean;
-  remainingMs: number;
-  budgetUsedRatio: number;
-  createdViewTypes: string[];
-  manifestPlanned: number;
-  manifestEntries: RendererPrewarmManifestEntryStats[];
-  manifestCompleted: number;
-  /** Entries that ran but were trimmed by a deadline or a pending prefetch. */
-  manifestPartial: number;
-  manifestSkipped: number;
-  manifestTimedOut: number;
-  manifestFailed: number;
-  partialEntryIds: string[];
-  timedOutEntryIds: string[];
-  failedEntryIds: string[];
-  diagnosticsBaseline: RendererPrewarmDiagnosticsBaselineStats | null;
 }
 
 interface ClickMarkerSlot {
@@ -2079,6 +2013,12 @@ export class Renderer {
     visibleViews: 0,
   };
   private lastPrewarmStats: RendererPrewarmStats | null = null;
+  private gpuHitchCompileLifecycle: PrewarmCompileLifecycle | null = null;
+  private gpuHitchPacing: {
+    controller: PrewarmPacing;
+    compileBatchRoots: number;
+    hardMaxMs: number;
+  } | null = null;
   private readonly renderDiagnostics = new RenderDiagnostics({
     counters: () => ({
       programs: this.webgl.info.programs?.length ?? 0,
@@ -4409,6 +4349,7 @@ export class Renderer {
   perfStats(): {
     graphicsConfigVersion: number;
     tier: string;
+    currentZoneId: string | null;
     qualityBuckets: {
       version: number;
       bands: GfxBucketBands;
@@ -4463,6 +4404,7 @@ export class Renderer {
     return {
       graphicsConfigVersion: GFX.graphicsConfigVersion,
       tier: GFX.tier,
+      currentZoneId: this.zoneIdAt(this.sim.player.pos.x, this.sim.player.pos.z),
       qualityBuckets: {
         version: GFX.graphicsConfigVersion,
         bands: GFX.bucketBands,
@@ -4522,6 +4464,21 @@ export class Renderer {
       prewarm: this.lastPrewarmStats,
       gpuQueue: this.backgroundGpuWork.stats(),
     };
+  }
+
+  /** Diagnostic-only lifecycle boundary, called immediately before curtain fade. */
+  markGpuHitchReveal(): void {
+    this.gpuHitchCompileLifecycle?.markReveal();
+    this.gpuHitchPacing?.controller.markReveal();
+    if (this.lastPrewarmStats?.prewarmPacing && this.gpuHitchPacing) {
+      Object.assign(
+        this.lastPrewarmStats.prewarmPacing,
+        this.gpuHitchPacing.controller.receipt(
+          this.gpuHitchPacing.compileBatchRoots,
+          this.gpuHitchPacing.hardMaxMs,
+        ),
+      );
+    }
   }
 
   /** Overlay-gated hitch correlation: enabled by the ?perf monitor only. */
@@ -5945,10 +5902,13 @@ export class Renderer {
     });
     const constrainedPrewarm = policy.minimalManifest;
     const maxMs = Math.max(0, options.maxMs ?? policy.maxMs);
+    const pacing = createPrewarmPacing(location.search, { now: () => performance.now() });
     const defaultHardMaxMs = constrainedPrewarm
       ? VIEW_PREWARM_HARD_MAX_MS_CONSTRAINED
-      : VIEW_PREWARM_HARD_MAX_MS;
+      : (pacing.knobs.hardMaxMs ?? VIEW_PREWARM_HARD_MAX_MS);
     const hardMaxMs = Math.max(maxMs, options.hardMaxMs ?? defaultHardMaxMs);
+    const compileBatchRoots = pacing.knobs.compileBatchRoots ?? PREWARM_COMPILE_BATCH_ROOTS;
+    this.gpuHitchPacing = { controller: pacing, compileBatchRoots, hardMaxMs };
     const started = performance.now();
     const deadline = started + maxMs;
     const hardDeadline = started + hardMaxMs;
@@ -6055,6 +6015,8 @@ export class Renderer {
     let compileUnitsPlanned = 0;
     let compileUnitsDone = 0;
     let compileUnitsDropped = 0;
+    const compileLifecycle = createPrewarmCompileLifecycle(() => performance.now());
+    this.gpuHitchCompileLifecycle = compileLifecycle;
     let vfxPrewarmBursts = 0;
     let compileMode: RendererPrewarmStats['compileMode'] = 'none';
     let compileMs = 0;
@@ -6144,7 +6106,7 @@ export class Renderer {
       const stagedRoots = new Set<THREE.Object3D>(
         stagedGroups.flatMap(([, group]) => (group ? [group] : [])),
       );
-      return buildPrewarmCompileUnits(
+      const units = buildPrewarmCompileUnits(
         [
           ...(includeGroup('scene')
             ? [
@@ -6227,9 +6189,11 @@ export class Renderer {
             );
           },
           sharedDedupe: compileDedupe,
-          batchSize: PREWARM_COMPILE_BATCH_ROOTS,
+          batchSize: compileBatchRoots,
         },
       );
+      for (const unit of units) compileLifecycle.recordFor(unit, 'programs.compile');
+      return units;
     };
 
     // Early compile submission: compileAsync links settle off-thread, so the
@@ -6264,7 +6228,11 @@ export class Renderer {
     // entry's tail call passes min(gpuSubmitDeadline, compileAwaitDeadline)
     // so the submit loop can never eat the await reserve that keeps
     // world.initial-frame's programs linked before it draws.
-    const submitCompileUnits = async (includeLate: boolean, deadlineMs = gpuSubmitDeadline) => {
+    const submitCompileUnits = async (
+      includeLate: boolean,
+      deadlineMs = gpuSubmitDeadline,
+      lane = includeLate ? 'programs.compile' : 'programs.compile-submit',
+    ) => {
       const plan = planCompileSubmission({
         groups: [
           { id: 'scene', exists: true },
@@ -6281,18 +6249,19 @@ export class Renderer {
       // Earlier-deferred units resubmit ahead of the fresh collection; their
       // groups are already marked, so the plan above never re-collected them.
       const pending = [...deferredSubmitUnits.splice(0, deferredSubmitUnits.length), ...units];
+      const outOfTime = () =>
+        prewarmSubmitShouldStop(
+          performance.now(),
+          deadlineMs,
+          policy.finishFullManifestBeforeReveal,
+        );
       for (let i = 0; i < pending.length; i++) {
         // Deadline-aware, checked BETWEEN units: one uninterrupted submit loop
         // measured 22 s of synchronous prologue work in production, sailing
         // past the 15 s hard deadline and dropping every entry behind it, the
         // deadline-exempt debt payers included (hitch-hunt S1/S2).
-        if (
-          prewarmSubmitShouldStop(
-            performance.now(),
-            deadlineMs,
-            policy.finishFullManifestBeforeReveal,
-          )
-        ) {
+        if (!(await pacing.awaitSlot(outOfTime))) {
+          for (const deferred of pending.slice(i)) compileLifecycle.recordFor(deferred, lane);
           deferredSubmitUnits.push(...pending.slice(i));
           // The deferred units' compiles now settle AFTER the manifest, so
           // the warm entity/NPC pools must not publish from the manifest's
@@ -6305,12 +6274,15 @@ export class Renderer {
           return;
         }
         const unit = pending[i];
-        submittedCompileUnits.push({
-          id: unit.id,
-          done: Promise.resolve(unit.run()).catch((err: unknown) => {
-            console.warn(`Renderer async prewarm compile failed: ${unit.id}`, err);
+        submittedCompileUnits.push(
+          submitPrewarmCompileUnit(unit, lane, {
+            lifecycle: compileLifecycle,
+            pacing,
+            programCount: () => this.webgl.info.programs?.length ?? 0,
+            onError: (err) =>
+              console.warn(`Renderer async prewarm compile failed: ${unit.id}`, err),
           }),
-        });
+        );
         // Yield between unit submissions: each carries up to 32 synchronous
         // compileAsync prologue walks, and links progress off-thread anyway.
         await new Promise<void>((resolve) => setTimeout(resolve, 0));
@@ -6786,7 +6758,7 @@ export class Renderer {
         required: false,
         run: async () => {
           if (policy.skipMonolithCompile || !this.asyncCompileSupported) return;
-          await submitCompileUnits(false);
+          await submitCompileUnits(false, gpuSubmitDeadline, 'programs.compile-submit');
         },
         detail: () =>
           deferredSubmitUnits.length > 0
@@ -7171,7 +7143,11 @@ export class Renderer {
           // the late-staged groups (weapon-vfx stages at priority 61), any
           // group that did not exist yet back then (landmark stages at 48),
           // and the live-scene re-collection.
-          await submitCompileUnits(true, Math.min(gpuSubmitDeadline, compileAwaitDeadline));
+          await submitCompileUnits(
+            true,
+            Math.min(gpuSubmitDeadline, compileAwaitDeadline),
+            'programs.compile',
+          );
           compileUnitsPlanned = submittedCompileUnits.length + deferredSubmitUnits.length;
           // Honesty gate: units deferred mid-run went to the resume lane, so
           // this entry must report 'partial', never 'completed'
@@ -7579,6 +7555,8 @@ export class Renderer {
       timedOutEntryIds: manifestTimedOut.map((entry) => entry.id),
       failedEntryIds: manifestFailed.map((entry) => entry.id),
       diagnosticsBaseline,
+      compileUnits: compileLifecycle.records,
+      prewarmPacing: pacing.receipt(compileBatchRoots, hardMaxMs),
     };
     this.lastPrewarmStats = stats;
     this.prewarmedZonePrograms.add(activeZone.id);
