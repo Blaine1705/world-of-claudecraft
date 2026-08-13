@@ -20,19 +20,21 @@ import {
   type UpsertAdSpendInput,
   upsertAdSpend,
 } from './ad_spend_db';
-import { accountAndScopeForToken, pool } from './db';
-import { ADMIN_META, type AdminAuthDb, createRequireAdmin } from './http/middleware/require_admin';
+import { requireAdmin } from './admin';
+import { pool } from './db';
+import { ADMIN_META } from './http/middleware/require_admin';
 import type { Ctx, RouteDef } from './http/types';
 import { json, readBody } from './http_util';
-import { adminRolesForAccount } from './staff_db';
 
 // ---------------------------------------------------------------------------
 // Db seam (the auth_routes.ts shape): the real bundle, swappable in tests.
+// Auth is NOT part of this seam: the routes mount admin.ts's shared
+// requireAdmin gate, so the setAdminDbForTests injection and the admin scope
+// sweep (tests/server/http/ownership_coverage.test.ts) stay authoritative
+// for these routes too.
 // ---------------------------------------------------------------------------
 
 const REAL_AD_SPEND_DB = {
-  accountAndScopeForToken,
-  adminRolesForAccount,
   upsertAdSpend: (input: UpsertAdSpendInput): Promise<AdSpendRow> => upsertAdSpend(pool, input),
   listAdSpend: (days: number): Promise<AdSpendRow[]> => listAdSpend(pool, days),
   deleteAdSpend: (day: string, campaign: string): Promise<boolean> =>
@@ -41,8 +43,7 @@ const REAL_AD_SPEND_DB = {
 let adSpendDb = REAL_AD_SPEND_DB;
 
 /** Override the ad-spend db bundle with a fake (test-only; merges over the
- *  CURRENT bundle so a test can layer a second override without re-supplying
- *  its auth fakes; resetAdSpendDbForTests restores the real bundle). */
+ *  CURRENT bundle; resetAdSpendDbForTests restores the real bundle). */
 export function setAdSpendDbForTests(overrides: Partial<typeof REAL_AD_SPEND_DB>): void {
   adSpendDb = { ...adSpendDb, ...overrides };
 }
@@ -51,14 +52,6 @@ export function setAdSpendDbForTests(overrides: Partial<typeof REAL_AD_SPEND_DB>
 export function resetAdSpendDbForTests(): void {
   adSpendDb = REAL_AD_SPEND_DB;
 }
-
-// The admin-auth gate, reading the LIVE bundle per request like admin.ts does.
-const requireAdmin = createRequireAdmin(
-  (): AdminAuthDb => ({
-    accountAndScopeForToken: (token) => adSpendDb.accountAndScopeForToken(token),
-    adminRolesForAccount: (accountId) => adSpendDb.adminRolesForAccount(accountId),
-  }),
-);
 
 const ok = (ctx: Ctx, data: unknown): void =>
   json(ctx.res, 200, { success: true, data, error: null });

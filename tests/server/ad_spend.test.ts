@@ -1,18 +1,17 @@
-// The ad-spend ledger admin endpoints (server/ad_spend.ts): the auth gate,
-// the upsert/list/delete handlers through the routes table with the db seam
-// faked (no Postgres), and the validation surface of ad_spend_db's input
-// checks (driven through the handler error arm).
+// The ad-spend ledger admin endpoints (server/ad_spend.ts): the shared admin
+// auth gate (driven through admin.ts's setAdminDbForTests seam, the same one
+// the ownership scope sweep uses), the upsert/list/delete handlers through
+// the routes table with the data seam faked (no Postgres), and the
+// validation surface of ad_spend_db's input checks. Real modules, no db
+// module mock: nothing here is allowed to reach the pg pool (the
+// ownership_coverage idiom).
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('../../server/db', () => ({
-  pool: { query: vi.fn(async () => ({ rows: [], rowCount: 0 })) },
-  accountAndScopeForToken: vi.fn(async () => null),
-}));
 
 import { resetAdSpendDbForTests, routes, setAdSpendDbForTests } from '../../server/ad_spend';
 import type { AdSpendRow } from '../../server/ad_spend_db';
 import { upsertAdSpend } from '../../server/ad_spend_db';
+import { resetAdminDbForTests, setAdminDbForTests } from '../../server/admin';
 import { fakeCtx } from './helpers';
 
 const ADMIN_TOKEN = 'a'.repeat(64);
@@ -73,10 +72,12 @@ const sampleRow: AdSpendRow = {
 };
 
 beforeEach(() => {
-  setAdSpendDbForTests({
-    accountAndScopeForToken: async (token) =>
+  setAdminDbForTests({
+    accountAndScopeForToken: async (token: string) =>
       token === ADMIN_TOKEN ? { accountId: 1, scope: 'full' as const } : null,
     adminRolesForAccount: async () => ({ username: 'ops', roles: ['admin'] }),
+  });
+  setAdSpendDbForTests({
     listAdSpend: async () => [sampleRow],
     upsertAdSpend: async (input) => ({ ...sampleRow, ...input }) as AdSpendRow,
     deleteAdSpend: async () => true,
@@ -85,6 +86,7 @@ beforeEach(() => {
 
 afterEach(() => {
   resetAdSpendDbForTests();
+  resetAdminDbForTests();
 });
 
 describe('auth gate', () => {
@@ -95,7 +97,11 @@ describe('auth gate', () => {
   });
 
   it('rejects a staff account without the write permission on POST', async () => {
-    setAdSpendDbForTests({
+    // setAdminDbForTests overlays the REAL bundle, not the previous override,
+    // so the token fake must ride along with the viewer-role fake.
+    setAdminDbForTests({
+      accountAndScopeForToken: async (token: string) =>
+        token === ADMIN_TOKEN ? { accountId: 1, scope: 'full' as const } : null,
       adminRolesForAccount: async () => ({ username: 'viewer', roles: ['viewer'] }),
     });
     const read = await runRoute('GET', '/admin/api/ad-spend');
