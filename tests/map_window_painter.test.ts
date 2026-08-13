@@ -642,6 +642,9 @@ describe('map_window_painter: cadence + cached background preserved', () => {
     expect(tooltipAdapter).not.toContain('getBoundingClientRect');
     expect(markerInteraction.match(/\.getBoundingClientRect\(/g)).toHaveLength(1);
     expect(hud).toContain('this.mapMarkerInteraction.refreshGeometry(canvas);');
+    expect(hud).toContain(
+      "if (el.id === 'map-window') this.mapMarkerInteraction.refreshCurrentGeometry();",
+    );
     // The gather arm resolves through the shared world-hover pair (behind the
     // tested memo seam), so the map tip and the 3D node tip cannot disagree.
     expect(markerTooltipContent).toContain('resolveGatherTipMemo(this.gatherMemo, marker.nodeId');

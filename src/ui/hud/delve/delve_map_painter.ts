@@ -23,6 +23,7 @@ import { DELVE_MODULE_LAYOUTS, type DelveModuleId } from '../../../sim/delve_lay
 import type { DelveRunInfo, IWorld } from '../../../world_api';
 import { tEntity } from '../../entity_i18n';
 import { type TranslationKey, t } from '../../i18n';
+import { isLiveMapEntityDisclosed } from '../../map_entity_disclosure_core';
 import {
   EMPTY_MAP_MARKER_ART,
   MAP_MARKER_SIZES,
@@ -38,7 +39,6 @@ import {
 } from '../../map_marker_semantics_core';
 import type { PainterHostWriters } from '../../painter_host';
 import { TextSpriteCache } from '../../text_sprite_cache';
-import { isInstanceMapEntityDisclosed } from '../instance_map_disclosure_core';
 import {
   type DelveMapFit,
   delveAreaLabel,
@@ -234,7 +234,7 @@ export function delveDrawModel(
   const companionId = world.companionState?.entityId;
   for (const e of world.entities.values()) {
     if (e.id === p.id || e.id === companionId) continue;
-    if (!isInstanceMapEntityDisclosed(p.pos.x, p.pos.z, e.pos.x, e.pos.z)) continue;
+    if (!isLiveMapEntityDisclosed(p.pos.x, p.pos.z, e.pos.x, e.pos.z)) continue;
     let semantic: DelveObjectMarker['semantic'] | null = null;
     if (e.kind === 'object') {
       const classified = classifyMapObjectMarker(e, { delveRun: run });

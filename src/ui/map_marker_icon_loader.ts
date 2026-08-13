@@ -7,8 +7,10 @@
 // Rift/delve navigation and reward state is baked by the same bounded cache:
 // rank notches, sealed locks, active rings, opened checks, jammed crosses, and
 // bountiful corner points never run in either painter's redraw loop.
-// All treatment happens once here, never in a redraw. A missing/loading asset
-// returns null so procedural fallbacks remain available.
+// Treatment runs at decode. Theme and forced-colors signals re-sample the
+// palette once, then rebuild decoded sprites only when a token value changed,
+// never in a redraw. A missing/loading asset returns null so procedural
+// fallbacks remain available.
 
 import {
   MAP_MARKER_ART_IDS,
@@ -43,6 +45,10 @@ export const MAP_MARKER_RASTER_COLOR_TOKENS = {
 export type MapMarkerRasterColors = Readonly<{
   [Key in keyof typeof MAP_MARKER_RASTER_COLOR_TOKENS]: string;
 }>;
+
+export interface MapMarkerArtCache extends MapMarkerArt {
+  refreshPalette(): void;
+}
 
 export function resolveMapMarkerRasterColors(
   style: Pick<CSSStyleDeclaration, 'getPropertyValue'>,
@@ -372,12 +378,14 @@ function browserImage(): HTMLImageElement | null {
 export function createMapMarkerArt(
   hostDocument: Pick<Document, 'createElement'>,
   createImage: ImageFactory = browserImage,
-  colors: MapMarkerRasterColors = resolveMapMarkerRasterColors(
-    getComputedStyle((hostDocument as Document).documentElement),
-  ),
-): MapMarkerArt {
+  fixedColors?: MapMarkerRasterColors,
+): MapMarkerArtCache {
   const images = new Map<MapMarkerArtId, IconLoadState>();
   const sprites = new Map<MapMarkerArtId, Map<MapMarkerSize, HTMLCanvasElement>>();
+  const resolveColors = (): MapMarkerRasterColors =>
+    fixedColors ??
+    resolveMapMarkerRasterColors(getComputedStyle((hostDocument as Document).documentElement));
+  let colors = resolveColors();
   let scratch: HTMLCanvasElement | null = null;
 
   const rasterize = (id: MapMarkerArtId, image: HTMLImageElement): void => {
@@ -461,6 +469,15 @@ export function createMapMarkerArt(
     if (image.complete && image.naturalWidth > 0) rasterize(id, image);
   };
 
+  const paletteMatches = (next: MapMarkerRasterColors): boolean => {
+    for (const key of Object.keys(MAP_MARKER_RASTER_COLOR_TOKENS) as Array<
+      keyof MapMarkerRasterColors
+    >) {
+      if (colors[key] !== next[key]) return false;
+    }
+    return true;
+  };
+
   return {
     sprite(id, size): CanvasImageSource | null {
       ensure(id);
@@ -468,6 +485,15 @@ export function createMapMarkerArt(
     },
     preload(): void {
       for (const id of MAP_MARKER_ART_IDS) ensure(id);
+    },
+    refreshPalette(): void {
+      const next = resolveColors();
+      if (paletteMatches(next)) return;
+      colors = next;
+      sprites.clear();
+      for (const [id, state] of images) {
+        if (state !== 'loading' && state !== 'missing') rasterize(id, state);
+      }
     },
   };
 }

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { DELVE_LIST, PORTALS, zoneContaining } from '../src/sim/data';
+import { LIVE_MAP_ENTITY_DISCLOSURE_RADIUS } from '../src/ui/map_entity_disclosure_core';
 import {
   isNearbyLiveRiftZoneMapEntity,
-  LIVE_RIFT_ZONE_MAP_RANGE,
   STABLE_MAP_NAVIGATION_LANDMARKS,
 } from '../src/ui/map_navigation_landmarks_core';
 
@@ -77,12 +77,34 @@ describe('live rift zone-map visibility', () => {
   it('includes live rifts through the inclusive 80-yard host-fair boundary', () => {
     expect(isNearbyLiveRiftZoneMapEntity(riftAt(player.x + 79.99, player.z), player)).toBe(true);
     expect(
-      isNearbyLiveRiftZoneMapEntity(riftAt(player.x + LIVE_RIFT_ZONE_MAP_RANGE, player.z), player),
+      isNearbyLiveRiftZoneMapEntity(
+        riftAt(player.x + LIVE_MAP_ENTITY_DISCLOSURE_RADIUS, player.z),
+        player,
+      ),
     ).toBe(true);
     expect(
       isNearbyLiveRiftZoneMapEntity(
-        riftAt(player.x + LIVE_RIFT_ZONE_MAP_RANGE + 0.01, player.z),
+        riftAt(player.x + LIVE_MAP_ENTITY_DISCLOSURE_RADIUS + 0.01, player.z),
         player,
+      ),
+    ).toBe(false);
+  });
+
+  it('uses planar distance at the negative diagonal boundary', () => {
+    const negativePlayer = { x: -200, z: -300 };
+    const dx = LIVE_MAP_ENTITY_DISCLOSURE_RADIUS * 0.6;
+    const dz = LIVE_MAP_ENTITY_DISCLOSURE_RADIUS * 0.8;
+
+    expect(
+      isNearbyLiveRiftZoneMapEntity(
+        riftAt(negativePlayer.x - dx, negativePlayer.z - dz),
+        negativePlayer,
+      ),
+    ).toBe(true);
+    expect(
+      isNearbyLiveRiftZoneMapEntity(
+        riftAt(negativePlayer.x - dx, negativePlayer.z - dz - 0.01),
+        negativePlayer,
       ),
     ).toBe(false);
   });

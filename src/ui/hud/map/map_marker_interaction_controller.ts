@@ -88,6 +88,11 @@ export class MapMarkerInteractionController {
     this.geometryCanvas = canvas;
   }
 
+  refreshCurrentGeometry(): void {
+    if (!this.geometryCanvas) return;
+    this.refreshGeometry(this.geometryCanvas);
+  }
+
   showAt(canvas: HTMLCanvasElement, clientX: number, clientY: number, touch = false): boolean {
     if (canvas !== this.geometryCanvas) return false;
     return showMapMarkerTooltipAt(

@@ -4,9 +4,7 @@
 // deliberately obey the same 80-yard information boundary as their world art.
 
 import { DELVE_LIST, PORTALS, zoneContaining } from '../sim/data';
-
-export const LIVE_RIFT_ZONE_MAP_RANGE = 80;
-const LIVE_RIFT_ZONE_MAP_RANGE_SQUARED = LIVE_RIFT_ZONE_MAP_RANGE * LIVE_RIFT_ZONE_MAP_RANGE;
+import { isLiveMapEntityDisclosed } from './map_entity_disclosure_core';
 
 export type StableMapNavigationLandmark =
   | Readonly<{
@@ -90,7 +88,5 @@ export function isNearbyLiveRiftZoneMapEntity(
   playerPosition: Readonly<{ x: number; z: number }>,
 ): boolean {
   if (entity.templateId !== 'rift_portal' || entity.kind !== 'object') return false;
-  const dx = entity.pos.x - playerPosition.x;
-  const dz = entity.pos.z - playerPosition.z;
-  return dx * dx + dz * dz <= LIVE_RIFT_ZONE_MAP_RANGE_SQUARED;
+  return isLiveMapEntityDisclosed(playerPosition.x, playerPosition.z, entity.pos.x, entity.pos.z);
 }

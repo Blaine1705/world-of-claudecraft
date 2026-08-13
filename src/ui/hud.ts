@@ -3146,7 +3146,10 @@ export class Hud {
       bringToFront: (el) => this.bringWindowToFront(el),
       hideTooltip: () => this.hideTooltip(),
       pinWindow: (el, rect) => this.setWindowPixelPosition(el, rect.left, rect.top, rect),
-      commitWindow: (el, left, top, rect) => this.setWindowPixelPosition(el, left, top, rect),
+      commitWindow: (el, left, top, rect) => {
+        this.setWindowPixelPosition(el, left, top, rect);
+        if (el.id === 'map-window') this.mapMarkerInteraction.refreshCurrentGeometry();
+      },
     });
     installWindowResize({
       getScale: () => getUiScale(),
@@ -18892,6 +18895,10 @@ export class Hud {
 
   attachOptions(hooks: OptionsHooks): void {
     this.optionsHooks = hooks;
+  }
+
+  refreshMapMarkerArtPalette(): void {
+    this.mapMarkerArt.refreshPalette();
   }
 
   attachReporting(hooks: ReportHooks): void {

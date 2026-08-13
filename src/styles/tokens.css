@@ -285,9 +285,10 @@
     --color-map-gather-herb-cooldown: #90989a;
     --color-map-gather-herb-glow: rgba(105, 207, 114, 0.32);
     --color-map-gather-locked: var(--color-minimap-node-locked);
-    /* One-time map-marker raster treatments. The shared Hud cache resolves
-       these once before it bakes keylines, cooldown rings, locks, ranks, and
-       reward-state badges into exact-size sprites. */
+    /* Cached map-marker raster treatments. The shared Hud cache resolves these
+       at construction, re-samples them on theme and forced-colors signals, and
+       rebuilds only when a value changed. Keylines, cooldown rings, locks,
+       ranks, and reward-state badges stay outside every painter redraw. */
     --color-map-marker-keyline: #f5dfad;
     --color-map-marker-cooldown-arc-dark: #24292a;
     --color-map-marker-cooldown-arc-light: #c8cdcc;

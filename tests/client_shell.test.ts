@@ -2582,14 +2582,17 @@ describe('client HTML shell', () => {
     expect(hudTs).toContain('this.isWindowVisible(mapWindow)');
     expect(hudTs).toContain('this.isWindowVisible(questLogWindow)');
     expect(hudMobileCss).toContain(
-      '--mobile-map-quest-stack-top: max(10px, env(safe-area-inset-top));',
+      '--mobile-map-quest-stack-top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));',
+    );
+    expect(hudMobileCss).toContain(
+      '--mobile-map-quest-stack-bottom: calc(\n      max(10px, env(safe-area-inset-bottom)) /\n      var(--ui-scale, 1)\n    );',
     );
     expect(hudMobileCss).toContain('body.mobile-touch.mobile-map-quest-open #quest-log-window');
     expect(hudMobileCss).toContain('top: var(--mobile-map-quest-stack-top);');
     expect(hudMobileCss).toContain('max-height: var(--mobile-map-quest-log-max-height);');
     expect(hudMobileCss).toContain('body.mobile-touch.mobile-map-quest-open #map-window');
     expect(hudMobileCss).toContain('var(--mobile-map-quest-stack-gap)');
-    expect(hudMobileCss).toContain('22px');
+    expect(hudMobileCss).toContain('var(--mobile-map-stack-shell-height)');
     expect(hudMobileCss).toContain(
       'width: min(330px, calc(var(--app-vw) / var(--ui-scale, 1) - 32px));',
     );

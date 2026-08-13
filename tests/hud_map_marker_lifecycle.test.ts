@@ -18,10 +18,23 @@ import type {
   MapStationMarker,
   MapViewRect,
 } from '../src/ui/map_window_view';
+import type { WindowDragDeps } from '../src/ui/window_drag';
 import type { IWorld, RiftFloorView } from '../src/world_api';
 
 const mapPointMarkerHitsIntoCalls = vi.hoisted(() => vi.fn());
 const questAreaObjectivesAtIntoCalls = vi.hoisted(() => vi.fn());
+const installWindowDragCalls = vi.hoisted(() => vi.fn());
+
+vi.mock('../src/ui/window_drag', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../src/ui/window_drag')>();
+  return {
+    ...actual,
+    installWindowDrag: (deps: WindowDragDeps) => {
+      installWindowDragCalls(deps);
+      return { cancel: () => {}, destroy: () => {} };
+    },
+  };
+});
 
 vi.mock('../src/ui/map_window_view', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../src/ui/map_window_view')>();
@@ -58,6 +71,9 @@ function installFakeDocument(): void {
     createElement: (tagName: string) => fakeElement(tagName),
     querySelector: (selector: string) =>
       selector.startsWith('#') ? (hudElements.get(selector.slice(1)) ?? null) : null,
+    querySelectorAll: () => [],
+    addEventListener: () => {},
+    removeEventListener: () => {},
     body: {
       append: (...elements: HTMLElement[]) => {
         for (const element of elements) if (element.id) hudElements.set(element.id, element);
@@ -68,6 +84,7 @@ function installFakeDocument(): void {
 }
 
 interface MapHudHarness {
+  initWindowManagement(): void;
   showMapTipAt(
     mapCanvas: HTMLCanvasElement,
     clientX: number,
@@ -105,6 +122,8 @@ interface MapHudHarness {
   gatherNodeMapTooltipHtml(marker: MapGatherNodeMarker): string;
   questAreaTooltipHtml(refs: readonly QuestObjectiveRef[], activeCount?: number): string;
   paintTooltipAt(html: string, clientX: number, clientY: number): void;
+  syncAnyWindowOpenState(): void;
+  setWindowPixelPosition(element: HTMLElement, left: number, top: number, rect?: DOMRect): void;
   setDisplay(element: HTMLElement, display: string): void;
   setStyleProp(element: HTMLElement, prop: string, value: string): void;
   setText(element: HTMLElement, text: string): void;
@@ -435,6 +454,7 @@ function lifecycleHarness(): {
 
 beforeEach(() => {
   installFakeDocument();
+  installWindowDragCalls.mockClear();
   mapPointMarkerHitsIntoCalls.mockClear();
   questAreaObjectivesAtIntoCalls.mockClear();
 });
@@ -717,6 +737,57 @@ describe('Hud zone-map marker interaction', () => {
 
     hud.mapMarkerInteraction.refreshGeometry(canvas);
     expect(hud.showMapTipAt(canvas, 65, 100)).toBe(true);
+    expect(readRect).toHaveBeenCalledTimes(2);
+  });
+
+  it('refreshes cached projection geometry only when the map window drag commits', () => {
+    const canvas = canvasFixture();
+    let left = 100;
+    const readRect = vi.fn(
+      () =>
+        ({
+          x: left,
+          y: 50,
+          left,
+          top: 50,
+          width: 280,
+          height: 280,
+          right: left + 280,
+          bottom: 330,
+          toJSON: () => ({}),
+        }) as DOMRect,
+    );
+    canvas.getBoundingClientRect = readRect;
+    const { hud } = markerHarness();
+    Object.assign(hud, {
+      windowObserver: null,
+      syncAnyWindowOpenState: vi.fn(),
+      setWindowPixelPosition: (element: HTMLElement, nextLeft: number) => {
+        if (element.id === 'map-window') left = nextLeft;
+      },
+    });
+    vi.stubGlobal(
+      'MutationObserver',
+      class {
+        observe(): void {}
+      },
+    );
+    vi.stubGlobal('window', { addEventListener: vi.fn() });
+
+    hud.initWindowManagement();
+    const dragDeps = installWindowDragCalls.mock.lastCall?.[0] as WindowDragDeps | undefined;
+    expect(dragDeps).toBeDefined();
+    hud.mapMarkerInteraction.refreshGeometry(canvas);
+    expect(hud.showMapTipAt(canvas, 170, 150)).toBe(true);
+    expect(readRect).toHaveBeenCalledTimes(1);
+
+    dragDeps?.commitWindow({ id: 'bags' } as HTMLElement, 60, 50, {} as DOMRect);
+    expect(hud.showMapTipAt(canvas, 170, 150)).toBe(true);
+    expect(readRect).toHaveBeenCalledTimes(1);
+
+    dragDeps?.commitWindow({ id: 'map-window' } as HTMLElement, 30, 50, {} as DOMRect);
+    expect(hud.showMapTipAt(canvas, 170, 150)).toBe(false);
+    expect(hud.showMapTipAt(canvas, 100, 150)).toBe(true);
     expect(readRect).toHaveBeenCalledTimes(2);
   });
 });

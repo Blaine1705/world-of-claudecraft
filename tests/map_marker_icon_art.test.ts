@@ -35,6 +35,7 @@ const v2ProvenancePath = path.join(repoRoot, v2ProvenanceRef);
 const creditsPath = path.join(repoRoot, 'CREDITS.md');
 const loaderSource = readFileSync(path.join(repoRoot, 'src/ui/map_marker_icon_loader.ts'), 'utf8');
 const tokenSource = readFileSync(path.join(repoRoot, 'src/styles/tokens.css'), 'utf8');
+const mainSource = readFileSync(path.join(repoRoot, 'src/main.ts'), 'utf8');
 
 const RASTER_COLORS = {
   keyline: '#f5dfad',
@@ -487,6 +488,204 @@ describe('map marker painted art', () => {
       ]) {
         expect(strokeColors).toContain(color);
       }
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('refreshes a changed default palette without reloading decoded marker sources', () => {
+    const images: FakeImage[] = [];
+    const canvases: FakeCanvas[] = [];
+    const root = {};
+    let palettePrefix = 'initial';
+    const style = {
+      getPropertyValue: vi.fn((token: string) => {
+        const key = Object.entries(MAP_MARKER_RASTER_COLOR_TOKENS).find(
+          ([, expectedToken]) => expectedToken === token,
+        )?.[0];
+        return key ? `${palettePrefix}-${key}` : '';
+      }),
+    } as Pick<CSSStyleDeclaration, 'getPropertyValue'>;
+    const getComputedStyleMock = vi.fn(() => style);
+    vi.stubGlobal('getComputedStyle', getComputedStyleMock);
+
+    try {
+      const hostDocument = {
+        documentElement: root,
+        createElement: vi.fn((tag: string) => {
+          expect(tag).toBe('canvas');
+          const canvas = new FakeCanvas();
+          canvases.push(canvas);
+          return canvas;
+        }),
+      };
+      const art = createMapMarkerArt(hostDocument as unknown as Document, () => {
+        const image = new FakeImage();
+        images.push(image);
+        return image as unknown as HTMLImageElement;
+      });
+
+      expect(art.sprite('rift-entrance', 'minimapNavigationRankS')).toBeNull();
+      images[0].onload?.();
+      const initialSprite = art.sprite('rift-entrance', 'minimapNavigationRankS');
+      expect(initialSprite).not.toBeNull();
+      const initialCanvasCount = canvases.length;
+
+      art.refreshPalette();
+      expect(art.sprite('rift-entrance', 'minimapNavigationRankS')).toBe(initialSprite);
+      expect(canvases).toHaveLength(initialCanvasCount);
+
+      palettePrefix = 'refreshed';
+      art.refreshPalette();
+      const refreshedSprite = art.sprite('rift-entrance', 'minimapNavigationRankS');
+
+      expect(refreshedSprite).not.toBeNull();
+      expect(refreshedSprite).not.toBe(initialSprite);
+      expect(images).toHaveLength(1);
+      expect(images[0].srcAssignments).toEqual([mapMarkerIconUrl('rift-entrance')]);
+      expect(getComputedStyleMock).toHaveBeenCalledTimes(3);
+      expect(getComputedStyleMock).toHaveBeenLastCalledWith(root);
+      const refreshedCanvases = canvases.slice(initialCanvasCount);
+      expect(refreshedCanvases.length).toBeGreaterThan(0);
+      const refreshedFills = refreshedCanvases.flatMap((canvas) =>
+        canvas.fills.map((fill) => fill.style),
+      );
+      const refreshedStrokes = refreshedCanvases.flatMap((canvas) =>
+        canvas.strokes.map((stroke) => stroke.style),
+      );
+      expect(refreshedFills).toEqual(
+        expect.arrayContaining(['refreshed-keyline', 'refreshed-semanticGold']),
+      );
+      expect(refreshedStrokes).toEqual(
+        expect.arrayContaining(['refreshed-semanticDark', 'refreshed-semanticGold']),
+      );
+      expect(refreshedFills.some((color) => color.startsWith('initial-'))).toBe(false);
+      expect(refreshedStrokes.some((color) => color.startsWith('initial-'))).toBe(false);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('rebuilds every decoded marker when one non-first palette token changes', () => {
+    const images: FakeImage[] = [];
+    const canvases: FakeCanvas[] = [];
+    let palette: MapMarkerRasterColors = { ...RASTER_COLORS };
+    vi.stubGlobal('getComputedStyle', () => ({
+      getPropertyValue: (token: string) => {
+        const key = Object.entries(MAP_MARKER_RASTER_COLOR_TOKENS).find(
+          ([, expectedToken]) => expectedToken === token,
+        )?.[0] as keyof MapMarkerRasterColors | undefined;
+        return key ? palette[key] : '';
+      },
+    }));
+
+    try {
+      const art = createMapMarkerArt(
+        {
+          documentElement: {},
+          createElement: () => {
+            const canvas = new FakeCanvas();
+            canvases.push(canvas);
+            return canvas;
+          },
+        } as unknown as Document,
+        () => {
+          const image = new FakeImage();
+          images.push(image);
+          return image as unknown as HTMLImageElement;
+        },
+      );
+
+      expect(art.sprite('reward-reliquary', 'minimapRewardActive')).toBeNull();
+      images[0].onload?.();
+      expect(art.sprite('rift-entrance', 'minimapNavigationRankS')).toBeNull();
+      images[1].onload?.();
+      const activeBefore = art.sprite('reward-reliquary', 'minimapRewardActive');
+      const rankBefore = art.sprite('rift-entrance', 'minimapNavigationRankS');
+      const initialCanvasCount = canvases.length;
+
+      const refreshedCyan = '#16bde8';
+      palette = { ...palette, semanticCyan: refreshedCyan };
+      art.refreshPalette();
+
+      expect(art.sprite('reward-reliquary', 'minimapRewardActive')).not.toBe(activeBefore);
+      expect(art.sprite('rift-entrance', 'minimapNavigationRankS')).not.toBe(rankBefore);
+      expect(images).toHaveLength(2);
+      expect(images[0].srcAssignments).toEqual([mapMarkerIconUrl('reward-reliquary')]);
+      expect(images[1].srcAssignments).toEqual([mapMarkerIconUrl('rift-entrance')]);
+      const refreshedStrokes = canvases
+        .slice(initialCanvasCount)
+        .flatMap((canvas) => canvas.strokes.map((stroke) => stroke.style));
+      expect(refreshedStrokes).toContain(refreshedCyan);
+      expect(refreshedStrokes).not.toContain(RASTER_COLORS.semanticCyan);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('uses the latest palette when a source finishes decoding after a refresh', () => {
+    const images: FakeImage[] = [];
+    const canvases: FakeCanvas[] = [];
+    let palettePrefix = 'initial';
+    vi.stubGlobal('getComputedStyle', () => ({
+      getPropertyValue: (token: string) => {
+        const key = Object.entries(MAP_MARKER_RASTER_COLOR_TOKENS).find(
+          ([, expectedToken]) => expectedToken === token,
+        )?.[0];
+        return key ? `${palettePrefix}-${key}` : '';
+      },
+    }));
+
+    try {
+      const art = createMapMarkerArt(
+        {
+          documentElement: {},
+          createElement: () => {
+            const canvas = new FakeCanvas();
+            canvases.push(canvas);
+            return canvas;
+          },
+        } as unknown as Document,
+        () => {
+          const image = new FakeImage();
+          images.push(image);
+          return image as unknown as HTMLImageElement;
+        },
+      );
+
+      expect(art.sprite('gather-ore', 'minimapGatherCooldownLocked')).toBeNull();
+      expect(images).toHaveLength(1);
+      expect(canvases).toHaveLength(0);
+
+      palettePrefix = 'latest';
+      art.refreshPalette();
+      images[0].onload?.();
+
+      expect(art.sprite('gather-ore', 'minimapGatherCooldownLocked')).not.toBeNull();
+      expect(images).toHaveLength(1);
+      expect(images[0].srcAssignments).toEqual([mapMarkerIconUrl('gather-ore')]);
+      const bakedFills = canvases.flatMap((canvas) => canvas.fills.map((fill) => fill.style));
+      const bakedStrokes = canvases.flatMap((canvas) =>
+        canvas.strokes.map((stroke) => stroke.style),
+      );
+      expect(bakedFills).toEqual(
+        expect.arrayContaining([
+          'latest-keyline',
+          'latest-lockDark',
+          'latest-lockBronze',
+          'latest-lockHighlight',
+        ]),
+      );
+      expect(bakedStrokes).toEqual(
+        expect.arrayContaining([
+          'latest-cooldownArcDark',
+          'latest-cooldownArcLight',
+          'latest-lockDark',
+          'latest-lockBronze',
+        ]),
+      );
+      expect(bakedFills.some((color) => color.startsWith('initial-'))).toBe(false);
+      expect(bakedStrokes.some((color) => color.startsWith('initial-'))).toBe(false);
     } finally {
       vi.unstubAllGlobals();
     }
@@ -1291,6 +1490,15 @@ describe('map marker painted art', () => {
     );
     expect(hud).toMatch(
       /mapMarkerProfileForFlags\(\s*classes\.contains\('mobile-touch'\),\s*classes\.contains\('hud-mobile-compact'\),\s*classes\.contains\('hud-mobile-landscape'\),?\s*\)/,
+    );
+    expect(hud).toMatch(
+      /refreshMapMarkerArtPalette\(\): void \{\s*this\.mapMarkerArt\.refreshPalette\(\);\s*\}/,
+    );
+    expect(mainSource).toMatch(
+      /function applyTheme\(\): void \{[\s\S]*?mapMarkerPaletteLifecycle\?\.notify\(\);\s*\}/,
+    );
+    expect(mainSource).toMatch(
+      /mapMarkerPaletteLifecycle = installMapMarkerPaletteLifecycle\(\s*window,\s*\(\) =>\s*hud\.refreshMapMarkerArtPalette\(\),?\s*\)/,
     );
   });
 });

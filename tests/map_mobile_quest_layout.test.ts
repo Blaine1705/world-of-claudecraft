@@ -25,6 +25,38 @@ function wideLandscapeLayout(uiScale: number): {
   };
 }
 
+function stackedLandscapeLayout(uiScale: number): {
+  canvasPhysical: number;
+  questPhysical: number;
+  questWidthPhysical: number;
+  bottomPhysical: number;
+} {
+  const viewportWidth = 819;
+  const viewportHeight = 390;
+  const stackTop = 10 / uiScale;
+  // Source-level model for an iPhone-class 34px bottom safe area. Chromium's
+  // desktop browser provider resolves env(safe-area-inset-bottom) to zero.
+  const stackBottom = 34 / uiScale;
+  const quest = Math.min(118, Math.max(88, viewportHeight / uiScale - 150));
+  const gap = 8;
+  const shellHeight = 22;
+  const map = Math.min(
+    viewportWidth * 0.52,
+    320,
+    viewportHeight / uiScale - stackTop - stackBottom - quest - gap - shellHeight,
+  );
+  const questWidth = Math.min(
+    Math.min(680, Math.max(320, viewportWidth * 0.76)),
+    viewportWidth / uiScale - 32,
+  );
+  return {
+    canvasPhysical: (map + 4) * uiScale,
+    questPhysical: quest * uiScale,
+    questWidthPhysical: questWidth * uiScale,
+    bottomPhysical: (stackTop + quest + gap + map + shellHeight + stackBottom) * uiScale,
+  };
+}
+
 describe('wide landscape map and quest layout', () => {
   it('uses a scale-correct side-by-side contract with the narrow stacked fallback intact', () => {
     expect(css).toContain('@media (min-width: 820px)');
@@ -79,5 +111,35 @@ describe('wide landscape map and quest layout', () => {
     const map = Math.min(320, (viewportHeight - 104) / uiScale);
     const quest = Math.min(300, Math.max(220, available - 8 - 58 - 18 - map));
     expect((available - quest - 8 - 58 - 18 - map) * uiScale).toBeGreaterThanOrEqual(0);
+  });
+
+  it('keeps the stacked fallback scale-correct below the side-by-side breakpoint', () => {
+    expect(css).toContain(
+      '--mobile-map-quest-stack-top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));',
+    );
+    expect(css).toContain(
+      '--mobile-map-quest-stack-bottom: calc(\n      max(10px, env(safe-area-inset-bottom)) /\n      var(--ui-scale, 1)\n    );',
+    );
+    expect(css).toContain('--mobile-map-stack-shell-height: 22px;');
+    expect(css).toContain('--mobile-map-touch-target: max(40px, calc(40px / var(--ui-scale, 1)));');
+    expect(css).toContain('body.mobile-touch.mobile-map-quest-open #quest-log-window .ql-item,');
+    expect(css).toContain('min-width: var(--mobile-map-touch-target);');
+    expect(css).toContain('min-height: var(--mobile-map-touch-target);');
+    expect(css).toContain('max-width: calc(var(--app-vw) / var(--ui-scale, 1) - 32px);');
+    expect(css).toContain('var(--mobile-map-quest-stack-top) -');
+    expect(css).toContain('var(--mobile-map-quest-stack-bottom) -');
+    expect(css).toContain('var(--mobile-map-stack-shell-height)');
+    expect(css).toContain(
+      'width: min(\n        calc(var(--mobile-map-size) + var(--mobile-map-rail) + var(--mobile-map-frame)),',
+    );
+    expect(css).toContain('padding-bottom: var(--window-pad);');
+
+    for (const uiScale of [0.85, 1, 1.4]) {
+      const layout = stackedLandscapeLayout(uiScale);
+      expect(layout.questPhysical).toBeLessThanOrEqual(118 * uiScale);
+      expect(layout.questWidthPhysical).toBeLessThanOrEqual(819 - 32 * uiScale);
+      expect(layout.canvasPhysical).toBeGreaterThanOrEqual(140);
+      expect(layout.bottomPhysical).toBeLessThanOrEqual(390 + Number.EPSILON * 512);
+    }
   });
 });

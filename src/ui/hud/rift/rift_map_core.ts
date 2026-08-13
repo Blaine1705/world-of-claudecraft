@@ -20,13 +20,13 @@ import { generateRiftFloor } from '../../../sim/rift/rift_gen';
 import type { RiftFloorPlan } from '../../../sim/rift/types';
 import type { RiftTier } from '../../../sim/types';
 import type { IWorld, RiftFloorView } from '../../../world_api';
+import { isLiveMapEntityDisclosed } from '../../map_entity_disclosure_core';
 import {
   classifyMapObjectMarker,
   type MapMarkerSemantic,
   type MapMarkerSemanticEntity,
   mapMarkerSemanticLayer,
 } from '../../map_marker_semantics_core';
-import { isInstanceMapEntityDisclosed } from '../instance_map_disclosure_core';
 
 const MIN_SPAN = 1;
 const RIFT_SEMANTIC_CACHE_LIMIT = 32;
@@ -684,7 +684,7 @@ export function createRiftMapView(fit: RiftMapFit = 'rect'): RiftMapView {
 
       for (const entity of world.entities.values()) {
         if (entity.id === player.id || entity.id === companionId) continue;
-        if (!isInstanceMapEntityDisclosed(player.pos.x, player.pos.z, entity.pos.x, entity.pos.z))
+        if (!isLiveMapEntityDisclosed(player.pos.x, player.pos.z, entity.pos.x, entity.pos.z))
           continue;
         let semantic: RiftObjectSemantic | null = null;
         if (entity.kind === 'object') {
@@ -749,7 +749,7 @@ export function createRiftMapView(fit: RiftMapFit = 'rect'): RiftMapView {
       }
 
       for (const zone of world.riftBossDeathZones()) {
-        if (!isInstanceMapEntityDisclosed(player.pos.x, player.pos.z, zone.x, zone.z)) continue;
+        if (!isLiveMapEntityDisclosed(player.pos.x, player.pos.z, zone.x, zone.z)) continue;
         const cx = riftLocalCanvasX(zone.x - origin.x, transform);
         const cy = riftLocalCanvasY(zone.z - origin.z, transform);
         if (!isInsideCanvas(cx, cy, canvasSize)) continue;
