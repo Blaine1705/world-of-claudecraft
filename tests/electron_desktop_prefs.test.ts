@@ -1,4 +1,13 @@
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  lstatSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
@@ -6,6 +15,7 @@ import {
   DESKTOP_PREFS_FILENAME,
   DESKTOP_PREFS_VERSION,
   defaultDesktopPrefs,
+  desktopPrefsTempPath,
   loadDesktopPrefs,
   MAX_PREFS_FILE_BYTES,
   sanitizeDesktopPrefs,
@@ -222,30 +232,139 @@ describe('loadDesktopPrefs', () => {
     };
     expect(loadDesktopPrefs('/nope/prefs.json', { statSync: boom })).toEqual(defaultDesktopPrefs());
     expect(
-      loadDesktopPrefs('/nope/prefs.json', { statSync: () => ({ size: 10 }), readFileSync: boom }),
+      loadDesktopPrefs('/nope/prefs.json', {
+        statSync: () => ({ size: 10, isFile: () => true }),
+        readFileSync: boom,
+      }),
     ).toEqual(defaultDesktopPrefs());
+  });
+
+  it('never reads a path that is not a regular file', () => {
+    // The hang-proof. A FIFO left at the prefs path (or a symlink to one, since
+    // statSync follows) reports size 0 and then blocks its reader FOREVER, and
+    // this read is the first thing main.cjs does: the shell would hang before
+    // any window exists, showing the player nothing at all. So the file type
+    // has to be checked before the read, and the read must never be reached.
+    let reads = 0;
+    const readFileSync = () => {
+      reads += 1;
+      return '{"version":1,"gpuForceOptOut":true}';
+    };
+    expect(
+      loadDesktopPrefs('/tmp/prefs-fifo', {
+        statSync: () => ({ size: 0, isFile: () => false }),
+        readFileSync,
+      }),
+    ).toEqual(defaultDesktopPrefs());
+    expect(reads, 'a non-regular file must never be read').toBe(0);
+    // The same stub reporting a regular file DOES get read, so the arm above
+    // fails on the file type rather than on some unrelated stub mismatch.
+    expect(
+      loadDesktopPrefs('/tmp/prefs-fifo', {
+        statSync: () => ({ size: 35, isFile: () => true }),
+        readFileSync,
+      }).gpuForceOptOut,
+    ).toBe(true);
+    expect(reads).toBe(1);
+  });
+
+  it('cannot be used to pollute Object.prototype', () => {
+    const filePath = scratchPath('proto.json');
+    writeFileSync(
+      filePath,
+      '{"__proto__":{"polluted":"yes"},"version":1,"maximized":true}',
+      'utf8',
+    );
+    const prefs = loadDesktopPrefs(filePath);
+    // Only whitelisted fields are ever copied onto a fresh object, so the
+    // payload contributes nothing. The maximized:true beside it still lands,
+    // which proves the file was read rather than rejected wholesale.
+    expect(prefs).toEqual({ version: 1, maximized: true, gpuForceOptOut: false });
+    expect(Object.prototype).not.toHaveProperty('polluted');
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined();
+    expect(Object.getPrototypeOf(prefs)).toBe(Object.prototype);
   });
 });
 
 describe('saveDesktopPrefs', () => {
-  it('writes through a temp file and renames it over the target', () => {
+  it('writes through an exclusive temp file and renames it over the target', () => {
     const calls: string[] = [];
+    let staged = '';
     const filePath = '/userdata/desktop-prefs.json';
     const ok = saveDesktopPrefs(
       filePath,
       { version: 1, gpuForceOptOut: true },
       {
         mkdirSync: (dir, options) => calls.push(`mkdir:${dir}:${options.recursive}`),
-        writeFileSync: (target, data) => calls.push(`write:${target}:${data}`),
-        renameSync: (from, to) => calls.push(`rename:${from}:${to}`),
+        writeFileSync: (target, data, options) => {
+          staged = target;
+          calls.push(`write:${data}:${options.encoding}:${options.flag}`);
+        },
+        renameSync: (from, to) => calls.push(`rename:${from === staged ? '<staged>' : from}:${to}`),
       },
     );
     expect(ok).toBe(true);
+    // The flag is the whole defense and it is a string a typo would silently
+    // downgrade to a following write, so pin it literally: 'wx' is O_EXCL.
     expect(calls).toEqual([
       'mkdir:/userdata:true',
-      'write:/userdata/desktop-prefs.json.tmp:{"version":1,"maximized":false,"gpuForceOptOut":true}',
-      'rename:/userdata/desktop-prefs.json.tmp:/userdata/desktop-prefs.json',
+      'write:{"version":1,"maximized":false,"gpuForceOptOut":true}:utf8:wx',
+      'rename:<staged>:/userdata/desktop-prefs.json',
     ]);
+    // Staged beside the target, under an unpredictable name: a fixed sibling is
+    // a path another local process can pre-create and wait on.
+    expect(staged.startsWith('/userdata/desktop-prefs.json.')).toBe(true);
+    expect(staged).toMatch(/\.\d+-[0-9a-f]{8}\.tmp$/);
+    expect(staged).not.toBe('/userdata/desktop-prefs.json.tmp');
+  });
+
+  it('mints a different scratch path on every save', () => {
+    // Two saves in a row must not collide on the same name, or the second would
+    // hit its own leftover and refuse.
+    const paths = new Set<string>();
+    for (let i = 0; i < 50; i += 1) paths.add(desktopPrefsTempPath('/userdata/prefs.json'));
+    expect(paths.size).toBeGreaterThan(45);
+    // The injected source is what makes the path knowable in the symlink test
+    // below, so prove it actually steers the name.
+    expect(desktopPrefsTempPath('/userdata/prefs.json', () => 0.5)).toBe(
+      desktopPrefsTempPath('/userdata/prefs.json', () => 0.5),
+    );
+    expect(desktopPrefsTempPath('/userdata/prefs.json', () => 0.5)).not.toBe(
+      desktopPrefsTempPath('/userdata/prefs.json', () => 0.25),
+    );
+  });
+
+  it('refuses to write through a pre-existing scratch path, leaving its target alone', () => {
+    // The attack this closes: another local process pre-creates the scratch
+    // path as a symlink to a file it wants overwritten, and every save writes
+    // through it. O_EXCL refuses the symlink instead of following it.
+    const victimPath = scratchPath('victim.txt');
+    const targetPath = scratchPath('planted/desktop-prefs.json');
+    writeFileSync(victimPath, 'victim bytes', 'utf8');
+    const random = () => 0.42;
+    const tempPath = desktopPrefsTempPath(targetPath, random);
+    expect(tempPath, 'the scratch path must keep its shape').toMatch(/\.\d+-[0-9a-f]{8}\.tmp$/);
+    // The plant has to sit where the save will stage, so the directory exists
+    // before the save (which would otherwise create it itself).
+    mkdirSync(join(scratch, 'planted'), { recursive: true });
+    symlinkSync(victimPath, tempPath);
+
+    expect(saveDesktopPrefs(targetPath, { version: 1, gpuForceOptOut: true }, { random })).toBe(
+      false,
+    );
+    expect(readFileSync(victimPath, 'utf8'), 'the victim file was written through').toBe(
+      'victim bytes',
+    );
+    expect(existsSync(targetPath), 'nothing may reach the target on a refused save').toBe(false);
+    // The refused path is deliberately left as it was found: it is not ours to
+    // delete, and the exclusive write already made it harmless.
+    expect(lstatSync(tempPath).isSymbolicLink()).toBe(true);
+
+    // A later save mints a different scratch path and succeeds, so one planted
+    // path cannot wedge the store forever.
+    expect(saveDesktopPrefs(targetPath, { version: 1, gpuForceOptOut: true })).toBe(true);
+    expect(loadDesktopPrefs(targetPath).gpuForceOptOut).toBe(true);
+    expect(readFileSync(victimPath, 'utf8')).toBe('victim bytes');
   });
 
   it('validates on the way OUT, so junk is never persisted', () => {
@@ -269,6 +388,51 @@ describe('saveDesktopPrefs', () => {
       maximized: false,
       gpuForceOptOut: true,
     });
+  });
+
+  it('cleans up the scratch file it created, and only that one', () => {
+    const noop = () => {};
+    // A rename that fails after a successful staging write leaves OUR file
+    // behind, and a save that fails once per toggle would litter the directory.
+    const unlinked: string[] = [];
+    let staged = '';
+    expect(
+      saveDesktopPrefs(
+        '/x/prefs.json',
+        { version: 1 },
+        {
+          mkdirSync: noop,
+          writeFileSync: (target) => {
+            staged = target;
+          },
+          renameSync: () => {
+            throw new Error('EXDEV');
+          },
+          unlinkSync: (target) => unlinked.push(target),
+        },
+      ),
+    ).toBe(false);
+    expect(unlinked).toEqual([staged]);
+
+    // The other polarity: the exclusive write REFUSED, so that path was already
+    // there, is not ours, and must be left exactly as found. Deleting it would
+    // hand back the clobber the exclusive write just prevented.
+    const refusedUnlinks: string[] = [];
+    expect(
+      saveDesktopPrefs(
+        '/x/prefs.json',
+        { version: 1 },
+        {
+          mkdirSync: noop,
+          writeFileSync: () => {
+            throw new Error('EEXIST');
+          },
+          renameSync: noop,
+          unlinkSync: (target) => refusedUnlinks.push(target),
+        },
+      ),
+    ).toBe(false);
+    expect(refusedUnlinks, 'a path we did not create must never be unlinked').toEqual([]);
   });
 
   it('reports false (and never throws) on every write failure', () => {

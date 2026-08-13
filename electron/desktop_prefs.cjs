@@ -101,16 +101,25 @@ function sanitizeDesktopPrefs(input) {
 
 /**
  * Read the prefs file. NEVER throws and always answers a complete prefs object:
- * a missing file, an oversized one, unparseable JSON, a non-object root, and an
- * unknown schema version all resolve to defaults. Injectable fs for tests.
+ * a missing file, a path that is not a regular file, an oversized one,
+ * unparseable JSON, a non-object root, and an unknown schema version all
+ * resolve to defaults. Injectable fs for tests.
  */
 function loadDesktopPrefs(filePath, deps = {}) {
   const statSync = deps.statSync ?? nodeFs.statSync;
   const readFileSync = deps.readFileSync ?? nodeFs.readFileSync;
   try {
     const stat = statSync(filePath);
-    // Size first, so an absurd file is refused without ever being read.
-    if (!stat || !isInteger(stat.size) || stat.size > MAX_PREFS_FILE_BYTES) {
+    // Regular files only, and the check has to come before the read. statSync
+    // follows symlinks, and a FIFO (or a symlink to one) left at this path
+    // reports size 0 and then BLOCKS the reader forever. This read is the first
+    // thing main.cjs does, so that would hang the shell before any window
+    // exists: no game, no error, nothing to see.
+    if (!stat || typeof stat.isFile !== 'function' || !stat.isFile()) {
+      return defaultDesktopPrefs();
+    }
+    // Size next, so an absurd file is refused without ever being read.
+    if (!isInteger(stat.size) || stat.size > MAX_PREFS_FILE_BYTES) {
       return defaultDesktopPrefs();
     }
     const text = readFileSync(filePath, 'utf8');
@@ -126,25 +135,63 @@ function loadDesktopPrefs(filePath, deps = {}) {
 }
 
 /**
- * Persist the prefs. Atomic: the payload is written to a sibling temp file and
+ * The scratch path a save stages its payload at. Unpredictable on purpose: a
+ * fixed sibling name (prefs.json.tmp) is a path any other local process can
+ * pre-create, and since the prefs live in a user-writable directory that is a
+ * real handle to grab. Randomized here and refused by O_EXCL in the writer, so
+ * neither half stands alone.
+ */
+function desktopPrefsTempPath(filePath, random = Math.random) {
+  const suffix = Math.floor(random() * 0x100000000)
+    .toString(16)
+    .padStart(8, '0');
+  return `${filePath}.${process.pid}-${suffix}.tmp`;
+}
+
+/**
+ * Persist the prefs. Atomic: the payload is written to a scratch sibling and
  * renamed over the target, so an interrupted write cannot leave a truncated
  * prefs file behind (rename is atomic within a directory on every platform we
  * ship). Never throws; returns whether the value actually landed on disk, which
  * is what the IPC setter reports to the renderer.
+ *
+ * The staging write is EXCLUSIVE ('wx' is O_EXCL): it fails outright if
+ * anything already exists at the scratch path, and O_EXCL refuses a symlink
+ * rather than following it. Without that, a local process that pre-created the
+ * scratch path as a symlink would have every save write through it, turning a
+ * settings toggle into a clobber of whatever file it pointed at. Failing the
+ * save is the safe answer: the player's preference just does not stick, and the
+ * IPC setter already reports that honestly.
  */
 function saveDesktopPrefs(filePath, prefs, deps = {}) {
   const mkdirSync = deps.mkdirSync ?? nodeFs.mkdirSync;
   const writeFileSync = deps.writeFileSync ?? nodeFs.writeFileSync;
   const renameSync = deps.renameSync ?? nodeFs.renameSync;
+  const unlinkSync = deps.unlinkSync ?? nodeFs.unlinkSync;
+  // Set only once the exclusive write has succeeded, i.e. once the file at that
+  // path is one WE created. A path that was already there is never unlinked:
+  // the whole point of the exclusive write is to leave what it refused alone.
+  let ownedTempPath = '';
   try {
     const text = JSON.stringify(sanitizeDesktopPrefs(prefs));
     if (text.length > MAX_PREFS_FILE_BYTES) return false;
     mkdirSync(nodePath.dirname(filePath), { recursive: true });
-    const tempPath = `${filePath}.tmp`;
-    writeFileSync(tempPath, text, 'utf8');
+    const tempPath = desktopPrefsTempPath(filePath, deps.random);
+    writeFileSync(tempPath, text, { encoding: 'utf8', flag: 'wx' });
+    ownedTempPath = tempPath;
     renameSync(tempPath, filePath);
     return true;
   } catch {
+    // A rename that failed after a successful staging write leaves our own
+    // scratch file behind; drop it best-effort so a failing save cannot litter
+    // the directory once per attempt.
+    if (ownedTempPath !== '') {
+      try {
+        unlinkSync(ownedTempPath);
+      } catch {
+        // Nothing further to do: the save already failed.
+      }
+    }
     return false;
   }
 }
@@ -154,6 +201,7 @@ module.exports = {
   DESKTOP_PREFS_VERSION,
   MAX_PREFS_FILE_BYTES,
   defaultDesktopPrefs,
+  desktopPrefsTempPath,
   sanitizeDesktopPrefs,
   loadDesktopPrefs,
   saveDesktopPrefs,

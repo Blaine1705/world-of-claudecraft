@@ -13,20 +13,28 @@ export interface DesktopPrefs {
 }
 
 export interface DesktopPrefsReadDeps {
-  statSync?: (filePath: string) => { size?: unknown } | null;
+  statSync?: (filePath: string) => { size?: unknown; isFile?: () => boolean } | null;
   readFileSync?: (filePath: string, encoding: string) => unknown;
 }
 
 export interface DesktopPrefsWriteDeps {
   mkdirSync?: (dirPath: string, options: { recursive: boolean }) => unknown;
-  writeFileSync?: (filePath: string, data: string, encoding: string) => void;
+  writeFileSync?: (
+    filePath: string,
+    data: string,
+    options: { encoding: string; flag: string },
+  ) => void;
   renameSync?: (fromPath: string, toPath: string) => void;
+  unlinkSync?: (filePath: string) => void;
+  /** Injected only by tests, so a scratch path can be known in advance. */
+  random?: () => number;
 }
 
 export const DESKTOP_PREFS_FILENAME: string;
 export const DESKTOP_PREFS_VERSION: number;
 export const MAX_PREFS_FILE_BYTES: number;
 export function defaultDesktopPrefs(): DesktopPrefs;
+export function desktopPrefsTempPath(filePath: string, random?: () => number): string;
 export function sanitizeDesktopPrefs(input: unknown): DesktopPrefs;
 export function loadDesktopPrefs(filePath: string, deps?: DesktopPrefsReadDeps): DesktopPrefs;
 export function saveDesktopPrefs(
