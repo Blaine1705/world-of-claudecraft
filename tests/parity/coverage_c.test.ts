@@ -639,4 +639,23 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect({ x: far.pos.x, z: far.pos.z }).toEqual({ x: far.spawnPos.x, z: far.spawnPos.z });
     expect(trace.draws).toBe(0);
   });
+
+  it('grix_respawn_window: both deaths roll an independent 5 to 10 minute timer', () => {
+    const rec = run('grix_respawn_window');
+    const first = rec.notes.firstRoll as number;
+    const second = rec.notes.secondRoll as number;
+    for (const roll of [first, second]) {
+      // rng.range(12, 24) x 25s: uniform in the half-open [300, 600).
+      expect(roll).toBeGreaterThanOrEqual(300);
+      expect(roll).toBeLessThan(600);
+    }
+    // Independent draws: equal rolls would mean the death site stopped
+    // consuming the stream per death (this seed pair does not collide).
+    expect(first).not.toBe(second);
+    // The in-place respawn between the kills really happened, so the second
+    // roll came from a genuine second death of the same entity id.
+    expect(rec.notes.respawned).toBe(true);
+    const deaths = (rec.allEvents as Ev[]).filter((e) => e.type === 'death');
+    expect(deaths.length).toBeGreaterThanOrEqual(2);
+  });
 });

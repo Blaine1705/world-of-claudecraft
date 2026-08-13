@@ -241,6 +241,21 @@ describe('resolveRespawnSeconds: full precedence', () => {
     expect(resolveRespawnSeconds(grix, thornpeak, undefined, (_min, max) => max)).toBe(600);
   });
 
+  it('holds every authored respawnMultMax window to a sane shape', () => {
+    // Both fields are optional and nothing at load validates the pair, so the
+    // catalog is pinned here: an upper bound only means something above an
+    // authored respawnMult (rng.range(min, max) with max below min inverts the
+    // window silently, and a bare respawnMultMax would price at the 1x or rare
+    // 4x floor for every roll-less caller while the death site rolled higher).
+    const windowed = Object.values(MOBS).filter((t) => t.respawnMultMax !== undefined);
+    // Grix ships today; the floor keeps this sweep from going vacuous.
+    expect(windowed.length).toBeGreaterThanOrEqual(1);
+    for (const t of windowed) {
+      expect(t.respawnMult, t.id).toBeDefined();
+      expect(t.respawnMultMax, t.id).toBeGreaterThan(t.respawnMult as number);
+    }
+  });
+
   it('classifies self-scheduled templates by multiplier OR rare status', () => {
     expect(isSelfScheduled({ respawnMult: 4 })).toBe(true);
     expect(isSelfScheduled({ rare: true })).toBe(true);

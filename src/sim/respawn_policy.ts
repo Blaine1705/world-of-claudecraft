@@ -103,8 +103,8 @@ export interface RespawnTemplateFields {
   respawnSeconds?: number;
   respawnMult?: number;
   // Upper bound of a RANDOM respawn window: with both authored, the effective
-  // multiplier is drawn uniformly in [respawnMult, respawnMultMax] per death
-  // (same 25s-base units as respawnMult). Authored alongside respawnMult.
+  // multiplier is drawn uniformly in [respawnMult, respawnMultMax) per death
+  // (half-open, Rng.range; same 25s-base units). Authored alongside respawnMult.
   respawnMultMax?: number;
   rare?: boolean;
 }
@@ -119,11 +119,13 @@ export const LEGACY_RESPAWN_SECONDS = 25;
 
 /**
  * Does this template carry its OWN respawn schedule rather than inheriting the
- * world's? Two ways to say so, and both were tuned against the flat 25s base:
+ * world's? Three ways to say so, and all were tuned against the flat 25s base:
  *
  *  - an authored `respawnMult`: every shipped coefficient is a wall-clock target
  *    expressed as a multiple of 25 (144 is one hour, 432 three, 864 six, and 7.2
  *    is the three minutes tests/fixes.test.ts pins for a quest rare);
+ *  - an authored `respawnMultMax`: the upper bound of a random window is a
+ *    schedule statement exactly like the fixed coefficient it accompanies;
  *  - `rare: true`, whose default 4x is the 100s cadence every bare rare shipped
  *    with.
  *
@@ -152,8 +154,8 @@ export function isSelfScheduled(template: RespawnTemplateFields | undefined): bo
  *     templates that are NOT self-scheduled (see isSelfScheduled).
  *
  * A template with respawnMultMax carries a random WINDOW instead of a fixed
- * multiplier: the effective mult is drawn uniformly in
- * [respawnMult, respawnMultMax] via the caller-supplied `roll` (the death site
+ * multiplier: the effective mult is drawn uniformly in the half-open
+ * [respawnMult, respawnMultMax) via the caller-supplied `roll` (the death site
  * passes ctx.rng.range, keeping this leaf pure and the sim deterministic).
  * Without a roll, the window resolves to its minimum, so every pure caller and
  * test stays deterministic.
