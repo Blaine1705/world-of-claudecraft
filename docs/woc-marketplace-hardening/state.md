@@ -6,7 +6,9 @@ actually reads.
 ## Where we are
 
 - Next file to run: `docs/woc-marketplace-hardening/phase-05-custody-entry-hardening.md`
-- 04 QA COMPLETE (PASS-WITH-FOLLOWUPS, every fix applied, PUSHED per R4).
+- 04 QA COMPLETE (PASS-WITH-FOLLOWUPS, every fix applied, PUSHED per R4;
+  gate GREEN at the final tip 8c1028e89d, full-suite fallback, all 8
+  steps).
   Release/v0.37.0 synced (merge a43a1e8b52; the parity/command count-pin
   merge trap fired for real, pins re-derived from runs: IWorld 322/85/237,
   sends 199, dispatches 212; hud.ts ceiling 19177 after the
