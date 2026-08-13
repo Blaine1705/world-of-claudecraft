@@ -57,8 +57,10 @@ import {
   placeMarshWallDressing,
 } from './delve_marsh_dressing';
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
+import { attachSceneGroupGated } from './gated_scene_attach';
 import { EMISSIVE_LIGHT, GFX, sharedUniforms } from './gfx';
 import { buildLastKeepDressing, ensureLastKeepDressing } from './lastkeep_dressing';
+import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
@@ -671,6 +673,12 @@ export class DungeonInteriors {
     private lowGfx: boolean,
     private flames: THREE.Mesh[],
     private fireLights: THREE.PointLight[],
+    // The renderer's live compile gate. A live interior build (first dungeon
+    // approach, delve module, rift floor) attaches through it hidden until its
+    // programs are linked: the boot prewarm covers the base pack materials,
+    // but the lazily minted tinted grades (tintedMats) and bespoke shaders
+    // otherwise link synchronously at first draw.
+    private compileGate?: (target: THREE.Object3D) => Promise<unknown>,
   ) {}
 
   // Instantiate every distinct interior material once so the startup prewarm's
@@ -900,7 +908,7 @@ export class DungeonInteriors {
     }
     group.position.set(ox, 0, oz);
     group.userData.renderCategory = 'dungeon';
-    this.scene.add(group);
+    await attachSceneGroupGated(this.scene, group, this.compileGate);
     return group;
   }
 
@@ -1469,7 +1477,13 @@ export class DungeonInteriors {
           : isMarsh && RECEIVER_KINDS.has(kind)
             ? this.marshMaterial(asset.pack, 'floor')
             : this.material(asset.pack);
-      const material = base.clone();
+      // Program-preserving clone: the pack material carries the triplanar
+      // stone surface-detail layer (see this.material), and a bare clone()
+      // drops onBeforeCompile, so every hideable arena wall would draw as flat
+      // untextured plastic AND link its own program on first sight. The
+      // sibling tintedMaterial re-applies the same layer by hand for the same
+      // reason; this site takes the shared helper.
+      const material = cloneMaterialWithHooks(base);
       // Hideable walls bypass emit(), so the Drowned Court's wet-stone tint is
       // applied to this per-wall clone directly (structural stone only: the
       // banners keep their true colors, same scoping as the marsh tint).

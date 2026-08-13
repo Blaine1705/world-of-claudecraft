@@ -2,22 +2,30 @@ import type * as http from 'node:http';
 import { verifyLoginTwoFactor } from './account';
 import { parseAdminAccountSort } from './admin_accounts_sort';
 import {
+  ACTIVITY_WINDOW_DAYS,
+  classDistribution,
+  levelDistribution,
+  registrationsByDay,
+  sessionsByDay,
+} from './admin_activity_cache';
+import {
   accountDetail,
   associationsForIp,
   characterProfessionsRow,
-  classDistribution,
   clientPerfRaw,
   clientPerfSummary,
   dailyRewardPointEvents,
-  levelDistribution,
   listAccounts,
   listCharacters,
   listModerationActions,
   listSharedIps,
   onlineHistory,
-  registrationsByDay,
-  sessionsByDay,
 } from './admin_db';
+import {
+  type AdminGeneralChatRateLimitDeps,
+  type AdminGeneralChatRateLimitService,
+  createAdminGeneralChatRateLimitService,
+} from './admin_general_chat_rate_limit';
 import type { AdminGuildBankView } from './admin_guild_bank_view';
 import {
   ADMIN_GUILD_REASON_MAX,
@@ -94,6 +102,7 @@ import {
 } from './db';
 import { emailSecurityIncident } from './email';
 import type { GameServer } from './game';
+import { type GeneralChatRateLimit, setGeneralChatRateLimit } from './general_chat_quota_db';
 import { ctxAccountId } from './http/context';
 import { logger } from './http/logger';
 import {
@@ -116,7 +125,6 @@ import {
   ignoreReport,
   liftAccountChatMute,
   moderateAccount,
-  moderationQueue,
   moderationReportsForAccount,
   muteAccountChat,
   reactivateAccountAudited,
@@ -128,6 +136,7 @@ import {
   setDailyRewardsBan,
   setDailyRewardsIpBan,
 } from './moderation_db';
+import { readModerationQueue } from './moderation_queue_cache';
 import { providerUsageSnapshot } from './provider_usage';
 import { authThrottled, clearAuthFailures, rateLimited, recordAuthFailure } from './ratelimit';
 import { REALM } from './realm';
@@ -174,7 +183,6 @@ const ADMIN_LOGIN_TOO_MANY_FAILED_ATTEMPTS =
 const ADMIN_LOGIN_INVALID_TWO_FACTOR_CODE = 'invalid authentication code';
 const MAX_PAGE_LIMIT = 200;
 const DEFAULT_PAGE_LIMIT = 25;
-const ACTIVITY_WINDOW_DAYS = 30;
 const ANTIBOT_CONFIG_NOTE_MAX = 500;
 const UNSTUCK_DEFAULT_DAYS = 30;
 const UNSTUCK_DEFAULT_LIMIT = 50;
@@ -207,6 +215,51 @@ const GUILD_BANK_SAVE_FAILED = 'the change could not be saved and was rolled bac
 // there is nothing to retry).
 const GUILD_BANK_DELETING = 'that guild is being deleted, so its bank is closed';
 const GUILD_BANK_PURGE_REFUSED = 'the guild bank change was refused';
+
+const realAdminGeneralChatRateLimitDeps: AdminGeneralChatRateLimitDeps = {
+  set: setGeneralChatRateLimit,
+  isAdminAccount,
+};
+let adminGeneralChatRateLimitService: AdminGeneralChatRateLimitService =
+  createAdminGeneralChatRateLimitService(realAdminGeneralChatRateLimitDeps);
+
+/** Install the narrow General chat policy persistence seam for endpoint tests. */
+export function setAdminGeneralChatRateLimitDepsForTests(
+  deps: AdminGeneralChatRateLimitDeps,
+): void {
+  adminGeneralChatRateLimitService = createAdminGeneralChatRateLimitService(deps);
+}
+
+/** Restore the production General chat policy persistence seam after a unit test. */
+export function resetAdminGeneralChatRateLimitDepsForTests(): void {
+  adminGeneralChatRateLimitService = createAdminGeneralChatRateLimitService(
+    realAdminGeneralChatRateLimitDeps,
+  );
+}
+
+/**
+ * The one general-chat-rate-limit endpoint body, shared verbatim by the legacy
+ * handleAdminApi arm and the routes-table handler. The service validates
+ * bounds, refuses admin targets, and calls the atomic persistence seam once;
+ * that transaction owns the audit row, window reset, and NOTIFY, so no live
+ * state can apply before the durable commit. Applying synchronously afterward
+ * closes the response-to-NOTIFY window for sessions on the handling realm;
+ * LISTEN remains authoritative elsewhere.
+ */
+async function respondGeneralChatRateLimit(
+  res: http.ServerResponse,
+  input: { targetAccountId: number; adminAccountId: number; body: unknown },
+  applyLive: (accountId: number, after: GeneralChatRateLimit | null) => void,
+): Promise<void> {
+  const outcome = await adminGeneralChatRateLimitService.update({
+    accountId: input.targetAccountId,
+    adminAccountId: input.adminAccountId,
+    body: input.body,
+  });
+  if (!outcome.ok) return fail(res, outcome.status, outcome.error);
+  applyLive(input.targetAccountId, outcome.value.after);
+  return ok(res, { ok: true });
+}
 
 function guildRenameFailure(error: AdminGuildRenameError): { status: number; message: string } {
   switch (error) {
@@ -1127,6 +1180,22 @@ export async function handleAdminApi(
       }
     }
 
+    const generalChatRateLimitMatch =
+      /^\/admin\/api\/accounts\/(\d+)\/general-chat-rate-limit$/.exec(path);
+    if (req.method === 'POST' && generalChatRateLimitMatch) {
+      // `await`, not a bare returned promise: a rejected setter must land in
+      // this function's own catch (the 500 'internal error' boundary).
+      return await respondGeneralChatRateLimit(
+        res,
+        {
+          targetAccountId: Number(generalChatRateLimitMatch[1]),
+          adminAccountId: accountId,
+          body: await readBody(req),
+        },
+        (id, after) => game.applyGeneralChatRateLimitLive(id, after),
+      );
+    }
+
     // Account flair: the AI-operated mark and an official streamer's links. Both
     // are cosmetic and non-punitive, so (unlike suspend/ban/chat-mute) there is
     // deliberately NO isAdminAccount guard: marking a staff account as a streamer
@@ -1496,7 +1565,7 @@ export async function handleAdminApi(
       });
     }
     if (path === '/admin/api/moderation/queue') {
-      return ok(res, { rows: await moderationQueue(game.liveAccountIds()) });
+      return ok(res, { rows: await readModerationQueue(game.liveAccountIds()) });
     }
     if (path === '/admin/api/moderation/history') {
       const { page, limit } = parsePageParams(url.searchParams);
@@ -1701,6 +1770,7 @@ export type AdminRuntime = Pick<
   | 'muteAccountChat'
   | 'liftChatMuteLive'
   | 'resetChatStrikesLive'
+  | 'applyGeneralChatRateLimitLive'
   // Push an operator's account-flair edit onto the account's live session, so the
   // AI mark / streamer links change without a reconnect.
   | 'applyAccountFlairLive'
@@ -1802,6 +1872,9 @@ function makeRealAdminDb() {
     accountDetail,
     associationsForIp,
     characterProfessionsRow,
+    // Cache-backed (the shared admin activity bundle; both dispatch arms read
+    // it): a setAdminDbForTests override still replaces these members outright,
+    // which bypasses the cache and keeps existing fakes exact.
     classDistribution,
     clientPerfRaw,
     clientPerfSummary,
@@ -1847,7 +1920,10 @@ function makeRealAdminDb() {
     ignoreReport,
     liftAccountChatMute,
     moderateAccount,
-    moderationQueue,
+    // Cache-backed (the shared moderation queue memo; both dispatch arms read
+    // it and it is bust-wired by moderation_db.ts's setOnModerationQueueChanged
+    // hook): a setAdminDbForTests override still replaces this member outright.
+    moderationQueue: readModerationQueue,
     moderationReportsForAccount,
     muteAccountChat,
     accountAndScopeForToken,
@@ -2790,6 +2866,25 @@ async function resetPasswordHandler(ctx: Ctx): Promise<void> {
 }
 
 /**
+ * POST /admin/api/accounts/:id/general-chat-rate-limit: set or clear the account's
+ * General-channel-only quota. Same moderation family as suspend/ban/chat-mute, so
+ * the shared service refuses admin targets (clearing stays allowed); the full
+ * endpoint body lives in respondGeneralChatRateLimit, shared with the legacy arm.
+ */
+async function generalChatRateLimitHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  return respondGeneralChatRateLimit(
+    ctx.res,
+    {
+      targetAccountId: adminTargetId(ctx),
+      adminAccountId: ctxAccountId(ctx),
+      body: await readBody(ctx.req),
+    },
+    (id, after) => rt.applyGeneralChatRateLimitLive(id, after),
+  );
+}
+
+/**
  * POST /admin/api/accounts/:id/ai: mark the account as AI-operated (or clear it).
  * Cosmetic and non-punitive: no reason is required and, unlike suspend/ban/chat-mute,
  * there is NO isAdminAccount guard (a staff account can legitimately carry flair).
@@ -3220,6 +3315,14 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('account')],
     meta: adminTargetMeta('account'),
     handler: resetPasswordHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/accounts/:id/general-chat-rate-limit',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: generalChatRateLimitHandler,
   },
 
   // Account flair: the AI-operated mark and an official streamer's platform links.

@@ -44,10 +44,12 @@ import {
   isFenbridgeRebuildWell,
 } from './fenbridge_town';
 import { EMISSIVE_LIGHT, GFX, type GfxSettings, sharedUniforms, surfaceMat } from './gfx';
+import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import { type PropCellBounds, propCellKey, updatePropCell } from './prop_cell_core';
-import { applySurfaceDetail, reapplySurfaceDetailToClone, wornFamilyFor } from './worn_stone';
+import type { RevealGateCore } from './reveal_gate_core';
+import { applySurfaceDetail, wornFamilyFor } from './worn_stone';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
 // fences, graveyards — all real CC0 glTF assets (Quaternius medieval village +
@@ -87,6 +89,16 @@ export interface PropsResult {
     dt: number,
     reducedMotion?: boolean,
   ): void;
+  /**
+   * First-reveal compile gating for the far-cell bakes (hitch-hunt P3a): a
+   * cell's first drawn far swap is held in the pixel-identical near
+   * representation until the gate warms its key. No gate keeps the immediate
+   * flip (tests, renderers without async compile; the editor viewport
+   * composes the real Renderer and is therefore gated too).
+   */
+  setFarCellRevealGate(gate: RevealGateCore | null): void;
+  /** The compile roots behind a far-cell gate key (that cell's bake meshes). */
+  farCellRevealRoots(key: string): readonly THREE.Object3D[];
 }
 
 const mergeBandDepth = (): number => (GFX.standardMaterials ? 180 : 90);
@@ -425,11 +437,14 @@ const LOW_TIER_PROP_KEYS: readonly PropKey[] = [
  * the high-performance renderer then resolves medium+), a tier-SCOPED preload set
  * would omit props that buildProps then places, and propAsset() throws "prop asset
  * not preloaded", the v0.16.0 farmCrate crash on world entry (red "Could not start
- * the renderer" overlay). So every tier preloads the full PROP_ASSET_DEFS, mirroring
- * foliage.ts, which sources its one frozen MODEL_URLS list for both preload and
- * placement and is structurally immune to this class of bug. Because every placement
- * key is typed PropKey (a key of PROP_ASSET_DEFS), the full set is provably a superset
- * of anything buildProps can place, on every tier and device.
+ * the renderer" overlay). So every tier preloads the full PROP_ASSET_DEFS, matching the
+ * same tier-independent-superset invariant foliage.ts's deferred boot lane enforces
+ * (a `deferredFoliageUrlsForBoot()` gate once broke it there too and reopened this
+ * exact crash for "models/foliage/pine_2.glb" - see the P0 comment in foliage.ts).
+ * The shapes differ (this function ignores its tier argument outright; foliage.ts's
+ * loop just never filters by tier in the first place) but the invariant is identical.
+ * Because every placement key is typed PropKey (a key of PROP_ASSET_DEFS), the full
+ * set is provably a superset of anything buildProps can place, on every tier and device.
  *
  * The arg is retained to document the invariant and to let the guard test assert it at
  * the lowest (most dangerous) import tier; the result intentionally ignores it.
@@ -484,9 +499,10 @@ for (const key of ALL_PROP_KEYS) {
     // superset; live profile preparation may load only the requested target.
     if (!deferredPropKeysForBoot().has(key)) return Promise.resolve();
     return preparePropSource(key).then(() => {
-      // Preserve the packaged-iOS boot path: extract each source as it lands
-      // and release its parsed scene before the renderer build.
-      if (GFX.nativeIosMemoryProfile) propAsset(key);
+      // Preserve the iOS WebKit boot path (Safari, other iOS browsers, and the
+      // packaged app alike): extract each source as it lands and release its
+      // parsed scene before the renderer build.
+      if (GFX.iosMemoryProfile) propAsset(key);
     });
   });
 }
@@ -1168,10 +1184,14 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       const src = mesh.material as THREE.Material;
       let tm = matMap.get(src);
       if (!tm) {
-        const ghostSrc = src.clone();
-        // Material.clone drops onBeforeCompile: re-attach the recorded
-        // surface-detail layer so ghostable buildings keep their texture.
-        reapplySurfaceDetailToClone(ghostSrc);
+        // The hook-preserving clone: a bare clone dropped BOTH own-property
+        // hooks, so the ghost lost the zone-haze layer AND minted a new
+        // program cache key, linking a program per ghosted kit material the
+        // first time a crowd arrival whipped the camera across town (the
+        // measured first-contact burst). With the hooks carried over the
+        // ghost's OPAQUE program is the source's own; only the transparent
+        // fade variant remains a distinct (prewarmable) key.
+        const ghostSrc = cloneMaterialWithHooks(src);
         tm = occluderFadeMat(ghostSrc);
         matMap.set(src, tm);
       }
@@ -2269,17 +2289,25 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   // Far-cell merged bakes for the hideables (dual representation): identical
   // world-baked geometry on the SHARED pre-clone materials, one mesh per
   // (cell, material, castShadow). The per-frame swap lives in update().
-  // Constrained-memory profiles (phone WebKit, native iOS) skip the bake:
+  // Constrained-memory profiles (phone WebKit, every iOS WebKit host) skip the bake:
   // duplicating the prop geometry at world entry is exactly the allocation
   // spike the v0.27.2 memory hotfix class guards against, and the draw-call
   // win matters most on the desktop tiers.
   const farCells = GFX.constrainedMemory ? [] : buildFarPropCells(group, hideables);
+  const farCellsByKey = new Map(farCells.map((cell) => [cell.key, cell]));
+  let farCellRevealGate: RevealGateCore | null = null;
 
   return {
     group,
     flames,
     windmillFans,
     fireLights,
+    setFarCellRevealGate(gate: RevealGateCore | null): void {
+      farCellRevealGate = gate;
+    },
+    farCellRevealRoots(key: string): readonly THREE.Object3D[] {
+      return farCellsByKey.get(key)?.meshes ?? [];
+    },
     update(
       camX: number,
       camY: number,
@@ -2301,7 +2329,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       // (where the ghost fade can fire) draw the individuals while the bake
       // stays as the shadow-only caster. Pixel-identical both ways.
       for (const cell of farCells) {
-        updatePropCell(cell, camX, camZ, fogFar);
+        updatePropCell(cell, camX, camZ, fogFar, undefined, farCellRevealGate);
       }
       for (let i = 0; i < hideables.length; i++) {
         const h = hideables[i];
@@ -2379,11 +2407,13 @@ interface Hideable {
 // and their union IS the bake, so the shadows are pixel-identical while the
 // per-structure shadow submissions collapse to one per (material, cell).
 interface FarPropCell {
+  key: string;
   bounds: PropCellBounds;
   meshes: THREE.InstancedMesh[];
   hideables: Hideable[];
   farMode: boolean;
   visible: boolean;
+  farReady: boolean;
 }
 
 type Footprint = Omit<
@@ -2648,14 +2678,16 @@ function buildFarPropCells(group: THREE.Group, hideables: Hideable[]): FarPropCe
     }
   }
   const out: FarPropCell[] = [];
-  for (const cellBuild of cells.values()) {
+  for (const [cellKey, cellBuild] of cells) {
     const meshes: THREE.InstancedMesh[] = [];
     const cell: FarPropCell = {
+      key: cellKey,
       bounds: cellBuild.bounds,
       meshes,
       hideables: cellBuild.hideables,
       farMode: false,
       visible: true,
+      farReady: false,
     };
     for (const bucket of cellBuild.buckets.values()) {
       const geo = mergeGeometries(bucket.geoms, false);
@@ -2666,6 +2698,7 @@ function buildFarPropCells(group: THREE.Group, hideables: Hideable[]): FarPropCe
       // per frame without touching visibility (three's instanced draw path
       // is a free no-op at count 0).
       const mesh = new THREE.InstancedMesh(geo, bucket.material, 1);
+      mesh.name = `far-bake:${cellKey}`;
       mesh.setMatrixAt(0, new THREE.Matrix4());
       mesh.instanceMatrix.needsUpdate = true;
       // Pin the object bounds to the world-baked geometry bounds NOW: the
@@ -2696,7 +2729,7 @@ function buildFarPropCells(group: THREE.Group, hideables: Hideable[]): FarPropCe
     // shadow via the bake exactly as they did per-material before; the
     // lowProps ghost path (whole-group hide) cannot diverge because every
     // lowProps profile also disables dynamicShadows (gfx.ts:
-    // constrainedMemory is true whenever nativeIosMemoryProfile is).
+    // constrainedMemory is true whenever iosMemoryProfile is).
     for (const h of cellBuild.hideables) {
       for (const b of h.bakeMeshes) b.mesh.castShadow = false;
     }
