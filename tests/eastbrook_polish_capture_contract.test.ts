@@ -145,8 +145,11 @@ interface AttributionTargetFixture {
 // (evictFarZoneIfConstrained) with the release branch's organized renderer
 // imports. Both parents move renderer.ts, so the rendererIntegration leaf
 // mints a value matching neither parent. No capture was retaken.
+// Re-minted for the night-lighting overhaul (readable ambient floor, moon-phase
+// brightness): threading the moon illumination into the grade moves the
+// rendererIntegration leaf (src/render/renderer.ts). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'decde6de14371817605eb651a7f0450148057e922e1ff81e7169521591704ecd';
+  '2cf33caa79f3a9c17a974f6b04810767e4385e1b212b4c163c708b7e6e009f80';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

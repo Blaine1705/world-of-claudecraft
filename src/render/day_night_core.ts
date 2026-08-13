@@ -159,14 +159,6 @@ export function moonNightFloors(litFrac: number): NightFloors {
 }
 
 /**
- * The pre-overhaul night floors, kept ONLY as the A/B comparison baseline the
- * dev `/daynight legacy` command flips to. This is the old world: a single
- * global base light of 0.30 driving the ambient, with the key light at the old
- * 0.46 ratio and no moon-phase swing. Not used by the live grade; a dev tool so
- * the owner can toggle old-vs-new lighting in place. Delete with the command.
- */
-export const LEGACY_NIGHT_FLOORS: NightFloors = { ambient: 0.3, key: 0.3 * 0.46 };
-/**
  * Measured ambient energy of each realm's own sky HDRI: the solid-angle-weighted
  * mean radiance over the sphere with sky.ts's gain and clamp applied, so it is
  * what the renderer actually integrates rather than what the file contains.
@@ -493,16 +485,8 @@ export function effectiveDayness(global: number, biome: BiomeId): number {
  *  deep-blue night. `moonLitFrac` (0 = new, 1 = full; default a half moon, the
  *  lunar-cycle average) swings the night floors so a full-moon night is brighter
  *  than a new-moon one. Day is always the identity, so neither the biome nor the
- *  moon shapes anything but the night dip, never the authored daylight. `legacy`
- *  is the dev A/B switch: when true, the pre-overhaul flat floors replace both
- *  the raised ambient and the moon swing, so the old darker night can be compared
- *  in place (the `/daynight legacy` command). */
-export function dayNightGrade(
-  e: number,
-  biome?: BiomeId,
-  moonLitFrac = 0.5,
-  legacy = false,
-): DayNightGrade {
+ *  moon shapes anything but the night dip, never the authored daylight. */
+export function dayNightGrade(e: number, biome?: BiomeId, moonLitFrac = 0.5): DayNightGrade {
   const c = clamp01(e);
   const palette = biome === undefined ? undefined : REALM_NIGHT_PALETTE[biome];
   const nightSky = palette?.sky ?? NIGHT_SKY;
@@ -510,9 +494,8 @@ export function dayNightGrade(
   const floorScale = palette?.floorScale ?? 1;
   // The moon's illuminated fraction swings both floors around their half-moon
   // reference (full brighter, new darker); floorScale then carries any per-realm
-  // difference on top exactly as before. Legacy mode ignores the moon and takes
-  // the old flat floors, purely so the dev command can show the before/after.
-  const moon = legacy ? LEGACY_NIGHT_FLOORS : moonNightFloors(moonLitFrac);
+  // difference on top exactly as before.
+  const moon = moonNightFloors(moonLitFrac);
   const nightFloor = moon.key * floorScale;
   // A realm's floorScale shapes its ambient the same way it shapes its key
   // light, but the ambient floor is capped at the authored day so a realm that

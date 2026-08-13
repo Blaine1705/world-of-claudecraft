@@ -15,7 +15,6 @@ import {
   effectiveDayness,
   fullDayGrade,
   globalDayness,
-  LEGACY_NIGHT_FLOORS,
   LUNAR_CYCLE_MS,
   lunarPhase,
   MIN_DAYNIGHT_AMPLITUDE,
@@ -674,11 +673,9 @@ describe('the moon phase lifts the night floor (brighter nights under a fuller m
   });
 
   it('keeps even a new moon navigable: the ambient never falls to the old cutout', () => {
-    // The pre-split world sat the whole night at 0.30 ambient (LEGACY_NIGHT_FLOORS),
-    // which read as a black cutout off the lit roads. The darkest night here stays
-    // clear of it.
+    // The pre-split world sat the whole night at 0.30 ambient, which read as a
+    // black cutout off the lit roads. The darkest night here stays clear of it.
     expect(moonNightFloors(0).ambient).toBeGreaterThan(0.35);
-    expect(moonNightFloors(0).ambient).toBeGreaterThan(LEGACY_NIGHT_FLOORS.ambient);
   });
 
   it('swings the night NOTICEABLY from new to full, not a token amount', () => {
@@ -712,32 +709,6 @@ describe('the moon phase lifts the night floor (brighter nights under a fuller m
   it('leaves DAY untouched at every moon phase, so the moon only shapes the dip', () => {
     expect(dayNightGrade(1, undefined, 0)).toEqual(NEUTRAL_DAY_GRADE);
     expect(dayNightGrade(1, undefined, 1)).toEqual(NEUTRAL_DAY_GRADE);
-  });
-});
-
-describe('the legacy night A/B (dev before/after comparison)', () => {
-  it('grades a deep night with the old flat floors when legacy is on', () => {
-    const g = dayNightGrade(0, undefined, 0.5, true);
-    expect(g.ambientScale).toBeCloseTo(LEGACY_NIGHT_FLOORS.ambient, 12);
-    expect(g.lightScale).toBeCloseTo(LEGACY_NIGHT_FLOORS.key, 12);
-  });
-
-  it('is darker than the new night at every moon phase (that is the whole point)', () => {
-    for (const lit of [0, 0.5, 1]) {
-      const legacy = dayNightGrade(0, undefined, lit, true);
-      const modern = dayNightGrade(0, undefined, lit, false);
-      expect(legacy.ambientScale, `ambient at lit=${lit}`).toBeLessThan(modern.ambientScale);
-    }
-  });
-
-  it('ignores the moon phase, because the old world had no moon swing', () => {
-    expect(dayNightGrade(0, undefined, 0, true).ambientScale).toBe(
-      dayNightGrade(0, undefined, 1, true).ambientScale,
-    );
-  });
-
-  it('still lands day on the identity grade, legacy or not', () => {
-    expect(dayNightGrade(1, undefined, 0.5, true)).toEqual(NEUTRAL_DAY_GRADE);
   });
 });
 
