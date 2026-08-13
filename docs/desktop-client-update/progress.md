@@ -1321,3 +1321,16 @@ b393f17057 formatting; tree clean, LOCAL-ONLY intact):
   amendment, inventory); phase-07/08/09/10/11 and their QA files re-pointed
   and premise-fixed (each edit cites its forcing sha in the file);
   implementation-plan.md and README.md re-pointed.
+- GATE (gate_select, BROWSER_PATH exported, NO biome pin, run post-refresh):
+  i18n/wiki/SFX artifacts green, malware scan PASS (6315 files, 0 high),
+  changed-files biome GREEN WITH ZERO WORKING-TREE EDITS (the retired-pin
+  recipe confirmed live: diff base auto-resolved to origin/release/v0.38.0,
+  204 changed paths). Full-suite vitest fallback: 2702 files / 37711 tests
+  green; red = the 9 seal suites (14 tests) PLUS tests/monolith_budget
+  .test.ts (2 tests), a NEW structural finding surfaced (not band-aided):
+  upstream's extract-and-lower ratchet re-pinned renderer.ts/hud.ts ceilings
+  with near-zero slack (13764/19490) and the branch's phase 4-6
+  thin-consumer wiring now sits +89/+10 over; ceiling raise is a maintainer
+  decision, recorded OPEN in state.md gotchas. Gate aborts at the vitest
+  step by design; post-abort turbo proofs green 5/5 (check:types build:env
+  build:server build:bot) + 3/3 (build:bundle).

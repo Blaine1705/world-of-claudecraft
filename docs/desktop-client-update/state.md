@@ -664,6 +664,22 @@ comparisons.
   .ts bytes are a provenance input the train moved): the phase 11 seal step must
   run its twelve-input --check first; if the r185 delta touches town rendering
   the polish captures must be RE-SHOT, not just re-recorded.
+- MONOLITH RATCHET RED (OPEN, surfaced 2026-08-13, user decision pending):
+  tests/monolith_budget.test.ts reds on the merged tree: renderer.ts 13853 vs
+  ceiling 13764 (+89) and hud.ts 19500 vs 19490 (+10). Structural, not a
+  defect: upstream's own extract-and-lower ratchet updates (marker interaction
+  out of HUD 16181436bf, renderer diagnostics 8d755848ee) re-pinned the
+  ceilings with near-zero slack, and the branch's phase 4-6 additions to the
+  two coordinators are already thin-consumer wiring to extracted modules
+  (presentation_gate, frame_present, dpr_watch, instance_music,
+  static_matrix), so no clean branch-owned extraction exists. Per the ratchet
+  doctrine a ceiling raise is a MAINTAINER decision; the branch does not
+  self-raise. Until resolved, a full-fallback gate run reds on the 9 seal
+  suites (14 tests) PLUS this suite (2 tests) = 10 files / 16 tests; the
+  monolith rows are the ONLY accepted non-seal red and any OTHER red is a
+  regression. Resolution options at PR time: maintainer ceiling raise with
+  recorded rationale, or an offsetting extraction of upstream-owned mass
+  (permanent merge friction for a long-lived branch; not done unilaterally).
 - tests/profile_mode.test.mjs (in the normal vitest suite) and the browser
   regressions leg need a browser binary this machine lacks by default: export
   BROWSER_PATH=~/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome for gate
