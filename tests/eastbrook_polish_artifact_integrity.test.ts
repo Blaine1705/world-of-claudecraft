@@ -724,10 +724,14 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // with the release branch's organized renderer imports. Both parents move
 // renderer.ts, so the rendererIntegration leaf mints a value matching neither
 // parent. No capture was retaken.
+// Re-minted after the point-light adoption seam moved the fire-light budget
+// pass out of renderer.ts into fire_light_registry.ts. renderer.ts is a
+// provenance input, so the composite moves and the swept evidence bytes follow.
+// No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '00dbdfda2c79d0f19dcae84ae132fc700925ed50d7acdab780f2b4285a05f4c4';
+  '23d36bc9229108b3f308b1bc87253c3a94a05acd0b4c6531229ce54ca33f5f59';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'decde6de14371817605eb651a7f0450148057e922e1ff81e7169521591704ecd';
+  '1fdbcece9c5c56df2e8fcea2a513964862a5b4ce297d2def78800cc7c3582b22';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1632,6 +1636,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // the first-order composite follows both parents' renderer.ts and
     // prewarm_policy.ts inputs, then this second-order performance seal follows
     // the swept evidence bytes. No capture was retaken.
+    // Re-minted after the point-light adoption seam moved the fire-light budget
+    // pass out of renderer.ts: the first-order composite follows renderer.ts,
+    // then this second-order seal follows the swept evidence bytes. No capture
+    // was retaken.
     // Re-pinned for the merge of release/v0.36.0 (post PR 3220/3221) into the
     // KTX2 mip-release branch: the first-order composite follows both parents'
     // renderer.ts inputs, then this second-order performance seal follows the
@@ -1691,7 +1699,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('9b6bce82c9e8927b7afc6de52863bf0d5205febbc205c70cffff06db65f7e9f8');
+    ).toBe('2954fdd9218444975d66307c80739d5f321c3dc12cb7fdba618e8110f1467b4e');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
