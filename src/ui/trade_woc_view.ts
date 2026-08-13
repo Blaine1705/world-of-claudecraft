@@ -319,9 +319,12 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
         ? 'await_their_items'
         : // An offer pins EXACTLY ONE copy (H10: the server refuses acceptance
           // of any copy but the pinned one), so a table holding several
-          // eligible items is ambiguous about which the price buys. Silently
-          // pinning the first would be the bait-and-switch surface inverted.
-          eligible.length > 1
+          // eligible items, or one STACK of several units, is ambiguous about
+          // what the price buys: acceptance escrows exactly one unit, and a
+          // buyer looking at a stack of three would pay the stack price for
+          // one. Silently pinning the first would be the bait-and-switch
+          // surface inverted.
+          eligible.length > 1 || (eligible[0]?.count ?? 1) !== 1
           ? 'one_item'
           : input.usdCents === null || input.usdCents <= 0
             ? 'enter_price'
@@ -376,7 +379,7 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
     // A standing offer replaces the form: you cannot send a second one over it.
     canSend: wocMode && hint === null && input.pendingOffer === null,
     sendHint: wocMode && hint !== null ? SEND_HINT_KEYS[hint] : null,
-    agreedItem: eligible.length === 1 ? eligible[0] : null,
+    agreedItem: eligible.length === 1 && eligible[0].count === 1 ? eligible[0] : null,
     statusKey:
       input.pendingOffer === null
         ? null

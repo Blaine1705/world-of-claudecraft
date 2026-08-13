@@ -4,9 +4,11 @@
 // cleanup + the joint invite-expiry sweep reach them through the same seam. The
 // inventory hub stays on Sim and is consumed via ctx. Instanced payloads cross
 // intact through removeOffer/grantOffer; Rift gear remains owner-bound and is
-// excluded explicitly. This is a MOVE: the statements, branches, and iteration order are
-// byte-identical to the pre-move methods (the immutability waiver applies, so the
-// in-place mutation of the shared TradeSession / PlayerMeta.copper is preserved).
+// excluded explicitly. (The original extraction was a byte-identical MOVE; the
+// directed-rail hardening then changed STAGING deliberately: stagedOfferSlots
+// previews the swap's own selection so the session offer carries per-copy
+// identity, and removeOffer consumes those pinned copies first. The swap's
+// removal/grant payload semantics are unchanged.)
 //
 // Sim keeps thin same-named delegates for the public methods so the IWorld + server
 // + leave-path + tick() call sites resolve unchanged; this module draws no rng.
@@ -15,14 +17,17 @@ import type { TradeInfo } from '../../world_api';
 import { addStacked, bagCapacity, countFit, removeStacked } from '../bags';
 import { RIFT_GEAR_ITEM_IDS } from '../content/rift/items';
 import { ITEMS } from '../data';
+import { itemCopyPin } from '../item_copy_ref';
+import { removeMatchingInstance } from '../item_instance_transfer';
 import {
+  removeSellUnitsFromInventory,
   removeVendorSellUnits,
   sellerSignedCharmDeprioritize,
   type VendorRemovedUnit,
 } from '../items';
 import type { PlayerMeta, TradeSession } from '../sim';
 import type { SimContext } from '../sim_context';
-import { dist2d, type InvSlot, type ItemInstancePayload } from '../types';
+import { cloneItemInstancePayload, dist2d, type InvSlot, type ItemInstancePayload } from '../types';
 
 // A trade is only offered/kept while both parties are within this many yards;
 // the drift sweep cancels an open session once they wander past TRADE_RANGE + 4.
@@ -128,6 +133,56 @@ export function tradeAccept(ctx: SimContext, pid?: number): void {
   }
 }
 
+/**
+ * The per-copy slots a staged line really offers, resolved at STAGE time by
+ * the EXACT selection the swap will run (removeSellUnitsFromInventory with the
+ * same skip and deprioritize predicates removeOffer passes), over a scratch
+ * deep copy of the bags. This is what lets the counterparty's window show,
+ * and the $WOC directed-offer pin fingerprint, the REAL copies on the table:
+ * the old id-plus-count normalization stripped every instance payload, so a
+ * buyer could never see (nor pin) which roll, enchant, or crafted provenance
+ * they were agreeing to, and the H10 fingerprint degenerated to an item-id
+ * comparison. Consecutive identical units group back into one slot (keyed by
+ * itemCopyPin, the copy-identity rule every exchange pipe shares), so a plain
+ * stack still reads as one line. The returned payloads are the scratch's own
+ * deep clones and never alias the live bags.
+ */
+function stagedOfferSlots(meta: PlayerMeta, itemId: string, count: number): InvSlot[] {
+  const scratch: InvSlot[] = (meta.inventory ?? []).map((s) => ({
+    ...s,
+    ...(s.instance === undefined ? {} : { instance: cloneItemInstancePayload(s.instance) }),
+  }));
+  const units = removeSellUnitsFromInventory(
+    scratch,
+    itemId,
+    count,
+    isTradeLocked,
+    sellerSignedCharmDeprioritize(meta.name, itemId),
+  );
+  const out: InvSlot[] = [];
+  for (const u of units) {
+    const prev = out[out.length - 1];
+    const key = (instance: ItemInstancePayload | undefined, crafted: string | undefined): string =>
+      itemCopyPin({
+        itemId,
+        count: 1,
+        ...(instance === undefined ? {} : { instance }),
+        ...(crafted === undefined ? {} : { craftedRecipeId: crafted }),
+      });
+    if (prev && key(prev.instance, prev.craftedRecipeId) === key(u.instance, u.craftedRecipeId)) {
+      prev.count += 1;
+      continue;
+    }
+    out.push({
+      itemId,
+      count: 1,
+      ...(u.instance === undefined ? {} : { instance: u.instance }),
+      ...(u.craftedRecipeId === undefined ? {} : { craftedRecipeId: u.craftedRecipeId }),
+    });
+  }
+  return out;
+}
+
 export function tradeSetOffer(
   ctx: SimContext,
   items: InvSlot[],
@@ -164,10 +219,10 @@ export function tradeSetOffer(
     const unbound = offerableCount(ctx, r.meta, itemId);
     if (unbound < count) {
       boundDenied = true;
-      if (unbound > 0) cleaned.push({ itemId, count: unbound });
+      if (unbound > 0) cleaned.push(...stagedOfferSlots(r.meta, itemId, unbound));
       continue;
     }
-    cleaned.push({ itemId, count });
+    cleaned.push(...stagedOfferSlots(r.meta, itemId, count));
   }
   if (boundDenied) ctx.error(r.meta.entityId, 'That item is bound and cannot be traded.');
   const offer = {
@@ -213,6 +268,30 @@ type PendingGrant = { itemId: string; units: VendorRemovedUnit[] };
 // feeds the real removal AND the capacity model below.
 export { sellerSignedCharmDeprioritize };
 
+/** One PLAIN unit whose crafted marker matches the staged slot's, highest
+ *  index first (the walk order every removal here shares). The plain sibling
+ *  of removeMatchingInstance, local because only the pinned-slot removal
+ *  below wants marker-exact plain consumption. */
+function removePlainMatchingUnit(
+  ctx: SimContext,
+  itemId: string,
+  craftedRecipeId: string | undefined,
+  pid: number,
+): VendorRemovedUnit | null {
+  const r = ctx.resolve(pid);
+  if (!r) return null;
+  const inventory = r.meta.inventory ?? [];
+  for (let i = inventory.length - 1; i >= 0; i--) {
+    const s = inventory[i];
+    if (s.itemId !== itemId || s.instance || s.craftedRecipeId !== craftedRecipeId) continue;
+    s.count -= 1;
+    if (s.count <= 0) inventory.splice(i, 1);
+    ctx.onInventoryChangedForQuests?.(r.meta);
+    return { instance: undefined, craftedRecipeId };
+  }
+  return null;
+}
+
 function removeOffer(ctx: SimContext, items: InvSlot[], fromPid: number): PendingGrant[] {
   const grants: PendingGrant[] = [];
   // The copy-choice fix: when an instanced CHARM copy must ship, the
@@ -220,21 +299,46 @@ function removeOffer(ctx: SimContext, items: InvSlot[], fromPid: number): Pendin
   // above owns the predicate and its scope).
   const sellerName = ctx.resolve(fromPid)?.meta.name;
   for (const s of items) {
+    // The staged slots carry the EXACT copies the stage-time preview
+    // selected (stagedOfferSlots), so the swap consumes those copies first:
+    // what the counterparty saw is what ships. A copy that left the bags
+    // between staging and confirm falls back, per missing unit, to the old
+    // generic walk (same predicates), which preserves the pre-preview
+    // behavior of moving SOME eligible copy rather than failing the trade;
+    // offerCovered has already re-validated the per-id totals.
+    //
     // A trade removal NEVER consumes a trade-locked copy. The offer
     // was already clamped to the unbound count (tradeSetOffer / offerCovered),
     // so enough unbound copies exist; the skip predicate is defence in depth so
-    // removeVendorSellUnits's highest-index-first walk spares a bound copy even
-    // if one sits above an unbound one. The deprioritize second pass makes the
-    // seller's own self-signed charm copies go last; a caller passing no
-    // predicate keeps the single-pass walk byte-identical.
-    const units = removeVendorSellUnits(
-      ctx,
-      s.itemId,
-      s.count,
-      fromPid,
-      isTradeLocked,
-      sellerSignedCharmDeprioritize(sellerName, s.itemId),
-    );
+    // the highest-index-first walks spare a bound copy even if one sits above
+    // an unbound one. The deprioritize second pass makes the seller's own
+    // self-signed charm copies go last.
+    const units: VendorRemovedUnit[] = [];
+    for (let unit = 0; unit < s.count; unit++) {
+      if (s.instance !== undefined) {
+        const matched = removeMatchingInstance(ctx, s.itemId, s.instance, fromPid);
+        if (matched) {
+          units.push(matched);
+          continue;
+        }
+      } else {
+        const matched = removePlainMatchingUnit(ctx, s.itemId, s.craftedRecipeId, fromPid);
+        if (matched) {
+          units.push(matched);
+          continue;
+        }
+      }
+      units.push(
+        ...removeVendorSellUnits(
+          ctx,
+          s.itemId,
+          1,
+          fromPid,
+          isTradeLocked,
+          sellerSignedCharmDeprioritize(sellerName, s.itemId),
+        ),
+      );
+    }
     grants.push({ itemId: s.itemId, units });
   }
   return grants;

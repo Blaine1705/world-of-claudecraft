@@ -346,6 +346,13 @@ describe('a disabled send button always says WHY', () => {
     const mixed = buildWocTradeModel(input({ theirStaged: [pinned, slot(QUEST.id)] }));
     expect(mixed.canSend).toBe(true);
     expect(mixed.agreedItem).toBe(pinned);
+    // A single STACK is just as ambiguous as two slots: acceptance escrows
+    // exactly one unit, and a buyer looking at a stack of three would pay
+    // the stack price for one.
+    const stack = buildWocTradeModel(input({ theirStaged: [{ itemId: EPIC.id, count: 3 }] }));
+    expect(stack.canSend).toBe(false);
+    expect(stack.sendHint).toBe('hudChrome.trade.woc.hintOneItem');
+    expect(stack.agreedItem).toBeNull();
   });
 
   it('disables the $WOC tab entirely while you hold items', () => {

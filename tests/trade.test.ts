@@ -836,6 +836,88 @@ describe('trade module (direct, no Sim)', () => {
     expect(units('baked_bread')).toBe(2);
   });
 
+  it('stages the offer as PER-COPY slots carrying the payloads the swap will move', () => {
+    // The old normalization stripped every staged slot to id plus count, so
+    // the counterparty's window (and the $WOC directed-offer fingerprint fed
+    // from it) could never see WHICH copy was on the table. Staging now
+    // previews the swap's own selection walk (plain first, then instanced,
+    // highest index first) and records the per-copy payloads it picks.
+    const { ctx, players } = makeInstancedTradeCtx(
+      [
+        { itemId: 'wolf_fang', count: 1 },
+        { itemId: 'wolf_fang', count: 1, instance: { signer: 'Ayla' } },
+      ],
+      [],
+    );
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 2 }], 0, 1);
+    const session = tradeMod.tradeFor(ctx, 1);
+    const staged = (session!.a === 1 ? session!.offerA : session!.offerB).items;
+    expect(staged).toEqual([
+      { itemId: 'wolf_fang', count: 1 },
+      { itemId: 'wolf_fang', count: 1, instance: { signer: 'Ayla' } },
+    ]);
+    // The staged payload is the preview's own clone, never an alias of the
+    // live bag copy: mutating it must not reach the bags.
+    (staged[1].instance as { signer: string }).signer = 'Tampered';
+    expect(players.get(1).inventory[1].instance.signer).toBe('Ayla');
+  });
+
+  it('groups staged units by copy identity, in the selection order', () => {
+    const { ctx } = makeInstancedTradeCtx(
+      [
+        { itemId: 'wolf_fang', count: 2, instance: { signer: 'Ayla' } },
+        { itemId: 'wolf_fang', count: 1, instance: { signer: 'Borin' } },
+      ],
+      [],
+    );
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 3 }], 0, 1);
+    const session = tradeMod.tradeFor(ctx, 1);
+    const staged = (session!.a === 1 ? session!.offerA : session!.offerB).items;
+    // Highest index first: the Borin copy sits above the Ayla stack, and the
+    // two identical Ayla units group back into one slot.
+    expect(staged).toEqual([
+      { itemId: 'wolf_fang', count: 1, instance: { signer: 'Borin' } },
+      { itemId: 'wolf_fang', count: 2, instance: { signer: 'Ayla' } },
+    ]);
+  });
+
+  it('falls back to the generic walk when a staged copy left the bags before confirm', () => {
+    // Bags can change between staging and confirm; offerCovered re-validates
+    // the per-id totals, and a missing pinned copy must not fail the trade
+    // (the pre-preview behavior: SOME eligible copy moves). The staged
+    // display was stale for exactly the window the player changed their own
+    // bags, which is the honesty level the gold trade always had.
+    const { ctx, players, events } = makeInstancedTradeCtx(
+      [
+        { itemId: 'wolf_fang', count: 1 },
+        { itemId: 'wolf_fang', count: 1, instance: { signer: 'Ayla' } },
+      ],
+      [],
+    );
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    // Stage ONE fang: the preview pins the PLAIN copy (plain-first walk).
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 1 }], 0, 1);
+    // The plain copy then leaves the bags outside the trade's sight.
+    const invA = players.get(1).inventory;
+    invA.splice(
+      invA.findIndex((s: any) => s.itemId === 'wolf_fang' && !s.instance),
+      1,
+    );
+    tradeMod.tradeConfirm(ctx, 1);
+    tradeMod.tradeConfirm(ctx, 2);
+    expect(events.some((e: any) => e.type === 'error')).toBe(false);
+    // The signed copy crossed instead of the vanished plain one.
+    expect(players.get(2).inventory).toEqual([
+      { itemId: 'wolf_fang', count: 1, instance: { signer: 'Ayla' } },
+    ]);
+    expect(players.get(1).inventory.filter((s: any) => s.itemId === 'wolf_fang')).toHaveLength(0);
+  });
+
   it('accepts a trade that fits only by merging into a byte-equal receiver stack', () => {
     // The receiver is slot-full, but one slot is a byte-equal signed stack
     // with room: the capacity gate must model the merge and accept
