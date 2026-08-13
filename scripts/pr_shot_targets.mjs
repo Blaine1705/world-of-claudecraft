@@ -3280,6 +3280,44 @@ export const TARGETS = [
     },
   },
   {
+    key: 'market-sell-price-ref',
+    label: 'World Market Sell tab (current lowest listing price reference, issue 3043)',
+    when: ['ui/market_window', 'ui/market_view', 'sim/market'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    // Grant a house-stocked food item (roasted_boar, seeded at 700c/5 = 140c/unit
+    // by market.ts's standing stock, so the reference always has a real, non-zero
+    // price to show), open the Sell tab, then stage the item through the REAL bag
+    // click path (isMarketSell -> stageMarketSell), not a debug-hook shortcut:
+    // bag rows carry a stable `bag:<itemId>:<ordinal>` focus key.
+    async capture(page) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const p = sim?.player;
+        if (p?.pos) {
+          p.pos.x = 0;
+          p.pos.z = 11.5;
+        }
+        sim?.addItem?.('roasted_boar', 5, p?.id);
+        const el = document.querySelector('#market-window');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.openMarket?.();
+      });
+      if (!(await pollForSize(page, '#market-window'))) return {};
+      const staged = await page.evaluate(() => {
+        const tab = document.querySelector('#market-window [data-tab="sell"]');
+        if (!tab) return false;
+        tab.click();
+        const row = document.querySelector('[data-focus-key^="bag:roasted_boar:"]');
+        if (!row) return false;
+        row.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        return true;
+      });
+      if (!staged) return {};
+      await wait(300);
+      return { clip: '#market-window' };
+    },
+  },
+  {
     key: 'market-collect-ledger',
     label: 'World Market Collect tab (itemized sale ledger under the proceeds line)',
     when: ['ui/market_window', 'ui/market_view', 'sim/market'],

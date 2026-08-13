@@ -8950,6 +8950,8 @@ export const fr_CA: EnTranslations = {
       "quantity": "Quantité",
       "quantityOf": "sur {count}",
       "priceEach": "Prix unitaire",
+      "lowestPriceLabel": "Current lowest listed price",
+      "lowestPriceNone": "No active listings for this item yet.",
       "listButton": "Publier au Marché mondial",
       "minPriceError": "Indiquez un prix d'au moins 1 cuivre.",
       "collectEmpty": "Rien en attente. Les recettes et annonces expirées se récupèrent ici.",

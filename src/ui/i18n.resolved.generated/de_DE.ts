@@ -8950,6 +8950,8 @@ export const de_DE: EnTranslations = {
       "quantity": "Menge",
       "quantityOf": "von {count}",
       "priceEach": "Preis je Stück",
+      "lowestPriceLabel": "Current lowest listed price",
+      "lowestPriceNone": "No active listings for this item yet.",
       "listButton": "Auf dem Weltmarkt einstellen",
       "minPriceError": "Nennt einen Preis von mindestens 1 Kupfer.",
       "collectEmpty": "Nichts wartet. Verkaufserlöse und abgelaufene Angebote werden hier abgeholt.",

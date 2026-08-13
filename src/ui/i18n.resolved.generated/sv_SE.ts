@@ -8950,6 +8950,8 @@ export const sv_SE: EnTranslations = {
       "quantity": "Antal",
       "quantityOf": "av {count}",
       "priceEach": "Pris per styck",
+      "lowestPriceLabel": "Current lowest listed price",
+      "lowestPriceNone": "No active listings for this item yet.",
       "listButton": "Lägg upp på Världsmarknaden",
       "minPriceError": "Ange ett pris på minst 1 koppar.",
       "collectEmpty": "Inget väntar. Försäljningsintäkter och utgångna annonser hämtas här.",

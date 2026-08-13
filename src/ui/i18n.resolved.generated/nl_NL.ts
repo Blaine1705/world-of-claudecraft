@@ -8950,6 +8950,8 @@ export const nl_NL: EnTranslations = {
       "quantity": "Aantal",
       "quantityOf": "van {count}",
       "priceEach": "Prijs per stuk",
+      "lowestPriceLabel": "Current lowest listed price",
+      "lowestPriceNone": "No active listings for this item yet.",
       "listButton": "Aanbieden op de Wereldmarkt",
       "minPriceError": "Noem een prijs van minstens 1 koper.",
       "collectEmpty": "Niets in afwachting. Verkoopopbrengsten en verlopen aanbiedingen komen hier binnen.",

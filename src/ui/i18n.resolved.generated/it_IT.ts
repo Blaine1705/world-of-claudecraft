@@ -8950,6 +8950,8 @@ export const it_IT: EnTranslations = {
       "quantity": "Quantità",
       "quantityOf": "di {count}",
       "priceEach": "Prezzo unitario",
+      "lowestPriceLabel": "Current lowest listed price",
+      "lowestPriceNone": "No active listings for this item yet.",
       "listButton": "Metti sul Mercato Mondiale",
       "minPriceError": "Indica un prezzo di almeno 1 rame.",
       "collectEmpty": "Non c'è nulla in attesa. Ricavi e inserzioni scadute si ritirano qui.",
