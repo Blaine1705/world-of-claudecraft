@@ -461,13 +461,13 @@ describe('RiftMapPainter', () => {
     const painter = new RiftMapPainter(
       writers,
       () => 'class',
-      (name, rank) => `${name} — ${rank}`,
+      (name, rank) => `${name} - ${rank}`,
       markerArt,
     );
     painter.paintMinimap(ctx as unknown as CanvasRenderingContext2D, world(), labelEl, 162);
     expect(ctx.arc).toHaveBeenCalledWith(81, 81, 79, 0, Math.PI * 2);
     expect(ctx.clip).toHaveBeenCalled();
-    expect(writers.setText).toHaveBeenCalledWith(labelEl, 'The Ember Test: Depth 1 — A');
+    expect(writers.setText).toHaveBeenCalledWith(labelEl, 'The Ember Test: Depth 1 - A');
   });
 
   it.each(

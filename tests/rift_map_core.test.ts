@@ -433,7 +433,7 @@ describe('rift map live model', () => {
 
   it('shows only mirrored live entities and never leaks the generated spawn plan', () => {
     const view = createRiftMapView();
-    const empty = view.build(worldWith(), 162, 8, 'The Test Rift — Rank B');
+    const empty = view.build(worldWith(), 162, 8, 'The Test Rift - Rank B');
     expect(empty).not.toBeNull();
     expect(empty?.mobs).toEqual([]);
     expect(empty?.objects).toEqual([]);
@@ -461,7 +461,7 @@ describe('rift map live model', () => {
       ]),
       162,
       8,
-      'The Test Rift — Rank B',
+      'The Test Rift - Rank B',
     );
     expect(live?.mobs).toHaveLength(1);
     expect(live?.mobs[0].aggro).toBe(true);
@@ -612,7 +612,7 @@ describe('rift map live model', () => {
       ]),
       162,
       8,
-      'The Test Rift — Rank B',
+      'The Test Rift - Rank B',
     );
     expect(model?.objects.map((marker) => marker.semantic.kind)).toEqual([
       'rift-mechanic',
