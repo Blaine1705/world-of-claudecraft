@@ -220,6 +220,88 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     ).toBeGreaterThan(schemes);
   });
 
+  it('reads the prefs store before anything that depends on it', () => {
+    // The store gates the two GPU-force levers, and both of those must run
+    // before Electron's own startup, so the read has to be the first thing this
+    // file does. A read that drifted below them would leave the opt-out silently
+    // inert with every unit test still green.
+    expect(code, 'the store must live in userData under the module-owned filename').toContain(
+      "path.join(app.getPath('userData'), DESKTOP_PREFS_FILENAME)",
+    );
+    const loadAt = code.indexOf('loadDesktopPrefs(desktopPrefsPath)');
+    const relaunchAt = code.indexOf('relaunchForLinuxPrime({ log: console })');
+    const forceAt = code.indexOf('forceHighPerformanceGpu({ app, log });');
+    expect(loadAt, 'the prefs must be loaded synchronously at module scope').toBeGreaterThan(-1);
+    expect(relaunchAt, 'the PRIME relaunch call must survive').toBeGreaterThan(-1);
+    expect(loadAt, 'the prefs read must precede the PRIME relaunch decision').toBeLessThan(
+      relaunchAt,
+    );
+    expect(loadAt, 'the prefs read must precede the GPU force call').toBeLessThan(forceAt);
+  });
+
+  it('constructs the window at the restored geometry rather than resizing it after', () => {
+    // Applying saved bounds after construction would create the window at the
+    // default size first, so the reveal on 'ready-to-show' could catch a resize
+    // (and a maximized session would flash its un-maximized size).
+    const resolveAt = code.indexOf('resolveWindowRestore({');
+    const ctorAt = code.indexOf('new BrowserWindow({');
+    expect(resolveAt, 'the restore must be resolved in createMainWindow').toBeGreaterThan(-1);
+    expect(resolveAt, 'the restore must be resolved before the constructor').toBeLessThan(ctorAt);
+    const options = block('new BrowserWindow({', '\n  });', 'BrowserWindow options');
+    for (const field of [
+      'x: restore.x,',
+      'y: restore.y,',
+      'width: restore.width,',
+      'height: restore.height,',
+    ]) {
+      expect(
+        options.includes(`\n    ${field}\n`),
+        `the constructor options must carry ${field}`,
+      ).toBe(true);
+    }
+    const maximizeAt = code.indexOf('if (restore.maximized) mainWindow.maximize();');
+    expect(maximizeAt, 'a maximized session must be restored maximized').toBeGreaterThan(ctorAt);
+    expect(
+      maximizeAt,
+      'maximize must happen while the window is still hidden, before the reveal is armed',
+    ).toBeLessThan(code.indexOf("mainWindow.once('ready-to-show'"));
+  });
+
+  it('remembers the window geometry on settle and once more at close', () => {
+    const capture = block('const captureWindowBounds = () => {', '\n  };', 'captureWindowBounds');
+    expect(
+      capture,
+      'a maximized session must remember the size it un-maximizes to, not the full screen',
+    ).toContain('win.getNormalBounds()');
+    expect(capture, 'getBounds would persist the maximized rect').not.toContain('win.getBounds()');
+    expect(capture, 'the maximized state itself must be remembered').toContain('win.isMaximized()');
+    expect(capture, 'the display the window sits on must be remembered').toContain(
+      'screen.getDisplayMatching(',
+    );
+    expect(capture, 'the whole prefs record must be persisted').toContain(
+      'saveDesktopPrefs(desktopPrefsPath, desktopPrefs);',
+    );
+
+    expect(code, 'a resize must schedule a save').toContain(
+      "mainWindow.on('resize', scheduleWindowBoundsSave);",
+    );
+    const move = block("mainWindow.on('move'", '\n  });', 'move handler');
+    expect(move, 'a drag must schedule a save').toContain('scheduleWindowBoundsSave();');
+    expect(move, 'the display re-read must still fire on move').toContain('sendDisplayChange();');
+
+    // 'closed' is after destruction, where the bounds can no longer be read, so
+    // the final capture has to hang off 'close'.
+    const close = block("mainWindow.on('close', () => {", '\n  });', 'close handler');
+    expect(close, 'the pending debounce must be cancelled first').toContain(
+      'clearBoundsSaveTimer();',
+    );
+    expect(close, 'the final capture must be synchronous on close').toContain(
+      'captureWindowBounds();',
+    );
+    const closed = block("mainWindow.on('closed'", '\n  });', 'closed handler');
+    expect(closed, 'no save timer may outlive its window').toContain('clearBoundsSaveTimer();');
+  });
+
   it('no longer carries a per-window setMenu(null)', () => {
     expect(
       count(code, 'setMenu(null)'),

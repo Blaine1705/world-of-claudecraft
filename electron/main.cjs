@@ -28,6 +28,16 @@ const {
 } = require('./shell_guards.cjs');
 const { rangeContentType, rangedFileResponse } = require('./media_range.cjs');
 const { resolveDesktopConfig, walletConnectionSupported } = require('./desktop_config.cjs');
+const {
+  DESKTOP_PREFS_FILENAME,
+  loadDesktopPrefs,
+  saveDesktopPrefs,
+} = require('./desktop_prefs.cjs');
+const {
+  MIN_WINDOW_HEIGHT,
+  MIN_WINDOW_WIDTH,
+  resolveWindowRestore,
+} = require('./window_memory.cjs');
 const { createSteamShell } = require('./steam.cjs');
 const { createEpicShell } = require('./epic.cjs');
 const { PRODUCTION_API_ORIGIN } = require('./update_guard.cjs');
@@ -59,6 +69,18 @@ const {
   buildWalletHandoffBrowserUrl,
   parseWalletHandoffDeepLink,
 } = require('./wallet_handoff.cjs');
+
+// The shell's persisted preferences (electron/desktop_prefs.cjs), read synchronously and
+// FIRST because the very next decision depends on them: both discrete-GPU levers have to
+// run before Electron's own startup, so a preference fetched any later than this could not
+// gate them. app.getPath('userData') is callable before app 'ready', and the resolve plus a
+// small-file read plus JSON.parse measures well under a millisecond, so the boot cost is
+// noise. This ONE object is the single in-memory source every save writes from: the window
+// saver and the GPU opt-out setter each update their own field and persist the whole record,
+// so neither can clobber the other's (the opt-out can be toggled mid-session, with a
+// close-time bounds save still to come).
+const desktopPrefsPath = path.join(app.getPath('userData'), DESKTOP_PREFS_FILENAME);
+const desktopPrefs = loadDesktopPrefs(desktopPrefsPath);
 
 // On a Linux hybrid-graphics laptop, the PRIME render-offload env vars (DRI_PRIME,
 // __NV_PRIME_RENDER_OFFLOAD, etc; see electron/gpu_preference.cjs) only reach the GPU
@@ -280,6 +302,17 @@ const READY_TO_SHOW_FALLBACK_MS = 4000;
 // A drag fires 'move' continuously; only the position it lands on is worth a read.
 const MOVE_DISPLAY_DEBOUNCE_MS = 250;
 
+// The size a launch with no usable window memory gets (a first run, or a monitor
+// layout the saved bounds no longer fit). The MINIMUMS live in
+// electron/window_memory.cjs, which clamps every restored size to them.
+const DEFAULT_WINDOW_WIDTH = 1440;
+const DEFAULT_WINDOW_HEIGHT = 900;
+
+// How long a resize or a drag must settle before the window geometry is written
+// to disk. Both events fire continuously, and the file is rewritten whole, so
+// this is what keeps a single drag from being hundreds of writes.
+const WINDOW_BOUNDS_SAVE_DEBOUNCE_MS = 700;
+
 // The last display reading pushed, so an unchanged reading is not re-sent (both
 // triggers fire for reasons that leave the reading identical).
 let lastDisplayPush = null;
@@ -338,11 +371,26 @@ function sendDisplayChange() {
 }
 
 function createMainWindow() {
+  // Where the window comes back (electron/window_memory.cjs): the remembered
+  // geometry when the display it was saved on is still connected and enough of
+  // the window would land on screen, otherwise the default size centered on the
+  // nearest display. Resolved BEFORE the constructor so the restored size is in
+  // the options literal itself: applying it afterwards with setBounds would
+  // create the window at the default size first, and the reveal on
+  // 'ready-to-show' could catch it mid-resize.
+  const restore = resolveWindowRestore({
+    saved: desktopPrefs,
+    displays: screen.getAllDisplays(),
+    primaryId: screen.getPrimaryDisplay()?.id,
+    defaults: { width: DEFAULT_WINDOW_WIDTH, height: DEFAULT_WINDOW_HEIGHT },
+  });
   mainWindow = new BrowserWindow({
-    width: 1440,
-    height: 900,
-    minWidth: 1024,
-    minHeight: 720,
+    x: restore.x,
+    y: restore.y,
+    width: restore.width,
+    height: restore.height,
+    minWidth: MIN_WINDOW_WIDTH,
+    minHeight: MIN_WINDOW_HEIGHT,
     title: 'World of ClaudeCraft',
     backgroundColor: '#05070a',
     // Created hidden and revealed on 'ready-to-show' below, so the player never
@@ -378,6 +426,11 @@ function createMainWindow() {
       disableBlinkFeatures: 'Autofill',
     },
   });
+
+  // A session that ended maximized comes back maximized. Done here, while the
+  // window is still hidden (show:false above), so the reveal on 'ready-to-show'
+  // is already maximized rather than flashing the restored size for a frame.
+  if (restore.maximized) mainWindow.maximize();
 
   // Show once, and only a window that is still alive and still hidden: the
   // fallback timer and 'ready-to-show' race by design, and crash recovery
@@ -424,6 +477,43 @@ function createMainWindow() {
   mainWindow.on('show', sendPresentationState);
   mainWindow.on('focus', sendPresentationState);
 
+  // Window memory: where and how big the window was, so the next launch opens
+  // it there (electron/desktop_prefs.cjs stores it, window_memory.cjs decides at
+  // launch whether it is still usable). getNormalBounds, never getBounds: a
+  // session that ends maximized must remember the size it would un-maximize to,
+  // or the window could never come back small again. The whole prefs record is
+  // written each time, so this and the GPU opt-out setter cannot clobber each
+  // other's field. Captured `win` for the same reason as the timers above.
+  let boundsSaveTimer = null;
+  const clearBoundsSaveTimer = () => {
+    if (boundsSaveTimer === null) return;
+    clearTimeout(boundsSaveTimer);
+    boundsSaveTimer = null;
+  };
+  const captureWindowBounds = () => {
+    if (win.isDestroyed()) return;
+    const bounds = win.getNormalBounds();
+    desktopPrefs.windowBounds = bounds;
+    desktopPrefs.displayId = screen.getDisplayMatching(bounds)?.id;
+    desktopPrefs.maximized = win.isMaximized();
+    saveDesktopPrefs(desktopPrefsPath, desktopPrefs);
+  };
+  const scheduleWindowBoundsSave = () => {
+    clearBoundsSaveTimer();
+    boundsSaveTimer = setTimeout(() => {
+      boundsSaveTimer = null;
+      captureWindowBounds();
+    }, WINDOW_BOUNDS_SAVE_DEBOUNCE_MS);
+  };
+  mainWindow.on('resize', scheduleWindowBoundsSave);
+  // 'close' is the last moment the bounds can be read at all: it fires while the
+  // window still exists, where 'closed' is already after destruction. The
+  // pending debounce is cancelled first so this final capture is what lands.
+  mainWindow.on('close', () => {
+    clearBoundsSaveTimer();
+    captureWindowBounds();
+  });
+
   // Dragging the window to another monitor can change the scale factor the
   // renderer resolves its drawing buffer from. 'moved' would be the natural
   // event but does not fire on Linux, so listen to 'move' (which fires
@@ -437,7 +527,11 @@ function createMainWindow() {
     clearTimeout(moveDisplayTimer);
     moveDisplayTimer = null;
   };
+  // Two independent debounces ride this one event: the window-memory save above
+  // and the display re-read below. Separate timers on purpose, since they answer
+  // to different settle times and neither may swallow the other.
   mainWindow.on('move', () => {
+    scheduleWindowBoundsSave();
     clearMoveDisplayTimer();
     moveDisplayTimer = setTimeout(() => {
       moveDisplayTimer = null;
@@ -560,6 +654,7 @@ function createMainWindow() {
   mainWindow.on('closed', () => {
     clearReadyToShowFallback();
     clearMoveDisplayTimer();
+    clearBoundsSaveTimer();
     clearHiddenRederiveTimer();
     mainWindow = null;
   });

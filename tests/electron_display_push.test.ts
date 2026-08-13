@@ -87,8 +87,10 @@ describe('the display change push to the renderer', () => {
     expect(main).toMatch(/^const MOVE_DISPLAY_DEBOUNCE_MS = \d+;$/m);
 
     const body = flat(createMainWindowBody());
+    // The window-memory save shares this event (its own debounce, its own
+    // timer); the display re-read below it must survive that unchanged.
     expect(body).toContain(
-      "mainWindow.on('move', () => { clearMoveDisplayTimer(); " +
+      "mainWindow.on('move', () => { scheduleWindowBoundsSave(); clearMoveDisplayTimer(); " +
         'moveDisplayTimer = setTimeout(() => { moveDisplayTimer = null; ' +
         'if (win.isDestroyed()) return; sendDisplayChange(); }, MOVE_DISPLAY_DEBOUNCE_MS); });',
     );
@@ -97,7 +99,8 @@ describe('the display change push to the renderer', () => {
     expect(body).toContain('lastDisplayPush = null;');
     expect(body).toContain(
       "mainWindow.on('closed', () => { clearReadyToShowFallback(); " +
-        'clearMoveDisplayTimer(); clearHiddenRederiveTimer(); mainWindow = null; });',
+        'clearMoveDisplayTimer(); clearBoundsSaveTimer(); clearHiddenRederiveTimer(); ' +
+        'mainWindow = null; });',
     );
   });
 
@@ -130,8 +133,14 @@ describe('the display change push to the renderer', () => {
 
   it('carries only the scale factor: no id, no bounds, no label', () => {
     // Window bounds are a separate, later contract, and the display id is a
-    // stable OS-derived identifier the renderer has no use for.
-    expect(main).not.toContain('getNormalBounds()');
+    // stable OS-derived identifier the renderer has no use for. The ban is
+    // scoped to the send path: window memory reads getNormalBounds elsewhere in
+    // main.cjs for its own unrelated purpose (remembering the pre-maximize size
+    // for the next launch), and that never crosses this channel.
+    const sendStart = main.indexOf('function sendDisplayChange()');
+    expect(sendStart, 'sendDisplayChange is gone from electron/main.cjs').toBeGreaterThan(-1);
+    const sendBody = main.slice(sendStart, main.indexOf('\n}', sendStart));
+    expect(sendBody).not.toContain('getNormalBounds()');
     expect(/webContents\.send\('desktop-display-changed', \{/.test(main)).toBe(false);
     const wire = read('electron/display_events.cjs');
     const start = wire.indexOf('function displayWirePayload(');

@@ -73,7 +73,7 @@ describe('the window presentation push to the renderer', () => {
     // Torn down with its window, alongside the sibling timers.
     const closed = flat(main);
     expect(closed).toContain(
-      "mainWindow.on('closed', () => { clearReadyToShowFallback(); clearMoveDisplayTimer(); clearHiddenRederiveTimer(); mainWindow = null; });",
+      "mainWindow.on('closed', () => { clearReadyToShowFallback(); clearMoveDisplayTimer(); clearBoundsSaveTimer(); clearHiddenRederiveTimer(); mainWindow = null; });",
     );
   });
 
