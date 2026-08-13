@@ -336,7 +336,10 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     elite: true,
     canSwim: true,
     ccImmune: true,
-    respawnMult: 432,
+    // Random respawn window: 12 to 24 times the 25s base is 5 to 10 minutes,
+    // drawn fresh per death (was a fixed 432, three hours).
+    respawnMult: 12,
+    respawnMultMax: 24,
     hpBase: 280,
     hpPerLevel: 52,
     dmgBase: 11,

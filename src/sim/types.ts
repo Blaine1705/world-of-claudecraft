@@ -1502,6 +1502,10 @@ export interface MobTemplate {
   // Ignores taunt/growl forced-target windows. Used by special add AI only.
   ignoreTaunt?: boolean;
   respawnMult?: number;
+  // Upper bound of a RANDOM respawn window, in the same 25s-base units as
+  // respawnMult: with both authored, each death draws the effective multiplier
+  // uniformly in [respawnMult, respawnMultMax] (src/sim/respawn_policy.ts).
+  respawnMultMax?: number;
   // Fixed respawn delay in seconds, overriding respawnSeconds*respawnMult; also
   // caps corpse decay so the mob returns on schedule. (Training dummy: 10s.)
   respawnSeconds?: number;

@@ -102,6 +102,10 @@ export function baseRespawnSecondsAt(
 export interface RespawnTemplateFields {
   respawnSeconds?: number;
   respawnMult?: number;
+  // Upper bound of a RANDOM respawn window: with both authored, the effective
+  // multiplier is drawn uniformly in [respawnMult, respawnMultMax] per death
+  // (same 25s-base units as respawnMult). Authored alongside respawnMult.
+  respawnMultMax?: number;
   rare?: boolean;
 }
 
@@ -131,7 +135,11 @@ export const LEGACY_RESPAWN_SECONDS = 25;
  * cadence.
  */
 export function isSelfScheduled(template: RespawnTemplateFields | undefined): boolean {
-  return template?.respawnMult !== undefined || template?.rare === true;
+  return (
+    template?.respawnMult !== undefined ||
+    template?.respawnMultMax !== undefined ||
+    template?.rare === true
+  );
 }
 
 /**
@@ -143,6 +151,13 @@ export function isSelfScheduled(template: RespawnTemplateFields | undefined): bo
  *     from the flat-timer era; only which base it multiplies moved, and only for
  *     templates that are NOT self-scheduled (see isSelfScheduled).
  *
+ * A template with respawnMultMax carries a random WINDOW instead of a fixed
+ * multiplier: the effective mult is drawn uniformly in
+ * [respawnMult, respawnMultMax] via the caller-supplied `roll` (the death site
+ * passes ctx.rng.range, keeping this leaf pure and the sim deterministic).
+ * Without a roll, the window resolves to its minimum, so every pure caller and
+ * test stays deterministic.
+ *
  * An explicit SimConfig base still overrides everything below the template's own
  * fixed seconds, for both populations, exactly as it always did.
  *
@@ -153,10 +168,16 @@ export function resolveRespawnSeconds(
   template: RespawnTemplateFields | undefined,
   spawnPos: { x: number; z: number },
   cfgRespawnSeconds: number | undefined,
+  roll?: (min: number, max: number) => number,
 ): number {
   if (template?.respawnSeconds !== undefined) return template.respawnSeconds;
   const base = isSelfScheduled(template)
     ? (cfgRespawnSeconds ?? LEGACY_RESPAWN_SECONDS)
     : baseRespawnSecondsAt(spawnPos.x, spawnPos.z, cfgRespawnSeconds);
-  return base * (template?.respawnMult ?? (template?.rare ? 4 : 1));
+  const minMult = template?.respawnMult ?? (template?.rare ? 4 : 1);
+  const mult =
+    template?.respawnMultMax !== undefined && roll
+      ? roll(minMult, template.respawnMultMax)
+      : minMult;
+  return base * mult;
 }

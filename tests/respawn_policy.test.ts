@@ -215,10 +215,38 @@ describe('resolveRespawnSeconds: full precedence', () => {
     expect(resolveRespawnSeconds({ respawnMult: 7.2 }, thornpeak, 2)).toBe(14.4);
   });
 
+  it('draws a respawnMultMax window through the injected roll, min without one', () => {
+    const window = { respawnMult: 12, respawnMultMax: 24 };
+    // The roll decides where in [min, max] the death lands, in mult units.
+    expect(resolveRespawnSeconds(window, vale, undefined, (min, _max) => min)).toBe(300);
+    expect(resolveRespawnSeconds(window, vale, undefined, (_min, max) => max)).toBe(600);
+    expect(resolveRespawnSeconds(window, vale, undefined, (min, max) => (min + max) / 2)).toBe(450);
+    // No roll supplied (pure callers, this suite's quantified sweeps): the
+    // window resolves deterministically to its minimum.
+    expect(resolveRespawnSeconds(window, vale, undefined)).toBe(300);
+    // An explicit global base still overrides what the rolled mult multiplies.
+    expect(resolveRespawnSeconds(window, vale, 2, (_min, max) => max)).toBe(48);
+    // ...and a fixed template respawnSeconds still wins over the window.
+    expect(
+      resolveRespawnSeconds({ ...window, respawnSeconds: 10 }, vale, undefined, (_min, max) => max),
+    ).toBe(10);
+  });
+
+  it('puts Grix the Tunnelking on the 5 to 10 minute random window', () => {
+    const grix = MOBS.grix_the_tunnelking;
+    expect(grix.respawnMult).toBe(12);
+    expect(grix.respawnMultMax).toBe(24);
+    // 12..24 times the 25s legacy base is 300..600 seconds, wherever he stands.
+    expect(resolveRespawnSeconds(grix, vale, undefined, (min, _max) => min)).toBe(300);
+    expect(resolveRespawnSeconds(grix, thornpeak, undefined, (_min, max) => max)).toBe(600);
+  });
+
   it('classifies self-scheduled templates by multiplier OR rare status', () => {
     expect(isSelfScheduled({ respawnMult: 4 })).toBe(true);
     expect(isSelfScheduled({ rare: true })).toBe(true);
     expect(isSelfScheduled({ respawnMult: 4, rare: true })).toBe(true);
+    // A window upper bound is an authored schedule too.
+    expect(isSelfScheduled({ respawnMultMax: 24 })).toBe(true);
     expect(isSelfScheduled({})).toBe(false);
     // Elite and boss status alone do NOT self-schedule: an open-world boss that
     // never declares a cadence rides the world delay like the trash around it.
@@ -335,6 +363,21 @@ describe('the death site consumes the policy', () => {
     expect(mob.dead).toBe(true);
     expect(mob.respawnTimer).toBe(TRASH_RESPAWN_SECONDS);
     expect(mob.respawnTimer).not.toBe(DEFAULT_RESPAWN_SECONDS);
+  });
+
+  it('rolls Grix a fresh 5 to 10 minute timer from the sim rng at death', () => {
+    const sim = new Sim({ seed: 20061, playerClass: 'warrior' });
+    const grix = [...sim.entities.values()].find(
+      (e) => e.kind === 'mob' && e.templateId === 'grix_the_tunnelking',
+    );
+    if (!grix) throw new Error('no grix_the_tunnelking spawned');
+    sim.dealDamage(null, grix, 999_999, false, 'physical', null, 'hit');
+    expect(grix.dead).toBe(true);
+    // Uniform in [300, 600): inside the window, and decisively off the old
+    // fixed three hours.
+    expect(grix.respawnTimer).toBeGreaterThanOrEqual(300);
+    expect(grix.respawnTimer).toBeLessThan(600);
+    expect(grix.respawnTimer).not.toBe(10_800);
   });
 
   it('honors an explicit global base, which is what the fast suites rely on', () => {
