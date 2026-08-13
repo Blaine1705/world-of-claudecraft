@@ -801,6 +801,11 @@ export const tr_TR: EnTranslations = {
       "resetAction": "Sıfırla",
       "note": "Pencereyi taşımak için sohbet sekme şeridini, yeniden boyutlandırmak için köşe tutamacını sürükleyin. Sıfırla, onu varsayılan konum ve boyutuna döndürür."
     },
+    "chatQuota": {
+      "limitReached": "Genel sohbet sınırına ulaşıldı. {seconds} içinde tekrar dene.",
+      "pending": "Önceki Genel sohbet mesajın hâlâ gönderiliyor. Birazdan tekrar dene.",
+      "unavailable": "Genel sohbet geçici olarak kullanılamıyor. Kısa süre sonra tekrar dene."
+    },
     "swing": {
       "ready": "Vuruş",
       "seconds": "{seconds}sn"
@@ -892,6 +897,14 @@ export const tr_TR: EnTranslations = {
       "bodyWithVersion": "World of ClaudeCraft'ın {version} sürümü mevcut. En son düzeltmeler ve iyileştirmeler için şimdi güncelle.",
       "notNow": "Şimdi Değil",
       "update": "Güncelle"
+    },
+    "otaUpdate": {
+      "title": "Oyun Güncellemesi",
+      "downloading": "Güncelleme indiriliyor: {percent}",
+      "applying": "Güncelleme indirildi. Uygulamak için oyun yeniden başlatılıyor.",
+      "incompatible": "Oynamak için bir güncelleme gerekiyor. İndirme tamamlanır tamamlanmaz uygulanacak.",
+      "continueAnyway": "Güncelleme yapmadan devam et",
+      "progressLabel": "Güncelleme indirme ilerlemesi"
     },
     "cameraPrompt": {
       "title": "Kamera Modunu Seç",
@@ -2186,6 +2199,10 @@ export const tr_TR: EnTranslations = {
       "itemAriaBound": "{item}, adet {count}, bağlı kopya",
       "itemAriaMasterwork": "{item}, adet {count}, şaheser",
       "itemAriaQuest": "{item}, adet {count}, görev eşyası",
+      "itemAriaLocked": "{item}, adet {count}, kilitli",
+      "itemLockedLine": "Kilitli",
+      "lockItem": "Eşyayı Kilitle",
+      "unlockItem": "Eşyanın Kilidini Aç",
       "filterGroupAria": "Çantaları kategoriye göre filtrele",
       "filterAll": "Tümü",
       "filterWeapon": "Silahlar",
@@ -3216,6 +3233,7 @@ export const tr_TR: EnTranslations = {
       "craftedToast": "Hazırlanma Tarihi: {name}",
       "craftedToastQty": "Hazırlandı: {name} x{qty}",
       "insufficientMaterials": "Bunun için malzemeleriniz yok.",
+      "reagentLocked": "Bunun için gereken bir reaktif kilitli.",
       "unknownRecipe": "O tarif mevcut değil.",
       "comboRequirementUnmet": "O tarif için gereken iki zanaata da gereken kademede sahip değilsin.",
       "comboRequires": "Uyum: {craftA} + {craftB}, kademe {tier}.",
@@ -3322,6 +3340,7 @@ export const tr_TR: EnTranslations = {
       "notHeld": "O eşya elinizde yok.",
       "notDisenchantable": "Bunun büyüsünü bozamazsınız.",
       "notSalvageable": "Bunu parçalayamazsınız.",
+      "salvageLocked": "O eşya kilitli.",
       "disenchantBusy": "Meşgulsün.",
       "salvageBusy": "Meşgulsün.",
       "enchantBusy": "Meşgulsün.",
@@ -8898,6 +8917,9 @@ export const tr_TR: EnTranslations = {
       "filterPrimaryStatAll": "Herhangi bir birincil nitelik",
       "filterRarity": "Nadirlik",
       "filterRarityAll": "Tüm nadirlikler",
+      "filterSort": "Sırala",
+      "sortName": "Ad (A-Z)",
+      "sortPriceAsc": "Fiyat: düşükten yükseğe",
       "collapseLowest": "Lowest price only",
       "weaponSword": "Kılıçlar",
       "weaponDagger": "Hançerler",
