@@ -302,10 +302,17 @@ export class WocTradeController {
     const offer = this.wocTradeOffer;
     if (!hooks || !offer) return;
     // The seller's staged copy is what escrows; the buyer brings only money, so
-    // they send no item at all.
+    // they send no item at all. The copy resolves from the SIM's cleaned offer
+    // (tradeInfo.myOffer), never the HUD-local compose state: the local list
+    // is id-plus-count only, so resolving from it could only ever match a
+    // PLAIN bag copy (the fix-round review: an instanced directed sale either
+    // refused at the index resolution or extracted the wrong copy into an
+    // item_mismatch), while the cleaned offer carries the per-copy payload the
+    // staging preview pinned. The local list stays as the pre-send fallback.
+    const stagedAuthoritative = this.sim.tradeInfo?.myOffer.items ?? this.stagedTrade.items;
     const first =
       offer.role === 'seller'
-        ? this.stagedTrade.items.find((sl) => wocTradableSlot(sl, ITEMS))
+        ? stagedAuthoritative.find((sl) => wocTradableSlot(sl, ITEMS))
         : undefined;
     if (offer.role === 'seller' && !first) {
       this.log(t('hudChrome.trade.woc.hintAcceptNeedsItem'), '#ff6b6b');

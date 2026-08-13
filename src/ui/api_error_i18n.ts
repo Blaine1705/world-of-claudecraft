@@ -173,6 +173,7 @@ export const API_ERROR_KEYS = {
   'woc_market.cap_reached': 'apiError.woc_market.cap_reached',
   'woc_market.stale_item': 'apiError.woc_market.stale_item',
   'woc_market.item_mismatch': 'apiError.woc_market.item_mismatch',
+  'woc_market.offer_pending': 'apiError.woc_market.offer_pending',
   'woc_market.not_eligible': 'apiError.woc_market.not_eligible',
   'woc_market.invalid_params': 'apiError.woc_market.invalid_params',
   'woc_market.signature_reused': 'apiError.woc_market.signature_reused',

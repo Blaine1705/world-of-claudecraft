@@ -186,6 +186,9 @@ export const REFUSAL_ERRORS: Record<WocMarketRefusal, { status: number; code: Er
   lease_lost: { status: 409, code: 'woc_market.stale_item' },
   signature_reused: { status: 409, code: 'woc_market.signature_reused' },
   stale_copy: { status: 409, code: 'woc_market.stale_item' },
+  // One live directed deal per (buyer, seller) pair: the strike-farming
+  // bound. Its own code (the already_pending copy describes a pending BID).
+  offer_pending: { status: 409, code: 'woc_market.offer_pending' },
   // The directed bait-and-switch guard: the accepted copy's fingerprint does
   // not match the one the buyer agreed to at offer time (H10). Its own code,
   // not a stale_item collapse: the fix is a fresh DEAL, not a re-select.
@@ -273,8 +276,6 @@ function signatureField(value: unknown): string {
   return sig;
 }
 
-/** An instance payload from the client is opaque JSON the sim compares
- *  structurally; only its container shape is checked here. */
 /** A real instance payload (rolled stats, enchant, signer, provenance)
  *  serializes to a few hundred bytes; 2 KiB is generous headroom. The bound
  *  is load-bearing twice over: it caps what a caller can persist through the

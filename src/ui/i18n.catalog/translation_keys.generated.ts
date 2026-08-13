@@ -200,6 +200,7 @@ export type TranslationKeyFlat =
   | 'apiError.woc_market.not_pending'
   | 'apiError.woc_market.not_yours'
   | 'apiError.woc_market.offer_expired'
+  | 'apiError.woc_market.offer_pending'
   | 'apiError.woc_market.own_listing'
   | 'apiError.woc_market.paused'
   | 'apiError.woc_market.quote_expired'

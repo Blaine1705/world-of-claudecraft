@@ -8581,6 +8581,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.cancel_pending': '판매자가 이 판매글을 취소하는 중입니다.',
   'apiError.woc_market.item_mismatch':
     '구매자가 동의한 아이템과 일치하지 않습니다. 거래를 새로 시작하세요.',
+  'apiError.woc_market.offer_pending':
+    '이 플레이어와 진행 중인 거래가 이미 있습니다. 먼저 해결하세요.',
   'apiError.woc_market.bond_window_closed':
     '이 입찰은 더 이상 결제할 수 없습니다. 결제 기간이 끝났습니다. 다시 입찰하여 새 기간을 받으세요.',
   'apiError.woc_market.claim_cooldown':

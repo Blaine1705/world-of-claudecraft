@@ -4160,6 +4160,7 @@ export const ko_KR: EnTranslations = {
       "cap_reached": "거래소 등록 한도에 도달했습니다.",
       "stale_item": "해당 아이템이 변경되었거나 이동했습니다. 다시 선택한 뒤 시도하세요.",
       "item_mismatch": "구매자가 동의한 아이템과 일치하지 않습니다. 거래를 새로 시작하세요.",
+      "offer_pending": "이 플레이어와 진행 중인 거래가 이미 있습니다. 먼저 해결하세요.",
       "not_eligible": "해당 아이템은 $WOC 거래소에 등록할 수 없습니다.",
       "invalid_params": "시작가, 최저가, 즉시 구매가, 기간을 확인하세요.",
       "signature_reused": "해당 트랜잭션은 이미 제출되었습니다."

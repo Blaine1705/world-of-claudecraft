@@ -3686,7 +3686,7 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     expect(first.ok).toBe(true);
     expect(await h.service.createDirectedOffer(offerArgs())).toEqual({
       ok: false,
-      reason: 'already_pending',
+      reason: 'offer_pending',
     });
     if (!first.ok) throw new Error('unreachable');
     // Resolving the standing deal frees the pair for a fresh one.

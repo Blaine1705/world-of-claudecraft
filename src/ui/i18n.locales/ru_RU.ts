@@ -8728,6 +8728,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.cancel_pending': 'Продавец отменяет этот лот.',
   'apiError.woc_market.item_mismatch':
     'Это не тот предмет, на который согласился покупатель. Начните новую сделку.',
+  'apiError.woc_market.offer_pending':
+    'У вас уже есть незавершённая сделка с этим игроком. Сначала завершите её.',
   'apiError.woc_market.bond_window_closed':
     'Эту ставку больше нельзя оплатить: окно оплаты закрылось. Сделайте ставку заново, чтобы получить новое.',
   'apiError.woc_market.claim_cooldown':

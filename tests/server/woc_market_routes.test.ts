@@ -121,7 +121,7 @@ describe('the refusal-to-wire mapping', () => {
     const rows = Object.entries(REFUSAL_ERRORS);
     // The EXACT count, not a floor. A floor of 35 let four union members vanish
     // silently; tsc catches a deleted Record key but not a shrunken union.
-    expect(rows).toHaveLength(50);
+    expect(rows).toHaveLength(51);
     for (const [reason, mapped] of rows) {
       expect(mapped.code, reason).toMatch(/^woc_market\./);
       expect(mapped.status, reason).toBeGreaterThanOrEqual(400);
@@ -193,6 +193,9 @@ describe('the refusal-to-wire mapping', () => {
     // The directed bait-and-switch guard (H10): its OWN code, not a
     // stale_item collapse, because the fix is a fresh deal, not a re-select.
     ['item_mismatch', 409, 'woc_market.item_mismatch'],
+    // One live directed deal per pair (its own code: already_pending's copy
+    // describes a pending BID on a listing, a different rail).
+    ['offer_pending', 409, 'woc_market.offer_pending'],
     // Every eligibility shape collapses to one code too: naming which policy
     // rule refused exposes the policy to probing.
     ['soulbound', 400, 'woc_market.not_eligible'],

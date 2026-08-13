@@ -8611,6 +8611,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.cancel_pending': '出品者がこの出品を取り消そうとしています。',
   'apiError.woc_market.item_mismatch':
     '買い手が同意したアイテムと一致しません。改めて取引をやり直してください。',
+  'apiError.woc_market.offer_pending':
+    'このプレイヤーとの取引がすでに進行中です。先にそちらを解決してください。',
   'apiError.woc_market.bond_window_closed':
     'この入札はもう支払えません。支払い期間が終了しています。もう一度入札して新しい期間を得てください。',
   'apiError.woc_market.claim_cooldown':

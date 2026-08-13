@@ -4686,11 +4686,10 @@ export class GameServer {
     return this.characterSaveQueues.enqueue(characterId, job);
   }
 
-  /** Terminal escrow-job arms, fired from inside the job. 'fenced' kicks the
-   *  displaced zombie; 'ambiguous' quarantines so the durable row decides
-   *  both branches of an unknown COMMIT. The pid is the extraction identity;
-   *  mid-leave still quarantines (the queued flush re-checks), skipping only
-   *  the kick. Books revert; the kick WIRES the takeover literal. */
+  /** Terminal escrow-job arms, fired from inside the job: 'fenced' kicks the
+   *  displaced zombie; 'ambiguous' quarantines so the durable row decides an
+   *  unknown COMMIT. The pid is the extraction identity; a mid-leave session
+   *  still quarantines (kick skipped); books revert; the kick WIRES the takeover literal. */
   escrowSessionLost(pid: number, characterId: number, kind: 'fenced' | 'ambiguous'): void {
     const session = this.sessionByCharacterId(characterId);
     if (!session || session.pid !== pid) return;
@@ -9594,6 +9593,7 @@ export class GameServer {
     const mine = t.a === pid;
     const otherPid = mine ? t.b : t.a;
     const other = this.sim.meta(otherPid);
+    // FULL payloads on purpose, no publicInstanceView trim: see stagedOfferSlots (trade.ts).
     return {
       otherPid,
       otherName: other?.name ?? '?',

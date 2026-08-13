@@ -4160,6 +4160,7 @@ export const zh_CN: EnTranslations = {
       "cap_reached": "你已达到交易所挂单数量上限。",
       "stale_item": "该物品已变动或被移动。请重新选择后再试。",
       "item_mismatch": "这不是买家同意购买的那件物品。请重新发起一笔交易。",
+      "offer_pending": "你与该玩家已有一笔进行中的交易。请先处理完它。",
       "not_eligible": "该物品不能在 $WOC 交易所挂单。",
       "invalid_params": "请检查起拍价、底价、一口价与拍卖时长。",
       "signature_reused": "该交易已提交过。"

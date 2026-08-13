@@ -427,7 +427,7 @@ export class FakeWocMarketDb implements WocMarketDb {
     expiresAtMs: number;
     itemId: string;
     itemPin: string;
-  }): Promise<WocDirectedOfferRow | 'already_pending'> {
+  }): Promise<WocDirectedOfferRow | 'offer_pending'> {
     // The pair-pending unique index's mirror: one live deal per
     // (buyer, seller) pair (the strike-farming bound).
     for (const o of this.offers.values()) {
@@ -437,7 +437,7 @@ export class FakeWocMarketDb implements WocMarketDb {
         o.buyerAccount === offer.buyerAccount &&
         o.sellerAccount === offer.sellerAccount
       ) {
-        return 'already_pending';
+        return 'offer_pending';
       }
     }
     const row: WocDirectedOfferRow = {
@@ -1254,6 +1254,9 @@ export class FakeWocMarketDb implements WocMarketDb {
     if (!row || row.realm !== args.realm) return { ok: false, reason: 'not_found' };
     // The callbacks see the row as it was read (a copy), the Pg SELECT shape.
     const snapshot = this.listingOut(row);
+    // A directed sale accepts NO bids, refused not_found before any other
+    // verdict (mirrors the Pg anti-enumeration guard).
+    if (snapshot.directedBuyerAccount !== null) return { ok: false, reason: 'not_found' };
     if (snapshot.status !== 'active') return { ok: false, reason: 'not_active' };
     if (snapshot.endsAtMs <= args.nowMs) return { ok: false, reason: 'not_active' };
     // Cancel-intent blocks new bids (mirrors the Pg guard).

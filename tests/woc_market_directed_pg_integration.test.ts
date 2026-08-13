@@ -728,7 +728,7 @@ describeDb('woc market directed rail against real Postgres', () => {
         itemId: 'amber_crimson_armor_plate',
         itemPin: 'p'.repeat(64),
       });
-      expect(second, 'the unique index answers typed').toBe('already_pending');
+      expect(second, 'the unique index answers typed').toBe('offer_pending');
     });
   });
 

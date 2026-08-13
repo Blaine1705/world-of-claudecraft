@@ -18,10 +18,9 @@ import { addStacked, bagCapacity, countFit, removeStacked } from '../bags';
 import { RIFT_GEAR_ITEM_IDS } from '../content/rift/items';
 import { ITEMS } from '../data';
 import { itemCopyPin } from '../item_copy_ref';
-import { removeMatchingInstance } from '../item_instance_transfer';
+import { itemInstancePayloadsEqual } from '../item_instance_merge';
 import {
   removeSellUnitsFromInventory,
-  removeVendorSellUnits,
   sellerSignedCharmDeprioritize,
   type VendorRemovedUnit,
 } from '../items';
@@ -146,6 +145,15 @@ export function tradeAccept(ctx: SimContext, pid?: number): void {
  * itemCopyPin, the copy-identity rule every exchange pipe shares), so a plain
  * stack still reads as one line. The returned payloads are the scratch's own
  * deep clones and never alias the live bags.
+ *
+ * These slots ship to the COUNTERPARTY in full, deliberately without the
+ * anonymous-pipe publicInstanceView trim (the server's tradeWire points
+ * here): a trade is a consensual named exchange whose whole point is mutual
+ * inspection, so charges, bind arming, and rift state are facts the other
+ * player agrees TO, and the $WOC directed pin fingerprints the full
+ * identity, so a trimmed wire would let two copies differing only in hidden
+ * fields alias one agreement. The per-tick diff cost is bounded by the six
+ * staged slots and rides the change-gated wire serialization.
  */
 function stagedOfferSlots(meta: PlayerMeta, itemId: string, count: number): InvSlot[] {
   const scratch: InvSlot[] = (meta.inventory ?? []).map((s) => ({
@@ -269,25 +277,46 @@ type PendingGrant = { itemId: string; units: VendorRemovedUnit[] };
 export { sellerSignedCharmDeprioritize };
 
 /** One PLAIN unit whose crafted marker matches the staged slot's, highest
- *  index first (the walk order every removal here shares). The plain sibling
- *  of removeMatchingInstance, local because only the pinned-slot removal
- *  below wants marker-exact plain consumption. */
+ *  index first (the walk order every removal here shares). Local because
+ *  only the pinned-slot removal below wants marker-exact plain consumption;
+ *  fires no quest hook (removeOffer batches ONE per staged line, the
+ *  pre-preview cadence, so a 20-unit line does not emit 20 progress
+ *  events). */
 function removePlainMatchingUnit(
-  ctx: SimContext,
+  inventory: InvSlot[],
   itemId: string,
   craftedRecipeId: string | undefined,
-  pid: number,
 ): VendorRemovedUnit | null {
-  const r = ctx.resolve(pid);
-  if (!r) return null;
-  const inventory = r.meta.inventory ?? [];
   for (let i = inventory.length - 1; i >= 0; i--) {
     const s = inventory[i];
     if (s.itemId !== itemId || s.instance || s.craftedRecipeId !== craftedRecipeId) continue;
     s.count -= 1;
     if (s.count <= 0) inventory.splice(i, 1);
-    ctx.onInventoryChangedForQuests?.(r.meta);
     return { instance: undefined, craftedRecipeId };
+  }
+  return null;
+}
+
+/** One INSTANCED unit payload-equal to the staged slot's, highest index
+ *  first. Local rather than the shared removeMatchingInstance because that
+ *  helper skips on the WIDER anonymous-pipe lock (bindOnTrade AND boundTo),
+ *  which would silently route every armed commission copy around the pinned
+ *  path; a trade locks boundTo alone (isTradeLocked). Same clone-on-survival
+ *  contract as every removal here; no quest hook (see the plain twin). */
+function removeInstancedMatchingUnit(
+  inventory: InvSlot[],
+  itemId: string,
+  instance: ItemInstancePayload,
+): VendorRemovedUnit | null {
+  for (let i = inventory.length - 1; i >= 0; i--) {
+    const s = inventory[i];
+    if (s.itemId !== itemId || !s.instance || isTradeLocked(s.instance)) continue;
+    if (!itemInstancePayloadsEqual(s.instance, instance)) continue;
+    const consumed = s.count === 1 ? s.instance : cloneItemInstancePayload(s.instance);
+    const craftedRecipeId = s.craftedRecipeId;
+    s.count -= 1;
+    if (s.count <= 0) inventory.splice(i, 1);
+    return { instance: consumed, craftedRecipeId };
   }
   return null;
 }
@@ -297,7 +326,7 @@ function removeOffer(ctx: SimContext, items: InvSlot[], fromPid: number): Pendin
   // The copy-choice fix: when an instanced CHARM copy must ship, the
   // seller's own self-signed copies go last (sellerSignedCharmDeprioritize
   // above owns the predicate and its scope).
-  const sellerName = ctx.resolve(fromPid)?.meta.name;
+  const meta = ctx.resolve(fromPid)?.meta;
   for (const s of items) {
     // The staged slots carry the EXACT copies the stage-time preview
     // selected (stagedOfferSlots), so the swap consumes those copies first:
@@ -314,30 +343,29 @@ function removeOffer(ctx: SimContext, items: InvSlot[], fromPid: number): Pendin
     // an unbound one. The deprioritize second pass makes the seller's own
     // self-signed charm copies go last.
     const units: VendorRemovedUnit[] = [];
-    for (let unit = 0; unit < s.count; unit++) {
-      if (s.instance !== undefined) {
-        const matched = removeMatchingInstance(ctx, s.itemId, s.instance, fromPid);
+    if (meta) {
+      const inventory = meta.inventory ?? [];
+      for (let unit = 0; unit < s.count; unit++) {
+        const matched =
+          s.instance !== undefined
+            ? removeInstancedMatchingUnit(inventory, s.itemId, s.instance)
+            : removePlainMatchingUnit(inventory, s.itemId, s.craftedRecipeId);
         if (matched) {
           units.push(matched);
           continue;
         }
-      } else {
-        const matched = removePlainMatchingUnit(ctx, s.itemId, s.craftedRecipeId, fromPid);
-        if (matched) {
-          units.push(matched);
-          continue;
-        }
+        units.push(
+          ...removeSellUnitsFromInventory(
+            inventory,
+            s.itemId,
+            1,
+            isTradeLocked,
+            sellerSignedCharmDeprioritize(meta.name, s.itemId),
+          ),
+        );
       }
-      units.push(
-        ...removeVendorSellUnits(
-          ctx,
-          s.itemId,
-          1,
-          fromPid,
-          isTradeLocked,
-          sellerSignedCharmDeprioritize(sellerName, s.itemId),
-        ),
-      );
+      // ONE quest-hook fire per staged line, the pre-preview cadence.
+      ctx.onInventoryChangedForQuests?.(meta);
     }
     grants.push({ itemId: s.itemId, units });
   }
@@ -430,10 +458,25 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
     gives: InvSlot[],
     receives: InvSlot[],
   ): boolean => {
+    // The model runs per ITEM ID, never per staged slot: stagedOfferSlots can
+    // split one line into several per-copy slots, and every budget below (the
+    // fungible min, the giver-stock walks) was written under the one-line-
+    // per-id invariant tradeSetOffer used to guarantee. A per-slot pass
+    // re-counts the same giver stock once per slot (the fix-round review's
+    // double-count: two slots of one id each claimed the same single plain
+    // unit, the model predicted one arrival slot where the grant needs two,
+    // and the receiver overflowed past the capacity gate, the #2139/#2605
+    // class). Merging here restores the invariant; the walks then model the
+    // same copies the staging preview picked, in the same order.
+    const mergedById = (items: InvSlot[]): InvSlot[] => {
+      const totals = new Map<string, number>();
+      for (const s of items) totals.set(s.itemId, (totals.get(s.itemId) ?? 0) + s.count);
+      return [...totals].map(([itemId, count]) => ({ itemId, count }));
+    };
     const scratch = meta.inventory.map((s) => ({ ...s }));
-    for (const s of gives) removeStacked(scratch, s.itemId, s.count);
+    for (const s of mergedById(gives)) removeStacked(scratch, s.itemId, s.count);
     const capacity = bagCapacity(meta.bags);
-    for (const s of receives) {
+    for (const s of mergedById(receives)) {
       const plainCount = Math.min(s.count, ctx.countFungibleItem(s.itemId, giver.entityId));
       if (plainCount > 0) {
         // grantOffer re-grants the plain units bucketed by craftedRecipeId (a

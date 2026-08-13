@@ -8222,6 +8222,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.confirm_in_flight': '你的付款仍在确认中。待其完成后再试。',
   'apiError.woc_market.cancel_pending': '卖家正在取消该挂单。',
   'apiError.woc_market.item_mismatch': '这不是买家同意购买的那件物品。请重新发起一笔交易。',
+  'apiError.woc_market.offer_pending': '你与该玩家已有一笔进行中的交易。请先处理完它。',
   'apiError.woc_market.bond_window_closed': '该出价已无法支付：支付窗口已关闭。请重新出价以获得新的支付窗口。',
   'apiError.woc_market.claim_cooldown': '你最近放弃过一次直购。请稍后再试。',
   'apiError.woc_market.buy_now_locked': '另一位买家正在完成这笔购买，请稍后再试。',

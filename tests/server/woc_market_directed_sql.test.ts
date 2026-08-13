@@ -172,7 +172,7 @@ describe('the directed-rail integrity statements, in SQL', () => {
       itemId: 'crown_of_embers',
       itemPin: 'a'.repeat(64),
     });
-    expect(out).toBe('already_pending');
+    expect(out).toBe('offer_pending');
   });
 
   it('the seller acceptance records the claimed ref but never rewrites the agreed item_id', async () => {

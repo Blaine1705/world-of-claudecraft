@@ -1427,7 +1427,7 @@ export class PgWocMarketDb implements WocMarketDb {
     expiresAtMs: number;
     itemId: string;
     itemPin: string;
-  }): Promise<WocDirectedOfferRow | 'already_pending'> {
+  }): Promise<WocDirectedOfferRow | 'offer_pending'> {
     // item_id and item_pin are stamped at CREATION (H10): the offer names the
     // exact copy the buyer agreed to, and acceptance validates the extracted
     // copy against the pin before anything escrows.
@@ -1455,8 +1455,12 @@ export class PgWocMarketDb implements WocMarketDb {
     } catch (err) {
       // The pair-pending unique index is the strike-farming bound's
       // authority: one live deal per (buyer, seller) pair. 23505 here can
-      // only be that index (the table's PK is a bigserial).
-      if ((err as { code?: string }).code === '23505') return 'already_pending';
+      // only be that index: the table's ONLY other unique constraint is the
+      // bigserial PK, which this insert never supplies (a restore that
+      // left the sequence behind the data would break that premise; the
+      // sequence rides pg_dump with the table, so only a hand-built partial
+      // restore can produce it).
+      if ((err as { code?: string }).code === '23505') return 'offer_pending';
       throw err;
     }
   }

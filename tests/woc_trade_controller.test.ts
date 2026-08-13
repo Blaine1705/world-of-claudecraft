@@ -626,6 +626,47 @@ describe('the accept request body (seller escrow)', () => {
     expect(h.state.calls.acceptOffers).toEqual([]);
     expect(r.host.logs.at(-1)).toBe(t('hudChrome.trade.woc.hintAcceptNeedsItem'));
   });
+
+  it('resolves an INSTANCED staged copy through the sim offer, index and payload both', async () => {
+    // The fix-round blocker: the HUD-local compose list is id-plus-count
+    // only, so resolving from it could only match a PLAIN bag copy; an
+    // instanced directed sale either refused at the index resolution or
+    // extracted the wrong copy into an item_mismatch. The sim's cleaned
+    // offer (tradeInfo.myOffer) carries the per-copy payload the staging
+    // preview pinned, and the accept must resolve through IT.
+    const h = fakeHooks();
+    const r = rig(h.hooks);
+    const signed = { itemId: 'worn_sword', count: 1, instance: { signer: 'Ayla' } };
+    r.host.staged.items.push({ itemId: 'worn_sword', count: 1 });
+    r.host.tradeInfo = {
+      otherPid: 2,
+      otherName: 'Borin',
+      myOffer: { items: [signed], copper: 0 },
+      theirOffer: { items: [], copper: 0 },
+      myAccepted: false,
+      theirAccepted: false,
+    } as unknown as typeof r.host.tradeInfo;
+    r.host.inventory.push({ itemId: 'worn_sword', count: 1 }, {
+      itemId: 'worn_sword',
+      count: 1,
+      instance: { signer: 'Ayla' },
+    } as unknown as {
+      itemId: string;
+      count: number;
+    });
+    const c = r.controller as unknown as {
+      wocTradeOffer: WocPendingOffer | null;
+      acceptWocTradeOffer(): Promise<void>;
+    };
+    c.wocTradeOffer = heldOffer({ role: 'seller' });
+    await c.acceptWocTradeOffer();
+    expect(h.state.calls.acceptOffers).toEqual([7]);
+    expect(h.state.lastAcceptBody).toMatchObject({
+      itemIndex: 1,
+      itemId: 'worn_sword',
+      expectInstance: { signer: 'Ayla' },
+    });
+  });
 });
 
 describe('the close-path recovery (the stale-bag race)', () => {

@@ -968,6 +968,52 @@ describe('trade module (direct, no Sim)', () => {
     expect(players.get(2).inventory).toHaveLength(16);
   });
 
+  it('models per-copy slots of ONE id against a shared fungible budget (no double-count)', () => {
+    // The fix-round blocker: stagedOfferSlots splits one line into per-copy
+    // slots, and a per-slot capacity pass re-counted the same giver stock
+    // (two slots of one id each claimed the single plain unit, the model
+    // predicted one arrival slot where the grant needs two, and the receiver
+    // overflowed past the gate). One plain plus one signed fang need TWO
+    // receiver slots; with one free slot the trade must refuse.
+    const giver = [
+      { itemId: 'wolf_fang', count: 1 },
+      { itemId: 'wolf_fang', count: 1, instance: { signer: 'Ayla' } },
+    ];
+    const receiverFull = Array.from({ length: 15 }, (_, i) => ({
+      itemId: `filler_${i}`,
+      count: 1,
+    }));
+    {
+      const { ctx, players, events } = makeInstancedTradeCtx(structuredClone(giver), [
+        ...structuredClone(receiverFull),
+      ]);
+      tradeMod.tradeRequest(ctx, 2, 1);
+      tradeMod.tradeAccept(ctx, 2);
+      tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 2 }], 0, 1);
+      tradeMod.tradeConfirm(ctx, 1);
+      tradeMod.tradeConfirm(ctx, 2);
+      expect(events.some((e) => e.type === 'error' && /not enough bag space/.test(e.text))).toBe(
+        true,
+      );
+      expect(players.get(1).inventory, 'nothing left the giver').toHaveLength(2);
+      expect(players.get(2).inventory, 'nothing overflowed in').toHaveLength(15);
+    }
+    // The positive control: two free slots fit the same offer.
+    {
+      const { ctx, players, events } = makeInstancedTradeCtx(
+        structuredClone(giver),
+        structuredClone(receiverFull).slice(0, 14),
+      );
+      tradeMod.tradeRequest(ctx, 2, 1);
+      tradeMod.tradeAccept(ctx, 2);
+      tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 2 }], 0, 1);
+      tradeMod.tradeConfirm(ctx, 1);
+      tradeMod.tradeConfirm(ctx, 2);
+      expect(events.some((e) => e.type === 'error')).toBe(false);
+      expect(players.get(2).inventory).toHaveLength(16);
+    }
+  });
+
   it('updateTradesAndInvites expires stale invites and cancels drifted trades', () => {
     const h = makeTradeCtx();
     h.addPlayer(1, 'Ayla', 0, 0);

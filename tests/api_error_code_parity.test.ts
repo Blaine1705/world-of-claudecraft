@@ -144,6 +144,7 @@ const KNOWN_CODES = [
   'woc_market.claim_cooldown',
   'woc_market.bond_window_closed',
   'woc_market.item_mismatch',
+  'woc_market.offer_pending',
   'woc_market.confirm_failed',
   'woc_market.confirm_in_flight',
   'woc_market.buy_now_locked',

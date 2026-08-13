@@ -304,7 +304,7 @@ export interface WocMarketDb {
     expiresAtMs: number;
     itemId: string;
     itemPin: string;
-  }): Promise<WocDirectedOfferRow | 'already_pending'>;
+  }): Promise<WocDirectedOfferRow | 'offer_pending'>;
   directedOfferById(realm: string, id: number): Promise<WocDirectedOfferRow | null>;
   /** Pending offers this account may act on, both directions. */
   directedOffersForAccount(realm: string, account: number): Promise<WocDirectedOfferRow[]>;
@@ -1089,6 +1089,7 @@ export type WocMarketRefusal =
   // Directed p2p offers
   | 'recipient_wallet_required' // the named buyer has no verified wallet
   | 'self_offer' // seller and buyer are the same account OR the same wallet
+  | 'offer_pending' // one live directed deal per pair (the strike-farming bound)
   | 'item_mismatch' // the copy offered at acceptance is not the pinned agreed copy
   | 'offer_expired'
   | ExtractRefusal
@@ -1697,8 +1698,9 @@ export class WocMarketService {
       }),
     });
     // ONE pending offer per pair (the strike-farming bound): the unique
-    // partial index is the authority, surfaced typed.
-    if (offer === 'already_pending') return refuse('already_pending');
+    // partial index is the authority, surfaced typed. Its OWN code: the
+    // already_pending copy talks about a pending BID, a different rail.
+    if (offer === 'offer_pending') return refuse('offer_pending');
     return { ok: true, offer };
   }
 
@@ -2769,7 +2771,13 @@ export class WocMarketService {
    * recorder exempts (WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS, one member,
    * service_unavailable, deliberately non-mintable): a directed buyer whose
    * payment died in a service outage must not eat a strike the public buyer
-   * would not even eat a cooldown for.
+   * would not even eat a cooldown for. Reachability, honestly: TODAY no
+   * in-repo path writes that reason onto a settlement row (the proxy's
+   * outage arm answers pending and both confirm consumers return before
+   * recording a reason), the same standing gap the public exemption carries;
+   * the R5/verifier work owns making the vocabulary real, and until then the
+   * HEALTH probe above is the live gate. The arm stays because the exempt
+   * list is the one seam that vocabulary lands on when R5 delivers.
    */
   private async strikeDirectedBuyer(
     account: number,
@@ -3115,23 +3123,23 @@ export class WocMarketService {
       }
       await this.deps.db.clearBuyNowLock(listing.id, settlement.buyerAccount);
       if (listing.directedBuyerAccount !== null) {
-        // The strike is gated by the expiry transition CAS above (`moved`),
-        // which fires at most once per settlement, so a re-run of this row
-        // cannot strike twice. The failReason rides along so a chain-outage
-        // refusal spares the strike on the shared exempt vocabulary.
-        await this.strikeDirectedBuyer(settlement.buyerAccount, nowMs, settlement.failReason);
-        // AUTO-CLOSE (H12): a directed listing has exactly one permitted
-        // buyer, so an expired unpaid settlement is the end of the deal, not
-        // a return to the shelf. Closing here (instead of leaving the row
-        // active until the hold expires or the seller notices) returns the
-        // item on the next return-flight pass. The guard refuses only if a
-        // RACING fresh claim opened a new settlement in this sliver; that
-        // window then owns the outcome and a later expiry converges the
-        // close. The close-arm strike stays mutually exclusive with this one
-        // through its ever-settled gate (this settlement row exists).
+        // AUTO-CLOSE (H12) runs FIRST: a directed listing has exactly one
+        // permitted buyer, so an expired unpaid settlement is the end of the
+        // deal, not a return to the shelf, and closing returns the item on
+        // the next return-flight pass. Custody before penalty: the strike
+        // below awaits an economy health read that can reject, and the
+        // expiry CAS above fires once, so a strike-side throw after the
+        // close costs only the penalty, never the item's trip home. The
+        // close guard refuses only if a RACING fresh claim opened a new
+        // settlement in this sliver; that window then owns the outcome and
+        // a later expiry converges the close. The close-arm strike stays
+        // mutually exclusive with this one through its ever-settled gate
+        // (this settlement row exists); this strike is gated by the expiry
+        // transition CAS (`moved`), which fires at most once per settlement.
         if (!(await this.deps.db.closeListingIfNoOpenSettlement(listing.id, 'unsettled'))) {
           await this.deps.db.markListingSettling(listing.id);
         }
+        await this.strikeDirectedBuyer(settlement.buyerAccount, nowMs, settlement.failReason);
       }
       return;
     }

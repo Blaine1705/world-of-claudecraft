@@ -308,6 +308,9 @@ export const ERROR_CODES = deepFreeze({
   'woc_market.cap_reached': { params: [] },
   // The referenced inventory copy changed or moved; re-select it (409).
   'woc_market.stale_item': { params: [] },
+  // One live directed deal per (buyer, seller) pair; resolve the standing
+  // one first (the strike-farming bound) (409).
+  'woc_market.offer_pending': { params: [] },
   // A directed acceptance offered a copy whose fingerprint does not match
   // the one the buyer agreed to at offer time (bait-and-switch guard) (409).
   'woc_market.item_mismatch': { params: [] },
