@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
   THREE_CACHE_KEY_PARAMETERS,
@@ -29,6 +30,14 @@ function section(startMarker: string, endMarker: string): string {
 }
 
 describe('three r165 program reflection contract', () => {
+  it('is reading the revision every message in this file names', () => {
+    // Every failure below says "r165". Nothing else here asserts the revision,
+    // so a three bump that happens to keep these marker strings would leave the
+    // whole file passing while its messages, and the reasoning behind the
+    // analyzer's classification, silently referred to the wrong release.
+    expect(THREE.REVISION).toBe('165');
+  });
+
   it('resolves readiness through COMPLETION_STATUS_KHR without reflecting', () => {
     // isReady is the whole of what compileAsync waits on. If it ever populated
     // the uniform cache, "settled" would imply "reflected" and the

@@ -98,6 +98,27 @@ describe('adaptive link budget core', () => {
     });
   });
 
+  it('never halves the window below the configured floor', () => {
+    // The clamp is the only thing keeping repeated backoffs from driving the
+    // window to zero links, which would stall entry as surely as the backlog
+    // the pacing exists to avoid. Halving alone reaches 6 then 3 then 1 here.
+    const clock = virtualClock();
+    const budget = createAdaptiveLinkBudget({ ...CONFIG, initialWindowLinks: 24 }, clock);
+    const windows: number[] = [];
+
+    for (let index = 0; index < 3; index++) {
+      const id = `scene:${index}`;
+      budget.markSubmitted(id);
+      budget.markSyncEnd(id, 8);
+      clock.advance(2_500);
+      budget.markSettled(id);
+      windows.push(budget.snapshot().windowLinks);
+    }
+
+    expect(windows).toEqual([12, 8, 8]);
+    expect(budget.snapshot()).toMatchObject({ state: 'backoff', backoffCount: 3 });
+  });
+
   it('stops admission after bounded no-progress waits', async () => {
     const clock = virtualClock();
     const budget = createAdaptiveLinkBudget(CONFIG, clock);

@@ -81,8 +81,47 @@ describe('prewarm compile submission core', () => {
     );
 
     await expect(submitted.done).resolves.toBeUndefined();
-    expect(events).toContain('lifecycle:failed');
-    expect(events).toContain('pacing:failed');
+    expect(events).toEqual([
+      'lifecycle:submitted',
+      'pacing:submitted',
+      'lifecycle:sync-end',
+      'pacing:sync-end:0',
+      'lifecycle:failed',
+      'pacing:failed',
+    ]);
+    expect(onError).toHaveBeenCalledWith(error);
+  });
+
+  it('turns a rejected promise into a fail-soft settled submission', async () => {
+    // The arm that actually happens in the wild: an async compile whose driver
+    // work rejects later, not a synchronous throw. Dropping markFailed here
+    // leaves the unit in flight forever, so the adaptive window never reopens
+    // and every remaining prewarm unit waits behind it.
+    const { events, lifecycle, pacing } = harness();
+    const error = new Error('link rejected');
+    const onError = vi.fn();
+    let programs = 10;
+    const submitted = submitPrewarmCompileUnit(
+      {
+        id: 'scene:0',
+        run: () => {
+          programs = 13;
+          return Promise.reject(error);
+        },
+      },
+      'programs.compile',
+      { lifecycle, pacing, programCount: () => programs, onError },
+    );
+
+    await expect(submitted.done).resolves.toBeUndefined();
+    expect(events).toEqual([
+      'lifecycle:submitted',
+      'pacing:submitted',
+      'lifecycle:sync-end',
+      'pacing:sync-end:3',
+      'lifecycle:failed',
+      'pacing:failed',
+    ]);
     expect(onError).toHaveBeenCalledWith(error);
   });
 });
