@@ -75,7 +75,7 @@ export const OPEN_SETTLEMENT_STATES: readonly WocSettlementState[] = [
 
 export class FakeWocMarketDb implements WocMarketDb {
   /** Force the NEXT escrowInsertListing to refuse (consumed on use). */
-  failNextEscrow: 'lease_lost' | 'cap_reached' | null = null;
+  failNextEscrow: 'lease_lost' | 'cap_reached' | 'contended' | null = null;
   /** The buy-now abandon ledger (claim cooldowns), the Pg table's mirror. */
   readonly buyNowAbandons: {
     realm: string;
@@ -183,7 +183,9 @@ export class FakeWocMarketDb implements WocMarketDb {
   async escrowInsertListing(
     save: CharacterSaveArgs,
     listing: NewWocListing,
-  ): Promise<{ ok: true; id: number } | { ok: false; reason: 'lease_lost' | 'cap_reached' }> {
+  ): Promise<
+    { ok: true; id: number } | { ok: false; reason: 'lease_lost' | 'cap_reached' | 'contended' }
+  > {
     // The Pg transaction runs the character save first, then the cap check;
     // the fake records the save it received either way (a refused escrow rolls
     // the save back in Pg, but the SAVE ARGS still crossed the edge).

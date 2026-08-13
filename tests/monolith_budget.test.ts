@@ -54,8 +54,12 @@ const MONOLITHS: MonolithRow[] = [
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
+    // Zero headroom, ratcheted down from 12660 after the broker custody pair
+    // moved to src/sim/broker_custody.ts and the offline daily-rewards readout
+    // to src/sim/daily_rewards_stub.ts (which also took sim.ts off the $WOC
+    // firewall allowlist in tests/architecture.test.ts).
     file: 'src/sim/sim.ts',
-    ceiling: 12660,
+    ceiling: 12428,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -64,12 +68,14 @@ const MONOLITHS: MonolithRow[] = [
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
-    // Ratcheted 10900 to the exact merged size after the v0.37.0 sync: the
-    // release's entity_update_cadence extraction shrank the file without
-    // lowering the ceiling, and banking that slack would let the next growth
-    // ride in unnoticed.
+    // Ratcheted to the exact size after the character-save FIFO and save-
+    // fixups extractions (serial_writer.ts createKeyedSerialWriter,
+    // character_save_fixups.ts): the three inline per-key queue copies left,
+    // which paid for the marketplace escrow-persist host seam
+    // (enqueueCharacterWrite, serializeCharacterForPersist, the guild-book
+    // flush pair). Zero headroom on purpose, the standing posture here.
     file: 'server/game.ts',
-    ceiling: 10859,
+    ceiling: 10858,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

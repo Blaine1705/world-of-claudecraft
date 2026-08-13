@@ -92,6 +92,9 @@ class ScriptedEconomy implements WocMarketEconomy {
 
 /** Custody stub: the bond/lock paths under test never move items. */
 const inertCustody: WocMarketCustody = {
+  runSerialized() {
+    throw new Error('not exercised');
+  },
   extractCopy() {
     throw new Error('not exercised');
   },

@@ -2776,6 +2776,11 @@ const wocMarketService = new WocMarketService({
     },
     wocCustodySession: (characterId) => liveGame().wocCustodySession(characterId),
     persistMailBlob: () => liveGame().persistMailBlob(),
+    enqueueCharacterWrite: (characterId, job) => liveGame().enqueueCharacterWrite(characterId, job),
+    serializeCharacterForPersist: (characterId) =>
+      liveGame().serializeCharacterForPersist(characterId),
+    hasDirtyGuildBooks: (characterId) => liveGame().hasDirtyGuildBooks(characterId),
+    flushDirtyGuildBooks: (characterId) => liveGame().flushDirtyGuildBooks(characterId),
   }),
   verifiedWallet: async (account) => (await walletForAccount(account))?.pubkey ?? null,
   balanceTokens: (pubkey) => cachedWocBalance(pubkey),

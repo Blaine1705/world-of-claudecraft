@@ -62,6 +62,9 @@ class ParcelCustody implements WocMarketCustody {
    *  the ref, so only this can say whether a second write was attempted. */
   readonly persistCalls: string[] = [];
 
+  runSerialized(): never {
+    throw new Error('escrow extraction is not exercised by this suite');
+  }
   extractCopy(): never {
     throw new Error('escrow extraction is not exercised by this suite');
   }
@@ -1311,5 +1314,183 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       expect(away.stuckDelivering.sample[0]?.id).toBe(foreignSettlement.id);
       expect(away.undisposedListings.sample[0]?.id).toBe(foreignListing);
     }, 20_000);
+  });
+
+  describe('the escrow listing transaction (custody entry)', () => {
+    const SAVE_STATE = { questLog: [], questsDone: [], inventory: [] } as unknown as CharacterState;
+
+    async function seedLease(realm: string, characterId: number, nonce: string): Promise<void> {
+      await pool.query(
+        `INSERT INTO character_leases (character_id, realm, holder, nonce, expires_at)
+         VALUES ($1, $2, $3, $4, now() + interval '90 seconds')`,
+        [characterId, realm, db.PROCESS_LEASE_HOLDER, nonce],
+      );
+    }
+
+    function escrowListing(
+      realm: string,
+      sellerAccount: number,
+      sellerCharacter: number,
+      over: { directedBuyerAccount?: number | null } = {},
+    ) {
+      seq++;
+      return {
+        realm,
+        sellerAccount,
+        sellerCharacter,
+        sellerName: `EscrowSeller${seq}`,
+        sellerWallet: `wallet-escrow-${seq}`,
+        item: { itemId: 'crown_of_embers', count: 1 },
+        itemId: 'crown_of_embers',
+        quality: 'epic' as const,
+        params: {
+          format: 'auction' as const,
+          directedBuyerAccount: over.directedBuyerAccount ?? null,
+          startCents: 5000,
+          reserveCents: null,
+          buyNowCents: null,
+          durationHours: 12,
+          offerNext: false,
+        },
+        endsAtMs: BASE_MS + 12 * 60 * MINUTE_MS,
+      };
+    }
+
+    it('commits the fenced character blob and the listing row in ONE transaction', async () => {
+      const realm = 'escrow-commit';
+      const account = await seedAccount();
+      const characterId = await seedCharacter(realm, account);
+      await seedLease(realm, characterId, 'escrow-nonce-live');
+      const out = await marketDb.escrowInsertListing(
+        { characterId, level: 12, state: SAVE_STATE, leaseNonce: 'escrow-nonce-live' },
+        escrowListing(realm, account, characterId),
+      );
+      if (!out.ok) throw new Error(`escrow refused: ${out.reason}`);
+      const character = await pool.query(`SELECT level FROM characters WHERE id = $1`, [
+        characterId,
+      ]);
+      expect(character.rows[0].level, 'the fenced save landed').toBe(12);
+      const listing = await pool.query(
+        `SELECT status FROM woc_market_listings WHERE id = $1 AND realm = $2`,
+        [out.id, realm],
+      );
+      expect(listing.rows[0]?.status).toBe('active');
+    });
+
+    it('a lease fence miss rolls BOTH halves back: no blob, no listing', async () => {
+      const realm = 'escrow-fence-miss';
+      const account = await seedAccount();
+      const characterId = await seedCharacter(realm, account);
+      await seedLease(realm, characterId, 'escrow-nonce-live');
+      const out = await marketDb.escrowInsertListing(
+        { characterId, level: 12, state: SAVE_STATE, leaseNonce: 'escrow-nonce-stale' },
+        escrowListing(realm, account, characterId),
+      );
+      expect(out).toEqual({ ok: false, reason: 'lease_lost' });
+      const character = await pool.query(`SELECT level FROM characters WHERE id = $1`, [
+        characterId,
+      ]);
+      expect(character.rows[0].level, 'the seeded level survived untouched').toBe(10);
+      const listings = await pool.query(`SELECT id FROM woc_market_listings WHERE realm = $1`, [
+        realm,
+      ]);
+      expect(listings.rowCount).toBe(0);
+    });
+
+    it('a held accounts row surfaces the typed contended refusal at the lock ceiling', async () => {
+      const realm = 'escrow-contended';
+      const account = await seedAccount();
+      const characterId = await seedCharacter(realm, account);
+      await seedLease(realm, characterId, 'escrow-nonce-live');
+      const holder = await pool.connect();
+      try {
+        await holder.query('BEGIN');
+        await holder.query('SELECT 1 FROM accounts WHERE id = $1 FOR UPDATE', [account]);
+        const startedAt = Date.now();
+        const out = await marketDb.escrowInsertListing(
+          { characterId, level: 12, state: SAVE_STATE, leaseNonce: 'escrow-nonce-live' },
+          escrowListing(realm, account, characterId),
+        );
+        const elapsed = Date.now() - startedAt;
+        expect(out).toEqual({ ok: false, reason: 'contended' });
+        // The 2s lock_timeout is the bound that fired, not the statement
+        // allowance and not the 15s session default (generous CI margins).
+        expect(elapsed).toBeGreaterThanOrEqual(1_000);
+        expect(elapsed).toBeLessThan(5_000);
+        const listings = await pool.query(`SELECT id FROM woc_market_listings WHERE realm = $1`, [
+          realm,
+        ]);
+        expect(listings.rowCount).toBe(0);
+      } finally {
+        await holder.query('ROLLBACK').catch(() => {});
+        holder.release();
+      }
+    }, 20_000);
+
+    it('runs beside the delivered-save twin on the same character without a deadlock', async () => {
+      // The lock-graph probe: escrow takes accounts then characters; the
+      // delivered save takes characters then the claim row. No reverse edge
+      // exists, so the two serialize on the characters row instead of
+      // deadlocking; both must land.
+      const realm = 'escrow-lock-graph';
+      const account = await seedAccount();
+      const characterId = await seedCharacter(realm, account);
+      await seedLease(realm, characterId, 'escrow-nonce-live');
+      const ref = `escrow_lock_graph_${seq}`;
+      expect(await marketDb.claimCustodyRef(realm, ref)).toBe(true);
+      const [escrow, booked] = await Promise.all([
+        marketDb.escrowInsertListing(
+          { characterId, level: 12, state: SAVE_STATE, leaseNonce: 'escrow-nonce-live' },
+          escrowListing(realm, account, characterId),
+        ),
+        marketDb.saveDeliveredCharacterBooked(
+          { characterId, level: 13, state: SAVE_STATE, leaseNonce: 'escrow-nonce-live' },
+          ref,
+        ),
+      ]);
+      expect(escrow.ok).toBe(true);
+      expect(booked).toBe('booked');
+    }, 20_000);
+
+    it('measures the transaction cost against its statement allowance', async () => {
+      // The workload-scoped 5s statement_timeout replaced the 60s heavy
+      // allowance because this transaction now heads a character's save FIFO.
+      // Prove the expected cost really is orders of magnitude under the
+      // ceiling with a representative blob (a few hundred inventory slots),
+      // and print the distribution for the ledger.
+      const { ESCROW_STATEMENT_TIMEOUT_MS } = await import('../server/woc_market_db');
+      const realm = 'escrow-cost';
+      const account = await seedAccount();
+      const characterId = await seedCharacter(realm, account);
+      await seedLease(realm, characterId, 'escrow-nonce-live');
+      const heavyState = {
+        questLog: [],
+        questsDone: [],
+        inventory: Array.from({ length: 300 }, (_, i) => ({
+          itemId: 'crown_of_embers',
+          count: 1,
+          instance: { rolled: { quality: 'epic', seed: i } },
+        })),
+      } as unknown as CharacterState;
+      const samples: number[] = [];
+      for (let i = 0; i < 25; i++) {
+        const startedAt = performance.now();
+        const out = await marketDb.escrowInsertListing(
+          { characterId, level: 12, state: heavyState, leaseNonce: 'escrow-nonce-live' },
+          // Directed listings are exempt from the active cap, so the loop
+          // never trips it.
+          escrowListing(realm, account, characterId, { directedBuyerAccount: account }),
+        );
+        samples.push(performance.now() - startedAt);
+        if (!out.ok) throw new Error(`escrow refused on pass ${i}: ${out.reason}`);
+      }
+      samples.sort((a, b) => a - b);
+      const p50 = samples[Math.floor(samples.length / 2)] ?? 0;
+      const p99 = samples[samples.length - 1] ?? 0;
+      console.log(
+        `[escrow-cost] blob ${JSON.stringify(heavyState).length} bytes: p50 ${p50.toFixed(1)}ms max ${p99.toFixed(1)}ms over ${samples.length} passes`,
+      );
+      expect(p99).toBeLessThan(ESCROW_STATEMENT_TIMEOUT_MS / 5);
+    }, 30_000);
   });
 });

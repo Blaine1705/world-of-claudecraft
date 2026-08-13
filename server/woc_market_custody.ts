@@ -13,12 +13,13 @@ import {
   WOC_MARKET_SOLD_LETTER,
 } from '../src/sim/content/letters';
 import type { ExtractRef } from '../src/sim/inventory_extract';
-import type { Sim } from '../src/sim/sim';
+import type { CharacterState, Sim } from '../src/sim/sim';
 import type { InvSlot } from '../src/sim/types';
 import type { WocCustodyExtract, WocCustodyGrant, WocMarketCustody } from './woc_market';
 
 /** The narrow slice of GameServer the custody module consumes (game.ts
- *  wocCustodySession / persistMailBlob plus the public sim). */
+ *  wocCustodySession / persistMailBlob plus the public sim, and the
+ *  per-character save FIFO seam the escrow persist rides). */
 export interface WocCustodyGameHost {
   sim: Sim;
   wocCustodySession(characterId: number): {
@@ -28,7 +29,32 @@ export interface WocCustodyGameHost {
     leaseNonce: string | undefined;
   } | null;
   persistMailBlob(): Promise<void>;
+  /** The per-character save FIFO (game.ts characterSaveQueues): a job runs
+   *  only after every earlier save or job for that character settled, so
+   *  commit order is enqueue order. A job must never await another enqueue
+   *  for the same character (self-deadlock). */
+  enqueueCharacterWrite<T>(characterId: number, job: () => Promise<T>): Promise<T>;
+  /** The save-shaped snapshot (live serialization PLUS the session save
+   *  fixups: jail/spectate position, stowed pet, the jail flag). Every blob
+   *  this module hands to a durable write comes from here; a raw
+   *  sim.serializeCharacter is a jail escape. Null when the session is
+   *  gone, torn down, or escrow-quarantined. */
+  serializeCharacterForPersist(
+    characterId: number,
+  ): { level: number; state: CharacterState } | null;
+  hasDirtyGuildBooks(characterId: number): boolean;
+  flushDirtyGuildBooks(characterId: number): Promise<void>;
 }
+
+/** How long a listing request may WAIT for its turn on the character's save
+ *  FIFO before refusing typed 'contended' (the job is cancelled before it
+ *  starts, so nothing was extracted). Sized beside the pool's own 5s
+ *  connect deadline: past that, something is wedged and holding the HTTP
+ *  request open only invites a retry pile-up. */
+export const ESCROW_QUEUE_WAIT_MS = 5_000;
+/** Queue waits past this warn (rate-unlimited by design: one line per slow
+ *  listing attempt is the observability for the new FIFO coupling). */
+export const ESCROW_QUEUE_WARN_MS = 2_000;
 
 const LETTERS = {
   delivery: WOC_MARKET_DELIVERY_LETTER,
@@ -36,7 +62,13 @@ const LETTERS = {
   sold_notice: WOC_MARKET_SOLD_LETTER,
 } as const;
 
-export function createWocMarketCustody(host: WocCustodyGameHost): WocMarketCustody {
+export function createWocMarketCustody(
+  host: WocCustodyGameHost,
+  opts: { escrowWaitMs?: number } = {},
+): WocMarketCustody {
+  const escrowWaitMs = opts.escrowWaitMs ?? ESCROW_QUEUE_WAIT_MS;
+  /** Depth cap 1 per character: the ids with an escrow job queued or running. */
+  const escrowJobsInFlight = new Set<number>();
   return {
     extractCopy(accountId: number, characterId: number, ref: ExtractRef): WocCustodyExtract {
       const session = host.wocCustodySession(characterId);
@@ -46,8 +78,10 @@ export function createWocMarketCustody(host: WocCustodyGameHost): WocMarketCusto
       if (session.accountId !== accountId) return { ok: false, reason: 'not_yours' };
       const out = host.sim.extractTradableCopy(session.pid, ref);
       if (!out.ok) return out;
-      const state = host.sim.serializeCharacter(session.pid);
-      if (!state) {
+      // The save-shaped snapshot, never the raw serialization: the session
+      // save fixups (jail/spectate) must ride every durable blob.
+      const snap = host.serializeCharacterForPersist(characterId);
+      if (!snap) {
         // The session raced a teardown mid-call: undo and report offline.
         restoreInto(host, session.pid, out.extracted);
         return { ok: false, reason: 'offline' };
@@ -58,11 +92,60 @@ export function createWocMarketCustody(host: WocCustodyGameHost): WocMarketCusto
         characterName: session.name,
         save: {
           characterId,
-          level: state.level,
-          state,
+          level: snap.level,
+          state: snap.state,
           leaseNonce: session.leaseNonce,
         },
       };
+    },
+
+    async runSerialized<T>(characterId: number, job: () => Promise<T>): Promise<T | 'contended'> {
+      // The escrow critical section (extract, re-check, durable write,
+      // compensation) runs as ONE job on the character's save FIFO, so no
+      // autosave can interleave anywhere inside it and a snapshot serialized
+      // in-job is fresher than every previously committed one. Policy lives
+      // here, not in the queue: at most ONE queued escrow job per character
+      // (a second concurrent listing request refuses 'contended' instead of
+      // stacking HTTP waiters), a wait deadline that cancels a job BEFORE it
+      // starts (a cancelled job has extracted nothing, so refusing is free),
+      // and the dirty-guild-book guard: the escrow write persists the
+      // character row ALONE, so book-paired deltas are flushed atomically
+      // FIRST (never from inside the job: self-deadlock), and residue that
+      // re-dirtied during the wait refuses rather than tears.
+      if (escrowJobsInFlight.has(characterId)) return 'contended';
+      escrowJobsInFlight.add(characterId);
+      let cancelled = false;
+      let started = false;
+      let timer: NodeJS.Timeout | undefined;
+      try {
+        await host.flushDirtyGuildBooks(characterId);
+        const enqueuedAt = Date.now();
+        const run = host.enqueueCharacterWrite(characterId, async (): Promise<T | 'contended'> => {
+          if (cancelled) return 'contended';
+          started = true;
+          const waited = Date.now() - enqueuedAt;
+          if (waited > ESCROW_QUEUE_WARN_MS) {
+            console.warn(`[woc_market] escrow queue wait ${waited}ms for character ${characterId}`);
+          }
+          if (host.hasDirtyGuildBooks(characterId)) return 'contended';
+          return job();
+        });
+        const timeout = new Promise<'timeout'>((resolve) => {
+          timer = setTimeout(() => resolve('timeout'), escrowWaitMs);
+        });
+        const winner = await Promise.race([run, timeout]);
+        if (winner !== 'timeout') return winner;
+        // The deadline fired. If the job already started, its runtime is
+        // bounded by the transaction's own timeouts and its outcome is the
+        // truth (returning 'contended' for a write that may commit would lie
+        // to the seller); only a job still WAITING is cancelled.
+        if (started) return await run;
+        cancelled = true;
+        return 'contended';
+      } finally {
+        if (timer !== undefined) clearTimeout(timer);
+        escrowJobsInFlight.delete(characterId);
+      }
     },
 
     grantCopy(accountId: number, characterId: number, slot: InvSlot): WocCustodyGrant {
@@ -75,9 +158,9 @@ export function createWocMarketCustody(host: WocCustodyGameHost): WocMarketCusto
       if (!session) return { ok: false, reason: 'offline' };
       if (session.accountId !== accountId) return { ok: false, reason: 'not_yours' };
       if (!host.sim.grantTradableCopy(session.pid, slot)) return { ok: false, reason: 'no_space' };
-      const state = host.sim.serializeCharacter(session.pid);
-      if (!state) {
-        // Defensive: today resolve() and serializeCharacter share their
+      const snap = host.serializeCharacterForPersist(characterId);
+      if (!snap) {
+        // Defensive: today resolve() and the persist snapshot share their
         // preconditions with grantTradableCopy and no await separates them,
         // so this branch is unreachable, but nothing PINS that coincidence.
         // If it ever fires, the grant has already mutated the LIVE bags and a
@@ -90,8 +173,8 @@ export function createWocMarketCustody(host: WocCustodyGameHost): WocMarketCusto
         ok: true,
         save: {
           characterId,
-          level: state.level,
-          state,
+          level: snap.level,
+          state: snap.state,
           leaseNonce: session.leaseNonce,
         },
       };
@@ -106,14 +189,14 @@ export function createWocMarketCustody(host: WocCustodyGameHost): WocMarketCusto
       const session = host.wocCustodySession(characterId);
       if (!session) return { ok: false, reason: 'offline' };
       if (session.accountId !== accountId) return { ok: false, reason: 'not_yours' };
-      const state = host.sim.serializeCharacter(session.pid);
-      if (!state) return { ok: false, reason: 'offline' };
+      const snap = host.serializeCharacterForPersist(characterId);
+      if (!snap) return { ok: false, reason: 'offline' };
       return {
         ok: true,
         save: {
           characterId,
-          level: state.level,
-          state,
+          level: snap.level,
+          state: snap.state,
           leaseNonce: session.leaseNonce,
         },
       };

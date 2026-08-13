@@ -91,6 +91,22 @@ interface BookedParcel {
 }
 
 class FakeCustody implements WocMarketCustody {
+  /** Every runSerialized invocation's characterId, in order: the pin that the
+   *  listing critical section actually rides the per-character FIFO seam. */
+  readonly serializedRuns: number[] = [];
+  /** Force the NEXT runSerialized to answer 'contended' without running the
+   *  job (the queue-wait deadline / depth-cap refusal). */
+  failNextRunSerialized = false;
+
+  async runSerialized<T>(characterId: number, job: () => Promise<T>): Promise<T | 'contended'> {
+    this.serializedRuns.push(characterId);
+    if (this.failNextRunSerialized) {
+      this.failNextRunSerialized = false;
+      return 'contended';
+    }
+    return job();
+  }
+
   readonly bags = new Map<number, InvSlot[]>();
   readonly owners = new Map<number, number>();
   readonly names = new Map<number, string>();
@@ -498,6 +514,50 @@ describe('createListing', () => {
       params: listingParams(),
     });
     expect(res).toEqual({ ok: false, reason: 'below_quality_floor' });
+    expect(bagsOf(h, SELLER_CHAR)).toHaveLength(2);
+    expect(h.db.escrowSaves).toHaveLength(0);
+  });
+
+  it('runs the custody critical section through runSerialized for the listed character', async () => {
+    const h = makeHarness();
+    const res = await h.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams(),
+    });
+    expect(res.ok).toBe(true);
+    // The extraction and the escrow write happened INSIDE the serialized job
+    // (a direct db call outside it would leave this recorder empty).
+    expect(h.custody.serializedRuns).toEqual([SELLER_CHAR]);
+    expect(h.db.escrowSaves).toHaveLength(1);
+  });
+
+  it("a db-level 'contended' escrow refusal restores the copy and answers the typed refusal", async () => {
+    const h = makeHarness();
+    h.db.failNextEscrow = 'contended';
+    const res = await h.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams(),
+    });
+    expect(res).toEqual({ ok: false, reason: 'contended' });
+    // The transaction provably rolled back (55P03/40P01/25P03), so the copy
+    // is restored to the bags rather than parked.
+    expect(bagsOf(h, SELLER_CHAR)).toHaveLength(2);
+  });
+
+  it("maps the serialized-job 'contended' to the typed refusal with nothing extracted", async () => {
+    const h = makeHarness();
+    h.custody.failNextRunSerialized = true;
+    const res = await h.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams(),
+    });
+    expect(res).toEqual({ ok: false, reason: 'contended' });
     expect(bagsOf(h, SELLER_CHAR)).toHaveLength(2);
     expect(h.db.escrowSaves).toHaveLength(0);
   });

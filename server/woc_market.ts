@@ -19,6 +19,7 @@ import { ITEMS } from '../src/sim/data';
 import type { ExtractRef, ExtractRefusal } from '../src/sim/inventory_extract';
 import type { CharacterState } from '../src/sim/sim';
 import type { InvSlot } from '../src/sim/types';
+import { throwProvedRollback } from './pg_rollback_proof';
 import {
   antiSnipeExtendedEndMs,
   bondCents,
@@ -251,11 +252,16 @@ export interface CharacterSaveArgs {
 export interface WocMarketDb {
   // Listing custody edge: character UPDATE (the bags just lost the copy) and
   // the listing INSERT commit in ONE transaction, with the per-account active
-  // cap enforced under a lock (the insertAssetCapped shape).
+  // cap enforced under a lock (the insertAssetCapped shape). 'contended' is
+  // the bounded lock-wait / deadlock-victim / idle-kill refusal (55P03,
+  // 40P01, 25P03): the transaction provably rolled back and the caller
+  // restores the copy and answers the typed retry refusal.
   escrowInsertListing(
     save: CharacterSaveArgs,
     listing: NewWocListing,
-  ): Promise<{ ok: true; id: number } | { ok: false; reason: 'lease_lost' | 'cap_reached' }>;
+  ): Promise<
+    { ok: true; id: number } | { ok: false; reason: 'lease_lost' | 'cap_reached' | 'contended' }
+  >;
   listingById(realm: string, id: number): Promise<WocListingRow | null>;
   /** A has-more PROBE, never a full count: the window count forced a read of
    *  every live listing per page (measured as a parallel seq scan plus an
@@ -900,6 +906,17 @@ export interface WocStuckCustodyReadout extends WocStuckCustodyClasses {
  *  synchronous-in-memory except persistMailParcel, which books at most once
  *  by custodyRef and then persists the realm mail blob. */
 export interface WocMarketCustody {
+  /** Run the escrow critical section (extract, re-check, durable write,
+   *  compensation) as ONE job on the character's per-character save FIFO, so
+   *  no autosave snapshot can interleave anywhere inside it: a snapshot
+   *  serialized in-job is fresher than every previously committed one, and a
+   *  stale pre-extraction autosave always commits BEFORE the job runs (H5).
+   *  'contended' means the job never started (another escrow job was queued
+   *  for this character, the wait deadline fired first, or the seller's
+   *  dirty guild books could not be flushed clear): nothing was extracted
+   *  and the request simply retries. The job must not await another
+   *  character write for the same character (FIFO self-deadlock). */
+  runSerialized<T>(characterId: number, job: () => Promise<T>): Promise<T | 'contended'>;
   extractCopy(accountId: number, characterId: number, ref: ExtractRef): WocCustodyExtract;
   /** Hand a held copy straight to a live buyer's bags. Returns the save the
    *  caller must persist before treating the delivery as done. */
@@ -1353,50 +1370,85 @@ export class WocMarketService {
       if (active >= WOC_MARKET_MAX_ACTIVE_LISTINGS) return refuse('cap_reached');
     }
 
-    // Custody edge: the copy leaves the live bags in memory, then the
-    // character save and the listing insert commit together. Any persist
-    // refusal restores the copy before reporting.
-    const extract = this.deps.custody.extractCopy(args.account, args.characterId, args.itemRef);
-    if (!extract.ok) {
-      return refuse(
-        extract.reason === 'offline' || extract.reason === 'not_yours'
-          ? 'character_invalid'
-          : extract.reason,
-      );
-    }
-    // Re-decide eligibility against the AUTHORITATIVE extracted copy, not the
-    // payload the client claimed: a copy whose rolled quality sits below its
-    // def quality must not slip through on the def alone.
-    const eligibleReal = listingEligibility(def, extract.extracted.instance, this.cfg.policy);
-    if (!eligibleReal.ok) {
-      this.deps.custody.restoreCopy(args.characterId, extract.extracted);
-      return refuse(eligibleReal.reason);
-    }
-    const nowMs = this.now();
-    const listing: NewWocListing = {
-      realm: this.cfg.realm,
-      sellerAccount: args.account,
-      sellerCharacter: args.characterId,
-      sellerName: extract.characterName,
-      sellerWallet: wallet,
-      item: extract.extracted,
-      itemId: extract.extracted.itemId,
-      quality: extract.extracted.instance?.rolled?.quality ?? def?.quality ?? 'common',
-      params: args.params,
-      endsAtMs: nowMs + args.params.durationHours * 3600 * 1000,
-    };
-    let inserted: Awaited<ReturnType<WocMarketDb['escrowInsertListing']>>;
-    try {
-      inserted = await this.deps.db.escrowInsertListing(extract.save, listing);
-    } catch (err) {
-      this.deps.custody.restoreCopy(args.characterId, extract.extracted);
-      throw err;
-    }
-    if (!inserted.ok) {
-      this.deps.custody.restoreCopy(args.characterId, extract.extracted);
-      return refuse(inserted.reason === 'cap_reached' ? 'cap_reached' : 'lease_lost');
-    }
-    const row = await this.deps.db.listingById(this.cfg.realm, inserted.id);
+    // Custody edge, the WHOLE critical section as one job on the seller's
+    // per-character save FIFO (H5): the copy leaves the live bags, the
+    // character save and the listing insert commit together, and any persist
+    // refusal restores the copy, all with no autosave able to interleave. An
+    // autosave snapshot serialized BEFORE the extraction therefore always
+    // commits before the escrow write, and the escrow blob (serialized at
+    // extraction, inside the job) is fresher than every committed one, so no
+    // stale snapshot can ever resurrect the escrowed item.
+    type ListingJobOutcome = { refusal: WocMarketRefusal } | { id: number };
+    const outcome = await this.deps.custody.runSerialized(
+      args.characterId,
+      async (): Promise<ListingJobOutcome> => {
+        const extract = this.deps.custody.extractCopy(args.account, args.characterId, args.itemRef);
+        if (!extract.ok) {
+          return {
+            refusal:
+              extract.reason === 'offline' || extract.reason === 'not_yours'
+                ? ('character_invalid' as const)
+                : extract.reason,
+          };
+        }
+        // Re-decide eligibility against the AUTHORITATIVE extracted copy, not
+        // the payload the client claimed: a copy whose rolled quality sits
+        // below its def quality must not slip through on the def alone.
+        const eligibleReal = listingEligibility(def, extract.extracted.instance, this.cfg.policy);
+        if (!eligibleReal.ok) {
+          this.deps.custody.restoreCopy(args.characterId, extract.extracted);
+          return { refusal: eligibleReal.reason };
+        }
+        const nowMs = this.now();
+        const listing: NewWocListing = {
+          realm: this.cfg.realm,
+          sellerAccount: args.account,
+          sellerCharacter: args.characterId,
+          sellerName: extract.characterName,
+          sellerWallet: wallet,
+          item: extract.extracted,
+          itemId: extract.extracted.itemId,
+          quality: extract.extracted.instance?.rolled?.quality ?? def?.quality ?? 'common',
+          params: args.params,
+          endsAtMs: nowMs + args.params.durationHours * 3600 * 1000,
+        };
+        let inserted: Awaited<ReturnType<WocMarketDb['escrowInsertListing']>>;
+        try {
+          inserted = await this.deps.db.escrowInsertListing(extract.save, listing);
+        } catch (err) {
+          // Restore ONLY on proof the transaction rolled back. A throw that
+          // proves nothing (a connection-class failure, a driver timeout with
+          // no SQLSTATE) may follow a COMMIT that landed, and restoring there
+          // mints the copy twice: once in the listing, once in the bags. That
+          // ambiguous copy PARKS instead (kept out of the live bags, logged
+          // with its ids for the operator, who checks whether the listing row
+          // exists and hand-restores when it does not).
+          if (throwProvedRollback(err)) {
+            this.deps.custody.restoreCopy(args.characterId, extract.extracted);
+          } else {
+            console.error(
+              `[woc_market] escrow_outcome_unknown: listing persist for character ${args.characterId} ` +
+                `item ${extract.extracted.itemId} threw without rollback proof; copy parked out of bags`,
+              err,
+            );
+          }
+          throw err;
+        }
+        if (!inserted.ok) {
+          this.deps.custody.restoreCopy(args.characterId, extract.extracted);
+          return {
+            refusal:
+              inserted.reason === 'cap_reached' || inserted.reason === 'contended'
+                ? inserted.reason
+                : ('lease_lost' as const),
+          };
+        }
+        return { id: inserted.id };
+      },
+    );
+    if (outcome === 'contended') return refuse('contended');
+    if ('refusal' in outcome) return refuse(outcome.refusal);
+    const row = await this.deps.db.listingById(this.cfg.realm, outcome.id);
     if (!row) throw new Error('woc_market: listing vanished after insert');
     return { ok: true, listing: row };
   }
@@ -3171,7 +3223,18 @@ export class WocMarketService {
 
   /** The durable half of a direct hand-off: persist the granted bags and book
    *  the ref in ONE transaction (saveDeliveredCharacterBooked). See
-   *  handToBuyer for what each outcome means to the caller. */
+   *  handToBuyer for what each outcome means to the caller.
+   *
+   *  RECORDED CARVE-OUT from the per-character save FIFO: unlike the escrow
+   *  listing write (createListing's runSerialized job), this write does NOT
+   *  ride enqueueCharacterWrite, so a stale autosave serialized before the
+   *  grant can still commit after it. That direction is item LOSS on the
+   *  buyer, not a mint, and the claims ledger plus the park subset make it
+   *  operator-recoverable (the lease_lost arm below documents exactly this
+   *  ambiguity); routing sweep-driven grants through the FIFO would also let
+   *  one wedged character save head-of-line block a delivery batch, which
+   *  needs its own bound before it is safe. Closing this half is filed as
+   *  packet follow-up work, not silently deferred. */
   private async commitGrant(
     custodyRef: string,
     save: CharacterSaveArgs,

@@ -480,6 +480,23 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     expect(getPoolClientErrorCount()).toBe(before + 1);
   });
 
+  it('the escrow listing allowance sits between the lock ceiling and the session default', async () => {
+    const { DB_STATEMENT_TIMEOUT_MS, DB_HEAVY_STATEMENT_TIMEOUT_MS } = await import(
+      '../../server/db'
+    );
+    const { ESCROW_STATEMENT_TIMEOUT_MS } = await import('../../server/woc_market_db');
+    expect(ESCROW_STATEMENT_TIMEOUT_MS).toBe(5_000);
+    // The escrow transaction heads a character's save FIFO (the H5 custody
+    // entry), so its allowance must sit under the ordinary session default
+    // and far under the 30s autosave period; the 60s heavy allowance stays
+    // reserved for the logout-shaped saves whose loss is data loss. It must
+    // also sit ABOVE the 2s lock-wait ceiling so a contended row surfaces as
+    // the typed 55P03 refusal, never as a statement cancel.
+    expect(ESCROW_STATEMENT_TIMEOUT_MS).toBeLessThan(DB_STATEMENT_TIMEOUT_MS);
+    expect(ESCROW_STATEMENT_TIMEOUT_MS).toBeLessThan(DB_HEAVY_STATEMENT_TIMEOUT_MS);
+    expect(ESCROW_STATEMENT_TIMEOUT_MS).toBeGreaterThan(2_000);
+  });
+
   it('runWithStatementTimeout rejects a non-integer or negative timeout before touching the pool', async () => {
     // SET LOCAL cannot bind a parameter, so the timeout is interpolated into the
     // statement text as an integer; the safe-integer validation is therefore the

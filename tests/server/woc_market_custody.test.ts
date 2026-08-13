@@ -28,12 +28,25 @@ function makeHost(over: Partial<WocCustodyGameHost> = {}): {
   persists: () => number;
 } {
   let persists = 0;
+  const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
   const host: WocCustodyGameHost = {
-    sim: new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true }),
+    sim,
     wocCustodySession: () => null,
     persistMailBlob: async () => {
       persists++;
     },
+    // Pass-through FIFO and a fixup-free persist snapshot: these tests have
+    // no GameServer, so the session fixups and queue ordering are exercised
+    // by tests/server/woc_market_escrow_queue.test.ts instead.
+    enqueueCharacterWrite: (_characterId, job) => job(),
+    serializeCharacterForPersist: (characterId) => {
+      const session = host.wocCustodySession(characterId);
+      if (!session) return null;
+      const state = host.sim.serializeCharacter(session.pid);
+      return state ? { level: state.level, state } : null;
+    },
+    hasDirtyGuildBooks: () => false,
+    flushDirtyGuildBooks: async () => {},
     ...over,
   };
   return { host, persists: () => persists };

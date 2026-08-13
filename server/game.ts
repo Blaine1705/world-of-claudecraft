@@ -153,6 +153,7 @@ import {
   type DetectionCalibrationSnapshot,
 } from './calibration_snapshot';
 import { RESTORE_ITEM_MAX_COUNT } from './character_professions';
+import { applyCharacterSaveFixups } from './character_save_fixups';
 import { ChatFilter } from './chat_filter';
 import {
   isChatFilterWrite,
@@ -322,7 +323,7 @@ import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
 import { refusedRiftForgeCommand } from './rift_forge_gate';
 import { RiftUpgradeCoordinator, riftUpgraderConfigFromEnv } from './rift_upgrader';
-import { createSerialWriter } from './serial_writer';
+import { createKeyedSerialWriter, createSerialWriter } from './serial_writer';
 import {
   jsonWithField,
   StableAuraWireCache,
@@ -1925,15 +1926,19 @@ export class GameServer {
   private saveTimer = 0;
   private socialPosTimer = 0;
   private saveAllInFlight: Promise<void> | null = null;
-  private readonly characterSaveQueues = new Map<number, Promise<boolean>>();
+  // One FIFO per character id (a drained key's entry is dropped). EVERY
+  // durable character write rides it: saveCharacter, and the out-of-band
+  // enqueueCharacterWrite the marketplace escrow persist uses, so commit
+  // order across all of a character's writers is enqueue order.
+  private readonly characterSaveQueues = createKeyedSerialWriter<number>();
   // Weapon-skin loadouts are whole-record replacements in their dedicated paid
   // state row. Keep one FIFO per account so rapid apply/detach commands cannot
   // commit on separate pool clients in reverse order and resurrect stale state.
-  private readonly weaponSkinLoadoutSaveQueues = new Map<number, Promise<void>>();
+  private readonly weaponSkinLoadoutSaveQueues = createKeyedSerialWriter<number>();
   // Action-bar layout is a whole-record replacement in its own character column.
   // One FIFO per character so a burst of debounced client saves cannot commit on
   // separate pool clients in reverse order and persist a stale layout.
-  private readonly hotbarLayoutSaveQueues = new Map<number, Promise<void>>();
+  private readonly hotbarLayoutSaveQueues = createKeyedSerialWriter<number>();
   // Serializes every write of the single global Market blob (the 30s autosave
   // and the leave-path combined save). Both serialize the whole market; without
   // a queue their transactions could commit out of capture order and persist an
@@ -3689,37 +3694,22 @@ export class GameServer {
     weaponSkinLoadout: Record<string, string>,
   ): void {
     const snapshot = { ...weaponSkinLoadout };
-    const previous = this.weaponSkinLoadoutSaveQueues.get(accountId);
-    const run = (previous ? previous.catch(() => {}) : Promise.resolve()).then(async () => {
-      await setAccountWeaponSkinLoadout(accountId, snapshot);
-    });
-    this.weaponSkinLoadoutSaveQueues.set(accountId, run);
-    const cleanup = (): void => {
-      if (this.weaponSkinLoadoutSaveQueues.get(accountId) === run) {
-        this.weaponSkinLoadoutSaveQueues.delete(accountId);
-      }
-    };
-    void run.then(cleanup, (err) => {
-      console.error('failed to save weapon skin loadout:', err);
-      cleanup();
-    });
+    // Fire and forget BY CONTRACT for this queue: a failed loadout save is a
+    // cosmetic loss the next apply overwrites, so it swallows to the log.
+    void this.weaponSkinLoadoutSaveQueues
+      .enqueue(accountId, () => setAccountWeaponSkinLoadout(accountId, snapshot))
+      .catch((err) => {
+        console.error('failed to save weapon skin loadout:', err);
+      });
   }
 
   private enqueueHotbarLayoutSave(characterId: number, layout: ActionBarLayout): void {
-    const previous = this.hotbarLayoutSaveQueues.get(characterId);
-    const run = (previous ? previous.catch(() => {}) : Promise.resolve()).then(async () => {
-      await setCharacterHotbarLayout(characterId, layout);
-    });
-    this.hotbarLayoutSaveQueues.set(characterId, run);
-    const cleanup = (): void => {
-      if (this.hotbarLayoutSaveQueues.get(characterId) === run) {
-        this.hotbarLayoutSaveQueues.delete(characterId);
-      }
-    };
-    void run.then(cleanup, (err) => {
-      console.error('failed to save hotbar layout:', err);
-      cleanup();
-    });
+    // Same fire-and-forget contract as the loadout queue above.
+    void this.hotbarLayoutSaveQueues
+      .enqueue(characterId, () => setCharacterHotbarLayout(characterId, layout))
+      .catch((err) => {
+        console.error('failed to save hotbar layout:', err);
+      });
   }
 
   join(
@@ -4406,8 +4396,7 @@ export class GameServer {
     // its book half could not, so persisting it is exactly the mint the
     // refusal prevented. It reloads from its durable row instead.
     if (session.escrowQuarantined) return false;
-    const previous = this.characterSaveQueues.get(session.characterId);
-    const run = (previous ? previous.catch(() => {}) : Promise.resolve()).then(async () => {
+    return this.characterSaveQueues.enqueue(session.characterId, async () => {
       // Re-checked INSIDE the queue, not only at entry: a save enqueued before
       // the rollback would otherwise run after it, and by then this session's
       // book ops have been undone while its character blob still reflects
@@ -4423,36 +4412,9 @@ export class GameServer {
       if (state && e) {
         // The session-position/jail fixups, applicable to ANY snapshot of this
         // character (the T0 one below, or a re-serialized one inside the
-        // queued escrow thunk).
-        const applyFixups = (s: NonNullable<typeof state>): NonNullable<typeof state> => {
-          if (session.spectating) {
-            s.pos = {
-              x: session.spectating.savedPos.x,
-              z: session.spectating.savedPos.z,
-            };
-            s.pet = session.spectating.stowedPet;
-          }
-          if (session.jailVisit) {
-            s.pos = {
-              x: session.jailVisit.savedPos.x,
-              z: session.jailVisit.savedPos.z,
-            };
-            s.facing = session.jailVisit.savedFacing;
-            s.pet = session.jailVisit.stowedPet;
-          }
-          if (session.jailed) {
-            const jailPos = this.jailSpawnFor(session);
-            s.pos = { x: jailPos.x, z: jailPos.z };
-            s.jail = session.jailed;
-            s.dead = false;
-            s.ghost = false;
-            s.corpsePos = null;
-            s.hp = Math.max(1, s.hp);
-          } else {
-            delete s.jail;
-          }
-          return s;
-        };
+        // queued escrow thunk); the module header owns the rationale.
+        const applyFixups = (s: NonNullable<typeof state>): NonNullable<typeof state> =>
+          applyCharacterSaveFixups(session, s, () => this.jailSpawnFor(session));
         applyFixups(state);
         // Use the SERIALIZED level (not e.level): during a 2v2 Fiesta bout e.level
         // is temporarily 20, but serializeCharacter reports the real level — so the
@@ -4726,14 +4688,16 @@ export class GameServer {
       }
       return true;
     });
-    this.characterSaveQueues.set(session.characterId, run);
-    try {
-      return await run;
-    } finally {
-      if (this.characterSaveQueues.get(session.characterId) === run) {
-        this.characterSaveQueues.delete(session.characterId);
-      }
-    }
+  }
+
+  /** An out-of-band durable character write (the marketplace escrow persist)
+   *  rides the SAME per-character FIFO as saveCharacter, so its commit order
+   *  against the autosaves is enqueue order and a snapshot serialized before
+   *  it can never commit after it. The job must not await another enqueue for
+   *  the same character: the FIFO makes that a deadlock (the kickSession note
+   *  inside saveCharacter is the same rule). */
+  enqueueCharacterWrite<T>(characterId: number, job: () => Promise<T>): Promise<T> {
+    return this.characterSaveQueues.enqueue(characterId, job);
   }
 
   async saveAll(reason: string): Promise<void> {
@@ -6103,13 +6067,48 @@ export class GameServer {
     leaseNonce: string | undefined;
   } | null {
     const session = this.sessionByCharacterId(characterId);
-    if (!session || session.left) return null;
+    // A quarantined session's live state was abandoned when its guild-bank
+    // escrow rolled back (the saveCharacter refusal above): its bags are not
+    // truth for ANY custody op, so extraction, grant, snapshot, and restore
+    // all treat it as absent rather than read or mutate abandoned state.
+    if (!session || session.left || session.escrowQuarantined) return null;
     return {
       pid: session.pid,
       accountId: session.accountId,
       name: session.name,
       leaseNonce: session.leaseNonce,
     };
+  }
+
+  // The save-shaped snapshot every marketplace custody persist must use: the
+  // live serialization PLUS the session fixups an ordinary save applies
+  // (character_save_fixups.ts owns the rationale; skipping them is a jail
+  // escape and a stowed-pet loss, not cosmetics).
+  serializeCharacterForPersist(
+    characterId: number,
+  ): { level: number; state: import('../src/sim/sim').CharacterState } | null {
+    const session = this.sessionByCharacterId(characterId);
+    if (!session || session.left || session.escrowQuarantined) return null;
+    const state = this.sim.serializeCharacter(session.pid);
+    if (!state) return null;
+    applyCharacterSaveFixups(session, state, () => this.jailSpawnFor(session));
+    return { level: state.level, state };
+  }
+
+  hasDirtyGuildBooks(characterId: number): boolean {
+    const session = this.sessionByCharacterId(characterId);
+    return !!session && !session.left && session.dirtyGuildBanks.size > 0;
+  }
+
+  // One ordinary save to flush a seller's dirty guild books BEFORE the escrow
+  // critical section: the escrow write persists the character row ALONE, and
+  // a blob carrying unflushed book-paired deltas would tear the guild-bank
+  // escrow atomicity (the character half durable without its book half).
+  // Never call from inside a queued character write: self-deadlock.
+  async flushDirtyGuildBooks(characterId: number): Promise<void> {
+    const session = this.sessionByCharacterId(characterId);
+    if (!session || session.left || session.dirtyGuildBanks.size === 0) return;
+    await this.saveCharacter(session);
   }
 
   async persistMailBlob(): Promise<void> {

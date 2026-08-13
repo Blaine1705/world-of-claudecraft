@@ -232,6 +232,9 @@ describeDb('woc market settlement guards against real Postgres', () => {
 
   function makeService(realm: string): WocMarketService {
     const custody: WocMarketCustody = {
+      runSerialized: () => {
+        throw new Error('custody not exercised by this suite');
+      },
       extractCopy: () => {
         throw new Error('custody not exercised by this suite');
       },

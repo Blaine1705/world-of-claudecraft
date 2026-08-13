@@ -663,6 +663,22 @@ const ESCROW_LOCK_TIMEOUT_MS = 2_000;
  *  older guards rides the hot-path work. */
 const GUARD_IDLE_TX_TIMEOUT_MS = ESCROW_LOCK_TIMEOUT_MS;
 
+/** Per-statement allowance for the escrow listing transaction, WORKLOAD
+ *  scoped (exported for the tunables-ladder pin). It sits between the lock
+ *  wait ceiling and the session default: the transaction now runs inside the
+ *  per-character save FIFO, so its worst case bounds the seller's own
+ *  autosave chain, a saveAll worker slot, and leave/takeover, and it must
+ *  stay well under the 30s autosave period even across all four real
+ *  statements. Measured against Postgres 16 with a 27KB character blob:
+ *  p50 3.5ms, max 8.3ms over 25 passes (the delivery pg suite's escrow-cost
+ *  test re-measures and asserts the max stays under a fifth of this
+ *  allowance), so 5s is orders of magnitude of headroom while a genuinely
+ *  wedged statement can no longer hold the FIFO for the 60s heavy
+ *  allowance. The heavy allowance remains correct for the LOGOUT-shaped
+ *  saves (losing one is data loss; losing a listing attempt is a refusal
+ *  the player retries). */
+export const ESCROW_STATEMENT_TIMEOUT_MS = 5_000;
+
 const LISTING_COLS =
   'id, realm, seller_account, seller_character, seller_name, seller_wallet, item, item_id, ' +
   'quality, format, start_cents, reserve_cents, buy_now_cents, offer_next, status, resolution, ' +
@@ -928,81 +944,95 @@ export class PgWocMarketDb implements WocMarketDb {
   async escrowInsertListing(
     save: CharacterSaveArgs,
     listing: NewWocListing,
-  ): Promise<{ ok: true; id: number } | { ok: false; reason: 'lease_lost' | 'cap_reached' }> {
-    return this.withTx(async (client) => {
-      // LOCK ORDER carve-out: no bid row lock and no listing row lock is
-      // taken here (this transaction locks the ACCOUNTS row, then only
-      // INSERTs a listing), so it can never close a cycle with the
-      // bids-then-listing order the market transactions follow.
-      // A logout-race save should wait out a slow database, not lose the
-      // escrow halves (the saveCharacterAndMarketState rationale). The LOCK
-      // wait is bounded separately and tightly: without lock_timeout, ten
-      // rate-limit-compliant listings for one account can each block up to the
-      // heavy allowance on the same accounts row and pin the whole pool
-      // (DB_POOL_MAX_CLIENTS), starving the game loop's own saves.
-      await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
-      await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
-      // Lock ORDER is accounts-then-characters, matching every established
-      // capped-insert path (db.ts createCharacterCapped, maps_db, user_assets_db),
-      // so no future accounts-first path can deadlock against this one. The cap
-      // is counted under the lock and NOT re-counted outside it.
-      await client.query('SELECT 1 FROM accounts WHERE id = $1 FOR UPDATE', [
-        listing.sellerAccount,
-      ]);
-      // The cap is PUBLIC-listing-only in both directions, matching the service's
-      // pre-check: a directed offer is exempt from it and invisible to it. This
-      // is the AUTHORITATIVE half (the pre-check races; this runs under the row
-      // lock), so the exemption has to be spelled here too or a directed offer
-      // would pass the pre-check and abort in the transaction.
-      if (listing.params.directedBuyerAccount === null) {
-        const count = await client.query(
-          `SELECT COUNT(*)::int AS n FROM woc_market_listings
+  ): Promise<
+    { ok: true; id: number } | { ok: false; reason: 'lease_lost' | 'cap_reached' | 'contended' }
+  > {
+    try {
+      return await this.withTx(async (client) => {
+        // LOCK ORDER carve-out: no bid row lock and no listing row lock is
+        // taken here (this transaction locks the ACCOUNTS row, then only
+        // INSERTs a listing), so it can never close a cycle with the
+        // bids-then-listing order the market transactions follow.
+        // The statement allowance is WORKLOAD-SCOPED, not the heavy save
+        // allowance: this transaction now runs inside the per-character save
+        // FIFO, so its worst case is the head-of-line bound on the seller's
+        // own autosaves, one of the four saveAll worker slots, and
+        // leave/lease-release/takeover. Every failure mode here is fully
+        // compensated (the copy restores or the request refuses), unlike a
+        // logout flush, so it gets a short deadline instead of the 60s one;
+        // the LOCK wait is bounded tighter still, and the idle bound stops a
+        // stalled event loop from holding the accounts row between
+        // statements (both surface as the typed 'contended' refusal).
+        await client.query(`SET LOCAL statement_timeout = ${ESCROW_STATEMENT_TIMEOUT_MS}`);
+        await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
+        await client.query(
+          `SET LOCAL idle_in_transaction_session_timeout = ${GUARD_IDLE_TX_TIMEOUT_MS}`,
+        );
+        // Lock ORDER is accounts-then-characters, matching every established
+        // capped-insert path (db.ts createCharacterCapped, maps_db, user_assets_db),
+        // so no future accounts-first path can deadlock against this one. The cap
+        // is counted under the lock and NOT re-counted outside it.
+        await client.query('SELECT 1 FROM accounts WHERE id = $1 FOR UPDATE', [
+          listing.sellerAccount,
+        ]);
+        // The cap is PUBLIC-listing-only in both directions, matching the service's
+        // pre-check: a directed offer is exempt from it and invisible to it. This
+        // is the AUTHORITATIVE half (the pre-check races; this runs under the row
+        // lock), so the exemption has to be spelled here too or a directed offer
+        // would pass the pre-check and abort in the transaction.
+        if (listing.params.directedBuyerAccount === null) {
+          const count = await client.query(
+            `SELECT COUNT(*)::int AS n FROM woc_market_listings
             WHERE realm = $1 AND seller_account = $2 AND status <> 'closed'
               AND directed_buyer_account IS NULL`,
-          [listing.realm, listing.sellerAccount],
-        );
-        if ((count.rows[0]?.n ?? 0) >= WOC_MARKET_MAX_ACTIVE_LISTINGS) {
-          throw new TxAbort({ ok: false as const, reason: 'cap_reached' as const });
+            [listing.realm, listing.sellerAccount],
+          );
+          if ((count.rows[0]?.n ?? 0) >= WOC_MARKET_MAX_ACTIVE_LISTINGS) {
+            throw new TxAbort({ ok: false as const, reason: 'cap_reached' as const });
+          }
         }
-      }
-      const saved = await saveCharacterStateOnClient(
-        client,
-        save.characterId,
-        save.level,
-        save.state,
-        save.leaseNonce,
-      );
-      if (!saved) {
-        throw new TxAbort({ ok: false as const, reason: 'lease_lost' as const });
-      }
-      const inserted = await client.query(
-        `INSERT INTO woc_market_listings (
+        const saved = await saveCharacterStateOnClient(
+          client,
+          save.characterId,
+          save.level,
+          save.state,
+          save.leaseNonce,
+        );
+        if (!saved) {
+          throw new TxAbort({ ok: false as const, reason: 'lease_lost' as const });
+        }
+        const inserted = await client.query(
+          `INSERT INTO woc_market_listings (
            realm, seller_account, seller_character, seller_name, seller_wallet,
            item, item_id, quality, format, start_cents, reserve_cents,
            buy_now_cents, offer_next, ends_at, base_ends_at, directed_buyer_account
          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
                    to_timestamp($14 / 1000.0), to_timestamp($14 / 1000.0), $15)
          RETURNING id`,
-        [
-          listing.realm,
-          listing.sellerAccount,
-          listing.sellerCharacter,
-          listing.sellerName,
-          listing.sellerWallet,
-          JSON.stringify(listing.item),
-          listing.itemId,
-          listing.quality,
-          listing.params.format,
-          listing.params.startCents,
-          listing.params.reserveCents,
-          listing.params.buyNowCents,
-          listing.params.offerNext,
-          listing.endsAtMs,
-          listing.params.directedBuyerAccount,
-        ],
-      );
-      return { ok: true as const, id: Number(inserted.rows[0].id) };
-    });
+          [
+            listing.realm,
+            listing.sellerAccount,
+            listing.sellerCharacter,
+            listing.sellerName,
+            listing.sellerWallet,
+            JSON.stringify(listing.item),
+            listing.itemId,
+            listing.quality,
+            listing.params.format,
+            listing.params.startCents,
+            listing.params.reserveCents,
+            listing.params.buyNowCents,
+            listing.params.offerNext,
+            listing.endsAtMs,
+            listing.params.directedBuyerAccount,
+          ],
+        );
+        return { ok: true as const, id: Number(inserted.rows[0].id) };
+      });
+    } catch (err) {
+      if (isLockContention(err)) return { ok: false as const, reason: 'contended' as const };
+      throw err;
+    }
   }
 
   async listingById(realm: string, id: number): Promise<WocListingRow | null> {

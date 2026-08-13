@@ -1119,6 +1119,87 @@ describe('the atomic save-and-book, in SQL', () => {
   });
 });
 
+describe('the escrow listing transaction, in SQL', () => {
+  const SAVE = {
+    characterId: 21,
+    level: 10,
+    state: { questLog: [], questsDone: [], inventory: [] } as unknown as CharacterState,
+    leaseNonce: 'nonce-1',
+  };
+  const LISTING = {
+    realm: REALM,
+    sellerAccount: 4,
+    sellerCharacter: 21,
+    sellerName: 'Selara',
+    sellerWallet: 'wallet-seller',
+    item: { itemId: 'crown_of_embers', count: 1 },
+    itemId: 'crown_of_embers',
+    quality: 'epic' as const,
+    params: {
+      format: 'auction' as const,
+      directedBuyerAccount: null,
+      startCents: 5000,
+      reserveCents: null,
+      buyNowCents: null,
+      durationHours: 12,
+      offerNext: false,
+    },
+    endsAtMs: 1_820_000_000_000,
+  };
+
+  it('bounds itself, locks accounts THEN writes the fenced character, then inserts', async () => {
+    const { pool, sql } = recordingTxPool((text) =>
+      text.includes('RETURNING id') ? { rows: [{ id: 7 }], rowCount: 1 } : undefined,
+    );
+    const out = await new PgWocMarketDb(pool).escrowInsertListing(SAVE, LISTING);
+    expect(out).toEqual({ ok: true, id: 7 });
+    const seq = sql();
+    expect(seq[0]).toBe('BEGIN');
+    expect(seq.at(-1)).toBe('COMMIT');
+    // The three SET LOCAL bounds with their literals: the workload-scoped
+    // statement allowance (the transaction heads a character's save FIFO, so
+    // it must never hold it for the 60s heavy allowance), the lock-wait
+    // ceiling, and the idle-in-transaction kill its guard siblings carry.
+    expect(seq.some((t) => t.includes('SET LOCAL statement_timeout = 5000'))).toBe(true);
+    expect(seq.some((t) => t.includes('SET LOCAL lock_timeout = 2000'))).toBe(true);
+    expect(
+      seq.some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout = 2000')),
+    ).toBe(true);
+    // Lock ORDER: accounts before characters (the createCharacterCapped
+    // order), and the listing INSERT only after the fenced character write.
+    const accounts = seq.findIndex((t) => t.includes('FROM accounts') && t.includes('FOR UPDATE'));
+    const character = seq.findIndex((t) => t.includes('UPDATE characters'));
+    const insert = seq.findIndex((t) => t.includes('INSERT INTO woc_market_listings'));
+    expect(accounts).toBeGreaterThan(0);
+    expect(character).toBeGreaterThan(accounts);
+    expect(insert).toBeGreaterThan(character);
+    // The character half carries the in-statement lease fence.
+    expect(seq[character]).toContain('character_leases');
+  });
+
+  it('rolls the WHOLE transaction back when the lease fence matches no row', async () => {
+    const { pool, sql } = recordingTxPool((text) =>
+      text.includes('UPDATE characters') ? { rows: [], rowCount: 0 } : undefined,
+    );
+    const out = await new PgWocMarketDb(pool).escrowInsertListing(SAVE, LISTING);
+    expect(out).toEqual({ ok: false, reason: 'lease_lost' });
+    const seq = sql();
+    expect(seq.some((t) => t.includes('INSERT INTO woc_market_listings'))).toBe(false);
+    expect(seq.at(-1)).toBe('ROLLBACK');
+  });
+
+  it('refuses cap_reached under the accounts lock BEFORE any character write', async () => {
+    const { pool, sql } = recordingTxPool((text) =>
+      text.includes('COUNT(*)') ? { rows: [{ n: 12 }], rowCount: 1 } : undefined,
+    );
+    const out = await new PgWocMarketDb(pool).escrowInsertListing(SAVE, LISTING);
+    expect(out).toEqual({ ok: false, reason: 'cap_reached' });
+    const seq = sql();
+    expect(seq.some((t) => t.includes('UPDATE characters'))).toBe(false);
+    expect(seq.at(-1)).toBe('ROLLBACK');
+  });
+});
+
 describe('the custody claim primitives stay monotonic, in SQL', () => {
   it('books and stamps ONLY while unbooked', async () => {
     for (const run of [
