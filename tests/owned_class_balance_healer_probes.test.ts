@@ -28,7 +28,13 @@ describe('owned-class level 20 balance harness (healer probes)', () => {
         expect(result.talents).toEqual(OWNED_CLASS_PBE_TALENTS[spec]);
       }
     },
-    30_000,
+    // Was 30_000 when this case ran sixth in the warm pre-split file; it now
+    // runs FIRST in its own file and absorbs cold-start (measured cold 8.24s
+    // local vs 6.9s warm; the family sizes budgets at ~2.5x local for the
+    // fast-runner margin, and lane contention at workers=2 can roughly double
+    // that, which put 30s within reach of a spurious bound-kill on a REQUIRED
+    // lane).
+    60_000,
   );
 
   it('runs Priest healer pressure through shields and Seraphic Vigil', () => {

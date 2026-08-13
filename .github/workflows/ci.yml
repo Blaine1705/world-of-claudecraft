@@ -896,7 +896,7 @@ jobs:
     #
     # 20 was sized from a 14.63 minute healthy worst case (run 31117143257).
     # That premise died on 2026-08-11 at b160a1ba18, where shard 1 drew FOUR
-    # of the nine long suites (owned_class_balance_harness, nythraxis_matrix,
+    # of the then-nine long suites (owned_class_balance_harness, nythraxis_matrix,
     # hunter_dps_balance, and druid_balance_probe) and was bound-killed four
     # times (run 31443047694 attempts 1 through 3, run 31443040285 attempt 1)
     # while attempt 2 of that same push run passed the identical scope in 16

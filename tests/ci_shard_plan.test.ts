@@ -274,10 +274,10 @@ describe('buildShardPlan: fail-closed fallbacks', () => {
 
 describe('the long-sims lane (Phase 4)', () => {
   // A fixture that COLLECTS two lane files, one of them floor-classified
-  // (mirroring the real tree, where tests/battleground.test.ts is blind and
-  // the other lane files are graph-visible).
-  const LANE_BLIND = 'tests/battleground.test.ts';
-  const LANE_GRAPH = 'tests/chronomancy_balance.test.ts';
+  // (mirroring the real tree, where tests/nythraxis_matrix.test.ts is
+  // floor-classified and the owned-class balance files are graph-visible).
+  const LANE_BLIND = 'tests/nythraxis_matrix.test.ts';
+  const LANE_GRAPH = 'tests/owned_class_balance_role_bands.test.ts';
   const LANE_BASE = {
     ...BASE,
     alwaysRun: [...ALWAYS, LANE_BLIND],
@@ -290,9 +290,7 @@ describe('the long-sims lane (Phase 4)', () => {
     // in the measured record (docs/qa-gate.md, "The long-sims lane"), never a
     // refactor side effect.
     expect([...CI_LONG_SUITES]).toEqual([
-      'tests/audit_conservation_property.test.ts',
-      'tests/battleground.test.ts',
-      'tests/chronomancy_balance.test.ts',
+      'tests/chronomancy_balance_targets.test.ts',
       'tests/druid_balance_probe.test.ts',
       'tests/eastbrook_gameplay_integration.test.ts',
       'tests/hunter_dps_balance.test.ts',
@@ -308,26 +306,24 @@ describe('the long-sims lane (Phase 4)', () => {
       'tests/owned_class_raid_sustain_bands.test.ts',
     ]);
     // The two lane jobs' halves, also literal (the a/b balance is a measured
-    // decision, re-balanced 2026-08-13 with the harness split's duration
-    // ledger).
+    // decision, re-balanced 2026-08-13 with the run 31732244215 per-file
+    // duration ledger recorded in the lane-split PRs).
     expect([...CI_LONG_SUITE_HALVES.a]).toEqual([
-      'tests/battleground.test.ts',
-      'tests/chronomancy_balance.test.ts',
-      'tests/druid_balance_probe.test.ts',
+      'tests/nythraxis_matrix.test.ts',
+      'tests/owned_class_balance_dps_metrics.test.ts',
       'tests/owned_class_balance_dps_probes.test.ts',
-      'tests/owned_class_balance_groveheart.test.ts',
+      'tests/owned_class_balance_druid_bands.test.ts',
+      'tests/owned_class_balance_healer_probes.test.ts',
       'tests/owned_class_balance_role_bands.test.ts',
       'tests/owned_class_raid_armor_avoidance.test.ts',
     ]);
     expect([...CI_LONG_SUITE_HALVES.b]).toEqual([
-      'tests/audit_conservation_property.test.ts',
+      'tests/chronomancy_balance_targets.test.ts',
+      'tests/druid_balance_probe.test.ts',
       'tests/eastbrook_gameplay_integration.test.ts',
       'tests/hunter_dps_balance.test.ts',
-      'tests/nythraxis_matrix.test.ts',
-      'tests/owned_class_balance_dps_metrics.test.ts',
-      'tests/owned_class_balance_druid_bands.test.ts',
+      'tests/owned_class_balance_groveheart.test.ts',
       'tests/owned_class_balance_healer_contract.test.ts',
-      'tests/owned_class_balance_healer_probes.test.ts',
       'tests/owned_class_raid_sustain_bands.test.ts',
     ]);
     // Exact partition of the union the shard legs exclude: a lane file in
@@ -722,8 +718,8 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     }
     // Each half runs ITS files and none of the other's; together they cover
     // the whole CI_LONG_SUITES union the shard legs exclude.
-    expect(runA.log).toContain('npm test -- tests/battleground.test.ts');
-    expect(runB.log).toContain('npm test -- tests/audit_conservation_property.test.ts');
+    expect(runA.log).toContain('npm test -- tests/nythraxis_matrix.test.ts');
+    expect(runB.log).toContain('npm test -- tests/chronomancy_balance_targets.test.ts');
     for (const f of CI_LONG_SUITE_HALVES.b) expect(runA.log).not.toContain(f);
     for (const f of CI_LONG_SUITE_HALVES.a) expect(runB.log).not.toContain(f);
     for (const f of CI_LONG_SUITES) {
@@ -748,21 +744,24 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     const runA = await runEntry(['--lane=long-sims-a', '--plan-only'], env);
     expect(runA.exitCode).toBe(0);
     // The exact reason line closes BOTH directions and the cardinality at
-    // once: "1 of 3" fails if a second half-a lane file joins (whatever its
-    // sort position) and if the half's list total drifts.
+    // once: "1 of 7" fails if a second half-a lane file lands on the floor
+    // (whatever its sort position) and if the half's list total drifts.
     expect(runA.log).toContain(
       'plan: mode=selective (selective: 1 of 7 lane file(s) on the floor or changed)',
     );
-    expect(runA.log).toContain('lane runs: tests/battleground.test.ts');
-    expect(runA.log).not.toContain('tests/chronomancy_balance.test.ts');
-    expect(runA.log).not.toContain('tests/nythraxis_matrix.test.ts');
+    expect(runA.log).toContain('lane runs: tests/nythraxis_matrix.test.ts');
+    expect(runA.log).not.toContain('tests/owned_class_balance_role_bands.test.ts');
+    expect(runA.log).not.toContain('tests/druid_balance_probe.test.ts');
     const runB = await runEntry(['--lane=long-sims-b', '--plan-only'], env);
     expect(runB.exitCode).toBe(0);
+    // Half b currently has no floor-classified member, so a leaf diff plans
+    // ZERO legs here: the documented empty-lane path, exercised on the real
+    // tree (the fixture-based cases above cover the non-empty shapes).
     expect(runB.log).toContain(
-      'plan: mode=selective (selective: 1 of 9 lane file(s) on the floor or changed)',
+      'plan: mode=selective (selective: 0 of 7 lane file(s) on the floor or changed)',
     );
-    expect(runB.log).toContain('lane runs: tests/nythraxis_matrix.test.ts');
-    expect(runB.log).not.toContain('tests/battleground.test.ts');
+    expect(runB.log).toContain('lane runs: nothing');
+    expect(runB.log).not.toContain('tests/nythraxis_matrix.test.ts');
   });
 
   async function listVitestFilesExcluding(
