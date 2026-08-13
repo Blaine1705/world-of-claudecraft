@@ -9,7 +9,7 @@ import {
   type SemanticMapMarkerArt,
   semanticMapMarkerArt,
 } from '../src/ui/map_marker_icon_art';
-import { createMapMarkerArt } from '../src/ui/map_marker_icon_loader';
+import { createMapMarkerArt, type MapMarkerRasterColors } from '../src/ui/map_marker_icon_loader';
 import type { MapMarkerSemantic } from '../src/ui/map_marker_semantics_core';
 
 const NEW_ART_IDS = [
@@ -25,6 +25,23 @@ const NEW_ART_IDS = [
   'reward-reliquary',
   'world-passage',
 ] as const;
+
+const RASTER_COLORS = {
+  keyline: '#f5dfad',
+  cooldownArcDark: '#24292a',
+  cooldownArcLight: '#c8cdcc',
+  lockDark: '#24170f',
+  lockBronze: '#d39a45',
+  lockHighlight: '#f2c46d',
+  semanticDark: '#171a1d',
+  semanticBronze: '#c28a42',
+  semanticSilver: '#d7dce1',
+  semanticGold: '#f2c357',
+  semanticCyan: '#70d8ff',
+  semanticJammed: '#e56d45',
+  semanticOpened: '#d8dddc',
+  neutralFallback: '#9ba1a2',
+} as const satisfies MapMarkerRasterColors;
 
 type SizeMatrix = readonly [MapMarkerSize, MapMarkerSize, MapMarkerSize, MapMarkerSize];
 
@@ -463,6 +480,7 @@ function stateSprite(
       images.push(image);
       return image as unknown as HTMLImageElement;
     },
+    RASTER_COLORS,
   );
   expect(art.sprite(id, size)).toBeNull();
   images[0].onload?.();

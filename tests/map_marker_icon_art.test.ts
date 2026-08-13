@@ -17,7 +17,13 @@ import {
   questMarkerArtId,
   stationMarkerArtId,
 } from '../src/ui/map_marker_icon_art';
-import { createMapMarkerArt, grayscaleMapMarkerPixels } from '../src/ui/map_marker_icon_loader';
+import {
+  createMapMarkerArt,
+  grayscaleMapMarkerPixels,
+  MAP_MARKER_RASTER_COLOR_TOKENS,
+  type MapMarkerRasterColors,
+  resolveMapMarkerRasterColors,
+} from '../src/ui/map_marker_icon_loader';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const markerDir = path.join(repoRoot, 'public/ui/map-markers');
@@ -27,6 +33,25 @@ const v2ProvenanceRef = 'docs/achievements/map-marker-art-v2-2026-08-12.md';
 const historicalProvenancePath = path.join(repoRoot, historicalProvenanceRef);
 const v2ProvenancePath = path.join(repoRoot, v2ProvenanceRef);
 const creditsPath = path.join(repoRoot, 'CREDITS.md');
+const loaderSource = readFileSync(path.join(repoRoot, 'src/ui/map_marker_icon_loader.ts'), 'utf8');
+const tokenSource = readFileSync(path.join(repoRoot, 'src/styles/tokens.css'), 'utf8');
+
+const RASTER_COLORS = {
+  keyline: '#f5dfad',
+  cooldownArcDark: '#24292a',
+  cooldownArcLight: '#c8cdcc',
+  lockDark: '#24170f',
+  lockBronze: '#d39a45',
+  lockHighlight: '#f2c46d',
+  semanticDark: '#171a1d',
+  semanticBronze: '#c28a42',
+  semanticSilver: '#d7dce1',
+  semanticGold: '#f2c357',
+  semanticCyan: '#70d8ff',
+  semanticJammed: '#e56d45',
+  semanticOpened: '#d8dddc',
+  neutralFallback: '#9ba1a2',
+} as const satisfies MapMarkerRasterColors;
 
 const GATHER_TYPES = ['ore', 'wood', 'herb'] as const satisfies readonly GatherNodeType[];
 const STATION_TYPES = [
@@ -329,16 +354,64 @@ function loaderHarness(options: LoaderHarnessOptions = {}): {
       return canvas;
     }),
   };
-  const art = createMapMarkerArt(hostDocument as unknown as Pick<Document, 'createElement'>, () => {
-    const image = new FakeImage();
-    options.configureImage?.(image, images.length);
-    images.push(image);
-    return image as unknown as HTMLImageElement;
-  });
+  const art = createMapMarkerArt(
+    hostDocument as unknown as Pick<Document, 'createElement'>,
+    () => {
+      const image = new FakeImage();
+      options.configureImage?.(image, images.length);
+      images.push(image);
+      return image as unknown as HTMLImageElement;
+    },
+    RASTER_COLORS,
+  );
   return { art, images, canvases };
 }
 
 describe('map marker painted art', () => {
+  it('resolves every one-time raster color from an exact design token', () => {
+    expect(MAP_MARKER_RASTER_COLOR_TOKENS).toEqual({
+      keyline: '--color-map-marker-keyline',
+      cooldownArcDark: '--color-map-marker-cooldown-arc-dark',
+      cooldownArcLight: '--color-map-marker-cooldown-arc-light',
+      lockDark: '--color-map-marker-lock-dark',
+      lockBronze: '--color-map-marker-lock-bronze',
+      lockHighlight: '--color-map-marker-lock-highlight',
+      semanticDark: '--color-map-marker-semantic-dark',
+      semanticBronze: '--color-map-marker-semantic-bronze',
+      semanticSilver: '--color-map-marker-semantic-silver',
+      semanticGold: '--color-map-marker-semantic-gold',
+      semanticCyan: '--color-map-marker-semantic-cyan',
+      semanticJammed: '--color-map-marker-semantic-jammed',
+      semanticOpened: '--color-map-marker-semantic-opened',
+      neutralFallback: '--color-map-marker-neutral-fallback',
+    });
+
+    const reads: string[] = [];
+    const resolved = resolveMapMarkerRasterColors({
+      getPropertyValue: (token: string) => {
+        reads.push(token);
+        const key = Object.entries(MAP_MARKER_RASTER_COLOR_TOKENS).find(
+          ([, expectedToken]) => expectedToken === token,
+        )?.[0] as keyof MapMarkerRasterColors | undefined;
+        return `  ${key ? RASTER_COLORS[key] : ''}  `;
+      },
+    } as Pick<CSSStyleDeclaration, 'getPropertyValue'>);
+    expect(resolved).toEqual(RASTER_COLORS);
+    expect(reads).toEqual(Object.values(MAP_MARKER_RASTER_COLOR_TOKENS));
+
+    for (const [key, token] of Object.entries(MAP_MARKER_RASTER_COLOR_TOKENS) as Array<
+      [keyof MapMarkerRasterColors, string]
+    >) {
+      const matches = tokenSource.match(new RegExp(`${token}:\\s*${RASTER_COLORS[key]};`, 'g'));
+      expect(matches, token).toHaveLength(1);
+    }
+    const executableLoader = loaderSource
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
+    expect(executableLoader.match(/#[0-9a-fA-F]{3,8}\b/g)).toBeNull();
+    expect(executableLoader.match(/\brgba?\s*\(/g)).toBeNull();
+  });
+
   it('keeps the closed catalog, URL routes, and committed WebPs in exact bijection', () => {
     const expectedIds = [
       'dungeon-entrance',
@@ -1045,6 +1118,7 @@ describe('map marker painted art', () => {
     const art = createMapMarkerArt(
       hostDocument as unknown as Pick<Document, 'createElement'>,
       createImage,
+      RASTER_COLORS,
     );
 
     expect(art.sprite('gather-ore', 'minimapGatherReady')).toBeNull();

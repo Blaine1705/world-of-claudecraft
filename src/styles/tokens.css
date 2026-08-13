@@ -285,6 +285,23 @@
     --color-map-gather-herb-cooldown: #90989a;
     --color-map-gather-herb-glow: rgba(105, 207, 114, 0.32);
     --color-map-gather-locked: var(--color-minimap-node-locked);
+    /* One-time map-marker raster treatments. The shared Hud cache resolves
+       these once before it bakes keylines, cooldown rings, locks, ranks, and
+       reward-state badges into exact-size sprites. */
+    --color-map-marker-keyline: #f5dfad;
+    --color-map-marker-cooldown-arc-dark: #24292a;
+    --color-map-marker-cooldown-arc-light: #c8cdcc;
+    --color-map-marker-lock-dark: #24170f;
+    --color-map-marker-lock-bronze: #d39a45;
+    --color-map-marker-lock-highlight: #f2c46d;
+    --color-map-marker-semantic-dark: #171a1d;
+    --color-map-marker-semantic-bronze: #c28a42;
+    --color-map-marker-semantic-silver: #d7dce1;
+    --color-map-marker-semantic-gold: #f2c357;
+    --color-map-marker-semantic-cyan: #70d8ff;
+    --color-map-marker-semantic-jammed: #e56d45;
+    --color-map-marker-semantic-opened: #d8dddc;
+    --color-map-marker-neutral-fallback: #9ba1a2;
     /* continent overview: the open water the world_overview plate is letterboxed
        into (resolved by continent_map_painter.ts). Its own token rather than
        --color-map-ocean above, because the plate is a tall portrait crop of the

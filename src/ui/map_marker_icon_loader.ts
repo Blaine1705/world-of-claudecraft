@@ -23,12 +23,50 @@ import {
 type IconLoadState = HTMLImageElement | 'loading' | 'missing';
 type ImageFactory = () => HTMLImageElement | null;
 
-const MARKER_KEYLINE_COLOR = '#f5dfad';
-const GATHER_COOLDOWN_ARC_DARK = '#24292a';
-const GATHER_COOLDOWN_ARC_LIGHT = '#c8cdcc';
-const GATHER_LOCK_DARK = '#24170f';
-const GATHER_LOCK_BRONZE = '#d39a45';
-const GATHER_LOCK_HIGHLIGHT = '#f2c46d';
+export const MAP_MARKER_RASTER_COLOR_TOKENS = {
+  keyline: '--color-map-marker-keyline',
+  cooldownArcDark: '--color-map-marker-cooldown-arc-dark',
+  cooldownArcLight: '--color-map-marker-cooldown-arc-light',
+  lockDark: '--color-map-marker-lock-dark',
+  lockBronze: '--color-map-marker-lock-bronze',
+  lockHighlight: '--color-map-marker-lock-highlight',
+  semanticDark: '--color-map-marker-semantic-dark',
+  semanticBronze: '--color-map-marker-semantic-bronze',
+  semanticSilver: '--color-map-marker-semantic-silver',
+  semanticGold: '--color-map-marker-semantic-gold',
+  semanticCyan: '--color-map-marker-semantic-cyan',
+  semanticJammed: '--color-map-marker-semantic-jammed',
+  semanticOpened: '--color-map-marker-semantic-opened',
+  neutralFallback: '--color-map-marker-neutral-fallback',
+} as const;
+
+export type MapMarkerRasterColors = Readonly<{
+  [Key in keyof typeof MAP_MARKER_RASTER_COLOR_TOKENS]: string;
+}>;
+
+export function resolveMapMarkerRasterColors(
+  style: Pick<CSSStyleDeclaration, 'getPropertyValue'>,
+): MapMarkerRasterColors {
+  const color = (key: keyof typeof MAP_MARKER_RASTER_COLOR_TOKENS): string =>
+    style.getPropertyValue(MAP_MARKER_RASTER_COLOR_TOKENS[key]).trim();
+  return {
+    keyline: color('keyline'),
+    cooldownArcDark: color('cooldownArcDark'),
+    cooldownArcLight: color('cooldownArcLight'),
+    lockDark: color('lockDark'),
+    lockBronze: color('lockBronze'),
+    lockHighlight: color('lockHighlight'),
+    semanticDark: color('semanticDark'),
+    semanticBronze: color('semanticBronze'),
+    semanticSilver: color('semanticSilver'),
+    semanticGold: color('semanticGold'),
+    semanticCyan: color('semanticCyan'),
+    semanticJammed: color('semanticJammed'),
+    semanticOpened: color('semanticOpened'),
+    neutralFallback: color('neutralFallback'),
+  };
+}
+
 const MARKER_KEYLINE_OFFSETS = [
   [-1, -1],
   [0, -1],
@@ -64,14 +102,6 @@ const GRAYSCALE_LUMA_GREEN = 0.7152;
 const GRAYSCALE_LUMA_BLUE = 0.0722;
 const GRAYSCALE_CONTRAST = 0.75;
 const GRAYSCALE_LIFT = 40;
-const SEMANTIC_DARK = '#171a1d';
-const SEMANTIC_BRONZE = '#c28a42';
-const SEMANTIC_SILVER = '#d7dce1';
-const SEMANTIC_GOLD = '#f2c357';
-const SEMANTIC_CYAN = '#70d8ff';
-const SEMANTIC_JAMMED = '#e56d45';
-const SEMANTIC_OPENED = '#d8dddc';
-
 function isGatherCooldown(size: MapMarkerSize): boolean {
   return size.includes('GatherCooldown');
 }
@@ -111,16 +141,20 @@ function semanticRank(size: MapMarkerSize): 'C' | 'B' | 'A' | 'S' | null {
 /** The clockwise arc leaves a sixty-degree gap at the lower right. That gap
  * reads as an incomplete timer at micro scale and reserves clear space for
  * the independent padlock on a combined cooldown + locked node. */
-function drawGatherCooldownArc(ctx: CanvasRenderingContext2D, pixels: number): void {
+function drawGatherCooldownArc(
+  ctx: CanvasRenderingContext2D,
+  pixels: number,
+  colors: MapMarkerRasterColors,
+): void {
   const center = pixels / 2;
   const radius = center - GATHER_COOLDOWN_ARC_EDGE_INSET;
   ctx.lineCap = 'round';
-  ctx.strokeStyle = GATHER_COOLDOWN_ARC_DARK;
+  ctx.strokeStyle = colors.cooldownArcDark;
   ctx.lineWidth = GATHER_COOLDOWN_ARC_DARK_WIDTH;
   ctx.beginPath();
   ctx.arc(center, center, radius, GATHER_COOLDOWN_ARC_START, GATHER_COOLDOWN_ARC_END);
   ctx.stroke();
-  ctx.strokeStyle = GATHER_COOLDOWN_ARC_LIGHT;
+  ctx.strokeStyle = colors.cooldownArcLight;
   ctx.lineWidth = GATHER_COOLDOWN_ARC_LIGHT_WIDTH;
   ctx.beginPath();
   ctx.arc(center, center, radius, GATHER_COOLDOWN_ARC_START, GATHER_COOLDOWN_ARC_END);
@@ -130,7 +164,11 @@ function drawGatherCooldownArc(ctx: CanvasRenderingContext2D, pixels: number): v
 /** A simplified two-value padlock survives the smallest standard raster. The
  * dark under-shape separates it from both bright ore and pale cooldown art;
  * the bronze body and one-pixel highlight keep it in the forged UI family. */
-function drawGatherLockBadge(ctx: CanvasRenderingContext2D, pixels: number): void {
+function drawGatherLockBadge(
+  ctx: CanvasRenderingContext2D,
+  pixels: number,
+  colors: MapMarkerRasterColors,
+): void {
   const width = Math.max(
     GATHER_LOCK_BADGE_MIN_WIDTH,
     Math.round(pixels * GATHER_LOCK_BADGE_WIDTH_RATIO),
@@ -146,57 +184,72 @@ function drawGatherLockBadge(ctx: CanvasRenderingContext2D, pixels: number): voi
   const shackleRadius = width * GATHER_LOCK_SHACKLE_RADIUS_RATIO;
 
   ctx.lineCap = 'round';
-  ctx.strokeStyle = GATHER_LOCK_DARK;
+  ctx.strokeStyle = colors.lockDark;
   ctx.lineWidth = GATHER_LOCK_SHACKLE_DARK_WIDTH;
   ctx.beginPath();
   ctx.arc(shackleX, shackleY, shackleRadius, Math.PI, Math.PI * 2);
   ctx.stroke();
-  ctx.strokeStyle = GATHER_LOCK_BRONZE;
+  ctx.strokeStyle = colors.lockBronze;
   ctx.lineWidth = GATHER_LOCK_SHACKLE_BRONZE_WIDTH;
   ctx.beginPath();
   ctx.arc(shackleX, shackleY, shackleRadius, Math.PI, Math.PI * 2);
   ctx.stroke();
 
-  ctx.fillStyle = GATHER_LOCK_DARK;
+  ctx.fillStyle = colors.lockDark;
   ctx.fillRect(x - 1, y - 1, width + 2, bodyHeight + 2);
-  ctx.fillStyle = GATHER_LOCK_BRONZE;
+  ctx.fillStyle = colors.lockBronze;
   ctx.fillRect(x, y, width, bodyHeight);
-  ctx.fillStyle = GATHER_LOCK_HIGHLIGHT;
+  ctx.fillStyle = colors.lockHighlight;
   ctx.fillRect(x + 1, y + 1, Math.max(1, width - 2), 1);
-  ctx.fillStyle = GATHER_LOCK_DARK;
+  ctx.fillStyle = colors.lockDark;
   ctx.fillRect(Math.round(shackleX) - 1, y + 2, 2, Math.max(1, bodyHeight - 2));
 }
 
-function drawSemanticLockBadge(ctx: CanvasRenderingContext2D, pixels: number): void {
-  drawGatherLockBadge(ctx, pixels);
+function drawSemanticLockBadge(
+  ctx: CanvasRenderingContext2D,
+  pixels: number,
+  colors: MapMarkerRasterColors,
+): void {
+  drawGatherLockBadge(ctx, pixels, colors);
 }
 
 function drawSemanticRank(
   ctx: CanvasRenderingContext2D,
   pixels: number,
   rank: 'C' | 'B' | 'A' | 'S',
+  colors: MapMarkerRasterColors,
 ): void {
   const center = pixels / 2;
   const radius = center - 2.5;
   const count = rank === 'C' ? 1 : rank === 'B' ? 2 : rank === 'A' ? 3 : 4;
   ctx.lineCap = 'round';
-  ctx.strokeStyle = SEMANTIC_DARK;
+  ctx.strokeStyle = colors.semanticDark;
   ctx.lineWidth = 3;
   ctx.beginPath();
   ctx.arc(center, center, radius, 0, Math.PI * 2);
   ctx.stroke();
-  ctx.strokeStyle = rank === 'C' ? SEMANTIC_BRONZE : rank === 'B' ? SEMANTIC_SILVER : SEMANTIC_GOLD;
+  ctx.strokeStyle =
+    rank === 'C'
+      ? colors.semanticBronze
+      : rank === 'B'
+        ? colors.semanticSilver
+        : colors.semanticGold;
   ctx.lineWidth = 1.5;
   ctx.beginPath();
   ctx.arc(center, center, radius, 0, Math.PI * 2);
   ctx.stroke();
   const notchWidth = Math.max(2, Math.round(pixels * 0.1));
   const startX = Math.round(center - ((count - 1) * (notchWidth + 1)) / 2);
-  ctx.fillStyle = SEMANTIC_DARK;
+  ctx.fillStyle = colors.semanticDark;
   for (let index = 0; index < count; index++) {
     ctx.fillRect(startX + index * (notchWidth + 1) - 1, 0, notchWidth + 2, 4);
   }
-  ctx.fillStyle = rank === 'C' ? SEMANTIC_BRONZE : rank === 'B' ? SEMANTIC_SILVER : SEMANTIC_GOLD;
+  ctx.fillStyle =
+    rank === 'C'
+      ? colors.semanticBronze
+      : rank === 'B'
+        ? colors.semanticSilver
+        : colors.semanticGold;
   for (let index = 0; index < count; index++) {
     ctx.fillRect(startX + index * (notchWidth + 1), 0, notchWidth, 3);
   }
@@ -205,36 +258,44 @@ function drawSemanticRank(
     // survives compact downsampling and makes A/S distinct by silhouette, not
     // merely by one crowded top notch or the shared gold ring.
     const diamondY = pixels - 4;
-    ctx.fillStyle = SEMANTIC_DARK;
+    ctx.fillStyle = colors.semanticDark;
     ctx.fillRect(Math.round(center) - 2, diamondY - 1, 5, 5);
-    ctx.fillStyle = SEMANTIC_GOLD;
+    ctx.fillStyle = colors.semanticGold;
     ctx.fillRect(Math.round(center) - 1, diamondY, 3, 3);
   }
 }
 
-function drawSemanticActive(ctx: CanvasRenderingContext2D, pixels: number): void {
+function drawSemanticActive(
+  ctx: CanvasRenderingContext2D,
+  pixels: number,
+  colors: MapMarkerRasterColors,
+): void {
   const center = pixels / 2;
   const radius = center - 2.5;
   ctx.lineCap = 'round';
-  ctx.strokeStyle = SEMANTIC_DARK;
+  ctx.strokeStyle = colors.semanticDark;
   ctx.lineWidth = 3;
   ctx.beginPath();
   ctx.arc(center, center, radius, Math.PI / 4, Math.PI * 1.75);
   ctx.stroke();
-  ctx.strokeStyle = SEMANTIC_CYAN;
+  ctx.strokeStyle = colors.semanticCyan;
   ctx.lineWidth = 1.5;
   ctx.beginPath();
   ctx.arc(center, center, radius, Math.PI / 4, Math.PI * 1.75);
   ctx.stroke();
 }
 
-function drawSemanticOpened(ctx: CanvasRenderingContext2D, pixels: number): void {
+function drawSemanticOpened(
+  ctx: CanvasRenderingContext2D,
+  pixels: number,
+  colors: MapMarkerRasterColors,
+): void {
   const badge = Math.max(6, Math.round(pixels * 0.34));
   const x = pixels - badge - 1;
   const y = 1;
-  ctx.fillStyle = SEMANTIC_DARK;
+  ctx.fillStyle = colors.semanticDark;
   ctx.fillRect(x, y, badge, badge);
-  ctx.strokeStyle = SEMANTIC_OPENED;
+  ctx.strokeStyle = colors.semanticOpened;
   ctx.lineCap = 'round';
   ctx.lineWidth = 2;
   ctx.beginPath();
@@ -244,10 +305,14 @@ function drawSemanticOpened(ctx: CanvasRenderingContext2D, pixels: number): void
   ctx.stroke();
 }
 
-function drawSemanticJammed(ctx: CanvasRenderingContext2D, pixels: number): void {
+function drawSemanticJammed(
+  ctx: CanvasRenderingContext2D,
+  pixels: number,
+  colors: MapMarkerRasterColors,
+): void {
   const inset = Math.max(3, Math.round(pixels * 0.18));
   ctx.lineCap = 'round';
-  ctx.strokeStyle = SEMANTIC_DARK;
+  ctx.strokeStyle = colors.semanticDark;
   ctx.lineWidth = 4;
   ctx.beginPath();
   ctx.moveTo(inset, inset);
@@ -255,7 +320,7 @@ function drawSemanticJammed(ctx: CanvasRenderingContext2D, pixels: number): void
   ctx.moveTo(pixels - inset, inset);
   ctx.lineTo(inset, pixels - inset);
   ctx.stroke();
-  ctx.strokeStyle = SEMANTIC_JAMMED;
+  ctx.strokeStyle = colors.semanticJammed;
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(inset, inset);
@@ -265,15 +330,19 @@ function drawSemanticJammed(ctx: CanvasRenderingContext2D, pixels: number): void
   ctx.stroke();
 }
 
-function drawSemanticBountiful(ctx: CanvasRenderingContext2D, pixels: number): void {
+function drawSemanticBountiful(
+  ctx: CanvasRenderingContext2D,
+  pixels: number,
+  colors: MapMarkerRasterColors,
+): void {
   const center = Math.round(pixels / 2);
   const length = Math.max(3, Math.round(pixels * 0.16));
-  ctx.fillStyle = SEMANTIC_DARK;
+  ctx.fillStyle = colors.semanticDark;
   ctx.fillRect(center - 2, 0, 4, length + 1);
   ctx.fillRect(center - 2, pixels - length - 1, 4, length + 1);
   ctx.fillRect(0, center - 2, length + 1, 4);
   ctx.fillRect(pixels - length - 1, center - 2, length + 1, 4);
-  ctx.fillStyle = SEMANTIC_GOLD;
+  ctx.fillStyle = colors.semanticGold;
   ctx.fillRect(center - 1, 0, 2, length);
   ctx.fillRect(center - 1, pixels - length, 2, length);
   ctx.fillRect(0, center - 1, length, 2);
@@ -303,6 +372,9 @@ function browserImage(): HTMLImageElement | null {
 export function createMapMarkerArt(
   hostDocument: Pick<Document, 'createElement'>,
   createImage: ImageFactory = browserImage,
+  colors: MapMarkerRasterColors = resolveMapMarkerRasterColors(
+    getComputedStyle((hostDocument as Document).documentElement),
+  ),
 ): MapMarkerArt {
   const images = new Map<MapMarkerArtId, IconLoadState>();
   const sprites = new Map<MapMarkerArtId, Map<MapMarkerSize, HTMLCanvasElement>>();
@@ -338,7 +410,7 @@ export function createMapMarkerArt(
           // Same-origin project art should always allow pixel access. Retain a
           // truthful neutral silhouette if a host nevertheless denies it.
           scratchCtx.globalCompositeOperation = 'source-in';
-          scratchCtx.fillStyle = '#9ba1a2';
+          scratchCtx.fillStyle = colors.neutralFallback;
           scratchCtx.fillRect(0, 0, pixels, pixels);
           scratchCtx.globalCompositeOperation = 'source-over';
         }
@@ -355,19 +427,19 @@ export function createMapMarkerArt(
       ctx.imageSmoothingQuality = 'high';
       for (const [dx, dy] of MARKER_KEYLINE_OFFSETS) ctx.drawImage(scratch, dx, dy);
       ctx.globalCompositeOperation = 'source-in';
-      ctx.fillStyle = MARKER_KEYLINE_COLOR;
+      ctx.fillStyle = colors.keyline;
       ctx.fillRect(0, 0, pixels, pixels);
       ctx.globalCompositeOperation = 'source-over';
       ctx.drawImage(scratch, 0, 0);
-      if (isGatherCooldown(sizeId)) drawGatherCooldownArc(ctx, pixels);
-      if (isGatherLocked(sizeId)) drawGatherLockBadge(ctx, pixels);
-      if (isSemanticLocked(sizeId)) drawSemanticLockBadge(ctx, pixels);
+      if (isGatherCooldown(sizeId)) drawGatherCooldownArc(ctx, pixels, colors);
+      if (isGatherLocked(sizeId)) drawGatherLockBadge(ctx, pixels, colors);
+      if (isSemanticLocked(sizeId)) drawSemanticLockBadge(ctx, pixels, colors);
       const rank = semanticRank(sizeId);
-      if (rank) drawSemanticRank(ctx, pixels, rank);
-      if (isSemanticActive(sizeId)) drawSemanticActive(ctx, pixels);
-      if (isSemanticOpened(sizeId)) drawSemanticOpened(ctx, pixels);
-      if (isSemanticJammed(sizeId)) drawSemanticJammed(ctx, pixels);
-      if (isSemanticBountiful(sizeId)) drawSemanticBountiful(ctx, pixels);
+      if (rank) drawSemanticRank(ctx, pixels, rank, colors);
+      if (isSemanticActive(sizeId)) drawSemanticActive(ctx, pixels, colors);
+      if (isSemanticOpened(sizeId)) drawSemanticOpened(ctx, pixels, colors);
+      if (isSemanticJammed(sizeId)) drawSemanticJammed(ctx, pixels, colors);
+      if (isSemanticBountiful(sizeId)) drawSemanticBountiful(ctx, pixels, colors);
       bySize.set(sizeId, canvas);
     }
     sprites.set(id, bySize);
