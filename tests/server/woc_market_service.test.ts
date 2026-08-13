@@ -3680,6 +3680,35 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     expect((await h.db.directedOfferById(REALM, made.offer.id))?.status).toBe('pending');
   });
 
+  it('a THROWING reopen never replaces the typed refusal, and reports offer_reopen', async () => {
+    // The swallow's own contract: a reopen transport failure (pool timeout,
+    // reset) is reported through the sweep-error channel rather than
+    // silently eaten, the caller still sees the typed refusal, and the
+    // still-accepted row is left for the converge arm to recover from
+    // durable truth.
+    const h = stocked();
+    const made = await h.service.createDirectedOffer(offerArgs());
+    if (!made.ok) throw new Error('offer refused');
+    await h.service.acceptDirectedOffer(BUYER_A, made.offer.id, null, CHAR_A);
+    h.db.failNextEscrow = 'not_pending';
+    h.db.reopenDirectedOffer = async () => {
+      throw new Error('timeout exceeded when trying to connect');
+    };
+    const out = await h.service.acceptDirectedOffer(
+      SELLER,
+      made.offer.id,
+      { index: 0, itemId: EPIC_ITEM },
+      SELLER_CHAR,
+    );
+    expect(out).toEqual({ ok: false, reason: 'not_pending' });
+    expect(bagsOf(h, SELLER_CHAR), 'the copy restored').toContainEqual({
+      itemId: EPIC_ITEM,
+      count: 1,
+    });
+    expect((await h.db.directedOfferById(REALM, made.offer.id))?.status).toBe('accepted');
+    expect(h.sweepErrors.map(([arm]) => arm)).toContain('offer_reopen');
+  });
+
   it('bounds the pair to ONE pending offer (the strike-farming bound), and frees it on resolve', async () => {
     const h = stocked();
     const first = await h.service.createDirectedOffer(offerArgs());

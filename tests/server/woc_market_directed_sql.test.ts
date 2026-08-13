@@ -12,7 +12,12 @@
 
 import type { Pool } from 'pg';
 import { describe, expect, it, vi } from 'vitest';
-import { PgWocMarketDb, SETTLED_OFFER_GRACE_MS, TxNeverStarted } from '../../server/woc_market_db';
+import {
+  PgWocMarketDb,
+  SETTLED_OFFER_GRACE_MS,
+  TxNeverStarted,
+  WOC_MARKET_OFFERS_PAIR_PENDING_INDEX,
+} from '../../server/woc_market_db';
 import type { CharacterState } from '../../src/sim/sim';
 
 const REALM = 'Claudemoon';
@@ -154,13 +159,10 @@ describe('the directed-rail integrity statements, in SQL', () => {
     expect(seenParams[0]).toContain('crown_of_embers');
     expect(seenParams[0]).toContain('a'.repeat(64));
     // The pair-pending unique violation answers typed instead of throwing:
-    // the strike-farming bound must be a refusal the client can render.
-    const dup = {
-      query: vi.fn(async () => {
-        throw Object.assign(new Error('duplicate key'), { code: '23505' });
-      }),
-    };
-    const out = await new PgWocMarketDb(dup as unknown as Pool).insertDirectedOffer({
+    // the strike-farming bound must be a refusal the client can render. The
+    // discriminator keys on the CONSTRAINT name (shared with the DDL via the
+    // exported constant), so the fixture carries it the way pg does.
+    const offerRow = (over: Partial<Parameters<PgWocMarketDb['insertDirectedOffer']>[0]> = {}) => ({
       realm: REALM,
       sellerAccount: 4,
       sellerCharacter: 21,
@@ -171,8 +173,32 @@ describe('the directed-rail integrity statements, in SQL', () => {
       expiresAtMs: 1_820_000_000_000,
       itemId: 'crown_of_embers',
       itemPin: 'a'.repeat(64),
+      ...over,
     });
+    const dup = {
+      query: vi.fn(async () => {
+        throw Object.assign(new Error('duplicate key'), {
+          code: '23505',
+          constraint: WOC_MARKET_OFFERS_PAIR_PENDING_INDEX,
+        });
+      }),
+    };
+    const out = await new PgWocMarketDb(dup as unknown as Pool).insertDirectedOffer(offerRow());
     expect(out).toBe('offer_pending');
+    // A 23505 from any OTHER unique index (a desynced sequence after a
+    // hand-built partial restore) must surface as the 500 it is, never as
+    // "the pair is occupied".
+    const foreign = {
+      query: vi.fn(async () => {
+        throw Object.assign(new Error('duplicate key'), {
+          code: '23505',
+          constraint: 'woc_market_directed_offers_pkey',
+        });
+      }),
+    };
+    await expect(
+      new PgWocMarketDb(foreign as unknown as Pool).insertDirectedOffer(offerRow()),
+    ).rejects.toThrow('duplicate key');
   });
 
   it('the seller acceptance records the claimed ref but never rewrites the agreed item_id', async () => {

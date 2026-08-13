@@ -1156,8 +1156,16 @@ export interface WocSweepPassStats {
 /** Sweep failure tags: every per-arm stats key, plus the delivery sub-steps
  *  that report row-level failures from inside an arm (the grant commit and
  *  the seller notice), which carry their own tags so an operator can tell
- *  WHERE in the delivery a row is failing. */
-export type WocSweepErrorTag = keyof WocSweepPassStats | 'deliver_grant' | 'deliver_notice';
+ *  WHERE in the delivery a row is failing. 'offer_reopen' is the one
+ *  request-thread tag: the acceptance path's in-request reopen swallows its
+ *  own transport failures (the escrow root cause and the typed refusal are
+ *  the caller-facing truths), and this report is what connects a
+ *  reopen-latency symptom to that swallow. */
+export type WocSweepErrorTag =
+  | keyof WocSweepPassStats
+  | 'deliver_grant'
+  | 'deliver_notice'
+  | 'offer_reopen';
 
 /** Contention and park accounting for ONE delivery entry: the sweep pass
  *  owns one scope across its arm sequence, and the eager confirm entry mints
@@ -1795,11 +1803,14 @@ export class WocMarketService {
       if (throwProvedRollback(err)) {
         try {
           await this.deps.db.reopenDirectedOffer(this.cfg.realm, offerId);
-        } catch {
+        } catch (reopenErr) {
           // A reopen that fails in transport (pool timeout, reset) must never
           // REPLACE the escrow root cause below: the row simply stays
           // accepted-and-unstamped and the converge arm settles it from
-          // durable truth, so swallowing here loses nothing.
+          // durable truth. Reported, never rethrown: without the report, a
+          // systemic reopen failure would surface only as unexplained
+          // converge latency.
+          this.sweepError('offer_reopen', reopenErr);
         }
       }
       throw err;
@@ -1807,9 +1818,10 @@ export class WocMarketService {
     if (!created.ok) {
       try {
         await this.deps.db.reopenDirectedOffer(this.cfg.realm, offerId);
-      } catch {
+      } catch (reopenErr) {
         // Same rationale: the typed refusal is the caller-facing truth, and
         // the converge arm recovers the still-accepted row.
+        this.sweepError('offer_reopen', reopenErr);
       }
       return created;
     }

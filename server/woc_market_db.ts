@@ -54,6 +54,11 @@ const OPEN_SETTLEMENT_STATES_SQL = `('offered', 'confirming', 'review', 'confirm
  *  floor pins the subset relationship so the two lists cannot drift apart. */
 const PAID_SETTLEMENT_STATES_SQL = `('confirming', 'review', 'confirmed', 'delivering', 'delivered')`;
 
+/** The pair-pending unique index's name, shared by the DDL and BOTH 23505
+ *  discriminators (insert and reopen) so the catch literals cannot drift
+ *  from the index they claim to recognize. */
+export const WOC_MARKET_OFFERS_PAIR_PENDING_INDEX = 'woc_market_offers_pair_pending';
+
 export const WOC_MARKET_SCHEMA = `
 CREATE TABLE IF NOT EXISTS woc_market_listings (
   id BIGSERIAL PRIMARY KEY,
@@ -683,7 +688,7 @@ CREATE INDEX IF NOT EXISTS woc_market_offers_accepted_unstamped
 UPDATE woc_market_directed_offers o SET status = 'expired', updated_at = now()
  WHERE NOT EXISTS (
      SELECT 1 FROM pg_index i
-      WHERE i.indexrelid = to_regclass('woc_market_offers_pair_pending')
+      WHERE i.indexrelid = to_regclass('${WOC_MARKET_OFFERS_PAIR_PENDING_INDEX}')
         AND i.indisvalid)
    AND o.status = 'pending' AND EXISTS (
    SELECT 1 FROM woc_market_directed_offers n
@@ -697,12 +702,12 @@ UPDATE woc_market_directed_offers o SET status = 'expired', updated_at = now()
 DO $woc_pair_idx$ BEGIN
   IF EXISTS (
     SELECT 1 FROM pg_index i
-     WHERE i.indexrelid = to_regclass('woc_market_offers_pair_pending')
+     WHERE i.indexrelid = to_regclass('${WOC_MARKET_OFFERS_PAIR_PENDING_INDEX}')
        AND NOT i.indisvalid) THEN
-    EXECUTE 'DROP INDEX woc_market_offers_pair_pending';
+    EXECUTE 'DROP INDEX ${WOC_MARKET_OFFERS_PAIR_PENDING_INDEX}';
   END IF;
 END $woc_pair_idx$;
-CREATE UNIQUE INDEX IF NOT EXISTS woc_market_offers_pair_pending
+CREATE UNIQUE INDEX IF NOT EXISTS ${WOC_MARKET_OFFERS_PAIR_PENDING_INDEX}
   ON woc_market_directed_offers(realm, buyer_account, seller_account)
   WHERE status = 'pending';
 `;
@@ -1485,13 +1490,15 @@ export class PgWocMarketDb implements WocMarketDb {
       return toOffer(res.rows[0]);
     } catch (err) {
       // The pair-pending unique index is the strike-farming bound's
-      // authority: one live deal per (buyer, seller) pair. 23505 here can
-      // only be that index: the table's ONLY other unique constraint is the
-      // bigserial PK, which this insert never supplies (a restore that
-      // left the sequence behind the data would break that premise; the
-      // sequence rides pg_dump with the table, so only a hand-built partial
-      // restore can produce it).
-      if ((err as { code?: string }).code === '23505') return 'offer_pending';
+      // authority: one live deal per (buyer, seller) pair. Keyed on the
+      // CONSTRAINT name (the reopen belt's rule, harmonized): a 23505 from
+      // any OTHER unique index, today the bigserial PK a hand-built partial
+      // restore could desync, must surface as the 500 it is rather than
+      // telling the client the pair is occupied.
+      const pg = err as { code?: string; constraint?: string };
+      if (pg.code === '23505' && pg.constraint === WOC_MARKET_OFFERS_PAIR_PENDING_INDEX) {
+        return 'offer_pending';
+      }
       throw err;
     }
   }
@@ -1650,7 +1657,9 @@ export class PgWocMarketDb implements WocMarketDb {
       // silent no-op, so a future second unique index on this table must not
       // have its violations swallowed as "the pair is occupied".
       const pg = err as { code?: string; constraint?: string };
-      if (pg.code !== '23505' || pg.constraint !== 'woc_market_offers_pair_pending') throw err;
+      if (pg.code !== '23505' || pg.constraint !== WOC_MARKET_OFFERS_PAIR_PENDING_INDEX) {
+        throw err;
+      }
       return false;
     }
   }

@@ -516,5 +516,11 @@ describe('a staged slot resolves to its INVENTORY index', () => {
     const both: InvSlot[] = [{ itemId: EPIC.id, count: 1 }, crafted];
     expect(inventoryIndexOfStaged(both, crafted)).toBe(1);
     expect(inventoryIndexOfStaged(both, slot(EPIC.id))).toBe(0);
+    // The discriminating reverse: with the CRAFTED copy first, a marker-blind
+    // comparator resolves an unmarked staged slot to index 0 (the crafted
+    // copy); only the marker leg forces it past to the plain twin.
+    const craftedFirst: InvSlot[] = [crafted, { itemId: EPIC.id, count: 1 }];
+    expect(inventoryIndexOfStaged(craftedFirst, slot(EPIC.id))).toBe(1);
+    expect(inventoryIndexOfStaged(craftedFirst, crafted)).toBe(0);
   });
 });
