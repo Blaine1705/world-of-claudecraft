@@ -5890,6 +5890,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.quantity': 'Quantité',
   'itemUi.market.quantityOf': 'sur {count}',
   'itemUi.market.priceEach': 'Prix unitaire',
+  'itemUi.market.lowestPriceLabel': 'Prix actuel le plus bas des annonces',
+  'itemUi.market.lowestPriceNone': 'Aucune annonce active pour cet objet pour le moment.',
   'itemUi.market.listButton': 'Publier au Marché mondial',
   'itemUi.market.minPriceError': "Indiquez un prix d'au moins 1 cuivre.",
   'itemUi.market.collectEmpty':

@@ -8782,6 +8782,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.pageRange': 'Hiển thị {shown} trong {total} tin rao.',
   'itemUi.market.pageStatus': 'Trang {current} trong {total}',
   'itemUi.market.priceEach': 'Giá mỗi món',
+  'itemUi.market.lowestPriceLabel': 'Giá rao thấp nhất hiện tại',
+  'itemUi.market.lowestPriceNone': 'Chưa có tin rao đang hoạt động cho vật phẩm này.',
   'itemUi.market.quantity': 'Số lượng',
   'itemUi.market.quantityOf': 'trong {count}',
   'itemUi.market.rarityCommon': 'Phổ Thông',

@@ -8288,6 +8288,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.pageRange': 'Wyświetlono {shown} z {total} ofert.',
   'itemUi.market.pageStatus': 'Strona {current} z {total}',
   'itemUi.market.priceEach': 'Cena za sztukę',
+  'itemUi.market.lowestPriceLabel': 'Obecna najniższa cena oferty',
+  'itemUi.market.lowestPriceNone': 'Nie ma jeszcze aktywnych ofert na ten przedmiot.',
   'itemUi.market.quantity': 'Ilość',
   'itemUi.market.quantityOf': 'z {count}',
   'itemUi.market.rarityCommon': 'Pospolity',

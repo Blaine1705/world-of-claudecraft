@@ -9,70 +9,25 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "itemUi.market.lowestPriceLabel",
-    "itemUi.market.lowestPriceNone"
-  ],
-  "es_ES": [
-    "itemUi.market.lowestPriceLabel",
-    "itemUi.market.lowestPriceNone"
-  ],
-  "fr_FR": [
-    "itemUi.market.lowestPriceLabel",
-    "itemUi.market.lowestPriceNone"
-  ],
-  "fr_CA": [
-    "itemUi.market.lowestPriceLabel",
-    "itemUi.market.lowestPriceNone"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "itemUi.market.lowestPriceLabel",
-    "itemUi.market.lowestPriceNone"
-  ],
-  "de_DE": [
-    "itemUi.market.lowestPriceLabel",
-    "itemUi.market.lowestPriceNone"
-  ],
+  "it_IT": [],
+  "de_DE": [],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [
-    "itemUi.market.lowestPriceLabel",
-    "itemUi.market.lowestPriceNone"
-  ],
+  "pt_BR": [],
   "ru_RU": [],
-  "cs_CZ": [
-    "itemUi.market.lowestPriceLabel",
-    "itemUi.market.lowestPriceNone"
-  ],
-  "nl_NL": [
-    "itemUi.market.lowestPriceLabel",
-    "itemUi.market.lowestPriceNone"
-  ],
-  "pl_PL": [
-    "itemUi.market.lowestPriceLabel",
-    "itemUi.market.lowestPriceNone"
-  ],
-  "id_ID": [
-    "itemUi.market.lowestPriceLabel",
-    "itemUi.market.lowestPriceNone"
-  ],
-  "tr_TR": [
-    "itemUi.market.lowestPriceLabel",
-    "itemUi.market.lowestPriceNone"
-  ],
-  "sv_SE": [
-    "itemUi.market.lowestPriceLabel",
-    "itemUi.market.lowestPriceNone"
-  ],
-  "vi_VN": [
-    "itemUi.market.lowestPriceLabel",
-    "itemUi.market.lowestPriceNone"
-  ],
-  "da_DK": [
-    "itemUi.market.lowestPriceLabel",
-    "itemUi.market.lowestPriceNone"
-  ]
+  "cs_CZ": [],
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };

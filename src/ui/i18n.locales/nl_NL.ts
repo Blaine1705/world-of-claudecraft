@@ -8268,6 +8268,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.pageRange': '{shown} van {total} aanbiedingen getoond.',
   'itemUi.market.pageStatus': 'Pagina {current} van {total}',
   'itemUi.market.priceEach': 'Prijs per stuk',
+  'itemUi.market.lowestPriceLabel': 'Huidige laagste aanbiedingsprijs',
+  'itemUi.market.lowestPriceNone': 'Nog geen actieve aanbiedingen voor dit voorwerp.',
   'itemUi.market.quantity': 'Aantal',
   'itemUi.market.quantityOf': 'van {count}',
   'itemUi.market.rarityCommon': 'Gewoon',

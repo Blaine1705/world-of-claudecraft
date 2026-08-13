@@ -5448,6 +5448,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.quantity': 'Menge',
   'itemUi.market.quantityOf': 'von {count}',
   'itemUi.market.priceEach': 'Preis je Stück',
+  'itemUi.market.lowestPriceLabel': 'Aktuell niedrigster Angebotspreis',
+  'itemUi.market.lowestPriceNone': 'Für diesen Gegenstand gibt es noch keine aktiven Angebote.',
   'itemUi.market.listButton': 'Auf dem Weltmarkt einstellen',
   'itemUi.market.minPriceError': 'Nennt einen Preis von mindestens 1 Kupfer.',
   'itemUi.market.collectEmpty':

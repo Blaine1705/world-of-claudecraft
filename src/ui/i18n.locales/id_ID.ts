@@ -8882,6 +8882,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.pageRange': 'Menampilkan {shown} dari {total} daftar jual.',
   'itemUi.market.pageStatus': 'Halaman {current} dari {total}',
   'itemUi.market.priceEach': 'Harga satuan',
+  'itemUi.market.lowestPriceLabel': 'Harga daftar terendah saat ini',
+  'itemUi.market.lowestPriceNone': 'Belum ada daftar aktif untuk barang ini.',
   'itemUi.market.quantity': 'Jumlah',
   'itemUi.market.quantityOf': 'dari {count}',
   'itemUi.market.rarityCommon': 'Umum',

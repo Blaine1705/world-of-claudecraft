@@ -8063,6 +8063,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.pageRange': 'Visar {shown} av {total} listningar.',
   'itemUi.market.pageStatus': 'Sida {current} av {total}',
   'itemUi.market.priceEach': 'Pris per styck',
+  'itemUi.market.lowestPriceLabel': 'Aktuellt lägsta listningspris',
+  'itemUi.market.lowestPriceNone': 'Inga aktiva listningar för detta föremål ännu.',
   'itemUi.market.quantity': 'Antal',
   'itemUi.market.quantityOf': 'av {count}',
   'itemUi.market.rarityCommon': 'Vanlig',

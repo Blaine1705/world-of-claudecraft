@@ -3478,6 +3478,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.pageRange': 'Zobrazeno {shown} z {total} nabídek.',
   'itemUi.market.pageStatus': 'Stránka {current} z {total}',
   'itemUi.market.priceEach': 'Cena za kus',
+  'itemUi.market.lowestPriceLabel': 'Aktuální nejnižší nabídková cena',
+  'itemUi.market.lowestPriceNone': 'Pro tento předmět zatím nejsou žádné aktivní nabídky.',
   'itemUi.market.quantity': 'Množství',
   'itemUi.market.quantityOf': 'z {count}',
   'itemUi.market.rarityCommon': 'Běžné',

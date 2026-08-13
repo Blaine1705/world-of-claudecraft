@@ -8795,6 +8795,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.pageRange': '{total} ilandan {shown} tanesi gösteriliyor.',
   'itemUi.market.pageStatus': 'Sayfa {current} / {total}',
   'itemUi.market.priceEach': 'Adet fiyatı',
+  'itemUi.market.lowestPriceLabel': 'Mevcut en düşük ilan fiyatı',
+  'itemUi.market.lowestPriceNone': 'Bu eşya için henüz aktif ilan yok.',
   'itemUi.market.quantity': 'Miktar',
   'itemUi.market.quantityOf': '/ {count}',
   'itemUi.market.rarityCommon': 'Sıradan',

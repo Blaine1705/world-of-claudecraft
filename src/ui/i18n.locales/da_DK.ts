@@ -8109,6 +8109,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.pageRange': 'Viser {shown} af {total} opslag.',
   'itemUi.market.pageStatus': 'Side {current} af {total}',
   'itemUi.market.priceEach': 'Pris pr. styk',
+  'itemUi.market.lowestPriceLabel': 'Nuværende laveste opslagspris',
+  'itemUi.market.lowestPriceNone': 'Ingen aktive opslag for denne genstand endnu.',
   'itemUi.market.quantity': 'Antal',
   'itemUi.market.quantityOf': 'af {count}',
   'itemUi.market.rarityCommon': 'Almindelig',

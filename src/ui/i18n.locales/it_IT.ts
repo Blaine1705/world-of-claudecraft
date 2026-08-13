@@ -5434,6 +5434,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.quantity': 'Quantità',
   'itemUi.market.quantityOf': 'di {count}',
   'itemUi.market.priceEach': 'Prezzo unitario',
+  'itemUi.market.lowestPriceLabel': 'Prezzo di inserzione più basso attuale',
+  'itemUi.market.lowestPriceNone': 'Non ci sono ancora inserzioni attive per questo oggetto.',
   'itemUi.market.listButton': 'Metti sul Mercato Mondiale',
   'itemUi.market.minPriceError': 'Indica un prezzo di almeno 1 rame.',
   'itemUi.market.collectEmpty':

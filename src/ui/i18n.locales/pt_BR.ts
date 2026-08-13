@@ -5388,6 +5388,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.quantity': 'Quantidade',
   'itemUi.market.quantityOf': 'de {count}',
   'itemUi.market.priceEach': 'Preço unitário',
+  'itemUi.market.lowestPriceLabel': 'Menor preço listado atual',
+  'itemUi.market.lowestPriceNone': 'Ainda não há listagens ativas para este item.',
   'itemUi.market.listButton': 'Listar no Mercado Mundial',
   'itemUi.market.minPriceError': 'Informe um preço de pelo menos 1 cobre.',
   'itemUi.market.collectEmpty':
