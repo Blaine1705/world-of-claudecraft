@@ -161,12 +161,47 @@ Residuals accepted this round (owners; do not re-raise):
   lock_timeout) are generous but not saturation-proof; judged
   acceptable for an env-gated suite.
 
-Validation: tsc clean; the 20-suite DB-free set 1078 green; all three
-pg suites 109 green under TEST_DATABASE_URL (zero skips, demonstrably
-ran) plus the 5-test escrow set (fence both ways, the 55P03 ceiling
-with elapsed bounds, the lock-graph probe now looped 5x, the measured
-cost distribution asserted under a fifth of the allowance);
-ci:changed exit 0.
+qa-checklist verdict READY (0 blocking, 2 should-fix + 2 nits, all
+applied: the stale marketplace-PRD enforcement-point paragraphs, the
+57014 comment truth-up at the escrow SET LOCAL block (the mapping
+itself deliberately stays a 500: a statement blowing a 5s allowance
+measured at single-digit milliseconds is an incident to surface, not
+contention to retry, and widening the SHARED isLockContention helper
+would change every guard; QA re-judges), the broker_custody PRD line,
+and the daily_rewards_stub pure-leaf row). It also named the one
+dispatch-table reviewer the phase list omitted: server-hot-path.
+
+Hot-path round (1 blocking, 3 should-fix, 4 nits; applied or owned):
+- BLOCKING, applied: a pool checkout timeout is CODELESS, so it
+  classified ambiguous and quarantine-kicked the seller although no
+  transaction ever started, in volume exactly under pool saturation (a
+  self-amplifying loop). withTx tags TxNeverStarted; the escrow write
+  maps it to the typed contended (restore rail); pinned DB-free.
+- Applied: the wocEscrowQueue counter on the game-signals seam (the
+  refused wait never reached the throttled warn); the FIFO-occupancy
+  relation pin (4 x statement + lock wait + pool checkout < the 30s
+  autosave period); the escrow-cost pin tightened 120x -> 25x slack;
+  the wait-deadline docblock now states the real request ceiling.
+- Owned by 16 (recorded, not silently deferred): the guild-book flush
+  inside runSerialized still rides the 60s logout allowance, the
+  dominant term in the worst-case FIFO occupancy (threading a
+  workload-scoped allowance through saveCharacter is invasive); a
+  pendingKeys gauge beside players-online; widening the TxNeverStarted
+  -> contended mapping to the OTHER guard transactions (today only the
+  escrow write maps it; the rest 500 as before, no quarantine
+  involved); the per-listing serializeCharacter event-loop cost
+  attribution.
+- Accepted nits: the depth-cap slot pins for the process lifetime if a
+  FIFO never settles past every db bound (visible as depth_refused);
+  takeover/shutdown wait out the escrow bound (the 75s stop grace
+  covers the ~27s worst case).
+
+Validation: tsc clean; the 20-suite DB-free set 1078 green plus the
+counter/metrics suites; all three pg suites 109 green under
+TEST_DATABASE_URL (zero skips, demonstrably ran) plus the escrow set
+(fence both ways, the 55P03 ceiling with elapsed bounds, the
+lock-graph probe looped 5x on the public arm, the measured cost
+distribution asserted at 25x slack); ci:changed exit 0.
 
 ## 04 QA round (verdict PASS-WITH-FOLLOWUPS, every fix applied)
 

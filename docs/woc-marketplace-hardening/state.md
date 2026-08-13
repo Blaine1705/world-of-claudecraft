@@ -913,9 +913,9 @@ Still open (a phase that hits one asks at session start):
     #2139 per-dimension refusals and a zero-rng pin with positive
     control). src/sim/daily_rewards_stub.ts holds the offline
     daily-rewards readout (value-pinned by its own suite). Monolith
-    ceilings ratcheted to EXACT: sim.ts 12660 -> 12428, game.ts 10859 ->
-    10857 (the FIFO/fixups/depth-warn extractions paid for the new host
-    members).
+    ceilings: sim.ts ratcheted 12660 -> 12428 exact; game.ts HELD at its
+    exact pre-existing 10859 (the FIFO/fixups/depth-warn extractions paid
+    line for line for the new host members).
   - FIREWALL: FIREWALL_ALLOWED is exactly ['src/sim/daily_rewards_stub.ts']
     with an existence + pattern-hit + read-only-projection shape pin (one
     export function, no control flow, type-only imports); sim.ts,
@@ -928,10 +928,20 @@ Still open (a phase that hits one asks at session start):
     suffixes + base/cut/fee/account. Bare 'signature' and 'token' stay
     out (49 measured content false positives; riftToken/chatTokens).
     Non-vacuity floor 440 of 474 files.
+  - OBSERVABILITY: the wocEscrowQueue counter (game-signals seam, kinds
+    started / deadline_refused / depth_refused / books_dirty_refused /
+    flush_failed, zero-backfilled) plus a 30s-throttled realm-global
+    queue-wait warn. A checkout-failed transaction is tagged
+    TxNeverStarted (exported from woc_market_db) and maps to 'contended'
+    on the escrow write ONLY.
   - Handoffs: phase 06 opens with the acceptDirectedOffer throw-arm
     question (an escrow THROW leaves the offer 'accepted' with no
     listing; conservative, operator-resolvable; judge an unwind); phase
-    16 owns the escrow-queue metrics counter and the saveAll-wave
+    16 owns the escrow-queue additions from the hot-path round (the
+    guild-book flush still rides the 60s logout allowance inside the
+    deadline, the dominant occupancy term; a pendingKeys FIFO gauge;
+    widening TxNeverStarted -> contended to the other guards; the
+    per-listing serialize cost attribution) plus the saveAll-wave
     suppression measurement; phase 22's pre-enable audit gains one line
     (scan standing listings' item payloads for bindOnTrade-armed copies
     that entered before H6). The 04 ledger's "REFUSAL_ERRORS is 48 rows"
