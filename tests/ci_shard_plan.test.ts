@@ -297,23 +297,38 @@ describe('the long-sims lane (Phase 4)', () => {
       'tests/eastbrook_gameplay_integration.test.ts',
       'tests/hunter_dps_balance.test.ts',
       'tests/nythraxis_matrix.test.ts',
-      'tests/owned_class_balance_harness.test.ts',
-      'tests/owned_class_raid_balance_harness.test.ts',
+      'tests/owned_class_balance_dps_metrics.test.ts',
+      'tests/owned_class_balance_dps_probes.test.ts',
+      'tests/owned_class_balance_druid_bands.test.ts',
+      'tests/owned_class_balance_groveheart.test.ts',
+      'tests/owned_class_balance_healer_contract.test.ts',
+      'tests/owned_class_balance_healer_probes.test.ts',
+      'tests/owned_class_balance_role_bands.test.ts',
+      'tests/owned_class_raid_armor_avoidance.test.ts',
+      'tests/owned_class_raid_sustain_bands.test.ts',
     ]);
     // The two lane jobs' halves, also literal (the a/b balance is a measured
-    // decision recorded in the lane-diet PR).
+    // decision, re-balanced 2026-08-13 with the harness split's duration
+    // ledger).
     expect([...CI_LONG_SUITE_HALVES.a]).toEqual([
       'tests/battleground.test.ts',
       'tests/chronomancy_balance.test.ts',
-      'tests/owned_class_balance_harness.test.ts',
+      'tests/druid_balance_probe.test.ts',
+      'tests/owned_class_balance_dps_probes.test.ts',
+      'tests/owned_class_balance_groveheart.test.ts',
+      'tests/owned_class_balance_role_bands.test.ts',
+      'tests/owned_class_raid_armor_avoidance.test.ts',
     ]);
     expect([...CI_LONG_SUITE_HALVES.b]).toEqual([
       'tests/audit_conservation_property.test.ts',
-      'tests/druid_balance_probe.test.ts',
       'tests/eastbrook_gameplay_integration.test.ts',
       'tests/hunter_dps_balance.test.ts',
       'tests/nythraxis_matrix.test.ts',
-      'tests/owned_class_raid_balance_harness.test.ts',
+      'tests/owned_class_balance_dps_metrics.test.ts',
+      'tests/owned_class_balance_druid_bands.test.ts',
+      'tests/owned_class_balance_healer_contract.test.ts',
+      'tests/owned_class_balance_healer_probes.test.ts',
+      'tests/owned_class_raid_sustain_bands.test.ts',
     ]);
     // Exact partition of the union the shard legs exclude: a lane file in
     // neither half would be excluded from every shard but run by no lane job,
@@ -376,8 +391,8 @@ describe('the long-sims lane (Phase 4)', () => {
     // The suite-side registry for the balance-harness diet (docs/qa-gate.md,
     // "The balance-harness diet"), mirroring the I18N_RELEASE_TIER precedent:
     // the workflow-side pins hold the flag ONTO the nightly test job and OUT
-    // of ci.yml, and this list holds WHICH suites read it, so a fourth
-    // harness quietly growing a diet, or one of these three quietly losing
+    // of ci.yml, and this list holds WHICH suites read it, so another
+    // harness quietly growing a diet, or a listed reader quietly losing
     // it, is a conscious edit here. Every reader must also be a
     // CI_LONG_SUITES member: the diet exists to shrink the lane, and a diet
     // on a sharded suite would thin coverage nothing accounted for. The
@@ -399,8 +414,12 @@ describe('the long-sims lane (Phase 4)', () => {
       .sort();
     expect(readers).toEqual([
       'tests/hunter_dps_balance.test.ts',
-      'tests/owned_class_balance_harness.test.ts',
-      'tests/owned_class_raid_balance_harness.test.ts',
+      'tests/owned_class_balance_dps_metrics.test.ts',
+      'tests/owned_class_balance_druid_bands.test.ts',
+      'tests/owned_class_balance_healer_contract.test.ts',
+      'tests/owned_class_balance_role_bands.test.ts',
+      'tests/owned_class_raid_armor_avoidance.test.ts',
+      'tests/owned_class_raid_sustain_bands.test.ts',
     ]);
     for (const f of readers) expect(CI_LONG_SUITES).toContain(f);
   });
@@ -732,7 +751,7 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     // once: "1 of 3" fails if a second half-a lane file joins (whatever its
     // sort position) and if the half's list total drifts.
     expect(runA.log).toContain(
-      'plan: mode=selective (selective: 1 of 3 lane file(s) on the floor or changed)',
+      'plan: mode=selective (selective: 1 of 7 lane file(s) on the floor or changed)',
     );
     expect(runA.log).toContain('lane runs: tests/battleground.test.ts');
     expect(runA.log).not.toContain('tests/chronomancy_balance.test.ts');
@@ -740,7 +759,7 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     const runB = await runEntry(['--lane=long-sims-b', '--plan-only'], env);
     expect(runB.exitCode).toBe(0);
     expect(runB.log).toContain(
-      'plan: mode=selective (selective: 1 of 6 lane file(s) on the floor or changed)',
+      'plan: mode=selective (selective: 1 of 9 lane file(s) on the floor or changed)',
     );
     expect(runB.log).toContain('lane runs: tests/nythraxis_matrix.test.ts');
     expect(runB.log).not.toContain('tests/battleground.test.ts');

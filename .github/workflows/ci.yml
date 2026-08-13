@@ -657,6 +657,13 @@ jobs:
     # so read them as runner-to-runner variance dominating, not as a proof
     # about contention.
     #
+    # 2026-08-13: the owned-class harness pair was split into the
+    # owned_class_balance_* / owned_class_raid_* single-responsibility files
+    # and the halves were re-balanced, so no lane chain carries that single
+    # 13-minute file any more. The figures above stay as the measured record;
+    # 30 predates the split and re-derives from fresh measured JOB walls in a
+    # follow-up change.
+    #
     # 30 applies the same arithmetic as release-gate's bound: healthy JOB wall
     # times the 1.60 fast-to-slow runner ratio measured at b160a1ba18
     # (13.73 x 1.60 = 22.0 for the slower half), then the 1.37x margin the
@@ -895,7 +902,11 @@ jobs:
     # while attempt 2 of that same push run passed the identical scope in 16
     # minutes. Same commit, same warm transform cache: the differentiator was
     # runner speed, with owned_class_balance_harness measured at 527s on the
-    # fast runner and 842s on the slow one, a ratio of 1.60.
+    # fast runner and 842s on the slow one, a ratio of 1.60. (2026-08-13:
+    # that harness pair has since been split into the owned_class_balance_* /
+    # owned_class_raid_* files, so one shard draw can no longer carry a
+    # 13-minute single file; the figures stay as the record behind the 1.60
+    # ratio.)
     #
     # Sizing, stated as the arithmetic rather than a feel. Every figure below
     # is a JOB wall, which is what timeout-minutes actually polices: setup
