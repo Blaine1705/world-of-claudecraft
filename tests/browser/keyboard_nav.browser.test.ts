@@ -381,6 +381,7 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
       rarity: 'all',
       sort: 'price',
       page: 0,
+      collapseLowest: false,
     });
     const reSelect = req(
       root.querySelector<HTMLElement>('[data-market-filter-menu="sort"]'),
