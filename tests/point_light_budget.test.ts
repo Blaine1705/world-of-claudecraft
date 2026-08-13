@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { createFireLightAdopter } from '../src/render/fire_light_registry';
 import {
   applyPointLightBudget,
   countDrawnPointLights,
@@ -340,9 +341,15 @@ describe('applyPointLightBudget', () => {
     // see: the renderer must pass its scene so ancestry is checked against the
     // real root, and the pads must fill against the DRAWN count, not the
     // chosen count. Dropping either silently reinstates the arrival freeze.
-    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
-    const methodStart = source.indexOf('private budgetFireLights(');
-    const methodEnd = source.indexOf('// light shafts fade', methodStart);
+    // The pass moved out of renderer.ts into fire_light_registry.ts under the
+    // monolith ratchet; the two halves are pinned where they now live, and the
+    // renderer half is pinned to the scene it hands in.
+    const source = readFileSync(
+      new URL('../src/render/fire_light_registry.ts', import.meta.url),
+      'utf8',
+    );
+    const methodStart = source.indexOf('export function runFireLightBudgetPass(');
+    const methodEnd = source.indexOf('pass.pads[i].visible = i < padCount;', methodStart);
     // A renamed end marker must fail here, never silently widen the slice to
     // the rest of the file (which would let the pins match anywhere).
     expect(methodStart).toBeGreaterThan(-1);
@@ -350,9 +357,14 @@ describe('applyPointLightBudget', () => {
     const method = source.slice(methodStart, methodEnd);
 
     expect(method).toContain('const drawnCount = applyPointLightBudget(');
-    expect(method).toContain('this.scene,');
-    expect(method).toContain('pointLightPadCount(drawnCount, visibleCount)');
+    expect(method).toContain('pass.scene,');
+    expect(method).toContain('pointLightPadCount(drawnCount, pass.visibleCount)');
     expect(method).not.toContain('pointLightPadCount(ranked.length');
+
+    // The renderer must still hand its OWN scene in, so ancestry is checked
+    // against the real root rather than a detached one.
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    expect(renderer).toContain('scene: this.scene,');
   });
 
   it('wires mid-session fx lights into the same ranked budget', () => {
@@ -465,12 +477,15 @@ describe('applyPointLightBudget', () => {
   });
 
   it('wires contributor flicker after the renderer completes selection', () => {
-    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
-    const methodStart = source.indexOf('private budgetFireLights(');
-    const methodEnd = source.indexOf('// light shafts fade', methodStart);
+    const source = readFileSync(
+      new URL('../src/render/fire_light_registry.ts', import.meta.url),
+      'utf8',
+    );
+    const methodStart = source.indexOf('export function runFireLightBudgetPass(');
+    const methodEnd = source.indexOf('pass.pads[i].visible = i < padCount;', methodStart);
     const method = source.slice(methodStart, methodEnd);
     const selection = method.indexOf('applyPointLightBudget(');
-    const flickerGate = method.indexOf('if (flicker) {');
+    const flickerGate = method.indexOf('if (pass.flickerTime !== null) {');
     const flickerCall = method.indexOf('flickerContributingFireLights(');
 
     expect(methodStart).toBeGreaterThan(-1);
@@ -478,6 +493,116 @@ describe('applyPointLightBudget', () => {
     expect(selection).toBeGreaterThan(-1);
     expect(flickerGate).toBeGreaterThan(selection);
     expect(flickerCall).toBeGreaterThan(flickerGate);
-    expect(source).toContain('this.budgetFireLights(p.pos.x, p.pos.z, true);');
+    // The flicker arm is only reached because the renderer asks for it on the
+    // live frame path; pin that call where it lives.
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    expect(renderer).toContain('this.budgetFireLights(p.pos.x, p.pos.z, true);');
+  });
+});
+
+describe('fire-light adoption sink', () => {
+  // three counts a light into numPointLights the moment it is visible, whatever
+  // its intensity, and that count sits in every material's program cache key: a
+  // light visible before the budget ranks it changes the count for the frames in
+  // between and relinks every material drawn in them (measured at 100 to 200 ms
+  // per relink). Adoption has to hide AND dirty, and these drive the real
+  // factory so dropping either line in production turns them red.
+  function adopterOver(registry: THREE.PointLight[]) {
+    let dirty = 0;
+    const adopter = createFireLightAdopter(
+      () => registry,
+      () => {
+        dirty++;
+      },
+    );
+    return { adopter, dirtyCount: () => dirty };
+  }
+
+  it('hides an adopted light and marks the rank dirty in the same step', () => {
+    const registry: THREE.PointLight[] = [];
+    const { adopter, dirtyCount } = adopterOver(registry);
+    const light = new THREE.PointLight(0xffffff, 9, 24, 2);
+    expect(light.visible, 'three creates a point light visible').toBe(true);
+
+    adopter.adopt(light);
+
+    expect(light.visible).toBe(false);
+    expect(registry).toEqual([light]);
+    expect(dirtyCount()).toBe(1);
+  });
+
+  it('adopts every light of a multi-light sink push', () => {
+    // The rebuild guard compares rank length against a COUNT, so the dirty mark
+    // cannot be skipped: a balanced add-and-remove would leave a stale rank.
+    const registry: THREE.PointLight[] = [];
+    const { adopter, dirtyCount } = adopterOver(registry);
+    const lights = [
+      new THREE.PointLight(0xffffff, 1, 4, 2),
+      new THREE.PointLight(0xffffff, 2, 5, 2),
+      new THREE.PointLight(0xffffff, 3, 6, 2),
+    ];
+
+    expect(adopter.sink.push(...lights)).toBe(3);
+
+    expect(lights.every((light) => light.visible === false)).toBe(true);
+    expect(registry).toEqual(lights);
+    expect(dirtyCount()).toBe(3);
+  });
+
+  it('reads the registry through the getter, so a reassigned array still adopts', () => {
+    // renderer.ts assigns `this.fireLights = props.fireLights` after the adopter
+    // is constructed; a captured array would silently adopt into a dead one.
+    let registry: THREE.PointLight[] = [];
+    const adopter = createFireLightAdopter(
+      () => registry,
+      () => {},
+    );
+    const replaced: THREE.PointLight[] = [];
+    registry = replaced;
+    const light = new THREE.PointLight(0xffffff, 5, 10, 2);
+
+    adopter.adopt(light);
+
+    expect(replaced).toEqual([light]);
+  });
+
+  it('wires every post-construction registry mutation through adoption', () => {
+    // Source-scan, because no unit case can see whether a CALL SITE bypassed the
+    // seam. A bare `this.fireLights.push` after the constructor's mass hide, or a
+    // retire that forgets the dirty mark, reinstates the relink bug.
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    expect(renderer).toContain(
+      'for (const light of view.glowLights ?? []) this.fireLightAdopter.adopt(light)',
+    );
+    expect(renderer).toContain(
+      'for (const light of this.jailScene.glowLights) this.fireLightAdopter.adopt(light)',
+    );
+    // retireInteriorGroup must dirty the rank on REMOVAL: the guard is a count,
+    // so an add and a remove of equal size would leave the rank stale.
+    const retireStart = renderer.indexOf('private retireInteriorGroup(');
+    const retireEnd = renderer.indexOf('private ensureDungeons(', retireStart);
+    expect(retireStart).toBeGreaterThan(-1);
+    expect(retireEnd).toBeGreaterThan(retireStart);
+    const retire = renderer.slice(retireStart, retireEnd);
+    expect(retire).toContain('this.fireLights.splice(i, 1);');
+    expect(retire).toContain('this.lightRankDirty = true;');
+  });
+
+  it('gives the jail gate light to the budget with its authored intensity', () => {
+    // Source-scan: buildJailScene mints canvas textures, so it cannot run in
+    // this suite's plain-Node env. The light used to be in NO registry while its
+    // group is toggled every frame AFTER the budget pass, so it moved
+    // numPointLights whenever the jail came into camera range. Adoption also
+    // puts it under the fire flicker, which centres on userData.baseIntensity
+    // (11 when unset), so the authored 9 has to travel with it.
+    const jail = readFileSync(new URL('../src/render/jail_scene.ts', import.meta.url), 'utf8');
+    expect(jail).toContain('glowLights: THREE.PointLight[];');
+    expect(jail).toContain('light.userData.baseIntensity = 9;');
+    expect(jail).toContain('glowLights.push(light);');
+    const declaration = jail.indexOf('const light = new THREE.PointLight(0x86b4ff, 9, 24, 2);');
+    expect(declaration, 'the jail gate light moved or changed its authored value').toBeGreaterThan(
+      -1,
+    );
+    expect(jail.indexOf('light.userData.baseIntensity = 9;')).toBeGreaterThan(declaration);
   });
 });

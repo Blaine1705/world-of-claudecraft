@@ -2159,6 +2159,21 @@ export class CharacterVisual {
     return skin ? (WEAPON_VFX[skin.model] ?? null) : null;
   }
 
+  /**
+   * Whether a point-light budget owns this rig's weapon-skin light.
+   *
+   * TRUE only in the world, where the renderer reconciles the light into its
+   * fixed budget: born visible there, it would be counted for the frames before
+   * the first budget pass, and that changed numPointLights relinks every
+   * material drawn in them. `createCharacterVisual` sets it.
+   *
+   * FALSE for a rig built directly (the armoury preview, the character screen).
+   * Those own their renderer and scene and have NO budget, so nothing would ever
+   * turn the light back on: the skin's cast glow is the product on a cosmetics
+   * surface, and it must light immediately.
+   */
+  budgetedWeaponLight = false;
+
   /** Attach the skin's rarity VFX rig to each held payload (in-hand mode: no
    *  backdrop dome, no ground pool; emissive + particles ride the weapon). */
   private buildWeaponVfx(payloads: THREE.Object3D[]): void {
@@ -2170,7 +2185,10 @@ export class CharacterVisual {
     this.weaponVfxAuthored = weaponVfxTuningFor(skin.model, spec.tier);
     this.weaponVfxShed = 1;
     for (const payload of payloads) {
-      const handle = createWeaponVfx(payload, spec, { grounded: false });
+      const handle = createWeaponVfx(payload, spec, {
+        grounded: false,
+        budgetedLight: this.budgetedWeaponLight,
+      });
       handle.setBackdropVisible(false);
       handle.setTuning(this.weaponVfxAuthored);
       handle.setPixelScale(weaponVfxViewportHeight * this.weaponVfxSpriteScale);

@@ -157,6 +157,39 @@ function sourceMap(): THREE.Texture {
 // Order-independent by construction: beforeEach drops the module-level
 // sprite/sky texture memo, so every case below observes a cold build and
 // "did this rig draw a sky canvas" stays a real question in any run order.
+describe('createWeaponVfx point-light visibility ownership', () => {
+  // three counts a light into numPointLights iff it is visible, whatever its
+  // intensity, and every material's program cache key carries that count. A
+  // light born visible on the budgeted world path is therefore counted for the
+  // frames before the point-light budget first rules on it, and the changed
+  // count relinks every material drawn in them: measured as one frame in 5434
+  // sitting at 7 budgeted lights against a pin of 6, each relink a 100 to
+  // 200 ms synchronous stall.
+  it('is born hidden when a budget owns its visibility', () => {
+    const handle = createWeaponVfx(weaponRoot(), EPIC_SPEC, {
+      grounded: false,
+      budgetedLight: true,
+    });
+    expect(handle.light.visible).toBe(false);
+    // Still a real, budget-rankable light: only `visible` is deferred.
+    expect(handle.light.userData.budgetDynamic).toBe(true);
+    expect(handle.light.intensity).toBeGreaterThan(0);
+    handle.dispose();
+  });
+
+  it('keeps lighting immediately for a caller with no budget', () => {
+    // The armoury preview owns its own renderer and scene, so nothing there
+    // ever sets `visible` for it.
+    const preview = createWeaponVfx(weaponRoot(), EPIC_SPEC, { grounded: true });
+    expect(preview.light.visible).toBe(true);
+    preview.dispose();
+
+    const worldDefault = createWeaponVfx(weaponRoot(), EPIC_SPEC, { grounded: false });
+    expect(worldDefault.light.visible).toBe(true);
+    worldDefault.dispose();
+  });
+});
+
 describe('createWeaponVfx backdrop construction', () => {
   it('builds no backdrop at all on the world (held) path', () => {
     const root = weaponRoot();

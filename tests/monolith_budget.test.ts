@@ -43,7 +43,10 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/render/renderer.ts',
-    ceiling: 13740,
+    // Lowered after extracting the fire-light adopter and the budget pass into
+    // src/render/fire_light_registry.ts (the ratchet's own rule: an extraction
+    // lowers the ceiling, it never raises it).
+    ceiling: 13720,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

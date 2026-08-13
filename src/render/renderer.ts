@@ -263,6 +263,7 @@ import {
 import { buildFarshoreFeatures } from './farshore_features';
 import { buildFenFeatures, type FenFeaturesView } from './fen_features';
 import { buildFenbridgeTownView, type FenbridgeTownView } from './fenbridge_town';
+import { createFireLightAdopter, runFireLightBudgetPass } from './fire_light_registry';
 import { type FireballTravelVisual, syncFireballTravelVisual } from './fireball_travel_visual';
 import { buildFish, type FishView } from './fish';
 import { FishingBobberVisual } from './fishing_bobber';
@@ -409,9 +410,7 @@ import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
 import { type PlayerAuraRingInput, PlayerAuraRings } from './player_aura_rings';
 import {
-  applyPointLightBudget,
   countDrawnPointLights,
-  flickerContributingFireLights,
   pointLightPadCount,
   type RankedPointLight,
   reconcileViewPointLights,
@@ -1724,6 +1723,18 @@ export class Renderer {
   private lightPads: THREE.PointLight[] = [];
   private lightRankDirty = true; // viewLights set changed: rebuild the budget rank
   private effectivePointLights = 0;
+
+  // Adoption is the ONE way a point light joins the budget after construction:
+  // it hides the light AND dirties the rank, which are only correct together
+  // (fire_light_registry.ts explains why). Subsystems get `sink`, which is the
+  // same operation shaped like Array.push, so they cannot bypass it.
+  private readonly fireLightAdopter = createFireLightAdopter(
+    () => this.fireLights,
+    () => {
+      this.lightRankDirty = true;
+    },
+  );
+
   private propsView!: {
     update(
       camX: number,
@@ -2640,6 +2651,9 @@ export class Renderer {
     this.jailScene = buildJailScene(this.sim.cfg.seed);
     setRenderCategory(this.jailScene.group, 'props');
     this.scene.add(this.jailScene.group);
+    // updateVisibility toggles this group every frame AFTER the budget pass, so
+    // its light has to ride the budget rather than stand permanently visible.
+    for (const light of this.jailScene.glowLights) this.fireLightAdopter.adopt(light);
 
     this.gatherNodes = buildGatherNodes(this.sim.cfg.seed);
     setRenderCategory(this.gatherNodes.group, 'props');
@@ -2658,7 +2672,8 @@ export class Renderer {
     freezeStaticMatrices(stationProps.group);
     for (const flame of stationProps.flames) flame.matrixAutoUpdate = true;
     this.flames.push(...stationProps.flames);
-    this.fireLights.push(...stationProps.fireLights);
+    // After the mass hide above, so these adopt individually.
+    for (const light of stationProps.fireLights) this.fireLightAdopter.adopt(light);
     bd('stations');
 
     // Town streetlamps: world-spanning dressing, so it is built here with the
@@ -4056,8 +4071,10 @@ export class Renderer {
       light.position.copy(this.tmpV);
     }
     if (freeze) freezeStaticMatrices(view.group);
-    for (const light of view.glowLights ?? []) this.fireLights.push(light);
-    this.lightRankDirty = true;
+    // adoptFireLight, not a bare push: a feature attaches from a zone-prepare
+    // continuation, so its glow lights would otherwise be visible and unranked
+    // for the frames until the next budget pass.
+    for (const light of view.glowLights ?? []) this.fireLightAdopter.adopt(light);
     this.lastAttachedFeatureGroups.push(view.group);
     // A view spanning several regions registers each child for the distance
     // cull instead of the whole group: one world-wide footprint can never be
@@ -9301,7 +9318,12 @@ export class Renderer {
     const doomed = new Set<THREE.Object3D>();
     group.traverse((o) => doomed.add(o));
     for (let i = this.fireLights.length - 1; i >= 0; i--) {
-      if (doomed.has(this.fireLights[i])) this.fireLights.splice(i, 1);
+      if (!doomed.has(this.fireLights[i])) continue;
+      this.fireLights.splice(i, 1);
+      // The rebuild guard compares ranked.length against a COUNT, so a retire
+      // that removes as many lights as a same-microtask build added would leave
+      // a stale rank holding the retired floor and missing the new one.
+      this.lightRankDirty = true;
     }
     for (let i = this.flames.length - 1; i >= 0; i--) {
       if (doomed.has(this.flames[i])) this.flames.splice(i, 1);
@@ -9318,7 +9340,7 @@ export class Renderer {
       this.scene,
       this.lowGfx,
       this.flames,
-      this.fireLights,
+      this.fireLightAdopter.sink,
       this.asyncCompileSupported ? (target) => this.compileGate(target) : undefined,
     );
     return this.dungeons;
@@ -9708,7 +9730,7 @@ export class Renderer {
         if (Math.abs(px - o.x) < 200 && Math.abs(pz - o.z) < 120) {
           const view = buildYumiMaze(o, this.sim.cfg.seed, {
             flames: this.flames,
-            fireLights: this.fireLights,
+            fireLights: this.fireLightAdopter.sink,
             lowGfx: this.lowGfx,
           });
           setRenderCategory(view.group, 'dungeon');
@@ -9731,6 +9753,9 @@ export class Renderer {
           // callback marks the rank dirty whenever it does.
           const view = buildBattleground(o, this.sim.cfg.seed, {
             lowGfx: this.lowGfx,
+            // The raw registry on purpose: buildBgFieldLights already hides
+            // each light (battleground.ts) and its release path splices, which
+            // an append-only sink cannot express.
             fireLights: this.fireLights,
             onFireLightsChanged: () => {
               this.lightRankDirty = true;
@@ -12870,80 +12895,26 @@ export class Renderer {
   // Static world positions stay cached; moving weapon VFX refresh into their
   // existing vectors, so this hot loop allocates nothing.
   private budgetFireLights(px: number, pz: number, flicker = false): void {
-    const ranked = this.lightRank;
-    // Rank the union of static fire lights AND entity-view lights (e.g. quest-object
-    // glows). Both must share one budget: if a view light were counted separately,
-    // numPointLights would change as it streams in/out and recompile every lit
-    // material. Rebuild only when the set changes (dirty), or when fire lights grow
-    // (dungeon interiors push to fireLights) - both rare, so the hot path just
-    // refreshes distances. Static positions are cached; dynamic weapon-light
-    // positions refresh in applyPointLightBudget.
-    const want = this.fireLights.length + this.viewLights.length;
-    if (this.lightRankDirty || ranked.length !== want) {
-      ranked.length = 0;
-      for (let fireIndex = 0; fireIndex < this.fireLights.length; fireIndex++) {
-        const light = this.fireLights[fireIndex];
-        ranked.push({
-          light,
-          d2: 0,
-          worldPos: light.getWorldPosition(new THREE.Vector3()),
-          base: null,
-          dynamic: false,
-          fireIndex,
-        });
-      }
-      for (const light of this.viewLights) {
-        const stored = light.userData.budgetBase;
-        const base = typeof stored === 'number' ? stored : light.intensity;
-        const dynamic = light.userData.budgetDynamic === true;
-        ranked.push({
-          light,
-          d2: 0,
-          worldPos: light.getWorldPosition(new THREE.Vector3()),
-          base: dynamic ? null : base,
-          dynamic,
-        });
-      }
-      this.lightRankDirty = false;
-    }
-    // Keep a CONSTANT number of point lights `visible` so numPointLights in every
-    // material's program cache key never changes as the player travels. Three counts
-    // a light into numPointLights iff `visible` (intensity is irrelevant to the
-    // count), so toggling visibility as campfires budget in/out used to recompile
-    // every nearby material 0<->maxPointLights times - the dominant open-world travel
-    // freeze. Now the nearest maxPointLights lights stay visible (one stable program
-    // per material); lights past the live budget or out of range simply contribute
-    // nothing (intensity 0). maxPointLights is the per-tier constant, so the live
-    // governor (effectivePointLights) only changes how many SHINE, not the count.
-    const visibleCount = GFX.maxPointLights;
-    const liveBudget = this.effectivePointLights || GFX.maxPointLights;
-    // Ancestry-aware: a chosen light under a group the world hid (zone
-    // streaming, far-LOD wraps, compile gates) is not drawn, so it must not
-    // hold a counted slot; the returned drawn count drives the pads below.
-    const drawnCount = applyPointLightBudget(
-      ranked,
+    // The pass itself lives in fire_light_registry.ts; the renderer only owns
+    // the registries, the pads and the clock it reads from.
+    runFireLightBudgetPass({
+      rank: this.lightRank,
+      rankDirty: this.lightRankDirty,
+      fireLights: this.fireLights,
+      viewLights: this.viewLights,
+      pads: this.lightPads,
       px,
       pz,
-      visibleCount,
-      liveBudget,
-      LIGHT_BUDGET_RANGE_SQ,
-      this.scene,
-    );
-    if (flicker) {
-      flickerContributingFireLights(
-        ranked,
-        this.time,
-        visibleCount,
-        liveBudget,
-        LIGHT_BUDGET_RANGE_SQ,
-      );
-    }
-    // Fill unused slots of the visible count with pad lights so the total
-    // visible point-light count stays pinned at visibleCount even when fewer
-    // real lights than the budget exist (boot, sparse custom maps, interiors)
-    // or when chosen lights sit under hidden ancestors (drawnCount < chosen).
-    const padCount = pointLightPadCount(drawnCount, visibleCount);
-    for (let i = 0; i < this.lightPads.length; i++) this.lightPads[i].visible = i < padCount;
+      // maxPointLights is the per-tier constant, so the live governor
+      // (effectivePointLights) only changes how many SHINE, not the count.
+      visibleCount: GFX.maxPointLights,
+      liveBudget: this.effectivePointLights || GFX.maxPointLights,
+      rangeSq: LIGHT_BUDGET_RANGE_SQ,
+      scene: this.scene,
+      flickerTime: flicker ? this.time : null,
+    });
+    // A completed pass always leaves the rank current.
+    this.lightRankDirty = false;
   }
 
   // light shafts fade in as the camera turns toward the sun, outdoor only
