@@ -3,7 +3,8 @@
 // (single and bulk) until unlocked again. An optional safety mark the player
 // toggles themself, distinct from the def-level noVendorSell/noDiscard
 // content flags (items.ts) and the per-copy transfer lock the anonymous
-// exchange pipes enforce (item_instance_transfer.ts isTransferLockedInstance,
+// exchange pipes enforce (isTransferLockedInstance, its body in
+// transfer_lock.ts and re-exported by item_instance_transfer.ts,
 // keyed on boundTo/bindOnTrade): those are content/trade rules nobody
 // chooses, this is nothing but the owner's own choice, so it lives on the
 // SAME optional ItemInstancePayload every other per-copy fact rides (types.ts),

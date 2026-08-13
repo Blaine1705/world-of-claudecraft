@@ -67,6 +67,10 @@ export const ESCROW_QUEUE_WAIT_MS = 5_000;
  *  burst carries it) is this coupling's observability floor; the metrics
  *  counter rides the hot-path work. */
 export const ESCROW_QUEUE_WARN_MS = 2_000;
+/** The queue-wait warn's realm-global throttle (one line per burst; the
+ *  wocEscrowQueue counter carries per-event counts). Exported for the
+ *  tunables-ladder pin beside its siblings. */
+export const ESCROW_QUEUE_WARN_THROTTLE_MS = 30_000;
 
 const LETTERS = {
   delivery: WOC_MARKET_DELIVERY_LETTER,
@@ -76,9 +80,11 @@ const LETTERS = {
 
 export function createWocMarketCustody(
   host: WocCustodyGameHost,
-  opts: { escrowWaitMs?: number } = {},
+  opts: { escrowWaitMs?: number; escrowWarnMs?: number; escrowWarnThrottleMs?: number } = {},
 ): WocMarketCustody {
   const escrowWaitMs = opts.escrowWaitMs ?? ESCROW_QUEUE_WAIT_MS;
+  const escrowWarnMs = opts.escrowWarnMs ?? ESCROW_QUEUE_WARN_MS;
+  const escrowWarnThrottleMs = opts.escrowWarnThrottleMs ?? ESCROW_QUEUE_WARN_THROTTLE_MS;
   /** Depth cap 1 per character: the ids with an escrow job queued or
    *  running. Released when the WORK settles; a FIFO that never settles
    *  (a non-query hang past every db bound) would pin its character's slot
@@ -164,7 +170,7 @@ export function createWocMarketCustody(
             if (cancelled) return 'contended';
             started = true;
             const waited = Date.now() - enqueuedAt;
-            if (waited > ESCROW_QUEUE_WARN_MS && Date.now() - lastQueueWarnMs > 30_000) {
+            if (waited > escrowWarnMs && Date.now() - lastQueueWarnMs > escrowWarnThrottleMs) {
               lastQueueWarnMs = Date.now();
               console.warn(
                 `[woc_market] escrow queue wait ${waited}ms for character ${characterId}`,
@@ -266,9 +272,13 @@ export function createWocMarketCustody(
       // durable row still holds the item until the flush lands). Only when
       // the player is already gone (removePlayer ran, so the leave flush
       // committed bags without the copy) is the return parcel the right
-      // rail. A QUARANTINED session never reaches here: extraction refuses
-      // it up front, and quarantine cannot be set mid-job (it is only
-      // assigned inside a saveCharacter thunk on this same FIFO).
+      // rail. A QUARANTINED session never reaches here because BOTH arms
+      // that quarantine are terminal: the ambiguous escrow arm rethrows
+      // without ever calling restoreCopy (restoring on an unproven COMMIT is
+      // the double mint), and the guild-bank refusal arm runs inside a
+      // saveCharacter thunk on this same FIFO, so it cannot interleave with
+      // this job. Extraction additionally refuses quarantined sessions up
+      // front.
       // Both maps, the same presence rule Sim.resolve applies: a divergence
       // would otherwise drop the copy silently inside the add helpers.
       if (host.sim.players.has(pid) && host.sim.entities.has(pid)) {
@@ -287,7 +297,12 @@ export function createWocMarketCustody(
       // The pure ownership probe the service consults BEFORE any serialized
       // side effect: a foreign character id must be a refusal with zero side
       // effects (naming a victim's character could otherwise occupy their
-      // escrow slot and force their guild-book flush).
+      // escrow slot and force their guild-book flush). Scope is precise: it
+      // proves the named ACCOUNT owns the live character, not that the HTTP
+      // caller is that account. The one path where they differ is the
+      // directed-offer accept, where the BUYER's request drives the SELLER's
+      // listing; that occupancy is consented (the seller accepted this exact
+      // deal) and bounded by the buyer's own route rate limit.
       const session = host.wocCustodySession(characterId);
       return session !== null && session.accountId === accountId;
     },
@@ -344,7 +359,11 @@ export function createWocMarketCustody(
 }
 
 /** Silent add-back of an extracted copy (escrow compensation): the player
- *  never observably lost the item, so no loot toast fires. */
+ *  never observably lost the item, so no loot toast fires. DELIBERATELY not
+ *  grantTradableCopy: compensation must never be refusable, so this skips
+ *  the canGrantCopies capacity pre-check and appends past the modelled cap
+ *  when the seller filled the freed slot mid-job (overfilling one slot beats
+ *  losing the only copy; the extractCopy undo arm has room by construction). */
 function restoreInto(host: WocCustodyGameHost, pid: number, slot: InvSlot): void {
   if (slot.instance) {
     host.sim.addItemInstance(slot.itemId, slot.instance, pid, slot.count, {

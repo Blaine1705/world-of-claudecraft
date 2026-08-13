@@ -1930,8 +1930,8 @@ export class GameServer {
   private saveTimer = 0;
   private socialPosTimer = 0;
   private saveAllInFlight: Promise<void> | null = null;
-  // One FIFO per character id: EVERY durable character write rides it, so
-  // commit order is enqueue order (saveCharacter, enqueueCharacterWrite).
+  // One FIFO per character id: every durable LIVE-SESSION character write
+  // rides it, so commit order is enqueue order (exceptions: server/CLAUDE.md).
   private readonly characterSaveQueues = createKeyedSerialWriter<number>();
   // Weapon-skin loadouts are whole-record replacements in their dedicated paid
   // state row. Keep one FIFO per account so rapid apply/detach commands cannot
@@ -4679,26 +4679,25 @@ export class GameServer {
   }
 
   /** An out-of-band durable character write (the marketplace escrow persist)
-   *  on the SAME per-character FIFO as saveCharacter. A job must not await
-   *  another same-character enqueue (FIFO self-deadlock). */
+   *  on saveCharacter's own per-character FIFO; a job must not await a same-
+   *  character enqueue (self-deadlock). saveCharacter's post-commit steps
+   *  (lastSave, deed publish, level feed) catch up one save later. */
   enqueueCharacterWrite<T>(characterId: number, job: () => Promise<T>): Promise<T> {
     return this.characterSaveQueues.enqueue(characterId, job);
   }
 
-  /** Terminal escrow-job arms, fire and forget from inside the job. 'fenced'
-   *  kicks the displaced zombie; 'ambiguous' quarantines so the durable row
-   *  decides both branches of an unknown COMMIT. The pid is the extraction
-   *  identity (a turned-over session is left alone). A MID-LEAVE session
-   *  still quarantines: its queued leave flush re-checks the flag, which is
-   *  what stops it committing bags-without-the-copy over a rollback; only
-   *  the kick is skipped. Book deltas revert like any abandoned session's. */
+  /** Terminal escrow-job arms, fired from inside the job. 'fenced' kicks the
+   *  displaced zombie; 'ambiguous' quarantines so the durable row decides
+   *  both branches of an unknown COMMIT. The pid is the extraction identity;
+   *  mid-leave still quarantines (the queued flush re-checks), skipping only
+   *  the kick. Books revert; the kick WIRES the takeover literal. */
   escrowSessionLost(pid: number, characterId: number, kind: 'fenced' | 'ambiguous'): void {
     const session = this.sessionByCharacterId(characterId);
     if (!session || session.pid !== pid) return;
     if (kind === 'ambiguous') session.escrowQuarantined = true;
     this.revertOwnGuildBookOps(session, [...session.dirtyGuildBanks.keys()]);
     if (!session.left) {
-      void this.kickSession(session, `market escrow ${kind}`, 'character taken over');
+      void this.kickSession(session, 'character taken over', `market escrow ${kind}`);
     }
   }
 
@@ -5114,7 +5113,7 @@ export class GameServer {
     // withdrawing that phantom value would be refused in turn.
     this.revertOwnGuildBookOps(session, [...session.dirtyGuildBanks.keys()]);
     if (!session.left) {
-      void this.kickSession(session, 'guild bank escrow rollback', 'character taken over');
+      void this.kickSession(session, 'character taken over', 'guild bank escrow rollback');
     }
   }
 
@@ -6103,9 +6102,10 @@ export class GameServer {
   }
 
   // One ordinary save to flush a seller's dirty guild books BEFORE the escrow
-  // critical section (that write persists the character row ALONE, so a blob
-  // carrying unflushed book-paired deltas would tear the guild-bank
-  // atomicity). Never call from inside a queued character write: deadlock.
+  // critical section (that write persists the character row ALONE; unflushed
+  // book-paired deltas would tear the guild-bank atomicity). Never call from
+  // inside a queued character write: deadlock. The boolean is deliberately
+  // discarded: every false re-verdicts downstream (re-check or extractCopy).
   async flushDirtyGuildBooks(characterId: number): Promise<void> {
     const session = this.sessionByCharacterId(characterId);
     if (!session || session.left || session.dirtyGuildBanks.size === 0) return;

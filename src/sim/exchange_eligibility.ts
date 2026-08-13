@@ -14,12 +14,17 @@
 //
 // The per-copy half is shared one level further out: the locks that depend on
 // the INSTANCE rather than the def come from isTransferLockedInstance
-// (transfer_lock.ts, re-exported by item_instance_transfer.ts), the same predicate the gold market, Ravenpost
+// (transfer_lock.ts, re-exported by item_instance_transfer.ts), the same
+// predicate the gold market, Ravenpost
 // mail and the guild bank gate on. Every one of those is an anonymous pipe with
 // nobody for a bind-on-trade stamp to land on, so a state one of them refuses
 // and this rail accepts would be a laundering route rather than a difference of
 // opinion. The face-to-face gold trade (social/trade.ts isTradeLocked) is the
 // deliberate exception: it has a named recipient, so an armed copy passes there.
+// A DIRECTED $WOC offer also names its recipient but stays refused on purpose:
+// its delivery path stamps no boundTo, so the copy would arrive still armed
+// and re-listable (whether directed delivery should stamp its recipient and
+// inherit the trade-window exception is an open design call).
 //
 // The split of responsibility matters and is deliberate: this module owns the
 // CONTENT TAXONOMY (a mount is a mount because src/sim/content says so) and the

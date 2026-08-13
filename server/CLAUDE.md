@@ -101,8 +101,10 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
   so two processes can never double-load one character. The steal predicate has three arms
   (expiry, same holder, same AUTHENTICATED account), so a player whose old process died
   reclaims their own character immediately instead of waiting out the TTL; rows with a NULL
-  `account_id` fail that arm closed. Character saves are lease-fenced: both save functions
-  take the session's lease nonce and land only while the row still carries it (an in-statement
+  `account_id` fail that arm closed. Character saves are lease-fenced: every fenced character-write path
+  (the `db.ts` save pair plus `saveCharacterStateOnClient` inside the marketplace escrow and
+  delivered-save transactions)
+  takes the session's lease nonce and lands only while the row still carries it (an in-statement
   EXISTS fence, never check-then-write), and a fenced-out session is kicked with the existing
   takeover signal, so a displaced zombie can never overwrite live state. `bank_ledger` is the
   append-only per-op audit trail (`scripts/bank_audit.mjs` replays it offline).
@@ -111,11 +113,13 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
   resume never re-acquires the lease. Forced disconnects (moderation, takeover, anti-bot) skip
   grace and tear down via `GameServer.leave()`. Never resume a session whose teardown has begun
   (the `left` flag): the reconnect would get a zombie whose lease is released under it.
-- Every durable character write rides the per-character FIFO (`GameServer.enqueueCharacterWrite`,
-  backed by `serial_writer.ts` `createKeyedSerialWriter`): commit order is enqueue order across
-  autosaves, leave flushes, and the marketplace escrow persist, and every write's blob carries the
-  session save fixups (`character_save_fixups.ts`: jail/spectate position, stowed pet, the jail
-  flag). Cross-queue order is the character FIFO first, THEN the market serial writer; never
+- Every durable LIVE-SESSION character write rides the per-character FIFO
+  (`GameServer.enqueueCharacterWrite`, backed by `serial_writer.ts` `createKeyedSerialWriter`):
+  commit order is enqueue order across autosaves, leave flushes, and the marketplace escrow
+  persist, and every write's blob carries the session save fixups (`character_save_fixups.ts`:
+  jail/spectate position, stowed pet, the jail flag). Recorded exceptions: the marketplace
+  delivered-save twin (`commitGrant`, carve-out recorded at the method) and the offline
+  admin/boost writers, which never race a live session. Cross-queue order is the character FIFO first, THEN the market serial writer; never
   enqueue from inside a market thunk, an open transaction, or another job for the same character.
 - Save cadence: autosave every **30 s** (`AUTOSAVE_SECONDS`), on `leave`, and on
   `SIGINT`/`SIGTERM` shutdown (`saveAll`). World Market is a per-realm JSONB row (`world_state`

@@ -674,9 +674,16 @@ export const GUARD_IDLE_TX_TIMEOUT_MS = ESCROW_LOCK_TIMEOUT_MS;
  *  test re-measures and asserts the max stays under a fifth of this
  *  allowance), so 5s is orders of magnitude of headroom PER STATEMENT while
  *  a genuinely wedged statement can no longer hold the FIFO for the 60s
- *  heavy allowance (whole-transaction worst case: four statements plus the
- *  2s lock wait, roughly 22s, still under the 30s autosave period, which is
- *  the bound that matters). The heavy allowance remains correct for the
+ *  heavy allowance. Honest ceiling accounting: this allowance bounds the
+ *  FOUR workload statements (the tunables relation pins exactly those, plus
+ *  the lock wait and the pool checkout, about 27s); BEGIN and the SET LOCAL
+ *  that installs the allowance necessarily run under the 15s session
+ *  default, and COMMIT's only hard bound is the 65s driver query_timeout
+ *  backstop, so a genuinely wedged transaction can exceed one 30s autosave
+ *  interval. What bounds the player-facing impact in that tail is the queue
+ *  wait deadline plus the depth cap (later requests refuse typed instead of
+ *  stacking); tightening the tail itself rides the hot-path follow-up with
+ *  the guild-flush 60s term. The heavy allowance remains correct for the
  *  LOGOUT-shaped saves (losing one is data loss; losing a listing attempt
  *  is a refusal the player retries). */
 export const ESCROW_STATEMENT_TIMEOUT_MS = 5_000;
@@ -934,12 +941,32 @@ export class PgWocMarketDb implements WocMarketDb {
       if (asyncErr === null) asyncErr = err;
     };
     client.on('error', onError);
+    let beginFailed = false;
     try {
-      await client.query('BEGIN');
+      // BEGIN rides the never-started tag too: a pooled client whose socket
+      // died since its last use (a NAT idle-reap, a Postgres restart the
+      // pool's own eviction raced) is not validated at checkout, so it fails
+      // HERE with a codeless connection error rather than at connect, and in
+      // the same correlated volume as checkout timeouts. Nothing can have
+      // committed before BEGIN returns, so the typed retry refusal is as
+      // provably correct as it is for the checkout arm; without this tag the
+      // class parked as ambiguous, which is the quarantine-kick loop the tag
+      // exists to prevent, one statement later.
+      try {
+        await client.query('BEGIN');
+      } catch (err) {
+        beginFailed = true;
+        throw new TxNeverStarted(err);
+      }
       const out = await fn(client);
       await client.query('COMMIT');
       return out;
     } catch (err) {
+      // A never-started transaction owes no ROLLBACK, and it must skip the
+      // code-preference below: a coded async close arriving on the same dead
+      // socket would replace the tag and re-park a provably-nothing-ran
+      // failure as ambiguous.
+      if (err instanceof TxNeverStarted) throw err;
       await client.query('ROLLBACK').catch(() => {});
       if (err instanceof TxAbort) return err.value as T;
       // Prefer whichever error carries the SQLSTATE: under an event-loop
@@ -948,12 +975,24 @@ export class PgWocMarketDb implements WocMarketDb {
       // ordering flips (both measured). Either way the coded error is the
       // honest one. When NEITHER carries a code, the thrown error (fn's own
       // bug) stays primary: a codeless connection close must not mask it.
-      const code = (e: unknown): string | undefined => (e as { code?: string }).code;
+      // Known residual of that preference: a CODELESS bug thrown by fn while
+      // a coded async termination is buffered gets labeled with the async
+      // code. The mislabel is item-safe for the compensating callers (fn
+      // threw, so COMMIT was never issued and rollback is certain) but can
+      // hide the bug behind a typed retry; accepted as the price of keeping
+      // the 25P03 arm live.
+      // Null-safe on purpose: asyncErr is null until an 'error' event fires,
+      // and a codeless thrown error evaluates the asyncErr side; a plain cast
+      // dereferenced the null here and replaced the real failure (and its
+      // stack) with a TypeError from this very line.
+      const code = (e: unknown): string | undefined =>
+        (e as { code?: string } | null | undefined)?.code;
       throw code(err) !== undefined ? err : code(asyncErr) !== undefined ? asyncErr : err;
     } finally {
       client.removeListener('error', onError);
-      // A terminated session must be DISCARDED, not returned to the pool.
-      client.release(asyncErr !== null ? true : undefined);
+      // A terminated or begin-broken session must be DISCARDED, not returned
+      // to the pool.
+      client.release(asyncErr !== null || beginFailed ? true : undefined);
     }
   }
 

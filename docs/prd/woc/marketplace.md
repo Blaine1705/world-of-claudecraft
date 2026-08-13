@@ -154,17 +154,23 @@ game never holds wallet keys. Custody is escrow-by-removal, the World Market
 and Ravenpost precedent:
 
 - Listing an item extracts the exact copy (including its
-  `ItemInstancePayload`) from the seller's bags on the world loop and snapshots
-  it on the listing row; the character save and the listing insert commit
-  together, so a crash can never dupe or destroy the copy.
+  `ItemInstancePayload`) from the seller's live bags and snapshots it on the
+  listing row; the character save and the listing insert commit together, and
+  the whole critical section runs as one job on the per-character save FIFO
+  (`WocMarketCustody.runSerialized` over `GameServer.enqueueCharacterWrite`),
+  so neither a crash nor a stale pre-extraction autosave can dupe or destroy
+  the copy: every autosave serialized before extraction commits before the
+  escrow write, and the escrow blob is serialized inside the job.
 - An escrowed item cannot be equipped, destroyed, traded, or listed elsewhere,
   because it is no longer in any inventory.
 - The copy returns to the seller by system mail when the auction ends unsold,
   the reserve is not met, or settlement ultimately fails; it is delivered to
   the buyer by system mail when settlement confirms.
-- The extraction seam re-enforces the `boundTo` trade lock and the
-  `soulbound` / `noMarketList` / quest-kind refusals explicitly, as
-  `docs/design/professions.md` requires for any instanced carriage.
+- The extraction seam re-enforces both bind-on-trade states (`boundTo` once
+  the stamp has landed, and the still-armed `bindOnTrade` copy, refused as
+  `bind_armed`) plus the `soulbound` / `noMarketList` / quest-kind refusals
+  explicitly, as `docs/design/professions.md` requires for any instanced
+  carriage.
 
 ### Eligibility policy
 

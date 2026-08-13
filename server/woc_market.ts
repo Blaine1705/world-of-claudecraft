@@ -925,9 +925,11 @@ export interface WocMarketCustody {
    *  dirty guild books could not be flushed clear): nothing was extracted
    *  and the request simply retries. The job must not await another
    *  character write for the same character (FIFO self-deadlock). The
-   *  refusal is a string sentinel sharing the job's return channel: safe
-   *  while every caller's T is an object (as here), so a future caller
-   *  whose T could itself be a string must wrap its result first. */
+   *  refusal is a string sentinel sharing the job's return channel, and the
+   *  implementation races an internal 'timeout' sentinel on the same
+   *  channel: safe while every caller's T is an object (as here), so a
+   *  future caller whose T could itself be a string (either literal) must
+   *  wrap its result first. */
   runSerialized<T>(characterId: number, job: () => Promise<T>): Promise<T | 'contended'>;
   /** Ownership probe with ZERO side effects, consulted before runSerialized:
    *  a foreign character id must never reach the flush or the depth cap. */

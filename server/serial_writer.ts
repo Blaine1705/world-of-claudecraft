@@ -37,7 +37,9 @@ export function createSerialWriter(): <T>(write: () => Promise<T>) => Promise<T>
 export interface KeyedSerialWriter<K> {
   enqueue<T>(key: K, write: () => Promise<T>): Promise<T>;
   /** How many keys hold a running or queued write right now (the leak pin:
-   *  a drained key must not retain its entry). */
+   *  a drained key must not retain its entry). No production caller yet by
+   *  design: the players-online-adjacent gauge that will read it rides the
+   *  hot-path follow-up work; tests are its only consumer until then. */
   pendingKeys(): number;
 }
 
