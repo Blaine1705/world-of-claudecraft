@@ -2669,7 +2669,11 @@ async function cheaterMarkHandler(ctx: Ctx): Promise<void> {
   const decoded = cheaterMarkBodySchema.decode(ctx.body ?? {});
   if (!decoded.ok) throw decoded;
   await refuseAdminCheaterMarkTarget(targetAccountId);
-  let storedSeconds = 0;
+  // No initializer on purpose: 0 is the wire form of "no mark", so a default
+  // here would mean a future non-throwing arm in the catch below silently LIFTS
+  // a live mark. rethrowCheaterMarkRefusal returns never, which is what makes
+  // the definite assignment hold.
+  let storedSeconds: number;
   try {
     storedSeconds = await adminDb().setAccountCheaterMark({
       accountId: targetAccountId,

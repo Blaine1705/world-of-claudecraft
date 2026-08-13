@@ -93,9 +93,11 @@ export async function persistCheaterMark(
 ): Promise<void> {
   if (!session.cheaterMarked) return;
   // Absence of a list is absence of EVIDENCE, never evidence the mark expired:
-  // the call site reads `entities.get(pid)?.auras`, so a save that lands while
-  // the character is not in the sim (a respawn, an arena or fiesta swap) hands
-  // us undefined. Zeroing on that would wipe a budget the player still owes.
+  // the call site reads `entities.get(pid)?.auras`, so any save that runs once
+  // the character has left the sim (a fire-and-forget save queued behind the
+  // awaited leave save, a sweep whose session list was captured before the
+  // session was dropped) hands us undefined. Zeroing on that would wipe a
+  // budget the player still owes, off a read that never happened.
   if (auras === undefined) return;
   const live = auras.find((a) => a.id === CHEATER_MARK_AURA_ID);
   const remaining = Math.max(0, Math.floor(live?.remaining ?? 0));

@@ -150,8 +150,11 @@ describe('cheater mark contract (server/cheater_mark_api.ts)', () => {
       'cheater_mark.reason_required',
       'cheater_mark.invalid_duration',
       'cheater_mark.not_marked',
+      // Deliberately the shared account code, not a cheater_mark twin: the fact
+      // reported is the one every other account route already reports.
+      'account.not_found',
     ]);
-    expect(mapped.map((e) => e.status)).toEqual([400, 400, 409]);
+    expect(mapped.map((e) => e.status)).toEqual([400, 400, 409, 404]);
     expect(new Set(mapped.map((e) => e.code)).size).toBe(CHEATER_MARK_REFUSALS.length);
   });
 
@@ -277,6 +280,26 @@ describe('POST /admin/api/moderation/accounts/:id/cheater-mark', () => {
 
     expect(res.status).toBe(400);
     expect(res.body).toEqual(adminError('cheater_mark.invalid_duration'));
+  });
+
+  it('404s a mistyped account id and does NOT push, since the route can reach one', async () => {
+    // requireAdminTarget only decodes the :id into a positive integer, and the
+    // operator-target guard's isAdminAccount answers false for an id with no
+    // row, so a typo lands in the write. The write refuses, the operator gets a
+    // fact they can act on, and nothing is pushed onto a live session.
+    const applyCheaterMarkLive = vi.fn();
+    authedAdminDb({
+      setAccountCheaterMark: async () => {
+        throw new CheaterMarkRefused('no_account');
+      },
+    });
+    configureAdminRuntime({ applyCheaterMarkLive } as unknown as AdminRuntime);
+
+    const res = await runRoute(MARK_PATH, { body: { reason: REASON, seconds: 600 } });
+
+    expect(res.status).toBe(404);
+    expect(res.body).toEqual(adminError('account.not_found'));
+    expect(applyCheaterMarkLive).not.toHaveBeenCalled();
   });
 
   it('surfaces an unexpected write failure as the coded 500, leaking no prose', async () => {

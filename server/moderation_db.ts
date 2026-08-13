@@ -686,15 +686,19 @@ export async function setAccountCheaterMark(input: {
       [input.accountId, seconds, reason],
     );
     const stored = updated.rows[0]?.cheater_mark_seconds;
-    // Mirrors the lift arm's rowCount check: an audit row saying an account was
-    // branded, written when the UPDATE matched nothing, is a false entry in a
-    // permanent record. A plain Error rather than a CheaterMarkRefused on
-    // purpose: the admin route resolves the target before calling (see
-    // refuseAdminCheaterMarkTarget in admin.ts), so reaching here is an internal
-    // caller error and belongs on the pipeline's 500, not dressed up as an
-    // operator mistake the way a coded refusal would be.
+    // Mirrors the lift arm's rowCount check, and for the same reason: an audit
+    // row saying an account was branded, written when the UPDATE matched
+    // nothing, is a false entry in a permanent record. Refusing BEFORE
+    // recordModerationAction is what keeps it out, since the throw rolls the
+    // transaction back.
+    //
+    // A mistyped or purged account id really does reach here from the admin
+    // route: requireAdminTarget only decodes the :id into a positive integer,
+    // and the operator-target guard's isAdminAccount read answers false for an
+    // id with no row. So this is a coded refusal an operator can act on, not an
+    // opaque 500.
     if ((updated.rowCount ?? 0) === 0 || stored === undefined) {
-      throw new Error(`cheater mark target account ${input.accountId} does not exist`);
+      throw new CheaterMarkRefused('no_account');
     }
     await recordModerationAction(client, 'cheater_mark', {
       accountId: input.accountId,
