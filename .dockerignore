@@ -12,6 +12,7 @@ tests
 scripts/*
 !scripts/build_media_manifest.mjs
 !scripts/build_sfx_manifest.mjs
+!scripts/build_bundle_pregen.mjs
 !scripts/build_server.mjs
 !scripts/build_bot.mjs
 !scripts/migrate_old_cragmaw_pelt.ts
