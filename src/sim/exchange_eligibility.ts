@@ -2,13 +2,24 @@
 // What KIND of thing an item is for the $WOC Exchange, and which transfer locks
 // hold for that kind whatever an operator's policy says.
 //
-// One definition, because there are three enforcement points and they must
-// agree: the server's listingEligibility (authoritative), the sim's
-// extractTradableCopy (defence in depth at the bags), and the client's
-// sellableRows (the Sell picker's pre-filter). Each carried its own copy of the
-// same four checks, so a category the server accepted could still be refused at
-// escrow, or never offered in the picker at all. Three copies is what earns a
+// One definition, because there are four enforcement points and they must
+// agree: the server's listingEligibility (server/woc_market_rules.ts, the
+// authoritative one), the sim's extractTradableCopy (src/sim/inventory_extract.ts,
+// defence in depth at the bags), and the two client pre-filters, sellableRows
+// (src/ui/woc_market_view.ts, the Sell picker) and wocTradableSlot
+// (src/ui/trade_woc_view.ts, the trade window's exchange arm). Each carried its
+// own copy of the same checks, so a category the server accepted could still be
+// refused at escrow, or never offered in the picker at all. That is what earns a
 // shared module (the repo's rule of three), and this is the shared one.
+//
+// The per-copy half is shared one level further out: the locks that depend on
+// the INSTANCE rather than the def come from isTransferLockedInstance
+// (item_instance_transfer.ts), the same predicate the gold market, Ravenpost
+// mail and the guild bank gate on. Every one of those is an anonymous pipe with
+// nobody for a bind-on-trade stamp to land on, so a state one of them refuses
+// and this rail accepts would be a laundering route rather than a difference of
+// opinion. The face-to-face gold trade (social/trade.ts isTradeLocked) is the
+// deliberate exception: it has a named recipient, so an armed copy passes there.
 //
 // The split of responsibility matters and is deliberate: this module owns the
 // CONTENT TAXONOMY (a mount is a mount because src/sim/content says so) and the
@@ -18,11 +29,13 @@
 // entitled to decide them.
 //
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no rng, no clock. It
-// is a leaf (no SimContext), so a Vitest imports it directly. It carries no
-// wallet, token, or settlement vocabulary, so the token firewall over src/sim
+// is a leaf (no SimContext, and the one predicate it borrows brings none at
+// runtime), so a Vitest imports it directly. It carries no wallet, token, or
+// settlement vocabulary, so the token firewall over src/sim
 // (tests/architecture.test.ts) still holds with this file inside it.
 // ---------------------------------------------------------------------------
 
+import { isTransferLockedInstance } from './item_instance_transfer';
 import type { ItemDef, ItemInstancePayload } from './types';
 
 /**
@@ -51,8 +64,12 @@ export function exchangeItemCategory(def: ItemDef): ExchangeItemCategory {
 /**
  * The locks no configuration may lift.
  *
- * `quest_item` and `bound_copy` are absolute: a quest item is not property, and
- * a copy already bound to a character cannot become someone else's.
+ * `quest_item`, `bound_copy` and `bind_armed` are absolute: a quest item is not
+ * property, a copy already bound to a character cannot become someone else's,
+ * and an armed copy (commissioned gear carrying bindOnTrade with no stamp yet)
+ * binds to whoever receives it next, which an anonymous escrow has nobody to
+ * be. Unbinding clears `boundTo` and leaves `bindOnTrade`, so a peeled copy
+ * returns to the armed state rather than to a plain one.
  *
  * `soulbound` and `no_market_list` are absolute only for the categories that do
  * not tolerate them, which is where the two collectible categories differ from
@@ -72,7 +89,12 @@ export function exchangeItemCategory(def: ItemDef): ExchangeItemCategory {
  *
  * Everything else keeps both refusals exactly as before.
  */
-export type ExchangeLock = 'soulbound' | 'quest_item' | 'no_market_list' | 'bound_copy';
+export type ExchangeLock =
+  | 'soulbound'
+  | 'quest_item'
+  | 'no_market_list'
+  | 'bound_copy'
+  | 'bind_armed';
 
 export function exchangeHardLock(
   def: ItemDef,
@@ -80,7 +102,14 @@ export function exchangeHardLock(
 ): ExchangeLock | null {
   const category = exchangeItemCategory(def);
   if (def.kind === 'quest') return 'quest_item';
-  if (instance?.boundTo !== undefined) return 'bound_copy';
+  // The sibling pipes' predicate, so parity holds by construction rather than by
+  // two lists agreeing today. It answers WHETHER the copy is locked; which of
+  // the two states it is in decides what the player is told, and the stamp wins
+  // because `boundTo` is the stronger fact (pid 0 is a real character id, so the
+  // read is presence, never truthiness).
+  if (isTransferLockedInstance(instance)) {
+    return instance?.boundTo !== undefined ? 'bound_copy' : 'bind_armed';
+  }
   if (def.soulbound && category !== 'mount') return 'soulbound';
   if (def.noMarketList && category !== 'mech_chroma') return 'no_market_list';
   return null;

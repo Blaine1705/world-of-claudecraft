@@ -336,6 +336,7 @@ export type WocEligibilityRefusal =
   | 'quest_item'
   | 'no_market_list'
   | 'bound_copy'
+  | 'bind_armed'
   | 'excluded_item';
 
 export interface WocEligibilityPolicy {
@@ -389,8 +390,9 @@ const QUALITY_RANK: Record<string, number> = {
 
 /**
  * Whether one exact copy may be listed under `policy`. The hard transfer
- * locks (soulbound / quest / noMarketList / boundTo) are re-checked by the
- * sim at extraction time (inventory_extract.ts); repeating them here means a
+ * locks (soulbound / quest / noMarketList / boundTo / an unstamped bindOnTrade)
+ * are re-checked by the sim at extraction time (inventory_extract.ts);
+ * repeating them here means a
  * refusal is decided BEFORE any custody action, and policy alone can never
  * unlock a copy the sim would refuse. The instance's rolled quality beats the
  * def quality when present (the discovery-ledger convention).

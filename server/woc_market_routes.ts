@@ -192,6 +192,7 @@ export const REFUSAL_ERRORS: Record<WocMarketRefusal, { status: number; code: Er
   quest_item: { status: 400, code: 'woc_market.not_eligible' },
   no_market_list: { status: 400, code: 'woc_market.not_eligible' },
   bound_copy: { status: 400, code: 'woc_market.not_eligible' },
+  bind_armed: { status: 400, code: 'woc_market.not_eligible' },
   unknown_item: { status: 400, code: 'woc_market.not_eligible' },
   not_eligible_category: { status: 400, code: 'woc_market.not_eligible' },
   below_quality_floor: { status: 400, code: 'woc_market.not_eligible' },

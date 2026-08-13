@@ -11,11 +11,13 @@ import { MOUNTS } from '../src/sim/content/mounts';
 import { MECH_CHROMAS, mechChromaItemId } from '../src/sim/content/skins';
 import { ITEMS } from '../src/sim/data';
 import {
+  type ExchangeLock,
   exchangeCategoryUsesQualityFloor,
   exchangeHardLock,
   exchangeItemCategory,
 } from '../src/sim/exchange_eligibility';
-import type { ItemDef } from '../src/sim/types';
+import { isTransferLockedInstance } from '../src/sim/item_instance_transfer';
+import type { ItemDef, ItemInstancePayload } from '../src/sim/types';
 
 const def = (over: Record<string, unknown>): ItemDef =>
   ({
@@ -101,6 +103,55 @@ describe('exchangeHardLock: which locks a category tolerates', () => {
 
   it('leaves ordinary equipment exactly as it was', () => {
     expect(exchangeHardLock(def({ slot: 'chest' }), undefined)).toBe(null);
+  });
+
+  it('refuses a still-armed commissioned copy, the state an unbind returns to', () => {
+    // A commission is stamped on hand-off, so before the stamp the copy carries
+    // bindOnTrade with no boundTo. Unbinding clears boundTo only, so a peeled
+    // copy lands back in exactly this state and must not become resellable here.
+    expect(exchangeHardLock(def({ slot: 'chest' }), { bindOnTrade: true })).toBe('bind_armed');
+    expect(
+      exchangeHardLock(def({ kind: 'mount', mount: 'valorsteed' }), { bindOnTrade: true }),
+    ).toBe('bind_armed');
+  });
+
+  it('reports the stamp, not the arming, once a copy is actually bound', () => {
+    // Precedence: an armed AND stamped copy is bound, and the refusal a player
+    // sees must say so rather than describing the weaker state it grew out of.
+    expect(exchangeHardLock(def({ slot: 'chest' }), { bindOnTrade: true, boundTo: 7 })).toBe(
+      'bound_copy',
+    );
+    // pid 0 is a real character id, so the check is presence and never truthiness.
+    expect(exchangeHardLock(def({ slot: 'chest' }), { boundTo: 0 })).toBe('bound_copy');
+  });
+
+  it('passes a never-armed and an explicitly disarmed copy', () => {
+    expect(exchangeHardLock(def({ slot: 'chest' }), {})).toBe(null);
+    expect(exchangeHardLock(def({ slot: 'chest' }), { bindOnTrade: false })).toBe(null);
+    expect(exchangeHardLock(def({ slot: 'chest' }), { signer: 'Aldric' })).toBe(null);
+  });
+});
+
+describe('the exchange rail refuses exactly what the sibling pipes refuse', () => {
+  // The gold market, Ravenpost mail and the guild bank all gate a per-copy state
+  // through isTransferLockedInstance. The exchange is a fourth anonymous pipe, so
+  // any state one of them refuses and this one accepts is a laundering route.
+  const tradable = def({ slot: 'chest' });
+  const STATES: [string, ItemInstancePayload, ExchangeLock | null][] = [
+    ['a plain copy', {}, null],
+    ['an armed copy', { bindOnTrade: true }, 'bind_armed'],
+    ['an explicitly disarmed copy', { bindOnTrade: false }, null],
+    ['a bound copy', { boundTo: 7 }, 'bound_copy'],
+    ['a copy bound to pid 0', { boundTo: 0 }, 'bound_copy'],
+    ['an armed and bound copy', { bindOnTrade: true, boundTo: 7 }, 'bound_copy'],
+  ];
+
+  it.each(STATES)('%s carries the expected exchange lock', (_name, instance, expected) => {
+    expect(exchangeHardLock(tradable, instance)).toBe(expected);
+  });
+
+  it.each(STATES)('%s reaches the same verdict on both rails', (_name, instance) => {
+    expect(exchangeHardLock(tradable, instance) !== null).toBe(isTransferLockedInstance(instance));
   });
 });
 

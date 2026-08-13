@@ -166,6 +166,16 @@ describe('extractTradableCopy (pure leaf)', () => {
       expect(inventory).toHaveLength(1);
     });
 
+    it('refuses a still-armed commissioned copy before any stamp lands', () => {
+      // bindOnTrade with no boundTo: the copy binds to whoever receives it next,
+      // which an anonymous escrow has nobody to be. The gold market and mail
+      // refuse the same state, and unbinding returns a copy to it.
+      const inventory = inv({ itemId: 'blade', count: 1, instance: { bindOnTrade: true } });
+      const out = extractTradableCopy(inventory, { index: 0, itemId: 'blade' }, def());
+      expect(out).toEqual({ ok: false, reason: 'bind_armed' });
+      expect(inventory).toHaveLength(1);
+    });
+
     it('refuses a stale instance reference (the payload the caller saw is gone)', () => {
       const inventory = inv({ itemId: 'blade', count: 1, instance: { signer: 'Belra' } });
       const out = extractTradableCopy(

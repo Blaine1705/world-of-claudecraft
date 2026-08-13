@@ -498,6 +498,16 @@ describe('listingEligibility', () => {
     });
   });
 
+  it('refuses a still-armed commissioned copy via instance.bindOnTrade', () => {
+    // The refusal is decided here, before any custody action: an armed copy
+    // binds to its next owner, and an escrow has no owner for the stamp.
+    const instance: ItemInstancePayload = { bindOnTrade: true };
+    expect(listingEligibility(equipDef(), instance, policy)).toEqual({
+      ok: false,
+      reason: 'bind_armed',
+    });
+  });
+
   it('refuses an item on the policy exclusion list', () => {
     const excluding: WocEligibilityPolicy = {
       ...WOC_MARKET_RESTRICTED_POLICY,

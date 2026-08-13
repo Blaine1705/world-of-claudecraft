@@ -121,7 +121,7 @@ describe('the refusal-to-wire mapping', () => {
     const rows = Object.entries(REFUSAL_ERRORS);
     // The EXACT count, not a floor. A floor of 35 let four union members vanish
     // silently; tsc catches a deleted Record key but not a shrunken union.
-    expect(rows).toHaveLength(48);
+    expect(rows).toHaveLength(49);
     for (const [reason, mapped] of rows) {
       expect(mapped.code, reason).toMatch(/^woc_market\./);
       expect(mapped.status, reason).toBeGreaterThanOrEqual(400);
@@ -196,6 +196,7 @@ describe('the refusal-to-wire mapping', () => {
     ['quest_item', 400, 'woc_market.not_eligible'],
     ['no_market_list', 400, 'woc_market.not_eligible'],
     ['bound_copy', 400, 'woc_market.not_eligible'],
+    ['bind_armed', 400, 'woc_market.not_eligible'],
     ['unknown_item', 400, 'woc_market.not_eligible'],
     ['not_eligible_category', 400, 'woc_market.not_eligible'],
     ['below_quality_floor', 400, 'woc_market.not_eligible'],
@@ -245,6 +246,7 @@ describe('the refusal-to-wire mapping', () => {
     ]);
     expect(withCode('woc_market.not_eligible')).toEqual([
       'below_quality_floor',
+      'bind_armed',
       'bound_copy',
       'excluded_item',
       'no_market_list',

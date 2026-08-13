@@ -7,8 +7,9 @@
 //
 // Transfer legality is enforced HERE, at the moment the copy leaves the bags,
 // mirroring the World Market (market.ts) and Ravenpost (mail/post_office.ts)
-// gates. For instanced copies the boundTo trade lock is a named, explicit
-// refusal: docs/design/professions.md requires any instanced carriage to
+// gates. For instanced copies both bind-on-trade states are named, explicit
+// refusals (bound_copy once the stamp has landed, bind_armed while it is still
+// pending): docs/design/professions.md requires any instanced carriage to
 // re-enforce that lock rather than inherit it emergently from fungible-only
 // escrow.
 //
@@ -29,7 +30,8 @@ export type ExtractRefusal =
   | 'soulbound'
   | 'quest_item'
   | 'no_market_list'
-  | 'bound_copy'; // instance.boundTo set (the bind-on-trade lock)
+  | 'bound_copy' // instance.boundTo set (the bind-on-trade stamp has landed)
+  | 'bind_armed'; // instance.bindOnTrade set, no stamp yet (it binds on hand-off)
 
 export type ExtractOutcome =
   | { ok: true; extracted: InvSlot }
