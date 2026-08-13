@@ -15,6 +15,7 @@ import {
 import type { ExtractRef } from '../src/sim/inventory_extract';
 import type { CharacterState, Sim } from '../src/sim/sim';
 import type { InvSlot } from '../src/sim/types';
+import { gameMetricsCounters } from './http/game_signals';
 import type { WocCustodyExtract, WocCustodyGrant, WocMarketCustody } from './woc_market';
 
 /** The narrow slice of GameServer the custody module consumes (game.ts
@@ -55,7 +56,11 @@ export interface WocCustodyGameHost {
  *  FIFO before refusing typed 'contended' (the job is cancelled before it
  *  starts, so nothing was extracted). Sized beside the pool's own 5s
  *  connect deadline: past that, something is wedged and holding the HTTP
- *  request open only invites a retry pile-up. */
+ *  request open only invites a retry pile-up. NOTE this bounds only the
+ *  wait: a job that STARTED holds the request for the transaction's own
+ *  ceiling (statement/lock/idle bounds plus the pool checkout, tens of
+ *  seconds worst case, under the HTTP layer's 300s), so client fetch
+ *  timeouts must be sized off THAT, not off this deadline. */
 export const ESCROW_QUEUE_WAIT_MS = 5_000;
 /** Queue waits past this warn. The throttle (30s, realm-global across every
  *  character on purpose: the signal is "escrow waits are slow", one line per
@@ -74,7 +79,10 @@ export function createWocMarketCustody(
   opts: { escrowWaitMs?: number } = {},
 ): WocMarketCustody {
   const escrowWaitMs = opts.escrowWaitMs ?? ESCROW_QUEUE_WAIT_MS;
-  /** Depth cap 1 per character: the ids with an escrow job queued or running. */
+  /** Depth cap 1 per character: the ids with an escrow job queued or
+   *  running. Released when the WORK settles; a FIFO that never settles
+   *  (a non-query hang past every db bound) would pin its character's slot
+   *  for the process lifetime, visible as depth_refused on the counter. */
   const escrowJobsInFlight = new Set<number>();
   /** The queue-wait warn throttles like the market writer's depth warn: the
    *  signal is "waits are slow", one line per burst carries it. */
@@ -123,7 +131,10 @@ export function createWocMarketCustody(
       // character row ALONE, so book-paired deltas are flushed atomically
       // FIRST (never from inside the job: self-deadlock), and residue that
       // re-dirtied during the wait refuses rather than tears.
-      if (escrowJobsInFlight.has(characterId)) return 'contended';
+      if (escrowJobsInFlight.has(characterId)) {
+        gameMetricsCounters().wocEscrowQueue('depth_refused');
+        return 'contended';
+      }
       escrowJobsInFlight.add(characterId);
       let cancelled = false;
       let started = false;
@@ -144,6 +155,7 @@ export function createWocMarketCustody(
           try {
             await host.flushDirtyGuildBooks(characterId);
           } catch (err) {
+            gameMetricsCounters().wocEscrowQueue('flush_failed');
             console.error(`[woc_market] guild-book flush failed for character ${characterId}`, err);
             return 'contended';
           }
@@ -158,7 +170,11 @@ export function createWocMarketCustody(
                 `[woc_market] escrow queue wait ${waited}ms for character ${characterId}`,
               );
             }
-            if (host.hasDirtyGuildBooks(characterId)) return 'contended';
+            if (host.hasDirtyGuildBooks(characterId)) {
+              gameMetricsCounters().wocEscrowQueue('books_dirty_refused');
+              return 'contended';
+            }
+            gameMetricsCounters().wocEscrowQueue('started');
             return job();
           });
         })();
@@ -178,6 +194,9 @@ export function createWocMarketCustody(
         // cancelled, and a cancelled job extracts nothing.
         if (started) return await work;
         cancelled = true;
+        // The refused wait is the case an operator most needs to see, and it
+        // never reaches the in-job warn: count it here.
+        gameMetricsCounters().wocEscrowQueue('deadline_refused');
         return 'contended';
       } finally {
         if (timer !== undefined) clearTimeout(timer);

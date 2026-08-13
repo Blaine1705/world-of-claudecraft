@@ -1201,6 +1201,22 @@ describe('the escrow listing transaction, in SQL', () => {
     expect(out).toEqual({ ok: false, reason: 'contended' });
   });
 
+  it("a pool checkout failure maps to 'contended': the transaction never started", async () => {
+    // pg-pool's checkout timeout is a CODELESS error, so without the
+    // TxNeverStarted tag it would classify as ambiguous at the service and
+    // quarantine-kick the seller under exactly the saturation that causes
+    // checkout timeouts in volume. Nothing ran, so the typed retry refusal
+    // (whose compensation restores the copy) is the provably correct answer.
+    const pool = {
+      query: vi.fn(),
+      connect: async () => {
+        throw new Error('timeout exceeded when trying to connect');
+      },
+    } as unknown as Pool;
+    const out = await new PgWocMarketDb(pool).escrowInsertListing(SAVE, LISTING);
+    expect(out).toEqual({ ok: false, reason: 'contended' });
+  });
+
   it('rethrows a non-contention failure instead of eating it as a refusal', async () => {
     const { pool } = recordingTxPool((text) => {
       if (text.includes('INSERT INTO woc_market_listings')) {

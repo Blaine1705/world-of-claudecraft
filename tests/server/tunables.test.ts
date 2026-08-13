@@ -508,6 +508,15 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     expect(ESCROW_STATEMENT_TIMEOUT_MS).toBeLessThan(DB_STATEMENT_TIMEOUT_MS);
     expect(ESCROW_STATEMENT_TIMEOUT_MS).toBeLessThan(DB_HEAVY_STATEMENT_TIMEOUT_MS);
     expect(ESCROW_STATEMENT_TIMEOUT_MS).toBeGreaterThan(ESCROW_LOCK_TIMEOUT_MS);
+    // The full escrow FIFO-occupancy ceiling (four bounded statements plus
+    // the lock wait plus the pool checkout) must stay under the 30s autosave
+    // period, or one listing can stall a saveAll worker across a whole wave.
+    // AUTOSAVE_SECONDS is a game.ts module const; 30_000 is its literal, and
+    // this line is what fails if either side moves.
+    const { DB_POOL_CONNECT_TIMEOUT_MS } = await import('../../server/db');
+    expect(
+      ESCROW_STATEMENT_TIMEOUT_MS * 4 + ESCROW_LOCK_TIMEOUT_MS + DB_POOL_CONNECT_TIMEOUT_MS,
+    ).toBeLessThan(30_000);
   });
 
   it('runWithStatementTimeout rejects a non-integer or negative timeout before touching the pool', async () => {

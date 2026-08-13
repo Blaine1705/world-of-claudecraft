@@ -423,6 +423,7 @@ function recordingSink() {
     wsMessageDropped(cause) {
       dropped.push(cause);
     },
+    wocEscrowQueue() {},
     wsRateKick() {
       rateKicks++;
     },

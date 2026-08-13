@@ -883,6 +883,19 @@ class TxAbort<T> {
   constructor(readonly value: T) {}
 }
 
+/** A withTx transaction that provably NEVER STARTED: the pool checkout
+ *  itself failed (no client, no BEGIN). pg-pool's timeout and the fresh-
+ *  connect socket errors carry no SQLSTATE, so without this tag they would
+ *  classify as AMBIGUOUS at a compensating caller and park work that
+ *  provably did nothing; a checkout timeout is a saturation symptom that
+ *  arrives in volume, exactly when a park-and-kick hurts most. Callers with
+ *  compensation logic map it to their typed retry refusal. */
+export class TxNeverStarted extends Error {
+  constructor(readonly reason: unknown) {
+    super(`transaction never started: ${String(reason)}`);
+  }
+}
+
 /** 55P03 (lock_timeout) and 40P01 (deadlock victim): the row set is contended
  *  by another market transaction. The guards surface these as a typed
  *  'contended' retry refusal; without the mapping they 500 as internal.error,
@@ -901,7 +914,12 @@ export class PgWocMarketDb implements WocMarketDb {
   constructor(private readonly pool: Pool) {}
 
   private async withTx<T>(fn: (client: PoolClient) => Promise<T>): Promise<T> {
-    const client = await this.pool.connect();
+    let client: PoolClient;
+    try {
+      client = await this.pool.connect();
+    } catch (err) {
+      throw new TxNeverStarted(err);
+    }
     // The idle-in-transaction timeout TERMINATES THE SESSION, and its
     // SQLSTATE (25P03) arrives asynchronously on the client's 'error' event
     // while no statement is in flight; the statement that then fails carries
@@ -964,7 +982,11 @@ export class PgWocMarketDb implements WocMarketDb {
         // logout flush, so it gets a short deadline instead of the 60s one;
         // the LOCK wait is bounded tighter still, and the idle bound stops a
         // stalled event loop from holding the accounts row between
-        // statements (both surface as the typed 'contended' refusal).
+        // statements (those two surface as the typed 'contended' refusal;
+        // the statement bound's 57014 deliberately does NOT: it proves
+        // rollback, so the copy restores, and then it 500s, because a
+        // statement blowing a 5s allowance measured at single-digit
+        // milliseconds is an incident to surface, not contention to retry).
         await client.query(`SET LOCAL statement_timeout = ${ESCROW_STATEMENT_TIMEOUT_MS}`);
         await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
         await client.query(
@@ -1032,7 +1054,12 @@ export class PgWocMarketDb implements WocMarketDb {
         return { ok: true as const, id: Number(inserted.rows[0].id) };
       });
     } catch (err) {
-      if (isLockContention(err)) return { ok: false as const, reason: 'contended' as const };
+      // TxNeverStarted joins the contention codes: nothing ran, so the typed
+      // retry refusal (which restores the copy) is strictly correct, and the
+      // ambiguous quarantine arm must never fire for a checkout failure.
+      if (err instanceof TxNeverStarted || isLockContention(err)) {
+        return { ok: false as const, reason: 'contended' as const };
+      }
       throw err;
     }
   }

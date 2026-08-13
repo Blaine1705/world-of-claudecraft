@@ -180,6 +180,10 @@ those rather than a roster here. The ones whose CONTRACT you cannot infer from t
   SYSTEM logic stays on `Sim`.
 - `professions/proficiency_display_heal.ts`: the one-time gathering-proficiency
   display-band heal applied at character load.
+- `daily_rewards_stub.ts`: the offline daily-rewards readout constant, and the
+  ONE file on the $WOC token-firewall allowlist (`tests/architecture.test.ts`
+  pins its read-only-projection shape: one exported function, no control flow,
+  type-only imports).
 
 ## The SimContext seam (final shape)
 `sim_context.ts` defines `SimContext` = `SimContextPrimitives` (live getters onto the

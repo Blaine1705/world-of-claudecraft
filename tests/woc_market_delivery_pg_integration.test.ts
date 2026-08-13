@@ -1501,7 +1501,10 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       console.log(
         `[escrow-cost] blob ${JSON.stringify(heavyState).length} bytes: p50 ${p50.toFixed(1)}ms max ${p99.toFixed(1)}ms over ${samples.length} passes`,
       );
-      expect(p99).toBeLessThan(ESCROW_STATEMENT_TIMEOUT_MS / 5);
+      // 25x the observed 8.3ms max: loose enough for a loaded dev box, tight
+      // enough that a plan regression (a scan, a lost index) reds here
+      // instead of hiding under the 5s allowance.
+      expect(p99).toBeLessThan(ESCROW_STATEMENT_TIMEOUT_MS / 25);
     }, 30_000);
   });
 });

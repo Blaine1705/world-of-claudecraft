@@ -70,6 +70,8 @@ import {
   type GeneralChatQuotaOutcome,
   GUILD_BANK_INCIDENTS,
   type GuildBankIncident,
+  WOC_ESCROW_QUEUE_OUTCOMES,
+  type WocEscrowQueueOutcome,
   WS_DROP_CAUSES,
   type WsDropCause,
   type WsMessageDirection,
@@ -133,6 +135,10 @@ export const WOC_GUILD_BANK_INCIDENTS_TOTAL = 'woc_guild_bank_incidents_total';
 
 /** Rift forge wire commands refused while the gate is closed (server/rift_forge_gate.ts). */
 export const WOC_RIFT_FORGE_REFUSED_TOTAL = 'woc_rift_forge_refused_total';
+
+/** Marketplace escrow-queue outcomes (the listing entry on the per-character
+ *  save FIFO), by kind. */
+export const WOC_ESCROW_QUEUE_TOTAL = 'woc_escrow_queue_total';
 
 /** Guild bank activity log cache readout, labeled by counter name. ONE metric
  *  with a `kind` label rather than six names: the vocabulary is closed and
@@ -498,6 +504,13 @@ export function registerGameStateMetrics(
   // operator alerts on, and an alert rule cannot fire on a series that does
   // not exist until its first incident.
   for (const kind of GUILD_BANK_INCIDENTS) guildBankIncidents.inc({ kind }, 0);
+  const wocEscrowQueue = new Counter({
+    name: WOC_ESCROW_QUEUE_TOTAL,
+    help: 'Marketplace escrow-queue outcomes on the per-character save FIFO (started, deadline_refused, depth_refused, books_dirty_refused, flush_failed), by kind.',
+    labelNames: ['kind'],
+    registers: [registry],
+  });
+  for (const kind of WOC_ESCROW_QUEUE_OUTCOMES) wocEscrowQueue.inc({ kind }, 0);
   new Gauge({
     name: WOC_GUILD_BANK_LOG_CACHE,
     help: 'Guild bank activity log read cache: reads, refreshes (the query rate), evictions, busts, live entries, and guilds inside the coalescing floor.',
@@ -708,6 +721,13 @@ export function registerGameStateMetrics(
         charactersCreated.inc();
       } catch {
         // Drop the sample rather than propagate into the create path.
+      }
+    },
+    wocEscrowQueue(outcome: WocEscrowQueueOutcome): void {
+      try {
+        wocEscrowQueue.inc({ kind: outcome });
+      } catch {
+        // Observability must never fail a listing request.
       }
     },
     guildBankIncident(kind: GuildBankIncident): void {

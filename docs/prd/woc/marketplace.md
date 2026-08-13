@@ -202,12 +202,17 @@ others, and the switches ride the `/status` payload so the Sell picker offers
 exactly what the realm will accept.
 
 The taxonomy and the lock predicate are ONE definition
-(`src/sim/exchange_eligibility.ts`) consulted by all three enforcement points:
+(`src/sim/exchange_eligibility.ts`) consulted by all four enforcement points:
 the server's `listingEligibility` (authoritative), the sim's
-`extractTradableCopy` (defence in depth at the bags), and the client's
-`sellableRows` (the picker's pre-filter). They each carried a copy of the same
-four checks before, which is how a category the server accepted could still be
-refused at escrow, or never be offered in the picker at all.
+`extractTradableCopy` (defence in depth at the bags), and the two client
+pre-filters, `sellableRows` (the Sell picker) and `wocTradableSlot`
+(`src/ui/trade_woc_view.ts`, the trade window's exchange arm). They each
+carried a copy of the same checks before, which is how a category the server
+accepted could still be refused at escrow, or never be offered in the picker
+at all. The per-copy locks (a `boundTo`-stamped copy, and since the H6 close a
+still-armed `bindOnTrade` one) come from the shared transfer-lock predicate
+(`src/sim/transfer_lock.ts`), the same rule the gold market, mail, and guild
+bank gate on.
 
 ### Integrity
 
@@ -314,8 +319,10 @@ enabled on a production realm until they are reconciled:
   `ALLOW_DEV_COMMANDS=1` and `WOC_MARKET_DEV_SERVICE=1`),
   `server/woc_market_sweep.ts` (the per-realm advisory-locked sweep shell),
   wiring and sweep registration in `server/main.ts`.
-- Sim custody: `src/sim/inventory_extract.ts` (exact-copy escrow extraction),
-  system-mail delivery through the existing `PostOffice`.
+- Sim custody: `src/sim/broker_custody.ts` (the extraction facade and the
+  grant-back, behind SimContext) over `src/sim/inventory_extract.ts` (the
+  exact-copy escrow legality leaf), system-mail delivery through the existing
+  `PostOffice`.
 - Client: `src/net/woc_market_sdk.ts` (typed, never-throws),
   `src/ui/woc_market_view.ts` (pure core) + `src/ui/woc_market_window.ts`
   (painter shell), wallet signing through the existing Wallet Standard path.
