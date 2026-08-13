@@ -13,74 +13,38 @@ export const pending: Record<string, readonly string[]> = {
     "apiError.cheater_mark.admin_target",
     "apiError.cheater_mark.invalid_duration",
     "apiError.cheater_mark.not_marked",
-    "apiError.cheater_mark.reason_required",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "apiError.cheater_mark.reason_required"
   ],
   "es_ES": [
     "apiError.cheater_mark.admin_target",
     "apiError.cheater_mark.invalid_duration",
     "apiError.cheater_mark.not_marked",
-    "apiError.cheater_mark.reason_required",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "apiError.cheater_mark.reason_required"
   ],
   "fr_FR": [
     "apiError.cheater_mark.admin_target",
     "apiError.cheater_mark.invalid_duration",
     "apiError.cheater_mark.not_marked",
-    "apiError.cheater_mark.reason_required",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "apiError.cheater_mark.reason_required"
   ],
   "fr_CA": [
     "apiError.cheater_mark.admin_target",
     "apiError.cheater_mark.invalid_duration",
     "apiError.cheater_mark.not_marked",
-    "apiError.cheater_mark.reason_required",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "apiError.cheater_mark.reason_required"
   ],
   "en_CA": [],
   "it_IT": [
     "apiError.cheater_mark.admin_target",
     "apiError.cheater_mark.invalid_duration",
     "apiError.cheater_mark.not_marked",
-    "apiError.cheater_mark.reason_required",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "apiError.cheater_mark.reason_required"
   ],
   "de_DE": [
     "apiError.cheater_mark.admin_target",
     "apiError.cheater_mark.invalid_duration",
     "apiError.cheater_mark.not_marked",
-    "apiError.cheater_mark.reason_required",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "apiError.cheater_mark.reason_required"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -90,109 +54,55 @@ export const pending: Record<string, readonly string[]> = {
     "apiError.cheater_mark.admin_target",
     "apiError.cheater_mark.invalid_duration",
     "apiError.cheater_mark.not_marked",
-    "apiError.cheater_mark.reason_required",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "apiError.cheater_mark.reason_required"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "apiError.cheater_mark.admin_target",
     "apiError.cheater_mark.invalid_duration",
     "apiError.cheater_mark.not_marked",
-    "apiError.cheater_mark.reason_required",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "apiError.cheater_mark.reason_required"
   ],
   "nl_NL": [
     "apiError.cheater_mark.admin_target",
     "apiError.cheater_mark.invalid_duration",
     "apiError.cheater_mark.not_marked",
-    "apiError.cheater_mark.reason_required",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "apiError.cheater_mark.reason_required"
   ],
   "pl_PL": [
     "apiError.cheater_mark.admin_target",
     "apiError.cheater_mark.invalid_duration",
     "apiError.cheater_mark.not_marked",
-    "apiError.cheater_mark.reason_required",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "apiError.cheater_mark.reason_required"
   ],
   "id_ID": [
     "apiError.cheater_mark.admin_target",
     "apiError.cheater_mark.invalid_duration",
     "apiError.cheater_mark.not_marked",
-    "apiError.cheater_mark.reason_required",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "apiError.cheater_mark.reason_required"
   ],
   "tr_TR": [
     "apiError.cheater_mark.admin_target",
     "apiError.cheater_mark.invalid_duration",
     "apiError.cheater_mark.not_marked",
-    "apiError.cheater_mark.reason_required",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "apiError.cheater_mark.reason_required"
   ],
   "sv_SE": [
     "apiError.cheater_mark.admin_target",
     "apiError.cheater_mark.invalid_duration",
     "apiError.cheater_mark.not_marked",
-    "apiError.cheater_mark.reason_required",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "apiError.cheater_mark.reason_required"
   ],
   "vi_VN": [
     "apiError.cheater_mark.admin_target",
     "apiError.cheater_mark.invalid_duration",
     "apiError.cheater_mark.not_marked",
-    "apiError.cheater_mark.reason_required",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "apiError.cheater_mark.reason_required"
   ],
   "da_DK": [
     "apiError.cheater_mark.admin_target",
     "apiError.cheater_mark.invalid_duration",
     "apiError.cheater_mark.not_marked",
-    "apiError.cheater_mark.reason_required",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "apiError.cheater_mark.reason_required"
   ]
 };
