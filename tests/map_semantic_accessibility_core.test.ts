@@ -389,7 +389,7 @@ describe('map semantic accessibility core', () => {
     }
     expect(first).toContain('Service: Mailbox');
     expect(first).toContain('Service: Notice Board');
-    expect(first).toContain('12 more markers.');
+    expect(first).toContain('Additional markers: 12.');
 
     const stationCalls = stationName.mock.calls.length;
     const zoneCalls = zoneName.mock.calls.length;

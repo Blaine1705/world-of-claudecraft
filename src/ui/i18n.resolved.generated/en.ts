@@ -8006,7 +8006,7 @@ export const en: EnTranslations = {
       "mapMarkerEmpty": "No meaningful markers are visible.",
       "mapMarkerLocated": "{marker}: {direction}, {distance}.",
       "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
-      "mapMarkerMore": "{count} more markers.",
+      "mapMarkerMore": "Additional markers: {count}.",
       "mapMarkerDirections": {
         "center": "center",
         "north": "north",

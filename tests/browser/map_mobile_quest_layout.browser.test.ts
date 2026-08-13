@@ -7,13 +7,9 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
 import { cleanup } from './_harness';
 
-const VIEWPORT = { width: 844, height: 390 };
 const EPSILON = 1;
 
 beforeEach(async () => {
-  await page.viewport(VIEWPORT.width, VIEWPORT.height);
-  document.documentElement.style.setProperty('--app-vw', `${VIEWPORT.width}px`);
-  document.documentElement.style.setProperty('--app-vh', `${VIEWPORT.height}px`);
   document.body.className = 'mobile-touch game-active mobile-map-quest-open';
 });
 
@@ -50,9 +46,17 @@ function mountWindows(): { quest: HTMLElement; map: HTMLElement; canvas: HTMLCan
 }
 
 describe('mobile map and quest layout', () => {
-  it.each([0.85, 1, 1.4])(
-    'computes two non-overlapping side-by-side windows at 844x390 and UI scale %s',
-    (uiScale) => {
+  it.each([
+    { width: 844, height: 390, uiScale: 0.85 },
+    { width: 844, height: 390, uiScale: 1 },
+    { width: 844, height: 390, uiScale: 1.4 },
+    { width: 820, height: 390, uiScale: 1.4 },
+  ])(
+    'computes non-overlapping windows at $width x $height and UI scale $uiScale',
+    async ({ width, height, uiScale }) => {
+      await page.viewport(width, height);
+      document.documentElement.style.setProperty('--app-vw', `${width}px`);
+      document.documentElement.style.setProperty('--app-vh', `${height}px`);
       document.documentElement.style.setProperty('--ui-scale', String(uiScale));
       const { quest, map, canvas } = mountWindows();
       const questRect = quest.getBoundingClientRect();
@@ -66,7 +70,7 @@ describe('mobile map and quest layout', () => {
       expect(questRect.width).toBeLessThanOrEqual(300 * uiScale + EPSILON);
       expect(canvasRect.width).toBeGreaterThanOrEqual(272 - EPSILON);
       expect(questRect.right + 8).toBeLessThanOrEqual(mapRect.left + EPSILON);
-      expect(mapRect.right).toBeLessThanOrEqual(VIEWPORT.width + EPSILON);
+      expect(mapRect.right).toBeLessThanOrEqual(width + EPSILON);
     },
   );
 });

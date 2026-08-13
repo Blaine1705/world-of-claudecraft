@@ -5535,6 +5535,7 @@
            #map-window made the quest-width expression invalid: custom
            properties inherit down the tree, never sideways or upward. */
         --mobile-map-rail: 58px;
+        --mobile-map-frame: 18px;
         --mobile-map-dual-edge-left: calc(
           max(10px, env(safe-area-inset-left)) /
           var(--ui-scale, 1)
@@ -5562,7 +5563,8 @@
             var(--mobile-map-dual-available-width) -
             var(--mobile-map-dual-gap) -
             var(--mobile-map-rail) -
-            var(--mobile-map-dual-size)
+            var(--mobile-map-dual-size) -
+            var(--mobile-map-frame)
           ),
           300px
         );
@@ -5589,20 +5591,8 @@
         /* #map-window is border-box. Include both 8px window pads and both
            1px borders so --mobile-map-size remains the canvas size instead
            of silently losing 16px to its frame. */
-        width: calc(
-          var(--mobile-map-size) +
-          var(--mobile-map-rail) +
-          var(--window-pad) +
-          var(--window-pad) +
-          2px
-        );
-        max-width: calc(
-          var(--mobile-map-size) +
-          var(--mobile-map-rail) +
-          var(--window-pad) +
-          var(--window-pad) +
-          2px
-        );
+        width: calc(var(--mobile-map-size) + var(--mobile-map-rail) + var(--mobile-map-frame));
+        max-width: calc(var(--mobile-map-size) + var(--mobile-map-rail) + var(--mobile-map-frame));
         transform: none;
       }
     }

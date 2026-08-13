@@ -8006,7 +8006,7 @@ export const en_XA: EnTranslations = {
       "mapMarkerEmpty": "[Ñó ɱéáñíñĝƒúļ ɱáŕķéŕš áŕé ʋíšíƀļé.]",
       "mapMarkerLocated": "[{marker}: {direction}, {distance}.]",
       "mapMarkerLocatedCount": "[{marker}: {count}; {direction}, {distance}.]",
-      "mapMarkerMore": "[{count} ɱóŕé ɱáŕķéŕš.]",
+      "mapMarkerMore": "[Áððíţíóñáļ ɱáŕķéŕš: {count}.]",
       "mapMarkerDirections": {
         "center": "[çéñţéŕ]",
         "north": "[ñóŕţĥ]",
