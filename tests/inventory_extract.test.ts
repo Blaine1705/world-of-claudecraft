@@ -6,9 +6,7 @@
 // here is what keeps an ineligible or already-moved copy out of escrow.
 
 import { describe, expect, it } from 'vitest';
-import { ITEMS } from '../src/sim/data';
 import { extractTradableCopy } from '../src/sim/inventory_extract';
-import { Sim } from '../src/sim/sim';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 
 const def = (over: Partial<ItemDef> = {}): ItemDef =>

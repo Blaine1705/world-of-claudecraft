@@ -486,9 +486,8 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     );
     const { ESCROW_STATEMENT_TIMEOUT_MS, ESCROW_LOCK_TIMEOUT_MS, GUARD_IDLE_TX_TIMEOUT_MS } =
       await import('../../server/woc_market_db');
-    const { ESCROW_QUEUE_WAIT_MS, ESCROW_QUEUE_WARN_MS } = await import(
-      '../../server/woc_market_custody'
-    );
+    const { ESCROW_QUEUE_WAIT_MS, ESCROW_QUEUE_WARN_MS, ESCROW_QUEUE_WARN_THROTTLE_MS } =
+      await import('../../server/woc_market_custody');
     expect(ESCROW_STATEMENT_TIMEOUT_MS).toBe(5_000);
     expect(ESCROW_LOCK_TIMEOUT_MS).toBe(2_000);
     // Equal BY RULING (the idle bound and the lock wait tell one story).
@@ -498,25 +497,50 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     // 5s checkout deadline, and slow waits warn before they refuse.
     expect(ESCROW_QUEUE_WAIT_MS).toBe(5_000);
     expect(ESCROW_QUEUE_WARN_MS).toBe(2_000);
-    expect(ESCROW_QUEUE_WAIT_MS).toBeGreaterThan(ESCROW_QUEUE_WARN_MS);
+    expect(ESCROW_QUEUE_WARN_THROTTLE_MS).toBe(30_000);
+    // The warn must be REACHABLE before the deadline refuses: a warn sitting at
+    // or above the wait would only ever fire on waits that already failed, so
+    // the slow-but-served band (the one an operator wants to see coming) would
+    // never log at all.
+    expect(ESCROW_QUEUE_WARN_MS).toBeLessThan(ESCROW_QUEUE_WAIT_MS);
+    // And the throttle covers at least one whole wait, which is what makes it
+    // one line per burst rather than one line per waiter: a throttle shorter
+    // than the deadline would let a single pile-up log repeatedly.
+    expect(ESCROW_QUEUE_WARN_THROTTLE_MS).toBeGreaterThanOrEqual(ESCROW_QUEUE_WAIT_MS);
     // The escrow transaction heads a character's save FIFO (the H5 custody
     // entry), so its allowance must sit under the ordinary session default
-    // and far under the 30s autosave period; the 60s heavy allowance stays
+    // and far under one autosave period; the 60s heavy allowance stays
     // reserved for the logout-shaped saves whose loss is data loss. It must
     // also sit ABOVE the 2s lock-wait ceiling so a contended row surfaces as
     // the typed 55P03 refusal, never as a statement cancel.
     expect(ESCROW_STATEMENT_TIMEOUT_MS).toBeLessThan(DB_STATEMENT_TIMEOUT_MS);
     expect(ESCROW_STATEMENT_TIMEOUT_MS).toBeLessThan(DB_HEAVY_STATEMENT_TIMEOUT_MS);
     expect(ESCROW_STATEMENT_TIMEOUT_MS).toBeGreaterThan(ESCROW_LOCK_TIMEOUT_MS);
-    // The full escrow FIFO-occupancy ceiling (four bounded statements plus
-    // the lock wait plus the pool checkout) must stay under the 30s autosave
-    // period, or one listing can stall a saveAll worker across a whole wave.
-    // AUTOSAVE_SECONDS is a game.ts module const; 30_000 is its literal, and
-    // this line is what fails if either side moves.
+    // The escrow FIFO-occupancy relation, and it bounds exactly this much: the
+    // FOUR workload statements plus the lock wait plus the pool checkout, kept
+    // under one autosave period so a listing does not stall a saveAll worker
+    // across a whole wave. It is NOT the whole worst case: BEGIN and the SET
+    // LOCAL that installs the allowance run under the 15s session default, and
+    // COMMIT's only hard bound is the 65s driver query_timeout backstop, so a
+    // genuinely wedged job CAN exceed one autosave interval. What bounds the
+    // player-facing impact there is the queue wait deadline plus the depth cap,
+    // not this sum.
+    // AUTOSAVE_SECONDS is a game.ts MODULE-PRIVATE const, so a re-typed 30_000
+    // here would stay green after a re-tuned save cadence; scrape it (comments
+    // stripped first, the file's own idiom) and let the relation follow it.
     const { DB_POOL_CONNECT_TIMEOUT_MS } = await import('../../server/db');
+    const autosaveMatch = codeOnly(read('server/game.ts')).match(
+      /^const AUTOSAVE_SECONDS = (\d+);$/m,
+    );
+    expect(autosaveMatch).not.toBeNull();
+    // A failed scrape yields NaN, and the relation below would then red with a
+    // comparison message that says nothing about the real cause, so the parse
+    // asserts for itself first.
+    const autosaveMs = Number(autosaveMatch?.[1]) * 1000;
+    expect(autosaveMs).toBeGreaterThan(0);
     expect(
       ESCROW_STATEMENT_TIMEOUT_MS * 4 + ESCROW_LOCK_TIMEOUT_MS + DB_POOL_CONNECT_TIMEOUT_MS,
-    ).toBeLessThan(30_000);
+    ).toBeLessThan(autosaveMs);
   });
 
   it('runWithStatementTimeout rejects a non-integer or negative timeout before touching the pool', async () => {

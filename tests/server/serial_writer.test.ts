@@ -4,8 +4,13 @@
 // GameServer's per-character save queue and the marketplace escrow persist
 // share one instance per server, so these pins are what "commit order equals
 // enqueue order" rests on.
-import { describe, expect, it, vi } from 'vitest';
-import { createKeyedSerialWriter } from '../../server/serial_writer';
+//
+// Plus its depth-warned sibling, which GameServer's shared market writer rides:
+// the depth accounting is the whole behavior, and a depth that leaks on a
+// settled or rejected write would either warn forever or (once the throttle
+// swallows it) go silent on a real pile-up.
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { createDepthWarnedSerialWriter, createKeyedSerialWriter } from '../../server/serial_writer';
 
 function gate(): { open: () => void; held: Promise<void> } {
   let open!: () => void;
@@ -95,5 +100,148 @@ describe('createKeyedSerialWriter', () => {
     expect(writer.pendingKeys()).toBe(1);
     expect(await b).toBe('tail');
     expect(writer.pendingKeys()).toBe(0);
+  });
+});
+
+describe('createDepthWarnedSerialWriter', () => {
+  // The wrapper's own literal (server/serial_writer.ts): one warn per minute.
+  const WARN_THROTTLE_MS = 60_000;
+  // Any base past the throttle window, so the very first over-depth write is
+  // eligible to warn (lastWarnMs starts at 0, and the wrapper compares against
+  // the wall clock, not against a start time it captured).
+  const BASE_MS = 1_700_000_000_000;
+  let warnSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(BASE_MS);
+    warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    warnSpy.mockRestore();
+    vi.useRealTimers();
+  });
+
+  it('stays silent while the queue sits at or below warnDepth', async () => {
+    const message = vi.fn((depth: number) => `market writer depth ${depth}`);
+    const write = createDepthWarnedSerialWriter(3, message);
+    const parked = gate();
+    // Three concurrent writes: depth reaches exactly warnDepth, and the
+    // comparison is strict, so the boundary itself must not warn.
+    const running = Promise.all([
+      write(async () => {
+        await parked.held;
+        return 'a';
+      }),
+      write(async () => 'b'),
+      write(async () => 'c'),
+    ]);
+    expect(warnSpy).not.toHaveBeenCalled();
+    expect(message).not.toHaveBeenCalled();
+    parked.open();
+    expect(await running).toEqual(['a', 'b', 'c']);
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+
+  it('warns once past warnDepth, with the caller-supplied message and the real depth', async () => {
+    const message = vi.fn((depth: number) => `market writer depth ${depth}`);
+    const write = createDepthWarnedSerialWriter(2, message);
+    const parked = gate();
+    const running = Promise.all([
+      write(async () => {
+        await parked.held;
+        return 'a';
+      }),
+      write(async () => 'b'),
+      write(async () => 'c'),
+    ]);
+    // The third write is the one that crosses: depth 3 against warnDepth 2, and
+    // the message is the wrapper's ONE behavior, so it must carry that 3 rather
+    // than the threshold it crossed.
+    expect(message).toHaveBeenCalledTimes(1);
+    expect(message).toHaveBeenCalledWith(3);
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    expect(warnSpy).toHaveBeenCalledWith('market writer depth 3');
+    parked.open();
+    await running;
+  });
+
+  it('throttles the warn to one per minute, then warns again past the window', async () => {
+    const message = vi.fn((depth: number) => `market writer depth ${depth}`);
+    const write = createDepthWarnedSerialWriter(1, message);
+    const parked = gate();
+    const held = write(async () => {
+      await parked.held;
+      return 'held';
+    });
+    const queued = [write(async () => 'second')];
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+
+    // Still inside the window: a deeper queue must NOT re-log, or one pile-up
+    // becomes a line per waiter.
+    vi.setSystemTime(BASE_MS + WARN_THROTTLE_MS - 1_000);
+    queued.push(write(async () => 'third'));
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+
+    // Past it: the next over-depth write logs again, carrying the depth it saw.
+    vi.setSystemTime(BASE_MS + WARN_THROTTLE_MS + 1);
+    queued.push(write(async () => 'fourth'));
+    expect(warnSpy).toHaveBeenCalledTimes(2);
+    expect(message).toHaveBeenLastCalledWith(4);
+
+    parked.open();
+    expect(await held).toBe('held');
+    await Promise.all(queued);
+  });
+
+  it('releases depth as writes settle, so a later burst is measured from zero', async () => {
+    const message = vi.fn((depth: number) => `market writer depth ${depth}`);
+    const write = createDepthWarnedSerialWriter(2, message);
+    const parked = gate();
+    const first = write(async () => {
+      await parked.held;
+      return 'a';
+    });
+    const second = write(async () => 'b');
+    expect(warnSpy).not.toHaveBeenCalled();
+    parked.open();
+    expect(await Promise.all([first, second])).toEqual(['a', 'b']);
+
+    // Nothing has warned yet, so the throttle cannot mask a leak here: if the
+    // two settled writes had left their depth behind, this third one would sit
+    // at 3 and log.
+    expect(await write(async () => 'c')).toBe('c');
+    expect(warnSpy).not.toHaveBeenCalled();
+    expect(message).not.toHaveBeenCalled();
+  });
+
+  it('releases depth on a REJECTED write too, never leaking a permanent floor', async () => {
+    const message = vi.fn((depth: number) => `market writer depth ${depth}`);
+    const write = createDepthWarnedSerialWriter(2, message);
+    const boom = [
+      write(async () => {
+        throw new Error('one');
+      }),
+      write(async () => {
+        throw new Error('two');
+      }),
+      write(async () => {
+        throw new Error('three');
+      }),
+    ];
+    // Crossing at depth 3 warns once; each failure still reaches its own caller.
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    await expect(boom[0]).rejects.toThrow('one');
+    await expect(boom[1]).rejects.toThrow('two');
+    await expect(boom[2]).rejects.toThrow('three');
+
+    // Step past the throttle window FIRST: otherwise a leaked depth would be
+    // hidden by the throttle rather than by the accounting, and this pin would
+    // pass for the wrong reason.
+    vi.setSystemTime(BASE_MS + WARN_THROTTLE_MS + 1);
+    expect(await write(async () => 'after')).toBe('after');
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    expect(message).toHaveBeenCalledTimes(1);
   });
 });

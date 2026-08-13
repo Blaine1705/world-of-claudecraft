@@ -276,7 +276,7 @@ describe('Sim.extractTradableCopy (facade delegate)', () => {
   });
 
   it('does not touch the ride when the escrowed item is a DIFFERENT mount', () => {
-    const { itemId, key } = mountFixture();
+    const { key } = mountFixture();
     const other = Object.keys(ITEMS).find(
       (id) => ITEMS[id].kind === 'mount' && (ITEMS[id] as { mount?: string }).mount !== key,
     );

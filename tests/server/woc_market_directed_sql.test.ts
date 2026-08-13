@@ -12,7 +12,7 @@
 
 import type { Pool } from 'pg';
 import { describe, expect, it, vi } from 'vitest';
-import { PgWocMarketDb, SETTLED_OFFER_GRACE_MS } from '../../server/woc_market_db';
+import { PgWocMarketDb, SETTLED_OFFER_GRACE_MS, TxNeverStarted } from '../../server/woc_market_db';
 import type { CharacterState } from '../../src/sim/sim';
 
 const REALM = 'Claudemoon';
@@ -1117,6 +1117,27 @@ describe('the atomic save-and-book, in SQL', () => {
     expect(seen.some((t) => t.includes('woc_market_custody_claims'))).toBe(false);
     expect(seen.at(-1)).toBe('ROLLBACK');
   });
+
+  it('surfaces a never-started transaction as the TYPED tag, not a bare error', async () => {
+    // This method has no TxNeverStarted catch on purpose (its caller owns the
+    // grant-side decision), which makes it the honest place to prove the tag
+    // is a real exported class rather than a comment: escrowInsertListing
+    // maps the tag to 'contended' by an instanceof test, so a tag that
+    // stopped being thrown (or stopped being this class) would silently send
+    // that provably-nothing-ran failure back down the ambiguous park arm.
+    const pool = {
+      query: vi.fn(),
+      connect: async () => {
+        throw new Error('timeout exceeded when trying to connect');
+      },
+    } as unknown as Pool;
+    await expect(
+      new PgWocMarketDb(pool).saveDeliveredCharacterBooked(SAVE, 'ref-1'),
+    ).rejects.toBeInstanceOf(TxNeverStarted);
+    await expect(
+      new PgWocMarketDb(pool).saveDeliveredCharacterBooked(SAVE, 'ref-1'),
+    ).rejects.toThrow('transaction never started');
+  });
 });
 
 describe('the escrow listing transaction, in SQL', () => {
@@ -1188,16 +1209,101 @@ describe('the escrow listing transaction, in SQL', () => {
     expect(seq.at(-1)).toBe('ROLLBACK');
   });
 
-  it("maps a lock-contention throw to the typed 'contended' refusal", async () => {
+  it.each([
+    ['55P03', 'canceling statement due to lock timeout'],
+    ['40P01', 'deadlock detected'],
+    ['25P03', 'terminating connection due to idle-in-transaction timeout'],
+  ])('maps the %s contention code to the typed refusal', async (code, message) => {
+    // All three are the same answer to the seller (retry; the copy restores),
+    // and all three must reach it through isLockContention rather than the
+    // 500 an unmapped code would produce: 40P01 is this transaction chosen as
+    // the deadlock victim, 25P03 its own idle-in-transaction bound firing on
+    // a stalled event loop.
     const { pool } = recordingTxPool((text) => {
       if (text.includes('FOR UPDATE')) {
-        throw Object.assign(new Error('canceling statement due to lock timeout'), {
-          code: '55P03',
-        });
+        throw Object.assign(new Error(message), { code });
       }
       return undefined;
     });
     const out = await new PgWocMarketDb(pool).escrowInsertListing(SAVE, LISTING);
+    expect(out).toEqual({ ok: false, reason: 'contended' });
+  });
+
+  it("maps a CODELESS BEGIN failure to 'contended': nothing could have committed", async () => {
+    // A pooled client whose socket died since its last use is not revalidated
+    // at checkout, so it fails HERE with a codeless connection error instead
+    // of at connect, in the same correlated volume as checkout timeouts.
+    // withTx tags that as TxNeverStarted; without the tag this class parked as
+    // ambiguous, which quarantine-kicked the seller for a transaction that
+    // provably never began.
+    const { pool, sql } = recordingTxPool((text) => {
+      if (text === 'BEGIN') throw new Error('Connection terminated unexpectedly');
+      return undefined;
+    });
+    const out = await new PgWocMarketDb(pool).escrowInsertListing(SAVE, LISTING);
+    expect(out).toEqual({ ok: false, reason: 'contended' });
+    // A never-started transaction owes no ROLLBACK, and issuing one on the
+    // dead session is what the tag's early rethrow exists to skip.
+    expect(sql()).toEqual(['BEGIN']);
+  });
+
+  it('does NOT widen the never-started tag past BEGIN: a later codeless throw rejects', async () => {
+    // The companion negative. Once a statement has run, a codeless failure
+    // proves nothing about what committed, so it must stay a rejection for
+    // the service's ambiguous arm (park the copy, loudly) rather than
+    // collapsing into the retry refusal whose compensation restores it.
+    const { pool } = recordingTxPool((text) => {
+      if (text.includes('FOR UPDATE')) throw new Error('Connection terminated unexpectedly');
+      return undefined;
+    });
+    const out = await new PgWocMarketDb(pool)
+      .escrowInsertListing(SAVE, LISTING)
+      .catch((err: unknown) => err);
+    expect(out).not.toEqual({ ok: false, reason: 'contended' });
+    expect(out).not.toBeInstanceOf(TxNeverStarted);
+    // The ORIGINAL error reaches the caller. This is the half that pins
+    // withTx's code-preference expression: while its helper dereferenced the
+    // still-null asyncErr, every codeless failure in this module arrived as
+    // "TypeError: Cannot read properties of null (reading 'code')" instead,
+    // which classified the same but erased the cause from the incident.
+    expect(out).toBeInstanceOf(Error);
+    expect((out as Error).message).toBe('Connection terminated unexpectedly');
+  });
+
+  it('prefers a CODED async termination over the codeless shell it leaves behind', async () => {
+    // The other half of that same expression, and the reason it cannot simply
+    // always keep the thrown error: the idle-in-transaction kill arrives on
+    // the client's 'error' event while no statement is in flight, and the
+    // statement that then fails carries only a generic not-queryable shell
+    // with no code. Preferring the coded one is what keeps the 25P03
+    // contention arm live instead of dropping a retryable refusal into the
+    // 500 arm. The live-Postgres twin needs TEST_DATABASE_URL
+    // (woc_market_bond_pg_integration), so the arm is pinned here too, where
+    // ordinary CI always runs.
+    let onError: ((err: unknown) => void) | undefined;
+    const query = async (text: string) => {
+      if (text.includes('FOR UPDATE')) {
+        onError?.(
+          Object.assign(new Error('terminating connection due to idle-in-transaction timeout'), {
+            code: '25P03',
+          }),
+        );
+        throw new Error('Client has encountered a connection error and is not queryable');
+      }
+      return { rows: [], rowCount: 1 };
+    };
+    const client = {
+      query,
+      release: () => {},
+      on: (_event: string, fn: (err: unknown) => void) => {
+        onError = fn;
+      },
+      removeListener: () => {},
+    };
+    const pool = { query, connect: async () => client } as unknown as Pool;
+    const out = await new PgWocMarketDb(pool).escrowInsertListing(SAVE, LISTING);
+    // Contended, not a rejection: reached only by throwing the captured async
+    // error in place of the codeless one the statement produced.
     expect(out).toEqual({ ok: false, reason: 'contended' });
   });
 

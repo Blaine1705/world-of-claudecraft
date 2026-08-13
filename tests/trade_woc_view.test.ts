@@ -82,6 +82,30 @@ describe('eligibility is shared with the server, not restated', () => {
     expect(wocTradableSlot(slot('no_such_item'), TABLE)).toBe(false);
   });
 
+  it('refuses an ARMED bind-on-trade copy, and accepts the same copy disarmed', () => {
+    // The two arms of this one window answer differently on purpose: a gold
+    // trade has a named recipient for a bind-on-trade stamp to land on, so an
+    // armed copy passes there, while the $WOC arm sells through the exchange
+    // and has nobody to bind to. The control is the SAME payload minus the
+    // flag, so the refusal is attributable to the arming alone.
+    const armed: InvSlot = {
+      itemId: EPIC.id,
+      count: 1,
+      instance: { signer: 'Aldan', bindOnTrade: true },
+    };
+    const disarmed: InvSlot = { itemId: EPIC.id, count: 1, instance: { signer: 'Aldan' } };
+    expect(wocTradableSlot(armed, TABLE)).toBe(false);
+    expect(wocTradableSlot(disarmed, TABLE)).toBe(true);
+    // And through the model, because that is what the window renders: the
+    // armed copy lands in the ineligible list, so the arm reports it is still
+    // waiting for goods rather than offering to buy something it cannot.
+    const model = buildWocTradeModel(input({ theirStaged: [armed] }));
+    expect(model.eligible).toEqual([]);
+    expect(model.ineligible).toEqual([armed]);
+    expect(model.sendHint).toBe('hudChrome.trade.woc.hintAwaitTheirItems');
+    expect(model.canSend).toBe(false);
+  });
+
   it('agrees with the real ITEMS table on a real mount', () => {
     // Guards against the fixture above quietly diverging from shipped content:
     // mounts trade at every rarity, which is a deliberate policy decision.

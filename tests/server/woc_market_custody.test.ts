@@ -133,6 +133,35 @@ describe('extractCopy requires the seller live in this realm process', () => {
     });
   });
 
+  it('puts the copy BACK when the session races a teardown mid-extraction', () => {
+    // The one arm where the bags are already mutated before the refusal: the
+    // extraction succeeded, then serializeCharacterForPersist answered null
+    // (the session tore down, or quarantined, between the two calls). Without
+    // the restore the copy is simply gone, and the seller is told 'offline'
+    // about an item that no longer exists anywhere. The host's persist
+    // snapshot is decoupled from the session lookup here on purpose: the two
+    // agree in the shared fake, and this case is exactly where they must not.
+    const { host } = makeHost({ serializeCharacterForPersist: () => null });
+    const pid = liveSession(host);
+    host.sim.addItem('rusty_hatchet', 1, pid, { silent: true });
+    const meta = host.sim.players.get(pid);
+    if (!meta) throw new Error('no live player meta');
+    const index = meta.inventory.findIndex((s) => s.itemId === 'rusty_hatchet');
+    expect(index, 'the fixture item must be in the bags to extract').toBeGreaterThanOrEqual(0);
+    const before = meta.inventory
+      .filter((s) => s.itemId === 'rusty_hatchet')
+      .reduce((n, s) => n + s.count, 0);
+    const custody = createWocMarketCustody(host);
+    expect(custody.extractCopy(7, 2, { index, itemId: 'rusty_hatchet' })).toEqual({
+      ok: false,
+      reason: 'offline',
+    });
+    const after = meta.inventory
+      .filter((s) => s.itemId === 'rusty_hatchet')
+      .reduce((n, s) => n + s.count, 0);
+    expect(after, 'the extracted unit is restored, not lost').toBe(before);
+  });
+
   it('refuses not_yours when the live character belongs to another account', () => {
     // The account check happens BEFORE any bag mutation: a mismatched pair must
     // never reach extractTradableCopy.

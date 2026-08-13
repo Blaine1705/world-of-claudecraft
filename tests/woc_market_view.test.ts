@@ -283,6 +283,23 @@ describe('sellableRows: the sell-tab pre-filter over real ITEMS', () => {
     expect(sellableRows(inventory, 'epic', BOTH_ON)).toEqual([]);
   });
 
+  it('drops an ARMED bind-on-trade copy, and keeps the same copy disarmed', () => {
+    // bindOnTrade with no stamp yet: the copy binds to whoever receives it
+    // next, and an escrow listing is an anonymous pipe with nobody for the
+    // stamp to land on. The picker has to hide it, or the seller reaches the
+    // listing form for an item the server's extraction then refuses.
+    // The control is the SAME payload minus the flag, so the drop is
+    // attributable to the arming rather than to anything else in the fixture.
+    const armed: InvSlot[] = [
+      { itemId: epicEquipId, count: 1, instance: { signer: 'Selara', bindOnTrade: true } },
+    ];
+    expect(sellableRows(armed, 'epic', BOTH_ON)).toEqual([]);
+    const disarmed: InvSlot[] = [{ itemId: epicEquipId, count: 1, instance: { signer: 'Selara' } }];
+    expect(sellableRows(disarmed, 'epic', BOTH_ON)).toEqual([
+      { index: 0, itemId: epicEquipId, quality: 'epic', instance: { signer: 'Selara' } },
+    ]);
+  });
+
   it('lets a rolled epic quality lift a rare def over an epic floor', () => {
     const instance = { rolled: { quality: 'epic' } };
     expect(sellableRows([{ itemId: rareEquipId, count: 1, instance }], 'epic', BOTH_ON)).toEqual([

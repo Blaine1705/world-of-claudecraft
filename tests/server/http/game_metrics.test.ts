@@ -29,6 +29,7 @@ import {
   WOC_COPPER_CREDITED_TOTAL,
   WOC_COPPER_SPENT_TOTAL,
   WOC_DB_POOL_CLIENTS,
+  WOC_ESCROW_QUEUE_TOTAL,
   WOC_FISHING_CASTS_TOTAL,
   WOC_FISHING_CATCHES_TOTAL,
   WOC_FISHING_EARLY_REELS_TOTAL,
@@ -60,6 +61,7 @@ import {
 import {
   GENERAL_CHAT_QUOTA_DB_OUTCOMES,
   GUILD_BANK_INCIDENTS,
+  WOC_ESCROW_QUEUE_OUTCOMES,
   WS_DROP_CAUSES,
 } from '../../../server/http/game_signals';
 
@@ -470,6 +472,67 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     );
   });
 
+  it('pre-registers every escrow-queue outcome at zero and increments by kind', async () => {
+    const registry = new Registry();
+    const counters = registerGameStateMetrics(registry, stubSource());
+
+    expect(WOC_ESCROW_QUEUE_TOTAL).toBe('woc_escrow_queue_total');
+    // The whole vocabulary as literals: the refusal kinds are the production
+    // readout for the listing FIFO coupling (a refused or slow queue is
+    // otherwise visible only as a throttled warn line), so a rename must fail
+    // here rather than silently retire an operator's alert rule.
+    expect(WOC_ESCROW_QUEUE_OUTCOMES).toEqual([
+      // The throughput baseline the four failure kinds are read against: a
+      // refusal rate means nothing without the jobs that started.
+      'started',
+      // Waited past the queue deadline. Nothing was extracted (the job is
+      // cancelled before it runs), so this is contention, not loss.
+      'deadline_refused',
+      // The one-job-per-character depth cap refused a second listing.
+      'depth_refused',
+      // Dirty guild books could not be flushed first, so the job never ran:
+      // flushing from inside the job would self-deadlock the FIFO.
+      'books_dirty_refused',
+      // The pre-job guild-book flush itself failed.
+      'flush_failed',
+    ]);
+
+    // Scrape BEFORE any increment: prom counters cannot backfill, so a rate
+    // rule over these series has to see them from boot, not from the first
+    // refusal (which is exactly the moment nobody wants a gap).
+    const zeroed = await registry.metrics();
+    expect(zeroed).toContain(`# TYPE ${WOC_ESCROW_QUEUE_TOTAL} counter`);
+    for (const kind of WOC_ESCROW_QUEUE_OUTCOMES) {
+      expect(
+        sampleValue(zeroed, new RegExp(`^woc_escrow_queue_total\\{kind="${kind}"\\} (\\d+)$`, 'm')),
+        kind,
+      ).toBe('0');
+    }
+
+    counters.wocEscrowQueue('started');
+    counters.wocEscrowQueue('started');
+    counters.wocEscrowQueue('started');
+    counters.wocEscrowQueue('depth_refused');
+
+    const text = await registry.metrics();
+    expect(sampleValue(text, /^woc_escrow_queue_total\{kind="started"\} (\d+)$/m)).toBe('3');
+    expect(sampleValue(text, /^woc_escrow_queue_total\{kind="depth_refused"\} (\d+)$/m)).toBe('1');
+    // Each outcome lands on its OWN series: a depth refusal is not a deadline
+    // refusal, and the untouched kinds stay at their pre-registered zero.
+    expect(sampleValue(text, /^woc_escrow_queue_total\{kind="deadline_refused"\} (\d+)$/m)).toBe(
+      '0',
+    );
+    expect(sampleValue(text, /^woc_escrow_queue_total\{kind="books_dirty_refused"\} (\d+)$/m)).toBe(
+      '0',
+    );
+    expect(sampleValue(text, /^woc_escrow_queue_total\{kind="flush_failed"\} (\d+)$/m)).toBe('0');
+    // The other direction: the exposed vocabulary is exactly the closed set, so
+    // no character id, listing id, or account ever reaches a label.
+    expect(labelValues(text, 'kind', WOC_ESCROW_QUEUE_TOTAL)).toEqual(
+      new Set(WOC_ESCROW_QUEUE_OUTCOMES),
+    );
+  });
+
   it('swallows a throwing counter in every sink method and never propagates', () => {
     const registry = new Registry();
     const counters = registerGameStateMetrics(registry, stubSource());
@@ -495,6 +558,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       WOC_FISHING_EMPTY_HOOKS_TOTAL,
       WOC_ROD_FEE_PAYMENTS_TOTAL,
       WOC_GUILD_BANK_INCIDENTS_TOTAL,
+      WOC_ESCROW_QUEUE_TOTAL,
       WOC_BATTLEGROUND_MATCHES_TOTAL,
       WOC_BATTLEGROUND_DURATION_SECONDS_TOTAL,
       WOC_BATTLEGROUND_CAPTURES_TOTAL,
@@ -535,6 +599,10 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     expect(() => counters.fishingEmptyHook('mirefen_marsh', '1')).not.toThrow();
     expect(() => counters.rodFeePaid(ROD_FEE_RECIPE_IDS[0])).not.toThrow();
     expect(() => counters.guildBankIncident('reconcile')).not.toThrow();
+    // The escrow-queue counter sits on the listing request path: a prom failure
+    // there must never turn an observable refusal into a thrown 500.
+    expect(() => counters.wocEscrowQueue('started')).not.toThrow();
+    expect(() => counters.wocEscrowQueue('deadline_refused')).not.toThrow();
   });
 
   it('bounds the ws direction label to in/out and emits no per-player label anywhere', async () => {

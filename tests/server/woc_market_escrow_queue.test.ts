@@ -43,13 +43,20 @@ vi.mock('../../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../../server/game';
+import {
+  noopGameMetricsCounters,
+  setGameMetricsCounters,
+  type WocEscrowQueueOutcome,
+} from '../../server/http/game_signals';
 import type { CharacterSaveArgs, WocMarketCustody } from '../../server/woc_market';
 import { WocMarketService } from '../../server/woc_market';
 import { createWocMarketCustody } from '../../server/woc_market_custody';
 import { createDevWocMarketEconomy } from '../../server/woc_market_proxy';
 import type { WocListingParams } from '../../server/woc_market_rules';
 import { WOC_MARKET_RESTRICTED_POLICY } from '../../server/woc_market_rules';
+import { WOC_MARKET_RETURN_LETTER } from '../../src/sim/content/letters';
 import { ITEMS } from '../../src/sim/data';
+import type { GuildBankOpDelta } from '../../src/sim/guild_bank';
 import type { CharacterState } from '../../src/sim/sim';
 import { stripComments } from '../helpers/strip_comments';
 import { FakeWocMarketDb } from './helpers/fake_woc_market_db';
@@ -93,6 +100,68 @@ function fakeWs(): unknown {
   return { readyState: 1, send: () => {}, close: () => {}, terminate: () => {} };
 }
 
+/** A socket that KEEPS what the server sent, for the kick wire pins (the plain
+ *  fakeWs above drops every frame). */
+function recordingWs(): { sent: string[]; ws: unknown } {
+  const sent: string[] = [];
+  return {
+    sent,
+    ws: {
+      readyState: 1,
+      bufferedAmount: 0,
+      send: (payload: string) => {
+        sent.push(payload);
+      },
+      close: () => {},
+      terminate: () => {},
+    },
+  };
+}
+
+/** The error frames a socket received: the kick signal, separated from the
+ *  ordinary social/snapshot traffic a live session also gets. */
+function errorFrames(sent: string[]): Array<{ t: string; error?: string }> {
+  return sent
+    .map((payload) => JSON.parse(payload) as { t: string; error?: string })
+    .filter((frame) => frame.t === 'error');
+}
+
+/** Install a recording game-metrics sink and return the escrow-queue kinds it
+ *  collects, in emission order. afterEach restores the noop sink. */
+function recordEscrowKinds(): WocEscrowQueueOutcome[] {
+  const kinds: WocEscrowQueueOutcome[] = [];
+  setGameMetricsCounters({
+    ...noopGameMetricsCounters,
+    wocEscrowQueue(kind) {
+      kinds.push(kind);
+    },
+  });
+  return kinds;
+}
+
+/** A treasury-only book delta. The inverse subtracts copperDelta straight back
+ *  off the live book, so a revert is observable as one number rather than only
+ *  as a cleared map. */
+function goldDelta(copperDelta: number): GuildBankOpDelta {
+  return {
+    op: 'deposit_gold',
+    itemId: null,
+    count: null,
+    instance: null,
+    copperDelta,
+    purchasedSlotsBefore: 0,
+    purchasedSlotsAfter: 0,
+  };
+}
+
+/** A loaded book plus one unflushed deposit this session owns: the shape a
+ *  terminal escrow signal has to unwind. */
+function dirtyOwnBook(rig: Rig): void {
+  rig.server.sim.loadGuildBank(GUILD, { treasury: 1000, inventory: [], purchasedSlots: 24 });
+  rig.session.dirtyGuildBanks.set(GUILD, 1);
+  rig.session.unflushedGuildBankOps.set(GUILD, [goldDelta(500)]);
+}
+
 interface Rig {
   server: GameServer;
   session: ClientSession;
@@ -110,7 +179,9 @@ interface Rig {
 const blobHoldsItem = (state: CharacterState, itemId: string): boolean =>
   state.inventory.some((s) => s.itemId === itemId);
 
-function makeRig(opts: { escrowWaitMs?: number } = {}): Rig {
+function makeRig(
+  opts: { escrowWaitMs?: number; escrowWarnMs?: number; escrowWarnThrottleMs?: number } = {},
+): Rig {
   const server = new GameServer();
   const join = (accountId: number, characterId: number, name: string): ClientSession => {
     const joined = server.join(fakeWs() as never, accountId, characterId, name, 'warrior', null);
@@ -215,11 +286,13 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.restoreAllMocks();
+  setGameMetricsCounters(noopGameMetricsCounters);
 });
 
 describe('the escrow critical section rides the per-character save queue (H5)', () => {
   it('a stale autosave snapshot can never resurrect an escrowed item', async () => {
     const rig = makeRig();
+    const kinds = recordEscrowKinds();
     const gate = holdNextAutosave(rig);
     const autosaveDone = rig.server.saveCharacter(rig.session);
     await vi.waitFor(() => expect(dbMock.saveCharacterState).toHaveBeenCalledTimes(1));
@@ -247,6 +320,9 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     expect(rig.commits.at(-1)?.holdsItem).toBe(false);
     expect(rig.bagsHold(EPIC_ITEM)).toBe(false);
     expect(rig.db.escrowSaves).toHaveLength(1);
+    // The production readout for the arm that RAN: one job started, no
+    // refusal of any kind.
+    expect(kinds).toEqual(['started']);
   });
 
   it('the escrow blob is serialized inside the job, after every queued commit', async () => {
@@ -285,6 +361,13 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
       priorGm: false,
       stowedPet,
     };
+    // Non-vacuity control: the LIVE body stands somewhere else entirely and
+    // carries no stowed pet, so neither pin below can be satisfied by a raw
+    // serialization that happens to agree with the fixup.
+    const live = rig.server.sim.serializeCharacter(rig.session.pid);
+    if (!live) throw new Error('missing live serialization');
+    expect(live.pos).not.toEqual({ x: 111, z: 222 });
+    expect(live.pet).not.toEqual(stowedPet);
     const listed = await createListing(rig);
     if (!listed.ok) throw new Error(`createListing refused: ${listed.reason}`);
     const blob = rig.db.escrowSaves[0]?.state;
@@ -292,6 +375,28 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     // Non-null on purpose: a null pet also serializes as null with the fixups
     // dropped, so only a real stowed pet can catch the regression.
     expect(blob?.pet).toEqual(stowedPet);
+  });
+
+  it('the escrow blob carries the JAIL fixup, cage position and sentence alike', async () => {
+    const rig = makeRig();
+    // The other half of the same rule, and the one that is a moderation
+    // escape rather than a cosmetic slip: a blob written from the raw
+    // serialization drops the sentence, so the next load walks free.
+    const jailed = { returnPos: { x: 40, z: -60 }, returnFacing: 1.25, until: 1_800_000_000_000 };
+    rig.session.jailed = jailed;
+    const live = rig.server.sim.serializeCharacter(rig.session.pid);
+    if (!live) throw new Error('missing live serialization');
+    const listed = await createListing(rig);
+    if (!listed.ok) throw new Error(`createListing refused: ${listed.reason}`);
+    const blob = rig.db.escrowSaves[0]?.state;
+    // jailCageSpawn(21): cage index 1, so angle 0 and radius 11 off
+    // JAIL_CENTER (-12000, -12000).
+    expect(blob?.pos).toEqual({ x: -11_989, z: -12_000 });
+    expect(blob?.jail).toEqual(jailed);
+    // Non-vacuity control: the live body is nowhere near the cage and carries
+    // no sentence of its own, so only the fixup can put either in the blob.
+    expect(live.pos).not.toEqual({ x: -11_989, z: -12_000 });
+    expect(live.jail).toBeUndefined();
   });
 
   it('grant and snapshot blobs carry the fixups too', () => {
@@ -335,8 +440,22 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     expect(rig.server.sim.postOffice.mail).toHaveLength(mailBefore);
     // Positive control for that absence: the return-parcel arm is real and
     // fires when the extraction pid is genuinely gone from the sim.
-    rig.custody.restoreCopy(999_999, SELLER_CHAR, { itemId: EPIC_ITEM, count: 1 });
+    const idsBefore = new Set(rig.server.sim.postOffice.mail.map((m) => m.id));
+    const mailSpy = vi.spyOn(rig.server, 'persistMailBlob');
+    rig.custody.restoreCopy(999_999, SELLER_CHAR, { itemId: EPIC_ITEM, count: 2 });
     expect(rig.server.sim.postOffice.mail).toHaveLength(mailBefore + 1);
+    const booked = rig.server.sim.postOffice.mail.filter((m) => !idsBefore.has(m.id));
+    expect(booked).toHaveLength(1);
+    // The whole parcel, not just its existence: addressed by the stable
+    // character-id mailbox key, carrying the RETURN letter (never the delivery
+    // or sold-notice twin) and the EXACT slot handed in.
+    expect(booked[0]?.recipientKey).toBe(String(SELLER_CHAR));
+    expect(booked[0]?.letterId).toBe('woc_market_return');
+    expect(booked[0]?.letterId).toBe(WOC_MARKET_RETURN_LETTER.letterId);
+    expect(booked[0]?.items).toEqual([{ itemId: EPIC_ITEM, count: 2 }]);
+    // The in-memory book alone is not the item: the blob write is what makes
+    // the parcel survive a restart.
+    expect(mailSpy).toHaveBeenCalledTimes(1);
   });
 
   it('a refusal mid-leave restores the LIVE bags, never a second rail', async () => {
@@ -389,6 +508,63 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     await vi.waitFor(() => expect(rig.session.left).toBe(true));
   });
 
+  it('a terminal escrow signal for a pid that no longer owns the character does nothing', async () => {
+    const rig = makeRig();
+    dirtyOwnBook(rig);
+    const rec = recordingWs();
+    rig.session.ws = rec.ws as never;
+    // The extraction pid IS the identity: the character was turned over to
+    // another session between the job and this signal, and tearing down the
+    // new holder over the old job's outcome would be the takeover bug.
+    rig.server.escrowSessionLost(rig.session.pid + 1, SELLER_CHAR, 'ambiguous');
+    await settle();
+    expect(rig.session.escrowQuarantined).toBe(false);
+    expect(rig.session.left).toBe(false);
+    expect(errorFrames(rec.sent)).toEqual([]);
+    // Nothing was unwound either: the marks, the log, and the live book are
+    // exactly as they were.
+    expect(rig.session.dirtyGuildBanks.get(GUILD)).toBe(1);
+    expect(rig.session.unflushedGuildBankOps.get(GUILD)).toHaveLength(1);
+    expect(rig.server.sim.serializeGuildBank(GUILD)?.treasury).toBe(1000);
+  });
+
+  it('an ambiguous loss reverts this session own book ops, quarantines, and kicks', async () => {
+    const rig = makeRig();
+    dirtyOwnBook(rig);
+    const rec = recordingWs();
+    rig.session.ws = rec.ws as never;
+    rig.server.escrowSessionLost(rig.session.pid, SELLER_CHAR, 'ambiguous');
+    expect(rig.session.escrowQuarantined).toBe(true);
+    // The 500 comes back off the LIVE book: this session can never persist
+    // it, so leaving it there would be guild copper no save will ever back.
+    expect(rig.server.sim.serializeGuildBank(GUILD)?.treasury).toBe(500);
+    expect(rig.session.dirtyGuildBanks.size).toBe(0);
+    expect(rig.session.unflushedGuildBankOps.size).toBe(0);
+    await vi.waitFor(() => expect(rig.session.left).toBe(true));
+    // The WIRE literal is the matcher-covered takeover string. The internal
+    // 'market escrow ambiguous' kind is a LEAVE reason for the log only: on
+    // the wire it would reach the client as an unlocalizable mystery.
+    expect(errorFrames(rec.sent)).toEqual([{ t: 'error', error: 'character taken over' }]);
+    expect(rec.sent.join('|')).not.toContain('market escrow');
+  });
+
+  it('an ambiguous loss on an already departing session quarantines without a second kick', async () => {
+    const rig = makeRig();
+    const rec = recordingWs();
+    rig.session.ws = rec.ws as never;
+    const leaveSpy = vi.spyOn(rig.server, 'leave');
+    // A leave that already began: the quarantine flag still has to land (its
+    // queued flush re-checks it, which is what stops that flush committing
+    // bags-without-the-copy), but the teardown must not run twice.
+    rig.session.left = true;
+    rig.server.escrowSessionLost(rig.session.pid, SELLER_CHAR, 'ambiguous');
+    await settle();
+    expect(rig.session.escrowQuarantined).toBe(true);
+    expect(rig.session.left).toBe(true);
+    expect(leaveSpy).not.toHaveBeenCalled();
+    expect(errorFrames(rec.sent)).toEqual([]);
+  });
+
   it('flushes dirty guild books BEFORE the escrow write, atomically with their character half', async () => {
     const rig = makeRig();
     rig.server.sim.loadGuildBank(GUILD, { treasury: 1000, inventory: [], purchasedSlots: 24 });
@@ -424,8 +600,34 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     expect(rig.db.escrowSaves).toHaveLength(0);
   });
 
+  it('refuses contended when the guild-book flush THROWS, never a 500', async () => {
+    const rig = makeRig();
+    const kinds = recordEscrowKinds();
+    dirtyOwnBook(rig);
+    // The flush save dies inside its transaction: the books are simply not
+    // provably clean, which is the bounded typed refusal the seller retries,
+    // not an exception out of the request.
+    dbMock.saveCharacterAndGuildBankState.mockRejectedValueOnce(new Error('books down'));
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const res = await createListing(rig);
+    const logged = errSpy.mock.calls.map((call) => String(call[0]));
+    errSpy.mockRestore();
+    expect(res).toEqual({ ok: false, reason: 'contended' });
+    // The job never started, so nothing left the bags and nothing crossed the
+    // escrow edge: a refusal here owes no compensation.
+    expect(rig.bagsHold(EPIC_ITEM)).toBe(true);
+    expect(rig.db.escrowSaves).toHaveLength(0);
+    // Booked under its own kind (the throw is a different operator story from
+    // a queue that is merely busy), and still loud in the log.
+    expect(kinds).toEqual(['flush_failed']);
+    expect(
+      logged.some((line) => line.includes(`guild-book flush failed for character ${SELLER_CHAR}`)),
+    ).toBe(true);
+  });
+
   it('refuses contended within the wait deadline instead of hanging, with nothing extracted', async () => {
     const rig = makeRig({ escrowWaitMs: 50 });
+    const kinds = recordEscrowKinds();
     let releaseQueue!: () => void;
     const held = new Promise<void>((resolve) => {
       releaseQueue = resolve;
@@ -444,6 +646,10 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     expect(res).toEqual({ ok: false, reason: 'contended' });
     expect(rig.bagsHold(EPIC_ITEM)).toBe(true);
     expect(rig.db.escrowSaves).toHaveLength(0);
+    // The refusal an operator most needs to see is booked under its OWN kind:
+    // the three 'contended' producers answer the same literal on the wire, so
+    // the counter is the only thing that tells them apart.
+    expect(kinds).toEqual(['deadline_refused']);
     releaseQueue();
     await wedge;
     await settle();
@@ -453,6 +659,9 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     expect(rig.db.escrowSaves).toHaveLength(0);
     const retry = await createListing(rig);
     expect(retry.ok).toBe(true);
+    // The cancelled job books nothing between the two: it returns before the
+    // 'started' counter, which is what proves it never ran the job body.
+    expect(kinds).toEqual(['deadline_refused', 'started']);
   });
 
   it('a job that STARTED before the deadline answers its real outcome, never contended', async () => {
@@ -476,6 +685,7 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     // produce this refusal (the deadline path answers the identical literal,
     // which let a cap-less build pass an earlier version of this pin).
     const rig = makeRig({ escrowWaitMs: 60_000 });
+    const kinds = recordEscrowKinds();
     let releaseQueue!: () => void;
     const held = new Promise<void>((resolve) => {
       releaseQueue = resolve;
@@ -491,14 +701,119 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     const second = await createListing(rig);
     expect(Date.now() - startedAt).toBeLessThan(2_000);
     expect(second).toEqual({ ok: false, reason: 'contended' });
+    // Booked as the DEPTH refusal, not the deadline one: the wait deadline
+    // here is unreachable, so a build that answered from the wrong arm would
+    // show up as the wrong kind.
+    expect(kinds).toEqual(['depth_refused']);
     releaseQueue();
     await wedge;
     const firstOut = await first;
     expect(firstOut.ok).toBe(true);
+    expect(kinds).toEqual(['depth_refused', 'started']);
+  });
+
+  it('holds the depth-cap slot until the abandoned WORK settles, not until the waiter returns', async () => {
+    // A deadline long enough that "immediate" and "waited it out" are far
+    // apart on the clock, so the second refusal's ARM is legible from the
+    // elapsed time as well as from the counter.
+    const rig = makeRig({ escrowWaitMs: 300 });
+    const kinds = recordEscrowKinds();
+    let releaseQueue!: () => void;
+    const held = new Promise<void>((resolve) => {
+      releaseQueue = resolve;
+    });
+    const wedge = rig.server.enqueueCharacterWrite(SELLER_CHAR, async () => {
+      await held;
+    });
+    const first = await createListing(rig);
+    expect(first).toEqual({ ok: false, reason: 'contended' });
+    expect(kinds).toEqual(['deadline_refused']);
+
+    // The waiter has returned, but its ABANDONED work is still queued on the
+    // wedged FIFO. Releasing the depth-cap slot here (rather than when that
+    // work settles) is what would let 5s retries stack flush after flush onto
+    // a queue that is already wedged, so the retry must still refuse.
+    const startedAt = Date.now();
+    const second = await createListing(rig);
+    const secondElapsed = Date.now() - startedAt;
+    expect(second).toEqual({ ok: false, reason: 'contended' });
+    // Both discriminators for the same claim: the counter names the arm, and
+    // the clock rules out a second trip through the 300ms deadline.
+    expect(kinds).toEqual(['deadline_refused', 'depth_refused']);
+    expect(secondElapsed).toBeLessThan(150);
+
+    releaseQueue();
+    await wedge;
+    await settle();
+    // The slot IS released once the work finally settles: the character is
+    // not wedged out of listing for the process lifetime.
+    const third = await createListing(rig);
+    expect(third.ok).toBe(true);
+    expect(kinds).toEqual(['deadline_refused', 'depth_refused', 'started']);
+  });
+
+  it('warns when a queue wait crosses the warn threshold', async () => {
+    // A wait deadline far past the wedge, so the job RUNS and the only thing
+    // under test is the observability floor for a slow queue.
+    const rig = makeRig({ escrowWaitMs: 60_000, escrowWarnMs: 1, escrowWarnThrottleMs: 0 });
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    let releaseQueue!: () => void;
+    const held = new Promise<void>((resolve) => {
+      releaseQueue = resolve;
+    });
+    const wedge = rig.server.enqueueCharacterWrite(SELLER_CHAR, async () => {
+      await held;
+    });
+    const listingDone = createListing(rig);
+    setTimeout(releaseQueue, 30);
+    const listed = await listingDone;
+    await wedge;
+    const warns = warnSpy.mock.calls
+      .map((call) => String(call[0]))
+      .filter((line) => line.includes('escrow queue wait'));
+    warnSpy.mockRestore();
+    if (!listed.ok) throw new Error(`createListing refused: ${listed.reason}`);
+    expect(warns).toHaveLength(1);
+    expect(warns[0]).toContain(`character ${SELLER_CHAR}`);
+  });
+
+  it('throttles the queue-wait warn to one line per burst', async () => {
+    const rig = makeRig({ escrowWaitMs: 60_000, escrowWarnMs: 1, escrowWarnThrottleMs: 60_000 });
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const slowListing = async (): Promise<number> => {
+      let releaseQueue!: () => void;
+      const held = new Promise<void>((resolve) => {
+        releaseQueue = resolve;
+      });
+      const wedge = rig.server.enqueueCharacterWrite(SELLER_CHAR, async () => {
+        await held;
+      });
+      const startedAt = Date.now();
+      const listingDone = createListing(rig);
+      setTimeout(releaseQueue, 30);
+      const listed = await listingDone;
+      await wedge;
+      if (!listed.ok) throw new Error(`createListing refused: ${listed.reason}`);
+      return Date.now() - startedAt;
+    };
+    const firstWaited = await slowListing();
+    // A second copy for the second listing: the first one is escrowed now.
+    rig.server.sim.addItem(EPIC_ITEM, 1, rig.session.pid, { silent: true });
+    const secondWaited = await slowListing();
+    const warns = warnSpy.mock.calls
+      .map((call) => String(call[0]))
+      .filter((line) => line.includes('escrow queue wait'));
+    warnSpy.mockRestore();
+    // Both waits were warn-eligible (well past the 1ms threshold), so the
+    // single line is the throttle, not a second job that happened to be fast.
+    expect(firstWaited).toBeGreaterThanOrEqual(20);
+    expect(secondWaited).toBeGreaterThanOrEqual(20);
+    expect(warns).toHaveLength(1);
   });
 
   it('refuses contended when the books re-dirty during the queue wait', async () => {
     const rig = makeRig({ escrowWaitMs: 10_000 });
+    const kinds = recordEscrowKinds();
     rig.server.sim.loadGuildBank(GUILD, { treasury: 1000, inventory: [], purchasedSlots: 24 });
     let releaseQueue!: () => void;
     const held = new Promise<void>((resolve) => {
@@ -519,6 +834,9 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     expect(res).toEqual({ ok: false, reason: 'contended' });
     expect(rig.bagsHold(EPIC_ITEM)).toBe(true);
     expect(rig.db.escrowSaves).toHaveLength(0);
+    // The in-job re-check refused, so the job never reached 'started': that
+    // pairing is what separates this arm from a job that ran and failed.
+    expect(kinds).toEqual(['books_dirty_refused']);
   });
 
   it('the delivered-save twin keeps its recorded FIFO carve-out', () => {
@@ -530,6 +848,18 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     const src = stripComments(readFileSync(resolve(process.cwd(), 'server/woc_market.ts'), 'utf8'));
     expect(src.match(/\.runSerialized\(/g)).toHaveLength(1);
     expect(src).not.toContain('enqueueCharacterWrite');
+    // The service module is not the only place a custody character write
+    // could appear: the sweep and the monitor run the same domain on their
+    // own clocks. Counting only in woc_market.ts would date a carve-out a
+    // sibling module had already widened, so those two carry a flat zero.
+    for (const sibling of ['server/woc_market_sweep.ts', 'server/woc_market_monitor.ts']) {
+      const siblingSrc = stripComments(readFileSync(resolve(process.cwd(), sibling), 'utf8'));
+      // Non-vacuity: a file read that silently produced nothing would satisfy
+      // both absence checks below.
+      expect(siblingSrc).toContain('export function create');
+      expect(siblingSrc).not.toContain('.runSerialized(');
+      expect(siblingSrc).not.toContain('enqueueCharacterWrite');
+    }
   });
 
   it('wocCustodySession refuses a quarantined session for every custody op', () => {
