@@ -5,7 +5,30 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-06-directed-rail-integrity.md`
+- Next file to run: `docs/woc-marketplace-hardening/phase-06-qa.md`
+- 06 implemented AND reviewed (LOCAL, not pushed per R4): H10, H12, H14,
+  createDirectedOffer guardBalance, and the directed non-payment
+  auto-close closed; BOTH opening judgments settled ((a) unwind made
+  provable by the atomic listing stamp + the convergedOffers sweep arm;
+  (b) NO boundTo stamping, the rationale truthed-up at
+  exchange_eligibility.ts). A db-perf PRE-implementation checkpoint
+  (BLOCK, A1-A8) reshaped the design before code; the pg suite ran RED
+  first for all seven target behaviors; FOUR fresh reviewers plus a
+  fix-round re-review plus qa-checklist ran, every finding applied
+  including nits (the security round's CRITICAL: the trade session
+  stripped staged slots to id+count, so the H10 pin's client source
+  could not carry an instance payload; trade staging now previews
+  per-copy identity through the swap's own selection walk). After the
+  first gate pass, SIX closing rounds ran (two independent fresh
+  reviews of the gate-round commit, every fix round re-reviewed fresh;
+  the CLOSING ROUNDS bullet in the 06 ledger has the substance). Gate
+  GREEN three times: 5287214294, 5ebb176a73 (all production code), and
+  the final tip ea1bb82322 (each full-suite fallback, all 8 steps, run
+  WITH TEST_DATABASE_URL so every pg suite executed). The 06 ledger
+  entry below is the registry later sessions need; the phase-06-qa
+  session consumes it, and should verify the final tests-only commit
+  ea1bb82322 FIRST (it implements the last reviewer's prescriptions
+  and is the one round without a fresh review of its own).
 - 05 QA COMPLETE (PASS-WITH-FOLLOWUPS, every fix applied, PUSHED per R4).
   Release/v0.38.0 synced (merge b9e937c075, trivial: seven commits, no
   marketplace overlap, no count-pin surface). All four owed re-judgments
@@ -228,6 +251,255 @@ Still open (a phase that hits one asks at session start):
 
 ## Per-phase ledger (append as phases complete)
 
+- 06 directed-rail-integrity (2026-08-13, session start b948aa64fb = the
+  trivial release/v0.38.0 sync (16 commits, the chronomancer train, no
+  marketplace overlap, no count-pin surface), gate GREEN at 5287214294,
+  LOCAL, not pushed per R4): H10, H12, H14, createDirectedOffer
+  guardBalance, and the directed auto-close closed. The registry later
+  sessions need:
+  - JUDGMENT (b) SETTLED: NO boundTo stamping this packet. The
+    anonymous-escrow premise genuinely does not cover a named directed
+    deal; the standing rationale is the ESCROW LIFECYCLE (every
+    compensation exit would need its own binding decision) and is now
+    written at exchange_eligibility.ts. Lifting it is an offered product
+    follow-up (the R7 pattern), sized as stamp-at-delivery across
+    grant/return/restore/mail/park. Consequence: offer CREATION runs
+    listingEligibility on the pinned item, so bind_armed refuses at
+    offer time.
+  - JUDGMENT (a) SETTLED: UNWIND, made provable. escrowInsertListing
+    stamps offer.listing_id INSIDE the escrow transaction (CAS on
+    accepted-and-unstamped; zero rows aborts typed 'not_pending' and the
+    copy restores). Invariant: listing exists IFF the offer is stamped;
+    resolveDirectedOffer lost its post-hoc stamp arm (the one
+    offers-then-listings lock edge, deleted). A proven-rollback throw
+    also reopens in-request; ambiguity writes nothing; the NEW
+    convergedOffers sweep arm unwinds aged accepted-unstamped rows from
+    durable truth (reopen inside the TTL, expire past it) inside a
+    TWO-SIDED window: WOC_MARKET_OFFER_CONVERGE_SECONDS = 300 clears
+    every transaction bound; WOC_MARKET_OFFER_CONVERGE_MAX_AGE_SECONDS =
+    86400 refuses rows the listings prune's ON DELETE SET NULL
+    un-stamped long after their deal completed (NOT rollback evidence;
+    without it the arm relabeled real history). Behind
+    woc_market_offers_accepted_unstamped, ORDER BY updated_at, narrow
+    projection (id + expires_at), per-row sweepError isolation, no park.
+    The seller-quarantine and parked-copy legs of the three-legged
+    residual STAND.
+  - H10 FINGERPRINT SEMANTICS: the identity is the sim's itemCopyPin
+    3-tuple (item id + instance payload + crafted provenance; NO new
+    serializer); item_pin stores its fixed-width sha256 hex DIGEST (a
+    raw client-derived serialization banked kilobytes per row). Stamped
+    at CREATION; the buyer's client sends the partner's ONE staged slot
+    of COUNT ONE (the one_item hint arm covers the WHOLE table: a second
+    slot, a stack, or an ineligible companion all block the send;
+    WocTradeModel.agreedItem is the pinned copy). Authoritative check:
+    itemPinDigest(extract.extracted) inside the serialized escrow job;
+    mismatch restores + refuses typed 'item_mismatch' (NEW leaf
+    woc_market.item_mismatch, 409, five non-Latin fills; its own code,
+    the fix is a fresh deal). A NULL pin (pre-pin row) refuses too. THE
+    LOAD-BEARING PREREQUISITE (the security round's critical): the trade
+    session used to strip staged slots to id+count, so NO client source
+    carried the identity (and the seller could not even resolve an
+    instanced accept). Trade STAGING now previews per-copy identity:
+    stagedOfferSlots (src/sim/social/trade.ts) runs the swap's own
+    selection walk (removeSellUnitsFromInventory, extracted byte-faithful
+    from removeVendorSellUnits) over a scratch deep copy, groups by
+    itemCopyPin, ships FULL payloads on the trade wire (a judged accept:
+    consensual mutual inspection; a publicInstanceView trim would alias
+    copies differing in hidden fields), and the swap consumes the pinned
+    copies first (trade-scoped matchers: isTradeLocked only, the shared
+    helper's wider lock routed armed copies around the pin) with a
+    per-unit generic-walk fallback; a decoupled inventory hub's
+    unattributable remainder keeps the old id+count shape. The capacity
+    model merges by item id first (per-copy slots double-counted the
+    giver's stock, the receiver-overflow class). The seller's directed
+    accept resolves from sim.tradeInfo.myOffer (the cleaned per-copy
+    truth), never the HUD-local id-only compose list;
+    inventoryIndexOfStaged compares payloads order-independently
+    (itemInstancePayloadsEqual). The offer intake bounds itemInstance at
+    INSTANCE_MAX_JSON_BYTES = 2048 (both intakes ride optionalInstance;
+    the bound also caps nesting depth for the recursive sortedJson,
+    which a 64 KiB body overflowed into a 500, verified).
+  - H12 HOLD + STRIKE POLICY: WOC_MARKET_DIRECTED_HOLD_SECONDS =
+    WOC_MARKET_SETTLEMENT_WINDOW_SECONDS (identity pinned;
+    directedParams' durationHours is shape-validation-only, documented
+    inert). Worst-case escrow occupancy: one hold + one settlement
+    window. STRIKES exactly once per walk-away: never-claimed expiry via
+    closeDueAuctions' directed branch (resolution 'unsettled'), strike
+    AFTER the close CAS and gated on everSettledForListing probed AFTER
+    the CAS ('failed' is not OPEN; the open-probe alone double-struck);
+    claimed-then-unpaid keeps the overdue arm's strike, and that arm
+    AUTO-CLOSES 'unsettled' BEFORE striking (custody before penalty: the
+    strike awaits a health read that can reject; the expiry CAS fires
+    once). BOTH strike arms ride strikeDirectedBuyer: no strike while
+    the price oracle is unhealthy (buyNow refuses market_paused in the
+    same window; the sweep still closes and returns, only the penalty
+    pauses; an intra-window blip is an accepted residual) and no strike
+    on the shared exempt vocabulary (service_unavailable; TODAY
+    unreachable on a settlement row by construction, the same standing
+    R5 gap the public exemption carries, documented at the helper; the
+    health probe is the live gate). An UNEXPIRED claim lock refuses the
+    directed close (the 270s lock outlives the 600s hold routinely; the
+    row waits via 'ending' + the 300s stranded reclaim, documented). ONE
+    pending offer per (buyer, seller) pair
+    (woc_market_offers_pair_pending, UNIQUE partial; 23505 answers the
+    NEW typed 'offer_pending', woc_market.offer_pending 409 + five
+    fills; already_pending's copy describes a pending BID): the
+    strike-farming bound; a boot repair expires all-but-newest pending
+    per pair ahead of the index (a populated dev database must not fail
+    the whole boot; unbatched, pre-enable rationale recorded). REOPEN is
+    pair-aware: flipping accepted back to pending is an INSERT into that
+    index, so every reopen site (typed refusal, proven-rollback,
+    converge) no-ops when a fresh offer occupies the pair (NOT EXISTS
+    arm + 23505 race belt) and the converge arm expires the blocked row
+    at its TTL. A directed listing accepts NO bids (insertPendingBid
+    refuses 'not_found' FIRST, anti-enum; an active stranger bid
+    diverted the directed close into the auction close where the bidder
+    wins the escrow).
+  - H12 CAP: directed listings count against the shared 12 cap in BOTH
+    byte-identical halves (countActiveBySeller + the in-transaction
+    count; the false mitigation rationale rewritten at both sites and
+    the PRD question resolved). cap_reached at acceptance rides the
+    typed restore + reopen. No creation-time cap check (a moving fact;
+    the create-time invariant covers static facts, documented).
+  - H14 SEMANTICS: wallet_links.pubkey is UNIQUE, so the twin is the
+    SEQUENTIAL RELINK (list under W recorded on listing.seller_wallet,
+    unlink, relink W on a second account, buy). Guard layers: buyNow
+    fast path from values in hand (A7: no advisory wallet read); the
+    locked re-check in claimBuyNowLock (lock-first-then-check, PROVEN
+    string equality only: undefined === undefined must not fire, the JS
+    twin of NULL = NULL); the NOT EXISTS predicate inside the claiming
+    UPDATE with zero rows answering typed 'own_listing' (the deref-500
+    guard). The UPDATE arm is RECORDED defense-in-depth (only a real-SQL
+    interleave distinguishes it; pinned structurally + the relink dance
+    real-SQL test). The directed rail refuses 'self_offer' wallet twins
+    at creation AND completion (live-vs-live reads; defense in depth
+    under UNIQUE).
+  - ESCROW BUDGET: ESCROW_STATEMENT_TIMEOUT_MS 5000 -> 4000 over FIVE
+    workload statements (the cap count no longer skips directed rows;
+    the stamp is the fifth); the tunables relation moved to *5 (27000 <
+    30000), the statement count pinned 5-directed/4-public, the
+    delivery escrow-cost bound derives to 160ms and held (the cost loop
+    now closes each measured row: it leaned on the old cap exemption).
+    A2: expireDueDirectedOffers carries the outer status qual (EPQ
+    re-checks own columns; without it a raced acceptance could be
+    expired over its committed listing) + FOR UPDATE SKIP LOCKED.
+  - RETENTION + INDEXES: woc_market_directed_offers_listing (the FK
+    referent index the listings prune pays a per-row seq scan without)
+    + the accepted-unstamped partial + the pair-pending unique, all
+    boot DDL with the pre-enable rationale recorded.
+    pruneResolvedWocOffersBatch (house pool-first shape, ORDER BY behind
+    woc_market_offers_resolved_updated) + WOC_MARKET_OFFERS_RETENTION_DAYS
+    (default 180, matches listings so a deal's rows age out together) +
+    the main.ts registration (BEFORE the listings entry, which stays
+    LAST) + the wiring and config-table pins. item_id stamps at CREATION
+    and the seller's acceptance no longer rewrites it (display honesty).
+  - PLAN PROOFS (one-off evidence, session scratchpad; STANDING planner
+    assertions remain phase 20 per the recorded precedent): the widened
+    cap count = Index Only Scan on woc_market_listings_seller_live, no
+    heap filter; the converge read = partial index + LIMIT pushdown, no
+    sort; offers-by-listing = the new FK index; the wallet probe
+    seq-scans at 300 rows (small-table artifact, PK exists).
+  - TESTS: new pg suite tests/woc_market_directed_pg_integration.test.ts
+    (17 tests; ran RED first for all seven target behaviors: the relink
+    claim succeeding, the 12h hold, both cap halves, no auto-close, no
+    never-claim strike, bait-and-switch accepted; plus the converge
+    three-way + young/ancient guards, the prune-fallout regression, the
+    SKIP LOCKED interleave, the pair bound, exactly-one-strike, the
+    offers prune). The DB-free floor gained the stamp/converge/expiry/
+    ever-settled/prune/insert pins and the wallet-predicate
+    defense-in-depth pin; the service suite the full refusal matrix +
+    strike exemptions + close-arm branches + the blocked-reopen arc; the
+    trade suite the staging/grouping/fallback/overflow repros; the
+    controller suite the instanced accept resolution. The fake db
+    mirrors every new semantic and gained seedListingRow (the direct
+    residue seam; the widened cap closed the escrow-path staging the
+    residue tests leaned on). REFUSAL_ERRORS is 51 rows exact.
+  - INHERITED RED REPAIRED IN PLACE: tests/admin_guilds_db_integration
+    red on the release tip itself (env-gated, CI never runs it;
+    accountDetail gained the general-chat quota LEFT JOIN while the
+    rig hand-picks its DDL modules); the rig now applies
+    GENERAL_CHAT_QUOTA_SCHEMA. Flows back to the release when this
+    branch merges.
+  - CLOSING ROUNDS (after the first gate pass; commits f618eaf146,
+    da5ca53b4b, d3f831b17e, 685fd0eb00, 5ebb176a73, ea1bb82322): two
+    independent fresh reviews of the gate-round commit converged, then
+    each fix round got its own fresh review (the final tests-only
+    commit excepted; the QA session verifies it first), every finding
+    applied. The substance: inventoryIndexOfStaged
+    now compares the FULL itemCopyPin triple (the crafted marker leg was
+    missing; a staged crafted copy resolved to its unmarked twin and
+    refused item_mismatch, with discriminating tests both directions);
+    the seller accept mirrors the whole-table one_item rule: the model
+    gains acceptHint naming the RIGHT obstacle (nothing sellable =
+    needs-item, wrong table shape = one_item, past review = nothing,
+    which also retired the stale needs-item copy during
+    awaiting_payment), judged over the sim's AUTHORITATIVE offer table
+    (stagedAuthoritative, the table the player sees rendered; the
+    compose list stays correct for the pre-push gates) with both
+    hand-offs pinned, the panel renders it verbatim, and the controller
+    belt is the ONLY accept-time enforcement (the trade window's Accept
+    never consults the model), arm order matching the model's ladder
+    (the ambiguity previously only surfaced as a server-side
+    item_mismatch);
+    reopenDirectedOffer returns whether the row really flipped and the
+    converge stat stops counting blocked no-ops (service pin at
+    expiresAtMs - 1000); both acceptance-path reopen swallows report
+    through the new offer_reopen sweep-error tag (the typed refusal and
+    the escrow root cause stay the caller-facing truths, proven by a
+    throwing-reopen test); the pair index joined the house
+    INVALID-carcass convention (DO drop ahead of CREATE, convention pin
+    now enumerates all three repair pairs) and its name became one
+    exported constant (WOC_MARKET_OFFERS_PAIR_PENDING_INDEX) consumed by
+    the DDL and BOTH 23505 discriminators, with the insert harmonized
+    (foreign-constraint 23505 rethrows, pinned); a deterministic
+    real-Postgres interleave (uncommitted racer; the wait OBSERVED from
+    a separate pool connection, since a transaction freezes its
+    pg_stat_activity snapshot at first read; COMMIT only after the
+    block is asserted) proves the 23505 belt swallows by constraint
+    name in 20ms; the offer_reopen report is pinned on BOTH catches
+    (typed-refusal and proven-rollback throwing arms) with
+    count-not-presence restore assertions (the harness seeds identical
+    copies, so presence checks were vacuous); the boot dedupe repair
+    gained the one-time validity gate; the
+    quest hook collapsed to ONE fire per removal batch (every per-id
+    fire saw the same final state); the instance intake bound measures
+    real utf8 bytes (a non-ASCII payload was getting ~3x the named
+    budget, pinned); plus prose/title truth-ups. Recorded as
+    informational, NOT defects: the two marker-less staged producers
+    (the remainder fallback line and the controller pre-send fallback)
+    cannot resolve a crafted-only bag and fail SAFE client-side
+    (hintAcceptNeedsItem), both effectively unreachable in a real Sim;
+    an all-ineligible table deliberately answers await_their_items over
+    one_item (ladder precedence, pinned with the WHY).
+  - Deploy notes: guardBalance on offer creation is fail-closed (an
+    economy outage blocks directed offer creation, intended); dev
+    databases carrying THIS BRANCH's earlier builds can hold raw-JSON
+    pins (acceptance refuses, the deal reopens; dev-only) or
+    accepted-unstamped rows WITH a live listing from an old binary's
+    post-hoc stamp crash (the converge arm would reopen them: wipe such
+    dev DBs or expire the rows; production unreachable, the marketplace
+    has never shipped). A REINDEX CONCURRENTLY of the pair index names
+    its transient index _ccnew; a violation raised against THAT name
+    rethrows (a 500) rather than no-opping, which is fail-safe but worth
+    knowing during index maintenance.
+  - Handoffs: phase 13 step-up covers acceptDirectedOffer per the
+    out-of-scope note. Phase 14 needs NO new server command for the
+    offer lifecycle (decline/withdraw routes exist; the directed cancel
+    remains cancelListingIfUnbid and auto-close shrinks its need); 14/15
+    own SHOWING the buyer the pinned copy (agreedItem renders nowhere
+    yet; the one_item gate carries the honesty until then), the
+    one_item/offer_pending/item_mismatch copy surfaces (now including
+    the seller-side accept: the model disables over a multi-slot table
+    and the belt logs hintOneItem, but no inline panel copy explains the
+    disabled button yet), and the trade
+    window's richer payload display (tooltips can now show real rolls).
+    Phase 16's cluster gains: the estimate-per-offer-create amplifier
+    note (bounded by the LIST limiter; memoize per usdCents if it shows
+    in latency) and the trade-wire payload diff cost note (bounded, six
+    slots, change-gated). Phase 20 owes standing planner assertions incl
+    the two new partial indexes. Phase 22's pre-enable audit: the
+    bindOnTrade scan line stands; add the two dev-db classes from the
+    deploy notes above.
 - 01 branch-baseline (2026-08-11, session start e4c3dde956, tip 418f75b876,
   LOCAL, not pushed per R4): branch was already current with
   origin/release/v0.37.0 (no sync merge needed). All five coordinator

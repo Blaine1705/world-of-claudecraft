@@ -14,6 +14,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 04 | bond-payment-lifecycle | game | DONE | 3f20375918 | release sync no-op; three review rounds (security/db/coverage x2, qa-checklist, migration-safety) all applied; 17 mutation spot-proofs bit; gate GREEN at 0afdaa71a5. A follow-up verification session (sections below) re-ran the whole phase, applied two further audited fix rounds (commits 60034033f1, a938c410f3 plus docs), re-bit 11 mutations (3 re-proofs + 8 on the new fixes), and re-gated GREEN TWICE (full-suite fallback, all 8 steps, at c7176d730b and 6642c6e15b); LOCAL, not pushed per R4; final docs commit on top |
 | 04 QA | phase-04-qa | game | DONE | e4ae9d1602 | PASS-WITH-FOLLOWUPS, every fix applied (section below); release/v0.37.0 synced (merge a43a1e8b52: the count-pin trap fired FOR REAL, both sides at 321 with different members, re-derived 322/85/237 + sends 199 dispatches 212 from runs; hud.ts over ceiling, fixed by the crafting_deny_core extraction, ceiling 19190 to 19177; game.ts ceiling banked to 10859); five audit lanes + fresh fix-round re-reviews; deep mutation pass incl. one REAL hole closed (the async-stall withTx shape); three correctness fixes proven red-on-old (lapse-straddle refresh, poll-race standing, review retry); a THIRD round from the fresh re-review (review-state client honesty, the devsig colon, the at-cap self-steal recording, bond_window_closed); gate GREEN at 8c1028e89d (full-suite fallback, all 8 steps; the first run caught the extraction's stale station pins in profession_identity_card, retargeted to the core); pushed per R4 (no open PR on this branch, so no PR CI) |
 | 05 | custody-entry-hardening | game | DONE | f07ca88278 | release sync trivial (one locale-fill commit; generated pending.ts regenerated); H5/H6/extraction/firewall closed; dbperf pre-checkpoint BLOCK folded in; three-reviewer round + fresh fix-round re-review + qa-checklist READY + hot-path round (sections below); real-SQL suites green incl. the new escrow set; gate GREEN (full-suite fallback, all 8 steps; the one intermediate red was the malware scanner flagging the firewall comment's own key-shape prose, reworded); LOCAL, not pushed per R4 |
+| 06 | directed-rail-integrity | game | DONE | b948aa64fb | release sync trivial (16 commits, chronomancer train, no marketplace overlap, no count-pin surface); H10/H12/H14 + guardBalance + auto-close closed, both opening judgments settled; dbperf pre-checkpoint BLOCK (A1-A8) folded in before code; pg suite ran RED first (7 behaviors); FOUR fresh reviewers + fix-round re-review + qa-checklist, every finding applied incl. nits (the security CRITICAL: the trade session stripped staged identity, fixed by per-copy staging through the swap's own selection walk); one inherited env-gated red (admin_guilds vs the release's quota join) repaired in place; first gate GREEN at 5287214294; then SIX closing rounds (two independent fresh reviews of the gate-round commit, every subsequent fix round re-reviewed fresh, ~45 more findings applied incl. the crafted-marker comparator leg, the accept-side one_item mirror with the model acceptHint judged over the AUTHORITATIVE offer table, the pair index carcass convention + shared name constant, the offer_reopen report on both swallows, the observed-wait 23505 interleave, and the wiring/count pins that made the last round's fixes decisive); THREE gate runs GREEN along the way (5287214294, then 5ebb176a73 covering all production code, then the final at tip ea1bb82322: full-suite fallback, all 8 steps, run WITH TEST_DATABASE_URL so every pg suite executed); LOCAL, not pushed per R4 |
 | 05 QA | phase-05-qa | game | DONE | b9e937c075 | PASS-WITH-FOLLOWUPS, every fix applied (section below); release sync origin/release/v0.38.0 trivial (7 commits, no marketplace overlap, no count-pin surface); five audit lanes + a fresh fix-round re-review + qa-checklist READY + a db-perf close-out; real-SQL suites 109 green THREE times (zero skips); the three named mutation probes plus the agents' per-pin mutation matrices all bit; the round found and fixed the BEGIN-outside-TxNeverStarted critical, the withTx null-deref evidence destroyer, both kick argument swaps, and the db-perf codeless-discard P1; gate GREEN at eeaa137e5c (full-suite fallback, all 8 steps, 38196 tests + 118 browser); pushed per R4 |
 | 06 | directed-rail-integrity | game | NOT STARTED | | |
 | 06 QA | phase-06-qa | game | NOT STARTED | | |
@@ -49,6 +50,145 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 21 QA | phase-21-qa | service + game | NOT STARTED | | |
 | 22 | close-out | all three | NOT STARTED | | teardown offer lives in 22 QA |
 | 22 QA | phase-22-qa | all three | NOT STARTED | | |
+
+## 06 implement round (directed rail and self-deal integrity)
+
+Release sync: merge b948aa64fb (origin/release/v0.38.0, 16 commits, the
+chronomancer heal-tuning train; no marketplace overlap, no count-pin
+surface, tsc clean; release-merge-audit not warranted).
+
+Both opening judgments settled BEFORE code, (b) first since it shaped
+H10: (b) NO boundTo stamping this packet (the honest rationale is the
+escrow lifecycle, not anonymity; truthed-up at exchange_eligibility.ts;
+lifting it is an offered R7-pattern product follow-up); (a) UNWIND made
+provable (the atomic in-transaction listing stamp turns
+accepted-with-no-listing into rollback PROOF; the convergedOffers arm
+finishes the unwind from durable truth; the quarantine and parked-copy
+legs stand). Full rationale in the 06 ledger entry (state.md).
+
+A database-performance PRE-implementation checkpoint returned BLOCK with
+six P1s, every amendment folded in before code: the five-statement
+occupancy arithmetic (allowance 5000 to 4000), the expiry sweep's
+status qual + SKIP LOCKED beside the new stamp lock, the never-settled
+strike gate ordered after the close CAS, the offers listing_id FK
+index, the phantom retention prune made real, the zero-row claim deref,
+the advisory wallet read dropped for the in-hand fast path, the
+converge ordering + the directed close's live-lock refusal. It also
+corrected the brief's own premise (the "12h hold" was
+WOC_MARKET_DURATION_HOURS[0] via directedParams; the cap-exemption
+rationale comment was false against the code).
+
+Red-first evidence: the new pg suite failed 7 of 9 against the pre-fix
+tree for exactly the target behaviors (the relink-dance claim
+succeeding, the 12 hour hold, both cap exemption halves, the missing
+auto-close, the missing never-claim strike, and a bait-and-switch
+acceptance with a re-rolled copy going through).
+
+The four-reviewer round (fresh privacy-security, db-perf close-out,
+migration-safety, test-coverage; one earlier reviewer wave died on a
+usage limit and was relaunched fresh), every finding applied incl.
+nits:
+- SECURITY CRITICAL: the H10 pin was wired to a source that cannot
+  carry an instance payload (tradeSetOffer normalized staged lines to
+  id+count; the seller could not even resolve an instanced accept).
+  Fixed by per-copy staging through the swap's own selection walk; the
+  full mechanism and its knock-on fixes are in the ledger entry.
+- Strike fairness: the oracle-health gate, the shared exempt-vocabulary
+  gate (documented unreachable today, the R5 seam), the pair-pending
+  unique index bounding strike farming, the probe-after-close ordering.
+- The stranger-bid hole on directed listings (an active bid diverted
+  the directed close into the auction close).
+- dbperf P1: the pin stored as a sha256 digest + the 2 KiB instance
+  intake bound (which also fixes the migration round's verified
+  sortedJson stack-overflow 500).
+- migration W1 / dbperf F3 (independent finds): the listings prune's
+  ON DELETE SET NULL falsifies the converge premise for completed
+  deals; the converge window gained its upper age bound.
+- Coverage: the different-item-id arm, the legacy NULL-pin arm, six
+  structural SQL pins, the config knob row, honest retitles (the
+  outer-qual and deadlock-probe tests claimed more than they proved),
+  the route schema tests, and more (ledger).
+
+The fix-round re-review (fresh, the standing rule) found two blockers
+IN the fixes, both repaired with repros: the capacity model's fungible
+double-count under per-copy slots (receiver overflow past the gate) and
+the seller accept still reading the HUD-local id-only list. Its
+should-fixes and nits all applied (offer_pending as its own code, the
+fake bid mirror, auto-close before the strike, the trade-scoped pinned
+matcher, the per-line quest-hook cadence, the full-payload trade-wire
+judgment recorded at stagedOfferSlots).
+
+qa-checklist (LAST) returned NOT READY on one real blocker, applied:
+reopening an accepted offer is an INSERT into the pair-pending unique
+index, so every reopen site could 23505 (a 500 over the typed refusal;
+on the proven-rollback path it destroyed the root-cause trace); the
+reopen is now pair-aware and no-ops, the converge arm expires the
+blocked row at its TTL, and a boot repair dedupes populated dev
+databases ahead of the unique index. Its should-fixes applied: the
+whole-table one_item rule (an ineligible companion misleads the buyer
+the same as a second eligible slot); the order-independent
+inventoryIndexOfStaged comparator; the realistic-payload positive
+control for the intake bound.
+
+The first gate run (full-suite fallback) caught three more: the stale
+5000 tunables literal, the error-code append-only snapshot, and the
+trade-staging fallout in four suites (two were deliberate-enrichment
+expectation updates; two were the decoupled-inventory contract, fixed
+with the unattributed-remainder fallback). It also surfaced ONE
+inherited red: tests/admin_guilds_db_integration is red on the release
+tip itself (env-gated, CI never runs it; accountDetail gained the
+general-chat quota join while the rig hand-picks its DDL); repaired in
+place.
+
+Validation: tsc clean throughout; parity gate 207 green TWICE with NO
+golden regeneration (plain staged lines serialize identically); all
+FOUR marketplace pg suites + the repaired admin suite 146 green zero
+skips; the affected DB-free sweep 1150 green; one-off EXPLAIN plan
+proofs recorded (standing planner assertions remain phase 20 per the
+recorded precedent); ci:changed exit 0; gate GREEN THREE times, at
+5287214294 (38461 tests + 118 browser), at 5ebb176a73 (38472 + 118,
+every production-code change covered), and finally at tip ea1bb82322,
+each full-suite fallback, all 8 steps, run WITH TEST_DATABASE_URL.
+
+The closing rounds (after the first gate pass): two INDEPENDENT fresh
+reviews of the gate-round commit converged on the same defects from
+different angles, and every subsequent fix round got its own fresh
+review, six commits in all (f618eaf146, da5ca53b4b, d3f831b17e,
+685fd0eb00, 5ebb176a73, ea1bb82322). The substance, beyond the first
+round's summary above: the staged-slot resolver gained the crafted
+marker leg of the itemCopyPin triple (a staged crafted copy resolved
+to its unmarked twin and refused item_mismatch); the seller accept
+mirrors the whole-table one_item rule with the model's new acceptHint
+naming the RIGHT obstacle, judged over the sim's AUTHORITATIVE offer
+table (the table the player sees rendered) with the compose list as
+the no-session fallback, the controller belt as the only accept-time
+enforcement, and both hand-offs pinned; reopenDirectedOffer reports
+whether the row flipped so the converge stat cannot count blocked
+no-ops; both acceptance-path reopen swallows report through the new
+offer_reopen sweep-error tag with each catch's throwing arm pinned;
+the pair index joined the carcass-drop convention, its name became one
+exported constant consumed by the DDL and BOTH 23505 discriminators
+(the insert harmonized: foreign-constraint 23505 rethrows), and the
+convention pin gained a parsed reverse sweep; a deterministic
+real-Postgres interleave observes the blocked reopen from a separate
+connection before committing the racer (the first version's poll ran
+on the racer's frozen snapshot and was an accidental 2.7s sleep); the
+quest hook collapsed to one fire per removal batch; and the instance
+intake bound measures real utf8 bytes. The final round (ea1bb82322,
+tests and comments only) implements the last reviewer's own
+prescriptions verbatim and is the one round without a fresh review of
+its own: the QA session should verify it first.
+
+Residuals recorded (owners; do not re-raise): phases 14/15 own showing
+the buyer the pinned copy and the new refusal copy surfaces; phase 16
+gains the estimate-amplifier and trade-wire diff-cost notes; phase 20
+owes the standing planner assertions; phase 22's pre-enable audit gains
+the two dev-database classes (raw-JSON pins; old-binary
+accepted-unstamped rows with live listings). Accepted without code
+change: the exempt-vocabulary strike gate is unreachable until R5
+delivers the service vocabulary (the health probe is the live gate);
+the intra-window oracle-blip strike residual; the full-payload trade
+wire (a judged product truth, recorded at stagedOfferSlots).
 
 ## 05 QA round (verdict PASS-WITH-FOLLOWUPS, every fix applied)
 
