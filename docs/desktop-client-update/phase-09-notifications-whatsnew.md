@@ -8,15 +8,24 @@ Model: Fable 5, xhigh effort. Harness: Claude Code. Workflow orchestration: none
 
 PROJECT RULES (from docs/desktop-client-update/state.md): work ONLY in
 /home/fernandoramirez/Documents/woc-desktop-client-update (git -C always); LOCAL-ONLY,
-never push; first action pull+merge origin/release/v0.36.0; git status clean or stop.
+never push; first action: discover the LATEST release/* branch (git ls-remote --heads
+origin 'release/*', highest version), ancestry-guard, then pull+merge it (state.md
+standing rule 3); git status clean or stop.
 
 Goal: the desktop tells an unfocused player about a ready update and a party invite via
 OS notifications, and the update toast links to what changed.
 
 LOCKED DECISIONS (state.md): notification strings are t()-rendered in the RENDERER and
 pushed as final strings over a validated, capped, rate-limited channel (main stays
-language-agnostic). What's-new is a t()-keyed LINK to the wiki changelog, NOT feed
-release-notes text (rejected for i18n; do not revisit).
+language-agnostic). What's-new is a t()-keyed LINK, NOT feed release-notes text
+(rejected for i18n; do not revisit). LINK TARGET IS AN OPEN PHASE-START DECISION
+(2026-08-13 census: NO /wiki changelog page exists on the merged tree, so the
+original "wiki changelog" target cannot be built as written): ask the user to pick
+(a) GITHUB_RELEASES_URL (src/ui/charselect_news.ts), the surface most consistent
+with the existing GitHub-releases News & Updates pipeline; (b) the in-client news
+feed (src/ui/news_feed.ts via the /api/releases proxy), no external hop; or (c) a
+new changelog guide page (duplicates the release-notes pipeline; the costliest).
+A bare /wiki-root link is the weakest choice; do not default to it.
 
 STEP 0 - memory scan (topics: desktop-client-update program, shell strings push
 pattern, wiki launcher PR 3124 for how the client opens wiki URLs).
@@ -59,8 +68,9 @@ Renderer agent:
   strings main renders itself; do not touch it).
 - What's-new: a link row on the 'ready' state of the update toast (extend the pure
   view core + painter per the existing toast structure), t('desktop.update.whatsNew'),
-  opening the wiki changelog through the established wiki-launch pattern. The reducer
-  gains nothing; this is render-only off mode==='ready'.
+  opening the TARGET CHOSEN AT PHASE START (see LOCKED DECISIONS above) through the
+  established external-launch pattern (wiki_link.ts's confirm-first hop for external
+  URLs). The reducer gains nothing; this is render-only off mode==='ready'.
 
 INVARIANTS IN PLAY: main language-agnostic (final strings only); every player string
 t()-keyed English + M16; the update_events payload whitelist is NOT extended (the link

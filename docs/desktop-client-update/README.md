@@ -8,7 +8,9 @@ memory, display modes), performance fixes (hidden-window render skip, DPI handli
 governor recovery-ladder stall, LOW-tier monotonicity), and desktop features (GPU
 visibility, OS notifications, what's-new link, gamepad display-sleep blocker, in-house
 Discord Rich Presence). Worktree: /home/fernandoramirez/Documents/woc-desktop-client-update,
-branch feature/desktop-client-update off release/v0.36.0. LOCAL-ONLY until the user
+branch feature/desktop-client-update, authored off release/v0.36.0 and rebased onto
+the LATEST release/* branch at every phase start (discovered fresh via git ls-remote;
+release/v0.38.0 since the 2026-08-13 interim reconcile). LOCAL-ONLY until the user
 says done.
 
 ## Index

@@ -9,7 +9,9 @@ Model: Fable 5, xhigh effort. Harness: Claude Code. Workflow orchestration: none
 
 PROJECT RULES (from docs/desktop-client-update/state.md): work ONLY in
 /home/fernandoramirez/Documents/woc-desktop-client-update (git -C always); LOCAL-ONLY,
-never push; first action pull+merge origin/release/v0.36.0; git status clean or stop.
+never push; first action: discover the LATEST release/* branch (git ls-remote --heads
+origin 'release/*', highest version), ancestry-guard, then pull+merge it (state.md
+standing rule 3); git status clean or stop.
 
 Goal: a real display-mode choice on desktop (borderless fullscreen / windowed) that
 persists, and a screen that never dims during controller-only play.
@@ -31,7 +33,10 @@ STEP 2 - EXECUTE (electron agent + game/options agent in parallel):
 Electron agent:
 - displayMode in the prefs store schema ('borderless' | 'windowed'; default
   'borderless' to match a AAA default, but RESPECT the phase 7 store versioning) and a
-  setDisplayMode invoke channel (trustedSender, validated enum). Implementation:
+  setDisplayMode invoke channel (trustedSender, validated enum). If the options
+  surface renders it as a multi-value control, use the existing choice-control
+  family (the dial ladder is highCapLadderOptions since upstream 9d166dfc8b; no new
+  settings family exists or should be invented). Implementation:
   borderless = win.setFullScreen(true) (Electron fullscreen on the window's current
   display; it is borderless-style, there is no exclusive mode in Electron, do not
   fake one); windowed = setFullScreen(false) restoring the remembered bounds. Apply at
@@ -41,6 +46,17 @@ Electron agent:
   stop after a debounce (~60s without pings), always stopped on quit and on window
   hidden. Bridge: notifyGamepadActivity() fire-and-forget invoke, rate-limited
   main-side (ignore pings more often than ~1/10s). ipc pins updated for both channels.
+- HIDDEN-SHELL GPU LANE AUDIT (added 2026-08-13; census claim post-entry-prewarm-
+  hidden-gpu, upstream 7079697863 era): the backgroundGpuWork producers (post-entry
+  preview prewarm via renderer.queueSecondaryPreviewPrewarm, compile gates, texture
+  chunk uploads, zone/asset prepare, maybeWarmCurrentZone) all run OUTSIDE the phase
+  4 presentation gate: a hidden desktop shell (backgroundThrottling off, timers and
+  requestIdleCallback still firing) keeps executing those GPU units at their own
+  pacing until their bounded schedules complete. ENUMERATE the lane set on the
+  current tree and pause-or-accept EACH while hidden, with the decision recorded per
+  lane (the prewarm schedule is finite and self-limiting, likely accept-with-note;
+  a recurring producer would be a pause). This is the power story's other half
+  beside the display-sleep blocker.
 Game/options agent:
 - Display-mode options row via the doctrine: on DESKTOP the existing fullscreen toggle
   is REPLACED by the display-mode control (feature-check the bridge; web/mobile keep

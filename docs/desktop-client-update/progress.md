@@ -16,6 +16,7 @@
 | 5 QA | Verify phase 5 | done | 2026-08-09 | 2026-08-09 |
 | 6 | three.js 0.185 train | done | 2026-08-09 | 2026-08-09 |
 | 6 QA | Verify phase 6 | done | 2026-08-09 | 2026-08-10 |
+| interim | Base reconcile onto release/v0.38.0 + plan refresh | done | 2026-08-13 | 2026-08-13 |
 | 7 | Desktop prefs store and window memory | not started | | |
 | 7 QA | Verify phase 7 | not started | | |
 | 8 | Display modes and power | not started | | |
@@ -1215,3 +1216,108 @@ b393f17057 formatting; tree clean, LOCAL-ONLY intact):
   row-batching (comment updated, revisit candidate); the high/ultra
   merge-owned town-idle regression is surfaced to the user for upstream
   routing.
+
+### Interim reconcile (2026-08-13, base onto release/v0.38.0 + plan refresh)
+
+- Plan-integrity phase, not a feature phase. Two release windows (v0.37, v0.38)
+  landed since phase 6 QA: 1453 commits, 2375 files. Ancestry guard held
+  (7ce12bad9e is an ancestor of origin/release/v0.38.0); upstream did NOT move
+  the three train (its package.json still pins three 0.165.0), but 37c373cdd0
+  modified patches/three@0.165.0.patch (bounded compileAsync isReady poll) and
+  extended tests/three_compile_async_patch.test.ts, a modify/delete collision
+  with our re-authored r185 patch, resolved by PORTING (below).
+- MERGE cd03351264, eight conflicts hand-reconciled: (1) desktop_download.ts
+  kept the __APP_VERSION__ derive (upstream bumped the literal to 0.37.0, which
+  the derive subsumes; version surfaces are consistently 0.37.0 on the merged
+  tree, the 0.38.0 sync has not happened upstream yet). (2) architecture.test
+  .ts RENDER_PURE_CORES unioned (our frame_present.ts + upstream shadow_cadence
+  _core, shadow_texel_snap_core). (3) fx.ts adopted upstream's new vortex
+  streams>1 arm with our MOTE_QUALITY_GATE preserved in the else-if; the new
+  arm renders ungated but the below-gate path is unreachable in governed play
+  (tests/vfx_mote_floor.test.ts pins every tier floor above the gate;
+  census-verified no pinned semantic bypassed). (4) characters/preview.ts took
+  upstream's mid-prewarm pendingActive/syncSize resync with our r185
+  timer.reset(). (5) renderer.ts unioned imports and adopted upstream's
+  rewritten pinned multi-key prepareZoneSky (NOTE: earlier session notes
+  misnamed it prewarmZoneSky; the census settled the resolution by direct
+  diff: code-identical to upstream with exactly two comment deltas re-applying
+  our r185 truths). (6) patches/three@0.165.0.patch deleted, upstream's
+  bounded-poll semantics ported into patches/three@0.185.1.patch on top of our
+  disposal guard via the pnpm patch flow; the merged 7-test pin suite passes;
+  both arms now carry the disposal guard, so the arms have zero semantic
+  delta. (7) pnpm-lock take-theirs + reconcile; electron 43.3.0 and n8ao
+  2.0.0 resolutions restored after caret floats to 43.4.0/2.0.1. (8)
+  pending.ts regenerated via i18n:gen. One legitimate red fixed in its own
+  commit a43e7f46e2: @types/three 0.185 dropped KeyframeTrack
+  .createInterpolant while upstream's new paladin clip modules call it; module
+  augmentation src/render/types/three_keyframe_track.d.ts (kill evidence: tsc
+  reds on 5 sites without it). Post-merge: tsc clean; ~55 pinned suites green
+  (~770 tests) incl. every governor canary and all gfx hash pins UNMOVED; the
+  seal family is the only red at 9 files / 14 tests (13 + upstream
+  154f0563ce's new receipt-authorization test, same fingerprint root cause).
+- DELTA CENSUS (workflow: 6 area auditors + 2 adversarial skeptics per
+  consequential claim; 38 agents, zero losses; 16/16 claims survived, none
+  refuted). By area: (a) RENDER/PERF: the phase 5 governor territory is
+  untouched (zero commits to render_budget.ts, ui_effects_profile.ts,
+  foliage*, zone_streaming.ts, static_matrix.ts, post_*); gfx.ts moved 11
+  lines (9d166dfc8b Shadow Quality dial capped at High 4096, Insane arm
+  deleted, LOW derivation byte-identical). The upstream perf mass (shadow
+  cadence + texel snap cores, contact blob shadows on shadowless tiers,
+  first-reveal compile gates, early prewarm submission, texture-residency
+  prewarm, character far LOD + variant eviction, iOS far-zone eviction, sky
+  HDR eviction) lands in the moving/streaming path the phase 6 QA blamed for
+  the LOW gap: the attribution's NUMBERS are stale (re-freeze required), its
+  MECHANISM is not refuted; skeptics note most of the new body cannot move the
+  LOW open-run average (shadow cores inert at LOW where dynamicShadows is
+  off; zone eviction no-ops unconstrained; reveal work targets 1%-lows) and
+  only the character far-LOD/variant-eviction pair plausibly shifts
+  steady-state moving cost. ONE new coupling into branch-owned code:
+  renderer.ts feeds updateShadowCadence from renderBudgetGovernor.update's
+  state.pressure/state.enabled (ce06b16f0a), inert at LOW (early-returns when
+  the sun casts no shadow, which every shipped LOW/iOS profile disables) but
+  a phase 11 what-is-missing line: cadence enter/exit must not oscillate
+  against the split recovery ladder on medium+. (b) DESKTOP SHELL: zero-touch
+  (no commits under electron/, build/, desktop-publish.yml,
+  release_version.mjs; no dep/builder churn); frame() gate threading
+  bit-identical through the merge; hud paint cut survives with its 8-call
+  head list; gpu-notice family untouched. Upstream's post-entry preview
+  prewarm rides a backgroundGpuWork lane OUTSIDE the presentation gate: a
+  hidden desktop shell still executes those bounded GPU units; phase 8's
+  powersave scope now enumerates the lane set. (c) PHASE 7: greenfield holds
+  (only electron-log writes disk); the options doctrine recipe resolves
+  symbol-by-symbol; drift is modest (209a38b650 parseStoredJson shared core,
+  reliquaryTrackerCollapsed as a persisted-only BOOL_SETTINGS key). Two
+  phase-07 doc defects fixed: a never-existed symbol (the real GPU seams are
+  forceHighPerformanceGpu at main.cjs:159 and relaunchForLinuxPrime at
+  main.cjs:72) and the missing desktop-only-row mechanism (OptionsEnv arm on
+  buildInterfaceControls mirroring buildGraphicsControls env.nativeShell,
+  dual-armed GENERAL_KEYS pin). (d) PHASE 8/9: zero upstream display/
+  powersave/gamepad work; both phase 9 observation points hold exactly; shell
+  catalog merged clean with no key collisions; NO /wiki changelog page exists,
+  so the whats-new target is a phase-9-start decision (GitHub releases URL /
+  in-client news feed / new guide page; /wiki root weakest). (e) PHASE 10/11
+  + QA MACHINERY: zero client-side discord code in range; remint runbook
+  unchanged; six export_entry.js files still set PCFSoftShadowMap; NEW
+  rerecord_polish_provenance.mjs (fb78debb7f) joins the phase 11 seal step;
+  ci:changed became scripts/ci_changed.mjs with resolveSelectBase (biome-pin
+  recipe obsolete, both skeptics CONFIRMED); 72cc09e65f check:ts:bot
+  incremental was REVERTED upstream (9f8072c4ad), so the turbo proof list
+  stands; PR tier still keys on branch name; docs/qa-gate.md now names
+  gate:select the merge bar. (f) MERGE AUDIT: every named branch semantic
+  survived symbol-level inspection; the ported patch is hunk-by-hunk
+  semantically identical to upstream's; legacy 0.165 doc references remain on
+  five surfaces (README badge + 21 localized READMEs, CONTRIBUTING.md patch
+  doctrine, docs/perf/hitch/README.md, prewarm_policy comment), all
+  PRE-EXISTING phase 6 gaps, scheduled into phase 11.
+- PERF: the phase 6 frozen baselines are obsolete as future comparison
+  targets; a re-freeze on the merged tree was attempted but the first run was
+  CONTAMINATED (other Claude sessions + cold vite cache; low 41.7 overall vs
+  the ~190-210 era) and reverted uncommitted; re-freeze pends a quiet
+  machine. The r181 showcase pairs remain internally valid for decision #2
+  and must never be diffed against post-merge captures.
+- DOC REFRESH: state.md (current base, standing rule 3 rewritten to
+  discover-the-latest-release/*, new biome recipe, seal count 9/14 + the
+  provenance re-record, perf/showcase validity notes, whats-new target
+  amendment, inventory); phase-07/08/09/10/11 and their QA files re-pointed
+  and premise-fixed (each edit cites its forcing sha in the file);
+  implementation-plan.md and README.md re-pointed.

@@ -8,7 +8,10 @@ Model: Fable 5, xhigh effort. Harness: Claude Code. Workflow orchestration: none
 
 PROJECT RULES (from docs/desktop-client-update/state.md): work ONLY in
 /home/fernandoramirez/Documents/woc-desktop-client-update (git -C always); LOCAL-ONLY,
-never push; first action pull+merge origin/release/v0.36.0; git status clean or stop.
+never push; first action: discover the LATEST release/* branch (git ls-remote --heads
+origin 'release/*', highest version), ancestry-guard, then pull+merge it (state.md
+standing rule 3); git status clean or stop. (2026-08-13 census: the v0.37/v0.38 range
+added zero client-side discord code; the in-house plan has a clear field.)
 
 Goal: "Playing World of ClaudeCraft, <Zone>" in Discord, via an in-house local-IPC
 client, optional, privacy-respecting, never blocking boot, zero new dependencies.

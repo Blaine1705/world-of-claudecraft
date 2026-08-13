@@ -44,9 +44,12 @@ extra rounds, and so phase 6's baseline includes the retuned tiers.
      command uses `git -C` with that absolute path; verify cwd assumptions with
      `status --porcelain` before and after each commit.
    - LOCAL-ONLY: never push, never open a PR (user releases this rule at packet end).
-   - Pull the base: `git -C <worktree> fetch origin release/v0.36.0 &&
-     git -C <worktree> merge origin/release/v0.36.0`. If the merge is non-trivial,
-     re-run the suites this phase depends on before writing new code.
+   - Pull the base: discover the LATEST release/* branch fresh
+     (`git -C <worktree> ls-remote --heads origin 'release/*'`, highest version),
+     ancestry-guard it, then `git -C <worktree> fetch origin <branch> &&
+     git -C <worktree> merge origin/<branch>` (state.md standing rule 3). If the
+     merge is non-trivial, re-run the suites this phase depends on before writing
+     new code.
    - `git status` must be clean before starting; if not, stop and ask the user.
    - Memory scan per the phase file's suggested topics.
 1. LOAD CONTEXT via an Explore agent (state.md + progress.md + the phase file + the

@@ -11,7 +11,9 @@ agents per focus area, findings adversarially verified by independent skeptics
 before they count.
 
 PROJECT RULES: work ONLY in /home/fernandoramirez/Documents/woc-desktop-client-update
-(git -C always); LOCAL-ONLY, never push; first pull+merge origin/release/v0.36.0;
+(git -C always); LOCAL-ONLY, never push; first: discover the LATEST release/* branch (git ls-remote --heads
+origin 'release/*', highest version), ancestry-guard, then pull+merge it (state.md
+standing rule 3);
 git status clean or stop and ask.
 
 Goal: audit phase 9. Risk centers: free-form strings crossing to an OS surface, and

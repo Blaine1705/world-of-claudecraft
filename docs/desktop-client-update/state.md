@@ -1,8 +1,10 @@
 # Desktop Client Update: state (cross-phase cheat sheet)
 
 Read this first in every session. Base commit at packet authoring: 6ed4d7e12c on
-release/v0.36.0. Any file:line anchors in this packet were verified at that base and
-may drift; re-verify by symbol name before relying on one.
+release/v0.36.0 (historical record; do not re-point). CURRENT BASE since the
+2026-08-13 interim reconcile: origin/release/v0.38.0 tip 952c183fc3, merged as
+cd03351264. Any file:line anchors in this packet were verified at their era's
+base and may drift; re-verify by symbol name before relying on one.
 
 ## Current phase
 
@@ -249,10 +251,23 @@ re-litigations all UPHOLD, hit-list 13/15 MATCH (2 record-only discrepancies),
 92/29 anchors reconcile, 20 actionable findings -> 17 confirmed / 2 resolved
 splits / 1 killed, all fixed except the user decisions. Probe round 12/12
 killed rc!=0 with named tests. Shader smoke clean at low and ultra. Crowd
-decay flat (solo 28.3 to crowd-50 29.8; first reference on this branch). Next
-up: phase 7 (phase-07-prefs-window-memory.md), fresh session, pull+merge
-first; read the phase 6 QA notes in progress.md for the merge-owned town
-regression and the two open user decisions before building on top.
+decay flat (solo 28.3 to crowd-50 29.8; first reference on this branch).
+
+INTERIM RECONCILE done 2026-08-13 (base -> origin/release/v0.38.0 tip
+952c183fc3, merge cd03351264 + fix a43e7f46e2; 2375 files, 8 conflicts
+hand-reconciled; census workflow 38 agents zero losses, 16 consequential
+claims all skeptic-verified; see the progress.md reconciliation record for
+the full delta census and the conflict ledger). Headlines: electron/ and the
+whole phase 1-4 shell surface were untouched upstream; the phase 5 governor
+files and LOW derivation survived byte-level (gfx hash pins passed unmoved);
+upstream's bounded compileAsync poll was ported into patches/three@0.185.1
+.patch (both arms now carry the disposal guard, zero semantic delta); the
+gate's biome recipe changed (see gotchas); the seal family is 9 files / 14
+tests (see gotchas); phase 7-11 files re-verified and edited against the
+merged tree. Next up: phase 7 (phase-07-prefs-window-memory.md), fresh
+session, latest-release merge first per standing rule 3; carry the two open
+user decisions (low hold-or-accept, r181 acceptance) and the merge-owned
+town-idle regression into that conversation.
 
 ## Standing rules (user-locked, 2026-08-08, non-negotiable)
 
@@ -263,11 +278,17 @@ regression and the two open user decisions before building on top.
    ~/Documents/world-of-claudecraft.
 2. LOCAL-ONLY: never push, never open a PR, until the user explicitly says the whole
    packet is done. No exceptions per phase.
-3. Every phase starts by pulling the latest release branch and merging it in:
-   `git -C <worktree> fetch origin release/v0.36.0` then
-   `git -C <worktree> merge origin/release/v0.36.0`. After any non-trivial base merge,
-   re-run the phase-relevant suites before building on top (hot release branches have
-   produced semantically wrong auto-merges before; do not trust a clean textual merge).
+3. Every phase starts by rebasing onto the LATEST release/* branch, DISCOVERED FRESH
+   each session, never a hardcoded name (user rule, 2026-08-13): run
+   `git -C <worktree> ls-remote --heads origin 'release/*'`, take the highest version
+   number (currently release/v0.38.0), then
+   `git -C <worktree> fetch origin <that-branch>` and
+   `git -C <worktree> merge origin/<that-branch>`. Before merging, ancestry-guard it:
+   `git merge-base --is-ancestor <current-base-sha> origin/<that-branch>` must hold, or
+   stop and surface (a release cut that dropped our base). After any non-trivial base
+   merge, re-run the phase-relevant suites before building on top (hot release branches
+   have produced semantically wrong auto-merges before; do not trust a clean textual
+   merge). A literal branch name anywhere in these docs is a snapshot, not the rule.
 4. Phases interleave QA: phase N, then phase N QA, then phase N+1. Do not start N+1
    before N QA passes.
 
@@ -288,9 +309,16 @@ regression and the two open user decisions before building on top.
   named pipe/socket only, zero new dependencies). The vendored-library route
   (@xhayper/discord-rpc) was evaluated and rejected: it drags @discordjs/rest and undici
   into an audited bundle. See brainstorm.md section 6.
-- Update-toast "what's new" is a t()-keyed LINK to the wiki changelog, not feed-supplied
-  release-notes text (feed text cannot satisfy the i18n contract). The feed releaseNotes
-  approach is rejected, do not revisit.
+- Update-toast "what's new" is a t()-keyed LINK, not feed-supplied release-notes text
+  (feed text cannot satisfy the i18n contract). The feed releaseNotes approach is
+  rejected, do not revisit. TARGET AMENDED by the 2026-08-13 census: no /wiki
+  changelog page exists on the merged tree, so "the wiki changelog" cannot be the
+  target as written; phase 9 starts with a target decision among (a) the existing
+  GitHub-releases News & Updates surface (GITHUB_RELEASES_URL, src/ui/
+  charselect_news.ts, most consistent with the live release-notes pipeline), (b) the
+  in-client news feed (src/ui/news_feed.ts via the /api/releases proxy), or (c) a new
+  changelog guide page (duplicates the existing pipeline); a bare /wiki-root link is
+  the weakest choice. The link-not-feed-text doctrine is unchanged.
 - OS notifications are assembled and t()-rendered in the RENDERER, pushed to main as
   final strings over a validated, capped, rate-limited channel. Main stays
   language-agnostic (same doctrine as the crash-dialog strings).
@@ -542,16 +570,44 @@ tmp/r181-showcase-frozen/ (frozen-phase pairs, the decision set),
 tmp/r181-showcase/ (unfrozen full-location sets), tmp/perf-parity/ (phase 6
 swiftshader mechanical pairs). Attribution + probe artifacts in the session
 scratchpad (low-attrib.json, probe-results.json, crowd-phase6qa.json).
+Interim reconcile additions (2026-08-13): merge cd03351264 (origin/release/
+v0.38.0, 2375 files); patches/three@0.185.1.patch re-authored to carry
+upstream 37c373cdd0's bounded round-robin isReady poll pass (2 ms budget,
+10..320 ms backoff, cheap-queries-only reset) on top of the disposal guard,
+pinned by the merged tests/three_compile_async_patch.test.ts (7 tests);
+src/render/types/three_keyframe_track.d.ts (module augmentation restoring
+KeyframeTrack.createInterpolant, which @types/three 0.185 dropped while the
+runtime keeps it; upstream's paladin clip modules and tests call it). Lock
+resolutions restored after the take-theirs lockfile floated them: electron
+43.3.0 (was drifting to 43.4.0) and n8ao 2.0.0 (was drifting to 2.0.1);
+specs unchanged. Upstream tooling now available to later phases: the boot
+load profiler (src/game/load_profiler.ts, src/render/load_marks.ts,
+scripts/load_probe.mjs, d7db12cf14) for desktop shell load metrics.
 
 Perf baselines: docs/perf/baseline/history.jsonl carries the phase 5 rows (low
 pre/post dressing fix + medium, this machines RTX 5090, 1280x720, vsync off;
 raw runs in tmp/perf-baseline/, gitignored). Phase 6 froze the pre-upgrade
 baselines at 519f1c328d; the phase 6 QA rows (4x low, 2x each medium/high/
-ultra, commit-per-run) are the fresh-vs-frozen evidence. NOTE for future perf
-work: chromium ANGLE on this MUXless box renders on the Intel iGPU by default;
-frozen and fresh rows share that stack so comparisons hold, but absolute fps
-is iGPU-bound, and any recipe change that moves the browser onto the 5090
-invalidates cross-era comparisons.
+ultra, commit-per-run) are the fresh-vs-frozen evidence. INTERIM RECONCILE
+2026-08-13: those frozen baselines are OBSOLETE as comparison targets for any
+FUTURE run (upstream v0.37/v0.38 landed a large perf body: shadow cadence and
+texel snap, first-reveal compile gates, early prewarm submission, texture
+residency prewarm, character far LOD + variant eviction, sky HDR eviction);
+the phase 6 baseline-vs-after TABLE remains valid historical evidence of the
+three-train delta. Baselines must be RE-FROZEN on the merged tree (quiet
+machine: other Claude sessions and workflow fan-outs poison the numbers; a
+contaminated first attempt on 2026-08-13 read low at 41.7 overall and was
+reverted uncommitted) before any new baseline-gated comparison. The r181
+frozen showcase pairs in tmp/r181-showcase-frozen/ remain INTERNALLY VALID
+for user decision #2 (both sides captured on the same pre-merge base, so they
+isolate the three-train lighting delta); NEVER diff post-merge captures
+against them: upstream changed sky, portraits, character visuals, terrain
+KTX2, and added contact blob shadows, so post-merge shots differ for reasons
+unrelated to r181. NOTE for future perf work: chromium ANGLE on this MUXless
+box renders on the Intel iGPU by default; frozen and fresh rows share that
+stack so comparisons hold, but absolute fps is iGPU-bound, and any recipe
+change that moves the browser onto the 5090 invalidates cross-era
+comparisons.
 
 ## Known gotchas for this packet
 
@@ -570,16 +626,17 @@ invalidates cross-era comparisons.
 - The i18n semantic-regressions suite (full gate only) pins reviewed locale prose:
   rewording an existing English value that has stale Latin locale fills reds it;
   re-point pins or add fresh non-Latin fills in the same change.
-- gate_select's biome leg (`npm run ci:changed`) diffs against biome.json
-  `vcs.defaultBranch` (origin/main), so on this release-based branch it sweeps the
-  whole release-vs-main delta (300+ files) and reds on pre-existing offenders
-  (vite.config.ts noUndeclaredEnvVars, src/render/characters/manifest.ts format),
-  aborting the gate before vitest and the builds. Struck in phase 1. Verify the true
-  delta with `npx @biomejs/biome ci --changed --since=origin/release/v0.36.0
-  --no-errors-on-unmatched`; for a fully green gate run, pin biome.json
-  defaultBranch to origin/release/v0.36.0 in the working tree for the run and revert
-  it after (NEVER commit the pin). Do not fix the offenders: they are deferred
-  whole-repo debt, not this branch's regression.
+- gate biome leg, POST-v0.38.0 RECIPE: the old biome.json defaultBranch pin is
+  OBSOLETE. Upstream ddc4b8a706 replaced the bare `biome ci --changed` with
+  `scripts/ci_changed.mjs`, which resolves a real `--since` via gate_discovery's
+  resolveSelectBase: the GATE_SELECT_BASE env override if set, else the newest
+  origin/release/* by version sort, else origin/main. On this branch the newest
+  release branch IS our base, so `npm run ci:changed` and the gate's biome leg
+  diff against the right base with NO working-tree edit. Verify a delta manually
+  with `GATE_SELECT_BASE=origin/<latest-release> npm run ci:changed` if the
+  auto-resolution ever picks wrong. (Census claim ci-changed-since-obsoletes-
+  biome-pin, both skeptics CONFIRMED, 2026-08-13.) Do not fix pre-existing
+  whole-repo biome offenders: deferred debt, not this branch's regression.
 - electron/vendor/ is gitignored generated output, so "vendor bundles unchanged"
   can never be read off `git status`: hash `electron/vendor/*.cjs` before and after
   and compare (phase 1 recipe).
@@ -595,8 +652,18 @@ invalidates cross-era comparisons.
   them). Phase 6 QA expansion: tests/mob_portrait_source_manifest.test.ts (arrived
   with the artwork-overhaul merge) seals the portrait RENDERER fingerprint, which
   the three train moved; it needs the re-render + review + receipt flow, so it is
-  the NINTH accepted seal suite (9 files / 13 tests total) batched with the phase
-  11 re-mint.
+  the NINTH accepted seal suite, batched with the phase 11 re-mint. Interim
+  reconcile 2026-08-13: the accepted-red SET is unchanged (same 9 suites;
+  eastbrook_provenance_diagnostics still green) but the count is now 9 files / 14
+  tests: upstream 154f0563ce added a third mob_portrait test (the --write receipt
+  authorization), red for the same fingerprint root cause. Two sealed suites new
+  in the range (tests/metamorphosis_asset.test.ts, tests/native_assets_pack
+  .test.ts) do NOT hash pnpm-lock.yaml, so the lockfile blast radius is unchanged
+  and they stay green. Phase 11 addition: upstream fb78debb7f shipped
+  scripts/assets/eastbrook_grand_armoury/rerecord_polish_provenance.mjs (renderer
+  .ts bytes are a provenance input the train moved): the phase 11 seal step must
+  run its twelve-input --check first; if the r185 delta touches town rendering
+  the polish captures must be RE-SHOT, not just re-recorded.
 - tests/profile_mode.test.mjs (in the normal vitest suite) and the browser
   regressions leg need a browser binary this machine lacks by default: export
   BROWSER_PATH=~/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome for gate
