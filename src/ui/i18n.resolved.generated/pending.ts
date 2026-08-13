@@ -11,50 +11,32 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.items.reins_rickshaw_mount.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_rickshaw_mount",
     "hudChrome.mounts.name_rickshaw_mount"
   ],
   "es_ES": [
     "entities.items.reins_rickshaw_mount.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_rickshaw_mount",
     "hudChrome.mounts.name_rickshaw_mount"
   ],
   "fr_FR": [
     "entities.items.reins_rickshaw_mount.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_rickshaw_mount",
     "hudChrome.mounts.name_rickshaw_mount"
   ],
   "fr_CA": [
     "entities.items.reins_rickshaw_mount.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_rickshaw_mount",
     "hudChrome.mounts.name_rickshaw_mount"
   ],
   "en_CA": [],
   "it_IT": [
     "entities.items.reins_rickshaw_mount.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_rickshaw_mount",
     "hudChrome.mounts.name_rickshaw_mount"
   ],
   "de_DE": [
     "entities.items.reins_rickshaw_mount.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_rickshaw_mount",
     "hudChrome.mounts.name_rickshaw_mount"
   ],
@@ -64,74 +46,47 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "entities.items.reins_rickshaw_mount.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_rickshaw_mount",
     "hudChrome.mounts.name_rickshaw_mount"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "entities.items.reins_rickshaw_mount.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_rickshaw_mount",
     "hudChrome.mounts.name_rickshaw_mount"
   ],
   "nl_NL": [
     "entities.items.reins_rickshaw_mount.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_rickshaw_mount",
     "hudChrome.mounts.name_rickshaw_mount"
   ],
   "pl_PL": [
     "entities.items.reins_rickshaw_mount.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_rickshaw_mount",
     "hudChrome.mounts.name_rickshaw_mount"
   ],
   "id_ID": [
     "entities.items.reins_rickshaw_mount.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_rickshaw_mount",
     "hudChrome.mounts.name_rickshaw_mount"
   ],
   "tr_TR": [
     "entities.items.reins_rickshaw_mount.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_rickshaw_mount",
     "hudChrome.mounts.name_rickshaw_mount"
   ],
   "sv_SE": [
     "entities.items.reins_rickshaw_mount.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_rickshaw_mount",
     "hudChrome.mounts.name_rickshaw_mount"
   ],
   "vi_VN": [
     "entities.items.reins_rickshaw_mount.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_rickshaw_mount",
     "hudChrome.mounts.name_rickshaw_mount"
   ],
   "da_DK": [
     "entities.items.reins_rickshaw_mount.name",
-    "hudChrome.chatQuota.limitReached",
-    "hudChrome.chatQuota.pending",
-    "hudChrome.chatQuota.unavailable",
     "hudChrome.mounts.desc_rickshaw_mount",
     "hudChrome.mounts.name_rickshaw_mount"
   ]
