@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   areComparable,
+  COMPARABILITY_KEYS,
   cacheKeyVariance,
   comparabilityMismatches,
   countEventsInWindow,
@@ -8,12 +9,14 @@ import {
   linksBeforeQuery,
   measurementParams,
   reflectionAttribution,
+  SOFTWARE_RENDERER_PATTERN,
   sanitizeCaptureUrl,
   summarizeCapture,
   uploadBucketsBeforeQuery,
   validateCapture,
   variantDiffParameter,
 } from '../scripts/profiler/gpu_hitch_metrics.mjs';
+import { SOFTWARE_RENDERER_PATTERN as CANONICAL_SOFTWARE_RENDERER_PATTERN } from '../src/render/software_renderer';
 
 function capture(overrides = {}) {
   return {
@@ -228,6 +231,71 @@ describe('gpu hitch metrics', () => {
     expect(comparabilityMismatches(left, right)).toEqual(['probeSha256', 'glRenderer']);
   });
 
+  // One mutation per comparability dimension, spelled out rather than derived
+  // from COMPARABILITY_KEYS: the two lists are diffed below, so a dimension
+  // dropped from the analyzer cannot quietly drop its own case here too.
+  // Refusing a drifted A/B pair is a headline claim of this workflow, and
+  // without these most of the list could be deleted with nothing going red.
+  const COMPARABILITY_MUTATIONS = {
+    sourceBuildId: (base) => ({ provenance: { ...base.provenance, sourceBuildId: 'other' } }),
+    servedBuildId: (base) => ({ provenance: { ...base.provenance, servedBuildId: 'other' } }),
+    probeSha256: (base) => ({ provenance: { ...base.provenance, probeSha256: 'other' } }),
+    analyzerSha256: (base) => ({ provenance: { ...base.provenance, analyzerSha256: 'other' } }),
+    schemaVersion: () => ({ schemaVersion: GPU_HITCH_SCHEMA_VERSION + 1 }),
+    profile: (base) => ({ capture: { ...base.capture, profile: 'entry' } }),
+    browserVersion: (base) => ({
+      environment: { ...base.environment, browserVersion: 'Chrome/9' },
+    }),
+    browserFlags: (base) => ({ environment: { ...base.environment, browserFlags: ['--other'] } }),
+    shaderDiskCache: (base) => ({
+      environment: { ...base.environment, shaderDiskCache: 'enabled' },
+    }),
+    glVendor: (base) => ({ environment: { ...base.environment, glVendor: 'other-vendor' } }),
+    glRenderer: (base) => ({ environment: { ...base.environment, glRenderer: 'other-renderer' } }),
+    viewport: (base) => ({ environment: { ...base.environment, viewport: '2560x1440' } }),
+    devicePixelRatio: (base) => ({ environment: { ...base.environment, devicePixelRatio: 2 } }),
+    gfx: (base) => ({ requested: { ...base.requested, gfx: 'high' } }),
+    scenario: (base) => ({ capture: { ...base.capture, scenario: 'online-geared-entry' } }),
+    zone: (base) => ({ capture: { ...base.capture, zone: 'fenbridge' } }),
+    observer: (base) => ({ capture: { ...base.capture, observer: { x: 10, z: 20 } } }),
+    groupId: (base) => ({ capture: { ...base.capture, groupId: 'other-group' } }),
+    fixture: (base) => ({ capture: { ...base.capture, fixture: { bots: 20 } } }),
+    durationMs: (base) => ({ capture: { ...base.capture, durationMs: 90_000 } }),
+    'requested.linkmode': (base) => ({ requested: { ...base.requested, linkmode: 'adaptive' } }),
+    'requested.linkrate': (base) => ({ requested: { ...base.requested, linkrate: 24 } }),
+    'requested.linkburst': (base) => ({ requested: { ...base.requested, linkburst: 8 } }),
+    'requested.compileroots': (base) => ({ requested: { ...base.requested, compileroots: 16 } }),
+    'requested.prewarmdeadline': (base) => ({
+      requested: { ...base.requested, prewarmdeadline: 15_000 },
+    }),
+    'requested.modular': (base) => ({ requested: { ...base.requested, modular: 'off' } }),
+    'requested.modularpeers': (base) => ({ requested: { ...base.requested, modularpeers: 'off' } }),
+    'effective.prewarmPacing': (base) => ({
+      effective: { ...base.effective, prewarmPacing: { available: true } },
+    }),
+    'effective.modular': (base) => ({
+      effective: { ...base.effective, modular: { available: true } },
+    }),
+    rendererTier: (base) => ({ effective: { ...base.effective, renderer: { tier: 'low' } } }),
+  };
+
+  it('covers every comparability dimension with a mutation case', () => {
+    expect([...COMPARABILITY_KEYS]).toEqual(Object.keys(COMPARABILITY_MUTATIONS));
+  });
+
+  it.each(Object.keys(COMPARABILITY_MUTATIONS))(
+    'refuses an A/B pair that drifted on %s and nothing else',
+    (key) => {
+      const left = capture();
+      const right = capture(COMPARABILITY_MUTATIONS[key](left));
+      // A leg is always its own control, so a comparator that just returned the
+      // whole key list could not pass this pair of assertions.
+      expect(comparabilityMismatches(left, left)).toEqual([]);
+      expect(comparabilityMismatches(left, right)).toEqual([key]);
+      expect(areComparable(left, right)).toBe(false);
+    },
+  );
+
   it('requires an explicit varying knob for an A/B difference', () => {
     const left = capture({
       requested: { ...capture().requested, linkrate: 0 },
@@ -422,6 +490,39 @@ describe('gpu hitch metrics', () => {
         'SwiftShader software renderer cannot be used as performance evidence',
       ]),
     );
+  });
+
+  it('refuses a WARP or llvmpipe capture through the generic software arm', () => {
+    // The SwiftShader case above has its own named arm; this is the OTHER one,
+    // which had no coverage at all. WARP is the live hazard: Chromium 141
+    // dropped the SwiftShader WebGL fallback, so a Windows machine with no
+    // usable GPU now reports "Microsoft Basic Render Driver" instead.
+    for (const glRenderer of [
+      'ANGLE (Microsoft, Microsoft Basic Render Driver Direct3D11 vs_5_0 ps_5_0)',
+      'Mesa/X.org llvmpipe (LLVM 15.0.6, 256 bits)',
+    ]) {
+      const raw = capture({ environment: { ...capture().environment, glRenderer } });
+      const smoke = validateCapture(raw);
+      expect(smoke.valid).toBe(true);
+      expect(smoke.evidenceKind).toBe('smoke');
+      expect(smoke.warnings).toContain(
+        'software renderer is smoke-only and cannot be used as performance evidence',
+      );
+
+      const performance = validateCapture(raw, { performanceEvidence: true });
+      expect(performance.valid).toBe(false);
+      expect(performance.errors).toContain(
+        'software renderer cannot be used as performance evidence',
+      );
+    }
+  });
+
+  it('reads software rasterizers with the repo-wide adapter pattern', () => {
+    // The analyzer is plain Node and cannot import the TS source of truth, so
+    // the two are pinned here. They drifted once already, and the drift is
+    // silent: a software capture simply passes as performance evidence.
+    expect(SOFTWARE_RENDERER_PATTERN.source).toBe(CANONICAL_SOFTWARE_RENDERER_PATTERN.source);
+    expect(SOFTWARE_RENDERER_PATTERN.flags).toBe(CANONICAL_SOFTWARE_RENDERER_PATTERN.flags);
   });
 
   it('labels a visible hardware capture as performance evidence', () => {

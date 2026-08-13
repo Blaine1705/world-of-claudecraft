@@ -80,8 +80,17 @@ function finiteQueryNumber(value: string | null): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+// The numeric knobs above are bounded by Number() already. These are free-form
+// strings, and the capture embeds the whole receipt verbatim
+// (scripts/gpu_hitch_capture.mjs), which is the one place an operator-controlled
+// value could travel into an artifact that gets handed around. Every flag the
+// client actually honours is a short token, so anything else is not a flag the
+// run used and has no business being recorded as one.
+const QUERY_FLAG_PATTERN = /^[A-Za-z0-9_.,:-]{1,32}$/;
+
 function queryFlag(value: string | null): string | null {
-  return value === null ? null : value;
+  if (value === null) return null;
+  return QUERY_FLAG_PATTERN.test(value) ? value : null;
 }
 
 function requestedFromSearch(search: string): GpuHitchRuntimeReceipt['requested'] {
@@ -94,7 +103,7 @@ function requestedFromSearch(search: string): GpuHitchRuntimeReceipt['requested'
     prewarmdeadline: finiteQueryNumber(params.get('prewarmdeadline')),
     modular: queryFlag(params.get('modular')),
     modularpeers: queryFlag(params.get('modularpeers')),
-    gfx: params.get('gfx'),
+    gfx: queryFlag(params.get('gfx')),
   };
 }
 

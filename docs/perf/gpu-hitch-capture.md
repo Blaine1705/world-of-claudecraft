@@ -14,6 +14,12 @@ even when `GL_RENDERER` confirms that Chrome used the discrete GPU rather than
 SwiftShader. Headless changes the window/compositor path and must never be mixed
 with headed legs in one A/B campaign.
 
+The analyzer refuses any software rasterizer as performance evidence, not just
+SwiftShader: it reads the adapter string through `SOFTWARE_RENDERER_PATTERN`
+(`src/render/software_renderer.ts`), which also names llvmpipe and the D3D11
+WARP fallback that Windows now uses in place of SwiftShader. Such a capture
+still validates, as a `smoke` artifact.
+
 For headed evidence, inhibit automatic sleep/DPMS for the complete command and
 keep the browser foregrounded. A physical HDMI switch can remove the display's
 EDID and reconfigure the desktop/GPU without producing a browser

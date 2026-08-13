@@ -98,7 +98,14 @@ const MEASUREMENT_KEYS = Object.freeze([
   'gfx',
 ]);
 
-const COMPARABILITY_KEYS = Object.freeze([
+/**
+ * Every dimension that has to match for two legs to be one another's control.
+ *
+ * Exported so the suite can pin it: the refusal is a headline claim of the
+ * capture workflow, and a dimension deleted here would silently start accepting
+ * drifted pairs while every other test stayed green.
+ */
+export const COMPARABILITY_KEYS = Object.freeze([
   'sourceBuildId',
   'servedBuildId',
   'probeSha256',
@@ -132,6 +139,20 @@ const COMPARABILITY_KEYS = Object.freeze([
 ]);
 
 const SAFE_GFX_VALUES = new Set(['low', 'medium', 'high', 'ultra', 'insane']);
+
+/**
+ * The adapter-name tokens that mark a software rasterizer.
+ *
+ * Kept EXACTLY in step with `SOFTWARE_RENDERER_PATTERN` in
+ * `src/render/software_renderer.ts`, the repo's single source of truth; this
+ * module is plain Node and cannot import the TS one, so the suite pins the two
+ * together instead. The earlier local pattern here had already drifted: it
+ * missed WARP, so a Windows no-GPU machine (whose renderer string is
+ * "Microsoft Basic Render Driver") passed as performance evidence. A bare
+ * "warp" token stays out on purpose, being a substring of real adapter names.
+ */
+export const SOFTWARE_RENDERER_PATTERN =
+  /swiftshader|llvmpipe|basic render|softpipe|microsoft basic|software/i;
 
 const finite = (value) => typeof value === 'number' && Number.isFinite(value);
 
@@ -523,7 +544,7 @@ function captureEvidence(capture) {
     swiftShader ||
     environment.softwareRendering === true ||
     environment.softwareRenderer === true ||
-    /(llvmpipe|softpipe|software rasterizer|software renderer)/i.test(rendererText);
+    SOFTWARE_RENDERER_PATTERN.test(rendererText);
   return {
     headless,
     swiftShader,

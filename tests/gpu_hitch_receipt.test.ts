@@ -29,6 +29,36 @@ describe('gpu hitch runtime receipt', () => {
     expect(JSON.stringify(receipt)).not.toContain('secret');
   });
 
+  it('drops a free-form flag value instead of copying it into the artifact', () => {
+    // modular, modularpeers and gfx are the only unbounded operator-controlled
+    // strings in the receipt, and the capture embeds the whole receipt verbatim
+    // (scripts/gpu_hitch_capture.mjs), around the measurementParams allowlist
+    // that guards every other path. Every flag the client honours is a short
+    // token, so anything longer or otherwise shaped is not a flag this run used.
+    (globalThis as unknown as { window: Record<string, unknown> }).window = {};
+    const long = 'a'.repeat(33);
+    const receipt = publishGpuHitchRuntimeReceipt({
+      search: `?modular=${long}&modularpeers=${encodeURIComponent('tok en/with spaces')}&gfx=${encodeURIComponent('<script>')}`,
+      renderer: null,
+    });
+    expect(receipt?.requested).toMatchObject({
+      modular: null,
+      modularpeers: null,
+      gfx: null,
+    });
+    const serialized = JSON.stringify(receipt);
+    expect(serialized).not.toContain(long);
+    expect(serialized).not.toContain('script');
+
+    // A real flag still travels: bounding must not silently blank the knobs the
+    // A/B comparator keys on.
+    const kept = publishGpuHitchRuntimeReceipt({
+      search: '?modular=off&modularpeers=on&gfx=ultra',
+      renderer: null,
+    });
+    expect(kept?.requested).toMatchObject({ modular: 'off', modularpeers: 'on', gfx: 'ultra' });
+  });
+
   it('publishes the pacing values consumed by the renderer after prewarm', () => {
     (globalThis as unknown as { window: Record<string, unknown> }).window = {};
     const receipt = publishGpuHitchRuntimeReceipt({

@@ -8,7 +8,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
-import { BROWSER_PATH } from './browser_path.mjs';
+import { findBrowserPath } from './browser_path_resolve.mjs';
 import { dismissEntryOverlays, enterOfflineGame } from './enter_offline_game.mjs';
 import { assertLoopbackUrl } from './lib/loopback_guard.mjs';
 import {
@@ -420,8 +420,30 @@ export async function prepareOnlineGearedRoster({
   // The geared crowd rides with the observer: measuring a different town with
   // the bots left behind at the default spot would silently change the scenario
   // (no nearby geared players) as well as the location.
-  await roster.prepare({ center: args.observer ?? GEARED_ARRIVAL_OBSERVER });
+  //
+  // prepare() registers accounts and opens sockets one bot at a time and has no
+  // cleanup of its own, so a failure partway through would strand everything it
+  // already created: the caller's finally only sees a roster this function
+  // RETURNED. Close it here, then rethrow the original failure.
+  try {
+    await roster.prepare({ center: args.observer ?? GEARED_ARRIVAL_OBSERVER });
+  } catch (error) {
+    await roster.close().catch(() => {});
+    throw error;
+  }
   return roster;
+}
+
+// Resolved at launch, never at module load: this file's pure halves (parseArgs,
+// buildCapture, prepareOnlineGearedRoster) are unit-tested, and a load-time
+// throw would red the whole suite on any machine without a Chromium.
+function requireBrowserPath() {
+  const resolved = findBrowserPath();
+  if (!resolved)
+    throw new Error(
+      'No Chrome/Edge/Chromium binary found. Set BROWSER_PATH to your browser executable.',
+    );
+  return resolved;
 }
 
 export async function capture(args) {
@@ -453,7 +475,7 @@ export async function capture(args) {
       args.fixtureEvidence = roster.evidence();
     }
     browser = await puppeteer.launch({
-      executablePath: BROWSER_PATH,
+      executablePath: requireBrowserPath(),
       headless: args.headless ? 'new' : false,
       userDataDir: profileDir,
       args: browserArgs(args.viewport),

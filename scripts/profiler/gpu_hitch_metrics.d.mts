@@ -26,6 +26,8 @@ export function validateCapture(
   performanceEvidence: boolean;
   evidenceKind: 'performance' | 'smoke' | 'invalid';
 };
+export const COMPARABILITY_KEYS: readonly string[];
+export const SOFTWARE_RENDERER_PATTERN: RegExp;
 export function comparabilityMismatches(
   left: unknown,
   right: unknown,

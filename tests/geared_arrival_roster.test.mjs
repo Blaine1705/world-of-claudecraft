@@ -45,10 +45,17 @@ describe('geared arrival roster geometry', () => {
   });
 
   it('bounds direct database work and tears down exact fixture accounts', () => {
+    // Full-line // comments are stripped first, the same rule
+    // tests/loopback_guard.test.ts applies: this module explains its own
+    // timeouts and teardown in prose right beside them, so a raw-text scan
+    // would be satisfied by a commented-out or merely described setting.
     const source = readFileSync(
       new URL('../scripts/profiler/geared_arrival_roster.mjs', import.meta.url),
       'utf8',
-    );
+    )
+      .split('\n')
+      .filter((line) => !/^\s*\/\//.test(line))
+      .join('\n');
     expect(source).toContain('connectionTimeoutMillis: 5_000');
     expect(source).toContain('query_timeout: DB_TIMEOUT_MS');
     expect(source).toContain('statement_timeout: DB_TIMEOUT_MS');

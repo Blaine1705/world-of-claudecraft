@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   buildCapture,
@@ -141,12 +142,48 @@ describe('gpu hitch capture CLI', () => {
   });
 
   it('requires complete, safe A/B metadata', () => {
-    expect(() => parseArgs(['--group-id', 'campaign'])).toThrow(
-      '--group-id, --leg, --repetition, and --order must be supplied together',
-    );
+    // Every field on its own, not just --group-id: the rule is symmetric, and a
+    // capture labelled with three of the four cannot be placed in its campaign.
+    const together = '--group-id, --leg, --repetition, and --order must be supplied together';
+    expect(() => parseArgs(['--group-id', 'campaign'])).toThrow(together);
+    expect(() => parseArgs(['--leg', 'limited'])).toThrow(together);
+    expect(() => parseArgs(['--repetition', '1'])).toThrow(together);
+    expect(() => parseArgs(['--order', '2'])).toThrow(together);
+    expect(() =>
+      parseArgs(['--group-id', 'campaign', '--leg', 'limited', '--repetition', '1']),
+    ).toThrow(together);
+    // All four together is the only accepted shape.
+    expect(
+      parseArgs([
+        '--group-id',
+        'campaign',
+        '--leg',
+        'limited',
+        '--repetition',
+        '1',
+        '--order',
+        '2',
+      ]),
+    ).toMatchObject({ groupId: 'campaign', leg: 'limited', repetition: 1, order: 2 });
     expect(() => parseArgs(['--leg', 'bad leg'])).toThrow(
       '--leg must be a 1-64 character identifier',
     );
+  });
+
+  it('resolves the capture zone from the live player position, not a constant', () => {
+    // The producer end of the `zone` comparability dimension. buildCapture is
+    // covered below, but perfStats() is where the value is DERIVED, and it
+    // cannot run in Node: regressing it to a literal null would silently
+    // disable the analyzer's zone check with every other test still green.
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    expect(renderer).toContain(
+      'currentZoneId: this.zoneIdAt(this.sim.player.pos.x, this.sim.player.pos.z),',
+    );
+    const capture = readFileSync(
+      new URL('../scripts/gpu_hitch_capture.mjs', import.meta.url),
+      'utf8',
+    );
+    expect(capture).toContain('zone: snapshot.rendererStats?.currentZoneId ?? null,');
   });
 
   it('assembles a complete capture artifact from a probe snapshot without a browser', () => {
@@ -279,6 +316,35 @@ describe('gpu hitch capture CLI', () => {
 
     expect(prepared).toBe(roster);
     expect(events).toEqual(['capability:http://localhost:8787', 'construct:2', 'prepare']);
+  });
+
+  it('closes a roster whose prepare failed partway through', async () => {
+    // prepare() registers accounts and opens sockets one bot at a time and has
+    // no cleanup of its own. A failure on bot 7 of 20 used to strand every
+    // account it had already inserted plus the open pg client, because the
+    // caller's finally only ever sees a roster this function RETURNED.
+    const events = [];
+    const roster = {
+      prepare: async () => {
+        events.push('prepare');
+        throw new Error('bot 7 failed to enter the world');
+      },
+      close: async () => events.push('close'),
+    };
+    await expect(
+      prepareOnlineGearedRoster({
+        args: {
+          url: 'http://localhost:5173/?perf',
+          serverUrl: 'http://localhost:8787',
+          bots: 20,
+        },
+        runId: 'capture-1',
+        databaseUrl: 'postgres://localhost/test',
+        checkCapability: async () => {},
+        rosterFactory: () => roster,
+      }),
+    ).rejects.toThrow('bot 7 failed to enter the world');
+    expect(events).toEqual(['prepare', 'close']);
   });
 
   it('rejects a remote page before capability checks or roster mutation', async () => {
