@@ -324,6 +324,35 @@ describe('mob portrait source manifest', () => {
     }
   });
 
+  it('never treats a changed browser bundle entry (non-digest metadata) as a bookkeeping-only drift', () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'wocc-portrait-manifest-bundle-metadata-'));
+    try {
+      const current = JSON.parse(readFileSync(manifestPath, 'utf8')) as PortraitSourceManifest;
+      const metadataCorrupted = structuredClone(current);
+      metadataCorrupted.rendererFingerprint = 'stale-bookkeeping-fingerprint';
+      metadataCorrupted.renderer.browserBundle = {
+        ...metadataCorrupted.renderer.browserBundle,
+        // A legitimate digest move, paired with a corrupted (never-legitimate) entry path.
+        // The check must still reject this: entry is provenance, not digest, and cannot be
+        // waved through just because the digest fields also changed.
+        sha256: 'stale-bookkeeping-bundle-hash',
+        entry: 'scripts/render_finder_portraits_corrupted.mjs',
+      };
+      const corruptedManifest = join(tempDir, 'bundle-metadata.json');
+      writeFileSync(corruptedManifest, `${JSON.stringify(metadataCorrupted, null, 2)}\n`);
+
+      const result = spawnSync(
+        process.execPath,
+        [script, '--check', '--manifest', corruptedManifest],
+        { cwd: repoRoot, encoding: 'utf8', timeout: 30_000 },
+      );
+      expect(result.status).toBe(1);
+      expect(result.stdout).not.toContain('bookkeeping-only');
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
   it('never treats a missing or unparseable manifest as a bookkeeping-only drift', () => {
     const tempDir = mkdtempSync(join(tmpdir(), 'wocc-portrait-manifest-missing-'));
     try {

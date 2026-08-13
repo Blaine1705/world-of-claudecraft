@@ -70,16 +70,24 @@ function parseManifestOrNull(buffer) {
   }
 }
 
-// The only two fields the browser render bundle's wide import graph can move without any
-// portrait row, tracked source file, schema, or count changing (mob_portrait_manifest_diff.mjs
-// explains why). Blanking exactly these two and deep-equating everything else PROVES nothing
-// else drifted, rather than trusting a hand-enumerated dimension list to stay exhaustive as the
-// manifest schema grows.
+// The only fields the browser render bundle's wide import graph can move without any portrait
+// row, tracked source file, schema, or count changing (mob_portrait_manifest_diff.mjs explains
+// why): the top-level rendererFingerprint plus the digest half of renderer.browserBundle
+// (bytes, sha256). Every other browserBundle field (entry, esbuildVersion, ...) is provenance,
+// not digest, and must still be compared: blanking the whole browserBundle object would let a
+// corrupted entry path or esbuild version through as "bookkeeping-only" drift. Blanking exactly
+// the digest fields and deep-equating everything else PROVES nothing else drifted, rather than
+// trusting a hand-enumerated dimension list to stay exhaustive as the manifest schema grows.
 function withoutBundleFingerprint(manifest) {
   return {
     ...manifest,
     rendererFingerprint: null,
-    renderer: { ...manifest.renderer, browserBundle: null },
+    renderer: {
+      ...manifest.renderer,
+      browserBundle: manifest.renderer?.browserBundle
+        ? { ...manifest.renderer.browserBundle, bytes: null, sha256: null }
+        : manifest.renderer?.browserBundle,
+    },
   };
 }
 
