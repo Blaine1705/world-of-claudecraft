@@ -17,7 +17,7 @@
 //
 // Usage:
 //   GAME_URL=http://localhost:5195 SERVER_URL=http://127.0.0.1:8791 \
-//     SHOTS_DIR=docs/screenshots/admin-cheater-mark-panel \
+//     SHOTS_DIR=docs/screenshots/admin-cheater-mark \
 //     node scripts/admin_cheater_mark_shot.mjs
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -27,7 +27,9 @@ import { assertLoopbackDatabaseUrl, assertLoopbackUrl } from './lib/loopback_gua
 
 const GAME_URL = process.env.GAME_URL ?? 'http://localhost:5195';
 const SERVER_URL = process.env.SERVER_URL ?? 'http://127.0.0.1:8791';
-const OUT = process.env.SHOTS_DIR ?? 'docs/screenshots/admin-cheater-mark-panel';
+// Defaults to the directory the committed captures actually live in, so a bare
+// re-run overwrites them in place instead of minting a second screenshot dir.
+const OUT = process.env.SHOTS_DIR ?? 'docs/screenshots/admin-cheater-mark';
 
 // This script registers accounts and grants a STAFF role, so every target it
 // touches must be loopback (the mob_stall_repro.mjs policy): the HTTP server,
