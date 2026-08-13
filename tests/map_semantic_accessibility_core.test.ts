@@ -102,6 +102,21 @@ function crowdedOverworldModel(): MapPaintResult {
   } as unknown as MapPaintResult;
 }
 
+const GATHER_ACCESSIBILITY_CASES = [
+  { type: 'ore', ready: true, locked: false, label: 'Ready ore node' },
+  { type: 'wood', ready: true, locked: false, label: 'Ready wood node' },
+  { type: 'herb', ready: true, locked: false, label: 'Ready herb node' },
+  { type: 'ore', ready: true, locked: true, label: 'Ready ore node, tool locked' },
+  { type: 'wood', ready: true, locked: true, label: 'Ready wood node, tool locked' },
+  { type: 'herb', ready: true, locked: true, label: 'Ready herb node, tool locked' },
+  { type: 'ore', ready: false, locked: false, label: 'Depleted ore node' },
+  { type: 'wood', ready: false, locked: false, label: 'Depleted wood node' },
+  { type: 'herb', ready: false, locked: false, label: 'Depleted herb node' },
+  { type: 'ore', ready: false, locked: true, label: 'Depleted ore node, tool locked' },
+  { type: 'wood', ready: false, locked: true, label: 'Depleted wood node, tool locked' },
+  { type: 'herb', ready: false, locked: true, label: 'Depleted herb node, tool locked' },
+] as const;
+
 beforeAll(async () => {
   await ensureLocaleLoaded('zh_CN');
 });
@@ -327,6 +342,33 @@ describe('map semantic accessibility core', () => {
     expect(stationName).toHaveBeenCalledTimes(stationCalls);
     expect(zoneName).toHaveBeenCalledTimes(zoneCalls);
   });
+
+  it.each(GATHER_ACCESSIBILITY_CASES)(
+    'names $type ready=$ready locked=$locked as "$label"',
+    ({ type, ready, locked, label }) => {
+      const model = {
+        view: {},
+        cursor: 'default',
+        questAreas: [],
+        npcs: [],
+        gatherNodes: [
+          { mx: 280, my: 280, nodeId: `${type}-${ready}-${locked}`, type, ready, locked },
+        ],
+        stations: [],
+        services: [],
+        navigation: [],
+        player: null,
+        allies: [],
+        party: [],
+        portals: [],
+        pois: [],
+      } as unknown as MapPaintResult;
+
+      expect(core().updateOverworld(model, 'Eastbrook Vale', 560)).toContain(
+        `${label}: center, near.`,
+      );
+    },
+  );
 
   it('rebuilds cached prose when only the loaded language changes', () => {
     const view = core();
