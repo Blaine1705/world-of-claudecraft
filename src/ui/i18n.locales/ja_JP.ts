@@ -2705,6 +2705,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterBagAll': 'すべてのバッグ',
   'itemUi.market.filterRarity': 'レア度',
   'itemUi.market.filterRarityAll': 'すべてのレア度',
+  'itemUi.market.filterSort': '並べ替え',
+  'itemUi.market.sortName': '名前 (A-Z)',
+  'itemUi.market.sortPriceAsc': '価格: 安い順',
   'itemUi.market.weaponSword': '剣',
   'itemUi.market.weaponDagger': '短剣',
   'itemUi.market.weaponStaff': '杖',
@@ -5534,6 +5537,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.chatWindow.resetAction': 'リセット',
   'hudChrome.chatWindow.note':
     'チャットのタブ列をドラッグするとウィンドウを移動でき、右下のグリップをドラッグするとサイズを変更できます。リセットすると既定の位置とサイズに戻ります。',
+  'hudChrome.chatQuota.limitReached':
+    '一般チャットの上限に達しました。{seconds}後にもう一度お試しください。',
+  'hudChrome.chatQuota.pending':
+    '直前の一般チャットのメッセージは送信中です。少し待ってからもう一度お試しください。',
+  'hudChrome.chatQuota.unavailable':
+    '一般チャットは一時的に利用できません。しばらくしてからもう一度お試しください。',
   'hudChrome.compass.E': '東',
   'hudChrome.compass.N': '北',
   'hudChrome.compass.NE': '北東',
@@ -7626,6 +7635,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.craftedToast': '製作しました:{name}',
   'hudChrome.crafting.craftedToastQty': '製作しました:{name} x{qty}',
   'hudChrome.crafting.insufficientMaterials': '材料が不足しています。',
+  'hudChrome.crafting.reagentLocked': 'その素材はロックされています。',
   'hudChrome.crafting.unknownRecipe': 'そのレシピは存在しません。',
   'hudChrome.crafting.comboRequires': '調律条件：{craftA} + {craftB}、ティア {tier}。',
   'hudChrome.crafting.comboMet': '準備完了。',
@@ -7698,14 +7708,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'World of ClaudeCraft のバージョン {version} が利用可能です。今すぐアップデートして最新の修正と改善を入手しましょう。',
   'hudChrome.nativeUpdate.notNow': '後で',
   'hudChrome.nativeUpdate.update': '更新',
-  'hudChrome.otaUpdate.title': 'ゲームアップデート',
-  'hudChrome.otaUpdate.downloading': 'アップデートをダウンロード中：{percent}',
-  'hudChrome.otaUpdate.applying':
-    'アップデートをダウンロードしました。適用のためゲームを再起動しています。',
-  'hudChrome.otaUpdate.incompatible':
-    'プレイするにはアップデートが必要です。ダウンロードが完了すると自動的に適用されます。',
-  'hudChrome.otaUpdate.continueAnyway': '更新せずに続行',
-  'hudChrome.otaUpdate.progressLabel': 'アップデートのダウンロード進行状況',
   'hudChrome.cameraPrompt.title': 'カメラを選択',
   'hudChrome.cameraPrompt.intro': 'カメラがキャラクターを追う方法を選びましょう。',
   'hudChrome.cameraPrompt.mouseDesc': 'ボタンを押さずにマウスを動かして視点を回します。',
@@ -10649,6 +10651,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.notHeld': 'そのアイテムを所持していません。',
   'hudChrome.enchanting.notDisenchantable': 'それは魔力分解できません。',
   'hudChrome.enchanting.notSalvageable': 'それは解体できません。',
+  'hudChrome.enchanting.salvageLocked': 'そのアイテムはロックされています。',
   'hudChrome.enchanting.enchantWrongSlot': 'そのエンチャントはそのアイテムには付与できません。',
   'hudChrome.enchanting.enchantUnknown': 'そのエンチャントは存在しません。',
   'hudChrome.enchanting.enchantInsufficient': 'そのエンチャントに必要な素材がありません。',
@@ -11317,6 +11320,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmAccept': '置き換える',
   'hudChrome.bags.itemAriaEnchanted': '{item}、数量 {count}、エンチャント済みの品',
   'hudChrome.bags.itemAriaBound': '{item}、数量 {count}、バインド済みの品',
+  'hudChrome.bags.itemAriaLocked': '{item}、数量 {count}、ロック済み',
+  'hudChrome.bags.itemLockedLine': 'ロック中',
+  'hudChrome.bags.unlockItem': 'アイテムのロック解除',
   'hudChrome.itemTooltip.enchantedFallback': 'エンチャント済み',
   'devCommand.actions.kit.description':
     '指定したスペック向けのSanctum以前レベル20プリセットを装備します (バッグを先に)。装備品のみです。',
@@ -12884,4 +12890,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '進行中の試合を抜けることは離脱にあたり、レーティングのかかった仕組みで負けている最中に接続を切る行為に報いるわけにはいきません。離脱した者はその場で敗北と、それに伴うレーティングの下落を負い、旗を運んでいたなら旗を落とし、その味方は一人欠けたまま戦い続けます。この最後の点こそ、空席が用意される理由です。試合が人数不足の間、待機列はその席を待っている誰かに差し出すことができますが、これは常に受けるか断るかを選べる誘いであって、勝手に転送されるわけではありません。断っても何の損もなく、席は次の人へ回ります。声がかかるのは単独で並んでいる人だけなので、一緒に並んだパーティーが穴埋めのために引き離されることはありません。',
   'guide.thornhollowPage.backfillNote':
     '補充の席は意図的に危険のないものになっています。あなたが飛び込むのは自分が関わっていない戦況なので、勝っても負けてもこの試合があなたの戦場レーティングに触れることはなく、途中で抜けても何も負いません。試合が終わりに近づき、来たところで結果を変えられない頃合いになると誘い自体が届かなくなるので、他人の幕引きに座らされることはありません。',
+  'hudChrome.bags.lockItem': 'アイテムをロック',
+  'hudChrome.otaUpdate.applying': 'アップデートをダウンロードしました。適用のためゲームを再起動しています。',
+  'hudChrome.otaUpdate.continueAnyway': '更新せずに続行',
+  'hudChrome.otaUpdate.downloading': 'アップデートをダウンロード中：{percent}',
+  'hudChrome.otaUpdate.incompatible': 'プレイするにはアップデートが必要です。ダウンロードが完了すると自動的に適用されます。',
+  'hudChrome.otaUpdate.progressLabel': 'アップデートのダウンロード進行状況',
+  'hudChrome.otaUpdate.title': 'ゲームアップデート',
 };

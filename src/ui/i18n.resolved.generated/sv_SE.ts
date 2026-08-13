@@ -801,6 +801,11 @@ export const sv_SE: EnTranslations = {
       "resetAction": "Återställ",
       "note": "Dra chattflikraden för att flytta fönstret, eller hörnhandtaget för att ändra storlek. Återställ sätter det till standardläge och -storlek."
     },
+    "chatQuota": {
+      "limitReached": "Gränsen för Allmänt-chatten är nådd. Försök igen om {seconds}.",
+      "pending": "Ditt föregående meddelande i Allmänt-chatten skickas fortfarande. Försök igen om en stund.",
+      "unavailable": "Allmänt-chatten är tillfälligt otillgänglig. Försök igen snart."
+    },
     "swing": {
       "ready": "Sving",
       "seconds": "{seconds}s"
@@ -894,12 +899,12 @@ export const sv_SE: EnTranslations = {
       "update": "Uppdatera"
     },
     "otaUpdate": {
-      "title": "Game Update",
-      "downloading": "Downloading update: {percent}",
-      "applying": "Update downloaded. Restarting the game to apply it.",
-      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
-      "continueAnyway": "Continue without updating",
-      "progressLabel": "Update download progress"
+      "title": "Speluppdatering",
+      "downloading": "Laddar ner uppdatering: {percent}",
+      "applying": "Uppdateringen har laddats ner. Spelet startas om för att tillämpa den.",
+      "incompatible": "En uppdatering krävs för att spela. Den tillämpas så snart nedladdningen är klar.",
+      "continueAnyway": "Fortsätt utan att uppdatera",
+      "progressLabel": "Förlopp för nedladdning av uppdatering"
     },
     "cameraPrompt": {
       "title": "Välj din kamera",
@@ -2194,6 +2199,10 @@ export const sv_SE: EnTranslations = {
       "itemAriaBound": "{item}, antal {count}, bunden kopia",
       "itemAriaMasterwork": "{item}, antal {count}, mästerverk",
       "itemAriaQuest": "{item}, antal {count}, uppdragsföremål",
+      "itemAriaLocked": "{item}, antal {count}, låst",
+      "itemLockedLine": "Låst",
+      "lockItem": "Lås föremål",
+      "unlockItem": "Lås upp föremål",
       "filterGroupAria": "Filtrera väskor efter kategori",
       "filterAll": "Alla",
       "filterWeapon": "Vapen",
@@ -3225,6 +3234,7 @@ export const sv_SE: EnTranslations = {
       "craftedToast": "Tillverkad: {name}",
       "craftedToastQty": "Tillverkad: {name} x{qty}",
       "insufficientMaterials": "Du har inte materialet för det.",
+      "reagentLocked": "En reagens för det är låst.",
       "unknownRecipe": "Det receptet finns inte.",
       "comboRequirementUnmet": "Du har inte båda de hantverk som krävs på den nivå receptet kräver.",
       "comboRequires": "Inriktning: {craftA} + {craftB}, nivå {tier}.",
@@ -3331,6 +3341,7 @@ export const sv_SE: EnTranslations = {
       "notHeld": "Du har inte det föremålet.",
       "notDisenchantable": "Du kan inte avförtrylla det.",
       "notSalvageable": "Du kan inte bärga det.",
+      "salvageLocked": "Det föremålet är låst.",
       "disenchantBusy": "Du är upptagen.",
       "salvageBusy": "Du är upptagen.",
       "enchantBusy": "Du är upptagen.",
@@ -8907,6 +8918,9 @@ export const sv_SE: EnTranslations = {
       "filterPrimaryStatAll": "Alla primära attribut",
       "filterRarity": "Sällsynthet",
       "filterRarityAll": "Alla sällsyntheter",
+      "filterSort": "Sortera",
+      "sortName": "Namn (A-Z)",
+      "sortPriceAsc": "Pris: lågt till högt",
       "weaponSword": "Svärd",
       "weaponDagger": "Dolkar",
       "weaponStaff": "Stavar",

@@ -10,144 +10,54 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hudChrome.nameplate.cheaterTag",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.nameplate.cheaterTag"
   ],
   "es_ES": [
-    "hudChrome.nameplate.cheaterTag",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.nameplate.cheaterTag"
   ],
   "fr_FR": [
-    "hudChrome.nameplate.cheaterTag",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.nameplate.cheaterTag"
   ],
   "fr_CA": [
-    "hudChrome.nameplate.cheaterTag",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.nameplate.cheaterTag"
   ],
   "en_CA": [],
   "it_IT": [
-    "hudChrome.nameplate.cheaterTag",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.nameplate.cheaterTag"
   ],
   "de_DE": [
-    "hudChrome.nameplate.cheaterTag",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.nameplate.cheaterTag"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "hudChrome.nameplate.cheaterTag",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.nameplate.cheaterTag"
   ],
   "ru_RU": [],
   "cs_CZ": [
-    "hudChrome.nameplate.cheaterTag",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.nameplate.cheaterTag"
   ],
   "nl_NL": [
-    "hudChrome.nameplate.cheaterTag",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.nameplate.cheaterTag"
   ],
   "pl_PL": [
-    "hudChrome.nameplate.cheaterTag",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.nameplate.cheaterTag"
   ],
   "id_ID": [
-    "hudChrome.nameplate.cheaterTag",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.nameplate.cheaterTag"
   ],
   "tr_TR": [
-    "hudChrome.nameplate.cheaterTag",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.nameplate.cheaterTag"
   ],
   "sv_SE": [
-    "hudChrome.nameplate.cheaterTag",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.nameplate.cheaterTag"
   ],
   "vi_VN": [
-    "hudChrome.nameplate.cheaterTag",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.nameplate.cheaterTag"
   ],
   "da_DK": [
-    "hudChrome.nameplate.cheaterTag",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.nameplate.cheaterTag"
   ]
 };

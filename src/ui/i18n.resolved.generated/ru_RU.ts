@@ -801,6 +801,11 @@ export const ru_RU: EnTranslations = {
       "resetAction": "Сбросить",
       "note": "Перетащите полосу вкладок чата, чтобы переместить окно, или угловой маркер, чтобы изменить размер. Сброс возвращает окно в положение и размер по умолчанию."
     },
+    "chatQuota": {
+      "limitReached": "Достигнут лимит общего чата. Повторите попытку через {seconds}.",
+      "pending": "Предыдущее сообщение в общий чат ещё отправляется. Повторите попытку через мгновение.",
+      "unavailable": "Общий чат временно недоступен. Повторите попытку позже."
+    },
     "swing": {
       "ready": "Замах",
       "seconds": "{seconds} сек."
@@ -2194,6 +2199,10 @@ export const ru_RU: EnTranslations = {
       "itemAriaBound": "{item}, количество {count}, привязанный экземпляр",
       "itemAriaMasterwork": "{item}, количество {count}, шедевр",
       "itemAriaQuest": "{item}, количество {count}, предмет задания",
+      "itemAriaLocked": "{item}, количество {count}, заблокированный экземпляр",
+      "itemLockedLine": "Заблокировано",
+      "lockItem": "Заблокировать предмет",
+      "unlockItem": "Разблокировать предмет",
       "filterGroupAria": "Фильтровать сумки по категории",
       "filterAll": "Все",
       "filterWeapon": "Оружие",
@@ -3225,6 +3234,7 @@ export const ru_RU: EnTranslations = {
       "craftedToast": "Создано: {name}",
       "craftedToastQty": "Создано: {name} x{qty}",
       "insufficientMaterials": "У вас недостаточно материалов.",
+      "reagentLocked": "Один из реагентов заблокирован.",
       "unknownRecipe": "Такого рецепта не существует.",
       "comboRequirementUnmet": "У вас нет обоих требуемых ремесел нужного уровня для этого рецепта.",
       "comboRequires": "Настройка: {craftA} + {craftB}, ранг {tier}.",
@@ -3331,6 +3341,7 @@ export const ru_RU: EnTranslations = {
       "notHeld": "У вас нет этого предмета.",
       "notDisenchantable": "Это нельзя распылить.",
       "notSalvageable": "Это нельзя разобрать.",
+      "salvageLocked": "Этот предмет заблокирован.",
       "disenchantBusy": "Вы заняты.",
       "salvageBusy": "Вы заняты.",
       "enchantBusy": "Вы заняты.",
@@ -8907,6 +8918,9 @@ export const ru_RU: EnTranslations = {
       "filterPrimaryStatAll": "Любая основная характеристика",
       "filterRarity": "Редкость",
       "filterRarityAll": "Все редкости",
+      "filterSort": "Сортировка",
+      "sortName": "Название (А-Я)",
+      "sortPriceAsc": "Цена: по возрастанию",
       "weaponSword": "Мечи",
       "weaponDagger": "Кинжалы",
       "weaponStaff": "Посохи",

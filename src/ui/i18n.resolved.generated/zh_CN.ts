@@ -801,6 +801,11 @@ export const zh_CN: EnTranslations = {
       "resetAction": "重置",
       "note": "拖动聊天标签栏可移动窗口，拖动右下角手柄可调整大小。重置可恢复到默认位置和大小。"
     },
+    "chatQuota": {
+      "limitReached": "综合聊天已达到限额。请在 {seconds} 后重试。",
+      "pending": "上一条综合聊天消息仍在发送中。请稍候再试。",
+      "unavailable": "综合聊天暂时不可用。请稍后再试。"
+    },
     "swing": {
       "ready": "挥击",
       "seconds": "{seconds}秒"
@@ -2194,6 +2199,10 @@ export const zh_CN: EnTranslations = {
       "itemAriaBound": "{item}，数量 {count}，已绑定的副本",
       "itemAriaMasterwork": "{item}，数量 {count}，杰作",
       "itemAriaQuest": "{item}，数量 {count}，任务物品",
+      "itemAriaLocked": "{item}，数量 {count}，已锁定",
+      "itemLockedLine": "已锁定",
+      "lockItem": "锁定物品",
+      "unlockItem": "解锁物品",
       "filterGroupAria": "按类别筛选背包",
       "filterAll": "全部",
       "filterWeapon": "武器",
@@ -3225,6 +3234,7 @@ export const zh_CN: EnTranslations = {
       "craftedToast": "已制作:{name}",
       "craftedToastQty": "已制作:{name} x{qty}",
       "insufficientMaterials": "你没有足够的材料。",
+      "reagentLocked": "该配方所需的材料已锁定。",
       "unknownRecipe": "该配方不存在。",
       "comboRequirementUnmet": "你没有达到该配方所需组合的两项制造技能等级。",
       "comboRequires": "调谐要求：{craftA} + {craftB}，阶级 {tier}。",
@@ -3331,6 +3341,7 @@ export const zh_CN: EnTranslations = {
       "notHeld": "你没有那件物品。",
       "notDisenchantable": "你无法分解那件物品。",
       "notSalvageable": "你无法拆解那件物品。",
+      "salvageLocked": "该物品已锁定。",
       "disenchantBusy": "你正忙着。",
       "salvageBusy": "你正忙着。",
       "enchantBusy": "你正忙着。",
@@ -8907,6 +8918,9 @@ export const zh_CN: EnTranslations = {
       "filterPrimaryStatAll": "任意主属性",
       "filterRarity": "稀有度",
       "filterRarityAll": "全部稀有度",
+      "filterSort": "排序",
+      "sortName": "名称 (A-Z)",
+      "sortPriceAsc": "价格：从低到高",
       "weaponSword": "剑",
       "weaponDagger": "匕首",
       "weaponStaff": "法杖",
