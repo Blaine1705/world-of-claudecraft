@@ -311,8 +311,33 @@ Still open (a phase that hits one asks at session start):
     rent joins the preflight), so the bidder is always made whole in full; the
     bounded griefing exposure (about 0.002 SOL per bond cycle via account
     re-closing) is accepted and visible through the low-SOL monitor.
-  Still open: verifier commitment level and confirming timeout (10), devnet
-  mint choice (21).
+  The two 10 items are RESOLVED (Fernando, 2026-08-14, proposed and confirmed
+  at the 10 session start):
+  - Verifier commitment level: the existing split is RATIFIED and pinned.
+    Verification MATCHES at 'confirmed' (the incident-driven read: a
+    finalized-level getParsedTransaction returns null for tens of seconds
+    after broadcast, indistinguishable from absence, and once cost a real
+    player their payment); crediting (the settled write) requires 'finalized'
+    observed via signature status, and the releaser/probe paths stay
+    finalized-only. Both levels become code-owned exported constants, NO env
+    knob (lowering the credit bar is a money-safety foot-gun; precedent:
+    code-owned MAX_REPLACEABLE_AGE_MS). The pending answer vocabulary
+    SPLITS: matched-at-confirmed-awaiting-finality keeps awaiting_finality;
+    nothing-visible-yet answers a distinct stable reason, so a fabricated
+    signature is distinguishable on the wire. That is the service half of
+    the anti-snipe fabricated-signature residual assigned to 10; the game
+    adopts the distinction in 12 (extension only on the matched arm).
+  - Confirming timeout: FIVE HOURS, code-owned MAX_CONFIRMING_AGE_MS,
+    applied through the existing expiry sweep seam. Deliberately UNDER both
+    6h bounds: the game's poll receives the service's stable terminal
+    verdict before its own H15 review park fires (review stays the genuine
+    service-unreachable backstop), and the terminal call lands while RPC
+    signature history can still decisively answer a re-verify. A timed-out
+    confirming row goes EXPIRED, never rejected, so the ledger-proven
+    adoption arm remains the recovery path and the bound is money-safe even
+    against a real payment unobserved for the whole window. Values noted
+    here for 21 per the 10 spec.
+  Still open: devnet mint choice (21).
 - R6 (phase 07, B7): counsel owns final Terms language. The phase produces drafts and a
   decision memo; counsel sign-off is a launch gate tracked here, not a packet deliverable.
   STATUS 2026-08-13: package READY, recorded SENT-TO-COUNSEL (the send is
