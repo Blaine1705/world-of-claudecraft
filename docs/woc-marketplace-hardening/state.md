@@ -5,7 +5,26 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-07-qa.md`
+- Next file to run: `docs/woc-marketplace-hardening/phase-08-service-auth-hardening.md`
+  (service repo, worktree `/Users/fernando/Documents/woc-rewards-service-pr31`).
+- 07 QA COMPLETE (PASS-WITH-FOLLOWUPS, every fix applied, PUSHED per R4).
+  Release/v0.38.0 re-synced (merge 55c2ba992e, trivial: two CI-harness
+  commits, no marketplace overlap, no count-pin surface; tsc clean and
+  the four pin suites 377 green on the merged tree). Eight fresh audit
+  lanes over the package; the unreviewed proofreader-fix round verified
+  clean site by site. The round's own finds, all applied: the draft was
+  missing three shipped mechanics (the seller opt-in second-chance
+  offer, the one blocking find: it falsified "your bond is returned
+  when you are outbid"; the anti-snipe extension; the buy-now abandon
+  cooldown pair) plus wording drifts (10.4 cancel boundaries, bid
+  withdrawal, bound items; 10.6 pause honesty; 10.7 rounding and wallet
+  identity; the Section 9 bond-custody carve-out) and companion
+  truth-ups (marketplace.md's third TOTP site and suspension scope and
+  phantom store-catalog claim, wallet-link's server-vs-service-built,
+  README's "sells no items", the p2p cap-knob anchor, the src/ui
+  CLAUDE.md Exchange-checkbox honesty). New deferreds with owners in
+  the amended 07 ledger entry (QA ROUND bullet). The amended draft
+  postdates the recorded R6 send: Fernando forwards the AMENDED draft.
 - 07 COMPLETE (docs only, zero code diff, LOCAL, not pushed per R4).
   Release/v0.38.0 synced (merge 8a1739d67a, trivial, no marketplace
   overlap; monolith_budget AUTO-MERGED, all four count-pin suites
@@ -225,10 +244,15 @@ Still open (a phase that hits one asks at session start):
   `TERMS_AND_CONDITIONS_MARKETPLACE_DRAFT.md` plus the decision memo, held
   privately at `/Users/fernando/Documents/woc-counsel/counsel-decision-memo.md`
   outside the public repo; Fernando forwards them).
-  Sign-off remains the launch gate; the memo's enable-time checklist (R9 affordance,
-  the seller terms gate if counsel confirms, the R2 forfeit split plus its client
-  disclosure, terms.html/privacy reconciliation) enumerates what must land before R6
-  can flip to granted.
+  Sign-off remains the launch gate; the memo's enable-time checklist (the R9
+  affordance for BOTH surfaces: the trade panel and the Exchange checkbox's own
+  terms link, the seller terms gate if counsel confirms, the R2 forfeit split plus
+  its client disclosure, terms.html/privacy reconciliation) enumerates what must
+  land before R6 can flip to granted. NOTE (07 QA, 2026-08-13): the QA round
+  amended the draft after this status was recorded (second-chance offer,
+  pause honesty, bond-custody carve-out, and sibling fixes; see the 07
+  ledger's QA ROUND bullet), so the copy forwarded to counsel must be the
+  amended draft at the QA tip.
 - R7 (scope adds, unanswered 2026-08-11): Fernando was offered four deferred
   nice-to-haves as packet phases and did not select any: dispute-case UI, marketplace
   player wiki/guide page, game-side audited runtime pause, numeric reserve guard. They
@@ -349,7 +373,9 @@ Still open (a phase that hits one asks at session start):
     bullet at all). Publication is a reconciliation, not a copy-across; the
     privacy pair (`PRIVACY_POLICY.md` + `public/privacy.html`) owes the
     marketplace data classes and retention windows at the same moment (memo
-    question 9).
+    question 9), plus the section 14 rescope: its "has no connection to
+    your account data" token sentence goes false once marketplace rows tie
+    $WOC activity to accounts.
   - DEFERRED WITH OWNERS (docs-only scope kept them out): the 20
     `docs/i18n/README.*.md` locale files carry pre-carve-out Web3 wording
     (four claim sites each, with pre-existing Highlights drift): maintainer
@@ -367,8 +393,9 @@ Still open (a phase that hits one asks at session start):
     `woc_market.totp_*` error codes, their api_error catalog rows and locale
     fills, `.wm-totp` CSS, the commented `.env.example` knob.
   - VALIDATION: copy floor clean over every added line; anchor rule held;
-    `npm run ci:changed` exit 0, zero errors; zero code diff (fourteen .md
-    files). FRESH proofreader over the whole package: 1 blocking (draft 10.5
+    `npm run ci:changed` exit 0, zero errors; zero code diff (fifteen .md
+    files: thirteen package files plus the two ledger files; the QA round
+    corrected the original fourteen count). FRESH proofreader over the whole package: 1 blocking (draft 10.5
     pointed at a marketplace-interface disclosure that does not exist) + 7
     should-fix + 6 nits, EVERY finding applied. The proofreader also
     verified the renumbering reference-by-reference and the factual claims
@@ -380,6 +407,91 @@ Still open (a phase that hits one asks at session start):
     sweep). 14/15 build the trade-panel terms affordance against draft
     Section 10.3's language. 22's pre-enable audit gains the memo's
     enable-time checklist. R6 is recorded sent-to-counsel in Rulings.
+  - QA ROUND (2026-08-13, verdict PASS-WITH-FOLLOWUPS, every fix applied,
+    PUSHED per R4; session start 55c2ba992e = the trivial release/v0.38.0
+    re-sync, two CI-harness commits, no marketplace overlap, no count-pin
+    surface). Eight fresh audit lanes (fix-site re-verify,
+    completeness-vs-code, claim greps, overpromise, cross-doc consistency,
+    renumbering, anchor rule, fresh proofreader); the unreviewed
+    proofreader-fix round verified clean site by site against code. The
+    round's own finds, ALL applied:
+    - DRAFT vs SHIPPED MECHANICS (one blocking + siblings): Section 10.5
+      now discloses the seller opt-in second-chance offer (an outbid
+      runner-up can be promoted at their own bid with a fresh settlement
+      window; a still-held or refund-pending bond is re-held and
+      forfeitable, a returned bond never; strikes apply on default;
+      [COUNSEL]), the anti-snipe extension, and the buy-now abandon
+      cooldown pair; 10.4's cancel sentence trued (any standing bid
+      refuses, including a bond still being paid; a cancel during an
+      unpaid buy-now window is the automatic cancel-intent; support waits
+      out in-flight payments) and bid withdrawal scoped to signed bonds
+      (abandonBid exists for unsigned pending bonds); the bound-items
+      sentence scoped to boundTo copies (the eligibility policy tolerates
+      soulbound mounts and noMarketList plates by design); 10.6's pause
+      paragraph trued (settlement windows keep running, broadcast
+      payments still verify and deliver; [COUNSEL] for the tolling
+      question); 10.7 gained the round-up-per-leg rounding, the
+      listing-time wallet identity, and addresses-visible-on-chain (they
+      are published nowhere else); Section 9's money bullet carves the
+      bid bond out of "we never hold your funds" ([COUNSEL]: the bond IS
+      operator-held player money between placement and return or
+      forfeit); the change summary now discloses the survival-list
+      expansion and the [COUNSEL] flag on old Section 16.
+    - COMPANION TRUTH-UPS: marketplace.md's third TOTP site (Open
+      questions) reads superseded-by-R1 and drops the phantom "shipped
+      as configuration" claim; "bidding suspensions" corrected to
+      marketplace-wide; the eligibility bullet's store-catalog
+      consultation replaced with the real WOC_MARKET_EXCLUDED_ITEM_IDS
+      mechanism (the service merge is specified, not built); wallet-link
+      "server-built" corrected to "service-built" (the malware-audit
+      invariant hangs on that word); README's "sells no items" scoped to
+      not-a-party-to-any-marketplace-sale (the Claudium store sells
+      items); the p2p Landed row's literal cap count replaced by the
+      knob name; the src/ui CLAUDE.md Exchange bullet no longer holds
+      the checkbox up as a compliant model (it owes its own terms link).
+    - NEW DEFERRED WITH OWNERS (code surfaces a docs phase cannot touch):
+      the Exchange window's terms checkbox owes a terms link or
+      presentation before enable per draft 10.3 (14/15 own beside R9;
+      memo question 1 already describes the gap to counsel); the auction
+      default arm strikes and forfeits with NO oracle-health gate while
+      strikeDirectedBuyer health-gates, so a winner locked out by a
+      pricing pause can be struck for the outage (14 owns the gate
+      decision, 22 audits); the pausedBanner copy ("no sale settles
+      until pricing is healthy again") and sellFeeNote's flat "90
+      percent to you" both overstate vs the trued draft (14 owns); no
+      bidder-facing disclosure that a listing is offer-next (14 owns);
+      woc_market_rules.ts's excludedItemIds comment repeats the phantom
+      store-catalog merge and its strikes comment still says "bidding
+      suspensions" (next code change touching either); the cascade
+      re-quote arm the woc_market.ts cascade comment describes is
+      UNREACHABLE as shipped (the bond flow refuses any bid not in
+      pending_bond, and a cascade-promoted bid is stamped won), so a
+      refunded runner-up proceeds bond-free with nothing forfeitable; 09
+      owns converging the mechanic and the comment, and the draft's
+      second-chance sentence ("a bond already returned is not taken
+      again; only a bond we hold can be forfeited") must be revisited if
+      09 builds the re-quote arm; a wind-down
+      runbook so 10.10's return-and-resolve promise is operable (drain
+      with the flag ON, then flip off: a bare WOC_MARKET_ENABLED=0
+      freezes sweeps, returns, and refunds; 22 owns via the runbook).
+    - LEDGER CORRECTIONS: the phase diff is fifteen .md files (thirteen
+      package files plus the two ledger files), corrected in both
+      ledger entries; the privacy-pair residual now also names
+      PRIVACY_POLICY.md section 14's token sentence.
+    - COUNSEL PACKAGE NOTE: these amendments postdate the recorded R6
+      send. Fernando forwards (or re-forwards) the AMENDED draft, and
+      should flag that the memo's "operator never touches funds"
+      simplification inherits the draft's new bid-bond carve-out, and
+      that the memo's Section 8 question should consider the Claudium
+      store by name.
+    - VALIDATION: copy floor clean over every added line; anchor rule
+      held; npm run ci:changed exit 0 on the fix round; tsc clean and
+      the four count-pin suites 377 green on the re-synced tree; live
+      Terms and public/terms.html byte-untouched across the whole
+      outgoing range; the counsel memo verified absent from the branch
+      (tree scan plus content grep), only the two sanctioned ledger
+      pointers present; a fresh reviewer re-verified this QA fix round
+      before the push.
 - 06 directed-rail-integrity (2026-08-13, session start b948aa64fb = the
   trivial release/v0.38.0 sync (16 commits, the chronomancer train, no
   marketplace overlap, no count-pin surface), gate GREEN at 5287214294,

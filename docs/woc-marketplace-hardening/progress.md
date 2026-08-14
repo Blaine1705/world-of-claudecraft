@@ -18,7 +18,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 05 QA | phase-05-qa | game | DONE | b9e937c075 | PASS-WITH-FOLLOWUPS, every fix applied (section below); release sync origin/release/v0.38.0 trivial (7 commits, no marketplace overlap, no count-pin surface); five audit lanes + a fresh fix-round re-review + qa-checklist READY + a db-perf close-out; real-SQL suites 109 green THREE times (zero skips); the three named mutation probes plus the agents' per-pin mutation matrices all bit; the round found and fixed the BEGIN-outside-TxNeverStarted critical, the withTx null-deref evidence destroyer, both kick argument swaps, and the db-perf codeless-discard P1; gate GREEN at eeaa137e5c (full-suite fallback, all 8 steps, 38196 tests + 118 browser); pushed per R4 |
 | 06 QA | phase-06-qa | game | DONE | ab2742012b | PASS-WITH-FOLLOWUPS, every fix applied, PUSHED per R4; v0.38.0 re-sync NON-trivial (3 conflicts + 2 silent count-pin auto-merges, all re-derived from runs: IWorld 323/86/237, fanout 10, hud.ts 19160 DOWN, sim.ts 12436; release-merge-audit faithful, 0 findings over 7 groups); ea1bb82322 verified FIRST (comment-only src, all pins mutation-proven); six fresh lanes: 0 code blockers, 4 blocking TEST gaps closed; QA-found code fixes: the capacity model now RUNS the removal walk (receiver-overflow class closed for good), the crafted-marker leg on the instanced matcher, guardTerms on the directed buyer, the model-reading accept belt, sweep-fallback stack+null-safety; NEW OPEN RULING R9 (implied terms consent, pre-enable affordance owed); pg suites 152 green zero skips on the tip; 21 mutation probes all bit; qa-checklist READY 0 blocking; gate GREEN at 47399f77b7 |
 | 07 | policy-terms-drafts | game | DONE | 8a1739d67a | DOCS ONLY, zero code diff; release/v0.38.0 synced (merge 8a1739d67a, trivial: 30 commits, no marketplace overlap; monolith_budget AUTO-MERGED so all four count-pin suites re-derived from a run, 377 green, renderer.ts ceiling 13708 lowered by the release's own extraction); counsel package complete: TERMS_AND_CONDITIONS_MARKETPLACE_DRAFT.md (full revised Terms beside the untouched live Terms; new Section 10 incl. the 10.3 acceptance-surface requirement per R9; renumbering verified reference-by-reference) + the decision memo (adopted position, nine counsel questions incl R9 and the NEW seller-side terms gap, exact-changes list, enable-time checklist; held PRIVATELY outside the public repo per the state.md locked decision); never-power carve-out landed consistently (README Highlights + Web3, wallet-link, holder-flair, marketplace.md launch gates); staleness cluster fixed (marketplace.md forfeit destination / delivery / review-state / TOTP-superseded-by-R1 truth-ups, p2p-woc-trade implementation status, DESIGN.md window inventory, malware-scan-catalog signing surfaces, both money-claim agent docs, docs+net+ui CLAUDE.md); FRESH proofreader over the whole package: 1 blocking + 7 should-fix + 6 nits, ALL applied; copy floor clean, ci:changed exit 0; LOCAL, not pushed per R4 |
-| 07 QA | phase-07-qa | game | NOT STARTED | | |
+| 07 QA | phase-07-qa | game | DONE | 55c2ba992e | PASS-WITH-FOLLOWUPS, every fix applied (section below); release re-sync trivial (two CI-harness commits, no marketplace overlap; tsc clean, four pin suites 377 green); eight fresh audit lanes (the phase-prescribed fresh proofreader among them); the round found the draft's missing second-chance-offer disclosure (blocking; it falsified the outbid-refund promise) plus the anti-snipe and abandon-cooldown gaps, four draft wording drifts, and seven companion truth-ups, all applied; new deferreds with owners in state.md's 07 QA ROUND bullet; the amended draft postdates the recorded R6 send (Fernando forwards the amended copy); ci:changed exit 0; live Terms + terms.html byte-untouched; counsel memo verified absent from the branch; pushed per R4 |
 | 08 | service-auth-hardening | service | NOT STARTED | | |
 | 08 QA | phase-08-qa | service | NOT STARTED | | |
 | 09 | bond-releaser | service | NOT STARTED | | |
@@ -115,7 +115,8 @@ with owners.
 Validation: copy floor clean over every added line (the one dash hit in the
 tree is a pre-existing untouched line); anchor rule held (sections and
 symbols, no line numbers); npm run ci:changed exit 0 with zero errors; zero
-code diff (fourteen .md files). A FRESH proofreader swept the whole package
+code diff (fifteen .md files: thirteen package files plus the two ledger
+files; the QA round corrected the original fourteen count). A FRESH proofreader swept the whole package
 for internal consistency and factual accuracy against code: 1 blocking
 (draft 10.5 pointed at a marketplace-interface disclosure that does not
 exist), 7 should-fix (a false counterparty-binding claim, the view-core path
@@ -123,6 +124,81 @@ contradiction, the memo misquoting its own draft, marketplace.md still
 implying TOTP-to-come against R1, the ui CLAUDE.md reading as if the panel
 already follows the model, the unrecorded seller-gate obligation, change
 summary omissions), 6 nits; every finding applied, including nits.
+
+## 07 QA round (verdict PASS-WITH-FOLLOWUPS, every fix applied)
+
+Release re-sync: merge 55c2ba992e (origin/release/v0.38.0 tip b08d79ef91,
+two commits: the CI selective-floor and related-legs merge). Trivial: no
+conflicts, no marketplace overlap, none of the four count-pin files
+touched; tsc clean and the four pin suites 377 green on the merged tree
+as insurance.
+
+Session-start verifications, all clean: the phase diff is exactly fifteen
+.md files with zero non-md; TERMS_AND_CONDITIONS.md and public/terms.html
+byte-untouched across the whole outgoing range; the draft bannered DRAFT
+FOR COUNSEL; the counsel memo present at its private home, absent from
+the branch (tree filename scan plus distinctive-content grep; only the
+two sanctioned ledger pointer references exist); no secret-like patterns
+in any outgoing doc diff; copy floor clean; ci:changed exit 0.
+
+Eight fresh audit lanes ran over the package (fix-site re-verify,
+completeness-vs-code, claim greps, overpromise hunt, cross-doc
+consistency, renumbering reference-by-reference, anchor rule, and the
+phase-prescribed fresh proofreader). The unreviewed proofreader-fix
+round from the implement session verified clean site by site: the 10.5
+forfeit sentence states R2 with no phantom disclosure, the
+counterparty-by-name paragraph matches the create-time server-side
+resolution, every cited view-core path exists, the two main TOTP
+passages read superseded, the Exchange bullet is R9-honest, and the
+change summary was reconciled section by section against the live Terms
+(renumbering clean, all cross-references correct, survival list
+deliberate).
+
+The round's own finds, all applied:
+
+- The draft was missing three shipped mechanics. Blocking: the seller
+  opt-in second-chance offer (sellOfferNext), under which an outbid
+  runner-up whose bond is still held or refund-pending is re-armed and
+  promoted into a fresh settlement window at their own bid, with default
+  then striking (and forfeiting a re-held bond); this falsified 10.5's
+  flat "your bond is returned when you are outbid". Also uncovered: the
+  anti-snipe extension and the buy-now abandon cooldown pair. All three
+  now have governing sentences, the cascade one [COUNSEL]-marked.
+- Draft wording drifts trued to code: the 10.4 cancel boundaries (any
+  standing bid refuses, cancel-intent is automatic, support waits out
+  in-flight payments), bid withdrawal scoped to signed bonds, bound
+  items scoped to boundTo copies, the 10.6 pause paragraph (windows keep
+  running and broadcast payments still verify and deliver; the old "no
+  sale becomes irreversible while pricing is down" was false against the
+  confirm path), 10.7 rounding/wallet-identity/addresses, and the
+  Section 9 bond-custody carve-out ("we never hold your funds" was
+  contradicted by the operator-held bond).
+- Companion truth-ups: marketplace.md (third TOTP site, marketplace-wide
+  suspensions, the phantom store-catalog consultation replaced with
+  WOC_MARKET_EXCLUDED_ITEM_IDS), wallet-link.md (service-built),
+  README.md (not-a-party-to-any-marketplace-sale), p2p-woc-trade.md
+  (cap knob anchor), src/ui/CLAUDE.md (the Exchange checkbox owes its
+  own terms link).
+- The change summary now discloses the survival-list expansion and the
+  [COUNSEL] flag added to old Section 16.
+
+New deferreds with owners (recorded in state.md's 07 QA ROUND bullet):
+the Exchange-checkbox terms affordance (14/15), the auction-arm
+strike/forfeit oracle-health asymmetry plus the pausedBanner and
+sellFeeNote copy (14), the bidder-facing offer-next disclosure (14), the
+woc_market_rules.ts store-catalog and bidding-suspensions comments (next
+code change), the unreachable cascade re-quote arm the woc_market.ts
+comment describes (a refunded runner-up proceeds bond-free as shipped;
+09 owns converging mechanic, comment, and the draft's second-chance
+sentence), the wind-down runbook behind 10.10's promise (22). Judged, no change: R6
+stays recorded sent-to-counsel with the note that the amended draft is
+the copy to forward; 10.10's return-and-resolve promise stays as an
+operator-conduct commitment; the fee-change prospectivity sentence
+likewise.
+
+Validation: copy floor clean over every added line; anchor rule held;
+npm run ci:changed exit 0 on the fix round; a fresh reviewer re-verified
+the QA fix round before the push; pushed per R4.
 
 ## 06 QA round (verdict PASS-WITH-FOLLOWUPS, every fix applied)
 
