@@ -46,7 +46,14 @@ function flattenControlChars(text) {
 function clampText(value, maxLength) {
   if (typeof value !== 'string') return '';
   const cleaned = flattenControlChars(value);
-  if (cleaned.length <= maxLength) return cleaned;
+  if (cleaned.length <= maxLength) {
+    // An upstream cut (the preload pre-cap) can hand this function a string
+    // already ending in a lone high surrogate, and the flattener can collapse
+    // a run so the string lands under the cap with that tail intact; drop it
+    // here too, not only at this function's own cap boundary.
+    const tail = cleaned.charCodeAt(cleaned.length - 1);
+    return tail >= 0xd800 && tail <= 0xdbff ? cleaned.slice(0, -1) : cleaned;
+  }
   // A cap landing between the halves of an astral character would leave a
   // lone high surrogate that native UTF-8 conversion renders as U+FFFD.
   const cut = cleaned.charCodeAt(maxLength - 1);

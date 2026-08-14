@@ -991,7 +991,10 @@ ipcMain.handle('desktop-gamepad-activity', (event) => {
 // entity-escaped (electron/diagnostics.cjs escapeNotificationMarkup): the
 // freedesktop spec lets daemons parse markup in bodies, and a toast must
 // never style itself or plant a link. Other platforms treat notification
-// text as plain and get the strings verbatim.
+// text as plain and get the strings verbatim. The escape deliberately runs
+// AFTER the clamp: escaping first and clamping second could cut an entity
+// mid-sequence, while the post-clamp expansion is bounded at five times the
+// cap and purely cosmetic.
 // A click only focuses the window, through the one shared focusMainWindow path,
 // so the notification can never become a navigation the renderer chose.
 ipcMain.handle('desktop-show-notification', (event, payload) => {

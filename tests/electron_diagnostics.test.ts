@@ -64,6 +64,17 @@ describe('clampText', () => {
     expect(clampText(`${'x'.repeat(8)}${emoji}y`, 10)).toBe(`${'x'.repeat(8)}${emoji}...`);
   });
 
+  it('drops a trailing lone high surrogate on the unclamped path too', () => {
+    // The preload pre-cap can split an astral pair, and the flattener can
+    // collapse a run so the cut string lands UNDER this cap with the lone
+    // surrogate tail intact (security-review probe); both exits strip it.
+    const loneHigh = String.fromCharCode(0xd83d);
+    expect(clampText(`short${loneHigh}`, 100)).toBe('short');
+    // A complete pair at the end of a short string survives untouched.
+    const emoji = String.fromCodePoint(0x1f600);
+    expect(clampText(`short${emoji}`, 100)).toBe(`short${emoji}`);
+  });
+
   it('strips invisible direction and width formatters bound for OS surfaces', () => {
     // U+202E (right-to-left override) can visually reorder a notification or
     // dialog line into reading as something else; U+200B and U+FEFF hide seams
@@ -81,6 +92,14 @@ describe('escapeNotificationMarkup', () => {
       '&lt;b&gt;bold&lt;/b&gt; &amp; &lt;a href="x"&gt;y&lt;/a&gt;',
     );
     expect(escapeNotificationMarkup('no markup here')).toBe('no markup here');
+  });
+
+  it('neutralizes pre-encoded and numeric entity smuggling', () => {
+    // A daemon that decodes entities must see only literal text: an attacker
+    // shipping already-encoded markup has its ampersands re-escaped, so
+    // neither form survives to be re-interpreted.
+    expect(escapeNotificationMarkup('&lt;b&gt;')).toBe('&amp;lt;b&amp;gt;');
+    expect(escapeNotificationMarkup('&#60;b&#62;')).toBe('&amp;#60;b&amp;#62;');
   });
 });
 
