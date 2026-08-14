@@ -1849,6 +1849,7 @@ export const pl_PL: EnTranslations = {
       "joinChannels": "Wskazówka: wpisz /join world lub /join lfg, aby rozmawiać z graczami z całego świata."
     },
     "itemHeroicTag": "[HEROICZNY]",
+    "itemHeroicLabel": "Heroic",
     "itemSoulbound": "Związany z duszą",
     "itemUniqueEquipped": "Unikatowo zakładany",
     "itemSet": {

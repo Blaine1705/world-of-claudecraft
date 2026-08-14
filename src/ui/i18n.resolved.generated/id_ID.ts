@@ -1849,6 +1849,7 @@ export const id_ID: EnTranslations = {
       "joinChannels": "Tips: ketik /join world atau /join lfg untuk mengobrol dengan pemain di seluruh dunia."
     },
     "itemHeroicTag": "[HEROIK]",
+    "itemHeroicLabel": "Heroic",
     "itemSoulbound": "Terikat Jiwa",
     "itemUniqueEquipped": "Unik-Dipakai",
     "itemSet": {

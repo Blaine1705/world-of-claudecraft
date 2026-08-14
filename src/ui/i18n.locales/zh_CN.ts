@@ -480,6 +480,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.checkoutWalletUnsupported': '此钱包无法签署和发送 Solana 交易。',
   'hudChrome.claudium.checkoutNotSettled': '交易已发送，但 Claudium 尚未到账，请稍后重试。',
   'hudChrome.itemHeroicTag': '[英雄]',
+  'hudChrome.itemHeroicLabel': '英雄',
   'hudChrome.readyCheck.notInPartyError': '你必须加入队伍才能发起就绪确认。',
   'hudChrome.readyCheck.inProgressError': '就绪确认已在进行中。',
   'entities.abilities.collective_reversal.name': '集体逆转',

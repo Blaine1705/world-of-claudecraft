@@ -258,6 +258,7 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/guild-bank-tab/',
       '            /docs/screenshots/guild-social-v1/',
       '            /docs/screenshots/item-art-consistency-2026-08-09/',
+      '            /docs/screenshots/market-house-redesign/',
       '            /docs/screenshots/placeholder-art-completion-2026-08-09/',
       '            /docs/screenshots/r35-admin-professions-inspector/',
       '            /docs/screenshots/release-v036-skill-normalization-2026-08-10/',

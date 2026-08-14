@@ -1849,6 +1849,7 @@ export const en_XA: EnTranslations = {
       "joinChannels": "[Ţíþ: ţýþé /ĵóíñ ŵóŕļð óŕ /ĵóíñ ļƒĝ ţó çĥáţ ŵíţĥ þļáýéŕš áçŕóšš ţĥé ŵóŕļð.]"
     },
     "itemHeroicTag": "[[ĤÉŔÓÍÇ]]",
+    "itemHeroicLabel": "[Ĥéŕóíç]",
     "itemSoulbound": "[Šóúļƀóúñð]",
     "itemUniqueEquipped": "[Úñíɋúé-Éɋúíþþéð]",
     "itemSet": {

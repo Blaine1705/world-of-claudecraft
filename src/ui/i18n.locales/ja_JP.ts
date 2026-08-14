@@ -483,6 +483,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.checkoutNotSettled':
     '取引は送信されましたが、Claudiumはまだ反映されていません。しばらくしてからお試しください。',
   'hudChrome.itemHeroicTag': '[ヒロイック]',
+  'hudChrome.itemHeroicLabel': 'ヒロイック',
   'hudChrome.readyCheck.notInPartyError':
     '準備確認を開始するにはパーティーに参加している必要があります。',
   'hudChrome.readyCheck.inProgressError': '準備確認はすでに進行中です。',

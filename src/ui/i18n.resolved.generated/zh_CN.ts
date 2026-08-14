@@ -1849,6 +1849,7 @@ export const zh_CN: EnTranslations = {
       "joinChannels": "提示：输入 /join world 或 /join lfg，与全服玩家聊天。"
     },
     "itemHeroicTag": "[英雄]",
+    "itemHeroicLabel": "英雄",
     "itemSoulbound": "灵魂绑定",
     "itemUniqueEquipped": "装备唯一",
     "itemSet": {

@@ -1849,6 +1849,7 @@ export const tr_TR: EnTranslations = {
       "joinChannels": "İpucu: Dünya genelindeki oyuncularla sohbet etmek için /join world ya da /join lfg yaz."
     },
     "itemHeroicTag": "[KAHRAMANCA]",
+    "itemHeroicLabel": "Heroic",
     "itemSoulbound": "Ruha Bağlı",
     "itemUniqueEquipped": "Eşsiz Kuşanım",
     "itemSet": {

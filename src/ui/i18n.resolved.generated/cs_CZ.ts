@@ -1849,6 +1849,7 @@ export const cs_CZ: EnTranslations = {
       "joinChannels": "Tip: napiš /join world nebo /join lfg a chatuj s hráči napříč světem."
     },
     "itemHeroicTag": "[HRDINSKÉ]",
+    "itemHeroicLabel": "Heroic",
     "itemSoulbound": "Vázáno na duši",
     "itemUniqueEquipped": "Jedinečně nositelné",
     "itemSet": {

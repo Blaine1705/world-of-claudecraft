@@ -1849,6 +1849,7 @@ export const es_ES: EnTranslations = {
       "joinChannels": "Consejo: escribe /join world o /join lfg para chatear con jugadores de todas partes del mundo."
     },
     "itemHeroicTag": "[HEROICO]",
+    "itemHeroicLabel": "Heroic",
     "itemSoulbound": "Ligado al alma",
     "itemUniqueEquipped": "Único al equipar",
     "itemSet": {
