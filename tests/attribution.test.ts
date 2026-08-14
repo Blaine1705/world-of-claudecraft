@@ -65,6 +65,24 @@ describe('parseFirstTouch', () => {
     const touch = parseFirstTouch('', 'https://worldofclaudecraft.com/', 'https://reddit.com/');
     expect(touch?.referrer).toBe('https://reddit.com/');
   });
+
+  it('ignores a same-origin referrer (navigation, not acquisition)', () => {
+    // The wiki chrome links straight to /play; an own-site hop must never
+    // claim the write-once first touch and block a later real ad click.
+    const touch = parseFirstTouch(
+      '',
+      'https://worldofclaudecraft.com/play',
+      'https://worldofclaudecraft.com/wiki',
+    );
+    expect(touch).toBeNull();
+    const withCampaign = parseFirstTouch(
+      '?utm_source=facebook',
+      'https://worldofclaudecraft.com/play',
+      'https://worldofclaudecraft.com/wiki',
+    );
+    expect(withCampaign?.utmSource).toBe('facebook');
+    expect(withCampaign?.referrer).toBeUndefined();
+  });
 });
 
 describe('sanitizeStoredTouch', () => {

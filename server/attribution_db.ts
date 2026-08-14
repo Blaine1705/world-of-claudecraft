@@ -6,10 +6,14 @@
 // tie a cohort back to a campaign and creative; without it every funnel
 // number is a blended average.
 //
-// Privacy shape: the row is keyed on the account and deleted with it
-// (ON DELETE CASCADE), carries no IP and no free-text beyond capped
+// Privacy shape: the row carries no IP and no free-text beyond capped
 // identifiers the visitor's own URL carried, and is written only when the
-// signup request presented at least one attribution signal.
+// signup request presented at least one attribution signal. Lifecycle: the
+// FK CASCADE covers only a hard account DELETE (the federated-race provision
+// cleanup); user-facing removal is a SOFT delete (deactivated_at), so the
+// deactivation path explicitly deletes this row (deleteAccountAttribution,
+// called from handleAccountDeactivate) and the subject-access export
+// includes it (exportAccountData).
 //
 // No './db' import: db.ts applies ACCOUNT_ATTRIBUTION_SCHEMA at boot, so this
 // module takes the pool as a parameter (the unstuck_db shape) to keep the
@@ -59,18 +63,47 @@ export interface AccountAttributionRow {
 const nullable = (value: string | null | undefined): string | null =>
   value === undefined || value === null || value.length === 0 ? null : value;
 
-/** Stamp the signup country (ISO 3166-1 alpha-2) resolved from the trusted
- *  edge geo header. COALESCE keeps an already-stamped value: signup writes
- *  once, later calls never overwrite. */
-export async function setAccountCreatedCountry(
+/** Stamp the whole signup profile in ONE UPDATE (locale, country, opt-in).
+ *  Registration is exactly when write bursts happen, so this replaces three
+ *  single-column UPDATEs (three row versions, three pool checkouts) with one.
+ *  Null fields leave the column untouched; the country keeps its write-once
+ *  semantic via COALESCE; opt-in only ever flips TO true here (the explicit
+ *  checkbox), never back. */
+export async function updateAccountSignupProfile(
   db: Pool,
   accountId: number,
-  country: string,
+  profile: { locale: string | null; country: string | null; marketingOptIn: boolean },
 ): Promise<void> {
   await db.query(
-    'UPDATE accounts SET created_country = COALESCE(created_country, $2) WHERE id = $1',
-    [accountId, country],
+    `UPDATE accounts SET
+       locale = COALESCE($2, locale),
+       created_country = COALESCE(created_country, $3),
+       marketing_opt_in = (marketing_opt_in OR $4)
+     WHERE id = $1`,
+    [accountId, profile.locale, profile.country, profile.marketingOptIn],
   );
+}
+
+/** Remove the attribution row on account deactivation: user-facing removal is
+ *  a soft delete that never fires the FK CASCADE, so the ad-click identifiers
+ *  are erased explicitly when the player leaves. */
+export async function deleteAccountAttribution(db: Pool, accountId: number): Promise<void> {
+  await db.query('DELETE FROM account_attribution WHERE account_id = $1', [accountId]);
+}
+
+/** The subject-access read (exportAccountData): the stored first-touch row,
+ *  or null when signup carried no signal. */
+export async function accountAttributionForExport(
+  db: Pool,
+  accountId: number,
+): Promise<Record<string, unknown> | null> {
+  const res = await db.query(
+    `SELECT fbclid, fbp, fbc, utm_source, utm_medium, utm_campaign, utm_content, utm_term,
+            landing_url, referrer, visitor_id, created_at
+       FROM account_attribution WHERE account_id = $1`,
+    [accountId],
+  );
+  return res.rows[0] ?? null;
 }
 
 /** Write the one first-touch attribution row. ON CONFLICT DO NOTHING keeps

@@ -305,6 +305,7 @@ import {
 } from './player_card';
 import { prunePlayerActivityDailyBatch } from './player_metrics_db';
 import { handleAvatar, handleCharacterSitemap, handleProfilePage } from './profile_page';
+import { progressEventsIdle } from './progress_events';
 import { pruneFtueEventsBatch, pruneLevelUpEventsBatch } from './progress_events_db';
 import { recordUsageCacheEvent, recordUsageMetric, setUsageCacheSize } from './provider_usage';
 import {
@@ -3529,6 +3530,10 @@ export async function startServer(): Promise<http.Server> {
     // go missing until that character's next login (the join reconcile is the
     // only heal). Rejections log inside the writer, so the drain never throws.
     await deedRecordsIdle();
+    // Drain the progress-events FIFO (level_up_events / ftue_events) as well:
+    // unlike deeds these rows have no reconcile heal path, so a row dropped by
+    // pool.end() is gone. Rejections log inside the writer; never throws.
+    await progressEventsIdle();
     // Stop accepted /unstuck report intake and drain only to a finite deadline.
     // Per-query timeouts bound an active write; deadline expiry aborts retry
     // delays and drops queued telemetry before the shared pool closes.

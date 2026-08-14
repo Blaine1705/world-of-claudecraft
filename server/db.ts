@@ -14,7 +14,7 @@ import { AD_SPEND_SCHEMA } from './ad_spend_db';
 import { bustAdminGuildListReads } from './admin_guilds_read';
 import { ADMIN_GUILDS_SCHEMA } from './admin_guilds_schema';
 import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
-import { ACCOUNT_ATTRIBUTION_SCHEMA } from './attribution_db';
+import { ACCOUNT_ATTRIBUTION_SCHEMA, accountAttributionForExport } from './attribution_db';
 import { validCharName } from './auth';
 import type { BankBonusFacts } from './bank_entitlements';
 import {
@@ -2444,6 +2444,23 @@ export async function exportAccountData(
       ORDER BY claimed_at`,
     [accountId],
   );
+  // Subject-access completeness for the UA instrumentation: the signup
+  // country, the first-touch attribution row, and the per-account analytics
+  // event rows are all account-linked personal data, so they ride the export.
+  const createdCountry = await pool.query('SELECT created_country FROM accounts WHERE id = $1', [
+    accountId,
+  ]);
+  const attribution = await accountAttributionForExport(pool, accountId);
+  const levelUpEvents = await pool.query(
+    `SELECT character_id, level, earned_at
+       FROM level_up_events WHERE account_id = $1 ORDER BY earned_at`,
+    [accountId],
+  );
+  const ftueEvents = await pool.query(
+    `SELECT character_id, kind, quest_id, level, zone, killer, occurred_at
+       FROM ftue_events WHERE account_id = $1 ORDER BY occurred_at`,
+    [accountId],
+  );
   return {
     exportedAt: new Date().toISOString(),
     account: {
@@ -2452,9 +2469,13 @@ export async function exportAccountData(
       email: acct.email,
       createdAt: acct.created_at,
       locale: acct.locale,
+      createdCountry: createdCountry.rows[0]?.created_country ?? null,
       marketingOptIn: acct.marketing_opt_in,
       twoFactorEnabled,
     },
+    signupAttribution: attribution,
+    levelUpEvents: levelUpEvents.rows,
+    ftueEvents: ftueEvents.rows,
     characters: characters.map((c) => ({
       id: c.id,
       name: c.name,

@@ -28,7 +28,6 @@ CREATE TABLE IF NOT EXISTS ad_spend (
     spend_cents >= 0 AND impressions >= 0 AND clicks >= 0
   )
 );
-CREATE INDEX IF NOT EXISTS ad_spend_day ON ad_spend(day);
 `;
 
 const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -140,7 +139,12 @@ export async function upsertAdSpend(db: Pool, input: UpsertAdSpendInput): Promis
   return rowFromRaw(res.rows[0]);
 }
 
-/** Newest-first rows for the trailing window (bounded by the max window). */
+/** Row ceiling on the list read: generous for hand-entered data, and a real
+ *  bound once a Marketing API importer raises campaign cardinality. */
+export const AD_SPEND_MAX_LIST_ROWS = 5000;
+
+/** Newest-first rows for the trailing window (bounded by the max window and
+ *  the row ceiling). The (day, campaign) PK serves the day range. */
 export async function listAdSpend(db: Pool, days: number): Promise<AdSpendRow[]> {
   const window = Math.min(
     AD_SPEND_MAX_LIST_DAYS,
@@ -150,8 +154,9 @@ export async function listAdSpend(db: Pool, days: number): Promise<AdSpendRow[]>
     `SELECT day, campaign, spend_cents, impressions, clicks, currency, updated_at
        FROM ad_spend
       WHERE day >= (now() - ($1::int * INTERVAL '1 day'))::date
-      ORDER BY day DESC, campaign ASC`,
-    [window],
+      ORDER BY day DESC, campaign ASC
+      LIMIT $2`,
+    [window, AD_SPEND_MAX_LIST_ROWS],
   );
   return res.rows.map(rowFromRaw);
 }

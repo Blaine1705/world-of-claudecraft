@@ -22,9 +22,10 @@ import {
 } from './ad_spend_db';
 import { requireAdmin } from './admin';
 import { pool } from './db';
+import { withBody } from './http/middleware/body';
 import { ADMIN_META } from './http/middleware/require_admin';
 import type { Ctx, RouteDef } from './http/types';
-import { json, readBody } from './http_util';
+import { json } from './http_util';
 
 // ---------------------------------------------------------------------------
 // Db seam (the auth_routes.ts shape): the real bundle, swappable in tests.
@@ -66,7 +67,7 @@ async function listHandler(ctx: Ctx): Promise<void> {
 
 /** POST /admin/api/ad-spend: upsert one (day, campaign) row. */
 async function upsertHandler(ctx: Ctx): Promise<void> {
-  const body = await readBody(ctx.req);
+  const body = (ctx.body ?? {}) as Record<string, unknown>;
   try {
     const row = await adSpendDb.upsertAdSpend({
       day: body.day as string,
@@ -88,7 +89,7 @@ async function upsertHandler(ctx: Ctx): Promise<void> {
 
 /** POST /admin/api/ad-spend/delete: remove one (day, campaign) row. */
 async function deleteHandler(ctx: Ctx): Promise<void> {
-  const body = await readBody(ctx.req);
+  const body = (ctx.body ?? {}) as Record<string, unknown>;
   try {
     const deleted = await adSpendDb.deleteAdSpend(body.day as string, body.campaign as string);
     ok(ctx, { deleted });
@@ -110,11 +111,13 @@ export const routes: RouteDef[] = [
     meta: ADMIN_META,
     handler: listHandler,
   },
+  // withBody() after the auth gate: readBody's own failures (bad json, body
+  // too large) surface as coded 4xx through the onion instead of handler 500s.
   {
     method: 'POST',
     path: '/admin/api/ad-spend',
     surface: 'admin',
-    middleware: [requireAdmin],
+    middleware: [requireAdmin, withBody()],
     meta: ADMIN_META,
     handler: upsertHandler,
   },
@@ -122,7 +125,7 @@ export const routes: RouteDef[] = [
     method: 'POST',
     path: '/admin/api/ad-spend/delete',
     surface: 'admin',
-    middleware: [requireAdmin],
+    middleware: [requireAdmin, withBody()],
     meta: ADMIN_META,
     handler: deleteHandler,
   },

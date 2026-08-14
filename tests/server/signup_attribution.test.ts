@@ -6,8 +6,6 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
-  setAccountLocale: vi.fn(async () => {}),
-  setAccountMarketingOptIn: vi.fn(async () => {}),
 }));
 
 import {
@@ -25,22 +23,17 @@ import {
 function fakeDb() {
   const calls = {
     attribution: [] as unknown[],
-    locale: [] as [number, string][],
-    country: [] as [number, string][],
-    optIn: [] as [number, boolean][],
+    profile: [] as [
+      number,
+      { locale: string | null; country: string | null; marketingOptIn: boolean },
+    ][],
   };
   const db: SignupCaptureDb = {
     insertAttribution: async (row) => {
       calls.attribution.push(row);
     },
-    setLocale: async (id, locale) => {
-      calls.locale.push([id, locale]);
-    },
-    setCountry: async (id, country) => {
-      calls.country.push([id, country]);
-    },
-    setMarketingOptIn: async (id, optIn) => {
-      calls.optIn.push([id, optIn]);
+    updateSignupProfile: async (id, profile) => {
+      calls.profile.push([id, profile]);
     },
   };
   return { calls, db };
@@ -161,16 +154,35 @@ describe('captureSignupContext', () => {
     expect(calls.attribution[0]).toMatchObject({ accountId: 3, fbp: 'fb.1.9.9', fbclid: null });
   });
 
-  it('skips the row entirely with no signal, still records profile fields', async () => {
+  it('skips the row entirely with no signal, records the profile in ONE call', async () => {
     const { calls, db } = fakeDb();
     const r = req({ 'accept-language': 'de-DE,de;q=0.8', 'cf-ipcountry': 'DE' });
     const body = { marketingOptIn: true };
     captureSignupContext(4, r, body, parseSignupProfile(r, body), db);
     await flush();
     expect(calls.attribution).toHaveLength(0);
-    expect(calls.locale).toEqual([[4, 'de_DE']]);
-    expect(calls.country).toEqual([[4, 'DE']]);
-    expect(calls.optIn).toEqual([[4, true]]);
+    expect(calls.profile).toEqual([[4, { locale: 'de_DE', country: 'DE', marketingOptIn: true }]]);
+  });
+
+  it('skips the profile update entirely when no profile field is present', async () => {
+    const { calls, db } = fakeDb();
+    const r = req({ cookie: '_fbp=fb.1.9.9' });
+    captureSignupContext(6, r, {}, parseSignupProfile(r, {}), db);
+    await flush();
+    expect(calls.profile).toHaveLength(0);
+  });
+
+  it('caps and control-strips oversized cookie values before persisting', async () => {
+    const { calls, db } = fakeDb();
+    const r = req({ cookie: `_fbp=fb.\x01${'x'.repeat(2000)}; _fbc=fb.1.1.ok` });
+    captureSignupContext(7, r, {}, parseSignupProfile(r, {}), db);
+    await flush();
+    expect(calls.attribution).toHaveLength(1);
+    const row = calls.attribution[0] as { fbp: string; fbc: string };
+    expect(row.fbp.length).toBeLessThanOrEqual(512);
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: asserting the strip is the point
+    expect(row.fbp).not.toMatch(/[\x00-\x1f]/);
+    expect(row.fbc).toBe('fb.1.1.ok');
   });
 
   it('never throws when every write rejects', async () => {
@@ -179,13 +191,7 @@ describe('captureSignupContext', () => {
       insertAttribution: async () => {
         throw new Error('down');
       },
-      setLocale: async () => {
-        throw new Error('down');
-      },
-      setCountry: async () => {
-        throw new Error('down');
-      },
-      setMarketingOptIn: async () => {
+      updateSignupProfile: async () => {
         throw new Error('down');
       },
     };

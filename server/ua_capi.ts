@@ -10,6 +10,7 @@
 import { accountMailTarget, pool } from './db';
 import {
   type CapiUserData,
+  capiEnabled,
   trackDay7Retained,
   trackReachedLevel2,
   trackReachedLevel5,
@@ -30,6 +31,7 @@ export interface UaCapiSession {
 
 /** Injected seam so tests drive the module without Postgres or network. */
 export interface UaCapiDeps {
+  enabled: () => boolean;
   emailForAccount: (accountId: number) => Promise<string | null>;
   claimDay7: (accountId: number) => Promise<boolean>;
   sendLevel2: (characterId: number, userData: CapiUserData, sourceUrl?: string) => Promise<void>;
@@ -38,6 +40,7 @@ export interface UaCapiDeps {
 }
 
 const REAL_DEPS: UaCapiDeps = {
+  enabled: capiEnabled,
   emailForAccount: async (accountId) => (await accountMailTarget(accountId))?.email ?? null,
   claimDay7: (accountId) => claimDay7Retention(pool, accountId),
   sendLevel2: trackReachedLevel2,
@@ -69,6 +72,9 @@ export function trackLevelMilestoneCapi(
   deps: UaCapiDeps = REAL_DEPS,
 ): void {
   if (level !== 2 && level !== 5) return;
+  // CAPI-dark process (no token): skip BEFORE the email enrichment read, so a
+  // dark realm pays nothing per ding.
+  if (!deps.enabled()) return;
   void (async () => {
     const userData = await enrichedUserData(s, deps);
     const send = level === 2 ? deps.sendLevel2 : deps.sendLevel5;
@@ -82,6 +88,11 @@ export function trackLevelMilestoneCapi(
  *  atomic claim (ua_capi_db.ts) owns the day-seven window and the dedupe;
  *  a losing claim is the common case and costs one indexed UPDATE. */
 export function maybeTrackDay7Retained(s: UaCapiSession, deps: UaCapiDeps = REAL_DEPS): void {
+  // CAPI-dark process: skip BEFORE the claim, so a token-dark window (rotation,
+  // deploy gap, a realm without CAPI) can never consume the once-guard with
+  // nothing sent; the account stays claimable for a later lit session that
+  // still falls inside the day-seven window.
+  if (!deps.enabled()) return;
   void (async () => {
     if (!(await deps.claimDay7(s.accountId))) return;
     const userData = await enrichedUserData(s, deps);

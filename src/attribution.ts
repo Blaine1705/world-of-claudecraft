@@ -46,6 +46,19 @@ const cleanUrl = (value: string | null | undefined): string | undefined => {
   return text && /^https?:\/\//i.test(text) ? text : undefined;
 };
 
+/** An own-site referrer is navigation, not acquisition: both entries route
+ *  through the same origin (the wiki chrome links straight to /play), and a
+ *  same-origin hop stored as the write-once first touch would permanently
+ *  block a later real ad click from claiming it. */
+const isExternalReferrer = (referrer: string | undefined, landingUrl: string): boolean => {
+  if (!referrer) return false;
+  try {
+    return new URL(referrer).origin !== new URL(landingUrl).origin;
+  } catch {
+    return false;
+  }
+};
+
 /** Parse the attribution signals out of one page view. Pure; returns null
  *  when the view carries no signal at all (no row is worth storing then). */
 export function parseFirstTouch(
@@ -54,6 +67,7 @@ export function parseFirstTouch(
   referrer: string,
 ): FirstTouchAttribution | null {
   const params = new URLSearchParams(search);
+  const externalReferrer = cleanUrl(referrer);
   const touch: FirstTouchAttribution = {
     fbclid: clean(params.get('fbclid'), MAX_CLICK_ID_LENGTH),
     utmSource: clean(params.get('utm_source'), MAX_TAG_LENGTH),
@@ -62,7 +76,7 @@ export function parseFirstTouch(
     utmContent: clean(params.get('utm_content'), MAX_TAG_LENGTH),
     utmTerm: clean(params.get('utm_term'), MAX_TAG_LENGTH),
     landingUrl: undefined,
-    referrer: cleanUrl(referrer),
+    referrer: isExternalReferrer(externalReferrer, landingUrl) ? externalReferrer : undefined,
   };
   const hasCampaignSignal =
     touch.fbclid !== undefined ||

@@ -212,10 +212,13 @@ const DEFAULT_EMAIL_LOG_RETENTION_DAYS = 90;
 const DEFAULT_PLAYER_REPORT_RETENTION_DAYS = 180;
 const DEFAULT_BUG_REPORT_RETENTION_DAYS = 90;
 const DEFAULT_CHAT_VIOLATION_RETENTION_DAYS = 90;
-// The UA cohort reports read multi-month funnels, so both event logs default
-// to a year: long enough for any retrospective, still bounded.
+// level_up_events feeds multi-month friction maps, so it defaults to a year.
+// ftue_events answers a FIRST-SESSION question and has the higher intake
+// (roughly 100-250 rows per new character), so it defaults to a quarter: at
+// the sweep's per-run row budget a long window could otherwise fall behind
+// during a paid-campaign burst.
 const DEFAULT_LEVEL_UP_EVENTS_RETENTION_DAYS = 365;
-const DEFAULT_FTUE_EVENTS_RETENTION_DAYS = 365;
+const DEFAULT_FTUE_EVENTS_RETENTION_DAYS = 90;
 // PROVISIONAL: two hours after the nightly 03:15 UTC pg_dump window, pending real
 // traffic-curve evidence of the quietest hour; revisit when that evidence lands.
 const DEFAULT_RETENTION_SWEEP_UTC_HOUR = 5;

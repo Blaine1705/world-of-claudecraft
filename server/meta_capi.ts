@@ -15,6 +15,15 @@ if (!ENABLED) {
   console.log('[capi] META_CAPI_ACCESS_TOKEN unset; Conversions API disabled.');
 }
 
+/** Whether the Conversions API is configured for this process. Callers with
+ *  per-event costs (db reads, once-guard claims) check this BEFORE doing any
+ *  work: sendCapiEvent silently no-ops when disabled, so without this gate a
+ *  token-dark window would still consume one-shot claims (the D7 once-guard)
+ *  and pay enrichment reads with nothing sent. */
+export function capiEnabled(): boolean {
+  return ENABLED;
+}
+
 export interface CapiUserData {
   email?: string | null;
   externalId?: string | null;

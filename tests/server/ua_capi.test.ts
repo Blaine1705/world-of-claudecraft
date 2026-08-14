@@ -28,6 +28,7 @@ const session = {
 function fakeDeps(over: Partial<UaCapiDeps> = {}) {
   const sent: Array<{ kind: string; id: number; userData: Record<string, unknown> }> = [];
   const deps: UaCapiDeps = {
+    enabled: () => true,
     emailForAccount: async () => 'player@example.com',
     claimDay7: async () => true,
     sendLevel2: async (id, userData) => {
@@ -93,6 +94,39 @@ describe('trackLevelMilestoneCapi', () => {
     await flush();
     expect(errSpy).toHaveBeenCalled();
     errSpy.mockRestore();
+  });
+});
+
+describe('capi-dark gate', () => {
+  it('level milestones skip all work (no email read, no send) when disabled', async () => {
+    const emailReads: number[] = [];
+    const { sent, deps } = fakeDeps({
+      enabled: () => false,
+      emailForAccount: async (id) => {
+        emailReads.push(id);
+        return null;
+      },
+    });
+    trackLevelMilestoneCapi(session, 2, deps);
+    trackLevelMilestoneCapi(session, 5, deps);
+    await flush();
+    expect(sent).toEqual([]);
+    expect(emailReads).toEqual([]);
+  });
+
+  it('D7 never consumes the once-guard claim when disabled', async () => {
+    const claims: number[] = [];
+    const { sent, deps } = fakeDeps({
+      enabled: () => false,
+      claimDay7: async (id) => {
+        claims.push(id);
+        return true;
+      },
+    });
+    maybeTrackDay7Retained(session, deps);
+    await flush();
+    expect(sent).toEqual([]);
+    expect(claims).toEqual([]);
   });
 });
 

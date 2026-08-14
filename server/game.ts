@@ -9733,13 +9733,16 @@ export class GameServer {
       }
       if ((ev.type === 'questAccepted' || ev.type === 'questDone') && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
-        const level = this.sim.entities.get(ev.pid)?.level ?? 1;
-        if (s)
+        const entity = this.sim.entities.get(ev.pid);
+        // Skip when the entity is gone rather than defaulting the level: the
+        // level is the gate that bounds ftue_events growth, so it must never
+        // fail open (the death arm has the same direction).
+        if (s && entity)
           recordFtueQuest(
             s,
             ev.type === 'questAccepted' ? 'quest_accepted' : 'quest_done',
             ev.questId,
-            level,
+            entity.level,
           );
       }
       if (ev.type === 'death' && this.clients.has(ev.entityId)) {

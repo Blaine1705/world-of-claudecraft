@@ -16,8 +16,8 @@
 // Everything above the exports section is pure and unit-tested without IO.
 
 import type { IncomingMessage } from 'node:http';
-import { insertAccountAttribution, setAccountCreatedCountry } from './attribution_db';
-import { pool, setAccountLocale, setAccountMarketingOptIn } from './db';
+import { insertAccountAttribution, updateAccountSignupProfile } from './attribution_db';
+import { pool } from './db';
 import { metaCookieData } from './meta_capi';
 
 /** Length caps for client-supplied attribution values. URLs get the same
@@ -158,22 +158,24 @@ export function parseSignupProfile(
 
 export interface SignupCaptureDb {
   insertAttribution: (row: Parameters<typeof insertAccountAttribution>[1]) => Promise<void>;
-  setLocale: (accountId: number, locale: string) => Promise<void>;
-  setCountry: (accountId: number, country: string) => Promise<void>;
-  setMarketingOptIn: (accountId: number, optIn: boolean) => Promise<void>;
+  updateSignupProfile: (
+    accountId: number,
+    profile: { locale: string | null; country: string | null; marketingOptIn: boolean },
+  ) => Promise<void>;
 }
 
 const REAL_DB: SignupCaptureDb = {
   insertAttribution: (row) => insertAccountAttribution(pool, row),
-  setLocale: (accountId, locale) => setAccountLocale(accountId, locale),
-  setCountry: (accountId, country) => setAccountCreatedCountry(pool, accountId, country),
-  setMarketingOptIn: (accountId, optIn) => setAccountMarketingOptIn(accountId, optIn),
+  updateSignupProfile: (accountId, profile) => updateAccountSignupProfile(pool, accountId, profile),
 };
 
 /**
  * Persist the whole signup context for a freshly created account,
- * best-effort. Never throws and never blocks registration: every write is
- * independent, and a failure logs and drops that one write.
+ * best-effort. Never throws and never blocks registration. At most TWO
+ * detached statements per signup: the attribution INSERT (only when a signal
+ * exists) and ONE combined accounts UPDATE for locale/country/opt-in (only
+ * when any of the three is present); registration bursts are exactly when
+ * this path runs, so per-signup statement count is kept minimal.
  */
 export function captureSignupContext(
   accountId: number,
@@ -185,13 +187,18 @@ export function captureSignupContext(
   try {
     const attribution = parseClientAttribution(body.attribution);
     const cookies = metaCookieData(req.headers.cookie);
-    if (attribution || cookies.fbp || cookies.fbc) {
+    // The cookies are the one client-supplied field metaCookieData does not
+    // bound; cap and control-strip them like every other stored identifier
+    // (fbc embeds the fbclid, so it shares the click-id cap).
+    const fbp = cleanText(cookies.fbp, MAX_CLICK_ID_LENGTH);
+    const fbc = cleanText(cookies.fbc, MAX_CLICK_ID_LENGTH);
+    if (attribution || fbp || fbc) {
       void db
         .insertAttribution({
           accountId,
           fbclid: attribution?.fbclid ?? null,
-          fbp: cookies.fbp ?? null,
-          fbc: cookies.fbc ?? null,
+          fbp,
+          fbc,
           utmSource: attribution?.utmSource ?? null,
           utmMedium: attribution?.utmMedium ?? null,
           utmCampaign: attribution?.utmCampaign ?? null,
@@ -203,21 +210,15 @@ export function captureSignupContext(
         })
         .catch((err) => console.error('account_attribution write failed:', err));
     }
-    if (profile.locale) {
-      void db
-        .setLocale(accountId, profile.locale)
-        .catch((err) => console.error('signup locale write failed:', err));
-    }
     const country = parseSignupCountry(req.headers);
-    if (country) {
+    if (profile.locale || country || profile.marketingOptIn) {
       void db
-        .setCountry(accountId, country)
-        .catch((err) => console.error('signup country write failed:', err));
-    }
-    if (profile.marketingOptIn) {
-      void db
-        .setMarketingOptIn(accountId, true)
-        .catch((err) => console.error('signup marketing opt-in write failed:', err));
+        .updateSignupProfile(accountId, {
+          locale: profile.locale,
+          country,
+          marketingOptIn: profile.marketingOptIn,
+        })
+        .catch((err) => console.error('signup profile write failed:', err));
     }
   } catch (err) {
     // Analytics capture must never fault the register path.
