@@ -98,7 +98,7 @@ describe('the display change push to the renderer', () => {
     // its window.
     expect(body).toContain('lastDisplayPush = null;');
     expect(body).toContain(
-      "mainWindow.on('closed', () => { clearReadyToShowFallback(); " +
+      "mainWindow.on('closed', () => { powerSave.setHidden(true); clearReadyToShowFallback(); " +
         'clearMoveDisplayTimer(); clearBoundsSaveTimer(); clearHiddenRederiveTimer(); ' +
         'mainWindow = null; });',
     );

@@ -315,6 +315,25 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     ).toBeLessThan(reveal.indexOf('win.show();'));
   });
 
+  it('drives the display-sleep lease from the one presentation derivation', () => {
+    // A second reading of the window could disagree with the push the renderer
+    // got, and then the shell would hold the display awake for a window the
+    // renderer already stopped drawing. Both failures are silent.
+    const derive = block('function sendPresentationState() {', '\n}', 'sendPresentationState');
+    expect(derive).toContain('const hidden = mainWindow.isMinimized() || !mainWindow.isVisible();');
+    expect(derive, 'the lease must read the derived value, not the window again').toContain(
+      'powerSave.setHidden(hidden);',
+    );
+    expect(count(code, 'isMinimized() || !mainWindow.isVisible()'), 'one derivation only').toBe(1);
+    // A destroyed window can no longer derive (that function returns early), so
+    // the lease is released from 'closed' rather than waiting out its timer,
+    // and quit is terminal.
+    const closed = block("mainWindow.on('closed', () => {", '\n  });', 'closed handler');
+    expect(closed).toContain('powerSave.setHidden(true);');
+    const quit = block("app.on('will-quit', () => {", '\n});', 'will-quit handler');
+    expect(quit).toContain('powerSave.shutdown();');
+  });
+
   it('applies the stored display mode at the reveal, never at construction', () => {
     // Same reasoning as the maximize above: setFullScreen on a hidden window is
     // window state the reveal discipline owns, and a `fullscreen` key in the

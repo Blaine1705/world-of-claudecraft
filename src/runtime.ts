@@ -168,6 +168,10 @@ export interface DesktopBridge {
   // post-trio methods.
   getDisplayMode?(): Promise<DesktopDisplayMode>;
   setDisplayMode?(mode: DesktopDisplayMode): Promise<boolean>;
+  // Fire-and-forget gamepad-activity ping feeding the shell's display-sleep
+  // blocker (the shell rate-limits and debounces; the renderer throttles its
+  // own sends). Absent on older shells: feature-check before use.
+  notifyGamepadActivity?(): void;
 }
 
 export function desktopBridge(): DesktopBridge | null {

@@ -183,6 +183,14 @@ contextBridge.exposeInMainWorld('wocDesktop', {
     if (mode !== 'borderless' && mode !== 'windowed') return Promise.resolve(false);
     return ipcRenderer.invoke('desktop-set-display-mode', mode);
   },
+  // Gamepad activity, so the shell can keep the display awake during a
+  // controller-only session (gamepad input does not reset the OS idle timer).
+  // Fire-and-forget from the renderer's input loop: it returns nothing and
+  // swallows a rejection, because a shell that cannot take the lease must never
+  // surface an unhandled rejection in the game's input path.
+  notifyGamepadActivity: () => {
+    ipcRenderer.invoke('desktop-gamepad-activity').catch(() => {});
+  },
   // Whether the shell's window is minimized or hidden, pushed from the main
   // process because the page cannot see it: the window sets
   // backgroundThrottling:false, which keeps document.visibilityState at

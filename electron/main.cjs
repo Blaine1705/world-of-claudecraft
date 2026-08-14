@@ -6,6 +6,7 @@ const {
   ipcMain,
   Menu,
   net,
+  powerSaveBlocker,
   protocol,
   screen,
   session,
@@ -38,6 +39,7 @@ const {
   MIN_WINDOW_WIDTH,
   resolveWindowRestore,
 } = require('./window_memory.cjs');
+const { createPowerSave } = require('./power_save.cjs');
 const { createSteamShell } = require('./steam.cjs');
 const { createEpicShell } = require('./epic.cjs');
 const { PRODUCTION_API_ORIGIN } = require('./update_guard.cjs');
@@ -351,6 +353,18 @@ const clearHiddenRederiveTimer = () => {
   hiddenRederiveTimer = null;
 };
 
+// Display-sleep suppression for controller-only play (electron/power_save.cjs
+// owns the state machine and the reasoning). Wired to the real Electron blocker,
+// the real timers, and the wall clock; the module itself is pure, so every
+// transition is tested without an Electron runtime.
+const powerSave = createPowerSave({
+  start: (type) => powerSaveBlocker.start(type),
+  stop: (id) => powerSaveBlocker.stop(id),
+  setTimer: (callback, delayMs) => setTimeout(callback, delayMs),
+  clearTimer: (handle) => clearTimeout(handle),
+  now: () => Date.now(),
+});
+
 // The single send site for 'desktop-presentation-changed'. The renderer cannot
 // work hidden-ness out for itself: the game window sets backgroundThrottling:false,
 // which keeps the Page Visibility API reporting 'visible' the whole time the
@@ -362,9 +376,14 @@ const clearHiddenRederiveTimer = () => {
 // would park the renderer on a window the player is looking at, with nothing
 // able to correct it. Deriving means every later event re-reads the truth, so a
 // missed event costs one stale push instead of the rest of the session.
+// The display-sleep lease (powerSave.setHidden below) reads the SAME
+// derivation the renderer is told about, from this one site: a second reading
+// of the window could disagree with the push, and then the shell would be
+// holding the display awake for a window the renderer already stopped drawing.
 function sendPresentationState() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
   const hidden = mainWindow.isMinimized() || !mainWindow.isVisible();
+  powerSave.setHidden(hidden);
   if (hidden && hiddenRederiveTimer === null) {
     hiddenRederiveTimer = setInterval(sendPresentationState, HIDDEN_REDERIVE_INTERVAL_MS);
   } else if (!hidden) clearHiddenRederiveTimer();
@@ -685,7 +704,11 @@ function createMainWindow() {
     }
   }
 
+  // No window left to keep awake, and the presentation derivation cannot run
+  // any more (it returns early on a destroyed window), so the display-sleep
+  // lease is released from 'closed' rather than waiting out its idle timer.
   mainWindow.on('closed', () => {
+    powerSave.setHidden(true);
     clearReadyToShowFallback();
     clearMoveDisplayTimer();
     clearBoundsSaveTimer();
@@ -929,6 +952,15 @@ ipcMain.handle('desktop-get-display-mode', (event) => {
   return desktopPrefs.displayMode;
 });
 
+// Gamepad activity from the renderer's input loop, the one signal the display-sleep lease
+// runs on (gamepad input does not reset the OS idle timer on any platform we ship). The
+// renderer fires and forgets; the rate limit lives in electron/power_save.cjs.
+ipcMain.handle('desktop-gamepad-activity', (event) => {
+  if (!trustedSender(event)) return false;
+  powerSave.notifyActivity();
+  return true;
+});
+
 // Uncaught renderer errors forwarded by the preload. The preload clamps and
 // caps, but main re-validates and re-caps without trusting it
 // (electron/diagnostics.cjs); a malformed payload is dropped silently.
@@ -1124,4 +1156,12 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
+});
+
+// Drop the display-sleep lease for good on the way out. Terminal, so a late
+// window event during teardown cannot re-arm a timer in a process that is
+// leaving; on macOS the app can outlive its window, which is exactly why this
+// hangs off quit rather than off 'window-all-closed'.
+app.on('will-quit', () => {
+  powerSave.shutdown();
 });

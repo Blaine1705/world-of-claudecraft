@@ -26,6 +26,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
         'desktop-epic-capability',
         'desktop-epic-link-proof',
         'desktop-epic-link-settled',
+        'desktop-gamepad-activity',
         'desktop-get-display-mode',
         'desktop-get-gpu-force-opt-out',
         'desktop-login-open-browser',
@@ -186,6 +187,16 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     );
   });
 
+  it('the gamepad-activity handler feeds the display-sleep lease', () => {
+    // The channel existing proves nothing: it exists ONLY so controller input
+    // keeps the display awake, and nothing else in the shell pings the lease.
+    const main = read('electron/main.cjs');
+    const start = main.indexOf("ipcMain.handle('desktop-gamepad-activity'");
+    expect(start).toBeGreaterThan(-1);
+    const body = main.slice(start, main.indexOf('\n});', start));
+    expect(body).toContain('powerSave.notifyActivity();');
+  });
+
   it('activates the macOS app when the browser returns a wallet handoff', () => {
     const main = read('electron/main.cjs');
     const start = main.indexOf('function deliverWalletHandoffCode');
@@ -210,6 +221,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
       'setGpuForceOptOut',
       'getDisplayMode',
       'setDisplayMode',
+      'notifyGamepadActivity',
       'steamLinkTicket',
       'steamLinkSupported',
       'steamLinkSettled',
