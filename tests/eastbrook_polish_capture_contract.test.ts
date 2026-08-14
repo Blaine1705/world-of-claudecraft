@@ -161,8 +161,11 @@ interface AttributionTargetFixture {
 // preload test hook. The civicShader leaf moves; no capture was retaken.
 // Re-minted after applying the PR #3339 review repair atop PR #3344. The
 // rendererIntegration and civicShader leaves both survive; no capture was retaken.
+// Re-minted for final PR #3345 integration. The reviewed offscreen-heal
+// renderer bytes remain while the new lockfile and accepted GLBs join the
+// provenance inputs. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'a20916f64adf563b5ac8ea58dee38acf2cd44436936dacc7565ffa7f32ce9176';
+  '0dcd09708c53427d503809aa90f06228246a4047e15b10f52ca6c5a64e36f510';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
