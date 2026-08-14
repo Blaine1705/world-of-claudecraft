@@ -1696,3 +1696,123 @@ row, 831b0c2cb1 hidden zone-warm pause, the docs commit closing the phase docs.
   green. Commit bisectability verified in a throwaway worktree: c1
   55 tests, c2 87, c3 116, all green standalone; final tree byte-equal
   to the validated working tree (post-surgery status clean).
+
+## Phase 8 QA record (2026-08-14)
+
+Verdict PASS-WITH-FOLLOWUPS, 0 blocking in shipped code; every confirmed
+finding fixed in-session. Commits: 74d8eec048 QA-start base merge of
+release/v0.38.0 tip 51aa4eab13 (a large upstream window: the cheater-mark
+train, UA analytics, CI work; ONE conflict, the generated i18n
+pending.ts, resolved by regenerating via i18n:gen; parity 335/335 plus
+the ci_workflow sparse-cone pin, the architecture guard, and tsc all
+green after; upstream's only touch near the phase surfaces was analytics
+code in src/main.ts), then 5d1e1c44f7 electron pin hardening, ddaa389f57
+renderer pin and coverage hardening, 6736deb4d9 zone-warm honesty,
+bc5a758186 setter deviation docs.
+
+- AUDIT SHAPE: one deterministic workflow, 34 agents, zero errored: 7
+  focus auditors (web-parity, blocker-lifecycle, display-mode,
+  test-coverage-auditor, qa-checklist, privacy-security-review,
+  frontend-seam-reviewer) and 6 ledger re-litigations in parallel, a
+  merge-dedup stage, then 2 adversarial skeptics per actionable item.
+  ONE empty result: the privacy-security-review custom-agentType lane
+  finished without StructuredOutput (the known phase 4 QA failure mode
+  recurred); re-run as a direct read-only dispatch, which delivered 0
+  blocking, 0 should-fix, 3 nice-to-haves (ledgered below) and
+  independently confirmed the four QA fix commits changed no runtime
+  behavior (comment-only outside tests/).
+- RE-LITIGATIONS: 6/6 UPHOLD. blocking-arm-at-reveal (stronger than the
+  recorded rationale: the main.ts ready-bail double-gates the blocking
+  screen, and in the never-resident case the blocking arm is the BETTER
+  player outcome than revealing inside the residency fog);
+  setter-idempotence-drift (any live-window sensitivity reintroduces the
+  world-entry snap-back, because the echo and a deliberate same-value
+  re-select are byte-identical at the IPC boundary);
+  initial-lease-hidden-false (bounded at about 4 s by the reveal
+  fallback, and a pre-reveal ping requires real pad input before first
+  paint); i18n-domain-choice (hud.options is the Display card's majority
+  domain, the phase 7 hudChrome precedent is an Interface-panel row, and
+  the M16 fills already exist under the hud.options names);
+  shader-campaign-override (finite tens of seconds hidden, 3-unit
+  concurrency cap, the jank-free-reveal benefit is production-documented
+  in background_gpu_queue.ts); security-nits (the stop() guard is
+  structurally present since blockerId only ever holds a live claim, and
+  setter spam is harm-bounded by the atomic size-capped write).
+- FINDINGS: 10 actionable after merge-dedup from 40 raw; 8
+  double-confirmed, 2 splits. F1 (tests/monolith_budget.test.ts red,
+  hud.ts and renderer.ts over ceiling) is the OPEN inherited ratchet
+  decision, re-confirmed as branch-carried, not phase-8-owned: no
+  action. FIXED: F2 the createPowerSave construction was completely
+  unpinned (the one line binding the lease to the real powerSaveBlocker;
+  a no-op stop would have leaked the display-sleep claim with the unit
+  suite green); F6 both prefs setters' save-failure guards could be
+  deleted with every ordering pin still passing (the display-mode AND
+  the inherited gpu-setter gap); F7 the preload junk refusal and
+  gamepad-notify catch had zero body coverage (the catch is NOT
+  redundant with the renderer module's: notifyGamepadActivity returns
+  undefined, so the renderer-side catch can never see the invoke
+  rejection); F8 the gamepad activity predicate had per-arm coverage for
+  only 1 of 4 movement flags and 1 of 2 cursor dimensions; F9 the
+  untrusted getter fallback literal was unpinned (a 'windowed' mutation
+  passed); F10 the display-mode wiring pins read raw source, so a
+  commented-out composition line still passed; F4 the zone-warm comments
+  overclaimed the rift-edge guarantee (docs plus a bound-pinning test,
+  see below); F3 the setter idempotence dead-click cost was undocumented
+  (accepted-deviation comment landed at the guard).
+- SPLIT ADJUDICATIONS: F4 (rift-exit edge lost when both crossings
+  happen inside one hidden span) downgraded from behavior fix to
+  docs-plus-test by the reproduction skeptic: the fog harm cannot be
+  constructed (queueVisibleZonePrepares early-returns inside the band,
+  evictFarZoneIfConstrained needs an overworld zone, and hidden frames
+  keep the streaming lane running, so residency at reveal is never worse
+  than at hide), and the accumulated displacement still routes a
+  teleport-sized reveal to the blocking arm; a sticky
+  saw-band-while-hidden latch stays a recorded nice-to-have. F5 (the
+  world-entry apply-all loop pushes displayMode, racing the boot
+  reflection) downgraded to a ledgered hardening candidate: the
+  differing-value ordering requires a main process stalled from module
+  eval to world entry, which also blocks the clicks needed to reach
+  world entry, and invoke arrival order services the boot get first;
+  the optional hardening (skip displayMode in the apply-all loop, or
+  gate the push on the reflection having settled) is recorded, not
+  landed, and the shell-side idempotent early return remains the pinned
+  guard for the equal-value echo, which is the only reachable case.
+- PROBES: 15/15 KILLED rc=1 with named failing tests via the disciplined
+  driver (anchored count==1 replace, landing proof, rc plus names plus
+  summary, git-restore verified per row): the lease-stop no-op, both
+  setter guard mutations, both preload mutations, all four gamepad arm
+  drops, the untrusted-value flip, the setHidden coercion, the
+  commented-out push (run by hand: the driver's landing proof rejects a
+  prefix-comment replacement whose text still contains the find string,
+  a driver artifact, not a survivor), the hidden-band sampling mutation,
+  and two controls through pre-existing pins. The two power_save
+  `if (stopped) return;` guards were pre-declared unobservable defensive
+  survivors and not scored.
+- NEW LEDGER (phase 11 / follow-up candidates): main-side isFocused()
+  gate on the gamepad-activity handler (trusted-side mirror of the
+  renderer focus gate; a compromised renderer can otherwise hold the
+  display awake while unfocused, battery drain only, display-sleep
+  scope); preload notifyGamepadActivity sync-throw guard (matters only
+  for a future second caller, the shipped caller wraps);
+  Object.freeze(DISPLAY_MODES) (style, nothing untrusted runs in main);
+  the F5 apply-all-loop hardening and F4 sticky latch above;
+  blocker-lifecycle notes worth keeping: crash recovery relies on the
+  60 s idle backstop (bounded, coherent after the did-finish-load
+  re-derive), the renderer's 30 s notify stamp never resets on unhide
+  (an up-to-30 s re-claim gap, masked in practice by keyboard or mouse
+  resetting the OS idle clock), and sendPresentationState's
+  destroyed-window early return leaves the hidden-rederive interval for
+  the closed handler to clear; the Reset-doctrine test re-implements the
+  push ternary (a coordinated swap of both reds nothing); the guide
+  settings page has no Display Mode row, matching the GPU-pref
+  "guide documents the web experience" convention.
+- GATE at bc5a758186: gate_select resolved mode=full; pre-vitest legs
+  green; the full-suite fallback red EXACTLY the accepted set (9 seal
+  suites / 14 tests plus tests/monolith_budget.test.ts 2, the OPEN
+  ratchet decision), 38347 passed, zero phase regressions; post-abort
+  turbo proofs 5/5 (check:types build:env build:server build:bot) plus
+  3/3 (build:bundle); browser leg standalone 19 files / 125 tests
+  green; tree committed-clean throughout, all probe mutations restored.
+- Neither macOS stopping rule tripped: no new Space-semantics evidence
+  surfaced (the mac soak stays unverifiable on this box; simpleFullscreen
+  remains the documented alternative if a mac soak objects).

@@ -798,6 +798,34 @@ them). GPU lane audit adjudication + smoke rig (prototype-patched
 BrowserWindow, PRIME-child writes the result late) recorded in
 progress.md.
 
+Phase 8 QA done (2026-08-14, PASS-WITH-FOLLOWUPS, 0 blocking; QA-start
+merge 74d8eec048 of release tip 51aa4eab13 with one generated-i18n
+conflict resolved by i18n:gen regen, parity 335/335 + ci_workflow +
+architecture + tsc green after; fix commits 5d1e1c44f7 electron pins,
+ddaa389f57 renderer pins + gamepad arms, 6736deb4d9 zone-warm honesty,
+bc5a758186 setter deviation docs; full record in progress.md). 34-agent
+workflow plus one direct security re-dispatch (the custom-agentType
+StructuredOutput failure mode recurred; the direct dispatch answered 0
+blocking / 0 should-fix): 6/6 ledger re-litigations UPHOLD, 10
+actionable findings (8 double-confirmed all resolved, 2 splits
+adjudicated down: F4 to docs+test, F5 to ledgered hardening), probe
+round 15/15 killed with named tests. New pins from QA: the
+createPowerSave wiring block (five injected members, count 1), both
+prefs setters' save-failure guard literals, the preload junk-refusal and
+notify-catch bodies, the untrusted getter fallback literal plus
+per-channel trust returns, comment-strip on the display-mode wiring pins
+(mainSource/optionsWindowSource), the web-arm ordered Display card run,
+gamepad per-arm activity cases (back/strafeLeft/strafeRight + vertical
+cursor), the power_save strict-true setHidden arm, and the zone-warm
+both-hidden bound test (the rift edge survives a hidden span only when
+some part of the crossing was seen; entirely-hidden crossings are a
+pinned deliberate bound). Ledger for phase 11: main-side isFocused() on
+the gamepad-activity handler, preload notify sync-throw guard,
+Object.freeze(DISPLAY_MODES), the F5 apply-all-loop hardening, the F4
+sticky hidden-band latch. Gate red exactly the accepted set (9 seals/14
++ monolith 2), 38347 passed; turbo proofs 5/5 + 3/3; browser leg 19/125
+green. Neither macOS stopping rule tripped.
+
 Perf baselines: docs/perf/baseline/history.jsonl carries the phase 5 rows (low
 pre/post dressing fix + medium, this machines RTX 5090, 1280x720, vsync off;
 raw runs in tmp/perf-baseline/, gitignored). Phase 6 froze the pre-upgrade
