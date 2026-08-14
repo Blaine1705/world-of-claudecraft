@@ -6256,7 +6256,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'form_bear', value: 0.65, duration: 3600 }],
     description:
-      'Shapeshift into a bear: armor +100%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. Cast again to return to caster form.',
+      'Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. Cast again to return to caster form.',
   },
   bear_charge: {
     id: 'bear_charge',

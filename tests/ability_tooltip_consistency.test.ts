@@ -48,7 +48,7 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   charge: [9, 1],
   bear_charge: [9, 1],
   // "30% more threat": the stance threat multiplier inside threatModifier.
-  // Bear form's "armor +100%" and "maximum health +30%" are the
+  // Bear form's "armor +110%" and "maximum health +30%" are the
   // recalcPlayerStats multipliers (2.1 and 1.3, the v0.38 tank-parity pass)
   // in entity.ts, not the form effect's value.
   defensive_stance: [30],
@@ -57,7 +57,7 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // Valor Roar's Protection-only damage reduction is applied when the party
   // maximum-health aura is created, rather than stored on its shared effect.
   rallying_cry: [5],
-  bear_form: [30, 100],
+  bear_form: [30, 110],
   // "compelled to attack you for 3 sec": the taunt compel window in threat.ts.
   taunt: [3],
   holy_taunt: [3],

@@ -148,20 +148,20 @@ export function applyWarspiritPosture(
     school: 'nature',
   });
   ctx.applyAura(player, {
-    id: STONEBOUND_STAMINA_ID,
-    name: 'Stonebound Vigor',
-    kind: 'buff_sta_pct',
-    value: STONEBOUND_STAMINA_BONUS,
+    id: STONEBOUND_DR_ID,
+    name: 'Stonebound Guard',
+    kind: 'buff_dr',
+    value: STONEBOUND_DAMAGE_REDUCTION + stoneboundTalentDamageReduction(ctx, player),
     remaining: duration,
     duration,
     sourceId: player.id,
     school: 'nature',
   });
   ctx.applyAura(player, {
-    id: STONEBOUND_DR_ID,
-    name: 'Stonebound Guard',
-    kind: 'buff_dr',
-    value: STONEBOUND_DAMAGE_REDUCTION + stoneboundTalentDamageReduction(ctx, player),
+    id: STONEBOUND_STAMINA_ID,
+    name: 'Stonebound Vigor',
+    kind: 'buff_sta_pct',
+    value: STONEBOUND_STAMINA_BONUS,
     remaining: duration,
     duration,
     sourceId: player.id,

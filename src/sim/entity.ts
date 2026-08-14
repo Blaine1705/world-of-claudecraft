@@ -490,7 +490,7 @@ export function recalcPlayerStats(
   s.agi = Math.max(0, s.agi);
   s.armor += s.agi * 2;
   if (bearForm) {
-    // 2.0x (v0.38 tank parity, was 2.3x): the armor trim funds the bigger form
+    // 2.1x (v0.38 tank parity, was 2.3x): the armor trim funds the bigger form
     // health pool below so total effective HP stays inside the committed-tank
     // band while the bear owns the classic big-pool identity. Leather peaks
     // ~1700-2100 armor vs the warrior's 2861; the form multiplier still fakes
