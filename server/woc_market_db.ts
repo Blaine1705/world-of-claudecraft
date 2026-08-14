@@ -636,8 +636,11 @@ CREATE INDEX IF NOT EXISTS woc_market_offers_resolved_updated
   ON woc_market_directed_offers(updated_at)
   WHERE status <> 'pending';
 -- The offer inverted after the table first shipped (the buyer now opens the
--- deal, so the item is unknown until acceptance). Dropping the NOT NULL is
--- additive and idempotent; a pre-existing row keeps its item.
+-- deal). item_ref stays acceptance-written; item_id has since re-tightened to
+-- stamp at CREATION (H10, the fingerprint block below), so for it this DROP
+-- now covers only LEGACY rows written between the inversion and the pin.
+-- Dropping the NOT NULL is additive and idempotent; a pre-existing row keeps
+-- its item.
 ALTER TABLE woc_market_directed_offers ALTER COLUMN item_ref DROP NOT NULL;
 ALTER TABLE woc_market_directed_offers ALTER COLUMN item_id DROP NOT NULL;
 -- Both sides accept through the trade window's ordinary Accept button, so the
@@ -679,8 +682,11 @@ CREATE INDEX IF NOT EXISTS woc_market_offers_accepted_unstamped
 -- UPDATE below it exists for NON-empty developer and staging databases that
 -- ran before the bound (duplicate pending pairs would fail the unique index
 -- build and with it the whole boot): all but the newest pending offer per
--- pair expire, unbatched like the open2 repair (safe pre-enable; the first
--- populated-table repair must batch). Gated on the index's own validity,
+-- pair expire, where "newest" means HIGHEST ID (the n.id > o.id tiebreak,
+-- which equals insert order; a database whose timestamps disagree with id
+-- order keeps the last-inserted row, not the last-touched one), unbatched
+-- like the open2 repair (safe pre-enable; the first populated-table repair
+-- must batch). Gated on the index's own validity,
 -- open2's one-time pseudoconstant shape: the planner emits a one-time
 -- filter, so a healthy boot (index already built) never executes the scan,
 -- and dropping the index re-arms the repair. Idempotent either way: zero
@@ -748,8 +754,8 @@ export const GUARD_IDLE_TX_TIMEOUT_MS = ESCROW_LOCK_TIMEOUT_MS;
  *  original 5000, BECAUSE the statement count grew: the directed rail added
  *  the offer-stamp CAS and stopped skipping the cap count, and five 5s
  *  allowances would put the pinned worst-case sum past one autosave period.
- *  Honest ceiling
- *  accounting: this allowance bounds the FIVE workload statements (the
+ *  Honest ceiling accounting: this allowance bounds the FIVE workload
+ *  statements (the
  *  tunables relation pins exactly those, plus the lock wait and the pool
  *  checkout, 27s; the two later SET LOCALs also run under it but are
  *  protocol statements with no locks, IO, or planning, excluded from the

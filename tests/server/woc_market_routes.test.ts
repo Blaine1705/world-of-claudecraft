@@ -263,14 +263,21 @@ describe('the refusal-to-wire mapping', () => {
     ]);
   });
 
-  it('gates offer creation at the schema: no item id and oversized payloads refuse before the service, a realistic heavy payload reaches it', async () => {
+  it('gates offer creation at the schema, then forwards the whole agreed copy and the terms flag', async () => {
     // The agreed-item identity became REQUIRED wire contract (H10): an old
     // cached client posting the pre-pin body must get a 400, never an offer
     // with nothing pinned (which was the bait-and-switch surface itself).
     let reached = 0;
+    // The double CAPTURES its argument: a double that only counts calls
+    // proves the request was not rejected, never that the decoded identity
+    // reached the service, so dropping a field from the forwarded item would
+    // pass every assertion a bare counter can make.
+    type OfferArgs = Parameters<WocMarketService['createDirectedOffer']>[0];
+    const forwarded: OfferArgs[] = [];
     service({
-      createDirectedOffer: (async () => {
+      createDirectedOffer: (async (args: OfferArgs) => {
         reached += 1;
+        forwarded.push(args);
         throw new Error('unreachable');
       }) as unknown as WocMarketService['createDirectedOffer'],
     });
@@ -348,10 +355,51 @@ describe('the refusal-to-wire mapping', () => {
         usdCents: 5000,
         itemId: 'crown_of_embers',
         itemInstance: heavy,
+        itemCraftedRecipeId: 'recipe_ember_crown',
+        acceptTerms: true,
       },
     });
     await expect(handlerFor('POST', '/api/woc-market/offers')(ok)).rejects.toThrow('unreachable');
     expect(reached).toBe(1);
+    // The WHOLE agreed-copy identity has to survive the decode: itemId, the
+    // instance payload, and the crafted provenance are the three legs of the
+    // pin the seller's acceptance is checked against, so a dropped leg here
+    // is a bait-and-switch hole that no refusal test can see.
+    expect(forwarded[0]).toMatchObject({
+      account: VIEWER,
+      characterId: 1,
+      sellerCharacterName: 'Selara',
+      usdCents: 5000,
+      item: {
+        itemId: 'crown_of_embers',
+        instance: heavy,
+        craftedRecipeId: 'recipe_ember_crown',
+      },
+      acceptTerms: true,
+    });
+    // acceptTerms follows the posted flag STRICTLY: the offer is a strikeable
+    // commitment, so an absent (or non-true) field must forward false rather
+    // than accept the terms on the buyer's behalf.
+    const untermed = fakeCtx({
+      method: 'POST',
+      url: '/api/woc-market/offers',
+      account: { accountId: VIEWER, scope: 'full' },
+      body: {
+        characterId: 1,
+        sellerCharacterName: 'Selara',
+        usdCents: 5000,
+        itemId: 'crown_of_embers',
+        acceptTerms: 'yes',
+      },
+    });
+    await expect(handlerFor('POST', '/api/woc-market/offers')(untermed)).rejects.toThrow(
+      'unreachable',
+    );
+    expect(reached).toBe(2);
+    expect(forwarded[1].acceptTerms).toBe(false);
+    // And the copy with nothing but an id forwards no instance and no
+    // provenance, rather than inventing empty ones the pin would digest.
+    expect(forwarded[1].item).toEqual({ itemId: 'crown_of_embers' });
   });
 
   it('surfaces a service refusal through a real handler as that status and code', async () => {

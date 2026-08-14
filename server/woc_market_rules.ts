@@ -149,12 +149,17 @@ export const WOC_MARKET_DIRECTED_OFFER_TTL_SECONDS = 600;
  *
  * Equal to the settlement window BY RULING (H12): a directed sale is bought
  * immediately or not at all, so the hold is the same promise the settlement
- * window makes, and the worst-case escrow occupancy is one hold plus one
- * settlement window (a last-moment claim). The 12-hour auction backstop it
+ * window makes. Typical worst-case escrow occupancy is one hold plus one
+ * settlement window (a last-moment claim); the honest ceiling is higher,
+ * since the named buyer can re-claim in the sliver between a settlement's
+ * expiry and the auto-close (directed rows deliberately skip the re-claim
+ * cooldown), chaining roughly hold plus two more windows before the strike
+ * ladder's suspension cuts the loop off. The 12-hour auction backstop it
  * replaces was the cap-exemption's stated mitigation inverted: the exemption
  * assumed a settlement-window hold while the code granted the shortest
  * auction duration. The identity (not a copied literal) keeps the two windows
- * from drifting apart silently; the rules suite pins it at the definition.
+ * from drifting apart silently; the rules suite pins it at the definition,
+ * plus a source-text pin so a copied literal cannot satisfy it.
  */
 export const WOC_MARKET_DIRECTED_HOLD_SECONDS = WOC_MARKET_SETTLEMENT_WINDOW_SECONDS;
 

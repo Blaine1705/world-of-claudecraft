@@ -27,6 +27,7 @@ import {
   WOC_MARKET_MAX_ACTIVE_LISTINGS,
   WOC_MARKET_MAX_PRICE_CENTS,
   WOC_MARKET_MIN_PRICE_CENTS,
+  WOC_MARKET_OFFER_CONVERGE_MAX_AGE_SECONDS,
   WOC_MARKET_OFFER_CONVERGE_SECONDS,
   WOC_MARKET_QUOTE_TTL_SECONDS,
   WOC_MARKET_RESTRICTED_POLICY,
@@ -71,11 +72,28 @@ describe('tunables: literal pins', () => {
     // bought immediately or not at all, so the hold makes the same promise the
     // settlement window makes, and retuning one must retune the other.
     expect(WOC_MARKET_DIRECTED_HOLD_SECONDS).toBe(WOC_MARKET_SETTLEMENT_WINDOW_SECONDS);
+    // Both constants are 600, so the comparison above CANNOT fail on a copied
+    // literal: it is exactly as green either way. The identity itself is
+    // therefore pinned at the definition site, comment-stripped so the
+    // docblock claiming the identity cannot satisfy the pin for it.
+    const rules = stripComments(
+      readFileSync(new URL('../server/woc_market_rules.ts', import.meta.url), 'utf8'),
+    );
+    expect(rules).toContain(
+      'WOC_MARKET_DIRECTED_HOLD_SECONDS = WOC_MARKET_SETTLEMENT_WINDOW_SECONDS',
+    );
     // The converge arm may only touch an accepted-unstamped offer after every
     // bound an in-flight acceptance can ride has passed: the 65s COMMIT driver
     // backstop plus the escrow FIFO wait. 300s is comfortably past both and
     // pinned exactly so a retune is a conscious re-derivation.
     expect(WOC_MARKET_OFFER_CONVERGE_SECONDS).toBe(300);
+    // The far side of the same window: rows older than a day stopped being
+    // rollback evidence (the listings prune SET-NULLs listing_id long after a
+    // deal completed), so the arm must leave them alone.
+    expect(WOC_MARKET_OFFER_CONVERGE_MAX_AGE_SECONDS).toBe(24 * 3600);
+    expect(WOC_MARKET_OFFER_CONVERGE_MAX_AGE_SECONDS).toBeGreaterThan(
+      WOC_MARKET_OFFER_CONVERGE_SECONDS,
+    );
   });
 
   it('pins the bond poll park delay and the anti-snipe trio to their literals', () => {

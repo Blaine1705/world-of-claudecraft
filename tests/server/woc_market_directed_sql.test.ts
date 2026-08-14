@@ -106,6 +106,24 @@ describe('the schema carries the directed column additively', () => {
     expect(WOC_MARKET_SCHEMA).toContain('woc_market_offers_accepted_unstamped');
     expect(WOC_MARKET_SCHEMA).toContain('woc_market_offers_pair_pending');
   });
+
+  it('creates the pair-pending index with its exact columns and partial predicate', async () => {
+    // The name alone is not the bound: this index IS the strike-farming
+    // authority (one live deal per buyer/seller pair), and it enforces that
+    // only while it is UNIQUE, keyed on exactly those three columns, and
+    // partial on pending. Drop 'realm' and two realms collide; drop the WHERE
+    // and a resolved pair can never deal again; make it non-unique and the
+    // bound silently disappears while every name pin stays green.
+    // Comment-stripped and whitespace-collapsed first: the rationale prose
+    // above the DDL names the same columns, and the statement is reflowed.
+    const { WOC_MARKET_SCHEMA } = await import('../../server/woc_market_db');
+    const schema = WOC_MARKET_SCHEMA.replace(/--[^\n]*/g, ' ').replace(/\s+/g, ' ');
+    expect(schema).toContain(
+      `CREATE UNIQUE INDEX IF NOT EXISTS ${WOC_MARKET_OFFERS_PAIR_PENDING_INDEX}` +
+        ' ON woc_market_directed_offers(realm, buyer_account, seller_account)' +
+        " WHERE status = 'pending'",
+    );
+  });
 });
 
 describe('the directed-rail integrity statements, in SQL', () => {
@@ -1777,6 +1795,30 @@ describe('the escrow listing transaction, in SQL', () => {
     await expect(new PgWocMarketDb(pool).escrowInsertListing(SAVE, LISTING)).rejects.toThrow(
       'duplicate key',
     );
+  });
+
+  it('counts the cap with the SAME predicate as the pre-check, directed rows included', async () => {
+    // The authoritative half of the H12 cap. The pre-check has its own
+    // no-exemption pin, but loosening only THIS half reopens the race the two
+    // halves exist to close, and every outcome assertion in this describe
+    // stays green while it does. Pinned two ways: the exemption predicate is
+    // absent here, and the two statements are the same statement modulo
+    // reflow, so a widened predicate has to be widened in both places
+    // deliberately rather than drifting into one.
+    const flatten = (text: string) => text.replace(/\s+/g, ' ').trim();
+    const { pool: txPool, sql: txSql } = recordingTxPool((text) =>
+      text.includes('RETURNING id') ? { rows: [{ id: 7 }], rowCount: 1 } : undefined,
+    );
+    await new PgWocMarketDb(txPool).escrowInsertListing(SAVE, LISTING);
+    const capStatements = txSql().filter((t) => t.includes('COUNT(*)'));
+    expect(capStatements, 'exactly one cap count inside the transaction').toHaveLength(1);
+    expect(capStatements[0]).toContain("status <> 'closed'");
+    expect(capStatements[0], 'no directed exemption inside the transaction').not.toContain(
+      'directed_buyer_account',
+    );
+    const { pool: precheckPool, sql: precheckSql } = recordingPool();
+    await new PgWocMarketDb(precheckPool).countActiveBySeller(REALM, LISTING.sellerAccount);
+    expect(flatten(capStatements[0])).toBe(flatten(precheckSql()[0]));
   });
 
   it('refuses cap_reached under the accounts lock BEFORE any character write', async () => {

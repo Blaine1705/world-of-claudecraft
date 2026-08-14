@@ -45,6 +45,7 @@ import {
   WOC_MARKET_BOND_POLL_PARK_SECONDS,
   WOC_MARKET_BUY_NOW_LOCK_SECONDS,
   WOC_MARKET_MAX_ACTIVE_LISTINGS,
+  WOC_MARKET_OFFER_CONVERGE_MAX_AGE_SECONDS,
   WOC_MARKET_OFFER_CONVERGE_SECONDS,
   WOC_MARKET_QUOTE_TTL_SECONDS,
   WOC_MARKET_RESTRICTED_POLICY,
@@ -55,7 +56,7 @@ import { ITEMS } from '../../src/sim/data';
 import type { ExtractRef } from '../../src/sim/inventory_extract';
 import { extractTradableCopy } from '../../src/sim/inventory_extract';
 import type { CharacterState } from '../../src/sim/sim';
-import type { InvSlot } from '../../src/sim/types';
+import type { InvSlot, ItemInstancePayload } from '../../src/sim/types';
 import { FakeWocMarketDb } from './helpers/fake_woc_market_db';
 
 // ---------------------------------------------------------------------------
@@ -135,7 +136,14 @@ class FakeCustody implements WocMarketCustody {
    *  to model a relog (a takeover mints a new lease nonce). */
   leaseNonce: string | undefined = 'nonce';
 
+  /** Every extractCopy ATTEMPT's characterId, in order. The "refused before
+   *  custody moved" pins need a witness that no extraction was even reached:
+   *  a bag-length check cannot tell a never-extracted copy from an
+   *  extracted-then-restored one. */
+  readonly extractAttempts: number[] = [];
+
   extractCopy(accountId: number, characterId: number, ref: ExtractRef): WocCustodyExtract {
+    this.extractAttempts.push(characterId);
     const inventory = this.bags.get(characterId);
     if (!inventory) return { ok: false, reason: 'offline' };
     if (this.owners.get(characterId) !== accountId) return { ok: false, reason: 'not_yours' };
@@ -3536,6 +3544,10 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     // The agreed copy (H10): the plain stocked EPIC_ITEM the seller's accept
     // will extract, so the pin matches unless a test deliberately diverges.
     item: { itemId: EPIC_ITEM },
+    // Terms parity: a directed buyer can be struck, so the offer sits behind
+    // guardTerms. Accepted by default here so every other case under test is
+    // the one the title names; the terms gate has its own pair of cases.
+    acceptTerms: true,
     ...over,
   });
   /** The seller's half: names the copy. */
@@ -3587,6 +3599,29 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     const h = stocked();
     const res = await h.service.createDirectedOffer(offerArgs({ sellerCharacterName: 'Aldan' }));
     expect(res).toEqual({ ok: false, reason: 'self_offer' });
+  });
+
+  it('refuses terms_required from a buyer who has never accepted them, and records the acceptance once', async () => {
+    // Terms parity with placeBid and buyNow: a directed buyer can be STRUCK
+    // for walking away, so the offer sits behind the same gate. It is also
+    // what makes the pay arm's "terms were accepted when the offer was made"
+    // premise true.
+    const h = stocked();
+    expect(await h.service.createDirectedOffer(offerArgs({ acceptTerms: false }))).toEqual({
+      ok: false,
+      reason: 'terms_required',
+    });
+    expect(await h.db.termsAcceptedAt(BUYER_A), 'a refused offer records nothing').toBeNull();
+    expect((await h.service.createDirectedOffer(offerArgs())).ok).toBe(true);
+    expect(await h.db.termsAcceptedAt(BUYER_A), 'accepting records the acceptance').toBe(BASE_MS);
+    // The stored acceptance is what the gate reads, so a LATER offer passes
+    // without the flag. Addressed to a different seller, because the
+    // pair-pending bound would otherwise refuse this second deal for an
+    // unrelated reason and the case would pass without exercising the gate.
+    const later = await h.service.createDirectedOffer(
+      offerArgs({ sellerCharacterName: 'Brint', acceptTerms: false }),
+    );
+    expect(later.ok, 'a recorded acceptance passes the gate without the flag').toBe(true);
   });
 
   it('accepting escrows the item and produces a directed listing at the agreed price', async () => {
@@ -3912,6 +3947,41 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     expect((await h.db.strikeInfo(BUYER_A))?.strikes ?? 0).toBe(1);
   });
 
+  it('strikes ONCE when a claimed-then-unpaid window and the hold lapse together (the ever-settled gate)', async () => {
+    // Both strike arms are live in the SAME pass here: the close arm runs
+    // first and its CAS succeeds (a 'failed' settlement is not an OPEN one,
+    // so nothing blocks the close), then the overdue arm expires the dead
+    // window and strikes for the claim. Only the ever-settled probe keeps
+    // those from being two strikes for one walk-away, so deleting it reds
+    // this on the FIRST pass; the second pass is the durable-state control.
+    const h = stocked();
+    const listing = await acceptedOffer(h);
+    unwrap(
+      await h.service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    const settlement = await liveSettlement(h, listing.id);
+    expect(await h.db.submitSettlementSignature(settlement.id, 'sig-gate')).toBe('ok');
+    expect(
+      await h.db.transitionSettlement(settlement.id, ['confirming'], 'failed', 'confirm_failed'),
+    ).toBe(true);
+    expect(await h.db.strikeInfo(BUYER_A), 'nothing owed while the window is live').toBeNull();
+    // Past the hold AND the payment deadline, so neither arm is spared by a
+    // clock that only cleared one of them.
+    h.setNow(Math.max(listing.endsAtMs, settlement.deadlineAtMs) + 1);
+    await h.service.sweepPass();
+    expect((await h.db.strikeInfo(BUYER_A))?.strikes ?? 0, 'one walk-away, one strike').toBe(1);
+    expect((await h.db.listingById(REALM, listing.id))?.status).toBe('closed');
+    expect((await h.db.listingById(REALM, listing.id))?.resolution).toBe('unsettled');
+    await h.service.sweepPass();
+    expect((await h.db.strikeInfo(BUYER_A))?.strikes ?? 0).toBe(1);
+  });
+
   it('leaves a mid-flight claim alone at hold expiry (the unexpired-lock early return)', async () => {
     // The 270s claim lock routinely outlives the 600s hold. Closing over a
     // paying buyer would return the escrow while their payment request is in
@@ -4046,6 +4116,122 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     expect((await h.db.directedOfferById(REALM, offer.offer.id))?.status).toBe('pending');
   });
 
+  /** One directed deal over a seller holding exactly the slot given, driven to
+   *  the seller's escrowing acceptance. The seller names index 0 and the
+   *  instance payload they can see, which is all a trade window ever knows. */
+  async function acceptOfferForCopy(
+    h: Harness,
+    sellerSlot: InvSlot,
+    agreed: { itemId: string; instance?: ItemInstancePayload; craftedRecipeId?: string },
+  ): Promise<{ ok: true; listing: WocListingRow | null } | Refused> {
+    h.custody.bags.set(SELLER_CHAR, [sellerSlot]);
+    const offer = await h.service.createDirectedOffer(offerArgs({ item: agreed }));
+    if (!offer.ok) throw new Error(`offer refused: ${(offer as { reason: string }).reason}`);
+    const first = await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id, null, CHAR_A);
+    if (!first.ok) throw new Error('buyer accept refused');
+    return h.service.acceptDirectedOffer(
+      SELLER,
+      offer.offer.id,
+      {
+        index: 0,
+        itemId: sellerSlot.itemId,
+        expectInstance: sellerSlot.instance ?? null,
+      },
+      SELLER_CHAR,
+    );
+  }
+
+  it('escrows an INSTANCED copy end to end: both digest sites agree on the same payload', async () => {
+    // The two itemPinDigest sites see DIFFERENT objects for the same deal:
+    // createDirectedOffer digests the buyer's claimed snapshot, createListing
+    // digests the copy extractTradableCopy actually pulled from the bags. For
+    // a plain stack they trivially agree; for an instanced copy they agree
+    // only if the payload survives the extraction unchanged, and nothing else
+    // in this suite drives an instanced directed sale to a real listing.
+    const instance: ItemInstancePayload = { signer: 'Ayla' };
+    const h = makeHarness();
+    const escrowed = await acceptOfferForCopy(
+      h,
+      { itemId: EPIC_ITEM, count: 1, instance },
+      { itemId: EPIC_ITEM, instance },
+    );
+    if (!escrowed.ok) {
+      throw new Error(`accept refused: ${(escrowed as { reason: string }).reason}`);
+    }
+    expect(escrowed.listing, 'the second acceptance escrows and lists').not.toBeNull();
+    expect(escrowed.listing?.directedBuyerAccount).toBe(BUYER_A);
+    // The escrowed copy is the instanced one, not a plain stack of the id.
+    expect(escrowed.listing?.item.instance).toEqual(instance);
+    expect(bagsOf(h, SELLER_CHAR), 'the copy left the bags').toHaveLength(0);
+  });
+
+  it('treats crafted provenance as part of the agreed copy, in BOTH directions', async () => {
+    // craftedRecipeId is the third leg of the itemCopyPin 3-tuple and the one
+    // no other case exercises. The twins here are byte-equal but for the
+    // marker, so a pin that dropped the leg would accept the wrong copy while
+    // every other item_mismatch case stayed green.
+    const instance: ItemInstancePayload = { signer: 'Ayla' };
+    const agreed = { itemId: EPIC_ITEM, instance, craftedRecipeId: 'recipe_x' };
+    const unmarked = makeHarness();
+    const refused = await acceptOfferForCopy(
+      unmarked,
+      { itemId: EPIC_ITEM, count: 1, instance },
+      agreed,
+    );
+    expect(refused, 'the unmarked twin is not the agreed copy').toEqual({
+      ok: false,
+      reason: 'item_mismatch',
+    });
+    expect(bagsOf(unmarked, SELLER_CHAR), 'the copy restored').toHaveLength(1);
+    // The positive control, same deal with the marker present: without it the
+    // refusal above would also be produced by a pin that simply never matches.
+    const marked = makeHarness();
+    const escrowed = await acceptOfferForCopy(
+      marked,
+      { itemId: EPIC_ITEM, count: 1, instance, craftedRecipeId: 'recipe_x' },
+      agreed,
+    );
+    if (!escrowed.ok) {
+      throw new Error(`accept refused: ${(escrowed as { reason: string }).reason}`);
+    }
+    expect(escrowed.listing?.item.craftedRecipeId).toBe('recipe_x');
+    expect(bagsOf(marked, SELLER_CHAR), 'the marked copy left the bags').toHaveLength(0);
+  });
+
+  it('refuses a capped seller BEFORE any custody move, not inside the escrow transaction', async () => {
+    // The cap has two byte-identical halves: the service pre-check and the
+    // in-transaction count under the accounts lock. The pre-check exists to
+    // spare the extract and the FIFO job, so a regression that leaned on the
+    // in-transaction half alone would still answer cap_reached and pass every
+    // outcome-only assertion. The witness is the extraction log: bag counts
+    // cannot tell "never extracted" from "extracted then restored".
+    const h = makeHarness();
+    h.custody.bags.set(
+      SELLER_CHAR,
+      Array.from({ length: WOC_MARKET_MAX_ACTIVE_LISTINGS + 1 }, () => ({
+        itemId: EPIC_ITEM,
+        count: 1,
+      })),
+    );
+    const offer = await h.service.createDirectedOffer(offerArgs());
+    if (!offer.ok) throw new Error('offer refused');
+    const agreed = await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id, null, CHAR_A);
+    expect(agreed.ok).toBe(true);
+    // The seller fills their cap between agreeing and accepting: a MOVING
+    // fact, which is why the offer was creatable in the first place.
+    for (let i = 0; i < WOC_MARKET_MAX_ACTIVE_LISTINGS; i += 1) await listEpic(h);
+    // Those twelve listings each extracted, which is what proves the witness
+    // below is live rather than a log nothing ever writes to.
+    expect(h.custody.extractAttempts).toHaveLength(WOC_MARKET_MAX_ACTIVE_LISTINGS);
+    h.custody.extractAttempts.length = 0;
+    const escrowed = await sellerAccepts(h, offer.offer.id);
+    expect(escrowed).toEqual({ ok: false, reason: 'cap_reached' });
+    expect(h.custody.extractAttempts, 'nothing was extracted').toEqual([]);
+    expect(bagsOf(h, SELLER_CHAR), 'the last copy is untouched').toHaveLength(1);
+    // Typed, so the deal reopens and the pair can retry once a slot frees.
+    expect((await h.db.directedOfferById(REALM, offer.offer.id))?.status).toBe('pending');
+  });
+
   it('a proven-rollback escrow throw REOPENS the offer; an ambiguous one parks it accepted', async () => {
     // Judgment (a)'s in-request half: with rollback proof the listing provably
     // does not exist, so reopening cannot pair a live listing with a reopened
@@ -4137,6 +4323,45 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     stats = await h.service.sweepPass();
     expect(stats?.convergedOffers).toBe(1);
     expect((await h.db.directedOfferById(REALM, stuck.offer.id))?.status).toBe('expired');
+  });
+
+  it('leaves an ANCIENT unstamped acceptance alone: the old bound is not rollback evidence', async () => {
+    // The two-sided age window's far side. An offer un-stamped long after its
+    // deal completed is the listings prune's ON DELETE SET NULL, not a rolled
+    // back escrow, so the converge arm must not relabel it as live history.
+    const h = stocked();
+    const stuck = await h.service.createDirectedOffer(offerArgs());
+    if (!stuck.ok) throw new Error('offer refused');
+    await h.service.acceptDirectedOffer(BUYER_A, stuck.offer.id, null, CHAR_A);
+    h.db.failNextEscrowThrow = new Error('socket died mid-commit');
+    await expect(
+      h.service.acceptDirectedOffer(
+        SELLER,
+        stuck.offer.id,
+        { index: 0, itemId: EPIC_ITEM },
+        SELLER_CHAR,
+      ),
+    ).rejects.toThrow();
+    // Age the row past the far bound. Its TTL and the young bound are both
+    // long since cleared, so the OLD bound is the only thing that can hold it
+    // out of the batch.
+    h.db.offerUpdatedMs.set(
+      stuck.offer.id,
+      BASE_MS - (WOC_MARKET_OFFER_CONVERGE_MAX_AGE_SECONDS + 1) * 1000,
+    );
+    const skipped = await h.service.sweepPass();
+    expect(skipped?.convergedOffers, 'an aged-out row is not converge work').toBe(0);
+    expect((await h.db.directedOfferById(REALM, stuck.offer.id))?.status).toBe('accepted');
+    // The control that keeps the case honest: the SAME row, stamped back
+    // inside the window, converges. Without it a row rejected for any other
+    // reason would satisfy the assertions above.
+    h.db.offerUpdatedMs.set(
+      stuck.offer.id,
+      BASE_MS - (WOC_MARKET_OFFER_CONVERGE_SECONDS + 1) * 1000,
+    );
+    const converged = await h.service.sweepPass();
+    expect(converged?.convergedOffers).toBe(1);
+    expect((await h.db.directedOfferById(REALM, stuck.offer.id))?.status).toBe('pending');
   });
 
   /** Put the buyer online with room to spare. Without this every hand-off
@@ -5153,6 +5378,7 @@ describe('a directed sale carries the consequences of the rail it rides', () => 
       sellerCharacterName: 'Selara',
       usdCents: 5000,
       item: { itemId: EPIC_ITEM },
+      acceptTerms: true,
     });
     if (!offer.ok) throw new Error('offer refused');
     const first = await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id, null, CHAR_A);
@@ -5290,6 +5516,7 @@ describe('the trade window asks whether a counterparty can be paid in $WOC', () 
       sellerCharacterName: 'Selara Alt',
       usdCents: 5000,
       item: { itemId: EPIC_ITEM },
+      acceptTerms: true,
     });
     expect(res).toEqual({ ok: false, reason: 'self_offer' });
   });
@@ -5309,6 +5536,7 @@ describe('the sweep expires unanswered directed offers', () => {
       sellerCharacterName: 'Selara',
       usdCents: 5000,
       item: { itemId: EPIC_ITEM },
+      acceptTerms: true,
     });
     if (!made.ok) throw new Error('offer refused');
 
@@ -5331,6 +5559,7 @@ describe('the sweep expires unanswered directed offers', () => {
       sellerCharacterName: 'Selara',
       usdCents: 5000,
       item: { itemId: EPIC_ITEM },
+      acceptTerms: true,
     });
     if (!made.ok) throw new Error('offer refused');
     h.setNow(made.offer.expiresAtMs + 1);
@@ -5619,6 +5848,7 @@ async function directedSale(h: Harness, signature: string): Promise<{ listingId:
       sellerCharacterName: 'Selara',
       usdCents: 5000,
       item: { itemId: EPIC_ITEM },
+      acceptTerms: true,
     }),
     'createDirectedOffer',
   );

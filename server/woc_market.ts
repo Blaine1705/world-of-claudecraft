@@ -1402,17 +1402,16 @@ export class WocMarketService {
     return null;
   }
 
-  /** Balance is a bid-time plausibility gate, never a guarantee (the bond is
-   *  the enforcement). Compares service-computed token estimates against the
-   *  cached chain read; when either side is unreadable the gate refuses
-   *  closed. */
   /** The stored form of the agreed-copy fingerprint: a fixed-width sha256 of
    *  the sim's canonical itemCopyPin string, never the raw serialization. The
    *  identity RULE stays the sim's (one pin definition for every exchange
    *  pipe); the digest is a storage decision: item_pin rides every offer row,
    *  is re-read by the offer views and the converge arm, and a raw
    *  client-derived serialization would let one account bank tens of
-   *  kilobytes per row against the retention window. */
+   *  kilobytes per row against the retention window. The pin is CONTENT
+   *  identity, not slot identity: a byte-identical duplicate in another bag
+   *  cell satisfies it, and the seller's named index picks which copy ships
+   *  (deliberate: identical copies are interchangeable by definition). */
   private itemPinDigest(slot: {
     itemId: string;
     count: number;
@@ -1422,6 +1421,10 @@ export class WocMarketService {
     return createHash('sha256').update(itemCopyPin(slot)).digest('hex');
   }
 
+  /** Balance is a bid-time plausibility gate, never a guarantee (the bond is
+   *  the enforcement). Compares service-computed token estimates against the
+   *  cached chain read; when either side is unreadable the gate refuses
+   *  closed. */
   private async guardBalance(wallet: string, usdCents: number): Promise<Refused | null> {
     const [estimate, balance] = await Promise.all([
       this.deps.economy.estimate(usdCents),
@@ -1454,7 +1457,10 @@ export class WocMarketService {
     if (!wallet) return refuse('wallet_required');
     const params = validListingParams(args.params);
     if (!params.ok) return refuse(params.reason);
-    const def = ITEMS[args.itemRef.itemId];
+    // Own-property lookup, same as the offer intake: a prototype key would
+    // resolve a Function the taxonomy's closed default refuses anyway, but an
+    // honest miss beats a lucky one.
+    const def = Object.hasOwn(ITEMS, args.itemRef.itemId) ? ITEMS[args.itemRef.itemId] : undefined;
     const eligible = listingEligibility(
       def,
       args.itemRef.expectInstance ?? undefined,
@@ -1633,8 +1639,16 @@ export class WocMarketService {
      *  only ever REFUSES the seller's acceptance, so a forged snapshot hurts
      *  only the forger's own deal. */
     item: { itemId: string; instance?: ItemInstancePayload; craftedRecipeId?: string };
+    acceptTerms: boolean;
   }): Promise<{ ok: true; offer: WocDirectedOfferRow } | Refused> {
-    const gate = (await this.guardEnabledHealthy()) ?? (await this.guardSuspended(args.account));
+    // Terms parity with the public buyer-side money paths (placeBid, buyNow):
+    // a directed buyer can be STRUCK for walking away, and every other path
+    // that can strike sits behind guardTerms. This is also what makes the pay
+    // arm's "terms were accepted when the offer was made" premise true.
+    const gate =
+      (await this.guardEnabledHealthy()) ??
+      (await this.guardSuspended(args.account)) ??
+      (await this.guardTerms(args.account, args.acceptTerms));
     if (gate) return gate;
     const seller = await this.deps.db.characterByName(this.cfg.realm, args.sellerCharacterName);
     if (!seller) return refuse('character_invalid');
@@ -2726,7 +2740,13 @@ export class WocMarketService {
       this.deps.onSweepError(arm, err);
       return;
     }
-    console.error(`[woc_market] sweep arm ${arm} failed:`, err);
+    // code+message only, never the raw error (the escrow arm's discipline): a
+    // pg violation's `detail` spells out key values (account ids, pair
+    // columns), so the raw object would echo row values into the ops log.
+    console.error(`[woc_market] sweep arm ${arm} failed:`, {
+      code: (err as { code?: string }).code,
+      message: String(err),
+    });
   }
 
   /**

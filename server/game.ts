@@ -4686,10 +4686,10 @@ export class GameServer {
     return this.characterSaveQueues.enqueue(characterId, job);
   }
 
-  /** Terminal escrow-job arms, fired from inside the job: 'fenced' kicks the
-   *  displaced zombie; 'ambiguous' quarantines so the durable row decides an
-   *  unknown COMMIT. The pid is the extraction identity; a mid-leave session
-   *  still quarantines (kick skipped); books revert; the kick WIRES the takeover literal. */
+  /** Terminal escrow-job arms, fired from inside the job: 'fenced' kicks the displaced
+   *  zombie; 'ambiguous' quarantines so the durable row decides an unknown COMMIT (right in
+   *  BOTH branches, committed or rolled back). Pid = extraction identity; a mid-leave session
+   *  still quarantines (its queued flush re-checks); books revert; kick WIRES the takeover literal. */
   escrowSessionLost(pid: number, characterId: number, kind: 'fenced' | 'ambiguous'): void {
     const session = this.sessionByCharacterId(characterId);
     if (!session || session.pid !== pid) return;

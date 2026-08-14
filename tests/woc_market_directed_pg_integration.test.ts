@@ -125,6 +125,10 @@ describeDb('woc market directed rail against real Postgres', () => {
       buyNowCents?: number | null;
       directedBuyerAccount?: number | null;
       sellerWallet?: string;
+      /** A REAL characters row id, for the arms that resolve a recipient
+       *  (the return flight's deliveryTarget). The synthetic default never
+       *  resolves, which is what the park arms want. */
+      sellerCharacter?: number;
     } = {},
   ): Promise<number> {
     seq++;
@@ -141,7 +145,7 @@ describeDb('woc market directed rail against real Postgres', () => {
       [
         realm,
         sellerAccount,
-        9000 + seq,
+        over.sellerCharacter ?? 9000 + seq,
         `Seller${seq}`,
         over.sellerWallet ?? `wallet-seller-${seq}`,
         JSON.stringify({ itemId: 'amber_crimson_armor_plate', count: 1 }),
@@ -155,11 +159,16 @@ describeDb('woc market directed rail against real Postgres', () => {
     return Number(res.rows[0].id);
   }
 
-  async function listingRow(
-    id: number,
-  ): Promise<{ status: string; resolution: string | null; endsAtMs: number }> {
+  async function listingRow(id: number): Promise<{
+    status: string;
+    resolution: string | null;
+    endsAtMs: number;
+    itemDisposed: boolean;
+    item: InvSlot;
+  }> {
     const res = await pool.query(
-      `SELECT status, resolution, (EXTRACT(EPOCH FROM ends_at) * 1000)::bigint AS ends_ms
+      `SELECT status, resolution, item, item_disposed,
+              (EXTRACT(EPOCH FROM ends_at) * 1000)::bigint AS ends_ms
          FROM woc_market_listings WHERE id = $1`,
       [id],
     );
@@ -167,6 +176,8 @@ describeDb('woc market directed rail against real Postgres', () => {
       status: res.rows[0].status,
       resolution: res.rows[0].resolution ?? null,
       endsAtMs: Number(res.rows[0].ends_ms),
+      itemDisposed: Boolean(res.rows[0].item_disposed),
+      item: res.rows[0].item as InvSlot,
     };
   }
 
@@ -177,18 +188,36 @@ describeDb('woc market directed rail against real Postgres', () => {
     return res.rows[0] ? Number(res.rows[0].strikes) : 0;
   }
 
+  /** One persistMailParcel call, flattened to what a test asserts on. */
+  interface MailParcel {
+    recipientKey: string;
+    letter: 'delivery' | 'return' | 'sold_notice';
+    itemIds: string[];
+    custodyRef: string;
+  }
+
   /**
    * A service whose custody fake really executes the escrow job: extractCopy
-   * answers from the per-character copy map (validating expectInstance like
-   * the real extraction), runSerialized runs the job inline, and the lease is
+   * answers from the per-character copy map (matching on itemId ONLY: the
+   * real extraction also validates expectInstance, but the pin check under
+   * test runs on the RETURNED copy, so the narrower fake weakens nothing
+   * here), runSerialized runs the job inline, and the lease is
    * skipped (leaseNonce undefined saves unfenced, matching the delivery
    * suite's unfenced arm).
+   *
+   * A test that stocks `bags` gets the whole bag array and extraction resolves
+   * the NAMED index, which is what the duplicate-copy arm needs; `copies`
+   * stays the one-copy-at-any-index shorthand every other test uses. A test
+   * that passes `parcels` gets the mail rail's parcel book (the delivery
+   * suite's ParcelCustody, narrowed to what the return flight needs).
    */
   function makeService(
     realm: string,
     opts: {
       wallets: Map<number, string | null>;
       copies?: Map<number, InvSlot>;
+      bags?: Map<number, InvSlot[]>;
+      parcels?: MailParcel[];
       nowMs?: () => number;
     },
   ): WocMarketService {
@@ -197,7 +226,8 @@ describeDb('woc market directed rail against real Postgres', () => {
       ownsLiveCharacter: () => true,
       escrowSessionLost: () => {},
       extractCopy: (_account, characterId, ref): WocCustodyExtract => {
-        const copy = opts.copies?.get(characterId);
+        const bag = opts.bags?.get(characterId);
+        const copy = bag ? bag[ref.index] : opts.copies?.get(characterId);
         if (!copy || copy.itemId !== ref.itemId) return { ok: false, reason: 'stale_copy' };
         return {
           ok: true,
@@ -214,8 +244,17 @@ describeDb('woc market directed rail against real Postgres', () => {
         throw new Error('snapshot not exercised by this suite');
       },
       restoreCopy: () => {},
-      persistMailParcel: async () => {},
-      hasParcel: () => false,
+      persistMailParcel: async (recipient, letter, items, custodyRef) => {
+        // The live post office dedupes on the ref; recording every CALL is
+        // what lets a test say a second write was attempted at all.
+        opts.parcels?.push({
+          recipientKey: recipient.key,
+          letter,
+          itemIds: items.map((item) => item.itemId),
+          custodyRef,
+        });
+      },
+      hasParcel: (custodyRef) => (opts.parcels ?? []).some((p) => p.custodyRef === custodyRef),
     };
     return new marketMod.WocMarketService({
       db: marketDb,
@@ -257,6 +296,10 @@ describeDb('woc market directed rail against real Postgres', () => {
       sellerCharacterName: args.sellerName,
       usdCents: 1000,
       item: args.agreed,
+      // The strike-parity gate: a directed buyer can be struck, so the offer
+      // intake sits behind terms. Recorded once per account, so every later
+      // offer from the same buyer passes on the stored acceptance.
+      acceptTerms: true,
     } as Parameters<WocMarketService['createDirectedOffer']>[0]);
     if (!created.ok) return created as { ok: false; reason: string };
     const offerId = (created as { ok: true; offer: { id: number } }).offer.id;
@@ -316,7 +359,9 @@ describeDb('woc market directed rail against real Postgres', () => {
         BASE_MS,
         BASE_MS + 270_000,
       );
-      expect(typeof ok).toBe('object');
+      // The claimed row itself, not merely "not a refusal string": a future
+      // refusal returned as an object would pass the typeof check alone.
+      expect(ok).toMatchObject({ id: listingId });
     });
 
     it('a claimer with NO wallet row never trips the twin guard', async () => {
@@ -336,7 +381,7 @@ describeDb('woc market directed rail against real Postgres', () => {
         BASE_MS,
         BASE_MS + 270_000,
       );
-      expect(typeof claimed).toBe('object');
+      expect(claimed).toMatchObject({ id: listingId });
     });
   });
 
@@ -530,6 +575,59 @@ describeDb('woc market directed rail against real Postgres', () => {
       await service.sweepPass();
       await service.sweepPass();
       expect(await strikeCount(buyer)).toBe(1);
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // H12: the other half of the auto-close, the return flight home
+  // -------------------------------------------------------------------------
+
+  describe('directed return flight', () => {
+    it('mails the escrowed copy home and disposes the listing in the auto-closing pass', async () => {
+      const realm = 'directed-return-home';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      // A REAL characters row: the return flight resolves its recipient through
+      // deliveryTarget, and a synthetic seller_character resolves to nobody
+      // (which is the park arm, not this one).
+      const sellerCharacter = await seedCharacter(realm, seller, `ReturnSeller${seq}`);
+      const listingId = await seedListing(realm, seller, {
+        directedBuyerAccount: buyer,
+        endsAtMs: BASE_MS - MINUTE_MS,
+        sellerCharacter,
+      });
+      const parcels: MailParcel[] = [];
+      const service = makeService(realm, { wallets: new Map(), parcels });
+      // ONE pass does both halves: the closed arm auto-closes the never-claimed
+      // hold 'unsettled', and the returned arm (later in the same pass) flies
+      // the copy home, so a seller never has to cancel to get their item back.
+      await service.sweepPass();
+      const row = await listingRow(listingId);
+      expect(row.status).toBe('closed');
+      expect(row.resolution).toBe('unsettled');
+      expect(row.itemDisposed, 'the flag that retires the row from the backlog').toBe(true);
+      const custodyRef = rulesMod.listingReturnCustodyRef(listingId);
+      expect(parcels).toEqual([
+        {
+          recipientKey: String(sellerCharacter),
+          letter: 'return',
+          itemIds: ['amber_crimson_armor_plate'],
+          custodyRef,
+        },
+      ]);
+      // The durable half, which is what makes the flight exactly-once: the
+      // claim carries the mail-rail attribution AND the one-way booked flip.
+      const claim = await pool.query(
+        `SELECT booked_at IS NOT NULL AS booked, mail_intent_at IS NOT NULL AS mail_intent,
+                grant_character_id
+           FROM woc_market_custody_claims WHERE custody_ref = $1`,
+        [custodyRef],
+      );
+      expect(claim.rows[0]).toMatchObject({ booked: true, mail_intent: true });
+      expect(claim.rows[0].grant_character_id, 'the mail rail, never the grant rail').toBeNull();
+      // A second pass over the same durable state must not mint a second copy.
+      await service.sweepPass();
+      expect(parcels, 'the disposed listing left the backlog').toHaveLength(1);
     });
   });
 
@@ -832,6 +930,68 @@ describeDb('woc market directed rail against real Postgres', () => {
     });
   });
 
+  describe('the pair-pending boot repair, in real SQL', () => {
+    it('expires all but the newest pending offer per pair, then rebuilds a valid index', async () => {
+      // The repair exists for developer and staging databases that ran BEFORE
+      // the pair bound: their duplicate pending rows would fail the unique
+      // index build and take the whole boot with it. A fresh database creates
+      // the index immediately, so the only way to reach the repair is to stage
+      // the pre-bound shape: drop the index (which re-arms the repair's own
+      // validity gate), seed the duplicates, and boot again.
+      const realm = 'directed-pair-repair';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const marketDbMod = await import('../server/woc_market_db');
+      const indexName = marketDbMod.WOC_MARKET_OFFERS_PAIR_PENDING_INDEX;
+      await pool.query(`DROP INDEX ${indexName}`);
+      const gone = await pool.query(`SELECT to_regclass($1) AS reg`, [indexName]);
+      expect(
+        gone.rows[0].reg,
+        'the repair gate is armed only while the index is missing',
+      ).toBeNull();
+      // Ascending stamps in insert order, the shape a real pre-bound database
+      // has. The repair's tiebreak is the row ID (id > o.id), not the stamp,
+      // so the survivor below is asserted as the last row inserted.
+      const oldest = await seedOffer(realm, seller, buyer, {
+        updatedAtMs: BASE_MS - 30 * MINUTE_MS,
+      });
+      const middle = await seedOffer(realm, seller, buyer, {
+        updatedAtMs: BASE_MS - 20 * MINUTE_MS,
+      });
+      const newest = await seedOffer(realm, seller, buyer, {
+        updatedAtMs: BASE_MS - 10 * MINUTE_MS,
+      });
+      expect(newest, 'the survivor is the highest id of the pair').toBeGreaterThan(middle);
+
+      // The REAL boot path, which is where the repair lives.
+      await db.ensureSchema();
+
+      expect((await offerRow(oldest)).status).toBe('expired');
+      expect((await offerRow(middle)).status).toBe('expired');
+      expect((await offerRow(newest)).status).toBe('pending');
+      const rebuilt = await pool.query(
+        `SELECT i.indisvalid FROM pg_index i WHERE i.indexrelid = to_regclass($1)`,
+        [indexName],
+      );
+      expect(rebuilt.rows[0]?.indisvalid, 'the bound is enforcing again').toBe(true);
+      // The bound really binds after the repair: a fourth pending row for the
+      // same pair is refused by the index, not merely absent.
+      const blocked = await marketDb.insertDirectedOffer({
+        realm,
+        sellerAccount: seller,
+        sellerCharacter: 1,
+        sellerName: 'RepairSeller',
+        buyerAccount: buyer,
+        buyerName: 'RepairBuyer',
+        usdCents: 1000,
+        expiresAtMs: BASE_MS + 10 * MINUTE_MS,
+        itemId: 'amber_crimson_armor_plate',
+        itemPin: 'r'.repeat(64),
+      });
+      expect(blocked).toBe('offer_pending');
+    }, 60_000);
+  });
+
   describe('the offer-expiry sweep against a concurrent stamp, in real SQL', () => {
     it('SKIP LOCKED walks past a row a concurrent transaction holds', async () => {
       // The OUTER status qual (the EvalPlanQual guard beside the escrow
@@ -967,9 +1127,20 @@ describeDb('woc market directed rail against real Postgres', () => {
         updatedAtMs: realNowMs - MINUTE_MS,
       });
       const marketDbMod = await import('../server/woc_market_db');
+      // The count below is EXACT by construction, and this is the premise that
+      // makes it so: every other fixture row in this disposable database is
+      // stamped from BASE_MS, which sits over a year AHEAD of the real clock,
+      // so nothing but resolvedOld can fall behind the retention cutoff.
+      // Asserted rather than assumed, so a future fixture that seeds a real
+      // aged row fails here with the reason instead of drifting the count.
+      const reachable = await pool.query(
+        `SELECT count(*)::int AS n FROM woc_market_directed_offers
+          WHERE status <> 'pending' AND updated_at < now() - interval '180 days'`,
+      );
+      expect(reachable.rows[0].n, 'only this test seeds a row inside the window').toBe(1);
       // The retention clock is now(); the seeded rows are dated far behind it.
       const pruned = await marketDbMod.pruneResolvedWocOffersBatch(pool, 180, 100);
-      expect(pruned).toBeGreaterThanOrEqual(1);
+      expect(pruned).toBe(1);
       const remaining = await pool.query(
         `SELECT id FROM woc_market_directed_offers WHERE realm = $1 ORDER BY id`,
         [realm],
@@ -1036,6 +1207,130 @@ describeDb('woc market directed rail against real Postgres', () => {
           instance: agreedInstance as InvSlot['instance'],
         }),
       );
+    });
+
+    it('accepts a byte-identical duplicate from another bag cell', async () => {
+      // The pin is CONTENT identity, not slot identity (itemPinDigest's
+      // contract): a duplicate in another cell satisfies it, and the seller's
+      // named index decides which copy ships. Identical copies are
+      // interchangeable by definition, so this must not refuse.
+      const realm = 'directed-duplicate-copy';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const sellerCharacter = await seedCharacter(realm, seller, `TwinSeller${seq}`);
+      const sellerName = `TwinSeller${seq - 1}`;
+      const buyerCharacter = await seedCharacter(realm, buyer);
+      // Two copies the pin cannot tell apart, in different bag cells. `slot` is
+      // the advisory cell marker and sits OUTSIDE the pin's 3-tuple (item id,
+      // instance payload, crafted provenance), which is exactly what lets it
+      // say WHICH copy shipped without changing what the pin sees.
+      const staged: InvSlot = {
+        itemId: 'amber_crimson_armor_plate',
+        count: 1,
+        instance: { rolled: { stats: { str: 5 } } } as InvSlot['instance'],
+        slot: 2,
+      };
+      const duplicate: InvSlot = {
+        itemId: 'amber_crimson_armor_plate',
+        count: 1,
+        instance: { rolled: { stats: { str: 5 } } } as InvSlot['instance'],
+        slot: 7,
+      };
+      expect(itemCopyPin(staged), 'the two cells are one content identity').toBe(
+        itemCopyPin(duplicate),
+      );
+      const service = makeService(realm, {
+        wallets: new Map([
+          [seller, 'wallet-twin-copy-seller'],
+          [buyer, 'wallet-twin-copy-buyer'],
+        ]),
+        bags: new Map([[sellerCharacter, [staged, duplicate]]]),
+      });
+      const out = await acceptDirectedDeal({
+        realm,
+        service,
+        buyer,
+        buyerCharacter,
+        sellerName,
+        sellerCharacter,
+        seller,
+        // The buyer's trade window previewed the copy in cell 2; the seller
+        // accepts naming the one in cell 7.
+        agreed: { itemId: 'amber_crimson_armor_plate', instance: staged.instance },
+        acceptRef: {
+          index: 1,
+          itemId: 'amber_crimson_armor_plate',
+          expectInstance: duplicate.instance,
+        },
+      });
+      expect(out).toMatchObject({ ok: true });
+      const listing = (out as { ok: true; listing: { id: number } }).listing;
+      expect(listing, 'the deal escrowed').not.toBeNull();
+      const row = await listingRow(listing.id);
+      expect(row.item, 'the NAMED index is the copy that shipped').toEqual(duplicate);
+    });
+
+    it('escrows an instanced, crafted copy end to end', async () => {
+      const realm = 'directed-instanced-deal';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const sellerCharacter = await seedCharacter(realm, seller, `ForgeSeller${seq}`);
+      const sellerName = `ForgeSeller${seq - 1}`;
+      const buyerCharacter = await seedCharacter(realm, buyer);
+      // Both provenance channels a copy can carry at once: the instance payload
+      // and the plain-stack crafted marker, which together with the item id are
+      // the whole pin.
+      const copy: InvSlot = {
+        itemId: 'amber_crimson_armor_plate',
+        count: 1,
+        instance: {
+          signer: 'Sableforge',
+          rolled: { stats: { str: 7, sta: 4 }, masterwork: true },
+        } as InvSlot['instance'],
+        craftedRecipeId: 'recipe_amber_crimson_armor_plate',
+      };
+      const service = makeService(realm, {
+        wallets: new Map([
+          [seller, 'wallet-forge-seller'],
+          [buyer, 'wallet-forge-buyer'],
+        ]),
+        copies: new Map([[sellerCharacter, copy]]),
+      });
+      const out = await acceptDirectedDeal({
+        realm,
+        service,
+        buyer,
+        buyerCharacter,
+        sellerName,
+        sellerCharacter,
+        seller,
+        agreed: {
+          itemId: copy.itemId,
+          instance: copy.instance,
+          craftedRecipeId: copy.craftedRecipeId,
+        },
+        acceptRef: {
+          index: 0,
+          itemId: copy.itemId,
+          expectInstance: copy.instance,
+        },
+      });
+      expect(out).toMatchObject({ ok: true });
+      const listing = (out as { ok: true; listing: { id: number } }).listing;
+      expect(listing).not.toBeNull();
+      const row = await listingRow(listing.id);
+      // The whole payload survived the escrow write: an instanced deal that
+      // dropped a channel here would launder the copy on delivery.
+      expect(row.item).toEqual(copy);
+      expect(row.status).toBe('active');
+      // And the offer carries the atomic stamp (listing exists IFF stamped).
+      const offer = await pool.query(
+        `SELECT status, listing_id FROM woc_market_directed_offers WHERE realm = $1`,
+        [realm],
+      );
+      expect(offer.rows).toHaveLength(1);
+      expect(offer.rows[0].status).toBe('accepted');
+      expect(Number(offer.rows[0].listing_id)).toBe(listing.id);
     });
   });
 });

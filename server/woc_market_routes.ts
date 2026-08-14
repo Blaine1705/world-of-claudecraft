@@ -764,7 +764,11 @@ const OWNED_ACCOUNT = { requireOwned: { kind: 'woc-market', ownerScope: 'account
 // Any authenticated player may read a listing or its sales history, and may
 // bid on / buy ANY listing: there is no per-object ownership by design, so
 // these carry the intentional publicRead marker instead of a loader (the
-// service owns every other guard: seller/wallet exclusion, terms).
+// service owns every other guard: seller/wallet exclusion, terms). The
+// directed-offer mutations (accept/decline/withdraw) ride it too even though
+// an offer HAS two parties: the acting-side check is in-service by design,
+// answering a stranger `not_found` (anti-enumeration), which a generic owner
+// loader could not express for a two-party object.
 const NO_OWNER = { publicRead: true } as const;
 const ADMIN_META = { envelope: 'admin' } as const;
 const ADMIN_TARGET_META = {
@@ -821,6 +825,7 @@ async function createOfferHandler(ctx: Ctx): Promise<void> {
       ...(instance == null ? {} : { instance }),
       ...(craftedRecipeId === undefined ? {} : { craftedRecipeId }),
     },
+    acceptTerms: body.acceptTerms === true,
   });
   if (!out.ok) throwRefusal(out.reason);
   json(ctx.res, 200, { offer: offerView(out.offer, ctxAccountId(ctx)) });
