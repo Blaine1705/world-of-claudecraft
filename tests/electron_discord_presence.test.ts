@@ -770,6 +770,36 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     expect(rig.timers).toEqual([]);
   });
 
+  it('reconnects on a pre-READY CLOSE with a transient code; terminal is 4000 only', () => {
+    // Only code 4000 was probe-confirmed as the invalid-client refusal. A
+    // daemon bowing out mid-handshake with any other code (a restart, a
+    // shutdown) must not kill presence for the rest of the run.
+    const rig = createRig();
+    rig.presence.setActivity({ details: 'Eastbrook' });
+    const socket = rig.live();
+    socket.emit('connect');
+    rig.feed(socket, OPCODES.CLOSE, { code: 1000, message: 'restarting' });
+    expect(rig.presence.stateForTest().state).toBe('backoff');
+    expect(rig.warnings).toEqual([]);
+    expect(rig.timers).toHaveLength(1);
+    expect(socket.destroyed).toBe(1);
+    // The desired activity survives to the retry.
+    expect(rig.presence.stateForTest().desiredActivity).toEqual({ details: 'Eastbrook' });
+  });
+
+  it('fails closed on a pre-READY CLOSE whose payload carries no readable code', () => {
+    // A peer that refuses without saying why gets no hot loop: unreadable is
+    // treated as the refusal shape, exactly like 4000.
+    const rig = createRig();
+    rig.presence.setActivity({ details: 'Eastbrook' });
+    const socket = rig.live();
+    socket.emit('connect');
+    rig.feed(socket, OPCODES.CLOSE, { message: 'no code here' });
+    expect(rig.presence.stateForTest().state).toBe('invalid-client');
+    expect(rig.warnings).toHaveLength(1);
+    expect(rig.timers).toEqual([]);
+  });
+
   it('treats a CLOSE on a working connection as a disconnect, not a refusal', () => {
     // Discord quitting sends the same opcode. Going terminal here would leave
     // presence dead for the rest of the session over a normal restart.

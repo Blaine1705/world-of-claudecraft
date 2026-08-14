@@ -397,7 +397,20 @@ function createDiscordPresence({
     }
     if (frame.opcode === OPCODES.CLOSE) {
       if (state !== 'ready') {
-        onInvalidClient(frame.payload);
+        // Only the probe-confirmed refusal shape is a verdict on the BUILD:
+        // {"code":4000,"message":"Invalid Client ID"} before READY, or a
+        // payload too mangled to carry a code at all (fail closed: a peer that
+        // cannot say why it refused is not one to hot-loop against). Any OTHER
+        // explicit code pre-READY is the daemon bowing out (a restart, a
+        // shutdown), which is a reconnect, not a full stop for the run.
+        const code = frame.payload?.code;
+        if (!Number.isInteger(code) || code === 4000) {
+          onInvalidClient(frame.payload);
+          return;
+        }
+        log.debug('[discord] client closed during the handshake:', clampLogValue(code));
+        destroySocket();
+        scheduleRetry();
         return;
       }
       // A CLOSE on a connection that was working is Discord shutting down, not
