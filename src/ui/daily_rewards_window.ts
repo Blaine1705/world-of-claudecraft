@@ -524,6 +524,14 @@ export class DailyRewardsWindow {
     return chips ? `<span class="armory-classes">${chips}</span>` : '';
   }
 
+  /** Store-intent warming: build the Armory stage now that the player has opened
+   *  the store. The card list itself needs none of it (warming the whole armory
+   *  moved a cold store open 530.9 ms to 522.8 ms, i.e. not at all), but the
+   *  first card inspect does, and that click is a second or two away. */
+  warmArmoryStage(): void {
+    this.ensureArmoryInspect().warmStage();
+  }
+
   private openArmoryInspect(row: ArmorySkinRow): void {
     this.ensureArmoryInspect().open(row);
   }

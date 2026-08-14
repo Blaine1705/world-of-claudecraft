@@ -87,6 +87,14 @@ export class ArmoryInspect {
     return this.row?.skin.id ?? null;
   }
 
+  /** Build the stage (second WebGL context, composer, first rig) WITHOUT opening
+   *  anything, so a store visitor pays it while scanning the card list instead
+   *  of on the click that opens the first inspect. Idempotent: ensureStage
+   *  returns the existing stage. */
+  warmStage(): void {
+    this.ensureStage();
+  }
+
   open(row: ArmorySkinRow): void {
     const wasOpen = this.overlay !== null;
     if (wasOpen) this.hideOverlay(false);

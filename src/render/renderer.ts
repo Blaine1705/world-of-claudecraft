@@ -422,6 +422,7 @@ import {
   reconcileViewPointLights,
 } from './point_light_budget';
 import { buildComposer, type PostPipeline } from './post';
+import { createPreviewPrewarmLane } from './preview_prewarm_lane';
 import {
   createPrewarmCompileLifecycle,
   type PrewarmCompileLifecycle,
@@ -5444,26 +5445,23 @@ export class Renderer {
       });
   }
 
-  private previewPrewarmLane: Promise<void> = Promise.resolve();
+  private readonly previewPrewarm = createPreviewPrewarmLane({
+    idleSlot: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 }),
+    run: (unit, priority, label, options) =>
+      this.backgroundGpuWork.run(unit, priority, label, options),
+  });
 
-  /** Post-entry secondary-context preview prewarm (paperdoll, armory, portrait
-   *  caches): one bounded unit per idle slot, arbitrated with every other lane
-   *  that reaches WebGL. releaseTail because a unit's cost is dominated by its
-   *  compileAsync links, which settle off-thread. Rejections propagate to the
-   *  caller per unit; the lane itself never wedges on one. */
+  /** Scheduled secondary-context preview warming (paperdoll, portrait caches).
+   *  Lane policy lives in preview_prewarm_lane.ts. */
   queueSecondaryPreviewPrewarm(label: string, unit: () => void | Promise<void>): Promise<void> {
-    const queued = this.previewPrewarmLane
-      .then(() => idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 }))
-      .then(() =>
-        this.backgroundGpuWork.run(unit, GPU_WORK_PRIORITY.BACKGROUND, label, {
-          releaseTail: true,
-        }),
-      );
-    this.previewPrewarmLane = queued.then(
-      () => undefined,
-      () => undefined,
-    );
-    return queued;
+    return this.previewPrewarm.queueScheduled(label, unit);
+  }
+
+  /** Intent-driven warming: the player opened the surface, so this skips the
+   *  scheduled lane entirely (that lane is minutes deep) and runs at
+   *  VISIBLE_PREWARM with its tail held. */
+  queueIntentPreviewPrewarm(label: string, unit: () => void | Promise<void>): Promise<void> {
+    return this.previewPrewarm.queueIntent(label, unit);
   }
 
   private readonly gpuReadyTextures = new WeakSet<THREE.Texture>();

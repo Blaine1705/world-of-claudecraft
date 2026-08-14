@@ -17562,6 +17562,16 @@ export class Hud {
     if (!this.dailyRewardsEnabled()) return;
     this.dailyRewardsWindow.openStore();
     this.refreshDailyRewardsLauncher(true);
+    // Warm the Armory stage while the player scans the list. It is the one piece
+    // the first card inspect cannot avoid (a measured ~600 ms build dominated by
+    // an atomic WebGL context creation), and the list needs none of it, so the
+    // seconds between opening the store and clicking a card are exactly where it
+    // belongs. Intent lane, not the scheduled one, which is minutes deep.
+    void this.renderer
+      .queueIntentPreviewPrewarm('intent:armory:stage', () =>
+        this.dailyRewardsWindow.warmArmoryStage(),
+      )
+      .catch((err: unknown) => console.warn('[armory] stage warm failed', err));
   }
 
   /** Inject the online economy hooks that back the Claudium window (main.ts, online only). */
