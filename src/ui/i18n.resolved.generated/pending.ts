@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.itemHeroicLabel"
+  ],
+  "es_ES": [
+    "hudChrome.itemHeroicLabel"
+  ],
+  "fr_FR": [
+    "hudChrome.itemHeroicLabel"
+  ],
+  "fr_CA": [
+    "hudChrome.itemHeroicLabel"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.itemHeroicLabel"
+  ],
+  "de_DE": [
+    "hudChrome.itemHeroicLabel"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.itemHeroicLabel"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.itemHeroicLabel"
+  ],
+  "nl_NL": [
+    "hudChrome.itemHeroicLabel"
+  ],
+  "pl_PL": [
+    "hudChrome.itemHeroicLabel"
+  ],
+  "id_ID": [
+    "hudChrome.itemHeroicLabel"
+  ],
+  "tr_TR": [
+    "hudChrome.itemHeroicLabel"
+  ],
+  "sv_SE": [
+    "hudChrome.itemHeroicLabel"
+  ],
+  "vi_VN": [
+    "hudChrome.itemHeroicLabel"
+  ],
+  "da_DK": [
+    "hudChrome.itemHeroicLabel"
+  ]
 };

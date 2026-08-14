@@ -37,15 +37,18 @@ const ARMOR_PIP_COUNT: Record<ArmorType, number> = {
 // The Browse-row armor cue markup: a small pip chip that sits on the item icon
 // corner. `label` MUST be the caller's already-localized AND already-escaped
 // armor-type word (this module stays i18n-runtime-free): it becomes the chip's
-// accessible name (aria-label + title), so the localized word survives for
-// screen readers and hover even though the visible cue is a symbol. The pips
-// themselves are aria-hidden so a reader announces the word once, not "3 dots".
+// accessible name (aria-label), so the localized word survives for screen readers
+// even though the visible cue is a symbol. The pips themselves are aria-hidden so
+// a reader announces the word once, not "3 dots". NO native `title`: the Browse
+// row already shows the full game item tooltip on hover (attachTooltip), so a
+// second native tooltip on the chip would stack on top of it, and a title
+// duplicating the aria-label makes a verbose reader announce the word twice.
 export function marketArmorPips(armorType: ArmorType, label: string): string {
   const pips = ARMOR_PIP_COUNT[armorType];
   const dots = Array.from({ length: pips }, () => '<span class="mkt-pip"></span>').join('');
   return (
     `<span class="mkt-armor-pips mkt-armor-pips--${armorType}" role="img"` +
-    ` aria-label="${label}" title="${label}"><span class="mkt-pip-row" aria-hidden="true">${dots}</span></span>`
+    ` aria-label="${label}"><span class="mkt-pip-row" aria-hidden="true">${dots}</span></span>`
   );
 }
 
@@ -59,13 +62,15 @@ export function isHeroicItem(item: ItemDef): boolean {
 // The heroic mark for a Browse row: a small gold star on the icon's TOP-LEFT
 // corner (the armor pips ride the bottom-right, so they never collide). Returns
 // '' for a non-heroic item. `label` MUST be the caller's already-localized AND
-// escaped "Heroic" word (this module stays i18n-runtime-free): it becomes the
-// star's accessible name so the heroic distinction reaches a screen reader, while
-// the star glyph itself is aria-hidden decoration.
+// escaped standalone "Heroic" word (this module stays i18n-runtime-free): it
+// becomes the star's accessible name so the heroic distinction reaches a screen
+// reader, while the star glyph itself is aria-hidden decoration. NO native
+// `title` (same reason as marketArmorPips: the row's game tooltip already fires
+// on hover, and a title duplicating the aria-label double-announces).
 export function marketHeroicStar(item: ItemDef, label: string): string {
   if (!isHeroicItem(item)) return '';
   return (
-    `<span class="mkt-heroic-star" role="img" aria-label="${label}" title="${label}">` +
+    `<span class="mkt-heroic-star" role="img" aria-label="${label}">` +
     `<span aria-hidden="true">★</span></span>`
   );
 }

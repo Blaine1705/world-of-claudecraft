@@ -107,7 +107,17 @@ async function clipMarket(page, name, { scrollToRows = false } = {}) {
 const browser = await puppeteer.launch({
   executablePath: BROWSER_PATH,
   headless: 'new',
-  args: ['--window-size=1280,900', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
+  args: [
+    '--window-size=1280,900',
+    '--use-angle=swiftshader',
+    '--enable-unsafe-swiftshader',
+    // Suppress the Chromium "hardware acceleration is unavailable" infobar that
+    // software rendering (swiftshader) raises: it can overlap the clipped market
+    // window corner and leak into a committed shot. --test-type stops Chromium
+    // treating the automation session as a normal profile that shows the banner.
+    '--disable-infobars',
+    '--test-type',
+  ],
   defaultViewport: { width: 1280, height: 900 },
 });
 

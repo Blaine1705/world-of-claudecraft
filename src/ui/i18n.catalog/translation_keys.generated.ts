@@ -8721,6 +8721,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.itemArmorType.cloth'
   | 'hudChrome.itemArmorType.leather'
   | 'hudChrome.itemArmorType.mail'
+  | 'hudChrome.itemHeroicLabel'
   | 'hudChrome.itemHeroicTag'
   | 'hudChrome.itemMenu.applyEnchant'
   | 'hudChrome.itemMenu.disenchant'

@@ -67,7 +67,9 @@ describe('marketArmorPips', () => {
     const html = marketArmorPips('mail', 'Mail');
     expect(html).toContain('role="img"');
     expect(html).toContain('aria-label="Mail"');
-    expect(html).toContain('title="Mail"');
+    // NO native title: the row's game tooltip already fires on hover, so a title
+    // here would stack a second tooltip and double-announce the aria-label word.
+    expect(html).not.toContain('title=');
     // the pips themselves are decorative; the word is announced once
     expect(html).toContain('aria-hidden="true"');
   });
@@ -114,7 +116,9 @@ describe('isHeroicItem / marketHeroicStar', () => {
     const html = marketHeroicStar(base({ heroic: true }), 'Heroic');
     expect(html).toContain('role="img"');
     expect(html).toContain('aria-label="Heroic"');
-    expect(html).toContain('title="Heroic"');
+    // NO native title (same reason as the pips): avoid a tooltip stacked on the
+    // row's game tooltip and a double-announced label.
+    expect(html).not.toContain('title=');
     expect(html).toContain('aria-hidden="true"');
     expect(html).toContain('mkt-heroic-star');
   });

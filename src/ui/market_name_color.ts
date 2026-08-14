@@ -1,12 +1,15 @@
 // Pure resolver for the World Market row's item-NAME color.
 //
-// The market paints readable name colors that clear WCAG AA against the dark
-// panel. Two of the six shipped QUALITY_COLOR values fail that bar on the panel
-// ground (rare #0070dd reads 3.87:1, epic #a335ee reads 3.82:1, both under the
-// 4.5:1 text floor); the rest pass. Rather than change the shared QUALITY_COLOR
-// map (icons.ts), which drives bags, bank, tooltips, loot and the wiki, this
-// lifts ONLY the two failing hues and ONLY for the market name, leaving the icon
-// border and every other surface on the shipped palette.
+// Why this FORKS item_name_color.ts instead of calling it: the shared resolver
+// returns the shipped QUALITY_COLOR hues (correct for chat, loot, tooltips), but
+// two of the six FAIL WCAG AA against the dark market panel ground (rare #0070dd
+// reads 3.87:1, epic #a335ee reads 3.82:1, both under the 4.5:1 text floor); the
+// rest pass. This module exists to REPAIR exactly those two, and ONLY on the
+// market name lane. A palette parameter on the shared resolver was considered and
+// rejected: it also carries the quest-purpose override (kind === 'quest' wins
+// over quality), which the market row does not want, and it would push a palette
+// argument onto every unrelated caller. So the market keeps a small purpose-built
+// map, and this note is the "why it forks" the shared module's readers need.
 //
 // Returns a CSS custom-property reference, never a raw hex, so no color literal
 // lives in the painter (the market_window no-magic guard) and the values stay
@@ -33,7 +36,11 @@ const MARKET_NAME_COLOR_VAR: Record<ItemQuality, string> = {
 export const MARKET_NAME_DEFAULT_COLOR = 'var(--mkt-name-common)';
 
 export function marketNameColor(quality: ItemQuality | undefined): string {
-  return quality
-    ? (MARKET_NAME_COLOR_VAR[quality] ?? MARKET_NAME_DEFAULT_COLOR)
+  // Object.hasOwn, not a bare index, so a hostile wire quality string that
+  // collides with an Object.prototype key cannot resolve to a function source
+  // interpolated into the row's style attr (the same doctrine item_name_color.ts
+  // carries; the value here is written into `style="color:..."`).
+  return quality && Object.hasOwn(MARKET_NAME_COLOR_VAR, quality)
+    ? MARKET_NAME_COLOR_VAR[quality]
     : MARKET_NAME_DEFAULT_COLOR;
 }

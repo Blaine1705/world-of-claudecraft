@@ -487,6 +487,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.checkoutNotSettled':
     '거래는 전송됐지만 Claudium이 아직 지급되지 않았습니다. 잠시 후 다시 시도해 주세요.',
   'hudChrome.itemHeroicTag': '[영웅]',
+  'hudChrome.itemHeroicLabel': '영웅',
   'hudChrome.readyCheck.notInPartyError': '준비 확인을 시작하려면 파티에 속해 있어야 합니다.',
   'hudChrome.readyCheck.inProgressError': '준비 확인이 이미 진행 중입니다.',
   'entities.abilities.collective_reversal.name': '집단 역행',

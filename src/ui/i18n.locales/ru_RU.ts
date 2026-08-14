@@ -482,6 +482,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.checkoutNotSettled':
     'Транзакция отправлена, но Claudium ещё не зачислен. Повторите попытку позже.',
   'hudChrome.itemHeroicTag': '[ГЕРОИЧЕСКИЙ]',
+  'hudChrome.itemHeroicLabel': 'Героический',
   'hudChrome.readyCheck.notInPartyError':
     'Чтобы начать проверку готовности, вы должны состоять в группе.',
   'hudChrome.readyCheck.inProgressError': 'Проверка готовности уже идёт.',

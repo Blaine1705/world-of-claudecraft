@@ -624,6 +624,13 @@ export class MarketWindow {
         total: formatNumber(page.total, { maximumFractionDigits: 0 }),
       });
     }
+    // Localized short unit letters for the single-unit price, resolved once per
+    // render (not per row) and handed to the i18n-free price builder.
+    const priceUnits = {
+      gold: esc(t('itemUi.money.goldShort')),
+      silver: esc(t('itemUi.money.silverShort')),
+      copper: esc(t('itemUi.money.copperShort')),
+    };
     for (const { listing: l, item } of page.items) {
       // The Browse-row NAME uses the market-readable quality color (rare/epic
       // lifted to clear WCAG AA on the panel; market_name_color.ts). The icon
@@ -653,12 +660,20 @@ export class MarketWindow {
         ? marketArmorPips(armorBadge.armorType, esc(t(armorBadge.labelKey)))
         : '';
       // Heroic-tier mark: a gold star on the icon's top-left corner (opposite the
-      // armor pips). Reuses the existing [HEROIC] tag string, so no new string.
-      const heroicStar = marketHeroicStar(item, esc(t('hudChrome.itemHeroicTag')));
+      // armor pips). Uses the bare "Heroic" label (hudChrome.itemHeroicLabel), not
+      // the bracketed [HEROIC] tooltip tag, so a screen reader reads "Heroic", not
+      // "left-bracket HEROIC right-bracket".
+      const heroicStar = marketHeroicStar(item, esc(t('hudChrome.itemHeroicLabel')));
       // Gold-dominant, coinless, copper-trimmed price (market-scoped, see
-      // market_price_view). The full localized amount rides the block's
-      // aria-label so the coinless visual never hides the real value.
-      const priceHtml = marketPriceHtml(l.price, esc(formatLocalizedMoney(l.price, 'long')));
+      // market_price_view). The pure builder is i18n-free: pass the localized
+      // short unit letters and the full localized amount (which rides the block's
+      // aria-label and hover title so the coinless visual never hides the real
+      // value).
+      const priceHtml = marketPriceHtml(
+        l.price,
+        priceUnits,
+        esc(formatLocalizedMoney(l.price, 'long')),
+      );
       row.innerHTML =
         `<span class="mkt-ico">${this.deps.itemIcon(item)}${badge}${heroicStar}</span>` +
         `<span class="mkt-name"><span class="nm" style="color:${qColor}">${esc(itemName)}${stack}</span>` +
@@ -885,7 +900,7 @@ export class MarketWindow {
         count > 1
           ? ` ${t('itemUi.market.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) })}`
           : '';
-      row.innerHTML = `<span class="mkt-collect-item">${this.deps.itemIcon(item)}<span style="color:${qColor}">${esc(itemDisplayName(item))}${esc(stack)}</span></span>`;
+      row.innerHTML = `<span class="mkt-collect-item">${this.deps.itemIcon(item)}<span class="mkt-collect-name" style="color:${qColor}">${esc(itemDisplayName(item))}${esc(stack)}</span></span>`;
       this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, instance));
       body.appendChild(row);
     }
