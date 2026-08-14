@@ -373,9 +373,7 @@ describe('Shaman v0.29 talent grid', () => {
     applyWarspiritPosture(stone.sim.ctx, stone.player, 'stonebound');
     // v0.38 tank retune: STONEBOUND_DAMAGE_REDUCTION 0.10 -> 0.15, so Imbue
     // Mastery's +0.05 lands the posture guard at 0.20.
-    expect(stone.player.auras.find((aura) => aura.id === STONEBOUND_DR_ID)?.value).toBeCloseTo(
-      0.2,
-    );
+    expect(stone.player.auras.find((aura) => aura.id === STONEBOUND_DR_ID)?.value).toBeCloseTo(0.2);
 
     const spirit = shaman({ 14: SHAMAN_TALENT_IDS.imbueMastery }, 'restoration');
     spirit.player.auras.push({
