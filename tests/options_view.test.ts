@@ -1011,7 +1011,18 @@ describe('options_view: the desktop display-mode picker replaces the fullscreen 
     ];
     for (const env of envs) {
       const keys = displayCardKeys(env);
-      expect(keys).toContain('fullscreen');
+      // The whole ordered run, mirroring the desktop arm's pin: "byte for
+      // byte" means the toggle holds the exact slot the picker would take,
+      // not merely membership somewhere in the card.
+      expect(keys).toEqual([
+        'renderScale',
+        'brightness',
+        'cameraFov',
+        'fullscreen',
+        'weather',
+        'waterRipples',
+        'showOverflowXp',
+      ]);
       expect(keys).not.toContain('displayMode');
       const controls = buildGraphicsControls(makeSource({ graphicsPreset: 4 }), env);
       expect(find(controls, 'displayMode')).toBeUndefined();

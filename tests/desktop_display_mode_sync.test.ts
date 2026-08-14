@@ -273,10 +273,15 @@ describe('desktop_display_mode_sync: boot reflection', () => {
 // pins on the composition lines, because a wiring edit is exactly the
 // regression the module suite cannot see.
 describe('desktop_display_mode_sync: wiring pins', () => {
-  const mainSource = readFileSync(join(__dirname, '..', 'src', 'main.ts'), 'utf8');
-  const optionsWindowSource = readFileSync(
-    join(__dirname, '..', 'src', 'ui', 'options_window.ts'),
-    'utf8',
+  // Strip block and line comments before matching (same rationale and the same
+  // colon guard as tests/electron_shell_startup.test.ts, which keeps `://`
+  // scheme literals intact): a commented-out composition line must never
+  // satisfy a positive pin.
+  const stripComments = (source: string): string =>
+    source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/[^\n]*/gm, '$1');
+  const mainSource = stripComments(readFileSync(join(__dirname, '..', 'src', 'main.ts'), 'utf8'));
+  const optionsWindowSource = stripComments(
+    readFileSync(join(__dirname, '..', 'src', 'ui', 'options_window.ts'), 'utf8'),
   );
 
   it('gates the options row on the bridge CAPABILITY, never on the native-shell flag', () => {

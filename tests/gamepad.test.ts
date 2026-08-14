@@ -597,6 +597,22 @@ describe('GamepadManager: onActivity', () => {
     expect(onActivity).toHaveBeenCalledTimes(1);
   });
 
+  it('fires on each remaining movement direction alone (every flag feeds the predicate)', () => {
+    // Per-arm coverage: one axis, one direction, no buttons, so a flag dropped
+    // from the `acted` OR cannot hide behind a sibling arm or a button edge.
+    const arms: Array<[string, number, number]> = [
+      ['back', AXIS.LEFT_Y, 1],
+      ['strafe left', AXIS.LEFT_X, -1],
+      ['strafe right', AXIS.LEFT_X, 1],
+    ];
+    for (const [label, axis, value] of arms) {
+      stubPad(padWith([], stickAxes(axis, value)));
+      const { manager, onActivity } = rig();
+      manager.poll(1 / 60);
+      expect(onActivity, `${label} alone must count as activity`).toHaveBeenCalledTimes(1);
+    }
+  });
+
   it('fires on UI cursor movement alone while a window is open (pointer mode)', () => {
     // Pointer mode returns before the movement/look arms, so it needs its own
     // signal: a player navigating the bags with the stick is still present.
@@ -612,6 +628,20 @@ describe('GamepadManager: onActivity', () => {
       const idle = rig(true);
       idle.manager.poll(1 / 60);
       expect(idle.onActivity).not.toHaveBeenCalled();
+    } finally {
+      restore();
+    }
+  });
+
+  it('fires on vertical cursor movement alone (both cursor dimensions count)', () => {
+    // The horizontal case above cannot see a dropped `my` arm in the cursor's
+    // moved-this-frame predicate; this one isolates it.
+    const restore = installDocumentStub(true);
+    try {
+      stubPad(padWith([], stickAxes(AXIS.LEFT_Y, 1)));
+      const { manager, onActivity } = rig(true);
+      manager.poll(1 / 60);
+      expect(onActivity).toHaveBeenCalledTimes(1);
     } finally {
       restore();
     }
