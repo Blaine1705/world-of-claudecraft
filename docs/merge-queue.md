@@ -17,10 +17,14 @@ merged into the target branch (`PR gate (long sims)` was the first case), and
 expect open PRs whose heads predate the job to need a base re-merge before
 they can queue, since a required context that never reports blocks the merge
 forever. Renames follow the same choreography in reverse plus forward: when
-the lane-diet PR split `PR gate (long sims)` into `PR gate (long sims A)` and
-`PR gate (long sims B)`, the old context had to leave the ruleset at the same
-time the two new ones joined (after the split merged), because a required
-name no run produces anymore blocks every later merge.
+the lane-diet PR split `PR gate (long sims)` into `PR gate (long sims A)`
+and `PR gate (long sims B)` (the names those jobs carried then), the old
+context had to leave the ruleset at the same time the two new ones joined
+(after the split merged), because a required name no run produces anymore
+blocks every later merge. The 2026-08-14 clean-scheme rename is the same
+choreography at full width: all fourteen required contexts swapped in one
+ruleset edit at merge time, with every open PR needing a base update
+afterward so its next run reports under the new names.
 
 Why: on 2026-08-05 two merges landed on an already-red release tip, every open
 PR inherited 67 broken tests, and repair took a day of close/reopen churn. The
@@ -117,7 +121,7 @@ the Checks tab (filter by event: merge_group).
 
 Required on both `main` and `release/**`, all sourced from GitHub Actions:
 
-- `Detect code path changes`. Required itself, and load-bearing: when it fails,
+- `Classify changes`. Required itself, and load-bearing: when it fails,
   its non-matrix dependents report skipped under their exact names, and branch
   protection treats skipped as satisfied (the shard matrix instead collapses to
   an unsuffixed check run, which blocks by accident rather than by decision).
@@ -128,7 +132,7 @@ Required on both `main` and `release/**`, all sourced from GitHub Actions:
   (`.github/workflows/`) and the selection pipeline's own scripts are
   themselves fail-closed triggers (always `code=true`, always full mode); a
   hostile edit is a review problem, not something protection can solve.
-- `PR gate (English-only legal) (1)` through `(8)`: the sharded test suite.
+- `PR tests (1)` through `(8)`: the sharded test suite.
   The matrix legs START on every `pull_request` and `merge_group` run and gate
   their work at STEP level: on a run the suite does not apply to (a docs-only
   PR, a release-to-main PR) each leg skips its steps and reports green in
@@ -137,7 +141,7 @@ Required on both `main` and `release/**`, all sourced from GitHub Actions:
   which string-matches none of these required contexts and leaves them
   "expected" forever, so the PR could never be queued or merged (observed live
   on the Phase 3 queue drills).
-- `PR gate (long sims A)` and `PR gate (long sims B)`: the dedicated lane
+- `PR long sims A` and `PR long sims B`: the dedicated lane
   pair for the long rotation sims (`CI_LONG_SUITES` split by
   `CI_LONG_SUITE_HALVES` in `scripts/lib/ci_shard_plan.mjs`). The shard
   matrix deliberately excludes those files, so these jobs carry coverage
@@ -146,20 +150,20 @@ Required on both `main` and `release/**`, all sourced from GitHub Actions:
   `merge_group` run; unlike the shard matrix, a job-level skip is safe here
   because a non-matrix job's skipped check run keeps its exact required name,
   which satisfies protection.
-- `PR checks (freshness, typecheck, builds)`.
-- `Format + lint (Biome, changed files)`: deterministic, diff-scoped, minutes
+- `PR checks`.
+- `Lint (changed files)`: deterministic, diff-scoped, minutes
   long, and a red here is always a real defect in the changed files. On queue
   runs it diffs against the merge group's base SHA, falling back to the live
   target-branch tip if that SHA is unreachable, so a `release/**` queue run
   never sweeps the release-vs-main delta (and its intentionally-red whole-repo
   debt) into biome.
-- `Browser regressions (Chromium)`: the real-browser net for a browser game.
+- `Browser tests`: the real-browser net for a browser game.
   It reports (or is skipped, which satisfies) on every PR and queue run.
 
 Never require these, deliberately:
 
-- The release lanes (`Release gate (tests)`, `Release i18n (21-locale fill)`,
-  `Release checks (freshness, typecheck, builds)`, `Release version gate`):
+- The release lanes (`Release tests`, `Release i18n`,
+  `Release checks`, `Release version gate`):
   release-process lanes, legitimately red or skipped mid-cycle. Release i18n in
   particular is red by design until the release-time locale fill.
 - `Dependency audit`: its workflow is path-filtered to dependency changes, so

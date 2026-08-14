@@ -13,7 +13,7 @@ Codex have different entry points and share the same deterministic scripts and c
 | Day-loop fast path | `npm run gate:fast` through `scripts/gate_fast.mjs` | While iterating (agents and mid/low-tier machines) | No (local only; not merge) |
 | **Selective gate** | `node scripts/gate_select.mjs` | **Before implementation is called ready / pre-merge** | **Yes (the merge bar)** |
 | Full local gate | `npm run gate` through `scripts/gate.mjs` | When you want the whole suite locally, or the planner falls back | Yes (deeper check) |
-| Selective PR-tier CI | ci.yml `pr-gate` shards through `scripts/ci_shard_test.mjs` (same selection semantics, sharded; full suite on any unprovable diff) | Every pull request | Yes (PR checks) |
+| Selective PR-tier CI | ci.yml `pr-gate` shards through `scripts/ci_shard_test.mjs` (same selection semantics, sharded; full suite on any unprovable diff) | Every pull request | Yes (required checks) |
 | Merge queue | ci.yml on the `merge_group` event: the full PR tier over the exact merge result about to become the branch tip (see `docs/merge-queue.md`, including rollout status: `release/**` first, `main` at the next release-to-main merge) | Every queued merge into a queue-protected branch | Yes (required checks on the merge group) |
 | Nightly full gate | `.github/workflows/nightly.yml`: full suite + checks + browser over the tips of main and the active `release/**` branch | Scheduled nightly (04:47 UTC) | No (alerting: files and closes one tracking issue) |
 | Judgment review | Claude `/qa` or Codex `$woc-qa`, plus scoped reviewers | End of a contribution | Advisory locally |
@@ -233,7 +233,7 @@ seconds inside a full-mode shard, the chronomancy balance sweep among them, plus
 owned-class balance family, which is lane-owned as a unit since its 2026-08-13 split
 so the diet-flag registry and its lane accounting stay in one place; the measured
 per-file lane duration ledgers live in the lane-split PR bodies, #3370 first) run in the
-dedicated `PR gate (long sims A)` / `PR gate (long sims B)` job pair
+dedicated `PR long sims A` / `PR long sims B` job pair
 (`node scripts/ci_shard_test.mjs --lane=long-sims-a` / `--lane=long-sims-b`, one
 `CI_LONG_SUITE_HALVES` half each), and every shard leg excludes the whole union, so a
 single multi-minute file no longer sets the slowest shard's wall clock and the lane's
