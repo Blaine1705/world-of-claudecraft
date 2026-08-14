@@ -21,7 +21,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 07 QA | phase-07-qa | game | DONE | 55c2ba992e | PASS-WITH-FOLLOWUPS, every fix applied (section below); release re-sync trivial (two CI-harness commits, no marketplace overlap; tsc clean, four pin suites 377 green); eight fresh audit lanes (the phase-prescribed fresh proofreader among them); the round found the draft's missing second-chance-offer disclosure (blocking; it falsified the outbid-refund promise) plus the anti-snipe and abandon-cooldown gaps, four draft wording drifts, and seven companion truth-ups, all applied; new deferreds with owners in state.md's 07 QA ROUND bullet; the amended draft postdates the recorded R6 send (Fernando forwards the amended copy); ci:changed exit 0; live Terms + terms.html byte-untouched; counsel memo verified absent from the branch; pushed per R4 |
 | 08 | service-auth-hardening | service | DONE | 70d4207 | SERVICE repo (origin/master already contained); B5 + the fail-open config mediums + the compose staleness default closed, every refusal proven red-first (the bypass returned 200 on the old routing with the internal secret alone); two fresh review lenses, then two fix rounds each re-reviewed fresh and a self-reviewed polish round, every finding applied incl. nits; the rounds' own finds: the THIRD dev escape (CLAUDIUM_ALLOW_FAKE_STRIPE, still denylist), the wallet-segment fragment gap, the duplicate-oracle heartbeat bug (warmed one instance, quoted from another), ASCII-before-trim; suite 439 tests 435 pass 0 fail (the QA round corrected the baseline arithmetic: the range ran 417 tests with 413 passing before, so the growth is 417 to 439 totals); 12 commits, tip 4b9e413; LOCAL, not pushed per R4 |
 | 08 QA | phase-08-qa | service | DONE | 4b9e413 | PASS-WITH-FOLLOWUPS, every fix applied (section below); the self-reviewed polish commit 4b9e413 verified FIRST and clean; six fresh audit lanes + a dedicated red-proof lane over 70d4207..4b9e413: 0 blocking, all four red-first claims REPRODUCED-RED against a throwaway 70d4207 build; 8 should-fix + 13 nits ALL applied in three commits, re-reviewed fresh (0 blocking, 7 should-fix, 8 nits, ALL applied in a fourth commit, tip aa44873); 12 + 2 mutations all BIT; suite 445 tests 441 pass 0 fail 4 env-gated skips; game worktree re-synced to release/v0.38.0 (merge bfceae8d4b, NON-trivial: 33 conflicts, wireAura extraction pays the merged game.ts overage, pins re-derived 324/86/238 + sends 200 dispatches 213; release-merge-audit found THREE union-only reds, all fixed; gate GREEN at ad197c0801, full-suite fallback, all 12 steps, WITH TEST_DATABASE_URL, real-SQL suites 154 green zero skips); pushed per R4 (service 70d4207..aa44873 updating PR #31, its test checks running at push time; game 8dd51a8a20..f5325ffbe8, pre-push floor green, no open PR on this branch so no PR CI) |
-| 09 | bond-releaser | service | NOT STARTED | | |
+| 09 | bond-releaser | service | DONE | aa44873 | SERVICE repo (origin/master already contained at df09756); B3 + the bond double-pay medium + the bond-cents ownership mediums closed; R2 forfeit split landed (one code path with the settlement schedule); the two R5 items this repo owns RULED by Fernando at session start and implemented (SOL fees: preflight + overview monitor + manual funding, knob WOC_MARKET_ESCROW_MIN_SOL_LAMPORTS; ATA rent on refund: escrow pays, inside the preflight); FIVE red-first proofs (ownership behaviors, both double-pay classes, all-or-nothing boot, the late-confirm stomp, the terminal-adoption abandonment); two fresh coverage lenses (security 18 findings incl. 1 blocking, correctness 14 incl. 2 blocking) plus a fresh re-review of the fix rounds (1 blocking + 5 should-fix + 5 nits), every finding applied or judged with the file open; 9 commits, tip 3346878; suite 445 to 493 tests, 488 pass + 5 env-gated skips default tier, 493/493 with CLAUDIUM_TEST_DATABASE_URL (zero skips); LOCAL, not pushed per R4 |
 | 09 QA | phase-09-qa | service | NOT STARTED | | |
 | 10 | chain-verifier | service | NOT STARTED | | |
 | 10 QA | phase-10-qa | service | NOT STARTED | | |
@@ -49,6 +49,76 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 21 QA | phase-21-qa | service + game | NOT STARTED | | |
 | 22 | close-out | all three | NOT STARTED | | teardown offer lives in 22 QA |
 | 22 QA | phase-22-qa | all three | NOT STARTED | | |
+
+## 09 implement round (bond releaser)
+
+Service repo, worktree woc-rewards-service-pr31; session start aa44873 (clean,
+origin/master already contained at df09756), tip 3346878, 9 commits, LOCAL not
+pushed per R4. Fernando ruled the two R5 items at session start (recorded in
+state.md Rulings). Build shape, five commits then four review-round commits:
+
+- 2173870 service-owned bond sizing: bond-quote takes bidCents, one clamped
+  policy in peg.ts (ceil bps, floor/cap knobs, never above the bid), drift
+  refusal bond_amount_drift carrying the expected figure, response bondCents;
+  splitForfeitProceeds beside splitMarketProceeds (R2, burn ceils, treasury
+  absorbs, exact-sum).
+- 1f50f3d release-intent persistence: 'releasing' status; release_to /
+  release_prepared / release_claimed_ms columns (create block AND guarded
+  ALTERs); claimRelease / replaceReleasePrepared / finalizeRelease CAS in both
+  stores (guards in the WHERE on the row's own columns, the EvalPlanQual-safe
+  shape); confirm answers settled on a releasing bond; exposure counts
+  releasing as held; pg suite gained a blocked-interleave race proving one
+  claim winner (the memory catalog's lock-first prescription followed).
+- 2ed6adf the crash-safe protocol (release_protocol.ts): prepare with nothing
+  durable, claim CAS before broadcast, probe-before-resend on retry (finalized
+  adopts, active/unknown refuse, replaceable re-prepares keyed on the old
+  signature), direction conflict from the claim on; forfeits move the R2
+  split; dev chain mirrors the probe contract.
+- d8ca678 SolanaMarketBondReleaser (adapter over the settlement rail's
+  prepared-transaction machinery; shared instruction assembly in
+  transfer_instructions.ts with the unsigned builder), all-or-nothing boot
+  (live chain without WOC_MARKET_ESCROW_JSON refuses, proven red first), R5
+  fee+rent preflight, escrow SOL monitor in the overview attention block,
+  probe set = every configured RPC endpoint.
+- 44a3c5a docs/env/compose: MARKET_SETTLEMENT and MARKET_CHAIN_WIRING truth-ups
+  (status BUILT, R2/R5 answered), new knobs in .env.example and compose with
+  conformance pins, service CLAUDE.md.
+- 12f894c correctness round applied (guarded update closes the late-confirm
+  stomp, red-proven in-suite; race-test decisiveness; releaseRail pin; monitor
+  arms; zero-leg ATA skip; instruction build inside the refusal envelope; dev
+  chain broadcast dupe-guard keyed on actual broadcasts).
+- 44dd52f security round applied (MAX_REPLACEABLE_AGE_MS age bound on the
+  replaceable verdict; finalize CAS keyed on the persisted signature and
+  clearing the signed blob; release_attempt_signatures audit trail;
+  allowReleaserlessChain closes the override-bag bypass and the stale
+  buildEconomyApps comment; tri-state escrowSolLow; boot low-SOL warning;
+  typed Token-2022 refusal; routes refusal gains signatureRequired).
+- 6ef569d + 3346878 re-review round applied (adoption arms: a ledger-proven
+  payment outranks the unpaid terminals expired/superseded, red-proven, with
+  the stomp pin intact; live-arm gate restored beside the generic one; replace
+  refreshes the age-bound clock; the age-bound park documented as its own
+  operator remedy; attempt trail on the admin rows; the finalize signature key
+  driven through the real service path; post-race confirm answers in the entry
+  vocabulary).
+
+Red-first evidence (all five reproduced before their fix, transcripts in the
+session): the four ownership behaviors refused/accepted wrongly on the old
+bondQuote; crash-after-broadcast retry re-sent the payment and concurrent
+refund+forfeit both paid (throwaway suite against the pre-protocol path);
+live-chain-without-key built; the late confirm reverted a finalized release
+and the sweep paid twice; the raced terminal kept expired/superseded while
+confirm answered settled. Reviewer-side proofs: the pg claim-CAS mutant
+(guard removed) was BIT by the blocked-interleave test; two reviewer PoCs
+against dist/ confirmed the double-pay classes independently.
+
+Validation: in service/, npm run build clean; npm test 493 tests, 488 pass,
+0 fail, 5 env-gated skips default tier; with CLAUDIUM_TEST_DATABASE_URL
+(dev Postgres :5433) 493/493 zero skips, run after every slice. Copy floor
+clean (no em/en dashes, no emojis, no "phase" in code or commits).
+
+The 09 ledger entry in state.md carries the registry the QA session consumes
+(judged and deferred items with owners, knob and reason vocabularies, the
+cross-repo obligations for 12).
 
 ## 08 QA round (service auth hardening)
 

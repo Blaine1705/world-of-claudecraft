@@ -5,10 +5,22 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-09-bond-releaser.md`
+- Next file to run: `docs/woc-marketplace-hardening/phase-09-qa.md`
   (SERVICE repo, worktree `/Users/fernando/Documents/woc-rewards-service-pr31`,
-  fresh session, own origin/master sync first; the service tip is now aa44873
-  and PR #31 is updated).
+  fresh session, own origin/master sync first; the QA diffs aa44873..3346878,
+  9 commits, LOCAL).
+- 09 COMPLETE (SERVICE repo, LOCAL not pushed per R4; session start aa44873,
+  tip 3346878, 9 commits). B3, the bond double-pay medium, and the bond-cents
+  ownership mediums closed; R2 forfeit split landed one-code-path (so the R6
+  Terms publication gate's R2 dependency is now met service-side); the two R5
+  items this repo owns RULED by Fernando and implemented. Five red-first
+  proofs; two fresh coverage lenses plus a fresh re-review of the fix rounds,
+  every finding applied or judged with the file open. Suite 445 to 493 tests
+  (488 + 5 env-gated skips default; 493/493 with CLAUDIUM_TEST_DATABASE_URL).
+  The 09 ledger entry below is the registry the 09-qa session consumes;
+  progress.md carries the commit-by-commit round. LOUD cross-repo handoff for
+  12 inside the ledger entry: the game must adopt the bond-quote contract
+  BEFORE the service ever deploys ahead of it, or bond quoting refuses.
 - 08 QA COMPLETE (PASS-WITH-FOLLOWUPS, every fix applied, PUSHED per R4:
   service aa44873 to feature/woc-market-settlement, game to
   feature/woc-marketplace after this session's v0.38.0 re-sync). The fix
@@ -266,9 +278,20 @@ Still open (a phase that hits one asks at session start):
 - R3 (phase 11, H3): oracle venue posture. The PRD requires a cross-venue deviation gate
   but Pyth has no $WOC feed. Options: add a second real venue, or revise the claim to
   single-venue with tightened staleness/deviation bounds. Needs a product call.
-- R5 (phases 09/10/21): the remaining chain-wiring operational decisions: SOL fee
-  funding and monitor, ATA-rent-on-refund policy, verifier commitment level and
-  confirming timeout, devnet mint choice. Phases propose defaults; Fernando confirms.
+- R5 (phases 09/10/21): the chain-wiring operational decisions. The two 09
+  items are RESOLVED (Fernando, 2026-08-14, proposed and confirmed at the 09
+  session start):
+  - SOL fee funding and monitor: the releaser preflights fee plus rent against
+    the escrow's SOL (refuses insufficient_sol_fee, bond stays held and
+    retryable); the admin overview reports the balance and flags it under
+    WOC_MARKET_ESCROW_MIN_SOL_LAMPORTS (default 0.05 SOL); funding stays a
+    MANUAL op (no automated cross-wallet top-up).
+  - ATA rent on refund: the ESCROW pays it (idempotent create funded by escrow,
+    rent joins the preflight), so the bidder is always made whole in full; the
+    bounded griefing exposure (about 0.002 SOL per bond cycle via account
+    re-closing) is accepted and visible through the low-SOL monitor.
+  Still open: verifier commitment level and confirming timeout (10), devnet
+  mint choice (21).
 - R6 (phase 07, B7): counsel owns final Terms language. The phase produces drafts and a
   decision memo; counsel sign-off is a launch gate tracked here, not a packet deliverable.
   STATUS 2026-08-13: package READY, recorded SENT-TO-COUNSEL (the send is
@@ -367,6 +390,133 @@ Still open (a phase that hits one asks at session start):
   extraction, firewall regex) -> 05. Doc staleness -> 07. Runbook -> 22.
 
 ## Per-phase ledger (append as phases complete)
+
+- 09 bond-releaser (2026-08-14, SERVICE repo, session start aa44873 =
+  the 08 QA tip, origin/master already contained at df09756; 9 commits,
+  tip 3346878, LOCAL not pushed per R4; validation npm run build + npm
+  test in service/, 493 tests 488 pass 0 fail 5 env-gated skips default
+  tier and 493/493 zero skips with CLAUDIUM_TEST_DATABASE_URL, baseline
+  was 445/441/4). The registry the 09-qa session needs:
+  - B3 CLOSED all-or-nothing: WOC_MARKET_ESCROW_JSON becomes a retained
+    signer; SolanaMarketBondReleaser (service/src/market/
+    bond_releaser_solana.ts) adapts the settlement rail's prepared
+    machinery with the verbatim signer-equals-escrow guard re-checked at
+    prepare, the R5 fee+rent preflight, and broadcast of exactly the
+    persisted bytes; shared instruction assembly (transfer_instructions.ts)
+    with the unsigned builder so the paths cannot drift. buildMarketApps:
+    live chain without the key refuses (red-proven); the generic gate
+    covers the override bag too (code-only allowReleaserlessChain is the
+    single seam that may construct a releaserless market, the runtime
+    release_not_wired refusal's only reachable path); MarketApps.releaseRail
+    ('override'|'dev'|'live'|'none', derived from the resolved instance)
+    pins the wiring; probe set = every configured RPC endpoint.
+  - DOUBLE-PAY CLOSED (both classes reproduced red on the pre-protocol
+    path: crash-after-broadcast retry re-sent; concurrent refund+forfeit
+    both paid). The protocol (release_protocol.ts): prepare durable-free,
+    ONE claim CAS settled->releasing persisting direction + signed tx +
+    attempt start + attempt-signature trail BEFORE broadcast,
+    probe-before-resend on retry (finalized adopts without re-send;
+    active/unknown refuse; replaceable re-prepares keyed on the OLD
+    signature, age-bounded), direction-guarded signature-keyed finalize
+    that clears the signed blob and keeps the trail. Guards live in each
+    statement's WHERE on the row's own columns (EvalPlanQual-safe); the pg
+    suite proves one claim winner under a real blocked interleave and pins
+    every CAS arm.
+  - THE GUARDED UPDATE + ADOPTION (two sequential blockers found by the
+    review rounds, both red-proven): quotes.update(quote, expectedStatus)
+    refuses when the row moved (a late confirm could revert a finalized
+    release and re-arm the sweep: the stomp); confirm's settled write then
+    gained ADOPTION arms (expired, superseded: states no money ever left)
+    because the ledger-proven payment outranks an unpaid terminal, else a
+    sweep/supersede landing in confirm's read-verify-write gap abandoned a
+    paid bond as nothing_collected; any other refusal re-reads and answers
+    in the entry checks' exact vocabulary. Stomp pin intact: releasing/
+    refunded/forfeited/rejected stay immovable.
+  - AMOUNT OWNERSHIP: bond-quote takes bidCents; ONE clamped policy
+    (peg.ts clampedBondCentsForBid: ceil bps, WOC_MARKET_BOND_MIN_CENTS
+    100 / WOC_MARKET_BOND_MAX_CENTS 5000, never above the bid); optional
+    caller echo usdCents refused on mismatch with bond_amount_drift, the
+    refusal CARRYING the expected bondCents so a knob change cannot strand
+    a bid; response carries bondCents; marketFeeSchedule and the overview
+    fees gained the clamp pair. R2 forfeit split: splitForfeitProceeds
+    (same module, same ceil/remainder discipline, 7:3 of the whole bond at
+    defaults, exact-sum) feeds legs treasury + burnBase burn; refund moves
+    the exact base units whole.
+  - R5 RULED AND IMPLEMENTED (see Rulings): preflight refusals
+    insufficient_sol_fee; overview attention gains releasing count,
+    escrowSolLamports, tri-state escrowSolLow (null = unmeasured, never
+    "fine"); one-shot boot warning under the floor; admin quote rows gain
+    releaseTo, releaseClaimedMs, releaseAttemptSignatures (the
+    reconciliation handle; the signed blob never leaves the service).
+  - REASON VOCABULARY (wire, game passes through): bond_amount_drift,
+    release_in_flight, release_direction_conflict, release_unverifiable,
+    release_unavailable, destination_account_unsupported,
+    insufficient_sol_fee, not_configured, release_failed, send_failed;
+    dev chain adds dev_chain_transaction_superseded /
+    dev_chain_unknown_transaction. routes.ts refusal() now typed to
+    WireQuoteResponse and carries signatureRequired.
+  - AGE BOUND: MAX_REPLACEABLE_AGE_MS (release_protocol.ts, 6h,
+    code-owned constant) refuses to trust a replaceable verdict for an
+    attempt older than the bound (RPC history prunes; an old "absent"
+    stops being evidence); replaceReleasePrepared refreshes the clock so
+    recovery across replace cycles measures the CURRENT attempt. The
+    age-parked case has its own operator remedy documented in
+    MARKET_CHAIN_WIRING.md (reconcile by the attempt trail), distinct from
+    the inside-bound release_unverifiable case (second, genuinely
+    independent RPC endpoint; independence is an operator obligation the
+    code cannot verify).
+  - REVIEWS: two fresh coverage lenses (security: 18 findings, 1 blocking;
+    correctness: 14 findings, 2 blocking) then a FRESH re-review of the
+    two fix-round commits (1 blocking + 5 should-fix + 5 nits), every
+    finding applied or judged with the file open; the final two commits
+    were closed by careful self-review (narrow, test-covered). Reviewer
+    PoCs independently reproduced both double-pay classes; the pg
+    claim-CAS mutant (status guard removed) was BIT.
+  - JUDGED, no code change (do not re-raise): single-endpoint 'finalized'
+    trust in combineProbeStates matches the confirm path's RPC trust model
+    (quorum-for-finalized would wedge single-RPC deployments; commitment
+    policy is 10's charter); retry pacing/attempt caps belong to the
+    game's sweep (04's cooldowns; the attempt trail gives visibility);
+    livePendingByMemoRef stays (pre-existing, pg-tested, no src caller);
+    a raced REJECTED write leaves an expired/superseded row terminal-unpaid
+    with a slightly different reason string (a mismatched signature proves
+    nothing about payment, no adoption); the sum asserts in peg.ts are
+    defense-in-depth by construction (commented as such).
+  - PRE-EXISTING EDGE registered, not this session's regression: confirm
+    on an ALREADY-expired/superseded row answers the terminal reason at
+    entry without consulting the ledger, so a buyer who signed before
+    expiry and broadcast after is told terminal while the money reached
+    escrow; QA/10/21 judge the remedy (probing the chain for expired
+    quotes on confirm).
+  - DEFERRED with owners, the LOUD one first: phase 12 (game) MUST adopt
+    the bond-quote contract BEFORE any deploy of the service ahead of the
+    game (today the game sends usdCents only, so its bond quoting would
+    refuse invalid_amount): send bidCents, adopt the response's bondCents
+    (also present on drift refusals), retire or demote woc_market_rules.ts
+    bondCents() to render-only (its round-half-up disagrees with the
+    service ceil at half-cent boundaries), and decide the pre-quote
+    display source (the service exposes the clamp only on the admin
+    overview; a game-facing schedule read may be wanted). DEPLOY-ORDER
+    COUPLING is a Fernando note for the eventual rollout. Also to 12: the
+    game dev economy's floor-based 90/3 split (woc_market_proxy.ts) vs the
+    service ceil rule; health.ts RAIL_KEYS.marketplace still names
+    WOC_RPC_URL + MARKET_KEEPER_KEYPAIR_JSON, keys the market never reads
+    (the wiring doc carries the KNOWN DRIFT note). To 21: dev chain probe
+    never answers active/unknown (fidelity note; devnet exercises the real
+    states). To 22 pre-enable audit: whether the age bound deserves an env
+    knob and whether an audited manual-adopt lever for parked releases is
+    wanted; probe-endpoint independence in the deploy runbook. Production
+    pg pools still carry no connectionTimeoutMillis (inherited 08 note;
+    NOT addressed this session, the release path is chain-bound not
+    pool-bound; 10/22 re-judge).
+  - RED-FIRST REGISTRY for the QA red-proof lane (all five reproduced
+    before their fix): (1) the four ownership behaviors against the old
+    bondQuote; (2) crash-after-broadcast re-send and (3) refund-vs-forfeit
+    both-paid on the pre-protocol path; (4) live-chain-without-key built;
+    (5) the late-confirm stomp and (6) the terminal-adoption abandonment,
+    both in-suite. The throwaway pre-protocol red file was deleted after
+    recording; its two cases live on as the crash/race suite against the
+    new seam.
 
 - 08 service-auth-hardening (2026-08-14, SERVICE repo, session start 70d4207
   = PR #31 tip, origin/master already contained; 12 commits, tip 4b9e413,
