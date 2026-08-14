@@ -5,10 +5,31 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-09-qa.md`
+- Next file to run: `docs/woc-marketplace-hardening/phase-10-chain-verifier.md`
   (SERVICE repo, worktree `/Users/fernando/Documents/woc-rewards-service-pr31`,
-  fresh session, own origin/master sync first; the QA diffs aa44873..3346878,
-  9 commits, LOCAL).
+  fresh session, own origin/master sync first). Its session start proposes the
+  R5 remainder (verifier commitment level and confirming timeout). NOTE for
+  10's session start: the confirm-side remedy for the paid-after-expiry edge
+  is DONE (the 09 QA round shipped entry adoption; see the 09 ledger's QA
+  ROUND bullet), so 10's charter on that edge shrinks to the commitment
+  policy itself.
+- 09 QA COMPLETE (PASS-WITH-FOLLOWUPS, every finding applied or judged with
+  the file open, PUSHED per R4: service aa44873..02713f2 to
+  feature/woc-market-settlement updating PR #31; game pushed after this
+  session's v0.38.0 re-sync, merge abd4a9e0e2, trivial, generated-i18n
+  conflict regenerated). Nine lanes over aa44873..3346878: ZERO blocking in
+  the implement range; all six red-first registry claims REPRODUCED-RED; all
+  seven mutation arms BIT by name in both stores. The round's own fixes (5
+  commits, tip 02713f2): entry adoption closing the registered
+  paid-after-expiry edge, typed signature_already_settled on the
+  settled-signature collision (both stores; was an unhandled 23505 500), the
+  undecided late-visibility window, the rejected-write entry-vocabulary fix,
+  the rpc probe-list membership pin, the actor intake bound, fifteen
+  test-decisiveness hardenings, and the doc truth-ups. Two fresh re-review
+  lenses over the fix round, everything applied or judged; round-2
+  mutation-proven. Suite 493 to 508 (502 + 6 env-gated skips default;
+  508/508 zero skips with CLAUDIUM_TEST_DATABASE_URL). The 09 ledger entry's
+  QA ROUND bullet below is the registry phase 10 consumes.
 - 09 COMPLETE (SERVICE repo, LOCAL not pushed per R4; session start aa44873,
   tip 3346878, 9 commits). B3, the bond double-pay medium, and the bond-cents
   ownership mediums closed; R2 forfeit split landed one-code-path (so the R6
@@ -517,6 +538,54 @@ Still open (a phase that hits one asks at session start):
     both in-suite. The throwaway pre-protocol red file was deleted after
     recording; its two cases live on as the crash/race suite against the
     new seam.
+  - 09 QA ROUND (2026-08-14, verdict PASS-WITH-FOLLOWUPS, tip 02713f2,
+    PUSHED per R4; the registry additions phase 10 consumes):
+    - ENTRY ADOPTION shipped (confirmTerminalEntry in service.ts): the
+      registered paid-after-expiry edge is CLOSED. A ledger-proven finalized
+      payment adopts an already-expired or already-superseded quote at
+      confirm entry through the same guarded adoption write as the mid-call
+      arms; a matched-but-unfinal payment answers awaiting_finality; an
+      UNDECIDED verdict answers awaiting_finality only inside
+      MAX_LATE_PAYMENT_VISIBILITY_MS (service.ts, ten minutes past expiry,
+      code-owned) and the stable terminal answer past it; a decided mismatch
+      stays terminal and writes nothing; refunded/forfeited/rejected never
+      re-verify at entry. QA was the named judge on this edge and ruled
+      fix-now; 10 no longer owes the confirm-side remedy. The residual half
+      (a buyer the game never re-polls for) remains with 12's contract
+      adoption.
+    - NEW confirm reason: signature_already_settled (terminal). The
+      settled-signature uniqueness now fails TYPED on both stores: the
+      memory store carries the same one-credit-per-signature check the pg
+      partial index enforces, throwing the pg 23505 shape, and both
+      settled-write sites catch exactly code 23505 with constraint
+      woc_market_quotes_settled_signature (the constraint NAME is
+      load-bearing and pinned in real SQL; renaming the index would turn
+      the refusal back into a 500). Reachable via a crafted transaction
+      carrying two memo instructions matching two identical-leg quotes;
+      previously an unhandled 500 the game re-read forever.
+    - JUDGED, no code change (do not re-raise): the confirming-write
+      boolean in confirm() stays deliberately UNCHECKED (its refusal must
+      fall through to verification or the mid-call adoption arms never see
+      the payment; commented at the site); the double-signed-memo residual
+      (two distinct transactions, one memo) stays reconciliation-only and
+      is documented in MARKET_SETTLEMENT.md; the terminal-row verify RPC
+      cost is accepted (internal tier; bounding it risks re-opening the
+      abandonment; front-door rate limiting stays with 22); the
+      MEMO_PROGRAM_ID/tokenProgramForMint duplication across
+      settlement/claudium is a follow-up chore; the whitespace-only admin
+      actor passing the empty gate is pre-existing.
+    - DEFERRED adds: 12 (game wire) also owes tolerating TWO settled quotes
+      for one memoRef (superseded adoption makes it legitimate: the old
+      adopted quote and the fresh one, each backed by its own payment; the
+      game bond ledger must key on the reference). Everything else in the
+      earlier DEFERRED bullet stands.
+    - Smaller contracts added: marketRpcEndpoints (bootstrap.ts, exported,
+      membership-pinned: every configured RPC endpoint joins the probe set,
+      deduped, claudium precedence); admin actor bounded to 200 code points
+      at intake (server.ts adminActor); compose_conformance now pins the
+      COMPLETE WOC_MARKET_* shadow set with a self-enforcing discovery
+      sweep (a new shadowed compose knob fails until it joins the table);
+      the in-memory livePendingByMemoRef answers newest-first like pg.
 
 - 08 service-auth-hardening (2026-08-14, SERVICE repo, session start 70d4207
   = PR #31 tip, origin/master already contained; 12 commits, tip 4b9e413,

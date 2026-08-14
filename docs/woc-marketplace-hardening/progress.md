@@ -22,7 +22,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 08 | service-auth-hardening | service | DONE | 70d4207 | SERVICE repo (origin/master already contained); B5 + the fail-open config mediums + the compose staleness default closed, every refusal proven red-first (the bypass returned 200 on the old routing with the internal secret alone); two fresh review lenses, then two fix rounds each re-reviewed fresh and a self-reviewed polish round, every finding applied incl. nits; the rounds' own finds: the THIRD dev escape (CLAUDIUM_ALLOW_FAKE_STRIPE, still denylist), the wallet-segment fragment gap, the duplicate-oracle heartbeat bug (warmed one instance, quoted from another), ASCII-before-trim; suite 439 tests 435 pass 0 fail (the QA round corrected the baseline arithmetic: the range ran 417 tests with 413 passing before, so the growth is 417 to 439 totals); 12 commits, tip 4b9e413; LOCAL, not pushed per R4 |
 | 08 QA | phase-08-qa | service | DONE | 4b9e413 | PASS-WITH-FOLLOWUPS, every fix applied (section below); the self-reviewed polish commit 4b9e413 verified FIRST and clean; six fresh audit lanes + a dedicated red-proof lane over 70d4207..4b9e413: 0 blocking, all four red-first claims REPRODUCED-RED against a throwaway 70d4207 build; 8 should-fix + 13 nits ALL applied in three commits, re-reviewed fresh (0 blocking, 7 should-fix, 8 nits, ALL applied in a fourth commit, tip aa44873); 12 + 2 mutations all BIT; suite 445 tests 441 pass 0 fail 4 env-gated skips; game worktree re-synced to release/v0.38.0 (merge bfceae8d4b, NON-trivial: 33 conflicts, wireAura extraction pays the merged game.ts overage, pins re-derived 324/86/238 + sends 200 dispatches 213; release-merge-audit found THREE union-only reds, all fixed; gate GREEN at ad197c0801, full-suite fallback, all 12 steps, WITH TEST_DATABASE_URL, real-SQL suites 154 green zero skips); pushed per R4 (service 70d4207..aa44873 updating PR #31, its test checks running at push time; game 8dd51a8a20..f5325ffbe8, pre-push floor green, no open PR on this branch so no PR CI) |
 | 09 | bond-releaser | service | DONE | aa44873 | SERVICE repo (origin/master already contained at df09756); B3 + the bond double-pay medium + the bond-cents ownership mediums closed; R2 forfeit split landed (one code path with the settlement schedule); the two R5 items this repo owns RULED by Fernando at session start and implemented (SOL fees: preflight + overview monitor + manual funding, knob WOC_MARKET_ESCROW_MIN_SOL_LAMPORTS; ATA rent on refund: escrow pays, inside the preflight); FIVE red-first proofs (ownership behaviors, both double-pay classes, all-or-nothing boot, the late-confirm stomp, the terminal-adoption abandonment); two fresh coverage lenses (security 18 findings incl. 1 blocking, correctness 14 incl. 2 blocking) plus a fresh re-review of the fix rounds (1 blocking + 5 should-fix + 5 nits), every finding applied or judged with the file open; 9 commits, tip 3346878; suite 445 to 493 tests, 488 pass + 5 env-gated skips default tier, 493/493 with CLAUDIUM_TEST_DATABASE_URL (zero skips); LOCAL, not pushed per R4 |
-| 09 QA | phase-09-qa | service | NOT STARTED | | |
+| 09 QA | phase-09-qa | service | DONE | 3346878 | PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open (section below); SERVICE repo (origin/master already contained at df09756); nine lanes (six read-only audits, two red-proof, one mutation): 0 blocking in the implement range, all six red-first registry claims REPRODUCED-RED, all seven mutation arms BIT by name (claim CAS, guarded update, finalize signature key in BOTH stores, age bound; 493-test full runs each); the round's own fixes: entry adoption of a ledger-proven payment on an already-expired or superseded quote (the registered pre-existing edge, the crash-matrix lane's fix-now case accepted), typed signature_already_settled on the settled-signature collision BOTH stores (the partial-unique-index 23505 trap, previously an unhandled 500), the undecided late-visibility window, the rejected-write vocabulary fix, the rpc probe-list pin, the actor clamp, fifteen test-decisiveness hardenings, doc truth-ups; two fresh re-review lenses over the fix round, everything applied or judged, round-2 mutation-proven (4 mutants BIT); suite 493 to 508 (502 + 6 env-gated skips default; 508/508 zero skips with CLAUDIUM_TEST_DATABASE_URL); 5 commits, tip 02713f2, PUSHED per R4 (service aa44873..02713f2 updates PR #31; game after the v0.38.0 re-sync merge abd4a9e0e2, trivial: one generated-i18n conflict, regenerated) |
 | 10 | chain-verifier | service | NOT STARTED | | |
 | 10 QA | phase-10-qa | service | NOT STARTED | | |
 | 11 | oracle-health | service | NOT STARTED | | |
@@ -49,6 +49,95 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 21 QA | phase-21-qa | service + game | NOT STARTED | | |
 | 22 | close-out | all three | NOT STARTED | | teardown offer lives in 22 QA |
 | 22 QA | phase-22-qa | all three | NOT STARTED | | |
+
+## 09 QA round (verdict PASS-WITH-FOLLOWUPS, every finding applied or judged)
+
+Service repo, worktree woc-rewards-service-pr31; session start 3346878 (clean,
+origin/master already contained at df09756), tip 02713f2, 5 commits, PUSHED per
+R4 (service aa44873..02713f2 to feature/woc-market-settlement, updates PR #31).
+Audit range aa44873..3346878. Nine lanes ran concurrently: deliverables,
+crash-matrix (the QA spec's independent third agent), security, test
+decisiveness, dead code, docs freshness, red-proof (two lanes), and mutation,
+the last three in isolated scratch worktrees so nothing touched the real tree.
+
+Round-1 verdicts on the implement range: ZERO blocking. All six red-first
+registry claims REPRODUCED-RED (the tip peg and bootstrap tests fail tsc at
+aa44873 on exactly the ownership and gate vocabulary, with a behavioral
+live-chain-without-key probe on the aa44873 build; the stomp test red at
+44a3c5a via the 12f894c overlay; both double-pay classes reproduced by PoC
+against the aa44873 build, sends==2 observed; the adoption tests red at
+44dd52f). All seven mutation arms BIT with name-matched failures under full
+493-test runs (claim CAS pg and memory, guarded update pg and memory, finalize
+signature key pg and memory, age bound), worktree restored clean between
+mutants. The crash-matrix walk covered every status times every crash point
+and found no state whose retry can re-broadcast without a probe.
+
+The round's fixes (five commits):
+- 6cd43fa entry adoption: the registered paid-after-expiry edge is CLOSED
+  (the crash-matrix lane's fix-now recommendation, accepted: everything the
+  remedy needed shipped in the 09 range; a ledger-proven finalized payment
+  now adopts an already-expired or already-superseded quote at confirm entry
+  via the same adoption discipline as the mid-call arms; the rejected write's
+  refusal now answers from the stored row in the entry vocabulary).
+- 6c79602 marketRpcEndpoints extracted and membership-pinned (dropping the
+  fallback RPC can no longer silently downgrade crash recovery); admin actor
+  truncated to the audit reason bound at intake; tokenProgramForMint
+  un-exported.
+- fe06e21 test decisiveness: the direction conflict mirrored BOTH ways in
+  BOTH stores, the pg interleave OBSERVES the row-lock wait from a separate
+  autocommit connection, schema pins comment-stripped plus a live
+  legacy-upgrade arm on a second pool, the age bound pinned at exact
+  equality, the drift refusal's bondCents pinned at the wire, the typed
+  Token-2022 and dev unknown-transaction refusals cased, compose conformance
+  extended to the complete WOC_MARKET_* shadow set.
+- c434cca docs: the wiring doc's dead MARKET_KEEPER_KEYPAIR_JSON references,
+  the impossible-today sentence, and the keeperOwnsWocPayIn prescription all
+  trued; refusal vocabulary completed; MIN_LIQUIDITY knob row added.
+- 02713f2 the re-review round (below).
+
+The fix round was re-reviewed by two FRESH lenses (security and correctness).
+Their finds, all applied in 02713f2 or judged: the settled-signature
+uniqueness enforced by unhandled 23505 (both lenses independently; a crafted
+transaction can carry TWO memo instructions and match two quotes with
+identical legs; now a typed terminal signature_already_settled on both
+stores, with the memory store gaining the uniqueness twin, red-proven first,
+and the pg error SHAPE pinned in real SQL because the catch keys on the
+constraint name); the UNDECIDED verdict at terminal entry answering
+hard-terminal (residual first-poll-after-expiry stranding; now
+awaiting_finality inside MAX_LATE_PAYMENT_VISIBILITY_MS, ten minutes past
+expiry, nothing written, junk bounded past the window); actor truncation made
+surrogate-safe; the lock-wait observation scoped by a run-unique
+application_name; the compose table made self-enforcing by a discovery sweep;
+livePendingByMemoRef made newest-first in memory to match the pg ORDER BY;
+adoption pins gained the settlement-kind, forfeited-entry, and
+cleared-release-field arms. Round-2 was mutation-proven (4 mutants, all BIT
+by name) and closed by careful self-review with one doc trueup folded in.
+
+Judged, no code change (rationale recorded; do not re-raise): the
+confirming-write boolean stays deliberately unchecked (its refusal must fall
+through to verification or the mid-call adoption arms never see the payment;
+commented at the site and documented); the double-signed-memo residual stays
+reconciliation-only (first-writer-wins on submittedSignature would refuse a
+genuine second payment's evidence); the terminal-row verify RPC cost is
+accepted (internal tier; both suggested bounds risk re-opening the
+abandonment; front-door rate limiting stays with 22); the fourth copy of
+MEMO_PROGRAM_ID/tokenProgramForMint is a follow-up chore, out of range; the
+admin-credit fingerprint change under actor truncation is a cross-deploy
+non-case; the whitespace-only actor passing the empty gate is pre-existing
+and unraised.
+
+Validation matrix after every slice; final: build clean, 508 tests, 502 pass
++ 6 env-gated skips default tier, 508/508 zero skips with
+CLAUDIUM_TEST_DATABASE_URL. Copy floor clean. Repo isolation verified (the
+game tree's only local commit beyond origin was the packet-docs commit).
+
+Game side this session: release/v0.38.0 re-synced (merge abd4a9e0e2,
+TRIVIAL: 12 commits, delves content + CI sharding, no marketplace overlap;
+the one conflict was the generated i18n pending bundle, resolved by
+regeneration per the standing rule; npx tsc clean; monolith_budget +
+world_api_parity + architecture 459 green, every ceiling and count pin
+held without re-derivation). Gate run before the game push; hashes in the
+row above and CI state noted below.
 
 ## 09 implement round (bond releaser)
 
