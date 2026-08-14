@@ -2172,3 +2172,182 @@ in-session; both relitigations UPHOLD; the security follow-up round found
   release-tier pending fills owed for the two new options keys (L3
   queue); the win32 named-pipe namespace cannot be stat-gated (no
   ownership check exists there; recorded, not fixable in-process).
+
+## Phase 10 QA record (2026-08-14)
+
+- Verdict: PASS-WITH-FOLLOWUPS, 0 blocking. Both stopping-rule watches
+  (unclamped inbound peer text reaching a sink, any pre-window socket
+  touch) and the zero-dependency rule verified clean by every lane.
+- QA-start absorb d29421bcff of release/v0.38.0 tip 2ee438e32c (PR 3397
+  delve-marks-window-bonus, sim-side delve economy only; no electron or
+  desktop paths). Parity re-run after the merge per standing rule:
+  parity + ci_workflow + ci_shard_partition 374/374 green.
+- Workflow audit: 29 agents, ZERO losses (6 audit lanes as DEFAULT
+  workflow agents with inlined charters + 1 merge-dedup + 2 adversarial
+  skeptics per actionable finding, distinct lenses: reproduction and
+  design-intent). Lanes returned roughly 70 verified-ok rows, 25
+  informational items, and 11 actionable findings; 11/11 survived both
+  skeptics (7 double-CONFIRMED, 4 severity splits adjudicated by the
+  orchestrator, reasoning below).
+- EIGHT FIX COMMITS, each with its suites green at commit and every
+  behavior mutation-verified after commit:
+  - f2ab4113e3 (A2): a candidate that ACCEPTED and closed pre-READY
+    fell to scheduleRetry, whose timer restarts the walk at slot 0, so
+    an accept-and-drop squatter pinned the walk forever (win32 has no
+    ownership gate). A pre-READY hangup now advances the walk in the
+    same pass; exhaustion still backs off. The design skeptic's
+    residuals (silent-hold squatter, READY-answering squatter) stay
+    ledgered as the upheld win32 exemption.
+  - 8b8591357c (A11): every pre-READY CLOSE went terminal
+    invalid-client; only code 4000 was probe-confirmed as the refusal
+    shape. Terminal is now code 4000 or an unreadable payload (fail
+    closed); state.md contract line re-scoped in the same commit.
+  - 341ea5cba1 (A1, the one re-litigation PARTIAL OVERTURN): no
+    renderer path ever sent a leave-world clear, and the real logout is
+    a location.reload(), so the recorded "old zone up to 15s" was
+    actually app-lifetime staleness with a ticking session clock at the
+    character screen, while the main.cjs comment documented the unsent
+    clear. Fixed three ways in one commit: the snapshot carries inWorld
+    and the core clears once (forgetting dedup memory) when a published
+    world goes away; initDiscordPresence sends one boot-time
+    reconciliation publish(null) because the shell process outlives the
+    reloading page while holding the last activity; the main.cjs
+    comment is now true. The blank-entity no-publish guarantee is
+    unchanged: the zone is never resolved while out of the world.
+  - 6090d27cf8 (A3-A7 test hardening): fake socket records op order and
+    can throw on write, so the clear-BEFORE-end contract and both
+    write-throw recovery arms are executed (A3; a real net.Socket
+    surfaces write-after-end as an async error the teardown never
+    sees, so the order pin is the only guard); DISCORD_LOG_TEXT_MAX
+    pinned to its 200 literal (A4: both bounded-log arms compared
+    against the import, the wire-name-constant class); ipc_channels
+    discord pins comment-stripped line-first and the will-quit dispose
+    pin scoped to its handler slice (A5); the coalescer 15s default
+    pinned from below at the 14999/15000 boundary (A6); the
+    re-enable-inside-the-window blank pinned as DELIBERATE with its
+    rationale (A7); the 1 Hz poll throttle sharpened to the exact
+    999/1000 boundary so POLL_INTERVAL_MS is load-bearing.
+  - 7ba7873fdf (A9, adjudicated between the split skeptics): the
+    WOC_DISCORD_APP_ID row lands in docs/desktop-release.md
+    (registration-name requirement, inert-when-unset design, the
+    unprovisioned-build toggle caveat), while row-hiding and the
+    packaging stamp stay with the OPEN registration item per the design
+    skeptic: the operator line's final content depends on the unmade
+    packaging decision, and hiding the row needs a status channel the
+    fire-and-forget bridge deliberately lacks.
+  - 931d9eff70 (PROT-3, unpromoted but decisive): high-bit length words
+    pin the UNSIGNED header read; a readInt32LE regression walks the
+    decode loop backward forever and would surface as a vitest HANG in
+    the fuzz arm, not a red.
+  - ea1b7bb258: the fresh privacy review caught the asymmetry A11 left
+    open (a CLOSE-answering squatter could still pin the walk via the
+    pathIndex-0 retry); a transient pre-READY CLOSE now advances the
+    walk too, symmetric with the hangup arm.
+  - aa03f2db2a: the fresh qa-checklist caught the ipc_channels
+    flattener half-applied inside its own file; the shared preload and
+    mainSide constants now strip too, so all 19 cases refuse commented
+    text.
+- Re-litigations: (a) PARTIAL OVERTURN, fixed as A1. (b) dungeon
+  entry-region hold UPHOLD (privacy-safe, no new i18n surface in a
+  zone-only phase). (c) refuse-malformed-timestamps UPHOLD (the sole
+  legitimate producer always emits a safe positive integer; stripping
+  would silently publish a wrong-moment public clock). (d)
+  id-gate-after-throttle UPHOLD (the stamp can delay the FIRST real
+  publish by at most one sub-second poll, once per world entry;
+  lastEmitAt never advances while gated). (e) renderer-wins boot
+  reconciliation UPHOLD (the options row reads renderer Settings, so
+  that is the store of user intent; no stale-acted window exists
+  because the shell cannot dial before the renderer's first
+  setActivity; honest cost, recorded: a wiped localStorage flips a
+  previously-off player back to default ON, visible in the row).
+- A7 RULING (the design ruling the new arm pins): the re-enable-within-
+  15s blank window is DELIBERATE; it trails Discord's real limit (an
+  earlier resend would be silently dropped there) and matches the
+  limits-survive-lifecycle doctrine the shell already records. A future
+  immediate-resend decision must rewrite the pinned arm.
+- A8, the monolith red, re-attributed by both skeptics: hud.ts 19510
+  over its 19490 ceiling and renderer.ts 13785 over 13700 PREDATE phase
+  10 entirely (already red at f30c1d0f87, the phase 9 QA docs commit;
+  the release tip is green at 19483/13691, branch growth +27 hud / +94
+  renderer, attributed by the checklist reviewer to the
+  presentation-lifecycle phases). The earlier state.md numbers
+  (13853/13764, 19500/19490) were stale against upstream's re-pinned
+  ceilings; refreshed. Still the recorded OPEN maintainer decision;
+  hardens to blocking at PR time; monolith_budget rides gate_select's
+  always-run floor (fs-scan classification, verified through the real
+  collectSuiteVisibility), so no selection path dodges it.
+- A10 SIZED for phase 11, fix deferred per the diff-scope doctrine (the
+  design skeptic's ruling; the hazard predates the range and masks no
+  live offender, the blind range scans clean). Live blast radius: ONE
+  suite with real consequence, tests/quest_link.test.ts, whose
+  RAW_ENCODER_RE negative sweep is vacuously blind over src/main.ts
+  3145-5093 today (probe-proven: planted encoder calls at 3500/4400/
+  5000 invisible, at 2000/6000 caught), plus TWO currently-clean
+  block-first carriers (tests/desktop_display_mode_sync.test.ts,
+  tests/language_fanout_registry.test.ts, both with zero pins in range
+  today). Everything else touching main.ts text reads it raw or strips
+  safely (survival matrix in the audit artifacts). Phase 11 sweep is
+  small: flip three stripComments bodies to line-comments-first, one
+  planted-mutation check each near line 4400, optionally extract a
+  shared line-first helper (12+ local variants across tests/).
+- Mutation probes 19/19 KILLED, every verdict rc=1 plus named failing
+  tests plus the vitest summary line; anchored count==1 replaces with
+  landing proof, per-probe git checkout restore with a clean-tree
+  check. The set: the audit's 11 nominations (P6/P7/P8/P9/P10 were
+  PREDICT-GREEN vacuity proofs pre-fix and now EXPECT-FAIL kills; P12
+  scored a kill on its decisive walk-advance arm, the exhaustion arm
+  passes under the revert by design since backoff-at-end is also the
+  revert's immediate state) plus 8 probes over the new fixes (walk
+  advance revert, terminal-scope inversion, world-gone arm dead, boot
+  clear dropped, dispose parked outside will-quit, clear-write-after-
+  end reorder, write-throw retry dropped, CLOSE-advance revert).
+- Fresh reviews over the QA commits, both delivered first-try with the
+  SendMessage-to-main charter line: privacy-security-review 0 blocking
+  / 0 should-fix (notes: the win32 handshake can now reach up to 10
+  pipes in one pass carrying only {v, client_id}, no PII pre-READY;
+  the CLOSE asymmetry, fixed same-day; the new debug line is
+  number-only, clamped, backoff-bounded). qa-checklist READY, 1
+  should-fix (fixed as aa03f2db2a); its adversarial pass verified the
+  boot-clear double-fire on a disabled session harmless AND pinned
+  ([[null],[null]]), all four disable/world-gone orderings (one
+  redundant-clear ordering ledgered cosmetic), the isLive() guard
+  against a double walk advance, and the main.cjs comment now true.
+- Live re-smoke of the FINAL tree against the real flatpak client
+  (throwaway registered id, closed after): smoke A walk found the
+  socket unaided, READY at 0.4s, SET_ACTIVITY acked, a requested clear
+  trailed to t+15.3s, OFF at t+19s cleared immediately and cancelled
+  the pending re-set, final state off with one connect attempt. Smoke
+  B, NEW, proves A2 live: a real accept-then-close squatter planted at
+  XDG_RUNTIME_DIR/discord-ipc-0 was dialed exactly once, the walk
+  advanced in the same pass, READY landed on the real flatpak socket,
+  no re-dial loop.
+- Validation at final HEAD aa03f2db2a: the 11-suite phase 10 set 348
+  passed / 3 skipped; tsc rc=0 at final HEAD and across every slice's
+  TypeScript surface. Gate: gate_select's full fallback run TWICE (once
+  mid-fix at 7ba7873fdf, once definitive at final HEAD aa03f2db2a),
+  both red EXACTLY the accepted set: 9 files / 13 tests = the 8 asset
+  seal suites (11 tests) + monolith_budget (2), with 38777 passed and
+  ZERO contention flakes either run. Post-abort turbo proofs green
+  (check:types + build:env + build:server + build:bot 5/5, then
+  build:bundle 3/3); browser leg standalone 19 files / 129 tests green
+  with BROWSER_PATH exported.
+- NEW LEDGER (adds for phase 11): the A2 residual squatter shapes
+  (silent-hold denial would need a handshake timeout; READY-answering
+  interception is the upheld win32 ownership exemption; PROT-5 lstat
+  is optional defense-in-depth, fs.protected_symlinks covers the
+  symlink arm on shipping kernels); PROT-6 PONG echo is fire-and-forget
+  1:1 write amplification, own-uid gated on unix, unbounded-peer-rate
+  in principle on win32; SPECTATE freezes the last real zone with the
+  clock ticking rather than clearing (pre-existing gate shape; the new
+  nothing-stays-published doctrine does not extend to it, maintainer
+  ruling wanted); reconnect-resync blanking (ClientWorld answers the
+  placeholder during a resync window, so presence clears then waits
+  out the 15s floor before republishing; arguably correct, not
+  verified live); the publish-leave-disable redundant second clear
+  (harmless, uncovered, cosmetic). The phase 10 ledger items all
+  VERIFIED-AS-RECORDED and held: pendingNonce fails stale (reset on
+  socket teardown and READY), prefs channel rate limit parity with the
+  gpu shape, guild-widget adjacency grep-hazard only, un-wrapped data
+  handler crash disproof holds for current code, feed cost on
+  throttled frames is a Date.now() and a comparison, language-switch
+  staleness stated in the header, win32 stat exemption confirmed.

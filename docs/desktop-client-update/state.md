@@ -366,9 +366,39 @@ time). Bisectability verified per slice in a throwaway worktree. main.ts
 11467/11490. Gate: full fallback red EXACTLY the accepted set (8 seal
 suites / 11 tests + monolith 2; 38752 passed, zero contention flakes
 this run); turbo proofs 7/7; browser leg isolated 19 files / 129 tests
-green. Next: phase 10 QA (phase-10-qa.md), fresh session,
-pull+merge first; the two open user decisions (low hold-or-accept, r181)
-still ride; Application ID provisioning still OPEN.
+green.
+
+Phase 10 QA done (2026-08-14; verdict PASS-WITH-FOLLOWUPS, 0 blocking;
+QA-start absorb d29421bcff of tip 2ee438e32c, PR 3397 delve train
+sim-only, parity + ci_workflow + ci_shard_partition 374/374 after).
+Workflow audit 29 agents zero losses (6 default-agent lanes, merge-
+dedup, 2 skeptics per finding); 11 actionable, 11/11 survived skeptics,
+all resolved: EIGHT fix commits f2ab4113e3 (pre-READY hangup advances
+the candidate walk), 8b8591357c (terminal CLOSE scoped to 4000 or
+unreadable), 341ea5cba1 (world-exit clear: core inWorld arm + boot-time
+reconciliation publish(null); the leave-world path is a
+location.reload(), staleness was app-lifetime, the one re-litigation
+PARTIAL OVERTURN), 6090d27cf8 (pin hardening: fake-socket op order +
+writeThrows, DISCORD_LOG_TEXT_MAX 200 literal, ipc_channels line-first
+strip + will-quit slice, 15s default pinned from below, re-enable blank
+window pinned DELIBERATE, poll boundary 999/1000), 7ba7873fdf
+(app-id row in docs/desktop-release.md), 931d9eff70 (unsigned length
+word high-bit pins), ea1b7bb258 (transient pre-READY CLOSE also
+advances the walk; fresh privacy review catch), aa03f2db2a (whole-suite
+comment strip; fresh qa-checklist catch). Other four re-litigations
+UPHOLD. Probes 19/19 killed rc=1 named. Fresh reviews over the QA
+commits: privacy 0/0, qa-checklist READY. Live re-smoke of the FINAL
+tree: happy path green (clear trailed to 15.3s, OFF immediate) plus a
+NEW live squatter arm proving the walk advance end to end. Monolith red
+re-attributed: predates phase 10 (hud 19510/19490, renderer
+13785/13700; release tip green), stays the OPEN maintainer decision.
+Flattener hazard SIZED for phase 11: one live consequence
+(quest_link's RAW_ENCODER_RE blind over main.ts 3145-5093) + two clean
+block-first carriers; sweep recipe in the QA record. Next: phase 11
+final integration QA (phase-11-final-qa.md), fresh session, pull+merge
+first; the two open user decisions (low hold-or-accept, r181) still
+ride; Application ID provisioning still OPEN (registration + packaging
+stamp + the unprovisioned-build toggle caveat ride together).
 
 ## Standing rules (user-locked, 2026-08-08, non-negotiable)
 
@@ -443,7 +473,12 @@ still ride; Application ID provisioning still OPEN.
   WOC_DISCORD_APP_ID from the environment (15 to 22 digit snowflake shape or the whole
   feature is inert and silent); nothing is hardcoded. The registration's application
   NAME is what Discord renders as "Playing <name>", so it must be "World of ClaudeCraft".
-  Packaging decision (how the env slot is stamped into builds) rides with it.
+  Packaging decision (how the env slot is stamped into builds) rides with it, and so
+  does the phase 10 QA observation that the options row renders in an UNPROVISIONED
+  build as a live-looking toggle driving an inert manager (suppressing it would need a
+  main-to-renderer status channel the fire-and-forget bridge deliberately lacks; decide
+  when the registration lands). Operator-facing row added to docs/desktop-release.md
+  at phase 10 QA.
 - Discord approval-gate ambiguity: RESOLVED EMPIRICALLY 2026-08-14 (phase 10 live probe
   against a running, logged-in client): SET_ACTIVITY is accepted for a registered but
   UNVERIFIED application id, so no approval gate exists for rich presence; an
@@ -1096,20 +1131,22 @@ or phase 11 design call); no party invites, buttons, or art assets.
   .ts bytes are a provenance input the train moved): the phase 11 seal step must
   run its twelve-input --check first; if the r185 delta touches town rendering
   the polish captures must be RE-SHOT, not just re-recorded.
-- MONOLITH RATCHET RED (OPEN, surfaced 2026-08-13, user decision pending):
-  tests/monolith_budget.test.ts reds on the merged tree: renderer.ts 13853 vs
-  ceiling 13764 (+89) and hud.ts 19500 vs 19490 (+10). Structural, not a
-  defect: upstream's own extract-and-lower ratchet updates (marker interaction
-  out of HUD 16181436bf, renderer diagnostics 8d755848ee) re-pinned the
-  ceilings with near-zero slack, and the branch's phase 4-6 additions to the
-  two coordinators are already thin-consumer wiring to extracted modules
-  (presentation_gate, frame_present, dpr_watch, instance_music,
-  static_matrix), so no clean branch-owned extraction exists. Per the ratchet
-  doctrine a ceiling raise is a MAINTAINER decision; the branch does not
-  self-raise. Until resolved, a full-fallback gate run reds on the 9 seal
-  suites (14 tests) PLUS this suite (2 tests) = 10 files / 16 tests; the
-  monolith rows are the ONLY accepted non-seal red and any OTHER red is a
-  regression. Resolution options at PR time: maintainer ceiling raise with
+- MONOLITH RATCHET RED (OPEN, surfaced 2026-08-13, user decision pending;
+  numbers refreshed at phase 10 QA 2026-08-14): tests/monolith_budget.test.ts
+  reds on the merged tree: hud.ts 19510 vs ceiling 19490 (+20) and renderer.ts
+  13785 vs 13700 (+85); the release tip is green at 19483/13691, branch growth
+  +27 hud / +94 renderer, already red BEFORE phase 10 began (the crossing sits
+  at or before phase 9). Structural, not a defect: upstream's own
+  extract-and-lower ratchet updates re-pinned the ceilings with near-zero
+  slack, and the branch's additions to the two coordinators are already
+  thin-consumer wiring to extracted modules (presentation_gate, frame_present,
+  dpr_watch, instance_music, static_matrix), so no clean branch-owned
+  extraction exists. Per the ratchet doctrine a ceiling raise is a MAINTAINER
+  decision; the branch does not self-raise. Until resolved, a full-fallback
+  gate run reds on the 8 seal suites (11 tests) PLUS this suite (2 tests) = 9
+  files / 13 tests; the monolith rows are the ONLY accepted non-seal red and
+  any OTHER red is a regression. monolith_budget rides gate_select's
+  always-run floor (fs-scan classification), so no selection path skips it. Resolution options at PR time: maintainer ceiling raise with
   recorded rationale, or an offsetting extraction of upstream-owned mass
   (permanent merge friction for a long-lived branch; not done unilaterally).
 - tests/profile_mode.test.mjs (in the normal vitest suite) and the browser
