@@ -35,7 +35,14 @@ automatically instead of by hand.
 ## What changes at the merge button
 
 - The merge button becomes **Merge when ready**. It queues the PR instead of
-  merging it. `gh pr merge` queues the same way.
+  merging it. From the CLI, `gh pr merge` does NOT work here (measured
+  2026-08-14: it calls the auto-merge API, which this repo disables, and
+  fails with "Auto merge is not allowed"); queue from the CLI with the
+  GraphQL mutation instead:
+
+  ```bash
+  gh api graphql -f query='mutation { enqueuePullRequest(input: {pullRequestId: "<gh pr view N --json id -q .id>"}) { mergeQueueEntry { position } } }'
+  ```
 - A PR can be queued once its own required checks are green. The queue then
   builds the candidate merge result (your PR merged onto the current tip, plus
   any PRs queued ahead of you) and runs CI on it as a `merge_group` event.
@@ -166,10 +173,12 @@ Never require these, deliberately:
   `Release checks`, `Release version gate`):
   release-process lanes, legitimately red or skipped mid-cycle. Release i18n in
   particular is red by design until the release-time locale fill.
-- `Dependency audit`: its workflow is path-filtered to dependency changes, so
-  on most PRs (and on every queue run) the check never reports at all, and a
-  required check that never reports blocks the merge forever. Skipped jobs
-  satisfy protection; absent workflows do not.
+- `pnpm audit` (the job in the `Dependency audit` workflow; protection sees
+  JOB names, and this list keeps the exact form protection sees): its
+  workflow is path-filtered to dependency changes, so on most PRs (and on
+  every queue run) the check never reports at all, and a required check that
+  never reports blocks the merge forever. Skipped jobs satisfy protection;
+  absent workflows do not.
 
 The same rule generalizes: a check may only join the required list if ci.yml
 produces (or explicitly skips) it on every `pull_request` AND every

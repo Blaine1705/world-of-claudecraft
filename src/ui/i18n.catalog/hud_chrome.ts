@@ -1992,6 +1992,11 @@ export const hudChromeStrings = {
   // (content/heroic_variants.ts), e.g. "Epic Armor [HEROIC]". The variant shares the
   // base item's name; this tag is the only heroic marker, shown in gold.
   itemHeroicTag: '[HEROIC]',
+  // The bare "Heroic" word as a STANDALONE accessible name (no brackets): the
+  // market Browse row's heroic star uses it for its aria-label, where the
+  // bracketed tag above is tooltip-line chrome, not a label a screen reader
+  // should read as "left-bracket HEROIC right-bracket".
+  itemHeroicLabel: 'Heroic',
   // Tooltip marker for a soulbound item (bound to its owner: cannot be traded, mailed,
   // listed, sold, or destroyed). Currency-like reward tokens (Heroic Marks) carry this.
   itemSoulbound: 'Soulbound',

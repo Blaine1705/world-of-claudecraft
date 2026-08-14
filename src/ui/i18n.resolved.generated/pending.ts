@@ -10,54 +10,69 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "entities.abilities.cheap_shot.descriptionNoStealth"
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.itemHeroicLabel"
   ],
   "es_ES": [
-    "entities.abilities.cheap_shot.descriptionNoStealth"
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.itemHeroicLabel"
   ],
   "fr_FR": [
-    "entities.abilities.cheap_shot.descriptionNoStealth"
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.itemHeroicLabel"
   ],
   "fr_CA": [
-    "entities.abilities.cheap_shot.descriptionNoStealth"
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.itemHeroicLabel"
   ],
   "en_CA": [],
   "it_IT": [
-    "entities.abilities.cheap_shot.descriptionNoStealth"
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.itemHeroicLabel"
   ],
   "de_DE": [
-    "entities.abilities.cheap_shot.descriptionNoStealth"
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.itemHeroicLabel"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "entities.abilities.cheap_shot.descriptionNoStealth"
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.itemHeroicLabel"
   ],
   "ru_RU": [],
   "cs_CZ": [
-    "entities.abilities.cheap_shot.descriptionNoStealth"
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.itemHeroicLabel"
   ],
   "nl_NL": [
-    "entities.abilities.cheap_shot.descriptionNoStealth"
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.itemHeroicLabel"
   ],
   "pl_PL": [
-    "entities.abilities.cheap_shot.descriptionNoStealth"
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.itemHeroicLabel"
   ],
   "id_ID": [
-    "entities.abilities.cheap_shot.descriptionNoStealth"
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.itemHeroicLabel"
   ],
   "tr_TR": [
-    "entities.abilities.cheap_shot.descriptionNoStealth"
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.itemHeroicLabel"
   ],
   "sv_SE": [
-    "entities.abilities.cheap_shot.descriptionNoStealth"
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.itemHeroicLabel"
   ],
   "vi_VN": [
-    "entities.abilities.cheap_shot.descriptionNoStealth"
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.itemHeroicLabel"
   ],
   "da_DK": [
-    "entities.abilities.cheap_shot.descriptionNoStealth"
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.itemHeroicLabel"
   ]
 };
