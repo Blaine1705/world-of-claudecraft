@@ -316,6 +316,33 @@ the accepted set (now 8 seals/11 + monolith 2; mob_portrait healed upstream),
 (phase-09-qa.md), fresh session, pull+merge first; the two open user
 decisions (low hold-or-accept, r181) still ride.
 
+Phase 9 QA done (2026-08-14, verdict PASS-WITH-FOLLOWUPS, 0 blocking; full
+record in progress.md). QA-start absorb f79feed36f of tip 54a729294d (PR
+3394 gate-select platform split only), parity 336/336 after. Workflow audit
+17 agents zero losses: 6 actionable findings, 6/6 double-confirmed, all
+fixed in six commits (b99ba01bf5 flattener widened to LS/PS + margin
+classes incl. tag characters, astral-safe clampText; 51a62198b0
+escapeNotificationMarkup entity-escape on linux + preload pre-caps 512/1024
++ pin hardening incl. notification.show() and the slice-terminator guard;
+7a1870fa07 spectator gate on the online notify site; 9a9beb8381 coverage
+arms + comment honesty; acad2656b0 ja_JP invitee fill; 094cd88a46 trailing
+lone-surrogate strip on the unclamped path + entity-smuggling pins). Both
+relitigations UPHOLD (away-gate ordering constant-true, now pinned at the
+fold; plain-anchor hop, setWindowOpenHandler deny + openExternal verified).
+Fresh qa-checklist READY 0 blocking; fresh privacy-security-review over the
+QA commits 0 blocking (its one LOW closed by 094cd88a46). Probes 23/23
+killed rc!=0 named. Smoke 7/7 incl. the new markup arm (real OS toast
+arrived entity-escaped, LS flattened). Gate red reconciles exactly to the
+accepted set (8 seals/11 + monolith 2) plus three contention flakes proven
+green standalone (parity/coverage_c druid_engines, chronomancy_balance_
+targets, item_art_audit_builder); an upstream-owned cosmetic "pathspec
+src/ui/i18n.resolved.sha256" git line at the vitest abort point is noted in
+progress.md. The notification caps are now genuinely both-sides: preload
+512/1024 transport caps, main 120/240 authority. main.ts 11458/11490 (32
+lines headroom for phase 10). Next: phase 10 (phase-10-discord-presence.md),
+fresh session, pull+merge first; the two open user decisions (low
+hold-or-accept, r181) still ride.
+
 ## Standing rules (user-locked, 2026-08-08, non-negotiable)
 
 1. ALL work happens in the worktree /home/fernandoramirez/Documents/woc-desktop-client-update
@@ -880,25 +907,34 @@ stack so comparisons hold, but absolute fps is iGPU-bound, and any recipe
 change that moves the browser onto the 5090 invalidates cross-era
 comparisons.
 
-Phase 9 inventory: IPC invoke channel desktop-show-notification (payload
-{kind, title, body}; kinds 'update-ready' | 'party-invite'; caps 120/240 via
-clampText; trust-gate return false; preload method showNotification, fresh
-const message rebuild + invoke .catch + sync try/catch). Pure module
+Phase 9 inventory (as amended by phase 9 QA): IPC invoke channel
+desktop-show-notification (payload {kind, title, body}; kinds
+'update-ready' | 'party-invite'; caps both-sided: preload transport slices
+512/1024, main authority 120/240 via clampText; trust-gate return false;
+preload method showNotification, fresh const message rebuild + invoke
+.catch + sync try/catch). On linux both strings are entity-escaped
+(escapeNotificationMarkup in diagnostics.cjs, ampersand first, AFTER the
+clamp) so markup-parsing daemons see only literal text. Pure module
 electron/notify_guard.cjs + .d.cts (createNotifyGuard({now, minIntervalMs}),
 NOTIFY_MIN_INTERVAL_MS = 10000, allow(kind) stamps only on true, TypeError
 boundary validation; suite tests/electron_notify_guard.test.ts). Renderer
 module src/game/desktop_notifications.ts (createDesktopNotifyCore,
 shouldNotifyDesktop, initDesktopNotifications composed LAST in
 desktop_shell_integration, desktopNotifyOnSimEvents armed-latch called from
-the two main.ts event sites; suite tests/desktop_notifications.test.ts).
-DesktopBridge gains optional showNotification(request:
-DesktopNotificationRequest) in src/runtime.ts. i18n keys:
-desktop.notify.updateReadyTitle/updateReadyBody/partyInviteTitle/
+the two main.ts event sites, the ONLINE site gated on net.spectating ===
+null: a spectating session's net.playerId is the watched player's pid;
+suite tests/desktop_notifications.test.ts). DesktopBridge gains optional
+showNotification(request: DesktopNotificationRequest) in src/runtime.ts.
+i18n keys: desktop.notify.updateReadyTitle/updateReadyBody/partyInviteTitle/
 partyInviteBody + desktop.update.whatsNew ('See what changed in your
 browser'), all five with the five M16 fills. GITHUB_RELEASES_URL exported
-from src/ui/news_feed.ts. flattenControlChars (diagnostics.cjs) now also
-strips bidi/zero-width formatters. DEFERRED by design: a notification
-preferences UI (no in-game toggle; OS-level muting is the only off switch).
+from src/ui/news_feed.ts. flattenControlChars (diagnostics.cjs) strips
+bidi/zero-width formatters, the U+2028/U+2029 line separators, soft hyphen,
+ALM, Mongolian vowel separator, word joiner and invisible operators,
+interlinear annotation, and the tag characters (/u flag); clampText never
+emits a trailing lone high surrogate from either exit. DEFERRED by design:
+a notification preferences UI (no in-game toggle; OS-level muting is the
+only off switch).
 
 ## Known gotchas for this packet
 

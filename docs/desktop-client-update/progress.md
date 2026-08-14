@@ -1961,3 +1961,128 @@ bc5a758186 setter deviation docs.
   screenshots for the eventual PR deferred to the pre-PR pass (the
   ready-card link needs a live shell update event; capture when the
   program goes public per the LOCAL-ONLY rule).
+
+## Phase 9 QA record (2026-08-14)
+
+Verdict: PASS-WITH-FOLLOWUPS, 0 blocking. Every confirmed finding fixed
+in-session; both relitigations UPHOLD; the security follow-up round found
+0 blocking and its one LOW was closed in-session.
+
+- QA-START MERGE: absorb f79feed36f of origin/release/v0.38.0
+  tip 54a729294d (3 commits: the PR 3394 gate-select merged-leg platform
+  split, scripts and their pin test only). Ancestry guard held
+  (e56010cec1 ancestor of 54a729294d), no conflicts, parity 336/336
+  green after, tsc green, tree clean.
+- WORKFLOW AUDIT: 17 agents, zero losses (4 default-agent lanes with
+  inlined charters per the phase 8 QA schema lesson; merge-dedup; 2
+  independent skeptics per actionable finding). 36 raw findings, 34
+  after dedup, 6 actionable, 6/6 double-CONFIRMED by both skeptics, 0
+  splits, 28 passive rows adjudicated orchestrator-side.
+- FIXES (six commits, each mutation-verified post-commit):
+  - b99ba01bf5 (TB1+TB3+TB4): flattenControlChars widened to the
+    U+2028/U+2029 line separators (its own single-line contract was not
+    met) plus the margin classes (soft hyphen, ALM, Mongolian vowel
+    separator, word joiner and invisible operators, interlinear
+    annotation, tag characters U+E0000-U+E007F via the new /u flag);
+    clampText stopped splitting surrogate pairs at the cap boundary.
+    Executed arms per class.
+  - 51a62198b0 (TB2+TB7+TQ-3+TQ-4+TB6): escapeNotificationMarkup
+    entity-escapes ampersand-first on linux only (freedesktop daemons
+    may parse body markup; other platforms treat text as plain), the
+    preload pre-caps title/body at 512/1024 making the both-sides-capped
+    claim true, the handler slice guards its terminator (an unfound
+    close would silently pin the whole file), notification.show() and
+    click-before-show order pinned, main's payload-object refusal
+    pinned, preload pins scoped to the method's own slice.
+  - 7a1870fa07 (bc2, the one behavior defect): a spectating session's
+    net.playerId is the watched player's pid, so an away spectator got a
+    'you were invited' OS toast for the fighter's invite; the online
+    call site now carries the neighboring net.spectating === null gate,
+    pinned in the gated form. The hud's own in-window prompt behaves the
+    same and predates the branch; only the OS escalation was phase 9's.
+  - 9a9beb8381 (bc5+TQ-2+TQ-6+bc3+bc6+TQ-8+TQ-9): older-shell split arm
+    (invites live without onUpdateEvent), versionless-ready fires
+    exactly once (pins the null initial), already-ready newer version
+    quiet at core AND composed fold (pins the terminality premise the
+    away-gate adjudication rests on), guard junk-kind no-cross-effect
+    arm, backwards-clock fail-safe pin; comment honesty: every real
+    partyInvite emission stamps a pid (src/sim/social/party.ts, so the
+    no-pid arm is shape robustness, NOT the offline case), and the
+    compose-last position in shell integration is defensive.
+  - acad2656b0 (L4): ja_JP partyInviteBody names the invitee
+    (あなたを), resolved bundle regenerated via i18n:gen.
+  - 094cd88a46 (security LOW): the preload cut can split an astral pair
+    and the flattener can collapse a run so the string lands UNDER the
+    clamp cap with the lone high surrogate intact (review probe: 450
+    zero-widths collapse to one space); both clampText exits now strip
+    a trailing lone high surrogate; entity-smuggling forms pinned
+    (&lt; and &#60; both arrive dead); escape-after-clamp rationale
+    recorded in the handler comment.
+- RELITIGATIONS, both UPHOLD: (1) away-gate-before-core ordering is
+  CONSTANT-TRUE ('downloaded' always folds to ready, mode ready blocks
+  every other event, the dismiss/expire paths are card-local and never
+  enter the notify subscription's fold, the stamp dies with the
+  composition); now also PINNED at the fold level by the
+  second-downloaded-while-ready arm. (2) The plain-anchor whats-new hop
+  survives: setWindowOpenHandler returns action deny unconditionally and
+  routes http(s) through shell.openExternal, so the target=_blank anchor
+  can never mint a BrowserWindow; the news-surface precedent and the
+  Restart-is-more-disruptive rationale both stand.
+- REVIEWS: qa-checklist (fresh, over the final diff) READY, 0 blocking,
+  0 should-fix, 4 observations dispositioned: escape-after-clamp
+  expansion recorded in the handler comment; title escape kept as
+  defense-in-depth (freedesktop summary is plain text; both titles
+  carry no markup chars in any locale); the name-charset premise
+  verified first-hand (server/auth.ts:155 pins names to
+  /^[A-Za-z][A-Za-z' -]{1,15}$/, no markup characters possible); the
+  RTL note ledgered below. privacy-security-review (fresh, direct
+  Agent-tool dispatch, over the six QA commits) 0 blocking: probed /u
+  lone-surrogate safety (no throw, byte-identical pass-through), zero
+  legitimate uses of the twelve newly stripped code points across every
+  catalog and overlay, entity-smuggling neutralization, and the
+  spectator gate's exactness (spectating: string | null with definite
+  initializer, exactly two call sites, update trigger correctly
+  unaffected).
+- PROBES: 23/23 killed rc!=0 with named failing tests (13 matrix rows
+  from the audit incl. M8 drop-show which the new pin converts from
+  designed survivor to kill, 8 fix-arm rows P1-P8, 2 F-rows both
+  directions on the trailing-surrogate strip). Driver: anchored
+  count==1 replaces, landing grep, git-checkout restores against a
+  committed-clean tree, orchestrator-run.
+- SMOKE: 7/7 arms on the real shell (instrumented wrapper re-run,
+  isolated userData, --ozone-platform=x11): the six phase 9 arms
+  reproduced (untrusted refused, update shown, rate-limited, dirty
+  strings flattened + clamped, focused drop, unknown kind refused) plus
+  the new arm 7 after a 10.5s pace wait: markup + LS body arrived on a
+  REAL OS notification entity-escaped with the LS flattened
+  (&lt;b&gt;Grask&lt;/b&gt; &amp; ...), showCount exactly 3. The PRIME
+  child wrote arm 7 ~15s after the parent exited; poll the file.
+- GATE (full fallback, BROWSER_PATH exported): red reconciles EXACTLY
+  to the accepted set (8 lockfile-seal suites / 11 tests + monolith 2:
+  renderer.ts 13785/13700 and hud.ts 19510/19490, the open maintainer
+  decision) plus THREE contention flakes each proven green standalone
+  on the same tree (tests/parity/coverage_c.test.ts druid_engines,
+  tests/chronomancy_balance_targets.test.ts fixed-seed sustain at 120s,
+  tests/item_art_audit_builder.test.ts fresh-checkout rebuild), which
+  also rules out a semantic collision (a collision is deterministic).
+  38644 passed. One cosmetic gate-plumbing line noted: an
+  "error: pathspec 'src/ui/i18n.resolved.sha256'" git message at the
+  vitest abort point, upstream-owned (arrived with the PR 3394
+  platform-split leg), no effect on the verdict; mention to the
+  maintainer if it persists.
+- NEW LEDGER (phase 11 / future): RTL-locale caveat: the widened
+  flattener strips ALM and would strip legitimate bidi controls if an
+  RTL locale ever lands (revisit with the RTL plan); Windows toast
+  escaping rests on Electron building toast XML via DOM insertion (an
+  external fact; a Windows shell smoke with markup in the body would
+  settle it); release-tier pending fills for the five notify keys owed
+  at the maintainer's release fill (L3); TB9 stamp-without-show if the
+  Notification constructor throws after allow() stamped (theoretical);
+  TB10 renderer once-per-version latch stamps before the fire-and-forget
+  send, so a main-side refusal (focus race, rate collision) permanently
+  suppresses that version's toast (functional miss only, the card still
+  informs); bc8 discarded unsubscribe hooks make the composition
+  non-re-entrant (unreachable today); TB5 zalgo combining-mark stacking
+  accepted under the hostile-page model (stripping would corrupt
+  legitimate combining sequences); bc4 second-version-while-ready never
+  re-notifies, now pinned as deliberate.
