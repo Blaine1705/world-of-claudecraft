@@ -100,6 +100,21 @@ describe('prewarm resume ledger', () => {
     expect(literal).toContain('return resumeLedger.stats();');
     // The failure mode spelled out, so a rename cannot quietly satisfy it.
     expect(literal).not.toMatch(/\bresume:\s*resumeLedger/);
+
+    // Building it live is only half: the object then travels to
+    // lastPrewarmStats and out through perfStats(), and a spread at either hop
+    // would evaluate the getter once and freeze it, which is the same silent
+    // `scheduled` row by another route.
+    expect(renderer).toContain('this.lastPrewarmStats = stats;');
+    expect(renderer).not.toMatch(/this\.lastPrewarmStats\s*=\s*\{\s*\.\.\./);
+    expect(renderer).toContain('prewarm: this.lastPrewarmStats,');
+    expect(renderer).not.toMatch(/prewarm:\s*\{\s*\.\.\.\s*this\.lastPrewarmStats/);
+    expect(renderer).not.toMatch(/structuredClone\(\s*this\.lastPrewarmStats/);
+    // Copying the stats INTO a fresh object is the dangerous shape. Mutating a
+    // sub-object in place is not, and markGpuHitchReveal legitimately does that
+    // to prewarmPacing, so the pin has to tell the two apart.
+    expect(renderer).not.toMatch(/Object\.assign\(\s*\{[^)]*this\.lastPrewarmStats/);
+    expect(renderer).toContain('Object.assign(\n        this.lastPrewarmStats.prewarmPacing,');
   });
 
   it('reads LIVE through a getter, so a spread cannot freeze it at scheduled', () => {

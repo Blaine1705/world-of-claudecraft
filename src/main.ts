@@ -4940,9 +4940,10 @@ async function startGame(
           // One-time machine-local performance nudge (packet 0 rulings R14-R16):
           // the assembler polls the same PerfMonitor the reporter reads.
           initPerfNudge({ perf, desktopShell: DESKTOP_APP });
-          // Post-entry preview prewarm (paperdoll, armory catalog, portrait
-          // caches): one bounded unit per idle slot on the renderer's
-          // background GPU queue, paused while the owning window is open. The
+          // Post-entry preview prewarm (paperdoll and portrait caches; the
+          // armory catalog is NOT warmed, it builds per inspected card): one
+          // bounded unit per idle slot on the renderer's background GPU queue,
+          // paused while the owning window is open. The
           // 4 GB-class tight profile still skips the secondary contexts
           // entirely and keeps their documented lazy first-open path.
           if (!GFX.tightMemory) hud.startPostEntryPreviewPrewarm();

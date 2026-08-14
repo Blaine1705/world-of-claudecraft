@@ -61,13 +61,25 @@ describe('Armory preview lifecycle', () => {
     expect(callers).toBe(1);
     expect(store).toContain('this.ensureArmoryInspect().open(row)');
 
-    // openStore never reaches it: it flips the tab and renders the list.
-    const openStoreStart = store.indexOf('openStore(): void {');
-    expect(openStoreStart).toBeGreaterThan(-1);
-    const openStore = store.slice(openStoreStart, store.indexOf('\n  }', openStoreStart));
-    expect(openStore.toLowerCase()).not.toContain('ensurearmory');
-    expect(openStore.toLowerCase()).not.toContain('warm');
+    // openStore never reaches it, DIRECTLY or through what it calls. Checking
+    // openStore's own body alone would miss a preparation hidden one hop away,
+    // so every method it reaches is checked too.
+    const bodyOf = (name: string): string => {
+      const at = store.indexOf(name);
+      expect(at, `${name} not found`).toBeGreaterThan(-1);
+      return store.slice(at, store.indexOf('\n  }', at));
+    };
+    const openStore = bodyOf('openStore(): void {');
     expect(openStore).toContain("this.tab = 'store'");
+    for (const hop of [
+      openStore,
+      bodyOf('toggle(): void {'),
+      bodyOf('private async renderCurrent('),
+      bodyOf('private async renderStore('),
+    ]) {
+      expect(hop.toLowerCase()).not.toContain('ensurearmory');
+      expect(hop.toLowerCase()).not.toContain('warm');
+    }
 
     // And the hud's store entry point adds nothing of its own.
     const hudOpenStart = hud.indexOf('openWocStore(): void {');

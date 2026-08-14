@@ -282,8 +282,8 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
     // the shell itself is unbuilt there (its own cover is already down, so
     // building it would hitch a live frame), and the per-skin/per-pose units
     // no-op against a null this.charPreview anyway. Portrait units stay (they
-    // are canvas-2D, no dependence on the shell); armory units stay too (its
-    // own prewarm path lazily rebuilds its stage).
+    // are canvas-2D, no dependence on the shell). There are no armory units in
+    // any plan: that catalog builds per inspected card.
     const calls: string[] = [];
     const units = buildPostEntryPreviewPrewarmUnits<string>({
       playerClass: 'hunter',
