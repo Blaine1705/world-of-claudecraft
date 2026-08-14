@@ -13,7 +13,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 985,
+      "nextId": 982,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -27,9 +27,9 @@
     {
       "tick": 3,
       "time": 0.15,
-      "nextId": 988,
-      "state": "ca3f1d83",
-      "events": "6b59dd9c",
+      "nextId": 985,
+      "state": "a16cc256",
+      "events": "cdffa468",
       "rng": {
         "draws": 2,
         "digest": "6f587c5e"
@@ -73,7 +73,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 985,
+          "entityId": 982,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -140,7 +140,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 986,
+          "entityId": 983,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -196,7 +196,7 @@
               "name": "Battle Stance",
               "remaining": 3599.85,
               "school": "physical",
-              "sourceId": 985
+              "sourceId": 982
             }
           ],
           "blockChance": 0.05,
@@ -209,7 +209,7 @@
           "fallStartY": 0.963955,
           "fiveSecondRule": 99.15,
           "hp": 100,
-          "id": 985,
+          "id": 982,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -259,7 +259,7 @@
           "fallStartY": 0.789491,
           "fiveSecondRule": 99.15,
           "hp": 54,
-          "id": 986,
+          "id": 983,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -311,7 +311,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 54,
-          "id": 987,
+          "id": 984,
           "kind": "mob",
           "level": 2,
           "lootFfaTimer": "Infinity",
@@ -336,7 +336,7 @@
           "stats": {
             "armor": 10
           },
-          "tappedById": 985,
+          "tappedById": 982,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,
