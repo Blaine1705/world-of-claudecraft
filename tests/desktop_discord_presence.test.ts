@@ -135,6 +135,35 @@ describe('createDiscordPresenceCore: the coalescer', () => {
     });
   });
 
+  it('holds a zone change at the DEFAULT interval boundary (15s, pinned from below)', () => {
+    // Every other hold arm passes an explicit intervalMs, so without this one
+    // the 15_000 default is unpinned from below: shrinking it would move the
+    // trailing-edge decision from this core to the shell's own send floor with
+    // every test green.
+    const core = createDiscordPresenceCore();
+    core.update(0, snapshot());
+    expect(core.update(14_999, snapshot({ zoneId: 'zone_b', zoneName: 'Zone B' }))).toBeNull();
+    expect(core.update(15_000, snapshot({ zoneId: 'zone_b', zoneName: 'Zone B' }))).toMatchObject({
+      kind: 'set',
+    });
+  });
+
+  it('holds a re-enable inside the window: the limiter survives the toggle (deliberate)', () => {
+    // PINNED AS DELIBERATE (phase 10 QA ruling): lastEmitAt survives the
+    // disable transition, so a fast off/on leaves the presence blank until the
+    // window from the LAST emit opens. That trails Discord's real 15s limit
+    // (an earlier resend would be silently dropped there anyway) and matches
+    // the shell-side doctrine that timing state survives lifecycle events. A
+    // future decision to resend immediately on re-enable must rewrite this
+    // arm, not just the disable arm.
+    const core = createDiscordPresenceCore();
+    core.update(0, snapshot());
+    expect(core.update(2_000, snapshot({ enabled: false }))).toEqual({ kind: 'clear' });
+    expect(core.update(5_000, snapshot())).toBeNull();
+    expect(core.update(14_999, snapshot())).toBeNull();
+    expect(core.update(15_000, snapshot())).toMatchObject({ kind: 'set' });
+  });
+
   it('clears once when the world goes away after a publish, then stays quiet', () => {
     // Without this arm a logged-out session would keep the last zone (and a
     // ticking session clock) on the profile for as long as the app ran.

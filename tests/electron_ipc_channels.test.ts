@@ -8,6 +8,15 @@ import { describe, expect, it } from 'vitest';
 const repoRoot = join(__dirname, '..');
 const read = (rel: string) => readFileSync(join(repoRoot, rel), 'utf8');
 
+// LINE comments first, then block comments (a bare /* inside a line comment
+// would otherwise swallow every real line to the next */), with the [^:] guard
+// keeping `://` scheme literals intact. Applied where a body is PINNED (the
+// discord handler slices below): main.cjs cannot run under vitest, so textual
+// robustness IS the coverage there, and a raw substring pin is satisfied by a
+// commented-out line: exactly the silent-dead-feature shape it must catch.
+const stripComments = (source: string): string =>
+  source.replace(/(^|[^:])\/\/[^\n]*/gm, '$1').replace(/\/\*[\s\S]*?\*\//g, '');
+
 const preload = read('electron/preload.cjs');
 const mainSide = read('electron/main.cjs') + read('electron/updater.cjs');
 
@@ -351,8 +360,10 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     // cannot see a field added to the object that actually leaves. What is
     // pinned here is the wiring around it: the sender gate, the clear arm, and
     // that the ONLY thing handed to the presence module is the sanitized
-    // object, refused by value when the whitelist says no.
-    const main = read('electron/main.cjs');
+    // object, refused by value when the whitelist says no. Comments are
+    // stripped first: a line-commented setActivity(clean) satisfied every
+    // raw pin below while shipping a sanitize-then-drop dead feature.
+    const main = stripComments(read('electron/main.cjs'));
     const start = main.indexOf("ipcMain.handle('desktop-set-discord-activity'");
     expect(start).toBeGreaterThan(-1);
     const end = main.indexOf('\n});', start);
@@ -394,7 +405,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
   });
 
   it('the discord-presence setter takes a strict boolean, persists, then applies live', () => {
-    const main = read('electron/main.cjs');
+    const main = stripComments(read('electron/main.cjs'));
     const start = main.indexOf("ipcMain.handle('desktop-set-discord-presence-enabled'");
     expect(start).toBeGreaterThan(-1);
     const end = main.indexOf('\n});', start);
@@ -442,7 +453,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     // Boot purity rides on the factory: it is built at module scope precisely
     // because construction does no IO, and a second connector anywhere in the
     // shell would be a socket opened outside that contract.
-    const main = read('electron/main.cjs');
+    const main = stripComments(read('electron/main.cjs'));
     expect(main).toContain("require('./discord_presence.cjs')");
     expect(main.split('const discordPresence = createDiscordPresence({')).toHaveLength(2);
     const bindingAt = main.indexOf('const discordPresence = createDiscordPresence({');
@@ -466,8 +477,16 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     // snowflake would have every fork reporting as the maintainer's app.
     expect(binding).toContain('clientId: resolveDiscordClientId(process.env),');
     expect(binding).toContain('initiallyEnabled: desktopPrefs.discordPresenceEnabled,');
-    // And it is released on the way out, like the display-sleep lease.
-    expect(main).toContain('discordPresence.dispose();');
+    // And it is released on the way out, like the display-sleep lease: pinned
+    // INSIDE the will-quit slice, because an anywhere-in-file pin stays green
+    // when dispose() is parked in a function nothing calls.
+    const quitStart = main.indexOf("app.on('will-quit'");
+    expect(quitStart).toBeGreaterThan(-1);
+    const quitEnd = main.indexOf('\n});', quitStart);
+    expect(quitEnd).toBeGreaterThan(quitStart);
+    const quit = main.slice(quitStart, quitEnd);
+    expect(quit).toContain('powerSave.shutdown();');
+    expect(quit).toContain('discordPresence.dispose();');
   });
 
   it('the preload rebuilds the presence payload and refuses junk toggles', () => {

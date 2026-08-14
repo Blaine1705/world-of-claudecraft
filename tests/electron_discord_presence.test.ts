@@ -36,8 +36,14 @@ interface ArmedTimer {
 interface FakeSocket {
   path: string;
   writes: Buffer[];
+  /** Operation order ('write' | 'end' | 'destroy'), so ORDER contracts (the
+   *  disable clear must be written BEFORE end()) are assertable, not just
+   *  counts a reordering would satisfy. */
+  ops: string[];
   ended: number;
   destroyed: number;
+  /** When set, write() throws like a real pipe closed under the writer. */
+  writeThrows: boolean;
   on: (event: string, listener: (...args: never[]) => void) => unknown;
   write: (data: unknown) => unknown;
   end: () => unknown;
@@ -50,8 +56,10 @@ function createFakeSocket(path: string): FakeSocket {
   const socket: FakeSocket = {
     path,
     writes: [],
+    ops: [],
     ended: 0,
     destroyed: 0,
+    writeThrows: false,
     on: (event, listener) => {
       const list = listeners.get(event) ?? [];
       list.push(listener as unknown as (arg?: unknown) => void);
@@ -59,14 +67,18 @@ function createFakeSocket(path: string): FakeSocket {
       return socket;
     },
     write: (data) => {
+      socket.ops.push('write');
+      if (socket.writeThrows) throw new Error('EPIPE');
       socket.writes.push(data as Buffer);
       return true;
     },
     end: () => {
+      socket.ops.push('end');
       socket.ended += 1;
       return socket;
     },
     destroy: () => {
+      socket.ops.push('destroy');
       socket.destroyed += 1;
       return socket;
     },
@@ -463,6 +475,10 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     expect(DISCORD_MIN_SEND_INTERVAL_MS).toBe(15000);
     expect(DISCORD_BASE_BACKOFF_MS).toBe(2000);
     expect(DISCORD_MAX_BACKOFF_MS).toBe(60000);
+    // The peer-text log bound rides this literal: the two bounded-log arms
+    // compare against the imported constant, so without this pin a raised
+    // constant would vacuously green the whole hostile-peer guarantee.
+    expect(DISCORD_LOG_TEXT_MAX).toBe(200);
   });
 
   it('does no IO at construction', () => {
@@ -934,6 +950,10 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     });
     expect(socket.ended).toBe(1);
     expect(socket.destroyed).toBe(1);
+    // ORDER is the contract, not just the counts: end() moved above the clear
+    // write would lose the clear on a real net.Socket (write-after-end lands
+    // as an async error the teardown never sees) while both counts stayed 1.
+    expect(socket.ops.slice(-3)).toEqual(['write', 'end', 'destroy']);
     expect(rig.presence.stateForTest().state).toBe('off');
     expect(rig.presence.stateForTest().desiredActivity).toBeNull();
     // Re-enabling arms nothing by itself; the next activity is what dials.
@@ -941,6 +961,41 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     expect(rig.sockets).toHaveLength(1);
     rig.presence.setActivity({ details: 'Vale of Kings' });
     expect(rig.sockets).toHaveLength(2);
+  });
+
+  it('treats a throwing write as a lost socket: destroy, back off, redial', () => {
+    const rig = createRig();
+    const socket = rig.bringUp({ details: 'Eastbrook' });
+    rig.feed(socket, OPCODES.FRAME, { cmd: 'SET_ACTIVITY', evt: null, data: null, nonce: 'woc-1' });
+    rig.state.now += DISCORD_MIN_SEND_INTERVAL_MS;
+    // The pipe closes under the writer: the synchronous throw is the same
+    // event as a close, and the desired value must survive to the redial.
+    socket.writeThrows = true;
+    rig.presence.setActivity({ details: 'Vale of Kings' });
+    expect(socket.destroyed).toBe(1);
+    expect(rig.presence.stateForTest().state).toBe('backoff');
+    expect(rig.timers).toHaveLength(1);
+    rig.fireTimer(0);
+    const second = rig.live();
+    expect(second).not.toBe(socket);
+    rig.ready(second);
+    const sent = rig.payloadsOf(second)[1];
+    expect(sent.args).toEqual({ pid: 4321, activity: { details: 'Vale of Kings' } });
+  });
+
+  it('lands in off with no live timers when the disable clear itself throws', () => {
+    const rig = createRig();
+    const socket = rig.bringUp({ details: 'Eastbrook' });
+    socket.writeThrows = true;
+    rig.presence.setEnabled(false);
+    // The throwing clear write scheduled a retry on its way down (write treats
+    // a throw as a lost socket); the off switch must still cancel every timer
+    // and land terminal-quiet, with the socket released exactly once.
+    expect(rig.presence.stateForTest().state).toBe('off');
+    expect(socket.destroyed).toBe(1);
+    const liveTimers = rig.timers.filter((timer) => !rig.cleared.includes(timer.handle));
+    expect(liveTimers).toEqual([]);
+    expect(rig.presence.stateForTest().desiredActivity).toBeNull();
   });
 
   it('cancels a pending reconnect when the player turns it off', () => {
