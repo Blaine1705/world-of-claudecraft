@@ -155,8 +155,12 @@ interface AttributionTargetFixture {
 // both parents move renderer.ts (the release's point-light seam, this branch's
 // moon-phase grade threading), so the merged tree mints a value matching
 // neither parent. No capture was retaken.
+// Re-minted for the quest-collectable spawn gate: this branch's renderer.ts
+// edits (the view gate call sites and the ground-object pool key move) shift
+// the runtimeRender.renderer leaf, the only leaf that moved. No Eastbrook
+// input, geometry value, or capture moved.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '3c28607bde322259909cfb57b86aa3e4e09e0b0cb9f2c195f8cc86901df4dbad';
+  'c1af0584c6e621195f18d05c9fe12925ee70cc4640157e42e67349abe475af45';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

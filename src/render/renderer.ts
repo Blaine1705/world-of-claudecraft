@@ -1337,7 +1337,6 @@ export class Renderer {
   camera: THREE.PerspectiveCamera;
   webgl: THREE.WebGLRenderer;
   views = new Map<number, EntityView>();
-  // Editor opt-out for the quest-collectable view gate (see RendererCreateOptions).
   private questObjectHidden = makeQuestObjectGate({});
   private viewCreateRetry = new ViewCreateRetryGate(VIEW_CREATE_FAIL_RETRY_MS);
   // view groups that own a budgeted point light: exempt from the hidden-view
@@ -4770,8 +4769,7 @@ export class Renderer {
     let count = 0;
     const questLog = this.sim.questLog;
     for (const e of this.sim.entities.values()) {
-      if (this.views.has(e.id)) continue;
-      if (this.questObjectHidden(e, questLog)) continue; // quest_object_gate_core
+      if (this.views.has(e.id) || this.questObjectHidden(e, questLog)) continue;
       const required = e.id === center.id || e.id === center.targetId;
       if (required && !includeRequired) continue;
       const d2 = distSqXZ(e, center);
