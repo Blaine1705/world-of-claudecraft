@@ -122,8 +122,11 @@ describe('the Cheater mark over the wire', () => {
     apply({ t: 'snap', ents: [wireEntity(e)] });
     expect(client.entities.get(e.id)?.cheaterMark).toBe(true);
 
+    // A lift leaves the flag ABSENT, never false (the sim core's
+    // absent-when-empty rule), so the identity record ships with no chm key
+    // and the mirror's clear-on-absent arm is what un-brands the client copy.
     sim.setCheaterMark(0);
-    expect(e.cheaterMark).toBe(false);
+    expect(e.cheaterMark).toBeUndefined();
     apply({ t: 'snap', ents: [wireEntity(e)] });
     expect(client.entities.get(e.id)?.cheaterMark).toBe(false);
   });
