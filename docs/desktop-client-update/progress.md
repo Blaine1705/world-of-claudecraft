@@ -19,9 +19,9 @@
 | interim | Base reconcile onto release/v0.38.0 + plan refresh | done | 2026-08-13 | 2026-08-13 |
 | 7 | Desktop prefs store and window memory | done | 2026-08-13 | 2026-08-13 |
 | 7 QA | Verify phase 7 | done | 2026-08-13 | 2026-08-13 |
-| 8 | Display modes and power | not started | | |
-| 8 QA | Verify phase 8 | not started | | |
-| 9 | Notifications and what's new | not started | | |
+| 8 | Display modes and power | done | 2026-08-14 | 2026-08-14 |
+| 8 QA | Verify phase 8 | done | 2026-08-14 | 2026-08-14 |
+| 9 | Notifications and what's new | done | 2026-08-14 | 2026-08-14 |
 | 9 QA | Verify phase 9 | not started | | |
 | 10 | Discord Rich Presence | not started | | |
 | 10 QA | Verify phase 10 | not started | | |
@@ -73,13 +73,13 @@ setting wired through the store (options doctrine row + bridge). Ticked at QA
 in-session, one behavior fix among them: maximized restores now maximize at the
 reveal; see the Phase 7 QA record).
 
-Phase 8: [ ] display-mode option (borderless fullscreen / windowed) via the options
+Phase 8: [x] display-mode option (borderless fullscreen / windowed) via the options
 doctrine, desktop-only visibility, reconciled with the existing fullscreen setting;
-[ ] gamepad-active powerSaveBlocker with debounce and tests.
+[x] gamepad-active powerSaveBlocker with debounce and tests.
 
-Phase 9: [ ] OS notifications for update-ready and party-invite-while-unfocused
-(renderer-rendered strings, validated + rate-limited channel, focus-gated); [ ] what's
-new t()-keyed link on the ready toast; [ ] string contract pins.
+Phase 9: [x] OS notifications for update-ready and party-invite-while-unfocused
+(renderer-rendered strings, validated + rate-limited channel, focus-gated); [x] what's
+new t()-keyed link on the ready toast; [x] string contract pins.
 
 Phase 10: [ ] empirical SET_ACTIVITY gate probe recorded; [ ] pure frame codec module +
 socket manager (main), never blocks boot, backoff on absence; [ ] renderer activity
@@ -1816,3 +1816,148 @@ bc5a758186 setter deviation docs.
 - Neither macOS stopping rule tripped: no new Space-semantics evidence
   surfaced (the mac soak stays unverifiable on this box; simpleFullscreen
   remains the documented alternative if a mac soak objects).
+
+## Phase 9: OS notifications + what's-new link (2026-08-14)
+
+- STATUS: done. Commits 84fe7cae86 (feat(desktop): validated rate-limited
+  os notification channel), dd235dfdeb (feat(game): notify unfocused
+  players of ready updates and party invites), 175a414a7f (feat(ui):
+  what's-new link on the update-ready toast), plus this docs commit.
+  Tree committed-clean, LOCAL-ONLY intact.
+- BASE MERGE 105306e494 took origin/release/v0.38.0 tip e56010cec1 (108
+  commits; ancestry guard held over the previous tip 51aa4eab13; the
+  remote moved between ls-remote and fetch, re-fetch settled it). Seven
+  conflicts: src/game/desktop_download.ts (ours: the __APP_VERSION__
+  derive supersedes upstream's 0.38.0 hardcode bump), .github/workflows/
+  ci.yml + the tests/ci_workflow.test.ts SPARSE_CONE literal (upstream
+  pruned nine unreferenced docs/screenshots cone rows; our still-
+  referenced desktop-client-update-phase5-low row kept in all five
+  blocks and the pinned literal), pnpm-lock.yaml (ours: the entire
+  upstream delta was the r165 patch-hash re-mint), patches/
+  three@0.185.1.patch + tests/three_compile_async_patch.test.ts
+  (upstream added a per-pass notReadyThisPass program-dedupe to the r165
+  compileAsync patch: one COMPLETION_STATUS_KHR verdict per DISTINCT
+  pending program per pass; ported onto the r185 patch via the pnpm
+  patch flow with count==1 anchored replaces, all upstream needles land
+  exactly once in the patched module, both three.cjs count controls hold
+  at 1, and the pin test gained the re-worded third dedupe test with the
+  guard+delete pair needle), and the generated pending.ts (i18n:gen
+  regen). After the merge: parity 336/336 (the suite grew one member
+  upstream), tsc green, patch + ci_workflow suites green.
+- PHASE-START DECISION (user, via AskUserQuestion, 2026-08-14): the
+  what's-new link opens the GITHUB RELEASES page, option (a), most
+  consistent with the existing GitHub-releases News & Updates pipeline.
+- CHANNEL (electron): desktop-show-notification invoke handler in
+  main.cjs: trustedSender first line returning false by value; kind
+  whitelist ('update-ready' | 'party-invite'); typeof checks on title/
+  body; clampText caps 120/240 (flattens control chars, three-dot
+  suffix on clamp); empty-after-flatten refusal; live-window +
+  !isFocused() gate (the trusted-side mirror of the renderer gate);
+  Notification.isSupported(); notifyGuard.allow(kind) LAST before show
+  so only a real show stamps; click routes to focusMainWindow only.
+  Preload showNotification mirrors the validation, rebuilds a fresh
+  {kind, title, body} literal (hoisted to a const so the invoke stays
+  single-line for the channel-scan regex), swallows the rejection and
+  guards sync throws. electron/notify_guard.cjs + .d.cts: pure per-kind
+  rate limit in the power_save pattern (injected clock, >= boundary,
+  NOTIFY_MIN_INTERVAL_MS 10000, a refused call never moves the stamp,
+  TypeError boundary validation). Review hardening: flattenControlChars
+  (diagnostics.cjs) now also strips bidi embeds/overrides/isolates,
+  zero-widths, and U+FEFF, with an executed clampText test arm; the
+  biome-ignore suppression sits directly above the regex literal (biome
+  wrapped the call and the comment stopped reaching the line: gate-
+  caught twice, format the .cjs THEN check the suppression line).
+- RENDERER: src/game/desktop_notifications.ts, pure decision core +
+  thin init on the desktop_gpu_status module-scope-latch pattern. Core:
+  partyInvite takes a real SimEvent and narrows inside (the hud pid
+  gate mirrored exactly: pid !== undefined && pid !== localPid skips),
+  updateReady fires on transition-into-ready once per version.
+  shouldNotifyDesktop(env) = hidden || !focused; hidden comes from the
+  desktop presentation latch (document.hidden never flips in the shell,
+  backgroundThrottling:false), focus from document.hasFocus(), both
+  sampled at fire time. Init feature-checks the lone action method
+  singly, folds its own UpdateToastState via the existing
+  reduceUpdateToast, and arms desktopNotifyOnSimEvents(events,
+  localPid), a no-op-until-armed module function called from the two
+  main.ts event sites (offlineSim.playerId offline, net.playerId
+  online; each argument form pinned exactly once). main.ts delta 3
+  lines (11456 vs ceiling 11490, 34 lines headroom left for phase 10).
+  i18n: desktop.notify.{updateReadyTitle,updateReadyBody,
+  partyInviteTitle,partyInviteBody} + desktop.update.whatsNew, English
+  + all five M16 non-Latin fills, one i18n:gen pass; nothing touched
+  DEFAULT_SHELL_STRINGS (per-call strings are not the crash set).
+- WHAT'S-NEW: a plain external anchor on the ready card
+  (#desktop-update-whats-new, GITHUB_RELEASES_URL, target _blank, rel
+  noopener noreferrer), render-only off mode==='ready'; the reducer
+  gained nothing and the update_events whitelist was NOT extended.
+  Adjudicated deviation (recorded in-code): NOT the wiki confirm-first
+  hop; the card's own Restart action is a strictly more disruptive
+  unconfirmed click, and the label 'See what changed in your browser'
+  names the hop (the seam review killed the original 'no Hud to confirm
+  through' rationale: the #prompt-stack modal seam exists pre-game).
+  GITHUB_RELEASES_URL moved to src/ui/news_feed.ts (its natural home);
+  charselect_news imports it. The link joined the desktop-update
+  family's coarse-pointer touch floor (min-height 40px arm).
+- REVIEWS (both direct Agent-tool dispatch, fresh agents, per the
+  phase 8 QA workflow-schema lesson): privacy-security-review 0
+  blocking, 2 should-fix (flattener bidi gap FIXED with test; the
+  normalizeNotification pure-module extraction LEDGERED as precedent-
+  consistent), 3 nits (2 comment fixes landed, click-listener retention
+  ledgered as rate-limit-bounded). frontend-seam-reviewer 0 blocking,
+  5 should-fix (touch floor FIXED; anchor rationale + lost safety copy
+  FIXED via comment rewrite + label rename incl. 5 locale fills; core
+  type-decoupling FIXED, SimEvent narrowed, test casts removed with
+  real union-member fixtures incl. readyCheckStart/guildInvite; main.ts
+  wiring pin FIXED to per-argument-form pins; the away-gate ordering
+  pin ADJUDICATED DOWN as constant-true: 'ready' is terminal in the
+  fold and the stamp dies with the composition, so the ordering is
+  unobservable in any reachable scenario, comment now says so), 5 notes
+  (constant relocation landed; purity-registry, aria-live announcement,
+  and perf-window placement ledgered).
+- SMOKE (instrumented shell, phase 8 wrapper style: isolated userData,
+  --ozone-platform=x11, ipcMain.handle capture + controllable
+  BrowserWindow.prototype.isFocused + call-through Notification.show
+  patched BEFORE require(main.cjs)): 6/6 arms in one run on this
+  GNOME/Wayland box (Notification.isSupported() true): untrusted frame
+  refused; update-ready unfocused SHOWN (real OS notification); same-
+  kind repeat inside 10s dropped; party-invite (distinct kind) SHOWN
+  with U+0007/U+0000 flattened to one space and a 300-char body clamped
+  at 240+'...'; focused drop; unknown kind refused. Exactly 2 OS
+  notifications total. macOS behavior stays contract-level (isSupported
+  gate + documented API); no signing was needed for local verification,
+  neither stopping rule tripped.
+- GATE (committed-clean tree, three commits + bisectability of both
+  intermediate trees proven in a throwaway worktree): gate_select
+  resolved mode=full (lockfile in the diff base range); pre-vitest legs
+  green (i18n freshness, manifests, malware scan, biome-changed
+  rc=0); full fallback red on 9 files / 13 tests = the accepted set
+  MINUS ONE: the 8 lockfile-seal suites (11 tests) + monolith_budget
+  (2: renderer.ts 13785 vs 13700, hud.ts 19510 vs 19490, both
+  inherited), 38507 passed. tests/mob_portrait_source_manifest.test.ts
+  is GREEN on the merged tree (upstream's portrait revert train,
+  d0a061ff6c restoring PR 3307 behavior, healed the fingerprint): the
+  NINTH seal suite left the accepted red set, which is now 8 suites /
+  11 tests + monolith 2. GATE ENV TRAP (cost two runs): export
+  BROWSER_PATH before gate_select or four browser-driving suites
+  (gpu_hitch_capture, perf_hitch_soak, perf_hitch_store, profile_mode)
+  die at file level on browser discovery; with it exported all four
+  pass (128 tests). Post-abort turbo proofs rc=0 (check:types
+  build:env build:server build:bot, then build:bundle); browser leg
+  standalone 19 files / 129 tests green (grew 4 upstream; one
+  contention-flaky run red at file level when chained directly behind
+  the turbo builds, clean in isolation).
+- LEDGER for phase 9 QA / phase 11: normalizeNotification extraction
+  (move the payload normalization into notify_guard.cjs so the
+  refusals become executed tests; today they are source pins in the
+  file's established style); Notification click-listener retention
+  (bounded to ~6/min/kind by the guard); desktop_notifications purity
+  registry membership (matches the unregistered gpu_status precedent;
+  a desktop_notify_core.ts split would earn the UI_PURE_CORES guard);
+  the ready-card aria-live region now announces the link label on the
+  ready transition (defensible, one more read-aloud item); the sim-
+  event scan sits outside the perf beacon's events window (invisible
+  cost, negligible today); notification preferences UI DEFERRED by
+  design (no toggle; OS-level muting is the only off switch today);
+  screenshots for the eventual PR deferred to the pre-PR pass (the
+  ready-card link needs a live shell update event; capture when the
+  program goes public per the LOCAL-ONLY rule).

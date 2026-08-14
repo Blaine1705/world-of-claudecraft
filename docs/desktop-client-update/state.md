@@ -297,6 +297,25 @@ phase 7 QA (phase-07-qa.md), fresh session, latest-release merge first per
 standing rule 3; the two open user decisions (low hold-or-accept, r181
 acceptance) still ride along.
 
+Phase 9 done (2026-08-14, commits 84fe7cae86 channel + dd235dfdeb renderer +
+175a414a7f link + docs; base merge 105306e494 of tip e56010cec1, 7 conflicts
+reconciled incl. the upstream notReadyThisPass dedupe ported into
+patches/three@0.185.1.patch, parity 336/336 after). OS notifications for
+update-ready and party invites: desktop-show-notification invoke channel
+(trust gate, kind whitelist, clampText 120/240, live+unfocused mirror,
+isSupported, notify_guard 10s-per-kind stamping only on real shows, click =
+focusMainWindow), renderer decision core src/game/desktop_notifications.ts
+(hud pid gate mirrored on real SimEvent narrowing, transition-into-ready once
+per version, away = presentation latch hidden || !document.hasFocus()),
+what's-new plain-anchor link on the ready card to GITHUB_RELEASES_URL (now in
+news_feed.ts), label 'See what changed in your browser', 5 new keys + M16
+fills. Reviews 0 blocking both (security + seam), all should-fixes landed or
+adjudicated (ledger in progress.md). Smoke 6/6 on the real shell. Gate red =
+the accepted set (now 8 seals/11 + monolith 2; mob_portrait healed upstream),
+38507 passed, turbo 5/5+3/3, browser leg 19/129. Next: phase 9 QA
+(phase-09-qa.md), fresh session, pull+merge first; the two open user
+decisions (low hold-or-accept, r181) still ride.
+
 ## Standing rules (user-locked, 2026-08-08, non-negotiable)
 
 1. ALL work happens in the worktree /home/fernandoramirez/Documents/woc-desktop-client-update
@@ -346,7 +365,11 @@ acceptance) still ride along.
   charselect_news.ts, most consistent with the live release-notes pipeline), (b) the
   in-client news feed (src/ui/news_feed.ts via the /api/releases proxy), or (c) a new
   changelog guide page (duplicates the existing pipeline); a bare /wiki-root link is
-  the weakest choice. The link-not-feed-text doctrine is unchanged.
+  the weakest choice. The link-not-feed-text doctrine is unchanged. DECIDED
+  2026-08-14 (user, AskUserQuestion at phase 9 start): option (a), the GitHub
+  releases page. GITHUB_RELEASES_URL now lives in src/ui/news_feed.ts and the
+  ready card links it through a plain external anchor (adjudication recorded in
+  desktop_update_toast.ts and progress.md phase 9).
 - OS notifications are assembled and t()-rendered in the RENDERER, pushed to main as
   final strings over a validated, capped, rate-limited channel. Main stays
   language-agnostic (same doctrine as the crash-dialog strings).
@@ -857,6 +880,26 @@ stack so comparisons hold, but absolute fps is iGPU-bound, and any recipe
 change that moves the browser onto the 5090 invalidates cross-era
 comparisons.
 
+Phase 9 inventory: IPC invoke channel desktop-show-notification (payload
+{kind, title, body}; kinds 'update-ready' | 'party-invite'; caps 120/240 via
+clampText; trust-gate return false; preload method showNotification, fresh
+const message rebuild + invoke .catch + sync try/catch). Pure module
+electron/notify_guard.cjs + .d.cts (createNotifyGuard({now, minIntervalMs}),
+NOTIFY_MIN_INTERVAL_MS = 10000, allow(kind) stamps only on true, TypeError
+boundary validation; suite tests/electron_notify_guard.test.ts). Renderer
+module src/game/desktop_notifications.ts (createDesktopNotifyCore,
+shouldNotifyDesktop, initDesktopNotifications composed LAST in
+desktop_shell_integration, desktopNotifyOnSimEvents armed-latch called from
+the two main.ts event sites; suite tests/desktop_notifications.test.ts).
+DesktopBridge gains optional showNotification(request:
+DesktopNotificationRequest) in src/runtime.ts. i18n keys:
+desktop.notify.updateReadyTitle/updateReadyBody/partyInviteTitle/
+partyInviteBody + desktop.update.whatsNew ('See what changed in your
+browser'), all five with the five M16 fills. GITHUB_RELEASES_URL exported
+from src/ui/news_feed.ts. flattenControlChars (diagnostics.cjs) now also
+strips bidi/zero-width formatters. DEFERRED by design: a notification
+preferences UI (no in-game toggle; OS-level muting is the only off switch).
+
 ## Known gotchas for this packet
 
 - pnpm only: regenerate the lockfile via pnpm add/update, never hand-edit; frozen
@@ -904,7 +947,14 @@ comparisons.
   reconcile 2026-08-13: the accepted-red SET is unchanged (same 9 suites;
   eastbrook_provenance_diagnostics still green) but the count is now 9 files / 14
   tests: upstream 154f0563ce added a third mob_portrait test (the --write receipt
-  authorization), red for the same fingerprint root cause. Two sealed suites new
+  authorization), red for the same fingerprint root cause. PHASE 9 UPDATE
+  (2026-08-14): mob_portrait_source_manifest is GREEN on the merged tree
+  (upstream's portrait revert train, d0a061ff6c restoring PR 3307 behavior,
+  healed the fingerprint), so the accepted red set is now 8 seal suites / 11
+  tests plus the monolith 2. GATE ENV: export BROWSER_PATH before gate_select
+  or four browser-driving vitest suites (gpu_hitch_capture, perf_hitch_soak,
+  perf_hitch_store, profile_mode) red at FILE level on browser discovery
+  inside the full fallback; they are environmental, green with it exported. Two sealed suites new
   in the range (tests/metamorphosis_asset.test.ts, tests/native_assets_pack
   .test.ts) do NOT hash pnpm-lock.yaml, so the lockfile blast radius is unchanged
   and they stay green. Phase 11 addition: upstream fb78debb7f shipped
