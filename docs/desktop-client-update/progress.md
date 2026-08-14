@@ -1549,3 +1549,150 @@ stat gate; tree clean, LOCAL-ONLY intact).
   turbo proofs 5/5 (check:types build:env build:server build:bot) + 3/3
   (build:bundle); the real-browser suite standalone with BROWSER_PATH:
   19 files / 125 tests green.
+
+## Phase 8 record (2026-08-14)
+
+Display modes (borderless fullscreen / windowed) and the gamepad
+display-sleep blocker. Commits: 3fe05f89ad base merge of release/v0.38.0
+tip 6ee7f3fd27 (tank-crit attacker keying + CI sparse checkout; parity
+335/335 green after), 40c8368c6b sparse-cone reconciliation, 5f144f5beb
+display mode (electron), ffc2c083b2 display-sleep blocker, b2e1f59537 options
+row, 831b0c2cb1 hidden zone-warm pause, the docs commit closing the phase docs.
+
+- BASE SYNC: ancestry guard held (b08d79ef91 ancestor of 6ee7f3fd27);
+  merge clean, zero conflicts. ONE semantic collision: upstream PR 3380's
+  new tests/ci_workflow.test.ts requires the CI sparse-checkout cone to
+  SET-EQUAL every referenced docs/screenshots subtree, and the branch's
+  phase 5 docs reference desktop-client-update-phase5-low; the entry
+  joined all five ci.yml cone blocks plus the pinned SPARSE_CONE literal
+  (fails toward more checkout). gate-integrity-reviewer PASS (set
+  equality live both directions, 22=22, vacuity floors 167/6711).
+- STORE: displayMode joined desktop-prefs.json as one validated enum
+  field ('borderless' | 'windowed', strict literals, junk resolves
+  'borderless') plus a defaults entry; DESKTOP_PREFS_VERSION stays 1
+  (additive, absent-tolerated). Default 'borderless' (AAA default),
+  matching the renderer setting displayMode def 1.
+- ELECTRON: startup apply lives INSIDE showMainWindow before show()
+  (same reveal discipline as maximize; borderless SUPERSEDES maximize
+  via the pinned else-if; NEVER a `fullscreen` constructor option, an
+  explicit false disables the macOS fullscreen button). IPC:
+  desktop-set-display-mode (pinned recipe: trustedSender, strict enum,
+  IDEMPOTENT same-value early return BEFORE the save, spread-literal
+  save, mirror after persisted-ok, then live setFullScreen), desktop-
+  get-display-mode (stored value), desktop-gamepad-activity (feeds the
+  lease). CAPTURE GUARD from the smoke: captureWindowBounds early-
+  returns while isFullScreen() because Linux getNormalBounds() equals
+  getBounds(), so a borderless session would persist the display rect
+  over the remembered windowed geometry (smoke reproduced the clobber
+  pre-fix and its absence post-fix).
+- POWER: electron/power_save.cjs pure state machine (injected start/
+  stop/timers/clock): accepted ping starts 'prevent-display-sleep' and
+  re-arms the 60 s idle release (POWER_SAVE_IDLE_MS), 10 s main-side
+  ping floor (POWER_SAVE_MIN_PING_INTERVAL_MS), hidden releases
+  immediately and mutes pings, shutdown terminal on will-quit, 'closed'
+  releases via setHidden(true); setHidden rides the SAME single hidden
+  derivation as the desktop-presentation-changed push. The rate-limit
+  stamp resets on release so the first ping after idle/un-hide re-claims
+  instantly (implementer deviation, accepted). 14-test transition suite.
+- RENDERER: gamepad poll fires optional onActivity at most once per
+  poll on real input only (rising edge, look.active, move flags,
+  pointer-cursor movement; focus gate suppresses free);
+  gamepad_activity_notify throttles to one bridge invoke per 30 s
+  (GAMEPAD_ACTIVITY_NOTIFY_INTERVAL_MS), permanent no-op without the
+  bridge method, total failure shape.
+- OPTIONS: displayMode SETTING_RANGES {0..1, def 1}; the Graphics
+  Display card renders choice(displayMode) INSTEAD of the fullscreen
+  toggle when OptionsEnv.desktopDisplayMode (bridge capability from
+  desktopDisplayModeSupported, BOTH methods, never isNativeAppShell);
+  web/mobile arm byte-identical (same slot, ordered key-run pins both
+  arms, four-env negative sweep). desktop_display_mode_sync.ts copies
+  the gpu template (fire-forget push, factory-after-read boot
+  reflection, strict union validation). requestPreferredFullscreen
+  early-returns when the shell owns display mode, so desktop stops
+  calling requestBrowserFullscreen (old shells keep the legacy path;
+  NO F11 keybind exists, no other reader of the fullscreen setting).
+  applySetting 'displayMode' arm pushes the mapped literal; Reset
+  doctrine pinned through the REAL footer filter (rendered keys minus
+  GRAPHICS_REBUILD_KEYS, displayMode survives). i18n: hud.options.
+  displayMode/displayModeBorderless/displayModeWindowed + 5 non-Latin
+  M16 fills (ja/ko/ru/zh_CN/zh_TW), regenerated via i18n:gen. Kept in
+  hud.options beside the fullscreen key it replaces (conscious choice
+  vs hudChrome.options; seam-review NOTE).
+- GPU LANE AUDIT (hidden shell, per-lane pause-or-accept, final
+  adjudication): (1) maybeWarmCurrentZone PAUSE, implemented: the one
+  recurring producer (position-driven, PMREM + uploads + terrain rides
+  it); extracted src/game/zone_warm_tracker.ts owns displacement +
+  rift-edge + hidden-freeze semantics (behavior suite: hidden frames
+  answer null and consume nothing, reveal measures from the last
+  VISIBLE position, rift edge preserved through a hidden span, reused
+  result object = zero per-frame allocations); main.ts is a thin
+  consumer, composition pinned in desktop_presentation_threading.
+  (2) secondary preview prewarm ACCEPT-WITH-NOTE (input-driven, finite
+  queue). (3) idle_queue scheduler ACCEPT (drain mechanism; gating it
+  risks reveal deadlock, gate producers instead). (4) terrain builds
+  TRANSITIVE with lane 1 (per-zone bounded batches via pendingZones;
+  no independent per-frame streaming entry enqueues builds; in-flight
+  batch finishes, consistent with no-cancel-in-flight). (5) shader
+  compile campaign ACCEPT-WITH-NOTE, overriding the auditor's pause:
+  finite + self-terminating, completing hidden buys a jank-free
+  reveal, and a gate would grow over-ceiling render files. (6) icon
+  prewarm ACCEPT-WITH-NOTE (one-shot catalog). (7) HUD map prewarm
+  ACCEPT-WITH-NOTE (bounded per zone, preemptible). (8) options-window
+  capture ACCEPT (unreachable hidden). (9) diagnostics capture ACCEPT
+  (panel-gated; by-analogy confidence). (10) texture uploads
+  TRANSITIVE (terminal cost of 1/2/4/5).
+- SMOKE (instrumented shell, isolated userData, --ozone-platform=x11;
+  BrowserWindow.prototype patched BEFORE require(main.cjs) to record
+  call order, so WM cooperation is irrelevant): borderless seed:
+  setFullScreen(true) at t=516 ms on a HIDDEN window, show() at 569 ms,
+  end state fullscreen (setFullScreen actually works on this rig,
+  unlike maximize); windowed seed: zero setFullScreen/maximize calls,
+  real centered bounds captured; borderless with windowed memory:
+  bounds survive the session byte-identical post-guard. PRIME-relaunch
+  note: the child inherits the wrapper env and writes the result ~7 s
+  after the parent exits; poll for the file. Blocker not smoke-testable
+  headlessly (no pad); every transition unit-proven instead.
+- REVIEWS: privacy-security PASS (0 blocking, 0 should-fix; 3 nits
+  accepted to ledger: initial hidden=false self-heals within one load,
+  unguarded stop() defensive-only, sync disk write matches the gpu
+  setter shape; INFO: indefinite renderer-sustained hold is the
+  intended semantics, display-sleep only, web wake-lock equivalent).
+  frontend-seam 0 blocking, 3 should-fix ALL RESOLVED: (a) world-entry
+  apply-all echo fixed by the setter idempotence + pin; (b) hidden
+  pause surfacing the blocking arm at reveal ACCEPTED deliberately
+  (mirrors a live teleport at teleport-sized displacement; common case
+  is zero displacement; phase 8 QA re-litigates); (c) text-only pin
+  fixed by the zone_warm_tracker extraction + behavior suite. NOTES:
+  Reset pin upgraded to the real filter path; i18n domain choice
+  recorded; touch+capability env sweep skipped (unreachable).
+- PIN COLLISIONS from the lease line: electron_presentation_push whole-
+  body pin and both closed-handler pins (presentation_push +
+  display_push) re-pointed; implementer comments relocated OUTSIDE the
+  pinned bodies (the flatteners do not strip comments).
+- LEDGER for phase 8 QA: blocking-arm-at-reveal acceptance (above);
+  setter idempotence leaves a window that DRIFTED from the stored mode
+  (WM revoked fullscreen) unhealed until the player toggles; getter
+  answers 'borderless' to an untrusted sender (gpu-getter shape);
+  initial lease hidden=false window; macOS fullscreen Space semantics
+  UNVERIFIED on this box (setFullScreen is the standard Electron game
+  path; simpleFullscreen fallback documented as the stopping-rule
+  alternative if a mac soak objects; neither stopping rule tripped on
+  evidence available here); maximize+borderless cross-display exotic
+  (maximized flag rides normal-bounds memory, phase 7 passthrough).
+- GATE: node scripts/gate_select.mjs at 831b0c2cb1-equivalent tree (all
+  phase changes staged pre-surgery) resolved the diff base to
+  origin/release/v0.38.0 (235 changed paths), mode=full (broad/
+  unclassified: package.json, the three patch, and the lockfile in the
+  branch-vs-base diff). Pre-vitest legs green: i18n gen + freshness
+  (NOTE: freshness diffs against the INDEX, so gating an uncommitted
+  tree requires the regen artifacts staged; the first run failed there
+  by construction), wiki, sfx, malware scan, biome changed-files.
+  Full-suite fallback: 2758 files / 38194 tests, red EXACTLY the
+  accepted set (9 seal suites / 14 tests + tests/monolith_budget.test.ts
+  2, the OPEN ratchet decision: hud.ts +10 / renderer.ts +94 inherited
+  from the base); 38064 passed, zero phase regressions. Post-abort
+  turbo proofs 5/5 (check:types build:env build:server build:bot) +
+  3/3 (build:bundle); browser leg standalone 19 files / 125 tests
+  green. Commit bisectability verified in a throwaway worktree: c1
+  55 tests, c2 87, c3 116, all green standalone; final tree byte-equal
+  to the validated working tree (post-surgery status clean).

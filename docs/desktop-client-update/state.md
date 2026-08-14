@@ -734,6 +734,70 @@ THREE.REVISION '165'; re-pointed wholesale to r185 in 29f83ced66, all six
 contract tests already held on the r185 build); post-fix red exactly 9
 seals/14 + monolith 2, turbo proofs 5/5 + 3/3, browser leg 19/125 green.
 
+Phase 8 done (2026-08-14, base merge 3fe05f89ad of release tip 6ee7f3fd27 +
+sparse-cone reconcile 40c8368c6b + commits 5f144f5beb display mode,
+ffc2c083b2 display-sleep blocker, b2e1f59537 options row, 831b0c2cb1
+hidden zone-warm pause, + docs; parity 335/335 green after the merge;
+security review 0 blocking / 0 should-fix, seam review 3 should-fix all
+resolved, gate-integrity PASS on the cone reconcile; full record in
+progress.md).
+
+Phase 8 additions: displayMode in desktop-prefs.json ('borderless' |
+'windowed' via strict readDisplayMode, junk resolves 'borderless', default
+'borderless', DESKTOP_PREFS_VERSION still 1) with the startup apply INSIDE
+showMainWindow before show() (borderless supersedes maximize in a pinned
+else-if; never a `fullscreen` constructor option: an explicit false
+disables the macOS fullscreen button) and a captureWindowBounds guard
+(early return while isFullScreen(): Linux getNormalBounds() equals
+getBounds(), so a borderless session would persist the display rect over
+the windowed memory; smoke-reproduced both directions). IPC invoke trio:
+desktop-set-display-mode (pinned recipe + IDEMPOTENT same-value early
+return before the save, then live setFullScreen), desktop-get-display-mode
+(stored value; 'borderless' to an untrusted sender), desktop-gamepad-
+activity (feeds the lease). electron/power_save.cjs + .d.cts (pure
+display-sleep state machine, injected start/stop/setTimer/clearTimer/now:
+POWER_SAVE_IDLE_MS 60000 idle release re-armed per accepted ping,
+POWER_SAVE_MIN_PING_INTERVAL_MS 10000 main-side floor whose stamp resets
+on release, hidden releases immediately and mutes, shutdown terminal;
+wired to the real powerSaveBlocker, setHidden rides the ONE hidden
+derivation inside sendPresentationState, 'closed' releases, 'will-quit'
+shuts down). Preload + DesktopBridge: getDisplayMode/setDisplayMode
+(preload refuses junk without crossing) + notifyGamepadActivity (fire and
+forget, rejection swallowed); DesktopDisplayMode union in src/runtime.ts.
+Renderer: src/game/desktop_display_mode_sync.ts (gpu-template trio:
+desktopDisplayModeSupported BOTH-methods capability, pushDesktopDisplayMode
+fire-forget total, syncDesktopDisplayModeSetting factory-after-read strict-
+union boot reflection writing displayMode 1/0); src/game/
+gamepad_activity_notify.ts (GAMEPAD_ACTIVITY_NOTIFY_INTERVAL_MS 30000
+client throttle, permanent no-op sans bridge, throttle stamp advances on
+throw so a dead channel cannot retry-storm); GamepadCallbacks.onActivity
+fired at most once per poll on real input only (edge, look.active, move
+flags, pointer-cursor movement; after the focus gate); src/game/
+zone_warm_tracker.ts (displacement + rift-exit-edge tracker with hidden-
+freeze semantics for the GPU lane 1 pause: hidden answers null and
+consumes nothing, reveal measures from the last visible position, reused
+result object so the per-frame path allocates nothing; main.ts thin
+consumer threading desktopPresentationHidden()). Settings/options:
+displayMode SETTING_RANGES {min 0, max 1, def 1} (1 = borderless); the
+Graphics Display card swaps toggle(fullscreen) for choice(displayMode)
+when OptionsEnv.desktopDisplayMode (capability set in options_window.ts
+beside desktopGpuPref); requestPreferredFullscreen early-returns when the
+shell owns display mode (web, mobile, and OLD desktop shells keep the
+browser path; NO F11 keybind exists and nothing else reads the fullscreen
+setting); the fullscreen key itself stays untouched for web/mobile. i18n
+keys hud.options.displayMode / displayModeBorderless / displayModeWindowed
+(hud.options beside the row it replaces, a recorded conscious choice vs
+hudChrome.options) + 5 non-Latin M16 fills. New suites:
+tests/electron_power_save.test.ts, tests/zone_warm_tracker.test.ts,
+tests/gamepad_activity_notify.test.ts (incl. the main.ts onActivity
+composition pin), tests/desktop_display_mode_sync.test.ts (crossings,
+wiring pins, Reset-through-the-real-footer-filter doctrine). The
+presentation_push/display_push whole-body pins now carry the lease lines
+(comments must stay OUTSIDE pinned bodies: the flatteners do not strip
+them). GPU lane audit adjudication + smoke rig (prototype-patched
+BrowserWindow, PRIME-child writes the result late) recorded in
+progress.md.
+
 Perf baselines: docs/perf/baseline/history.jsonl carries the phase 5 rows (low
 pre/post dressing fix + medium, this machines RTX 5090, 1280x720, vsync off;
 raw runs in tmp/perf-baseline/, gitignored). Phase 6 froze the pre-upgrade
