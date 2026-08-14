@@ -1892,6 +1892,7 @@ export const nl_NL: EnTranslations = {
       "joinChannels": "Tip: typ /join world of /join lfg om te chatten met spelers over de hele wereld."
     },
     "itemHeroicTag": "[HELDHAFTIG]",
+    "itemHeroicLabel": "Heroic",
     "itemSoulbound": "Zielsgebonden",
     "itemUniqueEquipped": "Uniek-Uitgerust",
     "itemSet": {

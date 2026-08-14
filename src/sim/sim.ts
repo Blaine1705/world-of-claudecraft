@@ -11885,10 +11885,6 @@ export class Sim {
     runsMod.grantDelveClearTo(this.ctx, run, delve, meta, pid);
   }
 
-  private grantDelveRewards(run: DelveRun): void {
-    runsMod.grantDelveRewards(this.ctx, run);
-  }
-
   private openDelveSurfaceExit(run: DelveRun): void {
     runsMod.openDelveSurfaceExit(this.ctx, run);
   }
