@@ -5522,6 +5522,34 @@ describe('the trade window asks whether a counterparty can be paid in $WOC', () 
   });
 });
 
+describe('the sweep error fallback, with NO onSweepError injected', () => {
+  it('logs the code, message, and stack shape and keeps a bare rejection inside the arm', async () => {
+    // Production injects no onSweepError (nothing under server/ supplies
+    // one), so the console.error fallback IS the production log line; the
+    // harness always injects, so without this case the shipped branch never
+    // ran under test. A bare Promise.reject() carries `undefined`: the
+    // null-safe code read must not throw, or the TypeError would escape
+    // arm()'s isolation and abort the remaining arms of the pass.
+    const h = makeHarness();
+    const bare = new WocMarketService({ ...h.deps, onSweepError: undefined });
+    h.db.expireDueDirectedOffers = () => Promise.reject();
+    const logged: unknown[][] = [];
+    const original = console.error;
+    console.error = (...args: unknown[]) => {
+      logged.push(args);
+    };
+    try {
+      const stats = await bare.sweepPass();
+      expect(stats, 'the pass completed past the failed arm').not.toBeNull();
+    } finally {
+      console.error = original;
+    }
+    const line = logged.find((args) => String(args[0]).includes('sweep arm'));
+    expect(line, 'the fallback logged the failed arm').toBeDefined();
+    expect(line?.[1]).toEqual({ code: undefined, message: 'undefined', stack: undefined });
+  });
+});
+
 describe('the sweep expires unanswered directed offers', () => {
   // The gap this pins: expireDueDirectedOffers existed and nothing called it, so
   // a pending offer never resolved. It escrows nothing, but it stayed visible in

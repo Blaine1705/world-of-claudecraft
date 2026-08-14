@@ -385,6 +385,12 @@ function shippedOfferUnits(
           units.push(matched);
           continue;
         }
+        // The marker guarantee ends at the pinned match above: this generic
+        // fallback is marker-blind (plain-first, then any eligible instanced
+        // copy), so a staged copy that LEFT the bags can ship a
+        // marker-differing twin. The shipped unit still carries its own true
+        // marker, so nothing is forged; it is the documented "some eligible
+        // copy" posture, same as the plain twin's.
         units.push(
           ...removeSellUnitsFromInventory(
             inventory,
