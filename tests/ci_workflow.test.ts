@@ -1170,44 +1170,33 @@ describe('CI workflow parity', () => {
           String.raw` {10}TEST_MODE: \$\{\{ needs\.changes\.outputs\.test_mode \}\}\n` +
           String.raw` {10}TEST_MODE_REASON: \$\{\{ needs\.changes\.outputs\.test_mode_reason \}\}\n` +
           String.raw` {10}CHANGED_FILES: \$\{\{ needs\.changes\.outputs\.changed_files \}\}\n` +
-          String.raw`( {10}#[^\n]*\n)*` +
-          String.raw` {10}WOC_TEST_WORKERS: '3'\n` +
           String.raw` {8}run: node scripts/ci_shard_test\.mjs --shard=\$\{\{ matrix\.shard \}\}/${SHARD_N}\n`,
       ),
     );
     // Exactly three entry invocations: the shard matrix and the two long-sims
     // lane halves.
     expect(workflow.match(/run: node scripts\/ci_shard_test\.mjs/g)).toHaveLength(3);
-    // The 3-worker value rides exactly those three entry steps (the entry
-    // validates it; scripts/ci_shard_test.mjs carries the measured ruling
-    // this trial answers). Release-gate keeps its inline half-cores default
-    // until the trial's green run justifies moving it. All three pins run on
-    // the comment-stripped workflow: the BARE-KEY count catches a stray
-    // override in any YAML value form (same-line, next-line, block scalar),
-    // shapes a value-form lookahead alone would miss, and a doc comment
-    // quoting the line can neither satisfy nor redden them.
-    expect(workflowCode.match(/WOC_TEST_WORKERS:/g)).toHaveLength(3);
-    expect(workflowCode.match(/WOC_TEST_WORKERS: '3'\n/g)).toHaveLength(3);
-    expect(jobSource('release-gate')).not.toContain('WOC_TEST_WORKERS');
-    // The trial literal is WELDED to the resolver's accept range at the
-    // documented runner size (4 vCPU on ubuntu-latest): the value ci.yml
-    // actually carries must be HONORED there, or the whole trial would
-    // silently measure the default while every job stays green.
-    const trialValue = workflowCode.match(/WOC_TEST_WORKERS: '(\d+)'\n/)?.[1];
-    expect(trialValue).toBeDefined();
-    expect(resolveWorkerCount({ cores: 4, envValue: trialValue })).toEqual({
-      workers: Number(trialValue),
-      source: 'env',
-    });
-    // The declaration must not silently vanish, for two mechanisms: biome's
-    // suspicious/noUndeclaredEnvVars warns on any process.env read absent
-    // from turbo.json, and turbo's strict env sandbox strips undeclared
-    // variables from task environments (the turbo-run paths would silently
-    // default). WOC_TEST_WORKERS lives in the pass-through list, never a
-    // hashed input: worker count cannot change task outcomes.
+    // WOC_TEST_WORKERS must not be set ANYWHERE in the workflow: both
+    // alternatives to the half-cores default were measured and regressed
+    // (4 workers, run 31107474546; 3 workers, run 31771637461, three
+    // unrelated default-timeout blowouts for about a minute of wall), so a
+    // reappearing override means someone re-trialing without a new ruling.
+    // Counted as the BARE key on the comment-stripped workflow, which
+    // catches every YAML value form (same-line, next-line, block scalar)
+    // while a doc comment naming the knob stays legal.
+    expect(workflowCode).not.toContain('WOC_TEST_WORKERS');
+    // The knob's declaration must not silently vanish while the entry reads
+    // it, for two mechanisms: biome's suspicious/noUndeclaredEnvVars warns
+    // on any process.env read absent from turbo.json, and turbo's strict
+    // env sandbox strips undeclared variables from task environments (the
+    // turbo-run paths would silently default). Both entries live in the
+    // pass-through list, never a hashed input: neither can change task
+    // outcomes.
     expect(turboJson).toContain('"WOC_TEST_WORKERS"');
-    // The F3 weld above assumes the documented 4-vCPU public runner; pin the
-    // assumption where it is used so a runner move re-opens the decision.
+    expect(turboJson).toContain('"GITHUB_ACTIONS"');
+    // The per-test budgets and the half-cores ruling are calibrated on the
+    // documented 4-vCPU public runner; pin the assumption so a runner move
+    // re-opens the worker decision instead of inheriting it.
     for (const job of ['pr-gate', 'pr-long-sims-a', 'pr-long-sims-b']) {
       expect(jobSource(job), job).toContain('runs-on: ubuntu-latest');
     }
@@ -1228,8 +1217,6 @@ describe('CI workflow parity', () => {
             String.raw` {10}TEST_MODE: \$\{\{ needs\.changes\.outputs\.test_mode \}\}\n` +
             String.raw` {10}TEST_MODE_REASON: \$\{\{ needs\.changes\.outputs\.test_mode_reason \}\}\n` +
             String.raw` {10}CHANGED_FILES: \$\{\{ needs\.changes\.outputs\.changed_files \}\}\n` +
-            String.raw`( {10}#[^\n]*\n)*` +
-            String.raw` {10}WOC_TEST_WORKERS: '3'\n` +
             String.raw` {8}run: node scripts/ci_shard_test\.mjs --lane=${laneFlag}\n`,
         ),
       );

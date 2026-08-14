@@ -66,11 +66,16 @@ const planOnly = argv.includes('--plan-only');
 // workers on the 4-vCPU runner, run 31107474546) inflated the four sims'
 // aggregate CPU time from 644 s to 1027 s through memory-bandwidth
 // contention and pushed the eastbrook integration sweep past its own 180 s
-// budget, while the half-cores run finished green with a 432 s wall. Every
-// per-test budget in the suite is calibrated against this bound; raise it
-// only with a green measured run at the new value. WOC_TEST_WORKERS is the
-// knob that produces such a run (resolveWorkerCount validates it; anything
-// malformed or out of range falls back to this default, loudly).
+// budget, while the half-cores run finished green with a 432 s wall. A
+// 3-worker trial (run 31771637461, 2026-08-14) confirmed the bound from
+// the other side: three unrelated suites blew DEFAULT timeouts under the
+// contention (coverage_c 20 s, a terrain_streaming 10 s hook, groveheart
+// 20 s) while the green shards gained at most about a minute of wall, so
+// half cores stands at both neighbors. Every per-test budget in the suite
+// is calibrated against this bound; raise it only with a green measured
+// run at the new value. WOC_TEST_WORKERS is the knob that produces such a
+// run (resolveWorkerCount validates it; anything malformed or out of
+// range falls back to this default, loudly).
 const workerResolution = resolveWorkerCount({
   cores: os.availableParallelism(),
   envValue: process.env.WOC_TEST_WORKERS,
