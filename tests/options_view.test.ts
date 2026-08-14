@@ -939,3 +939,83 @@ describe('options_view: determinism', () => {
     );
   });
 });
+
+// The Display card is the one card whose shape changes by HOST: a desktop shell
+// that owns its window gets a real window-mode picker, every other host keeps
+// the browser Fullscreen toggle. Both arms are pinned, because a capability
+// leaking onto the web build would render a control nothing can serve, and a
+// capability that failed to swap would leave the desktop player asking the
+// browser for fullscreen inside an already-fullscreen window.
+describe('options_view: the desktop display-mode picker replaces the fullscreen toggle', () => {
+  const DISPLAY_ENV: OptionsEnv = { touch: false, nativeShell: false, desktopDisplayMode: true };
+  const displayCardKeys = (env: OptionsEnv): string[] => {
+    const card = buildGraphicsSections(makeSource({ graphicsPreset: 4 }), env).find(
+      (s) => s.titleKey === 'hudChrome.options.gfxSectionDisplay',
+    );
+    expect(card, 'the Display card must exist on every host').toBeTruthy();
+    return keysOf(card?.controls ?? []);
+  };
+
+  it('swaps the toggle for the picker IN PLACE when the shell owns the window', () => {
+    // The whole ordered run, not just a membership check: the picker takes the
+    // toggle's slot, so the card's row order is byte-for-byte the web order.
+    expect(displayCardKeys(DISPLAY_ENV)).toEqual([
+      'renderScale',
+      'brightness',
+      'cameraFov',
+      'displayMode',
+      'weather',
+      'waterRipples',
+      'showOverflowXp',
+    ]);
+    expect(displayCardKeys(DISPLAY_ENV)).not.toContain('fullscreen');
+    const controls = buildGraphicsControls(makeSource({ graphicsPreset: 4 }), DISPLAY_ENV);
+    expect(find(controls, 'displayMode')).toMatchObject({
+      control: 'choice',
+      labelKey: 'hud.options.displayMode',
+      // Windowed first, borderless second: the picker's order IS the setting's
+      // numeric order, so a reordering here cannot silently re-map the values.
+      options: [
+        { value: 0, labelKey: 'hud.options.displayModeWindowed' },
+        { value: 1, labelKey: 'hud.options.displayModeBorderless' },
+      ],
+    });
+  });
+
+  it('reflects the stored mode in BOTH directions (no mapping at this seam)', () => {
+    // The numeric <-> string mapping happens at the bridge crossings
+    // (desktop_display_mode_sync), never here, so the picker reads straight
+    // through: 1 selects Borderless Fullscreen, 0 selects Windowed.
+    const borderless = buildGraphicsControls(
+      makeSource({ graphicsPreset: 4, displayMode: 1 }),
+      DISPLAY_ENV,
+    );
+    expect(find(borderless, 'displayMode')).toMatchObject({ control: 'choice', current: 1 });
+    const windowed = buildGraphicsControls(
+      makeSource({ graphicsPreset: 4, displayMode: 0 }),
+      DISPLAY_ENV,
+    );
+    expect(find(windowed, 'displayMode')).toMatchObject({ control: 'choice', current: 0 });
+  });
+
+  it('never renders on the web, a mobile shell, or a desktop shell without the bridge', () => {
+    // Every host that is not a display-mode-capable desktop shell keeps the
+    // pre-existing toggle, byte for byte. nativeShell is true in the mobile
+    // shells and desktopGpuPref is a DIFFERENT capability: neither may stand in
+    // for this one.
+    const envs: OptionsEnv[] = [
+      { touch: false, nativeShell: false },
+      { touch: true, nativeShell: true },
+      { touch: false, nativeShell: false, desktopDisplayMode: false },
+      { touch: false, nativeShell: true, desktopGpuPref: true },
+    ];
+    for (const env of envs) {
+      const keys = displayCardKeys(env);
+      expect(keys).toContain('fullscreen');
+      expect(keys).not.toContain('displayMode');
+      const controls = buildGraphicsControls(makeSource({ graphicsPreset: 4 }), env);
+      expect(find(controls, 'displayMode')).toBeUndefined();
+      expect(find(controls, 'fullscreen')).toMatchObject({ control: 'toggle' });
+    }
+  });
+});

@@ -21,6 +21,7 @@
 
 import { syncAppViewport } from '../game/app_viewport';
 import { audio } from '../game/audio';
+import { desktopDisplayModeSupported } from '../game/desktop_display_mode_sync';
 import { desktopGpuPrefSupported } from '../game/desktop_gpu_pref_sync';
 import {
   GAMEPAD_NONE,
@@ -1153,6 +1154,11 @@ export class OptionsWindow {
             {
               touch: useTouchInterface(),
               nativeShell: isNativeAppShell(),
+              // Swaps the Display card's browser Fullscreen toggle for the
+              // shell's window-mode picker. The BRIDGE CAPABILITY again, never
+              // nativeShell: the mobile shells and pre-display-mode desktop
+              // builds must keep the browser toggle they can actually serve.
+              desktopDisplayMode: desktopDisplayModeSupported(desktopBridge()),
             },
           )
         : [];

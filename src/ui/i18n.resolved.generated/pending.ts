@@ -11,32 +11,50 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "gpuNotice.bodyDiscreteInactive",
+    "hud.options.displayMode",
+    "hud.options.displayModeBorderless",
+    "hud.options.displayModeWindowed",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "es_ES": [
     "gpuNotice.bodyDiscreteInactive",
+    "hud.options.displayMode",
+    "hud.options.displayModeBorderless",
+    "hud.options.displayModeWindowed",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "fr_FR": [
     "gpuNotice.bodyDiscreteInactive",
+    "hud.options.displayMode",
+    "hud.options.displayModeBorderless",
+    "hud.options.displayModeWindowed",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "fr_CA": [
     "gpuNotice.bodyDiscreteInactive",
+    "hud.options.displayMode",
+    "hud.options.displayModeBorderless",
+    "hud.options.displayModeWindowed",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "en_CA": [],
   "it_IT": [
     "gpuNotice.bodyDiscreteInactive",
+    "hud.options.displayMode",
+    "hud.options.displayModeBorderless",
+    "hud.options.displayModeWindowed",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "de_DE": [
     "gpuNotice.bodyDiscreteInactive",
+    "hud.options.displayMode",
+    "hud.options.displayModeBorderless",
+    "hud.options.displayModeWindowed",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
@@ -46,47 +64,74 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "gpuNotice.bodyDiscreteInactive",
+    "hud.options.displayMode",
+    "hud.options.displayModeBorderless",
+    "hud.options.displayModeWindowed",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "gpuNotice.bodyDiscreteInactive",
+    "hud.options.displayMode",
+    "hud.options.displayModeBorderless",
+    "hud.options.displayModeWindowed",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "nl_NL": [
     "gpuNotice.bodyDiscreteInactive",
+    "hud.options.displayMode",
+    "hud.options.displayModeBorderless",
+    "hud.options.displayModeWindowed",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "pl_PL": [
     "gpuNotice.bodyDiscreteInactive",
+    "hud.options.displayMode",
+    "hud.options.displayModeBorderless",
+    "hud.options.displayModeWindowed",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "id_ID": [
     "gpuNotice.bodyDiscreteInactive",
+    "hud.options.displayMode",
+    "hud.options.displayModeBorderless",
+    "hud.options.displayModeWindowed",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "tr_TR": [
     "gpuNotice.bodyDiscreteInactive",
+    "hud.options.displayMode",
+    "hud.options.displayModeBorderless",
+    "hud.options.displayModeWindowed",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "sv_SE": [
     "gpuNotice.bodyDiscreteInactive",
+    "hud.options.displayMode",
+    "hud.options.displayModeBorderless",
+    "hud.options.displayModeWindowed",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "vi_VN": [
     "gpuNotice.bodyDiscreteInactive",
+    "hud.options.displayMode",
+    "hud.options.displayModeBorderless",
+    "hud.options.displayModeWindowed",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "da_DK": [
     "gpuNotice.bodyDiscreteInactive",
+    "hud.options.displayMode",
+    "hud.options.displayModeBorderless",
+    "hud.options.displayModeWindowed",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ]

@@ -202,6 +202,14 @@ export interface OptionsEnv {
    *  shells, and is true for a desktop shell too old to have the preference).
    *  Absent (the web/offline callers) means the row never renders. */
   desktopGpuPref?: boolean;
+  /** desktopDisplayModeSupported(): the shell owns the window, so the Display
+   *  card shows a windowed/borderless picker INSTEAD of the browser Fullscreen
+   *  toggle (asking the browser for fullscreen inside an already-fullscreen
+   *  shell window makes the two fight). Also a BRIDGE CAPABILITY, not
+   *  nativeShell: a desktop shell too old to have display modes keeps the
+   *  browser toggle, which is what actually works there. Absent (the
+   *  web/offline callers) means the picker never renders. */
+  desktopDisplayMode?: boolean;
 }
 
 const slider = (
@@ -260,6 +268,14 @@ const choice = (
 });
 
 const note = (textKey: TranslationKey): NoteControl => ({ control: 'note', textKey });
+
+// The desktop shell's window modes, in the order a player reads them: the
+// smaller window first, the default (borderless fullscreen) second, matching
+// the stored numbers 0 and 1 so the picker's order is the setting's order.
+const displayModeOptions: ChoiceOption[] = [
+  { value: 0, labelKey: 'hud.options.displayModeWindowed' },
+  { value: 1, labelKey: 'hud.options.displayModeBorderless' },
+];
 
 // The advanced-preset sub-setting ladders (round 10). Values are the
 // PERSISTED numbers gfx.ts maps to knob levels: the historical binary rows
@@ -462,7 +478,13 @@ export function buildGraphicsSections(
     slider(s, 'renderScale', 'hud.options.renderQuality'),
     slider(s, 'brightness', 'hud.options.brightness'),
     slider(s, 'cameraFov', 'hud.options.fieldOfView', 'degrees', 1),
-    toggle(s, 'fullscreen', 'hud.options.fullscreen'),
+    // One row, two meanings by host. A desktop shell that owns the window gets
+    // the mode picker (it also covers "make the window smaller", which the
+    // browser toggle cannot); every other host keeps the browser Fullscreen
+    // toggle byte for byte, so the web and mobile arms are untouched.
+    env.desktopDisplayMode
+      ? choice(s, 'displayMode', 'hud.options.displayMode', displayModeOptions)
+      : toggle(s, 'fullscreen', 'hud.options.fullscreen'),
     toggle(s, 'weather', 'game.settings.weather'),
     // Opt-in wake/ripple simulation on water (default off): the one water effect
     // that runs extra GPU passes; bubbles and splashes are unaffected. It sits

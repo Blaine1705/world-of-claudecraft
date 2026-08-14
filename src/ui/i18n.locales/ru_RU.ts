@@ -2097,6 +2097,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.options.graphicsReloadNote':
     'Качество графики и детализация местности применяются после перезагрузки.',
   'hud.options.reloadNow': 'Перезагрузить сейчас',
+  'hud.options.displayMode': 'Режим отображения',
+  'hud.options.displayModeBorderless': 'Полноэкранный без рамки',
+  'hud.options.displayModeWindowed': 'Оконный',
   'hud.options.fullscreen': 'Полный экран',
   'hud.options.touchLookSpeed': 'Скорость обзора (касание)',
   'hud.options.joystickSize': 'Размер джойстика',

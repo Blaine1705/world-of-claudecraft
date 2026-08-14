@@ -76,6 +76,13 @@ export const SETTING_RANGES = {
   cameraZoom: { min: 3, max: 22, def: 12 },
   renderScale: { min: 0.5, max: 1, def: 1 },
   fullscreen: { min: 0, max: 1, def: 1 },
+  // Desktop-shell window mode: 1 = borderless fullscreen (what the shell opens
+  // with, matching its prefs-store default), 0 = a normal resizable window.
+  // Only the desktop shell can act on it, so its options row replaces the
+  // browser Fullscreen toggle there and never renders anywhere else; the two
+  // are separate keys because a player who leaves fullscreen in the desktop app
+  // has not changed what the web build should do on the same machine.
+  displayMode: { min: 0, max: 1, def: 1 },
   // on by default: post-cap players see their overflow/virtual-level bar; turn
   // off for the classic static "MAX LEVEL" text (Max-Level XP Overflow)
   showOverflowXp: { min: 0, max: 1, def: 1 },

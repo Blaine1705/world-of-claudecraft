@@ -108,6 +108,10 @@ describe('Settings', () => {
     expect(s.get('shadowQuality')).toBe(SETTING_RANGES.shadowQuality.def);
     expect(s.get('renderScale')).toBe(1);
     expect(s.get('fullscreen')).toBe(1);
+    // Borderless fullscreen, matching the desktop shell's own prefs default:
+    // the shell opens that way, so a fresh profile must not disagree with the
+    // window it is already looking at.
+    expect(s.get('displayMode')).toBe(1);
     expect(s.get('clickToMove')).toBe(0);
     expect(s.get('clickToMoveButton')).toBe(0);
     expect(s.get('cameraFov')).toBe(SETTING_RANGES.cameraFov.def);
@@ -159,6 +163,10 @@ describe('Settings', () => {
     expect(s.set('effectsQuality', 99)).toBe(SETTING_RANGES.effectsQuality.max);
     expect(s.set('shadowQuality', -1)).toBe(SETTING_RANGES.shadowQuality.min);
     expect(s.set('fullscreen', -1)).toBe(0);
+    // displayMode is a two-value picker stored as a number: anything outside
+    // [0, 1] clamps rather than reaching the shell as an unknown mode.
+    expect(s.set('displayMode', -1)).toBe(0);
+    expect(s.set('displayMode', 4)).toBe(1);
     // Interface Mode (0 Auto, 1 Desktop, 2 Touch) clamps to its 0..2 bounds.
     expect(s.set('interfaceMode', 99)).toBe(SETTING_RANGES.interfaceMode.max);
     expect(s.set('interfaceMode', -1)).toBe(SETTING_RANGES.interfaceMode.min);
@@ -194,10 +202,15 @@ describe('Settings', () => {
     a.set('cameraSpeed', 0.4);
     a.set('musicVolume', 0.2);
     a.set('fullscreen', 0);
+    a.set('displayMode', 0);
     const b = new Settings();
     expect(b.get('cameraSpeed')).toBe(0.4);
     expect(b.get('musicVolume')).toBe(0.2);
     expect(b.get('fullscreen')).toBe(0);
+    // The chosen window mode outlives the session: the shell restores its own
+    // window at launch and the boot reflection re-reads it, but a player who
+    // never opens options must still find their choice on the row.
+    expect(b.get('displayMode')).toBe(0);
   });
 
   it('persists boolean settings across instances', () => {

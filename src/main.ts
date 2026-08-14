@@ -40,6 +40,11 @@ import { getClientSeed } from './game/client_seed';
 import { localPartyMemberIds } from './game/corpse_loot_availability';
 import { shouldClearAutorunOnDeath } from './game/death_input_reset';
 import { setDisplayChangeTarget } from './game/desktop_display_change';
+import {
+  desktopDisplayModeSupported,
+  pushDesktopDisplayMode,
+  syncDesktopDisplayModeSetting,
+} from './game/desktop_display_mode_sync';
 import { initDesktopDownload } from './game/desktop_download';
 import { pushDesktopGpuPref, syncDesktopGpuPrefSetting } from './game/desktop_gpu_pref_sync';
 import { desktopPresentationHidden } from './game/desktop_presentation';
@@ -512,6 +517,7 @@ if (DESKTOP_APP) initDesktopShellIntegration();
 // before the round trip would rewrite the whole settings blob over any write
 // that landed while it was in flight.
 if (DESKTOP_APP) void syncDesktopGpuPrefSetting(desktopBridge(), () => new Settings());
+if (DESKTOP_APP) void syncDesktopDisplayModeSetting(desktopBridge(), () => new Settings());
 // Free every WebGL context (game renderer, character preview, portrait rig) when
 // the page is torn down, so logout/login reload cycles don't exhaust the GPU
 // context pool and break the next renderer with "Error creating WebGL context".
@@ -1005,6 +1011,8 @@ function exitBrowserFullscreen(): void {
 
 function requestPreferredFullscreen(): void {
   if (NATIVE_APP) return;
+  // The shell's own display mode owns the window (older shells fail the check).
+  if (desktopDisplayModeSupported(desktopBridge())) return;
   if (useTouchInterface()) {
     requestMobileFullscreenLandscape();
     return;
@@ -2645,6 +2653,9 @@ async function startGame(
         break;
       case 'fullscreen':
         v >= 0.5 ? requestPreferredFullscreen() : exitBrowserFullscreen();
+        break;
+      case 'displayMode':
+        pushDesktopDisplayMode(desktopBridge(), v >= 0.5 ? 'borderless' : 'windowed');
         break;
       case 'clickToMove':
         if (v < 0.5) input.clearClickMove();
