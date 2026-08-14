@@ -43,11 +43,13 @@ describe('Stonebound PBE benchmark contract', () => {
   it('stays below a dedicated Protection Warrior on physical effective health', () => {
     // v0.38 tank parity pass: the ceiling moved from 0.8 to 0.9. The posture
     // gained a Stamina component, more armor, and deeper damage reduction so a
-    // Stonebound shaman can tank heroic Nythraxis without being one-shot; on a
-    // best-in-slot stamina kit it now lands just UNDER the prot warrior
-    // (0.99x), so the warrior remains the pure-tank ceiling, but the old
-    // "materially below tier" off-tank framing no longer holds. Owner
-    // decision surfaced in the v0.38 tank balance PR.
+    // Stonebound shaman can tank heroic Nythraxis without being one-shot, and
+    // the old "materially below tier" off-tank framing no longer holds. The
+    // two frames read differently and both matter: on THIS test's default
+    // autoEquip kit the ratio is 0.83, while on a hand-built best-in-slot
+    // stamina kit (the tests/tank_parity.test.ts frame) it reaches 0.99. The
+    // warrior stays the pure-tank ceiling in both. Owner decision surfaced in
+    // the v0.38 tank balance PR.
     const stone = enhancement('stonebound');
     const protection = new Sim({ seed: 2920, playerClass: 'warrior', autoEquip: true });
     protection.setPlayerLevel(20);

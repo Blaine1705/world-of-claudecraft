@@ -246,6 +246,60 @@ describe('threat from damage', () => {
     expect(sim.setSpec('prot')).toBe(true);
     expect(expectDefined(sim.resolvedAbility('sunder_armor')).threatFlat).toBe(120);
   });
+
+  // v0.38 tank threat parity converted the warrior and bear signatures from a
+  // pure flat add to `damage * mult + flat`, so the tank scales with gear like
+  // the Faithwarden kit does. Measure the DELTA of a second hit so the aggro
+  // seed cannot mask a dropped term: a lost mult reads as flat-only, a lost
+  // flat reads as mult-only, and either fails here.
+  it('composes the converted tank signatures as damage * mult + flat', () => {
+    const sim = makeSim('warrior');
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('prot')).toBe(true);
+    const slam = expectDefined(sim.resolvedAbility('shield_slam'));
+    expect(slam.threatFlat).toBe(110);
+    expect(slam.threatMult).toBe(3.5);
+    const wolf = nearestMob(sim, 'forest_wolf');
+    beefUp(wolf);
+    const slamOpts = { flat: slam.threatFlat, mult: slam.threatMult };
+    // Prime aggro first, then measure only the second hit.
+    sim.dealDamage(sim.player, wolf, 100, false, 'physical', 'Shieldcrack', 'hit', true, slamOpts);
+    const primed = wolf.threat.get(sim.playerId) ?? 0;
+    sim.dealDamage(sim.player, wolf, 100, false, 'physical', 'Shieldcrack', 'hit', true, slamOpts);
+    // Recompense grants +80% threat, at full value once the level-20 mastery
+    // ramp (min(1, level / 20)) is complete.
+    const recompense = 1.8;
+    expect((wolf.threat.get(sim.playerId) ?? 0) - primed).toBeCloseTo(
+      (100 * 3.5 + 110) * recompense,
+      5,
+    );
+  });
+
+  it('composes Bonecrush the same way, on top of the bear form modifier', () => {
+    const sim = makeSim('druid');
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('feral')).toBe(true);
+    sim.castAbility('bear_form');
+    sim.tick();
+    expect(sim.player.auras.some((a) => a.kind === 'form_bear')).toBe(true);
+    const maul = expectDefined(sim.resolvedAbility('maul'));
+    expect(maul.threatFlat).toBe(20); // rank 2 from level 16
+    expect(maul.threatMult).toBe(2.5);
+    const wolf = nearestMob(sim, 'forest_wolf');
+    beefUp(wolf);
+    const maulOpts = { flat: maul.threatFlat, mult: maul.threatMult };
+    sim.dealDamage(sim.player, wolf, 100, false, 'physical', 'Bonecrush', 'hit', true, maulOpts);
+    const primed = wolf.threat.get(sim.playerId) ?? 0;
+    sim.dealDamage(sim.player, wolf, 100, false, 'physical', 'Bonecrush', 'hit', true, maulOpts);
+    // Bear Form x1.3 composed with the feral threat total: Primal Heart's +45%
+    // mastery PLUS the +20% feral baseline, which is additive with it (the
+    // warrior has no such baseline, so Recompense stands alone above).
+    const bearAndMastery = BEAR_FORM_THREAT_MULT * 1.65;
+    expect((wolf.threat.get(sim.playerId) ?? 0) - primed).toBeCloseTo(
+      (100 * 2.5 + 20) * bearAndMastery,
+      5,
+    );
+  });
 });
 
 describe('healing threat', () => {
