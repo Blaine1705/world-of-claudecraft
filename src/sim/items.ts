@@ -287,7 +287,9 @@ export function sellerSignedCharmDeprioritize(
 // stage-time preview (social/trade.ts stagedOfferSlots) can run the EXACT
 // selection the swap will run, over a scratch copy of the bags: one walk
 // definition is what keeps the staged display and the moved copies from
-// drifting. The body is a byte-identical move of the old ctx-taking walk.
+// drifting. The body is a behavior-identical move of the old ctx-taking walk
+// (meta.inventory became the inventory param; the quest hook hoisted to the
+// removeVendorSellUnits wrapper, preserving walk-then-hook order).
 export function removeSellUnitsFromInventory(
   inventory: InvSlot[],
   itemId: string,
