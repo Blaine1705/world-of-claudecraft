@@ -24,15 +24,21 @@ const MAX_MIRRORED_CONSOLE_LINES = 200;
 // dialog text stays flat. The class covers C0 (\u0000-\u001f),
 // DEL (\u007f), and C1 (\u0080-\u009f, which includes
 // \u009b, the one-byte control-sequence introducer), so a crafted string
-// cannot smuggle a terminal escape past the filter, plus the invisible
-// direction and width formatters (zero-widths and marks \u200b-\u200f, bidi
-// embeds and overrides \u202a-\u202e, isolates \u2066-\u2069, and \ufeff),
-// so text bound for an OS surface cannot reorder or hide what it displays.
+// cannot smuggle a terminal escape past the filter; the Unicode line breaks
+// LS and PS (\u2028, \u2029), which surfaces honoring Unicode line breaking
+// render as real newlines; and the invisible direction and width formatters
+// (soft hyphen \u00ad, the Arabic letter mark \u061c, the Mongolian vowel
+// separator \u180e, zero-widths and marks \u200b-\u200f, bidi embeds and
+// overrides \u202a-\u202e, word joiner and the invisible operators
+// \u2060-\u2064, isolates \u2066-\u2069, \ufeff, interlinear annotation
+// \ufff9-\ufffb, and the fully invisible tag characters
+// \u{e0000}-\u{e007f}), so text bound for an OS surface cannot reorder,
+// hide, or smuggle what it displays.
 // Shared by clampText and shell_strings.cjs.
 function flattenControlChars(text) {
   return text.replace(
     // biome-ignore lint/suspicious/noControlCharactersInRegex: matching control chars is the point
-    /[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff]+/g,
+    /[\u0000-\u001f\u007f-\u009f\u00ad\u061c\u180e\u200b-\u200f\u2028-\u202e\u2060-\u2064\u2066-\u2069\ufeff\ufff9-\ufffb\u{e0000}-\u{e007f}]+/gu,
     ' ',
   );
 }
@@ -40,7 +46,12 @@ function flattenControlChars(text) {
 function clampText(value, maxLength) {
   if (typeof value !== 'string') return '';
   const cleaned = flattenControlChars(value);
-  return cleaned.length > maxLength ? `${cleaned.slice(0, maxLength)}...` : cleaned;
+  if (cleaned.length <= maxLength) return cleaned;
+  // A cap landing between the halves of an astral character would leave a
+  // lone high surrogate that native UTF-8 conversion renders as U+FFFD.
+  const cut = cleaned.charCodeAt(maxLength - 1);
+  const end = cut >= 0xd800 && cut <= 0xdbff ? maxLength - 1 : maxLength;
+  return `${cleaned.slice(0, end)}...`;
 }
 
 // Best-effort redaction for log text that might embed a credential (the shell
