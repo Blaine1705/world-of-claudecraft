@@ -17,7 +17,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 06 | directed-rail-integrity | game | DONE | b948aa64fb | release sync trivial (16 commits, chronomancer train, no marketplace overlap, no count-pin surface); H10/H12/H14 + guardBalance + auto-close closed, both opening judgments settled; dbperf pre-checkpoint BLOCK (A1-A8) folded in before code; pg suite ran RED first (7 behaviors); FOUR fresh reviewers + fix-round re-review + qa-checklist, every finding applied incl. nits (the security CRITICAL: the trade session stripped staged identity, fixed by per-copy staging through the swap's own selection walk); one inherited env-gated red (admin_guilds vs the release's quota join) repaired in place; first gate GREEN at 5287214294; then SIX closing rounds (two independent fresh reviews of the gate-round commit, every subsequent fix round re-reviewed fresh, ~45 more findings applied incl. the crafted-marker comparator leg, the accept-side one_item mirror with the model acceptHint judged over the AUTHORITATIVE offer table, the pair index carcass convention + shared name constant, the offer_reopen report on both swallows, the observed-wait 23505 interleave, and the wiring/count pins that made the last round's fixes decisive); THREE gate runs GREEN along the way (5287214294, then 5ebb176a73 covering all production code, then the final at tip ea1bb82322: full-suite fallback, all 8 steps, run WITH TEST_DATABASE_URL so every pg suite executed); LOCAL, not pushed per R4 |
 | 05 QA | phase-05-qa | game | DONE | b9e937c075 | PASS-WITH-FOLLOWUPS, every fix applied (section below); release sync origin/release/v0.38.0 trivial (7 commits, no marketplace overlap, no count-pin surface); five audit lanes + a fresh fix-round re-review + qa-checklist READY + a db-perf close-out; real-SQL suites 109 green THREE times (zero skips); the three named mutation probes plus the agents' per-pin mutation matrices all bit; the round found and fixed the BEGIN-outside-TxNeverStarted critical, the withTx null-deref evidence destroyer, both kick argument swaps, and the db-perf codeless-discard P1; gate GREEN at eeaa137e5c (full-suite fallback, all 8 steps, 38196 tests + 118 browser); pushed per R4 |
 | 06 | directed-rail-integrity | game | NOT STARTED | | |
-| 06 QA | phase-06-qa | game | NOT STARTED | | |
+| 06 QA | phase-06-qa | game | DONE | ab2742012b | PASS-WITH-FOLLOWUPS, every fix applied, PUSHED per R4; v0.38.0 re-sync NON-trivial (3 conflicts + 2 silent count-pin auto-merges, all re-derived from runs: IWorld 323/86/237, fanout 10, hud.ts 19160 DOWN, sim.ts 12436; release-merge-audit faithful, 0 findings over 7 groups); ea1bb82322 verified FIRST (comment-only src, all pins mutation-proven); six fresh lanes: 0 code blockers, 4 blocking TEST gaps closed; QA-found code fixes: the capacity model now RUNS the removal walk (receiver-overflow class closed for good), the crafted-marker leg on the instanced matcher, guardTerms on the directed buyer, the model-reading accept belt, sweep-fallback stack+null-safety; NEW OPEN RULING R9 (implied terms consent, pre-enable affordance owed); pg suites 152 green zero skips on the tip; 21 mutation probes all bit; qa-checklist READY 0 blocking; gate GREEN at 47399f77b7 |
 | 07 | policy-terms-drafts | game | NOT STARTED | | |
 | 07 QA | phase-07-qa | game | NOT STARTED | | |
 | 08 | service-auth-hardening | service | NOT STARTED | | |
@@ -50,6 +50,119 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 21 QA | phase-21-qa | service + game | NOT STARTED | | |
 | 22 | close-out | all three | NOT STARTED | | teardown offer lives in 22 QA |
 | 22 QA | phase-22-qa | all three | NOT STARTED | | |
+
+## 06 QA round (verdict PASS-WITH-FOLLOWUPS, every fix applied)
+
+Release sync: merge ab2742012b (origin/release/v0.38.0 tip 172ed59d01, the
+map-marker overhaul + CI harness splits, 203 files). NON-trivial: three
+test conflicts (world_api_parity, monolith_budget, language_fanout) PLUS
+two silent count-pin auto-merges the conflict markers never showed (the
+parity union pin at the file bottom took 322 while the real union is 323;
+the fanout count took 9 while the merged list is 10). Every pin
+re-derived from a suite run per the count-pin discipline: IWorld 323 = 86
+data + 237 methods (both sides had claimed 322 with different splits);
+fanout exemptions 10 (one new row per side); hud.ts ceiling DOWN to
+19160 (the release extracted map marker interaction out of the
+coordinator, the ratchet follows the file down); sim.ts 12436 (the
+release's civic service placements). The release-merge-audit skill ran
+over the merge: seven parallel overlap groups (hud, sim, online, shell,
+world_api, catalog, guard suites), ZERO findings, both sides' intent
+verified preserved by diff-of-diffs and blob identity; i18n regen
+drift-free; command_schema green.
+
+First QA work, per the packet prescription: ea1bb82322 (the one round
+without its own review) verified before anything else. Its src hunk is
+comment-only as billed; the CONTROLLER source pin rides stripComments
+(not comment-gameable); the panel pass-through pin is behavioral (paint
+drives the real wocTradeModelFrom); the three restore count pins are
+exact counts; four targeted mutations (drop the pass-through, revert the
+controller feed, delete each restore) all bit exactly their pins.
+Verdict: clean.
+
+Six FRESH audit lanes over b948aa64fb..ea1bb82322 (privacy-security,
+test-coverage, architecture, frontend-seam, correctness-vs-promises,
+dead-code/doc-staleness): ZERO blocking code defects in the implement
+round; all four phase-file probes answered (the wallet-twin NOT EXISTS
+really rides the claiming UPDATE and the bid guard was not weakened; the
+fingerprint covers the whole instance payload with only count and the
+advisory slot outside it, and there is no durability axis in this game;
+strike parity is auction-default parity minus the bond, documented, with
+non-decaying strikes a deliberate difference; the auto-close return
+flight reuses closeListingIfNoOpenSettlement plus the shared
+undisposed-return path, nothing bespoke). The coverage lane found FOUR
+blocking TEST gaps (no successful instanced escrow anywhere, the crafted
+leg untested server-side, pinned-copy-first undiscriminated from the
+generic walk, the agreed-item wire body unpinned at both hops), and the
+test-writer wave found a real CODE defect while proving them: the
+capacity model modeled arrivals fungible-first while the swap ships the
+staged pinned copies first, so a pinned instanced arrival at a full bag
+passed the gate and overflowed the receiver (the third drift of that
+model class after #2139/#2605).
+
+The fix round (commits c67af5f62f sim, cedbaae8f2 server, 19eb3c74d6
+ui): fitsAfterSwap now RUNS shippedOfferUnits (the walk removeOffer
+delegates to) over scratch bags for both the gives and the receives, so
+the modeled copies equal the shipped copies by construction (red-first
+repro, then green; parity gate green after); the instanced matcher
+gained the crafted-marker leg with discriminating tests both directions;
+createDirectedOffer gained guardTerms (strike parity, the pay arm's
+recorded premise finally true; route decodes strictly, sdk requires the
+flag, controller sends it); the accept belt reads the model's own
+canAccept/acceptHint ladder (canAccept got its production consumer, the
+retired stale copy stays retired via the logs-nothing past-review arm);
+sweepError's production fallback logs code+message+stack null-safely;
+Object.hasOwn at all three client-string ITEMS lookups; plus the doc
+truth-ups (orphaned guardBalance docblock, the falsified
+item-unknown-until-acceptance DDL rationale, the honest occupancy
+ceiling, offer_pending in server/CLAUDE.md, the highest-id repair
+tiebreak, the two-party NO_OWNER rationale, the bag-capacity staged
+bound, behavior-identical extraction wording).
+
+Test additions (the three-writer wave + the fix-round re-review's
+hardening, commits 9c9854ee85 and 47399f77b7): the pg suite grew to 23
+(directed return flight with the parcel book, custody claim row, and
+item_disposed flip plus an idempotent second pass; the seeded
+boot-repair dedupe proving the highest-id survivor and a rebuilt valid
+index; byte-identical duplicate acceptance; instanced+crafted
+end-to-end; the prune count made exact by construction); the service
+suite gained the instanced happy path proving both digest sites agree,
+the crafted leg both directions, the terms arc, the ever-settled DB-free
+twin, the converge old-bound arm with the 24h literal pin, the
+cap-refusal-before-custody witness, and the sweep-fallback shape test;
+the routes test captures the forwarded body (identity + strict terms
+decode); tests/items_sell_units.test.ts is the shared walk's direct
+suite (12 cases incl. the foreign-id decoy placed where an id-blind walk
+would eat it, identity assertions over deliberately deep-equal payloads,
+both predicates on one fixture, and the wrapper's walk-then-hook order);
+trade.test.ts pins pinned-copy-first, both marker directions, the
+quest-log-order batch deltas, the overflow refusal, and the gives-side
+full-bag acceptance; the view comparator's key-order independence is
+pinned both ways; the panel's hint live-region has its pin. 21 mutation
+probes across the session (9 main-loop guard mutations incl. both H14
+arms, the ever-settled gate, the expiry qual, the converge old bound;
+plus the writers' 12) all went red on cue.
+
+Judged, no code change (recorded in the ledger; do not re-raise): the
+strike non-decay difference, the late-accept buyer-notice gap (bounded
+by the 600s offer TTL and the withdraw lever; 14 owns the surface), the
+client-only one_item quantity rule (overlaps the recorded 14/15 honesty
+residual; a server-side staged-shape check noted for 14), the padlock
+pin interaction (fail-safe refusal; 14's copy surfaces), the per-actor
+offer fan-out (rate-limited and pair-bounded). NEW OPEN RULING R9: the
+trade arm records implied terms consent with no terms text shown;
+acceptable only while the market stays config-off; the pre-enable audit
+must carry it.
+
+Validation: tsc clean throughout; ci:changed exit 0; parity 207 green
+twice (no golden regenerated); the S3 guard, architecture,
+hud_perf_budget, language_fanout green; all five pg suites 152 green
+zero skips ON THE FINAL TIP; qa-checklist READY with 0 blocking and its
+three should-fixes applied (the fallback-branch test, the R9 ledger
+recording, the marker-scope comment); gate GREEN at 47399f77b7 (node
+scripts/gate_select.mjs with TEST_DATABASE_URL exported). The final
+tests-only commit 47399f77b7 implements the qa gate's own prescriptions
+(34 lines); the 07 session should glance at it first, the ea1bb82322
+pattern one size smaller.
 
 ## 06 implement round (directed rail and self-deal integrity)
 

@@ -5,7 +5,24 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-06-qa.md`
+- Next file to run: `docs/woc-marketplace-hardening/phase-07-policy-terms-drafts.md`
+- 06 QA COMPLETE (PASS-WITH-FOLLOWUPS, every fix applied, PUSHED per R4).
+  Release/v0.38.0 re-synced (merge ab2742012b, NON-trivial: three test
+  conflicts plus two SILENT count-pin auto-merges, all re-derived from
+  suite runs: IWorld 323 = 86 data + 237 methods, fanout exemptions 10,
+  hud.ts ceiling DOWN to 19160, sim.ts 12436; release-merge-audit ran,
+  faithful, zero findings across seven overlap groups). ea1bb82322
+  verified FIRST (comment-only src hunk; every pin bit under mutation).
+  Six fresh audit lanes found ZERO code blockers in the implement round;
+  the QA round's own finds: the capacity model's fungible-first drift
+  (receiver overflow, fixed by making fitsAfterSwap run the removal walk
+  itself), the instanced matcher's missing crafted-marker leg, the
+  missing guardTerms on the directed buyer (strike parity), and four
+  blocking TEST gaps, all closed. ONE NEW OPEN RULING for Fernando (R9,
+  in Rulings): the trade arm records implied terms consent. The 06
+  ledger entry below is AMENDED IN PLACE; the 07 session consumes the
+  amended entry and should glance at the final tests-only commit
+  47399f77b7 first (34 lines, implements the qa gate's prescriptions).
 - 06 implemented AND reviewed (LOCAL, not pushed per R4): H10, H12, H14,
   createDirectedOffer guardBalance, and the directed non-payment
   auto-close closed; BOTH opening judgments settled ((a) unwind made
@@ -195,6 +212,17 @@ Still open (a phase that hits one asks at session start):
   player wiki/guide page, game-side audited runtime pause, numeric reserve guard. They
   stay in the follow-ups queue; if he opts any in later, add it as a new numbered phase
   before phase 21 and update progress.md and the plan table.
+- R9 (phases 07/14/22, raised by the 06 QA round 2026-08-13): the trade window's
+  $WOC arm records IMPLIED terms consent. Both its money sends (the offer create,
+  and the pay arm since it shipped) hard-code acceptTerms: true while the panel
+  renders no terms text or link, and guardTerms durably RECORDS the acceptance,
+  so a buyer who never opened the Exchange gets a stored consent row that later
+  backs strikes and suspensions. Inert while WOC_MARKET_ENABLED stays off.
+  Options: (a) keep the posture and land a panel terms affordance (the Exchange
+  window's checkbox is the model) before enable; (b) have the panel send the
+  player's real choice once 07's terms drafts exist. Either way the pre-enable
+  audit (22) must not pass while the panel records consent it never showed.
+  07 owns the terms drafts, 14/15 own the panel surface.
 
 ## Locked decisions
 
@@ -495,11 +523,80 @@ Still open (a phase that hits one asks at session start):
     window's richer payload display (tooltips can now show real rolls).
     Phase 16's cluster gains: the estimate-per-offer-create amplifier
     note (bounded by the LIST limiter; memoize per usdCents if it shows
-    in latency) and the trade-wire payload diff cost note (bounded, six
-    slots, change-gated). Phase 20 owes standing planner assertions incl
-    the two new partial indexes. Phase 22's pre-enable audit: the
-    bindOnTrade scan line stands; add the two dev-db classes from the
-    deploy notes above.
+    in latency) and the trade-wire payload diff cost note (bounded by
+    bag capacity, change-gated). Phase 20 owes standing planner
+    assertions incl the two new partial indexes. Phase 22's pre-enable
+    audit: the bindOnTrade scan line stands; add the two dev-db classes
+    from the deploy notes above.
+  - QA ROUND (2026-08-13, verdict PASS-WITH-FOLLOWUPS, every fix applied,
+    PUSHED per R4; commits c67af5f62f, cedbaae8f2, 19eb3c74d6,
+    9c9854ee85, 47399f77b7 on the ab2742012b sync merge). The amendments
+    the 07+ sessions consume:
+    - CAPACITY MODEL REWORKED: fitsAfterSwap no longer re-describes the
+      removal; it RUNS shippedOfferUnits (the walk removeOffer itself
+      delegates to) over scratch copies of both bags and lands each
+      returned unit with the boundTo-stamp arrival arm. Found because
+      the old fungible-first model passed a pinned INSTANCED arrival the
+      swap could not merge (a 16/16 receiver ended at 17 slots,
+      red-first repro in tests/trade.test.ts). Third drift of that
+      model's class (#2139, #2605, this); a walk cannot drift from
+      itself. The old conservative unmatched-unit tail was dropped as
+      unreachable in a live Sim (countItem and the walk read the same
+      array); source pin bounds the walk calls at exactly two and
+      negatives a second index walk.
+    - removeInstancedMatchingUnit gained the CRAFTED-MARKER leg (the UI
+      comparator's closing-round fix had no sim twin: a staged crafted
+      copy could ship its payload-equal unmarked twin, laundering
+      provenance past the disenchant gate and the H10 fingerprint);
+      discriminating tests both directions; the generic fallback stays
+      marker-blind BY POSTURE with the scope now written at the call.
+    - guardTerms NOW GATES createDirectedOffer (strike parity: every
+      path that can strike sits behind terms; order matches placeBid;
+      the route decodes acceptTerms strictly; the sdk requires it; the
+      controller sends true, see R9). terms_required pre-existed end to
+      end, so no new code, copy, or fills.
+    - The accept belt READS THE MODEL (canAccept/acceptHint) instead of
+      re-deriving the ladder; past-review the belt logs NOTHING (the
+      'nothing' arm); canAccept gained its production consumer. The
+      sweep-error fallback logs code+message+STACK (no detail, null-safe
+      code read at both log sites; the production branch now has its own
+      test). Own-property ITEMS lookups at all three client-string
+      sites.
+    - JUDGED, no code change (do not re-raise): strike non-decay vs the
+      public cooldown pair is DOCUMENTED design (the directed rail is
+      the auction-default rail minus the bond); the buyer-notice gap on
+      a late seller accept is bounded by the 600s offer TTL + the
+      withdraw lever, surface owned by 14; the client-only one_item
+      quantity rule overlaps the recorded 14/15 honesty residual (a
+      server-side staged-shape check noted for 14's consideration); the
+      padlock (item_lock `locked`) rides the pin, so toggling it
+      mid-deal refuses item_mismatch: fail-safe, 14's copy surfaces
+      should explain it; per-actor offer fan-out is rate-limited
+      (10/min) and pair-bounded per victim, watch at 14/16.
+    - NEW TESTS the next sessions inherit: the pg suite is 23 (return
+      flight incl. parcel book + item_disposed + idempotent second pass;
+      the seeded boot-repair dedupe, whose survivor is HIGHEST ID = last
+      inserted, now said at the DDL; byte-identical duplicate
+      acceptance; instanced+crafted end-to-end); the service suite
+      gained the instanced happy path proving BOTH digest sites agree,
+      the crafted leg both directions, the ever-settled DB-free twin,
+      the converge old-bound arm + the 24h literal pin, the
+      cap-refusal-before-custody witness (extractAttempts), and the
+      sweep-fallback shape; routes CAPTURE the forwarded offer body;
+      tests/items_sell_units.test.ts is the walk's direct suite;
+      trade.test.ts pins pinned-copy-first, both marker directions,
+      quest-log-order batch deltas, and both capacity-model halves.
+      All mutation-proven (9 session probes + the lanes' 12).
+    - MERGE RE-DERIVATIONS (for the next sync): IWorld 323 = 86 data +
+      237 methods; language-fanout exemptions 10; hud.ts ceiling 19160
+      (the release's map extraction LOWERED it); sim.ts 12436. The
+      parity union pin at the bottom of world_api_parity auto-merged
+      silently AGAIN (both sides claimed 322): the file's own NOTE
+      predicted it; only suite runs decide.
+    - Deploy note added: the sweep fallback's log line now carries the
+      stack (no err.detail; locates a failed arm across its call
+      sites). Phase 22's pre-enable audit gains R9 (the implied-consent
+      panel affordance) beside the two dev-db classes.
 - 01 branch-baseline (2026-08-11, session start e4c3dde956, tip 418f75b876,
   LOCAL, not pushed per R4): branch was already current with
   origin/release/v0.37.0 (no sync merge needed). All five coordinator
