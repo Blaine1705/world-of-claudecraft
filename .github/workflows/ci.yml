@@ -998,6 +998,17 @@ jobs:
       - name: Build client
         run: npm run wiki:content && npm run build:bundle
 
+      # The client build just regenerated all three committed build manifests
+      # (wiki:content writes the guide content, build:bundle's pregen writes
+      # the SFX and media manifests), so this diff proves the committed
+      # copies against this tree's own sources. The selective planner treats
+      # exactly these paths as inert-but-fed-to-related ONLY on the strength
+      # of this step (GENERATED_MANIFEST_ARTIFACT_FILES in
+      # scripts/lib/gate_select_plan.mjs; tests/ci_workflow.test.ts welds the
+      # classifier list, this argv, and the local gate list to each other).
+      - name: Manifest freshness (committed build manifests)
+        run: git diff --exit-code -- src/game/sfx_manifest.generated.ts src/guide/content.generated.ts src/render/assets/manifest.generated.ts public/audio/sfx/runtime-pack.json scripts/sfx/sfx_gain_ceiling.generated.json
+
   # A release ref runs THREE parallel jobs: release-gate (this one) runs the test
   # suite at PR tier, release-i18n runs the release TIER over the suites that read
   # the flag, and release-checks runs the serialized checks, so the release critical
@@ -1294,3 +1305,14 @@ jobs:
 
       - name: Build client
         run: npm run wiki:content && npm run build:bundle
+
+      # The client build just regenerated all three committed build manifests
+      # (wiki:content writes the guide content, build:bundle's pregen writes
+      # the SFX and media manifests), so this diff proves the committed
+      # copies against this tree's own sources. The selective planner treats
+      # exactly these paths as inert-but-fed-to-related ONLY on the strength
+      # of this step (GENERATED_MANIFEST_ARTIFACT_FILES in
+      # scripts/lib/gate_select_plan.mjs; tests/ci_workflow.test.ts welds the
+      # classifier list, this argv, and the local gate list to each other).
+      - name: Manifest freshness (committed build manifests)
+        run: git diff --exit-code -- src/game/sfx_manifest.generated.ts src/guide/content.generated.ts src/render/assets/manifest.generated.ts public/audio/sfx/runtime-pack.json scripts/sfx/sfx_gain_ceiling.generated.json

@@ -320,12 +320,24 @@ function resolveSelectiveInputs({ changedPaths, alwaysRun, testFiles, exists }) 
       fallback: `generated i18n artifact(s) missing from the tree (${missingArtifacts.slice(0, 3).join(', ')}${missingArtifacts.length > 3 ? ', ...' : ''}): failing closed to the full suite`,
     };
   }
+  // Same presence re-proof for the manifest family (the second and only
+  // other freshness-guarded generated family; lib/gate_select_plan.mjs).
+  const missingManifests = buckets.generatedManifests.filter((p) => !exists(p));
+  if (missingManifests.length > 0) {
+    return {
+      fallback: `generated manifest artifact(s) missing from the tree (${missingManifests.slice(0, 3).join(', ')}${missingManifests.length > 3 ? ', ...' : ''}): failing closed to the full suite`,
+    };
+  }
   // Present artifacts join the related leg as graph nodes (the header in
   // lib/gate_select_plan.mjs): their consumers hang off the ARTIFACT side of
   // the import graph, not off the catalog/overlay sources that drove the
-  // regeneration, so this union is what keeps a locale-fill or catalog PR's
-  // consumer suites selected.
-  const relatedSources = [...buckets.relatedSources, ...buckets.generatedI18n];
+  // regeneration, so this union is what keeps a locale-fill, catalog, or
+  // manifest PR's consumer suites selected.
+  const relatedSources = [
+    ...buckets.relatedSources,
+    ...buckets.generatedI18n,
+    ...buckets.generatedManifests,
+  ];
 
   const { floor, missingGuards } = buildFloor({
     alwaysRun,
