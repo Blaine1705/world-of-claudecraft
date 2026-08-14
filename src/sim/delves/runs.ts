@@ -725,18 +725,19 @@ export function onDelveBossDefeated(ctx: SimContext, run: DelveRun): void {
   }
 }
 
-// Base Marks payout for one clear. PRD §6.5 FR-5.3: full Marks for the first 3
-// completions per UTC day, then a diminished payout (Heroic 1 guaranteed, Normal
-// 50% chance of 1). §6.7 FR-7.1 Heroic "+30% Marks" rides the tier `rewardMult`.
-// Reads `markClears` BEFORE the caller increments it. NOTE: at the base of 1 Mark
-// the +30% rounds to no per-clear difference; the Heroic mark advantage comes from
-// the post-3 guaranteed-vs-50% rule. Uses `ctx.rng` only (deterministic).
 // The daily full-payout window: this many clears per reset day (one tally
 // shared across delves and tiers) pay full base Marks AND may carry chest/rite
 // bonus Marks. Both comparators below read this ONE constant so the base and
 // bonus windows cannot desync under a retune.
 export const DELVE_DAILY_FULL_CLEARS = 3;
 
+// Base Marks payout for one clear. PRD §6.5 FR-5.3: full Marks for the first 3
+// completions per reset day (1 Normal / 2 Heroic), then a diminished payout
+// (Heroic 1 guaranteed, Normal 50% chance of 1). Reads `markClears` BEFORE the
+// caller increments it. NOTE: the §6.7 FR-7.1 Heroic "+30% Marks" rides the
+// tier `rewardMult` (1.3) but rounds to no per-clear difference at this base;
+// the real Heroic edge is the in-window 2-vs-1 plus the post-window
+// guaranteed-vs-50% rule. Uses `ctx.rng` only (deterministic).
 export function delveMarkPayout(ctx: SimContext, run: DelveRun, meta: PlayerMeta): number {
   const isHeroic = run.tierId === 'heroic';
   // The first DELVE_DAILY_FULL_CLEARS clears/day pay full: 1 Normal / 2 Heroic
@@ -825,6 +826,12 @@ export function grantDelveClearTo(
 // `markClears` tally the window check reads is the one this pass incremented,
 // structurally, not by call-site convention.
 export function grantDelveRewards(ctx: SimContext, run: DelveRun): number[] {
+  // An already-completed run credits nobody, so the downstream granters pay NO
+  // bonus at all (no marks, no copper, no lockpickBonus event); deliberate,
+  // and safer than the old double-pay, but it couples the whole bonus to this
+  // flag. A future second grant path must carry its own credited list rather
+  // than fall back to party membership. Pinned by the "already-completed"
+  // tests in tests/delves.test.ts.
   if (run.completed) return [];
   run.completed = true;
   const delve = DELVES[run.delveId];
