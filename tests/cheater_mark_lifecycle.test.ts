@@ -23,7 +23,8 @@ import type { Aura, Entity } from '../src/sim/types';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // Every Sim member this file drives is public (ctx, tick, setCheaterMark, the
-// spirit verbs), so there is no `any` widening here: the rig is the real class.
+// spirit verbs). The one cast in rig() wraps the public emit so this file can
+// observe events without draining the queue the Sim's own consumers read.
 type Ev = { type?: string; name?: string; gained?: boolean; abilityId?: string; refresh?: boolean };
 
 const MARK_SECONDS = 3_600;
@@ -78,18 +79,24 @@ const markAura = (e: Entity): Aura | undefined =>
 const hasControl = (e: Entity): boolean => e.auras.some((a) => a.id === CONTROL_AURA_ID);
 
 describe('Cheater mark: survives every wipe a player can trigger', () => {
-  it('survives death, spirit release, and the corpse resurrection, budget intact', () => {
+  it('survives death, spirit release, and the corpse resurrection, partial budget intact', () => {
     const { sim, p } = marked();
-    const remaining = markAura(p)?.remaining;
-    expect(remaining).toBe(MARK_SECONDS);
+    // Burn 2s alive first so the surviving value is a PARTIAL budget: a
+    // regression that re-stamps a fresh full-duration mark on respawn would
+    // pass a pristine-value comparison but not this one.
+    for (let i = 0; i < 40; i++) sim.tick();
+    const remaining = markAura(p)?.remaining ?? 0;
+    expect(remaining).toBeCloseTo(MARK_SECONDS - 2, 5);
 
     sim.ctx.handleDeath(p, null);
     expect(p.dead).toBe(true);
     expect(hasControl(p)).toBe(false); // the control: the death wipe really ran
     expect(markAura(p)?.remaining).toBe(remaining);
 
+    p.auras.push(controlAura(p.id)); // fresh control for the NEXT wipe stage
     sim.releaseSpirit();
     expect(p.ghost).toBe(true);
+    expect(hasControl(p)).toBe(false); // the control: the release wipe really ran
     expect(markAura(p)?.remaining).toBe(remaining);
 
     // Walk the ghost onto its corpse and revive there (the penalty-free path).
@@ -97,9 +104,11 @@ describe('Cheater mark: survives every wipe a player can trigger', () => {
     p.pos = { x: corpse.x, y: corpse.y, z: corpse.z };
     p.prevPos = { ...p.pos };
     sim.rebucket(p);
+    p.auras.push(controlAura(p.id)); // fresh control for the revive stage
     sim.resurrectAtCorpse();
 
     expect(p.dead).toBe(false);
+    expect(hasControl(p)).toBe(false); // the control: the revive filter really ran
     expect(markAura(p)?.remaining).toBe(remaining);
     // The wire flag rides through untouched: nearby clients keep rendering the tag.
     expect(p.cheaterMark).toBe(true);
@@ -109,9 +118,11 @@ describe('Cheater mark: survives every wipe a player can trigger', () => {
     const { sim, p } = marked();
     sim.ctx.handleDeath(p, null);
     sim.releaseSpirit();
+    p.auras.push(controlAura(p.id)); // the control: the healer filter must wipe it
     expect(sim.resurrectAtSpiritHealer()).toBe(true);
 
     expect(p.dead).toBe(false);
+    expect(hasControl(p)).toBe(false);
     expect(markAura(p)?.remaining).toBe(MARK_SECONDS);
     expect(p.cheaterMark).toBe(true);
   });
@@ -143,9 +154,11 @@ describe('Cheater mark: survives every wipe a player can trigger', () => {
     const { sim, p } = marked();
 
     fiestaDownEntity(sim.ctx, p, null);
+    p.auras.push(controlAura(p.id)); // the control: the ready wipe must strip it
     readyArenaFighter(sim.ctx, p, { clearPrep: true });
 
     expect(p.dead).toBe(false);
+    expect(hasControl(p)).toBe(false);
     expect(markAura(p)?.remaining).toBe(MARK_SECONDS);
     expect(p.cheaterMark).toBe(true);
   });
@@ -192,7 +205,10 @@ describe('Cheater mark: the three ways it legitimately ends', () => {
     for (let i = 0; i < 40; i++) sim.tick(); // 2s of a 10s sanction
 
     expect(markAura(p)).toBeDefined();
-    expect(markAura(p)?.remaining).toBeLessThan(10);
+    // Exactly 2 seconds burned: one alive second of sim time IS one second of
+    // the sanction, the design claim the module docs stake out. A half-rate or
+    // double-rate burn fails here, not just a wildly wrong one.
+    expect(markAura(p)?.remaining).toBeCloseTo(8, 5);
     expect(p.cheaterMark).toBe(true);
   });
 
@@ -218,6 +234,11 @@ describe('Cheater mark: the three ways it legitimately ends', () => {
 
   it('a lift on an unmarked player is a silent no-op', () => {
     const { sim, p, events } = rig();
+    // Positive control first: prove the capture rig is live, so the silence
+    // assertion below cannot pass because the hook simply stopped recording.
+    sim.setCheaterMark(MARK_SECONDS);
+    expect(events.some((e) => e.type === 'aura' && e.gained === true)).toBe(true);
+    sim.setCheaterMark(0);
     events.length = 0;
 
     sim.setCheaterMark(0);
@@ -241,13 +262,26 @@ describe('Cheater mark: the wire flag tracks the aura, never the intent', () => 
     expect(p.cheaterMark).toBe(true);
   });
 
-  it('leaves an absent flag absent when the budget normalizes to nothing', () => {
+  it('leaves an absent flag absent on a garbage budget', () => {
     const { sim, p } = rig();
 
-    sim.setCheaterMark(Number.NaN); // garbage budget: normalizes to no mark
+    sim.setCheaterMark(Number.NaN); // garbage budget: a no-op, never a lift
 
     expect(markAura(p)).toBeUndefined();
     expect(p.cheaterMark).toBeUndefined();
+  });
+
+  it('a garbage budget never lifts a LIVE mark', () => {
+    // normalize collapses NaN to 0 and 0 is the lift arm, so without the
+    // non-finite guard a corrupt operator form, wire payload, or null column
+    // would silently end a live sanction. Only an explicit finite 0 lifts.
+    const { sim, p } = marked();
+    const remaining = markAura(p)?.remaining;
+
+    sim.setCheaterMark(Number.NaN);
+
+    expect(markAura(p)?.remaining).toBe(remaining);
+    expect(p.cheaterMark).toBe(true);
   });
 });
 

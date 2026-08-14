@@ -229,8 +229,12 @@ describe('cheaterMarkAura', () => {
     const flagDropped = { ...aura, undispellable: undefined };
     expect(isDispellableAura(flagDropped, false)).toBe(false);
     expect(isDispellableAura(flagDropped, true)).toBe(false);
-    // The control: the same call DOES clear a real magic debuff off an ally.
+    // The controls, one per arm: the same call DOES clear a real magic debuff
+    // off an ally, and DOES purge a real magic buff off an enemy. Without the
+    // second, the offensive-arm refusal above would be vacuous: a harmful kind
+    // is never offensively dispellable regardless of school or flag.
     expect(isDispellableAura(magicDebuff(0), false)).toBe(true);
+    expect(isDispellableAura({ ...magicDebuff(0), kind: 'buff_ap', value: 10 }, true)).toBe(true);
   });
 
   test('sorts into the debuff bar', () => {

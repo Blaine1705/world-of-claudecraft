@@ -5847,6 +5847,11 @@ export class Sim {
   setCheaterMark(seconds: number, pid?: number): void {
     const r = this.resolve(pid);
     if (!r) return;
+    // Garbage in, no-op out: normalize collapses NaN and non-numbers to 0, and
+    // 0 is the LIFT arm, so without this guard a corrupt budget from any caller
+    // would silently end a live sanction. Only an explicit finite value may
+    // lift; anything else leaves the mark exactly as it stands.
+    if (typeof seconds !== 'number' || !Number.isFinite(seconds)) return;
     const mark = moderationMod.normalizeCheaterMark(seconds);
     if (mark) {
       this.ctx.applyAura(r.e, moderationMod.cheaterMarkAura(mark, r.e.id));
