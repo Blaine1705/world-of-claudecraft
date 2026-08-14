@@ -206,14 +206,23 @@ describe('pushDiscordPresenceEnabled: the options write', () => {
 // Composition: init + the frame feed, against a fake bridge, the REAL zone data
 // and the REAL settings store.
 
+// Every Settings construction parses the whole blob through exactly one
+// getItem('woc_settings'), so counting those counts constructions.
+const SETTINGS_STORE_KEY = 'woc_settings';
+let settingsReads = 0;
+
 function installStorage(): void {
   const map = new Map<string, string>();
+  settingsReads = 0;
   const storage = {
     get length() {
       return map.size;
     },
     key: (index: number) => Array.from(map.keys())[index] ?? null,
-    getItem: (k: string) => map.get(k) ?? null,
+    getItem: (k: string) => {
+      if (k === SETTINGS_STORE_KEY) settingsReads++;
+      return map.get(k) ?? null;
+    },
     setItem: (k: string, v: string) => {
       map.set(k, v);
     },
@@ -231,15 +240,23 @@ const ZONE_A = zoneAt(0, 0);
 const ZONE_B = zoneAt(0, 300);
 
 let clock = 0;
-const world = (x: number, z: number) => ({ player: { pos: { x, z } } });
+// id defaults to a real local player id: both hosts number them from 1 up, and
+// only the online pre-snapshot placeholder is non-positive.
+const world = (x: number, z: number, id = 1) => ({ player: { id, pos: { x, z } } });
 
-function makeBridge(): { bridge: DesktopBridge; setDiscordActivity: ReturnType<typeof vi.fn> } {
+function makeBridge(): {
+  bridge: DesktopBridge;
+  setDiscordActivity: ReturnType<typeof vi.fn>;
+  setDiscordPresenceEnabled: ReturnType<typeof vi.fn>;
+} {
   const setDiscordActivity = vi.fn();
+  const setDiscordPresenceEnabled = vi.fn();
   return {
     setDiscordActivity,
+    setDiscordPresenceEnabled,
     bridge: {
       setDiscordActivity,
-      setDiscordPresenceEnabled: vi.fn(),
+      setDiscordPresenceEnabled,
     } as unknown as DesktopBridge,
   };
 }
@@ -286,7 +303,7 @@ describe('initDiscordPresence + desktopPresenceOnFrame', () => {
 
     // A disable 100ms later: a clear is NOT rate limited by the core, so the
     // only thing that can swallow it is the per-second frame throttle.
-    new Settings().set('discordPresence', false);
+    pushDiscordPresenceEnabled(bridge, false);
     clock += 100;
     desktopPresenceOnFrame(world(0, 0));
     expect(setDiscordActivity).toHaveBeenCalledTimes(1);
@@ -306,6 +323,84 @@ describe('initDiscordPresence + desktopPresenceOnFrame', () => {
     clock += 30_000;
     desktopPresenceOnFrame(world(0, 0));
     expect(setDiscordActivity.mock.calls).toEqual([[null]]);
+  });
+
+  it('reconciles the shell with the stored choice once at init, both polarities', () => {
+    // A shell store can disagree with the renderer's (cleared localStorage, a
+    // reset prefs file, a previous install told "off"), and without this the
+    // off switch would only hold from the first toggle rather than from boot.
+    new Settings().set('discordPresence', false);
+    const off = makeBridge();
+    initDiscordPresence(off.bridge);
+    expect(off.setDiscordPresenceEnabled.mock.calls).toEqual([[false]]);
+
+    new Settings().set('discordPresence', true);
+    const on = makeBridge();
+    initDiscordPresence(on.bridge);
+    expect(on.setDiscordPresenceEnabled.mock.calls).toEqual([[true]]);
+  });
+
+  it('never reconciles a shell that cannot serve presence', () => {
+    const setDiscordPresenceEnabled = vi.fn();
+    initDiscordPresence({ setDiscordPresenceEnabled } as unknown as DesktopBridge);
+    expect(setDiscordPresenceEnabled).not.toHaveBeenCalled();
+  });
+
+  it('reads the settings store exactly once per session, never in the poll', () => {
+    const { bridge } = makeBridge();
+    settingsReads = 0;
+    initDiscordPresence(bridge);
+    expect(settingsReads).toBe(1);
+    for (let i = 0; i < 5; i++) {
+      clock += 1_100;
+      desktopPresenceOnFrame(world(0, 0));
+    }
+    // Five polls later the store has still been read exactly that once: the
+    // poll reads the cache, never a fresh Settings.
+    expect(settingsReads).toBe(1);
+  });
+
+  it('takes a toggle through the push, with no settings read at all', () => {
+    const { bridge, setDiscordActivity } = makeBridge();
+    initDiscordPresence(bridge);
+    desktopPresenceOnFrame(world(0, 0));
+    expect(setDiscordActivity).toHaveBeenCalledTimes(1);
+    settingsReads = 0;
+
+    // The push is the cache refresh: the poll must see the new value without
+    // going back to the store (main.ts applySetting is the single write path,
+    // and it is the only caller of the push).
+    pushDiscordPresenceEnabled(bridge, false);
+    clock += 1_100;
+    desktopPresenceOnFrame(world(0, 0));
+    expect(setDiscordActivity).toHaveBeenLastCalledWith(null);
+
+    // Past the rate-limit window, so the resend is the only thing under test.
+    pushDiscordPresenceEnabled(bridge, true);
+    clock += 20_000;
+    desktopPresenceOnFrame(world(0, 0));
+    expect(setDiscordActivity).toHaveBeenCalledTimes(3);
+    expect((setDiscordActivity.mock.calls[2][0] as DesktopDiscordActivity).details).toBe(
+      zoneDisplayName(ZONE_A.id),
+    );
+    expect(settingsReads).toBe(0);
+  });
+
+  it('publishes nothing until the online world has a real local player', () => {
+    // ClientWorld.player is blankEntity(-1) at the origin until the first
+    // snapshot: publishing there would put everyone in the starting zone AND
+    // burn the rate-limit window that the real zone then needs.
+    const { bridge, setDiscordActivity } = makeBridge();
+    initDiscordPresence(bridge);
+    desktopPresenceOnFrame(world(0, 0, -1));
+    expect(setDiscordActivity).not.toHaveBeenCalled();
+
+    clock += 1_100;
+    desktopPresenceOnFrame(world(0, 300, 7));
+    expect(setDiscordActivity).toHaveBeenCalledTimes(1);
+    expect((setDiscordActivity.mock.calls[0][0] as DesktopDiscordActivity).details).toBe(
+      zoneDisplayName(ZONE_B.id),
+    );
   });
 
   it('holds the last overworld zone while the player is inside an instance', () => {
@@ -335,12 +430,23 @@ describe('initDiscordPresence + desktopPresenceOnFrame', () => {
     desktopPresenceOnFrame(world(0, 0));
     expect(first.setDiscordActivity).toHaveBeenCalledTimes(1);
 
+    // An init on a shell that cannot serve presence disarms the feed, and the
+    // previous session's bridge stops being written to.
+    initDiscordPresence({} as DesktopBridge);
+    clock += 60_000;
+    desktopPresenceOnFrame(world(0, 300));
+    expect(first.setDiscordActivity).toHaveBeenCalledTimes(1);
+
     const second = makeBridge();
     initDiscordPresence(second.bridge);
     desktopPresenceOnFrame(world(0, 0));
     expect(second.setDiscordActivity).toHaveBeenCalledTimes(1);
-    // the previous session's bridge is no longer written to
     expect(first.setDiscordActivity).toHaveBeenCalledTimes(1);
+    // The elapsed clock is re-captured per session, never carried over: the
+    // second session's start is its own init time.
+    expect(
+      (second.setDiscordActivity.mock.calls[0][0] as DesktopDiscordActivity).timestamps,
+    ).toEqual({ start: Math.floor(clock / 1000) });
   });
 });
 

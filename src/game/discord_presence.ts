@@ -22,9 +22,10 @@ import { Settings } from './settings';
 
 /** The structural slice of IWorld this module reads. Both hosts satisfy it (the
  *  offline Sim and the online ClientWorld), and keeping it minimal is what lets
- *  the frame-feed arms run against a plain object in Vitest. */
+ *  the frame-feed arms run against a plain object in Vitest. The id is read for
+ *  one reason only: telling a real local player from the online placeholder. */
 export interface DiscordPresenceWorld {
-  player: { pos: { x: number; z: number } };
+  player: { id: number; pos: { x: number; z: number } };
 }
 
 export interface DiscordPresenceSnapshot {
@@ -131,6 +132,13 @@ let lastPollAt = -Infinity;
 // see the dungeon gate in desktopPresenceOnFrame.
 let zoneId: string | null = null;
 let zoneName: string | null = null;
+// The player's stored choice, cached so the 1 Hz poll never rebuilds a Settings
+// (its constructor parses the whole localStorage blob). Seeded by the one read
+// initDiscordPresence does, and refreshed by pushDiscordPresenceEnabled below,
+// which every write passes through: the options row, the Interface panel's
+// Reset to Defaults, and the world-entry apply-all loop all reach the setting
+// through main.ts applySetting, and that arm is the only caller of the push.
+let presenceEnabled = true;
 
 /**
  * Compose the presence feed onto the bridge. A no-op on any bridge missing
@@ -140,6 +148,7 @@ let zoneName: string | null = null;
 export function initDiscordPresence(bridge: DesktopBridge): void {
   publish = null;
   core = null;
+  sessionStartSec = 0;
   lastPollAt = -Infinity;
   zoneId = null;
   zoneName = null;
@@ -152,6 +161,12 @@ export function initDiscordPresence(bridge: DesktopBridge): void {
   // restarting on every zone change (Discord restarts it whenever `start`
   // changes). Seconds, which is the unit the RPC payload wants.
   sessionStartSec = Math.floor(Date.now() / 1000);
+  // The ONE settings read of the session, and it does double duty: it seeds the
+  // cache the poll reads, and the push reconciles a shell whose own store
+  // disagrees (a cleared localStorage, a reset prefs file, a shell that was
+  // told "off" by a previous install). Without it the off switch would only
+  // hold from the first toggle rather than from startup.
+  pushDiscordPresenceEnabled(bridge, new Settings().get('discordPresence'));
   core = createDiscordPresenceCore();
 }
 
@@ -167,6 +182,13 @@ export function desktopPresenceOnFrame(world: DiscordPresenceWorld): void {
   if (now - lastPollAt < POLL_INTERVAL_MS) return;
   lastPollAt = now;
   const p = world.player;
+  // Online, ClientWorld.player answers blankEntity(-1) at the world origin until
+  // the first snapshot lands (src/net/online.ts). Publishing in that window puts
+  // every player in the starting zone, and the rate-limit window then swallows
+  // the real one for 15 seconds. Both hosts number real local players from 1 up
+  // (the offline Sim allocates from nextId = 1; online ids are server pids), so
+  // a non-positive id means "no player yet", never a real location.
+  if (p.id <= 0) return;
   // Dungeons have no zone row (the instance strip sits past this x), so the
   // presence HOLDS the region the player entered from: phase 10 is zone-only,
   // and naming the instance is a separate design call.
@@ -175,12 +197,15 @@ export function desktopPresenceOnFrame(world: DiscordPresenceWorld): void {
     if (id !== zoneId) {
       zoneId = id;
       // Resolved on change only: the core dedupes by zone id, so re-resolving
-      // every poll could not publish a language switch any sooner anyway.
+      // every poll could not publish a language switch any sooner anyway. The
+      // visible consequence: after an in-session language switch the published
+      // zone name stays in the previous language until the player crosses a
+      // zone border.
       zoneName = zoneDisplayName(id);
     }
   }
   const command = core.update(now, {
-    enabled: new Settings().get('discordPresence'),
+    enabled: presenceEnabled,
     zoneId,
     zoneName,
     sessionStartSec,
@@ -195,11 +220,16 @@ export function desktopPresenceOnFrame(world: DiscordPresenceWorld): void {
  * answer. NO inversion at this crossing (unlike the GPU preference next to it
  * in the options list): the setting and the wire value have the SAME polarity,
  * so presence enabled is `true` on both sides. Do not add a `!` here.
+ *
+ * Also the cache refresh for the frame poll, which is why it updates the cached
+ * value BEFORE the capability check: the renderer-side belief must follow the
+ * player's choice even on a shell that cannot be told about it.
  */
 export function pushDiscordPresenceEnabled(
   bridge: DesktopBridge | null | undefined,
   enabled: boolean,
 ): void {
+  presenceEnabled = enabled;
   const write = bridge?.setDiscordPresenceEnabled;
   if (typeof write !== 'function') return;
   write.call(bridge, enabled);
