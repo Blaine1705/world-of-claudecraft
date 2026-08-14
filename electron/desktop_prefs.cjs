@@ -126,7 +126,14 @@ function loadDesktopPrefs(filePath, deps = {}) {
     if (typeof text !== 'string' || text.length > MAX_PREFS_FILE_BYTES) {
       return defaultDesktopPrefs();
     }
-    return sanitizeDesktopPrefs(JSON.parse(text));
+    // Hand-editing this file is the documented no-boot rescue (set
+    // gpuForceOptOut by hand when the forced GPU cannot boot the game), and a
+    // Windows editor saving "UTF-8 with BOM" prepends U+FEFF, which JSON.parse
+    // rejects. Strip exactly one leading BOM so that rescue edit is honored
+    // instead of silently resolving to defaults, which would force the GPU
+    // right back ON.
+    const body = text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
+    return sanitizeDesktopPrefs(JSON.parse(body));
   } catch {
     // Missing file (the first launch), a permission error, a partial write: all
     // the same answer, because every one of them means "no usable memory".

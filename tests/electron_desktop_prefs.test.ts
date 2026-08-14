@@ -226,6 +226,61 @@ describe('loadDesktopPrefs', () => {
     expect(loadDesktopPrefs(smallPath).gpuForceOptOut).toBe(true);
   });
 
+  it('accepts a file at exactly the size cap (the bound is strictly greater)', () => {
+    // The refusal arm above proves cap+1 is rejected; this arm sits ON the cap
+    // so a strictly-greater bound quietly tightening to greater-or-equal fails
+    // a test instead of shrinking the accepted range by one byte.
+    const filePath = scratchPath('at-cap.json');
+    const content = '{"version":1,"gpuForceOptOut":true}';
+    writeFileSync(filePath, content + ' '.repeat(MAX_PREFS_FILE_BYTES - content.length), 'utf8');
+    expect(loadDesktopPrefs(filePath).gpuForceOptOut).toBe(true);
+  });
+
+  it('caps and type-checks the TEXT independently of the stat gate', () => {
+    // stat and read are two syscalls on the same untrusted path: a stat that
+    // under-reports (or a file that grew between the two) must not smuggle an
+    // oversized body past the cap, so the post-read guard has to bind on its
+    // own, exercised here with the stat lying small.
+    const lyingStat = () => ({ size: 10, isFile: () => true });
+    const oversized = `{"version":1,"gpuForceOptOut":true}${' '.repeat(MAX_PREFS_FILE_BYTES)}`;
+    expect(
+      loadDesktopPrefs('/lying/prefs.json', {
+        statSync: lyingStat,
+        readFileSync: () => oversized,
+      }),
+    ).toEqual(defaultDesktopPrefs());
+    // A read that answers something other than a string (a fake, or an encoding
+    // surprise) is refused by the same guard rather than reaching JSON.parse.
+    expect(
+      loadDesktopPrefs('/lying/prefs.json', {
+        statSync: lyingStat,
+        readFileSync: () => Buffer.from('{"version":1,"gpuForceOptOut":true}'),
+      }),
+    ).toEqual(defaultDesktopPrefs());
+    // The same rig with a sane string body loads, proving the guard above is
+    // what refused the other two, not the lying stat.
+    expect(
+      loadDesktopPrefs('/lying/prefs.json', {
+        statSync: lyingStat,
+        readFileSync: () => '{"version":1,"gpuForceOptOut":true}',
+      }).gpuForceOptOut,
+    ).toBe(true);
+  });
+
+  it('honors a hand-edit saved as UTF-8 with a BOM', () => {
+    // Hand-editing this file is the documented no-boot rescue, and a Windows
+    // editor's "UTF-8 with BOM" prepends U+FEFF, which JSON.parse rejects.
+    // Refusing the file would silently resolve to defaults and force the GPU
+    // back ON, the exact state the rescue edit exists to escape.
+    const filePath = scratchPath('bom.json');
+    writeFileSync(filePath, '\uFEFF{"version":1,"gpuForceOptOut":true}', 'utf8');
+    expect(loadDesktopPrefs(filePath).gpuForceOptOut).toBe(true);
+    // Exactly one BOM is stripped: a doubled BOM is still corrupt JSON.
+    const doublePath = scratchPath('double-bom.json');
+    writeFileSync(doublePath, '\uFEFF\uFEFF{"version":1,"gpuForceOptOut":true}', 'utf8');
+    expect(loadDesktopPrefs(doublePath)).toEqual(defaultDesktopPrefs());
+  });
+
   it('never throws when the filesystem does', () => {
     const boom = () => {
       throw new Error('EACCES');
