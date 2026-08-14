@@ -1425,6 +1425,10 @@ function identityFields(e: Entity): Record<string, unknown> {
     if (e.relicsTotal) out.crt = e.relicsTotal; // character-scoped relic total
   }
   if (e.aiAccount) out.ai = 1; // operator-set AI-operated mark (name prefix)
+  // Operator-applied Cheater tag. A bare flag, not the remaining budget: every
+  // nearby client needs to RENDER the tag, but only the wearer needs the
+  // countdown, and the wearer already has it on the mark's own aura.
+  if (e.cheaterMark) out.chm = 1;
   // Official streamer's platform links (player menu). Already gated by
   // wireStreamerLinks at the point they were set on the entity, so an account whose
   // streamer flag is off has none here, whatever is stored against it.
