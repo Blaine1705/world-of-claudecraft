@@ -1,28 +1,29 @@
 // The Proving Shore movement bootcamp overlay: the island sibling of the
 // Eastbrook new-adventurer coachmark (tutorial.ts), sharing its card CSS
 // family and its whole shape. Engages once for a fresh character standing on
-// the tutorial island, walks them through move / camera / the Gauntlet flag
-// course with copy in the player's live input family (keyboard, touch, or
-// gamepad; src/game/input_hint_mode.ts), shows the physical keycaps to press
-// as on-screen chips, and points the guidance arrow along the course flags.
+// the tutorial island and walks them through Warden Tam's Gauntlet in its
+// running order (forward, camera, strafe left, camera, forward; the ladder
+// lives in bootcamp_view.ts) with copy in the player's live input family
+// (keyboard, touch, or gamepad; src/game/input_hint_mode.ts), the physical
+// keycaps as on-screen chips, and the guidance arrow on the current lane's
+// flag.
 //
-// Pure presentation: every lesson is detected by OBSERVING the world and the
-// camera (displacement from the engage point, accumulated camera-yaw travel,
-// proximity to the authored checkpoint flags). It never writes sim state and
-// runs identically against the offline Sim and the online ClientWorld.
-// Completion is remembered per device in localStorage, the coachmark family's
-// precedent. The two overlays can never fight for the corner: this one only
-// engages west of the strait (x < -180), exactly where isFreshCharacter
-// (tutorial.ts) refuses to.
-//
-// All step logic lives in the pure core (bootcamp_view.ts, Node-tested);
-// this file owns DOM and paint only.
+// Detection observes the world, the camera, and (keyboard mode only) the
+// held-movement probe the host wires in: a lane's flag only credits once its
+// button was actually seen held during that lesson, so the buttons really
+// are pressed in order. Touch and pad players are gated by the ladder alone:
+// their movement is one stick, and stalling them on a flag they are standing
+// beside would teach nothing. It never writes sim state and runs identically
+// against the offline Sim and the online ClientWorld. Completion is
+// remembered per device in localStorage, the coachmark family's precedent.
+// The two overlays can never fight for the corner: this one only engages
+// west of the strait (x < -180), exactly where isFreshCharacter (tutorial.ts)
+// refuses to.
 
 import { currentInputHintMode, type InputHintMode } from '../game/input_hint_mode';
 import type { Keybinds } from '../game/keybinds';
 import type { Renderer } from '../render/renderer';
 import { BOOTCAMP_COURSE_CHECKPOINTS } from '../sim/content/proving_shore';
-import { dist2d } from '../sim/types';
 import { groundHeight, WATER_LEVEL } from '../sim/world';
 import { WORLD_SEED } from '../sim/world_seed';
 import type { IWorld } from '../world_api';
@@ -37,8 +38,16 @@ import {
   bootcampNeedsRerender,
   bootcampTitleKey,
   computeBootcampStep,
+  stepMovementAction,
 } from './bootcamp_view';
 import { formatNumber, t } from './i18n';
+
+/** The held-movement flags the host may wire in (main.ts reads them off the
+ *  live Input); null when unwired, which degrades to ladder-only gating. */
+export interface BootcampHeldMovement {
+  forward: boolean;
+  strafeLeft: boolean;
+}
 
 const STORAGE_KEY = 'woc.psbootcamp.v1';
 // The closing card lingers, then dismisses itself (the tutorial.ts pattern);
@@ -56,10 +65,12 @@ export class BootcampOverlay {
   private lastMode: InputHintMode = 'keyboard';
 
   // Lesson progress, all observed (see the pure core for the thresholds).
-  private engagePos = { x: 0, y: 0, z: 0 };
   private lastYaw = 0;
-  private turnedRad = 0;
+  private yawSinceFlag = 0;
   private checkpointsReached = 0;
+  // Keyboard-mode order proof: the current lane's button, seen held at least
+  // once during this lesson. Reset whenever a flag is tagged.
+  private legKeySeen = false;
 
   private root: HTMLElement | null = null;
   private titleEl!: HTMLElement;
@@ -75,7 +86,12 @@ export class BootcampOverlay {
   }
 
   // Called every HUD frame. Cheap no-op once completed or while off-island.
-  update(world: IWorld, renderer: Renderer, keybinds: Keybinds): void {
+  update(
+    world: IWorld,
+    renderer: Renderer,
+    keybinds: Keybinds,
+    held: BootcampHeldMovement | null,
+  ): void {
     if (this.completed) return;
     const p = world.player;
     if (!p) return;
@@ -88,10 +104,10 @@ export class BootcampOverlay {
       // island's whole population), standing on the island.
       if (!onIsland || p.level > 2) return;
       this.engaged = true;
-      this.engagePos = { ...p.pos };
       this.lastYaw = renderer.camYaw;
-      this.turnedRad = 0;
+      this.yawSinceFlag = 0;
       this.checkpointsReached = 0;
+      this.legKeySeen = false;
     } else if (!onIsland) {
       // Ferried back mid-lesson: fold the card away without writing the done
       // flag, so the next island visit starts the lessons fresh.
@@ -105,30 +121,43 @@ export class BootcampOverlay {
     }
 
     // Camera-yaw travel accumulates across frames (|delta| summed, wrapped to
-    // the short way around, so a slow pan and a quick flick both count).
+    // the short way around), and resets at every flag so each camera lesson
+    // asks for its own fresh swing.
     const yaw = renderer.camYaw;
     let dYaw = yaw - this.lastYaw;
     if (dYaw > Math.PI) dYaw -= 2 * Math.PI;
     if (dYaw < -Math.PI) dYaw += 2 * Math.PI;
-    this.turnedRad += Math.abs(dYaw);
+    this.yawSinceFlag += Math.abs(dYaw);
     this.lastYaw = yaw;
 
-    this.checkpointsReached = advanceCheckpoints(this.checkpointsReached, p.pos);
+    const mode = currentInputHintMode();
+    const current = computeBootcampStep({
+      checkpointsReached: this.checkpointsReached,
+      yawTurnedSinceFlagRad: this.yawSinceFlag,
+    });
+    const action = stepMovementAction(current);
+    if (action && held?.[action]) this.legKeySeen = true;
+    // A lane's flag credits only during its own lesson (the camera lessons
+    // in between are mandatory), and keyboard mode further requires the
+    // lane's button to have actually been held.
+    const creditAllowed =
+      action !== null && (mode !== 'keyboard' || held === null || this.legKeySeen);
+    const advanced = advanceCheckpoints(this.checkpointsReached, p.pos, creditAllowed);
+    if (advanced !== this.checkpointsReached) {
+      this.checkpointsReached = advanced;
+      this.yawSinceFlag = 0;
+      this.legKeySeen = false;
+    }
 
     const next = computeBootcampStep({
-      movedYd: dist2d(p.pos, this.engagePos),
-      cameraTurnedRad: this.turnedRad,
       checkpointsReached: this.checkpointsReached,
+      yawTurnedSinceFlagRad: this.yawSinceFlag,
     });
 
-    const mode = currentInputHintMode();
     if (bootcampNeedsRerender(this.step, next, this.lastMode, mode)) {
       this.step = next;
       if (next === 'done' && this.doneSince === 0) this.doneSince = performance.now();
       this.renderPanel(keybinds);
-    } else if (this.step === 'course') {
-      // live-refresh the flag counter without rebuilding the whole panel
-      this.progressEl.textContent = this.courseProgress();
     }
 
     if (this.step === 'done') {
@@ -213,14 +242,9 @@ export class BootcampOverlay {
     const mode = currentInputHintMode();
     this.lastMode = mode;
 
-    const moveKeyList = ['forward', 'turnLeft', 'back', 'turnRight']
-      .map((id) => keybinds.primaryLabel(id))
-      .filter(Boolean);
-    const jumpKey = keybinds.primaryLabel('jump') || t('hud.options.unbound');
-    const allParams: Record<BootcampParam, string> = {
-      moveKeys: moveKeyList.join('/'),
-      jumpKey,
-    };
+    const forwardKey = keybinds.primaryLabel('forward') || t('hud.options.unbound');
+    const strafeKey = keybinds.primaryLabel('strafeLeft') || t('hud.options.unbound');
+    const allParams: Record<BootcampParam, string> = { forwardKey, strafeKey };
 
     const plan = bootcampBodyPlan(this.step!, mode);
     const params: Partial<Record<BootcampParam, string>> = {};
@@ -230,7 +254,7 @@ export class BootcampOverlay {
     this.bodyEl.textContent = t(plan.bodyKey, params);
 
     this.keysEl.replaceChildren();
-    for (const cap of bootcampKeycaps(this.step!, mode, { moveKeys: moveKeyList, jumpKey })) {
+    for (const cap of bootcampKeycaps(this.step!, mode, { forwardKey, strafeKey })) {
       const chip = document.createElement('span');
       chip.className = 'tut-keycap';
       chip.textContent = cap;
@@ -247,7 +271,7 @@ export class BootcampOverlay {
           })
         : '';
 
-    if (this.step === 'course') {
+    if (this.step !== 'done') {
       this.progressEl.textContent = this.courseProgress();
       this.progressEl.style.display = '';
     } else {
@@ -259,7 +283,7 @@ export class BootcampOverlay {
     this.root.classList.toggle('tut-done', this.step === 'done');
   }
 
-  // Points the shared course arrow at the next untagged Gauntlet flag.
+  // Points the shared course arrow at the current lane's flag.
   private updateArrow(renderer: Renderer): void {
     if (!this.arrow) return;
     const target = bootcampArrowTarget(this.step!, this.checkpointsReached);

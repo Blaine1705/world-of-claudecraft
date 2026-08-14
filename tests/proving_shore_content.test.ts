@@ -108,9 +108,19 @@ describe('proving shore placement', () => {
     const flags = (PROVING_SHORE_PROPS.decorProps ?? []).filter((d) => d.key.startsWith('hexFlag'));
     expect(flags.map((d) => ({ x: d.x, z: d.z }))).toEqual([...BOOTCAMP_COURSE_CHECKPOINTS]);
     expect(flags.at(-1)?.key).toBe('hexFlagRed');
-    // The course flags live on the south strand near camp, NOT out at the
-    // wreck line: the whole point of the move was to separate the two.
-    for (const c of BOOTCAMP_COURSE_CHECKPOINTS) expect(c.x).toBeGreaterThan(-320);
+    // Every flag stands inside the walled course rect on the south strand
+    // near camp, NOT out at the far-strand wreck line: the two grounds are
+    // deliberately separate.
+    for (const c of BOOTCAMP_COURSE_CHECKPOINTS) {
+      expect(c.x).toBeGreaterThan(-332);
+      expect(c.x).toBeLessThan(-284);
+      expect(c.z).toBeGreaterThan(-38);
+      expect(c.z).toBeLessThan(-10);
+    }
+    // The Gauntlet is lit for night running: braziers (real light sources)
+    // accompany the course, all south of camp with the walls.
+    const courseFires = (PROVING_SHORE_PROPS.campfires ?? []).filter(([, z]) => z < -4);
+    expect(courseFires.length).toBeGreaterThanOrEqual(6);
   });
 
   it('the greeter stands on dry ground at the Eastbrook spawn', () => {

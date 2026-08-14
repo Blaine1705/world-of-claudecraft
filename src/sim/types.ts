@@ -6597,6 +6597,10 @@ export interface StationDef {
 export interface MailboxDef {
   x: number;
   z: number;
+  /** Optional yaw for the spawned pillar entity (the renderer rotates every
+   *  object by its facing). Omitted means the default 0 the pillars have
+   *  always had; content sets it only where a slot faces the wrong way. */
+  facing?: number;
 }
 
 // Noticeboards currently have one complete cross-platform implementation. Keep

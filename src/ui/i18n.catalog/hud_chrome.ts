@@ -580,7 +580,7 @@ export const hudChromeStrings = {
   // (tutorial_greeting_view.ts / tutorial_greeting_window.ts).
   tutorialGreeting: {
     bodyFirst:
-      'It is tradition in these lands for those starting their adventure to visit the Proving Shore, a quiet island off the strait. There you can hone your skills and get used to the world before you take on its challenges. The ferry runs both ways, and no one will think less of you either way.',
+      'I have not seen you around before, friend. It is tradition in these lands for those starting their adventure to visit the Proving Shore, a quiet island off the strait. There you can hone your skills and get used to the world before you take on its challenges. The ferry runs both ways, and no one will think less of you either way.',
     bodyRefresher:
       'Back again with a fresh face, are you? You know how this goes, then. Still, if you would like a refresher before you set out, the Proving Shore never turns away a returning student, and the ferry is ready when you are.',
     play: 'Take the tutorial',
@@ -595,7 +595,7 @@ export const hudChromeStrings = {
     // Ferryman Odo's island welcome, shown once per device on the first
     // arrival: the greeting ferry lands beside his pier.
     islandArrivalNote:
-      'Fresh off the crossing? Welcome to the Proving Shore. Instructor Maren keeps the drills up at Dawnrest Camp, along the road behind me: walk right up to her until her name shows, then press F, or left-click her, to talk, and she will set you your first task. When you are ready to leave, ring the bell standing beside my pier and the crossing will carry you home to Eastbrook.',
+      'Fresh off the crossing? Welcome to the Proving Shore. Warden Tam keeps the Gauntlet on the strand right ahead of you: see him first, and his lanes will teach your legs everything they need. When the red flag is behind you, Instructor Maren at Dawnrest Camp, up the road north of my pier, has your first task: walk right up to her until her name shows, then press F, or left-click her, to talk. And when you are ready to leave, ring the bell standing beside my pier and the crossing will carry you home to Eastbrook.',
     noteClose: 'Understood',
   },
   // New-adventurer tutorial copy for the touch interface. The default tutorial
@@ -636,31 +636,44 @@ export const hudChromeStrings = {
     nextTipSocial: 'Open Social ({key}) to find a group for tougher fights.',
   },
   // The Proving Shore movement bootcamp (src/ui/bootcamp.ts): the coachmark a
-  // fresh arrival sees on the tutorial island, teaching walking, the camera,
-  // and jumping via the Gauntlet flag course on the south strand. Three copy
-  // arms per step: keyboard/mouse (default), touch, and gamepad, chosen by the
-  // live input-hint mode (src/game/input_hint_mode.ts). WORDY by M16, so the
-  // five non-Latin overlays carry real fills.
+  // fresh arrival sees on the tutorial island, walking them through Warden
+  // Tam's Gauntlet in its running order: forward down lane 1, swing the
+  // camera, strafe left down lane 2, swing the camera again, forward to the
+  // red flag. Three copy arms per step: keyboard/mouse (default), touch, and
+  // gamepad, chosen by the live input-hint mode (src/game/input_hint_mode.ts).
+  // WORDY by M16, so the five non-Latin overlays carry real fills.
   bootcamp: {
     title: 'First Steps',
-    moveTitle: 'Find your legs',
-    moveBody: 'Walk a few steps in any direction with {moveKeys}.',
-    moveBodyTouch:
-      'Drag the movement stick at the bottom of your screen to walk a few steps in any direction.',
-    moveBodyPad: 'Push the left stick to walk a few steps in any direction.',
+    forwardTitle: 'Walk the first lane',
+    forwardBody:
+      'Step through the Gauntlet gate ahead and hold {forwardKey} to walk the first lane west to its flag.',
+    forwardBodyTouch:
+      'Step through the Gauntlet gate ahead and push the movement stick up to walk the first lane west to its flag.',
+    forwardBodyPad:
+      'Step through the Gauntlet gate ahead and push the left stick up to walk the first lane west to its flag.',
     cameraTitle: 'Swing your view',
     cameraBody:
-      'Hold the right mouse button and drag to swing your view around. Take a good look left and right.',
+      'Flag one down. Now hold the right mouse button and drag to swing your view: look down the walled lane heading south, then settle back the way you were facing.',
     cameraBodyTouch:
-      'Drag a finger across the world (not the movement stick) to swing your view around.',
-    cameraBodyPad: 'Push the right stick to swing your view around.',
-    courseTitle: 'Run the Gauntlet',
-    courseBody:
-      'Now put both together: run the flag line on the strand south of the pier. Jump the rails with {jumpKey}, clamber over the boxes, and touch every flag through to the red one.',
-    courseBodyTouch:
-      'Now put both together: run the flag line on the strand south of the pier. Jump the rails with the Jump button, clamber over the boxes, and touch every flag through to the red one.',
-    courseBodyPad:
-      'Now put both together: run the flag line on the strand south of the pier. Jump the rails with the jump button, clamber over the boxes, and touch every flag through to the red one.',
+      'Flag one down. Now drag a finger across the world (not the movement stick) to swing your view: look down the walled lane heading south.',
+    cameraBodyPad:
+      'Flag one down. Now push the right stick to swing your view: look down the walled lane heading south.',
+    leftTitle: 'Slip left',
+    leftBody:
+      'Keep facing where you are and hold {strafeKey} to sidestep left down the south lane to its flag. Sidestepping keeps your eyes on a target while you move: you will fight this way one day.',
+    leftBodyTouch: 'Push the movement stick left to slip sideways down the south lane to its flag.',
+    leftBodyPad: 'Push the left stick left to slip sideways down the south lane to its flag.',
+    camera2Title: 'Look again',
+    camera2Body:
+      'Second flag down. Swing your view once more with the right mouse button held, and line yourself up with the last lane running west.',
+    camera2BodyTouch:
+      'Second flag down. Drag across the world once more and line yourself up with the last lane running west.',
+    camera2BodyPad:
+      'Second flag down. Push the right stick once more and line yourself up with the last lane running west.',
+    forward2Title: 'Run it home',
+    forward2Body: 'Hold {forwardKey} again and run the last lane to the red flag.',
+    forward2BodyTouch: 'Push the movement stick up again and run the last lane to the red flag.',
+    forward2BodyPad: 'Push the left stick up again and run the last lane to the red flag.',
     courseProgress: 'Flag {current} of {total}',
     doneTitle: 'Ready for the drills',
     doneBody:

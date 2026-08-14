@@ -1,18 +1,19 @@
-﻿// Pure, host-agnostic model for the Proving Shore movement bootcamp: the
-// coachmark a fresh arrival sees on the tutorial island, teaching walking,
-// the camera, and jumping via the Gauntlet flag course on the south strand.
+// Pure, host-agnostic model for the Proving Shore movement bootcamp: the
+// coachmark a fresh arrival sees on the tutorial island, walking them
+// through Warden Tam's Gauntlet, the walled two-elbow lane course on the
+// south strand, one ordered lesson per lane.
+//
+// The running order IS the curriculum: hold forward down lane 1 to its
+// flag, swing the camera, strafe left down lane 2 to its flag, swing the
+// camera again, then hold forward down lane 3 to the red finish flag. The
+// ladder is strictly sequential (a camera lesson must be finished before
+// the next lane's flag will credit), so the buttons are learned in order.
 //
 // The island's on-rails quest chain teaches the GAME (combat, looting,
-// trades, the bank); this overlay teaches the HANDS, the three things a
-// complete beginner must feel before any quest text can help them: move,
-// look, jump. It is the island sibling of the Eastbrook new-adventurer
-// coachmark (tutorial.ts + tutorial_copy.ts) and follows the same recipe:
-// a pure step ladder over an observed snapshot, copy selection keyed by
-// step and input family, and a DOM overlay (bootcamp.ts) that owns nothing
-// but paint. Unlike the Eastbrook card's binary keyboard/touch split, copy
-// here has THREE arms: keyboard/mouse, touch, and gamepad, chosen by the
-// live input-hint mode (src/game/input_hint_mode.ts), because the island is
-// the one place guaranteed to meet a player who has never used any of them.
+// trades, the bank); this overlay teaches the HANDS. It is the island
+// sibling of the Eastbrook new-adventurer coachmark (tutorial.ts +
+// tutorial_copy.ts). Copy has THREE arms: keyboard/mouse, touch, and
+// gamepad, chosen by the live input-hint mode (src/game/input_hint_mode.ts).
 //
 // The pure-core half of the pure-core + thin-consumer split (root CLAUDE.md);
 // registered in UI_PURE_CORES (tests/architecture.test.ts); driven directly
@@ -26,81 +27,112 @@ import type { TranslationKey } from './i18n';
  *  this core stays free of game/ imports (the pure-core purity scan). */
 export type BootcampInputMode = 'keyboard' | 'touch' | 'pad';
 
-/** Yards of displacement from the engage point before "move" is learned. */
-export const BOOTCAMP_MOVE_THRESHOLD_YD = 3;
-/** Cumulative camera-yaw travel (radians) before "camera" is learned. */
+/** Camera-yaw travel (radians) each camera lesson asks for. */
 export const BOOTCAMP_CAMERA_TURN_RAD = 0.9;
 /** How close (yards) the player must pass to a Gauntlet flag to tag it. */
 export const BOOTCAMP_CHECKPOINT_RADIUS_YD = 4;
 
-export type BootcampStep = 'move' | 'camera' | 'course' | 'done';
+export type BootcampStep = 'forward' | 'camera' | 'left' | 'camera2' | 'forward2' | 'done';
 
-export const BOOTCAMP_STEP_ORDER: readonly BootcampStep[] = ['move', 'camera', 'course'];
+export const BOOTCAMP_STEP_ORDER: readonly BootcampStep[] = [
+  'forward',
+  'camera',
+  'left',
+  'camera2',
+  'forward2',
+];
 
 export interface BootcampSnapshot {
-  /** 2D displacement from where the overlay engaged, in yards. */
-  movedYd: number;
-  /** Total camera-yaw travel since engage, radians (absolute, accumulated). */
-  cameraTurnedRad: number;
-  /** Gauntlet flags tagged so far, in running order. */
+  /** Gauntlet flags tagged so far, in running order (0..3). */
   checkpointsReached: number;
+  /** Camera-yaw travel since the LAST flag was tagged, radians (absolute,
+   *  accumulated; the overlay resets it at each tag). */
+  yawTurnedSinceFlagRad: number;
 }
 
-/** The first lesson the snapshot has not yet satisfied. Strictly ordered:
- *  move, then camera, then the course, so one card teaches one thing. */
+/** The current lesson. One lane at a time, a camera lesson between lanes,
+ *  strictly in order. */
 export function computeBootcampStep(s: BootcampSnapshot): BootcampStep {
-  if (s.movedYd < BOOTCAMP_MOVE_THRESHOLD_YD) return 'move';
-  if (s.cameraTurnedRad < BOOTCAMP_CAMERA_TURN_RAD) return 'camera';
-  if (s.checkpointsReached < BOOTCAMP_COURSE_CHECKPOINTS.length) return 'course';
+  if (s.checkpointsReached <= 0) return 'forward';
+  if (s.checkpointsReached === 1) {
+    return s.yawTurnedSinceFlagRad < BOOTCAMP_CAMERA_TURN_RAD ? 'camera' : 'left';
+  }
+  if (s.checkpointsReached === 2) {
+    return s.yawTurnedSinceFlagRad < BOOTCAMP_CAMERA_TURN_RAD ? 'camera2' : 'forward2';
+  }
   return 'done';
 }
 
+/** The movement action a lane lesson teaches, or null for the camera
+ *  lessons. The overlay uses it two ways: which keycap chip to show, and
+ *  (keyboard mode) which held key unlocks the lane's flag credit. */
+export function stepMovementAction(step: BootcampStep): 'forward' | 'strafeLeft' | null {
+  if (step === 'forward' || step === 'forward2') return 'forward';
+  if (step === 'left') return 'strafeLeft';
+  return null;
+}
+
 /** Advance the sequential checkpoint counter: the NEXT flag in running order
- *  is tagged when the player passes within radius. One call may only ever
- *  advance by one (a frame cannot cross two flags 10 yards apart). */
-export function advanceCheckpoints(reached: number, pos: { x: number; z: number }): number {
+ *  is tagged when the player passes within radius AND the ladder is on that
+ *  lane's movement lesson with its button seen (creditAllowed). The gate is
+ *  what makes the order real: running the whole course without ever doing a
+ *  camera lesson leaves the later flags untagged. */
+export function advanceCheckpoints(
+  reached: number,
+  pos: { x: number; z: number },
+  creditAllowed: boolean,
+): number {
+  if (!creditAllowed) return reached;
   const next = BOOTCAMP_COURSE_CHECKPOINTS[reached];
   if (!next) return reached;
   const d = Math.hypot(pos.x - next.x, pos.z - next.z);
   return d <= BOOTCAMP_CHECKPOINT_RADIUS_YD ? reached + 1 : reached;
 }
 
-/** The world point the guidance arrow should aim at, or null once done. */
+/** The world point the guidance arrow should aim at: the current lane's flag
+ *  during a lane lesson, nothing during the camera lessons (the whole point
+ *  there is to look around, not follow a marker) or once done. */
 export function bootcampArrowTarget(
   step: BootcampStep,
   checkpointsReached: number,
 ): { x: number; z: number } | null {
-  if (step !== 'course') return null;
+  if (stepMovementAction(step) === null) return null;
   return BOOTCAMP_COURSE_CHECKPOINTS[checkpointsReached] ?? null;
 }
 
-export type BootcampParam = 'moveKeys' | 'jumpKey';
+export type BootcampParam = 'forwardKey' | 'strafeKey';
 
 export interface BootcampBodyPlan {
   bodyKey: TranslationKey;
   /** Which interpolation params the body needs (keyboard arms only; touch and
-   *  pad copy names on-screen affordances and sticks instead of bind labels). */
+   *  pad copy names sticks and on-screen affordances instead of bind labels). */
   params: readonly BootcampParam[];
 }
 
 const KEYBOARD: Record<BootcampStep, BootcampBodyPlan> = {
-  move: { bodyKey: 'hudChrome.bootcamp.moveBody', params: ['moveKeys'] },
+  forward: { bodyKey: 'hudChrome.bootcamp.forwardBody', params: ['forwardKey'] },
   camera: { bodyKey: 'hudChrome.bootcamp.cameraBody', params: [] },
-  course: { bodyKey: 'hudChrome.bootcamp.courseBody', params: ['jumpKey'] },
+  left: { bodyKey: 'hudChrome.bootcamp.leftBody', params: ['strafeKey'] },
+  camera2: { bodyKey: 'hudChrome.bootcamp.camera2Body', params: [] },
+  forward2: { bodyKey: 'hudChrome.bootcamp.forward2Body', params: ['forwardKey'] },
   done: { bodyKey: 'hudChrome.bootcamp.doneBody', params: [] },
 };
 
 const TOUCH: Record<BootcampStep, BootcampBodyPlan> = {
-  move: { bodyKey: 'hudChrome.bootcamp.moveBodyTouch', params: [] },
+  forward: { bodyKey: 'hudChrome.bootcamp.forwardBodyTouch', params: [] },
   camera: { bodyKey: 'hudChrome.bootcamp.cameraBodyTouch', params: [] },
-  course: { bodyKey: 'hudChrome.bootcamp.courseBodyTouch', params: [] },
+  left: { bodyKey: 'hudChrome.bootcamp.leftBodyTouch', params: [] },
+  camera2: { bodyKey: 'hudChrome.bootcamp.camera2BodyTouch', params: [] },
+  forward2: { bodyKey: 'hudChrome.bootcamp.forward2BodyTouch', params: [] },
   done: { bodyKey: 'hudChrome.bootcamp.doneBody', params: [] },
 };
 
 const PAD: Record<BootcampStep, BootcampBodyPlan> = {
-  move: { bodyKey: 'hudChrome.bootcamp.moveBodyPad', params: [] },
+  forward: { bodyKey: 'hudChrome.bootcamp.forwardBodyPad', params: [] },
   camera: { bodyKey: 'hudChrome.bootcamp.cameraBodyPad', params: [] },
-  course: { bodyKey: 'hudChrome.bootcamp.courseBodyPad', params: [] },
+  left: { bodyKey: 'hudChrome.bootcamp.leftBodyPad', params: [] },
+  camera2: { bodyKey: 'hudChrome.bootcamp.camera2BodyPad', params: [] },
+  forward2: { bodyKey: 'hudChrome.bootcamp.forward2BodyPad', params: [] },
   done: { bodyKey: 'hudChrome.bootcamp.doneBody', params: [] },
 };
 
@@ -112,9 +144,11 @@ export function bootcampBodyPlan(step: BootcampStep, mode: BootcampInputMode): B
 
 export function bootcampTitleKey(step: BootcampStep): TranslationKey {
   const titles: Record<BootcampStep, TranslationKey> = {
-    move: 'hudChrome.bootcamp.moveTitle',
+    forward: 'hudChrome.bootcamp.forwardTitle',
     camera: 'hudChrome.bootcamp.cameraTitle',
-    course: 'hudChrome.bootcamp.courseTitle',
+    left: 'hudChrome.bootcamp.leftTitle',
+    camera2: 'hudChrome.bootcamp.camera2Title',
+    forward2: 'hudChrome.bootcamp.forward2Title',
     done: 'hudChrome.bootcamp.doneTitle',
   };
   return titles[step];
@@ -122,20 +156,21 @@ export function bootcampTitleKey(step: BootcampStep): TranslationKey {
 
 /** The physical keycap chips to show under the body ("the buttons they need
  *  to press, on screen"). Keyboard only: touch and pad have no keycaps, their
- *  copy names the on-screen affordance or stick instead. */
+ *  copy names the stick or on-screen affordance instead. */
 export function bootcampKeycaps(
   step: BootcampStep,
   mode: BootcampInputMode,
-  labels: { moveKeys: readonly string[]; jumpKey: string },
+  labels: { forwardKey: string; strafeKey: string },
 ): readonly string[] {
   if (mode !== 'keyboard') return [];
-  if (step === 'move') return labels.moveKeys.filter(Boolean);
-  if (step === 'course') return labels.jumpKey ? [labels.jumpKey] : [];
+  const action = stepMovementAction(step);
+  if (action === 'forward') return labels.forwardKey ? [labels.forwardKey] : [];
+  if (action === 'strafeLeft') return labels.strafeKey ? [labels.strafeKey] : [];
   return [];
 }
 
 /** Repaint only when the step or the input family changes (the tutorial.ts
- *  precedent): the course counter alone is live-patched by the overlay. */
+ *  precedent): the flag counter alone is live-patched by the overlay. */
 export function bootcampNeedsRerender(
   prevStep: BootcampStep | null,
   nextStep: BootcampStep,

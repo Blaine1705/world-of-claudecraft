@@ -2476,6 +2476,7 @@ export class Sim {
       box.templateId = 'mailbox';
       box.objectItemId = null;
       box.lootable = true; // interactable
+      if (boxDef.facing !== undefined) box.facing = boxDef.facing;
       this.addEntity(box);
       this.postOffice.mailboxIds.push(box.id);
     }

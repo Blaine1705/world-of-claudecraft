@@ -12875,7 +12875,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.status.needsAttention': '要確認',
   // The Proving Shore (tutorial island) + the spawn greeting dialog.
   'hudChrome.tutorialGreeting.bodyFirst':
-    'この土地では、冒険を始める者が修練の浜を訪れるのが習わしだ。海峡の先にある静かな島だよ。あそこなら世界の試練に挑む前に腕を磨き、この土地に慣れることができる。渡し船は行きも帰りも出ているし、行っても行かなくても誰も君を軽んじたりはしないよ。',
+    '見かけない顔だね、旅の人。この土地では、冒険を始める者が修練の浜を訪れるのが習わしだ。海峡の先にある静かな島だよ。あそこなら世界の試練に挑む前に腕を磨き、この土地に慣れることができる。渡し船は行きも帰りも出ているし、行っても行かなくても誰も君を軽んじたりはしないよ。',
   'hudChrome.tutorialGreeting.bodyRefresher':
     '新しい顔でまた来たのかい？なら勝手は分かっているね。それでも旅立つ前におさらいがしたければ、修練の浜は出戻りの生徒を追い返したりしない。渡し船はいつでも出せるよ。',
   'hudChrome.tutorialGreeting.play': 'チュートリアルを受ける',
@@ -12884,28 +12884,44 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorialGreeting.bellHomeNote':
     'もう浜から戻ったのかい？さっき鳴らしたのが渡しの鐘だよ。その双子がすぐそこ、レイヴンポストの郵便柱のそばに掛かっている。いつでも鳴らせば、渡しが修練の浜へ運び直してくれる。間違って鳴らしたのなら、それはそれで構わないさ。',
   'hudChrome.tutorialGreeting.islandArrivalNote':
-    '渡ってきたばかりかい？ようこそ修練の浜へ。教官マレンが私の後ろの道の先、暁の野営地で稽古を仕切っている。彼女の名前が見えるところまで歩み寄って、Fを押すか、左クリックすれば話ができ、最初の仕事を言いつけてくれるはずだ。発つ支度ができたら、私の桟橋のそばに立つ鐘を鳴らしなさい。渡しがイーストブルックの家まで運んでくれる。',
+    '渡ってきたばかりかい？ようこそ修練の浜へ。ウォーデン・タムが目の前の浜でガントレットを預かっている。まず彼のところへ行けば、そのレーンが体の動かし方を全部教えてくれる。赤い旗を越えたら、桟橋から北へ道を上った先の暁の野営地で、教官マレンが最初の仕事をくれる。名前が見えるところまで歩み寄って、Fを押すか、左クリックすれば話ができる。発つ支度ができたら、私の桟橋のそばに立つ鐘を鳴らしなさい。渡しがイーストブルックの家まで運んでくれる。',
   'hudChrome.tutorialGreeting.noteClose': 'わかった',
   'hudChrome.tutorialGreeting.skip': 'チュートリアルを飛ばす',
   'hudChrome.bootcamp.title': '最初の一歩',
-  'hudChrome.bootcamp.moveTitle': '足を慣らす',
-  'hudChrome.bootcamp.moveBody': '{moveKeys}で、どの方向へでも数歩歩いてみよう。',
-  'hudChrome.bootcamp.moveBodyTouch':
-    '画面下の移動スティックをドラッグして、どの方向へでも数歩歩いてみよう。',
-  'hudChrome.bootcamp.moveBodyPad': '左スティックを倒して、どの方向へでも数歩歩いてみよう。',
+  'hudChrome.bootcamp.forwardTitle': '最初のレーンを歩く',
+  'hudChrome.bootcamp.forwardBody':
+    '前方のガントレットの門をくぐり、{forwardKey}を押したまま最初のレーンを西へ、旗まで歩こう。',
+  'hudChrome.bootcamp.forwardBodyTouch':
+    '前方のガントレットの門をくぐり、移動スティックを上に倒したまま最初のレーンを西へ、旗まで歩こう。',
+  'hudChrome.bootcamp.forwardBodyPad':
+    '前方のガントレットの門をくぐり、左スティックを上に倒したまま最初のレーンを西へ、旗まで歩こう。',
   'hudChrome.bootcamp.cameraTitle': '視点を回す',
   'hudChrome.bootcamp.cameraBody':
-    'マウスの右ボタンを押したままドラッグして視点を回してみよう。左右をしっかり見渡してみて。',
+    '旗一本目、よし。次はマウスの右ボタンを押したままドラッグして視点を回そう。南へ延びる柵のレーンを見下ろしてから、元の向きに戻ろう。',
   'hudChrome.bootcamp.cameraBodyTouch':
-    '（移動スティックではなく）世界を指でドラッグして視点を回してみよう。',
-  'hudChrome.bootcamp.cameraBodyPad': '右スティックを倒して視点を回してみよう。',
-  'hudChrome.bootcamp.courseTitle': 'ガントレットを駆けろ',
-  'hudChrome.bootcamp.courseBody':
-    'では二つを合わせよう。桟橋の南の浜にある旗の列を駆け抜けるんだ。{jumpKey}で柵を跳び越え、箱をよじ登り、赤い旗まで全部の旗に触れよう。',
-  'hudChrome.bootcamp.courseBodyTouch':
-    'では二つを合わせよう。桟橋の南の浜にある旗の列を駆け抜けるんだ。ジャンプボタンで柵を跳び越え、箱をよじ登り、赤い旗まで全部の旗に触れよう。',
-  'hudChrome.bootcamp.courseBodyPad':
-    'では二つを合わせよう。桟橋の南の浜にある旗の列を駆け抜けるんだ。ジャンプボタンで柵を跳び越え、箱をよじ登り、赤い旗まで全部の旗に触れよう。',
+    '旗一本目、よし。次は（移動スティックではなく）世界を指でドラッグして視点を回そう。南へ延びる柵のレーンを見下ろしてみて。',
+  'hudChrome.bootcamp.cameraBodyPad':
+    '旗一本目、よし。次は右スティックを倒して視点を回そう。南へ延びる柵のレーンを見下ろしてみて。',
+  'hudChrome.bootcamp.leftTitle': '左へ滑る',
+  'hudChrome.bootcamp.leftBody':
+    '向きはそのままで、{strafeKey}を押したまま南のレーンを左へ横滑りして旗まで進もう。横歩きなら視線を敵に置いたまま動ける。いつか戦いでそう動く日が来る。',
+  'hudChrome.bootcamp.leftBodyTouch':
+    '移動スティックを左に倒して、南のレーンを横滑りで旗まで進もう。',
+  'hudChrome.bootcamp.leftBodyPad': '左スティックを左に倒して、南のレーンを横滑りで旗まで進もう。',
+  'hudChrome.bootcamp.camera2Title': 'もう一度見回す',
+  'hudChrome.bootcamp.camera2Body':
+    '旗二本目、よし。もう一度右ボタンを押したまま視点を回し、西へ延びる最後のレーンに体を合わせよう。',
+  'hudChrome.bootcamp.camera2BodyTouch':
+    '旗二本目、よし。もう一度指でドラッグして、西へ延びる最後のレーンに体を合わせよう。',
+  'hudChrome.bootcamp.camera2BodyPad':
+    '旗二本目、よし。もう一度右スティックを倒して、西へ延びる最後のレーンに体を合わせよう。',
+  'hudChrome.bootcamp.forward2Title': '駆け抜けろ',
+  'hudChrome.bootcamp.forward2Body':
+    'もう一度{forwardKey}を押したまま、最後のレーンを赤い旗まで駆け抜けよう。',
+  'hudChrome.bootcamp.forward2BodyTouch':
+    'もう一度移動スティックを上に倒して、最後のレーンを赤い旗まで駆け抜けよう。',
+  'hudChrome.bootcamp.forward2BodyPad':
+    'もう一度左スティックを上に倒して、最後のレーンを赤い旗まで駆け抜けよう。',
   'hudChrome.bootcamp.courseProgress': '旗 {current} / {total}',
   'hudChrome.bootcamp.doneTitle': '稽古の準備は万端',
   'hudChrome.bootcamp.doneBody':
@@ -12930,7 +12946,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.ferryman_odo.name': '渡し守オド',
   'entities.npcs.ferryman_odo.title': '渡し場の番人',
   'entities.npcs.ferryman_odo.greeting':
-    '渡ってきたばかりかい、{playerName}？なら浜の道を上っていきなさい。教官マレンが暁の野営地で稽古を仕切っている。彼女に歩み寄ってFを押すか、左クリックすれば、最初の仕事を言いつけてくれるよ。渓谷が君を呼び戻したら、私の桟橋のそばに立つ鐘を鳴らせば、渡しがイーストブルックの町まで送り届けてくれる。',
+    '渡ってきたばかりかい、{playerName}？ウォーデン・タムが桟橋のすぐ南の浜でガントレットを預かっている。まず彼のレーンを走ってくれば、足が礼を言うだろう。そのあとは暁の野営地の教官マレンが最初の仕事をくれる。渓谷が君を呼び戻したら、私の桟橋のそばに立つ鐘を鳴らせば、渡しがイーストブルックの町まで送り届けてくれる。',
+  'entities.npcs.warden_tam.name': 'ウォーデン・タム',
+  'entities.npcs.warden_tam.title': 'ガントレットの番人',
+  'entities.npcs.warden_tam.greeting':
+    'このレーンがガントレットだ、{playerName}。渓谷に名を知られた冒険者は皆ここを走った。最初のレーンを西へ旗まで歩き、あたりをよく見回し、二本目のレーンを左へ滑り、もう一度見回してから、最後のレーンを赤い旗まで駆け抜けるんだ。篝火は夜通し灯っている。赤い旗を越えたら、暁の野営地の教官マレンが最初の仕事をくれる。',
   'entities.npcs.bursar_wick.name': '出納係ウィック',
   'entities.npcs.bursar_wick.title': '金張りの金庫',
   'entities.npcs.bursar_wick.greeting':

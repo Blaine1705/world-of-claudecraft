@@ -342,6 +342,7 @@ const NPC_IDS = [
   'quartermaster_finch',
   'ferryman_odo',
   'bursar_wick',
+  'warden_tam',
 ] as const;
 
 const QUEST_IDS = [

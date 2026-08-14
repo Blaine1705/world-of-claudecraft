@@ -44,19 +44,18 @@ const PROVING_SHORE_NOTICEBOARD = {
   templateId: eastbrook.templateId,
   assetId: eastbrook.assetId,
   name: eastbrook.name,
-  // On the bursar's path at the camp's west side, clear of the outfitter's
-  // stall, the muster fire and the strongbox desk, facing back east into the
-  // muster ground.
-  x: -316,
-  z: 47,
-  rotation: -Math.PI / 2,
+  // On the practice-yard road south of camp, facing north up it, so every
+  // recruit walking between the camp and the yard passes its face.
+  x: -314,
+  z: 30,
+  rotation: 0,
   width: eastbrook.nativeDimensions.width,
   depth: eastbrook.nativeDimensions.depth,
   height: eastbrook.nativeDimensions.height,
   interactionRadius: eastbrook.interactionRadius,
   // The board is a solid collider, so walkers aim for the reading spot in
   // front of it rather than the board's own point (the Eastbrook pattern).
-  frontStandingPoint: { x: -314.5, z: 47 },
+  frontStandingPoint: { x: -314, z: 31.5 },
 } satisfies NoticeboardDef;
 
 assertCanonicalEastbrookNoticeboardDef(PROVING_SHORE_NOTICEBOARD);

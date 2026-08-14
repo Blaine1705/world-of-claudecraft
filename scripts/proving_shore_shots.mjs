@@ -101,29 +101,37 @@ const shot = async (name) => {
 const look = (from, at, opts = {}) =>
   stand(from.x, from.z, Math.atan2(at.x - from.x, at.z - from.z), opts.dist, opts.pitch);
 
-// The widened camp from its east gate: stall row, tents, muster fire, and
-// the new rail fence running the plateau shoulder.
-await look({ x: -292, z: 48 }, { x: -310, z: 51 }, { dist: 12, pitch: 0.32 });
+// The arrival view: what a newcomer actually sees the moment the ferry sets
+// them down (the teleport camera snap aims at Warden Tam's Gauntlet gate).
+await look({ x: -282, z: 6 }, { x: -283, z: -13 }, { dist: 8, pitch: 0.18 });
+await shot('arrival-view');
+
+// The Gauntlet's gate: Warden Tam, the entrance braziers, and lane 1
+// running west between its walls.
+await look({ x: -280, z: -14 }, { x: -296, z: -16 }, { dist: 9, pitch: 0.22 });
+await shot('gauntlet-gate');
+
+// The first elbow: flag 1 where lane 1 turns into the southward lane 2.
+await look({ x: -300, z: -16 }, { x: -308, z: -22 }, { dist: 9, pitch: 0.25 });
+await shot('gauntlet-elbow');
+
+// The finish: lane 3 running west to the red flag, braziers along the wall.
+await look({ x: -310, z: -32 }, { x: -328, z: -32 }, { dist: 9, pitch: 0.2 });
+await shot('gauntlet-finish');
+
+// The widened camp from its east gate: Maren at the junction, the stall row
+// on the north edge, tents by the muster fire, and the perimeter rail.
+await look({ x: -292, z: 48 }, { x: -310, z: 52 }, { dist: 12, pitch: 0.32 });
 await shot('camp-overview');
 
-// Bursar Wick's strongbox desk at the camp's quiet west end (-325, 42), with
-// the notice board (-316, 47) on the path spur leading to it.
-await look({ x: -312, z: 47 }, { x: -323, z: 43 }, { dist: 9, pitch: 0.2 });
+// Bursar Wick's strongbox desk at the camp's quiet west end (-325, 42),
+// now facing north-west over the water.
+await look({ x: -318, z: 45 }, { x: -324, z: 42.5 }, { dist: 8, pitch: 0.2 });
 await shot('wick-desk');
 
-// The Gauntlet: the flag line, jump rails, and mantle crates on the south
-// strand, viewed from the first flag looking down the course.
-await look({ x: -286, z: -13 }, { x: -300, z: -28 }, { dist: 10, pitch: 0.25 });
-await shot('gauntlet');
-
-// The wreck line on the far strand: castaway crates among the scuttlers at
-// the end of the practice-yard path.
-await look({ x: -382, z: -26 }, { x: -391, z: -33 }, { dist: 9, pitch: 0.22 });
-await shot('wreck-line-far-strand');
-
-// The pier bell at (-274, 6), stood clear of the plank end.
-await look({ x: -274, z: 16 }, { x: -274, z: 6 }, { dist: 6, pitch: 0.15 });
-await shot('island-bell');
+// The notice board on the practice-yard road at (-314, 30), facing north.
+await look({ x: -313, z: 36 }, { x: -314, z: 30 }, { dist: 6, pitch: 0.15 });
+await shot('notice-board');
 
 await browser.close();
 console.log('proving shore shots written to tmp/');

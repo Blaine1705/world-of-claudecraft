@@ -12647,7 +12647,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.status.needsAttention': '需要注意',
   // The Proving Shore (tutorial island) + the spawn greeting dialog.
   'hudChrome.tutorialGreeting.bodyFirst':
-    '在这片土地上，初次踏上冒险之路的人照传统都会去试炼之滨走一趟，那是海峡对面的一座安静小岛。在那里你可以先磨练身手、熟悉这个世界，再去迎接它的挑战。渡船来回都通，去或不去都没人会小看你。',
+    '这张面孔我可没见过，朋友。在这片土地上，初次踏上冒险之路的人照传统都会去试炼之滨走一趟，那是海峡对面的一座安静小岛。在那里你可以先磨练身手、熟悉这个世界，再去迎接它的挑战。渡船来回都通，去或不去都没人会小看你。',
   'hudChrome.tutorialGreeting.bodyRefresher':
     '又换了一副新面孔回来了？那你知道该怎么做。不过，出发前若想温习一遍，试炼之滨从不拒绝回炉的学生，渡船随时候着你。',
   'hudChrome.tutorialGreeting.play': '进行新手教学',
@@ -12657,24 +12657,39 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorialGreeting.bellHomeNote':
     '这么快就从海滨回来了？你刚才敲响的正是渡船铃。它的孪生兄弟就挂在那边鸦邮信箱旁：想回试炼之滨，随时敲响它，渡航就会送你过去。敲错了也不打紧。',
   'hudChrome.tutorialGreeting.islandArrivalNote':
-    '刚下渡船吗？欢迎来到试炼之滨。教官玛伦在我身后这条路尽头的晨憩营地主持操练：走到她跟前，直到她的名字显示出来，然后按 F，或者用鼠标左键点击她，就能与她交谈，她会交给你第一件差事。等你准备离开时，敲响立在我码头旁的那口铃，渡航就会送你回东溪镇。',
+    '刚下渡船吗？欢迎来到试炼之滨。看守塔姆就在你正前方的海滩上守着试炼跑道：先去找他，他的跑道会把你双腿该会的都教给你。等红旗被你甩在身后，就沿码头北边的路上去晨憩营地找教官玛伦领第一件差事：走到她跟前，直到她的名字显示出来，然后按 F，或者用鼠标左键点击她交谈。等你准备离开时，敲响立在我码头旁的那口铃，渡航就会送你回东溪镇。',
   'hudChrome.tutorialGreeting.noteClose': '明白了',
   'hudChrome.bootcamp.title': '最初的脚步',
-  'hudChrome.bootcamp.moveTitle': '活动双腿',
-  'hudChrome.bootcamp.moveBody': '用 {moveKeys} 朝任意方向走上几步。',
-  'hudChrome.bootcamp.moveBodyTouch': '拖动屏幕下方的移动摇杆，朝任意方向走上几步。',
-  'hudChrome.bootcamp.moveBodyPad': '推动左摇杆，朝任意方向走上几步。',
+  'hudChrome.bootcamp.forwardTitle': '走过第一条跑道',
+  'hudChrome.bootcamp.forwardBody':
+    '穿过面前的试炼跑道大门，按住 {forwardKey} 沿第一条跑道向西走到旗帜处。',
+  'hudChrome.bootcamp.forwardBodyTouch':
+    '穿过面前的试炼跑道大门，把移动摇杆推向上方，沿第一条跑道向西走到旗帜处。',
+  'hudChrome.bootcamp.forwardBodyPad':
+    '穿过面前的试炼跑道大门，把左摇杆推向上方，沿第一条跑道向西走到旗帜处。',
   'hudChrome.bootcamp.cameraTitle': '转动视角',
-  'hudChrome.bootcamp.cameraBody': '按住鼠标右键并拖动来转动视角。往左右两边好好看一圈。',
-  'hudChrome.bootcamp.cameraBodyTouch': '用手指拖动世界画面（不是移动摇杆）来转动视角。',
-  'hudChrome.bootcamp.cameraBodyPad': '推动右摇杆来转动视角。',
-  'hudChrome.bootcamp.courseTitle': '跑过试炼跑道',
-  'hudChrome.bootcamp.courseBody':
-    '现在把两样合起来：沿码头以南海滩上的旗列跑一趟。用 {jumpKey} 跃过栏杆，爬过木箱，依次碰到每一面旗，直到红旗为止。',
-  'hudChrome.bootcamp.courseBodyTouch':
-    '现在把两样合起来：沿码头以南海滩上的旗列跑一趟。用跳跃按钮跃过栏杆，爬过木箱，依次碰到每一面旗，直到红旗为止。',
-  'hudChrome.bootcamp.courseBodyPad':
-    '现在把两样合起来：沿码头以南海滩上的旗列跑一趟。用跳跃按钮跃过栏杆，爬过木箱，依次碰到每一面旗，直到红旗为止。',
+  'hudChrome.bootcamp.cameraBody':
+    '第一面旗到手。现在按住鼠标右键并拖动来转动视角：看看向南延伸的围栏跑道，然后转回原来的朝向。',
+  'hudChrome.bootcamp.cameraBodyTouch':
+    '第一面旗到手。现在用手指拖动世界画面（不是移动摇杆）来转动视角：看看向南延伸的围栏跑道。',
+  'hudChrome.bootcamp.cameraBodyPad':
+    '第一面旗到手。现在推动右摇杆来转动视角：看看向南延伸的围栏跑道。',
+  'hudChrome.bootcamp.leftTitle': '向左滑步',
+  'hudChrome.bootcamp.leftBody':
+    '保持朝向不变，按住 {strafeKey} 沿南边的跑道向左横移，走到旗帜处。横移能让你移动时视线始终锁在目标上：总有一天你会这样作战。',
+  'hudChrome.bootcamp.leftBodyTouch': '把移动摇杆推向左边，沿南边的跑道横移到旗帜处。',
+  'hudChrome.bootcamp.leftBodyPad': '把左摇杆推向左边，沿南边的跑道横移到旗帜处。',
+  'hudChrome.bootcamp.camera2Title': '再看一次',
+  'hudChrome.bootcamp.camera2Body':
+    '第二面旗到手。再按住右键转动一次视角，对准向西延伸的最后一条跑道。',
+  'hudChrome.bootcamp.camera2BodyTouch':
+    '第二面旗到手。再用手指拖动一次画面，对准向西延伸的最后一条跑道。',
+  'hudChrome.bootcamp.camera2BodyPad':
+    '第二面旗到手。再推动一次右摇杆，对准向西延伸的最后一条跑道。',
+  'hudChrome.bootcamp.forward2Title': '一口气跑完',
+  'hudChrome.bootcamp.forward2Body': '再次按住 {forwardKey}，沿最后一条跑道跑到红旗处。',
+  'hudChrome.bootcamp.forward2BodyTouch': '再次把移动摇杆推向上方，沿最后一条跑道跑到红旗处。',
+  'hudChrome.bootcamp.forward2BodyPad': '再次把左摇杆推向上方，沿最后一条跑道跑到红旗处。',
   'hudChrome.bootcamp.courseProgress': '旗帜 {current}/{total}',
   'hudChrome.bootcamp.doneTitle': '可以受训了',
   'hudChrome.bootcamp.doneBody':
@@ -12699,7 +12714,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.ferryman_odo.name': '渡船人奥多',
   'entities.npcs.ferryman_odo.title': '渡口看守',
   'entities.npcs.ferryman_odo.greeting':
-    '刚下渡船吗，{playerName}？那就沿着岸边的路往上走：教官玛伦在晨憩营地主持操练。走到她跟前，按 F，或者用鼠标左键点击她，她就会交给你第一件差事。等谷地召唤你回去时，敲响立在我码头旁的那口铃，渡航会把你送到东溪镇上。',
+    '刚下渡船吗，{playerName}？看守塔姆就在码头正南的海滩上守着试炼跑道：先去跑一趟他的跑道，你的双腿会感谢你的。之后晨憩营地的教官玛伦会交给你第一件差事。等谷地召唤你回去时，敲响立在我码头旁的那口铃，渡航会把你送到东溪镇上。',
+  'entities.npcs.warden_tam.name': '看守塔姆',
+  'entities.npcs.warden_tam.title': '试炼跑道的看守',
+  'entities.npcs.warden_tam.greeting':
+    '这几条跑道就是试炼跑道，{playerName}，谷地敬重的每一位冒险者都跑过它。沿第一条跑道向西走到旗帜处，好好环顾四周，再沿第二条跑道向左滑步下去，再看一圈，最后沿末尾的跑道跑到红旗处。火盆整夜不熄。等红旗被你甩在身后，晨憩营地的教官玛伦会交给你第一件差事。',
   'entities.npcs.bursar_wick.name': '司库威克',
   'entities.npcs.bursar_wick.title': '镀金保险箱',
   'entities.npcs.bursar_wick.greeting':

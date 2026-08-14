@@ -868,13 +868,13 @@ export const es_ES: EnTranslations = {
       "chatPlaceholder": "Di algo..."
     },
     "tutorialGreeting": {
-      "bodyFirst": "It is tradition in these lands for those starting their adventure to visit the Proving Shore, a quiet island off the strait. There you can hone your skills and get used to the world before you take on its challenges. The ferry runs both ways, and no one will think less of you either way.",
+      "bodyFirst": "I have not seen you around before, friend. It is tradition in these lands for those starting their adventure to visit the Proving Shore, a quiet island off the strait. There you can hone your skills and get used to the world before you take on its challenges. The ferry runs both ways, and no one will think less of you either way.",
       "bodyRefresher": "Back again with a fresh face, are you? You know how this goes, then. Still, if you would like a refresher before you set out, the Proving Shore never turns away a returning student, and the ferry is ready when you are.",
       "play": "Take the tutorial",
       "skip": "Skip the tutorial",
       "declineNote": "As you like, friend. Should you ever change your mind, the ferry bell by the Ravenpost mailbox rings you across to the Proving Shore any time, day or night. It will still be here when the wolves are not.",
       "bellHomeNote": "Back from the shore already? That was the ferry bell you rang. Its twin hangs just there by the Ravenpost mailbox: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.",
-      "islandArrivalNote": "Fresh off the crossing? Welcome to the Proving Shore. Instructor Maren keeps the drills up at Dawnrest Camp, along the road behind me: walk right up to her until her name shows, then press F, or left-click her, to talk, and she will set you your first task. When you are ready to leave, ring the bell standing beside my pier and the crossing will carry you home to Eastbrook.",
+      "islandArrivalNote": "Fresh off the crossing? Welcome to the Proving Shore. Warden Tam keeps the Gauntlet on the strand right ahead of you: see him first, and his lanes will teach your legs everything they need. When the red flag is behind you, Instructor Maren at Dawnrest Camp, up the road north of my pier, has your first task: walk right up to her until her name shows, then press F, or left-click her, to talk. And when you are ready to leave, ring the bell standing beside my pier and the crossing will carry you home to Eastbrook.",
       "noteClose": "Understood"
     },
     "tutorial": {
@@ -891,18 +891,26 @@ export const es_ES: EnTranslations = {
     },
     "bootcamp": {
       "title": "First Steps",
-      "moveTitle": "Find your legs",
-      "moveBody": "Walk a few steps in any direction with {moveKeys}.",
-      "moveBodyTouch": "Drag the movement stick at the bottom of your screen to walk a few steps in any direction.",
-      "moveBodyPad": "Push the left stick to walk a few steps in any direction.",
+      "forwardTitle": "Walk the first lane",
+      "forwardBody": "Step through the Gauntlet gate ahead and hold {forwardKey} to walk the first lane west to its flag.",
+      "forwardBodyTouch": "Step through the Gauntlet gate ahead and push the movement stick up to walk the first lane west to its flag.",
+      "forwardBodyPad": "Step through the Gauntlet gate ahead and push the left stick up to walk the first lane west to its flag.",
       "cameraTitle": "Swing your view",
-      "cameraBody": "Hold the right mouse button and drag to swing your view around. Take a good look left and right.",
-      "cameraBodyTouch": "Drag a finger across the world (not the movement stick) to swing your view around.",
-      "cameraBodyPad": "Push the right stick to swing your view around.",
-      "courseTitle": "Run the Gauntlet",
-      "courseBody": "Now put both together: run the flag line on the strand south of the pier. Jump the rails with {jumpKey}, clamber over the boxes, and touch every flag through to the red one.",
-      "courseBodyTouch": "Now put both together: run the flag line on the strand south of the pier. Jump the rails with the Jump button, clamber over the boxes, and touch every flag through to the red one.",
-      "courseBodyPad": "Now put both together: run the flag line on the strand south of the pier. Jump the rails with the jump button, clamber over the boxes, and touch every flag through to the red one.",
+      "cameraBody": "Flag one down. Now hold the right mouse button and drag to swing your view: look down the walled lane heading south, then settle back the way you were facing.",
+      "cameraBodyTouch": "Flag one down. Now drag a finger across the world (not the movement stick) to swing your view: look down the walled lane heading south.",
+      "cameraBodyPad": "Flag one down. Now push the right stick to swing your view: look down the walled lane heading south.",
+      "leftTitle": "Slip left",
+      "leftBody": "Keep facing where you are and hold {strafeKey} to sidestep left down the south lane to its flag. Sidestepping keeps your eyes on a target while you move: you will fight this way one day.",
+      "leftBodyTouch": "Push the movement stick left to slip sideways down the south lane to its flag.",
+      "leftBodyPad": "Push the left stick left to slip sideways down the south lane to its flag.",
+      "camera2Title": "Look again",
+      "camera2Body": "Second flag down. Swing your view once more with the right mouse button held, and line yourself up with the last lane running west.",
+      "camera2BodyTouch": "Second flag down. Drag across the world once more and line yourself up with the last lane running west.",
+      "camera2BodyPad": "Second flag down. Push the right stick once more and line yourself up with the last lane running west.",
+      "forward2Title": "Run it home",
+      "forward2Body": "Hold {forwardKey} again and run the last lane to the red flag.",
+      "forward2BodyTouch": "Push the movement stick up again and run the last lane to the red flag.",
+      "forward2BodyPad": "Push the left stick up again and run the last lane to the red flag.",
       "courseProgress": "Flag {current} of {total}",
       "doneTitle": "Ready for the drills",
       "doneBody": "That is everything your legs need to know. Instructor Maren keeps the drills at Dawnrest Camp, up the road from the pier, and she has your first task."
@@ -14198,12 +14206,17 @@ export const es_ES: EnTranslations = {
       "ferryman_odo": {
         "name": "Ferryman Odo",
         "title": "Keeper of the Crossing",
-        "greeting": "Fresh off the crossing, {playerName}? Then up the shore road with you: Instructor Maren keeps the drills at Dawnrest Camp. Walk up close to her and press F, or left-click her, and she will set you your first task. When the vale calls you back, ring the bell standing beside my pier and the crossing will set you down in Eastbrook town."
+        "greeting": "Fresh off the crossing, {playerName}? Warden Tam keeps the Gauntlet on the strand just south of my pier: run his lanes first and your legs will thank you. After that, Instructor Maren at Dawnrest Camp has your first task. When the vale calls you back, ring the bell standing beside my pier and the crossing will set you down in Eastbrook town."
       },
       "bursar_wick": {
         "name": "Bursar Wick",
         "title": "The Gilded Strongbox",
         "greeting": "The Gilded Strongbox keeps a desk even here, {playerName}. Whatever you deposit with me waits in the same vault behind every bursar in every town, safe from wolves, water, and your own worse judgment."
+      },
+      "warden_tam": {
+        "name": "Warden Tam",
+        "title": "Keeper of the Gauntlet",
+        "greeting": "These lanes are the Gauntlet, {playerName}, and every adventurer the vale respects has run them. Walk the first lane west to the flag, take a good look around, slip left down the second lane, look again, then run the last lane to the red flag. The braziers stay lit all night. When the red flag is behind you, Instructor Maren at Dawnrest Camp has your first task."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",

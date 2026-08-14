@@ -49,7 +49,7 @@ export const PROVING_SHORE_ZONE: ZoneDef = {
     { x: -280, z: 0, label: 'The Old Pier', id: 'the_old_pier' },
     { x: -336, z: -14, label: 'The Practice Yard', id: 'the_practice_yard' },
     { x: -391, z: -33, label: 'The Wreck Line', id: 'the_wreck_line' },
-    { x: -298, z: -25, label: 'The Gauntlet', id: 'the_gauntlet' },
+    { x: -306, z: -22, label: 'The Gauntlet', id: 'the_gauntlet' },
   ],
   welcome:
     'The Proving Shore asks nothing of you but time. Learn the camp, strike the effigies, walk the wreck line, and when you are ready, Ferryman Odo will see you across to the vale.',
@@ -71,7 +71,29 @@ export const PROVING_SHORE_ROADS: { x: number; z: number }[][] = [
     { x: -298, z: 46 },
     { x: -290, z: 14 },
     { x: -286, z: -14 },
-  ], // Dawnrest Camp -> the Gauntlet (the movement course on the south strand)
+  ], // Dawnrest Camp -> the Gauntlet's gate (the movement course on the south strand)
+  [
+    { x: -286, z: -16 },
+    { x: -296, z: -16 },
+    { x: -308, z: -16 },
+    { x: -308, z: -24 },
+    { x: -308, z: -32 },
+    { x: -318, z: -32 },
+    { x: -328, z: -32 },
+  ], // the Gauntlet's own running line: lane 1 west, lane 2 south, lane 3 west.
+  //   Authored as a road on purpose: the dirt track paints the running line
+  //   between the walls, and road-side flora suppression (world.ts
+  //   terrainCalmAt, foliage roadDistance gates) keeps trees out of the lanes.
+  [
+    { x: -311, z: -13 },
+    { x: -308, z: -16 },
+  ], // the Gauntlet's north-west corner pocket: the running line's spline
+  //   rounds the L inward, and the 5 yd tree-suppression band around it
+  //   left this outer corner unswept, so a pine could stand inside the walls.
+  [
+    { x: -311, z: -29 },
+    { x: -308, z: -32 },
+  ], // the same sweep for the second elbow's outer corner pocket.
   [
     { x: -300, z: 48 },
     { x: -310, z: 46 },
@@ -97,8 +119,12 @@ export const PROVING_SHORE_ROADS: { x: number; z: number }[][] = [
 export const PROVING_SHORE_PORTALS: PortalDef[] = [];
 
 /** Where the tutorial greeting's accept path sets a new adventurer down:
- *  beside the Old Pier's ferry bell, facing up the camp road. */
-export const PROVING_SHORE_ARRIVAL = { x: -282, z: 6, facing: 2.4 } as const;
+ *  beside the Old Pier's ferry bell, facing Warden Tam at the Gauntlet's
+ *  gate on the strand to the south-southwest (the client snaps the chase
+ *  camera to this facing on any teleport-scale displacement,
+ *  game/teleport_camera.ts, so the first thing a newcomer SEES is the
+ *  course keeper Odo's welcome note directs them to). */
+export const PROVING_SHORE_ARRIVAL = { x: -282, z: 6, facing: -3.09 } as const;
 
 export const PROVING_SHORE_MOBS: Record<string, MobTemplate> = {
   // Built to be hit: the practice yard's straw-and-timber targets. They
@@ -173,9 +199,10 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     id: 'instructor_maren',
     name: 'Instructor Maren',
     title: 'Proving Master',
-    // The camp's east anchor, at the junction where all three roads meet.
-    pos: { x: -299, z: 44 },
-    facing: 0,
+    // The camp's east anchor, at the junction where all three roads meet,
+    // facing south-east down the pier road to greet each new arrival.
+    pos: { x: -299, z: 49 },
+    facing: (-3 * Math.PI) / 4,
     color: 0x6b4a8a,
     questIds: [
       'q_ps_strike_true',
@@ -191,9 +218,11 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     id: 'quartermaster_finch',
     name: 'Quartermaster Finch',
     title: 'Camp Outfitter',
-    // The stall row on the camp's north side, clear of the muster fire.
-    pos: { x: -309, z: 53 },
-    facing: -Math.PI / 2,
+    // Behind her stall on the camp's north edge (the old second tent's
+    // ground), facing south over the counter into the muster ground. Kept a
+    // step south of the perimeter rail, which crosses z 57.8 at this x.
+    pos: { x: -312, z: 57.2 },
+    facing: Math.PI,
     color: 0x6b6b3a,
     // Provisions and a starter bag, NEVER professions tools (the R37 vendor
     // rule): the chain's copper is sized so a graduate buys the full tier-1
@@ -213,9 +242,9 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     name: 'Bursar Wick',
     title: 'The Gilded Strongbox',
     // The strongbox desk holds the camp's quiet west end, up its own spur of
-    // the camp path, facing east back down it toward the muster fire.
+    // the camp path, facing north-west out over the water at his back wall.
     pos: { x: -325, z: 42 },
-    facing: -Math.PI / 2,
+    facing: Math.PI / 4,
     color: 0xc9a227,
     // No questIds ON PURPOSE: clicking a banker opens the bank window, not
     // the quest gossip, so no quest can give or hand in at him. His teaching
@@ -234,7 +263,24 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     color: 0x4a6a8a,
     questIds: ['q_ps_set_sail'],
     greeting:
-      'Fresh off the crossing, $N? Then up the shore road with you: Instructor Maren keeps the drills at Dawnrest Camp. Walk up close to her and press F, or left-click her, and she will set you your first task. When the vale calls you back, ring the bell standing beside my pier and the crossing will set you down in Eastbrook town.',
+      'Fresh off the crossing, $N? Warden Tam keeps the Gauntlet on the strand just south of my pier: run his lanes first and your legs will thank you. After that, Instructor Maren at Dawnrest Camp has your first task. When the vale calls you back, ring the bell standing beside my pier and the crossing will set you down in Eastbrook town.',
+  },
+  // The Gauntlet's keeper: the first pair of hands a newcomer is sent to,
+  // standing at the course gate the arrival facing points straight at. He
+  // holds no quest on purpose: his whole lesson is the bootcamp overlay's
+  // walk-through of his lanes (ui/bootcamp.ts), and his greeting mirrors its
+  // running order for anyone who clicks him instead.
+  warden_tam: {
+    id: 'warden_tam',
+    name: 'Warden Tam',
+    title: 'Keeper of the Gauntlet',
+    pos: { x: -283, z: -13 },
+    // Facing the pier landing, greeting each new arrival as they walk down.
+    facing: 0.05,
+    color: 0x8a5a3a,
+    questIds: [],
+    greeting:
+      'These lanes are the Gauntlet, $N, and every adventurer the vale respects has run them. Walk the first lane west to the flag, take a good look around, slip left down the second lane, look again, then run the last lane to the red flag. The braziers stay lit all night. When the red flag is behind you, Instructor Maren at Dawnrest Camp has your first task.',
   },
 };
 
@@ -431,16 +477,29 @@ export const PROVING_SHORE_OBJECTS: GroundObjectDef[] = [
 export const PROVING_SHORE_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
   // Dawnrest Camp: a training camp, not a town, spread wide so nothing
-  // crowds anything. Tents flank the muster fire, the outfitter's stall
-  // holds the north row, and the strongbox desk anchors the far west end.
-  stalls: [{ x: -310, z: 54, rot: 0.8, r: 1.6 }],
+  // crowds anything. Finch's stall holds the old second tent's ground on the
+  // north edge, Maren's tent sits by the muster fire, and the strongbox desk
+  // anchors the far west end.
+  stalls: [{ x: -312, z: 55.6, rot: Math.PI, r: 1.6 }],
   campfires: [
     [-302, 50], // the muster fire
     [-334, -10], // the practice yard's brazier
+    // The Gauntlet's braziers: real light sources so the course reads at
+    // night, every one placed OUTSIDE the lane walls (a campfire is a solid
+    // collider, colliders.ts CAMPFIRE_MOVE_TOP) at the gate, the corners,
+    // and the finish.
+    [-286, -10],
+    [-296, -10],
+    [-314, -22],
+    [-302, -26],
+    [-316, -38],
+    [-326, -38],
+    [-332, -32],
   ],
   tents: [
-    { x: -295, z: 45, rot: 0.4, scale: 1 },
-    { x: -312, z: 57, rot: -1.6, scale: 1 },
+    // Maren's tent, pulled inside the fence beside the muster fire (its old
+    // spot at (-295, 45) sat against the east rail).
+    { x: -299, z: 52.5, rot: 0.4, scale: 1 },
   ],
   fences: [
     // The camp's own rail fence, run along the dry shoulder of the plateau
@@ -458,38 +517,53 @@ export const PROVING_SHORE_PROPS: ZonePropsDef = {
     { x1: -294, z1: 44, x2: -294, z2: 40 }, // east run, to the pier gate
     { x1: -299, z1: 39, x2: -303, z2: 39 }, // south run, between the gates
     { x1: -308, z1: 39, x2: -330, z2: 39 }, // south run, west of the yard gate
-    // The Gauntlet's two jump rails, square across the course lane. A
-    // grounded walker is stopped; a jump clears them (colliders.ts isFence).
-    { x1: -295, z1: -19, x2: -291, z2: -23 },
-    { x1: -302, z1: -26, x2: -298, z2: -30 },
+    // The Gauntlet: an L of two fenced lanes on the south strand, entered
+    // from the east gate beside Warden Tam. Lane 1 runs west (hold forward),
+    // lane 2 runs south off its end (strafe left while still facing west),
+    // lane 3 runs west again to the red finish flag. The walls are the
+    // course: they make the running line unmissable and keep a wanderer on
+    // it. The south-east wall corner slants to (-304, -33) because the
+    // straight corner at (-304, -36) stands in the shallows.
+    { x1: -284, z1: -12, x2: -312, z2: -12 }, // lane 1 north wall
+    { x1: -284, z1: -20, x2: -304, z2: -20 }, // lane 1 south wall
+    { x1: -312, z1: -12, x2: -312, z2: -28 }, // lane 2 west wall
+    { x1: -304, z1: -20, x2: -304, z2: -33 }, // lane 2 east wall
+    { x1: -312, z1: -28, x2: -330, z2: -28 }, // lane 3 north wall
+    { x1: -304, z1: -33, x2: -330, z2: -36 }, // lane 3 south wall
   ],
-  // The Gauntlet's mantle boxes: campCrateShape tops them out around 1.2 yd,
-  // the height a running jump plus the mantle assist just clears
-  // (tests/parkour.test.ts pins that a raw jump alone cannot).
-  crates: [
-    [-296, -24],
-    [-297.2, -25],
-    [-304, -31],
-  ],
-  // The Gauntlet's checkpoint flags: pure dressing (no collider, no entity;
-  // the bootcamp overlay detects arrival by position against these same
-  // coordinates, pinned to BOOTCAMP_COURSE_CHECKPOINTS below).
+  // The Gauntlet's flags mark its corners (pure dressing: no collider, no
+  // entity; the bootcamp overlay detects arrival by position against the
+  // same coordinates, pinned to BOOTCAMP_COURSE_CHECKPOINTS below), and
+  // torches dress the walls between the corner braziers.
   decorProps: [
-    { key: 'hexFlag', x: -288, z: -16 },
-    { key: 'hexFlag', x: -298, z: -26 },
-    { key: 'hexFlagRed', x: -308, z: -34 },
+    { key: 'hexFlag', x: -308, z: -16 },
+    { key: 'hexFlag', x: -308, z: -32 },
+    { key: 'hexFlagRed', x: -328, z: -32 },
+    { key: 'kcasTorch', x: -290, z: -12 },
+    { key: 'kcasTorch', x: -300, z: -12 },
+    { key: 'kcasTorch', x: -310, z: -12 },
+    { key: 'kcasTorch', x: -290, z: -20 },
+    { key: 'kcasTorch', x: -300, z: -20 },
+    { key: 'kcasTorch', x: -312, z: -18 },
+    { key: 'kcasTorch', x: -304, z: -26 },
+    { key: 'kcasTorch', x: -318, z: -28 },
+    { key: 'kcasTorch', x: -326, z: -28 },
+    { key: 'kcasTorch', x: -312, z: -35.5 },
+    { key: 'kcasTorch', x: -320, z: -35.8 },
+    { key: 'kcasTorch', x: -328, z: -36 },
   ],
   // The Old Pier, where the crossing circle waits at the plank's end.
   docks: [{ x: -271, z: 0, rot: 1.4, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } }],
   graveyards: [{ x: -324, z: 58 }],
 };
 
-/** The Gauntlet's checkpoint line, in running order: pier end first, red
- *  finish flag last. The bootcamp overlay (src/ui/bootcamp_view.ts) walks a
- *  player through these by proximity; each entry mirrors a decorProps flag
- *  above (tests/proving_shore_content.test.ts pins the two lists equal). */
+/** The Gauntlet's checkpoint flags, in running order: lane 1's corner, lane
+ *  2's corner, then the red finish. The bootcamp overlay
+ *  (src/ui/bootcamp_view.ts) walks a player through these by proximity, one
+ *  ordered lesson per lane; each entry mirrors a decorProps flag above
+ *  (tests/proving_shore_content.test.ts pins the two lists equal). */
 export const BOOTCAMP_COURSE_CHECKPOINTS: readonly { x: number; z: number }[] = [
-  { x: -288, z: -16 },
-  { x: -298, z: -26 },
-  { x: -308, z: -34 },
+  { x: -308, z: -16 },
+  { x: -308, z: -32 },
+  { x: -328, z: -32 },
 ];

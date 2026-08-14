@@ -155,6 +155,7 @@ import { currentResetDay, currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
 import { telemetryZoneId } from './game/world_telemetry';
 import { ferryPrewarmTargetFor } from './game/ferry_prewarm';
+import { teleportCameraYaw } from './game/teleport_camera';
 import { zoneWarmupMode } from './game/zone_transition';
 import {
   CHAR_SORT_MODES,
@@ -1981,6 +1982,13 @@ async function startGame(
   // with no live hostile target (the HUD falls back to plain castSlot(0) until
   // this is wired); the Target button cycles targets via the Tab path below.
   hud.onMobileAttackNearest = () => attackNearest();
+  // The island bootcamp's keyboard-order gate reads the held movement keys
+  // the same way the perf overlay reads its input debug state: a narrow
+  // closure over the live Input, so the HUD never holds an input reference.
+  hud.bootcampHeldMovement = () => {
+    const held = input.debugState().movementHeld;
+    return { forward: held.forward, strafeLeft: held.strafeLeft };
+  };
 
   let lastOptionsOpen = hud.optionsOpen;
   let lastCharacterOpen = hud.characterOpen;
@@ -3754,6 +3762,9 @@ async function startGame(
       : 0;
     lastWarmCheckX = player.pos.x;
     lastWarmCheckZ = player.pos.z;
+    // A teleport-scale jump snaps the chase camera behind the landed facing,
+    // so the player sees what the landing authored (game/teleport_camera.ts).
+    input.camYaw = teleportCameraYaw(displacement, player.facing, input.camYaw);
     const wasInRiftBand = lastWarmInRiftBand;
     lastWarmInRiftBand = isRiftPos(player.pos.x);
     const riftExit = wasInRiftBand && !lastWarmInRiftBand;

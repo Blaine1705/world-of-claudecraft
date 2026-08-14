@@ -47,6 +47,7 @@ export const MAILBOXES: MailboxDef[] = [
   // Dawnrest Camp, up the camp's north edge. Requested at (-306, 60), moved
   // 4 yards south: the camp's shoreline runs diagonally and (-306, 60) sits
   // below the waterline (ground -4.02 against WATER_LEVEL -4.3), which would
-  // have put the Ravenpost perch in the shallows.
-  hubMailbox(PROVING_SHORE_ZONE, { x: -6, z: 6 }),
+  // have put the Ravenpost perch in the shallows. Turned a half circle from
+  // the pillars' default yaw so the slot faces the muster ground.
+  { ...hubMailbox(PROVING_SHORE_ZONE, { x: -6, z: 6 }), facing: Math.PI },
 ];
