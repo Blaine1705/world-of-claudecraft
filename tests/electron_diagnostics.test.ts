@@ -30,6 +30,14 @@ describe('clampText', () => {
     const nel = String.fromCharCode(0x85);
     expect(clampText(`a${csi}b${nel}c`, 100)).toBe('a b c');
   });
+
+  it('strips invisible direction and width formatters bound for OS surfaces', () => {
+    // U+202E (right-to-left override) can visually reorder a notification or
+    // dialog line into reading as something else; U+200B and U+FEFF hide seams
+    // between words. Format characters flatten to one space like the controls.
+    expect(clampText('a\u202eb\u2066c', 100)).toBe('a b c');
+    expect(clampText('pay\u200bload\ufeff!', 100)).toBe('pay load !');
+  });
 });
 
 describe('redactSecrets', () => {

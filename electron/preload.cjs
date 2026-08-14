@@ -191,6 +191,22 @@ contextBridge.exposeInMainWorld('wocDesktop', {
   notifyGamepadActivity: () => {
     ipcRenderer.invoke('desktop-gamepad-activity').catch(() => {});
   },
+  // An OS notification, with both strings already rendered by the renderer's
+  // t(). Refused here unless it is one of the two kinds main will accept, and
+  // rebuilt into a fresh object so no renderer prototype crosses the bridge.
+  // Fire-and-forget: it returns nothing, swallows the rejection, and guards the
+  // synchronous throw, because a shell that cannot notify must never surface an
+  // error in the caller's path.
+  showNotification: (payload) => {
+    if (!payload || typeof payload !== 'object') return;
+    const kind = payload.kind;
+    if (kind !== 'update-ready' && kind !== 'party-invite') return;
+    if (typeof payload.title !== 'string' || typeof payload.body !== 'string') return;
+    const message = { kind, title: payload.title, body: payload.body };
+    try {
+      ipcRenderer.invoke('desktop-show-notification', message).catch(() => {});
+    } catch {}
+  },
   // Whether the shell's window is minimized or hidden, pushed from the main
   // process because the page cannot see it: the window sets
   // backgroundThrottling:false, which keeps document.visibilityState at

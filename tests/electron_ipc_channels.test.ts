@@ -34,6 +34,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
         'desktop-set-display-mode',
         'desktop-set-gpu-force-opt-out',
         'desktop-set-strings',
+        'desktop-show-notification',
         'desktop-steam-capability',
         'desktop-steam-link-settled',
         'desktop-steam-link-ticket',
@@ -219,6 +220,77 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     expect(body).toContain('powerSave.notifyActivity();');
   });
 
+  it('the show-notification handler validates, re-checks focus, then paces the OS surface', () => {
+    // Everything this handler refuses is refused ONLY here: it is the one path
+    // from the page to a surface outside the game, so an untrusted frame, an
+    // unknown kind, an unbounded string, a focused window, and a repeat inside
+    // the floor each have to be answered by value rather than by a call some
+    // later line could ignore.
+    const main = read('electron/main.cjs');
+    const start = main.indexOf("ipcMain.handle('desktop-show-notification'");
+    expect(start).toBeGreaterThan(-1);
+    const body = main.slice(start, main.indexOf('\n});', start));
+    expect(body).toContain('if (!trustedSender(event)) return false;');
+    expect(body).toContain("if (kind !== 'update-ready' && kind !== 'party-invite') return false;");
+    expect(body).toContain(
+      "if (typeof payload.title !== 'string' || typeof payload.body !== 'string') return false;",
+    );
+    // The caps are what keep a crafted string out of the OS surface, and
+    // clampText is what flattens its control characters on the way.
+    expect(body).toContain('clampText(payload.title, 120)');
+    expect(body).toContain('clampText(payload.body, 240)');
+    expect(body).toContain("if (title.trim() === '' || body.trim() === '') return false;");
+    // The trusted-side focus mirror: a renderer that lost track of focus must
+    // not be able to toast a player who is looking straight at the game.
+    expect(body).toContain(
+      'if (!mainWindow || mainWindow.isDestroyed() || mainWindow.isFocused()) return false;',
+    );
+    expect(body).toContain('if (!Notification.isSupported()) return false;');
+    expect(body).toContain('if (!notifyGuard.allow(kind)) return false;');
+    // A click focuses the window through the one shared path, and nothing else:
+    // any other handler here would be a navigation the renderer chose.
+    expect(body).toContain("notification.on('click', focusMainWindow);");
+    expect(body).toContain('silent: false');
+    expect(body).toContain('return true;');
+
+    // Order is the contract, not just presence: pacing before the show means the
+    // rate limit stamps only on a notification that really reaches the OS, and
+    // every refusal above it costs nothing.
+    const trustAt = body.indexOf('if (!trustedSender(event)) return false;');
+    const kindAt = body.indexOf("if (kind !== 'update-ready'");
+    const clampAt = body.indexOf('clampText(payload.title, 120)');
+    const focusAt = body.indexOf('mainWindow.isFocused()');
+    const allowAt = body.indexOf('notifyGuard.allow(kind)');
+    const showAt = body.indexOf('new Notification(');
+    expect(trustAt).toBeGreaterThan(-1);
+    expect(kindAt).toBeGreaterThan(trustAt);
+    expect(clampAt).toBeGreaterThan(kindAt);
+    expect(focusAt).toBeGreaterThan(clampAt);
+    expect(allowAt).toBeGreaterThan(focusAt);
+    expect(showAt).toBeGreaterThan(allowAt);
+
+    // The BINDING lines, not just the handler: a guard that was never
+    // constructed (or constructed off a clock that does not move) would leave
+    // the handler above reading a floor nothing enforces.
+    expect(main).toContain("require('./notify_guard.cjs')");
+    expect(main).toContain('const notifyGuard = createNotifyGuard({ now: () => Date.now() });');
+  });
+
+  it('the preload refuses junk notification payloads and rebuilds them for the bridge', () => {
+    // These live ONLY in the preload. The kind whitelist keeps main from being
+    // asked about values it would refuse anyway; the fresh object is what stops
+    // a renderer prototype (or a getter) crossing the bridge; and the invoke is
+    // fire-and-forget both ways, so its rejection is swallowed and its
+    // synchronous throw is caught rather than surfacing in the caller's path.
+    expect(preload).toContain("if (kind !== 'update-ready' && kind !== 'party-invite') return;");
+    expect(preload).toContain(
+      'const message = { kind, title: payload.title, body: payload.body };',
+    );
+    expect(preload).toContain(
+      "ipcRenderer.invoke('desktop-show-notification', message).catch(() => {});",
+    );
+  });
+
   it('the preload refuses junk display modes and swallows gamepad-notify rejections', () => {
     // Both behaviors live ONLY in the preload and fail silently when lost. The
     // junk refusal keeps main receiving values it can apply; the catch is
@@ -258,6 +330,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
       'getDisplayMode',
       'setDisplayMode',
       'notifyGamepadActivity',
+      'showNotification',
       'steamLinkTicket',
       'steamLinkSupported',
       'steamLinkSettled',

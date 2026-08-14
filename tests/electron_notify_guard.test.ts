@@ -1,0 +1,110 @@
+import { describe, expect, it } from 'vitest';
+import { createNotifyGuard, NOTIFY_MIN_INTERVAL_MS } from '../electron/notify_guard.cjs';
+
+// The notification rate limit (electron/notify_guard.cjs) is pure and injected,
+// so the whole window boundary runs here without an Electron runtime. What it
+// protects is not in the game's window: a lost floor turns one noisy source into
+// a stream of OS toasts the player dismisses outside the app, and a floor that
+// never reopens silently drops every notification after the first.
+
+function createRig(options: { minIntervalMs?: number } = {}) {
+  const state = { now: 1_000_000 };
+  const guard = createNotifyGuard({ now: () => state.now, ...options });
+  return { guard, state };
+}
+
+describe('notification rate limit (electron/notify_guard.cjs)', () => {
+  it('pins the minimum interval to its literal', () => {
+    // The floor is felt by the player: it is how often the shell is allowed to
+    // reach the operating system's notification surface for one kind.
+    expect(NOTIFY_MIN_INTERVAL_MS).toBe(10000);
+  });
+
+  it('allows the first notification of a kind', () => {
+    const rig = createRig();
+    expect(rig.guard.allow('update-ready')).toBe(true);
+  });
+
+  it('refuses one millisecond inside the window and allows exactly at it', () => {
+    // The comparison is >= the floor, not > it: an off-by-one the other way
+    // would hold a notification back for a whole extra window.
+    const rig = createRig();
+    expect(rig.guard.allow('update-ready')).toBe(true);
+    rig.state.now += NOTIFY_MIN_INTERVAL_MS - 1;
+    expect(rig.guard.allow('update-ready')).toBe(false);
+
+    const other = createRig();
+    expect(other.guard.allow('update-ready')).toBe(true);
+    other.state.now += NOTIFY_MIN_INTERVAL_MS;
+    expect(other.guard.allow('update-ready')).toBe(true);
+  });
+
+  it('does not move the stamp on a refused call', () => {
+    // A refusal that stamped would let a source asking inside the floor push its
+    // own window out forever, so it would never notify again.
+    const rig = createRig();
+    expect(rig.guard.allow('update-ready')).toBe(true);
+    rig.state.now += 9000;
+    expect(rig.guard.allow('update-ready')).toBe(false);
+    rig.state.now += 1000;
+    expect(rig.guard.allow('update-ready')).toBe(true);
+  });
+
+  it('paces each kind on its own window', () => {
+    // A shared window would let a repeating update notice mute a party invite
+    // the player is actually waiting on.
+    const rig = createRig();
+    expect(rig.guard.allow('update-ready')).toBe(true);
+    expect(rig.guard.allow('party-invite')).toBe(true);
+    rig.state.now += 1;
+    expect(rig.guard.allow('update-ready')).toBe(false);
+    expect(rig.guard.allow('party-invite')).toBe(false);
+    rig.state.now += NOTIFY_MIN_INTERVAL_MS;
+    expect(rig.guard.allow('party-invite')).toBe(true);
+    expect(rig.guard.allow('update-ready')).toBe(true);
+  });
+
+  it('honors an injected interval rather than the default', () => {
+    const rig = createRig({ minIntervalMs: 250 });
+    expect(rig.guard.allow('update-ready')).toBe(true);
+    rig.state.now += 249;
+    expect(rig.guard.allow('update-ready')).toBe(false);
+    rig.state.now += 1;
+    expect(rig.guard.allow('update-ready')).toBe(true);
+  });
+
+  it('refuses a non-string kind without taking a window', () => {
+    // Fail closed: the handler validates the kind first, so anything else
+    // reaching here is a mistake, and a junk key must not take a window of its
+    // own or answer yes.
+    const rig = createRig();
+    expect(rig.guard.allow(42)).toBe(false);
+    expect(rig.guard.allow(null)).toBe(false);
+    expect(rig.guard.allow(undefined)).toBe(false);
+    expect(rig.guard.allow({ kind: 'update-ready' })).toBe(false);
+  });
+
+  it('refuses a non-positive, non-finite or non-numeric interval at construction', () => {
+    // Zero or negative would disable the rate limit this module exists to be,
+    // and a non-finite one would refuse every notification forever, so neither
+    // may become a runtime to diagnose.
+    expect(() => createRig({ minIntervalMs: 0 })).toThrow(TypeError);
+    expect(() => createRig({ minIntervalMs: -5 })).toThrow(TypeError);
+    expect(() => createRig({ minIntervalMs: Number.NaN })).toThrow(TypeError);
+    expect(() => createRig({ minIntervalMs: Number.POSITIVE_INFINITY })).toThrow(TypeError);
+    expect(() => createRig({ minIntervalMs: '10' as unknown as number })).toThrow(TypeError);
+    expect(() => createRig({ minIntervalMs: 0 })).toThrow(/createNotifyGuard/);
+    // The defaults are valid, so the guard cannot be satisfied by refusing
+    // everything.
+    expect(() => createRig()).not.toThrow();
+  });
+
+  it('refuses a clock that is not a function at construction', () => {
+    expect(() => createNotifyGuard({ now: undefined as unknown as () => number })).toThrow(
+      TypeError,
+    );
+    expect(() => createNotifyGuard({ now: 0 as unknown as () => number })).toThrow(
+      /createNotifyGuard/,
+    );
+  });
+});

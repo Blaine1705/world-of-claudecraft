@@ -6,6 +6,7 @@ const {
   ipcMain,
   Menu,
   net,
+  Notification,
   powerSaveBlocker,
   protocol,
   screen,
@@ -40,12 +41,14 @@ const {
   resolveWindowRestore,
 } = require('./window_memory.cjs');
 const { createPowerSave } = require('./power_save.cjs');
+const { createNotifyGuard } = require('./notify_guard.cjs');
 const { createSteamShell } = require('./steam.cjs');
 const { createEpicShell } = require('./epic.cjs');
 const { PRODUCTION_API_ORIGIN } = require('./update_guard.cjs');
 const {
   MAX_FORWARDED_ERRORS,
   MAX_MIRRORED_CONSOLE_LINES,
+  clampText,
   normalizeConsoleMessage,
   rendererErrorLogEntry,
   shouldLogConsoleLevel,
@@ -364,6 +367,10 @@ const powerSave = createPowerSave({
   clearTimer: (handle) => clearTimeout(handle),
   now: () => Date.now(),
 });
+
+// The pacing authority for OS notifications (electron/notify_guard.cjs). Main
+// side, because the renderer is not trusted to pace a surface outside the game.
+const notifyGuard = createNotifyGuard({ now: () => Date.now() });
 
 // The single send site for 'desktop-presentation-changed'. The renderer cannot
 // work hidden-ness out for itself: the game window sets backgroundThrottling:false,
@@ -965,6 +972,37 @@ ipcMain.handle('desktop-get-display-mode', (event) => {
 ipcMain.handle('desktop-gamepad-activity', (event) => {
   if (!trustedSender(event)) return false;
   powerSave.notifyActivity();
+  return true;
+});
+
+// An OS notification for something the player asked to be told about while the
+// game is not the focused window. Both strings arrive already rendered by the
+// renderer's t(), because main stays language-agnostic and has no catalog of its
+// own. The focus re-check here is the trusted-side mirror of the renderer's own
+// gate rather than a duplicate of it: a renderer that lost track of focus (or a
+// page that never checked) must not be able to toast a player who is looking
+// straight at the game. Caps are 120/240 through clampText (a clamped string
+// gains a three-dot suffix on top of the cap), which also flattens control and
+// invisible-formatting characters so a crafted string cannot smuggle escapes
+// or bidi reordering into the OS surface, and the rate limit stamps only on a
+// notification that really shows.
+// A click only focuses the window, through the one shared focusMainWindow path,
+// so the notification can never become a navigation the renderer chose.
+ipcMain.handle('desktop-show-notification', (event, payload) => {
+  if (!trustedSender(event)) return false;
+  if (!payload || typeof payload !== 'object') return false;
+  const kind = payload.kind;
+  if (kind !== 'update-ready' && kind !== 'party-invite') return false;
+  if (typeof payload.title !== 'string' || typeof payload.body !== 'string') return false;
+  const title = clampText(payload.title, 120);
+  const body = clampText(payload.body, 240);
+  if (title.trim() === '' || body.trim() === '') return false;
+  if (!mainWindow || mainWindow.isDestroyed() || mainWindow.isFocused()) return false;
+  if (!Notification.isSupported()) return false;
+  if (!notifyGuard.allow(kind)) return false;
+  const notification = new Notification({ title, body, silent: false });
+  notification.on('click', focusMainWindow);
+  notification.show();
   return true;
 });
 

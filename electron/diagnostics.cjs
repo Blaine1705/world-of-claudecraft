@@ -24,11 +24,17 @@ const MAX_MIRRORED_CONSOLE_LINES = 200;
 // dialog text stays flat. The class covers C0 (\u0000-\u001f),
 // DEL (\u007f), and C1 (\u0080-\u009f, which includes
 // \u009b, the one-byte control-sequence introducer), so a crafted string
-// cannot smuggle a terminal escape past the filter. Shared by clampText and
-// shell_strings.cjs.
+// cannot smuggle a terminal escape past the filter, plus the invisible
+// direction and width formatters (zero-widths and marks \u200b-\u200f, bidi
+// embeds and overrides \u202a-\u202e, isolates \u2066-\u2069, and \ufeff),
+// so text bound for an OS surface cannot reorder or hide what it displays.
+// Shared by clampText and shell_strings.cjs.
 function flattenControlChars(text) {
-  // biome-ignore lint/suspicious/noControlCharactersInRegex: matching control chars is the point
-  return text.replace(/[\u0000-\u001f\u007f-\u009f]+/g, ' ');
+  return text.replace(
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: matching control chars is the point
+    /[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff]+/g,
+    ' ',
+  );
 }
 
 function clampText(value, maxLength) {
