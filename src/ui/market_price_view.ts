@@ -64,7 +64,7 @@ function fromTenths(tenths: number): string {
  * greater than the real price.
  *   >= 1 gold   -> gold, one decimal ("1.5", "48,500")
  *   >= 1 silver -> silver, one decimal ("10.5")
- *   else        -> copper, whole ("80", "0") — copper is the smallest unit, so
+ *   else        -> copper, whole ("80", "0"): copper is the smallest unit, so
  *                  there is nothing to put after a decimal point.
  */
 export function marketPriceDisplay(copper: number): MarketPriceDisplay {
