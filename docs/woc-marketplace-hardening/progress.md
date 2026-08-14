@@ -19,8 +19,8 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 06 QA | phase-06-qa | game | DONE | ab2742012b | PASS-WITH-FOLLOWUPS, every fix applied, PUSHED per R4; v0.38.0 re-sync NON-trivial (3 conflicts + 2 silent count-pin auto-merges, all re-derived from runs: IWorld 323/86/237, fanout 10, hud.ts 19160 DOWN, sim.ts 12436; release-merge-audit faithful, 0 findings over 7 groups); ea1bb82322 verified FIRST (comment-only src, all pins mutation-proven); six fresh lanes: 0 code blockers, 4 blocking TEST gaps closed; QA-found code fixes: the capacity model now RUNS the removal walk (receiver-overflow class closed for good), the crafted-marker leg on the instanced matcher, guardTerms on the directed buyer, the model-reading accept belt, sweep-fallback stack+null-safety; NEW OPEN RULING R9 (implied terms consent, pre-enable affordance owed); pg suites 152 green zero skips on the tip; 21 mutation probes all bit; qa-checklist READY 0 blocking; gate GREEN at 47399f77b7 |
 | 07 | policy-terms-drafts | game | DONE | 8a1739d67a | DOCS ONLY, zero code diff; release/v0.38.0 synced (merge 8a1739d67a, trivial: 30 commits, no marketplace overlap; monolith_budget AUTO-MERGED so all four count-pin suites re-derived from a run, 377 green, renderer.ts ceiling 13708 lowered by the release's own extraction); counsel package complete: TERMS_AND_CONDITIONS_MARKETPLACE_DRAFT.md (full revised Terms beside the untouched live Terms; new Section 10 incl. the 10.3 acceptance-surface requirement per R9; renumbering verified reference-by-reference) + the decision memo (adopted position, nine counsel questions incl R9 and the NEW seller-side terms gap, exact-changes list, enable-time checklist; held PRIVATELY outside the public repo per the state.md locked decision); never-power carve-out landed consistently (README Highlights + Web3, wallet-link, holder-flair, marketplace.md launch gates); staleness cluster fixed (marketplace.md forfeit destination / delivery / review-state / TOTP-superseded-by-R1 truth-ups, p2p-woc-trade implementation status, DESIGN.md window inventory, malware-scan-catalog signing surfaces, both money-claim agent docs, docs+net+ui CLAUDE.md); FRESH proofreader over the whole package: 1 blocking + 7 should-fix + 6 nits, ALL applied; copy floor clean, ci:changed exit 0; LOCAL, not pushed per R4 |
 | 07 QA | phase-07-qa | game | DONE | 55c2ba992e | PASS-WITH-FOLLOWUPS, every fix applied (section below); release re-sync trivial (two CI-harness commits, no marketplace overlap; tsc clean, four pin suites 377 green); eight fresh audit lanes (the phase-prescribed fresh proofreader among them); the round found the draft's missing second-chance-offer disclosure (blocking; it falsified the outbid-refund promise) plus the anti-snipe and abandon-cooldown gaps, four draft wording drifts, and seven companion truth-ups, all applied; new deferreds with owners in state.md's 07 QA ROUND bullet; the amended draft postdates the recorded R6 send (Fernando forwards the amended copy); ci:changed exit 0; live Terms + terms.html byte-untouched; counsel memo verified absent from the branch; pushed per R4 |
-| 08 | service-auth-hardening | service | DONE | 70d4207 | SERVICE repo (origin/master already contained); B5 + the fail-open config mediums + the compose staleness default closed, every refusal proven red-first (the bypass returned 200 on the old routing with the internal secret alone); two fresh review lenses, then two fix rounds each re-reviewed fresh and a self-reviewed polish round, every finding applied incl. nits; the rounds' own finds: the THIRD dev escape (CLAUDIUM_ALLOW_FAKE_STRIPE, still denylist), the wallet-segment fragment gap, the duplicate-oracle heartbeat bug (warmed one instance, quoted from another), ASCII-before-trim; suite 439 tests 435 pass 0 fail (was 413); 12 commits, tip 4b9e413; LOCAL, not pushed per R4 |
-| 08 QA | phase-08-qa | service | NOT STARTED | | |
+| 08 | service-auth-hardening | service | DONE | 70d4207 | SERVICE repo (origin/master already contained); B5 + the fail-open config mediums + the compose staleness default closed, every refusal proven red-first (the bypass returned 200 on the old routing with the internal secret alone); two fresh review lenses, then two fix rounds each re-reviewed fresh and a self-reviewed polish round, every finding applied incl. nits; the rounds' own finds: the THIRD dev escape (CLAUDIUM_ALLOW_FAKE_STRIPE, still denylist), the wallet-segment fragment gap, the duplicate-oracle heartbeat bug (warmed one instance, quoted from another), ASCII-before-trim; suite 439 tests 435 pass 0 fail (the QA round corrected the baseline arithmetic: the range ran 417 tests with 413 passing before, so the growth is 417 to 439 totals); 12 commits, tip 4b9e413; LOCAL, not pushed per R4 |
+| 08 QA | phase-08-qa | service | DONE | 4b9e413 | PASS-WITH-FOLLOWUPS, every fix applied (section below); the self-reviewed polish commit 4b9e413 verified FIRST and clean; six fresh audit lanes + a dedicated red-proof lane over 70d4207..4b9e413: 0 blocking, all four red-first claims REPRODUCED-RED against a throwaway 70d4207 build; 8 should-fix + 13 nits ALL applied in three commits, re-reviewed fresh (0 blocking, 7 should-fix, 8 nits, ALL applied in a fourth commit, tip aa44873); 12 + 2 mutations all BIT; suite 445 tests 441 pass 0 fail 4 env-gated skips; game worktree re-synced to release/v0.38.0 (merge bfceae8d4b, NON-trivial: 33 conflicts, wireAura extraction pays the merged game.ts overage, pins re-derived 324/86/238 + sends 200 dispatches 213; release-merge-audit found THREE union-only reds, all fixed; gate GREEN at ad197c0801, full-suite fallback, all 12 steps, WITH TEST_DATABASE_URL, real-SQL suites 154 green zero skips); pushed per R4 |
 | 09 | bond-releaser | service | NOT STARTED | | |
 | 09 QA | phase-09-qa | service | NOT STARTED | | |
 | 10 | chain-verifier | service | NOT STARTED | | |
@@ -49,6 +49,126 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 21 QA | phase-21-qa | service + game | NOT STARTED | | |
 | 22 | close-out | all three | NOT STARTED | | teardown offer lives in 22 QA |
 | 22 QA | phase-22-qa | all three | NOT STARTED | | |
+
+## 08 QA round (service auth hardening)
+
+Service repo, worktree woc-rewards-service-pr31; audited 70d4207..4b9e413 (the 12
+implement commits). Session start checks: clean tree at 4b9e413, origin/master
+(df09756) already contained, baseline validation matched the ledger exactly (build
+clean; 439 tests, 435 pass, 0 fail, 4 env-gated skips). The self-reviewed polish
+commit 4b9e413 was verified FIRST with files open: docs and comments truthful, the
+dropped ordering regex behaviorally covered by the RangeError case, both new tests
+decisive; its one miss (dev_env.ts still saying "both of this module's consumers"
+after the enumeration grew to three) fed the fix round.
+
+Six fresh coverage-prompted lanes (normalization sweep with 28 live raw-socket
+probe shapes, secrets and fail-closed config, correctness and behavior parity,
+pin-skeptic test coverage, cleanup and doc accuracy, red-proof): ZERO blocking
+findings. The red-proof lane rebuilt 70d4207 in a throwaway worktree and
+REPRODUCED all four red-first claims (refund?x=1 executed with the internal secret
+alone and the plain path 403ed, proving the query string was the exact vector; the
+dev chain armed on unset NODE_ENV; an enabled market constructed on in-memory
+stores; two MarketPriceOracle instances with the market quoting the unwarmed one),
+each flipping green on the new dist, so the implement ledger's evidence is
+accurate.
+
+Findings applied (8 should-fix + 13 nits, every one; three commits on 4b9e413,
+tip efad850):
+
+- The un-flagged in-memory fallback was still denylist-shaped: with NO money rail,
+  no DATABASE_URL, and an unset NODE_ENV the whole economy (balances, admin
+  credits, gift cards) booted silently on RAM. DATABASE_URL is now required
+  unless NODE_ENV affirms development or test, red-proven, with the railless
+  dev/test arm still allowed flag-free.
+- The partial-Stripe coherence refusal lost its production-only qualifier (an
+  unset NODE_ENV might BE production; red-proven for unset and staging), and both
+  claudium escape flags are trimmed before the '1' compare like the dev chain's
+  (red-proven; the store-contract test arms moved onto a non-Stripe rail so the
+  new coherence gate cannot mask the stores message they pin).
+- Raw-first printable-ASCII on BOTH secrets: a Unicode-whitespace-only value now
+  refuses loudly by name on either secret instead of reading as unset (the admin
+  twin used to slip through the trim-emptiness short circuit with nothing
+  logged). The admin tier gained the space-pad-authenticates and newline/NBSP
+  boot-refusal pins the internal secret already had; the usdc wallet segment
+  gained the malformed-percent 400 pin its sol twin had; the two lead-in comments
+  still describing the ops tier as discount-only now describe the whole tier.
+- New service/test/compose_conformance.test.ts: the compose staleness default
+  must equal DEFAULT_MARKET_ORACLE_CONFIG.maxAgeMs (the exact divergence that
+  once halted the market permanently), NODE_ENV: production must stay pinned for
+  the deployed service, and the ONE remaining compose-vs-code divergence
+  (CLAUDIUM_QUOTE_TTL_MS 600000 vs 60000, found by the defaults sweep) is now
+  documented as deliberate beside the value and pinned with its WHY comment.
+- The in-memory opt-in gained its unreachability pin: every operator-settable
+  flag shape plus the REAL buildEconomyApps call site must still refuse a
+  poolless market. The structural timingSafeEqual pin narrowed to the
+  secretsMatch function body. The superseded "outside production" test name was
+  renamed to the allowlist contract its own body pins. Doc truth-ups:
+  MARKET_SETTLEMENT.md's "can never move a bond" sentence now mirrors the
+  grief-forfeit-but-cannot-steal wording, and its CLAUDIUM_WOC_REFERENCE_MAX_AGE_MS
+  cross-claim states the real story (the deployed .env sets the hour; that knob's
+  code default falls back to CLAUDIUM_ORACLE_MAX_AGE_MS, one minute; the
+  market/bootstrap.ts comment fixed the same way). Dead MarketRouteDeps deleted;
+  dev_env.ts reflowed to "every consumer"; dev_chain.ts flag comment states the
+  trim contract; .env.example documents the service-wide DATABASE_URL rule and
+  CLAUDE.md carries it.
+
+Validation after fixes: 445 tests, 441 pass, 0 fail, 4 env-gated skips (the
+CLAUDIUM_TEST_DATABASE_URL pg set). All 12 lane-prescribed mutations run serially
+with in-memory restore and proof-the-test-ran checks, all BIT their exact named
+test (isOpsOnlyPath refund entry, secretsMatch length guard and unset-expected
+denial, explicitlyDevOrTest denylist revert, poolless refusal, second-oracle
+revert, printableAscii newline, secret trim, requestPath raw, admin 503 gate, sol
+wallet capture, trimmed-ASCII order). A fresh re-review lane audited the fix
+round's three commits with its own mutation experiments on throwaway builds:
+0 blocking, 7 should-fix, 8 nits, ALL applied in a fourth commit (tip
+aa44873; the vacuous money-rail arms re-pinned and mutation-proven, the
+compose NODE_ENV pin anchored, the quote-TTL default exported and truly
+pinned, the walk-up anchored on .git, the 'real' Stripe arm added, compose
+DATABASE_URL required at interpolation, and the doc and enumeration
+truth-ups; full registry in the state.md 08 ledger, incl. the two deploy
+notes for Fernando).
+
+Judged, no code change (recorded, do not re-raise): GET /v1/health?x=1 now
+answers 200 where the raw-compare 404ed (the uniform normalized contract,
+deliberately pinned); a literal second '?' in a query now follows the RFC reading
+where the old per-handler split silently truncated (comment records it; standard
+clients percent-encode); the DATABASE_URL construction test's internal pg.Pool
+has no teardown (the env-DSN branch is the pin's whole point, pg connects lazily,
+and a pg behavior change surfaces as a loud suite timeout, not a silent pass);
+the timingSafeEqual presence pin remains textual (now function-scoped; the
+behavioral RangeError case is the true guard).
+
+Game worktree work this session (the sync the push required): release/v0.38.0
+merge bfceae8d4b, NON-trivial (33 conflicts: the error-code family union, the
+retention config/sweep unions with listings kept LAST, the registry spread union,
+21 generated i18n bundles regenerated, the world_api_parity narrative, the
+admin_guilds rig comment taken from the release, one modify/delete). Count pins
+re-derived from runs: IWorld 324 = 86 data + 238 methods (the union of this
+branch's tradeClose and the release's marketSellPriceCheck), sends 200,
+dispatches 213. The merged server/game.ts overshot even the release's raised
+ceiling, so the legacy full-aura wire encoder (WireAura + wireAura) moved
+byte-identical into server/snapshot_timer_wire.ts beside the stable aura cache
+that already mirrors its rules; hud.ts and sim.ts pinned at merged actuals
+(19170, 12505). The release-merge-audit ran (agent, full seven steps): overlap
+patch-identity CLEAN across all 68 branch-owned files, injected-helper bindings
+CLEAN, i18n regeneration proven mechanical, db-mock trap does not fire; it found
+THREE union-only reds, all fixed and proven (the dead-code sweep's deletion of
+scripts/trade_money_shot.mjs whose references are branch-owned, restored
+byte-identical; the widened Windows-path guard vs server_sim_facade.test.ts's
+bare .pathname reads, wrapped in fileURLToPath; the new sparse cones missing
+docs/screenshots/woc-market, added to all five cone blocks and the workflow
+pin) plus pin-quality repairs (the retention last-entry pin now scrapes and pins
+the full 20-name table order after the old two-indexOf compare proved gameable;
+the five new prune call-forms joined the pre-listen and exactly-once lists;
+WOC_MARKET_SCHEMA gained its ensureSchema wiring pin, mutation-proven; the
+error-code duplicate guard now scans the source literal instead of the
+already-collapsed Object.keys) and the aura-move's two orphaned imports dropped
+(game.ts 10818, ceiling banked there). Real-SQL marketplace suites 154 green
+zero skips against dev Postgres (the audit's residual). Gate GREEN at
+ad197c0801: full-suite fallback (planner correctly refused to reason about a
+208-commit merge), all 12 steps (the gate grew four manifest steps since the "all
+8 steps" era), 39724 vitest tests + 129 browser, WITH TEST_DATABASE_URL so every
+pg suite executed.
 
 ## 08 implement round (service auth hardening and fail-closed config)
 
@@ -452,7 +572,8 @@ with the unattributed-remainder fallback). It also surfaced ONE
 inherited red: tests/admin_guilds_db_integration is red on the release
 tip itself (env-gated, CI never runs it; accountDetail gained the
 general-chat quota join while the rig hand-picks its DDL); repaired in
-place.
+place. (The release later fixed the same rig upstream in 10629f302a;
+the v0.38.0 merge kept one copy, the release's comment.)
 
 Validation: tsc clean throughout; parity gate 207 green TWICE with NO
 golden regeneration (plain staged lines serialize identically); all

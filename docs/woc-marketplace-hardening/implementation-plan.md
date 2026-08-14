@@ -11,7 +11,7 @@ production realm until the acceptance bar in `review.md` is fully checked.
 
 | Surface | Working tree | Branch | Validation |
 |---|---|---|---|
-| Game (this repo) | `/Users/fernando/Documents/wocc-marketplace` | `feature/woc-marketplace` (tracks origin, current with release/v0.37.0) | `npx tsc --noEmit`, targeted `npx vitest run`, `npm run ci:changed`, pre-merge `node scripts/gate_select.mjs` |
+| Game (this repo) | `/Users/fernando/Documents/wocc-marketplace` | `feature/woc-marketplace` (tracks origin, current with release/v0.38.0) | `npx tsc --noEmit`, targeted `npx vitest run`, `npm run ci:changed`, pre-merge `node scripts/gate_select.mjs` |
 | Economy service (PR #31) | `/Users/fernando/Documents/woc-rewards-service-pr31` | `integration/woc-market-settlement` (PR tip 70d4207; pushes go to `origin/feature/woc-market-settlement`) | in `service/`: `npm run build`, `npm test` |
 | Ops dashboard (PR #13) | `/Users/fernando/Documents/woc-rewards-dashboard-pr13` | `integration/woc-market-trading` (PR tip c001d4a; pushes go to `origin/feature/woc-market-trading-controls`) | `npm test`, `npm run check`, `npm run build` |
 
@@ -39,7 +39,7 @@ substitute for the dedicated QA session; both happen.
 2. `git status` in that worktree must be clean; if not, stop and ask Fernando
    (concurrent sessions exist).
 3. Sync EVERY session at start (implement AND QA): game sessions `git fetch origin` and
-   merge the newest `origin/release/**` branch (currently `release/v0.37.0`) into
+   merge the newest `origin/release/**` branch (currently `release/v0.38.0`) into
    `feature/woc-marketplace`; service and dashboard sessions merge `origin/master` into
    their integration branch. If a game merge is non-trivial, run the
    `release-merge-audit` skill on it before starting the phase.

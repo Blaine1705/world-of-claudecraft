@@ -5,22 +5,39 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-08-qa.md`
-  (service repo, worktree `/Users/fernando/Documents/woc-rewards-service-pr31`,
-  fresh session; QA diffs 70d4207..4b9e413 and pushes on a PASS per R4).
-- 08 implemented AND reviewed (SERVICE repo, LOCAL, not pushed per R4; 12
-  commits, tip 4b9e413; suite 439/435 green, was 413). B5 closed on one
-  normalized path with the bypass proven red over the socket; both secrets
-  constant-time, trimmed, boot-enforced printable ASCII; ALL THREE dev
-  escapes on the shared explicitlyDevOrTest allowlist (the third,
-  CLAUDIUM_ALLOW_FAKE_STRIPE, found by the fix-round reviewer); an enabled
-  market refuses in-memory stores (DATABASE_URL required); compose staleness
-  aligned to the one-hour constant; PLUS the review-found duplicate-oracle
-  bug fixed (heartbeat warmed an instance the market never quoted from).
-  Two fresh lenses, two fresh fix-round re-reviews, every finding applied
-  incl. nits. The 08 ledger entry below is the registry the QA session
-  consumes; the final polish commit 4b9e413 is the one round without a
-  fresh reviewer of its own (self-reviewed): QA verifies it FIRST.
+- Next file to run: `docs/woc-marketplace-hardening/phase-09-bond-releaser.md`
+  (SERVICE repo, worktree `/Users/fernando/Documents/woc-rewards-service-pr31`,
+  fresh session, own origin/master sync first; the service tip is now aa44873
+  and PR #31 is updated).
+- 08 QA COMPLETE (PASS-WITH-FOLLOWUPS, every fix applied, PUSHED per R4:
+  service aa44873 to feature/woc-market-settlement, game to
+  feature/woc-marketplace after this session's v0.38.0 re-sync). The fix
+  round was re-reviewed FRESH (0 blocking, 7 should-fix, 8 nits, ALL
+  applied in a fourth commit, mutation-proven where the re-review proved a
+  pin gameable). Six fresh
+  lanes + a dedicated red-proof lane over 70d4207..4b9e413: 0 blocking, all
+  four red-first claims REPRODUCED-RED on a throwaway 70d4207 build. The
+  round's own finds, all applied (8 should-fix + 13 nits): the railless
+  durable-store gate was still denylist-shaped (DATABASE_URL now required
+  unless NODE_ENV affirms dev or test), partial-Stripe strictness outside
+  dev/test, both claudium escape flags trimmed, raw-first ASCII on BOTH
+  secrets (a Unicode-whitespace-only admin secret used to read as unset
+  silently), admin-tier trim/refusal pins, usdc percent pin, NEW
+  compose_conformance.test.ts (staleness = oracle constant, NODE_ENV
+  production, the deliberate CLAUDIUM_QUOTE_TTL_MS divergence documented),
+  the in-memory seam's unreachability pin through the real buildEconomyApps
+  call site, and the doc truth-up sweep. 12 mutations bit; suite 445/441/0/4.
+  The 08 ledger's QA ROUND bullet below is the registry 09 consumes.
+- GAME side this session: release/v0.38.0 re-synced (merge bfceae8d4b,
+  NON-trivial, 33 conflicts; pins re-derived IWorld 324 = 86 + 238, sends
+  200, dispatches 213; wireAura moved byte-identical to
+  snapshot_timer_wire.ts to pay the merged game.ts overage). The
+  release-merge-audit found THREE union-only reds (trade_money_shot.mjs
+  restored; server_sim_facade fileURLToPath; woc-market joined the CI sparse
+  cones) plus pin-quality repairs, all landed. Real-SQL suites 154 green
+  zero skips; gate GREEN at ad197c0801 (full-suite fallback, all 12 steps:
+  the gate grew four manifest steps since the "all 8" era, 39724 vitest +
+  129 browser, WITH TEST_DATABASE_URL).
 - 07 QA COMPLETE (PASS-WITH-FOLLOWUPS, every fix applied, PUSHED per R4).
   Release/v0.38.0 re-synced (merge 55c2ba992e, trivial: two CI-harness
   commits, no marketplace overlap, no count-pin surface; tsc clean and
@@ -286,7 +303,7 @@ Still open (a phase that hits one asks at session start):
 
 ## Locked decisions
 
-- Base: `feature/woc-marketplace`, already merged up to release/v0.37.0. Every game phase
+- Base: `feature/woc-marketplace`, already merged up to release/v0.38.0. Every game phase
   re-syncs the latest `release/**` at phase start; service/dashboard phases re-sync
   `origin/master`.
 - Packet docs live in the game repo only; service and dashboard phases are specified here
@@ -318,9 +335,10 @@ Still open (a phase that hits one asks at session start):
 
 ## Known gotchas carried from the review session
 
-- The two pin tests hit the merge trap: totals were set from a suite run (send 198,
-  dispatch 211, IWorld 321, method 236, data 85). If a later release merge conflicts
-  there again, re-derive from a suite run, never take either side's number.
+- The count-pin merge trap keeps firing: after the v0.38.0 re-sync the run-derived
+  totals are send 200, dispatch 213, IWorld 324 (86 data + 238 methods). If a later
+  release merge conflicts (or silently auto-merges) there again, re-derive from a
+  suite run, never take either side's number.
 - `npm run i18n:build` does NOT run `i18n:scan`; the S3 guard needs `i18n.status.json`
   present (full `npm run i18n:gen` creates it). Bit the review session at push time.
 - (RESOLVED by 01) `hud.ts` was monolith-RED until the p2p controller extraction;
@@ -328,6 +346,10 @@ Still open (a phase that hits one asks at session start):
 - The marketplace test set on the game branch was 866 passing at packet creation; the
   full suites: game 1524, service 413, dashboard 131.
 - Dashboard `npm audit`: 11 vulnerabilities at review time (phase 19 owns it).
+- kickSession argument order: the branch fixed a wire/log swap (c0955c6126) that
+  the RELEASE still carries on its own tree; the v0.38.0 merge kept the branch's
+  fixed order. A future release merge must not re-apply the release's order
+  (the second argument crosses the wire to the player).
 
 ## Findings-to-phase map (from review.md)
 
@@ -431,11 +453,97 @@ Still open (a phase that hits one asks at session start):
     review-time matter (the membership pin plus the CLAUDE.md rule are
     the guards).
   - Service repo gained a top-level CLAUDE.md (auth contract, fail-closed
-    gates, validation commands). Handoff: 08-qa diffs 70d4207..4b9e413,
-    validates in service/ (npm run build, npm test), verifies the
-    self-reviewed polish commit 4b9e413 FIRST, and pushes
-    integration/woc-market-settlement:feature/woc-market-settlement on a
-    PASS per R4.
+    gates, validation commands). ARITHMETIC CORRECTION by the QA round: the
+    range's baseline ran 417 tests (413 passing), so the growth is 417 to
+    439 totals; the original "was 413" conflated the pass count with a
+    total.
+  - 08 QA ROUND (2026-08-14, verdict PASS-WITH-FOLLOWUPS, every fix applied;
+    FOUR commits on 4b9e413, tip aa44873, PUSHED per R4; suite 445 tests
+    441 pass 0 fail 4 env-gated skips; 12 + 2 mutation proofs bit). Fixes the
+    round added on top of the implement range: DATABASE_URL required unless
+    NODE_ENV affirms dev or test EVEN WITH NO MONEY RAIL (the un-flagged
+    in-memory fallback was the one denylist-shaped gate left; red-proven);
+    the partial-Stripe coherence refusal fires outside dev/test, message
+    /partial Stripe configuration/ (unset NODE_ENV might BE production);
+    CLAUDIUM_ALLOW_IN_MEMORY and CLAUDIUM_ALLOW_FAKE_STRIPE trimmed like
+    the dev chain's flag; printable-ASCII checked raw-first on BOTH secrets
+    before the emptiness decision (Unicode-whitespace-only now refuses
+    loudly by name on either secret); admin space-pad-authenticates and
+    newline/NBSP refusal pins; usdc malformed-percent 400 pin; NEW
+    service/test/compose_conformance.test.ts (compose staleness default
+    equals DEFAULT_MARKET_ORACLE_CONFIG.maxAgeMs, NODE_ENV: production
+    pinned, CLAUDIUM_QUOTE_TTL_MS 600000-vs-60000 documented deliberate and
+    pinned with its WHY); allowInMemoryStores unreachability pinned through
+    env-flag shapes AND the real buildEconomyApps call site; timingSafeEqual
+    presence pin scoped to the secretsMatch body; "outside production" test
+    renamed to the allowlist contract; MARKET_SETTLEMENT.md bond-lifecycle
+    and CLAUDIUM_WOC_REFERENCE_MAX_AGE_MS truth-ups (that knob's CODE
+    default falls back to CLAUDIUM_ORACLE_MAX_AGE_MS, one minute; the hour
+    lives in the deployed env); MarketRouteDeps deleted; escape-hatch
+    comments say every consumer and the trim contract; .env.example and
+    CLAUDE.md carry the service-wide DATABASE_URL rule.
+  - 08 QA RE-REVIEW of the fix round (fresh lane, 0 blocking, 7 should-fix,
+    8 nits, ALL applied in the fourth commit aa44873): the money-rail
+    DATABASE_URL arms had gone vacuous under the loose regex the new
+    railless gate also satisfies (deleting the rail gate stayed green;
+    fixed with specific messages plus the one shape only the rail gate
+    catches, mutation-proven BIT); the compose NODE_ENV pin passed on a
+    commented-out line (anchored active); the quote-TTL "pinned both
+    sides" claim had no code-side pin (DEFAULT_CLAUDIUM_QUOTE_TTL_MS now
+    exported, shared by both builders, imported by the test); the compose
+    walk-up accepted a stray ancestor compose (anchored on the .git
+    sibling); stripeCheckoutMode gained its untested 'real'-in-production
+    arm; docker-compose.yml now REQUIRES DATABASE_URL at interpolation
+    (the :? form, replacing a silent in-container crash loop);
+    .env.example gained the commented NODE_ENV=development knob (commented
+    on purpose: shipping it live would arm the escape flags on a copied
+    prod .env) and lost its pre-existing em dash; MARKET_SETTLEMENT.md now
+    states the forfeit destination truthfully (the CONFIGURED treasury;
+    refund from the stored quote; neither from the request) and the
+    service-wide database rule; consumer enumerations went count-free
+    (five explicitlyDevOrTest call sites now: three escapes plus two
+    strictness gates). DEPLOY NOTES for Fernando before this reaches
+    production: (1) confirm the live .env sets DATABASE_URL, since both
+    compose interpolation and the boot now require it; (2) an admin secret
+    of only non-printable whitespace now refuses the whole boot where it
+    used to leave the service up with a 503 ops tier.
+  - 08 QA JUDGED, no code change (do not re-raise): health?x=1 answers 200
+    where the raw compare 404ed (uniform normalized contract, pinned on
+    purpose); a second literal '?' follows the RFC reading where old
+    per-handler splits truncated (comment records it); the DATABASE_URL
+    construction test's internal pg.Pool has no teardown (the env-DSN
+    branch is the pin's point; pg connects lazily; a pg change surfaces as
+    a loud timeout); the timing pin stays textual, function-scoped, with
+    the behavioral RangeError case as the true guard.
+  - 08 QA NOTES for later phases (game side, from the v0.38.0 sync audit):
+    i18n release-fill debt is now SIZED: about 600 pending Latin-script
+    rows over the apiError.woc_market.* family at I18N_RELEASE_TIER=1,
+    plus hudChrome.trade.woc.tabGold with no fill in any locale (maintainer
+    release fill per the locked decision; 22's pre-enable audit should
+    carry the number). The release dead-code sweep deleted wallet_e2e.mjs
+    and four market *_shot.mjs scripts; wallet_e2e was the only
+    live-Postgres proof a freed wallet can relink to another account, so
+    20/21 own restoring that proof as a real-SQL test.
+    scripts/trade_money_shot.mjs was restored (branch-owned pins reference
+    it). Release-owned defect surfaced to Fernando in the session wrap:
+    server/ad_spend.ts answers 400 with raw English err.message instead of
+    a stable ERROR_CODES key (invisible to the parity pin, unlocalizable).
+    Phase 13: the TOTP rows moved to error_codes.ts around lines 263/265
+    (the phantom-TOTP premise itself re-verified true). Phase 15: the
+    screenshots directory is docs/screenshots/woc-market, and any NEW
+    screenshot slug must join the FIVE sparse-cone blocks in
+    .github/workflows/ci.yml plus the SPARSE_CONE literal in
+    tests/ci_workflow.test.ts in the same change or CI test jobs cannot see
+    the files. Phase 22: the CI required-check contexts were all renamed
+    (dbe8ffd28e); re-derive before PR prep. Phases 12 to 16: hud.ts, sim.ts,
+    and game.ts sit at EXACT zero headroom (19170, 12505, 10818) and the
+    budget test now also forbids sitting more than 400 lines UNDER a
+    ceiling, so large extractions must lower their ceiling same-change.
+    New release-side rules that bind future game phases: any player-visible
+    sanction follows src/sim/moderation/CLAUDE.md; every aura-wipe site
+    routes through the aurasSurvivingDeath / aurasSurvivingCleanSlate
+    seams; npm run gate takes a machine-wide loopback lock (GATE_NO_LOCK=1
+    opts out) while gate_select does not.
 - 07 policy-terms-drafts (2026-08-13, session start 8a1739d67a = the trivial
   release/v0.38.0 sync (30 commits, GPU-hitch + night-lighting + OTA trains,
   no marketplace overlap; monolith_budget AUTO-MERGED: renderer.ts ceiling
