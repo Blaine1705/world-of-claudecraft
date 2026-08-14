@@ -17,10 +17,11 @@
 //   every later clear pays a diminished base only, with no bonus Marks (see
 //   `delveMarkPayout` and `delveBonusMarksFor` in src/sim/delves/runs.ts).
 //   That puts a Normal-only player here around 3-9 Marks/day by lockpick
-//   skill (the chest's loot tier sets the bonus),
-//   and a flawless Heroic runner at 12 (24 at the Litany), a bounded daily
-//   ceiling rather than an open grind. Prices are deliberately STEEP relative
-//   to that income, the reward gear is a clear upgrade over the silver-vendor
+//   skill (the chest's loot tier sets the bonus), and a flawless Heroic runner
+//   at 12 in-window (24 at the Litany). Past the window a grinder still drips
+//   diminished BASE Marks per clear without bound (Heroic 1, doubled at the
+//   Litany), so this is a bounded full-rate window plus a slow drip, not a
+//   hard daily cap. Prices are deliberately STEEP relative to that income, the reward gear is a clear upgrade over the silver-vendor
 //   armor of the same tier (Smith Haldren's commons: chainmail vest 60 armor,
 //   leather jerkin 40, robe 22, trousers 24), so each piece is
 //   uncommon-or-rare quality with stat bonuses on top. A casual player kits

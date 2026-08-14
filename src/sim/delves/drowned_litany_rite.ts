@@ -73,10 +73,16 @@ function emitPartyLog(ctx: SimContext, run: DelveRun, text: string, color: strin
   }
 }
 
-function grantRiteBonus(ctx: SimContext, run: DelveRun, tier: LootTier): void {
+// Paid to exactly the members grantDelveRewards just credited (see
+// delveBonusMarksFor in runs.ts for why the credited list is load-bearing).
+function grantRiteBonus(
+  ctx: SimContext,
+  run: DelveRun,
+  tier: LootTier,
+  creditedPids: number[],
+): void {
   const reward = LOCKPICK_TIER_REWARD[tier];
   const delve = DELVES[run.delveId];
-  const members = run.partyKey ? ctx.partyMembersForKey(run.partyKey) : [];
   const tierDef = delve.tiers.find((t) => t.id === run.tierId);
   const baseCopper = Math.round(
     ((tierDef?.copperMin ?? delve.baseRewards.copperMin) +
@@ -87,7 +93,7 @@ function grantRiteBonus(ctx: SimContext, run: DelveRun, tier: LootTier): void {
   // The Drowned Litany pays double Marks vs. the Collapsed Reliquary's lockpick
   // chest (delve index 1 vs. 0): a deliberate currency-curve step.
   const fullBonusMarks = reward.bonusMarks * 2;
-  for (const pid of members) {
+  for (const pid of creditedPids) {
     const meta = ctx.players.get(pid);
     if (!meta) continue;
     // Bonus Marks only ride a clear inside the daily window (per member); the
@@ -244,8 +250,8 @@ function openDrownedReliquary(
     obj.name = 'Opened Drowned Reliquary';
     obj.templateId = 'delve_drowned_reliquary_open';
   }
-  grantDelveRewards(ctx, run);
-  grantRiteBonus(ctx, run, tier);
+  const credited = grantDelveRewards(ctx, run);
+  grantRiteBonus(ctx, run, tier, credited);
   openDelveSurfaceExit(ctx, run);
   for (const pid of members) {
     ctx.emit({
