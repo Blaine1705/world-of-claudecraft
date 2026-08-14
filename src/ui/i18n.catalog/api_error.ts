@@ -210,6 +210,14 @@ export const apiErrorStrings = {
     entitlement_required: 'Verified Seeker entitlement is required.',
     current_ownership_required: 'Current Seeker Genesis Token ownership is required.',
   },
+  // cheater_mark: the operator-applied public Cheater tag (server/cheater_mark_api.ts).
+  // Operator-facing copy: only the admin dashboard ever receives these codes.
+  cheater_mark: {
+    admin_target: 'Operator accounts cannot be marked.',
+    reason_required: 'A reason is required.',
+    invalid_duration: 'Enter a mark duration of at least one second.',
+    not_marked: 'That account is not marked.',
+  },
   // woc_market: the config-gated $WOC Exchange family
   // (server/woc_market_routes.ts). USD-denominated auctions settled in $WOC;
   // every code here is a player-actionable refusal.

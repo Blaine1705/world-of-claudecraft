@@ -136,6 +136,11 @@ export const API_ERROR_KEYS = {
   'seeker.entitlement_required': 'apiError.seeker.entitlement_required',
   'seeker.current_ownership_required': 'apiError.seeker.current_ownership_required',
 
+  // cheater_mark: the operator-applied public Cheater tag (server/cheater_mark_api.ts).
+  'cheater_mark.admin_target': 'apiError.cheater_mark.admin_target',
+  'cheater_mark.reason_required': 'apiError.cheater_mark.reason_required',
+  'cheater_mark.invalid_duration': 'apiError.cheater_mark.invalid_duration',
+  'cheater_mark.not_marked': 'apiError.cheater_mark.not_marked',
   // woc_market: the config-gated $WOC Exchange family (server/woc_market_routes.ts).
   'woc_market.invalid_input': 'apiError.woc_market.invalid_input',
   'woc_market.disabled': 'apiError.woc_market.disabled',

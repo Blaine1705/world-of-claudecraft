@@ -2515,7 +2515,8 @@ export const tr_TR: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "UZAKTA"
+      "afkTag": "UZAKTA",
+      "cheaterTag": "< Hileci >"
     },
     "mobTooltip": {
       "levelFamily": "Seviye {level} {family}",
@@ -4122,6 +4123,12 @@ export const tr_TR: EnTranslations = {
       "genesis_token_claimed": "Bu Seeker Genesis Token zaten talep edilmiş.",
       "entitlement_required": "Doğrulanmış bir Seeker hakkı gerekir.",
       "current_ownership_required": "Seeker Genesis Token'a şu anda sahip olmanız gerekir."
+    },
+    "cheater_mark": {
+      "admin_target": "Operatör hesapları işaretlenemez.",
+      "reason_required": "Bir neden belirtilmesi gerekir.",
+      "invalid_duration": "En az bir saniyelik bir işaret süresi gir.",
+      "not_marked": "Bu hesap işaretli değil."
     },
     "woc_market": {
       "invalid_input": "Invalid input.",
@@ -6780,6 +6787,7 @@ export const tr_TR: EnTranslations = {
     "email": "E-posta",
     "emailPlaceholder": "sen@ornek.com",
     "emailError": "Lütfen geçerli bir e-posta adresi gir.",
+    "marketingOptIn": "Bana oyun haberlerini ve güncellemelerini e-postayla gönder (isteğe bağlı)",
     "showPassword": "Parolayı göster",
     "hidePassword": "Parolayı gizle",
     "logIn": "Giriş Yap",
@@ -6880,6 +6888,19 @@ export const tr_TR: EnTranslations = {
     "style": "Stil",
     "resetLook": "Görünümü Sıfırla",
     "resetShort": "Sıfırla",
+    "shareTab": "Paylaş",
+    "designCode": "Görünüm kodu",
+    "designCodeHint": "Bu görünümü kaydetmek veya paylaşmak için kodu kopyala. Bir görünümü yüklemek için kodu buraya yapıştırıp içe aktar.",
+    "copyCode": "Kodu kopyala",
+    "importCode": "İçe aktar",
+    "designCodeCopied": "Görünüm kodu kopyalandı.",
+    "designCodeCopyManual": "Otomatik kopyalama burada engellendi. Kod seçildi; klavyeni kullanarak kopyala.",
+    "designCodeImported": "Görünüm içe aktarıldı.",
+    "designCodeImportedPartial": "Görünüm içe aktarıldı. Bu sürümün tanımadığı değerler atlandı.",
+    "designCodeErrEmpty": "Önce bir görünüm kodu yapıştır.",
+    "designCodeErrHeader": "Bu bir görünüm koduna benzemiyor.",
+    "designCodeErrVersion": "Bu görünüm kodu oyunun daha yeni bir sürümünden geliyor.",
+    "designCodeErrMalformed": "Bu görünüm kodu bozuk. Kodun tamamını kopyalayıp yeniden dene.",
     "browFlat": "Düz",
     "browArched": "Kavisli",
     "browThin": "İnce",
@@ -9254,6 +9275,7 @@ export const tr_TR: EnTranslations = {
       "filterSort": "Sırala",
       "sortName": "Ad (A-Z)",
       "sortPriceAsc": "Fiyat: düşükten yükseğe",
+      "collapseLowest": "Yalnızca en düşük fiyat",
       "weaponSword": "Kılıçlar",
       "weaponDagger": "Hançerler",
       "weaponStaff": "Asalar",
@@ -9284,6 +9306,8 @@ export const tr_TR: EnTranslations = {
       "quantity": "Miktar",
       "quantityOf": "/ {count}",
       "priceEach": "Adet fiyatı",
+      "lowestPriceLabel": "Mevcut en düşük ilan fiyatı",
+      "lowestPriceNone": "Bu eşya için henüz etkin ilan yok.",
       "listButton": "Dünya Pazarı'na koy",
       "minPriceError": "En az 1 bakır bir fiyat belirleyin.",
       "collectEmpty": "Bekleyen bir şey yok. Satış gelirleri ve süresi dolan ilanlar burada toplanır.",

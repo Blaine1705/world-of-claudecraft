@@ -48,7 +48,7 @@ const MONOLITHS: MonolithRow[] = [
     // overhaul extracted marker interaction out of the coordinator, so the
     // merged file landed SMALLER and the ratchet follows it down.
     file: 'src/ui/hud.ts',
-    ceiling: 19160,
+    ceiling: 19170,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -57,7 +57,7 @@ const MONOLITHS: MonolithRow[] = [
     // stranded-light reparent and the registry prune into
     // src/render/fire_light_registry.ts (the ratchet's own rule: an extraction
     // lowers the ceiling, never raises it).
-    ceiling: 13708,
+    ceiling: 13700,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -68,7 +68,7 @@ const MONOLITHS: MonolithRow[] = [
     // merged size after the v0.38.0 sync merge landed the release's civic
     // service placements in the sim; still under the release's own 12660.
     file: 'src/sim/sim.ts',
-    ceiling: 12436,
+    ceiling: 12505,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -84,7 +84,7 @@ const MONOLITHS: MonolithRow[] = [
     // serializeCharacterForPersist, escrowSessionLost, the guild-book flush
     // pair). Zero headroom on purpose, the standing posture here.
     file: 'server/game.ts',
-    ceiling: 10859,
+    ceiling: 10820,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

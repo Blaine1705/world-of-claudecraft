@@ -2515,7 +2515,8 @@ export const sv_SE: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "BV"
+      "afkTag": "BV",
+      "cheaterTag": "< Fuskare >"
     },
     "mobTooltip": {
       "levelFamily": "Nivå {level} {family}",
@@ -4122,6 +4123,12 @@ export const sv_SE: EnTranslations = {
       "genesis_token_claimed": "Denna Seeker Genesis Token har redan hämtats.",
       "entitlement_required": "Verifierad Seeker-behörighet krävs.",
       "current_ownership_required": "Du måste fortfarande äga din Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Operatörskonton kan inte märkas.",
+      "reason_required": "En anledning krävs.",
+      "invalid_duration": "Ange en märkningslängd på minst en sekund.",
+      "not_marked": "Det kontot är inte märkt."
     },
     "woc_market": {
       "invalid_input": "Invalid input.",
@@ -6780,6 +6787,7 @@ export const sv_SE: EnTranslations = {
     "email": "E-post",
     "emailPlaceholder": "du@exempel.se",
     "emailError": "Ange en giltig e-postadress.",
+    "marketingOptIn": "Skicka mig nyheter och uppdateringar om spelet via e-post (valfritt)",
     "showPassword": "Visa lösenord",
     "hidePassword": "Dölj lösenord",
     "logIn": "Logga in",
@@ -6880,6 +6888,19 @@ export const sv_SE: EnTranslations = {
     "style": "Stil",
     "resetLook": "Återställ utseende",
     "resetShort": "Återställ",
+    "shareTab": "Dela",
+    "designCode": "Utseendekod",
+    "designCodeHint": "Kopiera den här koden för att spara eller dela utseendet. Klistra in en kod här och importera den för att läsa in utseendet.",
+    "copyCode": "Kopiera kod",
+    "importCode": "Importera",
+    "designCodeCopied": "Utseendekoden har kopierats.",
+    "designCodeCopyManual": "Automatisk kopiering är blockerad här. Koden är markerad; kopiera den med tangentbordet.",
+    "designCodeImported": "Utseendet har importerats.",
+    "designCodeImportedPartial": "Utseendet har importerats. Värden som den här versionen inte känner igen hoppades över.",
+    "designCodeErrEmpty": "Klistra in en utseendekod först.",
+    "designCodeErrHeader": "Det där ser inte ut som en utseendekod.",
+    "designCodeErrVersion": "Den utseendekoden kommer från en nyare spelversion.",
+    "designCodeErrMalformed": "Den utseendekoden är skadad. Kopiera hela koden och försök igen.",
     "browFlat": "Platt",
     "browArched": "Bågformad",
     "browThin": "Tunn",
@@ -9254,6 +9275,7 @@ export const sv_SE: EnTranslations = {
       "filterSort": "Sortera",
       "sortName": "Namn (A-Z)",
       "sortPriceAsc": "Pris: lågt till högt",
+      "collapseLowest": "Endast lägsta pris",
       "weaponSword": "Svärd",
       "weaponDagger": "Dolkar",
       "weaponStaff": "Stavar",
@@ -9284,6 +9306,8 @@ export const sv_SE: EnTranslations = {
       "quantity": "Antal",
       "quantityOf": "av {count}",
       "priceEach": "Pris per styck",
+      "lowestPriceLabel": "Nuvarande lägsta annonspris",
+      "lowestPriceNone": "Det finns inga aktiva annonser för det här föremålet ännu.",
       "listButton": "Lägg upp på Världsmarknaden",
       "minPriceError": "Ange ett pris på minst 1 koppar.",
       "collectEmpty": "Inget väntar. Försäljningsintäkter och utgångna annonser hämtas här.",

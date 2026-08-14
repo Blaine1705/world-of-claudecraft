@@ -340,12 +340,8 @@ describeDb('admin guild production SQL (real Postgres)', () => {
       await client.query(db.DAILY_REWARD_EXCLUDED_ACCOUNTS_VIEW_SQL);
       await client.query(social.SOCIAL_SCHEMA);
       await client.query(ADMIN_GUILDS_SCHEMA);
-      // accountDetail LEFT JOINs the general-chat quota table since the
-      // account-quota work; this rig hand-picks its boot modules, so the
-      // sibling schema rides along (its deps, accounts and
-      // account_moderation_actions, come from db.SCHEMA above) or the read
-      // fails on a missing relation: an env-gated red CI never sees,
-      // inherited by the branch from the release tip and repaired here.
+      // accountDetail LEFT JOINs the general chat quota table; without this the
+      // account read below fails with "relation ... does not exist".
       await client.query(GENERAL_CHAT_QUOTA_SCHEMA);
 
       const admin = await client.query(

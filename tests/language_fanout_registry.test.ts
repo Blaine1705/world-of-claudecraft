@@ -313,9 +313,9 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'market_window.ts',
-    memos: ['lastSig'],
+    memos: ['lastSig', 'lastSellPriceRefSig'],
     answer: 'this.marketWindow.render',
-    why: 'the listing ids, prices and the active tab; render() carries no self-gate',
+    why: 'the listing ids, prices and the active tab; render() carries no self-gate. lastSellPriceRefSig (issue 3043) is the Sell tab price reference: render() rebuilds it via renderSell -> sellPriceRefHtml with the CURRENT language, the same full-rebuild path that already answers lastSig',
   },
   {
     file: 'woc_market_window.ts',

@@ -224,6 +224,19 @@ export const ERROR_CODES = deepFreeze({
   'seeker.entitlement_required': { params: [] },
   'seeker.current_ownership_required': { params: [] },
 
+  // --- cheater_mark: the operator-applied public Cheater tag (src/sim/moderation/,
+  // server/cheater_mark_api.ts). The tag is cosmetic-only, so every code here is
+  // about WHO may be branded and for HOW LONG, never a gameplay effect. ---
+
+  // The target account is an operator, and an operator cannot be branded (400).
+  'cheater_mark.admin_target': { params: [] },
+  // The audited reason was absent or blank on either arm (400).
+  'cheater_mark.reason_required': { params: [] },
+  // The played-second budget did not normalize to a positive number (400).
+  'cheater_mark.invalid_duration': { params: [] },
+  // A lift was asked for on an account that is not wearing the tag (409).
+  'cheater_mark.not_marked': { params: [] },
+
   // --- $WOC Exchange family codes (server/woc_market_routes.ts). The whole
   // surface is config-gated: with WOC_MARKET_ENABLED unset every mutating
   // route answers woc_market.disabled. ---
