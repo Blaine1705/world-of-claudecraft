@@ -84,6 +84,7 @@ function git(cmd, args) {
       status: res.status,
       stdout: res.stdout,
       stderr: `${res.error.message}\n${res.stderr ?? ''}`,
+      error: res.error,
     };
   }
   return { status: res.status, stdout: res.stdout, stderr: res.stderr };

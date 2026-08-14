@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -540,6 +541,31 @@ describe('branch diff resolution', () => {
     expect(r.base).toBeNull();
   });
 
+  it('reports a Git child-process launch error instead of replacing it with a base miss', () => {
+    const r = resolveSelectBase({
+      env: {},
+      run: () => ({
+        status: null,
+        stdout: '',
+        error: new Error('spawnSync git ENOENT'),
+      }),
+    });
+    expect(r).toEqual({ base: null, reason: 'git failed to launch: spawnSync git ENOENT' });
+  });
+
+  it('still falls back after an ordinary nonzero release-listing result', () => {
+    const r = resolveSelectBase({
+      env: {},
+      run: (_c, args) => {
+        if (args[0] === 'for-each-ref') return { status: 1, stdout: '' };
+        return args.includes('origin/main^{commit}')
+          ? { status: 0, stdout: '' }
+          : { status: 128, stdout: '' };
+      },
+    });
+    expect(r.base).toBe('origin/main');
+  });
+
   // #3225: on win32, gate_select.mjs, gate_shadow.mjs, and ci_changed.mjs used
   // to spawn git with shell:true. cmd.exe treats `^` as its own escape
   // character, so the `<ref>^{commit}` peel this probe sends arrives at git
@@ -609,6 +635,37 @@ describe('branch diff resolution', () => {
         gitCall,
         `${file}: git spawn must omit shell (cmd.exe mangles the ^{commit} peel)`,
       ).not.toMatch(/\bshell\b/);
+    }
+  });
+
+  it.each([
+    [
+      'scripts/ci_changed.mjs',
+      '[ci:changed] ci:changed: could not resolve a --since base ref (git failed to launch: spawnSync git ENOENT)',
+    ],
+    [
+      'scripts/gate_shadow.mjs',
+      '[gate:shadow] cannot resolve a branch base: git failed to launch: spawnSync git ENOENT',
+    ],
+  ])('%s prints the Git launch error and exits 1', (script, diagnostic) => {
+    const emptyPath = mkdtempSync(path.join(tmpdir(), 'wocc-no-git-'));
+    try {
+      const env = Object.fromEntries(
+        Object.entries(process.env).filter(([key]) => key.toLowerCase() !== 'path'),
+      );
+      env.PATH = emptyPath;
+      delete env.GATE_SELECT_BASE;
+      const result = spawnSync(process.execPath, [path.join(REPO_ROOT, script)], {
+        cwd: REPO_ROOT,
+        encoding: 'utf8',
+        env,
+      });
+      expect(result.status).toBe(1);
+      expect(result.signal).toBeNull();
+      expect(result.stdout).toBe('');
+      expect(result.stderr.trim()).toBe(diagnostic);
+    } finally {
+      rmSync(emptyPath, { recursive: true, force: true });
     }
   });
 

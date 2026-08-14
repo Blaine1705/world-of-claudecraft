@@ -27,7 +27,7 @@ const REPO_ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 // no base ever resolved, even though this run() already surfaces res.error
 // below (#3225, same root cause as gate_select.mjs/gate_shadow.mjs). `shell`
 // stays on the npx biome spawn further down, which genuinely needs it.
-/** @type {(cmd: string, args: string[]) => { status: number | null, stdout?: string, stderr?: string }} */
+/** @type {(cmd: string, args: string[]) => { status: number | null, stdout?: string, stderr?: string, error?: Error }} */
 function run(cmd, args) {
   const res = spawnSync(cmd, args, { encoding: 'utf8', cwd: REPO_ROOT });
   if (res.error !== undefined) {
@@ -37,6 +37,7 @@ function run(cmd, args) {
       status: res.status,
       stdout: res.stdout,
       stderr: `${res.error.message}\n${res.stderr ?? ''}`,
+      error: res.error,
     };
   }
   return { status: res.status, stdout: res.stdout, stderr: res.stderr };
