@@ -8,7 +8,8 @@
 // to agree on is still a regression, and this is the file that says so.
 
 import { describe, expect, it } from 'vitest';
-import { removeSellUnitsFromInventory } from '../src/sim/items';
+import { removeSellUnitsFromInventory, removeVendorSellUnits } from '../src/sim/items';
+import type { SimContext } from '../src/sim/sim_context';
 import type { InvSlot, ItemInstancePayload } from '../src/sim/types';
 
 const ID = 'wolf_fang';
@@ -45,13 +46,32 @@ describe('the plain pass', () => {
   });
 
   it('ignores another item id entirely, however it is spelled in the bags', () => {
+    // The foreign id sits ABOVE the target on purpose: highest-index-first,
+    // an id-blind walk would consume the bread and satisfy `left` before it
+    // ever reached the fang, so this fixture order is what makes the id
+    // guard load-bearing rather than a same-outcome pass.
     const inv: InvSlot[] = [
-      { itemId: 'baked_bread', count: 3 },
       { itemId: ID, count: 1 },
+      { itemId: 'baked_bread', count: 3 },
     ];
     const units = removeSellUnitsFromInventory(inv, ID, 1);
     expect(units).toHaveLength(1);
     expect(inv).toEqual([{ itemId: 'baked_bread', count: 3 }]);
+  });
+
+  it('ignores a foreign id in the INSTANCED passes too', () => {
+    // The plain pass's id guard cannot vouch for the instanced ones: an
+    // id-blind instanced walk would ship the bread's enchanted copy here.
+    const fang: ItemInstancePayload = { signer: 'Ayla' };
+    const bread: ItemInstancePayload = { signer: 'Cedric' };
+    const inv: InvSlot[] = [
+      { itemId: ID, count: 1, instance: fang },
+      { itemId: 'baked_bread', count: 1, instance: bread },
+    ];
+    const units = removeSellUnitsFromInventory(inv, ID, 1);
+    expect(units).toHaveLength(1);
+    expect(units[0].instance).toBe(fang);
+    expect(inv).toEqual([{ itemId: 'baked_bread', count: 1, instance: bread }]);
   });
 });
 
@@ -99,17 +119,21 @@ describe('the two instanced passes', () => {
     expect(inv).toEqual([{ itemId: ID, count: 1, instance: lower }]);
   });
 
-  it('carries each instanced unit its own slot marker, not the previous slot', () => {
+  it('carries each instanced unit its own slot payload and marker, not the previous slot', () => {
+    // IDENTITY, not deep equality: the two payloads are deliberately
+    // deep-equal, so only toBe can catch a walk that reports the right
+    // marker with the other slot's payload object (the bind-on-trade stamp
+    // later writes into that object in place, so identity is the contract).
     const plain: ItemInstancePayload = { signer: 'Ayla' };
     const crafted: ItemInstancePayload = { signer: 'Ayla' };
     const inv: InvSlot[] = [
       { itemId: ID, count: 1, instance: plain },
       { itemId: ID, count: 1, instance: crafted, craftedRecipeId: 'recipe_fang' },
     ];
-    expect(removeSellUnitsFromInventory(inv, ID, 2)).toEqual([
-      { instance: crafted, craftedRecipeId: 'recipe_fang' },
-      { instance: plain, craftedRecipeId: undefined },
-    ]);
+    const units = removeSellUnitsFromInventory(inv, ID, 2);
+    expect(units.map((u) => u.craftedRecipeId)).toEqual(['recipe_fang', undefined]);
+    expect(units[0].instance).toBe(crafted);
+    expect(units[1].instance).toBe(plain);
   });
 });
 
@@ -126,6 +150,26 @@ describe('the skip predicate', () => {
       { instance: free, craftedRecipeId: undefined },
     ]);
     expect(inv).toEqual([{ itemId: ID, count: 1, instance: bound }]);
+  });
+
+  it('spares a skipped copy even in the preferred pass, with both predicates live', () => {
+    // The live callers (the trade swap and the staging preview) always pass
+    // skip AND deprioritize together; separately-tested predicates cannot
+    // catch an arm-order mutant that lets a skipped copy satisfy the
+    // preferred pass. The skipped copy here is NOT deprioritized and sits on
+    // top, so only the skip check keeps it home.
+    const boundForeign: ItemInstancePayload = { signer: 'Cedric', boundTo: 7 };
+    const own: ItemInstancePayload = { signer: 'Ayla' };
+    const skip = (instance: ItemInstancePayload): boolean => instance.boundTo !== undefined;
+    const deprioritize = (instance: ItemInstancePayload): boolean => instance.signer === 'Ayla';
+    const inv: InvSlot[] = [
+      { itemId: ID, count: 1, instance: own },
+      { itemId: ID, count: 1, instance: boundForeign },
+    ];
+    expect(removeSellUnitsFromInventory(inv, ID, 1, skip, deprioritize)).toEqual([
+      { instance: own, craftedRecipeId: undefined },
+    ]);
+    expect(inv).toEqual([{ itemId: ID, count: 1, instance: boundForeign }]);
   });
 
   it('under-delivers rather than reaching past a spared copy', () => {
@@ -196,5 +240,25 @@ describe('asking for more than the bags hold', () => {
     const inv: InvSlot[] = [{ itemId: 'baked_bread', count: 1 }];
     expect(removeSellUnitsFromInventory(inv, ID, 3)).toEqual([]);
     expect(inv).toEqual([{ itemId: 'baked_bread', count: 1 }]);
+  });
+});
+
+describe('the ctx-taking wrapper', () => {
+  it('fires the quest hook exactly once, AFTER the walk mutated the bags', () => {
+    // The extraction hoisted the hook out of the walk into this wrapper;
+    // deleting it there would silently kill collect-quest credit on every
+    // vendor sale, mail parcel, and crafting consumption. The recorded count
+    // proves the ORDER: a hook fired before the walk would still see 2.
+    const meta = { inventory: [{ itemId: ID, count: 2 }] as InvSlot[] };
+    const observed: number[] = [];
+    const ctx = {
+      resolve: () => ({ meta, e: {} }),
+      onInventoryChangedForQuests: (m: { inventory: InvSlot[] }) => {
+        observed.push(m.inventory[0]?.count ?? 0);
+      },
+    } as unknown as SimContext;
+    const units = removeVendorSellUnits(ctx, ID, 1, 1);
+    expect(units).toHaveLength(1);
+    expect(observed, 'one fire, after the walk').toEqual([1]);
   });
 });

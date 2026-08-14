@@ -1568,7 +1568,13 @@ export class WocMarketService {
               `[woc_market] escrow_outcome_unknown: listing persist for character ${args.characterId} ` +
                 `threw without rollback proof; abandoning the session so the durable row decides, ` +
                 `slot ${JSON.stringify(extract.extracted)}`,
-              { code: (err as { code?: string }).code, message: String(err) },
+              {
+                code:
+                  typeof err === 'object' && err !== null
+                    ? (err as { code?: string }).code
+                    : undefined,
+                message: String(err),
+              },
             );
             this.deps.custody.escrowSessionLost(extract.pid, args.characterId, 'ambiguous');
           }
@@ -1764,7 +1770,7 @@ export class WocMarketService {
     if (side === 'seller') {
       if (!itemRef) return refuse('character_invalid');
       const eligible = listingEligibility(
-        ITEMS[itemRef.itemId],
+        Object.hasOwn(ITEMS, itemRef.itemId) ? ITEMS[itemRef.itemId] : undefined,
         itemRef.expectInstance ?? undefined,
         this.cfg.policy,
       );
@@ -2740,12 +2746,16 @@ export class WocMarketService {
       this.deps.onSweepError(arm, err);
       return;
     }
-    // code+message only, never the raw error (the escrow arm's discipline): a
-    // pg violation's `detail` spells out key values (account ids, pair
+    // code+message+stack, never the raw error (the escrow arm's discipline):
+    // a pg violation's `detail` spells out key values (account ids, pair
     // columns), so the raw object would echo row values into the ops log.
+    // The stack carries no row values and is what locates a failure across
+    // an arm's dozens of call sites; the null-safe code read keeps a bare
+    // Promise.reject() from escaping arm()'s isolation as a TypeError here.
     console.error(`[woc_market] sweep arm ${arm} failed:`, {
-      code: (err as { code?: string }).code,
+      code: typeof err === 'object' && err !== null ? (err as { code?: string }).code : undefined,
       message: String(err),
+      stack: err instanceof Error ? err.stack : undefined,
     });
   }
 

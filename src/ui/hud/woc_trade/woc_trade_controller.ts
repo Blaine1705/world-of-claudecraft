@@ -526,8 +526,11 @@ export class WocTradeController {
         : { itemCraftedRecipeId: agreed.craftedRecipeId }),
       // The server records acceptance once per account (guardTerms) and this
       // send is what makes the pay arm's "terms were accepted when the offer
-      // was made" premise hold; the visible terms copy is the market window's
-      // (and the panel's own link is owned follow-up work).
+      // was made" premise hold. IMPLIED consent, deliberately: the panel
+      // renders no terms text yet, the same posture the pay arm below has
+      // always shipped, acceptable only while the market stays config-OFF.
+      // Before enable, the panel owes a real terms affordance (the recorded
+      // pre-enable obligation; the Exchange window's checkbox is the model).
       acceptTerms: true,
     });
     if (res.ok) {

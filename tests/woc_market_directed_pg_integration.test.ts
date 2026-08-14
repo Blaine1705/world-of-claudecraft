@@ -1213,7 +1213,11 @@ describeDb('woc market directed rail against real Postgres', () => {
       // The pin is CONTENT identity, not slot identity (itemPinDigest's
       // contract): a duplicate in another cell satisfies it, and the seller's
       // named index decides which copy ships. Identical copies are
-      // interchangeable by definition, so this must not refuse.
+      // interchangeable by definition, so this must not refuse. What the
+      // index half of this test pins is that the SERVICE forwards ref.index
+      // into extraction (proved through the fake's own bag[ref.index]
+      // resolution); the real extractTradableCopy honoring the index is its
+      // own suite's contract.
       const realm = 'directed-duplicate-copy';
       const seller = await seedAccount();
       const buyer = await seedAccount();

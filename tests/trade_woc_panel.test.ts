@@ -346,6 +346,23 @@ describe('a standing offer becomes a REVIEW surface for both sides', () => {
     );
   });
 
+  it('keeps every hint paragraph a polite live region', () => {
+    // The accept WHY changes in place after a rebuild (the partner drops a
+    // second item mid-review); without role=status the change is silent to a
+    // screen reader until the user navigates back to it. Checked across the
+    // arm shapes that render a hint, with a floor so an arm losing its hint
+    // node entirely cannot pass vacuously.
+    let seen = 0;
+    for (const d of [deps(), deps({ pendingOffer: offer })]) {
+      const root = paint(d);
+      for (const hint of root.querySelectorAll('[data-woc-hint]')) {
+        expect(hint.getAttribute('role')).toBe('status');
+        seen += 1;
+      }
+    }
+    expect(seen).toBeGreaterThan(0);
+  });
+
   it('the controller feeds the accept arm the same authoritative-first read as the belt', () => {
     // Source pin on the ONE line that makes the model judge the table the
     // player is looking at; losing it silently reverts the hint to the

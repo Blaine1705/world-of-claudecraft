@@ -542,6 +542,13 @@ describe('trade module (direct, no Sim)', () => {
     // giver's walk over the giver's scratch.
     expect(body).toContain('shippedOfferUnits(ctx, gives, meta.entityId, scratchOwn)');
     expect(body).toContain('shippedOfferUnits(ctx, receives, giver.entityId, scratchGiver)');
+    // Exactly two walk calls, and the model must CONSUME the second one's
+    // return: a fork that keeps both calls but iterates its own hand-rolled
+    // walk (presence pins alone cannot see that) fails the count, the
+    // consumption pin, or the no-second-index-walk negative below.
+    expect(body.match(/shippedOfferUnits\(/g)).toHaveLength(2);
+    expect(body).toContain('for (const g of shipped)');
+    expect(body).not.toMatch(/for \(let i = [^;]*inventory\.length - 1/);
     // The arrival is landed unit by unit with the boundTo stamp arm, keyed on
     // payload AND marker (the merge key addStacked really uses).
     expect(body).toContain('addStacked(scratchOwn, g.itemId, 1, arrival, u.craftedRecipeId)');
@@ -1009,6 +1016,51 @@ describe('trade module (direct, no Sim)', () => {
     ).toBe(true);
     expect(players.get(2).inventory, 'the receiver stayed at capacity').toHaveLength(16);
     expect(players.get(1).inventory, 'nothing left the giver').toHaveLength(2);
+  });
+
+  it('frees the instanced give its OWN slot in the model, so a full-bag swap completes', () => {
+    // The GIVES half of the same rework: the old model removed gives by item
+    // id (removeStacked, highest-index-first over any slot), so with a plain
+    // stack sitting ABOVE the pinned instanced give it freed a plain unit
+    // and left the instanced slot occupied in scratch, over-counting a full
+    // giver's slots and refusing a swap that really fits. The walk frees the
+    // exact staged slot.
+    const signedA = { signer: 'Ayla' };
+    const signedB = { signer: 'Borin' };
+    const filler = Array.from({ length: 14 }, (_, i) => ({ itemId: `filler_${i}`, count: 1 }));
+    const { ctx, players, events } = makeInstancedTradeCtx(
+      [...filler, { itemId: 'wolf_fang', count: 1, instance: signedA }],
+      [{ itemId: 'baked_bread', count: 1, instance: signedB }],
+    );
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 1 }], 0, 1);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'baked_bread', count: 1 }], 0, 2);
+    // A plain stack lands ABOVE the pinned copy, filling the giver to 16/16.
+    players.get(1).inventory.push({ itemId: 'wolf_fang', count: 2 });
+
+    tradeMod.tradeConfirm(ctx, 1);
+    tradeMod.tradeConfirm(ctx, 2);
+
+    expect(
+      events.filter((e) => e.type === 'error'),
+      'the swap must fit',
+    ).toEqual([]);
+    expect(
+      players.get(1).inventory.some((s: { itemId: string }) => s.itemId === 'baked_bread'),
+      'the bread arrived in the slot the give freed',
+    ).toBe(true);
+    expect(players.get(2).inventory, 'the pinned signed copy crossed, not a plain unit').toEqual([
+      { itemId: 'wolf_fang', count: 1, instance: signedA },
+    ]);
+    expect(
+      players
+        .get(1)
+        .inventory.find(
+          (s: { itemId: string; instance?: unknown }) => s.itemId === 'wolf_fang' && !s.instance,
+        )?.count,
+      'the plain stack stayed whole',
+    ).toBe(2);
   });
 
   it('ships the pinned CRAFTED copy, never the payload-equal unmarked twin above it', () => {
