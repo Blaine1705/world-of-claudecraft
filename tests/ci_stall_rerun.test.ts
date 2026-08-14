@@ -17,7 +17,8 @@ import {
 // is a SAFETY predicate: a wrong "rerun" can resurrect a superseded run or
 // blur a real failure's triage, so every case that is not positively the
 // stall shape must decide no. The primary fixture is the real incident:
-// run 31392590628 attempt 2 (2026-08-10), "PR long sims A" killed by
+// run 31392590628 attempt 2 (2026-08-10), the job then named "PR gate
+// (long sims A)" (now "PR long sims A"; fixture data uses the live name) killed by
 // its 20-minute bound inside "Check out repository", steps and annotation
 // text verbatim from the GitHub API.
 

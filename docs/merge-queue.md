@@ -17,10 +17,14 @@ merged into the target branch (`PR gate (long sims)` was the first case), and
 expect open PRs whose heads predate the job to need a base re-merge before
 they can queue, since a required context that never reports blocks the merge
 forever. Renames follow the same choreography in reverse plus forward: when
-the lane-diet PR split `PR gate (long sims)` into `PR long sims A` and
-`PR long sims B`, the old context had to leave the ruleset at the same
-time the two new ones joined (after the split merged), because a required
-name no run produces anymore blocks every later merge.
+the lane-diet PR split `PR gate (long sims)` into `PR gate (long sims A)`
+and `PR gate (long sims B)` (the names those jobs carried then), the old
+context had to leave the ruleset at the same time the two new ones joined
+(after the split merged), because a required name no run produces anymore
+blocks every later merge. The 2026-08-14 clean-scheme rename is the same
+choreography at full width: all fourteen required contexts swapped in one
+ruleset edit at merge time, with every open PR needing a base update
+afterward so its next run reports under the new names.
 
 Why: on 2026-08-05 two merges landed on an already-red release tip, every open
 PR inherited 67 broken tests, and repair took a day of close/reopen churn. The

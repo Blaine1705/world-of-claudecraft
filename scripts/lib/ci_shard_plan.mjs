@@ -137,8 +137,8 @@ export const CI_LONG_SUITES = Object.freeze([
 ]);
 
 /**
- * The two parallel lane jobs ("PR long sims A" / "PR gate (long sims
- * B)" in ci.yml): a literal partition of CI_LONG_SUITES, so the pair's wall
+ * The two parallel lane jobs ("PR long sims A" / "PR long sims B"
+ * in ci.yml): a literal partition of CI_LONG_SUITES, so the pair's wall
  * clock is roughly half of the single-job lane's. Halves are balanced by
  * MEASURED post-diet suite duration, not file count (re-balanced 2026-08-13
  * from the per-file durations in the harness-split PR after the owned-class
