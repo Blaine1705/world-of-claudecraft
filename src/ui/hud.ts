@@ -16705,8 +16705,7 @@ export class Hud {
     this.previewPrewarmHandle?.cancel();
     const handle = runPreviewPrewarmSchedule(this.postEntryPreviewPrewarmUnits(includeCharFamily), {
       enqueue: (label, run) => this.renderer.queueSecondaryPreviewPrewarm(label, run),
-      isFamilyBusy: (family) =>
-        family === 'char' ? this.isCharPreviewSurfaceVisible() : this.dailyRewardsWindow.isOpen,
+      isFamilyBusy: () => this.isCharPreviewSurfaceVisible(),
       // Pause while the FPS governor reports a struggling frame; the core's
       // poll cap keeps ambient pressure from starving the warmup forever.
       hasHeadroom: () => this.renderer.perfStats().renderBudget.mode !== 'degrading',

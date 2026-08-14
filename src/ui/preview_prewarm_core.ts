@@ -25,11 +25,11 @@
 // trade (the CPU caches the world renderer also reads):
 // docs/design/armory-preview-warming.md.
 
-/** Which owning surface a unit's pause key watches. `armory` carries no PLANNED
- *  unit any more (see the header), but the pause-by-family mechanism is generic
- *  and the member keeps `isFamilyBusy` a total function over the surfaces that
- *  own a preview context. */
-export type PreviewPrewarmFamily = 'char' | 'armory';
+/** Which owning surface a unit's pause key watches. One member, because one
+ *  surface is planned: the armory family went with the catalog warming, and an
+ *  unused member would only invite the schedule back. The pause mechanism
+ *  itself stays keyed, so a second surface costs one member and no rewiring. */
+export type PreviewPrewarmFamily = 'char';
 
 export interface PreviewPrewarmUnit {
   family: PreviewPrewarmFamily;
@@ -82,8 +82,7 @@ export interface PreviewPrewarmPlanDeps<Pose> {
    *  reset already dropped its own cover, so building the shell as a schedule
    *  unit would hitch a live frame, the exact class of stall the curtain
    *  exists to avoid. Portrait units stay in every plan (canvas-2D only, no
-   *  dependence on the shell); so do armory units (its own prewarm path
-   *  lazily rebuilds its stage). */
+   *  dependence on the shell). */
   includeCharFamily: boolean;
   renderCharShell: () => void;
   prewarmCharSkin: (skin: number) => void | Promise<void>;

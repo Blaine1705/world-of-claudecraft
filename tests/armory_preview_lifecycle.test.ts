@@ -46,6 +46,37 @@ describe('Armory preview lifecycle', () => {
     expect(inspect).not.toContain('prewarm');
   });
 
+  it('reaches the Armory stage from a CARD CLICK and from nowhere else', () => {
+    // The invariant this branch actually ships: no preparation on store open,
+    // construction only on the click that opens a card. Symbol-absence searches
+    // alone cannot say that (they pass if the chain returns under a new name),
+    // so this walks the real chain and then pins that it is the ONLY one.
+    //
+    // ensureArmoryInspect is the single door to the stage: ensureStage is
+    // private and reached only through it.
+    const doors = [...inspect.matchAll(/this\.ensureStage\(\)/g)].length;
+    expect(doors).toBeGreaterThan(0);
+    const callers = [...store.matchAll(/this\.ensureArmoryInspect\(\)/g)].length;
+    // Exactly one caller, and it is the card-open path.
+    expect(callers).toBe(1);
+    expect(store).toContain('this.ensureArmoryInspect().open(row)');
+
+    // openStore never reaches it: it flips the tab and renders the list.
+    const openStoreStart = store.indexOf('openStore(): void {');
+    expect(openStoreStart).toBeGreaterThan(-1);
+    const openStore = store.slice(openStoreStart, store.indexOf('\n  }', openStoreStart));
+    expect(openStore.toLowerCase()).not.toContain('ensurearmory');
+    expect(openStore.toLowerCase()).not.toContain('warm');
+    expect(openStore).toContain("this.tab = 'store'");
+
+    // And the hud's store entry point adds nothing of its own.
+    const hudOpenStart = hud.indexOf('openWocStore(): void {');
+    expect(hudOpenStart).toBeGreaterThan(-1);
+    const hudOpen = hud.slice(hudOpenStart, hud.indexOf('\n  }', hudOpenStart));
+    expect(hudOpen.toLowerCase()).not.toContain('armory');
+    expect(hudOpen.toLowerCase()).not.toContain('warm');
+  });
+
   it('keeps the armory catalog OUT of the post-entry prewarm schedule', () => {
     // The whole warming chain is gone from the store window, its catalog
     // helper included: nothing but the prewarm ever called it, so it went with

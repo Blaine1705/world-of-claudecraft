@@ -9,7 +9,7 @@ import {
 } from '../src/ui/preview_prewarm_core';
 
 const unit = (
-  family: 'char' | 'armory',
+  family: 'char',
   label: string,
   run: () => void | Promise<void> = () => {},
 ): PreviewPrewarmUnit => ({ family, label, run });
@@ -18,7 +18,7 @@ describe('runPreviewPrewarmSchedule', () => {
   it('enqueues every unit in order and resolves done', async () => {
     const ran: string[] = [];
     const handle = runPreviewPrewarmSchedule(
-      [unit('char', 'a'), unit('char', 'b'), unit('armory', 'c')],
+      [unit('char', 'a'), unit('char', 'b'), unit('char', 'c')],
       {
         enqueue: async (label, run) => {
           ran.push(label);
@@ -36,7 +36,7 @@ describe('runPreviewPrewarmSchedule', () => {
     const ran: string[] = [];
     const waits: number[] = [];
     let charBusyPolls = 0;
-    const handle = runPreviewPrewarmSchedule([unit('char', 'a'), unit('armory', 'b')], {
+    const handle = runPreviewPrewarmSchedule([unit('char', 'a'), unit('char', 'b')], {
       enqueue: async (label) => {
         ran.push(label);
       },
@@ -81,7 +81,7 @@ describe('runPreviewPrewarmSchedule', () => {
     const ran: string[] = [];
     const failed: string[] = [];
     const handle = runPreviewPrewarmSchedule(
-      [unit('char', 'a'), unit('char', 'boom'), unit('armory', 'c')],
+      [unit('char', 'a'), unit('char', 'boom'), unit('char', 'c')],
       {
         enqueue: async (label) => {
           if (label === 'boom') throw new Error('context lost');
@@ -118,7 +118,7 @@ describe('runPreviewPrewarmSchedule', () => {
     expect(ran).toEqual(['a']);
 
     // Cancellation while paused on a busy window also exits promptly.
-    const stuck = runPreviewPrewarmSchedule([unit('armory', 'x')], {
+    const stuck = runPreviewPrewarmSchedule([unit('char', 'x')], {
       enqueue: async () => {
         throw new Error('must not run');
       },

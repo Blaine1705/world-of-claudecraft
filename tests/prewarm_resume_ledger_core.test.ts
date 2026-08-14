@@ -1,5 +1,8 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { createPrewarmResumeLedger } from '../src/render/prewarm_resume_ledger_core';
+
+const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
 
 const entry = (id: string, unitIds: string[]) => ({ id, units: unitIds.map((u) => ({ id: u })) });
 const isDebt = (id: string): boolean => id.startsWith('programs.') || id === 'textures.scene';
@@ -82,6 +85,21 @@ describe('prewarm resume ledger', () => {
     // The COUNT stays authoritative while the id list is a bounded sample, the
     // same asymmetry the manifest id lists already carry into the beacon.
     expect(stats.failedUnits).toBe(4);
+  });
+
+  it('is wired into the renderer as a GETTER, not a value captured at pass end', () => {
+    // The behavioural test below builds its own getter, so on its own it proves
+    // the SHAPE works and nothing about the production seam. Replace
+    // renderer.ts's getter with `resume: resumeLedger.stats()` and every other
+    // test here stays green while the beacon reports `scheduled` forever, which
+    // is a plausible-looking row rather than a visible failure.
+    const statsStart = renderer.indexOf('const stats: RendererPrewarmStats = {');
+    expect(statsStart).toBeGreaterThan(-1);
+    const literal = renderer.slice(statsStart, renderer.indexOf('\n    };', statsStart));
+    expect(literal).toContain('get resume() {');
+    expect(literal).toContain('return resumeLedger.stats();');
+    // The failure mode spelled out, so a rename cannot quietly satisfy it.
+    expect(literal).not.toMatch(/\bresume:\s*resumeLedger/);
   });
 
   it('reads LIVE through a getter, so a spread cannot freeze it at scheduled', () => {

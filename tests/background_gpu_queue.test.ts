@@ -389,6 +389,49 @@ describe('createBackgroundGpuQueue', () => {
     expect(wait?.tails).toEqual(['preview:armory:skin']);
   });
 
+  it('does not blame the cap for a unit enqueued from the settling tail promise', async () => {
+    // The microtask order that makes this subtle: settle() resolves the unit's
+    // public promise BEFORE it releases the parked loop, so a reaction to that
+    // promise runs while the loop is still formally parked. A unit enqueued
+    // there never waited on the cap, and reporting one would put stale
+    // occupants next to it in the readout.
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock, tailLimit: 1 });
+    let settleLink!: () => void;
+    const tail = queue.run(
+      () => {
+        clock += 1;
+        return new Promise<void>((resolve) => {
+          settleLink = resolve;
+        });
+      },
+      GPU_WORK_PRIORITY.BACKGROUND,
+      'preview:armory:skin',
+      { releaseTail: true },
+    );
+    await flush();
+    const parked = queue.run(() => {}, GPU_WORK_PRIORITY.BACKGROUND, 'parked');
+    await flush();
+    // Enqueue from the tail's own continuation: this is the reaction that runs
+    // before the drain loop resumes. The clock advance AFTER the enqueue is
+    // what gives the unit a measurable wait, so it reaches the ranking at all
+    // (a zero wait is dropped, which made a first version of this test vacuous).
+    const chained = tail.then(() => {
+      const started = queue.run(() => {}, GPU_WORK_PRIORITY.LIVE_VIEW, 'chained');
+      clock += 300;
+      return started;
+    });
+    clock += 200;
+    settleLink();
+    await Promise.all([tail, parked, chained]);
+    const wait = queue.stats().longestWaits.find((entry) => entry.label === 'chained');
+    expect(wait).toBeDefined();
+    expect(wait?.waitMs).toBe(300);
+    // It waited, but not on the cap: the slot was free before it ever existed.
+    expect(wait?.waitedOnTailCap).toBe(false);
+    expect(wait?.tails).toEqual([]);
+  });
+
   it('keeps units granted immediately out of the wait ranking', async () => {
     let clock = 0;
     const queue = createBackgroundGpuQueue({ now: () => clock });

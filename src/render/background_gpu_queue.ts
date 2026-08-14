@@ -523,6 +523,14 @@ export function createBackgroundGpuQueue(opts?: {
       if (settled) return;
       settled = true;
       waitingTails.delete(unit);
+      // Clear the park flag HERE, synchronously with the slot freeing, not in
+      // the drain loop's continuation. complete() below resolves the unit's
+      // public promise, and a reaction to that promise runs as a microtask
+      // BEFORE the parked loop resumes: a unit enqueued from such a reaction
+      // would otherwise capture parkedOnTailCapAtEnqueue true and be reported
+      // as having waited on a cap that had already released it, with the stale
+      // occupants to match.
+      if (waitingTails.size < tailLimit) parkedOnTailCap = false;
       recordUnit(unit, syncMs);
       complete();
       const notify = tailNotify;
@@ -560,6 +568,9 @@ export function createBackgroundGpuQueue(opts?: {
             tailNotify = resolve;
           });
         } finally {
+          // Backstop only: the settle path above clears this the moment a slot
+          // frees. This covers the paths that leave the park without one
+          // (shutdown), and re-clearing is idempotent.
           parkedOnTailCap = false;
         }
       }
