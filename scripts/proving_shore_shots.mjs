@@ -101,26 +101,29 @@ const shot = async (name) => {
 const look = (from, at, opts = {}) =>
   stand(from.x, from.z, Math.atan2(at.x - from.x, at.z - from.z), opts.dist, opts.pitch);
 
-// The camp: notice board at (-308, 50), mailbox at (-306, 56), Finch's stall
-// at (-305, 55). Stand east of the cluster looking back across it.
-await look({ x: -294, z: 54 }, { x: -306, z: 53 }, { dist: 11, pitch: 0.3 });
+// The widened camp from its east gate: stall row, tents, muster fire, and
+// the new rail fence running the plateau shoulder.
+await look({ x: -292, z: 48 }, { x: -310, z: 51 }, { dist: 12, pitch: 0.32 });
 await shot('camp-overview');
 
-// The guild notice board, read from its own front standing point.
-await look({ x: -304, z: 50 }, { x: -308, z: 50 }, { dist: 5, pitch: 0.12 });
-await shot('notice-board');
+// Bursar Wick's strongbox desk at the camp's quiet west end (-325, 42), with
+// the notice board (-316, 47) on the path spur leading to it.
+await look({ x: -312, z: 47 }, { x: -323, z: 43 }, { dist: 9, pitch: 0.2 });
+await shot('wick-desk');
 
-// The pier bell at (-274, 6), now stood clear of the plank end.
+// The Gauntlet: the flag line, jump rails, and mantle crates on the south
+// strand, viewed from the first flag looking down the course.
+await look({ x: -286, z: -13 }, { x: -300, z: -28 }, { dist: 10, pitch: 0.25 });
+await shot('gauntlet');
+
+// The wreck line on the far strand: castaway crates among the scuttlers at
+// the end of the practice-yard path.
+await look({ x: -382, z: -26 }, { x: -391, z: -33 }, { dist: 9, pitch: 0.22 });
+await shot('wreck-line-far-strand');
+
+// The pier bell at (-274, 6), stood clear of the plank end.
 await look({ x: -274, z: 16 }, { x: -274, z: 6 }, { dist: 6, pitch: 0.15 });
 await shot('island-bell');
-
-// The Eastbrook bell at (3, -7.5), on the far side of the town mailbox
-// (mailbox_eastbrook sits at (0, -7.5)). Shot twice: close, so the bell
-// itself reads, and from the square, so the pairing with the mailbox does.
-await look({ x: 7, z: -6 }, { x: 3, z: -7.5 }, { dist: 5, pitch: 0.1 });
-await shot('town-bell');
-await look({ x: 2, z: 1 }, { x: 1.5, z: -7.5 }, { dist: 8, pitch: 0.15 });
-await shot('town-bell-square');
 
 await browser.close();
 console.log('proving shore shots written to tmp/');
