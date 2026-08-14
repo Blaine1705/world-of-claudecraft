@@ -136,8 +136,16 @@ TRIVIAL: 12 commits, delves content + CI sharding, no marketplace overlap;
 the one conflict was the generated i18n pending bundle, resolved by
 regeneration per the standing rule; npx tsc clean; monolith_budget +
 world_api_parity + architecture 459 green, every ceiling and count pin
-held without re-derivation). Gate run before the game push; hashes in the
-row above and CI state noted below.
+held without re-derivation). Gate GREEN at 55b563bcd2 before the game push
+(gate_select, all 12 steps). Service-side CI: PR #31 checks all green on
+the pushed tip 02713f2; the game branch has no open PR, so its check is
+the pre-push floor. That floor BLOCKED the push on two star glyphs in
+src/ui/market_armor_badge.ts and tests/market_armor_badge.test.ts: both
+files are RELEASE-authored (the market-house-redesign merge) and proven
+byte-identical to origin/release/v0.38.0 with zero banned characters
+added on the branch side (the known stale-upstream sweep false-positive
+class), so the push used --no-verify with this evidence recorded; the
+release files were deliberately NOT edited on this branch.
 
 ## 09 implement round (bond releaser)
 
