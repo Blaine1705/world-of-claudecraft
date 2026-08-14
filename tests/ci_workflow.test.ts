@@ -126,7 +126,7 @@ const PR_TIER_EVENT_FRAGMENT =
 // classifier's fail-closed doctrine; under the merge queue a skipped required
 // check reads satisfied, so failing toward SKIP would be the wrong direction.
 // (Covers green-but-empty output only: a FAILED changes job skips dependents
-// via needs regardless, which requiring "Detect code path changes" closes.)
+// via needs regardless, which requiring "Classify changes" closes.)
 const PR_TIER_IF_LINE = `    if: (${PR_TIER_EVENT_FRAGMENT}) && needs.changes.outputs.code != 'false'`;
 
 // pr-gate alone splits those two arms across levels (the docs-only matrix
@@ -995,13 +995,13 @@ describe('CI workflow parity', () => {
     // each name exactly.
     const mergeQueueDoc = readFileSync(new URL('../docs/merge-queue.md', import.meta.url), 'utf8');
     const requiredCheckNames = [
-      'Detect code path changes',
-      'PR gate (English-only legal)',
-      'PR gate (long sims A)',
-      'PR gate (long sims B)',
-      'PR checks (freshness, typecheck, builds)',
-      'Format + lint (Biome, changed files)',
-      'Browser regressions (Chromium)',
+      'Classify changes',
+      'PR tests',
+      'PR long sims A',
+      'PR long sims B',
+      'PR checks',
+      'Lint (changed files)',
+      'Browser tests',
     ] as const;
     for (const name of requiredCheckNames) {
       // Anchored to the job-level name: line (4-space indent), so a
@@ -1023,13 +1023,13 @@ describe('CI workflow parity', () => {
     expect(neverSectionEnd).toBeGreaterThan(neverIdx);
     const neverSection = mergeQueueDoc.slice(neverIdx, neverSectionEnd);
     const docRequiredNameForms = [
-      '`Detect code path changes`',
-      `\`PR gate (English-only legal) (1)\` through \`(${SHARD_N})\``,
-      '`PR gate (long sims A)`',
-      '`PR gate (long sims B)`',
-      '`PR checks (freshness, typecheck, builds)`',
-      '`Format + lint (Biome, changed files)`',
-      '`Browser regressions (Chromium)`',
+      '`Classify changes`',
+      `\`PR tests (1)\` through \`(${SHARD_N})\``,
+      '`PR long sims A`',
+      '`PR long sims B`',
+      '`PR checks`',
+      '`Lint (changed files)`',
+      '`Browser tests`',
     ] as const;
     for (const form of docRequiredNameForms) {
       expect(requiredHalf).toContain(form);
