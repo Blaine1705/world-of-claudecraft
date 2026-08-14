@@ -151,8 +151,12 @@ interface AttributionTargetFixture {
 // Re-minted again for the review fixes on the same PR: the stranded-light
 // reparent moved out of renderer.ts too, and the budget-pass descriptor became
 // a pooled field. renderer.ts bytes only. No capture was retaken.
+// Re-minted for the merge of release/v0.38.0 into the night-lighting branch:
+// both parents move renderer.ts (the release's point-light seam, this branch's
+// moon-phase grade threading), so the merged tree mints a value matching
+// neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '1c04866fbf189d69d6c1b7e27e9f29d2884e2a7b91f119549df644da44fecf00';
+  '3c28607bde322259909cfb57b86aa3e4e09e0b0cb9f2c195f8cc86901df4dbad';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

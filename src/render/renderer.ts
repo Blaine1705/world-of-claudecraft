@@ -205,6 +205,7 @@ import {
   fullDayGrade,
   globalDayness,
   moonDirection,
+  moonTerminator,
   NEUTRAL_DAY_GRADE,
   nightIblScale,
   nightSkyDesat,
@@ -9689,11 +9690,13 @@ export class Renderer {
         this.sunUp = aboveHorizon(sd[1]) * amp;
         this.moonUp = aboveHorizon(md[1]) * Math.max(amp, 0.6);
         this.starAmt = nightStarAmount(gday);
+        // Moon phase lifts the night floor (full brighter, new darker), epoch-anchored.
+        const moonLit = moonTerminator(currentLunarPhase()).litFrac;
         // the whole grade warms as the sun crosses the horizon, so the fog,
         // sky dome, and water all take the sunrise/sunset orange rather than
         // just the key light
         this.dnGrade = warmDuskGrade(
-          dayNightGrade(effectiveDayness(gday, biome), biome),
+          dayNightGrade(effectiveDayness(gday, biome), biome, moonLit),
           duskWarmAmount(sd[1]),
         );
         // The night-visibility layers read the world clock, not the realm's
