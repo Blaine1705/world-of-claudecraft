@@ -343,6 +343,33 @@ lines headroom for phase 10). Next: phase 10 (phase-10-discord-presence.md),
 fresh session, pull+merge first; the two open user decisions (low
 hold-or-accept, r181) still ride.
 
+Phase 10 done (2026-08-14; commits 6e8446290a electron codec + client +
+bridge + store field, ecfb69249f game module, 48501d7909 options row +
+M16 fills, review hardening 29a98dc470 security / 718ca30177 seam /
+b2222b99db copy disclosure; base merge f088ced82d of tip 6d309b945c, PR
+3396 CI shard rebalance only, parity + ci_workflow + ci_shard_partition
+green after, 374 tests). USER DECISION at phase start: presence defaults
+ON (see OPEN items). LIVE PROBE at phase start resolved the
+approval-gate ambiguity (see OPEN items) and confirmed the locked wire
+protocol byte for byte; live smoke of the SHIPPED manager against the
+real client: the candidate walk found the flatpak socket unaided, READY,
+acked SET_ACTIVITY, a requested clear trailed to exactly the 15s
+boundary, the OFF switch cleared immediately, cancelled the pending
+re-set, and disconnected. Reviews: privacy-security 0 blocking / 4
+should-fix (executed whitelist extraction, unix socket ownership gate,
+peer-text log clamp, details cap 125 for the ellipsis overshoot; ALL
+landed), frontend-seam 0 blocking / 4 should-fix (session-clock
+disclosure in the note, boot reconciliation push, blank-entity origin
+gate, cached setting off the 1 Hz poll; ALL landed) plus ledgered notes.
+Mutations 26/26 killed across four rounds (rc!=0 with named tests every
+time). Bisectability verified per slice in a throwaway worktree. main.ts
+11467/11490. Gate: full fallback red EXACTLY the accepted set (8 seal
+suites / 11 tests + monolith 2; 38752 passed, zero contention flakes
+this run); turbo proofs 7/7; browser leg isolated 19 files / 129 tests
+green. Next: phase 10 QA (phase-10-qa.md), fresh session,
+pull+merge first; the two open user decisions (low hold-or-accept, r181)
+still ride; Application ID provisioning still OPEN.
+
 ## Standing rules (user-locked, 2026-08-08, non-negotiable)
 
 1. ALL work happens in the worktree /home/fernandoramirez/Documents/woc-desktop-client-update
@@ -412,14 +439,20 @@ hold-or-accept, r181) still ride.
 ## OPEN items (need a human / credential / empirical answer)
 
 - Discord application registration (Application ID + art assets in the Discord developer
-  portal): maintainer infrastructure. Phase 10 can build and unit-test everything with a
-  placeholder id; the live probe needs a real id.
-- Discord approval-gate ambiguity: official pages conflict on whether SET_ACTIVITY works
-  for unapproved application ids. Phase 10 step 1 probes empirically BEFORE any player
-  facing copy promises presence.
-- Rich Presence default state (recommend default ON with an options toggle; presence is
-  additionally gated by Discord's own activity-sharing setting): confirm with user at
-  Phase 10 start.
+  portal): maintainer infrastructure, STILL OPEN after phase 10. The shell reads
+  WOC_DISCORD_APP_ID from the environment (15 to 22 digit snowflake shape or the whole
+  feature is inert and silent); nothing is hardcoded. The registration's application
+  NAME is what Discord renders as "Playing <name>", so it must be "World of ClaudeCraft".
+  Packaging decision (how the env slot is stamped into builds) rides with it.
+- Discord approval-gate ambiguity: RESOLVED EMPIRICALLY 2026-08-14 (phase 10 live probe
+  against a running, logged-in client): SET_ACTIVITY is accepted for a registered but
+  UNVERIFIED application id, so no approval gate exists for rich presence; an
+  UNREGISTERED id is refused with opcode 2 CLOSE {code:4000, "Invalid Client ID"}
+  before READY (the manager treats that as a terminal invalid-client state for the
+  process run). Feature copy needed no change.
+- Rich Presence default state: DECIDED 2026-08-14 (user, AskUserQuestion at phase 10
+  start): default ON, the Options Interface row is the off switch, and Discord's own
+  activity-sharing setting still gates visibility.
 - r181 lighting shift (PBR energy conservation): expect a global brightness change after
   the three upgrade. Phase 6 QA captures before/after screenshots; user accepts or the
   phase compensates. This is a judgment call, surface it, do not silently absorb it.
@@ -935,6 +968,68 @@ interlinear annotation, and the tag characters (/u flag); clampText never
 emits a trailing lone high surrogate from either exit. DEFERRED by design:
 a notification preferences UI (no in-game toggle; OS-level muting is the
 only off switch).
+
+Phase 10 inventory: pure codec electron/discord_presence_codec.cjs + .d.cts
+(OPCODES 0..4, MAX_FRAME_BYTES 65536, encodeFrame/encodeHandshake/
+encodeSetActivity/encodePong, decodeFrames draining an accumulator with
+partial-frame rest, payload-null on bad JSON, error 'oversize' |
+'bad-opcode'; clear = SET_ACTIVITY args WITHOUT the activity key; suite
+tests/electron_discord_codec.test.ts with byte-literal and split-position
+fuzz pins). Connection manager electron/discord_presence.cjs + .d.cts
+(candidatePipePaths n-major over XDG_RUNTIME_DIR + flatpak
+app/com.discordapp.Discord + snap.discord subdirs + TMPDIR + /tmp, win32
+\\?\pipe\discord-ipc-N; resolveDiscordClientId env snowflake gate;
+sanitizeDiscordActivity PURE executed whitelist, details clamped at
+DISCORD_DETAILS_MAX 125 so the clampText suffix stays inside Discord's
+128, malformed timestamps refuse the whole call; createDiscordPresence
+with injected connect/statPath/uid/now/timers/random/log/clampText:
+construction does NO io, first dial only inside setActivity(nonNull)
+while enabled with a clientId, unix candidates must be own-uid sockets
+before dialing (statPath, skip-on-fail), jittered backoff 2s doubling to
+60s cap, opcode 2 pre-READY = TERMINAL invalid-client (one warn, never
+redials this run), PING answered with echoing PONG, sends single-flight
+on woc-N nonces behind a 15s trailing rate limit that SPANS reconnects,
+structural dedup, evt ERROR logged once (clamped 200) and treated as
+delivered, close after READY = backoff resume with the desired activity
+surviving, setEnabled(false) = immediate clear + disconnect + timers
+cancelled, dispose on will-quit; suite tests/electron_discord_presence
+.test.ts, fake socket + fake timers). IPC invoke channels
+desktop-set-discord-activity (trustedSender; null clears; otherwise
+sanitizeDiscordActivity or return false; effectful line
+discordPresence.setActivity(clean)) and desktop-set-discord-presence-
+enabled (strict boolean, IDEMPOTENT same-value early return BEFORE the
+save, whole-record spread save, mirror commit after persisted-ok, then
+setEnabled). Store field discordPresenceEnabled (bool, default TRUE,
+additive, DESKTOP_PREFS_VERSION still 1). Preload setDiscordActivity
+(null passthrough, fresh rebuild, details transport pre-cap 256) +
+setDiscordPresenceEnabled (strict boolean), both fire-and-forget with
+.catch plus sync try/catch; preload method list now 28. Renderer
+src/game/discord_presence.ts (desktopDiscordPresenceSupported BOTH
+methods; buildZoneActivity the ONLY activity constructor, key set pinned
+BY EXECUTION to exactly details + timestamps.start in epoch SECONDS;
+createDiscordPresenceCore pure trailing coalescer, 15s window, same-zone
+dedup, clear once per disable transition and on the first-ever disabled
+poll; initDiscordPresence armed latch composed in
+initDesktopShellIntegration, one-shot Settings read seeds the cached
+enabled flag AND reconciles the shell store via
+pushDiscordPresenceEnabled; desktopPresenceOnFrame 1s self-throttle,
+world.player.id <= 0 bail for the online blank-entity window, dungeon
+hold via DUNGEON_X_THRESHOLD, zoneDisplayName resolved on zone change
+only so a language switch shows the old name until the next border,
+stated in the header; pushDiscordPresenceEnabled refreshes the cache and
+is the applySetting arm's helper, same polarity both sides). Feed sites:
+offline desktopPresenceOnFrame(offlineSim), online gated net.spectating
+=== null; both pinned via the line-comments-FIRST flattener (main.ts has
+a line comment containing a bare /* around line 3144, so block-first
+stripping voids pins in roughly lines 3144-5094; seam review verified
+each pin flips on its own line's removal). Settings discordPresence def
+true; OptionsEnv.desktopDiscordPresence capability row + privacy note
+after the gpu block (note discloses zone AND session-time sharing,
+public profile visibility, needs the Discord app running); i18n keys
+hudChrome.options.discordPresence / discordPresenceNote with the five
+M16 fills. WOC_DISCORD_APP_ID env slot (see OPEN items). Deliberate
+scope: dungeon presence holds the entry region (naming a dungeon is a QA
+or phase 11 design call); no party invites, buttons, or art assets.
 
 ## Known gotchas for this packet
 

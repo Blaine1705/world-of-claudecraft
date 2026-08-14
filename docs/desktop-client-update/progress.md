@@ -2086,3 +2086,89 @@ in-session; both relitigations UPHOLD; the security follow-up round found
   accepted under the hostile-page model (stripping would corrupt
   legitimate combining sequences); bc4 second-version-while-ready never
   re-notifies, now pinned as deliberate.
+
+## Phase 10: Discord Rich Presence, in-house (2026-08-14)
+
+- Base merge f088ced82d of release/v0.38.0 tip 6d309b945c (PR 3396 CI
+  shard rebalance only; no electron or desktop paths). Post-merge proof:
+  parity + ci_workflow + ci_shard_partition 374 tests green, phase5-low
+  sparse-cone row intact in all five ci.yml blocks and the pinned
+  literal, the vite __APP_VERSION__ define intact.
+- USER DECISION at phase start (AskUserQuestion): presence defaults ON;
+  the Options Interface row is the off switch; Discord activity sharing
+  still gates visibility. Recorded in state.md OPEN items.
+- LIVE PROBE (resolve-first item, ran against the real flatpak client on
+  this box, logged in): the locked wire protocol verified byte for byte
+  (LE opcode + length framing, HANDSHAKE v1, DISPATCH READY). VERDICTS:
+  a registered but UNVERIFIED application id gets SET_ACTIVITY ACCEPTED
+  (no approval gate exists; neither stopping rule tripped; the rendered
+  "Playing X" name comes from the app registration name), an
+  UNREGISTERED id gets opcode 2 CLOSE code 4000 BEFORE READY (now the
+  manager terminal invalid-client state), and clearing is SET_ACTIVITY
+  with the activity key omitted (accepted, data null).
+- Feature commits: 6e8446290a feat(desktop) pure codec + injected-IO
+  connection manager + two trusted invoke channels + additive store
+  field discordPresenceEnabled (version stays 1); ecfb69249f feat(game)
+  builder + pure trailing coalescer + armed-latch init in
+  desktop_shell_integration + two main.ts feed sites (+9 lines,
+  11467/11490) with the online site spectator-gated; 48501d7909
+  feat(ui) options row + note behind the both-methods capability, dual
+  armed GENERAL_KEYS pins, two hudChrome.options keys with five M16
+  fills, resolved artifacts regenerated.
+- Reviews (direct Agent dispatch, both delivered first try with the
+  SendMessage-to-main charter): privacy-security 0 blocking / 4
+  should-fix / 5 nits; frontend-seam 0 blocking / 4 should-fix / 4
+  notes. ALL eight should-fixes landed as review hardening commits
+  29a98dc470 / 718ca30177 / b2222b99db: executed-whitelist extraction
+  sanitizeDiscordActivity (the main handler key-set was source-pinned
+  only; now Object.keys pinned by execution incl. a proto-key arm),
+  unix socket candidates must be own-uid sockets before dialing (a /tmp
+  squatter could receive frames or force the terminal state), peer
+  CLOSE/ERROR text clamped to 200 before logging, details cap 125 (the
+  clampText ellipsis rides ON TOP of the cap, so 128 could emit 131 and
+  Discord refuses past 128), session-clock disclosure added to the
+  privacy note in English + all five fills (timestamps.start renders a
+  public elapsed clock; the note read as an exhaustive list without
+  it), boot reconciliation (init pushes the stored setting once, so a
+  divergent shell store heals and the off switch drops the connection
+  from startup), blank-entity origin gate (online net.player falls back
+  to blankEntity(-1) at 0,0 pre-snapshot; a poll there published
+  zoneAt(0,0) and the 15s window then suppressed the correction; the
+  poll now bails on id at or below 0, id positivity verified in both
+  hosts), and the cached enabled flag (new Settings() left the 1 Hz
+  poll; the push helper refreshes the cache, being the single write
+  path's only exit).
+- Mutations 26/26 killed across four rounds (electron implementer 8 + 6
+  on its fixes, orchestrator 9 cross-half + 3 on the fix pins), every
+  verdict rc!=0 with named failing tests, every restore verified, tree
+  clean after each round.
+- Live smoke of the SHIPPED manager module against the real client:
+  candidate walk found the flatpak socket unaided, READY, acked send,
+  requested clear trailed to exactly the 15s boundary, OFF switch
+  cleared immediately, cancelled the pending re-set, and disconnected.
+  (Discord also clears presence when the connection drops, so a dispose
+  mid-window leaves nothing stale.)
+- Bisectability: c1 93 tests, c2 159 tests, each green with tsc rc=0 in
+  a throwaway worktree; c3 is the validated head.
+- NEW LEDGER (phase 10 QA / phase 11): pendingNonce has no watchdog (a
+  peer that accepts a send and never echoes the nonce freezes presence
+  at the last value for that connection; fails stale, not open); the
+  prefs-writing channel has no rate limit (same pre-existing shape as
+  the gpu opt-out handler); the new import naming sits beside the
+  pre-existing discordPresence GUILD-WIDGET symbol family in main.ts
+  (grep hazard only); encodePong sits in an un-wrapped data handler
+  (deep-nesting crash hypothesis probed and DISPROVEN, try/catch would
+  be belt-and-braces only); both feed calls sit outside the perf trace
+  window (invisible cost, currently trivial); language-switch staleness
+  is stated in the module header (the dedupe key would need the
+  resolved name to correct sooner); dungeon presence deliberately holds
+  the entry region (naming dungeons is a design call); the MAIN.TS
+  FLATTENER HAZARD: a line comment containing a bare /* near line 3144
+  makes block-comments-first stripping swallow to the next close marker
+  (~1950 lines), so any EXISTING main.ts pin between roughly 3144 and
+  5094 built on the block-first flattener is currently unenforceable;
+  our pins strip line comments first and were mutation-verified; AUDIT
+  the pre-existing pins in that range (phase 11 candidate);
+  release-tier pending fills owed for the two new options keys (L3
+  queue); the win32 named-pipe namespace cannot be stat-gated (no
+  ownership check exists there; recorded, not fixable in-process).
