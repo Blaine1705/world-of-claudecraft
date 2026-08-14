@@ -783,7 +783,7 @@ void notifyOtaAppReady();
 // into "updating now" (the onDisconnect arm consults it before fatalOverlay).
 const otaUpdateGate = installOtaUpdateGate({
   overlay: {
-    render: (model) => renderOtaUpdateOverlay(model, { onContinue: () => otaUpdateGate.dismiss() }),
+    render: renderOtaUpdateOverlay,
     hide: hideOtaUpdateOverlay,
   },
   isInWorld: () => document.body.classList.contains('game-active'),
