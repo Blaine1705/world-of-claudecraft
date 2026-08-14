@@ -4851,10 +4851,12 @@ async function startGame(
   }
   // The paperdoll and portrait preview prewarms no longer hold the curtain:
   // they start after the reveal (see revealWorld below) as paced background
-  // GPU units. The ARMORY is not among them and is warmed nowhere ahead of
-  // time: it builds per inspected card, on the click that opens it
-  // (docs/design/armory-preview-warming.md). Measured on the reference desktop they were 11 to 26 s of the
-  // entry spent on secondary contexts for windows the player may never open.
+  // GPU units. Measured on the reference desktop, awaiting the paperdoll,
+  // armory and portrait prewarms here cost 11 to 26 s of the entry, spent on
+  // secondary contexts for windows the player may never open. The ARMORY is
+  // no longer in that set at all and is warmed nowhere ahead of time: it
+  // builds per inspected card, on the click that opens it
+  // (docs/design/armory-preview-warming.md).
   // Only the paperdoll SHELL still builds here (~700 ms): it is the one coarse
   // step the paced lane cannot split, and behind the curtain it costs nothing
   // a player can feel. The tight profile keeps skipping every secondary

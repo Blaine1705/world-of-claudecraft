@@ -59,8 +59,9 @@ export interface PreviewPrewarmHandle {
 }
 
 export const PREVIEW_PREWARM_BUSY_POLL_MS = 2_000;
-/** Fixed spacing between units: a warm catalog a few minutes after entry is
- *  fine (the store rarely opens that early); a hitch every frame is not. */
+/** Fixed spacing between units: the paperdoll and portrait caches being warm a
+ *  few minutes after entry is fine (nobody is waiting on either); a hitch every
+ *  frame is not. */
 export const PREVIEW_PREWARM_UNIT_SPACING_MS = 750;
 /** Max consecutive no-headroom polls before running the unit anyway. */
 export const PREVIEW_PREWARM_HEADROOM_POLL_CAP = 15;

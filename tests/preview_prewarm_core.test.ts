@@ -221,8 +221,11 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
     // NEGATIVE pin, and the load-bearing one. The armory catalog was about 2.1
     // to 2.6 s of live-frame hitches that every online session paid for a window
     // only some players open, and its cost was positional rather than per skin,
-    // so no gentler schedule was available. It is intent-driven now. A restored
-    // loop fails here instead of silently returning.
+    // so no gentler schedule was available. It is warmed NOWHERE ahead of time
+    // now: the store's card list needs none of it, and one card's preview is
+    // built on the inspect click. A store-open warm was the attempt this branch
+    // measured and deleted (it moved a cold store open 530.9 ms to 522.8 ms), so
+    // a restored loop fails here instead of silently returning.
     expect(units.some((entry) => entry.label.startsWith('preview:armory'))).toBe(false);
     for (const entry of units) entry.run();
     expect(calls).toEqual([
@@ -236,9 +239,6 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       'portrait:hunter:1:body',
       'portrait:mage:0:headshot',
       'portrait:mage:0:body',
-      // The finalize unit runs LAST: the per-unit warmups keep the small
-      // warmup buffer, and this is the one restore that replaces the old
-      // per-unit reallocation + forced full-size draw.
     ]);
   });
 

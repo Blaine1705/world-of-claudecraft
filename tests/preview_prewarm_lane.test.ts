@@ -34,8 +34,10 @@ describe('preview prewarm lane', () => {
     await h.lane.queueScheduled('scheduled', () => {});
     expect(h.calls[0]).toMatchObject({
       priority: GPU_WORK_PRIORITY.BACKGROUND,
-      // Released because a scheduled unit's cost is dominated by compileAsync
-      // links settling off-thread.
+      // Pinned as the value the lane SHIPS, not as a considered one: a preview
+      // unit does real main-thread work in its tail, so the released tail is a
+      // known misdeclaration the module header names and explains. Flipping it
+      // needs the queue's waitedOnTailCap readout, not an edit to this pin.
       releaseTail: true,
     });
   });
