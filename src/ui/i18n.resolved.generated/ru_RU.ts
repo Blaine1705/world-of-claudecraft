@@ -7171,6 +7171,7 @@ export const ru_RU: EnTranslations = {
       "shopMarksRequired": "Чтобы купить {name}, нужно Меток Вылазок: {marks}.",
       "shopSealPremiumOnly": "Эта печать поддаётся лишь руке мастера: открыть её можно только Превосходной ставкой.",
       "passageSealed": "Проход запечатан.",
+      "enemiesRemain": "Сначала расправьтесь с оставшимися врагами.",
       "moveCloserPassage": "Подойдите ближе к проходу.",
       "moveCloserChest": "Подойдите ближе к сундуку.",
       "moveCloserReliquary": "Подойдите ближе к реликварию.",

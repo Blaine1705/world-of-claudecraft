@@ -7171,6 +7171,7 @@ export const pl_PL: EnTranslations = {
       "shopMarksRequired": "Potrzebujesz {marks} Znaków Eskapady, aby kupić: {name}.",
       "shopSealPremiumOnly": "Ta pieczęć ustępuje tylko ręce mistrza. Otworzyć ją może jedynie stawka Premium.",
       "passageSealed": "Przejście jest zapieczętowane.",
+      "enemiesRemain": "Clear the remaining enemies first.",
       "moveCloserPassage": "Podejdź bliżej przejścia.",
       "moveCloserChest": "Podejdź bliżej skrzyni.",
       "moveCloserReliquary": "Podejdź bliżej relikwiarza.",
