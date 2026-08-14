@@ -224,6 +224,7 @@ describe('CI workflow parity', () => {
       '            !/docs/screenshots/*/',
       '            /docs/screenshots/admin-guild-bank-panel/',
       '            /docs/screenshots/class-skin-color-wash/',
+      '            /docs/screenshots/desktop-client-update-phase5-low/',
       '            /docs/screenshots/eastbrook-grand-armoury/',
       '            /docs/screenshots/eastbrook-vale-rebuild/',
       '            /docs/screenshots/far-foliage-impostors/',
