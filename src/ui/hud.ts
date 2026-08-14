@@ -151,14 +151,11 @@ import {
 } from '../world_api';
 import {
   type AbilityScaling,
-  abilityBuffValue,
   abilityDamageBonus,
-  abilityDurationValue,
-  abilityOverTimeEffect,
   abilityPrimaryEffect,
   abilitySecondaryEffect,
-  abilityTemporalHourglassValues,
 } from './ability_damage';
+import { abilityDisplayDescription, formatAbilityNumber } from './ability_description';
 import { abilityDisplayName, abilityDisplayNameFromSource } from './ability_display_name';
 import { ArenaWindow } from './arena_window';
 import { auraDisplayNameForHud, auraDisplayNameFromSource } from './aura_display_name';
@@ -290,7 +287,6 @@ import {
   salvageResultToast,
 } from './enchanting_view';
 import {
-  type AbilitySpecNoteField,
   classDisplayName,
   dungeonDisplayName,
   itemDisplayName,
@@ -298,7 +294,6 @@ import {
   knownLetterId,
   riftFloorLabel,
   tEntity,
-  tEntityOptional,
   zoneDisplayName,
   zonePoiLabel,
 } from './entity_i18n';
@@ -19087,66 +19082,6 @@ function describeAbilitySummary(
   return parts.join(' · ');
 }
 
-// Fills every description placeholder from the RESOLVED ability: {damage} ($d)
-// the primary hit, {overTime} ($o) a hybrid's dot/hot total, {buff} ($b) the
-// first buff's value, {duration} ($t) the first timed effect's duration. All are
-// rank- and talent-resolved, so the prose can never drift from what a cast does.
-function abilityDisplayDescription(
-  res: ResolvedAbility,
-  damageText: string,
-  scaling?: AbilityScaling,
-  spec?: string | null,
-): string {
-  const buff = abilityBuffValue(res);
-  const duration = abilityDurationValue(res);
-  const hourglass = abilityTemporalHourglassValues(res);
-  // {rage} splices the RESOLVED gainResource total, so a talent that raises the
-  // granted amount (Blood Offering on Blood Toll) shows in the tooltip.
-  const rageGained = res.effects.reduce(
-    (sum, eff) => sum + (eff.type === 'gainResource' ? eff.amount : 0),
-    0,
-  );
-  const rageText = rageGained > 0 ? formatAbilityNumber(rageGained) : '';
-  const values = {
-    damage: damageText,
-    overTime: abilityOverTimeText(res, scaling),
-    buff: buff === null ? '' : formatAbilityNumber(buff),
-    duration: duration === null ? '' : formatAbilityNumber(duration),
-    healing: hourglass === null ? '' : formatAbilityNumber(hourglass.healing),
-    selfCooldownRecovery:
-      hourglass === null ? '' : formatAbilityNumber(hourglass.selfCooldownRecovery),
-    allyCooldownRecovery:
-      hourglass === null ? '' : formatAbilityNumber(hourglass.allyCooldownRecovery),
-    hostilePveDuration: hourglass === null ? '' : formatAbilityNumber(hourglass.hostilePveDuration),
-    hostilePvpDuration: hourglass === null ? '' : formatAbilityNumber(hourglass.hostilePvpDuration),
-    groundDuration: hourglass === null ? '' : formatAbilityNumber(hourglass.groundDuration),
-    rage: rageText,
-  };
-  // Cheap Trick retires Gut Punch's stealth requirement. When the RESOLVED ability
-  // has dropped it, prefer the stealth-free description variant so the prose stops
-  // contradicting the (talent-aware) requirement line, the same way the cost/cast
-  // lines already prefer resolved values. Falls back to the base description for
-  // any locale that has not filled the variant yet, so no raw content placeholder
-  // can surface.
-  const stealthFreeVariant =
-    res.ignoreStealthRequirement === true && res.def.requiresStealth === true
-      ? tEntityOptional({ kind: 'ability', id: res.def.id, field: 'descriptionNoStealth', values })
-      : null;
-  const text =
-    stealthFreeVariant ??
-    tEntity({ kind: 'ability', id: res.def.id, field: 'description', values });
-  // Spec-aware teaching line: a shared button explains its interaction ONLY
-  // for the player's current spec, so a new player never reads another
-  // spec's rules on their own tooltip.
-  const note = spec ? res.def.specNotes?.[spec] : undefined;
-  if (!note) return text;
-  return `${text} ${tEntity({
-    kind: 'ability',
-    id: res.def.id,
-    field: `specNote_${spec}` as AbilitySpecNoteField,
-  })}`;
-}
-
 function itemDisplayNameFromSource(name: string): string {
   const item = Object.values(ITEMS).find((candidate) => candidate.name === name);
   return item ? itemDisplayName(item) : name;
@@ -19261,10 +19196,6 @@ function parseSimMoney(text: string): number | null {
     else copper += amount;
   }
   return matched ? copper : null;
-}
-
-function formatAbilityNumber(value: number): string {
-  return formatNumber(value, { maximumFractionDigits: 1 });
 }
 
 function abilityRangeLine(def: AbilityDef): string | null {
@@ -19456,26 +19387,6 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
     default:
       return '';
   }
-}
-
-// Builds the `$o` over-time string (a hybrid's dot/hot TOTAL) the same way
-// abilityEffectText builds `$d`, including the "(+N)" scaling callout (which the
-// bonus helper zeroes for hybrid riders, matching combat's no-double-dip rule).
-function abilityOverTimeText(res: ResolvedAbility, scaling?: AbilityScaling): string {
-  const eff = abilityOverTimeEffect(res);
-  if (!eff) return '';
-  const b = scaling ? abilityDamageBonus(res, eff, scaling) : 0;
-  const bonus =
-    b > 0 ? ` ${t('hudChrome.abilityScaling.bonus', { value: formatAbilityNumber(b) })}` : '';
-  if (eff.type === 'dot' && eff.perCombo !== undefined) {
-    return (
-      t('abilityUi.tooltip.finisherDamage', {
-        base: formatAbilityNumber(eff.total),
-        perCombo: formatAbilityNumber(eff.perCombo),
-      }) + bonus
-    );
-  }
-  return formatAbilityNumber(eff.total) + bonus;
 }
 
 function abilityAmountRange(min: number, max: number): string {
