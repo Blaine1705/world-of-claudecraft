@@ -364,8 +364,9 @@ rests on three structural facts, each pinned:
 three facts, as the second and only other freshness-guarded family
 (`GENERATED_MANIFEST_ARTIFACT_FILES` in `scripts/lib/gate_select_plan.mjs`): both check
 jobs and the nightly checks job regenerate them (the `wiki:content && build:bundle`
-step; regeneration is deterministic and sub-second per generator) and `git diff
---exit-code` the FULL output set; both arms feed the changed .ts paths to `vitest
+step; regeneration is deterministic and sub-second per generator), prove every output
+remains tracked with `git ls-files --error-unmatch`, and `git diff --exit-code` the FULL
+output set; both arms feed the changed .ts paths to `vitest
 related` as graph nodes; deletions and renames widen, the shard plan re-proves
 presence, and the local planner widens without an existence probe. The freshness diff
 set is a strict SUPERSET of the classifier family: the SFX generator also writes
@@ -373,9 +374,10 @@ set is a strict SUPERSET of the classifier family: the SFX generator also writes
 which are diffed for integrity (a partial diff would let the local gate silently heal
 them mid-run while CI reads stale committed copies) but never declassified, since
 fs-read data is not a graph node. The local gate regenerates the SFX and media
-manifests in their own steps (the wiki content regenerates in the artifacts turbo step)
-and diffs the whole set as its `manifest freshness` step.
-`tests/ci_workflow.test.ts` welds the classifier list, both check jobs' diff argv, and
+manifests in their own steps (the wiki content regenerates in the artifacts turbo step),
+proves the whole set remains tracked, and diffs it as its `manifest freshness` step.
+`tests/ci_workflow.test.ts` welds the classifier list, both check jobs' trackedness and
+diff argv, and
 the local gate's `MANIFEST_ARTIFACTS` to each other. Membership is exact files, no
 prefixes.
 

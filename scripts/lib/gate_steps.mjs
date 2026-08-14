@@ -57,7 +57,7 @@ export const I18N_ARTIFACTS = Object.freeze([
 // belong in the DIFF (a partial diff would let the local gate silently heal
 // them mid-run while CI reads the stale committed copies) but never in the
 // classifier. tests/ci_workflow.test.ts welds this list, both check jobs'
-// diff argv, and the classifier containment to each other. The wiki content
+// trackedness and diff argv, and the classifier containment to each other. The wiki content
 // regenerates in the artifacts turbo step (wiki:content); the SFX and media
 // manifests regenerate in their own steps directly (sub-second scripts, not
 // turbo tasks).
@@ -115,7 +115,7 @@ export function buildFullGateSteps(workers, opts = {}) {
     },
     // The two manifest generators run directly (each is a deterministic
     // sub-second script; the wiki content regenerated in the turbo step
-    // above), then one diff proves all three committed manifests fresh.
+    // above), then trackedness plus one diff prove all committed outputs fresh.
     {
       name: 'sfx manifest regen',
       cmd: 'node',
@@ -125,6 +125,14 @@ export function buildFullGateSteps(workers, opts = {}) {
       name: 'media manifest regen',
       cmd: 'node',
       args: ['scripts/build_media_manifest.mjs', 'generate'],
+    },
+    {
+      name: 'manifest trackedness',
+      cmd: 'git',
+      args: ['ls-files', '--error-unmatch', '--', ...MANIFEST_ARTIFACTS],
+      hint:
+        'every generated build-manifest output must remain tracked: restore the missing path ' +
+        'or update the manifest contract before re-running the gate',
     },
     {
       name: 'manifest freshness',
