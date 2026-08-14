@@ -193,7 +193,9 @@ contextBridge.exposeInMainWorld('wocDesktop', {
   },
   // An OS notification, with both strings already rendered by the renderer's
   // t(). Refused here unless it is one of the two kinds main will accept, and
-  // rebuilt into a fresh object so no renderer prototype crosses the bridge.
+  // rebuilt into a fresh object so no renderer prototype crosses the bridge,
+  // pre-capped so a hostile page cannot ship unbounded strings across the IPC
+  // (main re-clamps to the visible 120/240 without trusting these caps).
   // Fire-and-forget: it returns nothing, swallows the rejection, and guards the
   // synchronous throw, because a shell that cannot notify must never surface an
   // error in the caller's path.
@@ -202,7 +204,7 @@ contextBridge.exposeInMainWorld('wocDesktop', {
     const kind = payload.kind;
     if (kind !== 'update-ready' && kind !== 'party-invite') return;
     if (typeof payload.title !== 'string' || typeof payload.body !== 'string') return;
-    const message = { kind, title: payload.title, body: payload.body };
+    const message = { kind, title: payload.title.slice(0, 512), body: payload.body.slice(0, 1024) };
     try {
       ipcRenderer.invoke('desktop-show-notification', message).catch(() => {});
     } catch {}

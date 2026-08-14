@@ -229,8 +229,13 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     const main = read('electron/main.cjs');
     const start = main.indexOf("ipcMain.handle('desktop-show-notification'");
     expect(start).toBeGreaterThan(-1);
-    const body = main.slice(start, main.indexOf('\n});', start));
+    const end = main.indexOf('\n});', start);
+    // An unfound close would make the slice run to end-of-file, letting every
+    // pin and order comparison below be satisfied by later handlers' text.
+    expect(end).toBeGreaterThan(start);
+    const body = main.slice(start, end);
     expect(body).toContain('if (!trustedSender(event)) return false;');
+    expect(body).toContain("if (!payload || typeof payload !== 'object') return false;");
     expect(body).toContain("if (kind !== 'update-ready' && kind !== 'party-invite') return false;");
     expect(body).toContain(
       "if (typeof payload.title !== 'string' || typeof payload.body !== 'string') return false;",
@@ -251,6 +256,16 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     // any other handler here would be a navigation the renderer chose.
     expect(body).toContain("notification.on('click', focusMainWindow);");
     expect(body).toContain('silent: false');
+    // The one line that actually displays anything: a handler that constructs,
+    // wires the click, and returns true without ever showing would pass every
+    // other pin here and only the manual shell smoke would notice.
+    expect(body).toContain('notification.show();');
+    // The Linux markup escape: freedesktop daemons may parse body markup, so
+    // both strings are entity-escaped there and ride verbatim elsewhere.
+    expect(body).toContain("const escapeMarkup = process.platform === 'linux';");
+    expect(body).toContain('title: escapeMarkup ? escapeNotificationMarkup(title) : title,');
+    expect(body).toContain('body: escapeMarkup ? escapeNotificationMarkup(body) : body,');
+    expect(main).toContain('  escapeNotificationMarkup,');
     expect(body).toContain('return true;');
 
     // Order is the contract, not just presence: pacing before the show means the
@@ -262,12 +277,18 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     const focusAt = body.indexOf('mainWindow.isFocused()');
     const allowAt = body.indexOf('notifyGuard.allow(kind)');
     const showAt = body.indexOf('new Notification(');
+    const clickAt = body.indexOf("notification.on('click', focusMainWindow);");
+    const showCallAt = body.indexOf('notification.show();');
     expect(trustAt).toBeGreaterThan(-1);
     expect(kindAt).toBeGreaterThan(trustAt);
     expect(clampAt).toBeGreaterThan(kindAt);
     expect(focusAt).toBeGreaterThan(clampAt);
     expect(allowAt).toBeGreaterThan(focusAt);
     expect(showAt).toBeGreaterThan(allowAt);
+    // Click wiring before show: a listener attached after show() could miss a
+    // click on a notification the OS already displayed.
+    expect(clickAt).toBeGreaterThan(showAt);
+    expect(showCallAt).toBeGreaterThan(clickAt);
 
     // The BINDING lines, not just the handler: a guard that was never
     // constructed (or constructed off a clock that does not move) would leave
@@ -279,16 +300,32 @@ describe('electron IPC channel contract (preload <-> main)', () => {
   it('the preload refuses junk notification payloads and rebuilds them for the bridge', () => {
     // These live ONLY in the preload. The kind whitelist keeps main from being
     // asked about values it would refuse anyway; the fresh object is what stops
-    // a renderer prototype (or a getter) crossing the bridge; and the invoke is
+    // a renderer prototype (or a getter) crossing the bridge; the slices keep a
+    // hostile page from shipping unbounded strings across the IPC (main
+    // re-clamps to the visible caps without trusting them); and the invoke is
     // fire-and-forget both ways, so its rejection is swallowed and its
     // synchronous throw is caught rather than surfacing in the caller's path.
-    expect(preload).toContain("if (kind !== 'update-ready' && kind !== 'party-invite') return;");
-    expect(preload).toContain(
-      'const message = { kind, title: payload.title, body: payload.body };',
+    // Pins are scoped to the method's own slice: identical guard lines exist
+    // in sibling methods, and a pin the whole file satisfies proves nothing
+    // about this one.
+    const showStart = preload.indexOf('showNotification: (payload) => {');
+    expect(showStart).toBeGreaterThan(-1);
+    const showEnd = preload.indexOf('\n  },', showStart);
+    expect(showEnd).toBeGreaterThan(showStart);
+    const show = preload.slice(showStart, showEnd);
+    expect(show).toContain("if (!payload || typeof payload !== 'object') return;");
+    expect(show).toContain("if (kind !== 'update-ready' && kind !== 'party-invite') return;");
+    expect(show).toContain(
+      "if (typeof payload.title !== 'string' || typeof payload.body !== 'string') return;",
     );
-    expect(preload).toContain(
+    expect(show).toContain(
+      'const message = { kind, title: payload.title.slice(0, 512), body: payload.body.slice(0, 1024) };',
+    );
+    expect(show).toContain(
       "ipcRenderer.invoke('desktop-show-notification', message).catch(() => {});",
     );
+    expect(show).toContain('try {');
+    expect(show).toContain('} catch {}');
   });
 
   it('the preload refuses junk display modes and swallows gamepad-notify rejections', () => {

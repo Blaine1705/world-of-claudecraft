@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   clampText,
   classifyRendererExit,
+  escapeNotificationMarkup,
   MAX_ERROR_TEXT,
   normalizeConsoleMessage,
   redactSecrets,
@@ -69,6 +70,17 @@ describe('clampText', () => {
     // between words. Format characters flatten to one space like the controls.
     expect(clampText('a\u202eb\u2066c', 100)).toBe('a b c');
     expect(clampText('pay\u200bload\ufeff!', 100)).toBe('pay load !');
+  });
+});
+
+describe('escapeNotificationMarkup', () => {
+  it('entity-escapes the three markup-significant characters, ampersand first', () => {
+    // Ampersand first, or the escapes of < and > would themselves be
+    // double-escaped on the way through.
+    expect(escapeNotificationMarkup('<b>bold</b> & <a href="x">y</a>')).toBe(
+      '&lt;b&gt;bold&lt;/b&gt; &amp; &lt;a href="x"&gt;y&lt;/a&gt;',
+    );
+    expect(escapeNotificationMarkup('no markup here')).toBe('no markup here');
   });
 });
 

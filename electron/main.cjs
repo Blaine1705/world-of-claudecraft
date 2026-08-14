@@ -49,6 +49,7 @@ const {
   MAX_FORWARDED_ERRORS,
   MAX_MIRRORED_CONSOLE_LINES,
   clampText,
+  escapeNotificationMarkup,
   normalizeConsoleMessage,
   rendererErrorLogEntry,
   shouldLogConsoleLevel,
@@ -986,6 +987,11 @@ ipcMain.handle('desktop-gamepad-activity', (event) => {
 // invisible-formatting characters so a crafted string cannot smuggle escapes
 // or bidi reordering into the OS surface, and the rate limit stamps only on a
 // notification that really shows.
+// On Linux both strings additionally have their markup-significant characters
+// entity-escaped (electron/diagnostics.cjs escapeNotificationMarkup): the
+// freedesktop spec lets daemons parse markup in bodies, and a toast must
+// never style itself or plant a link. Other platforms treat notification
+// text as plain and get the strings verbatim.
 // A click only focuses the window, through the one shared focusMainWindow path,
 // so the notification can never become a navigation the renderer chose.
 ipcMain.handle('desktop-show-notification', (event, payload) => {
@@ -1000,7 +1006,12 @@ ipcMain.handle('desktop-show-notification', (event, payload) => {
   if (!mainWindow || mainWindow.isDestroyed() || mainWindow.isFocused()) return false;
   if (!Notification.isSupported()) return false;
   if (!notifyGuard.allow(kind)) return false;
-  const notification = new Notification({ title, body, silent: false });
+  const escapeMarkup = process.platform === 'linux';
+  const notification = new Notification({
+    title: escapeMarkup ? escapeNotificationMarkup(title) : title,
+    body: escapeMarkup ? escapeNotificationMarkup(body) : body,
+    silent: false,
+  });
   notification.on('click', focusMainWindow);
   notification.show();
   return true;

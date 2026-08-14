@@ -54,6 +54,19 @@ function clampText(value, maxLength) {
   return `${cleaned.slice(0, end)}...`;
 }
 
+// Neutralize markup-significant characters for an OS notification surface
+// that may parse them: the freedesktop notification spec allows markup in
+// bodies, and several Linux daemons (KDE, dunst, xfce4-notifyd) render
+// b/i/a tags, so a hostile page must not be able to style a toast or plant
+// a clickable link in it. Entity escaping is the spec's own literal form:
+// markup-parsing daemons decode the entities back to the literal
+// characters, and daemons that do not parse markup never meet these
+// characters in legitimate strings (the t() templates and the server's
+// name charset exclude them).
+function escapeNotificationMarkup(text) {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 // Best-effort redaction for log text that might embed a credential (the shell
 // never logs tokens itself; this guards against a renderer error message, a
 // console line, or a source URL's query string quoting one). A cost-raising
@@ -160,6 +173,7 @@ module.exports = {
   MAX_MIRRORED_CONSOLE_LINES,
   flattenControlChars,
   clampText,
+  escapeNotificationMarkup,
   redactSecrets,
   rendererErrorLogEntry,
   normalizeConsoleMessage,
