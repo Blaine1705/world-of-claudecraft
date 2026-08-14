@@ -67,8 +67,12 @@ import { computeGateWorkers, resolveGateWorkerTierCap } from './lib/gate_workers
 const shell = process.platform === 'win32';
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-/** @param {string} cmd @param {string[]} args */
-const git = (cmd, args) => spawnSync(cmd, args, { encoding: 'utf8', shell, cwd: repoRoot });
+/** @param {string} cmd @param {string[]} args
+ *  git is a real executable and must not get the .cmd shell shim: cmd.exe
+ *  eats the caret in resolveSelectBase's `ref^{commit}` probes, so with
+ *  shell:true every base candidate "fails" to verify on Windows and the
+ *  selective gate dies before selecting anything (same fix as ci_changed.mjs). */
+const git = (cmd, args) => spawnSync(cmd, args, { encoding: 'utf8', shell: false, cwd: repoRoot });
 
 // Resolve the vitest binary directly instead of going through `npx --no-install
 // vitest`: npx still pays a real per-invocation startup cost even when it skips

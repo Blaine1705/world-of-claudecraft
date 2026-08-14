@@ -16,6 +16,16 @@ describe('ci_changed.mjs git spawns', () => {
     expect(src).toMatch(/spawnSync\(cmd, args, \{ encoding: 'utf8', shell: false,/);
     expect(src).toMatch(/spawnSync\('npx', buildBiomeArgs\(since\), \{ stdio: 'inherit', shell \}/);
   });
+
+  it.each(['scripts/gate_select.mjs', 'scripts/gate_shadow.mjs'])(
+    '%s spawns its git runner with shell: false too',
+    (file) => {
+      const src = readFileSync(resolve(process.cwd(), file), 'utf8');
+      expect(src).toMatch(
+        /const git = \(cmd, args\) => spawnSync\(cmd, args, \{ encoding: 'utf8', shell: false,/,
+      );
+    },
+  );
 });
 
 type Run = (cmd: string, args: string[]) => { status: number | null; stdout?: string };
