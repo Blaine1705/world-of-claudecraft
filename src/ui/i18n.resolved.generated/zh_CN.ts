@@ -9055,6 +9055,8 @@ export const zh_CN: EnTranslations = {
       "quantity": "数量",
       "quantityOf": "共 {count}",
       "priceEach": "单价",
+      "lowestPriceLabel": "当前最低上架价格",
+      "lowestPriceNone": "该物品目前没有在售的上架。",
       "listButton": "上架到世界市场",
       "minPriceError": "价格至少为 1 铜币。",
       "collectEmpty": "没有待领取内容。销售收益和过期上架会在这里领取。",

@@ -103,6 +103,27 @@ export const MARKET_HOUSE_STOCK = [
   { itemId: 'linen_pouch', count: 1, price: 250 },
   { itemId: 'travelers_knapsack', count: 1, price: 2000 },
 ] as const;
+// The current lowest active listing price for `itemId`, PER UNIT (issue #3043):
+// `MarketListing.price` is the total buyout for the whole stack, but the Sell
+// tab's "price each" field the player is about to fill in is per-unit, so this
+// normalizes every stack (including a single-copy instanced listing, count 1)
+// before comparing. House stock counts as real active supply: a buyer can pick
+// it over the player's new listing exactly like any other row. Null when no
+// listing of the item is active. Rounded to the nearest copper: a reference
+// figure, not a precise undercut calculator.
+export function lowestListingPricePerUnit(
+  listings: readonly MarketListing[],
+  itemId: string,
+): number | null {
+  let lowest: number | null = null;
+  for (const l of listings) {
+    if (l.itemId !== itemId) continue;
+    const perUnit = Math.round(l.price / l.count);
+    if (lowest === null || perUnit < lowest) lowest = perUnit;
+  }
+  return lowest;
+}
+
 const MARKET_MIN_PRICE = 1; // copper
 const MARKET_MAX_PRICE = 5_000_000; // 500g ceiling, guards against overflow / fat-finger
 // Exported for the wiki generator (scripts/wiki/build_content.mjs) and its
@@ -482,6 +503,19 @@ export class Market {
     // including ones added later.
     if (JSON.stringify(r.meta.marketQuery) === JSON.stringify(next)) return;
     r.meta.marketQuery = next;
+  }
+
+  // Set (or clear, with null) the item the Sell tab wants a current-price
+  // reference for (issue #3043: the sell form shows the item's lowest active
+  // listing price so the player never has to leave the sell path to check
+  // Browse first). Purely a display/query narrowing (no gameplay effect, the
+  // Browse precedent above), so like marketSearch it needs no proximity or
+  // liveness gate; the next marketInfoFor snapshot reflects it. An unknown
+  // item id clears the check rather than naming a bogus item.
+  marketSellPriceCheck(itemId: string | null, pid?: number): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    r.meta.sellPriceItemId = itemId && ITEMS[itemId] ? itemId : null;
   }
 
   marketList(itemId: string, count: number, price: number, pid?: number): void {
@@ -1056,6 +1090,15 @@ export class Market {
       cutPct: Math.round(MARKET_CUT * 100),
       maxListings: MARKET_MAX_LISTINGS,
       myListingCount,
+      // The Sell tab's current-lowest-price reference (issue #3043), echoed
+      // alongside the item id it was computed for: the UI shows the price only
+      // when this echo matches what it currently has staged, so a stale
+      // snapshot across an item switch never displays a price that belongs to
+      // the PREVIOUS item.
+      sellPriceItemId: meta.sellPriceItemId,
+      sellLowestPrice: meta.sellPriceItemId
+        ? lowestListingPricePerUnit(this.marketListings, meta.sellPriceItemId)
+        : null,
     };
   }
 

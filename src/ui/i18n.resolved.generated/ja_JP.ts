@@ -9055,6 +9055,8 @@ export const ja_JP: EnTranslations = {
       "quantity": "数量",
       "quantityOf": "/ {count}",
       "priceEach": "単価",
+      "lowestPriceLabel": "現在の最安出品価格",
+      "lowestPriceNone": "このアイテムには現在出品がありません。",
       "listButton": "ワールドマーケットに出品",
       "minPriceError": "価格は最低1銅貨にしてください。",
       "collectEmpty": "待機中のものはありません。売上と期限切れの出品はここで受け取ります。",

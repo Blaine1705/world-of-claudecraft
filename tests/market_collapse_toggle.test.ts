@@ -33,6 +33,8 @@ function info(over: Partial<MarketInfo> = {}): MarketInfo {
     cutPct: 5,
     maxListings: 16,
     myListingCount: 0,
+    sellPriceItemId: null,
+    sellLowestPrice: null,
     ...over,
   };
 }
@@ -52,6 +54,7 @@ function harness(): Harness {
     marketCollectPending: false,
     inventory: [],
     marketSearch: (q: MarketQuery) => queries.push(q),
+    marketSellPriceCheck: () => {},
     marketList: () => {},
     marketBuy: () => {},
     marketCancel: () => {},

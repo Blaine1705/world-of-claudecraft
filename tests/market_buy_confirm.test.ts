@@ -59,6 +59,8 @@ function info(listings: MarketListingView[], over: Partial<MarketInfo> = {}): Ma
     cutPct: 5,
     maxListings: 16,
     myListingCount: 0,
+    sellPriceItemId: null,
+    sellLowestPrice: null,
     ...over,
   };
 }
@@ -94,6 +96,7 @@ function harness(initial: MarketInfo): Harness {
     marketCollectPending: false,
     inventory: [],
     marketSearch: () => {},
+    marketSellPriceCheck: () => {},
     marketList: () => {},
     marketBuy: (id: number) => bought.push(id),
     marketCancel: (id: number) => cancelled.push(id),

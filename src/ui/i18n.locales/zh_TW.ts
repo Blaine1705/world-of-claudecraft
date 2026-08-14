@@ -2722,6 +2722,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.quantity': '數量',
   'itemUi.market.quantityOf': '共 {count}',
   'itemUi.market.priceEach': '單價',
+  'itemUi.market.lowestPriceLabel': '目前最低上架價格',
+  'itemUi.market.lowestPriceNone': '此物品目前沒有在售的上架。',
   'itemUi.market.listButton': '上架到世界市場',
   'itemUi.market.minPriceError': '價格至少為 1 銅幣。',
   'itemUi.market.collectEmpty': '沒有待領取內容。銷售收益和過期上架會在這裡領取。',

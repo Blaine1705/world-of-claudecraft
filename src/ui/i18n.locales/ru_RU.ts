@@ -2866,6 +2866,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.quantity': 'Количество',
   'itemUi.market.quantityOf': 'из {count}',
   'itemUi.market.priceEach': 'Цена за штуку',
+  'itemUi.market.lowestPriceLabel': 'Текущая минимальная цена лота',
+  'itemUi.market.lowestPriceNone': 'Активных лотов на этот предмет пока нет.',
   'itemUi.market.listButton': 'Выставить на мировой рынок',
   'itemUi.market.minPriceError': 'Назовите цену не меньше 1 меди.',
   'itemUi.market.collectEmpty': 'Ничего не ждет. Выручка и истекшие лоты собираются здесь.',

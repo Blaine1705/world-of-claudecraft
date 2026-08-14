@@ -12885,6 +12885,21 @@
   .mkt-sell-pick .ps-name {
     font-size: 13px;
   }
+  /* The Sell tab's current-lowest-price reference (issue #3043): a same-page
+     market check. Muted like the adjacent .mkt-price-row labels, so the
+     reference reads as informational context, not competing emphasis with the
+     price the player is about to set. Empty (no text) while the server's echo
+     has not confirmed a value yet; a separate off-screen .mkt-sell-price-status
+     live region announces the same text once it lands (see market_window.ts). */
+  .mkt-sell-price-ref {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin: 0 0 10px;
+    font-family: var(--font-ui);
+  }
+  .mkt-sell-price-ref .mkt-price {
+    margin-left: 4px;
+  }
   .mkt-price-form {
     display: flex;
     flex-direction: column;

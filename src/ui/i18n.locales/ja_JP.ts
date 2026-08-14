@@ -2838,6 +2838,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.quantity': '数量',
   'itemUi.market.quantityOf': '/ {count}',
   'itemUi.market.priceEach': '単価',
+  'itemUi.market.lowestPriceLabel': '現在の最安出品価格',
+  'itemUi.market.lowestPriceNone': 'このアイテムには現在出品がありません。',
   'itemUi.market.listButton': 'ワールドマーケットに出品',
   'itemUi.market.minPriceError': '価格は最低1銅貨にしてください。',
   'itemUi.market.collectEmpty':

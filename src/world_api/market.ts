@@ -67,6 +67,13 @@ export interface MarketInfo {
   cutPct: number; // the Merchant's cut on a sale, as a percentage
   maxListings: number; // per-seller active-listing cap
   myListingCount: number; // how many active listings the viewer already has
+  // The Sell tab's current-lowest-listing-price reference (issue #3043), echoed
+  // alongside the item id it was computed for so a stale snapshot across an item
+  // switch is detectable (compare against the currently staged item before
+  // trusting sellLowestPrice). Null itemId means nothing is staged; a null
+  // price with a non-null itemId means the item has no active listings.
+  sellPriceItemId: string | null;
+  sellLowestPrice: number | null; // per unit, matching the sell form's "price each" field
 }
 
 export interface IWorldMarket {
@@ -78,6 +85,10 @@ export interface IWorldMarket {
   // World Market. The browse query (search + type/subtype/rarity filters + page) is
   // sent to the server, which filters and paginates; marketInfo mirrors the result.
   marketSearch(query: MarketQuery): void;
+  /** Ask for a current-lowest-listing-price reference for the Sell tab's staged
+   *  item (issue #3043); null clears it. Purely a display/query narrowing (no
+   *  gameplay effect), the marketSearch precedent. */
+  marketSellPriceCheck(itemId: string | null): void;
   marketList(itemId: string, count: number, price: number): void;
   /** List ONE instanced copy (count 1), named by its payload: the sim escrows
    *  the actual held copy whose payload matches, refusing transfer-locked

@@ -5039,6 +5039,9 @@ export class ClientWorld implements IWorld {
       collapseLowest: query.collapseLowest,
     });
   }
+  marketSellPriceCheck(itemId: string | null): void {
+    this.cmd({ cmd: 'market_sell_price_check', item: itemId });
+  }
   marketList(itemId: string, count: number, price: number): void {
     this.cmd({ cmd: 'market_list', item: itemId, count, price });
   }

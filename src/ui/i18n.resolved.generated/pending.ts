@@ -10,54 +10,84 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "itemUi.market.collapseLowest"
+    "itemUi.market.collapseLowest",
+    "itemUi.market.lowestPriceLabel",
+    "itemUi.market.lowestPriceNone"
   ],
   "es_ES": [
-    "itemUi.market.collapseLowest"
+    "itemUi.market.collapseLowest",
+    "itemUi.market.lowestPriceLabel",
+    "itemUi.market.lowestPriceNone"
   ],
   "fr_FR": [
-    "itemUi.market.collapseLowest"
+    "itemUi.market.collapseLowest",
+    "itemUi.market.lowestPriceLabel",
+    "itemUi.market.lowestPriceNone"
   ],
   "fr_CA": [
-    "itemUi.market.collapseLowest"
+    "itemUi.market.collapseLowest",
+    "itemUi.market.lowestPriceLabel",
+    "itemUi.market.lowestPriceNone"
   ],
   "en_CA": [],
   "it_IT": [
-    "itemUi.market.collapseLowest"
+    "itemUi.market.collapseLowest",
+    "itemUi.market.lowestPriceLabel",
+    "itemUi.market.lowestPriceNone"
   ],
   "de_DE": [
-    "itemUi.market.collapseLowest"
+    "itemUi.market.collapseLowest",
+    "itemUi.market.lowestPriceLabel",
+    "itemUi.market.lowestPriceNone"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "itemUi.market.collapseLowest"
+    "itemUi.market.collapseLowest",
+    "itemUi.market.lowestPriceLabel",
+    "itemUi.market.lowestPriceNone"
   ],
   "ru_RU": [],
   "cs_CZ": [
-    "itemUi.market.collapseLowest"
+    "itemUi.market.collapseLowest",
+    "itemUi.market.lowestPriceLabel",
+    "itemUi.market.lowestPriceNone"
   ],
   "nl_NL": [
-    "itemUi.market.collapseLowest"
+    "itemUi.market.collapseLowest",
+    "itemUi.market.lowestPriceLabel",
+    "itemUi.market.lowestPriceNone"
   ],
   "pl_PL": [
-    "itemUi.market.collapseLowest"
+    "itemUi.market.collapseLowest",
+    "itemUi.market.lowestPriceLabel",
+    "itemUi.market.lowestPriceNone"
   ],
   "id_ID": [
-    "itemUi.market.collapseLowest"
+    "itemUi.market.collapseLowest",
+    "itemUi.market.lowestPriceLabel",
+    "itemUi.market.lowestPriceNone"
   ],
   "tr_TR": [
-    "itemUi.market.collapseLowest"
+    "itemUi.market.collapseLowest",
+    "itemUi.market.lowestPriceLabel",
+    "itemUi.market.lowestPriceNone"
   ],
   "sv_SE": [
-    "itemUi.market.collapseLowest"
+    "itemUi.market.collapseLowest",
+    "itemUi.market.lowestPriceLabel",
+    "itemUi.market.lowestPriceNone"
   ],
   "vi_VN": [
-    "itemUi.market.collapseLowest"
+    "itemUi.market.collapseLowest",
+    "itemUi.market.lowestPriceLabel",
+    "itemUi.market.lowestPriceNone"
   ],
   "da_DK": [
-    "itemUi.market.collapseLowest"
+    "itemUi.market.collapseLowest",
+    "itemUi.market.lowestPriceLabel",
+    "itemUi.market.lowestPriceNone"
   ]
 };

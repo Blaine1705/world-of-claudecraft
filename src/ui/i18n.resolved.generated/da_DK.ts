@@ -9055,6 +9055,8 @@ export const da_DK: EnTranslations = {
       "quantity": "Antal",
       "quantityOf": "af {count}",
       "priceEach": "Pris pr. styk",
+      "lowestPriceLabel": "Current lowest listed price",
+      "lowestPriceNone": "No active listings for this item yet.",
       "listButton": "Sæt til salg på Verdensmarkedet",
       "minPriceError": "Angiv en pris på mindst 1 kobber.",
       "collectEmpty": "Intet venter. Salgsindtægter og udløbne varer hentes her.",
