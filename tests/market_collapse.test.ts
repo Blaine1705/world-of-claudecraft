@@ -56,6 +56,23 @@ describe('collapseToLowestPerItem', () => {
     ]);
   });
 
+  it('keeps materially distinct instanced copies separate from plain-item collapse', () => {
+    const listings = [
+      { id: 1, itemId: 'sword_basic', price: 100 },
+      { id: 2, itemId: 'sword_basic', price: 300, instance: { enchant: 'fiery' } },
+      {
+        id: 3,
+        itemId: 'sword_basic',
+        price: 400,
+        instance: { rolled: { masterwork: true, stats: { str: 2 } } },
+      },
+      { id: 4, itemId: 'sword_basic', price: 500, instance: { signer: 'Artisan' } },
+      { id: 5, itemId: 'sword_basic', price: 200 },
+    ];
+
+    expect(collapseToLowestPerItem(listings)).toEqual(listings.slice(0, 4));
+  });
+
   it('returns an empty array for an empty input, and a single row unchanged', () => {
     expect(collapseToLowestPerItem([])).toEqual([]);
     const solo = [{ id: 1, itemId: 'x', price: 10 }];

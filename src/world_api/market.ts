@@ -31,9 +31,10 @@ export interface MarketListingView {
 }
 
 export interface MarketInfo {
-  // The viewer's own listings (always wired, for reclaim) followed by ONE page of
-  // other sellers' listings matching the active query. The server filters + paginates
-  // authoritatively, so paging walks the whole market, not just a single wire window.
+  // The viewer's own visible listings followed by ONE page of other sellers' listings
+  // matching the active query. All matching own rows wire for reclaim normally; collapse
+  // mode first narrows the whole match set, including own rows. The server filters +
+  // paginates authoritatively, so paging walks the whole market.
   listings: MarketListingView[];
   totalCount: number; // all listings matching the active filter (mine + others)
   filter: string; // the active search string (echoed back from the server)
@@ -50,7 +51,7 @@ export interface MarketInfo {
   primaryStat: MarketPrimaryStatFilter;
   rarity: MarketRarityFilter;
   sort: MarketSort;
-  // Whether the server collapsed OTHER sellers' listings to the lowest price per item
+  // Whether the server collapsed matching plain listings to the lowest price per item
   // (issue #3103), echoed back for the same drift-detection reason as the axes above.
   collapseLowest: boolean;
   page: number; // current browse page (of other sellers' listings), 0-based

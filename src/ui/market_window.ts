@@ -123,7 +123,7 @@ export class MarketWindow {
   private primaryStatFilter: MarketPrimaryStatFilter = 'all';
   private rarityFilter: MarketRarityFilter = 'all';
   private sortFilter: MarketSort = 'name';
-  // Browse toggle: collapse other sellers' listings to the cheapest per item
+  // Browse toggle: collapse matching plain listings to the cheapest per item
   // (issue 3103). Server-side, like every other filter axis, so it narrows the
   // WHOLE market, not just the wired page.
   private collapseLowest = false;
@@ -1168,10 +1168,9 @@ export class MarketWindow {
     );
   }
 
-  // The "lowest price of each" Browse toggle (issue 3103): collapses other sellers'
-  // listings to one row per distinct item, the cheapest among them, so scanning for
-  // the best deal on a common item does not mean paging through every near-duplicate
-  // stack. A real labeled checkbox (the professions "Ask each use" toggle precedent):
+  // The "lowest price of each" Browse toggle (issue 3103): collapses matching plain
+  // listings to the cheapest row per item while preserving non-fungible instanced copies.
+  // A real labeled checkbox (the professions "Ask each use" toggle precedent):
   // keyboard-operable and announced by its own text, not a bare icon button.
   private renderCollapseLowestToggle(): string {
     if (this.tab !== 'browse') return '';

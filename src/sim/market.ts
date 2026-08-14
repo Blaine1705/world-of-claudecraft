@@ -1012,20 +1012,19 @@ export class Market {
     // book to filter is the one thing that DOES depend on the viewer: their chosen
     // sort axis (name, the classic default, or price ascending, issue 3102).
     const sorted = this.sortedBookFor(query.sort).filter((l) => marketItemMatches(l.itemId, query));
-    // The viewer's own listings are always wired (so they can reclaim from the Browse
-    // tab without hunting for the right page); other sellers' listings are paged. Own
-    // count (<= MARKET_MAX_LISTINGS = 12) plus one page (MARKET_PAGE_SIZE = 50) stays
-    // well under MARKET_WIRE_LIMIT, which remains a hard safety bound on wire size.
+    // The viewer's own matching listings are wired before the paged other-seller rows.
+    // Outside collapse mode this preserves the full reclaim set. In collapse mode the
+    // whole matched book collapses first, so an own row appears only when it is the
+    // cheapest row for its plain item identity. Turning the toggle off restores every
+    // reclaim row. Own count (<= MARKET_MAX_LISTINGS = 12) plus one page
+    // (MARKET_PAGE_SIZE = 50) stays well under MARKET_WIRE_LIMIT.
     const isMine = (l: MarketListing) => this.marketListingBelongsTo(l, meta);
-    const mineSorted = sorted.filter(isMine);
-    // The viewer's own listings are never collapsed (their full reclaim set always
-    // wires, filter or no); only OTHER sellers' rows collapse to the cheapest per
-    // item id when the toggle is on (issue #3103). `sorted` is already name-then-
-    // price ordered, so within one item id the rows already run cheapest first;
-    // collapseToLowestPerItem does not depend on that, it re-derives the minimum
-    // itself, so this stays correct even if the book's sort ever changes.
-    const othersSorted = sorted.filter((l) => !isMine(l));
-    const others = query.collapseLowest ? collapseToLowestPerItem(othersSorted) : othersSorted;
+    // Collapse BEFORE ownership partitioning so the player sees at most one plain row
+    // per item even when their own listing is among the matches. Instanced copies remain
+    // distinct in collapseToLowestPerItem because their payload changes the goods.
+    const visibleSorted = query.collapseLowest ? collapseToLowestPerItem(sorted) : sorted;
+    const mineSorted = visibleSorted.filter(isMine);
+    const others = visibleSorted.filter((l) => !isMine(l));
     const pageCount = Math.max(1, Math.ceil(others.length / MARKET_PAGE_SIZE));
     const page = Math.max(0, Math.min(pageCount - 1, query.page));
     const othersPage = others.slice(
@@ -1054,13 +1053,9 @@ export class Market {
     );
     return {
       listings,
-      // Every listing matching the filter (the viewer's own plus all others), so the
-      // SELL/notes read true counts; `pageCount` below paginates the others. Reads
-      // `others.length`, not `sorted.length`: when collapseLowest folded other
-      // sellers' rows down to one per item, the pager (market_view.ts, which derives
-      // its "N of M" range as totalCount minus the mine-on-page count) must count the
-      // SAME set pageCount/othersPage paginate, or the range and the page count
-      // disagree.
+      // Every visible listing after filters and optional collapse. pageCount below
+      // paginates the other-seller rows; the market view subtracts visible own rows
+      // from this total when deriving its "N of M" range.
       totalCount: mineSorted.length + others.length,
       filter: query.search,
       // Echo every filter axis, not just the search text: a fresh join (post-
