@@ -84,7 +84,7 @@ const MONOLITHS: MonolithRow[] = [
     // serializeCharacterForPersist, escrowSessionLost, the guild-book flush
     // pair). Zero headroom on purpose, the standing posture here.
     file: 'server/game.ts',
-    ceiling: 10820,
+    ceiling: 10818,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

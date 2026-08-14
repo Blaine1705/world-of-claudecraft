@@ -49,6 +49,11 @@ describe('retention sweep wiring in server/main.ts', () => {
       'prunePlayerReportsBatch(',
       'pruneBugReportsBatch(',
       'pruneChatViolationsBatch(',
+      'pruneLevelUpEventsBatch(',
+      'pruneFtueEventsBatch(',
+      'pruneWocBuyNowAbandonsBatch(',
+      'pruneResolvedWocOffersBatch(',
+      'pruneClosedWocListingsBatch(',
     ]) {
       expect(preListen).not.toContain(call);
     }
@@ -107,6 +112,11 @@ describe('retention sweep wiring in server/main.ts', () => {
       // per event; each registers its bounded prune with the sweep.
       'pruneLevelUpEventsBatch(',
       'pruneFtueEventsBatch(',
+      // The $WOC Exchange retention trio; exactly-once is what catches the
+      // splice-duplication hazard the listings entry's own comment records.
+      'pruneWocBuyNowAbandonsBatch(',
+      'pruneResolvedWocOffersBatch(',
+      'pruneClosedWocListingsBatch(',
     ]) {
       expect(count(MAIN, call)).toBe(1);
     }
@@ -173,13 +183,40 @@ describe('retention sweep wiring in server/main.ts', () => {
   it('keeps the woc listings prune LAST in the table array', () => {
     // The tail is the one position a rebase auto-merge cannot splice a new
     // entry into the preceding object (it has happened twice; the comment at
-    // the entry records it). The abandon-ledger prune sits directly before it.
-    // The CALL sites (config-threaded), not the import block, whose
-    // alphabetical order says nothing about the table array.
-    const abandons = MAIN.indexOf('pruneWocBuyNowAbandonsBatch(pool, config.');
-    const listings = MAIN.indexOf('pruneClosedWocListingsBatch(pool, config.');
-    expect(abandons).toBeGreaterThan(0);
-    expect(listings).toBeGreaterThan(abandons);
+    // the entry records it). Order also carries semantics: abandons cascades
+    // and directed offers SET NULL on listing_id, so sweeping listings first
+    // would forge "this offer never became a listing". The old pin only
+    // compared two indexOf positions, so a new entry appended AFTER listings
+    // (the natural landing spot for a merge) stayed green; this one scrapes
+    // the real array and pins the whole order plus the tail.
+    const start = MAIN.indexOf('tables: [');
+    expect(start).toBeGreaterThan(-1);
+    const block = MAIN.slice(start, MAIN.indexOf('onlineSamples:', start));
+    const names = [...block.matchAll(/name: '([a-z_]+)'/g)].map((m) => m[1]);
+    expect(names).toEqual([
+      'chat_logs',
+      'client_perf_reports',
+      'daily_reward_events',
+      'player_activity_daily',
+      'admin_site_presence_samples',
+      'site_presence_sessions',
+      'play_sessions',
+      'account_ip_associations',
+      'unstuck_reports',
+      'password_reset_requests',
+      'email_change_requests',
+      'email_log',
+      'player_reports',
+      'bug_reports',
+      'chat_violations',
+      'level_up_events',
+      'ftue_events',
+      'woc_market_buy_now_abandons',
+      'woc_market_directed_offers',
+      'woc_market_listings',
+    ]);
+    expect(new Set(names).size).toBe(names.length);
+    expect(names.at(-1)).toBe('woc_market_listings');
   });
 
   it('sweeps the play-session fold before the association ager', () => {

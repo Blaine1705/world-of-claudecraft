@@ -141,6 +141,7 @@ export const API_ERROR_KEYS = {
   'cheater_mark.reason_required': 'apiError.cheater_mark.reason_required',
   'cheater_mark.invalid_duration': 'apiError.cheater_mark.invalid_duration',
   'cheater_mark.not_marked': 'apiError.cheater_mark.not_marked',
+
   // woc_market: the config-gated $WOC Exchange family (server/woc_market_routes.ts).
   'woc_market.invalid_input': 'apiError.woc_market.invalid_input',
   'woc_market.disabled': 'apiError.woc_market.disabled',

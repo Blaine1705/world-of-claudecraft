@@ -357,6 +357,17 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS ad_spend');
   });
 
+  it('applies the $WOC Exchange schema (listings plus a dependent table)', async () => {
+    // WOC_MARKET_SCHEMA (server/woc_market_db.ts) backs every marketplace
+    // table. Same defined-but-unwired hazard as the DISCORD_SCHEMA lesson:
+    // deleting its ensureSchema line in server/db.ts must fail here, not at
+    // the first production listing.
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS woc_market_listings');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS woc_market_bids');
+  });
+
   it('applies the compact player-metrics schema without a boot backfill', async () => {
     // Both phases, in the order server/main.ts runs them: the schema
     // transaction, then the CONCURRENTLY builds, which are now a SEPARATE call

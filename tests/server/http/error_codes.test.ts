@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { ERROR_CODES, type ErrorCode } from '../../../server/http/error_codes';
 
@@ -141,8 +143,22 @@ describe('ERROR_CODES catalog', () => {
   });
 
   it('has no duplicate codes', () => {
-    const keys = Object.keys(ERROR_CODES);
-    expect(new Set(keys).size).toBe(keys.length);
+    // Over the SOURCE TEXT, not Object.keys: a duplicated literal key (the
+    // union-merge hazard this guard exists for) has already collapsed by the
+    // time the object is constructed, so a runtime key-set comparison can
+    // never fail. tsc flags the duplicate too; this keeps the guard local
+    // and named.
+    const source = readFileSync(
+      fileURLToPath(new URL('../../../server/http/error_codes.ts', import.meta.url)),
+      'utf8',
+    );
+    const start = source.indexOf('export const ERROR_CODES');
+    const literal = source.slice(start, source.indexOf('as const', start));
+    const keys = [...literal.matchAll(/^\s{2}'([a-z0-9_.]+)': \{/gm)].map((m) => m[1]);
+    expect(keys.length).toBe(Object.keys(ERROR_CODES).length);
+    const seen = new Set<string>();
+    const dupes = keys.filter((k) => (seen.has(k) ? true : (seen.add(k), false)));
+    expect(dupes).toEqual([]);
   });
 
   it('carries the 9 structural codes with their exact param keys', () => {

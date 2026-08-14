@@ -61,7 +61,6 @@ import {
   partyFrameIncomingHeals,
   partyFrameRole,
 } from '../src/sim/party_frame_info';
-import { isPersistentEngineAura } from '../src/sim/persistent_aura';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { effectiveFishingBand } from '../src/sim/professions/fishing';
 import { RESPEC_TIER_CONFIG, type RespecPaymentTier } from '../src/sim/professions/focus';
@@ -89,7 +88,6 @@ import {
 } from '../src/sim/talent_allocation_input';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import {
-  type Aura,
   DT,
   dist2d,
   type Entity,

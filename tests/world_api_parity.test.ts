@@ -1873,7 +1873,7 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     }
   });
 
-  it('the 28 facet arrays are pairwise disjoint (no member filed in two facets)', () => {
+  it('the facet arrays are pairwise disjoint (no member filed in two facets)', () => {
     const entries = Object.entries(FACET_MEMBER_ARRAYS);
     const overlaps: string[] = [];
     for (let i = 0; i < entries.length; i++) {
