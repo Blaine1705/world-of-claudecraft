@@ -5,7 +5,21 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-07-policy-terms-drafts.md`
+- Next file to run: `docs/woc-marketplace-hardening/phase-07-qa.md`
+- 07 COMPLETE (docs only, zero code diff, LOCAL, not pushed per R4).
+  Release/v0.38.0 synced (merge 8a1739d67a, trivial, no marketplace
+  overlap; monolith_budget AUTO-MERGED, all four count-pin suites
+  re-derived green from a run, 377 tests, renderer ceiling 13708 is the
+  release's own extraction). The counsel package is READY and R6 is
+  recorded sent-to-counsel 2026-08-13 (see Rulings). Deliverables:
+  TERMS_AND_CONDITIONS_MARKETPLACE_DRAFT.md (beside the untouched live
+  Terms) + the decision memo (held PRIVATELY outside the public repo, see
+  Locked decisions) + the carve-out reconciliation + the staleness cluster
+  fixes. A FRESH proofreader swept the package
+  (1 blocking + 7 should-fix + 6 nits, ALL applied). The 07 ledger entry
+  below carries the findings registry (the seller-side terms gap, the
+  terms.html drift, the R2 forfeit-split publication gate, the locale
+  README fills); the 07 QA session consumes it.
 - 06 QA COMPLETE (PASS-WITH-FOLLOWUPS, every fix applied, PUSHED per R4).
   Release/v0.38.0 re-synced (merge ab2742012b, NON-trivial: three test
   conflicts plus two SILENT count-pin auto-merges, all re-derived from
@@ -207,6 +221,14 @@ Still open (a phase that hits one asks at session start):
   confirming timeout, devnet mint choice. Phases propose defaults; Fernando confirms.
 - R6 (phase 07, B7): counsel owns final Terms language. The phase produces drafts and a
   decision memo; counsel sign-off is a launch gate tracked here, not a packet deliverable.
+  STATUS 2026-08-13: package READY, recorded SENT-TO-COUNSEL (the send is
+  `TERMS_AND_CONDITIONS_MARKETPLACE_DRAFT.md` plus the decision memo, held
+  privately at `/Users/fernando/Documents/woc-counsel/counsel-decision-memo.md`
+  outside the public repo; Fernando forwards them).
+  Sign-off remains the launch gate; the memo's enable-time checklist (R9 affordance,
+  the seller terms gate if counsel confirms, the R2 forfeit split plus its client
+  disclosure, terms.html/privacy reconciliation) enumerates what must land before R6
+  can flip to granted.
 - R7 (scope adds, unanswered 2026-08-11): Fernando was offered four deferred
   nice-to-haves as packet phases and did not select any: dispute-case UI, marketplace
   player wiki/guide page, game-side audited runtime pause, numeric reserve guard. They
@@ -231,6 +253,13 @@ Still open (a phase that hits one asks at session start):
   `origin/master`.
 - Packet docs live in the game repo only; service and dashboard phases are specified here
   and executed in their own worktrees.
+- COUNSEL MATERIAL STAYS OUT OF THE PUBLIC REPO (Fernando, 2026-08-13): the game repo is
+  open source, so the counsel decision memo lives privately at
+  `/Users/fernando/Documents/woc-counsel/counsel-decision-memo.md` and is referenced from
+  packet and shipped docs by pointer only, never committed. The Terms DRAFT itself stays
+  public (clearly bannered; a ToS is public by nature). Any future counsel-bound
+  document follows the same rule. Before every push, confirm no counsel file entered
+  the branch.
 - The custody/settlement lifecycle fixes land as focused phases 02 to 06 (the review's
   "one change" recommendation, split along test seams to keep sessions small; QA between
   each keeps the shared root cause honest).
@@ -279,6 +308,78 @@ Still open (a phase that hits one asks at session start):
 
 ## Per-phase ledger (append as phases complete)
 
+- 07 policy-terms-drafts (2026-08-13, session start 8a1739d67a = the trivial
+  release/v0.38.0 sync (30 commits, GPU-hitch + night-lighting + OTA trains,
+  no marketplace overlap; monolith_budget AUTO-MERGED: renderer.ts ceiling
+  13708, lowered by the release's own fire-light extraction; all four
+  count-pin suites re-derived from a run, 377 green, no re-pin needed);
+  DOCS ONLY, zero code diff; LOCAL, not pushed per R4). The registry later
+  sessions need:
+  - DELIVERABLES: `TERMS_AND_CONDITIONS_MARKETPLACE_DRAFT.md` (repo root,
+    beside the UNTOUCHED live Terms; complete revised document; new Section
+    10 with the R9 acceptance-surface requirement at 10.3 and a proposed 18+
+    floor at 10.2; old 10 to 22 renumbered 11 to 23, every cross-reference
+    verified; `[COUNSEL]` marks judgment passages); the decision memo
+    (adopted position, nine counsel questions, exact-changes list,
+    enable-time checklist), held PRIVATELY at
+    `/Users/fernando/Documents/woc-counsel/counsel-decision-memo.md` per the
+    Locked decision below; the never-power carve-out consistent across README
+    (Highlights AND Web3), wallet-link.md, holder-cosmetic-flair.md, and
+    marketplace.md launch gate 1; staleness fixes in marketplace.md,
+    p2p-woc-trade.md, DESIGN.md, malware-scan-catalog.md, the
+    release-malware-audit and privacy-security-review agent docs, and the
+    docs/, src/net/, src/ui/ CLAUDE.md files. Deed/reliquary "never power"
+    lines verified to govern a DIFFERENT system and left alone.
+  - SELLER TERMS GAP (new finding, memo question 1): only the paying paths
+    run `guardTerms` (`placeBid`, `buyNow`, `createDirectedOffer`);
+    `createListing` and the seller's directed accept record and require NO
+    acceptance, so a seller can escrow and sell having never accepted, while
+    draft 10.2/10.3 promise seller acceptance. If counsel confirms the
+    draft, 13/14 own the gate and the 22 pre-enable audit must verify it
+    (the memo's enable-time checklist carries it beside R9).
+  - FORFEIT DESTINATION: R2 decided treasury+burn (one code path with the
+    fee split) but the service routes forfeits ALL-TREASURY today (the
+    review's fee-split divergence, 09 owns closing it). Draft 10.5 states
+    the split, so Terms publication gates on 09's implementation PLUS a
+    client forfeit-destination disclosure (the bid-bond note says only
+    "forfeited"); both recorded in the memo checklist.
+  - TERMS.HTML DRIFT: `public/terms.html` is hand-maintained and has drifted
+    from `TERMS_AND_CONDITIONS.md` independently of the marketplace (its
+    acceptable-use section is a different, longer text with NO real-money
+    bullet at all). Publication is a reconciliation, not a copy-across; the
+    privacy pair (`PRIVACY_POLICY.md` + `public/privacy.html`) owes the
+    marketplace data classes and retention windows at the same moment (memo
+    question 9).
+  - DEFERRED WITH OWNERS (docs-only scope kept them out): the 20
+    `docs/i18n/README.*.md` locale files carry pre-carve-out Web3 wording
+    (four claim sites each, with pre-existing Highlights drift): maintainer
+    release fill via the i18n-locale-fill skill, NOT packet debt;
+    `server/db.ts`'s bank-entitlement comment cites "the $WOC PRDs pin
+    cosmetic-only" language the PRDs no longer use (next code change that
+    touches it); the guide catalog's "No pay to win, ever" line joins the
+    recorded P2 wiki/guide follow-up; the privacy-security-review agent's
+    Scope Gate still omits the `woc_market*` modules (tooling follow-up);
+    DEPLOY.md has zero WOC_MARKET env/runbook coverage (12/22 own);
+    `.env.example` misses `WOC_MARKET_SERVICE_URL` and
+    `DASHBOARD_INTERNAL_SECRET` and still documents the dead TOTP knob
+    (12/13 own). marketplace.md now records R1's supersession of TOTP; the
+    phantom scaffolding inventory for 13's deletion list: the two
+    `woc_market.totp_*` error codes, their api_error catalog rows and locale
+    fills, `.wm-totp` CSS, the commented `.env.example` knob.
+  - VALIDATION: copy floor clean over every added line; anchor rule held;
+    `npm run ci:changed` exit 0, zero errors; zero code diff (fourteen .md
+    files). FRESH proofreader over the whole package: 1 blocking (draft 10.5
+    pointed at a marketplace-interface disclosure that does not exist) + 7
+    should-fix + 6 nits, EVERY finding applied. The proofreader also
+    verified the renumbering reference-by-reference and the factual claims
+    against code (guardTerms call sites, no TOTP anywhere under
+    woc_market*, handToBuyer grant-with-mail-fallback, the review state's
+    driverless transition pair, the cap counting both halves).
+  - Handoffs: 07-qa verifies the package (docs-only: no repo reviewers per
+    the dispatch rule; re-run the claim greps and the internal-consistency
+    sweep). 14/15 build the trade-panel terms affordance against draft
+    Section 10.3's language. 22's pre-enable audit gains the memo's
+    enable-time checklist. R6 is recorded sent-to-counsel in Rulings.
 - 06 directed-rail-integrity (2026-08-13, session start b948aa64fb = the
   trivial release/v0.38.0 sync (16 commits, the chronomancer train, no
   marketplace overlap, no count-pin surface), gate GREEN at 5287214294,

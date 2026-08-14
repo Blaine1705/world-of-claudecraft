@@ -16,9 +16,8 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 05 | custody-entry-hardening | game | DONE | f07ca88278 | release sync trivial (one locale-fill commit; generated pending.ts regenerated); H5/H6/extraction/firewall closed; dbperf pre-checkpoint BLOCK folded in; three-reviewer round + fresh fix-round re-review + qa-checklist READY + hot-path round (sections below); real-SQL suites green incl. the new escrow set; gate GREEN (full-suite fallback, all 8 steps; the one intermediate red was the malware scanner flagging the firewall comment's own key-shape prose, reworded); LOCAL, not pushed per R4 |
 | 06 | directed-rail-integrity | game | DONE | b948aa64fb | release sync trivial (16 commits, chronomancer train, no marketplace overlap, no count-pin surface); H10/H12/H14 + guardBalance + auto-close closed, both opening judgments settled; dbperf pre-checkpoint BLOCK (A1-A8) folded in before code; pg suite ran RED first (7 behaviors); FOUR fresh reviewers + fix-round re-review + qa-checklist, every finding applied incl. nits (the security CRITICAL: the trade session stripped staged identity, fixed by per-copy staging through the swap's own selection walk); one inherited env-gated red (admin_guilds vs the release's quota join) repaired in place; first gate GREEN at 5287214294; then SIX closing rounds (two independent fresh reviews of the gate-round commit, every subsequent fix round re-reviewed fresh, ~45 more findings applied incl. the crafted-marker comparator leg, the accept-side one_item mirror with the model acceptHint judged over the AUTHORITATIVE offer table, the pair index carcass convention + shared name constant, the offer_reopen report on both swallows, the observed-wait 23505 interleave, and the wiring/count pins that made the last round's fixes decisive); THREE gate runs GREEN along the way (5287214294, then 5ebb176a73 covering all production code, then the final at tip ea1bb82322: full-suite fallback, all 8 steps, run WITH TEST_DATABASE_URL so every pg suite executed); LOCAL, not pushed per R4 |
 | 05 QA | phase-05-qa | game | DONE | b9e937c075 | PASS-WITH-FOLLOWUPS, every fix applied (section below); release sync origin/release/v0.38.0 trivial (7 commits, no marketplace overlap, no count-pin surface); five audit lanes + a fresh fix-round re-review + qa-checklist READY + a db-perf close-out; real-SQL suites 109 green THREE times (zero skips); the three named mutation probes plus the agents' per-pin mutation matrices all bit; the round found and fixed the BEGIN-outside-TxNeverStarted critical, the withTx null-deref evidence destroyer, both kick argument swaps, and the db-perf codeless-discard P1; gate GREEN at eeaa137e5c (full-suite fallback, all 8 steps, 38196 tests + 118 browser); pushed per R4 |
-| 06 | directed-rail-integrity | game | NOT STARTED | | |
 | 06 QA | phase-06-qa | game | DONE | ab2742012b | PASS-WITH-FOLLOWUPS, every fix applied, PUSHED per R4; v0.38.0 re-sync NON-trivial (3 conflicts + 2 silent count-pin auto-merges, all re-derived from runs: IWorld 323/86/237, fanout 10, hud.ts 19160 DOWN, sim.ts 12436; release-merge-audit faithful, 0 findings over 7 groups); ea1bb82322 verified FIRST (comment-only src, all pins mutation-proven); six fresh lanes: 0 code blockers, 4 blocking TEST gaps closed; QA-found code fixes: the capacity model now RUNS the removal walk (receiver-overflow class closed for good), the crafted-marker leg on the instanced matcher, guardTerms on the directed buyer, the model-reading accept belt, sweep-fallback stack+null-safety; NEW OPEN RULING R9 (implied terms consent, pre-enable affordance owed); pg suites 152 green zero skips on the tip; 21 mutation probes all bit; qa-checklist READY 0 blocking; gate GREEN at 47399f77b7 |
-| 07 | policy-terms-drafts | game | NOT STARTED | | |
+| 07 | policy-terms-drafts | game | DONE | 8a1739d67a | DOCS ONLY, zero code diff; release/v0.38.0 synced (merge 8a1739d67a, trivial: 30 commits, no marketplace overlap; monolith_budget AUTO-MERGED so all four count-pin suites re-derived from a run, 377 green, renderer.ts ceiling 13708 lowered by the release's own extraction); counsel package complete: TERMS_AND_CONDITIONS_MARKETPLACE_DRAFT.md (full revised Terms beside the untouched live Terms; new Section 10 incl. the 10.3 acceptance-surface requirement per R9; renumbering verified reference-by-reference) + the decision memo (adopted position, nine counsel questions incl R9 and the NEW seller-side terms gap, exact-changes list, enable-time checklist; held PRIVATELY outside the public repo per the state.md locked decision); never-power carve-out landed consistently (README Highlights + Web3, wallet-link, holder-flair, marketplace.md launch gates); staleness cluster fixed (marketplace.md forfeit destination / delivery / review-state / TOTP-superseded-by-R1 truth-ups, p2p-woc-trade implementation status, DESIGN.md window inventory, malware-scan-catalog signing surfaces, both money-claim agent docs, docs+net+ui CLAUDE.md); FRESH proofreader over the whole package: 1 blocking + 7 should-fix + 6 nits, ALL applied; copy floor clean, ci:changed exit 0; LOCAL, not pushed per R4 |
 | 07 QA | phase-07-qa | game | NOT STARTED | | |
 | 08 | service-auth-hardening | service | NOT STARTED | | |
 | 08 QA | phase-08-qa | service | NOT STARTED | | |
@@ -50,6 +49,80 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 21 QA | phase-21-qa | service + game | NOT STARTED | | |
 | 22 | close-out | all three | NOT STARTED | | teardown offer lives in 22 QA |
 | 22 QA | phase-22-qa | all three | NOT STARTED | | |
+
+## 07 policy and terms drafts round (docs only)
+
+Release sync: merge 8a1739d67a (origin/release/v0.38.0 tip 62626b5cc1, the
+GPU-hitch instrumentation, night-lighting, and OTA-overlay trains, 83 files).
+Trivial for this branch: no conflicts, no marketplace-owned files touched, but
+tests/monolith_budget.test.ts AUTO-MERGED (the release lowered the renderer.ts
+ceiling to 13708 after its own fire-light extraction), so per the count-pin
+discipline all four pin suites were re-derived from a run: 377 tests green,
+no re-pin needed. 47399f77b7 (the one 06 round without its own review)
+verified first: comment-only src hunk as billed, and its production
+sweep-fallback test runs green on the merged tree.
+
+Deliverables, all landed:
+
+- `TERMS_AND_CONDITIONS_MARKETPLACE_DRAFT.md` at the repo root, beside the
+  UNTOUCHED live Terms, banner "DRAFT FOR COUNSEL. NOT IN FORCE." A complete
+  revised document, not a fragment: Section 6 carve-out, Section 8 rescope
+  (licence-transfer framing), Section 9 split (linking stays no-transaction;
+  marketplace participation is transactional), new Section 10 covering
+  trading, participation (18+ floor proposed, browser-only, jurisdiction
+  refusal), the R9 acceptance-surface requirement (10.3), custody/escrow,
+  bonds/forfeiture, settlement, fees/burn, finality/disputes, conduct,
+  taxes, availability; old Sections 10 to 22 renumbered to 11 to 23 with
+  every cross-reference verified (survival list expanded to swallow the new
+  Section 10 deliberately). Counsel-judgment passages carry `[COUNSEL]`.
+- The counsel decision memo, held PRIVATELY at
+  `/Users/fernando/Documents/woc-counsel/counsel-decision-memo.md` (outside
+  the public repo per the state.md locked decision): the adopted position
+  (five points), nine counsel questions (R9 acceptance surface incl the
+  seller-side gap, Section 8 reconciliation, age floor, regulatory posture,
+  finality vs consumer law, app-store posture, liability cap, tax, privacy
+  disclosure), the exact-changes list, and an enable-time checklist the 22
+  audit consumes.
+- Carve-out reconciliation, consistent across every claim site: README
+  (Highlights bullet AND the Web3 section), wallet-link.md,
+  holder-cosmetic-flair.md, marketplace.md launch gate 1 (now points at the
+  landed position + memo), with the deed/reliquary "never power" lines
+  verified to be a DIFFERENT system and left alone.
+- Staleness cluster: marketplace.md (forfeit destination truthed to R2 with
+  the service-side all-treasury divergence recorded, delivery is
+  grant-with-mail-fallback, review-state resolver honesty, TOTP superseded
+  by R1 with the phantom-scaffolding inventory), p2p-woc-trade.md
+  (implementation status trued to landed, counterparty-by-name resolution,
+  cap-exemption row, view-core paths), DESIGN.md window inventory (the
+  Exchange and the trade $WOC arm join the completeness claim),
+  malware-scan-catalog (both signing surfaces in both sentences),
+  release-malware-audit + privacy-security-review agent docs (the
+  real-money-rails claims), docs/ + src/net/ + src/ui/ CLAUDE.md.
+
+Findings the next sessions need (also in the state.md ledger): the
+public/terms.html acceptable-use section has drifted independently of the
+marketplace and contains no real-money bullet at all (publication is a
+reconciliation); sellers never accept terms in code (createListing and the
+seller accept run no guardTerms) while draft 10.2/10.3 promise it, memo
+question 1 owns the ruling and the enable-time checklist carries the gate;
+draft 10.5 states the R2 forfeit split that the service does not implement
+yet (09 owns) and the client discloses no forfeit destination; the 20
+docs/i18n/README locale files carry pre-carve-out Web3 wording for the
+maintainer release fill; server/db.ts's cosmetic-only comment citation and
+the guide catalog's "No pay to win, ever" line are code surfaces deferred
+with owners.
+
+Validation: copy floor clean over every added line (the one dash hit in the
+tree is a pre-existing untouched line); anchor rule held (sections and
+symbols, no line numbers); npm run ci:changed exit 0 with zero errors; zero
+code diff (fourteen .md files). A FRESH proofreader swept the whole package
+for internal consistency and factual accuracy against code: 1 blocking
+(draft 10.5 pointed at a marketplace-interface disclosure that does not
+exist), 7 should-fix (a false counterparty-binding claim, the view-core path
+contradiction, the memo misquoting its own draft, marketplace.md still
+implying TOTP-to-come against R1, the ui CLAUDE.md reading as if the panel
+already follows the model, the unrecorded seller-gate obligation, change
+summary omissions), 6 nits; every finding applied, including nits.
 
 ## 06 QA round (verdict PASS-WITH-FOLLOWUPS, every fix applied)
 
