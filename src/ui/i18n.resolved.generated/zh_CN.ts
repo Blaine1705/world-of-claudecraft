@@ -9506,6 +9506,7 @@ export const zh_CN: EnTranslations = {
       "cheap_shot": {
         "name": "击腹拳",
         "description": "攻击目标，造成 {damage} 点伤害，并使其昏迷 4 秒。必须处于潜行状态。奖励 2 个连击点。",
+        "descriptionNoStealth": "攻击目标，造成 {damage} 点伤害，并使其昏迷 4 秒。奖励 2 个连击点。",
         "specNote_subtlety": "从暮帷中使用可累积1层幽暝（最多3层）。幽暝达到3层时，无需潜行即可使用：该次使用不消耗能量，消耗全部3层幽暝，并开启持续6秒的暗影缠身。"
       },
       "sap": {
