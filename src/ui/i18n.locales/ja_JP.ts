@@ -1304,6 +1304,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.forceHighPerfGpu': '専用ゲーミングGPUを使用',
   'hudChrome.options.forceHighPerfGpuNote':
     '既定でオン：デスクトップ版はこのコンピューターの専用ゲーミングGPUを要求します。ゲームが起動しない、起動後に画面が真っ暗になる、またはノートパソコンの画面が映らない場合はオフにしてください。この設定は次回ゲームを起動したときに反映されます。',
+  'hudChrome.options.discordPresence': 'Discord リッチプレゼンス',
+  'hudChrome.options.discordPresenceNote':
+    'プレイ中、現在いるゾーンをDiscordのアクティビティとして表示します。あなたのDiscordプロフィールを見られる人は誰でもそれを見られます。共有されるのはゾーン名とゲーム名だけで、キャラクターやアカウント、一緒に遊んでいる相手が共有されることはありません。このコンピューターでDiscordアプリが起動している必要があります。',
   'hudChrome.options.showDevBadges': '開発者バッジを表示',
   'hudChrome.options.showOwnNameplate': '自分のネームプレートを表示',
   'hudChrome.options.showPlayerNameplates': 'プレイヤーのネームプレートを表示',

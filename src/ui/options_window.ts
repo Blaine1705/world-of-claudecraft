@@ -23,6 +23,7 @@ import { syncAppViewport } from '../game/app_viewport';
 import { audio } from '../game/audio';
 import { desktopDisplayModeSupported } from '../game/desktop_display_mode_sync';
 import { desktopGpuPrefSupported } from '../game/desktop_gpu_pref_sync';
+import { desktopDiscordPresenceSupported } from '../game/discord_presence';
 import {
   GAMEPAD_NONE,
   GAMEPAD_ZOOM_IN,
@@ -1396,6 +1397,7 @@ export class OptionsWindow {
       touch: useTouchInterface(),
       nativeShell: isNativeAppShell(),
       desktopGpuPref: desktopGpuPrefSupported(desktopBridge()),
+      desktopDiscordPresence: desktopDiscordPresenceSupported(desktopBridge()),
     };
     const controls = hooks ? buildInterfaceControls(this.settingsSource(hooks), env) : [];
 

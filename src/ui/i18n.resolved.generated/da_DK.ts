@@ -1369,6 +1369,8 @@ export const da_DK: EnTranslations = {
       "showPlaytime": "Vis spilletid på karakterskærm",
       "forceHighPerfGpu": "Use the Dedicated Gaming GPU",
       "forceHighPerfGpuNote": "On by default: the desktop app asks this computer for its dedicated gaming GPU. Turn this off if the game will not start, opens to a black screen, or the laptop display goes blank. Takes effect the next time the game starts.",
+      "discordPresence": "Discord Rich Presence",
+      "discordPresenceNote": "Shows the zone you are in right now as your Discord activity while you play, and anyone who can see your Discord profile can see it. Only the zone name and the game are shared, never your character, your account, or who you are playing with. Needs the Discord app running on this computer.",
       "showDevBadges": "Vis udviklermærker",
       "showOwnNameplate": "Vis mit navneskilt",
       "showPlayerNameplates": "Vis spillernavneskilte",

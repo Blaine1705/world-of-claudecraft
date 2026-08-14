@@ -267,6 +267,13 @@ describe('options_window: interface tab split', () => {
     // bridge probe, and never from the shell flag it is easily confused with.
     expect(body).toContain('desktopGpuPref: desktopGpuPrefSupported(desktopBridge())');
     expect(body).not.toContain('desktopGpuPref: isNativeAppShell(');
+    // The Discord presence row is gated the same way, on its OWN probe: the
+    // shell that has the GPU preference may still predate presence.
+    expect(body).toContain(
+      'desktopDiscordPresence: desktopDiscordPresenceSupported(desktopBridge()),',
+    );
+    expect(body).not.toContain('desktopDiscordPresence: isNativeAppShell(');
+    expect(body).not.toContain('desktopDiscordPresence: desktopGpuPrefSupported(');
     // the other two env fields keep their own probes
     expect(body).toContain('touch: useTouchInterface(),');
     expect(body).toContain('nativeShell: isNativeAppShell(),');

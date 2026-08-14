@@ -210,6 +210,12 @@ export interface OptionsEnv {
    *  browser toggle, which is what actually works there. Absent (the
    *  web/offline callers) means the picker never renders. */
   desktopDisplayMode?: boolean;
+  /** desktopDiscordPresenceSupported(): reveals the Discord Rich Presence row.
+   *  A BRIDGE CAPABILITY like the two above, deliberately not nativeShell: the
+   *  mobile shells cannot publish a presence at all, and neither can a desktop
+   *  shell installed before it shipped. Absent (the web/offline callers) means
+   *  the row never renders. */
+  desktopDiscordPresence?: boolean;
 }
 
 const slider = (
@@ -675,6 +681,16 @@ export function buildInterfaceControls(
     general.push(
       boolToggle(s, 'forceHighPerfGpu', 'hudChrome.options.forceHighPerfGpu'),
       note('hudChrome.options.forceHighPerfGpuNote'),
+    );
+  }
+  // Discord Rich Presence, behind its own bridge capability (an older shell has
+  // the GPU preference but not this one, so the two gates are independent). Its
+  // note carries the privacy caveat: the activity is visible to anyone who can
+  // see the player's Discord profile.
+  if (env?.desktopDiscordPresence) {
+    general.push(
+      boolToggle(s, 'discordPresence', 'hudChrome.options.discordPresence'),
+      note('hudChrome.options.discordPresenceNote'),
     );
   }
   return [

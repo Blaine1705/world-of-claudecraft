@@ -569,6 +569,10 @@ const INTERFACE_KEYS_BY_TAB: Record<InterfaceTab, string[]> = {
 // capability. Every list above is the web/mobile arm, which must stay byte-for-
 // byte what it was, so the row can never leak onto a build that cannot serve it.
 const DESKTOP_GPU_KEYS = ['forceHighPerfGpu', 'note:hudChrome.options.forceHighPerfGpuNote'];
+// The Discord Rich Presence row, behind its OWN capability: a shell can expose
+// the GPU preference without presence (it shipped first), so the two gates are
+// independent and the row order is gpu block then presence block.
+const DESKTOP_DISCORD_KEYS = ['discordPresence', 'note:hudChrome.options.discordPresenceNote'];
 const GENERAL_KEYS_DESKTOP = [...GENERAL_KEYS, ...DESKTOP_GPU_KEYS];
 const INTERFACE_KEYS_BY_TAB_DESKTOP: Record<InterfaceTab, string[]> = {
   ...INTERFACE_KEYS_BY_TAB,
@@ -638,6 +642,7 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
         ...COMBAT_KEYS,
       ]);
       expect(find(withoutCapability, 'forceHighPerfGpu')).toBeUndefined();
+      expect(find(withoutCapability, 'discordPresence')).toBeUndefined();
       expect(withoutCapability.some((c) => c.control === 'note')).toBe(false);
     }
 
@@ -655,6 +660,84 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
         'forceHighPerfGpu',
       ),
     ).toBeUndefined();
+  });
+
+  it('appends the Discord presence row + note ONLY with its own bridge capability', () => {
+    // Alone (a shell with presence but no GPU preference): the presence block
+    // closes the General tab and the GPU row is nowhere.
+    const presenceOnly = buildInterfaceControls(makeSource(), {
+      touch: false,
+      nativeShell: false,
+      desktopDiscordPresence: true,
+    });
+    expect(keysOf(presenceOnly)).toEqual([
+      ...GENERAL_KEYS,
+      ...DESKTOP_DISCORD_KEYS,
+      ...FRAMES_KEYS,
+      ...CHAT_KEYS,
+      ...COMBAT_KEYS,
+    ]);
+    expect(find(presenceOnly, 'forceHighPerfGpu')).toBeUndefined();
+    expect(find(presenceOnly, 'discordPresence')).toMatchObject({
+      control: 'boolToggle',
+      category: 'general',
+      labelKey: 'hudChrome.options.discordPresence',
+    });
+
+    // Both capabilities: the GPU block first, then presence, matching the code.
+    const both = buildInterfaceControls(makeSource(), {
+      ...DESKTOP_ENV,
+      desktopDiscordPresence: true,
+    });
+    expect(keysOf(both)).toEqual([
+      ...GENERAL_KEYS,
+      ...DESKTOP_GPU_KEYS,
+      ...DESKTOP_DISCORD_KEYS,
+      ...FRAMES_KEYS,
+      ...CHAT_KEYS,
+      ...COMBAT_KEYS,
+    ]);
+
+    // The capability alone always reveals it and nativeShell alone never does:
+    // the mobile shells cannot publish a presence at all.
+    expect(
+      find(
+        buildInterfaceControls(makeSource(), {
+          touch: true,
+          nativeShell: true,
+          desktopDiscordPresence: true,
+        }),
+        'discordPresence',
+      ),
+    ).toBeTruthy();
+    expect(
+      find(
+        buildInterfaceControls(makeSource(), { touch: false, nativeShell: true }),
+        'discordPresence',
+      ),
+    ).toBeUndefined();
+    expect(
+      find(
+        buildInterfaceControls(makeSource(), { ...WEB_ENV, desktopDiscordPresence: false }),
+        'discordPresence',
+      ),
+    ).toBeUndefined();
+  });
+
+  it('reads the stored presence choice straight through (no inversion at this seam)', () => {
+    const env: OptionsEnv = { touch: false, nativeShell: false, desktopDiscordPresence: true };
+    expect(
+      find(
+        buildInterfaceControls(makeSource({}, { discordPresence: true }), env),
+        'discordPresence',
+      ),
+    ).toMatchObject({ control: 'boolToggle', on: true });
+    expect(
+      find(
+        buildInterfaceControls(makeSource({}, { discordPresence: false }), env),
+        'discordPresence',
+      ),
+    ).toMatchObject({ control: 'boolToggle', on: false });
   });
 
   it('reflects the stored GPU preference in BOTH directions (no inversion at this seam)', () => {

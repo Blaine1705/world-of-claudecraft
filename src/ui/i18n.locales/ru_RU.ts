@@ -1322,6 +1322,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.forceHighPerfGpu': 'Использовать дискретную игровую видеокарту',
   'hudChrome.options.forceHighPerfGpuNote':
     'Включено по умолчанию: настольное приложение запрашивает у компьютера дискретную игровую видеокарту. Отключите, если игра не запускается, показывает черный экран или экран ноутбука гаснет. Настройка применится при следующем запуске игры.',
+  'hudChrome.options.discordPresence': 'Статус в Discord',
+  'hudChrome.options.discordPresenceNote':
+    'Показывает зону, в которой вы сейчас находитесь, как вашу активность в Discord во время игры, и ее видит любой, кому доступен ваш профиль Discord. Передаются только название зоны и название игры, но никогда ваш персонаж, ваша учетная запись или те, с кем вы играете. Требуется запущенное приложение Discord на этом компьютере.',
   'hudChrome.options.showDevBadges': 'Показывать значки разработчика',
   'hudChrome.options.showOwnNameplate': 'Показывать свою табличку с именем',
   'hudChrome.options.showPlayerNameplates': 'Показывать таблички с именами игроков',

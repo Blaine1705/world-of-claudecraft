@@ -19,6 +19,8 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
     "hud.options.displayModeWindowed",
+    "hudChrome.options.discordPresence",
+    "hudChrome.options.discordPresenceNote",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
@@ -32,6 +34,8 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
     "hud.options.displayModeWindowed",
+    "hudChrome.options.discordPresence",
+    "hudChrome.options.discordPresenceNote",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
@@ -45,6 +49,8 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
     "hud.options.displayModeWindowed",
+    "hudChrome.options.discordPresence",
+    "hudChrome.options.discordPresenceNote",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
@@ -58,6 +64,8 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
     "hud.options.displayModeWindowed",
+    "hudChrome.options.discordPresence",
+    "hudChrome.options.discordPresenceNote",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
@@ -72,6 +80,8 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
     "hud.options.displayModeWindowed",
+    "hudChrome.options.discordPresence",
+    "hudChrome.options.discordPresenceNote",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
@@ -85,6 +95,8 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
     "hud.options.displayModeWindowed",
+    "hudChrome.options.discordPresence",
+    "hudChrome.options.discordPresenceNote",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
@@ -102,6 +114,8 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
     "hud.options.displayModeWindowed",
+    "hudChrome.options.discordPresence",
+    "hudChrome.options.discordPresenceNote",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
@@ -116,6 +130,8 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
     "hud.options.displayModeWindowed",
+    "hudChrome.options.discordPresence",
+    "hudChrome.options.discordPresenceNote",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
@@ -129,6 +145,8 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
     "hud.options.displayModeWindowed",
+    "hudChrome.options.discordPresence",
+    "hudChrome.options.discordPresenceNote",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
@@ -142,6 +160,8 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
     "hud.options.displayModeWindowed",
+    "hudChrome.options.discordPresence",
+    "hudChrome.options.discordPresenceNote",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
@@ -155,6 +175,8 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
     "hud.options.displayModeWindowed",
+    "hudChrome.options.discordPresence",
+    "hudChrome.options.discordPresenceNote",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
@@ -168,6 +190,8 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
     "hud.options.displayModeWindowed",
+    "hudChrome.options.discordPresence",
+    "hudChrome.options.discordPresenceNote",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
@@ -181,6 +205,8 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
     "hud.options.displayModeWindowed",
+    "hudChrome.options.discordPresence",
+    "hudChrome.options.discordPresenceNote",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
@@ -194,6 +220,8 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
     "hud.options.displayModeWindowed",
+    "hudChrome.options.discordPresence",
+    "hudChrome.options.discordPresenceNote",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ],
@@ -207,6 +235,8 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
     "hud.options.displayModeWindowed",
+    "hudChrome.options.discordPresence",
+    "hudChrome.options.discordPresenceNote",
     "hudChrome.options.forceHighPerfGpu",
     "hudChrome.options.forceHighPerfGpuNote"
   ]
