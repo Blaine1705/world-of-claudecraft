@@ -284,12 +284,23 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
         `the constructor options must carry ${field}`,
       ).toBe(true);
     }
-    const maximizeAt = code.indexOf('if (restore.maximized) mainWindow.maximize();');
-    expect(maximizeAt, 'a maximized session must be restored maximized').toBeGreaterThan(ctorAt);
+    // maximize() on a hidden window also SHOWS it (BrowserWindow contract), so
+    // the maximize must live inside the reveal, not at construction: a
+    // constructor-time maximize presents an unpainted frame for the whole load.
     expect(
-      maximizeAt,
-      'maximize must happen while the window is still hidden, before the reveal is armed',
-    ).toBeLessThan(code.indexOf("mainWindow.once('ready-to-show'"));
+      code,
+      'a constructor-time maximize would show the unpainted window for the whole load',
+    ).not.toContain('if (restore.maximized) mainWindow.maximize();');
+    const reveal = block('const showMainWindow = () => {', '\n  };', 'showMainWindow');
+    const revealMaximizeAt = reveal.indexOf('if (restore.maximized) win.maximize();');
+    expect(
+      revealMaximizeAt,
+      'a maximized session must be restored maximized at the reveal',
+    ).toBeGreaterThan(-1);
+    expect(
+      revealMaximizeAt,
+      'maximize must precede show() so the first visible frame is the maximized one',
+    ).toBeLessThan(reveal.indexOf('win.show();'));
   });
 
   it('remembers the window geometry on settle and once more at close', () => {

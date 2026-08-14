@@ -443,20 +443,23 @@ function createMainWindow() {
     },
   });
 
-  // A session that ended maximized comes back maximized. Done here, while the
-  // window is still hidden (show:false above), so the reveal on 'ready-to-show'
-  // is already maximized rather than flashing the restored size for a frame.
-  if (restore.maximized) mainWindow.maximize();
-
   // Show once, and only a window that is still alive and still hidden: the
   // fallback timer and 'ready-to-show' race by design, and crash recovery
   // reloads this same window's webContents (electron/crash_guard.cjs), so a
   // late refire must be a no-op rather than a second show. Captured `win`, not
   // the module-level mainWindow: createMainWindow can run again (macOS
   // 'activate'), and this window's timer must never act on a successor window.
+  //
+  // A session that ended maximized comes back maximized, and the maximize has
+  // to live INSIDE the reveal: maximize() on a hidden window also shows it
+  // (documented BrowserWindow contract, verified against Electron 43), so a
+  // constructor-time maximize would present an unpainted frame for the whole
+  // load, defeating show:false. Placed before show() so the first visible
+  // frame is the already-maximized one.
   const win = mainWindow;
   const showMainWindow = () => {
     if (win.isDestroyed() || win.isVisible()) return false;
+    if (restore.maximized) win.maximize();
     win.show();
     return true;
   };
