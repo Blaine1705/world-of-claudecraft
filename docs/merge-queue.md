@@ -186,6 +186,35 @@ requires write access, so this is always a maintainer action: read the diff
 before queueing a fork PR, and treat any fork change under `.github/**` or
 `scripts/**` as needing a real review first.
 
+## Minting a release branch
+
+The settings half of a mint is ONE command, run locally by the maintainer
+right after creating the new `release/vX.Y.Z` branch:
+
+```bash
+node scripts/release_mint.mjs vX.Y.Z            # or --dry-run first
+```
+
+It dumps both green-tip rulesets as the audit trail, verifies the
+required-checks ruleset's `release/**` include covers the new ref, and
+rewrites the merge-queue ruleset's include to exactly `refs/heads/main` plus
+the new release ref (the previous release branch leaves; its tip is frozen).
+It runs locally by design: editing rulesets needs an admin-scoped gh login
+that a workflow token does not have and ci.yml deliberately refuses secrets.
+
+This script exists because the manual version of this step was skipped three
+releases running: the merge-queue ruleset stayed pinned to
+`refs/heads/release/v0.35.0` from the v0.36.0 mint until 2026-08-14, so the
+queue silently stopped queueing anything (every "queue" merge in that window
+was an ordinary merge with required checks only). The re-arm on 2026-08-14
+restored `main` plus the active release branch; treat any future mint that
+skips the script as re-opening that gap.
+
+The rest of the mint (branch creation, version bump, tracking issue,
+announcement) is unchanged; the script prints the remaining checklist. The
+first queued PR on the new branch doubles as the queue drill: watch its
+`gh-readonly-queue` run go green before trusting the queue.
+
 ## What did not change
 
 - Fork PRs still need maintainer approval before their `pull_request` workflows
