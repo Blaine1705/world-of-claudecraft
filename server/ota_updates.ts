@@ -166,7 +166,6 @@ export const otaUpdatesBodySchema = object({
   version_build: optional(str({ maxLength: 64 })),
   plugin_version: optional(str({ maxLength: 64 })),
 });
-export type OtaUpdatesBody = Infer<typeof otaUpdatesBodySchema>;
 
 /** An update offer in the plugin's response shape; null means "no update". */
 export interface OtaUpdateOffer {

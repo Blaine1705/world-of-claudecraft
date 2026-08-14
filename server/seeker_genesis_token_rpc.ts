@@ -230,9 +230,3 @@ export async function findSeekerGenesisToken(
   const tokens = await findSeekerGenesisTokens(walletAddress, rpcUrl, signal, requiredMint);
   return tokens?.[0] ?? null;
 }
-
-export const seekerGenesisTokenIdentity = {
-  mintAuthority: SEEKER_GENESIS_TOKEN_MINT_AUTHORITY,
-  metadataAddress: SEEKER_GENESIS_TOKEN_METADATA_ADDRESS,
-  groupAddress: SEEKER_GENESIS_TOKEN_GROUP_ADDRESS,
-} as const;

@@ -157,8 +157,10 @@ interface AttributionTargetFixture {
 // neither parent. No capture was retaken.
 // Re-minted for PR #3339's healGlowAt view-eviction fix on the newer release
 // renderer. The rendererIntegration leaf moves; no capture was retaken.
+// Re-minted for PR #3344 after removing the unused Eastbrook civic-beacon
+// preload test hook. The civicShader leaf moves; no capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '4df3e461c9f0204768c63e33a77d1523f4333befc8a63efc9f7dcac4a524b095';
+  'a1226a747f82b1f2d8e750593cae4bec6c60ab5bcb89918c58e8ef3f287a6d18';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
