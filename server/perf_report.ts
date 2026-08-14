@@ -568,8 +568,14 @@ function rawSummary(value: unknown, devTraceAllowed = false): Record<string, unk
     // Without this the resume block's entries and failed-unit ids reach storage
     // unclamped on every report under the size limit, and the compact path's
     // sanitizer only ever sees the oversized minority.
-    const prewarm = parsed.rendererPrewarmSummary;
-    if (isRecord(prewarm)) {
+    // BOTH prewarm keys, never only the summary: the current client stopped
+    // sending the full `rendererPrewarm` twin, but a client older than that
+    // change still does (its resume block rides a getter on the live stats
+    // object), the compact path still accepts the key as its fallback, and any
+    // token holder can post one whatever their client does.
+    for (const key of ['rendererPrewarmSummary', 'rendererPrewarm']) {
+      const prewarm = parsed[key];
+      if (!isRecord(prewarm)) continue;
       const resume = sanitizePrewarmResume(prewarm.resume);
       if (resume) prewarm.resume = resume;
       else delete prewarm.resume;

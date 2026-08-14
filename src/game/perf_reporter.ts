@@ -461,8 +461,13 @@ function payloadFromSnapshot(
       rendererBudget: renderer.renderBudget,
       rendererQualityBuckets: renderer.qualityBuckets,
       rendererDiagnostics: renderer.renderDiagnostics,
+      // The summary above is the whole prewarm payload. The live stats object
+      // used to ride along beside it as `rendererPrewarm`, from before the
+      // summary existed; nothing reads it back out of storage, and once its
+      // resume getter started serializing, the report carried two copies of one
+      // block under a 16 KB cap, only one of which the ingest rebuilds from a
+      // fixed key set. Add a field to the summary rather than sending the twin.
       rendererPrewarmSummary: rendererPrewarmSummary(renderer.prewarm),
-      rendererPrewarm: renderer.prewarm,
       rendererGpuQueue: rendererGpuQueueSummary(renderer.gpuQueue),
       assets: {
         preload: snapshot.assets.preload,

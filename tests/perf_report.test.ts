@@ -1041,6 +1041,53 @@ describe('perf report ingestion', () => {
     expect(storedEntries[0].started).toBe(0);
     expect(PREWARM_RESUME_LANES).toEqual(['debt', 'cosmetic']);
 
+    // The SAME clamp on the legacy `rendererPrewarm` key. The current client
+    // sends only the summary, but a client older than that change still posts
+    // the live stats object, whose resume block rides a getter, and any token
+    // holder can post the key whatever their client does. Sanitizing only the
+    // summary left the twin as an unclamped way into the same storage.
+    vi.mocked(insertClientPerfReport).mockClear();
+    const legacyTwin = fakeRes();
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'prewarm-legacy-twin-hostile',
+        rawSummary: {
+          rendererPrewarm: {
+            manifestPlanned: 30,
+            resume: {
+              status: 'totally-made-up',
+              plannedUnits: 9e12,
+              failedUnitIds: Array.from({ length: 40 }, () => 'f'.repeat(400)),
+              entries: Array.from({ length: 40 }, () => ({
+                id: 'e'.repeat(200),
+                lane: 'invented-lane',
+                planned: 9e12,
+              })),
+            },
+          },
+        },
+      }),
+      legacyTwin,
+    );
+    expect(legacyTwin.statusCode).toBe(200);
+    const twinRow = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    const storedTwin = (
+      (twinRow.rawSummary as Record<string, Record<string, unknown>>).rendererPrewarm as Record<
+        string,
+        unknown
+      >
+    ).resume as Record<string, unknown>;
+    expect(storedTwin.status).toBe('none');
+    expect(storedTwin.plannedUnits).toBe(100_000);
+    expect(storedTwin.entries).toHaveLength(PREWARM_RESUME_ENTRIES_MAX);
+    expect(storedTwin.failedUnitIds).toHaveLength(PREWARM_RESUME_ENTRIES_MAX);
+    expect((storedTwin.failedUnitIds as string[])[0]).toHaveLength(160);
+    expect((storedTwin.entries as Record<string, unknown>[])[0]).toMatchObject({
+      id: 'e'.repeat(80),
+      lane: 'cosmetic',
+      planned: 100_000,
+    });
+
     // A malformed block is dropped rather than stored half-shaped.
     vi.mocked(insertClientPerfReport).mockClear();
     const malformed = fakeRes();

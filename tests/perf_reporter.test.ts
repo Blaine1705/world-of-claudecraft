@@ -544,10 +544,13 @@ describe('perf reporter payload', () => {
       workDone: 12,
       workPlanned: 20,
     });
-    expect(
-      (body.rawSummary as { rendererPrewarm?: { manifestEntries?: unknown[] } }).rendererPrewarm
-        ?.manifestEntries,
-    ).toHaveLength(2);
+    // The live stats object is NOT sent beside the summary. It was a second
+    // copy of the same block under the ingest's 16 KB cap, and once its resume
+    // getter started serializing, the copy the server rebuilds from a fixed key
+    // set was no longer the only one carrying resume. Nothing reads the twin
+    // back out of storage, so the summary is the whole payload: a new field
+    // belongs in `rendererPrewarmSummary`, never in a restored twin.
+    expect(body.rawSummary as Record<string, unknown>).not.toHaveProperty('rendererPrewarm');
     // The resume lane's outcome, which is the other half of "did this entry
     // run". `vfx.weapon-skins` reads timed-out above; only this block says its
     // units were handed to the lane, and that one of them failed, so the
