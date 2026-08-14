@@ -37,11 +37,11 @@ the packet's headline results.
 
 STEP 2b - THE SEAL RE-MINT LIST (deferred from phase 1 by user decision 2026-08-08;
 refreshed by the 2026-08-13 interim reconcile; run over the branch's FINAL lockfile):
-- The 9 accepted-red suites / 14 tests: the 8 lockfile-keyed asset suites (11 tests)
-  via the 5-step size-preserving runbook (scripts/assets/remint_lockfile_fingerprints
-  .mjs, order in commit 218de2db08), plus tests/mob_portrait_source_manifest.test.ts
-  (3 tests since upstream 154f0563ce) via the portrait re-render + review + receipt
-  flow.
+- The accepted-red set (CORRECTED at phase 11 execution: 8 lockfile-keyed asset
+  suites / 11 tests; mob_portrait_source_manifest was healed by upstream d0a061ff6c
+  at phase 9 and stays green, so its portrait re-render + review + receipt flow is
+  NOT needed) via the 5-step size-preserving runbook
+  (scripts/assets/remint_lockfile_fingerprints.mjs, order in commit 218de2db08).
 - The eastbrook polish provenance RE-RECORD: prefer upstream fb78debb7f's
   scripts/assets/eastbrook_grand_armoury/rerecord_polish_provenance.mjs (its --check
   mode first; honor its twelve-input verification); renderer.ts bytes are a hashed
@@ -50,15 +50,21 @@ refreshed by the 2026-08-13 interim reconcile; run over the branch's FINAL lockf
   not merely re-recorded.
 - The scripts/assets/*/export_entry.js PCFSoftShadowMap renames (six files:
   eastbrook_grand_armoury, fenbridge_town, eastbrook_town, eastbrook_noticeboard,
-  banker_chest, eastbrook_mailbox), batched here because they are seal-fingerprinted.
+  banker_chest, eastbrook_mailbox), batched here because five are seal-fingerprinted
+  (CORRECTED at phase 11: banker_chest has no source_fingerprint.mjs and no digest
+  pins, so it renames freely; the renames must land BEFORE the fingerprint
+  re-stamp or five seals go stale again).
 - The five-surface three-0.165 doc flip (pre-existing phase 6 gap, census claim
-  stale-0165-doc-arms): the README.md Three.js badge PLUS all 21 docs/i18n/README.*
-  .md localized badges (release_version.mjs processes them; a root-only flip leaves
-  them inconsistent), CONTRIBUTING.md's "pnpm patch three@0.165.0" regeneration
-  doctrine (it names a file that no longer exists), docs/perf/hitch/README.md's
-  reference to the deleted patch, and the "pinned r165" comment wording at the
-  prewarm_policy idle-upload test (re-verify the indivisible-upload premise on r185
-  when rewording). Deliberate r165 provenance/history comments stay.
+  stale-0165-doc-arms): the README.md Three.js badge PLUS all docs/i18n/README.*
+  .md localized badges (CORRECTED at phase 11: the tree has exactly 20, not 21;
+  release_version.mjs processes them; a root-only flip leaves them inconsistent),
+  CONTRIBUTING.md's "pnpm patch three@0.165.0" regeneration doctrine (it names a
+  file that no longer exists), docs/perf/hitch/README.md's reference to the
+  deleted patch, and the "pinned r165" comment wording at the prewarm_policy
+  idle-upload test (the indivisible-upload premise was already re-verified on r185
+  at phase 6 QA: r185 row-batches via native update ranges, exemption retained;
+  the comment mirrors the renderer's sky-entry ruling). Deliberate r165
+  provenance/history comments stay.
 - The phase 2 QA deferral: the dist grep proving the built output never ships the
   DESKTOP_VERSION '0.0.0' fallback (subsumes download-page staleness).
 - The phase 2 QA nice-to-have: the win32 pre-ready menu launch check.
