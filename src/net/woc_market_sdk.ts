@@ -324,8 +324,9 @@ export class WocMarketClient {
     sellerCharacterName: string;
     usdCents: number;
     itemId: string;
-    itemInstance?: unknown;
+    itemInstance?: ItemInstancePayload;
     itemCraftedRecipeId?: string;
+    acceptTerms: boolean;
   }): Promise<{ ok: true; offer: WocOfferView } | WocMarketFail> {
     const out = await this.request<{ offer: WocOfferView }>('POST', '/api/woc-market/offers', req);
     return out.ok ? { ok: true, ...out.data } : out;
@@ -335,7 +336,12 @@ export class WocMarketClient {
    *  A null listing means "agreed, waiting on the other side". */
   async acceptOffer(
     id: number,
-    req: { characterId: number; itemIndex?: number; itemId?: string; expectInstance?: unknown },
+    req: {
+      characterId: number;
+      itemIndex?: number;
+      itemId?: string;
+      expectInstance?: ItemInstancePayload;
+    },
   ): Promise<{ ok: true; listing: WocListingView | null } | WocMarketFail> {
     const out = await this.request<{ listing: WocListingView | null }>(
       'POST',

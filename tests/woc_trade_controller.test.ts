@@ -181,12 +181,15 @@ function fakeHooks(): {
     estimateImpl: (cents: number) => Promise<unknown>;
     buyNowImpl: () => Promise<unknown>;
     acceptOfferImpl: () => Promise<unknown>;
+    createOfferImpl: () => Promise<unknown>;
     lastAcceptBody: Record<string, unknown> | null;
+    lastCreateBody: Record<string, unknown> | null;
     calls: {
       offers: number;
       estimates: number[];
       buyNows: number;
       acceptOffers: number[];
+      createOffers: number;
       resolveOffers: [number, string][];
     };
   };
@@ -198,12 +201,16 @@ function fakeHooks(): {
     buyNowImpl: (): Promise<unknown> => Promise.resolve({ ok: false, code: 'woc_market.disabled' }),
     // The waiting branch by default: agreed, the other side has not yet.
     acceptOfferImpl: (): Promise<unknown> => Promise.resolve({ ok: true, listing: null }),
+    createOfferImpl: (): Promise<unknown> =>
+      Promise.resolve({ ok: false, code: 'woc_market.disabled' }),
     lastAcceptBody: null as Record<string, unknown> | null,
+    lastCreateBody: null as Record<string, unknown> | null,
     calls: {
       offers: 0,
       estimates: [] as number[],
       buyNows: 0,
       acceptOffers: [] as number[],
+      createOffers: 0,
       resolveOffers: [] as [number, string][],
     },
   };
@@ -232,7 +239,11 @@ function fakeHooks(): {
       },
       settlementQuote: () => Promise.resolve({ ok: false, code: 'woc_market.disabled' }),
       confirmSettlement: () => Promise.resolve({ ok: false, code: 'woc_market.disabled' }),
-      createOffer: () => Promise.resolve({ ok: false, code: 'woc_market.disabled' }),
+      createOffer: (body: Record<string, unknown>) => {
+        state.calls.createOffers++;
+        state.lastCreateBody = body;
+        return state.createOfferImpl();
+      },
       tradePartner: () => Promise.resolve(null),
     },
     characterId: () => 1,
@@ -733,6 +744,149 @@ describe('the accept request body (seller escrow)', () => {
       itemId: 'worn_sword',
       expectInstance: { signer: 'Ayla' },
     });
+  });
+});
+
+describe('the createOffer request body (buyer send)', () => {
+  it('names the EXACT copy on the table, and asserts the terms per call', async () => {
+    // The offer pins a fingerprint of the copy it is for (H10): the server
+    // refuses acceptance of any other copy, so an id-only body would let a
+    // seller swap in a re-rolled instance after the price was agreed. The
+    // per-call terms flag is the other half: the pay arm's "terms were
+    // accepted when the offer was made" premise is only true because the SEND
+    // carries it.
+    const h = fakeHooks();
+    h.state.createOfferImpl = () => Promise.resolve({ ok: true, offer: { id: 11, usdCents: 250 } });
+    const r = rig(h.hooks);
+    // No openTrade: the send path reads the model's inputs and the hooks, and
+    // the open poll's empty-result callback would clear state mid-test (the
+    // accept-body suite's rationale).
+    const agreed = {
+      itemId: 'worn_sword',
+      count: 1,
+      instance: { signer: 'Ayla', enchant: 'flame_weapon' },
+      craftedRecipeId: 'recipe_worn_sword',
+    };
+    r.host.tradeInfo = {
+      otherPid: 2,
+      otherName: 'Borin',
+      myOffer: { items: [], copper: 0 },
+      theirOffer: { items: [agreed], copper: 0 },
+      myAccepted: false,
+      theirAccepted: false,
+    } as unknown as typeof r.host.tradeInfo;
+    const c = r.controller as unknown as {
+      wocTradeMode: 'gold' | 'woc';
+      wocTradeUsdCents: number | null;
+      wocTradePartner: { name: string; walletVerified: boolean } | null;
+      wocTradePartnerResolved: boolean;
+      wocTradeOffer: WocPendingOffer | null;
+      sendWocTradeOffer(otherName: string): Promise<void>;
+    };
+    c.wocTradeMode = 'woc';
+    c.wocTradeUsdCents = 250;
+    c.wocTradePartner = { name: 'Borin', walletVerified: true };
+    c.wocTradePartnerResolved = true;
+
+    await c.sendWocTradeOffer('Borin');
+
+    expect(h.state.calls.createOffers).toBe(1);
+    // The WHOLE body, so a dropped field fails here rather than at the server.
+    expect(h.state.lastCreateBody).toEqual({
+      characterId: 1,
+      sellerCharacterName: 'Borin',
+      usdCents: 250,
+      itemId: 'worn_sword',
+      itemInstance: { signer: 'Ayla', enchant: 'flame_weapon' },
+      itemCraftedRecipeId: 'recipe_worn_sword',
+      acceptTerms: true,
+    });
+    expect(h.state.lastCreateBody?.acceptTerms).toBe(true);
+    // The ok arm really ran: the returned row is what the window now holds.
+    expect(c.wocTradeOffer?.id).toBe(11);
+    expect(r.host.logs.at(-1)).toBe(t('hudChrome.trade.woc.offerSent', { name: 'Borin' }));
+  });
+
+  it('omits the per-copy fields for a PLAIN staged copy rather than sending nulls', async () => {
+    // The two optional legs are spread conditionally: a plain copy carries no
+    // instance and no marker, and sending either as an explicit null would
+    // fingerprint a copy that does not exist.
+    const h = fakeHooks();
+    h.state.createOfferImpl = () => Promise.resolve({ ok: true, offer: { id: 12, usdCents: 250 } });
+    const r = rig(h.hooks);
+    r.host.tradeInfo = {
+      otherPid: 2,
+      otherName: 'Borin',
+      myOffer: { items: [], copper: 0 },
+      theirOffer: { items: [{ itemId: 'worn_sword', count: 1 }], copper: 0 },
+      myAccepted: false,
+      theirAccepted: false,
+    } as unknown as typeof r.host.tradeInfo;
+    const c = r.controller as unknown as {
+      wocTradeMode: 'gold' | 'woc';
+      wocTradeUsdCents: number | null;
+      wocTradePartner: { name: string; walletVerified: boolean } | null;
+      wocTradePartnerResolved: boolean;
+      sendWocTradeOffer(otherName: string): Promise<void>;
+    };
+    c.wocTradeMode = 'woc';
+    c.wocTradeUsdCents = 250;
+    c.wocTradePartner = { name: 'Borin', walletVerified: true };
+    c.wocTradePartnerResolved = true;
+
+    await c.sendWocTradeOffer('Borin');
+
+    expect(h.state.calls.createOffers).toBe(1);
+    expect(Object.keys(h.state.lastCreateBody ?? {}).sort()).toEqual([
+      'acceptTerms',
+      'characterId',
+      'itemId',
+      'sellerCharacterName',
+      'usdCents',
+    ]);
+  });
+});
+
+describe('the accept belt past the review window', () => {
+  it('logs NOTHING once the goods are escrowed: an empty table is the correct state', async () => {
+    // The retired copy named "stage the item" whenever no staged slot
+    // resolved, which past review is a lie: the goods left the bags into
+    // escrow, so the table is empty BY DESIGN. The model answers a null hint
+    // outside review, and a null hint with a refused accept says nothing.
+    const h = fakeHooks();
+    const r = rig(h.hooks);
+    r.host.tradeInfo = {
+      otherPid: 2,
+      otherName: 'Borin',
+      myOffer: { items: [], copper: 0 },
+      theirOffer: { items: [], copper: 0 },
+      myAccepted: false,
+      theirAccepted: false,
+    } as unknown as typeof r.host.tradeInfo;
+    const c = r.controller as unknown as {
+      wocTradeOffer: WocPendingOffer | null;
+      acceptWocTradeOffer(): Promise<void>;
+    };
+    c.wocTradeOffer = heldOffer({
+      role: 'seller',
+      phase: 'awaiting_payment',
+      listingId: 41,
+      buyerAccepted: true,
+      sellerAccepted: true,
+    });
+
+    await c.acceptWocTradeOffer();
+
+    expect(r.host.logs).toEqual([]);
+    expect(h.state.calls.acceptOffers).toEqual([]);
+
+    // The counter-shape, so the silence above is a decision rather than a dead
+    // path: the SAME empty table inside the review window still earns the
+    // needs-item line, because there the goods really are missing.
+    c.wocTradeOffer = heldOffer({ role: 'seller' });
+    await c.acceptWocTradeOffer();
+    expect(r.host.logs).toEqual([t('hudChrome.trade.woc.hintAcceptNeedsItem')]);
+    expect(h.state.calls.acceptOffers).toEqual([]);
   });
 });
 

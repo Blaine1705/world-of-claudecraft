@@ -195,7 +195,7 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
             }${esc(t(model.statusKey ?? 'hudChrome.trade.woc.awaitingPayment'))}</p>`;
       return `<div class="trade-woc-arm">${modeTabs}
         ${body}
-        <p class="trade-woc-hint" data-woc-hint></p>
+        <p class="trade-woc-hint" data-woc-hint role="status"></p>
       </div>`;
     }
     // No Accept button of its own: agreement rides the trade window's existing
@@ -208,7 +208,7 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
     return `<div class="trade-woc-arm">${modeTabs}
       <p class="trade-woc-warn">${esc(t('hudChrome.trade.woc.notInstant'))}</p>
       ${action}
-      <p class="trade-woc-hint" data-woc-hint></p>
+      <p class="trade-woc-hint" data-woc-hint role="status"></p>
     </div>`;
   }
   if (model.mode !== 'woc') return `<div class="trade-woc-arm">${modeTabs}</div>`;
@@ -224,7 +224,7 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
     <p class="trade-woc-warn">${esc(t('hudChrome.trade.woc.variableWarning'))}</p>
     <p class="trade-woc-warn">${esc(t('hudChrome.trade.woc.notInstant'))}</p>
     <button type="button" class="btn trade-woc-send" data-woc-send>${esc(t('hudChrome.trade.woc.sendOffer'))}</button>
-    <p class="trade-woc-hint" data-woc-hint></p>
+    <p class="trade-woc-hint" data-woc-hint role="status"></p>
   </div>`;
 }
 

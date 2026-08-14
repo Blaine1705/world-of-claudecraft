@@ -564,6 +564,50 @@ describe('a staged slot resolves to its INVENTORY index', () => {
     expect(inventoryIndexOfStaged(both, slot(EPIC.id))).toBe(0);
   });
 
+  it('matches the same instance fields written in a DIFFERENT key order', () => {
+    // The comparison runs through the sim's structural comparator, which is
+    // key-order independent. A JSON.stringify comparator agrees with it only
+    // while both sides happen to spell their keys in the same order, which no
+    // clone, wire hop or persisted round trip preserves: it would answer -1
+    // here and refuse a perfectly good instanced directed sale.
+    const staged: InvSlot = {
+      itemId: EPIC.id,
+      count: 1,
+      instance: { signer: 'Ayla', enchant: 'flame_weapon' } as InvSlot['instance'],
+    };
+    const bags: InvSlot[] = [
+      { itemId: EPIC.id, count: 1 },
+      {
+        itemId: EPIC.id,
+        count: 1,
+        instance: { enchant: 'flame_weapon', signer: 'Ayla' } as InvSlot['instance'],
+      },
+    ];
+    // The INDEX, not merely "found": index 0 is the plain copy a comparator
+    // that gave up on the payload would land on instead.
+    expect(inventoryIndexOfStaged(bags, staged)).toBe(1);
+  });
+
+  it('still misses when one payload VALUE differs, whatever order the keys are in', () => {
+    // The negative twin of the pin above: order-independence must not become
+    // payload-blindness. A comparator that ignored the payload would answer 0
+    // (the plain copy) and escrow the wrong item.
+    const staged: InvSlot = {
+      itemId: EPIC.id,
+      count: 1,
+      instance: { signer: 'Ayla', enchant: 'flame_weapon' } as InvSlot['instance'],
+    };
+    const bags: InvSlot[] = [
+      { itemId: EPIC.id, count: 1 },
+      {
+        itemId: EPIC.id,
+        count: 1,
+        instance: { enchant: 'hearth_ward', signer: 'Ayla' } as InvSlot['instance'],
+      },
+    ];
+    expect(inventoryIndexOfStaged(bags, staged)).toBe(-1);
+  });
+
   it('does not resolve a staged CRAFTED copy to its unmarked twin at a lower index', () => {
     // Copy identity is the itemCopyPin triple (id, instance, crafted marker).
     // Matching on id plus instance alone resolved a staged plain-but-crafted

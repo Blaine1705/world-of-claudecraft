@@ -314,27 +314,30 @@ export class WocTradeController {
     // item_mismatch), while the cleaned offer carries the per-copy payload the
     // staging preview pinned. The local list stays as the pre-send fallback.
     const stagedAuthoritative = this.sim.tradeInfo?.myOffer.items ?? this.stagedTrade.items;
+    // This belt IS the accept-time enforcement of the whole-table one_item
+    // rule, not a redundant second line: the woc panel renders no accept
+    // button of its own (agreement rides the trade window's Accept, whose
+    // disabled state never consults the model), so deleting this gate
+    // reopens the ambiguous-slot resolution. The DECISION is the model's own
+    // canAccept/acceptHint ladder, read here rather than re-derived, so the
+    // belt and the rendered WHY can never disagree about the table's shape.
+    // A null hint with a refused accept is the past-review 'nothing' arm:
+    // the goods are escrowed and there is nothing to name, so log nothing.
+    if (offer.role === 'seller') {
+      const model = wocTradeModelFrom(this.wocTradeDeps(this.sim.tradeInfo?.otherName ?? ''));
+      if (!model.canAccept) {
+        if (model.acceptHint !== null) this.log(t(model.acceptHint), '#ff6b6b');
+        return;
+      }
+    }
     const first =
       offer.role === 'seller'
         ? stagedAuthoritative.find((sl) => wocTradableSlot(sl, ITEMS))
         : undefined;
     if (offer.role === 'seller' && !first) {
+      // Unreachable behind canAccept (the single accepted slot is tradable),
+      // kept as the extraction belt: refusing beats escrowing the wrong item.
       this.log(t('hudChrome.trade.woc.hintAcceptNeedsItem'), '#ff6b6b');
-      return;
-    }
-    if (
-      offer.role === 'seller' &&
-      (stagedAuthoritative.length > 1 || (stagedAuthoritative[0]?.count ?? 1) !== 1)
-    ) {
-      // This belt IS the accept-time enforcement of the whole-table one_item
-      // rule, not a redundant second line: the woc panel renders no accept
-      // button of its own (agreement rides the trade window's Accept, whose
-      // disabled state never consults the model), so deleting this check
-      // reopens the ambiguous-slot resolution. The model's acceptHint names
-      // the same WHY beside the panel, and the arm ORDER here mirrors its
-      // ladder: nothing sellable answers needs-item above, a wrong shape
-      // answers one_item here.
-      this.log(t('hudChrome.trade.woc.hintOneItem'), '#ff6b6b');
       return;
     }
     // The extraction keys on an INVENTORY index. Sending the staged position
@@ -521,6 +524,11 @@ export class WocTradeController {
       ...(agreed.craftedRecipeId === undefined
         ? {}
         : { itemCraftedRecipeId: agreed.craftedRecipeId }),
+      // The server records acceptance once per account (guardTerms) and this
+      // send is what makes the pay arm's "terms were accepted when the offer
+      // was made" premise hold; the visible terms copy is the market window's
+      // (and the panel's own link is owned follow-up work).
+      acceptTerms: true,
     });
     if (res.ok) {
       // The window STAYS OPEN. The offer now sits in it for both players to
