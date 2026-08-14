@@ -8,7 +8,9 @@ SESSION START (do this first in every fresh session): cd into the worktree
 non-trivial, run the `release-merge-audit` skill on it before continuing.
 
 Follow the shared workflow in `implementation-plan.md` first; `state.md` has the
-validation matrix and ruling R6. This file is the phase spec.
+validation matrix and rulings R6 AND R9 (the 06 QA round's implied-consent
+finding: the trade window's $WOC arm records terms acceptance while showing no
+terms text; read R9's full text before drafting). This file is the phase spec.
 
 - Repo: game (docs only). Worktree `/Users/fernando/Documents/wocc-marketplace`, branch
   `feature/woc-marketplace`.
@@ -46,7 +48,11 @@ the marketplace.
    that makes the claim.
 3. A one-page decision memo for Fernando and counsel: the adopted position, the open
    questions counsel must answer, and exactly which lines change where (R6). Counsel
-   approval is tracked in state.md as a launch gate.
+   approval is tracked in state.md as a launch gate. The memo MUST carry R9 as one of
+   the counsel questions: where terms acceptance may be recorded (today the trade
+   window's offer send and pay arm both record it with no terms shown), and what the
+   trade-window affordance must present; the drafts state the acceptance-surface
+   requirement so 14/15 can build against agreed language.
 4. Fix the doc staleness cluster: every marketplace doc matches shipped behavior (cite
    stable paths and symbols per the anchor rule; no literal counts or line numbers).
 

@@ -35,7 +35,11 @@ push.
 2. Acceptance-bar audit: walk `review.md`'s "Acceptance bar" and this packet's
    `qa-checklist.md` row by row, attaching evidence (test file, command output,
    state.md record, screenshot path) for every box. Any box that cannot be checked
-   becomes an explicit open item for Fernando; nothing is hand-waved.
+   becomes an explicit open item for Fernando; nothing is hand-waved. This audit
+   ALSO verifies ruling R9 is resolved: the trade window must not record terms
+   acceptance it never showed (grep the woc_trade controller for a hard-coded
+   acceptTerms; a surviving one FAILS the pre-enable bar), plus the two dev-database
+   classes and the bindOnTrade scan line from the 06 ledger's deploy notes.
 3. Full gates, all green: game `node scripts/gate_select.mjs` on the committed tip
    (plus `npm run gate` if Fernando wants the deeper run); service `npm run build` +
    `npm test`; dashboard `npm test` + `npm run check` + `npm run build`.

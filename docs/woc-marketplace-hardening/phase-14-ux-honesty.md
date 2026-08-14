@@ -42,6 +42,10 @@ lives in `src/ui/hud/woc_trade/` after phase 01)
    rows name the item.
 3. Informed commitment: the p2p Pay flow passes through the quote-review panel; a
    pre-bid disclosure states bids cannot be withdrawn before the first bond charge.
+   Per ruling R9 (state.md; ask at session start if unresolved): the trade window's
+   $WOC arm gains its terms affordance (the Exchange window's checkbox is the model)
+   so the offer send and pay arm stop hard-coding acceptTerms while showing nothing;
+   use the language phase 07's drafts adopted.
 4. Localized money surface: wallet-bridge failures map to `t()` keys (raw `err.message`
    never renders; the message still logs for devs); `wocUsdText` uses the Intl-based
    money formatter everywhere it prints.
