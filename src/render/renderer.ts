@@ -235,6 +235,13 @@ import {
 import { buildEastbrookTownView, type EastbrookTownView } from './eastbrook_town';
 import { buildEmberFeatures, type EmberFeaturesView } from './ember_features';
 import { buildEmberPools, type EmberPoolsView } from './ember_pools';
+import {
+  entityViewCandidatePriority,
+  entityViewDistanceSq,
+  entityViewIsAdmitted,
+  isPersistentPortalObject,
+  entityViewShouldDrop as shouldDropView,
+} from './entity_view_policy_core';
 import { resolveEnvironmentPrefilterPlan } from './env_prefilter_core';
 import {
   createEnvironmentMapTransition,
@@ -439,7 +446,6 @@ import {
 } from './prewarm_pass';
 import {
   constrainedEntryViewCreateBudget,
-  interactionLandmarkViewPriority,
   mandatoryLandmarkViewsReady,
   materialProgramSignature,
   orderedPrewarmIds,
@@ -1188,12 +1194,6 @@ function roundMs(v: number): number {
   return Math.round(v * 100) / 100;
 }
 
-function distSqXZ(a: Entity, b: Entity): number {
-  const dx = a.pos.x - b.pos.x;
-  const dz = a.pos.z - b.pos.z;
-  return dx * dx + dz * dz;
-}
-
 function summarizeMs(values: number[]): {
   count: number;
   avg: number;
@@ -1274,12 +1274,6 @@ function emptyFoliagePerfStats(): FoliagePerfStats {
     grassBuildMs: 0,
     grassCacheLimit: 0,
   };
-}
-
-function isPersistentPortalObject(e: Entity): boolean {
-  return (
-    e.kind === 'object' && (e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit')
-  );
 }
 
 function sleep(ms: number): Promise<void> {
@@ -4746,22 +4740,6 @@ export class Renderer {
     return base;
   }
 
-  private viewCandidatePriority(e: Entity, p: Entity, d2: number): number {
-    if (e.id === p.id) return -100;
-    if (e.id === p.targetId) return -90;
-    if (e.kind === 'mob' && e.hostile && d2 <= 35 * 35) return 0;
-    if (e.kind === 'npc' && d2 <= 45 * 45) return 1;
-    const landmarkPriority = interactionLandmarkViewPriority(e.templateId, d2);
-    if (landmarkPriority !== null) return landmarkPriority;
-    if (e.kind === 'object' && (e.lootable || isPersistentPortalObject(e))) return 2;
-    if (e.kind === 'player') return 3;
-    if (e.kind === 'mob' && e.hostile) return 4;
-    if (e.kind === 'mob') return 5;
-    if (e.kind === 'npc') return 6;
-    if (e.kind === 'object') return 7;
-    return 9;
-  }
-
   private collectMissingViewCandidates(
     center: Entity,
     rangeSq: number,
@@ -4771,10 +4749,10 @@ export class Renderer {
     const questLog = this.sim.questLog;
     for (const e of this.sim.entities.values()) {
       if (this.views.has(e.id)) continue;
-      if (this.questObjectHidden(e, questLog)) continue; // quest_object_gate_core
+      if (!entityViewIsAdmitted(e, questLog, this.questObjectHidden)) continue;
       const required = e.id === center.id || e.id === center.targetId;
       if (required && !includeRequired) continue;
-      const d2 = distSqXZ(e, center);
+      const d2 = entityViewDistanceSq(e, center);
       if (!required && d2 > rangeSq) continue;
       writeViewCandidate(
         this.viewCandidatePool,
@@ -4782,7 +4760,7 @@ export class Renderer {
         count,
         e.id,
         d2,
-        this.viewCandidatePriority(e, center, d2),
+        entityViewCandidatePriority(e, center, d2),
       );
       count++;
     }
@@ -4802,6 +4780,7 @@ export class Renderer {
     if (id === null) return 0;
     const e = this.sim.entities.get(id);
     if (!e || this.views.has(e.id)) return 0;
+    if (!entityViewIsAdmitted(e, this.sim.questLog, this.questObjectHidden)) return 0;
     if (!this.viewCreateRetry.canAttempt(e.id, 'view', performance.now())) return 0;
     this.createView(e);
     this.sampleCreatedViewType(createdViewTypes, e);
@@ -9132,7 +9111,7 @@ export class Renderer {
   // distance to the player, the same measure the view create/destroy bands use.
   private readonly weaponSkinRank = (viewId: number): number | undefined => {
     const entity = this.sim.entities.get(viewId);
-    return entity ? distSqXZ(entity, this.sim.player) : undefined;
+    return entity ? entityViewDistanceSq(entity, this.sim.player) : undefined;
   };
 
   /** Apply (or clear) a weapon-skin cosmetic on one view and latch it. The
@@ -10656,13 +10635,9 @@ export class Renderer {
     this.doomedIds.length = 0;
     for (const id of this.views.keys()) {
       const e = sim.entities.get(id);
+      // The pure policy also retires quest objects after turn-in or abandon.
       if (
-        !e ||
-        this.questObjectHidden(e, sim.questLog) || // turn-in/abandon retires it mid-session
-        (!isPersistentPortalObject(e) &&
-          id !== p.id &&
-          id !== p.targetId &&
-          distSqXZ(e, p) > this.entityViewDestroyRangeSq)
+        shouldDropView(e, p, sim.questLog, this.questObjectHidden, this.entityViewDestroyRangeSq)
       ) {
         this.doomedIds.push(id);
       }

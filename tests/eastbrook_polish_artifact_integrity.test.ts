@@ -748,10 +748,12 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for final PR #3345 integration. The reviewed offscreen-heal
 // renderer bytes remain while the Three.js patch, lockfile, and accepted GLBs
 // join the provenance inputs. No capture was retaken.
+// Re-minted after extracting entity-view policy from renderer.ts to satisfy
+// the release monolith ratchet. Behavior is unchanged; no capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'c45f2a37d3383f5381b7823165af20e62113f9cab86adb69455b6130be866454';
+  '64c0a557bf91643e5bcfade4e63a28c58891dd640ae1b92e9b8113c2c1a4eee1';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '0dcd09708c53427d503809aa90f06228246a4047e15b10f52ca6c5a64e36f510';
+  '07cedef28f54d15df54b3a60bd1862f97510e3f305cbabdb3a3188d84636cd6b';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1732,10 +1734,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-pinned for final PR #3345 integration. The first-order composite follows
     // the combined renderer, lockfile, and GLBs, then this seal follows the swept
     // evidence bytes. No capture was retaken.
+    // Re-pinned after extracting entity-view policy from renderer.ts for the
+    // monolith ratchet. The seal follows the swept bytes; no capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('dcb570ff1a059d1ebbe750883cc9c172325d73b4fab052e4264da53fecd58418');
+    ).toBe('2384d6e536704aab6103fbddd8b3c2025eba280c601d120e349b36cd7023c26b');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

@@ -164,8 +164,10 @@ interface AttributionTargetFixture {
 // Re-minted for final PR #3345 integration. The reviewed offscreen-heal
 // renderer bytes remain while the new lockfile and accepted GLBs join the
 // provenance inputs. No capture was retaken.
+// Re-minted after extracting entity-view policy from renderer.ts to satisfy
+// the release monolith ratchet. Behavior is unchanged; no capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '0dcd09708c53427d503809aa90f06228246a4047e15b10f52ca6c5a64e36f510';
+  '07cedef28f54d15df54b3a60bd1862f97510e3f305cbabdb3a3188d84636cd6b';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
