@@ -155,8 +155,10 @@ interface AttributionTargetFixture {
 // both parents move renderer.ts (the release's point-light seam, this branch's
 // moon-phase grade threading), so the merged tree mints a value matching
 // neither parent. No capture was retaken.
+// Re-minted for PR #3339's healGlowAt view-eviction fix on the newer release
+// renderer. The rendererIntegration leaf moves; no capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '3c28607bde322259909cfb57b86aa3e4e09e0b0cb9f2c195f8cc86901df4dbad';
+  '4df3e461c9f0204768c63e33a77d1523f4333befc8a63efc9f7dcac4a524b095';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

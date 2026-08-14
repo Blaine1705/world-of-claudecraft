@@ -10467,6 +10467,10 @@ export class Renderer {
     v.paladinAegisVisual?.dispose();
     v.paladinSunVerdictVisual?.dispose();
     this.audioSink?.mountEngineReset(id);
+    // healGlowAt has no decay loop of its own (unlike fiestaGlows/waterJetVisualChannels),
+    // so a view drop is its only eviction point; otherwise every distinct entity ever
+    // healed accretes an entry for the rest of the session.
+    this.healGlowAt.delete(id);
     this.views.delete(id);
   }
 

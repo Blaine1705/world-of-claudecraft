@@ -736,10 +736,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // both parents move renderer.ts, so the composite mints a value matching neither
 // parent and this metadata authority sha follows the swept bytes. No capture was
 // retaken.
+// Re-minted for PR #3339's healGlowAt view-eviction fix on the newer release
+// renderer. The rendererIntegration leaf and swept evidence bytes move; no
+// capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'e91fe6c023cf53817f8ee19dae440c88769b1c3ee4d3c3b8d954ea725ad43175';
+  '91323b3dbc87e31415ac8a24d52ead6b5ae0b12214ea4dca9f2d1b7097ef9667';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '3c28607bde322259909cfb57b86aa3e4e09e0b0cb9f2c195f8cc86901df4dbad';
+  '4df3e461c9f0204768c63e33a77d1523f4333befc8a63efc9f7dcac4a524b095';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1708,10 +1711,13 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // both parents move renderer.ts, so the first-order composite mints anew and
     // this second-order seal follows the swept evidence bytes. No capture was
     // retaken.
+    // Re-pinned for PR #3339's healGlowAt view-eviction fix on the newer release
+    // renderer. The first-order composite follows renderer.ts, then this
+    // second-order seal follows the swept evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('d0f558f0d7d972663fa78f5c12b06ecf85b5188cb3c58a548e207fe2c9e879be');
+    ).toBe('bb06e2ac1535d7299b2d7ae55090f8b7e99dbaa97241830d38dab42765e7ded7');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
