@@ -131,6 +131,12 @@ const devServerUrl = app.isPackaged ? undefined : process.env.VITE_DEV_SERVER_UR
 const appOrigins = appNavigationOrigins(APP_ORIGIN, devServerUrl);
 const deepLinkProtocol = 'worldofclaudecraft';
 let mainWindow = null;
+// The live window's reveal closure (showMainWindow inside createMainWindow),
+// published so focusMainWindow can route a pre-paint reveal through the SAME
+// discipline as 'ready-to-show'. It self-guards on its captured window
+// (isDestroyed/isVisible), so a stale value after a window dies is a no-op
+// and the next createMainWindow overwrites it for the successor.
+let revealMainWindow = null;
 let pendingLoginCode = null;
 let pendingWalletHandoffCode = null;
 // Session cap counter for the renderer console mirror (used by the
@@ -533,6 +539,7 @@ function createMainWindow() {
     win.show();
     return true;
   };
+  revealMainWindow = showMainWindow;
   // A renderer that wedges before its first paint must not leave the player
   // with no window at all, so showing is armed on a timer as well. Armed once
   // per window creation (never re-armed on a crash-recovery reload) and cleared
@@ -773,12 +780,23 @@ function openDesktopWalletHandoff(code) {
 // Bring the running window back to the player. A deep link or a second launch
 // can arrive during the pre-paint hidden phase (the window is created with
 // show:false), where restore()/focus() alone would leave the app looking dead,
-// so a still-hidden window is shown as-is: a dark unpainted frame beats
-// nothing happening. restore() before focus(), because focus() on a minimized
-// window does nothing on Windows and Linux.
+// so a still-hidden window is revealed here: a dark unpainted frame beats
+// nothing happening. The reveal routes through revealMainWindow, the SAME
+// discipline 'ready-to-show' uses: a bare show() would present the window
+// with neither its stored display mode nor its maximized memory, and
+// showMainWindow no-ops once visible, so the miss would hold for the whole
+// session (the world-entry display-mode echo cannot heal it either: the
+// idempotent set-display-mode guard compares against the same stored prefs
+// the bare reveal skipped). restore() before focus(), because focus() on a
+// minimized window does nothing on Windows and Linux.
 function focusMainWindow() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
-  if (!mainWindow.isVisible()) mainWindow.show();
+  if (!mainWindow.isVisible() && !(revealMainWindow && revealMainWindow())) {
+    // Defensive only (createMainWindow always publishes the closure before
+    // the window can be reached): an unrevealable window still beats a
+    // vanished one.
+    mainWindow.show();
+  }
   if (mainWindow.isMinimized()) mainWindow.restore();
   mainWindow.focus();
 }

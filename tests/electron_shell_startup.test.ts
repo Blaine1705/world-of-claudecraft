@@ -130,9 +130,23 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
   it('defines focusMainWindow once and routes every focus site through it', () => {
     expect(count(code, 'function focusMainWindow('), 'expected one focusMainWindow').toBe(1);
     const def = block('function focusMainWindow(', '\n}', 'focusMainWindow');
+    // The pre-paint reveal must go through the published reveal closure (the
+    // same displayMode/maximized discipline as 'ready-to-show'), with the bare
+    // show() only as the guarded fallback: a bare show() FIRST would present
+    // the window with neither, and showMainWindow no-ops once visible, so the
+    // stored borderless default and maximized memory would silently never
+    // apply for the whole session. Whole-expression pin, polarity included: a
+    // dropped `!` would invert the routing and ship green without it.
+    expect(def, 'focus must route a hidden window through the reveal discipline').toContain(
+      '!mainWindow.isVisible() && !(revealMainWindow && revealMainWindow())',
+    );
     expect(def, 'focus must reveal a still-hidden window (pre-paint deep links)').toContain(
       'mainWindow.show()',
     );
+    expect(
+      def.indexOf('revealMainWindow') < def.indexOf('mainWindow.show()'),
+      'the reveal-discipline routing must guard the bare show(), not follow it',
+    ).toBe(true);
     expect(def, 'focus must restore a minimized window first').toContain(
       'mainWindow.isMinimized()',
     );
@@ -145,6 +159,22 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
       count(code, 'focusMainWindow('),
       'focusMainWindow call-site count drifted from the reviewed set',
     ).toBe(5);
+  });
+
+  it('publishes the reveal closure for the pre-paint focus path', () => {
+    // Exactly one publication, and it must sit INSIDE createMainWindow's
+    // reveal block (after the showMainWindow definition, before the fallback
+    // timer arms): published anywhere else it could capture the wrong window,
+    // and absent it silently reverts focusMainWindow to the bare show() whose
+    // miss holds for the whole session.
+    expect(
+      count(code, 'revealMainWindow = showMainWindow;'),
+      'expected exactly one reveal-closure publication',
+    ).toBe(1);
+    const reveal = block('const showMainWindow = ', '\n  let readyToShowFallback', 'reveal block');
+    expect(reveal, 'the publication must ride the reveal block itself').toContain(
+      'revealMainWindow = showMainWindow;',
+    );
   });
 
   it('reveals the existing window on activate instead of no-opping', () => {
