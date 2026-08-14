@@ -9,12 +9,15 @@
 // push on the ARGUMENT the bridge actually receives, so flipping a `!` (or
 // dropping one) fails here rather than shipping as "the toggle does not stick".
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   desktopGpuPrefSupported,
   pushDesktopGpuPref,
   syncDesktopGpuPrefSetting,
 } from '../src/game/desktop_gpu_pref_sync';
+import { Settings } from '../src/game/settings';
 import type { DesktopBridge } from '../src/runtime';
 
 // A settings FACTORY double. It records every write, so "wrote nothing" is
@@ -250,5 +253,74 @@ describe('desktop_gpu_pref_sync: boot reflection', () => {
     } as unknown as DesktopBridge;
     await syncDesktopGpuPrefSetting(bridge, settings.create);
     expect(settings.writes).toEqual([{ key: 'forceHighPerfGpu', value: false }]);
+  });
+});
+
+// The module suites above prove each crossing in isolation; these pins prove
+// main.ts actually WIRES them. The house pattern for desktop wiring
+// (tests/desktop_presentation_threading.test.ts, tests/client_shell.test.ts):
+// textual pins on the composition lines, because a wiring edit is exactly the
+// regression the module suite cannot see.
+describe('desktop_gpu_pref_sync: main.ts wiring pins', () => {
+  const mainSource = readFileSync(join(__dirname, '..', 'src', 'main.ts'), 'utf8');
+
+  it('boots the reflection with an INLINE settings factory, desktop-gated', () => {
+    // The factory literal is load-bearing: hoisting it to `const s = new
+    // Settings()` outside the call re-creates the pre-await snapshot bug the
+    // sync module exists to prevent (a whole-blob save reverting every
+    // settings write that landed during the bridge round trip).
+    expect(mainSource).toContain(
+      'if (DESKTOP_APP) void syncDesktopGpuPrefSetting(desktopBridge(), () => new Settings());',
+    );
+  });
+
+  it('routes the options toggle through the push, which owns the inversion', () => {
+    // The push arm hands the bridge the COMMITTED setting value (settings.set
+    // returns it); pushDesktopGpuPref inverts exactly once. An inline `!` here
+    // would double-invert, and a settings.get would push a stale value.
+    expect(mainSource).toContain(
+      "pushDesktopGpuPref(desktopBridge(), settings.set('forceHighPerfGpu', !!value));",
+    );
+  });
+});
+
+// Interface "Reset to Defaults" restores forceHighPerfGpu to its default TRUE
+// and the footer re-applies every reset key through onSettingChange, so the
+// reset click itself pushes gpuForceOptOut=false to the shell store: a player
+// who opted out and clicks Reset has re-armed the GPU force for their next
+// launch. ACCEPTED DOCTRINE (phase 7 QA re-litigation, ACCEPT-AND-PIN): reset
+// means defaults, and this row resets like every other rendered row. This test
+// is the coupling pin; changing the behavior means rewriting it consciously.
+describe('desktop_gpu_pref_sync: Reset to Defaults re-arms the force', () => {
+  const installStorage = (): void => {
+    const map = new Map<string, string>();
+    const storage: Storage = {
+      get length() {
+        return map.size;
+      },
+      key: (index: number) => Array.from(map.keys())[index] ?? null,
+      getItem: (k: string) => map.get(k) ?? null,
+      setItem: (k: string, v: string) => {
+        map.set(k, v);
+      },
+      removeItem: (k: string) => {
+        map.delete(k);
+      },
+      clear: () => map.clear(),
+    };
+    Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: storage });
+  };
+
+  it('reset restores the default ON and the re-apply pushes opt-out false', () => {
+    installStorage();
+    const settings = new Settings();
+    expect(settings.set('forceHighPerfGpu', false)).toBe(false);
+    settings.reset(['forceHighPerfGpu']);
+    expect(settings.get('forceHighPerfGpu'), 'reset must restore the doctrinal default').toBe(true);
+    // The footer's re-apply lands in the main.ts arm pinned above, which is
+    // exactly this call shape: the committed value in, the inversion inside.
+    const { bridge, received } = recordingWriteBridge();
+    pushDesktopGpuPref(bridge, settings.get('forceHighPerfGpu'));
+    expect(received, 'the reset click re-arms the force in the shell store').toEqual([false]);
   });
 });

@@ -262,6 +262,18 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
       ),
       'the GPU force must be the else arm of the opt-out guard',
     ).toBe(true);
+    // Exactly ONE call site per lever: the else-arm regexes above prove a
+    // guarded call exists, and these counts prove it is the only one, so a
+    // second unguarded call added anywhere cannot revert the opt-out while
+    // every shape pin stays green.
+    expect(
+      count(code, 'forceHighPerformanceGpu({ app, log });'),
+      'expected exactly one GPU force call site',
+    ).toBe(1);
+    expect(
+      count(code, 'relaunchForLinuxPrime({ log: console })'),
+      'expected exactly one PRIME relaunch call site',
+    ).toBe(1);
   });
 
   it('constructs the window at the restored geometry rather than resizing it after', () => {
@@ -318,6 +330,21 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
       'saveDesktopPrefs(desktopPrefsPath, desktopPrefs);',
     );
 
+    // The schedule must CANCEL the pending timer before arming a new one:
+    // without it, a drag stacks one timer per resize/move event and the
+    // debounce degenerates into dozens of whole-file writes 700ms later.
+    const schedule = block(
+      'const scheduleWindowBoundsSave = () => {',
+      '\n  };',
+      'scheduleWindowBoundsSave',
+    );
+    expect(schedule, 'each schedule must cancel the pending debounce first').toContain(
+      'clearBoundsSaveTimer();',
+    );
+    expect(
+      schedule.indexOf('clearBoundsSaveTimer();'),
+      'the cancel must precede the re-arm',
+    ).toBeLessThan(schedule.indexOf('setTimeout('));
     expect(code, 'a resize must schedule a save').toContain(
       "mainWindow.on('resize', scheduleWindowBoundsSave);",
     );

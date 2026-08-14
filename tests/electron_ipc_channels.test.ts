@@ -126,7 +126,13 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     expect(start).toBeGreaterThan(-1);
     const body = main.slice(start, main.indexOf('\n});', start));
     expect(body).toContain('if (optOut !== true && optOut !== false) return false;');
-    expect(body).toContain('saveDesktopPrefs(desktopPrefsPath,');
+    // The WHOLE record, spread from the live module-scope object: this is the
+    // anti-clobber contract with the window-bounds saver. Saving only the
+    // toggled field would wipe windowBounds/displayId/maximized from disk on
+    // every mid-session toggle, so the spread is pinned literally.
+    expect(body).toContain(
+      'saveDesktopPrefs(desktopPrefsPath, { ...desktopPrefs, gpuForceOptOut: optOut })',
+    );
     // The in-memory mirror is updated only after a successful save, so the
     // getter can never report a value the next launch would not read.
     const saveAt = body.indexOf('saveDesktopPrefs(desktopPrefsPath,');
