@@ -224,6 +224,21 @@ describe('loadDesktopPrefs', () => {
     const smallPath = scratchPath('small.json');
     writeFileSync(smallPath, '{"version":1,"gpuForceOptOut":true}', 'utf8');
     expect(loadDesktopPrefs(smallPath).gpuForceOptOut).toBe(true);
+    // And the refusal must come from the STAT, before any read: the text guard
+    // downstream would also refuse an oversized body, but only after bringing
+    // the whole file into memory, so "without parsing it" needs its own arm
+    // (the real-file case above cannot tell the two guards apart).
+    const reads: string[] = [];
+    expect(
+      loadDesktopPrefs('/oversized/prefs.json', {
+        statSync: () => ({ size: MAX_PREFS_FILE_BYTES + 1, isFile: () => true }),
+        readFileSync: (readPath: string) => {
+          reads.push(readPath);
+          return '{}';
+        },
+      }),
+    ).toEqual(defaultDesktopPrefs());
+    expect(reads, 'the size gate must refuse BEFORE the read').toEqual([]);
   });
 
   it('accepts a file at exactly the size cap (the bound is strictly greater)', () => {
