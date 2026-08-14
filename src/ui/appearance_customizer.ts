@@ -9,6 +9,12 @@
 // that to CharacterPreview.setModular so the turntable updates live.
 // Persistence is the caller's job, this component is stateless across mounts
 // apart from the value it is constructed with.
+
+import {
+  type DesignCodeError,
+  decodeDesignCode,
+  encodeDesignCode,
+} from '../render/characters/design_code_core';
 import {
   type ArmorSetId,
   BEARD_STYLES,
@@ -474,7 +480,14 @@ export function mountAppearanceCustomizer(
   host.textContent = '';
   host.classList.add('appearance-customizer');
 
-  const emit = () => opts.onChange(value);
+  // The Share tab mirrors the whole look as a design code, so every change
+  // refreshes it alongside the caller's own onChange. Assigned when the tab
+  // is built (below); a no-op until then.
+  let refreshShareCode: () => void = () => {};
+  const emit = () => {
+    refreshShareCode();
+    opts.onChange(value);
+  };
   /** Close callbacks for the custom-colour drawers, so opening one shuts the
    *  rest (see colorRow). */
   const drawerClosers: (() => void)[] = [];
@@ -1034,6 +1047,7 @@ export function mountAppearanceCustomizer(
   const pFace = tabPage('auth.face');
   const pHair = tabPage('auth.hair');
   const pStyle = tabPage('auth.style');
+  const pShare = tabPage('auth.shareTab');
 
   // Body: pick a body, tone it, then shape the silhouette.
   seg<Gender>(
@@ -1267,6 +1281,97 @@ export function mountAppearanceCustomizer(
       },
       () => onHelm(helm),
     );
+  }
+
+  // Share: the whole look as one line of feature=value pairs (the design
+  // code), exported and imported in place. The box always mirrors the current
+  // design except while the player is editing it to paste a code; Import
+  // replaces every changeable feature and KEEPS the body, the same contract
+  // randomize and reset honor (body proportions are Fit Studio data).
+  {
+    row(pShare, null, 'ac-r-full').appendChild(
+      el('div', 'ac-share-hint', t('auth.designCodeHint')),
+    );
+
+    const code = el('textarea', 'ac-code');
+    code.rows = 4;
+    code.spellcheck = false;
+    code.setAttribute('autocomplete', 'off');
+    code.setAttribute('autocapitalize', 'off');
+    code.setAttribute('aria-label', t('auth.designCode'));
+    row(pShare, null, 'ac-r-full').appendChild(code);
+
+    const btns = el('div', 'ac-share-btns');
+    const copyBtn = el('button', 'ac-share-btn', t('auth.copyCode'));
+    copyBtn.type = 'button';
+    const importBtn = el('button', 'ac-share-btn', t('auth.importCode'));
+    importBtn.type = 'button';
+    btns.appendChild(copyBtn);
+    btns.appendChild(importBtn);
+    row(pShare, null, 'ac-r-full').appendChild(btns);
+
+    const status = el('div', 'ac-share-status');
+    status.setAttribute('aria-live', 'polite');
+    pShare.appendChild(status);
+    const setStatus = (text: string, isError: boolean) => {
+      status.textContent = text;
+      status.classList.toggle('err', isError);
+    };
+
+    const sync = () => {
+      // Never clobber a paste in progress: while the caret is in the box the
+      // player owns it. Any other change re-mirrors the code and clears the
+      // last action's status, so what the row says always tracks the look.
+      if (document.activeElement === code) return;
+      code.value = encodeDesignCode(value);
+      setStatus('', false);
+    };
+    refreshShareCode = sync;
+    syncers.push(sync);
+    sync();
+
+    const ERR_LABEL: Record<DesignCodeError, TranslationKey> = {
+      empty: 'auth.designCodeErrEmpty',
+      header: 'auth.designCodeErrHeader',
+      version: 'auth.designCodeErrVersion',
+      malformed: 'auth.designCodeErrMalformed',
+    };
+
+    on(copyBtn, 'click', () => {
+      const text = code.value.trim() || encodeDesignCode(value);
+      // Clipboard access can be denied or absent (older engines, iframes):
+      // fall back to selecting the code so one keystroke finishes the job.
+      const manual = () => {
+        code.focus();
+        code.select();
+        setStatus(t('auth.designCodeCopyManual'), true);
+      };
+      const clip = navigator.clipboard;
+      if (clip?.writeText) {
+        clip.writeText(text).then(() => setStatus(t('auth.designCodeCopied'), false), manual);
+      } else {
+        manual();
+      }
+    });
+
+    on(importBtn, 'click', () => {
+      const parsed = decodeDesignCode(code.value);
+      if (!parsed.ok) {
+        setStatus(t(ERR_LABEL[parsed.reason]), true);
+        return;
+      }
+      value = { ...parsed.appearance, body: value.body };
+      syncAll();
+      emit();
+      setStatus(
+        t(
+          parsed.ignored.length > 0 || parsed.coerced.length > 0
+            ? 'auth.designCodeImportedPartial'
+            : 'auth.designCodeImported',
+        ),
+        false,
+      );
+    });
   }
 
   selectTab(0);
