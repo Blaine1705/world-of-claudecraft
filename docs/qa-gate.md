@@ -233,6 +233,18 @@ same `[ci-shard]` audit lines as the shards. `release-gate` is deliberately not
 lane-split: `release/**` pushes keep the full suite in their 8 shards; a push to `main`
 or `dev-*` runs the PR tier, so it gets the shards-plus-lanes layout.
 
+**Declared duration budgets.** `tests/suite_duration_budget.test.ts` is the anti-whale
+ratchet: it scrapes every test file's DECLARED vitest timeouts (diet arm of ternaries,
+comments stripped; parsing contract in `tests/helpers/declared_timeouts.ts`) and
+enforces two conscious-decision rules in the `monolith_budget` mold: a single test may
+not declare more than the worker-chain cap without an exact exception row (one test is
+one worker chain and cannot parallelize, which is how the pre-split owned-class harness
+came to set whole job walls), and a file whose summed allowance exceeds the default
+needs an exact ledger row, with splitting along cost clusters as the preferred remedy.
+It reads allowances, not runtimes, so lane membership stays a MEASURED decision owned
+by `CI_LONG_SUITES` and its 90-second rule; the guard classifies blind and rides every
+selective floor.
+
 **The balance-harness diet.** The heavy balance suites in the lane are regression
 tripwires, not measurements (the authoritative instrument is the offline Monte Carlo
 sweep), so at PR time they run a reduced configuration: fewer fixed seeds, the
