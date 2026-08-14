@@ -166,6 +166,7 @@ describe.sequential('parse content-pack producer', () => {
         }),
       ]);
       expect(request.headers['content-type']).toBe('application/x-ndjson');
+      expect(request.headers['content-encoding']).toBe('gzip');
       expect(request.headers['x-woc-parse-secret']).toBe('content-pack-test-secret');
       const [headerLine, recordLine] = gunzipSync(request.body).toString('utf8').split('\n');
       const header = JSON.parse(headerLine) as BatchHeader;
