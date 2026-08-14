@@ -1351,7 +1351,7 @@ export const hudChromeStrings = {
     // activity (desktop app only, on by default).
     discordPresence: 'Discord Rich Presence',
     discordPresenceNote:
-      'Shows the zone you are in right now as your Discord activity while you play, and anyone who can see your Discord profile can see it. Only the zone name and the game are shared, never your character, your account, or who you are playing with. Needs the Discord app running on this computer.',
+      'Shows the zone you are in and how long you have been playing this session as your Discord activity, and anyone who can see your Discord profile can see both. Only the zone name, your session time, and the game are shared, never your character, your account, or who you are playing with. Needs the Discord app running on this computer.',
     // Interface panel toggle: nameplate glyph/outline, inspect block, player
     // card, and the Developers leaderboard tab (on by default).
     showDevBadges: 'Show Developer Badges',

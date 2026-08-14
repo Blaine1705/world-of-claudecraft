@@ -1370,7 +1370,7 @@ export const zh_TW: EnTranslations = {
       "forceHighPerfGpu": "使用獨立遊戲顯示卡",
       "forceHighPerfGpuNote": "預設開啟：桌面版會向本機要求使用獨立遊戲顯示卡。若遊戲無法啟動、啟動後黑屏，或筆記型電腦螢幕沒有畫面，請關閉此選項。此設定會在下次啟動遊戲時生效。",
       "discordPresence": "Discord 遊戲狀態",
-      "discordPresenceNote": "遊玩時將你目前所在的區域顯示為你的 Discord 活動狀態，任何能看到你 Discord 個人資料的人都能看到它。只會分享區域名稱和遊戲名稱，絕不會分享你的角色、帳號或與你同行的人。需要本機正在執行 Discord 應用程式。",
+      "discordPresenceNote": "遊玩時將你目前所在的區域以及本次遊戲時長顯示為你的 Discord 活動狀態，任何能看到你 Discord 個人資料的人都能看到這兩項。只會分享區域名稱、本次遊戲時長和遊戲名稱，絕不會分享你的角色、帳號或與你同行的人。需要本機正在執行 Discord 應用程式。",
       "showDevBadges": "顯示開發者徽章",
       "showOwnNameplate": "顯示我的姓名板",
       "showPlayerNameplates": "顯示玩家姓名板",

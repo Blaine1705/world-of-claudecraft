@@ -1302,7 +1302,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '기본값 켜짐: 데스크톱 앱이 이 컴퓨터의 전용 게이밍 GPU를 요청합니다. 게임이 시작되지 않거나, 시작 후 검은 화면만 보이거나, 노트북 화면이 나오지 않으면 끄세요. 이 설정은 다음에 게임을 시작할 때 적용됩니다.',
   'hudChrome.options.discordPresence': 'Discord 리치 프레즌스',
   'hudChrome.options.discordPresenceNote':
-    '플레이하는 동안 현재 있는 지역을 Discord 활동으로 표시하며, 당신의 Discord 프로필을 볼 수 있는 사람은 누구나 이를 볼 수 있습니다. 공유되는 것은 지역 이름과 게임뿐이며, 캐릭터나 계정, 함께 플레이하는 사람은 절대 공유되지 않습니다. 이 컴퓨터에서 Discord 앱이 실행 중이어야 합니다.',
+    '플레이하는 동안 현재 있는 지역과 이번 세션의 플레이 시간을 Discord 활동으로 표시하며, 당신의 Discord 프로필을 볼 수 있는 사람은 누구나 둘 다 볼 수 있습니다. 공유되는 것은 지역 이름, 이번 세션의 플레이 시간, 게임뿐이며, 캐릭터나 계정, 함께 플레이하는 사람은 절대 공유되지 않습니다. 이 컴퓨터에서 Discord 앱이 실행 중이어야 합니다.',
   'hudChrome.options.showDevBadges': '개발자 배지 표시',
   'hudChrome.options.showOwnNameplate': '내 이름표 표시',
   'hudChrome.options.showPlayerNameplates': '플레이어 이름표 표시',
