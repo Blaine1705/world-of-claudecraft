@@ -115,12 +115,15 @@ protects a gate run from itself, but does nothing when a second `npm run gate` i
 running in a sibling worktree, which this repo's own per-task-worktree workflow makes
 routine; two gates that each correctly claim half the cores still request the whole
 machine between them. `gate.mjs` acquires an advisory lock (`scripts/lib/gate_lock.mjs`,
-a single JSON file in `os.tmpdir()`, shared by every worktree on the host) around the
-`vitest (full suite)` step only, never the rest of the run. A gate that finds the lock
-held waits and prints who holds it; a lock whose pid is gone, or that has sat far
-longer than any real full suite takes, is reclaimed rather than honored, so a killed or
-crashed gate can never wedge later runs. `GATE_NO_LOCK=1` restores fully concurrent
-behavior for a user who deliberately wants two full suites running at once.
+an exclusive loopback listener shared by every worktree on the host) around the
+`vitest (full suite)` step only, never the rest of the run. The kernel's atomic listener
+ownership admits one gate at a time and disappears with its process, so recovery never
+deletes a raced lock file or trusts a reusable pid. A gate that finds the listener held
+waits and prints who holds it; a non-gate service on the reserved port is identified and
+bypassed rather than blocking local work. The locked npm/Vitest step runs in a managed
+child process group, so handled termination tears down the active workload before
+releasing ownership. `GATE_NO_LOCK=1` restores fully concurrent behavior for a user who
+deliberately wants two full suites running at once.
 `gate_select.mjs`/`gate_fast.mjs` never touch this lock; it exists for the one step
 that is actually the shared-host bottleneck.
 

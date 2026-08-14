@@ -1,483 +1,209 @@
-import fs, { readFileSync } from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { spawn } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import net from 'node:net';
+import { describe, expect, it } from 'vitest';
 import {
   acquireFullSuiteLock,
+  DEFAULT_LOCK_HOST,
   DEFAULT_MAX_WAIT_MS,
-  DEFAULT_STALE_MS,
-  isPidAlive,
 } from '../scripts/lib/gate_lock.mjs';
 
 const gate = readFileSync(new URL('../scripts/gate.mjs', import.meta.url), 'utf8');
+const lockModuleUrl = new URL('../scripts/lib/gate_lock.mjs', import.meta.url).href;
 
-// A real temp directory (not a mocked fs): the module's only impure surface beyond
-// the injected clock/pid/sleep/isAlive is plain file IO, so exercising it against a
-// throwaway dir is both faster to write and closer to the real gate than mocking fs.
-let lockDir: string;
-
-beforeEach(() => {
-  lockDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gate-lock-test-'));
-});
-
-afterEach(() => {
-  fs.rmSync(lockDir, { recursive: true, force: true });
-});
-
-const LOCK_FILE_NAME = 'test.lock';
-const lockPath = () => path.join(lockDir, LOCK_FILE_NAME);
-const noSleep = () => Promise.resolve();
-
-describe('isPidAlive', () => {
-  it('reports the current process as alive', () => {
-    expect(isPidAlive(process.pid)).toBe(true);
+async function freePort(): Promise<number> {
+  const server = net.createServer();
+  await new Promise<void>((resolve, reject) => {
+    server.once('error', reject);
+    server.listen({ host: DEFAULT_LOCK_HOST, port: 0 }, resolve);
   });
+  const address = server.address();
+  if (address === null || typeof address === 'string') throw new Error('expected TCP address');
+  await new Promise<void>((resolve) => server.close(() => resolve()));
+  return address.port;
+}
 
-  it('reports a pid that cannot plausibly exist as not alive', () => {
-    // PIDs are a bounded namespace; this value is outside it on every real OS.
-    expect(isPidAlive(999_999_999)).toBe(false);
-  });
-});
-
-describe('acquireFullSuiteLock: uncontended', () => {
-  it('creates the lock file with this process pid and the injected clock, and release() removes it', async () => {
-    const { release } = await acquireFullSuiteLock({
-      lockDir,
-      lockFileName: LOCK_FILE_NAME,
-      pid: 4242,
-      now: () => 1_000,
-      sleep: noSleep,
-    });
-
-    const raw = fs.readFileSync(lockPath(), 'utf8');
-    expect(JSON.parse(raw)).toEqual({ pid: 4242, startedAt: 1_000 });
-
-    release();
-    expect(fs.existsSync(lockPath())).toBe(false);
-  });
-});
-
-describe('acquireFullSuiteLock: contended wait', () => {
-  it('waits, prints a message naming the holder, and acquires once the holder releases', async () => {
-    fs.writeFileSync(lockPath(), JSON.stringify({ pid: 7777, startedAt: 500 }));
-
-    const logs: string[] = [];
-    let sleepCalls = 0;
-    const sleep = (_ms: number) => {
-      sleepCalls++;
-      // Simulate the holder releasing on the first poll so the loop terminates.
-      fs.rmSync(lockPath(), { force: true });
-      return Promise.resolve();
-    };
-
-    const { release } = await acquireFullSuiteLock({
-      lockDir,
-      lockFileName: LOCK_FILE_NAME,
-      pid: 4242,
-      now: () => 600,
-      pollMs: 5,
-      sleep,
-      log: (msg: string) => logs.push(msg),
-      isAlive: (pid) => pid === 7777, // the holder is alive, so this is a real wait, not a reclaim
-    });
-
-    expect(sleepCalls).toBe(1);
-    expect(logs.some((l) => l.includes('7777'))).toBe(true);
-    expect(JSON.parse(fs.readFileSync(lockPath(), 'utf8'))).toEqual({ pid: 4242, startedAt: 600 });
-
-    release();
-  });
-
-  it('only logs again when the holder identity changes, not on every poll', async () => {
-    fs.writeFileSync(lockPath(), JSON.stringify({ pid: 7777, startedAt: 500 }));
-    const logs: string[] = [];
-    let polls = 0;
-    const sleep = (_ms: number) => {
-      polls++;
-      if (polls >= 3) fs.rmSync(lockPath(), { force: true });
-      return Promise.resolve();
-    };
-
-    await acquireFullSuiteLock({
-      lockDir,
-      lockFileName: LOCK_FILE_NAME,
-      pid: 4242,
-      now: () => 600,
-      pollMs: 5,
-      sleep,
-      log: (msg: string) => logs.push(msg),
-      isAlive: (pid) => pid === 7777,
-    });
-
-    expect(polls).toBe(3);
-    expect(logs.length).toBe(1);
-  });
-});
-
-describe('acquireFullSuiteLock: stale reclaim', () => {
-  it('reclaims immediately (no wait) when the holder pid is gone', async () => {
-    fs.writeFileSync(lockPath(), JSON.stringify({ pid: 999_999_999, startedAt: 0 }));
-    let sleepCalls = 0;
-
-    const { release } = await acquireFullSuiteLock({
-      lockDir,
-      lockFileName: LOCK_FILE_NAME,
-      pid: 4242,
-      now: () => 1_000,
-      sleep: () => {
-        sleepCalls++;
-        return Promise.resolve();
-      },
-      isAlive: () => false,
-    });
-
-    expect(sleepCalls).toBe(0);
-    expect(JSON.parse(fs.readFileSync(lockPath(), 'utf8')).pid).toBe(4242);
-    release();
-  });
-
-  it('reclaims a lock older than the stale ceiling even while its pid is alive', async () => {
-    const startedAt = 0;
-    const now = DEFAULT_STALE_MS + 1;
-    fs.writeFileSync(lockPath(), JSON.stringify({ pid: 7777, startedAt }));
-    let sleepCalls = 0;
-
-    const { release } = await acquireFullSuiteLock({
-      lockDir,
-      lockFileName: LOCK_FILE_NAME,
-      pid: 4242,
-      now: () => now,
-      sleep: () => {
-        sleepCalls++;
-        return Promise.resolve();
-      },
-      isAlive: () => true, // pid IS alive; only the age ceiling should trigger reclaim
-    });
-
-    expect(sleepCalls).toBe(0);
-    release();
-  });
-
-  it('does not reclaim a live holder still under the stale ceiling', async () => {
-    fs.writeFileSync(lockPath(), JSON.stringify({ pid: 7777, startedAt: 0 }));
-    let sleepCalls = 0;
-    const sleep = () => {
-      sleepCalls++;
-      fs.rmSync(lockPath(), { force: true }); // let the wait terminate
-      return Promise.resolve();
-    };
-
-    await acquireFullSuiteLock({
-      lockDir,
-      lockFileName: LOCK_FILE_NAME,
-      pid: 4242,
-      now: () => DEFAULT_STALE_MS - 1,
-      sleep,
-      isAlive: () => true,
-    });
-
-    expect(sleepCalls).toBe(1);
-  });
-
-  it('reclaims a corrupt or unreadable lock file rather than waiting on it forever', async () => {
-    fs.writeFileSync(lockPath(), 'not json');
-    let sleepCalls = 0;
-
-    const { release } = await acquireFullSuiteLock({
-      lockDir,
-      lockFileName: LOCK_FILE_NAME,
-      pid: 4242,
-      now: () => 1_000,
-      sleep: () => {
-        sleepCalls++;
-        return Promise.resolve();
-      },
-      isAlive: () => true,
-    });
-
-    expect(sleepCalls).toBe(0);
-    release();
-  });
-
-  it('does not remove a newer holder created between the stale read and the reclaim unlink', async () => {
-    // Two waiters both observe the same stale holder (pid 999_999_999). Between this
-    // waiter's initial stale-read and its reclaim unlink, a second (faster) waiter
-    // races ahead, removes the stale lock, and installs its own fresh one. The
-    // re-read immediately before unlinking must see that swap and skip the unlink,
-    // rather than deleting the second waiter's brand new lock out from under it.
-    fs.writeFileSync(lockPath(), JSON.stringify({ pid: 999_999_999, startedAt: 0 }));
-    let readCalls = 0;
-    const readFile = (p: fs.PathOrFileDescriptor, enc: BufferEncoding) => {
-      readCalls++;
-      if (readCalls === 2) {
-        // The re-read right before unlink: simulate the second waiter's race here.
-        fs.writeFileSync(lockPath(), JSON.stringify({ pid: 5555, startedAt: 1_000 }));
+async function waitForLine(stream: NodeJS.ReadableStream, expected: string): Promise<void> {
+  await new Promise<void>((resolve, reject) => {
+    let output = '';
+    const timer = setTimeout(() => reject(new Error(`timed out waiting for ${expected}`)), 5000);
+    stream.on('data', (chunk) => {
+      output += chunk.toString();
+      if (output.split(/\r?\n/).includes(expected)) {
+        clearTimeout(timer);
+        resolve();
       }
-      return fs.readFileSync(p, enc);
-    };
-    let unlinkCalls = 0;
-    const unlink = (p: fs.PathLike) => {
-      unlinkCalls++;
-      fs.unlinkSync(p);
-    };
-
-    let nowMs = 1_000;
-    await acquireFullSuiteLock({
-      lockDir,
-      lockFileName: LOCK_FILE_NAME,
-      pid: 4242,
-      now: () => nowMs,
-      sleep: () => {
-        nowMs += 10; // advance the clock so the bounded wait below actually terminates
-        return Promise.resolve();
-      },
-      isAlive: (pid) => pid === 5555, // the raced-in holder is alive, so the wait ends there
-      readFile,
-      unlink,
-      maxWaitMs: 1,
-    });
-
-    expect(unlinkCalls).toBe(0);
-    expect(JSON.parse(fs.readFileSync(lockPath(), 'utf8'))).toEqual({
-      pid: 5555,
-      startedAt: 1_000,
     });
   });
-});
+}
 
-describe('acquireFullSuiteLock: opt-out', () => {
-  it('never touches the filesystem and release() is a no-op', async () => {
-    const { release } = await acquireFullSuiteLock({
-      optOut: true,
-      lockDir,
-      lockFileName: LOCK_FILE_NAME,
-      sleep: noSleep,
+describe('acquireFullSuiteLock', () => {
+  it('owns an uncontended listener until its idempotent release completes', async () => {
+    const port = await freePort();
+    const first = await acquireFullSuiteLock({ port });
+    let secondAcquired = false;
+    const secondPromise = acquireFullSuiteLock({ port, pollMs: 5 }).then((lock) => {
+      secondAcquired = true;
+      return lock;
     });
 
-    expect(fs.existsSync(lockPath())).toBe(false);
-    expect(() => release()).not.toThrow();
-    expect(fs.existsSync(lockPath())).toBe(false);
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    expect(secondAcquired).toBe(false);
+    await first.release();
+    await first.release();
+    const second = await secondPromise;
+    expect(secondAcquired).toBe(true);
+    await second.release();
   });
 
-  it('opting out does not disturb a lock another process is holding', async () => {
-    fs.writeFileSync(lockPath(), JSON.stringify({ pid: 7777, startedAt: 0 }));
-
-    const { release } = await acquireFullSuiteLock({
-      optOut: true,
-      lockDir,
-      lockFileName: LOCK_FILE_NAME,
-      sleep: noSleep,
-    });
-    release();
-
-    expect(JSON.parse(fs.readFileSync(lockPath(), 'utf8')).pid).toBe(7777);
-  });
-});
-
-describe('acquireFullSuiteLock: release safety', () => {
-  it('never deletes a lock file that another process has since taken over', async () => {
-    const { release } = await acquireFullSuiteLock({
-      lockDir,
-      lockFileName: LOCK_FILE_NAME,
-      pid: 4242,
-      now: () => 1_000,
-      sleep: noSleep,
-    });
-
-    // Simulate a reclaim race: another process decided our lock looked stale (or a
-    // stray manual cleanup) and wrote its own lock over ours before we released.
-    fs.writeFileSync(lockPath(), JSON.stringify({ pid: 5555, startedAt: 2_000 }));
-
-    release();
-
-    expect(JSON.parse(fs.readFileSync(lockPath(), 'utf8')).pid).toBe(5555);
-  });
-
-  it('release() is safe to call when the lock file is already gone', async () => {
-    const { release } = await acquireFullSuiteLock({
-      lockDir,
-      lockFileName: LOCK_FILE_NAME,
-      pid: 4242,
-      now: () => 1_000,
-      sleep: noSleep,
-    });
-
-    fs.rmSync(lockPath(), { force: true });
-    expect(() => release()).not.toThrow();
-  });
-});
-
-describe('acquireFullSuiteLock: never blocks the gate from running tests', () => {
-  it('gives up after repeated failures to remove a stale lock, instead of spinning forever', async () => {
-    fs.writeFileSync(lockPath(), JSON.stringify({ pid: 999_999_999, startedAt: 0 }));
-    const logs: string[] = [];
-    let sleepCalls = 0;
-
-    const { release } = await acquireFullSuiteLock({
-      lockDir,
-      lockFileName: LOCK_FILE_NAME,
-      pid: 4242,
-      now: () => 1_000,
-      sleep: () => {
-        sleepCalls++;
-        return Promise.resolve();
-      },
-      isAlive: () => false, // the holder IS stale; only removing it fails
-      unlink: () => {
-        throw Object.assign(new Error('EPERM'), { code: 'EPERM' });
-      },
-      log: (msg: string) => logs.push(msg),
-    });
-
-    // Bounded (a handful of yields), not zero and not unbounded: it must yield between
-    // retries rather than hot-spin, but it must also terminate.
-    expect(sleepCalls).toBeGreaterThan(0);
-    expect(sleepCalls).toBeLessThan(20);
-    expect(logs.some((l) => l.includes('WARN') && l.includes('stale'))).toBe(true);
-    // The unresolvable lock file is left in place; still, release() must be safe to call.
-    expect(() => release()).not.toThrow();
-  });
-
-  it('degrades to unserialized rather than throwing when lock creation fails for a reason other than EEXIST', async () => {
-    const logs: string[] = [];
-
-    const { release } = await acquireFullSuiteLock({
-      lockDir,
-      lockFileName: LOCK_FILE_NAME,
-      pid: 4242,
-      now: () => 1_000,
-      sleep: noSleep,
-      writeFile: () => {
-        throw Object.assign(new Error('ENOENT: no such file or directory'), { code: 'ENOENT' });
-      },
-      log: (msg: string) => logs.push(msg),
-    });
-
-    expect(logs.some((l) => l.includes('WARN') && l.includes('ENOENT'))).toBe(true);
-    expect(() => release()).not.toThrow();
-  });
-
-  it('gives up waiting past maxWaitMs and proceeds unserialized, even for a live, non-stale holder', async () => {
-    fs.writeFileSync(lockPath(), JSON.stringify({ pid: 7777, startedAt: 0 }));
-    const logs: string[] = [];
-    let elapsed = 0;
-    const sleep = (ms: number) => {
-      elapsed += ms;
-      return Promise.resolve();
-    };
-
-    const { release } = await acquireFullSuiteLock({
-      lockDir,
-      lockFileName: LOCK_FILE_NAME,
-      pid: 4242,
-      now: () => elapsed,
-      pollMs: 1000,
-      maxWaitMs: 5000,
-      sleep,
-      isAlive: () => true,
-      log: (msg: string) => logs.push(msg),
-    });
-
-    expect(logs.some((l) => l.includes('WARN') && l.includes('waited over'))).toBe(true);
-    expect(() => release()).not.toThrow();
-    // The live holder's lock is untouched: this run backed off, it did not reclaim.
-    expect(JSON.parse(fs.readFileSync(lockPath(), 'utf8')).pid).toBe(7777);
-  });
-
-  it('never exceeds maxWaitMs by more than roughly one poll interval', async () => {
-    fs.writeFileSync(lockPath(), JSON.stringify({ pid: 7777, startedAt: 0 }));
-    let elapsed = 0;
-    let polls = 0;
-    const sleep = (ms: number) => {
-      polls++;
-      elapsed += ms;
-      return Promise.resolve();
-    };
-
-    await acquireFullSuiteLock({
-      lockDir,
-      lockFileName: LOCK_FILE_NAME,
-      pid: 4242,
-      now: () => elapsed,
-      pollMs: 1000,
-      maxWaitMs: 5000,
-      sleep,
-      isAlive: () => true,
-    });
-
-    expect(elapsed).toBeLessThanOrEqual(6000);
-    expect(polls).toBeLessThanOrEqual(6);
-  });
-});
-
-describe('acquireFullSuiteLock: long-wait visibility', () => {
-  it('re-announces the same holder periodically as the clock advances, not just once', async () => {
-    fs.writeFileSync(lockPath(), JSON.stringify({ pid: 7777, startedAt: 0 }));
-    const logs: string[] = [];
-    let elapsed = 0;
-    let polls = 0;
-    const sleep = (ms: number) => {
-      polls++;
-      elapsed += ms;
-      if (polls >= 4) fs.rmSync(lockPath(), { force: true }); // let the wait terminate
-      return Promise.resolve();
-    };
-
-    await acquireFullSuiteLock({
-      lockDir,
-      lockFileName: LOCK_FILE_NAME,
-      pid: 4242,
-      now: () => elapsed,
-      pollMs: 60_000, // 1 minute per poll
-      reannounceMs: 90_000, // re-announce after 1.5 minutes of silence
-      sleep,
-      isAlive: () => true,
-      log: (msg: string) => logs.push(msg),
-    });
-
-    // 4 polls at 60s = 4 minutes elapsed, crossing the 90s reannounce threshold more
-    // than once: the same pid must be logged more than the single first-sight line.
-    expect(logs.filter((l) => l.includes('7777')).length).toBeGreaterThan(1);
-  });
-});
-
-describe('readHolder pid validation (via acquireFullSuiteLock reclaim behavior)', () => {
-  it.each([0, -1, 1.5, Number.NaN])(
-    'treats an unusable holder pid (%s) as corrupt and reclaims immediately',
-    async (badPid) => {
-      fs.writeFileSync(lockPath(), JSON.stringify({ pid: badPid, startedAt: 0 }));
-      let sleepCalls = 0;
-
-      const { release } = await acquireFullSuiteLock({
-        lockDir,
-        lockFileName: LOCK_FILE_NAME,
-        pid: 4242,
-        now: () => 1_000,
-        sleep: () => {
-          sleepCalls++;
-          return Promise.resolve();
-        },
-        // If pid validation is missing, process.kill(0|-1, 0) would read as alive and this
-        // would never be consulted for those two cases; a real isAlive would also never
-        // be asked about a non-integer pid, so returning true here is a conservative
-        // "would incorrectly wait" signal this test proves does NOT happen.
-        isAlive: () => true,
+  it('serializes two concurrent contenders after a holder exits', async () => {
+    const port = await freePort();
+    const first = await acquireFullSuiteLock({ port });
+    const acquired: string[] = [];
+    const contender = (ownerId: string) =>
+      acquireFullSuiteLock({ port, ownerId, pollMs: 5 }).then((lock) => {
+        acquired.push(ownerId);
+        return lock;
       });
+    const secondPromise = contender('second');
+    const thirdPromise = contender('third');
 
-      expect(sleepCalls).toBe(0);
-      expect(JSON.parse(fs.readFileSync(lockPath(), 'utf8')).pid).toBe(4242);
-      release();
-    },
-  );
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    expect(acquired).toEqual([]);
+    await first.release();
+    while (acquired.length === 0) await new Promise((resolve) => setTimeout(resolve, 5));
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    expect(acquired).toHaveLength(1);
+
+    const firstWinner = acquired[0] === 'second' ? await secondPromise : await thirdPromise;
+    await firstWinner.release();
+    const finalOwner = acquired[0] === 'second' ? await thirdPromise : await secondPromise;
+    expect(new Set(acquired)).toEqual(new Set(['second', 'third']));
+    await finalOwner.release();
+  });
+
+  it('logs the real holder identity while waiting, without polling pid liveness', async () => {
+    const port = await freePort();
+    const first = await acquireFullSuiteLock({
+      port,
+      ownerId: 'holder-one',
+      pid: 7777,
+      now: () => 1000,
+    });
+    const logs: string[] = [];
+    let elapsed = 1000;
+    const secondPromise = acquireFullSuiteLock({
+      port,
+      ownerId: 'holder-two',
+      pid: 8888,
+      now: () => elapsed,
+      pollMs: 5,
+      sleep: async (ms) => {
+        elapsed += ms;
+        await new Promise((resolve) => setTimeout(resolve, 1));
+      },
+      log: (message) => logs.push(message),
+    });
+    while (!logs.some((message) => message.includes('pid 7777'))) {
+      await new Promise((resolve) => setTimeout(resolve, 1));
+    }
+    await first.release();
+    const second = await secondPromise;
+    expect(logs.some((message) => message.includes('pid 7777'))).toBe(true);
+    await second.release();
+  });
+
+  it('recovers when the owning process dies even if its reported pid belongs to a live process', async () => {
+    const port = await freePort();
+    const source = `
+      const { acquireFullSuiteLock } = await import(${JSON.stringify(lockModuleUrl)});
+      await acquireFullSuiteLock({
+        port: ${port},
+        pid: ${process.pid},
+        ownerId: 'doomed-owner'
+      });
+      console.log('owned');
+      setInterval(() => {}, 1000);
+    `;
+    const owner = spawn(process.execPath, ['--input-type=module', '-e', source], {
+      stdio: ['ignore', 'pipe', 'inherit'],
+    });
+    if (owner.stdout === null) throw new Error('expected owner stdout');
+    await waitForLine(owner.stdout, 'owned');
+    owner.kill('SIGKILL');
+    await new Promise<void>((resolve) => owner.once('close', () => resolve()));
+
+    // The pid written into the dead owner's protocol response is this still-live
+    // Vitest process. Socket ownership, not numeric pid identity, decides recovery.
+    const recovered = await acquireFullSuiteLock({ port, pollMs: 5 });
+    expect(process.kill(process.pid, 0)).toBe(true);
+    await recovered.release();
+  });
+
+  it('falls open instead of blocking behind an unrelated loopback service', async () => {
+    const port = await freePort();
+    const foreign = net.createServer((socket) => socket.end('not a gate lock\n'));
+    await new Promise<void>((resolve) =>
+      foreign.listen({ host: DEFAULT_LOCK_HOST, port }, resolve),
+    );
+    const logs: string[] = [];
+    const lock = await acquireFullSuiteLock({
+      port,
+      pollMs: 1,
+      identifyTimeoutMs: 50,
+      sleep: async () => {},
+      log: (message) => logs.push(message),
+    });
+    expect(logs.some((message) => message.includes('not a World of Claudecraft'))).toBe(true);
+    await lock.release();
+    await new Promise<void>((resolve) => foreign.close(() => resolve()));
+  });
+
+  it('keeps the bounded wait fallback for a genuine long-running holder', async () => {
+    const port = await freePort();
+    const first = await acquireFullSuiteLock({ port, now: () => 0 });
+    let elapsed = 0;
+    const logs: string[] = [];
+    const second = await acquireFullSuiteLock({
+      port,
+      now: () => elapsed,
+      pollMs: 1000,
+      maxWaitMs: 5000,
+      sleep: async (ms) => {
+        elapsed += ms;
+      },
+      log: (message) => logs.push(message),
+    });
+    expect(logs.some((message) => message.includes('waited over'))).toBe(true);
+    await second.release();
+    await first.release();
+  });
+
+  it('opts out without binding the port or disturbing a real holder', async () => {
+    const port = await freePort();
+    const first = await acquireFullSuiteLock({ port });
+    const optedOut = await acquireFullSuiteLock({ port, optOut: true });
+    await optedOut.release();
+    let contenderAcquired = false;
+    const contenderPromise = acquireFullSuiteLock({ port, pollMs: 5 }).then((lock) => {
+      contenderAcquired = true;
+      return lock;
+    });
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(contenderAcquired).toBe(false);
+    await first.release();
+    const contender = await contenderPromise;
+    await contender.release();
+  });
 });
 
 describe('gate.mjs wiring pin', () => {
-  it('imports the lock and locks only the full-suite step, releasing in a finally', () => {
+  it('locks only the full-suite step and awaits release in a finally', () => {
     expect(gate).toContain("import { acquireFullSuiteLock } from './lib/gate_lock.mjs'");
-    expect(gate).toContain('FULL_SUITE_STEP_NAME');
-    expect(gate).toContain('acquireFullSuiteLock');
+    expect(gate).toContain("import { runGateChild } from './lib/gate_child.mjs'");
     expect(gate).toMatch(/locked\s*=\s*name === FULL_SUITE_STEP_NAME/);
-    expect(gate).toMatch(/finally\s*{\s*release\(\);?\s*}/);
+    expect(gate).toMatch(/locked\s*\? await runGateChild/);
+    expect(gate).toMatch(/finally\s*{\s*await release\(\);?\s*}/);
   });
 
   it('reads GATE_NO_LOCK as the opt-out and announces it', () => {
@@ -486,13 +212,9 @@ describe('gate.mjs wiring pin', () => {
   });
 });
 
-// DEFAULT_MAX_WAIT_MS is exercised above only through injected small values; this just
-// pins that the shipped default is meaningfully bounded (well under DEFAULT_STALE_MS,
-// so a stuck wait cannot silently ride the full 3-hour staleness ceiling) and generous
-// (comfortably above the multi-worktree contention wall clock this issue measured).
 describe('DEFAULT_MAX_WAIT_MS', () => {
-  it('sits well under the staleness ceiling and well over a realistic contended wait', () => {
-    expect(DEFAULT_MAX_WAIT_MS).toBeLessThan(DEFAULT_STALE_MS);
-    expect(DEFAULT_MAX_WAIT_MS).toBeGreaterThan(30 * 60 * 1000); // > 30 minutes
+  it('is generous for a real suite but remains bounded', () => {
+    expect(DEFAULT_MAX_WAIT_MS).toBeGreaterThan(30 * 60 * 1000);
+    expect(DEFAULT_MAX_WAIT_MS).toBeLessThanOrEqual(60 * 60 * 1000);
   });
 });

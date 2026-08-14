@@ -22,6 +22,7 @@
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import { cwd } from 'node:process';
+import { runGateChild } from './lib/gate_child.mjs';
 import { acquireFullSuiteLock } from './lib/gate_lock.mjs';
 import { resolveAvailableMemoryBytes } from './lib/gate_memory.mjs';
 import { runGatePreflights } from './lib/gate_preflight.mjs';
@@ -106,12 +107,14 @@ for (const { name, cmd, args, hint, env: envOverlay } of steps) {
   const locked = name === FULL_SUITE_STEP_NAME;
   const { release } = locked
     ? await acquireFullSuiteLock({ optOut: noLock })
-    : { release: () => {} };
+    : { release: async () => {} };
   let res;
   try {
-    res = spawnSync(cmd, args, { stdio: 'inherit', env, shell });
+    res = locked
+      ? await runGateChild(cmd, args, { stdio: 'inherit', env, shell })
+      : spawnSync(cmd, args, { stdio: 'inherit', env, shell });
   } finally {
-    release();
+    await release();
   }
   if (res.status !== 0) {
     console.error(`\n[gate] FAIL at "${name}" (exit ${res.status ?? 'killed'})`);
