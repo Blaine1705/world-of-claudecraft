@@ -488,13 +488,20 @@ function compactPrewarmSummary(value: unknown): Record<string, unknown> | null {
 // client's report is stored without a hollow block that a reader would have to
 // tell apart from a lane that genuinely did nothing.
 const PREWARM_RESUME_ENTRIES_MAX = 24;
+// Mirrors PrewarmResumeStatus / PrewarmResumeEntryOutcome['lane'] in
+// src/render/prewarm_resume_ledger_core.ts. server/ cannot import src/render,
+// so this is a deliberate copy, the same pattern as CROWD_BUCKET_LABELS above.
+const PREWARM_RESUME_STATUSES = ['none', 'scheduled', 'done', 'failed'] as const;
+const PREWARM_RESUME_LANES = ['debt', 'cosmetic'] as const;
 
 function sanitizePrewarmResume(value: unknown): Record<string, unknown> | null {
   if (!isRecord(value)) return null;
   const entries = Array.isArray(value.entries) ? value.entries : [];
   const failedUnitIds = Array.isArray(value.failedUnitIds) ? value.failedUnitIds : [];
   return {
-    status: textIn(value.status, 16),
+    // Enums, so an allowlist rather than 16 free characters: a client cannot
+    // store a status a reader would then have to guess the meaning of.
+    status: choiceIn(value.status, PREWARM_RESUME_STATUSES, 'none'),
     plannedEntries: intIn(value.plannedEntries, 0, 1000, 0),
     plannedUnits: intIn(value.plannedUnits, 0, 100_000, 0),
     startedUnits: intIn(value.startedUnits, 0, 100_000, 0),
@@ -508,7 +515,7 @@ function sanitizePrewarmResume(value: unknown): Record<string, unknown> | null {
       .filter(isRecord)
       .map((entry) => ({
         id: textIn(entry.id, 80),
-        lane: textIn(entry.lane, 16),
+        lane: choiceIn(entry.lane, PREWARM_RESUME_LANES, 'cosmetic'),
         planned: intIn(entry.planned, 0, 100_000, 0),
         started: intIn(entry.started, 0, 100_000, 0),
         failed: intIn(entry.failed, 0, 100_000, 0),
@@ -556,6 +563,17 @@ function rawSummary(value: unknown, devTraceAllowed = false): Record<string, unk
     const gpuQueue = sanitizeGpuQueueSummary(parsed.rendererGpuQueue);
     if (gpuQueue) parsed.rendererGpuQueue = gpuQueue;
     else delete parsed.rendererGpuQueue;
+    // The prewarm summary rides through verbatim on this path, bounded only by
+    // the body cap, so its client-supplied LISTS are bounded here explicitly.
+    // Without this the resume block's entries and failed-unit ids reach storage
+    // unclamped on every report under the size limit, and the compact path's
+    // sanitizer only ever sees the oversized minority.
+    const prewarm = parsed.rendererPrewarmSummary;
+    if (isRecord(prewarm)) {
+      const resume = sanitizePrewarmResume(prewarm.resume);
+      if (resume) prewarm.resume = resume;
+      else delete prewarm.resume;
+    }
     const boundedText = JSON.stringify(parsed);
     const maxBytes = devTraceAllowed ? RAW_SUMMARY_DEV_TRACE_MAX_BYTES : RAW_SUMMARY_MAX_BYTES;
     if (Buffer.byteLength(boundedText) > maxBytes) {
@@ -697,8 +715,12 @@ export const perfReportInternalsForTest = {
   GPU_QUEUE_RAW_MS_MAX,
   GPU_QUEUE_RAW_AGE_MS_MAX,
   GPU_QUEUE_RAW_STALLS_MAX,
+  GPU_QUEUE_RAW_SLOWEST_MAX,
   GPU_QUEUE_RAW_TAILS_MAX,
   GPU_QUEUE_RAW_LANES_MAX,
   GPU_QUEUE_RAW_WAITS_MAX,
   GPU_QUEUE_RAW_WINDOW_MS_MAX,
+  PREWARM_RESUME_ENTRIES_MAX,
+  PREWARM_RESUME_STATUSES,
+  PREWARM_RESUME_LANES,
 };

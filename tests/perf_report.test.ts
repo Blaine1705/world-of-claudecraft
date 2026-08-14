@@ -764,10 +764,14 @@ describe('perf report ingestion', () => {
       GPU_QUEUE_RAW_MS_MAX,
       GPU_QUEUE_RAW_AGE_MS_MAX,
       GPU_QUEUE_RAW_STALLS_MAX,
+      GPU_QUEUE_RAW_SLOWEST_MAX,
       GPU_QUEUE_RAW_TAILS_MAX,
       GPU_QUEUE_RAW_LANES_MAX,
       GPU_QUEUE_RAW_WAITS_MAX,
       GPU_QUEUE_RAW_WINDOW_MS_MAX,
+      PREWARM_RESUME_ENTRIES_MAX,
+      PREWARM_RESUME_STATUSES,
+      PREWARM_RESUME_LANES,
     } = perfReportInternalsForTest;
     // The frame-cost fields ride here too. This sanitizer REBUILDS the block
     // from a fixed key set rather than filtering it, so a client field the
@@ -892,6 +896,15 @@ describe('perf report ingestion', () => {
               settled: 'yes',
             })),
             slowest: 'not-an-array',
+            blockiest: Array.from({ length: 20 }, () => ({
+              label: 'b'.repeat(200),
+              priority: 10,
+              syncMs: 1,
+              wallMs: 1,
+              waitMs: 1,
+              frameGapMs: 1,
+              sharedFrameGap: 1,
+            })),
             // Sized to overrun every bound (12 > 8 waits, 8 > 4 tails, 100 > 80
             // label chars) while staying under the request body cap.
             longestWaits: Array.from({ length: 12 }, () => ({
@@ -947,11 +960,18 @@ describe('perf report ingestion', () => {
     // hostile payload cannot turn the fixed-size lane readout into a list.
     const hostileRecent = hostileQueue.recent as Record<string, unknown>;
     expect(hostileRecent.units).toBe(0);
+    // Pinned to the LITERAL as well: comparing the output against the constant
+    // the sanitizer clamps with passes at any value, including one that removes
+    // the bound entirely.
+    expect(GPU_QUEUE_RAW_WINDOW_MS_MAX).toBe(600_000);
+    expect(GPU_QUEUE_RAW_AGE_MS_MAX).toBe(1_800_000);
     expect(hostileRecent.windowMs).toBe(GPU_QUEUE_RAW_WINDOW_MS_MAX);
     expect(hostileRecent.worstWaitMs).toBe(GPU_QUEUE_RAW_AGE_MS_MAX);
     // The wait ranking is bounded and shaped like everything else here. Note
     // blockedBy is NULLABLE by design: a wait with nothing running points at the
     // tail cap, and coercing that to a string would invent a culprit.
+    expect(hostileQueue.blockiest).toHaveLength(GPU_QUEUE_RAW_SLOWEST_MAX);
+    expect(GPU_QUEUE_RAW_SLOWEST_MAX).toBe(8);
     expect(GPU_QUEUE_RAW_WAITS_MAX).toBe(8);
     expect(hostileQueue.longestWaits).toHaveLength(GPU_QUEUE_RAW_WAITS_MAX);
     const hostileWait = (hostileQueue.longestWaits as Record<string, unknown>[])[0];
@@ -967,6 +987,59 @@ describe('perf report ingestion', () => {
     // A block missing entirely is still shaped, never absent: a reader that
     // has to feature-detect the interval arm cannot compare two reports.
     expect(hostileQueue.worstWaitMs).toBe(0);
+
+    // The resume block, on the NORMAL ingest path. It had no test at all: the
+    // claim "every new field is clamped" was unproven for this whole function,
+    // and its sanitizer was only reachable from the oversized-report fallback,
+    // so a hostile client could store unbounded lists on every ordinary report.
+    vi.mocked(insertClientPerfReport).mockClear();
+    const hostileResume = fakeRes();
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'prewarm-resume-hostile',
+        rawSummary: {
+          rendererPrewarmSummary: {
+            manifestPlanned: 30,
+            resume: {
+              status: 'totally-made-up',
+              plannedEntries: 9e9,
+              plannedUnits: -4,
+              startedUnits: 'nope',
+              failedUnits: 9e12,
+              failedUnitIds: Array.from({ length: 40 }, () => 'f'.repeat(400)),
+              entries: Array.from({ length: 40 }, (_unused, index) => ({
+                id: 'e'.repeat(200),
+                lane: index === 0 ? 'debt' : 'invented-lane',
+                planned: 9e12,
+                started: -1,
+                failed: 'many',
+              })),
+            },
+          },
+        },
+      }),
+      hostileResume,
+    );
+    expect(hostileResume.statusCode).toBe(200);
+    const resumeRow = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    const storedResume = (
+      (resumeRow.rawSummary as Record<string, Record<string, unknown>>)
+        .rendererPrewarmSummary as Record<string, unknown>
+    ).resume as Record<string, unknown>;
+    expect(PREWARM_RESUME_ENTRIES_MAX).toBe(24);
+    expect(storedResume.entries).toHaveLength(PREWARM_RESUME_ENTRIES_MAX);
+    expect(storedResume.failedUnitIds).toHaveLength(PREWARM_RESUME_ENTRIES_MAX);
+    expect((storedResume.failedUnitIds as string[])[0]).toHaveLength(160);
+    // status and lane are enums, so an invented value falls back rather than
+    // storing 16 characters a reader would have to guess the meaning of.
+    expect(storedResume.status).toBe('none');
+    expect(PREWARM_RESUME_STATUSES).toContain('done');
+    const storedEntries = storedResume.entries as Record<string, unknown>[];
+    expect(storedEntries[0]).toMatchObject({ id: 'e'.repeat(80), lane: 'debt' });
+    expect(storedEntries[1].lane).toBe('cosmetic');
+    expect(storedEntries[0].planned).toBe(100_000);
+    expect(storedEntries[0].started).toBe(0);
+    expect(PREWARM_RESUME_LANES).toEqual(['debt', 'cosmetic']);
 
     // A malformed block is dropped rather than stored half-shaped.
     vi.mocked(insertClientPerfReport).mockClear();

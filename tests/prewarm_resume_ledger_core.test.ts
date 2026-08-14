@@ -84,6 +84,35 @@ describe('prewarm resume ledger', () => {
     expect(stats.failedUnits).toBe(4);
   });
 
+  it('reads LIVE through a getter, so a spread cannot freeze it at scheduled', () => {
+    // The resume lane is fire-and-forget: it settles long after the stats
+    // object is built, which is why RendererPrewarmStats.resume is a getter.
+    // Nothing else in the suite fails if a future contributor writes
+    // `{ ...stats }` on the way to the beacon, and the symptom would be a
+    // plausible-looking `scheduled` row forever rather than a crash.
+    const ledger = createPrewarmResumeLedger();
+    ledger.schedule([entry('programs.compile', ['a'])], isDebt);
+    const stats = {
+      get resume() {
+        return ledger.stats();
+      },
+    };
+    expect(stats.resume.status).toBe('scheduled');
+    ledger.noteStart('programs.compile');
+    ledger.finish(true);
+    // Live read: the same object now reports the settled lane.
+    expect(stats.resume.status).toBe('done');
+    expect(stats.resume.startedUnits).toBe(1);
+    // Serialisation must invoke it, because the beacon is JSON.
+    expect(JSON.parse(JSON.stringify(stats)).resume.status).toBe('done');
+    // A spread is what breaks it, and it breaks it silently: the copy keeps
+    // whatever the lane happened to have done at that instant.
+    const frozen = { ...stats };
+    ledger.schedule([entry('textures.scene', ['b'])], isDebt);
+    expect(stats.resume.plannedEntries).toBe(2);
+    expect(frozen.resume.plannedEntries).toBe(1);
+  });
+
   it('hands back copies, so a reader cannot mutate the ledger', () => {
     const ledger = createPrewarmResumeLedger();
     ledger.schedule([entry('programs.compile', ['a'])], isDebt);

@@ -8,28 +8,22 @@
 // cancellation (graphics rebuild destroys the target contexts mid-schedule).
 // The Hud composes it with real thunks; a Vitest drives it with fakes.
 //
-// The ARMORY catalog is deliberately NOT in this plan any more. Measured, its
-// warming was per-CONTEXT GPU program setup: about 2.1 to 2.6 s of live-frame
-// hitches that every online session paid whether or not the player ever opened
-// the store, buying nothing but the store's own first inspect (GPU program
-// caches do not cross a WebGL context). It is intent-driven now: the store
-// window needs none of it (measured: warming the armory moved a cold store open
-// 530.9 ms to 522.8 ms, i.e. not at all), and the lazy per-card path already
-// builds exactly what one inspected card needs.
+// The ARMORY catalog is deliberately NOT in this plan, and is warmed NOWHERE
+// ahead of time: the store's card list needs none of it (measured, warming the
+// whole armory moved a cold store open 530.9 ms to 522.8 ms, i.e. not at all),
+// and the lazy per-card path builds exactly what one inspected card needs, on
+// the click that opens it. A store-open warm was tried and removed because it
+// measured worse.
 //
-// The cost was also positional rather than per skin: the first unit to DRAW paid
-// about 0.9 s and the first unit with a VFX rig about 0.6 s, while 24 of the 29
-// skins cost the live frame nothing at all. So this is not a case where a
-// gentler schedule was available. Evidence and the refutations along the way:
-// tmp/armory-prewarm-measurement.md, rounds 2 to 4.
+// Measured, the warming was per-CONTEXT GPU program setup: about 2.1 to 2.6 s of
+// live-frame hitches every online session paid whether or not the player ever
+// opened the store, buying nothing but the store's own first inspect (GPU
+// program caches do not cross a WebGL context). The cost was also POSITIONAL
+// rather than per skin, so no gentler schedule was available.
 //
-// Known trade, accepted and unmeasured: the character-mode units also populated
-// process-wide CPU caches (parsed GLBs, material and derived-emissive caches)
-// that the world renderer reads when it first sights a remote player wearing a
-// skin. That warming is gone with them, so those costs move to first sighting,
-// a few to seventy milliseconds each and only for skins actually seen. The
-// world's own weapon-skin program warming is a separate entry in the renderer's
-// entry manifest (`vfx.weapon-skins`) and is unaffected.
+// Full evidence, the refutations along the way, and the accepted unmeasured
+// trade (the CPU caches the world renderer also reads):
+// docs/design/armory-preview-warming.md.
 
 /** Which owning surface a unit's pause key watches. `armory` carries no PLANNED
  *  unit any more (see the header), but the pause-by-family mechanism is generic
@@ -101,9 +95,9 @@ export interface PreviewPrewarmPlanDeps<Pose> {
  *  preview per skin, the player-card poses, both portrait framings for every
  *  class (chips use headshots while Inspect uses a full-body portrait, so
  *  warming only the former still leaves a synchronous WebGL readback + PNG
- *  encode on the first inspected player). NO Armory units: that catalog is
- *  warmed on store intent now, not on a schedule (see the header). Each entry is
- *  one bounded GPU unit the renderer's background lane paces.
+ *  encode on the first inspected player). NO Armory units: that catalog is not
+ *  warmed ahead of time at all, it is built per inspected card (see the header).
+ *  Each entry is one bounded GPU unit the renderer's background lane paces.
  *  `deps.includeCharFamily` gates the shell/skin/pose units only; see its doc
  *  on `PreviewPrewarmPlanDeps`. */
 export function buildPostEntryPreviewPrewarmUnits<Pose>(

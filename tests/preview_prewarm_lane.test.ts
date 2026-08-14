@@ -12,7 +12,6 @@ function harness() {
   const calls: RunCall[] = [];
   const order: string[] = [];
   let idleSlots = 0;
-  const gates = new Map<string, () => void>();
   const lane = createPreviewPrewarmLane({
     idleSlot: () => {
       idleSlots++;
@@ -26,7 +25,7 @@ function harness() {
       });
     },
   });
-  return { lane, calls, order, gates, idleSlots: () => idleSlots };
+  return { lane, calls, order, idleSlots: () => idleSlots };
 }
 
 describe('preview prewarm lane', () => {

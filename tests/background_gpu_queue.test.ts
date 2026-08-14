@@ -290,6 +290,69 @@ describe('createBackgroundGpuQueue', () => {
     expect(wait?.tails).toEqual(['preview:armory:skin']);
   });
 
+  it('blames nothing when the queue was idle, rather than a unit that long since finished', async () => {
+    // The null branch of blockedBy is the one that says "you waited on the cap
+    // or on a scheduling hop, not behind a holder". Without resetting the
+    // holder when the queue drains it is unreachable after the first unit of
+    // the session, and the readout accuses a unit that settled arbitrarily long
+    // ago: a diagnostic naming an innocent unit, inside the tool built to stop
+    // exactly that.
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    await queue.run(
+      () => {
+        clock += 5;
+      },
+      GPU_WORK_PRIORITY.BACKGROUND,
+      'long-gone',
+    );
+    await flush();
+    // The queue is idle now. A later arrival that still measures a wait (a
+    // scheduling hop a long task stretched) waited on nothing this queue holds.
+    const pending = queue.run(() => {}, GPU_WORK_PRIORITY.ACTIONABLE_VIEW, 'late-gate');
+    clock += 40;
+    await pending;
+    const wait = queue.stats().longestWaits.find((entry) => entry.label === 'late-gate');
+    expect(wait).toBeDefined();
+    expect(wait?.blockedBy).toBeNull();
+    expect(wait?.blockedByPriority).toBeNull();
+  });
+
+  it('charges only the FIRST unit of a frameless burst as unshared', async () => {
+    // The limitation, pinned at its real shape rather than the alarming
+    // version. overlappingUnits resets only in noteFrame, so units passing
+    // between two frames count their predecessors: the first is clean, every
+    // later one is marked shared. worstUnsharedFrameGapMs therefore reports the
+    // FIRST unit of a burst, which is rarely the worst one. That matters
+    // because world entry, where the prewarm hitches live, is exactly such a
+    // burst.
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    queue.noteFrame(0);
+    // Growing costs, so the worst unit is the LAST one and the unshared arm
+    // demonstrably does not report it.
+    for (const cost of [20, 40, 80, 160]) {
+      await queue.run(
+        () => {
+          clock += cost;
+        },
+        GPU_WORK_PRIORITY.BOOT_DEBT,
+        `boot:${cost}`,
+      );
+    }
+    clock += 100;
+    queue.noteFrame(clock);
+    const stats = queue.stats();
+    const first = stats.blockiest.find((unit) => unit.label === 'boot:20');
+    const worst = stats.blockiest.find((unit) => unit.label === 'boot:160');
+    expect(first?.sharedFrameGap).toBe(1);
+    expect(worst?.sharedFrameGap).toBeGreaterThan(1);
+    // The clean arm reports the first unit, not the worst: 20 ms against the
+    // 160 ms one that actually dominated.
+    expect(stats.worstUnsharedFrameGapMs).toBe(20);
+    expect(stats.worstFrameGapMs).toBeGreaterThan(stats.worstUnsharedFrameGapMs);
+  });
+
   it('keeps units granted immediately out of the wait ranking', async () => {
     let clock = 0;
     const queue = createBackgroundGpuQueue({ now: () => clock });
@@ -1196,6 +1259,16 @@ describe('createBackgroundGpuQueue', () => {
     // reports frameGapMs 0 and an empty blockiest, which reads as "the lane cost
     // no frames" rather than as "nobody measured". Nothing else in the suite can
     // see that, because every behavior test drives noteFrame by hand.
+    // The resume ledger's `started` means "handed to the queue", not "finished".
+    // That semantic lives ONLY at the call site: move noteStart into the unit's
+    // completion continuation and the counter silently inverts its meaning while
+    // every unit test stays green, because the ledger itself is just arithmetic.
+    const runUnit = initial.slice(initial.indexOf('runUnit: (unit, entry) => {'));
+    const noteAt = runUnit.indexOf('resumeLedger.noteStart(entry.id);');
+    const runAt = runUnit.indexOf('return this.backgroundGpuWork.run(');
+    expect(noteAt).toBeGreaterThan(-1);
+    expect(runAt).toBeGreaterThan(noteAt);
+
     const sync = method('  sync(\n', '\n    const frameStats = this.lastFrameStats;');
     expect(sync).toContain('this.backgroundGpuWork.noteFrame(');
     // After the shutdown guard: a torn-down renderer must stop the frame clock

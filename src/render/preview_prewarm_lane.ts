@@ -10,8 +10,18 @@
 // coordinator held to a line ceiling. It is a lane, not a framework: an
 // intent-driven second entry point was written here and REMOVED once measurement
 // showed the warming it served did not reduce anything (see
-// tmp/armory-prewarm-measurement.md, round 5). Do not reintroduce one
-// speculatively; add it when a caller has a measurement behind it.
+// docs/design/armory-preview-warming.md). Do not reintroduce one speculatively;
+// add it when a caller has a measurement behind it.
+//
+// The releaseTail below is a KNOWN misdeclaration, kept deliberately and named
+// here so the next reader does not take it for a considered choice. A preview
+// unit does real main-thread work in its tail (uploads, a composer draw), so
+// "dominated by an off-thread wait" is false for it, and a released tail still
+// holds a cap slot while the drain loop refuses to start anything. Two such
+// units can therefore delay a live gate. It is retained because holding the
+// tail instead trades one bound for another and nobody has measured which is
+// worse; the queue's grant-latency readout (waitedOnTailCap) is what would
+// settle it.
 
 import { GPU_WORK_PRIORITY, type GpuWorkRunOptions } from './background_gpu_queue';
 

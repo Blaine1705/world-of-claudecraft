@@ -176,12 +176,21 @@ export interface GpuWorkWaitStat {
    *  was pending. This is the mechanism a released tail can delay a live gate
    *  with while claiming to have freed the queue: releasing the tail frees the
    *  serial slot but still occupies a cap slot, and the loop refuses to START
-   *  anything while the cap is full. */
+   *  anything while the cap is full.
+   *
+   *  UNDER-reports, deliberately and worth knowing: the park counter is read at
+   *  ENQUEUE, so a unit that arrives while the loop is ALREADY parked, and is
+   *  released by that same park, sees no counter advance and reports false
+   *  despite having genuinely waited on the cap. False here means "no park
+   *  began during my wait", never "the cap did not delay me". */
   waitedOnTailCap: boolean;
   /** The tails that HELD the cap, captured when the loop parked on it, not when
    *  the wait ended: by then the blocker has left by definition, so reading the
    *  set at grant time returns the tails that did not block anything. Empty
-   *  unless `waitedOnTailCap`. Bounded by the tail limit. */
+   *  unless `waitedOnTailCap`. Bounded by the tail limit.
+   *
+   *  It is the MOST RECENT park's occupants, one global snapshot, so a wait that
+   *  spanned two different parks is attributed the second one's tails only. */
   tails: string[];
 }
 
@@ -202,7 +211,16 @@ export interface BackgroundGpuQueueStats {
    *  attribution readout should watch: the shared one rises whenever anything
    *  at all stalls a frame while any unit happens to be in flight, so a diff
    *  built on it prints a queue dimension moving for hitches the queue did not
-   *  cause, inside the very tool used to find the cause. */
+   *  cause, inside the very tool used to find the cause.
+   *
+   *  Its BLIND SPOT, stated because the rest of these docs are careful about
+   *  what a number cannot tell you: `overlappingUnits` only resets in
+   *  noteFrame, so in a BURST with no frame between units (world entry, which
+   *  is where the prewarm hitches live) only the FIRST unit is charged
+   *  unshared; every later one counts its predecessors and is marked shared.
+   *  So this field reports the first unit of a burst, which is rarely the worst
+   *  one. It is not inert there, but it is not a ranking either: read
+   *  `blockiest` with its trio. Pinned by the boot-burst case in the suite. */
   worstUnsharedFrameGapMs: number;
   /** Slowest units by sync slice, worst first, bounded. */
   slowest: GpuWorkUnitStat[];
@@ -587,6 +605,14 @@ export function createBackgroundGpuQueue(opts?: {
       }
     }
     active = false;
+    // Nothing holds the queue any more, so the next unit to wait waited on the
+    // TAIL CAP or on a scheduling hop, not on a holder. Without this reset the
+    // null branch of blockedBy is unreachable after the first unit of the
+    // session and the readout names a unit that settled arbitrarily long ago:
+    // a diagnostic accusing an innocent unit, inside the tool built to stop
+    // exactly that.
+    lastHolderLabel = null;
+    lastHolderPriority = null;
     // A run() call can land after the loop observes an empty queue but before
     // this async continuation clears active. Start another drain in that case.
     if (pending.length > 0) scheduleDrain();
