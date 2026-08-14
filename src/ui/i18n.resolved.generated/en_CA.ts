@@ -9833,7 +9833,7 @@ export const en_CA: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Stonebound Weapon",
-        "description": "Imbue your weapon for 30 min. Each swing deals {damage} extra damage. Warspirit also gains 40% armor and 20% Stamina, takes 15% less damage, is immune to critical strikes from creatures, and generates two and a half times as much threat. Earthen Jolt forces its target to attack you for 3 sec, and Thunder Ward grants 10% damage reduction for 3 sec."
+        "description": "Imbue your weapon for 30 min. Each swing deals {damage} extra damage. Warspirit also gains 40% armor and 20% Stamina, takes 15% less damage, is immune to critical strikes from creatures, and generates two and three quarter times as much threat. Earthen Jolt forces its target to attack you for 3 sec, and Thunder Ward grants 10% damage reduction for 3 sec."
       },
       "healing_wave": {
         "name": "Mending Waters",

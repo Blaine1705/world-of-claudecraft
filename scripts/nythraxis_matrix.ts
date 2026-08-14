@@ -856,17 +856,31 @@ function sharedTankMainhandScore(item: ItemDef): number {
   return weaponDps * 1000 + (stats.sta ?? 0) * 100 + (stats.str ?? 0) * 25;
 }
 
-function sharedTankCandidates(slot: ItemDef['slot']): ItemDef[] {
+// The tank kit for ONE class: the best stamina-first item it can actually wear
+// in each slot. Passing no class yields the warrior-and-paladin intersection,
+// which is the shared reference kit reported as `sharedTankGear`.
+//
+// Every boss tank gears through this one rule. It used to be shared-kit for the
+// plate/mail tanks and a generic 8-slot dps-ish score for the druid, which left
+// the bear with no neck, no rings and no offhand (28 stamina of accessories it
+// can wear) and made it read as the smallest pool in the harness purely as a
+// gearing artifact.
+function tankCandidates(slot: ItemDef['slot'], cls?: PlayerClass): ItemDef[] {
+  // A shield is the tank offhand only for classes that can hold one; a druid
+  // tanks with a held offhand instead, so requiring blockValue would silently
+  // drop the slot for it.
+  const wantsShield = cls === undefined || cls === 'warrior' || cls === 'paladin';
   return Object.values(ITEMS)
     .filter(
       (item) =>
         item.slot === slot &&
         !isNythraxisDrop(item) &&
         (item.requiredLevel ?? 1) <= 20 &&
-        canEquipItem('warrior', item) &&
-        canEquipItem('paladin', item) &&
+        (cls === undefined
+          ? canEquipItem('warrior', item) && canEquipItem('paladin', item)
+          : canEquipItem(cls, item)) &&
         (slot !== 'mainhand' || (item.kind === 'weapon' && weaponHand(item) !== 'twohand')) &&
-        (slot !== 'offhand' || (item.blockValue ?? 0) > 0),
+        (slot !== 'offhand' || !wantsShield || (item.blockValue ?? 0) > 0),
     )
     .sort(
       (a, b) =>
@@ -874,6 +888,10 @@ function sharedTankCandidates(slot: ItemDef['slot']): ItemDef[] {
           ? sharedTankMainhandScore(b) - sharedTankMainhandScore(a)
           : sharedTankScore(b) - sharedTankScore(a)) || a.id.localeCompare(b.id),
     );
+}
+
+function sharedTankCandidates(slot: ItemDef['slot']): ItemDef[] {
+  return tankCandidates(slot);
 }
 
 const SHARED_TANK_SINGLE_SLOTS: ItemDef['slot'][] = [
@@ -901,31 +919,28 @@ function sharedTankGearIds(): string[] {
 }
 
 function equipSharedTankGear(sim: Sim, pid: number, cls: PlayerClass): void {
-  // Warrior and paladin take the head of each shared list; the Stonebound
-  // shaman takes the best entry it can actually equip (production shaman tanks
-  // wear the same mail kit, but the weapon families differ per class).
+  // Every boss tank fills the same twelve slots with the best stamina-first
+  // item its own class can wear. The plate and mail tanks converge on one
+  // identical kit (they share the armor tier); the druid lands on leather with
+  // the same neck and rings, which is the comparison the study wants.
   for (const slot of SHARED_TANK_SINGLE_SLOTS) {
-    const item = sharedTankCandidates(slot).find((candidate) => canEquipItem(cls, candidate));
+    const item = tankCandidates(slot, cls)[0];
     if (!item) continue;
     sim.addItem(item.id, 1, pid);
     // Equip by explicit slot: a dual-wield-capable tank (the Stonebound
     // shaman) would otherwise route its mainhand pick into the empty offhand.
     sim.equipItemToSlot(item.id, slot as EquipSlot, pid);
   }
-  for (const [index, ring] of sharedTankCandidates('ring')
-    .filter((candidate) => canEquipItem(cls, candidate))
-    .slice(0, 2)
-    .entries()) {
+  for (const [index, ring] of tankCandidates('ring', cls).slice(0, 2).entries()) {
     sim.addItem(ring.id, 1, pid);
     sim.equipItemToSlot(ring.id, `ring${index + 1}` as EquipSlot, pid);
   }
 }
 
 function equipBest(sim: Sim, pid: number, spec: Spec) {
-  if (
-    spec.kind === 'tank' &&
-    (spec.cls === 'warrior' || spec.cls === 'paladin' || spec.cls === 'shaman')
-  ) {
+  // Every tank row gears through the one tank rule, boss tank or off-tank, the
+  // druid included (it used to fall through to the generic 8-slot path).
+  if (spec.kind === 'tank') {
     equipSharedTankGear(sim, pid, spec.cls);
     if (spec.key === 'stonebound_shaman') {
       // Production Stonebound tanks dual-wield (gravewyrm_cleaver in both

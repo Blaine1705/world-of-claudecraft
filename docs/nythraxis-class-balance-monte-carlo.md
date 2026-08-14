@@ -397,23 +397,34 @@ in-harness raid kits; the BiS-stamina parity frame (`tests/tank_parity.test.ts`)
 warrior 2592/3097 EHP 6809, paladin 2498/3264 EHP 6090, bear 2603/3609 EHP 6741,
 Stonebound 2173/3745 EHP 6774.
 
-| Tank | Pool | Armor | DTPS n/h | Survival n/h | Threat/s n/h | Biggest heroic hit | DPS n/h |
+| Tank | Pool | Armor | DTPS n/h | Survival n/h | Threat/s n/h | Biggest heroic hit | Heroic ratio |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| Ironguard warrior | 2602 | 2428 | 78 / 171 | 33.2s / 15.2s | 295 / 245 | 1992 (77%) | 38 / 33 |
-| Faithwarden paladin | 2508 | 2537 | 51 / 159 | 49.3s / 15.8s | 317 / 292 | 2135 (85%) | 89 / 70 |
-| Wildfang bear | 2148 | 3765 | 179 / 361 | 12.0s / 5.9s | 263 / 304 | 1968 (92%) | 50 / 43 |
-| Stonebound shaman | 2303 | 2740 | 155 / 397 | 14.9s / 5.8s | 248 / 251 | 1818 (79%) | 80 / 72 |
+| Ironguard warrior | 2602 | 2428 | 76 / 189 | 34.2s / 13.8s | 299 / 276 | 1696 (65%) | 0.93 |
+| Faithwarden paladin | 2508 | 2537 | 52 / 178 | 48.2s / 14.1s | 319 / 296 | 2162 (86%) | 1.00 |
+| Wildfang bear | **2746** | 3580 | 166 / 398 | 16.6s / 6.9s | 283 / 316 | 1993 (73%) | 1.07 |
+| Stonebound shaman | 2303 | 2740 | 158 / 402 | 14.5s / 5.7s | 271 / 255 | 2019 (88%) | 0.86 |
 
-- **The threat gap is closed.** Heroic ratios to the paladin: warrior 0.84, bear 1.04,
-  Stonebound 0.86 (normal: 0.93 / 0.83 / 0.78). The paladin came DOWN (692 to 292 on
+The bear carries the largest raw pool of the four, which is the classic
+big-pool identity this pass set out to restore.
+
+- **The threat gap is closed.** Heroic ratios to the paladin: warrior 0.93, bear 1.07,
+  Stonebound 0.86 (normal: 0.94 / 0.89 / 0.85). The paladin came DOWN (692 to 296 on
   heroic with this kit lineage), nobody was inflated to the old paladin number, and
   flat-threat scaling no longer widens the gap per gear tier.
-- **No tank is one-shot on heroic.** Worst case is the bear at 92% of pool from the
-  biggest observed hit; Stonebound's old literal one-shot (2433 vs a 1733 pool) is
-  gone (1818 vs 2303, with creature crit immunity intact).
+- **No tank is one-shot on heroic.** Worst case is Stonebound at 88% of pool from the
+  biggest observed hit; its old literal one-shot (2433 vs a 1733 pool) is gone
+  (2019 vs 2303, with creature crit immunity intact).
+- **A harness gearing defect was fixed in the same pass, and it mattered.** The druid
+  tank was the only tank not geared through the shared tank rule: it ran an 8-slot
+  generic score with no neck, no rings and no offhand, so it read as the SMALLEST pool
+  (2148) purely as an artifact. Every tank now fills the same twelve slots with the
+  best stamina-first item its own class can wear (`tankCandidates` in
+  `scripts/nythraxis_matrix.ts`). The plate and mail kits are byte-identical to before,
+  so the comparison against the pre-pass baseline still holds; the bear gained 598 HP
+  of accessories it could always wear.
 - **The unresolved tradeoff, stated with numbers:** bear and Stonebound unhealed
-  survival (5.8-5.9s heroic) remains roughly 40% of the warrior/paladin tier (15.2 /
-  15.8s) even after the pool and armor gains, because their intake is structural (no
+  survival (5.7-6.9s heroic) remains roughly half the warrior/paladin tier (13.8 /
+  14.1s) even after the pool and armor gains, because their intake is structural (no
   block, no Raised Guard tier of cooldowns) and the committed-tank EHP band
   (`tests/tank_parity.test.ts`, 0.88-1.08 of the warrior) caps how much pool can
   compensate. Closing it fully means widening that band or new mitigation mechanics:

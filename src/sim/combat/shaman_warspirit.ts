@@ -31,12 +31,12 @@ export const STORMCAST_DURATION = 12;
 // buff_armor_pct / buff_sta_pct store integer percentage points (40 = +40%).
 // v0.38 tank threat/survivability parity pass: armor 30 -> 40, stamina bonus
 // added (was none, the posture had no health component at all), damage
-// reduction 0.1 -> 0.15, threat 2 -> 2.5. Sized so Stonebound effective HP
+// reduction 0.1 -> 0.15, threat 2 -> 2.75. Sized so Stonebound effective HP
 // stays just under the prot warrior ceiling on a best-in-slot stamina kit.
 export const STONEBOUND_ARMOR_BONUS = 40;
 export const STONEBOUND_STAMINA_BONUS = 20;
 export const STONEBOUND_DAMAGE_REDUCTION = 0.15;
-export const STONEBOUND_THREAT_MULTIPLIER = 2.5;
+export const STONEBOUND_THREAT_MULTIPLIER = 2.75;
 export const STONEBOUND_WARD_SMOOTH_REDUCTION = 0.1;
 export const STONEBOUND_WARD_SMOOTH_DURATION = 3;
 export const ELEMENTAL_TRANCE_ID = 'elemental_trance';

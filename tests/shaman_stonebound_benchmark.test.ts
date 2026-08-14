@@ -63,7 +63,7 @@ describe('Stonebound PBE benchmark contract', () => {
     expect(stoneEhp).toBeLessThan(protectionEhp * 0.9);
   });
 
-  it('multiplies damaging-action threat by 2.5 but gives up Galeheart sustained output', () => {
+  it('multiplies damaging-action threat by 2.75 but gives up Galeheart sustained output', () => {
     const gale = enhancement('galeheart');
     const stone = enhancement('stonebound');
     const galeTarget = target(gale.sim, gale.player);
@@ -80,7 +80,7 @@ describe('Stonebound PBE benchmark contract', () => {
       100 * stoneboundThreatMultiplier(stone.sim.ctx, stone.player),
     );
     expect(stoneTarget.threat.get(stone.player.id)).toBe(
-      (galeTarget.threat.get(gale.player.id) ?? 0) * 2.5,
+      (galeTarget.threat.get(gale.player.id) ?? 0) * 2.75,
     );
 
     for (let step = 0; step < 3; step++) {

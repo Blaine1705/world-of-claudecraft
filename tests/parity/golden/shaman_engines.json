@@ -1569,7 +1569,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 968,
-      "state": "3c1ef98c",
+      "state": "28b4ed33",
       "events": "83cff67a",
       "rng": {
         "draws": 1712,
@@ -1580,7 +1580,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 968,
-      "state": "8d4760b8",
+      "state": "982d9937",
       "events": "741638a5",
       "rng": {
         "draws": 1862,
@@ -1591,7 +1591,7 @@
       "tick": 224,
       "time": 11.2,
       "nextId": 968,
-      "state": "592b555f",
+      "state": "533c0ff4",
       "events": "741638a5",
       "rng": {
         "draws": 1892,
@@ -2352,7 +2352,7 @@
             ],
             [
               964,
-              391
+              420
             ]
           ],
           "weapon": {
@@ -2365,7 +2365,7 @@
       "tick": 240,
       "time": 12,
       "nextId": 968,
-      "state": "dc675581",
+      "state": "7cb7c6ee",
       "events": "e4a8a32f",
       "rng": {
         "draws": 2029,
@@ -2376,7 +2376,7 @@
       "tick": 260,
       "time": 13,
       "nextId": 968,
-      "state": "4b37b262",
+      "state": "c463f625",
       "events": "bd36bfcc",
       "rng": {
         "draws": 2176,
@@ -2387,7 +2387,7 @@
       "tick": 280,
       "time": 14,
       "nextId": 968,
-      "state": "29446530",
+      "state": "4d9974bb",
       "events": "bb0df322",
       "rng": {
         "draws": 2338,
@@ -2398,7 +2398,7 @@
       "tick": 300,
       "time": 15,
       "nextId": 968,
-      "state": "e2f30aeb",
+      "state": "65193719",
       "events": "82d18c74",
       "rng": {
         "draws": 2517,
@@ -2409,7 +2409,7 @@
       "tick": 306,
       "time": 15.3,
       "nextId": 968,
-      "state": "1ac97674",
+      "state": "21b8dfa6",
       "events": "741638a5",
       "rng": {
         "draws": 2569,
@@ -3186,7 +3186,7 @@
             ],
             [
               964,
-              846
+              920.5
             ]
           ],
           "weapon": {
@@ -3199,7 +3199,7 @@
       "tick": 306,
       "time": 15.3,
       "nextId": 968,
-      "state": "1ac97674",
+      "state": "21b8dfa6",
       "events": "741638a5",
       "rng": {
         "draws": 2569,
@@ -3976,7 +3976,7 @@
             ],
             [
               964,
-              846
+              920.5
             ]
           ],
           "weapon": {

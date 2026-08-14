@@ -4573,7 +4573,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 3, level: 16, cost: 45, effects: [{ type: 'imbue', bonus: 14, duration: 1800 }] },
     ],
     description:
-      'Imbue your weapon for 30 min. Each swing deals $d extra damage. Warspirit also gains 40% armor and 20% Stamina, takes 15% less damage, is immune to critical strikes from creatures, and generates two and a half times as much threat. Earthen Jolt forces its target to attack you for 3 sec, and Thunder Ward grants 10% damage reduction for 3 sec.',
+      'Imbue your weapon for 30 min. Each swing deals $d extra damage. Warspirit also gains 40% armor and 20% Stamina, takes 15% less damage, is immune to critical strikes from creatures, and generates two and three quarter times as much threat. Earthen Jolt forces its target to attack you for 3 sec, and Thunder Ward grants 10% damage reduction for 3 sec.',
   },
   galeheart_weapon: {
     id: 'galeheart_weapon',
