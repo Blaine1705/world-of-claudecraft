@@ -155,8 +155,11 @@ interface AttributionTargetFixture {
 // both parents move renderer.ts (the release's point-light seam, this branch's
 // moon-phase grade threading), so the merged tree mints a value matching
 // neither parent. No capture was retaken.
+// Re-minted for the Armory warming redesign: the catalog leaves the post-entry
+// schedule and renderer.ts loses its preview-lane policy to
+// src/render/preview_prewarm_lane.ts. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '3c28607bde322259909cfb57b86aa3e4e09e0b0cb9f2c195f8cc86901df4dbad';
+  'ae4cdc3894059c68bbe999b206c6d2d32a10f5f9f3e0a33c8cca2cb1ed163adb';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

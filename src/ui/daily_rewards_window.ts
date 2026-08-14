@@ -1,5 +1,3 @@
-import type { ArmoryPreviewMode, ArmoryPreviewPrewarmOptions } from '../render/armory_preview';
-import { WEAPON_SKIN_LIST } from '../sim/content/weapon_skins';
 import type { PlayerClass, WeaponSkinType } from '../sim/types';
 import type { DailyRewardHistory, DailyRewardStatus, IWorld } from '../world_api';
 import { ArmoryInspect } from './armory_inspect';
@@ -159,33 +157,6 @@ export class DailyRewardsWindow {
       return;
     }
     void this.renderCurrent('open');
-  }
-
-  /** Prebuild the store's persistent Armory context while a curtain hides it. */
-  async prewarmArmoryPreview(): Promise<void> {
-    await this.prewarmArmoryPreviewSkins(this.armoryPrewarmSkinIds());
-  }
-
-  /** The full catalog the post-entry prewarm schedule walks, one id per unit. */
-  armoryPrewarmSkinIds(): string[] {
-    if (!this.storeEnabled()) return [];
-    return WEAPON_SKIN_LIST.map((skin) => skin.id);
-  }
-
-  /** Warm one bounded slice of the Armory catalog (post-entry paced units). */
-  async prewarmArmoryPreviewSkins(
-    skinIds: readonly string[],
-    modes?: readonly ArmoryPreviewMode[],
-    options?: ArmoryPreviewPrewarmOptions,
-  ): Promise<void> {
-    if (!this.storeEnabled() || skinIds.length === 0) return;
-    await this.ensureArmoryInspect().prewarm(skinIds, modes, options);
-  }
-
-  /** End a keep-buffer prewarm run (the paced lane's final unit): restore the
-   *  live-size preview buffer once instead of per unit. */
-  finishArmoryPreviewPrewarm(): void {
-    this.armoryInspect?.finishPrewarm();
   }
 
   /** Dispose the profile-bound Armory context; the next open rebuilds it lazily. */
@@ -522,14 +493,6 @@ export class DailyRewardsWindow {
       })
       .join('');
     return chips ? `<span class="armory-classes">${chips}</span>` : '';
-  }
-
-  /** Store-intent warming: build the Armory stage now that the player has opened
-   *  the store. The card list itself needs none of it (warming the whole armory
-   *  moved a cold store open 530.9 ms to 522.8 ms, i.e. not at all), but the
-   *  first card inspect does, and that click is a second or two away. */
-  warmArmoryStage(): void {
-    this.ensureArmoryInspect().warmStage();
   }
 
   private openArmoryInspect(row: ArmorySkinRow): void {

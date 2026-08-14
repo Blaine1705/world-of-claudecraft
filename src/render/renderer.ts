@@ -5457,13 +5457,6 @@ export class Renderer {
     return this.previewPrewarm.queueScheduled(label, unit);
   }
 
-  /** Intent-driven warming: the player opened the surface, so this skips the
-   *  scheduled lane entirely (that lane is minutes deep) and runs at
-   *  VISIBLE_PREWARM with its tail held. */
-  queueIntentPreviewPrewarm(label: string, unit: () => void | Promise<void>): Promise<void> {
-    return this.previewPrewarm.queueIntent(label, unit);
-  }
-
   private readonly gpuReadyTextures = new WeakSet<THREE.Texture>();
   private readonly textureUploadTasks = new WeakMap<THREE.Texture, Promise<void>>();
   private readonly textureUploadTaskSet = new Set<Promise<void>>();

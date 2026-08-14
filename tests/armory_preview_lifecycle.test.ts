@@ -42,23 +42,27 @@ describe('Armory preview lifecycle', () => {
     expect(restore).toContain('composer.render();');
   });
 
-  it('walks every armory skin through the post-entry prewarm schedule', () => {
-    expect(store).toContain('WEAPON_SKIN_LIST.map((skin) => skin.id)');
-    expect(hud).toContain('this.dailyRewardsWindow.armoryPrewarmSkinIds()');
-    // One MODE per paced unit (a whole-skin unit was a measured 170 to 225 ms
-    // main-thread block in live play), keeping the warmup buffer across units
-    // (the per-unit restore cost two composer target reallocations plus a
-    // forced full-size draw EVERY unit) with the one finalize restore at the
-    // end of the schedule.
-    expect(hud).toContain(
-      'this.dailyRewardsWindow.prewarmArmoryPreviewSkins([skinId], [armoryMode], {',
-    );
-    expect(hud).toContain('keepWarmupBuffer: true,');
-    expect(hud).toContain(
-      'finishArmoryPrewarm: () => this.dailyRewardsWindow.finishArmoryPreviewPrewarm()',
-    );
-    // The schedule starts after the reveal (post-entry paced units), no longer
-    // holding the loading curtain for the whole catalog.
+  it('keeps the armory catalog OUT of the post-entry prewarm schedule', () => {
+    // The whole warming chain is gone from the store window, its catalog
+    // helper included: nothing but the prewarm ever called it, so it went with
+    // it rather than lingering as a method with no caller.
+    expect(store).not.toContain('armoryPrewarmSkinIds');
+    expect(store).not.toContain('prewarmArmoryPreview');
+    expect(store).not.toContain('finishArmoryPreviewPrewarm');
+    // Measured, warming it cost about 2.1 to 2.6 s of live-frame hitches that
+    // every online session paid for a window only some players open, and the
+    // cost was positional rather than per skin, so no gentler schedule was
+    // available. The lazy per-card path builds what one inspected card needs,
+    // and a second card measured 79 ms. Evidence and the before/after:
+    // tmp/armory-prewarm-measurement.md, rounds 2 to 5.
+    //
+    // NEGATIVE pins: the hud must hand the plan no armory thunk at all, so a
+    // restored schedule fails here rather than silently returning.
+    expect(hud).not.toContain('armoryPrewarmSkinIds()');
+    expect(hud).not.toContain('prewarmArmoryPreviewSkins');
+    expect(hud).not.toContain('finishArmoryPreviewPrewarm');
+    // The schedule itself still starts after the reveal, never holding the
+    // loading curtain.
     const revealAt = main.indexOf('const revealWorld = (): void => {');
     expect(revealAt).toBeGreaterThan(-1);
     const startAt = main.indexOf('hud.startPostEntryPreviewPrewarm();', revealAt);

@@ -30,6 +30,17 @@ function harness() {
 }
 
 describe('preview prewarm lane', () => {
+  it('runs scheduled work at BACKGROUND with a released tail', async () => {
+    const h = harness();
+    await h.lane.queueScheduled('scheduled', () => {});
+    expect(h.calls[0]).toMatchObject({
+      priority: GPU_WORK_PRIORITY.BACKGROUND,
+      // Released because a scheduled unit's cost is dominated by compileAsync
+      // links settling off-thread.
+      releaseTail: true,
+    });
+  });
+
   it('serialises scheduled units and takes an idle slot before each', async () => {
     const h = harness();
     const first = h.lane.queueScheduled('a', () => {});
@@ -50,44 +61,5 @@ describe('preview prewarm lane', () => {
     await expect(boom).rejects.toThrow('unit failed');
     await after;
     expect(h.order).toContain('end:after');
-  });
-
-  it('runs an intent unit without the scheduled lane or an idle slot', async () => {
-    const h = harness();
-    // A scheduled unit is parked in front, exactly as the real lane is when a
-    // player opens the store: about 130 units at 750 ms spacing.
-    let releaseParked!: () => void;
-    const parked = h.lane.queueScheduled(
-      'parked',
-      () => new Promise<void>((resolve) => (releaseParked = resolve)),
-    );
-    await Promise.resolve();
-    await h.lane.queueIntent('intent', () => {});
-    // The whole point: the intent unit ran while the scheduled one was still in
-    // flight. Riding that lane would have made it wait minutes.
-    expect(h.order).toContain('end:intent');
-    expect(h.order).not.toContain('end:parked');
-    expect(h.idleSlots()).toBe(1);
-    releaseParked();
-    await parked;
-  });
-
-  it('gives intent work the approaching-content priority and holds its tail', async () => {
-    const h = harness();
-    await h.lane.queueIntent('intent', () => {});
-    await h.lane.queueScheduled('scheduled', () => {});
-    const intent = h.calls.find((c) => c.label === 'intent');
-    const scheduled = h.calls.find((c) => c.label === 'scheduled');
-    expect(intent).toMatchObject({
-      priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM,
-      // Held: an intent warm is a synchronous build, so declaring the tail
-      // released would hand the queue a claim it cannot honour.
-      releaseTail: undefined,
-    });
-    expect(scheduled).toMatchObject({
-      priority: GPU_WORK_PRIORITY.BACKGROUND,
-      releaseTail: true,
-    });
-    expect(GPU_WORK_PRIORITY.VISIBLE_PREWARM).toBeGreaterThan(GPU_WORK_PRIORITY.BACKGROUND);
   });
 });
