@@ -195,10 +195,12 @@ right after creating the new `release/vX.Y.Z` branch:
 node scripts/release_mint.mjs vX.Y.Z            # or --dry-run first
 ```
 
-It dumps both green-tip rulesets as the audit trail, verifies the
-required-checks ruleset's `release/**` include covers the new ref, and
-rewrites the merge-queue ruleset's include to exactly `refs/heads/main` plus
-the new release ref (the previous release branch leaves; its tip is frozen).
+It dumps both green-tip rulesets as the audit trail, verifies the active
+required-checks ruleset includes the new ref without excluding it, proves the
+canonical release ref exists, and rewrites the merge-queue ruleset's include to
+exactly `refs/heads/main` plus the new release ref (the previous release branch
+leaves; its tip is frozen). It fetches the after-state and fails unless the
+include now matches that exact pair.
 It runs locally by design: editing rulesets needs an admin-scoped gh login
 that a workflow token does not have and ci.yml deliberately refuses secrets.
 
