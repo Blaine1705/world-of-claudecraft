@@ -2462,7 +2462,8 @@ export const pl_PL: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Cheater >"
     },
     "mobTooltip": {
       "levelFamily": "Poziom {level}: {family}",

@@ -2462,7 +2462,8 @@ export const ru_RU: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Читер >"
     },
     "mobTooltip": {
       "levelFamily": "Уровень {level} {family}",

@@ -43,6 +43,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
   'hudChrome.nameplate.mobLevel': '{level}',
   'hudChrome.nameplate.afkTag': '暫離',
+  'hudChrome.nameplate.cheaterTag': '< 作弊者 >',
   'hudChrome.discord.roleTag.legend': '傳奇',
   'hudChrome.discord.roleTag.shill': '擁護者',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',

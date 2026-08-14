@@ -43,6 +43,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
   'hudChrome.nameplate.mobLevel': '{level}',
   'hudChrome.nameplate.afkTag': '자리비움',
+  'hudChrome.nameplate.cheaterTag': '< 부정행위자 >',
   'hudChrome.discord.roleTag.legend': '전설',
   'hudChrome.discord.roleTag.shill': '홍보대사',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',

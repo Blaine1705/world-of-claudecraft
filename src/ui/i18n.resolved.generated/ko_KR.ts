@@ -2462,7 +2462,8 @@ export const ko_KR: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "자리비움"
+      "afkTag": "자리비움",
+      "cheaterTag": "< 부정행위자 >"
     },
     "mobTooltip": {
       "levelFamily": "{level}레벨 {family}",

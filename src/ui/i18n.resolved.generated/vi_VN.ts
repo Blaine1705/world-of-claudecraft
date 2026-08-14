@@ -2462,7 +2462,8 @@ export const vi_VN: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "VắngMặt"
+      "afkTag": "VắngMặt",
+      "cheaterTag": "< Cheater >"
     },
     "mobTooltip": {
       "levelFamily": "{family} cấp {level}",

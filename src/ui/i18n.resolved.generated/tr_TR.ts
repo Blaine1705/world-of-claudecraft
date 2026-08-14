@@ -2462,7 +2462,8 @@ export const tr_TR: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "UZAKTA"
+      "afkTag": "UZAKTA",
+      "cheaterTag": "< Cheater >"
     },
     "mobTooltip": {
       "levelFamily": "Seviye {level} {family}",

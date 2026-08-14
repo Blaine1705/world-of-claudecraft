@@ -43,6 +43,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
   'hudChrome.nameplate.mobLevel': '{level}',
   'hudChrome.nameplate.afkTag': '退席',
+  'hudChrome.nameplate.cheaterTag': '< チーター >',
   'hudChrome.discord.roleTag.legend': 'レジェンド',
   'hudChrome.discord.roleTag.shill': 'サポーター',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',

@@ -2462,7 +2462,8 @@ export const en_XA: EnTranslations = {
     "nameplate": {
       "mobLevel": "[{level}]",
       "mobEliteLevel": "[{level}+]",
-      "afkTag": "[ÁƑĶ]"
+      "afkTag": "[ÁƑĶ]",
+      "cheaterTag": "[< Çĥéáţéŕ >]"
     },
     "mobTooltip": {
       "levelFamily": "[Ļéʋéļ {level} {family}]",

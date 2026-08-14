@@ -2462,7 +2462,8 @@ export const ja_JP: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "退席"
+      "afkTag": "退席",
+      "cheaterTag": "< チーター >"
     },
     "mobTooltip": {
       "levelFamily": "レベル{level} {family}",

@@ -43,6 +43,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
   'hudChrome.nameplate.mobLevel': '{level}',
   'hudChrome.nameplate.afkTag': 'AFK',
+  'hudChrome.nameplate.cheaterTag': '< Читер >',
   'hudChrome.discord.roleTag.legend': 'ЛЕГЕНДА',
   'hudChrome.discord.roleTag.shill': 'ГЛАШАТАЙ',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
