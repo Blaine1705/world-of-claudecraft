@@ -528,6 +528,41 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     expect(() => rig.live().emit('error', new Error('ENOENT'))).not.toThrow();
   });
 
+  it('advances the walk when a candidate accepts and hangs up before READY', () => {
+    const rig = createRig();
+    rig.presence.setActivity({ details: 'Eastbrook' });
+    const first = rig.live();
+    first.emit('connect');
+    expect(rig.presence.stateForTest().state).toBe('handshaking');
+    // Accepting proved something listens at the slot, not that it is Discord:
+    // the walk must move on in the SAME pass rather than back off, because the
+    // retry restarts at slot 0 and would re-dial the hung-up slot forever
+    // while a real Discord sat unreached at a later one.
+    first.emit('close');
+    expect(rig.sockets).toHaveLength(2);
+    expect(rig.sockets[1].path).toBe('/run/user/1000/app/com.discordapp.Discord/discord-ipc-0');
+    expect(rig.presence.stateForTest().state).toBe('connecting');
+    // A later slot that answers READY still wins the walk.
+    rig.ready(rig.live());
+    expect(rig.presence.stateForTest().state).toBe('ready');
+  });
+
+  it('backs off once a hangup-advanced walk exhausts every candidate', () => {
+    const rig = createRig();
+    rig.presence.setActivity({ details: 'Eastbrook' });
+    for (let guard = 0; guard < 60; guard += 1) {
+      if (rig.presence.stateForTest().state === 'backoff') break;
+      const socket = rig.live();
+      socket.emit('connect');
+      socket.emit('close');
+    }
+    // Every slot accepted and dropped: that is still "no usable Discord", so
+    // the walk ends in the ordinary silent backoff, not a tight loop.
+    expect(rig.presence.stateForTest().state).toBe('backoff');
+    expect(rig.timers).toHaveLength(1);
+    expect(rig.warnings).toEqual([]);
+  });
+
   it('never dials a socket another user owns', () => {
     // The walk ends at /tmp, world-writable on every unix we ship to. A second
     // local account can listen on one of these names and answer the handshake,

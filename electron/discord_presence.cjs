@@ -471,14 +471,23 @@ function createDiscordPresence({
         // Already gone; nothing to release.
       }
       if (terminal !== null || state === 'off') return;
-      if (state === 'connecting') {
-        // The socket never came up, which is the ordinary reading of "Discord
-        // is not listening on THIS path": try the next one.
+      if (state === 'connecting' || state === 'handshaking') {
+        // 'connecting': the socket never came up, the ordinary reading of
+        // "Discord is not listening on THIS path". 'handshaking': it accepted
+        // and hung up before READY, which proves something listens there but
+        // not that it is Discord (a real client answers READY in one turn).
+        // Either way the slot is treated as refused and the walk moves on in
+        // the same pass; backing off here instead would restart every retry at
+        // slot 0 and pin the walk to an accept-and-drop squatter forever (the
+        // win32 pipe namespace has no ownership gate at all). A squatter that
+        // holds the socket open silently, or one that answers READY, is beyond
+        // this arm; see the ledger.
+        state = 'connecting';
         connectNextPath();
         return;
       }
-      // It came up and then went away (Discord quit, a broken pipe): the paths
-      // are not the problem, so back off rather than walking them again.
+      // It was READY and then went away (Discord quit, a broken pipe): the
+      // paths are not the problem, so back off rather than walking them again.
       scheduleRetry();
     };
 
