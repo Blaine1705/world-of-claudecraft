@@ -61,7 +61,7 @@ import {
   dist2d,
   type Entity,
 } from '../types';
-import { grantDelveRewards, openDelveSurfaceExit } from './runs';
+import { delveBonusMarksFor, grantDelveRewards, openDelveSurfaceExit } from './runs';
 
 /** Resolve the locked-chest object + run for an acting player, with all the
  * proximity/eligibility guards. Returns null (after emitting an error) on any
@@ -439,14 +439,17 @@ function grantLockpickBonus(
   for (const pid of members) {
     const meta = ctx.players.get(pid);
     if (!meta) continue;
-    meta.delveMarks += reward.bonusMarks;
+    // Bonus Marks only ride a clear inside the daily window (per member); the
+    // copper bonus and the loot tier are unaffected. See delveBonusMarksFor.
+    const bonusMarks = delveBonusMarksFor(meta, reward.bonusMarks);
+    meta.delveMarks += bonusMarks;
     meta.copper += bonusCopper;
     // Structured (no prose crosses the sim boundary): the client builds the
     // localized "spoils" line from the tier token and formats the numbers.
     ctx.emit({
       type: 'lockpickBonus',
       tier,
-      marks: reward.bonusMarks,
+      marks: bonusMarks,
       copper: bonusCopper,
       pid,
     });

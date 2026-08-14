@@ -740,6 +740,20 @@ export function delveMarkPayout(ctx: SimContext, run: DelveRun, meta: PlayerMeta
   return ctx.rng.chance(0.5) ? 1 : 0;
 }
 
+// Chest/rite bonus Marks ride the SAME daily window as the base payout above: a
+// clear whose base Marks were paid inside the first-3-clears window may carry
+// its loot-tier bonus Marks; every later clear pays base Marks only. Without
+// this, the uncapped premium bonuses (+2 lockpick / +4 rite) let an all-day
+// grinder outrun the shop pricing the window exists to protect. Both callers
+// (grantLockpickBonus, grantRiteBonus) run AFTER grantDelveClearTo incremented
+// `markClears` for the clear the bonus rides, so that clear was in-window
+// exactly when the incremented tally is still <= 3. Bonus COPPER is
+// deliberately not windowed (copper is not the paced currency), and neither is
+// the loot tier itself. Draws no rng.
+export function delveBonusMarksFor(meta: PlayerMeta, bonusMarks: number): number {
+  return meta.delveDaily.markClears <= 3 ? bonusMarks : 0;
+}
+
 // Unlock the next un-owned lore journal entry (PRD §6.4 / §7.6, five entries
 // across repeat clears). Emits a stable lore id (no English crosses the sim
 // boundary); the client localises it via the `delveUi.lore.*` keys.

@@ -18,7 +18,12 @@ import {
   type RiteShrineKind,
 } from '../types';
 import { RITE_INTENSITY } from './rite_tuning';
-import { collectDelveChestLoot, grantDelveRewards, openDelveSurfaceExit } from './runs';
+import {
+  collectDelveChestLoot,
+  delveBonusMarksFor,
+  grantDelveRewards,
+  openDelveSurfaceExit,
+} from './runs';
 
 const RITE_PLAYBACK_STEP = 0.6; // seconds between sequence lights
 const RITE_REPEAT_GAP = 1.2; // longer dark beat between repeat playbacks
@@ -81,10 +86,13 @@ function grantRiteBonus(ctx: SimContext, run: DelveRun, tier: LootTier): void {
   const bonusCopper = Math.round(baseCopper * (reward.copperMult - 1));
   // The Drowned Litany pays double Marks vs. the Collapsed Reliquary's lockpick
   // chest (delve index 1 vs. 0): a deliberate currency-curve step.
-  const bonusMarks = reward.bonusMarks * 2;
+  const fullBonusMarks = reward.bonusMarks * 2;
   for (const pid of members) {
     const meta = ctx.players.get(pid);
     if (!meta) continue;
+    // Bonus Marks only ride a clear inside the daily window (per member); the
+    // copper bonus and the loot tier are unaffected. See delveBonusMarksFor.
+    const bonusMarks = delveBonusMarksFor(meta, fullBonusMarks);
     meta.delveMarks += bonusMarks;
     meta.copper += bonusCopper;
     ctx.emit({ type: 'lockpickBonus', tier, marks: bonusMarks, copper: bonusCopper, pid });
