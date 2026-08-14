@@ -19,7 +19,7 @@ import type { Entity, QuestProgress } from './types';
 
 /** Active or ready: the two states in which a quest's own entities are shown, and the
  *  same pair `pickUpObject` accepts a quest-item pickup in. */
-function onQuest(questLog: Map<string, QuestProgress>, questId: string): boolean {
+function onQuest(questLog: ReadonlyMap<string, QuestProgress>, questId: string): boolean {
   const qp = questLog.get(questId);
   return !!qp && (qp.state === 'active' || qp.state === 'ready');
 }
@@ -43,7 +43,7 @@ function collectQuestForObject(entity: Entity): string | null {
  *  asks this one and the click/nameplate paths ask the general one below. */
 export function isQuestGatedGroundObjectHidden(
   entity: Entity,
-  questLog: Map<string, QuestProgress>,
+  questLog: ReadonlyMap<string, QuestProgress>,
 ): boolean {
   if (entity.kind !== 'object') return false;
   const questId = collectQuestForObject(entity);
@@ -52,7 +52,7 @@ export function isQuestGatedGroundObjectHidden(
 
 export function isQuestGatedEntityHidden(
   entity: Entity,
-  questLog: Map<string, QuestProgress>,
+  questLog: ReadonlyMap<string, QuestProgress>,
 ): boolean {
   if (entity.kind === 'object') return isQuestGatedGroundObjectHidden(entity, questLog);
   if (entity.kind !== 'mob') return false;
