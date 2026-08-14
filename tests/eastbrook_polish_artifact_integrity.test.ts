@@ -742,10 +742,12 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for PR #3344 after removing the unused Eastbrook civic-beacon
 // preload test hook. The civicShader leaf and swept evidence bytes move; no
 // capture was retaken.
+// Re-minted for PR #3345 after the Three.js compileAsync patch changed the
+// lockfile input and the accepted GLBs. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'bd360eb75ed38255bd7922c3f31961c0ad851d4df6e0ab1e25112b238c501451';
+  '5c4303bc8fa6d18a26efeea12ca1ddcdba17e1374e554d2db187b330faa3c5d1';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'a1226a747f82b1f2d8e750593cae4bec6c60ab5bcb89918c58e8ef3f287a6d18';
+  'd4424e6550c00ef1f05d81164754c08702c09c4c85cefa93ff45d0571a978b18';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1720,10 +1722,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-pinned for PR #3344 after removing the unused Eastbrook civic-beacon
     // preload test hook. The first-order composite follows the civicShader leaf,
     // then this second-order seal follows the swept bytes. No capture was retaken.
+    // Re-pinned for PR #3345 after the Three.js compileAsync patch changed the
+    // lockfile input and accepted GLBs. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('36dc7b6534c7c5f62bfebb21b31bb73f8152b8c768e5b4493bba1082312632f4');
+    ).toBe('32cc68fbb6de3e276037e67f63ad230f45f5f8f35e89d38041fee0b9105be3f0');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

@@ -159,8 +159,10 @@ interface AttributionTargetFixture {
 // renderer. The rendererIntegration leaf moves; no capture was retaken.
 // Re-minted for PR #3344 after removing the unused Eastbrook civic-beacon
 // preload test hook. The civicShader leaf moves; no capture was retaken.
+// Re-minted for PR #3345 after the Three.js compileAsync patch changed the
+// lockfile input and the accepted GLBs. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'a1226a747f82b1f2d8e750593cae4bec6c60ab5bcb89918c58e8ef3f287a6d18';
+  'd4424e6550c00ef1f05d81164754c08702c09c4c85cefa93ff45d0571a978b18';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
