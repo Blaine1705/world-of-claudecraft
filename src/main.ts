@@ -67,6 +67,7 @@ import { shouldUseGamepadPointerMode } from './game/gamepad_pointer_mode';
 import { isGameplayInputBlocked } from './game/gameplay_input_gate';
 import { handleGatherNodeInteract } from './game/gather_node_interact';
 import { gatherToolProfessionFor, nearestGatherNodeForProfession } from './game/gather_tool_use';
+import { publishGpuHitchRuntimeReceipt } from './game/gpu_hitch_receipt';
 import { GraphicsRebuildCoordinator } from './game/graphics_rebuild_coordinator';
 import {
   type GraphicsSettingsSnapshot,
@@ -793,7 +794,7 @@ void notifyOtaAppReady();
 // into "updating now" (the onDisconnect arm consults it before fatalOverlay).
 const otaUpdateGate = installOtaUpdateGate({
   overlay: {
-    render: (model) => renderOtaUpdateOverlay(model, { onContinue: () => otaUpdateGate.dismiss() }),
+    render: renderOtaUpdateOverlay,
     hide: hideOtaUpdateOverlay,
   },
   isInWorld: () => document.body.classList.contains('game-active'),
@@ -1474,6 +1475,7 @@ async function startGame(
     // character's choice onto every character on the machine.
     renderer = loadSpan('renderer-ctor', () => new Renderer(world, canvas, nameplates));
     rendererReady = true;
+    publishGpuHitchRuntimeReceipt({ search: location.search, renderer: renderer.perfStats() });
     renderer.setAudioSink(sfx);
     renderer.showDevBadges = settings.get('showDevBadges');
     renderer.showOwnNameplate = settings.get('showOwnNameplate');
@@ -2812,7 +2814,10 @@ async function startGame(
     },
     showOpaqueCurtain: () => showLoadingScreen(t('hudChrome.options.graphicsApplying')),
     awaitCurtainPaint: nextPaint,
-    hideOpaqueCurtain: hideLoadingScreen,
+    hideOpaqueCurtain: () => {
+      renderer.markGpuHitchReveal();
+      hideLoadingScreen();
+    },
     prepareTargetAssets: async (target, onProgress) => {
       const profile = resolveGfxProfile(graphicsCapabilities, target, location.search);
       await prepareGraphicsProfileAssets(profile.settings, world.player.pos, onProgress);
@@ -2891,6 +2896,7 @@ async function startGame(
       next.setAudioSink(sfx);
       renderer = next;
       rendererReady = true;
+      publishGpuHitchRuntimeReceipt({ search: location.search, renderer: next.perfStats() });
       hud.replaceRenderer(next);
       perf.setRenderer(next);
       perf.reset();
@@ -4888,6 +4894,7 @@ async function startGame(
           prewarmCategory: category,
         }),
     });
+    publishGpuHitchRuntimeReceipt({ search: location.search, renderer: renderer.perfStats() });
     entryDiagnostics.checkpoint('prewarm-complete', {
       ...renderEntryDiagnostics(),
       prewarmElapsedMs: prewarm.elapsedMs,
@@ -4978,6 +4985,7 @@ async function startGame(
       const revealWorld = (): void => {
         loadPhaseEnd('settle-cover');
         loadPhaseStart('curtain-fade');
+        renderer.markGpuHitchReveal();
         hideLoadingScreen();
         // Start the intro clock as the loading screen begins to fade: the camera
         // holds the opening pose until now, so the fade doubles as the cut in.

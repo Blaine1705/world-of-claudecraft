@@ -9,14 +9,19 @@
 //               dedicated lane job runs exactly those files in the same run,
 //               so in FULL mode the shards plus the lane run the whole old
 //               suite and a fail-closed decision can never cost coverage.
-//   selective   two sharded legs. Leg 1 runs the always-run FLOOR through
-//               `npm test` (its pretest regenerates the i18n artifacts the
-//               guard suites read, in every shard, exactly as today), minus
-//               the lane files, which the lane job carries instead. Leg 2
-//               runs `vitest related` over the changed sources; pretest has
-//               already run by then. The related leg is deliberately NOT
-//               lane-filtered: a lane file it reaches re-runs there, which
-//               duplicates work but never opens a gap.
+//   selective   ONE merged sharded leg: `vitest related` over the changed
+//               sources PLUS the always-run floor files as self-selecting
+//               seeds (vitest seeds its affected set with the given paths
+//               themselves), minus the lane files on the floor side, which
+//               the lane job carries instead. One collection, one transform
+//               pass, one sharding, where the former floor and related legs
+//               paid a second vitest startup per shard. The related side is
+//               deliberately NOT lane-filtered: a lane file the graph walk
+//               reaches re-runs here, which duplicates work but never opens
+//               a gap. `npx vitest` has no npm lifecycle, so the entry
+//               (scripts/ci_shard_test.mjs) regenerates the artifacts once
+//               per job before spawning, and the guard suites still read
+//               fresh bytes on every shard.
 //   lane        the "PR gate (long sims A)" / "PR gate (long sims B)" jobs
 //               (buildLanePlan, one CI_LONG_SUITE_HALVES half each): the
 //               half's collected CI_LONG_SUITES files, all of them in full
@@ -39,10 +44,11 @@
 //      or the import graph shifts underneath them;
 //   3. every test file the PR itself changed.
 //
-// Sharding: vitest partitions the COLLECTED file set, so `--shard=i/N` on an
-// explicit file list (leg 1) and on a related run (leg 2) each split their own
-// set 8 ways. The two legs may overlap on partial tests; that re-runs a few
-// files and is wasted time, never a correctness gap.
+// Sharding: vitest partitions the COLLECTED file set, so `--shard=i/N` on the
+// merged related invocation splits the floor-union-related selection 8 ways in
+// one draw. A file both floor-classified and graph-reachable appears once in
+// the argv and once in the collection: vitest's related set is a Set, so the
+// old two-leg overlap re-runs are gone by construction.
 
 import { isRelayablePath } from './ci_test_select.mjs';
 import { classifySelectPaths } from './gate_select_plan.mjs';
@@ -58,6 +64,7 @@ export const CI_GUARD_SUITES = Object.freeze([
   'tests/architecture.test.ts',
   'tests/localization_fixes.test.ts',
   'tests/localization_coverage.test.ts',
+  'tests/suite_duration_budget.test.ts',
   'tests/world_api_parity.test.ts',
 ]);
 
@@ -377,36 +384,52 @@ export function buildShardPlan({
   // put the multi-minute files right back on the shard tail.
   const floorFiles = floor.filter((f) => !laneSet.has(f));
   const laneFloorCount = floor.length - floorFiles.length;
+  const liveSources = relatedSources.filter((p) => exists(p));
+  // ONE merged leg (2026-08-14; formerly a floor `npm test` leg plus a
+  // separate `vitest related` leg): `vitest related` keeps a spec whose own
+  // moduleId is among the given paths (vitest 4.1.10, specifications.ts,
+  // filterTestsBySource's `path === specification.moduleId` arm), so a floor
+  // TEST file passed as a positional selects itself. Feeding the floor beside the changed sources therefore
+  // runs floor-union-related in one collection, one transform pass, and one
+  // sharding, where the two sequential legs paid a second vitest startup and
+  // re-imported the shared setup on every shard.
+  // tests/ci_shard_plan.test.ts pins the self-selection property by EXECUTION
+  // so a vitest upgrade that dropped it goes red there instead of silently
+  // un-flooring every selective shard. The related side stays deliberately
+  // NOT lane-filtered: a lane file `related` reaches re-runs here (duplicate
+  // work, never a gap). `npx vitest` has no npm lifecycle, so pretest runs
+  // once at the entry (scripts/ci_shard_test.mjs) instead of per leg; the
+  // per-JOB artifact regeneration the S3 guard and freshness suites rely on
+  // is unchanged.
   const legs = [
     {
-      name: `npm test (always-run floor, ${floorFiles.length} files, shard ${shard.index}/${shard.total})`,
-      cmd: 'npm',
-      args: ['test', '--', ...floorFiles, shardArg, workersArg],
-    },
-  ];
-  const liveSources = relatedSources.filter((p) => exists(p));
-  if (liveSources.length > 0) {
-    // Deliberately NOT lane-filtered: a lane file `related` reaches re-runs
-    // here (duplicate work, never a gap), exactly the overlap contract the two
-    // selective legs already have with each other.
-    legs.push({
       // "path(s)", not "changed source file(s)": liveSources is the union of
       // changed sources and fed-through generated i18n artifacts; the mode
       // reason carries the split counts.
-      name: `vitest related (${liveSources.length} path(s), shard ${shard.index}/${shard.total})`,
+      name:
+        `vitest related (merged: ${floorFiles.length} floor file(s) + ` +
+        `${liveSources.length} changed path(s), shard ${shard.index}/${shard.total})`,
       cmd: 'npx',
+      // EXPLICIT --passWithNoTests=false: the related subcommand defaults
+      // the option to TRUE internally (options.passWithNoTests ??= true in
+      // vitest's cac wiring), so omitting the flag is NOT loud; only an
+      // explicit false sticks through the ??=. With it, a merged leg that
+      // collects nothing exits 1 (measured both directions), which is the
+      // red a floor-seeding collapse must produce in real CI; a healthy leg
+      // always collects the floor, so no false red is possible.
       args: [
         '--no-install',
         'vitest',
         'related',
         ...liveSources,
+        ...floorFiles,
         '--run',
-        '--passWithNoTests',
+        '--passWithNoTests=false',
         shardArg,
         workersArg,
       ],
-    });
-  }
+    },
+  ];
   return {
     mode: 'selective',
     reason: `selective: floor ${floorFiles.length} + related over ${liveSources.length} source(s)`,

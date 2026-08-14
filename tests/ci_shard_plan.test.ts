@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { readdirSync, readFileSync } from 'node:fs';
+import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -88,6 +88,7 @@ describe('the floor union', () => {
       'tests/architecture.test.ts',
       'tests/localization_fixes.test.ts',
       'tests/localization_coverage.test.ts',
+      'tests/suite_duration_budget.test.ts',
       'tests/world_api_parity.test.ts',
     ]);
     expect([...CI_GUARD_PREFIXES]).toEqual(['tests/parity/']);
@@ -144,43 +145,55 @@ describe('buildShardPlan: full mode replays the old step minus the lane', () => 
 });
 
 describe('buildShardPlan: selective mode', () => {
-  it('builds the floor leg through npm test and the related leg through vitest related', () => {
+  it('builds ONE merged vitest related leg carrying the sources and the floor as seeds', () => {
     const plan = buildShardPlan({ ...BASE });
     expect(plan.mode).toBe('selective');
-    expect(plan.legs).toHaveLength(2);
-    const [floorLeg, relatedLeg] = plan.legs;
-    // npm test, never bare vitest: pretest must regenerate the i18n artifacts
-    // in every shard exactly as the old run line did.
-    expect(floorLeg.cmd).toBe('npm');
-    expect(floorLeg.args.slice(0, 2)).toEqual(['test', '--']);
-    expect(floorLeg.args).toContain('tests/architecture.test.ts');
-    expect(floorLeg.args).toContain('tests/world_api_parity.test.ts');
-    expect(floorLeg.args).toContain('tests/parity/golden_warrior.test.ts');
-    expect(floorLeg.args).toContain('--shard=3/8');
-    expect(floorLeg.args).toContain('--maxWorkers=2');
-    expect(floorLeg.args).not.toContain('--passWithNoTests');
-    expect(relatedLeg.cmd).toBe('npx');
-    expect(relatedLeg.args).toEqual([
-      '--no-install',
-      'vitest',
-      'related',
-      'src/ui/unit_portrait.ts',
+    expect(plan.legs).toHaveLength(1);
+    const [merged] = plan.legs;
+    expect(merged.cmd).toBe('npx');
+    // Argv order: the vitest related invocation, the changed sources, then
+    // every floor file as a SELF-SELECTING seed (vitest seeds its affected
+    // set with the given paths themselves; the subprocess describe below
+    // pins that property by execution), then the flags. The floor files ride
+    // this leg because `npx vitest` has no npm lifecycle: pretest moved to
+    // the entry (scripts/ci_shard_test.mjs), once per job.
+    expect(merged.args.slice(0, 3)).toEqual(['--no-install', 'vitest', 'related']);
+    expect(merged.args[3]).toBe('src/ui/unit_portrait.ts');
+    expect(merged.args).toContain('tests/architecture.test.ts');
+    expect(merged.args).toContain('tests/world_api_parity.test.ts');
+    expect(merged.args).toContain('tests/parity/golden_warrior.test.ts');
+    expect(merged.args.slice(-4)).toEqual([
       '--run',
-      '--passWithNoTests',
+      '--passWithNoTests=false',
       '--shard=3/8',
       '--maxWorkers=2',
     ]);
+    // EXPLICIT =false, never the bare flag and never omitted: the related
+    // subcommand defaults passWithNoTests to TRUE internally, so only an
+    // explicit false makes an empty collection exit 1. That is the loud
+    // direction a floor-seeding collapse must take in real CI (measured both
+    // ways in the gate-integrity round).
+    expect(merged.args).not.toContain('--passWithNoTests');
+    // Every floor member is a positional: sources (1) + floor + the 3 fixed
+    // leading/4 trailing tokens accounts for the whole argv. (The genuine
+    // completeness proof is the partition test below, which recomputes
+    // buildFloor independently; this count only pins the argv shape.)
+    const positionals = merged.args.slice(3, -4);
+    expect(positionals.length).toBe(1 + (plan.floorCount ?? 0));
   });
 
-  it('omits the related leg when the diff has no live sources', () => {
+  it('keeps the merged leg when the diff has no live sources (floor seeds only)', () => {
     const docsOnly = buildShardPlan({ ...BASE, changedPaths: ['docs/a.md', 'README.md'] });
     expect(docsOnly.mode).toBe('selective');
     expect(docsOnly.legs).toHaveLength(1);
+    expect(docsOnly.legs[0].args.filter((a) => a.startsWith('src/'))).toEqual([]);
+    expect(docsOnly.legs[0].args).toContain('tests/architecture.test.ts');
     const deleted = buildShardPlan({ ...BASE, exists: (p) => !p.startsWith('src/') });
     expect(deleted.legs).toHaveLength(1);
+    expect(deleted.legs[0].args.filter((a) => a.startsWith('src/'))).toEqual([]);
   });
 
-  it('adds a changed test file to the floor leg and drops a deleted one from the argv', () => {
+  it('adds a changed test file to the merged seeds and drops a deleted one from the argv', () => {
     const plan = buildShardPlan({
       ...BASE,
       changedPaths: ['tests/pure_b.test.ts', 'tests/deleted.test.ts'],
@@ -195,10 +208,11 @@ describe('buildShardPlan: selective mode', () => {
     const plan = buildShardPlan({ ...BASE });
     // Derived from the fixture, not the implementation's own formula: FILLER
     // (FLOOR_SANITY_MIN + 20) + architecture + localization_fixes always-run,
-    // plus localization_coverage, world_api_parity, and the parity file via
-    // the guard union = FLOOR_SANITY_MIN + 25; COLLECTED holds two more pure
-    // tests, which are exactly the outside-floor remainder.
-    expect(plan.floorCount).toBe(FLOOR_SANITY_MIN + 25);
+    // plus localization_coverage, suite_duration_budget, world_api_parity,
+    // and the parity file via the guard union = FLOOR_SANITY_MIN + 26;
+    // COLLECTED holds two more pure tests, exactly the outside-floor
+    // remainder.
+    expect(plan.floorCount).toBe(FLOOR_SANITY_MIN + 26);
     expect(plan.relatedCount).toBe(1);
     expect(plan.outsideFloorCount).toBe(2);
   });
@@ -456,20 +470,24 @@ describe('the long-sims lane (Phase 4)', () => {
     }
   });
 
-  it('selective mode moves floor lane files to the lane and leaves related unfiltered', () => {
+  it('selective mode moves floor lane files to the lane and keeps the merged leg unfiltered', () => {
     const plan = buildShardPlan({ ...LANE_BASE });
     expect(plan.mode).toBe('selective');
-    const [floorLeg, relatedLeg] = plan.legs;
-    expect(floorLeg.args).not.toContain(LANE_BLIND);
-    expect(floorLeg.args).not.toContain(LANE_GRAPH);
+    expect(plan.legs).toHaveLength(1);
+    const [merged] = plan.legs;
+    // The FLOOR-SEED half of the merged argv is lane-filtered (the lane job
+    // owns those files); the RELATED side stays unfiltered: no --exclude may
+    // appear, so a lane file vitest's graph walk reaches still re-runs here
+    // (duplicate work, never a gap).
+    expect(merged.args).not.toContain(LANE_BLIND);
+    expect(merged.args).not.toContain(LANE_GRAPH);
     expect(plan.laneFloorCount).toBe(1);
-    // floorCount reports what THIS leg runs. The fixture's whole floor is the
-    // base fixture's FLOOR_SANITY_MIN + 25 plus LANE_BLIND (added to
-    // alwaysRun above); the one lane member then moves to the lane, so the
-    // leg is back at the base figure.
-    expect(plan.floorCount).toBe(FLOOR_SANITY_MIN + 25);
-    expect(relatedLeg.args).not.toContain(`--exclude=${LANE_BLIND}`);
-    expect(relatedLeg.args.join(' ')).not.toContain('--exclude');
+    // floorCount reports what this leg SEEDS. The fixture's whole floor is
+    // the base fixture's floor plus LANE_BLIND (added to alwaysRun above);
+    // the one lane member then moves to the lane, so the seed list is back
+    // at the base figure.
+    expect(plan.floorCount).toBe(FLOOR_SANITY_MIN + 26);
+    expect(merged.args.join(' ')).not.toContain('--exclude');
   });
 
   it('a changed lane test rides the lane, not the floor leg', () => {
@@ -618,14 +636,14 @@ describe('the long-sims lane (Phase 4)', () => {
     expect(
       shardFull.legs[0].args.filter((a) => a.startsWith('--exclude=')).map((a) => a.slice(10)),
     ).toEqual([...laneFullA.laneFiles, ...laneFullB.laneFiles].sort());
-    // Selective mode: the floor leg plus both halves' lane files re-cover the
-    // whole floor with no overlap and no loss.
+    // Selective mode: the merged leg's floor SEEDS plus both halves' lane
+    // files re-cover the whole floor with no overlap and no loss. Only the
+    // tests/ positionals are floor seeds; the changed src/ source rides the
+    // same argv but is not a floor member.
     const shardSel = buildShardPlan({ ...LANE_BASE });
     const laneSelA = buildLanePlan({ ...LANE_BASE, half: 'a' });
     const laneSelB = buildLanePlan({ ...LANE_BASE, half: 'b' });
-    const floorLegFiles = shardSel.legs[0].args.filter(
-      (a) => a.startsWith('tests/') || a.startsWith('src/'),
-    );
+    const floorLegFiles = shardSel.legs[0].args.filter((a) => a.startsWith('tests/'));
     const { floor } = buildFloor({
       alwaysRun: LANE_BASE.alwaysRun,
       testFiles: LANE_BASE.testFiles,
@@ -644,6 +662,107 @@ describe('the long-sims lane (Phase 4)', () => {
 // cannot hide behind unit tests of the parts.
 describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
   const repoRoot = fileURLToPath(new URL('..', import.meta.url));
+
+  it('vitest related runs a TEST-file seed and goes RED on an empty collection', async () => {
+    // The merged selective leg feeds the floor files to `vitest related` as
+    // positionals, relying on vitest keeping a spec whose own moduleId is
+    // among the given paths (specifications.ts, filterTestsBySource's
+    // `path === specification.moduleId` arm). This pins BOTH halves of that
+    // contract by EXECUTION against the REAL installed vitest: the seed runs,
+    // and with --passWithNoTests=false an empty collection exits 1 (the
+    // related subcommand defaults the flag to TRUE internally, so the loud
+    // direction only exists with the explicit false). A vitest upgrade that
+    // dropped either half would otherwise silently un-floor every selective
+    // shard, the worst failure class this planner has.
+    //
+    // A mkdtemp FIXTURE PROJECT, not the repo corpus: `vitest related`
+    // transforms every collected spec for its reverse graph, and over the
+    // repo's ~2,700 specs that took minutes under CI contention (a 60s
+    // watchdog killed the first cut of this pin on a loaded runner). The
+    // property under test is vitest's, not the repo's, so a one-file corpus
+    // proves it in seconds with the same installed binary.
+    const fixtureRoot = mkdtempSync(path.join(os.tmpdir(), 'wocc-seed-pin-'));
+    try {
+      writeFileSync(
+        path.join(fixtureRoot, 'vitest.config.mjs'),
+        "export default { test: { include: ['*.test.mjs'] } };\n",
+      );
+      writeFileSync(
+        path.join(fixtureRoot, 'a.test.mjs'),
+        "import { expect, it } from 'vitest';\nit('seed runs', () => { expect(1).toBe(1); });\n",
+      );
+      writeFileSync(path.join(fixtureRoot, 'notes.md'), 'inert non-test seed\n');
+      const runChild = (seeds: string[]) => {
+        const child = spawn(
+          'npx',
+          [
+            '--no-install',
+            'vitest',
+            'related',
+            ...seeds,
+            '--run',
+            '--passWithNoTests=false',
+            '--root',
+            fixtureRoot,
+            '--config',
+            path.join(fixtureRoot, 'vitest.config.mjs'),
+          ],
+          {
+            cwd: repoRoot,
+            // A SCRUBBED env, like runEntry below: this test itself runs
+            // inside vitest, and an inherited VITEST_* worker environment
+            // makes the child vitest misbehave (observed: it prints the RUN
+            // header, runs nothing, and exits 0). HOME rides along for the
+            // npx cache.
+            env: {
+              PATH: process.env.PATH ?? '',
+              ...(process.env.HOME ? { HOME: process.env.HOME } : {}),
+            },
+          },
+        );
+        let log = '';
+        child.stdout.on('data', (chunk) => {
+          log += String(chunk);
+        });
+        child.stderr.on('data', (chunk) => {
+          log += String(chunk);
+        });
+        return new Promise<{ exitCode: number | null; log: string }>((resolve, reject) => {
+          const killer = setTimeout(() => {
+            child.kill('SIGKILL');
+            reject(new Error(`nested vitest hung; log tail:\n${log.slice(-2000)}`));
+          }, 60_000);
+          child.on('error', (error) => {
+            clearTimeout(killer);
+            reject(error);
+          });
+          child.on('close', (code) => {
+            clearTimeout(killer);
+            resolve({ exitCode: code, log });
+          });
+        });
+      };
+      // The MIXED argv shape the planner emits: an inert non-test path beside
+      // the test-file seed. The seed must run.
+      const seeded = await runChild(['notes.md', 'a.test.mjs']);
+      // Full ANSI strip, ESC byte included (a CSI-tail-only strip leaves raw
+      // ESC bytes between the summary tokens and \s does not match them);
+      // constructed, not a literal, so no control character sits in a regex.
+      const esc = String.fromCharCode(27);
+      const clean = seeded.log
+        .replace(new RegExp(`${esc}\\[[0-9;]*m`, 'g'), '')
+        .split(esc)
+        .join('');
+      expect(seeded.exitCode, clean.slice(-2000)).toBe(0);
+      expect(clean).toContain('a.test.mjs');
+      expect(clean).toMatch(/Test Files\s+1 passed/);
+      // The loud direction: a collection that matches nothing exits 1.
+      const empty = await runChild(['missing.test.mjs']);
+      expect(empty.exitCode, empty.log.slice(-1000)).toBe(1);
+    } finally {
+      rmSync(fixtureRoot, { recursive: true, force: true });
+    }
+  }, 120_000);
 
   async function runEntry(args: string[], env: Record<string, string>) {
     const child = spawn(process.execPath, ['scripts/ci_shard_test.mjs', ...args], {
@@ -785,6 +904,15 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     // Binding negative: zero legs means no npm test invocation is printed at
     // all (a filename negative would be vacuous against the "nothing" line).
     expect(runB.log).not.toContain('npm test');
+    // The same zero-leg path FOR REAL (no --plan-only): the entry must exit
+    // green without spawning a leg AND without running pretest (nothing
+    // below reads the artifacts), so the legCount arm of the entry decision
+    // executes here rather than living only in its unit test.
+    const runBReal = await runEntry(['--lane=long-sims-b'], env);
+    expect(runBReal.exitCode).toBe(0);
+    expect(runBReal.log).toContain('lane runs: nothing');
+    expect(runBReal.log).toContain('PASS: 0 leg(s) green');
+    expect(runBReal.log).not.toContain('i18n:gen');
   });
 
   async function listVitestFilesExcluding(
@@ -910,11 +1038,10 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     expect(run.exitCode).toBe(0);
     expect(run.log).toContain('plan: mode=full (mode=full from the changes job)');
     expect(run.log).toContain('npm test -- --shard=4/8');
-    expect(run.log).not.toContain('npm test (always-run floor');
     expect(run.log).not.toContain('vitest related');
   });
 
-  it('plans the two selective legs over the real tree and prints the audit trail', async () => {
+  it('plans the merged selective leg over the real tree and prints the audit trail', async () => {
     const run = await runEntry(['--shard=5/8', '--plan-only'], {
       TEST_MODE: 'selective',
       TEST_MODE_REASON:
