@@ -74,6 +74,15 @@ describe('gate cache inventory vs turbo.json', () => {
     expect(inputs.some((p) => p.includes('i18n.catalog'))).toBe(true);
     expect(inputs.some((p) => p.includes('i18n.locales'))).toBe(true);
   });
+
+  it('invalidates the server bundle when either Rift rollback migration source changes', () => {
+    expect(turboJson.tasks['build:server'].inputs).toEqual(
+      expect.arrayContaining([
+        'scripts/migrate_rift_forge_rollback.ts',
+        'scripts/rift_forge_rollback_migration.ts',
+      ]),
+    );
+  });
 });
 
 describe('git worktree cache sharing (Turborepo >= 2.8)', () => {
