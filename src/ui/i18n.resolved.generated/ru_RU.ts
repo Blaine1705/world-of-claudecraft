@@ -1845,6 +1845,7 @@ export const ru_RU: EnTranslations = {
       "joinChannels": "Совет: введите /join world или /join lfg, чтобы общаться с игроками по всему миру."
     },
     "itemHeroicTag": "[ГЕРОИЧЕСКИЙ]",
+    "itemHeroicLabel": "Героический",
     "itemSoulbound": "Персональный",
     "itemUniqueEquipped": "Уникальный (экипируется)",
     "itemSet": {

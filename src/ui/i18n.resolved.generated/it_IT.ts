@@ -1845,6 +1845,7 @@ export const it_IT: EnTranslations = {
       "joinChannels": "Suggerimento: digita /join world o /join lfg per chattare con i giocatori di tutto il mondo."
     },
     "itemHeroicTag": "[EROICO]",
+    "itemHeroicLabel": "Heroic",
     "itemSoulbound": "Vincolato all’anima",
     "itemUniqueEquipped": "Unico Equipaggiato",
     "itemSet": {
