@@ -23,7 +23,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 08 QA | phase-08-qa | service | DONE | 4b9e413 | PASS-WITH-FOLLOWUPS, every fix applied (section below); the self-reviewed polish commit 4b9e413 verified FIRST and clean; six fresh audit lanes + a dedicated red-proof lane over 70d4207..4b9e413: 0 blocking, all four red-first claims REPRODUCED-RED against a throwaway 70d4207 build; 8 should-fix + 13 nits ALL applied in three commits, re-reviewed fresh (0 blocking, 7 should-fix, 8 nits, ALL applied in a fourth commit, tip aa44873); 12 + 2 mutations all BIT; suite 445 tests 441 pass 0 fail 4 env-gated skips; game worktree re-synced to release/v0.38.0 (merge bfceae8d4b, NON-trivial: 33 conflicts, wireAura extraction pays the merged game.ts overage, pins re-derived 324/86/238 + sends 200 dispatches 213; release-merge-audit found THREE union-only reds, all fixed; gate GREEN at ad197c0801, full-suite fallback, all 12 steps, WITH TEST_DATABASE_URL, real-SQL suites 154 green zero skips); pushed per R4 (service 70d4207..aa44873 updating PR #31, its test checks running at push time; game 8dd51a8a20..f5325ffbe8, pre-push floor green, no open PR on this branch so no PR CI) |
 | 09 | bond-releaser | service | DONE | aa44873 | SERVICE repo (origin/master already contained at df09756); B3 + the bond double-pay medium + the bond-cents ownership mediums closed; R2 forfeit split landed (one code path with the settlement schedule); the two R5 items this repo owns RULED by Fernando at session start and implemented (SOL fees: preflight + overview monitor + manual funding, knob WOC_MARKET_ESCROW_MIN_SOL_LAMPORTS; ATA rent on refund: escrow pays, inside the preflight); FIVE red-first proofs (ownership behaviors, both double-pay classes, all-or-nothing boot, the late-confirm stomp, the terminal-adoption abandonment); two fresh coverage lenses (security 18 findings incl. 1 blocking, correctness 14 incl. 2 blocking) plus a fresh re-review of the fix rounds (1 blocking + 5 should-fix + 5 nits), every finding applied or judged with the file open; 9 commits, tip 3346878; suite 445 to 493 tests, 488 pass + 5 env-gated skips default tier, 493/493 with CLAUDIUM_TEST_DATABASE_URL (zero skips); LOCAL, not pushed per R4 |
 | 09 QA | phase-09-qa | service | DONE | 3346878 | PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open (section below); SERVICE repo (origin/master already contained at df09756); nine lanes (six read-only audits, two red-proof, one mutation): 0 blocking in the implement range, all six red-first registry claims REPRODUCED-RED, all seven mutation arms BIT by name (claim CAS, guarded update, finalize signature key in BOTH stores, age bound; 493-test full runs each); the round's own fixes: entry adoption of a ledger-proven payment on an already-expired or superseded quote (the registered pre-existing edge, the crash-matrix lane's fix-now case accepted), typed signature_already_settled on the settled-signature collision BOTH stores (the partial-unique-index 23505 trap, previously an unhandled 500), the undecided late-visibility window, the rejected-write vocabulary fix, the rpc probe-list pin, the actor clamp, fifteen test-decisiveness hardenings, doc truth-ups; two fresh re-review lenses over the fix round, everything applied or judged, round-2 mutation-proven (4 mutants BIT); suite 493 to 508 (502 + 6 env-gated skips default; 508/508 zero skips with CLAUDIUM_TEST_DATABASE_URL); 5 commits, tip 02713f2, PUSHED per R4 (service aa44873..02713f2 updates PR #31; game after the v0.38.0 re-sync merge abd4a9e0e2, trivial: one generated-i18n conflict, regenerated) |
-| 10 | chain-verifier | service | NOT STARTED | | |
+| 10 | chain-verifier | service | DONE | 02713f2 | SERVICE repo (origin/master already contained at df09756); B4 closed with red-first proofs (three redirect shapes reproduced MATCHED on the old verifier); the two R5 items this file owns RULED by Fernando at session start and implemented (commitment split ratified as code-owned MATCH_COMMITMENT/CREDIT_COMMITMENT; five hour confirming bound MAX_CONFIRMING_AGE_MS, both stores, new pg partial index, one minute sweep driver in buildMarketApps, previously NOTHING drove expiry in production); undecided confirm answers split (not_yet_visible vs awaiting_finality, the anti-snipe service half); two fresh lenses + a fresh re-review of the fix round, every finding applied or judged (the re-review REFUTED the round's multisig-impossibility claim with the parser's count-based labeling, arm restored money-safe); 15 mutants BIT + 1 judged environment survivor (pg ORDER BY delete coincides with partial-index order; the DESC variant bites); suite 508 to 536 (530 + 6 env-gated skips default; 536/536 zero skips with CLAUDIUM_TEST_DATABASE_URL); 6 commits, tip ba7df0b, LOCAL not pushed per R4 |
 | 10 QA | phase-10-qa | service | NOT STARTED | | |
 | 11 | oracle-health | service | NOT STARTED | | |
 | 11 QA | phase-11-qa | service | NOT STARTED | | |
@@ -49,6 +49,75 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 21 QA | phase-21-qa | service + game | NOT STARTED | | |
 | 22 | close-out | all three | NOT STARTED | | teardown offer lives in 22 QA |
 | 22 QA | phase-22-qa | all three | NOT STARTED | | |
+
+## 10 implement round (chain verifier proves the burn)
+
+Service repo, worktree woc-rewards-service-pr31; session start 02713f2 (clean,
+origin/master already contained at df09756, origin/feature/woc-market-settlement
+matching the tip), 6 commits, tip ba7df0b, LOCAL not pushed per R4. Baseline
+validation matched the documented contract exactly (build clean; 508 tests,
+502 pass, 6 env-gated skips default tier; 508/508 zero skips with
+CLAUDIUM_TEST_DATABASE_URL against the dev Postgres).
+
+RULING FIRST: the two R5 remainder items were proposed with code-grounded
+rationale and confirmed by Fernando before any code (recorded in state.md
+Rulings, game commit 71f36c695f): the commitment split ratified (match at
+confirmed, credit at finalized, code-owned constants, no env knob, plus the
+pending-vocabulary split) and the confirming bound at five hours expiring to
+the adoptable expired state.
+
+Commits:
+- 5bf0812 the B4 fix: settlement_proof.ts (pure necessity checks: burnedBaseFor,
+  unexpectedCredit) wired into the verifier after the leg checks with distinct
+  stable reasons burn_missing / burn_mismatch / unexpected_credit;
+  MATCH_COMMITMENT / CREDIT_COMMITMENT pinned. Red-first: the full
+  burn-redirect, the short-burn-with-redirect, and the extra-credit rider all
+  verified as MATCHED on the old code (recorded); five more vectors were
+  reason-contract reds.
+- 65bb341 the ruled bound: MAX_CONFIRMING_AGE_MS in quotes.ts; both stores'
+  expirePastDue gain the confirming arm (expired, reason confirming_expired,
+  submitted signature preserved for entry adoption); pg gets the
+  woc_market_quotes_confirming_due partial index and outer status+due guards
+  on BOTH arms (EvalPlanQual discipline; the pending arm's subselect-only
+  shape predated this change); buildMarketApps gains the one minute unref'd
+  expiry sweep with stopExpirySweep (expireStaleQuotes previously had ZERO
+  production callers). Red-first: the service-level bound test and both pg
+  arms reproduced red before the change.
+- 44e94dc the vocabulary split: confirm's undecided arms pass the verifier's
+  own reason through (not_yet_visible live; awaiting_finality stays the
+  matched-arm word and the reason-less fallback). Red-first both arms. The
+  game-side adoption (anti-snipe extension gating on the matched arm) is 12's.
+- 498d6bd docs: wiring decision 4 ANSWERED, verifier promise rewritten off the
+  disproved payer-debit description, lifecycle diagram, repo CLAUDE.md.
+- ca568cc the review fix round (both fresh lenses applied): edge-triggered
+  operator warn on getSignatureStatuses outages, not_yet_visible pinned at its
+  real emitter, memory sweep oldest-expiry-first with an always-running budget
+  test, negative pins (forged program label, partially decoded instructions,
+  malformed amounts, two-burn over-sum, 0n no-burn), comment and doc truth-ups.
+- ba7df0b the re-review round: the fix round's multisig-impossibility claim
+  REFUTED (jsonParsed labels the burn authority multisigAuthority by ACCOUNT
+  COUNT while the token program ignores trailing accounts, so the shape is an
+  ordinary honestly-paid burn); the acceptance arm restored with true
+  rationale and both test arms; the pg intra-arm ORDER BY pinned.
+
+Mutation registry: 15 mutants BIT by name under full-suite runs (burn authority
+drop, exact-amount to less-than, burn_missing unreachable, whitelist threshold,
+whitelist expected-skip, pg and memory cutoff drops, sweep cadence halved,
+not_yet_visible reason drop, multisig re-admit then multisig re-refuse and
+accept-any-label, warn-every-failure, memory sort drop, pg ORDER BY DESC) plus
+ONE JUDGED SURVIVOR: deleting the pg pending-arm ORDER BY fails nothing because
+the planner's partial-index scan order coincides with sorted order on this
+shape; the pin is decisive against real order regressions (the DESC variant
+bites) and the clause stays correct-by-construction. NOTE: the first fix-round
+battery fired the uncommitted-revert trap (git checkout over WIP discarded
+three files' fix edits, and one mutant silently no-op'd); everything was
+re-applied, committed FIRST, and the whole battery re-run clean over the
+committed tree.
+
+Validation after every slice; final at ba7df0b: build clean, 536 tests, 530
+pass + 6 env-gated skips default tier, 536/536 zero skips with
+CLAUDIUM_TEST_DATABASE_URL. Copy floor clean both repos. Docs upkeep in the
+same change: service CLAUDE.md, MARKET_SETTLEMENT.md, MARKET_CHAIN_WIRING.md.
 
 ## 09 QA round (verdict PASS-WITH-FOLLOWUPS, every finding applied or judged)
 

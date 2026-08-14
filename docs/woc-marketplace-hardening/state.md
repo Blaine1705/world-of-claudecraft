@@ -5,14 +5,24 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-10-chain-verifier.md`
+- Next file to run: `docs/woc-marketplace-hardening/phase-10-qa.md`
   (SERVICE repo, worktree `/Users/fernando/Documents/woc-rewards-service-pr31`,
-  fresh session, own origin/master sync first). Its session start proposes the
-  R5 remainder (verifier commitment level and confirming timeout). NOTE for
-  10's session start: the confirm-side remedy for the paid-after-expiry edge
-  is DONE (the 09 QA round shipped entry adoption; see the 09 ledger's QA
-  ROUND bullet), so 10's charter on that edge shrinks to the commitment
-  policy itself.
+  fresh session, own origin/master sync first; audit range 02713f2..ba7df0b,
+  LOCAL not pushed per R4, QA pushes on PASS).
+- 10 COMPLETE (SERVICE repo, LOCAL not pushed per R4; session start 02713f2,
+  tip ba7df0b, 6 commits). B4 closed red-first (three redirect shapes
+  reproduced MATCHED on the old verifier); the two R5 items this file owned
+  RULED by Fernando at session start and implemented (commitment split
+  ratified code-owned; five hour confirming bound, both stores, sweep driver:
+  expiry previously had NO production driver at all); the undecided confirm
+  vocabulary split (not_yet_visible vs awaiting_finality) landed as the
+  service half of the anti-snipe residual. Two fresh lenses plus a fresh
+  re-review of the fix round, every finding applied or judged; the re-review
+  REFUTED the fix round's multisig-impossibility rationale (count-based
+  jsonParsed labeling) and the arm was restored money-safe. Suite 508 to 536
+  (530 + 6 env-gated skips default; 536/536 zero skips with
+  CLAUDIUM_TEST_DATABASE_URL). The 10 ledger entry below is the registry the
+  10-qa session consumes; progress.md carries the commit-by-commit round.
 - 09 QA COMPLETE (PASS-WITH-FOLLOWUPS, every finding applied or judged with
   the file open, PUSHED per R4: service aa44873..02713f2 to
   feature/woc-market-settlement updating PR #31; game pushed after this
@@ -437,6 +447,110 @@ Still open (a phase that hits one asks at session start):
 
 ## Per-phase ledger (append as phases complete)
 
+- 10 chain-verifier (2026-08-14, SERVICE repo, session start 02713f2 = the
+  09 QA tip, origin/master already contained at df09756; 6 commits, tip
+  ba7df0b, LOCAL not pushed per R4; validation npm run build + npm test in
+  service/, 536 tests 530 pass 0 fail 6 env-gated skips default tier and
+  536/536 zero skips with CLAUDIUM_TEST_DATABASE_URL, baseline was
+  508/502/6). The registry the 10-qa session needs:
+  - B4 CLOSED, sufficiency plus necessity: settlement_proof.ts
+    (service/src/market/) adds two pure checks the verifier runs after the
+    leg checks and before the payer-debit check: burnedBaseFor (a real SPL
+    Token burn of the quoted mint NAMING the quoted payer under either
+    jsonParsed authority label, burn and burnChecked, both token program
+    labels, inner instructions flattened, amounts summed, malformed amount
+    strings parse to 0n) and unexpectedCredit (reverse walk of the delta
+    map; any positive delta outside payer-plus-expected refuses). Reasons:
+    burn_missing (no burn of the quoted mint under the payer), burn_mismatch
+    (wrong total), unexpected_credit; the wrong-mint settlement stays
+    leg_mismatch, so the acceptance bar's triple is pairwise distinct.
+    Check order legs -> burn proof -> whitelist -> payer debit; order
+    affects reasons only, never admission (conjunctive refusals).
+  - R5 RULED AND IMPLEMENTED (see Rulings; game commit 71f36c695f recorded
+    the ruling BEFORE code): MATCH_COMMITMENT 'confirmed' /
+    CREDIT_COMMITMENT 'finalized' (solana_chain.ts, code-owned, no env
+    knob), behaviorally pinned (the fake connection records the read
+    commitment; the three-status finality matrix pins crediting).
+    MAX_CONFIRMING_AGE_MS five hours (quotes.ts, code-owned): both stores'
+    expirePastDue gain a confirming arm (to expired, reason
+    confirming_expired, submittedSignature preserved so entry adoption
+    stays the recovery path), pending arm first with the budget shared,
+    oldest expiry first in both stores; pg gains the
+    woc_market_quotes_confirming_due partial index and outer status+due
+    guards on BOTH arms (the pre-existing pending arm was subselect-only
+    and could expire a concurrently settled row under EvalPlanQual).
+    buildMarketApps now drives expiry with a one minute unref'd interval
+    (stopExpirySweep beside stopOracleHeartbeat): expireStaleQuotes
+    previously had ZERO production callers, so NOTHING expired quotes on a
+    live deployment, pending rows included.
+  - VOCABULARY SPLIT (the anti-snipe service half): confirm's undecided
+    arms answer the verifier's own reason (not_yet_visible on the live
+    chain; dev arm surfaces its dev_chain_* words by design) and
+    awaiting_finality is reserved for the MATCHED arms plus the reason-less
+    fallback and the raced stored-row answer. pending:true is unchanged, so
+    the game wire is compatible today.
+  - REVIEWS: two fresh lenses on the final diff (security: 1 should-fix +
+    7 nits, 0 blocking; correctness: 1 should-fix + 9 nits + 1 observation,
+    0 blocking), every finding applied or judged; the fix round ca568cc was
+    re-reviewed FRESH (1 should-fix + 3 nits + 1 observation), its round
+    ba7df0b closed by careful self-review (narrow, test-covered,
+    mutation-proven).
+  - THE REFUTED REFUTATION (the round's big lesson, judged with the parser
+    argument in view): the fix round removed the multisigAuthority
+    acceptance arm on an on-chain-impossibility rationale; the fresh
+    re-review proved the rationale FALSE (agave's jsonParsed picks
+    authority vs multisigAuthority purely by the instruction's account
+    count while the token program's single-owner branch ignores trailing
+    accounts, so multisigAuthority-equals-payer is an ordinary, executable,
+    honestly-paid burn) and the removal would have terminally rejected real
+    money (rejected rows never re-verify). ba7df0b restored the arm
+    (either label must NAME the quoted payer; economics forced by the
+    delta and debit checks) with positive and negative pins.
+  - JUDGED, no code change (do not re-raise): owner-less token balance rows
+    stay invisible to the delta map and whitelist (refusing would convert
+    an RPC quirk into terminal rejections of real payments; not
+    attacker-reachable via transaction shape on an honest RPC; documented
+    at the site); delegate-authorized burns stay refused fail-closed
+    (documented; the built transaction burns under the owner); the
+    edge-triggered status-outage warn accepts flap noise (hysteresis would
+    add clock state for log cosmetics); unref on the sweep interval is not
+    directly asserted (matches the heartbeat's accepted standing); pg tie
+    order under equal expires_at_ms is unspecified and may transiently
+    differ from the memory store under a binding budget (converges next
+    sweep; commented).
+  - JUDGED SURVIVOR (mutation, recorded): deleting the pg pending-arm
+    ORDER BY fails nothing because the planner's partial-index scan order
+    coincides with sorted order on this table shape; the pin IS decisive
+    against real order regressions (the DESC variant bites by name) and
+    the clause is correct-by-construction. Fifteen other mutants BIT by
+    name under full-suite runs (list in progress.md).
+  - DEFERRED with owners: 12 (game wire) owes tolerating and localizing
+    the new reasons (not_yet_visible pending; burn_missing, burn_mismatch,
+    unexpected_credit terminal; confirming_expired is ops-visible only,
+    terminal entry answers 'expired') and gating the anti-snipe extension
+    on the matched arm (awaiting_finality), closing the fabricated-
+    signature residual; 21 (devnet) verifies the jsonParsed label
+    assumptions against a real RPC (spl-token-2022 label string, the
+    multisigAuthority count-labeling, burnChecked info shapes) and
+    exercises the burn proof end to end per the wiring doc's test plan; 22
+    re-judges the pre-existing uncaught getParsedTransaction throw (a full
+    RPC outage rejects out of confirm through the route as a 500; distinct
+    from the degraded-statuses arm the new warn covers) and the inherited
+    connectionTimeoutMillis note. The game review-state resolution arms
+    (H15's review -> confirmed / review -> failed) can now build against
+    the service's stable five-hour verdict: that stays with 12/14 as
+    already registered.
+  - RED-FIRST REGISTRY for the QA red-proof lane (all reproduced before
+    their fix, on the 02713f2 build): (1) burn-redirect, (2)
+    short-burn-with-redirect, and (3) extra-credit-rider each verified
+    MATCHED by the old verifier (the B4 exploit class; five more vectors
+    were reason-contract reds); (4) the confirming five-hour bound
+    (expireStaleQuotes returned 0 and the row stayed confirming, service
+    and pg arms both); (5) the pg schema pin for the confirming-due index
+    red at 02713f2; (6) both vocabulary-split arms (unseen and
+    terminal-entry undecided answered awaiting_finality). The sweep
+    driver's red form is structural: expireStaleQuotes had no src caller
+    at 02713f2 (grep evidence), and stopExpirySweep fails tsc there.
 - 09 bond-releaser (2026-08-14, SERVICE repo, session start aa44873 =
   the 08 QA tip, origin/master already contained at df09756; 9 commits,
   tip 3346878, LOCAL not pushed per R4; validation npm run build + npm
