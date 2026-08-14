@@ -9603,8 +9603,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': '影跳びのカマカゲ',
   'hudChrome.mounts.name_stormfeather_griffin': 'スカイリーチ・ストームフェザー',
   'hudChrome.mounts.name_drakemaw_raptor': '火口のラプトル',
+  'hudChrome.mounts.name_lanternback_troll': 'ランタンバックのグルンボル',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。',
+  'hudChrome.mounts.desc_lanternback_troll':
+    '点灯人に軛で馴らされた丘トロル。肩に鉄の玉座を担ぎ、その両の肘掛けには嵐提灯が灯る。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '大七面鳥サンダーストラット',
   'hudChrome.mounts.name_terrorspark_groundshaker': '地揺らしのテラースパーク',
   'hudChrome.mounts.desc_valorsteed': '頑健で足取り確かな駿馬。移動速度を高める。',
@@ -10392,6 +10395,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
   'entities.items.last_keep_signet.name': '最後の砦の印章',
   'entities.items.reins_terrorspark_groundshaker.name': 'テラースパークの始動キー',
+  'entities.items.reins_lanternback_troll.name':
+    '点灯人の軛：グルンボル',
   'entities.dungeons.the_last_keep.leaveText': '砦の扉を閉め、ドレイクランドの風の中へ戻った。',
   'entities.items.wildheart_tuskblade.name': 'ワイルドハートの牙大剣',
   'entities.items.wildheart_hexwood_staff.name': '盆地の呪木杖',

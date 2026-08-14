@@ -120,6 +120,14 @@ export const SFX = [
     custom: true,
   },
   {
+    // Synthesised rather than generated: one stride of a loaded troll is a
+    // 36 Hz body drop with the lantern chains ringing a beat behind it, and
+    // the layer timing that sells the weight is easier to author than to
+    // prompt for. Source: tmp_troll_step.mjs in the mount's build change.
+    key: 'mount_run_lanternback_troll',
+    custom: true,
+  },
+  {
     key: 'mount_run_terrorspark_groundshaker_start',
     custom: true,
   },

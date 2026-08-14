@@ -1670,6 +1670,27 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 4.5,
     lazyPreload: true,
   },
+  // The Lanternback Troll: a hand-authored rig (troll body skinned, the iron
+  // throne and both lanterns each welded rigid to a single bone) with authored
+  // Idle/Walk/Run/Death clips. runRef is deliberately the RIDDEN speed
+  // (RUN_SPEED 7 x +80% = 12.6), the same call the Drakemaw Raptor makes above:
+  // his stride is a long loose lope, and foot-matching a 3.4yd stride to 12.6
+  // yd/s would play the cycle at 3.7 strides/sec, which reads as a wind-up toy
+  // on a mount this heavy. At 12.6 the timeScale lands on 1.0 and he lopes at
+  // the authored 2.5 steps/sec.
+  mount_lanternback_troll: {
+    url: `${MOUNTS_DIR}/lanternback_troll.glb`,
+    // 7.0 makes him the tallest thing in the stable by a distance (the griffin
+    // is 4.1), which is the point: he is a hill troll wearing a throne, and at
+    // 5.0 he read as merely large rather than as something you would strap a
+    // chair to. walkRef scales with him, since a bigger creature covers more
+    // ground per stride and would otherwise scurry.
+    height: 7.0,
+    clips: MOUNT_RIGGED,
+    walkRef: 5.6,
+    runRef: 12.6,
+    lazyPreload: true,
+  },
   // Compact fantasy tank. One wheel revolution per locomotion clip matches
   // its authored tread cadence at the reference ground speeds below.
   mount_terrorspark_groundshaker: {

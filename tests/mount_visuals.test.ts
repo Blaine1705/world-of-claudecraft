@@ -6,8 +6,12 @@ import { tintedMaterial } from '../src/render/characters/assets';
 import { VISUALS } from '../src/render/characters/manifest';
 import { gfxInternalsForTest } from '../src/render/gfx';
 import {
+  MOUNT_LAMP_COLOR,
+  MOUNT_LAMP_DISTANCE,
+  MOUNT_LAMP_INTENSITY,
   MOUNT_VISUAL_SPECS,
   mountBobY,
+  mountLampFlicker,
   mountSeatLift,
   mountVisualSpec,
 } from '../src/render/mount_visuals';
@@ -169,6 +173,85 @@ describe('procedural bob math', () => {
   it('the snail glides flat (no bob at all)', () => {
     const spec = MOUNT_VISUAL_SPECS.stalkglider_snail;
     expect(mountBobY(spec, 0.5, true)).toBe(0);
+  });
+
+  it('the Lanternback Troll seats its rider ON the throne pan, not through it', () => {
+    const spec = MOUNT_VISUAL_SPECS.lanternback_troll;
+    const def = VISUALS.mount_lanternback_troll;
+    expect(spec).toMatchObject({
+      visualKey: 'mount_lanternback_troll',
+      seat: 5.15,
+      seatFwd: -0.36,
+      rigged: true,
+      bobAmp: 0,
+      fx: null,
+    });
+    expect(def).toMatchObject({
+      url: 'models/mounts/lanternback_troll.glb',
+      height: 7,
+      walkRef: 5.6,
+      runRef: 12.6,
+      lazyPreload: true,
+    });
+    // Fitted against a live probe: the throne's seat pan sits 3.656 above
+    // ground and the sit pose carries the rider's hip 0.087 above their root,
+    // so the lift has to clear the pan. Below it the throne's side panel
+    // swallows the rider's whole lower body.
+    const SEAT_PAN_ABOVE_GROUND = 3.656 * 1.4;
+    const SIT_POSE_HIP_ABOVE_ROOT = 0.087 * 1.4;
+    expect(spec.seat + SIT_POSE_HIP_ABOVE_ROOT).toBeGreaterThan(SEAT_PAN_ABOVE_GROUND);
+    // ...but not so far that he floats: keep it inside a hand's width.
+    expect(spec.seat + SIT_POSE_HIP_ABOVE_ROOT - SEAT_PAN_ABOVE_GROUND).toBeLessThan(0.35);
+    // The mount carries no procedural bob; the authored lope owns the bounce.
+    expect(mountBobY(spec, 0.7, true)).toBe(0);
+  });
+
+  it('the Lanternback Troll is the only mount that carries lamps, one per chain', () => {
+    for (const key of MOUNT_KEYS) {
+      const lamps = MOUNT_VISUAL_SPECS[key].lamps;
+      if (key === 'lanternback_troll') {
+        expect(lamps.map((l) => l.bone)).toEqual(['lantern_l', 'lantern_r']);
+        // Both chains are identical, so both lamps share one measured offset
+        // straight down the bone (0.681 of a 1.02-unit bone, in MODEL units).
+        for (const lamp of lamps) {
+          expect(lamp.offset[1]).toBeCloseTo(0.681, 3);
+          expect(Math.abs(lamp.offset[0])).toBeLessThan(0.02);
+          expect(Math.abs(lamp.offset[2])).toBeLessThan(0.02);
+        }
+      } else {
+        expect(lamps, `${key} must carry no lamps`).toEqual([]);
+      }
+    }
+    // Warm sodium, a touch under a wall torch, on the standard decay-2 falloff.
+    expect(MOUNT_LAMP_COLOR).toBe(0xff8c32);
+    expect(MOUNT_LAMP_INTENSITY).toBe(6.5);
+    expect(MOUNT_LAMP_DISTANCE).toBe(17);
+  });
+
+  it('lamp flicker stays inside the band that keeps the light budget stable', () => {
+    // A lamp that guttered to zero would flip the budget's shine decision on
+    // and off; one that spiked would bloom. Sample a long stretch densely.
+    let lo = Number.POSITIVE_INFINITY;
+    let hi = Number.NEGATIVE_INFINITY;
+    for (let i = 0; i < 20000; i++) {
+      for (const lamp of [0, 1]) {
+        const v = mountLampFlicker(i * 0.0037, lamp);
+        lo = Math.min(lo, v);
+        hi = Math.max(hi, v);
+      }
+    }
+    expect(lo).toBeGreaterThan(0.77);
+    expect(hi).toBeLessThan(1.15);
+    // Deterministic, so a headless render is reproducible.
+    expect(mountLampFlicker(3.25, 0)).toBe(mountLampFlicker(3.25, 0));
+    // The two lamps are detuned: pulsing in lockstep is what gives a scripted
+    // flicker away. Over a real stretch they must diverge substantially.
+    let maxSplit = 0;
+    for (let i = 0; i < 4000; i++) {
+      const t = i * 0.0037;
+      maxSplit = Math.max(maxSplit, Math.abs(mountLampFlicker(t, 0) - mountLampFlicker(t, 1)));
+    }
+    expect(maxSplit).toBeGreaterThan(0.15);
   });
 
   it('pins the ambient particle effects: snail slime, hover-cycle exhaust', () => {

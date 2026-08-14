@@ -355,6 +355,14 @@ import { buildMailboxPillar } from './mailbox';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
+import { type MountLamps, updateMountLamps } from './mount_lamps';
+import {
+  disposeMountView,
+  type MountViewHost,
+  placeRider,
+  syncMountTransitionFx,
+  syncMountVisual,
+} from './mount_lifecycle';
 import { mountBobY, mountVisualSpec } from './mount_visuals';
 import { NameplatePainter } from './nameplate_painter';
 import {
@@ -1078,6 +1086,8 @@ export interface EntityView {
   travelVisual: CharacterVisual | null; // druid travel form (chicken-cow), built lazily
   mountVisual: CharacterVisual | null; // rideable mount under a player, built lazily
   mountVisualKey: string; // '' = none; diffed each frame for live mount swaps
+  mountLamps: MountLamps | null; // point lights the mount carries on its own bones
+  mountSeatBone: THREE.Object3D | null; // resolved seat bone the rider anchors to
   /** world-unit rider saddle lift while mounted (0 dismounted); the nameplate,
    *  chat-bubble, and sloppy-pick overhead anchors add it (scaled by e.scale) */
   mountLift: number;
@@ -8861,6 +8871,8 @@ export class Renderer {
       travelVisual: null,
       mountVisual: null,
       mountVisualKey: '',
+      mountLamps: null,
+      mountSeatBone: null,
       mountLift: 0,
       metamorphVisual: null,
       fireballTravelVisual: null,
@@ -9228,6 +9240,13 @@ export class Renderer {
       const kind = this.sim.entities.get(entry.viewId)?.kind ?? '';
       if (view) this.applyWeaponSkin(view, entry.skinId, kind);
     }
+  }
+
+  private mountViewHost(v: EntityView): MountViewHost {
+    return {
+      reconcileViewLights: () => this.reconcileViewLights(v),
+      gateSwapFlagOnCompile: (root, done) => this.gateSwapFlagOnCompile(root, done),
+    };
   }
 
   private reconcileViewLights(v: EntityView): void {
@@ -10511,7 +10530,7 @@ export class Renderer {
       v.bearVisual?.dispose();
       v.catVisual?.dispose();
       v.travelVisual?.dispose();
-      v.mountVisual?.dispose();
+      disposeMountView(v);
       v.metamorphVisual?.dispose();
       v.fireballTravelVisual?.dispose();
     } else {
@@ -11327,12 +11346,15 @@ export class Renderer {
       v.visual.setFerocityStage(petFrenzy ? 3 : ferocityStage);
       v.visual.setPresentationScale(hunterPetVisualScale(ferocityStage, petFrenzy));
 
-      // live sheathe toggle (Z key): the sim's weaponStowed bit moves held
-      // props between the hands and the on-back pose (self or a peer)
-      if (e.weaponStowed !== v.weaponStowed) {
-        v.weaponStowed = e.weaponStowed;
-        v.visual.setWeaponStowed(e.weaponStowed);
-      }
+      // The live sheathe toggle (Z key) is diffed further down, folded into the
+      // swim/mount stow overlay: ONE writer for `v.weaponStowed`. Two diffs
+      // against the same field fight, because they compute different targets —
+      // this one the bare sim bit, the other the union with swimming/riding. A
+      // swimmer with a weapon drawn had them ping-pong the field every frame,
+      // replaying the sheathe one-shot forever (for a player rig that clip is
+      // 1H_Melee_Attack_Chop), which pins `currentIsOneShot` true and so
+      // suppresses every base-state fade: the authored strokes never played and
+      // the body froze in the chop's windup.
 
       // lazy form visuals, swapped by visibility like the old sheep/bear rigs
       // (build, compile gate and encounter prewarm all live in buildFormVisual)
@@ -11373,35 +11395,7 @@ export class Renderer {
       // is untouched either way).
       const mountSpec = e.kind === 'player' && e.mountKey ? mountVisualSpec(e.mountKey) : null;
       const mountShown = !!mountSpec && requestedForm === 'base' && !e.dead;
-      if (mountSpec && v.mountVisualKey !== mountSpec.visualKey) {
-        if (v.mountVisual) {
-          v.group.remove(v.mountVisual.root);
-          v.mountVisual.dispose();
-          v.mountVisual = null;
-        }
-        v.mountVisualKey = '';
-        if (mountAssetsReady(mountSpec.visualKey)) {
-          v.mountVisual = createMountVisual(mountSpec.visualKey);
-          v.group.add(v.mountVisual.root); // group.scale already carries e.scale
-          v.mountVisualKey = mountSpec.visualKey;
-          // A newly summoned mount is exactly a brand-new rig's materials
-          // linking for the first time; gate it like a gear swap instead of
-          // freezing the frame the mount lands on (#2571).
-          v.mountCompilePending = true;
-          this.gateSwapFlagOnCompile(v.mountVisual.root, () => {
-            v.mountCompilePending = false;
-          });
-        } else {
-          void preloadMountAssets(mountSpec.visualKey).catch((err) =>
-            console.error('Failed to preload mount model:', err),
-          );
-        }
-      } else if (!mountSpec && v.mountVisual) {
-        v.group.remove(v.mountVisual.root);
-        v.mountVisual.dispose();
-        v.mountVisual = null;
-        v.mountVisualKey = '';
-      }
+      syncMountVisual(v, mountSpec, this.mountViewHost(v));
       if (v.mountVisual) v.mountVisual.root.visible = mountShown && !v.mountCompilePending;
       v.mountLift = mountShown && v.mountVisual ? mountSpec.seat : 0;
       const active = activeCharacterFormVisual(
@@ -11450,8 +11444,7 @@ export class Renderer {
       // the seat height while mounted; 0 whenever the mount is absent/hidden.
       // seatFwd slides the rider along facing onto saddles that sit off the
       // model origin (the toad's is well back toward the tail).
-      v.visual.root.position.y = v.mountLift;
-      v.visual.root.position.z = v.mountLift > 0 && mountSpec ? mountSpec.seatFwd : 0;
+      placeRider(v, v.visual.root, mountSpec, v.mountLift, 0);
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual && resolvedForm !== 'fireball');
       v.sheepVisual?.setFar(v.isFar && active === v.sheepVisual);
@@ -11513,7 +11506,11 @@ export class Renderer {
       // drawn, and a peer's weapon rides their back the moment they start
       // swimming without any wire traffic. (This diff sits here, after the swim
       // latch, precisely so both halves are known in the same frame.)
-      const stowed = e.weaponStowed || swimming;
+      // Riding stows too, on the same overlay terms as swimming: a rider with a
+      // polearm drawn fouls the throne he is sitting in, and both hands are on
+      // the reins anyway. The player's own sheathe choice is untouched, so
+      // dismounting restores exactly what they had drawn.
+      const stowed = e.weaponStowed || swimming || v.mountLift > 0;
       if (stowed !== v.weaponStowed) {
         v.weaponStowed = stowed;
         v.visual.setWeaponStowed(stowed);
@@ -12036,7 +12033,7 @@ export class Renderer {
           // float), not just the mount body
           const bob = mountBobY(mountSpec, this.time, moving);
           v.mountVisual.root.position.y = bob;
-          v.visual.root.position.y = v.mountLift + bob;
+          placeRider(v, v.visual.root, mountSpec, v.mountLift, bob);
           // ambient mount particles: the snail paints its slime path while
           // gliding, the hover cycle streams aether exhaust off its tail
           if (mountSpec.fx === 'slime') {
@@ -12044,6 +12041,9 @@ export class Renderer {
           } else if (mountSpec.fx === 'exhaust') {
             this.vfx.mountExhaust(v.group.position, facing, dt, moving);
           }
+          // Carried lamps are DYNAMIC budget lights: the pass only ever zeroes
+          // them, so the flame level has to be re-driven here, ahead of it.
+          if (v.mountLamps) updateMountLamps(v.mountLamps, this.time);
         } else {
           v.mountVisual.advanceOffscreen(dt);
         }
@@ -12063,49 +12063,19 @@ export class Renderer {
         }
       }
 
-      // Mount summon/dismount transition FX (render-only; the wire fields carry
-      // the state to every client, so no SimEvent is needed). The rider throws up
-      // a call pose the instant a summon begins, and a yellow-orange shimmer rings
-      // them when the mount actually appears, swaps, or clears.
       if (e.kind === 'player') {
-        const mountCasting = e.mountCastRemaining > 0;
-        // idle -> summoning edge (mountCastKey set): play the arm-raise call pose
-        // for ~the transition window. A dismount (mountCastKey === '') gets no
-        // pose; its effect is the completion glow below. Gated like the emote path
-        // (the sim roots the player, so moving/airborne is unlikely regardless).
-        if (
-          mountCasting &&
-          !v.wasMountCasting &&
-          e.mountCastKey !== '' &&
-          !visuallyDead &&
-          !swimming &&
-          runCharacterPresentation
-        ) {
-          active.playCallPose(e.mountCastRemaining);
-        }
-        v.wasMountCasting = mountCasting;
-        // mountKey change = summon completed, dismount completed, or a live swap:
-        // fire the shimmer at the rider. Tracked separately from mountVisualKey,
-        // which lags async asset loading.
-        if (e.mountKey !== v.lastMountKey) {
-          v.lastMountKey = e.mountKey;
-          if (runCharacterPresentation) this.vfx.mountSummonGlow(e.id);
-          // A mountKey change (dismount, a live mount swap, or a fresh summon
-          // reusing this entity id) must drop any engine mount's windup/loop
-          // state; otherwise the old loop node stays connected forever once
-          // logicallyMounted goes false (the entity/view-removal reset at
-          // removeView() never fires for a live swap or dismount), and a swap
-          // would carry the old moving state into the new mount, skipping its
-          // windup.
-          this.audioSink?.mountEngineReset(e.id);
-          // Warm the new mount's engine clips right away (not e.g. lazily on
-          // the first movement frame): a cold first ride otherwise plays the
-          // windup through playAt's cold path (silently dropped past a 0.12s
-          // fetch/decode window) and the loop's cold path (a fallback fade-in
-          // instead of the immediate splice), reading as ~0.9s of silence
-          // then a swell. A no-op for an ordinary (non-engine) mount.
-          if (e.mountKey !== '') this.audioSink?.preloadMountEngine(e.mountKey);
-        }
+        v.wasMountCasting = syncMountTransitionFx(v, {
+          mountCasting: e.mountCastRemaining > 0,
+          mountCastKey: e.mountCastKey,
+          mountCastRemaining: e.mountCastRemaining,
+          mountKey: e.mountKey,
+          poseAllowed: !visuallyDead && !swimming && runCharacterPresentation,
+          present: runCharacterPresentation,
+          playCallPose: (secs: number) => active.playCallPose(secs),
+          summonGlow: () => this.vfx.mountSummonGlow(e.id),
+          engineReset: () => this.audioSink?.mountEngineReset(e.id),
+          preloadEngine: (key: string) => this.audioSink?.preloadMountEngine(key),
+        });
       }
 
       // per-ability windup orb + buff-orbit bands (spec-driven; no-op for

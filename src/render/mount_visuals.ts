@@ -8,6 +8,31 @@
 import type { MountKey } from '../sim/content/mounts';
 import { MOUNTS } from '../sim/content/mounts';
 
+/** A lit lamp carried on the mount's own skeleton. The renderer hangs a point
+ *  light off `bone` so the flame tracks the lamp through every swing of the
+ *  clip, instead of a world-space light chasing the body a frame behind. */
+export interface MountLampSpec {
+  /** Joint node name in the mount GLB (three names its Bone after it). */
+  bone: string;
+  /** Lamp centre in that bone's LOCAL space, in MODEL units. The visual's
+   *  normalization scale carries it to world, so this stays valid whatever
+   *  `height` the manifest gives the mount. */
+  offset: readonly [number, number, number];
+}
+
+/** A seat carried on the mount's own skeleton, for mounts whose saddle MOVES
+ *  relative to the body (the Lanternback's throne rolls and pitches with his
+ *  shoulders). The rider is parented to the bone instead of floating at a fixed
+ *  lift, so his weight stays on the seat through the whole cycle rather than
+ *  the seat sliding through him. */
+export interface MountSeatSpec {
+  /** Joint node name in the mount GLB (three names its Bone after it). */
+  bone: string;
+  /** Where the rider's ROOT sits in that bone's local space, in MODEL units, so
+   *  it survives any `height` the manifest normalizes the mount to. */
+  offset: readonly [number, number, number];
+}
+
 export interface MountVisualSpec {
   /** VISUALS key (src/render/characters/manifest.ts, lazyPreload). */
   visualKey: string;
@@ -31,6 +56,11 @@ export interface MountVisualSpec {
   /** Ambient particle effect the renderer emits for this mount: the snail's
    *  slime path while moving, the hover cycle's aether exhaust. */
   fx: 'slime' | 'exhaust' | null;
+  /** Lit lamps carried on the rig (empty for every mount that carries none). */
+  lamps: readonly MountLampSpec[];
+  /** Seat bone the rider is anchored to, or null to sit at the fixed `seat`
+   *  lift (every mount whose saddle does not move under the rider). */
+  seatBone: MountSeatSpec | null;
 }
 
 const spec = (
@@ -40,6 +70,8 @@ const spec = (
   bob?: { amp: number; hz: number; idle?: boolean; shape?: 'hover' | 'hop' },
   seatFwd = 0,
   fx: 'slime' | 'exhaust' | null = null,
+  lamps: readonly MountLampSpec[] = [],
+  seatBone: MountSeatSpec | null = null,
 ): MountVisualSpec => ({
   visualKey,
   seat,
@@ -50,7 +82,27 @@ const spec = (
   bobIdle: bob?.idle ?? false,
   bobShape: bob?.shape ?? 'hop',
   fx,
+  lamps,
+  seatBone,
 });
+
+// The Lanternback's two storm lanterns. Each hangs from the TOP of its chain
+// (the bone head), so the offset is measured straight down the bone to the
+// lamp's glass: 0.681 model units of a 1.02-unit bone. The two chains are
+// identical, hence one shared offset.
+const LANTERN_LAMP_OFFSET = [0.005, 0.681, -0.007] as const;
+
+/** Colour of a carried lamp's point light: sodium-warm, matching the emissive
+ *  `lantern_glow` material baked into the mount GLB. */
+export const MOUNT_LAMP_COLOR = 0xff8c32;
+/** Base intensity. Above a wall torch (castle_features uses 4 at 13) on purpose:
+ *  these are the mount's whole identity, they hang high on a 7-unit creature, and
+ *  a lamp that only lit the throne it hung from was not worth carrying. */
+export const MOUNT_LAMP_INTENSITY = 6.5;
+/** Falloff radius in world units. Sized against the Lanternback at height 7.0,
+ *  whose lamps hang about 5 units up and 1.7 apart: they should pool light on the
+ *  ground around him, not stop at the throne. */
+export const MOUNT_LAMP_DISTANCE = 17;
 
 export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // seat tuned to the authored horse model: its saddle sits forward of the
@@ -81,6 +133,32 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // The Drakemaw Raptor: authored saddle sits over the hips behind the neck
   // spines (hence the slight rear shift), gait-rigged Walk/Run cycles.
   drakemaw_raptor: spec('mount_drakemaw_raptor', 2.35, true, undefined, -0.1),
+  // The Lanternback Troll: the rider sits IN the iron throne strapped across
+  // his shoulders, not astride a back, so the seat is high and set BEHIND the
+  // model origin. `seat`/`seatFwd` here are only the FALLBACK and the anchor the
+  // nameplate rides; the rider's actual position comes from the chair bone
+  // below. Both were fitted at height 5.0 (pan 3.656 above ground, sit-pose hip
+  // 0.087 above the root) and then carried to the 40% larger height 7.0.
+  // No procedural bob: the authored lope carries the whole bounce.
+  lanternback_troll: spec(
+    'mount_lanternback_troll',
+    5.15,
+    true,
+    undefined,
+    -0.36,
+    null,
+    [
+      { bone: 'lantern_l', offset: LANTERN_LAMP_OFFSET },
+      { bone: 'lantern_r', offset: LANTERN_LAMP_OFFSET },
+    ],
+    // The throne rides his shoulders, so it rolls and pitches with every stride:
+    // a rider held at a fixed lift gets slid through by it. Anchoring to the
+    // chair bone keeps him planted in the seat instead. Offset measured in
+    // Blender: the seat pan sits (0, 0.89, 0.25) from the bone head, and the
+    // rider's root rides a hair above the pan so the sit pose's hips carry his
+    // weight onto it.
+    { bone: 'chair', offset: [0, 0.918, 0.25] },
+  ),
 };
 
 /** Spec for an entity's active mountKey, or null when dismounted/unknown. */
@@ -91,6 +169,24 @@ export function mountVisualSpec(mountKey: string): MountVisualSpec | null {
 /** World-unit rider lift for the active mountKey ('' or unknown: 0). */
 export function mountSeatLift(mountKey: string): number {
   return mountVisualSpec(mountKey)?.seat ?? 0;
+}
+
+/**
+ * Flame flicker for one carried lamp, as a multiplier on MOUNT_LAMP_INTENSITY.
+ *
+ * Two detuned sines per lamp rather than noise: it is deterministic (so the
+ * headless tests can pin it), allocation-free on the hot path, and never
+ * repeats visibly because the two periods are incommensurate. `index` detunes
+ * the pair per lamp so the left and right lanterns never pulse in lockstep,
+ * which is what gives away a scripted flicker. Bounded to [0.78, 1.14]: a lamp
+ * that guttered to zero would pop the point-light budget's shine decision on
+ * and off, and one that spiked would bloom.
+ */
+export function mountLampFlicker(timeSec: number, index: number): number {
+  const phase = index * 2.399;
+  const a = Math.sin(timeSec * 7.3 + phase);
+  const b = Math.sin(timeSec * 11.9 + phase * 1.7);
+  return 0.96 + 0.12 * a + 0.06 * b;
 }
 
 /** Procedural vertical offset for a clipless mount at time t (seconds). */

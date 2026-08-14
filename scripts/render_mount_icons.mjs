@@ -27,6 +27,8 @@ mkdirSync(outDir, { recursive: true });
 if (debugDir) mkdirSync(debugDir, { recursive: true });
 
 // Per-mount render jobs. `file` is the GLB basename, `id` the reins item id (icon filename).
+// The Lanternback Troll is deliberately absent: its reins ship a PAINTED icon, and a
+// render job here would overwrite that with a 3D cut-out on the next run.
 // `cfg` overrides the generic head framing (defaults live in the entry); tuned by eye until
 // each mount's face fills the frame. All mounts face +Z (the model convention), so `fwd` is
 // only set where a model deviates.

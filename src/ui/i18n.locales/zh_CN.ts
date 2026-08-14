@@ -9192,8 +9192,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': '影跃蟾蜍卡玛影',
   'hudChrome.mounts.name_stormfeather_griffin': '凌天风暴之羽',
   'hudChrome.mounts.name_drakemaw_raptor': '龙喉迅猛龙',
+  'hudChrome.mounts.name_lanternback_troll': '提灯背者格伦博',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。',
+  'hudChrome.mounts.desc_lanternback_troll':
+    '被点灯人驯服的山地巨魔，肩上扛着一把铁王座，两侧扶手各挂一盏燃烧的风灯。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆阔步大火鸡',
   'hudChrome.mounts.name_terrorspark_groundshaker': '惊雷撼地者',
   'hudChrome.mounts.desc_valorsteed': '一匹坚韧稳健的骏马，可提升旅行速度。',
@@ -9931,6 +9934,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.enterText': '你踏入最后的堡垒那冰冷而寂静的大厅。',
   'entities.items.last_keep_signet.name': '最后的堡垒印戒',
   'entities.items.reins_terrorspark_groundshaker.name': '惊雷撼地者点火钥匙',
+  'entities.items.reins_lanternback_troll.name':
+    '点灯人之轭：格伦博',
   'entities.dungeons.the_last_keep.leaveText': '你带上堡门，重新走进龙裔荒原的寒风中。',
   'entities.items.wildheart_tuskblade.name': '荒野之心獠牙巨刃',
   'entities.items.wildheart_hexwood_staff.name': '盆地巫木法杖',

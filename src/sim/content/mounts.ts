@@ -20,6 +20,7 @@ export type MountKey =
   | 'stormfeather_griffin'
   | 'thunderstrut_gobbler'
   | 'drakemaw_raptor'
+  | 'lanternback_troll'
   | 'terrorspark_groundshaker';
 
 export type MountRarity = 'common' | 'uncommon' | 'rare' | 'epic';
@@ -79,9 +80,10 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     moveSpeedPct: 0.75,
   },
   // Epic tier (80%): the hover-cycle and the gobbler come from Rift S clears.
-  // The Terrorspark Groundshaker is developer-only for now and has no
-  // player-facing acquisition, and stays LAST in the catalog (the tests pin the
-  // developer mount as the tail, so a new player-facing mount lands above it).
+  // The Terrorspark Groundshaker and the Lanternback Troll are developer-only
+  // for now and have no player-facing acquisition. The tank stays LAST in the
+  // catalog (the tests pin it as the tail, so a new player-facing mount lands
+  // above it); see DEVELOPER_MOUNTS below for the shared gate.
   aether_hover_cycle: {
     key: 'aether_hover_cycle',
     name: 'Aether-Jouster Hover-Cycle',
@@ -103,6 +105,15 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },
+  // A hill troll broken to the saddle by lamplighters: he carries an iron
+  // throne strapped across his shoulders with a storm lantern hung off each
+  // arm of it, so the rider travels lit. Developer-only for now.
+  lanternback_troll: {
+    key: 'lanternback_troll',
+    name: 'Grumbol the Lanternback',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
   terrorspark_groundshaker: {
     key: 'terrorspark_groundshaker',
     name: 'Terrorspark Groundshaker',
@@ -113,6 +124,23 @@ export const MOUNTS: Record<MountKey, MountDef> = {
 
 /** Catalog order: rarity tier, then declaration order. */
 export const MOUNT_KEYS = Object.keys(MOUNTS) as readonly MountKey[];
+
+/** Mounts with NO player-facing acquisition path: absent from vendors, quests,
+ *  creature loot, heroic loot, and Rift reward pools, reachable only through
+ *  `/dev mounts` or `/dev give <reins>`. Their reins stay SOULBOUND, unlike
+ *  every player mount, because a tradable dev grant is an economy leak. This is
+ *  the single source of truth: the catalog, the item table, and the acquisition
+ *  tests all read it, so a fourth place can never disagree about which mounts
+ *  are still under development. */
+export const DEVELOPER_MOUNTS: readonly MountKey[] = [
+  'lanternback_troll',
+  'terrorspark_groundshaker',
+];
+
+/** True while a mount has no player-facing acquisition path (see DEVELOPER_MOUNTS). */
+export function isDeveloperMount(key: string): boolean {
+  return (DEVELOPER_MOUNTS as readonly string[]).includes(key);
+}
 
 /** The horse: the default stable pick and the fallback for every unknown/legacy
  *  persisted value. It is no longer free (a fresh player owns nothing): owning

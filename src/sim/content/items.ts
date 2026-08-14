@@ -414,6 +414,20 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
   },
+  // Developer-only mount, on the same terms as the tank above (DEVELOPER_MOUNTS
+  // in content/mounts.ts): no vendor, quest, creature, heroic, or Rift source,
+  // and soulbound so a dev grant cannot be traded into the economy. Use
+  // /dev mounts or /dev give reins_lanternback_troll.
+  reins_lanternback_troll: {
+    id: 'reins_lanternback_troll',
+    name: "Lamplighter's Yoke: Grumbol",
+    kind: 'mount',
+    mount: 'lanternback_troll',
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
   mistveil_cord: {
     id: 'mistveil_cord',
     name: 'Mistveil Cord',

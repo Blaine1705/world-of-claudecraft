@@ -6484,6 +6484,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mount",
+        "name": "Grumbol the Lanternback"
+      },
+      {
+        "kind": "mount",
         "name": "Terrorspark Groundshaker"
       }
     ]
