@@ -71,7 +71,7 @@ Foundational rather than a flywheel itself: every other $WOC mechanic needs a ve
 
 ## Out of scope
 Custody, arbitrary transactions, staking, and gameplay power remain out of scope.
-Every transaction handoff is a server-built intent already bound to the linked
+Every transaction handoff is a service-built intent already bound to the linked
 wallet: the Claudium purchase, and the $WOC marketplace's bond and settlement
 transactions (`docs/prd/woc/marketplace.md`); the wallet-link feature itself
 still moves no funds.

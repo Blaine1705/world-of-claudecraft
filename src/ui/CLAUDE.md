@@ -610,8 +610,9 @@ same file), and each module's header carries its own contract.
   The trade window's $WOC arm (panel `trade_woc_view.ts`/`trade_woc_panel.ts`, driven
   from `src/ui/hud/woc_trade/`) does NOT follow that model yet: it hard-codes
   `acceptTerms: true` with no terms shown, the recorded R9 pre-enable obligation
-  (`docs/woc-marketplace-hardening/state.md`); the Exchange checkbox is the model to
-  build against.
+  (`docs/woc-marketplace-hardening/state.md`); the Exchange checkbox is the model
+  for the acceptance CONTROL, but it shows no terms text or link itself and owes
+  that affordance pre-enable too (draft Terms 10.3).
 - **woc_store_view.ts** (+ **char_skin_window.ts**, **armory_inspect.ts**,
   **armory_labels.ts**, **store_promo_card.ts**, **preview_prewarm_core.ts**): the WOC Store
   and Season 1 Armory. The pure projection reads the skin catalog

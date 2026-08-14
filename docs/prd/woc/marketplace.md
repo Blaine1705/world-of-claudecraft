@@ -116,7 +116,8 @@ destination. The adopted destination is the treasury and burn split, one code
 path with the settlement fee split (ruling R2 in the hardening packet); the
 service currently routes forfeits to the treasury only, a recorded divergence
 the bond-releaser work closes. Repeated defaults earn progressively longer
-bidding suspensions (strike ladder in `woc_market_rules.ts`).
+marketplace suspensions (marketplace-wide: a suspension blocks listing as
+well as bidding; strike ladder in `woc_market_rules.ts`).
 
 Deviation from the proposal, recorded deliberately: the proposal suggests the
 bond "counts toward payment" on a win. Here the winner pays the full price in
@@ -209,9 +210,10 @@ Eligibility is a per-server policy, not a hardcoded rule set
   item left, which needs no rule of its own.
 - Still defined and dark: serialized collectibles (no assets behind them yet).
 - Excluded always, for every category: `boundTo` copies, quest items, anything
-  currently sold for Claudium (the store catalog is consulted through the
-  service when reachable), Gold, and Claudium themselves (not items,
-  structurally unlistable). `soulbound` and `noMarketList` remain absolute for
+  currently sold for Claudium (kept out today by the operator-maintained
+  exclusion list, `WOC_MARKET_EXCLUDED_ITEM_IDS`; the specified store-catalog
+  merge through the service is not built), Gold, and Claudium themselves (not
+  items, structurally unlistable). `soulbound` and `noMarketList` remain absolute for
   every category except the one that tolerates each, above.
 
 Each category is an independent switch (`allowEquipment`, `allowMounts`,
@@ -366,7 +368,8 @@ enabled on a production realm until they are reconciled:
 ## Open questions
 
 - Should high-value settlements additionally take a temporary security hold
-  (admin-released) on top of TOTP? Shipped as configuration, default off.
+  (admin-released) on top of the wallet-signature step-up (ruling R1, which
+  superseded TOTP)? Not built: no such hold or configuration exists in code.
 - Closely-linked-account bidding blocks beyond same-account and same-wallet:
   how much of the moderation shared-IP graph should auto-block versus flag for
   review?

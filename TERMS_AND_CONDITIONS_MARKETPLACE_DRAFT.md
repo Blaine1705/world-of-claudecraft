@@ -17,9 +17,10 @@ Summary of changes against the live Terms:
 - Section 8 (virtual items): the "no monetary value" and "cannot be redeemed"
   statements are rescoped to trading outside the marketplace, and the
   licence-not-ownership framing is restated to survive a marketplace sale.
-- Section 9 (the $WOC token): the "no effect on your account" and "wallet
-  verification involves no transaction" statements are rescoped to wallet
-  linking; marketplace participation is separated out as optional and
+- Section 9 (the $WOC token): the "no effect on your account" statement is
+  rescoped to token holding (holding grants no gameplay power) and the
+  "wallet verification involves no transaction" statement is rescoped to
+  wallet linking; marketplace participation is separated out as optional and
   transactional.
 - New Section 10 (the $WOC marketplace): the whole marketplace contract:
   real-money item trading, who may participate (an 18+ age floor, browser
@@ -31,9 +32,12 @@ Summary of changes against the live Terms:
   and the old Section 18 (suspension and termination) gains a sentence on
   resolving marketplace escrow when an account closes.
 - Sections 10 to 22 of the live Terms become Sections 11 to 23, with the
-  cross-references in the old Sections 13, 18, and 21 updated to match, and
-  the old Section 21 (app store terms) additionally states that the
-  marketplace is not available in the App on any platform.
+  cross-references in the old Sections 13, 18, and 21 updated to match. The
+  old Section 18's survival list is additionally expanded so the new Section
+  10 survives termination, the old Section 21 (app store terms) additionally
+  states that the marketplace is not available in the App on any platform,
+  and the old Section 16 (limitation of liability) is unchanged in substance
+  but carries a `[COUNSEL]` flag for the liability-cap question.
 
 Open questions for counsel are collected in a decision memo held privately
 with the counsel material, outside this repository (the repository is open
@@ -111,9 +115,9 @@ We may modify, remove, reset, or wipe virtual items, currency, characters, and g
 
 A token referred to as $WOC, associated with the community on the Solana network, was created and is controlled by a third party. We do not issue, mint, control, manage, promote as an investment, or guarantee the $WOC token or its value.
 
-- The token is not required to play. Holding it, or not holding it, never grants or withholds gameplay power: it has no effect on your characters' stats, progression, drop rates, or any other gameplay outcome. The optional marketplace (Section 10) lets players trade eligible earned items among themselves for $WOC; it does not let anyone buy power from us.
+- The token is not required to play. Holding it, or not holding it, never grants or withholds gameplay power: holding it has no effect on your characters' stats, progression, drop rates, or any other gameplay outcome. The optional marketplace (Section 10) lets players trade eligible earned items among themselves for $WOC; it does not let anyone buy power from us.
 - Linking a wallet to your account is cosmetic and read-only. It is done with one signature, involves no transaction and no transfer of funds, and displays optional flair or a badge.
-- Participating in the $WOC marketplace is separate from wallet linking, entirely optional, and does involve real blockchain transactions: payments and bid bonds that you sign in your own wallet. We never hold your keys or your funds. Section 10 governs that participation.
+- Participating in the $WOC marketplace is separate from wallet linking, entirely optional, and does involve real blockchain transactions: payments and bid bonds that you sign in your own wallet. We never hold your keys, and apart from the refundable bid bond described in Section 10.5, which we hold from when your bond payment confirms until it is returned or forfeited, we never hold your funds. [COUNSEL] Section 10 governs that participation.
 - Nothing in the Service is financial, investment, legal, or tax advice, or an offer, solicitation, or recommendation to buy, sell, or hold any token or digital asset.
 - Digital assets are volatile and carry risk, including total loss, and may be regulated differently in different countries. You are solely responsible for your own decisions and for complying with the laws that apply to you.
 
@@ -143,20 +147,26 @@ Your first Marketplace commitment requires you to accept these Marketplace terms
 
 When you list an item, or agree a direct sale, the exact item copy leaves your character's bags and is held by the Game in escrow for the life of the listing. While escrowed it cannot be equipped, used, traded, mailed, or listed anywhere else, and you cannot get it back except as these terms describe. If the listing ends without a completed sale (it expires unsold, the reserve is not met, you cancel where cancellation is allowed, the buyer never pays, or the sale otherwise fails), the same copy is returned to you by in-game mail. If the sale completes, the same copy is delivered to the buyer: placed directly into their character's bags, or sent by in-game mail.
 
-We decide which item categories are eligible for the Marketplace, per realm, and may change eligibility at any time. Bound items, quest items, and other excluded categories cannot be listed. Delisting a category does not disturb completed sales.
+We decide which item categories are eligible for the Marketplace, per realm, and may change eligibility at any time. Items already bound to a character, quest items, and any other items or categories we exclude cannot be listed. Delisting a category does not disturb completed sales.
 
-A seller cannot cancel a listing after the first confirmed bid, or while a buyer's payment may be in progress, except through player support. Bids cannot be withdrawn.
+A seller cannot cancel a listing while any bid stands, including a bid whose bond is still being paid, or while a buyer's payment may be in progress; a cancellation requested while a buy-now purchase is pending takes effect only if that purchase does not complete, and player support can cancel a listing only once no payment is in flight. A bid is binding once you sign its bond transaction; before that you may abandon it, and a bid whose bond is never paid lapses on its own after a short period.
 
 ### 10.5 Bidding, bid bonds, and forfeiture
 
 Placing an auction bid requires a small refundable bond, denominated in US dollars and paid in $WOC when the bid is placed. The bond is our protection against bidders who win and never pay; it works like this:
 
 - The bond is a percentage of your bid (currently 5%, within a fixed minimum and maximum); the resolved bond amount is shown before you commit. You sign the bond transaction in your own wallet, and your bid becomes active only when that transaction is confirmed.
-- Your bond is returned when you are outbid, when the auction ends below its reserve, and when a buy-now purchase closes the auction.
+- Your bond is returned when you are outbid (subject to the second-chance offer below), when the auction ends below its reserve, and when a buy-now purchase closes the auction.
 - If you win and complete payment, your bond is returned after settlement confirms.
 - If you win and do not pay within the settlement window, you forfeit the bond: it is not returned to you, it never goes to the seller, and it is split between the Game treasury and the permanent token burn. Failing to pay also earns your account a Marketplace strike; repeated strikes earn progressively longer suspensions from the Marketplace.
 
+A bid confirmed in the final minutes of an auction extends the auction by a short period so it can be answered; the total extension is capped at a fixed period past the listed end time.
+
+A seller may enable a second-chance offer when creating a listing. If the winner does not pay, the highest eligible remaining bidder becomes the buyer at their own bid amount, with a fresh settlement window. If that bidder's bond has not yet been returned, it is held again and remains subject to this Section; a bond already returned is not taken again. Not paying within the new window carries the same consequences as any winning bid, except that only a bond we hold can be forfeited. [COUNSEL]
+
 Direct sales agreed through the trade window carry no bond. If you agree a direct purchase and do not pay within its window, the item returns to the seller and your account earns a strike on the same ladder.
+
+On listings other than direct sales, abandoning a buy-now purchase without paying carries no bond and no strike, but it temporarily blocks you from re-claiming that listing, and repeated abandonments within a short period temporarily block new buy-now purchases across your account.
 
 ### 10.6 Payment, settlement, and delivery
 
@@ -164,11 +174,11 @@ A winning bidder or buyer pays inside a limited settlement window. Payment works
 
 You pay the network transaction fee. If the market price of $WOC moves between your commitment and your payment, the token count due will differ from the estimate you saw when you committed; the US dollar price does not change. If you do not pay within the settlement window, the sale fails and Section 10.5's consequences apply.
 
-When the price of $WOC cannot be read reliably, or the pricing service is degraded or unreachable, the Marketplace suspends new purchases and settlements until pricing recovers. Auctions keep counting down; no sale becomes irreversible while pricing is down.
+When the price of $WOC cannot be read reliably, or the pricing service is degraded or unreachable, the Marketplace stops accepting new listings, offers, purchases, and bids, and stops issuing payment quotes, until pricing recovers. Auctions keep counting down, settlement windows continue to run during the pause, and a payment already broadcast is still verified and delivered. [COUNSEL]
 
 ### 10.7 Fees and the burn
 
-Every completed sale carries a 10% fee, paid by the seller out of the sale amount: 90% of the settlement amount goes to the seller's verified wallet, 7% to the Game treasury, and 3% is permanently burned (destroyed, removing those tokens from circulation). The split is computed inside the settlement transaction and shown to both parties before they confirm. The treasury and burn addresses are public. We may change the fee or the split prospectively; a change never applies to a sale already agreed.
+Every completed sale carries a 10% fee, paid by the seller out of the sale amount: 7% of the settlement amount goes to the Game treasury, 3% is permanently burned (destroyed, removing those tokens from circulation), and the seller receives the remainder, paid to the wallet that was verified on their account when the listing was created. Each fee leg is rounded up to the whole cent, so the seller's share can fall up to two cents below 90%. The split is computed inside the settlement transaction and shown to both parties before they confirm, and the treasury and burn addresses are visible on-chain in every settlement transaction. We may change the fee or the split prospectively; a change never applies to a sale already agreed.
 
 ### 10.8 Finality, disputes, and refunds
 

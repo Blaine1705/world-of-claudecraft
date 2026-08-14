@@ -293,7 +293,7 @@ history plus, in "Landed", the original foundation table.
 | Directed rows excluded from public browse | `browseListings` (SQL) |
 | Detail refuses non-parties; `viewerAccount` is REQUIRED | `WocMarketService.listingDetail` |
 | `buyNow` refuses a non-designated buyer as `not_found` | `WocMarketService.buyNow` |
-| Shared 12-listing cap counts directed listings, both halves (the launch-time cap exemption was removed by the directed-rail hardening, H12) | `woc_market.ts`, `woc_market_db.ts` |
+| Shared per-account cap (`WOC_MARKET_MAX_ACTIVE_LISTINGS`) counts directed listings, both halves (the launch-time cap exemption was removed by the directed-rail hardening, H12) | `woc_market.ts`, `woc_market_db.ts` |
 | Auction form + malformed account id refused | `validListingParams` |
 | The three USD legs on `/estimate` | service `splitMarketProceedsCents` |
 

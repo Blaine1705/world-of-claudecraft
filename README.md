@@ -188,7 +188,7 @@ $WOC also has optional utility in the live game:
 - **WOC Store**: buy Claudium, the one-way cosmetic currency, with fiat, SOL, USDC, or $WOC. The $WOC payment rail is discounted against the others.
 - **Season 1 Armory**: spend Claudium on cosmetic weapon-skin collections. Store purchases do not add stats or combat power.
 - **Daily Rewards**: eligible verified holders can earn points through a daily spin and rotating tasks, then compete for a share of the daily prize pool.
-- **$WOC Marketplace** (built, ships disabled): a player-to-player auction house and direct-trade rail where players sell eligible already-earned items, stat-bearing gear included, to each other for $WOC. Every sale settles in $WOC with a 10% fee: 7% to the treasury, 3% burned. The game itself sells no items and no power; enabling it on a production realm awaits legal sign-off (`docs/prd/woc/marketplace.md`).
+- **$WOC Marketplace** (built, ships disabled): a player-to-player auction house and direct-trade rail where players sell eligible already-earned items, stat-bearing gear included, to each other for $WOC. Every sale settles in $WOC with a 10% fee: 7% to the treasury, 3% burned. The game itself is not a party to any marketplace sale and never sells power; enabling it on a production realm awaits legal sign-off (`docs/prd/woc/marketplace.md`).
 
 None of this is needed to play. Wallet linking is optional and non-custodial, and the game never sells power: nothing bought from us, in any currency, grants stats, gear, or progression. The marketplace, when it enables, is players trading their own earned items with each other. The whole game plays fine without ever connecting a wallet.
 
