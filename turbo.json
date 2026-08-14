@@ -90,6 +90,8 @@
     "UPDATE_PARITY",
     "UPDATE_TERRAIN_HEIGHT_PARITY",
     "WOC_SKIP_PRETEST",
+    "WOC_TEST_WORKERS",
+    "GITHUB_ACTIONS",
     "CI",
     "PATH",
     "HOME",
@@ -163,6 +165,8 @@
         "src/**",
         "scripts/build_server.mjs",
         "scripts/migrate_old_cragmaw_pelt.ts",
+        "scripts/migrate_rift_forge_rollback.ts",
+        "scripts/rift_forge_rollback_migration.ts",
         "private/**",
         "package.json"
       ],

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { WS_BACKPRESSURE_LIMIT_BYTES } from '../server/ws_backpressure';
 import {
   INPUT_SEND_BACKPRESSURE_LIMIT_BYTES,
+  INPUT_SEND_MAX_FRAME_BYTES,
   isInputSendBackpressured,
 } from '../src/net/send_backpressure';
 
@@ -21,11 +21,23 @@ describe('isInputSendBackpressured', () => {
     expect(isInputSendBackpressured(64, 64)).toBe(false);
   });
 
-  it('sits far above one legitimate input frame (under 200 bytes serialized)', () => {
-    expect(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES).toBeGreaterThan(200 * 100);
+  it('leaves headroom for more than 100 maximum-sized input frames', () => {
+    const fullInputFrame = JSON.stringify({
+      t: 'input',
+      seq: Number.MAX_SAFE_INTEGER,
+      mi: { f: 1, b: 1, tl: 1, tr: 1, sl: 1, sr: 1, j: 1, dv: 1, sf: 1, ss: 1 },
+      facing: Math.PI * 2,
+    });
+    expect(new TextEncoder().encode(fullInputFrame).byteLength).toBeLessThanOrEqual(
+      INPUT_SEND_MAX_FRAME_BYTES,
+    );
+    expect(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES).toBeGreaterThan(INPUT_SEND_MAX_FRAME_BYTES * 100);
   });
 
-  it('sits well below the server hard-kill limit, so the client sheds long before the server would terminate the session', () => {
-    expect(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES).toBeLessThan(WS_BACKPRESSURE_LIMIT_BYTES);
+  it('bounds an input admission at the threshold to one additional frame', () => {
+    expect(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES).toBe(64 * 1024);
+    expect(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + INPUT_SEND_MAX_FRAME_BYTES).toBeLessThan(
+      65 * 1024,
+    );
   });
 });

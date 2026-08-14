@@ -34,7 +34,6 @@ export const TEMPORAL_ECHO_ID = 'temporal_echo';
 const TEMPORAL_ECHO_NAME = ABILITIES[TEMPORAL_ECHO_ID]?.name ?? 'Temporal Echo';
 // Playtest-provisional (PRD section 13.1 / 13.14): 15s window, 40% single-target
 // conversion, 15% area conversion. Not balance-locked.
-export const TEMPORAL_ECHO_DURATION = 15;
 export const ECHO_CONVERT_SINGLE = 0.4;
 export const ECHO_CONVERT_AOE = 0.15;
 // Cascada temporal (Phase 4 group echo, docs/prd/mage-chronomancy.md): the group
@@ -341,8 +340,8 @@ function applyEchoHeal(
 export const ARCANE_SURGE_ID = 'arcane_surge';
 const ARCANE_SURGE_NAME = ABILITIES[ARCANE_SURGE_ID]?.name ?? 'Aether Surge';
 // PLAYTEST-provisional (PRD 13.4 / 14). The base cost lives on the ABILITIES
-// record; it is DERIVED via tests/chronomancy_balance.test.ts to land the
-// conservative rotation near 70-80s to OOM at the real level-20 pool.
+// record; it is DERIVED via tests/chronomancy_balance_targets.test.ts to land
+// the conservative rotation near 70-80s to OOM at the real level-20 pool.
 export const AETHER_SURGE_MAX_CHARGES = 4;
 export const AETHER_SURGE_DMG_PER_CHARGE = 0.3; // +30% damage per charge (linear, moderate)
 export const AETHER_SURGE_COST_PER_CHARGE = 1.0; // x2 cost per charge (geometric: each charge DOUBLES the cost)

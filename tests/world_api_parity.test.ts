@@ -593,10 +593,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // (data) + setActiveBorder (method), leaving 319. This branch's backward
     // target cycle (Shift+Tab) adds tabTargetPrev (IWorldTargeting, a method),
     // leaving 320. The player item lock (issue #3042) adds setItemLocked
-    // (IWorldInventory, a method), leaving 321. The release branch's market
-    // lowest-price check adds marketSellPriceCheck (IWorldMarket, a method),
-    // leaving 322. Civic service anchors add civicServicePlacements
-    // (IWorldInteraction, data), leaving 323.
+    // (IWorldInventory, a method), leaving 321. Civic service anchors add
+    // civicServicePlacements (IWorldInteraction, data), leaving 322. The market
+    // Sell-tab price reference adds marketSellPriceCheck (IWorldMarket, a
+    // method), leaving 323.
     //
     // NOTE for the next merge, four syncs run now: BOTH sides of this pin move
     // it independently every cycle. Twice git merged identical numbers with no

@@ -4862,11 +4862,6 @@
     width: 0%;
     background: linear-gradient(#8a6a26, #5a4413 55%, #473409);
   }
-  @media (pointer: coarse) {
-    .ota-update-dialog .native-update-actions .btn {
-      min-height: 40px;
-    }
-  }
 
   /* ---------- first-run camera mode prompt ---------- */
   .camera-prompt-backdrop {
@@ -12579,6 +12574,23 @@
     letter-spacing: 0.4px;
     color: var(--color-text-muted);
     text-transform: uppercase;
+  }
+  /* The "lowest price of each" Browse toggle: a real labeled checkbox sharing the
+     controls grid with search and the filter selects (issue #3103). Own class, not
+     `.mkt-filter`, so its inline label text does not inherit that rule's tiny
+     uppercase filter-name styling meant for the select cells above it. */
+  .mkt-collapse-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    max-width: none;
+    cursor: var(--cursor-point);
+  }
+  .mkt-collapse-toggle span {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    color: #f0e4c8;
   }
   .mkt-select {
     position: relative;

@@ -123,6 +123,10 @@ export class MarketWindow {
   private primaryStatFilter: MarketPrimaryStatFilter = 'all';
   private rarityFilter: MarketRarityFilter = 'all';
   private sortFilter: MarketSort = 'name';
+  // Browse toggle: collapse matching plain listings to the cheapest per item
+  // (issue 3103). Server-side, like every other filter axis, so it narrows the
+  // WHOLE market, not just the wired page.
+  private collapseLowest = false;
   private browsePage = 0;
   private sellItemId: string | null = null;
   private sellInstance: ItemInstancePayload | null = null;
@@ -168,6 +172,7 @@ export class MarketWindow {
     this.primaryStatFilter = 'all';
     this.rarityFilter = 'all';
     this.sortFilter = 'name';
+    this.collapseLowest = false;
     this.browsePage = 0;
     this.sellItemId = null;
     this.sellInstance = null;
@@ -222,6 +227,7 @@ export class MarketWindow {
       rarity: this.rarityFilter,
       sort: this.sortFilter,
       page: this.browsePage,
+      collapseLowest: this.collapseLowest,
     };
   }
 
@@ -302,6 +308,7 @@ export class MarketWindow {
       this.primaryStatFilter,
       this.rarityFilter,
       this.sortFilter,
+      this.collapseLowest,
       this.browsePage,
       info?.listings,
       info?.totalCount,
@@ -416,6 +423,7 @@ export class MarketWindow {
         ? `<div class="mkt-controls" role="group" aria-label="${esc(t('itemUi.market.filters'))}">` +
           `<input type="search" class="mkt-search" placeholder="${esc(t('itemUi.market.searchPlaceholder'))}" aria-label="${esc(t('itemUi.market.searchAria'))}" value="${esc(this.searchQuery)}">` +
           this.renderMarketFilters() +
+          this.renderCollapseLowestToggle() +
           `</div>`
         : '';
     el.innerHTML =
@@ -433,6 +441,19 @@ export class MarketWindow {
       this.searchQuery = searchInput.value;
       this.browsePage = 0;
       this.pushQuery();
+    });
+    const collapseCheckbox = el.querySelector<HTMLInputElement>('.mkt-collapse-checkbox');
+    collapseCheckbox?.addEventListener('change', () => {
+      this.collapseLowest = collapseCheckbox.checked;
+      this.browsePage = 0;
+      this.pushQuery(); // filtering is server-side now, so the query must round-trip
+      this.lastSig = '';
+      audio.click();
+      this.render();
+      // Return focus to the checkbox after render() rebuilds the controls row, so a
+      // keyboard user is not dropped to <body> (WCAG 2.4.3), the same pattern the
+      // filter dropdowns use below.
+      (this.deps.root().querySelector('.mkt-collapse-checkbox') as HTMLElement | null)?.focus();
     });
     el.querySelectorAll('[data-tab]').forEach((node) => {
       node.addEventListener('click', () => {
@@ -1144,6 +1165,21 @@ export class MarketWindow {
       `<button type="button" class="mkt-select-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(t('itemUi.market.filterValueAria', { label, value: current }))}"><span>${esc(current)}</span><span class="mkt-select-chevron" aria-hidden="true"></span></button>` +
       `<div class="mkt-select-menu" role="listbox" hidden>${optionHtml}</div>` +
       `</div></div>`
+    );
+  }
+
+  // The "lowest price of each" Browse toggle (issue 3103): collapses matching plain
+  // listings to the cheapest row per item while preserving non-fungible instanced copies.
+  // A real labeled checkbox (the professions "Ask each use" toggle precedent):
+  // keyboard-operable and announced by its own text, not a bare icon button.
+  private renderCollapseLowestToggle(): string {
+    if (this.tab !== 'browse') return '';
+    const checked = this.collapseLowest ? ' checked' : '';
+    return (
+      `<label class="mkt-collapse-toggle">` +
+      `<input type="checkbox" class="mkt-collapse-checkbox"${checked}> ` +
+      `<span>${esc(t('itemUi.market.collapseLowest'))}</span>` +
+      `</label>`
     );
   }
 

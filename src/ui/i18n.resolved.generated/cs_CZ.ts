@@ -2462,7 +2462,8 @@ export const cs_CZ: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "PRYČ"
+      "afkTag": "PRYČ",
+      "cheaterTag": "< Podvodník >"
     },
     "mobTooltip": {
       "levelFamily": "Úroveň {level} {family}",
@@ -3934,6 +3935,12 @@ export const cs_CZ: EnTranslations = {
       "genesis_token_claimed": "Tento Seeker Genesis Token už byl uplatněn.",
       "entitlement_required": "Je vyžadováno ověřené oprávnění Seeker.",
       "current_ownership_required": "Je vyžadováno aktuální vlastnictví Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Účty operátorů nelze označit.",
+      "reason_required": "Je nutné uvést důvod.",
+      "invalid_duration": "Zadejte dobu označení alespoň jednu sekundu.",
+      "not_marked": "Tento účet není označen."
     }
   },
   "guide": {
@@ -6550,6 +6557,7 @@ export const cs_CZ: EnTranslations = {
     "email": "E-mail",
     "emailPlaceholder": "ty@example.com",
     "emailError": "Zadej platnou e-mailovou adresu.",
+    "marketingOptIn": "Chci dostávat novinky a aktualizace hry e-mailem (volitelné)",
     "showPassword": "Zobrazit heslo",
     "hidePassword": "Skrýt heslo",
     "logIn": "Přihlásit se",
@@ -6650,6 +6658,19 @@ export const cs_CZ: EnTranslations = {
     "style": "Styl",
     "resetLook": "Resetovat vzhled",
     "resetShort": "Resetovat",
+    "shareTab": "Sdílet",
+    "designCode": "Kód vzhledu",
+    "designCodeHint": "Zkopírujte tento kód, chcete-li vzhled uložit nebo sdílet. Vložte sem kód a importujte jej, abyste vzhled načetli.",
+    "copyCode": "Kopírovat kód",
+    "importCode": "Importovat",
+    "designCodeCopied": "Kód vzhledu byl zkopírován.",
+    "designCodeCopyManual": "Automatické kopírování je zde zablokováno. Kód je vybraný, zkopírujte jej pomocí klávesnice.",
+    "designCodeImported": "Vzhled byl importován.",
+    "designCodeImportedPartial": "Vzhled byl importován. Hodnoty, které tato verze nezná, byly přeskočeny.",
+    "designCodeErrEmpty": "Nejprve vložte kód vzhledu.",
+    "designCodeErrHeader": "Toto nevypadá jako kód vzhledu.",
+    "designCodeErrVersion": "Tento kód vzhledu pochází z novější verze hry.",
+    "designCodeErrMalformed": "Tento kód vzhledu je poškozený. Zkopírujte celý kód a zkuste to znovu.",
     "browFlat": "Rovné",
     "browArched": "Klenuté",
     "browThin": "Tenké",
@@ -9024,6 +9045,7 @@ export const cs_CZ: EnTranslations = {
       "filterSort": "Řazení",
       "sortName": "Název (A-Z)",
       "sortPriceAsc": "Cena: od nejnižší po nejvyšší",
+      "collapseLowest": "Pouze nejnižší cena",
       "weaponSword": "Meče",
       "weaponDagger": "Dýky",
       "weaponStaff": "Hole",
@@ -9054,7 +9076,7 @@ export const cs_CZ: EnTranslations = {
       "quantity": "Množství",
       "quantityOf": "z {count}",
       "priceEach": "Cena za kus",
-      "lowestPriceLabel": "Aktuální nejnižší nabídková cena",
+      "lowestPriceLabel": "Současná nejnižší nabídková cena",
       "lowestPriceNone": "Pro tento předmět zatím nejsou žádné aktivní nabídky.",
       "listButton": "Nabídnout na Světovém trhu",
       "minPriceError": "Zadej cenu alespoň 1 měď.",
