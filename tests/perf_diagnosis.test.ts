@@ -132,6 +132,7 @@ function baseSnapshot(): PerfSnapshot {
         stallCount: 0,
         stalls: [],
         worstWaitMs: 0,
+        longestWaits: [],
         recent: {
           windowMs: 30000,
           units: 0,

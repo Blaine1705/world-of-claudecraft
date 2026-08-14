@@ -308,6 +308,17 @@ function snapshot(): PerfSnapshot {
         stallCount: 0,
         stalls: [],
         worstWaitMs: 940.5,
+        longestWaits: [
+          {
+            label: 'texture-chunk',
+            priority: 10,
+            waitMs: 940.5,
+            blockedBy: 'preview:armory:skin',
+            blockedByPriority: 10,
+            waitedOnTailCap: true,
+            tails: ['preview:armory:skin'],
+          },
+        ],
         recent: {
           windowMs: 30000,
           units: 2,
@@ -654,6 +665,19 @@ describe('perf reporter payload', () => {
       ],
     });
     expect(settledQueue?.worstWaitMs).toBe(940.5);
+    // Attribution rides with the wait: the cost lists cannot carry it, because a
+    // unit can wait a long time while costing nothing itself.
+    expect(settledQueue?.longestWaits).toEqual([
+      {
+        label: 'texture-chunk',
+        priority: 10,
+        waitMs: 940.5,
+        blockedBy: 'preview:armory:skin',
+        blockedByPriority: 10,
+        waitedOnTailCap: true,
+        tails: ['preview:armory:skin'],
+      },
+    ]);
     // The frame-cost ranking inverts the sync ranking, which is the whole point
     // of shipping both: a sync-ordered beacon would bury the unit that hurt.
     expect(settledQueue?.blockiest).toEqual([
@@ -695,6 +719,7 @@ describe('perf reporter payload', () => {
         { label: 'wedged-compile', priority: 40, ageMs: 91_000, atMs: 12_000, settled: false },
       ],
       worstWaitMs: 0,
+      longestWaits: [],
       recent: {
         windowMs: 30000,
         units: 0,

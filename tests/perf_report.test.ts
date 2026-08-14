@@ -766,6 +766,7 @@ describe('perf report ingestion', () => {
       GPU_QUEUE_RAW_STALLS_MAX,
       GPU_QUEUE_RAW_TAILS_MAX,
       GPU_QUEUE_RAW_LANES_MAX,
+      GPU_QUEUE_RAW_WAITS_MAX,
       GPU_QUEUE_RAW_WINDOW_MS_MAX,
     } = perfReportInternalsForTest;
     // The frame-cost fields ride here too. This sanitizer REBUILDS the block
@@ -810,6 +811,17 @@ describe('perf report ingestion', () => {
       // preview pacing pilot must be judged against, and none of the cumulative
       // fields above can express it.
       worstWaitMs: 812.7,
+      longestWaits: [
+        {
+          label: 'live-view-compile',
+          priority: 30,
+          waitMs: 812.7,
+          blockedBy: 'preview:armory:skin',
+          blockedByPriority: 10,
+          waitedOnTailCap: true,
+          tails: ['preview:armory:skin'],
+        },
+      ],
       recent: {
         windowMs: 30_000,
         units: 2,
@@ -880,6 +892,17 @@ describe('perf report ingestion', () => {
               settled: 'yes',
             })),
             slowest: 'not-an-array',
+            // Sized to overrun every bound (12 > 8 waits, 8 > 4 tails, 100 > 80
+            // label chars) while staying under the request body cap.
+            longestWaits: Array.from({ length: 12 }, () => ({
+              label: 'z'.repeat(100),
+              priority: 9e9,
+              waitMs: 9e12,
+              blockedBy: 42,
+              blockedByPriority: 'nope',
+              waitedOnTailCap: 'yes',
+              tails: Array.from({ length: 8 }, () => 'w'.repeat(100)),
+            })),
             recent: {
               windowMs: 9e12,
               units: -3,
@@ -926,6 +949,18 @@ describe('perf report ingestion', () => {
     expect(hostileRecent.units).toBe(0);
     expect(hostileRecent.windowMs).toBe(GPU_QUEUE_RAW_WINDOW_MS_MAX);
     expect(hostileRecent.worstWaitMs).toBe(GPU_QUEUE_RAW_AGE_MS_MAX);
+    // The wait ranking is bounded and shaped like everything else here. Note
+    // blockedBy is NULLABLE by design: a wait with nothing running points at the
+    // tail cap, and coercing that to a string would invent a culprit.
+    expect(GPU_QUEUE_RAW_WAITS_MAX).toBe(8);
+    expect(hostileQueue.longestWaits).toHaveLength(GPU_QUEUE_RAW_WAITS_MAX);
+    const hostileWait = (hostileQueue.longestWaits as Record<string, unknown>[])[0];
+    expect(hostileWait.label).toBe('z'.repeat(80));
+    expect(hostileWait.waitMs).toBe(GPU_QUEUE_RAW_AGE_MS_MAX);
+    expect(hostileWait.blockedBy).toBeNull();
+    expect(hostileWait.blockedByPriority).toBe(0);
+    expect(hostileWait.waitedOnTailCap).toBe(true);
+    expect(hostileWait.tails).toHaveLength(GPU_QUEUE_RAW_TAILS_MAX);
     expect(GPU_QUEUE_RAW_LANES_MAX).toBe(8);
     expect(hostileRecent.lanes).toHaveLength(GPU_QUEUE_RAW_LANES_MAX);
     expect((hostileRecent.lanes as Record<string, unknown>[])[0].worstWaitMs).toBe(0);

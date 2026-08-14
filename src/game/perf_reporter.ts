@@ -271,6 +271,9 @@ const GPU_QUEUE_REPORT_TAILS = 4;
 // constants rather than free numbers, so this only bounds the beacon against a
 // caller inventing its own.
 const GPU_QUEUE_REPORT_LANES = 8;
+// Grant waits, worst first. Same size as the two cost rankings: a starvation
+// report needs a few examples, not the whole leaderboard.
+const GPU_QUEUE_REPORT_WAITS = 5;
 
 function rendererGpuQueueSummary(gpuQueue: RendererGpuQueueSnapshot): Record<string, unknown> {
   return {
@@ -315,6 +318,20 @@ function rendererGpuQueueSummary(gpuQueue: RendererGpuQueueSnapshot): Record<str
     // is the only one that can. Its lane rows are what says whether a cosmetic
     // lane made an actionable one wait.
     worstWaitMs: gpuQueue.worstWaitMs,
+    // The waits, each naming what it was behind. `worstWaitMs` alone says a lane
+    // was delayed; only these say by what, and `waitedOnTailCap` is what
+    // separates "waited behind an ordinary holder" from "waited on a released
+    // tail still occupying the cap", which is the mechanism a mis-declared
+    // releaseTail delays a live gate with.
+    longestWaits: gpuQueue.longestWaits.slice(0, GPU_QUEUE_REPORT_WAITS).map((wait) => ({
+      label: wait.label,
+      priority: wait.priority,
+      waitMs: wait.waitMs,
+      blockedBy: wait.blockedBy,
+      blockedByPriority: wait.blockedByPriority,
+      waitedOnTailCap: wait.waitedOnTailCap,
+      tails: wait.tails,
+    })),
     recent: {
       windowMs: gpuQueue.recent.windowMs,
       units: gpuQueue.recent.units,

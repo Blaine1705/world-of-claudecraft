@@ -275,6 +275,8 @@ const GPU_QUEUE_RAW_TAILS_MAX = 4;
 // six named lanes; the slack absorbs a caller passing its own number without
 // letting a hostile payload turn a fixed-size block into a list.
 const GPU_QUEUE_RAW_LANES_MAX = 8;
+// Grant-wait examples. The client caps at 5; this only defends the ingest.
+const GPU_QUEUE_RAW_WAITS_MAX = 8;
 // The recent window is an INTERVAL readout, so its span is bounded by what a
 // client could plausibly aggregate over rather than by a unit age.
 const GPU_QUEUE_RAW_WINDOW_MS_MAX = 10 * 60_000;
@@ -345,6 +347,27 @@ function sanitizeGpuQueueSummary(value: unknown): Record<string, unknown> | unde
       .filter(isRecord)
       .map(sanitizeGpuQueueUnit),
     worstWaitMs: numberIn(value.worstWaitMs, 0, GPU_QUEUE_RAW_AGE_MS_MAX, 0),
+    longestWaits: (Array.isArray(value.longestWaits) ? value.longestWaits : [])
+      .slice(0, GPU_QUEUE_RAW_WAITS_MAX)
+      .filter(isRecord)
+      .map((wait) => ({
+        label: gpuQueueUnitLabel(wait.label),
+        priority: gpuQueuePriority(wait.priority),
+        waitMs: numberIn(wait.waitMs, 0, GPU_QUEUE_RAW_AGE_MS_MAX, 0),
+        // Nullable by design: a wait with nothing running points at the tail cap
+        // rather than at a holder, and flattening that to a string would invent
+        // a culprit.
+        blockedBy: typeof wait.blockedBy === 'string' ? gpuQueueUnitLabel(wait.blockedBy) : null,
+        blockedByPriority:
+          wait.blockedByPriority === null || wait.blockedByPriority === undefined
+            ? null
+            : gpuQueuePriority(wait.blockedByPriority),
+        waitedOnTailCap: Boolean(wait.waitedOnTailCap),
+        tails: (Array.isArray(wait.tails) ? wait.tails : [])
+          .slice(0, GPU_QUEUE_RAW_TAILS_MAX)
+          .filter((tail): tail is string => typeof tail === 'string')
+          .map((tail) => gpuQueueUnitLabel(tail)),
+      })),
     recent: sanitizeGpuQueueRecent(value.recent),
   };
 }
@@ -676,5 +699,6 @@ export const perfReportInternalsForTest = {
   GPU_QUEUE_RAW_STALLS_MAX,
   GPU_QUEUE_RAW_TAILS_MAX,
   GPU_QUEUE_RAW_LANES_MAX,
+  GPU_QUEUE_RAW_WAITS_MAX,
   GPU_QUEUE_RAW_WINDOW_MS_MAX,
 };

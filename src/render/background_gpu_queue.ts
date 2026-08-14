@@ -96,6 +96,9 @@ interface PendingGpuWork<T> {
   /** Enqueue time, so a started unit can report how long it waited for its
    *  grant. `order` is a FIFO tiebreak counter, not a clock. */
   enqueuedAt: number;
+  /** The tail-cap park counter as it stood at enqueue. If it has advanced by
+   *  the time this unit starts, the loop parked on the cap while it waited. */
+  tailCapParksAtEnqueue: number;
   work: () => T | Promise<T>;
   resolve: (value: T | PromiseLike<T>) => void;
   reject: (reason?: unknown) => void;
@@ -156,6 +159,32 @@ export interface GpuWorkStallStat {
   settled: boolean;
 }
 
+/** A long grant wait, with what the waiting unit was behind. The wait alone says
+ *  a lane was delayed; only these fields say BY WHAT, which is the difference
+ *  between a symptom and a diagnosis. Captured at the moment the wait ends,
+ *  because by then the queue still knows who it just released. */
+export interface GpuWorkWaitStat {
+  label: string;
+  priority: number;
+  waitMs: number;
+  /** The unit that held the serial queue immediately before this one was
+   *  granted. Null when nothing was running, which points at the tail cap
+   *  below rather than at a holder. */
+  blockedBy: string | null;
+  blockedByPriority: number | null;
+  /** True when the drain loop parked on the released-tail cap while this unit
+   *  was pending. This is the mechanism a released tail can delay a live gate
+   *  with while claiming to have freed the queue: releasing the tail frees the
+   *  serial slot but still occupies a cap slot, and the loop refuses to START
+   *  anything while the cap is full. */
+  waitedOnTailCap: boolean;
+  /** The tails that HELD the cap, captured when the loop parked on it, not when
+   *  the wait ended: by then the blocker has left by definition, so reading the
+   *  set at grant time returns the tails that did not block anything. Empty
+   *  unless `waitedOnTailCap`. Bounded by the tail limit. */
+  tails: string[];
+}
+
 export interface BackgroundGpuQueueStats {
   units: number;
   totalSyncMs: number;
@@ -204,6 +233,11 @@ export interface BackgroundGpuQueueStats {
   /** Worst grant latency any unit waited, session-wide. The windowed arm below
    *  rolls, so this keeps a long session's record from vanishing with it. */
   worstWaitMs: number;
+  /** Longest grant waits, worst first, bounded, each naming what it was behind.
+   *  A SEPARATE ranking from the two cost lists: a unit can wait a long time
+   *  while costing nothing itself, and that is precisely the priority-inversion
+   *  shape, so it can never surface in a cost-ordered list. */
+  longestWaits: GpuWorkWaitStat[];
   /** The RECENT interval, per priority lane. Every other field on this object is
    *  cumulative or a lifetime maximum; this one is the only arm two runs of a
    *  pacing experiment can be compared on. See gpu_queue_window_core.ts. */
@@ -294,6 +328,7 @@ export function createBackgroundGpuQueue(opts?: {
   const slowest: GpuWorkUnitStat[] = [];
   const blockiest: GpuWorkUnitStat[] = [];
   const stalls: GpuWorkStallStat[] = [];
+  const longestWaits: GpuWorkWaitStat[] = [];
   const waitingTails = new Set<RunningGpuWork>();
   const recent = createGpuQueueWindow({
     windowMs: opts?.recentWindowMs,
@@ -303,6 +338,14 @@ export function createBackgroundGpuQueue(opts?: {
   let totalSyncMs = 0;
   let worstSyncMs = 0;
   let worstWaitMs = 0;
+  let tailCapParks = 0;
+  // Snapshot of the cap's occupants the last time the loop parked on it. See the
+  // `tails` field note for why the park, and not the grant, is the capture point.
+  let lastCapOccupants: string[] = [];
+  // The unit that most recently held the serial queue. A unit granted after a
+  // wait was, by construction, waiting on this one.
+  let lastHolderLabel: string | null = null;
+  let lastHolderPriority: number | null = null;
   let worstFrameGapMs = 0;
   let worstUnsharedFrameGapMs = 0;
   let totalFrameGapMs = 0;
@@ -358,6 +401,27 @@ export function createBackgroundGpuQueue(opts?: {
     if (overlap <= unit.worstFrameGapMs) return;
     unit.worstFrameGapMs = overlap;
     unit.worstFrameGapShared = shared;
+  };
+
+  /** Called once per unit, at the moment its wait ends. Bounded top-N by wait,
+   *  membership gated on a wait that actually happened: a unit granted instantly
+   *  is not "the least delayed one", it is simply not a member. */
+  const recordWait = (unit: RunningGpuWork): void => {
+    if (round1(unit.waitMs) <= 0) return;
+    const waitedOnTailCap = tailCapParks > unit.entry.tailCapParksAtEnqueue;
+    const stat: GpuWorkWaitStat = {
+      label: unit.entry.label,
+      priority: unit.entry.priority,
+      waitMs: unit.waitMs,
+      blockedBy: lastHolderLabel,
+      blockedByPriority: lastHolderPriority,
+      waitedOnTailCap,
+      tails: waitedOnTailCap ? [...lastCapOccupants] : [],
+    };
+    let index = longestWaits.length;
+    while (index > 0 && longestWaits[index - 1].waitMs < stat.waitMs) index--;
+    longestWaits.splice(index, 0, stat);
+    if (longestWaits.length > slowestLimit) longestWaits.length = slowestLimit;
   };
 
   const recordUnit = (unit: RunningGpuWork, syncMs: number): void => {
@@ -458,6 +522,11 @@ export function createBackgroundGpuQueue(opts?: {
       // running unit's own driver work too: at most tailLimit + 1 units'
       // driver work can be in flight at any instant.
       while (waitingTails.size >= tailLimit) {
+        // Counted, not just awaited: this park is the one way a RELEASED tail
+        // still delays a higher-priority arrival, and without the count a long
+        // wait cannot be told apart from waiting behind an ordinary holder.
+        tailCapParks++;
+        lastCapOccupants = [...waitingTails].map((tail) => tail.entry.label);
         await new Promise<void>((resolve) => {
           tailNotify = resolve;
         });
@@ -489,6 +558,10 @@ export function createBackgroundGpuQueue(opts?: {
       };
       overlappingUnits++;
       running = unit;
+      // Before overwriting the holder: this unit waited on whoever held it last.
+      recordWait(unit);
+      lastHolderLabel = next.label;
+      lastHolderPriority = next.priority;
       let syncMs = 0;
       let released = false;
       try {
@@ -543,6 +616,7 @@ export function createBackgroundGpuQueue(opts?: {
           label,
           releaseTail: options?.releaseTail === true,
           enqueuedAt: now(),
+          tailCapParksAtEnqueue: tailCapParks,
           work,
           resolve,
           reject,
@@ -623,6 +697,11 @@ export function createBackgroundGpuQueue(opts?: {
           atMs: Math.round(stall.atMs),
         })),
         worstWaitMs: round1(worstWaitMs),
+        longestWaits: longestWaits.map((wait) => ({
+          ...wait,
+          waitMs: round1(wait.waitMs),
+          tails: [...wait.tails],
+        })),
         recent: recent.stats(now()),
       };
     },

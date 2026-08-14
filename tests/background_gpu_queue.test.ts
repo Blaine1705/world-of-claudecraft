@@ -215,6 +215,92 @@ describe('createBackgroundGpuQueue', () => {
     expect(actionable).toMatchObject({ units: 1, worstWaitMs: 700 });
   });
 
+  // The wait alone was a symptom: it said a lane got delayed without saying by
+  // what. These pin the attribution that turns it into a diagnosis.
+  it('names the unit a delayed one was waiting behind', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    const holder = queue.run(() => gate, GPU_WORK_PRIORITY.BACKGROUND, 'cosmetic-holder');
+    await flush();
+    const waiter = queue.run(
+      () => {
+        clock += 2;
+      },
+      GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
+      'live-gate',
+    );
+    clock += 600;
+    release();
+    await Promise.all([holder, waiter]);
+    const waits = queue.stats().longestWaits;
+    expect(waits).toHaveLength(1);
+    expect(waits[0]).toMatchObject({
+      label: 'live-gate',
+      priority: GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
+      waitMs: 600,
+      // The whole point: an actionable unit delayed 600 ms, and the report names
+      // the cosmetic unit it sat behind instead of leaving it unattributable.
+      blockedBy: 'cosmetic-holder',
+      blockedByPriority: GPU_WORK_PRIORITY.BACKGROUND,
+      waitedOnTailCap: false,
+    });
+  });
+
+  it('marks a wait spent behind the released-tail cap', async () => {
+    // The mechanism a RELEASED tail still delays a live gate with: releasing the
+    // tail frees the serial slot but keeps a cap slot, and the drain loop refuses
+    // to START anything while the cap is full. Without this flag that wait is
+    // indistinguishable from waiting behind an ordinary holder, and the two call
+    // for opposite fixes.
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock, tailLimit: 1 });
+    let settleLink!: () => void;
+    const tail = queue.run(
+      () => {
+        clock += 1;
+        return new Promise<void>((resolve) => {
+          settleLink = resolve;
+        });
+      },
+      GPU_WORK_PRIORITY.BACKGROUND,
+      'preview:armory:skin',
+      { releaseTail: true },
+    );
+    await flush();
+    // The queue is now free of a RUNNING unit, yet the cap is full.
+    expect(queue.stats().active).toBeNull();
+    const waiter = queue.run(
+      () => {
+        clock += 2;
+      },
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+      'live-gate',
+    );
+    await flush();
+    clock += 900;
+    settleLink();
+    await Promise.all([tail, waiter]);
+    const wait = queue.stats().longestWaits.find((entry) => entry.label === 'live-gate');
+    expect(wait).toBeDefined();
+    expect(wait?.waitedOnTailCap).toBe(true);
+    expect(wait?.waitMs).toBe(900);
+    // And it names the occupant, so the report says WHICH lane's tail held the cap.
+    expect(wait?.tails).toEqual(['preview:armory:skin']);
+  });
+
+  it('keeps units granted immediately out of the wait ranking', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    await queue.run(() => {
+      clock += 5;
+    }, GPU_WORK_PRIORITY.BACKGROUND);
+    // A unit that never waited is not "the least delayed one", it is not a
+    // member: keeping it out is what makes a short list readable.
+    expect(queue.stats().longestWaits).toEqual([]);
+  });
+
   it('reports a recent interval beside the lifetime maxima', async () => {
     let clock = 0;
     const queue = createBackgroundGpuQueue({ now: () => clock, recentWindowMs: 1000 });
