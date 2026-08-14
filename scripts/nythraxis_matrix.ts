@@ -2327,82 +2327,86 @@ function percentile(values: readonly number[], fraction: number): number {
   return sorted[Math.min(sorted.length - 1, Math.floor((sorted.length - 1) * fraction))];
 }
 
-const tankMonteCarloSummary = tankMonteCarloPlans.map((plan) => plan.tank.key).map((tankKey) => {
-  const samples = results
-    .filter((result) => result.key.startsWith(`${tankKey}|`))
-    .map((result) => {
-      const tank = result.actors[tankKey];
-      const minimumSampledHpPct = tank.dead
-        ? 0
-        : Math.min(1, ...tank.hpSamples.map((sample) => sample.value / tank.maxHp));
-      const healerNetManaConsumed = Object.values(result.actors)
-        .filter((actor) => actor.role === 'healer')
-        .reduce(
-          (total, healer) => total + Math.max(0, healer.startResource - healer.finalResource),
-          0,
-        );
-      const groupDps =
-        Object.values(result.actors).reduce((total, actor) => total + actor.damageDone, 0) /
-        Math.max(0.05, result.seconds);
-      const tankActiveSeconds = Math.max(0.05, tank.deathTime ?? result.seconds);
-      return {
-        killed: result.killed,
-        tankDead: tank.dead,
-        survivalSeconds: tank.deathTime ?? result.seconds,
-        maxHp: tank.maxHp,
-        armor: tank.armor,
-        dps: tank.dps,
-        // The harness seeds the boss tank with 1000 opening threat; back it out
-        // so the rate reflects generated threat only.
-        bossThreatPerSecond: Math.max(0, tank.bossThreatPeak - 1000) / tankActiveSeconds,
-        maxHitTaken: tank.maxHitTaken,
-        damageTakenPerSecond: tank.damageTaken / tankActiveSeconds,
-        healingTakenPerSecond: tank.healingTaken / tankActiveSeconds,
-        selfHealingPerSecond: tank.healingDone / tankActiveSeconds,
-        minimumSampledHpPct,
-        finalHpPct: tank.dead ? 0 : tank.finalHp / tank.maxHp,
-        healerNetManaConsumed,
-        groupDps,
-        fightSeconds: result.seconds,
-      };
-    });
-  const survivalTimes = samples.map((sample) => sample.survivalSeconds);
-  const kills = samples.filter((sample) => sample.killed);
-  const avgMaxHp = average(samples.map((sample) => sample.maxHp));
-  const avgDamageTakenPerSecond = average(samples.map((sample) => sample.damageTakenPerSecond));
-  return {
-    key: tankKey,
-    n: samples.length,
-    killRate: average(samples.map((sample) => Number(sample.killed))),
-    tankDeathRate: average(samples.map((sample) => Number(sample.tankDead))),
-    avgSurvivalSeconds: round1(average(survivalTimes)),
-    p10SurvivalSeconds: round1(percentile(survivalTimes, 0.1)),
-    medianSurvivalSeconds: round1(percentile(survivalTimes, 0.5)),
-    avgKillSeconds:
-      kills.length > 0 ? round1(average(kills.map((sample) => sample.fightSeconds))) : null,
-    avgMaxHp: Math.round(avgMaxHp),
-    avgArmor: Math.round(average(samples.map((sample) => sample.armor))),
-    avgBossThreatPerSecond: round1(average(samples.map((sample) => sample.bossThreatPerSecond))),
-    maxHitTaken: Math.round(Math.max(0, ...samples.map((sample) => sample.maxHitTaken))),
-    // The class-balance doc's tank survival column: unhealed pool over intake.
-    poolOverDtpsSeconds:
-      avgDamageTakenPerSecond > 0 ? round1(avgMaxHp / avgDamageTakenPerSecond) : null,
-    avgTankDps: round1(average(samples.map((sample) => sample.dps))),
-    avgGroupDps: round1(average(samples.map((sample) => sample.groupDps))),
-    avgDamageTakenPerSecond: round1(avgDamageTakenPerSecond),
-    avgHealingTakenPerSecond: round1(
-      average(samples.map((sample) => sample.healingTakenPerSecond)),
-    ),
-    avgSelfHealingPerSecond: round1(average(samples.map((sample) => sample.selfHealingPerSecond))),
-    avgMinimumSampledHpPct: round1(
-      average(samples.map((sample) => sample.minimumSampledHpPct)) * 100,
-    ),
-    avgFinalHpPct: round1(average(samples.map((sample) => sample.finalHpPct)) * 100),
-    avgHealerNetManaConsumed: Math.round(
-      average(samples.map((sample) => sample.healerNetManaConsumed)),
-    ),
-  };
-});
+const tankMonteCarloSummary = tankMonteCarloPlans
+  .map((plan) => plan.tank.key)
+  .map((tankKey) => {
+    const samples = results
+      .filter((result) => result.key.startsWith(`${tankKey}|`))
+      .map((result) => {
+        const tank = result.actors[tankKey];
+        const minimumSampledHpPct = tank.dead
+          ? 0
+          : Math.min(1, ...tank.hpSamples.map((sample) => sample.value / tank.maxHp));
+        const healerNetManaConsumed = Object.values(result.actors)
+          .filter((actor) => actor.role === 'healer')
+          .reduce(
+            (total, healer) => total + Math.max(0, healer.startResource - healer.finalResource),
+            0,
+          );
+        const groupDps =
+          Object.values(result.actors).reduce((total, actor) => total + actor.damageDone, 0) /
+          Math.max(0.05, result.seconds);
+        const tankActiveSeconds = Math.max(0.05, tank.deathTime ?? result.seconds);
+        return {
+          killed: result.killed,
+          tankDead: tank.dead,
+          survivalSeconds: tank.deathTime ?? result.seconds,
+          maxHp: tank.maxHp,
+          armor: tank.armor,
+          dps: tank.dps,
+          // The harness seeds the boss tank with 1000 opening threat; back it out
+          // so the rate reflects generated threat only.
+          bossThreatPerSecond: Math.max(0, tank.bossThreatPeak - 1000) / tankActiveSeconds,
+          maxHitTaken: tank.maxHitTaken,
+          damageTakenPerSecond: tank.damageTaken / tankActiveSeconds,
+          healingTakenPerSecond: tank.healingTaken / tankActiveSeconds,
+          selfHealingPerSecond: tank.healingDone / tankActiveSeconds,
+          minimumSampledHpPct,
+          finalHpPct: tank.dead ? 0 : tank.finalHp / tank.maxHp,
+          healerNetManaConsumed,
+          groupDps,
+          fightSeconds: result.seconds,
+        };
+      });
+    const survivalTimes = samples.map((sample) => sample.survivalSeconds);
+    const kills = samples.filter((sample) => sample.killed);
+    const avgMaxHp = average(samples.map((sample) => sample.maxHp));
+    const avgDamageTakenPerSecond = average(samples.map((sample) => sample.damageTakenPerSecond));
+    return {
+      key: tankKey,
+      n: samples.length,
+      killRate: average(samples.map((sample) => Number(sample.killed))),
+      tankDeathRate: average(samples.map((sample) => Number(sample.tankDead))),
+      avgSurvivalSeconds: round1(average(survivalTimes)),
+      p10SurvivalSeconds: round1(percentile(survivalTimes, 0.1)),
+      medianSurvivalSeconds: round1(percentile(survivalTimes, 0.5)),
+      avgKillSeconds:
+        kills.length > 0 ? round1(average(kills.map((sample) => sample.fightSeconds))) : null,
+      avgMaxHp: Math.round(avgMaxHp),
+      avgArmor: Math.round(average(samples.map((sample) => sample.armor))),
+      avgBossThreatPerSecond: round1(average(samples.map((sample) => sample.bossThreatPerSecond))),
+      maxHitTaken: Math.round(Math.max(0, ...samples.map((sample) => sample.maxHitTaken))),
+      // The class-balance doc's tank survival column: unhealed pool over intake.
+      poolOverDtpsSeconds:
+        avgDamageTakenPerSecond > 0 ? round1(avgMaxHp / avgDamageTakenPerSecond) : null,
+      avgTankDps: round1(average(samples.map((sample) => sample.dps))),
+      avgGroupDps: round1(average(samples.map((sample) => sample.groupDps))),
+      avgDamageTakenPerSecond: round1(avgDamageTakenPerSecond),
+      avgHealingTakenPerSecond: round1(
+        average(samples.map((sample) => sample.healingTakenPerSecond)),
+      ),
+      avgSelfHealingPerSecond: round1(
+        average(samples.map((sample) => sample.selfHealingPerSecond)),
+      ),
+      avgMinimumSampledHpPct: round1(
+        average(samples.map((sample) => sample.minimumSampledHpPct)) * 100,
+      ),
+      avgFinalHpPct: round1(average(samples.map((sample) => sample.finalHpPct)) * 100),
+      avgHealerNetManaConsumed: Math.round(
+        average(samples.map((sample) => sample.healerNetManaConsumed)),
+      ),
+    };
+  });
 
 const output = {
   attempted,
