@@ -95,6 +95,7 @@ Linux artifacts on Linux). Cross-building is not part of this runbook.
 | Epic EOS client id/secret (+ `EPIC_ENABLED=1`, product/deployment ids) | Book of Deeds achievement mirror + account link (`server/epic/`) | game-server runtime env (see `DEPLOY.md`); never the BPT client secret |
 | Epic BPT client id/secret + organization/artifact ids | BuildPatchTool binary upload to Dev sandbox | local shell only; never commit; see `docs/epic-games-integration/bpt-upload.md` |
 | Optional: a crash-minidump endpoint (e.g. a Sentry project's minidump URL) | crash uploads | build env `WOC_CRASH_SUBMIT_URL` (https only) |
+| Discord application registration, NAMED "World of ClaudeCraft" (the registration name is what Discord renders as "Playing X") | Discord Rich Presence (`electron/discord_presence.cjs`) | the app id feeds the `WOC_DISCORD_APP_ID` env slot read at shell launch (`resolveDiscordClientId`); unset or malformed leaves the feature inert and silent by design. OPEN: the registration and the decision on how builds stamp the slot ride together, tracked in `docs/desktop-client-update/state.md`; note the options toggle still renders in an unprovisioned build |
 
 Never commit any of these values; they are env vars in CI or the local shell.
 
