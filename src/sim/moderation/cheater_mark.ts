@@ -23,7 +23,13 @@
 
 import type { Aura } from '../types';
 
-/** Aura id for the countdown debuff. Stable: it is persisted in save blobs. */
+/**
+ * Aura id for the countdown debuff. Stable because every host keys off it by
+ * literal: the survive-a-wipe allowlists (../resurrection.ts), the natural-expiry
+ * hook that drops the wire flag (../combat/auras.ts), and the operator apply/lift
+ * path. The aura itself is NOT persisted (general auras never are); what the
+ * server writes back on save is the remaining played-second budget.
+ */
 export const CHEATER_MARK_AURA_ID = 'cheater_mark';
 
 /**
@@ -93,9 +99,17 @@ export function cheaterMarkAfterPlayed(
  * to stay honest. Whatever is left when the session ends is what the server
  * persists back onto the account.
  *
- * `undispellable` for the same reason the recovery sicknesses carry it (see
- * applySickness in ../spirit.ts): a penalty a dispel, a cleanse, or a
- * right-click could shed is not a penalty. Only its own timer clears it.
+ * TWO independent guards keep it on the wearer, because one flag is a single
+ * edit away from being dropped:
+ *  - `undispellable`, for the same reason the recovery sicknesses carry it (see
+ *    applySickness in ../spirit.ts): a penalty a dispel, a cleanse, or a
+ *    right-click could shed is not a penalty.
+ *  - the PHYSICAL school, which isDispellableAura (../aura_classify.ts) refuses
+ *    outright, whatever the flag says. This is what the repo's other inert
+ *    markers ride ('flag_carried', 'internal_cd'), and it is the reason the
+ *    mark is not on 'shadow': a shadow-school debuff protected by one boolean
+ *    is one careless edit away from being a warlock's Voidfeast snack.
+ * Only its own timer, an operator lift, or the served sanction clears it.
  */
 export function cheaterMarkAura(mark: CheaterMark, entityId: number): Aura {
   const seconds = normalizeCheaterMarkSeconds(mark.secondsRemaining);
@@ -108,7 +122,7 @@ export function cheaterMarkAura(mark: CheaterMark, entityId: number): Aura {
     // Power-neutral by construction: the kind is inert and the value is zero.
     value: 0,
     sourceId: entityId,
-    school: 'shadow',
+    school: 'physical',
     undispellable: true,
   };
 }

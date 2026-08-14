@@ -1,5 +1,13 @@
 import { describe, expect, test } from 'vitest';
-import { DEBUFF_AURA_KINDS, isDebuffAura, isPlayerRemovableAura } from '../src/sim/aura_classify';
+import {
+  DEBUFF_AURA_KINDS,
+  isDebuffAura,
+  isDispellableAura,
+  isPartyFrameRelevantAura,
+  isPlayerRemovableAura,
+} from '../src/sim/aura_classify';
+import { partyAuraPriority } from '../src/sim/combat/chronomancy';
+import { createPlayer, recalcPlayerStats } from '../src/sim/entity';
 import {
   CHEATER_MARK_AURA_ID,
   CHEATER_MARK_MAX_SECONDS,
@@ -9,6 +17,37 @@ import {
   normalizeCheaterMark,
   normalizeCheaterMarkSeconds,
 } from '../src/sim/moderation';
+import {
+  partyFrameAuras,
+  partyFrameAurasForViewer,
+  preparePartyFrameAuras,
+} from '../src/sim/party_frame_info';
+import { type Aura, type Entity, PARTY_MEMBER_AURA_CAP } from '../src/sim/types';
+
+// EVERY field of the entity except its aura list. Deliberately not a curated
+// list of derived stat names: the two players compared below are built from
+// identical arguments and differ only by the aura, so any field that moves is
+// the aura's doing, and a derived field added to recalcPlayerStats later is
+// covered the day it appears rather than silently escaping a hand-kept roster.
+function entityExceptAuras(e: Entity): Record<string, unknown> {
+  const { auras: _auras, ...rest } = e as unknown as Record<string, unknown> & { auras: unknown };
+  return rest;
+}
+
+// A real dispellable magic debuff, the negative control for the party-frame and
+// dispel pins: anything that stops surfacing or removing THIS one has over-reached.
+function magicDebuff(index: number): Aura {
+  return {
+    id: `test_curse_${index}`,
+    name: `Test Curse ${index}`,
+    kind: 'dot',
+    remaining: 30,
+    duration: 30,
+    value: 10,
+    sourceId: 99,
+    school: 'shadow',
+  };
+}
 
 describe('normalizeCheaterMarkSeconds', () => {
   test('clamps a value above the ceiling down to it', () => {
@@ -139,13 +178,42 @@ describe('cheaterMarkAura', () => {
     expect(aura.kind).toBe('cheater_mark');
   });
 
-  test('POWER-NEUTRAL: no arm of the player stat fold matches the kind', async () => {
-    // Guards the actual mechanism rather than restating the constant: if someone
-    // later adds a `cheater_mark` arm to recalcPlayerStats, this fails.
-    const entitySrc = await import('node:fs/promises').then((fs) =>
-      fs.readFile(new URL('../src/sim/entity.ts', import.meta.url), 'utf8'),
-    );
-    expect(entitySrc).not.toContain("'cheater_mark'");
+  test('POWER-NEUTRAL: the stat fold produces identical output with the mark on', () => {
+    // Behavioral, not textual: run the REAL stat-fold entry point over the same
+    // player twice, once carrying the mark, and compare every derived number. A
+    // source-text assertion would have gone red on any future comment naming the
+    // kind while staying green on a fold arm that read it through a variable.
+    const bare = createPlayer(1, 'warrior', { x: 0, y: 0, z: 0 }, 'Bare');
+    const marked = createPlayer(1, 'warrior', { x: 0, y: 0, z: 0 }, 'Bare');
+    marked.auras.push(cheaterMarkAura({ secondsRemaining: 3_600 }, marked.id));
+
+    recalcPlayerStats(bare, 'warrior', {}, undefined, {});
+    recalcPlayerStats(marked, 'warrior', {}, undefined, {});
+
+    expect(marked.auras.some((a) => a.id === CHEATER_MARK_AURA_ID)).toBe(true);
+    expect(entityExceptAuras(marked)).toEqual(entityExceptAuras(bare));
+  });
+
+  test('POWER-NEUTRAL: the derived snapshot is sensitive enough to catch a real fold', () => {
+    // The control for the pin above: an aura the fold DOES read must move the
+    // snapshot, or "identical output" would prove nothing.
+    const drained = createPlayer(1, 'warrior', { x: 0, y: 0, z: 0 }, 'Bare');
+    const bare = createPlayer(1, 'warrior', { x: 0, y: 0, z: 0 }, 'Bare');
+    drained.auras.push({
+      id: 'test_drain',
+      name: 'Test Drain',
+      kind: 'buff_allstats_pct',
+      remaining: 30,
+      duration: 30,
+      value: -0.5,
+      sourceId: 1,
+      school: 'shadow',
+    });
+
+    recalcPlayerStats(bare, 'warrior', {}, undefined, {});
+    recalcPlayerStats(drained, 'warrior', {}, undefined, {});
+
+    expect(entityExceptAuras(drained)).not.toEqual(entityExceptAuras(bare));
   });
 
   test('no player counter can shed it', () => {
@@ -153,8 +221,73 @@ describe('cheaterMarkAura', () => {
     expect(isPlayerRemovableAura(aura)).toBe(false);
   });
 
+  test('rides the physical school, so a dispel is refused even without the flag', () => {
+    // Two independent guards, pinned independently. The repo's other inert
+    // markers (flag_carried, internal_cd) ride physical for exactly this reason:
+    // one boolean is one careless edit away from making the tag dispel food.
+    expect(aura.school).toBe('physical');
+    const flagDropped = { ...aura, undispellable: undefined };
+    expect(isDispellableAura(flagDropped, false)).toBe(false);
+    expect(isDispellableAura(flagDropped, true)).toBe(false);
+    // The controls, one per arm: the same call DOES clear a real magic debuff
+    // off an ally, and DOES purge a real magic buff off an enemy. Without the
+    // second, the offensive-arm refusal above would be vacuous: a harmful kind
+    // is never offensively dispellable regardless of school or flag.
+    expect(isDispellableAura(magicDebuff(0), false)).toBe(true);
+    expect(isDispellableAura({ ...magicDebuff(0), kind: 'buff_ap', value: 10 }, true)).toBe(true);
+  });
+
   test('sorts into the debuff bar', () => {
     expect(DEBUFF_AURA_KINDS.has('cheater_mark')).toBe(true);
     expect(isDebuffAura(aura.kind, aura.value)).toBe(true);
+  });
+});
+
+// A party/raid frame draws at most PARTY_MEMBER_AURA_CAP auras and sorts harmful
+// ones first, so a mark that counted as party-frame relevant would push a real
+// dispellable debuff off the marked player's healer's frame. That is an
+// information handicap, forbidden by the same power-neutrality rule as a stat
+// change. The tag's render surfaces are the nameplate and the target frame.
+describe('cheaterMarkAura: never on a party or raid frame', () => {
+  const aura = cheaterMarkAura({ secondsRemaining: 3_600 }, 42);
+
+  test('is not party-frame relevant, despite classifying as a debuff', () => {
+    expect(isDebuffAura(aura.kind, aura.value)).toBe(true);
+    expect(isPartyFrameRelevantAura(aura)).toBe(false);
+  });
+
+  test('sorts to the bottom tier instead of tier 0 beside real debuffs', () => {
+    expect(partyAuraPriority(aura)).toBe(3);
+    expect(partyAuraPriority(magicDebuff(0))).toBe(0);
+  });
+
+  test('takes no slot, so a full cap of real debuffs all still show', () => {
+    const debuffs = Array.from({ length: PARTY_MEMBER_AURA_CAP }, (_, i) => magicDebuff(i));
+    // The mark FIRST in the array: without the exclusion the stable sort would
+    // have kept it ahead of the tier-0 debuffs and evicted the last one.
+    const shown = partyFrameAuras([aura, ...debuffs]);
+
+    expect(shown).toHaveLength(PARTY_MEMBER_AURA_CAP);
+    expect(shown.some((row) => row.id === CHEATER_MARK_AURA_ID)).toBe(false);
+    for (const debuff of debuffs) {
+      expect(shown.some((row) => row.id === debuff.id)).toBe(true);
+    }
+  });
+
+  test('takes no slot on the SERVER path either, prepare plus per-viewer cap', () => {
+    // The offline strip calls partyFrameAuras; the server snapshot builder calls
+    // preparePartyFrameAuras once and then partyFrameAurasForViewer per viewer.
+    // Both filter through isPartyFrameRelevantAura, so pin both rather than
+    // assuming the pair agrees.
+    const debuffs = Array.from({ length: PARTY_MEMBER_AURA_CAP }, (_, i) => magicDebuff(i));
+    const prepared = preparePartyFrameAuras([aura, ...debuffs]);
+    const shown = partyFrameAurasForViewer(prepared, aura.sourceId);
+
+    expect(prepared.some((row) => row.summary.id === CHEATER_MARK_AURA_ID)).toBe(false);
+    expect(shown).toHaveLength(PARTY_MEMBER_AURA_CAP);
+    expect(shown.some((row) => row.id === CHEATER_MARK_AURA_ID)).toBe(false);
+    for (const debuff of debuffs) {
+      expect(shown.some((row) => row.id === debuff.id)).toBe(true);
+    }
   });
 });
