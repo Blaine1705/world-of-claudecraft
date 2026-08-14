@@ -36,6 +36,13 @@ export const I18N_RELEASE_TIER_SUITES = Object.freeze([
  */
 export const PRE_VITEST_STEP_NAME = 'biome (changed files)';
 
+/**
+ * Name of the full-suite vitest step. gate.mjs locks around exactly this step (issue
+ * #2808), never the whole run, so both sides read the same constant rather than the
+ * lock matching a display string a rename would silently move.
+ */
+export const FULL_SUITE_STEP_NAME = 'vitest (full suite)';
+
 export const I18N_ARTIFACTS = Object.freeze([
   'src/ui/i18n.resolved.generated',
   'src/admin/i18n.resolved.generated',
@@ -149,7 +156,7 @@ export function buildFullGateSteps(workers, opts = {}) {
 
   if (!opts.skipVitest) {
     steps.push({
-      name: 'vitest (full suite)',
+      name: FULL_SUITE_STEP_NAME,
       cmd: 'npm',
       args: ['test', '--', `--maxWorkers=${workers}`],
       env: gateVitestSkipPretestEnv(),
