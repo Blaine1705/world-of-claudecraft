@@ -269,7 +269,10 @@ describe('post-entry mob-body streaming (every iOS WebKit host)', () => {
     // once the GLB lands; the character rig cache does not, which is a separate
     // pre-existing defect recorded in the handoff notes.
     expect(assetsSource).toContain('if (residentOrEnsure(url) === null) return null;');
-    // The preview recovers on reselect: same-skin no-op only while a rig exists.
+    // Only the WEAPON preview recovers on reselect (same-skin no-op is guarded
+    // on the rig existing). The character rig cache has no such retry, so a card
+    // opened before its GLB lands keeps a rig wearing the base weapon: a
+    // separate pre-existing defect, recorded in the handoff notes.
     const previewSource = readFileSync(
       new URL('../src/render/armory_preview.ts', import.meta.url),
       'utf8',
