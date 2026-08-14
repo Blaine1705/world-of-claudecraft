@@ -6550,6 +6550,7 @@ export const sv_SE: EnTranslations = {
     "email": "E-post",
     "emailPlaceholder": "du@exempel.se",
     "emailError": "Ange en giltig e-postadress.",
+    "marketingOptIn": "Skicka mig nyheter och uppdateringar om spelet via e-post (valfritt)",
     "showPassword": "Visa lösenord",
     "hidePassword": "Dölj lösenord",
     "logIn": "Logga in",

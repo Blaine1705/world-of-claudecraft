@@ -6550,6 +6550,7 @@ export const pt_BR: EnTranslations = {
     "email": "E-mail",
     "emailPlaceholder": "voce@exemplo.com",
     "emailError": "Por favor, insira um endereço de e-mail válido.",
+    "marketingOptIn": "Quero receber notícias e atualizações do jogo por e-mail (opcional)",
     "showPassword": "Mostrar senha",
     "hidePassword": "Ocultar senha",
     "logIn": "Entrar",

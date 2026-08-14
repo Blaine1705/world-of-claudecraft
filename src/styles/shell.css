@@ -3653,6 +3653,25 @@
     color: var(--color-primary);
   }
 
+  /* The marketing opt-in row: an inline checkbox beside its label text, so it
+     must escape the block/width-100% treatment generic auth inputs get. */
+  .auth-optin .auth-optin-label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+    color: var(--color-text-muted);
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .auth-panel-premium .auth-optin input[type="checkbox"] {
+    display: inline-block;
+    width: auto;
+    margin-top: 2px;
+    accent-color: var(--color-primary);
+    cursor: pointer;
+  }
+
   .auth-panel-premium input {
     display: block;
     width: 100%;

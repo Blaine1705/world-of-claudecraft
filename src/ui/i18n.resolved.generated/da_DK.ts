@@ -6550,6 +6550,7 @@ export const da_DK: EnTranslations = {
     "email": "E-mail",
     "emailPlaceholder": "dig@eksempel.com",
     "emailError": "Indtast venligst en gyldig e-mailadresse.",
+    "marketingOptIn": "Send mig nyheder og opdateringer om spillet via e-mail (valgfrit)",
     "showPassword": "Vis adgangskode",
     "hidePassword": "Skjul adgangskode",
     "logIn": "Log ind",

@@ -6550,6 +6550,7 @@ export const ko_KR: EnTranslations = {
     "email": "이메일",
     "emailPlaceholder": "you@example.com",
     "emailError": "유효한 이메일 주소를 입력하세요.",
+    "marketingOptIn": "게임 소식 및 업데이트 이메일 받기 (선택 사항)",
     "showPassword": "비밀번호 표시",
     "hidePassword": "비밀번호 숨기기",
     "logIn": "로그인",

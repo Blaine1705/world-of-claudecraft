@@ -6550,6 +6550,7 @@ export const en_XA: EnTranslations = {
     "email": "[Éɱáíļ]",
     "emailPlaceholder": "[ýóú@éẋáɱþļé.çóɱ]",
     "emailError": "[Þļéášé éñţéŕ á ʋáļíð éɱáíļ áððŕéšš.]",
+    "marketingOptIn": "[Éɱáíļ ɱé ĝáɱé ñéŵš áñð úþðáţéš (óþţíóñáļ)]",
     "showPassword": "[Šĥóŵ þáššŵóŕð]",
     "hidePassword": "[Ĥíðé þáššŵóŕð]",
     "logIn": "[Ļóĝ Íñ]",

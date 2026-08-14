@@ -472,6 +472,15 @@ export class Api {
     turnstileToken = '',
     ref = '',
     nativeAttestation: unknown = undefined,
+    // UA analytics extras, all optional: the first-touch attribution payload
+    // (src/attribution.ts), the marketing opt-in checkbox state, and the
+    // player's selected language. The server validates every field
+    // (server/signup_attribution.ts) and none can fail registration.
+    extras: {
+      attribution?: Record<string, string> | null;
+      marketingOptIn?: boolean;
+      locale?: string;
+    } = {},
   ): Promise<{ accountId?: number }> {
     const data = await this.post('/api/register', {
       username,
@@ -480,6 +489,9 @@ export class Api {
       turnstileToken,
       ref,
       nativeAttestation,
+      attribution: extras.attribution ?? undefined,
+      marketingOptIn: extras.marketingOptIn === true ? true : undefined,
+      locale: extras.locale,
     });
     this.token = data.token;
     this.username = data.username;

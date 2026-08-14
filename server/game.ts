@@ -275,7 +275,6 @@ import {
   type ListReadGuardState,
 } from './list_read_guard';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
-import { trackReachedLevel5 } from './meta_capi';
 import {
   applyMobScanTick,
   createMobScanTickStats,
@@ -316,6 +315,7 @@ import {
 } from './parse';
 import { PartyFrameProjectionCache } from './party_frame_projection';
 import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
+import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
 import { nextRaidResetMs, resetDayKey } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
@@ -334,6 +334,7 @@ import { PgSocialDb } from './social_db';
 import { reconcileOnLogin as reconcileSteamOnLogin } from './steam/mirror';
 import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
+import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
 import { recordUnstuckEvent } from './unstuck_records';
 import { holderInfoForPubkey } from './woc_balance';
 import { isBackpressureExceeded } from './ws_backpressure';
@@ -3987,6 +3988,9 @@ export class GameServer {
         reconcileEpicOnLogin(accountId);
       })
       .catch(() => {});
+    // D7Retained ad conversion: fires once per account when a session opens
+    // during day seven after signup (atomic claim inside; fire-and-forget).
+    maybeTrackDay7Retained(session);
     openPlaySession(accountId, characterId, name, meta, initialLevel)
       .then((id) => {
         session.dbSessionId = id;
@@ -9724,22 +9728,32 @@ export class GameServer {
           // carries the old level until the next save, which enqueues again from
           // saveCharacter, so an early drain re-reads once the row catches up.
           enqueueLinkChange({ accountId: session.accountId, kinds: ['flex'] }, now);
+          recordLevelUp(session, ev.level);
         }
       }
-      if (ev.type === 'levelup' && ev.level === 5 && ev.pid !== undefined) {
+      if ((ev.type === 'questAccepted' || ev.type === 'questDone') && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
-        if (s) {
-          void trackReachedLevel5(
-            s.characterId,
-            {
-              clientIp: s.ip,
-              clientUserAgent: s.userAgent,
-              fbp: s.fbp,
-              fbc: s.fbc,
-            },
-            s.sourceUrl,
+        const entity = this.sim.entities.get(ev.pid);
+        // Skip when the entity is gone rather than defaulting the level: the
+        // level is the gate that bounds ftue_events growth, so it must never
+        // fail open (the death arm has the same direction).
+        if (s && entity)
+          recordFtueQuest(
+            s,
+            ev.type === 'questAccepted' ? 'quest_accepted' : 'quest_done',
+            ev.questId,
+            entity.level,
           );
-        }
+      }
+      if (ev.type === 'death' && this.clients.has(ev.entityId)) {
+        const s = this.clients.get(ev.entityId);
+        if (s) recordFtueDeath(s, this.sim, ev.entityId, ev.killerId);
+      }
+      if (ev.type === 'levelup' && (ev.level === 2 || ev.level === 5) && ev.pid !== undefined) {
+        const s = this.clients.get(ev.pid);
+        // Level 2 and 5 ad conversions, email-enriched for match quality
+        // (ua_capi.ts); other levels no-op inside the module.
+        if (s) trackLevelMilestoneCapi(s, ev.level);
       }
       if (ev.type === 'levelup' && ev.level === MAX_LEVEL && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);

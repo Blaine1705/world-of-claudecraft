@@ -1518,6 +1518,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'auth.passwordPlaceholder': 'パスワードを入力',
   'auth.email': 'メールアドレス',
   'auth.emailError': '有効なメールアドレスを入力してください。',
+  'auth.marketingOptIn': 'ゲームのニュースやアップデートをメールで受け取る（任意）',
   'auth.recovery.title': '復旧用メールアドレスを追加',
   'auth.recovery.body':
     'メールアドレスを設定すると、アカウントを復旧できるようになります。パスワードのリセットが必要になった際に、このアカウントの所有者であることを確認するためだけに使用します。',

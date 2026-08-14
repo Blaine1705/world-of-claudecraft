@@ -6550,6 +6550,7 @@ export const zh_CN: EnTranslations = {
     "email": "邮箱",
     "emailPlaceholder": "you@example.com",
     "emailError": "请输入有效的邮箱地址。",
+    "marketingOptIn": "向我发送游戏新闻和更新邮件（可选）",
     "showPassword": "显示密码",
     "hidePassword": "隐藏密码",
     "logIn": "登录",

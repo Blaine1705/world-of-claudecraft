@@ -1467,6 +1467,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'auth.passwordPlaceholder': '請輸入密碼',
   'auth.email': '電子郵件',
   'auth.emailError': '請輸入有效的電子郵件地址。',
+  'auth.marketingOptIn': '向我發送遊戲新聞和更新郵件（可選）',
   'auth.recovery.title': '新增復原電子郵件',
   'auth.recovery.body':
     '設定一個電子郵件地址，以便您可以復原自己的帳號。我們僅在您需要重設密碼時，用它來確認您是本帳號的擁有者。',
