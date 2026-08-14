@@ -5,8 +5,22 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-08-service-auth-hardening.md`
-  (service repo, worktree `/Users/fernando/Documents/woc-rewards-service-pr31`).
+- Next file to run: `docs/woc-marketplace-hardening/phase-08-qa.md`
+  (service repo, worktree `/Users/fernando/Documents/woc-rewards-service-pr31`,
+  fresh session; QA diffs 70d4207..4b9e413 and pushes on a PASS per R4).
+- 08 implemented AND reviewed (SERVICE repo, LOCAL, not pushed per R4; 12
+  commits, tip 4b9e413; suite 439/435 green, was 413). B5 closed on one
+  normalized path with the bypass proven red over the socket; both secrets
+  constant-time, trimmed, boot-enforced printable ASCII; ALL THREE dev
+  escapes on the shared explicitlyDevOrTest allowlist (the third,
+  CLAUDIUM_ALLOW_FAKE_STRIPE, found by the fix-round reviewer); an enabled
+  market refuses in-memory stores (DATABASE_URL required); compose staleness
+  aligned to the one-hour constant; PLUS the review-found duplicate-oracle
+  bug fixed (heartbeat warmed an instance the market never quoted from).
+  Two fresh lenses, two fresh fix-round re-reviews, every finding applied
+  incl. nits. The 08 ledger entry below is the registry the QA session
+  consumes; the final polish commit 4b9e413 is the one round without a
+  fresh reviewer of its own (self-reviewed): QA verifies it FIRST.
 - 07 QA COMPLETE (PASS-WITH-FOLLOWUPS, every fix applied, PUSHED per R4).
   Release/v0.38.0 re-synced (merge 55c2ba992e, trivial: two CI-harness
   commits, no marketplace overlap, no count-pin surface; tsc clean and
@@ -332,6 +346,96 @@ Still open (a phase that hits one asks at session start):
 
 ## Per-phase ledger (append as phases complete)
 
+- 08 service-auth-hardening (2026-08-14, SERVICE repo, session start 70d4207
+  = PR #31 tip, origin/master already contained; 12 commits, tip 4b9e413,
+  LOCAL not pushed per R4; validation npm run build + npm test in service/,
+  439 tests 435 pass 0 fail 4 env-gated skips, baseline was 413). The
+  registry the 08-qa session needs:
+  - B5 CLOSED: service/src/http_guard.ts (requestPath, requestQuery,
+    secretsMatch, printableAscii) is the one interpretation of a request
+    target; server.ts hands the normalized path to every gate AND every
+    handler (handler signatures now path + URLSearchParams; market
+    routes.ts matchers take the normalized path). isOpsOnlyPath is
+    EXPORTED with membership pinned both directions; the two exact-match
+    ops entries (refund, clawback) are served by handleClaudium/handleNative
+    with cross-reference comments at both ends. Bypass red-proof recorded:
+    refund?x=1 with internal secret alone returned 200 on the old routing.
+    NO decoding, NO slash collapsing, NO fragment stripping by design
+    (gates and handlers compare the identical string; unrecognized shapes
+    404 with both secrets, socket-pinned; the two wallet-segment captures
+    exclude '#', the only routes where a fragment survived to a handler).
+  - SECRETS: length-guarded timingSafeEqual both tiers (mirrors the game
+    server pattern); env values trimmed with printable-ASCII checked on the
+    RAW value FIRST (a Unicode-space or newline pad refuses loudly at boot
+    instead of being trimmed into a secret no client can send; the message
+    names padding; .env.example documents it); unset internal secret
+    throws, unset or whitespace-only admin secret 503s; space-padded
+    secret authenticates its transported form (pinned); boot-refusal tests
+    ride a helper that closes an unexpectedly started server (a regression
+    fails by name instead of hanging the file); readout limits normalized
+    at the edge via intParam (garbled/zero/empty fall back, pinned; the
+    stores clamp too).
+  - FAIL CLOSED: service/src/dev_env.ts explicitlyDevOrTest (NODE_ENV
+    exactly development or test; unset refuses) with ALL THREE escapes on
+    it: the market dev chain, CLAUDIUM_ALLOW_IN_MEMORY, and
+    CLAUDIUM_ALLOW_FAKE_STRIPE (the third found by the fix-round reviewer
+    still on the not-production denylist). buildMarketApps refuses a null
+    pool unless the CODE-ONLY overrides.allowInMemoryStores test seam is
+    set (config-unreachable; the explicit null pool buildEconomyApps
+    passes through refuses too), so an enabled market requires
+    DATABASE_URL. All refusals red-proven on the old gates.
+  - COMPOSE + ORACLE: WOC_MARKET_PRICE_MAX_AGE_MS compose default 120000
+    -> 3600000 = DEFAULT_MARKET_ORACLE_CONFIG.maxAgeMs with the
+    permanent-halt WHY beside it; pythSource imports the constant;
+    MARKET_SETTLEMENT.md's stale 30-minute prose trued to one hour. REVIEW
+    BONUS BUG FIXED: bootstrap constructed TWO MarketPriceOracle
+    instances, the heartbeat and boot prime warmed one while
+    MarketSettlementService quoted from the other (the exact false outage
+    the heartbeat exists to prevent); now one shared instance, red-proven
+    by the min-samples-2 priming arm.
+  - REVIEWS: two fresh coverage lenses (security: socket probes over every
+    exotic target shape, no bypass survives; correctness: mutation-proved
+    the bypass pin), fix round 1 re-reviewed fresh, fix round 2
+    re-reviewed fresh (mutation-verified every new pin, incl. proving two
+    then-unpinned behaviors, both closed in round 3), round 3 (docs,
+    comments, tests only) careful self-review. Every finding applied
+    including nits.
+  - JUDGED, no code change (do not re-raise): bond-refund/bond-forfeit on
+    the internal tier is BY DESIGN (the game drives its own settlement
+    lifecycle; destinations resolve from the STORED quote, never the
+    request, so a compromised game server could grief-forfeit but not
+    steal; the routes.ts header now says exactly this and that the
+    admin-exclusive levers are pause + the audited read surface); the
+    webhook's query-string variant adds no pre-auth surface the bare
+    path lacks (signature-verified either way); NODE_ENV=test stays in
+    the allowlist (the phase spec prescribes dev/test); the security
+    lens's "recover records anonymous money moves" was REFUTED in part
+    with the file open (an empty actor refuses execution as
+    invalid_request; 'unknown' lands only on refused audit rows); a
+    duplicated admin-actor header is recorded verbatim as joined
+    (self-inflicted by an admin-secret holder); limit=0 on
+    credits/recoveries now falls back to the default instead of one row
+    (pinned).
+  - DEFERRED with owners: the oracle stamps TWAP samples with nowMs, not
+    the venue's publishMs, so a FROZEN print re-samples itself and
+    spot-vs-TWAP can never fire, and the default config is single-venue
+    so the venue-deviation gate is structurally inert: BOTH to phase 11
+    (its charter is oracle health, venue posture, quote timestamps; feeds
+    R3). Front-door rate limiting and a secret entropy floor: 22
+    pre-enable audit (compose binds loopback by default; matters if
+    ECONOMY_BIND=0.0.0.0 for the remote dashboard). The purchases
+    fromMs/toMs and cosmetics/recoveries cursor params are still
+    untested (the limit plumbing IS pinned): service test debt, 21/22.
+    Production pg pools carry no connectionTimeoutMillis: note for 09. A
+    genuinely NEW money route omitted from isOpsOnlyPath remains a
+    review-time matter (the membership pin plus the CLAUDE.md rule are
+    the guards).
+  - Service repo gained a top-level CLAUDE.md (auth contract, fail-closed
+    gates, validation commands). Handoff: 08-qa diffs 70d4207..4b9e413,
+    validates in service/ (npm run build, npm test), verifies the
+    self-reviewed polish commit 4b9e413 FIRST, and pushes
+    integration/woc-market-settlement:feature/woc-market-settlement on a
+    PASS per R4.
 - 07 policy-terms-drafts (2026-08-13, session start 8a1739d67a = the trivial
   release/v0.38.0 sync (30 commits, GPU-hitch + night-lighting + OTA trains,
   no marketplace overlap; monolith_budget AUTO-MERGED: renderer.ts ceiling

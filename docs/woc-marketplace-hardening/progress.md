@@ -19,7 +19,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 06 QA | phase-06-qa | game | DONE | ab2742012b | PASS-WITH-FOLLOWUPS, every fix applied, PUSHED per R4; v0.38.0 re-sync NON-trivial (3 conflicts + 2 silent count-pin auto-merges, all re-derived from runs: IWorld 323/86/237, fanout 10, hud.ts 19160 DOWN, sim.ts 12436; release-merge-audit faithful, 0 findings over 7 groups); ea1bb82322 verified FIRST (comment-only src, all pins mutation-proven); six fresh lanes: 0 code blockers, 4 blocking TEST gaps closed; QA-found code fixes: the capacity model now RUNS the removal walk (receiver-overflow class closed for good), the crafted-marker leg on the instanced matcher, guardTerms on the directed buyer, the model-reading accept belt, sweep-fallback stack+null-safety; NEW OPEN RULING R9 (implied terms consent, pre-enable affordance owed); pg suites 152 green zero skips on the tip; 21 mutation probes all bit; qa-checklist READY 0 blocking; gate GREEN at 47399f77b7 |
 | 07 | policy-terms-drafts | game | DONE | 8a1739d67a | DOCS ONLY, zero code diff; release/v0.38.0 synced (merge 8a1739d67a, trivial: 30 commits, no marketplace overlap; monolith_budget AUTO-MERGED so all four count-pin suites re-derived from a run, 377 green, renderer.ts ceiling 13708 lowered by the release's own extraction); counsel package complete: TERMS_AND_CONDITIONS_MARKETPLACE_DRAFT.md (full revised Terms beside the untouched live Terms; new Section 10 incl. the 10.3 acceptance-surface requirement per R9; renumbering verified reference-by-reference) + the decision memo (adopted position, nine counsel questions incl R9 and the NEW seller-side terms gap, exact-changes list, enable-time checklist; held PRIVATELY outside the public repo per the state.md locked decision); never-power carve-out landed consistently (README Highlights + Web3, wallet-link, holder-flair, marketplace.md launch gates); staleness cluster fixed (marketplace.md forfeit destination / delivery / review-state / TOTP-superseded-by-R1 truth-ups, p2p-woc-trade implementation status, DESIGN.md window inventory, malware-scan-catalog signing surfaces, both money-claim agent docs, docs+net+ui CLAUDE.md); FRESH proofreader over the whole package: 1 blocking + 7 should-fix + 6 nits, ALL applied; copy floor clean, ci:changed exit 0; LOCAL, not pushed per R4 |
 | 07 QA | phase-07-qa | game | DONE | 55c2ba992e | PASS-WITH-FOLLOWUPS, every fix applied (section below); release re-sync trivial (two CI-harness commits, no marketplace overlap; tsc clean, four pin suites 377 green); eight fresh audit lanes (the phase-prescribed fresh proofreader among them); the round found the draft's missing second-chance-offer disclosure (blocking; it falsified the outbid-refund promise) plus the anti-snipe and abandon-cooldown gaps, four draft wording drifts, and seven companion truth-ups, all applied; new deferreds with owners in state.md's 07 QA ROUND bullet; the amended draft postdates the recorded R6 send (Fernando forwards the amended copy); ci:changed exit 0; live Terms + terms.html byte-untouched; counsel memo verified absent from the branch; pushed per R4 |
-| 08 | service-auth-hardening | service | NOT STARTED | | |
+| 08 | service-auth-hardening | service | DONE | 70d4207 | SERVICE repo (origin/master already contained); B5 + the fail-open config mediums + the compose staleness default closed, every refusal proven red-first (the bypass returned 200 on the old routing with the internal secret alone); two fresh review lenses, then two fix rounds each re-reviewed fresh and a self-reviewed polish round, every finding applied incl. nits; the rounds' own finds: the THIRD dev escape (CLAUDIUM_ALLOW_FAKE_STRIPE, still denylist), the wallet-segment fragment gap, the duplicate-oracle heartbeat bug (warmed one instance, quoted from another), ASCII-before-trim; suite 439 tests 435 pass 0 fail (was 413); 12 commits, tip 4b9e413; LOCAL, not pushed per R4 |
 | 08 QA | phase-08-qa | service | NOT STARTED | | |
 | 09 | bond-releaser | service | NOT STARTED | | |
 | 09 QA | phase-09-qa | service | NOT STARTED | | |
@@ -49,6 +49,58 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 21 QA | phase-21-qa | service + game | NOT STARTED | | |
 | 22 | close-out | all three | NOT STARTED | | teardown offer lives in 22 QA |
 | 22 QA | phase-22-qa | all three | NOT STARTED | | |
+
+## 08 implement round (service auth hardening and fail-closed config)
+
+Service repo, worktree woc-rewards-service-pr31, branch integration/woc-market-settlement.
+Session start 70d4207 (= PR #31 tip; origin/master already merged, fetch confirmed no
+movement). Baseline suite green (413 pass) before any change. 12 commits, tip 4b9e413,
+LOCAL per R4. Validation matrix ran green after every slice: npm run build + npm test in
+service/ (final: 439 tests, 435 pass, 0 fail, 4 skips, the CLAUDIUM_TEST_DATABASE_URL
+env-gated pg set).
+
+- B5: new service/src/http_guard.ts (requestPath, requestQuery, secretsMatch,
+  printableAscii); server.ts derives the path ONCE and hands it to every gate and every
+  handler (all handler signatures moved from raw url to path + URLSearchParams;
+  market/routes.ts matchers take the normalized path). The regression test drove the real
+  socket and was RED on the old code: POST /v1/claudium/refund?x=1 with only the internal
+  secret returned 200 and executed the stub refund; now 403 with the handler unreached,
+  same for the gift-card clawback. Deliberately NO decoding, slash collapsing, or
+  fragment stripping: gates and handlers compare the identical string, so every
+  unrecognized shape (fragments, %2F, //, absolute-form targets) fails closed to 404,
+  pinned over the socket with both secrets. The ops tier is the exported isOpsOnlyPath
+  with its membership pinned both directions.
+- Secrets: length-guarded timingSafeEqual (mirrors the game server's secretsMatch);
+  trimmed and boot-enforced printable ASCII on the RAW value (a Unicode-space pad hits
+  the loud refusal instead of being trimmed into a secret no client can send; a plain
+  space pad now authenticates its transported form, pinned); unset internal secret
+  throws, unset or whitespace-only admin secret 503s the ops tier, all pinned via a
+  helper that closes an unexpectedly started server so a regression fails by name
+  instead of hanging the file.
+- Fail closed: new service/src/dev_env.ts explicitlyDevOrTest is the ONE allowlist
+  (NODE_ENV exactly development or test; unset refuses) and all THREE dev escapes ride
+  it: the market dev chain, CLAUDIUM_ALLOW_IN_MEMORY, and CLAUDIUM_ALLOW_FAKE_STRIPE
+  (the third was found by the fix-round reviewer still on the denylist; a stray flag
+  advertised a Stripe checkout that can never complete). buildMarketApps refuses a null
+  pool unless the code-only allowInMemoryStores test seam is passed (config-unreachable;
+  the explicit null pool buildEconomyApps passes through now refuses), so an enabled
+  market requires DATABASE_URL. Every refusal ran red-first on the old gates.
+- Compose and oracle: WOC_MARKET_PRICE_MAX_AGE_MS compose default 120000 (the
+  permanent-halt value) to 3600000 with the WHY recorded beside it; the pyth venue
+  imports DEFAULT_MARKET_ORACLE_CONFIG.maxAgeMs instead of repeating the literal;
+  MARKET_SETTLEMENT.md's stale 30-minute claim trued to one hour. Bonus REAL bug found
+  by review: bootstrap built TWO MarketPriceOracle instances, the heartbeat and boot
+  prime warmed one while the market quoted from the other (exactly the false outage the
+  heartbeat comment promises to prevent); now shared, red-proven by the min-samples-2
+  priming arm.
+- Reviews: security lens + correctness lens (fresh, coverage-prompted, both reported
+  socket-probe and mutation evidence); fix round 1 re-reviewed fresh; fix round 2
+  re-reviewed fresh (mutation-verified every new pin); round 3 (docs, comments, tests)
+  self-reviewed with files open. Every finding applied including nits; judged and
+  deferred items recorded in the state.md 08 ledger entry with owners.
+- Service repo gained a concise top-level CLAUDE.md (auth contract, fail-closed gates,
+  validation commands); .env.example documents the padding contract and the NODE_ENV
+  allowlist beside all three escape flags.
 
 ## 07 policy and terms drafts round (docs only)
 
