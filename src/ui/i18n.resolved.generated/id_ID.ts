@@ -6550,7 +6550,7 @@ export const id_ID: EnTranslations = {
     "email": "Email",
     "emailPlaceholder": "kamu@contoh.com",
     "emailError": "Silakan masukkan alamat email yang valid.",
-    "marketingOptIn": "Email me game news and updates (optional)",
+    "marketingOptIn": "Kirimkan berita dan pembaruan game ke email saya (opsional)",
     "showPassword": "Tampilkan kata sandi",
     "hidePassword": "Sembunyikan kata sandi",
     "logIn": "Masuk",

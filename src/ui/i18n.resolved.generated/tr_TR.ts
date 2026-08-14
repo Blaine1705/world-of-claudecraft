@@ -6550,7 +6550,7 @@ export const tr_TR: EnTranslations = {
     "email": "E-posta",
     "emailPlaceholder": "sen@ornek.com",
     "emailError": "Lütfen geçerli bir e-posta adresi gir.",
-    "marketingOptIn": "Email me game news and updates (optional)",
+    "marketingOptIn": "Bana oyun haberlerini ve güncellemelerini e-postayla gönder (isteğe bağlı)",
     "showPassword": "Parolayı göster",
     "hidePassword": "Parolayı gizle",
     "logIn": "Giriş Yap",
