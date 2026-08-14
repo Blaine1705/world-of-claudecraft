@@ -136,6 +136,12 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     expect(body).toContain(
       'saveDesktopPrefs(desktopPrefsPath, { ...desktopPrefs, gpuForceOptOut: optOut })',
     );
+    // The failure GUARD is load-bearing, not just the ordering: a bare save
+    // call after this line would still satisfy an index comparison while
+    // flipping the mirror on a write that never reached disk.
+    expect(body).toContain(
+      'if (!saveDesktopPrefs(desktopPrefsPath, { ...desktopPrefs, gpuForceOptOut: optOut })) {',
+    );
     // The in-memory mirror is updated only after a successful save, so the
     // getter can never report a value the next launch would not read.
     const saveAt = body.indexOf('saveDesktopPrefs(desktopPrefsPath,');
@@ -159,12 +165,21 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     const start = main.indexOf("ipcMain.handle('desktop-set-display-mode'");
     expect(start).toBeGreaterThan(-1);
     const body = main.slice(start, main.indexOf('\n});', start));
+    // An untrusted frame is refused by VALUE, not just by a gate call whose
+    // result something might ignore.
+    expect(body).toContain('if (!trustedSender(event)) return false;');
     expect(body).toContain("if (mode !== 'borderless' && mode !== 'windowed') return false;");
     // Same anti-clobber contract as the GPU setter: the WHOLE record, spread
     // from the live module-scope object, or a mid-session change would wipe
     // windowBounds/displayId/maximized off disk.
     expect(body).toContain(
       'saveDesktopPrefs(desktopPrefsPath, { ...desktopPrefs, displayMode: mode })',
+    );
+    // The failure GUARD is load-bearing: without the `if (!` arm a failed disk
+    // write would still flip the mirror and the live window, leaving a mode the
+    // next launch cannot reproduce.
+    expect(body).toContain(
+      'if (!saveDesktopPrefs(desktopPrefsPath, { ...desktopPrefs, displayMode: mode })) {',
     );
     const saveAt = body.indexOf('saveDesktopPrefs(desktopPrefsPath,');
     const commitAt = body.indexOf('desktopPrefs.displayMode = mode;');
@@ -185,6 +200,12 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     expect(getter, 'the getter must report the STORED mode').toContain(
       'return desktopPrefs.displayMode;',
     );
+    // The untrusted arm answers the DEFAULT by value: the generic gate sweep
+    // only proves trustedSender is called, not that its verdict decides the
+    // answer, and an untrusted frame must learn nothing about the real mode.
+    expect(getter, 'an untrusted frame is answered with the default').toContain(
+      "if (!trustedSender(event)) return 'borderless';",
+    );
   });
 
   it('the gamepad-activity handler feeds the display-sleep lease', () => {
@@ -194,7 +215,22 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     const start = main.indexOf("ipcMain.handle('desktop-gamepad-activity'");
     expect(start).toBeGreaterThan(-1);
     const body = main.slice(start, main.indexOf('\n});', start));
+    expect(body).toContain('if (!trustedSender(event)) return false;');
     expect(body).toContain('powerSave.notifyActivity();');
+  });
+
+  it('the preload refuses junk display modes and swallows gamepad-notify rejections', () => {
+    // Both behaviors live ONLY in the preload and fail silently when lost. The
+    // junk refusal keeps main receiving values it can apply; the catch is
+    // load-bearing and NOT redundant with the renderer module's own catch:
+    // notifyGamepadActivity returns undefined to its caller, so the renderer
+    // side can never see the invoke rejection, and dropping this catch would
+    // surface one unhandled rejection per notify on a shell whose handler
+    // rejects.
+    expect(preload).toContain(
+      "if (mode !== 'borderless' && mode !== 'windowed') return Promise.resolve(false);",
+    );
+    expect(preload).toContain("ipcRenderer.invoke('desktop-gamepad-activity').catch(() => {});");
   });
 
   it('activates the macOS app when the browser returns a wallet handoff', () => {

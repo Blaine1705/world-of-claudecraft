@@ -221,4 +221,19 @@ describe('power save lease (electron/power_save.cjs)', () => {
     rig.powerSave.notifyActivity();
     expect(rig.armed).toHaveLength(2);
   });
+
+  it('treats only literal true as hidden: a truthy non-boolean releases nothing', () => {
+    // The production caller derives a real boolean, so this is boundary
+    // strictness: a permissive coercion would let a junk value release a live
+    // claim (or latch hidden and mute every later ping).
+    const rig = createRig();
+    rig.powerSave.notifyActivity();
+    expect(rig.started).toHaveLength(1);
+    rig.powerSave.setHidden(1 as unknown as boolean);
+    expect(rig.stopped).toHaveLength(0);
+    // hidden never latched: the next spaced ping still lands and re-arms
+    rig.state.now += POWER_SAVE_MIN_PING_INTERVAL_MS;
+    rig.powerSave.notifyActivity();
+    expect(rig.armed).toHaveLength(2);
+  });
 });

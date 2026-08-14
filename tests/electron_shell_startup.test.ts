@@ -334,6 +334,20 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     expect(quit).toContain('powerSave.shutdown();');
   });
 
+  it('wires the lease to the real powerSaveBlocker, timers, and clock', () => {
+    // The pure state machine proves every transition against injected fakes;
+    // this construction is the one place those proofs become real. A no-op
+    // stop (or swapped start/stop) would leak the display-sleep claim with
+    // the whole unit suite green, and nothing at runtime reds it.
+    expect(count(code, 'createPowerSave('), 'exactly one lease construction').toBe(1);
+    const wiring = block('const powerSave = createPowerSave({', '\n});', 'createPowerSave wiring');
+    expect(wiring).toContain('start: (type) => powerSaveBlocker.start(type),');
+    expect(wiring).toContain('stop: (id) => powerSaveBlocker.stop(id),');
+    expect(wiring).toContain('setTimer: (callback, delayMs) => setTimeout(callback, delayMs),');
+    expect(wiring).toContain('clearTimer: (handle) => clearTimeout(handle),');
+    expect(wiring).toContain('now: () => Date.now(),');
+  });
+
   it('applies the stored display mode at the reveal, never at construction', () => {
     // Same reasoning as the maximize above: setFullScreen on a hidden window is
     // window state the reveal discipline owns, and a `fullscreen` key in the
