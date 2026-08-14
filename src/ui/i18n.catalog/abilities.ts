@@ -580,8 +580,20 @@ type AbilityEntityTranslation = {
 
 type AbilityEntityTranslations = Record<string, AbilityEntityTranslation>;
 
+// Labelled tuple: the two optional tails are positional, so an entry that wants
+// descriptionNoStealth WITHOUT spec notes passes `undefined` for specNotes. The
+// labels are what make that call site readable (and what tsc echoes on a wrong
+// argument) instead of a bare trailing string nobody can identify.
+type AbilityTranslationEntry = readonly [
+  id: string,
+  name: string,
+  description: string,
+  specNotes?: Record<string, string>,
+  descriptionNoStealth?: string,
+];
+
 function abilityTranslations(
-  entries: readonly (readonly [string, string, string, Record<string, string>?, string?])[],
+  entries: readonly AbilityTranslationEntry[],
 ): AbilityEntityTranslations {
   const translations: AbilityEntityTranslations = {};
   for (const [id, name, description, specNotes, descriptionNoStealth] of entries) {
