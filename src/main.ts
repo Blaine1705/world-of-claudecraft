@@ -4958,10 +4958,14 @@ async function startGame(
   if (streamedCount > 0) {
     console.info(`[entry-guard] streaming ${streamedCount} deferred character assets`);
   }
-  // The paperdoll/armory/portrait preview prewarms no longer hold the curtain:
+  // The paperdoll and portrait preview prewarms no longer hold the curtain:
   // they start after the reveal (see revealWorld below) as paced background
-  // GPU units. Measured on the reference desktop they were 11 to 26 s of the
-  // entry spent on secondary contexts for windows the player may never open.
+  // GPU units. Measured on the reference desktop, awaiting the paperdoll,
+  // armory and portrait prewarms here cost 11 to 26 s of the entry, spent on
+  // secondary contexts for windows the player may never open. The ARMORY is
+  // no longer in that set at all and is warmed nowhere ahead of time: it
+  // builds per inspected card, on the click that opens it
+  // (docs/design/armory-preview-warming.md).
   // Only the paperdoll SHELL still builds here (~700 ms): it is the one coarse
   // step the paced lane cannot split, and behind the curtain it costs nothing
   // a player can feel. The tight profile keeps skipping every secondary
@@ -5052,9 +5056,10 @@ async function startGame(
           // One-time machine-local performance nudge (packet 0 rulings R14-R16):
           // the assembler polls the same PerfMonitor the reporter reads.
           initPerfNudge({ perf, desktopShell: DESKTOP_APP });
-          // Post-entry preview prewarm (paperdoll, armory catalog, portrait
-          // caches): one bounded unit per idle slot on the renderer's
-          // background GPU queue, paused while the owning window is open. The
+          // Post-entry preview prewarm (paperdoll and portrait caches; the
+          // armory catalog is NOT warmed, it builds per inspected card): one
+          // bounded unit per idle slot on the renderer's background GPU queue,
+          // paused while the owning window is open. The
           // 4 GB-class tight profile still skips the secondary contexts
           // entirely and keeps their documented lazy first-open path.
           if (!GFX.tightMemory) hud.startPostEntryPreviewPrewarm();

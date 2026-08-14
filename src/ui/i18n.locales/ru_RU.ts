@@ -3049,6 +3049,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cheap_shot.name': 'Удар под дых',
   'entities.abilities.cheap_shot.description':
     'Бьет цель, нанося {damage} ед. урона и оглушая ее на 4 сек. Требуется незаметность. Дает 2 очка серии.',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    'Бьет цель, нанося {damage} ед. урона и оглушая ее на 4 сек. Дает 2 очка серии.',
   'entities.abilities.sap.name': 'Ошеломление',
   'entities.abilities.sap.description':
     'Выводит цель из строя на 8 сек. Требуется незаметность и нахождение вне боя. Любой урон прерывает эффект.',

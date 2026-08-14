@@ -1304,6 +1304,7 @@ export type TranslationKeyFlat =
   | 'entities.abilities.charge.description'
   | 'entities.abilities.charge.name'
   | 'entities.abilities.cheap_shot.description'
+  | 'entities.abilities.cheap_shot.descriptionNoStealth'
   | 'entities.abilities.cheap_shot.name'
   | 'entities.abilities.cheap_shot.specNote_subtlety'
   | 'entities.abilities.choir_of_deliverance.description'

@@ -38,14 +38,17 @@ interface MonolithRow {
 const MONOLITHS: MonolithRow[] = [
   {
     file: 'src/ui/hud.ts',
-    // Raised 19490 -> 19510 (+20) for the desktop-client-update packet, a
-    // maintainer decision prepared for PR review with the recorded rationale:
-    // upstream's own extract-and-lower updates re-pinned this ceiling with
-    // near-zero slack, and the branch's additions are thin-consumer wiring to
-    // extracted modules (presentation_gate, instance_music), so no clean
-    // branch-owned extraction exists. Set to the exact current count: any
+    // Lowered after extracting the ability description prose (the placeholder
+    // values, the over-time string and the talent-conditional field choice) into
+    // src/ui/ability_description.ts (the ratchet's own rule: an extraction lowers
+    // the ceiling, never raises it).
+    // Raised 19420 -> 19432 (+12) for the desktop-client-update packet, a
+    // maintainer decision prepared for PR review: the branch's additions are
+    // thin-consumer wiring to extracted modules (presentation_gate,
+    // instance_music) riding on top of upstream's near-zero-slack re-pins, so
+    // no clean branch-owned extraction exists. Exact merged count: any
     // further growth reds again.
-    ceiling: 19510,
+    ceiling: 19432,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -54,12 +57,17 @@ const MONOLITHS: MonolithRow[] = [
     // stranded-light reparent and the registry prune into
     // src/render/fire_light_registry.ts (the ratchet's own rule: an extraction
     // lowers the ceiling, never raises it).
-    // Raised 13700 -> 13785 (+85) for the desktop-client-update packet, same
+    // Lowered again after extracting the secondary-context preview warming
+    // policy into src/render/preview_prewarm_lane.ts. Earlier steps down: the
+    // per-status manifest rollup to summarizePrewarmManifest
+    // (prewarm_compile_lifecycle.ts, beside the interface it fills) and the
+    // resume-lane bookkeeping to prewarm_resume_ledger_core.ts.
+    // Raised 13682 -> 13776 (+94) for the desktop-client-update packet, same
     // maintainer-decision preparation as hud.ts above: the growth is
     // thin-consumer wiring to extracted modules (frame_present, dpr_watch,
     // static_matrix, shadow cadence hookup) over upstream's near-zero-slack
-    // re-pin. Exact current count: any further growth reds again.
-    ceiling: 13785,
+    // re-pins. Exact merged count: any further growth reds again.
+    ceiling: 13776,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

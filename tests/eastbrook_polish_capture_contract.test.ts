@@ -168,6 +168,9 @@ interface AttributionTargetFixture {
 // the release monolith ratchet. Behavior is unchanged; no capture was retaken.
 // Re-minted again after making that extracted policy an explicit provenance
 // leaf. The evidence now follows policy-only changes; no capture was retaken.
+// Re-minted for the merge of release/v0.38.0 into the Armory warming branch:
+// both parents move renderer.ts, so the merged tree mints a value matching
+// neither parent. No capture was retaken.
 // Re-minted for the phase 11 desktop-client-update seal re-mint over the
 // branch's final lockfile: the lockfile moved the three GLB source-fingerprint
 // leaves (electron + three r185 train), and the branch's renderer.ts and
@@ -177,8 +180,12 @@ interface AttributionTargetFixture {
 // evidence stays verbatim per this seal's own frozen-history doctrine (the
 // bank-rebuild precedent); provenance re-recorded only. No capture was
 // retaken.
+// Re-minted for the merge of release/v0.38.0 (the Armory pacing train) into
+// the desktop-client-update packet: both parents moved renderer.ts and each
+// carried its own mint, so the merged tree mints a value matching neither
+// parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'd05e927d0abd8ba3fd34305deb5fe41cd44cc20cc78c1e417cb1e8afe11b3ac3';
+  '60ea4fe0e87a02a3c4f64d1ff9c96c63dea81e91c8b0702fc5864a2a038d738c';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
