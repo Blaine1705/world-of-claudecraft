@@ -211,6 +211,32 @@ export function parseShardArg(argv) {
 }
 
 /**
+ * Resolve the vitest worker count for a CI test job. The default is half the
+ * runner's cores, a MEASURED ruling (full-core run 31107474546 inflated the
+ * long sims' aggregate CPU ~1.6x through memory-bandwidth contention and
+ * timed out the eastbrook sweep); every per-test budget is calibrated
+ * against it. WOC_TEST_WORKERS is the sanctioned trial knob for producing
+ * the green measured run that ruling requires before any new default: an
+ * integer between 1 and the core count is honored; a malformed or
+ * out-of-range value falls back to the measured default and reports
+ * `source: 'invalid'` so the entry announces it in the job log; unset or
+ * empty is the ordinary default (`source: 'default'`) and stays quiet.
+ * Worker count never changes WHICH tests run, so the fallback direction is
+ * safety toward the calibrated bound, not toward fewer tests.
+ *
+ * @param {{ cores: number, envValue?: string }} opts
+ * @returns {{ workers: number, source: 'default' | 'env' | 'invalid' }}
+ */
+export function resolveWorkerCount({ cores, envValue }) {
+  const fallback = Math.max(1, Math.floor(cores / 2));
+  if (envValue === undefined || envValue === '') return { workers: fallback, source: 'default' };
+  if (!/^[1-9]\d*$/.test(envValue)) return { workers: fallback, source: 'invalid' };
+  const parsed = Number(envValue);
+  if (parsed > cores) return { workers: fallback, source: 'invalid' };
+  return { workers: parsed, source: 'env' };
+}
+
+/**
  * Resolve the floor for a selective run.
  *
  * @param {{

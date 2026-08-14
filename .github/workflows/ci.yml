@@ -639,8 +639,12 @@ jobs:
       # merged selective leg is a bare vitest-related invocation with no npm
       # lifecycle, so scripts/ci_shard_test.mjs runs pretest before spawning
       # and the npm-test legs skip their lifecycle copy). The freshness diff
-      # lives in pr-checks. Workers stay at half the runner's cores inside the
-      # script.
+      # lives in pr-checks. Worker count resolves inside the script: the
+      # half-cores measured default unless a step env sets a valid
+      # WOC_TEST_WORKERS. None is set: both alternatives were measured and
+      # regressed (4 workers, run 31107474546; 3 workers, run 31771637461,
+      # three unrelated default-timeout blowouts for at most a minute of
+      # wall). The ruling lives in scripts/ci_shard_test.mjs.
       #
       # Phase 2 (docs/qa-gate.md, "Selective PR-tier CI"): the runner reads the
       # changes job's selection decision. test_mode=full spawns the old step
