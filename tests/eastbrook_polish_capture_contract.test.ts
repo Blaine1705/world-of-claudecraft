@@ -159,8 +159,10 @@ interface AttributionTargetFixture {
 // renderer. The rendererIntegration leaf moves; no capture was retaken.
 // Re-minted for PR #3344 after removing the unused Eastbrook civic-beacon
 // preload test hook. The civicShader leaf moves; no capture was retaken.
+// Re-minted after applying the PR #3339 review repair atop PR #3344. The
+// rendererIntegration and civicShader leaves both survive; no capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'a1226a747f82b1f2d8e750593cae4bec6c60ab5bcb89918c58e8ef3f287a6d18';
+  'a20916f64adf563b5ac8ea58dee38acf2cd44436936dacc7565ffa7f32ce9176';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

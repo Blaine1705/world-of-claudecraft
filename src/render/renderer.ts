@@ -8092,8 +8092,10 @@ export class Renderer {
         // Throttle the particle bloom to one per target per 110ms so a burst of tiny
         // simultaneous heals (a Chronomancy group echo converting an AoE that hit
         // several enemies onto five allies in one frame) cannot spike the particle
-        // count. The healing number itself (FCT) is emitted elsewhere and unaffected.
-        if (ev.amount > 0 || ev.crit) {
+        // count. Targets without a view have no VFX anchor, so do not timestamp
+        // them and suppress the first bloom after they become visible. The healing
+        // number itself (FCT) is emitted elsewhere and unaffected.
+        if ((ev.amount > 0 || ev.crit) && this.views.has(ev.targetId)) {
           const nowMs = performance.now();
           if (nowMs - (this.healGlowAt.get(ev.targetId) ?? 0) >= 110) {
             this.healGlowAt.set(ev.targetId, nowMs);
@@ -10410,6 +10412,10 @@ export class Renderer {
 
   // Drop the view of an entity that left the world / our interest area.
   private removeView(id: number, terminal = false): void {
+    // healGlowAt has no decay loop of its own (unlike fiestaGlows/waterJetVisualChannels).
+    // Clear it before the idempotent early return so legacy or raced missing-view
+    // removals cannot leave a stale throttle entry for the rest of the session.
+    this.healGlowAt.delete(id);
     const v = this.views.get(id);
     if (!v) return;
     // A pending weapon-skin application must never land on a dropped (or
@@ -10467,10 +10473,6 @@ export class Renderer {
     v.paladinAegisVisual?.dispose();
     v.paladinSunVerdictVisual?.dispose();
     this.audioSink?.mountEngineReset(id);
-    // healGlowAt has no decay loop of its own (unlike fiestaGlows/waterJetVisualChannels),
-    // so a view drop is its only eviction point; otherwise every distinct entity ever
-    // healed accretes an entry for the rest of the session.
-    this.healGlowAt.delete(id);
     this.views.delete(id);
   }
 
