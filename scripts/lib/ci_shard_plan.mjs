@@ -58,6 +58,7 @@ export const CI_GUARD_SUITES = Object.freeze([
   'tests/architecture.test.ts',
   'tests/localization_fixes.test.ts',
   'tests/localization_coverage.test.ts',
+  'tests/suite_duration_budget.test.ts',
   'tests/world_api_parity.test.ts',
 ]);
 
