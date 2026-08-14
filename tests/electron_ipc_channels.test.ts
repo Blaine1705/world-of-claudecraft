@@ -26,9 +26,11 @@ describe('electron IPC channel contract (preload <-> main)', () => {
         'desktop-epic-capability',
         'desktop-epic-link-proof',
         'desktop-epic-link-settled',
+        'desktop-get-display-mode',
         'desktop-get-gpu-force-opt-out',
         'desktop-login-open-browser',
         'desktop-login-take-code',
+        'desktop-set-display-mode',
         'desktop-set-gpu-force-opt-out',
         'desktop-set-strings',
         'desktop-steam-capability',
@@ -147,6 +149,43 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     );
   });
 
+  it('the display-mode setter takes only the two literals, persists, then applies live', () => {
+    // The stored mode decides how the NEXT launch reveals the window and the
+    // live apply is what the player sees under the click, so a junk value must
+    // reach neither, and a failed write must not leave the window in a mode the
+    // next launch would not reproduce.
+    const main = read('electron/main.cjs');
+    const start = main.indexOf("ipcMain.handle('desktop-set-display-mode'");
+    expect(start).toBeGreaterThan(-1);
+    const body = main.slice(start, main.indexOf('\n});', start));
+    expect(body).toContain("if (mode !== 'borderless' && mode !== 'windowed') return false;");
+    // Same anti-clobber contract as the GPU setter: the WHOLE record, spread
+    // from the live module-scope object, or a mid-session change would wipe
+    // windowBounds/displayId/maximized off disk.
+    expect(body).toContain(
+      'saveDesktopPrefs(desktopPrefsPath, { ...desktopPrefs, displayMode: mode })',
+    );
+    const saveAt = body.indexOf('saveDesktopPrefs(desktopPrefsPath,');
+    const commitAt = body.indexOf('desktopPrefs.displayMode = mode;');
+    const applyAt = body.indexOf("mainWindow.setFullScreen(mode === 'borderless');");
+    expect(commitAt).toBeGreaterThan(saveAt);
+    expect(applyAt).toBeGreaterThan(commitAt);
+    // Idempotence: the world-entry apply-all loop re-sends the reflected mode,
+    // and a same-value send must neither rewrite the file nor re-apply window
+    // state over a manually fullscreened (or restored) window. The early
+    // return sits after validation and before the save.
+    const sameAt = body.indexOf('if (mode === desktopPrefs.displayMode) return true;');
+    expect(sameAt).toBeGreaterThan(body.indexOf("if (mode !== 'borderless'"));
+    expect(sameAt).toBeLessThan(saveAt);
+
+    const getterAt = main.indexOf("ipcMain.handle('desktop-get-display-mode'");
+    expect(getterAt).toBeGreaterThan(-1);
+    const getter = main.slice(getterAt, main.indexOf('\n});', getterAt));
+    expect(getter, 'the getter must report the STORED mode').toContain(
+      'return desktopPrefs.displayMode;',
+    );
+  });
+
   it('activates the macOS app when the browser returns a wallet handoff', () => {
     const main = read('electron/main.cjs');
     const start = main.indexOf('function deliverWalletHandoffCode');
@@ -169,6 +208,8 @@ describe('electron IPC channel contract (preload <-> main)', () => {
       'onDisplayChanged',
       'getGpuForceOptOut',
       'setGpuForceOptOut',
+      'getDisplayMode',
+      'setDisplayMode',
       'steamLinkTicket',
       'steamLinkSupported',
       'steamLinkSettled',

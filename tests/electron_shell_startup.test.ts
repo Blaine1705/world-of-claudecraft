@@ -315,12 +315,48 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     ).toBeLessThan(reveal.indexOf('win.show();'));
   });
 
+  it('applies the stored display mode at the reveal, never at construction', () => {
+    // Same reasoning as the maximize above: setFullScreen on a hidden window is
+    // window state the reveal discipline owns, and a `fullscreen` key in the
+    // constructor options would both skip that discipline and (as an explicit
+    // false) disable the macOS full-screen button for the whole session.
+    const reveal = block('const showMainWindow = () => {', '\n  };', 'showMainWindow');
+    const fullScreenAt = reveal.indexOf(
+      "if (desktopPrefs.displayMode === 'borderless') win.setFullScreen(true);",
+    );
+    expect(fullScreenAt, 'a borderless session must be revealed full screen').toBeGreaterThan(-1);
+    expect(
+      fullScreenAt,
+      'the mode must be applied before show() so the first visible frame is the right one',
+    ).toBeLessThan(reveal.indexOf('win.show();'));
+    // Borderless supersedes maximize: doing both would leave the window
+    // remembering a maximized state it never presented.
+    expect(reveal, 'the maximize must be the else arm of the borderless branch').toContain(
+      'else if (restore.maximized) win.maximize();',
+    );
+    expect(count(code, 'win.setFullScreen(true);'), 'one reveal-time apply only').toBe(1);
+    const options = block('new BrowserWindow({', '\n  });', 'BrowserWindow options');
+    expect(
+      options,
+      'an explicit fullscreen option would disable the macOS full-screen button',
+    ).not.toContain('fullscreen:');
+    expect(options).not.toContain('setFullScreen');
+  });
+
   it('remembers the window geometry on settle and once more at close', () => {
     const capture = block('const captureWindowBounds = () => {', '\n  };', 'captureWindowBounds');
     expect(
       capture,
       'a maximized session must remember the size it un-maximizes to, not the full screen',
     ).toContain('win.getNormalBounds()');
+    // On Linux getNormalBounds() equals getBounds(), so a capture during a
+    // borderless session would persist the full display rect over the
+    // remembered windowed geometry (the startup smoke reproduced it). The
+    // guard must sit BEFORE the read, and with the right polarity.
+    const fullScreenGuardAt = capture.indexOf('if (win.isFullScreen()) return;');
+    expect(fullScreenGuardAt, 'no capture while full screen').toBeGreaterThan(-1);
+    expect(fullScreenGuardAt).toBeLessThan(capture.indexOf('win.getNormalBounds()'));
+    expect(capture).not.toContain('!win.isFullScreen()');
     expect(capture, 'getBounds would persist the maximized rect').not.toContain('win.getBounds()');
     expect(capture, 'the maximized state itself must be remembered').toContain('win.isMaximized()');
     expect(capture, 'the display the window sits on must be remembered').toContain(

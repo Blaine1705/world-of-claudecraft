@@ -98,6 +98,11 @@ export interface DesktopDisplayChange {
   scaleFactor: number;
 }
 
+// The desktop window's presentation mode. Electron has no exclusive
+// fullscreen: 'borderless' is setFullScreen(true) on the window's current
+// display, 'windowed' is a normal frame restored to the remembered bounds.
+export type DesktopDisplayMode = 'borderless' | 'windowed';
+
 export interface DesktopBridge {
   openBrowserLogin(): Promise<void>;
   takeLoginCode(): Promise<string | null>;
@@ -156,6 +161,13 @@ export interface DesktopBridge {
   // before use, like the other post-trio methods.
   getGpuForceOptOut?(): Promise<boolean>;
   setGpuForceOptOut?(optOut: boolean): Promise<boolean>;
+  // The persisted display mode. The shell prefs store is the source of truth;
+  // the setter persists AND applies it to the live window (unlike the GPU
+  // pref, which only takes effect next launch), the getter returns the stored
+  // value. Absent on older shells: feature-check before use, like the other
+  // post-trio methods.
+  getDisplayMode?(): Promise<DesktopDisplayMode>;
+  setDisplayMode?(mode: DesktopDisplayMode): Promise<boolean>;
 }
 
 export function desktopBridge(): DesktopBridge | null {

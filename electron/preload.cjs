@@ -174,6 +174,15 @@ contextBridge.exposeInMainWorld('wocDesktop', {
   getGpuForceOptOut: () => ipcRenderer.invoke('desktop-get-gpu-force-opt-out'),
   setGpuForceOptOut: (optOut) =>
     ipcRenderer.invoke('desktop-set-gpu-force-opt-out', optOut === true),
+  // How the shell presents its window: 'borderless' (full screen) or 'windowed'.
+  // The setter applies live AND stores for the next launch, and answers whether
+  // the choice actually reached disk. An unknown mode is refused here rather
+  // than crossing the bridge, so main only ever sees a value it can apply.
+  getDisplayMode: () => ipcRenderer.invoke('desktop-get-display-mode'),
+  setDisplayMode: (mode) => {
+    if (mode !== 'borderless' && mode !== 'windowed') return Promise.resolve(false);
+    return ipcRenderer.invoke('desktop-set-display-mode', mode);
+  },
   // Whether the shell's window is minimized or hidden, pushed from the main
   // process because the page cannot see it: the window sets
   // backgroundThrottling:false, which keeps document.visibilityState at

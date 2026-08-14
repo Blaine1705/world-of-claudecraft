@@ -51,6 +51,7 @@ describe('desktop prefs schema', () => {
       version: 1,
       maximized: false,
       gpuForceOptOut: false,
+      displayMode: 'borderless',
     });
   });
 
@@ -61,6 +62,7 @@ describe('desktop prefs schema', () => {
       displayId: 12345,
       maximized: true,
       gpuForceOptOut: true,
+      displayMode: 'windowed',
       // Junk a hand-edited file could carry; none of it may survive.
       apiOrigin: 'https://evil.example',
       extra: 'nope',
@@ -71,9 +73,11 @@ describe('desktop prefs schema', () => {
       displayId: 12345,
       maximized: true,
       gpuForceOptOut: true,
+      displayMode: 'windowed',
     });
     expect(Object.keys(prefs).sort()).toEqual([
       'displayId',
+      'displayMode',
       'gpuForceOptOut',
       'maximized',
       'version',
@@ -134,6 +138,27 @@ describe('desktop prefs schema', () => {
     expect(sanitizeDesktopPrefs({ version: 1, maximized: false }).maximized).toBe(false);
   });
 
+  it('takes the display mode as an exact literal, defaulting to borderless', () => {
+    // The stored mode is fed straight to setFullScreen at the reveal, so a
+    // near-miss has to land on the default rather than on whichever branch a
+    // loose comparison would take. Case variants are junk on purpose.
+    expect(sanitizeDesktopPrefs({ version: 1, displayMode: 'borderless' }).displayMode).toBe(
+      'borderless',
+    );
+    expect(sanitizeDesktopPrefs({ version: 1, displayMode: 'windowed' }).displayMode).toBe(
+      'windowed',
+    );
+    for (const junk of ['BORDERLESS', 'Windowed', 'full', 'fullscreen', '', 1, 0, null, true, {}]) {
+      expect(
+        sanitizeDesktopPrefs({ version: 1, displayMode: junk }).displayMode,
+        `displayMode ${JSON.stringify(junk)} must resolve to the default`,
+      ).toBe('borderless');
+    }
+    // Absent is the normal reading of a file written before the field existed,
+    // which is why the schema version did not move for it.
+    expect(sanitizeDesktopPrefs({ version: 1, maximized: true }).displayMode).toBe('borderless');
+  });
+
   it('drops window bounds unless every field is a finite integer', () => {
     const good = { x: 0, y: 0, width: 1440, height: 900 };
     expect(sanitizeDesktopPrefs({ version: 1, windowBounds: good }).windowBounds).toEqual(good);
@@ -187,6 +212,7 @@ describe('loadDesktopPrefs', () => {
       displayId: 4242,
       maximized: true,
       gpuForceOptOut: true,
+      displayMode: 'windowed',
     };
     expect(saveDesktopPrefs(filePath, saved)).toBe(true);
     // mkdir recursive: the userData subdirectory may not exist on a first run.
@@ -198,6 +224,7 @@ describe('loadDesktopPrefs', () => {
       displayId: 4242,
       maximized: true,
       gpuForceOptOut: true,
+      displayMode: 'windowed',
     });
   });
 
@@ -349,7 +376,12 @@ describe('loadDesktopPrefs', () => {
     // Only whitelisted fields are ever copied onto a fresh object, so the
     // payload contributes nothing. The maximized:true beside it still lands,
     // which proves the file was read rather than rejected wholesale.
-    expect(prefs).toEqual({ version: 1, maximized: true, gpuForceOptOut: false });
+    expect(prefs).toEqual({
+      version: 1,
+      maximized: true,
+      gpuForceOptOut: false,
+      displayMode: 'borderless',
+    });
     expect(Object.prototype).not.toHaveProperty('polluted');
     expect(({} as Record<string, unknown>).polluted).toBeUndefined();
     expect(Object.getPrototypeOf(prefs)).toBe(Object.prototype);
@@ -378,7 +410,7 @@ describe('saveDesktopPrefs', () => {
     // downgrade to a following write, so pin it literally: 'wx' is O_EXCL.
     expect(calls).toEqual([
       'mkdir:/userdata:true',
-      'write:{"version":1,"maximized":false,"gpuForceOptOut":true}:utf8:wx',
+      'write:{"version":1,"maximized":false,"gpuForceOptOut":true,"displayMode":"borderless"}:utf8:wx',
       'rename:<staged>:/userdata/desktop-prefs.json',
     ]);
     // Staged beside the target, under an unpredictable name: a fixed sibling is
@@ -457,6 +489,7 @@ describe('saveDesktopPrefs', () => {
       windowBounds: { x: 5, y: 5, width: 1024, height: 720 },
       maximized: false,
       gpuForceOptOut: true,
+      displayMode: 'borderless',
     });
   });
 

@@ -53,6 +53,17 @@ const isInteger = (value) => typeof value === 'number' && Number.isInteger(value
 /** Booleans are accepted strictly: 'true', 1, and null are junk, not true. */
 const readBoolean = (value, fallback) => (value === true || value === false ? value : fallback);
 
+/** The two display modes the shell can present in; the default is borderless. */
+const DISPLAY_MODES = ['borderless', 'windowed'];
+
+/**
+ * The window presentation mode off disk. Exact-literal only: no case folding and
+ * no aliases, because the value is fed straight to setFullScreen at the reveal,
+ * and a near-miss ('Borderless', 'fullscreen') has to resolve to the default
+ * rather than to whichever branch a loose comparison happened to take.
+ */
+const readDisplayMode = (value, fallback) => (DISPLAY_MODES.includes(value) ? value : fallback);
+
 /**
  * A window rect off disk, or null. Partial bounds are dropped whole: three of
  * four fields cannot place a window, and pairing a saved x with a default width
@@ -72,7 +83,12 @@ function readWindowBounds(value) {
 
 /** The prefs a first launch (or any unusable file) gets. */
 function defaultDesktopPrefs() {
-  return { version: DESKTOP_PREFS_VERSION, maximized: false, gpuForceOptOut: false };
+  return {
+    version: DESKTOP_PREFS_VERSION,
+    maximized: false,
+    gpuForceOptOut: false,
+    displayMode: 'borderless',
+  };
 }
 
 /**
@@ -96,6 +112,11 @@ function sanitizeDesktopPrefs(input) {
   if (isInteger(input.displayId)) prefs.displayId = input.displayId;
   prefs.maximized = readBoolean(input.maximized, false);
   prefs.gpuForceOptOut = readBoolean(input.gpuForceOptOut, false);
+  // Additive since the version was stamped, so an ABSENT displayMode is the
+  // normal reading of a file written by an older build, not a corrupt one: it
+  // resolves to the default like any other unusable value, which is why the
+  // schema version does not move for it.
+  prefs.displayMode = readDisplayMode(input.displayMode, 'borderless');
   return prefs;
 }
 

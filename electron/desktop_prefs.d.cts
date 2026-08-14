@@ -4,10 +4,13 @@
 
 import type { WindowRect } from './window_memory.cjs';
 
+export type DesktopDisplayMode = 'borderless' | 'windowed';
+
 export interface DesktopPrefs {
   version: number;
   maximized: boolean;
   gpuForceOptOut: boolean;
+  displayMode: DesktopDisplayMode;
   windowBounds?: WindowRect;
   displayId?: number;
 }

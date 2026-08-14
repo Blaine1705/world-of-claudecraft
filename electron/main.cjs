@@ -459,7 +459,14 @@ function createMainWindow() {
   const win = mainWindow;
   const showMainWindow = () => {
     if (win.isDestroyed() || win.isVisible()) return false;
-    if (restore.maximized) win.maximize();
+    // Borderless SUPERSEDES a maximized session: full screen already covers the
+    // display, and doing both would leave the window remembering a maximized
+    // state it never presented. Applied here for the same reason as the
+    // maximize (and never as a `fullscreen` option on the constructor: an
+    // explicit fullscreen:false disables the macOS full-screen button, and
+    // constructor-time state would skip this reveal discipline entirely).
+    if (desktopPrefs.displayMode === 'borderless') win.setFullScreen(true);
+    else if (restore.maximized) win.maximize();
     win.show();
     return true;
   };
@@ -511,6 +518,14 @@ function createMainWindow() {
   };
   const captureWindowBounds = () => {
     if (win.isDestroyed()) return;
+    // Never capture while full screen: on Linux getNormalBounds() returns the
+    // same rect as getBounds(), so a borderless session would persist the full
+    // display rect over the windowed geometry it is supposed to restore to
+    // (the startup smoke reproduced exactly that before this guard). Skipping
+    // leaves the last windowed capture standing, which is the memory the
+    // windowed mode wants; entering windowed live fires its own resize and
+    // re-captures real bounds.
+    if (win.isFullScreen()) return;
     const bounds = win.getNormalBounds();
     desktopPrefs.windowBounds = bounds;
     desktopPrefs.displayId = screen.getDisplayMatching(bounds)?.id;
@@ -877,6 +892,41 @@ ipcMain.handle('desktop-set-gpu-force-opt-out', (event, optOut) => {
 ipcMain.handle('desktop-get-gpu-force-opt-out', (event) => {
   if (!trustedSender(event)) return false;
   return desktopPrefs.gpuForceOptOut === true;
+});
+
+// How the shell presents its window (Options > Interface). Unlike the GPU force this
+// applies LIVE as well as being stored: the player expects the mode to change under the
+// click, and the next launch reads the same stored value at the reveal. Persisted first,
+// so a mode that could not be written is not applied to a window the next launch would
+// open differently.
+ipcMain.handle('desktop-set-display-mode', (event, mode) => {
+  if (!trustedSender(event)) return false;
+  // The two literals only: this value is fed straight to setFullScreen, so a junk value
+  // must not reach the file, let alone the window.
+  if (mode !== 'borderless' && mode !== 'windowed') return false;
+  // Idempotent on purpose: the renderer's world-entry apply-all loop re-sends
+  // the reflected mode, and answering it with a disk write plus a setFullScreen
+  // of the current state would snap back a window the player has manually
+  // fullscreened (or restored) since launch. Same value stored = nothing to do.
+  if (mode === desktopPrefs.displayMode) return true;
+  if (!saveDesktopPrefs(desktopPrefsPath, { ...desktopPrefs, displayMode: mode })) {
+    log.warn('[shell] could not persist the display mode preference');
+    return false;
+  }
+  desktopPrefs.displayMode = mode;
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    // Leaving full screen restores the pre-fullscreen bounds itself, which is why
+    // windowed needs no geometry of its own here.
+    mainWindow.setFullScreen(mode === 'borderless');
+  }
+  return true;
+});
+
+// What the settings control shows: the stored mode, which is also what the next launch
+// applies at the reveal. Guaranteed to be one of the two literals by the prefs sanitizer.
+ipcMain.handle('desktop-get-display-mode', (event) => {
+  if (!trustedSender(event)) return 'borderless';
+  return desktopPrefs.displayMode;
 });
 
 // Uncaught renderer errors forwarded by the preload. The preload clamps and
