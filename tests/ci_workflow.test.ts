@@ -9,9 +9,15 @@ import { decideTestMode } from '../scripts/lib/ci_test_select.mjs';
 import {
   GENERATED_I18N_ARTIFACT_FILES,
   GENERATED_I18N_ARTIFACT_PREFIXES,
+  GENERATED_MANIFEST_ARTIFACT_FILES,
   isGeneratedI18nArtifactPath,
+  isGeneratedManifestArtifactPath,
 } from '../scripts/lib/gate_select_plan.mjs';
-import { buildFullGateSteps, I18N_ARTIFACTS } from '../scripts/lib/gate_steps.mjs';
+import {
+  buildFullGateSteps,
+  I18N_ARTIFACTS,
+  MANIFEST_ARTIFACTS,
+} from '../scripts/lib/gate_steps.mjs';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
 
 const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
@@ -97,6 +103,7 @@ const CHECK_RUN_STEPS = [
   'run: npm run security:gate',
   TYPECHECK_BUILDS_TURBO_RUN,
   'run: npm run wiki:content && npm run build:bundle\n',
+  'run: git diff --exit-code -- src/game/sfx_manifest.generated.ts',
 ] as const;
 
 // Exact job-level if line for both release jobs. toContain alone would allow a
@@ -523,7 +530,7 @@ describe('CI workflow parity', () => {
       const job = jobSource(jobName);
       // Anchored to the src/ prefix so a future unrelated `git diff
       // --exit-code` step added above this one cannot re-point the pin.
-      const m = job.match(/run: git diff --exit-code -- (src\/[^\n]+)/);
+      const m = job.match(/\n {8}run: git diff --exit-code -- (src\/[^\n]+)/);
       expect(m, `${jobName} must carry the freshness diff step`).not.toBeNull();
       const freshnessPaths = (m as RegExpMatchArray)[1].trim().split(/\s+/).sort();
       expect(classifierPaths).toEqual(freshnessPaths);
@@ -548,6 +555,72 @@ describe('CI workflow parity', () => {
       true,
     );
     expect(isGeneratedI18nArtifactPath('src/guide/content.generated.ts')).toBe(false);
+  });
+
+  it('pins the inert generated-manifest classifier to exactly the freshness-diffed paths', () => {
+    // The second freshness-guarded family holds the same weld family as the
+    // i18n arm above, with one deliberate asymmetry: the freshness DIFF set
+    // (MANIFEST_ARTIFACTS) is a strict SUPERSET of the classifier family.
+    // The SFX generator writes two more tracked files (the runtime pack and
+    // the gain-ceiling cache) that are fs-read data, never graph nodes:
+    // diffing them prevents the local gate from silently healing them
+    // mid-run while CI reads stale committed copies; feeding them to
+    // `related` would select nothing. Both lists are pinned to literals (the
+    // family-growth mitigation: a fourth path moved in lockstep through
+    // every derived side would otherwise stay green), the classifier family
+    // must be contained in the diff set, and BOTH check jobs' argv must
+    // equal the diff set exactly.
+    expect([...GENERATED_MANIFEST_ARTIFACT_FILES].sort()).toEqual([
+      'src/game/sfx_manifest.generated.ts',
+      'src/guide/content.generated.ts',
+      'src/render/assets/manifest.generated.ts',
+    ]);
+    expect([...MANIFEST_ARTIFACTS].sort()).toEqual(
+      [
+        'src/game/sfx_manifest.generated.ts',
+        'src/guide/content.generated.ts',
+        'src/render/assets/manifest.generated.ts',
+        'public/audio/sfx/runtime-pack.json',
+        'scripts/sfx/sfx_gain_ceiling.generated.json',
+      ].sort(),
+    );
+    for (const member of GENERATED_MANIFEST_ARTIFACT_FILES) {
+      expect(MANIFEST_ARTIFACTS, 'every classifier path must be freshness-diffed').toContain(
+        member,
+      );
+    }
+    for (const jobName of ['pr-checks', 'release-checks']) {
+      const job = jobSource(jobName);
+      // Exactly two src/-anchored freshness diffs per check job: the i18n
+      // one (welded above) and this one; a third would ambiguate the
+      // first-match anchor the i18n weld relies on. The `\n {8}run: ` anchor
+      // means a YAML-commented-out step can never satisfy the match.
+      const diffs = [...job.matchAll(/\n {8}run: git diff --exit-code -- (src\/[^\n]+)/g)];
+      expect(diffs, `${jobName} freshness diff steps`).toHaveLength(2);
+      const manifestDiff = diffs.find((d) => d[1].includes('sfx_manifest.generated.ts'));
+      expect(manifestDiff, `${jobName} must carry the manifest freshness diff`).toBeTruthy();
+      const freshnessPaths = (manifestDiff as RegExpMatchArray)[1].trim().split(/\s+/).sort();
+      expect(freshnessPaths).toEqual([...MANIFEST_ARTIFACTS].sort());
+      // Regenerate BEFORE diff, inside the same job: the client build
+      // (wiki:content writes the guide content, build:bundle's pregen writes
+      // the SFX and media manifests) must precede the diff, or the diff
+      // proves nothing about this tree's sources.
+      const buildIdx = job.indexOf('run: npm run wiki:content && npm run build:bundle\n');
+      expect(buildIdx).toBeGreaterThan(0);
+      expect(buildIdx).toBeLessThan(job.indexOf((manifestDiff as RegExpMatchArray)[0]));
+    }
+    // Nightly coverage is transitive: release-checks carries the diff (welded
+    // here) and tests/nightly_workflow.test.ts pins nightly's run-line
+    // sequence equal to release-checks', so nightly cannot quietly drop it.
+    // The predicate agrees with the pinned path classes on both sides, and
+    // any OTHER .generated path keeps the widen-to-full behavior.
+    for (const p of GENERATED_MANIFEST_ARTIFACT_FILES) {
+      expect(isGeneratedManifestArtifactPath(p), p).toBe(true);
+    }
+    expect(isGeneratedManifestArtifactPath('src/ui/icons.generated.ts')).toBe(false);
+    expect(
+      isGeneratedManifestArtifactPath('src/ui/i18n.catalog/translation_keys.generated.ts'),
+    ).toBe(false);
   });
 
   it('runs the release tier against a release-to-main pull request merge result', () => {
@@ -660,7 +733,7 @@ describe('CI workflow parity', () => {
     // ...and a structural count, the same backstop release-gate has: an added
     // or removed pr-checks step must consciously update this test rather than
     // slipping in beside the by-name pins above.
-    expect(prChecks.match(/\n {6}- name: /g)).toHaveLength(11);
+    expect(prChecks.match(/\n {6}- name: /g)).toHaveLength(12);
     // pr-checks is unsharded, so NO step in it may carry a condition: an
     // `if: matrix.shard == 1` copy-pasted here is never true and would disable
     // that step outright.
@@ -689,11 +762,11 @@ describe('CI workflow parity', () => {
       expect(releaseGate).not.toContain(step);
     }
     // Named-step count: checkout, setup-pnpm, setup-node, pnpm install, plus
-    // seven check steps (i18n gen/summary/freshness, malware, tsc cache, the
-    // combined typecheck + env/server/bot builds turbo call, client build).
-    // An accidental extra step on the checks job would otherwise stay green.
-    expect(releaseChecks.match(/\n {6}- name: /g)).toHaveLength(11);
-    expect(jobSource('pr-checks').match(/\n {6}- name: /g)).toHaveLength(11);
+    // eight check steps (i18n gen/summary/freshness, malware, tsc cache, the
+    // combined typecheck + env/server/bot builds turbo call, client build,
+    // manifest freshness). An accidental extra step would otherwise stay green.
+    expect(releaseChecks.match(/\n {6}- name: /g)).toHaveLength(12);
+    expect(jobSource('pr-checks').match(/\n {6}- name: /g)).toHaveLength(12);
     // tsc incremental cache (#2758) must land on both check jobs, never on a
     // matrixed test job (would N-way cache thrash or reintroduce shard-1 gates).
     for (const job of [releaseChecks, jobSource('pr-checks')]) {
