@@ -17,7 +17,7 @@
 | 6 | three.js 0.185 train | done | 2026-08-09 | 2026-08-09 |
 | 6 QA | Verify phase 6 | done | 2026-08-09 | 2026-08-10 |
 | interim | Base reconcile onto release/v0.38.0 + plan refresh | done | 2026-08-13 | 2026-08-13 |
-| 7 | Desktop prefs store and window memory | not started | | |
+| 7 | Desktop prefs store and window memory | done | 2026-08-13 | 2026-08-13 |
 | 7 QA | Verify phase 7 | not started | | |
 | 8 | Display modes and power | not started | | |
 | 8 QA | Verify phase 8 | not started | | |
@@ -1362,3 +1362,71 @@ b393f17057 formatting; tree clean, LOCAL-ONLY intact):
   percent open-run 1-percent-low improvement is REVERSED on the merged
   stack (merged-tree worst-frames are consistently worse than the old
   tree same-day across all five scenarios and five runs).
+
+## Phase 7 record (2026-08-13)
+
+Phase 7 done (prefs store + window memory + GPU opt-out; commits
+92c79dc112 store modules, a7fd017f41 window memory, f9e26c1125 gpu
+opt-out setting, 4f656661bd store file-shape hardening, 3576bd9b53
+sync-module write crossing; tree clean, LOCAL-ONLY intact).
+- Base merge 1ca227a9aa took origin/release/v0.38.0 tip 172ed59d01 (6
+  commits, balance-suite splits + portrait manifest re-bless, test/CI
+  lanes only; lockfile untouched, ancestry guard held, parity suite green
+  after the merge).
+- Design probe BEFORE implementation: app.getPath('userData') is callable
+  at module scope pre-ready; resolve + small-file read + JSON.parse
+  measured ~136 microseconds, so the pre-ready synchronous store read
+  clears the startup stopping rule by design. The no-flash stopping rule
+  is met structurally: the restore is resolved before the BrowserWindow
+  constructor and spread into the options literal, and maximize() runs
+  while the window is still hidden.
+- Commit 2 bisectability verified in a throwaway worktree (8 electron
+  suites green at a7fd017f41); commit surgery was index-only (hash-object
+  + update-index), the working tree held final validated bytes throughout
+  (FINAL_BYTES_OK).
+- Smoke, 5 real-shell runs against isolated userData: save persists the
+  exact resized bounds + displayId; relaunch restores them into the
+  constructor; absent display + off-screen bounds fall back centered with
+  the stale maximized flag dropped; opt-out true skips BOTH levers with
+  log lines (negative arm: run 1 PRIME-relaunched normally); a truncated
+  store launches clean with force ON. Wayland caveat recorded: without
+  the x11 ozone arg the compositor owns placement; centering verified
+  under X11.
+- Reviews: privacy-security-review 0 blocking (passed: fail-safe
+  polarity, fresh-object whitelist, proto-pollution immunity, strict IPC,
+  no new OS state beyond the store file; 2 should-fix FIXED in
+  4f656661bd: predictable temp path written through symlinks, missing
+  isFile() gate = FIFO boot hang). frontend-seam-reviewer 0 blocking
+  (passed: doctrine complete, capability gate honest incl. the
+  mobile-shell arm, i18n clean, regen byte-reproducible, fairness
+  trivial; 2 should-fix FIXED in 3576bd9b53: the applySetting arm's
+  polarity crossing was UNPINNED (a dropped ! shipped green), and the
+  boot reflection's pre-await Settings snapshot could revert unrelated
+  boot writes via the whole-blob save; both test nits landed).
+  Implementer mutation rounds: all named kills ('wx' downgrade, isFile
+  gate delete, dropped inversion, hoisted factory, gate-forced-open,
+  polarity flips), restores verified.
+- LEDGER (recorded, not fixed; phase 7 QA re-litigates): (1) Interface
+  Reset to Defaults re-arms the GPU force through the doctrinal reset
+  path; accepted as doctrine, may deserve a pin. (2) The note copy names
+  no-boot symptoms the in-game toggle cannot reach; candidate fix is a
+  pre-lever env-var/CLI escape hatch plus a docs line naming the prefs
+  path (phase 11 or user decision). (3) A Graphics-tab pointer note for
+  discoverability (cheap follow-up). (4) The restore ceiling 16384 is
+  not clamped to the target work area (deliberate sanity bound; symmetry
+  clamp optional). (5) No jsdom render test proves the row absent from
+  real DOM on web; the pure-core dual arms + the renderInterface source
+  pins are the house pattern, recorded as residual.
+- GATE: node scripts/gate_select.mjs at 3576bd9b53 resolved the diff base
+  to origin/release/v0.38.0 itself (220 changed paths), mode=full
+  (broad/unclassified: package.json, the three patch, and the lockfile
+  sit in the branch-vs-base diff). Pre-vitest legs green: i18n gen +
+  freshness (regen clean), wiki, sfx conformance, malware scan PASS
+  (6338 files, 0 high), biome changed-files green (warning-severity rows
+  only, pre-existing). Full-suite fallback: 2739 files / 37912 tests,
+  red EXACTLY the accepted set (the 9 seal suites / 14 tests plus
+  tests/monolith_budget.test.ts 2 tests, the OPEN ratchet decision);
+  37782 passed, zero phase regressions. The gate aborts at the vitest
+  step by design; post-abort turbo proofs 5/5 (check:types build:env
+  build:server build:bot) + 3/3 (build:bundle); the real-browser suite
+  run standalone with BROWSER_PATH: 19 files / 125 tests green.

@@ -269,6 +269,34 @@ session, latest-release merge first per standing rule 3; carry the two open
 user decisions (low hold-or-accept, r181 acceptance) and the merge-owned
 town-idle regression into that conversation.
 
+Phase 7 done (2026-08-13, commits: base merge 1ca227a9aa of release tip
+172ed59d01 (test-lane-only, parity green after), 92c79dc112 store modules,
+a7fd017f41 window memory, f9e26c1125 gpu opt-out setting, 4f656661bd store
+file-shape hardening, 3576bd9b53 sync-module write crossing, plus this docs
+commit): the shell's first disk persistence. The prefs store
+(electron/desktop_prefs.cjs, desktop-prefs.json under userData) and the pure
+restore resolver (electron/window_memory.cjs) land as DI modules; main.cjs
+reads the store as its FIRST statement (orchestrator probe: userData is
+resolvable pre-ready, ~136 microseconds, both stopping rules cleared),
+restores geometry inside the BrowserWindow constructor (no default-size
+flash, maximize while hidden), saves on debounced resize/move plus a
+synchronous close capture, and skips BOTH gpu levers when the stored opt-out
+is strictly true (corrupt or missing store fail-safe = force ON). The
+forceHighPerfGpu row (def true, the INVERSE of the stored opt-out) follows
+the full options doctrine behind a bridge-capability gate with dual-armed
+pins; the boot reflection constructs its Settings only after the bridge read
+resolves and pushDesktopGpuPref owns the write-crossing inversion (both
+review rounds' should-fixes, all landed same-phase). Five-run real-shell
+smoke green (save/restore exact, fallback centered, opt-out skips logged,
+corrupt store clean). Reviews 0 blocking. Gate: full fallback red exactly
+the accepted set (9 seals / 14 + monolith 2), 37782 passed; turbo proofs
+5/5 + 3/3; browser leg standalone 19 files / 125 green. Ledger for phase 7
+QA in the progress.md record (reset re-arm, unreachable-toggle copy,
+graphics-tab pointer, 16384 ceiling, no jsdom web-absence render). Next up:
+phase 7 QA (phase-07-qa.md), fresh session, latest-release merge first per
+standing rule 3; the two open user decisions (low hold-or-accept, r181
+acceptance) still ride along.
+
 ## Standing rules (user-locked, 2026-08-08, non-negotiable)
 
 1. ALL work happens in the worktree /home/fernandoramirez/Documents/woc-desktop-client-update
@@ -482,7 +510,8 @@ did-finish-load re-push) + optional onPresentationChanged, and
 never crosses, main-side dedup via shouldForwardDisplayChange; triggers
 app-level display-metrics-changed + 250 ms debounced window move) + optional
 onDisplayChanged (phase 4)
-New settings keys: (none yet; the gpu notice dismissal localStorage value
+New settings keys: (through phase 6: none; phase 7 added forceHighPerfGpu,
+see the phase 7 block below; the gpu notice dismissal localStorage value
 woc_gpu_notice_dismissed grew from '1' to a component signature in phase 3, legacy
 '1' still honored)
 New i18n keys: gpuNotice.bodyDiscreteInactive (en + zh_CN/zh_TW/ja_JP/ko_KR/ru_RU
@@ -583,6 +612,88 @@ resolutions restored after the take-theirs lockfile floated them: electron
 specs unchanged. Upstream tooling now available to later phases: the boot
 load profiler (src/game/load_profiler.ts, src/render/load_marks.ts,
 scripts/load_probe.mjs, d7db12cf14) for desktop shell load metrics.
+
+Phase 7 additions: electron/desktop_prefs.cjs + .d.cts (the shell's FIRST
+disk persistence: desktop-prefs.json under app.getPath('userData'), schema
+v1 { version, windowBounds {x,y,width,height}, displayId, maximized,
+gpuForceOptOut }; loadDesktopPrefs never throws or hangs: stat.isFile()
+gate then a 64 KiB stat cap BEFORE any read, strict === true/false
+booleans, finite-integer clamps width/height [1024..16384] and x/y
+[-32768..32767], partial bounds dropped whole, unknown version discards
+the file, the result is a fresh whitelisted object so __proto__ is inert;
+saveDesktopPrefs validates outbound and stages through desktopPrefsTempPath
+(pid + 8 random hex) opened with the exclusive 'wx' flag, renames over the
+target, and unlinks only a temp it created itself: a pre-existing path,
+symlink included, refuses the write and save answers false, fail-safe.
+PHASE 8 PATTERN: displayMode joins as one validated field plus one
+defaults entry in sanitizeDesktopPrefs; version stays 1 while no existing
+field changes meaning), electron/window_memory.cjs + .d.cts (pure
+resolveWindowRestore: honored only when the saved displayId matches a live
+display AND at least 100x50 px lands in a work area AND the title strip is
+reachable, else defaults CENTERED on the display nearest the saved point,
+primary when none; a stale maximized flag never rides a fallback;
+MIN_WINDOW_WIDTH/HEIGHT 1024/720 are shared constants consumed by the
+main.cjs constructor), src/game/desktop_gpu_pref_sync.ts
+(desktopGpuPrefSupported requires BOTH bridge methods as functions;
+syncDesktopGpuPrefSetting(bridge, createSettings) reflects the STORED
+opt-out into the setting, factory invoked only AFTER the read resolves and
+only on a strict boolean, writes settings.set directly and deliberately
+not through onSettingChange; pushDesktopGpuPref(bridge, force) owns the
+write crossing: the one inversion, feature check, sync-throw guard,
+swallowed rejection). main.cjs wiring: the prefs read is the first
+statement after the require block (probe: userData resolvable pre-ready,
+~136 microseconds); ONE module-scope desktopPrefs record is the single
+source every save writes whole (the bounds saver and the IPC setter cannot
+clobber each other); strict-true opt-out guards wrap BOTH gpu levers with
+each lever in its else arm (skips logged; skipping means NOT CALLING,
+since forceHighPerformanceGpu appends its switches on every platform
+before its own win32 gates); WINDOW_BOUNDS_SAVE_DEBOUNCE_MS 700 on
+resize/move plus a synchronous 'close' capture using getNormalBounds
+(never getBounds) + isMaximized + getDisplayMatching, timer cleared in
+'closed'; DEFAULT_WINDOW_WIDTH/HEIGHT 1440/900 stay in main.cjs.
+New bridge methods / IPC channels (phase 7): invoke channels
+'desktop-set-gpu-force-opt-out' (trustedSender-gated, accepts only literal
+true/false, persists first and commits the in-memory mirror only on
+persisted-ok, returns that ok) and 'desktop-get-gpu-force-opt-out'
+(trustedSender-gated, returns the STORED boolean, which is what the NEXT
+launch does); optional DesktopBridge members getGpuForceOptOut /
+setGpuForceOptOut (the preload setter sends optOut === true).
+New settings keys (phase 7): forceHighPerfGpu { def: true }, the INVERSE
+of the stored gpuForceOptOut (setting true = force on = opt-out false);
+the shell store is the source of truth, reflected at boot; desktop-only
+row gated on OptionsEnv.desktopGpuPref (a BRIDGE capability, never
+isNativeAppShell), appended with its note row at the END of Interface
+General so the web arm's order is untouched; buildInterfaceControls takes
+an OPTIONAL env (single-arg callers render no row); the GENERAL_KEYS pins
+are dual-armed (desktop and web lists both exact-ordered).
+New i18n keys (phase 7): hudChrome.options.forceHighPerfGpu +
+hudChrome.options.forceHighPerfGpuNote (en plus the five M16 fills each in
+zh_CN/zh_TW/ja_JP/ko_KR/ru_RU; 16 locales pending for the release fill
+pass).
+New tests (phase 7): tests/electron_desktop_prefs.test.ts (24: content
+whitelist/clamps/strict booleans/unknown version/oversize-before-parse,
+file shapes: symlinked-temp refusal with a victim-untouched pin,
+own-temp-only cleanup, the isFile hang-proof with a read-count-0 pin, the
+__proto__ pollution pin, throwing-fs arms, validate-outbound,
+no-mutate/no-return of parsed input), tests/electron_window_memory.test.ts
+(9: display-gone, off-screen, too-small intersection, happy + maximized
+restore, exact center math), tests/desktop_gpu_pref_sync.test.ts (17:
+reflection both polarities on a recorded write log, the
+factory-after-resolve ordering pin, construct-nothing arms, push both
+polarities on the received argument, absent-method/no-bridge/rejected/
+sync-throw/this-receiver arms). tests/electron_shell_startup.test.ts grew
+4 pins (prefs-read-before-levers, the strict-true guard at exactly 2 sites
+with each lever in its else arm, restore-in-constructor plus
+maximize-before-reveal, settle + close capture wiring);
+tests/electron_ipc_channels.test.ts grew the two channels, two method
+names, and a setter body pin; tests/electron_display_push.test.ts's
+getNormalBounds ban re-scoped to the sendDisplayChange body;
+tests/options_view.test.ts dual-armed (it.each web/desktop) plus the
+appends-only-with-capability test and a direct no-musicToggle assert;
+tests/options_window.test.ts carries whitespace-tolerant
+contains/not-contains pins on the renderInterface env
+(desktopGpuPrefSupported in, isNativeAppShell out);
+tests/settings.test.ts default-true plus persisted opt-out round trip.
 
 Perf baselines: docs/perf/baseline/history.jsonl carries the phase 5 rows (low
 pre/post dressing fix + medium, this machines RTX 5090, 1280x720, vsync off;
