@@ -3779,7 +3779,10 @@ async function startGame(
     // nobody sees (the presentation gate stops render, not this lane, and
     // this is its heaviest recurring producer). The tracker freezes whole
     // while hidden, so the reveal frame computes the accumulated displacement
-    // and the rift-exit edge exactly as if the transition just happened.
+    // as if the transition just happened; a rift crossing keeps its exit edge
+    // unless it entered AND left the band inside the hidden span (no rift
+    // session was rendered then, so no eviction happened, and the
+    // displacement arms cover that reveal; see zone_warm_tracker.ts).
     const warm = warmTracker(player.pos.x, player.pos.z, desktopPresentationHidden());
     if (!warm) return;
     const { displacement, riftExit } = warm;

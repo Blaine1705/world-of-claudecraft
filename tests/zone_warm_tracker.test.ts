@@ -60,6 +60,23 @@ describe('zone_warm_tracker', () => {
     expect(track(10, 0, false)?.riftExit).toBe(false);
   });
 
+  it('does not report an exit for a crossing contained entirely in one hidden span', () => {
+    // Deliberate bound, not an oversight (phase 8 QA): hidden frames sample
+    // nothing, so a band entered AND left while hidden was never seen. No rift
+    // session was rendered during the span (nothing near the exit was
+    // evicted), and the whole-span displacement still routes a teleport-sized
+    // reveal to the blocking arm, so the wider rift-exit stream radius is not
+    // needed here.
+    const track = createZoneWarmTracker(inRift);
+    track(0, 0, false);
+    expect(track(RIFT_X + 5, 0, true)).toBeNull();
+    expect(track(100, 0, true)).toBeNull();
+    const reveal = track(100, 0, false);
+    expect(reveal?.riftExit).toBe(false);
+    // the whole-span displacement still lands
+    expect(reveal?.displacement).toBe(100);
+  });
+
   it('reuses one result object across calls (the per-frame path allocates nothing)', () => {
     const track = createZoneWarmTracker(inRift);
     const first = track(0, 0, false);

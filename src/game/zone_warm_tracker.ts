@@ -7,10 +7,17 @@
 // The hidden argument is the desktop shell's presentation latch. A hidden
 // frame is a full freeze: no tracker update, no answer. That is what makes
 // the reveal frame honest: it computes the displacement accumulated across
-// the whole hidden span and still sees the rift-band edge if the crossing
-// happened while hidden, so the blocking-versus-background decision
+// the whole hidden span, so the blocking-versus-background decision
 // downstream keeps its meaning (an accumulated teleport-sized jump takes the
 // blocking arm exactly as a live teleport would).
+//
+// The rift-exit edge survives a hidden span whenever any part of the crossing
+// was seen: entered visible and exited hidden, or still inside the band at
+// the reveal. A crossing contained ENTIRELY in one hidden span (entered and
+// left the band with no visible frame in between) is deliberately not
+// reported: no rift session was rendered during the span, so nothing near
+// the exit was evicted, and the accumulated displacement still routes a
+// teleport-sized reveal to the blocking arm.
 
 export interface ZoneWarmCheck {
   /** Distance from the last visible check; 0 on the very first check. */
