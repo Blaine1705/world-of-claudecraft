@@ -7,7 +7,34 @@
 // warming what the player is looking at), soft-fail continuation, and
 // cancellation (graphics rebuild destroys the target contexts mid-schedule).
 // The Hud composes it with real thunks; a Vitest drives it with fakes.
+//
+// The ARMORY catalog is deliberately NOT in this plan any more. Measured, its
+// warming was per-CONTEXT GPU program setup: about 2.1 to 2.6 s of live-frame
+// hitches that every online session paid whether or not the player ever opened
+// the store, buying nothing but the store's own first inspect (GPU program
+// caches do not cross a WebGL context). It is intent-driven now: the store
+// window needs none of it (measured: warming the armory moved a cold store open
+// 530.9 ms to 522.8 ms, i.e. not at all), and the lazy per-card path already
+// builds exactly what one inspected card needs.
+//
+// The cost was also positional rather than per skin: the first unit to DRAW paid
+// about 0.9 s and the first unit with a VFX rig about 0.6 s, while 24 of the 29
+// skins cost the live frame nothing at all. So this is not a case where a
+// gentler schedule was available. Evidence and the refutations along the way:
+// tmp/armory-prewarm-measurement.md, rounds 2 to 4.
+//
+// Known trade, accepted and unmeasured: the character-mode units also populated
+// process-wide CPU caches (parsed GLBs, material and derived-emissive caches)
+// that the world renderer reads when it first sights a remote player wearing a
+// skin. That warming is gone with them, so those costs move to first sighting,
+// a few to seventy milliseconds each and only for skins actually seen. The
+// world's own weapon-skin program warming is a separate entry in the renderer's
+// entry manifest (`vfx.weapon-skins`) and is unaffected.
 
+/** Which owning surface a unit's pause key watches. `armory` carries no PLANNED
+ *  unit any more (see the header), but the pause-by-family mechanism is generic
+ *  and the member keeps `isFamilyBusy` a total function over the surfaces that
+ *  own a preview context. */
 export type PreviewPrewarmFamily = 'char' | 'armory';
 
 export interface PreviewPrewarmUnit {
@@ -53,8 +80,6 @@ export interface PreviewPrewarmPlanDeps<Pose> {
   skinCount: (unitId: string) => number;
   /** Player-card closeup poses, opaque to the plan. */
   cardPoses: readonly Pose[];
-  /** Armory catalog skin ids to warm, in catalog order. */
-  armorySkinIds: readonly string[];
   /** True on the boot path, false on a graphics-rebuild restart. Excludes the
    *  char-window shell unit plus the per-skin and per-pose units that depend on
    *  it (they no-op via `this.charPreview?.` once built): at boot the shell
@@ -70,22 +95,15 @@ export interface PreviewPrewarmPlanDeps<Pose> {
   prewarmCharSkin: (skin: number) => void | Promise<void>;
   prewarmCardPose: (pose: Pose) => void | Promise<void>;
   renderPortrait: (cls: string, skin: number, framing: 'headshot' | 'body') => void | Promise<void>;
-  prewarmArmorySkin: (skinId: string, mode: 'character' | 'weapon') => void | Promise<void>;
-  /** Runs once after the last armory unit: the per-unit warmups keep the small
-   *  warmup drawing buffer in place (restoring it per unit cost two composer
-   *  target reallocations plus a forced full-size draw EVERY unit), and this
-   *  restores the live-size buffer once. */
-  finishArmoryPrewarm: () => void | Promise<void>;
 }
 
 /** Build the ordered post-entry preview prewarm plan: the shared paperdoll
  *  preview per skin, the player-card poses, both portrait framings for every
  *  class (chips use headshots while Inspect uses a full-body portrait, so
  *  warming only the former still leaves a synchronous WebGL readback + PNG
- *  encode on the first inspected player), then every Armory catalog skin in
- *  CHARACTER mode only (one unit per skin; weapon mode was measured and
- *  removed, see the loop). Each entry is one bounded GPU unit the renderer's
- *  background lane paces.
+ *  encode on the first inspected player). NO Armory units: that catalog is
+ *  warmed on store intent now, not on a schedule (see the header). Each entry is
+ *  one bounded GPU unit the renderer's background lane paces.
  *  `deps.includeCharFamily` gates the shell/skin/pose units only; see its doc
  *  on `PreviewPrewarmPlanDeps`. */
 export function buildPostEntryPreviewPrewarmUnits<Pose>(
@@ -125,33 +143,6 @@ export function buildPostEntryPreviewPrewarmUnits<Pose>(
         });
       }
     }
-  }
-  for (const skinId of deps.armorySkinIds) {
-    // CHARACTER MODE ONLY. Weapon-mode warming was measured and removed: it cost
-    // three separate live-frame hitches (156, 107 and 91 ms on the VFX-tier
-    // skins, 26 of 29 units costing nothing at all) to remove a single 131 ms
-    // hitch on the cold first "Weapon only" click, itself measured on the
-    // catalogue's most expensive skin. Spending three visible hitches to remove
-    // one smaller one, on a button the player deliberately pressed, is a net
-    // loss. Character mode stays: it is what covers the card inspect, which
-    // costs about a second cold.
-    //
-    // The mode argument survives on the dep for exactly one reason: warming ONE
-    // skin in weapon mode on user intent is the sanctioned way to bring this
-    // back if the toggle ever gets expensive. Do not restore the catalog loop.
-    // Evidence: tmp/armory-prewarm-measurement.md, round 2.
-    units.push({
-      family: 'armory',
-      label: `preview:armory:${skinId}:character`,
-      run: () => deps.prewarmArmorySkin(skinId, 'character'),
-    });
-  }
-  if (deps.armorySkinIds.length > 0) {
-    units.push({
-      family: 'armory',
-      label: 'preview:armory:finalize',
-      run: () => deps.finishArmoryPrewarm(),
-    });
   }
   return units;
 }

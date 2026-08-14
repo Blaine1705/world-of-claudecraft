@@ -16648,7 +16648,6 @@ export class Hud {
       allClasses: ALL_CLASSES,
       skinCount,
       cardPoses: CARD_POSES,
-      armorySkinIds: this.dailyRewardsWindow.armoryPrewarmSkinIds(),
       includeCharFamily,
       renderCharShell: () => {
         if (!this.charPreview) this.charWindow.render();
@@ -16660,11 +16659,6 @@ export class Hud {
       // paced unit never books the 43 to 201 ms cold-capture block.
       renderPortrait: (portraitClass, skin, framing) =>
         prewarmPlayerPortrait(portraitClass as PlayerClass, skin, framing),
-      prewarmArmorySkin: (skinId, armoryMode) =>
-        this.dailyRewardsWindow.prewarmArmoryPreviewSkins([skinId], [armoryMode], {
-          keepWarmupBuffer: true,
-        }),
-      finishArmoryPrewarm: () => this.dailyRewardsWindow.finishArmoryPreviewPrewarm(),
     });
   }
 

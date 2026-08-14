@@ -184,14 +184,13 @@ describe('runPreviewPrewarmSchedule', () => {
 });
 
 describe('buildPostEntryPreviewPrewarmUnits', () => {
-  it('orders shell, own skins, card poses, all-class portraits, then armory in character mode only (boot: includeCharFamily true)', () => {
+  it('orders shell, own skins, card poses, then all-class portraits, and plans NO armory unit (boot: includeCharFamily true)', () => {
     const calls: string[] = [];
     const units = buildPostEntryPreviewPrewarmUnits<string>({
       playerClass: 'hunter',
       allClasses: ['hunter', 'mage'],
       skinCount: (unitId) => (unitId === 'player_hunter' ? 2 : 1),
       cardPoses: ['heroic'],
-      armorySkinIds: ['mech_amber'],
       includeCharFamily: true,
       renderCharShell: () => {
         calls.push('shell');
@@ -205,12 +204,6 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       renderPortrait: (cls, skin, framing) => {
         calls.push(`portrait:${cls}:${skin}:${framing}`);
       },
-      prewarmArmorySkin: (skinId, mode) => {
-        calls.push(`armory:${skinId}:${mode}`);
-      },
-      finishArmoryPrewarm: () => {
-        calls.push('armory:finalize');
-      },
     });
     expect(units.map((entry) => entry.label)).toEqual([
       'preview:char-window',
@@ -223,17 +216,14 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       'preview:portrait:hunter:1:body',
       'preview:portrait:mage:0:headshot',
       'preview:portrait:mage:0:body',
-      'preview:armory:mech_amber:character',
-      'preview:armory:finalize',
     ]);
-    // The armory rows belong to the armory family (their pause key is the
-    // store window, not the paperdoll); everything before them is 'char'.
-    expect(units.slice(0, 10).every((entry) => entry.family === 'char')).toBe(true);
-    expect(units.slice(10).every((entry) => entry.family === 'armory')).toBe(true);
-    // Weapon mode is deliberately absent: it cost three live-frame hitches to
-    // remove one smaller one on a deliberate second click. Pinned as a NEGATIVE
-    // so a restored catalog loop fails here rather than silently returning.
-    expect(units.some((entry) => entry.label.endsWith(':weapon'))).toBe(false);
+    expect(units.every((entry) => entry.family === 'char')).toBe(true);
+    // NEGATIVE pin, and the load-bearing one. The armory catalog was about 2.1
+    // to 2.6 s of live-frame hitches that every online session paid for a window
+    // only some players open, and its cost was positional rather than per skin,
+    // so no gentler schedule was available. It is intent-driven now. A restored
+    // loop fails here instead of silently returning.
+    expect(units.some((entry) => entry.label.startsWith('preview:armory'))).toBe(false);
     for (const entry of units) entry.run();
     expect(calls).toEqual([
       'shell',
@@ -246,11 +236,9 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       'portrait:hunter:1:body',
       'portrait:mage:0:headshot',
       'portrait:mage:0:body',
-      'armory:mech_amber:character',
       // The finalize unit runs LAST: the per-unit warmups keep the small
       // warmup buffer, and this is the one restore that replaces the old
       // per-unit reallocation + forced full-size draw.
-      'armory:finalize',
     ]);
   });
 
@@ -264,7 +252,6 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       allClasses: ['hunter'],
       skinCount: () => 1,
       cardPoses: [],
-      armorySkinIds: [],
       includeCharFamily: false,
       renderCharShell: () => {},
       prewarmCharSkin: () => {},
@@ -273,8 +260,6 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
         new Promise<void>((resolve) => {
           resolvePortrait = resolve;
         }),
-      prewarmArmorySkin: () => {},
-      finishArmoryPrewarm: () => {},
     });
     const portraitUnit = units.find(
       (entry) => entry.label === 'preview:portrait:hunter:0:headshot',
@@ -291,25 +276,7 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
     expect(settled).toBe(true);
   });
 
-  it('emits no armory finalize unit when the armory catalog is empty', () => {
-    const units = buildPostEntryPreviewPrewarmUnits<string>({
-      playerClass: 'hunter',
-      allClasses: ['hunter'],
-      skinCount: () => 1,
-      cardPoses: [],
-      armorySkinIds: [],
-      includeCharFamily: false,
-      renderCharShell: () => {},
-      prewarmCharSkin: () => {},
-      prewarmCardPose: () => {},
-      renderPortrait: () => {},
-      prewarmArmorySkin: () => {},
-      finishArmoryPrewarm: () => {},
-    });
-    expect(units.some((entry) => entry.label === 'preview:armory:finalize')).toBe(false);
-  });
-
-  it('excludes the char-window shell/skin/pose units on a graphics-rebuild restart, keeping portrait and armory in order (includeCharFamily false)', () => {
+  it('excludes the char-window shell/skin/pose units on a graphics-rebuild restart, keeping the portrait units in order (includeCharFamily false)', () => {
     // The rebuild-restart plan (hud.ts restoreGraphicsPreviewContexts passing
     // includeCharFamily: false) must drop exactly the shell-dependent trio:
     // the shell itself is unbuilt there (its own cover is already down, so
@@ -323,7 +290,6 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       allClasses: ['hunter', 'mage'],
       skinCount: (unitId) => (unitId === 'player_hunter' ? 2 : 1),
       cardPoses: ['heroic'],
-      armorySkinIds: ['mech_amber'],
       includeCharFamily: false,
       renderCharShell: () => {
         calls.push('shell');
@@ -337,12 +303,6 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       renderPortrait: (cls, skin, framing) => {
         calls.push(`portrait:${cls}:${skin}:${framing}`);
       },
-      prewarmArmorySkin: (skinId, mode) => {
-        calls.push(`armory:${skinId}:${mode}`);
-      },
-      finishArmoryPrewarm: () => {
-        calls.push('armory:finalize');
-      },
     });
     expect(units.map((entry) => entry.label)).toEqual([
       'preview:portrait:hunter:0:headshot',
@@ -351,8 +311,6 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       'preview:portrait:hunter:1:body',
       'preview:portrait:mage:0:headshot',
       'preview:portrait:mage:0:body',
-      'preview:armory:mech_amber:character',
-      'preview:armory:finalize',
     ]);
     expect(units.every((entry) => !entry.label.startsWith('preview:char-window'))).toBe(true);
     expect(units.every((entry) => !entry.label.startsWith('preview:char-skin'))).toBe(true);
@@ -365,8 +323,6 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       'portrait:hunter:1:body',
       'portrait:mage:0:headshot',
       'portrait:mage:0:body',
-      'armory:mech_amber:character',
-      'armory:finalize',
     ]);
     expect(calls).not.toContain('shell');
   });
