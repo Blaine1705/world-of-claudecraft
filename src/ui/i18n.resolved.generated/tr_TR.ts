@@ -9024,6 +9024,7 @@ export const tr_TR: EnTranslations = {
       "filterSort": "Sırala",
       "sortName": "Ad (A-Z)",
       "sortPriceAsc": "Fiyat: düşükten yükseğe",
+      "collapseLowest": "Lowest price only",
       "weaponSword": "Kılıçlar",
       "weaponDagger": "Hançerler",
       "weaponStaff": "Asalar",

@@ -9024,6 +9024,7 @@ export const zh_CN: EnTranslations = {
       "filterSort": "排序",
       "sortName": "名称 (A-Z)",
       "sortPriceAsc": "价格：从低到高",
+      "collapseLowest": "仅显示最低价",
       "weaponSword": "剑",
       "weaponDagger": "匕首",
       "weaponStaff": "法杖",

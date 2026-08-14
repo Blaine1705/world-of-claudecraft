@@ -18,6 +18,7 @@ const baseQuery: MarketQuery = {
   rarity: 'rare',
   sort: 'price',
   page: 0,
+  collapseLowest: true,
 };
 
 // Only the fields queryDiffersFromEcho reads; the rest of MarketInfo is irrelevant
@@ -33,6 +34,7 @@ function echoOf(overrides: Partial<MarketInfo> = {}): MarketInfo {
     primaryStat: baseQuery.primaryStat,
     rarity: baseQuery.rarity,
     sort: baseQuery.sort,
+    collapseLowest: baseQuery.collapseLowest,
     page: 0,
     pageCount: 1,
     collectionCopper: 0,
@@ -64,6 +66,7 @@ describe('queryDiffersFromEcho (issue #2416)', () => {
       primaryStat: 'all',
       rarity: 'all',
       sort: 'name',
+      collapseLowest: false,
     });
     expect(queryDiffersFromEcho(baseQuery, echo)).toBe(true);
   });
@@ -75,6 +78,7 @@ describe('queryDiffersFromEcho (issue #2416)', () => {
     ['primaryStat', { primaryStat: 'str' as const }],
     ['rarity', { rarity: 'epic' as const }],
     ['sort', { sort: 'name' as const }],
+    ['collapseLowest', { collapseLowest: false as const }],
   ])('detects drift on the %s axis alone', (_axis, overrides) => {
     expect(queryDiffersFromEcho(baseQuery, echoOf(overrides))).toBe(true);
   });

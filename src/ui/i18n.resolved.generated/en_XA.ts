@@ -9024,6 +9024,7 @@ export const en_XA: EnTranslations = {
       "filterSort": "[Šóŕţ]",
       "sortName": "[Ñáɱé (Á-Ž)]",
       "sortPriceAsc": "[Þŕíçé: Ļóŵ ţó Ĥíĝĥ]",
+      "collapseLowest": "[Ļóŵéšţ þŕíçé óñļý]",
       "weaponSword": "[Šŵóŕðš]",
       "weaponDagger": "[Ðáĝĝéŕš]",
       "weaponStaff": "[Šţáʋéš]",

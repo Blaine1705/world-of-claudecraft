@@ -9024,6 +9024,7 @@ export const vi_VN: EnTranslations = {
       "filterSort": "Sắp xếp",
       "sortName": "Tên (A-Z)",
       "sortPriceAsc": "Giá: thấp đến cao",
+      "collapseLowest": "Lowest price only",
       "weaponSword": "Kiếm",
       "weaponDagger": "Dao Găm",
       "weaponStaff": "Trượng",

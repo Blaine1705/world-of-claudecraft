@@ -9024,6 +9024,7 @@ export const ko_KR: EnTranslations = {
       "filterSort": "정렬",
       "sortName": "이름 (A-Z)",
       "sortPriceAsc": "가격: 낮은순",
+      "collapseLowest": "최저가만 표시",
       "weaponSword": "검",
       "weaponDagger": "단검",
       "weaponStaff": "지팡이",

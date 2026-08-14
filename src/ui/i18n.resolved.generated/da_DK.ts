@@ -9024,6 +9024,7 @@ export const da_DK: EnTranslations = {
       "filterSort": "Sortering",
       "sortName": "Navn (A-Z)",
       "sortPriceAsc": "Pris: laveste til højeste",
+      "collapseLowest": "Lowest price only",
       "weaponSword": "Sværd",
       "weaponDagger": "Dolke",
       "weaponStaff": "Stave",

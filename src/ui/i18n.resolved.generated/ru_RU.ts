@@ -9024,6 +9024,7 @@ export const ru_RU: EnTranslations = {
       "filterSort": "Сортировка",
       "sortName": "Название (А-Я)",
       "sortPriceAsc": "Цена: по возрастанию",
+      "collapseLowest": "Только минимальная цена",
       "weaponSword": "Мечи",
       "weaponDagger": "Кинжалы",
       "weaponStaff": "Посохи",

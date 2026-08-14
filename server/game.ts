@@ -7932,6 +7932,7 @@ export class GameServer {
             rarity: msg.rarity,
             sort: msg.sort,
             page: typeof msg.page === 'number' ? msg.page : 0,
+            collapseLowest: msg.collapseLowest,
           }),
           pid,
         );

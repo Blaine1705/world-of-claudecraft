@@ -26,6 +26,7 @@ function q(search = '', extra: Partial<MarketQuery> = {}): MarketQuery {
     rarity: 'all',
     sort: 'name',
     page: 0,
+    collapseLowest: false,
     ...extra,
   };
 }
@@ -1296,6 +1297,205 @@ describe('the World Market: the Merchant', () => {
     expect(mineWired).toBe(info.myListingCount);
     // The wire cap is still respected overall.
     expect(info.listings.length).toBeLessThanOrEqual(120);
+  });
+});
+
+describe('World Market: collapse to lowest price per item (issue #3103)', () => {
+  it('collapses other sellers to the cheapest listing, leaving the viewer own row alone', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+    const book = sim.market.marketListings;
+    book.length = 0;
+    book.push(
+      {
+        id: 1,
+        sellerKey: 'A',
+        sellerName: 'A',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 500,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+      {
+        id: 2,
+        sellerKey: 'B',
+        sellerName: 'B',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 300,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+      {
+        id: 3,
+        sellerKey: marketSellerKey(viewer),
+        sellerName: 'Viewer',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 800,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+    );
+
+    sim.marketSearch(q('', { collapseLowest: false }), viewer);
+    const full = marketInfo(sim, viewer);
+    expect(full.listings.map((l) => ({ id: l.id, price: l.price, mine: l.mine }))).toEqual([
+      { id: 3, price: 800, mine: true }, // the viewer's own row, always wired
+      { id: 2, price: 300, mine: false },
+      { id: 1, price: 500, mine: false },
+    ]);
+
+    sim.marketSearch(q('', { collapseLowest: true }), viewer);
+    const collapsed = marketInfo(sim, viewer);
+    expect(collapsed.listings.map((l) => ({ id: l.id, price: l.price, mine: l.mine }))).toEqual([
+      { id: 3, price: 800, mine: true }, // still wired in full: not collapsed away
+      { id: 2, price: 300, mine: false }, // the cheapest OTHER row; A's 500 is dropped
+    ]);
+  });
+
+  it('keeps totalCount and pageCount in step with the collapsed set, not the raw match count', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+    const book = sim.market.marketListings;
+    book.length = 0;
+    // Three duplicate listings of the same item from three sellers, plus two
+    // distinct single-seller items: 5 raw "other" rows, 3 distinct items.
+    book.push(
+      {
+        id: 1,
+        sellerKey: 'A',
+        sellerName: 'A',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 300,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+      {
+        id: 2,
+        sellerKey: 'B',
+        sellerName: 'B',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 200,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+      {
+        id: 3,
+        sellerKey: 'C',
+        sellerName: 'C',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 100,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+      {
+        id: 4,
+        sellerKey: 'D',
+        sellerName: 'D',
+        itemId: 'copper_ore',
+        count: 1,
+        price: 50,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+      {
+        id: 5,
+        sellerKey: 'E',
+        sellerName: 'E',
+        itemId: 'linen_pouch',
+        count: 1,
+        price: 900,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+    );
+
+    sim.marketSearch(q('', { collapseLowest: false }), viewer);
+    expect(marketInfo(sim, viewer).totalCount).toBe(5);
+
+    sim.marketSearch(q('', { collapseLowest: true }), viewer);
+    const collapsed = marketInfo(sim, viewer);
+    expect(collapsed.totalCount).toBe(3); // worn_sword collapses 3 rows into 1
+    expect(collapsed.pageCount).toBe(1);
+    expect(collapsed.listings.find((l) => l.itemId === 'worn_sword')?.price).toBe(100);
+  });
+
+  it('breaks an exact price tie by the older listing id, matching the pure core', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+    const book = sim.market.marketListings;
+    book.length = 0;
+    book.push(
+      {
+        id: 20,
+        sellerKey: 'Newer',
+        sellerName: 'Newer',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 300,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+      {
+        id: 10,
+        sellerKey: 'Older',
+        sellerName: 'Older',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 300,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+    );
+
+    sim.marketSearch(q('', { collapseLowest: true }), viewer);
+    expect(marketInfo(sim, viewer).listings).toEqual([
+      expect.objectContaining({ id: 10, sellerName: 'Older', price: 300 }),
+    ]);
+  });
+
+  it('toggling collapseLowest off restores the full listing set on the same session', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+    const book = sim.market.marketListings;
+    book.length = 0;
+    book.push(
+      {
+        id: 1,
+        sellerKey: 'A',
+        sellerName: 'A',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 500,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+      {
+        id: 2,
+        sellerKey: 'B',
+        sellerName: 'B',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 300,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+    );
+
+    sim.marketSearch(q('', { collapseLowest: true }), viewer);
+    expect(marketInfo(sim, viewer).listings).toHaveLength(1);
+
+    sim.marketSearch(q('', { collapseLowest: false }), viewer);
+    expect(marketInfo(sim, viewer).listings).toHaveLength(2);
   });
 });
 

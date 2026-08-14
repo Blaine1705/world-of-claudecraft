@@ -9024,6 +9024,7 @@ export const nl_NL: EnTranslations = {
       "filterSort": "Sorteren",
       "sortName": "Naam (A-Z)",
       "sortPriceAsc": "Prijs: laag naar hoog",
+      "collapseLowest": "Lowest price only",
       "weaponSword": "Zwaarden",
       "weaponDagger": "Dolken",
       "weaponStaff": "Staven",

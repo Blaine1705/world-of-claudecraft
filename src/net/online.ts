@@ -5036,6 +5036,7 @@ export class ClientWorld implements IWorld {
       rarity: query.rarity,
       sort: query.sort,
       page: query.page,
+      collapseLowest: query.collapseLowest,
     });
   }
   marketList(itemId: string, count: number, price: number): void {

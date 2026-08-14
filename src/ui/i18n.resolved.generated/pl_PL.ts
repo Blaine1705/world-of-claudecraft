@@ -9024,6 +9024,7 @@ export const pl_PL: EnTranslations = {
       "filterSort": "Sortuj",
       "sortName": "Nazwa (A-Z)",
       "sortPriceAsc": "Cena: od najniższej do najwyższej",
+      "collapseLowest": "Lowest price only",
       "weaponSword": "Miecze",
       "weaponDagger": "Sztylety",
       "weaponStaff": "Kostury",

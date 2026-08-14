@@ -9024,6 +9024,7 @@ export const ja_JP: EnTranslations = {
       "filterSort": "並べ替え",
       "sortName": "名前 (A-Z)",
       "sortPriceAsc": "価格: 安い順",
+      "collapseLowest": "最安値のみ表示",
       "weaponSword": "剣",
       "weaponDagger": "短剣",
       "weaponStaff": "杖",

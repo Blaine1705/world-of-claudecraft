@@ -163,6 +163,7 @@ describe('classifyDiff', () => {
     expect(plan.isVisual).toBe(true);
     expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
       'market-window',
+      'market-collapse-toggle',
       'market-collect-ledger',
       'market-buy-confirm',
       'market-armor-filters',

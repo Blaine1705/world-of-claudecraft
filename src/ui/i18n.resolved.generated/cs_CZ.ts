@@ -9024,6 +9024,7 @@ export const cs_CZ: EnTranslations = {
       "filterSort": "Řazení",
       "sortName": "Název (A-Z)",
       "sortPriceAsc": "Cena: od nejnižší po nejvyšší",
+      "collapseLowest": "Lowest price only",
       "weaponSword": "Meče",
       "weaponDagger": "Dýky",
       "weaponStaff": "Hole",

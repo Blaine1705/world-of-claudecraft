@@ -9024,6 +9024,7 @@ export const id_ID: EnTranslations = {
       "filterSort": "Urutkan",
       "sortName": "Nama (A-Z)",
       "sortPriceAsc": "Harga: rendah ke tinggi",
+      "collapseLowest": "Lowest price only",
       "weaponSword": "Pedang",
       "weaponDagger": "Belati",
       "weaponStaff": "Tongkat Sihir",

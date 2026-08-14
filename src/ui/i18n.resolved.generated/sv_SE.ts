@@ -9024,6 +9024,7 @@ export const sv_SE: EnTranslations = {
       "filterSort": "Sortera",
       "sortName": "Namn (A-Z)",
       "sortPriceAsc": "Pris: lågt till högt",
+      "collapseLowest": "Lowest price only",
       "weaponSword": "Svärd",
       "weaponDagger": "Dolkar",
       "weaponStaff": "Stavar",

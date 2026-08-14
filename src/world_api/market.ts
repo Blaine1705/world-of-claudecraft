@@ -50,6 +50,9 @@ export interface MarketInfo {
   primaryStat: MarketPrimaryStatFilter;
   rarity: MarketRarityFilter;
   sort: MarketSort;
+  // Whether the server collapsed OTHER sellers' listings to the lowest price per item
+  // (issue #3103), echoed back for the same drift-detection reason as the axes above.
+  collapseLowest: boolean;
   page: number; // current browse page (of other sellers' listings), 0-based
   pageCount: number; // total browse pages of other sellers' listings (>= 1)
   collectionCopper: number; // proceeds waiting to be collected
@@ -91,9 +94,10 @@ export interface IWorldMarket {
 // against the live match count (a normal narrowing, not drift), and `filter` is
 // not sanitized the same way `search` is on the way in (length/trim), so comparing
 // it here would false-positive on a search box the player is mid-typing in. The
-// six compared axes (five filters plus sort, issue 3102) are exactly the ones
-// that silently reset to default on a fresh join (post-linkdead-grace reconnect)
-// while a window's own filter controls survive the socket drop untouched.
+// seven compared axes (five filters plus sort, issue 3102, plus collapseLowest,
+// issue 3103) are exactly the ones that silently reset to default on a fresh join
+// (post-linkdead-grace reconnect) while a window's own filter controls survive the
+// socket drop untouched.
 export function queryDiffersFromEcho(query: MarketQuery, info: MarketInfo): boolean {
   return (
     query.itemType !== info.itemType ||
@@ -101,7 +105,8 @@ export function queryDiffersFromEcho(query: MarketQuery, info: MarketInfo): bool
     query.armorClass !== info.armorClass ||
     query.primaryStat !== info.primaryStat ||
     query.rarity !== info.rarity ||
-    query.sort !== info.sort
+    query.sort !== info.sort ||
+    query.collapseLowest !== info.collapseLowest
   );
 }
 
