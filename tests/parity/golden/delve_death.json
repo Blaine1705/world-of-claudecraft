@@ -14,8 +14,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 983,
-      "state": "0a19cf24",
+      "nextId": 984,
+      "state": "e16ac422",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -52,7 +52,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 978,
+          "entityId": 979,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -94,7 +94,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 978,
+          "id": 979,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -146,9 +146,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 993,
-      "state": "5e4d3de0",
-      "events": "520a0515",
+      "nextId": 994,
+      "state": "0dc7fc9c",
+      "events": "63e70952",
       "rng": {
         "draws": 1,
         "digest": "368503ad"
@@ -184,7 +184,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 978,
+          "entityId": 979,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -227,7 +227,7 @@
           "fallStartY": 2.077747,
           "fiveSecondRule": 99,
           "hp": 93,
-          "id": 978,
+          "id": 979,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -278,9 +278,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 993,
-      "state": "f3dcf532",
-      "events": "6206b656",
+      "nextId": 994,
+      "state": "5201e580",
+      "events": "4636edbe",
       "rng": {
         "draws": 1,
         "digest": "368503ad"
@@ -326,7 +326,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 978,
+          "entityId": 979,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -370,7 +370,7 @@
           "fallStartY": 2.266438,
           "fiveSecondRule": 99.1,
           "hp": 185,
-          "id": 978,
+          "id": 979,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -422,8 +422,8 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 993,
-      "state": "f3dcf532",
+      "nextId": 994,
+      "state": "5201e580",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -470,7 +470,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 978,
+          "entityId": 979,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -514,7 +514,7 @@
           "fallStartY": 2.266438,
           "fiveSecondRule": 99.1,
           "hp": 185,
-          "id": 978,
+          "id": 979,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
