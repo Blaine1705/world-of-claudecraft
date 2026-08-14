@@ -52,7 +52,10 @@ const MONOLITHS: MonolithRow[] = [
     // per-status manifest rollup to summarizePrewarmManifest
     // (prewarm_compile_lifecycle.ts, beside the interface it fills) and the
     // resume-lane bookkeeping to prewarm_resume_ledger_core.ts.
-    ceiling: 13699,
+    // Merging release/v0.38.0: both sides had pinned their own size (13699 here,
+    // 13700 there), and the merged file is smaller than either, so the ceiling
+    // follows it down rather than inheriting a parent's slack.
+    ceiling: 13682,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
