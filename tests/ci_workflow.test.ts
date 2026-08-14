@@ -20,6 +20,25 @@ const detectEntry = readFileSync(
   'utf8',
 );
 const ciShardEntry = readFileSync(new URL('../scripts/ci_shard_test.mjs', import.meta.url), 'utf8');
+// Comment-stripped (same idiom as gateCode below): a source-text pin on the
+// entry must not stay green when the pinned call survives only in a comment.
+const ciShardEntryCode = ciShardEntry
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .replace(/(^|[^:])\/\/.*$/gm, '$1');
+const ciShardPlanSource = readFileSync(
+  new URL('../scripts/lib/ci_shard_plan.mjs', import.meta.url),
+  'utf8',
+);
+// Stripped for the formula weld: the module's docblocks discuss the default
+// in prose, and a weld a comment can satisfy is not a weld.
+const ciShardPlanCode = ciShardPlanSource
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .replace(/(^|[^:])\/\/.*$/gm, '$1');
+// ci.yml with full-line YAML comments removed: the worker-trial pins below
+// count KEY occurrences, and a doc comment quoting the env line must neither
+// satisfy a count nor turn it red.
+const workflowCode = workflow.replace(/^[ \t]*#.*$/gm, '');
+const turboJson = readFileSync(new URL('../turbo.json', import.meta.url), 'utf8');
 const packageJson = JSON.parse(
   readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
 ) as { packageManager?: string };
@@ -1162,10 +1181,36 @@ describe('CI workflow parity', () => {
     // The 3-worker value rides exactly those three entry steps (the entry
     // validates it; scripts/ci_shard_test.mjs carries the measured ruling
     // this trial answers). Release-gate keeps its inline half-cores default
-    // until the trial's green run justifies moving it.
-    expect(workflow.match(/WOC_TEST_WORKERS: '3'/g)).toHaveLength(3);
-    expect(workflow).not.toMatch(/WOC_TEST_WORKERS: (?!'3'\n)/);
+    // until the trial's green run justifies moving it. All three pins run on
+    // the comment-stripped workflow: the BARE-KEY count catches a stray
+    // override in any YAML value form (same-line, next-line, block scalar),
+    // shapes a value-form lookahead alone would miss, and a doc comment
+    // quoting the line can neither satisfy nor redden them.
+    expect(workflowCode.match(/WOC_TEST_WORKERS:/g)).toHaveLength(3);
+    expect(workflowCode.match(/WOC_TEST_WORKERS: '3'\n/g)).toHaveLength(3);
     expect(jobSource('release-gate')).not.toContain('WOC_TEST_WORKERS');
+    // The trial literal is WELDED to the resolver's accept range at the
+    // documented runner size (4 vCPU on ubuntu-latest): the value ci.yml
+    // actually carries must be HONORED there, or the whole trial would
+    // silently measure the default while every job stays green.
+    const trialValue = workflowCode.match(/WOC_TEST_WORKERS: '(\d+)'\n/)?.[1];
+    expect(trialValue).toBeDefined();
+    expect(resolveWorkerCount({ cores: 4, envValue: trialValue })).toEqual({
+      workers: Number(trialValue),
+      source: 'env',
+    });
+    // The declaration must not silently vanish, for two mechanisms: biome's
+    // suspicious/noUndeclaredEnvVars warns on any process.env read absent
+    // from turbo.json, and turbo's strict env sandbox strips undeclared
+    // variables from task environments (the turbo-run paths would silently
+    // default). WOC_TEST_WORKERS lives in the pass-through list, never a
+    // hashed input: worker count cannot change task outcomes.
+    expect(turboJson).toContain('"WOC_TEST_WORKERS"');
+    // The F3 weld above assumes the documented 4-vCPU public runner; pin the
+    // assumption where it is used so a runner move re-opens the decision.
+    for (const job of ['pr-gate', 'pr-long-sims-a', 'pr-long-sims-b']) {
+      expect(jobSource(job), job).toContain('runs-on: ubuntu-latest');
+    }
     // Each lane job mirrors the shard step's hardened relay (env block, never
     // run-line interpolation) and runs the entry in its lane-half mode:
     // unsharded, no matrix, two jobs that between them own the
@@ -1240,15 +1285,22 @@ describe('CI workflow parity', () => {
       .replace(/'\)"$/, '')
       .replace('require("node:os")', 'os');
     expect(capExpression).toBe('Math.max(1, Math.floor(os.availableParallelism() / 2))');
-    // Behavioral weld, not just source text: the resolver's default must
-    // compute the SAME value as release-gate's inline formula on any core
-    // count, and the entry must wire the resolver to the real inputs.
+    // The weld's consumer: the formula's new home is resolveWorkerCount's
+    // fallback, so the DERIVED expression (cores in place of the os call)
+    // must appear in the plan module. Without this line capExpression is
+    // inert and both sides of the loop below are test-file literals, which
+    // is drift, not a weld.
+    expect(ciShardPlanCode).toContain(capExpression.replace('os.availableParallelism()', 'cores'));
+    // Behavioral weld, second layer: the resolver's default must compute the
+    // SAME value as release-gate's inline formula (sampled core counts, not
+    // an exhaustive proof), and the entry must wire the resolver to the real
+    // inputs (comment-stripped source, so a commented-out call fails).
     for (const cores of [1, 2, 3, 4, 8]) {
       expect(resolveWorkerCount({ cores }).workers).toBe(Math.max(1, Math.floor(cores / 2)));
     }
-    expect(ciShardEntry).toContain('resolveWorkerCount({');
-    expect(ciShardEntry).toContain('cores: os.availableParallelism()');
-    expect(ciShardEntry).toContain('envValue: process.env.WOC_TEST_WORKERS');
+    expect(ciShardEntryCode).toContain('resolveWorkerCount({');
+    expect(ciShardEntryCode).toContain('cores: os.availableParallelism()');
+    expect(ciShardEntryCode).toContain('envValue: process.env.WOC_TEST_WORKERS');
     // Legacy N=4 run lines must not remain once SHARD_N has moved on.
     // String(SHARD_N) comparison avoids tsc folding a constant always-true arm.
     if (String(SHARD_N) !== '4') {

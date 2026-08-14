@@ -846,18 +846,28 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     });
     expect(run.exitCode).toBe(0);
     expect(run.log).toContain('shard 1/8, workers=1 (WOC_TEST_WORKERS)');
-    expect(run.log).toContain('--maxWorkers=1');
+    // \b so a --maxWorkers=10..19 from a wide-cores regression cannot satisfy
+    // a bare prefix match.
+    expect(run.log).toMatch(/--maxWorkers=1\b/);
   });
 
   it('falls back loudly to the measured default on a junk WOC_TEST_WORKERS', async () => {
     const fallback = Math.max(1, Math.floor(os.availableParallelism() / 2));
+    // GITHUB_ACTIONS gates the ::warning (same idiom as the leg runner's
+    // known-flake annotation): set it so the annotation arm is exercised; a
+    // local repro without it prints only the plain log line.
     const run = await runEntry(['--shard=1/8', '--plan-only'], {
       TEST_MODE: 'full',
       WOC_TEST_WORKERS: 'banana',
+      GITHUB_ACTIONS: 'true',
     });
     expect(run.exitCode).toBe(0);
     expect(run.log).toContain('WOC_TEST_WORKERS="banana" is not an integer');
-    expect(run.log).toContain(`shard 1/8, workers=${fallback}`);
+    expect(run.log).toContain('::warning title=ci-shard invalid WOC_TEST_WORKERS::');
+    // The ` (default)` suffix bounds the number AND names the arm; the
+    // honored marker must be absent (its positive control is the sibling
+    // test above).
+    expect(run.log).toContain(`shard 1/8, workers=${fallback} (default)`);
     expect(run.log).not.toContain('(WOC_TEST_WORKERS)');
   });
 
@@ -903,13 +913,16 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
       expect(run.log).toContain('plan: mode=full (mode=full from the changes job)');
       for (const f of CI_LONG_SUITE_HALVES[half]) expect(run.log).toContain(f);
       expect(run.log).not.toContain('--shard=');
-      // The lane keeps the half-cores bound, a MEASURED decision (see the
-      // entry's comment: the full-core trial in run 31107474546 inflated the
-      // sims' aggregate CPU time ~1.6x through contention and timed out the
-      // eastbrook sweep). Pinned so neither direction changes silently: the
-      // budgets are calibrated against this bound.
+      // This pins the resolver DEFAULT: runEntry spawns with a scrubbed env,
+      // so the assertion holds even inside a CI job that exports
+      // WOC_TEST_WORKERS (the lane's real CI worker count is pinned in
+      // tests/ci_workflow.test.ts). The default is the half-cores MEASURED
+      // ruling (the full-core trial in run 31107474546 inflated the sims'
+      // aggregate CPU time ~1.6x through contention and timed out the
+      // eastbrook sweep); the budgets are calibrated against this bound, and
+      // the ` (default)` suffix proves no env override leaked in.
       expect(run.log).toContain(
-        `long-sims-${half} lane, workers=${Math.max(1, Math.floor(os.availableParallelism() / 2))}`,
+        `long-sims-${half} lane, workers=${Math.max(1, Math.floor(os.availableParallelism() / 2))} (default)`,
       );
     }
     // Each half runs ITS files and none of the other's; together they cover

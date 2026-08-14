@@ -77,12 +77,28 @@ const workerResolution = resolveWorkerCount({
 });
 const workers = workerResolution.workers;
 if (workerResolution.source === 'invalid') {
+  // Loud twice by design: the log line for the transcript, the ::warning
+  // annotation (same channel as the known-flake retry in
+  // lib/ci_leg_runner.mjs, and gated the same way so a local repro never
+  // prints a raw workflow command) so a measured-trial run that silently
+  // fell back to the default cannot be mistaken for one that ran at the
+  // trial value.
+  const shown = JSON.stringify(process.env.WOC_TEST_WORKERS);
   console.log(
-    `[ci-shard] WOC_TEST_WORKERS=${JSON.stringify(process.env.WOC_TEST_WORKERS)} is not an ` +
+    `[ci-shard] WOC_TEST_WORKERS=${shown} is not an ` +
       `integer between 1 and the core count; using the measured default ${workers}`,
   );
+  if (process.env.GITHUB_ACTIONS === 'true') {
+    console.log(
+      `::warning title=ci-shard invalid WOC_TEST_WORKERS::${shown} rejected; ` +
+        `this job ran at the measured default of ${workers} workers`,
+    );
+  }
 }
-const workersLabel = `workers=${workers}${workerResolution.source === 'env' ? ' (WOC_TEST_WORKERS)' : ''}`;
+// The label always names its arm, so every job log states which resolution
+// produced the number and a trial run is self-auditing even when nobody is
+// diffing env blocks.
+const workersLabel = `workers=${workers} (${workerResolution.source === 'env' ? 'WOC_TEST_WORKERS' : 'default'})`;
 
 const mode = process.env.TEST_MODE ?? '';
 // Echoed into the log only. The producer already strips CR/LF; re-stripping
