@@ -166,6 +166,7 @@ import { currentResetDay, currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
 import { telemetryZoneId } from './game/world_telemetry';
 import { zoneWarmupMode } from './game/zone_transition';
+import { createZoneWarmTracker } from './game/zone_warm_tracker';
 import {
   CHAR_SORT_MODES,
   type CharSortMode,
@@ -3757,30 +3758,30 @@ async function startGame(
   let gameInputReady = false;
   let zoneWarmup: Promise<void> | null = null;
 
-  let lastWarmCheckX = Number.NaN;
-  let lastWarmCheckZ = Number.NaN;
-  // Rift-band exit tracking. Leaving the instance band teleports back into an
-  // overworld zone that is usually still RESIDENT, so the ready-bail below
-  // would skip the loading screen entirely and drop the player inside the
-  // residency fog clamp while the surrounding zones stream back in: a tight
-  // teal fog wall easing open over seconds that reads as "standing in water".
-  // A rift exit therefore always takes the blocking path, and it streams a
-  // WIDER arrival neighbourhood than an ordinary teleport: the rift band sits
-  // outside the overworld entirely, so the whole ring around the exit point
-  // may have been evicted rather than just the border the player lands next
-  // to (ARRIVAL_NEIGHBOR_STREAM_RADIUS covers that ordinary case).
-  let lastWarmInRiftBand = false;
+  // Displacement and rift-band-exit tracking (src/game/zone_warm_tracker.ts
+  // owns the state and the hidden-freeze semantics). Rift-exit background: the
+  // instance band teleports back into an overworld zone that is usually still
+  // RESIDENT, so the ready-bail below would skip the loading screen entirely
+  // and drop the player inside the residency fog clamp while the surrounding
+  // zones stream back in: a tight teal fog wall easing open over seconds that
+  // reads as "standing in water". A rift exit therefore always takes the
+  // blocking path, and it streams a WIDER arrival neighbourhood than an
+  // ordinary teleport: the rift band sits outside the overworld entirely, so
+  // the whole ring around the exit point may have been evicted rather than
+  // just the border the player lands next to (ARRIVAL_NEIGHBOR_STREAM_RADIUS
+  // covers that ordinary case).
+  const warmTracker = createZoneWarmTracker(isRiftPos);
   const RIFT_EXIT_STREAM_RADIUS = 240;
   const maybeWarmCurrentZone = (): void => {
     const player = world.player;
-    const displacement = Number.isFinite(lastWarmCheckX)
-      ? Math.hypot(player.pos.x - lastWarmCheckX, player.pos.z - lastWarmCheckZ)
-      : 0;
-    lastWarmCheckX = player.pos.x;
-    lastWarmCheckZ = player.pos.z;
-    const wasInRiftBand = lastWarmInRiftBand;
-    lastWarmInRiftBand = isRiftPos(player.pos.x);
-    const riftExit = wasInRiftBand && !lastWarmInRiftBand;
+    // A hidden desktop shell must not pay zone-warm GPU work for a view
+    // nobody sees (the presentation gate stops render, not this lane, and
+    // this is its heaviest recurring producer). The tracker freezes whole
+    // while hidden, so the reveal frame computes the accumulated displacement
+    // and the rift-exit edge exactly as if the transition just happened.
+    const warm = warmTracker(player.pos.x, player.pos.z, desktopPresentationHidden());
+    if (!warm) return;
+    const { displacement, riftExit } = warm;
     if (zoneWarmup) return;
     if (!riftExit && renderer.isZoneReadyAt(player.pos.x, player.pos.z)) return;
     const zoneX = player.pos.x;

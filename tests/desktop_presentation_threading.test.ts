@@ -133,6 +133,54 @@ describe('the shell integration boot ordering (phase 4 QA F5)', () => {
   });
 });
 
+describe('the hidden-shell zone-warm pause (phase 8 GPU lane audit, lane 1)', () => {
+  // maybeWarmCurrentZone is the one recurring background GPU producer that
+  // runs outside gate.render (it sits after the gate.tick early-out, so a
+  // hidden shell re-evaluates it every frame), and it kicks the heaviest
+  // work in the lane set (zone prepare: PMREM, texture uploads, terrain
+  // chunk builds ride it transitively). The freeze SEMANTICS (no baseline
+  // consumption, rift edge preserved, accumulated reveal displacement) are
+  // behavior-tested in tests/zone_warm_tracker.test.ts; these pins hold the
+  // composition: the latch threaded as the tracker's hidden argument, and
+  // the no-answer early-out.
+  function warmBody(): string {
+    let warm: ts.VariableDeclaration | undefined;
+    const visit = (node: ts.Node): void => {
+      if (
+        ts.isVariableDeclaration(node) &&
+        ts.isIdentifier(node.name) &&
+        node.name.text === 'maybeWarmCurrentZone'
+      ) {
+        warm = node;
+        return;
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(sourceFile);
+    if (!warm) throw new Error('src/main.ts maybeWarmCurrentZone was not found');
+    return warm.getText(sourceFile);
+  }
+
+  it('threads the presentation latch into the tracker and bails on a hidden frame', () => {
+    const body = flat(stripLineComments(warmBody()));
+    expect(body).toContain(
+      'const warm = warmTracker(player.pos.x, player.pos.z, desktopPresentationHidden());',
+    );
+    expect(body).toContain('if (!warm) return;');
+    // Polarity: neither the latch nor the bail may pick up a stray negation.
+    expect(body).not.toContain('!desktopPresentationHidden()');
+    expect(body).not.toContain('if (warm) return;');
+    // The tracker call is the FIRST statement after the player read, so no
+    // warm work precedes the hidden decision.
+    expect(body.indexOf('const warm = warmTracker(')).toBeLessThan(body.indexOf('zoneWarmup'));
+  });
+
+  it('builds the tracker once, on the real rift predicate', () => {
+    expect(sourceText).toContain('const warmTracker = createZoneWarmTracker(isRiftPos);');
+    expect([...sourceText.matchAll(/createZoneWarmTracker\(/g)]).toHaveLength(1);
+  });
+});
+
 describe('the renderer governor hold on hidden frames (phase 4 QA F6)', () => {
   // The one behavioral seam upstream of this call is frame telemetry, which
   // runs BEFORE the guard and so cannot observe it; presentedFrames() sits
