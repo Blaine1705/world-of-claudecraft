@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
+  "es_ES": [
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
+  "fr_FR": [
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
+  "fr_CA": [
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
+  "de_DE": [
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
+  "nl_NL": [
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
+  "pl_PL": [
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
+  "id_ID": [
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
+  "tr_TR": [
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
+  "sv_SE": [
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
+  "vi_VN": [
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
+  "da_DK": [
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_lanternback_troll"
+  ]
 };
