@@ -97,8 +97,13 @@ interface PendingGpuWork<T> {
    *  grant. `order` is a FIFO tiebreak counter, not a clock. */
   enqueuedAt: number;
   /** The tail-cap park counter as it stood at enqueue. If it has advanced by
-   *  the time this unit starts, the loop parked on the cap while it waited. */
+   *  the time this unit starts, a park BEGAN while this unit waited. */
   tailCapParksAtEnqueue: number;
+  /** Whether the loop was ALREADY parked on the cap at enqueue. Without this a
+   *  unit that arrives mid-park and is released by that same park sees no
+   *  counter advance and reports no cap wait, despite having waited on exactly
+   *  that. The counter alone can confirm a cap wait but never rule one out. */
+  parkedOnTailCapAtEnqueue: boolean;
   work: () => T | Promise<T>;
   resolve: (value: T | PromiseLike<T>) => void;
   reject: (reason?: unknown) => void;
@@ -178,11 +183,11 @@ export interface GpuWorkWaitStat {
    *  serial slot but still occupies a cap slot, and the loop refuses to START
    *  anything while the cap is full.
    *
-   *  UNDER-reports, deliberately and worth knowing: the park counter is read at
-   *  ENQUEUE, so a unit that arrives while the loop is ALREADY parked, and is
-   *  released by that same park, sees no counter advance and reports false
-   *  despite having genuinely waited on the cap. False here means "no park
-   *  began during my wait", never "the cap did not delay me". */
+   *  Both arms are covered, which is what makes a FALSE here meaningful: a park
+   *  that BEGAN during the wait (the counter advanced) and a park already under
+   *  way when the unit arrived (the flag at enqueue). The counter alone would
+   *  miss the second and could then only confirm a cap wait, never rule one
+   *  out, which is useless for the experiment this signal exists to settle. */
   waitedOnTailCap: boolean;
   /** The tails that HELD the cap, captured when the loop parked on it, not when
    *  the wait ended: by then the blocker has left by definition, so reading the
@@ -357,6 +362,9 @@ export function createBackgroundGpuQueue(opts?: {
   let worstSyncMs = 0;
   let worstWaitMs = 0;
   let tailCapParks = 0;
+  // True while the drain loop is parked waiting for a cap slot. Read at enqueue
+  // so a unit arriving mid-park is attributed the wait it really had.
+  let parkedOnTailCap = false;
   // Snapshot of the cap's occupants the last time the loop parked on it. See the
   // `tails` field note for why the park, and not the grant, is the capture point.
   let lastCapOccupants: string[] = [];
@@ -426,7 +434,8 @@ export function createBackgroundGpuQueue(opts?: {
    *  is not "the least delayed one", it is simply not a member. */
   const recordWait = (unit: RunningGpuWork): void => {
     if (round1(unit.waitMs) <= 0) return;
-    const waitedOnTailCap = tailCapParks > unit.entry.tailCapParksAtEnqueue;
+    const waitedOnTailCap =
+      unit.entry.parkedOnTailCapAtEnqueue || tailCapParks > unit.entry.tailCapParksAtEnqueue;
     const stat: GpuWorkWaitStat = {
       label: unit.entry.label,
       priority: unit.entry.priority,
@@ -545,9 +554,14 @@ export function createBackgroundGpuQueue(opts?: {
         // wait cannot be told apart from waiting behind an ordinary holder.
         tailCapParks++;
         lastCapOccupants = [...waitingTails].map((tail) => tail.entry.label);
-        await new Promise<void>((resolve) => {
-          tailNotify = resolve;
-        });
+        parkedOnTailCap = true;
+        try {
+          await new Promise<void>((resolve) => {
+            tailNotify = resolve;
+          });
+        } finally {
+          parkedOnTailCap = false;
+        }
       }
       // shutdown() splices pending while the loop is parked on the cap wait
       // above: re-check emptiness before selecting, or the resumed iteration
@@ -643,6 +657,7 @@ export function createBackgroundGpuQueue(opts?: {
           releaseTail: options?.releaseTail === true,
           enqueuedAt: now(),
           tailCapParksAtEnqueue: tailCapParks,
+          parkedOnTailCapAtEnqueue: parkedOnTailCap,
           work,
           resolve,
           reject,

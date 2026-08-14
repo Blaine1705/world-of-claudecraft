@@ -353,6 +353,42 @@ describe('createBackgroundGpuQueue', () => {
     expect(stats.worstFrameGapMs).toBeGreaterThan(stats.worstUnsharedFrameGapMs);
   });
 
+  it('marks a unit that arrived while the loop was ALREADY parked on the cap', async () => {
+    // The arm the park counter alone cannot see. Without it a FALSE here means
+    // only "no park began during my wait", so the signal could confirm a cap
+    // wait but never rule one out, which is useless for the releaseTail
+    // experiment it exists to settle.
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock, tailLimit: 1 });
+    let settleLink!: () => void;
+    const tail = queue.run(
+      () => {
+        clock += 1;
+        return new Promise<void>((resolve) => {
+          settleLink = resolve;
+        });
+      },
+      GPU_WORK_PRIORITY.BACKGROUND,
+      'preview:armory:skin',
+      { releaseTail: true },
+    );
+    await flush();
+    // First arrival makes the loop park on the full cap.
+    const early = queue.run(() => {}, GPU_WORK_PRIORITY.BACKGROUND, 'early');
+    await flush();
+    // This one arrives while that park is ALREADY under way, and the same park
+    // releases both, so no counter advance happens during its wait.
+    clock += 500;
+    const late = queue.run(() => {}, GPU_WORK_PRIORITY.LIVE_VIEW, 'late-gate');
+    clock += 300;
+    settleLink();
+    await Promise.all([tail, early, late]);
+    const wait = queue.stats().longestWaits.find((entry) => entry.label === 'late-gate');
+    expect(wait).toBeDefined();
+    expect(wait?.waitedOnTailCap).toBe(true);
+    expect(wait?.tails).toEqual(['preview:armory:skin']);
+  });
+
   it('keeps units granted immediately out of the wait ranking', async () => {
     let clock = 0;
     const queue = createBackgroundGpuQueue({ now: () => clock });

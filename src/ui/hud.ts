@@ -16744,10 +16744,11 @@ export class Hud {
     if (this.restoreCharPreviewAfterGraphicsRebuild) this.charWindow.renderIfOpen();
     this.restoreCharPreviewAfterGraphicsRebuild = false;
     this.dailyRewardsWindow.restoreArmoryPreviewAfterGraphicsRebuild();
-    // Fresh contexts start cold; re-run the paced schedule so armory and
-    // portrait first-open stay covered after a rebuild exactly like they are
-    // after boot. The char family (the shell plus its dependent skin/pose
-    // units) is excluded here: unlike boot, this restart runs with no curtain
+    // Fresh contexts start cold; re-run the paced schedule so the portrait
+    // caches stay covered after a rebuild exactly like they are after boot.
+    // (The armory is not in that schedule: it warms per inspected card.)
+    // The char family (the shell plus its dependent skin/pose units) is
+    // excluded here: unlike boot, this restart runs with no curtain
     // up (resetGraphicsPreviewContexts already dropped it before this point),
     // so building the ~700 ms paperdoll shell + its secondary WebGL context as
     // a schedule unit would hitch a live frame, the exact stall class the

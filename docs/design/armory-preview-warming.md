@@ -12,8 +12,16 @@ local client connected to production, 29 catalog skins.
 ## What the warming cost
 
 About 2.1 to 2.6 seconds of live-frame hitches, paid by every online session,
-for a window only some players ever open. It bought nothing else: GPU program
-caches do not cross a WebGL context, so none of it reached the world renderer.
+for a window only some players ever open.
+
+What it bought, stated precisely because the two halves differ: **no
+transferable GPU benefit at all**, because program caches do not cross a WebGL
+context and the Armory has its own; and a **secondary CPU benefit** that was
+real, because the character-mode units populated process-wide caches (parsed
+GLBs, material and derived-emissive) the world renderer also reads. That second
+half is not lost, it is MOVED: those costs now land on the first sighting of a
+remote player wearing a given skin, a few to seventy milliseconds each, and only
+for skins actually seen. See the trade at the end of this document.
 
 ## Why no gentler schedule was available
 
@@ -82,9 +90,17 @@ cost. Do not change code before that exists.
 
 ## Accepted, unmeasured trade
 
-The character-mode units also populated process-wide CPU caches (parsed GLBs,
-material and derived-emissive) that the world renderer reads when it first
-sights a remote player wearing a skin. Those costs move to first sighting, a few
-to seventy milliseconds each, and only for skins actually seen. The world's own
-weapon-skin program warming is a separate entry in the renderer's entry manifest
-(`vfx.weapon-skins`) and is unaffected.
+The secondary CPU benefit named at the top is the one thing removal gives up.
+The character-mode units populated process-wide caches (parsed GLBs, material
+and derived-emissive) that the world renderer reads when it first sights a
+remote player wearing a skin. Those costs move to first sighting, a few to
+seventy milliseconds each, and only for skins actually seen, rather than being
+paid up front for all 29 whether or not any of them is ever seen.
+
+It is accepted rather than measured: no capture was taken of first-sighting cost
+before and after. If it ever looks like it matters, that is the measurement to
+take, and the fix would be to warm those CPU caches WITHOUT minting the second
+WebGL context, which is a different seam from the one this document is about.
+
+The world's own weapon-skin program warming is a separate entry in the
+renderer's entry manifest (`vfx.weapon-skins`) and is unaffected.
