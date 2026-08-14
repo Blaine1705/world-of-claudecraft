@@ -8,8 +8,9 @@
 // code field), and anything new lands as a new field id so old codes keep
 // importing. Body proportions are deliberately absent: they are Fit Studio
 // authoring data the game's creator cannot change, so a code neither carries
-// nor overwrites them (the importer keeps the current body, the same contract
-// randomize and reset already honor).
+// nor overwrites them. The importer therefore keeps the body it found, which
+// is what randomize does too; reset is the one whole-look action that returns
+// the proportions to neutral along with everything else.
 //
 // Pure core (RENDER_PURE_CORES): no DOM, no Three, no i18n, no clock, no
 // randomness. Decode failures are stable discriminators the UI localizes.
@@ -190,6 +191,9 @@ const faceField: DesignField = {
  *  row set and this table must move together; tests/design_code.test.ts pins
  *  the id set. */
 export const DESIGN_FIELDS: readonly DesignField[] = [
+  // `body` is the body PICK (the Body tab's male/female segment), not the
+  // proportions. Ids are frozen, so this one is spent: sculpted proportions,
+  // if they ever become a player-facing choice, need a new id of their own.
   pickField('body', 'gender', ['male', 'female']),
   colorField('skin', ['skinHue', 'skinSat', 'skinLight']),
   pickField('eyes', 'eyeShape', EYE_STYLES),
@@ -264,7 +268,12 @@ export function decodeDesignCode(raw: string): DecodedDesignCode | DesignCodeFai
   const warn = (entry: string) => ignored.push(entry);
 
   for (const token of tokens.slice(1)) {
-    const m = token.match(/^([a-z]+)\s*=\s*(.*)$/i);
+    // The id half accepts digits and underscores even though no field uses
+    // them today: every shipped client is frozen with THIS regex, so an id
+    // like `hair2` added later must land in `ignored` on an old build rather
+    // than failing the whole paste, which is the format's forward-compat
+    // promise.
+    const m = token.match(/^([a-z][a-z0-9_]*)\s*=\s*(.*)$/i);
     if (!m) return { ok: false, reason: 'malformed' };
     const field = byId.get(m[1].toLowerCase());
     if (!field) {

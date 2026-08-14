@@ -164,6 +164,22 @@ describe('creator share tab: import', () => {
     m.destroy();
   });
 
+  it('re-mirrors the canonical code even while the box still holds focus', () => {
+    // Clicking a button does not move focus in jsdom, which is exactly the
+    // case the import handler must own: sync()'s paste guard skips a focused
+    // textarea, so relying on it would leave the raw pasted text in a box
+    // that claims to show the imported look.
+    const m = mount();
+    m.code.focus();
+    m.code.value = 'WOC1; hair=mohawk';
+    m.importBtn.click();
+    const a = m.changed();
+    if (!a) throw new Error('no change emitted');
+    expect(document.activeElement).toBe(m.code);
+    expect(m.code.value).toBe(encodeDesignCode(a));
+    m.destroy();
+  });
+
   it('keeps the current body proportions across an import', () => {
     const shaped = {
       ...DEFAULT_APPEARANCE,

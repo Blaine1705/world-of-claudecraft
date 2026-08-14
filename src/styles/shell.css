@@ -8966,15 +8966,17 @@
   transform: translateY(0.5px);
 }
 
+/* Tokens, not literals: the theme presets recompute the --color-* vars at
+   runtime, so a raw hex here would not follow a theme switch. */
 .appearance-customizer .ac-share-status {
   min-height: 16px;
   font-size: 11px;
   line-height: 1.45;
-  color: #b8e6b8;
+  color: var(--color-text-success);
 }
 
 .appearance-customizer .ac-share-status.err {
-  color: #ffc2c2;
+  color: var(--color-text-error);
 }
 
 /* ------------------------------------------------------------------ focus */

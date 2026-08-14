@@ -275,6 +275,16 @@ describe('design code import tolerance', () => {
     expect(r.appearance.hair).toBe('mohawk');
   });
 
+  it('imports around a future field id carrying digits or underscores', () => {
+    // Every shipped client is frozen with the token regex it was built with,
+    // so an additive id a later build introduces (`hair2`) has to land in
+    // `ignored` on an old one. Failing the whole paste would break the
+    // format's forward-compat promise for codes that are otherwise fine.
+    const r = decodeOk('WOC1; hair2=braided; skin_tone=1/2/3; hair=mohawk');
+    expect(r.ignored).toEqual(['hair2', 'skin_tone']);
+    expect(r.appearance.hair).toBe('mohawk');
+  });
+
   it('imports around an unknown face slider and reports it', () => {
     const r = decodeOk('WOC1; face=nose:20,wings:50');
     expect(r.ignored).toEqual(['face.wings']);

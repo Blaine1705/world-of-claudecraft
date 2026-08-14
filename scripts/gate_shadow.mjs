@@ -45,10 +45,22 @@ const TMP = path.join(repoRoot, 'tmp');
 const LOG = process.env.GATE_SHADOW_LOG ?? path.join(TMP, 'gate-shadow.jsonl');
 
 /** @param {string} cmd @param {string[]} args
- *  shell:false on purpose: cmd.exe eats the caret in resolveSelectBase's
+ *  No .cmd shim on purpose: cmd.exe eats the caret in resolveSelectBase's
  *  `ref^{commit}` probes, breaking base resolution on Windows (same fix as
- *  ci_changed.mjs and gate_select.mjs; git never needs the .cmd shim). */
-const git = (cmd, args) => spawnSync(cmd, args, { encoding: 'utf8', shell: false, cwd: repoRoot });
+ *  ci_changed.mjs and gate_select.mjs). That makes a spawn FAILURE reachable,
+ *  so report it rather than letting the caller blame the git ref. */
+const git = (cmd, args) => {
+  const res = spawnSync(cmd, args, { encoding: 'utf8', shell: false, cwd: repoRoot });
+  if (res.error !== undefined) {
+    console.error(`[gate:shadow] could not spawn ${cmd}: ${res.error.message}`);
+    return {
+      status: res.status,
+      stdout: res.stdout,
+      stderr: `${res.error.message}\n${res.stderr ?? ''}`,
+    };
+  }
+  return res;
+};
 
 const workers = computeGateWorkers({
   cpuCount: os.availableParallelism(),

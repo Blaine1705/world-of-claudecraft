@@ -1289,8 +1289,10 @@ export function mountAppearanceCustomizer(
   // Share: the whole look as one line of feature=value pairs (the design
   // code), exported and imported in place. The box always mirrors the current
   // design except while the player is editing it to paste a code; Import
-  // replaces every changeable feature and KEEPS the body, the same contract
-  // randomize and reset honor (body proportions are Fit Studio data).
+  // replaces every changeable feature and KEEPS the body proportions (Fit
+  // Studio data no creator row can reach), which is what randomize does too.
+  // Reset is the deliberate exception: it returns the proportions to neutral
+  // with the rest of the look.
   {
     const hint = el('div', 'ac-share-hint', t('auth.designCodeHint'));
     hint.id = `${uid}-share-hint`;
@@ -1374,6 +1376,11 @@ export function mountAppearanceCustomizer(
       value = { ...parsed.appearance, body: value.body };
       syncAll();
       emit();
+      // Re-mirror the canonical encode HERE rather than leaning on sync():
+      // this handler owns the box at this moment, and sync's paste guard
+      // skips a textarea that still holds focus, which would leave the raw
+      // pasted text sitting in a box that claims to show the imported look.
+      code.value = encodeDesignCode(value);
       setStatus(
         t(
           parsed.ignored.length > 0 || parsed.coerced.length > 0
