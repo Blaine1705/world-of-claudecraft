@@ -157,9 +157,12 @@ interface AttributionTargetFixture {
 // neither parent. No capture was retaken.
 // Re-minted for the Armory warming redesign: the catalog leaves the post-entry
 // schedule and renderer.ts loses its preview-lane policy to
-// src/render/preview_prewarm_lane.ts. No capture was retaken.
+// src/render/preview_prewarm_lane.ts. Re-minted again for the review rounds,
+// which moved the viewPriorityPolicy leaf (a stale char/armory lane comment in
+// prewarm_policy.ts): the fingerprint covers more than renderer.ts. No capture
+// was retaken either time.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'ae4cdc3894059c68bbe999b206c6d2d32a10f5f9f3e0a33c8cca2cb1ed163adb';
+  'a94e1d4c090f6bfafefc285683138d83948edab1c943b6a84d20d1e7a24f7172';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
