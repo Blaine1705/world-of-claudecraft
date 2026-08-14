@@ -43,6 +43,17 @@ describe('strip_comments helper', () => {
     expect(out).toContain('const live = 1;');
   });
 
+  it('strips a line comment that immediately follows a block closing marker', () => {
+    // The consuming-guard form (^|[^:]) needs one unclaimed character before
+    // the //, and the block arm has already eaten the terminator's slash, so
+    // the trailing line comment survived and its text could satisfy a
+    // positive source pin. The lookbehind guard closes exactly this.
+    const src = 'const a = 1; /* b *///  phantomPinToken';
+    const out = stripComments(src);
+    expect(out).toContain('const a = 1;');
+    expect(out).not.toContain('phantomPinToken');
+  });
+
   it('keeps protocol strings intact (the #2499 colon guard)', () => {
     const src = "const url = 'https://example.test/path'; // trailing note";
     const out = stripComments(src);

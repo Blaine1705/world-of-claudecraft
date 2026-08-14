@@ -15,8 +15,13 @@
  * - Block comments are blanked to spaces, so line count and the column
  *   offsets of following lines survive for offset-sensitive scans.
  * - Line comments are deleted to end of line (the newline survives).
- * - The `(^|[^:])` guard keeps protocol strings (`http://`, `app://`) intact,
- *   the stripper bug this repo already shipped once (#2499).
+ * - The not-after-a-colon guard keeps protocol strings (`http://`, `app://`)
+ *   intact, the stripper bug this repo already shipped once (#2499). It is a
+ *   LOOKBEHIND rather than the consuming `(^|[^:])` form: a consuming guard
+ *   needs one unclaimed character before the `//`, and when a line comment
+ *   immediately follows a block comment's closing marker the block arm has
+ *   already eaten that character, so the line comment would survive and its
+ *   text could satisfy a positive pin (gate-integrity finding, phase 11).
  * - Comment markers inside STRING literals are not understood (no stripper in
  *   this repo tokenizes strings); a `/*` inside a string still opens a
  *   phantom block in any pass order. Guards that pin such content must reason
@@ -26,7 +31,7 @@
  * by `strip_comments.test.ts` rather than only through its consumers.
  */
 export function stripComments(source: string): string {
-  return source.replace(/\/\*[\s\S]*?\*\/|(^|[^:])\/\/[^\n]*/gm, (m, pre) =>
-    m.startsWith('/*') ? m.replace(/[^\n]/g, ' ') : (pre ?? ''),
+  return source.replace(/\/\*[\s\S]*?\*\/|(?<=^|[^:])\/\/[^\n]*/gm, (m) =>
+    m.startsWith('/*') ? m.replace(/[^\n]/g, ' ') : '',
   );
 }
