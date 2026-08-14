@@ -752,10 +752,16 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // the release monolith ratchet. Behavior is unchanged; no capture was retaken.
 // Re-minted again after registering the extracted policy as its own provenance
 // leaf. The captures remain unchanged and were not retaken.
+// Re-minted for the phase 11 desktop-client-update seal re-mint over the
+// branch's final lockfile (GLB source-fingerprint leaves) plus the branch's
+// renderer.ts and prewarm_policy.ts runtimeRender moves. RULING (user,
+// 2026-08-14): the r185 lighting shift is accepted for the live game; the
+// frozen historical A/B evidence stays verbatim per the frozen-history
+// doctrine, provenance re-recorded only. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '3a45257ca823deae6c5971b4d9ca1be9b66f3aac9449f19408c918c9bef85812';
+  'd5cba2474a3f16e0acff50e88e769ad45ed401d8488da25254a01d7a2c25eaea';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'e069626230576fa39ed87eeb94a78cb0ec111156f031fd8063bf2471a99db070';
+  'd05e927d0abd8ba3fd34305deb5fe41cd44cc20cc78c1e417cb1e8afe11b3ac3';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1740,10 +1746,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // monolith ratchet. The seal follows the swept bytes; no capture was retaken.
     // Re-pinned again after the policy became an explicit provenance leaf. The
     // performance records changed only in their swept provenance blocks.
+    // Re-minted for the phase 11 desktop-client-update seal re-mint: the
+    // first-order composite follows the final lockfile's GLB leaves and the
+    // branch's renderer.ts + prewarm_policy.ts inputs, then this second-order
+    // performance seal follows the swept evidence bytes. No capture was
+    // retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('05ade62f3e9a75cf0cea69d7a7fd3397fef92ed5f6d79d36ab4d1a1c1e29607d');
+    ).toBe('3c1edecb507a25297fe28a23d739bad8e56b4f89051c4a2ebcf304e4a9dc0264');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

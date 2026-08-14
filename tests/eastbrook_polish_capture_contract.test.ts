@@ -168,8 +168,17 @@ interface AttributionTargetFixture {
 // the release monolith ratchet. Behavior is unchanged; no capture was retaken.
 // Re-minted again after making that extracted policy an explicit provenance
 // leaf. The evidence now follows policy-only changes; no capture was retaken.
+// Re-minted for the phase 11 desktop-client-update seal re-mint over the
+// branch's final lockfile: the lockfile moved the three GLB source-fingerprint
+// leaves (electron + three r185 train), and the branch's renderer.ts and
+// prewarm_policy.ts moves ride the runtimeRender leaves. RULING (user,
+// 2026-08-14): the r185 lighting shift (Rec.709 bloom on the emissive beacon
+// at ultra) is accepted for the live game, and the frozen historical A/B
+// evidence stays verbatim per this seal's own frozen-history doctrine (the
+// bank-rebuild precedent); provenance re-recorded only. No capture was
+// retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'e069626230576fa39ed87eeb94a78cb0ec111156f031fd8063bf2471a99db070';
+  'd05e927d0abd8ba3fd34305deb5fe41cd44cc20cc78c1e417cb1e8afe11b3ac3';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
