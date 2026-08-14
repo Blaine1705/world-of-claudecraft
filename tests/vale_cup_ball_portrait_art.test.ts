@@ -14,12 +14,21 @@ function sha256(bytes: Buffer): string {
   return createHash('sha256').update(bytes).digest('hex');
 }
 
+interface AcceptedReference {
+  path: string;
+  bytes: number;
+  sha256: string;
+}
+
 describe('Vale Cup ball target portrait art', () => {
   it('pins the accepted generation and processing record', () => {
     const bytes = readFileSync(EVIDENCE_PATH);
     expect(bytes.byteLength).toBe(3316);
-    expect(sha256(bytes)).toBe('fbba34fde2722caa5edfb31ba357516a4c34e6653f3e81b5d1978cafb6d7da5a');
-    const evidence = JSON.parse(bytes.toString('utf8'));
+    expect(sha256(bytes)).toBe('b9169b865723c28fa3fa000a725fac8aafd64459ce75677890d75a75ab886f96');
+    const evidence = JSON.parse(bytes.toString('utf8')) as {
+      generationPrompt: string;
+      references: AcceptedReference[];
+    };
     expect(evidence).toMatchObject({
       schemaVersion: 1,
       batch: 'vale-cup-ball-portrait-2026-08-10',
@@ -61,12 +70,12 @@ describe('Vale Cup ball target portrait art', () => {
     expect(evidence.references).toEqual([
       {
         path: 'public/ui/mobs/wild_boar.webp',
-        bytes: 2830,
+        bytes: 2832,
         sha256: '6659380d8e6fed07b916c78026b8e860dd3a58d4e1569e25c049a18ac2faf06f',
       },
       {
         path: 'public/ui/mobs/training_dummy.webp',
-        bytes: 1788,
+        bytes: 1812,
         sha256: '400afcac22527f9e0145b7a1dcc39f068f8f50d265798497925559464cd70915',
       },
       {
@@ -76,10 +85,15 @@ describe('Vale Cup ball target portrait art', () => {
       },
       {
         path: 'public/ui/mobs/old_greyjaw.webp',
-        bytes: 2126,
+        bytes: 2042,
         sha256: '8f633043c612c2fa7b5a911afbf4b90d6d0aa57098666be2545d40fb8e6cde33',
       },
     ]);
+    for (const reference of evidence.references) {
+      const referenceBytes = readFileSync(resolve(process.cwd(), reference.path));
+      expect(referenceBytes.byteLength, `${reference.path} byte length`).toBe(reference.bytes);
+      expect(sha256(referenceBytes), `${reference.path} SHA-256`).toBe(reference.sha256);
+    }
   });
 
   it('ships the accepted static painting on the live target route', async () => {
