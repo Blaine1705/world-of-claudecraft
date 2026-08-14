@@ -7789,7 +7789,14 @@ export const tr_TR: EnTranslations = {
       "readyBody": "Çıkış yaptığında kurulur ya da şimdi yeniden başlat.",
       "restart": "Şimdi Yeniden Başlat",
       "later": "Daha Sonra",
-      "dismiss": "Kapat"
+      "dismiss": "Kapat",
+      "whatsNew": "See what changed in your browser"
+    },
+    "notify": {
+      "updateReadyTitle": "Update {version} is ready",
+      "updateReadyBody": "Restart World of ClaudeCraft to apply the update.",
+      "partyInviteTitle": "Party invite",
+      "partyInviteBody": "{name} invited you to a party."
     },
     "crash": {
       "title": "World of ClaudeCraft",

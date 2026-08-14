@@ -18,10 +18,12 @@ vi.mock('../src/game/desktop_presentation', () => ({
   initDesktopPresentation: vi.fn(() => () => {}),
 }));
 vi.mock('../src/game/desktop_shell_strings', () => ({ initDesktopShellStrings: vi.fn() }));
+vi.mock('../src/game/desktop_notifications', () => ({ initDesktopNotifications: vi.fn() }));
 
 import { initDesktopDisplayChange } from '../src/game/desktop_display_change';
 import { initDesktopErrorRelay } from '../src/game/desktop_error_relay';
 import { initDesktopGpuStatus } from '../src/game/desktop_gpu_status';
+import { initDesktopNotifications } from '../src/game/desktop_notifications';
 import { initDesktopPresentation } from '../src/game/desktop_presentation';
 import { initDesktopShellIntegration } from '../src/game/desktop_shell_integration';
 import { initDesktopShellStrings } from '../src/game/desktop_shell_strings';
@@ -36,6 +38,7 @@ const pieces = [
   initDesktopGpuStatus,
   initDesktopDisplayChange,
   initDesktopPresentation,
+  initDesktopNotifications,
 ].map((piece) => vi.mocked(piece as (bridge: unknown) => unknown));
 
 beforeEach(() => {
@@ -54,6 +57,11 @@ describe('initDesktopShellIntegration', () => {
     // The error relay's listeners must exist before anything else runs.
     const orders = pieces.map((piece) => piece.mock.invocationCallOrder[0]);
     expect(orders[0]).toBe(Math.min(...orders));
+    // The notification away-gate reads the presentation latch, so it must
+    // compose after the subscription that keeps the latch truthful.
+    expect(vi.mocked(initDesktopNotifications).mock.invocationCallOrder[0]).toBeGreaterThan(
+      vi.mocked(initDesktopPresentation).mock.invocationCallOrder[0],
+    );
   });
 
   it('is a total no-op without a bridge (web build, plain browser, older shell)', () => {

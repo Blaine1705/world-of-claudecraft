@@ -7789,7 +7789,14 @@ export const en_XA: EnTranslations = {
       "readyBody": "[Ŕéšţáŕţ ţó íñšţáļļ ñóŵ, óŕ ķééþ þļáýíñĝ áñð íţ íñšţáļļš ŵĥéñ ýóú ɋúíţ.]",
       "restart": "[Ŕéšţáŕţ ñóŵ]",
       "later": "[Ļáţéŕ]",
-      "dismiss": "[Ðíšɱíšš]"
+      "dismiss": "[Ðíšɱíšš]",
+      "whatsNew": "[Šéé ŵĥáţ çĥáñĝéð íñ ýóúŕ ƀŕóŵšéŕ]"
+    },
+    "notify": {
+      "updateReadyTitle": "[Úþðáţé {version} íš ŕéáðý]",
+      "updateReadyBody": "[Ŕéšţáŕţ Ŵóŕļð óƒ ÇļáúðéÇŕáƒţ ţó áþþļý ţĥé úþðáţé.]",
+      "partyInviteTitle": "[Þáŕţý íñʋíţé]",
+      "partyInviteBody": "[{name} íñʋíţéð ýóú ţó á þáŕţý.]"
     },
     "crash": {
       "title": "[Ŵóŕļð óƒ ÇļáúðéÇŕáƒţ]",

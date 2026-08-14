@@ -7789,7 +7789,14 @@ export const nl_NL: EnTranslations = {
       "readyBody": "Deze wordt geïnstalleerd wanneer je afsluit, of herstart nu.",
       "restart": "Nu herstarten",
       "later": "Later",
-      "dismiss": "Sluiten"
+      "dismiss": "Sluiten",
+      "whatsNew": "See what changed in your browser"
+    },
+    "notify": {
+      "updateReadyTitle": "Update {version} is ready",
+      "updateReadyBody": "Restart World of ClaudeCraft to apply the update.",
+      "partyInviteTitle": "Party invite",
+      "partyInviteBody": "{name} invited you to a party."
     },
     "crash": {
       "title": "World of ClaudeCraft",

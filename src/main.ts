@@ -48,6 +48,7 @@ import {
 } from './game/desktop_display_mode_sync';
 import { initDesktopDownload } from './game/desktop_download';
 import { pushDesktopGpuPref, syncDesktopGpuPrefSetting } from './game/desktop_gpu_pref_sync';
+import { desktopNotifyOnSimEvents } from './game/desktop_notifications';
 import { desktopPresentationHidden } from './game/desktop_presentation';
 import { initDesktopShellIntegration } from './game/desktop_shell_integration';
 import { installDevTeleports } from './game/dev_shortcuts';
@@ -4391,6 +4392,7 @@ async function startGame(
           perf.finishTime('sim', simStart);
         }
         const eventsLength = events.length;
+        desktopNotifyOnSimEvents(events, offlineSim.playerId);
         const eventsStart = perf.startTime();
         traceStart = perf.startTrace();
         try {
@@ -4569,6 +4571,7 @@ async function startGame(
       net.playerId,
     );
     const drainedEventsLength = drainedEvents.length;
+    desktopNotifyOnSimEvents(drainedEvents, net.playerId);
     const eventsStart = perf.startTime();
     traceStart = perf.startTrace();
     try {

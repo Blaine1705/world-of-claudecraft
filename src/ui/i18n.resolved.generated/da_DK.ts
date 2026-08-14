@@ -7789,7 +7789,14 @@ export const da_DK: EnTranslations = {
       "readyBody": "Den installeres, når du afslutter, eller genstart nu.",
       "restart": "Genstart nu",
       "later": "Senere",
-      "dismiss": "Afvis"
+      "dismiss": "Afvis",
+      "whatsNew": "See what changed in your browser"
+    },
+    "notify": {
+      "updateReadyTitle": "Update {version} is ready",
+      "updateReadyBody": "Restart World of ClaudeCraft to apply the update.",
+      "partyInviteTitle": "Party invite",
+      "partyInviteBody": "{name} invited you to a party."
     },
     "crash": {
       "title": "World of ClaudeCraft",

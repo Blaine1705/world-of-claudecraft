@@ -7789,7 +7789,14 @@ export const ja_JP: EnTranslations = {
       "readyBody": "ゲーム終了時に自動でインストールされます。今すぐ再起動もできます。",
       "restart": "今すぐ再起動",
       "later": "後で",
-      "dismiss": "閉じる"
+      "dismiss": "閉じる",
+      "whatsNew": "変更内容をブラウザで見る"
+    },
+    "notify": {
+      "updateReadyTitle": "アップデート {version} の準備ができました",
+      "updateReadyBody": "アップデートを適用するには World of ClaudeCraft を再起動してください。",
+      "partyInviteTitle": "パーティ招待",
+      "partyInviteBody": "{name}がパーティに招待しています。"
     },
     "crash": {
       "title": "World of ClaudeCraft",

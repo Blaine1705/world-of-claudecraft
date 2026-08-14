@@ -10,6 +10,11 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "desktop.notify.partyInviteBody",
+    "desktop.notify.partyInviteTitle",
+    "desktop.notify.updateReadyBody",
+    "desktop.notify.updateReadyTitle",
+    "desktop.update.whatsNew",
     "gpuNotice.bodyDiscreteInactive",
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
@@ -18,6 +23,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "es_ES": [
+    "desktop.notify.partyInviteBody",
+    "desktop.notify.partyInviteTitle",
+    "desktop.notify.updateReadyBody",
+    "desktop.notify.updateReadyTitle",
+    "desktop.update.whatsNew",
     "gpuNotice.bodyDiscreteInactive",
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
@@ -26,6 +36,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "fr_FR": [
+    "desktop.notify.partyInviteBody",
+    "desktop.notify.partyInviteTitle",
+    "desktop.notify.updateReadyBody",
+    "desktop.notify.updateReadyTitle",
+    "desktop.update.whatsNew",
     "gpuNotice.bodyDiscreteInactive",
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
@@ -34,6 +49,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "fr_CA": [
+    "desktop.notify.partyInviteBody",
+    "desktop.notify.partyInviteTitle",
+    "desktop.notify.updateReadyBody",
+    "desktop.notify.updateReadyTitle",
+    "desktop.update.whatsNew",
     "gpuNotice.bodyDiscreteInactive",
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
@@ -43,6 +63,11 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "desktop.notify.partyInviteBody",
+    "desktop.notify.partyInviteTitle",
+    "desktop.notify.updateReadyBody",
+    "desktop.notify.updateReadyTitle",
+    "desktop.update.whatsNew",
     "gpuNotice.bodyDiscreteInactive",
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
@@ -51,6 +76,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "de_DE": [
+    "desktop.notify.partyInviteBody",
+    "desktop.notify.partyInviteTitle",
+    "desktop.notify.updateReadyBody",
+    "desktop.notify.updateReadyTitle",
+    "desktop.update.whatsNew",
     "gpuNotice.bodyDiscreteInactive",
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
@@ -63,6 +93,11 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "desktop.notify.partyInviteBody",
+    "desktop.notify.partyInviteTitle",
+    "desktop.notify.updateReadyBody",
+    "desktop.notify.updateReadyTitle",
+    "desktop.update.whatsNew",
     "gpuNotice.bodyDiscreteInactive",
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
@@ -72,6 +107,11 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "desktop.notify.partyInviteBody",
+    "desktop.notify.partyInviteTitle",
+    "desktop.notify.updateReadyBody",
+    "desktop.notify.updateReadyTitle",
+    "desktop.update.whatsNew",
     "gpuNotice.bodyDiscreteInactive",
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
@@ -80,6 +120,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "nl_NL": [
+    "desktop.notify.partyInviteBody",
+    "desktop.notify.partyInviteTitle",
+    "desktop.notify.updateReadyBody",
+    "desktop.notify.updateReadyTitle",
+    "desktop.update.whatsNew",
     "gpuNotice.bodyDiscreteInactive",
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
@@ -88,6 +133,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "pl_PL": [
+    "desktop.notify.partyInviteBody",
+    "desktop.notify.partyInviteTitle",
+    "desktop.notify.updateReadyBody",
+    "desktop.notify.updateReadyTitle",
+    "desktop.update.whatsNew",
     "gpuNotice.bodyDiscreteInactive",
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
@@ -96,6 +146,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "id_ID": [
+    "desktop.notify.partyInviteBody",
+    "desktop.notify.partyInviteTitle",
+    "desktop.notify.updateReadyBody",
+    "desktop.notify.updateReadyTitle",
+    "desktop.update.whatsNew",
     "gpuNotice.bodyDiscreteInactive",
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
@@ -104,6 +159,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "tr_TR": [
+    "desktop.notify.partyInviteBody",
+    "desktop.notify.partyInviteTitle",
+    "desktop.notify.updateReadyBody",
+    "desktop.notify.updateReadyTitle",
+    "desktop.update.whatsNew",
     "gpuNotice.bodyDiscreteInactive",
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
@@ -112,6 +172,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "sv_SE": [
+    "desktop.notify.partyInviteBody",
+    "desktop.notify.partyInviteTitle",
+    "desktop.notify.updateReadyBody",
+    "desktop.notify.updateReadyTitle",
+    "desktop.update.whatsNew",
     "gpuNotice.bodyDiscreteInactive",
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
@@ -120,6 +185,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "vi_VN": [
+    "desktop.notify.partyInviteBody",
+    "desktop.notify.partyInviteTitle",
+    "desktop.notify.updateReadyBody",
+    "desktop.notify.updateReadyTitle",
+    "desktop.update.whatsNew",
     "gpuNotice.bodyDiscreteInactive",
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",
@@ -128,6 +198,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.forceHighPerfGpuNote"
   ],
   "da_DK": [
+    "desktop.notify.partyInviteBody",
+    "desktop.notify.partyInviteTitle",
+    "desktop.notify.updateReadyBody",
+    "desktop.notify.updateReadyTitle",
+    "desktop.update.whatsNew",
     "gpuNotice.bodyDiscreteInactive",
     "hud.options.displayMode",
     "hud.options.displayModeBorderless",

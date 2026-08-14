@@ -7789,7 +7789,14 @@ export const fr_FR: EnTranslations = {
       "readyBody": "Elle s'installe à la fermeture, ou redémarrez maintenant.",
       "restart": "Redémarrer maintenant",
       "later": "Plus tard",
-      "dismiss": "Fermer"
+      "dismiss": "Fermer",
+      "whatsNew": "See what changed in your browser"
+    },
+    "notify": {
+      "updateReadyTitle": "Update {version} is ready",
+      "updateReadyBody": "Restart World of ClaudeCraft to apply the update.",
+      "partyInviteTitle": "Party invite",
+      "partyInviteBody": "{name} invited you to a party."
     },
     "crash": {
       "title": "World of ClaudeCraft",

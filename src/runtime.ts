@@ -55,6 +55,16 @@ export interface DesktopUpdateEvent {
   percent?: number;
 }
 
+// One OS-level notification the page asks the shell to post. `kind` is the
+// call site, not a payload variant: the shell keys its own per-kind policy
+// (coalescing, click routing) off it, and the two strings arrive already
+// localized because the main process has no i18n runtime.
+export interface DesktopNotificationRequest {
+  kind: 'update-ready' | 'party-invite';
+  title: string;
+  body: string;
+}
+
 // One main-world uncaught error relayed to the shell's log file
 // (src/game/desktop_error_relay.ts builds it; the shell clamps + validates).
 export interface DesktopRendererErrorReport {
@@ -168,6 +178,9 @@ export interface DesktopBridge {
   // post-trio methods.
   getDisplayMode?(): Promise<DesktopDisplayMode>;
   setDisplayMode?(mode: DesktopDisplayMode): Promise<boolean>;
+  // Posts an OS notification. Absent on older shells: feature-check before use,
+  // like the other post-trio methods.
+  showNotification?(request: DesktopNotificationRequest): void;
   // Fire-and-forget gamepad-activity ping feeding the shell's display-sleep
   // blocker (the shell rate-limits and debounces; the renderer throttles its
   // own sends). Absent on older shells: feature-check before use.

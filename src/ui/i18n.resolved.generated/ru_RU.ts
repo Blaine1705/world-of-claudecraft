@@ -7789,7 +7789,14 @@ export const ru_RU: EnTranslations = {
       "readyBody": "Оно установится при выходе из игры, либо перезапустите сейчас.",
       "restart": "Перезапустить сейчас",
       "later": "Позже",
-      "dismiss": "Закрыть"
+      "dismiss": "Закрыть",
+      "whatsNew": "Посмотреть изменения в браузере"
+    },
+    "notify": {
+      "updateReadyTitle": "Обновление {version} готово",
+      "updateReadyBody": "Перезапустите World of ClaudeCraft, чтобы применить обновление.",
+      "partyInviteTitle": "Приглашение в группу",
+      "partyInviteBody": "{name} приглашает вас в группу."
     },
     "crash": {
       "title": "World of ClaudeCraft",

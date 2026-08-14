@@ -134,6 +134,16 @@ export const shellStrings = {
         restart: 'Restart now',
         later: 'Later',
         dismiss: 'Dismiss',
+        whatsNew: 'See what changed in your browser',
+      },
+      // OS notifications the shell posts while the player is away from the
+      // window (src/game/desktop_notifications.ts). Title and body cross the
+      // bridge already rendered: the main process has no i18n runtime.
+      notify: {
+        updateReadyTitle: 'Update {version} is ready',
+        updateReadyBody: 'Restart World of ClaudeCraft to apply the update.',
+        partyInviteTitle: 'Party invite',
+        partyInviteBody: '{name} invited you to a party.',
       },
       crash: {
         title: 'World of ClaudeCraft',

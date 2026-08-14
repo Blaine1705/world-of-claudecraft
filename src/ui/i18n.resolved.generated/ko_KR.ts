@@ -7789,7 +7789,14 @@ export const ko_KR: EnTranslations = {
       "readyBody": "게임을 종료하면 자동으로 설치되며, 지금 다시 시작할 수도 있습니다.",
       "restart": "지금 다시 시작",
       "later": "나중에",
-      "dismiss": "닫기"
+      "dismiss": "닫기",
+      "whatsNew": "변경 사항을 브라우저에서 보기"
+    },
+    "notify": {
+      "updateReadyTitle": "업데이트 {version} 준비 완료",
+      "updateReadyBody": "업데이트를 적용하려면 World of ClaudeCraft를 다시 시작하세요.",
+      "partyInviteTitle": "파티 초대",
+      "partyInviteBody": "{name}님이 파티에 초대했습니다."
     },
     "crash": {
       "title": "World of ClaudeCraft",

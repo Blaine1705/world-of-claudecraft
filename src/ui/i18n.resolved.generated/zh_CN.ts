@@ -7789,7 +7789,14 @@ export const zh_CN: EnTranslations = {
       "readyBody": "退出游戏时将自动安装，也可立即重启。",
       "restart": "立即重启",
       "later": "稍后",
-      "dismiss": "关闭"
+      "dismiss": "关闭",
+      "whatsNew": "在浏览器中查看更新内容"
+    },
+    "notify": {
+      "updateReadyTitle": "更新 {version} 已就绪",
+      "updateReadyBody": "重启 World of ClaudeCraft 以应用更新。",
+      "partyInviteTitle": "组队邀请",
+      "partyInviteBody": "{name} 邀请你加入队伍。"
     },
     "crash": {
       "title": "World of ClaudeCraft",
