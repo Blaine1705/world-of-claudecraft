@@ -15,6 +15,8 @@ import {
   PROVING_SHORE_QUESTS,
   PROVING_SHORE_ZONE,
 } from '../src/sim/content/proving_shore';
+import { MAILBOXES } from '../src/sim/content/mailboxes';
+import { NOTICEBOARDS } from '../src/sim/content/noticeboards';
 import { ITEMS, ZONES } from '../src/sim/data';
 import { groundHeight, provingLandness, terrainSteepnessAt, WATER_LEVEL } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
@@ -51,6 +53,31 @@ describe('proving shore placement', () => {
     const steep = points.filter((p) => !walkable(p.x, p.z)).map((p) => p.what);
     expect(wet, `underwater: ${wet.join(', ')}`).toEqual([]);
     expect(steep, `too steep: ${steep.join(', ')}`).toEqual([]);
+  });
+
+  it('the camp services stand on dry walkable ground', () => {
+    // The mailbox and the guild notice board are world services, authored
+    // outside this module (content/mailboxes.ts, content/noticeboards.ts), so
+    // the placement sweep above cannot see them.
+    // Scoped to the island RECT, not just x: the northern realms sit in the
+    // same western column (Amberfall's mailbox is at x -353).
+    const inIsland = (p: { x: number; z: number }) =>
+      p.x >= -540 && p.x < -180 && p.z >= -180 && p.z < 180;
+    const mailbox = MAILBOXES.find(inIsland);
+    expect(mailbox, 'the island mailbox').toBeTruthy();
+    expect([mailbox?.x, mailbox?.z]).toEqual([-306, 56]);
+    const board = NOTICEBOARDS.find(inIsland);
+    expect(board, 'the island notice board').toBeTruthy();
+    for (const point of [mailbox, board]) {
+      if (!point) continue;
+      expect(dry(point.x, point.z)).toBe(true);
+      expect(walkable(point.x, point.z)).toBe(true);
+    }
+    // Its reading spot is reachable too, not stranded inside the board.
+    const front = board?.frontStandingPoint;
+    expect(front && dry(front.x, front.z)).toBe(true);
+    // A second board needs its own reserved static-service id.
+    expect(new Set(NOTICEBOARDS.map((b) => b.entityId)).size).toBe(NOTICEBOARDS.length);
   });
 
   it('the greeter stands on dry ground at the Eastbrook spawn', () => {

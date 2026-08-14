@@ -44,5 +44,9 @@ export const MAILBOXES: MailboxDef[] = [
   hubMailbox(EVERGARDEN_ZONE, { x: -6, z: 6 }), // Hedgewick, facing the parterre
   hubMailbox(GALECREST_ZONE, { x: 7, z: -5 }), // Wickharbor, beside the harbor square
   hubMailbox(FARSHORE_ZONE, { x: -6, z: 6 }), // Gullhaven, inside the redoubt
-  hubMailbox(PROVING_SHORE_ZONE, { x: -6, z: -6 }), // Dawnrest Camp, by the muster fire
+  // Dawnrest Camp, up the camp's north edge. Requested at (-306, 60), moved
+  // 4 yards south: the camp's shoreline runs diagonally and (-306, 60) sits
+  // below the waterline (ground -4.02 against WATER_LEVEL -4.3), which would
+  // have put the Ravenpost perch in the shallows.
+  hubMailbox(PROVING_SHORE_ZONE, { x: -6, z: 6 }),
 ];

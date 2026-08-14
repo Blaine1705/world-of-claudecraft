@@ -154,6 +154,7 @@ import {
 import { currentResetDay, currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
 import { telemetryZoneId } from './game/world_telemetry';
+import { ferryPrewarmTargetFor } from './game/ferry_prewarm';
 import { zoneWarmupMode } from './game/zone_transition';
 import {
   CHAR_SORT_MODES,
@@ -3728,6 +3729,24 @@ async function startGame(
   // to (ARRIVAL_NEIGHBOR_STREAM_RADIUS covers that ordinary case).
   let lastWarmInRiftBand = false;
   const RIFT_EXIT_STREAM_RADIUS = 240;
+  // Ferry crossings are a CLICK, not a walk, so the far shore has to be
+  // resident BEFORE the bell is rung or the arrival takes the blocking loading
+  // screen. Warm it while the player is still walking up to the bell; the
+  // latch keeps it to one stream per destination per session, and a failure
+  // simply leaves the classic screen in place.
+  const ferryPrewarmed = new Set<string>();
+  const maybeWarmFerryDestination = (): void => {
+    const target = ferryPrewarmTargetFor(world.player.pos.x, world.player.pos.z);
+    if (!target || ferryPrewarmed.has(target.id)) return;
+    ferryPrewarmed.add(target.id);
+    void renderer
+      .prepareZoneAt(target.x, target.z)
+      .then(() => renderer.prewarmZoneAt(target.x, target.z, { background: true }))
+      .catch(() => {
+        // Let a failed stream be retried the next time the player walks up.
+        ferryPrewarmed.delete(target.id);
+      });
+  };
   const maybeWarmCurrentZone = (): void => {
     const player = world.player;
     const displacement = Number.isFinite(lastWarmCheckX)
@@ -4201,6 +4220,7 @@ async function startGame(
       return;
     }
     maybeWarmCurrentZone();
+    maybeWarmFerryDestination();
     let frameDt = (now - last) / 1000;
     last = now;
     if (frameDt > 0.25) frameDt = 0.25;

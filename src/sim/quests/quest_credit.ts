@@ -16,6 +16,7 @@ import { QUESTS } from '../data';
 import { countAcrossGrades, materialGradeIds } from '../professions/material_grades';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { ownedItemCount } from './quest_owned_count';
 import {
   type Entity,
   type GatherNodeDef,
@@ -126,9 +127,13 @@ export function onInventoryChangedForQuests(ctx: SimContext, meta: PlayerMeta): 
         // "Copper Ore delivered" objective sit at 0 while their bags filled
         // with fine copper ore, since eastbrook_vale is all tier-1 nodes and
         // the plain grade stops dropping for them entirely.
+        const carried = countAcrossGrades(obj.itemId, (id) => ctx.countItem(id, meta.entityId));
+        // An ownership objective (QuestDef.keepsCollectedItems) also counts
+        // copies worn in a bag socket, so following the quest's own "buckle it
+        // on" instruction cannot un-complete it.
         const have = Math.min(
           required,
-          countAcrossGrades(obj.itemId, (id) => ctx.countItem(id, meta.entityId)),
+          quest.keepsCollectedItems ? ownedItemCount(carried, meta, obj.itemId) : carried,
         );
         if (have !== qp.counts[i]) {
           if (have > qp.counts[i]) meta.counters.questProgress += have - qp.counts[i];

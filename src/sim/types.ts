@@ -3800,6 +3800,15 @@ export interface QuestDef {
   // (e.g. the paladin-only Divine Tome chain). Availability enforced in computeQuestState.
   minLevel?: number;
   retired?: boolean; // remains finishable if already accepted, but cannot be newly accepted
+  // OWNERSHIP collect objectives instead of DELIVERY ones: the collect count
+  // includes copies worn in a bag socket (quests/quest_owned_count.ts) and the
+  // turn-in never consumes them. For a quest that asks the player to acquire
+  // and KEEP a thing rather than fetch it, e.g. the tutorial island's Pouch
+  // and Purse: it tells the player to buy a Linen Pouch and buckle it on, so
+  // taking it back at the turn-in would undo the lesson it just taught, and
+  // counting carried copies alone made the objective unfinishable the moment
+  // they equipped it.
+  keepsCollectedItems?: boolean;
   shareable?: boolean; // quest-link sharing allowed (default true; set false to opt out)
   suggestedPlayers?: number; // group quests ("Suggested players: 5")
   // Repeatable quests remain in questsDone as history but become available

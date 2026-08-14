@@ -296,6 +296,47 @@ describe('the quest-gated vendor row (the pouch lock-out guard)', () => {
     expect(sim.countItem('linen_pouch')).toBe(2);
   });
 
+  it('the pouch objective survives being buckled on, and the turn-in leaves it', () => {
+    // The quest tells the player to buy the pouch AND wear it, so the two
+    // things that used to break it are pinned together: equipBag moves the
+    // item out of the inventory countItem reads (the objective fell back to
+    // 0/1 and could never be handed in), and a normal collect turn-in would
+    // have taken the bag Maren just taught them to wear.
+    const sim = makeSim();
+    const finch = standAtFinch(sim);
+    const meta = sim.players.get(sim.playerId)!;
+    meta.copper = 1000;
+    meta.questLog.set('q_ps_pouch_and_purse', {
+      questId: 'q_ps_pouch_and_purse',
+      counts: [0],
+      state: 'active',
+    });
+    sim.buyItem(finch.id, 'linen_pouch');
+    expect(meta.questLog.get('q_ps_pouch_and_purse')?.counts[0]).toBe(1);
+
+    sim.equipBag('linen_pouch');
+    expect(sim.countItem('linen_pouch'), 'the pouch left the bags for a socket').toBe(0);
+    expect(meta.bags.filter((b) => b === 'linen_pouch')).toHaveLength(1);
+    // Still complete: the ownership objective counts the worn copy.
+    expect(meta.questLog.get('q_ps_pouch_and_purse')?.counts[0]).toBe(1);
+    expect(sim.questState('q_ps_pouch_and_purse')).toBe('ready');
+
+    // Hand in at Maren: she pays, and the pouch stays buckled on.
+    const maren = [...sim.entities.values()].find(
+      (e) => e.kind === 'npc' && e.templateId === 'instructor_maren',
+    )!;
+    const p = sim.entities.get(sim.playerId)!;
+    p.pos.x = maren.pos.x + 1;
+    p.pos.z = maren.pos.z;
+    const before = meta.copper;
+    sim.turnInQuest('q_ps_pouch_and_purse');
+    expect(sim.questsDone.has('q_ps_pouch_and_purse')).toBe(true);
+    expect(meta.copper).toBe(before + 120);
+    expect(meta.bags.filter((b) => b === 'linen_pouch'), 'Maren kept her hands off it').toHaveLength(
+      1,
+    );
+  });
+
   it('ungated rows sell as before (the gate narrows nothing else)', () => {
     const sim = makeSim();
     const finch = standAtFinch(sim);

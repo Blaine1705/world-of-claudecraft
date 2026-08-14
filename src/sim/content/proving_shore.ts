@@ -227,7 +227,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     name: 'Strike True',
     giverNpcId: 'instructor_maren',
     turnInNpcId: 'instructor_maren',
-    text: 'Welcome to the Proving Shore, $N. Every lesson here starts the same way: feet set, blade in hand. The effigies stand on the practice yard southwest of camp, and they were built to be hit. If you cannot find the yard, press M to open the map: every task you carry is marked on it, so you never need to wander. Walk up to an effigy and press Tab, or left-click it, to make it your target, then press 1, or click the first icon on the action bar along the bottom of your screen, to swing. Keep striking until three of them give out. Their blows barely sting. The things beyond this shore hit far harder.',
+    text: 'Welcome to the Proving Shore, $N. Every lesson here starts the same way: feet set, blade in hand. The effigies stand on the practice yard southwest of camp, and they were built to be hit. If you cannot find the yard, press M to open the map: every task you carry is marked on it, so you never need to wander. Walk up to an effigy and press Tab, or left-click it, to make it your target, then press 1, or click the first icon on the action bar along the bottom of your screen, to swing. Keep striking until three of them give out. Their blows barely sting; the things beyond this shore hit far harder. When the third one falls, walk back here to me and press F to hand the task in and take your reward: that is how every quest in the world ends.',
     completionText:
       'Three down, and your grip already surer. Remember the feel of it, $N: target, strike, and keep striking. The vale wolves are faster than straw, but they fall to the same arithmetic.',
     objectives: [
@@ -270,7 +270,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     turnInNpcId: 'quartermaster_finch',
     text: 'A blade feeds you once, $N. A trade feeds you for life. Every adventurer works professions beside the sword: mining, logging, herb-picking, fishing, and the crafts that turn all of it into worth. Quartermaster Finch keeps the stall a few steps from my drill ground, and she has kept more of them than I have run drills. Walk up to her and press F, or left-click her, to talk: the same key that opens a crate opens a conversation.',
     completionText:
-      'So Maren finally sends me a student worth the breath. Listen once, $N: gathering starts with a tool, a pick, an axe, a sickle, a pole, all sold at the vale traders. Your crafts sit on a wheel: work the ones you love, and when you attune to a neighbouring pair, those two become your uncapped majors, one craft across the wheel stays your hobby, and the rest sleep until you take them up again. Nothing you learn is ever lost, and the craft masters in the towns offer attunement when you are ready.',
+      'So Maren finally sends me a student worth the breath. Listen once, $N: gathering starts with a tool, a pick, an axe, a sickle, a pole, all sold at the vale traders. Hold Shift and press P to open your professions book: that is your wheel, and it shows every craft you know and how far each has come. Work the ones you like, and when you attune to a neighbouring pair those two become your uncapped majors, one craft across the wheel stays your hobby, and the rest sleep with their knowledge kept. Nothing is ever lost, and nothing is final: a craft master sets your pair, and a craft master will change it later whenever you ask. You will find them in Eastbrook, Forgemistress Darva at the forge, Cook Marlow in the inn kitchens, Weaver Ottilie at the loom and Tinker Gizzel in the toolworks, with Tanner Hesk at the Fenbridge tannery and Alchemist Verane at the Highwatch apothecary.',
     objectives: [
       {
         type: 'interact',
@@ -304,6 +304,11 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     completionText:
       'A fine pouch, and six more slots to fill with trouble. Now the half of the lesson no bag can hold, $N: what you cannot carry, the Gilded Strongbox keeps. Bursar Wick at the desk behind me opens the same vault every bursar in every town shares, and more vault space can be bought once your purse grows into it. Keep your valuables banked and your bags roomy. A full pack has ended more adventures than any wolf ever did.',
     objectives: [{ type: 'collect', itemId: 'linen_pouch', count: 1, label: 'Linen Pouch bought' }],
+    // OWNERSHIP, not delivery (types.ts keepsCollectedItems): the quest tells
+    // the player to buckle the pouch on, so it must still count once worn in
+    // a bag socket, and Maren must not take back the bag she just taught them
+    // to wear.
+    keepsCollectedItems: true,
     xpReward: 0,
     copperReward: 120,
     itemRewards: {},
@@ -366,8 +371,10 @@ export const PROVING_SHORE_ITEMS: Record<string, ItemDef> = {
 // bit-identical.
 export const PROVING_SHORE_CAMPS: CampDef[] = [
   { mobId: 'training_effigy', center: { x: -336, z: -14 }, radius: 6, count: 3, offStream: true },
-  { mobId: 'shore_scuttler', center: { x: -286, z: -20 }, radius: 10, count: 4, offStream: true },
-  { mobId: 'shore_scuttler', center: { x: -308, z: -36 }, radius: 8, count: 3, offStream: true },
+  // Halved from 4 and 3: the wreck line is a looting lesson, and a crate
+  // ringed by crabs turned it into a fight the quest never asked for.
+  { mobId: 'shore_scuttler', center: { x: -286, z: -20 }, radius: 10, count: 2, offStream: true },
+  { mobId: 'shore_scuttler', center: { x: -308, z: -36 }, radius: 8, count: 2, offStream: true },
 ];
 
 export const PROVING_SHORE_OBJECTS: GroundObjectDef[] = [
@@ -405,10 +412,6 @@ export const PROVING_SHORE_PROPS: ZonePropsDef = {
   // Dawnrest Camp: a training camp, not a town. Tents around a muster fire,
   // the outfitter's stall, and a rail fence penning the practice yard.
   stalls: [{ x: -305, z: 55, rot: 0.8, r: 1.6 }],
-  crates: [
-    [-302, 56],
-    [-298, 50],
-  ],
   campfires: [
     [-300, 52], // the muster fire
     [-334, -10], // the practice yard's brazier
