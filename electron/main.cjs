@@ -97,6 +97,15 @@ const {
 const desktopPrefsPath = path.join(app.getPath('userData'), DESKTOP_PREFS_FILENAME);
 const desktopPrefs = loadDesktopPrefs(desktopPrefsPath);
 
+// No-boot escape hatch (documented in docs/desktop-release.md): setting
+// WOC_DISABLE_GPU_FORCE=1 in the environment skips BOTH discrete-GPU levers
+// for this launch, exactly like the stored opt-out, without touching the
+// stored preference. It exists for the machine the force prevents from
+// booting at all: the in-game toggle needs a boot to reach and the prefs-file
+// rescue needs a hand edit, an env var needs neither. Strict '1' so a stray
+// value cannot half-arm it.
+const gpuForceDisabledByEnv = process.env.WOC_DISABLE_GPU_FORCE === '1';
+
 // On a Linux hybrid-graphics laptop, the PRIME render-offload env vars (DRI_PRIME,
 // __NV_PRIME_RENDER_OFFLOAD, etc; see electron/gpu_preference.cjs) only reach the GPU
 // process if they are present in THIS process's environment from birth: Electron's Linux
@@ -111,7 +120,9 @@ const desktopPrefs = loadDesktopPrefs(desktopPrefsPath);
 // the prefs read above). Opting out means NOT CALLING this: the relaunch spawns a second
 // process and pins the X11 Ozone backend, both of which the opt-out exists to avoid, and
 // there is no gentler dial inside the function to reach for.
-if (desktopPrefs.gpuForceOptOut === true) {
+if (gpuForceDisabledByEnv) {
+  console.log('[gpu] WOC_DISABLE_GPU_FORCE=1: skipping the Linux PRIME relaunch');
+} else if (desktopPrefs.gpuForceOptOut === true) {
   console.log('[gpu] player opted out of the GPU force; skipping the Linux PRIME relaunch');
 } else if (relaunchForLinuxPrime({ log: console })) {
   // process.exit stops the main script before any statement below runs, so this
@@ -211,7 +222,9 @@ if (process.platform === 'linux' && process.env[PRIME_RELAUNCH_MARKER] === '1') 
 // every platform before its own win32 gates, so honoring the preference means skipping the
 // CALL, not adding a condition inside it. The value is read from the prefs file at launch,
 // so a mid-session toggle takes effect the next time the game starts.
-if (desktopPrefs.gpuForceOptOut === true) {
+if (gpuForceDisabledByEnv) {
+  log.info('[gpu] WOC_DISABLE_GPU_FORCE=1: no switches or per-app preference');
+} else if (desktopPrefs.gpuForceOptOut === true) {
   log.info('[gpu] player opted out of the discrete-GPU force; no switches or per-app preference');
 } else {
   forceHighPerformanceGpu({ app, log });

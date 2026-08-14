@@ -270,6 +270,34 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     expect(loadAt, 'the prefs read must precede the GPU force call').toBeLessThan(forceAt);
   });
 
+  it('arms the no-boot escape hatch before both GPU-force levers, strict and launch-only', () => {
+    // WOC_DISABLE_GPU_FORCE=1 is the recovery for a machine the force prevents
+    // from booting (docs/desktop-release.md): it must read the env exactly
+    // once with the strict '1' comparison (a truthy test would let any stray
+    // value disable the force), gate BOTH levers, and sit ahead of the stored
+    // opt-out arm so it works even when the prefs file is unreadable.
+    expect(
+      count(code, "process.env.WOC_DISABLE_GPU_FORCE === '1'"),
+      'expected exactly one strict env read for the escape hatch',
+    ).toBe(1);
+    expect(
+      count(code, 'if (gpuForceDisabledByEnv) {'),
+      'expected the hatch guard at both lever call sites',
+    ).toBe(2);
+    expect(
+      [
+        ...code.matchAll(
+          /if \(gpuForceDisabledByEnv\) \{\n[^\n]*\n\} else if \(desktopPrefs\.gpuForceOptOut === true\) \{/g,
+        ),
+      ].length,
+      'each hatch arm must lead its lever guard chain, ahead of the stored opt-out',
+    ).toBe(2);
+    expect(
+      code.indexOf("process.env.WOC_DISABLE_GPU_FORCE === '1'"),
+      'the hatch must be derived before its first lever use',
+    ).toBeLessThan(code.indexOf('if (gpuForceDisabledByEnv) {'));
+  });
+
   it('skips a GPU-force lever only when the stored opt-out is exactly true', () => {
     // Polarity, both sites: an inverted or truthy test would disable the force
     // for every player (the default record carries gpuForceOptOut: false) and

@@ -535,7 +535,11 @@ product exist. Coding and merge stay dark-safe without those credentials.
   `{"version":1,"gpuForceOptOut":true}` (or set just that field in the existing
   JSON), and relaunch; the next launch skips both GPU levers. The loader
   tolerates hand-edits, including a Windows editor's UTF-8 BOM; a corrupt or
-  deleted file resolves to defaults, which is force ON.
+  deleted file resolves to defaults, which is force ON. Faster one-launch
+  variant needing no file edit: start the game with `WOC_DISABLE_GPU_FORCE=1`
+  in the environment (strict `1`), which skips both levers for that launch
+  without touching the stored preference; use it to boot far enough to flip
+  the in-game toggle off for good.
 - V8 code cache: the app:// scheme registers `codeCache: true` (electron/main.cjs,
   pinned key by key in `tests/electron_scheme_privileges.test.ts`), so Chromium
   persists compiled bytecode for the bundled scripts under the per-user profile

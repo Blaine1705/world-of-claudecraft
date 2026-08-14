@@ -853,7 +853,7 @@ describe('main.cjs gpu wiring pin', () => {
     // itself is still top-level, and its polarity is pinned in
     // tests/electron_shell_startup.test.ts.
     expect(source).toMatch(
-      /^if \(desktopPrefs\.gpuForceOptOut === true\) \{\n[^\n]*\n\} else \{\n {2}forceHighPerformanceGpu\(\{ app, log \}\);\n\}/m,
+      /^if \(gpuForceDisabledByEnv\) \{\n[^\n]*\n\} else if \(desktopPrefs\.gpuForceOptOut === true\) \{\n[^\n]*\n\} else \{\n {2}forceHighPerformanceGpu\(\{ app, log \}\);\n\}/m,
     );
     const callAt = source.indexOf('forceHighPerformanceGpu({ app, log });');
     const readyAt = source.indexOf('app.whenReady()');
