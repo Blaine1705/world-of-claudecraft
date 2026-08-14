@@ -17,8 +17,10 @@ const read = (rel: string) => readFileSync(join(repoRoot, rel), 'utf8');
 const stripComments = (source: string): string =>
   source.replace(/(^|[^:])\/\/[^\n]*/gm, '$1').replace(/\/\*[\s\S]*?\*\//g, '');
 
-const preload = read('electron/preload.cjs');
-const mainSide = read('electron/main.cjs') + read('electron/updater.cjs');
+// Stripped at the shared constants too, so EVERY substring pin in this suite
+// (not just the discord slices) refuses a commented-out line.
+const preload = stripComments(read('electron/preload.cjs'));
+const mainSide = stripComments(read('electron/main.cjs') + read('electron/updater.cjs'));
 
 const matches = (source: string, re: RegExp): Set<string> => {
   const found = new Set<string>();
