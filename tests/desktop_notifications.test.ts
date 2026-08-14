@@ -92,7 +92,7 @@ afterEach(() => {
 });
 
 describe('createDesktopNotifyCore party invites', () => {
-  it('fires for an event with no pid at all (the offline-events case)', () => {
+  it('fires for an event with no pid at all (shape robustness: every real emission stamps one)', () => {
     const core = createDesktopNotifyCore();
     expect(core.partyInvite(inviteEvent({ fromName: 'Ayla' }), LOCAL_PID)).toEqual({
       name: 'Ayla',
@@ -171,6 +171,26 @@ describe('createDesktopNotifyCore update readiness', () => {
     expect(core.updateReady('downloading', readyState('0.38.0'))).toEqual({ version: '0.38.0' });
     expect(core.updateReady('downloading', readyState('0.39.0'))).toEqual({ version: '0.39.0' });
   });
+
+  it("fires exactly once for a ready state whose version is empty (a versionless 'downloaded')", () => {
+    // The stated reason lastNotifiedVersion starts as null, not '': an update
+    // event that never carried a version folds to version '' and still
+    // deserves its one notification instead of colliding with the initial.
+    const core = createDesktopNotifyCore();
+    expect(core.updateReady('downloading', readyState(''))).toEqual({ version: '' });
+    expect(core.updateReady('downloading', readyState(''))).toBeNull();
+  });
+
+  it('stays quiet for a newer version while the card is already ready', () => {
+    // Documented consequence, accepted at phase 9 QA: a second update version
+    // superseding an already-ready card re-surfaces the card silently but
+    // never re-notifies, because prevMode is 'ready' for every later event in
+    // the session's fold and the player's pending action (restart) is the
+    // same either way.
+    const core = createDesktopNotifyCore();
+    expect(core.updateReady('downloading', readyState('0.38.0'))).toEqual({ version: '0.38.0' });
+    expect(core.updateReady('ready', readyState('0.39.0'))).toBeNull();
+  });
 });
 
 describe('initDesktopNotifications update trigger', () => {
@@ -211,6 +231,32 @@ describe('initDesktopNotifications update trigger', () => {
     fire({ type: 'downloaded', version: '0.38.0' });
     desktopNotifyOnSimEvents([inviteEvent({ fromName: 'Ayla' })], LOCAL_PID);
     expect(sent).toEqual([]);
+  });
+
+  it('keeps party invites working on a shell with notifications but no updater events', () => {
+    // The older-shell split: showNotification exists, onUpdateEvent does not.
+    // Arming happens before the update feature-check returns, so the invite
+    // path must stay live while the update trigger is silently absent.
+    const { sent, fire } = boot({ onUpdateEvent: false });
+    setPlayer({ hidden: true, focused: false });
+    expect(() => fire({ type: 'downloaded', version: '0.38.0' })).not.toThrow();
+    desktopNotifyOnSimEvents([inviteEvent({ pid: LOCAL_PID, fromName: 'Ayla' })], LOCAL_PID);
+    expect(sent).toEqual([
+      { kind: 'party-invite', title: 'Party invite', body: 'Ayla invited you to a party.' },
+    ]);
+  });
+
+  it('posts nothing for a second version that lands while the card is already ready', () => {
+    // 'ready' is terminal in the fold for a session (the premise the
+    // away-gate ordering adjudication rests on): the second downloaded event
+    // finds prevMode 'ready' and stays silent, while the card itself shows
+    // the newer version.
+    const { sent, fire } = boot();
+    setPlayer({ hidden: true, focused: false });
+    fire({ type: 'downloaded', version: '0.38.0' });
+    expect(sent).toHaveLength(1);
+    fire({ type: 'downloaded', version: '0.39.0' });
+    expect(sent).toHaveLength(1);
   });
 });
 

@@ -82,6 +82,22 @@ describe('notification rate limit (electron/notify_guard.cjs)', () => {
     expect(rig.guard.allow(null)).toBe(false);
     expect(rig.guard.allow(undefined)).toBe(false);
     expect(rig.guard.allow({ kind: 'update-ready' })).toBe(false);
+    // No cross-effect: a real kind still gets its first window immediately
+    // after the junk refusals, which fails if any of them stamped anything.
+    expect(rig.guard.allow('update-ready')).toBe(true);
+  });
+
+  it('refuses while an injected clock runs backwards past a stamp (fail-safe, not fail-open)', () => {
+    // A large backwards step (NTP correction, resume weirdness) makes the
+    // delta negative, which reads as inside the window: the kind stays muted
+    // until the clock re-passes its stamp. For a best-effort surface the safe
+    // failure is silence, never a burst; this pins that choice.
+    const rig = createRig();
+    expect(rig.guard.allow('update-ready')).toBe(true);
+    rig.state.now -= NOTIFY_MIN_INTERVAL_MS * 5;
+    expect(rig.guard.allow('update-ready')).toBe(false);
+    rig.state.now += NOTIFY_MIN_INTERVAL_MS * 6;
+    expect(rig.guard.allow('update-ready')).toBe(true);
   });
 
   it('refuses a non-positive, non-finite or non-numeric interval at construction', () => {

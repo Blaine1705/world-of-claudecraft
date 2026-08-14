@@ -27,7 +27,10 @@ export function initDesktopShellIntegration(): void {
   // replay, so a change arriving before the subscription exists is simply lost.
   initDesktopDisplayChange(bridge);
   initDesktopPresentation(bridge);
-  // Last: its away-gate reads the presentation latch, which must be subscribed
-  // before the first notification decision can be made.
+  // Last, so the reading order mirrors the data flow: its away-gate reads the
+  // presentation latch initDesktopPresentation subscribes above. The position
+  // is defensive rather than load-bearing: every init here runs synchronously
+  // in one task, and notification decisions only happen inside later bridge
+  // callbacks and frame scans.
   initDesktopNotifications(bridge);
 }

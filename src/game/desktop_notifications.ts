@@ -41,8 +41,10 @@ export function createDesktopNotifyCore(): DesktopNotifyCore {
       if (event.type !== 'partyInvite') return null;
       // The hud's per-event addressing gate, mirrored exactly (see the
       // `ev.pid !== undefined && ev.pid !== sim.playerId` skip in
-      // src/ui/hud.ts handleEvents): an offline event carries no pid and is
-      // always local, an online one is addressed to a single player.
+      // src/ui/hud.ts handleEvents). Every real emission stamps a pid
+      // (src/sim/social/party.ts): offline it equals the local player's id,
+      // online the server routes each event to its addressee. The undefined
+      // arm is shape robustness, not the offline case.
       if (event.pid !== undefined && event.pid !== localPid) return null;
       return { name: event.fromName };
     },
