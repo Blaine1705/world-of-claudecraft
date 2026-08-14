@@ -17,7 +17,12 @@ fs.mkdirSync('tmp', { recursive: true });
 const browser = await puppeteer.launch({
   executablePath: EDGE,
   headless: 'new',
-  protocolTimeout: 60000,
+  // A single CDP call has to survive a cold dev server: the first evaluate
+  // after an i18n or wiki regen lands while Vite is still transforming the
+  // module graph on the page's own main thread, which outran the 60s this
+  // used to allow. The per-step waits below stay tight, so this only raises
+  // the ceiling on how long one call may block, never how long a check waits.
+  protocolTimeout: 240_000,
   args: [
     '--no-sandbox',
     '--disable-setuid-sandbox',
