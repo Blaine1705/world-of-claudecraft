@@ -25,6 +25,7 @@ const SESSION_START_SEC = 1_700_000_000;
 
 const snapshot = (over: Partial<DiscordPresenceSnapshot> = {}): DiscordPresenceSnapshot => ({
   enabled: true,
+  inWorld: true,
   zoneId: 'zone_a',
   zoneName: 'Zone A',
   sessionStartSec: SESSION_START_SEC,
@@ -132,6 +133,41 @@ describe('createDiscordPresenceCore: the coalescer', () => {
       kind: 'set',
       activity: { details: 'Zone A', timestamps: { start: SESSION_START_SEC } },
     });
+  });
+
+  it('clears once when the world goes away after a publish, then stays quiet', () => {
+    // Without this arm a logged-out session would keep the last zone (and a
+    // ticking session clock) on the profile for as long as the app ran.
+    const core = createDiscordPresenceCore();
+    core.update(0, snapshot());
+    expect(core.update(1_000, snapshot({ inWorld: false, zoneId: null, zoneName: null }))).toEqual({
+      kind: 'clear',
+    });
+    expect(
+      core.update(2_000, snapshot({ inWorld: false, zoneId: null, zoneName: null })),
+    ).toBeNull();
+    expect(
+      core.update(60_000, snapshot({ inWorld: false, zoneId: null, zoneName: null })),
+    ).toBeNull();
+  });
+
+  it('owes no clear when nothing was published before the world went away', () => {
+    // The online pre-snapshot window: the placeholder player must neither
+    // publish nor clear (there is nothing of ours on the socket to clear).
+    const core = createDiscordPresenceCore();
+    expect(core.update(0, snapshot({ inWorld: false, zoneId: null, zoneName: null }))).toBeNull();
+    // and entering the world afterwards publishes normally
+    expect(core.update(1_000, snapshot())).toMatchObject({ kind: 'set' });
+  });
+
+  it('republishes the same zone after a world exit and re-entry', () => {
+    const core = createDiscordPresenceCore({ intervalMs: 2_000 });
+    core.update(0, snapshot());
+    expect(core.update(500, snapshot({ inWorld: false, zoneId: null, zoneName: null }))).toEqual({
+      kind: 'clear',
+    });
+    // Same zone as before: without the forget, the dedup would sit silent.
+    expect(core.update(2_000, snapshot())).toMatchObject({ kind: 'set' });
   });
 
   it('publishes nothing for an unknown zone, and leaves the dedup memory alone', () => {
@@ -276,12 +312,49 @@ describe('initDiscordPresence + desktopPresenceOnFrame', () => {
     expect(ZONE_A.id).not.toBe(ZONE_B.id);
   });
 
+  it('clears once at init: a reload leaves the shell holding the last page presence', () => {
+    // The leave-world path is the options-menu logout, a location.reload():
+    // the shell process outlives the page with the old zone still published,
+    // so the NEXT page's init owes one reconciliation clear.
+    const { bridge, setDiscordActivity } = makeBridge();
+    initDiscordPresence(bridge);
+    expect(setDiscordActivity.mock.calls).toEqual([[null]]);
+    // and an incapable shell gets no boot clear (nothing is armed at all)
+    const half = vi.fn();
+    initDiscordPresence({ setDiscordActivity: half } as unknown as DesktopBridge);
+    expect(half).not.toHaveBeenCalled();
+  });
+
+  it('clears when the fed world loses its player, once, and republishes on re-entry', () => {
+    const { bridge, setDiscordActivity } = makeBridge();
+    initDiscordPresence(bridge);
+    desktopPresenceOnFrame(world(0, 0));
+    expect(setDiscordActivity).toHaveBeenCalledTimes(2);
+    // Back at a world-less screen: the frame feed now carries the placeholder
+    // shape, and the published zone (with its ticking clock) must come down.
+    clock += 2_000;
+    desktopPresenceOnFrame(world(0, 0, -1));
+    expect(setDiscordActivity).toHaveBeenCalledTimes(3);
+    expect(setDiscordActivity).toHaveBeenLastCalledWith(null);
+    clock += 2_000;
+    desktopPresenceOnFrame(world(0, 0, -1));
+    expect(setDiscordActivity).toHaveBeenCalledTimes(3);
+    // Re-entering the SAME zone republishes once the window allows.
+    clock += 20_000;
+    desktopPresenceOnFrame(world(0, 0));
+    expect(setDiscordActivity).toHaveBeenCalledTimes(4);
+    expect((setDiscordActivity.mock.calls[3][0] as DesktopDiscordActivity).details).toBe(
+      zoneDisplayName(ZONE_A.id),
+    );
+  });
+
   it('publishes the localized zone name and the session clock on the first frame', () => {
     const { bridge, setDiscordActivity } = makeBridge();
     initDiscordPresence(bridge);
     desktopPresenceOnFrame(world(0, 0));
-    expect(setDiscordActivity).toHaveBeenCalledTimes(1);
-    const activity = setDiscordActivity.mock.calls[0][0] as DesktopDiscordActivity;
+    // Call 0 is the boot reconciliation clear; call 1 is the first publish.
+    expect(setDiscordActivity).toHaveBeenCalledTimes(2);
+    const activity = setDiscordActivity.mock.calls[1][0] as DesktopDiscordActivity;
     expect(activity.details).toBe(zoneDisplayName(ZONE_A.id));
     // and it is the display name, never the raw content id
     expect(activity.details).not.toBe(ZONE_A.id);
@@ -295,34 +368,38 @@ describe('initDiscordPresence + desktopPresenceOnFrame', () => {
     expect(setDiscordActivity).not.toHaveBeenCalled();
   });
 
-  it('polls at most once per second, whatever the frame rate', () => {
+  it('polls at most once per second, at exactly the 1000ms boundary', () => {
     const { bridge, setDiscordActivity } = makeBridge();
     initDiscordPresence(bridge);
     desktopPresenceOnFrame(world(0, 0));
-    expect(setDiscordActivity).toHaveBeenCalledTimes(1);
+    expect(setDiscordActivity).toHaveBeenCalledTimes(2);
 
-    // A disable 100ms later: a clear is NOT rate limited by the core, so the
-    // only thing that can swallow it is the per-second frame throttle.
+    // A disable inside the window: a clear is NOT rate limited by the core, so
+    // the only thing that can swallow it is the per-second frame throttle. At
+    // 999ms the frame is skipped; at 1000 it is processed: the boundary pins
+    // POLL_INTERVAL_MS itself (a lowered constant would clear at 999).
     pushDiscordPresenceEnabled(bridge, false);
-    clock += 100;
-    desktopPresenceOnFrame(world(0, 0));
-    expect(setDiscordActivity).toHaveBeenCalledTimes(1);
-
-    clock += 1_000;
+    clock += 999;
     desktopPresenceOnFrame(world(0, 0));
     expect(setDiscordActivity).toHaveBeenCalledTimes(2);
+
+    clock += 1;
+    desktopPresenceOnFrame(world(0, 0));
+    expect(setDiscordActivity).toHaveBeenCalledTimes(3);
     expect(setDiscordActivity).toHaveBeenLastCalledWith(null);
   });
 
-  it('clears exactly once while the setting stays off', () => {
+  it('clears on the disable transition and then stays quiet while off', () => {
     const { bridge, setDiscordActivity } = makeBridge();
     new Settings().set('discordPresence', false);
     initDiscordPresence(bridge);
     desktopPresenceOnFrame(world(0, 0));
-    expect(setDiscordActivity.mock.calls).toEqual([[null]]);
+    // The boot reconciliation clear plus the core's first-disabled-poll clear;
+    // what matters is that polling while off never keeps clearing.
+    expect(setDiscordActivity.mock.calls).toEqual([[null], [null]]);
     clock += 30_000;
     desktopPresenceOnFrame(world(0, 0));
-    expect(setDiscordActivity.mock.calls).toEqual([[null]]);
+    expect(setDiscordActivity.mock.calls).toEqual([[null], [null]]);
   });
 
   it('reconciles the shell with the stored choice once at init, both polarities', () => {
@@ -364,7 +441,7 @@ describe('initDiscordPresence + desktopPresenceOnFrame', () => {
     const { bridge, setDiscordActivity } = makeBridge();
     initDiscordPresence(bridge);
     desktopPresenceOnFrame(world(0, 0));
-    expect(setDiscordActivity).toHaveBeenCalledTimes(1);
+    expect(setDiscordActivity).toHaveBeenCalledTimes(2);
     settingsReads = 0;
 
     // The push is the cache refresh: the poll must see the new value without
@@ -379,8 +456,8 @@ describe('initDiscordPresence + desktopPresenceOnFrame', () => {
     pushDiscordPresenceEnabled(bridge, true);
     clock += 20_000;
     desktopPresenceOnFrame(world(0, 0));
-    expect(setDiscordActivity).toHaveBeenCalledTimes(3);
-    expect((setDiscordActivity.mock.calls[2][0] as DesktopDiscordActivity).details).toBe(
+    expect(setDiscordActivity).toHaveBeenCalledTimes(4);
+    expect((setDiscordActivity.mock.calls[3][0] as DesktopDiscordActivity).details).toBe(
       zoneDisplayName(ZONE_A.id),
     );
     expect(settingsReads).toBe(0);
@@ -393,12 +470,14 @@ describe('initDiscordPresence + desktopPresenceOnFrame', () => {
     const { bridge, setDiscordActivity } = makeBridge();
     initDiscordPresence(bridge);
     desktopPresenceOnFrame(world(0, 0, -1));
-    expect(setDiscordActivity).not.toHaveBeenCalled();
+    // Only the boot clear: no ACTIVITY may be published for the placeholder,
+    // and there is nothing of ours on the socket for the placeholder to clear.
+    expect(setDiscordActivity.mock.calls).toEqual([[null]]);
 
     clock += 1_100;
     desktopPresenceOnFrame(world(0, 300, 7));
-    expect(setDiscordActivity).toHaveBeenCalledTimes(1);
-    expect((setDiscordActivity.mock.calls[0][0] as DesktopDiscordActivity).details).toBe(
+    expect(setDiscordActivity).toHaveBeenCalledTimes(2);
+    expect((setDiscordActivity.mock.calls[1][0] as DesktopDiscordActivity).details).toBe(
       zoneDisplayName(ZONE_B.id),
     );
   });
@@ -407,19 +486,19 @@ describe('initDiscordPresence + desktopPresenceOnFrame', () => {
     const { bridge, setDiscordActivity } = makeBridge();
     initDiscordPresence(bridge);
     desktopPresenceOnFrame(world(0, 0));
-    expect(setDiscordActivity).toHaveBeenCalledTimes(1);
+    expect(setDiscordActivity).toHaveBeenCalledTimes(2);
 
     // Inside the instance strip, at a z whose overworld band is the OTHER zone:
     // without the hold this frame would publish that zone instead.
     clock += 30_000;
     desktopPresenceOnFrame(world(DUNGEON_X_THRESHOLD + 100, 300));
-    expect(setDiscordActivity).toHaveBeenCalledTimes(1);
+    expect(setDiscordActivity).toHaveBeenCalledTimes(2);
 
     // Back outside, in that other zone: the feed resumes normally.
     clock += 30_000;
     desktopPresenceOnFrame(world(0, 300));
-    expect(setDiscordActivity).toHaveBeenCalledTimes(2);
-    expect((setDiscordActivity.mock.calls[1][0] as DesktopDiscordActivity).details).toBe(
+    expect(setDiscordActivity).toHaveBeenCalledTimes(3);
+    expect((setDiscordActivity.mock.calls[2][0] as DesktopDiscordActivity).details).toBe(
       zoneDisplayName(ZONE_B.id),
     );
   });
@@ -428,24 +507,24 @@ describe('initDiscordPresence + desktopPresenceOnFrame', () => {
     const first = makeBridge();
     initDiscordPresence(first.bridge);
     desktopPresenceOnFrame(world(0, 0));
-    expect(first.setDiscordActivity).toHaveBeenCalledTimes(1);
+    expect(first.setDiscordActivity).toHaveBeenCalledTimes(2);
 
     // An init on a shell that cannot serve presence disarms the feed, and the
     // previous session's bridge stops being written to.
     initDiscordPresence({} as DesktopBridge);
     clock += 60_000;
     desktopPresenceOnFrame(world(0, 300));
-    expect(first.setDiscordActivity).toHaveBeenCalledTimes(1);
+    expect(first.setDiscordActivity).toHaveBeenCalledTimes(2);
 
     const second = makeBridge();
     initDiscordPresence(second.bridge);
     desktopPresenceOnFrame(world(0, 0));
-    expect(second.setDiscordActivity).toHaveBeenCalledTimes(1);
-    expect(first.setDiscordActivity).toHaveBeenCalledTimes(1);
+    expect(second.setDiscordActivity).toHaveBeenCalledTimes(2);
+    expect(first.setDiscordActivity).toHaveBeenCalledTimes(2);
     // The elapsed clock is re-captured per session, never carried over: the
     // second session's start is its own init time.
     expect(
-      (second.setDiscordActivity.mock.calls[0][0] as DesktopDiscordActivity).timestamps,
+      (second.setDiscordActivity.mock.calls[1][0] as DesktopDiscordActivity).timestamps,
     ).toEqual({ start: Math.floor(clock / 1000) });
   });
 });

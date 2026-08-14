@@ -1070,7 +1070,10 @@ ipcMain.handle('desktop-show-notification', (event, payload) => {
 ipcMain.handle('desktop-set-discord-activity', (event, payload) => {
   if (!trustedSender(event)) return false;
   // Null is the CLEAR, and it is the one payload with nothing to validate: the
-  // renderer sends it when the player leaves the world or hides their presence.
+  // renderer sends it when the fed world loses its player, once at every page
+  // boot (the logout path is a location.reload(), so the NEXT page's
+  // reconciliation clear is what covers leaving the world that way), and when
+  // presence is disabled.
   if (payload === null) {
     discordPresence.setActivity(null);
     return true;

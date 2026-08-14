@@ -30,6 +30,10 @@ export interface DiscordPresenceWorld {
 
 export interface DiscordPresenceSnapshot {
   enabled: boolean;
+  /** False when the fed world has no real local player (the online
+   *  pre-snapshot placeholder, a session back out of the world): nothing may
+   *  STAY published there, so the core owes a clear for anything it set. */
+  inWorld: boolean;
   zoneId: string | null;
   zoneName: string | null;
   sessionStartSec: number;
@@ -110,6 +114,16 @@ export function createDiscordPresenceCore({
         return { kind: 'clear' };
       }
       live = true;
+      if (!snapshot.inWorld) {
+        // The world went away under the feed: a published zone would otherwise
+        // sit on the profile, clock ticking, for as long as the app stays
+        // open. Cleared once, and the dedup memory is forgotten so re-entering
+        // the same zone republishes. lastEmitAt survives, like the disable
+        // arm: the shell's own 15s send floor would drop an earlier resend.
+        if (lastPushedZoneId === null) return null;
+        lastPushedZoneId = null;
+        return { kind: 'clear' };
+      }
       if (snapshot.zoneId === null || snapshot.zoneName === null) return null;
       if (snapshot.zoneId === lastPushedZoneId) return null;
       if (nowMs - lastEmitAt < intervalMs) return null;
@@ -167,6 +181,13 @@ export function initDiscordPresence(bridge: DesktopBridge): void {
   // told "off" by a previous install). Without it the off switch would only
   // hold from the first toggle rather than from startup.
   pushDiscordPresenceEnabled(bridge, new Settings().get('discordPresence'));
+  // The one boot-time clear. The leave-world path is a location.reload() (the
+  // options-menu logout), so the shell process outlives the page while holding
+  // whatever the previous page published; a fresh page is not in any world, so
+  // its correct presence is nothing. On a shell with no connection this dials
+  // nothing (the manager only connects for a non-null activity), and on a live
+  // socket the clear rides the shell's own send floor.
+  publish(null);
   core = createDiscordPresenceCore();
 }
 
@@ -183,16 +204,23 @@ export function desktopPresenceOnFrame(world: DiscordPresenceWorld): void {
   lastPollAt = now;
   const p = world.player;
   // Online, ClientWorld.player answers blankEntity(-1) at the world origin until
-  // the first snapshot lands (src/net/online.ts). Publishing in that window puts
-  // every player in the starting zone, and the rate-limit window then swallows
-  // the real one for 15 seconds. Both hosts number real local players from 1 up
-  // (the offline Sim allocates from nextId = 1; online ids are server pids), so
-  // a non-positive id means "no player yet", never a real location.
-  if (p.id <= 0) return;
-  // Dungeons have no zone row (the instance strip sits past this x), so the
-  // presence HOLDS the region the player entered from: phase 10 is zone-only,
-  // and naming the instance is a separate design call.
-  if (p.pos.x <= DUNGEON_X_THRESHOLD) {
+  // the first snapshot lands (src/net/online.ts), and the same shape is what a
+  // session that LEFT the world feeds. Both hosts number real local players
+  // from 1 up (the offline Sim allocates from nextId = 1; online ids are server
+  // pids), so a non-positive id means "no player here", never a real location.
+  // The core is still polled on those frames, because it owes a clear when a
+  // zone was published before the world went away; publishing zoneAt(0,0) in
+  // the pre-snapshot window stays impossible because the zone is never
+  // resolved while out of the world.
+  const inWorld = p.id > 0;
+  if (!inWorld) {
+    // Forget the held zone so re-entry resolves it fresh.
+    zoneId = null;
+    zoneName = null;
+  } else if (p.pos.x <= DUNGEON_X_THRESHOLD) {
+    // Dungeons have no zone row (the instance strip sits past this x), so the
+    // presence HOLDS the region the player entered from: phase 10 is
+    // zone-only, and naming the instance is a separate design call.
     const id = zoneAt(p.pos.x, p.pos.z).id;
     if (id !== zoneId) {
       zoneId = id;
@@ -206,6 +234,7 @@ export function desktopPresenceOnFrame(world: DiscordPresenceWorld): void {
   }
   const command = core.update(now, {
     enabled: presenceEnabled,
+    inWorld,
     zoneId,
     zoneName,
     sessionStartSec,
