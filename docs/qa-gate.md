@@ -201,8 +201,11 @@ Since Phase 2 of the CI/CD performance packet, the
 API-fetched file listing that decides `code` (`scripts/lib/ci_test_select.mjs`), and each
 `pr-gate` shard builds its legs through `scripts/lib/ci_shard_plan.mjs` via
 `scripts/ci_shard_test.mjs`: in full mode, the old `npm test -- --shard=i/8` step minus
-the long-sims lane files (below); in selective mode, the always-run floor plus
-`vitest related` over the changed sources, both sharded.
+the long-sims lane files (below); in selective mode, ONE merged sharded `vitest related`
+leg over the changed sources plus the floor files as self-selecting seeds (vitest seeds
+its affected set with the given paths themselves; the property is pinned by execution in
+`tests/ci_shard_plan.test.ts`). The entry regenerates the generated artifacts once per
+job before spawning, since `npx vitest` has no npm lifecycle.
 
 **The long-sims lanes** (Phase 4; split in two by the lane-diet PR). The
 `CI_LONG_SUITES` files (`scripts/lib/ci_shard_plan.mjs`: the suites measured over 90
@@ -218,14 +221,14 @@ own wall clock is the slower HALF, not the whole list. Completeness is a pinned
 invariant, not an intention: each lane fails closed to its whole half on exactly the
 inputs that make a shard fail closed to full, the shard legs exclude exactly the files
 the two lanes own between them, and in selective mode each lane runs just its half's
-lane files the floor or the PR's diff would have carried (the related legs stay
+lane files the floor or the PR's diff would have carried (the merged leg's related side stays
 unfiltered, so a reached lane file re-runs there: duplicate work, never a gap). Mode for
 mode, the ten PR-tier test jobs together therefore run exactly what the pre-lane
 8-shard layout would have run (`tests/ci_shard_plan.test.ts` pins the partition;
 selective mode still skips the outside-floor remainder by design, exactly as before the
 lane). The latency win is concentrated in FULL mode: most lane files are
-graph-visible, so on a sim-heavy selective PR the `related` legs pull them back into a
-shard exactly as they did before the lane, and only the blind members (plus any lane
+graph-visible, so on a sim-heavy selective PR the merged leg's related side pulls them back into a
+shard exactly as the old related legs did before the lane, and only the blind members (plus any lane
 test the PR itself changed) ride the lanes.
 The lanes reproduce locally with
 `node scripts/ci_shard_test.mjs --lane=long-sims-a --plan-only` (and `-b`), printing the
@@ -310,8 +313,8 @@ rests on three structural facts, each pinned:
    mechanism: it floors the direct artifact-naming importers on every selective run,
    with witnesses floored SOLELY by it (`tests/i18n_lazy_loader.test.ts`,
    `tests/i18n_dialect_resolution.test.ts`) pinned in `tests/gate_select_plan.test.ts`.
-   Each `npm test` leg's pretest also regenerates the artifacts, so selected suites
-   always assert over fresh content.
+   The shard entry also regenerates the artifacts once per job before its legs run,
+   so selected suites always assert over fresh content.
 3. **Deletions and unprovable shapes widen.** The freshness diff cannot flag a
    deleted-then-regenerated file (regeneration recreates it UNTRACKED, and `git diff`
    never shows untracked files), so a removed or renamed-away artifact forces full in
