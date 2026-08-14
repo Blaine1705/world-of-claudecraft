@@ -724,6 +724,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // with the release branch's organized renderer imports. Both parents move
 // renderer.ts, so the rendererIntegration leaf mints a value matching neither
 // parent. No capture was retaken.
+// Re-minted for the night-lighting overhaul: the moon-phase grade threading
+// moves the rendererIntegration leaf, so this metadata authority sha follows the
+// swept evidence bytes. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   '37ce59f842ed8f6d0449f6fde8cdfe965dfda8392710abfefa552217a5e53eca';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =

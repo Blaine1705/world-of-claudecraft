@@ -295,8 +295,8 @@ export const MOON_HALO_SCALE = 118;
 
 /**
  * Where the moon's limb falls on the HALO sprite, as a fraction of the halo's
- * radius. The halo is drawn concentric with the face but two and a half times
- * wider, so the face only covers its inner third or so.
+ * radius. The halo is drawn concentric with the face but about 2.2 times wider,
+ * so the face covers a bit under half its radius (the limb sits at ~0.42).
  */
 export const MOON_LIMB_IN_HALO = (MOON_FACE_SCALE * (MOON_R / 128)) / MOON_HALO_SCALE;
 
