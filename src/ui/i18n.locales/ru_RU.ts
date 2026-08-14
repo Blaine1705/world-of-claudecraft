@@ -11805,7 +11805,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'auth.copyCode': 'Копировать код',
   'auth.importCode': 'Импорт',
   'auth.designCodeCopied': 'Код облика скопирован.',
-  'auth.designCodeCopyManual': 'Автоматическое копирование здесь недоступно. Код выделен, нажмите Ctrl+C.',
+  'auth.designCodeCopyManual': 'Автоматическое копирование здесь недоступно. Код выделен, скопируйте его с клавиатуры.',
   'auth.designCodeImported': 'Облик импортирован.',
   'auth.designCodeImportedPartial': 'Облик импортирован. Значения, неизвестные этой версии, были пропущены.',
   'auth.designCodeErrEmpty': 'Сначала вставьте код облика.',

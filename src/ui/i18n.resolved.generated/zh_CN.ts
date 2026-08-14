@@ -6656,7 +6656,7 @@ export const zh_CN: EnTranslations = {
     "copyCode": "复制代码",
     "importCode": "导入",
     "designCodeCopied": "外观代码已复制。",
-    "designCodeCopyManual": "此处无法自动复制。代码已选中，请按 Ctrl+C。",
+    "designCodeCopyManual": "此处无法自动复制。代码已选中，请使用键盘复制。",
     "designCodeImported": "造型已导入。",
     "designCodeImportedPartial": "造型已导入。此版本无法识别的数值已被跳过。",
     "designCodeErrEmpty": "请先粘贴外观代码。",

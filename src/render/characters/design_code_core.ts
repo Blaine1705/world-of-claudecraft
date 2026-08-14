@@ -102,7 +102,11 @@ function pickField(id: string, key: StylePick, options: readonly string[]): Desi
     encode: (a) => String(a[key]),
     apply: (draft, raw) => {
       const v = raw.trim().toLowerCase();
-      if (!/^[a-z][a-z0-9_-]*$/.test(v)) return false;
+      // Same charset as the wire's STYLE_ID_RE (src/world_api/appearance.ts):
+      // a value the server could never store must not parse here, and a value
+      // the wire would accept (a leading digit included) must never turn the
+      // whole paste into "malformed", it just coerces that one field.
+      if (!/^[a-z0-9_]{1,24}$/.test(v)) return false;
       (draft as Record<string, unknown>)[key] = v;
       return true;
     },
@@ -116,8 +120,13 @@ function colorField(id: string, [hueKey, satKey, lightKey]: ColorTriple): Design
     encode: (a) =>
       `${fmt(a[hueKey] as number)}/${fmt((a[satKey] as number) * 100)}/${fmt((a[lightKey] as number) * 100)}`,
     apply: (draft, raw) => {
-      const parts = raw.split('/').map((p) => Number(p.trim()));
-      if (parts.length !== 3 || parts.some((n) => !Number.isFinite(n))) return false;
+      // An empty component is rejected, not read as zero: Number('') is 0,
+      // which would silently import a truncated `27//68` as saturation 0 and
+      // in-range zeroes never show up in `coerced`. Damage stays loud.
+      const texts = raw.split('/').map((p) => p.trim());
+      if (texts.length !== 3 || texts.some((p) => p === '')) return false;
+      const parts = texts.map(Number);
+      if (parts.some((n) => !Number.isFinite(n))) return false;
       const d = draft as Record<string, unknown>;
       d[hueKey] = parts[0];
       d[satKey] = parts[1] / 100;

@@ -6656,7 +6656,7 @@ export const ru_RU: EnTranslations = {
     "copyCode": "Копировать код",
     "importCode": "Импорт",
     "designCodeCopied": "Код облика скопирован.",
-    "designCodeCopyManual": "Автоматическое копирование здесь недоступно. Код выделен, нажмите Ctrl+C.",
+    "designCodeCopyManual": "Автоматическое копирование здесь недоступно. Код выделен, скопируйте его с клавиатуры.",
     "designCodeImported": "Облик импортирован.",
     "designCodeImportedPartial": "Облик импортирован. Значения, неизвестные этой версии, были пропущены.",
     "designCodeErrEmpty": "Сначала вставьте код облика.",

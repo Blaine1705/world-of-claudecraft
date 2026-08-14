@@ -11128,7 +11128,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'auth.copyCode': '复制代码',
   'auth.importCode': '导入',
   'auth.designCodeCopied': '外观代码已复制。',
-  'auth.designCodeCopyManual': '此处无法自动复制。代码已选中，请按 Ctrl+C。',
+  'auth.designCodeCopyManual': '此处无法自动复制。代码已选中，请使用键盘复制。',
   'auth.designCodeImported': '造型已导入。',
   'auth.designCodeImportedPartial': '造型已导入。此版本无法识别的数值已被跳过。',
   'auth.designCodeErrEmpty': '请先粘贴外观代码。',

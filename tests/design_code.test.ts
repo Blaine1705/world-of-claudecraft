@@ -8,11 +8,23 @@ import {
   encodeDesignCode,
 } from '../src/render/characters/design_code_core';
 import {
+  BEARD_STYLES,
+  BLUSH_SHADES,
+  BROW_STYLES,
   DEFAULT_APPEARANCE,
+  EAR_STYLES,
+  EARRING_MATERIAL_IDS,
+  EARRING_STYLES,
+  EYE_STYLES,
   FACE_SLIDERS,
+  HAIR_STYLES,
+  LIP_SHADES,
+  MOUTH_STYLES,
   type ModularAppearance,
   normalizeAppearance,
+  OUTFIT_COLORWAY_IDS,
   randomizeAppearance,
+  SHADOW_SHADES,
 } from '../src/render/characters/modular';
 
 /** Deterministic LCG so the randomized round trip is reproducible. */
@@ -67,6 +79,68 @@ describe('design code field registry', () => {
     expect(code).toContain('body=male');
     expect(code).toContain('hair=crew');
     expect(code).toContain('skin=27/46/68');
+  });
+});
+
+describe('design code drift guard', () => {
+  // Which catalog list backs each string-valued appearance field. A NEW
+  // string field lands here (and in DESIGN_FIELDS) or this guard reds.
+  const ALT_STYLE: Partial<Record<keyof ModularAppearance, readonly string[]>> = {
+    hair: HAIR_STYLES,
+    beard: BEARD_STYLES,
+    brows: BROW_STYLES,
+    earrings: EARRING_STYLES,
+    earringMaterial: EARRING_MATERIAL_IDS,
+    mouth: MOUTH_STYLES,
+    eyeShape: EYE_STYLES,
+    ears: EAR_STYLES,
+    lipstick: LIP_SHADES,
+    blush: BLUSH_SHADES,
+    eyeshadow: SHADOW_SHADES,
+    outfit: OUTFIT_COLORWAY_IDS,
+  };
+
+  it('round-trips a non-default value for EVERY appearance field except body', () => {
+    // The both-ways guard the id pin alone cannot be: mutate each model
+    // field in turn and prove the mutation survives encode -> decode. A
+    // field added to ModularAppearance without a DESIGN_FIELDS entry decodes
+    // back to its default here and fails, instead of silently never
+    // exporting (the shape of tests/appearance_wire_bounds.test.ts).
+    const d = normalizeAppearance(DEFAULT_APPEARANCE);
+    for (const key of Object.keys(d) as (keyof ModularAppearance)[]) {
+      if (key === 'body') continue; // Fit Studio data, deliberately not in the code
+      const current = d[key];
+      let mutated: ModularAppearance;
+      if (key === 'face') {
+        mutated = { ...d, face: { ...d.face, nose: 0.4 } };
+      } else if (typeof current === 'boolean') {
+        mutated = { ...d, [key]: !current };
+      } else if (typeof current === 'number') {
+        const next = key.endsWith('Hue') ? (current + 40) % 360 : current === 0.33 ? 0.44 : 0.33;
+        mutated = { ...d, [key]: next };
+      } else if (key === 'gender') {
+        mutated = { ...d, gender: d.gender === 'male' ? 'female' : 'male' };
+      } else {
+        const alts = ALT_STYLE[key];
+        expect(
+          alts,
+          `no mutation known for '${key}': give it a DESIGN_FIELDS codec and an ALT_STYLE row`,
+        ).toBeDefined();
+        mutated = { ...d, [key]: alts?.find((o) => o !== current) };
+      }
+      mutated = normalizeAppearance(mutated);
+      const r = decodeDesignCode(encodeDesignCode(mutated));
+      if (!r.ok) throw new Error(`decode failed for mutated '${key}'`);
+      expect(r.coerced, key).toEqual([]);
+      const got = key === 'face' ? r.appearance.face.nose : r.appearance[key];
+      const want = key === 'face' ? 0.4 : mutated[key];
+      if (typeof want === 'number') {
+        const eps = key.endsWith('Hue') ? 0.05 : 0.005;
+        expect(Math.abs((got as number) - want), key).toBeLessThanOrEqual(eps);
+      } else {
+        expect(got, key).toBe(want);
+      }
+    }
   });
 });
 
@@ -132,6 +206,28 @@ describe('design code round trip', () => {
     }
   });
 
+  it('round-trips the finishing-pass fields the randomizer never moves', () => {
+    // randomizeAppearance pins the makeup rows to 'none' and never rolls the
+    // outfit, so the 25-look test above proves nothing about these five.
+    const app = normalizeAppearance({
+      ...DEFAULT_APPEARANCE,
+      outfit: 'crimson',
+      lipstick: 'ruby',
+      blush: 'peach',
+      eyeshadow: 'smoke',
+      earrings: 'hoop',
+      earringMaterial: 'jade',
+    });
+    const r = decodeOk(encodeDesignCode(app));
+    expect(r.appearance.outfit).toBe('crimson');
+    expect(r.appearance.lipstick).toBe('ruby');
+    expect(r.appearance.blush).toBe('peach');
+    expect(r.appearance.eyeshadow).toBe('smoke');
+    expect(r.appearance.earrings).toBe('hoop');
+    expect(r.appearance.earringMaterial).toBe('jade');
+    expect(r.coerced).toEqual([]);
+  });
+
   it('round-trips a sculpted face through named slider values', () => {
     const app = normalizeAppearance({
       ...DEFAULT_APPEARANCE,
@@ -191,6 +287,14 @@ describe('design code import tolerance', () => {
     expect(r.appearance.hair).toBe(DEFAULT_APPEARANCE.hair);
   });
 
+  it('treats a wire-legal but unknown id (leading digit) as coercion, not damage', () => {
+    // the value charset matches the wire's STYLE_ID_RE: what the server
+    // could store must never turn the whole paste into "malformed"
+    const r = decodeOk('WOC1; hair=9lives');
+    expect(r.coerced).toEqual(['hair']);
+    expect(r.appearance.hair).toBe(DEFAULT_APPEARANCE.hair);
+  });
+
   it('clamps and reports coercion for an out-of-range colour', () => {
     // skin lightness floor is 0.12; 5% is below it
     const r = decodeOk('WOC1; skin=27/46/5');
@@ -208,6 +312,10 @@ describe('design code failures', () => {
     ['WOC1; body', 'malformed'],
     ['WOC1; skin=1/2', 'malformed'],
     ['WOC1; skin=a/b/c', 'malformed'],
+    // a truncated component must not silently import as zero
+    ['WOC1; skin=27//68', 'malformed'],
+    // off the wire charset (STYLE_ID_RE has no hyphen): damaged, not coerced
+    ['WOC1; hair=semi-bald', 'malformed'],
     ['WOC1; lashes=maybe', 'malformed'],
     ['WOC1; face=nose-40', 'malformed'],
   ] as const)('rejects %j with reason %s', (code, reason) => {

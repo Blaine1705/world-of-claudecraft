@@ -6656,7 +6656,7 @@ export const cs_CZ: EnTranslations = {
     "copyCode": "Copy code",
     "importCode": "Import",
     "designCodeCopied": "Design code copied.",
-    "designCodeCopyManual": "Automatic copy is blocked here. The code is selected, press Ctrl+C.",
+    "designCodeCopyManual": "Automatic copy is blocked here. The code is selected, copy it with your keyboard.",
     "designCodeImported": "Design imported.",
     "designCodeImportedPartial": "Design imported. Values this version does not know were skipped.",
     "designCodeErrEmpty": "Paste a design code first.",

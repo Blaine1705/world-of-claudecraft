@@ -6656,7 +6656,7 @@ export const ja_JP: EnTranslations = {
     "copyCode": "コードをコピー",
     "importCode": "インポート",
     "designCodeCopied": "デザインコードをコピーしました。",
-    "designCodeCopyManual": "ここでは自動コピーができません。コードは選択済みです。Ctrl+C を押してください。",
+    "designCodeCopyManual": "ここでは自動コピーができません。コードは選択済みです。キーボードでコピーしてください。",
     "designCodeImported": "デザインをインポートしました。",
     "designCodeImportedPartial": "デザインをインポートしました。このバージョンで認識できない値はスキップされました。",
     "designCodeErrEmpty": "まずデザインコードを貼り付けてください。",

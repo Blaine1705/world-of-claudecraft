@@ -6656,7 +6656,7 @@ export const ko_KR: EnTranslations = {
     "copyCode": "코드 복사",
     "importCode": "가져오기",
     "designCodeCopied": "디자인 코드가 복사되었습니다.",
-    "designCodeCopyManual": "여기서는 자동 복사가 차단되어 있습니다. 코드가 선택되어 있으니 Ctrl+C를 누르세요.",
+    "designCodeCopyManual": "여기서는 자동 복사가 차단되어 있습니다. 코드가 선택되어 있으니 키보드로 복사하세요.",
     "designCodeImported": "디자인을 가져왔습니다.",
     "designCodeImportedPartial": "디자인을 가져왔습니다. 이 버전에서 인식할 수 없는 값은 건너뛰었습니다.",
     "designCodeErrEmpty": "먼저 디자인 코드를 붙여넣으세요.",

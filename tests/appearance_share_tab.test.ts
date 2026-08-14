@@ -72,9 +72,75 @@ describe('creator share tab: export', () => {
     const m = mount();
     m.copyBtn.click();
     expect(document.activeElement).toBe(m.code);
-    expect(m.status.classList.contains('err')).toBe(true);
-    expect(m.status.textContent).not.toBe('');
+    // informational, not an error: the copy is one keystroke away
+    expect(m.status.classList.contains('err')).toBe(false);
+    expect(m.status.textContent).toBe(
+      'Automatic copy is blocked here. The code is selected, copy it with your keyboard.',
+    );
     m.destroy();
+  });
+
+  const withClipboard = (writeText: (text: string) => Promise<void>, run: () => Promise<void>) => {
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true,
+    });
+    return run().finally(() => {
+      // biome-ignore lint/performance/noDelete: restoring jsdom's clipboard-free default
+      delete (navigator as { clipboard?: unknown }).clipboard;
+    });
+  };
+
+  it('reports success through the async clipboard API and copies the mirrored code', async () => {
+    const copied: string[] = [];
+    await withClipboard(
+      (text) => {
+        copied.push(text);
+        return Promise.resolve();
+      },
+      async () => {
+        const m = mount();
+        m.copyBtn.click();
+        await new Promise((r) => setTimeout(r, 0));
+        expect(copied).toEqual([encodeDesignCode(DEFAULT_APPEARANCE)]);
+        expect(m.status.classList.contains('err')).toBe(false);
+        expect(m.status.textContent).toBe('Design code copied.');
+        m.destroy();
+      },
+    );
+  });
+
+  it('falls back to select-and-keystroke when the clipboard write is denied', async () => {
+    await withClipboard(
+      () => Promise.reject(new Error('denied')),
+      async () => {
+        const m = mount();
+        m.copyBtn.click();
+        await new Promise((r) => setTimeout(r, 0));
+        expect(document.activeElement).toBe(m.code);
+        expect(m.status.classList.contains('err')).toBe(false);
+        expect(m.status.textContent).not.toBe('');
+        m.destroy();
+      },
+    );
+  });
+
+  it('copies the live look when the box was emptied', async () => {
+    const copied: string[] = [];
+    await withClipboard(
+      (text) => {
+        copied.push(text);
+        return Promise.resolve();
+      },
+      async () => {
+        const m = mount();
+        m.code.value = '   ';
+        m.copyBtn.click();
+        await new Promise((r) => setTimeout(r, 0));
+        expect(copied).toEqual([encodeDesignCode(DEFAULT_APPEARANCE)]);
+        m.destroy();
+      },
+    );
   });
 });
 
@@ -119,6 +185,28 @@ describe('creator share tab: import', () => {
     expect(m.status.textContent).toBe(
       'Design imported. Values this version does not know were skipped.',
     );
+    m.destroy();
+  });
+
+  it('shows the partial notice when a value was coerced, not just when ignored', () => {
+    const m = mount();
+    m.code.value = 'WOC1; hair=notastyle';
+    m.importBtn.click();
+    expect(m.changed()?.hair).toBe(DEFAULT_APPEARANCE.hair);
+    expect(m.status.classList.contains('err')).toBe(false);
+    expect(m.status.textContent).toBe(
+      'Design imported. Values this version does not know were skipped.',
+    );
+    m.destroy();
+  });
+
+  it('asks for a code when the box is empty', () => {
+    const m = mount();
+    m.code.value = '   ';
+    m.importBtn.click();
+    expect(m.changed()).toBeNull();
+    expect(m.status.classList.contains('err')).toBe(true);
+    expect(m.status.textContent).toBe('Paste a design code first.');
     m.destroy();
   });
 

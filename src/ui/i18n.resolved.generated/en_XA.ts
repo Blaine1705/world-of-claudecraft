@@ -6656,7 +6656,7 @@ export const en_XA: EnTranslations = {
     "copyCode": "[Çóþý çóðé]",
     "importCode": "[Íɱþóŕţ]",
     "designCodeCopied": "[Ðéšíĝñ çóðé çóþíéð.]",
-    "designCodeCopyManual": "[Áúţóɱáţíç çóþý íš ƀļóçķéð ĥéŕé. Ţĥé çóðé íš šéļéçţéð, þŕéšš Çţŕļ+Ç.]",
+    "designCodeCopyManual": "[Áúţóɱáţíç çóþý íš ƀļóçķéð ĥéŕé. Ţĥé çóðé íš šéļéçţéð, çóþý íţ ŵíţĥ ýóúŕ ķéýƀóáŕð.]",
     "designCodeImported": "[Ðéšíĝñ íɱþóŕţéð.]",
     "designCodeImportedPartial": "[Ðéšíĝñ íɱþóŕţéð. Ʋáļúéš ţĥíš ʋéŕšíóñ ðóéš ñóţ ķñóŵ ŵéŕé šķíþþéð.]",
     "designCodeErrEmpty": "[Þášţé á ðéšíĝñ çóðé ƒíŕšţ.]",

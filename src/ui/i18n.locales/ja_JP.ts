@@ -11625,7 +11625,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'auth.copyCode': 'コードをコピー',
   'auth.importCode': 'インポート',
   'auth.designCodeCopied': 'デザインコードをコピーしました。',
-  'auth.designCodeCopyManual': 'ここでは自動コピーができません。コードは選択済みです。Ctrl+C を押してください。',
+  'auth.designCodeCopyManual': 'ここでは自動コピーができません。コードは選択済みです。キーボードでコピーしてください。',
   'auth.designCodeImported': 'デザインをインポートしました。',
   'auth.designCodeImportedPartial': 'デザインをインポートしました。このバージョンで認識できない値はスキップされました。',
   'auth.designCodeErrEmpty': 'まずデザインコードを貼り付けてください。',

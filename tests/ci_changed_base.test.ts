@@ -1,6 +1,22 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { resolveChangedBaseRef } from '../scripts/lib/ci_changed_base.mjs';
 import { buildBiomeArgs } from '../scripts/lib/ci_changed_biome_args.mjs';
+
+describe('ci_changed.mjs git spawns', () => {
+  // The injected-run suites below structurally cannot see the orchestrator's
+  // own spawn flags, and this one bit them once: with shell:true, cmd.exe
+  // eats the caret in the resolver's `ref^{commit}` probes, every base
+  // candidate "fails" to verify on Windows, and ci:changed exits before
+  // linting anything. git is a real executable; only the npx biome exec
+  // needs the .cmd shell shim.
+  it('spawns git with shell: false and keeps the shell for the biome exec', () => {
+    const src = readFileSync(resolve(process.cwd(), 'scripts/ci_changed.mjs'), 'utf8');
+    expect(src).toMatch(/spawnSync\(cmd, args, \{ encoding: 'utf8', shell: false,/);
+    expect(src).toMatch(/spawnSync\('npx', buildBiomeArgs\(since\), \{ stdio: 'inherit', shell \}/);
+  });
+});
 
 type Run = (cmd: string, args: string[]) => { status: number | null; stdout?: string };
 

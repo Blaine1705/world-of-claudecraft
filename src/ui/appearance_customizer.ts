@@ -1,6 +1,6 @@
 // Character-creation appearance customizer for the modular character.
 //
-// A compact tabbed panel (Body / Face / Hair / Style) in the visual language of
+// A compact tabbed panel (Body / Face / Hair / Style / Share) in the visual language of
 // a AAA creator: stepper rows for the long style lists, centre-notched sliders
 // for the morph pairs, switches for the boolean views, swatch strips for makeup
 // and for the recolourable materials, each with an HSL wheel folded away behind
@@ -586,6 +586,9 @@ export function mountAppearanceCustomizer(
     }
     pagesHost.scrollTop = 0;
     if (focus) tabButtons[idx].focus();
+    // The Share box only re-encodes while its page is visible (see sync's
+    // hidden guard), so entering the tab is what refreshes it.
+    refreshShareCode();
   }
 
   function tabPage(labelKey: TranslationKey): HTMLElement {
@@ -1289,9 +1292,9 @@ export function mountAppearanceCustomizer(
   // replaces every changeable feature and KEEPS the body, the same contract
   // randomize and reset honor (body proportions are Fit Studio data).
   {
-    row(pShare, null, 'ac-r-full').appendChild(
-      el('div', 'ac-share-hint', t('auth.designCodeHint')),
-    );
+    const hint = el('div', 'ac-share-hint', t('auth.designCodeHint'));
+    hint.id = `${uid}-share-hint`;
+    row(pShare, null, 'ac-r-full').appendChild(hint);
 
     const code = el('textarea', 'ac-code');
     code.rows = 4;
@@ -1299,6 +1302,8 @@ export function mountAppearanceCustomizer(
     code.setAttribute('autocomplete', 'off');
     code.setAttribute('autocapitalize', 'off');
     code.setAttribute('aria-label', t('auth.designCode'));
+    // the visible instruction doubles as the box's description for AT
+    code.setAttribute('aria-describedby', hint.id);
     row(pShare, null, 'ac-r-full').appendChild(code);
 
     const btns = el('div', 'ac-share-btns');
@@ -1319,6 +1324,10 @@ export function mountAppearanceCustomizer(
     };
 
     const sync = () => {
+      // A hidden page does not re-encode: a slider drag emits per input
+      // event, and paying a 19-field serialize for a box nobody can see is
+      // waste. selectTab refreshes on entry, so the box is never stale.
+      if (pShare.hidden) return;
       // Never clobber a paste in progress: while the caret is in the box the
       // player owns it. Any other change re-mirrors the code and clears the
       // last action's status, so what the row says always tracks the look.
@@ -1326,9 +1335,10 @@ export function mountAppearanceCustomizer(
       code.value = encodeDesignCode(value);
       setStatus('', false);
     };
+    // emit() already runs this on every change, so it is deliberately NOT in
+    // `syncers` too: syncAll callers always emit right after, and a double
+    // registration would just encode the same look twice per action.
     refreshShareCode = sync;
-    syncers.push(sync);
-    sync();
 
     const ERR_LABEL: Record<DesignCodeError, TranslationKey> = {
       empty: 'auth.designCodeErrEmpty',
@@ -1344,7 +1354,8 @@ export function mountAppearanceCustomizer(
       const manual = () => {
         code.focus();
         code.select();
-        setStatus(t('auth.designCodeCopyManual'), true);
+        // informational, not an error: the copy is one keystroke away
+        setStatus(t('auth.designCodeCopyManual'), false);
       };
       const clip = navigator.clipboard;
       if (clip?.writeText) {

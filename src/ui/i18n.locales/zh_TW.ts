@@ -11131,7 +11131,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'auth.copyCode': '複製代碼',
   'auth.importCode': '匯入',
   'auth.designCodeCopied': '外觀代碼已複製。',
-  'auth.designCodeCopyManual': '此處無法自動複製。代碼已選取，請按 Ctrl+C。',
+  'auth.designCodeCopyManual': '此處無法自動複製。代碼已選取，請使用鍵盤複製。',
   'auth.designCodeImported': '造型已匯入。',
   'auth.designCodeImportedPartial': '造型已匯入。此版本無法識別的數值已被略過。',
   'auth.designCodeErrEmpty': '請先貼上外觀代碼。',
