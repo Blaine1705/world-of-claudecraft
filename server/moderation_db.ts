@@ -658,13 +658,19 @@ export async function muteAccountChat(input: {
  * meant instead of having to lift and re-apply.
  *
  * Validated here rather than at the route so the ceiling holds for every caller.
+ *
+ * Returns the budget the row now holds, read back by the UPDATE itself. Callers
+ * must use THAT rather than a follow-up SELECT: the unaudited save-path burn
+ * below is guarded only by `cheater_mark_seconds > 0`, so it can land between
+ * this COMMIT and any second read and hand the caller the OLD remaining while
+ * this write reported success.
  */
 export async function setAccountCheaterMark(input: {
   accountId: number;
   adminAccountId: number;
   reason: unknown;
   seconds: unknown;
-}): Promise<void> {
+}): Promise<number> {
   const reason = cleanText(input.reason, ACTION_REASON_MAX);
   if (!reason) throw new CheaterMarkRefused('reason_required');
   const seconds = normalizeCheaterMarkSeconds(input.seconds);
@@ -672,18 +678,35 @@ export async function setAccountCheaterMark(input: {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    await client.query(
+    const updated = await client.query<{ cheater_mark_seconds: number }>(
       `UPDATE accounts
        SET cheater_mark_seconds = $2, cheater_mark_reason = $3, cheater_mark_set_at = now()
-       WHERE id = $1`,
+       WHERE id = $1
+       RETURNING cheater_mark_seconds`,
       [input.accountId, seconds, reason],
     );
+    const stored = updated.rows[0]?.cheater_mark_seconds;
+    // Mirrors the lift arm's rowCount check, and for the same reason: an audit
+    // row saying an account was branded, written when the UPDATE matched
+    // nothing, is a false entry in a permanent record. Refusing BEFORE
+    // recordModerationAction is what keeps it out, since the throw rolls the
+    // transaction back.
+    //
+    // A mistyped or purged account id really does reach here from the admin
+    // route: requireAdminTarget only decodes the :id into a positive integer,
+    // and the operator-target guard's isAdminAccount read answers false for an
+    // id with no row. So this is a coded refusal an operator can act on, not an
+    // opaque 500.
+    if ((updated.rowCount ?? 0) === 0 || stored === undefined) {
+      throw new CheaterMarkRefused('no_account');
+    }
     await recordModerationAction(client, 'cheater_mark', {
       accountId: input.accountId,
       adminAccountId: input.adminAccountId,
       reason,
     });
     await client.query('COMMIT');
+    return normalizeCheaterMarkSeconds(stored);
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
     throw err;

@@ -4454,9 +4454,9 @@ export class GameServer {
       // one character's save would let an alt's stale snapshot resurrect a budget
       // another character already burned down.
       //
-      // The live aura is the source of truth, not meta.cheaterMark, because the
-      // aura is what ticks (see src/sim/moderation/CLAUDE.md). Its absence means
-      // the sanction is served, and burn(0) is what clears the account row.
+      // The live aura is the ONLY sim source of truth, because the aura is what
+      // ticks (see src/sim/moderation/CLAUDE.md). Its absence means the sanction
+      // is served, and burn(0) is what clears the account row.
       void persistCheaterMark(session, e?.auras);
       // Captured at serialize time: only unlocks already inside THIS blob may
       // publish when it lands. An unlock granted while the write is in flight

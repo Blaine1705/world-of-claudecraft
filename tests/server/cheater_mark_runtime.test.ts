@@ -139,6 +139,31 @@ describe('persistCheaterMark', () => {
     expect(served.cheaterMarked).toBe(false);
   });
 
+  it('skips the write entirely when there was no entity to read, keeping the latch', async () => {
+    // The call site passes `entities.get(pid)?.auras`, so a save that lands
+    // while the character is not in the sim hands this undefined. That is
+    // absence of EVIDENCE, not a served sanction: collapsing it onto the empty
+    // list above would zero a live budget off a read that never happened.
+    const offSim = session(41858, 7, true);
+    await persistCheaterMark(offSim, undefined);
+    expect(burnAccountCheaterMark).not.toHaveBeenCalled();
+    expect(offSim.cheaterMarked).toBe(true);
+  });
+
+  it('keeps the two absent-aura meanings distinct on the SAME session', async () => {
+    // Pinned together so a regression that re-merges the cases cannot pass by
+    // satisfying one of them: the undefined save writes nothing and holds the
+    // latch, and the very next save with a real (empty) list does the zeroing.
+    const marked = session(41858, 7, true);
+    await persistCheaterMark(marked, undefined);
+    expect(burnAccountCheaterMark).not.toHaveBeenCalled();
+    expect(marked.cheaterMarked).toBe(true);
+    await persistCheaterMark(marked, []);
+    expect(burnAccountCheaterMark).toHaveBeenCalledTimes(1);
+    expect(burnAccountCheaterMark).toHaveBeenCalledWith(41858, 0);
+    expect(marked.cheaterMarked).toBe(false);
+  });
+
   it('swallows a write-back failure instead of failing the save', async () => {
     const errorLog = vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.mocked(burnAccountCheaterMark).mockRejectedValue(new Error('pg down'));
@@ -147,6 +172,26 @@ describe('persistCheaterMark', () => {
       persistCheaterMark(marked, [{ id: CHEATER_MARK_AURA_ID, remaining: 60 }]),
     ).resolves.toBeUndefined();
     expect(errorLog).toHaveBeenCalled();
+    errorLog.mockRestore();
+  });
+
+  it('keeps the latch when the ZEROING write fails, so the next save retries it', async () => {
+    // The latch is what gates the write-back at all. Clearing it before the
+    // burn resolved meant one transient failure on the final write disabled
+    // every later save's write-back, and the next login restored a budget the
+    // player had already served.
+    const errorLog = vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.mocked(burnAccountCheaterMark).mockRejectedValueOnce(new Error('pg down'));
+    const served = session(41858, 7, true);
+
+    await persistCheaterMark(served, []);
+    expect(served.cheaterMarked).toBe(true);
+
+    // The retry on the next save succeeds, and only THEN does the latch release.
+    await persistCheaterMark(served, []);
+    expect(burnAccountCheaterMark).toHaveBeenCalledTimes(2);
+    expect(served.cheaterMarked).toBe(false);
+    expect(errorLog).toHaveBeenCalledTimes(1);
     errorLog.mockRestore();
   });
 });

@@ -26,6 +26,13 @@ export const CHEATER_MARK_REFUSALS = [
   'invalid_duration',
   // A lift was asked for on an account that is not wearing the tag.
   'not_marked',
+  // The write matched no account row. Reachable from the admin routes despite
+  // requireAdminTarget, which only decodes the :id into a positive integer and
+  // never resolves it, and despite the operator-target guard, whose
+  // isAdminAccount read answers false for an id that does not exist. So a
+  // mistyped or purged account id lands here, and it has to read as a precise
+  // operator-facing answer rather than an opaque 500.
+  'no_account',
 ] as const;
 export type CheaterMarkRefusal = (typeof CHEATER_MARK_REFUSALS)[number];
 
@@ -45,18 +52,27 @@ export class CheaterMarkRefused extends Error {
  * The HTTP status per refusal. `not_marked` is a 409 and not a 400: the request
  * was well formed and the operator's intent is unambiguous, the account simply is
  * not in a state that can be lifted (a double-clicked Lift button lands here).
+ * `no_account` is the 404 that says the target itself does not exist.
  */
 const REFUSAL_STATUS: Record<CheaterMarkRefusal, number> = {
   reason_required: 400,
   invalid_duration: 400,
   not_marked: 409,
+  no_account: 404,
 };
 
-/** The stable code per refusal (the client localizes `apiError.<code>`). */
+/**
+ * The stable code per refusal (the client localizes `apiError.<code>`).
+ *
+ * `no_account` deliberately reuses the repo-wide `account.not_found` rather than
+ * minting a `cheater_mark.*` twin: it is the same fact every other account route
+ * already reports, and the shared code is already mapped and translated.
+ */
 const REFUSAL_CODE: Record<CheaterMarkRefusal, ErrorCode> = {
   reason_required: 'cheater_mark.reason_required',
   invalid_duration: 'cheater_mark.invalid_duration',
   not_marked: 'cheater_mark.not_marked',
+  no_account: 'account.not_found',
 };
 
 /**

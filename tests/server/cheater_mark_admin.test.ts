@@ -9,8 +9,9 @@
 // pins:
 //  - the contract module: what each refusal maps to, and that a NON-refusal
 //    (a driver error) passes through untouched so it still becomes a 500;
-//  - the happy paths, including that the live push carries the STORED budget
-//    (moderation_db clamps it) rather than the number the operator typed;
+//  - the happy paths, including that the live push carries the budget the WRITE
+//    ITSELF returned (moderation_db clamps it) rather than the number the
+//    operator typed or a follow-up read a save-path burn could overtake;
 //  - the operator-target guard on BOTH arms;
 //  - the 422 shape gate, and the two real moderation_db refusals (a blank reason,
 //    a non-positive budget) reaching the wire as their codes;
@@ -149,8 +150,11 @@ describe('cheater mark contract (server/cheater_mark_api.ts)', () => {
       'cheater_mark.reason_required',
       'cheater_mark.invalid_duration',
       'cheater_mark.not_marked',
+      // Deliberately the shared account code, not a cheater_mark twin: the fact
+      // reported is the one every other account route already reports.
+      'account.not_found',
     ]);
-    expect(mapped.map((e) => e.status)).toEqual([400, 400, 409]);
+    expect(mapped.map((e) => e.status)).toEqual([400, 400, 409, 404]);
     expect(new Set(mapped.map((e) => e.code)).size).toBe(CHEATER_MARK_REFUSALS.length);
   });
 
@@ -182,15 +186,12 @@ describe('cheater mark contract (server/cheater_mark_api.ts)', () => {
 
 describe('POST /admin/api/moderation/accounts/:id/cheater-mark', () => {
   it('marks the account and pushes the STORED budget, not the requested one', async () => {
-    const setAccountCheaterMark = vi.fn(async () => {});
+    // moderation_db clamps to the ceiling, so what the write RETURNS is what the
+    // account owes; echoing the request would count a live session down from a
+    // number the row never held.
+    const setAccountCheaterMark = vi.fn(async () => CHEATER_MARK_MAX_SECONDS);
     const applyCheaterMarkLive = vi.fn();
-    // moderation_db clamps to the ceiling, so the read-back is what the account
-    // owes; echoing the request would count a live session down from a number the
-    // row never held.
-    authedAdminDb({
-      setAccountCheaterMark,
-      accountCheaterMarkSeconds: async () => CHEATER_MARK_MAX_SECONDS,
-    });
+    authedAdminDb({ setAccountCheaterMark });
     configureAdminRuntime({ applyCheaterMarkLive } as unknown as AdminRuntime);
 
     const res = await runRoute(MARK_PATH, {
@@ -207,8 +208,32 @@ describe('POST /admin/api/moderation/accounts/:id/cheater-mark', () => {
     expect(applyCheaterMarkLive).toHaveBeenCalledWith(TARGET_ACCOUNT_ID, CHEATER_MARK_MAX_SECONDS);
   });
 
+  it('pushes the value the WRITE returned, never a second read that a burn could overtake', async () => {
+    // Re-lengthening a live mark: the transaction stores 10800, but the account
+    // is online and burning down, so a follow-up SELECT can be overtaken by the
+    // save-path burn (guarded only by `cheater_mark_seconds > 0`) and answer
+    // with the OLD remaining. The operator's correction would then vanish while
+    // the API reported ok.
+    //
+    // The stale read is wired in as a NEGATIVE CONTROL: it is not a member of
+    // the real db bundle any more, and a handler that reaches for one again both
+    // calls it and pushes 42 instead of 10800, failing on two counts.
+    const RELENGTHENED = 10_800;
+    const staleReadAfterBurn = vi.fn(async () => 42);
+    const setAccountCheaterMark = vi.fn(async () => RELENGTHENED);
+    const applyCheaterMarkLive = vi.fn();
+    authedAdminDb({ setAccountCheaterMark, accountCheaterMarkSeconds: staleReadAfterBurn });
+    configureAdminRuntime({ applyCheaterMarkLive } as unknown as AdminRuntime);
+
+    const res = await runRoute(MARK_PATH, { body: { reason: REASON, seconds: RELENGTHENED } });
+
+    expect(res.status).toBe(200);
+    expect(applyCheaterMarkLive).toHaveBeenCalledWith(TARGET_ACCOUNT_ID, RELENGTHENED);
+    expect(staleReadAfterBurn).not.toHaveBeenCalled();
+  });
+
   it('refuses an operator target with cheater_mark.admin_target and never writes', async () => {
-    const setAccountCheaterMark = vi.fn(async () => {});
+    const setAccountCheaterMark = vi.fn(async () => 600);
     authedAdminDb({ setAccountCheaterMark });
     configureAdminRuntime({ applyCheaterMarkLive: vi.fn() } as unknown as AdminRuntime);
 
@@ -223,7 +248,7 @@ describe('POST /admin/api/moderation/accounts/:id/cheater-mark', () => {
   });
 
   it('422s a body missing the played-second budget before any write', async () => {
-    const setAccountCheaterMark = vi.fn(async () => {});
+    const setAccountCheaterMark = vi.fn(async () => 600);
     authedAdminDb({ setAccountCheaterMark });
     configureAdminRuntime({ applyCheaterMarkLive: vi.fn() } as unknown as AdminRuntime);
 
@@ -255,6 +280,26 @@ describe('POST /admin/api/moderation/accounts/:id/cheater-mark', () => {
 
     expect(res.status).toBe(400);
     expect(res.body).toEqual(adminError('cheater_mark.invalid_duration'));
+  });
+
+  it('404s a mistyped account id and does NOT push, since the route can reach one', async () => {
+    // requireAdminTarget only decodes the :id into a positive integer, and the
+    // operator-target guard's isAdminAccount answers false for an id with no
+    // row, so a typo lands in the write. The write refuses, the operator gets a
+    // fact they can act on, and nothing is pushed onto a live session.
+    const applyCheaterMarkLive = vi.fn();
+    authedAdminDb({
+      setAccountCheaterMark: async () => {
+        throw new CheaterMarkRefused('no_account');
+      },
+    });
+    configureAdminRuntime({ applyCheaterMarkLive } as unknown as AdminRuntime);
+
+    const res = await runRoute(MARK_PATH, { body: { reason: REASON, seconds: 600 } });
+
+    expect(res.status).toBe(404);
+    expect(res.body).toEqual(adminError('account.not_found'));
+    expect(applyCheaterMarkLive).not.toHaveBeenCalled();
   });
 
   it('surfaces an unexpected write failure as the coded 500, leaking no prose', async () => {
@@ -383,9 +428,8 @@ describe('the Cheater mark is cosmetic only (server side)', () => {
       emailSecurityIncident: vi.fn(async () => {}),
     };
     authedAdminDb({
-      setAccountCheaterMark: async () => {},
+      setAccountCheaterMark: async () => 600,
       liftAccountCheaterMark: async () => {},
-      accountCheaterMarkSeconds: async () => 600,
       ...restrictions,
     });
 
@@ -410,8 +454,7 @@ describe('the Cheater mark is cosmetic only (server side)', () => {
     const { calls, runtime } = recordingRuntime();
     const muteAccountChat = vi.fn(async () => {});
     authedAdminDb({
-      setAccountCheaterMark: async () => {},
-      accountCheaterMarkSeconds: async () => 600,
+      setAccountCheaterMark: async () => 600,
       muteAccountChat,
     });
     const route = routeFor(MARK_PATH);
