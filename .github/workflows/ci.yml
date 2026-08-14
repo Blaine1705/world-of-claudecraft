@@ -659,6 +659,11 @@ jobs:
           TEST_MODE: ${{ needs.changes.outputs.test_mode }}
           TEST_MODE_REASON: ${{ needs.changes.outputs.test_mode_reason }}
           CHANGED_FILES: ${{ needs.changes.outputs.changed_files }}
+          # Measured 3-worker trial (the entry validates the value and falls
+          # back to the half-cores default on junk; scripts/ci_shard_test.mjs
+          # carries the ruling this trial answers). Watch the per-test budget
+          # compliance, not just the walls: the budgets are calibrated at 2.
+          WOC_TEST_WORKERS: '3'
         run: node scripts/ci_shard_test.mjs --shard=${{ matrix.shard }}/8
 
   # The long-sims lanes (Phase 4 of the CI/CD performance packet; split into
@@ -810,6 +815,8 @@ jobs:
           TEST_MODE: ${{ needs.changes.outputs.test_mode }}
           TEST_MODE_REASON: ${{ needs.changes.outputs.test_mode_reason }}
           CHANGED_FILES: ${{ needs.changes.outputs.changed_files }}
+          # Same 3-worker trial as the shard step; see its note.
+          WOC_TEST_WORKERS: '3'
         run: node scripts/ci_shard_test.mjs --lane=long-sims-a
 
   # Second half of the long-sims lane pair; every design note sits on
@@ -891,6 +898,8 @@ jobs:
           TEST_MODE: ${{ needs.changes.outputs.test_mode }}
           TEST_MODE_REASON: ${{ needs.changes.outputs.test_mode_reason }}
           CHANGED_FILES: ${{ needs.changes.outputs.changed_files }}
+          # Same 3-worker trial as the shard step; see its note.
+          WOC_TEST_WORKERS: '3'
         run: node scripts/ci_shard_test.mjs --lane=long-sims-b
 
   # Runs in parallel with pr-gate: same if-condition, no needs edge in either

@@ -15,6 +15,7 @@ import {
   collectedLaneFiles,
   FLOOR_SANITY_MIN,
   parseShardArg,
+  resolveWorkerCount,
 } from '../scripts/lib/ci_shard_plan.mjs';
 import { collectSuiteVisibility } from '../scripts/lib/gate_discovery.mjs';
 
@@ -51,6 +52,35 @@ describe('parseShardArg', () => {
     [[], null],
   ])('%j -> %j', (argv, expected) => {
     expect(parseShardArg(argv as string[])).toEqual(expected);
+  });
+});
+
+describe('resolveWorkerCount', () => {
+  // The half-cores default is the MEASURED ruling (run 31107474546; the
+  // entry's comment); WOC_TEST_WORKERS is its sanctioned trial knob. Every
+  // rejected shape falls back to the ruling value with source 'invalid' so
+  // the entry reports it, and a bad value can never mean fewer tests, only
+  // the calibrated worker bound.
+  it.each([
+    [4, undefined, { workers: 2, source: 'default' }],
+    [4, '', { workers: 2, source: 'default' }],
+    [4, '3', { workers: 3, source: 'env' }],
+    [4, '1', { workers: 1, source: 'env' }],
+    [4, '4', { workers: 4, source: 'env' }],
+    [4, '5', { workers: 2, source: 'invalid' }],
+    [4, '0', { workers: 2, source: 'invalid' }],
+    [4, '-2', { workers: 2, source: 'invalid' }],
+    [4, '2.5', { workers: 2, source: 'invalid' }],
+    [4, '03', { workers: 2, source: 'invalid' }],
+    [4, ' 3', { workers: 2, source: 'invalid' }],
+    [4, 'banana', { workers: 2, source: 'invalid' }],
+    [1, undefined, { workers: 1, source: 'default' }],
+    [1, '1', { workers: 1, source: 'env' }],
+    [1, '2', { workers: 1, source: 'invalid' }],
+  ])('cores=%j env=%j -> %j', (cores, envValue, expected) => {
+    expect(resolveWorkerCount({ cores, envValue: envValue as string | undefined })).toEqual(
+      expected,
+    );
   });
 });
 
@@ -804,6 +834,31 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     expect(bad.log).toContain('usage:');
     const malformed = await runEntry(['--shard=9/8'], {});
     expect(malformed.exitCode).toBe(1);
+  });
+
+  it('honors a valid WOC_TEST_WORKERS and reports the source in the job log', async () => {
+    // The entry, not just the resolver: the ci.yml trial env line only works
+    // if the spawned entry reads it. workers=1 is valid on every core count,
+    // so this arm is machine-independent.
+    const run = await runEntry(['--shard=1/8', '--plan-only'], {
+      TEST_MODE: 'full',
+      WOC_TEST_WORKERS: '1',
+    });
+    expect(run.exitCode).toBe(0);
+    expect(run.log).toContain('shard 1/8, workers=1 (WOC_TEST_WORKERS)');
+    expect(run.log).toContain('--maxWorkers=1');
+  });
+
+  it('falls back loudly to the measured default on a junk WOC_TEST_WORKERS', async () => {
+    const fallback = Math.max(1, Math.floor(os.availableParallelism() / 2));
+    const run = await runEntry(['--shard=1/8', '--plan-only'], {
+      TEST_MODE: 'full',
+      WOC_TEST_WORKERS: 'banana',
+    });
+    expect(run.exitCode).toBe(0);
+    expect(run.log).toContain('WOC_TEST_WORKERS="banana" is not an integer');
+    expect(run.log).toContain(`shard 1/8, workers=${fallback}`);
+    expect(run.log).not.toContain('(WOC_TEST_WORKERS)');
   });
 
   it('fails loud on an unknown lane or an ambiguous lane-plus-shard spec', async () => {

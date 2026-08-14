@@ -23,7 +23,12 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { formatLegHeader, runLegsWithFlakeRetry } from './lib/ci_leg_runner.mjs';
-import { buildLanePlan, buildShardPlan, parseShardArg } from './lib/ci_shard_plan.mjs';
+import {
+  buildLanePlan,
+  buildShardPlan,
+  parseShardArg,
+  resolveWorkerCount,
+} from './lib/ci_shard_plan.mjs';
 import { shouldRunEntryPretest, WOC_SKIP_PRETEST } from './lib/gate_artifact_skip.mjs';
 import { collectSuiteVisibility } from './lib/gate_discovery.mjs';
 
@@ -63,8 +68,21 @@ const planOnly = argv.includes('--plan-only');
 // contention and pushed the eastbrook integration sweep past its own 180 s
 // budget, while the half-cores run finished green with a 432 s wall. Every
 // per-test budget in the suite is calibrated against this bound; raise it
-// only with a green measured run at the new value.
-const workers = Math.max(1, Math.floor(os.availableParallelism() / 2));
+// only with a green measured run at the new value. WOC_TEST_WORKERS is the
+// knob that produces such a run (resolveWorkerCount validates it; anything
+// malformed or out of range falls back to this default, loudly).
+const workerResolution = resolveWorkerCount({
+  cores: os.availableParallelism(),
+  envValue: process.env.WOC_TEST_WORKERS,
+});
+const workers = workerResolution.workers;
+if (workerResolution.source === 'invalid') {
+  console.log(
+    `[ci-shard] WOC_TEST_WORKERS=${JSON.stringify(process.env.WOC_TEST_WORKERS)} is not an ` +
+      `integer between 1 and the core count; using the measured default ${workers}`,
+  );
+}
+const workersLabel = `workers=${workers}${workerResolution.source === 'env' ? ' (WOC_TEST_WORKERS)' : ''}`;
 
 const mode = process.env.TEST_MODE ?? '';
 // Echoed into the log only. The producer already strips CR/LF; re-stripping
@@ -122,8 +140,8 @@ const plan = lane
 
 console.log(
   lane
-    ? `[ci-shard] long-sims-${laneHalf} lane, workers=${workers}`
-    : `[ci-shard] shard ${shard.index}/${shard.total}, workers=${workers}`,
+    ? `[ci-shard] long-sims-${laneHalf} lane, ${workersLabel}`
+    : `[ci-shard] shard ${shard.index}/${shard.total}, ${workersLabel}`,
 );
 console.log(
   `[ci-shard] changes-job decision: mode=${mode || '(unset)'}${modeReason ? ` (${modeReason})` : ''}`,

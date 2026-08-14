@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { isCodePath } from '../scripts/lib/ci_change_classify.mjs';
-import { CI_LONG_SUITE_HALVES } from '../scripts/lib/ci_shard_plan.mjs';
+import { CI_LONG_SUITE_HALVES, resolveWorkerCount } from '../scripts/lib/ci_shard_plan.mjs';
 import { decideTestMode } from '../scripts/lib/ci_test_select.mjs';
 import {
   GENERATED_I18N_ARTIFACT_FILES,
@@ -1151,12 +1151,21 @@ describe('CI workflow parity', () => {
           String.raw` {10}TEST_MODE: \$\{\{ needs\.changes\.outputs\.test_mode \}\}\n` +
           String.raw` {10}TEST_MODE_REASON: \$\{\{ needs\.changes\.outputs\.test_mode_reason \}\}\n` +
           String.raw` {10}CHANGED_FILES: \$\{\{ needs\.changes\.outputs\.changed_files \}\}\n` +
+          String.raw`( {10}#[^\n]*\n)*` +
+          String.raw` {10}WOC_TEST_WORKERS: '3'\n` +
           String.raw` {8}run: node scripts/ci_shard_test\.mjs --shard=\$\{\{ matrix\.shard \}\}/${SHARD_N}\n`,
       ),
     );
     // Exactly three entry invocations: the shard matrix and the two long-sims
     // lane halves.
     expect(workflow.match(/run: node scripts\/ci_shard_test\.mjs/g)).toHaveLength(3);
+    // The 3-worker value rides exactly those three entry steps (the entry
+    // validates it; scripts/ci_shard_test.mjs carries the measured ruling
+    // this trial answers). Release-gate keeps its inline half-cores default
+    // until the trial's green run justifies moving it.
+    expect(workflow.match(/WOC_TEST_WORKERS: '3'/g)).toHaveLength(3);
+    expect(workflow).not.toMatch(/WOC_TEST_WORKERS: (?!'3'\n)/);
+    expect(jobSource('release-gate')).not.toContain('WOC_TEST_WORKERS');
     // Each lane job mirrors the shard step's hardened relay (env block, never
     // run-line interpolation) and runs the entry in its lane-half mode:
     // unsharded, no matrix, two jobs that between them own the
@@ -1174,6 +1183,8 @@ describe('CI workflow parity', () => {
             String.raw` {10}TEST_MODE: \$\{\{ needs\.changes\.outputs\.test_mode \}\}\n` +
             String.raw` {10}TEST_MODE_REASON: \$\{\{ needs\.changes\.outputs\.test_mode_reason \}\}\n` +
             String.raw` {10}CHANGED_FILES: \$\{\{ needs\.changes\.outputs\.changed_files \}\}\n` +
+            String.raw`( {10}#[^\n]*\n)*` +
+            String.raw` {10}WOC_TEST_WORKERS: '3'\n` +
             String.raw` {8}run: node scripts/ci_shard_test\.mjs --lane=${laneFlag}\n`,
         ),
       );
@@ -1219,15 +1230,25 @@ describe('CI workflow parity', () => {
       expect(job).not.toContain('--exclude');
     }
     // The half-cores worker bound moved from pr-gate's run line into the shard
-    // runner. Derive the expected expression FROM halfCoreCap (the release-gate
-    // pin) so the two forms cannot drift apart: same formula, minus the shell
-    // wrapper and with the runner's `os` import in place of require().
+    // runner, and from there into resolveWorkerCount (the WOC_TEST_WORKERS
+    // trial knob's validated resolver). Derive the expected expression FROM
+    // halfCoreCap (the release-gate pin) so the forms cannot drift apart:
+    // same formula, minus the shell wrapper and with the runner's `os` import
+    // in place of require().
     const capExpression = halfCoreCap
       .replace(/^--maxWorkers="\$\(node -p '/, '')
       .replace(/'\)"$/, '')
       .replace('require("node:os")', 'os');
     expect(capExpression).toBe('Math.max(1, Math.floor(os.availableParallelism() / 2))');
-    expect(ciShardEntry).toContain(capExpression);
+    // Behavioral weld, not just source text: the resolver's default must
+    // compute the SAME value as release-gate's inline formula on any core
+    // count, and the entry must wire the resolver to the real inputs.
+    for (const cores of [1, 2, 3, 4, 8]) {
+      expect(resolveWorkerCount({ cores }).workers).toBe(Math.max(1, Math.floor(cores / 2)));
+    }
+    expect(ciShardEntry).toContain('resolveWorkerCount({');
+    expect(ciShardEntry).toContain('cores: os.availableParallelism()');
+    expect(ciShardEntry).toContain('envValue: process.env.WOC_TEST_WORKERS');
     // Legacy N=4 run lines must not remain once SHARD_N has moved on.
     // String(SHARD_N) comparison avoids tsc folding a constant always-true arm.
     if (String(SHARD_N) !== '4') {
