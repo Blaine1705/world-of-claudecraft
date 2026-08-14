@@ -191,6 +191,16 @@ describe('discord IPC frame codec (electron/discord_presence_codec.cjs)', () => 
     const atCap = rawFrame(OPCODES.FRAME, MAX_FRAME_BYTES, Buffer.alloc(0));
     expect(decodeFrames(atCap).error).toBeNull();
     expect(decodeFrames(atCap).frames).toEqual([]);
+    // High-bit length words pin the UNSIGNED read: under a readInt32LE
+    // regression these go negative, skip both the oversize compare and the
+    // completeness break, and the decode loop walks BACKWARD forever, so the
+    // only symptom would be a vitest HANG in the fuzz arm rather than a red.
+    expect(decodeFrames(rawFrame(OPCODES.FRAME, 0x80000000, Buffer.alloc(0))).error).toBe(
+      'oversize',
+    );
+    expect(decodeFrames(rawFrame(OPCODES.FRAME, 0xffffffff, Buffer.alloc(0))).error).toBe(
+      'oversize',
+    );
   });
 
   it('stops on an opcode above the known five', () => {
