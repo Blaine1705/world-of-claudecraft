@@ -2541,5 +2541,16 @@ reconcile: never cross-era without a same-day control):
 - Startup: second launch hits the single-instance lock in 109 ms (phase 2
   smoke); pack cold-boot banner clean, zero fallback lines.
 
-Final gate + turbo proofs + isolated browser leg: recorded below after the
-run (the docs commit lands first so the gate covers the final tree).
+FINAL GATE (2026-08-14, after the docs record commit, BROWSER_PATH
+exported): PASS, all 12 steps green, exit 0. Full vitest 2786 files / 38826
+tests passed, ZERO failed (12 skipped files, 115 skipped tests, 2 expected
+fail); browser regressions 19 files / 129 tests green INSIDE the gate (no
+flake this run; in the gate order the browser leg precedes the turbo
+builds); typecheck + env/server/bot builds + client build green; i18n
+freshness, manifest freshness/trackedness, malware scan (0 high), and
+changed-files biome all green. The going-in run earlier the same day redded
+exactly the accepted set and aborted at vitest by design; going-in turbo
+proofs were also taken standalone (5/5 + 3/3). This is the packet's first
+fully green full gate: the seal re-mint healed the 8 asset suites and the
+user-approved ceiling raise healed the monolith rows, so ANY red on this
+branch is now a regression.
