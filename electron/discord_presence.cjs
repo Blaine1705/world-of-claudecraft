@@ -409,8 +409,14 @@ function createDiscordPresence({
           return;
         }
         log.debug('[discord] client closed during the handshake:', clampLogValue(code));
+        // Advance the walk, symmetric with a pre-READY socket hangup: a peer
+        // that answers CLOSE has spoken the protocol but has NOT proven it is
+        // Discord, and backing off here would restart every retry at slot 0,
+        // pinned to a CLOSE-answering squatter. Real Discord bowing out costs
+        // only the remaining stat-fail candidates before the same backoff.
         destroySocket();
-        scheduleRetry();
+        state = 'connecting';
+        connectNextPath();
         return;
       }
       // A CLOSE on a connection that was working is Discord shutting down, not

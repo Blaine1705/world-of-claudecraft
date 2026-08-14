@@ -786,21 +786,29 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     expect(rig.timers).toEqual([]);
   });
 
-  it('reconnects on a pre-READY CLOSE with a transient code; terminal is 4000 only', () => {
+  it('advances the walk on a pre-READY CLOSE with a transient code; terminal is 4000 only', () => {
     // Only code 4000 was probe-confirmed as the invalid-client refusal. A
-    // daemon bowing out mid-handshake with any other code (a restart, a
-    // shutdown) must not kill presence for the rest of the run.
+    // peer bowing out mid-handshake with any other code (a restart, a
+    // shutdown) must neither kill presence for the rest of the run NOR pin
+    // the walk to its slot: symmetric with the socket-hangup arm, the walk
+    // moves on in the same pass (a CLOSE-answering squatter would otherwise
+    // hold slot 0 forever on win32).
     const rig = createRig();
     rig.presence.setActivity({ details: 'Eastbrook' });
     const socket = rig.live();
     socket.emit('connect');
     rig.feed(socket, OPCODES.CLOSE, { code: 1000, message: 'restarting' });
-    expect(rig.presence.stateForTest().state).toBe('backoff');
     expect(rig.warnings).toEqual([]);
-    expect(rig.timers).toHaveLength(1);
     expect(socket.destroyed).toBe(1);
-    // The desired activity survives to the retry.
+    expect(rig.sockets).toHaveLength(2);
+    expect(rig.presence.stateForTest().state).toBe('connecting');
+    // The desired activity survives, and a later slot that answers READY
+    // still receives it.
     expect(rig.presence.stateForTest().desiredActivity).toEqual({ details: 'Eastbrook' });
+    rig.ready(rig.live());
+    expect(rig.presence.stateForTest().state).toBe('ready');
+    const sent = rig.payloadsOf(rig.sockets[1])[1];
+    expect(sent.args).toEqual({ pid: 4321, activity: { details: 'Eastbrook' } });
   });
 
   it('fails closed on a pre-READY CLOSE whose payload carries no readable code', () => {

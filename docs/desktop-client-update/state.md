@@ -988,9 +988,9 @@ while enabled with a clientId, unix candidates must be own-uid sockets
 before dialing (statPath, skip-on-fail), jittered backoff 2s doubling to
 60s cap, opcode 2 pre-READY with code 4000 or an unreadable payload =
 TERMINAL invalid-client (one warn, never redials this run; any other
-explicit pre-READY code reconnects, and a pre-READY socket hangup
-advances the candidate walk: both QA-scoped in phase 10 QA), PING
-answered with echoing PONG, sends single-flight
+explicit pre-READY code AND a pre-READY socket hangup both advance the
+candidate walk in the same pass, exhaustion backs off: QA-scoped in
+phase 10 QA), PING answered with echoing PONG, sends single-flight
 on woc-N nonces behind a 15s trailing rate limit that SPANS reconnects,
 structural dedup, evt ERROR logged once (clamped 200) and treated as
 delivered, close after READY = backoff resume with the desired activity
