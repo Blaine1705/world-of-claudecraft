@@ -40,7 +40,14 @@ function target(sim: Sim, player: Entity): Entity {
 }
 
 describe('Stonebound PBE benchmark contract', () => {
-  it('stays materially below a dedicated Protection Warrior on physical effective health', () => {
+  it('stays below a dedicated Protection Warrior on physical effective health', () => {
+    // v0.38 tank parity pass: the ceiling moved from 0.8 to 0.9. The posture
+    // gained a Stamina component, more armor, and deeper damage reduction so a
+    // Stonebound shaman can tank heroic Nythraxis without being one-shot; on a
+    // best-in-slot stamina kit it now lands just UNDER the prot warrior
+    // (0.99x), so the warrior remains the pure-tank ceiling, but the old
+    // "materially below tier" off-tank framing no longer holds. Owner
+    // decision surfaced in the v0.38 tank balance PR.
     const stone = enhancement('stonebound');
     const protection = new Sim({ seed: 2920, playerClass: 'warrior', autoEquip: true });
     protection.setPlayerLevel(20);
@@ -48,13 +55,13 @@ describe('Stonebound PBE benchmark contract', () => {
     protection.castAbility('defensive_stance');
     protection.tick();
 
-    const stoneEhp = physicalEffectiveHealth(stone.sim, stone.player, 0.1);
+    const stoneEhp = physicalEffectiveHealth(stone.sim, stone.player, 0.15);
     const protectionEhp = physicalEffectiveHealth(protection, protection.player, 0.1);
     expect(stoneEhp).toBeGreaterThan(stone.player.maxHp * 1.25);
-    expect(stoneEhp).toBeLessThan(protectionEhp * 0.8);
+    expect(stoneEhp).toBeLessThan(protectionEhp * 0.9);
   });
 
-  it('doubles damaging-action threat but gives up Galeheart sustained output', () => {
+  it('multiplies damaging-action threat by 2.5 but gives up Galeheart sustained output', () => {
     const gale = enhancement('galeheart');
     const stone = enhancement('stonebound');
     const galeTarget = target(gale.sim, gale.player);
@@ -71,7 +78,7 @@ describe('Stonebound PBE benchmark contract', () => {
       100 * stoneboundThreatMultiplier(stone.sim.ctx, stone.player),
     );
     expect(stoneTarget.threat.get(stone.player.id)).toBe(
-      (galeTarget.threat.get(gale.player.id) ?? 0) * 2,
+      (galeTarget.threat.get(gale.player.id) ?? 0) * 2.5,
     );
 
     for (let step = 0; step < 3; step++) {

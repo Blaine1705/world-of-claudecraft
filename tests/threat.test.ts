@@ -183,7 +183,7 @@ describe('threat from damage', () => {
     expect(wolf.threat.get(sim.playerId)).toBeCloseTo(100 * BEAR_FORM_THREAT_MULT + 1, 5);
   });
 
-  it('Burning Oath passively multiplies Protection Holy-damage threat by 1.6', () => {
+  it('Burning Oath passively multiplies Protection Holy-damage threat by 1.3', () => {
     const sim = makeSim('paladin');
     sim.setPlayerLevel(16);
     expect(sim.setSpec('protection')).toBe(true);
@@ -193,7 +193,8 @@ describe('threat from damage', () => {
     const wolf = nearestMob(sim, 'forest_wolf');
     beefUp(wolf);
     hit(sim, sim.player, wolf, 100, 'holy');
-    const protectionMasteryThreat = 1.4;
+    // Oathward threatPct 0.4 scaled by the level-16 mastery ramp (16/20).
+    const protectionMasteryThreat = 1.32;
     expect(wolf.threat.get(sim.playerId)).toBeCloseTo(
       100 * protectionMasteryThreat * RIGHTEOUS_FURY_THREAT_MULT + 1,
       5,
@@ -243,7 +244,7 @@ describe('threat from damage', () => {
     expect(expectDefined(sim.resolvedAbility('heroic_strike')).threatFlat).toBe(39);
     sim.setPlayerLevel(10);
     expect(sim.setSpec('prot')).toBe(true);
-    expect(expectDefined(sim.resolvedAbility('sunder_armor')).threatFlat).toBe(100);
+    expect(expectDefined(sim.resolvedAbility('sunder_armor')).threatFlat).toBe(120);
   });
 });
 

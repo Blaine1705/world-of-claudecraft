@@ -93,8 +93,8 @@ describe('Warspirit engine', () => {
     const { sim, shaman, target } = setup();
     applyWarspiritPosture(sim.ctx, shaman, 'stonebound', 14);
     expect(warspiritPosture(shaman)).toBe('stonebound');
-    expect(shaman.auras.find((aura) => aura.id === STONEBOUND_ARMOR_ID)?.value).toBe(30);
-    expect(shaman.auras.find((aura) => aura.id === STONEBOUND_DR_ID)?.value).toBe(0.1);
+    expect(shaman.auras.find((aura) => aura.id === STONEBOUND_ARMOR_ID)?.value).toBe(40);
+    expect(shaman.auras.find((aura) => aura.id === STONEBOUND_DR_ID)?.value).toBe(0.15);
     applyStoneboundJolt(sim.ctx, shaman, target);
     expect(target.forcedTargetId).toBeNull();
 
