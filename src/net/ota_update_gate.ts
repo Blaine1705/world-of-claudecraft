@@ -171,9 +171,11 @@ export function installOtaUpdateGate(deps: OtaUpdateGateDeps): OtaUpdateGate {
       if (state.fatal) {
         // Nothing left to try in fatal mode: hand the screen back to the
         // caller's own dead-end overlay rather than showing "restarting"
-        // forever. The plugin still applies the staged bundle on the next
-        // launch or backgrounding.
-        paint();
+        // forever. Hiding is load-bearing, not cosmetic: the caller's
+        // recovery overlay stacks BELOW this scrim, so a repaint here would
+        // bury its only action. The plugin still applies the staged bundle
+        // on the next launch or backgrounding.
+        deps.overlay.hide();
         deps.onFatalRecoveryFailed?.();
       } else {
         // Pre-world boot flow: fall back silently to apply-on-background.

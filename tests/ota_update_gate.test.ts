@@ -218,6 +218,10 @@ describe('installOtaUpdateGate', () => {
     applyFails.handlers.onComplete();
     await flushMicrotasks();
     expect(applyFails.onFatalRecoveryFailed).toHaveBeenCalledTimes(1);
+    // Handing the screen back means actually hiding this overlay: the caller's
+    // recovery overlay stacks BELOW the OTA scrim, so a still-painted overlay
+    // would bury the only remaining action (the z-order regression this pins).
+    expect(applyFails.hide).toHaveBeenCalled();
 
     const downloadFails = makeRig();
     downloadFails.handlers.onProgress(80);

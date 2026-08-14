@@ -33,6 +33,17 @@ describe('renderOtaUpdateOverlay', () => {
     expect(root?.querySelectorAll('button, [role="button"], a, input')).toHaveLength(0);
   });
 
+  it('lands keyboard focus on the dialog root, the only focus target left', async () => {
+    renderOtaUpdateOverlay(model());
+    // The focus is deferred one tick (layout-before-focus, like
+    // native_update_prompt); a broken tabindex on the dialog root would leave
+    // focus on body and fail this.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const dialog = backdrop()?.querySelector('[role="dialog"]');
+    expect(dialog).not.toBeNull();
+    expect(document.activeElement).toBe(dialog);
+  });
+
   it('updates the mounted dialog in place instead of remounting', () => {
     renderOtaUpdateOverlay(model({ percent: 10 }));
     const first = backdrop();

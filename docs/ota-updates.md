@@ -63,8 +63,8 @@ The plugin itself is MPL-2.0; self-hosting is a documented, supported mode.
    incompatible-version dead end, so the gate holds until the update lands);
    when the download completes and the player has not entered the world, the
    staged bundle is applied immediately via `reload()` instead of waiting
-   for a backgrounding. When
-   the server rejects a stale bundle's world-layout epoch
+   for a backgrounding. When the server rejects a stale bundle's
+   world-layout epoch
    (`ONLINE_WORLD_INCOMPATIBLE_MESSAGE`) while a download is in flight or
    staged, the gate replaces the dead-end fatal overlay: progress, then
    auto-apply, and the resume marker survives so the reload lands back in the
