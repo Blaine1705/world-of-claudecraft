@@ -1860,6 +1860,32 @@ describe('sell-tab lowest listing price reference (issue #3043)', () => {
     expect(info.sellLowestPrice).toBe(100);
   });
 
+  it('rounds a non-divisible stack total up to the copper amount Browse shows per unit', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, viewer);
+    sim.addItem('healing_potion', 3, seller);
+    sim.marketList('healing_potion', 3, 100, seller);
+
+    sim.marketSellPriceCheck('healing_potion', viewer);
+    expect(marketInfo(sim, viewer).sellLowestPrice).toBe(34);
+  });
+
+  it('never reports zero when a positive stack total is smaller than its count', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, viewer);
+    sim.addItem('healing_potion', 3, seller);
+    sim.marketList('healing_potion', 3, 1, seller);
+
+    sim.marketSellPriceCheck('healing_potion', viewer);
+    expect(marketInfo(sim, viewer).sellLowestPrice).toBe(1);
+  });
+
   it('reports null when the checked item has no active listings', () => {
     const sim = makeWorld();
     const viewer = sim.addPlayer('warrior', 'Viewer');
@@ -1909,7 +1935,7 @@ describe('sell-tab lowest listing price reference (issue #3043)', () => {
 
     sim.marketSellPriceCheck(houseRow.itemId, viewer);
     const info = marketInfo(sim, viewer);
-    expect(info.sellLowestPrice).toBe(Math.round(houseRow.price / houseRow.count));
+    expect(info.sellLowestPrice).toBe(Math.ceil(houseRow.price / houseRow.count));
   });
 
   it('does not require standing at the Merchant to set the check (a display/query narrowing, like marketSearch)', () => {

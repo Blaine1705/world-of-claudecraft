@@ -12236,6 +12236,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterPrimaryStat': 'Atributo primário',
   'itemUi.market.filterPrimaryStatAll': 'Qualquer atributo primário',
   'itemUi.market.filterValueAria': '{label}: {value}',
+  'itemUi.market.collapseLowest': 'Apenas o menor preço',
+  'itemUi.market.lowestPriceLabel': 'Menor preço anunciado no momento',
+  'itemUi.market.lowestPriceNone': 'Ainda não há anúncios ativos para este item.',
   'devCommand.actions.kit.description':
     'Veste o predefinido de nível 20 pré-Santuário de uma especialização, começando pelas bolsas. Somente equipamento.',
   'devCommand.actions.biskit.label': 'Equipar kit BIS de nível 20',

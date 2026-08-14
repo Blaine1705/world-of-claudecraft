@@ -12004,6 +12004,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterPrimaryStat': 'Hlavní atribut',
   'itemUi.market.filterPrimaryStatAll': 'Libovolný hlavní atribut',
   'itemUi.market.filterValueAria': '{label}: {value}',
+  'itemUi.market.collapseLowest': 'Pouze nejnižší cena',
+  'itemUi.market.lowestPriceLabel': 'Současná nejnižší nabídková cena',
+  'itemUi.market.lowestPriceNone': 'Pro tento předmět zatím nejsou žádné aktivní nabídky.',
   'devCommand.actions.kit.description':
     'Obleč přednastavenou sadu na 20. úroveň před Svatyní pro danou specializaci, nejprve batohy. Pouze výbava.',
   'devCommand.actions.biskit.label': 'Vybavit BIS sadu na 20. úroveň',

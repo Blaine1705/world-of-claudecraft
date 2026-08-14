@@ -12122,6 +12122,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterPrimaryStat': 'Stat utama',
   'itemUi.market.filterPrimaryStatAll': 'Stat utama apa pun',
   'itemUi.market.filterValueAria': '{label}: {value}',
+  'itemUi.market.collapseLowest': 'Hanya harga terendah',
+  'itemUi.market.lowestPriceLabel': 'Harga penawaran terendah saat ini',
+  'itemUi.market.lowestPriceNone': 'Belum ada penawaran aktif untuk item ini.',
   'devCommand.actions.kit.description':
     'Kenakan preset level 20 pra-Sanktum untuk sebuah spesialisasi, tas dahulu. Hanya perlengkapan.',
   'devCommand.actions.biskit.label': 'Kenakan kit BIS level 20',

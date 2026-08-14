@@ -12062,6 +12062,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterPrimaryStat': 'Primärt attribut',
   'itemUi.market.filterPrimaryStatAll': 'Alla primära attribut',
   'itemUi.market.filterValueAria': '{label}: {value}',
+  'itemUi.market.collapseLowest': 'Endast lägsta pris',
+  'itemUi.market.lowestPriceLabel': 'Nuvarande lägsta annonspris',
+  'itemUi.market.lowestPriceNone': 'Det finns inga aktiva annonser för det här föremålet ännu.',
   'devCommand.actions.kit.description':
     'Ta på nivå 20-förvalet före Sanctum för en specialisering, väskor först. Endast utrustning.',
   'devCommand.actions.biskit.label': 'Utrusta BIS nivå 20-kit',

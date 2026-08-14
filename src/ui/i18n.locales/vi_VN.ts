@@ -11916,6 +11916,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterPrimaryStat': 'Chỉ số chính',
   'itemUi.market.filterPrimaryStatAll': 'Bất kỳ chỉ số chính nào',
   'itemUi.market.filterValueAria': '{label}: {value}',
+  'itemUi.market.collapseLowest': 'Chỉ giá thấp nhất',
+  'itemUi.market.lowestPriceLabel': 'Giá đăng bán thấp nhất hiện tại',
+  'itemUi.market.lowestPriceNone': 'Hiện chưa có tin đăng bán nào cho vật phẩm này.',
   'devCommand.actions.kit.description':
     'Mặc bộ trang bị mẫu cấp 20 trước Thánh Đường cho một hệ phái, ưu tiên vào túi đồ. Chỉ trang bị.',
   'devCommand.actions.biskit.label': 'Trang bị bộ đồ BIS cấp 20',

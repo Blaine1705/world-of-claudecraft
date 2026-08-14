@@ -10994,6 +10994,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterPrimaryStat': 'Primärattribut',
   'itemUi.market.filterPrimaryStatAll': 'Beliebiges Primärattribut',
   'itemUi.market.filterValueAria': '{label}: {value}',
+  'itemUi.market.collapseLowest': 'Nur den niedrigsten Preis anzeigen',
+  'itemUi.market.lowestPriceLabel': 'Aktuell niedrigster Angebotspreis',
+  'itemUi.market.lowestPriceNone': 'Für diesen Gegenstand gibt es noch keine aktiven Angebote.',
   'devCommand.actions.kit.description':
     'Die Vor-Heiligtum-Voreinstellung für Stufe 20 einer Spezialisierung anlegen, zuerst die Taschen. Nur Ausrüstung.',
   'devCommand.actions.biskit.label': 'BIS-20-Set anlegen',

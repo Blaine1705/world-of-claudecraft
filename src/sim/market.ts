@@ -109,8 +109,8 @@ export const MARKET_HOUSE_STOCK = [
 // normalizes every stack (including a single-copy instanced listing, count 1)
 // before comparing. House stock counts as real active supply: a buyer can pick
 // it over the player's new listing exactly like any other row. Null when no
-// listing of the item is active. Rounded to the nearest copper: a reference
-// figure, not a precise undercut calculator.
+// listing of the item is active. Round up to the next whole copper, matching
+// Browse's indivisible-copper per-unit display and never understating a price.
 export function lowestListingPricePerUnit(
   listings: readonly MarketListing[],
   itemId: string,
@@ -118,7 +118,7 @@ export function lowestListingPricePerUnit(
   let lowest: number | null = null;
   for (const l of listings) {
     if (l.itemId !== itemId) continue;
-    const perUnit = Math.round(l.price / l.count);
+    const perUnit = Math.ceil(l.price / l.count);
     if (lowest === null || perUnit < lowest) lowest = perUnit;
   }
   return lowest;

@@ -12126,6 +12126,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterPrimaryStat': 'Główny atrybut',
   'itemUi.market.filterPrimaryStatAll': 'Dowolny główny atrybut',
   'itemUi.market.filterValueAria': '{label}: {value}',
+  'itemUi.market.collapseLowest': 'Tylko najniższa cena',
+  'itemUi.market.lowestPriceLabel': 'Obecnie najniższa cena wystawienia',
+  'itemUi.market.lowestPriceNone': 'Nie ma jeszcze aktywnych ofert tego przedmiotu.',
   'devCommand.actions.kit.description':
     'Załóż zestaw sprzed Sanktuarium na 20. poziom dla wybranej specjalizacji, najpierw torby. Tylko ekwipunek.',
   'devCommand.actions.biskit.label': 'Załóż zestaw BIS na 20. poziom',

@@ -12447,6 +12447,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterPrimaryStat': 'Caractéristique principale',
   'itemUi.market.filterPrimaryStatAll': 'Toute caractéristique principale',
   'itemUi.market.filterValueAria': '{label} : {value}',
+  'itemUi.market.collapseLowest': 'Prix le plus bas uniquement',
+  'itemUi.market.lowestPriceLabel': 'Prix de vente le plus bas actuellement',
+  'itemUi.market.lowestPriceNone': 'Aucune annonce active pour cet objet pour le moment.',
   'devCommand.actions.kit.description':
     "Enfile le kit de spécialisation niveau 20 pré-Sanctuaire, sacs d'abord. Équipement seul.",
   'devCommand.actions.biskit.label': 'Équiper un kit BIS niveau 20',

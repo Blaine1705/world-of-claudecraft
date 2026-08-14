@@ -11881,6 +11881,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterPrimaryStat': 'Primær statistik',
   'itemUi.market.filterPrimaryStatAll': 'Alle primære statistikker',
   'itemUi.market.filterValueAria': '{label}: {value}',
+  'itemUi.market.collapseLowest': 'Kun laveste pris',
+  'itemUi.market.lowestPriceLabel': 'Nuværende laveste udbudspris',
+  'itemUi.market.lowestPriceNone': 'Der er endnu ingen aktive opslag for denne genstand.',
   'devCommand.actions.kit.description':
     'Ifør den forudindstillede niveau 20-opsætning fra før Sanctum til en specialisering, tasker først. Kun udstyr.',
   'devCommand.actions.biskit.label': 'Udrust BIS 20-sæt',

@@ -12551,6 +12551,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterPrimaryStat': 'Estadística principal',
   'itemUi.market.filterPrimaryStatAll': 'Cualquier estadística principal',
   'itemUi.market.filterValueAria': '{label}: {value}',
+  'itemUi.market.collapseLowest': 'Solo el precio más bajo',
+  'itemUi.market.lowestPriceLabel': 'Precio de venta más bajo actual',
+  'itemUi.market.lowestPriceNone': 'Aún no hay anuncios activos para este objeto.',
   'devCommand.actions.kit.description':
     'Equipa el kit preestablecido de nivel 20 previo al Santuario para una especialización, primero las bolsas. Solo equipo.',
   'devCommand.actions.biskit.label': 'Equipar kit BIS de nivel 20',

@@ -12025,6 +12025,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterPrimaryStat': 'Primaire eigenschap',
   'itemUi.market.filterPrimaryStatAll': 'Elke eigenschap',
   'itemUi.market.filterValueAria': '{label}: {value}',
+  'itemUi.market.collapseLowest': 'Alleen de laagste prijs',
+  'itemUi.market.lowestPriceLabel': 'Huidige laagste aanbiedingsprijs',
+  'itemUi.market.lowestPriceNone': 'Er zijn nog geen actieve aanbiedingen voor dit voorwerp.',
   'devCommand.actions.kit.description':
     'Rust de niveau-20-set van vóór het Heiligdom uit voor een spec, eerst de tassen. Alleen uitrusting.',
   'devCommand.actions.biskit.label': 'BIS-kit voor niveau 20 uitrusten',

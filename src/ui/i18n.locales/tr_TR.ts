@@ -12072,6 +12072,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterPrimaryStat': 'Birincil nitelik',
   'itemUi.market.filterPrimaryStatAll': 'Herhangi bir birincil nitelik',
   'itemUi.market.filterValueAria': '{label}: {value}',
+  'itemUi.market.collapseLowest': 'Yalnızca en düşük fiyat',
+  'itemUi.market.lowestPriceLabel': 'Mevcut en düşük ilan fiyatı',
+  'itemUi.market.lowestPriceNone': 'Bu eşya için henüz etkin ilan yok.',
   'devCommand.actions.kit.description':
     'Uzmanlık için Sanctum öncesi 20. seviye setini kuşandır, önce çantalara. Yalnızca teçhizat.',
   'devCommand.actions.biskit.label': 'BIS-20 takımını kuşan',

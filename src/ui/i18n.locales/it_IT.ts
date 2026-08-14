@@ -12299,6 +12299,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterPrimaryStat': 'Statistica principale',
   'itemUi.market.filterPrimaryStatAll': 'Qualsiasi statistica principale',
   'itemUi.market.filterValueAria': '{label}: {value}',
+  'itemUi.market.collapseLowest': 'Solo il prezzo più basso',
+  'itemUi.market.lowestPriceLabel': 'Prezzo di vendita più basso attuale',
+  'itemUi.market.lowestPriceNone': 'Non ci sono ancora inserzioni attive per questo oggetto.',
   'devCommand.actions.kit.description':
     'Equipaggia il preset di livello 20 pre-Santuario per una specializzazione, prima le borse. Solo equipaggiamento.',
   'devCommand.actions.biskit.label': 'Equipaggia kit BIS livello 20',
