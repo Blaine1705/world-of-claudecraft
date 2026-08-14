@@ -82,10 +82,10 @@ export interface PreviewPrewarmPlanDeps<Pose> {
  *  preview per skin, the player-card poses, both portrait framings for every
  *  class (chips use headshots while Inspect uses a full-body portrait, so
  *  warming only the former still leaves a synchronous WebGL readback + PNG
- *  encode on the first inspected player), then every Armory catalog skin,
- *  one MODE per unit (a whole-skin warmup measured 170 to 225 ms of
- *  main-thread block during live play; per-mode units roughly halve it).
- *  Each entry is one bounded GPU unit the renderer's background lane paces.
+ *  encode on the first inspected player), then every Armory catalog skin in
+ *  CHARACTER mode only (one unit per skin; weapon mode was measured and
+ *  removed, see the loop). Each entry is one bounded GPU unit the renderer's
+ *  background lane paces.
  *  `deps.includeCharFamily` gates the shell/skin/pose units only; see its doc
  *  on `PreviewPrewarmPlanDeps`. */
 export function buildPostEntryPreviewPrewarmUnits<Pose>(
@@ -127,13 +127,24 @@ export function buildPostEntryPreviewPrewarmUnits<Pose>(
     }
   }
   for (const skinId of deps.armorySkinIds) {
-    for (const armoryMode of ['character', 'weapon'] as const) {
-      units.push({
-        family: 'armory',
-        label: `preview:armory:${skinId}:${armoryMode}`,
-        run: () => deps.prewarmArmorySkin(skinId, armoryMode),
-      });
-    }
+    // CHARACTER MODE ONLY. Weapon-mode warming was measured and removed: it cost
+    // three separate live-frame hitches (156, 107 and 91 ms on the VFX-tier
+    // skins, 26 of 29 units costing nothing at all) to remove a single 131 ms
+    // hitch on the cold first "Weapon only" click, itself measured on the
+    // catalogue's most expensive skin. Spending three visible hitches to remove
+    // one smaller one, on a button the player deliberately pressed, is a net
+    // loss. Character mode stays: it is what covers the card inspect, which
+    // costs about a second cold.
+    //
+    // The mode argument survives on the dep for exactly one reason: warming ONE
+    // skin in weapon mode on user intent is the sanctioned way to bring this
+    // back if the toggle ever gets expensive. Do not restore the catalog loop.
+    // Evidence: tmp/armory-prewarm-measurement.md, round 2.
+    units.push({
+      family: 'armory',
+      label: `preview:armory:${skinId}:character`,
+      run: () => deps.prewarmArmorySkin(skinId, 'character'),
+    });
   }
   if (deps.armorySkinIds.length > 0) {
     units.push({
