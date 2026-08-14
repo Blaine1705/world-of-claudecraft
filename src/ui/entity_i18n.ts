@@ -25,6 +25,7 @@ import {
   getLanguage,
   hasTranslation,
   type InterpolationValues,
+  isPendingTranslation,
   type SupportedLanguage,
   supportedLanguages,
   t,
@@ -461,14 +462,23 @@ export function tEntity(request: EntityTranslationRequest): string {
   return fallback;
 }
 
-/** Bundle-only entity resolution: the localized string for the active locale, or
- *  null when the key is absent from that locale's bundle, WITHOUT falling back to
- *  the canonical English source. For an OPTIONAL entity variant a caller resolves
- *  a different base field on a miss (e.g. a talent-conditional ability
- *  description that falls back to the plain description) instead of surfacing raw
- *  content placeholders in a locale that has not filled the variant yet. */
+/** Bundle-only entity resolution for an OPTIONAL variant field: the ACTIVE
+ *  locale's own translation, or null when it does not have one, WITHOUT falling
+ *  back to English. Null on both misses that matter: the key is absent from the
+ *  bundle, or the locale has not translated it yet (a `pending` row, which the
+ *  dense table English-FILLS - tOptional alone would hand that fill straight
+ *  back).
+ *
+ *  The caller resolves a different base field on null (a talent-conditional
+ *  ability description falling back to the plain description), so an untranslated
+ *  locale reads its own prose rather than one English sentence spliced into an
+ *  otherwise localized string. This is also why declining the fill is safe here
+ *  and not in t(): an optional variant always has a translated base field to fall
+ *  back to. */
 export function tEntityOptional(request: EntityTranslationRequest): string | null {
-  return tOptional(cachedEntityTranslationKey(request), request.values);
+  const key = cachedEntityTranslationKey(request);
+  if (isPendingTranslation(key)) return null;
+  return tOptional(key, request.values);
 }
 
 export function itemDisplayName(item: ItemDef): string {
