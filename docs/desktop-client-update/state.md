@@ -670,21 +670,26 @@ New i18n keys (phase 7): hudChrome.options.forceHighPerfGpu +
 hudChrome.options.forceHighPerfGpuNote (en plus the five M16 fills each in
 zh_CN/zh_TW/ja_JP/ko_KR/ru_RU; 16 locales pending for the release fill
 pass).
-New tests (phase 7): tests/electron_desktop_prefs.test.ts (24: content
+New tests (phase 7): tests/electron_desktop_prefs.test.ts (content
 whitelist/clamps/strict booleans/unknown version/oversize-before-parse,
 file shapes: symlinked-temp refusal with a victim-untouched pin,
 own-temp-only cleanup, the isFile hang-proof with a read-count-0 pin, the
 __proto__ pollution pin, throwing-fs arms, validate-outbound,
-no-mutate/no-return of parsed input), tests/electron_window_memory.test.ts
-(9: display-gone, off-screen, too-small intersection, happy + maximized
-restore, exact center math), tests/desktop_gpu_pref_sync.test.ts (17:
+no-mutate/no-return of parsed input; QA added the at-cap boundary, the
+lying-stat text-guard arm, the read-count-0 size gate, and the BOM arms),
+tests/electron_window_memory.test.ts (display-gone, off-screen, too-small
+intersection, happy + maximized restore, exact center math; per-suite test
+counts deliberately not recorded here, they rot: run the suite),
+tests/desktop_gpu_pref_sync.test.ts (
 reflection both polarities on a recorded write log, the
 factory-after-resolve ordering pin, construct-nothing arms, push both
 polarities on the received argument, absent-method/no-bridge/rejected/
 sync-throw/this-receiver arms). tests/electron_shell_startup.test.ts grew
 4 pins (prefs-read-before-levers, the strict-true guard at exactly 2 sites
-with each lever in its else arm, restore-in-constructor plus
-maximize-before-reveal, settle + close capture wiring);
+with each lever in its else arm plus QA's exactly-one-call-site counts,
+restore-in-constructor plus maximize-INSIDE-the-reveal (QA moved it: a
+constructor-time maximize shows the hidden window), settle + close capture
+wiring with the debounce-cancel pin);
 tests/electron_ipc_channels.test.ts grew the two channels, two method
 names, and a setter body pin; tests/electron_display_push.test.ts's
 getNormalBounds ban re-scoped to the sendDisplayChange body;
@@ -694,6 +699,40 @@ tests/options_window.test.ts carries whitespace-tolerant
 contains/not-contains pins on the renderInterface env
 (desktopGpuPrefSupported in, isNativeAppShell out);
 tests/settings.test.ts default-true plus persisted opt-out round trip.
+
+Phase 7 QA done (2026-08-13, PASS-WITH-FOLLOWUPS, 0 blocking; QA-start base
+merge db35378113 took release tip b08d79ef91, 92 files, no electron/desktop
+surfaces, one sorted-list conflict in tests/architecture.test.ts, parity green
+after). 19-agent workflow (context loader, 5 auditors, merge-dedup, 2 skeptics
+per actionable), zero losses: 34 raw findings, 6 actionable, 6/6 CONFIRMED by
+both skeptics. Fixes (commits 1a42dbde40, 544f38085d, cf58aa78a7, 35d4efa20d,
+7e61fa823d, 29f83ced66 gate collision): maximize moved INSIDE the reveal (maximize() on a hidden window
+also shows it, runtime-reproduced: the pre-fix shape shows an unpainted frame
+at t=2ms); BOM strip on the loader (a Windows BOM'd hand-edit of the rescue
+field silently resolved to defaults = force back ON); the IPC setter's
+whole-record spread pinned literally; both src/main.ts crossings textually
+pinned; the Reset-re-arm coupling pinned as accepted doctrine; lever
+call-site counts pinned to 1; debounce-cancel pinned; the stat-size gate made
+observable (read-count-0). Ledger re-litigations: reset-re-arm ACCEPT-AND-PIN
+(the Reset click IS the push, not the next toggle), note-copy CHANGE
+docs-only (rescue paragraph in docs/desktop-release.md; the env-var/CLI
+escape hatch stays the phase 11 user decision), graphics-tab pointer /
+16384 ceiling / no-jsdom-web-absence all UPHOLD. Probe round 19/19 KILLED
+rc=1 with named tests (14 audit rows incl. the two designed pre-fix
+survivors now killed, 4 QA-pin rows, 1 rig-gap re-probe). ENVIRONMENT
+CAVEAT: on this box's XWayland/Mutter x11 rig, win.maximize() is inert in
+EVERY order (probed maximize-then-show, show-then-maximize, and the pre-fix
+constructor shape), so the maximized-restore half is verified at the
+contract level (electron.d.ts plus the vendored-binary probe), while the
+hidden-until-ready half is runtime-proven (seeded smoke: first visible
+439ms, ready-to-show 432ms, zero early-visible samples, both opt-out skip
+log lines present). Smoke rig: scratchpad seed/verify wrapper, seed mode
+learns the live displayId then writes the store via saveDesktopPrefs.
+Gate: full fallback red the accepted set plus ONE merge-window semantic
+collision (upstream's tests/three_reflection_contract.test.ts pins
+THREE.REVISION '165'; re-pointed wholesale to r185 in 29f83ced66, all six
+contract tests already held on the r185 build); post-fix red exactly 9
+seals/14 + monolith 2, turbo proofs 5/5 + 3/3, browser leg 19/125 green.
 
 Perf baselines: docs/perf/baseline/history.jsonl carries the phase 5 rows (low
 pre/post dressing fix + medium, this machines RTX 5090, 1280x720, vsync off;

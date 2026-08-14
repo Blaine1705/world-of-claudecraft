@@ -18,7 +18,7 @@
 | 6 QA | Verify phase 6 | done | 2026-08-09 | 2026-08-10 |
 | interim | Base reconcile onto release/v0.38.0 + plan refresh | done | 2026-08-13 | 2026-08-13 |
 | 7 | Desktop prefs store and window memory | done | 2026-08-13 | 2026-08-13 |
-| 7 QA | Verify phase 7 | not started | | |
+| 7 QA | Verify phase 7 | done | 2026-08-13 | 2026-08-13 |
 | 8 | Display modes and power | not started | | |
 | 8 QA | Verify phase 8 | not started | | |
 | 9 | Notifications and what's new | not started | | |
@@ -66,9 +66,12 @@ no-hit adversarially verified); [x] shader-error smoke pass clean (after it caug
 and the phase fixed the r185 vColor vec4 break); [x] perf/visual comparison recorded
 (QA gates it; low-tier open-run/combat regression flagged, r181 pairs saved).
 
-Phase 7: [ ] electron/desktop_prefs.cjs store (atomic, corrupt-tolerant, Node-tested);
-[ ] bounds + display persistence with on-screen validation; [ ] GPU-force opt-out
-setting wired through the store (options doctrine row + bridge).
+Phase 7: [x] electron/desktop_prefs.cjs store (atomic, corrupt-tolerant, Node-tested);
+[x] bounds + display persistence with on-screen validation; [x] GPU-force opt-out
+setting wired through the store (options doctrine row + bridge). Ticked at QA
+(verdict PASS-WITH-FOLLOWUPS, 0 blocking; 6 confirmed should-fix all fixed
+in-session, one behavior fix among them: maximized restores now maximize at the
+reveal; see the Phase 7 QA record).
 
 Phase 8: [ ] display-mode option (borderless fullscreen / windowed) via the options
 doctrine, desktop-only visibility, reconciled with the existing fullscreen setting;
@@ -1430,3 +1433,119 @@ sync-module write crossing; tree clean, LOCAL-ONLY intact).
   step by design; post-abort turbo proofs 5/5 (check:types build:env
   build:server build:bot) + 3/3 (build:bundle); the real-browser suite
   run standalone with BROWSER_PATH: 19 files / 125 tests green.
+
+## Phase 7 QA record (2026-08-13)
+
+Phase 7 QA done (verdict PASS-WITH-FOLLOWUPS, 0 blocking; fixes committed
+in-session: 1a42dbde40 maximize-at-reveal, 544f38085d BOM'd hand-edit,
+cf58aa78a7 crossing pins, 35d4efa20d rescue docs, 7e61fa823d observable
+stat gate; tree clean, LOCAL-ONLY intact).
+- Base merge db35378113 took origin/release/v0.38.0 tip b08d79ef91 (92
+  files: night lighting, GPU hitch instrumentation, point-light budget,
+  CI merged-leg + duration ratchet; NO electron/ or desktop sync
+  surfaces; one both-sides-appended conflict in the
+  tests/architecture.test.ts sorted purity list, resolved keep-all-three;
+  ancestry guard held, parity 335/335 green after, monolith red exactly
+  the known accepted pair).
+- Workflow audit: 19 agents, zero losses (context loader; security,
+  correctness, test-quality, qa-checklist-charter, ledger-relitigation
+  auditors in parallel; merge-dedup; 2 adversarial skeptics per
+  actionable finding, code lens + doctrine lens). 34 raw findings
+  merged to 6 actionable, 6/6 CONFIRMED by both skeptics (12/12 votes,
+  0 splits, 0 killed), 20 passthrough recorded below. All four landed
+  review-round fixes re-verified independently by three auditors.
+- FIXED (all six confirmed should-fixes): (1) BEHAVIOR: maximize() on a
+  hidden window also SHOWS it (documented BrowserWindow contract; a
+  skeptic reproduced it against the vendored Electron 43 binary, and the
+  QA smoke reproduced the pre-fix early-show at t=2ms), so the
+  constructor-time maximize presented an unpainted dark frame for the
+  whole load; moved inside showMainWindow before show(), pin re-pointed
+  with a negative arm on the old shape. (2) The IPC setter's
+  whole-record spread (the anti-clobber contract) was unpinned: a
+  single-field save shipped green and wiped window memory on every
+  toggle; pinned literally in electron_ipc_channels. (3) Both
+  src/main.ts crossings (the inline post-await settings factory, the
+  push arm) had no pin: a factory hoist reintroduced the whole-blob
+  revert bug with every suite green; textual wiring pins added in
+  desktop_gpu_pref_sync. (4) Ledger reset-re-arm adjudicated
+  ACCEPT-AND-PIN with the mechanism corrected: the Interface Reset
+  click IS the push (the footer re-applies every rendered key through
+  onSettingChange), so an opted-out player who clicks Reset re-arms the
+  force for the next launch in the same click; behavioral coupling test
+  added, doctrine stands (reset means defaults, issue 2341 scope).
+  (5) Ledger note-copy adjudicated CHANGE docs-only: the player copy
+  stays byte-identical (accurate; a reword costs 5 M16 fills plus the
+  semantic-regression pin surface), but the no-boot rescue nobody could
+  discover is now documented in docs/desktop-release.md (per-OS
+  desktop-prefs.json path + the gpuForceOptOut edit), and the NEW BOM
+  hazard a skeptic probe-confirmed (JSON.parse throws on U+FEFF, so a
+  Windows Notepad rescue edit silently resolved to defaults = force
+  back ON) is fixed with a one-BOM strip in the loader plus both-arm
+  tests. (6) The three Phase 7 deliverable checkboxes were still
+  unticked while the same file said done twice; ticked with this QA.
+- Ledger verdicts (the other three): graphics-tab pointer UPHOLD
+  deferred (bundle into the phase 11 copy round); 16384 ceiling UPHOLD
+  (challenged with 16384x16384 at (100,100) on a 1080p work area: the
+  boundsUsableOn reachability guarantee makes it an annoyance, never a
+  lockout); no-jsdom-web-absence UPHOLD (every link pinned in both
+  polarities; revisit only if the call site stops being one expression).
+  No verdict changes the DEFAULT force-ON behavior; neither stopping
+  rule tripped. ADJACENCY for the user: until the phase 11 escape-hatch
+  decision lands, Reset-to-Defaults re-arming the force plus the
+  documented hand-edit rescue are the only recovery pair for a machine
+  the force prevents from booting.
+- Pin hardenings beyond the six (from the audit's nice-to-have tier):
+  lever call sites count-pinned to exactly one each (the else-arm
+  regexes prove a guarded call exists, not that it is the only one);
+  the schedule body's cancel-before-re-arm pinned (a clear drop stacked
+  one write per resize event); the at-cap boundary and the lying-stat
+  text-guard arm added to the loader suite.
+- Probe round (orchestrator-side, disciplined driver, committed-clean
+  tree): 19/19 KILLED rc=1 with named failing tests: the 12 audit rows
+  against the shipped suites, the two designed pre-fix survivors (spread
+  drop, debounce-cancel drop) now killed by the new pins, four QA-pin
+  rows (maximize order, BOM strip drop, factory hoist, reset default
+  flip), and the one first-round survivor (stat-size cap drop, masked by
+  the redundant text guard) re-probed KILLED after the read-count-0 arm.
+- Real-shell smoke (isolated userData, x11 ozone arg, seeded
+  maximized+opted-out store on the live display id): hidden until
+  ready-to-show (432ms) with zero early-visible samples, first visible
+  439ms; both opt-out skip log lines present, no PRIME relaunch.
+  ENVIRONMENT CAVEAT: win.maximize() is inert under this box's
+  XWayland/Mutter x11 rig in every order (probed a/b/c including the
+  pre-fix shape), so the maximized-restore half rests on the documented
+  contract plus the vendored-binary probe, and the pre-fix early-show
+  defect DID reproduce live (show at t=2ms, visibleAlready at
+  ready-to-show), which is the half the fix exists for.
+- Passthrough ledger (recorded, no action): TOCTOU stat-to-read window
+  accepted-design residue; boot reflection timing-held not
+  construction-held (a pre-sync long-lived Settings would revert it;
+  none exists today); preload coerces non-boolean set input to false
+  (main still rejects; one shipped caller); displayId unclamped
+  magnitude (identity-compare only); minimized-close may persist
+  maximized:false on some platforms (self-correcting); maximized
+  restore targets the normal-bounds display (phase 8 displayMode note);
+  save outbound size check vacuous-by-construction (defense-in-depth);
+  resolver clamps redundant with upstream sanitize; src/main.ts +15
+  lines composition-only with ~70 ceiling headroom (phases 8-10 note);
+  PR screenshots correctly deferred (LOCAL-ONLY).
+- GATE: node scripts/gate_select.mjs at 7e61fa823d resolved the diff base
+  to origin/release/v0.38.0 (220 changed paths), mode=full
+  (broad/unclassified: package.json, the three patch, and the lockfile in
+  the branch-vs-base diff). Pre-vitest legs green: i18n gen + freshness
+  (regen clean), wiki, sfx conformance (advisory rows only), malware scan
+  PASS (6366 files, 0 high), biome changed-files green. Full-suite
+  fallback: 2753 files / 38117 tests; first run red on the accepted set
+  PLUS ONE: upstream's new tests/three_reflection_contract.test.ts (GPU
+  hitch analyzer premise pins) self-guards on THREE.REVISION '165' while
+  this branch runs the 0.185.1 train, a no-textual-conflict semantic
+  collision from the QA-start merge window; all six actual contract tests
+  passed against the r185 build (the deferred reflection cycle holds
+  through the branch's patched compileAsync too), so the premise was
+  re-pointed wholesale in 29f83ced66. Post-fix red EXACTLY the accepted
+  set (the 9 seal suites / 14 tests plus tests/monolith_budget.test.ts 2
+  tests, the OPEN ratchet decision); 37986 passed, zero phase
+  regressions. The gate aborts at the vitest step by design; post-abort
+  turbo proofs 5/5 (check:types build:env build:server build:bot) + 3/3
+  (build:bundle); the real-browser suite standalone with BROWSER_PATH:
+  19 files / 125 tests green.
