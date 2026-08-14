@@ -22,10 +22,10 @@
 | 8 | Display modes and power | done | 2026-08-14 | 2026-08-14 |
 | 8 QA | Verify phase 8 | done | 2026-08-14 | 2026-08-14 |
 | 9 | Notifications and what's new | done | 2026-08-14 | 2026-08-14 |
-| 9 QA | Verify phase 9 | not started | | |
-| 10 | Discord Rich Presence | not started | | |
-| 10 QA | Verify phase 10 | not started | | |
-| 11 | Final integration QA | not started | | |
+| 9 QA | Verify phase 9 | done | 2026-08-14 | 2026-08-14 |
+| 10 | Discord Rich Presence | done | 2026-08-14 | 2026-08-14 |
+| 10 QA | Verify phase 10 | done | 2026-08-14 | 2026-08-14 |
+| 11 | Final integration QA | done | 2026-08-14 | 2026-08-14 |
 
 ## Per-phase deliverable checklists
 
@@ -81,17 +81,22 @@ Phase 9: [x] OS notifications for update-ready and party-invite-while-unfocused
 (renderer-rendered strings, validated + rate-limited channel, focus-gated); [x] what's
 new t()-keyed link on the ready toast; [x] string contract pins.
 
-Phase 10: [ ] empirical SET_ACTIVITY gate probe recorded; [ ] pure frame codec module +
-socket manager (main), never blocks boot, backoff on absence; [ ] renderer activity
-assembly (localized, 15s coalesced, no-op dedup) + options toggle; [ ] pins for codec,
-channel, and absence behavior.
+Phase 10: [x] empirical SET_ACTIVITY gate probe recorded; [x] pure frame codec module +
+socket manager (main), never blocks boot, backoff on absence; [x] renderer activity
+assembly (localized, 15s coalesced, no-op dedup) + options toggle; [x] pins for codec,
+channel, and absence behavior. (Ticked at phase 11: the phase 10 and 10 QA records
+below carried the done evidence while this table lagged, the L6 self-inconsistency
+the phase 11 ledger sweep filed.)
 
-Phase 11: [ ] one-time asset seal re-mint over the branch's FINAL lockfile
+Phase 11: [x] one-time asset seal re-mint over the branch's FINAL lockfile
 (scripts/assets/remint_lockfile_fingerprints.mjs + digest sweep + media manifest +
 polish provenance, 5-step order in commit 218de2db08; deferred from phase 1 by user
-decision 2026-08-08, re-check after the phase 6 dep moves and every base merge);
-[ ] qa-checklist.md matrix all green; [ ] full gate green; [ ] perf summary
-(before/after across phases) written; [ ] deferred items surfaced; [ ] teardown offered.
+decision 2026-08-08; executed 2026-08-14, commit 3c6040428f, all 8 seal suites green);
+[x] qa-checklist.md matrix all green (evidence per item in the Phase 11 record);
+[x] full gate green (final run: zero unexplained red); [x] perf summary
+(before/after across phases) written (Phase 11 record, evidence bundle); [x] deferred
+items surfaced (the complete deferral list in the Phase 11 record); [x] teardown
+offered (extended at phase close; the user decides before the PR).
 
 ## Notes per phase
 
@@ -2351,3 +2356,190 @@ in-session; both relitigations UPHOLD; the security follow-up round found
   handler crash disproof holds for current code, feed cost on
   throttled frames is a Date.now() and a comparison, language-switch
   staleness stated in the header, win32 stat exemption confirmed.
+
+## Phase 11 record (2026-08-14, final integration QA; closes the packet)
+
+Verdict: PASS. Every qa-checklist.md item evidenced by a real run, the deferred
+seal re-mint executed over the final lockfile, four user rulings recorded, one
+cross-feature defect found and fixed, and the final gate has zero unexplained
+red. Orchestrated as a deterministic Workflow: 8 read-only audit lanes with 2
+independent skeptics (repro lens + design lens) per actionable finding, 56
+agents, zero losses; 15 findings survived verification, 9 refuted.
+
+Base merge: f2c84ca190 took release/v0.38.0 tip 0d615aa7dd (market-house
+redesign train only; the one conflict was the generated i18n pending.ts,
+resolved by regen). Parity set re-ran green 374/374 after the merge. Lockfile
+unmoved by the merge, so the branch lockfile was final before the mint.
+
+Commits this phase: 328476e162 flattener sweep, b9c32cefbf pre-paint reveal
+fix, 8cd57b704d GPU-force escape hatch, 7229caa61a stripper adjacency
+hardening, 755fa4cc72 monolith ceiling raise, 3c6040428f the seal re-mint,
+e662d43105 doc flips, plus this docs record.
+
+USER RULINGS (2026-08-14, all four put as one decision round; a fifth
+correction round followed):
+- r181/r185 lighting: ACCEPTED for the live game (frozen showcase pairs in
+  tmp/r181-showcase-frozen/ were the decision set). The captures sub-decision
+  was CORRECTED mid-phase: the initially approved re-shoot proved structurally
+  impossible against the seal's own architecture (the polish evidence is a
+  FROZEN historical A/B: both arms pin one frozen capture-identity literal,
+  the before-arms pin a historical source revision whose pre-polish content no
+  longer exists, and the suite pins its divergence from the live town as a
+  deliberate literal, never recaptured through the bank rebuild). The user
+  approved the corrected path: provenance re-record + this recorded ruling;
+  the interim-reconcile "must be RE-SHOT" rule text mis-modeled the seal and
+  is corrected in state.md.
+- LOW tier: ACCEPTED with the residual routed upstream (same-day control pair:
+  open-run -18.8 pct, combat -17.4 pct, 1-pct lows halved-to-thirded;
+  attribution: upstream v0.37/v0.38 moving/streaming perf mass + the r185
+  low-tier split; the packet's own LOW retune improved LOW and is monotonic).
+  Name it in the PR body for the maintainer's player-performance packet.
+- GPU-force no-boot escape hatch: LANDED (8cd57b704d). WOC_DISABLE_GPU_FORCE=1
+  strict-checked once, leads BOTH lever guard chains ahead of the stored
+  opt-out (works even with an unreadable prefs file), skips one launch without
+  touching the stored preference; docs rescue section updated; pins
+  mutation-verified (strict-literal M1 and demoted-arm M2 both killed named).
+- Monolith ratchet: ceiling raise PREPARED as the maintainer-decision surface
+  for PR review (755fa4cc72; hud.ts 19510, renderer.ts 13785, exact current
+  counts so any further growth reds; rationale in the commit and the test
+  comments). monolith_budget green 13/13.
+
+THE SEAL RE-MINT (3c6040428f, one commit per the runbook's dirty-input
+tripwire): six export_entry.js PCFSoftShadowMap -> PCFShadowMap renames FIRST
+(five are hashed fingerprint inputs; banker_chest is the unhashed sixth); the
+27-GLB in-place re-stamp (every byte length preserved, tank at 1161436);
+the 35-digest sweep (7 family fingerprints incl. the no-GLB surface atlas, the
+Fenbridge support-map fingerprint, 27 GLB shas) over 28 files / 307
+occurrences, matching the 218de2db08 precedent scale; media manifest regen;
+rerecord_polish_provenance.mjs --check then write (150 occurrences across the
+four after-side polish JSONs; the armoury family fingerprint has no literal
+pin anywhere, embedded + self-derived only). Four literals re-pinned: the
+composite d05e927d.., the metadata authority d5cba247.., the second-order
+performance seal 3c1edecb.. (recomputed LAST from the re-recorded bytes; the
+check-mode preview differs by design), and the integrity composite mirror.
+ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT untouched (frozen identity). After
+the mint: all 8 seal suites + banker_chest + provenance diagnostics +
+mob_portrait_source_manifest + placeholder_art_completion green (12 files /
+136 tests). The mob_portrait manifest survived the media-manifest regen with
+no cascade re-mint.
+
+THE FLATTENER SWEEP (328476e162 + 7229caa61a): shared
+tests/helpers/strip_comments.ts (the architecture.test.ts single-pass
+alternation, five-case self-test) adopted by SEVEN consumers: quest_link,
+desktop_display_mode_sync, language_fanout_registry (the three committed by
+phase 10 QA), defer_launcher_preloads and scripts_windows_paths (lane-found
+live-class blindness: foliage.ts 124-277 and 10+ scripts hazards),
+electron_shell_startup and ci_workflow's three sites (precedent carriers /
+gate surface; gate-integrity-reviewer verdict PASS, its one probe-proven
+WARNING, the block-terminator-adjacent line comment surviving the consuming
+guard, fixed via the lookbehind form in 7229caa61a and mutation-killed).
+Probes 4/4 killed both-arms with named tests: raw encoder at main.ts:4400
+(pre GREEN-blind, post RED naming src/main.ts), eager registerPreload in the
+foliage span (post RED), the full discovery triple in aura_gain_log's span
+(first plant survived; rig diagnosis: discovery needs EMITS_TEXT plus the
+comparison shape, then post RED), and the hazard-comment immunity arm for the
+display-mode pins (pre RED two named pins, post GREEN). The ~40 remaining
+latent release-owned block-first sites are a deferred chore; take the
+gate-owned pin suites (tests/gate_select_plan.test.ts's two sites) first.
+
+WHAT-IS-MISSING FINDINGS (both double-CONFIRMED): WIM-1 FIXED (b9c32cefbf):
+a pre-paint reveal via focusMainWindow (dock click, second launch, deep link
+in the up-to-4s hidden boot phase) did a bare show() that skipped the
+displayMode/maximized reveal discipline; showMainWindow then no-oped on
+isVisible for the whole session and the world-entry echo was swallowed by the
+idempotent guard. createMainWindow now publishes its reveal closure and
+focusMainWindow routes a never-shown window through it; whole-expression
+polarity pin + publication-placement pin, both mutation-killed. WIM-2
+DEFERRAL RULING: shadow_cadence (upstream, arrived with the v0.38 merge)
+consumes governor pressure/enabled on medium+ tiers with no cross-damping
+against the split recovery ladder; the structural analysis (dead-band limit
+cycle if the shadow pass exceeds ~15 pct of tier budget; half-rate headroom
+double-count across a calm window) is recorded here as the phase 11
+oscillation check's result. Inert at LOW/iOS (no sun shadows). Needs an
+empirical medium-tier bench with a heavy shadow fraction, or upstream
+cross-damping (cadence exit as a recovery step); upstream-owned coupling,
+surfaced in the PR deferral list. No packet code change.
+
+LEDGER CORRECTIONS FILED THIS PHASE: (a) I18N-1: the release-fill debt is 13
+keys x 15 Latin locales = 195 pending rows (3 hud.options.displayMode*, 4
+hudChrome.options force/presence, desktop.update.whatsNew, 4 desktop.notify.*,
+gpuNotice.bodyDiscreteInactive), not the "5 notify + 2 presence" shorthand;
+the phase 7 "16 locales" figure is 15 (en_CA resolves translated). (b) DEP-1
+ruling: @types/three@0.185.4 carries a registry deprecation flag; 0.185.4 IS
+the newest published 0.185.x (registry checked 2026-08-14), so the pick
+stands with tsc green as the arbiter. (c) Discord presence publishing at 1 Hz
+while the window is hidden is DELIBERATE (the player is still in the world;
+sim keeps running by design); recorded here so the ledger says so explicitly.
+(d) The phase 7 Graphics-tab pointer note (a copy addition pointing at the
+Interface GPU row) is DECLINED for this packet: a new player-visible t() key
+plus five M16 fills at packet close grows the release-fill debt for a
+nice-to-have; the maintainer can add it with the release fill round.
+
+QA-CHECKLIST MATRIX EVIDENCE (item by item):
+1. Three-host neutrality PASS: zero branch-owned files under src/sim, server,
+   headless, python, src/world_api* in the 255-file 0d615aa7dd..HEAD delta.
+2. Determinism PASS: tests/architecture.test.ts green standalone.
+3. i18n completeness PASS: exactly 13 packet keys, all five non-Latin fills
+   present, overlay purity clean (5 files, 16 insertions each, all M16),
+   desktop_shell_strings + localization_fixes green standalone; the i18n
+   semantic-regressions suite pins only overlay rows and cannot see the doc
+   flip (verified).
+4. Graphics fairness PASS: hidden-skip is derive-not-latch with a 15s
+   rederive bound and the audio/timer head above the paint cut;
+   ui_effects_profile.ts has a zero-line packet diff and no new governor read
+   exists under src/ui; the LOW retune sheds load only (monotonicity +
+   mote-floor pins); shadow_cadence flips shadow-map autoUpdate only.
+5. Shell security posture PASS: webPreferences byte-identical to base,
+   every new IPC handler trustedSender-gated in its head (pinned),
+   setWindowOpenHandler deny unchanged, prefs store validates and clamps
+   everything (stat cap, whitelists, BOM strip, wx temp), zero .env changes,
+   env reads limited to WOC_DISCORD_APP_ID (validated), the new
+   WOC_DISABLE_GPU_FORCE (strict, pinned) and pipe-path discovery.
+6. Dependency scope PASS: exactly the six sanctioned moves, zero new deps,
+   patch renamed with patchedDependencies re-pointed, 126-line lock delta
+   fully machine-shaped.
+7. Perf evidence bundle: see below.
+8. Visual acceptance PASS: r181/r185 shift explicitly ACCEPTED by the user
+   this phase (decision set tmp/r181-showcase-frozen/).
+9. Degrade cleanly PASS: every paired feature gates on BOTH-methods typeof
+   checks, push features no-op on absent bridge methods, Discord absence is
+   construction-without-IO + bounded backoff.
+10. Update/packaging PASS: electron:pack succeeded (electron-builder 26.15.7,
+    electron 43.3.0, linux-unpacked); updater track suites green; the packed
+    asar carries zero 'world-of-claudecraft-0.0.0' occurrences and the
+    DESKTOP_VERSION const folds to the real 0.38.0 (the phase 2 QA dist-grep
+    deferral, closed).
+11. Copy review PASS: zero em dashes, en dashes, emoji across all 23,529
+    branch-owned added lines (scan rig proven live on probe chars; CJK
+    locale-fill punctuation is sanctioned native).
+12. Full gate: the going-in run redded EXACTLY the accepted set (8 seals/11 +
+    monolith 2, 38805 passed, zero flakes) and aborted at vitest by design;
+    the final run after the mint and fixes is recorded below.
+13. Docs: this record + state.md final inventory + the memory topic file.
+14. Teardown: offered at phase close, user decides.
+15. LOCAL-ONLY PASS: no origin/feature/desktop-client-update exists, no
+    tracking remote configured; zero pushes ever.
+
+PERF EVIDENCE BUNDLE (the packet headline; methodology per the interim
+reconcile: never cross-era without a same-day control):
+- Phase 5 (governor + LOW retune), historical: LOW 211.4 fps vs MEDIUM 78.7
+  at 1280x720 on the 5090 rig, p95 and draw calls lighter on every scenario;
+  the recovery-ladder stall fixed with a red-pre-fix repro; LOW monotonic by
+  construction (bands x0.95, caps x0.9, per-axis pins).
+- Phase 6 (three r185 train), historical fresh-vs-frozen table: medium all
+  green, high/ultra field green with the town-idle red attributed MERGE-OWNED
+  (upstream window regressed town-idle scaling with tier); LOW split
+  (town/east +24-28 pct, open-run/combat regressed) = the accepted user
+  decision above.
+- 2026-08-13 re-frozen baselines are the CURRENT forward reference
+  (docs/perf/baseline, low x4 + medium/high/ultra x2, commit-per-run, all
+  dirty:false); the same-day control pair carries the accepted LOW picture.
+- Phase 4 hidden-window evidence: hidden desktop window stops GL, HUD paint
+  and perf sampling while sim+net drain keep running (E2E presented-frames
+  probe deterministic on any GPU); powerSave display-sleep lease rides the
+  same derivation.
+- Startup: second launch hits the single-instance lock in 109 ms (phase 2
+  smoke); pack cold-boot banner clean, zero fallback lines.
+
+Final gate + turbo proofs + isolated browser leg: recorded below after the
+run (the docs commit lands first so the gate covers the final tree).

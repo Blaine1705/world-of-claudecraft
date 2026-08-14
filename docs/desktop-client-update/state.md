@@ -488,9 +488,23 @@ stamp + the unprovisioned-build toggle caveat ride together).
 - Rich Presence default state: DECIDED 2026-08-14 (user, AskUserQuestion at phase 10
   start): default ON, the Options Interface row is the off switch, and Discord's own
   activity-sharing setting still gates visibility.
-- r181 lighting shift (PBR energy conservation): expect a global brightness change after
-  the three upgrade. Phase 6 QA captures before/after screenshots; user accepts or the
-  phase compensates. This is a judgment call, surface it, do not silently absorb it.
+- r181 lighting shift (PBR energy conservation): RESOLVED 2026-08-14 (user,
+  phase 11 decision round): ACCEPTED for the live game, decision set
+  tmp/r181-showcase-frozen/. The polish-captures sub-decision was corrected in
+  the same phase: provenance re-record with a recorded ruling, no retake (see
+  the phase 11 record and the corrected seal note in the gotchas below).
+- LOW-tier hold-or-accept: RESOLVED 2026-08-14 (user, phase 11): ACCEPTED with
+  the residual routed upstream in the PR body (same-day control pair open-run
+  -18.8 pct / combat -17.4 pct; upstream moving/streaming perf mass + r185
+  low-tier split own the residual).
+- GPU-force no-boot escape hatch: RESOLVED 2026-08-14 (user, phase 11):
+  LANDED as WOC_DISABLE_GPU_FORCE=1 (commit 8cd57b704d), strict env check
+  leading both lever guard chains; docs/desktop-release.md rescue section
+  carries the one-launch variant.
+- Monolith ratchet: RESOLVED for the branch 2026-08-14 (user, phase 11): the
+  ceiling raise is PREPARED as a reviewable commit (755fa4cc72, hud.ts 19510 /
+  renderer.ts 13785, exact current counts) for maintainer approval at PR
+  review; monolith_budget green on the branch.
 
 ## Validation matrix by change type
 
@@ -1129,8 +1143,17 @@ or phase 11 design call); no party invites, buttons, or art assets.
   and they stay green. Phase 11 addition: upstream fb78debb7f shipped
   scripts/assets/eastbrook_grand_armoury/rerecord_polish_provenance.mjs (renderer
   .ts bytes are a provenance input the train moved): the phase 11 seal step must
-  run its twelve-input --check first; if the r185 delta touches town rendering
-  the polish captures must be RE-SHOT, not just re-recorded.
+  run its twelve-input --check first. CORRECTED AT PHASE 11 EXECUTION: the
+  earlier "must be RE-SHOT if the r185 delta touches town rendering" clause
+  mis-modeled the seal. The polish evidence is a FROZEN historical A/B: both
+  arms pin one frozen capture-identity literal, the before-arms pin a
+  historical source revision whose pre-polish content no longer exists, and
+  the divergence from the live town is itself a pinned deliberate literal
+  (never recaptured through the bank rebuild). The sanctioned move for
+  "renderer moved, look changed" is the provenance re-record with a recorded
+  ruling, which phase 11 executed (commit 3c6040428f) under the user's
+  corrected approval; the r185-look acceptance is recorded in the mint
+  comments and the phase 11 record.
 - MONOLITH RATCHET RED (OPEN, surfaced 2026-08-13, user decision pending;
   numbers refreshed at phase 10 QA 2026-08-14): tests/monolith_budget.test.ts
   reds on the merged tree: hud.ts 19510 vs ceiling 19490 (+20) and renderer.ts
@@ -1169,3 +1192,30 @@ or phase 11 design call); no party invites, buttons, or art assets.
   restart vite with VITE_DESKTOP_RELATIVE_API=1. Register mode has a required
   email field (empty = silent requestSubmit no-op) and character names reject
   digits; scripts/desktop_hidden_skip_probe.mjs encodes all three.
+
+## Phase 11 final inventory (2026-08-14; packet complete)
+
+- Branch commits this phase (base merge f2c84ca190 of tip 0d615aa7dd first,
+  parity 374/374 after): 328476e162 flattener sweep + shared
+  tests/helpers/strip_comments.ts, b9c32cefbf pre-paint reveal-discipline fix
+  (WIM-1), 8cd57b704d WOC_DISABLE_GPU_FORCE=1 escape hatch, 7229caa61a
+  stripper lookbehind hardening, 755fa4cc72 monolith ceiling raise (hud 19510
+  / renderer 13785, maintainer-decision surface for PR review), 3c6040428f
+  the one-commit seal re-mint (27 GLBs re-stamped, 35-digest sweep, media
+  manifest, polish provenance re-record; frozen capture identity untouched),
+  e662d43105 doc flips (21 badges, CONTRIBUTING, hitch README rewrite,
+  prewarm comment, phase-doc corrections), plus the phase 11 docs record.
+- New seal values: composite polish fingerprint d05e927d0abd.., metadata
+  authority d5cba2474a3f.., second-order performance seal 3c1edecb507a..;
+  family fingerprints town 86261254.., mailbox 5a1e01b5.., notice 7836db25..,
+  armoury 4642a297.., tank cbae520e.., atlas 30575700.., fenbridge 33f81824..,
+  fenbridge support maps 0d259a1c...
+- The four user rulings (decision round + one corrected follow-up) are in the
+  phase 11 record in progress.md; OPEN items above updated in place.
+- Remaining OPEN after this phase: Discord Application ID provisioning +
+  packaging stamp + unprovisioned-toggle suppression decision (maintainer
+  infrastructure); the win32 live-launch observation for the pre-ready menu
+  (pinned by test, no Windows box here); the Windows minimized-close
+  isMaximized probe (same); the WIM-2 shadow-cadence bench (upstream-owned).
+- Release-fill debt for the maintainer's release-tier round: 13 packet keys x
+  15 Latin locales = 195 pending rows (list in the phase 11 record).
