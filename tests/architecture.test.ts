@@ -442,6 +442,7 @@ const RENDER_PURE_CORES = [
   'src/render/adaptive_link_budget_core.ts',
   'src/render/affliction_familiar_core.ts',
   'src/render/characters/portrait_prewarm_core.ts',
+  'src/render/characters/soul_rend_prewarm_core.ts',
   'src/render/characters/design_code_core.ts',
   'src/render/reveal_gate_core.ts',
   'src/render/town_reveal_core.ts',
@@ -516,6 +517,9 @@ const RENDER_PURE_CORES = [
   'src/render/link_rate_budget.ts',
   'src/render/prewarm_compile_lifecycle.ts',
   'src/render/prewarm_policy.ts',
+  // Same reason, one seam over: the per-interior encounter prewarm's decision
+  // layer (which interior warms what, the kill switch, the live-queue verdict).
+  'src/render/interior_encounter_prewarm.ts',
   'src/render/camp_brazier_placement_core.ts',
   'src/render/night_accents_core.ts',
   'src/render/night_light_field_core.ts',
@@ -585,6 +589,7 @@ const BARE_NAMED = [
   'src/render/link_rate_budget.ts',
   'src/render/prewarm_compile_lifecycle.ts',
   'src/render/prewarm_pass.ts',
+  'src/render/interior_encounter_prewarm.ts',
   'src/render/prewarm_policy.ts',
   'src/render/prewarm_resume.ts',
   'src/ui/mob_idle_sfx.ts',
@@ -1377,6 +1382,7 @@ const EXPECTED_BARE_NAMED = [
   'src/render/cast_bar.ts',
   'src/render/compile_gate.ts',
   'src/render/foliage_lod.ts',
+  'src/render/interior_encounter_prewarm.ts',
   'src/render/link_rate_budget.ts',
   'src/render/prewarm_compile_lifecycle.ts',
   'src/render/prewarm_pass.ts',

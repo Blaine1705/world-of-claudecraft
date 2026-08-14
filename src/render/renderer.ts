@@ -328,6 +328,10 @@ import { buildHollowGates } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
 import { buildImpactSite, type ImpactSiteView, MIREFEN_IMPACT_SITE } from './impact_site';
+import {
+  queueLiveSoulRendPrewarm,
+  startInteriorEncounterPrewarm,
+} from './interior_encounter_prewarm_pass';
 import { ensureDelveInteriorKit } from './interior_kit';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
@@ -1331,6 +1335,7 @@ export class Renderer {
   camera: THREE.PerspectiveCamera;
   webgl: THREE.WebGLRenderer;
   views = new Map<number, EntityView>();
+  activeInterior: string | null = null;
   // Editor opt-out for the quest-collectable view gate (see RendererCreateOptions).
   private questObjectHidden = makeQuestObjectGate({});
   private viewCreateRetry = new ViewCreateRetryGate(VIEW_CREATE_FAIL_RETRY_MS);
@@ -8860,6 +8865,7 @@ export class Renderer {
       tiltOnProp: false,
     });
     const view = this.views.get(e.id);
+    if (visual) queueLiveSoulRendPrewarm(this, visual, null);
     // Never gate the player's OWN view: it must be on screen immediately, its
     // class is already prewarmed, and the self render path does not re-evaluate
     // the compilePending flag (only the non-self loop does), so gating it would
@@ -9123,6 +9129,7 @@ export class Renderer {
     const changed = v.visual.setWeaponSkin(skinId);
     if (changed) for (const node of changed) this.gateSwapOnCompile(node);
     this.reconcileViewLights(v);
+    queueLiveSoulRendPrewarm(this, v.visual, skinId);
   }
 
   /** Spend this frame's weapon-skin application budget, nearest wearer first.
@@ -9327,6 +9334,7 @@ export class Renderer {
     oz: number,
     opts?: Parameters<DungeonInteriors['buildInterior']>[3],
   ): void {
+    startInteriorEncounterPrewarm(interior, this);
     void this.ensureDungeons()
       .buildInterior(interior, ox, oz, opts)
       .catch((err) => {
@@ -9817,6 +9825,7 @@ export class Renderer {
       inside && !inDelve && !inYumiMaze && !inBattleground && !isArenaPos(px)
         ? dungeonAt(px)?.interior
         : null;
+    this.activeInterior = interior ?? null;
     const inTemple = interior === 'temple';
     const inNythraxis = interior === 'nythraxis';
     // Wildheart is an OPEN-AIR jungle caldera, not a closed room: it keeps the

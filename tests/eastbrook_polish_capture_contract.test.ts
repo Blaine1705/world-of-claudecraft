@@ -169,7 +169,7 @@ interface AttributionTargetFixture {
 // Re-minted again after making that extracted policy an explicit provenance
 // leaf. The evidence now follows policy-only changes; no capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'e069626230576fa39ed87eeb94a78cb0ec111156f031fd8063bf2471a99db070';
+  '3047cd9d5047607915e6e5b6e6c0a4faa8ffb711432d87351cf1665fb9b240a9';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
