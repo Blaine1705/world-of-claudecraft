@@ -14,9 +14,23 @@ export interface DiscordPresenceLog {
   debug: (...args: unknown[]) => void;
 }
 
+export interface DiscordPathStats {
+  isSocket: () => boolean;
+  uid?: number;
+}
+
+export interface DiscordActivity {
+  details: string;
+  timestamps?: { start: number };
+}
+
 export interface DiscordPresenceDeps {
   clientId: string | null;
   connect: (path: string) => DiscordPresenceSocket | null;
+  statPath: (path: string) => DiscordPathStats | null;
+  /** The uid every candidate socket must belong to, or null to skip the check. */
+  uid?: number | null;
+  clampText?: (value: unknown, maxLength: number) => string;
   platform: string;
   env: Record<string, string | undefined>;
   now: () => number;
@@ -48,6 +62,8 @@ export interface DiscordPresence {
 }
 
 export const DISCORD_BASE_BACKOFF_MS: number;
+export const DISCORD_DETAILS_MAX: number;
+export const DISCORD_LOG_TEXT_MAX: number;
 export const DISCORD_MAX_BACKOFF_MS: number;
 export const DISCORD_MIN_SEND_INTERVAL_MS: number;
 export const DISCORD_PIPE_SLOTS: number;
@@ -59,3 +75,7 @@ export function createDiscordPresence(deps: DiscordPresenceDeps): DiscordPresenc
 export function resolveDiscordClientId(
   env: Record<string, string | undefined> | undefined,
 ): string | null;
+export function sanitizeDiscordActivity(
+  payload: unknown,
+  clampTextFn?: (value: unknown, maxLength: number) => string,
+): DiscordActivity | null;

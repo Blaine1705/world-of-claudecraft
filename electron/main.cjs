@@ -46,7 +46,11 @@ const {
 } = require('./window_memory.cjs');
 const { createPowerSave } = require('./power_save.cjs');
 const { createNotifyGuard } = require('./notify_guard.cjs');
-const { createDiscordPresence, resolveDiscordClientId } = require('./discord_presence.cjs');
+const {
+  createDiscordPresence,
+  resolveDiscordClientId,
+  sanitizeDiscordActivity,
+} = require('./discord_presence.cjs');
 const { createSteamShell } = require('./steam.cjs');
 const { createEpicShell } = require('./epic.cjs');
 const { PRODUCTION_API_ORIGIN } = require('./update_guard.cjs');
@@ -387,6 +391,13 @@ const notifyGuard = createNotifyGuard({ now: () => Date.now() });
 const discordPresence = createDiscordPresence({
   clientId: resolveDiscordClientId(process.env),
   connect: (p) => nodeNet.createConnection(p),
+  // The walk ends at world-writable /tmp, so a candidate is dialed only when it
+  // is a socket this account owns (electron/discord_presence.cjs explains why).
+  statPath: (p) => fs.statSync(p),
+  uid: typeof process.getuid === 'function' ? process.getuid() : null,
+  // Peer-written text is clamped and control-character flattened before it can
+  // reach the log, the same treatment renderer strings get.
+  clampText,
   platform: process.platform,
   env: process.env,
   now: () => Date.now(),
@@ -1048,17 +1059,14 @@ ipcMain.handle('desktop-show-notification', (event, payload) => {
 // The Discord Rich Presence line. The renderer decides WHAT to report (it is
 // the only side that knows the zone, and it is the side with a catalog, so the
 // string arrives already rendered by its t()); main decides what may leave the
-// machine. The whitelist is the whole point: a fresh object is built from two
-// validated fields, so no renderer prototype, no getter, and no extra key the
-// page invented crosses into a payload sent to another program.
-// details is clamped to 128 through clampText, which also flattens control and
-// invisible-formatting characters, because this string lands in a surface other
-// people read. Timestamps are REFUSED rather than stripped when malformed: a
-// start main silently dropped would show an elapsed timer that is simply wrong,
-// and the renderer would have no way to learn it never landed.
-// The pacing, the connection, and every failure arm live in
-// electron/discord_presence.cjs; a shell with no Discord running does nothing
-// here but return true.
+// machine. The whitelist itself lives in electron/discord_presence.cjs
+// (sanitizeDiscordActivity) rather than inline here, because it is the
+// privacy-load-bearing part of this handler and belongs where a test can
+// EXECUTE it: an extra field quietly added to the outgoing object later is the
+// regression this feature can least afford, and no amount of reading the
+// handler proves that what leaves carries only the two allowed keys.
+// The pacing, the connection, and every failure arm live in that module too; a
+// shell with no Discord running does nothing here but return true.
 ipcMain.handle('desktop-set-discord-activity', (event, payload) => {
   if (!trustedSender(event)) return false;
   // Null is the CLEAR, and it is the one payload with nothing to validate: the
@@ -1067,22 +1075,8 @@ ipcMain.handle('desktop-set-discord-activity', (event, payload) => {
     discordPresence.setActivity(null);
     return true;
   }
-  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return false;
-  if (typeof payload.details !== 'string') return false;
-  const details = clampText(payload.details, 128);
-  if (details.trim() === '') return false;
-  let clean = { details };
-  if (payload.timestamps !== undefined) {
-    const timestamps = payload.timestamps;
-    if (!timestamps || typeof timestamps !== 'object' || Array.isArray(timestamps)) return false;
-    const start = timestamps.start;
-    // A safe positive integer only: this is a unix timestamp in epoch SECONDS
-    // (the renderer builder's contract; Discord auto-detects the magnitude)
-    // rendered as a live counter, so a float, a NaN, or a zero would show the
-    // player a timer running from the epoch.
-    if (!Number.isSafeInteger(start) || start <= 0) return false;
-    clean = { details, timestamps: { start } };
-  }
+  const clean = sanitizeDiscordActivity(payload, clampText);
+  if (!clean) return false;
   discordPresence.setActivity(clean);
   return true;
 });

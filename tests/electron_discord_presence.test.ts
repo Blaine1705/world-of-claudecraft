@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest';
+import { clampText } from '../electron/diagnostics.cjs';
 import {
   candidatePipePaths,
   createDiscordPresence,
   DISCORD_BASE_BACKOFF_MS,
+  DISCORD_DETAILS_MAX,
+  DISCORD_LOG_TEXT_MAX,
   DISCORD_MAX_BACKOFF_MS,
   DISCORD_MIN_SEND_INTERVAL_MS,
   resolveDiscordClientId,
+  sanitizeDiscordActivity,
 } from '../electron/discord_presence.cjs';
 import { decodeFrames, encodeFrame, OPCODES } from '../electron/discord_presence_codec.cjs';
 
@@ -80,20 +84,30 @@ interface RigOptions {
   initiallyEnabled?: boolean;
   minSendIntervalMs?: number;
   maxBackoffMs?: number;
+  /** null means "this platform has no getuid", which skips the ownership check. */
+  uid?: number | null;
+  clampTextFn?: (value: unknown, maxLength: number) => string;
 }
+
+/** What the fake stat says about one candidate path. */
+type StatVerdict = 'ok' | 'foreign' | 'nonsocket' | 'throw';
 
 function createRig(options: RigOptions = {}) {
   const sockets: FakeSocket[] = [];
+  const statted: string[] = [];
   const timers: ArmedTimer[] = [];
   const cleared: number[] = [];
   const warnings: unknown[][] = [];
   const debugs: unknown[][] = [];
+  const OUR_UID = 501;
   const state = {
     now: 1_000_000,
     nextHandle: 700,
     random: 1,
     connectThrows: false,
     connectReturnsNull: false,
+    /** Per-path stat verdict; every candidate is a socket we own by default. */
+    statVerdict: (_path: string): StatVerdict => 'ok',
   };
   const presence = createDiscordPresence({
     clientId: options.clientId === undefined ? APP_ID : options.clientId,
@@ -104,6 +118,19 @@ function createRig(options: RigOptions = {}) {
       sockets.push(socket);
       return socket;
     },
+    statPath: (path: string) => {
+      statted.push(path);
+      const verdict = state.statVerdict(path);
+      if (verdict === 'throw') throw new Error('ENOENT');
+      // A foreign socket is the squatting case: it exists, it is a socket, and
+      // it belongs to somebody else on the machine.
+      return {
+        isSocket: () => verdict !== 'nonsocket',
+        uid: verdict === 'foreign' ? 999 : OUR_UID,
+      };
+    },
+    uid: options.uid === undefined ? OUR_UID : options.uid,
+    clampText: options.clampTextFn,
     platform: options.platform ?? 'linux',
     env: options.env ?? { XDG_RUNTIME_DIR: RUNTIME_DIR },
     now: () => state.now,
@@ -165,6 +192,7 @@ function createRig(options: RigOptions = {}) {
   return {
     presence,
     sockets,
+    statted,
     timers,
     cleared,
     warnings,
@@ -291,6 +319,143 @@ describe('discord app id resolution', () => {
   });
 });
 
+describe('discord activity whitelist', () => {
+  // EXECUTED, not read off the handler. This function decides what leaves the
+  // machine and reaches another program's UI, so the pins below are about the
+  // exact key set of the object it returns: a field added later (a character
+  // name, a party id, a join secret) would be invisible to any source-text pin
+  // on the IPC handler, and visible here immediately.
+  it('returns a fresh object carrying only the two allowed keys', () => {
+    const clean = sanitizeDiscordActivity({ details: 'Eastbrook' }, clampText);
+    expect(clean).toEqual({ details: 'Eastbrook' });
+    expect(Object.keys(clean ?? {})).toEqual(['details']);
+
+    const withStart = sanitizeDiscordActivity(
+      { details: 'Eastbrook', timestamps: { start: 1723600000 } },
+      clampText,
+    );
+    expect(Object.keys(withStart ?? {})).toEqual(['details', 'timestamps']);
+    expect(Object.keys(withStart?.timestamps ?? {})).toEqual(['start']);
+    expect(withStart?.timestamps?.start).toBe(1723600000);
+  });
+
+  it('drops every field Discord would happily have accepted', () => {
+    // Each of these is a real Rich Presence field: state, party size, join
+    // secrets, images, buttons. Reporting any of them would be a privacy
+    // decision nobody made, so the whitelist has to be an allow list rather
+    // than a deny list, and this proves it by execution.
+    const payload = JSON.parse(
+      JSON.stringify({
+        details: 'Eastbrook',
+        state: 'Fighting Grimjaw',
+        party: { id: 'party-77', size: [3, 5] },
+        secrets: { join: 'a-real-secret' },
+        assets: { large_image: 'https://example.invalid/x.png' },
+        buttons: [{ label: 'Join', url: 'https://example.invalid' }],
+        instance: true,
+        timestamps: { start: 1723600000, end: 1723609999 },
+      }),
+    );
+    const clean = sanitizeDiscordActivity(payload, clampText);
+    expect(Object.keys(clean ?? {})).toEqual(['details', 'timestamps']);
+    // Even inside the one nested object that survives, only start crosses.
+    expect(Object.keys(clean?.timestamps ?? {})).toEqual(['start']);
+    expect(JSON.stringify(clean)).not.toContain('secret');
+    expect(JSON.stringify(clean)).not.toContain('Grimjaw');
+  });
+
+  it('cannot be used to pollute Object.prototype', () => {
+    // An own __proto__ key, the shape JSON.parse produces (an object literal
+    // would set the prototype instead of an own property).
+    const payload = JSON.parse('{"__proto__":{"polluted":"yes"},"details":"Eastbrook"}');
+    const clean = sanitizeDiscordActivity(payload, clampText);
+    expect(Object.keys(clean ?? {})).toEqual(['details']);
+    expect(Object.prototype).not.toHaveProperty('polluted');
+    expect(Object.getPrototypeOf(clean)).toBe(Object.prototype);
+  });
+
+  it('refuses every malformed payload rather than repairing it', () => {
+    for (const junk of [
+      null,
+      undefined,
+      42,
+      'Eastbrook',
+      true,
+      [],
+      [{ details: 'Eastbrook' }],
+      {},
+      { details: 5 },
+      { details: null },
+      { details: '' },
+      { details: '   ' },
+    ]) {
+      expect(
+        sanitizeDiscordActivity(junk, clampText),
+        `${JSON.stringify(junk)} must be refused`,
+      ).toBeNull();
+    }
+    // Timestamps are refused WHOLE rather than stripped, one arm per failure
+    // mode: a start that was meant to be sent and quietly vanished would show
+    // the player a counter running from the wrong moment.
+    for (const timestamps of [
+      null,
+      'now',
+      42,
+      [],
+      {},
+      { start: 0 },
+      { start: -1 },
+      { start: 1.5 },
+      { start: '1723600000' },
+      { start: Number.NaN },
+      { start: Number.POSITIVE_INFINITY },
+      { start: Number.MAX_SAFE_INTEGER + 2 },
+      { end: 1723600000 },
+    ]) {
+      expect(
+        sanitizeDiscordActivity({ details: 'Eastbrook', timestamps }, clampText),
+        `timestamps ${JSON.stringify(timestamps)} must refuse the whole activity`,
+      ).toBeNull();
+    }
+    // And the accepted arm, so the refusals cannot be satisfied by refusing
+    // everything.
+    expect(
+      sanitizeDiscordActivity({ details: 'Eastbrook', timestamps: { start: 1 } }, clampText),
+    ).toEqual({ details: 'Eastbrook', timestamps: { start: 1 } });
+  });
+
+  it('clamps details to a length Discord will actually accept', () => {
+    // clampText appends three dots ON TOP of the cap it is given, so the cap
+    // has to sit below Discord's own 128 or the longest string this can produce
+    // is one the daemon rejects outright.
+    expect(DISCORD_DETAILS_MAX).toBe(125);
+    const clean = sanitizeDiscordActivity({ details: 'a'.repeat(400) }, clampText);
+    expect(clean?.details).toHaveLength(DISCORD_DETAILS_MAX + 3);
+    expect(clean?.details.length).toBeLessThanOrEqual(128);
+    // The injected clamp is the real one, so control characters are flattened
+    // on the way out too: this string lands in a surface other people read.
+    const flattened = sanitizeDiscordActivity(
+      { details: `East\nbrook${String.fromCodePoint(0x0007)}` },
+      clampText,
+    );
+    expect(flattened?.details).not.toContain('\n');
+    expect(flattened?.details).not.toContain(String.fromCodePoint(0x0007));
+  });
+
+  it('stays bounded when no clamp is injected, and refuses a clamp that misbehaves', () => {
+    // The fallback exists so the module is never silently unbounded when used
+    // standalone; it is a slice, so there is no suffix to account for.
+    expect(sanitizeDiscordActivity({ details: 'a'.repeat(400) })?.details).toHaveLength(
+      DISCORD_DETAILS_MAX,
+    );
+    // A clamp that returns something other than a string is a wiring bug, and
+    // it must refuse rather than send a non-string into a JSON frame.
+    expect(
+      sanitizeDiscordActivity({ details: 'Eastbrook' }, (() => 42) as unknown as typeof clampText),
+    ).toBeNull();
+  });
+});
+
 describe('discord presence connection (electron/discord_presence.cjs)', () => {
   it('pins the pacing and backoff constants to their literals', () => {
     // The send floor is Discord's own rate limit; the ceiling is how long a
@@ -361,6 +526,111 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     // must not escape into the caller's setActivity.
     rig.state.connectThrows = true;
     expect(() => rig.live().emit('error', new Error('ENOENT'))).not.toThrow();
+  });
+
+  it('never dials a socket another user owns', () => {
+    // The walk ends at /tmp, world-writable on every unix we ship to. A second
+    // local account can listen on one of these names and answer the handshake,
+    // and the shell would hand it the presence line. Ownership is checked
+    // BEFORE the dial, so the squatter never even sees a connection.
+    const rig = createRig();
+    rig.state.statVerdict = (path) => (path === '/run/user/1000/discord-ipc-0' ? 'foreign' : 'ok');
+    rig.presence.setActivity({ details: 'Eastbrook' });
+    expect(rig.statted[0]).toBe('/run/user/1000/discord-ipc-0');
+    expect(rig.sockets).toHaveLength(1);
+    expect(rig.sockets[0].path).toBe('/run/user/1000/app/com.discordapp.Discord/discord-ipc-0');
+    // Skipped, not attempted: the counter tracks dials, and a path that was
+    // never dialed must not read as one that was refused.
+    expect(rig.presence.stateForTest().connectAttempts).toBe(1);
+  });
+
+  it('never dials an entry that is not a socket, or one it cannot stat', () => {
+    // A regular file (or a directory) planted at the path is the same squat by
+    // another route, and a stat that throws is the ordinary "nothing there".
+    for (const verdict of ['nonsocket', 'throw'] as const) {
+      const rig = createRig();
+      rig.state.statVerdict = (path) => (path === '/run/user/1000/discord-ipc-0' ? verdict : 'ok');
+      rig.presence.setActivity({ details: 'Eastbrook' });
+      expect(rig.sockets, `${verdict} must be skipped`).toHaveLength(1);
+      expect(rig.sockets[0].path).toBe('/run/user/1000/app/com.discordapp.Discord/discord-ipc-0');
+    }
+  });
+
+  it('dials nothing at all when every candidate is squatted', () => {
+    const rig = createRig();
+    rig.state.statVerdict = () => 'foreign';
+    rig.presence.setActivity({ details: 'Eastbrook' });
+    expect(rig.sockets).toEqual([]);
+    expect(rig.presence.stateForTest().connectAttempts).toBe(0);
+    // Every candidate was still LOOKED at, so this is a refusal rather than a
+    // walk that stopped early, and it degrades into the ordinary backoff.
+    expect(rig.statted).toHaveLength(40);
+    expect(rig.timers).toHaveLength(1);
+    expect(rig.warnings).toEqual([]);
+    expect(rig.presence.stateForTest().state).toBe('backoff');
+  });
+
+  it('checks only the socket kind when the platform has no uid to compare', () => {
+    // Windows has no getuid, and neither does a caller that passed none; the
+    // ownership question is unanswerable there, but the socket check still is.
+    const rig = createRig({ uid: null });
+    rig.state.statVerdict = (path) => (path === '/run/user/1000/discord-ipc-0' ? 'foreign' : 'ok');
+    rig.presence.setActivity({ details: 'Eastbrook' });
+    expect(rig.sockets[0].path).toBe('/run/user/1000/discord-ipc-0');
+    const nonSocket = createRig({ uid: null });
+    nonSocket.state.statVerdict = (path) =>
+      path === '/run/user/1000/discord-ipc-0' ? 'nonsocket' : 'ok';
+    nonSocket.presence.setActivity({ details: 'Eastbrook' });
+    expect(nonSocket.sockets[0].path).toBe(
+      '/run/user/1000/app/com.discordapp.Discord/discord-ipc-0',
+    );
+  });
+
+  it('skips the stat entirely for a Windows named pipe', () => {
+    // There is no meaningful stat for one, and the pipe namespace is not a
+    // world-writable directory to begin with.
+    const rig = createRig({ platform: 'win32' });
+    rig.state.statVerdict = () => 'throw';
+    rig.presence.setActivity({ details: 'Eastbrook' });
+    expect(rig.statted).toEqual([]);
+    expect(rig.sockets).toHaveLength(1);
+    expect(rig.sockets[0].path).toBe('\\\\?\\pipe\\discord-ipc-0');
+  });
+
+  it('never logs unbounded or control-laden text a peer wrote', () => {
+    // Everything on this socket comes from another program. Unbounded, a
+    // hostile peer grows the log file without limit; with newlines, it forges
+    // log lines around its own.
+    const rig = createRig({ clampTextFn: clampText });
+    rig.presence.setActivity({ details: 'Eastbrook' });
+    rig.live().emit('connect');
+    rig.feed(rig.live(), OPCODES.CLOSE, {
+      code: 4000,
+      message: `${'A'.repeat(10000)}\nfake log line`,
+    });
+    expect(rig.warnings).toHaveLength(1);
+    const logged = rig.warnings[0][2] as string;
+    expect(typeof logged).toBe('string');
+    // The cap plus clampText's three-dot suffix, and nothing that could pass
+    // for a line of its own.
+    expect(logged.length).toBeLessThanOrEqual(DISCORD_LOG_TEXT_MAX + 3);
+    expect(logged).not.toContain('\n');
+    // The numeric code is not text and rides as itself, so the log stays
+    // readable and the existing refusal pin still means what it says.
+    expect(rig.warnings[0][1]).toBe(4000);
+  });
+
+  it('bounds a rejected-update message from the peer as well', () => {
+    const rig = createRig({ clampTextFn: clampText });
+    const socket = rig.bringUp({ details: 'Eastbrook' });
+    rig.feed(socket, OPCODES.FRAME, {
+      cmd: 'SET_ACTIVITY',
+      evt: 'ERROR',
+      data: { code: 4000, message: 'B'.repeat(10000) },
+      nonce: 'woc-1',
+    });
+    const logged = rig.warnings[0][1] as string;
+    expect(logged.length).toBeLessThanOrEqual(DISCORD_LOG_TEXT_MAX + 3);
   });
 
   it('treats a machine with no Discord as silent, with a jittered backoff', () => {
@@ -689,6 +959,8 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     const base: Record<string, unknown> = {
       clientId: APP_ID,
       connect: () => null,
+      statPath: () => ({ isSocket: () => true, uid: 1 }),
+      uid: 1,
       platform: 'linux',
       env: {},
       now: () => 0,
@@ -705,13 +977,25 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     // The defaults are valid, so the guard cannot be satisfied by refusing
     // everything.
     expect(() => build()).not.toThrow();
-    for (const field of ['connect', 'now', 'setTimeoutFn', 'clearTimeoutFn', 'random']) {
+    for (const field of [
+      'connect',
+      'statPath',
+      'now',
+      'setTimeoutFn',
+      'clearTimeoutFn',
+      'random',
+    ]) {
       expect(() => build({ [field]: undefined }), `${field} must be required`).toThrow(TypeError);
       expect(() => build({ [field]: 'not a function' }), `${field} must be a function`).toThrow(
         TypeError,
       );
     }
     expect(() => build({ pid: 1.5 })).toThrow(TypeError);
+    // clampText is the one dep with a default, so absence is fine and junk is
+    // not: a non-function would throw inside a log call on the machine of the
+    // one player whose Discord refused the handshake.
+    expect(() => build({ clampText: undefined })).not.toThrow();
+    expect(() => build({ clampText: 'nope' })).toThrow(TypeError);
     // A log without debug would throw inside a socket event instead, i.e. on
     // the machine of the one player whose Discord is missing.
     expect(() => build({ log: { warn: () => {} } })).toThrow(TypeError);

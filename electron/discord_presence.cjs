@@ -75,6 +75,56 @@ function resolveDiscordClientId(env) {
 }
 
 /**
+ * The visible cap on the details line. Deliberately BELOW Discord's own 128:
+ * clampText appends a three-dot suffix ON TOP of the cap it is given, so 125
+ * plus the suffix is the largest string this can produce, and a details line
+ * Discord would reject outright never leaves the machine.
+ */
+const DISCORD_DETAILS_MAX = 125;
+
+/** The cap on any peer-written text this module puts in the log. */
+const DISCORD_LOG_TEXT_MAX = 200;
+
+/**
+ * The clamp used when the caller injects none. The real one
+ * (electron/diagnostics.cjs clampText) also flattens control characters, which
+ * is why main.cjs passes it; this fallback only exists so the module is not
+ * silently unbounded when used standalone.
+ */
+const fallbackClampText = (value, maxLength) => String(value).slice(0, maxLength);
+
+/**
+ * Build the activity object that may be sent, or null for anything that may
+ * not. Pure and exported so the whitelist is EXECUTED by tests rather than
+ * merely read off the handler: the risk this guards is a field quietly added
+ * later (a player name, a party id, a lobby secret) reaching another program,
+ * and a source-text pin cannot see that happen.
+ *
+ * The answer is always a FRESH object built from validated primitives, so
+ * nothing that crossed the IPC (no prototype, no getter, no extra key) can ride
+ * along. Malformed timestamps REFUSE the whole activity rather than being
+ * stripped: a start the caller meant to send and this dropped would render as a
+ * live counter running from the wrong moment, with nothing to notice it.
+ */
+function sanitizeDiscordActivity(payload, clampTextFn) {
+  const clamp = typeof clampTextFn === 'function' ? clampTextFn : fallbackClampText;
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return null;
+  if (typeof payload.details !== 'string') return null;
+  const details = clamp(payload.details, DISCORD_DETAILS_MAX);
+  if (typeof details !== 'string' || details.trim() === '') return null;
+  if (payload.timestamps === undefined) return { details };
+  const timestamps = payload.timestamps;
+  if (!timestamps || typeof timestamps !== 'object' || Array.isArray(timestamps)) return null;
+  const start = timestamps.start;
+  // A safe positive integer only: this is a unix timestamp in epoch SECONDS
+  // (the renderer builder's contract; Discord auto-detects the magnitude)
+  // rendered as a live counter, so a float, a NaN, or a zero would show the
+  // player a timer running from the epoch.
+  if (!Number.isSafeInteger(start) || start <= 0) return null;
+  return { details, timestamps: { start } };
+}
+
+/**
  * Every socket path Discord could be listening on, in the order to try them.
  *
  * Windows uses named pipes and has one fixed base. Everywhere else the socket
@@ -156,6 +206,8 @@ function sameActivity(a, b) {
 function createDiscordPresence({
   clientId,
   connect,
+  statPath,
+  uid = null,
   platform,
   env,
   now,
@@ -164,11 +216,14 @@ function createDiscordPresence({
   random,
   pid,
   log,
+  clampText = fallbackClampText,
   initiallyEnabled = true,
   minSendIntervalMs = DISCORD_MIN_SEND_INTERVAL_MS,
   maxBackoffMs = DISCORD_MAX_BACKOFF_MS,
 }) {
   requireFunction(connect, 'connect');
+  requireFunction(statPath, 'statPath');
+  requireFunction(clampText, 'clampText');
   requireFunction(now, 'now');
   requireFunction(setTimeoutFn, 'setTimeoutFn');
   requireFunction(clearTimeoutFn, 'clearTimeoutFn');
@@ -309,13 +364,24 @@ function createDiscordPresence({
     flush();
   };
 
+  /**
+   * Peer-written text on its way to the log. Everything that arrives on this
+   * socket was written by another program, so it is bounded AND (with the real
+   * clampText) stripped of control characters before it reaches a log file:
+   * unbounded, a hostile peer could grow the log without limit, and with
+   * newlines it could forge log lines around its own. A numeric code is not
+   * text and rides as itself so the log stays readable.
+   */
+  const clampLogValue = (value) =>
+    typeof value === 'number' ? value : clampText(String(value ?? ''), DISCORD_LOG_TEXT_MAX);
+
   const onInvalidClient = (payload) => {
     // Terminal, and the one line in this module that is worth a warning: it is
     // always a build or configuration mistake, and it is silent otherwise.
     log.warn(
       '[discord] presence refused by the client, disabling for this run:',
-      payload?.code,
-      payload?.message,
+      clampLogValue(payload?.code),
+      clampLogValue(payload?.message),
     );
     terminal = 'invalid-client';
     clearRetryTimer();
@@ -353,7 +419,7 @@ function createDiscordPresence({
         // delivered: retrying the payload Discord just refused would be a loop,
         // and the next real change goes out normally.
         loggedActivityError = true;
-        log.warn('[discord] presence update rejected:', payload.data?.message);
+        log.warn('[discord] presence update rejected:', clampLogValue(payload.data?.message));
       }
       pendingNonce = null;
       flush();
@@ -420,6 +486,36 @@ function createDiscordPresence({
     candidate.on('close', onSocketGone);
   };
 
+  /**
+   * Whether a candidate path is safe to dial at all.
+   *
+   * The walk ends at /tmp, which is world-writable on every unix we ship to. A
+   * second local account (or any process running as another user on a shared
+   * machine) can create a listening socket at one of these names and answer the
+   * handshake, at which point the shell would hand it the presence line, and
+   * whatever the game reports would be readable by whoever planted it. So a
+   * candidate is dialed only when the entry is really a SOCKET and really OURS.
+   *
+   * A stat that throws is the ordinary case (nothing at that path) and counts
+   * exactly like a refused connect: walk on. Windows named pipes are skipped
+   * because there is no meaningful stat for one, and their namespace is not a
+   * world-writable directory to begin with.
+   */
+  const candidateIsOurs = (path) => {
+    if (platform === 'win32') return true;
+    let stats = null;
+    try {
+      stats = statPath(path);
+    } catch {
+      return false;
+    }
+    if (!stats || typeof stats.isSocket !== 'function' || !stats.isSocket()) return false;
+    // A platform with no getuid (or a caller that passed none) cannot answer
+    // the ownership question; the socket check above still stands.
+    if (typeof uid !== 'number') return true;
+    return stats.uid === uid;
+  };
+
   function connectNextPath() {
     if (terminal !== null || !enabled) return;
     if (pathIndex >= paths.length) {
@@ -432,6 +528,11 @@ function createDiscordPresence({
     }
     const path = paths[pathIndex];
     pathIndex += 1;
+    // Not counted as an attempt: nothing was dialed.
+    if (!candidateIsOurs(path)) {
+      connectNextPath();
+      return;
+    }
     connectAttempts += 1;
     let candidate = null;
     try {
@@ -556,10 +657,13 @@ function createDiscordPresence({
 
 module.exports = {
   DISCORD_BASE_BACKOFF_MS,
+  DISCORD_DETAILS_MAX,
+  DISCORD_LOG_TEXT_MAX,
   DISCORD_MAX_BACKOFF_MS,
   DISCORD_MIN_SEND_INTERVAL_MS,
   DISCORD_PIPE_SLOTS,
   candidatePipePaths,
   createDiscordPresence,
   resolveDiscordClientId,
+  sanitizeDiscordActivity,
 };

@@ -344,12 +344,14 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     expect(preload).toContain("ipcRenderer.invoke('desktop-gamepad-activity').catch(() => {});");
   });
 
-  it('the discord-activity handler whitelists, clamps, and refuses junk timestamps', () => {
-    // This is the one path from the page to a line other people read in another
-    // program, so everything it refuses is refused ONLY here: an untrusted
-    // frame, a non-object, a missing or empty details string, and a malformed
-    // timestamp each have to be answered by value rather than by a call some
-    // later line could ignore.
+  it('the discord-activity handler sends only what the whitelist returned', () => {
+    // The handler is deliberately thin: the whitelist itself lives in
+    // electron/discord_presence.cjs and is EXECUTED by
+    // tests/electron_discord_presence.test.ts, because a pin on handler text
+    // cannot see a field added to the object that actually leaves. What is
+    // pinned here is the wiring around it: the sender gate, the clear arm, and
+    // that the ONLY thing handed to the presence module is the sanitized
+    // object, refused by value when the whitelist says no.
     const main = read('electron/main.cjs');
     const start = main.indexOf("ipcMain.handle('desktop-set-discord-activity'");
     expect(start).toBeGreaterThan(-1);
@@ -364,37 +366,31 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     expect(body).not.toContain('if (trustedSender(event)) return false;');
     expect(body).toContain('if (payload === null) {');
     expect(body).toContain('discordPresence.setActivity(null);');
-    expect(body).toContain(
-      "if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return false;",
-    );
-    expect(body).toContain("if (typeof payload.details !== 'string') return false;");
-    // The cap and the control-character flattening both ride clampText, and the
-    // 128 is the visible length: pinned as the argument form so a widened cap
-    // cannot slip through as a different literal elsewhere in the file.
-    expect(body).toContain('clampText(payload.details, 128)');
-    expect(body).toContain("if (details.trim() === '') return false;");
-    // Refused, not stripped: a start main dropped silently would render as a
-    // live counter running from the wrong moment, with nothing to notice it.
-    expect(body).toContain('if (!Number.isSafeInteger(start) || start <= 0) return false;');
-    expect(body).toContain(
-      "if (!timestamps || typeof timestamps !== 'object' || Array.isArray(timestamps)) return false;",
-    );
-    // The effectful line, and the object it hands over is the FRESH one built
-    // here rather than the payload that crossed the bridge.
+    // The clamp is passed IN, so the module stays require-light and the visible
+    // cap (with its control-character flattening) is the shell's one clamp.
+    expect(body).toContain('const clean = sanitizeDiscordActivity(payload, clampText);');
+    expect(body).toContain('if (!clean) return false;');
+    // The effectful line hands over the FRESH object, never the payload that
+    // crossed the bridge.
     expect(body).toContain('discordPresence.setActivity(clean);');
     expect(body).not.toContain('discordPresence.setActivity(payload);');
+    // Nothing may be added to the sanitized object on its way out: a line like
+    // `clean.state = payload.state` here would defeat the whitelist while every
+    // other pin above stayed green.
+    expect(body).not.toContain('clean.');
+    expect(main).toContain('  sanitizeDiscordActivity,');
 
-    // Order is the contract: every refusal happens before anything is sent.
+    // Order is the contract: the refusal arms happen before anything is sent.
     const trustAt = body.indexOf('if (!trustedSender(event)) return false;');
     const nullArmAt = body.indexOf('if (payload === null) {');
-    const objectAt = body.indexOf("if (!payload || typeof payload !== 'object'");
-    const clampAt = body.indexOf('clampText(payload.details, 128)');
+    const sanitizeAt = body.indexOf('const clean = sanitizeDiscordActivity(payload, clampText);');
+    const refuseAt = body.indexOf('if (!clean) return false;');
     const sendAt = body.indexOf('discordPresence.setActivity(clean);');
     expect(trustAt).toBeGreaterThan(-1);
     expect(nullArmAt).toBeGreaterThan(trustAt);
-    expect(objectAt).toBeGreaterThan(nullArmAt);
-    expect(clampAt).toBeGreaterThan(objectAt);
-    expect(sendAt).toBeGreaterThan(clampAt);
+    expect(sanitizeAt).toBeGreaterThan(nullArmAt);
+    expect(refuseAt).toBeGreaterThan(sanitizeAt);
+    expect(sendAt).toBeGreaterThan(refuseAt);
   });
 
   it('the discord-presence setter takes a strict boolean, persists, then applies live', () => {
@@ -449,14 +445,27 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     const main = read('electron/main.cjs');
     expect(main).toContain("require('./discord_presence.cjs')");
     expect(main.split('const discordPresence = createDiscordPresence({')).toHaveLength(2);
+    const bindingAt = main.indexOf('const discordPresence = createDiscordPresence({');
+    const bindingEnd = main.indexOf('\n});', bindingAt);
+    expect(bindingEnd).toBeGreaterThan(bindingAt);
+    const binding = main.slice(bindingAt, bindingEnd);
     // Node's net, not the electron `net` binding beside it: the latter is the
     // Chromium HTTP stack and cannot open a local socket at all.
-    expect(main).toContain('connect: (p) => nodeNet.createConnection(p),');
+    expect(binding).toContain('connect: (p) => nodeNet.createConnection(p),');
     expect(main.split('createConnection(')).toHaveLength(2);
+    // The ownership guard is only as real as its wiring: without a statPath the
+    // module cannot tell a squatted /tmp socket from Discord's own, and without
+    // a uid it can only check that the entry is a socket.
+    expect(binding).toContain('statPath: (p) => fs.statSync(p),');
+    expect(binding).toContain(
+      "uid: typeof process.getuid === 'function' ? process.getuid() : null,",
+    );
+    // The shell's one clamp, so peer text in the log is bounded and flattened.
+    expect(binding).toContain('clampText,');
     // The app id is read from the environment, never baked in: a hardcoded
     // snowflake would have every fork reporting as the maintainer's app.
-    expect(main).toContain('clientId: resolveDiscordClientId(process.env),');
-    expect(main).toContain('initiallyEnabled: desktopPrefs.discordPresenceEnabled,');
+    expect(binding).toContain('clientId: resolveDiscordClientId(process.env),');
+    expect(binding).toContain('initiallyEnabled: desktopPrefs.discordPresenceEnabled,');
     // And it is released on the way out, like the display-sleep lease.
     expect(main).toContain('discordPresence.dispose();');
   });
