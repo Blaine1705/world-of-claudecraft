@@ -46,8 +46,8 @@ describe('interior encounter prewarm spec', () => {
     const buildStart = renderer.indexOf('private buildInterior(');
     const buildEnd = renderer.indexOf('\n  // Outdoor fog presets', buildStart);
     const build = renderer.slice(buildStart, buildEnd);
-    expect(build).toContain('startInteriorEncounterPrewarm(interior, this)');
-    const kickAt = build.indexOf('startInteriorEncounterPrewarm(interior, this)');
+    expect(build).toContain('encounterPrewarm.startInteriorEncounterPrewarm(interior, this)');
+    const kickAt = build.indexOf('encounterPrewarm.startInteriorEncounterPrewarm(interior, this)');
     const kitAt = build.indexOf('.buildInterior(interior, ox, oz, opts)');
     expect(kickAt).toBeGreaterThan(-1);
     expect(kitAt).toBeGreaterThan(kickAt);
@@ -270,20 +270,26 @@ describe('live Soul Rend player-visual prewarm', () => {
     expect(method).not.toContain('applyVisualMaterials');
 
     const renderer = readSource('../src/render/renderer.ts');
-    expect(renderer).toContain('activeInterior: string | null = null');
-    expect(renderer).toContain('this.activeInterior = interior');
+    // The live interior is owned by the pass, not by a field on the monolith;
+    // the renderer only REPORTS every change, including leaving one.
+    expect(renderer).not.toContain('activeInterior: string | null = null');
+    expect(renderer).toContain(
+      'encounterPrewarm.setEncounterPrewarmInterior(this, interior ?? null)',
+    );
     const createStart = renderer.indexOf('private createView(');
     const createEnd = renderer.indexOf('\n  // Shared core for every compile gate', createStart);
     const create = renderer.slice(createStart, createEnd);
     const setAt = create.indexOf('this.views.set(e.id, {');
-    const kickAt = create.indexOf('queueLiveSoulRendPrewarm(this, visual, null)');
+    const kickAt = create.indexOf('encounterPrewarm.queueLiveSoulRendPrewarm(this, visual, null)');
     expect(setAt).toBeGreaterThan(-1);
     expect(kickAt).toBeGreaterThan(setAt);
     const applyStart = renderer.indexOf('private applyWeaponSkin(');
     const applyEnd = renderer.indexOf('\n  /** Spend this frame', applyStart);
     const apply = renderer.slice(applyStart, applyEnd);
     const skinAt = apply.indexOf('v.visual.setWeaponSkin(skinId)');
-    const skinKick = apply.indexOf('queueLiveSoulRendPrewarm(this, v.visual, skinId)');
+    const skinKick = apply.indexOf(
+      'encounterPrewarm.queueLiveSoulRendPrewarm(this, v.visual, skinId)',
+    );
     expect(skinAt).toBeGreaterThan(-1);
     expect(skinKick).toBeGreaterThan(skinAt);
   });

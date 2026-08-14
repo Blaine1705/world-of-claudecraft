@@ -7,6 +7,7 @@ import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   queueLiveSoulRendPrewarm,
+  setEncounterPrewarmInterior,
   startInteriorEncounterPrewarm,
 } from '../src/render/interior_encounter_prewarm_pass';
 
@@ -39,7 +40,6 @@ function fakeHost(
   const compiled: string[] = [];
   const host = {
     shutdownStarted: false,
-    activeInterior: null as string | null,
     views: new Map(views.map((v) => [v.id, { visual: v.visual, weaponSkinId: null }])),
     sim: {
       entities: { get: (id: number) => views.find((v) => v.id === id) },
@@ -140,14 +140,28 @@ describe('interior encounter prewarm pass (driven)', () => {
     vi.restoreAllMocks();
   });
 
-  it('publishes the attached interior itself, before its host would', async () => {
-    const host = fakeHost();
-    // The host sets activeInterior in a later pass of its own frame, so a body
-    // created on the attach frame would read null and never warm.
-    expect(host.activeInterior).toBeNull();
+  it('records the attached interior itself, before its host would report one', async () => {
+    // The host reports the interior from a later pass of its own frame, so a
+    // body created on the attach frame would find none and never warm.
+    const player = fakeVisual('player');
+    const host = fakeHost([{ id: 1, kind: 'player', visual: player }]);
     startInteriorEncounterPrewarm('nythraxis', host);
-    expect(host.activeInterior).toBe('nythraxis');
     await drain();
+    // Queued with no interior argument: it can only have found one because the
+    // attach recorded it.
+    queueLiveSoulRendPrewarm(host, player as never, 'ice_fang_sword');
+    await drain();
+    expect(player.calls.prewarmSoulRendSlots).toBeGreaterThan(0);
+  });
+
+  it('stops warming live bodies once the host reports leaving the interior', async () => {
+    const player = fakeVisual('player');
+    const host = fakeHost([{ id: 1, kind: 'player', visual: player }]);
+    setEncounterPrewarmInterior(host, 'nythraxis');
+    setEncounterPrewarmInterior(host, null);
+    queueLiveSoulRendPrewarm(host, player as never, null);
+    await drain();
+    expect(player.calls.prewarmSoulRendSlots).toBe(0);
   });
 
   it('warms an interior once, however many times it attaches', async () => {
@@ -164,7 +178,6 @@ describe('interior encounter prewarm pass (driven)', () => {
     const host = fakeHost();
     startInteriorEncounterPrewarm('crypt', host);
     await drain();
-    expect(host.activeInterior).toBeNull();
     expect(host.compiled).toEqual([]);
 
     const dead = fakeHost();
@@ -181,7 +194,7 @@ describe('interior encounter prewarm pass (driven)', () => {
       { id: 1, kind: 'player', visual: player },
       { id: 2, kind: 'mob', visual: mob },
     ]);
-    host.activeInterior = 'nythraxis';
+    setEncounterPrewarmInterior(host, 'nythraxis');
 
     queueLiveSoulRendPrewarm(host, player as never, null);
     queueLiveSoulRendPrewarm(host, player as never, null);
@@ -205,7 +218,7 @@ describe('interior encounter prewarm pass (driven)', () => {
     await drain();
     expect(player.calls.prewarmSoulRendSlots).toBe(0);
 
-    host.activeInterior = 'nythraxis';
+    setEncounterPrewarmInterior(host, 'nythraxis');
     // The pass reads the live URL (`typeof location === 'undefined' ? '' :
     // location.search`), so the kill switch needs a location to read.
     const win = globalThis as unknown as { location?: { search: string } };
@@ -229,7 +242,7 @@ describe('interior encounter prewarm pass (driven)', () => {
       bodies.map((visual, index) => ({ id: index, kind: 'player', visual })),
       timeline,
     );
-    host.activeInterior = 'nythraxis';
+    setEncounterPrewarmInterior(host, 'nythraxis');
     for (const visual of bodies) queueLiveSoulRendPrewarm(host, visual as never, null);
     await drain();
 
@@ -248,7 +261,7 @@ describe('interior encounter prewarm pass (driven)', () => {
   it('places its hidden groups where the camera is, never at the world origin', async () => {
     const player = fakeVisual('player');
     const host = fakeHost([{ id: 1, kind: 'player', visual: player }]);
-    host.activeInterior = 'nythraxis';
+    setEncounterPrewarmInterior(host, 'nythraxis');
     const added: THREE.Object3D[] = [];
     host.scene.add = ((object: THREE.Object3D) => {
       added.push(object);

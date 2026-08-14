@@ -4,7 +4,6 @@ import type { CharacterVisual } from './characters';
 
 export interface InteriorEncounterPrewarmHost {
   shutdownStarted: boolean;
-  activeInterior: string | null;
   views: Map<number, { visual: CharacterVisual | null; weaponSkinId: string | null }>;
   sim: {
     entities: { get(id: number): { kind?: string } | undefined };

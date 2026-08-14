@@ -483,6 +483,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.checkoutNotSettled':
     '取引は送信されましたが、Claudiumはまだ反映されていません。しばらくしてからお試しください。',
   'hudChrome.itemHeroicTag': '[ヒロイック]',
+  'hudChrome.itemHeroicLabel': 'ヒロイック',
   'hudChrome.readyCheck.notInPartyError':
     '準備確認を開始するにはパーティーに参加している必要があります。',
   'hudChrome.readyCheck.inProgressError': '準備確認はすでに進行中です。',
@@ -3014,6 +3015,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cheap_shot.name': 'みぞおち強打',
   'entities.abilities.cheap_shot.description':
     '対象を打って{damage}ダメージを与え、4秒間スタンさせます。ステルス状態でなければなりません。コンボポイントを2獲得します。',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    '対象を打って{damage}ダメージを与え、4秒間スタンさせます。コンボポイントを2獲得します。',
   'entities.abilities.sap.name': 'サップ',
   'entities.abilities.sap.description':
     '対象を8秒間行動不能にします。ステルス状態かつ戦闘外でなければなりません。ダメージを受けると効果が切れます。',

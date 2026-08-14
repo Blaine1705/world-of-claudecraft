@@ -12,7 +12,6 @@ import {
   arenaOrigin,
   BG_SLOT_COUNT,
   battlegroundOrigin,
-  CAMPS,
   CLASSES,
   DELVE_MODULE_Z_START,
   DUNGEON_LIST,
@@ -328,10 +327,7 @@ import { buildHollowGates } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
 import { buildImpactSite, type ImpactSiteView, MIREFEN_IMPACT_SITE } from './impact_site';
-import {
-  queueLiveSoulRendPrewarm,
-  startInteriorEncounterPrewarm,
-} from './interior_encounter_prewarm_pass';
+import * as encounterPrewarm from './interior_encounter_prewarm_pass';
 import { ensureDelveInteriorKit } from './interior_kit';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
@@ -434,6 +430,7 @@ import {
   reconcileViewPointLights,
 } from './point_light_budget';
 import { buildComposer, type PostPipeline } from './post';
+import { createPreviewPrewarmLane } from './preview_prewarm_lane';
 import {
   createPrewarmCompileLifecycle,
   type PrewarmCompileLifecycle,
@@ -441,6 +438,7 @@ import {
   type RendererPrewarmDiagnosticsBaselineStats,
   type RendererPrewarmManifestEntryStats,
   type RendererPrewarmStats,
+  summarizePrewarmManifest,
 } from './prewarm_compile_lifecycle';
 import { submitPrewarmCompileUnit } from './prewarm_compile_submission_core';
 import {
@@ -484,6 +482,7 @@ import {
   trackPrefetch,
   waitForPrefetch,
 } from './prewarm_resume';
+import { createPrewarmResumeLedger } from './prewarm_resume_ledger_core';
 import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_markers_visual';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
 import { makeQuestObjectGate, type QuestObjectGateOptions } from './quest_object_gate_core';
@@ -638,6 +637,7 @@ import {
   isZoneFeatureShadowCasting,
   isZoneFeatureVisible,
 } from './zone_feature_visibility_core';
+import { zonePrewarmTemplateIds } from './zone_prewarm_templates_core';
 import {
   INITIAL_SKY_PREWARM_RADIUS,
   MAX_OUTDOOR_FOG_FAR,
@@ -1335,7 +1335,6 @@ export class Renderer {
   camera: THREE.PerspectiveCamera;
   webgl: THREE.WebGLRenderer;
   views = new Map<number, EntityView>();
-  activeInterior: string | null = null;
   // Editor opt-out for the quest-collectable view gate (see RendererCreateOptions).
   private questObjectHidden = makeQuestObjectGate({});
   private viewCreateRetry = new ViewCreateRetryGate(VIEW_CREATE_FAIL_RETRY_MS);
@@ -5167,27 +5166,7 @@ export class Renderer {
   }
 
   private templateIdsInZone(zone: ZoneDef, kind: 'mob' | 'npc'): string[] {
-    const ids = new Set<string>();
-    // Static content is authoritative here: online clients only receive nearby
-    // entities, so a just-crossed zone may not have delivered its first snapshot
-    // by the time the transition prewarm starts.
-    if (kind === 'mob') {
-      for (const camp of CAMPS) {
-        if (zoneAt(camp.center.x, camp.center.z).id === zone.id) ids.add(camp.mobId);
-      }
-    } else {
-      for (const npc of Object.values(NPCS)) {
-        if (!npc.dynamic && zoneAt(npc.pos.x, npc.pos.z).id === zone.id) ids.add(npc.id);
-      }
-    }
-    // Dynamic/event content has no static camp record. Union whatever the sim
-    // already knows without making correctness depend on snapshot timing.
-    for (const entity of this.sim.entities.values()) {
-      if (entity.kind !== kind || !entity.templateId || entity.pos.x > DUNGEON_X_THRESHOLD)
-        continue;
-      if (zoneAt(entity.pos.x, entity.pos.z).id === zone.id) ids.add(entity.templateId);
-    }
-    return [...ids].sort();
+    return zonePrewarmTemplateIds(zone.id, kind, this.sim.entities.values());
   }
 
   private buildEntityPrewarmGroup(zone: ZoneDef): {
@@ -5427,26 +5406,16 @@ export class Renderer {
       });
   }
 
-  private previewPrewarmLane: Promise<void> = Promise.resolve();
+  private readonly previewPrewarm = createPreviewPrewarmLane({
+    idleSlot: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 }),
+    run: (unit, priority, label, options) =>
+      this.backgroundGpuWork.run(unit, priority, label, options),
+  });
 
-  /** Post-entry secondary-context preview prewarm (paperdoll, armory, portrait
-   *  caches): one bounded unit per idle slot, arbitrated with every other lane
-   *  that reaches WebGL. releaseTail because a unit's cost is dominated by its
-   *  compileAsync links, which settle off-thread. Rejections propagate to the
-   *  caller per unit; the lane itself never wedges on one. */
+  /** Scheduled secondary-context preview warming (paperdoll, portrait caches).
+   *  Lane policy lives in preview_prewarm_lane.ts. */
   queueSecondaryPreviewPrewarm(label: string, unit: () => void | Promise<void>): Promise<void> {
-    const queued = this.previewPrewarmLane
-      .then(() => idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 }))
-      .then(() =>
-        this.backgroundGpuWork.run(unit, GPU_WORK_PRIORITY.BACKGROUND, label, {
-          releaseTail: true,
-        }),
-      );
-    this.previewPrewarmLane = queued.then(
-      () => undefined,
-      () => undefined,
-    );
-    return queued;
+    return this.previewPrewarm.queueScheduled(label, unit);
   }
 
   private readonly gpuReadyTextures = new WeakSet<THREE.Texture>();
@@ -6049,6 +6018,7 @@ export class Renderer {
     // Explicitly bounded units captured when their manifest entry misses the
     // loading deadline. Whole entry callbacks are never resumed live.
     const droppedEntries: PrewarmResumeEntry[] = [];
+    const resumeLedger = createPrewarmResumeLedger();
 
     // One shared dedupe store across EVERY compile collection in this entry
     // pass (early submission, the compile entry's tail, the live-scene
@@ -7387,11 +7357,10 @@ export class Renderer {
       // the cosmetic entries (which resume BELOW the preview lane) ahead of
       // the link/upload debt, the exact starvation this lane exists to fix.
       const resume = orderPrewarmResumeEntries(droppedEntries);
-      const failedResumeUnits: string[] = [];
-      if (resume.length > 0) {
-        console.info(
-          `[entry-guard] prewarm resume scheduled: dropped=[${resume.map((entry) => entry.id).join(',')}]`,
-        );
+      resumeLedger.schedule(resume, prewarmResumeIsDebt);
+      const dropped = resume.map((entry) => entry.id).join(',');
+      if (dropped.length > 0) {
+        console.info(`[entry-guard] prewarm resume scheduled: dropped=[${dropped}]`);
       }
       void settlePrewarmBeforePublish(
         async () => {
@@ -7420,6 +7389,7 @@ export class Renderer {
               // link queue shallow; live gates (LIVE_VIEW/ACTIONABLE_VIEW)
               // preempt between batches, waiting at most one batch's settle.
               const debt = prewarmResumeIsDebt(entry.id);
+              resumeLedger.noteStart(entry.id);
               return this.backgroundGpuWork.run(
                 unit.run,
                 debt ? GPU_WORK_PRIORITY.BOOT_DEBT : GPU_WORK_PRIORITY.BOOT_RESUME,
@@ -7436,7 +7406,7 @@ export class Renderer {
             },
             afterEntry: hidePrewarmArtifacts,
             onUnitError: (entry, unit, error) => {
-              failedResumeUnits.push(`${entry.id}:${unit.id}`);
+              resumeLedger.noteFailure(entry.id, unit.id);
               console.warn(`Renderer prewarm resume unit failed: ${entry.id}:${unit.id}`, error);
             },
           });
@@ -7444,13 +7414,15 @@ export class Renderer {
         () => cleanupPrewarmArtifacts({ clearVfx: false, publishPools: true }),
       )
         .then(() => {
+          resumeLedger.finish(true);
           if (resume.length === 0) return;
-          const unitCount = resume.reduce((sum, entry) => sum + entry.units.length, 0);
+          const done = resumeLedger.stats();
           console.info(
-            `[entry-guard] prewarm resume done: units=${unitCount};failed=[${failedResumeUnits.join(',')}]`,
+            `[entry-guard] prewarm resume done: units=${done.plannedUnits};failed=[${done.failedUnitIds.join(',')}]`,
           );
         })
         .catch((err) => {
+          resumeLedger.finish(false);
           console.warn('Renderer prewarm resume failed', err);
         });
     }
@@ -7521,9 +7493,6 @@ export class Renderer {
 
     const elapsed = performance.now() - started;
     const finalCounts = this.prewarmCounts();
-    const manifestTimedOut = manifestEntries.filter((entry) => entry.status === 'timed-out');
-    const manifestFailed = manifestEntries.filter((entry) => entry.status === 'failed');
-    const manifestPartial = manifestEntries.filter((entry) => entry.status === 'partial');
     const stats: RendererPrewarmStats = {
       elapsedMs: roundMs(elapsed),
       maxMs: roundMs(maxMs),
@@ -7544,14 +7513,10 @@ export class Renderer {
       createdViewTypes,
       manifestPlanned: manifest.length,
       manifestEntries,
-      manifestCompleted: manifestEntries.filter((entry) => entry.status === 'completed').length,
-      manifestPartial: manifestPartial.length,
-      manifestSkipped: manifestEntries.filter((entry) => entry.status === 'skipped').length,
-      manifestTimedOut: manifestTimedOut.length,
-      manifestFailed: manifestFailed.length,
-      partialEntryIds: manifestPartial.map((entry) => entry.id),
-      timedOutEntryIds: manifestTimedOut.map((entry) => entry.id),
-      failedEntryIds: manifestFailed.map((entry) => entry.id),
+      ...summarizePrewarmManifest(manifestEntries),
+      get resume() {
+        return resumeLedger.stats();
+      },
       diagnosticsBaseline,
       compileUnits: compileLifecycle.records,
       prewarmPacing: pacing.receipt(compileBatchRoots, hardMaxMs),
@@ -8865,7 +8830,7 @@ export class Renderer {
       tiltOnProp: false,
     });
     const view = this.views.get(e.id);
-    if (visual) queueLiveSoulRendPrewarm(this, visual, null);
+    if (visual) encounterPrewarm.queueLiveSoulRendPrewarm(this, visual, null);
     // Never gate the player's OWN view: it must be on screen immediately, its
     // class is already prewarmed, and the self render path does not re-evaluate
     // the compilePending flag (only the non-self loop does), so gating it would
@@ -9129,7 +9094,7 @@ export class Renderer {
     const changed = v.visual.setWeaponSkin(skinId);
     if (changed) for (const node of changed) this.gateSwapOnCompile(node);
     this.reconcileViewLights(v);
-    queueLiveSoulRendPrewarm(this, v.visual, skinId);
+    encounterPrewarm.queueLiveSoulRendPrewarm(this, v.visual, skinId);
   }
 
   /** Spend this frame's weapon-skin application budget, nearest wearer first.
@@ -9334,7 +9299,7 @@ export class Renderer {
     oz: number,
     opts?: Parameters<DungeonInteriors['buildInterior']>[3],
   ): void {
-    startInteriorEncounterPrewarm(interior, this);
+    encounterPrewarm.startInteriorEncounterPrewarm(interior, this);
     void this.ensureDungeons()
       .buildInterior(interior, ox, oz, opts)
       .catch((err) => {
@@ -9825,7 +9790,7 @@ export class Renderer {
       inside && !inDelve && !inYumiMaze && !inBattleground && !isArenaPos(px)
         ? dungeonAt(px)?.interior
         : null;
-    this.activeInterior = interior ?? null;
+    encounterPrewarm.setEncounterPrewarmInterior(this, interior ?? null);
     const inTemple = interior === 'temple';
     const inNythraxis = interior === 'nythraxis';
     // Wildheart is an OPEN-AIR jungle caldera, not a closed room: it keeps the
@@ -10573,6 +10538,8 @@ export class Renderer {
   ): void {
     if (this.shutdownStarted) return;
     const totalStart = performance.now();
+    // Feed the background lane the live frame clock (see its header).
+    this.backgroundGpuWork.noteFrame(totalStart);
     let phaseStart = totalStart;
     const frameStats = this.lastFrameStats;
     const framePhaseMs = frameStats.phaseMs;

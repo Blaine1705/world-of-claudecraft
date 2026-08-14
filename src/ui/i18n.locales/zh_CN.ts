@@ -480,6 +480,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.checkoutWalletUnsupported': '此钱包无法签署和发送 Solana 交易。',
   'hudChrome.claudium.checkoutNotSettled': '交易已发送，但 Claudium 尚未到账，请稍后重试。',
   'hudChrome.itemHeroicTag': '[英雄]',
+  'hudChrome.itemHeroicLabel': '英雄',
   'hudChrome.readyCheck.notInPartyError': '你必须加入队伍才能发起就绪确认。',
   'hudChrome.readyCheck.inProgressError': '就绪确认已在进行中。',
   'entities.abilities.collective_reversal.name': '集体逆转',
@@ -2888,6 +2889,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cheap_shot.name': '击腹拳',
   'entities.abilities.cheap_shot.description':
     '攻击目标，造成 {damage} 点伤害，并使其昏迷 4 秒。必须处于潜行状态。奖励 2 个连击点。',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    '攻击目标，造成 {damage} 点伤害，并使其昏迷 4 秒。奖励 2 个连击点。',
   'entities.abilities.sap.name': '闷棍',
   'entities.abilities.sap.description':
     '使目标无法行动，持续 8 秒。必须处于潜行状态且不在战斗中。任何伤害都会打破效果。',

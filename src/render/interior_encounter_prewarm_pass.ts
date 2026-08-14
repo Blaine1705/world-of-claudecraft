@@ -32,19 +32,30 @@ const liveWarmedByVisual = new WeakMap<CharacterVisual, Set<string>>();
 // a >150ms stall in the arrival window even with the clone pass deferred).
 // Chaining them spreads one body per idle period instead.
 const liveChainByHost = new WeakMap<object, Promise<void>>();
+// Which interior each host is standing in. Owned here rather than as a field on
+// the renderer: the host publishes it from its ambience pass, which runs AFTER
+// its entity loop, so a body created on the attach frame would read a stale
+// value; and a monolith under a line ratchet should not carry a field that
+// exists only for this seam.
+const activeInteriorByHost = new WeakMap<object, string>();
 const IDLE_MS = 250;
 const TEXTURE_BATCH = 2;
 const SOUL_REND_SKIN_HOST_CLASS = 'warrior';
+
+/** The host reports every interior change here, including leaving one (null):
+ *  a stale value would keep warming live bodies outside the encounter. */
+export function setEncounterPrewarmInterior(host: object, interior: string | null): void {
+  if (interior) activeInteriorByHost.set(host, interior);
+  else activeInteriorByHost.delete(host);
+}
 
 export function startInteriorEncounterPrewarm(interior: string, host: object): void {
   if (encounterPrewarmDisabled(typeof location === 'undefined' ? '' : location.search)) return;
   const typed = host as InteriorEncounterPrewarmHost;
   const spec = encounterPrewarmForInterior(interior);
   if (!spec || typed.shutdownStarted) return;
-  // The host publishes activeInterior from its ambience pass, which runs AFTER
-  // its entity loop: a body created on the attach frame would read a stale null
-  // and never warm. The attach itself is the earliest honest answer.
-  typed.activeInterior = interior;
+  // The attach is the earliest honest answer to "which interior is live".
+  setEncounterPrewarmInterior(host, interior);
   let started = startedByHost.get(host);
   if (!started) {
     started = new Set();
@@ -70,7 +81,7 @@ export function queueLiveSoulRendPrewarm(
   interior?: string | null,
 ): void {
   const typed = host as InteriorEncounterPrewarmHost;
-  const interiorId = interior ?? typed.activeInterior;
+  const interiorId = interior ?? activeInteriorByHost.get(host) ?? null;
   if (!interiorId) return;
   const spec = encounterPrewarmForInterior(interiorId);
   // Refuse on the interior BEFORE touching the views map: every createView and

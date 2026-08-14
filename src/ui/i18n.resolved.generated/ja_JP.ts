@@ -1845,6 +1845,7 @@ export const ja_JP: EnTranslations = {
       "joinChannels": "ヒント：/join world または /join lfg と入力すると、ワールド全体のプレイヤーとチャットできます。"
     },
     "itemHeroicTag": "[ヒロイック]",
+    "itemHeroicLabel": "ヒロイック",
     "itemSoulbound": "魂縛",
     "itemUniqueEquipped": "装備ユニーク",
     "itemSet": {
@@ -9505,6 +9506,7 @@ export const ja_JP: EnTranslations = {
       "cheap_shot": {
         "name": "みぞおち強打",
         "description": "対象を打って{damage}ダメージを与え、4秒間スタンさせます。ステルス状態でなければなりません。コンボポイントを2獲得します。",
+        "descriptionNoStealth": "対象を打って{damage}ダメージを与え、4秒間スタンさせます。コンボポイントを2獲得します。",
         "specNote_subtlety": "ダスクヴェールから使うと薄闇の蓄えが1段階進む（最大3）。3段階のときはステルスなしで使用できる：その1回はコストなしで、薄闇の蓄えを3段階すべて消費し、6秒間のヴェールストライクを開始する。"
       },
       "sap": {

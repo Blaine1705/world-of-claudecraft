@@ -480,6 +480,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.checkoutWalletUnsupported': '此錢包無法簽署及傳送 Solana 交易。',
   'hudChrome.claudium.checkoutNotSettled': '交易已傳送，但 Claudium 尚未入帳，請稍後再試。',
   'hudChrome.itemHeroicTag': '[英雄]',
+  'hudChrome.itemHeroicLabel': '英雄',
   'hudChrome.readyCheck.notInPartyError': '你必須加入隊伍才能發起就緒確認。',
   'hudChrome.readyCheck.inProgressError': '就緒確認已在進行中。',
   'entities.abilities.collective_reversal.name': '集體逆轉',
@@ -2890,6 +2891,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cheap_shot.name': '掏腹重擊',
   'entities.abilities.cheap_shot.description':
     '攻擊目標，造成 {damage} 點傷害，使其昏迷 4 秒。必須處於潛行狀態。獎勵 2 個連擊點。',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    '攻擊目標，造成 {damage} 點傷害，使其昏迷 4 秒。獎勵 2 個連擊點。',
   'entities.abilities.sap.name': '悶棍',
   'entities.abilities.sap.description':
     '使目標無法行動，持續 8 秒。必須處於潛行狀態且脫離戰鬥。任何傷害都會破除此效果。',

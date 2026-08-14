@@ -38,7 +38,11 @@ interface MonolithRow {
 const MONOLITHS: MonolithRow[] = [
   {
     file: 'src/ui/hud.ts',
-    ceiling: 19490,
+    // Lowered after extracting the ability description prose (the placeholder
+    // values, the over-time string and the talent-conditional field choice) into
+    // src/ui/ability_description.ts (the ratchet's own rule: an extraction lowers
+    // the ceiling, never raises it).
+    ceiling: 19420,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -47,7 +51,19 @@ const MONOLITHS: MonolithRow[] = [
     // stranded-light reparent and the registry prune into
     // src/render/fire_light_registry.ts (the ratchet's own rule: an extraction
     // lowers the ceiling, never raises it).
-    ceiling: 13700,
+    // Lowered again after extracting the secondary-context preview warming
+    // policy into src/render/preview_prewarm_lane.ts. Earlier steps down: the
+    // per-status manifest rollup to summarizePrewarmManifest
+    // (prewarm_compile_lifecycle.ts, beside the interface it fills) and the
+    // resume-lane bookkeeping to prewarm_resume_ledger_core.ts.
+    // Merging release/v0.38.0: both sides had pinned their own size (13699 here,
+    // 13700 there), and the merged file is smaller than either, so the ceiling
+    // follows it down rather than inheriting a parent's slack.
+    // Lowered again after extracting the zone prewarm's template selection into
+    // src/render/zone_prewarm_templates_core.ts, which paid for the encounter
+    // prewarm's five call-site lines: the ratchet's rule is that a file over its
+    // ceiling buys the room back by extraction, never by raising the number.
+    ceiling: 13667,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

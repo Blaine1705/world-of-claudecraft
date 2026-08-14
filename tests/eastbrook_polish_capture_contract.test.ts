@@ -168,8 +168,11 @@ interface AttributionTargetFixture {
 // the release monolith ratchet. Behavior is unchanged; no capture was retaken.
 // Re-minted again after making that extracted policy an explicit provenance
 // leaf. The evidence now follows policy-only changes; no capture was retaken.
+// Re-minted for the merge of release/v0.38.0 into the Armory warming branch:
+// both parents move renderer.ts, so the merged tree mints a value matching
+// neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '3047cd9d5047607915e6e5b6e6c0a4faa8ffb711432d87351cf1665fb9b240a9';
+  'f0ed104c95e4173f3fe37c33cef9e447787f4b6f6d45847bc421f0dfa9bbe890';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
