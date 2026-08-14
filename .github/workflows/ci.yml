@@ -568,6 +568,7 @@ jobs:
             /docs/screenshots/r35-admin-professions-inspector/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/wildheart/
+            /docs/screenshots/woc-market/
           sparse-checkout-cone-mode: false
           # Explicit for the reader; the sparse-checkout input
           # already implies it (matching the changes job's step).
@@ -777,6 +778,7 @@ jobs:
             /docs/screenshots/r35-admin-professions-inspector/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/wildheart/
+            /docs/screenshots/woc-market/
           sparse-checkout-cone-mode: false
           # Explicit for the reader; the sparse-checkout input
           # already implies it (matching the changes job's step).
@@ -868,6 +870,7 @@ jobs:
             /docs/screenshots/r35-admin-professions-inspector/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/wildheart/
+            /docs/screenshots/woc-market/
           sparse-checkout-cone-mode: false
           # Explicit for the reader; the sparse-checkout input
           # already implies it (matching the changes job's step).
@@ -1121,6 +1124,7 @@ jobs:
             /docs/screenshots/r35-admin-professions-inspector/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/wildheart/
+            /docs/screenshots/woc-market/
           sparse-checkout-cone-mode: false
           # Explicit for the reader; the sparse-checkout input
           # already implies it (matching the changes job's step).
@@ -1210,6 +1214,7 @@ jobs:
             /docs/screenshots/r35-admin-professions-inspector/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/wildheart/
+            /docs/screenshots/woc-market/
           sparse-checkout-cone-mode: false
           filter: blob:none
 

@@ -261,6 +261,7 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/r35-admin-professions-inspector/',
       '            /docs/screenshots/release-v036-skill-normalization-2026-08-10/',
       '            /docs/screenshots/wildheart/',
+      '            /docs/screenshots/woc-market/',
       '          sparse-checkout-cone-mode: false',
     ].join('\n');
     // Job-anchored, not a bare workflow-wide count: each sparse job carries

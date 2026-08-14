@@ -8,6 +8,7 @@
 // pass every behavior test and only the seam discipline is lost.
 
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
 import { tsFilesUnder } from './helpers/ts_files_under';
@@ -16,7 +17,7 @@ const stripComments = (s: string): string =>
   s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 
 describe('server stays off sim.postOffice (the Sim mail facade)', () => {
-  const files = tsFilesUnder(new URL('../server', import.meta.url).pathname);
+  const files = tsFilesUnder(fileURLToPath(new URL('../server', import.meta.url)));
 
   it('walks a real corpus and audits its own reads', () => {
     // Vacuity floor near the real count (tests/CLAUDE.md): server/ holds the
@@ -53,11 +54,14 @@ describe('server stays off sim.postOffice (the Sim mail facade)', () => {
     // Dead-alternate protection: the no-reach rule only means something while
     // the facade member exists and the custody bridge actually calls it.
     const sim = stripComments(
-      readFileSync(new URL('../src/sim/sim.ts', import.meta.url).pathname, 'utf8'),
+      readFileSync(fileURLToPath(new URL('../src/sim/sim.ts', import.meta.url)), 'utf8'),
     );
     expect(sim).toContain('hasCustodyParcel(custodyRef: string): boolean');
     const custody = stripComments(
-      readFileSync(new URL('../server/woc_market_custody.ts', import.meta.url).pathname, 'utf8'),
+      readFileSync(
+        fileURLToPath(new URL('../server/woc_market_custody.ts', import.meta.url)),
+        'utf8',
+      ),
     );
     expect(custody).toContain('host.sim.hasCustodyParcel(custodyRef)');
   });
