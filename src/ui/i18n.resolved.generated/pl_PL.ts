@@ -874,7 +874,7 @@ export const pl_PL: EnTranslations = {
       "skip": "Skip the tutorial",
       "declineNote": "As you like, friend. Should you ever change your mind, the ferry bell by the Ravenpost mailbox rings you across to the Proving Shore any time, day or night. It will still be here when the wolves are not.",
       "bellHomeNote": "Back from the shore already? That was the ferry bell you rang. Its twin hangs just there by the Ravenpost mailbox: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.",
-      "islandArrivalNote": "Fresh off the crossing? Welcome to the Proving Shore. Warden Tam keeps the Gauntlet on the strand right ahead of you: see him first, and his lanes will teach your legs everything they need. When the red flag is behind you, Instructor Maren at Dawnrest Camp, up the road north of my pier, has your first task: walk right up to her until her name shows, then press F, or left-click her, to talk. And when you are ready to leave, ring the bell standing beside my pier and the crossing will carry you home to Eastbrook.",
+      "islandArrivalNote": "Fresh off the crossing? Welcome to the Proving Shore. Warden Tam keeps the Gauntlet on the strand right ahead of you: walk up to him until his name shows, then press F, or left-click him, and his lanes will teach your legs everything they need. And when you are ready to leave, ring the bell standing beside my pier and the crossing will carry you home to Eastbrook.",
       "noteClose": "Understood"
     },
     "tutorial": {
@@ -912,8 +912,8 @@ export const pl_PL: EnTranslations = {
       "forward2BodyTouch": "Push the movement stick up again and run the last lane to the red flag.",
       "forward2BodyPad": "Push the left stick up again and run the last lane to the red flag.",
       "courseProgress": "Flag {current} of {total}",
-      "doneTitle": "Ready for the drills",
-      "doneBody": "That is everything your legs need to know. Instructor Maren keeps the drills at Dawnrest Camp, up the road from the pier, and she has your first task."
+      "doneTitle": "Run complete",
+      "doneBody": "That is everything your legs need to know. Walk back to Warden Tam at the gate and hand your run in: he has a word for you, and your first coin."
     },
     "widgets": {
       "clockTitle": "Czas lokalny - kliknij, aby przełączyć format 12/24-godzinny",
@@ -14216,7 +14216,7 @@ export const pl_PL: EnTranslations = {
       "warden_tam": {
         "name": "Warden Tam",
         "title": "Keeper of the Gauntlet",
-        "greeting": "These lanes are the Gauntlet, {playerName}, and every adventurer the vale respects has run them. Walk the first lane west to the flag, take a good look around, slip left down the second lane, look again, then run the last lane to the red flag. The braziers stay lit all night. When the red flag is behind you, Instructor Maren at Dawnrest Camp has your first task."
+        "greeting": "These lanes are the Gauntlet, {playerName}, and every adventurer the vale respects has run them. The lantern posts stay lit all night, so the lanes never close."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -16181,6 +16181,16 @@ export const pl_PL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Pokonany Rozdarty Koszmar"
+          }
+        }
+      },
+      "q_ps_the_gauntlet": {
+        "title": "Run the Gauntlet",
+        "text": "Every pair of legs the vale respects has run these lanes first, {playerName}. Walk the first lane west to its flag, take a good look around, slip left down the south lane to the second, look again, then run the last lane to the red flag. Pass the flags in order, and the card at the top of your screen will show you every button as you go. When the red flag is behind you, come back to me at the gate.",
+        "completion": "A clean run, {playerName}. Your legs know the lanes now, and the rest of you is ready for real work: Instructor Maren keeps the drills at Dawnrest Camp, up the road north of the pier. Walk right up to her until her name shows, then press F, or left-click her, and she will set you your first task.",
+        "objectives": {
+          "0": {
+            "label": "Gauntlet flag passed"
           }
         }
       },

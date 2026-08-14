@@ -3608,6 +3608,11 @@ export interface ZonePropsDef {
     x: number;
     z: number;
     rot: number;
+    /** Uniform size multiplier for the whole pier (planks, posts, dressing,
+     *  rowboat). Omitted means the classic 1; the walkable deck maths in
+     *  dock_layout.ts normalizes through it, so render, collision ground,
+     *  and footstep routing all scale together. */
+    scale?: number;
     hutLocal: { x: number; z: number; hw: number; hd: number };
   }[];
   tents: { x: number; z: number; rot: number; scale: number }[];

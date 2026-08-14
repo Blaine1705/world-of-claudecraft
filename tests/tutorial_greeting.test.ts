@@ -90,6 +90,41 @@ describe('tutorial greeting one-shot', () => {
     expect(later.filter((e) => e.type === 'tutorialGreeting')).toEqual([]);
   });
 
+  it('the Gauntlet run credits its flags in running order, by position, through real ticks', () => {
+    const sim = makeSim();
+    const p = sim.entities.get(sim.playerId)!;
+    const meta = sim.players.get(sim.playerId)!;
+    // Stand at Warden Tam's gate and take the run.
+    p.pos.x = -283;
+    p.pos.z = -21;
+    sim.acceptQuest('q_ps_the_gauntlet');
+    const qp = meta.questLog.get('q_ps_the_gauntlet')!;
+    expect(qp.state).toBe('active');
+
+    // Standing at flag TWO first credits nothing: running order, not any order.
+    p.pos.x = -308;
+    p.pos.z = -32;
+    sim.tick();
+    expect(qp.counts[0] ?? 0).toBe(0);
+
+    // Then the flags in order, one sweep tick each, and the last readies the
+    // quest for Warden Tam's hand-in.
+    p.pos.x = -308;
+    p.pos.z = -16;
+    sim.tick();
+    expect(qp.counts[0]).toBe(1);
+    p.pos.x = -308;
+    p.pos.z = -32;
+    sim.tick();
+    expect(qp.counts[0]).toBe(2);
+    expect(qp.state).toBe('active');
+    p.pos.x = -328;
+    p.pos.z = -32;
+    sim.tick();
+    expect(qp.counts[0]).toBe(3);
+    expect(qp.state).toBe('ready');
+  });
+
   it('does not re-fire across save/load, and omits the flag while unset', () => {
     const sim = makeSim();
     const meta = sim.players.get(sim.playerId)!;

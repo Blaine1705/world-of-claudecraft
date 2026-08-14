@@ -1,4 +1,4 @@
-// Proving Shore camp visuals: the Dawnrest Camp declutter (loose crates gone,
+﻿// Proving Shore camp visuals: the Dawnrest Camp declutter (loose crates gone,
 // mailbox off the outfitter's stall), the guild notice board that replaced
 // them, the pier ferry bell stood clear of the planks, and the Eastbrook bell
 // beside the town mailbox. Offline flow (no server). Needs `npm run dev`.
@@ -101,9 +101,12 @@ const shot = async (name) => {
 const look = (from, at, opts = {}) =>
   stand(from.x, from.z, Math.atan2(at.x - from.x, at.z - from.z), opts.dist, opts.pitch);
 
+// The bootcamp card only shows while Warden Tam's run quest is active.
+await page.evaluate(() => window.__game.sim.acceptQuest('q_ps_the_gauntlet'));
+
 // The arrival view: what a newcomer actually sees the moment the ferry sets
 // them down (the teleport camera snap aims at Warden Tam's Gauntlet gate).
-await look({ x: -282, z: 6 }, { x: -283, z: -13 }, { dist: 8, pitch: 0.18 });
+await look({ x: -282, z: 6 }, { x: -283, z: -21 }, { dist: 8, pitch: 0.18 });
 await shot('arrival-view');
 
 // The Gauntlet's gate: Warden Tam, the entrance braziers, and lane 1
@@ -129,9 +132,52 @@ await shot('camp-overview');
 await look({ x: -318, z: 45 }, { x: -324, z: 42.5 }, { dist: 8, pitch: 0.2 });
 await shot('wick-desk');
 
-// The notice board on the practice-yard road at (-314, 30), facing north.
-await look({ x: -313, z: 36 }, { x: -314, z: 30 }, { dist: 6, pitch: 0.15 });
+// The notice board south of the camp gate at (-312, 40), facing north.
+await look({ x: -312, z: 46 }, { x: -312, z: 40 }, { dist: 6, pitch: 0.15 });
 await shot('notice-board');
+
+// The scaled-up pier and rowboat, from the shore looking out.
+await look({ x: -280, z: 2 }, { x: -270, z: 0.5 }, { dist: 11, pitch: 0.25 });
+await shot('pier');
+
+// The Gauntlet at NIGHT: the fence lanterns are the course's only light, so
+// this is the proof they carry it. /daynight through real chat, the
+// streetlamp_night_shots.mjs recipe.
+async function setTimeOfDay(arg) {
+  const marker = `time of day set to ${arg}`;
+  const before = await page.evaluate(
+    (m) => (document.querySelector('#chatlog')?.textContent ?? '').split(m).length - 1,
+    marker,
+  );
+  await page.evaluate(() => document.activeElement?.blur?.());
+  await page.keyboard.press('Enter');
+  await sleep(500);
+  await page.click('#chat-input').catch(async () => {
+    await page.focus('#chat-input');
+  });
+  await sleep(200);
+  await page.evaluate((a) => {
+    const c = document.querySelector('#chat-input');
+    c.value = `/daynight ${a}`;
+    c.dispatchEvent(new Event('input', { bubbles: true }));
+  }, arg);
+  await page.keyboard.press('Enter');
+  const took = await page
+    .waitForFunction(
+      (m, n) => (document.querySelector('#chatlog')?.textContent ?? '').split(m).length - 1 > n,
+      { timeout: 15000 },
+      marker,
+      before,
+    )
+    .then(() => true)
+    .catch(() => false);
+  if (!took) throw new Error(`/daynight ${arg} did not register in #chatlog`);
+  await page.evaluate(() => document.querySelector('#chat-input')?.blur());
+  await sleep(30000); // the grade lerps in (slowly, under software GL)
+}
+await setTimeOfDay('night');
+await look({ x: -288, z: -16 }, { x: -304, z: -18 }, { dist: 9, pitch: 0.2 });
+await shot('gauntlet-night');
 
 await browser.close();
 console.log('proving shore shots written to tmp/');

@@ -34,8 +34,12 @@ function dockWorld(
 describe('world audio routing', () => {
   it('routes both rotated dock decks to wood without widening into nearby terrain', () => {
     for (const dock of PROPS.docks) {
-      const deck = dockWorld(dock, 0, -3.18);
-      const beside = dockWorld(dock, 1.05, -3.18);
+      // Local probe points grow with the dock's scale (dock_layout.ts
+      // normalizes deck maths through it): the deck centre and a point just
+      // past the scaled half-width (0.98s).
+      const s = dock.scale ?? 1;
+      const deck = dockWorld(dock, 0, -3.18 * s);
+      const beside = dockWorld(dock, 1.05 * s, -3.18 * s);
       expect(isOnDockDeck(deck.x, deck.z)).toBe(true);
       expect(
         footstepSurfaceAt(SEED, deck.x, groundHeight(deck.x, deck.z, SEED), deck.z, true),

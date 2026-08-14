@@ -53,7 +53,7 @@ export const PROVING_SHORE_ZONE: ZoneDef = {
   ],
   welcome:
     'The Proving Shore asks nothing of you but time. Learn the camp, strike the effigies, walk the wreck line, and when you are ready, Ferryman Odo will see you across to the vale.',
-  welcomeQuestId: 'q_ps_strike_true',
+  welcomeQuestId: 'q_ps_the_gauntlet',
 };
 
 export const PROVING_SHORE_ROADS: { x: number; z: number }[][] = [
@@ -124,7 +124,7 @@ export const PROVING_SHORE_PORTALS: PortalDef[] = [];
  *  camera to this facing on any teleport-scale displacement,
  *  game/teleport_camera.ts, so the first thing a newcomer SEES is the
  *  course keeper Odo's welcome note directs them to). */
-export const PROVING_SHORE_ARRIVAL = { x: -282, z: 6, facing: -3.09 } as const;
+export const PROVING_SHORE_ARRIVAL = { x: -282, z: 6, facing: -3.1 } as const;
 
 export const PROVING_SHORE_MOBS: Record<string, MobTemplate> = {
   // Built to be hit: the practice yard's straw-and-timber targets. They
@@ -266,25 +266,53 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
       'Fresh off the crossing, $N? Warden Tam keeps the Gauntlet on the strand just south of my pier: run his lanes first and your legs will thank you. After that, Instructor Maren at Dawnrest Camp has your first task. When the vale calls you back, ring the bell standing beside my pier and the crossing will set you down in Eastbrook town.',
   },
   // The Gauntlet's keeper: the first pair of hands a newcomer is sent to,
-  // standing at the course gate the arrival facing points straight at. He
-  // holds no quest on purpose: his whole lesson is the bootcamp overlay's
-  // walk-through of his lanes (ui/bootcamp.ts), and his greeting mirrors its
-  // running order for anyone who clicks him instead.
+  // standing beside the course's open east corner, where the arrival facing
+  // points. He gives AND takes the chain's head quest (q_ps_the_gauntlet):
+  // its objective is credited sim-side as the runner passes his flags in
+  // order (tutorial/gauntlet_run.ts), and his completion hands the newcomer
+  // on to Maren.
   warden_tam: {
     id: 'warden_tam',
     name: 'Warden Tam',
     title: 'Keeper of the Gauntlet',
-    pos: { x: -283, z: -13 },
+    pos: { x: -283, z: -21 },
     // Facing the pier landing, greeting each new arrival as they walk down.
     facing: 0.05,
     color: 0x8a5a3a,
-    questIds: [],
+    questIds: ['q_ps_the_gauntlet'],
     greeting:
-      'These lanes are the Gauntlet, $N, and every adventurer the vale respects has run them. Walk the first lane west to the flag, take a good look around, slip left down the second lane, look again, then run the last lane to the red flag. The braziers stay lit all night. When the red flag is behind you, Instructor Maren at Dawnrest Camp has your first task.',
+      'These lanes are the Gauntlet, $N, and every adventurer the vale respects has run them. The lantern posts stay lit all night, so the lanes never close.',
   },
 };
 
 export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
+  // The chain's head: Warden Tam's run of his own lanes. The objective is an
+  // 'interact' keyed on the sentinel ps_gauntlet_flag with NO live ground
+  // entity (the riding-lesson idiom, mounts_training.ts): the flags the
+  // player sees are decorProps dressing, and tutorial/gauntlet_run.ts
+  // credits one count per flag passed in running order, so the tracker
+  // reads "Gauntlet flag passed: 2/3" as they run. The bootcamp coachmark
+  // (ui/bootcamp.ts) rides the same counts for its lesson ladder.
+  q_ps_the_gauntlet: {
+    id: 'q_ps_the_gauntlet',
+    name: 'Run the Gauntlet',
+    giverNpcId: 'warden_tam',
+    turnInNpcId: 'warden_tam',
+    text: 'Every pair of legs the vale respects has run these lanes first, $N. Walk the first lane west to its flag, take a good look around, slip left down the south lane to the second, look again, then run the last lane to the red flag. Pass the flags in order, and the card at the top of your screen will show you every button as you go. When the red flag is behind you, come back to me at the gate.',
+    completionText:
+      'A clean run, $N. Your legs know the lanes now, and the rest of you is ready for real work: Instructor Maren keeps the drills at Dawnrest Camp, up the road north of the pier. Walk right up to her until her name shows, then press F, or left-click her, and she will set you your first task.',
+    objectives: [
+      {
+        type: 'interact',
+        targetObjectItemId: 'ps_gauntlet_flag',
+        count: 3,
+        label: 'Gauntlet flag passed',
+      },
+    ],
+    xpReward: 0,
+    copperReward: 40,
+    itemRewards: {},
+  },
   q_ps_strike_true: {
     id: 'q_ps_strike_true',
     name: 'Strike True',
@@ -299,6 +327,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     xpReward: 0,
     copperReward: 60,
     itemRewards: {},
+    requiresQuest: 'q_ps_the_gauntlet',
   },
   q_ps_the_wreck_line: {
     id: 'q_ps_the_wreck_line',
@@ -400,6 +429,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
 // crossing home. Every step's text names the exact key or click it needs, so
 // a player who has never held a mouse for this genre is never guessing.
 export const PROVING_SHORE_QUEST_ORDER: string[] = [
+  'q_ps_the_gauntlet',
   'q_ps_strike_true',
   'q_ps_the_wreck_line',
   'q_ps_the_wheel_of_trades',
@@ -428,6 +458,9 @@ export const PROVING_SHORE_ITEMS: Record<string, ItemDef> = {
     noVendorSell: true,
   },
 };
+// Note there is deliberately NO ItemDef for ps_gauntlet_flag: like the riding
+// lesson's train_valorsteed, it is a pure sentinel objective key with no live
+// object and no item, credited by position in tutorial/gauntlet_run.ts.
 
 // Every camp draws from its own private rng sub-stream (offStream), so
 // adding the tutorial island leaves the rest of the world's generation
@@ -484,17 +517,9 @@ export const PROVING_SHORE_PROPS: ZonePropsDef = {
   campfires: [
     [-302, 50], // the muster fire
     [-334, -10], // the practice yard's brazier
-    // The Gauntlet's braziers: real light sources so the course reads at
-    // night, every one placed OUTSIDE the lane walls (a campfire is a solid
-    // collider, colliders.ts CAMPFIRE_MOVE_TOP) at the gate, the corners,
-    // and the finish.
-    [-286, -10],
-    [-296, -10],
-    [-314, -22],
-    [-302, -26],
-    [-316, -38],
-    [-326, -38],
-    [-332, -32],
+    // The Gauntlet carries NO ground fires: its night light is the lantern
+    // posts along the fence lines (the kcasTorch decorProps below, lit by
+    // the renderer's torch-glow pass).
   ],
   tents: [
     // Maren's tent, pulled inside the fence beside the muster fire (its old
@@ -524,7 +549,10 @@ export const PROVING_SHORE_PROPS: ZonePropsDef = {
     // course: they make the running line unmissable and keep a wanderer on
     // it. The south-east wall corner slants to (-304, -33) because the
     // straight corner at (-304, -36) stands in the shallows.
-    { x1: -284, z1: -12, x2: -312, z2: -12 }, // lane 1 north wall
+    // Lane 1's north wall starts at x -292: the stretch from -283 to -292 is
+    // OPEN, so the pier landing walks straight into the course's wide east
+    // mouth instead of hunting for a gap.
+    { x1: -292, z1: -12, x2: -312, z2: -12 }, // lane 1 north wall
     { x1: -284, z1: -20, x2: -304, z2: -20 }, // lane 1 south wall
     { x1: -312, z1: -12, x2: -312, z2: -28 }, // lane 2 west wall
     { x1: -304, z1: -20, x2: -304, z2: -33 }, // lane 2 east wall
@@ -552,8 +580,22 @@ export const PROVING_SHORE_PROPS: ZonePropsDef = {
     { key: 'kcasTorch', x: -320, z: -35.8 },
     { key: 'kcasTorch', x: -328, z: -36 },
   ],
-  // The Old Pier, where the crossing circle waits at the plank's end.
-  docks: [{ x: -271, z: 0, rot: 1.4, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } }],
+  // The Old Pier, scaled up to read against a character: the classic pier is
+  // a rowboat jetty, and this one is the island's whole front door
+  // (dock_layout.ts normalizes the walkable-deck maths through the scale, so
+  // collision ground and footstep routing grow with the planks). Anchored ON
+  // the shore in the canonical dock orientation (the anchor is the land end;
+  // the shore-seating rule steps the seaward sections DOWN toward the water),
+  // where the old jetty met the sand, with the long run heading out to sea.
+  docks: [
+    {
+      x: -277.3,
+      z: -1.1,
+      rot: 1.4 - Math.PI,
+      scale: 1.75,
+      hutLocal: { x: 40, z: 40, hw: 0, hd: 0 },
+    },
+  ],
   graveyards: [{ x: -324, z: 58 }],
 };
 

@@ -1352,10 +1352,6 @@ export class Hud {
   // attack handler then falls back to the fixed attack control.
   onMobileAttackNearest: (() => void) | null = null;
   onQuestDialogStateChange: ((open: boolean) => void) | null = null;
-  // Held-movement flags for the island bootcamp's keyboard-order gating,
-  // injected by main.ts off the live Input (the HUD holds no input ref by
-  // design). Null until wired; the bootcamp then gates by ladder alone.
-  bootcampHeldMovement: (() => { forward: boolean; strafeLeft: boolean }) | null = null;
   // The healer button lives in the non-blocking ghost overlay, but successful
   // resurrection must still flow through main.ts so authoritative outcomes can
   // stop autorun without making Hud own Input or MobileControls.
@@ -8900,7 +8896,7 @@ export class Hud {
     this.mountRaceControls.update();
     this.lockpickController.repaintIfChanged();
     this.tutorial.update(sim, this.renderer, this.keybinds);
-    this.bootcamp.update(sim, this.renderer, this.keybinds, this.bootcampHeldMovement?.() ?? null);
+    this.bootcamp.update(sim, this.renderer, this.keybinds);
     this.lootRolls.update(now);
     if (slowHud) this.updateRaidLockoutBadge();
     if (slowHud) this.refreshDailyRewardsLauncher();

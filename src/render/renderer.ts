@@ -104,6 +104,7 @@ import {
   stepLandingDetector,
 } from './camera_feel_core';
 import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
+import { buildDecorTorchFx, type DecorTorchFxView } from './decor_torch_fx';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
 import { buildCastleFeatures, type CastleFeaturesView } from './castle_features';
 import { buildCelestialSprites, type CelestialSprites } from './celestial_sprites';
@@ -1814,6 +1815,7 @@ export class Renderer {
   private streetlamps: StreetlampsView | null = null;
   private emberPools: EmberPoolsView | null = null;
   private campBraziers: CampBraziersView | null = null;
+  private decorTorchFx: DecorTorchFxView | null = null;
   private nightAccents: NightAccentsView | null = null;
   private mobNightGlow: MobNightGlowView | null = null;
   // Contact blobs under nearby bodies, built ONLY on the tiers that cast no
@@ -2787,6 +2789,13 @@ export class Renderer {
     this.attachZoneFeature(this.campBraziers);
     for (const flame of this.campBraziers.flames) flame.matrixAutoUpdate = true;
     this.flames.push(...this.campBraziers.flames);
+    // Live fire for authored torch decor (the Gauntlet's fence lanterns):
+    // flames on the shared scenery pass, ground light through the night
+    // light field, no point lights (decor_torch_fx.ts).
+    this.decorTorchFx = buildDecorTorchFx(this.sim.cfg.seed);
+    this.attachZoneFeature(this.decorTorchFx);
+    for (const flame of this.decorTorchFx.flames) flame.matrixAutoUpdate = true;
+    this.flames.push(...this.decorTorchFx.flames);
     // The streamed wilderness layer (glow flora + fireflies) follows the camera
     // and rebuilds on a cell crossing, so it is NOT a zone feature.
     this.nightAccents = buildNightAccents(this.sim.cfg.seed);
@@ -12411,6 +12420,7 @@ export class Renderer {
     this.streetlamps?.update(lampGlow, this.time);
     this.emberPools?.update(lampGlow, this.time);
     this.campBraziers?.update(lampGlow, this.time);
+    this.decorTorchFx?.update(lampGlow, this.time);
     // The night light field: every lamp and camp fire plus the nearby bodies
     // collected above, packed into the terrain shader's uniform slots. Indoors
     // the world clock does not govern the ground either, so the same fogState

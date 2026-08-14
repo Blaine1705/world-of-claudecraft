@@ -12884,7 +12884,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorialGreeting.bellHomeNote':
     'もう浜から戻ったのかい？さっき鳴らしたのが渡しの鐘だよ。その双子がすぐそこ、レイヴンポストの郵便柱のそばに掛かっている。いつでも鳴らせば、渡しが修練の浜へ運び直してくれる。間違って鳴らしたのなら、それはそれで構わないさ。',
   'hudChrome.tutorialGreeting.islandArrivalNote':
-    '渡ってきたばかりかい？ようこそ修練の浜へ。ウォーデン・タムが目の前の浜でガントレットを預かっている。まず彼のところへ行けば、そのレーンが体の動かし方を全部教えてくれる。赤い旗を越えたら、桟橋から北へ道を上った先の暁の野営地で、教官マレンが最初の仕事をくれる。名前が見えるところまで歩み寄って、Fを押すか、左クリックすれば話ができる。発つ支度ができたら、私の桟橋のそばに立つ鐘を鳴らしなさい。渡しがイーストブルックの家まで運んでくれる。',
+    '渡ってきたばかりかい？ようこそ修練の浜へ。ウォーデン・タムが目の前の浜でガントレットを預かっている。名前が見えるところまで歩み寄って、Fを押すか、左クリックすれば、そのレーンが体の動かし方を全部教えてくれる。発つ支度ができたら、私の桟橋のそばに立つ鐘を鳴らしなさい。渡しがイーストブルックの家まで運んでくれる。',
   'hudChrome.tutorialGreeting.noteClose': 'わかった',
   'hudChrome.tutorialGreeting.skip': 'チュートリアルを飛ばす',
   'hudChrome.bootcamp.title': '最初の一歩',
@@ -12923,9 +12923,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bootcamp.forward2BodyPad':
     'もう一度左スティックを上に倒して、最後のレーンを赤い旗まで駆け抜けよう。',
   'hudChrome.bootcamp.courseProgress': '旗 {current} / {total}',
-  'hudChrome.bootcamp.doneTitle': '稽古の準備は万端',
+  'hudChrome.bootcamp.doneTitle': '走破',
   'hudChrome.bootcamp.doneBody':
-    '体の動かし方はこれで全部だ。教官マレンが桟橋から道を上った先の暁の野営地で稽古を仕切っている。最初の仕事を用意して待っているよ。',
+    '体の動かし方はこれで全部だ。門のウォーデン・タムのところへ歩いて戻り、走りの報告をしよう。ねぎらいの言葉と、最初の報酬が待っている。',
   'entities.zones.proving_shore.pois.4.label': 'ガントレット',
   'entities.items.ps_castaway_crate.name': '漂着した木箱',
   'entities.items.ps_ferry_bell.name': '渡しの鐘',
@@ -12950,7 +12950,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.warden_tam.name': 'ウォーデン・タム',
   'entities.npcs.warden_tam.title': 'ガントレットの番人',
   'entities.npcs.warden_tam.greeting':
-    'このレーンがガントレットだ、{playerName}。渓谷に名を知られた冒険者は皆ここを走った。最初のレーンを西へ旗まで歩き、あたりをよく見回し、二本目のレーンを左へ滑り、もう一度見回してから、最後のレーンを赤い旗まで駆け抜けるんだ。篝火は夜通し灯っている。赤い旗を越えたら、暁の野営地の教官マレンが最初の仕事をくれる。',
+    'このレーンがガントレットだ、{playerName}。渓谷に名を知られた冒険者は皆ここを走った。柵のランタンは夜通し灯っているから、レーンが閉まることはない。',
+  'entities.quests.q_ps_the_gauntlet.title': 'ガントレットを走れ',
+  'entities.quests.q_ps_the_gauntlet.text':
+    '渓谷に名を知られた者は皆、まずこのレーンを走った、{playerName}。最初のレーンを西へ旗まで歩き、あたりをよく見回し、南のレーンを左へ滑って二本目の旗へ、もう一度見回してから、最後のレーンを赤い旗まで駆け抜けるんだ。旗は順番どおりに通ること。画面上部のカードが、そのつど必要なボタンを見せてくれる。赤い旗を越えたら、門の私のところへ戻っておいで。',
+  'entities.quests.q_ps_the_gauntlet.completion':
+    '見事な走りだ、{playerName}。脚はもうレーンを覚えた。残りの体は本物の仕事に出せる。教官マレンが桟橋から北へ道を上った先の暁の野営地で稽古を仕切っている。名前が見えるところまで歩み寄って、Fを押すか、左クリックすれば、最初の仕事を言いつけてくれるよ。',
+  'entities.quests.q_ps_the_gauntlet.objectives.0.label': 'ガントレットの旗を通過',
   'entities.npcs.bursar_wick.name': '出納係ウィック',
   'entities.npcs.bursar_wick.title': '金張りの金庫',
   'entities.npcs.bursar_wick.greeting':

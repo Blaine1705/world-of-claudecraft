@@ -6,8 +6,9 @@
 // The running order IS the curriculum: hold forward down lane 1 to its
 // flag, swing the camera, strafe left down lane 2 to its flag, swing the
 // camera again, then hold forward down lane 3 to the red finish flag. The
-// ladder is strictly sequential (a camera lesson must be finished before
-// the next lane's flag will credit), so the buttons are learned in order.
+// flags themselves are credited sim-side in running order (the quest's own
+// objective count, tutorial/gauntlet_run.ts); this ladder folds that count
+// with the client-side camera-swing progress into one lesson at a time.
 //
 // The island's on-rails quest chain teaches the GAME (combat, looting,
 // trades, the bank); this overlay teaches the HANDS. It is the island
@@ -29,8 +30,6 @@ export type BootcampInputMode = 'keyboard' | 'touch' | 'pad';
 
 /** Camera-yaw travel (radians) each camera lesson asks for. */
 export const BOOTCAMP_CAMERA_TURN_RAD = 0.9;
-/** How close (yards) the player must pass to a Gauntlet flag to tag it. */
-export const BOOTCAMP_CHECKPOINT_RADIUS_YD = 4;
 
 export type BootcampStep = 'forward' | 'camera' | 'left' | 'camera2' | 'forward2' | 'done';
 
@@ -72,22 +71,10 @@ export function stepMovementAction(step: BootcampStep): 'forward' | 'strafeLeft'
   return null;
 }
 
-/** Advance the sequential checkpoint counter: the NEXT flag in running order
- *  is tagged when the player passes within radius AND the ladder is on that
- *  lane's movement lesson with its button seen (creditAllowed). The gate is
- *  what makes the order real: running the whole course without ever doing a
- *  camera lesson leaves the later flags untagged. */
-export function advanceCheckpoints(
-  reached: number,
-  pos: { x: number; z: number },
-  creditAllowed: boolean,
-): number {
-  if (!creditAllowed) return reached;
-  const next = BOOTCAMP_COURSE_CHECKPOINTS[reached];
-  if (!next) return reached;
-  const d = Math.hypot(pos.x - next.x, pos.z - next.z);
-  return d <= BOOTCAMP_CHECKPOINT_RADIUS_YD ? reached + 1 : reached;
-}
+// NOTE flag tagging itself lives sim-side (tutorial/gauntlet_run.ts credits
+// q_ps_the_gauntlet's objective count as the runner passes each flag in
+// order); the overlay mirrors that count, so this core only decides which
+// lesson the count-plus-yaw state is on.
 
 /** The world point the guidance arrow should aim at: the current lane's flag
  *  during a lane lesson, nothing during the camera lessons (the whole point

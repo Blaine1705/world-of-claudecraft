@@ -1868,21 +1868,25 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     const y = ground(d.x, d.z);
     const g = new THREE.Group();
     const key = d.x * 3.3 + d.z * 1.7;
+    // The dock's uniform scale (dock_layout.ts): the surface line lives in
+    // UNIT-local z, so world placement multiplies by ds and the pitch reads
+    // the slope back through it.
+    const ds = d.scale ?? 1;
     const surfaceLine = dockSurfaceLine(d, ground);
-    const pitch = -Math.atan(surfaceLine.slope);
-    const zScale = 0.85 / Math.cos(pitch);
+    const pitch = -Math.atan(surfaceLine.slope / ds);
+    const zScale = (0.85 / Math.cos(pitch)) * ds;
     for (let i = 0; i < DOCK_SECTION_LOCAL_Z.length; i++) {
       const lz = DOCK_SECTION_LOCAL_Z[i];
       const section = new THREE.Group();
-      section.position.set(0, dockSurfaceYAt(surfaceLine, lz) - y, lz);
+      section.position.set(0, dockSurfaceYAt(surfaceLine, lz) - y, lz * ds);
       section.rotation.x = pitch;
       g.add(section);
       // Pivot around the plank surface, not the post feet. Every section then
       // lies on the same analytic plane exposed by groundHeight. Compensating
       // z scale preserves the authored footprint after the pitch projection.
       addParts(section, 'dockPlatform', {
-        y: -DOCK_SECTION_SURFACE_Y,
-        scale: [0.78, 0.52, zScale],
+        y: -DOCK_SECTION_SURFACE_Y * ds,
+        scale: [0.78 * ds, 0.52 * ds, zScale],
       });
     }
     // hw/hd 0 means this dock carries no stone hut (e.g. the Farshore Landing).
@@ -1908,22 +1912,22 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       // ground sample: the shore undulates around the anchor.
       DOCK_DRESSING.forEach((dd, i) => {
         const off = {
-          x: dd.x * Math.cos(d.rot) + dd.z * Math.sin(d.rot),
-          z: -dd.x * Math.sin(d.rot) + dd.z * Math.cos(d.rot),
+          x: (dd.x * Math.cos(d.rot) + dd.z * Math.sin(d.rot)) * ds,
+          z: (-dd.x * Math.sin(d.rot) + dd.z * Math.cos(d.rot)) * ds,
         };
         addParts(g, i === 2 ? 'crateWooden' : 'barrel', {
-          x: dd.x,
+          x: dd.x * ds,
           y: ground(d.x + off.x, d.z + off.z) - y,
-          z: dd.z,
+          z: dd.z * ds,
           rot: keyRand(key, 5 + i) * Math.PI,
-          scale: dd.scale ?? 1,
+          scale: (dd.scale ?? 1) * ds,
         });
       });
     }
     // rowboat beside the deck's far end: floats at water level when the
     // shore dips below it, otherwise sits hauled up on the bank
-    const boatLx = DOCK_BOAT.x,
-      boatLz = DOCK_BOAT.z;
+    const boatLx = DOCK_BOAT.x * ds,
+      boatLz = DOCK_BOAT.z * ds;
     const boatWx = d.x + boatLx * Math.cos(d.rot) + boatLz * Math.sin(d.rot);
     const boatWz = d.z - boatLx * Math.sin(d.rot) + boatLz * Math.cos(d.rot);
     const boatGround = ground(boatWx, boatWz);
@@ -1934,7 +1938,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       z: boatLz,
       y: (isAfloat ? wl + 0.18 : boatGround + 0.06) - y,
       rot: DOCK_BOAT.rot + (keyRand(key, 8) - 0.5) * 0.4,
-      scale: 0.85,
+      scale: 0.85 * ds,
       euler: isAfloat
         ? undefined
         : new THREE.Euler(0.04, DOCK_BOAT.rot + (keyRand(key, 8) - 0.5) * 0.4, 0.16),

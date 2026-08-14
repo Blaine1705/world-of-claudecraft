@@ -86,12 +86,12 @@ await page.waitForFunction(
   },
   { timeout: 15000, polling: 200 },
 );
-// Ferryman Odo's per-device welcome note opens on the first island arrival,
-// directing the newcomer up the road to Maren.
+// Ferryman Odo's welcome note opens on the first island arrival, directing
+// the newcomer straight ahead to Warden Tam at the Gauntlet's gate.
 await page.waitForFunction(
   () => {
     const el = document.getElementById('tutorial-greeting');
-    return !!el && /Maren/i.test(el.innerText);
+    return !!el && /Tam/i.test(el.innerText);
   },
   { timeout: 10000, polling: 200 },
 );
@@ -102,7 +102,7 @@ const after = await page.evaluate(() => {
   const p = sim.entities.get(sim.playerId);
   return {
     pos: { ...p.pos },
-    questState: sim.questState('q_ps_strike_true'),
+    questState: sim.questState('q_ps_the_gauntlet'),
     greetingLatched: sim.players.get(sim.playerId).tutorialGreetingSent,
   };
 });

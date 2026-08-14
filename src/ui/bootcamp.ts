@@ -1,34 +1,31 @@
 // The Proving Shore movement bootcamp overlay: the island sibling of the
 // Eastbrook new-adventurer coachmark (tutorial.ts), sharing its card CSS
-// family and its whole shape. Engages once for a fresh character standing on
-// the tutorial island and walks them through Warden Tam's Gauntlet in its
+// family and its whole shape. Shows while Warden Tam's q_ps_the_gauntlet is
+// ACTIVE in the quest log and walks the runner through the lanes in their
 // running order (forward, camera, strafe left, camera, forward; the ladder
 // lives in bootcamp_view.ts) with copy in the player's live input family
 // (keyboard, touch, or gamepad; src/game/input_hint_mode.ts), the physical
 // keycaps as on-screen chips, and the guidance arrow on the current lane's
 // flag.
 //
-// Detection observes the world, the camera, and (keyboard mode only) the
-// held-movement probe the host wires in: a lane's flag only credits once its
-// button was actually seen held during that lesson, so the buttons really
-// are pressed in order. Touch and pad players are gated by the ladder alone:
-// their movement is one stick, and stalling them on a flag they are standing
-// beside would teach nothing. It never writes sim state and runs identically
-// against the offline Sim and the online ClientWorld. Completion is
-// remembered per device in localStorage, the coachmark family's precedent.
-// The two overlays can never fight for the corner: this one only engages
-// west of the strait (x < -180), exactly where isFreshCharacter (tutorial.ts)
-// refuses to.
+// The flag tally is the QUEST'S OWN objective count (the sim credits one
+// count per flag passed in order, tutorial/gauntlet_run.ts), so the card,
+// the quest tracker, and the server can never disagree about a tag, and
+// progress survives reloads with the character rather than the device. The
+// card folds away when the run is handed in (quest done) or the player
+// leaves the island; only the camera lessons live client-side, since the
+// sim has no camera. Reads world state, writes none, and runs identically
+// against the offline Sim and the online ClientWorld.
 
 import { currentInputHintMode, type InputHintMode } from '../game/input_hint_mode';
 import type { Keybinds } from '../game/keybinds';
 import type { Renderer } from '../render/renderer';
 import { BOOTCAMP_COURSE_CHECKPOINTS } from '../sim/content/proving_shore';
+import { GAUNTLET_QUEST_ID } from '../sim/tutorial/gauntlet_run';
 import { groundHeight, WATER_LEVEL } from '../sim/world';
 import { WORLD_SEED } from '../sim/world_seed';
 import type { IWorld } from '../world_api';
 import {
-  advanceCheckpoints,
   BOOTCAMP_STEP_ORDER,
   type BootcampParam,
   type BootcampStep,
@@ -38,39 +35,28 @@ import {
   bootcampNeedsRerender,
   bootcampTitleKey,
   computeBootcampStep,
-  stepMovementAction,
 } from './bootcamp_view';
 import { formatNumber, t } from './i18n';
 
-/** The held-movement flags the host may wire in (main.ts reads them off the
- *  live Input); null when unwired, which degrades to ladder-only gating. */
-export interface BootcampHeldMovement {
-  forward: boolean;
-  strafeLeft: boolean;
-}
-
-const STORAGE_KEY = 'woc.psbootcamp.v1';
 // The closing card lingers, then dismisses itself (the tutorial.ts pattern);
 // shorter than Eastbrook's because there is no tip list under it.
 const DONE_LINGER_MS = 10000;
-// The island column: engage west of the strait, disengage (without writing
-// the done flag) the moment the player ferries back east of it.
+// The island column: the card never shows east of the strait.
 const ISLAND_MAX_X = -180;
 
 export class BootcampOverlay {
-  private completed: boolean;
+  // Session-only dismissal: the skip button folds the card away until the
+  // quest is abandoned and re-accepted (a fresh log entry re-engages).
+  private dismissed = false;
   private engaged = false;
   private step: BootcampStep | null = null;
   private doneSince = 0;
   private lastMode: InputHintMode = 'keyboard';
 
-  // Lesson progress, all observed (see the pure core for the thresholds).
+  // The camera lessons' progress (client-side; the sim has no camera).
   private lastYaw = 0;
   private yawSinceFlag = 0;
-  private checkpointsReached = 0;
-  // Keyboard-mode order proof: the current lane's button, seen held at least
-  // once during this lesson. Reset whenever a flag is tagged.
-  private legKeySeen = false;
+  private lastCounts = 0;
 
   private root: HTMLElement | null = null;
   private titleEl!: HTMLElement;
@@ -81,48 +67,40 @@ export class BootcampOverlay {
   private skipBtn!: HTMLButtonElement;
   private arrow: HTMLElement | null = null;
 
-  constructor() {
-    this.completed = readDone();
-  }
-
-  // Called every HUD frame. Cheap no-op once completed or while off-island.
-  update(
-    world: IWorld,
-    renderer: Renderer,
-    keybinds: Keybinds,
-    held: BootcampHeldMovement | null,
-  ): void {
-    if (this.completed) return;
+  // Called every HUD frame. Cheap no-op while the run's quest is not active.
+  update(world: IWorld, renderer: Renderer, keybinds: Keybinds): void {
     const p = world.player;
     if (!p) return;
     if (world.playerId < 0 || p.id !== world.playerId) return;
 
+    const questActive = world.questLog.get(GAUNTLET_QUEST_ID)?.state === 'active';
     const onIsland = (p.pos?.x ?? 0) < ISLAND_MAX_X;
     if (!this.engaged) {
-      // A genuinely new pair of hands: the island's own level band (a
-      // graduate leaves at the same level they arrived, so level 1-2 IS the
-      // island's whole population), standing on the island.
-      if (!onIsland || p.level > 2) return;
+      if (!questActive || !onIsland || this.dismissed) {
+        // A fresh log entry after an abandon clears a session dismissal.
+        if (!questActive) this.dismissed = false;
+        return;
+      }
       this.engaged = true;
       this.lastYaw = renderer.camYaw;
       this.yawSinceFlag = 0;
-      this.checkpointsReached = 0;
-      this.legKeySeen = false;
-    } else if (!onIsland) {
-      // Ferried back mid-lesson: fold the card away without writing the done
-      // flag, so the next island visit starts the lessons fresh.
-      this.engaged = false;
-      this.step = null;
-      this.root?.remove();
-      this.arrow?.remove();
-      this.root = null;
-      this.arrow = null;
+      this.lastCounts = questCounts(world);
+    } else if (!onIsland || !questActive) {
+      // Handed in (or abandoned, or ferried away): fold the card away. A
+      // later re-accept starts the lessons fresh.
+      this.disengage();
       return;
     }
 
-    // Camera-yaw travel accumulates across frames (|delta| summed, wrapped to
-    // the short way around), and resets at every flag so each camera lesson
-    // asks for its own fresh swing.
+    // The flag tally is the quest objective's own count, credited sim-side
+    // in running order; the yaw accumulator resets at each new tag so every
+    // camera lesson asks for its own fresh swing.
+    const counts = questCounts(world);
+    if (counts !== this.lastCounts) {
+      this.lastCounts = counts;
+      this.yawSinceFlag = 0;
+    }
+
     const yaw = renderer.camYaw;
     let dYaw = yaw - this.lastYaw;
     if (dYaw > Math.PI) dYaw -= 2 * Math.PI;
@@ -131,26 +109,8 @@ export class BootcampOverlay {
     this.lastYaw = yaw;
 
     const mode = currentInputHintMode();
-    const current = computeBootcampStep({
-      checkpointsReached: this.checkpointsReached,
-      yawTurnedSinceFlagRad: this.yawSinceFlag,
-    });
-    const action = stepMovementAction(current);
-    if (action && held?.[action]) this.legKeySeen = true;
-    // A lane's flag credits only during its own lesson (the camera lessons
-    // in between are mandatory), and keyboard mode further requires the
-    // lane's button to have actually been held.
-    const creditAllowed =
-      action !== null && (mode !== 'keyboard' || held === null || this.legKeySeen);
-    const advanced = advanceCheckpoints(this.checkpointsReached, p.pos, creditAllowed);
-    if (advanced !== this.checkpointsReached) {
-      this.checkpointsReached = advanced;
-      this.yawSinceFlag = 0;
-      this.legKeySeen = false;
-    }
-
     const next = computeBootcampStep({
-      checkpointsReached: this.checkpointsReached,
+      checkpointsReached: counts,
       yawTurnedSinceFlagRad: this.yawSinceFlag,
     });
 
@@ -161,7 +121,9 @@ export class BootcampOverlay {
     }
 
     if (this.step === 'done') {
-      if (performance.now() - this.doneSince >= DONE_LINGER_MS) this.finish();
+      // The done card asks for the walk back to Warden Tam; it lingers, then
+      // trusts the quest tracker (the turn-in itself disengages above).
+      if (performance.now() - this.doneSince >= DONE_LINGER_MS) this.disengage();
       this.hideArrow();
       return;
     }
@@ -172,7 +134,7 @@ export class BootcampOverlay {
   /** Re-localize after an in-game language switch (the Hud's woc:languagechange
    *  fan-out). Self-gated on a card being up, the tutorial.ts precedent. */
   relocalize(_world: IWorld, keybinds: Keybinds): void {
-    if (this.completed || !this.engaged || this.step === null) return;
+    if (!this.engaged || this.step === null) return;
     this.renderPanel(keybinds);
   }
 
@@ -180,9 +142,7 @@ export class BootcampOverlay {
 
   private courseProgress(): string {
     return t('hudChrome.bootcamp.courseProgress', {
-      current: formatNumber(
-        Math.min(this.checkpointsReached + 1, BOOTCAMP_COURSE_CHECKPOINTS.length),
-      ),
+      current: formatNumber(Math.min(this.lastCounts + 1, BOOTCAMP_COURSE_CHECKPOINTS.length)),
       total: formatNumber(BOOTCAMP_COURSE_CHECKPOINTS.length),
     });
   }
@@ -286,7 +246,7 @@ export class BootcampOverlay {
   // Points the shared course arrow at the current lane's flag.
   private updateArrow(renderer: Renderer): void {
     if (!this.arrow) return;
-    const target = bootcampArrowTarget(this.step!, this.checkpointsReached);
+    const target = bootcampArrowTarget(this.step!, this.lastCounts);
     if (!target) {
       this.hideArrow();
       return;
@@ -321,28 +281,24 @@ export class BootcampOverlay {
     if (this.arrow) this.arrow.style.display = 'none';
   }
 
-  private finish(): void {
-    this.completed = true;
+  /** Fold the card away for now; the quest log decides any re-engage. */
+  private disengage(): void {
     this.engaged = false;
-    writeDone();
+    this.step = null;
+    this.doneSince = 0;
     this.root?.remove();
     this.arrow?.remove();
     this.root = null;
     this.arrow = null;
   }
+
+  private finish(): void {
+    this.dismissed = true;
+    this.disengage();
+  }
 }
 
-function readDone(): boolean {
-  try {
-    return localStorage.getItem(STORAGE_KEY) === 'done';
-  } catch {
-    return false;
-  }
-}
-function writeDone(): void {
-  try {
-    localStorage.setItem(STORAGE_KEY, 'done');
-  } catch {
-    /* private mode */
-  }
+/** The quest objective's own flag tally (0 when the quest is not active). */
+function questCounts(world: IWorld): number {
+  return world.questLog.get(GAUNTLET_QUEST_ID)?.counts?.[0] ?? 0;
 }

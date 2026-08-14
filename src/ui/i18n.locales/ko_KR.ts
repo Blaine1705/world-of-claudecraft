@@ -12892,7 +12892,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorialGreeting.bellHomeNote':
     '벌써 해안에서 돌아오셨나요? 방금 울리신 것이 나룻배 종입니다. 그 쌍둥이가 바로 저기 레이븐포스트 우편함 옆에 걸려 있죠. 언제든 울리면 건너기가 수련의 해안으로 다시 데려다줍니다. 실수로 울리셨더라도 손해 볼 것 없어요.',
   'hudChrome.tutorialGreeting.islandArrivalNote':
-    '방금 건너오셨나요? 수련의 해안에 온 것을 환영합니다. 바로 앞 바닷가에서 워든 탐이 건틀릿을 지키고 있어요. 먼저 그를 찾아가면, 그의 길이 몸 쓰는 법을 전부 가르쳐 줄 겁니다. 붉은 깃발을 지나고 나면, 부두 북쪽 길을 오른 새벽쉼터 야영지에서 교관 마렌이 첫 임무를 줄 거예요. 이름이 보일 때까지 바짝 다가가 F를 누르거나 왼쪽 클릭하면 이야기할 수 있습니다. 그리고 떠날 준비가 되면 제 부두 옆에 선 종을 울리세요. 건너기가 이스트브룩의 집으로 데려다줄 겁니다.',
+    '방금 건너오셨나요? 수련의 해안에 온 것을 환영합니다. 바로 앞 바닷가에서 워든 탐이 건틀릿을 지키고 있어요. 이름이 보일 때까지 바짝 다가가 F를 누르거나 왼쪽 클릭하면, 그의 길이 몸 쓰는 법을 전부 가르쳐 줄 겁니다. 그리고 떠날 준비가 되면 제 부두 옆에 선 종을 울리세요. 건너기가 이스트브룩의 집으로 데려다줄 겁니다.',
   'hudChrome.tutorialGreeting.noteClose': '알겠어요',
   'hudChrome.tutorialGreeting.skip': '튜토리얼 건너뛰기',
   'hudChrome.bootcamp.title': '첫걸음',
@@ -12932,9 +12932,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bootcamp.forward2BodyPad':
     '다시 왼쪽 스틱을 위로 밀어 마지막 길을 붉은 깃발까지 달리세요.',
   'hudChrome.bootcamp.courseProgress': '깃발 {current} / {total}',
-  'hudChrome.bootcamp.doneTitle': '훈련 준비 완료',
+  'hudChrome.bootcamp.doneTitle': '완주',
   'hudChrome.bootcamp.doneBody':
-    '몸 쓰는 법은 이걸로 전부입니다. 부두에서 길을 오르면 새벽쉼터 야영지에서 교관 마렌이 훈련을 이끌고 있어요. 첫 임무가 당신을 기다립니다.',
+    '몸 쓰는 법은 이걸로 전부입니다. 문가의 워든 탐에게 걸어 돌아가 완주를 보고하세요. 그가 건넬 말과 첫 보상이 기다립니다.',
   'entities.zones.proving_shore.pois.4.label': '건틀릿',
   'entities.items.ps_castaway_crate.name': '표류 상자',
   'entities.items.ps_ferry_bell.name': '나룻배 종',
@@ -12959,7 +12959,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.warden_tam.name': '워든 탐',
   'entities.npcs.warden_tam.title': '건틀릿의 파수꾼',
   'entities.npcs.warden_tam.greeting':
-    '이 길들이 건틀릿입니다, {playerName}. 골짜기가 인정하는 모험가는 모두 여길 달렸죠. 첫 번째 길을 서쪽 깃발까지 걷고, 주위를 한껏 둘러본 뒤, 두 번째 길을 왼쪽으로 미끄러져 내려가고, 다시 한 번 둘러본 다음, 마지막 길을 붉은 깃발까지 달리세요. 화톳불은 밤새 꺼지지 않습니다. 붉은 깃발을 지나고 나면, 새벽쉼터 야영지의 교관 마렌이 첫 임무를 줄 겁니다.',
+    '이 길들이 건틀릿입니다, {playerName}. 골짜기가 인정하는 모험가는 모두 여길 달렸죠. 울타리의 등불은 밤새 꺼지지 않으니, 길이 닫히는 일은 없습니다.',
+  'entities.quests.q_ps_the_gauntlet.title': '건틀릿 완주',
+  'entities.quests.q_ps_the_gauntlet.text':
+    '골짜기가 인정하는 다리는 모두 이 길부터 달렸습니다, {playerName}. 첫 번째 길을 서쪽 깃발까지 걷고, 주위를 한껏 둘러본 뒤, 남쪽 길을 왼쪽으로 미끄러져 두 번째 깃발까지 가고, 다시 한 번 둘러본 다음, 마지막 길을 붉은 깃발까지 달리세요. 깃발은 순서대로 지나야 합니다. 화면 위의 카드가 그때그때 필요한 버튼을 보여 줄 거예요. 붉은 깃발을 지나면 문가의 저에게 돌아오세요.',
+  'entities.quests.q_ps_the_gauntlet.completion':
+    '깔끔한 완주였습니다, {playerName}. 다리는 이제 길을 익혔으니, 나머지는 진짜 일을 할 차례죠. 교관 마렌이 부두 북쪽 길을 오른 새벽쉼터 야영지에서 훈련을 이끌고 있습니다. 이름이 보일 때까지 바짝 다가가 F를 누르거나 왼쪽 클릭하면, 첫 임무를 내줄 겁니다.',
+  'entities.quests.q_ps_the_gauntlet.objectives.0.label': '건틀릿 깃발 통과',
   'entities.npcs.bursar_wick.name': '경리관 윅',
   'entities.npcs.bursar_wick.title': '도금 금고',
   'entities.npcs.bursar_wick.greeting':

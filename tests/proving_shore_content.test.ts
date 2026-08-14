@@ -117,10 +117,19 @@ describe('proving shore placement', () => {
       expect(c.z).toBeGreaterThan(-38);
       expect(c.z).toBeLessThan(-10);
     }
-    // The Gauntlet is lit for night running: braziers (real light sources)
-    // accompany the course, all south of camp with the walls.
-    const courseFires = (PROVING_SHORE_PROPS.campfires ?? []).filter(([, z]) => z < -4);
-    expect(courseFires.length).toBeGreaterThanOrEqual(6);
+    // The Gauntlet is lit for night running by its fence-line lantern posts
+    // (kcasTorch decorProps, lit via render/decor_torch_fx.ts), NOT ground
+    // fires: campfires are solid colliders and the lanes stay clear.
+    const torches = (PROVING_SHORE_PROPS.decorProps ?? []).filter((d) =>
+      d.key.startsWith('kcasTorch'),
+    );
+    expect(torches.length).toBeGreaterThanOrEqual(10);
+    // (The practice yard's brazier at (-334, -10) sits west of the course
+    // rect and is not a course fire.)
+    const courseFires = (PROVING_SHORE_PROPS.campfires ?? []).filter(
+      ([x, z]) => x > -332 && z < -10,
+    );
+    expect(courseFires).toEqual([]);
   });
 
   it('the greeter stands on dry ground at the Eastbrook spawn', () => {
@@ -204,6 +213,7 @@ describe('proving shore placement', () => {
     // The rework's contract: professions, then bank-and-bags, both AFTER the
     // two doing-lessons and BEFORE Set Sail.
     expect(PROVING_SHORE_QUEST_ORDER).toEqual([
+      'q_ps_the_gauntlet',
       'q_ps_strike_true',
       'q_ps_the_wreck_line',
       'q_ps_the_wheel_of_trades',

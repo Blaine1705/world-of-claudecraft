@@ -595,7 +595,7 @@ export const hudChromeStrings = {
     // Ferryman Odo's island welcome, shown once per device on the first
     // arrival: the greeting ferry lands beside his pier.
     islandArrivalNote:
-      'Fresh off the crossing? Welcome to the Proving Shore. Warden Tam keeps the Gauntlet on the strand right ahead of you: see him first, and his lanes will teach your legs everything they need. When the red flag is behind you, Instructor Maren at Dawnrest Camp, up the road north of my pier, has your first task: walk right up to her until her name shows, then press F, or left-click her, to talk. And when you are ready to leave, ring the bell standing beside my pier and the crossing will carry you home to Eastbrook.',
+      'Fresh off the crossing? Welcome to the Proving Shore. Warden Tam keeps the Gauntlet on the strand right ahead of you: walk up to him until his name shows, then press F, or left-click him, and his lanes will teach your legs everything they need. And when you are ready to leave, ring the bell standing beside my pier and the crossing will carry you home to Eastbrook.',
     noteClose: 'Understood',
   },
   // New-adventurer tutorial copy for the touch interface. The default tutorial
@@ -675,9 +675,9 @@ export const hudChromeStrings = {
     forward2BodyTouch: 'Push the movement stick up again and run the last lane to the red flag.',
     forward2BodyPad: 'Push the left stick up again and run the last lane to the red flag.',
     courseProgress: 'Flag {current} of {total}',
-    doneTitle: 'Ready for the drills',
+    doneTitle: 'Run complete',
     doneBody:
-      'That is everything your legs need to know. Instructor Maren keeps the drills at Dawnrest Camp, up the road from the pier, and she has your first task.',
+      'That is everything your legs need to know. Walk back to Warden Tam at the gate and hand your run in: he has a word for you, and your first coin.',
   },
   // Minimap / compass / clock / coordinate widget tooltips and accessible names.
   widgets: {

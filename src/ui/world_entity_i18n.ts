@@ -546,6 +546,7 @@ const QUEST_IDS = [
   'q_fs_stalkers_off_the_light',
   'q_fs_the_great_break',
   // the Proving Shore (tutorial island)
+  'q_ps_the_gauntlet',
   'q_ps_strike_true',
   'q_ps_the_wreck_line',
   'q_ps_the_wheel_of_trades',

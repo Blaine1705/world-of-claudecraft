@@ -7,9 +7,7 @@
 import { describe, expect, it } from 'vitest';
 import { BOOTCAMP_COURSE_CHECKPOINTS } from '../src/sim/content/proving_shore';
 import {
-  advanceCheckpoints,
   BOOTCAMP_CAMERA_TURN_RAD,
-  BOOTCAMP_CHECKPOINT_RADIUS_YD,
   BOOTCAMP_STEP_ORDER,
   type BootcampStep,
   bootcampArrowTarget,
@@ -61,31 +59,8 @@ describe('stepMovementAction', () => {
   });
 });
 
-describe('advanceCheckpoints', () => {
-  const first = BOOTCAMP_COURSE_CHECKPOINTS[0];
-  const second = BOOTCAMP_COURSE_CHECKPOINTS[1];
-
-  it('tags the next flag in running order when the player passes close', () => {
-    expect(advanceCheckpoints(0, { x: first.x + 1, z: first.z - 1 }, true)).toBe(1);
-  });
-
-  it('never credits while the ladder is on a camera lesson (creditAllowed false)', () => {
-    expect(advanceCheckpoints(1, { x: second.x, z: second.z }, false)).toBe(1);
-  });
-
-  it('ignores a later flag until its turn (running order, not any order)', () => {
-    expect(advanceCheckpoints(0, { x: second.x, z: second.z }, true)).toBe(0);
-  });
-
-  it('does nothing outside the tag radius or past the last flag', () => {
-    expect(
-      advanceCheckpoints(0, { x: first.x + BOOTCAMP_CHECKPOINT_RADIUS_YD + 1, z: first.z }, true),
-    ).toBe(0);
-    expect(
-      advanceCheckpoints(BOOTCAMP_COURSE_CHECKPOINTS.length, { x: first.x, z: first.z }, true),
-    ).toBe(BOOTCAMP_COURSE_CHECKPOINTS.length);
-  });
-});
+// NOTE flag tagging is covered sim-side (tests/tutorial_greeting.test.ts
+// drives updateGauntletRuns through a real Sim): this core never tags.
 
 describe('bootcampArrowTarget', () => {
   it('aims at the current lane flag, hides during camera lessons and when done', () => {

@@ -1982,13 +1982,6 @@ async function startGame(
   // with no live hostile target (the HUD falls back to plain castSlot(0) until
   // this is wired); the Target button cycles targets via the Tab path below.
   hud.onMobileAttackNearest = () => attackNearest();
-  // The island bootcamp's keyboard-order gate reads the held movement keys
-  // the same way the perf overlay reads its input debug state: a narrow
-  // closure over the live Input, so the HUD never holds an input reference.
-  hud.bootcampHeldMovement = () => {
-    const held = input.debugState().movementHeld;
-    return { forward: held.forward, strafeLeft: held.strafeLeft };
-  };
 
   let lastOptionsOpen = hud.optionsOpen;
   let lastCharacterOpen = hud.characterOpen;

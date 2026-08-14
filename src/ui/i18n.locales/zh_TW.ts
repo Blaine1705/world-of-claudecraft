@@ -12663,7 +12663,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorialGreeting.bellHomeNote':
     '這麼快就從海濱回來了？你剛才敲響的正是渡船鈴。它的孿生兄弟就掛在那邊鴉郵信箱旁：想回試煉之濱，隨時敲響它，渡航就會送你過去。敲錯了也不打緊。',
   'hudChrome.tutorialGreeting.islandArrivalNote':
-    '剛下渡船嗎？歡迎來到試煉之濱。看守塔姆就在你正前方的海灘上守著試煉跑道：先去找他，他的跑道會把你雙腿該會的都教給你。等紅旗被你甩在身後，就沿碼頭北邊的路上去晨憩營地找教官瑪倫領第一件差事：走到她跟前，直到她的名字顯示出來，然後按 F，或用滑鼠左鍵點擊她交談。等你準備離開時，敲響立在我碼頭旁的那口鈴，渡航就會送你回東溪鎮。',
+    '剛下渡船嗎？歡迎來到試煉之濱。看守塔姆就在你正前方的海灘上守著試煉跑道：走到他跟前，直到他的名字顯示出來，然後按 F，或用滑鼠左鍵點擊他，他的跑道會把你雙腿該會的都教給你。等你準備離開時，敲響立在我碼頭旁的那口鈴，渡航就會送你回東溪鎮。',
   'hudChrome.tutorialGreeting.noteClose': '明白了',
   'hudChrome.bootcamp.title': '最初的腳步',
   'hudChrome.bootcamp.forwardTitle': '走過第一條跑道',
@@ -12697,9 +12697,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bootcamp.forward2BodyTouch': '再次把移動搖桿推向上方，沿最後一條跑道跑到紅旗處。',
   'hudChrome.bootcamp.forward2BodyPad': '再次把左搖桿推向上方，沿最後一條跑道跑到紅旗處。',
   'hudChrome.bootcamp.courseProgress': '旗幟 {current}/{total}',
-  'hudChrome.bootcamp.doneTitle': '可以受訓了',
+  'hudChrome.bootcamp.doneTitle': '跑完全程',
   'hudChrome.bootcamp.doneBody':
-    '腿上的功夫就這些了。教官瑪倫在碼頭沿路而上的晨憩營地主持操練，她的第一件差事正等著你。',
+    '腿上的功夫就這些了。走回大門處的看守塔姆那裡交差：他有話要對你說，還有你的第一份報酬。',
   'entities.zones.proving_shore.pois.4.label': '試煉跑道',
   'entities.items.ps_castaway_crate.name': '漂流貨箱',
   'entities.items.ps_ferry_bell.name': '渡船鈴',
@@ -12724,7 +12724,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.warden_tam.name': '看守塔姆',
   'entities.npcs.warden_tam.title': '試煉跑道的看守',
   'entities.npcs.warden_tam.greeting':
-    '這幾條跑道就是試煉跑道，{playerName}，谷地敬重的每一位冒險者都跑過它。沿第一條跑道向西走到旗幟處，好好環顧四周，再沿第二條跑道向左滑步下去，再看一圈，最後沿末尾的跑道跑到紅旗處。火盆整夜不熄。等紅旗被你甩在身後，晨憩營地的教官瑪倫會交給你第一件差事。',
+    '這幾條跑道就是試煉跑道，{playerName}，谷地敬重的每一位冒險者都跑過它。欄杆上的燈柱整夜不滅，跑道從不打烊。',
+  'entities.quests.q_ps_the_gauntlet.title': '跑過試煉跑道',
+  'entities.quests.q_ps_the_gauntlet.text':
+    '谷地敬重的每一雙腿，都是先從這幾條跑道跑出來的，{playerName}。沿第一條跑道向西走到旗幟處，好好環顧四周，再沿南邊的跑道向左滑步走到第二面旗，再看一圈，最後沿末尾的跑道跑到紅旗處。旗幟要按順序經過；螢幕上方的卡片會隨時告訴你該按哪個鍵。等紅旗被你甩在身後，回到大門處找我。',
+  'entities.quests.q_ps_the_gauntlet.completion':
+    '跑得乾淨俐落，{playerName}。你的雙腿已經記住了跑道，剩下的就該幹真正的活了：教官瑪倫在碼頭北邊沿路而上的晨憩營地主持操練。走到她跟前，直到她的名字顯示出來，然後按 F，或用滑鼠左鍵點擊她，她會交給你第一件差事。',
+  'entities.quests.q_ps_the_gauntlet.objectives.0.label': '經過試煉跑道旗幟',
   'entities.npcs.bursar_wick.name': '司庫威克',
   'entities.npcs.bursar_wick.title': '鍍金保險箱',
   'entities.npcs.bursar_wick.greeting':
