@@ -55,7 +55,7 @@ describe('runGateChild', () => {
     expect(result).toEqual({ status: 7, signal: null });
   });
 
-  it('kills the active child tree before releasing the lock on handled termination', async () => {
+  it('retains the lock when the direct child exits until its resistant grandchild is dead', async () => {
     const port = await freePort();
     const marker = path.join(tempDir, 'grandchild-pid.txt');
     const grandchildSource = `
@@ -67,7 +67,6 @@ describe('runGateChild', () => {
     const childSource = `
       const { spawn } = require('node:child_process');
       spawn(process.execPath, ['-e', ${JSON.stringify(grandchildSource)}], { stdio: 'ignore' });
-      process.on('SIGTERM', () => {});
       setInterval(() => {}, 1000);
     `;
     const wrapperSource = `
@@ -78,7 +77,9 @@ describe('runGateChild', () => {
       try {
         result = await runGateChild(process.execPath, ['-e', ${JSON.stringify(childSource)}], {
           stdio: 'ignore',
-          forceKillAfterMs: 100
+          forceKillAfterMs: 100,
+          quiescencePollMs: 10,
+          quiescenceEscalationMs: 500
         });
       } finally {
         await release();
@@ -92,8 +93,15 @@ describe('runGateChild', () => {
     const grandchildPid = Number(fs.readFileSync(marker, 'utf8'));
 
     let waiterAcquired = false;
+    let grandchildAliveWhenWaiterAcquired = false;
     const waiterPromise = acquireFullSuiteLock({ port, pollMs: 5 }).then((lock) => {
       waiterAcquired = true;
+      try {
+        process.kill(grandchildPid, 0);
+        grandchildAliveWhenWaiterAcquired = true;
+      } catch {
+        grandchildAliveWhenWaiterAcquired = false;
+      }
       return lock;
     });
     await new Promise((resolve) => setTimeout(resolve, 20));
@@ -104,6 +112,7 @@ describe('runGateChild', () => {
 
     expect(wrapperExit).toEqual({ code: 143, signal: null });
     expect(waiterAcquired).toBe(true);
+    expect(grandchildAliveWhenWaiterAcquired).toBe(false);
     expect(() => process.kill(grandchildPid, 0)).toThrow();
     await waiter.release();
   });

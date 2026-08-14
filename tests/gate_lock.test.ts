@@ -159,6 +159,39 @@ describe('acquireFullSuiteLock', () => {
     await new Promise<void>((resolve) => foreign.close(() => resolve()));
   });
 
+  it('bounds and yields reset-only identification retries before falling open', async () => {
+    const port = await freePort();
+    let connections = 0;
+    const resetting = net.createServer((socket) => {
+      connections++;
+      socket.resetAndDestroy();
+    });
+    await new Promise<void>((resolve) =>
+      resetting.listen({ host: DEFAULT_LOCK_HOST, port }, resolve),
+    );
+    const logs: string[] = [];
+    const startedAt = Date.now();
+    const lock = await Promise.race([
+      acquireFullSuiteLock({
+        port,
+        pollMs: 5,
+        maxWaitMs: 100,
+        identifyTimeoutMs: 25,
+        log: (message) => logs.push(message),
+      }),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('reset-only listener did not fall open')), 500),
+      ),
+    ]);
+
+    expect(Date.now() - startedAt).toBeLessThan(500);
+    expect(connections).toBeGreaterThan(0);
+    expect(connections).toBeLessThanOrEqual(4);
+    expect(logs.some((message) => message.includes('reset the gate lock probe'))).toBe(true);
+    await lock.release();
+    await new Promise<void>((resolve) => resetting.close(() => resolve()));
+  });
+
   it('keeps the bounded wait fallback for a genuine long-running holder', async () => {
     const port = await freePort();
     const first = await acquireFullSuiteLock({ port, now: () => 0 });

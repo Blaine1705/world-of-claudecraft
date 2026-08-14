@@ -27,6 +27,7 @@ export const DEFAULT_IDENTIFY_TIMEOUT_MS = 1000;
 
 const PROTOCOL = 'woc-gate-full-suite/v1';
 const MAX_FOREIGN_RESPONSES = 3;
+const MAX_RELEASE_RACE_RETRIES = 3;
 
 function sleepDefault(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -167,6 +168,16 @@ export async function acquireFullSuiteLock(opts = {}) {
   let lastAnnouncedAt = waitStartedAt;
   let announcedOwnerId = null;
   let foreignResponses = 0;
+  let releaseRaceRetries = 0;
+
+  const waitExpired = () => now() - waitStartedAt >= maxWaitMs;
+  const fallOpenAfterWait = () => {
+    log(
+      `[gate] WARN: waited over ${Math.round(maxWaitMs / 60000)}m for the full-suite ` +
+        'lock, running unserialized',
+    );
+    return { release: async () => {} };
+  };
 
   for (;;) {
     try {
@@ -186,9 +197,27 @@ export async function acquireFullSuiteLock(opts = {}) {
         return { release: async () => {} };
       }
     }
+    if (waitExpired()) return fallOpenAfterWait();
 
     const identity = await identifyHolder(host, port, identifyTimeoutMs);
-    if (identity.kind === 'retry') continue;
+    if (waitExpired()) return fallOpenAfterWait();
+    if (identity.kind === 'retry') {
+      releaseRaceRetries++;
+      if (releaseRaceRetries > MAX_RELEASE_RACE_RETRIES) {
+        log(
+          `[gate] WARN: ${host}:${port} repeatedly reset the gate lock probe, ` +
+            'running unserialized',
+        );
+        return { release: async () => {} };
+      }
+      // A holder can disappear between EADDRINUSE and the identity connection.
+      // Yield before the bounded re-bind attempt so a reset-only foreign service
+      // cannot turn that legitimate race allowance into hot connection churn.
+      await sleep(Math.min(pollMs, 100));
+      if (waitExpired()) return fallOpenAfterWait();
+      continue;
+    }
+    releaseRaceRetries = 0;
     if (identity.kind === 'foreign') {
       foreignResponses++;
       if (foreignResponses >= MAX_FOREIGN_RESPONSES) {
@@ -199,18 +228,12 @@ export async function acquireFullSuiteLock(opts = {}) {
         return { release: async () => {} };
       }
       await sleep(pollMs);
+      if (waitExpired()) return fallOpenAfterWait();
       continue;
     }
 
     foreignResponses = 0;
     const { holder } = identity;
-    if (now() - waitStartedAt > maxWaitMs) {
-      log(
-        `[gate] WARN: waited over ${Math.round(maxWaitMs / 60000)}m for the full-suite ` +
-          'lock, running unserialized',
-      );
-      return { release: async () => {} };
-    }
     if (holder.ownerId !== announcedOwnerId || now() - lastAnnouncedAt > reannounceMs) {
       const ageMs = Math.max(0, now() - holder.startedAt);
       log(
@@ -221,5 +244,6 @@ export async function acquireFullSuiteLock(opts = {}) {
       lastAnnouncedAt = now();
     }
     await sleep(pollMs);
+    if (waitExpired()) return fallOpenAfterWait();
   }
 }

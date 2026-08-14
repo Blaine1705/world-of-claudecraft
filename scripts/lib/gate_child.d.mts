@@ -8,5 +8,7 @@ export function runGateChild(
     cwd?: string;
     platform?: NodeJS.Platform;
     forceKillAfterMs?: number;
+    quiescencePollMs?: number;
+    quiescenceEscalationMs?: number;
   },
 ): Promise<{ status: number | null; signal: NodeJS.Signals | null }>;

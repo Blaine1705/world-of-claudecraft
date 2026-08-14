@@ -18,6 +18,8 @@ const WINDOWS_SIGNAL_EXIT = Object.freeze({
   SIGTERM: 143,
   SIGBREAK: 149,
 });
+const DEFAULT_QUIESCENCE_POLL_MS = 25;
+const DEFAULT_QUIESCENCE_ESCALATION_MS = 5000;
 
 function handledSignals(platform) {
   return Object.keys(platform === 'win32' ? WINDOWS_SIGNAL_EXIT : POSIX_SIGNAL_EXIT);
@@ -29,20 +31,30 @@ function signalExitCode(signal, platform) {
 }
 
 function terminateChildTree(child, signal, platform) {
-  if (child.pid == null) return;
+  if (child.pid == null) return false;
   if (platform === 'win32') {
     const result = spawnSync('taskkill', ['/pid', String(child.pid), '/T', '/F'], {
       stdio: 'ignore',
       windowsHide: true,
     });
-    if (result.status === 0) return;
+    if (result.status === 0) return true;
     child.kill();
-    return;
+    return false;
   }
   try {
     process.kill(-child.pid, signal);
   } catch {
     child.kill(signal);
+  }
+  return false;
+}
+
+function isPosixProcessGroupAlive(pid) {
+  try {
+    process.kill(-pid, 0);
+    return true;
+  } catch (error) {
+    return error?.code === 'EPERM';
   }
 }
 
@@ -58,12 +70,16 @@ function terminateChildTree(child, signal, platform) {
  *   cwd?: string,
  *   platform?: NodeJS.Platform,
  *   forceKillAfterMs?: number,
+ *   quiescencePollMs?: number,
+ *   quiescenceEscalationMs?: number,
  * }} [opts]
  * @returns {Promise<{ status: number | null, signal: NodeJS.Signals | null }>}
  */
 export function runGateChild(cmd, args, opts = {}) {
   const platform = opts.platform ?? process.platform;
   const forceKillAfterMs = opts.forceKillAfterMs ?? 5000;
+  const quiescencePollMs = opts.quiescencePollMs ?? DEFAULT_QUIESCENCE_POLL_MS;
+  const quiescenceEscalationMs = opts.quiescenceEscalationMs ?? DEFAULT_QUIESCENCE_ESCALATION_MS;
   const child = spawn(cmd, args, {
     stdio: opts.stdio ?? 'inherit',
     env: opts.env,
@@ -77,12 +93,17 @@ export function runGateChild(cmd, args, opts = {}) {
   return new Promise((resolve) => {
     let handledSignal = null;
     let forceKillTimer = null;
+    let quiescenceTimer = null;
+    let nextEscalationAt = null;
+    let directResult = null;
+    let windowsTreeTerminated = false;
     let settled = false;
     const handlers = new Map();
 
     const cleanup = () => {
       for (const [signal, handler] of handlers) process.removeListener(signal, handler);
       if (forceKillTimer !== null) clearTimeout(forceKillTimer);
+      if (quiescenceTimer !== null) clearTimeout(quiescenceTimer);
     };
     const finish = (status, signal) => {
       if (settled) return;
@@ -93,22 +114,64 @@ export function runGateChild(cmd, args, opts = {}) {
         signal,
       });
     };
+    const checkQuiescence = () => {
+      if (quiescenceTimer !== null) {
+        clearTimeout(quiescenceTimer);
+        quiescenceTimer = null;
+      }
+      if (settled || handledSignal === null) return;
+      if (platform === 'win32') {
+        if (directResult !== null && windowsTreeTerminated) {
+          finish(directResult.status, directResult.signal);
+          return;
+        }
+      } else if (
+        directResult !== null &&
+        (child.pid == null || !isPosixProcessGroupAlive(child.pid))
+      ) {
+        finish(directResult.status, directResult.signal);
+        return;
+      }
+
+      if (nextEscalationAt !== null && Date.now() >= nextEscalationAt) {
+        windowsTreeTerminated =
+          terminateChildTree(child, 'SIGKILL', platform) || windowsTreeTerminated;
+        nextEscalationAt = Date.now() + quiescenceEscalationMs;
+      }
+      quiescenceTimer = setTimeout(checkQuiescence, quiescencePollMs);
+    };
 
     for (const signal of handledSignals(platform)) {
       const handler = () => {
         if (handledSignal !== null) return;
         handledSignal = signal;
-        terminateChildTree(child, signal, platform);
+        windowsTreeTerminated = terminateChildTree(child, signal, platform);
+        nextEscalationAt = Date.now() + forceKillAfterMs + quiescenceEscalationMs;
         forceKillTimer = setTimeout(() => {
-          terminateChildTree(child, 'SIGKILL', platform);
+          windowsTreeTerminated =
+            terminateChildTree(child, 'SIGKILL', platform) || windowsTreeTerminated;
+          nextEscalationAt = Date.now() + quiescenceEscalationMs;
         }, forceKillAfterMs);
         forceKillTimer.unref?.();
+        checkQuiescence();
       };
       handlers.set(signal, handler);
       process.on(signal, handler);
     }
 
-    child.once('error', () => finish(null, null));
-    child.once('close', (code, signal) => finish(code, signal));
+    child.once('error', () => {
+      if (handledSignal === null) finish(null, null);
+      else {
+        directResult = { status: null, signal: null };
+        checkQuiescence();
+      }
+    });
+    child.once('close', (code, signal) => {
+      if (handledSignal === null) finish(code, signal);
+      else {
+        directResult = { status: code, signal };
+        checkQuiescence();
+      }
+    });
   });
 }
