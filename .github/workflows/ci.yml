@@ -588,20 +588,24 @@ jobs:
           path: node_modules/.experimental-vitest-cache
           key: vitest-fsmodule-${{ runner.os }}-shard${{ matrix.shard }}-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc', 'package.json') }}
 
-      # The shard runner spawns `npm test` itself, so pretest still regenerates
-      # the i18n artifacts in EVERY shard BY DESIGN (the S3 guard, guide
-      # freshness, and the git-subprocess suites need the generated artifacts no
-      # matter which shard they hash into); the freshness diff lives in
-      # pr-checks. Workers stay at half the runner's cores inside the script.
+      # The shard entry regenerates the artifacts itself, once per job, BY
+      # DESIGN (the S3 guard, guide freshness, and the git-subprocess suites
+      # need the generated artifacts no matter which shard they hash into; the
+      # merged selective leg is a bare vitest-related invocation with no npm
+      # lifecycle, so scripts/ci_shard_test.mjs runs pretest before spawning
+      # and the npm-test legs skip their lifecycle copy). The freshness diff
+      # lives in pr-checks. Workers stay at half the runner's cores inside the
+      # script.
       #
       # Phase 2 (docs/qa-gate.md, "Selective PR-tier CI"): the runner reads the
       # changes job's selection decision. test_mode=full spawns the old step
       # (`npm test -- --shard=i/8`) minus the long-sims lane files, which the
       # pr-long-sims-a/-b jobs run in this same run (Phase 4); test_mode=selective
-      # runs the always-run floor (blind/partial tests + invariant guard
-      # suites + changed tests, recomputed in this tree, minus the lane's
-      # floor members) plus `vitest related` over the changed sources, both
-      # sharded. Decisions and skip counts print in the job log.
+      # runs ONE merged sharded vitest-related leg: the changed sources plus
+      # the always-run floor (blind/partial tests + invariant guard suites +
+      # changed tests, recomputed in this tree, minus the lane's floor
+      # members) as self-selecting seeds. Decisions and skip counts print in
+      # the job log.
       # Release-gate below keeps the unconditional full run line; the nightly
       # workflow re-proves the full suite daily (docs/qa-gate.md).
       - name: Run tests (PR tier, shard ${{ matrix.shard }} of 8)
@@ -721,8 +725,9 @@ jobs:
           key: vitest-fsmodule-${{ runner.os }}-lane-long-sims-a-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc', 'package.json') }}
 
       # Same selection relay as the shard step (env, never run-line
-      # interpolation); the lane entry spawns `npm test` itself, so pretest
-      # regenerates the i18n artifacts here exactly as in every shard.
+      # interpolation); the lane entry regenerates the i18n artifacts once
+      # before spawning, exactly as in every shard (its npm-test legs skip
+      # their lifecycle copy so nothing regenerates twice).
       - name: Run tests (PR tier, long-sims lane A)
         env:
           TEST_MODE: ${{ needs.changes.outputs.test_mode }}
@@ -769,8 +774,9 @@ jobs:
           key: vitest-fsmodule-${{ runner.os }}-lane-long-sims-b-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc', 'package.json') }}
 
       # Same selection relay as the shard step (env, never run-line
-      # interpolation); the lane entry spawns `npm test` itself, so pretest
-      # regenerates the i18n artifacts here exactly as in every shard.
+      # interpolation); the lane entry regenerates the i18n artifacts once
+      # before spawning, exactly as in every shard (its npm-test legs skip
+      # their lifecycle copy so nothing regenerates twice).
       - name: Run tests (PR tier, long-sims lane B)
         env:
           TEST_MODE: ${{ needs.changes.outputs.test_mode }}
