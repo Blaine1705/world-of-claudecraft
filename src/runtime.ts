@@ -113,6 +113,17 @@ export interface DesktopDisplayChange {
 // display, 'windowed' is a normal frame restored to the remembered bounds.
 export type DesktopDisplayMode = 'borderless' | 'windowed';
 
+// One Discord Rich Presence activity, as the shell's RPC client wants it.
+// Deliberately tiny: `details` is the zone line under the "Playing World of
+// ClaudeCraft" the app registration supplies, and `start` (unix epoch SECONDS,
+// not milliseconds) drives Discord's own elapsed-time clock. Nothing that
+// identifies the player may be added here: the presence is public to everyone
+// who can see their Discord profile (src/game/discord_presence.ts).
+export interface DesktopDiscordActivity {
+  details: string;
+  timestamps?: { start: number };
+}
+
 export interface DesktopBridge {
   openBrowserLogin(): Promise<void>;
   takeLoginCode(): Promise<string | null>;
@@ -185,6 +196,13 @@ export interface DesktopBridge {
   // blocker (the shell rate-limits and debounces; the renderer throttles its
   // own sends). Absent on older shells: feature-check before use.
   notifyGamepadActivity?(): void;
+  // Discord Rich Presence, both fire-and-forget: setDiscordActivity publishes
+  // one activity (null clears it), and setDiscordPresenceEnabled carries the
+  // player's options-row choice so the shell can drop its RPC connection
+  // entirely rather than merely stop publishing. Absent on older shells:
+  // feature-check before use.
+  setDiscordActivity?(activity: DesktopDiscordActivity | null): void;
+  setDiscordPresenceEnabled?(enabled: boolean): void;
 }
 
 export function desktopBridge(): DesktopBridge | null {

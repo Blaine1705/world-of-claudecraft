@@ -408,6 +408,13 @@ export const BOOL_SETTINGS = {
   // source of truth: this value is reflected from it at boot and takes effect on the
   // next launch, never the running one.
   forceHighPerfGpu: { def: true },
+  // on by default (the phase 10 decision): publish the current zone as a Discord
+  // Rich Presence activity while playing. Discord's own activity-sharing setting
+  // still gates whether anyone sees it, and the desktop options row is the in-game
+  // off switch. Inert outside the desktop shell: the row renders only when the
+  // installed shell exposes the presence bridge (see game/discord_presence.ts),
+  // and nothing else reads the key.
+  discordPresence: { def: true },
   // internal, never shown in the options UI: set true once main.ts has persisted a
   // device-appropriate graphicsPreset on a player's first run (a CONCLUSIVE detection).
   // It gates firstRunGraphicsPreset so a recognized device is classified at most once and

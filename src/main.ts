@@ -52,6 +52,7 @@ import { desktopNotifyOnSimEvents } from './game/desktop_notifications';
 import { desktopPresentationHidden } from './game/desktop_presentation';
 import { initDesktopShellIntegration } from './game/desktop_shell_integration';
 import { installDevTeleports } from './game/dev_shortcuts';
+import { desktopPresenceOnFrame, pushDiscordPresenceEnabled } from './game/discord_presence';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import {
   clearEntryProbe,
@@ -2577,6 +2578,11 @@ async function startGame(
       pushDesktopGpuPref(desktopBridge(), settings.set('forceHighPerfGpu', !!value));
       return;
     }
+    if (key === 'discordPresence') {
+      // Same polarity on both sides: the shell drops its RPC connection on false.
+      pushDiscordPresenceEnabled(desktopBridge(), settings.set('discordPresence', !!value));
+      return;
+    }
     if (key === 'showDevBadges') {
       renderer.showDevBadges = settings.set('showDevBadges', !!value);
       return;
@@ -4393,6 +4399,7 @@ async function startGame(
         }
         const eventsLength = events.length;
         desktopNotifyOnSimEvents(events, offlineSim.playerId);
+        desktopPresenceOnFrame(offlineSim);
         const eventsStart = perf.startTime();
         traceStart = perf.startTrace();
         try {
@@ -4574,6 +4581,8 @@ async function startGame(
     // A spectating session remaps net.playerId to the watched player's pid, so
     // their personal events would read as addressed to us; never notify there.
     if (net.spectating === null) desktopNotifyOnSimEvents(drainedEvents, net.playerId);
+    // Same gate, second reason: a spectator's zone must not leak to presence.
+    if (net.spectating === null) desktopPresenceOnFrame(net);
     const eventsStart = perf.startTime();
     traceStart = perf.startTrace();
     try {

@@ -19,6 +19,7 @@ vi.mock('../src/game/desktop_presentation', () => ({
 }));
 vi.mock('../src/game/desktop_shell_strings', () => ({ initDesktopShellStrings: vi.fn() }));
 vi.mock('../src/game/desktop_notifications', () => ({ initDesktopNotifications: vi.fn() }));
+vi.mock('../src/game/discord_presence', () => ({ initDiscordPresence: vi.fn() }));
 
 import { initDesktopDisplayChange } from '../src/game/desktop_display_change';
 import { initDesktopErrorRelay } from '../src/game/desktop_error_relay';
@@ -27,6 +28,7 @@ import { initDesktopNotifications } from '../src/game/desktop_notifications';
 import { initDesktopPresentation } from '../src/game/desktop_presentation';
 import { initDesktopShellIntegration } from '../src/game/desktop_shell_integration';
 import { initDesktopShellStrings } from '../src/game/desktop_shell_strings';
+import { initDiscordPresence } from '../src/game/discord_presence';
 import { desktopBridge } from '../src/runtime';
 import { initDesktopUpdateToast } from '../src/ui/desktop_update_toast';
 
@@ -39,6 +41,7 @@ const pieces = [
   initDesktopDisplayChange,
   initDesktopPresentation,
   initDesktopNotifications,
+  initDiscordPresence,
 ].map((piece) => vi.mocked(piece as (bridge: unknown) => unknown));
 
 beforeEach(() => {

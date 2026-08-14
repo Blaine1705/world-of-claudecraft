@@ -271,6 +271,21 @@ describe('Settings', () => {
     expect(new Settings().get('forceHighPerfGpu')).toBe(true);
   });
 
+  it('defaults Discord Rich Presence on and persists an opt-out across instances', () => {
+    // Default true is the phase 10 decision: presence is on out of the box, and
+    // Discord's own activity-sharing setting still gates who sees it. Same
+    // polarity on both sides of the bridge, so the stored value IS what the
+    // shell is told (no inversion, unlike the GPU preference above).
+    const fresh = new Settings();
+    expect(fresh.get('discordPresence')).toBe(true);
+
+    fresh.set('discordPresence', false);
+    expect(new Settings().get('discordPresence')).toBe(false);
+
+    new Settings().set('discordPresence', true);
+    expect(new Settings().get('discordPresence')).toBe(true);
+  });
+
   it('defaults other-player nameplates off for fresh mobile sessions', () => {
     installTouchDefault(true);
 

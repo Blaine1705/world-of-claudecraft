@@ -12,6 +12,7 @@ import { initDesktopGpuStatus } from './desktop_gpu_status';
 import { initDesktopNotifications } from './desktop_notifications';
 import { initDesktopPresentation } from './desktop_presentation';
 import { initDesktopShellStrings } from './desktop_shell_strings';
+import { initDiscordPresence } from './discord_presence';
 
 export function initDesktopShellIntegration(): void {
   const bridge = desktopBridge();
@@ -33,4 +34,7 @@ export function initDesktopShellIntegration(): void {
   // in one task, and notification decisions only happen inside later bridge
   // callbacks and frame scans.
   initDesktopNotifications(bridge);
+  // Position is free: this one only arms a frame hook, so it has no ordering
+  // dependency on any subscription above it.
+  initDiscordPresence(bridge);
 }
