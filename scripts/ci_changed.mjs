@@ -21,15 +21,13 @@ const shell = process.platform === 'win32';
 // (e.g. invoked directly from a subdirectory).
 const REPO_ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-// git never needs a shell (it is a real binary on every platform, not a
-// .cmd shim); on win32, shell:true here routed git through cmd.exe, whose
-// `^` escape character mangled resolveSelectBase's `<ref>^{commit}` peel so
-// no base ever resolved, even though this run() already surfaces res.error
-// below (#3225, same root cause as gate_select.mjs/gate_shadow.mjs). `shell`
-// stays on the npx biome spawn further down, which genuinely needs it.
 /** @type {(cmd: string, args: string[]) => { status: number | null, stdout?: string, stderr?: string, error?: Error }} */
 function run(cmd, args) {
-  const res = spawnSync(cmd, args, { encoding: 'utf8', cwd: REPO_ROOT });
+  // git is a real executable, so it never needs the .cmd shell shim, and it
+  // must not get one: cmd.exe eats the caret in the resolver's `^{commit}`
+  // probes, which made every base candidate "fail" to verify on Windows and
+  // ci:changed exit before linting anything.
+  const res = spawnSync(cmd, args, { encoding: 'utf8', shell: false, cwd: REPO_ROOT });
   if (res.error !== undefined) {
     // Surface the real spawn failure (e.g. git not on PATH) instead of
     // letting a generic "status: null" reach resolveChangedBaseRef's caller.

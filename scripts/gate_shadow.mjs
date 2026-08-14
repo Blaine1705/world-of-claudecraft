@@ -44,15 +44,14 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 const TMP = path.join(repoRoot, 'tmp');
 const LOG = process.env.GATE_SHADOW_LOG ?? path.join(TMP, 'gate-shadow.jsonl');
 
-// git never needs a shell; see the matching comment in gate_select.mjs (#3225):
-// on win32, shell:true routes git through cmd.exe, whose `^` escape character
-// mangles resolveSelectBase's `<ref>^{commit}` probe so no base ever resolves.
-/** @param {string} cmd @param {string[]} args */
-function git(cmd, args) {
-  const res = spawnSync(cmd, args, { encoding: 'utf8', cwd: repoRoot });
+/** @param {string} cmd @param {string[]} args
+ *  No .cmd shim on purpose: cmd.exe eats the caret in resolveSelectBase's
+ *  `ref^{commit}` probes, breaking base resolution on Windows (same fix as
+ *  ci_changed.mjs and gate_select.mjs). That makes a spawn FAILURE reachable,
+ *  so report it rather than letting the caller blame the git ref. */
+const git = (cmd, args) => {
+  const res = spawnSync(cmd, args, { encoding: 'utf8', shell: false, cwd: repoRoot });
   if (res.error !== undefined) {
-    // Surface the real spawn failure instead of a bare "status: null"
-    // reaching resolveSelectBase/listChangedPaths (mirrors gate_select.mjs).
     return {
       status: res.status,
       stdout: res.stdout,
@@ -60,8 +59,8 @@ function git(cmd, args) {
       error: res.error,
     };
   }
-  return { status: res.status, stdout: res.stdout, stderr: res.stderr };
-}
+  return res;
+};
 
 const workers = computeGateWorkers({
   cpuCount: os.availableParallelism(),

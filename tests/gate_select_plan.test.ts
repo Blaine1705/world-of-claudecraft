@@ -633,8 +633,9 @@ describe('branch diff resolution', () => {
       ).toBeTruthy();
       expect(
         gitCall,
-        `${file}: git spawn must omit shell (cmd.exe mangles the ^{commit} peel)`,
-      ).not.toMatch(/\bshell\b/);
+        `${file}: git spawn must explicitly disable the shell (cmd.exe mangles the ^{commit} peel)`,
+      ).toMatch(/shell:\s*false/);
+      expect(gitCall).not.toMatch(/shell:\s*true|\bshell\s*[,}]/);
     }
   });
 

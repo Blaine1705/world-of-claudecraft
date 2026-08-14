@@ -67,19 +67,18 @@ import { computeGateWorkers, resolveGateWorkerTierCap } from './lib/gate_workers
 const shell = process.platform === 'win32';
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-// git never needs a shell (it is a real binary on every platform, not a .cmd
-// shim), and on win32 routing it through cmd.exe is actively harmful: cmd.exe
-// treats `^` as its escape character, so `<ref>^{commit}` (resolveSelectBase's
-// commit-peel probe) arrives at git as `<ref>{commit}` and every candidate base
-// fails to resolve (#3225). Always spawn git shell-less, on every platform.
-/** @param {string} cmd @param {string[]} args */
-function git(cmd, args) {
-  const res = spawnSync(cmd, args, { encoding: 'utf8', cwd: repoRoot });
+/** @param {string} cmd @param {string[]} args
+ *  git is a real executable and must not get the .cmd shim: cmd.exe eats the
+ *  caret in resolveSelectBase's `ref^{commit}` probes, so with a shell every
+ *  base candidate "fails" to verify on Windows and the selective gate dies
+ *  before selecting anything (same fix as ci_changed.mjs). Dropping the shim
+ *  makes a spawn FAILURE reachable (Node refuses to spawn a .cmd without a
+ *  shell), so report it: the callers only see a non-zero status and would
+ *  otherwise blame the git ref, sending the operator after a base problem
+ *  that does not exist. */
+const git = (cmd, args) => {
+  const res = spawnSync(cmd, args, { encoding: 'utf8', shell: false, cwd: repoRoot });
   if (res.error !== undefined) {
-    // Surface the real spawn failure (e.g. git not on PATH) instead of a bare
-    // "status: null" reaching resolveSelectBase/listChangedPaths, which would
-    // misreport it as "no release branch or origin base could be resolved"
-    // (mirrors ci_changed.mjs's run(), which resolves the same base).
     return {
       status: res.status,
       stdout: res.stdout,
@@ -87,8 +86,8 @@ function git(cmd, args) {
       error: res.error,
     };
   }
-  return { status: res.status, stdout: res.stdout, stderr: res.stderr };
-}
+  return res;
+};
 
 // Resolve the vitest binary directly instead of going through `npx --no-install
 // vitest`: npx still pays a real per-invocation startup cost even when it skips
