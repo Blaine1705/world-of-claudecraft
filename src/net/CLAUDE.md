@@ -49,10 +49,14 @@ tested sibling module here, never as more methods on `online.ts`. Exemplars
   optimism (scope in Never, below): while a `turnin` is in flight, prerequisite checks
   treat that quest as done, so a follow-up quest appears in the same gossip re-render
   instead of a snapshot later (issue 1667 rationale in its header).
-- Wallet/economy cluster (`wallet*.ts`, `desktop_wallet_*.ts`, `mobile_wallet_deeplink.ts`,
-  `stripe_checkout.ts`, `economy_sdk.ts`, `seeker_entitlement_sync.ts`,
-  `discord_onboarding_gate.ts`): non-custodial Solana linking plus the CLAUDIUM economy
-  client. The contracts: the account-to-wallet LINK is always challenge+signature
+- Wallet/economy cluster (`wallet*.ts`, `desktop_wallet_*.ts`,
+  `mobile_wallet_deeplink.ts`, `stripe_checkout.ts`, `economy_sdk.ts`,
+  `woc_market_sdk.ts`, `seeker_entitlement_sync.ts`, `discord_onboarding_gate.ts`):
+  non-custodial Solana linking plus the CLAUDIUM economy client and the $WOC
+  Exchange client (`woc_market_sdk.ts`, typed and never-throws like
+  `economy_sdk.ts`; marketplace bond and settlement transactions are
+  service-built and signed through the same Wallet Standard path as the
+  Claudium purchase, config-off behind `WOC_MARKET_ENABLED`). The contracts: the account-to-wallet LINK is always challenge+signature
   verified server-side (`server/wallet.ts`), nothing here is imported by `src/sim/`, and
   `economy_sdk.ts` is same-origin only (the game server's `/api/claudium/*` proxy, never
   the economy service) and NEVER throws into render: every failure resolves to the typed

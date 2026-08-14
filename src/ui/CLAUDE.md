@@ -604,6 +604,14 @@ same file), and each module's header carries its own contract.
   `_tracker_` pair memoizes its whole-catalog default scan on an ownership signature because
   `reliquaryPageCompletion` mints a fresh ownership bag per call in BOTH hosts; per-cell art
   resolution and the opaque-cell carve-out live in `reliquary_cell_art.ts` (see its header).
+- **woc_market_window.ts** over the pure **woc_market_view.ts** core: the $WOC Exchange
+  (config-off behind `WOC_MARKET_ENABLED`; `docs/prd/woc/marketplace.md`). Everything
+  economic is a passthrough of server numbers; the terms-acceptance checkbox lives here.
+  The trade window's $WOC arm (panel `trade_woc_view.ts`/`trade_woc_panel.ts`, driven
+  from `src/ui/hud/woc_trade/`) does NOT follow that model yet: it hard-codes
+  `acceptTerms: true` with no terms shown, the recorded R9 pre-enable obligation
+  (`docs/woc-marketplace-hardening/state.md`); the Exchange checkbox is the model to
+  build against.
 - **woc_store_view.ts** (+ **char_skin_window.ts**, **armory_inspect.ts**,
   **armory_labels.ts**, **store_promo_card.ts**, **preview_prewarm_core.ts**): the WOC Store
   and Season 1 Armory. The pure projection reads the skin catalog
