@@ -750,10 +750,12 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // join the provenance inputs. No capture was retaken.
 // Re-minted after extracting entity-view policy from renderer.ts to satisfy
 // the release monolith ratchet. Behavior is unchanged; no capture was retaken.
+// Re-minted again after registering the extracted policy as its own provenance
+// leaf. The captures remain unchanged and were not retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '64c0a557bf91643e5bcfade4e63a28c58891dd640ae1b92e9b8113c2c1a4eee1';
+  '3a45257ca823deae6c5971b4d9ca1be9b66f3aac9449f19408c918c9bef85812';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '07cedef28f54d15df54b3a60bd1862f97510e3f305cbabdb3a3188d84636cd6b';
+  'e069626230576fa39ed87eeb94a78cb0ec111156f031fd8063bf2471a99db070';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1736,10 +1738,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // evidence bytes. No capture was retaken.
     // Re-pinned after extracting entity-view policy from renderer.ts for the
     // monolith ratchet. The seal follows the swept bytes; no capture was retaken.
+    // Re-pinned again after the policy became an explicit provenance leaf. The
+    // performance records changed only in their swept provenance blocks.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('2384d6e536704aab6103fbddd8b3c2025eba280c601d120e349b36cd7023c26b');
+    ).toBe('05ade62f3e9a75cf0cea69d7a7fd3397fef92ed5f6d79d36ab4d1a1c1e29607d');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
