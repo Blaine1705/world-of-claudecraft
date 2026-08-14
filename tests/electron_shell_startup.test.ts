@@ -1,15 +1,16 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { stripComments } from './helpers/strip_comments';
 
 const raw = readFileSync(join(__dirname, '..', 'electron', 'main.cjs'), 'utf8');
 
-// Strip block comments and line comments before matching, so a commented-out
-// line never satisfies a positive pin. The line-comment pattern refuses a `//`
-// preceded by a colon, because main.cjs carries real scheme literals
-// (`app://`, `${deepLinkProtocol}://`) that a naive strip would eat along with
-// the rest of their line.
-const code = raw.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/[^\n]*/gm, '$1');
+// Strip comments before matching via the shared single-pass helper
+// (tests/helpers/strip_comments.ts), so a commented-out line never satisfies
+// a positive pin and a bare /* inside a line comment cannot open a phantom
+// block. Its colon guard keeps main.cjs's real scheme literals (`app://`,
+// `${deepLinkProtocol}://`) intact.
+const code = stripComments(raw);
 
 const count = (haystack: string, needle: string) => haystack.split(needle).length - 1;
 

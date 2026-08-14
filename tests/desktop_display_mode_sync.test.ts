@@ -23,6 +23,7 @@ import { GRAPHICS_REBUILD_KEYS } from '../src/game/graphics_rebuild_core';
 import { Settings } from '../src/game/settings';
 import type { DesktopBridge, DesktopDisplayMode } from '../src/runtime';
 import { buildGraphicsSections, optionsControlKeys } from '../src/ui/options_view';
+import { stripComments } from './helpers/strip_comments';
 
 // A settings FACTORY double. It records every write, so "wrote nothing" is
 // provable rather than inferred from a value that happened to match the
@@ -273,12 +274,11 @@ describe('desktop_display_mode_sync: boot reflection', () => {
 // pins on the composition lines, because a wiring edit is exactly the
 // regression the module suite cannot see.
 describe('desktop_display_mode_sync: wiring pins', () => {
-  // Strip block and line comments before matching (same rationale and the same
-  // colon guard as tests/electron_shell_startup.test.ts, which keeps `://`
-  // scheme literals intact): a commented-out composition line must never
-  // satisfy a positive pin.
-  const stripComments = (source: string): string =>
-    source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/[^\n]*/gm, '$1');
+  // Strip comments before matching via the shared single-pass helper
+  // (tests/helpers/strip_comments.ts): a commented-out composition line must
+  // never satisfy a positive pin, and a bare /* inside a line comment (the
+  // src/main.ts:3144 hazard class) must never open a phantom block that
+  // swallows the wiring these pins anchor on.
   const mainSource = stripComments(readFileSync(join(__dirname, '..', 'src', 'main.ts'), 'utf8'));
   const optionsWindowSource = stripComments(
     readFileSync(join(__dirname, '..', 'src', 'ui', 'options_window.ts'), 'utf8'),
