@@ -194,7 +194,9 @@ describe('Renderer lifecycle wiring', () => {
     // than lazily on the first movement frame) is what actually shrinks the
     // cold-first-ride silence window: the fetch+decode gets a head start.
     expect(mountKeyEdge).toContain('x.preloadEngine(x.mountKey)');
-    expect(source).toContain('preloadEngine: (key: string) => this.audioSink?.preloadMountEngine(key)');
+    expect(source).toContain(
+      'preloadEngine: (key: string) => this.audioSink?.preloadMountEngine(key)',
+    );
   });
 
   it("preloads an already-mounted entity's engine clips at view creation", () => {

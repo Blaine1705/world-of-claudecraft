@@ -5,8 +5,8 @@
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 822,
-    "liveItemDefinitions": 837,
+    "itemArtFilesReviewed": 823,
+    "liveItemDefinitions": 838,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -304,7 +304,7 @@
       "food": 21,
       "held_offhand": 9,
       "junk": 81,
-      "mount": 9,
+      "mount": 10,
       "potion": 13,
       "quest": 97,
       "tool": 45,
@@ -328,6 +328,18 @@
           "docs/achievements/missing-painted-icons-accepted-art.json"
         ],
         "note": "The four class-overhaul integration daggers and the soul_stone painting, generated under woc-item-icon-v1 and owner-reviewed pass on 2026-08-10; the 2026-08-09 campaign review of the prior 817 files stands unchanged."
+      },
+      {
+        "reviewedAt": "2026-08-15",
+        "branch": "feature/troll-mount",
+        "reviewer": "owner",
+        "addedIds": [
+          "reins_lanternback_troll"
+        ],
+        "provenance": [
+          "public/ui/items/mapping.json"
+        ],
+        "note": "The Lanternback Troll mount reins icon. The owner supplied the painted 624x624 master and directed its use for this item; it was downscaled to the 128px opaque woc-item-icon-v1 shipping format with no other change, and owner-reviewed pass on 2026-08-15. The 2026-08-09 campaign review of the prior 817 files and the 2026-08-10 review of the five class-overhaul integration additions both stand unchanged."
       }
     ]
   },
@@ -370,7 +382,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 822,
+    "passCount": 823,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -925,6 +937,7 @@
       "reins_aether_hover_cycle",
       "reins_drakemaw_raptor",
       "reins_grag_bear",
+      "reins_lanternback_troll",
       "reins_shadowjump_toad",
       "reins_stalkglider_snail",
       "reins_stormfeather_griffin",
@@ -1199,7 +1212,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 822 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10."
+    "summary": "All 823 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, and the Lanternback Troll mount reins icon owner-supplied and passed on 2026-08-15."
   },
   "nonVisualContentWatch": [
     {
@@ -1356,8 +1369,8 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "ea04f7224e4a13e35d098c6a1cc96dbda6b38df43fdff6252d1eae0dfcd98933",
-      "bytes": 451256
+      "sha256": "533b7be98506a28bb8e40f17ce7f9cfc7800a2f37952ca1c43472308e57535eb",
+      "bytes": 451794
     },
     "rendererFingerprint": "fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082",
     "sheetCount": 208,
@@ -1371,7 +1384,7 @@
       "small-multiview": 26,
       "identity": 26
     },
-    "sheetSetSha256": "acad50b8d261f88630e3ca323322d1522a4cfa0b3ea024111662fbdcda822c89",
+    "sheetSetSha256": "5ce34d184b33749b513e6b8bb1db12989f65d6c3f383ca88c8d14d057a66b536",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -2527,64 +2540,64 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--128-color.png",
-        "sha256": "31f74ade6951362722f51cc85c98c1d4705d1b2adfe7414ce7989688e9f1ea4d",
-        "bytes": 324975,
+        "sha256": "52aa4263eea0a30856aff93dc16ad0dec47be01e1fb070e53cc01ba36399df49",
+        "bytes": 374810,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--40-color.png",
-        "sha256": "e7d83e7409f03de58024266dd7aa8cd9da4fe7136f092b1c2c8ef78cc6957694",
-        "bytes": 61084,
+        "sha256": "a39d1b9772151bbcab7bb25cebff40f97809eb951347bc2684b6d858649ce664",
+        "bytes": 67274,
         "width": 1600,
         "height": 166,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--28-color.png",
-        "sha256": "237e10d12c6246022ad5bf5ab8439ff4d2f75df48b9211968048f029662e4bfb",
-        "bytes": 42755,
+        "sha256": "a1db1c8fd00e1950bfd9d6fb8022dd89cfb26ae2e16a8067cf5e1be3fea11a41",
+        "bytes": 45893,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--22-color.png",
-        "sha256": "d2a3cc6a0bfc8a7843fd56b59fc1922dc8e5b3fe638c68212d3d41a9a9da5f73",
-        "bytes": 33828,
+        "sha256": "388ed1325eee867a01e0f41f7e6ecf8b362d6d03850b9561b7822674ede01fd5",
+        "bytes": 36676,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--28-grayscale.png",
-        "sha256": "0fded7fbd7173e32d7b7d8a9c08e099b5865f1c8d6e99eac4bcf1f13b3c89229",
-        "bytes": 32248,
+        "sha256": "4f4d272d5c194c032f631a672d30ee0aa0f1a7c7d77eec03a3264967bcc4ecdf",
+        "bytes": 34685,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--64-circle.png",
-        "sha256": "f2d3f9ebf7f761042a0f67a9f915bb3847fce05782684e3a7f99f51ed8f7c311",
-        "bytes": 100934,
+        "sha256": "4fa4fde3795ce8655e32a7de2b1fe66e06300ec57e4529884d64ff0d036bb24b",
+        "bytes": 113434,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--small-multiview.png",
-        "sha256": "e4bdd337ad3df5a849ecee8acf24ab9af1d7d4fbed3541b0729d36a2df0e038e",
-        "bytes": 183714,
+        "sha256": "e382a9a7c606846a2f5b85d15d6e141425bedd06a12644d4eb852f2a7c0b4bdb",
+        "bytes": 205918,
         "width": 1800,
         "height": 262,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--identity.png",
-        "sha256": "e817d99475d5599a05b2164e3367b85b9148f16e8acd2b46ed170ef868cfce58",
-        "bytes": 342039,
+        "sha256": "ac0f6644cacf49bddab77f22097cde7345549e0d7ef06a1ce7d4c66b1d264c1c",
+        "bytes": 393148,
         "width": 1800,
         "height": 248,
         "format": "png"
@@ -3038,6 +3051,6 @@
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "17fe7b0b1ca629831283710441306ef01c54b04cc8c26d70bec361439e07c2ff"
+    "shippingCatalogSha256": "3e00a8806197dff2073ca9e7b4643cfafd441de4e7ef1af0b85dd1251ea6aef0"
   }
 }

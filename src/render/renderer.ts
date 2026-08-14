@@ -135,7 +135,6 @@ import {
   type AnimState,
   type CharacterVisual,
   createCharacterVisual,
-  createMountVisual,
   modularLookFor,
   setWeaponVfxViewportHeight,
 } from './characters';
@@ -154,9 +153,7 @@ import { logAssetMissOnce } from './characters/asset_miss_log';
 import {
   characterResidencySources,
   mechAssetsReady,
-  mountAssetsReady,
   preloadMechAssets,
-  preloadMountAssets,
   preloadTrainingDummyAssets,
   trainingDummyAssetsReady,
 } from './characters/assets';
