@@ -67,8 +67,27 @@ import { computeGateWorkers, resolveGateWorkerTierCap } from './lib/gate_workers
 const shell = process.platform === 'win32';
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
+// git never needs a shell (it is a real binary on every platform, not a .cmd
+// shim), and on win32 routing it through cmd.exe is actively harmful: cmd.exe
+// treats `^` as its escape character, so `<ref>^{commit}` (resolveSelectBase's
+// commit-peel probe) arrives at git as `<ref>{commit}` and every candidate base
+// fails to resolve (#3225). Always spawn git shell-less, on every platform.
 /** @param {string} cmd @param {string[]} args */
-const git = (cmd, args) => spawnSync(cmd, args, { encoding: 'utf8', shell, cwd: repoRoot });
+function git(cmd, args) {
+  const res = spawnSync(cmd, args, { encoding: 'utf8', cwd: repoRoot });
+  if (res.error !== undefined) {
+    // Surface the real spawn failure (e.g. git not on PATH) instead of a bare
+    // "status: null" reaching resolveSelectBase/listChangedPaths, which would
+    // misreport it as "no release branch or origin base could be resolved"
+    // (mirrors ci_changed.mjs's run(), which resolves the same base).
+    return {
+      status: res.status,
+      stdout: res.stdout,
+      stderr: `${res.error.message}\n${res.stderr ?? ''}`,
+    };
+  }
+  return { status: res.status, stdout: res.stdout, stderr: res.stderr };
+}
 
 // Resolve the vitest binary directly instead of going through `npx --no-install
 // vitest`: npx still pays a real per-invocation startup cost even when it skips
