@@ -10,25 +10,85 @@
 // and `pretest`). Reproducibility is checked by tests/i18n_admin_catalog.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "moderationHistory.actionCheaterMark",
+    "moderationHistory.actionCheaterMarkLift"
+  ],
+  "es_ES": [
+    "moderationHistory.actionCheaterMark",
+    "moderationHistory.actionCheaterMarkLift"
+  ],
+  "fr_FR": [
+    "moderationHistory.actionCheaterMark",
+    "moderationHistory.actionCheaterMarkLift"
+  ],
+  "fr_CA": [
+    "moderationHistory.actionCheaterMark",
+    "moderationHistory.actionCheaterMarkLift"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "moderationHistory.actionCheaterMark",
+    "moderationHistory.actionCheaterMarkLift"
+  ],
+  "de_DE": [
+    "moderationHistory.actionCheaterMark",
+    "moderationHistory.actionCheaterMarkLift"
+  ],
+  "zh_CN": [
+    "moderationHistory.actionCheaterMark",
+    "moderationHistory.actionCheaterMarkLift"
+  ],
+  "zh_TW": [
+    "moderationHistory.actionCheaterMark",
+    "moderationHistory.actionCheaterMarkLift"
+  ],
+  "ko_KR": [
+    "moderationHistory.actionCheaterMark",
+    "moderationHistory.actionCheaterMarkLift"
+  ],
+  "ja_JP": [
+    "moderationHistory.actionCheaterMark",
+    "moderationHistory.actionCheaterMarkLift"
+  ],
+  "pt_BR": [
+    "moderationHistory.actionCheaterMark",
+    "moderationHistory.actionCheaterMarkLift"
+  ],
+  "ru_RU": [
+    "moderationHistory.actionCheaterMark",
+    "moderationHistory.actionCheaterMarkLift"
+  ],
+  "cs_CZ": [
+    "moderationHistory.actionCheaterMark",
+    "moderationHistory.actionCheaterMarkLift"
+  ],
+  "nl_NL": [
+    "moderationHistory.actionCheaterMark",
+    "moderationHistory.actionCheaterMarkLift"
+  ],
+  "pl_PL": [
+    "moderationHistory.actionCheaterMark",
+    "moderationHistory.actionCheaterMarkLift"
+  ],
+  "id_ID": [
+    "moderationHistory.actionCheaterMark",
+    "moderationHistory.actionCheaterMarkLift"
+  ],
+  "tr_TR": [
+    "moderationHistory.actionCheaterMark",
+    "moderationHistory.actionCheaterMarkLift"
+  ],
+  "sv_SE": [
+    "moderationHistory.actionCheaterMark",
+    "moderationHistory.actionCheaterMarkLift"
+  ],
+  "vi_VN": [
+    "moderationHistory.actionCheaterMark",
+    "moderationHistory.actionCheaterMarkLift"
+  ],
+  "da_DK": [
+    "moderationHistory.actionCheaterMark",
+    "moderationHistory.actionCheaterMarkLift"
+  ]
 };

@@ -410,6 +410,8 @@ export const sv_SE: AdminTranslations = {
   "moderationHistory.actionGeneralChatRateLimit": "Hastighetsbegränsning för Allmänt-chatt ändrad",
   "moderationHistory.actionRestoreItem": "Föremålsåterställning",
   "moderationHistory.actionRestoreSlot": "Platsåterställning",
+  "moderationHistory.actionCheaterMark": "Cheater mark applied",
+  "moderationHistory.actionCheaterMarkLift": "Cheater mark lifted",
   "moderationHistory.actionGuildRename": "Gillesnamn ändrat",
   "moderationHistory.actionGuildBankPurge": "Rensning av gillesbank",
   "moderationHistory.actionUnknown": "Annan åtgärd",

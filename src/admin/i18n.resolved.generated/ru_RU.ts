@@ -410,6 +410,8 @@ export const ru_RU: AdminTranslations = {
   "moderationHistory.actionGeneralChatRateLimit": "Лимит общего чата изменён",
   "moderationHistory.actionRestoreItem": "Восстановление предмета",
   "moderationHistory.actionRestoreSlot": "Восстановление слота",
+  "moderationHistory.actionCheaterMark": "Cheater mark applied",
+  "moderationHistory.actionCheaterMarkLift": "Cheater mark lifted",
   "moderationHistory.actionGuildRename": "Переименование гильдии",
   "moderationHistory.actionGuildBankPurge": "Удаление предмета из банка гильдии",
   "moderationHistory.actionUnknown": "Другое действие",

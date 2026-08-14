@@ -3934,6 +3934,12 @@ export const fr_CA: EnTranslations = {
       "genesis_token_claimed": "Ce Seeker Genesis Token a déjà été réclamé.",
       "entitlement_required": "Des droits Seeker vérifiés sont requis.",
       "current_ownership_required": "La possession actuelle d'un Seeker Genesis Token est requise."
+    },
+    "cheater_mark": {
+      "admin_target": "Operator accounts cannot be marked.",
+      "reason_required": "A reason is required.",
+      "invalid_duration": "Enter a mark duration of at least one second.",
+      "not_marked": "That account is not marked."
     }
   },
   "guide": {

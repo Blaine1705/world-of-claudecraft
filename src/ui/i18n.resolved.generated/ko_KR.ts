@@ -3934,6 +3934,12 @@ export const ko_KR: EnTranslations = {
       "genesis_token_claimed": "해당 Seeker Genesis Token은 이미 등록되었습니다.",
       "entitlement_required": "인증된 Seeker 자격이 필요합니다.",
       "current_ownership_required": "현재 Seeker Genesis Token을 보유해야 합니다."
+    },
+    "cheater_mark": {
+      "admin_target": "운영자 계정에는 표식을 부여할 수 없습니다.",
+      "reason_required": "사유를 입력해야 합니다.",
+      "invalid_duration": "표식 기간은 최소 1초 이상이어야 합니다.",
+      "not_marked": "해당 계정에는 표식이 없습니다."
     }
   },
   "guide": {

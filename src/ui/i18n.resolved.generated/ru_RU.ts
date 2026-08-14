@@ -3934,6 +3934,12 @@ export const ru_RU: EnTranslations = {
       "genesis_token_claimed": "Этот Seeker Genesis Token уже был зарегистрирован.",
       "entitlement_required": "Требуются подтвержденные права Seeker.",
       "current_ownership_required": "Требуется текущее владение Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Учетные записи операторов нельзя отметить.",
+      "reason_required": "Необходимо указать причину.",
+      "invalid_duration": "Укажите длительность отметки не менее одной секунды.",
+      "not_marked": "Эта учетная запись не отмечена."
     }
   },
   "guide": {

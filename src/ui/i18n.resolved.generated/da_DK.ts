@@ -3934,6 +3934,12 @@ export const da_DK: EnTranslations = {
       "genesis_token_claimed": "Det Seeker Genesis Token er allerede indløst.",
       "entitlement_required": "Der kræves en verificeret Seeker-rettighed.",
       "current_ownership_required": "Der kræves aktuelt ejerskab af et Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Operator accounts cannot be marked.",
+      "reason_required": "A reason is required.",
+      "invalid_duration": "Enter a mark duration of at least one second.",
+      "not_marked": "That account is not marked."
     }
   },
   "guide": {

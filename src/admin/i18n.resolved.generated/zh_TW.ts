@@ -410,6 +410,8 @@ export const zh_TW: AdminTranslations = {
   "moderationHistory.actionGeneralChatRateLimit": "綜合聊天上限已變更",
   "moderationHistory.actionRestoreItem": "物品恢復",
   "moderationHistory.actionRestoreSlot": "鑲嵌槽恢復",
+  "moderationHistory.actionCheaterMark": "Cheater mark applied",
+  "moderationHistory.actionCheaterMarkLift": "Cheater mark lifted",
   "moderationHistory.actionGuildRename": "公會更名",
   "moderationHistory.actionGuildBankPurge": "公會銀行物品清除",
   "moderationHistory.actionUnknown": "其他動作",

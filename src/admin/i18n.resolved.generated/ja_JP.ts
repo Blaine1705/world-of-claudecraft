@@ -410,6 +410,8 @@ export const ja_JP: AdminTranslations = {
   "moderationHistory.actionGeneralChatRateLimit": "一般チャットのレート制限変更",
   "moderationHistory.actionRestoreItem": "アイテム復元",
   "moderationHistory.actionRestoreSlot": "スロット復元",
+  "moderationHistory.actionCheaterMark": "Cheater mark applied",
+  "moderationHistory.actionCheaterMarkLift": "Cheater mark lifted",
   "moderationHistory.actionGuildRename": "ギルド名変更",
   "moderationHistory.actionGuildBankPurge": "ギルド銀行アイテムの削除",
   "moderationHistory.actionUnknown": "その他のアクション",

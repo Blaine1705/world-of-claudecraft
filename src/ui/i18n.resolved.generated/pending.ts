@@ -10,6 +10,10 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "auth.copyCode",
     "auth.designCode",
     "auth.designCodeCopied",
@@ -25,6 +29,10 @@ export const pending: Record<string, readonly string[]> = {
     "auth.shareTab"
   ],
   "es_ES": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "auth.copyCode",
     "auth.designCode",
     "auth.designCodeCopied",
@@ -40,6 +48,10 @@ export const pending: Record<string, readonly string[]> = {
     "auth.shareTab"
   ],
   "fr_FR": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "auth.copyCode",
     "auth.designCode",
     "auth.designCodeCopied",
@@ -55,6 +67,10 @@ export const pending: Record<string, readonly string[]> = {
     "auth.shareTab"
   ],
   "fr_CA": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "auth.copyCode",
     "auth.designCode",
     "auth.designCodeCopied",
@@ -71,6 +87,10 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "auth.copyCode",
     "auth.designCode",
     "auth.designCodeCopied",
@@ -86,6 +106,10 @@ export const pending: Record<string, readonly string[]> = {
     "auth.shareTab"
   ],
   "de_DE": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "auth.copyCode",
     "auth.designCode",
     "auth.designCodeCopied",
@@ -105,6 +129,10 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "auth.copyCode",
     "auth.designCode",
     "auth.designCodeCopied",
@@ -121,6 +149,10 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "auth.copyCode",
     "auth.designCode",
     "auth.designCodeCopied",
@@ -136,6 +168,10 @@ export const pending: Record<string, readonly string[]> = {
     "auth.shareTab"
   ],
   "nl_NL": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "auth.copyCode",
     "auth.designCode",
     "auth.designCodeCopied",
@@ -151,6 +187,10 @@ export const pending: Record<string, readonly string[]> = {
     "auth.shareTab"
   ],
   "pl_PL": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "auth.copyCode",
     "auth.designCode",
     "auth.designCodeCopied",
@@ -166,6 +206,10 @@ export const pending: Record<string, readonly string[]> = {
     "auth.shareTab"
   ],
   "id_ID": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "auth.copyCode",
     "auth.designCode",
     "auth.designCodeCopied",
@@ -181,6 +225,10 @@ export const pending: Record<string, readonly string[]> = {
     "auth.shareTab"
   ],
   "tr_TR": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "auth.copyCode",
     "auth.designCode",
     "auth.designCodeCopied",
@@ -196,6 +244,10 @@ export const pending: Record<string, readonly string[]> = {
     "auth.shareTab"
   ],
   "sv_SE": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "auth.copyCode",
     "auth.designCode",
     "auth.designCodeCopied",
@@ -211,6 +263,10 @@ export const pending: Record<string, readonly string[]> = {
     "auth.shareTab"
   ],
   "vi_VN": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "auth.copyCode",
     "auth.designCode",
     "auth.designCodeCopied",
@@ -226,6 +282,10 @@ export const pending: Record<string, readonly string[]> = {
     "auth.shareTab"
   ],
   "da_DK": [
+    "apiError.cheater_mark.admin_target",
+    "apiError.cheater_mark.invalid_duration",
+    "apiError.cheater_mark.not_marked",
+    "apiError.cheater_mark.reason_required",
     "auth.copyCode",
     "auth.designCode",
     "auth.designCodeCopied",

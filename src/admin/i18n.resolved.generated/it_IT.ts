@@ -410,6 +410,8 @@ export const it_IT: AdminTranslations = {
   "moderationHistory.actionGeneralChatRateLimit": "Limite della chat Generale modificato",
   "moderationHistory.actionRestoreItem": "Oggetto ripristinato",
   "moderationHistory.actionRestoreSlot": "Slot ripristinato",
+  "moderationHistory.actionCheaterMark": "Cheater mark applied",
+  "moderationHistory.actionCheaterMarkLift": "Cheater mark lifted",
   "moderationHistory.actionGuildRename": "Rinomina gilda",
   "moderationHistory.actionGuildBankPurge": "Rimozione dalla banca della gilda",
   "moderationHistory.actionUnknown": "Altra azione",
