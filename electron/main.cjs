@@ -931,6 +931,13 @@ ipcMain.handle('desktop-set-display-mode', (event, mode) => {
   // the reflected mode, and answering it with a disk write plus a setFullScreen
   // of the current state would snap back a window the player has manually
   // fullscreened (or restored) since launch. Same value stored = nothing to do.
+  // Accepted cost (phase 8 QA, re-litigated): a window the WM forced OUT of
+  // the stored mode is not healed by re-selecting that same mode; the
+  // in-session heal is the two-click toggle, and the next launch re-applies
+  // the stored mode at the reveal. Comparing against the live window instead
+  // would turn the world-entry echo into exactly the snap-back this guard
+  // exists to stop, because the echo and a deliberate same-value re-select
+  // are byte-identical at this boundary.
   if (mode === desktopPrefs.displayMode) return true;
   if (!saveDesktopPrefs(desktopPrefsPath, { ...desktopPrefs, displayMode: mode })) {
     log.warn('[shell] could not persist the display mode preference');
