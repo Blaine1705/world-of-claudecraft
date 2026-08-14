@@ -1,11 +1,6 @@
 import bs58 from 'bs58';
 import { MAX_SEEKER_TOKEN_ACCOUNTS, MAX_SEEKER_TOKEN_MINTS } from './seeker_entitlement_limits';
-import {
-  isSeekerGenesisToken,
-  SEEKER_GENESIS_TOKEN_GROUP_ADDRESS,
-  SEEKER_GENESIS_TOKEN_METADATA_ADDRESS,
-  SEEKER_GENESIS_TOKEN_MINT_AUTHORITY,
-} from './seeker_genesis_token';
+import { isSeekerGenesisToken } from './seeker_genesis_token';
 import { seekerRpcResult } from './seeker_rpc_transport';
 
 const TOKEN_2022_PROGRAM_ID = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb';
