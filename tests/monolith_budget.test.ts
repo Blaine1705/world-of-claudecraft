@@ -47,11 +47,13 @@ const MONOLITHS: MonolithRow[] = [
     // stranded-light reparent and the registry prune into
     // src/render/fire_light_registry.ts (the ratchet's own rule: an extraction
     // lowers the ceiling, never raises it).
-    // Raised by two for the background-lane frame-clock feed at the top of
-    // sync(): the host has to stamp the boundary from inside the frame, so the
-    // call cannot move behind a seam. Instrumentation, not renderer logic; the
-    // next extraction here takes this back down.
-    ceiling: 13710,
+    // Briefly 13710 for the background-lane frame-clock feed at the top of
+    // sync(), which the host has to stamp from inside the frame. Back down as
+    // promised: the per-status manifest rollup moved to
+    // summarizePrewarmManifest (prewarm_compile_lifecycle.ts, beside the
+    // interface it fills) and the resume lane's outcome bookkeeping to
+    // prewarm_resume_ledger_core.ts.
+    ceiling: 13708,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

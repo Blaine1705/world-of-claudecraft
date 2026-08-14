@@ -179,6 +179,97 @@ describe('createBackgroundGpuQueue', () => {
     expect(stats.slowest[0].wallMs).toBe(512);
   });
 
+  // Grant latency: the queue's contract is that a cosmetic lane never delays an
+  // actionable one, and the wait between enqueue and start is the only place
+  // that contract can be observed breaking. Before this, nothing measured it.
+  it('records how long each unit waited for its grant', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock });
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    const first = queue.run(() => gate, GPU_WORK_PRIORITY.BACKGROUND, 'cosmetic');
+    // Let the cosmetic unit actually START before the gate is enqueued.
+    // Priority only decides which PENDING unit goes next, so a gate queued in
+    // the same turn would simply be picked first and measure nothing.
+    await flush();
+    const second = queue.run(
+      () => {
+        clock += 3;
+      },
+      GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
+      'live-gate',
+    );
+    clock += 700;
+    release();
+    await Promise.all([first, second]);
+    const stats = queue.stats();
+    const byLabel = new Map(stats.slowest.map((unit) => [unit.label, unit]));
+    expect(byLabel.get('cosmetic')?.waitMs).toBe(0);
+    expect(byLabel.get('live-gate')?.waitMs).toBe(700);
+    expect(stats.worstWaitMs).toBe(700);
+    // And it is readable per lane, which is what names the victim without
+    // reading every unit row.
+    const actionable = stats.recent.lanes.find(
+      (lane) => lane.priority === GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
+    );
+    expect(actionable).toMatchObject({ units: 1, worstWaitMs: 700 });
+  });
+
+  it('reports a recent interval beside the lifetime maxima', async () => {
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock, recentWindowMs: 1000 });
+    await queue.run(() => {
+      clock += 400;
+    }, GPU_WORK_PRIORITY.BACKGROUND);
+    expect(queue.stats().recent).toMatchObject({ windowMs: 1000, units: 1, worstSyncMs: 400 });
+    clock += 5000;
+    const later = queue.stats();
+    // The lifetime maximum keeps the record; the interval arm goes quiet. That
+    // difference is what makes a pacing A/B readable at all.
+    expect(later.worstSyncMs).toBe(400);
+    expect(later.recent).toMatchObject({ units: 0, worstSyncMs: 0, lanes: [] });
+  });
+
+  it('counts a late-settling released tail in the interval it settled in', async () => {
+    // The interval window is keyed on SETTLE time, not start time, and this is
+    // the case that decides it. A released tail can live for seconds (a driver
+    // link) and finish long after a unit that started later. Keyed on START it
+    // would be filed under a moment already outside the window and vanish from
+    // the interval it actually cost, and (because records arrive in settle
+    // order) it would also sit unsorted behind a younger sample where the
+    // prefix prune cannot reach it, inflating "recent" for the rest of the
+    // session.
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ now: () => clock, recentWindowMs: 150 });
+    let settleLink!: () => void;
+    const tail = queue.run(
+      () => {
+        clock += 5;
+        return new Promise<void>((resolve) => {
+          settleLink = resolve;
+        });
+      },
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+      'released-gate',
+      { releaseTail: true },
+    );
+    await flush();
+    clock = 100;
+    await queue.run(() => {
+      clock += 5;
+    }, GPU_WORK_PRIORITY.BACKGROUND);
+    clock = 400;
+    settleLink();
+    await tail;
+    const stats = queue.stats();
+    // The BACKGROUND unit settled at 105, outside a 150 ms window ending at 400,
+    // so it is correctly gone. The tail settled AT 400 and must be present.
+    expect(stats.recent.units).toBe(1);
+    expect(stats.recent.lanes.map((lane) => lane.priority)).toEqual([GPU_WORK_PRIORITY.LIVE_VIEW]);
+    // And the lifetime counters still saw both, so nothing was lost by rolling.
+    expect(stats.units).toBe(2);
+  });
+
   it('keeps the slowest units by sync slice, bounded, defaulting the label', async () => {
     let clock = 0;
     const queue = createBackgroundGpuQueue({ now: () => clock, slowestLimit: 2 });
@@ -851,6 +942,7 @@ describe('createBackgroundGpuQueue', () => {
       syncMs: 3,
       wallMs: 7003,
       atMs: 0,
+      waitMs: 0,
       // Zero because this suite never feeds the frame clock, which is the
       // honest reading: nothing here observed a frame to lose, so nothing was
       // charged and no span was shared.

@@ -218,11 +218,26 @@ function rendererPrewarmSummary(
     manifestPlanned: prewarm.manifestPlanned,
     manifestCompleted: prewarm.manifestCompleted,
     manifestPartial: prewarm.manifestPartial,
+    manifestSkipped: prewarm.manifestSkipped,
     manifestTimedOut: prewarm.manifestTimedOut,
     manifestFailed: prewarm.manifestFailed,
     partialEntryIds: prewarm.partialEntryIds,
     timedOutEntryIds: prewarm.timedOutEntryIds,
     failedEntryIds: prewarm.failedEntryIds,
+    // The other half of "did this entry run": a timed-out entry hands its units
+    // to the resume lane, and until this block existed nothing outside a console
+    // line said whether they ever ran. An entry reported timed-out with
+    // resume.status 'done' and no failures is protected a moment later; the same
+    // entry with 'scheduled' forever, or with failures, is not protected at all.
+    resume: {
+      status: prewarm.resume.status,
+      plannedEntries: prewarm.resume.plannedEntries,
+      plannedUnits: prewarm.resume.plannedUnits,
+      startedUnits: prewarm.resume.startedUnits,
+      failedUnits: prewarm.resume.failedUnits,
+      failedUnitIds: prewarm.resume.failedUnitIds,
+      entries: prewarm.resume.entries,
+    },
     entries: prewarm.manifestEntries.map((entry) => ({
       id: entry.id,
       category: entry.category,
@@ -252,6 +267,10 @@ const GPU_QUEUE_REPORT_SLOWEST = 5;
 // The queue's own tail cap keeps this list tiny; the slice only pins the
 // beacon size against a future cap raise, mirroring the two lists above.
 const GPU_QUEUE_REPORT_TAILS = 4;
+// One row per priority lane. GPU_WORK_PRIORITY has six, and callers pass the
+// constants rather than free numbers, so this only bounds the beacon against a
+// caller inventing its own.
+const GPU_QUEUE_REPORT_LANES = 8;
 
 function rendererGpuQueueSummary(gpuQueue: RendererGpuQueueSnapshot): Record<string, unknown> {
   return {
@@ -290,6 +309,22 @@ function rendererGpuQueueSummary(gpuQueue: RendererGpuQueueSnapshot): Record<str
     // Ranked by frame cost rather than sync slice, so the unit that hurt is in
     // the beacon even when its sync slice is single-digit milliseconds.
     blockiest: gpuQueue.blockiest.slice(0, GPU_QUEUE_REPORT_SLOWEST).map(reportGpuQueueUnit),
+    // Worst grant latency session-wide, and the interval arm beside it. Every
+    // other field here is cumulative or a lifetime maximum, so two reports from
+    // one session cannot be differenced into what a pacing change did; `recent`
+    // is the only one that can. Its lane rows are what says whether a cosmetic
+    // lane made an actionable one wait.
+    worstWaitMs: gpuQueue.worstWaitMs,
+    recent: {
+      windowMs: gpuQueue.recent.windowMs,
+      units: gpuQueue.recent.units,
+      totalSyncMs: gpuQueue.recent.totalSyncMs,
+      totalFrameGapMs: gpuQueue.recent.totalFrameGapMs,
+      worstSyncMs: gpuQueue.recent.worstSyncMs,
+      worstFrameGapMs: gpuQueue.recent.worstFrameGapMs,
+      worstWaitMs: gpuQueue.recent.worstWaitMs,
+      lanes: gpuQueue.recent.lanes.slice(0, GPU_QUEUE_REPORT_LANES),
+    },
   };
 }
 
@@ -298,6 +333,7 @@ function reportGpuQueueUnit(unit: RendererGpuQueueSnapshot['slowest'][number]): 
   priority: number;
   syncMs: number;
   wallMs: number;
+  waitMs: number;
   frameGapMs: number;
   sharedFrameGap: number;
 } {
@@ -306,6 +342,10 @@ function reportGpuQueueUnit(unit: RendererGpuQueueSnapshot['slowest'][number]): 
     priority: unit.priority,
     syncMs: unit.syncMs,
     wallMs: unit.wallMs,
+    // A ranked unit that also waited a long time for its grant is the shape a
+    // starvation report is made of; without this the two halves live in
+    // different blocks and cannot be read together.
+    waitMs: unit.waitMs,
     frameGapMs: unit.frameGapMs,
     // Without this a beacon reader repeats the mistake the metric already made
     // once: a long released tail shares a gap it did not cause and tops the

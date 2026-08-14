@@ -59,6 +59,8 @@
 // ambiguous. `sharedFrameGap === 1` therefore means "no other queue unit was in
 // flight", NOT "this unit did it". Proving cause needs an exclusive run, which
 // is what a probe driving one unit at a time is for.
+import { createGpuQueueWindow, type GpuQueueWindowStats } from './gpu_queue_window_core';
+
 export const GPU_WORK_PRIORITY = {
   BOOT_RESUME: 0,
   BACKGROUND: 10,
@@ -91,6 +93,9 @@ interface PendingGpuWork<T> {
   priority: number;
   label: string;
   releaseTail: boolean;
+  /** Enqueue time, so a started unit can report how long it waited for its
+   *  grant. `order` is a FIFO tiebreak counter, not a clock. */
+  enqueuedAt: number;
   work: () => T | Promise<T>;
   resolve: (value: T | PromiseLike<T>) => void;
   reject: (reason?: unknown) => void;
@@ -105,6 +110,12 @@ export interface GpuWorkUnitStat {
   syncMs: number;
   wallMs: number;
   atMs: number;
+  /** Enqueue to start: how long this unit waited for its grant. The only place
+   *  the queue's core promise (a cosmetic lane never delays an actionable one)
+   *  can be observed breaking, so it is measured per unit and aggregated per
+   *  priority in `recent.lanes`. Includes time parked on the released-tail cap,
+   *  which is a real wait a higher-priority arrival can still take. */
+  waitMs: number;
   /** Longest span this unit was in flight with NO live frame, i.e. what it
    *  actually cost the frame the lane exists to protect. Zero when the host
    *  never fed `noteFrame`. See the frame-gap note in the header for why this,
@@ -190,6 +201,13 @@ export interface BackgroundGpuQueueStats {
   stallCount: number;
   /** Most recent stalls, bounded. */
   stalls: GpuWorkStallStat[];
+  /** Worst grant latency any unit waited, session-wide. The windowed arm below
+   *  rolls, so this keeps a long session's record from vanishing with it. */
+  worstWaitMs: number;
+  /** The RECENT interval, per priority lane. Every other field on this object is
+   *  cumulative or a lifetime maximum; this one is the only arm two runs of a
+   *  pacing experiment can be compared on. See gpu_queue_window_core.ts. */
+  recent: GpuQueueWindowStats;
 }
 
 export interface BackgroundGpuQueue {
@@ -235,6 +253,8 @@ const DEFAULT_FRAME_GAP_IGNORE_MS = 5000;
 interface RunningGpuWork {
   entry: PendingGpuWork<unknown>;
   startedAt: number;
+  /** Grant latency, resolved once at start: startedAt minus entry.enqueuedAt. */
+  waitMs: number;
   stall: GpuWorkStallStat | null;
   /** Worst frameless span observed while this unit was in flight. */
   worstFrameGapMs: number;
@@ -249,6 +269,7 @@ const reportUnit = (stat: GpuWorkUnitStat): GpuWorkUnitStat => ({
   syncMs: round1(stat.syncMs),
   wallMs: round1(stat.wallMs),
   atMs: Math.round(stat.atMs),
+  waitMs: round1(stat.waitMs),
   frameGapMs: round1(stat.frameGapMs),
   sharedFrameGap: stat.sharedFrameGap,
 });
@@ -260,6 +281,8 @@ export function createBackgroundGpuQueue(opts?: {
   stallLimit?: number;
   tailLimit?: number;
   frameGapIgnoreMs?: number;
+  recentWindowMs?: number;
+  recentSampleLimit?: number;
 }): BackgroundGpuQueue {
   const now = opts?.now ?? ((): number => performance.now());
   const slowestLimit = Math.max(1, opts?.slowestLimit ?? DEFAULT_SLOWEST_LIMIT);
@@ -272,9 +295,14 @@ export function createBackgroundGpuQueue(opts?: {
   const blockiest: GpuWorkUnitStat[] = [];
   const stalls: GpuWorkStallStat[] = [];
   const waitingTails = new Set<RunningGpuWork>();
+  const recent = createGpuQueueWindow({
+    windowMs: opts?.recentWindowMs,
+    sampleLimit: opts?.recentSampleLimit,
+  });
   let units = 0;
   let totalSyncMs = 0;
   let worstSyncMs = 0;
+  let worstWaitMs = 0;
   let worstFrameGapMs = 0;
   let worstUnsharedFrameGapMs = 0;
   let totalFrameGapMs = 0;
@@ -354,9 +382,21 @@ export function createBackgroundGpuQueue(opts?: {
       syncMs,
       wallMs,
       atMs: unit.startedAt,
+      waitMs: unit.waitMs,
       frameGapMs: unit.worstFrameGapMs,
       sharedFrameGap: unit.worstFrameGapShared,
     };
+    if (stat.waitMs > worstWaitMs) worstWaitMs = stat.waitMs;
+    // Keyed on SETTLE time, not stat.atMs (the start): released tails settle out
+    // of start order, so a start-keyed window would be unsorted and its prune
+    // would strand old samples. See the field's own note in the core.
+    recent.record({
+      priority: stat.priority,
+      waitMs: stat.waitMs,
+      syncMs: stat.syncMs,
+      frameGapMs: stat.frameGapMs,
+      settledAtMs: settledAt,
+    });
     totalFrameGapMs += stat.frameGapMs;
     if (stat.frameGapMs > worstFrameGapMs) worstFrameGapMs = stat.frameGapMs;
     if (stat.sharedFrameGap <= 1 && stat.frameGapMs > worstUnsharedFrameGapMs) {
@@ -438,9 +478,11 @@ export function createBackgroundGpuQueue(opts?: {
         }
       }
       const [next] = pending.splice(selectedIndex, 1);
+      const startedAt = now();
       const unit: RunningGpuWork = {
         entry: next,
-        startedAt: now(),
+        startedAt,
+        waitMs: Math.max(0, startedAt - next.enqueuedAt),
         stall: null,
         worstFrameGapMs: 0,
         worstFrameGapShared: 0,
@@ -500,6 +542,7 @@ export function createBackgroundGpuQueue(opts?: {
           priority,
           label,
           releaseTail: options?.releaseTail === true,
+          enqueuedAt: now(),
           work,
           resolve,
           reject,
@@ -579,6 +622,8 @@ export function createBackgroundGpuQueue(opts?: {
           ageMs: round1(stall.ageMs),
           atMs: Math.round(stall.atMs),
         })),
+        worstWaitMs: round1(worstWaitMs),
+        recent: recent.stats(now()),
       };
     },
     shutdown(reason = new Error('Background GPU queue is shut down')): Promise<void> {

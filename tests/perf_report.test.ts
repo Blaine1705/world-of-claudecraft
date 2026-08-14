@@ -765,6 +765,8 @@ describe('perf report ingestion', () => {
       GPU_QUEUE_RAW_AGE_MS_MAX,
       GPU_QUEUE_RAW_STALLS_MAX,
       GPU_QUEUE_RAW_TAILS_MAX,
+      GPU_QUEUE_RAW_LANES_MAX,
+      GPU_QUEUE_RAW_WINDOW_MS_MAX,
     } = perfReportInternalsForTest;
     // The frame-cost fields ride here too. This sanitizer REBUILDS the block
     // from a fixed key set rather than filtering it, so a client field the
@@ -787,6 +789,7 @@ describe('perf report ingestion', () => {
           priority: 30,
           syncMs: 88.2,
           wallMs: 120.4,
+          waitMs: 812.7,
           frameGapMs: 306.5,
           sharedFrameGap: 1,
         },
@@ -797,10 +800,43 @@ describe('perf report ingestion', () => {
           priority: 10,
           syncMs: 9.4,
           wallMs: 740.2,
+          waitMs: 0,
           frameGapMs: 604.1,
           sharedFrameGap: 2,
         },
       ],
+      // The interval arm, and the grant latency it exists to carry: a live-view
+      // unit waiting 812 ms behind a cosmetic lane is the starvation shape the
+      // preview pacing pilot must be judged against, and none of the cumulative
+      // fields above can express it.
+      worstWaitMs: 812.7,
+      recent: {
+        windowMs: 30_000,
+        units: 2,
+        totalSyncMs: 97.6,
+        totalFrameGapMs: 910.6,
+        worstSyncMs: 88.2,
+        worstFrameGapMs: 604.1,
+        worstWaitMs: 812.7,
+        lanes: [
+          {
+            priority: 30,
+            units: 1,
+            worstWaitMs: 812.7,
+            totalWaitMs: 812.7,
+            worstSyncMs: 88.2,
+            worstFrameGapMs: 306.5,
+          },
+          {
+            priority: 10,
+            units: 1,
+            worstWaitMs: 0,
+            totalWaitMs: 0,
+            worstSyncMs: 9.4,
+            worstFrameGapMs: 604.1,
+          },
+        ],
+      },
     };
     const stored = fakeRes();
 
@@ -844,6 +880,16 @@ describe('perf report ingestion', () => {
               settled: 'yes',
             })),
             slowest: 'not-an-array',
+            recent: {
+              windowMs: 9e12,
+              units: -3,
+              worstWaitMs: 9e12,
+              lanes: Array.from({ length: 30 }, (_unused, index) => ({
+                priority: index,
+                units: 9e12,
+                worstWaitMs: 'nope',
+              })),
+            },
           },
         },
       }),
@@ -874,6 +920,18 @@ describe('perf report ingestion', () => {
       priority: -1000,
       ageMs: 0,
     });
+    // The interval block is rebuilt from a fixed key set like its parent, so a
+    // hostile payload cannot turn the fixed-size lane readout into a list.
+    const hostileRecent = hostileQueue.recent as Record<string, unknown>;
+    expect(hostileRecent.units).toBe(0);
+    expect(hostileRecent.windowMs).toBe(GPU_QUEUE_RAW_WINDOW_MS_MAX);
+    expect(hostileRecent.worstWaitMs).toBe(GPU_QUEUE_RAW_AGE_MS_MAX);
+    expect(GPU_QUEUE_RAW_LANES_MAX).toBe(8);
+    expect(hostileRecent.lanes).toHaveLength(GPU_QUEUE_RAW_LANES_MAX);
+    expect((hostileRecent.lanes as Record<string, unknown>[])[0].worstWaitMs).toBe(0);
+    // A block missing entirely is still shaped, never absent: a reader that
+    // has to feature-detect the interval arm cannot compare two reports.
+    expect(hostileQueue.worstWaitMs).toBe(0);
 
     // A malformed block is dropped rather than stored half-shaped.
     vi.mocked(insertClientPerfReport).mockClear();

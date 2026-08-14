@@ -271,6 +271,13 @@ const GPU_QUEUE_RAW_SLOWEST_MAX = 8;
 // Released compile-gate tails settling beside the active unit. The client caps
 // them at the queue's own tail limit; this bound only defends the ingest.
 const GPU_QUEUE_RAW_TAILS_MAX = 4;
+// One row per priority lane in the recent-interval block. GPU_WORK_PRIORITY has
+// six named lanes; the slack absorbs a caller passing its own number without
+// letting a hostile payload turn a fixed-size block into a list.
+const GPU_QUEUE_RAW_LANES_MAX = 8;
+// The recent window is an INTERVAL readout, so its span is bounded by what a
+// client could plausibly aggregate over rather than by a unit age.
+const GPU_QUEUE_RAW_WINDOW_MS_MAX = 10 * 60_000;
 
 function gpuQueueUnitLabel(value: unknown): string {
   return textIn(value, 80, 'unlabeled');
@@ -337,6 +344,36 @@ function sanitizeGpuQueueSummary(value: unknown): Record<string, unknown> | unde
       .slice(0, GPU_QUEUE_RAW_SLOWEST_MAX)
       .filter(isRecord)
       .map(sanitizeGpuQueueUnit),
+    worstWaitMs: numberIn(value.worstWaitMs, 0, GPU_QUEUE_RAW_AGE_MS_MAX, 0),
+    recent: sanitizeGpuQueueRecent(value.recent),
+  };
+}
+
+// The one INTERVAL-scoped block in the queue readout: everything beside it is
+// cumulative or a lifetime maximum, so this is what a pacing A/B is read from.
+// Rebuilt from a fixed key set like its parent, lanes included.
+function sanitizeGpuQueueRecent(value: unknown): Record<string, unknown> {
+  const record = isRecord(value) ? value : {};
+  const lanes = Array.isArray(record.lanes) ? record.lanes : [];
+  return {
+    windowMs: numberIn(record.windowMs, 0, GPU_QUEUE_RAW_WINDOW_MS_MAX, 0),
+    units: intIn(record.units, 0, 10_000_000, 0),
+    totalSyncMs: numberIn(record.totalSyncMs, 0, GPU_QUEUE_RAW_AGE_MS_MAX, 0),
+    totalFrameGapMs: numberIn(record.totalFrameGapMs, 0, GPU_QUEUE_RAW_AGE_MS_MAX, 0),
+    worstSyncMs: numberIn(record.worstSyncMs, 0, GPU_QUEUE_RAW_MS_MAX, 0),
+    worstFrameGapMs: numberIn(record.worstFrameGapMs, 0, GPU_QUEUE_RAW_AGE_MS_MAX, 0),
+    worstWaitMs: numberIn(record.worstWaitMs, 0, GPU_QUEUE_RAW_AGE_MS_MAX, 0),
+    lanes: lanes
+      .slice(0, GPU_QUEUE_RAW_LANES_MAX)
+      .filter(isRecord)
+      .map((lane) => ({
+        priority: gpuQueuePriority(lane.priority),
+        units: intIn(lane.units, 0, 10_000_000, 0),
+        worstWaitMs: numberIn(lane.worstWaitMs, 0, GPU_QUEUE_RAW_AGE_MS_MAX, 0),
+        totalWaitMs: numberIn(lane.totalWaitMs, 0, GPU_QUEUE_RAW_AGE_MS_MAX, 0),
+        worstSyncMs: numberIn(lane.worstSyncMs, 0, GPU_QUEUE_RAW_MS_MAX, 0),
+        worstFrameGapMs: numberIn(lane.worstFrameGapMs, 0, GPU_QUEUE_RAW_AGE_MS_MAX, 0),
+      })),
   };
 }
 
@@ -346,6 +383,9 @@ function sanitizeGpuQueueUnit(unit: Record<string, unknown>): Record<string, unk
     priority: gpuQueuePriority(unit.priority),
     syncMs: numberIn(unit.syncMs, 0, GPU_QUEUE_RAW_MS_MAX, 0),
     wallMs: numberIn(unit.wallMs, 0, GPU_QUEUE_RAW_AGE_MS_MAX, 0),
+    // Enqueue to start. A cosmetic lane delaying an actionable one shows up
+    // here first, so it survives ingest beside the cost fields.
+    waitMs: numberIn(unit.waitMs, 0, GPU_QUEUE_RAW_AGE_MS_MAX, 0),
     frameGapMs: numberIn(unit.frameGapMs, 0, GPU_QUEUE_RAW_AGE_MS_MAX, 0),
     sharedFrameGap: intIn(unit.sharedFrameGap, 0, 1_000_000, 0),
   };
@@ -371,6 +411,7 @@ function compactPrewarmSummary(value: unknown): Record<string, unknown> | null {
     'manifestPlanned',
     'manifestCompleted',
     'manifestPartial',
+    'manifestSkipped',
     'manifestTimedOut',
     'manifestFailed',
   ];
@@ -414,7 +455,42 @@ function compactPrewarmSummary(value: unknown): Record<string, unknown> | null {
       workPlanned: nullableNumberIn(entry.workPlanned, 0, 100_000),
       detail: textIn(entry.detail, 160),
     }));
+  const resume = sanitizePrewarmResume(value.resume);
+  if (resume) out.resume = resume;
   return out;
+}
+
+// The resume lane's outcome: whether the entries the deadline dropped ever ran.
+// Rebuilt from a fixed key set, and only when the client sent one, so an older
+// client's report is stored without a hollow block that a reader would have to
+// tell apart from a lane that genuinely did nothing.
+const PREWARM_RESUME_ENTRIES_MAX = 24;
+
+function sanitizePrewarmResume(value: unknown): Record<string, unknown> | null {
+  if (!isRecord(value)) return null;
+  const entries = Array.isArray(value.entries) ? value.entries : [];
+  const failedUnitIds = Array.isArray(value.failedUnitIds) ? value.failedUnitIds : [];
+  return {
+    status: textIn(value.status, 16),
+    plannedEntries: intIn(value.plannedEntries, 0, 1000, 0),
+    plannedUnits: intIn(value.plannedUnits, 0, 100_000, 0),
+    startedUnits: intIn(value.startedUnits, 0, 100_000, 0),
+    failedUnits: intIn(value.failedUnits, 0, 100_000, 0),
+    failedUnitIds: failedUnitIds
+      .slice(0, PREWARM_RESUME_ENTRIES_MAX)
+      .filter((id): id is string => typeof id === 'string')
+      .map((id) => textIn(id, 160)),
+    entries: entries
+      .slice(0, PREWARM_RESUME_ENTRIES_MAX)
+      .filter(isRecord)
+      .map((entry) => ({
+        id: textIn(entry.id, 80),
+        lane: textIn(entry.lane, 16),
+        planned: intIn(entry.planned, 0, 100_000, 0),
+        started: intIn(entry.started, 0, 100_000, 0),
+        failed: intIn(entry.failed, 0, 100_000, 0),
+      })),
+  };
 }
 
 function compactRawSummary(value: Record<string, unknown>): Record<string, unknown> {
@@ -599,4 +675,6 @@ export const perfReportInternalsForTest = {
   GPU_QUEUE_RAW_AGE_MS_MAX,
   GPU_QUEUE_RAW_STALLS_MAX,
   GPU_QUEUE_RAW_TAILS_MAX,
+  GPU_QUEUE_RAW_LANES_MAX,
+  GPU_QUEUE_RAW_WINDOW_MS_MAX,
 };
