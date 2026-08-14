@@ -264,7 +264,10 @@ describe('the main.ts frame wiring', () => {
     // smoke run. It exists because a scan wired into only one mode ships a
     // build where half the players never get an invite notification, so each
     // mode's argument form is pinned once: a second call inside one branch
-    // cannot masquerade as the other mode's wiring.
+    // cannot masquerade as the other mode's wiring. The online form carries
+    // the spectator gate: a spectating session's net.playerId is the watched
+    // player's pid, so without the gate their personal invites would notify
+    // the spectator as if addressed to them.
     const source = readFileSync(join(__dirname, '../src/main.ts'), 'utf8');
     expect(source).toContain(
       "import { desktopNotifyOnSimEvents } from './game/desktop_notifications';",
@@ -272,9 +275,11 @@ describe('the main.ts frame wiring', () => {
     expect(source.split('desktopNotifyOnSimEvents(events, offlineSim.playerId);').length - 1).toBe(
       1,
     );
-    expect(source.split('desktopNotifyOnSimEvents(drainedEvents, net.playerId);').length - 1).toBe(
-      1,
-    );
+    expect(
+      source.split(
+        'if (net.spectating === null) desktopNotifyOnSimEvents(drainedEvents, net.playerId);',
+      ).length - 1,
+    ).toBe(1);
     expect(source.split('desktopNotifyOnSimEvents(').length - 1).toBe(2);
   });
 });

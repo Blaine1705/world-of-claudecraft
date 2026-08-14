@@ -4571,7 +4571,9 @@ async function startGame(
       net.playerId,
     );
     const drainedEventsLength = drainedEvents.length;
-    desktopNotifyOnSimEvents(drainedEvents, net.playerId);
+    // A spectating session remaps net.playerId to the watched player's pid, so
+    // their personal events would read as addressed to us; never notify there.
+    if (net.spectating === null) desktopNotifyOnSimEvents(drainedEvents, net.playerId);
     const eventsStart = perf.startTime();
     traceStart = perf.startTrace();
     try {
