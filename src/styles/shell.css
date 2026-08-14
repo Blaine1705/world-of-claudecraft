@@ -7982,6 +7982,20 @@
     color: var(--color-text-muted);
     font-variant-numeric: tabular-nums;
   }
+  .desktop-update-whats-new {
+    display: inline-block;
+    margin-top: var(--spacing-sm);
+    font-size: 12px;
+    color: var(--color-text-muted);
+    text-decoration: none;
+  }
+  .desktop-update-whats-new[hidden] {
+    display: none;
+  }
+  .desktop-update-whats-new:hover {
+    color: var(--color-text-primary);
+    text-decoration: underline;
+  }
   .desktop-update-actions {
     display: flex;
     gap: var(--spacing-sm);
@@ -8065,6 +8079,11 @@
     .desktop-update-close {
       min-height: 40px;
       min-width: 40px;
+    }
+    .desktop-update-whats-new {
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
     }
     .desktop-update-title {
       padding-right: 44px;
