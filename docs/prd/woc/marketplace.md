@@ -95,7 +95,14 @@ settlement deadline that applies if the bid wins.
 Every bid requires: a verified linked wallet (`server/wallet.ts`), sufficient
 $WOC balance at bid time (`server/woc_balance.ts` cached read), an established
 account, acceptance of the variable-token settlement terms (recorded), and TOTP
-2FA (`server/totp.ts`) for bids at or above a configured USD threshold.
+2FA (`server/totp.ts`) for bids at or above a configured USD threshold. That
+TOTP requirement was never enforced server-side (the
+`WOC_MARKET_TOTP_THRESHOLD_CENTS` knob is documented only as a commented-out
+`.env.example` line and the error surface exists, while no code consults
+either, finding B6) and is SUPERSEDED: the adopted direction (ruling R1 in the
+hardening packet, `docs/woc-marketplace-hardening/`) is wallet-signature
+step-up on the custody-moving operations instead, with the phantom TOTP
+scaffolding deleted; the packet's step-up work owns building it pre-enable.
 
 Balance checks do not guarantee later possession, so every bid posts a small
 refundable bond, denominated in USD and paid in $WOC when the bid is placed
@@ -103,8 +110,12 @@ refundable bond, denominated in USD and paid in $WOC when the bid is placed
 service-issued transfer intent the bidder signs; a bid becomes active only when
 the service confirms the bond transaction. Bonds are returned when a bidder is
 outbid, when an auction ends below reserve, and when a buy-now closes the
-auction. A winner who fails to settle forfeits the bond to the treasury and
-burn split, never to the seller. Repeated defaults earn progressively longer
+auction. A winner who fails to settle forfeits the bond, never to the seller:
+the game marks it `forfeit_due` and the economy service applies the
+destination. The adopted destination is the treasury and burn split, one code
+path with the settlement fee split (ruling R2 in the hardening packet); the
+service currently routes forfeits to the treasury only, a recorded divergence
+the bond-releaser work closes. Repeated defaults earn progressively longer
 bidding suspensions (strike ladder in `woc_market_rules.ts`).
 
 Deviation from the proposal, recorded deliberately: the proposal suggests the
@@ -164,8 +175,9 @@ and Ravenpost precedent:
 - An escrowed item cannot be equipped, destroyed, traded, or listed elsewhere,
   because it is no longer in any inventory.
 - The copy returns to the seller by system mail when the auction ends unsold,
-  the reserve is not met, or settlement ultimately fails; it is delivered to
-  the buyer by system mail when settlement confirms.
+  the reserve is not met, or settlement ultimately fails; when settlement
+  confirms it is delivered to the buyer, handed directly into an online
+  buyer's bags (`handToBuyer`) with system mail as the durable fallback.
 - The extraction seam re-enforces both bind-on-trade states (`boundTo` once
   the stamp has landed, and the still-armed `bindOnTrade` copy, refused as
   `bind_armed`) plus the `soulbound` / `noMarketList` / quest-kind refusals
@@ -230,14 +242,21 @@ bank gate on.
   buy-now lock, any offered settlement holding a live quote, or a settlement in
   confirming and beyond), the admin suspend refuses too, and the resolution
   waits for the settlement to reach a terminal state (the bounded confirming
-  resolution is what restores an operator exit there).
+  resolution is what restores an operator exit there). A settlement parked in
+  the operator `review` state is visible through the internal stuck readout
+  (`server/woc_market_monitor.ts`), but the `review` to `confirmed` / `failed`
+  resolution pair has no in-repo driver yet: those operator arms arrive with
+  the service-side release tooling, and hand SQL is forbidden (it bypasses
+  the transition CAS).
 - Every settled sale lands in a public, per-item sales history (provenance);
   admins can exclude suspicious sales from public price statistics.
 - Marketplace strikes and progressive suspensions are account-scoped and
   admin-visible; operator endpoints can suspend listings, and the runtime
   pause is the economy-service health signal plus the WOC_MARKET_ENABLED
   flag (an audited runtime pause switch is a follow-up).
-- High-value bids and settlements require TOTP; thresholds are configuration.
+- Step-up authentication for custody-moving operations is adopted but not yet
+  built; it replaces the originally specified TOTP gate on high-value bids
+  (ruling R1; see the note under "Bidding and bid bonds").
 
 ### Platforms, realms, configuration
 
@@ -298,16 +317,22 @@ downgrade.
 This feature deliberately supersedes two standing positions, and MUST NOT be
 enabled on a production realm until they are reconciled:
 
-1. **Cosmetic-only token utility.** `docs/prd/woc/wallet-link.md` and
-   `docs/prd/woc/holder-cosmetic-flair.md` state token utility is never power.
-   Trading stat-bearing epic gear for $WOC is player-to-player transfer of
-   already-earned items rather than the game selling power, but the standing
-   language does not cover it. Both PRDs and README/marketing copy need a
-   revision that states the adopted position.
-2. **Terms and Conditions.** `TERMS_AND_CONDITIONS.md` currently prohibits
+1. **Cosmetic-only token utility: adopted position now stated.**
+   `docs/prd/woc/wallet-link.md`, `docs/prd/woc/holder-cosmetic-flair.md`, and
+   the README Web3 section now carry the marketplace carve-out: the game never
+   sells power; token utility is appearance, convenience, access,
+   realm-operation, or player-to-player trade; the marketplace transfers
+   already-earned items between players at player-set prices. Fernando and
+   counsel confirm the position through the decision memo (held privately
+   with the counsel material, outside this repository) before enable.
+2. **Terms and Conditions.** `TERMS_AND_CONDITIONS.md` still prohibits
    selling in-game items for real money and states wallet verification involves
-   no transaction. Counsel must revise the Terms before enablement, following
-   the `docs/prd/frontier-pvp-honor.md` precedent that legal review gates any
+   no transaction; the live Terms stay authoritative until counsel signs off.
+   The counsel-ready revision is drafted beside them
+   (`TERMS_AND_CONDITIONS_MARKETPLACE_DRAFT.md`, with the open questions in
+   the privately held decision memo). Counsel must
+   approve and publish the revision before enablement, following the
+   `docs/prd/frontier-pvp-honor.md` precedent that legal review gates any
    money-attached feature.
 3. **Economy service readiness.** The service must implement the marketplace
    quote, confirm, refund, and price-health surface this PRD specifies, with

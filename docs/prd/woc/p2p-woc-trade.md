@@ -222,11 +222,16 @@ which is the right shape.
 **2FA: removed on the paying side.** Scoped here to the directed p2p path; see the
 note below about whether it should also come off auctions.
 
-The reason it costs little is worth recording, because it is not obvious.
-`guardTotp` runs on `placeBid` and `buyNow` only, and both of those require the
-buyer's own wallet signature to move any money. A stolen session token does not carry
-the wallet key, so 2FA there is a step-up gate in front of an action that already
-demands a stronger second factor.
+The reason it costs little is worth recording, because it is not obvious. The
+marketplace PRD specifies TOTP on `placeBid` and `buyNow` only, and both of
+those require the buyer's own wallet signature to move any money. A stolen
+session token does not carry the wallet key, so 2FA there is a step-up gate in
+front of an action that already demands a stronger second factor. (Truth-up,
+2026-08-13: that TOTP gate was specified but never enforced server-side, on any
+path; the threshold knob has no consumer, finding B6. The step-up work in the
+hardening packet, `docs/woc-marketplace-hardening/`, owns building enforcement
+where it belongs, which per this analysis is the custody-moving side, not the
+paying side.)
 
 **The gap it leaves untouched is on the other side.** `createListing` has NO 2FA at
 all, and that is where a session-token thief can actually steal: list the victim's
@@ -248,7 +253,8 @@ to p2p trades, so it is noted here and tracked separately.
 
 **3. Does a directed offer count against the 12-listing cap?**
 RESOLVED by the directed-rail hardening (H12): a directed LISTING counts against the
-shared 12-listing cap in both directions (`countActiveBySeller` and the authoritative
+shared per-account cap (`WOC_MARKET_MAX_ACTIVE_LISTINGS`) in both directions
+(`countActiveBySeller` and the authoritative
 in-transaction count both dropped the exemption), because it holds an item in custody
 escrow exactly as a public listing does. A pending OFFER still escrows nothing and
 counts toward nothing. The directed hold is the settlement window
@@ -267,9 +273,16 @@ parallel-build.
 
 ## Implementation status
 
-Updated 2026-08-06. The server foundation has landed; the client cannot reach
-it yet, which is deliberate rather than half-wired: a directed listing simply
-does not exist until something creates one.
+Updated 2026-08-13. The whole rail has landed: the offer, accept, decline, and
+withdraw endpoints; escrow on acceptance with delivery on verified payment; the
+trade window's $WOC arm (`src/ui/hud/woc_trade/`); the strike on a
+never-paying buyer with the auto-close return flight; the agreed-copy
+fingerprint (`item_pin`); the one-pending-offer-per-pair bound; and terms
+acceptance gating both money paths (`guardTerms`). It ships disabled behind
+`WOC_MARKET_ENABLED` with the rest of the marketplace. The directed-rail
+hardening record lives in the packet ledger
+(`docs/woc-marketplace-hardening/state.md`); the sections below are the design
+history plus, in "Landed", the original foundation table.
 
 ### Landed (game `12543c8d55`, service `f2ea381`)
 
@@ -280,7 +293,7 @@ does not exist until something creates one.
 | Directed rows excluded from public browse | `browseListings` (SQL) |
 | Detail refuses non-parties; `viewerAccount` is REQUIRED | `WocMarketService.listingDetail` |
 | `buyNow` refuses a non-designated buyer as `not_found` | `WocMarketService.buyNow` |
-| Cap exemption, both the pre-check and the locked transaction | `woc_market.ts`, `woc_market_db.ts` |
+| Shared 12-listing cap counts directed listings, both halves (the launch-time cap exemption was removed by the directed-rail hardening, H12) | `woc_market.ts`, `woc_market_db.ts` |
 | Auction form + malformed account id refused | `validListingParams` |
 | The three USD legs on `/estimate` | service `splitMarketProceedsCents` |
 
@@ -291,13 +304,16 @@ service tests run against `FakeWocMarketDb` and therefore stay green when the
 real SQL predicate is deleted. That file drives `PgWocMarketDb` against a mock
 pool and pins the predicate on every sort. Every gate above is mutation-tested.
 
-### Remaining
+### Since landed (originally the remaining list; all built)
 
 1. **Offer / accept / decline endpoints.** `RouteDef` modules registered in
-   `server/http/registry.ts`. The offer route must resolve the counterparty
-   from the agreed trade; taking an account id from the seller's request body
-   would make any account a drop target, which is why `createListing` passes
-   `directedBuyerAccount: null` unconditionally today.
+   `server/http/registry.ts`. The offer route accepts the counterparty's
+   character NAME (the one handle the trade window has) and resolves it
+   server-side (`characterByName`), so no account id ever crosses the wire;
+   an account id in the request body would make any account a drop target,
+   which is why the public `createListing` route still passes
+   `directedBuyerAccount: null` unconditionally: only the offer rail creates
+   directed listings.
 2. **Counterparty wallet-verified status.** A server-fed sibling field, NOT a
    member of `TradeInfo`: the sim builds that and may not know about wallets
    (`src/sim/social/trade.ts` is inside the token firewall's scanned tree and
@@ -306,19 +322,22 @@ pool and pins the predicate on every sort. Every gate above is mutation-tested.
    `extractTradableCopy` then `mailSystemParcel` with a custody ref, reusing
    the settlement machinery so the existing expiry sweep supplies the strike
    and the sale flows into the public history unchanged.
-4. **The trade window's $WOC arm.** Pure `*_view.ts` core registered in
-   `UI_PURE_CORES` plus a thin cold painter: USD entry showing the $WOC
-   equivalent, net AND fee from the server split, gold/$WOC mutual exclusivity,
-   filtering to $WOC-tradable items, and the wallet-required message. English
-   `t()` keys only, in `i18n.catalog/hud_chrome.ts`.
-5. **An auction-listed item must not be offerable p2p**, per the requester.
-6. `npm run gate`.
+4. **The trade window's $WOC arm.** The pure view core and panel are
+   `src/ui/trade_woc_view.ts` and `src/ui/trade_woc_panel.ts`; the offer
+   machine (controller plus `woc_trade_offer_view.ts`) lives in
+   `src/ui/hud/woc_trade/`. USD entry showing the $WOC equivalent, net AND
+   fee from the server split, gold/$WOC mutual exclusivity, filtering to
+   $WOC-tradable items, and the wallet-required message, with English `t()`
+   keys in `i18n.catalog/hud_chrome.ts`.
+5. **An auction-listed item is not offerable p2p** structurally: listing is
+   escrow-by-removal, so a listed copy is no longer in any bag to stage.
 
-### Two decisions worth re-reading before starting
+### Two decisions worth re-reading
 
 The sim trade session is NOT used for $WOC mode (see "Second round of
 decisions"): its confirm performs the swap in the same tick, and a $WOC payment
 is asynchronous. The window is an agree-terms surface that hands off.
 
-`createListing` still has no 2FA, which is the real theft vector on this rail
-and is independent of this feature. Recorded, undecided, tracked separately.
+`createListing` still has no step-up factor, which is the real theft vector on
+this rail and is independent of this feature. The hardening packet's step-up
+work (`docs/woc-marketplace-hardening/`) owns closing it before enable.
