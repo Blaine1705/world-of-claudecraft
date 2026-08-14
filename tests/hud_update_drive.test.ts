@@ -266,6 +266,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the tutorial hint overlay',
   },
   {
+    call: 'this.bootcamp.update',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'the island movement-bootcamp overlay; a cheap latch check off-island',
+  },
+  {
     call: 'this.lootRolls.update',
     band: 'frame',
     gate: '',
@@ -1575,7 +1582,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // release's own window/chrome churn), so it cannot be reconciled by
       // arithmetic across a merge. The numbers below were set from a suite run
       // on the merged tree, not from either side's narrative.
-    ).toEqual({ window: 47, chrome: 82, none: 17 });
+    ).toEqual({ window: 47, chrome: 83, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

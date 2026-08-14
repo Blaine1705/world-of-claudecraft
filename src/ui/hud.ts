@@ -737,6 +737,7 @@ import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
 import { buildTradeItemRow, tradeOfferCeiling, tradeRowTooltipTarget } from './trade_view';
+import { BootcampOverlay } from './bootcamp';
 import { TutorialOverlay } from './tutorial';
 import {
   buildFerryBellHomeNote,
@@ -2026,6 +2027,7 @@ export class Hud {
   private meters: Meters;
   private readonly targetAurasWindow: TargetAurasWindow;
   private tutorial = new TutorialOverlay();
+  private bootcamp = new BootcampOverlay();
   private lastPetBarSig = '';
   // Value-diffed body-class flag: true while a live pet bar is shown. The mobile
   // top-band layout reads body.mobile-pet-active to yield the top-centre line to the
@@ -6475,6 +6477,7 @@ export class Hud {
     this.spellbookWindow.relocalize();
     this.lockpickController.relocalize();
     this.tutorial.relocalize(this.sim, this.keybinds);
+    this.bootcamp.relocalize(this.sim, this.keybinds);
     // The ring latches its page indicator on the page/count pair; dropping the
     // latch relabels it on the next paint (mobile layouts only build the ring).
     this.mobileActionRingPainter?.relocalize();
@@ -8893,6 +8896,7 @@ export class Hud {
     this.mountRaceControls.update();
     this.lockpickController.repaintIfChanged();
     this.tutorial.update(sim, this.renderer, this.keybinds);
+    this.bootcamp.update(sim, this.renderer, this.keybinds);
     this.lootRolls.update(now);
     if (slowHud) this.updateRaidLockoutBadge();
     if (slowHud) this.refreshDailyRewardsLauncher();

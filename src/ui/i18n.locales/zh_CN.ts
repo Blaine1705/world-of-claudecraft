@@ -12647,7 +12647,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.status.needsAttention': '需要注意',
   // The Proving Shore (tutorial island) + the spawn greeting dialog.
   'hudChrome.tutorialGreeting.bodyFirst':
-    '这张面孔我可没见过，朋友。如果这是你第一次踏上这些路，有一个地方可以让你先磨练身手、熟悉这个世界，再去迎接它的挑战：试炼之滨，海峡对面的一座安静小岛。渡船来回都通，去或不去都没人会小看你。',
+    '在这片土地上，初次踏上冒险之路的人照传统都会去试炼之滨走一趟，那是海峡对面的一座安静小岛。在那里你可以先磨练身手、熟悉这个世界，再去迎接它的挑战。渡船来回都通，去或不去都没人会小看你。',
   'hudChrome.tutorialGreeting.bodyRefresher':
     '又换了一副新面孔回来了？那你知道该怎么做。不过，出发前若想温习一遍，试炼之滨从不拒绝回炉的学生，渡船随时候着你。',
   'hudChrome.tutorialGreeting.play': '进行新手教学',
@@ -12657,8 +12657,29 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorialGreeting.bellHomeNote':
     '这么快就从海滨回来了？你刚才敲响的正是渡船铃。它的孪生兄弟就挂在那边鸦邮信箱旁：想回试炼之滨，随时敲响它，渡航就会送你过去。敲错了也不打紧。',
   'hudChrome.tutorialGreeting.islandArrivalNote':
-    '刚下渡船吗？欢迎来到试炼之滨。用 W、A、S、D 走路，按住鼠标右键转动视角。教官玛伦在我身后这条路尽头的晨憩营地主持操练：走到她跟前，直到她的名字显示出来，然后按 F，或者用鼠标左键点击她，就能与她交谈，她会交给你第一件差事。等你准备离开时，敲响立在我码头旁的那口铃，渡航就会送你回东溪镇。',
+    '刚下渡船吗？欢迎来到试炼之滨。教官玛伦在我身后这条路尽头的晨憩营地主持操练：走到她跟前，直到她的名字显示出来，然后按 F，或者用鼠标左键点击她，就能与她交谈，她会交给你第一件差事。等你准备离开时，敲响立在我码头旁的那口铃，渡航就会送你回东溪镇。',
   'hudChrome.tutorialGreeting.noteClose': '明白了',
+  'hudChrome.bootcamp.title': '最初的脚步',
+  'hudChrome.bootcamp.moveTitle': '活动双腿',
+  'hudChrome.bootcamp.moveBody': '用 {moveKeys} 朝任意方向走上几步。',
+  'hudChrome.bootcamp.moveBodyTouch': '拖动屏幕下方的移动摇杆，朝任意方向走上几步。',
+  'hudChrome.bootcamp.moveBodyPad': '推动左摇杆，朝任意方向走上几步。',
+  'hudChrome.bootcamp.cameraTitle': '转动视角',
+  'hudChrome.bootcamp.cameraBody': '按住鼠标右键并拖动来转动视角。往左右两边好好看一圈。',
+  'hudChrome.bootcamp.cameraBodyTouch': '用手指拖动世界画面（不是移动摇杆）来转动视角。',
+  'hudChrome.bootcamp.cameraBodyPad': '推动右摇杆来转动视角。',
+  'hudChrome.bootcamp.courseTitle': '跑过试炼跑道',
+  'hudChrome.bootcamp.courseBody':
+    '现在把两样合起来：沿码头以南海滩上的旗列跑一趟。用 {jumpKey} 跃过栏杆，爬过木箱，依次碰到每一面旗，直到红旗为止。',
+  'hudChrome.bootcamp.courseBodyTouch':
+    '现在把两样合起来：沿码头以南海滩上的旗列跑一趟。用跳跃按钮跃过栏杆，爬过木箱，依次碰到每一面旗，直到红旗为止。',
+  'hudChrome.bootcamp.courseBodyPad':
+    '现在把两样合起来：沿码头以南海滩上的旗列跑一趟。用跳跃按钮跃过栏杆，爬过木箱，依次碰到每一面旗，直到红旗为止。',
+  'hudChrome.bootcamp.courseProgress': '旗帜 {current}/{total}',
+  'hudChrome.bootcamp.doneTitle': '可以受训了',
+  'hudChrome.bootcamp.doneBody':
+    '腿上的功夫就这些了。教官玛伦在码头沿路而上的晨憩营地主持操练，她的第一件差事正等着你。',
+  'entities.zones.proving_shore.pois.4.label': '试炼跑道',
   'entities.items.ps_castaway_crate.name': '漂流货箱',
   'entities.items.ps_ferry_bell.name': '渡船铃',
   'entities.mobs.training_effigy.name': '训练草人',
@@ -12691,7 +12712,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ps_strike_true.objectives.0.label': '击倒训练草人',
   'entities.quests.q_ps_the_wreck_line.title': '沉船滩',
   'entities.quests.q_ps_the_wreck_line.text':
-    '潮水用海货支付这座岛：旧沉船上的漂流货箱，被冲上营地东南、面向谷地的那片海滩。开箱很简单，{playerName}。走到货箱跟前，直到它的名字显示出来，然后按 F，或者用鼠标左键点击货箱本身，它就会把里面的东西交出来。开三只就够了。翻拣残骸的掠蟹夹起人来比看上去疼，所以脚下留神；另外记住，你今后遇到的每一只箱子、每一处采集点、每一道门扉，用的都是同一个 F 键。',
+    '潮水用海货支付这座岛：旧沉船上的漂流货箱，被冲上练习场再往前的那片远滩。从木靶那里沿小路继续走，它会一直把你领到水边。开箱很简单，{playerName}。走到货箱跟前，直到它的名字显示出来，然后按 F，或者用鼠标左键点击货箱本身，它就会把里面的东西交出来。开三只就够了。翻拣残骸的掠蟹夹起人来比看上去疼，所以脚下留神；另外记住，你今后遇到的每一只箱子、每一处采集点、每一道门扉，用的都是同一个 F 键。',
   'entities.quests.q_ps_the_wreck_line.completion':
     '绳子、焦油，还有半轮大海竟然放过的奶酪。世上到处都是值得弯腰去捡的东西，{playerName}。保持这个习惯：走近，按 F，拿走属于你的东西。',
   'entities.quests.q_ps_the_wreck_line.objectives.0.label': '开启漂流货箱',

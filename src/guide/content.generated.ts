@@ -2385,7 +2385,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "Dawnrest Camp",
       "The Old Pier",
       "The Practice Yard",
-      "The Wreck Line"
+      "The Wreck Line",
+      "The Gauntlet"
     ],
     "welcome": "The Proving Shore asks nothing of you but time. Learn the camp, strike the effigies, walk the wreck line, and when you are ready, Ferryman Odo will see you across to the vale.",
     "families": [

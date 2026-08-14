@@ -12875,7 +12875,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.status.needsAttention': '要確認',
   // The Proving Shore (tutorial island) + the spawn greeting dialog.
   'hudChrome.tutorialGreeting.bodyFirst':
-    '見かけない顔だね、旅の人。この道を歩くのが初めてなら、世界の試練に挑む前に腕を磨き、この土地に慣れられる場所がある。修練の浜、海峡の向こうの静かな島だ。渡し船は行きも帰りも出ているし、行っても行かなくても誰も君を軽んじたりはしないよ。',
+    'この土地では、冒険を始める者が修練の浜を訪れるのが習わしだ。海峡の先にある静かな島だよ。あそこなら世界の試練に挑む前に腕を磨き、この土地に慣れることができる。渡し船は行きも帰りも出ているし、行っても行かなくても誰も君を軽んじたりはしないよ。',
   'hudChrome.tutorialGreeting.bodyRefresher':
     '新しい顔でまた来たのかい？なら勝手は分かっているね。それでも旅立つ前におさらいがしたければ、修練の浜は出戻りの生徒を追い返したりしない。渡し船はいつでも出せるよ。',
   'hudChrome.tutorialGreeting.play': 'チュートリアルを受ける',
@@ -12884,9 +12884,33 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorialGreeting.bellHomeNote':
     'もう浜から戻ったのかい？さっき鳴らしたのが渡しの鐘だよ。その双子がすぐそこ、レイヴンポストの郵便柱のそばに掛かっている。いつでも鳴らせば、渡しが修練の浜へ運び直してくれる。間違って鳴らしたのなら、それはそれで構わないさ。',
   'hudChrome.tutorialGreeting.islandArrivalNote':
-    '渡ってきたばかりかい？ようこそ修練の浜へ。W、A、S、Dで歩き、マウスの右ボタンを押したままにすれば視点を回せる。教官マレンが私の後ろの道の先、暁の野営地で稽古を仕切っている。彼女の名前が見えるところまで歩み寄って、Fを押すか、左クリックすれば話ができ、最初の仕事を言いつけてくれるはずだ。発つ支度ができたら、私の桟橋のそばに立つ鐘を鳴らしなさい。渡しがイーストブルックの家まで運んでくれる。',
+    '渡ってきたばかりかい？ようこそ修練の浜へ。教官マレンが私の後ろの道の先、暁の野営地で稽古を仕切っている。彼女の名前が見えるところまで歩み寄って、Fを押すか、左クリックすれば話ができ、最初の仕事を言いつけてくれるはずだ。発つ支度ができたら、私の桟橋のそばに立つ鐘を鳴らしなさい。渡しがイーストブルックの家まで運んでくれる。',
   'hudChrome.tutorialGreeting.noteClose': 'わかった',
   'hudChrome.tutorialGreeting.skip': 'チュートリアルを飛ばす',
+  'hudChrome.bootcamp.title': '最初の一歩',
+  'hudChrome.bootcamp.moveTitle': '足を慣らす',
+  'hudChrome.bootcamp.moveBody': '{moveKeys}で、どの方向へでも数歩歩いてみよう。',
+  'hudChrome.bootcamp.moveBodyTouch':
+    '画面下の移動スティックをドラッグして、どの方向へでも数歩歩いてみよう。',
+  'hudChrome.bootcamp.moveBodyPad': '左スティックを倒して、どの方向へでも数歩歩いてみよう。',
+  'hudChrome.bootcamp.cameraTitle': '視点を回す',
+  'hudChrome.bootcamp.cameraBody':
+    'マウスの右ボタンを押したままドラッグして視点を回してみよう。左右をしっかり見渡してみて。',
+  'hudChrome.bootcamp.cameraBodyTouch':
+    '（移動スティックではなく）世界を指でドラッグして視点を回してみよう。',
+  'hudChrome.bootcamp.cameraBodyPad': '右スティックを倒して視点を回してみよう。',
+  'hudChrome.bootcamp.courseTitle': 'ガントレットを駆けろ',
+  'hudChrome.bootcamp.courseBody':
+    'では二つを合わせよう。桟橋の南の浜にある旗の列を駆け抜けるんだ。{jumpKey}で柵を跳び越え、箱をよじ登り、赤い旗まで全部の旗に触れよう。',
+  'hudChrome.bootcamp.courseBodyTouch':
+    'では二つを合わせよう。桟橋の南の浜にある旗の列を駆け抜けるんだ。ジャンプボタンで柵を跳び越え、箱をよじ登り、赤い旗まで全部の旗に触れよう。',
+  'hudChrome.bootcamp.courseBodyPad':
+    'では二つを合わせよう。桟橋の南の浜にある旗の列を駆け抜けるんだ。ジャンプボタンで柵を跳び越え、箱をよじ登り、赤い旗まで全部の旗に触れよう。',
+  'hudChrome.bootcamp.courseProgress': '旗 {current} / {total}',
+  'hudChrome.bootcamp.doneTitle': '稽古の準備は万端',
+  'hudChrome.bootcamp.doneBody':
+    '体の動かし方はこれで全部だ。教官マレンが桟橋から道を上った先の暁の野営地で稽古を仕切っている。最初の仕事を用意して待っているよ。',
+  'entities.zones.proving_shore.pois.4.label': 'ガントレット',
   'entities.items.ps_castaway_crate.name': '漂着した木箱',
   'entities.items.ps_ferry_bell.name': '渡しの鐘',
   'entities.mobs.training_effigy.name': '訓練用のかかし',
@@ -12919,7 +12943,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ps_strike_true.objectives.0.label': '訓練用のかかしを倒す',
   'entities.quests.q_ps_the_wreck_line.title': '難破の浜',
   'entities.quests.q_ps_the_wreck_line.text':
-    '潮はこの島に漂着物で払いをする。古い難破船の木箱が、野営地の南東、渓谷に面した浜辺に打ち上げられるんだ。開けるのは簡単だよ、{playerName}。木箱の名前が見えるところまで歩み寄って、Fを押すか、木箱そのものを左クリックすれば、中身を差し出してくれる。三つで足りる。漂着物を漁る蟹どもは見た目より強く挟むから、足元には気をつけて。それから覚えておきなさい、この先出会うどんな宝箱も、採集場所も、扉も、開けるのは同じFひとつきりだよ。',
+    '潮はこの島に漂着物で払いをする。古い難破船の木箱が、練習場の先の遠い浜辺に打ち上げられるんだ。かかしの先へ道なりに進めば、そのまま水際まで案内してくれる。木箱を開けるのは簡単だよ、{playerName}。名前が見えるところまで歩み寄って、Fを押すか、木箱そのものを左クリックすれば、中身を差し出してくれる。三つで足りる。漂着物を漁る蟹どもは見た目より強く挟むから、足元には気をつけて。それから覚えておきなさい、この先出会うどんな宝箱も、採集場所も、扉も、開けるのは同じFひとつきりだよ。',
   'entities.quests.q_ps_the_wreck_line.completion':
     'ロープに、タールに、海がなぜか見逃したチーズが半玉。世の中は身をかがめる価値のあるもので満ちているよ、{playerName}。この習慣を続けなさい。近づいて、Fを押して、自分のものを頂く。',
   'entities.quests.q_ps_the_wreck_line.objectives.0.label': '漂着した木箱を開ける',

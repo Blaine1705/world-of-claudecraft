@@ -142,6 +142,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.spellbookWindow.relocalize|',
   'this.lockpickController.relocalize|',
   'this.tutorial.relocalize|',
+  'this.bootcamp.relocalize|',
   'this.mobileActionRingPainter.relocalize|',
   'this.mountRaceStrip.relocalize|',
   'this.mountRaceControls.relocalize|',

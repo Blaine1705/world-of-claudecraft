@@ -580,7 +580,7 @@ export const hudChromeStrings = {
   // (tutorial_greeting_view.ts / tutorial_greeting_window.ts).
   tutorialGreeting: {
     bodyFirst:
-      'I have not seen you around before, friend. If this is your first time on these roads, there is a place you can go to hone your skills and get used to the world before you take on its challenges: the Proving Shore, a quiet island across the strait. The ferry runs both ways, and no one will think less of you either way.',
+      'It is tradition in these lands for those starting their adventure to visit the Proving Shore, a quiet island off the strait. There you can hone your skills and get used to the world before you take on its challenges. The ferry runs both ways, and no one will think less of you either way.',
     bodyRefresher:
       'Back again with a fresh face, are you? You know how this goes, then. Still, if you would like a refresher before you set out, the Proving Shore never turns away a returning student, and the ferry is ready when you are.',
     play: 'Take the tutorial',
@@ -595,7 +595,7 @@ export const hudChromeStrings = {
     // Ferryman Odo's island welcome, shown once per device on the first
     // arrival: the greeting ferry lands beside his pier.
     islandArrivalNote:
-      'Fresh off the crossing? Welcome to the Proving Shore. Walk with W, A, S and D, and hold the right mouse button to steer your view. Instructor Maren keeps the drills up at Dawnrest Camp, along the road behind me: walk right up to her until her name shows, then press F, or left-click her, to talk, and she will set you your first task. When you are ready to leave, ring the bell standing beside my pier and the crossing will carry you home to Eastbrook.',
+      'Fresh off the crossing? Welcome to the Proving Shore. Instructor Maren keeps the drills up at Dawnrest Camp, along the road behind me: walk right up to her until her name shows, then press F, or left-click her, to talk, and she will set you your first task. When you are ready to leave, ring the bell standing beside my pier and the crossing will carry you home to Eastbrook.',
     noteClose: 'Understood',
   },
   // New-adventurer tutorial copy for the touch interface. The default tutorial
@@ -634,6 +634,37 @@ export const hudChromeStrings = {
     nextTipQuestLog: 'Open your Quest Log ({key}) to find your next task nearby.',
     nextTipMap: 'Check the World Map ({key}) to see where quests are waiting.',
     nextTipSocial: 'Open Social ({key}) to find a group for tougher fights.',
+  },
+  // The Proving Shore movement bootcamp (src/ui/bootcamp.ts): the coachmark a
+  // fresh arrival sees on the tutorial island, teaching walking, the camera,
+  // and jumping via the Gauntlet flag course on the south strand. Three copy
+  // arms per step: keyboard/mouse (default), touch, and gamepad, chosen by the
+  // live input-hint mode (src/game/input_hint_mode.ts). WORDY by M16, so the
+  // five non-Latin overlays carry real fills.
+  bootcamp: {
+    title: 'First Steps',
+    moveTitle: 'Find your legs',
+    moveBody: 'Walk a few steps in any direction with {moveKeys}.',
+    moveBodyTouch:
+      'Drag the movement stick at the bottom of your screen to walk a few steps in any direction.',
+    moveBodyPad: 'Push the left stick to walk a few steps in any direction.',
+    cameraTitle: 'Swing your view',
+    cameraBody:
+      'Hold the right mouse button and drag to swing your view around. Take a good look left and right.',
+    cameraBodyTouch:
+      'Drag a finger across the world (not the movement stick) to swing your view around.',
+    cameraBodyPad: 'Push the right stick to swing your view around.',
+    courseTitle: 'Run the Gauntlet',
+    courseBody:
+      'Now put both together: run the flag line on the strand south of the pier. Jump the rails with {jumpKey}, clamber over the boxes, and touch every flag through to the red one.',
+    courseBodyTouch:
+      'Now put both together: run the flag line on the strand south of the pier. Jump the rails with the Jump button, clamber over the boxes, and touch every flag through to the red one.',
+    courseBodyPad:
+      'Now put both together: run the flag line on the strand south of the pier. Jump the rails with the jump button, clamber over the boxes, and touch every flag through to the red one.',
+    courseProgress: 'Flag {current} of {total}',
+    doneTitle: 'Ready for the drills',
+    doneBody:
+      'That is everything your legs need to know. Instructor Maren keeps the drills at Dawnrest Camp, up the road from the pier, and she has your first task.',
   },
   // Minimap / compass / clock / coordinate widget tooltips and accessible names.
   widgets: {

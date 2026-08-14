@@ -6,13 +6,16 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  BOOTCAMP_COURSE_CHECKPOINTS,
   PROVING_SHORE_ARRIVAL,
   PROVING_SHORE_CAMPS,
   PROVING_SHORE_NPCS,
   PROVING_SHORE_OBJECTS,
   PROVING_SHORE_PORTALS,
+  PROVING_SHORE_PROPS,
   PROVING_SHORE_QUEST_ORDER,
   PROVING_SHORE_QUESTS,
+  PROVING_SHORE_ROADS,
   PROVING_SHORE_ZONE,
 } from '../src/sim/content/proving_shore';
 import { MAILBOXES } from '../src/sim/content/mailboxes';
@@ -48,6 +51,23 @@ describe('proving shore placement', () => {
       ...PROVING_SHORE_OBJECTS.flatMap((o) =>
         o.positions.map((p, i) => ({ x: p.x, z: p.z, what: `object:${o.itemId}[${i}]` })),
       ),
+      // The Gauntlet's furniture and the camp's perimeter rails: every fence
+      // post, mantle box, and checkpoint flag stands on dry walkable ground.
+      ...(PROVING_SHORE_PROPS.fences ?? []).flatMap((f, i) => [
+        { x: f.x1, z: f.z1, what: `fence[${i}].a` },
+        { x: f.x2, z: f.z2, what: `fence[${i}].b` },
+      ]),
+      ...(PROVING_SHORE_PROPS.crates ?? []).map(([x, z], i) => ({ x, z, what: `crate[${i}]` })),
+      ...(PROVING_SHORE_PROPS.decorProps ?? []).map((d, i) => ({
+        x: d.x,
+        z: d.z,
+        what: `decor:${d.key}[${i}]`,
+      })),
+      // Road knots too: a spline knot in the shallows would paint a dirt
+      // track into the sea and sprout a drowned streetlamp beside it.
+      ...PROVING_SHORE_ROADS.flatMap((road, i) =>
+        road.map((p, j) => ({ x: p.x, z: p.z, what: `road[${i}][${j}]` })),
+      ),
     ];
     const wet = points.filter((p) => !dry(p.x, p.z)).map((p) => p.what);
     const steep = points.filter((p) => !walkable(p.x, p.z)).map((p) => p.what);
@@ -78,6 +98,19 @@ describe('proving shore placement', () => {
     expect(front && dry(front.x, front.z)).toBe(true);
     // A second board needs its own reserved static-service id.
     expect(new Set(NOTICEBOARDS.map((b) => b.entityId)).size).toBe(NOTICEBOARDS.length);
+  });
+
+  it('the Gauntlet checkpoints mirror the authored flag dressing, in running order', () => {
+    // The bootcamp overlay detects course progress by position against
+    // BOOTCAMP_COURSE_CHECKPOINTS; the flags a player actually sees are the
+    // decorProps hexFlag entries. One list must be the other, first to last
+    // (the red flag is the finish), or the overlay would point at bare sand.
+    const flags = (PROVING_SHORE_PROPS.decorProps ?? []).filter((d) => d.key.startsWith('hexFlag'));
+    expect(flags.map((d) => ({ x: d.x, z: d.z }))).toEqual([...BOOTCAMP_COURSE_CHECKPOINTS]);
+    expect(flags.at(-1)?.key).toBe('hexFlagRed');
+    // The course flags live on the south strand near camp, NOT out at the
+    // wreck line: the whole point of the move was to separate the two.
+    for (const c of BOOTCAMP_COURSE_CHECKPOINTS) expect(c.x).toBeGreaterThan(-320);
   });
 
   it('the greeter stands on dry ground at the Eastbrook spawn', () => {

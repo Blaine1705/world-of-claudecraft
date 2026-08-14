@@ -22,6 +22,7 @@ import {
   TRIGGER_THRESHOLD,
 } from './gamepad_map';
 import type { Input } from './input';
+import { markPadActivity } from './input_hint_mode';
 
 export interface GamepadCallbacks {
   // Record one physical button rising edge for the HUD's APM readout.
@@ -218,6 +219,15 @@ export class GamepadManager {
     for (const idx of risingEdges(this.prevPressed, cur)) {
       this.cb.onInputEdge();
       this.dispatch(idx);
+    }
+
+    // Real pad input this frame flips on-screen hint text to gamepad phrasing
+    // (input_hint_mode.ts); a key or mouse press flips it back.
+    if (
+      cur.some(Boolean) ||
+      Math.max(Math.abs(lx), Math.abs(ly), Math.abs(rx), Math.abs(ry)) > this.deadzone
+    ) {
+      markPadActivity();
     }
 
     this.prevPressed = cur;

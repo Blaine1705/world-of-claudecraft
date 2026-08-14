@@ -868,13 +868,13 @@ export const es: EnTranslations = {
       "chatPlaceholder": "Di algo..."
     },
     "tutorialGreeting": {
-      "bodyFirst": "I have not seen you around before, friend. If this is your first time on these roads, there is a place you can go to hone your skills and get used to the world before you take on its challenges: the Proving Shore, a quiet island across the strait. The ferry runs both ways, and no one will think less of you either way.",
+      "bodyFirst": "It is tradition in these lands for those starting their adventure to visit the Proving Shore, a quiet island off the strait. There you can hone your skills and get used to the world before you take on its challenges. The ferry runs both ways, and no one will think less of you either way.",
       "bodyRefresher": "Back again with a fresh face, are you? You know how this goes, then. Still, if you would like a refresher before you set out, the Proving Shore never turns away a returning student, and the ferry is ready when you are.",
       "play": "Take the tutorial",
       "skip": "Skip the tutorial",
       "declineNote": "As you like, friend. Should you ever change your mind, the ferry bell by the Ravenpost mailbox rings you across to the Proving Shore any time, day or night. It will still be here when the wolves are not.",
       "bellHomeNote": "Back from the shore already? That was the ferry bell you rang. Its twin hangs just there by the Ravenpost mailbox: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.",
-      "islandArrivalNote": "Fresh off the crossing? Welcome to the Proving Shore. Walk with W, A, S and D, and hold the right mouse button to steer your view. Instructor Maren keeps the drills up at Dawnrest Camp, along the road behind me: walk right up to her until her name shows, then press F, or left-click her, to talk, and she will set you your first task. When you are ready to leave, ring the bell standing beside my pier and the crossing will carry you home to Eastbrook.",
+      "islandArrivalNote": "Fresh off the crossing? Welcome to the Proving Shore. Instructor Maren keeps the drills up at Dawnrest Camp, along the road behind me: walk right up to her until her name shows, then press F, or left-click her, to talk, and she will set you your first task. When you are ready to leave, ring the bell standing beside my pier and the crossing will carry you home to Eastbrook.",
       "noteClose": "Understood"
     },
     "tutorial": {
@@ -888,6 +888,24 @@ export const es: EnTranslations = {
       "nextTipQuestLog": "Abre tu Diario de misiones ({key}) para encontrar la siguiente tarea cercana.",
       "nextTipMap": "Consulta el mapa del mundo ({key}) para ver dónde te esperan misiones.",
       "nextTipSocial": "Abre el panel Social ({key}) para buscar un grupo para los combates más difíciles."
+    },
+    "bootcamp": {
+      "title": "First Steps",
+      "moveTitle": "Find your legs",
+      "moveBody": "Walk a few steps in any direction with {moveKeys}.",
+      "moveBodyTouch": "Drag the movement stick at the bottom of your screen to walk a few steps in any direction.",
+      "moveBodyPad": "Push the left stick to walk a few steps in any direction.",
+      "cameraTitle": "Swing your view",
+      "cameraBody": "Hold the right mouse button and drag to swing your view around. Take a good look left and right.",
+      "cameraBodyTouch": "Drag a finger across the world (not the movement stick) to swing your view around.",
+      "cameraBodyPad": "Push the right stick to swing your view around.",
+      "courseTitle": "Run the Gauntlet",
+      "courseBody": "Now put both together: run the flag line on the strand south of the pier. Jump the rails with {jumpKey}, clamber over the boxes, and touch every flag through to the red one.",
+      "courseBodyTouch": "Now put both together: run the flag line on the strand south of the pier. Jump the rails with the Jump button, clamber over the boxes, and touch every flag through to the red one.",
+      "courseBodyPad": "Now put both together: run the flag line on the strand south of the pier. Jump the rails with the jump button, clamber over the boxes, and touch every flag through to the red one.",
+      "courseProgress": "Flag {current} of {total}",
+      "doneTitle": "Ready for the drills",
+      "doneBody": "That is everything your legs need to know. Instructor Maren keeps the drills at Dawnrest Camp, up the road from the pier, and she has your first task."
     },
     "widgets": {
       "clockTitle": "Hora local: haz clic para alternar 12/24 horas",
@@ -16165,7 +16183,7 @@ export const es: EnTranslations = {
       },
       "q_ps_the_wreck_line": {
         "title": "The Wreck Line",
-        "text": "The tide pays this island in salvage: castaway crates off old wrecks, washed up along the strand southeast of camp, on the shore that faces the vale. Opening one is simple, {playerName}. Walk right up to a crate until its name shows, then press F, or left-click the crate itself, and it will give up what it holds. Three of them will do. The scuttlers that pick over the wrack pinch harder than they look, so mind your step, and remember F is the same key for every chest, node and doorway you will ever meet.",
+        "text": "The tide pays this island in salvage: castaway crates off old wrecks, washed up on the far strand past the practice yard. Follow the path on from the effigies and it will walk you straight to the water. Opening a crate is simple, {playerName}. Walk right up to one until its name shows, then press F, or left-click the crate itself, and it will give up what it holds. Three of them will do. The scuttlers that pick over the wrack pinch harder than they look, so mind your step, and remember F is the same key for every chest, node and doorway you will ever meet.",
         "completion": "Rope, tar, and half a wheel of cheese the sea somehow spared. The world is full of things worth stooping for, {playerName}. Keep the habit: walk close, press F, take what is yours.",
         "objectives": {
           "0": {
@@ -16778,6 +16796,9 @@ export const es: EnTranslations = {
           },
           "3": {
             "label": "The Wreck Line"
+          },
+          "4": {
+            "label": "The Gauntlet"
           }
         }
       }

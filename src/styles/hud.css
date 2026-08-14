@@ -475,6 +475,26 @@
     font-weight: 600;
     color: var(--gold-dim);
   }
+  /* The bootcamp card's on-screen keycap chips (bootcamp.ts): the physical
+     keys the current lesson asks for, drawn as caps under the body copy. */
+  .tut-keys {
+    display: flex;
+    gap: 4px;
+    margin-top: 8px;
+  }
+  .tut-keycap {
+    background: linear-gradient(180deg, #2c2c35, #15151c);
+    border: 1px solid #4a4a58;
+    border-bottom-width: 3px;
+    border-radius: 4px;
+    color: var(--gold, #d8c078);
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 1;
+    padding: 5px 8px 4px;
+    min-width: 14px;
+    text-align: center;
+  }
   .tut-next-tips {
     margin: 0;
     padding: 0;

@@ -48,7 +48,8 @@ export const PROVING_SHORE_ZONE: ZoneDef = {
     { x: -300, z: 50, label: 'Dawnrest Camp', id: 'dawnrest_camp' },
     { x: -280, z: 0, label: 'The Old Pier', id: 'the_old_pier' },
     { x: -336, z: -14, label: 'The Practice Yard', id: 'the_practice_yard' },
-    { x: -286, z: -18, label: 'The Wreck Line', id: 'the_wreck_line' },
+    { x: -391, z: -33, label: 'The Wreck Line', id: 'the_wreck_line' },
+    { x: -298, z: -25, label: 'The Gauntlet', id: 'the_gauntlet' },
   ],
   welcome:
     'The Proving Shore asks nothing of you but time. Learn the camp, strike the effigies, walk the wreck line, and when you are ready, Ferryman Odo will see you across to the vale.',
@@ -70,7 +71,19 @@ export const PROVING_SHORE_ROADS: { x: number; z: number }[][] = [
     { x: -298, z: 46 },
     { x: -290, z: 14 },
     { x: -286, z: -14 },
-  ], // Dawnrest Camp -> the Wreck Line
+  ], // Dawnrest Camp -> the Gauntlet (the movement course on the south strand)
+  [
+    { x: -300, z: 48 },
+    { x: -310, z: 46 },
+    { x: -318, z: 44 },
+    { x: -325, z: 42 },
+  ], // Dawnrest Camp -> Bursar Wick's strongbox desk
+  [
+    { x: -334, z: -10 },
+    { x: -352, z: -18 },
+    { x: -370, z: -28 },
+    { x: -390, z: -33 },
+  ], // the Practice Yard -> the Wreck Line (the far strand)
 ] as { x: number; z: number }[][];
 
 // No walk-in portals: the ferry crossing is a pair of CLICKED bells
@@ -160,7 +173,8 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     id: 'instructor_maren',
     name: 'Instructor Maren',
     title: 'Proving Master',
-    pos: { x: -300, z: 46 },
+    // The camp's east anchor, at the junction where all three roads meet.
+    pos: { x: -299, z: 44 },
     facing: 0,
     color: 0x6b4a8a,
     questIds: [
@@ -177,7 +191,8 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     id: 'quartermaster_finch',
     name: 'Quartermaster Finch',
     title: 'Camp Outfitter',
-    pos: { x: -304, z: 54 },
+    // The stall row on the camp's north side, clear of the muster fire.
+    pos: { x: -309, z: 53 },
     facing: -Math.PI / 2,
     color: 0x6b6b3a,
     // Provisions and a starter bag, NEVER professions tools (the R37 vendor
@@ -197,8 +212,10 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     id: 'bursar_wick',
     name: 'Bursar Wick',
     title: 'The Gilded Strongbox',
-    pos: { x: -310, z: 56 },
-    facing: Math.PI / 2,
+    // The strongbox desk holds the camp's quiet west end, up its own spur of
+    // the camp path, facing east back down it toward the muster fire.
+    pos: { x: -325, z: 42 },
+    facing: -Math.PI / 2,
     color: 0xc9a227,
     // No questIds ON PURPOSE: clicking a banker opens the bank window, not
     // the quest gossip, so no quest can give or hand in at him. His teaching
@@ -242,7 +259,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     name: 'The Wreck Line',
     giverNpcId: 'instructor_maren',
     turnInNpcId: 'instructor_maren',
-    text: 'The tide pays this island in salvage: castaway crates off old wrecks, washed up along the strand southeast of camp, on the shore that faces the vale. Opening one is simple, $N. Walk right up to a crate until its name shows, then press F, or left-click the crate itself, and it will give up what it holds. Three of them will do. The scuttlers that pick over the wrack pinch harder than they look, so mind your step, and remember F is the same key for every chest, node and doorway you will ever meet.',
+    text: 'The tide pays this island in salvage: castaway crates off old wrecks, washed up on the far strand past the practice yard. Follow the path on from the effigies and it will walk you straight to the water. Opening a crate is simple, $N. Walk right up to one until its name shows, then press F, or left-click the crate itself, and it will give up what it holds. Three of them will do. The scuttlers that pick over the wrack pinch harder than they look, so mind your step, and remember F is the same key for every chest, node and doorway you will ever meet.',
     completionText:
       'Rope, tar, and half a wheel of cheese the sea somehow spared. The world is full of things worth stooping for, $N. Keep the habit: walk close, press F, take what is yours.',
     objectives: [
@@ -371,21 +388,25 @@ export const PROVING_SHORE_ITEMS: Record<string, ItemDef> = {
 // bit-identical.
 export const PROVING_SHORE_CAMPS: CampDef[] = [
   { mobId: 'training_effigy', center: { x: -336, z: -14 }, radius: 6, count: 3, offStream: true },
-  // Halved from 4 and 3: the wreck line is a looting lesson, and a crate
-  // ringed by crabs turned it into a fight the quest never asked for.
-  { mobId: 'shore_scuttler', center: { x: -286, z: -20 }, radius: 10, count: 2, offStream: true },
-  { mobId: 'shore_scuttler', center: { x: -308, z: -36 }, radius: 8, count: 2, offStream: true },
+  // The wreck line lives on the FAR strand past the practice yard (the path
+  // from the yard leads straight to it), leaving the south strand nearest
+  // camp free for the Gauntlet movement course. Counts stay halved: the
+  // wreck line is a looting lesson, and a crate ringed by crabs turned it
+  // into a fight the quest never asked for.
+  { mobId: 'shore_scuttler', center: { x: -389, z: -30 }, radius: 8, count: 2, offStream: true },
+  { mobId: 'shore_scuttler', center: { x: -394, z: -36 }, radius: 7, count: 2, offStream: true },
 ];
 
 export const PROVING_SHORE_OBJECTS: GroundObjectDef[] = [
   {
     itemId: 'ps_castaway_crate',
     name: 'Castaway Crate',
-    // The Wreck Line (q_ps_the_wreck_line): salvage along the vale-facing strand.
+    // The Wreck Line (q_ps_the_wreck_line): salvage on the far strand past
+    // the practice yard, at the end of its path, among the scuttler camps.
     positions: [
-      { x: -282, z: -12 },
-      { x: -292, z: -26 },
-      { x: -280, z: -4 },
+      { x: -390, z: -28 },
+      { x: -384, z: -36 },
+      { x: -396, z: -33 },
     ],
   },
   {
@@ -409,22 +430,66 @@ export const PROVING_SHORE_OBJECTS: GroundObjectDef[] = [
 
 export const PROVING_SHORE_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
-  // Dawnrest Camp: a training camp, not a town. Tents around a muster fire,
-  // the outfitter's stall, and a rail fence penning the practice yard.
-  stalls: [{ x: -305, z: 55, rot: 0.8, r: 1.6 }],
+  // Dawnrest Camp: a training camp, not a town, spread wide so nothing
+  // crowds anything. Tents flank the muster fire, the outfitter's stall
+  // holds the north row, and the strongbox desk anchors the far west end.
+  stalls: [{ x: -310, z: 54, rot: 0.8, r: 1.6 }],
   campfires: [
-    [-300, 52], // the muster fire
+    [-302, 50], // the muster fire
     [-334, -10], // the practice yard's brazier
   ],
   tents: [
-    { x: -296, z: 44, rot: 0.4, scale: 1 },
-    { x: -306, z: 48, rot: -1.6, scale: 1 },
+    { x: -295, z: 45, rot: 0.4, scale: 1 },
+    { x: -312, z: 57, rot: -1.6, scale: 1 },
   ],
   fences: [
-    { x1: -342, z1: -8, x2: -330, z2: -6 },
-    { x1: -342, z1: -22, x2: -330, z2: -20 },
+    // The camp's own rail fence, run along the dry shoulder of the plateau
+    // and around the graveyard, with two gates where the roads pass: the
+    // south-east gap (the pier and Gauntlet roads, crossing near x -296)
+    // and the south gap (the practice-yard road, crossing near x -305).
+    // The practice yard itself is OPEN ground now; its old pen rails are
+    // gone so drilling players never snag on a corner post.
+    { x1: -330, z1: 39, x2: -330, z2: 61 }, // west run
+    { x1: -330, z1: 61, x2: -318, z2: 61 }, // north run, behind the graveyard
+    { x1: -318, z1: 61, x2: -314, z2: 58 }, // north-east shoulder
+    { x1: -314, z1: 58, x2: -304, z2: 57 }, // north run, behind the mailbox
+    { x1: -304, z1: 57, x2: -297, z2: 52 }, // shoreline shoulder
+    { x1: -297, z1: 52, x2: -294, z2: 44 }, // east run
+    { x1: -294, z1: 44, x2: -294, z2: 40 }, // east run, to the pier gate
+    { x1: -299, z1: 39, x2: -303, z2: 39 }, // south run, between the gates
+    { x1: -308, z1: 39, x2: -330, z2: 39 }, // south run, west of the yard gate
+    // The Gauntlet's two jump rails, square across the course lane. A
+    // grounded walker is stopped; a jump clears them (colliders.ts isFence).
+    { x1: -295, z1: -19, x2: -291, z2: -23 },
+    { x1: -302, z1: -26, x2: -298, z2: -30 },
+  ],
+  // The Gauntlet's mantle boxes: campCrateShape tops them out around 1.2 yd,
+  // the height a running jump plus the mantle assist just clears
+  // (tests/parkour.test.ts pins that a raw jump alone cannot).
+  crates: [
+    [-296, -24],
+    [-297.2, -25],
+    [-304, -31],
+  ],
+  // The Gauntlet's checkpoint flags: pure dressing (no collider, no entity;
+  // the bootcamp overlay detects arrival by position against these same
+  // coordinates, pinned to BOOTCAMP_COURSE_CHECKPOINTS below).
+  decorProps: [
+    { key: 'hexFlag', x: -288, z: -16 },
+    { key: 'hexFlag', x: -298, z: -26 },
+    { key: 'hexFlagRed', x: -308, z: -34 },
   ],
   // The Old Pier, where the crossing circle waits at the plank's end.
   docks: [{ x: -271, z: 0, rot: 1.4, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } }],
   graveyards: [{ x: -324, z: 58 }],
 };
+
+/** The Gauntlet's checkpoint line, in running order: pier end first, red
+ *  finish flag last. The bootcamp overlay (src/ui/bootcamp_view.ts) walks a
+ *  player through these by proximity; each entry mirrors a decorProps flag
+ *  above (tests/proving_shore_content.test.ts pins the two lists equal). */
+export const BOOTCAMP_COURSE_CHECKPOINTS: readonly { x: number; z: number }[] = [
+  { x: -288, z: -16 },
+  { x: -298, z: -26 },
+  { x: -308, z: -34 },
+];
