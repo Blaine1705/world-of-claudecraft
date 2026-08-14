@@ -370,6 +370,61 @@ for 4x threat), but the Stonebound story changed twice:
   degrades on heroic instead of failing outright; it also now out-threats the bear on
   both difficulties while keeping the highest tank DPS in the game.
 
+## v0.38 tank threat parity and survivability retune (2026-08-15)
+
+The table above described the tree BEFORE the v0.38 tank balance pass. Live 0.37.1
+parses confirmed its threat story in production: Faithwarden held 447 mean TPS on
+Nythraxis kills against warrior 173, Stonebound 171 and bear 101, with zero overlap
+between the paladin and warrior distributions. The pass converted the warrior and bear
+signature threat from flat adds to damage-scaling multipliers with flat floors, raised
+the Recompense and Dire Bruin masteries, trimmed the Faithwarden triple stack (Burning
+Oath, Oathward, and the per-ability multipliers), raised the Stonebound posture to
+2.5x, gave bear form the classic big-pool identity (maxHp x1.30 funded by an armor
+trim to x2.1), and gave the Stonebound posture a Stamina component plus deeper armor
+and damage reduction. Constants live in `src/sim/threat.ts`,
+`src/sim/content/classes.ts`, `src/sim/content/paladin_core_abilities.ts`, the spec
+masteries in `src/sim/content/talents_warrior.ts` / `talents_classic.ts`,
+`src/sim/combat/shaman_warspirit.ts`, and `src/sim/entity.ts`; the moved pins are
+`tests/threat.test.ts`, `tests/spec_masteries.test.ts`, `tests/tank_parity.test.ts`,
+and `tests/shaman_stonebound_benchmark.test.ts`.
+
+Instrument: the extended `scripts/nythraxis_matrix.ts` tank Monte Carlo mode
+(`MATRIX_TANK_MC_RUNS=8`, `MATRIX_DIFFICULTY=normal|heroic`), all four boss tanks over
+the identical support roster, production-grounded gear and rotations from the 0.37.1
+parse boards. Threat/s is boss hate-table peak over active tanking seconds; Survival
+keeps this document's pool-over-intake convention. Pool and armor columns here are the
+in-harness raid kits; the BiS-stamina parity frame (`tests/tank_parity.test.ts`) reads
+warrior 2592/3097 EHP 6809, paladin 2498/3264 EHP 6090, bear 2603/3609 EHP 6741,
+Stonebound 2173/3745 EHP 6774.
+
+| Tank | Pool | Armor | DTPS n/h | Survival n/h | Threat/s n/h | Biggest heroic hit | DPS n/h |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Ironguard warrior | 2602 | 2428 | 78 / 171 | 33.2s / 15.2s | 295 / 245 | 1992 (77%) | 38 / 33 |
+| Faithwarden paladin | 2508 | 2537 | 51 / 159 | 49.3s / 15.8s | 317 / 292 | 2135 (85%) | 89 / 70 |
+| Wildfang bear | 2148 | 3765 | 179 / 361 | 12.0s / 5.9s | 263 / 304 | 1968 (92%) | 50 / 43 |
+| Stonebound shaman | 2303 | 2740 | 155 / 397 | 14.9s / 5.8s | 248 / 251 | 1818 (79%) | 80 / 72 |
+
+- **The threat gap is closed.** Heroic ratios to the paladin: warrior 0.84, bear 1.04,
+  Stonebound 0.86 (normal: 0.93 / 0.83 / 0.78). The paladin came DOWN (692 to 292 on
+  heroic with this kit lineage), nobody was inflated to the old paladin number, and
+  flat-threat scaling no longer widens the gap per gear tier.
+- **No tank is one-shot on heroic.** Worst case is the bear at 92% of pool from the
+  biggest observed hit; Stonebound's old literal one-shot (2433 vs a 1733 pool) is
+  gone (1818 vs 2303, with creature crit immunity intact).
+- **The unresolved tradeoff, stated with numbers:** bear and Stonebound unhealed
+  survival (5.8-5.9s heroic) remains roughly 40% of the warrior/paladin tier (15.2 /
+  15.8s) even after the pool and armor gains, because their intake is structural (no
+  block, no Raised Guard tier of cooldowns) and the committed-tank EHP band
+  (`tests/tank_parity.test.ts`, 0.88-1.08 of the warrior) caps how much pool can
+  compensate. Closing it fully means widening that band or new mitigation mechanics:
+  an owner decision, not a tuning one.
+- **The Stonebound off-tank pin moved.** `tests/shaman_stonebound_benchmark.test.ts`
+  pinned Stonebound physical EHP below 0.8 of the prot warrior by design; the posture's
+  new Stamina component puts it at 0.83 on that test's frame (0.995 of the warrior on
+  the BiS-stamina frame, still below the ceiling), so the pin now reads 0.9. Whether
+  Stonebound stays a "below-tier off-tank" or is a full fourth tank is the owner's
+  call; the numbers above are the proposal.
+
 ---
 
 # Cross-cutting findings
