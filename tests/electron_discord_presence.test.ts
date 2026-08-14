@@ -1,0 +1,734 @@
+import { describe, expect, it } from 'vitest';
+import {
+  candidatePipePaths,
+  createDiscordPresence,
+  DISCORD_BASE_BACKOFF_MS,
+  DISCORD_MAX_BACKOFF_MS,
+  DISCORD_MIN_SEND_INTERVAL_MS,
+  resolveDiscordClientId,
+} from '../electron/discord_presence.cjs';
+import { decodeFrames, encodeFrame, OPCODES } from '../electron/discord_presence_codec.cjs';
+
+// The Discord presence connection (electron/discord_presence.cjs) is pure and
+// injected, so the whole state machine runs here with a fake socket, fake
+// timers, and a fake clock. That is the only way these arms get tested at all:
+// the interesting ones are a Discord that is not installed, a Discord that
+// quits mid-session, and an app id that was never registered, and none of the
+// three can be arranged in CI.
+//
+// Every arm asserts through what the fakes were ASKED to do (bytes written,
+// timers armed, log lines emitted) rather than through the readout alone, so a
+// state variable that says 'ready' while nothing reached the socket fails here.
+
+const APP_ID = '123456789012345678';
+const RUNTIME_DIR = '/run/user/1000';
+
+interface ArmedTimer {
+  handle: number;
+  callback: () => void;
+  delayMs: number;
+}
+
+interface FakeSocket {
+  path: string;
+  writes: Buffer[];
+  ended: number;
+  destroyed: number;
+  on: (event: string, listener: (...args: never[]) => void) => unknown;
+  write: (data: unknown) => unknown;
+  end: () => unknown;
+  destroy: () => unknown;
+  emit: (event: string, arg?: unknown) => void;
+}
+
+function createFakeSocket(path: string): FakeSocket {
+  const listeners = new Map<string, ((arg?: unknown) => void)[]>();
+  const socket: FakeSocket = {
+    path,
+    writes: [],
+    ended: 0,
+    destroyed: 0,
+    on: (event, listener) => {
+      const list = listeners.get(event) ?? [];
+      list.push(listener as unknown as (arg?: unknown) => void);
+      listeners.set(event, list);
+      return socket;
+    },
+    write: (data) => {
+      socket.writes.push(data as Buffer);
+      return true;
+    },
+    end: () => {
+      socket.ended += 1;
+      return socket;
+    },
+    destroy: () => {
+      socket.destroyed += 1;
+      return socket;
+    },
+    emit: (event, arg) => {
+      for (const listener of [...(listeners.get(event) ?? [])]) listener(arg);
+    },
+  };
+  return socket;
+}
+
+interface RigOptions {
+  clientId?: string | null;
+  platform?: string;
+  env?: Record<string, string | undefined>;
+  initiallyEnabled?: boolean;
+  minSendIntervalMs?: number;
+  maxBackoffMs?: number;
+}
+
+function createRig(options: RigOptions = {}) {
+  const sockets: FakeSocket[] = [];
+  const timers: ArmedTimer[] = [];
+  const cleared: number[] = [];
+  const warnings: unknown[][] = [];
+  const debugs: unknown[][] = [];
+  const state = {
+    now: 1_000_000,
+    nextHandle: 700,
+    random: 1,
+    connectThrows: false,
+    connectReturnsNull: false,
+  };
+  const presence = createDiscordPresence({
+    clientId: options.clientId === undefined ? APP_ID : options.clientId,
+    connect: (path: string) => {
+      if (state.connectThrows) throw new Error('EACCES');
+      if (state.connectReturnsNull) return null;
+      const socket = createFakeSocket(path);
+      sockets.push(socket);
+      return socket;
+    },
+    platform: options.platform ?? 'linux',
+    env: options.env ?? { XDG_RUNTIME_DIR: RUNTIME_DIR },
+    now: () => state.now,
+    setTimeoutFn: (callback: () => void, delayMs: number) => {
+      state.nextHandle += 1;
+      timers.push({ handle: state.nextHandle, callback, delayMs });
+      return state.nextHandle;
+    },
+    clearTimeoutFn: (handle: unknown) => {
+      cleared.push(handle as number);
+    },
+    random: () => state.random,
+    pid: 4321,
+    log: {
+      warn: (...args: unknown[]) => warnings.push(args),
+      debug: (...args: unknown[]) => debugs.push(args),
+    },
+    initiallyEnabled: options.initiallyEnabled,
+    minSendIntervalMs: options.minSendIntervalMs,
+    maxBackoffMs: options.maxBackoffMs,
+  });
+
+  const live = () => sockets[sockets.length - 1];
+  const framesOf = (socket: FakeSocket) =>
+    socket.writes.flatMap((buffer) => decodeFrames(buffer).frames);
+  const payloadsOf = (socket: FakeSocket) =>
+    framesOf(socket).map((frame) => frame.payload as Record<string, unknown>);
+  /** Deliver one frame the way a socket would: as bytes on a 'data' event. */
+  const feed = (socket: FakeSocket, opcode: number, payload: unknown) => {
+    socket.emit('data', encodeFrame(opcode, payload));
+  };
+  const ready = (socket: FakeSocket) => {
+    socket.emit('connect');
+    feed(socket, OPCODES.FRAME, { cmd: 'DISPATCH', evt: 'READY', data: { v: 1 }, nonce: null });
+  };
+  /** Fire an armed timer at its due time, advancing the clock the way one does. */
+  const fireTimer = (index: number) => {
+    const timer = timers[index];
+    state.now += timer.delayMs;
+    timer.callback();
+  };
+  /** Fail every candidate path, the way a machine with no Discord answers. */
+  const failWholeWalk = () => {
+    for (let guard = 0; guard < 200; guard += 1) {
+      const socket = live();
+      if (!socket) break;
+      const before = sockets.length;
+      socket.emit('error', new Error('ENOENT'));
+      if (sockets.length === before) break;
+    }
+  };
+  /** Bring a connection all the way up with one activity showing. */
+  const bringUp = (activity: unknown) => {
+    presence.setActivity(activity);
+    ready(live());
+    return live();
+  };
+
+  return {
+    presence,
+    sockets,
+    timers,
+    cleared,
+    warnings,
+    debugs,
+    state,
+    live,
+    framesOf,
+    payloadsOf,
+    feed,
+    ready,
+    fireTimer,
+    failWholeWalk,
+    bringUp,
+  };
+}
+
+describe('discord candidate socket paths', () => {
+  it('pins the linux walk, with the sandboxed installs, n-major', () => {
+    const paths = candidatePipePaths('linux', {
+      XDG_RUNTIME_DIR: RUNTIME_DIR,
+      TMPDIR: '/var/tmp',
+    });
+    // Five bases in priority order, and slot 0 for ALL of them before slot 1
+    // for any: a base-major walk would spend nine dead connects on the runtime
+    // directory before reaching the Flatpak socket that actually answers.
+    expect(paths.slice(0, 5)).toEqual([
+      '/run/user/1000/discord-ipc-0',
+      '/run/user/1000/app/com.discordapp.Discord/discord-ipc-0',
+      '/run/user/1000/snap.discord/discord-ipc-0',
+      '/var/tmp/discord-ipc-0',
+      '/tmp/discord-ipc-0',
+    ]);
+    expect(paths.slice(5, 10)).toEqual([
+      '/run/user/1000/discord-ipc-1',
+      '/run/user/1000/app/com.discordapp.Discord/discord-ipc-1',
+      '/run/user/1000/snap.discord/discord-ipc-1',
+      '/var/tmp/discord-ipc-1',
+      '/tmp/discord-ipc-1',
+    ]);
+    expect(paths).toHaveLength(50);
+    expect(paths[49]).toBe('/tmp/discord-ipc-9');
+  });
+
+  it('falls back to /tmp alone when the environment says nothing', () => {
+    const paths = candidatePipePaths('linux', {});
+    expect(paths).toEqual([
+      '/tmp/discord-ipc-0',
+      '/tmp/discord-ipc-1',
+      '/tmp/discord-ipc-2',
+      '/tmp/discord-ipc-3',
+      '/tmp/discord-ipc-4',
+      '/tmp/discord-ipc-5',
+      '/tmp/discord-ipc-6',
+      '/tmp/discord-ipc-7',
+      '/tmp/discord-ipc-8',
+      '/tmp/discord-ipc-9',
+    ]);
+    // An absent env object is the same answer, not a throw: main passes
+    // process.env, but nothing about the signature promises it is populated.
+    expect(candidatePipePaths('linux', undefined)).toEqual(paths);
+  });
+
+  it('never lists the same base twice when TMPDIR is /tmp', () => {
+    const paths = candidatePipePaths('linux', { TMPDIR: '/tmp' });
+    expect(paths).toHaveLength(10);
+    expect(new Set(paths).size).toBe(10);
+  });
+
+  it('gives macOS no flatpak or snap subdirectory', () => {
+    // Neither packaging exists there, so those two would be ten dead connects
+    // each on every walk.
+    const paths = candidatePipePaths('darwin', { XDG_RUNTIME_DIR: RUNTIME_DIR, TMPDIR: '/var/t' });
+    expect(paths.slice(0, 3)).toEqual([
+      '/run/user/1000/discord-ipc-0',
+      '/var/t/discord-ipc-0',
+      '/tmp/discord-ipc-0',
+    ]);
+    expect(paths).toHaveLength(30);
+    expect(paths.some((path) => path.includes('com.discordapp.Discord'))).toBe(false);
+    expect(paths.some((path) => path.includes('snap.discord'))).toBe(false);
+  });
+
+  it('uses named pipes on Windows and ignores the environment there', () => {
+    const paths = candidatePipePaths('win32', { XDG_RUNTIME_DIR: RUNTIME_DIR, TMPDIR: '/var/tmp' });
+    expect(paths).toEqual([
+      '\\\\?\\pipe\\discord-ipc-0',
+      '\\\\?\\pipe\\discord-ipc-1',
+      '\\\\?\\pipe\\discord-ipc-2',
+      '\\\\?\\pipe\\discord-ipc-3',
+      '\\\\?\\pipe\\discord-ipc-4',
+      '\\\\?\\pipe\\discord-ipc-5',
+      '\\\\?\\pipe\\discord-ipc-6',
+      '\\\\?\\pipe\\discord-ipc-7',
+      '\\\\?\\pipe\\discord-ipc-8',
+      '\\\\?\\pipe\\discord-ipc-9',
+    ]);
+  });
+});
+
+describe('discord app id resolution', () => {
+  it('accepts a snowflake and nothing else', () => {
+    // The id is written straight into a handshake, and there is no hardcoded
+    // fallback: everything unusable has to resolve to null so the feature stays
+    // inert rather than dialing with junk.
+    expect(resolveDiscordClientId({ WOC_DISCORD_APP_ID: APP_ID })).toBe(APP_ID);
+    expect(resolveDiscordClientId({ WOC_DISCORD_APP_ID: '1'.repeat(15) })).toBe('1'.repeat(15));
+    expect(resolveDiscordClientId({ WOC_DISCORD_APP_ID: '1'.repeat(22) })).toBe('1'.repeat(22));
+    for (const junk of [
+      '1'.repeat(14),
+      '1'.repeat(23),
+      '12345678901234567a',
+      ' 123456789012345678',
+      '123456789012345678 ',
+      '',
+      '-123456789012345678',
+    ]) {
+      expect(
+        resolveDiscordClientId({ WOC_DISCORD_APP_ID: junk }),
+        `${JSON.stringify(junk)} must not resolve to an app id`,
+      ).toBeNull();
+    }
+    expect(resolveDiscordClientId({})).toBeNull();
+    expect(resolveDiscordClientId(undefined)).toBeNull();
+  });
+});
+
+describe('discord presence connection (electron/discord_presence.cjs)', () => {
+  it('pins the pacing and backoff constants to their literals', () => {
+    // The send floor is Discord's own rate limit; the ceiling is how long a
+    // player who never runs Discord waits between pointless walks.
+    expect(DISCORD_MIN_SEND_INTERVAL_MS).toBe(15000);
+    expect(DISCORD_BASE_BACKOFF_MS).toBe(2000);
+    expect(DISCORD_MAX_BACKOFF_MS).toBe(60000);
+  });
+
+  it('does no IO at construction', () => {
+    // main.cjs builds this at module scope, before the window exists. A socket
+    // or a timer here would be boot-path work for a player who may never enter
+    // the world.
+    const rig = createRig();
+    expect(rig.sockets).toEqual([]);
+    expect(rig.timers).toEqual([]);
+    expect(rig.presence.stateForTest().state).toBe('idle');
+  });
+
+  it('connects only when there is something to show', () => {
+    const rig = createRig({ initiallyEnabled: false });
+    rig.presence.setEnabled(true);
+    expect(rig.sockets).toEqual([]);
+    // A clear with nothing running is not a reason to dial either.
+    rig.presence.setActivity(null);
+    expect(rig.sockets).toEqual([]);
+    rig.presence.setActivity({ details: 'Eastbrook' });
+    expect(rig.sockets).toHaveLength(1);
+    expect(rig.sockets[0].path).toBe('/run/user/1000/discord-ipc-0');
+    expect(rig.presence.stateForTest().state).toBe('connecting');
+  });
+
+  it('stays completely inert without an app id', () => {
+    const rig = createRig({ clientId: null });
+    rig.presence.setActivity({ details: 'Eastbrook' });
+    rig.presence.setEnabled(true);
+    rig.presence.setActivity({ details: 'Vale of Kings' });
+    expect(rig.sockets).toEqual([]);
+    expect(rig.timers).toEqual([]);
+    expect(rig.warnings).toEqual([]);
+    expect(rig.presence.stateForTest().state).toBe('absent');
+  });
+
+  it('sends the handshake with the app id as soon as a socket comes up', () => {
+    const rig = createRig();
+    rig.presence.setActivity({ details: 'Eastbrook' });
+    const socket = rig.live();
+    socket.emit('connect');
+    expect(rig.framesOf(socket)).toEqual([
+      { opcode: OPCODES.HANDSHAKE, payload: { v: 1, client_id: APP_ID } },
+    ]);
+    expect(rig.presence.stateForTest().state).toBe('handshaking');
+  });
+
+  it('walks to the next candidate path when a socket fails to come up', () => {
+    const rig = createRig();
+    rig.presence.setActivity({ details: 'Eastbrook' });
+    rig.live().emit('error', new Error('ENOENT'));
+    expect(rig.sockets).toHaveLength(2);
+    expect(rig.sockets[1].path).toBe('/run/user/1000/app/com.discordapp.Discord/discord-ipc-0');
+    // The refused socket is released rather than left half-open.
+    expect(rig.sockets[0].destroyed).toBe(1);
+    // A close with no error is the same event (a pipe that accepted and hung up).
+    rig.live().emit('close');
+    expect(rig.sockets).toHaveLength(3);
+    expect(rig.sockets[2].path).toBe('/run/user/1000/snap.discord/discord-ipc-0');
+    // And a connect() that THROWS (EACCES on a socket owned by another user)
+    // must not escape into the caller's setActivity.
+    rig.state.connectThrows = true;
+    expect(() => rig.live().emit('error', new Error('ENOENT'))).not.toThrow();
+  });
+
+  it('treats a machine with no Discord as silent, with a jittered backoff', () => {
+    const rig = createRig();
+    rig.presence.setActivity({ details: 'Eastbrook' });
+    rig.failWholeWalk();
+    // Forty candidates on this env (four bases, ten slots), all refused.
+    expect(rig.presence.stateForTest().connectAttempts).toBe(40);
+    // The common case for most players: nothing above debug, ever.
+    expect(rig.warnings).toEqual([]);
+    expect(rig.debugs.length).toBeGreaterThan(0);
+    expect(rig.timers).toHaveLength(1);
+    // random() pinned at 1 makes the jitter factor exactly 1.
+    expect(rig.timers[0].delayMs).toBe(DISCORD_BASE_BACKOFF_MS);
+    expect(rig.presence.stateForTest().state).toBe('backoff');
+    // Half the base at the other end of the jitter range, so the factor is
+    // really 0.5 + random()/2 rather than a constant.
+    const low = createRig();
+    low.state.random = 0;
+    low.presence.setActivity({ details: 'Eastbrook' });
+    low.failWholeWalk();
+    expect(low.timers[0].delayMs).toBe(DISCORD_BASE_BACKOFF_MS / 2);
+  });
+
+  it('doubles the backoff on each failed walk and stops at the ceiling', () => {
+    const rig = createRig({ env: {}, maxBackoffMs: 5000 });
+    rig.presence.setActivity({ details: 'Eastbrook' });
+    rig.failWholeWalk();
+    const delays: number[] = [rig.timers[0].delayMs];
+    for (let round = 1; round < 4; round += 1) {
+      rig.fireTimer(round - 1);
+      rig.failWholeWalk();
+      delays.push(rig.timers[round].delayMs);
+    }
+    expect(delays).toEqual([2000, 4000, 5000, 5000]);
+    // Ten candidates per walk on the bare env, and every walk really happened.
+    expect(rig.presence.stateForTest().connectAttempts).toBe(40);
+  });
+
+  it('does not reconnect for a player who turned it off, or with nothing to show', () => {
+    const rig = createRig();
+    rig.presence.setActivity({ details: 'Eastbrook' });
+    rig.failWholeWalk();
+    rig.presence.setActivity(null);
+    rig.fireTimer(0);
+    expect(rig.sockets).toHaveLength(40);
+    expect(rig.presence.stateForTest().state).toBe('idle');
+    // And it is not stuck: the next real activity dials again.
+    rig.presence.setActivity({ details: 'Vale of Kings' });
+    expect(rig.sockets).toHaveLength(41);
+  });
+
+  it('sends the desired activity as soon as Discord answers READY', () => {
+    const rig = createRig();
+    const socket = rig.bringUp({ details: 'Eastbrook', timestamps: { start: 17 } });
+    expect(rig.presence.stateForTest().state).toBe('ready');
+    expect(rig.framesOf(socket)[1]).toEqual({
+      opcode: OPCODES.FRAME,
+      payload: {
+        cmd: 'SET_ACTIVITY',
+        args: { pid: 4321, activity: { details: 'Eastbrook', timestamps: { start: 17 } } },
+        nonce: 'woc-1',
+      },
+    });
+    expect(rig.presence.stateForTest().pendingNonce).toBe('woc-1');
+    // A working connection forgives the backoff: a later drop is a new problem.
+    expect(rig.presence.stateForTest().backoffMs).toBe(0);
+  });
+
+  it('answers a PING with a PONG that echoes its payload', () => {
+    const rig = createRig();
+    const socket = rig.bringUp({ details: 'Eastbrook' });
+    rig.feed(socket, OPCODES.PING, { beat: 7 });
+    const frames = rig.framesOf(socket);
+    expect(frames[frames.length - 1]).toEqual({
+      opcode: OPCODES.PONG,
+      payload: { beat: 7 },
+    });
+  });
+
+  it('stops for good when the app id is refused before READY', () => {
+    const rig = createRig();
+    rig.presence.setActivity({ details: 'Eastbrook' });
+    const socket = rig.live();
+    socket.emit('connect');
+    // The probe-confirmed refusal shape for an unregistered client_id.
+    rig.feed(socket, OPCODES.CLOSE, { code: 4000, message: 'Invalid Client ID' });
+    expect(rig.presence.stateForTest().state).toBe('invalid-client');
+    // Exactly one line, and it carries the code and message an operator needs.
+    expect(rig.warnings).toHaveLength(1);
+    expect(rig.warnings[0]).toContain(4000);
+    expect(rig.warnings[0]).toContain('Invalid Client ID');
+    expect(socket.destroyed).toBe(1);
+    // No retry storm: nothing armed, and nothing later re-arms it. A hot loop
+    // here would hammer the daemon for the whole session.
+    expect(rig.timers).toEqual([]);
+    rig.presence.setActivity({ details: 'Vale of Kings' });
+    rig.presence.setEnabled(false);
+    rig.presence.setEnabled(true);
+    rig.presence.setActivity({ details: 'Ironforge Road' });
+    expect(rig.sockets).toHaveLength(1);
+    expect(rig.timers).toEqual([]);
+  });
+
+  it('treats a CLOSE on a working connection as a disconnect, not a refusal', () => {
+    // Discord quitting sends the same opcode. Going terminal here would leave
+    // presence dead for the rest of the session over a normal restart.
+    const rig = createRig();
+    const socket = rig.bringUp({ details: 'Eastbrook' });
+    rig.feed(socket, OPCODES.CLOSE, { code: 1000, message: 'closing' });
+    expect(rig.presence.stateForTest().state).toBe('backoff');
+    expect(rig.warnings).toEqual([]);
+    expect(rig.timers).toHaveLength(1);
+  });
+
+  it('re-sends the desired activity after a drop and a fresh READY', () => {
+    const rig = createRig();
+    const first = rig.bringUp({ details: 'Eastbrook' });
+    rig.feed(first, OPCODES.FRAME, { cmd: 'SET_ACTIVITY', evt: null, data: null, nonce: 'woc-1' });
+    first.emit('close');
+    expect(rig.presence.stateForTest().state).toBe('backoff');
+    rig.fireTimer(0);
+    const second = rig.live();
+    expect(second).not.toBe(first);
+    rig.ready(second);
+    // The rate limit spans the reconnect rather than being reset by it: the
+    // floor is Discord's, and a flapping socket must not become a way to send
+    // faster than it allows. So the re-send is armed for the remainder of the
+    // window (2000 ms of it were spent in the backoff) rather than written now.
+    expect(rig.framesOf(second)).toHaveLength(1);
+    expect(rig.timers[1].delayMs).toBe(DISCORD_MIN_SEND_INTERVAL_MS - 2000);
+    rig.fireTimer(1);
+    // The SAME activity goes out again: the dedup is per connection, because a
+    // new socket has been told nothing, and skipping it would leave the player
+    // with a blank presence until their next zone change.
+    const sent = rig.payloadsOf(second)[1];
+    expect(sent.cmd).toBe('SET_ACTIVITY');
+    expect(sent.args).toEqual({ pid: 4321, activity: { details: 'Eastbrook' } });
+  });
+
+  it('paces updates on the trailing edge, sending the LATEST value', () => {
+    const rig = createRig();
+    const socket = rig.bringUp({ details: 'Eastbrook' });
+    rig.feed(socket, OPCODES.FRAME, { cmd: 'SET_ACTIVITY', evt: null, data: null, nonce: 'woc-1' });
+    rig.state.now += 1000;
+    rig.presence.setActivity({ details: 'Vale of Kings' });
+    // Inside the floor: nothing written, one timer armed for the remainder.
+    expect(rig.framesOf(socket)).toHaveLength(2);
+    expect(rig.timers).toHaveLength(1);
+    expect(rig.timers[0].delayMs).toBe(DISCORD_MIN_SEND_INTERVAL_MS - 1000);
+    // A third zone before the timer fires REPLACES the second rather than
+    // queueing behind it: a presence line that replays four stale zones is
+    // worse than one that skipped them.
+    rig.presence.setActivity({ details: 'Ironforge Road' });
+    expect(rig.timers).toHaveLength(1);
+    rig.fireTimer(0);
+    const frames = rig.framesOf(socket);
+    expect(frames).toHaveLength(3);
+    const payload = frames[2].payload as Record<string, unknown>;
+    expect(payload.args).toEqual({ pid: 4321, activity: { details: 'Ironforge Road' } });
+    expect(payload.nonce).toBe('woc-2');
+  });
+
+  it('writes nothing when the activity has not actually changed', () => {
+    const rig = createRig();
+    const socket = rig.bringUp({ details: 'Eastbrook' });
+    rig.feed(socket, OPCODES.FRAME, { cmd: 'SET_ACTIVITY', evt: null, data: null, nonce: 'woc-1' });
+    rig.state.now += DISCORD_MIN_SEND_INTERVAL_MS * 2;
+    // A fresh object with the same content: the renderer rebuilds its payload
+    // on every world tick it reports from, so reference equality would never
+    // fire and every tick would cost a frame.
+    rig.presence.setActivity({ details: 'Eastbrook' });
+    expect(rig.framesOf(socket)).toHaveLength(2);
+    expect(rig.timers).toEqual([]);
+    // Key ORDER is not a change either.
+    rig.presence.setActivity({ timestamps: { start: 5 }, details: 'Eastbrook' });
+    expect(rig.framesOf(socket)).toHaveLength(3);
+    rig.feed(socket, OPCODES.FRAME, { cmd: 'SET_ACTIVITY', evt: null, data: null, nonce: 'woc-2' });
+    rig.state.now += DISCORD_MIN_SEND_INTERVAL_MS;
+    rig.presence.setActivity({ details: 'Eastbrook', timestamps: { start: 5 } });
+    expect(rig.framesOf(socket)).toHaveLength(3);
+  });
+
+  it('holds the next update until the one in flight is answered', () => {
+    const rig = createRig();
+    const socket = rig.bringUp({ details: 'Eastbrook' });
+    rig.state.now += DISCORD_MIN_SEND_INTERVAL_MS * 2;
+    rig.presence.setActivity({ details: 'Vale of Kings' });
+    // Outside the rate-limit window, so only the in-flight nonce is holding it.
+    expect(rig.framesOf(socket)).toHaveLength(2);
+    expect(rig.timers).toEqual([]);
+    rig.feed(socket, OPCODES.FRAME, { cmd: 'SET_ACTIVITY', evt: null, data: null, nonce: 'woc-1' });
+    const payload = rig.payloadsOf(socket)[2];
+    expect(payload.args).toEqual({ pid: 4321, activity: { details: 'Vale of Kings' } });
+    // An echo for a nonce we are not waiting on changes nothing.
+    rig.feed(socket, OPCODES.FRAME, { cmd: 'SET_ACTIVITY', evt: null, data: null, nonce: 'woc-9' });
+    expect(rig.presence.stateForTest().pendingNonce).toBe('woc-2');
+  });
+
+  it('logs a rejected update once and moves on rather than retrying it', () => {
+    const rig = createRig();
+    const socket = rig.bringUp({ details: 'Eastbrook' });
+    rig.feed(socket, OPCODES.FRAME, {
+      cmd: 'SET_ACTIVITY',
+      evt: 'ERROR',
+      data: { code: 4000, message: 'Invalid activity' },
+      nonce: 'woc-1',
+    });
+    expect(rig.warnings).toHaveLength(1);
+    // Treated as delivered: the refused payload is NOT written again, or the
+    // pair would loop for as long as the connection lived.
+    expect(rig.framesOf(socket)).toHaveLength(2);
+    expect(rig.presence.stateForTest().pendingNonce).toBeNull();
+    // A second rejection is silent; one line per run is the contract.
+    rig.state.now += DISCORD_MIN_SEND_INTERVAL_MS;
+    rig.presence.setActivity({ details: 'Vale of Kings' });
+    rig.feed(socket, OPCODES.FRAME, {
+      cmd: 'SET_ACTIVITY',
+      evt: 'ERROR',
+      data: { code: 4000, message: 'Invalid activity' },
+      nonce: 'woc-2',
+    });
+    expect(rig.warnings).toHaveLength(1);
+  });
+
+  it('clears the presence and closes the socket when the player turns it off', () => {
+    const rig = createRig();
+    const socket = rig.bringUp({ details: 'Eastbrook' });
+    rig.presence.setEnabled(false);
+    const last = rig.framesOf(socket)[2];
+    // The clear shape: pid only, no activity key. Leaving a stale line in
+    // Discord's UI is exactly what the toggle promises not to do.
+    expect(last).toEqual({
+      opcode: OPCODES.FRAME,
+      payload: { cmd: 'SET_ACTIVITY', args: { pid: 4321 }, nonce: 'woc-2' },
+    });
+    expect(socket.ended).toBe(1);
+    expect(socket.destroyed).toBe(1);
+    expect(rig.presence.stateForTest().state).toBe('off');
+    expect(rig.presence.stateForTest().desiredActivity).toBeNull();
+    // Re-enabling arms nothing by itself; the next activity is what dials.
+    rig.presence.setEnabled(true);
+    expect(rig.sockets).toHaveLength(1);
+    rig.presence.setActivity({ details: 'Vale of Kings' });
+    expect(rig.sockets).toHaveLength(2);
+  });
+
+  it('cancels a pending reconnect when the player turns it off', () => {
+    const rig = createRig({ env: {} });
+    rig.presence.setActivity({ details: 'Eastbrook' });
+    rig.failWholeWalk();
+    expect(rig.timers).toHaveLength(1);
+    rig.presence.setEnabled(false);
+    expect(rig.cleared).toContain(rig.timers[0].handle);
+    // Even if the cancelled timer somehow fires, it must not dial.
+    const dialed = rig.sockets.length;
+    rig.timers[0].callback();
+    expect(rig.sockets).toHaveLength(dialed);
+  });
+
+  it('sends a clear through the same rate limiter when the activity goes away', () => {
+    const rig = createRig();
+    const socket = rig.bringUp({ details: 'Eastbrook' });
+    rig.feed(socket, OPCODES.FRAME, { cmd: 'SET_ACTIVITY', evt: null, data: null, nonce: 'woc-1' });
+    rig.state.now += 5000;
+    rig.presence.setActivity(null);
+    // Inside the window, so it waits its turn like any other update.
+    expect(rig.framesOf(socket)).toHaveLength(2);
+    rig.fireTimer(0);
+    const payload = rig.payloadsOf(socket)[2];
+    expect(payload.args).toEqual({ pid: 4321 });
+    expect(rig.presence.stateForTest().lastSentActivity).toBeNull();
+  });
+
+  it('drops a corrupt stream without a warning and reconnects', () => {
+    const rig = createRig();
+    const socket = rig.bringUp({ details: 'Eastbrook' });
+    const bad = Buffer.alloc(8);
+    bad.writeUInt32LE(9, 0);
+    bad.writeUInt32LE(4, 4);
+    socket.emit('data', bad);
+    expect(socket.destroyed).toBe(1);
+    expect(rig.warnings).toEqual([]);
+    expect(rig.presence.stateForTest().state).toBe('backoff');
+    expect(rig.timers).toHaveLength(1);
+  });
+
+  it('reassembles a READY that arrives in two chunks', () => {
+    // The real socket splits wherever the kernel decides; a manager that only
+    // ever saw whole frames in tests would work on every machine but one.
+    const rig = createRig();
+    rig.presence.setActivity({ details: 'Eastbrook' });
+    const socket = rig.live();
+    socket.emit('connect');
+    const frame = encodeFrame(OPCODES.FRAME, { cmd: 'DISPATCH', evt: 'READY', data: {} });
+    socket.emit('data', frame.subarray(0, 5));
+    expect(rig.presence.stateForTest().state).toBe('handshaking');
+    socket.emit('data', frame.subarray(5));
+    expect(rig.presence.stateForTest().state).toBe('ready');
+    expect(rig.framesOf(socket)).toHaveLength(2);
+  });
+
+  it('goes inert on dispose', () => {
+    const rig = createRig();
+    const socket = rig.bringUp({ details: 'Eastbrook' });
+    rig.state.now += DISCORD_MIN_SEND_INTERVAL_MS;
+    rig.presence.setActivity({ details: 'Vale of Kings' });
+    rig.presence.dispose();
+    expect(socket.destroyed).toBe(1);
+    expect(rig.presence.stateForTest().state).toBe('disposed');
+    const writes = rig.framesOf(socket).length;
+    rig.presence.setActivity({ details: 'Ironforge Road' });
+    rig.presence.setEnabled(true);
+    expect(rig.sockets).toHaveLength(1);
+    expect(rig.framesOf(socket)).toHaveLength(writes);
+    // Late socket events during teardown must not resurrect the walk.
+    socket.emit('close');
+    expect(rig.sockets).toHaveLength(1);
+    expect(rig.timers).toEqual([]);
+  });
+
+  it('refuses a missing dependency or a non-positive interval at construction', () => {
+    // One case per injected function per failure mode: every one of these is a
+    // wiring mistake in main.cjs that would otherwise surface as a silent dead
+    // feature (or a throw inside a socket event) long after boot.
+    const base: Record<string, unknown> = {
+      clientId: APP_ID,
+      connect: () => null,
+      platform: 'linux',
+      env: {},
+      now: () => 0,
+      setTimeoutFn: () => 1,
+      clearTimeoutFn: () => {},
+      random: () => 0.5,
+      pid: 10,
+      log: { warn: () => {}, debug: () => {} },
+    };
+    const build = (overrides: Record<string, unknown> = {}) =>
+      createDiscordPresence({ ...base, ...overrides } as unknown as Parameters<
+        typeof createDiscordPresence
+      >[0]);
+    // The defaults are valid, so the guard cannot be satisfied by refusing
+    // everything.
+    expect(() => build()).not.toThrow();
+    for (const field of ['connect', 'now', 'setTimeoutFn', 'clearTimeoutFn', 'random']) {
+      expect(() => build({ [field]: undefined }), `${field} must be required`).toThrow(TypeError);
+      expect(() => build({ [field]: 'not a function' }), `${field} must be a function`).toThrow(
+        TypeError,
+      );
+    }
+    expect(() => build({ pid: 1.5 })).toThrow(TypeError);
+    // A log without debug would throw inside a socket event instead, i.e. on
+    // the machine of the one player whose Discord is missing.
+    expect(() => build({ log: { warn: () => {} } })).toThrow(TypeError);
+    for (const bad of [0, -1, Number.POSITIVE_INFINITY, Number.NaN]) {
+      expect(() => build({ minSendIntervalMs: bad })).toThrow(TypeError);
+      expect(() => build({ maxBackoffMs: bad })).toThrow(TypeError);
+    }
+  });
+
+  it('honors an injected send floor rather than the default', () => {
+    const rig = createRig({ minSendIntervalMs: 400 });
+    const socket = rig.bringUp({ details: 'Eastbrook' });
+    rig.feed(socket, OPCODES.FRAME, { cmd: 'SET_ACTIVITY', evt: null, data: null, nonce: 'woc-1' });
+    rig.state.now += 399;
+    rig.presence.setActivity({ details: 'Vale of Kings' });
+    expect(rig.timers[0].delayMs).toBe(1);
+    rig.fireTimer(0);
+    expect(rig.framesOf(socket)).toHaveLength(3);
+  });
+});

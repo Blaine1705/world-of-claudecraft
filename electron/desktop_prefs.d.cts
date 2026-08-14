@@ -11,6 +11,7 @@ export interface DesktopPrefs {
   maximized: boolean;
   gpuForceOptOut: boolean;
   displayMode: DesktopDisplayMode;
+  discordPresenceEnabled: boolean;
   windowBounds?: WindowRect;
   displayId?: number;
 }

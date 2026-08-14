@@ -14,6 +14,10 @@ const {
   shell,
 } = require('electron');
 const fs = require('node:fs');
+// Node's net, not Electron's: the presence socket is a local unix socket (a
+// named pipe on Windows), and the electron `net` destructured above is the
+// Chromium HTTP stack, which cannot open one.
+const nodeNet = require('node:net');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const {
@@ -42,6 +46,7 @@ const {
 } = require('./window_memory.cjs');
 const { createPowerSave } = require('./power_save.cjs');
 const { createNotifyGuard } = require('./notify_guard.cjs');
+const { createDiscordPresence, resolveDiscordClientId } = require('./discord_presence.cjs');
 const { createSteamShell } = require('./steam.cjs');
 const { createEpicShell } = require('./epic.cjs');
 const { PRODUCTION_API_ORIGIN } = require('./update_guard.cjs');
@@ -372,6 +377,26 @@ const powerSave = createPowerSave({
 // The pacing authority for OS notifications (electron/notify_guard.cjs). Main
 // side, because the renderer is not trusted to pace a surface outside the game.
 const notifyGuard = createNotifyGuard({ now: () => Date.now() });
+
+// Discord Rich Presence (electron/discord_presence.cjs owns the protocol and
+// every failure arm). Built here at module scope because construction does no
+// IO: the first candidate socket is dialed when the game first has something to
+// show, not at boot. The app id comes from the environment and nowhere else, so
+// a build that was never registered with Discord stays inert rather than
+// reporting presence as somebody else's application.
+const discordPresence = createDiscordPresence({
+  clientId: resolveDiscordClientId(process.env),
+  connect: (p) => nodeNet.createConnection(p),
+  platform: process.platform,
+  env: process.env,
+  now: () => Date.now(),
+  setTimeoutFn: setTimeout,
+  clearTimeoutFn: clearTimeout,
+  random: Math.random,
+  pid: process.pid,
+  log,
+  initiallyEnabled: desktopPrefs.discordPresenceEnabled,
+});
 
 // The single send site for 'desktop-presentation-changed'. The renderer cannot
 // work hidden-ness out for itself: the game window sets backgroundThrottling:false,
@@ -1020,6 +1045,71 @@ ipcMain.handle('desktop-show-notification', (event, payload) => {
   return true;
 });
 
+// The Discord Rich Presence line. The renderer decides WHAT to report (it is
+// the only side that knows the zone, and it is the side with a catalog, so the
+// string arrives already rendered by its t()); main decides what may leave the
+// machine. The whitelist is the whole point: a fresh object is built from two
+// validated fields, so no renderer prototype, no getter, and no extra key the
+// page invented crosses into a payload sent to another program.
+// details is clamped to 128 through clampText, which also flattens control and
+// invisible-formatting characters, because this string lands in a surface other
+// people read. Timestamps are REFUSED rather than stripped when malformed: a
+// start main silently dropped would show an elapsed timer that is simply wrong,
+// and the renderer would have no way to learn it never landed.
+// The pacing, the connection, and every failure arm live in
+// electron/discord_presence.cjs; a shell with no Discord running does nothing
+// here but return true.
+ipcMain.handle('desktop-set-discord-activity', (event, payload) => {
+  if (!trustedSender(event)) return false;
+  // Null is the CLEAR, and it is the one payload with nothing to validate: the
+  // renderer sends it when the player leaves the world or hides their presence.
+  if (payload === null) {
+    discordPresence.setActivity(null);
+    return true;
+  }
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return false;
+  if (typeof payload.details !== 'string') return false;
+  const details = clampText(payload.details, 128);
+  if (details.trim() === '') return false;
+  let clean = { details };
+  if (payload.timestamps !== undefined) {
+    const timestamps = payload.timestamps;
+    if (!timestamps || typeof timestamps !== 'object' || Array.isArray(timestamps)) return false;
+    const start = timestamps.start;
+    // A safe positive integer only: this is a unix timestamp in epoch SECONDS
+    // (the renderer builder's contract; Discord auto-detects the magnitude)
+    // rendered as a live counter, so a float, a NaN, or a zero would show the
+    // player a timer running from the epoch.
+    if (!Number.isSafeInteger(start) || start <= 0) return false;
+    clean = { details, timestamps: { start } };
+  }
+  discordPresence.setActivity(clean);
+  return true;
+});
+
+// The player's Discord presence setting (Options > Interface). Stored like the
+// other shell preferences AND applied live, because the toggle's promise is
+// that turning it off removes the line from Discord now, not at the next
+// launch. Persisted first, so a value that could not be written is not applied
+// to a session the next launch would start differently.
+ipcMain.handle('desktop-set-discord-presence-enabled', (event, enabled) => {
+  if (!trustedSender(event)) return false;
+  // Strictly boolean: anything else is a bug or a probe, and neither may write.
+  if (enabled !== true && enabled !== false) return false;
+  // Idempotent on purpose, and BEFORE the save: the renderer's world-entry
+  // apply-all loop re-sends the reflected value, so without this early return
+  // every world entry would rewrite the prefs file and re-run the clear/connect
+  // transition for a setting that did not change.
+  if (enabled === desktopPrefs.discordPresenceEnabled) return true;
+  if (!saveDesktopPrefs(desktopPrefsPath, { ...desktopPrefs, discordPresenceEnabled: enabled })) {
+    log.warn('[discord] could not persist the presence preference');
+    return false;
+  }
+  desktopPrefs.discordPresenceEnabled = enabled;
+  discordPresence.setEnabled(enabled);
+  return true;
+});
+
 // Uncaught renderer errors forwarded by the preload. The preload clamps and
 // caps, but main re-validates and re-caps without trusting it
 // (electron/diagnostics.cjs); a malformed payload is dropped silently.
@@ -1223,4 +1313,7 @@ app.on('window-all-closed', () => {
 // hangs off quit rather than off 'window-all-closed'.
 app.on('will-quit', () => {
   powerSave.shutdown();
+  // Same reasoning for the presence socket: a reconnect timer that survived
+  // the quit would hold a handle open behind a process on its way out.
+  discordPresence.dispose();
 });

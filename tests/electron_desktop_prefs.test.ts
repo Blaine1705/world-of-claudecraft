@@ -52,6 +52,7 @@ describe('desktop prefs schema', () => {
       maximized: false,
       gpuForceOptOut: false,
       displayMode: 'borderless',
+      discordPresenceEnabled: true,
     });
   });
 
@@ -63,6 +64,7 @@ describe('desktop prefs schema', () => {
       maximized: true,
       gpuForceOptOut: true,
       displayMode: 'windowed',
+      discordPresenceEnabled: false,
       // Junk a hand-edited file could carry; none of it may survive.
       apiOrigin: 'https://evil.example',
       extra: 'nope',
@@ -74,8 +76,10 @@ describe('desktop prefs schema', () => {
       maximized: true,
       gpuForceOptOut: true,
       displayMode: 'windowed',
+      discordPresenceEnabled: false,
     });
     expect(Object.keys(prefs).sort()).toEqual([
+      'discordPresenceEnabled',
       'displayId',
       'displayMode',
       'gpuForceOptOut',
@@ -136,6 +140,28 @@ describe('desktop prefs schema', () => {
     expect(sanitizeDesktopPrefs({ version: 1, maximized: true }).maximized).toBe(true);
     expect(sanitizeDesktopPrefs({ version: 1, gpuForceOptOut: true }).gpuForceOptOut).toBe(true);
     expect(sanitizeDesktopPrefs({ version: 1, maximized: false }).maximized).toBe(false);
+  });
+
+  it('takes the Discord presence toggle strictly, defaulting to ON', () => {
+    // Its default is the opposite polarity from the other two booleans, so the
+    // junk arms here prove the FALLBACK is per field rather than a shared
+    // false: a helper that hardcoded false would pass every arm above and turn
+    // this feature off for every player who never touched the setting.
+    for (const junk of ['false', 'true', 0, 1, null, {}, 'no']) {
+      expect(
+        sanitizeDesktopPrefs({ version: 1, discordPresenceEnabled: junk }).discordPresenceEnabled,
+        `discordPresenceEnabled ${JSON.stringify(junk)} must resolve to the default`,
+      ).toBe(true);
+    }
+    expect(
+      sanitizeDesktopPrefs({ version: 1, discordPresenceEnabled: false }).discordPresenceEnabled,
+    ).toBe(false);
+    expect(
+      sanitizeDesktopPrefs({ version: 1, discordPresenceEnabled: true }).discordPresenceEnabled,
+    ).toBe(true);
+    // Absent is the normal reading of a file written before the field existed,
+    // which is why the schema version did not move for it.
+    expect(sanitizeDesktopPrefs({ version: 1, maximized: true }).discordPresenceEnabled).toBe(true);
   });
 
   it('takes the display mode as an exact literal, defaulting to borderless', () => {
@@ -213,6 +239,7 @@ describe('loadDesktopPrefs', () => {
       maximized: true,
       gpuForceOptOut: true,
       displayMode: 'windowed',
+      discordPresenceEnabled: false,
     };
     expect(saveDesktopPrefs(filePath, saved)).toBe(true);
     // mkdir recursive: the userData subdirectory may not exist on a first run.
@@ -225,6 +252,9 @@ describe('loadDesktopPrefs', () => {
       maximized: true,
       gpuForceOptOut: true,
       displayMode: 'windowed',
+      // An OFF toggle survives the file: the default is ON, so a field that
+      // failed to persist would read back as the value the player rejected.
+      discordPresenceEnabled: false,
     });
   });
 
@@ -381,6 +411,7 @@ describe('loadDesktopPrefs', () => {
       maximized: true,
       gpuForceOptOut: false,
       displayMode: 'borderless',
+      discordPresenceEnabled: true,
     });
     expect(Object.prototype).not.toHaveProperty('polluted');
     expect(({} as Record<string, unknown>).polluted).toBeUndefined();
@@ -410,7 +441,7 @@ describe('saveDesktopPrefs', () => {
     // downgrade to a following write, so pin it literally: 'wx' is O_EXCL.
     expect(calls).toEqual([
       'mkdir:/userdata:true',
-      'write:{"version":1,"maximized":false,"gpuForceOptOut":true,"displayMode":"borderless"}:utf8:wx',
+      'write:{"version":1,"maximized":false,"gpuForceOptOut":true,"displayMode":"borderless","discordPresenceEnabled":true}:utf8:wx',
       'rename:<staged>:/userdata/desktop-prefs.json',
     ]);
     // Staged beside the target, under an unpredictable name: a fixed sibling is
@@ -490,6 +521,7 @@ describe('saveDesktopPrefs', () => {
       maximized: false,
       gpuForceOptOut: true,
       displayMode: 'borderless',
+      discordPresenceEnabled: true,
     });
   });
 

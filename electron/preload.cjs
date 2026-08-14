@@ -209,6 +209,38 @@ contextBridge.exposeInMainWorld('wocDesktop', {
       ipcRenderer.invoke('desktop-show-notification', message).catch(() => {});
     } catch {}
   },
+  // The Discord Rich Presence line, with the details string already rendered by
+  // the renderer's t(). null is the clear. Rebuilt into a fresh object (nested
+  // timestamps included) so no renderer prototype crosses the bridge, and
+  // pre-capped so a hostile page cannot ship an unbounded string across the IPC
+  // (main re-clamps to the visible 128 without trusting this cap). Fire-and-
+  // forget: it returns nothing, swallows the rejection, and guards the
+  // synchronous throw, because a shell that cannot report presence must never
+  // surface an error in the caller's path.
+  setDiscordActivity: (activity) => {
+    let message = null;
+    if (activity !== null) {
+      if (!activity || typeof activity !== 'object') return;
+      if (typeof activity.details !== 'string') return;
+      message = { details: activity.details.slice(0, 256) };
+      const timestamps = activity.timestamps;
+      if (timestamps && typeof timestamps === 'object' && typeof timestamps.start === 'number') {
+        message.timestamps = { start: timestamps.start };
+      }
+    }
+    try {
+      ipcRenderer.invoke('desktop-set-discord-activity', message).catch(() => {});
+    } catch {}
+  },
+  // The player's Discord presence setting. Refused here unless it is a real
+  // boolean, so main only ever sees a value it can store; fire-and-forget for
+  // the same reason as the activity above.
+  setDiscordPresenceEnabled: (enabled) => {
+    if (enabled !== true && enabled !== false) return;
+    try {
+      ipcRenderer.invoke('desktop-set-discord-presence-enabled', enabled).catch(() => {});
+    } catch {}
+  },
   // Whether the shell's window is minimized or hidden, pushed from the main
   // process because the page cannot see it: the window sets
   // backgroundThrottling:false, which keeps document.visibilityState at

@@ -88,6 +88,7 @@ function defaultDesktopPrefs() {
     maximized: false,
     gpuForceOptOut: false,
     displayMode: 'borderless',
+    discordPresenceEnabled: true,
   };
 }
 
@@ -117,6 +118,11 @@ function sanitizeDesktopPrefs(input) {
   // resolves to the default like any other unusable value, which is why the
   // schema version does not move for it.
   prefs.displayMode = readDisplayMode(input.displayMode, 'borderless');
+  // Additive since the version was stamped, so an ABSENT discordPresenceEnabled
+  // is the normal reading of a file written by an older build, not a corrupt
+  // one: it resolves to the default like any other unusable value, which is why
+  // the schema version does not move for it.
+  prefs.discordPresenceEnabled = readBoolean(input.discordPresenceEnabled, true);
   return prefs;
 }
 

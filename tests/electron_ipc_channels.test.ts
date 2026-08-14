@@ -31,6 +31,8 @@ describe('electron IPC channel contract (preload <-> main)', () => {
         'desktop-get-gpu-force-opt-out',
         'desktop-login-open-browser',
         'desktop-login-take-code',
+        'desktop-set-discord-activity',
+        'desktop-set-discord-presence-enabled',
         'desktop-set-display-mode',
         'desktop-set-gpu-force-opt-out',
         'desktop-set-strings',
@@ -342,6 +344,160 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     expect(preload).toContain("ipcRenderer.invoke('desktop-gamepad-activity').catch(() => {});");
   });
 
+  it('the discord-activity handler whitelists, clamps, and refuses junk timestamps', () => {
+    // This is the one path from the page to a line other people read in another
+    // program, so everything it refuses is refused ONLY here: an untrusted
+    // frame, a non-object, a missing or empty details string, and a malformed
+    // timestamp each have to be answered by value rather than by a call some
+    // later line could ignore.
+    const main = read('electron/main.cjs');
+    const start = main.indexOf("ipcMain.handle('desktop-set-discord-activity'");
+    expect(start).toBeGreaterThan(-1);
+    const end = main.indexOf('\n});', start);
+    // An unfound close would make the slice run to end-of-file, letting every
+    // pin and order comparison below be satisfied by later handlers' text.
+    expect(end).toBeGreaterThan(start);
+    const body = main.slice(start, end);
+    expect(body).toContain('if (!trustedSender(event)) return false;');
+    // A dropped `!` would ship green against the presence pin alone: with the
+    // gate inverted the handler answers untrusted frames and refuses real ones.
+    expect(body).not.toContain('if (trustedSender(event)) return false;');
+    expect(body).toContain('if (payload === null) {');
+    expect(body).toContain('discordPresence.setActivity(null);');
+    expect(body).toContain(
+      "if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return false;",
+    );
+    expect(body).toContain("if (typeof payload.details !== 'string') return false;");
+    // The cap and the control-character flattening both ride clampText, and the
+    // 128 is the visible length: pinned as the argument form so a widened cap
+    // cannot slip through as a different literal elsewhere in the file.
+    expect(body).toContain('clampText(payload.details, 128)');
+    expect(body).toContain("if (details.trim() === '') return false;");
+    // Refused, not stripped: a start main dropped silently would render as a
+    // live counter running from the wrong moment, with nothing to notice it.
+    expect(body).toContain('if (!Number.isSafeInteger(start) || start <= 0) return false;');
+    expect(body).toContain(
+      "if (!timestamps || typeof timestamps !== 'object' || Array.isArray(timestamps)) return false;",
+    );
+    // The effectful line, and the object it hands over is the FRESH one built
+    // here rather than the payload that crossed the bridge.
+    expect(body).toContain('discordPresence.setActivity(clean);');
+    expect(body).not.toContain('discordPresence.setActivity(payload);');
+
+    // Order is the contract: every refusal happens before anything is sent.
+    const trustAt = body.indexOf('if (!trustedSender(event)) return false;');
+    const nullArmAt = body.indexOf('if (payload === null) {');
+    const objectAt = body.indexOf("if (!payload || typeof payload !== 'object'");
+    const clampAt = body.indexOf('clampText(payload.details, 128)');
+    const sendAt = body.indexOf('discordPresence.setActivity(clean);');
+    expect(trustAt).toBeGreaterThan(-1);
+    expect(nullArmAt).toBeGreaterThan(trustAt);
+    expect(objectAt).toBeGreaterThan(nullArmAt);
+    expect(clampAt).toBeGreaterThan(objectAt);
+    expect(sendAt).toBeGreaterThan(clampAt);
+  });
+
+  it('the discord-presence setter takes a strict boolean, persists, then applies live', () => {
+    const main = read('electron/main.cjs');
+    const start = main.indexOf("ipcMain.handle('desktop-set-discord-presence-enabled'");
+    expect(start).toBeGreaterThan(-1);
+    const end = main.indexOf('\n});', start);
+    expect(end).toBeGreaterThan(start);
+    const body = main.slice(start, end);
+    expect(body).toContain('if (!trustedSender(event)) return false;');
+    expect(body).not.toContain('if (trustedSender(event)) return false;');
+    expect(body).toContain('if (enabled !== true && enabled !== false) return false;');
+    // Same anti-clobber contract as the GPU and display-mode setters: the WHOLE
+    // record, spread from the live module-scope object, or a mid-session toggle
+    // would wipe windowBounds/displayId/maximized off disk.
+    expect(body).toContain(
+      'saveDesktopPrefs(desktopPrefsPath, { ...desktopPrefs, discordPresenceEnabled: enabled })',
+    );
+    // The failure GUARD is load-bearing: without the `if (!` arm a failed disk
+    // write would still flip the mirror and the live connection, leaving a
+    // setting the next launch would not reproduce.
+    expect(body).toContain(
+      'if (!saveDesktopPrefs(desktopPrefsPath, { ...desktopPrefs, discordPresenceEnabled: enabled })) {',
+    );
+    expect(body).toContain('desktopPrefs.discordPresenceEnabled = enabled;');
+    expect(body).toContain('discordPresence.setEnabled(enabled);');
+
+    const trustAt = body.indexOf('if (!trustedSender(event)) return false;');
+    const strictAt = body.indexOf('if (enabled !== true && enabled !== false) return false;');
+    const sameAt = body.indexOf(
+      'if (enabled === desktopPrefs.discordPresenceEnabled) return true;',
+    );
+    const saveAt = body.indexOf('saveDesktopPrefs(desktopPrefsPath,');
+    const commitAt = body.indexOf('desktopPrefs.discordPresenceEnabled = enabled;');
+    const applyAt = body.indexOf('discordPresence.setEnabled(enabled);');
+    expect(strictAt).toBeGreaterThan(trustAt);
+    // Idempotence, and BEFORE the save: the world-entry apply-all loop re-sends
+    // the reflected value, so a same-value send must not rewrite the file (nor
+    // tear down and redial a connection that is already in the right state).
+    expect(sameAt).toBeGreaterThan(strictAt);
+    expect(sameAt).toBeLessThan(saveAt);
+    // The mirror commits only after a successful write, and the live apply only
+    // after the mirror, so nothing can be true in memory and false on disk.
+    expect(commitAt).toBeGreaterThan(saveAt);
+    expect(applyAt).toBeGreaterThan(commitAt);
+  });
+
+  it('the presence manager is constructed once, and is the only thing that dials', () => {
+    // Boot purity rides on the factory: it is built at module scope precisely
+    // because construction does no IO, and a second connector anywhere in the
+    // shell would be a socket opened outside that contract.
+    const main = read('electron/main.cjs');
+    expect(main).toContain("require('./discord_presence.cjs')");
+    expect(main.split('const discordPresence = createDiscordPresence({')).toHaveLength(2);
+    // Node's net, not the electron `net` binding beside it: the latter is the
+    // Chromium HTTP stack and cannot open a local socket at all.
+    expect(main).toContain('connect: (p) => nodeNet.createConnection(p),');
+    expect(main.split('createConnection(')).toHaveLength(2);
+    // The app id is read from the environment, never baked in: a hardcoded
+    // snowflake would have every fork reporting as the maintainer's app.
+    expect(main).toContain('clientId: resolveDiscordClientId(process.env),');
+    expect(main).toContain('initiallyEnabled: desktopPrefs.discordPresenceEnabled,');
+    // And it is released on the way out, like the display-sleep lease.
+    expect(main).toContain('discordPresence.dispose();');
+  });
+
+  it('the preload rebuilds the presence payload and refuses junk toggles', () => {
+    // These live ONLY in the preload: the fresh object (nested timestamps
+    // included) is what stops a renderer prototype or a getter crossing the
+    // bridge, the slice keeps a hostile page from shipping an unbounded string
+    // across the IPC, and the invoke is fire-and-forget both ways. Pins are
+    // scoped to each method's own slice, because identical guard lines exist in
+    // sibling methods and a pin the whole file satisfies proves nothing here.
+    const activityStart = preload.indexOf('setDiscordActivity: (activity) => {');
+    expect(activityStart).toBeGreaterThan(-1);
+    const activityEnd = preload.indexOf('\n  },', activityStart);
+    expect(activityEnd).toBeGreaterThan(activityStart);
+    const activity = preload.slice(activityStart, activityEnd);
+    expect(activity).toContain("if (!activity || typeof activity !== 'object') return;");
+    expect(activity).toContain("if (typeof activity.details !== 'string') return;");
+    expect(activity).toContain('message = { details: activity.details.slice(0, 256) };');
+    expect(activity).toContain('message.timestamps = { start: timestamps.start };');
+    expect(activity).toContain(
+      "if (timestamps && typeof timestamps === 'object' && typeof timestamps.start === 'number') {",
+    );
+    expect(activity).toContain(
+      "ipcRenderer.invoke('desktop-set-discord-activity', message).catch(() => {});",
+    );
+    expect(activity).toContain('try {');
+    expect(activity).toContain('} catch {}');
+
+    const toggleStart = preload.indexOf('setDiscordPresenceEnabled: (enabled) => {');
+    expect(toggleStart).toBeGreaterThan(-1);
+    const toggleEnd = preload.indexOf('\n  },', toggleStart);
+    expect(toggleEnd).toBeGreaterThan(toggleStart);
+    const toggle = preload.slice(toggleStart, toggleEnd);
+    expect(toggle).toContain('if (enabled !== true && enabled !== false) return;');
+    expect(toggle).toContain(
+      "ipcRenderer.invoke('desktop-set-discord-presence-enabled', enabled).catch(() => {});",
+    );
+    expect(toggle).toContain('} catch {}');
+  });
+
   it('activates the macOS app when the browser returns a wallet handoff', () => {
     const main = read('electron/main.cjs');
     const start = main.indexOf('function deliverWalletHandoffCode');
@@ -368,6 +524,8 @@ describe('electron IPC channel contract (preload <-> main)', () => {
       'setDisplayMode',
       'notifyGamepadActivity',
       'showNotification',
+      'setDiscordActivity',
+      'setDiscordPresenceEnabled',
       'steamLinkTicket',
       'steamLinkSupported',
       'steamLinkSettled',
