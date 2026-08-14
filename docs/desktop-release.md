@@ -521,6 +521,20 @@ product exist. Coding and merge stay dark-safe without those credentials.
   can read dumps, set a retention window, and disclose the upload in the privacy
   policy. The log redaction strips bearer tokens and obvious credential patterns
   before writing.
+- Desktop prefs and the GPU-force no-boot rescue: the shell persists its own
+  small store as `desktop-prefs.json` under the per-user profile directory
+  (`app.getPath('userData')`: macOS
+  `~/Library/Application Support/world-of-claudecraft/`; Windows
+  `%APPDATA%\world-of-claudecraft\`; Linux `~/.config/world-of-claudecraft/`),
+  holding window memory plus `gpuForceOptOut` (see `electron/desktop_prefs.cjs`).
+  The in-game toggle (Options, Interface, "Use the Dedicated Gaming GPU")
+  writes it, but a machine the GPU force prevents from booting can never reach
+  that toggle. The supported rescue for "the game will not start at all on a
+  hybrid-GPU machine": quit the game, edit the file so it contains
+  `{"version":1,"gpuForceOptOut":true}` (or set just that field in the existing
+  JSON), and relaunch; the next launch skips both GPU levers. The loader
+  tolerates hand-edits, including a Windows editor's UTF-8 BOM; a corrupt or
+  deleted file resolves to defaults, which is force ON.
 - V8 code cache: the app:// scheme registers `codeCache: true` (electron/main.cjs,
   pinned key by key in `tests/electron_scheme_privileges.test.ts`), so Chromium
   persists compiled bytecode for the bundled scripts under the per-user profile
