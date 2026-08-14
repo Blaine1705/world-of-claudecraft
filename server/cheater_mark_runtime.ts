@@ -74,8 +74,8 @@ export async function refreshCheaterMark(
  * Skips entirely when the session was never marked, so an unmarked account (the
  * overwhelming majority) costs zero writes: `session.cheaterMarked` latches on
  * at apply/restore and is what makes the LAST write, the one that zeroes the
- * row, still happen after the aura has gone. The live aura is the source of
- * truth, not meta.cheaterMark, because the aura is what ticks
+ * row, still happen after the aura has gone. The live aura is the ONLY sim
+ * source of truth, because the aura is what ticks
  * (src/sim/moderation/CLAUDE.md): its absence means the sanction is served, and
  * burn(0) is what clears the account row.
  *
