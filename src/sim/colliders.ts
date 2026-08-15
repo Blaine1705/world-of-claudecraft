@@ -43,7 +43,7 @@ import {
   yumiMazeOriginAt,
 } from './data';
 import {
-  ROCK_COLLIDER_MIN_SCALE,
+  decorationHasCollider,
   ROCK_RADIUS_PER_SCALE,
   rockHeight,
   rockRadius,
@@ -1596,7 +1596,7 @@ const MAX_DECORATION_COLLIDER_RADIUS = 1.6 * ROCK_RADIUS_PER_SCALE;
 
 function decorationCollider(seed: number, d: Decoration): Collider | null {
   if (d.kind === 'rock') {
-    if (d.scale < ROCK_COLLIDER_MIN_SCALE) return null;
+    if (!decorationHasCollider(d)) return null;
     // Height comes from decoration_dims (the one source the renderer scales
     // the rock GLB to), so the collision top IS the silhouette top: a squat
     // field stone is inside the character step height and gets walked over,
