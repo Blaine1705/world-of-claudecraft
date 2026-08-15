@@ -1743,6 +1743,7 @@ export const nl_NL: EnTranslations = {
       "notEnoughHonor": "Niet genoeg eer.",
       "reasons": {
         "arenaWin": "Arena-overwinning",
+        "arenaComplete": "arenagevecht uitgevochten",
         "fiestaKill": "Fiesta-uitschakeling",
         "fiestaComplete": "Fiesta voltooid",
         "fiestaWin": "Fiesta-overwinning",
@@ -1849,7 +1850,7 @@ export const nl_NL: EnTranslations = {
       "joinChannels": "Tip: typ /join world of /join lfg om te chatten met spelers over de hele wereld."
     },
     "itemHeroicTag": "[HELDHAFTIG]",
-    "itemHeroicLabel": "Heroic",
+    "itemHeroicLabel": "Heroïsch",
     "itemSoulbound": "Zielsgebonden",
     "itemUniqueEquipped": "Uniek-Uitgerust",
     "itemSet": {
@@ -9734,7 +9735,7 @@ export const nl_NL: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Brandende Eed",
-        "description": "Verhoogt passief de dreiging die uw Heilige schade opwekt met 60%. Alleen Geloofswachter."
+        "description": "Verhoogt passief de dreiging die uw Heilige schade opwekt met 30%. Alleen Geloofswachter."
       },
       "retribution_aura": {
         "name": "Aura van Vergelding",
@@ -9850,7 +9851,7 @@ export const nl_NL: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Steengebonden Wapen",
-        "description": "Doordrenkt uw wapen 30 min lang. Elke slag brengt {damage} extra schade toe. Versterking wint bovendien 30% pantser, krijgt 10% minder schade en wekt tweemaal zoveel dreiging op. Aardse Schok dwingt zijn doelwit u 3 sec lang aan te vallen, en Donderwering verleent 3 sec lang 10% schadevermindering."
+        "description": "Doordrenkt uw wapen 30 min lang. Elke slag brengt {damage} extra schade toe. Versterking wint bovendien 40% pantser en 20% Uithouding, krijgt 15% minder schade en is immuun voor kritieke treffers van wezens en wekt 2,75 keer zoveel dreiging op. Aardse Schok dwingt zijn doelwit u 3 sec lang aan te vallen, en Donderwering verleent 3 sec lang 10% schadevermindering."
       },
       "healing_wave": {
         "name": "Helende Wateren",
@@ -10029,7 +10030,7 @@ export const nl_NL: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruingedaante",
-        "description": "Verander in een beer: pantser +130%, sterk verhoogde aanvalskracht, je aanvallen bouwen woede op en genereren 30% meer dreiging. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante."
+        "description": "Verander in een beer: pantser +110%, maximale gezondheid +30%, sterk verhoogde aanvalskracht, je aanvallen bouwen woede op en genereren 30% meer dreiging. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante."
       },
       "maul": {
         "name": "Botverbrijzelen",
@@ -10039,6 +10040,10 @@ export const nl_NL: EnTranslations = {
       "growl": {
         "name": "Bedreigen",
         "description": "Gromt naar het doelwit: je dreiging stijgt tot het niveau van zijn meest gehate vijand en het wordt gedwongen je 3 sec aan te vallen. Alleen in Bruingedaante."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Wolfsgedaante",
