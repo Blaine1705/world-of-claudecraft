@@ -1367,10 +1367,10 @@ export const tr_TR: EnTranslations = {
       "showWalletOnCharacterScreen": "Cüzdanı Karakter Ekranında Göster",
       "showWalletOnPlayerCard": "Cüzdanı Oyuncu Kartında Göster",
       "showPlaytime": "Karakter Ekranında Oynama Süresini Göster",
-      "forceHighPerfGpu": "Use the Dedicated Gaming GPU",
-      "forceHighPerfGpuNote": "On by default: the desktop app asks this computer for its dedicated gaming GPU. Turn this off if the game will not start, opens to a black screen, or the laptop display goes blank. Takes effect the next time the game starts.",
-      "discordPresence": "Discord Rich Presence",
-      "discordPresenceNote": "Shows the zone you are in and how long you have been playing this session as your Discord activity, and anyone who can see your Discord profile can see both. Only the zone name, your session time, and the game are shared, never your character, your account, or who you are playing with. Needs the Discord app running on this computer.",
+      "forceHighPerfGpu": "Ayrık Oyun GPU'sunu Kullan",
+      "forceHighPerfGpuNote": "Varsayılan olarak açık: masaüstü uygulaması bu bilgisayardan ayrık oyun GPU'sunu ister. Oyun başlamıyorsa, siyah bir ekranla açılıyorsa ya da dizüstü bilgisayarın ekranı karararsa bunu kapat. Değişiklik oyunun bir sonraki başlangıcında etkili olur.",
+      "discordPresence": "Discord Zengin Durumu",
+      "discordPresenceNote": "Bulunduğun bölgeyi ve bu oturumda ne kadar süredir oynadığını Discord etkinliğin olarak gösterir, Discord profilini görebilen herkes ikisini de görebilir. Yalnızca bölge adı, oturum süren ve oyun paylaşılır; karakterin, hesabın ya da kiminle oynadığın asla paylaşılmaz. Bu bilgisayarda Discord uygulamasının çalışıyor olması gerekir.",
       "showDevBadges": "Geliştirici Rozetlerini Göster",
       "showOwnNameplate": "Kendi İsim Etiketimi Göster",
       "showPlayerNameplates": "Oyuncu İsim Etiketlerini Göster",
@@ -7794,14 +7794,14 @@ export const tr_TR: EnTranslations = {
       "restart": "Şimdi Yeniden Başlat",
       "later": "Daha Sonra",
       "dismiss": "Kapat",
-      "whatsNew": "See what changed in your browser"
+      "whatsNew": "Değişiklikleri Tarayıcında Gör"
     },
     "notify": {
-      "updateReadyTitle": "Update {version} is ready",
-      "updateReadyTitleNoVersion": "Update is ready",
-      "updateReadyBody": "Restart World of ClaudeCraft to apply the update.",
-      "partyInviteTitle": "Party invite",
-      "partyInviteBody": "{name} invited you to a party."
+      "updateReadyTitle": "{version} güncellemesi hazır",
+      "updateReadyTitleNoVersion": "Güncelleme hazır",
+      "updateReadyBody": "Güncellemeyi uygulamak için World of ClaudeCraft'ı yeniden başlat.",
+      "partyInviteTitle": "Grup daveti",
+      "partyInviteBody": "{name} seni grubuna davet etti."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7813,7 +7813,7 @@ export const tr_TR: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "Oyun GPU hızlandırması olmadan çalışıyor ve yavaş olacak. Grafik sürücülerini güncelleyip oyunu yeniden başlat. Windows'ta ayrıca Ayarlar > Sistem > Ekran > Grafikler altında oyunu Yüksek performans olarak ayarla.",
-    "bodyDiscreteInactive": "The game is not using the dedicated (gaming) GPU and is running on the power-saving GPU instead, so performance will suffer. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "bodyDiscreteInactive": "Oyun, ayrık (oyun) GPU'sunu kullanmıyor ve bunun yerine güç tasarruflu GPU üzerinde çalışıyor, bu yüzden performans düşecek. Grafik sürücülerini güncelleyip oyunu yeniden başlat. Windows'ta ayrıca oyunu Ayarlar > Sistem > Ekran > Grafikler altında Yüksek performans olarak ayarla.",
     "bodyWeb": "Oyun GPU hızlandırması olmadan çalışıyor ve yavaş olacak. Tarayıcı ayarlarından donanım hızlandırmayı etkinleştir, grafik sürücülerini güncelleyip tarayıcını yeniden başlat.",
     "hybridBodyWindows": "Bu oturum, tümleşik (güç tasarruflu) GPU üzerinde çalışıyor. Bu bilgisayarda ayrıca ayrık bir oyun GPU’su varsa tarayıcını Ayarlar > Sistem > Ekran > Grafikler altında Yüksek performans olarak ayarla, ardından yeniden başlat. Masaüstü uygulaması ayrık GPU’yu otomatik olarak seçer.",
     "hybridBodyLinux": "Bu oturum, tümleşik (güç tasarruflu) GPU üzerinde çalışıyor. Bu bilgisayarda ayrıca ayrık bir oyun GPU’su varsa tarayıcın veya grafik sürücün kendi GPU seçim ayarını sunabilir, ya da dağıtımın PRIME veya optimus-manager gibi bir GPU değiştirme aracı sağlayabilir. Masaüstü uygulaması ayrık GPU’yu otomatik olarak seçer.",
@@ -8181,9 +8181,9 @@ export const tr_TR: EnTranslations = {
       "graphicsReloadNote": "Grafik Kalitesi ve Arazi Ayrıntısı, yeniden yükledikten sonra uygulanır.",
       "reloadNow": "Şimdi Yeniden Yükle",
       "fullscreen": "Tam Ekran",
-      "displayMode": "Display Mode",
-      "displayModeBorderless": "Borderless Fullscreen",
-      "displayModeWindowed": "Windowed",
+      "displayMode": "Görüntü Modu",
+      "displayModeBorderless": "Kenarlıksız Tam Ekran",
+      "displayModeWindowed": "Pencereli",
       "touchLookSpeed": "Dokunmatik Bakış Hızı",
       "joystickSize": "Yönelteç Boyutu",
       "buttonSize": "Düğme Boyutu",
@@ -9523,7 +9523,7 @@ export const tr_TR: EnTranslations = {
       "cheap_shot": {
         "name": "Mide Yumruğu",
         "description": "Hedefe {damage} hasar vererek onu 4 sn sersemlet. Gizlenmiş olmalısın. 2 kombo puanı kazandırır.",
-        "descriptionNoStealth": "Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.",
+        "descriptionNoStealth": "Hedefe {damage} hasar vererek onu 4 sn sersemlet. 2 kombo puanı kazandırır.",
         "specNote_subtlety": "Alacakaranlık Perdesinden kullanıldığında 1 Alacakaranlık ekler (en fazla 3). 3 Alacakaranlıkta gizlilik OLMADAN kullanabilirsin: bu kullanım hiçbir şeye mal olmaz, 3 Alacakaranlığın tümünü harcar ve 6 sn'lik Gölge Perdesini başlatır."
       },
       "sap": {
@@ -10043,8 +10043,8 @@ export const tr_TR: EnTranslations = {
         "description": "Hedefe hırlar: tehdidin onun en nefret ettiği düşmanla eşitlenir ve 3 saniye boyunca sana saldırmaya zorlanır. Yalnızca Bruin Formu."
       },
       "challenging_roar": {
-        "name": "Baleful Roar",
-        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
+        "name": "Uğursuz Kükreme",
+        "description": "Uğursuz bir kükreme: 10 yarda içindeki her düşman kışkırtılır, tehdidi onun en nefret ettiği düşmanla eşitlenir ve 3 saniye boyunca sana saldırmaya zorlanır. Yalnızca Bruin Formu."
       },
       "cat_form": {
         "name": "Kurt Formu",

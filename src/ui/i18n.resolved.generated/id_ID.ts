@@ -1367,10 +1367,10 @@ export const id_ID: EnTranslations = {
       "showWalletOnCharacterScreen": "Tampilkan Dompet di Layar Karakter",
       "showWalletOnPlayerCard": "Tampilkan Dompet di Kartu Pemain",
       "showPlaytime": "Tampilkan Waktu Bermain di Lembar Karakter",
-      "forceHighPerfGpu": "Use the Dedicated Gaming GPU",
-      "forceHighPerfGpuNote": "On by default: the desktop app asks this computer for its dedicated gaming GPU. Turn this off if the game will not start, opens to a black screen, or the laptop display goes blank. Takes effect the next time the game starts.",
-      "discordPresence": "Discord Rich Presence",
-      "discordPresenceNote": "Shows the zone you are in and how long you have been playing this session as your Discord activity, and anyone who can see your Discord profile can see both. Only the zone name, your session time, and the game are shared, never your character, your account, or who you are playing with. Needs the Discord app running on this computer.",
+      "forceHighPerfGpu": "Gunakan GPU Gaming Diskret",
+      "forceHighPerfGpuNote": "Aktif secara bawaan: aplikasi desktop meminta GPU gaming diskret dari komputer ini. Nonaktifkan ini jika permainan tidak mau dimulai, terbuka dengan layar hitam, atau layar laptop menjadi kosong. Berlaku mulai lain kali kamu membuka permainan.",
+      "discordPresence": "Status Aktivitas Discord",
+      "discordPresenceNote": "Menampilkan zona tempatmu berada dan sudah berapa lama kamu bermain dalam sesi ini sebagai aktivitas Discord-mu, dan siapa pun yang bisa melihat profil Discord-mu bisa melihat keduanya. Hanya nama zona, waktu sesimu, dan permainan yang dibagikan, tidak pernah karaktermu, akunmu, atau dengan siapa kamu bermain. Membutuhkan aplikasi Discord yang berjalan di komputer ini.",
       "showDevBadges": "Tampilkan Lencana Pengembang",
       "showOwnNameplate": "Tampilkan Papan Namaku",
       "showPlayerNameplates": "Tampilkan Papan Nama Pemain",
@@ -7794,14 +7794,14 @@ export const id_ID: EnTranslations = {
       "restart": "Mulai Ulang Sekarang",
       "later": "Nanti",
       "dismiss": "Tutup",
-      "whatsNew": "See what changed in your browser"
+      "whatsNew": "Lihat apa yang berubah di browsermu"
     },
     "notify": {
-      "updateReadyTitle": "Update {version} is ready",
-      "updateReadyTitleNoVersion": "Update is ready",
-      "updateReadyBody": "Restart World of ClaudeCraft to apply the update.",
-      "partyInviteTitle": "Party invite",
-      "partyInviteBody": "{name} invited you to a party."
+      "updateReadyTitle": "Pembaruan {version} siap",
+      "updateReadyTitleNoVersion": "Pembaruan siap",
+      "updateReadyBody": "Mulai ulang World of ClaudeCraft untuk menerapkan pembaruan.",
+      "partyInviteTitle": "Undangan Kelompok",
+      "partyInviteBody": "{name} telah mengundangmu ke kelompoknya."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7813,7 +7813,7 @@ export const id_ID: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "Permainan berjalan tanpa akselerasi GPU dan akan lambat. Perbarui driver grafismu, lalu nyalakan ulang permainan. Di Windows, juga atur permainan ke Performa tinggi di Pengaturan > Sistem > Tampilan > Grafis.",
-    "bodyDiscreteInactive": "The game is not using the dedicated (gaming) GPU and is running on the power-saving GPU instead, so performance will suffer. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "bodyDiscreteInactive": "Permainan tidak menggunakan GPU gaming diskret dan sebagai gantinya berjalan pada GPU terintegrasi (hemat daya), sehingga performa akan menurun. Perbarui driver grafismu, lalu nyalakan ulang permainan. Di Windows, juga atur permainan ke Performa tinggi di Pengaturan > Sistem > Tampilan > Grafis.",
     "bodyWeb": "Permainan berjalan tanpa akselerasi GPU dan akan lambat. Aktifkan akselerasi perangkat keras di pengaturan browsermu, perbarui driver grafismu, lalu nyalakan ulang browsermu.",
     "hybridBodyWindows": "Sesi ini dirender menggunakan GPU terintegrasi (hemat daya). Jika komputer ini juga memiliki GPU gaming diskret, atur browsermu ke Performa tinggi di Pengaturan > Sistem > Tampilan > Grafis, lalu mulai ulang browsernya. Aplikasi desktop memilih GPU diskret secara otomatis.",
     "hybridBodyLinux": "Sesi ini dirender menggunakan GPU terintegrasi (hemat daya). Jika komputer ini juga memiliki GPU gaming diskret, browser atau driver grafismu mungkin punya pengaturan pemilihan GPU sendiri, atau distromu mungkin menyediakan alat pengalihan GPU (seperti PRIME atau optimus-manager). Aplikasi desktop memilih GPU diskret secara otomatis.",
@@ -8181,9 +8181,9 @@ export const id_ID: EnTranslations = {
       "graphicsReloadNote": "Kualitas Grafik dan Detail Medan berlaku setelah pemuatan ulang.",
       "reloadNow": "Muat Ulang Sekarang",
       "fullscreen": "Layar Penuh",
-      "displayMode": "Display Mode",
-      "displayModeBorderless": "Borderless Fullscreen",
-      "displayModeWindowed": "Windowed",
+      "displayMode": "Mode Layar",
+      "displayModeBorderless": "Layar Penuh Tanpa Bingkai",
+      "displayModeWindowed": "Jendela",
       "touchLookSpeed": "Kecepatan Pandang Sentuh",
       "joystickSize": "Ukuran Joystick",
       "buttonSize": "Ukuran Tombol",
@@ -9523,7 +9523,7 @@ export const id_ID: EnTranslations = {
       "cheap_shot": {
         "name": "Pukulan Ulu Hati",
         "description": "Serang target sebesar {damage} kerusakan, membuatnya terpana selama 4 detik. Harus dalam siluman. Memberi 2 poin combo.",
-        "descriptionNoStealth": "Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.",
+        "descriptionNoStealth": "Serang target sebesar {damage} kerusakan, membuatnya terpana selama 4 detik. Memberi 2 poin combo.",
         "specNote_subtlety": "Dipakai dari Selubung Senja, ini menambah 1 Gloam (maks 3). Pada 3 Gloam kamu bisa memakainya TANPA siluman: penggunaan itu tidak memakan biaya, menghabiskan seluruh 3 Gloam, dan memulai Tabir Bayangan selama 6 detik."
       },
       "sap": {
@@ -10043,8 +10043,8 @@ export const id_ID: EnTranslations = {
         "description": "Menggeram pada target: ancamanmu naik menyamai musuh yang paling dibencinya dan ia terdorong untuk menyerangmu selama 3 detik. Hanya dalam Wujud Bruin."
       },
       "challenging_roar": {
-        "name": "Baleful Roar",
-        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
+        "name": "Auman Garang",
+        "description": "Sebuah auman garang: semua musuh dalam 10 yard terhasut, ancaman mereka terhadapmu naik menyamai musuh yang paling mereka benci, dan mereka terpaksa menyerangmu selama 3 detik. Hanya dalam Wujud Bruin."
       },
       "cat_form": {
         "name": "Wujud Serigala",

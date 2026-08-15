@@ -1367,10 +1367,10 @@ export const nl_NL: EnTranslations = {
       "showWalletOnCharacterScreen": "Portemonnee tonen op personagescherm",
       "showWalletOnPlayerCard": "Portemonnee tonen op spelerskaart",
       "showPlaytime": "Speeltijd tonen op personagescherm",
-      "forceHighPerfGpu": "Use the Dedicated Gaming GPU",
-      "forceHighPerfGpuNote": "On by default: the desktop app asks this computer for its dedicated gaming GPU. Turn this off if the game will not start, opens to a black screen, or the laptop display goes blank. Takes effect the next time the game starts.",
-      "discordPresence": "Discord Rich Presence",
-      "discordPresenceNote": "Shows the zone you are in and how long you have been playing this session as your Discord activity, and anyone who can see your Discord profile can see both. Only the zone name, your session time, and the game are shared, never your character, your account, or who you are playing with. Needs the Discord app running on this computer.",
+      "forceHighPerfGpu": "Toegewijde game-GPU gebruiken",
+      "forceHighPerfGpuNote": "Standaard aan: de desktop-app vraagt deze computer om zijn toegewijde game-GPU. Zet dit uit als het spel niet opstart of met een zwart scherm opent, of als het laptopscherm leeg blijft. Wordt toegepast bij de volgende start van het spel.",
+      "discordPresence": "Discord-activiteit",
+      "discordPresenceNote": "Toont de zone waarin je je bevindt en hoelang je deze sessie al speelt als je Discord-activiteit, en iedereen die je Discord-profiel kan zien, kan beide zien. Alleen de zonenaam, je sessietijd en het spel worden gedeeld, nooit je personage, je account, of met wie je speelt. Vereist dat de Discord-app op deze computer actief is.",
       "showDevBadges": "Ontwikkelaarsinsignes tonen",
       "showOwnNameplate": "Mijn naambordje tonen",
       "showPlayerNameplates": "Spelersnamen Tonen",
@@ -7794,14 +7794,14 @@ export const nl_NL: EnTranslations = {
       "restart": "Nu herstarten",
       "later": "Later",
       "dismiss": "Sluiten",
-      "whatsNew": "See what changed in your browser"
+      "whatsNew": "Bekijk wat er is veranderd in je browser"
     },
     "notify": {
-      "updateReadyTitle": "Update {version} is ready",
-      "updateReadyTitleNoVersion": "Update is ready",
-      "updateReadyBody": "Restart World of ClaudeCraft to apply the update.",
-      "partyInviteTitle": "Party invite",
-      "partyInviteBody": "{name} invited you to a party."
+      "updateReadyTitle": "Update {version} is klaar",
+      "updateReadyTitleNoVersion": "Update is klaar",
+      "updateReadyBody": "Herstart World of ClaudeCraft om de update toe te passen.",
+      "partyInviteTitle": "Groepsuitnodiging",
+      "partyInviteBody": "{name} heeft je uitgenodigd voor een groep."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7813,7 +7813,7 @@ export const nl_NL: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "Het spel draait zonder GPU-versnelling en zal traag zijn. Werk je grafische stuurprogramma's bij en herstart het spel. Stel op Windows ook het spel in op Hoge prestaties via Instellingen, Systeem, Beeldscherm, Afbeeldingen.",
-    "bodyDiscreteInactive": "The game is not using the dedicated (gaming) GPU and is running on the power-saving GPU instead, so performance will suffer. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "bodyDiscreteInactive": "Het spel gebruikt niet de game-GPU en draait in plaats daarvan op de energiezuinige GPU, waardoor de prestaties zullen lijden. Werk je grafische stuurprogramma's bij en herstart het spel. Stel op Windows ook het spel in op Hoge prestaties via Instellingen, Systeem, Beeldscherm, Afbeeldingen.",
     "bodyWeb": "Het spel draait zonder GPU-versnelling en zal traag zijn. Schakel hardwareversnelling in je browserinstellingen in, werk je grafische stuurprogramma's bij en herstart je browser.",
     "hybridBodyWindows": "Deze sessie wordt weergegeven op de geïntegreerde (energiezuinige) GPU. Heeft deze computer ook een game-GPU, stel je browser dan in op Hoge prestaties via Instellingen > Systeem > Beeldscherm > Beeldinstellingen, en herstart hem daarna. De desktop-app kiest de game-GPU automatisch.",
     "hybridBodyLinux": "Deze sessie wordt weergegeven op de geïntegreerde (energiezuinige) GPU. Heeft deze computer ook een game-GPU, dan biedt je browser of grafische stuurprogramma mogelijk een eigen GPU-keuze-instelling, of biedt je distributie een GPU-wisselhulpmiddel (zoals PRIME of optimus-manager). De desktop-app kiest de game-GPU automatisch.",
@@ -8181,9 +8181,9 @@ export const nl_NL: EnTranslations = {
       "graphicsReloadNote": "Beeldkwaliteit en Terreindetail worden na een herlaadbeurt toegepast.",
       "reloadNow": "Nu herladen",
       "fullscreen": "Volledig scherm",
-      "displayMode": "Display Mode",
-      "displayModeBorderless": "Borderless Fullscreen",
-      "displayModeWindowed": "Windowed",
+      "displayMode": "Schermmodus",
+      "displayModeBorderless": "Randloos volledig scherm",
+      "displayModeWindowed": "Venster",
       "touchLookSpeed": "Kijksnelheid bij aanraking",
       "joystickSize": "Joystickgrootte",
       "buttonSize": "Knopgrootte",
@@ -9523,7 +9523,7 @@ export const nl_NL: EnTranslations = {
       "cheap_shot": {
         "name": "Buikstoot",
         "description": "Treft het doelwit voor {damage} schade en verdooft het 4 sec. Moet in sluiptocht zijn. Levert 2 combopunten op.",
-        "descriptionNoStealth": "Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.",
+        "descriptionNoStealth": "Treft het doelwit voor {damage} schade en verdooft het 4 sec. Levert 2 combopunten op.",
         "specNote_subtlety": "Vanuit Schemersluier gebruikt voegt dit 1 Schemer toe (max 3). Bij 3 Schemer kun je het gebruiken ZONDER sluiptocht: dat gebruik kost niets, verbruikt alle 3 Schemer, en start de schaduwsluier van 6 sec."
       },
       "sap": {
@@ -10043,8 +10043,8 @@ export const nl_NL: EnTranslations = {
         "description": "Gromt naar het doelwit: je dreiging stijgt tot het niveau van zijn meest gehate vijand en het wordt gedwongen je 3 sec aan te vallen. Alleen in Bruingedaante."
       },
       "challenging_roar": {
-        "name": "Baleful Roar",
-        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
+        "name": "Onheilspellend Gebrul",
+        "description": "Een onheilspellend gebrul: elke vijand binnen 10 m wordt bedreigd, zijn dreiging jegens jou stijgt tot het niveau van zijn meest gehate vijand, en wordt gedwongen je 3 sec aan te vallen. Alleen in Bruingedaante."
       },
       "cat_form": {
         "name": "Wolfsgedaante",

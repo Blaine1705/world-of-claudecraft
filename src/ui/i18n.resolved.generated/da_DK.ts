@@ -1367,10 +1367,10 @@ export const da_DK: EnTranslations = {
       "showWalletOnCharacterScreen": "Vis pengepung på karakterskærm",
       "showWalletOnPlayerCard": "Vis pengepung på spillerkort",
       "showPlaytime": "Vis spilletid på karakterskærm",
-      "forceHighPerfGpu": "Use the Dedicated Gaming GPU",
-      "forceHighPerfGpuNote": "On by default: the desktop app asks this computer for its dedicated gaming GPU. Turn this off if the game will not start, opens to a black screen, or the laptop display goes blank. Takes effect the next time the game starts.",
-      "discordPresence": "Discord Rich Presence",
-      "discordPresenceNote": "Shows the zone you are in and how long you have been playing this session as your Discord activity, and anyone who can see your Discord profile can see both. Only the zone name, your session time, and the game are shared, never your character, your account, or who you are playing with. Needs the Discord app running on this computer.",
+      "forceHighPerfGpu": "Brug den dedikerede gaming-GPU",
+      "forceHighPerfGpuNote": "Slået til som standard: skrivebordsappen beder denne computer om dens dedikerede gaming-GPU. Slå dette fra, hvis spillet ikke vil starte, åbner til en sort skærm, eller den bærbares skærm går i sort. Træder i kraft, næste gang spillet starter.",
+      "discordPresence": "Detaljeret Discord-tilstedeværelse",
+      "discordPresenceNote": "Viser den zone, du er i, og hvor længe du har spillet i denne session, som din Discord-aktivitet, og alle, der kan se din Discord-profil, kan se begge dele. Kun zonens navn, din sessionstid og spillet deles, aldrig din karakter, din konto eller hvem du spiller med. Kræver, at Discord-appen kører på denne computer.",
       "showDevBadges": "Vis udviklermærker",
       "showOwnNameplate": "Vis mit navneskilt",
       "showPlayerNameplates": "Vis spillernavneskilte",
@@ -7794,14 +7794,14 @@ export const da_DK: EnTranslations = {
       "restart": "Genstart nu",
       "later": "Senere",
       "dismiss": "Afvis",
-      "whatsNew": "See what changed in your browser"
+      "whatsNew": "Se ændringerne i din browser"
     },
     "notify": {
-      "updateReadyTitle": "Update {version} is ready",
-      "updateReadyTitleNoVersion": "Update is ready",
-      "updateReadyBody": "Restart World of ClaudeCraft to apply the update.",
-      "partyInviteTitle": "Party invite",
-      "partyInviteBody": "{name} invited you to a party."
+      "updateReadyTitle": "Opdatering {version} er klar",
+      "updateReadyTitleNoVersion": "Opdatering er klar",
+      "updateReadyBody": "Genstart World of ClaudeCraft for at anvende opdateringen.",
+      "partyInviteTitle": "Gruppeinvitation",
+      "partyInviteBody": "{name} inviterede dig til en gruppe."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7813,7 +7813,7 @@ export const da_DK: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "Spillet kører uden GPU-acceleration og vil være langsomt. Opdater dine grafikdrivere og genstart derefter spillet. På Windows skal du også indstille spillet til Høj ydeevne under Indstillinger, System, Skærm, Grafik.",
-    "bodyDiscreteInactive": "The game is not using the dedicated (gaming) GPU and is running on the power-saving GPU instead, so performance will suffer. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "bodyDiscreteInactive": "Spillet bruger ikke den dedikerede (gaming-)GPU og kører i stedet på den strømbesparende GPU, så ydeevnen forringes. Opdater dine grafikdrivere og genstart derefter spillet. På Windows skal du også indstille spillet til Høj ydeevne under Indstillinger, System, Skærm, Grafik.",
     "bodyWeb": "Spillet kører uden GPU-acceleration og vil være langsomt. Aktiver hardwareacceleration i din browsers indstillinger, opdater dine grafikdrivere og genstart derefter din browser.",
     "hybridBodyWindows": "Denne session kører på den integrerede (strømbesparende) GPU. Hvis denne computer også har en gaming-GPU, skal du indstille din browser til Høj ydeevne under Indstillinger, System, Skærm, Grafik, og derefter genstarte den. Skrivebordsappen vælger selv gaming-GPU'en.",
     "hybridBodyLinux": "Denne session kører på den integrerede (strømbesparende) GPU. Hvis denne computer også har en gaming-GPU, tilbyder din browser eller grafikdriver måske sin egen GPU-valgindstilling, eller din distribution tilbyder måske et GPU-skifteværktøj (såsom PRIME eller optimus-manager). Skrivebordsappen vælger selv gaming-GPU'en.",
@@ -8181,9 +8181,9 @@ export const da_DK: EnTranslations = {
       "graphicsReloadNote": "Grafikkvalitet og terrændetalje træder i kraft efter en genindlæsning.",
       "reloadNow": "Genindlæs nu",
       "fullscreen": "Fuldskærm",
-      "displayMode": "Display Mode",
-      "displayModeBorderless": "Borderless Fullscreen",
-      "displayModeWindowed": "Windowed",
+      "displayMode": "Skærmtilstand",
+      "displayModeBorderless": "Kantløs fuldskærm",
+      "displayModeWindowed": "Vindue",
       "touchLookSpeed": "Berøringskighastighed",
       "joystickSize": "Joystickstørrelse",
       "buttonSize": "Knapstørrelse",
@@ -9523,7 +9523,7 @@ export const da_DK: EnTranslations = {
       "cheap_shot": {
         "name": "Maveslag",
         "description": "Slå målet for {damage} skade og bedøv det i 4 sek. Skal være i snigen. Giver 2 combopoint.",
-        "descriptionNoStealth": "Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.",
+        "descriptionNoStealth": "Slå målet for {damage} skade og bedøv det i 4 sek. Giver 2 combopoint.",
         "specNote_subtlety": "Brugt fra Skumringsslør tilføjer dette 1 Tusmørke (maks. 3). Ved 3 Tusmørke kan du bruge den UDEN snigen: den brug koster intet, forbruger alle 3 Tusmørke og starter det 6 sek. lange Skyggesløret."
       },
       "sap": {
@@ -10043,8 +10043,8 @@ export const da_DK: EnTranslations = {
         "description": "Knurrer ad målet: din trussel stiger til at matche dets mest forhadte fjende, og det tvinges til at angribe dig i 3 sek. Kun i Bruin-form."
       },
       "challenging_roar": {
-        "name": "Baleful Roar",
-        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
+        "name": "Rædselsbrøl",
+        "description": "Et rædselsvækkende brøl: alle fjender inden for 10 meter bliver ægget, så deres trussel mod dig stiger til at matche deres mest forhadte fjende, og de tvinges til at angribe dig i 3 sek. Kun i Bruin-form."
       },
       "cat_form": {
         "name": "Ulveform",

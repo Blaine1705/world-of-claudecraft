@@ -1367,10 +1367,10 @@ export const fr_CA: EnTranslations = {
       "showWalletOnCharacterScreen": "Afficher le portefeuille sur l’écran des personnages",
       "showWalletOnPlayerCard": "Afficher le portefeuille sur la carte de joueur",
       "showPlaytime": "Afficher le temps de jeu sur l'écran des personnages",
-      "forceHighPerfGpu": "Use the Dedicated Gaming GPU",
-      "forceHighPerfGpuNote": "On by default: the desktop app asks this computer for its dedicated gaming GPU. Turn this off if the game will not start, opens to a black screen, or the laptop display goes blank. Takes effect the next time the game starts.",
-      "discordPresence": "Discord Rich Presence",
-      "discordPresenceNote": "Shows the zone you are in and how long you have been playing this session as your Discord activity, and anyone who can see your Discord profile can see both. Only the zone name, your session time, and the game are shared, never your character, your account, or who you are playing with. Needs the Discord app running on this computer.",
+      "forceHighPerfGpu": "Utiliser le GPU de jeu dédié",
+      "forceHighPerfGpuNote": "Activé par défaut : l'application de bureau demande à cet ordinateur son GPU de jeu dédié. Désactivez cette option si le jeu ne démarre pas, s'ouvre sur un écran noir, ou si l'écran de l'ordinateur portable reste éteint. Prend effet au prochain démarrage du jeu.",
+      "discordPresence": "Présence enrichie Discord",
+      "discordPresenceNote": "Affiche la zone où vous vous trouvez et depuis combien de temps vous jouez cette session comme votre activité Discord, et toute personne pouvant voir votre profil Discord peut voir les deux. Seuls le nom de la zone, votre temps de session et le jeu sont partagés, jamais votre personnage, votre compte, ou avec qui vous jouez. Nécessite que l'application Discord soit lancée sur cet ordinateur.",
       "showDevBadges": "Afficher les badges de développeur",
       "showOwnNameplate": "Afficher ma plaque de nom",
       "showPlayerNameplates": "Afficher les plaques de noms des joueurs",
@@ -7794,14 +7794,14 @@ export const fr_CA: EnTranslations = {
       "restart": "Redémarrer maintenant",
       "later": "Plus tard",
       "dismiss": "Fermer",
-      "whatsNew": "See what changed in your browser"
+      "whatsNew": "Voir les changements dans votre navigateur"
     },
     "notify": {
-      "updateReadyTitle": "Update {version} is ready",
-      "updateReadyTitleNoVersion": "Update is ready",
-      "updateReadyBody": "Restart World of ClaudeCraft to apply the update.",
-      "partyInviteTitle": "Party invite",
-      "partyInviteBody": "{name} invited you to a party."
+      "updateReadyTitle": "La mise à jour {version} est prête",
+      "updateReadyTitleNoVersion": "La mise à jour est prête",
+      "updateReadyBody": "Redémarrez World of ClaudeCraft pour appliquer la mise à jour.",
+      "partyInviteTitle": "Invitation de groupe",
+      "partyInviteBody": "{name} vous invite à rejoindre son groupe."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7813,7 +7813,7 @@ export const fr_CA: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "Le jeu fonctionne sans accélération GPU et sera lent. Mettez à jour vos pilotes graphiques, puis redémarrez le jeu. Sous Windows, définissez également le jeu sur Performances élevées dans Paramètres, Système, Affichage, Graphiques.",
-    "bodyDiscreteInactive": "The game is not using the dedicated (gaming) GPU and is running on the power-saving GPU instead, so performance will suffer. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "bodyDiscreteInactive": "Le jeu n'utilise pas le GPU de jeu dédié et fonctionne à la place sur le GPU intégré (économie d'énergie), ce qui nuira aux performances. Mettez à jour vos pilotes graphiques, puis redémarrez le jeu. Sous Windows, définissez également le jeu sur Performances élevées dans Paramètres, Système, Affichage, Graphiques.",
     "bodyWeb": "Le jeu fonctionne sans accélération GPU et sera lent. Activez l'accélération matérielle dans les paramètres de votre navigateur, mettez à jour vos pilotes graphiques, puis redémarrez votre navigateur.",
     "hybridBodyWindows": "Cette session s'exécute sur le GPU intégré (économie d'énergie). Si cet ordinateur possède aussi un GPU de jeu dédié, définissez votre navigateur sur Performances élevées dans Paramètres > Système > Affichage > Graphiques, puis redémarrez-le. L'application de bureau choisit automatiquement le GPU de jeu.",
     "hybridBodyLinux": "Cette session s'exécute sur le GPU intégré (économie d'énergie). Si cet ordinateur possède aussi un GPU de jeu dédié, votre navigateur ou votre pilote graphique propose peut-être son propre réglage de sélection du GPU, ou votre distribution propose peut-être un outil de bascule de GPU (comme PRIME ou optimus-manager). L'application de bureau choisit automatiquement le GPU de jeu.",
@@ -8181,9 +8181,9 @@ export const fr_CA: EnTranslations = {
       "graphicsReloadNote": "La qualité graphique et le détail du terrain s'appliquent après un rechargement.",
       "reloadNow": "Recharger maintenant",
       "fullscreen": "Plein écran",
-      "displayMode": "Display Mode",
-      "displayModeBorderless": "Borderless Fullscreen",
-      "displayModeWindowed": "Windowed",
+      "displayMode": "Mode d'affichage",
+      "displayModeBorderless": "Plein écran sans bordure",
+      "displayModeWindowed": "Fenêtré",
       "touchLookSpeed": "Vitesse caméra tactile",
       "joystickSize": "Taille du joystick",
       "buttonSize": "Taille des boutons",
@@ -9523,7 +9523,7 @@ export const fr_CA: EnTranslations = {
       "cheap_shot": {
         "name": "Coup au ventre",
         "description": "Frappe la cible pour {damage} points de dégâts, l'étourdissant pendant 4 s. Camouflage requis. Confère 2 points de combo.",
-        "descriptionNoStealth": "Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.",
+        "descriptionNoStealth": "Frappe la cible pour {damage} points de dégâts, l'étourdissant pendant 4 s. Confère 2 points de combo.",
         "specNote_subtlety": "Utilisée depuis le Voile du crépuscule, elle ajoute 1 Pénombre (maximum 3). À 3 Pénombre, vous pouvez l'utiliser SANS camouflage : cette utilisation ne coûte rien, dépense les 3 Pénombre, et déclenche le voile d'ombre de 6 s."
       },
       "sap": {
@@ -10043,8 +10043,8 @@ export const fr_CA: EnTranslations = {
         "description": "Gronde la cible : votre menace rejoint celle de son ennemi le plus haï et elle est forcée de vous attaquer pendant 3 s. Forme de Bruin uniquement."
       },
       "challenging_roar": {
-        "name": "Baleful Roar",
-        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
+        "name": "Rugissement funeste",
+        "description": "Un rugissement funeste : chaque ennemi dans un rayon de 10 mètres est provoqué, sa menace envers vous rejoignant celle de son ennemi le plus haï, et il est forcé de vous attaquer pendant 3 s. Forme de Bruin uniquement."
       },
       "cat_form": {
         "name": "Forme de loup",
