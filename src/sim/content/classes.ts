@@ -5853,7 +5853,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetMode: 'position',
     effects: [{ type: 'aoeDamage', min: 48, max: 60, radius: 8, canCrit: true }],
     description:
-      'Sacrifices a Bone Mage first, then a Skeletal Warrior, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal $d Shadow damage at the chosen location.',
+      'Sacrifices a Skeletal Warrior first, then a Bone Mage, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal $d Shadow damage at the chosen location.',
   },
   funeral_harvest: {
     id: 'funeral_harvest',
