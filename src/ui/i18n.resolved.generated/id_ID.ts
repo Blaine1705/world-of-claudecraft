@@ -1739,6 +1739,7 @@ export const id_ID: EnTranslations = {
       "notEnoughHonor": "Tidak cukup Kehormatan.",
       "reasons": {
         "arenaWin": "Kemenangan arena",
+        "arenaComplete": "Arena bout fought",
         "fiestaKill": "Eliminasi Fiesta",
         "fiestaComplete": "Fiesta selesai",
         "fiestaWin": "Kemenangan Fiesta",

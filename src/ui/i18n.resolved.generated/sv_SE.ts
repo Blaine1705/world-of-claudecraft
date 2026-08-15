@@ -1739,6 +1739,7 @@ export const sv_SE: EnTranslations = {
       "notEnoughHonor": "Inte tillräckligt med heder.",
       "reasons": {
         "arenaWin": "Arenaseger",
+        "arenaComplete": "Arena bout fought",
         "fiestaKill": "Fiesta-nedtagning",
         "fiestaComplete": "Fiesta avklarad",
         "fiestaWin": "Fiesta-seger",

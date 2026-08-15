@@ -1739,6 +1739,7 @@ export const ru_RU: EnTranslations = {
       "notEnoughHonor": "Недостаточно чести.",
       "reasons": {
         "arenaWin": "Победа на арене",
+        "arenaComplete": "Бой на арене",
         "fiestaKill": "Устранение на Фиесте",
         "fiestaComplete": "Завершение Фиесты",
         "fiestaWin": "Победа на Фиесте",

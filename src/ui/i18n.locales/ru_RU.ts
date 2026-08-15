@@ -986,6 +986,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorGain': 'Вы получаете {amount} очк. чести ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Недостаточно чести.',
   'hudChrome.warfare.reasons.arenaWin': 'Победа на арене',
+  'hudChrome.warfare.reasons.arenaComplete': 'Бой на арене',
   'hudChrome.warfare.reasons.fiestaKill': 'Устранение на Фиесте',
   'hudChrome.warfare.reasons.fiestaComplete': 'Завершение Фиесты',
   'hudChrome.warfare.reasons.fiestaWin': 'Победа на Фиесте',

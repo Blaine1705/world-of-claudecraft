@@ -1739,6 +1739,7 @@ export const en_XA: EnTranslations = {
       "notEnoughHonor": "[Ñóţ éñóúĝĥ Ĥóñóŕ.]",
       "reasons": {
         "arenaWin": "[Áŕéñá ʋíçţóŕý]",
+        "arenaComplete": "[Áŕéñá ƀóúţ ƒóúĝĥţ]",
         "fiestaKill": "[Ƒíéšţá ţáķéðóŵñ]",
         "fiestaComplete": "[Ƒíéšţá çóɱþļéţéð]",
         "fiestaWin": "[Ƒíéšţá ʋíçţóŕý]",

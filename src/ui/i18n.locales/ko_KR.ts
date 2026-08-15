@@ -974,6 +974,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorGain': '명예를 {amount} 획득했습니다({reason}).',
   'hudChrome.warfare.notEnoughHonor': '명예가 부족합니다.',
   'hudChrome.warfare.reasons.arenaWin': '투기장 승리',
+  'hudChrome.warfare.reasons.arenaComplete': '투기장 참전',
   'hudChrome.warfare.reasons.fiestaKill': '피에스타 처치',
   'hudChrome.warfare.reasons.fiestaComplete': '피에스타 완료',
   'hudChrome.warfare.reasons.fiestaWin': '피에스타 승리',
