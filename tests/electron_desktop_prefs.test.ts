@@ -420,35 +420,101 @@ describe('loadDesktopPrefs', () => {
 });
 
 describe('saveDesktopPrefs', () => {
-  it('writes through an exclusive temp file and renames it over the target', () => {
+  it('writes through an exclusive fd, fsyncs it BEFORE the rename, then fsyncs the directory', () => {
     const calls: string[] = [];
     let staged = '';
+    let nextFd = 40;
     const filePath = '/userdata/desktop-prefs.json';
     const ok = saveDesktopPrefs(
       filePath,
       { version: 1, gpuForceOptOut: true },
       {
         mkdirSync: (dir, options) => calls.push(`mkdir:${dir}:${options.recursive}`),
-        writeFileSync: (target, data, options) => {
-          staged = target;
-          calls.push(`write:${data}:${options.encoding}:${options.flag}`);
+        openSync: (target, flags) => {
+          if (flags === 'wx') staged = target;
+          calls.push(`open:${flags === 'wx' ? '<staged>' : target}:${flags}`);
+          nextFd += 1;
+          return nextFd;
         },
+        writeFileSync: (fd, data, options) => calls.push(`write:${fd}:${data}:${options.encoding}`),
+        fsyncSync: (fd) => calls.push(`fsync:${fd}`),
+        closeSync: (fd) => calls.push(`close:${fd}`),
         renameSync: (from, to) => calls.push(`rename:${from === staged ? '<staged>' : from}:${to}`),
       },
     );
     expect(ok).toBe(true);
-    // The flag is the whole defense and it is a string a typo would silently
-    // downgrade to a following write, so pin it literally: 'wx' is O_EXCL.
+    // The exact syscall order is the durability contract. 'wx' is O_EXCL (the
+    // anti-symlink defense, a string a typo would silently downgrade to a
+    // following write); the data fsync sits BEFORE the rename, because a
+    // journal-reordering filesystem may otherwise commit the rename ahead of
+    // the data blocks and a power loss then lands an EMPTY prefs file at the
+    // real path (losing gpuForceOptOut on exactly the machine that crashes);
+    // and the directory fsync after the rename is what makes the rename itself
+    // durable where the platform allows it.
     expect(calls).toEqual([
       'mkdir:/userdata:true',
-      'write:{"version":1,"maximized":false,"gpuForceOptOut":true,"displayMode":"borderless","discordPresenceEnabled":true}:utf8:wx',
+      'open:<staged>:wx',
+      'write:41:{"version":1,"maximized":false,"gpuForceOptOut":true,"displayMode":"borderless","discordPresenceEnabled":true}:utf8',
+      'fsync:41',
+      'close:41',
       'rename:<staged>:/userdata/desktop-prefs.json',
+      'open:/userdata:r',
+      'fsync:42',
+      'close:42',
     ]);
     // Staged beside the target, under an unpredictable name: a fixed sibling is
     // a path another local process can pre-create and wait on.
     expect(staged.startsWith('/userdata/desktop-prefs.json.')).toBe(true);
     expect(staged).toMatch(/\.\d+-[0-9a-f]{8}\.tmp$/);
     expect(staged).not.toBe('/userdata/desktop-prefs.json.tmp');
+  });
+
+  it('treats the directory fsync as best-effort: a platform that refuses it still saves', () => {
+    // Windows cannot open (let alone fsync) a directory, so the post-rename
+    // directory sync is advisory there; a save must not report failure for it,
+    // or every Windows toggle would read as "did not stick" while the file is
+    // actually on disk.
+    const noop = () => {};
+    let opens = 0;
+    expect(
+      saveDesktopPrefs(
+        '/x/prefs.json',
+        { version: 1, gpuForceOptOut: true },
+        {
+          mkdirSync: noop,
+          openSync: (_target, flags) => {
+            opens += 1;
+            if (flags === 'r') throw new Error('EISDIR');
+            return 7;
+          },
+          writeFileSync: noop,
+          fsyncSync: noop,
+          closeSync: noop,
+          renameSync: noop,
+        },
+      ),
+    ).toBe(true);
+    expect(opens, 'the directory open must really have been attempted').toBe(2);
+    // A directory that opens but refuses the fsync itself is the same answer.
+    let fsyncs = 0;
+    expect(
+      saveDesktopPrefs(
+        '/x/prefs.json',
+        { version: 1, gpuForceOptOut: true },
+        {
+          mkdirSync: noop,
+          openSync: () => 7,
+          writeFileSync: noop,
+          fsyncSync: () => {
+            fsyncs += 1;
+            if (fsyncs === 2) throw new Error('EINVAL');
+          },
+          closeSync: noop,
+          renameSync: noop,
+        },
+      ),
+    ).toBe(true);
+    expect(fsyncs, 'the directory fsync must really have been attempted').toBe(2);
   });
 
   it('mints a different scratch path on every save', () => {
@@ -537,9 +603,13 @@ describe('saveDesktopPrefs', () => {
         { version: 1 },
         {
           mkdirSync: noop,
-          writeFileSync: (target) => {
+          openSync: (target: string) => {
             staged = target;
+            return 7;
           },
+          writeFileSync: noop,
+          fsyncSync: noop,
+          closeSync: noop,
           renameSync: () => {
             throw new Error('EXDEV');
           },
@@ -549,9 +619,9 @@ describe('saveDesktopPrefs', () => {
     ).toBe(false);
     expect(unlinked).toEqual([staged]);
 
-    // The other polarity: the exclusive write REFUSED, so that path was already
+    // The other polarity: the exclusive open REFUSED, so that path was already
     // there, is not ours, and must be left exactly as found. Deleting it would
-    // hand back the clobber the exclusive write just prevented.
+    // hand back the clobber the exclusive open just prevented.
     const refusedUnlinks: string[] = [];
     expect(
       saveDesktopPrefs(
@@ -559,9 +629,12 @@ describe('saveDesktopPrefs', () => {
         { version: 1 },
         {
           mkdirSync: noop,
-          writeFileSync: () => {
+          openSync: () => {
             throw new Error('EEXIST');
           },
+          writeFileSync: noop,
+          fsyncSync: noop,
+          closeSync: noop,
           renameSync: noop,
           unlinkSync: (target) => refusedUnlinks.push(target),
         },
@@ -570,33 +643,59 @@ describe('saveDesktopPrefs', () => {
     expect(refusedUnlinks, 'a path we did not create must never be unlinked').toEqual([]);
   });
 
+  it('closes the staged fd on the failure path, so a failing save cannot leak handles', () => {
+    // A write or fsync that throws leaves the exclusive fd open; without the
+    // close in the catch, a save failing once per toggle would leak one handle
+    // per attempt for the life of the process.
+    const closed: number[] = [];
+    expect(
+      saveDesktopPrefs(
+        '/x/prefs.json',
+        { version: 1 },
+        {
+          mkdirSync: () => {},
+          openSync: () => 11,
+          writeFileSync: () => {
+            throw new Error('ENOSPC');
+          },
+          fsyncSync: () => {},
+          closeSync: (fd: number) => closed.push(fd),
+          renameSync: () => {},
+          unlinkSync: () => {},
+        },
+      ),
+    ).toBe(false);
+    expect(closed).toEqual([11]);
+  });
+
   it('reports false (and never throws) on every write failure', () => {
     const boom = () => {
       throw new Error('EROFS');
     };
     const noop = () => {};
     const prefs = { version: 1, gpuForceOptOut: true };
+    const healthy = {
+      mkdirSync: noop,
+      openSync: () => 7,
+      writeFileSync: noop,
+      fsyncSync: noop,
+      closeSync: noop,
+      renameSync: noop,
+    };
     // One failing dependency per case: a single catch that only covered the
-    // write would still pass a test that only broke the write.
-    expect(saveDesktopPrefs('/x/prefs.json', prefs, { mkdirSync: boom })).toBe(false);
-    expect(saveDesktopPrefs('/x/prefs.json', prefs, { mkdirSync: noop, writeFileSync: boom })).toBe(
+    // write would still pass a test that only broke the write. The data fsync
+    // is load-bearing (unlike the directory one): a save whose payload never
+    // reached the platter must not report that it did.
+    expect(saveDesktopPrefs('/x/prefs.json', prefs, { ...healthy, mkdirSync: boom })).toBe(false);
+    expect(saveDesktopPrefs('/x/prefs.json', prefs, { ...healthy, openSync: boom })).toBe(false);
+    expect(saveDesktopPrefs('/x/prefs.json', prefs, { ...healthy, writeFileSync: boom })).toBe(
       false,
     );
-    expect(
-      saveDesktopPrefs('/x/prefs.json', prefs, {
-        mkdirSync: noop,
-        writeFileSync: noop,
-        renameSync: boom,
-      }),
-    ).toBe(false);
-    // All three healthy: the same call reports true, so the arms above fail for
-    // the injected reason and not because the shape was wrong.
-    expect(
-      saveDesktopPrefs('/x/prefs.json', prefs, {
-        mkdirSync: noop,
-        writeFileSync: noop,
-        renameSync: noop,
-      }),
-    ).toBe(true);
+    expect(saveDesktopPrefs('/x/prefs.json', prefs, { ...healthy, fsyncSync: boom })).toBe(false);
+    expect(saveDesktopPrefs('/x/prefs.json', prefs, { ...healthy, closeSync: boom })).toBe(false);
+    expect(saveDesktopPrefs('/x/prefs.json', prefs, { ...healthy, renameSync: boom })).toBe(false);
+    // All healthy: the same call reports true, so the arms above fail for the
+    // injected reason and not because the shape was wrong.
+    expect(saveDesktopPrefs('/x/prefs.json', prefs, healthy)).toBe(true);
   });
 });

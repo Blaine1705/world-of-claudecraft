@@ -51,6 +51,18 @@ const DISCORD_BASE_BACKOFF_MS = 2000;
 /** The ceiling the doubling stops at. */
 const DISCORD_MAX_BACKOFF_MS = 60000;
 
+/**
+ * How long an accepted socket may sit on an unanswered handshake, or a READY
+ * connection on an unanswered SET_ACTIVITY, before the peer is treated as
+ * dead. A real Discord answers both in one turn, so this fires only for a
+ * wedged daemon or a squatter that accepts and says nothing, either of which
+ * used to park the state machine ('handshaking' forever, or flush() gated on
+ * a nonce nobody will echo) until the socket happened to close. Expiry is the
+ * same event as a hangup and takes the same road: destroy, then the ordinary
+ * retry/backoff path, never a tight loop.
+ */
+const DISCORD_ANSWER_TIMEOUT_MS = 10000;
+
 /** How many socket paths Discord may be listening on (discord-ipc-0 .. -9). */
 const DISCORD_PIPE_SLOTS = 10;
 
@@ -234,6 +246,7 @@ function createDiscordPresence({
   initiallyEnabled = true,
   minSendIntervalMs = DISCORD_MIN_SEND_INTERVAL_MS,
   maxBackoffMs = DISCORD_MAX_BACKOFF_MS,
+  answerTimeoutMs = DISCORD_ANSWER_TIMEOUT_MS,
 }) {
   requireFunction(connect, 'connect');
   requireFunction(statPath, 'statPath');
@@ -244,6 +257,7 @@ function createDiscordPresence({
   requireFunction(random, 'random');
   requirePositiveInterval(minSendIntervalMs, 'minSendIntervalMs');
   requirePositiveInterval(maxBackoffMs, 'maxBackoffMs');
+  requirePositiveInterval(answerTimeoutMs, 'answerTimeoutMs');
   if (!Number.isInteger(pid)) {
     throw new TypeError('createDiscordPresence: pid must be an integer');
   }
@@ -287,6 +301,7 @@ function createDiscordPresence({
   let backoffMs = 0;
   let retryTimer = null;
   let sendTimer = null;
+  let answerTimer = null;
 
   const clearRetryTimer = () => {
     if (retryTimer === null) return;
@@ -300,6 +315,12 @@ function createDiscordPresence({
     sendTimer = null;
   };
 
+  const clearAnswerTimer = () => {
+    if (answerTimer === null) return;
+    clearTimeoutFn(answerTimer);
+    answerTimer = null;
+  };
+
   // Drop the live socket without letting its own teardown events act: the
   // reference is cleared FIRST, so the handlers below see a socket that is no
   // longer ours and return.
@@ -309,11 +330,31 @@ function createDiscordPresence({
     socket = null;
     inbound = EMPTY_FRAME_BUFFER;
     pendingNonce = null;
+    // The answer wait belongs to the socket it was armed for; a dead socket
+    // owes nothing, and a stale expiry must never tear down a successor.
+    clearAnswerTimer();
     try {
       dead.destroy();
     } catch {
       // A socket that refuses to be destroyed is already gone as far as we care.
     }
+  };
+
+  // One bounded wait for the peer's next REQUIRED answer: READY after the
+  // handshake, then the nonce echo after each SET_ACTIVITY. Re-armed per
+  // question, disarmed when the answer arrives or the socket goes; expiry is
+  // treated exactly like a hangup, so it lands in the ordinary retry/backoff
+  // path (which, unforgiven, keeps escalating against a peer that never
+  // answers anything).
+  const armAnswerTimer = () => {
+    clearAnswerTimer();
+    answerTimer = setTimeoutFn(() => {
+      answerTimer = null;
+      if (socket === null) return;
+      log.debug('[discord] peer never answered within the timeout; reconnecting');
+      destroySocket();
+      scheduleRetry();
+    }, answerTimeoutMs);
   };
 
   const write = (buffer) => {
@@ -362,14 +403,25 @@ function createDiscordPresence({
     pendingNonce = nonce;
     lastSentActivity = activity;
     lastSendAt = at;
+    // The peer now owes an echo of this nonce; bound the wait, or a peer that
+    // never answers would gate this function forever.
+    armAnswerTimer();
   };
 
   const onReady = () => {
     state = 'ready';
-    // The walk starts over from the first candidate next time, and the backoff
-    // is forgiven: this connection worked, so a later failure is a new problem.
-    backoffMs = 0;
+    // The walk starts over from the first candidate next time. The backoff is
+    // deliberately NOT forgiven here: READY proves a peer speaks the protocol,
+    // not that it is a working Discord (the win32 pipe namespace has no
+    // ownership gate at all), and forgiving at READY handed a READY-then-drop
+    // squatter a reset of the escalation every cycle, a one-to-two-second
+    // redial loop for the whole session. Forgiveness waits for an
+    // ACKNOWLEDGED SET_ACTIVITY (the nonce-echo arm in handleFrame), which
+    // such a peer never produces.
     pathIndex = 0;
+    // The handshake was answered; the next bounded wait is armed by the flush
+    // write below, if anything actually goes out.
+    clearAnswerTimer();
     pendingNonce = null;
     // A new connection has been told nothing, so even an unchanged activity has
     // to go out again; without this reset a reconnect would leave the presence
@@ -447,6 +499,13 @@ function createDiscordPresence({
       return;
     }
     if (pendingNonce !== null && payload.nonce === pendingNonce) {
+      // The echo is the proof a working Discord sits at the far end (a
+      // squatter can parrot READY; answering a COMMAND it would have to
+      // implement the protocol), so this is where the reconnect backoff is
+      // forgiven: a later failure is a new problem. An ERROR echo forgives
+      // too; the connection answered, only the payload was refused.
+      backoffMs = 0;
+      clearAnswerTimer();
       if (payload.evt === 'ERROR' && !loggedActivityError) {
         // Once per run. A rejected activity is reported and then treated as
         // delivered: retrying the payload Discord just refused would be a loop,
@@ -469,7 +528,9 @@ function createDiscordPresence({
       if (!isLive()) return;
       state = 'handshaking';
       inbound = EMPTY_FRAME_BUFFER;
-      write(encodeHandshake(appId));
+      // The peer now owes a READY; bound the wait, so a squatter that accepts
+      // and says nothing costs one answer window rather than the session.
+      if (write(encodeHandshake(appId))) armAnswerTimer();
     });
 
     candidate.on('data', (chunk) => {
@@ -498,6 +559,7 @@ function createDiscordPresence({
       inbound = EMPTY_FRAME_BUFFER;
       pendingNonce = null;
       clearSendTimer();
+      clearAnswerTimer();
       try {
         candidate.destroy();
       } catch {
@@ -512,9 +574,13 @@ function createDiscordPresence({
         // Either way the slot is treated as refused and the walk moves on in
         // the same pass; backing off here instead would restart every retry at
         // slot 0 and pin the walk to an accept-and-drop squatter forever (the
-        // win32 pipe namespace has no ownership gate at all). A squatter that
-        // holds the socket open silently, or one that answers READY, is beyond
-        // this arm; see the ledger.
+        // win32 pipe namespace has no ownership gate at all). The other two
+        // squatter shapes are covered elsewhere: one that accepts and stays
+        // SILENT is destroyed by the answer timeout (armed at the handshake
+        // write) into this same backoff path, and one that parrots READY can
+        // no longer reset the escalation, because backoff forgiveness is
+        // gated on an acknowledged SET_ACTIVITY (see onReady and the
+        // nonce-echo arm in handleFrame).
         state = 'connecting';
         connectNextPath();
         return;
@@ -668,6 +734,7 @@ function createDiscordPresence({
       }
       clearRetryTimer();
       clearSendTimer();
+      clearAnswerTimer();
       destroySocket();
       desired = null;
       lastSentActivity = undefined;
@@ -680,6 +747,7 @@ function createDiscordPresence({
       terminal = 'disposed';
       clearRetryTimer();
       clearSendTimer();
+      clearAnswerTimer();
       destroySocket();
       desired = null;
     },
@@ -699,6 +767,7 @@ function createDiscordPresence({
 
 module.exports = {
   DEFAULT_DISCORD_APP_ID,
+  DISCORD_ANSWER_TIMEOUT_MS,
   DISCORD_BASE_BACKOFF_MS,
   DISCORD_DETAILS_MAX,
   DISCORD_LOG_TEXT_MAX,

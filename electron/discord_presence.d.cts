@@ -42,6 +42,7 @@ export interface DiscordPresenceDeps {
   initiallyEnabled?: boolean;
   minSendIntervalMs?: number;
   maxBackoffMs?: number;
+  answerTimeoutMs?: number;
 }
 
 export interface DiscordPresenceState {
@@ -61,6 +62,7 @@ export interface DiscordPresence {
   stateForTest: () => DiscordPresenceState;
 }
 
+export const DISCORD_ANSWER_TIMEOUT_MS: number;
 export const DISCORD_BASE_BACKOFF_MS: number;
 export const DISCORD_DETAILS_MAX: number;
 export const DISCORD_LOG_TEXT_MAX: number;

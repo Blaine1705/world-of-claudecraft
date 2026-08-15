@@ -5,11 +5,13 @@
 export interface NotifyGuardDeps {
   now: () => number;
   minIntervalMs?: number;
+  sessionMax?: number;
 }
 
 export interface NotifyGuard {
   allow: (kind: unknown) => boolean;
 }
 
+export const MAX_NOTIFICATIONS_PER_SESSION: number;
 export const NOTIFY_MIN_INTERVAL_MS: number;
 export function createNotifyGuard(deps: NotifyGuardDeps): NotifyGuard;

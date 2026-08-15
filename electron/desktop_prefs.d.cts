@@ -23,11 +23,12 @@ export interface DesktopPrefsReadDeps {
 
 export interface DesktopPrefsWriteDeps {
   mkdirSync?: (dirPath: string, options: { recursive: boolean }) => unknown;
-  writeFileSync?: (
-    filePath: string,
-    data: string,
-    options: { encoding: string; flag: string },
-  ) => void;
+  /** The exclusive staging open ('wx') and the best-effort directory open ('r'). */
+  openSync?: (path: string, flags: string) => number;
+  /** Writes the whole payload through the staged fd, leaving the fd open. */
+  writeFileSync?: (fd: number, data: string, options: { encoding: string }) => void;
+  fsyncSync?: (fd: number) => void;
+  closeSync?: (fd: number) => void;
   renameSync?: (fromPath: string, toPath: string) => void;
   unlinkSync?: (filePath: string) => void;
   /** Injected only by tests, so a scratch path can be known in advance. */

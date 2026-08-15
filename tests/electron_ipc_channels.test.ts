@@ -475,8 +475,14 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     );
     // The shell's one clamp, so peer text in the log is bounded and flattened.
     expect(binding).toContain('clampText,');
-    // The app id is read from the environment, never baked in: a hardcoded
-    // snowflake would have every fork reporting as the maintainer's app.
+    // The app id resolves through one function with a pinned precedence
+    // (tests/electron_discord_presence.test.ts executes it): an unset
+    // WOC_DISCORD_APP_ID means the baked official id, a set and VALID value
+    // overrides it (the operator slot), and a set-but-invalid value (the
+    // documented fork opt-out, WOC_DISCORD_APP_ID=off) keeps the feature
+    // inert. The baked default is safe to ship: an application id is a public
+    // snowflake every build exposes on the wire, not a secret, and it is what
+    // makes presence work for players who never set environment variables.
     expect(binding).toContain('clientId: resolveDiscordClientId(process.env),');
     expect(binding).toContain('initiallyEnabled: desktopPrefs.discordPresenceEnabled,');
     // And it is released on the way out, like the display-sleep lease: pinned

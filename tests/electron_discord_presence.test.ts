@@ -4,6 +4,7 @@ import {
   candidatePipePaths,
   createDiscordPresence,
   DEFAULT_DISCORD_APP_ID,
+  DISCORD_ANSWER_TIMEOUT_MS,
   DISCORD_BASE_BACKOFF_MS,
   DISCORD_DETAILS_MAX,
   DISCORD_LOG_TEXT_MAX,
@@ -110,6 +111,7 @@ function createRig(options: RigOptions = {}) {
   const statted: string[] = [];
   const timers: ArmedTimer[] = [];
   const cleared: number[] = [];
+  const fired: number[] = [];
   const warnings: unknown[][] = [];
   const debugs: unknown[][] = [];
   const OUR_UID = 501;
@@ -179,9 +181,19 @@ function createRig(options: RigOptions = {}) {
     socket.emit('connect');
     feed(socket, OPCODES.FRAME, { cmd: 'DISPATCH', evt: 'READY', data: { v: 1 }, nonce: null });
   };
-  /** Fire an armed timer at its due time, advancing the clock the way one does. */
+  /**
+   * Timers armed and neither cleared nor already fired: what is really pending.
+   * The raw `timers` array is append-only (the answer timeout arms once per
+   * handshake and once per in-flight update, and is almost always disarmed by
+   * the answer), so raw indexing stopped meaning anything; assertions about
+   * "what is armed right now" go through this instead.
+   */
+  const liveTimers = () =>
+    timers.filter((timer) => !cleared.includes(timer.handle) && !fired.includes(timer.handle));
+  /** Fire the index-th LIVE timer at its due time, advancing the clock the way one does. */
   const fireTimer = (index: number) => {
-    const timer = timers[index];
+    const timer = liveTimers()[index];
+    fired.push(timer.handle);
     state.now += timer.delayMs;
     timer.callback();
   };
@@ -212,6 +224,7 @@ function createRig(options: RigOptions = {}) {
     debugs,
     state,
     live,
+    liveTimers,
     framesOf,
     payloadsOf,
     feed,
@@ -486,6 +499,9 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     expect(DISCORD_MIN_SEND_INTERVAL_MS).toBe(15000);
     expect(DISCORD_BASE_BACKOFF_MS).toBe(2000);
     expect(DISCORD_MAX_BACKOFF_MS).toBe(60000);
+    // The bounded wait for a peer's required answer (READY, or a nonce echo):
+    // generous next to Discord's one-turn reality, small next to a session.
+    expect(DISCORD_ANSWER_TIMEOUT_MS).toBe(10000);
     // The peer-text log bound rides this literal: the two bounded-log arms
     // compare against the imported constant, so without this pin a raised
     // constant would vacuously green the whole hostile-peer guarantee.
@@ -586,7 +602,7 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     // Every slot accepted and dropped: that is still "no usable Discord", so
     // the walk ends in the ordinary silent backoff, not a tight loop.
     expect(rig.presence.stateForTest().state).toBe('backoff');
-    expect(rig.timers).toHaveLength(1);
+    expect(rig.liveTimers()).toHaveLength(1);
     expect(rig.warnings).toEqual([]);
   });
 
@@ -721,11 +737,13 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     const rig = createRig({ env: {}, maxBackoffMs: 5000 });
     rig.presence.setActivity({ details: 'Eastbrook' });
     rig.failWholeWalk();
-    const delays: number[] = [rig.timers[0].delayMs];
+    const delays: number[] = [rig.liveTimers()[0].delayMs];
     for (let round = 1; round < 4; round += 1) {
-      rig.fireTimer(round - 1);
+      // The retry is the only live timer between walks (no candidate here ever
+      // accepts, so no answer timeout is armed).
+      rig.fireTimer(0);
       rig.failWholeWalk();
-      delays.push(rig.timers[round].delayMs);
+      delays.push(rig.liveTimers()[0].delayMs);
     }
     expect(delays).toEqual([2000, 4000, 5000, 5000]);
     // Ten candidates per walk on the bare env, and every walk really happened.
@@ -758,8 +776,112 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
       },
     });
     expect(rig.presence.stateForTest().pendingNonce).toBe('woc-1');
-    // A working connection forgives the backoff: a later drop is a new problem.
+    // A first connection starts with a clean backoff. READY alone no longer
+    // FORGIVES an escalated one: forgiveness waits for an acknowledged update
+    // (the dedicated escalation arms below own that contract).
     expect(rig.presence.stateForTest().backoffMs).toBe(0);
+  });
+
+  it('keeps escalating the backoff while READY connections die unacknowledged', () => {
+    // The win32 pipe namespace has no ownership gate, so a squatter can answer
+    // READY forever. Forgiving the backoff AT READY handed exactly that peer a
+    // one-to-two-second redial loop for the whole session (every cycle reset
+    // the escalation); forgiveness now waits for an acknowledged SET_ACTIVITY,
+    // which a drop-on-READY peer never produces, so its redials stretch out.
+    const rig = createRig();
+    rig.presence.setActivity({ details: 'Eastbrook' });
+    rig.ready(rig.live());
+    rig.live().emit('close');
+    expect(rig.presence.stateForTest().state).toBe('backoff');
+    expect(rig.liveTimers()[0].delayMs).toBe(DISCORD_BASE_BACKOFF_MS);
+    rig.fireTimer(0);
+    rig.ready(rig.live());
+    // The re-send is still waiting out the rate-limit floor, so nothing was
+    // acknowledged when the peer drops again: the backoff doubles.
+    rig.live().emit('close');
+    expect(rig.liveTimers()[0].delayMs).toBe(DISCORD_BASE_BACKOFF_MS * 2);
+    rig.fireTimer(0);
+    rig.ready(rig.live());
+    rig.live().emit('close');
+    expect(rig.liveTimers()[0].delayMs).toBe(DISCORD_BASE_BACKOFF_MS * 4);
+    // Still the silent arm: a squatter is a no-Discord machine, not a warning.
+    expect(rig.warnings).toEqual([]);
+  });
+
+  it('forgives the backoff once Discord acknowledges an update', () => {
+    const rig = createRig();
+    rig.presence.setActivity({ details: 'Eastbrook' });
+    rig.ready(rig.live());
+    rig.live().emit('close');
+    // One unproven READY behind us: the escalation is live at the base delay.
+    rig.fireTimer(0);
+    rig.ready(rig.live());
+    // Fire the deferred re-send (the floor spans the reconnect), then answer
+    // it: the echo is what proves a working Discord sits at the far end.
+    rig.fireTimer(0);
+    rig.feed(rig.live(), OPCODES.FRAME, {
+      cmd: 'SET_ACTIVITY',
+      evt: null,
+      data: null,
+      nonce: 'woc-2',
+    });
+    expect(rig.presence.stateForTest().backoffMs).toBe(0);
+    rig.live().emit('close');
+    // A drop AFTER the ack is a new problem: the retry starts from the base
+    // again instead of continuing the escalation.
+    expect(rig.liveTimers()[0].delayMs).toBe(DISCORD_BASE_BACKOFF_MS);
+  });
+
+  it('bounds a silent-accept peer with the answer timeout, escalating on repeat', () => {
+    // A peer that accepts and never answers the handshake used to park the
+    // state machine in 'handshaking' until the socket happened to close (the
+    // ledger declared it out of scope). It now costs one answer window, then
+    // the socket is destroyed and the ordinary backoff path takes over.
+    const rig = createRig();
+    rig.presence.setActivity({ details: 'Eastbrook' });
+    const socket = rig.live();
+    socket.emit('connect');
+    expect(rig.presence.stateForTest().state).toBe('handshaking');
+    expect(rig.liveTimers().map((timer) => timer.delayMs)).toEqual([DISCORD_ANSWER_TIMEOUT_MS]);
+    rig.fireTimer(0);
+    expect(socket.destroyed).toBe(1);
+    expect(rig.presence.stateForTest().state).toBe('backoff');
+    expect(rig.liveTimers()[0].delayMs).toBe(DISCORD_BASE_BACKOFF_MS);
+    // The same silence on the retry ESCALATES rather than resetting: nothing
+    // was ever acknowledged, so this walks the same doubling as any failure.
+    rig.fireTimer(0);
+    rig.live().emit('connect');
+    rig.fireTimer(0);
+    expect(rig.presence.stateForTest().state).toBe('backoff');
+    expect(rig.liveTimers()[0].delayMs).toBe(DISCORD_BASE_BACKOFF_MS * 2);
+    // Silent at debug, like every other no-usable-Discord arm.
+    expect(rig.warnings).toEqual([]);
+  });
+
+  it('bounds a peer that answers READY but never echoes a SET_ACTIVITY nonce', () => {
+    // The pending-nonce wait rides the same timeout: without it, an unanswered
+    // update would gate flush() forever while the connection sat 'ready' and
+    // healthy-looking, and the presence line would silently never move again.
+    const rig = createRig();
+    const socket = rig.bringUp({ details: 'Eastbrook' });
+    expect(rig.presence.stateForTest().pendingNonce).toBe('woc-1');
+    expect(rig.liveTimers().map((timer) => timer.delayMs)).toEqual([DISCORD_ANSWER_TIMEOUT_MS]);
+    rig.fireTimer(0);
+    expect(socket.destroyed).toBe(1);
+    expect(rig.presence.stateForTest().state).toBe('backoff');
+    expect(rig.liveTimers()[0].delayMs).toBe(DISCORD_BASE_BACKOFF_MS);
+  });
+
+  it('leaves no answer timer pending after a fast READY and a prompt ack', () => {
+    // The normal path must be untouched by the timeout: both bounded waits
+    // (handshake to READY, write to echo) are answered and disarmed, so
+    // nothing is left to fire and tear down a healthy connection later.
+    const rig = createRig();
+    const socket = rig.bringUp({ details: 'Eastbrook' });
+    rig.feed(socket, OPCODES.FRAME, { cmd: 'SET_ACTIVITY', evt: null, data: null, nonce: 'woc-1' });
+    expect(rig.presence.stateForTest().state).toBe('ready');
+    expect(socket.destroyed).toBe(0);
+    expect(rig.liveTimers()).toEqual([]);
   });
 
   it('answers a PING with a PONG that echoes its payload', () => {
@@ -788,13 +910,13 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     expect(socket.destroyed).toBe(1);
     // No retry storm: nothing armed, and nothing later re-arms it. A hot loop
     // here would hammer the daemon for the whole session.
-    expect(rig.timers).toEqual([]);
+    expect(rig.liveTimers()).toEqual([]);
     rig.presence.setActivity({ details: 'Vale of Kings' });
     rig.presence.setEnabled(false);
     rig.presence.setEnabled(true);
     rig.presence.setActivity({ details: 'Ironforge Road' });
     expect(rig.sockets).toHaveLength(1);
-    expect(rig.timers).toEqual([]);
+    expect(rig.liveTimers()).toEqual([]);
   });
 
   it('advances the walk on a pre-READY CLOSE with a transient code; terminal is 4000 only', () => {
@@ -832,7 +954,7 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     rig.feed(socket, OPCODES.CLOSE, { message: 'no code here' });
     expect(rig.presence.stateForTest().state).toBe('invalid-client');
     expect(rig.warnings).toHaveLength(1);
-    expect(rig.timers).toEqual([]);
+    expect(rig.liveTimers()).toEqual([]);
   });
 
   it('treats a CLOSE on a working connection as a disconnect, not a refusal', () => {
@@ -843,7 +965,7 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     rig.feed(socket, OPCODES.CLOSE, { code: 1000, message: 'closing' });
     expect(rig.presence.stateForTest().state).toBe('backoff');
     expect(rig.warnings).toEqual([]);
-    expect(rig.timers).toHaveLength(1);
+    expect(rig.liveTimers()).toHaveLength(1);
   });
 
   it('re-sends the desired activity after a drop and a fresh READY', () => {
@@ -861,8 +983,8 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     // faster than it allows. So the re-send is armed for the remainder of the
     // window (2000 ms of it were spent in the backoff) rather than written now.
     expect(rig.framesOf(second)).toHaveLength(1);
-    expect(rig.timers[1].delayMs).toBe(DISCORD_MIN_SEND_INTERVAL_MS - 2000);
-    rig.fireTimer(1);
+    expect(rig.liveTimers()[0].delayMs).toBe(DISCORD_MIN_SEND_INTERVAL_MS - 2000);
+    rig.fireTimer(0);
     // The SAME activity goes out again: the dedup is per connection, because a
     // new socket has been told nothing, and skipping it would leave the player
     // with a blank presence until their next zone change.
@@ -879,13 +1001,13 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     rig.presence.setActivity({ details: 'Vale of Kings' });
     // Inside the floor: nothing written, one timer armed for the remainder.
     expect(rig.framesOf(socket)).toHaveLength(2);
-    expect(rig.timers).toHaveLength(1);
-    expect(rig.timers[0].delayMs).toBe(DISCORD_MIN_SEND_INTERVAL_MS - 1000);
+    expect(rig.liveTimers()).toHaveLength(1);
+    expect(rig.liveTimers()[0].delayMs).toBe(DISCORD_MIN_SEND_INTERVAL_MS - 1000);
     // A third zone before the timer fires REPLACES the second rather than
     // queueing behind it: a presence line that replays four stale zones is
     // worse than one that skipped them.
     rig.presence.setActivity({ details: 'Ironforge Road' });
-    expect(rig.timers).toHaveLength(1);
+    expect(rig.liveTimers()).toHaveLength(1);
     rig.fireTimer(0);
     const frames = rig.framesOf(socket);
     expect(frames).toHaveLength(3);
@@ -904,7 +1026,7 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     // fire and every tick would cost a frame.
     rig.presence.setActivity({ details: 'Eastbrook' });
     expect(rig.framesOf(socket)).toHaveLength(2);
-    expect(rig.timers).toEqual([]);
+    expect(rig.liveTimers()).toEqual([]);
     // Key ORDER is not a change either.
     rig.presence.setActivity({ timestamps: { start: 5 }, details: 'Eastbrook' });
     expect(rig.framesOf(socket)).toHaveLength(3);
@@ -919,9 +1041,11 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     const socket = rig.bringUp({ details: 'Eastbrook' });
     rig.state.now += DISCORD_MIN_SEND_INTERVAL_MS * 2;
     rig.presence.setActivity({ details: 'Vale of Kings' });
-    // Outside the rate-limit window, so only the in-flight nonce is holding it.
+    // Outside the rate-limit window, so only the in-flight nonce is holding it:
+    // no SEND timer is armed. (The one live timer is the answer timeout that
+    // bounds the wait on that nonce, not a re-arm of the write.)
     expect(rig.framesOf(socket)).toHaveLength(2);
-    expect(rig.timers).toEqual([]);
+    expect(rig.liveTimers().map((timer) => timer.delayMs)).toEqual([DISCORD_ANSWER_TIMEOUT_MS]);
     rig.feed(socket, OPCODES.FRAME, { cmd: 'SET_ACTIVITY', evt: null, data: null, nonce: 'woc-1' });
     const payload = rig.payloadsOf(socket)[2];
     expect(payload.args).toEqual({ pid: 4321, activity: { details: 'Vale of Kings' } });
@@ -993,7 +1117,7 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     rig.presence.setActivity({ details: 'Vale of Kings' });
     expect(socket.destroyed).toBe(1);
     expect(rig.presence.stateForTest().state).toBe('backoff');
-    expect(rig.timers).toHaveLength(1);
+    expect(rig.liveTimers()).toHaveLength(1);
     rig.fireTimer(0);
     const second = rig.live();
     expect(second).not.toBe(socket);
@@ -1012,8 +1136,7 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     // and land terminal-quiet, with the socket released exactly once.
     expect(rig.presence.stateForTest().state).toBe('off');
     expect(socket.destroyed).toBe(1);
-    const liveTimers = rig.timers.filter((timer) => !rig.cleared.includes(timer.handle));
-    expect(liveTimers).toEqual([]);
+    expect(rig.liveTimers()).toEqual([]);
     expect(rig.presence.stateForTest().desiredActivity).toBeNull();
   });
 
@@ -1054,7 +1177,7 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     expect(socket.destroyed).toBe(1);
     expect(rig.warnings).toEqual([]);
     expect(rig.presence.stateForTest().state).toBe('backoff');
-    expect(rig.timers).toHaveLength(1);
+    expect(rig.liveTimers()).toHaveLength(1);
   });
 
   it('reassembles a READY that arrives in two chunks', () => {
@@ -1088,7 +1211,7 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     // Late socket events during teardown must not resurrect the walk.
     socket.emit('close');
     expect(rig.sockets).toHaveLength(1);
-    expect(rig.timers).toEqual([]);
+    expect(rig.liveTimers()).toEqual([]);
   });
 
   it('refuses a missing dependency or a non-positive interval at construction', () => {
@@ -1141,6 +1264,7 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     for (const bad of [0, -1, Number.POSITIVE_INFINITY, Number.NaN]) {
       expect(() => build({ minSendIntervalMs: bad })).toThrow(TypeError);
       expect(() => build({ maxBackoffMs: bad })).toThrow(TypeError);
+      expect(() => build({ answerTimeoutMs: bad })).toThrow(TypeError);
     }
   });
 
@@ -1150,7 +1274,7 @@ describe('discord presence connection (electron/discord_presence.cjs)', () => {
     rig.feed(socket, OPCODES.FRAME, { cmd: 'SET_ACTIVITY', evt: null, data: null, nonce: 'woc-1' });
     rig.state.now += 399;
     rig.presence.setActivity({ details: 'Vale of Kings' });
-    expect(rig.timers[0].delayMs).toBe(1);
+    expect(rig.liveTimers()[0].delayMs).toBe(1);
     rig.fireTimer(0);
     expect(rig.framesOf(socket)).toHaveLength(3);
   });

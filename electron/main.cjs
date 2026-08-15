@@ -611,10 +611,28 @@ function createMainWindow() {
     // re-captures real bounds.
     if (win.isFullScreen()) return;
     const bounds = win.getNormalBounds();
-    desktopPrefs.windowBounds = bounds;
-    desktopPrefs.displayId = screen.getDisplayMatching(bounds)?.id;
-    desktopPrefs.maximized = win.isMaximized();
-    saveDesktopPrefs(desktopPrefsPath, desktopPrefs);
+    // Persist-then-commit, the same discipline as the IPC setters: the
+    // candidate record is built fresh (the whole record, spread from the live
+    // module-scope object, so this and the setters cannot clobber each
+    // other's fields), saved, and committed to the in-memory record only when
+    // the save reached disk. Mutating first would leave memory ahead of disk
+    // on a failed save, and the next unrelated successful save would then
+    // silently persist bounds no save ever accepted.
+    const nextPrefs = {
+      ...desktopPrefs,
+      windowBounds: bounds,
+      displayId: screen.getDisplayMatching(bounds)?.id,
+      maximized: win.isMaximized(),
+    };
+    if (!saveDesktopPrefs(desktopPrefsPath, nextPrefs)) {
+      // Once per debounce settle at most, and worth the line: the player's
+      // window memory is silently not sticking.
+      log.warn('[shell] could not persist the window geometry');
+      return;
+    }
+    desktopPrefs.windowBounds = nextPrefs.windowBounds;
+    desktopPrefs.displayId = nextPrefs.displayId;
+    desktopPrefs.maximized = nextPrefs.maximized;
   };
   const scheduleWindowBoundsSave = () => {
     clearBoundsSaveTimer();
@@ -1054,7 +1072,9 @@ ipcMain.handle('desktop-gamepad-activity', (event) => {
 // gains a three-dot suffix on top of the cap), which also flattens control and
 // invisible-formatting characters so a crafted string cannot smuggle escapes
 // or bidi reordering into the OS surface, and the rate limit stamps only on a
-// notification that really shows.
+// notification that really shows. The guard also holds the per-session TOTAL
+// cap (notify_guard.cjs MAX_NOTIFICATIONS_PER_SESSION, the console-mirror
+// precedent): once a session has shown its fill, further asks drop silently.
 // On Linux both strings additionally have their markup-significant characters
 // entity-escaped (electron/diagnostics.cjs escapeNotificationMarkup): the
 // freedesktop spec lets daemons parse markup in bodies, and a toast must

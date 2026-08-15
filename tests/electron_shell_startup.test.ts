@@ -454,8 +454,30 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     expect(capture, 'the display the window sits on must be remembered').toContain(
       'screen.getDisplayMatching(',
     );
-    expect(capture, 'the whole prefs record must be persisted').toContain(
-      'saveDesktopPrefs(desktopPrefsPath, desktopPrefs);',
+    // Persist-then-commit, the same discipline the IPC setters pin in
+    // tests/electron_ipc_channels.test.ts: the candidate record is built fresh
+    // (the WHOLE record, spread from the live module-scope object, which is
+    // also the anti-clobber contract with the other setters), saved, and
+    // committed to the in-memory record only when the save reached disk.
+    // Mutating first would leave memory ahead of disk on a failed save, and
+    // the next unrelated successful save would then silently persist bounds no
+    // save ever accepted.
+    expect(capture, 'the candidate must carry the whole live record').toContain('...desktopPrefs,');
+    expect(capture, 'the save-failure guard is load-bearing').toContain(
+      'if (!saveDesktopPrefs(desktopPrefsPath, nextPrefs)) {',
+    );
+    const captureSaveAt = capture.indexOf('saveDesktopPrefs(desktopPrefsPath, nextPrefs)');
+    const captureCommitAt = capture.indexOf('desktopPrefs.windowBounds = nextPrefs.windowBounds;');
+    expect(captureSaveAt, 'the whole prefs record must be persisted').toBeGreaterThan(-1);
+    expect(
+      captureCommitAt,
+      'the in-memory record must commit only after a successful save',
+    ).toBeGreaterThan(captureSaveAt);
+    expect(capture, 'every captured field commits together').toContain(
+      'desktopPrefs.displayId = nextPrefs.displayId;',
+    );
+    expect(capture, 'every captured field commits together').toContain(
+      'desktopPrefs.maximized = nextPrefs.maximized;',
     );
 
     // The schedule must CANCEL the pending timer before arming a new one:

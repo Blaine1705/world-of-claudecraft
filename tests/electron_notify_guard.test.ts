@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { createNotifyGuard, NOTIFY_MIN_INTERVAL_MS } from '../electron/notify_guard.cjs';
+import {
+  createNotifyGuard,
+  MAX_NOTIFICATIONS_PER_SESSION,
+  NOTIFY_MIN_INTERVAL_MS,
+} from '../electron/notify_guard.cjs';
 
 // The notification rate limit (electron/notify_guard.cjs) is pure and injected,
 // so the whole window boundary runs here without an Electron runtime. What it
@@ -7,7 +11,7 @@ import { createNotifyGuard, NOTIFY_MIN_INTERVAL_MS } from '../electron/notify_gu
 // a stream of OS toasts the player dismisses outside the app, and a floor that
 // never reopens silently drops every notification after the first.
 
-function createRig(options: { minIntervalMs?: number } = {}) {
+function createRig(options: { minIntervalMs?: number; sessionMax?: number } = {}) {
   const state = { now: 1_000_000 };
   const guard = createNotifyGuard({ now: () => state.now, ...options });
   return { guard, state };
@@ -98,6 +102,68 @@ describe('notification rate limit (electron/notify_guard.cjs)', () => {
     expect(rig.guard.allow('update-ready')).toBe(false);
     rig.state.now += NOTIFY_MIN_INTERVAL_MS * 6;
     expect(rig.guard.allow('update-ready')).toBe(true);
+  });
+
+  it('pins the session cap to its literal', () => {
+    // Generous on purpose: the per-kind floor already paces legitimate use, so
+    // no real session should ever reach this. It exists for the ceiling on
+    // clamped attacker-influenced text an unfocused player can be shown at all.
+    expect(MAX_NOTIFICATIONS_PER_SESSION).toBe(50);
+  });
+
+  it('silently drops every notification once the session cap is reached', () => {
+    // Same posture as the mirrored-console-line cap: the surface is bounded per
+    // session, and reaching the bound is terminal rather than a window that
+    // reopens (a reopening cap would just be a slower drip of the same spam).
+    const rig = createRig();
+    for (let shown = 0; shown < MAX_NOTIFICATIONS_PER_SESSION; shown += 1) {
+      expect(rig.guard.allow('update-ready'), `notification ${shown} is under the cap`).toBe(true);
+      rig.state.now += NOTIFY_MIN_INTERVAL_MS;
+    }
+    expect(rig.guard.allow('update-ready')).toBe(false);
+    // Terminal for the whole session: no amount of waiting reopens it.
+    rig.state.now += NOTIFY_MIN_INTERVAL_MS * 100;
+    expect(rig.guard.allow('update-ready')).toBe(false);
+  });
+
+  it('counts the cap per session, not per kind', () => {
+    // A per-kind cap would multiply the ceiling by the kind whitelist; the cap
+    // exists to bound the OS surface as a whole, so every kind draws from it.
+    const rig = createRig({ sessionMax: 2 });
+    expect(rig.guard.allow('update-ready')).toBe(true);
+    expect(rig.guard.allow('party-invite')).toBe(true);
+    // A third kind with a completely fresh per-kind window is still refused.
+    expect(rig.guard.allow('party-invite-2')).toBe(false);
+    expect(rig.guard.allow('update-ready')).toBe(false);
+  });
+
+  it('does not spend the cap on refused calls', () => {
+    // A refusal inside the per-kind floor (or a junk kind) never showed
+    // anything, so counting it would let a noisy source burn the session cap
+    // without a single toast reaching the player.
+    const rig = createRig({ sessionMax: 2 });
+    expect(rig.guard.allow('update-ready')).toBe(true);
+    for (let refused = 0; refused < 10; refused += 1) {
+      expect(rig.guard.allow('update-ready')).toBe(false);
+    }
+    expect(rig.guard.allow(42)).toBe(false);
+    rig.state.now += NOTIFY_MIN_INTERVAL_MS;
+    expect(rig.guard.allow('update-ready')).toBe(true);
+    rig.state.now += NOTIFY_MIN_INTERVAL_MS;
+    expect(rig.guard.allow('update-ready')).toBe(false);
+  });
+
+  it('refuses a non-positive or non-integer session cap at construction', () => {
+    // Zero or negative would silence the surface entirely, and a fractional cap
+    // is a wiring mistake; both fail loudly like the interval guard.
+    expect(() => createRig({ sessionMax: 0 })).toThrow(TypeError);
+    expect(() => createRig({ sessionMax: -1 })).toThrow(TypeError);
+    expect(() => createRig({ sessionMax: 2.5 })).toThrow(TypeError);
+    expect(() => createRig({ sessionMax: Number.NaN })).toThrow(TypeError);
+    expect(() => createRig({ sessionMax: '50' as unknown as number })).toThrow(/createNotifyGuard/);
+    // The default is valid, so the guard cannot be satisfied by refusing
+    // everything.
+    expect(() => createRig({ sessionMax: 1 })).not.toThrow();
   });
 
   it('refuses a non-positive, non-finite or non-numeric interval at construction', () => {

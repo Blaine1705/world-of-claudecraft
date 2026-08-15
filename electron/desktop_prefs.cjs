@@ -19,7 +19,9 @@
 //     window, an origin, a feed, or an IPC channel unvalidated.
 //
 // Writes are atomic (temp file plus rename) so a crash mid-write leaves the
-// previous file intact rather than a half-written one that reads as corrupt.
+// previous file intact rather than a half-written one that reads as corrupt,
+// and DURABLE (fsync the staged fd before the rename, then the directory best
+// effort) so a power loss cannot land the rename ahead of the data blocks.
 // Pure and dependency-injected: tests/electron_desktop_prefs.test.ts exercises
 // every arm with a real scratch directory and with throwing fake fs functions.
 
@@ -189,36 +191,79 @@ function desktopPrefsTempPath(filePath, random = Math.random) {
  * ship). Never throws; returns whether the value actually landed on disk, which
  * is what the IPC setter reports to the renderer.
  *
- * The staging write is EXCLUSIVE ('wx' is O_EXCL): it fails outright if
+ * The staging open is EXCLUSIVE ('wx' is O_EXCL): it fails outright if
  * anything already exists at the scratch path, and O_EXCL refuses a symlink
  * rather than following it. Without that, a local process that pre-created the
  * scratch path as a symlink would have every save write through it, turning a
  * settings toggle into a clobber of whatever file it pointed at. Failing the
  * save is the safe answer: the player's preference just does not stick, and the
  * IPC setter already reports that honestly.
+ *
+ * DURABLE, not just atomic: the staged fd is fsynced BEFORE the rename.
+ * Rename alone orders the directory entry, not the data blocks, and a
+ * journal-reordering filesystem may commit the rename first, so a power loss
+ * in the gap lands an EMPTY file at the real path, wiping every stored
+ * preference at once; the field that hurts most is gpuForceOptOut, lost on
+ * exactly the crash-prone machine the opt-out exists for. After the rename the
+ * DIRECTORY is fsynced too, best effort, so the rename itself survives the
+ * same loss where the platform allows it (Windows cannot open or fsync a
+ * directory, hence the swallowing try/catch around that arm alone).
  */
 function saveDesktopPrefs(filePath, prefs, deps = {}) {
   const mkdirSync = deps.mkdirSync ?? nodeFs.mkdirSync;
+  const openSync = deps.openSync ?? nodeFs.openSync;
   const writeFileSync = deps.writeFileSync ?? nodeFs.writeFileSync;
+  const fsyncSync = deps.fsyncSync ?? nodeFs.fsyncSync;
+  const closeSync = deps.closeSync ?? nodeFs.closeSync;
   const renameSync = deps.renameSync ?? nodeFs.renameSync;
   const unlinkSync = deps.unlinkSync ?? nodeFs.unlinkSync;
-  // Set only once the exclusive write has succeeded, i.e. once the file at that
+  // Set only once the exclusive open has succeeded, i.e. once the file at that
   // path is one WE created. A path that was already there is never unlinked:
-  // the whole point of the exclusive write is to leave what it refused alone.
+  // the whole point of the exclusive open is to leave what it refused alone.
   let ownedTempPath = '';
+  // The staged fd, tracked so the failure path can release it: a write or
+  // fsync that throws would otherwise leak one handle per failing save.
+  let stagedFd = null;
   try {
     const text = JSON.stringify(sanitizeDesktopPrefs(prefs));
     if (text.length > MAX_PREFS_FILE_BYTES) return false;
     mkdirSync(nodePath.dirname(filePath), { recursive: true });
     const tempPath = desktopPrefsTempPath(filePath, deps.random);
-    writeFileSync(tempPath, text, { encoding: 'utf8', flag: 'wx' });
+    stagedFd = openSync(tempPath, 'wx');
     ownedTempPath = tempPath;
+    // writeFileSync on an fd writes the whole payload (looping internally) and
+    // leaves the fd open, which is the point: the fsync must hit the same open
+    // descriptor the data went through.
+    writeFileSync(stagedFd, text, { encoding: 'utf8' });
+    fsyncSync(stagedFd);
+    closeSync(stagedFd);
+    stagedFd = null;
     renameSync(tempPath, filePath);
+    // Best-effort only from here: the payload is durable at its final name in
+    // the common case, and Windows has no directory fsync to offer, so this
+    // arm may fail without failing the save.
+    try {
+      const dirFd = openSync(nodePath.dirname(filePath), 'r');
+      try {
+        fsyncSync(dirFd);
+      } finally {
+        closeSync(dirFd);
+      }
+    } catch {
+      // The rename still happened; only its power-loss durability is weaker.
+    }
     return true;
   } catch {
-    // A rename that failed after a successful staging write leaves our own
-    // scratch file behind; drop it best-effort so a failing save cannot litter
-    // the directory once per attempt.
+    if (stagedFd !== null) {
+      try {
+        closeSync(stagedFd);
+      } catch {
+        // Nothing further to do: the save already failed.
+      }
+    }
+    // A failure after a successful exclusive open leaves our own scratch file
+    // behind; drop it best-effort so a failing save cannot litter the
+    // directory once per attempt.
     if (ownedTempPath !== '') {
       try {
         unlinkSync(ownedTempPath);
