@@ -10901,6 +10901,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} de Honra',
   'hudChrome.warfare.honorGain': 'Você recebe {amount} de Honra ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Honra insuficiente.',
+  'hudChrome.warfare.reasons.arenaComplete': 'combate na arena disputado',
   'hudChrome.warfare.reasons.arenaWin': 'Vitória na arena',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta concluída',
   'hudChrome.warfare.reasons.fiestaKill': 'Eliminação na Fiesta',

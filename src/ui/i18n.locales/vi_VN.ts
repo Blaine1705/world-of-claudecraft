@@ -10554,6 +10554,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} Danh dự',
   'hudChrome.warfare.honorGain': 'Bạn nhận được Danh dự {amount} ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Không đủ danh dự.',
+  'hudChrome.warfare.reasons.arenaComplete': 'Đã đấu trận đấu trường',
   'hudChrome.warfare.reasons.arenaWin': 'Chiến thắng đấu trường',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta đã hoàn thành',
   'hudChrome.warfare.reasons.fiestaKill': 'Hạ gục trong Fiesta',

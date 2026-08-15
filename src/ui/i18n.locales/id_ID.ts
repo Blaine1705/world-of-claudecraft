@@ -10738,6 +10738,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} Kehormatan',
   'hudChrome.warfare.honorGain': 'Anda mendapatkan Kehormatan {amount} ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Tidak cukup Kehormatan.',
+  'hudChrome.warfare.reasons.arenaComplete': 'Pertarungan arena dijalani',
   'hudChrome.warfare.reasons.arenaWin': 'Kemenangan arena',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta selesai',
   'hudChrome.warfare.reasons.fiestaKill': 'Eliminasi Fiesta',

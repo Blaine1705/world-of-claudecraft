@@ -2877,6 +2877,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} points d’honneur',
   'hudChrome.warfare.honorGain': 'Vous gagnez {amount} points d’honneur ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Vous n’avez pas assez d’honneur.',
+  'hudChrome.warfare.reasons.arenaComplete': 'combat en arène mené',
   'hudChrome.warfare.reasons.arenaWin': 'Victoire en arène',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta terminée',
   'hudChrome.warfare.reasons.fiestaKill': 'Élimination en Fiesta',

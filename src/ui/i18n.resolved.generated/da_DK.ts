@@ -1739,7 +1739,7 @@ export const da_DK: EnTranslations = {
       "notEnoughHonor": "Ikke nok Ære.",
       "reasons": {
         "arenaWin": "Arenasejr",
-        "arenaComplete": "Arena bout fought",
+        "arenaComplete": "Arenakamp udkæmpet",
         "fiestaKill": "Fiesta-nedlæggelse",
         "fiestaComplete": "Fiesta gennemført",
         "fiestaWin": "Fiesta-sejr",

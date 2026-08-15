@@ -10632,6 +10632,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} Ære',
   'hudChrome.warfare.honorGain': 'Du opnår {amount} Ære ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Ikke nok Ære.',
+  'hudChrome.warfare.reasons.arenaComplete': 'Arenakamp udkæmpet',
   'hudChrome.warfare.reasons.arenaWin': 'Arenasejr',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta gennemført',
   'hudChrome.warfare.reasons.fiestaKill': 'Fiesta-nedlæggelse',

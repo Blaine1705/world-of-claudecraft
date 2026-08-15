@@ -10650,6 +10650,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} Heder',
   'hudChrome.warfare.honorGain': 'Du får {amount} Heder ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Inte tillräckligt med heder.',
+  'hudChrome.warfare.reasons.arenaComplete': 'arenamatch utkämpad',
   'hudChrome.warfare.reasons.arenaWin': 'Arenaseger',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta avklarad',
   'hudChrome.warfare.reasons.fiestaKill': 'Fiesta-nedtagning',

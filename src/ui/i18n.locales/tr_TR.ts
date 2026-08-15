@@ -10627,6 +10627,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} Onur',
   'hudChrome.warfare.honorGain': '{amount} Onur ({reason}) kazanırsınız.',
   'hudChrome.warfare.notEnoughHonor': 'Yeterli Onur yok.',
+  'hudChrome.warfare.reasons.arenaComplete': 'Arena müsabakası yapıldı',
   'hudChrome.warfare.reasons.arenaWin': 'Arena zaferi',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta tamamlandı',
   'hudChrome.warfare.reasons.fiestaKill': 'Fiesta avlaması',

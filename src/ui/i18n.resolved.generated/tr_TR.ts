@@ -1739,7 +1739,7 @@ export const tr_TR: EnTranslations = {
       "notEnoughHonor": "Yeterli Onur yok.",
       "reasons": {
         "arenaWin": "Arena zaferi",
-        "arenaComplete": "Arena bout fought",
+        "arenaComplete": "Arena müsabakası yapıldı",
         "fiestaKill": "Fiesta avlaması",
         "fiestaComplete": "Fiesta tamamlandı",
         "fiestaWin": "Fiesta zaferi",

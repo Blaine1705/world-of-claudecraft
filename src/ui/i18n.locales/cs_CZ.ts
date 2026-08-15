@@ -10706,6 +10706,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} cti',
   'hudChrome.warfare.honorGain': 'Získáváš {amount} cti ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Nemáš dost cti.',
+  'hudChrome.warfare.reasons.arenaComplete': 'Odehrán souboj v aréně',
   'hudChrome.warfare.reasons.arenaWin': 'Vítězství v aréně',
   'hudChrome.warfare.reasons.fiestaComplete': 'Dokončení Fiesty',
   'hudChrome.warfare.reasons.fiestaKill': 'Vyřazení ve Fiestě',
