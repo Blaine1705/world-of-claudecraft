@@ -12,15 +12,11 @@ import { buildPostEntryPreviewPrewarmUnits, type PreviewPrewarmUnit } from './pr
 export interface HudPreviewPrewarmDeps<Pose> {
   playerClass: PlayerClass;
   cardPoses: readonly Pose[];
-  /** Armory catalog skin ids to warm, in catalog order. */
-  armorySkinIds: readonly string[];
   /** Forwarded verbatim; see its doc on `PreviewPrewarmPlanDeps`. */
   includeCharFamily: boolean;
   renderCharShell: () => void;
   prewarmCharSkin: (skin: number) => void | Promise<void>;
   prewarmCardPose: (pose: Pose) => void | Promise<void>;
-  prewarmArmorySkin: (skinId: string, mode: 'character' | 'weapon') => void | Promise<void>;
-  finishArmoryPrewarm: () => void | Promise<void>;
 }
 
 /** The ordered post-entry preview prewarm plan, composed for the Hud. */
@@ -32,7 +28,6 @@ export function buildHudPreviewPrewarmUnits<Pose>(
     allClasses: ALL_CLASSES,
     skinCount,
     cardPoses: deps.cardPoses,
-    armorySkinIds: deps.armorySkinIds,
     includeCharFamily: deps.includeCharFamily,
     renderCharShell: deps.renderCharShell,
     prewarmCharSkin: deps.prewarmCharSkin,
@@ -42,7 +37,5 @@ export function buildHudPreviewPrewarmUnits<Pose>(
     // paced unit never books the 43 to 201 ms cold-capture block.
     renderPortrait: (portraitClass, skin, framing) =>
       prewarmPlayerPortrait(portraitClass as PlayerClass, skin, framing),
-    prewarmArmorySkin: deps.prewarmArmorySkin,
-    finishArmoryPrewarm: deps.finishArmoryPrewarm,
   });
 }

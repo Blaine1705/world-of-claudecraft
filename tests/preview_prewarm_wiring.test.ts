@@ -18,16 +18,13 @@ type Calls = {
   shell: number;
   skins: number[];
   poses: string[];
-  armory: [string, string][];
-  finish: number;
 };
 
 function makeDeps(includeCharFamily: boolean, playerClass: 'warrior' | 'paladin' = 'warrior') {
-  const calls: Calls = { shell: 0, skins: [], poses: [], armory: [], finish: 0 };
+  const calls: Calls = { shell: 0, skins: [], poses: [] };
   const units = buildHudPreviewPrewarmUnits<string>({
     playerClass,
     cardPoses: ['poseA', 'poseB'],
-    armorySkinIds: ['skin_x', 'skin_y'],
     includeCharFamily,
     renderCharShell: () => {
       calls.shell++;
@@ -37,12 +34,6 @@ function makeDeps(includeCharFamily: boolean, playerClass: 'warrior' | 'paladin'
     },
     prewarmCardPose: (pose) => {
       calls.poses.push(pose);
-    },
-    prewarmArmorySkin: (skinId, mode) => {
-      calls.armory.push([skinId, mode]);
-    },
-    finishArmoryPrewarm: () => {
-      calls.finish++;
     },
   });
   return { calls, units };
@@ -79,13 +70,13 @@ describe('buildHudPreviewPrewarmUnits', () => {
       Array.from({ length: skinCount('player_warrior') }, (_, index) => index),
     );
     expect(calls.poses).toEqual(['poseA', 'poseB']);
-    expect(calls.armory).toEqual([
-      ['skin_x', 'character'],
-      ['skin_x', 'weapon'],
-      ['skin_y', 'character'],
-      ['skin_y', 'weapon'],
-    ]);
-    expect(calls.finish).toBe(1);
+    // NEGATIVE pin, mirroring the core suite: the armory catalog warming was
+    // removed upstream (about 2.1 to 2.6 s of live-frame hitches every online
+    // session paid for a window only some players open), so the composed plan
+    // must never carry an armory unit, and the wiring surface must offer no
+    // armory dep a restored loop could ride back in on.
+    expect(units.some((u) => u.label.startsWith('preview:armory'))).toBe(false);
+    expect(units.every((u) => u.family === 'char')).toBe(true);
   });
 
   it('forwards the deps playerClass into the char-skin count, never a hardcoded class', () => {
@@ -105,8 +96,8 @@ describe('buildHudPreviewPrewarmUnits', () => {
     expect(calls.shell).toBe(0);
     expect(calls.skins).toEqual([]);
     expect(calls.poses).toEqual([]);
-    // The portrait and armory families still warm.
+    // The portrait units still warm (canvas-2D only, no shell dependence).
     expect(units.some((u) => u.label.startsWith('preview:portrait:'))).toBe(true);
-    expect(calls.finish).toBe(1);
+    expect(units.every((u) => u.label.startsWith('preview:portrait:'))).toBe(true);
   });
 });
