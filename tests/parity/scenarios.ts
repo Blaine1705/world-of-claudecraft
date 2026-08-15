@@ -5677,6 +5677,74 @@ function idleMobDistanceCulling(): Scenario {
   };
 }
 
+// Wolf Form AUTO attacks, the arm druid_engines deliberately does not drive
+// (it scripts specials only): the fixed 1.0s cat cadence swings against a
+// bear-form control on the same staff swinging at the weapon speed. The cat
+// lane lands ~1.8x the swings (and rng draws) of the bear lane over the same
+// window, so a regression in the cat swing timer or the normalized mainhand
+// roll moves this golden's draw digest, not just its state hashes.
+function catFormAutoSwing(): Scenario {
+  return {
+    name: 'cat_form_auto_swing',
+    coverage: [
+      'class:druid (Wildfang cat + Bruin control)',
+      'Wolf Form fixed-cadence auto-attack: 1.0s swing timer, normalized mainhand weapon roll',
+      'bear-form control swinging at the equipped weapon speed on the same loadout',
+    ],
+    sampleEvery: 5,
+    build: () => new Sim({ seed: 2931, playerClass: 'druid', noPlayer: true, autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const catId = sim.addPlayer('druid', 'Pawtrace');
+      const bearId = sim.addPlayer('druid', 'Bruintrace');
+      for (const pid of [catId, bearId]) sim.setPlayerLevel(20, pid);
+      sim.setSpec('feral', catId);
+      sim.setSpec('feral', bearId);
+      const cat = sim.entities.get(catId) as AnyEntity;
+      const bear = sim.entities.get(bearId) as AnyEntity;
+      teleport(sim, cat, -30, -45);
+      teleport(sim, bear, 30, -45);
+      beef(cat, 80000);
+      beef(bear, 80000);
+      const stage = (owner: AnyEntity): AnyEntity => {
+        const m = spawnMob(sim, 'training_dummy', 1, owner.pos.x, owner.pos.y, owner.pos.z + 1.5);
+        beef(m, 1_000_000);
+        m.hostile = true;
+        m.aiState = 'idle';
+        rec.track(m.id);
+        return m;
+      };
+      const catTarget = stage(cat);
+      const bearTarget = stage(bear);
+      sim.targetEntity(catTarget.id, catId);
+      face(cat, catTarget);
+      cat.resource = cat.maxResource;
+      sim.castAbility('cat_form', catId);
+      sim.targetEntity(bearTarget.id, bearId);
+      face(bear, bearTarget);
+      bear.resource = bear.maxResource;
+      sim.castAbility('bear_form', bearId);
+      rec.tick(10);
+      sim.startAutoAttack(catId);
+      sim.startAutoAttack(bearId);
+      // 8 seconds of swings: ~8 cat swings vs ~2-3 staff-speed bear swings.
+      for (let round = 0; round < 8; round++) {
+        for (const [e, m] of [
+          [cat, catTarget],
+          [bear, bearTarget],
+        ] as const) {
+          face(e, m);
+        }
+        rec.tick(20);
+      }
+      rec.snapshot('after-swings');
+      sim.stopAutoAttack(catId);
+      sim.stopAutoAttack(bearId);
+      rec.tick(10);
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -5743,4 +5811,5 @@ export const SCENARIOS: Scenario[] = [
   professionsToolEffectSlot(),
   idleMobDistanceCulling(),
   riftBossFloor(),
+  catFormAutoSwing(),
 ];
