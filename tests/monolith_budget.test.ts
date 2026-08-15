@@ -59,7 +59,11 @@ const MONOLITHS: MonolithRow[] = [
     // Merging release/v0.38.0: both sides had pinned their own size (13699 here,
     // 13700 there), and the merged file is smaller than either, so the ceiling
     // follows it down rather than inheriting a parent's slack.
-    ceiling: 13682,
+    // Lowered again after extracting the shadow-depth material factory into
+    // src/render/prewarm_depth_material.ts (the self-spirit prewarm now shares
+    // that keyed cache); the net came out below the prior ceiling even with the
+    // self-spirit warm added.
+    ceiling: 13680,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

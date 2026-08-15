@@ -172,7 +172,7 @@ interface AttributionTargetFixture {
 // both parents move renderer.ts, so the merged tree mints a value matching
 // neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'e42ae5e718a5e9d9d817ecfdd77d8c06e939aa1ef990bb795d13f9d127e067c3';
+  'a7af2b93988ef6a825baa153e8cb9e41cfcbb780992b81e670063c6665230da7';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

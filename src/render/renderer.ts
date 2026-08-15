@@ -441,6 +441,7 @@ import {
   summarizePrewarmManifest,
 } from './prewarm_compile_lifecycle';
 import { submitPrewarmCompileUnit } from './prewarm_compile_submission_core';
+import { prewarmDepthMaterial } from './prewarm_depth_material';
 import {
   boundedPrewarmVisibility,
   runBackgroundPrewarm,
@@ -529,6 +530,7 @@ import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
 import { type SelfMotionFrame, SelfMotionPredictor, updateSelfRenderFallback } from './self_motion';
+import { SelfSpiritPrewarmer } from './self_spirit_prewarm';
 import { SentenceVfx } from './sentence_vfx';
 import { sentenceImpactPlan } from './sentence_vfx_core';
 import {
@@ -1810,6 +1812,13 @@ export class Renderer {
   // when a class is first sighted, so the builds queue behind one another and
   // each spends its own idle slot instead of stacking into one combat frame.
   private spiritBuildLane: Promise<unknown> = Promise.resolve();
+  // Warms the local player's own body spirit (ghost) shader variants ahead of
+  // death, so the ungated self view never links them inline on a spirit release
+  // (the measured ~2.2 s death stall). See self_spirit_prewarm.ts + warmSelfSpirit.
+  private selfSpirit = new SelfSpiritPrewarmer({
+    warm: () => this.warmSelfSpirit(),
+    idle: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS),
+  });
   // Static terrain/water/features just beyond the current zone are built in a
   // single background lane when their rectangles enter the relaxed fog
   // horizon, so a walked boundary crossing lands on already-resident ground.
@@ -5517,50 +5526,6 @@ export class Renderer {
     return count;
   }
 
-  private prewarmDepthMaterial(source: THREE.Material): THREE.MeshDepthMaterial {
-    const textured = source as TextureBackedMaterial & {
-      displacementScale?: number;
-      displacementBias?: number;
-      wireframe?: boolean;
-    };
-    const shadowSide =
-      source.shadowSide ??
-      (source.side === THREE.FrontSide
-        ? THREE.BackSide
-        : source.side === THREE.BackSide
-          ? THREE.FrontSide
-          : THREE.DoubleSide);
-    const key = [
-      shadowSide,
-      textured.map ? 1 : 0,
-      textured.alphaMap ? 1 : 0,
-      source.alphaToCoverage || source.alphaTest > 0 ? 1 : 0,
-      textured.displacementMap ? 1 : 0,
-      textured.wireframe ? 1 : 0,
-    ].join('|');
-    let depth = this.prewarmDepthMaterials.get(key);
-    if (depth) return depth;
-    depth = new THREE.MeshDepthMaterial({
-      side: shadowSide,
-      map: textured.map ?? null,
-      alphaMap: textured.alphaMap ?? null,
-      alphaTest: source.alphaToCoverage ? 0.5 : source.alphaTest,
-      displacementMap: textured.displacementMap ?? null,
-      displacementScale: textured.displacementScale ?? 1,
-      displacementBias: textured.displacementBias ?? 0,
-      wireframe: textured.wireframe ?? false,
-      // Match the REAL shadow pass: three's shared shadow depth material uses
-      // RGBADepthPacking and depthPacking sits in the program cache key, so
-      // the default BasicDepthPacking linked a variant the shadow pass never
-      // draws, and every "prewarmed" caster relinked at its first shadow
-      // draw anyway (the residue probe measured all of them).
-      depthPacking: THREE.RGBADepthPacking,
-    });
-    depth.name = `prewarm-depth:${key}`;
-    this.prewarmDepthMaterials.set(key, depth);
-    return depth;
-  }
-
   /**
    * Link a root's exact live colour-program variant before a bounded upload.
    * Three r165 chooses output colour space from the current render target in
@@ -5612,8 +5577,8 @@ export class Renderer {
       const material = mesh.material;
       swaps.push({ mesh, material });
       mesh.material = Array.isArray(material)
-        ? material.map((item) => this.prewarmDepthMaterial(item))
-        : this.prewarmDepthMaterial(material);
+        ? material.map((item) => prewarmDepthMaterial(this.prewarmDepthMaterials, item))
+        : prewarmDepthMaterial(this.prewarmDepthMaterials, material);
     });
     if (swaps.length === 0) return;
     // Match the real shadow pass's program key exactly. A bare
@@ -5645,6 +5610,33 @@ export class Renderer {
     }
     // Do not race a timer here. The underlying linker cannot be cancelled,
     // so a timeout only lets it overlap the next child and gameplay.
+    await compilePromise;
+  }
+
+  // Link the local player's own body spirit (ghost) transparent variants
+  // off-thread so a later spirit release reuses cached programs instead of
+  // linking ~20 inline on the ungated self view (the ~2.2 s death stall).
+  // Applies the ghost materials to the REAL skinned meshes (so the variant
+  // matches the flip's skinning/morph), runs compileAsync's synchronous
+  // prologue, then restores the opaque originals BEFORE awaiting the linker
+  // (the compileShadowPrograms restore-early pattern): no frame draws the ghost,
+  // and the clones the flip reuses stay cached on the visual.
+  private async warmSelfSpirit(): Promise<void> {
+    if (!this.asyncCompileSupported || this.sim.player.ghost) return;
+    const visual = this.views.get(this.sim.player.id)?.visual;
+    if (!visual) return;
+    const previousTarget = this.webgl.getRenderTarget();
+    // Composer tiers link the ghost variant against their offscreen colour space.
+    if (this.post) this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
+    let compilePromise: Promise<THREE.Object3D>;
+    visual.setGhost(true);
+    try {
+      this.webgl.setRenderTarget(this.post ? this.prewarmRenderTarget : null);
+      compilePromise = this.webgl.compileAsync(visual.root, this.camera, this.scene);
+    } finally {
+      this.webgl.setRenderTarget(previousTarget);
+      visual.setGhost(false);
+    }
     await compilePromise;
   }
 
@@ -11149,6 +11141,11 @@ export class Renderer {
       }
       this.updateBaseVisual(e, v);
       if (!v.visual) continue;
+      // Warm the local player's own spirit variants once per distinct look, so
+      // a death spirit-release never links them inline on the ungated self view.
+      if (e.id === this.sim.player.id) {
+        this.selfSpirit.observe(v.visual, e.skin, e.mainhandItemId, e.offhandItemId);
+      }
       if (iceBlockActivated) this.activeVisual(v)?.playEmote('wave', 1);
 
       // live skin swap: appearance changed (in-game changer or a multiplayer peer).
