@@ -185,7 +185,7 @@ interface AttributionTargetFixture {
 // carried its own mint, so the merged tree mints a value matching neither
 // parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '60ea4fe0e87a02a3c4f64d1ff9c96c63dea81e91c8b0702fc5864a2a038d738c';
+  'c1cde390dc97017ad52c037bd5c5256ac636abc5af8234032bb95a42f96e99c1';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

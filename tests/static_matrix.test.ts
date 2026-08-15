@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   freezeStaticMatrices,
   freezeStaticSubtreeMatrices,
@@ -103,6 +103,67 @@ describe('static matrix traversal', () => {
     expect(child.matrixWorld.elements[12]).toBe(17);
     // The stronger subtree freeze survives the rebake.
     expect(root.matrixWorldAutoUpdate).toBe(false);
+  });
+});
+
+describe('the no-nesting contract for subtree freezes', () => {
+  // Re-freeze correctness rests on "no caller nests subtree freezes": the
+  // flag-preserving bake heals the freeze ROOT but deliberately not a nested
+  // subtree-frozen descendant. The module warns at runtime when the contract
+  // breaks; these arms pin the warn AND demonstrate both sides of the hazard.
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('warns on a nested subtree-frozen descendant, whose world stays stale (the hazard)', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const scene = new THREE.Scene();
+    const outer = new THREE.Group();
+    const inner = new THREE.Group();
+    inner.position.x = 2;
+    const leaf = new THREE.Object3D();
+    leaf.position.x = 1;
+    inner.add(leaf);
+    outer.add(inner);
+    scene.add(outer);
+    freezeStaticSubtreeMatrices(inner);
+    expect(leaf.matrixWorld.elements[12]).toBe(3);
+
+    outer.position.x = 10;
+    freezeStaticMatrices(outer); // the forbidden nesting shape
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(String(warn.mock.calls[0][0])).toContain('nested subtree freeze');
+    // The hazard is real: the bake healed the outer root but not the nested
+    // frozen root, so its subtree is still composed against the stale parent.
+    expect(outer.matrixWorld.elements[12]).toBe(10);
+    expect(leaf.matrixWorld.elements[12]).toBe(3);
+  });
+
+  it('stays silent on every sanctioned shape, and the non-nested re-freeze heals fully', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const scene = new THREE.Scene();
+    const parent = new THREE.Group();
+    const root = new THREE.Group();
+    const child = new THREE.Object3D();
+    child.position.x = 4;
+    root.add(child);
+    parent.add(root);
+    scene.add(parent);
+
+    // Plain freeze, subtree freeze, re-freeze of the SAME root (the terrain
+    // rebuild idiom), and a per-mesh freeze UNDER a subtree-frozen ancestor
+    // (the water gap-sheet idiom): none of these nest a frozen root INSIDE
+    // the subtree being frozen.
+    freezeStaticMatrices(root);
+    freezeStaticSubtreeMatrices(root);
+    parent.position.x = 6;
+    scene.updateMatrixWorld(); // the gated root did not follow; the re-freeze must heal it
+    freezeStaticMatrices(root);
+    freezeStaticMatrices(child);
+    expect(warn).not.toHaveBeenCalled();
+    // Absent nesting, the re-freeze healed the whole chain.
+    expect(root.matrixWorld.elements[12]).toBe(6);
+    expect(child.matrixWorld.elements[12]).toBe(10);
   });
 });
 

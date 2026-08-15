@@ -518,6 +518,7 @@ import {
 import { createRevealGate } from './reveal_gate';
 import { collectRiftAmbientSources } from './rift_ambience';
 import { buildRiftRankBadge } from './rift_rank';
+import { syncRigMatrixFreeze, unfreezeRigMatrices } from './rig_visibility_freeze';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
 import {
   captureSceneCensus,
@@ -10471,6 +10472,7 @@ export class Renderer {
     // pooled and reused) view.
     this.weaponSkinApplies.cancel(id);
     this.scene.remove(v.group);
+    unfreezeRigMatrices(v.group); // a pooled visual must not keep hide-frozen flags
     this.lightOwnerGroups.delete(v.group);
     if (v.viewLights.length > 0) {
       for (const light of v.viewLights) {
@@ -12235,21 +12237,18 @@ export class Renderer {
         ? collectBodyNightLights(this.views, sim.entities, p.pos.x, p.pos.z, this.nightBodyLights)
         : 0;
 
-    // Hidden views gate their group root's world compose. Under r165 the flag
-    // also skipped the whole 30-60 node subtree walk; r185 recurses children
-    // unconditionally, so the traversal saving is gone upstream and only the
-    // root compose is skipped now. Correctness holds either way: the group's
-    // matrixAutoUpdate stays true, so every visited frame re-dirties it and
-    // the re-show frame composes from the live position/rotation properties,
-    // nothing renders stale. (pick() skips hidden views, so a frozen matrix
-    // never ghosts a hitbox. CAUTION: getWorldPosition on a node inside a
-    // GATED subtree still does not heal the chain (r185 visits the gated
-    // ancestor but skips its compose), hence the light-owner exemption; any
-    // new world-space read of a view child must use group.position or exempt
-    // the view too.)
+    // Hidden views hide-freeze their WHOLE rig subtree's matrix flags (r185
+    // recurses children unconditionally, so the old root-only gate left every
+    // default-flag descendant recomposing per frame; rig_visibility_freeze.ts
+    // carries the semantics). Flag walks run on transitions only, and the
+    // reveal forces one recompose of the current pose, so nothing renders
+    // stale. (pick() skips hidden views, so a frozen matrix never ghosts a
+    // hitbox. CAUTION: getWorldPosition inside a frozen subtree does not heal
+    // the chain, hence the light-owner exemption; any new world-space read of
+    // a hidden view's child must use group.position or exempt the view too.)
     let visibleViews = 0;
     for (const [, v] of this.views) {
-      v.group.matrixWorldAutoUpdate = v.group.visible || this.lightOwnerGroups.has(v.group);
+      syncRigMatrixFreeze(v.group, v.group.visible || this.lightOwnerGroups.has(v.group));
       if (v.group.visible) visibleViews++;
     }
 

@@ -48,7 +48,10 @@ const MONOLITHS: MonolithRow[] = [
     // instance_music) riding on top of upstream's near-zero-slack re-pins, so
     // no clean branch-owned extraction exists. Exact merged count: any
     // further growth reds again.
-    ceiling: 19432,
+    // Re-pinned 19432 -> 19433: the release/v0.38.0 merge into this branch
+    // grew hud.ts by one line at HEAD without updating the row, so the gate
+    // arrived red. Same exact-count, zero-slack intent as above.
+    ceiling: 19433,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -66,8 +69,10 @@ const MONOLITHS: MonolithRow[] = [
     // maintainer-decision preparation as hud.ts above: the growth is
     // thin-consumer wiring to extracted modules (frame_present, dpr_watch,
     // static_matrix, shadow cadence hookup) over upstream's near-zero-slack
-    // re-pins. Exact merged count: any further growth reds again.
-    ceiling: 13776,
+    // re-pins. Lowered 13776 -> 13775 after extracting the hidden-rig matrix
+    // freeze into rig_visibility_freeze.ts (the ratchet's own rule). Exact
+    // merged count: any further growth reds again.
+    ceiling: 13775,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

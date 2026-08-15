@@ -147,6 +147,34 @@ describe('watchDevicePixelRatio', () => {
     expect(queries[2].media).toBe('(resolution: 3dppx)');
   });
 
+  it('warns once on an addListener-only host and degrades to a dead watch', () => {
+    // The degrade-only contract: legacy addListener-only MediaQueryLists
+    // (pre-2020 WebKit) get no watch and no fallback path, matching the
+    // pre-watch world, but the dead arm must be VISIBLE. One warn per
+    // session, however many watchers hit it, and the returned unsubscribe
+    // stays a safe no-op.
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    setDpr(2);
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      writable: true,
+      value: () => ({
+        media: '(resolution: 2dppx)',
+        addListener: () => {},
+        removeListener: () => {},
+      }),
+    });
+    const onChange = vi.fn();
+    const unsubscribe = watchDevicePixelRatio(onChange);
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(String(warn.mock.calls[0][0])).toContain('addListener-only');
+    watchDevicePixelRatio(vi.fn());
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(() => unsubscribe()).not.toThrow();
+    expect(onChange).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
   it('is a no-op without matchMedia, and its unsubscribe is safe to call', () => {
     Object.defineProperty(window, 'matchMedia', {
       configurable: true,

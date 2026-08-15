@@ -196,6 +196,15 @@ export interface GfxSettings {
   readonly lowPlus: boolean;
   /** Use the cheaper low-foliage density/LOD policy while keeping the rest of the tier. */
   readonly leanFoliage: boolean;
+  /**
+   * Ground-dressing density compensation (foliage.ts: the denser dress step,
+   * the 1.24 density scale, the 1.08 spot boost). The lowPlus weak-GPU art
+   * cohort plus the leanFoliage MEDIUM session (weak integrated GPU keeping
+   * the lean model set at medium): the boost compensates the lean set's
+   * thinner ground read, so the medium-weak cohort keeps it even though plain
+   * low deliberately does not (low must stay monotonically lighter).
+   */
+  readonly denseDressing: boolean;
   readonly grassRadius: number;
   readonly grassStep: number;
   /** Stable-prefix floor for grass cards already inside their far alpha-fade band. */
@@ -982,6 +991,15 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     iosMemoryProfile,
     tightMemory: tightMemoryProfile,
   });
+  // lowPlus is art direction for fragment-bound weak GPUs (fatter grass cards, the
+  // terrain lowShade emissive), not a load reduction: applying it to EVERY low-tier
+  // session made plain low draw richer than medium. Gate it to the cohort it was
+  // authored for, reusing the file's one adapter classifier rather than a second
+  // regex set. classifyGpuRenderer returns 'unknown' for a masked or absent adapter
+  // string, so an unclassifiable session lands on plain low, the lighter default.
+  // Hoisted out of the literal so denseDressing below can extend the cohort.
+  const lowPlus =
+    iosMemoryProfile || (tier === 'low' && (gpuClass === 'weak' || gpuClass === 'software'));
   let settings: GfxSettings = {
     graphicsConfigVersion: GFX_CONFIG_VERSION,
     tier,
@@ -1039,18 +1057,15 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     smaa: aaPolicy.postAa === 'smaa',
     bloom: !iosMemoryProfile && gfxTierAtLeast(tier, 'high'),
     terrainCastShadows: tier !== 'low' && !constrainedMemory,
-    // lowPlus is art direction for fragment-bound weak GPUs (fatter grass cards, the
-    // terrain lowShade emissive), not a load reduction: applying it to EVERY low-tier
-    // session made plain low draw richer than medium. Gate it to the cohort it was
-    // authored for, reusing the file's one adapter classifier rather than a second
-    // regex set. classifyGpuRenderer returns 'unknown' for a masked or absent adapter
-    // string, so an unclassifiable session lands on plain low, the lighter default.
-    lowPlus:
-      iosMemoryProfile || (tier === 'low' && (gpuClass === 'weak' || gpuClass === 'software')),
+    lowPlus,
     // Tree and rock placement must match across clients because those decorations
     // occlude world sightlines. Keep the constrained profile on the full placement
     // set and reduce only non-occluding grass below.
     leanFoliage: tier === 'low' || (tier === 'medium' && weakIntegratedGpu),
+    // The dressing compensation cohort (interface comment carries the why):
+    // lowPlus plus the leanFoliage medium session, which the lowPlus re-key
+    // had silently stripped of its denser-dressing compensation.
+    denseDressing: lowPlus || (tier === 'medium' && weakIntegratedGpu),
     grassRadius: tightMemoryProfile
       ? 34
       : iosMemoryProfile

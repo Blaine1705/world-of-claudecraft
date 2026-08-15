@@ -159,13 +159,17 @@ describe('gfx override application', () => {
     // tests/gfx_low_monotonicity.test.ts) stacks on top of the C1 value, so
     // low hashes differently from the release row while the other five match
     // it byte for byte.
+    // Regenerated across the board for the denseDressing field (the dressing
+    // compensation cohort: lowPlus plus the leanFoliage medium session; see
+    // gfx.ts and tests/gfx.test.ts). Its VALUE is false for every
+    // desktop-default case here, only the serialized key name moves the bytes.
     expect(hashes).toEqual({
-      low: '3e2d1423e84f56ab561339ddd28f123b5fdc081df61cd96c8c6fa3cbcf01161f',
-      medium: 'e38687c8392fe46ee6941e26374e11473f7208732e9aa251dde7239faa74504e',
-      high: '02a87653c70f90faeeeb22e918cd2bb79ad4fdd14b8115c6745a8e4f575f4547',
-      ultra: 'c7f51f9c5e62bb013db47cf42ad98d904b8f5a675aa072b7b2884f1903017cd2',
-      insane: '393167d184c3029be560b9601bc50a1d103fc2221204d85dae3c79be9dbdc3da',
-      advanced: 'e99d3a399f2a18903f9f31c80320f99e5b46f35af3e84f21a6220c02ca3475b8',
+      low: '006edec83b3b6a50ac1a94b74ea3db24850e1cfbb1da3f053b7a7d09c68a7ca5',
+      medium: '98315c6396e6040891566ca9847999b6338dc048cc4591545abf77a27e6cc1dc',
+      high: '02205267b8778d10f7a44cbbca2b686602f62dde95069d0b27c23534ae219ab8',
+      ultra: '8bb27a672caf9e0df5c85a6b7ed628e5fa14a0c1f96d15b2ceb5df72c8cb71e0',
+      insane: 'a7c8bf8dd913f204eda8262b53289b27e9ff2a5af534817209cc5400e8999010',
+      advanced: '738594d16e2d1233b2f3d27a9e35e798dee354c6a07d684bac28c5923437ffa2',
     });
   });
 

@@ -29,12 +29,25 @@ export function freezeStaticMatrices(root: THREE.Object3D): void {
   // matrixWorldAutoUpdate gate, so a RE-freeze of a root that was previously
   // subtree-frozen would silently skip the root's own compose. Bake with the
   // flag held true and restore it (this deliberately does not heal a NESTED
-  // subtree-frozen descendant; no caller nests subtree freezes today).
+  // subtree-frozen descendant; no caller nests subtree freezes today, and
+  // the traverse below warns if one ever does).
   const worldAuto = root.matrixWorldAutoUpdate;
   root.matrixWorldAutoUpdate = true;
   root.updateMatrixWorld(true);
   root.matrixWorldAutoUpdate = worldAuto;
   root.traverse((o) => {
+    // No-nesting contract guard: inside a static prop subtree the only thing
+    // that sets matrixWorldAutoUpdate=false is a subtree freeze, and the bake
+    // above skipped that nested root's own compose, so everything under it may
+    // now be composed against a stale world. One warn per nested root (only
+    // the nested ROOT carries the flag); freezes run at build time, so this
+    // stays off the frame path.
+    if (o !== root && !o.matrixWorldAutoUpdate) {
+      console.warn(
+        'static_matrix: nested subtree freeze under a freeze root; its world compose was not healed',
+        o.name || o.type,
+      );
+    }
     o.matrixAutoUpdate = false;
   });
 }

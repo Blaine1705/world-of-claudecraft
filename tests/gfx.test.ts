@@ -263,6 +263,16 @@ describe('graphics tier resolution', () => {
     expect(mediumIris.standardMaterials).toBe(true);
     expect(mediumIris.leanFoliage).toBe(true);
     expect(mediumIris.lowPlus).toBe(false);
+    // denseDressing is lowPlus plus the leanFoliage MEDIUM session: the
+    // dressing compensation follows the lean model set (foliage.ts), so the
+    // medium weak-iGPU cohort keeps it while plain low and plain medium take
+    // medium-parity dressing (the low-monotonicity rationale above).
+    expect(low.denseDressing).toBe(false);
+    expect(lowNoAdapter.denseDressing).toBe(false);
+    expect(lowWeakIntel.denseDressing).toBe(true);
+    expect(lowSoftware.denseDressing).toBe(true);
+    expect(medium.denseDressing).toBe(false);
+    expect(mediumIris.denseDressing).toBe(true);
     expect(medium.terrainSplat).toBe(true);
     expect(medium.composer).toBe(false);
     expect(medium.ao).toBe(false);
@@ -540,6 +550,7 @@ describe('graphics tier resolution', () => {
     expect(medium.iosMemoryProfile).toBe(true);
     expect(medium.standardMaterials).toBe(false);
     expect(medium.lowPlus).toBe(true);
+    expect(medium.denseDressing).toBe(true); // rides the lowPlus art cohort
     // Collision-bearing tree/rock placement stays identical to other Medium clients.
     expect(medium.leanFoliage).toBe(false);
     expect(medium.terrainSplat).toBe(false);
