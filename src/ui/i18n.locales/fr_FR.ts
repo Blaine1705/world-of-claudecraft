@@ -6479,9 +6479,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'Forme de sélénien',
   'entities.abilities.moonkin_form.description':
     'Adopte la forme de sélénien, renforçant l’incantation jusqu’à ce que vous changiez de nouveau. Lancez à nouveau pour revenir à la forme normale. (signature Équilibre)',
-  'entities.abilities.feral_charge.name': 'Charge farouche',
+  'entities.abilities.feral_charge.name': 'Déferlante primordiale',
   'entities.abilities.feral_charge.description':
-    'Charge un ennemi et l’enracine pendant 1 s. Portée de 8-25 m. (signature Farouche)',
+    "Libère une déferlante primordiale. En Forme de loup, augmente la régénération d'énergie de 100% pendant 10 s. En Forme de Bruin, génère instantanément 50 points de rage. (signature Farouche)",
   'entities.abilities.swiftmend.name': 'Prompte guérison',
   'entities.abilities.crusader_strike.name': 'Frappe du croisé',
   'entities.abilities.crusader_strike.description':
@@ -11438,7 +11438,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     "Augmente vos chances d'esquiver de 50 points de pourcentage pendant 10 s. (talent de Chasseur)",
   'entities.abilities.earthbind.description': 'Immobilise les ennemis dans un rayon de 4 m autour du point visé pendant 2 s, puis les ralentit de 40% pendant 6 s. (Talent de chaman)',
-  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (talent de mage)',
+  'entities.abilities.evocation.description':
+    'Canalisez pendant 6 s : chaque seconde, vous récupérez 100 points de mana et gagnez 8 points de puissance des sorts. Le bonus se cumule pendant la canalisation et dure 15 s. (talent de Mage)',
   'entities.abilities.frenzied_regeneration.description':
     "Rend 180 points de vie en 10 s. Forme d'ours uniquement. (talent de Druide)",
   'entities.abilities.frost_trap.description':
@@ -11449,7 +11450,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     "Effraie les ennemis proches pendant un maximum de 3 s. Les dégâts peuvent interrompre l'effet. (talent de Démoniste)",
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talent de mage)',
+    'Vous enferme dans la glace pendant 8 s, vous immunisant contre tous les dégâts et effets et supprimant tous les effets néfastes. Utilisable lorsque vous êtes étourdi ou métamorphosé. Vous ne pouvez pas agir pendant cet effet. Lancez-le à nouveau pour l’annuler. (Mage)',
   'entities.abilities.inner_focus.description': 'Rend votre prochain sort de prêtre gratuit et ininterruptible. Dure 60 s.',
   'entities.abilities.innervate.description':
     "De la sève vivante afflue en vous pendant 10 s et restaure par vagues 20 points de votre ressource actuelle : mana, rage ou énergie. Changer de forme ne l'interrompt pas. Le sommeil, l'étourdissement ou la stase immobilisent la sève. (talent de Druide)",
@@ -11465,7 +11466,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.preparation.description':
     'Met fin au temps de recharge de Sprint, Évasion et Disparition. (talent de Voleur)',
   'entities.abilities.presence_of_mind.description':
-    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talent de mage)',
+    'Votre prochain sort ayant un temps d’incantation devient instantané. Dure 60 s. (talent de Mage)',
   'entities.abilities.psychic_scream.description': "Effraie les ennemis dans un rayon de 8 m pendant 4 s au plus. Les dégâts peuvent briser l'effet.",
   'entities.abilities.shadowstep.description':
     'Vous fait traverser les ombres en direction de votre cible. (talent de Voleur)',
