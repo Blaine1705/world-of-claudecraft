@@ -48,6 +48,10 @@ const MONOLITHS: MonolithRow[] = [
     // overhaul extracted marker interaction out of the coordinator, so the
     // merged file landed SMALLER and the ratchet follows it down.
     file: 'src/ui/hud.ts',
+    // The release-side row had meanwhile been raised 19420 -> 19432 (+12) for
+    // the desktop-client-update packet (a maintainer decision, PR #3406) and
+    // re-pinned to 19433 after its own v0.38.0 sync; the exact merged count
+    // below supersedes that release pin.
     // Re-pinned from 19170 after the v0.39.0 sync merge: the release stopped
     // warming the Armory catalog on a schedule and moved the ability
     // description prose out to src/ui/ability_description.ts, so the merged
