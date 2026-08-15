@@ -16655,12 +16655,25 @@ export class Hud {
    *  here with the real preview thunks. `includeCharFamily` is forwarded
    *  verbatim; see its doc on `PreviewPrewarmPlanDeps`. */
   private postEntryPreviewPrewarmUnits(includeCharFamily: boolean): PreviewPrewarmUnit[] {
+    // The local player's OWN look decides whether the paperdoll skin swatches
+    // are real work: a composed (modular) body ignores the fixed-rig `setSkin`
+    // the char-skin units drive, so warming them is pure cost there. Mech
+    // wearers and legacy no-look accounts still mount the fixed rig.
+    const self = this.sim.player;
+    const looksModular = !isMechWearer(self) && modularLookFor(self) != null;
     return buildPostEntryPreviewPrewarmUnits<(typeof CARD_POSES)[number]>({
       playerClass: this.sim.cfg.playerClass,
       allClasses: ALL_CLASSES,
       skinCount,
       cardPoses: CARD_POSES,
       includeCharFamily,
+      // WS2: skip the no-op skin sweep for a composed look.
+      warmCharSkins: !looksModular,
+      // WS1: the Player Card builds its poses lazily on open; do not warm at login.
+      includeCardPoses: false,
+      // WS3: headshots ride live frames (party/raid/target), so keep them warm;
+      // the body framing is Inspect-only and built on open, so defer it.
+      portraitFramings: ['headshot'],
       renderCharShell: () => {
         if (!this.charPreview) this.charWindow.render();
       },
