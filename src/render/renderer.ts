@@ -561,6 +561,7 @@ import { buildSoulwell, disposeSoulwellVisual, syncSoulwellVisual } from './soul
 import {
   freezeStaticMatrices,
   freezeStaticSubtreeMatrices,
+  lookAtFrozen,
   refreshFrozenWorldMatrix,
 } from './static_matrix';
 import { buildStationProps } from './stations';
@@ -2241,8 +2242,8 @@ export class Renderer {
     // updateCamera owns the one explicit camera matrix refresh. Prevent each
     // WebGLRenderer pass from repeating it for an unchanged camera. r185 also
     // gates the camera's own compose on this flag, so every explicit refresh
-    // goes through refreshFrozenWorldMatrix (a plain updateMatrixWorld() no
-    // longer composes a frozen node).
+    // goes through refreshFrozenWorldMatrix and every aim through lookAtFrozen
+    // (a plain updateMatrixWorld/lookAt no longer composes a frozen node).
     this.camera.matrixWorldAutoUpdate = false;
     // Nameplate Three/DOM ownership lives in the painter; it reads the
     // viewport / mob-nameplate toggle lazily (the renderer reassigns viewport on
@@ -13260,8 +13261,7 @@ export class Renderer {
         this.camera.fov = CAMERA_BASE_FOV;
         this.camera.updateProjectionMatrix();
       }
-      this.camera.lookAt(this.cameraLookAt);
-      refreshFrozenWorldMatrix(this.camera);
+      lookAtFrozen(this.camera, this.cameraLookAt);
       return;
     }
     const p = this.sim.player;
@@ -13385,8 +13385,8 @@ export class Renderer {
       this.camera.updateProjectionMatrix();
     }
     this.cameraLookAt.set(px, eyeY, pz);
-    this.camera.lookAt(this.cameraLookAt);
-    refreshFrozenWorldMatrix(this.camera);
+    // lookAtFrozen, never a bare lookAt (r185 frozen-matrix aim, static_matrix.ts).
+    lookAtFrozen(this.camera, this.cameraLookAt);
 
     // Spatial-audio listener (at the camera, facing the player) + ambience state.
     const sink = this.audioSink;
