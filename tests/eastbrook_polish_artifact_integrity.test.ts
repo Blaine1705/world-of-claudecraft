@@ -752,10 +752,24 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // the release monolith ratchet. Behavior is unchanged; no capture was retaken.
 // Re-minted again after registering the extracted policy as its own provenance
 // leaf. The captures remain unchanged and were not retaken.
+// Re-minted for the quest-collectable spawn gate: this branch's renderer.ts
+// edits (the view gate call sites and the ground-object pool key move) shift
+// the runtimeRender.renderer leaf, the only leaf that moved. No Eastbrook
+// input, geometry value, or capture moved.
+// Re-minted for the merge of PR #3359's quest-collectable spawn gate with the
+// release branch's extracted entity-view policy. Both renderer.ts and the
+// entityViewPolicy leaf are provenance inputs; no capture was retaken.
+// Re-minted for the review fixes on this branch (Soul Rend warms every rig a
+// live body can take, plus the lazy form-visual fold): the first-order
+// composite follows renderer.ts, then this seal follows the swept evidence
+// bytes. No capture was retaken.
+// Re-minted for the r185 frozen-camera aim fix: the first-order composite
+// follows renderer.ts, then this seal follows the swept evidence bytes. No
+// capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'e0ac3607e4a9ab89ae2eb661a990ef3d9d663d0189855369629864f7438916ce';
+  '66fe27c8adb3003812c249d05c65c73d2fe79e123c367569d8f75649db48e65e';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'a7af2b93988ef6a825baa153e8cb9e41cfcbb780992b81e670063c6665230da7';
+  'd310f1e999ab4e7c9b8a139d82ab4aa93677cc254e356a6a900dceeac51966b6';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1744,10 +1758,24 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // branch: the first-order composite follows the merged renderer.ts bytes,
     // then this second-order performance seal follows the swept evidence
     // bytes. No capture was retaken.
+    // Re-pinned for the quest-collectable spawn gate. The first-order
+    // composite follows renderer.ts, then this second-order seal follows the
+    // swept evidence bytes. No capture was retaken.
+    // Re-pinned for the merge of PR #3359's quest-collectable spawn gate with
+    // the release branch's extracted entity-view policy. The first-order
+    // composite follows renderer.ts and entityViewPolicy, then this seal
+    // follows the swept bytes. No capture was retaken.
+    // Re-minted for the review fixes on this branch (Soul Rend warms every rig
+    // a live body can take, plus the lazy form-visual fold): the first-order
+    // composite follows renderer.ts, then this seal follows the swept evidence
+    // bytes. No capture was retaken.
+    // Re-minted for the r185 frozen-camera aim fix. The first-order composite
+    // follows renderer.ts, then this second-order performance seal follows the
+    // swept evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('ff7cf77848915d743c86f371e8f4676f455c199460defbe0b15c3fda2217dc0d');
+    ).toBe('3926268b0c08ed5a46cf7f75343b5a7542531150d412574fd63fdc33fd6189d8');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

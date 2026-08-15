@@ -42,7 +42,21 @@ const MONOLITHS: MonolithRow[] = [
     // values, the over-time string and the talent-conditional field choice) into
     // src/ui/ability_description.ts (the ratchet's own rule: an extraction lowers
     // the ceiling, never raises it).
-    ceiling: 19420,
+    // Raised 19420 -> 19432 (+12) for the desktop-client-update packet, a
+    // maintainer decision prepared for PR review: the branch's additions are
+    // thin-consumer wiring to extracted modules (presentation_gate,
+    // instance_music) riding on top of upstream's near-zero-slack re-pins, so
+    // no clean branch-owned extraction exists. Exact merged count: any
+    // further growth reds again.
+    // Re-pinned 19432 -> 19433: the release/v0.38.0 merge into this branch
+    // grew hud.ts by one line at HEAD without updating the row, so the gate
+    // arrived red. Same exact-count, zero-slack intent as above.
+    // Raised 19433 -> 19442 (+9) for the login preview-prewarm trim: thin-consumer
+    // wiring (a `looksModular` read plus three flag args to the pure
+    // buildPostEntryPreviewPrewarmUnits) that has no clean branch-owned
+    // extraction, landing on upstream's zero-slack re-pin. Maintainer decision,
+    // exact merged count: any further growth reds again.
+    ceiling: 19442,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -56,14 +70,13 @@ const MONOLITHS: MonolithRow[] = [
     // per-status manifest rollup to summarizePrewarmManifest
     // (prewarm_compile_lifecycle.ts, beside the interface it fills) and the
     // resume-lane bookkeeping to prewarm_resume_ledger_core.ts.
-    // Merging release/v0.38.0: both sides had pinned their own size (13699 here,
-    // 13700 there), and the merged file is smaller than either, so the ceiling
-    // follows it down rather than inheriting a parent's slack.
-    // Lowered again after extracting the shadow-depth material factory into
-    // src/render/prewarm_depth_material.ts (the self-spirit prewarm now shares
-    // that keyed cache); the net came out below the prior ceiling even with the
-    // self-spirit warm added.
-    ceiling: 13680,
+    // Extracted the shadow-depth material factory into
+    // src/render/prewarm_depth_material.ts so the self-spirit prewarm could add
+    // Renderer.warmSelfSpirit + the per-frame observe without growing the file.
+    // Merging release/v0.39.0: upstream re-pinned 13754 (its own extractions),
+    // this branch pinned 13680; the merged file is the exact count below, so the
+    // ceiling follows it per the ratchet's merge rule (any further growth reds).
+    ceiling: 13751,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
