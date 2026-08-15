@@ -3140,6 +3140,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   bear_charge: r('earth', 'earthBrown', ['paw', { p: 'boot', ...BR }], ['motion']),
   maul: r('earth', 'earthBrown', ['paw', { p: 'claw_slash', ...TR }], ['glow']),
   growl: r('earth', 'earthBrown', ['roar'], ['arcs']),
+  challenging_roar: r('fury', 'earthBrown', ['roar', { p: 'paw', ...BR }], ['arcs']),
   demoralizing_roar: r('shadow', 'earthBrown', ['roar'], ['arcs']),
   cat_form: r('nature', 'leafGreen', ['paw', { p: 'fang', ...BR }]),
   prowl: r('nature', 'leafGreen', ['paw'], ['arcs']),

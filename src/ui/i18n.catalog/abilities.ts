@@ -1639,6 +1639,11 @@ const classAbilityNamesEn = {
         'Menaces the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec. Bruin Form only.',
       ],
       [
+        'challenging_roar',
+        'Baleful Roar',
+        'A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only.',
+      ],
+      [
         'cat_form',
         'Wolf Form',
         'Shapeshift into a wolf: agility rises with your level, attack power +8 plus 2 per level, your attacks use energy and combo points, and you generate 29% less threat. Cast again to return to caster form.',
@@ -2296,7 +2301,7 @@ const classAbilityNamesEn = {
       [
         'frenzied_regeneration',
         'Savage Mending',
-        'Restores 180 health over 10 sec. Bruin Form only. (Druid talent)',
+        'Restores 180 health over 10 sec. Bruin Form only.',
       ],
       [
         'frost_trap',

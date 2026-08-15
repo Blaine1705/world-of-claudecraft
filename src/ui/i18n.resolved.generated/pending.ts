@@ -10,22 +10,34 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
     "hudChrome.itemHeroicLabel"
   ],
   "es_ES": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
     "hudChrome.itemHeroicLabel"
   ],
   "fr_FR": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
     "hudChrome.itemHeroicLabel"
   ],
   "fr_CA": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
     "hudChrome.itemHeroicLabel"
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
     "hudChrome.itemHeroicLabel"
   ],
   "de_DE": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
     "hudChrome.itemHeroicLabel"
   ],
   "zh_CN": [],
@@ -33,31 +45,49 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
     "hudChrome.itemHeroicLabel"
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
     "hudChrome.itemHeroicLabel"
   ],
   "nl_NL": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
     "hudChrome.itemHeroicLabel"
   ],
   "pl_PL": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
     "hudChrome.itemHeroicLabel"
   ],
   "id_ID": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
     "hudChrome.itemHeroicLabel"
   ],
   "tr_TR": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
     "hudChrome.itemHeroicLabel"
   ],
   "sv_SE": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
     "hudChrome.itemHeroicLabel"
   ],
   "vi_VN": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
     "hudChrome.itemHeroicLabel"
   ],
   "da_DK": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
     "hudChrome.itemHeroicLabel"
   ]
 };

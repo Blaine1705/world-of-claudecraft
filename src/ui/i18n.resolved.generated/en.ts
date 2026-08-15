@@ -10024,6 +10024,10 @@ export const en: EnTranslations = {
         "name": "Menace",
         "description": "Menaces the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec. Bruin Form only."
       },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
+      },
       "cat_form": {
         "name": "Wolf Form",
         "description": "Shapeshift into a wolf: agility rises with your level, attack power +8 plus 2 per level, your attacks use energy and combo points, and you generate 29% less threat. Cast again to return to caster form."
@@ -10568,7 +10572,7 @@ export const en: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Savage Mending",
-        "description": "Restores 180 health over 10 sec. Bruin Form only. (Druid talent)"
+        "description": "Restores 180 health over 10 sec. Bruin Form only."
       },
       "frost_trap": {
         "name": "Rime Snare",
