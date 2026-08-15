@@ -763,10 +763,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // live body can take, plus the lazy form-visual fold): the first-order
 // composite follows renderer.ts, then this seal follows the swept evidence
 // bytes. No capture was retaken.
+// Re-minted for the r185 frozen-camera aim fix: the first-order composite
+// follows renderer.ts, then this seal follows the swept evidence bytes. No
+// capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'd1bfe3e23b47ecb421dcd31196dcf728efa091869008da648fcf2179defafaca';
+  'a876cff7a14093e44bd8d8d9ef3585b4c9aac3b07d2bf2e9bf80183f67495d3e';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'a3c695469afdc4732476008e9a423bc5f9745a7103648d7205b3c6205509d947';
+  '3a7cd67799cc945ebbe4c271905a2d59ff43ca890c5ae737ff02ea6bd4fdd090';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1766,10 +1769,13 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // a live body can take, plus the lazy form-visual fold): the first-order
     // composite follows renderer.ts, then this seal follows the swept evidence
     // bytes. No capture was retaken.
+    // Re-minted for the r185 frozen-camera aim fix. The first-order composite
+    // follows renderer.ts, then this second-order performance seal follows the
+    // swept evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('cee72ac3b60097a0cd552e60e79d25d3d952cd44f5b1be1a7150a7d57a7fdf69');
+    ).toBe('6bacdb492cb4b59bbce268f24b10379cd71be5ce186a94a7da59efceb8405a35');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
