@@ -62,15 +62,29 @@ const DISCORD_PIPE_SLOTS = 10;
 const DISCORD_CLIENT_ID_PATTERN = /^\d{15,22}$/;
 
 /**
- * The app id for this build, or null when there is none. There is deliberately
- * no hardcoded fallback: an id baked into the source would have every fork and
- * every local checkout reporting presence as the maintainer's registered app.
- * Absent means the whole feature stays inert, which is the correct reading of
- * an unconfigured build.
+ * The official World of ClaudeCraft Discord application id, baked in by the
+ * owner's provisioning decision (2026-08-15) once the registration landed
+ * under exactly that name (the registration name is what Discord renders as
+ * "Playing X"). An application id is public, every shipped build exposes it
+ * on the wire, so baking it in leaks nothing, and it is what makes presence
+ * work out of the box for players, who never set environment variables. This
+ * supersedes the earlier no-hardcoded-fallback stance, which was the correct
+ * reading only while no registration existed.
+ */
+const DEFAULT_DISCORD_APP_ID = '1537920691200983141';
+
+/**
+ * The app id for this build. Precedence: an unset WOC_DISCORD_APP_ID means
+ * the baked official id; a set and valid value overrides it (the operator
+ * slot); a set but INVALID value, the empty string included, resolves to
+ * null and keeps the whole feature inert. That last arm is deliberate twice
+ * over: it is the typo failure mode (never dial with junk), and it is the
+ * documented opt-out for forks that do not want their sessions reported as
+ * the official app (WOC_DISCORD_APP_ID=off).
  */
 function resolveDiscordClientId(env) {
   const raw = env?.WOC_DISCORD_APP_ID;
-  if (typeof raw !== 'string') return null;
+  if (typeof raw !== 'string') return DEFAULT_DISCORD_APP_ID;
   return DISCORD_CLIENT_ID_PATTERN.test(raw) ? raw : null;
 }
 
@@ -684,6 +698,7 @@ function createDiscordPresence({
 }
 
 module.exports = {
+  DEFAULT_DISCORD_APP_ID,
   DISCORD_BASE_BACKOFF_MS,
   DISCORD_DETAILS_MAX,
   DISCORD_LOG_TEXT_MAX,

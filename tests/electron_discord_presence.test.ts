@@ -3,6 +3,7 @@ import { clampText } from '../electron/diagnostics.cjs';
 import {
   candidatePipePaths,
   createDiscordPresence,
+  DEFAULT_DISCORD_APP_ID,
   DISCORD_BASE_BACKOFF_MS,
   DISCORD_DETAILS_MAX,
   DISCORD_LOG_TEXT_MAX,
@@ -305,10 +306,21 @@ describe('discord candidate socket paths', () => {
 });
 
 describe('discord app id resolution', () => {
-  it('accepts a snowflake and nothing else', () => {
-    // The id is written straight into a handshake, and there is no hardcoded
-    // fallback: everything unusable has to resolve to null so the feature stays
-    // inert rather than dialing with junk.
+  it('ships the official application id as the baked default', () => {
+    // Pinned to the LITERAL, not through the constant production reads: the
+    // registration under the name "World of ClaudeCraft" carries exactly this
+    // snowflake, and a drifted digit would dial a stranger's app while every
+    // shape check stays green. Owner provisioning decision, 2026-08-15.
+    expect(DEFAULT_DISCORD_APP_ID).toBe('1537920691200983141');
+    expect(resolveDiscordClientId({})).toBe('1537920691200983141');
+    expect(resolveDiscordClientId(undefined)).toBe('1537920691200983141');
+  });
+
+  it('lets a valid env id override the default, and nothing else through', () => {
+    // The id is written straight into a handshake. A set-but-invalid value
+    // (the empty string included) resolves to null and keeps the feature
+    // inert: the typo failure mode and the documented fork opt-out
+    // (WOC_DISCORD_APP_ID=off), never a silent fall-through to the default.
     expect(resolveDiscordClientId({ WOC_DISCORD_APP_ID: APP_ID })).toBe(APP_ID);
     expect(resolveDiscordClientId({ WOC_DISCORD_APP_ID: '1'.repeat(15) })).toBe('1'.repeat(15));
     expect(resolveDiscordClientId({ WOC_DISCORD_APP_ID: '1'.repeat(22) })).toBe('1'.repeat(22));
@@ -319,15 +331,14 @@ describe('discord app id resolution', () => {
       ' 123456789012345678',
       '123456789012345678 ',
       '',
+      'off',
       '-123456789012345678',
     ]) {
       expect(
         resolveDiscordClientId({ WOC_DISCORD_APP_ID: junk }),
-        `${JSON.stringify(junk)} must not resolve to an app id`,
+        `${JSON.stringify(junk)} must resolve to inert, not to an app id or the default`,
       ).toBeNull();
     }
-    expect(resolveDiscordClientId({})).toBeNull();
-    expect(resolveDiscordClientId(undefined)).toBeNull();
   });
 });
 

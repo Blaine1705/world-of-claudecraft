@@ -404,9 +404,10 @@ const notifyGuard = createNotifyGuard({ now: () => Date.now() });
 // Discord Rich Presence (electron/discord_presence.cjs owns the protocol and
 // every failure arm). Built here at module scope because construction does no
 // IO: the first candidate socket is dialed when the game first has something to
-// show, not at boot. The app id comes from the environment and nowhere else, so
-// a build that was never registered with Discord stays inert rather than
-// reporting presence as somebody else's application.
+// show, not at boot. The app id resolves to the baked official registration by
+// default (owner provisioning, 2026-08-15), with WOC_DISCORD_APP_ID as the
+// operator override and any set-but-invalid value (WOC_DISCORD_APP_ID=off)
+// keeping the feature inert, the documented fork opt-out.
 const discordPresence = createDiscordPresence({
   clientId: resolveDiscordClientId(process.env),
   connect: (p) => nodeNet.createConnection(p),
