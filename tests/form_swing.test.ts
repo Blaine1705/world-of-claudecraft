@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   baseSwingSpeed,
   CAT_FORM_DAMAGE_MULT,
+  CAT_FORM_LEGACY_SWING_SPEED,
   CAT_FORM_SWING_SPEED,
   ROGUE_BASE_SWING_SPEED,
 } from '../src/sim/combat/form_swing';
@@ -252,13 +253,71 @@ describe('Wolf Form swing speed', () => {
     sim.setPlayerLevel(20, a);
     sim.tick();
     const wolf = firstRequitalHit(sim, a, 'form_cat', 'Wolf Form');
-    expect(wolf).toBe(Math.round(22 * (CAT_FORM_SWING_SPEED / ROGUE_BASE_SWING_SPEED)));
+    // The ratio denominator is the FROZEN legacy cadence, deliberately not the
+    // rogue content lookup, so a rogue starting-weapon retune can never move a
+    // druid's Requital damage.
+    expect(CAT_FORM_LEGACY_SWING_SPEED).toBe(1.8);
+    expect(wolf).toBe(Math.round(22 * (CAT_FORM_SWING_SPEED / CAT_FORM_LEGACY_SWING_SPEED)));
 
     const sim2 = makeWorld();
     const b = sim2.addPlayer('druid', 'Zayin');
     sim2.setPlayerLevel(20, b);
     sim2.tick();
     expect(firstRequitalHit(sim2, b, 'form_bear', 'Bruin Form')).toBe(22);
+  });
+
+  it('a cat weaponStrike special keeps its raw roll: AP term at the cat cadence, form mult, no roll rescale', () => {
+    // Rendclaw (claw, rank 1: weaponStrike bonus 25) in Wolf Form on a slow
+    // 3.0-speed weapon pinned at 60 per swing. The special's weapon roll is
+    // deliberately NOT rescaled (only the mainhand AUTO arm normalizes), its
+    // AP-per-swing term follows baseSwingSpeed (the 1.0s cat cadence), the
+    // form damage multiplier covers the roll + AP subtotal, and the flat
+    // ability bonus lands after the multiplier, before armor.
+    const sim = makeWorld();
+    const a = sim.addPlayer('druid', 'Fang');
+    sim.setPlayerLevel(5, a);
+    sim.tick();
+    const p = sim.entities.get(a)!;
+    giveForm(sim, a, 'form_cat', 'Wolf Form');
+    p.critChance = 0;
+    p.weapon = { ...p.weapon, min: 60, max: 60, speed: 3.0 };
+    const dummy = [...sim.entities.values()].find((e) => e.kind === 'mob' && !e.dead)!;
+    dummy.level = 1;
+    dummy.stats.armor = 0;
+    dummy.hostile = true;
+    dummy.hp = dummy.maxHp = 1e9;
+    p.pos.x = dummy.pos.x + 1;
+    p.pos.z = dummy.pos.z;
+    p.pos.y = dummy.pos.y;
+    p.prevPos = { ...p.pos };
+    p.targetId = dummy.id;
+    p.facing = Math.atan2(dummy.pos.x - p.pos.x, dummy.pos.z - p.pos.z);
+    p.resource = p.maxResource;
+    sim.castAbility('claw', a);
+    for (let i = 0; i < 40; i++) {
+      const evs = sim.tick();
+      const hit = evs.find(
+        (e) =>
+          e.type === 'damage' && e.sourceId === a && e.ability === 'Rendclaw' && e.kind === 'hit',
+      );
+      if (hit && hit.type === 'damage') {
+        // biome-ignore lint/suspicious/noExplicitAny: reach private helpers for an exact expectation
+        const s = sim as any;
+        const dr = armorReduction(s.effectiveArmor(dummy), p.level);
+        const ap = s.effectiveAttackPower(p);
+        expect(hit.amount).toBe(
+          Math.max(
+            1,
+            Math.round(
+              ((60 + (ap / 14) * CAT_FORM_SWING_SPEED) * CAT_FORM_DAMAGE_MULT + 25) * (1 - dr),
+            ),
+          ),
+        );
+        return;
+      }
+      p.resource = p.maxResource;
+    }
+    throw new Error('Rendclaw never landed');
   });
 
   it('a non-cat auto swing keeps the raw per-swing roll (no normalization)', () => {

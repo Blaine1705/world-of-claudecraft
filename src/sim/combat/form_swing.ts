@@ -27,6 +27,13 @@ export const ROGUE_BASE_SWING_SPEED: number = ITEMS[CLASSES.rogue.startWeapon].w
 // feral feel sluggish; the classic cat cadence is a fixed fast 1.0s.
 export const CAT_FORM_SWING_SPEED = 1.0;
 
+// The cadence Wolf Form swung at BEFORE the 1.0s standardization, frozen as a
+// literal: per-swing sources balanced around the old cadence (Requital below)
+// rescale against this number. It happens to equal the rogue's starting dagger
+// speed because that is what cat form borrowed, but it must NOT track a future
+// rogue weapon retune, so it is deliberately not a content lookup.
+export const CAT_FORM_LEGACY_SWING_SPEED = 1.8;
+
 // The feral form damage knob: the single bench-neutrality constant for the
 // 2026-08 cat swing-cadence standardization (CAT_FORM_SWING_SPEED above).
 // Every Wolf Form melee swing (auto AND weaponStrike special) is scaled by it
@@ -67,12 +74,12 @@ export function catFormDamageMult(e: Entity): number {
 
 // Rescale for a FLAT on-every-landed-swing damage source (Requital Aura, the
 // paladin party buff): such a source was balanced around the old borrowed
-// rogue cadence, and at the 1.0s paw speed a cat lands ~80% more swings, so
-// without this its damage per second silently inflates by the same ~80%. The
-// cadence ratio keeps the source's per-second contribution unchanged by the
+// cadence, and at the 1.0s paw speed a cat lands ~80% more swings, so without
+// this its damage per second silently inflates by the same ~80%. The cadence
+// ratio keeps the source's per-second contribution unchanged by the
 // standardization; every other attacker keeps the full authored value.
 export function catFlatSwingAdderMult(e: Entity): number {
-  return isCatForm(e) ? CAT_FORM_SWING_SPEED / ROGUE_BASE_SWING_SPEED : 1;
+  return isCatForm(e) ? CAT_FORM_SWING_SPEED / CAT_FORM_LEGACY_SWING_SPEED : 1;
 }
 
 // Classic instant-attack normalization speeds (seconds), by weapon class. An
