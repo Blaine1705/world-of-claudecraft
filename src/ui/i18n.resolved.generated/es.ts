@@ -9717,7 +9717,7 @@ export const es: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Juramento Ardiente",
-        "description": "Aumenta pasivamente en un 60% la amenaza generada por tu daño Sagrado. Solo Guardián de fe."
+        "description": "Aumenta pasivamente en un 30% la amenaza generada por tu daño Sagrado. Solo Guardián de fe."
       },
       "retribution_aura": {
         "name": "Aura de Represalia",
@@ -9833,7 +9833,7 @@ export const es: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Arma Pétrea",
-        "description": "Imbuye tu arma durante 30 min. Cada golpe inflige {damage} de daño adicional. Mejora gana además un 30% de armadura, sufre un 10% menos de daño y genera el doble de amenaza. Sacudida Terrestre obliga a su objetivo a atacarte durante 3 s, y Égida de Truenos otorga un 10% de reducción de daño durante 3 s."
+        "description": "Imbuye tu arma durante 30 min. Cada golpe inflige {damage} de daño adicional. Mejora gana además un 40% de armadura y un 20% de Aguante, sufre un 15% menos de daño y es inmune a los golpes críticos de las criaturas y genera 2,75 veces más amenaza. Sacudida Terrestre obliga a su objetivo a atacarte durante 3 s, y Égida de Truenos otorga un 10% de reducción de daño durante 3 s."
       },
       "healing_wave": {
         "name": "Aguas Reparadoras",
@@ -10012,7 +10012,7 @@ export const es: EnTranslations = {
       },
       "bear_form": {
         "name": "Forma de Bruin",
-        "description": "Cambias a forma de oso: armadura +130%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Lánzala de nuevo para volver a forma de taumaturgo."
+        "description": "Cambias a forma de oso: armadura +110%, salud máxima +30%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Lánzala de nuevo para volver a forma de taumaturgo."
       },
       "maul": {
         "name": "Rompehuesos",

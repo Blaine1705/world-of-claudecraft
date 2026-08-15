@@ -9717,7 +9717,7 @@ export const fr_CA: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Serment ardent",
-        "description": "Augmente passivement de 60% la menace générée par vos dégâts Sacrés. Gardien de la foi uniquement."
+        "description": "Augmente passivement de 30% la menace générée par vos dégâts Sacrés. Gardien de la foi uniquement."
       },
       "retribution_aura": {
         "name": "Aura de représailles",
@@ -9833,7 +9833,7 @@ export const fr_CA: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Arme Stonebound",
-        "description": "Imprègne votre arme pendant 30 min. Chaque coup inflige {damage} points de dégâts supplémentaires. Amélioration gagne en plus 30% d'armure, subit 10% de dégâts en moins et génère deux fois plus de menace. Secousse tellurique force sa cible à vous attaquer pendant 3 s, et Garde de tonnerre accorde 10% de réduction des dégâts pendant 3 s."
+        "description": "Imprègne votre arme pendant 30 min. Chaque coup inflige {damage} points de dégâts supplémentaires. Amélioration gagne en plus 40% d'armure et 20% d'Endurance, subit 15% de dégâts en moins et est insensible aux coups critiques des créatures et génère 2,75 fois plus de menace. Secousse tellurique force sa cible à vous attaquer pendant 3 s, et Garde de tonnerre accorde 10% de réduction des dégâts pendant 3 s."
       },
       "healing_wave": {
         "name": "Eaux guérisseuses",
@@ -10012,7 +10012,7 @@ export const fr_CA: EnTranslations = {
       },
       "bear_form": {
         "name": "Forme de Bruin",
-        "description": "Vous change en ours: armure +130%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Relancez pour reprendre votre forme de lanceur."
+        "description": "Vous change en ours: armure +110%, santé maximale +30%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Relancez pour reprendre votre forme de lanceur."
       },
       "maul": {
         "name": "Brise-os",

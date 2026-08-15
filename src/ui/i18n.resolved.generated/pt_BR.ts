@@ -9717,7 +9717,7 @@ export const pt_BR: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Juramento Ardente",
-        "description": "Aumenta passivamente em 60% a ameaça gerada por vosso dano Sagrado. Apenas Guardião da fé."
+        "description": "Aumenta passivamente em 30% a ameaça gerada por vosso dano Sagrado. Apenas Guardião da fé."
       },
       "retribution_aura": {
         "name": "Aura de Represália",
@@ -9833,7 +9833,7 @@ export const pt_BR: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Arma Pétrea",
-        "description": "Impregna vossa arma por 30 min. Cada golpe causa {damage} de dano adicional. Aprimoramento ganha ainda 30% de armadura, sofre 10% menos dano e gera o dobro de ameaça. Abalo Terreno força seu alvo a vos atacar por 3 s, e Salvaguarda do Trovão concede 10% de redução de dano por 3 s."
+        "description": "Impregna vossa arma por 30 min. Cada golpe causa {damage} de dano adicional. Aprimoramento ganha ainda 40% de armadura e 20% de Vigor, sofre 15% menos dano e é imune a acertos críticos de criaturas e gera 2,75 vezes mais ameaça. Abalo Terreno força seu alvo a vos atacar por 3 s, e Salvaguarda do Trovão concede 10% de redução de dano por 3 s."
       },
       "healing_wave": {
         "name": "Águas Restauradoras",
@@ -10012,7 +10012,7 @@ export const pt_BR: EnTranslations = {
       },
       "bear_form": {
         "name": "Forma de Bruin",
-        "description": "Assume a forma de urso: armadura +130%, poder de ataque muito aumentado, seus ataques geram raiva e 30% mais ameaça. Lance de novo para voltar à forma de conjurador."
+        "description": "Assume a forma de urso: armadura +110%, vida máxima +30%, poder de ataque muito aumentado, seus ataques geram raiva e 30% mais ameaça. Lance de novo para voltar à forma de conjurador."
       },
       "maul": {
         "name": "Esmaga-Ossos",

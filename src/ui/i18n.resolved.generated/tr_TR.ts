@@ -9717,7 +9717,7 @@ export const tr_TR: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Yanan Yemin",
-        "description": "Kutsal hasarının ürettiği tehdidi pasif olarak %60 artırır. Yalnızca İnanç muhafızı."
+        "description": "Kutsal hasarının ürettiği tehdidi pasif olarak %30 artırır. Yalnızca İnanç muhafızı."
       },
       "retribution_aura": {
         "name": "Karşılık Aurası",
@@ -9833,7 +9833,7 @@ export const tr_TR: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Stonebound Silahı",
-        "description": "Silahına 30 dakika boyunca işler. Her savurma {damage} ek hasar verir. Güçlendirme ayrıca %30 zırh kazanır, %10 daha az hasar alır ve iki katı tehdit üretir. Toprak Sarsıntısı hedefini 3 sn boyunca sana saldırmaya zorlar ve Gök Gürültüsü Siperi 3 sn boyunca %10 hasar azaltımı verir."
+        "description": "Silahına 30 dakika boyunca işler. Her savurma {damage} ek hasar verir. Güçlendirme ayrıca %40 zırh ve %20 Dayanıklılık kazanır, %15 daha az hasar alır ve yaratıkların kritik vuruşlarına karşı bağışıktır ve 2,75 katı tehdit üretir. Toprak Sarsıntısı hedefini 3 sn boyunca sana saldırmaya zorlar ve Gök Gürültüsü Siperi 3 sn boyunca %10 hasar azaltımı verir."
       },
       "healing_wave": {
         "name": "Onaran Sular",
@@ -10012,7 +10012,7 @@ export const tr_TR: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin Formu",
-        "description": "Bir ayıya dönüş: zırh +%130, saldırı gücü büyük ölçüde artar, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. Büyücü formuna dönmek için tekrar kullan."
+        "description": "Bir ayıya dönüş: zırh +%110, azami sağlık +%30, saldırı gücü büyük ölçüde artar, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. Büyücü formuna dönmek için tekrar kullan."
       },
       "maul": {
         "name": "Kemik Kıran",

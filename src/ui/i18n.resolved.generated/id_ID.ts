@@ -9717,7 +9717,7 @@ export const id_ID: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Sumpah Membara",
-        "description": "Secara pasif meningkatkan ancaman yang dihasilkan kerusakan Sucimu sebesar 60%. Hanya Penjaga iman."
+        "description": "Secara pasif meningkatkan ancaman yang dihasilkan kerusakan Sucimu sebesar 30%. Hanya Penjaga iman."
       },
       "retribution_aura": {
         "name": "Aura Ganjaran",
@@ -9833,7 +9833,7 @@ export const id_ID: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Senjata Stonebound",
-        "description": "Meresapi senjatamu selama 30 menit. Setiap ayunan memberi {damage} kerusakan tambahan. Penguatan juga memperoleh 30% zirah, menerima 10% kerusakan lebih sedikit, dan menghasilkan dua kali lipat ancaman. Sentakan Bumi memaksa sasarannya menyerangmu selama 3 dtk, dan Tameng Guntur memberi 10% pengurangan kerusakan selama 3 dtk."
+        "description": "Meresapi senjatamu selama 30 menit. Setiap ayunan memberi {damage} kerusakan tambahan. Penguatan juga memperoleh 40% zirah dan 20% Stamina, menerima 15% kerusakan lebih sedikit, dan kebal terhadap serangan kritis dari makhluk, dan menghasilkan 2,75 kali lipat ancaman. Sentakan Bumi memaksa sasarannya menyerangmu selama 3 dtk, dan Tameng Guntur memberi 10% pengurangan kerusakan selama 3 dtk."
       },
       "healing_wave": {
         "name": "Air Pemulih",
@@ -10012,7 +10012,7 @@ export const id_ID: EnTranslations = {
       },
       "bear_form": {
         "name": "Wujud Bruin",
-        "description": "Berubah wujud menjadi beruang: zirah +130%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Rapal lagi untuk kembali ke wujud perapal."
+        "description": "Berubah wujud menjadi beruang: zirah +110%, kesehatan maksimum +30%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Rapal lagi untuk kembali ke wujud perapal."
       },
       "maul": {
         "name": "Remuk Tulang",

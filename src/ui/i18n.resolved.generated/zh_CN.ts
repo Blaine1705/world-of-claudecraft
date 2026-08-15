@@ -9717,7 +9717,7 @@ export const zh_CN: EnTranslations = {
       },
       "righteous_fury": {
         "name": "炽燃誓约",
-        "description": "被动地将你的神圣伤害所产生的威胁提高 60%。仅限信仰守卫。"
+        "description": "被动地将你的神圣伤害所产生的威胁提高 30%。仅限信仰守卫。"
       },
       "retribution_aura": {
         "name": "报偿光环",
@@ -9833,7 +9833,7 @@ export const zh_CN: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "缚石武器",
-        "description": "为你的武器附魔 30 分钟。每次挥击额外造成 {damage} 点伤害。增强还会获得 30% 护甲，受到的伤害降低 10%，并产生两倍的威胁。大地震击迫使其目标攻击你 3 秒，而雷霆护罩则给予 3 秒 10% 的伤害减免。"
+        "description": "为你的武器附魔 30 分钟。每次挥击额外造成 {damage} 点伤害。增强还会获得 40% 护甲和 20% 耐力，受到的伤害降低 15%，免疫生物的致命一击，并产生 2.75 倍的威胁。大地震击迫使其目标攻击你 3 秒，而雷霆护罩则给予 3 秒 10% 的伤害减免。"
       },
       "healing_wave": {
         "name": "治愈之水",
@@ -10012,7 +10012,7 @@ export const zh_CN: EnTranslations = {
       },
       "bear_form": {
         "name": "巨熊形态",
-        "description": "变形为熊：护甲 +130%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。"
+        "description": "变形为熊：护甲 +110%，最大生命值 +30%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。"
       },
       "maul": {
         "name": "碎骨击",

@@ -9717,7 +9717,7 @@ export const nl_NL: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Brandende Eed",
-        "description": "Verhoogt passief de dreiging die uw Heilige schade opwekt met 60%. Alleen Geloofswachter."
+        "description": "Verhoogt passief de dreiging die uw Heilige schade opwekt met 30%. Alleen Geloofswachter."
       },
       "retribution_aura": {
         "name": "Aura van Vergelding",
@@ -9833,7 +9833,7 @@ export const nl_NL: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Steengebonden Wapen",
-        "description": "Doordrenkt uw wapen 30 min lang. Elke slag brengt {damage} extra schade toe. Versterking wint bovendien 30% pantser, krijgt 10% minder schade en wekt tweemaal zoveel dreiging op. Aardse Schok dwingt zijn doelwit u 3 sec lang aan te vallen, en Donderwering verleent 3 sec lang 10% schadevermindering."
+        "description": "Doordrenkt uw wapen 30 min lang. Elke slag brengt {damage} extra schade toe. Versterking wint bovendien 40% pantser en 20% Uithouding, krijgt 15% minder schade en is immuun voor kritieke treffers van wezens en wekt 2,75 keer zoveel dreiging op. Aardse Schok dwingt zijn doelwit u 3 sec lang aan te vallen, en Donderwering verleent 3 sec lang 10% schadevermindering."
       },
       "healing_wave": {
         "name": "Helende Wateren",
@@ -10012,7 +10012,7 @@ export const nl_NL: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruingedaante",
-        "description": "Verander in een beer: pantser +130%, sterk verhoogde aanvalskracht, je aanvallen bouwen woede op en genereren 30% meer dreiging. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante."
+        "description": "Verander in een beer: pantser +110%, maximale gezondheid +30%, sterk verhoogde aanvalskracht, je aanvallen bouwen woede op en genereren 30% meer dreiging. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante."
       },
       "maul": {
         "name": "Botverbrijzelen",

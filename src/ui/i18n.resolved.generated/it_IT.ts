@@ -9717,7 +9717,7 @@ export const it_IT: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Giuramento Ardente",
-        "description": "Aumenta passivamente del 60% la minaccia generata dai vostri danni Sacri. Solo Custode della fede."
+        "description": "Aumenta passivamente del 30% la minaccia generata dai vostri danni Sacri. Solo Custode della fede."
       },
       "retribution_aura": {
         "name": "Aura della Rivalsa",
@@ -9833,7 +9833,7 @@ export const it_IT: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Arma Legapietra",
-        "description": "Permea la vostra arma per 30 min. Ogni colpo infligge {damage} danni aggiuntivi. Potenziamento guadagna inoltre il 30% di armatura, subisce il 10% di danni in meno e genera il doppio della minaccia. Scossa Tellurica costringe il proprio bersaglio ad attaccarvi per 3 sec, e Barriera di Tuono concede il 10% di riduzione del danno per 3 sec."
+        "description": "Permea la vostra arma per 30 min. Ogni colpo infligge {damage} danni aggiuntivi. Potenziamento guadagna inoltre il 40% di armatura e il 20% di Costituzione, subisce il 15% di danni in meno e è immune ai colpi critici delle creature e genera 2,75 volte la minaccia. Scossa Tellurica costringe il proprio bersaglio ad attaccarvi per 3 sec, e Barriera di Tuono concede il 10% di riduzione del danno per 3 sec."
       },
       "healing_wave": {
         "name": "Acque Risananti",
@@ -10012,7 +10012,7 @@ export const it_IT: EnTranslations = {
       },
       "bear_form": {
         "name": "Forma di Bruin",
-        "description": "Mutamenti in orso: armatura +130%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Lanciala di nuovo per tornare alla forma da incantatore."
+        "description": "Mutamenti in orso: armatura +110%, salute massima +30%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Lanciala di nuovo per tornare alla forma da incantatore."
       },
       "maul": {
         "name": "Frantumaossa",
