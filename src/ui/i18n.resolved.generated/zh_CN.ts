@@ -7798,6 +7798,7 @@ export const zh_CN: EnTranslations = {
     },
     "notify": {
       "updateReadyTitle": "更新 {version} 已就绪",
+      "updateReadyTitleNoVersion": "更新已就绪",
       "updateReadyBody": "重启 World of ClaudeCraft 以应用更新。",
       "partyInviteTitle": "组队邀请",
       "partyInviteBody": "{name} 邀请你加入队伍。"

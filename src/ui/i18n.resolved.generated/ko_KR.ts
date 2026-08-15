@@ -7798,6 +7798,7 @@ export const ko_KR: EnTranslations = {
     },
     "notify": {
       "updateReadyTitle": "업데이트 {version} 준비 완료",
+      "updateReadyTitleNoVersion": "업데이트 준비 완료",
       "updateReadyBody": "업데이트를 적용하려면 World of ClaudeCraft를 다시 시작하세요.",
       "partyInviteTitle": "파티 초대",
       "partyInviteBody": "{name}님이 파티에 초대했습니다."

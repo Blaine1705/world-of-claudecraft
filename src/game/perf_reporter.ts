@@ -460,6 +460,13 @@ function payloadFromSnapshot(
       graphicsConfigVersion: renderer.graphicsConfigVersion,
       seconds: snapshot.seconds,
       frames: snapshot.frames,
+      // Frames the desktop presentation gate skipped while hidden (never
+      // counted in `frames`, see PerfSnapshot). Sends are already skipped
+      // while hidden, so this is the AFTER-RESTORE evidence: the counter is
+      // what says a session's cumulative numbers spanned minimized time, and
+      // the only fleet-visible proof the skip is working. Rides in rawSummary
+      // (the no-DDL home, like the longtask block below), not as a column.
+      hiddenPresentSkips: snapshot.hiddenPresentSkips,
       windows: snapshot.windows,
       mainMs: snapshot.mainMs,
       rendererPhaseMs: renderer.phaseMs,

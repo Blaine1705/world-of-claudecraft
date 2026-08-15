@@ -74,4 +74,32 @@ describe('initDesktopShellIntegration', () => {
       expect(piece).not.toHaveBeenCalled();
     }
   });
+
+  it('disposes the previous composition before re-composing (no stacked subscriptions)', () => {
+    // The three subscribing inits return unsubscribe handles; a re-init that
+    // discarded them would leave the old closures folding bridge pushes beside
+    // the new ones (double GPU latch, double display fold, double presentation
+    // latch). The retained handles must fire exactly once, on the NEXT init.
+    const liveBridge = { onGpuStatus: () => () => {} };
+    bridge.mockReturnValue(liveBridge as never);
+    const disposals: string[] = [];
+    vi.mocked(initDesktopGpuStatus).mockReturnValue(() => {
+      disposals.push('gpu');
+    });
+    vi.mocked(initDesktopDisplayChange).mockReturnValue(() => {
+      disposals.push('display');
+    });
+    vi.mocked(initDesktopPresentation).mockReturnValue(() => {
+      disposals.push('presentation');
+    });
+    initDesktopShellIntegration();
+    expect(disposals).toEqual([]);
+    initDesktopShellIntegration();
+    // Exactly the first composition's three handles, disposed exactly once,
+    // and every piece composed once per init (one live subscription each).
+    expect(disposals).toEqual(['gpu', 'display', 'presentation']);
+    for (const piece of pieces) {
+      expect(piece).toHaveBeenCalledTimes(2);
+    }
+  });
 });

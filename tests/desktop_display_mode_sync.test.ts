@@ -294,14 +294,21 @@ describe('desktop_display_mode_sync: wiring pins', () => {
     expect(optionsWindowSource).not.toContain('desktopDisplayMode: isNativeAppShell(');
   });
 
-  it('boots the reflection with an INLINE settings factory, desktop-gated', () => {
-    // The factory literal is load-bearing: hoisting it to `const s = new
-    // Settings()` outside the call re-creates the pre-await snapshot bug the
-    // sync module exists to prevent (a whole-blob save reverting every settings
-    // write that landed during the bridge round trip).
+  it('boots the reflection with the live-or-fresh settings factory, desktop-gated', () => {
+    // The factory resolution is load-bearing twice over: it must construct the
+    // fresh snapshot AFTER the await (hoisting `new Settings()` outside the
+    // call re-creates the pre-await snapshot bug), and it must answer with the
+    // LIVE long-lived store once startGame has built one, or that store's next
+    // unrelated save() reverts the reflected value (the fast-entry boot race;
+    // the behavior half is the race suite below).
     expect(mainSource).toContain(
-      'if (DESKTOP_APP) void syncDesktopDisplayModeSetting(desktopBridge(), () => new Settings());',
+      'const settingsForShellReflection = (): Settings => liveSettings ?? new Settings();',
     );
+    expect(mainSource).toContain(
+      'if (DESKTOP_APP) void syncDesktopDisplayModeSetting(desktopBridge(), settingsForShellReflection);',
+    );
+    // startGame publishes its long-lived store into the holder the factory reads.
+    expect(mainSource).toContain('liveSettings = settings;');
   });
 
   it('routes the options picker through the push, both polarities in one statement', () => {
@@ -336,6 +343,54 @@ describe('desktop_display_mode_sync: wiring pins', () => {
     expect(mainSource).toContain(
       'v >= 0.5 ? requestPreferredFullscreen() : exitBrowserFullscreen();',
     );
+  });
+});
+
+// The boot race the live-or-fresh factory closes, display-mode twin of the
+// suite in tests/desktop_gpu_pref_sync.test.ts: a reflection resolving AFTER
+// the long-lived Settings exists must land in that instance, or its next
+// unrelated whole-blob save() reverts the reflected mode.
+describe('desktop_display_mode_sync: fast-entry boot race', () => {
+  const installStorage = (): void => {
+    const map = new Map<string, string>();
+    const storage: Storage = {
+      get length() {
+        return map.size;
+      },
+      key: (index: number) => Array.from(map.keys())[index] ?? null,
+      getItem: (k: string) => map.get(k) ?? null,
+      setItem: (k: string, v: string) => {
+        map.set(k, v);
+      },
+      removeItem: (k: string) => {
+        map.delete(k);
+      },
+      clear: () => map.clear(),
+    };
+    Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: storage });
+  };
+
+  it('a reflection resolving after the live store exists lands in it and survives an unrelated set()', async () => {
+    installStorage();
+    let live: Settings | null = null;
+    let resolveRead: (mode: DesktopDisplayMode) => void = () => {};
+    const read = new Promise<DesktopDisplayMode>((resolve) => {
+      resolveRead = resolve;
+    });
+    const pending = syncDesktopDisplayModeSetting(
+      fakeBridge({ getDisplayMode: () => read }),
+      () => live ?? new Settings(),
+    );
+    // The fast entry: the long-lived store is built while the read is in flight.
+    live = new Settings();
+    resolveRead('windowed'); // the shell's real window state, off the default 1
+    await pending;
+    expect(live.get('displayMode')).toBe(0);
+    // The revert scenario the race used to allow: an unrelated later write on
+    // the live store must not roll the reflected mode back to borderless.
+    live.set('showFps', true);
+    expect(new Settings().get('displayMode')).toBe(0);
+    expect(new Settings().get('showFps')).toBe(true);
   });
 });
 

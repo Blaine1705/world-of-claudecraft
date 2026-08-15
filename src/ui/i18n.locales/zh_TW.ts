@@ -7541,6 +7541,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'desktop.update.dismiss': '關閉',
   'desktop.update.whatsNew': '在瀏覽器中查看更新內容',
   'desktop.notify.updateReadyTitle': '更新 {version} 已就緒',
+  'desktop.notify.updateReadyTitleNoVersion': '更新已就緒',
   'desktop.notify.updateReadyBody': '重新啟動 World of ClaudeCraft 以套用更新。',
   'desktop.notify.partyInviteTitle': '組隊邀請',
   'desktop.notify.partyInviteBody': '{name} 邀請你加入隊伍。',

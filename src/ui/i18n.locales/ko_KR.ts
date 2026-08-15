@@ -7836,6 +7836,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'desktop.update.dismiss': '닫기',
   'desktop.update.whatsNew': '변경 사항을 브라우저에서 보기',
   'desktop.notify.updateReadyTitle': '업데이트 {version} 준비 완료',
+  'desktop.notify.updateReadyTitleNoVersion': '업데이트 준비 완료',
   'desktop.notify.updateReadyBody': '업데이트를 적용하려면 World of ClaudeCraft를 다시 시작하세요.',
   'desktop.notify.partyInviteTitle': '파티 초대',
   'desktop.notify.partyInviteBody': '{name}님이 파티에 초대했습니다.',

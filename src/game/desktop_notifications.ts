@@ -71,6 +71,10 @@ export function shouldNotifyDesktop(env: { hidden: boolean; focused: boolean }):
 // Armed by initDesktopNotifications, and only on a shell that can post at all.
 let send: ((request: DesktopNotificationRequest) => void) | null = null;
 let core: DesktopNotifyCore | null = null;
+// The previous init's update subscription, torn down on re-init so a stale
+// closure's state fold cannot double-notify beside the new one (the same
+// fresh-boot reset shape as initGpuNotice's applyShellVerdict).
+let unsubscribeUpdates: (() => void) | null = null;
 
 function playerIsAway(): boolean {
   return shouldNotifyDesktop({ hidden: desktopPresentationHidden(), focused: document.hasFocus() });
@@ -82,6 +86,10 @@ function playerIsAway(): boolean {
  * which leaves the latch disarmed and the frame path free.
  */
 export function initDesktopNotifications(bridge: DesktopBridge): void {
+  // Before the capability checks, so even an init that then disarms (older
+  // shell) still leaves no previous subscription live.
+  unsubscribeUpdates?.();
+  unsubscribeUpdates = null;
   send = null;
   core = null;
   const notify = bridge.showNotification;
@@ -97,7 +105,7 @@ export function initDesktopNotifications(bridge: DesktopBridge): void {
   // bridge multiplexes subscribers, and this side must not reach into the
   // card's DOM module for state it can fold itself.
   let state = INITIAL_UPDATE_TOAST_STATE;
-  subscribe.call(bridge, (event: DesktopUpdateEvent) => {
+  const unsubscribe = subscribe.call(bridge, (event: DesktopUpdateEvent) => {
     const prevMode = state.mode;
     state = reduceUpdateToast(state, event);
     // The away gate runs BEFORE the core, so an update that lands while the
@@ -111,10 +119,18 @@ export function initDesktopNotifications(bridge: DesktopBridge): void {
     if (!ready) return;
     send?.({
       kind: 'update-ready',
-      title: t('desktop.notify.updateReadyTitle', { version: ready.version }),
+      // The '' version arm is deliberate core behavior (a 'downloaded' event
+      // that carried no version): it gets its own key rather than rendering
+      // a dangling "Update  is ready" through the {version} slot.
+      title: ready.version
+        ? t('desktop.notify.updateReadyTitle', { version: ready.version })
+        : t('desktop.notify.updateReadyTitleNoVersion'),
       body: t('desktop.notify.updateReadyBody'),
     });
   });
+  // Retained so the next init tears this closure down instead of leaving two
+  // folds subscribed; a shell whose subscribe returns nothing keeps the null.
+  unsubscribeUpdates = typeof unsubscribe === 'function' ? unsubscribe : null;
 }
 
 /**

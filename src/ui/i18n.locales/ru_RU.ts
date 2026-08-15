@@ -7962,6 +7962,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'desktop.update.dismiss': 'Закрыть',
   'desktop.update.whatsNew': 'Посмотреть изменения в браузере',
   'desktop.notify.updateReadyTitle': 'Обновление {version} готово',
+  'desktop.notify.updateReadyTitleNoVersion': 'Обновление готово',
   'desktop.notify.updateReadyBody': 'Перезапустите World of ClaudeCraft, чтобы применить обновление.',
   'desktop.notify.partyInviteTitle': 'Приглашение в группу',
   'desktop.notify.partyInviteBody': '{name} приглашает вас в группу.',

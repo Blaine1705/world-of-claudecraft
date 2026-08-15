@@ -299,10 +299,11 @@ function installStorage(): void {
   Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: storage });
 }
 
-// Two real zones, derived from the live data rather than hard-coded, so a world
-// edit cannot quietly turn these arms into a single-zone test.
+// Three real zones, derived from the live data rather than hard-coded, so a
+// world edit cannot quietly collapse these arms into a single-zone test.
 const ZONE_A = zoneAt(0, 0);
 const ZONE_B = zoneAt(0, 300);
+const ZONE_C = zoneAt(0, 600);
 
 let clock = 0;
 // id defaults to a real local player id: both hosts number them from 1 up, and
@@ -337,8 +338,46 @@ describe('initDiscordPresence + desktopPresenceOnFrame', () => {
     vi.restoreAllMocks();
   });
 
-  it('sanity: the two probe points are different real zones', () => {
-    expect(ZONE_A.id).not.toBe(ZONE_B.id);
+  it('sanity: the three probe points are pairwise different real zones', () => {
+    expect(new Set([ZONE_A.id, ZONE_B.id, ZONE_C.id]).size).toBe(3);
+  });
+
+  it('freezes the last real zone across a spectate span (the main.ts gate, as behavior)', () => {
+    // The wiring pin below proves the gate TEXT (`net.spectating === null`);
+    // this arm drives the module through the same contract, because the freeze
+    // was previously pinned only textually: while spectating, main.ts feeds NO
+    // frames, so the watched player's zone must never publish and the last
+    // real zone stays on the profile; the feed resuming in a third zone then
+    // publishes where the player actually is.
+    const { bridge, setDiscordActivity } = makeBridge();
+    initDiscordPresence(bridge);
+    let spectating: string | null = null;
+    const feed = (x: number, z: number): void => {
+      if (spectating === null) desktopPresenceOnFrame(world(x, z));
+    };
+    // Enter zone A: published (call 0 is the boot reconciliation clear).
+    feed(0, 0);
+    expect(setDiscordActivity).toHaveBeenCalledTimes(2);
+    expect((setDiscordActivity.mock.calls[1][0] as DesktopDiscordActivity).details).toBe(
+      zoneDisplayName(ZONE_A.id),
+    );
+    // Start spectating someone in zone B: long past every rate-limit window,
+    // nothing publishes B and nothing clears, so the profile still reads A.
+    spectating = 'watched-player';
+    for (let i = 0; i < 5; i++) {
+      clock += 20_000;
+      feed(0, 300);
+    }
+    expect(setDiscordActivity).toHaveBeenCalledTimes(2);
+    // Stop spectating while standing in zone C: the feed resumes and C
+    // publishes at the next poll.
+    spectating = null;
+    clock += 20_000;
+    feed(0, 600);
+    expect(setDiscordActivity).toHaveBeenCalledTimes(3);
+    expect((setDiscordActivity.mock.calls[2][0] as DesktopDiscordActivity).details).toBe(
+      zoneDisplayName(ZONE_C.id),
+    );
   });
 
   it('clears once at init: a reload leaves the shell holding the last page presence', () => {

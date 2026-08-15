@@ -735,6 +735,7 @@ export type TranslationKeyFlat =
   | 'desktop.notify.partyInviteTitle'
   | 'desktop.notify.updateReadyBody'
   | 'desktop.notify.updateReadyTitle'
+  | 'desktop.notify.updateReadyTitleNoVersion'
   | 'desktop.update.checkingBody'
   | 'desktop.update.checkingTitle'
   | 'desktop.update.dismiss'

@@ -517,11 +517,17 @@ if (DESKTOP_APP) initDesktopShellIntegration();
 // Reflect the shell's STORED GPU preference into the local setting, so the
 // desktop-only options row shows what the next launch will do rather than a
 // local guess. Writes nothing without the bridge method (older shell, browser).
-// The store is built by the factory AFTER the bridge answers: a snapshot taken
-// before the round trip would rewrite the whole settings blob over any write
-// that landed while it was in flight.
-if (DESKTOP_APP) void syncDesktopGpuPrefSetting(desktopBridge(), () => new Settings());
-if (DESKTOP_APP) void syncDesktopDisplayModeSetting(desktopBridge(), () => new Settings());
+// The store is resolved by the factory AFTER the bridge answers: a snapshot
+// taken before the round trip would rewrite the whole settings blob over any
+// write that landed while it was in flight. And when a fast entry path has
+// already built startGame's long-lived store, the factory answers with THAT
+// instance instead of a fresh snapshot: a fresh one would land the reflection
+// only in localStorage, where the live store's next unrelated save() (a
+// whole-blob rewrite) would silently revert it.
+let liveSettings: Settings | null = null;
+const settingsForShellReflection = (): Settings => liveSettings ?? new Settings();
+if (DESKTOP_APP) void syncDesktopGpuPrefSetting(desktopBridge(), settingsForShellReflection);
+if (DESKTOP_APP) void syncDesktopDisplayModeSetting(desktopBridge(), settingsForShellReflection);
 // Free every WebGL context (game renderer, character preview, portrait rig) when
 // the page is torn down, so logout/login reload cycles don't exhaust the GPU
 // context pool and break the next renderer with "Error creating WebGL context".
@@ -1215,6 +1221,10 @@ async function startGame(
   // hoisting them ahead of mountGameUi is safe; everything DOM-bound (canvas
   // lookups, the context-lost listeners) stays below, after the template mounts.
   const settings = new Settings();
+  // Publish the long-lived store for the boot-time shell reflections
+  // (settingsForShellReflection): a bridge read resolving after this line
+  // writes into THIS instance rather than a doomed parallel snapshot.
+  liveSettings = settings;
   // "Stop Auto-Attack on Target Switch" (issue #1358) is authoritative on the
   // sim, so a stored player preference must be re-pushed on every world entry
   // (offline sim or online server), not just when the Options toggle changes.

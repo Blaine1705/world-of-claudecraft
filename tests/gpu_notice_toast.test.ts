@@ -62,6 +62,92 @@ describe('the languagechange listener rides the DOM', () => {
   });
 });
 
+describe('dismissal signatures merge across different-verdict dismissals', () => {
+  const software = {
+    softwareRendering: true,
+    desktopShell: true,
+    desktopPlatform: 'other',
+  } as const;
+  const hybrid = {
+    softwareRendering: false,
+    hybridGpuLikely: true,
+    desktopShell: false,
+    desktopPlatform: 'win',
+  } as const;
+
+  it('a later different-verdict dismissal keeps the earlier one (no re-nag on re-arm)', async () => {
+    // Boot 1: software verdict, dismissed.
+    let toast = await bootToast();
+    expect(toast.initGpuNotice(software)).toBe(true);
+    (document.querySelector('.gpu-notice-dismiss') as HTMLButtonElement).click();
+    expect(localStorage.getItem('woc_gpu_notice_dismissed')).toBe('software');
+
+    // Boot 2: a hybrid-only verdict shows and is dismissed too. The overwrite
+    // bug wrote 'hybrid' here, forgetting the software dismissal.
+    toast = await bootToast();
+    expect(toast.initGpuNotice(hybrid)).toBe(true);
+    (document.querySelector('.gpu-notice-dismiss') as HTMLButtonElement).click();
+    expect(localStorage.getItem('woc_gpu_notice_dismissed')).toBe('hybrid,software');
+
+    // Boot 3: the software verdict re-arms; the merged signature still covers
+    // it, so the player is not re-nagged by something they already closed.
+    toast = await bootToast();
+    expect(toast.initGpuNotice(software)).toBe(false);
+    expect(noticeRoot()).toBeNull();
+  });
+
+  it('merges over the legacy pre-signature value instead of dropping it', async () => {
+    // '1' is what every install stored before signatures existed: a software
+    // dismissal. A hybrid dismissal on top must migrate it into the merged
+    // signature, not overwrite it away.
+    localStorage.setItem('woc_gpu_notice_dismissed', '1');
+    const toast = await bootToast();
+    expect(toast.initGpuNotice(hybrid)).toBe(true);
+    (document.querySelector('.gpu-notice-dismiss') as HTMLButtonElement).click();
+    expect(localStorage.getItem('woc_gpu_notice_dismissed')).toBe('hybrid,software');
+  });
+});
+
+describe('re-init tears the previous instance down', () => {
+  it('a second init leaves one root and one live language listener', async () => {
+    const toast = await bootToast();
+    const addSpy = vi.spyOn(document, 'addEventListener');
+    const removeSpy = vi.spyOn(document, 'removeEventListener');
+    const shown = {
+      softwareRendering: true,
+      desktopShell: true,
+      desktopPlatform: 'other',
+    } as const;
+    expect(toast.initGpuNotice(shown)).toBe(true);
+    expect(document.querySelectorAll('#gpu-notice')).toHaveLength(1);
+
+    expect(toast.initGpuNotice(shown)).toBe(true);
+    // One root (the first was removed, not abandoned) and net one listener:
+    // each shown init binds once, and the re-init removed the first binding.
+    expect(document.querySelectorAll('#gpu-notice')).toHaveLength(1);
+    expect(languageBindings(addSpy)).toBe(2);
+    expect(removeSpy.mock.calls.filter((call) => call[0] === LANGUAGE_EVENT)).toHaveLength(1);
+    // and the surviving instance still repaints on a locale flip
+    expect(noticeRoot()?.hidden).toBe(false);
+    document.dispatchEvent(new Event(LANGUAGE_EVENT));
+    expect(noticeRoot()?.hidden).toBe(false);
+  });
+
+  it('a never-shown re-init owes and runs no teardown', async () => {
+    const toast = await bootToast();
+    const removeSpy = vi.spyOn(document, 'removeEventListener');
+    const hiddenInput = {
+      softwareRendering: false,
+      desktopShell: true,
+      desktopPlatform: 'other',
+    } as const;
+    expect(toast.initGpuNotice(hiddenInput)).toBe(false);
+    expect(toast.initGpuNotice(hiddenInput)).toBe(false);
+    expect(removeSpy.mock.calls.filter((call) => call[0] === LANGUAGE_EVENT)).toHaveLength(0);
+    expect(noticeRoot()).toBeNull();
+  });
+});
+
 describe('the displayed latch under a persisted dismissal', () => {
   it('stays empty when a stored dismissal keeps the boot notice hidden', async () => {
     // R16 seam: the exposures mean "the player was TOLD this session". A boot

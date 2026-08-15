@@ -508,11 +508,12 @@ describe('perf reporter payload', () => {
     expect(body.source).toBe('benchmark');
     expect(body.zoneOrScenario).toBe('bench_dense_foliage');
     expect(JSON.stringify(body.rawSummary)).not.toContain('Safari/605');
-    // hiddenPresentSkips stays OUT of the beacon in both spellings (phase 4
-    // decision, upheld in QA F11: a new fleet-schema field has server
-    // implications, and with sends gated on shellHidden there are no hidden
-    // beacons to disambiguate; the counter's live sink is the perf overlay).
-    expect(JSON.stringify(body)).not.toContain('hiddenPresentSkips');
+    // hiddenPresentSkips ships in rawSummary (review reversal of the phase 4
+    // decision): sends are skipped while hidden, but an after-restore session
+    // still beacons cumulative numbers whose spans included minimized time,
+    // and the counter is the only fleet-visible evidence of that residue. It
+    // rides in rawSummary (the no-DDL home), never as a top-level column.
+    expect((body.rawSummary as { hiddenPresentSkips?: number }).hiddenPresentSkips).toBe(0);
     expect((body.rawSummary as { graphicsConfigVersion?: number }).graphicsConfigVersion).toBe(16);
     expect(
       (body.rawSummary as { rendererQualityBuckets?: { levels?: { foliage?: number } } })
@@ -577,6 +578,17 @@ describe('perf reporter payload', () => {
       (body.rawSummary as { rendererFoliage?: { modelVisibleTrianglesByLod?: { core?: number } } })
         .rendererFoliage?.modelVisibleTrianglesByLod?.core,
     ).toBe(420_000);
+  });
+
+  it('carries a nonzero hiddenPresentSkips into raw summary (the after-restore evidence)', () => {
+    // A session minimized for a while and then restored: the skip counter is
+    // what disambiguates its diluted-looking spans from a genuinely slow
+    // machine, since no beacon goes out DURING the hidden span itself.
+    const settings = new Settings();
+    const snap = snapshot();
+    snap.hiddenPresentSkips = 4321;
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(snap, settings, 'sess1', 42)!;
+    expect((body.rawSummary as { hiddenPresentSkips?: number }).hiddenPresentSkips).toBe(4321);
   });
 
   it('carries the four dropped browser longtask fields into raw summary (#2479)', () => {

@@ -7846,6 +7846,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'desktop.update.dismiss': '閉じる',
   'desktop.update.whatsNew': '変更内容をブラウザで見る',
   'desktop.notify.updateReadyTitle': 'アップデート {version} の準備ができました',
+  'desktop.notify.updateReadyTitleNoVersion': 'アップデートの準備ができました',
   'desktop.notify.updateReadyBody': 'アップデートを適用するには World of ClaudeCraft を再起動してください。',
   'desktop.notify.partyInviteTitle': 'パーティ招待',
   'desktop.notify.partyInviteBody': '{name}があなたをパーティに招待しています。',

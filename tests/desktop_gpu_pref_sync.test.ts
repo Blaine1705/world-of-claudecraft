@@ -264,14 +264,21 @@ describe('desktop_gpu_pref_sync: boot reflection', () => {
 describe('desktop_gpu_pref_sync: main.ts wiring pins', () => {
   const mainSource = readFileSync(join(__dirname, '..', 'src', 'main.ts'), 'utf8');
 
-  it('boots the reflection with an INLINE settings factory, desktop-gated', () => {
-    // The factory literal is load-bearing: hoisting it to `const s = new
-    // Settings()` outside the call re-creates the pre-await snapshot bug the
-    // sync module exists to prevent (a whole-blob save reverting every
-    // settings write that landed during the bridge round trip).
+  it('boots the reflection with the live-or-fresh settings factory, desktop-gated', () => {
+    // The factory resolution is load-bearing twice over: it must construct the
+    // fresh snapshot AFTER the await (hoisting `new Settings()` outside the
+    // call re-creates the pre-await snapshot bug), and it must answer with the
+    // LIVE long-lived store once startGame has built one, or that store's next
+    // unrelated save() reverts the reflected value (the fast-entry boot race;
+    // the behavior half is the race suite below).
     expect(mainSource).toContain(
-      'if (DESKTOP_APP) void syncDesktopGpuPrefSetting(desktopBridge(), () => new Settings());',
+      'const settingsForShellReflection = (): Settings => liveSettings ?? new Settings();',
     );
+    expect(mainSource).toContain(
+      'if (DESKTOP_APP) void syncDesktopGpuPrefSetting(desktopBridge(), settingsForShellReflection);',
+    );
+    // startGame publishes its long-lived store into the holder the factory reads.
+    expect(mainSource).toContain('liveSettings = settings;');
   });
 
   it('routes the options toggle through the push, which owns the inversion', () => {
@@ -281,6 +288,57 @@ describe('desktop_gpu_pref_sync: main.ts wiring pins', () => {
     expect(mainSource).toContain(
       "pushDesktopGpuPref(desktopBridge(), settings.set('forceHighPerfGpu', !!value));",
     );
+  });
+});
+
+// The boot race the live-or-fresh factory closes: the reflection's bridge read
+// can resolve AFTER a fast entry path has already built startGame's long-lived
+// Settings. A fresh after-await snapshot would land the reflected value only in
+// localStorage, where the live store's next unrelated save() (whole-blob by
+// design) reverts it; answering with the LIVE store at resolve time is what
+// makes the reflection stick. This drives the module with exactly the factory
+// shape main.ts wires (pinned above).
+describe('desktop_gpu_pref_sync: fast-entry boot race', () => {
+  const installStorage = (): void => {
+    const map = new Map<string, string>();
+    const storage: Storage = {
+      get length() {
+        return map.size;
+      },
+      key: (index: number) => Array.from(map.keys())[index] ?? null,
+      getItem: (k: string) => map.get(k) ?? null,
+      setItem: (k: string, v: string) => {
+        map.set(k, v);
+      },
+      removeItem: (k: string) => {
+        map.delete(k);
+      },
+      clear: () => map.clear(),
+    };
+    Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: storage });
+  };
+
+  it('a reflection resolving after the live store exists lands in it and survives an unrelated set()', async () => {
+    installStorage();
+    let live: Settings | null = null;
+    let resolveRead: (optOut: boolean) => void = () => {};
+    const read = new Promise<boolean>((resolve) => {
+      resolveRead = resolve;
+    });
+    const pending = syncDesktopGpuPrefSetting(
+      fakeBridge({ getGpuForceOptOut: () => read }),
+      () => live ?? new Settings(),
+    );
+    // The fast entry: the long-lived store is built while the read is in flight.
+    live = new Settings();
+    resolveRead(true); // the shell says opted out, so the setting reflects OFF
+    await pending;
+    expect(live.get('forceHighPerfGpu')).toBe(false);
+    // The revert scenario the race used to allow: an unrelated later write on
+    // the live store must not roll the reflected value back to its default.
+    live.set('showFps', true);
+    expect(new Settings().get('forceHighPerfGpu')).toBe(false);
+    expect(new Settings().get('showFps')).toBe(true);
   });
 });
 

@@ -141,6 +141,10 @@ export const shellStrings = {
       // bridge already rendered: the main process has no i18n runtime.
       notify: {
         updateReadyTitle: 'Update {version} is ready',
+        // The versionless arm (a 'downloaded' event carrying no version, which
+        // the update core deliberately supports): rendering '' through the
+        // {version} slot above would read "Update  is ready".
+        updateReadyTitleNoVersion: 'Update is ready',
         updateReadyBody: 'Restart World of ClaudeCraft to apply the update.',
         partyInviteTitle: 'Party invite',
         partyInviteBody: '{name} invited you to a party.',

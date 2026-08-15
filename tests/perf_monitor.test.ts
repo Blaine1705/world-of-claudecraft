@@ -113,6 +113,58 @@ describe('hidden present skips', () => {
     expect(overlayText()).toContain('hidden skips 2');
   });
 
+  it('discounts a closed hidden span from the cumulative fps denominator', () => {
+    // The after-restore dilution (frames stop while hidden, wall seconds keep
+    // counting): 100 frames over ~10 visible seconds must read ~10 fps, not
+    // the ~0.9 that 110 wall seconds would produce.
+    const perf = new PerfMonitor(null);
+    const t0 = performance.now();
+    for (let i = 0; i < 100; i++) perf.frame(0.016, t0 + i * 16);
+    perf.setFrameSampling(false, t0 + 10_000);
+    perf.setFrameSampling(true, t0 + 110_000);
+    const snap = perf.snapshot(t0 + 110_000);
+    expect(snap.frames).toBe(100);
+    expect(snap.fps).toBeGreaterThan(8);
+    expect(snap.fps).toBeLessThan(12);
+  });
+
+  it('discounts a hidden span still open at snapshot time', () => {
+    const perf = new PerfMonitor(null);
+    const t0 = performance.now();
+    for (let i = 0; i < 100; i++) perf.frame(0.016, t0 + i * 16);
+    perf.setFrameSampling(false, t0 + 10_000);
+    const snap = perf.snapshot(t0 + 110_000);
+    expect(snap.fps).toBeGreaterThan(8);
+    expect(snap.fps).toBeLessThan(12);
+  });
+
+  it('treats repeated same-value sampling writes as no-ops (main.ts sets it every frame)', () => {
+    const perf = new PerfMonitor(null);
+    const t0 = performance.now();
+    for (let i = 0; i < 100; i++) perf.frame(0.016, t0 + i * 16);
+    perf.setFrameSampling(true, t0 + 5_000); // already on: must not move the ledger
+    perf.setFrameSampling(false, t0 + 10_000);
+    perf.setFrameSampling(false, t0 + 60_000); // still off: the span keeps its start
+    perf.setFrameSampling(true, t0 + 110_000);
+    const snap = perf.snapshot(t0 + 110_000);
+    expect(snap.fps).toBeGreaterThan(8);
+    expect(snap.fps).toBeLessThan(12);
+  });
+
+  it('clears the hidden-time ledger on reset', () => {
+    const perf = new PerfMonitor(null);
+    perf.setFrameSampling(false, 1_000);
+    perf.setFrameSampling(true, 61_000);
+    perf.reset();
+    const t0 = performance.now();
+    for (let i = 0; i < 50; i++) perf.frame(0.016, t0 + i * 16);
+    const snap = perf.snapshot(t0 + 10_000);
+    // Only wall time since the reset counts: a stale 60 s ledger would push
+    // the denominator to its floor and fake a huge fps here.
+    expect(snap.fps).toBeGreaterThan(4);
+    expect(snap.fps).toBeLessThan(6);
+  });
+
   it('records no bucket sample while frame sampling is off, and resumes when it returns', () => {
     // Phase 4 QA F10: a hidden desktop frame must reproduce the web
     // hidden-tab shape, where NO per-frame sample records (rAF pauses there),

@@ -208,6 +208,23 @@ describe('initDesktopNotifications update trigger', () => {
     ]);
   });
 
+  it('posts the versionless title for a ready state with no version (no dangling space)', () => {
+    // The '' version arm the core deliberately supports (a 'downloaded' event
+    // that carried no version) must not render through the {version} slot,
+    // which produced "Update  is ready"; it has its own key.
+    const { sent, fire } = boot();
+    setPlayer({ hidden: true, focused: true });
+    fire({ type: 'downloaded' });
+    expect(sent).toEqual([
+      {
+        kind: 'update-ready',
+        title: 'Update is ready',
+        body: 'Restart World of ClaudeCraft to apply the update.',
+      },
+    ]);
+    expect(sent[0].title).not.toContain('  ');
+  });
+
   it('posts nothing while the player is present: the card already tells them', () => {
     const { sent, fire } = boot();
     setPlayer({ hidden: false, focused: true });
@@ -244,6 +261,29 @@ describe('initDesktopNotifications update trigger', () => {
     expect(sent).toEqual([
       { kind: 'party-invite', title: 'Party invite', body: 'Ayla invited you to a party.' },
     ]);
+  });
+
+  it('a second init tears down the previous update subscription (one live fold, one post)', () => {
+    // The bridge multiplexes subscribers, so a re-init that discarded the
+    // returned unsubscribe would leave the old closure's state fold live
+    // beside the new one and double-post every update notification.
+    const sent: DesktopNotificationRequest[] = [];
+    const callbacks = new Set<(event: DesktopUpdateEvent) => void>();
+    const bridge = {
+      showNotification: (request: DesktopNotificationRequest) => {
+        sent.push(request);
+      },
+      onUpdateEvent: (cb: (event: DesktopUpdateEvent) => void) => {
+        callbacks.add(cb);
+        return () => callbacks.delete(cb);
+      },
+    } as unknown as DesktopBridge;
+    initDesktopNotifications(bridge);
+    initDesktopNotifications(bridge);
+    expect(callbacks.size).toBe(1);
+    setPlayer({ hidden: true, focused: false });
+    for (const cb of [...callbacks]) cb({ type: 'downloaded', version: '0.38.0' });
+    expect(sent).toHaveLength(1);
   });
 
   it('posts nothing for a second version that lands while the card is already ready', () => {

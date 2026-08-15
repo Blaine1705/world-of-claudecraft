@@ -73,7 +73,11 @@ export function pushDesktopGpuPref(
  * constructor and save() rewrites the whole blob, so a store built before the
  * bridge round trip would revert every write that landed during it (the
  * first-run graphics preset, the entry-crash safe-preset step-down). Building
- * it after the read shrinks that window to a single microtask.
+ * it after the read shrinks that window to a single microtask. The caller's
+ * half of the contract: once a LONG-LIVED store exists (startGame's), the
+ * factory must answer with that instance, or its next unrelated whole-blob
+ * save() reverts a reflection that resolved after it was built (main.ts
+ * settingsForShellReflection; the fast-entry boot race).
  */
 export async function syncDesktopGpuPrefSetting(
   bridge: DesktopBridge | null | undefined,

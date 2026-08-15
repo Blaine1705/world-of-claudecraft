@@ -7542,6 +7542,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'desktop.update.dismiss': '关闭',
   'desktop.update.whatsNew': '在浏览器中查看更新内容',
   'desktop.notify.updateReadyTitle': '更新 {version} 已就绪',
+  'desktop.notify.updateReadyTitleNoVersion': '更新已就绪',
   'desktop.notify.updateReadyBody': '重启 World of ClaudeCraft 以应用更新。',
   'desktop.notify.partyInviteTitle': '组队邀请',
   'desktop.notify.partyInviteBody': '{name} 邀请你加入队伍。',

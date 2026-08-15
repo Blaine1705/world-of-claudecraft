@@ -27,6 +27,7 @@ import {
   gpuNoticeBodyKey,
   gpuNoticeVerdictsEqual,
   mergeGpuNoticeVerdicts,
+  parseGpuNoticeSignature,
   resolveGpuNotice,
 } from './gpu_notice_view';
 import { t } from './i18n';
@@ -88,6 +89,11 @@ let shellVerdict: GpuNoticeVerdict = NO_VERDICT;
 // The live notice instance's re-resolve hook, or null before initGpuNotice runs.
 let applyShellVerdict: ((verdict: GpuNoticeVerdict) => void) | null = null;
 
+// The live instance's DOM teardown (root + woc:languagechange listener), or
+// null while no DOM was ever built. Called by the next initGpuNotice so a
+// re-init cannot strand a previous root and its listener.
+let disposeNotice: (() => void) | null = null;
+
 // Which components the shown notice ACCOUNTED FOR this session, latched true
 // and never cleared by a dismissal: the perf-nudge sibling suppresses its
 // redundant arms on "the boot notice already said this" (packet 0 ruling R16),
@@ -141,11 +147,14 @@ export function initGpuNotice(input: {
   desktopShell: boolean;
   desktopPlatform: DesktopPlatform;
 }): boolean {
-  // A fresh boot: drop any previous instance and per-session display latch.
-  // shellVerdict is deliberately KEPT: it carries a verdict that arrived before
-  // this init (the common order, the shell integration boots with the page),
-  // so it is cross-instance state, not instance state.
+  // A fresh boot: drop any previous instance (its hook, its DOM, and its
+  // language listener) and the per-session display latch. shellVerdict is
+  // deliberately KEPT: it carries a verdict that arrived before this init (the
+  // common order, the shell integration boots with the page), so it is
+  // cross-instance state, not instance state.
   applyShellVerdict = null;
+  disposeNotice?.();
+  disposeNotice = null;
   displayed = NO_VERDICT;
 
   const localVerdict: GpuNoticeVerdict = {
@@ -170,29 +179,45 @@ export function initGpuNotice(input: {
 
   const ensureDom = (): void => {
     if (root) return;
-    root = document.createElement('div');
-    root.id = 'gpu-notice';
-    root.setAttribute('role', 'status');
-    root.setAttribute('aria-live', 'polite');
-    root.hidden = true;
+    const created = document.createElement('div');
+    root = created;
+    created.id = 'gpu-notice';
+    created.setAttribute('role', 'status');
+    created.setAttribute('aria-live', 'polite');
+    created.hidden = true;
     message = document.createElement('span');
     message.className = 'gpu-notice-message';
     dismissButton = document.createElement('button');
     dismissButton.type = 'button';
     dismissButton.className = 'gpu-notice-dismiss';
     dismissButton.addEventListener('click', () => {
-      const signature = formatGpuNoticeSignature(state.components);
+      // MERGE the armed components into what is already stored rather than
+      // overwrite it: the stored signature can carry components from an
+      // earlier different-verdict dismissal (including the legacy '1', which
+      // parses as software), and dropping them would re-nag a verdict the
+      // player already closed. Bounded by construction: the parse admits only
+      // known components and the set dedupes.
+      const signature = formatGpuNoticeSignature([
+        ...new Set([...parseGpuNoticeSignature(dismissedSignature()), ...state.components]),
+      ]);
       state = dismissGpuNotice(state);
       memoDismissed = signature;
       writeDismissedSignature(signature);
       render();
     });
-    root.append(message, dismissButton);
-    document.body.appendChild(root);
+    created.append(message, dismissButton);
+    document.body.appendChild(created);
     // Locale flips re-render whatever is currently shown (the language selector
     // dispatches this on both the shell and the in-game options path). Bound
     // with the DOM so a session that never shows the notice adds no listener.
     document.addEventListener('woc:languagechange', render);
+    // The teardown rides with the DOM for the same reason: only an init that
+    // built the node owes one, and the NEXT init runs it so a re-init leaves
+    // exactly one root and one listener.
+    disposeNotice = () => {
+      document.removeEventListener('woc:languagechange', render);
+      created.remove();
+    };
   };
 
   const render = (): void => {

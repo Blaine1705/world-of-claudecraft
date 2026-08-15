@@ -7798,6 +7798,7 @@ export const ru_RU: EnTranslations = {
     },
     "notify": {
       "updateReadyTitle": "Обновление {version} готово",
+      "updateReadyTitleNoVersion": "Обновление готово",
       "updateReadyBody": "Перезапустите World of ClaudeCraft, чтобы применить обновление.",
       "partyInviteTitle": "Приглашение в группу",
       "partyInviteBody": "{name} приглашает вас в группу."

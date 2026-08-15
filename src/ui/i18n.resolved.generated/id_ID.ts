@@ -7798,6 +7798,7 @@ export const id_ID: EnTranslations = {
     },
     "notify": {
       "updateReadyTitle": "Update {version} is ready",
+      "updateReadyTitleNoVersion": "Update is ready",
       "updateReadyBody": "Restart World of ClaudeCraft to apply the update.",
       "partyInviteTitle": "Party invite",
       "partyInviteBody": "{name} invited you to a party."

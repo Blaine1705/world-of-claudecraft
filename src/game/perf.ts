@@ -569,8 +569,26 @@ export class PerfMonitor {
   // unaffected.
   private frameSampling = true;
 
-  setFrameSampling(on: boolean): void {
+  // Hidden-time ledger for the cumulative fps denominator: a hidden desktop
+  // span stops frames while wall seconds keep counting, so without it the
+  // session fps average is permanently diluted after a restore. Accumulated on
+  // the sampling-flag transitions main.ts drives from the presentation gate
+  // every frame; snapshot() subtracts it from the fps denominator only (wall
+  // `seconds` keeps its meaning for every other reader).
+  private hiddenAccumMs = 0;
+  private hiddenSince: number | null = null;
+
+  setFrameSampling(on: boolean, now = performance.now()): void {
+    if (on === this.frameSampling) return;
     this.frameSampling = on;
+    if (!on) {
+      this.hiddenSince = now;
+      return;
+    }
+    if (this.hiddenSince !== null) {
+      this.hiddenAccumMs += Math.max(0, now - this.hiddenSince);
+      this.hiddenSince = null;
+    }
   }
 
   finishTime(bucket: TimedBucket, start: number): void {
@@ -966,6 +984,14 @@ export class PerfMonitor {
 
   snapshot(now = performance.now()): PerfSnapshot {
     const seconds = Math.max(0.001, (now - this.startedAt) / 1000);
+    // The fps denominator discounts hidden desktop spans, including one still
+    // open at snapshot time: hidden frames are skipped, never sampled, so
+    // counting their wall time would dilute the session average forever after
+    // a restore (the hiddenPresentSkips counter is the matching numerator-side
+    // evidence in the fleet report).
+    const hiddenMs =
+      this.hiddenAccumMs + (this.hiddenSince !== null ? Math.max(0, now - this.hiddenSince) : 0);
+    const visibleSeconds = Math.max(0.001, seconds - hiddenMs / 1000);
     const mainMs = Object.fromEntries(
       (Object.keys(this.buckets) as TimedBucket[]).map((key) => [
         key,
@@ -990,7 +1016,7 @@ export class PerfMonitor {
       seconds: round(seconds),
       frames: this.frames,
       hiddenPresentSkips: this.hiddenPresentSkips,
-      fps: round(this.frames / seconds),
+      fps: round(this.frames / visibleSeconds),
       frameMs: summarizeFrames(this.frameMs.toArray()),
       windows: {
         last10s: windowSummary(10_000),
@@ -1102,6 +1128,10 @@ export class PerfMonitor {
     this.startedAt = performance.now();
     this.frames = 0;
     this.hiddenPresentSkips = 0;
+    this.hiddenAccumMs = 0;
+    // A reset mid-hidden re-opens the span from the new epoch, so the fps
+    // discount stays truthful without waiting for the next visibility flip.
+    this.hiddenSince = this.frameSampling ? null : this.startedAt;
     this.frameMs.clear();
     this.frameWindow.clear();
     this.lastCensus = null;
