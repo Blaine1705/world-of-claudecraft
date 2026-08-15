@@ -63,7 +63,10 @@ const MONOLITHS: MonolithRow[] = [
     // src/render/zone_prewarm_templates_core.ts, which paid for the encounter
     // prewarm's five call-site lines: the ratchet's rule is that a file over its
     // ceiling buys the room back by extraction, never by raising the number.
-    ceiling: 13667,
+    // Lowered again after folding the five near-identical lazy form-visual
+    // builds into buildFormVisual, which paid for the review's prewarm re-queue
+    // sites (form rigs, the base-visual replace, both held-weapon swaps).
+    ceiling: 13661,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

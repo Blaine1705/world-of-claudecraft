@@ -8,7 +8,6 @@
 // that had never compiled npc_aldric, his 70% spawn still linked ZERO programs
 // and cost 29ms, because his rig shares its programs with the player bodies
 // already on screen. Warming a model that costs nothing is work, not a fix.
-import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import type { PlayerClass } from '../sim/types';
 
 export interface InteriorEncounterPrewarmSpec {
@@ -34,9 +33,12 @@ export function encounterPrewarmDisabled(search: string): boolean {
   return value === '0' || value === 'off';
 }
 
+// vfxModels has no default on purpose: an empty catalog warms NOTHING, and a
+// module whose whole job is warming must not have "warm nothing" as its
+// fallback. The caller names the VFX table it means.
 export function vfxWeaponSkinIds(
-  skins: Record<string, { id: string; model: string }> = WEAPON_SKINS,
-  vfxModels: Record<string, unknown> = {},
+  skins: Record<string, { id: string; model: string }>,
+  vfxModels: Record<string, unknown>,
 ): string[] {
   const ids: string[] = [];
   for (const skin of Object.values(skins)) {
@@ -63,11 +65,26 @@ export function planInteriorEncounterPrewarm(
   };
 }
 
-// Keyed on the worn skin alone: the caller holds one warmed set PER VISUAL, and
-// a visual belongs to one body, so an entity id in the key would say nothing the
-// map does not already say (and forced a reverse scan to recover it).
-export function liveSoulRendPrewarmIdentity(weaponSkinId: string | null): string {
-  return weaponSkinId ?? '';
+/** What a body is HOLDING, the only part of a live look that re-keys the mark. */
+export interface LiveSoulRendLook {
+  weaponSkinId: string | null;
+  mainhandItemId: string | null;
+  offhandItemId: string | null;
+}
+
+// No entity id in the key: the caller holds one warmed set PER VISUAL, and a
+// visual belongs to one body, so an id would say nothing the map does not
+// already say (and forced a reverse scan to recover it).
+//
+// The HELD look is in the key, not just the worn skin, because the mark repaints
+// whatever the visual snapshotted as its original materials, and setWeapon and
+// setOffhand both re-run finishWeaponAttach, which re-snapshots that map with
+// the new weapon's meshes. A sheathe toggle re-clones the SAME materials, so it
+// composes the same program key and deliberately does not re-key here. A null
+// look is a body that holds nothing it can swap: a form rig.
+export function liveSoulRendPrewarmIdentity(look: LiveSoulRendLook | null): string {
+  if (!look) return '';
+  return `${look.weaponSkinId ?? ''}|${look.mainhandItemId ?? ''}|${look.offhandItemId ?? ''}`;
 }
 
 export function shouldQueueLiveSoulRendPrewarm(opts: {

@@ -13,6 +13,7 @@ import {
   encounterPrewarmDisabled,
   encounterPrewarmForInterior,
   type InteriorEncounterPrewarmSpec,
+  type LiveSoulRendLook,
   liveSoulRendPrewarmIdentity,
   planInteriorEncounterPrewarm,
   shouldQueueLiveSoulRendPrewarm,
@@ -69,36 +70,42 @@ export function startInteriorEncounterPrewarm(interior: string, host: object): v
     // unhandledrejection, which is the client's fatal overlay.
     void runInteriorEncounterPrewarm(spec, typed).catch(() => {});
   }
-  for (const view of typed.views.values()) {
-    if (view.visual) queueLiveSoulRendPrewarm(host, view.visual, view.weaponSkinId, interior);
+  for (const [id, view] of typed.views) {
+    if (!view.visual) continue;
+    queueLiveSoulRendPrewarm(
+      host,
+      view.visual,
+      view,
+      typed.sim.entities.get(id)?.kind ?? '',
+      interior,
+    );
   }
 }
 
+/** `look` is null for a rig that holds nothing it can swap (a druid or warlock
+ *  FORM body), which is also why a form visual could never be found by an
+ *  entity lookup: it is not any view's `visual`. The caller passes the kind for
+ *  the same reason, and because both call sites already hold the answer. */
 export function queueLiveSoulRendPrewarm(
   host: object,
   visual: CharacterVisual,
-  weaponSkinId: string | null,
+  look: LiveSoulRendLook | null,
+  kind: string,
   interior?: string | null,
 ): void {
   const typed = host as InteriorEncounterPrewarmHost;
   const interiorId = interior ?? activeInteriorByHost.get(host) ?? null;
   if (!interiorId) return;
   const spec = encounterPrewarmForInterior(interiorId);
-  // Refuse on the interior BEFORE touching the views map: every createView and
-  // every weapon-skin application in ANY interior reaches this, and only one
-  // interior has a spec at all.
+  // Refuse on the interior FIRST: every createView, every form build and every
+  // held-look change in ANY interior reaches this, and only one interior has a
+  // spec at all.
   if (!spec) return;
-  const identity = liveSoulRendPrewarmIdentity(weaponSkinId);
+  const identity = liveSoulRendPrewarmIdentity(look);
   let warmed = liveWarmedByVisual.get(visual);
   if (!warmed) {
     warmed = new Set();
     liveWarmedByVisual.set(visual, warmed);
-  }
-  let kind = '';
-  for (const [id, view] of typed.views) {
-    if (view.visual !== visual) continue;
-    kind = typed.sim.entities.get(id)?.kind ?? '';
-    break;
   }
   if (
     !shouldQueueLiveSoulRendPrewarm({

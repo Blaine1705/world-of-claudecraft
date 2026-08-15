@@ -4,6 +4,7 @@ import {
   encounterPrewarmDisabled,
   encounterPrewarmForInterior,
   INTERIOR_ENCOUNTER_PREWARM,
+  type LiveSoulRendLook,
   liveSoulRendPrewarmIdentity,
   planInteriorEncounterPrewarm,
   shouldQueueLiveSoulRendPrewarm,
@@ -81,6 +82,15 @@ describe('interior encounter prewarm spec', () => {
     const live = vfxWeaponSkinIds(WEAPON_SKINS, WEAPON_VFX);
     expect(live.length).toBeGreaterThan(10);
     expect(live).toContain('ice_fang_sword');
+    // Neither catalog may default: in a module whose whole job is warming, a
+    // defaulted argument that resolves to an empty map warms NOTHING, silently.
+    const source = readSource('../src/render/interior_encounter_prewarm.ts');
+    const signature = source.slice(
+      source.indexOf('export function vfxWeaponSkinIds('),
+      source.indexOf('): string[] {'),
+    );
+    expect(signature).toContain('vfxModels: Record<string, unknown>');
+    expect(signature).not.toContain('=');
   });
 
   it('plans only what each Soul Rend flag asks for', () => {
@@ -177,13 +187,37 @@ describe('live Soul Rend player-visual prewarm', () => {
     });
   }
 
-  it('keys a look by the worn weapon skin, the only thing that varies per body', () => {
+  it('keys a look by everything the body HOLDS, since each re-snapshots the rig', () => {
     // The caller holds one warmed set PER VISUAL, so the body's own identity is
     // already the map key; carrying it here forced a reverse scan of the views.
+    // What varies per body is the held look: setWeapon AND setOffhand both re-run
+    // finishWeaponAttach, which re-snapshots the original materials the mark
+    // repaints. A form rig (null) holds nothing it can swap.
+    const held = (over: Partial<LiveSoulRendLook>): LiveSoulRendLook => ({
+      weaponSkinId: null,
+      mainhandItemId: null,
+      offhandItemId: null,
+      ...over,
+    });
     expect(liveSoulRendPrewarmIdentity(null)).toBe('');
-    expect(liveSoulRendPrewarmIdentity('ice_fang_sword')).toBe('ice_fang_sword');
-    expect(liveSoulRendPrewarmIdentity('ice_fang_sword')).not.toBe(
-      liveSoulRendPrewarmIdentity('skyrender_axe'),
+    expect(liveSoulRendPrewarmIdentity(held({}))).toBe('||');
+    // One dimension at a time: a key that only reads the skin passes the first
+    // of these three and fails the other two.
+    for (const over of [
+      { weaponSkinId: 'ice_fang_sword' },
+      { mainhandItemId: 'ashbringer' },
+      { offhandItemId: 'oak_shield' },
+    ]) {
+      expect(liveSoulRendPrewarmIdentity(held(over))).not.toBe(
+        liveSoulRendPrewarmIdentity(held({})),
+      );
+    }
+    expect(liveSoulRendPrewarmIdentity(held({ weaponSkinId: 'ice_fang_sword' }))).not.toBe(
+      liveSoulRendPrewarmIdentity(held({ weaponSkinId: 'skyrender_axe' })),
+    );
+    // A sheathe toggle changes nothing it holds, so it must not re-key.
+    expect(liveSoulRendPrewarmIdentity(held({ mainhandItemId: 'ashbringer' }))).toBe(
+      liveSoulRendPrewarmIdentity(held({ mainhandItemId: 'ashbringer' })),
     );
   });
 
@@ -254,9 +288,11 @@ describe('live Soul Rend player-visual prewarm', () => {
 
     const start = pass.indexOf('export function startInteriorEncounterPrewarm');
     const startBody = pass.slice(start, queueStart);
-    expect(startBody).toContain(
-      'queueLiveSoulRendPrewarm(host, view.visual, view.weaponSkinId, interior)',
-    );
+    // The kind comes from the view's OWN entity, by id: the reverse scan that
+    // used to recover it could only ever find a body some view owns, which is
+    // exactly what a form rig is not.
+    expect(startBody).toContain("typed.sim.entities.get(id)?.kind ?? ''");
+    expect(queueBody).not.toContain('view.visual !== visual');
 
     const visualSrc = readFileSync(
       new URL('../src/render/characters/visual.ts', import.meta.url),
@@ -280,7 +316,9 @@ describe('live Soul Rend player-visual prewarm', () => {
     const createEnd = renderer.indexOf('\n  // Shared core for every compile gate', createStart);
     const create = renderer.slice(createStart, createEnd);
     const setAt = create.indexOf('this.views.set(e.id, {');
-    const kickAt = create.indexOf('encounterPrewarm.queueLiveSoulRendPrewarm(this, visual, null)');
+    const kickAt = create.indexOf(
+      'encounterPrewarm.queueLiveSoulRendPrewarm(this, visual, view, e.kind)',
+    );
     expect(setAt).toBeGreaterThan(-1);
     expect(kickAt).toBeGreaterThan(setAt);
     const applyStart = renderer.indexOf('private applyWeaponSkin(');
@@ -288,10 +326,62 @@ describe('live Soul Rend player-visual prewarm', () => {
     const apply = renderer.slice(applyStart, applyEnd);
     const skinAt = apply.indexOf('v.visual.setWeaponSkin(skinId)');
     const skinKick = apply.indexOf(
-      'encounterPrewarm.queueLiveSoulRendPrewarm(this, v.visual, skinId)',
+      'encounterPrewarm.queueLiveSoulRendPrewarm(this, v.visual, v, kind)',
     );
     expect(skinAt).toBeGreaterThan(-1);
     expect(skinKick).toBeGreaterThan(skinAt);
+  });
+
+  it('warms every OTHER path that mints or re-snapshots a live rig', () => {
+    const renderer = readSource('../src/render/renderer.ts');
+
+    // A form rig (sheep/bear/cat/travel/metamorph) is what a shapeshifted body
+    // takes the mark on, and three keys the program on mesh shape and skinning,
+    // so it cannot inherit the base rig's warmed variant. Its look is null: a
+    // form holds nothing it can swap.
+    const formStart = renderer.indexOf('  private buildFormVisual(');
+    const formEnd = renderer.indexOf('\n  private ', formStart + 10);
+    expect(formStart).toBeGreaterThan(-1);
+    const form = renderer.slice(formStart, formEnd);
+    // Positive control: a renamed method would leave an empty slice that
+    // satisfies the assertions below without reading a thing.
+    expect(form).toContain('this.createCharacterVisualWithRetry(e, formKey, formKey)');
+    expect(form).toContain('encounterPrewarm.queueLiveSoulRendPrewarm(this, built, null, e.kind)');
+    // Every lazy form goes through it, so none can be forgotten one at a time.
+    for (const call of [
+      "this.buildFormVisual(e, v, 'form_sheep', 'sheepVisual', true)",
+      "this.buildFormVisual(e, v, 'form_bear', 'bearVisual', true)",
+      "this.buildFormVisual(e, v, 'form_cat', 'catVisual', true)",
+      "this.buildFormVisual(e, v, 'form_travel', 'travelVisual', true)",
+      "this.buildFormVisual(e, v, 'form_metamorph', 'metamorphVisual', false)",
+    ]) {
+      expect(renderer).toContain(call);
+    }
+
+    // A race/mech swap replaces v.visual outright: the replacement is cold.
+    const baseStart = renderer.indexOf('  private updateBaseVisual(');
+    const baseEnd = renderer.indexOf('\n  // Weapon-skin cosmetics waiting', baseStart);
+    const base = renderer.slice(baseStart, baseEnd);
+    expect(base).toContain('v.visual = next');
+    const nextAt = base.indexOf('v.visual = next');
+    const baseKick = base.indexOf(
+      'encounterPrewarm.queueLiveSoulRendPrewarm(this, next, v, e.kind)',
+    );
+    expect(baseKick).toBeGreaterThan(nextAt);
+
+    // setWeapon/setOffhand both re-snapshot the originals with the new weapon's
+    // meshes, and applyWeaponSkin is the only re-queue that used to exist.
+    for (const setter of ['v.visual.setWeapon(e.mainhandItemId)', 'v.visual.setOffhand(']) {
+      const at = renderer.indexOf(setter);
+      expect(at).toBeGreaterThan(-1);
+      const kick = renderer.indexOf(
+        'encounterPrewarm.queueLiveSoulRendPrewarm(this, v.visual, v, e.kind)',
+        at,
+      );
+      expect(kick).toBeGreaterThan(at);
+      // ...inside the same diff block, not somewhere far below it.
+      expect(kick - at).toBeLessThan(400);
+    }
   });
 });
 

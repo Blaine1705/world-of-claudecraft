@@ -5,6 +5,7 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { LiveSoulRendLook } from '../src/render/interior_encounter_prewarm';
 import {
   queueLiveSoulRendPrewarm,
   setEncounterPrewarmInterior,
@@ -33,6 +34,13 @@ function fakeVisual(name: string, slots = 2, timeline: string[] = []) {
   };
 }
 
+const look = (over: Partial<LiveSoulRendLook> = {}): LiveSoulRendLook => ({
+  weaponSkinId: null,
+  mainhandItemId: null,
+  offhandItemId: null,
+  ...over,
+});
+
 function fakeHost(
   views: Array<{ id: number; kind: string; visual: unknown }> = [],
   timeline: string[] = [],
@@ -40,7 +48,7 @@ function fakeHost(
   const compiled: string[] = [];
   const host = {
     shutdownStarted: false,
-    views: new Map(views.map((v) => [v.id, { visual: v.visual, weaponSkinId: null }])),
+    views: new Map(views.map((v) => [v.id, { visual: v.visual, ...look() }])),
     sim: {
       entities: { get: (id: number) => views.find((v) => v.id === id) },
       player: { pos: { x: 103_300, y: 4, z: -1246 } },
@@ -149,7 +157,7 @@ describe('interior encounter prewarm pass (driven)', () => {
     await drain();
     // Queued with no interior argument: it can only have found one because the
     // attach recorded it.
-    queueLiveSoulRendPrewarm(host, player as never, 'ice_fang_sword');
+    queueLiveSoulRendPrewarm(host, player as never, look({ weaponSkinId: 'ice_fang' }), 'player');
     await drain();
     expect(player.calls.prewarmSoulRendSlots).toBeGreaterThan(0);
   });
@@ -159,7 +167,7 @@ describe('interior encounter prewarm pass (driven)', () => {
     const host = fakeHost([{ id: 1, kind: 'player', visual: player }]);
     setEncounterPrewarmInterior(host, 'nythraxis');
     setEncounterPrewarmInterior(host, null);
-    queueLiveSoulRendPrewarm(host, player as never, null);
+    queueLiveSoulRendPrewarm(host, player as never, look(), 'player');
     await drain();
     expect(player.calls.prewarmSoulRendSlots).toBe(0);
   });
@@ -196,25 +204,91 @@ describe('interior encounter prewarm pass (driven)', () => {
     ]);
     setEncounterPrewarmInterior(host, 'nythraxis');
 
-    queueLiveSoulRendPrewarm(host, player as never, null);
-    queueLiveSoulRendPrewarm(host, player as never, null);
-    queueLiveSoulRendPrewarm(host, mob as never, null);
+    queueLiveSoulRendPrewarm(host, player as never, look(), 'player');
+    queueLiveSoulRendPrewarm(host, player as never, look(), 'player');
+    queueLiveSoulRendPrewarm(host, mob as never, look(), 'mob');
     await drain();
 
     expect(player.calls.prewarmSoulRendSlots).toBe(1);
     expect(mob.calls.prewarmSoulRendSlots).toBe(0);
 
     // A new worn skin is a new look, so it warms again.
-    queueLiveSoulRendPrewarm(host, player as never, 'ice_fang_sword');
+    queueLiveSoulRendPrewarm(host, player as never, look({ weaponSkinId: 'ice_fang' }), 'player');
     await drain();
     expect(player.calls.prewarmSoulRendSlots).toBe(2);
+  });
+
+  it('warms the bodies already in the room at attach, each on its own kind', async () => {
+    const player = fakeVisual('player');
+    const mob = fakeVisual('mob');
+    const host = fakeHost([
+      { id: 1, kind: 'player', visual: player },
+      { id: 2, kind: 'mob', visual: mob },
+    ]);
+    startInteriorEncounterPrewarm('nythraxis', host);
+    await drain();
+    expect(player.calls.prewarmSoulRendSlots).toBe(1);
+    expect(mob.calls.prewarmSoulRendSlots).toBe(0);
+  });
+
+  it('warms a form rig no view owns, on the kind its caller passes', async () => {
+    // A shapeshifted body takes the mark on its FORM visual (sheep, bear, cat,
+    // travel, metamorph), and a form rig is never any view's `visual`: recovering
+    // the kind by scanning the views map found nothing and left every one of
+    // them cold, which is the whole failure this prewarm exists to remove.
+    const base = fakeVisual('base');
+    const form = fakeVisual('form');
+    const host = fakeHost([{ id: 1, kind: 'player', visual: base }]);
+    setEncounterPrewarmInterior(host, 'nythraxis');
+
+    queueLiveSoulRendPrewarm(host, form as never, null, 'player');
+    await drain();
+    expect(form.calls.prewarmSoulRendSlots).toBe(1);
+
+    // A null look never re-keys: a form rig holds nothing it can swap.
+    queueLiveSoulRendPrewarm(host, form as never, null, 'player');
+    await drain();
+    expect(form.calls.prewarmSoulRendSlots).toBe(1);
+  });
+
+  it('re-warms a body whose held look changed, and only then', async () => {
+    const player = fakeVisual('player');
+    const host = fakeHost([{ id: 1, kind: 'player', visual: player }]);
+    setEncounterPrewarmInterior(host, 'nythraxis');
+    const held = look({ mainhandItemId: 'rusty_sword' });
+
+    queueLiveSoulRendPrewarm(host, player as never, held, 'player');
+    await drain();
+    expect(player.calls.prewarmSoulRendSlots).toBe(1);
+
+    // The same held look re-queued: a sheathe toggle re-clones the SAME
+    // materials, so it composes the same program key and warms nothing new.
+    queueLiveSoulRendPrewarm(host, player as never, held, 'player');
+    await drain();
+    expect(player.calls.prewarmSoulRendSlots).toBe(1);
+
+    // setWeapon re-snapshots the originals with the new weapon's meshes...
+    queueLiveSoulRendPrewarm(
+      host,
+      player as never,
+      look({ mainhandItemId: 'ashbringer' }),
+      'player',
+    );
+    await drain();
+    expect(player.calls.prewarmSoulRendSlots).toBe(2);
+
+    // ...and so does setOffhand, down the same finishWeaponAttach tail.
+    const bothHands = look({ mainhandItemId: 'ashbringer', offhandItemId: 'oak_shield' });
+    queueLiveSoulRendPrewarm(host, player as never, bothHands, 'player');
+    await drain();
+    expect(player.calls.prewarmSoulRendSlots).toBe(3);
   });
 
   it('refuses to queue outside an interior and while the kill switch is set', async () => {
     const player = fakeVisual('player');
     const host = fakeHost([{ id: 1, kind: 'player', visual: player }]);
     // No interior attached and none passed: nothing to warm for.
-    queueLiveSoulRendPrewarm(host, player as never, null);
+    queueLiveSoulRendPrewarm(host, player as never, look(), 'player');
     await drain();
     expect(player.calls.prewarmSoulRendSlots).toBe(0);
 
@@ -224,7 +298,7 @@ describe('interior encounter prewarm pass (driven)', () => {
     const win = globalThis as unknown as { location?: { search: string } };
     win.location = { search: '?encounterPrewarm=0' };
     try {
-      queueLiveSoulRendPrewarm(host, player as never, null);
+      queueLiveSoulRendPrewarm(host, player as never, look(), 'player');
       await drain();
       expect(player.calls.prewarmSoulRendSlots).toBe(0);
     } finally {
@@ -243,7 +317,7 @@ describe('interior encounter prewarm pass (driven)', () => {
       timeline,
     );
     setEncounterPrewarmInterior(host, 'nythraxis');
-    for (const visual of bodies) queueLiveSoulRendPrewarm(host, visual as never, null);
+    for (const visual of bodies) queueLiveSoulRendPrewarm(host, visual as never, look(), 'player');
     await drain();
 
     // A body's compile lands before the next body's clone pass even starts.
@@ -268,7 +342,7 @@ describe('interior encounter prewarm pass (driven)', () => {
       return host.scene;
     }) as typeof host.scene.add;
 
-    queueLiveSoulRendPrewarm(host, player as never, null);
+    queueLiveSoulRendPrewarm(host, player as never, look(), 'player');
     await drain();
 
     expect(added.length).toBeGreaterThan(0);
