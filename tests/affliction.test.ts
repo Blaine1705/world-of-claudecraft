@@ -741,13 +741,21 @@ describe('Affliction Warlock', () => {
     ).toBe(false);
   });
 
-  it('lets Needle auto-mark only when no eye exists and awards 7 Condemnation', () => {
+  it('lets Needle auto-mark only when no eye exists and awards 7 Condemnation on impact', () => {
     const sim = makeAffliction();
     const first = addTarget(sim, 8);
     const second = addTarget(sim, 12);
 
-    const events = finishCast(sim, 'needle_of_fate', first);
+    sim.targetEntity(first.id);
+    sim.player.resource = sim.player.maxResource;
+    sim.castAbility('needle_of_fate');
+    const events: SimEvent[] = [];
+    while (sim.player.castingAbility) events.push(...sim.tick());
+    expect(ctx(sim).pendingProjectiles.length).toBeGreaterThan(0);
     expect(eye(first, sim.playerId)).toBe(true);
+    expect(ownedFateThreads(sim.player)).toBe(1);
+    expect(doomValue(sim.player)).toBe(0);
+    while (ctx(sim).pendingProjectiles.length > 0) events.push(...sim.tick());
     expect(doomValue(sim.player)).toBe(7);
     expect(events).toContainEqual(
       expect.objectContaining({
@@ -758,11 +766,31 @@ describe('Affliction Warlock', () => {
         ability: 'needle_of_fate',
       }),
     );
+    while (sim.player.gcdRemaining > 0) sim.tick();
 
     finishCast(sim, 'needle_of_fate', second);
     expect(eye(first, sim.playerId)).toBe(true);
     expect(eye(second, sim.playerId)).toBe(false);
     expect(doomValue(sim.player)).toBe(7);
+  });
+
+  it('keeps cast-completion Threads but grants no Condemnation when Needle is resisted', () => {
+    const sim = makeAffliction();
+    const target = addTarget(sim, 8);
+    vi.spyOn(ctx(sim).rng, 'chance').mockReturnValue(false);
+    sim.targetEntity(target.id);
+    sim.player.resource = sim.player.maxResource;
+
+    sim.castAbility('needle_of_fate');
+    while (sim.player.castingAbility) sim.tick();
+    expect(ctx(sim).pendingProjectiles.length).toBeGreaterThan(0);
+    expect(ownedFateThreads(sim.player)).toBe(1);
+    expect(doomValue(sim.player)).toBe(0);
+
+    const events: SimEvent[] = [];
+    while (ctx(sim).pendingProjectiles.length > 0) events.push(...sim.tick());
+    expect(doomValue(sim.player)).toBe(0);
+    expect(events).toContainEqual(expect.objectContaining({ type: 'damage', kind: 'resist' }));
   });
 
   it('stacks and refreshes up to three owned Fate Threads from the primary Evil Eye', () => {

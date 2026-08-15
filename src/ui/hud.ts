@@ -9767,14 +9767,9 @@ export class Hud {
   }
 
   private updateWarlockDoomMeter(p: Entity): number {
-    // Only Affliction needs to inspect its player-owned resource aura each frame.
     const affliction = this.sim.talentSpec === 'affliction';
     const fateThreads = affliction ? afflictionFateThreadCount(p.auras, p.id) : 0;
-    this.doomMeter.paint({
-      affliction,
-      auras: p.auras,
-      fateThreads,
-    });
+    this.doomMeter.paint({ affliction, auras: p.auras, fateThreads });
     return fateThreads;
   }
 
