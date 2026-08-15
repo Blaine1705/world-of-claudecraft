@@ -641,6 +641,11 @@ export const hudChromeStrings = {
     applying: 'Update downloaded. Restarting the game to apply it.',
     incompatible:
       'An update is required to play. It will be applied as soon as it finishes downloading.',
+    // RETIRED from the overlay (the OTA dialog is deliberately
+    // non-dismissable) but kept on purpose: deleting an English leaf whose
+    // translations are already filled would force edits across every
+    // i18n.locales overlay, which contributors must never touch. Do not
+    // "clean this up"; the maintainer prunes retired keys at release.
     continueAnyway: 'Continue without updating',
     progressLabel: 'Update download progress',
   },
@@ -1333,6 +1338,20 @@ export const hudChromeStrings = {
     // Interface panel twin of the character sheet's privacy eye: the same
     // per-device settings.showPlaytime preference, discoverable from Options.
     showPlaytime: 'Show Time Played on Character Screen',
+    // Desktop-app only Interface row (the row renders only when the installed
+    // shell exposes the GPU preference over the bridge). The stored shell field
+    // is the inverse opt-out; the note carries the next-launch caveat, because
+    // the shell picks its adapter at startup and cannot switch a live session
+    // (both values are wordy, M16: the five non-Latin fills land in this same
+    // change).
+    forceHighPerfGpu: 'Use the Dedicated Gaming GPU',
+    forceHighPerfGpuNote:
+      'On by default: the desktop app asks this computer for its dedicated gaming GPU. Turn this off if the game will not start, opens to a black screen, or the laptop display goes blank. Takes effect the next time the game starts.',
+    // Interface panel toggle: publish the current zone to Discord as an
+    // activity (desktop app only, on by default).
+    discordPresence: 'Discord Rich Presence',
+    discordPresenceNote:
+      'Shows the zone you are in and how long you have been playing this session as your Discord activity, and anyone who can see your Discord profile can see both. Only the zone name, your session time, and the game are shared, never your character, your account, or who you are playing with. Needs the Discord app running on this computer.',
     // Interface panel toggle: nameplate glyph/outline, inspect block, player
     // card, and the Developers leaderboard tab (on by default).
     showDevBadges: 'Show Developer Badges',
@@ -1817,6 +1836,9 @@ export const hudChromeStrings = {
     notEnoughHonor: 'Not enough Honor.',
     reasons: {
       arenaWin: 'Arena victory',
+      // Paid for a ranked loss and for a draw alike, so the line names the bout
+      // rather than the result (the same reading as battlegroundComplete below).
+      arenaComplete: 'Arena bout fought',
       fiestaKill: 'Fiesta takedown',
       fiestaComplete: 'Fiesta completed',
       fiestaWin: 'Fiesta victory',
@@ -1987,6 +2009,11 @@ export const hudChromeStrings = {
   // (content/heroic_variants.ts), e.g. "Epic Armor [HEROIC]". The variant shares the
   // base item's name; this tag is the only heroic marker, shown in gold.
   itemHeroicTag: '[HEROIC]',
+  // The bare "Heroic" word as a STANDALONE accessible name (no brackets): the
+  // market Browse row's heroic star uses it for its aria-label, where the
+  // bracketed tag above is tooltip-line chrome, not a label a screen reader
+  // should read as "left-bracket HEROIC right-bracket".
+  itemHeroicLabel: 'Heroic',
   // Tooltip marker for a soulbound item (bound to its owner: cannot be traded, mailed,
   // listed, sold, or destroyed). Currency-like reward tokens (Heroic Marks) carry this.
   itemSoulbound: 'Soulbound',
@@ -2874,6 +2901,12 @@ export const hudChromeStrings = {
     // /afk tag prefixed to a player's overhead name (nameplate_painter.ts wraps
     // it in angle brackets: "<AFK> Name"). Short label, not a sentence.
     afkTag: 'AFK',
+    // The operator-applied Cheater sanction (src/sim/moderation/), resolved for
+    // the nameplate and the target frame through src/ui/cheater_tag.ts. Unlike
+    // afkTag the brackets are part of the VALUE, so a locale that punctuates a
+    // tag differently owns its own wrapper instead of inheriting an English one.
+    // Wordy (M16), so the five non-Latin fills ship in this same change.
+    cheaterTag: '< Cheater >',
   },
   // World mouseover tooltip shown when hovering a mob (mob_tooltip_view.ts):
   // name (colored by the nameplate con-color), then "Level N <type>" ({family}

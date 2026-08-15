@@ -1367,6 +1367,10 @@ export const id_ID: EnTranslations = {
       "showWalletOnCharacterScreen": "Tampilkan Dompet di Layar Karakter",
       "showWalletOnPlayerCard": "Tampilkan Dompet di Kartu Pemain",
       "showPlaytime": "Tampilkan Waktu Bermain di Lembar Karakter",
+      "forceHighPerfGpu": "Gunakan GPU Gaming Diskret",
+      "forceHighPerfGpuNote": "Aktif secara bawaan: aplikasi desktop meminta GPU gaming diskret dari komputer ini. Nonaktifkan ini jika permainan tidak mau dimulai, terbuka dengan layar hitam, atau layar laptop menjadi kosong. Berlaku mulai lain kali kamu membuka permainan.",
+      "discordPresence": "Status Aktivitas Discord",
+      "discordPresenceNote": "Menampilkan zona tempatmu berada dan sudah berapa lama kamu bermain dalam sesi ini sebagai aktivitas Discord-mu, dan siapa pun yang bisa melihat profil Discord-mu bisa melihat keduanya. Hanya nama zona, waktu sesimu, dan permainan yang dibagikan, tidak pernah karaktermu, akunmu, atau dengan siapa kamu bermain. Membutuhkan aplikasi Discord yang berjalan di komputer ini.",
       "showDevBadges": "Tampilkan Lencana Pengembang",
       "showOwnNameplate": "Tampilkan Papan Namaku",
       "showPlayerNameplates": "Tampilkan Papan Nama Pemain",
@@ -1739,6 +1743,7 @@ export const id_ID: EnTranslations = {
       "notEnoughHonor": "Tidak cukup Kehormatan.",
       "reasons": {
         "arenaWin": "Kemenangan arena",
+        "arenaComplete": "Pertarungan arena dijalani",
         "fiestaKill": "Eliminasi Fiesta",
         "fiestaComplete": "Fiesta selesai",
         "fiestaWin": "Kemenangan Fiesta",
@@ -1845,6 +1850,7 @@ export const id_ID: EnTranslations = {
       "joinChannels": "Tips: ketik /join world atau /join lfg untuk mengobrol dengan pemain di seluruh dunia."
     },
     "itemHeroicTag": "[HEROIK]",
+    "itemHeroicLabel": "Heroik",
     "itemSoulbound": "Terikat Jiwa",
     "itemUniqueEquipped": "Unik-Dipakai",
     "itemSet": {
@@ -2462,7 +2468,8 @@ export const id_ID: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Pemain Curang >"
     },
     "mobTooltip": {
       "levelFamily": "{family} Level {level}",
@@ -3934,6 +3941,12 @@ export const id_ID: EnTranslations = {
       "genesis_token_claimed": "Seeker Genesis Token itu sudah diklaim.",
       "entitlement_required": "Diperlukan hak akses Seeker yang terverifikasi.",
       "current_ownership_required": "Diperlukan kepemilikan Seeker Genesis Token saat ini."
+    },
+    "cheater_mark": {
+      "admin_target": "Akun operator tidak dapat diberi tanda.",
+      "reason_required": "Alasan wajib diisi.",
+      "invalid_duration": "Masukkan durasi tanda setidaknya satu detik.",
+      "not_marked": "Akun tersebut tidak diberi tanda."
     }
   },
   "guide": {
@@ -6550,6 +6563,7 @@ export const id_ID: EnTranslations = {
     "email": "Email",
     "emailPlaceholder": "kamu@contoh.com",
     "emailError": "Silakan masukkan alamat email yang valid.",
+    "marketingOptIn": "Kirimkan berita dan pembaruan game ke email saya (opsional)",
     "showPassword": "Tampilkan kata sandi",
     "hidePassword": "Sembunyikan kata sandi",
     "logIn": "Masuk",
@@ -6650,6 +6664,19 @@ export const id_ID: EnTranslations = {
     "style": "Gaya",
     "resetLook": "Atur Ulang Tampilan",
     "resetShort": "Atur Ulang",
+    "shareTab": "Bagikan",
+    "designCode": "Kode tampilan",
+    "designCodeHint": "Salin kode ini untuk menyimpan atau membagikan tampilan ini. Tempel kode di sini lalu impor untuk memuatnya.",
+    "copyCode": "Salin kode",
+    "importCode": "Impor",
+    "designCodeCopied": "Kode tampilan disalin.",
+    "designCodeCopyManual": "Penyalinan otomatis diblokir di sini. Kode sudah dipilih; salin dengan papan ketik.",
+    "designCodeImported": "Tampilan diimpor.",
+    "designCodeImportedPartial": "Tampilan diimpor. Nilai yang tidak dikenali versi ini dilewati.",
+    "designCodeErrEmpty": "Tempel kode tampilan terlebih dahulu.",
+    "designCodeErrHeader": "Itu tampaknya bukan kode tampilan.",
+    "designCodeErrVersion": "Kode tampilan itu berasal dari versi gim yang lebih baru.",
+    "designCodeErrMalformed": "Kode tampilan itu rusak. Salin seluruh kode lalu coba lagi.",
     "browFlat": "Datar",
     "browArched": "Melengkung",
     "browThin": "Tipis",
@@ -7766,7 +7793,15 @@ export const id_ID: EnTranslations = {
       "readyBody": "Akan terpasang saat kamu keluar, atau mulai ulang sekarang.",
       "restart": "Mulai Ulang Sekarang",
       "later": "Nanti",
-      "dismiss": "Tutup"
+      "dismiss": "Tutup",
+      "whatsNew": "Lihat apa yang berubah di browsermu"
+    },
+    "notify": {
+      "updateReadyTitle": "Pembaruan {version} siap",
+      "updateReadyTitleNoVersion": "Pembaruan siap",
+      "updateReadyBody": "Mulai ulang World of ClaudeCraft untuk menerapkan pembaruan.",
+      "partyInviteTitle": "Undangan Kelompok",
+      "partyInviteBody": "{name} telah mengundangmu ke kelompoknya."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7778,6 +7813,7 @@ export const id_ID: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "Permainan berjalan tanpa akselerasi GPU dan akan lambat. Perbarui driver grafismu, lalu nyalakan ulang permainan. Di Windows, juga atur permainan ke Performa tinggi di Pengaturan > Sistem > Tampilan > Grafis.",
+    "bodyDiscreteInactive": "Permainan tidak menggunakan GPU gaming diskret dan sebagai gantinya berjalan pada GPU terintegrasi (hemat daya), sehingga performa akan menurun. Perbarui driver grafismu, lalu nyalakan ulang permainan. Di Windows, juga atur permainan ke Performa tinggi di Pengaturan > Sistem > Tampilan > Grafis.",
     "bodyWeb": "Permainan berjalan tanpa akselerasi GPU dan akan lambat. Aktifkan akselerasi perangkat keras di pengaturan browsermu, perbarui driver grafismu, lalu nyalakan ulang browsermu.",
     "hybridBodyWindows": "Sesi ini dirender menggunakan GPU terintegrasi (hemat daya). Jika komputer ini juga memiliki GPU gaming diskret, atur browsermu ke Performa tinggi di Pengaturan > Sistem > Tampilan > Grafis, lalu mulai ulang browsernya. Aplikasi desktop memilih GPU diskret secara otomatis.",
     "hybridBodyLinux": "Sesi ini dirender menggunakan GPU terintegrasi (hemat daya). Jika komputer ini juga memiliki GPU gaming diskret, browser atau driver grafismu mungkin punya pengaturan pemilihan GPU sendiri, atau distromu mungkin menyediakan alat pengalihan GPU (seperti PRIME atau optimus-manager). Aplikasi desktop memilih GPU diskret secara otomatis.",
@@ -8001,7 +8037,111 @@ export const id_ID: EnTranslations = {
       "zoomIn": "Perbesar",
       "zoomOut": "Perkecil",
       "mapCanvasLabel": "Peta",
-      "mapSummary": "Peta {zone}."
+      "mapSummary": "Peta {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Tidak ada penanda penting yang terlihat.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "{count} penanda lainnya.",
+      "mapMarkerDirections": {
+        "center": "di tengah",
+        "north": "di utara",
+        "northeast": "di timur laut",
+        "east": "di timur",
+        "southeast": "di tenggara",
+        "south": "di selatan",
+        "southwest": "di barat daya",
+        "west": "di barat",
+        "northwest": "di barat laut"
+      },
+      "mapMarkerDistances": {
+        "near": "dekat",
+        "medium": "jarak sedang",
+        "far": "jauh"
+      },
+      "mapMarkerLabels": {
+        "you": "Kamu",
+        "availableQuest": "Misi tersedia",
+        "readyQuest": "Misi siap diserahkan",
+        "repeatQuest": "Misi berulang",
+        "cooldownQuest": "Misi dalam masa tunggu",
+        "questObjective": "Area tujuan misi",
+        "readyOre": "Urat bijih siap ditambang",
+        "readyWood": "Tegakan pohon siap ditebang",
+        "readyHerb": "Petak herba siap dipanen",
+        "readyLockedOre": "Urat bijih siap ditambang, alat belum dapat digunakan",
+        "readyLockedWood": "Tegakan pohon siap ditebang, alat belum dapat digunakan",
+        "readyLockedHerb": "Petak herba siap dipanen, alat belum dapat digunakan",
+        "cooldownOre": "Urat bijih habis",
+        "cooldownWood": "Tegakan pohon telah ditebang",
+        "cooldownHerb": "Petak herba telah dipanen",
+        "cooldownLockedOre": "Urat bijih habis, alat belum dapat digunakan",
+        "cooldownLockedWood": "Tegakan pohon telah ditebang, alat belum dapat digunakan",
+        "cooldownLockedHerb": "Petak herba telah dipanen, alat belum dapat digunakan",
+        "station": "Stasiun kerajinan: {name}",
+        "service": "Layanan: {name}",
+        "partyMember": "Anggota party: {name}",
+        "deadPartyMember": "Anggota party yang tewas: {name}",
+        "partyMemberGeneric": "Anggota party",
+        "deadPartyMemberGeneric": "Anggota party yang tewas",
+        "friend": "Teman: {name}",
+        "guildMember": "Anggota guild: {name}",
+        "pointOfInterest": "Titik menarik: {name}",
+        "dungeonEntrance": "Pintu masuk dungeon: {name}",
+        "dungeonExit": "Pintu keluar dungeon",
+        "delveEntrance": "Pintu masuk delve: {name}",
+        "worldPassage": "Jalur menuju {zone}",
+        "riftEntrance": "Pintu masuk Rift: {name}",
+        "hostileEnemy": "Musuh yang siap menyerang",
+        "aggressiveEnemy": "Musuh yang menyerangmu",
+        "lootableEnemy": "Musuh yang dapat dijarah",
+        "corpse": "Mayatmu",
+        "deathZone": "Zona bahaya",
+        "teammate": "Rekan satu tim",
+        "deadTeammate": "Rekan satu tim yang tewas",
+        "flagCarrier": "Rekan satu tim yang membawa bendera",
+        "ownFlagStand": "Markas benderamu",
+        "enemyFlagStand": "Markas bendera musuh",
+        "riftDescent": "Jalur turun Rift",
+        "riftReturnBeacon": "Suar kembali",
+        "riftReturnExit": "Jalur keluar untuk kembali",
+        "ranked": "{marker}, peringkat {rank}",
+        "riftTreasureAvailable": "Harta tersedia",
+        "riftTreasureLocked": "Harta terkunci",
+        "riftTreasureOpened": "Harta telah dibuka",
+        "riftTreasureJammed": "Kunci peti harta macet",
+        "riftCacheAvailable": "Peti Rift tersedia",
+        "riftCacheLocked": "Peti terkunci",
+        "riftCacheOpened": "Peti telah dibuka",
+        "riftCacheJammed": "Kunci peti macet",
+        "pylonUnlit": "Pilar rune padam",
+        "pylonLit": "Pilar rune menyala",
+        "sequenceRuneUnlit": "Rune urutan padam",
+        "sequenceRuneLit": "Rune urutan menyala",
+        "iceGoal": "Sasaran es",
+        "boulderPad": "Sasaran batu besar",
+        "boulderMovable": "Batu besar yang dapat dipindahkan",
+        "boulderPlaced": "Batu besar yang telah ditempatkan",
+        "gateSealed": "Gerbang tersegel",
+        "gateOpen": "Gerbang terbuka",
+        "switchReady": "Sakelar siap",
+        "switchOn": "Sakelar diaktifkan",
+        "orbDormant": "Orb tertidur",
+        "orbActive": "Orb aktif",
+        "rollerHazard": "Bahaya batu besar menggelinding",
+        "delvePassageSealed": "Lorong tersegel",
+        "delvePassageOpen": "Lorong terbuka",
+        "delveSurfaceExit": "Pintu keluar ke permukaan",
+        "delveCacheLocked": "Peti delve terkunci",
+        "delveCacheReady": "Peti delve siap",
+        "delveCacheActive": "Peti delve aktif",
+        "delveCacheOpened": "Peti delve telah dibuka",
+        "delveReliquaryLocked": "Relikuari terkunci",
+        "delveReliquaryReady": "Relikuari siap",
+        "delveReliquaryActive": "Ritus relikuari aktif",
+        "delveReliquaryOpened": "Relikuari telah dibuka",
+        "bountiful": "Hadiah berlimpah: {marker}"
+      }
     },
     "options": {
       "gameMenu": "Menu Permainan",
@@ -8041,6 +8181,9 @@ export const id_ID: EnTranslations = {
       "graphicsReloadNote": "Kualitas Grafik dan Detail Medan berlaku setelah pemuatan ulang.",
       "reloadNow": "Muat Ulang Sekarang",
       "fullscreen": "Layar Penuh",
+      "displayMode": "Mode Layar",
+      "displayModeBorderless": "Layar Penuh Tanpa Bingkai",
+      "displayModeWindowed": "Jendela",
       "touchLookSpeed": "Kecepatan Pandang Sentuh",
       "joystickSize": "Ukuran Joystick",
       "buttonSize": "Ukuran Tombol",
@@ -8920,6 +9063,7 @@ export const id_ID: EnTranslations = {
       "filterSort": "Urutkan",
       "sortName": "Nama (A-Z)",
       "sortPriceAsc": "Harga: rendah ke tinggi",
+      "collapseLowest": "Hanya harga terendah",
       "weaponSword": "Pedang",
       "weaponDagger": "Belati",
       "weaponStaff": "Tongkat Sihir",
@@ -8950,6 +9094,8 @@ export const id_ID: EnTranslations = {
       "quantity": "Jumlah",
       "quantityOf": "dari {count}",
       "priceEach": "Harga satuan",
+      "lowestPriceLabel": "Harga penawaran terendah saat ini",
+      "lowestPriceNone": "Belum ada penawaran aktif untuk item ini.",
       "listButton": "Pajang di Pasar Dunia",
       "minPriceError": "Tetapkan harga minimal 1 tembaga.",
       "collectEmpty": "Tidak ada yang menunggu. Hasil penjualan dan daftar kedaluwarsa terkumpul di sini.",
@@ -9377,6 +9523,7 @@ export const id_ID: EnTranslations = {
       "cheap_shot": {
         "name": "Pukulan Ulu Hati",
         "description": "Serang target sebesar {damage} kerusakan, membuatnya terpana selama 4 detik. Harus dalam siluman. Memberi 2 poin combo.",
+        "descriptionNoStealth": "Serang target sebesar {damage} kerusakan, membuatnya terpana selama 4 detik. Memberi 2 poin combo.",
         "specNote_subtlety": "Dipakai dari Selubung Senja, ini menambah 1 Gloam (maks 3). Pada 3 Gloam kamu bisa memakainya TANPA siluman: penggunaan itu tidak memakan biaya, menghabiskan seluruh 3 Gloam, dan memulai Tabir Bayangan selama 6 detik."
       },
       "sap": {
@@ -9589,7 +9736,7 @@ export const id_ID: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Sumpah Membara",
-        "description": "Secara pasif meningkatkan ancaman yang dihasilkan kerusakan Sucimu sebesar 60%. Hanya Penjaga iman."
+        "description": "Secara pasif meningkatkan ancaman yang dihasilkan kerusakan Sucimu sebesar 30%. Hanya Penjaga iman."
       },
       "retribution_aura": {
         "name": "Aura Ganjaran",
@@ -9705,7 +9852,7 @@ export const id_ID: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Senjata Stonebound",
-        "description": "Meresapi senjatamu selama 30 menit. Setiap ayunan memberi {damage} kerusakan tambahan. Penguatan juga memperoleh 30% zirah, menerima 10% kerusakan lebih sedikit, dan menghasilkan dua kali lipat ancaman. Sentakan Bumi memaksa sasarannya menyerangmu selama 3 dtk, dan Tameng Guntur memberi 10% pengurangan kerusakan selama 3 dtk."
+        "description": "Meresapi senjatamu selama 30 menit. Setiap ayunan memberi {damage} kerusakan tambahan. Penguatan juga memperoleh 40% zirah dan 20% Stamina, menerima 15% kerusakan lebih sedikit, dan kebal terhadap serangan kritis dari makhluk, dan menghasilkan 2,75 kali lipat ancaman. Sentakan Bumi memaksa sasarannya menyerangmu selama 3 dtk, dan Tameng Guntur memberi 10% pengurangan kerusakan selama 3 dtk."
       },
       "healing_wave": {
         "name": "Air Pemulih",
@@ -9884,7 +10031,7 @@ export const id_ID: EnTranslations = {
       },
       "bear_form": {
         "name": "Wujud Bruin",
-        "description": "Berubah wujud menjadi beruang: zirah +130%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Rapal lagi untuk kembali ke wujud perapal."
+        "description": "Berubah wujud menjadi beruang: zirah +110%, kesehatan maksimum +30%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Rapal lagi untuk kembali ke wujud perapal."
       },
       "maul": {
         "name": "Remuk Tulang",
@@ -9894,6 +10041,10 @@ export const id_ID: EnTranslations = {
       "growl": {
         "name": "Gertakan",
         "description": "Menggeram pada target: ancamanmu naik menyamai musuh yang paling dibencinya dan ia terdorong untuk menyerangmu selama 3 detik. Hanya dalam Wujud Bruin."
+      },
+      "challenging_roar": {
+        "name": "Auman Garang",
+        "description": "Sebuah auman garang: semua musuh dalam 10 yard terhasut, ancaman mereka terhadapmu naik menyamai musuh yang paling mereka benci, dan mereka terpaksa menyerangmu selama 3 detik. Hanya dalam Wujud Bruin."
       },
       "cat_form": {
         "name": "Wujud Serigala",

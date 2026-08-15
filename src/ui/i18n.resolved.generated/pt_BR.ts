@@ -1367,6 +1367,10 @@ export const pt_BR: EnTranslations = {
       "showWalletOnCharacterScreen": "Mostrar carteira na tela de personagens",
       "showWalletOnPlayerCard": "Mostrar carteira no cartão de jogador",
       "showPlaytime": "Mostrar Tempo Jogado na Tela de Personagens",
+      "forceHighPerfGpu": "Usar a GPU dedicada para jogos",
+      "forceHighPerfGpuNote": "Ativado por padrão: o aplicativo para computador pede a este computador sua GPU dedicada para jogos. Desative se o jogo não iniciar, abrir em uma tela preta, ou se a tela do laptop ficar em branco. Tem efeito na próxima vez que o jogo iniciar.",
+      "discordPresence": "Rich Presence do Discord",
+      "discordPresenceNote": "Mostra a zona em que você está e há quanto tempo está jogando nesta sessão como sua atividade do Discord, e qualquer pessoa que possa ver seu perfil do Discord pode ver ambos. Só o nome da zona, seu tempo de sessão e o jogo são compartilhados, nunca seu personagem, sua conta, ou com quem você está jogando. Requer o aplicativo do Discord em execução neste computador.",
       "showDevBadges": "Exibir Insígnias de Desenvolvedor",
       "showOwnNameplate": "Mostrar Minha Placa de Nome",
       "showPlayerNameplates": "Mostrar Placas de Nome dos Jogadores",
@@ -1739,6 +1743,7 @@ export const pt_BR: EnTranslations = {
       "notEnoughHonor": "Honra insuficiente.",
       "reasons": {
         "arenaWin": "Vitória na arena",
+        "arenaComplete": "combate na arena disputado",
         "fiestaKill": "Eliminação na Fiesta",
         "fiestaComplete": "Fiesta concluída",
         "fiestaWin": "Vitória na Fiesta",
@@ -1845,6 +1850,7 @@ export const pt_BR: EnTranslations = {
       "joinChannels": "Dica: digite /join world ou /join lfg para conversar com jogadores do mundo inteiro."
     },
     "itemHeroicTag": "[HEROICO]",
+    "itemHeroicLabel": "Heroico",
     "itemSoulbound": "Vinculado à alma",
     "itemUniqueEquipped": "Único-Equipado",
     "itemSet": {
@@ -2462,7 +2468,8 @@ export const pt_BR: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Trapaceiro >"
     },
     "mobTooltip": {
       "levelFamily": "{family} de nível {level}",
@@ -3934,6 +3941,12 @@ export const pt_BR: EnTranslations = {
       "genesis_token_claimed": "Esse Seeker Genesis Token já foi resgatado.",
       "entitlement_required": "É necessário ter o benefício Seeker verificado.",
       "current_ownership_required": "É necessário possuir atualmente o Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Contas de operador não podem receber a marca.",
+      "reason_required": "É necessário informar um motivo.",
+      "invalid_duration": "Informe uma duração de pelo menos um segundo para a marca.",
+      "not_marked": "Essa conta não está marcada."
     }
   },
   "guide": {
@@ -6550,6 +6563,7 @@ export const pt_BR: EnTranslations = {
     "email": "E-mail",
     "emailPlaceholder": "voce@exemplo.com",
     "emailError": "Por favor, insira um endereço de e-mail válido.",
+    "marketingOptIn": "Quero receber notícias e atualizações do jogo por e-mail (opcional)",
     "showPassword": "Mostrar senha",
     "hidePassword": "Ocultar senha",
     "logIn": "Entrar",
@@ -6650,6 +6664,19 @@ export const pt_BR: EnTranslations = {
     "style": "Estilo",
     "resetLook": "Redefinir Aparência",
     "resetShort": "Redefinir",
+    "shareTab": "Compartilhar",
+    "designCode": "Código de aparência",
+    "designCodeHint": "Copie este código para salvar ou compartilhar esta aparência. Cole um código aqui e importe-o para carregá-la.",
+    "copyCode": "Copiar código",
+    "importCode": "Importar",
+    "designCodeCopied": "Código de aparência copiado.",
+    "designCodeCopyManual": "A cópia automática está bloqueada aqui. O código está selecionado; copie-o com o teclado.",
+    "designCodeImported": "Aparência importada.",
+    "designCodeImportedPartial": "Aparência importada. Os valores que esta versão não reconhece foram ignorados.",
+    "designCodeErrEmpty": "Cole primeiro um código de aparência.",
+    "designCodeErrHeader": "Isso não parece ser um código de aparência.",
+    "designCodeErrVersion": "Esse código de aparência veio de uma versão mais recente do jogo.",
+    "designCodeErrMalformed": "Esse código de aparência está corrompido. Copie o código inteiro e tente novamente.",
     "browFlat": "Reta",
     "browArched": "Arqueada",
     "browThin": "Fina",
@@ -7766,7 +7793,15 @@ export const pt_BR: EnTranslations = {
       "readyBody": "Ela será instalada ao sair, ou reinicie agora.",
       "restart": "Reiniciar agora",
       "later": "Depois",
-      "dismiss": "Dispensar"
+      "dismiss": "Dispensar",
+      "whatsNew": "Ver o que mudou no navegador"
+    },
+    "notify": {
+      "updateReadyTitle": "A atualização {version} está pronta",
+      "updateReadyTitleNoVersion": "A atualização está pronta",
+      "updateReadyBody": "Reinicie o World of ClaudeCraft para aplicar a atualização.",
+      "partyInviteTitle": "Convite de grupo",
+      "partyInviteBody": "{name} convidou você para um grupo."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7778,6 +7813,7 @@ export const pt_BR: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "O jogo está funcionando sem aceleração de GPU e ficará lento. Atualize os drivers de placa de vídeo e reinicie o jogo. No Windows, defina o jogo como Alto desempenho em Configurações > Sistema > Vídeo > Gráficos.",
+    "bodyDiscreteInactive": "O jogo não está usando a GPU dedicada (para jogos) e está sendo executado na GPU de economia de energia, o que prejudicará o desempenho. Atualize os drivers de placa de vídeo e reinicie o jogo. No Windows, defina o jogo como Alto desempenho em Configurações > Sistema > Vídeo > Gráficos.",
     "bodyWeb": "O jogo está funcionando sem aceleração de GPU e ficará lento. Ative a aceleração de hardware nas configurações do navegador, atualize os drivers de placa de vídeo e reinicie o navegador.",
     "hybridBodyWindows": "Esta sessão está sendo renderizada na GPU integrada (economia de energia). Se este computador também tiver uma GPU dedicada para jogos, defina seu navegador como Alto desempenho em Configurações > Sistema > Vídeo > Gráficos, depois reinicie-o. O aplicativo para computador escolhe a GPU dedicada automaticamente.",
     "hybridBodyLinux": "Esta sessão está sendo renderizada na GPU integrada (economia de energia). Se este computador também tiver uma GPU dedicada para jogos, seu navegador ou driver de vídeo pode oferecer sua própria configuração de seleção de GPU, ou sua distribuição pode oferecer uma ferramenta de troca de GPU (como PRIME ou optimus-manager). O aplicativo para computador escolhe a GPU dedicada automaticamente.",
@@ -8001,7 +8037,111 @@ export const pt_BR: EnTranslations = {
       "zoomIn": "Aproximar",
       "zoomOut": "Afastar",
       "mapCanvasLabel": "Mapa",
-      "mapSummary": "Mapa de {zone}."
+      "mapSummary": "Mapa de {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Não há nenhum marcador relevante visível.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "Marcadores adicionais: {count}.",
+      "mapMarkerDirections": {
+        "center": "no centro",
+        "north": "ao norte",
+        "northeast": "a nordeste",
+        "east": "a leste",
+        "southeast": "a sudeste",
+        "south": "ao sul",
+        "southwest": "a sudoeste",
+        "west": "a oeste",
+        "northwest": "a noroeste"
+      },
+      "mapMarkerDistances": {
+        "near": "perto",
+        "medium": "a uma distância média",
+        "far": "longe"
+      },
+      "mapMarkerLabels": {
+        "you": "Você",
+        "availableQuest": "Missão disponível",
+        "readyQuest": "Missão pronta para entrega",
+        "repeatQuest": "Missão repetível",
+        "cooldownQuest": "Missão em recarga",
+        "questObjective": "Área do objetivo da missão",
+        "readyOre": "Veio de minério disponível",
+        "readyWood": "Arvoredo pronto para corte",
+        "readyHerb": "Canteiro de ervas disponível para coleta",
+        "readyLockedOre": "Veio de minério disponível, ferramenta indisponível",
+        "readyLockedWood": "Arvoredo pronto para corte, ferramenta indisponível",
+        "readyLockedHerb": "Canteiro de ervas disponível para coleta, ferramenta indisponível",
+        "cooldownOre": "Veio de minério esgotado",
+        "cooldownWood": "Arvoredo cortado",
+        "cooldownHerb": "Canteiro de ervas colhido",
+        "cooldownLockedOre": "Veio de minério esgotado, ferramenta indisponível",
+        "cooldownLockedWood": "Arvoredo cortado, ferramenta indisponível",
+        "cooldownLockedHerb": "Canteiro de ervas colhido, ferramenta indisponível",
+        "station": "Estação de criação: {name}",
+        "service": "Serviço: {name}",
+        "partyMember": "Membro do grupo: {name}",
+        "deadPartyMember": "Membro morto do grupo: {name}",
+        "partyMemberGeneric": "Membro do grupo",
+        "deadPartyMemberGeneric": "Membro morto do grupo",
+        "friend": "Amigo: {name}",
+        "guildMember": "Membro da guilda: {name}",
+        "pointOfInterest": "Ponto de interesse: {name}",
+        "dungeonEntrance": "Entrada da masmorra: {name}",
+        "dungeonExit": "Saída da masmorra",
+        "delveEntrance": "Entrada da incursão: {name}",
+        "worldPassage": "Passagem para {zone}",
+        "riftEntrance": "Entrada da fenda: {name}",
+        "hostileEnemy": "Inimigo hostil",
+        "aggressiveEnemy": "Inimigo atacando você",
+        "lootableEnemy": "Inimigo saqueável",
+        "corpse": "Seu cadáver",
+        "deathZone": "Zona de perigo",
+        "teammate": "Companheiro de equipe",
+        "deadTeammate": "Companheiro de equipe morto",
+        "flagCarrier": "Companheiro de equipe com a bandeira",
+        "ownFlagStand": "Suporte da sua bandeira",
+        "enemyFlagStand": "Suporte da bandeira inimiga",
+        "riftDescent": "Descida da fenda",
+        "riftReturnBeacon": "Sinalizador de retorno",
+        "riftReturnExit": "Saída de volta ao mundo",
+        "ranked": "{marker}, ranque {rank}",
+        "riftTreasureAvailable": "Tesouro disponível",
+        "riftTreasureLocked": "Tesouro trancado",
+        "riftTreasureOpened": "Tesouro aberto",
+        "riftTreasureJammed": "Tesouro com a fechadura emperrada",
+        "riftCacheAvailable": "Reserva da fenda disponível",
+        "riftCacheLocked": "Reserva trancada",
+        "riftCacheOpened": "Reserva aberta",
+        "riftCacheJammed": "Reserva com a fechadura emperrada",
+        "pylonUnlit": "Pilar rúnico apagado",
+        "pylonLit": "Pilar rúnico aceso",
+        "sequenceRuneUnlit": "Runa da sequência apagada",
+        "sequenceRuneLit": "Runa da sequência acesa",
+        "iceGoal": "Alvo de gelo",
+        "boulderPad": "Alvo da rocha",
+        "boulderMovable": "Rocha móvel",
+        "boulderPlaced": "Rocha posicionada",
+        "gateSealed": "Portão selado",
+        "gateOpen": "Portão aberto",
+        "switchReady": "Interruptor pronto",
+        "switchOn": "Interruptor ativado",
+        "orbDormant": "Orbe adormecido",
+        "orbActive": "Orbe ativo",
+        "rollerHazard": "Rocha rolante perigosa",
+        "delvePassageSealed": "Passagem selada",
+        "delvePassageOpen": "Passagem aberta",
+        "delveSurfaceExit": "Saída para a superfície",
+        "delveCacheLocked": "Reserva da incursão trancada",
+        "delveCacheReady": "Reserva da incursão pronta",
+        "delveCacheActive": "Reserva da incursão ativa",
+        "delveCacheOpened": "Reserva da incursão aberta",
+        "delveReliquaryLocked": "Relicário trancado",
+        "delveReliquaryReady": "Relicário pronto",
+        "delveReliquaryActive": "Rito do relicário ativo",
+        "delveReliquaryOpened": "Relicário aberto",
+        "bountiful": "Recompensa generosa: {marker}"
+      }
     },
     "options": {
       "gameMenu": "Menu do jogo",
@@ -8041,6 +8181,9 @@ export const pt_BR: EnTranslations = {
       "graphicsReloadNote": "Qualidade gráfica e detalhe do terreno são aplicados após recarregar.",
       "reloadNow": "Recarregar agora",
       "fullscreen": "Tela cheia",
+      "displayMode": "Modo de exibição",
+      "displayModeBorderless": "Tela cheia sem bordas",
+      "displayModeWindowed": "Janela",
       "touchLookSpeed": "Velocidade da câmera por toque",
       "joystickSize": "Tamanho do joystick",
       "buttonSize": "Tamanho dos botões",
@@ -8920,6 +9063,7 @@ export const pt_BR: EnTranslations = {
       "filterSort": "Ordenar",
       "sortName": "Nome (A-Z)",
       "sortPriceAsc": "Preço: menor para maior",
+      "collapseLowest": "Apenas o menor preço",
       "weaponSword": "Espadas",
       "weaponDagger": "Adagas",
       "weaponStaff": "Cajados",
@@ -8950,6 +9094,8 @@ export const pt_BR: EnTranslations = {
       "quantity": "Quantidade",
       "quantityOf": "de {count}",
       "priceEach": "Preço unitário",
+      "lowestPriceLabel": "Menor preço anunciado no momento",
+      "lowestPriceNone": "Ainda não há anúncios ativos para este item.",
       "listButton": "Listar no Mercado Mundial",
       "minPriceError": "Informe um preço de pelo menos 1 cobre.",
       "collectEmpty": "Nada esperando. Receitas de venda e listagens expiradas ficam aqui.",
@@ -9377,6 +9523,7 @@ export const pt_BR: EnTranslations = {
       "cheap_shot": {
         "name": "Soco no Estômago",
         "description": "Golpeia o alvo causando {damage} de dano, atordoando-o por 4 s. Deve estar furtivo. Concede 2 pontos de combo.",
+        "descriptionNoStealth": "Golpeia o alvo causando {damage} de dano, atordoando-o por 4 s. Concede 2 pontos de combo.",
         "specNote_subtlety": "Usada a partir de Duskveil, adiciona 1 Gloam (máx. 3). Em 3 Gloam, você pode usá-la SEM furtividade: esse uso não custa nada, gasta todos os 3 Gloam e inicia o Shadow Veil de 6 s."
       },
       "sap": {
@@ -9589,7 +9736,7 @@ export const pt_BR: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Juramento Ardente",
-        "description": "Aumenta passivamente em 60% a ameaça gerada por vosso dano Sagrado. Apenas Guardião da fé."
+        "description": "Aumenta passivamente em 30% a ameaça gerada por vosso dano Sagrado. Apenas Guardião da fé."
       },
       "retribution_aura": {
         "name": "Aura de Represália",
@@ -9705,7 +9852,7 @@ export const pt_BR: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Arma Pétrea",
-        "description": "Impregna vossa arma por 30 min. Cada golpe causa {damage} de dano adicional. Aprimoramento ganha ainda 30% de armadura, sofre 10% menos dano e gera o dobro de ameaça. Abalo Terreno força seu alvo a vos atacar por 3 s, e Salvaguarda do Trovão concede 10% de redução de dano por 3 s."
+        "description": "Impregna vossa arma por 30 min. Cada golpe causa {damage} de dano adicional. Aprimoramento ganha ainda 40% de armadura e 20% de Vigor, sofre 15% menos dano e é imune a acertos críticos de criaturas e gera 2,75 vezes mais ameaça. Abalo Terreno força seu alvo a vos atacar por 3 s, e Salvaguarda do Trovão concede 10% de redução de dano por 3 s."
       },
       "healing_wave": {
         "name": "Águas Restauradoras",
@@ -9884,7 +10031,7 @@ export const pt_BR: EnTranslations = {
       },
       "bear_form": {
         "name": "Forma de Bruin",
-        "description": "Assume a forma de urso: armadura +130%, poder de ataque muito aumentado, seus ataques geram raiva e 30% mais ameaça. Lance de novo para voltar à forma de conjurador."
+        "description": "Assume a forma de urso: armadura +110%, vida máxima +30%, poder de ataque muito aumentado, seus ataques geram raiva e 30% mais ameaça. Lance de novo para voltar à forma de conjurador."
       },
       "maul": {
         "name": "Esmaga-Ossos",
@@ -9894,6 +10041,10 @@ export const pt_BR: EnTranslations = {
       "growl": {
         "name": "Ameaçar",
         "description": "Rosna para o alvo: sua ameaça sobe para igualar a do inimigo mais odiado por ele, que é forçado a atacar você por 3 s. Apenas Forma de Bruin."
+      },
+      "challenging_roar": {
+        "name": "Rugido Funesto",
+        "description": "Um rugido funesto: todos os inimigos em um raio de 10 m são provocados, sua ameaça subindo para igualar a do inimigo mais odiado por eles, e são forçados a atacar você por 3 s. Apenas Forma de Bruin."
       },
       "cat_form": {
         "name": "Forma de Lobo",
