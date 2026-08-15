@@ -10493,11 +10493,15 @@ export class Sim {
     duelMod.updateDuels(this.ctx);
   }
 
-  private clearAurasFromSource(target: Entity, sourceId: number): void {
+  private clearAurasFromSource(
+    target: Entity,
+    sourceId: number,
+    shouldClear?: (aura: Aura) => boolean,
+  ): void {
     let statsDirty = false;
     for (let i = target.auras.length - 1; i >= 0; i--) {
       const a = target.auras[i];
-      if (a.sourceId !== sourceId) continue;
+      if (a.sourceId !== sourceId || (shouldClear && !shouldClear(a))) continue;
       target.auras.splice(i, 1);
       this.emit({ type: 'aura', targetId: target.id, name: a.name, gained: false });
       if (a.kind.startsWith('buff') || a.kind.startsWith('form')) statsDirty = true;
