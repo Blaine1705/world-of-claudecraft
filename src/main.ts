@@ -167,6 +167,7 @@ import {
 } from './game/ui_effects_profile';
 import { currentResetDay, currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
+import { attachWocMarketExchange } from './game/woc_market_wiring';
 import { telemetryZoneId } from './game/world_telemetry';
 import { zoneWarmupMode } from './game/zone_transition';
 import { createZoneWarmTracker } from './game/zone_warm_tracker';
@@ -233,7 +234,6 @@ import { openStripeCheckout } from './net/stripe_checkout';
 import type { WalletOption, WalletPickerMode, WalletPickerResult } from './net/wallet';
 import { resolveWalletCapability } from './net/wallet_capability';
 import { installWalletResumeHandlers } from './net/wallet_resume';
-import { WocMarketClient } from './net/woc_market_sdk';
 import {
   prepareGraphicsProfileAssets,
   resetGraphicsProfileDerivedCaches,
@@ -3360,22 +3360,12 @@ async function startGame(
         };
       },
     };
-    // The $WOC Exchange (docs/prd/woc/marketplace.md): browser web ONLY.
-    // Electron desktop, Steam, and Capacitor native stay fail-closed, tighter
-    // than the wallet-link gate, per the PRD's browser-only scope; the server
-    // additionally answers woc_market.disabled until WOC_MARKET_ENABLED=1.
-    if (!NATIVE_APP && !DESKTOP_APP) {
-      const wocMarketClient = new WocMarketClient({ token: () => api.token, base: api.base });
-      hud.attachWocMarket({
-        client: wocMarketClient,
-        characterId: () => online.characterId,
-        walletLinked: () => linkedWalletPubkey !== null,
-        signAndSendTransactionBase64: async (transactionBase64) => {
-          const wallet = await loadWallet();
-          return wallet.signAndSendTransactionBase64(transactionBase64);
-        },
-      });
-    }
+    attachWocMarketExchange({
+      hud,
+      api,
+      online,
+      wallet: { linkedPubkey: () => linkedWalletPubkey, load: loadWallet },
+    });
     if (!NATIVE_APP) {
       hud.attachClaudium(claudiumHooks);
       if (

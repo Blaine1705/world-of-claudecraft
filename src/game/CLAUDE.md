@@ -26,6 +26,7 @@ Turns the player's keyboard/mouse/touch/gamepad into **movement intent** +
 | `spawn_cinematic.ts` | pure first-spawn camera approach math; start/landing/continuity pinned by `tests/spawn_cinematic.test.ts`. |
 | `ui_effects_profile.ts` / `ui_tier_knobs.ts` | pure graphics-tier resolvers: the STATIC preset only, never the FPS governor (the root fairness invariant). Registered as game-leaf pure cores in `UI_PURE_CORES` (`tests/architecture.test.ts`); keep the registration in sync when moving or renaming them. |
 | `desktop_*.ts` | Electron shell integration: `desktop_shell_integration.ts` is the one-call composition `main.ts` invokes (DESKTOP_APP-gated; every piece no-ops without the bridge), `desktop_shell_strings.ts` owns the `t()`-localized main-process dialog strings, `desktop_error_relay.ts` relays main-world errors to the shell log (the preload cannot see them across JS worlds), `desktop_download.ts` is the landing-page installer wiring. |
+| `woc_market_wiring.ts` | the one-call `$WOC` Exchange attach `main.ts` invokes from its online entry: browser web only (`NATIVE_APP` / `DESKTOP_APP` from `client_origin.ts`, injectable for tests; every wrapped shell stays fail-closed), builds the `WocMarketClient` and the `WocMarketHooks` the HUD consumes; pinned by `tests/woc_market_wiring.test.ts`. |
 | `perf_doctor.ts` | pure perf-snapshot analyzer producing `PerfSuggestion[]` (no DOM); `perf_reporter.ts` is the telemetry reporter; `perf.ts` is the overlay/trace harness |
 
 ## Local invariants
