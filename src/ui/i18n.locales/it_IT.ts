@@ -6021,9 +6021,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'Forma di Lunagufo',
   'entities.abilities.moonkin_form.description':
     'Assume Forma di Lunagufo, potenziando il lancio di incantesimi finché non cambi di nuovo. Lancia ancora per tornare alla forma normale. (firma Equilibrio)',
-  'entities.abilities.feral_charge.name': 'Carica Ferina',
+  'entities.abilities.feral_charge.name': 'Impeto Primordiale',
   'entities.abilities.feral_charge.description':
-    'Carica un nemico e lo immobilizza per 1 s. Portata 8-25 m. (firma Aggressore Ferino)',
+    'Scatena un impeto primordiale. In Forma del Lupo, la rigenerazione dell’energia aumenta del 100% per 10 s. In Forma di Bruin, genera istantaneamente 50 rabbia. (firma Aggressore Ferino)',
   'entities.abilities.swiftmend.name': 'Rapidità di Guarigione',
   'entities.abilities.crusader_strike.name': 'Assalto del Crociato',
   'entities.abilities.crusader_strike.description':
@@ -11317,7 +11317,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     'Aumenta la tua probabilità di schivata di 50 punti percentuali per 10 sec. (talento del Cacciatore)',
   'entities.abilities.earthbind.description': 'Radica i nemici entro 4 m dal punto bersaglio per 2 sec, poi li rallenta del 40% per 6 sec. (Talento da sciamano)',
-  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (talento da mago)',
+  'entities.abilities.evocation.description':
+    'Canalizza per 6 s: ogni secondo ripristina 100 mana e accumula 8 potere magico. Il bonus si accumula durante la canalizzazione e dura 15 s. (talento da mago)',
   'entities.abilities.frenzied_regeneration.description':
     'Ripristina 180 salute in 10 sec. Utilizzabile solo in Forma d’Orso. (talento del Druido)',
   'entities.abilities.frost_trap.description':
@@ -11328,7 +11329,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     'Terrorizza i nemici vicini per un massimo di 3 sec. I danni possono interrompere l’effetto. (talento dello Stregone)',
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talento da mago)',
+    'Ti racchiude nel ghiaccio solido per 8 s, rendendoti immune a tutti i danni e gli effetti e rimuovendo ogni effetto dannoso. Utilizzabile mentre sei stordito o trasformato. Non puoi agire mentre sei racchiuso. Lancia di nuovo per annullare. (mago)',
   'entities.abilities.inner_focus.description': 'Rende il vostro prossimo incantesimo da sacerdote gratuito e non interrompibile. Dura 60 sec.',
   'entities.abilities.innervate.description':
     'La linfa vivente scorre in te per 10 sec. e ripristina a ondate 20 della tua risorsa attuale: mana, rabbia o energia. Cambiare forma non la interrompe. Sonno, stordimento o stasi arrestano la linfa. (talento del Druido)',
@@ -11344,7 +11345,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.preparation.description':
     'Azzera il tempo di recupero di Scatto, Evasione e Sparizione. (talento del Ladro)',
   'entities.abilities.presence_of_mind.description':
-    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talento da mago)',
+    'Rende istantaneo il prossimo incantesimo con tempo di lancio. Dura 60 s. (talento da mago)',
   'entities.abilities.psychic_scream.description': "Atterrisce i nemici entro 8 m per un massimo di 4 sec. Il danno può spezzare l'effetto.",
   'entities.abilities.shadowstep.description':
     'Avanzi attraverso le ombre verso il tuo bersaglio. (talento del Ladro)',

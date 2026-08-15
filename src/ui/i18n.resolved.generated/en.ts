@@ -10582,7 +10582,7 @@ export const en: EnTranslations = {
       },
       "evocation": {
         "name": "Aetherwell",
-        "description": "Channel for 6 sec: each second restores 100 mana and builds 8 spell power, stacking while you channel. (Mage talent)"
+        "description": "Channel for 6 sec: each second restores 100 mana and builds 8 spell power, stacking while you channel and lasting 15 sec. (Mage talent)"
       },
       "flurry_of_knives": {
         "name": "Flurry of Knives",
@@ -10614,7 +10614,7 @@ export const en: EnTranslations = {
       },
       "ice_block": {
         "name": "Cold Coffin",
-        "description": "Encases you in ice, absorbing a massive amount of damage for 8 sec. (Mage talent)"
+        "description": "Encases you in solid ice for 8 sec, becoming immune to all damage and effects and removing every harmful effect. Usable while stunned or polymorphed. You cannot act while encased. Recast to cancel. (Mage)"
       },
       "inner_focus": {
         "name": "Stilled Mind",

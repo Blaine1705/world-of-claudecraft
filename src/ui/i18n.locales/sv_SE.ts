@@ -4483,9 +4483,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'Månugglaform',
   'entities.abilities.moonkin_form.description':
     'Anta månugglaform och stärk besvärjelser tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Balanssignatur)',
-  'entities.abilities.feral_charge.name': 'Vild rusning',
+  'entities.abilities.feral_charge.name': 'Urvåg',
   'entities.abilities.feral_charge.description':
-    'Rusa mot en fiende och rota den i 1 sek. 8-25 m räckvidd. (Vildhetssignatur)',
+    'Släpp lös en urvåg. I Vargform ökar er energiregenerering med 100% i 10 sek. I Bruinform får ni omedelbart 50 raseri. (Vildhetssignatur)',
   'entities.abilities.swiftmend.name': 'Snabb läkning',
   'entities.abilities.crusader_strike.name': 'Korsfararslag',
   'entities.abilities.crusader_strike.description':
@@ -10889,7 +10889,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     'Ökar din chans att undvika med 50 procentenheter i 10 sek. (jägartalang)',
   'entities.abilities.earthbind.description': 'Rotar fiender inom 4 m från målpunkten i 2 sek och saktar sedan ner dem med 40% i 6 sek. (Shamantalang)',
-  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (magikertalang)',
+  'entities.abilities.evocation.description':
+    'Kanalisera i 6 sek.: varje sekund återställer ni 100 mana och bygger upp 8 besvärjelsekraft. Bonusen staplas under kanaliseringen och varar i 15 sek. (magikertalang)',
   'entities.abilities.frenzied_regeneration.description':
     'Återställer 180 hälsa under 10 sek. Endast i Björngestalt. (druidtalang)',
   'entities.abilities.frost_trap.description':
@@ -10900,7 +10901,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     'Skrämmer fiender i närheten i upp till 3 sek. Skada kan bryta effekten. (häxmästartalang)',
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sek. (magikertalang)',
+    'Innesluter er i fast is i 8 sek., gör er immuna mot all skada och alla effekter och tar bort alla skadliga effekter. Kan användas medan ni är bedövade eller förvandlade. Ni kan inte agera medan ni är inneslutna. Kasta igen för att avbryta. (magiker)',
   'entities.abilities.inner_focus.description': 'Gör er nästa prästbesvärjelse gratis och omöjlig att avbryta. Varar 60 sek.',
   'entities.abilities.innervate.description':
     'Levande sav väller upp i dig i 10 sek. och återställer 20 av din aktuella resurs i vågor: mana, raseri eller energi. Formbyte avbryter den inte. Sömn, bedövning eller stasis stoppar saven. (druidtalang)',
@@ -10916,7 +10917,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.preparation.description':
     'Avslutar nedkylningen för Spurt, Undvikande och Försvinnande. (skurktalang)',
   'entities.abilities.presence_of_mind.description':
-    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sek. (magikertalang)',
+    'Gör er nästa besvärjelse med kasttid omedelbar. Varar i 60 sek. (magikertalang)',
   'entities.abilities.psychic_scream.description': 'Skrämmer fiender inom 8 m i upp till 4 sek. Skada kan bryta effekten.',
   'entities.abilities.shadowstep.description': 'Kliver genom skuggorna mot ditt mål. (skurktalang)',
   'entities.abilities.silence.description': 'Tystar målet i 4 sek. (prästtalang)',

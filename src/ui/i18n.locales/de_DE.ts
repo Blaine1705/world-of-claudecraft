@@ -6034,9 +6034,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'Mondkingestalt',
   'entities.abilities.moonkin_form.description':
     'Nehmt Mondkingestalt an und verstärkt Eure Zauber, bis Ihr zurückwechselt. Erneut wirken, um zur normalen Gestalt zurückzukehren. (Gleichgewichts-Signatur)',
-  'entities.abilities.feral_charge.name': 'Wilde Attacke',
+  'entities.abilities.feral_charge.name': 'Urwoge',
   'entities.abilities.feral_charge.description':
-    'Stürmt einen Gegner an und wurzelt ihn 1 Sek. lang. 8-25 m Reichweite. (Wildheits-Signatur)',
+    'Entfesselt eine Urwoge. In Wolfsgestalt wird Eure Energieregeneration 10 Sek. lang um 100% erhöht. In Bruin-Gestalt erhaltet Ihr sofort 50 Wut. (Wildheits-Signatur)',
   'entities.abilities.swiftmend.name': 'Rasche Heilung',
   'entities.abilities.crusader_strike.name': 'Kreuzfahrerstoß',
   'entities.abilities.crusader_strike.description':
@@ -10217,7 +10217,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     'Erhöht Eure Ausweichchance 10 Sek. lang um 50 Prozentpunkte. (Jägertalent)',
   'entities.abilities.earthbind.description': 'Macht Gegner im Umkreis von 4 m um den Zielpunkt 2 Sek. lang bewegungsunfähig und verlangsamt sie danach 6 Sek. lang um 40%. (Schamanentalent)',
-  'entities.abilities.evocation.description': 'Restaura Mana rápidamente. (Magier-Talent)',
+  'entities.abilities.evocation.description':
+    'Kanalisiert 6 Sek. lang: Jede Sekunde werden 100 Mana wiederhergestellt und 8 Zaubermacht aufgebaut. Der Bonus ist während des Kanalisierens stapelbar und hält 15 Sek. lang an. (Magier-Talent)',
   'entities.abilities.frenzied_regeneration.description':
     'Stellt im Verlauf von 10 Sek. 180 Gesundheit wieder her. Nur in Bärengestalt. (Druidentalent)',
   'entities.abilities.frost_trap.description':
@@ -10228,7 +10229,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     'Versetzt Gegner in der Nähe bis zu 3 Sek. lang in Furcht. Schaden kann den Effekt aufheben. (Hexenmeistertalent)',
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 Sek.. (Magier-Talent)',
+    'Schließt Euch 8 Sek. lang in festes Eis ein, macht Euch gegen jeglichen Schaden und alle Effekte immun und entfernt alle schädlichen Effekte. Kann während Betäubung oder Verwandlung eingesetzt werden. Ihr könnt währenddessen nicht handeln. Erneut wirken, um den Effekt abzubrechen. (Magier)',
   'entities.abilities.inner_focus.description': 'Euer nächster Priesterzauber kostet nichts und ist nicht unterbrechbar. Hält 60 Sek. lang an.',
   'entities.abilities.innervate.description':
     'Lebendiger Pflanzensaft quillt 10 Sek. lang in Euch auf und stellt in Wellen 20 Eurer aktuellen Ressource wieder her: Mana, Wut oder Energie. Gestaltwandel unterbricht ihn nicht. Schlaf, Betäubung oder Stasis bringen den Saft zum Stillstand. (Druidentalent)',
@@ -10244,7 +10245,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.preparation.description':
     'Schließt die Abklingzeiten von Sprint, Entrinnen und Verschwinden ab. (Schurkentalent)',
   'entities.abilities.presence_of_mind.description':
-    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 Sek.. (Magier-Talent)',
+    'Macht Euren nächsten Zauber mit Zauberzeit zu einem Spontanzauber. Hält 60 Sek. lang an. (Magier-Talent)',
   'entities.abilities.psychic_scream.description': 'Versetzt Gegner im Umkreis von 8 m bis zu 4 Sek. lang in Furcht. Schaden kann den Effekt aufheben.',
   'entities.abilities.shadowstep.description':
     'Tretet durch die Schatten auf Euer Ziel zu. (Schurkentalent)',

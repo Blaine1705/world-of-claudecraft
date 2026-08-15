@@ -3222,9 +3222,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': '梟獸形態',
   'entities.abilities.moonkin_form.description':
     '進入梟獸形態，強化施法直到你切換回來。再次施放可返回普通形態。（平衡專精招牌）',
-  'entities.abilities.feral_charge.name': '野性衝鋒',
+  'entities.abilities.feral_charge.name': '原始湧動',
   'entities.abilities.feral_charge.description':
-    '衝向敵人並使其定身1秒。8-25碼距離。（野性專精招牌）',
+    '釋放一股原始湧動。狼形態下，能量恢復速度提高100%，持續10秒。巨熊形態下，立即產生50點怒氣。（野性專精招牌）',
   'entities.abilities.swiftmend.name': '迅癒',
   'entities.abilities.swiftmend.description': '消耗友方目標身上的一個持續治療效果，治療其 {damage} 點生命。野性綻放與再度綻放的播撒會累加青翠；在 5 層青翠時，此按鈕會變為盛放，立即為每一位帶有你持續治療效果的盟友治療這些效果所剩餘量的 60%。（恢復標誌技能）',
   'entities.abilities.crusader_strike.name': '十字軍聖擊',
@@ -9369,7 +9369,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     '使你的閃躲幾率提高50個百分點，持續10秒。（獵人天賦）',
   'entities.abilities.earthbind.description': '將目標點 4 公尺內的敵人定身 2 秒，隨後使其減速 40%，持續 6 秒。（薩滿天賦）',
-  'entities.abilities.evocation.description': '快速恢復法力。（法師天賦）',
+  'entities.abilities.evocation.description':
+    '引導6秒：每秒恢復100點法力並獲得8點法術強度，效果在引導期間疊加並持續15秒。（法師天賦）',
   'entities.abilities.frenzied_regeneration.description':
     '在10秒內恢復180點生命值。只能在熊形態下使用。（德魯伊天賦）',
   'entities.abilities.frost_trap.description':
@@ -9381,7 +9382,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     '使附近的敵人恐懼，最多持續3秒。受到傷害可能打破該效果。（術士天賦）',
   'entities.abilities.ice_block.description':
-    '將你封入寒冰之中，吸收大量傷害，持續 8 秒。（法師天賦）',
+    '將你封入堅冰8秒，使你免疫所有傷害和效果，並移除所有有害效果。可在昏迷或變形狀態下使用。被封凍期間無法行動。再次施放可取消。（法師）',
   'entities.abilities.inner_focus.description': '使你的下一個牧師法術免費且無法被打斷。持續 60 秒。',
   'entities.abilities.innervate.description':
     '生命樹液在你體內湧動10秒，分波恢復20點當前資源，可恢復法力、怒氣或能量。變形不會中斷效果。睡眠、昏迷或停滯會使樹液停止湧動。（德魯伊天賦）',

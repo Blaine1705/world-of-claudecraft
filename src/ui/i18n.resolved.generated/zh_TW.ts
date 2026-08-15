@@ -10325,8 +10325,8 @@ export const zh_TW: EnTranslations = {
         "description": "進入梟獸形態，強化施法直到你切換回來。再次施放可返回普通形態。（平衡專精招牌）"
       },
       "feral_charge": {
-        "name": "野性衝鋒",
-        "description": "衝向敵人並使其定身1秒。8-25碼距離。（野性專精招牌）"
+        "name": "原始湧動",
+        "description": "釋放一股原始湧動。狼形態下，能量恢復速度提高100%，持續10秒。巨熊形態下，立即產生50點怒氣。（野性專精招牌）"
       },
       "swiftmend": {
         "name": "迅癒",
@@ -10582,7 +10582,7 @@ export const zh_TW: EnTranslations = {
       },
       "evocation": {
         "name": "乙太之井",
-        "description": "快速恢復法力。（法師天賦）"
+        "description": "引導6秒：每秒恢復100點法力並獲得8點法術強度，效果在引導期間疊加並持續15秒。（法師天賦）"
       },
       "flurry_of_knives": {
         "name": "刀刃亂舞",
@@ -10614,7 +10614,7 @@ export const zh_TW: EnTranslations = {
       },
       "ice_block": {
         "name": "寒冰棺",
-        "description": "將你封入寒冰之中，吸收大量傷害，持續 8 秒。（法師天賦）"
+        "description": "將你封入堅冰8秒，使你免疫所有傷害和效果，並移除所有有害效果。可在昏迷或變形狀態下使用。被封凍期間無法行動。再次施放可取消。（法師）"
       },
       "inner_focus": {
         "name": "靜心",
