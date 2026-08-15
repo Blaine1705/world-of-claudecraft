@@ -640,14 +640,14 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(trace.draws).toBe(0);
   });
 
-  it('grix_respawn_window: both deaths roll an independent 5 to 10 minute timer', () => {
+  it('grix_respawn_window: both deaths roll an independent 15 to 30 minute timer', () => {
     const rec = run('grix_respawn_window');
     const first = rec.notes.firstRoll as number;
     const second = rec.notes.secondRoll as number;
     for (const roll of [first, second]) {
-      // rng.range(12, 24) x 25s: uniform in the half-open [300, 600).
-      expect(roll).toBeGreaterThanOrEqual(300);
-      expect(roll).toBeLessThan(600);
+      // rng.range(36, 72) x 25s: uniform in the half-open [900, 1800).
+      expect(roll).toBeGreaterThanOrEqual(900);
+      expect(roll).toBeLessThan(1800);
     }
     // Independent draws: equal rolls would mean the death site stopped
     // consuming the stream per death (this seed pair does not collide).

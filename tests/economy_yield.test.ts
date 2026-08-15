@@ -60,7 +60,7 @@ function isTrash(template: MobTemplate): boolean {
     !template.boss &&
     !template.dummy &&
     !template.ambient &&
-    // Not self-scheduled (rare, or an authored respawnMult/respawnMultMax): the
+    // Not self-scheduled (rare, or an authored respawnMult/respawnWindow): the
     // sim's own classification, imported so the two definitions cannot drift.
     !isSelfScheduled(template) &&
     // A puzzle-object mob (xpMult 0: the 1 HP dragonkin egg, the spider egg-sac

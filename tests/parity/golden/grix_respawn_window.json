@@ -4,7 +4,7 @@
   "sampleEvery": 1,
   "ticks": 0,
   "coverage": [
-    "respawnMultMax window: death -> resolveRespawnSeconds rolls rng.range(12, 24) x 25s base",
+    "respawnWindow: death -> resolveRespawnSeconds rolls rng.range(36, 72) x 25s base",
     "second kill after an in-place respawnMob rolls an independent window value"
   ],
   "draws": 17,
@@ -28,7 +28,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 965,
-      "state": "034ac4ec",
+      "state": "8edd74b5",
       "events": "d44c5555",
       "rng": {
         "draws": 8,
@@ -240,7 +240,7 @@
             "y": 1.5
           },
           "potionCooldownUntil": -1,
-          "respawnTimer": 599.68579,
+          "respawnTimer": 1799.057371,
           "spawnPos": {
             "x": 4,
             "y": 1.5
@@ -262,7 +262,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 965,
-      "state": "2294edca",
+      "state": "41d9bcae",
       "events": "cfb99031",
       "rng": {
         "draws": 17,
@@ -478,7 +478,7 @@
             "y": 1.5
           },
           "potionCooldownUntil": -1,
-          "respawnTimer": 487.991869,
+          "respawnTimer": 1463.975608,
           "spawnPos": {
             "x": 4,
             "y": 1.5
@@ -501,7 +501,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 965,
-      "state": "2294edca",
+      "state": "41d9bcae",
       "events": "741638a5",
       "rng": {
         "draws": 17,
@@ -717,7 +717,7 @@
             "y": 1.5
           },
           "potionCooldownUntil": -1,
-          "respawnTimer": 487.991869,
+          "respawnTimer": 1463.975608,
           "spawnPos": {
             "x": 4,
             "y": 1.5

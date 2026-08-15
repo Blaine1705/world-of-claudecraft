@@ -5675,7 +5675,7 @@ function idleMobDistanceCulling(): Scenario {
   };
 }
 
-// The respawnMultMax random window (Grix the Tunnelking, the one shipped
+// The respawnWindow random window (Grix the Tunnelking, the one shipped
 // carrier): handleDeath's respawn resolution draws ONE shared-stream roll for a
 // windowed template where every fixed-schedule death draws none
 // (src/sim/respawn_policy.ts). Two kills pin two independent rolls in the draw
@@ -5685,7 +5685,7 @@ function grixRespawnWindow(): Scenario {
   return {
     name: 'grix_respawn_window',
     coverage: [
-      'respawnMultMax window: death -> resolveRespawnSeconds rolls rng.range(12, 24) x 25s base',
+      'respawnWindow: death -> resolveRespawnSeconds rolls rng.range(36, 72) x 25s base',
       'second kill after an in-place respawnMob rolls an independent window value',
     ],
     sampleEvery: 1,

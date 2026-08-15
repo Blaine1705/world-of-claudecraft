@@ -76,7 +76,7 @@ const FAST_RESPAWN_SECONDS = 100;
 
 /**
  * Farmable trash: not a boss, dummy or ambient prop, and not self-scheduled
- * (rare, or an authored respawnMult/respawnMultMax marking a mob with its own
+ * (rare, or an authored respawnMult/respawnWindow marking a mob with its own
  * tuned schedule; the sim's own classification is imported so the two
  * definitions cannot drift). This is exactly the population the zone respawn
  * tiers govern. Fed the FARM template (farmTemplate above), so a hatching shell

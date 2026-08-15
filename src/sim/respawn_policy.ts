@@ -98,14 +98,27 @@ export function baseRespawnSecondsAt(
   return trashRespawnSecondsForZone(zoneContaining(x, z));
 }
 
+/**
+ * A RANDOM respawn window, in the same 25s-base units as respawnMult: each death
+ * draws its effective multiplier uniformly in the half-open [minMult, maxMult)
+ * (Rng.range). Both bounds live in ONE field on purpose. A lone upper bound, or
+ * a max at or below its min, are states no author can write, so no test has to
+ * sweep the catalog for them.
+ */
+export interface RespawnWindow {
+  minMult: number;
+  maxMult: number;
+}
+
+/** The draw a windowed template needs. `null` means "resolve without randomness". */
+export type RespawnRoll = (min: number, max: number) => number;
+
 /** The template fields the policy reads; a MobTemplate satisfies it structurally. */
 export interface RespawnTemplateFields {
   respawnSeconds?: number;
   respawnMult?: number;
-  // Upper bound of a RANDOM respawn window: with both authored, the effective
-  // multiplier is drawn uniformly in [respawnMult, respawnMultMax) per death
-  // (half-open, Rng.range; same 25s-base units). Authored alongside respawnMult.
-  respawnMultMax?: number;
+  // Authored INSTEAD of respawnMult, never alongside it.
+  respawnWindow?: RespawnWindow;
   rare?: boolean;
 }
 
@@ -124,8 +137,8 @@ export const LEGACY_RESPAWN_SECONDS = 25;
  *  - an authored `respawnMult`: every shipped coefficient is a wall-clock target
  *    expressed as a multiple of 25 (144 is one hour, 432 three, 864 six, and 7.2
  *    is the three minutes tests/fixes.test.ts pins for a quest rare);
- *  - an authored `respawnMultMax`: the upper bound of a random window is a
- *    schedule statement exactly like the fixed coefficient it accompanies;
+ *  - an authored `respawnWindow`: a random window is a schedule statement
+ *    exactly like the fixed coefficient it replaces;
  *  - `rare: true`, whose default 4x is the 100s cadence every bare rare shipped
  *    with.
  *
@@ -139,7 +152,7 @@ export const LEGACY_RESPAWN_SECONDS = 25;
 export function isSelfScheduled(template: RespawnTemplateFields | undefined): boolean {
   return (
     template?.respawnMult !== undefined ||
-    template?.respawnMultMax !== undefined ||
+    template?.respawnWindow !== undefined ||
     template?.rare === true
   );
 }
@@ -153,12 +166,15 @@ export function isSelfScheduled(template: RespawnTemplateFields | undefined): bo
  *     from the flat-timer era; only which base it multiplies moved, and only for
  *     templates that are NOT self-scheduled (see isSelfScheduled).
  *
- * A template with respawnMultMax carries a random WINDOW instead of a fixed
+ * A template with a respawnWindow carries a random WINDOW instead of a fixed
  * multiplier: the effective mult is drawn uniformly in the half-open
- * [respawnMult, respawnMultMax) via the caller-supplied `roll` (the death site
- * passes ctx.rng.range, keeping this leaf pure and the sim deterministic).
- * Without a roll, the window resolves to its minimum, so every pure caller and
- * test stays deterministic.
+ * [minMult, maxMult) via the caller-supplied `roll` (the death site passes
+ * ctx.rng.range, keeping this leaf pure and the sim deterministic).
+ *
+ * `roll` is REQUIRED and nullable rather than optional: passing `null` resolves
+ * a window to its FLOOR, which is a deliberate choice a caller has to make out
+ * loud (a yield ceiling wants the fastest respawn), never something you get by
+ * forgetting an argument.
  *
  * An explicit SimConfig base still overrides everything below the template's own
  * fixed seconds, for both populations, exactly as it always did.
@@ -170,16 +186,15 @@ export function resolveRespawnSeconds(
   template: RespawnTemplateFields | undefined,
   spawnPos: { x: number; z: number },
   cfgRespawnSeconds: number | undefined,
-  roll?: (min: number, max: number) => number,
+  roll: RespawnRoll | null,
 ): number {
   if (template?.respawnSeconds !== undefined) return template.respawnSeconds;
   const base = isSelfScheduled(template)
     ? (cfgRespawnSeconds ?? LEGACY_RESPAWN_SECONDS)
     : baseRespawnSecondsAt(spawnPos.x, spawnPos.z, cfgRespawnSeconds);
-  const minMult = template?.respawnMult ?? (template?.rare ? 4 : 1);
-  const mult =
-    template?.respawnMultMax !== undefined && roll
-      ? roll(minMult, template.respawnMultMax)
-      : minMult;
-  return base * mult;
+  // Not named `window`: src/sim must stay free of DOM globals, and
+  // tests/architecture.test.ts scans for the identifier.
+  const span = template?.respawnWindow;
+  if (span) return base * (roll ? roll(span.minMult, span.maxMult) : span.minMult);
+  return base * (template?.respawnMult ?? (template?.rare ? 4 : 1));
 }
