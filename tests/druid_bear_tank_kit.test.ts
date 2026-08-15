@@ -1,12 +1,7 @@
-// Bruin Form's two tank tools: the aoe taunt (Baleful Roar) and the in-form
-// heal (Savage Mending). The heal was authored for the Talents 2.0 L17 row,
-// but that row shipped granting Gladesong and left the ability unreachable;
-// it is a Wildfang spec ability now.
-//
-// Both reach for WORLD mobs rather than hand-injected ones: aoeTaunt resolves
-// its targets through the spatial grid (Sim.hostilesInRadius), and an entity
-// written straight into `sim.entities` is never bucketed, so it is invisible to
-// the fan-out no matter how close it sits.
+// Bruin Form's in-form heal (Savage Mending). It was authored for the Talents
+// 2.0 L17 druid row, but that row shipped granting Gladesong instead, so the
+// ability was defined, painted and HUD-wired yet granted by nothing and
+// unreachable in play. It is a Wildfang spec ability now.
 import { describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers } from '../src/sim/content/talents';
@@ -48,35 +43,10 @@ function shiftToBear(sim: Sim, druid: Entity): void {
 }
 
 describe('Bruin Form tank kit', () => {
-  it('gives Wildfang the in-form heal and every druid the aoe taunt', () => {
+  it('gives the in-form heal to Wildfang only', () => {
     expect(knownIds('feral')).toContain('frenzied_regeneration');
     expect(knownIds('balance')).not.toContain('frenzied_regeneration');
     expect(knownIds('restoration')).not.toContain('frenzied_regeneration');
-    for (const spec of ['feral', 'balance', 'restoration']) {
-      expect(knownIds(spec), spec).toContain('challenging_roar');
-    }
-  });
-
-  it('taunts every hostile inside the radius and none outside it', () => {
-    const { sim, druid } = feralDruid();
-    const pack = wolves(sim).slice(0, 3);
-    expect(pack.length).toBe(3);
-    for (const wolf of pack) wolf.maxHp = wolf.hp = 5000;
-
-    const [near, alsoNear, far] = pack;
-    teleport(sim, druid, near.pos.x + 3, near.pos.z);
-    teleport(sim, alsoNear, druid.pos.x + 5, druid.pos.z);
-    // Far outside the 10 yd radius, so the fan-out has a real boundary.
-    teleport(sim, far, druid.pos.x + 60, druid.pos.z);
-
-    shiftToBear(sim, druid);
-    druid.resource = druid.maxResource;
-    sim.castAbility('challenging_roar');
-    sim.tick();
-
-    expect(near.forcedTargetId).toBe(druid.id);
-    expect(alsoNear.forcedTargetId).toBe(druid.id);
-    expect(far.forcedTargetId).toBeNull();
   });
 
   it('is refused in caster form, where a druid keeps its real heals', () => {
@@ -85,10 +55,6 @@ describe('Bruin Form tank kit', () => {
     wolf.maxHp = wolf.hp = 5000;
     teleport(sim, druid, wolf.pos.x + 3, wolf.pos.z);
     druid.resource = druid.maxResource;
-
-    sim.castAbility('challenging_roar');
-    sim.tick();
-    expect(wolf.forcedTargetId).toBeNull();
 
     const before = druid.hp;
     sim.castAbility('frenzied_regeneration');

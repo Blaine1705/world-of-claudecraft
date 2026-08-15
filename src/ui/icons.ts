@@ -4660,6 +4660,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'overbloom',
   'feral_charge',
   'frenzied_regeneration',
+  'challenging_roar',
   'hurricane',
   'innervate',
   'moonkin_form',
