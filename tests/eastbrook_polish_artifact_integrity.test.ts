@@ -752,6 +752,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // the release monolith ratchet. Behavior is unchanged; no capture was retaken.
 // Re-minted again after registering the extracted policy as its own provenance
 // leaf. The captures remain unchanged and were not retaken.
+// Re-minted for the quest-collectable spawn gate: this branch's renderer.ts
+// edits (the view gate call sites and the ground-object pool key move) shift
+// the runtimeRender.renderer leaf, the only leaf that moved. No Eastbrook
+// input, geometry value, or capture moved.
+// Re-minted for the merge of PR #3359's quest-collectable spawn gate with the
+// release branch's extracted entity-view policy. Both renderer.ts and the
+// entityViewPolicy leaf are provenance inputs; no capture was retaken.
 // Re-minted for the review fixes on this branch (Soul Rend warms every rig a
 // live body can take, plus the lazy form-visual fold): the first-order
 // composite follows renderer.ts, then this seal follows the swept evidence
@@ -1748,6 +1755,13 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // branch: the first-order composite follows the merged renderer.ts bytes,
     // then this second-order performance seal follows the swept evidence
     // bytes. No capture was retaken.
+    // Re-pinned for the quest-collectable spawn gate. The first-order
+    // composite follows renderer.ts, then this second-order seal follows the
+    // swept evidence bytes. No capture was retaken.
+    // Re-pinned for the merge of PR #3359's quest-collectable spawn gate with
+    // the release branch's extracted entity-view policy. The first-order
+    // composite follows renderer.ts and entityViewPolicy, then this seal
+    // follows the swept bytes. No capture was retaken.
     // Re-minted for the review fixes on this branch (Soul Rend warms every rig
     // a live body can take, plus the lazy form-visual fold): the first-order
     // composite follows renderer.ts, then this seal follows the swept evidence
