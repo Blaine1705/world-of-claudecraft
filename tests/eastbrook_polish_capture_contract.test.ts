@@ -171,8 +171,11 @@ interface AttributionTargetFixture {
 // Re-minted for the merge of release/v0.38.0 into the Armory warming branch:
 // both parents move renderer.ts, so the merged tree mints a value matching
 // neither parent. No capture was retaken.
+// Re-minted for the review fixes on this branch (Soul Rend warms every rig a
+// live body can take, plus the lazy form-visual fold): renderer.ts moves
+// again, so the composite follows its bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'f0ed104c95e4173f3fe37c33cef9e447787f4b6f6d45847bc421f0dfa9bbe890';
+  '190dbccc03436cbe5598543c4da77f0d63de08158cbf9100f5249d04d5bf251f';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
