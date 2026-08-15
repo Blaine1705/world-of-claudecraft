@@ -258,6 +258,29 @@ describe('dev commands', () => {
     expect(player.hp).toBe(50);
   });
 
+  it("refuses another tester's pet, which is an owned mob and not a player", () => {
+    const sim = devSim();
+    const player = sim.player;
+    player.maxHp = 200;
+    player.hp = 200;
+    sim.chat('/dev spawn forest_wolf');
+    const pet = devSpawns(sim)[0];
+    pet.maxHp = 1000;
+    pet.hp = 1000;
+
+    const other = sim.addPlayer('mage', 'Otherling');
+    pet.ownerId = other;
+    player.targetId = pet.id;
+    sim.chat('/dev hp 10');
+    expect(pet.hp).toBe(1000);
+    expect(player.hp).toBe(200);
+
+    // ...while the caller's OWN pet stays theirs to drive.
+    pet.ownerId = player.id;
+    sim.chat('/dev hp 10');
+    expect(pet.hp).toBe(100);
+  });
+
   it('errors, and changes nothing, when the caller is dead with no target', () => {
     const sim = devSim();
     const player = sim.player;

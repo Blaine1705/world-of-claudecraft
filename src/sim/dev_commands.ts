@@ -685,13 +685,19 @@ export function handleDevChat(
     const player = ctx.entities.get(pid);
     if (!player) return null;
     const targeted = player.targetId === null ? null : ctx.entities.get(player.targetId);
-    // Never another PLAYER: on a shared realm with dev commands enabled, this
-    // would be one tester rewriting another tester's fight. Yourself or a
-    // non-player body only, and a named-but-unusable target refuses rather than
-    // silently falling back to self (an automation caller whose target did not
-    // land would otherwise measure its own hp and never know).
-    if (targeted && (targeted.dead || (targeted.kind === 'player' && targeted.id !== pid))) {
-      ctx.error(pid, '[dev] Target yourself or a living non-player body.');
+    // Never another tester's BODY: on a shared realm with dev commands enabled,
+    // this would be one tester rewriting another tester's fight. That covers
+    // their controlled pet too, which is a mob carrying their id as ownerId, not
+    // a player entity. Yourself, your own pet, or an unowned non-player body
+    // only, and a named-but-unusable target refuses rather than silently falling
+    // back to self (an automation caller whose target did not land would
+    // otherwise measure its own hp and never know).
+    const someoneElses =
+      !!targeted &&
+      ((targeted.kind === 'player' && targeted.id !== pid) ||
+        (targeted.ownerId !== null && targeted.ownerId !== pid));
+    if (targeted && (targeted.dead || someoneElses)) {
+      ctx.error(pid, '[dev] Target yourself, your own pet, or a living unowned body.');
       return null;
     }
     const entity = targeted ?? (player.dead ? null : player);
