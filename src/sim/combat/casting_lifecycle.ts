@@ -85,6 +85,7 @@ import {
   afflictionTargetCastError,
   clearAfflictionConsumeThreads,
   completeAfflictionDrain,
+  completeNeedleOfFateCast,
   consumeFateThreadsForDrain,
   gainDoom,
 } from './affliction';
@@ -2503,6 +2504,9 @@ function applyAbility(
     spendAbilityCost(ctx, p, meta, res, target);
     armAbilityCooldownWithReflection(ctx, p, meta, res, togglingOff);
     res = reserveRuinousBrandCopy(ctx, p, meta, target, res);
+    if (res.effects.some((effect) => effect.type === 'afflictionNeedle')) {
+      completeNeedleOfFateCast(ctx, p, target);
+    }
     ctx.emit({
       type: 'spellfx',
       sourceId: p.id,

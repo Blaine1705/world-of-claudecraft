@@ -9916,7 +9916,7 @@ export const en_CA: EnTranslations = {
       },
       "needle_of_fate": {
         "name": "Needle of Fate",
-        "description": "Pierces the enemy for {damage} Shadow damage and generates 5 Condemnation if it bears your Evil Eye. Each hit on your primary Evil Eye adds a Fate Thread for 12 sec, up to 3. If no Evil Eye exists, the Needle first marks its target."
+        "description": "Pierces the enemy for {damage} Shadow damage and generates 7 Condemnation on impact if it bears your Evil Eye. Completing a cast against your primary Evil Eye adds a Fate Thread for 12 sec, up to 3. Fate Threads stay with you when the Eye moves or its target dies. If no Evil Eye exists, the completed cast first marks its target."
       },
       "sentence": {
         "name": "Sentence",
