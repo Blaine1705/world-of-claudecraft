@@ -1739,6 +1739,7 @@ export const pt_BR: EnTranslations = {
       "notEnoughHonor": "Honra insuficiente.",
       "reasons": {
         "arenaWin": "Vitória na arena",
+        "arenaComplete": "Arena bout fought",
         "fiestaKill": "Eliminação na Fiesta",
         "fiestaComplete": "Fiesta concluída",
         "fiestaWin": "Vitória na Fiesta",
@@ -9506,6 +9507,7 @@ export const pt_BR: EnTranslations = {
       "cheap_shot": {
         "name": "Soco no Estômago",
         "description": "Golpeia o alvo causando {damage} de dano, atordoando-o por 4 s. Deve estar furtivo. Concede 2 pontos de combo.",
+        "descriptionNoStealth": "Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.",
         "specNote_subtlety": "Usada a partir de Duskveil, adiciona 1 Gloam (máx. 3). Em 3 Gloam, você pode usá-la SEM furtividade: esse uso não custa nada, gasta todos os 3 Gloam e inicia o Shadow Veil de 6 s."
       },
       "sap": {

@@ -948,6 +948,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorGain': '你获得了 {amount} 点荣誉（{reason}）。',
   'hudChrome.warfare.notEnoughHonor': '荣誉不足。',
   'hudChrome.warfare.reasons.arenaWin': '竞技场胜利',
+  'hudChrome.warfare.reasons.arenaComplete': '竞技场参战',
   'hudChrome.warfare.reasons.fiestaKill': '嘉年华击倒',
   'hudChrome.warfare.reasons.fiestaComplete': '完成嘉年华',
   'hudChrome.warfare.reasons.fiestaWin': '嘉年华胜利',
@@ -2889,6 +2890,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cheap_shot.name': '击腹拳',
   'entities.abilities.cheap_shot.description':
     '攻击目标，造成 {damage} 点伤害，并使其昏迷 4 秒。必须处于潜行状态。奖励 2 个连击点。',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    '攻击目标，造成 {damage} 点伤害，并使其昏迷 4 秒。奖励 2 个连击点。',
   'entities.abilities.sap.name': '闷棍',
   'entities.abilities.sap.description':
     '使目标无法行动，持续 8 秒。必须处于潜行状态且不在战斗中。任何伤害都会打破效果。',

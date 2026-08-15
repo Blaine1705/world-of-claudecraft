@@ -949,6 +949,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorGain': '你獲得了 {amount} 點榮譽（{reason}）。',
   'hudChrome.warfare.notEnoughHonor': '榮譽不足。',
   'hudChrome.warfare.reasons.arenaWin': '競技場勝利',
+  'hudChrome.warfare.reasons.arenaComplete': '競技場參戰',
   'hudChrome.warfare.reasons.fiestaKill': '嘉年華擊倒',
   'hudChrome.warfare.reasons.fiestaComplete': '完成嘉年華',
   'hudChrome.warfare.reasons.fiestaWin': '嘉年華勝利',
@@ -2891,6 +2892,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cheap_shot.name': '掏腹重擊',
   'entities.abilities.cheap_shot.description':
     '攻擊目標，造成 {damage} 點傷害，使其昏迷 4 秒。必須處於潛行狀態。獎勵 2 個連擊點。',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    '攻擊目標，造成 {damage} 點傷害，使其昏迷 4 秒。獎勵 2 個連擊點。',
   'entities.abilities.sap.name': '悶棍',
   'entities.abilities.sap.description':
     '使目標無法行動，持續 8 秒。必須處於潛行狀態且脫離戰鬥。任何傷害都會破除此效果。',

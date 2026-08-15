@@ -753,9 +753,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted again after registering the extracted policy as its own provenance
 // leaf. The captures remain unchanged and were not retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '3a45257ca823deae6c5971b4d9ca1be9b66f3aac9449f19408c918c9bef85812';
+  '0241574492b72cf61a20464a3b2f86af1a9ed4910f00f9b124173e832ce24534';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'e069626230576fa39ed87eeb94a78cb0ec111156f031fd8063bf2471a99db070';
+  'e42ae5e718a5e9d9d817ecfdd77d8c06e939aa1ef990bb795d13f9d127e067c3';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1740,10 +1740,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // monolith ratchet. The seal follows the swept bytes; no capture was retaken.
     // Re-pinned again after the policy became an explicit provenance leaf. The
     // performance records changed only in their swept provenance blocks.
+    // Re-minted for the merge of release/v0.38.0 into the Armory warming
+    // branch: the first-order composite follows the merged renderer.ts bytes,
+    // then this second-order performance seal follows the swept evidence
+    // bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('05ade62f3e9a75cf0cea69d7a7fd3397fef92ed5f6d79d36ab4d1a1c1e29607d');
+    ).toBe('bbcac2f81d5228ab8265425c9da87521012b186f226068879f8c764551d80da6');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

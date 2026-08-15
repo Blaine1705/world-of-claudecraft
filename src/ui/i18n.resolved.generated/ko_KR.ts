@@ -1739,6 +1739,7 @@ export const ko_KR: EnTranslations = {
       "notEnoughHonor": "명예가 부족합니다.",
       "reasons": {
         "arenaWin": "투기장 승리",
+        "arenaComplete": "투기장 참전",
         "fiestaKill": "피에스타 처치",
         "fiestaComplete": "피에스타 완료",
         "fiestaWin": "피에스타 승리",
@@ -9506,6 +9507,7 @@ export const ko_KR: EnTranslations = {
       "cheap_shot": {
         "name": "명치 가격",
         "description": "대상을 가격해 {damage}의 피해를 입히고 4초 동안 기절시킵니다. 은신 상태여야 합니다. 연계 점수 2점을 얻습니다.",
+        "descriptionNoStealth": "대상을 가격해 {damage}의 피해를 입히고 4초 동안 기절시킵니다. 연계 점수 2점을 얻습니다.",
         "specNote_subtlety": "황혼장막 상태에서 사용하면 땅거미가 1단계 쌓입니다(최대 3단계). 땅거미 3단계에서는 은신 없이 사용할 수 있습니다: 이때는 자원이 들지 않고, 땅거미 3단계를 모두 소모하며, 6초 동안 그림자에 휩싸입니다."
       },
       "sap": {

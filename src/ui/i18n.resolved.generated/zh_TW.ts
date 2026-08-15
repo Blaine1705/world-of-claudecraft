@@ -1739,6 +1739,7 @@ export const zh_TW: EnTranslations = {
       "notEnoughHonor": "榮譽不足。",
       "reasons": {
         "arenaWin": "競技場勝利",
+        "arenaComplete": "競技場參戰",
         "fiestaKill": "嘉年華擊倒",
         "fiestaComplete": "完成嘉年華",
         "fiestaWin": "嘉年華勝利",
@@ -9506,6 +9507,7 @@ export const zh_TW: EnTranslations = {
       "cheap_shot": {
         "name": "掏腹重擊",
         "description": "攻擊目標，造成 {damage} 點傷害，使其昏迷 4 秒。必須處於潛行狀態。獎勵 2 個連擊點。",
+        "descriptionNoStealth": "攻擊目標，造成 {damage} 點傷害，使其昏迷 4 秒。獎勵 2 個連擊點。",
         "specNote_subtlety": "自暮紗中使用時累積 1 層幽暝（最多 3 層）。幽暝達 3 層時，可在明處使用：那一次施展不消耗資源，耗盡全部 3 層幽暝，並開啟 6 秒的暗影纏身。"
       },
       "sap": {

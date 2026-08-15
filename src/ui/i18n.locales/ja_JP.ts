@@ -976,6 +976,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorGain': '名誉を {amount} 獲得しました（{reason}）。',
   'hudChrome.warfare.notEnoughHonor': '名誉が足りません。',
   'hudChrome.warfare.reasons.arenaWin': 'アリーナ勝利',
+  'hudChrome.warfare.reasons.arenaComplete': 'アリーナ参戦',
   'hudChrome.warfare.reasons.fiestaKill': 'フィエスタ撃破',
   'hudChrome.warfare.reasons.fiestaComplete': 'フィエスタ完遂',
   'hudChrome.warfare.reasons.fiestaWin': 'フィエスタ勝利',
@@ -3015,6 +3016,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cheap_shot.name': 'みぞおち強打',
   'entities.abilities.cheap_shot.description':
     '対象を打って{damage}ダメージを与え、4秒間スタンさせます。ステルス状態でなければなりません。コンボポイントを2獲得します。',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    '対象を打って{damage}ダメージを与え、4秒間スタンさせます。コンボポイントを2獲得します。',
   'entities.abilities.sap.name': 'サップ',
   'entities.abilities.sap.description':
     '対象を8秒間行動不能にします。ステルス状態かつ戦闘外でなければなりません。ダメージを受けると効果が切れます。',

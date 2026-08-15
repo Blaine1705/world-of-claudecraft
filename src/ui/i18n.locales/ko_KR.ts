@@ -974,6 +974,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorGain': '명예를 {amount} 획득했습니다({reason}).',
   'hudChrome.warfare.notEnoughHonor': '명예가 부족합니다.',
   'hudChrome.warfare.reasons.arenaWin': '투기장 승리',
+  'hudChrome.warfare.reasons.arenaComplete': '투기장 참전',
   'hudChrome.warfare.reasons.fiestaKill': '피에스타 처치',
   'hudChrome.warfare.reasons.fiestaComplete': '피에스타 완료',
   'hudChrome.warfare.reasons.fiestaWin': '피에스타 승리',
@@ -2989,6 +2990,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cheap_shot.name': '명치 가격',
   'entities.abilities.cheap_shot.description':
     '대상을 가격해 {damage}의 피해를 입히고 4초 동안 기절시킵니다. 은신 상태여야 합니다. 연계 점수 2점을 얻습니다.',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    '대상을 가격해 {damage}의 피해를 입히고 4초 동안 기절시킵니다. 연계 점수 2점을 얻습니다.',
   'entities.abilities.sap.name': '관자놀이 가격',
   'entities.abilities.sap.description':
     '대상을 8초 동안 무력화합니다. 은신 상태이며 전투 중이 아니어야 합니다. 피해를 받으면 효과가 해제됩니다.',

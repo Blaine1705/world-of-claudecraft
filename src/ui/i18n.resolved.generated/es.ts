@@ -1739,6 +1739,7 @@ export const es: EnTranslations = {
       "notEnoughHonor": "No tienes suficiente Honor.",
       "reasons": {
         "arenaWin": "Victoria en la arena",
+        "arenaComplete": "Arena bout fought",
         "fiestaKill": "Derribo en Fiesta",
         "fiestaComplete": "Fiesta completada",
         "fiestaWin": "Victoria en Fiesta",
@@ -9506,6 +9507,7 @@ export const es: EnTranslations = {
       "cheap_shot": {
         "name": "Golpe al Vientre",
         "description": "Golpea al objetivo por {damage} de daño y lo aturde durante 4 s. Debes estar en sigilo. Otorga 2 puntos de combo.",
+        "descriptionNoStealth": "Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.",
         "specNote_subtlety": "Usada desde el Velo Crepuscular, añade 1 de Penumbra (máx. 3). Con 3 de Penumbra puedes usarla SIN sigilo: ese uso no cuesta nada, gasta toda la Penumbra y activa el Velo de Sombras de 6 s."
       },
       "sap": {

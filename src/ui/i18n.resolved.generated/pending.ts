@@ -11,28 +11,40 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name"
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "es_ES": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name"
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "fr_FR": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name"
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "fr_CA": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name"
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "en_CA": [],
   "it_IT": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name"
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "de_DE": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name"
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -40,39 +52,57 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name"
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name"
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "nl_NL": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name"
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "pl_PL": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name"
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "id_ID": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name"
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "tr_TR": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name"
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "sv_SE": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name"
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "vi_VN": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name"
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "da_DK": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name"
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
+    "hudChrome.warfare.reasons.arenaComplete"
   ]
 };

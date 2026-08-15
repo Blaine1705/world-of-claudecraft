@@ -986,6 +986,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorGain': 'Вы получаете {amount} очк. чести ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Недостаточно чести.',
   'hudChrome.warfare.reasons.arenaWin': 'Победа на арене',
+  'hudChrome.warfare.reasons.arenaComplete': 'Бой на арене',
   'hudChrome.warfare.reasons.fiestaKill': 'Устранение на Фиесте',
   'hudChrome.warfare.reasons.fiestaComplete': 'Завершение Фиесты',
   'hudChrome.warfare.reasons.fiestaWin': 'Победа на Фиесте',
@@ -3040,6 +3041,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cheap_shot.name': 'Удар под дых',
   'entities.abilities.cheap_shot.description':
     'Бьет цель, нанося {damage} ед. урона и оглушая ее на 4 сек. Требуется незаметность. Дает 2 очка серии.',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    'Бьет цель, нанося {damage} ед. урона и оглушая ее на 4 сек. Дает 2 очка серии.',
   'entities.abilities.sap.name': 'Ошеломление',
   'entities.abilities.sap.description':
     'Выводит цель из строя на 8 сек. Требуется незаметность и нахождение вне боя. Любой урон прерывает эффект.',

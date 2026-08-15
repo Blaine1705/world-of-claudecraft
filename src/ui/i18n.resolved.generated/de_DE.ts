@@ -1739,6 +1739,7 @@ export const de_DE: EnTranslations = {
       "notEnoughHonor": "Nicht genug Ehre.",
       "reasons": {
         "arenaWin": "Arenasieg",
+        "arenaComplete": "Arena bout fought",
         "fiestaKill": "Fiesta-Ausschaltung",
         "fiestaComplete": "Fiesta abgeschlossen",
         "fiestaWin": "Fiesta-Sieg",
@@ -9506,6 +9507,7 @@ export const de_DE: EnTranslations = {
       "cheap_shot": {
         "name": "Magenhieb",
         "description": "Trefft das Ziel für {damage} Schaden und betäubt es 4 Sek. lang. Erfordert Verstohlenheit. Gewährt 2 Combopunkte.",
+        "descriptionNoStealth": "Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.",
         "specNote_subtlety": "Aus Duskveil eingesetzt fügt dies 1 Dämmer hinzu (max. 3). Bei 3 Dämmer könnt Ihr es OHNE Verstohlenheit einsetzen: Dieser Einsatz kostet nichts, verbraucht alle 3 Dämmer und startet den 6 Sek. langen Schattenschleier."
       },
       "sap": {

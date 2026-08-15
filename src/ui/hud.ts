@@ -151,14 +151,11 @@ import {
 } from '../world_api';
 import {
   type AbilityScaling,
-  abilityBuffValue,
   abilityDamageBonus,
-  abilityDurationValue,
-  abilityOverTimeEffect,
   abilityPrimaryEffect,
   abilitySecondaryEffect,
-  abilityTemporalHourglassValues,
 } from './ability_damage';
+import { abilityDisplayDescription, formatAbilityNumber } from './ability_description';
 import { abilityDisplayName, abilityDisplayNameFromSource } from './ability_display_name';
 import { ArenaWindow } from './arena_window';
 import { auraDisplayNameForHud, auraDisplayNameFromSource } from './aura_display_name';
@@ -290,7 +287,6 @@ import {
   salvageResultToast,
 } from './enchanting_view';
 import {
-  type AbilitySpecNoteField,
   classDisplayName,
   dungeonDisplayName,
   itemDisplayName,
@@ -339,7 +335,10 @@ import {
   shouldShowHealLanding,
 } from './heal_landing_feedback_core';
 import { honorFloatText } from './honor_float_view';
-import { abilityRequirementKeys } from './hud/action_bar/ability_requirement_keys';
+import {
+  type AbilityRequirementResolve,
+  abilityRequirementKeys,
+} from './hud/action_bar/ability_requirement_keys';
 import {
   type ActionBarBindState,
   actionBarBindEnter,
@@ -1071,6 +1070,7 @@ const MOTD_RESULT_KEYS: Record<MotdResultCode, TranslationKey> = {
 };
 const HONOR_REASON_KEYS: Record<HonorReason, TranslationKey> = {
   arena_win: 'hudChrome.warfare.reasons.arenaWin',
+  arena_complete: 'hudChrome.warfare.reasons.arenaComplete',
   fiesta_kill: 'hudChrome.warfare.reasons.fiestaKill',
   fiesta_complete: 'hudChrome.warfare.reasons.fiestaComplete',
   fiesta_win: 'hudChrome.warfare.reasons.fiestaWin',
@@ -6593,7 +6593,10 @@ export class Hud {
         });
       }
     }
-    const requirements = abilityRequirementLines(a, this.sim.talents.spec);
+    // Pass the RESOLVED ability, not just its def: a talent that retires a
+    // requirement (Cheap Trick on Gut Punch) must retire its line with it, the
+    // same way the resolved cost / cast / cooldown above beat the def's.
+    const requirements = abilityRequirementLines(a, this.sim.talents.spec, res);
     if (requirements.length) {
       html += requirements.map((line) => `<div class="tt-sub">${esc(line)}</div>`).join('');
     }
@@ -16658,7 +16661,6 @@ export class Hud {
       allClasses: ALL_CLASSES,
       skinCount,
       cardPoses: CARD_POSES,
-      armorySkinIds: this.dailyRewardsWindow.armoryPrewarmSkinIds(),
       includeCharFamily,
       renderCharShell: () => {
         if (!this.charPreview) this.charWindow.render();
@@ -16670,11 +16672,6 @@ export class Hud {
       // paced unit never books the 43 to 201 ms cold-capture block.
       renderPortrait: (portraitClass, skin, framing) =>
         prewarmPlayerPortrait(portraitClass as PlayerClass, skin, framing),
-      prewarmArmorySkin: (skinId, armoryMode) =>
-        this.dailyRewardsWindow.prewarmArmoryPreviewSkins([skinId], [armoryMode], {
-          keepWarmupBuffer: true,
-        }),
-      finishArmoryPrewarm: () => this.dailyRewardsWindow.finishArmoryPreviewPrewarm(),
     });
   }
 
@@ -16721,8 +16718,7 @@ export class Hud {
     this.previewPrewarmHandle?.cancel();
     const handle = runPreviewPrewarmSchedule(this.postEntryPreviewPrewarmUnits(includeCharFamily), {
       enqueue: (label, run) => this.renderer.queueSecondaryPreviewPrewarm(label, run),
-      isFamilyBusy: (family) =>
-        family === 'char' ? this.isCharPreviewSurfaceVisible() : this.dailyRewardsWindow.isOpen,
+      isFamilyBusy: () => this.isCharPreviewSurfaceVisible(),
       // Pause while the FPS governor reports a struggling frame; the core's
       // poll cap keeps ambient pressure from starving the warmup forever.
       hasHeadroom: () => this.renderer.perfStats().renderBudget.mode !== 'degrading',
@@ -16760,10 +16756,11 @@ export class Hud {
     if (this.restoreCharPreviewAfterGraphicsRebuild) this.charWindow.renderIfOpen();
     this.restoreCharPreviewAfterGraphicsRebuild = false;
     this.dailyRewardsWindow.restoreArmoryPreviewAfterGraphicsRebuild();
-    // Fresh contexts start cold; re-run the paced schedule so armory and
-    // portrait first-open stay covered after a rebuild exactly like they are
-    // after boot. The char family (the shell plus its dependent skin/pose
-    // units) is excluded here: unlike boot, this restart runs with no curtain
+    // Fresh contexts start cold; re-run the paced schedule so the portrait
+    // caches stay covered after a rebuild exactly like they are after boot.
+    // (The armory is not in that schedule: it warms per inspected card.)
+    // The char family (the shell plus its dependent skin/pose units) is
+    // excluded here: unlike boot, this restart runs with no curtain
     // up (resetGraphicsPreviewContexts already dropped it before this point),
     // so building the ~700 ms paperdoll shell + its secondary WebGL context as
     // a schedule unit would hitch a live frame, the exact stall class the
@@ -19080,60 +19077,6 @@ function describeAbilitySummary(
   return parts.join(' · ');
 }
 
-// Fills every description placeholder from the RESOLVED ability: {damage} ($d)
-// the primary hit, {overTime} ($o) a hybrid's dot/hot total, {buff} ($b) the
-// first buff's value, {duration} ($t) the first timed effect's duration. All are
-// rank- and talent-resolved, so the prose can never drift from what a cast does.
-function abilityDisplayDescription(
-  res: ResolvedAbility,
-  damageText: string,
-  scaling?: AbilityScaling,
-  spec?: string | null,
-): string {
-  const buff = abilityBuffValue(res);
-  const duration = abilityDurationValue(res);
-  const hourglass = abilityTemporalHourglassValues(res);
-  // {rage} splices the RESOLVED gainResource total, so a talent that raises the
-  // granted amount (Blood Offering on Blood Toll) shows in the tooltip.
-  const rageGained = res.effects.reduce(
-    (sum, eff) => sum + (eff.type === 'gainResource' ? eff.amount : 0),
-    0,
-  );
-  const rageText = rageGained > 0 ? formatAbilityNumber(rageGained) : '';
-  const text = tEntity({
-    kind: 'ability',
-    id: res.def.id,
-    field: 'description',
-    values: {
-      damage: damageText,
-      overTime: abilityOverTimeText(res, scaling),
-      buff: buff === null ? '' : formatAbilityNumber(buff),
-      duration: duration === null ? '' : formatAbilityNumber(duration),
-      healing: hourglass === null ? '' : formatAbilityNumber(hourglass.healing),
-      selfCooldownRecovery:
-        hourglass === null ? '' : formatAbilityNumber(hourglass.selfCooldownRecovery),
-      allyCooldownRecovery:
-        hourglass === null ? '' : formatAbilityNumber(hourglass.allyCooldownRecovery),
-      hostilePveDuration:
-        hourglass === null ? '' : formatAbilityNumber(hourglass.hostilePveDuration),
-      hostilePvpDuration:
-        hourglass === null ? '' : formatAbilityNumber(hourglass.hostilePvpDuration),
-      groundDuration: hourglass === null ? '' : formatAbilityNumber(hourglass.groundDuration),
-      rage: rageText,
-    },
-  });
-  // Spec-aware teaching line: a shared button explains its interaction ONLY
-  // for the player's current spec, so a new player never reads another
-  // spec's rules on their own tooltip.
-  const note = spec ? res.def.specNotes?.[spec] : undefined;
-  if (!note) return text;
-  return `${text} ${tEntity({
-    kind: 'ability',
-    id: res.def.id,
-    field: `specNote_${spec}` as AbilitySpecNoteField,
-  })}`;
-}
-
 function itemDisplayNameFromSource(name: string): string {
   const item = Object.values(ITEMS).find((candidate) => candidate.name === name);
   return item ? itemDisplayName(item) : name;
@@ -19250,10 +19193,6 @@ function parseSimMoney(text: string): number | null {
   return matched ? copper : null;
 }
 
-function formatAbilityNumber(value: number): string {
-  return formatNumber(value, { maximumFractionDigits: 1 });
-}
-
 function abilityRangeLine(def: AbilityDef): string | null {
   if (def.range <= 0) return null;
   if (def.minRange !== undefined) {
@@ -19300,8 +19239,12 @@ function abilityCastLine(known: ResolvedAbility, spellHaste = 0): string {
 
 // Thin i18n mapper over the pure resolver (ability_requirement_keys.ts), which
 // owns the truth table incl. the Skulduggery-only stealth-bypass line.
-export function abilityRequirementLines(def: AbilityDef, spec?: string | null): string[] {
-  return abilityRequirementKeys(def, spec).map((req) => {
+export function abilityRequirementLines(
+  def: AbilityDef,
+  spec?: string | null,
+  resolved?: AbilityRequirementResolve,
+): string[] {
+  return abilityRequirementKeys(def, spec, resolved).map((req) => {
     switch (req.key) {
       case 'requiresForm':
         if (req.form) {
@@ -19439,26 +19382,6 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
     default:
       return '';
   }
-}
-
-// Builds the `$o` over-time string (a hybrid's dot/hot TOTAL) the same way
-// abilityEffectText builds `$d`, including the "(+N)" scaling callout (which the
-// bonus helper zeroes for hybrid riders, matching combat's no-double-dip rule).
-function abilityOverTimeText(res: ResolvedAbility, scaling?: AbilityScaling): string {
-  const eff = abilityOverTimeEffect(res);
-  if (!eff) return '';
-  const b = scaling ? abilityDamageBonus(res, eff, scaling) : 0;
-  const bonus =
-    b > 0 ? ` ${t('hudChrome.abilityScaling.bonus', { value: formatAbilityNumber(b) })}` : '';
-  if (eff.type === 'dot' && eff.perCombo !== undefined) {
-    return (
-      t('abilityUi.tooltip.finisherDamage', {
-        base: formatAbilityNumber(eff.total),
-        perCombo: formatAbilityNumber(eff.perCombo),
-      }) + bonus
-    );
-  }
-  return formatAbilityNumber(eff.total) + bonus;
 }
 
 function abilityAmountRange(min: number, max: number): string {
