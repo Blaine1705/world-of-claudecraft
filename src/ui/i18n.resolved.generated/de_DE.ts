@@ -1739,7 +1739,7 @@ export const de_DE: EnTranslations = {
       "notEnoughHonor": "Nicht genug Ehre.",
       "reasons": {
         "arenaWin": "Arenasieg",
-        "arenaComplete": "Arena bout fought",
+        "arenaComplete": "Arenakampf ausgetragen",
         "fiestaKill": "Fiesta-Ausschaltung",
         "fiestaComplete": "Fiesta abgeschlossen",
         "fiestaWin": "Fiesta-Sieg",
@@ -1846,7 +1846,7 @@ export const de_DE: EnTranslations = {
       "joinChannels": "Tipp: Gebt /join world oder /join lfg ein, um mit Spielern in der ganzen Welt zu chatten."
     },
     "itemHeroicTag": "[HEROISCH]",
-    "itemHeroicLabel": "Heroic",
+    "itemHeroicLabel": "Heroisch",
     "itemSoulbound": "Seelengebunden",
     "itemUniqueEquipped": "Einzigartig (ausgerüstet)",
     "itemSet": {
@@ -10025,6 +10025,10 @@ export const de_DE: EnTranslations = {
       "growl": {
         "name": "Bedrohen",
         "description": "Knurrt das Ziel an: Eure Bedrohung steigt auf die seines meistgehassten Gegners und es wird 3 Sek. lang gezwungen, euch anzugreifen. Nur in Bruin Form."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Wolfsgestalt",

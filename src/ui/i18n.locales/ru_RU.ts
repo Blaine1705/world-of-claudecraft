@@ -3221,6 +3221,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.name': 'Костолом',
   'entities.abilities.maul.description':
     'Свирепая атака, увеличивающая урон в ближнем бою на {damage} и создающая много угрозы. Срабатывает при следующем взмахе. Только в облике бурого.',
+  'entities.abilities.challenging_roar.description':
+    'Грозный рев: каждый враг в пределах 10 м получает провокацию, его угроза к вам повышается до уровня самого ненавистного ему врага, и он вынужден атаковать вас 3 сек. Только в облике бурого.',
+  'entities.abilities.challenging_roar.name': 'Грозный рев',
   'entities.abilities.growl.name': 'Устрашение',
   'entities.abilities.growl.description':
     'Рычит на цель: ваша угроза повышается до уровня самого ненавистного ей врага, и она вынуждена атаковать вас 3 сек. Только в облике бурого.',

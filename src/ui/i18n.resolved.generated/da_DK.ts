@@ -1739,7 +1739,7 @@ export const da_DK: EnTranslations = {
       "notEnoughHonor": "Ikke nok Ære.",
       "reasons": {
         "arenaWin": "Arenasejr",
-        "arenaComplete": "Arena bout fought",
+        "arenaComplete": "Arenakamp udkæmpet",
         "fiestaKill": "Fiesta-nedlæggelse",
         "fiestaComplete": "Fiesta gennemført",
         "fiestaWin": "Fiesta-sejr",
@@ -1846,7 +1846,7 @@ export const da_DK: EnTranslations = {
       "joinChannels": "Tip: skriv /join world eller /join lfg for at chatte med spillere på tværs af verdenen."
     },
     "itemHeroicTag": "[HEROISK]",
-    "itemHeroicLabel": "Heroic",
+    "itemHeroicLabel": "Heroisk",
     "itemSoulbound": "Sjælebundet",
     "itemUniqueEquipped": "Unikt Udrustet",
     "itemSet": {
@@ -10025,6 +10025,10 @@ export const da_DK: EnTranslations = {
       "growl": {
         "name": "Trussel",
         "description": "Knurrer ad målet: din trussel stiger til at matche dets mest forhadte fjende, og det tvinges til at angribe dig i 3 sek. Kun i Bruin-form."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Ulveform",

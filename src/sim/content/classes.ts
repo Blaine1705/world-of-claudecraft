@@ -571,7 +571,9 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'bear_charge',
       'maul',
       'growl',
+      'challenging_roar',
       'demoralizing_roar',
+      'frenzied_regeneration',
       'cat_form',
       'prowl',
       'rake',
@@ -6328,6 +6330,28 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'taunt' }],
     description:
       'Menaces the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec. Bruin Form only.',
+  },
+  // Bruin Form's aoe taunt, the fan-out of Menace exactly as Defiant Bellow is
+  // the fan-out of Goad on the warrior: every hostile mob in radius goes
+  // through the SHARED applyTaunt entry, so threat lifts to the top of each
+  // table and the mob is forced onto the druid. Form-gated rather than
+  // spec-gated, matching every other Bruin ability (Menace, Bonecrush,
+  // Sweeping Claws): the form IS the tank commitment for a druid.
+  challenging_roar: {
+    id: 'challenging_roar',
+    name: 'Baleful Roar',
+    class: 'druid',
+    learnLevel: 12,
+    cost: 10,
+    castTime: 0,
+    cooldown: 60,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    requiresForm: 'bear',
+    effects: [{ type: 'aoeTaunt', radius: 10 }],
+    description:
+      'A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only.',
   },
   demoralizing_roar: {
     id: 'demoralizing_roar',

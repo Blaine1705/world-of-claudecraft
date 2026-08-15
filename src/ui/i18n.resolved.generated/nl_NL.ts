@@ -1739,7 +1739,7 @@ export const nl_NL: EnTranslations = {
       "notEnoughHonor": "Niet genoeg eer.",
       "reasons": {
         "arenaWin": "Arena-overwinning",
-        "arenaComplete": "Arena bout fought",
+        "arenaComplete": "arenagevecht uitgevochten",
         "fiestaKill": "Fiesta-uitschakeling",
         "fiestaComplete": "Fiesta voltooid",
         "fiestaWin": "Fiesta-overwinning",
@@ -1846,7 +1846,7 @@ export const nl_NL: EnTranslations = {
       "joinChannels": "Tip: typ /join world of /join lfg om te chatten met spelers over de hele wereld."
     },
     "itemHeroicTag": "[HELDHAFTIG]",
-    "itemHeroicLabel": "Heroic",
+    "itemHeroicLabel": "Heroïsch",
     "itemSoulbound": "Zielsgebonden",
     "itemUniqueEquipped": "Uniek-Uitgerust",
     "itemSet": {
@@ -10025,6 +10025,10 @@ export const nl_NL: EnTranslations = {
       "growl": {
         "name": "Bedreigen",
         "description": "Gromt naar het doelwit: je dreiging stijgt tot het niveau van zijn meest gehate vijand en het wordt gedwongen je 3 sec aan te vallen. Alleen in Bruingedaante."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Wolfsgedaante",

@@ -1739,7 +1739,7 @@ export const pl_PL: EnTranslations = {
       "notEnoughHonor": "Za mało Honoru.",
       "reasons": {
         "arenaWin": "Zwycięstwo na arenie",
-        "arenaComplete": "Arena bout fought",
+        "arenaComplete": "Stoczono pojedynek na arenie",
         "fiestaKill": "Upadek Fiesty",
         "fiestaComplete": "Fiesta zakończona",
         "fiestaWin": "Zwycięstwo Fiesty",
@@ -1846,7 +1846,7 @@ export const pl_PL: EnTranslations = {
       "joinChannels": "Wskazówka: wpisz /join world lub /join lfg, aby rozmawiać z graczami z całego świata."
     },
     "itemHeroicTag": "[HEROICZNY]",
-    "itemHeroicLabel": "Heroic",
+    "itemHeroicLabel": "Heroiczny",
     "itemSoulbound": "Związany z duszą",
     "itemUniqueEquipped": "Unikatowo zakładany",
     "itemSet": {
@@ -10025,6 +10025,10 @@ export const pl_PL: EnTranslations = {
       "growl": {
         "name": "Groźba",
         "description": "Warczy na cel: twoje zagrożenie wzrasta do poziomu jego najbardziej znienawidzonego wroga, a cel zostaje zmuszony do atakowania cię przez 3 sek. Tylko w postaci Bruina."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Postać wilka",

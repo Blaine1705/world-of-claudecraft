@@ -1739,7 +1739,7 @@ export const it_IT: EnTranslations = {
       "notEnoughHonor": "Onore insufficiente.",
       "reasons": {
         "arenaWin": "Vittoria nell'Arena",
-        "arenaComplete": "Arena bout fought",
+        "arenaComplete": "incontro nell'arena disputato",
         "fiestaKill": "Abbattimento della Fiesta",
         "fiestaComplete": "Fiesta completata",
         "fiestaWin": "Vittoria nella Fiesta",
@@ -1846,7 +1846,7 @@ export const it_IT: EnTranslations = {
       "joinChannels": "Suggerimento: digita /join world o /join lfg per chattare con i giocatori di tutto il mondo."
     },
     "itemHeroicTag": "[EROICO]",
-    "itemHeroicLabel": "Heroic",
+    "itemHeroicLabel": "Eroico",
     "itemSoulbound": "Vincolato all’anima",
     "itemUniqueEquipped": "Unico Equipaggiato",
     "itemSet": {
@@ -10025,6 +10025,10 @@ export const it_IT: EnTranslations = {
       "growl": {
         "name": "Intimidazione",
         "description": "Ringhia al bersaglio: la tua minaccia sale fino a eguagliare quella del suo nemico più odiato e lo costringe ad attaccarti per 3 s. Solo in Forma di Bruin."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Forma del Lupo",

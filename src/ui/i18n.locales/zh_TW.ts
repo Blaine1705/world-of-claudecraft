@@ -3069,6 +3069,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.name': '碎骨擊',
   'entities.abilities.maul.description':
     '一次猛擊攻擊，使近戰傷害提高 {damage}，並產生大量威脅值。在你的下一次揮擊時觸發。僅限巨熊形態。',
+  'entities.abilities.challenging_roar.description':
+    '發出挑釁的咆哮：10 碼內的每個敵人都被嘲諷，其對你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。僅限巨熊形態。',
+  'entities.abilities.challenging_roar.name': '挑釁咆哮',
   'entities.abilities.growl.name': '威嚇',
   'entities.abilities.growl.description':
     '對目標低吼：你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。僅限巨熊形態。',

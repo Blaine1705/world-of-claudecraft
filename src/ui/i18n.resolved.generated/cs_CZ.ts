@@ -1739,7 +1739,7 @@ export const cs_CZ: EnTranslations = {
       "notEnoughHonor": "Nemáš dost cti.",
       "reasons": {
         "arenaWin": "Vítězství v aréně",
-        "arenaComplete": "Arena bout fought",
+        "arenaComplete": "Odehrán souboj v aréně",
         "fiestaKill": "Vyřazení ve Fiestě",
         "fiestaComplete": "Dokončení Fiesty",
         "fiestaWin": "Vítězství ve Fiestě",
@@ -1846,7 +1846,7 @@ export const cs_CZ: EnTranslations = {
       "joinChannels": "Tip: napiš /join world nebo /join lfg a chatuj s hráči napříč světem."
     },
     "itemHeroicTag": "[HRDINSKÉ]",
-    "itemHeroicLabel": "Heroic",
+    "itemHeroicLabel": "Hrdinský",
     "itemSoulbound": "Vázáno na duši",
     "itemUniqueEquipped": "Jedinečně nositelné",
     "itemSet": {
@@ -10025,6 +10025,10 @@ export const cs_CZ: EnTranslations = {
       "growl": {
         "name": "Hrozba",
         "description": "Zavrčí na cíl: tvoje hrozba se zvýší na úroveň jeho nejnenáviděnějšího nepřítele a cíl je donucen tě 3 s útočit. Pouze v medvědí podobě."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Vlčí podoba",

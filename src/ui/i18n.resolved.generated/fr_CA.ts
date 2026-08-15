@@ -1739,7 +1739,7 @@ export const fr_CA: EnTranslations = {
       "notEnoughHonor": "Vous n’avez pas assez d’honneur.",
       "reasons": {
         "arenaWin": "Victoire en arène",
-        "arenaComplete": "Arena bout fought",
+        "arenaComplete": "combat en arène mené",
         "fiestaKill": "Élimination en Fiesta",
         "fiestaComplete": "Fiesta terminée",
         "fiestaWin": "Victoire en Fiesta",
@@ -1846,7 +1846,7 @@ export const fr_CA: EnTranslations = {
       "joinChannels": "Conseil : tapez /join world ou /join lfg pour discuter avec les joueurs du monde entier."
     },
     "itemHeroicTag": "[HÉROÏQUE]",
-    "itemHeroicLabel": "Heroic",
+    "itemHeroicLabel": "Héroïque",
     "itemSoulbound": "Lié à l’âme",
     "itemUniqueEquipped": "Unique-équipé",
     "itemSet": {
@@ -10025,6 +10025,10 @@ export const fr_CA: EnTranslations = {
       "growl": {
         "name": "Menacer",
         "description": "Gronde la cible : votre menace rejoint celle de son ennemi le plus haï et elle est forcée de vous attaquer pendant 3 s. Forme de Bruin uniquement."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Forme de loup",

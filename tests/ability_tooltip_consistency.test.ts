@@ -62,6 +62,8 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   taunt: [3],
   holy_taunt: [3],
   growl: [3],
+  // Baleful Roar cites the same compel window plus its own aoeTaunt radius.
+  challenging_roar: [3, 10],
   // "attack power +8 plus 2 per level": the cat-form AP constants in
   // recalcPlayerStats (entity.ts), not effect fields.
   cat_form: [8, 2],

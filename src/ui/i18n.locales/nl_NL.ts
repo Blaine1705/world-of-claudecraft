@@ -10410,6 +10410,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleLoginCta': 'Ga verder met Apple',
   'hudChrome.dailyRewards.reason.banned':
     'Je bent uitgesloten van dagelijkse beloningen. Reden: {reason}',
+  'hudChrome.itemHeroicLabel': 'Heroïsch',
   'hudChrome.itemHeroicTag': '[HELDHAFTIG]',
   'hudChrome.itemSoulbound': 'Zielsgebonden',
   'hudChrome.keybinds.categoryPet': 'Huisdier',
@@ -10713,6 +10714,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} Eer',
   'hudChrome.warfare.honorGain': 'Je krijgt {amount} eer ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Niet genoeg eer.',
+  'hudChrome.warfare.reasons.arenaComplete': 'arenagevecht uitgevochten',
   'hudChrome.warfare.reasons.arenaWin': 'Arena-overwinning',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta voltooid',
   'hudChrome.warfare.reasons.fiestaKill': 'Fiesta-uitschakeling',

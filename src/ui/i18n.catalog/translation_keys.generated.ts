@@ -1294,6 +1294,8 @@ export type TranslationKeyFlat =
   | 'entities.abilities.chain_heal.name'
   | 'entities.abilities.chain_lightning.description'
   | 'entities.abilities.chain_lightning.name'
+  | 'entities.abilities.challenging_roar.description'
+  | 'entities.abilities.challenging_roar.name'
   | 'entities.abilities.chaos_bolt.description'
   | 'entities.abilities.chaos_bolt.name'
   | 'entities.abilities.charge.description'

@@ -10471,6 +10471,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleLoginCta': 'Kontynuuj przez Apple',
   'hudChrome.dailyRewards.reason.banned':
     'Masz zakaz udziału w codziennych nagrodach. Powód: {reason}',
+  'hudChrome.itemHeroicLabel': 'Heroiczny',
   'hudChrome.itemHeroicTag': '[HEROICZNY]',
   'hudChrome.itemSoulbound': 'Związany z duszą',
   'hudChrome.keybinds.categoryPet': 'Zwierzę',
@@ -10843,6 +10844,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} Honor',
   'hudChrome.warfare.honorGain': 'Otrzymujesz {amount} Honor ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Za mało Honoru.',
+  'hudChrome.warfare.reasons.arenaComplete': 'Stoczono pojedynek na arenie',
   'hudChrome.warfare.reasons.arenaWin': 'Zwycięstwo na arenie',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta zakończona',
   'hudChrome.warfare.reasons.fiestaKill': 'Upadek Fiesty',

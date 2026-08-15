@@ -1739,7 +1739,7 @@ export const id_ID: EnTranslations = {
       "notEnoughHonor": "Tidak cukup Kehormatan.",
       "reasons": {
         "arenaWin": "Kemenangan arena",
-        "arenaComplete": "Arena bout fought",
+        "arenaComplete": "Pertarungan arena dijalani",
         "fiestaKill": "Eliminasi Fiesta",
         "fiestaComplete": "Fiesta selesai",
         "fiestaWin": "Kemenangan Fiesta",
@@ -1846,7 +1846,7 @@ export const id_ID: EnTranslations = {
       "joinChannels": "Tips: ketik /join world atau /join lfg untuk mengobrol dengan pemain di seluruh dunia."
     },
     "itemHeroicTag": "[HEROIK]",
-    "itemHeroicLabel": "Heroic",
+    "itemHeroicLabel": "Heroik",
     "itemSoulbound": "Terikat Jiwa",
     "itemUniqueEquipped": "Unik-Dipakai",
     "itemSet": {
@@ -10025,6 +10025,10 @@ export const id_ID: EnTranslations = {
       "growl": {
         "name": "Gertakan",
         "description": "Menggeram pada target: ancamanmu naik menyamai musuh yang paling dibencinya dan ia terdorong untuk menyerangmu selama 3 detik. Hanya dalam Wujud Bruin."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Wujud Serigala",

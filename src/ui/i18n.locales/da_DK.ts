@@ -10331,6 +10331,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleLoginCta': 'Fortsæt med Apple',
   'hudChrome.dailyRewards.reason.banned':
     'Du er udelukket fra daglige belønninger. Årsag: {reason}',
+  'hudChrome.itemHeroicLabel': 'Heroisk',
   'hudChrome.itemHeroicTag': '[HEROISK]',
   'hudChrome.itemSoulbound': 'Sjælebundet',
   'hudChrome.keybinds.categoryPet': 'Kæledyr',
@@ -10631,6 +10632,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} Ære',
   'hudChrome.warfare.honorGain': 'Du opnår {amount} Ære ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Ikke nok Ære.',
+  'hudChrome.warfare.reasons.arenaComplete': 'Arenakamp udkæmpet',
   'hudChrome.warfare.reasons.arenaWin': 'Arenasejr',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta gennemført',
   'hudChrome.warfare.reasons.fiestaKill': 'Fiesta-nedlæggelse',

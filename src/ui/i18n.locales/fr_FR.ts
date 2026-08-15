@@ -2877,6 +2877,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} points d’honneur',
   'hudChrome.warfare.honorGain': 'Vous gagnez {amount} points d’honneur ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Vous n’avez pas assez d’honneur.',
+  'hudChrome.warfare.reasons.arenaComplete': 'combat en arène mené',
   'hudChrome.warfare.reasons.arenaWin': 'Victoire en arène',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta terminée',
   'hudChrome.warfare.reasons.fiestaKill': 'Élimination en Fiesta',
@@ -11126,6 +11127,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleLoginCta': 'Continuer avec Apple',
   'hudChrome.dailyRewards.reason.banned':
     'Vous êtes exclu des Récompenses quotidiennes. Motif : {reason}',
+  'hudChrome.itemHeroicLabel': 'Héroïque',
   'hudChrome.itemHeroicTag': '[HÉROÏQUE]',
   'hudChrome.itemSoulbound': 'Lié à l’âme',
   'hudChrome.keybinds.categoryPet': 'Familier',

@@ -1739,7 +1739,7 @@ export const sv_SE: EnTranslations = {
       "notEnoughHonor": "Inte tillräckligt med heder.",
       "reasons": {
         "arenaWin": "Arenaseger",
-        "arenaComplete": "Arena bout fought",
+        "arenaComplete": "arenamatch utkämpad",
         "fiestaKill": "Fiesta-nedtagning",
         "fiestaComplete": "Fiesta avklarad",
         "fiestaWin": "Fiesta-seger",
@@ -1846,7 +1846,7 @@ export const sv_SE: EnTranslations = {
       "joinChannels": "Tips: skriv /join world eller /join lfg för att chatta med spelare över hela världen."
     },
     "itemHeroicTag": "[HEROISK]",
-    "itemHeroicLabel": "Heroic",
+    "itemHeroicLabel": "Heroisk",
     "itemSoulbound": "Själabunden",
     "itemUniqueEquipped": "Unikt utrustad",
     "itemSet": {
@@ -10025,6 +10025,10 @@ export const sv_SE: EnTranslations = {
       "growl": {
         "name": "Hota",
         "description": "Morrar åt målet: ditt hot stiger till nivån hos dess mest hatade fiende och den tvingas anfalla dig i 3 sek. Endast i Bruinform."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Vargform",

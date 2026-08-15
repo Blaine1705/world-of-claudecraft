@@ -2545,6 +2545,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleLoginCta': 'Tiếp Tục với Apple',
   'hudChrome.dailyRewards.reason.banned':
     'Bạn đã bị cấm tham gia Phần Thưởng Hằng Ngày. Lý do: {reason}',
+  'hudChrome.itemHeroicLabel': 'Anh Hùng',
   'hudChrome.itemHeroicTag': '[ANH HÙNG]',
   'hudChrome.itemSoulbound': 'Ràng Buộc Linh Hồn',
   'hudChrome.keybinds.categoryPet': 'Thú Cưng',
@@ -10553,6 +10554,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} Danh dự',
   'hudChrome.warfare.honorGain': 'Bạn nhận được Danh dự {amount} ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Không đủ danh dự.',
+  'hudChrome.warfare.reasons.arenaComplete': 'Đã đấu trận đấu trường',
   'hudChrome.warfare.reasons.arenaWin': 'Chiến thắng đấu trường',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta đã hoàn thành',
   'hudChrome.warfare.reasons.fiestaKill': 'Hạ gục trong Fiesta',

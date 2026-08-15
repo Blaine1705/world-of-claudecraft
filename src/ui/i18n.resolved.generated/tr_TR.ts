@@ -1739,7 +1739,7 @@ export const tr_TR: EnTranslations = {
       "notEnoughHonor": "Yeterli Onur yok.",
       "reasons": {
         "arenaWin": "Arena zaferi",
-        "arenaComplete": "Arena bout fought",
+        "arenaComplete": "Arena müsabakası yapıldı",
         "fiestaKill": "Fiesta avlaması",
         "fiestaComplete": "Fiesta tamamlandı",
         "fiestaWin": "Fiesta zaferi",
@@ -1846,7 +1846,7 @@ export const tr_TR: EnTranslations = {
       "joinChannels": "İpucu: Dünya genelindeki oyuncularla sohbet etmek için /join world ya da /join lfg yaz."
     },
     "itemHeroicTag": "[KAHRAMANCA]",
-    "itemHeroicLabel": "Heroic",
+    "itemHeroicLabel": "Heroik",
     "itemSoulbound": "Ruha Bağlı",
     "itemUniqueEquipped": "Eşsiz Kuşanım",
     "itemSet": {
@@ -10025,6 +10025,10 @@ export const tr_TR: EnTranslations = {
       "growl": {
         "name": "Gözdağı",
         "description": "Hedefe hırlar: tehdidin onun en nefret ettiği düşmanla eşitlenir ve 3 saniye boyunca sana saldırmaya zorlanır. Yalnızca Bruin Formu."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Kurt Formu",
