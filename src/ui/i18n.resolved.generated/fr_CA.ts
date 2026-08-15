@@ -1739,6 +1739,7 @@ export const fr_CA: EnTranslations = {
       "notEnoughHonor": "Vous n’avez pas assez d’honneur.",
       "reasons": {
         "arenaWin": "Victoire en arène",
+        "arenaComplete": "Arena bout fought",
         "fiestaKill": "Élimination en Fiesta",
         "fiestaComplete": "Fiesta terminée",
         "fiestaWin": "Victoire en Fiesta",

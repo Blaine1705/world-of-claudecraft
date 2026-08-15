@@ -10010,6 +10010,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.warfare.honorFloatReason'
   | 'hudChrome.warfare.honorGain'
   | 'hudChrome.warfare.notEnoughHonor'
+  | 'hudChrome.warfare.reasons.arenaComplete'
   | 'hudChrome.warfare.reasons.arenaWin'
   | 'hudChrome.warfare.reasons.battlegroundAssist'
   | 'hudChrome.warfare.reasons.battlegroundComplete'

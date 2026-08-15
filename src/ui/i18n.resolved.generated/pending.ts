@@ -11,28 +11,34 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "hudChrome.itemHeroicLabel",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "es_ES": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "hudChrome.itemHeroicLabel",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "fr_FR": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "hudChrome.itemHeroicLabel",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "fr_CA": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "hudChrome.itemHeroicLabel",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "en_CA": [],
   "it_IT": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "hudChrome.itemHeroicLabel",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "de_DE": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "hudChrome.itemHeroicLabel",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -40,39 +46,48 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "hudChrome.itemHeroicLabel",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "hudChrome.itemHeroicLabel",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "nl_NL": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "hudChrome.itemHeroicLabel",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "pl_PL": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "hudChrome.itemHeroicLabel",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "id_ID": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "hudChrome.itemHeroicLabel",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "tr_TR": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "hudChrome.itemHeroicLabel",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "sv_SE": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "hudChrome.itemHeroicLabel",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "vi_VN": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "hudChrome.itemHeroicLabel",
+    "hudChrome.warfare.reasons.arenaComplete"
   ],
   "da_DK": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "hudChrome.itemHeroicLabel",
+    "hudChrome.warfare.reasons.arenaComplete"
   ]
 };

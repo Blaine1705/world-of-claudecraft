@@ -1739,6 +1739,7 @@ export const zh_TW: EnTranslations = {
       "notEnoughHonor": "榮譽不足。",
       "reasons": {
         "arenaWin": "競技場勝利",
+        "arenaComplete": "競技場參戰",
         "fiestaKill": "嘉年華擊倒",
         "fiestaComplete": "完成嘉年華",
         "fiestaWin": "嘉年華勝利",

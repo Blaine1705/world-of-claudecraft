@@ -949,6 +949,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorGain': '你獲得了 {amount} 點榮譽（{reason}）。',
   'hudChrome.warfare.notEnoughHonor': '榮譽不足。',
   'hudChrome.warfare.reasons.arenaWin': '競技場勝利',
+  'hudChrome.warfare.reasons.arenaComplete': '競技場參戰',
   'hudChrome.warfare.reasons.fiestaKill': '嘉年華擊倒',
   'hudChrome.warfare.reasons.fiestaComplete': '完成嘉年華',
   'hudChrome.warfare.reasons.fiestaWin': '嘉年華勝利',

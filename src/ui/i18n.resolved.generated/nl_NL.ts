@@ -1739,6 +1739,7 @@ export const nl_NL: EnTranslations = {
       "notEnoughHonor": "Niet genoeg eer.",
       "reasons": {
         "arenaWin": "Arena-overwinning",
+        "arenaComplete": "Arena bout fought",
         "fiestaKill": "Fiesta-uitschakeling",
         "fiestaComplete": "Fiesta voltooid",
         "fiestaWin": "Fiesta-overwinning",

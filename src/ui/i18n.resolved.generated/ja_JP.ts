@@ -1739,6 +1739,7 @@ export const ja_JP: EnTranslations = {
       "notEnoughHonor": "名誉が足りません。",
       "reasons": {
         "arenaWin": "アリーナ勝利",
+        "arenaComplete": "アリーナ参戦",
         "fiestaKill": "フィエスタ撃破",
         "fiestaComplete": "フィエスタ完遂",
         "fiestaWin": "フィエスタ勝利",
