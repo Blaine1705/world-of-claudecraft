@@ -5692,6 +5692,55 @@ function idleMobDistanceCulling(): Scenario {
   };
 }
 
+// The respawnWindow random window (Grix the Tunnelking, the one shipped
+// carrier): handleDeath's respawn resolution draws ONE shared-stream roll for a
+// windowed template where every fixed-schedule death draws none
+// (src/sim/respawn_policy.ts). Two kills pin two independent rolls in the draw
+// digest, so a refactor that moves, drops, or duplicates the death-site roll
+// turns this golden red rather than shipping silently.
+function grixRespawnWindow(): Scenario {
+  return {
+    name: 'grix_respawn_window',
+    coverage: [
+      'respawnWindow: death -> resolveRespawnSeconds rolls rng.range(36, 72) x 25s base',
+      'second kill after an in-place respawnMob rolls an independent window value',
+    ],
+    sampleEvery: 1,
+    build: () => new Sim({ seed: 1016, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const pid = sim.addPlayer('warrior', 'Spelunker');
+      const player = sim.entities.get(pid) as AnyEntity;
+      rec.track(pid);
+      beef(player, 1_000_000);
+      const grix = spawnMob(
+        sim,
+        'grix_the_tunnelking',
+        7,
+        player.pos.x + 2,
+        player.pos.y,
+        player.pos.z + 2,
+      );
+      rec.track(grix.id);
+      lethal(sim, player, grix);
+      rec.notes.firstRoll = grix.respawnTimer;
+      rec.snapshot('first-kill');
+
+      // The rolled wall clock is not the subject, the ROLL is: zero the timers
+      // out-of-band (the mob_lifecycle idiom) and drive the corpse tick to the
+      // in-place respawn, then kill the revived Grix for a second draw.
+      grix.lootable = false;
+      grix.corpseTimer = 0;
+      grix.respawnTimer = 0;
+      asHarness(sim).updateMob(grix); // respawnMob reuses the entity id
+      rec.notes.respawned = !grix.dead;
+      lethal(sim, player, grix);
+      rec.notes.secondRoll = grix.respawnTimer;
+      rec.snapshot('second-kill');
+    },
+  };
+}
+
 // Wolf Form AUTO attacks, the arm druid_engines deliberately does not drive
 // (it scripts specials only): the fixed 1.0s cat cadence swings against a
 // bear-form control on the same staff swinging at the weapon speed. The cat
@@ -5826,5 +5875,6 @@ export const SCENARIOS: Scenario[] = [
   professionsToolEffectSlot(),
   idleMobDistanceCulling(),
   riftBossFloor(),
+  grixRespawnWindow(),
   catFormAutoSwing(),
 ];
