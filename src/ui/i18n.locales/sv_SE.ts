@@ -10278,6 +10278,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleError': 'Det gick inte att logga in med Apple. Försök igen.',
   'hudChrome.auth.appleLoginCta': 'Fortsätt med Apple',
   'hudChrome.dailyRewards.reason.banned': 'Du är avstängd från dagliga belöningar. Orsak: {reason}',
+  'hudChrome.itemHeroicLabel': 'Heroisk',
   'hudChrome.itemHeroicTag': '[HEROISK]',
   'hudChrome.itemSoulbound': 'Själabunden',
   'hudChrome.keybinds.categoryPet': 'Djur',

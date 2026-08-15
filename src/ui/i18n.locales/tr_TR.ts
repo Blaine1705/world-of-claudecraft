@@ -2647,6 +2647,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleError': 'Apple ile oturum açılamadı. Lütfen tekrar dene.',
   'hudChrome.auth.appleLoginCta': 'Apple ile Devam Et',
   'hudChrome.dailyRewards.reason.banned': 'Günlük Ödüllerden yasaklandın. Gerekçe: {reason}',
+  'hudChrome.itemHeroicLabel': 'Heroik',
   'hudChrome.itemHeroicTag': '[KAHRAMANCA]',
   'hudChrome.interfaceTabs.chat': 'Sohbet',
   'hudChrome.interfaceTabs.combat': 'Savaş',

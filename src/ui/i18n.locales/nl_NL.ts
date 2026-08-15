@@ -10410,6 +10410,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleLoginCta': 'Ga verder met Apple',
   'hudChrome.dailyRewards.reason.banned':
     'Je bent uitgesloten van dagelijkse beloningen. Reden: {reason}',
+  'hudChrome.itemHeroicLabel': 'Heroïsch',
   'hudChrome.itemHeroicTag': '[HELDHAFTIG]',
   'hudChrome.itemSoulbound': 'Zielsgebonden',
   'hudChrome.keybinds.categoryPet': 'Huisdier',

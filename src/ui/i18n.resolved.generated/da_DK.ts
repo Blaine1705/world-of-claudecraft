@@ -1845,7 +1845,7 @@ export const da_DK: EnTranslations = {
       "joinChannels": "Tip: skriv /join world eller /join lfg for at chatte med spillere på tværs af verdenen."
     },
     "itemHeroicTag": "[HEROISK]",
-    "itemHeroicLabel": "Heroic",
+    "itemHeroicLabel": "Heroisk",
     "itemSoulbound": "Sjælebundet",
     "itemUniqueEquipped": "Unikt Udrustet",
     "itemSet": {

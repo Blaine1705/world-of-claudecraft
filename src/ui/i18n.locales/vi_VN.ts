@@ -2545,6 +2545,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleLoginCta': 'Tiếp Tục với Apple',
   'hudChrome.dailyRewards.reason.banned':
     'Bạn đã bị cấm tham gia Phần Thưởng Hằng Ngày. Lý do: {reason}',
+  'hudChrome.itemHeroicLabel': 'Anh Hùng',
   'hudChrome.itemHeroicTag': '[ANH HÙNG]',
   'hudChrome.itemSoulbound': 'Ràng Buộc Linh Hồn',
   'hudChrome.keybinds.categoryPet': 'Thú Cưng',

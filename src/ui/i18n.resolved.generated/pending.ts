@@ -11,34 +11,28 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.name"
   ],
   "es_ES": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.name"
   ],
   "fr_FR": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.name"
   ],
   "fr_CA": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.name"
   ],
   "en_CA": [],
   "it_IT": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.name"
   ],
   "de_DE": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.name"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -46,48 +40,39 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.name"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.name"
   ],
   "nl_NL": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.name"
   ],
   "pl_PL": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.name"
   ],
   "id_ID": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.name"
   ],
   "tr_TR": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.name"
   ],
   "sv_SE": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.name"
   ],
   "vi_VN": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.name"
   ],
   "da_DK": [
     "entities.abilities.challenging_roar.description",
-    "entities.abilities.challenging_roar.name",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.name"
   ]
 };

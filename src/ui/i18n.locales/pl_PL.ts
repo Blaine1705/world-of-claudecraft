@@ -10471,6 +10471,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleLoginCta': 'Kontynuuj przez Apple',
   'hudChrome.dailyRewards.reason.banned':
     'Masz zakaz udziału w codziennych nagrodach. Powód: {reason}',
+  'hudChrome.itemHeroicLabel': 'Heroiczny',
   'hudChrome.itemHeroicTag': '[HEROICZNY]',
   'hudChrome.itemSoulbound': 'Związany z duszą',
   'hudChrome.keybinds.categoryPet': 'Zwierzę',

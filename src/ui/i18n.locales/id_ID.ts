@@ -2660,6 +2660,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleError': 'Tidak dapat masuk dengan Apple. Silakan coba lagi.',
   'hudChrome.auth.appleLoginCta': 'Lanjutkan dengan Apple',
   'hudChrome.dailyRewards.reason.banned': 'Kamu dilarang mengikuti Hadiah Harian. Alasan: {reason}',
+  'hudChrome.itemHeroicLabel': 'Heroik',
   'hudChrome.itemHeroicTag': '[HEROIK]',
   'hudChrome.itemSoulbound': 'Terikat Jiwa',
   'hudChrome.keybinds.categoryPet': 'Peliharaan',
