@@ -31,7 +31,11 @@ export class DelveInteriorTracker {
   ) {}
 
   private schedule(key: string, moduleId: DelveModuleId, ox: number, oz: number): void {
-    const action = delveInteriorBuildAction(this.moduleAt.get(key), moduleId, this.pending.has(key));
+    const action = delveInteriorBuildAction(
+      this.moduleAt.get(key),
+      moduleId,
+      this.pending.has(key),
+    );
     if (action === 'skip') return;
     if (action === 'rebuild') {
       const stale = this.groups.get(key);
