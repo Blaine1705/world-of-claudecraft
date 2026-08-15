@@ -35,14 +35,20 @@ export const CAT_FORM_SWING_SPEED = 1.0;
 export const CAT_FORM_LEGACY_SWING_SPEED = 1.8;
 
 // The feral form damage knob: the single bench-neutrality constant for the
-// 2026-08 cat swing-cadence standardization (CAT_FORM_SWING_SPEED above).
-// Every Wolf Form melee swing (auto AND weaponStrike special) is scaled by it
-// in meleeSwing, so the 1.0s cadence plus roll normalization land DPS-neutral
-// on the feral bench instead of a stealth nerf: a fidelity and itemization
-// cleanup, not a buff. Tuned at 1.22 against the wildfang band probe
+// 2026-08 cat swing-cadence standardization (CAT_FORM_SWING_SPEED above; the
+// design home is docs/design/druid-v029-class-design.md, "Wolf Form
+// swing-cadence standardization"). Every Wolf Form melee swing (auto AND
+// weaponStrike special, deliberately: the special's AP term follows the
+// shared cadence, while its weapon roll stays raw per the classic
+// non-normalized special shape) is scaled by it in meleeSwing, so the 1.0s
+// cadence plus auto-roll normalization land DPS-neutral on the feral bench
+// instead of a stealth nerf: a fidelity and itemization cleanup, not a buff.
+// Tuned at 1.22 against the wildfang band probe
 // (tests/owned_class_balance_druid_bands.test.ts, 179.1 -> 181.9 dps) and the
 // 8-seed druid matrix (scripts/druid_balance_probe.ts, 176.6 -> 175.7 avg),
 // both within ~2% of the pre-change numbers and inside the shipped bands.
+// Measured at the level-20 balance anchor, the only tier the balance contract
+// covers; revisit if a higher cap shifts the flat-bonus/finisher share.
 export const CAT_FORM_DAMAGE_MULT = 1.22;
 
 export function isCatForm(e: Entity): boolean {

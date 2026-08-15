@@ -266,6 +266,44 @@ describe('Wolf Form swing speed', () => {
     expect(firstRequitalHit(sim2, b, 'form_bear', 'Bruin Form')).toBe(22);
   });
 
+  it('a Wolf Form cat lands about one auto swing per second over time', () => {
+    // The cadence over TIME, not just the scalar: 10 seconds of auto-attacks
+    // at the fixed 1.0s paw speed must land ~10 swing attempts (every
+    // hit/miss/dodge/parry resets the timer). This pins the swing-timer
+    // wiring in updatePlayerAutoAttack end to end.
+    const sim = makeWorld();
+    const a = sim.addPlayer('druid', 'Cadence');
+    sim.setPlayerLevel(20, a);
+    sim.tick();
+    const p = sim.entities.get(a)!;
+    giveForm(sim, a, 'form_cat', 'Wolf Form');
+    p.weapon = { ...p.weapon, min: 1, max: 1 };
+    const dummy = [...sim.entities.values()].find((e) => e.kind === 'mob' && !e.dead)!;
+    dummy.level = 1;
+    dummy.hostile = true;
+    p.pos.x = dummy.pos.x + 1;
+    p.pos.z = dummy.pos.z;
+    p.pos.y = dummy.pos.y;
+    p.prevPos = { ...p.pos };
+    p.targetId = dummy.id;
+    sim.startAutoAttack(a);
+    let swings = 0;
+    for (let i = 0; i < 200; i++) {
+      dummy.hp = dummy.maxHp = 1e9;
+      dummy.dead = false;
+      dummy.pos.x = p.pos.x - 1;
+      dummy.pos.z = p.pos.z;
+      p.hp = p.maxHp;
+      p.facing = Math.atan2(dummy.pos.x - p.pos.x, dummy.pos.z - p.pos.z);
+      const evs = sim.tick();
+      swings += evs.filter(
+        (e) => e.type === 'damage' && e.sourceId === a && e.ability == null,
+      ).length;
+    }
+    expect(swings).toBeGreaterThanOrEqual(9);
+    expect(swings).toBeLessThanOrEqual(11);
+  });
+
   it('a cat weaponStrike special keeps its raw roll: AP term at the cat cadence, form mult, no roll rescale', () => {
     // Rendclaw (claw, rank 1: weaponStrike bonus 25) in Wolf Form on a slow
     // 3.0-speed weapon pinned at 60 per swing. The special's weapon roll is
