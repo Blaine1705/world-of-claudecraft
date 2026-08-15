@@ -752,19 +752,21 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // the release monolith ratchet. Behavior is unchanged; no capture was retaken.
 // Re-minted again after registering the extracted policy as its own provenance
 // leaf. The captures remain unchanged and were not retaken.
-// Re-minted for the phase 11 desktop-client-update seal re-mint over the
-// branch's final lockfile (GLB source-fingerprint leaves) plus the branch's
-// renderer.ts and prewarm_policy.ts runtimeRender moves. RULING (user,
-// 2026-08-14): the r185 lighting shift is accepted for the live game; the
-// frozen historical A/B evidence stays verbatim per the frozen-history
-// doctrine, provenance re-recorded only. No capture was retaken.
-// Re-minted for the merge of release/v0.38.0 (the Armory pacing train):
-// both parents moved renderer.ts with their own mints, so the merged tree
-// mints values matching neither parent. No capture was retaken.
+// Re-minted for the quest-collectable spawn gate: this branch's renderer.ts
+// edits (the view gate call sites and the ground-object pool key move) shift
+// the runtimeRender.renderer leaf, the only leaf that moved. No Eastbrook
+// input, geometry value, or capture moved.
+// Re-minted for the merge of PR #3359's quest-collectable spawn gate with the
+// release branch's extracted entity-view policy. Both renderer.ts and the
+// entityViewPolicy leaf are provenance inputs; no capture was retaken.
+// Re-minted for the review fixes on this branch (Soul Rend warms every rig a
+// live body can take, plus the lazy form-visual fold): the first-order
+// composite follows renderer.ts, then this seal follows the swept evidence
+// bytes. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '3a2db73f192935b28c5384f3763ab24e1d47e23eb8e1f862fbcdda975bb254e5';
+  'd1bfe3e23b47ecb421dcd31196dcf728efa091869008da648fcf2179defafaca';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'c1cde390dc97017ad52c037bd5c5256ac636abc5af8234032bb95a42f96e99c1';
+  'a3c695469afdc4732476008e9a423bc5f9745a7103648d7205b3c6205509d947';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1753,15 +1755,21 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // branch: the first-order composite follows the merged renderer.ts bytes,
     // then this second-order performance seal follows the swept evidence
     // bytes. No capture was retaken.
-    // Re-minted for the phase 11 desktop-client-update seal re-mint: the
-    // first-order composite follows the final lockfile's GLB leaves and the
-    // branch's renderer.ts + prewarm_policy.ts inputs, then this second-order
-    // performance seal follows the swept evidence bytes. No capture was
-    // retaken.
+    // Re-pinned for the quest-collectable spawn gate. The first-order
+    // composite follows renderer.ts, then this second-order seal follows the
+    // swept evidence bytes. No capture was retaken.
+    // Re-pinned for the merge of PR #3359's quest-collectable spawn gate with
+    // the release branch's extracted entity-view policy. The first-order
+    // composite follows renderer.ts and entityViewPolicy, then this seal
+    // follows the swept bytes. No capture was retaken.
+    // Re-minted for the review fixes on this branch (Soul Rend warms every rig
+    // a live body can take, plus the lazy form-visual fold): the first-order
+    // composite follows renderer.ts, then this seal follows the swept evidence
+    // bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('c0fc55361b45b954568af32121a9723eaf99e035a95d02a6d3d3975cccbaf770');
+    ).toBe('cee72ac3b60097a0cd552e60e79d25d3d952cd44f5b1be1a7150a7d57a7fdf69');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

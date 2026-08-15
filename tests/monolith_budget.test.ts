@@ -65,14 +65,14 @@ const MONOLITHS: MonolithRow[] = [
     // per-status manifest rollup to summarizePrewarmManifest
     // (prewarm_compile_lifecycle.ts, beside the interface it fills) and the
     // resume-lane bookkeeping to prewarm_resume_ledger_core.ts.
-    // Raised 13682 -> 13776 (+94) for the desktop-client-update packet, same
-    // maintainer-decision preparation as hud.ts above: the growth is
-    // thin-consumer wiring to extracted modules (frame_present, dpr_watch,
-    // static_matrix, shadow cadence hookup) over upstream's near-zero-slack
-    // re-pins. Lowered 13776 -> 13775 after extracting the hidden-rig matrix
-    // freeze into rig_visibility_freeze.ts (the ratchet's own rule). Exact
-    // merged count: any further growth reds again.
-    ceiling: 13775,
+    // Raised for the desktop-client-update packet (thin-consumer wiring to the
+    // extracted modules: frame_present, dpr_watch, static_matrix, shadow cadence
+    // hookup), then lowered by that branch's rig_visibility_freeze.ts extraction.
+    // Merging release/v0.38.0 again: upstream lowered its own pin twice more
+    // (zone_prewarm_templates_core.ts, the buildFormVisual fold), and the merged
+    // file lands between the two pins, so the ceiling is the exact merged count
+    // per the ratchet's rule: any further growth reds again.
+    ceiling: 13754,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

@@ -171,21 +171,18 @@ interface AttributionTargetFixture {
 // Re-minted for the merge of release/v0.38.0 into the Armory warming branch:
 // both parents move renderer.ts, so the merged tree mints a value matching
 // neither parent. No capture was retaken.
-// Re-minted for the phase 11 desktop-client-update seal re-mint over the
-// branch's final lockfile: the lockfile moved the three GLB source-fingerprint
-// leaves (electron + three r185 train), and the branch's renderer.ts and
-// prewarm_policy.ts moves ride the runtimeRender leaves. RULING (user,
-// 2026-08-14): the r185 lighting shift (Rec.709 bloom on the emissive beacon
-// at ultra) is accepted for the live game, and the frozen historical A/B
-// evidence stays verbatim per this seal's own frozen-history doctrine (the
-// bank-rebuild precedent); provenance re-recorded only. No capture was
-// retaken.
-// Re-minted for the merge of release/v0.38.0 (the Armory pacing train) into
-// the desktop-client-update packet: both parents moved renderer.ts and each
-// carried its own mint, so the merged tree mints a value matching neither
-// parent. No capture was retaken.
+// Re-minted for the quest-collectable spawn gate: this branch's renderer.ts
+// edits (the view gate call sites and the ground-object pool key move) shift
+// the runtimeRender.renderer leaf, the only leaf that moved. No Eastbrook
+// input, geometry value, or capture moved.
+// Re-minted for the merge of PR #3359's quest-collectable spawn gate with the
+// release branch's extracted entity-view policy. Both renderer.ts and the
+// entityViewPolicy leaf are provenance inputs; no capture was retaken.
+// Re-minted for the review fixes on this branch (Soul Rend warms every rig a
+// live body can take, plus the lazy form-visual fold): renderer.ts moves
+// again, so the composite follows its bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'c1cde390dc97017ad52c037bd5c5256ac636abc5af8234032bb95a42f96e99c1';
+  'a3c695469afdc4732476008e9a423bc5f9745a7103648d7205b3c6205509d947';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
