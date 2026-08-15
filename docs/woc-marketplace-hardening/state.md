@@ -8,7 +8,38 @@ actually reads.
 - Next file to run: `docs/woc-marketplace-hardening/phase-10-qa.md`
   (SERVICE repo, worktree `/Users/fernando/Documents/woc-rewards-service-pr31`,
   fresh session, own origin/master sync first; audit range 02713f2..ba7df0b,
-  LOCAL not pushed per R4, QA pushes on PASS).
+  LOCAL not pushed per R4, QA pushes on PASS). Its SESSION START syncs are
+  ALREADY DONE by the 2026-08-15 sync-only session below (both repos current,
+  gates green); a fresh run will find nothing to merge and can go straight to
+  the audit.
+- 2026-08-15 SYNC-ONLY session ahead of 10 QA (Fernando asked to stop after
+  the merges): SERVICE origin/master still at df09756, already contained
+  (no-op); baseline at ba7df0b re-verified (build clean; 536 tests, 530 pass,
+  6 env-gated skips default; 536/536 zero skips with
+  CLAUDIUM_TEST_DATABASE_URL). GAME re-synced to the NEWEST release branch,
+  origin/release/v0.39.0 (v0.38.0 shipped to main via PR #3416, v0.39.0 minted
+  from it; tip d2d1a8ad5c = the v0.38.0 tip + 6), merge f5df042a86, NON-trivial:
+  five conflicts (hud.ts prewarm composition, generated pending.ts, the
+  add/add pair tests/helpers/strip_comments.ts + .test.ts, monolith_budget),
+  three ratchet reds on the union (hud re-pinned DOWN to 19120 exact, sim.ts
+  to 12508 exact = release-side growth only, main.ts nine over -> the Exchange
+  attach extracted to src/game/woc_market_wiring.ts in bf7aeb8a98, ceiling
+  kept at the release's 11490, file 11489, three mutants bit); the release's
+  Armory-prewarm removal was carried into the branch's
+  preview_prewarm_wiring.ts; three.js 0.185.1 (patched) needed a fresh
+  pnpm install. release-merge-audit (six lanes + a refuter per finding, 14
+  findings ALL confirmed, none refuted): every overlap file a clean union,
+  count pins 200/213/324 unchanged (run-confirmed), no route / world_api /
+  net delta, both new db-mock sites green; two pin-prose nits applied
+  (e362916958), nine doc premises corrected in this entry's commit, two i18n
+  observations recorded (the 3 hudChrome.trade.woc non-Latin rows are
+  pre-existing branch debt; entities.abilities.frenzied_regeneration.description
+  overlays are reword-stale ON THE RELEASE, 18 locales, a maintainer follow-up
+  on release/v0.39.0, not this branch). Gate GREEN at bf7aeb8a98 (gate_select,
+  full-suite fallback, all 12 steps, 2850 files / 40533 tests, browser 129,
+  WITH TEST_DATABASE_URL); DB-gated suites 18 files / 245 green zero skips.
+  Everything LOCAL, nothing pushed (the 10 QA session pushes on PASS per R4;
+  the game push then rides these sync commits).
 - 10 COMPLETE (SERVICE repo, LOCAL not pushed per R4; session start 02713f2,
   tip ba7df0b, 6 commits). B4 closed red-first (three redirect shapes
   reproduced MATCHED on the old verifier); the two R5 items this file owned
@@ -244,7 +275,7 @@ actually reads.
 
 | Repo | Worktree | Branch | Tip at packet creation |
 |---|---|---|---|
-| game | `/Users/fernando/Documents/wocc-marketplace` | `feature/woc-marketplace` | `a52da32c89` (merge of release/v0.37.0, current) |
+| game | `/Users/fernando/Documents/wocc-marketplace` | `feature/woc-marketplace` | `a52da32c89` (merge of release/v0.37.0 at packet creation; the base moves at every session start, see Locked decisions) |
 | service | `/Users/fernando/Documents/woc-rewards-service-pr31` | `integration/woc-market-settlement` | `70d4207` (= PR #31 tip) |
 | dashboard | `/Users/fernando/Documents/woc-rewards-dashboard-pr13` | `integration/woc-market-trading` | `c001d4a` (= PR #13 tip) |
 
@@ -382,7 +413,8 @@ Still open (a phase that hits one asks at session start):
 
 ## Locked decisions
 
-- Base: `feature/woc-marketplace`, already merged up to release/v0.38.0. Every game phase
+- Base: `feature/woc-marketplace`, already merged up to release/v0.39.0 (sync merge
+  f5df042a86 of tip d2d1a8ad5c, 2026-08-15). Every game phase
   re-syncs the latest `release/**` at phase start; service/dashboard phases re-sync
   `origin/master`.
 - Packet docs live in the game repo only; service and dashboard phases are specified here
@@ -415,7 +447,11 @@ Still open (a phase that hits one asks at session start):
 ## Known gotchas carried from the review session
 
 - The count-pin merge trap keeps firing: after the v0.38.0 re-sync the run-derived
-  totals are send 200, dispatch 213, IWorld 324 (86 data + 238 methods). If a later
+  totals are send 200, dispatch 213, IWorld 324 (86 data + 238 methods), unchanged by
+  the v0.39.0 sync (f5df042a86: no conflict and no silent auto-merge on either pin
+  file, the release touched none of src/world_api, src/net/online.ts, server/game.ts;
+  re-confirmed by running tests/command_schema.test.ts + tests/world_api_parity.test.ts
+  on the merged tree). If a later
   release merge conflicts (or silently auto-merges) there again, re-derive from a
   suite run, never take either side's number.
 - `npm run i18n:build` does NOT run `i18n:scan`; the S3 guard needs `i18n.status.json`
@@ -874,11 +910,16 @@ Still open (a phase that hits one asks at session start):
     a loud timeout); the timing pin stays textual, function-scoped, with
     the behavioral RangeError case as the true guard.
   - 08 QA NOTES for later phases (game side, from the v0.38.0 sync audit):
-    i18n release-fill debt is now SIZED: about 600 pending Latin-script
-    rows over the apiError.woc_market.* family at I18N_RELEASE_TIER=1,
-    plus hudChrome.trade.woc.tabGold with no fill in any locale (maintainer
-    release fill per the locked decision; 22's pre-enable audit should
-    carry the number). The release dead-code sweep deleted wallet_e2e.mjs
+    i18n release-fill debt at the merged tip is SIZED (re-counted after
+    the v0.39.0 sync, f5df042a86): 3450 pending rows, all
+    marketplace-owned (the release side is at zero pending since the
+    v0.38.0 fill, 1ca5e2515a): hudChrome.wocMarket 1995, hudChrome.trade
+    660 (hudChrome.trade.woc.tabGold pending in every non-English locale),
+    apiError.woc_market 600, entities.letters 135, hudChrome.plurals 60;
+    composition is 229 rows in each of the 15 Latin-script locales plus 3
+    hudChrome.trade.woc rows (pricePlaceholder, tabGold, tabWoc) in each
+    of zh_CN, zh_TW, ko_KR, ja_JP, ru_RU (maintainer release fill per the
+    locked decision; 22's pre-enable audit should carry the number). The release dead-code sweep deleted wallet_e2e.mjs
     and four market *_shot.mjs scripts; wallet_e2e was the only
     live-Postgres proof a freed wallet can relink to another account, so
     20/21 own restoring that proof as a real-SQL test.
@@ -893,15 +934,34 @@ Still open (a phase that hits one asks at session start):
     .github/workflows/ci.yml plus the SPARSE_CONE literal in
     tests/ci_workflow.test.ts in the same change or CI test jobs cannot see
     the files. Phase 22: the CI required-check contexts were all renamed
-    (dbe8ffd28e); re-derive before PR prep. Phases 12 to 16: hud.ts, sim.ts,
-    and game.ts sit at EXACT zero headroom (19170, 12505, 10818) and the
-    budget test now also forbids sitting more than 400 lines UNDER a
-    ceiling, so large extractions must lower their ceiling same-change.
+    (dbe8ffd28e); re-derive before PR prep. Phases 12 to 16: after the
+    v0.39.0 sync (merge f5df042a86 plus the bf7aeb8a98 extraction) hud.ts,
+    sim.ts, and game.ts sit at EXACT zero headroom (19120, 12508, 10818)
+    and main.ts sits ONE line under its 11490 ceiling (11489; the merge
+    itself landed main.ts nine over and bf7aeb8a98 moved the Exchange
+    attach to src/game/woc_market_wiring.ts rather than raise, so any
+    further main.ts line owes an extraction); the budget test also forbids
+    sitting more than 400 lines UNDER a ceiling, so large extractions must
+    lower their ceiling same-change.
     New release-side rules that bind future game phases: any player-visible
     sanction follows src/sim/moderation/CLAUDE.md; every aura-wipe site
     routes through the aurasSurvivingDeath / aurasSurvivingCleanSlate
     seams; npm run gate takes a machine-wide loopback lock (GATE_NO_LOCK=1
-    opts out) while gate_select does not.
+    opts out) while gate_select does not. v0.39.0 (f5df042a86) adds:
+    Hud.update(paint) has a paint cut (hud.ts `if (!paint) return;`, the
+    exact above-cut call list pinned by tests/hud_update_drive.test.ts
+    'the hidden-frame paint cut'; new per-frame non-paint work goes above
+    the cut AND into that list, paint work stays below); main.ts frames are
+    gated by src/game/presentation_gate.ts (gate.render / gate.paint,
+    hud.update(false) on hidden desktop frames); every ws-importing
+    scripts/**/*.mjs needs a row in tests/world_auth_scripts.test.ts
+    (scripts/woc_market_shot.mjs already has one) and sends chat and /dev
+    cheats only through chatCommandMessage from scripts/lib/world_auth.mjs,
+    never a top-level { t: 'chat' } frame; tests/helpers/strip_comments.ts
+    is the release's lookbehind helper now (the branch's copy was
+    superseded; every branch consumer's verdict is unchanged); the Armory
+    catalog is warmed nowhere (docs/design/armory-preview-warming.md) and
+    src/ui/preview_prewarm_wiring.ts composes paperdoll + portrait only.
 - 07 policy-terms-drafts (2026-08-13, session start 8a1739d67a = the trivial
   release/v0.38.0 sync (30 commits, GPU-hitch + night-lighting + OTA trains,
   no marketplace overlap; monolith_budget AUTO-MERGED: renderer.ts ceiling

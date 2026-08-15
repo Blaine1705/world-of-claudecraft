@@ -242,7 +242,7 @@ gear. The PRD makes counsel-revised Terms and a stated adopted-position precondi
   denial-of-use); prefer auto-close and return on settlement expiry.
 - **Bond size computed in the game** (`bondCents` with clamp) while the service uses pure bps ceil with no clamp:
   drift risk; the service should own bond cents on the wire.
-- **Browser-only gate is client-only** (`!NATIVE_APP && !DESKTOP_APP` in main.ts); the server accepts market REST
+- **Browser-only gate is client-only** (`!NATIVE_APP && !DESKTOP_APP` in main.ts, since moved to `src/game/woc_market_wiring.ts` by bf7aeb8a98); the server accepts market REST
   from any authenticated session (listing does not need a browser wallet).
 - **Coordinator drift.** `extractTradableCopy` / `grantTradableCopy` grew onto `sim.ts` instead of a module behind
   SimContext; `grantTradableCopy` has no test; the token-firewall allowlist exempts `sim.ts` wholesale and the regex

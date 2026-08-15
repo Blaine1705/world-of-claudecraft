@@ -4,7 +4,7 @@ SESSION START (do this first in every fresh session): cd into the worktree
 `/Users/fernando/Documents/wocc-marketplace`; verify `pwd` and
 `git branch --show-current` (must print `feature/woc-marketplace`). Then
 `git fetch origin` and merge the newest `origin/release/**` branch (currently
-`origin/release/v0.38.0`) so this session starts current; if the merge is
+`origin/release/v0.39.0`) so this session starts current; if the merge is
 non-trivial, run the `release-merge-audit` skill on it before continuing.
 
 Follow the shared workflow in `implementation-plan.md` first; `state.md` has the
@@ -29,8 +29,11 @@ acceptance require proof of wallet control, and no phantom security scaffolding 
   server enforcement. `createListing` and `acceptDirectedOffer` move custody on a
   session bearer alone: a token thief lists a victim's valuables at the $0.25 floor for
   a confederate to buy; the victim's wallet never signs anything.
-- The browser-only gate is client-only (`!NATIVE_APP && !DESKTOP_APP` in `main.ts`); the
-  server accepts market REST from any authenticated session.
+- The browser-only gate is client-only (`wocMarketAttachAllowed` in
+  `src/game/woc_market_wiring.ts`, called once from `main.ts` via
+  `attachWocMarketExchange`; the shell gate and the main.ts firewall are pinned by
+  `tests/woc_market_wiring.test.ts`); the server accepts market REST from any
+  authenticated session.
 
 ## Deliverables
 

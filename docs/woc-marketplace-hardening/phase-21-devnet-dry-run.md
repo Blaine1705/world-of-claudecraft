@@ -5,7 +5,7 @@ repos. cd into `/Users/fernando/Documents/woc-rewards-service-pr31` (branch must
 `integration/woc-market-settlement`), `git fetch origin`, merge `origin/master`. Then
 in `/Users/fernando/Documents/wocc-marketplace` (branch must be
 `feature/woc-marketplace`), `git fetch origin`, merge the newest `origin/release/**`
-(currently `origin/release/v0.38.0`). Verify `pwd` and the branch before any command
+(currently `origin/release/v0.39.0`). Verify `pwd` and the branch before any command
 in either repo.
 
 Follow the shared workflow in `implementation-plan.md` first; `state.md` has the

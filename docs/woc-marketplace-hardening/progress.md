@@ -24,7 +24,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 09 | bond-releaser | service | DONE | aa44873 | SERVICE repo (origin/master already contained at df09756); B3 + the bond double-pay medium + the bond-cents ownership mediums closed; R2 forfeit split landed (one code path with the settlement schedule); the two R5 items this repo owns RULED by Fernando at session start and implemented (SOL fees: preflight + overview monitor + manual funding, knob WOC_MARKET_ESCROW_MIN_SOL_LAMPORTS; ATA rent on refund: escrow pays, inside the preflight); FIVE red-first proofs (ownership behaviors, both double-pay classes, all-or-nothing boot, the late-confirm stomp, the terminal-adoption abandonment); two fresh coverage lenses (security 18 findings incl. 1 blocking, correctness 14 incl. 2 blocking) plus a fresh re-review of the fix rounds (1 blocking + 5 should-fix + 5 nits), every finding applied or judged with the file open; 9 commits, tip 3346878; suite 445 to 493 tests, 488 pass + 5 env-gated skips default tier, 493/493 with CLAUDIUM_TEST_DATABASE_URL (zero skips); LOCAL, not pushed per R4 |
 | 09 QA | phase-09-qa | service | DONE | 3346878 | PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open (section below); SERVICE repo (origin/master already contained at df09756); nine lanes (six read-only audits, two red-proof, one mutation): 0 blocking in the implement range, all six red-first registry claims REPRODUCED-RED, all seven mutation arms BIT by name (claim CAS, guarded update, finalize signature key in BOTH stores, age bound; 493-test full runs each); the round's own fixes: entry adoption of a ledger-proven payment on an already-expired or superseded quote (the registered pre-existing edge, the crash-matrix lane's fix-now case accepted), typed signature_already_settled on the settled-signature collision BOTH stores (the partial-unique-index 23505 trap, previously an unhandled 500), the undecided late-visibility window, the rejected-write vocabulary fix, the rpc probe-list pin, the actor clamp, fifteen test-decisiveness hardenings, doc truth-ups; two fresh re-review lenses over the fix round, everything applied or judged, round-2 mutation-proven (4 mutants BIT); suite 493 to 508 (502 + 6 env-gated skips default; 508/508 zero skips with CLAUDIUM_TEST_DATABASE_URL); 5 commits, tip 02713f2, PUSHED per R4 (service aa44873..02713f2 updates PR #31; game after the v0.38.0 re-sync merge abd4a9e0e2, trivial: one generated-i18n conflict, regenerated) |
 | 10 | chain-verifier | service | DONE | 02713f2 | SERVICE repo (origin/master already contained at df09756); B4 closed with red-first proofs (three redirect shapes reproduced MATCHED on the old verifier); the two R5 items this file owns RULED by Fernando at session start and implemented (commitment split ratified as code-owned MATCH_COMMITMENT/CREDIT_COMMITMENT; five hour confirming bound MAX_CONFIRMING_AGE_MS, both stores, new pg partial index, one minute sweep driver in buildMarketApps, previously NOTHING drove expiry in production); undecided confirm answers split (not_yet_visible vs awaiting_finality, the anti-snipe service half); two fresh lenses + a fresh re-review of the fix round, every finding applied or judged (the re-review REFUTED the round's multisig-impossibility claim with the parser's count-based labeling, arm restored money-safe); 15 mutants BIT + 1 judged environment survivor (pg ORDER BY delete coincides with partial-index order; the DESC variant bites); suite 508 to 536 (530 + 6 env-gated skips default; 536/536 zero skips with CLAUDIUM_TEST_DATABASE_URL); 6 commits, tip ba7df0b, LOCAL not pushed per R4 |
-| 10 QA | phase-10-qa | service | NOT STARTED | | |
+| 10 QA | phase-10-qa | service | NOT STARTED | | both SESSION START syncs already done 2026-08-15 by a sync-only session (section below): service origin/master no-op at df09756, baseline 536/530/6 and 536/536 pg re-verified; game re-synced to origin/release/v0.39.0 (merge f5df042a86, NON-trivial) + extraction bf7aeb8a98 + audit fixes e362916958, gate GREEN, LOCAL not pushed |
 | 11 | oracle-health | service | NOT STARTED | | |
 | 11 QA | phase-11-qa | service | NOT STARTED | | |
 | 12 | wire-completeness | game | NOT STARTED | | |
@@ -49,6 +49,102 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 21 QA | phase-21-qa | service + game | NOT STARTED | | |
 | 22 | close-out | all three | NOT STARTED | | teardown offer lives in 22 QA |
 | 22 QA | phase-22-qa | all three | NOT STARTED | | |
+
+## Sync-only session ahead of 10 QA (2026-08-15, both repos, LOCAL)
+
+Fernando asked this session to run only the SESSION START merges of
+phase-10-qa.md, gate them, and stop, so 10 QA itself starts fresh. Nothing
+was pushed (R4: the QA session pushes on PASS; the game push then carries
+these commits).
+
+SERVICE (worktree woc-rewards-service-pr31, integration/woc-market-settlement):
+tree clean at ba7df0b; origin/master fetched, still df09756 and already
+contained (no-op merge, nothing to record beyond that). Baseline
+re-verified in service/: build clean; 536 tests, 530 pass, 0 fail, 6
+env-gated skips default tier; 536/536 zero skips with
+CLAUDIUM_TEST_DATABASE_URL against the dev Postgres. Matches the 10
+implement contract exactly.
+
+GAME (worktree wocc-marketplace, feature/woc-marketplace): the newest
+release branch was DISCOVERED (standing rule) as origin/release/v0.39.0:
+v0.38.0 shipped to main via PR #3416 and v0.39.0 was minted from it (tip
+d2d1a8ad5c = the v0.38.0 tip fb88c3f094 + 6 commits: the merge, the 0.38.1
+version bump, the r185 chase-camera fix, the docker sharding-sequencer
+fix), so the sync merged v0.39.0 (a strict superset of the v0.38.0 tip the
+prompt named). Merge f5df042a86, NON-trivial (296 commits behind, 509 delta
+paths, five conflicts):
+- src/ui/hud.ts (postEntryPreviewPrewarmUnits): the release stopped warming
+  the Armory catalog on a schedule (56bb1f17e4) while the branch had
+  extracted the composition into src/ui/preview_prewarm_wiring.ts (02 QA).
+  Resolved by keeping the wiring composition and dropping the three armory
+  deps from it, its interface, and its suite (which gained the release's
+  NEGATIVE armory pin); the merged tests/armory_preview_lifecycle.test.ts
+  already carried both sides' pins.
+- tests/helpers/strip_comments.ts + .test.ts (add/add): the release's
+  lookbehind form taken for both (a strict superset: it also strips a line
+  comment glued to a block closer, `*///`; a whole-tree grep finds that
+  shape only in the helper's own fixture, so no branch consumer's verdict
+  moves; the release suite subsumes the branch's four pins).
+- src/ui/i18n.resolved.generated/pending.ts: regenerated (npm run i18n:gen
+  with TURBO_FORCE=1), never hand-merged.
+- tests/monolith_budget.test.ts: hud.ts row re-pinned DOWN to the exact
+  merged size 19120 (both sides shrank it: the Armory-prewarm removal and
+  the ability_description.ts extraction; the release's own 19420 -> 19432
+  maintainer raise + 19433 re-pin recorded in the row comment as release
+  lineage, e362916958). Two further ratchet reds surfaced only on the
+  union: sim.ts 12508 vs 12505 (release-side growth of 7 lines; the
+  branch's delegates unchanged; re-pinned to the exact merged size per the
+  row's own v0.38.0 precedent, still under the release's 12660) and
+  main.ts 11499 vs 11490 (the release grew the file to within eight lines
+  of its ceiling; the branch's 17-line inline Exchange attach sat on top).
+  main.ts was NOT raised: bf7aeb8a98 extracts the attach into
+  src/game/woc_market_wiring.ts (one-call composition in the
+  desktop_shell_integration shape: NATIVE_APP / DESKTOP_APP default from
+  client_origin and stay injectable, every wrapped shell fail-closed,
+  main.ts carries one call; tests/woc_market_wiring.test.ts pins the gate
+  per dimension, the live token / characterId / walletLinked routing, the
+  lazy wallet load on first sign, and the main.ts firewall by source scan;
+  three mutants bit: gate operator, hardcoded default shell, walletLinked
+  constant). main.ts lands at 11489 under the release's 11490; the merge
+  commit alone is red on that row (stated in its body), HEAD is green.
+- three.js moved 0.165.0 -> 0.185.1 (patched); pnpm install
+  --frozen-lockfile refreshed the worktree before any test ran.
+
+release-merge-audit (ultracode workflow: six audit lanes over the delta and
+the 26-file overlap set, then one adversarial refuter per finding; 20 agents,
+14 findings, ALL confirmed, none refuted): every overlap source and test
+file is a clean union (hud.ts hunk-by-hunk both directions, sim.ts,
+main.ts, entity_i18n.ts, CLAUDE.md, README, both HTML entries, the eight
+overlap tests); count pins send 200 / dispatch 213 / IWorld 324 unchanged
+and run-confirmed; the delta adds no route, registry row, WS command,
+world_api member, or src/net change (server/perf_report.ts is the only
+server file and the branch does not import it); the two new
+vi.mock('../server/db') sites (battleground_pop_wire_order, perf_report)
+mock nothing the branch extended and run green; branch i18n keys and
+overlay rows all survived and the committed pending.ts is byte-identical
+to a fresh regeneration; no branch-owned test source-scanning a
+release-changed file went red (union-reds lane: 0). Applied: the two
+pin-prose nits (e362916958: hud row release lineage; the armory negative
+pin now scans preview_prewarm_wiring.ts too, mutation-proven), and nine
+doc-premise corrections in this section's commit (implementation-plan
+current-release lines, state.md base / repos row / count-pin gotcha /
+i18n debt sizing / phases-12-16 ceilings / new v0.39.0 release rules,
+the 18 unrun phase files' SESSION START blocks, phase-13's gate pointer,
+review.md's pointer). Recorded, no action here: the 3 hudChrome.trade.woc
+rows pending in the five non-Latin locales are pre-existing branch debt
+(release fill), and entities.abilities.frenzied_regeneration.description
+is reword-stale in 18 overlays ON origin/release/v0.39.0 itself (English
+lost its "(Druid talent)" suffix in 4ca52c8eb0, the overlays kept theirs):
+a maintainer follow-up on the release branch, not this one.
+
+Validation on the committed tree: npx tsc clean; gate GREEN at bf7aeb8a98
+(node scripts/gate_select.mjs, full-suite fallback, ALL 12 steps, 2850 test
+files / 40533 tests, browser 129, WITH TEST_DATABASE_URL and TURBO_FORCE=1);
+DB-gated suites run separately with the URL: 18 files, 245 green, zero
+skips; e362916958 is a two-test-file prose change re-run green (20 tests).
+Copy floor clean over every new line; no "phase" word in any commit
+message. Tip after this session's docs commit: see git log; LOCAL, not
+pushed.
 
 ## 10 implement round (chain verifier proves the burn)
 
