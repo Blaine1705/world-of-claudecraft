@@ -16,7 +16,6 @@
 // render/ui/game/net, no Math.random/Date.now), so it runs unchanged in Node, the
 // browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
-import { ABILITIES } from '../content/classes';
 import { revokeMasterLooterAuthority } from '../loot/loot_roll';
 import { effectiveMasterLooter } from '../loot_master';
 import type { Party } from '../sim';
@@ -35,8 +34,12 @@ const RAID_MIN = 5;
 // wire bound too, which is the intent.
 export const RAID_MAX = 10;
 const RAID_GROUP_MAX = 5;
+const PERSISTENT_PALADIN_PARTY_AURA_IDS: ReadonlySet<string> = new Set([
+  'devotion_ward',
+  'retribution_aura',
+]);
 function isPersistentPaladinAura(aura: Aura): boolean {
-  return aura.permanent === true && ABILITIES[aura.id]?.class === 'paladin';
+  return aura.permanent === true && PERSISTENT_PALADIN_PARTY_AURA_IDS.has(aura.id);
 }
 
 // One indivisible Dungeon Finder unit as the formation seam receives it: a
@@ -206,6 +209,7 @@ export class PartyMachine {
     party.raidGroups.set(r.meta.entityId, raidGroup);
     this.partyByPid.set(r.meta.entityId, party.id);
     this.ctx.inheritDungeonResetLocks(r.meta.entityId);
+    this.syncPersistentPaladinPartyAuras(party);
     // Forming the party is the inviter's join too; the accepter counts on
     // every successful join.
     if (created) this.ctx.bumpDeedStat(leaderMeta, 'partiesJoined', 1);
@@ -501,6 +505,7 @@ export class PartyMachine {
         if (meta) this.ctx.bumpDeedStat(meta, 'partiesJoined', 1);
       }
     }
+    this.syncPersistentPaladinPartyAuras(party);
     if (convertedToRaid) {
       for (const mPid of party.members) {
         this.ctx.emit({
@@ -525,6 +530,22 @@ export class PartyMachine {
   private nextRaidGroupFor(party: Party): 1 | 2 {
     const g1 = party.members.filter((mPid) => (party.raidGroups.get(mPid) ?? 1) === 1).length;
     return g1 < RAID_GROUP_MAX ? 1 : 2;
+  }
+
+  private syncPersistentPaladinPartyAuras(party: Party): void {
+    for (const sourcePid of party.members) {
+      const source = this.ctx.resolve(sourcePid)?.e;
+      if (!source || source.dead) continue;
+      for (const aura of source.auras) {
+        if (!isPersistentPaladinAura(aura) || aura.sourceId !== sourcePid) continue;
+        for (const memberPid of party.members) {
+          if (memberPid === sourcePid) continue;
+          const member = this.ctx.resolve(memberPid)?.e;
+          if (!member || member.dead) continue;
+          this.ctx.applyAura(member, { ...aura });
+        }
+      }
+    }
   }
 
   private normalizeRaidGroups(party: Party): void {
