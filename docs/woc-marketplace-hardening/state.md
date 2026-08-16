@@ -5,21 +5,42 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-12-qa.md` (GAME
-  repo, worktree `/Users/fernando/Documents/wocc-marketplace`, fresh session,
-  newest origin/release/** sync first per the plan; at the 12 session's start
-  the branch was 0 behind origin/release/v0.39.0 tip d2d1a8ad5c, so its sync
-  was a no-op, but re-check at session start). The 12 ledger entry below is
-  the registry the 12-qa session consumes; it diffs a6ff42f1c5..bd089672f9
-  (9 commits, LOCAL not pushed per R4; the QA session pushes on PASS). The
-  LOUD deploy handoff is now BIDIRECTIONAL: enable the market only with BOTH
-  sides at or after the contract tips (game bd089672f9+, service 270e337+),
-  since the game now sends bidCents (an older service refuses it) and the
-  service computes bondCents (an older game never sends bidCents); skew in
-  either direction refuses bond quotes fail-safe. The service must also keep
-  reserving awaiting_finality for ledger-MATCHED payments (DEPLOY.md records
-  both).
-- 12 COMPLETE (GAME repo, LOCAL not pushed per R4; session start a6ff42f1c5,
+- Next file to run: `docs/woc-marketplace-hardening/phase-13-listing-step-up.md`
+  (GAME repo, worktree `/Users/fernando/Documents/wocc-marketplace`, fresh
+  session, newest origin/release/** sync first per the plan; at the 12 QA
+  session the branch was 0 behind origin/release/v0.39.0 tip d2d1a8ad5c and
+  the sync was a no-op, but re-check at session start). 13 OPENS with the R1
+  threshold posture ask (wallet-signature step-up per the resolved ruling,
+  including deleting the phantom TOTP code scaffolding whose .env.example
+  row 12 already removed). The 12 ledger entry below, INCLUDING its 12 QA
+  ROUND bullet, is the registry 13 consumes.
+- LOUD deploy handoff (DEPLOY.md records it): enable the market only with
+  BOTH sides at or after the contract tips (game: the build that sends
+  bidCents; service: PR #31 270e337+, the build whose bond quote answers
+  bondCents). The skew directions are ASYMMETRIC by design: an old game
+  against the new service refuses bond quotes fail-safe (the service demands
+  the bid), while a new game against an old service TOLERATES the missing
+  figure by falling back to its ceil mirror at the same knobs, so keep the
+  bond knobs in lockstep until both sides are current. The service must also
+  keep reserving awaiting_finality for ledger-MATCHED payments.
+- 12 QA COMPLETE (PASS-WITH-FOLLOWUPS, every finding applied or judged with
+  the file open; PUSHED per R4). Ten audit lanes over a6ff42f1c5..bd089672f9
+  (three repo reviewers via Agent + seven workflow lanes incl. the four
+  phase probes), a red-proof lane (all 7 registry claims reproduced or
+  verified), and two mutation batteries (round 1: 17 mutants, 16 BIT, the
+  one survivor a REAL pin gap; new-pin round: 18/18 BIT incl. that
+  survivor). Six fix commits to the pushed tip; the fix round re-reviewed
+  FRESH (two lenses) and every new pin mutation-proven. Highest-value
+  fixes: the anti-snipe extension now also fires on a POLL-settled bond
+  (the allowlist had un-extended the honest bidder whose confirm raced
+  chain visibility), the Exchange window honors signatureRequired false
+  (the dev payment path was unreachable there), a bond re-quote re-labels
+  the prompt from the adopted figure, the two payment surfaces agree about
+  confirmed/delivering answers, listingView carries cancelPending +
+  directed, and the status wire stopped leaking the service's verbatim
+  operational reason word. Details in the 12 QA ROUND bullet of the ledger
+  entry below.
+- 12 COMPLETE (GAME repo; session start a6ff42f1c5,
   tip bd089672f9, 9 commits). H8 closed (split + signatureRequired on the
   wire, wire-pin suite over every serializer), env truth closed (service URL
   + dashboard secret documented, dead TOTP knob deleted, two-direction guard
@@ -32,7 +53,7 @@ actually reads.
   (number|null pass-through). Four review lanes + a fresh fix-round
   re-review + qa-checklist READY (0 blocking); every finding applied or
   judged. The 12 ledger entry below is the registry the 12-qa session
-  consumes; progress.md carries the commit-by-commit round.
+  consumed; progress.md carries the commit-by-commit round.
 - 11 QA COMPLETE (PASS-WITH-FOLLOWUPS, every finding applied or judged with
   the file open, PUSHED per R4: service 8da6c03..270e337 to
   feature/woc-market-settlement updating PR #31; game docs pushed with it).
@@ -830,6 +851,124 @@ Still open (a phase that hits one asks at session start):
     echo recompute, sig drop, each bit exactly one named test; (7) the
     refresh re-guard and skip-echo tests are constructionally decisive
     (first guard passes by construction; one call asserted).
+  - 12 QA ROUND (2026-08-16, PASS-WITH-FOLLOWUPS, every finding applied
+    or judged with the file open; seven fix commits ef1d825236,
+    e0c4eee393, 8484a3ce50, 8402dc5f93, 1b28affbbe, 88cc70c61d,
+    9ae040b680 on the audited tip; PUSHED per R4). The registry 13
+    consumes:
+    - VERIFIED: all four earlier red proofs REPRODUCED-RED exactly as
+      recorded (14 red wire pins; the ceil pin alone; both anti-snipe
+      arms plus the revival trace; the split-adoption test), the env
+      guard red both directions, claim 7 judged decisive with the file
+      open. Round-1 mutation battery 17 mutants: 16 BIT, ONE SURVIVOR
+      (devSplit ceil-to-floor: no absolute leg pin existed at an odd
+      amount) closed and re-proven; new-pin battery 18/18 BIT (incl.
+      that survivor by name); wave-3 battery 10/10 BIT (both bond-leg
+      and the settlement-poll fail-warn call sites, the cancelPending
+      status gate, the status healthy-value hardcode, the badge render,
+      the trace-before-CAS revert, the finish split clear, the walk
+      classifier, the devsig branch inversion). Wire lockstep verified
+      BOTH directions cross-repo (xplat: 59 fields, every vocabulary
+      word the service emits is a member, the awaiting_finality
+      reservation confirmed downstream of a real ledger match in the
+      service source at 270e337; asOfMs number|null untouched).
+    - THE ROUND'S OWN FIXES (beyond the implement round's claims): the
+      anti-snipe extension now ALSO fires on a POLL-settled bond, from a
+      fresh per-row clock (the allowlist had un-extended the honest
+      bidder whose synchronous confirm raced chain visibility and whose
+      bond the ledger then settled; a fabricated string never settles,
+      so the allowlist posture holds); the verdict drift channel gained
+      a fail-side twin on BOTH legs including the rowless bond leg (a
+      refused bond keeps no fail_reason anywhere), logSafe-keyed dedupe,
+      a 100-word cap with one suppression line, and logSafe moved to the
+      intake screen's 256 so a full signature survives for exact-match
+      reconciliation; the retirement trace emits only AFTER its CAS
+      lands; the refused-signature warn joined the clamp; listingView
+      gained cancelPending (gated on active status: the stamp is never
+      cleared) and directed booleans, serialized AND rendered as
+      Activity badges with five non-Latin fills; the status wire price
+      is PROJECTED (the verbatim service operational reason word no
+      longer crosses; values pinned, not just keys); the placeBid
+      response bid mirrors the row's quote expiry; devSplit clamps its
+      ceil legs so a sub-floor estimate cannot mint a negative seller
+      leg (legs byte-identical at and above the 25-cent floor,
+      brute-verified); the Exchange window honors signatureRequired
+      false via the trade arm's devsig skip (branch ORDER pinned) and a
+      bond re-quote re-labels the prompt from the adopted figure; the
+      two payment surfaces make the SAME claim about a confirmed or
+      delivering answer (the trade arm's ladder mirrors the window; a
+      failed retry is refused server-side and cannot reach the settled
+      line); the adoption-stored fee split dies with its deal at all
+      four offer-clear sites; the bond prompt names the BOND, not the
+      bid (quoteBondFor reworded with five non-Latin fills; Latin rows
+      re-pend for the release fill); the orphaned bidBondConfirming key
+      and fills deleted; woc_market_reason_text.ts registered in the
+      pure-core purity scans; the dead wocSettlementInFlight wrapper
+      deleted with its membership re-pinned through wocOfferPhase; the
+      WHY line renders LAST in its row with its own wrapped-row class;
+      wrapper key-set pins for /me, /status, and the three quote
+      responses; the pending vocabulary's remainder pinned EMPTY beside
+      the fail remainder's 20; a comment-stripped scan pins every
+      game-written fail_reason word to the vocabulary or the pinned
+      expired-only exclusion trio; the env guard gained the new-reader
+      discovery walk (lstat, depth-bounded, classifier positive
+      control), a bracket-literal arm, and the PREFIXES-derived corpus
+      regex; DEPLOY.md's skew claim corrected (old game refuses; new
+      game TOLERATES an old service by mirror fallback at the same
+      knobs) with concrete contract-tip probes and per-surface auth
+      notes; the render-only-mirror doc claims trued (the mirror also
+      sizes the guard and seeds the row).
+    - JUDGED this round, no change (do not re-raise): the warn-capture
+      test helper consolidation (correct at every site; churn in a
+      money-path suite outweighs the ceremony; the helper lands with the
+      next new site); bondCentsOf mapping a malformed-present figure to
+      the absent-arm fallback (deliberate layering: the drift arm still
+      refuses and the wallet signs the service-minted amount);
+      keep-last-known-good for a transiently failed adoption estimate
+      (mirrors the tokens handling; 14 may polish); the trade arm's
+      settled line for confirmed/delivering (the Exchange parity call;
+      a distinct confirmed-awaiting-delivery line is 14's copy
+      decision); the sub-floor blank fee lines in production (fail-closed
+      screen; 14 owns the min-price hint arm); toContain money pins in
+      the panel render test (full-line toBe would couple to copy 14
+      changes); the fee sum as burn+treasury (the proxy enforces the
+      three-leg sum); the dead ?? '' fallback after the null gate
+      (harmless defensive); the JSON-stringify-drops-undefined superset
+      hole in the wire pins (needs an optional row property a fixture
+      leaves unset; fixtures are full rows on purpose); S3's server arm
+      not covering this rail (deliberate: the rail emits stable tokens,
+      the reason-text suite is the guard); the twin
+      WocSettlementView/WocListingView interfaces (pre-existing
+      structural-typing seam; the parity lane watches it); the
+      poll-anchor two-extensions budget nuance and the
+      supersede-still-extends arm (bounded by the anti-snipe cap, needs
+      a real broadcast payment); MARKET_BACKFILL_DRY_RUN outside
+      .env.example (deliberate ops-flag exception, documented in its
+      runbook and the config.ts comment); the wave-3 fresh-clock read
+      has no distinguishing test (a fake-clock rig cannot advance
+      mid-pass without rebuilding the poll; reviewed by reading).
+    - NEW DEFERRALS with owners (on top of the implement round's list):
+      14 (render surfaces for quote_expired-class copy AS BEFORE, plus:
+      a distinct confirmed-awaiting-delivery line for the trade arm;
+      the min-price hint arm for the trade panel with status
+      minPriceCents threaded in; the debounce-stale fee lines; the
+      wocUsdText Intl currency formatting, suffix-currency locales and
+      negatives, trade arm vs Exchange divergence named by the lane;
+      offerView.expiresAtMs countdown; bond-flavored pending copy for
+      the bond leg now bidBondConfirming is gone); 15 (screenshot pass
+      MUST capture: the fee lines as before, the WHY line's wrapped row
+      at mobile width with the ru fill, the new Activity badges, the
+      activity-row wrap across all three lists); 16 (saleView.item
+      ships the full InvSlot per sale row, the heaviest dead wire
+      weight); 17 (fail_reason accepts an unbounded service string
+      verbatim; bound the column write); 21 (the dev chain's
+      dev_chain_unknown_memo / dev_chain_leg_mismatch words will fire
+      the pending drift warn on devnet: expected, dismiss knowingly);
+      21/22 service rounds (as before, plus: a service-side test naming
+      clampedBondCentsForBid against the game mirror closes the
+      cross-repo anchor; mirror-vs-service bond drift is invisible to
+      operators, a monitoring line or knob-lockstep check belongs in
+      the runbook); 22 (runbook as before).
 - 11 oracle-health (2026-08-16, SERVICE repo, session start 8da6c03 = the
   10 QA tip, origin/master already contained at df09756; 5 commits, tip
   03df5de, LOCAL not pushed per R4; validation npm run build + npm test in

@@ -27,8 +27,8 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 10 QA | phase-10-qa | service | DONE | ba7df0b | PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open (section below); SERVICE repo (origin/master still df09756, contained; syncs pre-done by the sync-only session, re-fetched at the end: nothing new); seven audit lanes (56-shape hostile hunt with ZERO accepted_dishonest and the real wallet shape verified; security; correctness; coverage; docs; red-proof: all six registry claims REPRODUCED-RED on the 02713f2 build; mutation: 27 of 31 bit, the 4 survivors real pin gaps, all closed); the refuter stage hit the session limit after 15 of 68, every finding judged in the main loop with the file open and primary sources (agave parse_token.rs / parse_instruction.rs, spl-token processor.rs: the multisig restoration CORRECT, agave labels both token programs spl-token); the round's own fixes: the signature SHAPE screen before the first write (SEC-2, a junk string minted the game's service_unavailable exemption via the RPC's -32602 500), the payer-leg netting with owesOthers plus the escrow-bidder refusal (the fix-round re-review caught the bond self-leg vacuity), burn_authority_mismatch, the stray-owner log (once per memo, clamped), the sweep failure/recovery warn with in-flight guard, expirePastDue non-positive budget, attention.confirmingExpired24h on its own read, doc truth-ups (bound measured from expiry, ordering a two-knob precondition, the RPC-horizon premise re-anchored, vocabulary table, recovery caveat, deploy note); pins closed incl. the pg EvalPlanQual race rig on BOTH sweep arms; 21 + 11 mutants BIT over the committed rounds; suite 536 to 560 (553 + 7 env-gated skips default; 560/560 zero skips with CLAUDIUM_TEST_DATABASE_URL); 5 commits, tip 8da6c03, PUSHED per R4 (service ba7df0b..8da6c03 updates PR #31; game after the release check: 0 behind origin/release/v0.39.0, origin/main moved to the v0.38.2 hotfix tip which the next game session's sync picks up through v0.39.0) |
 | 11 | oracle-health | service | DONE | 8da6c03 | SERVICE repo (origin/master already contained at df09756); R3 RULED by Fernando at session start (single-venue posture, spot 500 bps; recorded BEFORE code in game commit e2f189e9a4) and implemented; H3's shared-instance half (already fixed in 08) pinned decisively under mocked timers with the quiet-period proof and a negative control; publish-time freshness on the wire (asOfMs) and the honest venue surface (per-venue age and verdict, configured/live counts, crossVenueGateArmed, distinctPrints, effective bounds); the dead Pyth venue path and its knob removed, the inert cross-venue knob retired (code default kept), spot 1000 -> 500; two fresh lenses (security/ops 14 findings, correctness 21) plus a fresh re-review of the fix round, every finding applied or judged with the file open; the fix round made the ORACLE the one judge of freshness per venue (an over-age print is refused as stale WITH its print time instead of dying at the source as no_price), env knobs may only tighten, the heartbeat feeds an edge-triggered halted/recovered operator signal; the cold-boot single-print exposure RULED record-and-document (Fernando 2026-08-16); the re-review round bounded every env knob in both directions, capped the sample buffer and made a paused refusal read the last heartbeat reading; PRD claim revised in the game repo (c5ce2793e7); 41 mutants BIT by name; suite 560 to 590 (583 + 7 env-gated skips default; 590/590 zero skips with CLAUDIUM_TEST_DATABASE_URL); 5 commits, tip 03df5de, LOCAL not pushed per R4 |
 | 11 QA | phase-11-qa | service | DONE | 03df5de | PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open (section below); SERVICE repo (origin/master already contained at df09756); eight audit lanes over 8da6c03..03df5de (correctness with the four probes, security/ops, test decisiveness, dead code and docs, red proof, three mutation groups): 0 blocking, 44 findings; red proof 11/11 REPRODUCED-RED on the named old builds; mutation 42 run, 41 BIT, the ONE survivor (overview crossVenueGateArmed hardcode) closed by a two-venue overview arm and re-proven; the fix round re-sized the two tightening floors from the venue cadence (staleness tight end 15 to 45 min, sample minimum 90 to 60, an R3-amendment note records it), pruned the refusal readout NON-MUTATINGLY, wired a parse-time warn for every mis-set oracle knob, put the window depth on the recovered line (the breaker-reset shape is visible in the log), mirrored spot/twap onto the overview, and trued every lagging doc; round-2 workflow over the fix round (two fresh lenses 13 findings 0 blocking, ALL applied; 16 new-pin mutants ALL BIT; completeness critic); suite 590 to 595 (588 + 7 env-gated skips default; 595/595 zero skips with CLAUDIUM_TEST_DATABASE_URL); 5 commits, tip 270e337, PUSHED per R4 (service updates PR #31, all four test checks GREEN after the push; game docs pushed with it, pre-push floor green) |
-| 12 | wire-completeness | game | DONE | a6ff42f1c5 | release sync no-op (0 behind origin/release/v0.39.0 tip d2d1a8ad5c); H8 + env truth + health-rail honesty closed AND the four cross-repo owed items adopted (service-owned bond quote, anti-snipe awaiting_finality allowlist, two-settled-per-memoRef tolerance, verdict localization; asOfMs pass-through verified untouched); 8 code and doc commits to tip bd089672f9 plus the ledger docs commit; four review lanes + a fresh fix-round re-review + qa-checklist READY (0 blocking), every finding applied or judged; ~12 mutants bit by name incl. wire-pin drop/rename, vocab delete, echo recompute, sig drop, env guard both directions; real-SQL suites green zero skips WITH TEST_DATABASE_URL; gate GREEN at the docs tip (gate_select full-suite fallback, all 12 steps, 2854 files / 40604 tests, browser 129, WITH TEST_DATABASE_URL); LOCAL, not pushed per R4 |
-| 12 QA | phase-12-qa | game | NOT STARTED | | |
+| 12 | wire-completeness | game | DONE (QA PASS) | a6ff42f1c5 | release sync no-op (0 behind origin/release/v0.39.0 tip d2d1a8ad5c); H8 + env truth + health-rail honesty closed AND the four cross-repo owed items adopted (service-owned bond quote, anti-snipe awaiting_finality allowlist, two-settled-per-memoRef tolerance, verdict localization; asOfMs pass-through verified untouched); 8 code and doc commits to tip bd089672f9 plus the ledger docs commit; four review lanes + a fresh fix-round re-review + qa-checklist READY (0 blocking), every finding applied or judged; ~12 mutants bit by name incl. wire-pin drop/rename, vocab delete, echo recompute, sig drop, env guard both directions; real-SQL suites green zero skips WITH TEST_DATABASE_URL; gate GREEN at the docs tip (gate_select full-suite fallback, all 12 steps, 2854 files / 40604 tests, browser 129, WITH TEST_DATABASE_URL); LOCAL, not pushed per R4 |
+| 12 QA | phase-12-qa | game | DONE | 90c007e36f | PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open (section below); release sync no-op (0 behind origin/release/v0.39.0 tip d2d1a8ad5c); ten audit lanes over a6ff42f1c5..bd089672f9 (cross-platform-sync, frontend-seam, test-coverage via Agent; server/client correctness, serializer sweep, fee edges, env sweep, dead code, docs truth via workflow) + red proof (all 7 registry claims reproduced or verified, wire pins exactly 14 red on the pre-fix build) + three mutation batteries (17 round-1: 16 BIT, the one survivor a REAL devSplit pin gap; 18/18 new-pin; 10/10 wave-3); seven fix commits (spine in the section below), the fix round re-reviewed FRESH (two lenses: 1 blocking test gap + 11 should-fix, all applied); qa-checklist READY; gate GREEN at the docs tip (gate_select, full-suite fallback, WITH TEST_DATABASE_URL); pushed per R4 (no open PR on this branch, pre-push floor green) |
 | 13 | listing-step-up | game | NOT STARTED | | R1 resolved: wallet signature; confirm threshold posture at start |
 | 13 QA | phase-13-qa | game | NOT STARTED | | |
 | 14 | ux-honesty | game | NOT STARTED | | |
@@ -49,6 +49,47 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 21 QA | phase-21-qa | service + game | NOT STARTED | | |
 | 22 | close-out | all three | NOT STARTED | | teardown offer lives in 22 QA |
 | 22 QA | phase-22-qa | all three | NOT STARTED | | |
+
+## 12 QA round (verdict PASS-WITH-FOLLOWUPS, every finding applied or judged)
+
+Session start 90c007e36f (the 12 implement docs tip; release sync a no-op, 0
+behind origin/release/v0.39.0 tip d2d1a8ad5c). QA range a6ff42f1c5..bd089672f9.
+Seven fix commits on top of the docs tip, then this round's docs commit:
+ef1d825236 (poll-settled extension, drift channels, logSafe 256, trace after
+CAS, response-bid expiry patch), e0c4eee393 (listing state booleans, status
+price projection, wrapper pins), 8484a3ce50 (devSplit clamps, the proxy
+fail-safe pins, the game-word scan), 8402dc5f93 (payment-surface parity,
+window devsig arm, re-quote re-label, split lifecycle, WHY-line row, orphan
+key deletion, pure-core registration), 1b28affbbe (env-guard discovery walk,
+DEPLOY.md and CLAUDE.md truth-ups, logSafe bound pin), 88cc70c61d (bond
+prompt copy), 9ae040b680 (the fresh re-review's round: bond-leg fail warns,
+fresh poll clock, cancelPending status gate, Activity badges with fills,
+status value pins, walk classifier control, devsig branch-order pins, dead
+wrapper deletion).
+
+Lanes, in order: ten read-only audit lanes over the immutable range (the
+three spec reviewers cross-platform-sync / frontend-seam / test-coverage
+dispatched via the Agent tool; seven workflow lanes: server correctness,
+client correctness, the serializer sweep, the fee edges, the env sweep,
+dead code, docs truth), the red-proof lane in a scratch worktree (all seven
+registry claims: the four old-build reproductions exact, the env guard red
+both directions, the named fix-round mutants re-bitten, claim 7 judged with
+the file open), and three mutation batteries (round 1: 17 mutants, 16 BIT,
+the ONE survivor was a real pin gap, devSplit ceil-to-floor with no absolute
+leg pin at an odd amount; new-pin round: 18/18 BIT including that survivor;
+wave 3 over the re-review fixes: 10/10 BIT). The fix round was re-reviewed
+FRESH by two lenses (correctness: 0 blocking, 5 should-fix, 5 nits/
+observations, incl. the bond-leg drift gap and the stale poll anchor;
+test-decisiveness: 1 blocking test gap, the fail-side POLL note call
+undecidable behind the same-word dedupe, plus 6 should-fix and 6 nits), ALL
+applied or judged; qa-checklist LAST over the whole diff. Validation: tsc
+clean throughout; every market suite + snapshots/env_protocol/bandwidth +
+architecture + monolith + i18n gates green; the four pg suites 132 green
+zero skips WITH TEST_DATABASE_URL (three runs across the round);
+ci:changed exit 0 (the one red on the way was format drift in four test
+files this round edited, fixed by a scoped format); gate run recorded below.
+Dispositions, judged list, and the new deferrals live in the state.md 12
+ledger entry's 12 QA ROUND bullet.
 
 ## 12 implement round (wire completeness and environment truth)
 
