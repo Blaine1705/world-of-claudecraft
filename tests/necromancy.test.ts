@@ -8,6 +8,7 @@ import { petCleaveAttack, petRangedAttack } from '../src/sim/pet/pet_ai';
 import { type ArenaMatch, Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import type { Entity, SimEvent } from '../src/sim/types';
+import { abilityDisplayDescription } from '../src/ui/ability_description';
 
 const NECROMANCY_IDS = new Set([
   'graveguard',
@@ -1424,7 +1425,7 @@ describe('Necromancy Warlock', () => {
     if (!warrior || !mage) throw new Error('Expected a full Dominion');
     warrior.hp = 1;
     mage.despawnTimer = 3;
-    const magePosition = { ...mage.pos };
+    const warriorPosition = { ...warrior.pos };
     const fragmentsBefore = fragmentCount(sim.player);
     const hpBefore = target.hp;
     sim.player.resource = sim.player.maxResource;
@@ -1456,8 +1457,8 @@ describe('Necromancy Warlock', () => {
     );
     expect(events).toContainEqual({
       type: 'spellfxAt',
-      x: magePosition.x,
-      z: magePosition.z,
+      x: warriorPosition.x,
+      z: warriorPosition.z,
       school: 'shadow',
       fx: 'burst',
       sourceId: sim.playerId,
@@ -1478,8 +1479,15 @@ describe('Necromancy Warlock', () => {
     expect(target.hp).toBeLessThan(hpBefore);
     expect(sim.player.resource).toBe(manaBefore - 30);
     expect(fragmentCount(sim.player)).toBe(fragmentsBefore);
-    expect(sim.entities.has(mage.id)).toBe(false);
-    expect(sim.entities.has(warrior.id)).toBe(true);
+    expect(sim.entities.has(warrior.id)).toBe(false);
+    expect(sim.entities.has(mage.id)).toBe(true);
+    const corpseExplosion = sim.players
+      .get(sim.playerId)
+      ?.known.find((known) => known.def.id === 'corpse_explosion');
+    if (!corpseExplosion) throw new Error('Expected Corpse Explosion to be known');
+    expect(abilityDisplayDescription(corpseExplosion, '48-60')).toBe(
+      'Sacrifices a Skeletal Warrior first, then a Bone Mage, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal 48-60 Shadow damage at the chosen location.',
+    );
     expect(deathEchoes(sim.player)).toEqual([expect.objectContaining({ id: 'legacy_death_echo' })]);
     expect(sim.player.cooldowns.get('corpse_explosion')).toBeGreaterThan(0);
     expect(ABILITIES.corpse_explosion.cooldown).toBe(8);
