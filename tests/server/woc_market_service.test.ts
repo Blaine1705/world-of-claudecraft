@@ -2470,6 +2470,7 @@ describe('a bond payment awaiting finality', () => {
       ok: true,
       standing: false,
       pending: true,
+      reason: 'awaiting_finality',
     });
     const bid = await getBid(h, placed.bid.id);
     expect(bid.status, 'the bid stays alive to be resolved').toBe('pending_bond');

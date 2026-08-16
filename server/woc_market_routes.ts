@@ -53,6 +53,8 @@ import type {
 import {
   bondCents,
   minNextBidCents,
+  screenWireFailReason,
+  screenWirePendingReason,
   WOC_MARKET_DURATION_HOURS,
   WOC_MARKET_MAX_PRICE_CENTS,
   WOC_MARKET_MIN_PRICE_CENTS,
@@ -369,6 +371,10 @@ function settlementView(row: WocSettlementRow): Record<string, unknown> {
     state: row.state,
     quoteReference: row.quoteReference,
     quoteExpiresAtMs: row.quoteExpiresAtMs,
+    // Screened, never the raw row: the row keeps the service's verbatim word
+    // for operators; the wire carries the pinned vocabulary so the client can
+    // say WHY a payment failed without repeating arbitrary service text.
+    failReason: screenWireFailReason(row.failReason),
     deadlineAtMs: row.deadlineAtMs,
     createdAtMs: row.createdAtMs,
   };
@@ -395,6 +401,9 @@ function quoteView(intent: WocQuoteIntent): Record<string, unknown> {
   return {
     reference: intent.reference,
     transactionBase64: intent.transactionBase64,
+    // Without this the dev-economy path is dead: the client only skips the
+    // wallet when the server SAYS no signature is needed (H8).
+    signatureRequired: intent.signatureRequired,
     amount: intent.amount,
     seller: intent.seller,
     burn: intent.burn,
@@ -409,6 +418,10 @@ function estimateView(estimate: WocEstimate): Record<string, unknown> {
     usdCents: estimate.usdCents,
     amount: estimate.amount,
     asOfMs: estimate.asOfMs,
+    // The three USD fee legs as the SERVICE computed them; the client never
+    // derives a split. Dropping this rendered every Fee / You receive line
+    // blank (H8).
+    split: estimate.split,
   };
 }
 
@@ -580,7 +593,13 @@ async function confirmBondHandler(ctx: Ctx): Promise<void> {
   if (!out.ok) throwRefusal(out.reason);
   // `pending` is the honest third answer: paid, but the chain has not decided.
   // Collapsing it into standing:false would read as "outbid" to the client.
-  json(ctx.res, 200, { standing: out.standing, pending: out.pending === true });
+  // The screened reason says WHICH pending: the ledger saw the payment
+  // (awaiting_finality), nothing is visible yet, or the service is down.
+  json(ctx.res, 200, {
+    standing: out.standing,
+    pending: out.pending === true,
+    reason: screenWirePendingReason(out.reason ?? null),
+  });
 }
 
 async function buyNowHandler(ctx: Ctx): Promise<void> {
@@ -612,7 +631,9 @@ async function confirmSettlementHandler(ctx: Ctx): Promise<void> {
     signatureField(body.signature),
   );
   if (!out.ok) throwRefusal(out.reason);
-  json(ctx.res, 200, { state: out.state });
+  // Same contract as the bond leg: a confirming state names its screened
+  // pending verdict; every decided state answers null.
+  json(ctx.res, 200, { state: out.state, reason: screenWirePendingReason(out.reason ?? null) });
 }
 
 async function myActivityHandler(ctx: Ctx): Promise<void> {

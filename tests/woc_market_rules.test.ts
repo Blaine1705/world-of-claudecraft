@@ -8,6 +8,8 @@ import {
   listingSoldNoticeCustodyRef,
   minIncrementCents,
   minNextBidCents,
+  screenWireFailReason,
+  screenWirePendingReason,
   settlementCustodyRef,
   strikeSuspensionMs,
   validListingParams,
@@ -22,8 +24,10 @@ import {
   WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR,
   WOC_MARKET_BUY_NOW_LOCK_SECONDS,
   WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS,
+  WOC_MARKET_CONFIRM_UNAVAILABLE_REASON,
   WOC_MARKET_DIRECTED_HOLD_SECONDS,
   WOC_MARKET_DURATION_HOURS,
+  WOC_MARKET_LEDGER_MATCHED_REASON,
   WOC_MARKET_MAX_ACTIVE_LISTINGS,
   WOC_MARKET_MAX_PRICE_CENTS,
   WOC_MARKET_MIN_PRICE_CENTS,
@@ -33,6 +37,9 @@ import {
   WOC_MARKET_RESTRICTED_POLICY,
   WOC_MARKET_SETTLEMENT_WINDOW_SECONDS,
   WOC_MARKET_STRANDED_RECLAIM_SECONDS,
+  WOC_MARKET_WIRE_FAIL_REASONS,
+  WOC_MARKET_WIRE_PENDING_REASONS,
+  WOC_MARKET_WIRE_REASON_OTHER,
   type WocEligibilityPolicy,
   type WocListingParams,
   type WocSettlementState,
@@ -812,5 +819,51 @@ describe('a directed sale (the p2p trade agreed in the trade window)', () => {
     expect(validListingParams(directed({ directedBuyerAccount: null, buyNowCents: 3000 }))).toEqual(
       { ok: true },
     );
+  });
+});
+
+describe('the wire reason screens', () => {
+  it('names the load-bearing verdicts as literal members', () => {
+    // The ledger-matched word gates the anti-snipe extension; the split
+    // sibling and the outage word are what the client distinguishes. Literal
+    // pins, not constant round-trips: a drifted string must fail HERE.
+    expect(WOC_MARKET_LEDGER_MATCHED_REASON).toBe('awaiting_finality');
+    expect(WOC_MARKET_CONFIRM_UNAVAILABLE_REASON).toBe('service_unavailable');
+    expect([...WOC_MARKET_WIRE_PENDING_REASONS].sort()).toEqual([
+      'awaiting_finality',
+      'not_yet_visible',
+      'service_unavailable',
+    ]);
+    // The verifier's terminal vocabulary the client localizes; the five words
+    // the chain-verifier round minted are the ones a drift would silently
+    // orphan, so they are pinned by name on top of the full-list sweep below.
+    for (const owed of [
+      'burn_missing',
+      'burn_mismatch',
+      'burn_authority_mismatch',
+      'unexpected_credit',
+      'signature_already_settled',
+    ]) {
+      expect(WOC_MARKET_WIRE_FAIL_REASONS).toContain(owed);
+    }
+  });
+
+  it('passes every pinned member through verbatim, both screens', () => {
+    for (const member of WOC_MARKET_WIRE_PENDING_REASONS) {
+      expect(screenWirePendingReason(member)).toBe(member);
+    }
+    for (const member of WOC_MARKET_WIRE_FAIL_REASONS) {
+      expect(screenWireFailReason(member)).toBe(member);
+    }
+  });
+
+  it('collapses anything else to the stable other token and keeps null', () => {
+    expect(WOC_MARKET_WIRE_REASON_OTHER).toBe('other');
+    expect(screenWirePendingReason('dev_chain_unknown_memo')).toBe('other');
+    expect(screenWirePendingReason('burn_missing')).toBe('other'); // wrong arm
+    expect(screenWirePendingReason(null)).toBeNull();
+    expect(screenWireFailReason('some_future_service_word')).toBe('other');
+    expect(screenWireFailReason('awaiting_finality')).toBe('other'); // wrong arm
+    expect(screenWireFailReason(null)).toBeNull();
   });
 });

@@ -129,6 +129,83 @@ export const WOC_MARKET_CONFIRM_UNAVAILABLE_REASON = 'service_unavailable';
 export const WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS = [
   WOC_MARKET_CONFIRM_UNAVAILABLE_REASON,
 ] as const;
+/**
+ * The service verdict that means the LEDGER has shown this payment: the
+ * verifier matched the transaction at its read commitment and only finality
+ * is outstanding. The service reserves this word for the matched arms (plus
+ * two fallback arms a fabricated signature cannot reach), and splits the
+ * nothing-visible-yet answer into 'not_yet_visible', so the two are
+ * distinguishable on the wire. Byte-identical with the service's emit ON
+ * PURPOSE: the anti-snipe extension branches on it, and a drifted literal
+ * fails toward never extending.
+ */
+export const WOC_MARKET_LEDGER_MATCHED_REASON = 'awaiting_finality';
+
+/**
+ * The pending-verdict words the game wire repeats to a player. An enumerable
+ * vocabulary, never arbitrary service text: the confirm responses carry one of
+ * these so the client can say "payment seen, awaiting finality" versus "no
+ * payment visible yet" versus "service unreachable", and anything the service
+ * invents later collapses to the stable 'other' token until the client learns
+ * it. Screening lives at the WIRE layer; rows and logs keep the verbatim
+ * service words for operators.
+ */
+export const WOC_MARKET_WIRE_PENDING_REASONS = [
+  WOC_MARKET_LEDGER_MATCHED_REASON,
+  'not_yet_visible',
+  WOC_MARKET_CONFIRM_UNAVAILABLE_REASON,
+] as const;
+
+/**
+ * The terminal fail_reason words the game wire repeats to a player on a
+ * settlement view. The union of the service verifier's decided refusals, its
+ * terminal row statuses, the dev economy's words, and the game's own recorded
+ * reasons; kept sorted for scanning. Same screening contract as the pending
+ * list: known words verbatim, unknown words 'other', null stays null.
+ */
+export const WOC_MARKET_WIRE_FAIL_REASONS = [
+  'bad_signature',
+  'burn_authority_mismatch',
+  'burn_missing',
+  'burn_mismatch',
+  'confirming_overdue',
+  'expired',
+  'forfeited',
+  'invalid_signature',
+  'leg_mismatch',
+  'memo_mismatch',
+  'payer_debit_mismatch',
+  'payer_mismatch',
+  'quote_expired',
+  'refunded',
+  'refused',
+  'rejected',
+  'signature_already_settled',
+  'signature_conflict',
+  'signature_did_not_match_quote',
+  'superseded',
+  'transaction_failed',
+  'unexpected_credit',
+  'unknown_reference',
+  'window_elapsed',
+] as const;
+
+/** The stable stand-in for any reason outside the pinned vocabularies. */
+export const WOC_MARKET_WIRE_REASON_OTHER = 'other';
+
+const WIRE_PENDING_SET: ReadonlySet<string> = new Set(WOC_MARKET_WIRE_PENDING_REASONS);
+const WIRE_FAIL_SET: ReadonlySet<string> = new Set(WOC_MARKET_WIRE_FAIL_REASONS);
+
+export function screenWirePendingReason(reason: string | null): string | null {
+  if (reason === null) return null;
+  return WIRE_PENDING_SET.has(reason) ? reason : WOC_MARKET_WIRE_REASON_OTHER;
+}
+
+export function screenWireFailReason(reason: string | null): string | null {
+  if (reason === null) return null;
+  return WIRE_FAIL_SET.has(reason) ? reason : WOC_MARKET_WIRE_REASON_OTHER;
+}
+
 /** How long a listing may sit mid-resolution before the sweep reclaims it. */
 export const WOC_MARKET_STRANDED_RECLAIM_SECONDS = 300;
 /**

@@ -2134,7 +2134,7 @@ export class WocMarketService {
     account: number,
     bidId: number,
     signature: string,
-  ): Promise<{ ok: true; standing: boolean; pending?: boolean } | Refused> {
+  ): Promise<{ ok: true; standing: boolean; pending?: boolean; reason?: string | null } | Refused> {
     if (!this.cfg.enabled) return refuse('disabled');
     const bid = await this.deps.db.bidById(bidId);
     if (!bid) return refuse('not_found');
@@ -2229,7 +2229,9 @@ export class WocMarketService {
       // not re-anchor on a fresh clock, or it holds the close at now plus
       // the extension continuously to the cap for free.
       if (confirmed.reason !== WOC_MARKET_CONFIRM_UNAVAILABLE_REASON) await extend(anchorMs);
-      return { ok: true, standing: false, pending: true };
+      // The verbatim service word rides the ok-shape for the route layer to
+      // screen: the player deserves to know WHICH pending this is.
+      return { ok: true, standing: false, pending: true, reason: confirmed.reason };
     }
     return refuse('confirm_failed');
   }
@@ -2508,7 +2510,7 @@ export class WocMarketService {
     account: number,
     settlementId: number,
     signature: string,
-  ): Promise<{ ok: true; state: WocSettlementState } | Refused> {
+  ): Promise<{ ok: true; state: WocSettlementState; reason?: string | null } | Refused> {
     if (!this.cfg.enabled) return refuse('disabled');
     const settlement = await this.deps.db.settlementById(settlementId);
     if (!settlement) return refuse('not_found');
@@ -2580,7 +2582,9 @@ export class WocMarketService {
       const after = await this.deps.db.settlementById(settlement.id);
       return { ok: true, state: after?.state ?? 'confirmed' };
     }
-    if (confirmed.pending) return { ok: true, state: 'confirming' };
+    // The verbatim service word rides the ok-shape for the route layer to
+    // screen (same contract as the bond leg's pending arm).
+    if (confirmed.pending) return { ok: true, state: 'confirming', reason: confirmed.reason };
     await this.deps.db.transitionSettlement(
       settlement.id,
       ['confirming'],
