@@ -20,6 +20,7 @@ import { revokeMasterLooterAuthority } from '../loot/loot_roll';
 import { effectiveMasterLooter } from '../loot_master';
 import type { Party } from '../sim';
 import type { SimContext } from '../sim_context';
+import { rememberSoulwellPartyEligibility } from '../soulwell';
 import { type Aura, DEFAULT_PARTY_LOOT_STRATEGIES } from '../types';
 
 // Group caps (classic 5-player party, 10-player raid as 2 subgroups of 5). Moved
@@ -208,6 +209,7 @@ export class PartyMachine {
     party.members.push(r.meta.entityId);
     party.raidGroups.set(r.meta.entityId, raidGroup);
     this.partyByPid.set(r.meta.entityId, party.id);
+    rememberSoulwellPartyEligibility(this.ctx, party);
     this.ctx.inheritDungeonResetLocks(r.meta.entityId);
     this.syncPersistentPaladinPartyAuras(party);
     // Forming the party is the inviter's join too; the accepter counts on
@@ -497,6 +499,7 @@ export class PartyMachine {
         party.members.push(pid);
         party.raidGroups.set(pid, raidGroup);
         this.partyByPid.set(pid, party.id);
+        rememberSoulwellPartyEligibility(this.ctx, party);
         // A finder merge is a join like any other: without this, a
         // finder-formed member escapes the reset-cooldown inheritance the
         // invite path (acceptInvite above) enforces.

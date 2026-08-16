@@ -36,6 +36,21 @@ function isOwnedSoulwell(entity: Entity, ownerId: number): boolean {
   );
 }
 
+function rememberEligiblePlayer(state: NonNullable<Entity['soulwell']>, playerId: number): void {
+  if (!state.eligiblePlayerIds.includes(playerId)) state.eligiblePlayerIds.push(playerId);
+}
+
+export function rememberSoulwellPartyEligibility(
+  ctx: SimContext,
+  party: { members: readonly number[] },
+): void {
+  for (const entity of ctx.entities.values()) {
+    const state = entity.soulwell;
+    if (!state || !party.members.includes(state.ownerId)) continue;
+    for (const memberId of party.members) rememberEligiblePlayer(state, memberId);
+  }
+}
+
 function overlapsGroundObject(ctx: SimContext, casterId: number, x: number, z: number): boolean {
   for (const entity of ctx.entities.values()) {
     if (entity.id === casterId || entity.kind !== 'object') continue;
@@ -119,6 +134,7 @@ export function interactSoulwell(ctx: SimContext, object: Entity, actorId: numbe
     ctx.error(actorId, 'That ally is not in your group.');
     return true;
   }
+  if (ownerParty) rememberSoulwellPartyEligibility(ctx, ownerParty);
 
   const actor = ctx.entities.get(actorId);
   if (actor?.inCombat) {
