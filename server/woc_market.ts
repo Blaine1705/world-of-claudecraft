@@ -2033,7 +2033,7 @@ export class WocMarketService {
       // The service priced the bond above the mirror the balance guard was
       // sized with: re-guard on the real figure before showing a prompt the
       // wallet cannot cover. The unpaid bid lapses on its own TTL.
-      const reGuard = await this.guardBalance(wallet, args.amountCents + adoptedBondCents);
+      const reGuard = await this.guardBalance(wallet, inserted.bid.amountCents + adoptedBondCents);
       if (reGuard) return reGuard;
     }
     const applied = await this.deps.db.setBidBondQuote(
@@ -2162,7 +2162,15 @@ export class WocMarketService {
       buyerWallet: bid.wallet,
     });
     let adoptedThroughDrift = false;
-    if (!intent.ok && intent.reason === 'bond_amount_drift' && intent.bondCents !== null) {
+    if (
+      !intent.ok &&
+      intent.reason === 'bond_amount_drift' &&
+      intent.bondCents !== null &&
+      // Pre-screened BEFORE the retry: a carried figure the game would never
+      // adopt is not worth an outbound echo (and a non-proxy economy
+      // implementation may not have screened the wire integer at all).
+      adoptableBondCents(intent.bondCents, bid.amountCents) !== null
+    ) {
       // ONE retry with the adopted echo, never a loop: a service that drifts
       // again answers the ordinary refusal below.
       adoptedThroughDrift = true;
@@ -2187,6 +2195,14 @@ export class WocMarketService {
           : bid.bondCents
         : adoptableBondCents(intent.bondCents, bid.amountCents);
     if (refreshedBondCents === null) return refuse('quote_unavailable');
+    if (refreshedBondCents > bid.bondCents) {
+      // The placeBid symmetry: a re-priced bond above the stored figure was
+      // never balance-guarded, and the prompt labels itself from this quote.
+      // Refusing here is safe (nothing written; the bid keeps its previous
+      // quote state and lapses on its own TTL if never funded).
+      const reGuard = await this.guardBalance(bid.wallet, bid.amountCents + refreshedBondCents);
+      if (reGuard) return reGuard;
+    }
     // The AUTHORITATIVE straddle check: the expiry actually stored is the
     // SERVICE's, not the local constant the pre-quote check predicted with,
     // and a service answering a longer TTL would straddle the lapse anyway.
@@ -2563,6 +2579,11 @@ export class WocMarketService {
         // rows (dev-channel, deliberately not player text). Scoped to rows
         // with a RECORDED signature: an unsigned re-quote is routine (the
         // quote-refresh path) and tracing it would emit a line per refresh.
+        // An UNSIGNED retired reference (paid on chain, never confirmed to
+        // the game) leaves no game-side line, deliberately: the service
+        // still holds that quote keyed by this settlement's memoRef
+        // (settlementCustodyRef of the id), which is what actually anchors
+        // reconciliation.
         console.warn(
           `[woc_market] settlement ${settlement.id} retires quote reference ${settlement.quoteReference} with recorded signature ${settlement.txSignature}`,
         );

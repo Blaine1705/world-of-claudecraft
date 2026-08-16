@@ -488,10 +488,10 @@ For off-box safety, sync the directory to S3 occasionally:
   moves, bids lapse on their TTL). The contract also reserves the confirm
   verdict word `awaiting_finality` for LEDGER-MATCHED payments (the game's
   anti-snipe extension trusts exactly that reservation); a service build that
-  starts emitting it optimistically is a breaking change, not a copy tweak. `DASHBOARD_INTERNAL_SECRET` gates the ops
-  dashboard's
-  `/internal/woc-market/*` reads; unset leaves them 404 (names only here, the
-  values live in deployment secrets).
+  starts emitting it optimistically is a breaking change, not a copy tweak.
+- **Ops dashboard market reads**: `DASHBOARD_INTERNAL_SECRET` gates the ops
+  dashboard's `/internal/woc-market/*` reads; unset leaves them 404 (names
+  only here, the values live in deployment secrets).
 - **Never** set `ALLOW_DEV_COMMANDS=1` in production: it enables the full
   `/dev` cheat set (the level/teleport cheats the test bots use, plus item
   grants, mob spawns, instance teleports, and the dev command GUI).

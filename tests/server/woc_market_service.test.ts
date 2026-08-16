@@ -6977,6 +6977,62 @@ describe('bond adoption bounds and fallbacks (the review round pins)', () => {
     expect(calls, 'the initial quote plus exactly one adopted retry').toBe(2);
   });
 
+  it('refresh skips the echo entirely for an out-of-bounds drift figure', async () => {
+    // A carried figure the game would never adopt is not worth an outbound
+    // round trip (and a non-proxy economy may not have screened the wire
+    // integer at all): one call, then the refusal.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const bidId = await placedWithAdopted(h, listing.id, 250);
+    let calls = 0;
+    const svc = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        bondQuote: async () => {
+          calls++;
+          return refusedIntent2({ reason: 'bond_amount_drift', bondCents: 999_999 });
+        },
+      },
+    });
+    expect(await svc.refreshBondQuote(BUYER_A, bidId)).toEqual({
+      ok: false,
+      reason: 'quote_unavailable',
+    });
+    expect(calls, 'no echo of a figure the bounds already refuse').toBe(1);
+  });
+
+  it('refresh re-guards the balance when the re-priced bond exceeds the stored figure', async () => {
+    // The placeBid symmetry: the drift-adopt path can raise the bond, and
+    // the prompt labels itself from this quote, so the guarded balance must
+    // cover the figure the wallet is about to be asked for.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const bidId = await placedWithAdopted(h, listing.id, 250);
+    // 5000 + stored 250 = 5250 cents -> 52_500 dev tokens (passes at 60_000);
+    // 5000 + re-priced 4000 = 9000 cents -> 90_000 tokens (fails).
+    h.balances.set('wallet-a', 60_000);
+    let first = true;
+    const svc = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        bondQuote: async () => {
+          if (first) {
+            first = false;
+            return refusedIntent2({ reason: 'bond_amount_drift', bondCents: 4000 });
+          }
+          return okIntent2({ bondCents: 4000, expiresAtMs: h.now() + 60_000 });
+        },
+      },
+    });
+    expect(await svc.refreshBondQuote(BUYER_A, bidId)).toEqual({
+      ok: false,
+      reason: 'insufficient_balance',
+    });
+    expect((await getBid(h, bidId)).bondCents, 'nothing was persisted').toBe(250);
+  });
+
   it('refresh refuses a post-drift success that carries NO figure', async () => {
     // The service just declared the stored figure wrong; succeeding without
     // saying the right one must not silently keep the refuted number.

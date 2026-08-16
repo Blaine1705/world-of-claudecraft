@@ -223,7 +223,12 @@ export function screenWireFailReason(reason: string | null): string | null {
  * accounting, the column is INT, and the contract's own invariant is "never
  * above the bid", so a figure that is not a positive integer at or under the
  * bid answers null and the caller refuses instead of persisting it (fail-safe:
- * the pending bid lapses on its TTL, nothing was transferred).
+ * the pending bid lapses on its TTL, nothing was transferred). Deliberately
+ * NOT clamped to WOC_MARKET_BOND_MAX_CENTS: the service owns the figure and
+ * its own policy caps it; the mirror bondCents() clamps only because it
+ * pre-labels displays before any quote exists. The at-or-under-the-bid arm
+ * also keeps the persisted figure transitively inside the INT column, since
+ * the bid is route-bounded at WOC_MARKET_MAX_PRICE_CENTS.
  */
 export function adoptableBondCents(figure: number, bidCents: number): number | null {
   if (!Number.isInteger(figure) || figure <= 0 || figure > bidCents) return null;
