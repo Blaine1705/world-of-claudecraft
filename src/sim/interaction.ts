@@ -24,6 +24,7 @@
 // (enforced by tests/architecture.test.ts).
 
 import { bagCapacity, canGrantItemInstance, fitsAll } from './bags';
+import { NOTICEBOARD_LISTINGS } from './content/noticeboard_listings';
 import { type NoticeboardDef, noticeboardDefByEntityId } from './content/noticeboards';
 import { HARVEST_COMPONENT_SPECIMENS, monsterMaterialTierFor } from './content/professions';
 import { corpseInteractionAvailability } from './corpse_interaction';
@@ -71,6 +72,7 @@ import { isQuestGatedGroundObjectHidden } from './quest_gated_entity';
 import { noteReliquaryMark } from './reliquary';
 import type { SimContext } from './sim_context';
 import { interactSoulwell } from './soulwell';
+import { creditSignpostRead } from './tutorial/signpost_read';
 import {
   cloneItemInstancePayload,
   dist2d,
@@ -771,12 +773,27 @@ export function pickUpObject(
     return false;
   }
   if (noticeboardDef) {
-    ctx.emit({
-      type: 'noticeboard',
-      noticeboardId: noticeboardDef.templateId,
-      state: 'empty',
-      pid: meta.entityId,
-    });
+    // The tutorial island's signpost lesson rides the same click as the
+    // notice feedback (tutorial/signpost_read.ts; a no-op off-quest and on
+    // every other board).
+    creditSignpostRead(ctx, meta, noticeboardDef.id);
+    const listings = NOTICEBOARD_LISTINGS[noticeboardDef.id] ?? [];
+    if (listings.length > 0) {
+      ctx.emit({
+        type: 'noticeboard',
+        noticeboardId: noticeboardDef.templateId,
+        state: 'listings',
+        listings,
+        pid: meta.entityId,
+      });
+    } else {
+      ctx.emit({
+        type: 'noticeboard',
+        noticeboardId: noticeboardDef.templateId,
+        state: 'empty',
+        pid: meta.entityId,
+      });
+    }
     return true;
   }
   const objectItemId = obj.objectItemId;

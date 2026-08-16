@@ -554,6 +554,7 @@ const QUEST_IDS = [
   'q_ps_shell_and_claw',
   'q_ps_the_wreck_line',
   'q_ps_pouch_and_purse',
+  'q_ps_the_signpost',
   'q_ps_set_sail',
   // the Galecrest
   'q_gc_down_the_windway',

@@ -5306,7 +5306,16 @@ export type SimEvent = { pid?: number } & (
   | { type: 'bank' }
   // Interacting with a town noticeboard. Structured and personal: the client
   // owns localized feedback, and online routing sends it only to the reader.
+  // 'listings' carries the board's posted notices verbatim (guild names and
+  // notes are world data, spliced by the client like player names, never
+  // translated); a board with nothing posted stays the bare 'empty' shape.
   | { type: 'noticeboard'; noticeboardId: string; state: 'empty' }
+  | {
+      type: 'noticeboard';
+      noticeboardId: string;
+      state: 'listings';
+      listings: readonly NoticeboardListing[];
+    }
   | {
       // A world object (a torched murloc hut, q_deepfen_purge) bursts into flames.
       // The renderer plays a fire burst at (x, z). Visual-only.
@@ -6692,6 +6701,14 @@ export interface NoticeboardDef {
   height: (typeof EASTBROOK_NOTICEBOARD_NATIVE_DIMENSIONS)['height'];
   interactionRadius: typeof EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS;
   frontStandingPoint: { x: number; z: number };
+}
+
+/** One posted notice on an interactable noticeboard, carried verbatim on the
+ *  'listings' arm of the noticeboard event: guild names and notes are world
+ *  data the client splices like player names, never translation keys. */
+export interface NoticeboardListing {
+  guild: string;
+  note: string;
 }
 
 /** A non-interactive authored muster board whose visible footprint is solid. */

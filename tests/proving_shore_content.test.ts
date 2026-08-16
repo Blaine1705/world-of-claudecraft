@@ -1,10 +1,13 @@
 // The Proving Shore (tutorial island) content pins: every authored position
 // sits on dry, walkable ground on the real terrain, the strait to the vale is
 // honest open water, the on-rails chain is a strict rail (each quest requires
-// the previous), every quest pays copper and ZERO experience, and the chain's
-// total pays for the full tier-1 gathering tool set the quartermaster stocks.
+// the previous), every quest pays copper and XP (the rail graduates a level
+// 3, no higher by quests alone), and the chain's total pays for the full
+// tier-1 gathering tool set the quartermaster stocks.
 
 import { describe, expect, it } from 'vitest';
+import { MAILBOXES } from '../src/sim/content/mailboxes';
+import { NOTICEBOARDS } from '../src/sim/content/noticeboards';
 import {
   BOOTCAMP_COURSE_CHECKPOINTS,
   PROVING_SHORE_ARRIVAL,
@@ -19,8 +22,6 @@ import {
   PROVING_SHORE_ROADS,
   PROVING_SHORE_ZONE,
 } from '../src/sim/content/proving_shore';
-import { MAILBOXES } from '../src/sim/content/mailboxes';
-import { NOTICEBOARDS } from '../src/sim/content/noticeboards';
 import { ITEMS, ZONES } from '../src/sim/data';
 import { mobXpValue, xpForLevel } from '../src/sim/types';
 import { groundHeight, provingLandness, terrainSteepnessAt, WATER_LEVEL } from '../src/sim/world';
@@ -105,19 +106,46 @@ describe('proving shore placement', () => {
   it('the Gauntlet checkpoints mirror the authored flag dressing, in running order', () => {
     // The bootcamp overlay detects course progress by position against
     // BOOTCAMP_COURSE_CHECKPOINTS; the flags a player actually sees are the
-    // decorProps hexFlag entries. One list must be the other, first to last
-    // (the red flag is the finish), or the overlay would point at bare sand.
-    const flags = (PROVING_SHORE_PROPS.decorProps ?? []).filter((d) => d.key.startsWith('hexFlag'));
+    // decorProps hexFlag entries INSIDE the walled course rect (the rail's
+    // giver-station flags stand elsewhere, checked below). One list must be
+    // the other, first to last (the red flag is the finish), or the overlay
+    // would point at bare sand.
+    const inCourseRect = (p: { x: number; z: number }) =>
+      p.x > -338 && p.x < -284 && p.z > -38 && p.z < -10;
+    const allFlags = (PROVING_SHORE_PROPS.decorProps ?? []).filter((d) =>
+      d.key.startsWith('hexFlag'),
+    );
+    const flags = allFlags.filter(inCourseRect);
     expect(flags.map((d) => ({ x: d.x, z: d.z }))).toEqual([...BOOTCAMP_COURSE_CHECKPOINTS]);
     expect(flags.at(-1)?.key).toBe('hexFlagRed');
-    // Every flag stands inside the walled course rect on the south strand
-    // near camp, NOT out at the far-strand wreck line: the two grounds are
-    // deliberately separate.
+    // Every checkpoint stands inside the walled course rect on the south
+    // strand near camp, NOT out at the far-strand wreck line: the two
+    // grounds are deliberately separate.
     for (const c of BOOTCAMP_COURSE_CHECKPOINTS) {
-      expect(c.x).toBeGreaterThan(-338);
-      expect(c.x).toBeLessThan(-284);
-      expect(c.z).toBeGreaterThan(-38);
-      expect(c.z).toBeLessThan(-10);
+      expect(inCourseRect(c)).toBe(true);
+    }
+    // Every rail quest giver has a station flag planted beside them (within
+    // 3 yards), OUTSIDE the course rect, so each stop on the relay reads as
+    // a station from across the ground.
+    const stationFlags = allFlags.filter((d) => !inCourseRect(d));
+    const givers = new Set(
+      PROVING_SHORE_QUEST_ORDER.map((id) => PROVING_SHORE_QUESTS[id].giverNpcId),
+    );
+    for (const npcId of givers) {
+      const npc = PROVING_SHORE_NPCS[npcId];
+      const near = stationFlags.some((d) => Math.hypot(d.x - npc.pos.x, d.z - npc.pos.z) <= 3);
+      expect(near, `station flag beside ${npcId}`).toBe(true);
+    }
+    // And a lit lantern post stands behind each giver (within 2.5 yards),
+    // kcasTorch decor lit by render/decor_torch_fx.ts, so every station
+    // stays readable after dark.
+    const lanterns = (PROVING_SHORE_PROPS.decorProps ?? []).filter((d) =>
+      d.key.startsWith('kcasTorch'),
+    );
+    for (const npcId of givers) {
+      const npc = PROVING_SHORE_NPCS[npcId];
+      const near = lanterns.some((d) => Math.hypot(d.x - npc.pos.x, d.z - npc.pos.z) <= 2.5);
+      expect(near, `lantern behind ${npcId}`).toBe(true);
     }
     // The Gauntlet is lit for night running by its fence-line lantern posts
     // (kcasTorch decorProps, lit via render/decor_torch_fx.ts), NOT ground
@@ -146,8 +174,7 @@ describe('proving shore placement', () => {
     // the greeter). Their dryness rides the placement sweep above (bells are
     // ground objects).
     expect(PROVING_SHORE_PORTALS).toEqual([]);
-    const bells =
-      PROVING_SHORE_OBJECTS.find((o) => o.itemId === 'ps_ferry_bell')?.positions ?? [];
+    const bells = PROVING_SHORE_OBJECTS.find((o) => o.itemId === 'ps_ferry_bell')?.positions ?? [];
     expect(bells.filter((b) => b.x < -180)).toHaveLength(1);
     expect(bells.filter((b) => b.x >= -180)).toHaveLength(1);
   });
@@ -239,6 +266,7 @@ describe('proving shore placement', () => {
       'q_ps_shell_and_claw',
       'q_ps_the_wreck_line',
       'q_ps_pouch_and_purse',
+      'q_ps_the_signpost',
       'q_ps_set_sail',
     ]);
     const relay = PROVING_SHORE_QUEST_ORDER.map((id) => PROVING_SHORE_QUESTS[id]);
@@ -248,6 +276,7 @@ describe('proving shore placement', () => {
       ['drillmaster_rook', 'tidewarden_nel'],
       ['tidewarden_nel', 'quartermaster_finch'],
       ['quartermaster_finch', 'instructor_maren'],
+      ['instructor_maren', 'instructor_maren'],
       ['instructor_maren', 'ferryman_odo'],
     ]);
     for (let i = 1; i < relay.length; i++) {
@@ -286,15 +315,25 @@ describe('proving shore placement', () => {
     for (const a of yards) {
       for (const b of yards) {
         if (a === b) continue;
-        expect(
-          Math.hypot(a.center.x - b.center.x, a.center.z - b.center.z),
-        ).toBeGreaterThanOrEqual(4);
+        expect(Math.hypot(a.center.x - b.center.x, a.center.z - b.center.z)).toBeGreaterThanOrEqual(
+          4,
+        );
       }
     }
     expect(PROVING_SHORE_QUESTS.q_ps_strike_true.objectives[0].count).toBe(1);
     // The scuttlers stay a real (gentle) fight: the whole point of Shell and
-    // Claw is a target that finally hits back.
+    // Claw is a target that finally hits back. Six of them on a 7-second
+    // respawn so a shared wreck line never queues the cull.
     expect(PROVING_SHORE_MOBS.shore_scuttler.dummy).toBeUndefined();
     expect(PROVING_SHORE_MOBS.shore_scuttler.dmgBase).toBeGreaterThan(0);
+    expect(PROVING_SHORE_MOBS.shore_scuttler.respawnSeconds).toBe(7);
+    const shells = PROVING_SHORE_CAMPS.filter((c) => c.mobId === 'shore_scuttler');
+    expect(shells.reduce((sum, c) => sum + c.count, 0)).toBe(6);
+    // The crate line asks for six opens and authors exactly six crates: the
+    // quest IS clearing the line, and OBJECT_RESPAWN covers a shared island.
+    expect(PROVING_SHORE_QUESTS.q_ps_the_wreck_line.objectives[0].count).toBe(6);
+    expect(
+      PROVING_SHORE_OBJECTS.find((o) => o.itemId === 'ps_castaway_crate')?.positions,
+    ).toHaveLength(6);
   });
 });

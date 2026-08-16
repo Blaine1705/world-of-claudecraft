@@ -8572,6 +8572,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_points': 'ポイントが足りません。',
   'hudChrome.mailbox.title': 'メールボックス',
   'hudChrome.noticeboard.empty': '何も貼られていないようだ。',
+  'hudChrome.noticeboard.listingsBanner': '掲示板には{count}件の貼り紙が出ている。',
+  'hudChrome.noticeboard.listingLine': '{guild}：{note}',
   'hudChrome.mailbox.subtitle': 'レイヴンポスト',
   'hudChrome.mailbox.close': 'メールボックスを閉じる',
   'hudChrome.mailbox.tabInbox': '受信箱',
@@ -13061,11 +13063,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '旗一本目、よし。右スティックを倒して回り、南へ延びる柵のレーンを正面に見たら、左スティックを上に倒して二本目の旗まで歩こう。',
   'hudChrome.bootcamp.strafeTitle': '最後のレーンを横歩き',
   'hudChrome.bootcamp.strafeBody':
-    '横に動く方法はもうひとつある。マウスの右ボタンを押したままドラッグして視点を回し、下ってきたレーンをさかのぼる北向きになったら、{strafeKey}を押したまま最後のレーンを赤い旗まで横歩きしよう。横歩きなら視線を敵に置いたまま動ける。いつか戦いでそう動く日が来る。',
+    '横に動く方法はもうひとつある。{turnKey}を押したまま、下ってきたレーンをさかのぼる向きになるまで回り、それから{strafeKey}を押したまま最後のレーンを赤い旗まで横歩きしよう。横歩きなら視線を敵に置いたまま動ける。いつか戦いでそう動く日が来る。',
   'hudChrome.bootcamp.strafeBodyTouch':
-    '横に動く方法はもうひとつある。指でドラッグして視点を回し、北を向いたら、移動スティックを左に倒して最後のレーンを赤い旗まで横滑りしよう。',
+    '横に動く方法はもうひとつある。下ってきたレーンをさかのぼる向きになるまで回り、それから移動スティックを左に倒して最後のレーンを赤い旗まで横滑りしよう。',
   'hudChrome.bootcamp.strafeBodyPad':
-    '横に動く方法はもうひとつある。右スティックを倒して視点を回し、北を向いたら、左スティックを左に倒して最後のレーンを赤い旗まで横滑りしよう。',
+    '横に動く方法はもうひとつある。右スティックを倒して、下ってきたレーンをさかのぼる向きになるまで回り、それから左スティックを左に倒して最後のレーンを赤い旗まで横滑りしよう。',
+  'hudChrome.bootcamp.cameraTitle': '視点を回す',
+  'hudChrome.bootcamp.cameraBody':
+    '走りを納める前に最後の一課だ。マウスの右ボタンを押したままドラッグして、視点を自分のまわりでぐるりと一周させよう。背後に何が立っているかを知る者が、戦いを制する。',
+  'hudChrome.bootcamp.cameraBodyTouch':
+    '走りを納める前に最後の一課だ。世界を指でドラッグして、視点を自分のまわりでぐるりと一周させよう。背後に何が立っているかを知る者が、戦いを制する。',
+  'hudChrome.bootcamp.cameraBodyPad':
+    '走りを納める前に最後の一課だ。右スティックを倒して、視点を自分のまわりでぐるりと一周させよう。背後に何が立っているかを知る者が、戦いを制する。',
   'hudChrome.bootcamp.courseProgress': '旗 {current} / {total}',
   'hudChrome.bootcamp.doneTitle': '走破',
   'hudChrome.bootcamp.doneBody':
@@ -13074,6 +13083,26 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '体の動かし方はこれで全部だ。監督官ペルが赤い旗のそばに立っている。彼をタップして走りを納め、最初の報酬を受け取ろう。',
   'hudChrome.bootcamp.doneBodyPad':
     '体の動かし方はこれで全部だ。監督官ペルが赤い旗のそばに立っている。インタラクトボタンを押して走りを納め、最初の報酬を受け取ろう。',
+  'hudChrome.bootcamp.coachNextTitle': '次は{npc}',
+  'hudChrome.bootcamp.coachNextBody':
+    '矢印をたどって{npc}のところへ。名前が見えるところまで歩み寄り、{interactKey}を押すか、左クリックして次の仕事を受けよう。',
+  'hudChrome.bootcamp.coachNextBodyTouch':
+    '矢印をたどって{npc}のところへ。名前が見えるところまで歩み寄り、相手をタップするか、使用ボタンをタップして次の仕事を受けよう。',
+  'hudChrome.bootcamp.coachNextBodyPad':
+    '矢印をたどって{npc}のところへ。名前が見えるところまで歩み寄り、インタラクトボタンを押して次の仕事を受けよう。',
+  'hudChrome.bootcamp.coachTaskBody':
+    '矢印をたどって仕事へ向かおう。右側のトラッカーが数を数えてくれるし、道に迷ったら{mapKey}で地図が開ける。',
+  'hudChrome.bootcamp.coachTaskBodyTouch':
+    '矢印をたどって仕事へ向かおう。右側のトラッカーが数を数えてくれるし、道に迷ったら地図ボタンが道を示してくれる。',
+  'hudChrome.bootcamp.coachTaskBodyPad':
+    '矢印をたどって仕事へ向かおう。右側のトラッカーが数を数えてくれるし、道に迷ったら地図ボタンが道を示してくれる。',
+  'hudChrome.bootcamp.coachReadyTitle': '任務完了',
+  'hudChrome.bootcamp.coachReadyBody':
+    '{npc}のもとへ戻り、{interactKey}を押すか、左クリックして納め、報酬を受け取ろう。',
+  'hudChrome.bootcamp.coachReadyBodyTouch':
+    '{npc}のもとへ戻り、相手をタップして納め、報酬を受け取ろう。',
+  'hudChrome.bootcamp.coachReadyBodyPad':
+    '{npc}のもとへ戻り、インタラクトボタンを押して納め、報酬を受け取ろう。',
   'entities.zones.proving_shore.pois.4.label': 'ガントレット',
   'entities.items.ps_castaway_crate.name': '漂着した木箱',
   'entities.items.ps_ferry_bell.name': '渡しの鐘',
@@ -13123,7 +13152,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '金張りの金庫は、こんな浜にも机を置いているんだよ、{playerName}。私に預けたものは、どの町のどの出納係の後ろにもある同じ金庫で待っている。狼にも、水にも、君自身のまずい思いつきにも手は届かない。',
   'entities.quests.q_ps_strike_true.title': '確かな一撃',
   'entities.quests.q_ps_strike_true.text':
-    '足の次は腕だ、{playerName}。練習場は私の後ろの道を上った先にあって、そこの藁のかかしは打たれるために作られている。道に迷ったらMを押して地図を開きなさい。引き受けた仕事はすべてそこに印がつく。かかしに歩み寄ってTabを押すか、左クリックすれば、それが君のターゲットになる。次に1を押すか、画面下のアクションバーの最初のアイコンをクリックすれば、刃が振れる。一体が崩れるまで打ち続けること。かかしは打ち返してこない。かかしとはそういうものだ。訓練長ルークが練習場の東の端から場を見ている。彼にFを押して、討ち取りの報告を納めなさい。',
+    '足の次は腕だ、{playerName}。練習場は私の後ろの道を上った先にあって、そこの藁のかかしは打たれるために作られている。道に迷ったらMを押して地図を開きなさい。引き受けた仕事はすべてそこに印がつく。かかしに歩み寄ってTabを押すか、左クリックすれば、それが君のターゲットになる。次に1を押すか、画面下のアクションバーの最初のアイコンをクリックすれば、刃が振れる。一体が崩れるまで打ち続けること。かかしは打ち返してこない。かかしとはそういうものだ。訓練長ルークは、浜辺への道が始まる練習場の西の肩から場を見ている。彼にFを押して、討ち取りの報告を納めなさい。',
   'entities.quests.q_ps_strike_true.completion':
     '見事に一体、握りももう確かになってきた。その感覚を忘れるな、{playerName}。狙いを定め、打ち込み、打ち続ける。藁は何をされても気にしない。だが次に君が刃を向ける相手は、そうはいかないぞ。',
   'entities.quests.q_ps_strike_true.objectives.0.label': '訓練用のかかしを倒す',
@@ -13135,16 +13164,22 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ps_shell_and_claw.objectives.0.label': '浜辺ガニを間引く',
   'entities.quests.q_ps_the_wreck_line.title': '難破の浜',
   'entities.quests.q_ps_the_wreck_line.text':
-    '潮はこの島に漂着物で払いをするんだ、{playerName}。古い難破船から出た漂着した木箱が、私と暁の野営地のあいだの丘に運ばれて置かれている。私の道を野営地のほうへ辿れば、そのすぐ脇を通る。開けるのは簡単だよ。名前が見えるところまで木箱に歩み寄って、Fを押すか、木箱そのものを左クリックすれば、中身を差し出してくれる。三つで足りる。そしてFは、この先出会うどんな宝箱にも、採集場所にも、扉にも使う同じキーだと覚えておきなさい。補給係フィンチが野営地の露店を構えていて、漂着物なら棒切れ一本でも買い取ってくれる。獲物は彼女に渡すんだ。',
+    '私の運び手たちは古い難破船から漂着物を下ろし、暁の野営地へ向かう丘を運び上げるんだ、{playerName}。ところが木箱の半分は登り切らない。道すがら置かれて、そのまま忘れられてしまう。私の道を野営地のほうへ辿れば、そのはぐれ荷のすぐ脇を通る。開けるのは簡単だよ。名前が見えるところまで木箱に歩み寄って、Fを押すか、木箱そのものを左クリックすれば、中身を差し出してくれる。六つ開ければ道は片づく。そしてFは、この先出会うどんな宝箱にも、採集場所にも、扉にも使う同じキーだと覚えておきなさい。補給係フィンチが野営地の露店を構えていて、漂着物なら棒切れ一本でも買い取ってくれる。獲物は彼女に渡すんだ。',
   'entities.quests.q_ps_the_wreck_line.completion':
-    'ロープに、タールに、海がなぜか見逃したチーズが半玉。全部引き取ろう。それだけ身をかがめて運べるのなら、{playerName}、生業の授業も聞いておきなさい。採集は道具から始まる。つるはし、斧、鎌、釣り竿、どれも渓谷の商人が売っている。Shiftを押しながらPを押せば専門の手帳が開く。それが君の生業の輪で、覚えた技がすべて並んでいる。隣り合う一対に調律すれば、その二つは上限のない主専攻になり、輪の向こうのひとつが趣味として残り、残りは知識を保ったまま眠る。決まってしまうものは何もない。職人頭が君の一対を定め、頼めばいつでも変えてくれる。イーストブルックの鍛冶場、厨房、織機、細工場、フェンブリッジのなめし場、ハイウォッチの薬房にいるよ。',
+    'ロープに、タールに、海がなぜか見逃したチーズが半玉。全部引き取ろう、{playerName}。拾ったものを担いで運べる背中は、この野営地にとってどんな刃より値打ちがある。そして君のその背中は、たった一登りで道を丸ごと片づけてくれた。',
   'entities.quests.q_ps_the_wreck_line.objectives.0.label': '漂着した木箱を開ける',
   'entities.quests.q_ps_pouch_and_purse.title': 'ポーチと財布',
   'entities.quests.q_ps_pouch_and_purse.text':
     '渓谷へ発つ前にもうひとつ、冒険者の命を守る授業だよ、{playerName}。君の持ち物の話だ。背嚢には十六の枠があり、その横に空の鞄留めが四つ待っている。鞄を留めるたびに、その分の空きが全体に加わる。では、もう一度私にFを押して店を開き、並んだ品の中の亜麻のポーチを左クリックして買い、それからBを押してバッグを開き、そこのポーチを左クリックして空いた留めに締めなさい。教官マレンは数歩東の集合の焚き火のそばで稽古をつけている。腰のポーチを彼女に見せておいで。',
   'entities.quests.q_ps_pouch_and_purse.completion':
-    '良いポーチだ。厄介ごとを詰める枠が六つ増えたね。ここからは、どんな鞄にも収まらない残り半分の授業だよ、{playerName}。持ちきれないものは金張りの金庫が預かる。出納係ウィックが西の道を上った先に金庫の机を構えていて、どの町のどの出納係とも共通の金庫を開けてくれる。財布が育てば金庫の枠も買い足せる。値打ち物は金庫へ、鞄には余裕を。狼よりも多くの冒険を終わらせてきたのは、はち切れた背嚢のほうなんだ。',
+    '良いポーチだ。まだ締めていないなら締めておきなさい。Bを押してバッグを開き、ポーチを左クリックして空いた鞄留めに収めれば、厄介ごとを詰める枠が六つ増える。ここからは、どんな鞄にも収まらない残り半分の授業だよ、{playerName}。持ちきれないものは金張りの金庫が預かる。出納係ウィックが西の道を上った先に金庫の机を構えていて、どの町のどの出納係とも共通の金庫を開けてくれる。財布が育てば金庫の枠も買い足せる。値打ち物は金庫へ、鞄には余裕を。狼よりも多くの冒険を終わらせてきたのは、はち切れた背嚢のほうなんだ。',
   'entities.quests.q_ps_pouch_and_purse.objectives.0.label': '亜麻のポーチを購入する',
+  'entities.quests.q_ps_the_signpost.title': '風の便り',
+  'entities.quests.q_ps_the_signpost.text':
+    '学ぶ習慣はあとひとつ、{playerName}、これに刃は要らない。掲示板を読むことだ。ギルドの掲示柱は私の焚き火から南西へ数歩、野営地の門のところに立っていて、ギルドや旅の一団が呼びかけを貼っていく。柱の正面まで歩み寄ってFを押すか、左クリックして貼られたものを読み、それから戻って、風が何を運んできたか聞かせておくれ。この先君が足を踏み入れるどの町にも、同じような掲示板が立っているよ。',
+  'entities.quests.q_ps_the_signpost.completion':
+    'これで渓谷での知らせの巡り方が分かったね、{playerName}。使者ではなく、掲示板で巡るんだ。通る町ごとに確かめなさい。冒険の半分は、板の上の三行の墨から始まるのだから。',
+  'entities.quests.q_ps_the_signpost.objectives.0.label': 'ギルドの掲示柱を読む',
   'entities.quests.q_ps_set_sail.title': '出航',
   'entities.quests.q_ps_set_sail.text':
     'この浜には、君がまだ走っていない、倒していない、開けていない、買っていないものは何も残っていないよ、{playerName}。準備はできた。イーストブルックには本物の仕事が待っている。浜の道を下って桟橋へ戻り、渡し守オドにFを押して、マレンが、君は渡りを勝ち取ったと言っていた、と伝えなさい。誰に何を頼まれていたか分からなくなったら、いつでもLを押しなさい。それが君のクエストログだよ。',

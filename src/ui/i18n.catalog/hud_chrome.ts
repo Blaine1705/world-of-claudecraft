@@ -659,8 +659,7 @@ export const hudChromeStrings = {
     talkBodyPad:
       'Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then press your interact button to talk: he will set you the run.',
     forwardTitle: 'Walk the first lane',
-    forwardBody:
-      'Step into the lane beside Tam and hold {forwardKey} to walk it west to its flag.',
+    forwardBody: 'Step into the lane beside Tam and hold {forwardKey} to walk it west to its flag.',
     forwardBodyTouch:
       'Step into the lane beside Tam and push the movement stick up to walk it west to its flag.',
     forwardBodyPad:
@@ -674,11 +673,18 @@ export const hudChromeStrings = {
       'Flag one down. Push the right stick to turn until you face down the walled lane heading south, then push the left stick up and walk it to the second flag.',
     strafeTitle: 'Sidestep the last lane',
     strafeBody:
-      'There is another way to move sideways. Hold the right mouse button and drag to swing your view around until you face north, back up the lane you came down, then hold {strafeKey} to sidestep along the last lane to the red flag. Sidestepping keeps your eyes on a target while you move: you will fight this way one day.',
+      'There is another way to move sideways. Hold {turnKey} until you face back up the lane you came down, then hold {strafeKey} to sidestep along the last lane to the red flag. Sidestepping keeps your eyes on a target while you move: you will fight this way one day.',
     strafeBodyTouch:
-      'There is another way to move sideways. Drag a finger to swing your view around until you face north, then push the movement stick left to slip sideways along the last lane to the red flag.',
+      'There is another way to move sideways. Turn until you face back up the lane you came down, then push the movement stick left to slip sideways along the last lane to the red flag.',
     strafeBodyPad:
-      'There is another way to move sideways. Push the right stick to swing your view around until you face north, then push the left stick left to slip sideways along the last lane to the red flag.',
+      'There is another way to move sideways. Push the right stick to turn until you face back up the lane you came down, then push the left stick left to slip sideways along the last lane to the red flag.',
+    cameraTitle: 'Swing the camera',
+    cameraBody:
+      'One last lesson before you hand the run in: hold the right mouse button and drag to swing the camera all the way around you. Knowing what stands behind you wins fights.',
+    cameraBodyTouch:
+      'One last lesson before you hand the run in: drag a finger across the world to swing the camera all the way around you. Knowing what stands behind you wins fights.',
+    cameraBodyPad:
+      'One last lesson before you hand the run in: push the right stick to swing the camera all the way around you. Knowing what stands behind you wins fights.',
     courseProgress: 'Flag {current} of {total}',
     doneTitle: 'Run complete',
     doneBody:
@@ -687,6 +693,31 @@ export const hudChromeStrings = {
       'That is everything your legs need to know. Overseer Pell stands beside the red flag: tap him to hand your run in and take your first reward.',
     doneBodyPad:
       'That is everything your legs need to know. Overseer Pell stands beside the red flag: press your interact button on him to hand your run in and take your first reward.',
+    // The rail coach: the same card, generic three-state copy for every
+    // island quest after the Gauntlet (walk to the giver, do the task,
+    // return to the turn-in), so the helper persists the whole relay. {npc}
+    // splices the localized NPC name; the active card is titled with the
+    // quest's own localized name by the overlay. WORDY by M16, so the five
+    // non-Latin overlays carry real fills.
+    coachNextTitle: 'Next: {npc}',
+    coachNextBody:
+      'Follow the arrow to {npc}. Walk up until the name shows, then press {interactKey}, or left-click them, to take your next task.',
+    coachNextBodyTouch:
+      'Follow the arrow to {npc}. Walk up until the name shows, then tap them, or tap the Use button, to take your next task.',
+    coachNextBodyPad:
+      'Follow the arrow to {npc}. Walk up until the name shows, then press your interact button to take your next task.',
+    coachTaskBody:
+      'Follow the arrow to your task. The tracker on the right keeps the tally, and {mapKey} opens the map if you lose the way.',
+    coachTaskBodyTouch:
+      'Follow the arrow to your task. The tracker on the right keeps the tally, and the map button shows the way if you lose it.',
+    coachTaskBodyPad:
+      'Follow the arrow to your task. The tracker on the right keeps the tally, and your map button shows the way if you lose it.',
+    coachReadyTitle: 'Task complete',
+    coachReadyBody:
+      'Return to {npc} and press {interactKey}, or left-click them, to hand it in and take your reward.',
+    coachReadyBodyTouch: 'Return to {npc} and tap them to hand it in and take your reward.',
+    coachReadyBodyPad:
+      'Return to {npc} and press your interact button to hand it in and take your reward.',
   },
   // Minimap / compass / clock / coordinate widget tooltips and accessible names.
   widgets: {
@@ -3402,6 +3433,11 @@ export const hudChromeStrings = {
   },
   noticeboard: {
     empty: 'Nothing seems posted.',
+    // The 'listings' arm of the noticeboard event: {count} notices banner,
+    // then one log line per notice. Guild names and notes are world data,
+    // spliced verbatim like player names, never translated.
+    listingsBanner: 'The board carries {count} posted notices.',
+    listingLine: '{guild}: {note}',
   },
   // The bank window (the Gilded Strongbox): a pooled deposit box shown while standing
   // at a banker NPC. Plain click withdraws a stack; shift-click withdraws a partial

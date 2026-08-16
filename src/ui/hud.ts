@@ -50,6 +50,7 @@ import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
 import { isOnMountRaceStartPlatform, MOUNTS } from '../sim/content/mounts';
+import { PROVING_SHORE_ARRIVAL } from '../sim/content/proving_shore';
 import { recipeById } from '../sim/content/recipes';
 import {
   RELIQUARY_PAGE_ORDER,
@@ -80,7 +81,6 @@ import {
   ZONES,
   zoneAt,
 } from '../sim/data';
-import { PROVING_SHORE_ARRIVAL } from '../sim/content/proving_shore';
 import { specialRoleColor } from '../sim/discord_roles';
 import { canEquipItem, isUniqueEquipped, weaponHand } from '../sim/equipment_rules';
 import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
@@ -183,6 +183,7 @@ import {
   bannerSubtextLines,
 } from './banner_queue';
 import { blockLandingLogKey } from './block_landing_feedback_core';
+import { BootcampOverlay } from './bootcamp';
 import { CalendarWindow } from './calendar_window';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
@@ -476,7 +477,6 @@ import {
   type VendorMultiple,
 } from './hud/vendor/vendor_view';
 import { renderVendorWindow } from './hud/vendor/vendor_window';
-import { visibleVendorStock } from './vendor_stock_gate_core';
 import { buildWarfareVendorView, warfareShopViewer } from './hud/vendor/warfare_vendor_view';
 import { renderWarfareVendorWindow } from './hud/vendor/warfare_vendor_window';
 import { afflictionFateThreadCount, createDoomMeter, destructionRuinPips } from './hud/warlock';
@@ -730,7 +730,6 @@ import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
 import { buildTradeItemRow, tradeOfferCeiling, tradeRowTooltipTarget } from './trade_view';
-import { BootcampOverlay } from './bootcamp';
 import { TutorialOverlay } from './tutorial';
 import {
   buildFerryBellHomeNote,
@@ -759,6 +758,7 @@ import { buildVcupHudView } from './vale_cup_hud_view';
 import { ValeCupIndicator } from './vale_cup_indicator';
 import { buildVcupIndicatorView } from './vale_cup_indicator_view';
 import { ValeCupWindow, vcupNationName } from './vale_cup_window';
+import { visibleVendorStock } from './vendor_stock_gate_core';
 import { nextVoicedYell, type VoicedYellState, voicedYellGain } from './voice_events';
 import {
   onWalletUiChange,
@@ -12582,12 +12582,29 @@ export class Hud {
           this.openBank();
           break;
         case 'noticeboard':
-          // The board has no posted content yet. The structured private event
-          // keeps this feedback localized and identical offline and online.
-          // Mobile keeps the chat log collapsed during normal play, so mirror
-          // the durable/live-announced log line into the shared transient
-          // banner instead of making a successful interaction look inert.
-          {
+          // The structured private event keeps this feedback localized and
+          // identical offline and online. Mobile keeps the chat log collapsed
+          // during normal play, so mirror the durable/live-announced log
+          // lines into the shared transient banner instead of making a
+          // successful interaction look inert. A board carrying listings
+          // banners the count and logs each notice (guild names and notes
+          // are world data, spliced verbatim like player names).
+          if (ev.state === 'listings') {
+            const banner = t('hudChrome.noticeboard.listingsBanner', {
+              count: formatNumber(ev.listings.length),
+            });
+            this.showBanner(banner);
+            this.log(banner, '#c8b98f');
+            for (const listing of ev.listings) {
+              this.log(
+                t('hudChrome.noticeboard.listingLine', {
+                  guild: listing.guild,
+                  note: listing.note,
+                }),
+                '#c8b98f',
+              );
+            }
+          } else {
             const message = t('hudChrome.noticeboard.empty');
             this.showBanner(message);
             this.log(message, '#c8b98f');

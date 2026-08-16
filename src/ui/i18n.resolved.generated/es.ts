@@ -909,14 +909,29 @@ export const es: EnTranslations = {
       "turnwalkBodyTouch": "Flag one down. Drag a finger across the world (not the movement stick) to turn until you face down the walled lane heading south, then push the stick up and walk it to the second flag.",
       "turnwalkBodyPad": "Flag one down. Push the right stick to turn until you face down the walled lane heading south, then push the left stick up and walk it to the second flag.",
       "strafeTitle": "Sidestep the last lane",
-      "strafeBody": "There is another way to move sideways. Hold the right mouse button and drag to swing your view around until you face north, back up the lane you came down, then hold {strafeKey} to sidestep along the last lane to the red flag. Sidestepping keeps your eyes on a target while you move: you will fight this way one day.",
-      "strafeBodyTouch": "There is another way to move sideways. Drag a finger to swing your view around until you face north, then push the movement stick left to slip sideways along the last lane to the red flag.",
-      "strafeBodyPad": "There is another way to move sideways. Push the right stick to swing your view around until you face north, then push the left stick left to slip sideways along the last lane to the red flag.",
+      "strafeBody": "There is another way to move sideways. Hold {turnKey} until you face back up the lane you came down, then hold {strafeKey} to sidestep along the last lane to the red flag. Sidestepping keeps your eyes on a target while you move: you will fight this way one day.",
+      "strafeBodyTouch": "There is another way to move sideways. Turn until you face back up the lane you came down, then push the movement stick left to slip sideways along the last lane to the red flag.",
+      "strafeBodyPad": "There is another way to move sideways. Push the right stick to turn until you face back up the lane you came down, then push the left stick left to slip sideways along the last lane to the red flag.",
+      "cameraTitle": "Swing the camera",
+      "cameraBody": "One last lesson before you hand the run in: hold the right mouse button and drag to swing the camera all the way around you. Knowing what stands behind you wins fights.",
+      "cameraBodyTouch": "One last lesson before you hand the run in: drag a finger across the world to swing the camera all the way around you. Knowing what stands behind you wins fights.",
+      "cameraBodyPad": "One last lesson before you hand the run in: push the right stick to swing the camera all the way around you. Knowing what stands behind you wins fights.",
       "courseProgress": "Flag {current} of {total}",
       "doneTitle": "Run complete",
       "doneBody": "That is everything your legs need to know. Overseer Pell stands beside the red flag: press {interactKey} on him, or left-click him, to hand your run in and take your first reward.",
       "doneBodyTouch": "That is everything your legs need to know. Overseer Pell stands beside the red flag: tap him to hand your run in and take your first reward.",
-      "doneBodyPad": "That is everything your legs need to know. Overseer Pell stands beside the red flag: press your interact button on him to hand your run in and take your first reward."
+      "doneBodyPad": "That is everything your legs need to know. Overseer Pell stands beside the red flag: press your interact button on him to hand your run in and take your first reward.",
+      "coachNextTitle": "Next: {npc}",
+      "coachNextBody": "Follow the arrow to {npc}. Walk up until the name shows, then press {interactKey}, or left-click them, to take your next task.",
+      "coachNextBodyTouch": "Follow the arrow to {npc}. Walk up until the name shows, then tap them, or tap the Use button, to take your next task.",
+      "coachNextBodyPad": "Follow the arrow to {npc}. Walk up until the name shows, then press your interact button to take your next task.",
+      "coachTaskBody": "Follow the arrow to your task. The tracker on the right keeps the tally, and {mapKey} opens the map if you lose the way.",
+      "coachTaskBodyTouch": "Follow the arrow to your task. The tracker on the right keeps the tally, and the map button shows the way if you lose it.",
+      "coachTaskBodyPad": "Follow the arrow to your task. The tracker on the right keeps the tally, and your map button shows the way if you lose it.",
+      "coachReadyTitle": "Task complete",
+      "coachReadyBody": "Return to {npc} and press {interactKey}, or left-click them, to hand it in and take your reward.",
+      "coachReadyBodyTouch": "Return to {npc} and tap them to hand it in and take your reward.",
+      "coachReadyBodyPad": "Return to {npc} and press your interact button to hand it in and take your reward."
     },
     "widgets": {
       "clockTitle": "Hora local: haz clic para alternar 12/24 horas",
@@ -2827,7 +2842,9 @@ export const es: EnTranslations = {
       "tip": "Las ganancias de venta u objetos devueltos te esperan en el Mercader."
     },
     "noticeboard": {
-      "empty": "Parece que no hay nada publicado."
+      "empty": "Parece que no hay nada publicado.",
+      "listingsBanner": "The board carries {count} posted notices.",
+      "listingLine": "{guild}: {note}"
     },
     "bank": {
       "title": "Banco",
@@ -16374,7 +16391,7 @@ export const es: EnTranslations = {
       },
       "q_ps_strike_true": {
         "title": "Strike True",
-        "text": "Footwork first, now the arm, {playerName}. The practice yard sits up the path behind me, and its straw effigies were built to be hit. If you lose the way, press M to open the map: every task you carry is marked on it. Walk up to an effigy and press Tab, or left-click it, to make it your target, then press 1, or click the first icon on the action bar along the bottom of your screen, to swing. Keep striking until one gives out; it will not swing back, effigies never do. Drillmaster Rook watches the yard from its east edge: press F on him to hand the fell in.",
+        "text": "Footwork first, now the arm, {playerName}. The practice yard sits up the path behind me, and its straw effigies were built to be hit. If you lose the way, press M to open the map: every task you carry is marked on it. Walk up to an effigy and press Tab, or left-click it, to make it your target, then press 1, or click the first icon on the action bar along the bottom of your screen, to swing. Keep striking until one gives out; it will not swing back, effigies never do. Drillmaster Rook watches the yard from its west shoulder, where the strand path sets out: press F on him to hand the fell in.",
         "completion": "One clean fell, and your grip already surer. Remember the feel of it, {playerName}: target, strike, and keep striking. Straw never minds. The next thing you swing at will.",
         "objectives": {
           "0": {
@@ -16394,8 +16411,8 @@ export const es: EnTranslations = {
       },
       "q_ps_the_wreck_line": {
         "title": "The Wreck Line",
-        "text": "The tide pays this island in salvage, {playerName}: castaway crates off the old wrecks, carried up and dropped along the rise between me and Dawnrest Camp. Follow my path toward the camp and you will walk right past them. Opening one is simple: walk up to a crate until its name shows, then press F, or left-click the crate itself, and it will give up what it holds. Three of them will do, and remember F is the same key for every chest, node and doorway you will ever meet. Quartermaster Finch keeps the camp stall and buys every stick of salvage: hand the haul to her.",
-        "completion": "Rope, tar, and half a wheel of cheese the sea somehow spared: I will take the lot. And since you can clearly stoop and carry, {playerName}, hear the trade lesson too. Gathering starts with a tool, a pick, an axe, a sickle, a pole, all sold at the vale traders. Hold Shift and press P to open your professions book: that is your craft wheel, and it shows every craft you know. Attune to a neighbouring pair and those two become your uncapped majors, one across the wheel stays your hobby, and the rest sleep with their knowledge kept. Nothing is final: a craft master sets your pair and changes it whenever you ask, at the Eastbrook forge, kitchens, loom and toolworks, the Fenbridge tannery, or the Highwatch apothecary.",
+        "text": "My porters haul salvage off the old wrecks and carry it up the rise toward Dawnrest Camp, {playerName}, and half the crates never finish the climb: they get set down along the path and forgotten. Follow my path toward the camp and you will walk right past the strays. Opening one is simple: walk up to a crate until its name shows, then press F, or left-click the crate itself, and it will give up what it holds. Six of them will clear the line, and remember F is the same key for every chest, node and doorway you will ever meet. Quartermaster Finch keeps the camp stall and buys every stick of salvage: hand the haul to her.",
+        "completion": "Rope, tar, and half a wheel of cheese the sea somehow spared: I will take the lot, {playerName}. A back that carries what it finds is worth more to this camp than any blade, and yours just cleared the whole line in one climb.",
         "objectives": {
           "0": {
             "label": "Castaway Crate opened"
@@ -16405,10 +16422,20 @@ export const es: EnTranslations = {
       "q_ps_pouch_and_purse": {
         "title": "Pouch and Purse",
         "text": "One more lesson before the vale, {playerName}, and it is the one that keeps adventurers alive: what you carry. Your backpack holds sixteen slots, and beside it wait four empty bag loops; every bag you buckle on adds its own space to the pool. So: press F on me again to open my stall, left-click the Linen Pouch in my wares to buy it, then press B to open your bags and left-click the pouch there to buckle it into a free loop. Instructor Maren drills by the muster fire a few steps east: show her the pouch on your belt.",
-        "completion": "A fine pouch, and six more slots to fill with trouble. Now the half of the lesson no bag can hold, {playerName}: what you cannot carry, the Gilded Strongbox keeps. Bursar Wick keeps his strongbox desk up the west path, and he opens the same vault every bursar in every town shares; more vault space can be bought once your purse grows into it. Keep your valuables banked and your bags roomy. A full pack has ended more adventures than any wolf ever did.",
+        "completion": "A fine pouch. Buckle it on if you have not already: press B to open your bags, then left-click the pouch to seat it in a free bag loop, and six more slots are yours to fill with trouble. Now the half of the lesson no bag can hold, {playerName}: what you cannot carry, the Gilded Strongbox keeps. Bursar Wick keeps his strongbox desk up the west path, and he opens the same vault every bursar in every town shares; more vault space can be bought once your purse grows into it. Keep your valuables banked and your bags roomy. A full pack has ended more adventures than any wolf ever did.",
         "objectives": {
           "0": {
             "label": "Linen Pouch bought"
+          }
+        }
+      },
+      "q_ps_the_signpost": {
+        "title": "Word on the Wind",
+        "text": "One habit left to learn, {playerName}, and it needs no blade: read the boards. The guild signpost stands at the camp gate a few steps south-west of my fire, and guilds and travelling crews post their calls on it. Walk up to its face and press F, or left-click it, to read what is posted, then come back and tell me what the wind carried in. A board like it stands in every town you will ever walk into.",
+        "completion": "So now you know how word moves in the vale, {playerName}: not by couriers, by boards. Check them in every town you pass; half an adventure starts as three lines of ink on one.",
+        "objectives": {
+          "0": {
+            "label": "Guild signpost read"
           }
         }
       },

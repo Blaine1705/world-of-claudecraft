@@ -21,7 +21,12 @@
 // registered in UI_PURE_CORES (tests/architecture.test.ts); driven directly
 // by tests/bootcamp_view.test.ts.
 
-import { BOOTCAMP_COURSE_CHECKPOINTS, PROVING_SHORE_NPCS } from '../sim/content/proving_shore';
+import {
+  BOOTCAMP_COURSE_CHECKPOINTS,
+  PROVING_SHORE_NPCS,
+  PROVING_SHORE_QUEST_ORDER,
+  PROVING_SHORE_QUESTS,
+} from '../sim/content/proving_shore';
 import type { TranslationKey } from './i18n';
 
 /** The control family the copy speaks for. Structurally identical to
@@ -29,38 +34,51 @@ import type { TranslationKey } from './i18n';
  *  this core stays free of game/ imports (the pure-core purity scan). */
 export type BootcampInputMode = 'keyboard' | 'touch' | 'pad';
 
-export type BootcampStep = 'talk' | 'forward' | 'turnwalk' | 'strafe' | 'done';
+export type BootcampStep = 'talk' | 'forward' | 'turnwalk' | 'strafe' | 'camera' | 'done';
 
 export const BOOTCAMP_STEP_ORDER: readonly BootcampStep[] = [
   'talk',
   'forward',
   'turnwalk',
   'strafe',
+  'camera',
 ];
+
+/** How far (radians of accumulated view travel) the camera lesson asks the
+ *  player to swing before it counts as learned: most of a full circle, so
+ *  they have genuinely looked around, with slack for direction changes. */
+export const CAMERA_LESSON_TRAVEL_RAD = 2.5;
 
 export interface BootcampSnapshot {
   /** The run quest sits in the quest log (accepted at Warden Tam). */
   questActive: boolean;
   /** Gauntlet flags tagged so far, in running order (0..3). */
   checkpointsReached: number;
+  /** The end-of-course camera lesson's own tally: the overlay accumulates
+   *  view-yaw travel and flips this at CAMERA_LESSON_TRAVEL_RAD. */
+  cameraTurned: boolean;
 }
 
-/** The current lesson: talk to the keeper, then one lane at a time. */
+/** The current lesson: talk to the keeper, one lane at a time, then the
+ *  camera swing at the finish, then the hand-in. */
 export function computeBootcampStep(s: BootcampSnapshot): BootcampStep {
   if (!s.questActive) return 'talk';
   if (s.checkpointsReached <= 0) return 'forward';
   if (s.checkpointsReached === 1) return 'turnwalk';
   if (s.checkpointsReached === 2) return 'strafe';
+  if (!s.cameraTurned) return 'camera';
   return 'done';
 }
 
 /** The world point the guidance arrow should aim at: Warden Tam for the talk
- *  lesson, the current lane's flag while running, Overseer Pell at the end. */
+ *  lesson, the current lane's flag while running, Overseer Pell at the end.
+ *  The camera lesson has no world target (the lesson is the view itself). */
 export function bootcampArrowTarget(
   step: BootcampStep,
   checkpointsReached: number,
 ): { x: number; z: number } | null {
   if (step === 'talk') return PROVING_SHORE_NPCS.warden_tam.pos;
+  if (step === 'camera') return null;
   if (step === 'done') return PROVING_SHORE_NPCS.overseer_pell.pos;
   return BOOTCAMP_COURSE_CHECKPOINTS[checkpointsReached] ?? null;
 }
@@ -78,7 +96,8 @@ const KEYBOARD: Record<BootcampStep, BootcampBodyPlan> = {
   talk: { bodyKey: 'hudChrome.bootcamp.talkBody', params: ['interactKey'] },
   forward: { bodyKey: 'hudChrome.bootcamp.forwardBody', params: ['forwardKey'] },
   turnwalk: { bodyKey: 'hudChrome.bootcamp.turnwalkBody', params: ['turnKey', 'forwardKey'] },
-  strafe: { bodyKey: 'hudChrome.bootcamp.strafeBody', params: ['strafeKey'] },
+  strafe: { bodyKey: 'hudChrome.bootcamp.strafeBody', params: ['turnKey', 'strafeKey'] },
+  camera: { bodyKey: 'hudChrome.bootcamp.cameraBody', params: [] },
   done: { bodyKey: 'hudChrome.bootcamp.doneBody', params: ['interactKey'] },
 };
 
@@ -87,6 +106,7 @@ const TOUCH: Record<BootcampStep, BootcampBodyPlan> = {
   forward: { bodyKey: 'hudChrome.bootcamp.forwardBodyTouch', params: [] },
   turnwalk: { bodyKey: 'hudChrome.bootcamp.turnwalkBodyTouch', params: [] },
   strafe: { bodyKey: 'hudChrome.bootcamp.strafeBodyTouch', params: [] },
+  camera: { bodyKey: 'hudChrome.bootcamp.cameraBodyTouch', params: [] },
   done: { bodyKey: 'hudChrome.bootcamp.doneBodyTouch', params: [] },
 };
 
@@ -95,6 +115,7 @@ const PAD: Record<BootcampStep, BootcampBodyPlan> = {
   forward: { bodyKey: 'hudChrome.bootcamp.forwardBodyPad', params: [] },
   turnwalk: { bodyKey: 'hudChrome.bootcamp.turnwalkBodyPad', params: [] },
   strafe: { bodyKey: 'hudChrome.bootcamp.strafeBodyPad', params: [] },
+  camera: { bodyKey: 'hudChrome.bootcamp.cameraBodyPad', params: [] },
   done: { bodyKey: 'hudChrome.bootcamp.doneBodyPad', params: [] },
 };
 
@@ -110,6 +131,7 @@ export function bootcampTitleKey(step: BootcampStep): TranslationKey {
     forward: 'hudChrome.bootcamp.forwardTitle',
     turnwalk: 'hudChrome.bootcamp.turnwalkTitle',
     strafe: 'hudChrome.bootcamp.strafeTitle',
+    camera: 'hudChrome.bootcamp.cameraTitle',
     done: 'hudChrome.bootcamp.doneTitle',
   };
   return titles[step];
@@ -128,19 +150,142 @@ export function bootcampKeycaps(
     talk: [labels.interactKey],
     forward: [labels.forwardKey],
     turnwalk: [labels.turnKey, labels.forwardKey],
-    strafe: [labels.strafeKey],
+    strafe: [labels.turnKey, labels.strafeKey],
+    camera: [],
     done: [labels.interactKey],
   };
   return caps[step].filter(Boolean);
 }
 
-/** Repaint only when the step or the input family changes (the tutorial.ts
- *  precedent): the flag counter alone is live-patched by the overlay. */
-export function bootcampNeedsRerender(
-  prevStep: BootcampStep | null,
-  nextStep: BootcampStep,
-  prevMode: BootcampInputMode,
-  nextMode: BootcampInputMode,
-): boolean {
-  return prevStep !== nextStep || prevMode !== nextMode;
+// ---------------------------------------------------------------------------
+// The rail coach: the same card, kept up for EVERY quest on the island's
+// relay after the Gauntlet's own lesson ladder. One generic three-state
+// template per quest (walk to the giver, do the task, return to the turn-in),
+// with a per-quest arrow target while the task is underway, so the top-of-
+// screen helper never goes dark between the pier and the crossing home.
+// ---------------------------------------------------------------------------
+
+/** The rail's head quest, whose card is the lesson ladder above instead of
+ *  the generic coach (mirrors tutorial/gauntlet_run.ts GAUNTLET_QUEST_ID
+ *  without importing sim logic into this pure core). */
+export const COACH_GAUNTLET_QUEST_ID = PROVING_SHORE_QUEST_ORDER[0];
+
+export type CoachState = 'available' | 'active' | 'ready';
+
+export interface CoachFocus {
+  questId: string;
+  state: CoachState;
+}
+
+/** The first rail quest still moving, in chain order: the relay hands one
+ *  quest to the next, so the first available/active/ready quest IS the
+ *  player's current station. Null once the whole rail is done (or none of it
+ *  is offered), which folds the card away. */
+export function coachFocus(stateOf: (questId: string) => CoachState | null): CoachFocus | null {
+  for (const questId of PROVING_SHORE_QUEST_ORDER) {
+    const state = stateOf(questId);
+    if (state) return { questId, state };
+  }
+  return null;
+}
+
+/** Where the arrow points while each quest's task is underway (the giver and
+ *  turn-in states aim at the NPCs themselves). Coordinates mirror the quest
+ *  content: the effigy yard, the wreck line, the first stray crate, Finch's
+ *  stall, the signpost's reading spot, and Odo at the crossing. */
+export const COACH_ACTIVE_TARGETS: Readonly<Record<string, { x: number; z: number }>> = {
+  q_ps_strike_true: { x: -336, z: -14 },
+  q_ps_shell_and_claw: { x: -391, z: -33 },
+  q_ps_the_wreck_line: { x: -362, z: -8 },
+  q_ps_pouch_and_purse: PROVING_SHORE_NPCS.quartermaster_finch.pos,
+  q_ps_the_signpost: { x: -312, z: 42.5 },
+  q_ps_set_sail: PROVING_SHORE_NPCS.ferryman_odo.pos,
+};
+
+export type CoachParam = 'interactKey' | 'mapKey';
+
+export interface CoachCardPlan {
+  /** Null on the active state: the overlay titles that card with the quest's
+   *  own localized name instead of a chrome key. */
+  titleKey: TranslationKey | null;
+  /** The title splices {npc} (the localized NPC name). */
+  titleHasNpc: boolean;
+  bodyKey: TranslationKey;
+  /** Bind labels the body splices (keyboard arm only; touch and pad copy
+   *  names sticks and on-screen affordances instead). */
+  params: readonly CoachParam[];
+  /** The body splices {npc}. */
+  bodyHasNpc: boolean;
+  /** Whose localized name fills {npc}: the giver on the way in, the turn-in
+   *  on the way back (also the active state's arrow fallback). */
+  npcId: string;
+  arrow: { x: number; z: number };
+}
+
+const COACH_BODY: Record<CoachState, Record<BootcampInputMode, TranslationKey>> = {
+  available: {
+    keyboard: 'hudChrome.bootcamp.coachNextBody',
+    touch: 'hudChrome.bootcamp.coachNextBodyTouch',
+    pad: 'hudChrome.bootcamp.coachNextBodyPad',
+  },
+  active: {
+    keyboard: 'hudChrome.bootcamp.coachTaskBody',
+    touch: 'hudChrome.bootcamp.coachTaskBodyTouch',
+    pad: 'hudChrome.bootcamp.coachTaskBodyPad',
+  },
+  ready: {
+    keyboard: 'hudChrome.bootcamp.coachReadyBody',
+    touch: 'hudChrome.bootcamp.coachReadyBodyTouch',
+    pad: 'hudChrome.bootcamp.coachReadyBodyPad',
+  },
+};
+
+export function coachCardPlan(focus: CoachFocus, mode: BootcampInputMode): CoachCardPlan {
+  const quest = PROVING_SHORE_QUESTS[focus.questId];
+  const giver = PROVING_SHORE_NPCS[quest.giverNpcId];
+  const turnIn = PROVING_SHORE_NPCS[quest.turnInNpcId];
+  const bodyKey = COACH_BODY[focus.state][mode];
+  if (focus.state === 'available') {
+    return {
+      titleKey: 'hudChrome.bootcamp.coachNextTitle',
+      titleHasNpc: true,
+      bodyKey,
+      params: mode === 'keyboard' ? ['interactKey'] : [],
+      bodyHasNpc: true,
+      npcId: quest.giverNpcId,
+      arrow: giver.pos,
+    };
+  }
+  if (focus.state === 'active') {
+    return {
+      titleKey: null,
+      titleHasNpc: false,
+      bodyKey,
+      params: mode === 'keyboard' ? ['mapKey'] : [],
+      bodyHasNpc: false,
+      npcId: quest.turnInNpcId,
+      arrow: COACH_ACTIVE_TARGETS[focus.questId] ?? turnIn.pos,
+    };
+  }
+  return {
+    titleKey: 'hudChrome.bootcamp.coachReadyTitle',
+    titleHasNpc: false,
+    bodyKey,
+    params: mode === 'keyboard' ? ['interactKey'] : [],
+    bodyHasNpc: true,
+    npcId: quest.turnInNpcId,
+    arrow: turnIn.pos,
+  };
+}
+
+/** Keycap chips for the generic coach cards: the interact key on the way in
+ *  and back, nothing while the task itself runs. Keyboard only, the ladder's
+ *  rule. */
+export function coachKeycaps(
+  state: CoachState,
+  mode: BootcampInputMode,
+  interactKeyLabel: string,
+): readonly string[] {
+  if (mode !== 'keyboard' || state === 'active') return [];
+  return [interactKeyLabel].filter(Boolean);
 }

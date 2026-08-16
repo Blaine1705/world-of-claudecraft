@@ -8202,6 +8202,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_points': '积分不足。',
   'hudChrome.mailbox.title': '邮箱',
   'hudChrome.noticeboard.empty': '看起来没有张贴任何内容。',
+  'hudChrome.noticeboard.listingsBanner': '告示板上贴着 {count} 张告示。',
+  'hudChrome.noticeboard.listingLine': '{guild}：{note}',
   'hudChrome.mailbox.subtitle': '渡鸦邮驿',
   'hudChrome.mailbox.close': '关闭邮箱',
   'hudChrome.mailbox.tabInbox': '收件箱',
@@ -12832,11 +12834,18 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '第一面旗到手。推动右摇杆转身，直到正对向南延伸的围栏跑道，然后把左摇杆推向上方，沿跑道走到第二面旗。',
   'hudChrome.bootcamp.strafeTitle': '横移走完最后一条跑道',
   'hudChrome.bootcamp.strafeBody':
-    '侧向移动还有另一种办法。按住鼠标右键并拖动来转动视角，直到面向北方、回望你刚走下来的那条跑道，然后按住 {strafeKey}，沿最后一条跑道横移到红旗处。横移能让你移动时视线始终锁在目标上：总有一天你会这样作战。',
+    '侧向移动还有另一种办法。按住 {turnKey} 转身，直到回望你刚走下来的那条跑道，然后按住 {strafeKey}，沿最后一条跑道横移到红旗处。横移能让你移动时视线始终锁在目标上：总有一天你会这样作战。',
   'hudChrome.bootcamp.strafeBodyTouch':
-    '侧向移动还有另一种办法。用手指拖动画面转动视角，直到面向北方，然后把移动摇杆推向左边，沿最后一条跑道滑步横移到红旗处。',
+    '侧向移动还有另一种办法。转身直到回望你刚走下来的那条跑道，然后把移动摇杆推向左边，沿最后一条跑道滑步横移到红旗处。',
   'hudChrome.bootcamp.strafeBodyPad':
-    '侧向移动还有另一种办法。推动右摇杆转动视角，直到面向北方，然后把左摇杆推向左边，沿最后一条跑道滑步横移到红旗处。',
+    '侧向移动还有另一种办法。推动右摇杆转身，直到回望你刚走下来的那条跑道，然后把左摇杆推向左边，沿最后一条跑道滑步横移到红旗处。',
+  'hudChrome.bootcamp.cameraTitle': '转动视角',
+  'hudChrome.bootcamp.cameraBody':
+    '交上成绩之前还有最后一课：按住鼠标右键并拖动，把视角绕着自己整整转上一圈。知道身后站着什么，才能打赢仗。',
+  'hudChrome.bootcamp.cameraBodyTouch':
+    '交上成绩之前还有最后一课：用手指拖动世界画面，把视角绕着自己整整转上一圈。知道身后站着什么，才能打赢仗。',
+  'hudChrome.bootcamp.cameraBodyPad':
+    '交上成绩之前还有最后一课：推动右摇杆，把视角绕着自己整整转上一圈。知道身后站着什么，才能打赢仗。',
   'hudChrome.bootcamp.courseProgress': '旗帜 {current}/{total}',
   'hudChrome.bootcamp.doneTitle': '跑完全程',
   'hudChrome.bootcamp.doneBody':
@@ -12845,6 +12854,25 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '腿上的功夫就这些了。监工佩尔就站在红旗旁边：点按他，交上你的成绩，领取你的第一份报酬。',
   'hudChrome.bootcamp.doneBodyPad':
     '腿上的功夫就这些了。监工佩尔就站在红旗旁边：按下互动键，交上你的成绩，领取你的第一份报酬。',
+  'hudChrome.bootcamp.coachNextTitle': '下一位：{npc}',
+  'hudChrome.bootcamp.coachNextBody':
+    '跟着箭头去找{npc}。走到跟前直到名字显示出来，然后按 {interactKey}，或者用鼠标左键点击对方，接下你的下一件差事。',
+  'hudChrome.bootcamp.coachNextBodyTouch':
+    '跟着箭头去找{npc}。走到跟前直到名字显示出来，然后点按对方，或点按使用按钮，接下你的下一件差事。',
+  'hudChrome.bootcamp.coachNextBodyPad':
+    '跟着箭头去找{npc}。走到跟前直到名字显示出来，然后按下互动键，接下你的下一件差事。',
+  'hudChrome.bootcamp.coachTaskBody':
+    '跟着箭头去完成差事。右侧的追踪栏随时记着进度，迷了路就按 {mapKey} 打开地图。',
+  'hudChrome.bootcamp.coachTaskBodyTouch':
+    '跟着箭头去完成差事。右侧的追踪栏随时记着进度，迷了路就点按地图按钮看路。',
+  'hudChrome.bootcamp.coachTaskBodyPad':
+    '跟着箭头去完成差事。右侧的追踪栏随时记着进度，迷了路就按下地图按钮看路。',
+  'hudChrome.bootcamp.coachReadyTitle': '差事办妥',
+  'hudChrome.bootcamp.coachReadyBody':
+    '回到{npc}身边，按 {interactKey}，或者用鼠标左键点击对方，交上差事，领取报酬。',
+  'hudChrome.bootcamp.coachReadyBodyTouch': '回到{npc}身边，点按对方，交上差事，领取报酬。',
+  'hudChrome.bootcamp.coachReadyBodyPad':
+    '回到{npc}身边，按下互动键，交上差事，领取报酬。',
   'entities.zones.proving_shore.pois.4.label': '试炼跑道',
   'entities.items.ps_castaway_crate.name': '漂流货箱',
   'entities.items.ps_ferry_bell.name': '渡船铃',
@@ -12894,7 +12922,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '镀金保险箱连这里也设了一张桌子，{playerName}。凡是存到我这里的东西，都躺在每座城镇每位司库身后的同一座金库里，狼咬不着，水泡不着，连你自己的糊涂决定也碰不着。',
   'entities.quests.q_ps_strike_true.title': '击中要害',
   'entities.quests.q_ps_strike_true.text':
-    '练完了脚，该练手臂了，{playerName}。练武场就在我身后沿路而上的地方，那里的草人生来就是挨打的。要是找不着路，按 M 打开地图：你身上的每件差事都会标在上面。走到一个草人跟前，按 Tab 或用鼠标左键点击它，把它设为目标，然后按 1，或者点击屏幕底部动作条上的第一个图标，挥出这一刀。一直打到一个散架为止；它不会还手，草人从来不还手。操练官鲁克在练武场东侧看着场子：对着他按 F，交上这份战果。',
+    '练完了脚，该练手臂了，{playerName}。练武场就在我身后沿路而上的地方，那里的草人生来就是挨打的。要是找不着路，按 M 打开地图：你身上的每件差事都会标在上面。走到一个草人跟前，按 Tab 或用鼠标左键点击它，把它设为目标，然后按 1，或者点击屏幕底部动作条上的第一个图标，挥出这一刀。一直打到一个散架为止；它不会还手，草人从来不还手。操练官鲁克在练武场西侧、通往海滩的小路启程的地方看着场子：对着他按 F，交上这份战果。',
   'entities.quests.q_ps_strike_true.completion':
     '干净利落的一击，手也已经稳多了。记住这种感觉，{playerName}：选定目标，挥刀，然后一直打下去。稻草挨打从不计较。你下一个挥刀的对象可就计较了。',
   'entities.quests.q_ps_strike_true.objectives.0.label': '击倒训练草人',
@@ -12906,16 +12934,22 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ps_shell_and_claw.objectives.0.label': '除灭滩涂掠蟹',
   'entities.quests.q_ps_the_wreck_line.title': '沉船滩',
   'entities.quests.q_ps_the_wreck_line.text':
-    '潮水用海货支付这座岛，{playerName}：旧沉船上的漂流货箱，被搬上来丢在我和晨憩营地之间的坡道旁。沿我这条路朝营地走，你正好会从它们旁边经过。开箱很简单：走到货箱跟前，直到它的名字显示出来，然后按 F，或者用鼠标左键点击货箱本身，它就会把里面的东西交出来。开三只就够了，并且记住：你今后遇到的每一只箱子、每一处采集点、每一道门扉，用的都是同一个 F 键。军需官芬奇守着营地的货摊，残骸海货连一根木棍都收：把这批货交给她。',
+    '我的搬运工把海货从旧沉船上卸下来，沿坡道扛往晨憩营地，{playerName}，可半数货箱从来到不了坡顶：它们被搁在路边，就此没人记得。沿我这条路朝营地走，你正好会从这些落单的货箱旁边经过。开箱很简单：走到货箱跟前，直到它的名字显示出来，然后按 F，或者用鼠标左键点击货箱本身，它就会把里面的东西交出来。开六只就能清完这条线，并且记住：你今后遇到的每一只箱子、每一处采集点、每一道门扉，用的都是同一个 F 键。军需官芬奇守着营地的货摊，残骸海货连一根木棍都收：把这批货交给她。',
   'entities.quests.q_ps_the_wreck_line.completion':
-    '绳子、焦油，还有半轮大海竟然放过的奶酪：我全要了。既然你显然弯得下腰、扛得动货，{playerName}，就顺便听听手艺这一课。采集从一件工具开始，矿镐、斧子、镰刀、钓竿，谷地的商人那里都有得卖。按住 Shift 再按 P，打开你的专业手册：那就是你的手艺环轮，上面列着你会的每一门技艺。调谐到相邻的一对，这两门便成为无上限的主修，环轮对面的一门留作你的爱好，其余的则连同所学一起休眠。什么都不是定局：技艺大师为你定下这一对，日后你想改，随时找他们就改了。他们就在东溪谷的锻炉、厨房、织机和工坊，芬桥的制革坊，还有高哨的药剂铺。',
+    '绳子、焦油，还有半轮大海竟然放过的奶酪：我全要了，{playerName}。一副肯弯腰扛货的脊背，对这座营地来说比任何刀剑都值钱，而你这一趟就把整条线清了个干净。',
   'entities.quests.q_ps_the_wreck_line.objectives.0.label': '开启漂流货箱',
   'entities.quests.q_ps_pouch_and_purse.title': '钱囊与背袋',
   'entities.quests.q_ps_pouch_and_purse.text':
     '去谷地之前还有最后一课，{playerName}，也是保住冒险者性命的一课：你随身带的东西。你的背包有十六格，旁边还空着四个袋扣；每系上一只袋子，它的空间就并入总容量。所以：再对我按一次 F，打开我的货摊，在我的货品里用鼠标左键点击亚麻小袋买下它，然后按 B 打开背包，再用鼠标左键点击袋中的亚麻小袋，把它系进一个空着的袋扣。教官玛伦就在东边几步外的集合篝火旁操练：把你腰带上的小袋给她看看。',
   'entities.quests.q_ps_pouch_and_purse.completion':
-    '好袋子，又多出六格用来装麻烦。接下来是任何袋子都装不下的另一半课，{playerName}：背不下的，交给镀金保险箱。司库威克的保险箱桌就设在西边沿路而上的地方，他为你打开的正是每座城镇每位司库共用的同一座金库；等你的钱袋鼓起来，还能购买更多金库空间。贵重的存进金库，袋子留出空当。塞满的行囊断送过的冒险，比任何狼都多。',
+    '好袋子。要是还没系上，现在就系：按 B 打开背包，用鼠标左键点击小袋，把它系进一个空着的袋扣，多出的六格就归你装麻烦了。接下来是任何袋子都装不下的另一半课，{playerName}：背不下的，交给镀金保险箱。司库威克的保险箱桌就设在西边沿路而上的地方，他为你打开的正是每座城镇每位司库共用的同一座金库；等你的钱袋鼓起来，还能购买更多金库空间。贵重的存进金库，袋子留出空当。塞满的行囊断送过的冒险，比任何狼都多。',
   'entities.quests.q_ps_pouch_and_purse.objectives.0.label': '购买亚麻小袋',
+  'entities.quests.q_ps_the_signpost.title': '风中传信',
+  'entities.quests.q_ps_the_signpost.text':
+    '还剩最后一个习惯要学，{playerName}，而且用不着刀剑：读告示板。公会告示柱就立在营地大门口，离我的篝火西南边几步远，公会和过路的队伍都把召集令贴在上面。走到柱面跟前，按 F，或者用鼠标左键点击它，读一读贴着的内容，然后回来告诉我风里捎来了什么。你今后走进的每一座城镇，都立着一块这样的告示板。',
+  'entities.quests.q_ps_the_signpost.completion':
+    '这下你知道消息在谷地里是怎么传的了，{playerName}：不靠信使，靠告示板。每过一座城镇都去看看；半数冒险的开头，不过是板上三行墨字。',
+  'entities.quests.q_ps_the_signpost.objectives.0.label': '读过公会告示柱',
   'entities.quests.q_ps_set_sail.title': '扬帆起航',
   'entities.quests.q_ps_set_sail.text':
     '这片海滨上已经没有你没跑过、没打倒过、没打开过、没买下过的东西了，{playerName}。你准备好了，而东溪谷有真正的差事在等着。沿海滨大道走回码头，对着渡船人奥多按 F，告诉他，就说是我说的，你挣到了这趟航程。什么时候记不清自己欠了谁什么，随时按 L：那是你的任务日志。',

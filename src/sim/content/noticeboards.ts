@@ -46,8 +46,15 @@ const PROVING_SHORE_NOTICEBOARD = {
   name: eastbrook.name,
   // Just south of the camp's south fence run, facing north at its gate, so
   // every recruit walking between the camp and the yard passes its face.
+  // z 41 rather than 40 ON PURPOSE: the Wick-path streetlamp plan drops a
+  // post at about (-311.8, 41.6), squarely on the board's old reading spot,
+  // and the board's own collider clearance (colliders.ts
+  // buildStreetlampPlacements' blocked probe, LAMP_CLEARANCE) is what
+  // suppresses that post; the
+  // authored gate lantern at (-320, 40) carries the light instead
+  // (proving_shore.ts decorProps).
   x: -312,
-  z: 40,
+  z: 41,
   rotation: 0,
   width: eastbrook.nativeDimensions.width,
   depth: eastbrook.nativeDimensions.depth,
@@ -55,7 +62,7 @@ const PROVING_SHORE_NOTICEBOARD = {
   interactionRadius: eastbrook.interactionRadius,
   // The board is a solid collider, so walkers aim for the reading spot in
   // front of it rather than the board's own point (the Eastbrook pattern).
-  frontStandingPoint: { x: -312, z: 41.5 },
+  frontStandingPoint: { x: -312, z: 42.5 },
 } satisfies NoticeboardDef;
 
 assertCanonicalEastbrookNoticeboardDef(PROVING_SHORE_NOTICEBOARD);

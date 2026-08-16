@@ -1,22 +1,27 @@
-// The Proving Shore movement bootcamp overlay: the island sibling of the
-// Eastbrook new-adventurer coachmark (tutorial.ts), sharing its card CSS
-// family and its whole shape. From the moment a fresh arrival lands (Warden
-// Tam's run quest AVAILABLE) through the run itself (quest ACTIVE), the card
-// walks them through the Gauntlet's ordered lessons: talk to Tam (press F),
-// hold forward down lane 1, turn with the turn key and walk the south lane,
-// swing the view with the mouse and strafe the last lane, then hand the run
-// to Overseer Pell at the finish. Copy follows the player's live input
-// family (keyboard, touch, or gamepad; src/game/input_hint_mode.ts), the
-// physical keycaps show as on-screen chips, and the guidance arrow leads to
-// Tam, the current lane's flag, or Pell.
+// The Proving Shore coach overlay: the island sibling of the Eastbrook
+// new-adventurer coachmark (tutorial.ts), sharing its card CSS family and its
+// whole shape, and now the top-of-screen helper for the WHOLE quest rail.
+//
+// The rail's head quest (Warden Tam's Gauntlet) keeps its ordered lesson
+// ladder: talk to Tam (press F), hold forward down lane 1, turn with the
+// turn key and walk the south lane, turn back and strafe the last lane, then
+// swing the camera at the finish, then hand the run to Overseer Pell. Every
+// LATER quest on the relay shows the generic three-state coach card instead
+// (walk to the giver, do the task, return to the turn-in), so the helper
+// text persists from the pier landing to the crossing home. Copy follows the
+// player's live input family (keyboard, touch, or gamepad;
+// src/game/input_hint_mode.ts), the physical keycaps show as on-screen
+// chips, and the guidance arrow leads to the current station.
 //
 // The flag tally is the QUEST'S OWN objective count (the sim credits one
 // count per flag passed in order, tutorial/gauntlet_run.ts), so the card,
 // the quest tracker, and the server can never disagree about a tag, and
 // progress survives reloads with the character rather than the device. The
-// card folds away when the run is handed in (quest done) or the player
-// leaves the island. Reads world state, writes none, and runs identically
-// against the offline Sim and the online ClientWorld.
+// end-of-course camera lesson is the one client-side tally (accumulated
+// view-yaw travel): it teaches a camera the sim never sees. The card folds
+// away when the rail runs out or the player leaves the island. Reads world
+// state, writes none, and runs identically against the offline Sim and the
+// online ClientWorld.
 
 import { currentInputHintMode, type InputHintMode } from '../game/input_hint_mode';
 import type { Keybinds } from '../game/keybinds';
@@ -33,10 +38,16 @@ import {
   bootcampArrowTarget,
   bootcampBodyPlan,
   bootcampKeycaps,
-  bootcampNeedsRerender,
   bootcampTitleKey,
+  CAMERA_LESSON_TRAVEL_RAD,
+  type CoachFocus,
+  type CoachState,
+  coachCardPlan,
+  coachFocus,
+  coachKeycaps,
   computeBootcampStep,
 } from './bootcamp_view';
+import { tEntity } from './entity_i18n';
 import { formatNumber, t } from './i18n';
 
 // The closing card lingers, then dismisses itself (the tutorial.ts pattern);
@@ -47,13 +58,17 @@ const ISLAND_MAX_X = -180;
 
 export class BootcampOverlay {
   // Session-only dismissal: the skip button folds the card away until the
-  // run quest's log state changes again.
-  private dismissed = false;
+  // rail moves to another quest or state.
+  private dismissedKey: string | null = null;
   private engaged = false;
   private step: BootcampStep | null = null;
+  private renderKey: string | null = null;
   private doneSince = 0;
   private lastMode: InputHintMode = 'keyboard';
   private lastCounts = 0;
+  // The camera lesson's client-side tally: accumulated view-yaw travel.
+  private cameraTravel = 0;
+  private cameraLastYaw: number | null = null;
 
   private root: HTMLElement | null = null;
   private titleEl!: HTMLElement;
@@ -63,52 +78,84 @@ export class BootcampOverlay {
   private progressEl!: HTMLElement;
   private skipBtn!: HTMLButtonElement;
   private arrow: HTMLElement | null = null;
+  private lastFocus: CoachFocus | null = null;
+  private lastKeybinds: Keybinds | null = null;
 
-  // Called every HUD frame. Cheap no-op while the run is neither offered nor
-  // underway.
+  // Called every HUD frame. Cheap no-op while no rail quest is moving.
   update(world: IWorld, renderer: Renderer, keybinds: Keybinds): void {
     const p = world.player;
     if (!p) return;
     if (world.playerId < 0 || p.id !== world.playerId) return;
 
-    const questState = world.questState(GAUNTLET_QUEST_ID);
-    const questActive = world.questLog.get(GAUNTLET_QUEST_ID)?.state === 'active';
-    const engageable = questActive || questState === 'available';
     const onIsland = (p.pos?.x ?? 0) < ISLAND_MAX_X;
-    if (!this.engaged) {
-      if (!engageable || !onIsland || this.dismissed) {
-        // A state change after a dismissal re-arms the card (accepting the
-        // quest after skipping the talk card, or abandoning and retaking).
-        if (!engageable) this.dismissed = false;
-        return;
-      }
-      this.engaged = true;
-      this.lastCounts = questCounts(world);
-    } else if (!onIsland || (!engageable && questState !== 'ready')) {
-      // Handed in (or ferried away mid-lesson): fold the card away. A later
-      // island visit with the quest offered again starts fresh.
-      this.disengage();
+    const focus = onIsland ? coachFocus((questId) => railQuestState(world, questId)) : null;
+    if (!focus) {
+      // Rail finished, not offered, or ferried away: fold the card and
+      // re-arm any dismissal for a later visit.
+      if (this.engaged) this.disengage();
+      this.dismissedKey = null;
       return;
     }
 
-    this.lastCounts = questCounts(world);
-    const mode = currentInputHintMode();
-    const next = computeBootcampStep({
-      questActive: questActive || questState === 'ready',
-      checkpointsReached: this.lastCounts,
-    });
+    this.lastFocus = focus;
+    this.lastKeybinds = keybinds;
+    const isGauntlet = focus.questId === GAUNTLET_QUEST_ID;
+    this.lastCounts = isGauntlet ? questCounts(world) : 0;
 
-    if (bootcampNeedsRerender(this.step, next, this.lastMode, mode)) {
+    // The camera lesson's yaw tally runs off the live renderer view. It only
+    // accumulates once the run's flags are all tagged; a fresh run (abandon
+    // and retake) starts the tally over.
+    if (isGauntlet && this.lastCounts >= BOOTCAMP_COURSE_CHECKPOINTS.length) {
+      const yaw = renderer.camYaw;
+      if (this.cameraLastYaw !== null) {
+        this.cameraTravel += Math.abs(wrapAngle(yaw - this.cameraLastYaw));
+      }
+      this.cameraLastYaw = yaw;
+    } else {
+      this.cameraTravel = 0;
+      this.cameraLastYaw = null;
+    }
+    const cameraTurned = this.cameraTravel >= CAMERA_LESSON_TRAVEL_RAD;
+
+    const focusKey = `${focus.questId}:${focus.state}`;
+    if (this.dismissedKey !== null) {
+      if (this.dismissedKey === focusKey) return; // skipped; wait for the rail to move
+      this.dismissedKey = null;
+    }
+    this.engaged = true;
+
+    const mode = currentInputHintMode();
+    let nextRenderKey: string;
+    if (isGauntlet) {
+      const next = computeBootcampStep({
+        questActive: focus.state !== 'available',
+        checkpointsReached: this.lastCounts,
+        cameraTurned,
+      });
       this.step = next;
-      if (next === 'done' && this.doneSince === 0) this.doneSince = performance.now();
+      nextRenderKey = `gauntlet:${next}:${mode}`;
+    } else {
+      this.step = null;
+      nextRenderKey = `${focusKey}:${mode}`;
+    }
+
+    if (this.renderKey !== nextRenderKey) {
+      this.renderKey = nextRenderKey;
+      this.lastMode = mode;
+      if (this.step === 'done' && this.doneSince === 0) this.doneSince = performance.now();
+      if (this.step !== 'done') this.doneSince = 0;
       this.renderPanel(keybinds);
     }
 
     if (this.step === 'done') {
       // The done card asks for the hand-in at Overseer Pell beside the red
-      // flag; it lingers, then trusts the quest tracker (the turn-in itself
-      // disengages above).
-      if (performance.now() - this.doneSince >= DONE_LINGER_MS) this.disengage();
+      // flag; it lingers, then folds until the rail moves on (the hand-in
+      // changes the focus, which re-opens the card for the next quest).
+      if (performance.now() - this.doneSince >= DONE_LINGER_MS) {
+        this.dismissedKey = focusKey;
+        this.disengage();
+        return;
+      }
     }
 
     this.updateArrow(renderer);
@@ -117,7 +164,7 @@ export class BootcampOverlay {
   /** Re-localize after an in-game language switch (the Hud's woc:languagechange
    *  fan-out). Self-gated on a card being up, the tutorial.ts precedent. */
   relocalize(_world: IWorld, keybinds: Keybinds): void {
-    if (!this.engaged || this.step === null) return;
+    if (!this.engaged || this.renderKey === null) return;
     this.renderPanel(keybinds);
   }
 
@@ -181,7 +228,12 @@ export class BootcampOverlay {
   private renderPanel(keybinds: Keybinds): void {
     this.ensureDom();
     if (!this.root) return;
+    if (this.step !== null) this.renderLadderPanel(keybinds);
+    else this.renderCoachPanel(keybinds);
+  }
 
+  /** The Gauntlet's own lesson-ladder card (the rail's head quest). */
+  private renderLadderPanel(keybinds: Keybinds): void {
     const mode = currentInputHintMode();
     this.lastMode = mode;
 
@@ -200,14 +252,7 @@ export class BootcampOverlay {
     this.titleEl.textContent = t(bootcampTitleKey(this.step!));
     this.bodyEl.textContent = t(plan.bodyKey, params);
 
-    this.keysEl.replaceChildren();
-    for (const cap of bootcampKeycaps(this.step!, mode, labels)) {
-      const chip = document.createElement('span');
-      chip.className = 'tut-keycap';
-      chip.textContent = cap;
-      this.keysEl.appendChild(chip);
-    }
-    this.keysEl.style.display = this.keysEl.childElementCount > 0 ? '' : 'none';
+    this.paintKeycaps(bootcampKeycaps(this.step!, mode, labels));
 
     const idx = BOOTCAMP_STEP_ORDER.indexOf(this.step!);
     this.stepEl.textContent =
@@ -218,7 +263,7 @@ export class BootcampOverlay {
           })
         : '';
 
-    if (this.step !== 'done' && this.step !== 'talk') {
+    if (this.step !== 'done' && this.step !== 'talk' && this.step !== 'camera') {
       this.progressEl.textContent = this.courseProgress();
       this.progressEl.style.display = '';
     } else {
@@ -227,13 +272,61 @@ export class BootcampOverlay {
 
     this.skipBtn.textContent =
       this.step === 'done' ? t('hud.tutorial.dismiss') : t('hud.tutorial.skip');
-    this.root.classList.toggle('tut-done', this.step === 'done');
+    this.root!.classList.toggle('tut-done', this.step === 'done');
+  }
+
+  /** The generic three-state coach card for every later rail quest. */
+  private renderCoachPanel(keybinds: Keybinds): void {
+    const focus = this.lastFocus;
+    if (!focus) return;
+    const mode = currentInputHintMode();
+    this.lastMode = mode;
+
+    const unbound = t('hud.options.unbound');
+    const interactKey = keybinds.primaryLabel('interact') || unbound;
+    const mapKey = keybinds.primaryLabel('map') || unbound;
+
+    const plan = coachCardPlan(focus, mode);
+    const npc = tEntity({ kind: 'npc', id: plan.npcId, field: 'name' });
+    const params: Record<string, string> = {};
+    if (plan.bodyHasNpc) params.npc = npc;
+    for (const key of plan.params) params[key] = key === 'interactKey' ? interactKey : mapKey;
+
+    this.titleEl.textContent = plan.titleKey
+      ? t(plan.titleKey, plan.titleHasNpc ? { npc } : undefined)
+      : tEntity({ kind: 'quest', id: focus.questId, field: 'title' });
+    this.bodyEl.textContent = t(plan.bodyKey, params);
+
+    this.paintKeycaps(coachKeycaps(focus.state, mode, interactKey));
+
+    // The step ladder and flag tally belong to the Gauntlet card alone.
+    this.stepEl.textContent = '';
+    this.progressEl.style.display = 'none';
+
+    this.skipBtn.textContent = t('hud.tutorial.skip');
+    this.root!.classList.remove('tut-done');
+  }
+
+  private paintKeycaps(caps: readonly string[]): void {
+    this.keysEl.replaceChildren();
+    for (const cap of caps) {
+      const chip = document.createElement('span');
+      chip.className = 'tut-keycap';
+      chip.textContent = cap;
+      this.keysEl.appendChild(chip);
+    }
+    this.keysEl.style.display = this.keysEl.childElementCount > 0 ? '' : 'none';
   }
 
   // Points the shared course arrow at the current lesson's target.
   private updateArrow(renderer: Renderer): void {
     if (!this.arrow) return;
-    const target = bootcampArrowTarget(this.step!, this.lastCounts);
+    const target =
+      this.step !== null
+        ? bootcampArrowTarget(this.step, this.lastCounts)
+        : this.lastFocus
+          ? coachCardPlan(this.lastFocus, this.lastMode).arrow
+          : null;
     if (!target) {
       this.hideArrow();
       return;
@@ -272,6 +365,7 @@ export class BootcampOverlay {
   private disengage(): void {
     this.engaged = false;
     this.step = null;
+    this.renderKey = null;
     this.doneSince = 0;
     this.root?.remove();
     this.arrow?.remove();
@@ -280,7 +374,8 @@ export class BootcampOverlay {
   }
 
   private finish(): void {
-    this.dismissed = true;
+    const focus = this.lastFocus;
+    this.dismissedKey = focus ? `${focus.questId}:${focus.state}` : null;
     this.disengage();
   }
 }
@@ -288,4 +383,22 @@ export class BootcampOverlay {
 /** The quest objective's own flag tally (0 when the quest is not active). */
 function questCounts(world: IWorld): number {
   return world.questLog.get(GAUNTLET_QUEST_ID)?.counts?.[0] ?? 0;
+}
+
+/** One rail quest's coach state, or null when it is not moving (locked
+ *  behind its prerequisite, or already handed in). */
+function railQuestState(world: IWorld, questId: string): CoachState | null {
+  if (world.questLog.get(questId)?.state === 'active') return 'active';
+  const state = world.questState(questId);
+  if (state === 'available') return 'available';
+  if (state === 'ready') return 'ready';
+  return null;
+}
+
+/** Shortest signed angular distance, for the camera lesson's travel tally. */
+function wrapAngle(a: number): number {
+  let r = a % (Math.PI * 2);
+  if (r > Math.PI) r -= Math.PI * 2;
+  if (r < -Math.PI) r += Math.PI * 2;
+  return r;
 }

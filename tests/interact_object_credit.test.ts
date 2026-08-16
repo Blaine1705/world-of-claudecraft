@@ -191,11 +191,12 @@ describe('every multi-count interact objective has enough distinct objects to fi
     expect(interactObjectives.filter((o) => o.count > 1).length).toBe(23);
   });
 
-  it.each(
-    interactObjectives.filter((o) => o.count > 1 && o.itemId !== 'ps_gauntlet_flag'),
-  )('$questId can reach $count on distinct $itemId objects', ({ itemId, count }) => {
-    expect(placedByItem.get(itemId) ?? 0).toBeGreaterThanOrEqual(count);
-  });
+  it.each(interactObjectives.filter((o) => o.count > 1 && o.itemId !== 'ps_gauntlet_flag'))(
+    '$questId can reach $count on distinct $itemId objects',
+    ({ itemId, count }) => {
+      expect(placedByItem.get(itemId) ?? 0).toBeGreaterThanOrEqual(count);
+    },
+  );
 
   it('the Gauntlet flag sentinel can reach its count on distinct authored checkpoints', () => {
     // No ground objects exist for ps_gauntlet_flag: the run's "objects" are
@@ -238,18 +239,20 @@ describe('every multi-count interact objective has enough distinct objects to fi
     }
   });
 
-  it('places every interact target in the world table, bar the two sentinels', () => {
-    // train_valorsteed (mounts_training.ts credits it off the trainer NPC)
-    // and ps_gauntlet_flag (tutorial/gauntlet_run.ts credits it by ordered
-    // position against the authored checkpoints) are sentinels with no
-    // object at all, so they never reach the ledger. Anything ELSE missing
-    // from the world table would mean an objective whose object spawns
-    // somewhere this reasoning has not checked.
+  it('places every interact target in the world table, bar the three sentinels', () => {
+    // train_valorsteed (mounts_training.ts credits it off the trainer NPC),
+    // ps_gauntlet_flag (tutorial/gauntlet_run.ts credits it by ordered
+    // position against the authored checkpoints), and ps_guild_signpost
+    // (tutorial/signpost_read.ts credits it off the camp noticeboard's own
+    // interaction arm) are sentinels with no object of their own, so they
+    // never reach the ledger. Anything ELSE missing from the world table
+    // would mean an objective whose object spawns somewhere this reasoning
+    // has not checked.
     const worldItemIds = new Set(GROUND_OBJECTS.map((d) => d.itemId));
     const unplaced = [...new Set(interactObjectives.map((o) => o.itemId))].filter(
       (id) => !worldItemIds.has(id),
     );
-    expect(unplaced.sort()).toEqual(['ps_gauntlet_flag', 'train_valorsteed']);
+    expect(unplaced.sort()).toEqual(['ps_gauntlet_flag', 'ps_guild_signpost', 'train_valorsteed']);
   });
 });
 
@@ -529,11 +532,16 @@ describe('the sibling interact-credit paths this fix does NOT cover', () => {
     );
     expect(unguarded).toEqual([]);
 
-    // The sentinel is object-keyed by type but has no object, so it rides the
-    // same "count 1 is the only guard" reasoning.
+    // The sentinels are object-keyed by type but have no object, so they ride
+    // the same "count 1 is the only guard" reasoning (signpost_read.ts and
+    // mounts_training.ts each gate on `counts >= required` and nothing else).
     const sentinel = QUESTS.q_riding_lessons?.objectives.find(
       (o) => o.type === 'interact' && o.targetObjectItemId === 'train_valorsteed',
     );
     expect(sentinel?.count).toBe(1);
+    const signpost = QUESTS.q_ps_the_signpost?.objectives.find(
+      (o) => o.type === 'interact' && o.targetObjectItemId === 'ps_guild_signpost',
+    );
+    expect(signpost?.count).toBe(1);
   });
 });
