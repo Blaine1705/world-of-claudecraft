@@ -856,7 +856,7 @@ describe('Affliction Warlock', () => {
     expect(second.auras.some((aura) => aura.kind === 'affliction_fate_threads')).toBe(false);
   });
 
-  it('grants the third Thread at cast completion and releases a queued Sentence immediately', () => {
+  it('grants the third Thread and keeps queued Sentence ahead of repeated Needle presses', () => {
     const sim = makeAffliction();
     const target = addTarget(sim, 18);
     finishCast(sim, 'evil_eye', target);
@@ -871,6 +871,8 @@ describe('Affliction Warlock', () => {
     expect(sim.player.castingAbility).toBe('needle_of_fate');
     while (sim.player.castRemaining > CAST_QUEUE_WINDOW_SEC) sim.tick();
     sim.castAbility('sentence');
+    expect(sim.player.queuedCastAbility).toBe('sentence');
+    sim.castAbility('needle_of_fate');
     expect(sim.player.queuedCastAbility).toBe('sentence');
     const events: SimEvent[] = [];
     while (sim.player.castingAbility || sim.player.queuedCastAbility) events.push(...sim.tick());
@@ -891,6 +893,53 @@ describe('Affliction Warlock', () => {
     while (ctx(sim).pendingProjectiles.length > 0) events.push(...sim.tick());
     expect(sentenceBursts(events)).toEqual([expect.objectContaining({ threads: FATE_THREAD_MAX })]);
     expect(ownedFateThreads(sim.player)).toBe(0);
+  });
+
+  it('buffers Sentence during the residual GCD after a possessed Needle completes', () => {
+    const sim = makeAffliction();
+    const target = addTarget(sim, 18);
+    finishCast(sim, 'evil_eye', target);
+    completeNeedleOfFateCast(ctx(sim), sim.player, target);
+    completeNeedleOfFateCast(ctx(sim), sim.player, target);
+    finishCast(sim, 'possess_evil_eye', target);
+    gainDoom(ctx(sim), sim.player, AFFLICTION_DOOM_MAX);
+    sim.targetEntity(target.id);
+    sim.player.resource = sim.player.maxResource;
+
+    sim.castAbility('needle_of_fate');
+    expect(sim.player.castTotal).toBeCloseTo(1, 5);
+    while (sim.player.castingAbility) sim.tick();
+    expect(sim.player.gcdRemaining).toBeGreaterThan(0);
+    while (sim.player.gcdRemaining > CAST_QUEUE_WINDOW_SEC) sim.tick();
+
+    sim.castAbility('sentence');
+    expect(sim.player.queuedCastAbility).toBe('sentence');
+    sim.castAbility('needle_of_fate');
+    expect(sim.player.queuedCastAbility).toBe('sentence');
+
+    // updateCasting retries the queue before updateTimers lowers the GCD. A
+    // repeated Needle arriving in the one-tick gap after that timer reaches zero
+    // must still yield to the already buffered Sentence.
+    sim.player.gcdRemaining = 0;
+    sim.castAbility('needle_of_fate');
+    expect(sim.player.castingAbility).toBeNull();
+    expect(sim.player.queuedCastAbility).toBe('sentence');
+    sim.castAbility('sentence');
+    expect(sim.player.castingAbility).toBeNull();
+    expect(sim.player.queuedCastAbility).toBe('sentence');
+
+    const events: SimEvent[] = [];
+    while (sim.player.queuedCastAbility) events.push(...sim.tick());
+    expect(
+      events.filter(
+        (event) =>
+          event.type === 'spellfx' &&
+          event.sourceId === sim.playerId &&
+          event.targetId === target.id &&
+          event.fx === 'projectile' &&
+          event.ability === 'sentence',
+      ),
+    ).toHaveLength(1);
   });
 
   it('keeps the cast-completion Thread when the Needle projectile later fizzles', () => {
