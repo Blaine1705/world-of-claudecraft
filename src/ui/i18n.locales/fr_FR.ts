@@ -11450,7 +11450,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     "Effraie les ennemis proches pendant un maximum de 3 s. Les dégâts peuvent interrompre l'effet. (talent de Démoniste)",
   'entities.abilities.ice_block.description':
-    'Vous enferme dans la glace pendant 8 s, vous immunisant contre tous les dégâts et effets et supprimant tous les effets néfastes. Utilisable lorsque vous êtes étourdi ou métamorphosé. Vous ne pouvez pas agir pendant cet effet. Lancez-le à nouveau pour l’annuler. (Mage)',
+    'Vous enferme dans la glace pendant 8 s, vous immunisant contre tous les dégâts. Supprime les effets néfastes ordinaires déjà actifs et empêche l’application de nouveaux effets de ce type. Certains effets de rencontre ne peuvent être ni supprimés ni empêchés. Utilisable lorsque vous êtes étourdi ou métamorphosé. Vous ne pouvez pas agir tant que vous êtes emprisonné. Relancez la capacité pour l’annuler. (talent de Mage)',
   'entities.abilities.inner_focus.description': 'Rend votre prochain sort de prêtre gratuit et ininterruptible. Dure 60 s.',
   'entities.abilities.innervate.description':
     "De la sève vivante afflue en vous pendant 10 s et restaure par vagues 20 points de votre ressource actuelle : mana, rage ou énergie. Changer de forme ne l'interrompt pas. Le sommeil, l'étourdissement ou la stase immobilisent la sève. (talent de Druide)",
