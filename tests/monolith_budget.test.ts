@@ -72,7 +72,14 @@ const MONOLITHS: MonolithRow[] = [
     // (zone_prewarm_templates_core.ts, the buildFormVisual fold), and the merged
     // file lands between the two pins, so the ceiling is the exact merged count
     // per the ratchet's rule: any further growth reds again.
-    ceiling: 13754,
+    // Lowered again after extracting the delve interior build-cache scheduling
+    // (the position-keyed rebuild/retire decision plus the async build loop)
+    // into src/render/delve_interior_tracker.ts.
+    // Lowered once more by this branch: the rideable-mount lifecycle (build,
+    // live swap, teardown, rider seating, carried lamps, the summon/dismount
+    // FX) moved to src/render/mount_lifecycle.ts. The extraction earns the
+    // slack, so the ceiling claims it rather than banking it.
+    ceiling: 13696,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -112,7 +119,7 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/render/foliage.ts',
-    ceiling: 4150,
+    ceiling: 4147,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

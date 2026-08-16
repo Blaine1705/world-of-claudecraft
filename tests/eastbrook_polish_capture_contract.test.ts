@@ -181,8 +181,16 @@ interface AttributionTargetFixture {
 // Re-minted for the review fixes on this branch (Soul Rend warms every rig a
 // live body can take, plus the lazy form-visual fold): renderer.ts moves
 // again, so the composite follows its bytes. No capture was retaken.
+// Re-minted for the r185 frozen-camera aim fix: updateCamera now aims through
+// lookAtFrozen, so renderer.ts moves and the composite follows its bytes. No
+// capture was retaken.
+// Re-minted after extracting the delve interior build-cache scheduling into
+// src/render/delve_interior_tracker.ts (renderer.ts moved again, no capture retaken).
+// Re-minted for the Lanternback Troll: the rideable-mount lifecycle moved out of
+// renderer.ts into mount_lifecycle.ts, and renderer.ts is a provenance input.
+// No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'a3c695469afdc4732476008e9a423bc5f9745a7103648d7205b3c6205509d947';
+  'f1b5afa2ac38b7b7e0a8a3b44ee0632c0c83502857455e64ecfbaff4cf4ce691';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
