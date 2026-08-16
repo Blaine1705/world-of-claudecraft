@@ -44,7 +44,9 @@ export function rememberSoulwellPartyEligibility(
   ctx: SimContext,
   party: { members: readonly number[] },
 ): void {
-  for (const entity of ctx.entities.values()) {
+  const entities = ctx.entities;
+  if (!entities || typeof entities.values !== 'function') return;
+  for (const entity of entities.values()) {
     const state = entity.soulwell;
     if (!state || !party.members.includes(state.ownerId)) continue;
     for (const memberId of party.members) rememberEligiblePlayer(state, memberId);
