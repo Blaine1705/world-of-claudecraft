@@ -1980,7 +1980,8 @@ describe('anti-snipe extension', () => {
       ...h.deps,
       economy: {
         ...h.economy,
-        confirm: async () => ({ settled: false, pending: true, reason: null }),
+        // The MATCHED pending word: the one that extends at all.
+        confirm: async () => ({ settled: false, pending: true, reason: 'awaiting_finality' }),
       },
     });
     const firstAt = listing.endsAtMs - 30_000;
@@ -1999,6 +2000,77 @@ describe('anti-snipe extension', () => {
     expect((await getListing(h, listing.id)).endsAtMs).toBe(
       firstAt + WOC_MARKET_ANTI_SNIPE_EXTENSION_SECONDS * 1000,
     );
+  });
+
+  it('a pending verdict extends ONLY when the ledger matched the payment', async () => {
+    // The service splits undecided in two: awaiting_finality means the
+    // verifier MATCHED the transaction at its read commitment (a fabricated
+    // signature cannot reach that arm on a live chain), and not_yet_visible
+    // means the ledger has shown nothing for the signature. Extending on the
+    // second hands a griefer the close for the price of a random string,
+    // which is the fabricated-signature residual this allowlist closes.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const bidAt = listing.endsAtMs - 60_000;
+    h.setNow(bidAt);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const verdict = { settled: false, pending: true, reason: 'not_yet_visible' as string | null };
+    const scripted = new WocMarketService({
+      ...h.deps,
+      economy: { ...h.economy, confirm: async () => verdict },
+    });
+    const firstAt = listing.endsAtMs - 30_000;
+    h.setNow(firstAt);
+    unwrap(await scripted.confirmBond(BUYER_A, placed.bid.id, 'sig-unseen'), 'confirmBond');
+    expect((await getListing(h, listing.id)).endsAtMs, 'nothing visible extends nothing').toBe(
+      listing.endsAtMs,
+    );
+    // The chain later SEES the payment: the matched verdict extends, and it
+    // anchors on the FIRST recording (the creep rule is unchanged).
+    verdict.reason = 'awaiting_finality';
+    h.setNow(listing.endsAtMs - 20_000);
+    unwrap(await scripted.confirmBond(BUYER_A, placed.bid.id, 'sig-unseen'), 'confirmBond');
+    expect(
+      (await getListing(h, listing.id)).endsAtMs,
+      'the matched verdict extends from the first-arrival anchor',
+    ).toBe(firstAt + WOC_MARKET_ANTI_SNIPE_EXTENSION_SECONDS * 1000);
+  });
+
+  it('a reason-less pending verdict extends nothing: an allowlist, not a denylist', async () => {
+    // The old gate excluded only service_unavailable, so ANY unknown pending
+    // word (or a null reason) moved the authoritative clock. The gate now
+    // requires the one word that proves the ledger saw the payment.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const bidAt = listing.endsAtMs - 60_000;
+    h.setNow(bidAt);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const scripted = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        confirm: async () => ({ settled: false, pending: true, reason: null }),
+      },
+    });
+    h.setNow(listing.endsAtMs - 30_000);
+    unwrap(await scripted.confirmBond(BUYER_A, placed.bid.id, 'sig-reasonless'), 'confirmBond');
+    expect((await getListing(h, listing.id)).endsAtMs).toBe(listing.endsAtMs);
   });
 
   it('a SETTLED verdict on a late re-post still extends, from the verdict moment', async () => {
@@ -6568,5 +6640,113 @@ describe('the service-owned bond quote contract', () => {
     });
     expect(echoed.ok).toBe(true);
     expect(echoed.bondCents).toBe(101);
+  });
+});
+
+describe('reference-keyed tolerance: one memoRef can hold two settled service quotes', () => {
+  // The service's entry adoption can re-settle a superseded quote beside the
+  // fresh one under a single memoRef, so the game must key every ask on the
+  // stored REFERENCE and never treat the memo as a settlement identity. The
+  // bond leg is structurally safe (its re-quote CAS refuses once a signature
+  // exists, so a paid pair can never be retired); the settlement leg CAN
+  // retire a pair on a failed-row revival, and owes the operator trace this
+  // pins.
+  it('a revival re-quote retires the old pair with a trace and asks only about the fresh reference', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+    let quoteN = 0;
+    const confirmAsked: string[] = [];
+    const verdict = { settled: false, pending: false, reason: 'leg_mismatch' as string | null };
+    const scripted = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        settlementQuote: async () => ({
+          ok: true,
+          reference: `WMS_r${++quoteN}`,
+          transactionBase64: 'dHg=',
+          signatureRequired: true,
+          amount: { base: '1', tokens: 1 },
+          seller: null,
+          burn: null,
+          treasury: null,
+          bondCents: null,
+          expiresAtMs: h.now() + 60_000,
+          reason: null,
+        }),
+        confirm: async (reference) => {
+          confirmAsked.push(reference);
+          return { settled: verdict.settled, pending: verdict.pending, reason: verdict.reason };
+        },
+      },
+    });
+    const bought = unwrap(
+      await scripted.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    expect(bought.quote.reference).toBe('WMS_r1');
+    // The payment against the FIRST reference is terminally refused: the row
+    // goes failed carrying that pair.
+    expect(await scripted.confirmSettlement(BUYER_A, bought.settlement.id, 'sig-old')).toEqual({
+      ok: false,
+      reason: 'confirm_failed',
+    });
+    // Revival mints a second quote under the SAME memo. The retired pair is
+    // traced (it is the only durable game-side record of it: the service may
+    // later adopt that quote settled if the payment was real).
+    const warned: string[] = [];
+    const spy = vi.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
+      warned.push(args.map(String).join(' '));
+    });
+    try {
+      const revived = unwrap(
+        await scripted.settlementQuote(BUYER_A, bought.settlement.id),
+        'settlementQuote',
+      );
+      expect(revived.quote.reference).toBe('WMS_r2');
+      const trace = warned.find((w) => w.includes('retires quote reference'));
+      expect(trace, 'the retired pair is traced').toBeDefined();
+      expect(trace).toContain('WMS_r1');
+      expect(trace).toContain('sig-old');
+      // Every later ask uses the STORED reference, which is now the fresh
+      // one; the retired sibling is the service's to account for.
+      verdict.settled = true;
+      verdict.pending = false;
+      verdict.reason = null;
+      confirmAsked.length = 0;
+      const out = await scripted.confirmSettlement(BUYER_A, bought.settlement.id, 'sig-new');
+      expect(out.ok).toBe(true);
+      expect(confirmAsked).toEqual(['WMS_r2']);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('a first quote on a fresh settlement traces nothing', async () => {
+    const warned: string[] = [];
+    const spy = vi.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
+      warned.push(args.map(String).join(' '));
+    });
+    try {
+      const h = makeHarness();
+      const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+      unwrap(
+        await h.service.buyNow({
+          account: BUYER_A,
+          characterId: CHAR_A,
+          listingId: listing.id,
+          acceptTerms: true,
+        }),
+        'buyNow',
+      );
+      expect(warned.filter((w) => w.includes('retires quote reference'))).toEqual([]);
+    } finally {
+      spy.mockRestore();
+    }
   });
 });

@@ -122,9 +122,16 @@ export const WOC_MARKET_CONFIRM_UNAVAILABLE_REASON = 'service_unavailable';
  * outage is not mintable on demand. The cost is that a genuinely late honest
  * buyer eats ONE recoverable abandon row (a 30-minute block on that listing,
  * one of three hourly slots); the alternative was a cooldown arm any griefer
- * bypassed unconditionally. Restoring a late-payment exemption requires a
- * verdict that distinguishes a real transfer from a posted string: ruling
- * R5 / the verifier work owns that, and must keep this string stable.
+ * bypassed unconditionally. The R5 verifier work has since SHIPPED the
+ * verdict that distinguishes a real transfer from a posted string
+ * (WOC_MARKET_LEDGER_MATCHED_REASON below, a live verifier's matched arm),
+ * and it now gates the anti-snipe extension. It does NOT join this list,
+ * deliberately: it is a PENDING word, the pending arms return before any
+ * fail_reason write, and a confirming settlement never reaches the abandon
+ * recorder at all (the expiry sweep only expires offered and failed rows),
+ * so a member here would be a dead alternate that reads as reachable. If a
+ * future carve-out ever records a pending word as a fail_reason, re-judge
+ * this list in the same change.
  */
 export const WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS = [
   WOC_MARKET_CONFIRM_UNAVAILABLE_REASON,

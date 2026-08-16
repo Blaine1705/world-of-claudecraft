@@ -975,11 +975,26 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
         reason: 'service_unavailable',
       });
       expect(Number((await listingRow(listingId)).ends_ms)).toBe(endsAtMs);
-      // A verdict the chain has SEEN (pending finality) earns the extension.
+      // A pending verdict where the ledger has shown NOTHING for the
+      // signature extends nothing: a fabricated string mints not_yet_visible
+      // forever, and the old any-pending gate handed it the clock.
+      const unseen = await seedBid(realm, listingId, await seedAccount(), {
+        bondReference: `snipe-unseen-${seq}`,
+      });
+      economy.verdict = { settled: false, pending: true, reason: 'not_yet_visible' };
+      await service.confirmBond(
+        (await pool.query(`SELECT account FROM woc_market_bids WHERE id = $1`, [unseen])).rows[0]
+          .account,
+        unseen,
+        'sig-never-broadcast',
+      );
+      expect(Number((await listingRow(listingId)).ends_ms)).toBe(endsAtMs);
+      // The verdict the chain has SEEN (matched, pending finality) is the ONE
+      // pending word that earns the extension.
       const paying = await seedBid(realm, listingId, pendingBuyer, {
         bondReference: `snipe-pending-${seq}`,
       });
-      economy.verdict = { settled: false, pending: true, reason: null };
+      economy.verdict = { settled: false, pending: true, reason: 'awaiting_finality' };
       await service.confirmBond(pendingBuyer, paying, 'sig-in-flight');
       expect(Number((await listingRow(listingId)).ends_ms)).toBe(
         BASE_MS + rulesMod.WOC_MARKET_ANTI_SNIPE_EXTENSION_SECONDS * 1000,

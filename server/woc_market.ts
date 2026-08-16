@@ -37,10 +37,10 @@ import {
   WOC_MARKET_BOND_PENDING_TTL_SECONDS,
   WOC_MARKET_BOND_POLL_PARK_SECONDS,
   WOC_MARKET_BUY_NOW_LOCK_SECONDS,
-  WOC_MARKET_CONFIRM_UNAVAILABLE_REASON,
   WOC_MARKET_DIRECTED_HOLD_SECONDS,
   WOC_MARKET_DIRECTED_OFFER_TTL_SECONDS,
   WOC_MARKET_DURATION_HOURS,
+  WOC_MARKET_LEDGER_MATCHED_REASON,
   WOC_MARKET_MAX_ACTIVE_LISTINGS,
   WOC_MARKET_OFFER_CONVERGE_MAX_AGE_SECONDS,
   WOC_MARKET_OFFER_CONVERGE_SECONDS,
@@ -836,6 +836,16 @@ export interface WocQuoteIntent {
   reason: string | null;
 }
 
+/**
+ * The economy-service seam. Everything on it is REFERENCE-keyed: the service
+ * can legitimately hold TWO settled quotes for one memoRef (its entry
+ * adoption re-settles a superseded quote that a ledger-proven payment backs,
+ * beside the fresh quote), so no consumer may assume one settled row per
+ * memo, enumerate by memo, or treat a memoRef as a settlement identity. The
+ * game stores exactly one live reference per row (bond_reference /
+ * quote_reference) and asks only about that; a re-quote that retires a
+ * stored reference leaves the operator trace quoteFor logs.
+ */
 export interface WocMarketEconomy {
   price(): Promise<WocPriceInfo>;
   estimate(usdCents: number): Promise<WocEstimate>;
@@ -2260,15 +2270,17 @@ export class WocMarketService {
       // unfinalized (tens of seconds on mainnet), so the bid stays pending with
       // its signature and pollConfirmingBonds finishes it. Refusing here is the
       // mistake that cost a real settlement its money before the same shape was
-      // found in this leg. The extension fires ONLY when the pending verdict
-      // came from the chain: the proxy maps an unreachable service to
-      // pending + service_unavailable (correct for money, which must never
-      // fail toward refusal), and extending on THAT arm would hand a
-      // fabricated signature the clock again for the length of any outage.
+      // found in this leg. The extension is an ALLOWLIST of one word: the
+      // verifier reserves awaiting_finality for a transaction it MATCHED at
+      // its read commitment, and answers not_yet_visible when the ledger has
+      // shown nothing, so only the matched word is proof the chain saw the
+      // transfer. The old gate excluded only service_unavailable, which let
+      // any other pending word (a fabricated signature's not_yet_visible
+      // included) move the authoritative clock for free.
       // First-arrival anchor: a re-post of a pending-forever signature must
       // not re-anchor on a fresh clock, or it holds the close at now plus
       // the extension continuously to the cap for free.
-      if (confirmed.reason !== WOC_MARKET_CONFIRM_UNAVAILABLE_REASON) await extend(anchorMs);
+      if (confirmed.reason === WOC_MARKET_LEDGER_MATCHED_REASON) await extend(anchorMs);
       // The verbatim service word rides the ok-shape for the route layer to
       // screen: the player deserves to know WHICH pending this is.
       return { ok: true, standing: false, pending: true, reason: confirmed.reason };
@@ -2503,6 +2515,23 @@ export class WocMarketService {
       sellerWallet,
     });
     if (intent.ok && intent.reference !== null && intent.expiresAtMs !== null) {
+      if (settlement.quoteReference !== null && settlement.quoteReference !== intent.reference) {
+        // A revival re-quote RETIRES the stored reference: the row holds one
+        // scalar, and every later confirm/re-verify asks about the fresh one
+        // only. The service side can legitimately end up with TWO settled
+        // quotes for this memoRef (its entry adoption re-settles a superseded
+        // quote a ledger-proven payment backs), and it keys everything on the
+        // reference, so this line is the game's only durable trace of the
+        // retired pair; an operator reconciling a later-adopted payment
+        // matches it against the service's admin quote rows (dev-channel,
+        // deliberately not player text).
+        console.warn(
+          `[woc_market] settlement ${settlement.id} retires quote reference ${settlement.quoteReference}` +
+            (settlement.txSignature === null
+              ? ' (no signature was recorded against it)'
+              : ` with recorded signature ${settlement.txSignature}`),
+        );
+      }
       const stamped = await this.deps.db.setSettlementQuote(
         settlement.id,
         intent.reference,
