@@ -13,7 +13,10 @@
 process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_woc_market_proxy';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createWocMarketEconomyProxy } from '../../server/woc_market_proxy';
+import {
+  createDevWocMarketEconomy,
+  createWocMarketEconomyProxy,
+} from '../../server/woc_market_proxy';
 
 const BASE = 'http://economy.test/v1/market/';
 const SECRET = 'internal-secret';
@@ -373,5 +376,108 @@ describe('the estimate fee split is accepted only when it reconciles', () => {
     const est = await createWocMarketEconomyProxy().estimate(100);
     expect(est.available).toBe(false);
     expect(est.split).toBeNull();
+  });
+});
+
+describe('signatureRequired is fail-safe at the proxy', () => {
+  // The client skips the wallet ONLY on an explicit false; a service that
+  // omits the field is NOT saying "no signature needed". Rewriting the
+  // fallback as `=== true` or `!!` turns an old service into a skip-the-
+  // wallet permission slip, and the confirm leg then receives a fabricated
+  // signature on a real charge.
+  it('an ABSENT field means the wallet signs', async () => {
+    respond = () => ({
+      status: 200,
+      body: { ok: true, reference: 'WMB_x', expiresAtMs: 42 },
+    });
+    const quote = await createWocMarketEconomyProxy().bondQuote({
+      memoRef: 'woc_bond:1',
+      bidCents: 2500,
+      buyerWallet: BUYER,
+    });
+    expect(quote.ok).toBe(true);
+    expect(quote.signatureRequired, 'absent means TRUE, never permission to skip').toBe(true);
+  });
+
+  it('only an explicit false crosses as false', async () => {
+    respond = () => ({
+      status: 200,
+      body: { ok: true, reference: 'WMB_x', expiresAtMs: 42, signatureRequired: false },
+    });
+    const quote = await createWocMarketEconomyProxy().bondQuote({
+      memoRef: 'woc_bond:1',
+      bidCents: 2500,
+      buyerWallet: BUYER,
+    });
+    expect(quote.signatureRequired).toBe(false);
+  });
+});
+
+describe('devSplit mirrors the service ceil-and-remainder rule at every edge', () => {
+  it('legs are non-negative and sum to the amount across the floor and odd cents', async () => {
+    const economy = createDevWocMarketEconomy(() => 1_000_000);
+    const amounts = [...Array.from({ length: 25 }, (_, i) => i + 1), 99, 101, 2001];
+    for (const cents of amounts) {
+      const est = await economy.estimate(cents);
+      const split = est.split;
+      expect(split, `estimate(${cents}) carries a split`).not.toBeNull();
+      if (!split) continue;
+      expect(split.sellerCents, `sellerCents at ${cents}`).toBeGreaterThanOrEqual(0);
+      expect(split.burnCents, `burnCents at ${cents}`).toBeGreaterThanOrEqual(0);
+      expect(split.treasuryCents, `treasuryCents at ${cents}`).toBeGreaterThanOrEqual(0);
+      expect(
+        split.sellerCents + split.burnCents + split.treasuryCents,
+        `legs sum exactly at ${cents}`,
+      ).toBe(cents);
+    }
+  });
+
+  it('rounds each fee leg UP with the seller absorbing the remainder (ceil, never floor)', async () => {
+    const economy = createDevWocMarketEconomy(() => 1_000_000);
+    // 2001 at 300/700 bps: burn ceil(60.03) = 61 where floor gave 60, and
+    // treasury ceil(140.07) = 141 where floor gave 140. The market floor
+    // (25) pins the smallest legal listing's exact legs.
+    expect((await economy.estimate(2001)).split).toEqual({
+      sellerCents: 1799,
+      burnCents: 61,
+      treasuryCents: 141,
+    });
+    expect((await economy.estimate(25)).split).toEqual({
+      sellerCents: 22,
+      burnCents: 1,
+      treasuryCents: 2,
+    });
+  });
+
+  it('the settlement quote legs are the SAME split the estimate showed', async () => {
+    // The 09-named cent-level drift: the settlement legs once used floor
+    // 90/3 while the estimate ceiled, so the panel promised one figure and
+    // the quote charged another on odd amounts.
+    const economy = createDevWocMarketEconomy(() => 1_000_000);
+    const est = await economy.estimate(2001);
+    const quote = await economy.settlementQuote({
+      memoRef: 'woc_settle:1',
+      usdCents: 2001,
+      buyerWallet: 'buyer',
+      sellerWallet: 'seller',
+    });
+    if (!quote.ok || !est.split) throw new Error('dev quote or split unavailable');
+    // devLeg: tokens = cents * 10_000 micro-USD / the fixed dev price (1000).
+    const price = 1000;
+    expect(quote.seller?.tokens).toBe((est.split.sellerCents * 10_000) / price);
+    expect(quote.burn?.tokens).toBe((est.split.burnCents * 10_000) / price);
+    expect(quote.treasury?.tokens).toBe((est.split.treasuryCents * 10_000) / price);
+  });
+
+  it('a dev settlement quote never carries a bond figure', async () => {
+    const economy = createDevWocMarketEconomy(() => 1_000_000);
+    const quote = await economy.settlementQuote({
+      memoRef: 'woc_settle:2',
+      usdCents: 5000,
+      buyerWallet: 'buyer',
+      sellerWallet: 'seller',
+    });
+    if (!quote.ok) throw new Error('dev quote unavailable');
+    expect(quote.bondCents).toBeNull();
   });
 });

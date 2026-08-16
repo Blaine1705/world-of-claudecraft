@@ -5,8 +5,11 @@
 // behind a liquidity floor, a spot-versus-average deviation limit, and
 // freshness judged on the venue's publish time), the 90/3/7 split,
 // transaction building, finality confirmation, and bond escrow
-// refunds/forfeits. The game passes
-// USD cents in and renders what comes back, verbatim.
+// refunds/forfeits. The game passes the USD figures in (the BID on bond
+// quotes: the service computes and owns the bond), adopts the figures that
+// come back, and repeats verdict words to players only through the screened
+// vocabularies (rules.ts; unknown words collapse to 'other'). Rows and logs
+// keep the verbatim word for operators.
 //
 // GRACEFUL DEGRADATION IS THE CONTRACT. If WOC_MARKET_SERVICE_URL or
 // WOC_ECONOMY_INTERNAL_SECRET is unset, OR the service is unreachable /
@@ -371,8 +374,16 @@ function devLeg(usdCents: number, priceMicroUsd: number): { base: string; tokens
  * the off-by-a-cent cases that a flat percentage gets wrong.
  */
 function devSplit(usdCents: number): WocEstimateSplit {
-  const burnCents = Math.ceil((usdCents * DEV_BURN_BPS) / 10_000);
-  const treasuryCents = Math.ceil((usdCents * DEV_TREASURY_BPS) / 10_000);
+  // The legs are capped at the amount so the seller remainder can never go
+  // negative: below the market's own price floor the ceil legs exceed the
+  // amount (devSplit(1) used to answer sellerCents -1, which the estimate
+  // rendered as a negative You-receive line), and the real service's wire
+  // screen refuses any negative leg, so the mirror must never mint one.
+  const burnCents = Math.min(Math.ceil((usdCents * DEV_BURN_BPS) / 10_000), usdCents);
+  const treasuryCents = Math.min(
+    Math.ceil((usdCents * DEV_TREASURY_BPS) / 10_000),
+    usdCents - burnCents,
+  );
   return { sellerCents: usdCents - burnCents - treasuryCents, burnCents, treasuryCents };
 }
 

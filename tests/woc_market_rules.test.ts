@@ -927,3 +927,88 @@ describe('adoptableBondCents: the wire figure is bounded before adoption', () =>
     expect(adoptableBondCents(2002, 2001), 'above the bid').toBeNull();
   });
 });
+
+describe('every game-written fail_reason word is a vocabulary member or a pinned exclusion', () => {
+  // The vocabulary doc claims it is the union of the service verdicts and the
+  // game-recorded reasons a FAILED row can carry, but only the service half
+  // has a drift signal (the once-per-word warn). This scan closes the game
+  // half: a NEW game-written word outside the vocabulary would render every
+  // affected buyer the generic line with no red test and no log. Expired-only
+  // words are excluded ON PURPOSE (never rendered: failDetailReason gates to
+  // failed rows, and these three are stamped on rows leaving through expiry).
+  const EXPIRED_ONLY_EXCLUSIONS = ['listing_cancelled', 'listing_suspended', 'schema_dedupe'];
+
+  /** The 4th argument of every transitionSettlement(...) call, by a depth
+   *  walk (the calls span lines, so a flat regex under-reaches). */
+  function transitionFailReasonLiterals(src: string): string[] {
+    const words: string[] = [];
+    let from = 0;
+    for (;;) {
+      const at = src.indexOf('transitionSettlement(', from);
+      if (at === -1) break;
+      let depth = 0;
+      let end = at + 'transitionSettlement('.length - 1;
+      for (let i = end; i < src.length; i++) {
+        if (src[i] === '(') depth++;
+        else if (src[i] === ')') {
+          depth--;
+          if (depth === 0) {
+            end = i;
+            break;
+          }
+        }
+      }
+      const call = src.slice(at, end + 1);
+      // Split the argument list at top level and read the 4th argument only:
+      // the 2nd/3rd args are STATE tokens, some of which ('expired') collide
+      // with vocabulary words and must not launder the scan.
+      const inner = call.slice(call.indexOf('(') + 1, -1);
+      const args: string[] = [];
+      let level = 0;
+      let cur = '';
+      for (const ch of inner) {
+        if (ch === '(' || ch === '[' || ch === '{') level++;
+        if (ch === ')' || ch === ']' || ch === '}') level--;
+        if (ch === ',' && level === 0) {
+          args.push(cur);
+          cur = '';
+        } else {
+          cur += ch;
+        }
+      }
+      args.push(cur);
+      // Comparison operands inside a ternary condition (state === 'failed'
+      // ? ... : 'window_elapsed') are STATE reads, not written reasons.
+      const failArg = (args[3] ?? '').replace(/[=!]==\s*'[a-z_]+'/g, '');
+      for (const m of failArg.matchAll(/'([a-z_]+)'/g)) words.push(m[1]);
+      from = end + 1;
+    }
+    return words;
+  }
+
+  it('the transition calls and the direct SQL writes stay inside the pinned union', () => {
+    const market = stripComments(
+      readFileSync(new URL('../server/woc_market.ts', import.meta.url), 'utf8'),
+    );
+    const db = stripComments(
+      readFileSync(new URL('../server/woc_market_db.ts', import.meta.url), 'utf8'),
+    );
+    const fromTransitions = transitionFailReasonLiterals(market);
+    const fromSql = [...db.matchAll(/fail_reason = '([a-z_]+)'/g)].map((m) => m[1]);
+    // Positive controls: the scan really sees the known writers on each arm,
+    // so a refactor that blinds an extraction regex goes red instead of
+    // silently passing an empty set.
+    expect(fromTransitions).toContain('refused');
+    expect(fromTransitions).toContain('confirming_overdue');
+    expect(fromTransitions).toContain('window_elapsed');
+    expect(fromSql).toContain('listing_cancelled');
+    expect(fromSql).toContain('schema_dedupe');
+    const union = new Set([...WOC_MARKET_WIRE_FAIL_REASONS, ...EXPIRED_ONLY_EXCLUSIONS]);
+    for (const word of [...fromTransitions, ...fromSql]) {
+      expect(
+        union.has(word),
+        `game-written fail_reason '${word}' needs a vocabulary decision`,
+      ).toBe(true);
+    }
+  });
+});

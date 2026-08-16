@@ -226,7 +226,8 @@ export function screenWireFailReason(reason: string | null): string | null {
  * the pending bid lapses on its TTL, nothing was transferred). Deliberately
  * NOT clamped to WOC_MARKET_BOND_MAX_CENTS: the service owns the figure and
  * its own policy caps it; the mirror bondCents() clamps only because it
- * pre-labels displays before any quote exists. The at-or-under-the-bid arm
+ * stands in before any quote exists (display, guard sizing, the row seed).
+ * The at-or-under-the-bid arm
  * also keeps the persisted figure transitively inside the INT column, since
  * the bid is route-bounded at WOC_MARKET_MAX_PRICE_CENTS.
  */
@@ -339,13 +340,16 @@ export function antiSnipeExtendedEndMs(
 
 /**
  * The refundable bid bond for a bid: 5% clamped to $1 .. $50, never above the
- * bid itself. A RENDER-ONLY mirror of the service's clampedBondCentsForBid
+ * bid itself. A PRE-QUOTE mirror of the service's clampedBondCentsForBid
  * (pure bps ceil, then the clamp, then min with the bid): the SERVICE owns the
  * bond figure, computes it from the bid on every bond quote, and the game
- * adopts the quoted figure onto the bid row. This mirror only pre-labels
- * listing views before any quote exists, so it must agree with the service at
- * the same knobs; ceil, not round, or the half-cent boundaries disagree by a
- * cent with the figure the quote then adopts.
+ * adopts the quoted figure onto the bid row. Until adoption the mirror is
+ * what exists: it pre-labels listing views, sizes placeBid's balance guard,
+ * and SEEDS the inserted bid row (the persisted figure whenever adoption
+ * never happens, e.g. the quote_unavailable path, until the row lapses on
+ * its TTL). So it must agree with the service at the same knobs; ceil, not
+ * round, or the half-cent boundaries disagree by a cent with the figure the
+ * quote then adopts.
  */
 export function bondCents(bidCents: number): number {
   const raw = Math.ceil((bidCents * WOC_MARKET_BOND_RATE_BPS) / 10_000);
