@@ -485,7 +485,10 @@ For off-box safety, sync the directory to S3 occasionally:
   service-owned (the game sends the BID, the service answers the bond), so
   enable the market only with BOTH sides at or after the contract tips; a
   version skew in either direction refuses bond quotes fail-safe (no money
-  moves, bids lapse on their TTL). `DASHBOARD_INTERNAL_SECRET` gates the ops
+  moves, bids lapse on their TTL). The contract also reserves the confirm
+  verdict word `awaiting_finality` for LEDGER-MATCHED payments (the game's
+  anti-snipe extension trusts exactly that reservation); a service build that
+  starts emitting it optimistically is a breaking change, not a copy tweak. `DASHBOARD_INTERNAL_SECRET` gates the ops
   dashboard's
   `/internal/woc-market/*` reads; unset leaves them 404 (names only here, the
   values live in deployment secrets).

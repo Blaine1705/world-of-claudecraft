@@ -75,7 +75,7 @@ export interface WocEstimateView {
   asOfMs: number | null;
   /** The server's USD fee split for this amount. Null when unavailable, or on
    *  an economy service too old to send it: the client NEVER derives it. */
-  split: { sellerCents: number; burnCents: number; treasuryCents: number } | null;
+  split?: { sellerCents: number; burnCents: number; treasuryCents: number } | null;
 }
 
 /** Whether a character can be paid in $WOC, for the trade window's arm. */

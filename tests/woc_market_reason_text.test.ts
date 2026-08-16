@@ -45,10 +45,60 @@ describe('wocSettlementFailText', () => {
   });
 
   it('answers the generic line for any other word and null for no reason', () => {
-    const generic = 'The payment did not match this purchase.';
+    // NON-CAUSAL on purpose: the fallback covers a heterogeneous set
+    // (expiries, chain failures, releases), so it must not assert a cause
+    // the wire does not support ("did not match" accused late payers).
+    const generic = 'This payment could not be completed.';
     expect(wocSettlementFailText('leg_mismatch')).toBe(generic);
     expect(wocSettlementFailText('other')).toBe(generic);
     expect(wocSettlementFailText(null)).toBeNull();
     expect(wocSettlementFailText(undefined)).toBeNull();
+  });
+});
+
+describe('the maps stay inside the server wire vocabularies', () => {
+  // A mapped word outside the screened vocabulary can never fire (the screen
+  // collapses it to 'other' before the client sees it), so it is a dead key;
+  // and the words deliberately LEFT generic should be a visible, pinned set
+  // rather than silent fallthrough. Importing the server constants makes a
+  // vocabulary change red here, where the copy decision lives.
+  it('every mapped word is a member of its wire vocabulary', async () => {
+    const rules = await import('../server/woc_market_rules');
+    const { WOC_MARKET_REASON_TEXT_KEYS } = await import('../src/ui/woc_market_reason_text');
+    for (const word of Object.keys(WOC_MARKET_REASON_TEXT_KEYS.pending)) {
+      expect(rules.WOC_MARKET_WIRE_PENDING_REASONS, `pending map: ${word}`).toContain(word);
+    }
+    for (const word of Object.keys(WOC_MARKET_REASON_TEXT_KEYS.fail)) {
+      expect(rules.WOC_MARKET_WIRE_FAIL_REASONS, `fail map: ${word}`).toContain(word);
+    }
+  });
+
+  it('pins the deliberately-generic remainder so vocabulary growth is visible', async () => {
+    const rules = await import('../server/woc_market_rules');
+    const { WOC_MARKET_REASON_TEXT_KEYS } = await import('../src/ui/woc_market_reason_text');
+    const mapped = new Set(Object.keys(WOC_MARKET_REASON_TEXT_KEYS.fail));
+    const generic = [...rules.WOC_MARKET_WIRE_FAIL_REASONS].filter((w) => !mapped.has(w)).sort();
+    expect(generic).toEqual([
+      'bad_signature',
+      'confirming_overdue',
+      'expired',
+      'forfeited',
+      'invalid_signature',
+      'leg_mismatch',
+      'memo_mismatch',
+      'payer_debit_mismatch',
+      'payer_mismatch',
+      'quote_expired',
+      'refunded',
+      'refused',
+      'rejected',
+      'signature_already_settled',
+      'signature_conflict',
+      'signature_did_not_match_quote',
+      'superseded',
+      'transaction_failed',
+      'unknown_reference',
+      'window_elapsed',
+    ]);
   });
 });

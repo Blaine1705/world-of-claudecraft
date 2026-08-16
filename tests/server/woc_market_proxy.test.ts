@@ -248,10 +248,33 @@ describe('graceful degradation is the contract', () => {
     expect(quote.bondCents).toBe(126);
   });
 
-  it('screens a junk bondCents to null rather than adopting it', async () => {
+  it('passes a valid bondCents through the OK arm by value', async () => {
+    // The production path from the live service: without this, a hard-coded
+    // null in toQuote's ok branch stays green (only the refusal arm carried
+    // a positive figure before).
     respond = () => ({
       status: 200,
-      body: { ok: true, reference: 'WMB_x', expiresAtMs: 42, bondCents: -5 },
+      body: { ok: true, reference: 'WMB_x', expiresAtMs: 42, bondCents: 126 },
+    });
+    const quote = await createWocMarketEconomyProxy().bondQuote({
+      memoRef: 'woc_bond:1',
+      bidCents: 2500,
+      buyerWallet: BUYER,
+    });
+    expect(quote.ok).toBe(true);
+    expect(quote.bondCents).toBe(126);
+  });
+
+  it.each([
+    ['negative', -5],
+    ['zero', 0],
+    ['non-integer', 12.5],
+    ['string', '126'],
+  ])('screens a %s bondCents to null rather than adopting it', async (_label, junk) => {
+    // Per-dimension: each case trips exactly one arm of the screen.
+    respond = () => ({
+      status: 200,
+      body: { ok: true, reference: 'WMB_x', expiresAtMs: 42, bondCents: junk },
     });
     const quote = await createWocMarketEconomyProxy().bondQuote({
       memoRef: 'woc_bond:1',

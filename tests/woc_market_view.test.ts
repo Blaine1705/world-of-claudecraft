@@ -499,7 +499,26 @@ describe('activity mapping', () => {
       }),
     );
     expect(a.settlements[0]?.failReason).toBe('burn_missing');
-    expect(a.settlements[1]?.failReason ?? null).toBeNull();
+    expect(a.settlements[1]?.failReason).toBeUndefined();
+  });
+
+  it('gates the WHY line in the MODEL: failed rows only, expired rows excluded', () => {
+    // failDetailReason is the painter's whole verdict, so this is the
+    // behavioral home of the gate. An expired row KEEPS a chain-refused
+    // try's failReason (the sweep COALESCEs it), and rendering a mismatch
+    // line under "Expired unpaid" would accuse a buyer who walked away.
+    const a = activityModel(
+      makeActivity({
+        settlements: [
+          makeSettlement({ id: 1, state: 'failed', failReason: 'burn_missing' }),
+          makeSettlement({ id: 2, state: 'expired', failReason: 'leg_mismatch' }),
+          makeSettlement({ id: 3, state: 'failed' }),
+        ],
+      }),
+    );
+    expect(a.settlements[0]?.failDetailReason).toBe('burn_missing');
+    expect(a.settlements[1]?.failDetailReason).toBeNull();
+    expect(a.settlements[2]?.failDetailReason).toBeNull();
   });
 
   it('defaults strikes to 0 with no strike record', () => {
@@ -609,6 +628,23 @@ describe('wocMarketViewSig', () => {
     const before = wocMarketViewSig(buildWocMarketView(sigInput({ nowMs: NOW })));
     const after = wocMarketViewSig(buildWocMarketView(sigInput({ nowMs: NOW + 200 })));
     expect(after).toBe(before);
+  });
+
+  it('moves when a failed settlement changes its WHY verdict, state unmoved', () => {
+    // The revival loop can re-fail a row under a NEW reason while the state
+    // string reads 'failed' both times; a signature that misses it leaves the
+    // old accusation on screen until something else changes.
+    const withReason = (failReason: string) =>
+      wocMarketViewSig(
+        buildWocMarketView(
+          sigInput({
+            activity: makeActivity({
+              settlements: [makeSettlement({ id: 1, state: 'failed', failReason })],
+            }),
+          }),
+        ),
+      );
+    expect(withReason('burn_missing')).not.toBe(withReason('unexpected_credit'));
   });
 
   it('digests non-ready models to their kind string', () => {

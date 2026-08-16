@@ -166,9 +166,13 @@ export const WOC_MARKET_WIRE_PENDING_REASONS = [
 /**
  * The terminal fail_reason words the game wire repeats to a player on a
  * settlement view. The union of the service verifier's decided refusals, its
- * terminal row statuses, the dev economy's words, and the game's own recorded
- * reasons; kept sorted for scanning. Same screening contract as the pending
- * list: known words verbatim, unknown words 'other', null stays null.
+ * terminal row statuses, the dev economy's words, and the game-recorded
+ * reasons a FAILED row can carry; kept sorted for scanning. Deliberately NOT
+ * in the list: the game-written words that ride only EXPIRED rows
+ * (listing_cancelled, listing_suspended, the schema_dedupe prefix), which the
+ * client never renders and which screen to 'other' harmlessly if a future
+ * view ever carries them. Same screening contract as the pending list: known
+ * words verbatim, unknown words 'other', null stays null.
  */
 export const WOC_MARKET_WIRE_FAIL_REASONS = [
   'bad_signature',
@@ -211,6 +215,19 @@ export function screenWirePendingReason(reason: string | null): string | null {
 export function screenWireFailReason(reason: string | null): string | null {
   if (reason === null) return null;
   return WIRE_FAIL_SET.has(reason) ? reason : WOC_MARKET_WIRE_REASON_OTHER;
+}
+
+/**
+ * Bounds a service-quoted bond figure before ADOPTION. The wire integer is not
+ * trusted into the row: the persisted bond backs refund and forfeit
+ * accounting, the column is INT, and the contract's own invariant is "never
+ * above the bid", so a figure that is not a positive integer at or under the
+ * bid answers null and the caller refuses instead of persisting it (fail-safe:
+ * the pending bid lapses on its TTL, nothing was transferred).
+ */
+export function adoptableBondCents(figure: number, bidCents: number): number | null {
+  if (!Number.isInteger(figure) || figure <= 0 || figure > bidCents) return null;
+  return figure;
 }
 
 /** How long a listing may sit mid-resolution before the sweep reclaims it. */

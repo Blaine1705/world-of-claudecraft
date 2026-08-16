@@ -203,6 +203,12 @@ export interface WocActivityModel {
   settlements: (WocSettlementView & {
     deadlineRemainingMs: number;
     quoteRemainingMs: number | null;
+    /** The WHY line's gate, decided HERE so it is testable without a DOM:
+     *  the screened verdict on FAILED rows only. An expired row keeps a
+     *  chain-refused try's failReason (the sweep COALESCEs it), but its
+     *  label already says "expired unpaid" and a mismatch line under it
+     *  would accuse a buyer who simply walked away. */
+    failDetailReason: string | null;
   })[];
   strikes: number;
   suspendedRemainingMs: number | null;
@@ -347,6 +353,7 @@ export function buildWocMarketView(input: WocMarketViewInput): WocMarketViewMode
           deadlineRemainingMs: Math.max(0, s.deadlineAtMs - nowMs),
           quoteRemainingMs:
             s.quoteExpiresAtMs === null ? null : Math.max(0, s.quoteExpiresAtMs - nowMs),
+          failDetailReason: s.state === 'failed' ? (s.failReason ?? null) : null,
         })),
         strikes: input.activity.strikes?.strikes ?? 0,
         suspendedRemainingMs:
@@ -437,7 +444,10 @@ export function wocMarketViewSig(model: WocMarketViewModel): string {
         model.activity.settlements
           .map(
             (s) =>
-              `${s.id}:${s.state}:${countdownSigBucket(s.deadlineRemainingMs)}:${Math.floor((s.quoteRemainingMs ?? -1000) / 1000)}`,
+              // failDetailReason joins the digest: a revival can change the
+              // WHY line while state stays 'failed', and a signature that
+              // misses it leaves the old accusation on screen.
+              `${s.id}:${s.state}:${s.failDetailReason ?? ''}:${countdownSigBucket(s.deadlineRemainingMs)}:${Math.floor((s.quoteRemainingMs ?? -1000) / 1000)}`,
           )
           .join(','),
         `${model.activity.strikes}:${model.activity.suspendedRemainingMs === null ? '' : Math.floor(model.activity.suspendedRemainingMs / 60_000)}:${model.activity.termsAccepted ? 1 : 0}`,

@@ -3995,7 +3995,7 @@ export const zh_CN: EnTranslations = {
       "settlementFailBurnMismatch": "付款销毁的代币数量不正确。",
       "settlementFailBurnAuthority": "代币销毁来自本次购买未指定的钱包。",
       "settlementFailUnexpectedCredit": "该交易向本次购买之外的钱包付了款。",
-      "settlementFailGeneric": "付款与本次购买不符。",
+      "settlementFailGeneric": "这笔付款未能完成。",
       "paymentSeenAwaitingFinality": "账本上已看到付款。正在等待最终确认。",
       "paymentNotYetVisible": "账本上尚未看到付款。可能需要片刻才会出现。",
       "paymentServiceUnreachable": "无法连接支付服务。你的付款已被记录，稍后会重新核验。",

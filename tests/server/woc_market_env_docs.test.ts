@@ -24,6 +24,10 @@ const CORPUS = [
   'server/main.ts',
   'server/http/config.ts',
   'server/http/middleware/require_internal_secret.ts',
+  // The claudium proxy owns WOC_ECONOMY_SERVICE_URL; it is in scope because
+  // the market shares the WOC_ECONOMY_* pair (the internal secret) and the
+  // dead-knob direction sweeps that prefix.
+  'server/claudium_proxy.ts',
 ];
 
 // Prefixes that make a name market-relevant for the forward check (main.ts
@@ -52,6 +56,16 @@ function documentedNames(): Set<string> {
 }
 
 describe('market env documentation matches the code', () => {
+  it('the scanner really sees the names the review found missing (positive control)', () => {
+    // Guards the guard: if the read-extraction regexes rot (a refactor to a
+    // destructured read, a renamed constant), the two set comparisons below
+    // would go vacuous instead of red. These two names are the exact original
+    // misses, one per extraction form.
+    const reads = readNames();
+    expect(reads).toContain('WOC_MARKET_SERVICE_URL');
+    expect(reads).toContain('DASHBOARD_INTERNAL_SECRET');
+  });
+
   it('documents every market env name the code reads', () => {
     const docs = documentedNames();
     const undocumented = [...readNames()].filter((n) => !docs.has(n)).sort();
@@ -61,10 +75,10 @@ describe('market env documentation matches the code', () => {
     ).toEqual([]);
   });
 
-  it('reads every WOC_MARKET_* name .env.example documents (no dead knobs)', () => {
+  it('reads every market-prefixed name .env.example documents (no dead knobs)', () => {
     const reads = readNames();
     const dead = [...documentedNames()]
-      .filter((n) => n.startsWith('WOC_MARKET_') && !reads.has(n))
+      .filter((n) => PREFIXES.some((p) => n.startsWith(p)) && !reads.has(n))
       .sort();
     expect(
       dead,

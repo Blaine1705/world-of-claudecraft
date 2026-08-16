@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  adoptableBondCents,
   antiSnipeExtendedEndMs,
   bondCents,
   listingEligibility,
@@ -856,6 +857,36 @@ describe('the wire reason screens', () => {
     ]) {
       expect(WOC_MARKET_WIRE_FAIL_REASONS).toContain(owed);
     }
+    // The WHOLE terminal vocabulary as a sorted literal, like the pending
+    // list above: the per-member screen sweep below iterates the constant
+    // itself, so without this pin a deleted word shrinks both sides together
+    // and its verdicts silently reach players as 'other'.
+    expect([...WOC_MARKET_WIRE_FAIL_REASONS].sort()).toEqual([
+      'bad_signature',
+      'burn_authority_mismatch',
+      'burn_mismatch',
+      'burn_missing',
+      'confirming_overdue',
+      'expired',
+      'forfeited',
+      'invalid_signature',
+      'leg_mismatch',
+      'memo_mismatch',
+      'payer_debit_mismatch',
+      'payer_mismatch',
+      'quote_expired',
+      'refunded',
+      'refused',
+      'rejected',
+      'signature_already_settled',
+      'signature_conflict',
+      'signature_did_not_match_quote',
+      'superseded',
+      'transaction_failed',
+      'unexpected_credit',
+      'unknown_reference',
+      'window_elapsed',
+    ]);
   });
 
   it('passes every pinned member through verbatim, both screens', () => {
@@ -875,5 +906,24 @@ describe('the wire reason screens', () => {
     expect(screenWireFailReason('some_future_service_word')).toBe('other');
     expect(screenWireFailReason('awaiting_finality')).toBe('other'); // wrong arm
     expect(screenWireFailReason(null)).toBeNull();
+  });
+});
+
+describe('adoptableBondCents: the wire figure is bounded before adoption', () => {
+  it('accepts a positive integer at or under the bid', () => {
+    expect(adoptableBondCents(101, 2001)).toBe(101);
+    expect(adoptableBondCents(2001, 2001)).toBe(2001); // the == bid boundary
+    expect(adoptableBondCents(1, 2001)).toBe(1);
+  });
+
+  it('refuses each bad dimension on its own', () => {
+    // Per-dimension negatives: each case trips exactly one arm of the guard.
+    // The bid itself is route-bounded at WOC_MARKET_MAX_PRICE_CENTS, so the
+    // at-or-under-the-bid arm transitively keeps the persisted figure far
+    // inside the INT column too.
+    expect(adoptableBondCents(100.5, 2001), 'non-integer').toBeNull();
+    expect(adoptableBondCents(0, 2001), 'zero').toBeNull();
+    expect(adoptableBondCents(-5, 2001), 'negative').toBeNull();
+    expect(adoptableBondCents(2002, 2001), 'above the bid').toBeNull();
   });
 });

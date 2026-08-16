@@ -1288,17 +1288,24 @@ describe('woc_market_window: the open window re-asks the server on its own caden
 });
 
 describe('woc_market_window: payment verdicts reach the player', () => {
-  it('renders the WHY line for failed settlement rows, from the screened vocabulary', () => {
-    const activity = between('private activityHtml(', 'private quoteHtml(');
-    // Failed rows only: an expired row keeps a chain-refused try's reason
-    // (the sweep COALESCEs it), and a mismatch line under "Expired unpaid"
-    // would accuse a buyer who simply walked away.
-    expect(activity).toContain("s.state === 'failed' && s.failReason != null");
-    expect(activity).toContain('wocSettlementFailText(s.failReason)');
+  // Comment-stripped slices, per the file's own discipline (line 22): a
+  // commented-out call site or a condition quoted in prose must not satisfy
+  // these pins. The GATE itself (failed rows only, expired excluded) is
+  // decided and behaviorally tested in the view core (failDetailReason,
+  // tests/woc_market_view.test.ts); the painter pin only proves the render
+  // consumes the core's verdict.
+  it('renders the WHY line from the view core verdict, through the mapper', () => {
+    const from = code.indexOf('private activityHtml(');
+    const to = code.indexOf('private quoteHtml(', from);
+    expect(from).toBeGreaterThanOrEqual(0);
+    expect(to).toBeGreaterThan(from);
+    const activity = code.slice(from, to);
+    expect(activity).toContain('s.failDetailReason != null');
+    expect(activity).toContain('wocSettlementFailText(s.failDetailReason)');
   });
 
   it('answers a pending confirm with the reason-specific line on both legs', () => {
-    const sign = painter.slice(painter.indexOf('private async signPendingQuote('));
+    const sign = code.slice(code.indexOf('private async signPendingQuote('));
     // Bond leg: the pending arm routes through the mapper, not a fixed key.
     // Settlement leg: a still-confirming answer must never toast purchase
     // complete (that is a delivery claim about money the chain has not

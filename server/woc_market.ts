@@ -23,6 +23,7 @@ import type { CharacterState } from '../src/sim/sim';
 import type { InvSlot, ItemInstancePayload } from '../src/sim/types';
 import { throwProvedRollback } from './pg_rollback_proof';
 import {
+  adoptableBondCents,
   antiSnipeExtendedEndMs,
   bondCents,
   type ListingParamsRefusal,
@@ -2006,19 +2007,35 @@ export class WocMarketService {
       minNext: (row) => minNextBidCents(row.currentBidCents, row.startCents),
     });
     if (!inserted.ok) return refuse(inserted.reason);
-    // The SERVICE owns the bond figure: send the bid, no echo (nothing has
-    // been shown to the player for this bid yet), and adopt the bondCents the
-    // quote answers. The local estimate above only sized the balance guard.
+    // The SERVICE owns the bond figure: send the bid (the ROW's figure, the
+    // authoritative source once inserted), no echo (nothing has been shown to
+    // the player for this bid yet), and adopt the bondCents the quote
+    // answers. The local estimate above only sized the balance guard.
     const intent = await this.deps.economy.bondQuote({
       memoRef: `woc_bond:${inserted.bid.id}`,
-      bidCents: args.amountCents,
+      bidCents: inserted.bid.amountCents,
       buyerWallet: wallet,
     });
     if (!intent.ok || intent.reference === null || intent.expiresAtMs === null) {
       // The pending bid lapses on its own TTL; nothing was transferred.
       return refuse('quote_unavailable');
     }
-    const adoptedBondCents = intent.bondCents ?? bond;
+    // Bounded adoption: a carried figure outside the contract (not a positive
+    // integer at or under the bid) refuses rather than persisting a bond the
+    // refund accounting would then ride; an ABSENT figure falls back to the
+    // mirror (an older service that does not send one yet).
+    const adoptedBondCents =
+      intent.bondCents === null
+        ? bond
+        : adoptableBondCents(intent.bondCents, inserted.bid.amountCents);
+    if (adoptedBondCents === null) return refuse('quote_unavailable');
+    if (adoptedBondCents > bond) {
+      // The service priced the bond above the mirror the balance guard was
+      // sized with: re-guard on the real figure before showing a prompt the
+      // wallet cannot cover. The unpaid bid lapses on its own TTL.
+      const reGuard = await this.guardBalance(wallet, args.amountCents + adoptedBondCents);
+      if (reGuard) return reGuard;
+    }
     const applied = await this.deps.db.setBidBondQuote(
       inserted.bid.id,
       intent.reference,
@@ -2144,7 +2161,11 @@ export class WocMarketService {
       usdCents: bid.bondCents,
       buyerWallet: bid.wallet,
     });
+    let adoptedThroughDrift = false;
     if (!intent.ok && intent.reason === 'bond_amount_drift' && intent.bondCents !== null) {
+      // ONE retry with the adopted echo, never a loop: a service that drifts
+      // again answers the ordinary refusal below.
+      adoptedThroughDrift = true;
       intent = await this.deps.economy.bondQuote({
         memoRef: `woc_bond:${bid.id}`,
         bidCents: bid.amountCents,
@@ -2155,6 +2176,17 @@ export class WocMarketService {
     if (!intent.ok || intent.reference === null || intent.expiresAtMs === null) {
       return refuse('quote_unavailable');
     }
+    // Bounded adoption, and the drift path DEMANDS the figure: the service
+    // just declared the stored one wrong, so falling back to it would persist
+    // a bond the quote disagrees with. The plain path may fall back (an older
+    // service that omits the figure).
+    const refreshedBondCents =
+      intent.bondCents === null
+        ? adoptedThroughDrift
+          ? null
+          : bid.bondCents
+        : adoptableBondCents(intent.bondCents, bid.amountCents);
+    if (refreshedBondCents === null) return refuse('quote_unavailable');
     // The AUTHORITATIVE straddle check: the expiry actually stored is the
     // SERVICE's, not the local constant the pre-quote check predicted with,
     // and a service answering a longer TTL would straddle the lapse anyway.
@@ -2166,7 +2198,7 @@ export class WocMarketService {
       bid.id,
       intent.reference,
       intent.expiresAtMs,
-      intent.bondCents ?? bid.bondCents,
+      refreshedBondCents,
     );
     if (!applied) {
       // The CAS lost a race: a signature landed (or the bid left pending)
@@ -2515,21 +2547,24 @@ export class WocMarketService {
       sellerWallet,
     });
     if (intent.ok && intent.reference !== null && intent.expiresAtMs !== null) {
-      if (settlement.quoteReference !== null && settlement.quoteReference !== intent.reference) {
-        // A revival re-quote RETIRES the stored reference: the row holds one
-        // scalar, and every later confirm/re-verify asks about the fresh one
-        // only. The service side can legitimately end up with TWO settled
-        // quotes for this memoRef (its entry adoption re-settles a superseded
-        // quote a ledger-proven payment backs), and it keys everything on the
-        // reference, so this line is the game's only durable trace of the
-        // retired pair; an operator reconciling a later-adopted payment
-        // matches it against the service's admin quote rows (dev-channel,
-        // deliberately not player text).
+      if (
+        settlement.quoteReference !== null &&
+        settlement.quoteReference !== intent.reference &&
+        settlement.txSignature !== null
+      ) {
+        // A revival re-quote RETIRES a stored reference a payment may exist
+        // against: the row holds one scalar, and every later confirm asks
+        // about the fresh one only. The service side can legitimately end up
+        // with TWO settled quotes for this memoRef (its entry adoption
+        // re-settles a superseded quote a ledger-proven payment backs), and
+        // it keys everything on the reference, so this line is the game's
+        // only durable trace of the retired pair; an operator reconciling a
+        // later-adopted payment matches it against the service's admin quote
+        // rows (dev-channel, deliberately not player text). Scoped to rows
+        // with a RECORDED signature: an unsigned re-quote is routine (the
+        // quote-refresh path) and tracing it would emit a line per refresh.
         console.warn(
-          `[woc_market] settlement ${settlement.id} retires quote reference ${settlement.quoteReference}` +
-            (settlement.txSignature === null
-              ? ' (no signature was recorded against it)'
-              : ` with recorded signature ${settlement.txSignature}`),
+          `[woc_market] settlement ${settlement.id} retires quote reference ${settlement.quoteReference} with recorded signature ${settlement.txSignature}`,
         );
       }
       const stamped = await this.deps.db.setSettlementQuote(

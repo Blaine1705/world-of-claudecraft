@@ -462,6 +462,10 @@ export class WocTradeController {
       // visible yet, or the payment service down).
       if (!wocSettlementInFlight(done.state)) {
         this.log(t('hudChrome.trade.woc.settled'), '#7fdc4f');
+      } else if (done.state === 'review') {
+        // Money parked under an operator verdict is not "awaiting
+        // confirmation": say what the Exchange window says for the same row.
+        this.log(t('hudChrome.wocMarket.settlementReview'), '#ffd100');
       } else {
         this.log(wocPaymentPendingText(done.reason), '#ffd100');
       }

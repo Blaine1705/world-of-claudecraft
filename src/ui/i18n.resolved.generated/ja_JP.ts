@@ -3995,7 +3995,7 @@ export const ja_JP: EnTranslations = {
       "settlementFailBurnMismatch": "支払いでバーンされたトークン量が正しくありません。",
       "settlementFailBurnAuthority": "トークンのバーンが、この購入で指定されていないウォレットから行われました。",
       "settlementFailUnexpectedCredit": "この購入とは関係のないウォレットへ送金されたトランザクションです。",
-      "settlementFailGeneric": "支払いがこの購入と一致しませんでした。",
+      "settlementFailGeneric": "この支払いを完了できませんでした。",
       "paymentSeenAwaitingFinality": "台帳で支払いを確認しました。最終確定を待っています。",
       "paymentNotYetVisible": "台帳にまだ支払いが見えません。表示まで少し時間がかかることがあります。",
       "paymentServiceUnreachable": "決済サービスに接続できません。支払いは記録済みで、後で再確認されます。",

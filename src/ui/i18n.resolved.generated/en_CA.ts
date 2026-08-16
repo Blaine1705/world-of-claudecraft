@@ -3995,7 +3995,7 @@ export const en_CA: EnTranslations = {
       "settlementFailBurnMismatch": "The payment burned the wrong token amount.",
       "settlementFailBurnAuthority": "The token burn came from a wallet this purchase did not name.",
       "settlementFailUnexpectedCredit": "The transaction paid a wallet outside this purchase.",
-      "settlementFailGeneric": "The payment did not match this purchase.",
+      "settlementFailGeneric": "This payment could not be completed.",
       "paymentSeenAwaitingFinality": "Payment seen on the ledger. Waiting for final confirmation.",
       "paymentNotYetVisible": "No payment is visible on the ledger yet. It can take a moment to appear.",
       "paymentServiceUnreachable": "The payment service is unreachable. Your payment stays recorded and will be re-checked.",

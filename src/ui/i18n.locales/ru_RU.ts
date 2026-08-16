@@ -9040,7 +9040,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.settlementFailBurnMismatch': 'В платеже сожжено неверное количество токенов.',
   'hudChrome.wocMarket.settlementFailBurnAuthority': 'Сжигание токенов выполнено с кошелька, не указанного в этой покупке.',
   'hudChrome.wocMarket.settlementFailUnexpectedCredit': 'Транзакция отправила средства на кошелек вне этой покупки.',
-  'hudChrome.wocMarket.settlementFailGeneric': 'Платеж не соответствует этой покупке.',
+  'hudChrome.wocMarket.settlementFailGeneric': 'Не удалось завершить этот платеж.',
   'hudChrome.wocMarket.paymentSeenAwaitingFinality': 'Платеж виден в реестре. Ожидается окончательное подтверждение.',
   'hudChrome.wocMarket.paymentNotYetVisible': 'Платеж пока не виден в реестре. Он может появиться через некоторое время.',
   'hudChrome.wocMarket.paymentServiceUnreachable': 'Платежный сервис недоступен. Ваш платеж записан и будет проверен повторно.',

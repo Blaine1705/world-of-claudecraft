@@ -8507,7 +8507,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.settlementFailBurnMismatch': '付款销毁的代币数量不正确。',
   'hudChrome.wocMarket.settlementFailBurnAuthority': '代币销毁来自本次购买未指定的钱包。',
   'hudChrome.wocMarket.settlementFailUnexpectedCredit': '该交易向本次购买之外的钱包付了款。',
-  'hudChrome.wocMarket.settlementFailGeneric': '付款与本次购买不符。',
+  'hudChrome.wocMarket.settlementFailGeneric': '这笔付款未能完成。',
   'hudChrome.wocMarket.paymentSeenAwaitingFinality': '账本上已看到付款。正在等待最终确认。',
   'hudChrome.wocMarket.paymentNotYetVisible': '账本上尚未看到付款。可能需要片刻才会出现。',
   'hudChrome.wocMarket.paymentServiceUnreachable': '无法连接支付服务。你的付款已被记录，稍后会重新核验。',

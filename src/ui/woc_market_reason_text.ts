@@ -29,6 +29,11 @@ const FAIL_KEYS: Readonly<Record<string, TranslationKey>> = {
   unexpected_credit: 'hudChrome.wocMarket.settlementFailUnexpectedCredit',
 };
 
+/** The word-to-key maps, exported for the vocabulary drift pin: the test
+ *  asserts every mapped word is a member of the server wire vocabulary and
+ *  pins the deliberately-generic remainder. */
+export const WOC_MARKET_REASON_TEXT_KEYS = { pending: PENDING_KEYS, fail: FAIL_KEYS } as const;
+
 /** Player copy for a pending confirm answer; generic when the word is new. */
 export function wocPaymentPendingText(reason: string | null | undefined): string {
   const key = reason == null ? undefined : PENDING_KEYS[reason];

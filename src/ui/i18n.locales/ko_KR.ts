@@ -8882,7 +8882,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.settlementFailBurnMismatch': '결제에서 소각된 토큰 수량이 올바르지 않습니다.',
   'hudChrome.wocMarket.settlementFailBurnAuthority': '이 구매에서 지정하지 않은 지갑에서 토큰이 소각되었습니다.',
   'hudChrome.wocMarket.settlementFailUnexpectedCredit': '이 구매와 무관한 지갑으로 송금된 트랜잭션입니다.',
-  'hudChrome.wocMarket.settlementFailGeneric': '결제가 이 구매와 일치하지 않았습니다.',
+  'hudChrome.wocMarket.settlementFailGeneric': '이 결제를 완료할 수 없었습니다.',
   'hudChrome.wocMarket.paymentSeenAwaitingFinality': '원장에서 결제가 확인되었습니다. 최종 확정을 기다리는 중입니다.',
   'hudChrome.wocMarket.paymentNotYetVisible': '원장에 아직 결제가 보이지 않습니다. 표시되기까지 잠시 걸릴 수 있습니다.',
   'hudChrome.wocMarket.paymentServiceUnreachable': '결제 서비스에 연결할 수 없습니다. 결제는 기록되어 있으며 나중에 다시 확인됩니다.',

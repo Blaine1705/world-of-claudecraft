@@ -460,6 +460,36 @@ describe('quoteView carries signatureRequired', () => {
     const body = await settlementQuoteBody(quoteIntent({ signatureRequired: false }));
     expect((body.quote as Record<string, unknown>).signatureRequired).toBe(false);
   });
+
+  it('carries the service bondCents figure by value', async () => {
+    // The key-set pin catches deletion; this catches a hard-coded null.
+    const body = await settlementQuoteBody(quoteIntent({ bondCents: 250 }));
+    expect((body.quote as Record<string, unknown>).bondCents).toBe(250);
+  });
+});
+
+describe('the place-bid response wraps bidView and quoteView', () => {
+  it('pins the wrapper keys and the bond figure through the real route', async () => {
+    service({
+      placeBid: async () => ({
+        ok: true as const,
+        bid: bidRow({ bondCents: 250 }),
+        bond: quoteIntent({ reference: 'WMB_ref1', bondCents: 250 }),
+      }),
+    });
+    const ctx = readCtx({
+      method: 'POST',
+      url: '/api/woc-market/listings/41/bids',
+      params: { id: '41' },
+      body: { characterId: 3, amountCents: 5000, acceptTerms: true },
+    });
+    await handlerFor('POST', '/api/woc-market/listings/:id/bids')(ctx);
+    const { status, body } = sent(ctx);
+    expect(status).toBe(200);
+    expect(Object.keys(body).sort()).toEqual(['bid', 'bond']);
+    expect((body.bond as Record<string, unknown>).bondCents).toBe(250);
+    expect((body.bid as Record<string, unknown>).bondCents).toBe(250);
+  });
 });
 
 describe('settlementView.failReason is the screened verdict vocabulary', () => {
@@ -531,6 +561,19 @@ describe('the confirm handlers answer the screened pending verdict', () => {
     expect(body).toEqual({ standing: false, pending: true, reason: 'awaiting_finality' });
   });
 
+  it('bond: the handler SCREENS the reason; an unknown word leaves as other', async () => {
+    // Without this pin, replacing the screen with a raw passthrough stays
+    // green on every vocabulary-word fixture and arbitrary service text
+    // reaches the client.
+    const body = await confirmBondBody({
+      ok: true,
+      standing: false,
+      pending: true,
+      reason: 'some_new_service_word_v9',
+    });
+    expect(body).toEqual({ standing: false, pending: true, reason: 'other' });
+  });
+
   it('bond: a settled verdict answers a null reason', async () => {
     const body = await confirmBondBody({ ok: true, standing: true });
     expect(body).toEqual({ standing: true, pending: false, reason: null });
@@ -543,6 +586,15 @@ describe('the confirm handlers answer the screened pending verdict', () => {
       reason: 'not_yet_visible',
     });
     expect(body).toEqual({ state: 'confirming', reason: 'not_yet_visible' });
+  });
+
+  it('settlement: the handler SCREENS the reason; an unknown word leaves as other', async () => {
+    const body = await confirmSettlementBody({
+      ok: true,
+      state: 'confirming',
+      reason: 'some_new_service_word_v9',
+    });
+    expect(body).toEqual({ state: 'confirming', reason: 'other' });
   });
 
   it('settlement: a decided state answers a null reason', async () => {

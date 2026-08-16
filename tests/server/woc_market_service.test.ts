@@ -6727,6 +6727,58 @@ describe('reference-keyed tolerance: one memoRef can hold two settled service qu
     }
   });
 
+  it('an UNSIGNED re-quote traces nothing: the trace is scoped to retired pairs', async () => {
+    // Re-quoting an offered row with no recorded signature is the routine
+    // quote-refresh path; a trace per refresh would be noise. Only a retired
+    // reference a payment may exist against (a recorded signature) earns the
+    // operator line.
+    const h = makeHarness();
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+    let quoteN = 0;
+    const scripted = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        settlementQuote: async () => ({
+          ok: true,
+          reference: `WMS_u${++quoteN}`,
+          transactionBase64: 'dHg=',
+          signatureRequired: true,
+          amount: { base: '1', tokens: 1 },
+          seller: null,
+          burn: null,
+          treasury: null,
+          bondCents: null,
+          expiresAtMs: h.now() + 60_000,
+          reason: null,
+        }),
+      },
+    });
+    const bought = unwrap(
+      await scripted.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    const warned: string[] = [];
+    const spy = vi.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
+      warned.push(args.map(String).join(' '));
+    });
+    try {
+      const requoted = unwrap(
+        await scripted.settlementQuote(BUYER_A, bought.settlement.id),
+        'settlementQuote',
+      );
+      expect(requoted.quote.reference).toBe('WMS_u2');
+      expect(warned.filter((w) => w.includes('retires quote reference'))).toEqual([]);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
   it('a first quote on a fresh settlement traces nothing', async () => {
     const warned: string[] = [];
     const spy = vi.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
@@ -6748,5 +6800,253 @@ describe('reference-keyed tolerance: one memoRef can hold two settled service qu
     } finally {
       spy.mockRestore();
     }
+  });
+});
+
+describe('bond adoption bounds and fallbacks (the review round pins)', () => {
+  const okIntent2 = (over: Partial<WocQuoteIntent>): WocQuoteIntent => ({
+    ok: true,
+    reference: 'WMB_svc2',
+    transactionBase64: null,
+    signatureRequired: true,
+    amount: null,
+    seller: null,
+    burn: null,
+    treasury: null,
+    bondCents: null,
+    expiresAtMs: 0,
+    reason: null,
+    ...over,
+  });
+  const refusedIntent2 = (over: Partial<WocQuoteIntent>): WocQuoteIntent => ({
+    ok: false,
+    reference: null,
+    transactionBase64: null,
+    signatureRequired: true,
+    amount: null,
+    seller: null,
+    burn: null,
+    treasury: null,
+    bondCents: null,
+    expiresAtMs: null,
+    reason: 'refused',
+    ...over,
+  });
+
+  async function placedWithAdopted(
+    h: Harness,
+    listingId: number,
+    bondCents: number,
+  ): Promise<number> {
+    const svc = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        bondQuote: async () => okIntent2({ bondCents, expiresAtMs: h.now() + 60_000 }),
+      },
+    });
+    const placed = unwrap(
+      await svc.placeBid({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId,
+        amountCents: 5000,
+        acceptTerms: true,
+      }),
+      'placeBid',
+    );
+    return placed.bid.id;
+  }
+
+  it('placeBid refuses a carried figure outside the contract, persisting nothing', async () => {
+    // A figure above the bid (or junk) is not adopted into money accounting:
+    // the quote is refused and the unpaid bid lapses on its TTL.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const svc = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        bondQuote: async () => okIntent2({ bondCents: 999_999, expiresAtMs: h.now() + 60_000 }),
+      },
+    });
+    expect(
+      await svc.placeBid({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+        acceptTerms: true,
+      }),
+    ).toEqual({ ok: false, reason: 'quote_unavailable' });
+  });
+
+  it('placeBid falls back to the mirror when an older service sends no figure', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const svc = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        bondQuote: async () => okIntent2({ bondCents: null, expiresAtMs: h.now() + 60_000 }),
+      },
+    });
+    const placed = unwrap(
+      await svc.placeBid({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+        acceptTerms: true,
+      }),
+      'placeBid',
+    );
+    expect(placed.bid.bondCents, 'the ceil mirror of 5000 at 500 bps').toBe(250);
+    expect((await getBid(h, placed.bid.id)).bondCents).toBe(250);
+  });
+
+  it('placeBid re-guards the balance when the adopted figure exceeds the mirror', async () => {
+    // The first guard was sized with the mirror; a service that prices the
+    // bond higher must not send the player to a wallet prompt the guarded
+    // balance cannot cover.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    // 5000 + mirror 250 = 5250 cents -> 52_500 dev tokens; 5000 + adopted
+    // 4000 = 9000 cents -> 90_000 tokens. 60_000 passes the first, fails the
+    // second.
+    h.balances.set('wallet-a', 60_000);
+    const svc = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        bondQuote: async () => okIntent2({ bondCents: 4000, expiresAtMs: h.now() + 60_000 }),
+      },
+    });
+    expect(
+      await svc.placeBid({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+        acceptTerms: true,
+      }),
+    ).toEqual({ ok: false, reason: 'insufficient_balance' });
+  });
+
+  it('refresh echoes the STORED service figure, not a local recomputation', async () => {
+    // The stored figure (321) is unreachable from the mirror (250 for this
+    // bid), so a regression to a locally recomputed echo cannot pass.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const bidId = await placedWithAdopted(h, listing.id, 321);
+    expect((await getBid(h, bidId)).bondCents).toBe(321);
+    const echoes: (number | undefined)[] = [];
+    const svc = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        bondQuote: async (args) => {
+          echoes.push(args.usdCents);
+          return okIntent2({ bondCents: 321, expiresAtMs: h.now() + 60_000 });
+        },
+      },
+    });
+    unwrap(await svc.refreshBondQuote(BUYER_A, bidId), 'refreshBondQuote');
+    expect(echoes).toEqual([321]);
+  });
+
+  it('refresh bounds the drift retry at ONE: a service that always drifts refuses', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const bidId = await placedWithAdopted(h, listing.id, 250);
+    let calls = 0;
+    const svc = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        bondQuote: async () => {
+          calls++;
+          return refusedIntent2({ reason: 'bond_amount_drift', bondCents: 260 });
+        },
+      },
+    });
+    expect(await svc.refreshBondQuote(BUYER_A, bidId)).toEqual({
+      ok: false,
+      reason: 'quote_unavailable',
+    });
+    expect(calls, 'the initial quote plus exactly one adopted retry').toBe(2);
+  });
+
+  it('refresh refuses a post-drift success that carries NO figure', async () => {
+    // The service just declared the stored figure wrong; succeeding without
+    // saying the right one must not silently keep the refuted number.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const bidId = await placedWithAdopted(h, listing.id, 250);
+    let first = true;
+    const svc = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        bondQuote: async () => {
+          if (first) {
+            first = false;
+            return refusedIntent2({ reason: 'bond_amount_drift', bondCents: 260 });
+          }
+          return okIntent2({ bondCents: null, expiresAtMs: h.now() + 60_000 });
+        },
+      },
+    });
+    expect(await svc.refreshBondQuote(BUYER_A, bidId)).toEqual({
+      ok: false,
+      reason: 'quote_unavailable',
+    });
+    expect((await getBid(h, bidId)).bondCents, 'the stored figure is untouched').toBe(250);
+  });
+
+  it('refresh keeps the stored figure when a PLAIN success omits one (older service)', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const bidId = await placedWithAdopted(h, listing.id, 321);
+    const svc = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        bondQuote: async () =>
+          okIntent2({ reference: 'WMB_plain', bondCents: null, expiresAtMs: h.now() + 60_000 }),
+      },
+    });
+    unwrap(await svc.refreshBondQuote(BUYER_A, bidId), 'refreshBondQuote');
+    const after = await getBid(h, bidId);
+    expect(after.bondReference).toBe('WMB_plain');
+    expect(after.bondCents).toBe(321);
+  });
+
+  it('an outage pending verdict still extends nothing (always-run arm)', async () => {
+    // The allowlist's most load-bearing exclusion, previously proven only in
+    // the env-gated pg fixture.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const bidAt = listing.endsAtMs - 60_000;
+    h.setNow(bidAt);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const scripted = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        confirm: async () => ({ settled: false, pending: true, reason: 'service_unavailable' }),
+      },
+    });
+    h.setNow(listing.endsAtMs - 30_000);
+    unwrap(await scripted.confirmBond(BUYER_A, placed.bid.id, 'sig-outage-arm'), 'confirmBond');
+    expect((await getListing(h, listing.id)).endsAtMs).toBe(listing.endsAtMs);
   });
 });

@@ -1154,12 +1154,12 @@ export class WocMarketWindow {
           s.state === 'offered' || s.state === 'failed'
             ? ` <span>${esc(t('hudChrome.wocMarket.activityDeadline', { duration: this.countdown(s.deadlineRemainingMs / 1000) }))}</span>`
             : '';
-        // WHY it failed, on failed rows only (wocSettlementFailText's contract
-        // explains the expired-row exclusion): the screened verdict is the
-        // difference between "try again" and "your transaction was wrong".
+        // WHY it failed: the view core owns the gate (failDetailReason is
+        // non-null on failed rows only; the expired-row exclusion is decided
+        // and tested there), the painter only renders its verdict.
         const failDetail =
-          s.state === 'failed' && s.failReason != null
-            ? ` <span>${esc(wocSettlementFailText(s.failReason) ?? '')}</span>`
+          s.failDetailReason != null
+            ? ` <span>${esc(wocSettlementFailText(s.failDetailReason) ?? '')}</span>`
             : '';
         return `<li><span>${esc(this.usd(s.amountCents))}</span> <span>${esc(t(settlementKey(s.state)))}</span>${failDetail}${deadline}${pay}</li>`;
       })
@@ -1832,9 +1832,11 @@ export class WocMarketWindow {
       this.pendingQuote = {
         kind: 'bond',
         bidId,
-        // The quote's own amount is authoritative; the cached row is only a
-        // label hint, so never render a fabricated $0.00 for a real charge.
-        usdCents: bid?.bondCents ?? null,
+        // The QUOTE's service-computed figure labels the prompt: a refresh can
+        // re-price the bond (the drift-adopt path), and the cached row is one
+        // reload stale. The row is only the fallback for an older server that
+        // sends no figure; never render a fabricated $0.00 for a real charge.
+        usdCents: out.bond.bondCents ?? bid?.bondCents ?? null,
         quote: out.bond,
       };
     });

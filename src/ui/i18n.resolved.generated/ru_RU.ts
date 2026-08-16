@@ -3995,7 +3995,7 @@ export const ru_RU: EnTranslations = {
       "settlementFailBurnMismatch": "В платеже сожжено неверное количество токенов.",
       "settlementFailBurnAuthority": "Сжигание токенов выполнено с кошелька, не указанного в этой покупке.",
       "settlementFailUnexpectedCredit": "Транзакция отправила средства на кошелек вне этой покупки.",
-      "settlementFailGeneric": "Платеж не соответствует этой покупке.",
+      "settlementFailGeneric": "Не удалось завершить этот платеж.",
       "paymentSeenAwaitingFinality": "Платеж виден в реестре. Ожидается окончательное подтверждение.",
       "paymentNotYetVisible": "Платеж пока не виден в реестре. Он может появиться через некоторое время.",
       "paymentServiceUnreachable": "Платежный сервис недоступен. Ваш платеж записан и будет проверен повторно.",

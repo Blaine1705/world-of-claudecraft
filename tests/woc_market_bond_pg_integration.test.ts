@@ -982,12 +982,20 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
         bondReference: `snipe-unseen-${seq}`,
       });
       economy.verdict = { settled: false, pending: true, reason: 'not_yet_visible' };
-      await service.confirmBond(
+      const unseenOut = await service.confirmBond(
         (await pool.query(`SELECT account FROM woc_market_bids WHERE id = $1`, [unseen])).rows[0]
           .account,
         unseen,
         'sig-never-broadcast',
       );
+      // The outcome shape proves the PENDING arm was reached: a refusal for
+      // an unrelated reason would also leave the close unmoved.
+      expect(unseenOut).toEqual({
+        ok: true,
+        standing: false,
+        pending: true,
+        reason: 'not_yet_visible',
+      });
       expect(Number((await listingRow(listingId)).ends_ms)).toBe(endsAtMs);
       // The verdict the chain has SEEN (matched, pending finality) is the ONE
       // pending word that earns the extension.

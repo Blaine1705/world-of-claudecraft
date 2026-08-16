@@ -8917,7 +8917,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.settlementFailBurnMismatch': '支払いでバーンされたトークン量が正しくありません。',
   'hudChrome.wocMarket.settlementFailBurnAuthority': 'トークンのバーンが、この購入で指定されていないウォレットから行われました。',
   'hudChrome.wocMarket.settlementFailUnexpectedCredit': 'この購入とは関係のないウォレットへ送金されたトランザクションです。',
-  'hudChrome.wocMarket.settlementFailGeneric': '支払いがこの購入と一致しませんでした。',
+  'hudChrome.wocMarket.settlementFailGeneric': 'この支払いを完了できませんでした。',
   'hudChrome.wocMarket.paymentSeenAwaitingFinality': '台帳で支払いを確認しました。最終確定を待っています。',
   'hudChrome.wocMarket.paymentNotYetVisible': '台帳にまだ支払いが見えません。表示まで少し時間がかかることがあります。',
   'hudChrome.wocMarket.paymentServiceUnreachable': '決済サービスに接続できません。支払いは記録済みで、後で再確認されます。',

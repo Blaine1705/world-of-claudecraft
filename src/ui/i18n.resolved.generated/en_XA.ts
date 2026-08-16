@@ -3995,7 +3995,7 @@ export const en_XA: EnTranslations = {
       "settlementFailBurnMismatch": "[Ţĥé þáýɱéñţ ƀúŕñéð ţĥé ŵŕóñĝ ţóķéñ áɱóúñţ.]",
       "settlementFailBurnAuthority": "[Ţĥé ţóķéñ ƀúŕñ çáɱé ƒŕóɱ á ŵáļļéţ ţĥíš þúŕçĥášé ðíð ñóţ ñáɱé.]",
       "settlementFailUnexpectedCredit": "[Ţĥé ţŕáñšáçţíóñ þáíð á ŵáļļéţ óúţšíðé ţĥíš þúŕçĥášé.]",
-      "settlementFailGeneric": "[Ţĥé þáýɱéñţ ðíð ñóţ ɱáţçĥ ţĥíš þúŕçĥášé.]",
+      "settlementFailGeneric": "[Ţĥíš þáýɱéñţ çóúļð ñóţ ƀé çóɱþļéţéð.]",
       "paymentSeenAwaitingFinality": "[Þáýɱéñţ šééñ óñ ţĥé ļéðĝéŕ. Ŵáíţíñĝ ƒóŕ ƒíñáļ çóñƒíŕɱáţíóñ.]",
       "paymentNotYetVisible": "[Ñó þáýɱéñţ íš ʋíšíƀļé óñ ţĥé ļéðĝéŕ ýéţ. Íţ çáñ ţáķé á ɱóɱéñţ ţó áþþéáŕ.]",
       "paymentServiceUnreachable": "[Ţĥé þáýɱéñţ šéŕʋíçé íš úñŕéáçĥáƀļé. Ýóúŕ þáýɱéñţ šţáýš ŕéçóŕðéð áñð ŵíļļ ƀé ŕé-çĥéçķéð.]",
