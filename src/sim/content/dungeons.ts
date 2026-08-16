@@ -512,7 +512,13 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     },
     enrage: { belowHpPct: 0.3, dmgMult: 1.5, hasteMult: 1.3 },
     loot: [
-      { copper: 50000, chance: 1 },
+      // 15000c base rolls to 9000c to 21000c (the 0.6x to 1.4x loot band):
+      // roughly the 1g to 2g finale payout, a 3x premium over the 5000c the
+      // other Sanctum bosses pay. The old 50000c base paid 3g to 7g per pop
+      // on a lockout-free, skip-pullable finale, the prime repeat gold-farm
+      // target (Zulgar in Wildheart pays 55000c but sits behind
+      // bossChainPull); tests/gravewyrm_boss_gold.test.ts pins the band.
+      { copper: 15000, chance: 1 },
       { itemId: 'boneplate_vest', chance: 0.34, rollGroup: 'korzul_guaranteed_uncommon' },
       { itemId: 'revenant_silk_robe', chance: 0.33, rollGroup: 'korzul_guaranteed_uncommon' },
       { itemId: 'nightwalk_jerkin', chance: 0.33, rollGroup: 'korzul_guaranteed_uncommon' },
