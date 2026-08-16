@@ -7171,6 +7171,7 @@ export const zh_CN: EnTranslations = {
       "shopMarksRequired": "购买{name}需要 {marks} 枚探秘印记。",
       "shopSealPremiumOnly": "此封印只向大师之手屈服，唯有上乘投入方能开启。",
       "passageSealed": "通道被封住了。",
+      "enemiesRemain": "先清除剩余的敌人。",
       "moveCloserPassage": "靠近通道一些。",
       "moveCloserChest": "靠近宝箱一些。",
       "moveCloserReliquary": "靠近圣物匣一些。",

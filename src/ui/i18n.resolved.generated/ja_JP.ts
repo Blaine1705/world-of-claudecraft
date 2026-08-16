@@ -7171,6 +7171,7 @@ export const ja_JP: EnTranslations = {
       "shopMarksRequired": "{name}を購入するにはデルヴの刻印が{marks}個必要だ。",
       "shopSealPremiumOnly": "この封印は達人の手にのみ応じる。極上の賭けだけが開くことができる。",
       "passageSealed": "通路は封じられている。",
+      "enemiesRemain": "残りの敵を先に倒せ。",
       "moveCloserPassage": "通路にもっと近づけ。",
       "moveCloserChest": "宝箱にもっと近づけ。",
       "moveCloserReliquary": "聖遺物匣にもっと近づけ。",

@@ -7361,6 +7361,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'sim.delve.moveCloserStairs': '階段にもっと近づけ。',
   'sim.delve.notInDelve': 'あなたはデルヴの中にいない。',
   'sim.delve.nothingHappens': '何も起こらない。',
+  'sim.delve.enemiesRemain': '残りの敵を先に倒せ。',
   'sim.delve.passageSealed': '通路は封じられている。',
   'sim.delve.raiseDead': '{name}が死者蘇生を唱え始める。',
   'sim.delve.runFailed': '{name}の攻略に失敗した。',

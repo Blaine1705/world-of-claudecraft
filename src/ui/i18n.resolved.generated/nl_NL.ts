@@ -7171,6 +7171,7 @@ export const nl_NL: EnTranslations = {
       "shopMarksRequired": "Je hebt {marks} Delve-Merken nodig om {name} te kopen.",
       "shopSealPremiumOnly": "Dit zegel wijkt alleen voor een meesterhand. Alleen de Premium-inzet kan het openen.",
       "passageSealed": "De doorgang is verzegeld.",
+      "enemiesRemain": "Clear the remaining enemies first.",
       "moveCloserPassage": "Kom dichter bij de doorgang.",
       "moveCloserChest": "Kom dichter bij de kist.",
       "moveCloserReliquary": "Kom dichter bij het reliekschrijn.",
