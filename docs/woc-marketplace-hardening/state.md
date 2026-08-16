@@ -968,7 +968,26 @@ Still open (a phase that hits one asks at session start):
       clampedBondCentsForBid against the game mirror closes the
       cross-repo anchor; mirror-vs-service bond drift is invisible to
       operators, a monitoring line or knob-lockstep check belongs in
-      the runbook); 22 (runbook as before).
+      the runbook); 22 (runbook as before); 16 ALSO owns the two
+      qa-checklist suggestions taken as one unit with its woc_market.ts
+      work: extract the drift-warn cluster (logSafe, WIRE_DRIFT_WARN_CAP,
+      wireDriftWarns, the three note methods) into a sibling
+      woc_market_drift_warn.ts, add a monolith_budget row for
+      server/woc_market.ts at the same time, and screen through the
+      exported WIRE_*_SET Sets so both screens share one judge; 16/21
+      also observe the poll settled-arm's one best-effort listing
+      transaction per settled bond per pass under a real burst.
+    - CLOSING VERDICTS: qa-checklist READY, 0 blocking, 0 should-fix
+      (its adversarial pass independently traced and CLEARED the trade
+      ladder against every reachable ok-state, the devsig double-gating,
+      the browse booleans as non-disclosures, the round-to-ceil money
+      safety, and SETTLING_STATES staying live; it NAMED the
+      no-BOND_MAX-clamp property as ruled, not a surprise). Gate GREEN
+      at 4377a38458: gate_select full-suite fallback, all 12 steps,
+      2854 files / 40635 tests + 2 expected fails, browser 129, WITH
+      TEST_DATABASE_URL so every pg suite executed inside it; the four
+      market pg suites additionally ran 132/132 zero skips three times
+      standalone during the round.
 - 11 oracle-health (2026-08-16, SERVICE repo, session start 8da6c03 = the
   10 QA tip, origin/master already contained at df09756; 5 commits, tip
   03df5de, LOCAL not pushed per R4; validation npm run build + npm test in
