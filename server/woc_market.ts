@@ -48,6 +48,7 @@ import {
   WOC_MARKET_QUOTE_TTL_SECONDS,
   WOC_MARKET_SETTLEMENT_WINDOW_SECONDS,
   WOC_MARKET_STRANDED_RECLAIM_SECONDS,
+  WOC_MARKET_WIRE_FAIL_REASONS,
   WOC_MARKET_WIRE_PENDING_REASONS,
   type WocBidStatus,
   type WocEligibilityPolicy,
@@ -1214,10 +1215,18 @@ interface WocDeliveryScope {
 /** Log-channel clamp for wire-supplied identifiers: printable ASCII only,
  *  bounded, so a hostile or corrupt value cannot forge log lines or flood
  *  the channel (the same discipline the route layer's signature screen
- *  applies at intake; this belt covers values that predate it). */
+ *  applies at intake; this belt covers values that predate it). The bound
+ *  matches the intake screen's 256 so a real base58 signature (87 to 88
+ *  chars) survives whole: the retirement trace is reconciliation evidence,
+ *  and a truncated signature defeats an exact-match log search. */
 function logSafe(value: string): string {
-  return value.replace(/[^\x20-\x7e]/g, '?').slice(0, 64);
+  return value.replace(/[^\x20-\x7e]/g, '?').slice(0, 256);
 }
+
+/** Distinct unrecognized verdict words warned about before the channel goes
+ *  quiet: one line per word is a drift signal, an unbounded set fed by wire
+ *  text is a leak. */
+const WIRE_DRIFT_WARN_CAP = 100;
 
 export class WocMarketService {
   constructor(private readonly deps: WocMarketDeps) {}
@@ -1268,8 +1277,15 @@ export class WocMarketService {
    *  every pass forever; young confirming bonds keep the full poll cadence. */
   private readonly parkedBondPolls = new Map<number, number>();
 
-  /** Pending confirm words already warned about (once per word per process). */
-  private readonly warnedPendingWords = new Set<string>();
+  /** Verdict words already warned about, one channel per vocabulary (once
+   *  per word per service instance; production runs one instance per realm
+   *  process). Keys are logSafe-clamped and the set is capped, so a
+   *  misbehaving service answering a distinct unbounded word per call cannot
+   *  grow process memory for its lifetime. */
+  private readonly wireDriftWarns = {
+    pending: { words: new Set<string>(), suppressed: false },
+    fail: { words: new Set<string>(), suppressed: false },
+  };
 
   /**
    * Dev-channel visibility for service vocabulary drift. The anti-snipe
@@ -1280,11 +1296,36 @@ export class WocMarketService {
    * visible instead of invisible.
    */
   private notePendingVerdict(reason: string | null): void {
+    this.noteWireVerdict('pending', WOC_MARKET_WIRE_PENDING_REASONS, reason);
+  }
+
+  /** The fail-side twin. Fail words persist verbatim on the settlement row,
+   *  so operators CAN query the drift after the fact; the warn exists so
+   *  they never have to know to look (the same silent-collapse class the
+   *  pending warn closes: every affected player sees the generic line). */
+  private noteFailVerdict(reason: string | null): void {
+    this.noteWireVerdict('fail', WOC_MARKET_WIRE_FAIL_REASONS, reason);
+  }
+
+  private noteWireVerdict(
+    kind: 'pending' | 'fail',
+    vocabulary: readonly string[],
+    reason: string | null,
+  ): void {
     if (reason === null) return;
-    if ((WOC_MARKET_WIRE_PENDING_REASONS as readonly string[]).includes(reason)) return;
-    if (this.warnedPendingWords.has(reason)) return;
-    this.warnedPendingWords.add(reason);
-    console.warn(`[woc_market] unrecognized pending confirm verdict ${logSafe(reason)}`);
+    if (vocabulary.includes(reason)) return;
+    const chan = this.wireDriftWarns[kind];
+    const word = logSafe(reason);
+    if (chan.words.has(word)) return;
+    if (chan.words.size >= WIRE_DRIFT_WARN_CAP) {
+      if (!chan.suppressed) {
+        chan.suppressed = true;
+        console.warn(`[woc_market] further unrecognized ${kind} verdict words suppressed`);
+      }
+      return;
+    }
+    chan.words.add(word);
+    console.warn(`[woc_market] unrecognized ${kind} confirm verdict ${word}`);
   }
 
   /** Next time the delivered-residue arm may run (minute-scale: it converges
@@ -2038,7 +2079,9 @@ export class WocMarketService {
     // The SERVICE owns the bond figure: send the bid (the ROW's figure, the
     // authoritative source once inserted), no echo (nothing has been shown to
     // the player for this bid yet), and adopt the bondCents the quote
-    // answers. The local estimate above only sized the balance guard.
+    // answers. The local mirror above sized the balance guard AND seeded the
+    // inserted row, so a row the quote path never reaches (refusal below)
+    // carries the mirror figure until its TTL lapse.
     const intent = await this.deps.economy.bondQuote({
       memoRef: `woc_bond:${inserted.bid.id}`,
       bidCents: inserted.bid.amountCents,
@@ -2078,7 +2121,16 @@ export class WocMarketService {
     }
     return {
       ok: true,
-      bid: { ...inserted.bid, bondReference: intent.reference, bondCents: adoptedBondCents },
+      // The patched bid mirrors the row the CAS just wrote (reference,
+      // figure, AND quote expiry): a response bid disagreeing with its own
+      // row invites a future consumer to cache "no live quote" for a bid
+      // that has one.
+      bid: {
+        ...inserted.bid,
+        bondReference: intent.reference,
+        bondCents: adoptedBondCents,
+        bondQuoteExpiresAtMs: intent.expiresAtMs,
+      },
       bond: intent,
     };
   }
@@ -2440,6 +2492,22 @@ export class WocMarketService {
         }
         this.parkedBondPolls.delete(bid.id);
         if (confirmed.settled) {
+          // The confirm leg's settled-arm rule, kept symmetric here: extend
+          // BEFORE activating, anchored on this pass's clock (the verdict
+          // moment as observed). The allowlist narrowed the PENDING arm to
+          // the one ledger-matched word, which un-extended the honest bidder
+          // whose synchronous confirm raced chain visibility
+          // (not_yet_visible) and whose bond the ledger then settled; a
+          // settled verdict is stronger proof than the matched word, so
+          // granting it here extends nothing a fabricated signature can
+          // reach (a fabricated string never settles), and the math no-ops
+          // once the auction is already over. Best-effort like the confirm
+          // site: a contended extension only fails toward a shorter auction.
+          await this.deps.db
+            .extendAuctionForBondProgress(this.cfg.realm, bid.listingId, (row) =>
+              antiSnipeExtendedEndMs(nowMs, row.endsAtMs, row.baseEndsAtMs),
+            )
+            .catch(() => {});
           await this.holdBondAndActivate(bid.id);
         } else {
           // Decided AGAINST: the bond never landed, so the bid lapses and its
@@ -2593,6 +2661,7 @@ export class WocMarketService {
       sellerWallet,
     });
     if (intent.ok && intent.reference !== null && intent.expiresAtMs !== null) {
+      let retiredPair: { reference: string; signature: string } | null = null;
       if (
         settlement.quoteReference !== null &&
         settlement.quoteReference !== intent.reference &&
@@ -2613,10 +2682,14 @@ export class WocMarketService {
         // the game) leaves no game-side line, deliberately: the service
         // still holds that quote keyed by this settlement's memoRef
         // (settlementCustodyRef of the id), which is what actually anchors
-        // reconciliation.
-        console.warn(
-          `[woc_market] settlement ${settlement.id} retires quote reference ${logSafe(settlement.quoteReference)} with recorded signature ${logSafe(settlement.txSignature)}`,
-        );
+        // reconciliation. Captured here, emitted only AFTER the CAS lands:
+        // the guarded write can lose (the row left 'offered' to a racing
+        // confirm), and a trace claiming a retirement that never happened
+        // would falsify the very trail it exists to keep.
+        retiredPair = {
+          reference: settlement.quoteReference,
+          signature: settlement.txSignature,
+        };
       }
       const stamped = await this.deps.db.setSettlementQuote(
         settlement.id,
@@ -2625,6 +2698,11 @@ export class WocMarketService {
         intent.amount?.base ?? null,
       );
       if (!stamped) return { ...intent, ok: false, reason: 'settlement_not_open' };
+      if (retiredPair !== null) {
+        console.warn(
+          `[woc_market] settlement ${settlement.id} retires quote reference ${logSafe(retiredPair.reference)} with recorded signature ${logSafe(retiredPair.signature)}`,
+        );
+      }
     }
     return intent;
   }
@@ -2716,7 +2794,7 @@ export class WocMarketService {
         // keeps the refused transfer; this line is the game-side trace of the
         // replacement (dev-channel, deliberately not player text).
         console.warn(
-          `[woc_market] settlement ${settlement.id} records a new payment attempt over refused signature ${settlement.txSignature}`,
+          `[woc_market] settlement ${settlement.id} records a new payment attempt over refused signature ${logSafe(settlement.txSignature)}`,
         );
       }
       const submitted = await this.deps.db.submitSettlementSignature(settlement.id, signature);
@@ -2743,6 +2821,7 @@ export class WocMarketService {
       this.notePendingVerdict(confirmed.reason);
       return { ok: true, state: 'confirming', reason: confirmed.reason };
     }
+    this.noteFailVerdict(confirmed.reason);
     await this.deps.db.transitionSettlement(
       settlement.id,
       ['confirming'],
@@ -3430,6 +3509,7 @@ export class WocMarketService {
         if (confirmed.settled) {
           await this.deps.db.transitionSettlement(settlement.id, ['confirming'], 'confirmed');
         } else {
+          this.noteFailVerdict(confirmed.reason);
           await this.deps.db.transitionSettlement(
             settlement.id,
             ['confirming'],

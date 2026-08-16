@@ -2956,10 +2956,11 @@ export class PgWocMarketDb implements WocMarketDb {
   }
 
   /**
-   * Anti-snipe, at BOND PROGRESS: called once when a bid's signature is
-   * recorded (the moment it becomes 'confirming', which held/paid then
-   * follows). The extension math is the caller's injected pure rule; the cap
-   * behavior is unchanged from the old placement-time arm.
+   * Anti-snipe, at BOND PROGRESS: called on a chain verdict that proves the
+   * transfer (a settled verdict at the confirm site or the bond poll, or the
+   * one ledger-matched pending word at the confirm site), never on the raw
+   * submission. The extension math is the caller's injected pure rule; the
+   * cap behavior is unchanged from the old placement-time arm.
    *
    * LOCK ORDER carve-out: this transaction takes the LISTING row only and
    * never a bid row lock (the signature UPDATE it follows is its own

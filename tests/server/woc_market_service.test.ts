@@ -6466,35 +6466,38 @@ describe('the seller notice can fail or be lost without touching the sale', () =
   });
 });
 
+/** Service bond-quote intent builders, shared by the contract and the bounds
+ *  describes below (the second copy was the rule-of-three tell). */
+const okIntent = (over: Partial<WocQuoteIntent>): WocQuoteIntent => ({
+  ok: true,
+  reference: 'WMB_svc',
+  transactionBase64: null,
+  signatureRequired: true,
+  amount: null,
+  seller: null,
+  burn: null,
+  treasury: null,
+  bondCents: null,
+  expiresAtMs: 0,
+  reason: null,
+  ...over,
+});
+const refusedIntent = (over: Partial<WocQuoteIntent>): WocQuoteIntent => ({
+  ok: false,
+  reference: null,
+  transactionBase64: null,
+  signatureRequired: true,
+  amount: null,
+  seller: null,
+  burn: null,
+  treasury: null,
+  bondCents: null,
+  expiresAtMs: null,
+  reason: 'refused',
+  ...over,
+});
+
 describe('the service-owned bond quote contract', () => {
-  const okIntent = (over: Partial<WocQuoteIntent>): WocQuoteIntent => ({
-    ok: true,
-    reference: 'WMB_svc',
-    transactionBase64: null,
-    signatureRequired: true,
-    amount: null,
-    seller: null,
-    burn: null,
-    treasury: null,
-    bondCents: null,
-    expiresAtMs: 0,
-    reason: null,
-    ...over,
-  });
-  const refusedIntent = (over: Partial<WocQuoteIntent>): WocQuoteIntent => ({
-    ok: false,
-    reference: null,
-    transactionBase64: null,
-    signatureRequired: true,
-    amount: null,
-    seller: null,
-    burn: null,
-    treasury: null,
-    bondCents: null,
-    expiresAtMs: null,
-    reason: 'refused',
-    ...over,
-  });
   type BondQuoteArgs = {
     memoRef: string;
     bidCents: number;
@@ -6535,7 +6538,12 @@ describe('the service-owned bond quote contract', () => {
     ]);
     expect(placed.bid.bondCents, 'the response bid carries the adopted figure').toBe(321);
     expect(placed.bond.bondCents, 'and the intent shows the service figure').toBe(321);
-    expect((await getBid(h, placed.bid.id)).bondCents, 'persisted on the row').toBe(321);
+    const row = await getBid(h, placed.bid.id);
+    expect(row.bondCents, 'persisted on the row').toBe(321);
+    // The response bid mirrors the WHOLE row the CAS wrote: a stale quote
+    // expiry invites a consumer to cache "no live quote" for a bid with one.
+    expect(placed.bid.bondQuoteExpiresAtMs).toBe(row.bondQuoteExpiresAtMs);
+    expect(placed.bid.bondQuoteExpiresAtMs).toBe(placed.bond.expiresAtMs);
   });
 
   it('refreshBondQuote echoes the stored figure and adopts through a drift refusal', async () => {
@@ -6804,34 +6812,9 @@ describe('reference-keyed tolerance: one memoRef can hold two settled service qu
 });
 
 describe('bond adoption bounds and fallbacks (the review round pins)', () => {
-  const okIntent2 = (over: Partial<WocQuoteIntent>): WocQuoteIntent => ({
-    ok: true,
-    reference: 'WMB_svc2',
-    transactionBase64: null,
-    signatureRequired: true,
-    amount: null,
-    seller: null,
-    burn: null,
-    treasury: null,
-    bondCents: null,
-    expiresAtMs: 0,
-    reason: null,
-    ...over,
-  });
-  const refusedIntent2 = (over: Partial<WocQuoteIntent>): WocQuoteIntent => ({
-    ok: false,
-    reference: null,
-    transactionBase64: null,
-    signatureRequired: true,
-    amount: null,
-    seller: null,
-    burn: null,
-    treasury: null,
-    bondCents: null,
-    expiresAtMs: null,
-    reason: 'refused',
-    ...over,
-  });
+  const okIntent2 = (over: Partial<WocQuoteIntent>): WocQuoteIntent =>
+    okIntent({ reference: 'WMB_svc2', ...over });
+  const refusedIntent2 = refusedIntent;
 
   async function placedWithAdopted(
     h: Harness,
@@ -6931,6 +6914,12 @@ describe('bond adoption bounds and fallbacks (the review round pins)', () => {
         acceptTerms: true,
       }),
     ).toEqual({ ok: false, reason: 'insufficient_balance' });
+    // The refresh twin's rule holds here too: nothing was persisted from the
+    // refused quote. The pending row keeps its insert-time mirror figure and
+    // no bond reference, and lapses on its own TTL.
+    const refused = (await h.db.bidsForListing(listing.id)).find((b) => b.account === BUYER_A);
+    expect(refused?.bondReference, 'no quote reference was persisted').toBeNull();
+    expect(refused?.bondCents, 'the row keeps the insert-time mirror figure').toBe(250);
   });
 
   it('refresh echoes the STORED service figure, not a local recomputation', async () => {
@@ -7105,6 +7094,52 @@ describe('bond adoption bounds and fallbacks (the review round pins)', () => {
     unwrap(await scripted.confirmBond(BUYER_A, placed.bid.id, 'sig-outage-arm'), 'confirmBond');
     expect((await getListing(h, listing.id)).endsAtMs).toBe(listing.endsAtMs);
   });
+
+  it('a bond the ledger settles at the POLL still extends, from the poll clock', async () => {
+    // The allowlist un-extended the honest bidder whose synchronous confirm
+    // raced chain visibility (not_yet_visible) and whose bond the ledger then
+    // settled: the poll's settled arm grants the same paid-bond extension the
+    // confirm site always granted, and a fabricated signature cannot reach it
+    // because a fabricated string never settles.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    h.setNow(listing.endsAtMs - 60_000);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const verdict = { settled: false, pending: true, reason: 'not_yet_visible' as string };
+    const scripted = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        confirm: async () => ({
+          settled: verdict.settled,
+          pending: verdict.pending,
+          reason: verdict.reason,
+        }),
+      },
+    });
+    h.setNow(listing.endsAtMs - 30_000);
+    unwrap(await scripted.confirmBond(BUYER_A, placed.bid.id, 'sig-poll-settle'), 'confirmBond');
+    // The visibility-lag word correctly extends nothing at the confirm site.
+    expect((await getListing(h, listing.id)).endsAtMs).toBe(listing.endsAtMs);
+    verdict.settled = true;
+    verdict.pending = false;
+    const pollAt = listing.endsAtMs - 10_000;
+    h.setNow(pollAt);
+    await scripted.sweepPass();
+    expect(
+      (await getListing(h, listing.id)).endsAtMs,
+      'the poll-observed settled verdict grants the paid-bond extension from the poll clock',
+    ).toBe(pollAt + WOC_MARKET_ANTI_SNIPE_EXTENSION_SECONDS * 1000);
+    expect((await getBid(h, placed.bid.id)).status).toBe('active');
+  });
 });
 
 describe('service vocabulary drift is visible on the dev channel', () => {
@@ -7141,11 +7176,215 @@ describe('service vocabulary drift is visible on the dev channel', () => {
       const driftLines = warned.filter((w) => w.includes('unrecognized pending confirm verdict'));
       expect(driftLines, 'once per word, not per sighting').toHaveLength(1);
       expect(driftLines[0]).toContain('ledger_matched_v2');
+      // The drifted word is exactly the shape the allowlist exists for: it
+      // must extend nothing (a denylist-form regression passes every
+      // known-word arm while any invented word moves the close for free).
+      expect(
+        (await getListing(h, listing.id)).endsAtMs,
+        'an unknown pending word never moves the close',
+      ).toBe(listing.endsAtMs);
       verdict.reason = 'awaiting_finality';
       unwrap(await scripted.confirmBond(BUYER_A, placed.bid.id, 'sig-drift-word'), 'confirmBond');
       expect(
         warned.filter((w) => w.includes('unrecognized pending confirm verdict')),
         'a known vocabulary word never warns',
+      ).toHaveLength(1);
+      // A SECOND distinct drift word earns its own line: a single-boolean
+      // dedupe would silence every drift after the first.
+      verdict.reason = 'ledger_seen_v3';
+      unwrap(await scripted.confirmBond(BUYER_A, placed.bid.id, 'sig-drift-word'), 'confirmBond');
+      const twoWords = warned.filter((w) => w.includes('unrecognized pending confirm verdict'));
+      expect(twoWords, 'one line per distinct word').toHaveLength(2);
+      expect(twoWords[1]).toContain('ledger_seen_v3');
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('clamps a hostile drift word: one bounded printable line, no forged newline', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const hostile = `seen\n[woc_market] forged operator line${'x'.repeat(300)}`;
+    const scripted = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        confirm: async () => ({ settled: false, pending: true, reason: hostile }),
+      },
+    });
+    const warned: string[] = [];
+    const spy = vi.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
+      warned.push(args.map(String).join(' '));
+    });
+    try {
+      unwrap(await scripted.confirmBond(BUYER_A, placed.bid.id, 'sig-hostile-word'), 'confirmBond');
+      const driftLines = warned.filter((w) => w.includes('unrecognized pending confirm verdict'));
+      expect(driftLines).toHaveLength(1);
+      expect(driftLines[0], 'the newline is replaced, never emitted').not.toContain('\n');
+      expect(driftLines[0]).toContain('?');
+      // logSafe bounds the identifier at 256 (the intake screen's bound, so a
+      // real 88-char signature elsewhere survives whole for reconciliation).
+      expect(driftLines[0].length).toBeLessThan(340);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('warns once per unrecognized FAIL word too, from the confirm site and the poll', async () => {
+    // The fail-side twin: fail words persist on the row, but nobody knows to
+    // query for drift; the sighting line is the signal. Same channel rules:
+    // once per word across sites, known vocabulary words never warn.
+    const h = makeHarness();
+    const verdict = { settled: false, pending: false, reason: 'burn_rejected_v9' as string };
+    const scripted = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        confirm: async () => ({
+          settled: verdict.settled,
+          pending: verdict.pending,
+          reason: verdict.reason,
+        }),
+      },
+    });
+    const warned: string[] = [];
+    const spy = vi.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
+      warned.push(args.map(String).join(' '));
+    });
+    const settledFor = async (buyer: number, char: number): Promise<number> => {
+      // The harness seeds ONE epic copy; each round lists a fresh one.
+      h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
+      const listing = await listEpic(h);
+      const standing = await confirmedBid(h, buyer, char, listing.id, 5000);
+      h.setNow((await getListing(h, listing.id)).endsAtMs + 1);
+      await h.service.sweepPass();
+      const settlement = await liveSettlement(h, listing.id);
+      unwrap(await scripted.settlementQuote(buyer, settlement.id), 'settlementQuote');
+      void standing;
+      return settlement.id;
+    };
+    try {
+      // Confirm site: the terminal refusal carries the drifted word.
+      const first = await settledFor(BUYER_A, CHAR_A);
+      expect(await scripted.confirmSettlement(BUYER_A, first, 'sig-fail-drift-1')).toEqual({
+        ok: false,
+        reason: 'confirm_failed',
+      });
+      const failLines = () => warned.filter((w) => w.includes('unrecognized fail confirm verdict'));
+      expect(failLines(), 'the confirm site warns on first sighting').toHaveLength(1);
+      expect(failLines()[0]).toContain('burn_rejected_v9');
+      expect((await getSettlement(h, first)).failReason, 'the row keeps the verbatim word').toBe(
+        'burn_rejected_v9',
+      );
+      // Poll site, same word: dedupe holds across call sites.
+      verdict.pending = true;
+      const second = await settledFor(BUYER_A, CHAR_A);
+      expect(
+        unwrap(await scripted.confirmSettlement(BUYER_A, second, 'sig-fail-drift-2'), 'confirm')
+          .state,
+      ).toBe('confirming');
+      verdict.pending = false;
+      await scripted.sweepPass();
+      expect((await getSettlement(h, second)).state).toBe('failed');
+      expect(failLines(), 'once per word, even across sites').toHaveLength(1);
+      // A KNOWN fail word never warns.
+      verdict.pending = true;
+      verdict.reason = 'refused';
+      const third = await settledFor(BUYER_A, CHAR_A);
+      expect(
+        unwrap(await scripted.confirmSettlement(BUYER_A, third, 'sig-fail-known'), 'confirm').state,
+      ).toBe('confirming');
+      verdict.pending = false;
+      await scripted.sweepPass();
+      expect(failLines(), 'vocabulary members are not drift').toHaveLength(1);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('the POLL call sites feed the same drift channel', async () => {
+    // Deleting either poller's note call leaves drift invisible on exactly
+    // the unattended path; each poller sighting must reach the channel.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const verdict = { reason: 'not_yet_visible' as string };
+    const scripted = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        confirm: async () => ({ settled: false, pending: true, reason: verdict.reason }),
+      },
+    });
+    const warned: string[] = [];
+    const spy = vi.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
+      warned.push(args.map(String).join(' '));
+    });
+    try {
+      unwrap(await scripted.confirmBond(BUYER_A, placed.bid.id, 'sig-poll-drift'), 'confirmBond');
+      expect(warned.filter((w) => w.includes('unrecognized'))).toHaveLength(0);
+      verdict.reason = 'poll_only_word_v1';
+      await scripted.sweepPass();
+      const driftLines = warned.filter((w) => w.includes('unrecognized pending confirm verdict'));
+      expect(driftLines, 'the bond poll sighting reaches the channel').toHaveLength(1);
+      expect(driftLines[0]).toContain('poll_only_word_v1');
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('caps the drift channel: one suppression line past the bound, then silence', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    let word = 0;
+    const scripted = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        confirm: async () => ({ settled: false, pending: true, reason: `drift_word_${word}` }),
+      },
+    });
+    const warned: string[] = [];
+    const spy = vi.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
+      warned.push(args.map(String).join(' '));
+    });
+    try {
+      for (word = 0; word < 103; word++) {
+        unwrap(await scripted.confirmBond(BUYER_A, placed.bid.id, 'sig-cap-word'), 'confirmBond');
+      }
+      expect(
+        warned.filter((w) => w.includes('unrecognized pending confirm verdict')),
+        'one line per distinct word up to the cap',
+      ).toHaveLength(100);
+      expect(
+        warned.filter((w) => w.includes('further unrecognized pending verdict words suppressed')),
+        'exactly one suppression line, then silence',
       ).toHaveLength(1);
     } finally {
       spy.mockRestore();
