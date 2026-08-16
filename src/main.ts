@@ -154,6 +154,13 @@ import {
 import { currentResetDay, currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
 import { telemetryZoneId } from './game/world_telemetry';
+import {
+  arrivalCinematicActive,
+  cancelArrivalCinematic,
+  createArrivalCinematic,
+  startArrivalCinematic,
+  stepArrivalCinematic,
+} from './game/arrival_cinematic';
 import { ferryPrewarmTargetFor } from './game/ferry_prewarm';
 import { teleportCameraYaw } from './game/teleport_camera';
 import { zoneWarmupMode } from './game/zone_transition';
@@ -1982,6 +1989,12 @@ async function startGame(
   // with no live hostile target (the HUD falls back to plain castSlot(0) until
   // this is wired); the Target button cycles targets via the Tab path below.
   hud.onMobileAttackNearest = () => attackNearest();
+  // The first island landing's camera fall (game/arrival_cinematic.ts): the
+  // HUD signals the sim's per-character first visit; the frame loop below
+  // steps the fall and any camera input from the player cancels it.
+  const arrivalCinematic = createArrivalCinematic();
+  hud.onIslandFirstArrival = () =>
+    startArrivalCinematic(arrivalCinematic, input.camDist, input.camPitch);
 
   let lastOptionsOpen = hud.optionsOpen;
   let lastCharacterOpen = hud.characterOpen;
@@ -3758,6 +3771,19 @@ async function startGame(
     // A teleport-scale jump snaps the chase camera behind the landed facing,
     // so the player sees what the landing authored (game/teleport_camera.ts).
     input.camYaw = teleportCameraYaw(displacement, player.facing, input.camYaw);
+    // The first-visit island arrival falls from the sky onto that same view;
+    // the player touching the camera cancels the remainder instantly.
+    if (arrivalCinematicActive(arrivalCinematic)) {
+      if (input.rightDown) {
+        cancelArrivalCinematic(arrivalCinematic);
+      } else {
+        const frame = stepArrivalCinematic(arrivalCinematic, 1 / 60);
+        if (frame) {
+          input.camDist = frame.dist;
+          input.camPitch = frame.pitch;
+        }
+      }
+    }
     const wasInRiftBand = lastWarmInRiftBand;
     lastWarmInRiftBand = isRiftPos(player.pos.x);
     const riftExit = wasInRiftBand && !lastWarmInRiftBand;

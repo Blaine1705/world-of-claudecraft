@@ -343,6 +343,9 @@ const NPC_IDS = [
   'ferryman_odo',
   'bursar_wick',
   'warden_tam',
+  'overseer_pell',
+  'drillmaster_rook',
+  'tidewarden_nel',
 ] as const;
 
 const QUEST_IDS = [
@@ -548,8 +551,8 @@ const QUEST_IDS = [
   // the Proving Shore (tutorial island)
   'q_ps_the_gauntlet',
   'q_ps_strike_true',
+  'q_ps_shell_and_claw',
   'q_ps_the_wreck_line',
-  'q_ps_the_wheel_of_trades',
   'q_ps_pouch_and_purse',
   'q_ps_set_sail',
   // the Galecrest

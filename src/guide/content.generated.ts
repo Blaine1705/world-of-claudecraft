@@ -2390,8 +2390,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     ],
     "welcome": "The Proving Shore asks nothing of you but time. Learn the camp, strike the effigies, walk the wreck line, and when you are ready, Ferryman Odo will see you across to the vale.",
     "families": [
-      "beast",
-      "humanoid"
+      "beast"
     ]
   }
 ];
@@ -2976,17 +2975,6 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
   {
     "family": "humanoid",
     "creatures": [
-      {
-        "name": "Training Effigy",
-        "min": 1,
-        "max": 1,
-        "rare": false,
-        "templateId": "training_effigy",
-        "model": "mob_training_dummy",
-        "tint": "#9a7b4f",
-        "tintStrength": 0.35,
-        "still": "/guide-stills/mob_training_dummy__9a7b4f__s35.webp"
-      },
       {
         "name": "Vale Bandit",
         "min": 3,
@@ -12961,12 +12949,6 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "url": "models/creatures/demonalt.glb",
     "idle": "Idle",
     "height": 2.1,
-    "tintStrength": 0.35
-  },
-  "mob_training_dummy": {
-    "url": "models/creatures/training_dummy.glb",
-    "idle": "Idle",
-    "height": 2.3,
     "tintStrength": 0.35
   }
 };

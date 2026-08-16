@@ -9,6 +9,7 @@ import {
   BOOTCAMP_COURSE_CHECKPOINTS,
   PROVING_SHORE_ARRIVAL,
   PROVING_SHORE_CAMPS,
+  PROVING_SHORE_MOBS,
   PROVING_SHORE_NPCS,
   PROVING_SHORE_OBJECTS,
   PROVING_SHORE_PORTALS,
@@ -21,6 +22,7 @@ import {
 import { MAILBOXES } from '../src/sim/content/mailboxes';
 import { NOTICEBOARDS } from '../src/sim/content/noticeboards';
 import { ITEMS, ZONES } from '../src/sim/data';
+import { mobXpValue, xpForLevel } from '../src/sim/types';
 import { groundHeight, provingLandness, terrainSteepnessAt, WATER_LEVEL } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
@@ -112,7 +114,7 @@ describe('proving shore placement', () => {
     // near camp, NOT out at the far-strand wreck line: the two grounds are
     // deliberately separate.
     for (const c of BOOTCAMP_COURSE_CHECKPOINTS) {
-      expect(c.x).toBeGreaterThan(-332);
+      expect(c.x).toBeGreaterThan(-338);
       expect(c.x).toBeLessThan(-284);
       expect(c.z).toBeGreaterThan(-38);
       expect(c.z).toBeLessThan(-10);
@@ -160,17 +162,36 @@ describe('proving shore placement', () => {
     );
   });
 
-  it('the quest chain is a strict rail with zero XP and copper on every step', () => {
+  it('the quest chain is a strict rail with XP and copper on every step', () => {
     const order = PROVING_SHORE_QUEST_ORDER;
     expect(order[0]).toBe(PROVING_SHORE_ZONE.welcomeQuestId);
     for (let i = 0; i < order.length; i++) {
       const q = PROVING_SHORE_QUESTS[order[i]];
       expect(q, order[i]).toBeTruthy();
-      expect(q.xpReward, `${q.id} xp`).toBe(0);
+      expect(q.xpReward, `${q.id} xp`).toBeGreaterThan(0);
       expect(q.copperReward, `${q.id} copper`).toBeGreaterThan(0);
       if (i === 0) expect(q.requiresQuest).toBeUndefined();
       else expect(q.requiresQuest, `${q.id} requires`).toBe(order[i - 1]);
     }
+  });
+
+  it('the chain graduates a fresh character at level 3, no higher by quests alone', () => {
+    // The rail's XP plus the kill XP its own objectives force must clear the
+    // level 3 threshold, and the quest XP alone must not already clear level
+    // 4: the island hands the vale a level 3, not a level 4.
+    const toLevel3 = xpForLevel(1) + xpForLevel(2);
+    const toLevel4 = toLevel3 + xpForLevel(3);
+    const questXp = PROVING_SHORE_QUEST_ORDER.reduce(
+      (sum, id) => sum + PROVING_SHORE_QUESTS[id].xpReward,
+      0,
+    );
+    // Forced kills: one effigy (Strike True) and the scuttler cull, valued
+    // at the WORST case (killed as late as level 2, level-1 mobs).
+    const forcedKills = PROVING_SHORE_QUESTS.q_ps_strike_true.objectives[0].count ?? 0;
+    const forcedCrabs = PROVING_SHORE_QUESTS.q_ps_shell_and_claw.objectives[0].count ?? 0;
+    const minKillXp = (forcedKills + forcedCrabs) * mobXpValue(1, 2);
+    expect(questXp + minKillXp).toBeGreaterThanOrEqual(toLevel3);
+    expect(questXp).toBeLessThan(toLevel4);
   });
 
   it('the chain pays for the pouch lesson AND the tool set, and vendors no tools', () => {
@@ -209,30 +230,60 @@ describe('proving shore placement', () => {
     expect(beforeLesson).toBeGreaterThanOrEqual(pouch);
   });
 
-  it('the two mechanics lessons sit on the rail between looting and the crossing', () => {
-    // The rework's contract: professions, then bank-and-bags, both AFTER the
-    // two doing-lessons and BEFORE Set Sail.
+  it('the rail is a relay: each NPC takes one quest in and hands the next out', () => {
+    // The rework's contract: the chain walks the newcomer around the whole
+    // island, NPC to NPC, and every hand-in NPC is the next quest's giver.
     expect(PROVING_SHORE_QUEST_ORDER).toEqual([
       'q_ps_the_gauntlet',
       'q_ps_strike_true',
+      'q_ps_shell_and_claw',
       'q_ps_the_wreck_line',
-      'q_ps_the_wheel_of_trades',
       'q_ps_pouch_and_purse',
       'q_ps_set_sail',
     ]);
-    // The bank lesson lives entirely at Maren: a banker's click opens the
-    // bank window, not the quest gossip, so Bursar Wick can hold NO quest
-    // (give or hand-in) and stays questIds-empty by design; Maren's
+    const relay = PROVING_SHORE_QUEST_ORDER.map((id) => PROVING_SHORE_QUESTS[id]);
+    expect(relay.map((q) => [q.giverNpcId, q.turnInNpcId])).toEqual([
+      ['warden_tam', 'overseer_pell'],
+      ['overseer_pell', 'drillmaster_rook'],
+      ['drillmaster_rook', 'tidewarden_nel'],
+      ['tidewarden_nel', 'quartermaster_finch'],
+      ['quartermaster_finch', 'instructor_maren'],
+      ['instructor_maren', 'ferryman_odo'],
+    ]);
+    for (let i = 1; i < relay.length; i++) {
+      expect(relay[i].giverNpcId, `${relay[i].id} giver is the previous hand-in`).toBe(
+        relay[i - 1].turnInNpcId,
+      );
+    }
+    // The bank lesson's vault half lives at Maren: a banker's click opens
+    // the bank window, not the quest gossip, so Bursar Wick can hold NO
+    // quest (give or hand-in) and stays questIds-empty by design; Maren's
     // completion points at his desk instead.
     expect(PROVING_SHORE_NPCS.bursar_wick.banker).toBe(true);
     expect(PROVING_SHORE_NPCS.bursar_wick.questIds).toEqual([]);
-    expect(PROVING_SHORE_QUESTS.q_ps_pouch_and_purse.giverNpcId).toBe('instructor_maren');
-    expect(PROVING_SHORE_QUESTS.q_ps_pouch_and_purse.turnInNpcId).toBe('instructor_maren');
     // The pouch cannot be bought before the lesson opens (the vendor gate
     // items.ts buyItem enforces and the vendor window mirrors), so an early
     // purchase can never strand the lesson's copper.
     expect(PROVING_SHORE_NPCS.quartermaster_finch.vendorQuestGates).toEqual({
       linen_pouch: 'q_ps_pouch_and_purse',
     });
+  });
+
+  it('the effigies are true dummies and the first fight is the scuttlers', () => {
+    // The yard teaches the swing against a target that cannot answer: the
+    // dummy flag (types.ts) removes retaliation outright, the damage is
+    // zeroed for good measure, and a felled effigy is back in seconds.
+    const effigy = PROVING_SHORE_MOBS.training_effigy;
+    expect(effigy.dummy).toBe(true);
+    expect(effigy.dmgBase).toBe(0);
+    expect(effigy.respawnSeconds).toBe(5);
+    // Five targets for one required fell: no queueing even in a rush.
+    const yard = PROVING_SHORE_CAMPS.find((c) => c.mobId === 'training_effigy');
+    expect(yard?.count).toBe(5);
+    expect(PROVING_SHORE_QUESTS.q_ps_strike_true.objectives[0].count).toBe(1);
+    // The scuttlers stay a real (gentle) fight: the whole point of Shell and
+    // Claw is a target that finally hits back.
+    expect(PROVING_SHORE_MOBS.shore_scuttler.dummy).toBeUndefined();
+    expect(PROVING_SHORE_MOBS.shore_scuttler.dmgBase).toBeGreaterThan(0);
   });
 });

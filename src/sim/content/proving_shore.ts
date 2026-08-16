@@ -63,11 +63,6 @@ export const PROVING_SHORE_ROADS: { x: number; z: number }[][] = [
     { x: -300, z: 48 },
   ], // the Old Pier -> Dawnrest Camp
   [
-    { x: -300, z: 48 },
-    { x: -318, z: 18 },
-    { x: -334, z: -10 },
-  ], // Dawnrest Camp -> the Practice Yard
-  [
     { x: -298, z: 46 },
     { x: -290, z: 14 },
     { x: -286, z: -14 },
@@ -80,6 +75,7 @@ export const PROVING_SHORE_ROADS: { x: number; z: number }[][] = [
     { x: -308, z: -32 },
     { x: -318, z: -32 },
     { x: -328, z: -32 },
+    { x: -334, z: -32.5 },
   ], // the Gauntlet's own running line: lane 1 west, lane 2 south, lane 3 west.
   //   Authored as a road on purpose: the dirt track paints the running line
   //   between the walls, and road-side flora suppression (world.ts
@@ -106,6 +102,25 @@ export const PROVING_SHORE_ROADS: { x: number; z: number }[][] = [
     { x: -370, z: -28 },
     { x: -390, z: -33 },
   ], // the Practice Yard -> the Wreck Line (the far strand)
+  [
+    { x: -335, z: -33 },
+    { x: -337, z: -24 },
+    { x: -336, z: -14 },
+  ], // the Gauntlet's finish (Overseer Pell) -> the Practice Yard
+  [
+    { x: -388, z: -28 },
+    { x: -370, z: -14 },
+    { x: -354, z: -3 },
+    { x: -339, z: 9 },
+  ], // the Wreck Line -> Tidewarden Nel's watch on the north rise
+  [
+    { x: -339, z: 9 },
+    { x: -333, z: 20 },
+    { x: -326, z: 30 },
+    { x: -318, z: 38 },
+    { x: -314, z: 44 },
+  ], // Tidewarden Nel -> Dawnrest Camp, past the castaway crates, through the
+  //   camp fence's south-west gate
 ] as { x: number; z: number }[][];
 
 // No walk-in portals: the ferry crossing is a pair of CLICKED bells
@@ -118,19 +133,19 @@ export const PROVING_SHORE_ROADS: { x: number; z: number }[][] = [
 // PROVING_SHORE_ARRIVAL.
 export const PROVING_SHORE_PORTALS: PortalDef[] = [];
 
-/** Where the tutorial greeting's accept path sets a new adventurer down:
- *  beside the Old Pier's ferry bell, facing Warden Tam at the Gauntlet's
- *  gate on the strand to the south-southwest (the client snaps the chase
- *  camera to this facing on any teleport-scale displacement,
- *  game/teleport_camera.ts, so the first thing a newcomer SEES is the
- *  course keeper Odo's welcome note directs them to). */
-export const PROVING_SHORE_ARRIVAL = { x: -282, z: 6, facing: -3.1 } as const;
+/** Where the tutorial greeting's accept path sets a new adventurer down: at
+ *  the Gauntlet's open east mouth, two steps from Warden Tam and facing him
+ *  (the client snaps the chase camera to this facing on any teleport-scale
+ *  displacement, game/teleport_camera.ts, and the first-visit arrival
+ *  cinematic settles onto the same view, so the first thing a newcomer SEES
+ *  is the course keeper Odo's welcome note directs them to). */
+export const PROVING_SHORE_ARRIVAL = { x: -281, z: -18, facing: -2.55 } as const;
 
 export const PROVING_SHORE_MOBS: Record<string, MobTemplate> = {
-  // Built to be hit: the practice yard's straw-and-timber targets. They
-  // neither move nor aggro (moveSpeed 0, aggroRadius 0), swat back for a
-  // token 1 damage, and stand back up fast so a class never queues for a
-  // target.
+  // Built to be hit: the practice yard's straw-and-timber targets. True
+  // dummies (types.ts MobTemplate.dummy): attackable, but they never move,
+  // aggro, or retaliate, and they stand back up in seconds so a class never
+  // queues for a target.
   training_effigy: {
     id: 'training_effigy',
     name: 'Training Effigy',
@@ -139,19 +154,20 @@ export const PROVING_SHORE_MOBS: Record<string, MobTemplate> = {
     family: 'humanoid',
     hpBase: 26,
     hpPerLevel: 0,
-    dmgBase: 1,
+    dmgBase: 0,
     dmgPerLevel: 0,
     attackSpeed: 2.5,
     armorPerLevel: 0,
     moveSpeed: 0,
     aggroRadius: 0,
+    dummy: true,
     // A splinter of copper in the stuffing: every camp-spawned mob carries an
     // unconditional copper entry (the progression-test floor), and a first
     // kill that pays SOMETHING teaches looting better than an empty corpse.
     loot: [{ copper: 1, chance: 1 }],
     scale: 1.0,
     color: 0x9a7b4f,
-    respawnSeconds: 20,
+    respawnSeconds: 5,
   },
   // The wreck line's salvage-pickers: the island's one honest hazard, and a
   // gentle one. Short aggro, light pinch, a few coppers in the shell.
@@ -204,13 +220,7 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     pos: { x: -299, z: 49 },
     facing: (-3 * Math.PI) / 4,
     color: 0x6b4a8a,
-    questIds: [
-      'q_ps_strike_true',
-      'q_ps_the_wreck_line',
-      'q_ps_the_wheel_of_trades',
-      'q_ps_pouch_and_purse',
-      'q_ps_set_sail',
-    ],
+    questIds: ['q_ps_pouch_and_purse', 'q_ps_set_sail'],
     greeting:
       'Every hero the vale has ever thanked stood where you stand now, $C, and not one of them knew which end of a blade to hold. That is what this shore is for. Ask, practice, and fail where failing is free.',
   },
@@ -231,7 +241,7 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     // the lesson's copper (types.ts vendorQuestGates).
     vendorItems: ['minor_healing_potion', 'baked_bread', 'spring_water', 'linen_pouch'],
     vendorQuestGates: { linen_pouch: 'q_ps_pouch_and_purse' },
-    questIds: ['q_ps_the_wheel_of_trades'],
+    questIds: ['q_ps_the_wreck_line', 'q_ps_pouch_and_purse'],
     greeting:
       'Bread, water, a draught for when practice gets ahead of you, and a spare pouch for what you pick up along the way. Coin buys them, and work earns the coin. That is the whole economy, $N, and it never gets more complicated. Only bigger.',
   },
@@ -258,19 +268,20 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     id: 'ferryman_odo',
     name: 'Ferryman Odo',
     title: 'Keeper of the Crossing',
-    pos: { x: -282, z: 2 },
-    facing: Math.PI / 2,
+    // Between his pier and the Gauntlet's mouth, facing south over the
+    // arrival point so every newcomer lands in front of him.
+    pos: { x: -284, z: -9 },
+    facing: Math.PI,
     color: 0x4a6a8a,
     questIds: ['q_ps_set_sail'],
     greeting:
       'Fresh off the crossing, $N? Warden Tam keeps the Gauntlet on the strand just south of my pier: run his lanes first and your legs will thank you. After that, Instructor Maren at Dawnrest Camp has your first task. When the vale calls you back, ring the bell standing beside my pier and the crossing will set you down in Eastbrook town.',
   },
   // The Gauntlet's keeper: the first pair of hands a newcomer is sent to,
-  // standing beside the course's open east corner, where the arrival facing
-  // points. He gives AND takes the chain's head quest (q_ps_the_gauntlet):
-  // its objective is credited sim-side as the runner passes his flags in
-  // order (tutorial/gauntlet_run.ts), and his completion hands the newcomer
-  // on to Maren.
+  // standing beside the course's open east mouth, where the arrival facing
+  // points. He GIVES the chain's head quest (q_ps_the_gauntlet, credited
+  // sim-side as the runner passes his flags in order,
+  // tutorial/gauntlet_run.ts); his overseer at the far end takes the run in.
   warden_tam: {
     id: 'warden_tam',
     name: 'Warden Tam',
@@ -283,6 +294,48 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     greeting:
       'These lanes are the Gauntlet, $N, and every adventurer the vale respects has run them. The lantern posts stay lit all night, so the lanes never close.',
   },
+  // The far end of the lanes: takes the run in, sends the runner up his path
+  // to the practice yard.
+  overseer_pell: {
+    id: 'overseer_pell',
+    name: 'Overseer Pell',
+    title: 'Gauntlet Overseer',
+    pos: { x: -337, z: -33 },
+    // Facing east back down the last lane, watching every run come home.
+    facing: -Math.PI / 2,
+    color: 0x5a6a3a,
+    questIds: ['q_ps_the_gauntlet', 'q_ps_strike_true'],
+    greeting:
+      'I clock every run that comes down these lanes, $N, and I have seen far worse footwork. The path behind me climbs to the practice yard: that is where footwork turns into swordwork.',
+  },
+  // The practice yard's master: takes the effigy lesson in, points the
+  // recruit down the long path to the wreck line's scuttlers.
+  drillmaster_rook: {
+    id: 'drillmaster_rook',
+    name: 'Drillmaster Rook',
+    title: 'Yard Master',
+    pos: { x: -332, z: -17 },
+    // Facing west into the yard, where the effigies stand.
+    facing: Math.PI / 2,
+    color: 0x7a4a4a,
+    questIds: ['q_ps_strike_true', 'q_ps_shell_and_claw'],
+    greeting:
+      'Straw first, shells second, $N. An effigy teaches your arm the swing; the scuttlers down the strand teach it to land on something that minds.',
+  },
+  // The north bluff's watcher: takes the scuttler cull in and sends the
+  // salvage up the rise to Dawnrest Camp.
+  tidewarden_nel: {
+    id: 'tidewarden_nel',
+    name: 'Tidewarden Nel',
+    title: 'Keeper of the Strand',
+    pos: { x: -339, z: 9 },
+    // Facing south-west down her path toward the wreck line.
+    facing: (3 * Math.PI) / 4,
+    color: 0x3a6a6a,
+    questIds: ['q_ps_shell_and_claw', 'q_ps_the_wreck_line'],
+    greeting:
+      'The tide takes and the tide pays, $N. I keep the tally of both: what the scuttlers pinch off the wrecks, and what honest hands carry back up this path.',
+  },
 };
 
 export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
@@ -292,15 +345,17 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
   // player sees are decorProps dressing, and tutorial/gauntlet_run.ts
   // credits one count per flag passed in running order, so the tracker
   // reads "Gauntlet flag passed: 2/3" as they run. The bootcamp coachmark
-  // (ui/bootcamp.ts) rides the same counts for its lesson ladder.
+  // (ui/bootcamp.ts) rides the same counts for its lesson ladder. Overseer
+  // Pell takes the run in at the lanes' far end, so the hand-in IS the
+  // finish line.
   q_ps_the_gauntlet: {
     id: 'q_ps_the_gauntlet',
     name: 'Run the Gauntlet',
     giverNpcId: 'warden_tam',
-    turnInNpcId: 'warden_tam',
-    text: 'Every pair of legs the vale respects has run these lanes first, $N. Walk the first lane west to its flag, take a good look around, slip left down the south lane to the second, look again, then run the last lane to the red flag. Pass the flags in order, and the card at the top of your screen will show you every button as you go. When the red flag is behind you, come back to me at the gate.',
+    turnInNpcId: 'overseer_pell',
+    text: 'Every pair of legs the vale respects has run these lanes first, $N. Walk the first lane west to its flag, swing yourself around, walk the south lane to the second, then sidestep the last lane to the red flag. Pass the flags in order, and the card at the top of your screen will show you every button as you go. Overseer Pell clocks every run from the far end: when the red flag is behind you, he is standing right there to take it in.',
     completionText:
-      'A clean run, $N. Your legs know the lanes now, and the rest of you is ready for real work: Instructor Maren keeps the drills at Dawnrest Camp, up the road north of the pier. Walk right up to her until her name shows, then press F, or left-click her, and she will set you your first task.',
+      'I clocked that run, $N, and I have failed faster feet. The Gauntlet is yours. The path behind me climbs to the practice yard, where Drillmaster Rook turns footwork into swordwork: he has your next task.',
     objectives: [
       {
         type: 'interact',
@@ -309,34 +364,52 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
         label: 'Gauntlet flag passed',
       },
     ],
-    xpReward: 0,
+    xpReward: 150,
     copperReward: 40,
     itemRewards: {},
   },
   q_ps_strike_true: {
     id: 'q_ps_strike_true',
     name: 'Strike True',
-    giverNpcId: 'instructor_maren',
-    turnInNpcId: 'instructor_maren',
-    text: 'Welcome to the Proving Shore, $N. Every lesson here starts the same way: feet set, blade in hand. The effigies stand on the practice yard southwest of camp, and they were built to be hit. If you cannot find the yard, press M to open the map: every task you carry is marked on it, so you never need to wander. Walk up to an effigy and press Tab, or left-click it, to make it your target, then press 1, or click the first icon on the action bar along the bottom of your screen, to swing. Keep striking until three of them give out. Their blows barely sting; the things beyond this shore hit far harder. When the third one falls, walk back here to me and press F to hand the task in and take your reward: that is how every quest in the world ends.',
+    giverNpcId: 'overseer_pell',
+    turnInNpcId: 'drillmaster_rook',
+    text: 'Footwork first, now the arm, $N. The practice yard sits up the path behind me, and its straw effigies were built to be hit. If you lose the way, press M to open the map: every task you carry is marked on it. Walk up to an effigy and press Tab, or left-click it, to make it your target, then press 1, or click the first icon on the action bar along the bottom of your screen, to swing. Keep striking until one gives out; it will not swing back, effigies never do. Drillmaster Rook watches the yard from its east edge: press F on him to hand the fell in.',
     completionText:
-      'Three down, and your grip already surer. Remember the feel of it, $N: target, strike, and keep striking. The vale wolves are faster than straw, but they fall to the same arithmetic.',
+      'One clean fell, and your grip already surer. Remember the feel of it, $N: target, strike, and keep striking. Straw never minds. The next thing you swing at will.',
     objectives: [
-      { type: 'kill', targetMobId: 'training_effigy', count: 3, label: 'Training Effigy felled' },
+      { type: 'kill', targetMobId: 'training_effigy', count: 1, label: 'Training Effigy felled' },
     ],
-    xpReward: 0,
+    xpReward: 150,
     copperReward: 60,
     itemRewards: {},
     requiresQuest: 'q_ps_the_gauntlet',
   },
+  // The first real fight: the wreck line's scuttlers pinch back, which is the
+  // whole lesson after a target that never did.
+  q_ps_shell_and_claw: {
+    id: 'q_ps_shell_and_claw',
+    name: 'Shell and Claw',
+    giverNpcId: 'drillmaster_rook',
+    turnInNpcId: 'tidewarden_nel',
+    text: 'Straw never minds, $N, so here is something that does. Shore scuttlers pick over the wreck line on the far strand: follow the path west from my yard and it walks you straight to them. They pinch back, so watch your health bar and keep swinging: target one with Tab or a left-click, press 1, and do not stop until its shell cracks. Three will do. Then climb the path up the north rise: Tidewarden Nel keeps the strand tally, and she counts your shells.',
+    completionText:
+      'Three shells cracked and all your fingers kept: a fair first fight, $N. The scuttlers pinch off the wrecks faster than the tide brings salvage in, so every one you cull is coin someone keeps.',
+    objectives: [
+      { type: 'kill', targetMobId: 'shore_scuttler', count: 3, label: 'Shore Scuttler culled' },
+    ],
+    xpReward: 250,
+    copperReward: 80,
+    itemRewards: {},
+    requiresQuest: 'q_ps_strike_true',
+  },
   q_ps_the_wreck_line: {
     id: 'q_ps_the_wreck_line',
     name: 'The Wreck Line',
-    giverNpcId: 'instructor_maren',
-    turnInNpcId: 'instructor_maren',
-    text: 'The tide pays this island in salvage: castaway crates off old wrecks, washed up on the far strand past the practice yard. Follow the path on from the effigies and it will walk you straight to the water. Opening a crate is simple, $N. Walk right up to one until its name shows, then press F, or left-click the crate itself, and it will give up what it holds. Three of them will do. The scuttlers that pick over the wrack pinch harder than they look, so mind your step, and remember F is the same key for every chest, node and doorway you will ever meet.',
+    giverNpcId: 'tidewarden_nel',
+    turnInNpcId: 'quartermaster_finch',
+    text: 'The tide pays this island in salvage, $N: castaway crates off the old wrecks, carried up and dropped along the rise between me and Dawnrest Camp. Follow my path toward the camp and you will walk right past them. Opening one is simple: walk up to a crate until its name shows, then press F, or left-click the crate itself, and it will give up what it holds. Three of them will do, and remember F is the same key for every chest, node and doorway you will ever meet. Quartermaster Finch keeps the camp stall and buys every stick of salvage: hand the haul to her.',
     completionText:
-      'Rope, tar, and half a wheel of cheese the sea somehow spared. The world is full of things worth stooping for, $N. Keep the habit: walk close, press F, take what is yours.',
+      'Rope, tar, and half a wheel of cheese the sea somehow spared: I will take the lot. And since you can clearly stoop and carry, $N, hear the trade lesson too. Gathering starts with a tool, a pick, an axe, a sickle, a pole, all sold at the vale traders. Hold Shift and press P to open your professions book: that is your craft wheel, and it shows every craft you know. Attune to a neighbouring pair and those two become your uncapped majors, one across the wheel stays your hobby, and the rest sleep with their knowledge kept. Nothing is final: a craft master sets your pair and changes it whenever you ask, at the Eastbrook forge, kitchens, loom and toolworks, the Fenbridge tannery, or the Highwatch apothecary.',
     objectives: [
       {
         type: 'interact',
@@ -345,94 +418,70 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
         label: 'Castaway Crate opened',
       },
     ],
-    xpReward: 0,
+    xpReward: 250,
     copperReward: 80,
     itemRewards: {},
-    requiresQuest: 'q_ps_strike_true',
-  },
-  // The professions lesson. Facts mirrored from Professions 2.0 (the craft
-  // wheel and attunement: src/sim/professions/, and the tier tutorial copy in
-  // i18n.catalog/hud_chrome.ts): gathering needs a bought tool, crafts sit on
-  // a wheel, attuning to an adjacent pair makes two uncapped majors and one
-  // rare-capped hobby while the rest lie dormant, and nothing learned is lost.
-  q_ps_the_wheel_of_trades: {
-    id: 'q_ps_the_wheel_of_trades',
-    name: 'The Wheel of Trades',
-    giverNpcId: 'instructor_maren',
-    turnInNpcId: 'quartermaster_finch',
-    text: 'A blade feeds you once, $N. A trade feeds you for life. Every adventurer works professions beside the sword: mining, logging, herb-picking, fishing, and the crafts that turn all of it into worth. Quartermaster Finch keeps the stall a few steps from my drill ground, and she has kept more of them than I have run drills. Walk up to her and press F, or left-click her, to talk: the same key that opens a crate opens a conversation.',
-    completionText:
-      'So Maren finally sends me a student worth the breath. Listen once, $N: gathering starts with a tool, a pick, an axe, a sickle, a pole, all sold at the vale traders. Hold Shift and press P to open your professions book: that is your wheel, and it shows every craft you know and how far each has come. Work the ones you like, and when you attune to a neighbouring pair those two become your uncapped majors, one craft across the wheel stays your hobby, and the rest sleep with their knowledge kept. Nothing is ever lost, and nothing is final: a craft master sets your pair, and a craft master will change it later whenever you ask. You will find them in Eastbrook, Forgemistress Darva at the forge, Cook Marlow in the inn kitchens, Weaver Ottilie at the loom and Tinker Gizzel in the toolworks, with Tanner Hesk at the Fenbridge tannery and Alchemist Verane at the Highwatch apothecary.',
-    objectives: [
-      {
-        type: 'interact',
-        targetNpcId: 'quartermaster_finch',
-        count: 1,
-        label: 'Ask Quartermaster Finch about the trades',
-      },
-    ],
-    xpReward: 0,
-    copperReward: 120,
-    itemRewards: {},
-    requiresQuest: 'q_ps_the_wreck_line',
+    requiresQuest: 'q_ps_shell_and_claw',
   },
   // The bank and bags lesson. Facts mirrored from the sim: the implicit
   // 16-slot backpack plus four bag sockets pooling capacity (BAG_SOCKETS,
   // src/sim/bags.ts), the shared bank vault behind every bursar with
   // purchasable extra slots (src/sim/bank.ts), and the Linen Pouch as the
   // cheapest vendor bag (6 slots, content/items.ts). The chain's copper
-  // through quest four is sized to afford the pouch when this unlocks.
-  // Maren gives AND takes the hand-in (a banker's click opens the bank, not
-  // the quest gossip, so Bursar Wick cannot hold a turn-in); her completion
-  // carries the vault half of the lesson and points at his desk. The Linen
-  // Pouch is quest-gated at Finch's stall (vendorQuestGates above), so it
-  // cannot be bought, equipped, and stranded before this quest opens.
+  // before this quest is sized to afford the pouch when it unlocks. Finch
+  // gives it (she sells the pouch), Maren takes the hand-in and speaks the
+  // vault half, pointing at Bursar Wick's strongbox desk (a banker's click
+  // opens the bank, not the quest gossip, so Wick cannot hold a turn-in).
+  // The Linen Pouch is quest-gated at Finch's stall (vendorQuestGates
+  // above), so it cannot be bought, equipped, and stranded early.
   q_ps_pouch_and_purse: {
     id: 'q_ps_pouch_and_purse',
     name: 'Pouch and Purse',
-    giverNpcId: 'instructor_maren',
+    giverNpcId: 'quartermaster_finch',
     turnInNpcId: 'instructor_maren',
-    text: 'One more lesson before the vale, $N, and it is the one that keeps adventurers alive: what you carry. Your backpack holds sixteen slots, and beside it wait four empty bag loops; every bag you buckle on adds its own space to the pool. So: press F on Quartermaster Finch to open her stall, left-click the Linen Pouch in her wares to buy it, then press B to open your bags and left-click the pouch there to buckle it into a free loop. Come back to me when it is on your belt.',
+    text: 'One more lesson before the vale, $N, and it is the one that keeps adventurers alive: what you carry. Your backpack holds sixteen slots, and beside it wait four empty bag loops; every bag you buckle on adds its own space to the pool. So: press F on me again to open my stall, left-click the Linen Pouch in my wares to buy it, then press B to open your bags and left-click the pouch there to buckle it into a free loop. Instructor Maren drills by the muster fire a few steps east: show her the pouch on your belt.',
     completionText:
-      'A fine pouch, and six more slots to fill with trouble. Now the half of the lesson no bag can hold, $N: what you cannot carry, the Gilded Strongbox keeps. Bursar Wick at the desk behind me opens the same vault every bursar in every town shares, and more vault space can be bought once your purse grows into it. Keep your valuables banked and your bags roomy. A full pack has ended more adventures than any wolf ever did.',
+      'A fine pouch, and six more slots to fill with trouble. Now the half of the lesson no bag can hold, $N: what you cannot carry, the Gilded Strongbox keeps. Bursar Wick keeps his strongbox desk up the west path, and he opens the same vault every bursar in every town shares; more vault space can be bought once your purse grows into it. Keep your valuables banked and your bags roomy. A full pack has ended more adventures than any wolf ever did.',
     objectives: [{ type: 'collect', itemId: 'linen_pouch', count: 1, label: 'Linen Pouch bought' }],
     // OWNERSHIP, not delivery (types.ts keepsCollectedItems): the quest tells
     // the player to buckle the pouch on, so it must still count once worn in
-    // a bag socket, and Maren must not take back the bag she just taught them
-    // to wear.
+    // a bag socket, and Maren must not take back the bag Finch just taught
+    // them to wear.
     keepsCollectedItems: true,
-    xpReward: 0,
+    xpReward: 250,
     copperReward: 120,
     itemRewards: {},
-    requiresQuest: 'q_ps_the_wheel_of_trades',
+    requiresQuest: 'q_ps_the_wreck_line',
   },
   q_ps_set_sail: {
     id: 'q_ps_set_sail',
     name: 'Set Sail',
     giverNpcId: 'instructor_maren',
     turnInNpcId: 'ferryman_odo',
-    text: 'There is nothing left on this shore you have not already beaten, opened, or bought, $N. You are ready, and Eastbrook has real work waiting. Walk down the road to the Old Pier, press F on Ferryman Odo, and tell him I said you have earned your crossing. Press L any time you lose track of what you owe whom: that is your quest log.',
+    text: 'There is nothing left on this shore you have not already run, beaten, opened, or bought, $N. You are ready, and Eastbrook has real work waiting. Walk back down the shore road to the pier, press F on Ferryman Odo, and tell him I said you have earned your crossing. Press L any time you lose track of what you owe whom: that is your quest log.',
     completionText:
       'Maren said that, did she? High praise from a woman who once made me practice mooring knots for a week. Ring the bell standing beside my pier whenever you are ready, $N, and the crossing will set you down in the middle of Eastbrook town. Mind the wolves.',
     objectives: [
       { type: 'interact', targetNpcId: 'ferryman_odo', count: 1, label: 'Report to Ferryman Odo' },
     ],
-    xpReward: 0,
+    xpReward: 150,
     copperReward: 50,
     itemRewards: {},
     requiresQuest: 'q_ps_pouch_and_purse',
   },
 };
 
-// Strict chain order: the shore is on rails by design. Combat, then looting,
-// then the two mechanics lessons (professions, bank and bags), then the
-// crossing home. Every step's text names the exact key or click it needs, so
-// a player who has never held a mouse for this genre is never guessing.
+// Strict chain order: the shore is on rails by design, one NPC handing the
+// newcomer to the next around the island: the run, the swing, the first real
+// fight, the salvage haul, the bags, and the crossing home. Every step's
+// text names the exact key or click it needs, so a player who has never held
+// a mouse for this genre is never guessing. The chain's XP (with the kill XP
+// its objectives force) lands a graduate at level 3 on the vale.
 export const PROVING_SHORE_QUEST_ORDER: string[] = [
   'q_ps_the_gauntlet',
   'q_ps_strike_true',
+  'q_ps_shell_and_claw',
   'q_ps_the_wreck_line',
-  'q_ps_the_wheel_of_trades',
   'q_ps_pouch_and_purse',
   'q_ps_set_sail',
 ];
@@ -466,7 +515,7 @@ export const PROVING_SHORE_ITEMS: Record<string, ItemDef> = {
 // adding the tutorial island leaves the rest of the world's generation
 // bit-identical.
 export const PROVING_SHORE_CAMPS: CampDef[] = [
-  { mobId: 'training_effigy', center: { x: -336, z: -14 }, radius: 6, count: 3, offStream: true },
+  { mobId: 'training_effigy', center: { x: -336, z: -14 }, radius: 6, count: 5, offStream: true },
   // The wreck line lives on the FAR strand past the practice yard (the path
   // from the yard leads straight to it), leaving the south strand nearest
   // camp free for the Gauntlet movement course. Counts stay halved: the
@@ -480,12 +529,13 @@ export const PROVING_SHORE_OBJECTS: GroundObjectDef[] = [
   {
     itemId: 'ps_castaway_crate',
     name: 'Castaway Crate',
-    // The Wreck Line (q_ps_the_wreck_line): salvage on the far strand past
-    // the practice yard, at the end of its path, among the scuttler camps.
+    // The Wreck Line (q_ps_the_wreck_line): salvage dropped along Tidewarden
+    // Nel's path up the rise toward Dawnrest Camp, so collecting it IS the
+    // walk to the hand-in at Finch's stall.
     positions: [
-      { x: -390, z: -28 },
-      { x: -384, z: -36 },
-      { x: -396, z: -33 },
+      { x: -334, z: 17 },
+      { x: -327, z: 24 },
+      { x: -320, z: 31 },
     ],
   },
   {
@@ -540,8 +590,12 @@ export const PROVING_SHORE_PROPS: ZonePropsDef = {
     { x1: -304, z1: 57, x2: -297, z2: 52 }, // shoreline shoulder
     { x1: -297, z1: 52, x2: -294, z2: 44 }, // east run
     { x1: -294, z1: 44, x2: -294, z2: 40 }, // east run, to the pier gate
-    { x1: -299, z1: 39, x2: -303, z2: 39 }, // south run, between the gates
-    { x1: -308, z1: 39, x2: -330, z2: 39 }, // south run, west of the yard gate
+    // South run: one gate only, at the south-west corner where Tidewarden
+    // Nel's path climbs into camp (x -313..-319). The old practice-yard gate
+    // is fenced back over: its road is gone, and a gap with no path through
+    // it just reads as a broken fence.
+    { x1: -299, z1: 39, x2: -313, z2: 39 }, // south run, east of Nel's gate
+    { x1: -319, z1: 39, x2: -330, z2: 39 }, // south run, west of Nel's gate
     // The Gauntlet: an L of two fenced lanes on the south strand, entered
     // from the east gate beside Warden Tam. Lane 1 runs west (hold forward),
     // lane 2 runs south off its end (strafe left while still facing west),
@@ -556,8 +610,10 @@ export const PROVING_SHORE_PROPS: ZonePropsDef = {
     { x1: -284, z1: -20, x2: -304, z2: -20 }, // lane 1 south wall
     { x1: -312, z1: -12, x2: -312, z2: -28 }, // lane 2 west wall
     { x1: -304, z1: -20, x2: -304, z2: -33 }, // lane 2 east wall
-    { x1: -312, z1: -28, x2: -330, z2: -28 }, // lane 3 north wall
-    { x1: -304, z1: -33, x2: -330, z2: -36 }, // lane 3 south wall
+    { x1: -312, z1: -28, x2: -335, z2: -28 }, // lane 3 north wall
+    { x1: -304, z1: -33, x2: -335, z2: -36 }, // lane 3 south wall, to the finish
+    //   (the west end past the red flag stays open: Overseer Pell stands
+    //   there, and the finish line hands straight onto his yard path)
   ],
   // The Gauntlet's flags mark its corners (pure dressing: no collider, no
   // entity; the bootcamp overlay detects arrival by position against the
@@ -566,7 +622,7 @@ export const PROVING_SHORE_PROPS: ZonePropsDef = {
   decorProps: [
     { key: 'hexFlag', x: -308, z: -16 },
     { key: 'hexFlag', x: -308, z: -32 },
-    { key: 'hexFlagRed', x: -328, z: -32 },
+    { key: 'hexFlagRed', x: -334, z: -32.5 },
     { key: 'kcasTorch', x: -290, z: -12 },
     { key: 'kcasTorch', x: -300, z: -12 },
     { key: 'kcasTorch', x: -310, z: -12 },
@@ -579,6 +635,8 @@ export const PROVING_SHORE_PROPS: ZonePropsDef = {
     { key: 'kcasTorch', x: -312, z: -35.5 },
     { key: 'kcasTorch', x: -320, z: -35.8 },
     { key: 'kcasTorch', x: -328, z: -36 },
+    { key: 'kcasTorch', x: -334, z: -36 },
+    { key: 'kcasTorch', x: -333, z: -28 },
   ],
   // The Old Pier, scaled up to read against a character: the classic pier is
   // a rowboat jetty, and this one is the island's whole front door
@@ -607,5 +665,5 @@ export const PROVING_SHORE_PROPS: ZonePropsDef = {
 export const BOOTCAMP_COURSE_CHECKPOINTS: readonly { x: number; z: number }[] = [
   { x: -308, z: -16 },
   { x: -308, z: -32 },
-  { x: -328, z: -32 },
+  { x: -334, z: -32.5 },
 ];

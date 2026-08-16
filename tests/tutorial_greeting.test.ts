@@ -118,8 +118,8 @@ describe('tutorial greeting one-shot', () => {
     sim.tick();
     expect(qp.counts[0]).toBe(2);
     expect(qp.state).toBe('active');
-    p.pos.x = -328;
-    p.pos.z = -32;
+    p.pos.x = -334;
+    p.pos.z = -32.5;
     sim.tick();
     expect(qp.counts[0]).toBe(3);
     expect(qp.state).toBe('ready');

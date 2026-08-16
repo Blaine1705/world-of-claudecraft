@@ -12666,40 +12666,42 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '剛下渡船嗎？歡迎來到試煉之濱。看守塔姆就在你正前方的海灘上守著試煉跑道：走到他跟前，直到他的名字顯示出來，然後按 F，或用滑鼠左鍵點擊他，他的跑道會把你雙腿該會的都教給你。等你準備離開時，敲響立在我碼頭旁的那口鈴，渡航就會送你回東溪鎮。',
   'hudChrome.tutorialGreeting.noteClose': '明白了',
   'hudChrome.bootcamp.title': '最初的腳步',
+  'hudChrome.bootcamp.talkTitle': '與看守塔姆交談',
+  'hudChrome.bootcamp.talkBody':
+    '看守塔姆就在前方守著試煉跑道的大門。走到他跟前，直到他的名字顯示出來，然後按 {interactKey}，或用滑鼠左鍵點擊他，與他交談：他會給你安排這趟跑道。',
+  'hudChrome.bootcamp.talkBodyTouch':
+    '看守塔姆就在前方守著試煉跑道的大門。走到他跟前，直到他的名字顯示出來，然後點按他，或點按使用按鈕，與他交談：他會給你安排這趟跑道。',
+  'hudChrome.bootcamp.talkBodyPad':
+    '看守塔姆就在前方守著試煉跑道的大門。走到他跟前，直到他的名字顯示出來，然後按下互動鍵與他交談：他會給你安排這趟跑道。',
   'hudChrome.bootcamp.forwardTitle': '走過第一條跑道',
   'hudChrome.bootcamp.forwardBody':
-    '穿過面前的試煉跑道大門，按住 {forwardKey} 沿第一條跑道向西走到旗幟處。',
+    '走進塔姆身旁的跑道，按住 {forwardKey}，沿跑道向西走到旗幟處。',
   'hudChrome.bootcamp.forwardBodyTouch':
-    '穿過面前的試煉跑道大門，把移動搖桿推向上方，沿第一條跑道向西走到旗幟處。',
+    '走進塔姆身旁的跑道，把移動搖桿推向上方，沿跑道向西走到旗幟處。',
   'hudChrome.bootcamp.forwardBodyPad':
-    '穿過面前的試煉跑道大門，把左搖桿推向上方，沿第一條跑道向西走到旗幟處。',
-  'hudChrome.bootcamp.cameraTitle': '轉動視角',
-  'hudChrome.bootcamp.cameraBody':
-    '第一面旗到手。現在按住滑鼠右鍵並拖動來轉動視角：看看向南延伸的圍欄跑道，然後轉回原來的朝向。',
-  'hudChrome.bootcamp.cameraBodyTouch':
-    '第一面旗到手。現在用手指拖動世界畫面（不是移動搖桿）來轉動視角：看看向南延伸的圍欄跑道。',
-  'hudChrome.bootcamp.cameraBodyPad':
-    '第一面旗到手。現在推動右搖桿來轉動視角：看看向南延伸的圍欄跑道。',
-  'hudChrome.bootcamp.leftTitle': '向左滑步',
-  'hudChrome.bootcamp.leftBody':
-    '保持朝向不變，按住 {strafeKey} 沿南邊的跑道向左橫移，走到旗幟處。橫移能讓你移動時視線始終鎖在目標上：總有一天你會這樣作戰。',
-  'hudChrome.bootcamp.leftBodyTouch': '把移動搖桿推向左邊，沿南邊的跑道橫移到旗幟處。',
-  'hudChrome.bootcamp.leftBodyPad': '把左搖桿推向左邊，沿南邊的跑道橫移到旗幟處。',
-  'hudChrome.bootcamp.camera2Title': '再看一次',
-  'hudChrome.bootcamp.camera2Body':
-    '第二面旗到手。再按住右鍵轉動一次視角，對準向西延伸的最後一條跑道。',
-  'hudChrome.bootcamp.camera2BodyTouch':
-    '第二面旗到手。再用手指拖動一次畫面，對準向西延伸的最後一條跑道。',
-  'hudChrome.bootcamp.camera2BodyPad':
-    '第二面旗到手。再推動一次右搖桿，對準向西延伸的最後一條跑道。',
-  'hudChrome.bootcamp.forward2Title': '一口氣跑完',
-  'hudChrome.bootcamp.forward2Body': '再次按住 {forwardKey}，沿最後一條跑道跑到紅旗處。',
-  'hudChrome.bootcamp.forward2BodyTouch': '再次把移動搖桿推向上方，沿最後一條跑道跑到紅旗處。',
-  'hudChrome.bootcamp.forward2BodyPad': '再次把左搖桿推向上方，沿最後一條跑道跑到紅旗處。',
+    '走進塔姆身旁的跑道，把左搖桿推向上方，沿跑道向西走到旗幟處。',
+  'hudChrome.bootcamp.turnwalkTitle': '轉身，再走',
+  'hudChrome.bootcamp.turnwalkBody':
+    '第一面旗到手。按住 {turnKey} 原地轉身，直到正對向南延伸的圍欄跑道，然後再次按住 {forwardKey}，沿跑道走到第二面旗。',
+  'hudChrome.bootcamp.turnwalkBodyTouch':
+    '第一面旗到手。用手指拖動世界畫面（不是移動搖桿）來轉身，直到正對向南延伸的圍欄跑道，然後把搖桿推向上方，沿跑道走到第二面旗。',
+  'hudChrome.bootcamp.turnwalkBodyPad':
+    '第一面旗到手。推動右搖桿轉身，直到正對向南延伸的圍欄跑道，然後把左搖桿推向上方，沿跑道走到第二面旗。',
+  'hudChrome.bootcamp.strafeTitle': '橫移走完最後一條跑道',
+  'hudChrome.bootcamp.strafeBody':
+    '側向移動還有另一種辦法。按住滑鼠右鍵並拖動來轉動視角，直到面向北方、回望你剛走下來的那條跑道，然後按住 {strafeKey}，沿最後一條跑道橫移到紅旗處。橫移能讓你移動時視線始終鎖在目標上：總有一天你會這樣作戰。',
+  'hudChrome.bootcamp.strafeBodyTouch':
+    '側向移動還有另一種辦法。用手指拖動畫面轉動視角，直到面向北方，然後把移動搖桿推向左邊，沿最後一條跑道滑步橫移到紅旗處。',
+  'hudChrome.bootcamp.strafeBodyPad':
+    '側向移動還有另一種辦法。推動右搖桿轉動視角，直到面向北方，然後把左搖桿推向左邊，沿最後一條跑道滑步橫移到紅旗處。',
   'hudChrome.bootcamp.courseProgress': '旗幟 {current}/{total}',
   'hudChrome.bootcamp.doneTitle': '跑完全程',
   'hudChrome.bootcamp.doneBody':
-    '腿上的功夫就這些了。走回大門處的看守塔姆那裡交差：他有話要對你說，還有你的第一份報酬。',
+    '腿上的功夫就這些了。監工佩爾就站在紅旗旁邊：對著他按 {interactKey}，或用滑鼠左鍵點擊他，交上你的成績，領取你的第一份報酬。',
+  'hudChrome.bootcamp.doneBodyTouch':
+    '腿上的功夫就這些了。監工佩爾就站在紅旗旁邊：點按他，交上你的成績，領取你的第一份報酬。',
+  'hudChrome.bootcamp.doneBodyPad':
+    '腿上的功夫就這些了。監工佩爾就站在紅旗旁邊：按下互動鍵，交上你的成績，領取你的第一份報酬。',
   'entities.zones.proving_shore.pois.4.label': '試煉跑道',
   'entities.items.ps_castaway_crate.name': '漂流貨箱',
   'entities.items.ps_ferry_bell.name': '渡船鈴',
@@ -12725,11 +12727,23 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.warden_tam.title': '試煉跑道的看守',
   'entities.npcs.warden_tam.greeting':
     '這幾條跑道就是試煉跑道，{playerName}，谷地敬重的每一位冒險者都跑過它。欄杆上的燈柱整夜不滅，跑道從不打烊。',
+  'entities.npcs.overseer_pell.name': '監工佩爾',
+  'entities.npcs.overseer_pell.title': '試煉跑道監工',
+  'entities.npcs.overseer_pell.greeting':
+    '每一趟從這幾條跑道下來的成績都由我掐錶，{playerName}，比這難看得多的腳步我也見過。我身後的路通往練武場：腳上功夫變成劍上功夫，就在那裡。',
+  'entities.npcs.drillmaster_rook.name': '操練官魯克',
+  'entities.npcs.drillmaster_rook.title': '練武場主管',
+  'entities.npcs.drillmaster_rook.greeting':
+    '先打稻草，再打殼，{playerName}。草人教你的手臂怎麼揮刀；海灘那頭的掠蟹教它落在一個會計較的對象身上。',
+  'entities.npcs.tidewarden_nel.name': '守潮人奈爾',
+  'entities.npcs.tidewarden_nel.title': '海灘的看守',
+  'entities.npcs.tidewarden_nel.greeting':
+    '潮水會拿走，潮水也會償還，{playerName}。這兩筆帳都由我來記：掠蟹從殘骸裡夾走的，和誠實的雙手沿這條路扛上來的。',
   'entities.quests.q_ps_the_gauntlet.title': '跑過試煉跑道',
   'entities.quests.q_ps_the_gauntlet.text':
-    '谷地敬重的每一雙腿，都是先從這幾條跑道跑出來的，{playerName}。沿第一條跑道向西走到旗幟處，好好環顧四周，再沿南邊的跑道向左滑步走到第二面旗，再看一圈，最後沿末尾的跑道跑到紅旗處。旗幟要按順序經過；螢幕上方的卡片會隨時告訴你該按哪個鍵。等紅旗被你甩在身後，回到大門處找我。',
+    '谷地敬重的每一雙腿，都是先從這幾條跑道跑出來的，{playerName}。沿第一條跑道向西走到旗幟處，原地轉過身來，沿南邊的跑道走到第二面旗，最後沿末尾的跑道橫移到紅旗處。旗幟要按順序經過；螢幕上方的卡片會隨時告訴你該按哪個鍵。監工佩爾在跑道盡頭掐著每一趟的錶：等紅旗被你甩在身後，他就站在那裡等著收你的成績。',
   'entities.quests.q_ps_the_gauntlet.completion':
-    '跑得乾淨俐落，{playerName}。你的雙腿已經記住了跑道，剩下的就該幹真正的活了：教官瑪倫在碼頭北邊沿路而上的晨憩營地主持操練。走到她跟前，直到她的名字顯示出來，然後按 F，或用滑鼠左鍵點擊她，她會交給你第一件差事。',
+    '這一趟我掐了錶，{playerName}，比你腳快的人我也刷下去過。試煉跑道是你的了。我身後的路通往練武場，操練官魯克在那裡把腳上功夫變成劍上功夫：你的下一件差事在他手裡。',
   'entities.quests.q_ps_the_gauntlet.objectives.0.label': '經過試煉跑道旗幟',
   'entities.npcs.bursar_wick.name': '司庫威克',
   'entities.npcs.bursar_wick.title': '鍍金保險箱',
@@ -12737,31 +12751,31 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '鍍金保險箱連這裡也設了一張桌子，{playerName}。凡是存到我這裡的東西，都躺在每座城鎮每位司庫身後的同一座金庫裡，狼咬不著，水泡不著，連你自己的糊塗決定也碰不著。',
   'entities.quests.q_ps_strike_true.title': '擊中要害',
   'entities.quests.q_ps_strike_true.text':
-    '歡迎來到試煉之濱，{playerName}。這裡的每一課都從同一件事開始：站穩腳，握好刃。營地西南練武場上的草人生來就是挨打的。要是找不到練武場，按 M 打開地圖：你身上的每件差事都會標在上面，用不著亂繞。走到一個草人跟前，按 Tab 或用滑鼠左鍵點擊它，把它設為目標，接著按 1，或點擊畫面底部動作列上的第一個圖示，揮出這一刀。一直打到三個散架為止。它們的還擊不痛不癢，這片海濱之外的東西下手可重得多。第三個倒下之後，走回我這兒來，按 F 交還任務、領取報酬：這世上每一件差事，都是這樣收尾的。',
+    '練完了腳，該練手臂了，{playerName}。練武場就在我身後沿路而上的地方，那裡的草人生來就是挨打的。要是找不著路，按 M 打開地圖：你身上的每件差事都會標在上面。走到一個草人跟前，按 Tab 或用滑鼠左鍵點擊它，把它設為目標，接著按 1，或點擊畫面底部動作列上的第一個圖示，揮出這一刀。一直打到一個散架為止；它不會還手，草人從來不還手。操練官魯克在練武場東側看著場子：對著他按 F，交上這份戰果。',
   'entities.quests.q_ps_strike_true.completion':
-    '三個倒下，你的手也穩多了。記住這種感覺，{playerName}：選定目標，揮出一刀，然後一直打下去。谷地的狼比稻草快，但同樣的算術也能放倒牠們。',
+    '乾淨俐落的一擊，手也已經穩多了。記住這種感覺，{playerName}：選定目標，揮刀，然後一直打下去。稻草挨打從不計較。你下一個揮刀的對象可就計較了。',
   'entities.quests.q_ps_strike_true.objectives.0.label': '擊倒訓練草人',
+  'entities.quests.q_ps_shell_and_claw.title': '甲殼與利螯',
+  'entities.quests.q_ps_shell_and_claw.text':
+    '稻草從不計較，{playerName}，所以給你找個計較的。灘塗掠蟹正在遠灘的沉船灘上翻揀殘骸：從我的練武場沿小路向西走，它會一直把你領到牠們跟前。牠們會夾回來，所以盯著你的生命條，別停下揮刀：用 Tab 或滑鼠左鍵選定一隻，按 1，打到牠的殼裂開為止。三隻就夠。然後沿路爬上北邊的坡：守潮人奈爾管著海灘的帳，你的蟹殼她都記數。',
+  'entities.quests.q_ps_shell_and_claw.completion':
+    '敲開三隻殼，十根手指一根沒少：頭一仗打得不賴，{playerName}。掠蟹從殘骸裡夾走東西的速度，比潮水送來的還快，所以你每除掉一隻，就有人多保住一枚銅板。',
+  'entities.quests.q_ps_shell_and_claw.objectives.0.label': '除滅灘塗掠蟹',
   'entities.quests.q_ps_the_wreck_line.title': '沉船灘',
   'entities.quests.q_ps_the_wreck_line.text':
-    '潮水用海貨支付這座島：舊沉船上的漂流貨箱，被沖上練習場再往前的那片遠灘。從木靶那裡沿小路繼續走，它會一直把你領到水邊。開箱很簡單，{playerName}。走到貨箱跟前，直到它的名字顯示出來，然後按 F，或用滑鼠左鍵點擊貨箱本身，它就會把裡面的東西交出來。開三只就夠了。翻揀殘骸的掠蟹夾起人來比看上去疼，所以腳下留神；另外記住，你今後遇到的每一只箱子、每一處採集點、每一道門扉，用的都是同一個 F 鍵。',
+    '潮水用海貨支付這座島，{playerName}：舊沉船上的漂流貨箱，被搬上來丟在我和晨憩營地之間的坡道旁。沿我這條路朝營地走，你正好會從它們旁邊經過。開箱很簡單：走到貨箱跟前，直到它的名字顯示出來，然後按 F，或用滑鼠左鍵點擊貨箱本身，它就會把裡面的東西交出來。開三只就夠了，並且記住：你今後遇到的每一只箱子、每一處採集點、每一道門扉，用的都是同一個 F 鍵。軍需官芬奇守著營地的貨攤，殘骸海貨連一根木棍都收：把這批貨交給她。',
   'entities.quests.q_ps_the_wreck_line.completion':
-    '繩子、焦油，還有半輪大海竟然放過的乳酪。世上到處都是值得彎腰去撿的東西，{playerName}。保持這個習慣：走近，按 F，拿走屬於你的東西。',
+    '繩子、焦油，還有半輪大海竟然放過的乳酪：我全要了。既然你顯然彎得下腰、扛得動貨，{playerName}，就順便聽聽手藝這一課。採集從一件工具開始，礦鎬、斧子、鐮刀、釣竿，谷地的商人那裡都有得賣。按住 Shift 再按 P，打開你的專業手冊：那就是你的手藝環輪，上面列著你會的每一門技藝。調諧到相鄰的一對，這兩門便成為無上限的主修，環輪對面的一門留作你的嗜好，其餘的則連同所學一起休眠。什麼都不是定局：技藝大師為你定下這一對，日後你想改，隨時找他們就改了。他們就在東溪谷的鍛爐、廚房、織機和工坊，芬橋的製革坊，還有高哨的藥劑鋪。',
   'entities.quests.q_ps_the_wreck_line.objectives.0.label': '開啟漂流貨箱',
-  'entities.quests.q_ps_the_wheel_of_trades.title': '百業環輪',
-  'entities.quests.q_ps_the_wheel_of_trades.text':
-    '一柄劍只能餵飽你一頓，{playerName}，一門手藝卻能餵養你一生。每個冒險者在刀劍之外都操持著專業：採礦、伐木、採藥、釣魚，還有把這一切變成價值的製作技藝。軍需官芬奇的貨攤就在我這操練場幾步之外，而她擺過的攤子比我帶過的操練還多。走到她跟前，按 F，或用滑鼠左鍵點擊她，就能與她交談：開箱子的那個鍵，同樣也開啟對話。',
-  'entities.quests.q_ps_the_wheel_of_trades.completion':
-    '瑪倫總算給我送來一個值得費口舌的學生。聽好了，{playerName}，只說一遍：採集從一件工具開始，礦鎬、斧子、鐮刀、釣竿，谷地的商人那裡都有得賣。按住 Shift 再按 P，就能打開你的專業手冊：那就是你的環輪，上面列著你會的每一門技藝，以及各自練到了哪一步。鑽研你喜歡的那些，當你調諧到相鄰的一對，這兩門便成為無上限的主修，環輪對面的一門留作你的嗜好，其餘的則連同所學一起休眠。什麼都不會失去，什麼也都不是定局：技藝大師為你定下這一對，日後你想改，找技藝大師也就改了。他們就在東溪谷：鍛爐旁的鍛造大師達爾瓦、旅店廚房裡的廚師馬洛、織機前的織匠奧蒂莉、工坊裡的機巧師吉澤爾，還有芬橋製革坊的皮匠赫斯克，和高哨藥劑鋪的鍊金師薇蘭。',
-  'entities.quests.q_ps_the_wheel_of_trades.objectives.0.label': '向軍需官芬奇請教百業',
   'entities.quests.q_ps_pouch_and_purse.title': '錢囊與背袋',
   'entities.quests.q_ps_pouch_and_purse.text':
-    '去谷地之前還有最後一課，{playerName}，也是保住冒險者性命的一課：你隨身帶的東西。你的背包有十六格，旁邊還空著四個袋扣；每繫上一只袋子，它的空間就併入總容量。所以：對著軍需官芬奇按 F，打開她的貨攤，在她的貨品裡用滑鼠左鍵點擊亞麻小袋買下它，然後按 B 打開背包，再用滑鼠左鍵點擊袋中的亞麻小袋，把它繫進一個空著的袋扣。等它掛上腰帶，就回來找我。',
+    '去谷地之前還有最後一課，{playerName}，也是保住冒險者性命的一課：你隨身帶的東西。你的背包有十六格，旁邊還空著四個袋扣；每繫上一只袋子，它的空間就併入總容量。所以：再對我按一次 F，打開我的貨攤，在我的貨品裡用滑鼠左鍵點擊亞麻小袋買下它，然後按 B 打開背包，再用滑鼠左鍵點擊袋中的亞麻小袋，把它繫進一個空著的袋扣。教官瑪倫就在東邊幾步外的集合篝火旁操練：把你腰帶上的小袋給她看看。',
   'entities.quests.q_ps_pouch_and_purse.completion':
-    '好袋子，又多出六格用來裝麻煩。接下來是任何袋子都裝不下的另一半課，{playerName}：背不下的，交給鍍金保險箱。我身後桌前的司庫威克，為你打開的正是每座城鎮每位司庫共用的同一座金庫，等你的錢袋鼓起來，還能購買更多金庫空間。貴重的存進金庫，袋子留出空當。塞滿的行囊斷送過的冒險，比任何狼都多。',
+    '好袋子，又多出六格用來裝麻煩。接下來是任何袋子都裝不下的另一半課，{playerName}：背不下的，交給鍍金保險箱。司庫威克的保險箱桌就設在西邊沿路而上的地方，他為你打開的正是每座城鎮每位司庫共用的同一座金庫；等你的錢袋鼓起來，還能購買更多金庫空間。貴重的存進金庫，袋子留出空當。塞滿的行囊斷送過的冒險，比任何狼都多。',
   'entities.quests.q_ps_pouch_and_purse.objectives.0.label': '購買亞麻小袋',
   'entities.quests.q_ps_set_sail.title': '揚帆起航',
   'entities.quests.q_ps_set_sail.text':
-    '這片海濱上已經沒有你沒打倒過、沒打開過、沒買下過的東西了，{playerName}。你準備好了，而東溪谷有真正的差事在等著。沿路走到舊碼頭，對著渡船人奧多按 F，告訴他，就說是我說的，你掙到了這趟航程。什麼時候記不清自己欠了誰什麼，隨時按 L：那是你的任務日誌。',
+    '這片海濱上已經沒有你沒跑過、沒打倒過、沒打開過、沒買下過的東西了，{playerName}。你準備好了，而東溪谷有真正的差事在等著。沿海濱大道走回碼頭，對著渡船人奧多按 F，告訴他，就說是我說的，你掙到了這趟航程。什麼時候記不清自己欠了誰什麼，隨時按 L：那是你的任務日誌。',
   'entities.quests.q_ps_set_sail.completion':
     '瑪倫這麼說了？能從一個曾讓我練了一星期繫纜繩的女人嘴裡說出來，這可是極高的評價。等你準備好了就敲響立在我碼頭旁的那口鈴，{playerName}，渡航會把你送到東溪鎮的正中央。當心狼群。',
   'entities.quests.q_ps_set_sail.objectives.0.label': '向渡船人奧多報到',

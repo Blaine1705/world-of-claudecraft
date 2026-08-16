@@ -12896,45 +12896,42 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorialGreeting.noteClose': '알겠어요',
   'hudChrome.tutorialGreeting.skip': '튜토리얼 건너뛰기',
   'hudChrome.bootcamp.title': '첫걸음',
+  'hudChrome.bootcamp.talkTitle': '워든 탐에게 말 걸기',
+  'hudChrome.bootcamp.talkBody':
+    '워든 탐이 바로 앞에서 건틀릿 문을 지키고 있습니다. 이름이 보일 때까지 다가가 {interactKey}를 누르거나 왼쪽 클릭해 말을 거세요. 그가 달리기 과제를 내줄 겁니다.',
+  'hudChrome.bootcamp.talkBodyTouch':
+    '워든 탐이 바로 앞에서 건틀릿 문을 지키고 있습니다. 이름이 보일 때까지 다가가 그를 탭하거나 사용 버튼을 탭해 말을 거세요. 그가 달리기 과제를 내줄 겁니다.',
+  'hudChrome.bootcamp.talkBodyPad':
+    '워든 탐이 바로 앞에서 건틀릿 문을 지키고 있습니다. 이름이 보일 때까지 다가가 상호작용 버튼을 눌러 말을 거세요. 그가 달리기 과제를 내줄 겁니다.',
   'hudChrome.bootcamp.forwardTitle': '첫 번째 길 걷기',
   'hudChrome.bootcamp.forwardBody':
-    '앞에 보이는 건틀릿 문으로 들어가, {forwardKey}를 누른 채 첫 번째 길을 따라 서쪽 깃발까지 걸어가세요.',
+    '탐 옆의 길에 들어서서 {forwardKey}를 누른 채 서쪽 깃발까지 걸어가세요.',
   'hudChrome.bootcamp.forwardBodyTouch':
-    '앞에 보이는 건틀릿 문으로 들어가, 이동 스틱을 위로 민 채 첫 번째 길을 따라 서쪽 깃발까지 걸어가세요.',
+    '탐 옆의 길에 들어서서 이동 스틱을 위로 민 채 서쪽 깃발까지 걸어가세요.',
   'hudChrome.bootcamp.forwardBodyPad':
-    '앞에 보이는 건틀릿 문으로 들어가, 왼쪽 스틱을 위로 민 채 첫 번째 길을 따라 서쪽 깃발까지 걸어가세요.',
-  'hudChrome.bootcamp.cameraTitle': '시점 돌리기',
-  'hudChrome.bootcamp.cameraBody':
-    '깃발 하나 통과. 이제 마우스 오른쪽 버튼을 누른 채 드래그해 시점을 돌려 보세요. 남쪽으로 뻗은 울타리 길을 내려다본 뒤, 원래 향하던 쪽으로 돌아오세요.',
-  'hudChrome.bootcamp.cameraBodyTouch':
-    '깃발 하나 통과. 이제 (이동 스틱이 아니라) 세상 화면을 손가락으로 드래그해 시점을 돌려 보세요. 남쪽으로 뻗은 울타리 길을 내려다보세요.',
-  'hudChrome.bootcamp.cameraBodyPad':
-    '깃발 하나 통과. 이제 오른쪽 스틱을 밀어 시점을 돌려 보세요. 남쪽으로 뻗은 울타리 길을 내려다보세요.',
-  'hudChrome.bootcamp.leftTitle': '왼쪽으로 미끄러지기',
-  'hudChrome.bootcamp.leftBody':
-    '향한 방향은 그대로 두고, {strafeKey}를 누른 채 남쪽 길을 따라 왼쪽으로 게걸음해 깃발까지 가세요. 옆걸음은 시선을 표적에 둔 채 움직이게 해 줍니다. 언젠가 전투에서 이렇게 움직이게 될 거예요.',
-  'hudChrome.bootcamp.leftBodyTouch':
-    '이동 스틱을 왼쪽으로 밀어 남쪽 길을 따라 옆걸음으로 깃발까지 가세요.',
-  'hudChrome.bootcamp.leftBodyPad':
-    '왼쪽 스틱을 왼쪽으로 밀어 남쪽 길을 따라 옆걸음으로 깃발까지 가세요.',
-  'hudChrome.bootcamp.camera2Title': '다시 둘러보기',
-  'hudChrome.bootcamp.camera2Body':
-    '깃발 둘 통과. 오른쪽 버튼을 누른 채 한 번 더 시점을 돌려, 서쪽으로 뻗은 마지막 길에 몸을 맞추세요.',
-  'hudChrome.bootcamp.camera2BodyTouch':
-    '깃발 둘 통과. 한 번 더 손가락으로 드래그해, 서쪽으로 뻗은 마지막 길에 몸을 맞추세요.',
-  'hudChrome.bootcamp.camera2BodyPad':
-    '깃발 둘 통과. 오른쪽 스틱을 한 번 더 밀어, 서쪽으로 뻗은 마지막 길에 몸을 맞추세요.',
-  'hudChrome.bootcamp.forward2Title': '끝까지 달리기',
-  'hudChrome.bootcamp.forward2Body':
-    '다시 {forwardKey}를 누른 채 마지막 길을 붉은 깃발까지 달리세요.',
-  'hudChrome.bootcamp.forward2BodyTouch':
-    '다시 이동 스틱을 위로 밀어 마지막 길을 붉은 깃발까지 달리세요.',
-  'hudChrome.bootcamp.forward2BodyPad':
-    '다시 왼쪽 스틱을 위로 밀어 마지막 길을 붉은 깃발까지 달리세요.',
+    '탐 옆의 길에 들어서서 왼쪽 스틱을 위로 민 채 서쪽 깃발까지 걸어가세요.',
+  'hudChrome.bootcamp.turnwalkTitle': '돌아선 다음 걷기',
+  'hudChrome.bootcamp.turnwalkBody':
+    '깃발 하나 통과. {turnKey}를 누른 채 제자리에서 돌아 남쪽으로 뻗은 울타리 길을 정면에 두고, 다시 {forwardKey}를 누른 채 두 번째 깃발까지 걸어가세요.',
+  'hudChrome.bootcamp.turnwalkBodyTouch':
+    '깃발 하나 통과. (이동 스틱이 아니라) 세상 화면을 손가락으로 드래그해 돌아 남쪽으로 뻗은 울타리 길을 정면에 두고, 스틱을 위로 밀어 두 번째 깃발까지 걸어가세요.',
+  'hudChrome.bootcamp.turnwalkBodyPad':
+    '깃발 하나 통과. 오른쪽 스틱을 밀어 돌아 남쪽으로 뻗은 울타리 길을 정면에 두고, 왼쪽 스틱을 위로 밀어 두 번째 깃발까지 걸어가세요.',
+  'hudChrome.bootcamp.strafeTitle': '마지막 길은 옆걸음으로',
+  'hudChrome.bootcamp.strafeBody':
+    '옆으로 움직이는 또 다른 방법이 있습니다. 마우스 오른쪽 버튼을 누른 채 드래그해 시점을 돌려, 내려온 길을 거슬러 북쪽을 바라보세요. 그런 다음 {strafeKey}를 누른 채 마지막 길을 붉은 깃발까지 옆걸음하세요. 옆걸음은 시선을 표적에 둔 채 움직이게 해 줍니다. 언젠가 전투에서 이렇게 움직이게 될 거예요.',
+  'hudChrome.bootcamp.strafeBodyTouch':
+    '옆으로 움직이는 또 다른 방법이 있습니다. 손가락으로 드래그해 시점을 돌려 북쪽을 바라본 다음, 이동 스틱을 왼쪽으로 밀어 마지막 길을 붉은 깃발까지 옆걸음하세요.',
+  'hudChrome.bootcamp.strafeBodyPad':
+    '옆으로 움직이는 또 다른 방법이 있습니다. 오른쪽 스틱을 밀어 시점을 돌려 북쪽을 바라본 다음, 왼쪽 스틱을 왼쪽으로 밀어 마지막 길을 붉은 깃발까지 옆걸음하세요.',
   'hudChrome.bootcamp.courseProgress': '깃발 {current} / {total}',
   'hudChrome.bootcamp.doneTitle': '완주',
   'hudChrome.bootcamp.doneBody':
-    '몸 쓰는 법은 이걸로 전부입니다. 문가의 워든 탐에게 걸어 돌아가 완주를 보고하세요. 그가 건넬 말과 첫 보상이 기다립니다.',
+    '몸 쓰는 법은 이걸로 전부입니다. 감독관 펠이 붉은 깃발 옆에 서 있습니다. 그에게 {interactKey}를 누르거나 왼쪽 클릭해 완주를 보고하고 첫 보상을 받으세요.',
+  'hudChrome.bootcamp.doneBodyTouch':
+    '몸 쓰는 법은 이걸로 전부입니다. 감독관 펠이 붉은 깃발 옆에 서 있습니다. 그를 탭해 완주를 보고하고 첫 보상을 받으세요.',
+  'hudChrome.bootcamp.doneBodyPad':
+    '몸 쓰는 법은 이걸로 전부입니다. 감독관 펠이 붉은 깃발 옆에 서 있습니다. 상호작용 버튼을 눌러 완주를 보고하고 첫 보상을 받으세요.',
   'entities.zones.proving_shore.pois.4.label': '건틀릿',
   'entities.items.ps_castaway_crate.name': '표류 상자',
   'entities.items.ps_ferry_bell.name': '나룻배 종',
@@ -12960,11 +12957,23 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.warden_tam.title': '건틀릿의 파수꾼',
   'entities.npcs.warden_tam.greeting':
     '이 길들이 건틀릿입니다, {playerName}. 골짜기가 인정하는 모험가는 모두 여길 달렸죠. 울타리의 등불은 밤새 꺼지지 않으니, 길이 닫히는 일은 없습니다.',
+  'entities.npcs.overseer_pell.name': '감독관 펠',
+  'entities.npcs.overseer_pell.title': '건틀릿 감독관',
+  'entities.npcs.overseer_pell.greeting':
+    '이 길을 내려오는 완주는 전부 내가 잽니다, {playerName}. 그리고 훨씬 형편없는 발놀림도 숱하게 봤죠. 내 뒤의 길은 수련장으로 오릅니다. 발놀림이 칼놀림으로 바뀌는 곳이 바로 거기죠.',
+  'entities.npcs.drillmaster_rook.name': '교련관 루크',
+  'entities.npcs.drillmaster_rook.title': '수련장의 주인',
+  'entities.npcs.drillmaster_rook.greeting':
+    '짚이 먼저, 껍데기는 그다음입니다, {playerName}. 허수아비는 팔에 휘두르는 법을 가르치고, 바닷가의 종종게들은 싫어하는 상대에게 맞히는 법을 가르치죠.',
+  'entities.npcs.tidewarden_nel.name': '조수지기 넬',
+  'entities.npcs.tidewarden_nel.title': '바닷가의 파수꾼',
+  'entities.npcs.tidewarden_nel.greeting':
+    '조수는 앗아 가고, 조수는 값을 치릅니다, {playerName}. 나는 그 양쪽 장부를 다 맡고 있죠. 종종게들이 난파선에서 집어 가는 것과, 정직한 손이 이 길로 날라 오는 것을요.',
   'entities.quests.q_ps_the_gauntlet.title': '건틀릿 완주',
   'entities.quests.q_ps_the_gauntlet.text':
-    '골짜기가 인정하는 다리는 모두 이 길부터 달렸습니다, {playerName}. 첫 번째 길을 서쪽 깃발까지 걷고, 주위를 한껏 둘러본 뒤, 남쪽 길을 왼쪽으로 미끄러져 두 번째 깃발까지 가고, 다시 한 번 둘러본 다음, 마지막 길을 붉은 깃발까지 달리세요. 깃발은 순서대로 지나야 합니다. 화면 위의 카드가 그때그때 필요한 버튼을 보여 줄 거예요. 붉은 깃발을 지나면 문가의 저에게 돌아오세요.',
+    '골짜기가 인정하는 다리는 모두 이 길부터 달렸습니다, {playerName}. 첫 번째 길을 서쪽 깃발까지 걷고, 몸을 빙 돌려 남쪽 길을 두 번째 깃발까지 걸은 다음, 마지막 길은 옆걸음으로 붉은 깃발까지 가세요. 깃발은 순서대로 지나야 합니다. 화면 위의 카드가 그때그때 필요한 버튼을 보여 줄 거예요. 감독관 펠이 길 끝에서 모든 완주를 재고 있습니다. 붉은 깃발을 지나면 바로 그 자리에 서서 당신의 완주를 받아 줄 겁니다.',
   'entities.quests.q_ps_the_gauntlet.completion':
-    '깔끔한 완주였습니다, {playerName}. 다리는 이제 길을 익혔으니, 나머지는 진짜 일을 할 차례죠. 교관 마렌이 부두 북쪽 길을 오른 새벽쉼터 야영지에서 훈련을 이끌고 있습니다. 이름이 보일 때까지 바짝 다가가 F를 누르거나 왼쪽 클릭하면, 첫 임무를 내줄 겁니다.',
+    '방금 그 완주, 제대로 쟀습니다, {playerName}. 더 빠른 발도 떨어뜨려 본 적이 있죠. 건틀릿은 이제 당신 것입니다. 내 뒤의 길은 수련장으로 오릅니다. 거기서 교련관 루크가 발놀림을 칼놀림으로 바꿔 주죠. 다음 임무는 그가 갖고 있습니다.',
   'entities.quests.q_ps_the_gauntlet.objectives.0.label': '건틀릿 깃발 통과',
   'entities.npcs.bursar_wick.name': '경리관 윅',
   'entities.npcs.bursar_wick.title': '도금 금고',
@@ -12972,31 +12981,31 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '도금 금고는 이런 곳에도 책상 하나를 두고 있답니다, {playerName}. 내게 맡긴 것은 모든 마을 모든 경리관 뒤에 있는 같은 금고에서 기다립니다. 늑대도, 바닷물도, 당신 자신의 섣부른 판단도 손대지 못하죠.',
   'entities.quests.q_ps_strike_true.title': '정확한 일격',
   'entities.quests.q_ps_strike_true.text':
-    '수련의 해안에 온 걸 환영해요, {playerName}. 이곳의 모든 가르침은 같은 것에서 시작합니다. 발을 딛고, 칼자루를 쥐는 것. 야영지 남서쪽 수련장의 허수아비들은 맞으라고 만든 것들입니다. 수련장을 못 찾겠거든 M을 눌러 지도를 여세요. 맡은 임무는 모두 지도에 표시되니 헤맬 일이 없습니다. 허수아비 하나에게 다가가 Tab을 누르거나 왼쪽 클릭하면 대상으로 잡히고, 그런 다음 1을 누르거나 화면 아래쪽 행동 단축바의 첫 번째 아이콘을 클릭해 내리치세요. 셋이 쓰러질 때까지 계속 내리치세요. 허수아비의 반격은 따끔한 정도지만, 이 해안 너머의 것들은 훨씬 세게 때린답니다. 셋째가 쓰러지면 내게 돌아와 F를 눌러 임무를 마치고 보상을 받으세요. 이 세상 모든 의뢰가 그렇게 끝난답니다.',
+    '발 다음은 팔입니다, {playerName}. 수련장은 내 뒤 길을 오른 곳에 있고, 그곳의 짚 허수아비들은 맞으라고 만든 것들이죠. 길을 잃겠거든 M을 눌러 지도를 여세요. 맡은 임무는 모두 지도에 표시됩니다. 허수아비에게 다가가 Tab을 누르거나 왼쪽 클릭해 대상으로 잡고, 그런 다음 1을 누르거나 화면 아래쪽 행동 단축바의 첫 번째 아이콘을 클릭해 내리치세요. 하나가 무너질 때까지 계속 치세요. 반격은 없습니다. 허수아비란 원래 그런 법이니까요. 교련관 루크가 수련장 동쪽 끝에서 지켜보고 있습니다. 그에게 F를 눌러 결과를 보고하세요.',
   'entities.quests.q_ps_strike_true.completion':
-    '셋을 쓰러뜨렸고, 손아귀도 벌써 단단해졌네요. 그 감각을 기억하세요, {playerName}. 대상을 잡고, 내리치고, 계속 내리치기. 골짜기의 늑대는 짚보다 빠르지만, 같은 산수에 쓰러진답니다.',
+    '깔끔하게 하나 쓰러뜨렸고, 손아귀도 벌써 단단해졌군요. 그 감각을 기억하세요, {playerName}. 대상을 잡고, 내리치고, 계속 내리치기. 짚은 아무래도 상관하지 않지만, 다음에 당신이 칼을 휘두를 상대는 그렇지 않을 겁니다.',
   'entities.quests.q_ps_strike_true.objectives.0.label': '훈련용 허수아비 쓰러뜨리기',
+  'entities.quests.q_ps_shell_and_claw.title': '껍데기와 집게발',
+  'entities.quests.q_ps_shell_and_claw.text':
+    '짚은 상관하지 않죠, {playerName}. 그러니 이번엔 상관하는 놈들입니다. 해변 종종게들이 먼 바닷가의 난파선 해안에서 잔해를 뒤지고 있어요. 내 수련장에서 서쪽으로 길을 따라가면 곧장 놈들에게 닿습니다. 놈들은 되꼬집으니 체력 막대를 살피며 계속 휘두르세요. Tab이나 왼쪽 클릭으로 한 마리를 대상으로 잡고, 1을 누르고, 껍데기가 갈라질 때까지 멈추지 마세요. 셋이면 충분합니다. 그런 다음 북쪽 언덕길을 오르세요. 조수지기 넬이 바닷가 장부를 맡고 있고, 당신의 껍데기도 세어 줄 겁니다.',
+  'entities.quests.q_ps_shell_and_claw.completion':
+    '껍데기 셋을 깨고도 손가락은 하나도 잃지 않았군요. 첫 싸움치고는 훌륭해요, {playerName}. 저 게들은 조수가 표류물을 실어 오는 것보다 빨리 난파선을 털어 가니, 당신이 한 마리 솎아 낼 때마다 누군가의 동전이 지켜진답니다.',
+  'entities.quests.q_ps_shell_and_claw.objectives.0.label': '해변 종종게 솎아내기',
   'entities.quests.q_ps_the_wreck_line.title': '난파선 해안',
   'entities.quests.q_ps_the_wreck_line.text':
-    '조수는 이 섬에 표류물로 값을 치릅니다. 옛 난파선의 표류 상자들이 연습장 너머 먼 바닷가로 밀려오죠. 허수아비들을 지나 길을 따라가면 곧장 물가까지 이어집니다. 상자를 여는 건 간단해요, {playerName}. 이름이 보일 때까지 바짝 다가가 F를 누르거나 상자를 왼쪽 클릭하면, 품고 있던 것을 내어 줍니다. 셋이면 충분합니다. 표류물을 뒤지는 게들은 보기보다 세게 꼬집으니 발밑을 조심하고, 이것만은 기억하세요. 앞으로 만날 모든 상자와 채집물과 문은 전부 같은 F 하나로 엽니다.',
+    '조수는 이 섬에 표류물로 값을 치릅니다, {playerName}. 옛 난파선에서 나온 표류 상자들이 나와 새벽쉼터 야영지 사이 언덕을 따라 옮겨져 놓여 있죠. 내 길을 따라 야영지 쪽으로 가면 바로 그 곁을 지나게 됩니다. 여는 건 간단해요. 이름이 보일 때까지 상자에 다가가 F를 누르거나 상자를 왼쪽 클릭하면, 품고 있던 것을 내어 줍니다. 셋이면 충분하고, 앞으로 만날 모든 상자와 채집물과 문도 전부 같은 F 하나로 연다는 걸 기억하세요. 보급관 핀치가 야영지 좌판을 지키며 표류물이라면 나뭇가지 하나까지 사들입니다. 거둔 것을 그녀에게 넘기세요.',
   'entities.quests.q_ps_the_wreck_line.completion':
-    '밧줄과 타르, 그리고 바다가 어쩐 일로 남겨 준 치즈 반 덩이. 세상은 허리를 굽힐 가치가 있는 것들로 가득해요, {playerName}. 이 습관을 지키세요. 가까이 다가가, F를 누르고, 당신 몫을 챙기기.',
+    '밧줄과 타르, 그리고 바다가 어쩐 일로 남겨 준 치즈 반 덩이. 전부 사죠. 몸을 굽혀 나를 줄 아는 게 분명하니, {playerName}, 생업 이야기도 들어 두세요. 채집은 도구에서 시작합니다. 곡괭이, 도끼, 낫, 낚싯대, 전부 골짜기 상인들이 팔죠. Shift를 누른 채 P를 누르면 전문 기술 수첩이 열립니다. 그것이 당신의 생업의 바퀴이고, 익힌 기술이 모두 적혀 있어요. 인접한 한 쌍에 조율하면 그 둘은 상한 없는 주 전공이 되고, 바퀴 건너편 하나는 취미로 남고, 나머지는 지식을 간직한 채 잠듭니다. 정해진 것은 아무것도 없어요. 장인이 짝을 정해 주고, 부탁하면 언제든 바꿔 줍니다. 이스트브룩의 대장간과 주방과 베틀과 공방, 펜브리지 무두질터, 하이워치 약방에서요.',
   'entities.quests.q_ps_the_wreck_line.objectives.0.label': '표류 상자 열기',
-  'entities.quests.q_ps_the_wheel_of_trades.title': '생업의 바퀴',
-  'entities.quests.q_ps_the_wheel_of_trades.text':
-    '칼은 한 끼를 먹여 주지만, {playerName}, 생업은 평생을 먹여 줍니다. 모험가라면 누구나 칼 곁에 전문 기술을 둡니다. 채광, 벌목, 약초 채집, 낚시, 그리고 그 모두를 값어치로 바꾸는 제작 기술이죠. 보급관 핀치의 좌판은 내 수련장에서 몇 걸음 거리에 있고, 핀치는 내가 치른 훈련보다 많은 좌판을 꾸려 왔어요. 다가가서 F를 누르거나 왼쪽 클릭하면 이야기할 수 있습니다. 상자를 여는 그 키가 대화도 연답니다.',
-  'entities.quests.q_ps_the_wheel_of_trades.completion':
-    '마렌이 드디어 말 걸 만한 학생을 보냈군요. 한 번만 말할 테니 잘 들어요, {playerName}. 채집은 도구에서 시작합니다. 곡괭이, 도끼, 낫, 낚싯대, 전부 골짜기 상인들이 팔죠. Shift를 누른 채 P를 누르면 전문 기술 수첩이 열립니다. 그것이 당신의 바퀴이고, 익힌 기술과 각각의 숙련도가 모두 적혀 있죠. 좋아하는 것을 갈고닦다가 인접한 한 쌍에 조율하면 그 둘은 상한 없는 주 전공이 되고, 바퀴 건너편 하나는 취미로 남고, 나머지는 지식을 간직한 채 잠듭니다. 사라지는 것도, 되돌릴 수 없는 것도 없어요. 짝을 정해 주는 것도 장인이고, 나중에 바꿔 주는 것도 장인입니다. 이스트브룩이라면 대장간의 대장장이 다르바, 여관 주방의 요리사 말로우, 베틀 앞의 직조공 오틸리에, 공방의 땜장이 기젤이 있고, 펜브리지 무두질터에는 무두장이 헤스크가, 하이워치 약방에는 연금술사 베란이 있습니다.',
-  'entities.quests.q_ps_the_wheel_of_trades.objectives.0.label': '보급관 핀치에게 생업에 대해 묻기',
   'entities.quests.q_ps_pouch_and_purse.title': '주머니와 돈주머니',
   'entities.quests.q_ps_pouch_and_purse.text':
-    '골짜기로 떠나기 전 마지막 가르침이에요, {playerName}. 모험가의 목숨을 지켜 주는 가르침이죠. 바로 당신이 지고 다니는 짐 얘기입니다. 배낭에는 열여섯 칸이 있고, 그 옆에 빈 가방 고리 넷이 기다립니다. 가방을 하나 채울 때마다 그 공간이 전체 용량에 더해져요. 그러니 보급관 핀치에게 F를 눌러 좌판을 열고, 물건 중에서 아마천 주머니를 왼쪽 클릭해 사세요. 그런 다음 B를 눌러 가방을 열고, 거기 있는 주머니를 왼쪽 클릭해 빈 고리에 채우세요. 허리에 걸리거든 내게 돌아오세요.',
+    '골짜기로 떠나기 전 마지막 가르침이에요, {playerName}. 모험가의 목숨을 지켜 주는 가르침이죠. 바로 당신이 지고 다니는 짐 얘기입니다. 배낭에는 열여섯 칸이 있고, 그 옆에 빈 가방 고리 넷이 기다립니다. 가방을 하나 채울 때마다 그 공간이 전체 용량에 더해져요. 그러니 내게 다시 F를 눌러 좌판을 열고, 물건 중에서 아마천 주머니를 왼쪽 클릭해 사세요. 그런 다음 B를 눌러 가방을 열고, 거기 있는 주머니를 왼쪽 클릭해 빈 고리에 채우세요. 교관 마렌이 몇 걸음 동쪽 집합 모닥불 곁에서 훈련을 이끌고 있습니다. 허리에 걸린 주머니를 보여 드리세요.',
   'entities.quests.q_ps_pouch_and_purse.completion':
-    '좋은 주머니군요. 말썽거리를 담을 칸이 여섯 늘었네요. 이제 어떤 가방에도 담기지 않는 나머지 절반의 가르침입니다, {playerName}. 들고 다닐 수 없는 것은 도금 금고가 맡습니다. 내 뒤 책상의 경리관 윅이 열어 주는 금고는 어느 마을의 어느 경리관과도 같은 금고이고, 돈주머니가 두둑해지면 금고 칸도 더 살 수 있죠. 값진 것은 금고에, 가방에는 여유를. 어떤 늑대보다도 꽉 찬 배낭이 끝장낸 모험이 더 많답니다.',
+    '좋은 주머니군요. 말썽거리를 담을 칸이 여섯 늘었네요. 이제 어떤 가방에도 담기지 않는 나머지 절반의 가르침입니다, {playerName}. 들고 다닐 수 없는 것은 도금 금고가 맡습니다. 경리관 윅이 서쪽 길을 오른 곳에 금고 책상을 두고 있는데, 그가 열어 주는 금고는 어느 마을의 어느 경리관과도 같은 금고이고, 돈주머니가 두둑해지면 금고 칸도 더 살 수 있죠. 값진 것은 금고에, 가방에는 여유를. 어떤 늑대보다도 꽉 찬 배낭이 끝장낸 모험이 더 많답니다.',
   'entities.quests.q_ps_pouch_and_purse.objectives.0.label': '아마천 주머니 구입하기',
   'entities.quests.q_ps_set_sail.title': '출항',
   'entities.quests.q_ps_set_sail.text':
-    '이 해안에는 당신이 쓰러뜨리지 않았거나, 열지 않았거나, 사지 않은 것이 하나도 남지 않았어요, {playerName}. 준비는 끝났고, 이스트브룩에는 진짜 일이 기다립니다. 길을 따라 낡은 부두로 내려가 뱃사공 오도에게 F를 누르고, 내가 당신이 건너갈 자격을 얻었다 했다고 전하세요. 누구에게 무엇을 빚졌는지 헷갈릴 때는 언제든 L을 누르세요. 그것이 당신의 퀘스트 일지입니다.',
+    '이 해안에는 당신이 이미 달리지 않았거나, 쓰러뜨리지 않았거나, 열지 않았거나, 사지 않은 것이 하나도 남지 않았어요, {playerName}. 준비는 끝났고, 이스트브룩에는 진짜 일이 기다립니다. 해안길을 따라 부두로 되돌아 내려가 뱃사공 오도에게 F를 누르고, 내가 당신이 건너갈 자격을 얻었다 했다고 전하세요. 누구에게 무엇을 빚졌는지 헷갈릴 때는 언제든 L을 누르세요. 그것이 당신의 퀘스트 일지입니다.',
   'entities.quests.q_ps_set_sail.completion':
     '마렌이 그렇게 말했다고요? 내게 일주일 내내 밧줄 매듭 연습을 시킨 사람의 입에서 나온 말치고는 대단한 칭찬이군요. 준비가 되면 내 부두 옆에 선 종을 울리세요, {playerName}. 건너기가 이스트브룩 마을 한복판에 내려 줄 겁니다. 늑대를 조심하세요.',
   'entities.quests.q_ps_set_sail.objectives.0.label': '뱃사공 오도에게 보고',

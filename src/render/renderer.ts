@@ -105,6 +105,7 @@ import {
 } from './camera_feel_core';
 import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
 import { buildDecorTorchFx, type DecorTorchFxView } from './decor_torch_fx';
+import { beaconNpcIds } from './quest_beacon_core';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
 import { buildCastleFeatures, type CastleFeaturesView } from './castle_features';
 import { buildCelestialSprites, type CelestialSprites } from './celestial_sprites';
@@ -1816,6 +1817,9 @@ export class Renderer {
   private emberPools: EmberPoolsView | null = null;
   private campBraziers: CampBraziersView | null = null;
   private decorTorchFx: DecorTorchFxView | null = null;
+  // Per-frame memo for the island rail's go-here-next NPC beacons.
+  private islandBeaconIds: ReadonlySet<string> = new Set();
+  private islandBeaconTime = -1;
   private nightAccents: NightAccentsView | null = null;
   private mobNightGlow: MobNightGlowView | null = null;
   // Contact blobs under nearby bodies, built ONLY on the tiers that cast no
@@ -11076,6 +11080,19 @@ export class Renderer {
           syncSoulwellVisual(v.objectMesh, this.time, e.id);
         }
         continue;
+      }
+      if (e.kind === 'npc') {
+        // The tutorial island's go-here-next beacon: a gentle holy fizz over
+        // the rail NPC that currently offers or awaits the chain's quest
+        // (quest_beacon_core.ts), so a brand-new player can see their next
+        // stop across the shore. The set is memoized once per frame.
+        if (this.islandBeaconTime !== this.time) {
+          this.islandBeaconTime = this.time;
+          this.islandBeaconIds = beaconNpcIds(this.sim);
+        }
+        if (this.islandBeaconIds.has(e.templateId)) {
+          this.vfx.castSparkle(e.id, 'holy', dt * 2.0);
+        }
       }
       if (e.templateId === VALE_CUP_BALL_TEMPLATE) {
         // bespoke ball motion (roll + contact shadow + dust); no rig to animate

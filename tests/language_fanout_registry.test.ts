@@ -221,12 +221,6 @@ const ANSWERED: readonly AnsweredSurface[] = [
     why: 'the race id, the phase and the whole second remaining, so the time-left line never moves with the locale',
   },
   {
-    file: 'bootcamp.ts',
-    memos: ['lastCounts'],
-    answer: 'this.bootcamp.relocalize',
-    why: 'the Gauntlet quest flag tally gates the lesson repaint, so the card title, body, keycap chips and flag counter would all sit in the old locale until the next flag was tagged',
-  },
-  {
     file: 'arena_window.ts',
     memos: ['lastSig'],
     answer: 'this.arenaWindow.relocalize',

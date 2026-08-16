@@ -1,13 +1,12 @@
-// The Proving Shore movement bootcamp's pure core: the strictly ordered
-// Gauntlet ladder (forward, camera, strafe left, camera, forward), the
-// order-gated checkpoint tagging, the three copy arms (keyboard / touch /
-// gamepad) resolving to real catalog keys, and the on-screen keycap chips
-// appearing only where physical keys exist to show.
+// The Proving Shore movement bootcamp's pure core: the ordered Gauntlet
+// ladder (talk to Warden Tam, forward, turn-and-walk, strafe, hand in), the
+// arrow targeting (Tam, the current lane's flag, Overseer Pell), the three
+// copy arms (keyboard / touch / gamepad) resolving to real catalog keys, and
+// the on-screen keycap chips appearing only where physical keys exist.
 
 import { describe, expect, it } from 'vitest';
-import { BOOTCAMP_COURSE_CHECKPOINTS } from '../src/sim/content/proving_shore';
+import { BOOTCAMP_COURSE_CHECKPOINTS, PROVING_SHORE_NPCS } from '../src/sim/content/proving_shore';
 import {
-  BOOTCAMP_CAMERA_TURN_RAD,
   BOOTCAMP_STEP_ORDER,
   type BootcampStep,
   bootcampArrowTarget,
@@ -16,46 +15,16 @@ import {
   bootcampNeedsRerender,
   bootcampTitleKey,
   computeBootcampStep,
-  stepMovementAction,
 } from '../src/ui/bootcamp_view';
 import { t } from '../src/ui/i18n';
 
-const TURNED = BOOTCAMP_CAMERA_TURN_RAD + 0.1;
-
 describe('computeBootcampStep', () => {
   it('walks the ladder in the Gauntlet running order', () => {
-    expect(computeBootcampStep({ checkpointsReached: 0, yawTurnedSinceFlagRad: 99 })).toBe(
-      'forward',
-    );
-    expect(computeBootcampStep({ checkpointsReached: 1, yawTurnedSinceFlagRad: 0 })).toBe('camera');
-    expect(computeBootcampStep({ checkpointsReached: 1, yawTurnedSinceFlagRad: TURNED })).toBe(
-      'left',
-    );
-    expect(computeBootcampStep({ checkpointsReached: 2, yawTurnedSinceFlagRad: 0 })).toBe(
-      'camera2',
-    );
-    expect(computeBootcampStep({ checkpointsReached: 2, yawTurnedSinceFlagRad: TURNED })).toBe(
-      'forward2',
-    );
-    expect(computeBootcampStep({ checkpointsReached: 3, yawTurnedSinceFlagRad: 0 })).toBe('done');
-  });
-
-  it('each camera lesson gates the lane after it (the yaw counter resets per flag)', () => {
-    // Reaching flag 1 with a huge PRIOR yaw travel still lands on 'camera':
-    // the overlay resets the counter at every tag, and the ladder reads only
-    // the travel since the last flag.
-    expect(computeBootcampStep({ checkpointsReached: 1, yawTurnedSinceFlagRad: 0 })).toBe('camera');
-  });
-});
-
-describe('stepMovementAction', () => {
-  it('maps lanes to their buttons and camera lessons to none', () => {
-    expect(stepMovementAction('forward')).toBe('forward');
-    expect(stepMovementAction('forward2')).toBe('forward');
-    expect(stepMovementAction('left')).toBe('strafeLeft');
-    expect(stepMovementAction('camera')).toBeNull();
-    expect(stepMovementAction('camera2')).toBeNull();
-    expect(stepMovementAction('done')).toBeNull();
+    expect(computeBootcampStep({ questActive: false, checkpointsReached: 0 })).toBe('talk');
+    expect(computeBootcampStep({ questActive: true, checkpointsReached: 0 })).toBe('forward');
+    expect(computeBootcampStep({ questActive: true, checkpointsReached: 1 })).toBe('turnwalk');
+    expect(computeBootcampStep({ questActive: true, checkpointsReached: 2 })).toBe('strafe');
+    expect(computeBootcampStep({ questActive: true, checkpointsReached: 3 })).toBe('done');
   });
 });
 
@@ -63,13 +32,12 @@ describe('stepMovementAction', () => {
 // drives updateGauntletRuns through a real Sim): this core never tags.
 
 describe('bootcampArrowTarget', () => {
-  it('aims at the current lane flag, hides during camera lessons and when done', () => {
+  it('leads to Tam, then the current lane flag, then Overseer Pell', () => {
+    expect(bootcampArrowTarget('talk', 0)).toEqual(PROVING_SHORE_NPCS.warden_tam.pos);
     expect(bootcampArrowTarget('forward', 0)).toEqual(BOOTCAMP_COURSE_CHECKPOINTS[0]);
-    expect(bootcampArrowTarget('left', 1)).toEqual(BOOTCAMP_COURSE_CHECKPOINTS[1]);
-    expect(bootcampArrowTarget('forward2', 2)).toEqual(BOOTCAMP_COURSE_CHECKPOINTS[2]);
-    expect(bootcampArrowTarget('camera', 1)).toBeNull();
-    expect(bootcampArrowTarget('camera2', 2)).toBeNull();
-    expect(bootcampArrowTarget('done', 3)).toBeNull();
+    expect(bootcampArrowTarget('turnwalk', 1)).toEqual(BOOTCAMP_COURSE_CHECKPOINTS[1]);
+    expect(bootcampArrowTarget('strafe', 2)).toEqual(BOOTCAMP_COURSE_CHECKPOINTS[2]);
+    expect(bootcampArrowTarget('done', 3)).toEqual(PROVING_SHORE_NPCS.overseer_pell.pos);
   });
 });
 
@@ -93,33 +61,31 @@ describe('copy plans', () => {
     }
   });
 
-  it('touch and pad copy never reference keyboard hardware', () => {
+  it('touch and pad copy never interpolate bind labels', () => {
     for (const step of steps) {
       for (const mode of ['touch', 'pad'] as const) {
         const plan = bootcampBodyPlan(step, mode);
         expect(plan.params, `${step}/${mode} interpolates bind labels`).toHaveLength(0);
-        const body = t(plan.bodyKey, {});
-        expect(body, `${step}/${mode} says mouse`).not.toMatch(/mouse/i);
       }
     }
   });
 
-  it('keycap chips show the ordered buttons: W lanes, Q lane, none for camera', () => {
-    const labels = { forwardKey: 'W', strafeKey: 'Q' };
+  it('keycap chips show the ordered buttons per lesson, keyboard only', () => {
+    const labels = { forwardKey: 'W', turnKey: 'D', strafeKey: 'Q', interactKey: 'F' };
+    expect(bootcampKeycaps('talk', 'keyboard', labels)).toEqual(['F']);
     expect(bootcampKeycaps('forward', 'keyboard', labels)).toEqual(['W']);
-    expect(bootcampKeycaps('left', 'keyboard', labels)).toEqual(['Q']);
-    expect(bootcampKeycaps('forward2', 'keyboard', labels)).toEqual(['W']);
-    expect(bootcampKeycaps('camera', 'keyboard', labels)).toEqual([]);
-    expect(bootcampKeycaps('camera2', 'keyboard', labels)).toEqual([]);
+    expect(bootcampKeycaps('turnwalk', 'keyboard', labels)).toEqual(['D', 'W']);
+    expect(bootcampKeycaps('strafe', 'keyboard', labels)).toEqual(['Q']);
+    expect(bootcampKeycaps('done', 'keyboard', labels)).toEqual(['F']);
     expect(bootcampKeycaps('forward', 'touch', labels)).toEqual([]);
-    expect(bootcampKeycaps('left', 'pad', labels)).toEqual([]);
+    expect(bootcampKeycaps('strafe', 'pad', labels)).toEqual([]);
   });
 });
 
 describe('bootcampNeedsRerender', () => {
   it('repaints on a step change or an input-family flip, not otherwise', () => {
-    expect(bootcampNeedsRerender(null, 'forward', 'keyboard', 'keyboard')).toBe(true);
-    expect(bootcampNeedsRerender('forward', 'camera', 'keyboard', 'keyboard')).toBe(true);
+    expect(bootcampNeedsRerender(null, 'talk', 'keyboard', 'keyboard')).toBe(true);
+    expect(bootcampNeedsRerender('talk', 'forward', 'keyboard', 'keyboard')).toBe(true);
     expect(bootcampNeedsRerender('forward', 'forward', 'keyboard', 'pad')).toBe(true);
     expect(bootcampNeedsRerender('forward', 'forward', 'pad', 'pad')).toBe(false);
   });

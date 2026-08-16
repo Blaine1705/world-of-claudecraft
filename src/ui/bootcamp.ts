@@ -1,20 +1,21 @@
 // The Proving Shore movement bootcamp overlay: the island sibling of the
 // Eastbrook new-adventurer coachmark (tutorial.ts), sharing its card CSS
-// family and its whole shape. Shows while Warden Tam's q_ps_the_gauntlet is
-// ACTIVE in the quest log and walks the runner through the lanes in their
-// running order (forward, camera, strafe left, camera, forward; the ladder
-// lives in bootcamp_view.ts) with copy in the player's live input family
-// (keyboard, touch, or gamepad; src/game/input_hint_mode.ts), the physical
-// keycaps as on-screen chips, and the guidance arrow on the current lane's
-// flag.
+// family and its whole shape. From the moment a fresh arrival lands (Warden
+// Tam's run quest AVAILABLE) through the run itself (quest ACTIVE), the card
+// walks them through the Gauntlet's ordered lessons: talk to Tam (press F),
+// hold forward down lane 1, turn with the turn key and walk the south lane,
+// swing the view with the mouse and strafe the last lane, then hand the run
+// to Overseer Pell at the finish. Copy follows the player's live input
+// family (keyboard, touch, or gamepad; src/game/input_hint_mode.ts), the
+// physical keycaps show as on-screen chips, and the guidance arrow leads to
+// Tam, the current lane's flag, or Pell.
 //
 // The flag tally is the QUEST'S OWN objective count (the sim credits one
 // count per flag passed in order, tutorial/gauntlet_run.ts), so the card,
 // the quest tracker, and the server can never disagree about a tag, and
 // progress survives reloads with the character rather than the device. The
 // card folds away when the run is handed in (quest done) or the player
-// leaves the island; only the camera lessons live client-side, since the
-// sim has no camera. Reads world state, writes none, and runs identically
+// leaves the island. Reads world state, writes none, and runs identically
 // against the offline Sim and the online ClientWorld.
 
 import { currentInputHintMode, type InputHintMode } from '../game/input_hint_mode';
@@ -46,16 +47,12 @@ const ISLAND_MAX_X = -180;
 
 export class BootcampOverlay {
   // Session-only dismissal: the skip button folds the card away until the
-  // quest is abandoned and re-accepted (a fresh log entry re-engages).
+  // run quest's log state changes again.
   private dismissed = false;
   private engaged = false;
   private step: BootcampStep | null = null;
   private doneSince = 0;
   private lastMode: InputHintMode = 'keyboard';
-
-  // The camera lessons' progress (client-side; the sim has no camera).
-  private lastYaw = 0;
-  private yawSinceFlag = 0;
   private lastCounts = 0;
 
   private root: HTMLElement | null = null;
@@ -67,51 +64,38 @@ export class BootcampOverlay {
   private skipBtn!: HTMLButtonElement;
   private arrow: HTMLElement | null = null;
 
-  // Called every HUD frame. Cheap no-op while the run's quest is not active.
+  // Called every HUD frame. Cheap no-op while the run is neither offered nor
+  // underway.
   update(world: IWorld, renderer: Renderer, keybinds: Keybinds): void {
     const p = world.player;
     if (!p) return;
     if (world.playerId < 0 || p.id !== world.playerId) return;
 
+    const questState = world.questState(GAUNTLET_QUEST_ID);
     const questActive = world.questLog.get(GAUNTLET_QUEST_ID)?.state === 'active';
+    const engageable = questActive || questState === 'available';
     const onIsland = (p.pos?.x ?? 0) < ISLAND_MAX_X;
     if (!this.engaged) {
-      if (!questActive || !onIsland || this.dismissed) {
-        // A fresh log entry after an abandon clears a session dismissal.
-        if (!questActive) this.dismissed = false;
+      if (!engageable || !onIsland || this.dismissed) {
+        // A state change after a dismissal re-arms the card (accepting the
+        // quest after skipping the talk card, or abandoning and retaking).
+        if (!engageable) this.dismissed = false;
         return;
       }
       this.engaged = true;
-      this.lastYaw = renderer.camYaw;
-      this.yawSinceFlag = 0;
       this.lastCounts = questCounts(world);
-    } else if (!onIsland || !questActive) {
-      // Handed in (or abandoned, or ferried away): fold the card away. A
-      // later re-accept starts the lessons fresh.
+    } else if (!onIsland || (!engageable && questState !== 'ready')) {
+      // Handed in (or ferried away mid-lesson): fold the card away. A later
+      // island visit with the quest offered again starts fresh.
       this.disengage();
       return;
     }
 
-    // The flag tally is the quest objective's own count, credited sim-side
-    // in running order; the yaw accumulator resets at each new tag so every
-    // camera lesson asks for its own fresh swing.
-    const counts = questCounts(world);
-    if (counts !== this.lastCounts) {
-      this.lastCounts = counts;
-      this.yawSinceFlag = 0;
-    }
-
-    const yaw = renderer.camYaw;
-    let dYaw = yaw - this.lastYaw;
-    if (dYaw > Math.PI) dYaw -= 2 * Math.PI;
-    if (dYaw < -Math.PI) dYaw += 2 * Math.PI;
-    this.yawSinceFlag += Math.abs(dYaw);
-    this.lastYaw = yaw;
-
+    this.lastCounts = questCounts(world);
     const mode = currentInputHintMode();
     const next = computeBootcampStep({
-      checkpointsReached: counts,
-      yawTurnedSinceFlagRad: this.yawSinceFlag,
+      questActive: questActive || questState === 'ready',
+      checkpointsReached: this.lastCounts,
     });
 
     if (bootcampNeedsRerender(this.step, next, this.lastMode, mode)) {
@@ -121,11 +105,10 @@ export class BootcampOverlay {
     }
 
     if (this.step === 'done') {
-      // The done card asks for the walk back to Warden Tam; it lingers, then
-      // trusts the quest tracker (the turn-in itself disengages above).
+      // The done card asks for the hand-in at Overseer Pell beside the red
+      // flag; it lingers, then trusts the quest tracker (the turn-in itself
+      // disengages above).
       if (performance.now() - this.doneSince >= DONE_LINGER_MS) this.disengage();
-      this.hideArrow();
-      return;
     }
 
     this.updateArrow(renderer);
@@ -202,19 +185,23 @@ export class BootcampOverlay {
     const mode = currentInputHintMode();
     this.lastMode = mode;
 
-    const forwardKey = keybinds.primaryLabel('forward') || t('hud.options.unbound');
-    const strafeKey = keybinds.primaryLabel('strafeLeft') || t('hud.options.unbound');
-    const allParams: Record<BootcampParam, string> = { forwardKey, strafeKey };
+    const unbound = t('hud.options.unbound');
+    const labels = {
+      forwardKey: keybinds.primaryLabel('forward') || unbound,
+      turnKey: keybinds.primaryLabel('turnRight') || unbound,
+      strafeKey: keybinds.primaryLabel('strafeLeft') || unbound,
+      interactKey: keybinds.primaryLabel('interact') || unbound,
+    };
 
     const plan = bootcampBodyPlan(this.step!, mode);
     const params: Partial<Record<BootcampParam, string>> = {};
-    for (const key of plan.params) params[key] = allParams[key];
+    for (const key of plan.params) params[key] = labels[key];
 
     this.titleEl.textContent = t(bootcampTitleKey(this.step!));
     this.bodyEl.textContent = t(plan.bodyKey, params);
 
     this.keysEl.replaceChildren();
-    for (const cap of bootcampKeycaps(this.step!, mode, { forwardKey, strafeKey })) {
+    for (const cap of bootcampKeycaps(this.step!, mode, labels)) {
       const chip = document.createElement('span');
       chip.className = 'tut-keycap';
       chip.textContent = cap;
@@ -231,7 +218,7 @@ export class BootcampOverlay {
           })
         : '';
 
-    if (this.step !== 'done') {
+    if (this.step !== 'done' && this.step !== 'talk') {
       this.progressEl.textContent = this.courseProgress();
       this.progressEl.style.display = '';
     } else {
@@ -243,7 +230,7 @@ export class BootcampOverlay {
     this.root.classList.toggle('tut-done', this.step === 'done');
   }
 
-  // Points the shared course arrow at the current lane's flag.
+  // Points the shared course arrow at the current lesson's target.
   private updateArrow(renderer: Renderer): void {
     if (!this.arrow) return;
     const target = bootcampArrowTarget(this.step!, this.lastCounts);
@@ -252,7 +239,7 @@ export class BootcampOverlay {
       return;
     }
 
-    // Flags are authored on dry ground; the max() is defensive for edited
+    // Targets are authored on dry ground; the max() is defensive for edited
     // worlds so the marker never aims under the sea.
     const y = Math.max(groundHeight(target.x, target.z, WORLD_SEED), WATER_LEVEL) + 2.2;
     const v = renderer.worldToScreen(target.x, y, target.z);

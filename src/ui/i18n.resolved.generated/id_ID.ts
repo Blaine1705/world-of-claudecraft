@@ -891,29 +891,27 @@ export const id_ID: EnTranslations = {
     },
     "bootcamp": {
       "title": "First Steps",
+      "talkTitle": "Speak to Warden Tam",
+      "talkBody": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then press {interactKey}, or left-click him, to talk: he will set you the run.",
+      "talkBodyTouch": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then tap him, or tap the Use button, to talk: he will set you the run.",
+      "talkBodyPad": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then press your interact button to talk: he will set you the run.",
       "forwardTitle": "Walk the first lane",
-      "forwardBody": "Step through the Gauntlet gate ahead and hold {forwardKey} to walk the first lane west to its flag.",
-      "forwardBodyTouch": "Step through the Gauntlet gate ahead and push the movement stick up to walk the first lane west to its flag.",
-      "forwardBodyPad": "Step through the Gauntlet gate ahead and push the left stick up to walk the first lane west to its flag.",
-      "cameraTitle": "Swing your view",
-      "cameraBody": "Flag one down. Now hold the right mouse button and drag to swing your view: look down the walled lane heading south, then settle back the way you were facing.",
-      "cameraBodyTouch": "Flag one down. Now drag a finger across the world (not the movement stick) to swing your view: look down the walled lane heading south.",
-      "cameraBodyPad": "Flag one down. Now push the right stick to swing your view: look down the walled lane heading south.",
-      "leftTitle": "Slip left",
-      "leftBody": "Keep facing where you are and hold {strafeKey} to sidestep left down the south lane to its flag. Sidestepping keeps your eyes on a target while you move: you will fight this way one day.",
-      "leftBodyTouch": "Push the movement stick left to slip sideways down the south lane to its flag.",
-      "leftBodyPad": "Push the left stick left to slip sideways down the south lane to its flag.",
-      "camera2Title": "Look again",
-      "camera2Body": "Second flag down. Swing your view once more with the right mouse button held, and line yourself up with the last lane running west.",
-      "camera2BodyTouch": "Second flag down. Drag across the world once more and line yourself up with the last lane running west.",
-      "camera2BodyPad": "Second flag down. Push the right stick once more and line yourself up with the last lane running west.",
-      "forward2Title": "Run it home",
-      "forward2Body": "Hold {forwardKey} again and run the last lane to the red flag.",
-      "forward2BodyTouch": "Push the movement stick up again and run the last lane to the red flag.",
-      "forward2BodyPad": "Push the left stick up again and run the last lane to the red flag.",
+      "forwardBody": "Step into the lane beside Tam and hold {forwardKey} to walk it west to its flag.",
+      "forwardBodyTouch": "Step into the lane beside Tam and push the movement stick up to walk it west to its flag.",
+      "forwardBodyPad": "Step into the lane beside Tam and push the left stick up to walk it west to its flag.",
+      "turnwalkTitle": "Turn, then walk",
+      "turnwalkBody": "Flag one down. Hold {turnKey} to rotate on the spot until you face down the walled lane heading south, then hold {forwardKey} again and walk it to the second flag.",
+      "turnwalkBodyTouch": "Flag one down. Drag a finger across the world (not the movement stick) to turn until you face down the walled lane heading south, then push the stick up and walk it to the second flag.",
+      "turnwalkBodyPad": "Flag one down. Push the right stick to turn until you face down the walled lane heading south, then push the left stick up and walk it to the second flag.",
+      "strafeTitle": "Sidestep the last lane",
+      "strafeBody": "There is another way to move sideways. Hold the right mouse button and drag to swing your view around until you face north, back up the lane you came down, then hold {strafeKey} to sidestep along the last lane to the red flag. Sidestepping keeps your eyes on a target while you move: you will fight this way one day.",
+      "strafeBodyTouch": "There is another way to move sideways. Drag a finger to swing your view around until you face north, then push the movement stick left to slip sideways along the last lane to the red flag.",
+      "strafeBodyPad": "There is another way to move sideways. Push the right stick to swing your view around until you face north, then push the left stick left to slip sideways along the last lane to the red flag.",
       "courseProgress": "Flag {current} of {total}",
       "doneTitle": "Run complete",
-      "doneBody": "That is everything your legs need to know. Walk back to Warden Tam at the gate and hand your run in: he has a word for you, and your first coin."
+      "doneBody": "That is everything your legs need to know. Overseer Pell stands beside the red flag: press {interactKey} on him, or left-click him, to hand your run in and take your first reward.",
+      "doneBodyTouch": "That is everything your legs need to know. Overseer Pell stands beside the red flag: tap him to hand your run in and take your first reward.",
+      "doneBodyPad": "That is everything your legs need to know. Overseer Pell stands beside the red flag: press your interact button on him to hand your run in and take your first reward."
     },
     "widgets": {
       "clockTitle": "Waktu lokal - klik untuk beralih 12/24 jam",
@@ -14218,6 +14216,21 @@ export const id_ID: EnTranslations = {
         "title": "Keeper of the Gauntlet",
         "greeting": "These lanes are the Gauntlet, {playerName}, and every adventurer the vale respects has run them. The lantern posts stay lit all night, so the lanes never close."
       },
+      "overseer_pell": {
+        "name": "Overseer Pell",
+        "title": "Gauntlet Overseer",
+        "greeting": "I clock every run that comes down these lanes, {playerName}, and I have seen far worse footwork. The path behind me climbs to the practice yard: that is where footwork turns into swordwork."
+      },
+      "drillmaster_rook": {
+        "name": "Drillmaster Rook",
+        "title": "Yard Master",
+        "greeting": "Straw first, shells second, {playerName}. An effigy teaches your arm the swing; the scuttlers down the strand teach it to land on something that minds."
+      },
+      "tidewarden_nel": {
+        "name": "Tidewarden Nel",
+        "title": "Keeper of the Strand",
+        "greeting": "The tide takes and the tide pays, {playerName}. I keep the tally of both: what the scuttlers pinch off the wrecks, and what honest hands carry back up this path."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Pengawas Pasang",
@@ -16186,8 +16199,8 @@ export const id_ID: EnTranslations = {
       },
       "q_ps_the_gauntlet": {
         "title": "Run the Gauntlet",
-        "text": "Every pair of legs the vale respects has run these lanes first, {playerName}. Walk the first lane west to its flag, take a good look around, slip left down the south lane to the second, look again, then run the last lane to the red flag. Pass the flags in order, and the card at the top of your screen will show you every button as you go. When the red flag is behind you, come back to me at the gate.",
-        "completion": "A clean run, {playerName}. Your legs know the lanes now, and the rest of you is ready for real work: Instructor Maren keeps the drills at Dawnrest Camp, up the road north of the pier. Walk right up to her until her name shows, then press F, or left-click her, and she will set you your first task.",
+        "text": "Every pair of legs the vale respects has run these lanes first, {playerName}. Walk the first lane west to its flag, swing yourself around, walk the south lane to the second, then sidestep the last lane to the red flag. Pass the flags in order, and the card at the top of your screen will show you every button as you go. Overseer Pell clocks every run from the far end: when the red flag is behind you, he is standing right there to take it in.",
+        "completion": "I clocked that run, {playerName}, and I have failed faster feet. The Gauntlet is yours. The path behind me climbs to the practice yard, where Drillmaster Rook turns footwork into swordwork: he has your next task.",
         "objectives": {
           "0": {
             "label": "Gauntlet flag passed"
@@ -16196,38 +16209,38 @@ export const id_ID: EnTranslations = {
       },
       "q_ps_strike_true": {
         "title": "Strike True",
-        "text": "Welcome to the Proving Shore, {playerName}. Every lesson here starts the same way: feet set, blade in hand. The effigies stand on the practice yard southwest of camp, and they were built to be hit. If you cannot find the yard, press M to open the map: every task you carry is marked on it, so you never need to wander. Walk up to an effigy and press Tab, or left-click it, to make it your target, then press 1, or click the first icon on the action bar along the bottom of your screen, to swing. Keep striking until three of them give out. Their blows barely sting; the things beyond this shore hit far harder. When the third one falls, walk back here to me and press F to hand the task in and take your reward: that is how every quest in the world ends.",
-        "completion": "Three down, and your grip already surer. Remember the feel of it, {playerName}: target, strike, and keep striking. The vale wolves are faster than straw, but they fall to the same arithmetic.",
+        "text": "Footwork first, now the arm, {playerName}. The practice yard sits up the path behind me, and its straw effigies were built to be hit. If you lose the way, press M to open the map: every task you carry is marked on it. Walk up to an effigy and press Tab, or left-click it, to make it your target, then press 1, or click the first icon on the action bar along the bottom of your screen, to swing. Keep striking until one gives out; it will not swing back, effigies never do. Drillmaster Rook watches the yard from its east edge: press F on him to hand the fell in.",
+        "completion": "One clean fell, and your grip already surer. Remember the feel of it, {playerName}: target, strike, and keep striking. Straw never minds. The next thing you swing at will.",
         "objectives": {
           "0": {
             "label": "Training Effigy felled"
           }
         }
       },
+      "q_ps_shell_and_claw": {
+        "title": "Shell and Claw",
+        "text": "Straw never minds, {playerName}, so here is something that does. Shore scuttlers pick over the wreck line on the far strand: follow the path west from my yard and it walks you straight to them. They pinch back, so watch your health bar and keep swinging: target one with Tab or a left-click, press 1, and do not stop until its shell cracks. Three will do. Then climb the path up the north rise: Tidewarden Nel keeps the strand tally, and she counts your shells.",
+        "completion": "Three shells cracked and all your fingers kept: a fair first fight, {playerName}. The scuttlers pinch off the wrecks faster than the tide brings salvage in, so every one you cull is coin someone keeps.",
+        "objectives": {
+          "0": {
+            "label": "Shore Scuttler culled"
+          }
+        }
+      },
       "q_ps_the_wreck_line": {
         "title": "The Wreck Line",
-        "text": "The tide pays this island in salvage: castaway crates off old wrecks, washed up on the far strand past the practice yard. Follow the path on from the effigies and it will walk you straight to the water. Opening a crate is simple, {playerName}. Walk right up to one until its name shows, then press F, or left-click the crate itself, and it will give up what it holds. Three of them will do. The scuttlers that pick over the wrack pinch harder than they look, so mind your step, and remember F is the same key for every chest, node and doorway you will ever meet.",
-        "completion": "Rope, tar, and half a wheel of cheese the sea somehow spared. The world is full of things worth stooping for, {playerName}. Keep the habit: walk close, press F, take what is yours.",
+        "text": "The tide pays this island in salvage, {playerName}: castaway crates off the old wrecks, carried up and dropped along the rise between me and Dawnrest Camp. Follow my path toward the camp and you will walk right past them. Opening one is simple: walk up to a crate until its name shows, then press F, or left-click the crate itself, and it will give up what it holds. Three of them will do, and remember F is the same key for every chest, node and doorway you will ever meet. Quartermaster Finch keeps the camp stall and buys every stick of salvage: hand the haul to her.",
+        "completion": "Rope, tar, and half a wheel of cheese the sea somehow spared: I will take the lot. And since you can clearly stoop and carry, {playerName}, hear the trade lesson too. Gathering starts with a tool, a pick, an axe, a sickle, a pole, all sold at the vale traders. Hold Shift and press P to open your professions book: that is your craft wheel, and it shows every craft you know. Attune to a neighbouring pair and those two become your uncapped majors, one across the wheel stays your hobby, and the rest sleep with their knowledge kept. Nothing is final: a craft master sets your pair and changes it whenever you ask, at the Eastbrook forge, kitchens, loom and toolworks, the Fenbridge tannery, or the Highwatch apothecary.",
         "objectives": {
           "0": {
             "label": "Castaway Crate opened"
           }
         }
       },
-      "q_ps_the_wheel_of_trades": {
-        "title": "The Wheel of Trades",
-        "text": "A blade feeds you once, {playerName}. A trade feeds you for life. Every adventurer works professions beside the sword: mining, logging, herb-picking, fishing, and the crafts that turn all of it into worth. Quartermaster Finch keeps the stall a few steps from my drill ground, and she has kept more of them than I have run drills. Walk up to her and press F, or left-click her, to talk: the same key that opens a crate opens a conversation.",
-        "completion": "So Maren finally sends me a student worth the breath. Listen once, {playerName}: gathering starts with a tool, a pick, an axe, a sickle, a pole, all sold at the vale traders. Hold Shift and press P to open your professions book: that is your wheel, and it shows every craft you know and how far each has come. Work the ones you like, and when you attune to a neighbouring pair those two become your uncapped majors, one craft across the wheel stays your hobby, and the rest sleep with their knowledge kept. Nothing is ever lost, and nothing is final: a craft master sets your pair, and a craft master will change it later whenever you ask. You will find them in Eastbrook, Forgemistress Darva at the forge, Cook Marlow in the inn kitchens, Weaver Ottilie at the loom and Tinker Gizzel in the toolworks, with Tanner Hesk at the Fenbridge tannery and Alchemist Verane at the Highwatch apothecary.",
-        "objectives": {
-          "0": {
-            "label": "Ask Quartermaster Finch about the trades"
-          }
-        }
-      },
       "q_ps_pouch_and_purse": {
         "title": "Pouch and Purse",
-        "text": "One more lesson before the vale, {playerName}, and it is the one that keeps adventurers alive: what you carry. Your backpack holds sixteen slots, and beside it wait four empty bag loops; every bag you buckle on adds its own space to the pool. So: press F on Quartermaster Finch to open her stall, left-click the Linen Pouch in her wares to buy it, then press B to open your bags and left-click the pouch there to buckle it into a free loop. Come back to me when it is on your belt.",
-        "completion": "A fine pouch, and six more slots to fill with trouble. Now the half of the lesson no bag can hold, {playerName}: what you cannot carry, the Gilded Strongbox keeps. Bursar Wick at the desk behind me opens the same vault every bursar in every town shares, and more vault space can be bought once your purse grows into it. Keep your valuables banked and your bags roomy. A full pack has ended more adventures than any wolf ever did.",
+        "text": "One more lesson before the vale, {playerName}, and it is the one that keeps adventurers alive: what you carry. Your backpack holds sixteen slots, and beside it wait four empty bag loops; every bag you buckle on adds its own space to the pool. So: press F on me again to open my stall, left-click the Linen Pouch in my wares to buy it, then press B to open your bags and left-click the pouch there to buckle it into a free loop. Instructor Maren drills by the muster fire a few steps east: show her the pouch on your belt.",
+        "completion": "A fine pouch, and six more slots to fill with trouble. Now the half of the lesson no bag can hold, {playerName}: what you cannot carry, the Gilded Strongbox keeps. Bursar Wick keeps his strongbox desk up the west path, and he opens the same vault every bursar in every town shares; more vault space can be bought once your purse grows into it. Keep your valuables banked and your bags roomy. A full pack has ended more adventures than any wolf ever did.",
         "objectives": {
           "0": {
             "label": "Linen Pouch bought"
@@ -16236,7 +16249,7 @@ export const id_ID: EnTranslations = {
       },
       "q_ps_set_sail": {
         "title": "Set Sail",
-        "text": "There is nothing left on this shore you have not already beaten, opened, or bought, {playerName}. You are ready, and Eastbrook has real work waiting. Walk down the road to the Old Pier, press F on Ferryman Odo, and tell him I said you have earned your crossing. Press L any time you lose track of what you owe whom: that is your quest log.",
+        "text": "There is nothing left on this shore you have not already run, beaten, opened, or bought, {playerName}. You are ready, and Eastbrook has real work waiting. Walk back down the shore road to the pier, press F on Ferryman Odo, and tell him I said you have earned your crossing. Press L any time you lose track of what you owe whom: that is your quest log.",
         "completion": "Maren said that, did she? High praise from a woman who once made me practice mooring knots for a week. Ring the bell standing beside my pier whenever you are ready, {playerName}, and the crossing will set you down in the middle of Eastbrook town. Mind the wolves.",
         "objectives": {
           "0": {

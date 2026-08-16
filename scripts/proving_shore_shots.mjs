@@ -101,13 +101,14 @@ const shot = async (name) => {
 const look = (from, at, opts = {}) =>
   stand(from.x, from.z, Math.atan2(at.x - from.x, at.z - from.z), opts.dist, opts.pitch);
 
-// The bootcamp card only shows while Warden Tam's run quest is active.
-await page.evaluate(() => window.__game.sim.acceptQuest('q_ps_the_gauntlet'));
-
 // The arrival view: what a newcomer actually sees the moment the ferry sets
-// them down (the teleport camera snap aims at Warden Tam's Gauntlet gate).
-await look({ x: -282, z: 6 }, { x: -283, z: -21 }, { dist: 8, pitch: 0.18 });
+// them down at the Gauntlet's mouth (the talk-to-Tam card is up, the quest
+// not yet accepted).
+await look({ x: -281, z: -18 }, { x: -283, z: -21 }, { dist: 8, pitch: 0.18 });
 await shot('arrival-view');
+
+// The rest of the pass runs the card's later lessons, so take the quest now.
+await page.evaluate(() => window.__game.sim.acceptQuest('q_ps_the_gauntlet'));
 
 // The Gauntlet's gate: Warden Tam, the entrance braziers, and lane 1
 // running west between its walls.
@@ -118,9 +119,14 @@ await shot('gauntlet-gate');
 await look({ x: -300, z: -16 }, { x: -308, z: -22 }, { dist: 9, pitch: 0.25 });
 await shot('gauntlet-elbow');
 
-// The finish: lane 3 running west to the red flag, braziers along the wall.
-await look({ x: -310, z: -32 }, { x: -328, z: -32 }, { dist: 9, pitch: 0.2 });
+// The finish: lane 3 running west to the red flag and Overseer Pell beyond.
+await look({ x: -322, z: -31.5 }, { x: -335, z: -33 }, { dist: 9, pitch: 0.2 });
 await shot('gauntlet-finish');
+
+// The relay's north leg: Tidewarden Nel on the rise, castaway crates dropped
+// along her path toward camp.
+await look({ x: -330, z: 15 }, { x: -338, z: 9.5 }, { dist: 10, pitch: 0.22 });
+await shot('relay-north');
 
 // The widened camp from its east gate: Maren at the junction, the stall row
 // on the north edge, tents by the muster fire, and the perimeter rail.

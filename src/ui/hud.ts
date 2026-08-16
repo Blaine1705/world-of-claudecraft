@@ -1352,6 +1352,10 @@ export class Hud {
   // attack handler then falls back to the fixed attack control.
   onMobileAttackNearest: (() => void) | null = null;
   onQuestDialogStateChange: ((open: boolean) => void) | null = null;
+  // First-ever landing on the tutorial island (the sim's per-character
+  // firstVisit): main.ts wires the arrival camera cinematic here
+  // (game/arrival_cinematic.ts). The HUD owns the event arm, not the camera.
+  onIslandFirstArrival: (() => void) | null = null;
   // The healer button lives in the non-blocking ghost overlay, but successful
   // resurrection must still flow through main.ts so authoritative outcomes can
   // stop autorun without making Hud own Input or MobileControls.
@@ -12200,7 +12204,10 @@ export class Hud {
           // up the road to Maren. Gated by the SIM's per-character firstVisit
           // (interactions/ferry_bell.ts), not a per-device flag, so every new
           // character is taught even on a browser that has seen it before.
-          if (ev.firstVisit) this.openTutorialGreetingNote(buildFerryIslandArrivalNote());
+          if (ev.firstVisit) {
+            this.openTutorialGreetingNote(buildFerryIslandArrivalNote());
+            this.onIslandFirstArrival?.();
+          }
           break;
         case 'profTrendNudge':
         case 'profTierTutorial':

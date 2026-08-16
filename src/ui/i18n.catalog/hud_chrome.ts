@@ -635,49 +635,52 @@ export const hudChromeStrings = {
     nextTipMap: 'Check the World Map ({key}) to see where quests are waiting.',
     nextTipSocial: 'Open Social ({key}) to find a group for tougher fights.',
   },
-  // The Proving Shore movement bootcamp (src/ui/bootcamp.ts): the coachmark a
-  // fresh arrival sees on the tutorial island, walking them through Warden
-  // Tam's Gauntlet in its running order: forward down lane 1, swing the
-  // camera, strafe left down lane 2, swing the camera again, forward to the
-  // red flag. Three copy arms per step: keyboard/mouse (default), touch, and
-  // gamepad, chosen by the live input-hint mode (src/game/input_hint_mode.ts).
-  // WORDY by M16, so the five non-Latin overlays carry real fills.
+  // The Proving Shore movement bootcamp (src/ui/bootcamp.ts): the coachmark
+  // that meets a fresh arrival at the Gauntlet and walks them through it in
+  // running order: talk to Warden Tam, hold forward down lane 1, turn with
+  // the turn key and walk the south lane, swing the view with the mouse and
+  // strafe the last lane, then hand the run to Overseer Pell. Three copy
+  // arms per step: keyboard/mouse (default), touch, and gamepad, chosen by
+  // the live input-hint mode (src/game/input_hint_mode.ts). WORDY by M16, so
+  // the five non-Latin overlays carry real fills.
   bootcamp: {
     title: 'First Steps',
+    talkTitle: 'Speak to Warden Tam',
+    talkBody:
+      'Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then press {interactKey}, or left-click him, to talk: he will set you the run.',
+    talkBodyTouch:
+      'Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then tap him, or tap the Use button, to talk: he will set you the run.',
+    talkBodyPad:
+      'Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then press your interact button to talk: he will set you the run.',
     forwardTitle: 'Walk the first lane',
     forwardBody:
-      'Step through the Gauntlet gate ahead and hold {forwardKey} to walk the first lane west to its flag.',
+      'Step into the lane beside Tam and hold {forwardKey} to walk it west to its flag.',
     forwardBodyTouch:
-      'Step through the Gauntlet gate ahead and push the movement stick up to walk the first lane west to its flag.',
+      'Step into the lane beside Tam and push the movement stick up to walk it west to its flag.',
     forwardBodyPad:
-      'Step through the Gauntlet gate ahead and push the left stick up to walk the first lane west to its flag.',
-    cameraTitle: 'Swing your view',
-    cameraBody:
-      'Flag one down. Now hold the right mouse button and drag to swing your view: look down the walled lane heading south, then settle back the way you were facing.',
-    cameraBodyTouch:
-      'Flag one down. Now drag a finger across the world (not the movement stick) to swing your view: look down the walled lane heading south.',
-    cameraBodyPad:
-      'Flag one down. Now push the right stick to swing your view: look down the walled lane heading south.',
-    leftTitle: 'Slip left',
-    leftBody:
-      'Keep facing where you are and hold {strafeKey} to sidestep left down the south lane to its flag. Sidestepping keeps your eyes on a target while you move: you will fight this way one day.',
-    leftBodyTouch: 'Push the movement stick left to slip sideways down the south lane to its flag.',
-    leftBodyPad: 'Push the left stick left to slip sideways down the south lane to its flag.',
-    camera2Title: 'Look again',
-    camera2Body:
-      'Second flag down. Swing your view once more with the right mouse button held, and line yourself up with the last lane running west.',
-    camera2BodyTouch:
-      'Second flag down. Drag across the world once more and line yourself up with the last lane running west.',
-    camera2BodyPad:
-      'Second flag down. Push the right stick once more and line yourself up with the last lane running west.',
-    forward2Title: 'Run it home',
-    forward2Body: 'Hold {forwardKey} again and run the last lane to the red flag.',
-    forward2BodyTouch: 'Push the movement stick up again and run the last lane to the red flag.',
-    forward2BodyPad: 'Push the left stick up again and run the last lane to the red flag.',
+      'Step into the lane beside Tam and push the left stick up to walk it west to its flag.',
+    turnwalkTitle: 'Turn, then walk',
+    turnwalkBody:
+      'Flag one down. Hold {turnKey} to rotate on the spot until you face down the walled lane heading south, then hold {forwardKey} again and walk it to the second flag.',
+    turnwalkBodyTouch:
+      'Flag one down. Drag a finger across the world (not the movement stick) to turn until you face down the walled lane heading south, then push the stick up and walk it to the second flag.',
+    turnwalkBodyPad:
+      'Flag one down. Push the right stick to turn until you face down the walled lane heading south, then push the left stick up and walk it to the second flag.',
+    strafeTitle: 'Sidestep the last lane',
+    strafeBody:
+      'There is another way to move sideways. Hold the right mouse button and drag to swing your view around until you face north, back up the lane you came down, then hold {strafeKey} to sidestep along the last lane to the red flag. Sidestepping keeps your eyes on a target while you move: you will fight this way one day.',
+    strafeBodyTouch:
+      'There is another way to move sideways. Drag a finger to swing your view around until you face north, then push the movement stick left to slip sideways along the last lane to the red flag.',
+    strafeBodyPad:
+      'There is another way to move sideways. Push the right stick to swing your view around until you face north, then push the left stick left to slip sideways along the last lane to the red flag.',
     courseProgress: 'Flag {current} of {total}',
     doneTitle: 'Run complete',
     doneBody:
-      'That is everything your legs need to know. Walk back to Warden Tam at the gate and hand your run in: he has a word for you, and your first coin.',
+      'That is everything your legs need to know. Overseer Pell stands beside the red flag: press {interactKey} on him, or left-click him, to hand your run in and take your first reward.',
+    doneBodyTouch:
+      'That is everything your legs need to know. Overseer Pell stands beside the red flag: tap him to hand your run in and take your first reward.',
+    doneBodyPad:
+      'That is everything your legs need to know. Overseer Pell stands beside the red flag: press your interact button on him to hand your run in and take your first reward.',
   },
   // Minimap / compass / clock / coordinate widget tooltips and accessible names.
   widgets: {

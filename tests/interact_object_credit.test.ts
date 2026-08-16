@@ -13,6 +13,7 @@
 // and recorded on the persisted QuestProgress.
 
 import { describe, expect, it } from 'vitest';
+import { BOOTCAMP_COURSE_CHECKPOINTS } from '../src/sim/content/proving_shore';
 import { DUNGEONS, GROUND_OBJECTS, QUESTS } from '../src/sim/data';
 import {
   hasInteractObjectCredit,
@@ -176,22 +177,36 @@ describe('every multi-count interact objective has enough distinct objects to fi
     ),
   );
 
-  it('covers the 21 multi-count objectives the exploit applied to', () => {
+  it('covers the 23 multi-count objectives the exploit applied to', () => {
     // 20 at the ledger's introduction, plus the quest-dedupe murloc-hut burn
     // (q_deepfen_purge, count 5 over 5 authored huts). The huts route to the
     // firebottle handler before the generic interact path, so their re-credit
     // pacing is the timed burnedObjects cooldown, not this ledger; the
     // distinct-objects floor above still holds for them. Plus the tutorial
-    // island's castaway crates (q_ps_the_wreck_line, count 3 over 3 spots).
-    expect(interactObjectives.filter((o) => o.count > 1).length).toBe(22);
+    // island's castaway crates (q_ps_the_wreck_line, count 3 over 3 spots)
+    // and the Gauntlet's flag sentinel (q_ps_the_gauntlet, count 3, credited
+    // by ORDERED POSITION in tutorial/gauntlet_run.ts, never by this
+    // ledger's object path: its count doubles as the next-flag index, so a
+    // flag can only ever credit once and only in sequence).
+    expect(interactObjectives.filter((o) => o.count > 1).length).toBe(23);
   });
 
-  it.each(interactObjectives.filter((o) => o.count > 1))(
-    '$questId can reach $count on distinct $itemId objects',
-    ({ itemId, count }) => {
-      expect(placedByItem.get(itemId) ?? 0).toBeGreaterThanOrEqual(count);
-    },
-  );
+  it.each(
+    interactObjectives.filter((o) => o.count > 1 && o.itemId !== 'ps_gauntlet_flag'),
+  )('$questId can reach $count on distinct $itemId objects', ({ itemId, count }) => {
+    expect(placedByItem.get(itemId) ?? 0).toBeGreaterThanOrEqual(count);
+  });
+
+  it('the Gauntlet flag sentinel can reach its count on distinct authored checkpoints', () => {
+    // No ground objects exist for ps_gauntlet_flag: the run's "objects" are
+    // the authored checkpoint flags, credited sequentially by position.
+    const objective = QUESTS.q_ps_the_gauntlet?.objectives.find(
+      (o) => o.type === 'interact' && o.targetObjectItemId === 'ps_gauntlet_flag',
+    );
+    expect(objective?.count).toBe(BOOTCAMP_COURSE_CHECKPOINTS.length);
+    const distinct = new Set(BOOTCAMP_COURSE_CHECKPOINTS.map((c) => `${c.x},${c.z}`));
+    expect(distinct.size).toBe(BOOTCAMP_COURSE_CHECKPOINTS.length);
+  });
 
   it('places every one of them at a DISTINCT authored spot', () => {
     // Two objects authored at the same spot would share a ledger key and only
@@ -223,16 +238,18 @@ describe('every multi-count interact objective has enough distinct objects to fi
     }
   });
 
-  it('places every interact target in the world table, bar the riding-lesson sentinel', () => {
-    // train_valorsteed is a sentinel targetObjectItemId with no object at all
-    // (mounts_training.ts credits it off the trainer NPC), so it never reaches
-    // the ledger. Anything ELSE missing from the world table would mean an
-    // objective whose object spawns somewhere this reasoning has not checked.
+  it('places every interact target in the world table, bar the two sentinels', () => {
+    // train_valorsteed (mounts_training.ts credits it off the trainer NPC)
+    // and ps_gauntlet_flag (tutorial/gauntlet_run.ts credits it by ordered
+    // position against the authored checkpoints) are sentinels with no
+    // object at all, so they never reach the ledger. Anything ELSE missing
+    // from the world table would mean an objective whose object spawns
+    // somewhere this reasoning has not checked.
     const worldItemIds = new Set(GROUND_OBJECTS.map((d) => d.itemId));
     const unplaced = [...new Set(interactObjectives.map((o) => o.itemId))].filter(
       (id) => !worldItemIds.has(id),
     );
-    expect(unplaced).toEqual(['train_valorsteed']);
+    expect(unplaced.sort()).toEqual(['ps_gauntlet_flag', 'train_valorsteed']);
   });
 });
 
