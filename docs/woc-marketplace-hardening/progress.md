@@ -24,7 +24,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 09 | bond-releaser | service | DONE | aa44873 | SERVICE repo (origin/master already contained at df09756); B3 + the bond double-pay medium + the bond-cents ownership mediums closed; R2 forfeit split landed (one code path with the settlement schedule); the two R5 items this repo owns RULED by Fernando at session start and implemented (SOL fees: preflight + overview monitor + manual funding, knob WOC_MARKET_ESCROW_MIN_SOL_LAMPORTS; ATA rent on refund: escrow pays, inside the preflight); FIVE red-first proofs (ownership behaviors, both double-pay classes, all-or-nothing boot, the late-confirm stomp, the terminal-adoption abandonment); two fresh coverage lenses (security 18 findings incl. 1 blocking, correctness 14 incl. 2 blocking) plus a fresh re-review of the fix rounds (1 blocking + 5 should-fix + 5 nits), every finding applied or judged with the file open; 9 commits, tip 3346878; suite 445 to 493 tests, 488 pass + 5 env-gated skips default tier, 493/493 with CLAUDIUM_TEST_DATABASE_URL (zero skips); LOCAL, not pushed per R4 |
 | 09 QA | phase-09-qa | service | DONE | 3346878 | PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open (section below); SERVICE repo (origin/master already contained at df09756); nine lanes (six read-only audits, two red-proof, one mutation): 0 blocking in the implement range, all six red-first registry claims REPRODUCED-RED, all seven mutation arms BIT by name (claim CAS, guarded update, finalize signature key in BOTH stores, age bound; 493-test full runs each); the round's own fixes: entry adoption of a ledger-proven payment on an already-expired or superseded quote (the registered pre-existing edge, the crash-matrix lane's fix-now case accepted), typed signature_already_settled on the settled-signature collision BOTH stores (the partial-unique-index 23505 trap, previously an unhandled 500), the undecided late-visibility window, the rejected-write vocabulary fix, the rpc probe-list pin, the actor clamp, fifteen test-decisiveness hardenings, doc truth-ups; two fresh re-review lenses over the fix round, everything applied or judged, round-2 mutation-proven (4 mutants BIT); suite 493 to 508 (502 + 6 env-gated skips default; 508/508 zero skips with CLAUDIUM_TEST_DATABASE_URL); 5 commits, tip 02713f2, PUSHED per R4 (service aa44873..02713f2 updates PR #31; game after the v0.38.0 re-sync merge abd4a9e0e2, trivial: one generated-i18n conflict, regenerated) |
 | 10 | chain-verifier | service | DONE | 02713f2 | SERVICE repo (origin/master already contained at df09756); B4 closed with red-first proofs (three redirect shapes reproduced MATCHED on the old verifier); the two R5 items this file owns RULED by Fernando at session start and implemented (commitment split ratified as code-owned MATCH_COMMITMENT/CREDIT_COMMITMENT; five hour confirming bound MAX_CONFIRMING_AGE_MS, both stores, new pg partial index, one minute sweep driver in buildMarketApps, previously NOTHING drove expiry in production); undecided confirm answers split (not_yet_visible vs awaiting_finality, the anti-snipe service half); two fresh lenses + a fresh re-review of the fix round, every finding applied or judged (the re-review REFUTED the round's multisig-impossibility claim with the parser's count-based labeling, arm restored money-safe); 15 mutants BIT + 1 judged environment survivor (pg ORDER BY delete coincides with partial-index order; the DESC variant bites); suite 508 to 536 (530 + 6 env-gated skips default; 536/536 zero skips with CLAUDIUM_TEST_DATABASE_URL); 6 commits, tip ba7df0b, LOCAL not pushed per R4 |
-| 10 QA | phase-10-qa | service | NOT STARTED | | both SESSION START syncs already done 2026-08-15 by a sync-only session (section below): service origin/master no-op at df09756, baseline 536/530/6 and 536/536 pg re-verified; game re-synced to origin/release/v0.39.0 (merge f5df042a86, NON-trivial) + extraction bf7aeb8a98 + audit fixes e362916958, gate GREEN, LOCAL not pushed |
+| 10 QA | phase-10-qa | service | DONE | ba7df0b | PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open (section below); SERVICE repo (origin/master still df09756, contained; syncs pre-done by the sync-only session, re-fetched at the end: nothing new); seven audit lanes (56-shape hostile hunt with ZERO accepted_dishonest and the real wallet shape verified; security; correctness; coverage; docs; red-proof: all six registry claims REPRODUCED-RED on the 02713f2 build; mutation: 27 of 31 bit, the 4 survivors real pin gaps, all closed); the refuter stage hit the session limit after 15 of 68, every finding judged in the main loop with the file open and primary sources (agave parse_token.rs / parse_instruction.rs, spl-token processor.rs: the multisig restoration CORRECT, agave labels both token programs spl-token); the round's own fixes: the signature SHAPE screen before the first write (SEC-2, a junk string minted the game's service_unavailable exemption via the RPC's -32602 500), the payer-leg netting with owesOthers plus the escrow-bidder refusal (the fix-round re-review caught the bond self-leg vacuity), burn_authority_mismatch, the stray-owner log (once per memo, clamped), the sweep failure/recovery warn with in-flight guard, expirePastDue non-positive budget, attention.confirmingExpired24h on its own read, doc truth-ups (bound measured from expiry, ordering a two-knob precondition, the RPC-horizon premise re-anchored, vocabulary table, recovery caveat, deploy note); pins closed incl. the pg EvalPlanQual race rig on BOTH sweep arms; 21 + 11 mutants BIT over the committed rounds; suite 536 to 560 (553 + 7 env-gated skips default; 560/560 zero skips with CLAUDIUM_TEST_DATABASE_URL); 5 commits, tip 8da6c03, PUSHED per R4 (service ba7df0b..8da6c03 updates PR #31; game after the release check: 0 behind origin/release/v0.39.0, origin/main moved to the v0.38.2 hotfix tip which the next game session's sync picks up through v0.39.0) |
 | 11 | oracle-health | service | NOT STARTED | | |
 | 11 QA | phase-11-qa | service | NOT STARTED | | |
 | 12 | wire-completeness | game | NOT STARTED | | |
@@ -145,6 +145,206 @@ skips; e362916958 is a two-test-file prose change re-run green (20 tests).
 Copy floor clean over every new line; no "phase" word in any commit
 message. Tip after this session's docs commit: see git log; LOCAL, not
 pushed.
+
+## 10 QA round (verdict PASS-WITH-FOLLOWUPS, every finding applied or judged)
+
+Service repo, worktree woc-rewards-service-pr31; session start ba7df0b (clean,
+origin/master still df09756 and already contained; the SESSION START syncs
+were already done by the 2026-08-15 sync-only session and a re-fetch at the
+end of this session found nothing new on origin/master or origin/release/v0.39.0),
+audit range 02713f2..ba7df0b, tip 8da6c03, 5 commits, PUSHED per R4
+(service ba7df0b..8da6c03 to feature/woc-market-settlement, updates PR #31;
+game after the release check below).
+
+Seven audit lanes ran concurrently in one workflow, each in its own scratch
+worktree where it needed a build (the live trees were never modified): a
+hostile-fixture inventor (56 shapes RUN through the real verifier), security,
+correctness, test-coverage, docs/dead-code/copy-floor, a red-proof lane on a
+throwaway 02713f2 build, and a mutation battery on a scratch ba7df0b build.
+The refuter stage (one adversarial refuter per finding, 68) ran into the
+session's subagent limit after 15 completed; per the standing rule every
+finding was judged in the main loop with the file open (the audit lanes'
+evidence plus primary sources), the fix round was built and committed, and
+the fresh fix-round re-review ran after the reset (two lenses).
+
+THE ROUND'S HIGHEST-STAKES JUDGMENT, made with the parser and the token
+program open (agave transaction-status/src/parse_token.rs and
+solana-program/token processor.rs, fetched this session): ba7df0b's
+restoration of the multisigAuthority-equals-payer acceptance arm is CORRECT
+and money-safe. parse_signers picks 'authority' vs 'multisigAuthority'
+purely by accounts.len() > 3 with no multisig-existence check; the token
+program's validate_owner non-multisig branch ignores the trailing signers
+slice and only requires the authority to be a signer; process_burn passes
+the trailing accounts as that slice; a fee payer must be system-owned so a
+real multisig can never be keys[0]. Refusing the label would have
+terminally rejected honestly-paid burns from any wallet that pads the
+account list. Also verified from parse_instruction.rs: agave labels BOTH
+token programs 'spl-token' (one ParsableProgram variant, kebab-cased), so
+the 'spl-token-2022' label is a defensive alias the reference parser never
+emits; the comment and test were trued and the 21 handoff narrowed.
+
+Round-1 verdicts on the implement range: ZERO blocking, ZERO
+accepted_dishonest shapes across the 56-fixture hunt (every redirect,
+short, over, split, delegate, PDA and forged-label burn, owner change,
+victim-account delegate payment, batched settlement, third-party gift,
+over-credit, mintTo offset and parked-fee shape refused; the real
+wallet-emitted transaction shape verified matched, with Lighthouse,
+durable-nonce, Jito-tip, ATA-exists and payer-ATA-closed variants). All six
+red-first registry claims REPRODUCED-RED on the 02713f2 build (compile
+shims for MATCH_COMMITMENT / CREDIT_COMMITMENT and a no-op stopExpirySweep
+only; a new-src overlay on the same tree turned every red green, so each is
+a behavior red). Mutation: 27 of 31 mutants BIT; the four survivors were
+real pin gaps (the pg sweep's outer status guards on BOTH arms, the
+confirming arm's ORDER BY, and the pre-existing payer_mismatch check whose
+only test was refused by a downstream check instead), all closed below.
+
+The QA round's own findings, all applied (with the judged exceptions
+listed): the SHOULD-FIX class had one money/security item and one
+fail-closed item. (1) SEC-2: a string that can never be a signature (not
+base58, or the wrong byte length such as a wallet address) passed confirm's
+32..120 bound and the game's regex, reached getParsedTransaction, the node
+answered -32602, web3.js threw, confirm 500ed on every poll, and the game
+read the 500 as service_unavailable, the verdict it exempts from its
+buy-now abandon ledger and anti-snipe extension on the premise that a real
+outage is not mintable on demand; the junk also held the signature slot
+for the confirming bound and blocked the real signature with
+signature_conflict. Closed by a chain-owned shape predicate
+(MarketChainVerifier.isPlausibleSignature; live: base58 to exactly 64
+bytes in the new dependency-free src/market/signature_shape.ts, fuzzed
+against bs58 out of band and pinned on reference-encoded vectors; dev: any
+tag) screened BEFORE the first write on both confirm entries, answering
+invalid_signature without a write or ledger read (the real signature still
+confirms after junk). (2) I15 (fixture hunt): a leg whose destination is
+the payer could never verify (the leg check compared the payer's NET delta;
+the debit check's netting branch was dead), reachable when the treasury
+wallet buys a listing; the leg check now skips the payer's own leg and the
+netting branch is live and pinned. Also applied: burn_authority_mismatch
+(a burn of the quoted mint under an authority the quote never named, a
+vault or router PDA or a delegate, is still refused but named, so the ops
+rail can tell it from a redirected fee; burnedBaseFor takes a null
+authority for that one distinction), the stray wallet named in the
+operator log on unexpected_credit, add() skipping non-string owners, the
+edge-triggered sweep-failure warn (the sweep is the only production driver
+of expiry and swallowed every failure silently), expirePastDue answering 0
+for a non-positive budget in both stores (pg refused a negative LIMIT
+outright), attention.confirmingExpired24h in the admin overview (the one
+expired class an operator should look at; state.md called it ops-visible,
+it was visible only by listing expired rows), and the doc truth-ups: the
+bound is measured from quote EXPIRY and the five-under-six ordering is a
+precondition on two knobs (WOC_MARKET_QUOTE_TTL_MS unclamped, keep it well
+under one hour; the game's WOC_MARKET_CONFIRMING_REVIEW_HOURS at or above
+six), the RPC-history premise now cites release_protocol's own six hour
+depth instead of contradicting it, the anti-snipe overclaim reworded to
+the game's follow-up, the wiring doc's verifier paragraph lists every
+check in order with its reason and scopes the whitelist to the quoted
+mint, MARKET_SETTLEMENT.md gains the confirm vocabulary in one place, the
+recovery caveat once the game has acted on a terminal answer (out-of-band
+re-confirm of the preserved signature), the treasury-rotation and TTL
+knob notes, the first-sweep backlog deploy note, and the four omitted
+suites in the tests list; CLAUDE.md and .env.example carry the two facts.
+
+Test pins added (each mutation-proven by name, 21 mutants BIT over the
+committed fix round): the real wallet-emitted shape (compute budget
+riders, idempotent ATA creation with inner instructions, checked legs,
+burn, memo last; guard rider; ATA exists; unfinal), a leg credited above
+the quote (payer-funded, donor-funded, treasury), two settlements batched
+(shared treasury, distinct treasuries, sale plus no-burn bond, from every
+quote's side), exact base-unit comparison above 2^53 and the uiAmount
+decoy, a delegate burn and a delegate-funded leg, an owner reassignment
+mid-transaction, the fee payer check on its own (payer_mismatch), the
+treasury buying a listing, the authority-mismatch word vs burn_missing,
+the stray-wallet log, the recovery warn once, the shape predicate at the
+verifier and the shape module's vectors; the service pins the reserved
+matched-arm word on both entries, the rejected reason landing on the row
+for every B4 word, the shape screen (no write, no verify call, real
+signature confirms after junk, entry path answers the terminal), and
+every entry arm of a confirming-expired quote (different signature,
+unseen, matched-unfinal with no window, adoption clearing the stale
+reason); the pg suite races BOTH sweep arms for real (lock wait observed
+before commit, zero swept), pins the confirming arm's order and the shared
+budget remainder, both partial indexes in the catalog, and the
+non-positive budget; the memory store gets the order and budget twins
+ungated and the preserved-signature pin; bootstrap proves a rejecting
+sweep is swallowed, keeps its cadence, never becomes an unhandled
+rejection, and warns once per outage; http pins the verifier reason on
+the quote listing and the confirming-expired counter.
+
+JUDGED, no code change (do not re-raise): the balance-row BigInt throw on
+a malformed amount (never emitted by agave) stays a THROW, deliberately
+the opposite of the burn side's parse-to-zero: a coerced balance would
+reject a real payment terminally while a throw is a retryable 500 that
+leaves the row confirming, now documented at the site and handed to 22's
+RPC-defect policy item together with the malformed-envelope throw (I24)
+and the lenient-vs-canonical amount asymmetry; a fee-sponsored (relayer)
+transaction is terminally payer_mismatch by design (the builder sets the
+buyer as fee payer and browser wallets do not rewrite it; a real-wallet
+observation for 21); the null-owner add() skip cannot be pinned (the
+outcome is identical either way, it removes a sentinel collision);
+Q5e (two memos, one payment, two identical quotes) is the 09 settled-
+signature index's case, not the verifier's; the docs lane's D21 (a
+pre-existing PRD sentence about expired quotes) predates the range and is
+game-side; the SEC-6 refutation was accepted (the game's anti-snipe gate
+is the registered 12 handoff), the EPQ-comment refutation was accepted in
+substance (EvalPlanQual re-checks the LAST committed version, so a two-hop
+move is a legitimate re-check target; the comment now names each arm's
+reachable moves instead of calling one unreachable). SEC-11 (expectedLegs
+resolves the treasury from the CURRENT config, so rotating the treasury
+wallet with quotes in flight rejects real payments) is pre-existing and
+out of range: documented in the knob table and deferred to 22's runbook.
+
+THE FRESH RE-REVIEW OF THE FIX ROUND (two lenses over ba7df0b..33c268c,
+after the reset) found one real weakening IN the fix round and both lenses
+found it independently: the payer-leg netting let a BOND quote whose payer
+is the escrow wallet (its only leg a self-transfer, no burn) verify against
+a transaction that moves nothing (executed on the 33c268c build; the
+ba7df0b build refused it leg_mismatch). Unreachable today (the memo would
+have to ride an escrow-signed transaction and the escrow be registered as a
+bidder through the game's verifiedWallet seam), but a break of the
+verify-the-outcome property, so it got two belts in 2c2ae78: bondQuote
+refuses the escrow as a bidder (self_dealing) and the verifier skips a
+payer-destination leg only while another leg or the burn keeps the debit
+equation binding (owesOthers), refusing the all-self-legs shape as
+leg_mismatch. Also applied from the re-review: the stray-credit warn once
+per memo (bounded set) with the RPC-supplied owner clamped to printable
+ASCII (log-forging / flooding), a trailing catch and an in-flight guard on
+the sweep chain (a throwing handler must not become an unhandled
+rejection; a slow store must not stack sweeps or flap the edge), the
+null-authority burn pass counting only ATTRIBUTED burns (an unattributed
+body stays burn_missing), the ops counter reading its own class through a
+new terminalReason list filter in both stores (the general list caps at
+200 rows and would crowd the class out; pinned by 250 newer unpaid
+expiries), softened overclaims (a well-shaped signature can still meet a
+real RPC failure; the game keeps its own first-claim signature slot), the
+owner-less balance row pinned as the judged policy, bad_body in the
+vocabulary table, the memory store's redundant budget guard removed, the
+superseded status comment, an honest stop-hook test title, and a plain
+boolean where a type predicate narrowed nothing. Every re-review-round pin
+mutation-proven (11 mutants BIT: owesOthers forced true, the escrow-bidder
+guard dropped, the attributed-authority requirement dropped, warn every
+poll, no clamp, no trailing catch, no in-flight guard, the pg and memory
+reason filters ignored, the null owner keyed, the counter derived from the
+crowded list). The re-review round itself was self-reviewed with the diff
+open (each change reviewer-prescribed and small). Judged from the
+re-review, no change: SEC-2's anti-snipe half is the registered 12 handoff
+(a well-shaped random signature still answers not_yet_visible pending, and
+the game keys on the pending flag until it gates on awaiting_finality);
+the observation that a zero amountBase would empty every leg and make the
+debit equation vacuous is pre-existing and quote-time (bond clamps to at
+least bondMinCents; a settlement's usdCents is validated positive), noted
+for 22's close-out audit rather than changed here.
+
+Validation after every slice; final at 8da6c03: build clean, 560
+tests, 553 pass + 7 env-gated skips default tier (the seventh is the
+new pg contention test), 560/560 zero skips with
+CLAUDIUM_TEST_DATABASE_URL. Copy floor clean over every added line and
+commit message (one banned word caught and fixed before commit).
+Both remotes re-fetched at the end: service origin/master still df09756
+(contained); game 0 behind origin/release/v0.39.0; origin/main moved to
+the v0.38.2 hotfix tip (a patch line off the shipped 0.38, not the newest
+release line, not contained in the branch; it flows to v0.39.0 through the
+maintainers' main sync, so the next game session's release sync will pick
+it up; nothing to merge here). PR #31 checks at 8da6c03: all three test runs
+GREEN (17 s, 54 s, 56 s), verified after the push.
 
 ## 10 implement round (chain verifier proves the burn)
 

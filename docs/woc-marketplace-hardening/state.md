@@ -5,13 +5,46 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-10-qa.md`
+- Next file to run: `docs/woc-marketplace-hardening/phase-11-oracle-health.md`
   (SERVICE repo, worktree `/Users/fernando/Documents/woc-rewards-service-pr31`,
-  fresh session, own origin/master sync first; audit range 02713f2..ba7df0b,
-  LOCAL not pushed per R4, QA pushes on PASS). Its SESSION START syncs are
-  ALREADY DONE by the 2026-08-15 sync-only session below (both repos current,
-  gates green); a fresh run will find nothing to merge and can go straight to
-  the audit.
+  fresh session, own origin/master sync first; its session start proposes
+  R3, the oracle venue posture, still OPEN in Rulings below). Game-side note
+  for the next GAME session's sync: origin/main moved to the v0.38.2 hotfix
+  tip (1fd1f2e247), a patch line off the shipped 0.38 that release/v0.39.0
+  has not absorbed yet; the newest release line is still v0.39.0 (0 behind
+  at this session's end), and the hotfix flows in through the maintainers'
+  main sync.
+- 10 QA COMPLETE (PASS-WITH-FOLLOWUPS, every finding applied or judged with
+  the file open, PUSHED per R4: service ba7df0b..8da6c03 to
+  feature/woc-market-settlement updating PR #31; game pushed at the end of
+  the session, 0 behind origin/release/v0.39.0). Seven audit lanes in one
+  workflow (hostile-fixture hunt: 56 shapes RUN through the real verifier,
+  ZERO accepted_dishonest, the real wallet shape verified matched; security;
+  correctness; coverage; docs; red-proof: all six registry claims
+  REPRODUCED-RED on the 02713f2 build; mutation: 27 of 31 BIT, four real
+  pin gaps closed); the refuter stage died on the session limit after 15,
+  every finding judged in the main loop with the file open and primary
+  sources. THE MULTISIG CALL: ba7df0b's restoration judged CORRECT with
+  agave parse_token.rs (count-based labeling) and spl-token processor.rs
+  (single-signer branch ignores trailing accounts) open; agave labels BOTH
+  token programs 'spl-token' (parse_instruction.rs). The round's fixes:
+  the chain-owned signature SHAPE screen before the first write (a junk
+  string used to 500 through the RPC's -32602 and read to the game as
+  service_unavailable, the abandon-ledger / anti-snipe exemption verdict),
+  the payer-leg netting (treasury as buyer) gated on owesOthers plus the
+  escrow-bidder refusal (the fix-round re-review caught the bond self-leg
+  vacuity my first cut introduced), burn_authority_mismatch, the stray
+  wallet named in the log (once per memo, clamped), the sweep
+  failing/recovered warn with in-flight guard, non-positive budgets,
+  attention.confirmingExpired24h on its own terminalReason read, and the
+  doc truth-ups (bound measured from EXPIRY, five-under-six a two-knob
+  precondition, the RPC-horizon premise re-anchored on
+  MAX_REPLACEABLE_AGE_MS, vocabulary table, recovery caveat, deploy note).
+  Pins closed incl. the pg EvalPlanQual race rig on BOTH sweep arms;
+  21 + 11 mutants BIT over the committed rounds. Suite 536 to 560 (553 + 7
+  env-gated skips default; 560/560 zero skips with
+  CLAUDIUM_TEST_DATABASE_URL). The 10 ledger entry below is AMENDED IN
+  PLACE with a 10 QA ROUND bullet, the registry phase 11 consumes.
 - 2026-08-15 SYNC-ONLY session ahead of 10 QA (Fernando asked to stop after
   the merges): SERVICE origin/master still at df09756, already contained
   (no-op); baseline at ba7df0b re-verified (build clean; 536 tests, 530 pass,
@@ -587,6 +620,110 @@ Still open (a phase that hits one asks at session start):
     terminal-entry undecided answered awaiting_finality). The sweep
     driver's red form is structural: expireStaleQuotes had no src caller
     at 02713f2 (grep evidence), and stopExpirySweep fails tsc there.
+  - 10 QA ROUND (2026-08-15, PASS-WITH-FOLLOWUPS, every finding applied or
+    judged with the file open, 5 commits ba7df0b..8da6c03, PUSHED per R4;
+    suite 536 to 560, 553 + 7 env-gated skips default,
+    560/560 zero skips with CLAUDIUM_TEST_DATABASE_URL). The
+    registry phase 11 consumes:
+    - THE MULTISIG CALL, judged with the parser and the token program open
+      (agave parse_token.rs parse_signers: 'multisigAuthority' iff
+      accounts.len() > 3, no multisig-existence check; spl-token
+      validate_owner's non-multisig branch ignores the trailing slice;
+      process_burn passes it; a fee payer must be system-owned so a real
+      multisig can never be keys[0]): ba7df0b's restoration is CORRECT and
+      money-safe; refusing the label terminally rejects honestly-paid burns.
+      Also from parse_instruction.rs: agave labels BOTH token programs
+      'spl-token', so 'spl-token-2022' is a defensive alias it never emits
+      (comment and test trued; the 21 label check narrows to "confirm the
+      alias is inert on the chosen RPC").
+    - FIXES at symbol level: MarketChainVerifier.isPlausibleSignature (new
+      interface member; live = isSolanaSignatureShape from the new
+      service/src/market/signature_shape.ts, base58 to exactly 64 bytes,
+      dependency-free; dev = true), screened by
+      MarketSettlementService.plausibleSignature BEFORE the first write on
+      the live confirm path and at confirmTerminalEntry (invalid_signature /
+      the stable terminal, no write, no verify call): a junk string used to
+      500 through getParsedTransaction's -32602 and read to the game as
+      service_unavailable, the abandon-ledger and anti-snipe exemption
+      verdict (SEC-2, cross-repo griefing rail closed on the service side;
+      the game's WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS premise now holds).
+      solana_chain.ts verify: the leg loop skips owner === payer (a
+      self-transfer nets to nothing; the debit check's netting branch, dead
+      until now, pins it; reachable when the treasury wallet buys),
+      burnedBaseFor(instrs, mint, null) counts any-authority burns so a
+      foreign-authority burn answers the NEW reason burn_authority_mismatch
+      (refusal unchanged, only named), console.warn names the stray wallet
+      on unexpected_credit, add() skips non-string owners. quotes.ts /
+      store_pg.ts expirePastDue return 0 for limit <= 0. bootstrap.ts
+      sweep: edge-triggered failing/recovered warn. admin.ts
+      attention.confirmingExpired24h (its own read through the new
+      MarketQuoteFilter.terminalReason filter in both stores). The fix-round
+      re-review's own belts (2c2ae78): bondQuote refuses the escrow wallet as
+      a bidder (self_dealing) and the verifier's payer-leg skip is gated on
+      owesOthers (another leg or the burn must keep the debit equation
+      binding; the all-self-legs shape refuses leg_mismatch), the
+      stray-credit warn is once per memo and clamps the RPC-supplied owner,
+      the sweep chain gains a trailing catch and an in-flight guard, and the
+      null-authority burn pass counts only attributed burns. Docs:
+      MAX_CONFIRMING_AGE_MS is measured
+      from quote EXPIRY; the five-under-six ordering is a deployment
+      precondition (WOC_MARKET_QUOTE_TTL_MS well under one hour, unclamped;
+      game WOC_MARKET_CONFIRMING_REVIEW_HOURS at or above six); the second
+      horizon is release_protocol's MAX_REPLACEABLE_AGE_MS (the "RPC history
+      prunes around six" premise contradicted it); the recovery caveat once
+      the game acted on a terminal answer (out-of-band re-confirm of the
+      preserved signature; the overview counter is the operator's cue); the
+      confirm vocabulary table; treasury-rotation knob note; first-sweep
+      backlog deploy note.
+    - PINS CLOSED (mutation-proven, 21 mutants BIT over the committed fix
+      round; the four implement-round survivors now bite): pg sweep outer
+      status guards BOTH arms under a real lock-wait race, confirming arm
+      ORDER BY, shared budget remainder, catalog indexes, non-positive
+      budget; payer_mismatch on its own; the real wallet-emitted shape;
+      leg over-credit; batched settlements; 2^53 exactness and the uiAmount
+      decoy; delegate burn / delegate-funded leg; owner reassignment;
+      treasury-as-buyer; authority-mismatch word; stray log; recovery warn
+      once; reserved matched-arm word both entries; rejected reason on the
+      row for every B4 word; every confirming-expired entry arm; the
+      preserved signature in the memory store; a rejecting sweep swallowed,
+      cadence kept, warned once; the ops rail counter and listing reason.
+    - JUDGED, no code change (do not re-raise): balance-row BigInt throw
+      on a malformed amount stays a retryable throw (documented at the site;
+      22's RPC-defect policy item, with I24 malformed envelopes and the
+      lenient/canonical amount asymmetry); relayer / fee-sponsored
+      transactions are payer_mismatch by design (21 real-wallet note); the
+      null-owner add() skip is unpinnable (identical outcome); Q5e two-memo
+      one-payment is the 09 index's case; D21 PRD sentence pre-existing,
+      game-side; SEC-6 refuted as the registered 12 handoff; the EPQ comment
+      refutation accepted in substance (EvalPlanQual re-checks the LAST
+      committed version); SEC-11 treasury rotation is pre-existing and out
+      of range (documented in the knob table, 22 runbook).
+    - DEFERRED with owners (amends the implement round's list): 12 (game
+      wire) owes tolerating and localizing burn_authority_mismatch alongside
+      burn_missing / burn_mismatch / unexpected_credit (terminal) and
+      not_yet_visible (pending), gating the anti-snipe extension on
+      awaiting_finality (and reading a live verifier's awaiting_finality as
+      "the ledger showed the payment"; the reason-less fallback and raced
+      stored-row arms also emit it but are unreachable by a fabricated
+      signature), and considering a game-side signature regex tightening
+      (the service now decides shape, so it is optional); 12/14 own the
+      game's revisability of a bid or settlement it lapsed or failed on a
+      confirming_expired verdict the service later adopts (the ops overview
+      counter is the operator's cue; the review-state arms are the seam);
+      18/19 (dashboard) may render attention.confirmingExpired24h (additive
+      field); 21 (devnet) verifies the shape screen against a real wallet
+      flow (fee-sponsored / gasless wallets would be payer_mismatch), the
+      inert 'spl-token-2022' alias, the multisigAuthority count-labeling and
+      burnChecked info shapes, exercises the burn proof end to end, and
+      carries the first-sweep backlog deploy note; 22 owns the RPC-defect
+      policy (uncaught getParsedTransaction throw, malformed balance rows
+      and envelopes: retryable 500 vs terminal), the treasury-rotation
+      runbook rule (or persisting the treasury wallet on the quote), and the
+      connectionTimeoutMillis note. Ruling text note for R5 (SEC-10): the
+      confirming bound is also the length of a free price option for a buyer
+      who pre-submits a durable-nonce signature and broadcasts only if the
+      price moves; bounded now at expiry plus five hours where it was
+      unbounded, worth weighing if the TTL or bound ever changes.
 - 09 bond-releaser (2026-08-14, SERVICE repo, session start aa44873 =
   the 08 QA tip, origin/master already contained at df09756; 9 commits,
   tip 3346878, LOCAL not pushed per R4; validation npm run build + npm
