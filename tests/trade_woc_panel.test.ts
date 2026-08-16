@@ -111,6 +111,21 @@ describe('what the arm renders', () => {
     expect(root.querySelector('[data-woc-net]')?.textContent).toBe('');
   });
 
+  it('renders the rounding edges honestly: zero fee, one cent, and the price floor', () => {
+    // A zero-fee split is a real $0.00, never a blank line; a one-cent fee
+    // must not round away; the smallest legal listing (the 25-cent floor)
+    // shows the exact ceil-and-remainder legs the dev split computes for it.
+    const zero = paint(deps({ split: { sellerCents: 100, burnCents: 0, treasuryCents: 0 } }));
+    expect(zero.querySelector('[data-woc-fee]')?.textContent).toContain('0.00');
+    expect(zero.querySelector('[data-woc-net]')?.textContent).toContain('1.00');
+    const cent = paint(deps({ split: { sellerCents: 0, burnCents: 1, treasuryCents: 0 } }));
+    expect(cent.querySelector('[data-woc-fee]')?.textContent).toContain('0.01');
+    expect(cent.querySelector('[data-woc-net]')?.textContent).toContain('0.00');
+    const floor = paint(deps({ split: { sellerCents: 22, burnCents: 1, treasuryCents: 2 } }));
+    expect(floor.querySelector('[data-woc-fee]')?.textContent).toContain('0.03');
+    expect(floor.querySelector('[data-woc-net]')?.textContent).toContain('0.22');
+  });
+
   it('escapes a hostile counterparty name wherever it is interpolated', () => {
     // The name is server-fed player text, so it must never reach innerHTML raw.
     const root = paint(
@@ -685,12 +700,24 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
 
   it('does not announce DELIVERY while the chain is still confirming', () => {
     // The mirror of the loss that cost real money: a correct payment can come
-    // back still confirming, and "on its way by mail" is a claim about delivery.
+    // back still confirming, and "on its way by mail" is a claim about
+    // delivery. The ladder is the Exchange window's, verbatim: review parks
+    // to its own line, only 'confirming' takes the pending mapper, and a
+    // DECIDED state (confirmed / delivering / delivered; a failed retry is
+    // refused server-side and never reaches the ok arm) takes the settled
+    // line, so the two surfaces make the same claim about the same answer.
     const pay = CONTROLLER.slice(
       CONTROLLER.indexOf('private async payWocTradeOffer'),
       CONTROLLER.indexOf('private async cancelWocTradeOffer'),
     );
-    expect(pay).toContain('wocSettlementInFlight(done.state)');
+    expect(pay).toContain("done.state === 'review'");
+    expect(pay).toContain("done.state === 'confirming'");
+    expect(pay).toContain('wocPaymentPendingText(done.reason)');
+    expect(pay).toContain('hudChrome.wocMarket.settlementReview');
+    // The pending arm must be decided BEFORE the settled else-arm.
+    expect(pay.indexOf("done.state === 'confirming'")).toBeLessThan(
+      pay.indexOf('hudChrome.trade.woc.settled'),
+    );
     // And the buyer sees the pending face the instant they commit, not when a
     // poll next happens to notice.
     expect(pay).toContain("phase: 'paying'");

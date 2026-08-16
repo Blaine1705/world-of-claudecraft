@@ -8809,8 +8809,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.signFailed':
     '지갑이 결제를 완료하지 못했습니다. 지갑을 확인한 뒤 다시 시도하세요.',
   'hudChrome.wocMarket.confirming': '체인에서 확인 중...',
-  'hudChrome.wocMarket.bidBondConfirming':
-    '보증금을 보냈습니다. 네트워크에서 확인 중이며, 완료되면 입찰이 등록됩니다.',
   'hudChrome.wocMarket.bidPlacedStanding': '입찰이 확정되었습니다. 현재 최고 입찰자입니다.',
   'hudChrome.wocMarket.bidPlacedOutbid': '보증금은 확인되었지만 더 높은 입찰이 먼저 들어왔습니다.',
   'hudChrome.wocMarket.purchaseComplete':

@@ -8843,8 +8843,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.signFailed':
     'ウォレットが支払いを完了できませんでした。ウォレットを確認して、もう一度お試しください。',
   'hudChrome.wocMarket.confirming': 'チェーン上で確認中...',
-  'hudChrome.wocMarket.bidBondConfirming':
-    '保証金を送信しました。ネットワークで確認中です。完了すると入札が有効になります。',
   'hudChrome.wocMarket.bidPlacedStanding': '入札が有効になりました。あなたが現在の最高入札者です。',
   'hudChrome.wocMarket.bidPlacedOutbid': '保証金は確認されましたが、先により高い入札が入りました。',
   'hudChrome.wocMarket.purchaseComplete':

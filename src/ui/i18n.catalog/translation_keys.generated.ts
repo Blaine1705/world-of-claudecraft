@@ -10168,7 +10168,6 @@ export type TranslationKeyFlat =
   | 'hudChrome.wocMarket.activityStrikes'
   | 'hudChrome.wocMarket.activitySuspended'
   | 'hudChrome.wocMarket.bidAria'
-  | 'hudChrome.wocMarket.bidBondConfirming'
   | 'hudChrome.wocMarket.bidBondNote'
   | 'hudChrome.wocMarket.bidBondPay'
   | 'hudChrome.wocMarket.bidBondPayAria'

@@ -24,7 +24,8 @@ describe('wocPaymentPendingText', () => {
     expect(wocPaymentPendingText('dev_chain_unknown_memo')).toBe(generic);
     expect(wocPaymentPendingText(null)).toBe(generic);
     expect(wocPaymentPendingText(undefined)).toBe(generic);
-    expect(wocPaymentPendingText('other')).not.toContain('other');
+    // The exact toBe pins above are the decisive assertions: a raw word can
+    // never appear in a string pinned byte-for-byte to the generic copy.
   });
 });
 
@@ -100,5 +101,18 @@ describe('the maps stay inside the server wire vocabularies', () => {
       'unknown_reference',
       'window_elapsed',
     ]);
+  });
+
+  it('pins the PENDING remainder too: today every pending word has copy', async () => {
+    // The twin of the fail-remainder pin. All three pending words are mapped,
+    // so the remainder is EMPTY, and pinning that emptiness is the point: a
+    // fourth pending word (the likelier vocabulary to grow, since pending
+    // words gate the anti-snipe extension) must land here as a copy decision,
+    // not silently render the generic line.
+    const rules = await import('../server/woc_market_rules');
+    const { WOC_MARKET_REASON_TEXT_KEYS } = await import('../src/ui/woc_market_reason_text');
+    const mapped = new Set(Object.keys(WOC_MARKET_REASON_TEXT_KEYS.pending));
+    const generic = [...rules.WOC_MARKET_WIRE_PENDING_REASONS].filter((w) => !mapped.has(w)).sort();
+    expect(generic).toEqual([]);
   });
 });

@@ -1131,10 +1131,9 @@ export class WocMarketWindow {
           b.status !== 'pending_bond'
             ? ''
             : b.bondConfirming
-              ? // The SHORT key, shared with the busy banner. The bidBondConfirming
-                // sentence beside it is the one-off notice shown when the payment
-                // is first accepted; as a permanent inline label on every affected
-                // row it would be a paragraph per bid.
+              ? // The SHORT key, shared with the busy banner: a permanent
+                // inline label on every affected row must stay terse (the
+                // first-accepted toast names WHICH pending it is instead).
                 ` <span class="wm-inline-busy" role="status">${esc(t('hudChrome.wocMarket.confirming'))}</span>`
               : ` <button type="button" data-action="pay-bond" data-bid="${b.id}" ${this.busy ? 'disabled' : ''} ` +
                 `aria-label="${esc(t('hudChrome.wocMarket.bidBondPayAria', { id: formatNumber(b.listingId) }))}" data-focus-key="wm-bond-${b.id}">` +
@@ -1159,7 +1158,7 @@ export class WocMarketWindow {
         // and tested there), the painter only renders its verdict.
         const failDetail =
           s.failDetailReason != null
-            ? ` <span>${esc(wocSettlementFailText(s.failDetailReason) ?? '')}</span>`
+            ? ` <span class="wm-fail-why">${esc(wocSettlementFailText(s.failDetailReason) ?? '')}</span>`
             : '';
         return `<li><span>${esc(this.usd(s.amountCents))}</span> <span>${esc(t(settlementKey(s.state)))}</span>${failDetail}${deadline}${pay}</li>`;
       })
@@ -1901,8 +1900,17 @@ export class WocMarketWindow {
     await this.withBusy('hudChrome.wocMarket.confirming', async () => {
       if (pending.kind === 'bond') {
         const out = await hooks.client.bondQuote(pending.bidId);
-        if (out.ok) this.pendingQuote = { ...pending, quote: out.bond };
-        else this.fail(out.code);
+        // The payBond rule holds on refresh too: a re-quote can re-price the
+        // bond (the drift-adopt path persists the service's new figure), and
+        // the prompt must label the amount the wallet is about to be asked
+        // for, never the figure the stale quote carried.
+        if (out.ok) {
+          this.pendingQuote = {
+            ...pending,
+            quote: out.bond,
+            usdCents: out.bond.bondCents ?? pending.usdCents,
+          };
+        } else this.fail(out.code);
       } else {
         const out = await hooks.client.settlementQuote(pending.settlementId);
         if (out.ok) this.pendingQuote = { ...pending, quote: out.quote };
@@ -1917,15 +1925,29 @@ export class WocMarketWindow {
     if (!hooks || !pending || pending.quote.transactionBase64 === null) return;
     await this.withBusy('hudChrome.wocMarket.signing', async () => {
       let signature: string;
-      try {
-        signature = await hooks.signAndSendTransactionBase64(pending.quote.transactionBase64 ?? '');
-      } catch (err) {
-        this.notice = {
-          text:
-            err instanceof Error && err.message ? err.message : t('hudChrome.wocMarket.loadFailed'),
-          error: true,
-        };
-        return;
+      if (pending.quote.signatureRequired === false) {
+        // The trade arm's dev-chain rule, mirrored: the service's stand-in
+        // transaction is not signable by any wallet (handing it to a real one
+        // threw at atob() before the wallet could reject it), and its
+        // verifier matches on the built memo rather than signature bytes.
+        // Explicit permission only: an absent flag still goes through the
+        // wallet.
+        signature = `devsig:${pending.quote.reference ?? ''}`;
+      } else {
+        try {
+          signature = await hooks.signAndSendTransactionBase64(
+            pending.quote.transactionBase64 ?? '',
+          );
+        } catch (err) {
+          this.notice = {
+            text:
+              err instanceof Error && err.message
+                ? err.message
+                : t('hudChrome.wocMarket.loadFailed'),
+            error: true,
+          };
+          return;
+        }
       }
       this.busyLabel = 'hudChrome.wocMarket.confirming';
       this.render();

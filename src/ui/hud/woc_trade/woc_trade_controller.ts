@@ -30,7 +30,6 @@ import {
   type WocTradePanelDeps,
   wireWocTradeArm,
   wocOfferPhase,
-  wocSettlementInFlight,
   wocTradeArmHtml,
   wocTradeModelFrom,
   wocTradeMoneyText,
@@ -211,6 +210,9 @@ export class WocTradeController {
       if (!mine) {
         if (this.wocTradeOffer !== null) {
           this.wocTradeOffer = null;
+          // The adoption-stored split dies with the deal it described, or a
+          // later compose form paints the dead deal's Fee / You receive lines.
+          this.wocTradeSplit = null;
           this.lastTradeSig = '';
         }
         return;
@@ -275,6 +277,7 @@ export class WocTradeController {
     // still correct.
     this.deps.refreshWocBalance();
     this.wocTradeOffer = null;
+    this.wocTradeSplit = null;
     this.lastTradeSig = '';
     // Closing the trade itself is the sim's call, not a display change: the
     // other player's client must learn the trade is over too. CLOSE, not
@@ -298,6 +301,7 @@ export class WocTradeController {
     const hooks = this.wocMarketHooks;
     const offer = this.wocTradeOffer;
     this.wocTradeOffer = null;
+    this.wocTradeSplit = null;
     if (!hooks || !offer || this.wocTradeFinished.has(offer.id)) return;
     void hooks.client.offers().then((res) => {
       if (!res.ok) return;
@@ -453,21 +457,21 @@ export class WocTradeController {
         this.log(userFacingApiError({ code: done.code }), '#ff6b6b');
         return;
       }
-      // "On its way by mail" is a claim about DELIVERY, so it waits for a state
-      // that means delivery. A correct payment can come back still confirming
-      // (finality takes tens of seconds), and announcing arrival then is the
-      // same mistake in reverse as rejecting it: the poll finishes the deal when
-      // the chain does, and the pending face stays up until it has. The interim
-      // line says WHICH pending the verdict was (ledger-matched, nothing
-      // visible yet, or the payment service down).
-      if (!wocSettlementInFlight(done.state)) {
-        this.log(t('hudChrome.trade.woc.settled'), '#7fdc4f');
-      } else if (done.state === 'review') {
-        // Money parked under an operator verdict is not "awaiting
-        // confirmation": say what the Exchange window says for the same row.
+      // The Exchange window's ladder, verbatim: two surfaces describing the
+      // same server answer must make the same claim. Only 'confirming' is
+      // pending (the chain has not decided; the line says WHICH pending),
+      // 'review' is money parked under an operator verdict, and everything
+      // else the ok-arm can answer (confirmed / delivering / delivered) is a
+      // DECIDED payment, which the old in-flight gate understated as
+      // "awaiting confirmation" while the Exchange toasted purchase complete
+      // for the same row. A failed retry never reaches here (the outcome arm
+      // refuses it), so the settled line cannot fire for lost money.
+      if (done.state === 'review') {
         this.log(t('hudChrome.wocMarket.settlementReview'), '#ffd100');
-      } else {
+      } else if (done.state === 'confirming') {
         this.log(wocPaymentPendingText(done.reason), '#ffd100');
+      } else {
+        this.log(t('hudChrome.trade.woc.settled'), '#7fdc4f');
       }
     } finally {
       this.wocTradePaying = false;
@@ -482,6 +486,7 @@ export class WocTradeController {
     const res = await hooks.client.resolveOffer(offer.id, action);
     if (res.ok) {
       this.wocTradeOffer = null;
+      this.wocTradeSplit = null;
       this.lastTradeSig = '';
     } else {
       this.log(userFacingApiError({ code: res.code }), '#ff6b6b');

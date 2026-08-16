@@ -182,6 +182,8 @@ function fakeHooks(): {
     buyNowImpl: () => Promise<unknown>;
     acceptOfferImpl: () => Promise<unknown>;
     createOfferImpl: () => Promise<unknown>;
+    settlementQuoteImpl: () => Promise<unknown>;
+    confirmSettlementImpl: () => Promise<unknown>;
     lastAcceptBody: Record<string, unknown> | null;
     lastCreateBody: Record<string, unknown> | null;
     calls: {
@@ -202,6 +204,10 @@ function fakeHooks(): {
     // The waiting branch by default: agreed, the other side has not yet.
     acceptOfferImpl: (): Promise<unknown> => Promise.resolve({ ok: true, listing: null }),
     createOfferImpl: (): Promise<unknown> =>
+      Promise.resolve({ ok: false, code: 'woc_market.disabled' }),
+    settlementQuoteImpl: (): Promise<unknown> =>
+      Promise.resolve({ ok: false, code: 'woc_market.disabled' }),
+    confirmSettlementImpl: (): Promise<unknown> =>
       Promise.resolve({ ok: false, code: 'woc_market.disabled' }),
     lastAcceptBody: null as Record<string, unknown> | null,
     lastCreateBody: null as Record<string, unknown> | null,
@@ -237,8 +243,8 @@ function fakeHooks(): {
         state.calls.resolveOffers.push([id, action]);
         return Promise.resolve({ ok: true });
       },
-      settlementQuote: () => Promise.resolve({ ok: false, code: 'woc_market.disabled' }),
-      confirmSettlement: () => Promise.resolve({ ok: false, code: 'woc_market.disabled' }),
+      settlementQuote: () => state.settlementQuoteImpl(),
+      confirmSettlement: () => state.confirmSettlementImpl(),
       createOffer: (body: Record<string, unknown>) => {
         state.calls.createOffers++;
         state.lastCreateBody = body;
@@ -960,5 +966,100 @@ describe('withdrawing the standing offer', () => {
     await c.cancelWocTradeOffer('withdraw');
     expect(h.state.calls.resolveOffers).toEqual([[7, 'withdraw']]);
     expect(c.wocTradeOffer).toBeNull();
+  });
+});
+
+describe('the pay verdict ladder matches the Exchange window', () => {
+  // Two surfaces describing the same confirm answer must make the same claim:
+  // review parks to its own line, only 'confirming' takes the pending mapper,
+  // and a decided state (confirmed / delivering) takes the settled line. The
+  // dev-chain quote (signatureRequired false) skips the wallet, so the ladder
+  // is reachable without a wallet stub.
+  async function payTo(confirmAnswer: unknown): Promise<string[]> {
+    const h = fakeHooks();
+    h.state.buyNowImpl = () => Promise.resolve({ ok: true, settlement: { id: 5 }, quote: null });
+    h.state.settlementQuoteImpl = () =>
+      Promise.resolve({
+        ok: true,
+        quote: {
+          reference: 'dev_woc_1',
+          transactionBase64: 'dHg=',
+          signatureRequired: false,
+          amount: null,
+          seller: null,
+          burn: null,
+          treasury: null,
+          bondCents: null,
+          expiresAtMs: 9_999_999_999_999,
+        },
+      });
+    h.state.confirmSettlementImpl = () => Promise.resolve(confirmAnswer);
+    const r = rig(h.hooks);
+    const c = r.controller as unknown as {
+      wocTradeOffer: WocPendingOffer | null;
+      payWocTradeOffer(): Promise<void>;
+    };
+    c.wocTradeOffer = heldOffer({
+      role: 'buyer',
+      phase: 'awaiting_payment',
+      listingId: 41,
+      buyerAccepted: true,
+      sellerAccepted: true,
+    });
+    await c.payWocTradeOffer();
+    return r.host.logs;
+  }
+
+  it('a review park logs the review line, never the generic pending one', async () => {
+    const logs = await payTo({ ok: true, state: 'review' });
+    expect(logs).toContain(t('hudChrome.wocMarket.settlementReview'));
+    expect(logs).not.toContain(t('hudChrome.trade.woc.settled'));
+  });
+
+  it('a confirming answer names WHICH pending it is', async () => {
+    const logs = await payTo({ ok: true, state: 'confirming', reason: 'not_yet_visible' });
+    expect(logs).toContain(t('hudChrome.wocMarket.paymentNotYetVisible'));
+    expect(logs).not.toContain(t('hudChrome.trade.woc.settled'));
+  });
+
+  it('a DECIDED payment (confirmed, delivery owed) logs the settled line, as the Exchange does', async () => {
+    const logs = await payTo({ ok: true, state: 'confirmed' });
+    expect(logs).toContain(t('hudChrome.trade.woc.settled'));
+    expect(logs).not.toContain(t('hudChrome.wocMarket.paymentPendingGeneric'));
+  });
+});
+
+describe('the adoption-stored split dies with its deal', () => {
+  it('clearing the offer clears the split, so a later compose form cannot render it', async () => {
+    const h = fakeHooks();
+    h.state.estimateImpl = () =>
+      Promise.resolve({
+        amount: { tokens: 800 },
+        split: { sellerCents: 90, burnCents: 3, treasuryCents: 7 },
+      });
+    h.state.offersResult = {
+      ok: true,
+      offers: [offerRow({ buyerAccepted: true, sellerAccepted: false })],
+    };
+    const r = rig(h.hooks);
+    openTrade(r);
+    const c = r.controller as unknown as {
+      wocTradeSplit: unknown;
+      wocTradeOffer: WocPendingOffer | null;
+    };
+    vi.useFakeTimers();
+    r.controller.updateTradeWindow();
+    await vi.advanceTimersByTimeAsync(2100);
+    r.controller.updateTradeWindow();
+    await flushAsync();
+    expect(c.wocTradeSplit, 'the adoption stored the split').not.toBeNull();
+    // The other side declines: the next poll finds no standing offer.
+    h.state.offersResult = { ok: true, offers: [] };
+    await vi.advanceTimersByTimeAsync(2100);
+    r.controller.updateTradeWindow();
+    await flushAsync();
+    expect(c.wocTradeOffer, 'the dead deal is gone').toBeNull();
+    expect(c.wocTradeSplit, 'and its split with it').toBeNull();
+    vi.useRealTimers();
   });
 });

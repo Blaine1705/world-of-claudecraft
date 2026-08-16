@@ -3935,7 +3935,6 @@ export const zh_CN: EnTranslations = {
       "signing": "等待钱包确认...",
       "signFailed": "你的钱包未能完成付款。请检查钱包后重试。",
       "confirming": "正在链上确认...",
-      "bidBondConfirming": "保证金已支付。正在网络上确认；确认完成后你的出价即生效。",
       "bidPlacedStanding": "你的出价已生效，你是当前最高出价者。",
       "bidPlacedOutbid": "你的保证金已确认，但有人抢先出了更高的价。",
       "purchaseComplete": "购买完成。物品将经乌鸦邮局寄达。",

@@ -8439,8 +8439,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.signing': '等待钱包确认...',
   'hudChrome.wocMarket.signFailed': '你的钱包未能完成付款。请检查钱包后重试。',
   'hudChrome.wocMarket.confirming': '正在链上确认...',
-  'hudChrome.wocMarket.bidBondConfirming':
-    '保证金已支付。正在网络上确认；确认完成后你的出价即生效。',
   'hudChrome.wocMarket.bidPlacedStanding': '你的出价已生效，你是当前最高出价者。',
   'hudChrome.wocMarket.bidPlacedOutbid': '你的保证金已确认，但有人抢先出了更高的价。',
   'hudChrome.wocMarket.purchaseComplete': '购买完成。物品将经乌鸦邮局寄达。',

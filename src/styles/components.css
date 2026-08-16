@@ -16617,10 +16617,21 @@
   #woc-market-window .wm-activity li {
     display: flex;
     align-items: center;
+    /* wrap, because the failed-row WHY sentence below shares this row with
+       the amount, status, countdown, and Pay button: unwrapped, a long fill
+       (ru/ja) squeezed the Pay control at the narrow panel width. */
+    flex-wrap: wrap;
     gap: 10px;
     padding: 4px 0;
     border-bottom: 1px solid var(--gold-dim);
     font-variant-numeric: tabular-nums;
+  }
+  /* The failed payment's WHY line: a full sentence, so it takes its own row
+     inside the flex item instead of competing with the controls. */
+  #woc-market-window .wm-fail-why {
+    flex-basis: 100%;
+    color: var(--color-text-muted);
+    font-size: 12px;
   }
   #woc-market-window .wm-quote-actions {
     display: flex;

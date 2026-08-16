@@ -1306,6 +1306,11 @@ describe('woc_market_window: payment verdicts reach the player', () => {
 
   it('answers a pending confirm with the reason-specific line on both legs', () => {
     const sign = code.slice(code.indexOf('private async signPendingQuote('));
+    // The slice runs to end-of-file, which is safe only while this is the
+    // LAST method: the count below goes red the moment a method is appended
+    // after it (the slice would silently widen and the toHaveLength ordering
+    // pins would stop meaning what they say), forcing a bounded re-anchor.
+    expect(sign.match(/private (?:async )?\w+\(/g)).toHaveLength(1);
     // Bond leg: the pending arm routes through the mapper, not a fixed key.
     // Settlement leg: a still-confirming answer must never toast purchase
     // complete (that is a delivery claim about money the chain has not
@@ -1318,5 +1323,30 @@ describe('woc_market_window: payment verdicts reach the player', () => {
     expect(settlementArm.indexOf("out.state === 'confirming'")).toBeLessThan(
       settlementArm.indexOf('purchaseComplete'),
     );
+  });
+
+  it('skips the wallet only on the explicit dev-chain permission, on both payment surfaces', () => {
+    // The trade arm's fail-safe rule, mirrored here: only an EXPLICIT false
+    // skips signing (an absent flag still goes through the wallet), and the
+    // skip mints the devsig reference the dev verifier matches on. A
+    // truthiness rewrite (!...signatureRequired) would turn an old server's
+    // missing field into a skip-the-wallet permission slip.
+    const sign = code.slice(code.indexOf('private async signPendingQuote('));
+    expect(sign).toContain('pending.quote.signatureRequired === false');
+    expect(sign).toContain('devsig:');
+    expect(sign).not.toContain('!pending.quote.signatureRequired');
+    // The wallet call survives on the other arm (the skip is not a bypass).
+    expect(sign).toContain('signAndSendTransactionBase64');
+  });
+
+  it('a bond re-quote re-labels the prompt from the quote it adopted', () => {
+    // The payBond rule holds on refresh: the drift-adopt path re-prices the
+    // bond server-side, and a prompt labeled with the stale figure while the
+    // wallet is handed the new one contradicts itself about the money.
+    const refresh = between(
+      'private async refreshPendingQuote(',
+      'private async signPendingQuote(',
+    );
+    expect(refresh).toContain('usdCents: out.bond.bondCents ?? pending.usdCents');
   });
 });
