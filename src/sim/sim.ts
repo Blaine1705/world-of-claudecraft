@@ -153,7 +153,6 @@ import {
   classHasSkin,
   EVENT_SKIN_TOKEN_ID,
   MECH_CHROMAS,
-  mechChromaItemId,
   mechChromaSkinIndex,
   rankAllowsMechChroma,
   rankAllowsSkin,
@@ -4640,25 +4639,21 @@ export class Sim {
     return { type: 'mechChroma', chromaId };
   }
 
+  /** Take the mech chroma off the resolved player's own current appearance,
+   *  reverting to the class body. The account-wide unlock
+   *  (accountCosmetics.mechChromaIds) is permanent, exactly like a purchased
+   *  Season 1 Armory weapon skin: this only changes what is CURRENTLY
+   *  displayed, never revokes ownership, so any character on the account can
+   *  freely re-select it later via changeSkin with no item involved. */
   unequipMechChroma(chromaId: string, pid?: number): boolean {
     const r = this.resolve(pid);
     if (!r) return false;
     const skin = mechChromaSkinIndex(chromaId);
-    const itemId = mechChromaItemId(chromaId);
-    if (skin < 0 || !itemId) return false;
+    if (skin < 0) return false;
     if (!this.accountCosmetics.mechChromaIds.includes(chromaId)) return false;
-    this.accountCosmetics = {
-      ...this.accountCosmetics,
-      mechChromaIds: this.accountCosmetics.mechChromaIds.filter((id) => id !== chromaId),
-    };
-    for (const meta of this.players.values()) {
-      if (meta.skinCatalog === 'mech' && meta.skin === skin) {
-        this.setPlayerSkin(meta.entityId, 0, 'class');
-      }
-    }
-    // movement: unequipping a mech chroma re-grants the very item equipping it
-    // consumed, so this relocates a copy the account already owns.
-    this.addItem(itemId, 1, r.meta.entityId, MOVEMENT_GRANT);
+    const { meta } = r;
+    if (meta.skinCatalog !== 'mech' || meta.skin !== skin) return false;
+    this.setPlayerSkin(meta.entityId, 0, 'class');
     return true;
   }
 
