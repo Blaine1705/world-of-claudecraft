@@ -4648,9 +4648,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'Wujud Burung Bulan',
   'entities.abilities.moonkin_form.description':
     'Mengambil wujud burung bulan, memperkuat perapalan mantra sampai kamu berubah kembali. Gunakan lagi untuk kembali ke wujud normal. (ciri khas Keseimbangan)',
-  'entities.abilities.feral_charge.name': 'Terjangan Liar',
+  'entities.abilities.feral_charge.name': 'Gelora Purba',
   'entities.abilities.feral_charge.description':
-    'Menerjang musuh dan mengakarkannya selama 1 dtk. Jarak 8-25 m. (ciri khas Keganasan)',
+    'Lepaskan gelora purba. Dalam Wujud Serigala, regenerasi energi meningkat 100% selama 10 detik. Dalam Wujud Bruin, langsung menghasilkan 50 Amukan. (ciri khas Keganasan)',
   'entities.abilities.swiftmend.name': 'Pemulihan Cepat',
   'entities.abilities.crusader_strike.name': 'Serangan Tentara Salib',
   'entities.abilities.crusader_strike.description':
@@ -10979,7 +10979,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     'Meningkatkan peluang menghindarmu sebesar 50 poin persentase selama 10 detik. (talenta Hunter)',
   'entities.abilities.earthbind.description': 'Mengakarkan musuh dalam 4 m dari titik sasaran selama 2 dtk, lalu memperlambat mereka 40% selama 6 dtk. (Talenta shaman)',
-  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (talenta mage)',
+  'entities.abilities.evocation.description':
+    'Menyalurkan selama 6 detik: setiap detik memulihkan 100 mana dan menambah 8 spell power. Bonus menumpuk selama penyaluran dan bertahan 15 detik. (talenta mage)',
   'entities.abilities.frenzied_regeneration.description':
     'Memulihkan 180 nyawa selama 10 detik. Hanya dalam Bentuk Beruang. (talenta Druid)',
   'entities.abilities.frost_trap.description':
@@ -10990,7 +10991,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     'Membuat musuh di dekatnya ketakutan hingga 3 detik. Kerusakan dapat membatalkan efek ini. (talenta Warlock)',
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 detik. (talenta mage)',
+    'Membungkusmu dalam es padat selama 8 detik, membuatmu kebal terhadap semua kerusakan. Menghapus efek berbahaya biasa dan mencegah penerapan efek baru. Beberapa efek pertempuran tidak dapat dihapus atau dicegah. Dapat digunakan saat terkena stun atau polymorph. Kamu tidak dapat bertindak selama terbungkus. Rapal lagi untuk membatalkan. (mage)',
   'entities.abilities.inner_focus.description': 'Membuat mantra pendeta berikutnya gratis dan tak bisa diinterupsi. Bertahan 60 dtk.',
   'entities.abilities.innervate.description':
     'Getah hidup mengalir dalam dirimu selama 10 detik dan memulihkan 20 sumber dayamu saat ini dalam gelombang: mana, amarah, atau energi. Berganti wujud tidak memutusnya. Tidur, pingsan, atau stasis menghentikan aliran getah. (talenta Druid)',
@@ -11006,7 +11007,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.preparation.description':
     'Mengakhiri waktu isi ulang Lari Cepat, Mengelak, dan Lenyap. (talenta Rogue)',
   'entities.abilities.presence_of_mind.description':
-    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 detik. (talenta mage)',
+    'Membuat mantra berikutnya yang memiliki waktu perapalan menjadi instan. Bertahan 60 detik. (talenta mage)',
   'entities.abilities.psychic_scream.description': 'Menakuti musuh dalam 8 m sampai 4 dtk. Kerusakan bisa mematahkan efeknya.',
   'entities.abilities.shadowstep.description':
     'Melangkah menembus bayangan menuju targetmu. (talenta Rogue)',

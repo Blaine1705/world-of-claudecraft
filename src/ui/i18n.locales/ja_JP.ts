@@ -3352,9 +3352,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'ムーンキンフォーム',
   'entities.abilities.moonkin_form.description':
     'ムーンキンフォームになり、戻るまで呪文詠唱を強化します。再び唱えると通常形態に戻ります。（バランス特性のシグネチャ）',
-  'entities.abilities.feral_charge.name': 'フェラルチャージ',
+  'entities.abilities.feral_charge.name': '原初の奔流',
   'entities.abilities.feral_charge.description':
-    '敵に突撃し、1秒間足止めします。射程8-25ヤード。（フェラル特性のシグネチャ）',
+    '原初の力を解き放ちます。ウルフフォームでは、10秒間エネルギーの再生速度が100%上昇します。ブルーインフォームでは、即座に怒りを50生成します。（フェラル特性のシグネチャ）',
   'entities.abilities.swiftmend.name': 'スウィフトメンド',
   'entities.abilities.swiftmend.description': '味方の対象にかかった継続回復効果を消費し、{damage}回復します。野生の芽吹きと二度目の開花の植え付けは青翠を貯め、青翠5でこのボタンは満開となり、あなたの継続回復効果を帯びた味方全員を、それらの効果の残量の60%だけ即座に回復します。（回復の象徴）',
   'entities.abilities.crusader_strike.name': 'クルセイダー ストライク',
@@ -9797,7 +9797,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     '回避率を50パーセントポイント上昇させる。効果時間10秒。（ハンターのタレント）',
   'entities.abilities.earthbind.description': '対象地点から4ヤード以内の敵を2秒間その場に縛り、続けて6秒間40%減速させます。（シャーマンのタレント）',
-  'entities.abilities.evocation.description': 'マナを急速に回復する。（メイジタレント）',
+  'entities.abilities.evocation.description':
+    '6秒間チャネルします。毎秒100マナを回復し、呪文威力が8上昇します。この効果はチャネル中に累積し、15秒間持続します。（メイジタレント）',
   'entities.abilities.frenzied_regeneration.description':
     '10秒かけて体力を180回復する。熊形態でのみ使用可能。（ドルイドのタレント）',
   'entities.abilities.frost_trap.description':
@@ -9809,7 +9810,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     '周囲の敵を最大3秒間恐怖状態にする。ダメージを受けると解除されることがある。（ウォーロックのタレント）',
   'entities.abilities.ice_block.description':
-    '自身を氷に封じ、大量のダメージを吸収する。効果時間 8 秒。（メイジタレント）',
+    '8秒間自身を堅い氷に封じ、あらゆるダメージを無効化します。通常の有害な効果を取り除き、新たに付与されるのを防ぎます。一部のエンカウント効果は解除も防止もできません。スタンまたは変身中でも使用できます。氷の中では行動できません。再使用すると解除します。（メイジ）',
   'entities.abilities.inner_focus.description': '次のプリーストの呪文を無償かつ中断されないものにします。60秒続きます。',
   'entities.abilities.innervate.description':
     '生命の樹液が10秒間あふれ、現在のリソースを波状に20回復する。マナ、怒り、エナジーに対応し、変身しても中断されない。睡眠、スタン、ステイシス中は樹液が止まる。（ドルイドのタレント）',

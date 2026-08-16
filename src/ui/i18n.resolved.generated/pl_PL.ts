@@ -10326,8 +10326,8 @@ export const pl_PL: EnTranslations = {
         "description": "Przyjmujesz postać księżycowej sowy, wzmacniając rzucanie zaklęć do czasu powrotu. Rzuć ponownie, aby wrócić do zwykłej postaci. (specjalizacja Równowaga)"
       },
       "feral_charge": {
-        "name": "Dzika szarża",
-        "description": "Szarżujesz na wroga i unieruchamiasz go na 1 sek. Zasięg 8-25 m. (specjalizacja Dzikość)"
+        "name": "Pierwotny przypływ",
+        "description": "Wyzwalasz pierwotny przypływ. W Postaci wilka regeneracja energii wzrasta o 100% na 10 sek. W Postaci Bruina natychmiast zyskujesz 50 pkt. wściekłości. (specjalizacja Dzikość)"
       },
       "swiftmend": {
         "name": "Szybkie uzdrowienie",
@@ -10583,7 +10583,7 @@ export const pl_PL: EnTranslations = {
       },
       "evocation": {
         "name": "Studnia Eteru",
-        "description": "Restaura manę rápidamente. (talent maga)"
+        "description": "Kanalizujesz przez 6 sek.: co sekundę przywracasz 100 many i zyskujesz 8 mocy zaklęć. Premia kumuluje się podczas kanalizowania i trwa 15 sek. (talent maga)"
       },
       "flurry_of_knives": {
         "name": "Grad noży",
@@ -10615,7 +10615,7 @@ export const pl_PL: EnTranslations = {
       },
       "ice_block": {
         "name": "Zimna Trumna",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talent maga)"
+        "description": "Zamyka cię w litym lodzie na 8 sek., zapewniając odporność na wszystkie obrażenia. Usuwa zwykłe szkodliwe efekty i zapobiega nakładaniu nowych. Niektórych efektów starcia nie można usunąć ani im zapobiec. Można użyć podczas ogłuszenia lub przemiany. W zamknięciu nie możesz działać. Użyj ponownie, aby anulować. (mag)"
       },
       "inner_focus": {
         "name": "Wyciszony Umysł",
@@ -10707,7 +10707,7 @@ export const pl_PL: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Pędzący Umysł",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talent maga)"
+        "description": "Sprawia, że twoje następne zaklęcie z czasem rzucania jest natychmiastowe. Trwa 60 sek. (talent maga)"
       },
       "psychic_scream": {
         "name": "Psychiczny Krzyk",

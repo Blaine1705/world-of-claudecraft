@@ -10583,7 +10583,7 @@ export const cs_CZ: EnTranslations = {
       },
       "evocation": {
         "name": "Éterická studna",
-        "description": "Restaura manu rápidamente. (mágovský talent)"
+        "description": "Kanalizuje po dobu 6 s: každou sekundu obnoví 100 many a získá 8 síly kouzel. Bonus se během kanalizování sčítá a trvá 15 s. (mágovský talent)"
       },
       "flurry_of_knives": {
         "name": "Smršť nožů",
@@ -10615,7 +10615,7 @@ export const cs_CZ: EnTranslations = {
       },
       "ice_block": {
         "name": "Ledová rakev",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (mágovský talent)"
+        "description": "Uzavře tě na 8 s do pevného ledu a učiní tě imunním vůči veškerému poškození. Odstraní běžné škodlivé efekty a zabrání aplikaci nových. Některé efekty střetnutí nelze odstranit ani jim zabránit. Lze použít při omráčení nebo proměnění. Během uvěznění nemůžeš jednat. Opětovným sesláním efekt zrušíš. (mág)"
       },
       "inner_focus": {
         "name": "Ztišená mysl",
@@ -10707,7 +10707,7 @@ export const cs_CZ: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Zrychlená mysl",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (mágovský talent)"
+        "description": "Tvé další kouzlo s dobou sesílání bude okamžité. Trvá 60 s. (mágovský talent)"
       },
       "psychic_scream": {
         "name": "Výkřik hrůzy",

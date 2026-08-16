@@ -10326,8 +10326,8 @@ export const da_DK: EnTranslations = {
         "description": "Antag månekinform, som styrker besværgelser, indtil du skifter tilbage. Kast igen for at vende tilbage til normal form. (Balancesignatur)"
       },
       "feral_charge": {
-        "name": "Vild ladning",
-        "description": "Storm mod en fjende og rodfæst den i 1 sek. 8-25 m rækkevidde. (Vildskabssignatur)"
+        "name": "Urkraftsbølge",
+        "description": "Udløs en urkraftsbølge. I Ulveform øges jeres energiregenerering med 100% i 10 sek. I Bruin-form får I øjeblikkeligt 50 raseri. (Vildskabssignatur)"
       },
       "swiftmend": {
         "name": "Hurtig heling",
@@ -10583,7 +10583,7 @@ export const da_DK: EnTranslations = {
       },
       "evocation": {
         "name": "Æterbrønd",
-        "description": "Restaura mana rápidamente. (magikertalent)"
+        "description": "Kanaliser i 6 sek.: Hvert sekund genopretter I 100 mana og opbygger 8 besværgelseskraft. Bonussen stables under kanaliseringen og varer 15 sek. (magikertalent)"
       },
       "flurry_of_knives": {
         "name": "Knivbyge",
@@ -10615,7 +10615,7 @@ export const da_DK: EnTranslations = {
       },
       "ice_block": {
         "name": "Kold kiste",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sek. (magikertalent)"
+        "description": "Indkapsler jer i fast is i 8 sek. og gør jer immune over for al skade. Fjerner almindelige skadelige effekter og forhindrer, at nye bliver påført. Visse kampeffekter kan ikke fjernes eller forhindres. Kan bruges, mens I er bedøvede eller forvandlede. I kan ikke handle, mens I er indkapslet. Kast igen for at annullere. (magiker)"
       },
       "inner_focus": {
         "name": "Stillet sind",
@@ -10707,7 +10707,7 @@ export const da_DK: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Ræsende sind",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sek. (magikertalent)"
+        "description": "Gør jeres næste besværgelse med kastetid øjeblikkelig. Varer 60 sek. (magikertalent)"
       },
       "psychic_scream": {
         "name": "Psykisk skrig",

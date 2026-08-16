@@ -4572,9 +4572,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'Dạng Cú Mặt Trăng',
   'entities.abilities.moonkin_form.description':
     'Nhận dạng cú mặt trăng, cường hóa thi triển phép cho đến khi bạn đổi lại. Thi triển lần nữa để trở về dạng thường. (dấu ấn Cân Bằng)',
-  'entities.abilities.feral_charge.name': 'Xung Phong Hoang Dã',
+  'entities.abilities.feral_charge.name': 'Dâng Trào Nguyên Thủy',
   'entities.abilities.feral_charge.description':
-    'Xung phong vào kẻ địch và trói chân chúng trong 1 giây. Tầm 8-25 m. (dấu ấn Hoang Dã)',
+    'Giải phóng một đợt dâng trào nguyên thủy. Trong Hình Sói, tốc độ hồi Năng Lượng tăng 100% trong 10 giây. Trong Hình Bruin, lập tức tạo 50 Nộ Khí. (dấu ấn Hoang Dã)',
   'entities.abilities.swiftmend.name': 'Hồi Phục Nhanh',
   'entities.abilities.crusader_strike.name': 'Đòn Thập Tự',
   'entities.abilities.crusader_strike.description':
@@ -10796,7 +10796,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     'Tăng 50 điểm phần trăm khả năng né tránh của bạn trong 10 giây. (thiên phú Thợ săn)',
   'entities.abilities.earthbind.description': 'Trói chân kẻ địch trong 4 m quanh điểm mục tiêu suốt 2 giây, rồi làm chậm chúng 40% trong 6 giây. (Thiên phú pháp sư tự nhiên)',
-  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (thiên phú pháp sư)',
+  'entities.abilities.evocation.description':
+    'Vận sức trong 6 giây: mỗi giây hồi 100 mana và cộng dồn 8 sức mạnh phép thuật. Hiệu ứng cộng dồn trong khi vận sức và kéo dài 15 giây. (thiên phú pháp sư)',
   'entities.abilities.frenzied_regeneration.description':
     'Hồi 180 máu trong 10 giây. Chỉ dùng được ở Dạng Gấu. (thiên phú Druid)',
   'entities.abilities.frost_trap.description':
@@ -10807,7 +10808,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     'Khiến kẻ địch ở gần sợ hãi trong tối đa 3 giây. Sát thương có thể phá hiệu ứng. (thiên phú Warlock)',
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 giây. (thiên phú pháp sư)',
+    'Bao bọc bạn trong băng cứng suốt 8 giây, khiến bạn miễn nhiễm mọi sát thương. Xóa các hiệu ứng có hại thông thường và ngăn hiệu ứng mới được áp dụng. Một số hiệu ứng đặc thù của cuộc chạm trán không thể bị xóa hoặc ngăn chặn. Có thể dùng khi bị choáng hoặc biến hình. Bạn không thể hành động khi bị bao bọc. Dùng lại để hủy. (pháp sư)',
   'entities.abilities.inner_focus.description': 'Khiến phép tu sĩ kế tiếp của bạn miễn phí và không thể bị ngắt. Kéo dài 60 giây.',
   'entities.abilities.innervate.description':
     'Nhựa sống trào dâng trong bạn trong 10 giây và hồi 20 tài nguyên hiện tại theo từng đợt: mana, nộ khí hoặc năng lượng. Biến hình không làm gián đoạn. Ngủ, choáng hoặc đình trệ sẽ làm dòng nhựa ngừng lại. (thiên phú Druid)',
@@ -10823,7 +10824,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.preparation.description':
     'Kết thúc thời gian hồi của Chạy nước rút, Né tránh và Biến mất. (thiên phú Đạo tặc)',
   'entities.abilities.presence_of_mind.description':
-    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 giây. (thiên phú pháp sư)',
+    'Khiến phép tiếp theo có thời gian niệm của bạn được thi triển tức thì. Kéo dài 60 giây. (thiên phú pháp sư)',
   'entities.abilities.psychic_scream.description': 'Làm kẻ địch trong 8 m khiếp sợ tối đa 4 giây. Sát thương có thể phá vỡ hiệu ứng.',
   'entities.abilities.shadowstep.description':
     'Bước xuyên bóng tối về phía mục tiêu. (thiên phú Đạo tặc)',

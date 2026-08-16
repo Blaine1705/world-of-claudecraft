@@ -5970,9 +5970,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'Forma de Luniscante',
   'entities.abilities.moonkin_form.description':
     'Assume Forma de Luniscante, fortalecendo a conjuração até você voltar. Lance novamente para retornar à forma normal. (assinatura Equilíbrio)',
-  'entities.abilities.feral_charge.name': 'Investida Feral',
+  'entities.abilities.feral_charge.name': 'Surto Primevo',
   'entities.abilities.feral_charge.description':
-    'Investe contra um inimigo e o enraíza por 1 s. Alcance de 8-25 m. (assinatura Feral)',
+    'Libera um surto primevo. Na Forma de Lobo, a regeneração de energia aumenta em 100% por 10 s. Na Forma de Bruin, gera instantaneamente 50 de raiva. (assinatura Feral)',
   'entities.abilities.swiftmend.name': 'Recuperação Rápida',
   'entities.abilities.crusader_strike.name': 'Golpe do Cruzado',
   'entities.abilities.crusader_strike.description':
@@ -11146,7 +11146,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     'Aumenta sua chance de esquiva em 50 pontos percentuais por 10 s. (talento de Caçador)',
   'entities.abilities.earthbind.description': 'Enraíza os inimigos a até 4 m do ponto alvo por 2 s, e depois os lentifica em 40% por 6 s. (Talento de xamã)',
-  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (talento de mago)',
+  'entities.abilities.evocation.description':
+    'Canaliza por 6 s: a cada segundo, restaura 100 de mana e acumula 8 de poder mágico. O bônus acumula durante a canalização e dura 15 s. (talento de mago)',
   'entities.abilities.frenzied_regeneration.description':
     'Restaura 180 de vida ao longo de 10 s. Somente em Forma de Urso. (talento de Druida)',
   'entities.abilities.frost_trap.description':
@@ -11157,7 +11158,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     'Amedronta os inimigos próximos por até 3 s. O dano pode interromper o efeito. (talento de Bruxo)',
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talento de mago)',
+    'Envolve você em gelo sólido por 8 s, tornando-o imune a todo dano. Remove efeitos nocivos comuns e impede a aplicação de novos. Alguns efeitos de encontro não podem ser removidos nem impedidos. Pode ser usado enquanto estiver atordoado ou transformado. Você não pode agir enquanto estiver envolto. Conjure novamente para cancelar. (mago)',
   'entities.abilities.inner_focus.description': 'Torna vossa próxima magia de sacerdote gratuita e ininterrompível. Dura 60 s.',
   'entities.abilities.innervate.description':
     'A seiva viva brota em você por 10 s e restaura em ondas 20 do seu recurso atual: mana, raiva ou energia. Mudar de forma não interrompe o efeito. Sono, atordoamento ou estase imobilizam a seiva. (talento de Druida)',
@@ -11173,7 +11174,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.preparation.description':
     'Encerra a recarga de Disparada, Evasão e Sumir. (talento de Ladino)',
   'entities.abilities.presence_of_mind.description':
-    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talento de mago)',
+    'Faz com que seu próximo feitiço com tempo de lançamento seja instantâneo. Dura 60 s. (talento de mago)',
   'entities.abilities.psychic_scream.description': 'Aterroriza os inimigos a até 8 m por até 4 s. O dano pode quebrar o efeito.',
   'entities.abilities.shadowstep.description':
     'Avança pelas sombras em direção ao seu alvo. (talento de Ladino)',

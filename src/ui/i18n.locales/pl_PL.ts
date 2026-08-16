@@ -4663,9 +4663,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'Postać księżycowej sowy',
   'entities.abilities.moonkin_form.description':
     'Przyjmujesz postać księżycowej sowy, wzmacniając rzucanie zaklęć do czasu powrotu. Rzuć ponownie, aby wrócić do zwykłej postaci. (specjalizacja Równowaga)',
-  'entities.abilities.feral_charge.name': 'Dzika szarża',
+  'entities.abilities.feral_charge.name': 'Pierwotny przypływ',
   'entities.abilities.feral_charge.description':
-    'Szarżujesz na wroga i unieruchamiasz go na 1 sek. Zasięg 8-25 m. (specjalizacja Dzikość)',
+    'Wyzwalasz pierwotny przypływ. W Postaci wilka regeneracja energii wzrasta o 100% na 10 sek. W Postaci Bruina natychmiast zyskujesz 50 pkt. wściekłości. (specjalizacja Dzikość)',
   'entities.abilities.swiftmend.name': 'Szybkie uzdrowienie',
   'entities.abilities.crusader_strike.name': 'Cios krzyżowca',
   'entities.abilities.crusader_strike.description':
@@ -11084,7 +11084,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     'Zwiększa twoją szansę na unik o 50 punktów procentowych na 10 sek. (talent Łowcy)',
   'entities.abilities.earthbind.description': 'Unieruchamia wrogów w promieniu 4 m od punktu celu na 2 s, a następnie spowalnia ich o 40% na 6 s. (Talent szamana)',
-  'entities.abilities.evocation.description': 'Restaura manę rápidamente. (talent maga)',
+  'entities.abilities.evocation.description':
+    'Kanalizujesz przez 6 sek.: co sekundę przywracasz 100 many i zyskujesz 8 mocy zaklęć. Premia kumuluje się podczas kanalizowania i trwa 15 sek. (talent maga)',
   'entities.abilities.frenzied_regeneration.description':
     'Przywraca 180 zdrowia przez 10 sek. Tylko w Formie Niedźwiedzia. (talent Druida)',
   'entities.abilities.frost_trap.description':
@@ -11095,7 +11096,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     'Przeraża pobliskich wrogów na maksymalnie 3 sek. Obrażenia mogą przerwać efekt. (talent Czarnoksiężnika)',
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talent maga)',
+    'Zamyka cię w litym lodzie na 8 sek., zapewniając odporność na wszystkie obrażenia. Usuwa zwykłe szkodliwe efekty i zapobiega nakładaniu nowych. Niektórych efektów starcia nie można usunąć ani im zapobiec. Można użyć podczas ogłuszenia lub przemiany. W zamknięciu nie możesz działać. Użyj ponownie, aby anulować. (mag)',
   'entities.abilities.inner_focus.description': 'Sprawia, że twoje następne zaklęcie kapłana jest darmowe i nieprzerywalne. Trwa 60 s.',
   'entities.abilities.innervate.description':
     'Żywe soki wzbierają w tobie przez 10 sek. i falami przywracają 20 twojego bieżącego zasobu: many, szału lub energii. Zmiana postaci ich nie przerywa. Sen, ogłuszenie lub zastój zatrzymują przepływ soków. (talent Druida)',
@@ -11111,7 +11112,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.preparation.description':
     'Kończy czas odnowienia Sprintu, Uniku i Zniknięcia. (talent Łotrzyka)',
   'entities.abilities.presence_of_mind.description':
-    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talent maga)',
+    'Sprawia, że twoje następne zaklęcie z czasem rzucania jest natychmiastowe. Trwa 60 sek. (talent maga)',
   'entities.abilities.psychic_scream.description': 'Przeraża wrogów w promieniu 8 m na maksymalnie 4 s. Obrażenia mogą przerwać efekt.',
   'entities.abilities.shadowstep.description':
     'Przechodzisz przez cienie w kierunku celu. (talent Łotrzyka)',

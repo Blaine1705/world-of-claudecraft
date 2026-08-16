@@ -4748,9 +4748,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'Maanuilvorm',
   'entities.abilities.moonkin_form.description':
     'Neem maanuilvorm aan en versterk spreuken totdat je terugschakelt. Spreek opnieuw uit om terug te keren naar normale vorm. (Balans signatuur)',
-  'entities.abilities.feral_charge.name': 'Wilde stormloop',
+  'entities.abilities.feral_charge.name': 'Oerkrachtgolf',
   'entities.abilities.feral_charge.description':
-    'Storm op een vijand af en wortel hem 1 sec. Bereik 8-25 m. (Wildernis signatuur)',
+    'Ontketent een golf van oerkracht. In Wolfsgedaante wordt uw energieregeneratie 10 sec. lang met 100% verhoogd. In Bruingedaante krijgt u onmiddellijk 50 woede. (Wildernis-signatuur)',
   'entities.abilities.swiftmend.name': 'Snelle genezing',
   'entities.abilities.crusader_strike.name': 'Kruisvaardersslag',
   'entities.abilities.crusader_strike.description':
@@ -10957,7 +10957,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     'Verhoogt je ontwijkingskans met 50 procentpunten gedurende 10 sec. (jagertalent)',
   'entities.abilities.earthbind.description': 'Wortelt vijanden binnen 4 m van het doelpunt 2 sec vast en vertraagt ze daarna 6 sec lang met 40%. (Sjamaantalent)',
-  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (magiertalent)',
+  'entities.abilities.evocation.description':
+    'Kanaliseert 6 sec.: elke seconde herstelt u 100 mana en bouwt u 8 spreukkracht op. De bonus stapelt zich tijdens het kanaliseren en blijft 15 sec. actief. (magiertalent)',
   'entities.abilities.frenzied_regeneration.description':
     'Herstelt 180 gezondheid gedurende 10 sec. Alleen in Berenvorm. (druïdetalent)',
   'entities.abilities.frost_trap.description':
@@ -10968,7 +10969,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     'Jaagt nabije vijanden tot 3 sec. angst aan. Schade kan het effect verbreken. (tovenaarstalent)',
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sec. (magiertalent)',
+    'Sluit u 8 sec. lang op in massief ijs en maakt u immuun voor alle schade. Verwijdert gewone schadelijke effecten en voorkomt dat nieuwe worden toegepast. Sommige gevechtseffecten kunnen niet worden verwijderd of voorkomen. Kan worden gebruikt terwijl u verdoofd of veranderd bent. U kunt niet handelen zolang u opgesloten bent. Werp opnieuw om te annuleren. (magiër)',
   'entities.abilities.inner_focus.description': 'Maakt uw volgende priesterspreuk gratis en niet te onderbreken. Duurt 60 sec.',
   'entities.abilities.innervate.description':
     'Levend sap welt 10 sec. in je op en herstelt in golven 20 van je huidige hulpbron: mana, woede of energie. Van gedaante wisselen onderbreekt het niet. Slaap, verdoving of stasis brengt het sap tot stilstand. (druïdetalent)',
@@ -10984,7 +10985,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.preparation.description':
     'Beëindigt de afkoeltijd van Sprint, Ontwijking en Verdwijning. (schurkentalent)',
   'entities.abilities.presence_of_mind.description':
-    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sec. (magiertalent)',
+    'Maakt uw volgende spreuk met een werptijd onmiddellijk. Blijft 60 sec. actief. (magiertalent)',
   'entities.abilities.psychic_scream.description': 'Jaagt vijanden binnen 8 m tot 4 sec lang angst aan. Schade kan het effect breken.',
   'entities.abilities.shadowstep.description':
     'Stapt door de schaduwen naar je doelwit. (schurkentalent)',

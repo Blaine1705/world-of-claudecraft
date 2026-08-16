@@ -10326,8 +10326,8 @@ export const id_ID: EnTranslations = {
         "description": "Mengambil wujud burung bulan, memperkuat perapalan mantra sampai kamu berubah kembali. Gunakan lagi untuk kembali ke wujud normal. (ciri khas Keseimbangan)"
       },
       "feral_charge": {
-        "name": "Terjangan Liar",
-        "description": "Menerjang musuh dan mengakarkannya selama 1 dtk. Jarak 8-25 m. (ciri khas Keganasan)"
+        "name": "Gelora Purba",
+        "description": "Lepaskan gelora purba. Dalam Wujud Serigala, regenerasi energi meningkat 100% selama 10 detik. Dalam Wujud Bruin, langsung menghasilkan 50 Amukan. (ciri khas Keganasan)"
       },
       "swiftmend": {
         "name": "Pemulihan Cepat",
@@ -10583,7 +10583,7 @@ export const id_ID: EnTranslations = {
       },
       "evocation": {
         "name": "Sumur Eter",
-        "description": "Restaura mana rápidamente. (talenta mage)"
+        "description": "Menyalurkan selama 6 detik: setiap detik memulihkan 100 mana dan menambah 8 spell power. Bonus menumpuk selama penyaluran dan bertahan 15 detik. (talenta mage)"
       },
       "flurry_of_knives": {
         "name": "Rentetan Pisau",
@@ -10615,7 +10615,7 @@ export const id_ID: EnTranslations = {
       },
       "ice_block": {
         "name": "Peti Es",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 detik. (talenta mage)"
+        "description": "Membungkusmu dalam es padat selama 8 detik, membuatmu kebal terhadap semua kerusakan. Menghapus efek berbahaya biasa dan mencegah penerapan efek baru. Beberapa efek pertempuran tidak dapat dihapus atau dicegah. Dapat digunakan saat terkena stun atau polymorph. Kamu tidak dapat bertindak selama terbungkus. Rapal lagi untuk membatalkan. (mage)"
       },
       "inner_focus": {
         "name": "Pikiran Hening",
@@ -10707,7 +10707,7 @@ export const id_ID: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Pikiran Melaju",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 detik. (talenta mage)"
+        "description": "Membuat mantra berikutnya yang memiliki waktu perapalan menjadi instan. Bertahan 60 detik. (talenta mage)"
       },
       "psychic_scream": {
         "name": "Jerit Psikis",
