@@ -5,15 +5,33 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-11-oracle-health.md`
+- Next file to run: `docs/woc-marketplace-hardening/phase-11-qa.md`
   (SERVICE repo, worktree `/Users/fernando/Documents/woc-rewards-service-pr31`,
-  fresh session, own origin/master sync first; its session start proposes
-  R3, the oracle venue posture, still OPEN in Rulings below). Game-side note
-  for the next GAME session's sync: origin/main moved to the v0.38.2 hotfix
-  tip (1fd1f2e247), a patch line off the shipped 0.38 that release/v0.39.0
-  has not absorbed yet; the newest release line is still v0.39.0 (0 behind
-  at this session's end), and the hotfix flows in through the maintainers'
-  main sync.
+  fresh session, own origin/master sync first; QA diffs 8da6c03..03df5de and
+  pushes on PASS per R4). Game-side note for the next GAME session's sync:
+  origin/main moved to the v0.38.2 hotfix tip (1fd1f2e247), a patch line off
+  the shipped 0.38 that release/v0.39.0 has not absorbed yet; the newest
+  release line is still v0.39.0, and the hotfix flows in through the
+  maintainers' main sync (this service session did not touch the game sync).
+- 11 COMPLETE (SERVICE repo, LOCAL not pushed per R4; session start 8da6c03,
+  tip 03df5de, 5 commits; game docs commits e2f189e9a4 (the R3 ruling record,
+  BEFORE code), c5ce2793e7 (PRD claim revised) and this entry's commit,
+  LOCAL). R3 RULED single-venue at session start and implemented; H3's
+  shared-instance half pinned decisively under mocked timers with the
+  quiet-period proof and a negative control; publish-time asOfMs on the wire
+  and the honest venue surface; the fix round made the oracle the ONE judge
+  of freshness per venue and the heartbeat now feeds an edge-triggered
+  halted/recovered operator signal; the re-review round bounded every env
+  knob in BOTH directions, capped the sample buffer, and made a paused
+  refusal read the last heartbeat reading instead of polling; the cold-boot
+  single-print exposure RULED record-and-document (an R3 amendment). Two
+  fresh lenses (security/ops 14, correctness 21) plus a fresh re-review of
+  the fix round (18), every finding applied or judged with the file open;
+  the re-review's own fixes closed by careful self-review (narrow,
+  test-covered, 11 mutants bit). Suite 560 to 590 (583 + 7 env-gated skips
+  default; 590/590 zero skips with CLAUDIUM_TEST_DATABASE_URL). The 11
+  ledger entry below is the registry the 11-qa session consumes;
+  progress.md carries the commit-by-commit round.
 - 10 QA COMPLETE (PASS-WITH-FOLLOWUPS, every finding applied or judged with
   the file open, PUSHED per R4: service ba7df0b..8da6c03 to
   feature/woc-market-settlement updating PR #31; game pushed at the end of
@@ -386,6 +404,52 @@ Resolved (Fernando, 2026-08-11):
   - Observation for 22, not this phase: the real manipulation cost is set by
     WOC_MARKET_MIN_LIQUIDITY_USD against WOC_MARKET_MAX_USD_CENTS; no oracle
     bound fixes that ratio.
+  AMENDED by the 11 review round (2026-08-16, the two fresh lenses plus the
+  fresh re-review of the fix round; Fernando ruled the cold-boot item at the
+  same session):
+  - The walk arithmetic above assumed a continuous republisher AND that the
+    gate caps the move; neither holds. The breaker is a HOLD-TIME cost: an
+    out-of-bound print halts trading but is still recorded (deliberately, or
+    a legitimate move would halt forever), so the average absorbs it and the
+    halt clears within one window (about 2.5 minutes for a 6% step, 7 for
+    10%, 13 for 50%); a manipulator must hold the moved price through the
+    halt and the settlement that follows, against arbitrage. What the 1000 ->
+    500 tightening buys is that moves between 5% and 10%, which used to pass
+    silently, now cost a multi-minute halt. At the deployed cadence (Birdeye
+    republishes $WOC on the order of tens of minutes against a fifteen-minute
+    window) the window holds ONE distinct print for most of every cycle and
+    the comparison is print-to-print. The tightening stands; the stated model
+    is corrected in the code, the docs and here.
+  - The env parser also caps the TIGHTENING direction (ORACLE_BOUND_RANGES:
+    window up to an hour and never past the staleness ceiling, samples up to
+    90, staleness down to the default window, spot down to 100 bps; decimal
+    integers only), because an absurd tightening is a permanent halt
+    indistinguishable from a broken venue.
+  - "compose, oracle and source share the constant" is no longer the design:
+    the ORACLE is the one judge of freshness, per venue (the market's Birdeye
+    source hands up every print it can parse, VENUE_AGE_SCREEN_OFF_MS), so an
+    over-age print is refused as stale WITH its print time instead of dying
+    at the source as no_price with nothing to show (stale was unreachable in
+    production under two equal ceilings). A stale print never enters the
+    median; a stalled sibling can never ride a fresh one; a future print
+    beyond the skew allowance or an unparseable publish time counts as no
+    print.
+  - Every oracle env knob may only TIGHTEN its code default (window longer,
+    samples more, staleness shorter, spot narrower); a widening value falls
+    back to the default. The effective bounds ride the health surface.
+  - COLD BOOT, ruled by Fernando (2026-08-16): a freshly booted oracle holds
+    one print with no predecessor to compare against, so for the first
+    venue republish after a deploy the breaker reads zero and a print moved
+    BEFORE the deploy is accepted as-is (pre-existing; made visible by
+    distinctPrints). Ruled: RECORD AND DOCUMENT, NO GATE. A distinct-print
+    gate would recreate the permanent-halt incident (steady state holds one
+    print too) and a one-republish warm-up would halt the market for tens of
+    minutes after every deploy. Runbook consequence (22): do not deploy or
+    restart the service while a high-value settlement window is live without
+    pausing the market first. The proper fix is a named follow-up: a durable
+    last-accepted-print anchor that survives restarts, age-bounded so a long
+    outage cannot halt the market forever (needs its own ruling; a candidate
+    for a numbered phase per R7 or for 17's DB work).
 - R4 (all phases): RESOLVED: push after each QA PASS (or PASS-WITH-FOLLOWUPS with fixes
   applied), repos the pair touched; implement sessions never push; FAIL pushes nothing.
   Exact push commands live in implementation-plan.md commit rules.
@@ -551,6 +615,137 @@ Still open (a phase that hits one asks at session start):
 
 ## Per-phase ledger (append as phases complete)
 
+- 11 oracle-health (2026-08-16, SERVICE repo, session start 8da6c03 = the
+  10 QA tip, origin/master already contained at df09756; 5 commits, tip
+  03df5de, LOCAL not pushed per R4; validation npm run build + npm test in
+  service/, 590 tests 583 pass 0 fail 7 env-gated skips default tier and
+  590/590 zero skips with CLAUDIUM_TEST_DATABASE_URL, baseline was
+  560/553/7). The registry the 11-qa session needs:
+  - R3 RULED AND IMPLEMENTED (see Rulings, incl. the review-round
+    amendments; game commit e2f189e9a4 recorded the ruling BEFORE code):
+    single-venue posture. bootstrap.ts: pythSource gone, sources =
+    [birdeyeSource] (or the dev price), VENUE_AGE_SCREEN_OFF_MS exported (the
+    market's BirdeyePriceOracle gets Number.MAX_SAFE_INTEGER as maxAgeMs: it
+    screens envelope shape, the liquidity floor and future skew only; the
+    ORACLE judges age), ORACLE_HEARTBEAT_MS exported. oracle.ts:
+    DEFAULT_MARKET_ORACLE_CONFIG.maxSpotDeviationBps 500 (was 1000),
+    maxVenueDeviationBps code-owned (marketOracleConfigFromEnv ignores the
+    env; every other knob may only TIGHTEN, and only within
+    ORACLE_BOUND_RANGES: window [15 min default, 1 h] and never past the
+    staleness ceiling, maxAge [default window, 1 h default], minSamples
+    [3, 90], spot [100, 500]; decimal integers only; a widening value falls
+    back to the default, an absurd tightening clamps to the range).
+    MAX_ORACLE_SAMPLES 3600 hard-caps the buffer (oldest out under request
+    load). compose and .env.example: the Pyth feed knob and the
+    venue-deviation knob removed, spot left blank; compose_conformance.test.ts
+    pins both files three ways plus every numeric oracle knob in .env.example
+    against the code constants.
+  - FRESHNESS (deliverable 3): MarketPriceHealth.asOfMs = the newest FRESH
+    venue publish time clamped to the poll clock (never the future; healthy
+    and refusals; on an all-stale reading the newest print judged, with the
+    spot those prints imply and the standing average still on the readout;
+    null only when no venue priced); price() and estimate() carry it (the
+    game renders it as "as of {time}"); a PAUSED refusal on either surface
+    carries MarketPriceOracle.latest()?.asOfMs, the heartbeat's last reading,
+    and never polls the venue (pausedAsOfMs in service.ts).
+    Per-venue judgement inside health(): priced requires finite usdPerUnit >
+    0, finite publishMs > 0, publishMs <= nowMs + MAX_ORACLE_FUTURE_SKEW_MS;
+    ageMs = max(0, now - publish); fresh = ageMs <= maxAgeMs; only fresh
+    prints enter the median and the deviation gate; a stale venue is listed
+    with price, age and fresh:false; all-stale answers 'stale'. Samples stay
+    POLL-stamped for the mean (identical arithmetic in-window; a
+    publish-keyed warm-up count would halt a slow republisher), carry the
+    newest fresh publish for distinctPrints, and insert in observation order
+    (concurrent polls can land inverted; the prune walks from the head).
+  - SURFACE (deliverable 4): diagnostics gains distinctPrints, bounds
+    (window, maxAge, minSamples, both deviation bounds), venues[] as
+    MarketVenueReading {name, usdPerToken, publishMs, ageMs, fresh},
+    configuredVenues, liveVenues (= the median array length, passed in, so
+    crossVenueGateArmed = liveVenues >= 2 can never claim an armed gate the
+    code would not fire); admin.ts overview.price mirrors every field
+    (typed, MarketVenueReading re-exported).
+  - ONE INSTANCE (deliverable 1, already fixed in 08): pinned in
+    market_bootstrap.test.ts under t.mock.timers (setInterval only): prime +
+    ticks + reads sample arithmetic in the market's own diagnostics; the
+    quiet-period test (20 min of idle heartbeat > the 15 min window, next
+    request healthy on price and estimate); the negative control (stop hook,
+    mocked time still ticks, venue reads stay flat, then insufficient_samples);
+    the structural belt (comment-stripped, whitespace-tolerant count of
+    `new MarketPriceOracle(` in the compiled module = 1).
+  - OPERATOR SIGNAL: src/market/price_gate_signal.ts createPriceGateSignal
+    (halted: reason + newest print age, floored at zero; still halted:
+    reason change; recovered: duration + reason), fed by the heartbeat only
+    (one poll in flight at a time, the sweep's guard, so edges arrive in
+    order), edge-triggered like the sweep warn; a boot logs the honest
+    warm-up pair (insufficient_samples then recovered; an alert keyed on the
+    halted line must expect it). Pinned directly
+    (market_price_gate_signal.test.ts) and through the real wiring (60
+    anchored ticks, a 6% print halts once, stays silent, recovers with
+    duration; a stalled poll suppresses the next tick's poll).
+  - REVIEWS: two fresh lenses on the three-commit diff (security/ops: 14
+    findings, 0 blocking; correctness: 21 findings, 1 blocking = the
+    cold-boot item, RULED record-and-document), every finding applied or
+    judged; the fix round a616f73 was re-reviewed FRESH (18 findings, 0
+    blocking, 8 should-fix + 10 nits; the load-bearing ones: the venue-fetch
+    mock leaked across the file via MockTracker restore order, the sample
+    buffer had no count cap, the tightening direction was unbounded, the
+    paused quote path polled the venue, the heartbeat lacked the sweep's
+    in-flight guard, and the "5% per publication" claim overstated the
+    breaker); its round 03df5de closed by careful self-review (narrow,
+    test-covered, 11 mutants bit).
+  - JUDGED, no code change (do not re-raise): the cold-boot single-print
+    exposure (Fernando: record and document, no gate; runbook note for 22;
+    the durable anchor is a named follow-up needing its own ruling); a
+    min-span warm-up gate (same decision); the TWAP-equals-last-print
+    steady state at the deployed cadence (a doc truth, not a gate change:
+    the breaker is a per-publication step limiter); the boot warm-up warn
+    pair (honest, two lines per deploy); the structural construction scan is
+    belt-only (the sample arithmetic is the decisive pin; a factory wrapper
+    would evade the scan, not the arithmetic); the two-parser split
+    (positiveInt vs num) is moot for age now that the source does not parse
+    the knob; distinctPrints keys on the newest fresh publish per reading
+    (documented; a per-venue evidence count is a multi-venue concern the
+    posture excludes); the warmed() test helper duplicated in two files (rule
+    of three, the repo's own rule); the fix-round commit subject at 82
+    columns (style only, the repo requires scope and body); the double
+    floating rounding of a multi-sample average (0.0010000000000000002 for a
+    steady 0.001 over real-clock spans; the dev-chain pin compares within
+    1e-12; the base-unit rounding downstream is pre-existing and unchanged).
+  - DEFERRED with owners: 19 (dashboard) renders venues[].ageMs and fresh
+    from the SERVICE (its priceVenueRows still derives age from the browser
+    clock), crossVenueGateArmed (today "Venue spread: -" is indistinguishable
+    from agreement), distinctPrints beside samples, and bounds; 14 (UX
+    honesty) re-judges the game copy "Current rate: about {tokens} $WOC per
+    USD, as of {time}" now that the time is the venue print (may read oddly
+    beside a 45-minute-old time; "venue print" wording is the candidate); 12
+    (game wire): nothing owed, asOfMs stays number|null and the game passes
+    it through (the dev proxy stamps now(): dev-only twin), noted for
+    awareness; 21 (devnet): observe the halted/recovered lines against the
+    real venue, confirm the real Birdeye updateUnixTime semantics (last
+    trade) and that no false `stale` appears at the real cadence under the
+    one-judge design; 22: the manipulation economics (WOC_MARKET_MIN_LIQUIDITY_USD
+    25k against WOC_MARKET_MAX_USD_CENTS $100k per quote: a 5% move on a
+    $25k pool costs hundreds and is worth $5k on a $100k settlement; the
+    reviewer's fix candidate: tie the quote ceiling to the venue's OBSERVED
+    liquidity, which birdeye_price.ts already reads), the runbook (pause
+    before deploying during a live high-value settlement; the two halt lines
+    per incident and the warm-up pair at every restart), and the cold-boot
+    anchor follow-up ruling (recorded in the service's TODOS.md too); 17 (DB)
+    is the natural home if the anchor is ruled in.
+  - RED-FIRST REGISTRY for the QA red-proof lane (reproduced before their
+    fix on the 8da6c03 build): (1) asOfMs on the wire and in health = the
+    poll clock; (2) a Pyth feed id alone constructs a market; (3) the venue
+    knob honored (999999 accepted) and spot at 1000 (a 6% jump passed); (4)
+    compose carried WOC_MARKET_PYTH_WOC_FEED_ID and
+    WOC_MARKET_MAX_VENUE_DEVIATION_BPS; on the a616f73^ oracle: (5) a print
+    24h in the future accepted healthy; (6) a two-hour-old print entering
+    the median beside a fresh venue (spot 0.0015 off 0.002 and 0.001); (7)
+    no bounds/fresh on the surface; (8) a widening env value accepted; on the
+    03df5de^ code: (9) a stalled heartbeat poll stacked behind the next tick;
+    (10) a paused estimate polled the venue; (11) a print inside the skew
+    allowance logged a negative age. The one-instance claim's red form is
+    structural (fixed in 08): the private second oracle mutant fails four
+    tests by name.
 - 10 chain-verifier (2026-08-14, SERVICE repo, session start 02713f2 = the
   09 QA tip, origin/master already contained at df09756; 6 commits, tip
   ba7df0b, LOCAL not pushed per R4; validation npm run build + npm test in

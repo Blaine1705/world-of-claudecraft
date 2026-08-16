@@ -25,7 +25,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 09 QA | phase-09-qa | service | DONE | 3346878 | PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open (section below); SERVICE repo (origin/master already contained at df09756); nine lanes (six read-only audits, two red-proof, one mutation): 0 blocking in the implement range, all six red-first registry claims REPRODUCED-RED, all seven mutation arms BIT by name (claim CAS, guarded update, finalize signature key in BOTH stores, age bound; 493-test full runs each); the round's own fixes: entry adoption of a ledger-proven payment on an already-expired or superseded quote (the registered pre-existing edge, the crash-matrix lane's fix-now case accepted), typed signature_already_settled on the settled-signature collision BOTH stores (the partial-unique-index 23505 trap, previously an unhandled 500), the undecided late-visibility window, the rejected-write vocabulary fix, the rpc probe-list pin, the actor clamp, fifteen test-decisiveness hardenings, doc truth-ups; two fresh re-review lenses over the fix round, everything applied or judged, round-2 mutation-proven (4 mutants BIT); suite 493 to 508 (502 + 6 env-gated skips default; 508/508 zero skips with CLAUDIUM_TEST_DATABASE_URL); 5 commits, tip 02713f2, PUSHED per R4 (service aa44873..02713f2 updates PR #31; game after the v0.38.0 re-sync merge abd4a9e0e2, trivial: one generated-i18n conflict, regenerated) |
 | 10 | chain-verifier | service | DONE | 02713f2 | SERVICE repo (origin/master already contained at df09756); B4 closed with red-first proofs (three redirect shapes reproduced MATCHED on the old verifier); the two R5 items this file owns RULED by Fernando at session start and implemented (commitment split ratified as code-owned MATCH_COMMITMENT/CREDIT_COMMITMENT; five hour confirming bound MAX_CONFIRMING_AGE_MS, both stores, new pg partial index, one minute sweep driver in buildMarketApps, previously NOTHING drove expiry in production); undecided confirm answers split (not_yet_visible vs awaiting_finality, the anti-snipe service half); two fresh lenses + a fresh re-review of the fix round, every finding applied or judged (the re-review REFUTED the round's multisig-impossibility claim with the parser's count-based labeling, arm restored money-safe); 15 mutants BIT + 1 judged environment survivor (pg ORDER BY delete coincides with partial-index order; the DESC variant bites); suite 508 to 536 (530 + 6 env-gated skips default; 536/536 zero skips with CLAUDIUM_TEST_DATABASE_URL); 6 commits, tip ba7df0b, LOCAL not pushed per R4 |
 | 10 QA | phase-10-qa | service | DONE | ba7df0b | PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open (section below); SERVICE repo (origin/master still df09756, contained; syncs pre-done by the sync-only session, re-fetched at the end: nothing new); seven audit lanes (56-shape hostile hunt with ZERO accepted_dishonest and the real wallet shape verified; security; correctness; coverage; docs; red-proof: all six registry claims REPRODUCED-RED on the 02713f2 build; mutation: 27 of 31 bit, the 4 survivors real pin gaps, all closed); the refuter stage hit the session limit after 15 of 68, every finding judged in the main loop with the file open and primary sources (agave parse_token.rs / parse_instruction.rs, spl-token processor.rs: the multisig restoration CORRECT, agave labels both token programs spl-token); the round's own fixes: the signature SHAPE screen before the first write (SEC-2, a junk string minted the game's service_unavailable exemption via the RPC's -32602 500), the payer-leg netting with owesOthers plus the escrow-bidder refusal (the fix-round re-review caught the bond self-leg vacuity), burn_authority_mismatch, the stray-owner log (once per memo, clamped), the sweep failure/recovery warn with in-flight guard, expirePastDue non-positive budget, attention.confirmingExpired24h on its own read, doc truth-ups (bound measured from expiry, ordering a two-knob precondition, the RPC-horizon premise re-anchored, vocabulary table, recovery caveat, deploy note); pins closed incl. the pg EvalPlanQual race rig on BOTH sweep arms; 21 + 11 mutants BIT over the committed rounds; suite 536 to 560 (553 + 7 env-gated skips default; 560/560 zero skips with CLAUDIUM_TEST_DATABASE_URL); 5 commits, tip 8da6c03, PUSHED per R4 (service ba7df0b..8da6c03 updates PR #31; game after the release check: 0 behind origin/release/v0.39.0, origin/main moved to the v0.38.2 hotfix tip which the next game session's sync picks up through v0.39.0) |
-| 11 | oracle-health | service | NOT STARTED | | |
+| 11 | oracle-health | service | DONE | 8da6c03 | SERVICE repo (origin/master already contained at df09756); R3 RULED by Fernando at session start (single-venue posture, spot 500 bps; recorded BEFORE code in game commit e2f189e9a4) and implemented; H3's shared-instance half (already fixed in 08) pinned decisively under mocked timers with the quiet-period proof and a negative control; publish-time freshness on the wire (asOfMs) and the honest venue surface (per-venue age and verdict, configured/live counts, crossVenueGateArmed, distinctPrints, effective bounds); the dead Pyth venue path and its knob removed, the inert cross-venue knob retired (code default kept), spot 1000 -> 500; two fresh lenses (security/ops 14 findings, correctness 21) plus a fresh re-review of the fix round, every finding applied or judged with the file open; the fix round made the ORACLE the one judge of freshness per venue (an over-age print is refused as stale WITH its print time instead of dying at the source as no_price), env knobs may only tighten, the heartbeat feeds an edge-triggered halted/recovered operator signal; the cold-boot single-print exposure RULED record-and-document (Fernando 2026-08-16); the re-review round bounded every env knob in both directions, capped the sample buffer and made a paused refusal read the last heartbeat reading; PRD claim revised in the game repo (c5ce2793e7); 41 mutants BIT by name; suite 560 to 590 (583 + 7 env-gated skips default; 590/590 zero skips with CLAUDIUM_TEST_DATABASE_URL); 5 commits, tip 03df5de, LOCAL not pushed per R4 |
 | 11 QA | phase-11-qa | service | NOT STARTED | | |
 | 12 | wire-completeness | game | NOT STARTED | | |
 | 12 QA | phase-12-qa | game | NOT STARTED | | |
@@ -145,6 +145,120 @@ skips; e362916958 is a two-test-file prose change re-run green (20 tests).
 Copy floor clean over every new line; no "phase" word in any commit
 message. Tip after this session's docs commit: see git log; LOCAL, not
 pushed.
+
+## 11 implement round (oracle health and honesty)
+
+Service repo, worktree woc-rewards-service-pr31; session start 8da6c03 (clean,
+origin/master already contained at df09756, origin/feature/woc-market-settlement
+matching the tip, PR #31 checks green there), 5 commits, tip 03df5de, LOCAL not
+pushed per R4. Baseline validation matched the documented contract exactly
+(build clean; 560 tests, 553 pass, 7 env-gated skips default tier; 560/560 zero
+skips with CLAUDIUM_TEST_DATABASE_URL against the dev Postgres).
+
+RULING FIRST: R3 was proposed with code-grounded rationale (bootstrap wires
+birdeye + a Pyth arm no feed can arm; the only configurable second source,
+Jupiter, publishes no print time; Birdeye's measured cadence would make a
+second venue a false-halt generator) and confirmed by Fernando before any code
+(recorded in state.md Rulings, game commit e2f189e9a4): single-venue posture,
+spot 500 bps, staleness at the measured hour with publish-time honesty as the
+compensation. A second ruling landed at the review round (cold boot: record
+and document, no gate; recorded as an R3 amendment).
+
+Commits (service):
+- 40321d8 publish-time freshness and the venue truth: MarketPriceHealth.asOfMs
+  is the newest venue publish time on healthy readings and refusals (null only
+  when no venue priced), the game wire (price, estimate) carries it, the
+  diagnostics gain per-venue ageMs, configuredVenues, liveVenues,
+  crossVenueGateArmed and distinctPrints, mapped field-by-field onto the admin
+  overview. RED-FIRST: the asOfMs pin reproduced red on the 8da6c03 oracle
+  (poll clock 1720000002000 where the print time 1719998502000 was expected);
+  the surface fields were structural reds (tsc). 7 mutants bit.
+- eca8730 the ruled posture: pythSource and WOC_MARKET_PYTH_WOC_FEED_ID gone
+  from bootstrap, compose, .env.example and docs; marketOracleConfigFromEnv
+  ignores WOC_MARKET_MAX_VENUE_DEVIATION_BPS (code default 500 kept, oracle
+  stays N-venue capable); DEFAULT_MARKET_ORACLE_CONFIG.maxSpotDeviationBps
+  500; compose_conformance pins the retired knobs out and the blank spot
+  default in. RED-FIRST: a Pyth feed id alone BUILT a market on 8da6c03
+  ([Object] where null was expected); the venue knob was honored; a 6% jump
+  passed at 1000; compose carried both knobs. 5 mutants bit.
+- 83d7d00 the deliverable-1 proofs under node:test mock timers: heartbeat
+  ticks alone satisfy the market's own read and its sample arithmetic (prime
+  + ticks + reads) proves one buffer; twenty minutes of idle heartbeat leaves
+  the next request healthy; the heartbeat-stopped negative control shows the
+  false-outage shape; a comment-stripped scan of the compiled bootstrap counts
+  one construction site. Red form: mutation (the H3 bug re-introduced as a
+  private second oracle fails four tests by name; a detached heartbeat fails
+  three; a stray construction site fails the belt). 4 mutants bit.
+- a616f73 the review fix round (both fresh lenses applied): the oracle is the
+  ONE judge of freshness, per venue (VENUE_AGE_SCREEN_OFF_MS hands every
+  parseable Birdeye print up; stale prints never enter the median; future
+  prints beyond MAX_ORACLE_FUTURE_SKEW_MS and unparseable publish times count
+  as no print; ageMs floors at zero); sorted sample insert; effective bounds
+  on the surface; env may only TIGHTEN each bound; tradableHealth reads
+  health before the pause check so a paused estimate carries the print time;
+  price_gate_signal.ts (new module) fed by the heartbeat: halted / still
+  halted / recovered lines, edge-triggered; test rigs: t.after cleanup,
+  RIG_PRINT_AGE_MS, ORACLE_HEARTBEAT_MS exported and imported, negative
+  control ticks through the stop, warmed() replaces the retired
+  min-samples-1 env shortcut, the REAL birdeyeSource driven end to end via a
+  mocked global fetch for a 70-minute print (stale with print time) and the
+  38-minute print (healthy), decisive distinctPrints and bounds pins over
+  HTTP, .env.example pinned beside compose; docs state what the breaker is at
+  the deployed cadence and record the cold-boot decision. RED-FIRST: the five
+  new oracle pins reproduced red on the pre-fix oracle (future print healthy,
+  stale print dragging the median to 0.0015, no bounds field, no fresh
+  verdict, a 999999 spot bound accepted). 14 mutants bit (one after
+  reshaping the out-of-order fixture to the reviewer's exact case: the newer
+  sample of an inverted pair at the head).
+- 03df5de the re-review round (a fresh third lens over a616f73, 18 findings,
+  all applied or judged): ORACLE_BOUND_RANGES caps the TIGHTENING direction
+  (window up to an hour and never past the staleness ceiling, samples up to
+  90, staleness down to the default window, spot down to 100 bps; decimal
+  integers only); MAX_ORACLE_SAMPLES hard-caps the buffer (oldest out under
+  request load); the stale arm keeps the spot it saw and the standing
+  average; asOfMs never claims the future; MarketPriceOracle.latest() and a
+  paused refusal that reads it instead of polling (price and every quote
+  path); the heartbeat runs one poll at a time (the sweep's guard) so the
+  operator signal's edges arrive in order; the halt line floors the print age
+  at zero; the venue-fetch mock is ONE mock over a mutable print time (node's
+  MockTracker restores in creation order, so a second mock on the same target
+  reinstalled the first stub for the rest of the file); .env.example's
+  numeric oracle knobs pinned against the code constants; the "5% per
+  publication" claim replaced with the truth (a hold-time cost that absorbs
+  any move within a window; the tightening converts 5% to 10% moves from
+  silent acceptance into a multi-minute halt); TODOS.md names the cold-boot
+  anchor follow-up. RED-FIRST: the in-flight, paused-no-poll and negative-age
+  pins reproduced red on a616f73. 11 mutants bit. Closed by careful
+  self-review with the diff open (narrow, test-covered).
+
+Game repo (docs, feature/woc-marketplace): e2f189e9a4 the R3 ruling record;
+c5ce2793e7 the PRD claim revised to the single-venue truth.
+
+Mutation registry: 41 mutants BIT by name under full-file runs: healthy asOfMs
+back to the poll clock, crossVenueGateArmed at one venue, distinctPrints as
+samples, ageMs null, stale refusal asOfMs poll clock, overview dropping the
+armed flag, liveVenues counting configured, spot bound back to 1000, venue
+knob re-read, pyth env re-wired, compose re-growing the pyth knob, compose
+numeric spot default, the private second oracle, heartbeat detached, stray
+construction site, boot prime removed, NaN publish accepted, future skew
+dropped, stale print entering the median, bounds misreporting, sorted insert
+removed (survived the first fixture, bit the reshaped one), spot bound may
+widen, min samples may lower, source judging age again, signal warning every
+tick, recovery line dropped, paused estimate asOfMs null, .env.example
+regrowing the pyth knob, stopOracleHeartbeat no-op, signal not wired,
+crossVenueGateArmed off the venue list; round 2: sample cap removed, latest()
+always null, asOfMs future clamp removed, stale arm dropping spot/twap, tight
+clamp dropped, integer regex dropped, window invariant dropped, heartbeat
+guard removed, signal age clamp removed, paused refusal polling again,
+.env.example min-samples drift.
+
+Validation after every slice; final at 03df5de: build clean, 590 tests, 583
+pass + 7 env-gated skips default tier (two consecutive full runs green after
+one floating-rounding flake was fixed at its pin), 590/590 zero skips with
+CLAUDIUM_TEST_DATABASE_URL. Copy floor clean both repos (no dashes, no
+emojis, no "phase" in code or commits). Docs upkeep in the same change:
+service CLAUDE.md, MARKET_SETTLEMENT.md, .env.example, docker-compose.yml,
+TODOS.md.
 
 ## 10 QA round (verdict PASS-WITH-FOLLOWUPS, every finding applied or judged)
 
