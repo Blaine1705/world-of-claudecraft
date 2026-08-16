@@ -473,6 +473,22 @@ For off-box safety, sync the directory to S3 occasionally:
   economy service, use `http://host.docker.internal:8798/v1/claudium/`.
   A separately deployed economy service should use its internal or remote DNS
   URL instead.
+- **$WOC market settlement service**: `WOC_MARKET_SERVICE_URL` points at the
+  same economy service's `/v1/market/` surface and is a SEPARATE knob from the
+  claudium URL above (the market proxy refuses to fall back to it; with the
+  market knob unset the Exchange reports itself unavailable). Same host
+  guidance as above. Health: probe `GET /v1/market/price` on this base (the
+  game mirrors it at `/api/woc-market/status`); do not key market monitoring
+  on the service's `/v1/health` rail matrix, which has no market-settlement
+  rail (its `marketplace` rail is the character-marketplace rail and names
+  keys this market never reads). Deploy coupling: the bond-quote contract is
+  service-owned (the game sends the BID, the service answers the bond), so
+  enable the market only with BOTH sides at or after the contract tips; a
+  version skew in either direction refuses bond quotes fail-safe (no money
+  moves, bids lapse on their TTL). `DASHBOARD_INTERNAL_SECRET` gates the ops
+  dashboard's
+  `/internal/woc-market/*` reads; unset leaves them 404 (names only here, the
+  values live in deployment secrets).
 - **Never** set `ALLOW_DEV_COMMANDS=1` in production: it enables the full
   `/dev` cheat set (the level/teleport cheats the test bots use, plus item
   grants, mob spawns, instance teleports, and the dev command GUI).

@@ -607,6 +607,10 @@ same file), and each module's header carries its own contract.
 - **woc_market_window.ts** over the pure **woc_market_view.ts** core: the $WOC Exchange
   (config-off behind `WOC_MARKET_ENABLED`; `docs/prd/woc/marketplace.md`). Everything
   economic is a passthrough of server numbers; the terms-acceptance checkbox lives here.
+  Payment-verdict words (the server's screened vocabulary: pending kinds, settlement
+  fail reasons) localize through `woc_market_reason_text.ts`, which owns the
+  word-to-copy maps with a generic fallback in each direction; never map a verdict
+  word to text inline in a painter.
   The trade window's $WOC arm (panel `trade_woc_view.ts`/`trade_woc_panel.ts`, driven
   from `src/ui/hud/woc_trade/`) does NOT follow that model yet: it hard-codes
   `acceptTerms: true` with no terms shown, the recorded R9 pre-enable obligation
