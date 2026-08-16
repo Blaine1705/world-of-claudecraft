@@ -33,7 +33,7 @@ const LEADEN_ROOT_LOCK_ID = 'wlk_leaden_hex_root_lock';
 const LEADEN_SLOW_PER_STACK = 0.05;
 const LEADEN_MAX_STACKS = 3;
 const LEADEN_DURATION = 5;
-const LEADEN_ROOT_DURATION = 1.5;
+const LEADEN_ROOT_DURATION = 3.5;
 const LEADEN_ROOT_LOCK = 15;
 
 const SHADOW_CREDIT_ID = 'wlk_shadow_credit';

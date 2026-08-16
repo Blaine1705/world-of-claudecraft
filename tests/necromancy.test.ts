@@ -283,7 +283,7 @@ describe('Necromancy Warlock', () => {
       effects: [
         {
           type: 'necromancyOssuaryMark',
-          duration: 12,
+          duration: 15,
           storedDamagePct: 0.2,
           soulLanceBonusPct: 0.5,
           deathRadius: 6,
@@ -349,6 +349,7 @@ describe('Necromancy Warlock', () => {
     const mark = target.auras.find((aura) => aura.kind === 'necromancy_ossuary_mark');
     const graveguard = sim.petOf(sim.playerId);
     if (!mark || !graveguard) throw new Error('Expected Ossuary Mark and Graveguard');
+    expect(mark.duration).toBe(15);
     const storedBefore = mark.damageAccrued ?? 0;
 
     sim.dealDamage(
@@ -435,6 +436,8 @@ describe('Necromancy Warlock', () => {
     const target = addTarget(sim);
     sim.player.hitBonus = 1;
     finishCast(sim, 'ossuary_mark');
+    const mark = target.auras.find((aura) => aura.kind === 'necromancy_ossuary_mark');
+    expect(mark?.duration).toBe(15);
     sim.dealDamage(
       sim.player,
       target,
@@ -469,7 +472,10 @@ describe('Necromancy Warlock', () => {
     const sim = makeNecromancer();
     const target = addTarget(sim);
     sim.player.hitBonus = 1;
-    finishCast(sim, 'ossuary_mark');
+    sim.castAbility('ossuary_mark');
+    const mark = target.auras.find((aura) => aura.kind === 'necromancy_ossuary_mark');
+    expect(mark?.duration).toBe(15);
+    expect(mark?.remaining).toBe(15);
     sim.dealDamage(
       sim.player,
       target,
@@ -489,14 +495,14 @@ describe('Necromancy Warlock', () => {
       true,
     );
     const hpBefore = target.hp;
+    if (!mark) throw new Error('Expected Ossuary Mark before expiry');
+    const ticksUntilExpiry = 20 * 15;
 
-    for (
-      let tick = 0;
-      tick < 20 * 15 && target.auras.some((aura) => aura.kind === 'necromancy_ossuary_mark');
-      tick++
-    ) {
-      sim.tick();
-    }
+    for (let tick = 0; tick < ticksUntilExpiry - 1; tick++) sim.tick();
+    expect(target.auras.some((aura) => aura.kind === 'necromancy_ossuary_mark')).toBe(true);
+    expect(target.hp).toBe(hpBefore);
+
+    sim.tick();
 
     expect(target.auras.some((aura) => aura.kind === 'necromancy_ossuary_mark')).toBe(false);
     expect(target.hp).toBe(hpBefore - 20);
