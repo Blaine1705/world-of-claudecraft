@@ -1,0 +1,79 @@
+// Mount program prewarm (#2571): mounts had ZERO prewarm coverage before this
+// module existed, so the first sighting of any mount (yours or another
+// player's) could freeze a live frame, worse still on hardware without
+// KHR_parallel_shader_compile, where the runtime fallback gate
+// (gateSwapFlagOnCompile) is a no-op. Pins the catalog-derived key list (no
+// separate hand-maintained list to drift, unlike the gap this module closes)
+// and the hidden, off-screen, prewarm-tagged rig contract renderer.ts's
+// vfx.mount-programs manifest entry stages and compiles.
+import * as THREE from 'three';
+import { describe, expect, it, vi } from 'vitest';
+import { VISUALS } from '../src/render/characters/manifest';
+import { MOUNT_VISUAL_SPECS } from '../src/render/mount_visuals';
+import { MOUNT_KEYS } from '../src/sim/content/mounts';
+
+function stubGltf(): { scene: THREE.Group; animations: THREE.AnimationClip[] } {
+  const scene = new THREE.Group();
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshStandardMaterial());
+  mesh.name = 'body';
+  scene.add(mesh);
+  return { scene, animations: [] };
+}
+
+async function importMountPrewarm(loadGltf: ReturnType<typeof vi.fn>) {
+  vi.resetModules();
+  vi.doMock('../src/render/assets/loader', () => ({
+    loadGltf,
+    loadHdr: vi.fn(() => new Promise(() => undefined)),
+    loadTexture: vi.fn(() => Promise.resolve(new THREE.Texture())),
+    loadKtx2Texture: vi.fn(() => Promise.resolve(new THREE.Texture())),
+    releaseGltf: vi.fn(),
+  }));
+  const { charactersReady, mountAssetsReady } = await import('../src/render/characters/assets');
+  await charactersReady();
+  const mountPrewarm = await import('../src/render/mount_prewarm');
+  return { ...mountPrewarm, mountAssetsReady };
+}
+
+describe('mountPrewarmKeys', () => {
+  it('covers every catalog MountKey, derived rather than hand-listed', async () => {
+    const { mountPrewarmKeys } = await importMountPrewarm(vi.fn(() => Promise.resolve(stubGltf())));
+    expect(mountPrewarmKeys().sort()).toEqual([...MOUNT_KEYS].sort());
+  });
+});
+
+describe('buildMountPrewarmVisual', () => {
+  it('lazily fetches the mount GLB and builds a hidden, off-screen, prewarm-tagged rig', async () => {
+    const loadGltf = vi.fn(() => Promise.resolve(stubGltf()));
+    const { buildMountPrewarmVisual, mountPrewarmKeys } = await importMountPrewarm(loadGltf);
+    const [key] = mountPrewarmKeys();
+    const visual = await buildMountPrewarmVisual(key);
+    expect(visual).not.toBeNull();
+    expect(visual?.root.name).toBe(`prewarm-mount:${key}`);
+    expect(visual?.root.position.toArray()).toEqual([0, -1000, 0]);
+    expect(visual?.root.userData.renderCategory).toBe('prewarm');
+    // Nothing preloaded this mount before the call: the lazy fetch actually ran.
+    expect(loadGltf).toHaveBeenCalled();
+  });
+
+  it('returns null, never throws, when the mount asset never arrives', async () => {
+    // The reject only takes effect AFTER import/charactersReady have already
+    // resolved every URL successfully, and the target key is one charactersReady()
+    // has not already warmed: the failure is isolated to the one fetch this
+    // test actually exercises, never the module's own boot.
+    const loadGltf = vi.fn((_url: string) => Promise.resolve(stubGltf()));
+    const { buildMountPrewarmVisual, mountPrewarmKeys, mountAssetsReady } =
+      await importMountPrewarm(loadGltf);
+    const key = mountPrewarmKeys().find(
+      (candidate) => !mountAssetsReady(MOUNT_VISUAL_SPECS[candidate].visualKey),
+    );
+    if (!key) throw new Error('every mount asset is already resident after charactersReady()');
+    const failingUrl = VISUALS[MOUNT_VISUAL_SPECS[key].visualKey]?.url;
+    expect(failingUrl).toBeTruthy();
+    loadGltf.mockImplementation((url: string) =>
+      url === failingUrl ? Promise.reject(new Error('network down')) : Promise.resolve(stubGltf()),
+    );
+    await expect(buildMountPrewarmVisual(key)).resolves.toBeNull();
+    expect(loadGltf).toHaveBeenCalledWith(failingUrl);
+  });
+});

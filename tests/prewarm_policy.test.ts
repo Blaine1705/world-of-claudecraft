@@ -81,6 +81,7 @@ const MANIFEST_IDS = [
   'textures.scene',
   'vfx.atlas',
   'vfx.weapon-skins',
+  'vfx.mount-programs',
   'vfx.ability-primitives',
   'sky.nearby-biomes',
   'world.initial-frame',
@@ -227,6 +228,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     // per-family criterion in the debt set's doc.
     expect(prewarmResumeIsDebt('props.ghost-fade-variants')).toBe(false);
     expect(prewarmResumeIsDebt('vfx.weapon-skins')).toBe(false);
+    expect(prewarmResumeIsDebt('vfx.mount-programs')).toBe(false);
     expect(prewarmResumeIsDebt('vfx.ability-primitives')).toBe(false);
   });
 
@@ -283,6 +285,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       'props.ghost-fade-variants',
       'vfx.atlas',
       'vfx.weapon-skins',
+      'vfx.mount-programs',
       'vfx.ability-primitives',
       'sky.current-zone',
       'render.settle-passes',
