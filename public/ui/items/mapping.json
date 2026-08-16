@@ -244,6 +244,14 @@
    "license": "World of ClaudeCraft original art (project-owned, created for this game)"
   },
   {
+   "itemId": "reins_chimeglass_tortoise",
+   "name": "Roadwarden's Bellstrap: Tolliver",
+   "sourcePack": "woc_hand_painted",
+   "sourceFile": "hand-painted portrait by the project owner (~/Documents/turtle icon .png, 567x569 RGBA), downscaled to 128px and flattened onto the #0E0E10 icon card to match the other reins_* icons",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+  },
+  {
    "itemId": "resonant_hide",
    "name": "Resonant Hide",
    "sourcePack": "woc_professions_art",

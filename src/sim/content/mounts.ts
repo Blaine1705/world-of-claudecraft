@@ -21,6 +21,7 @@ export type MountKey =
   | 'thunderstrut_gobbler'
   | 'drakemaw_raptor'
   | 'lanternback_troll'
+  | 'chimeglass_tortoise'
   | 'terrorspark_groundshaker';
 
 export type MountRarity = 'common' | 'uncommon' | 'rare' | 'epic';
@@ -114,6 +115,17 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },
+  // A salt-flat tortoise who has outwalked three caravan generations. The
+  // tinkers who adopted him ground his spectacles from storm-glass and hung a
+  // bronze bell at his throat so the road could hear him coming. He takes the
+  // flat epic 80% like the rest of his tier: speed is set by rarity here, and
+  // the joke that he is slow lives in his gait and his lore, not in his stats.
+  chimeglass_tortoise: {
+    key: 'chimeglass_tortoise',
+    name: 'Tolliver the Chimeglass',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
   terrorspark_groundshaker: {
     key: 'terrorspark_groundshaker',
     name: 'Terrorspark Groundshaker',
@@ -134,6 +146,7 @@ export const MOUNT_KEYS = Object.keys(MOUNTS) as readonly MountKey[];
  *  are still under development. */
 export const DEVELOPER_MOUNTS: readonly MountKey[] = [
   'lanternback_troll',
+  'chimeglass_tortoise',
   'terrorspark_groundshaker',
 ];
 

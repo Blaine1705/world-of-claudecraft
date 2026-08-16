@@ -1429,12 +1429,13 @@ export const RELIQUARY_ILLUMINATION_DEED_PAGES: Readonly<Record<string, string>>
  * never a score (the pinned doctrine), and no completion read may depend on
  * how many copies the world handed over.
  *
- * col_reliquary_complete is unearnable in production while FOUR catalogued
+ * col_reliquary_complete is unearnable in production while FIVE catalogued
  * slots stay owner-pended: the masterwork:engineering mark (13b QA ruling: no
  * engineering recipe can proc a masterwork, so the slot is catalogued but
- * unwritable) and the three SOURCE_PENDING_RULING mounts (reins_drakemaw_raptor
- * has no acquisition path in content; reins_terrorspark_groundshaker and
- * reins_lanternback_troll are dev-grant only). All four are owner decisions
+ * unwritable) and the four SOURCE_PENDING_RULING mounts (reins_drakemaw_raptor
+ * has no acquisition path in content; reins_terrorspark_groundshaker,
+ * reins_lanternback_troll and reins_chimeglass_tortoise are dev-grant only).
+ * All five are owner decisions
  * outside this packet; the
  * capstone becomes earnable with NO code change here once they all land.
  * Tests may still reach owned === total by granting marks and reins directly.

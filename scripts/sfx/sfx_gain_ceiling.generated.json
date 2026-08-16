@@ -2359,6 +2359,17 @@
       }
     ]
   },
+  "mount_run_chimeglass_tortoise": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mount_run_chimeglass_tortoise.mp3",
+        "sha256": "d650a08d4f9262375c1405346f76e5e6f9eb29e75459f8fc43880e3934a5137b",
+        "size": 15716,
+        "peakDb": -6.2
+      }
+    ]
+  },
   "mount_run_drakemaw_raptor": {
     "ceilingDb": 5.2,
     "tracks": [

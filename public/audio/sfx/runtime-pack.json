@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "cbd768a0a194be10aba70f9ef07051a51c2dcaf476d77399aeffe63ff65c5df6",
-  "catalogHash": "b69828f67abb719ec940210d7051d7dbf2ae718dcc6ca894b0c030a8a2be5fff",
+  "bundleId": "2c235c4f5b2f88d36704bbe9251355d7d7f0fda41ca44c5a8d436fecd93f02ff",
+  "catalogHash": "0d8eb6fecd81fe7d7284cbfc220793680c1128d1409ba384e27a8cb2c9dc7ebd",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -2861,6 +2861,18 @@
           "url": "/audio/sfx/mount_run_aether_hover_cycle.mp3?v=355a7b665113",
           "bytes": 17102,
           "sha256": "355a7b6651139d8737500829ebd23ae3d0dba02fb2d3ccb8b3506864346b8c3c"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_run_chimeglass_tortoise": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_chimeglass_tortoise.mp3?v=d650a08d4f92",
+          "bytes": 15716,
+          "sha256": "d650a08d4f9262375c1405346f76e5e6f9eb29e75459f8fc43880e3934a5137b"
         }
       ],
       "gain": 1,

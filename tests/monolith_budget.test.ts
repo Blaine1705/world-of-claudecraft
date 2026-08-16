@@ -75,11 +75,21 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again after extracting the delve interior build-cache scheduling
     // (the position-keyed rebuild/retire decision plus the async build loop)
     // into src/render/delve_interior_tracker.ts.
-    // Lowered once more by this branch: the rideable-mount lifecycle (build,
-    // live swap, teardown, rider seating, carried lamps, the summon/dismount
-    // FX) moved to src/render/mount_lifecycle.ts. The extraction earns the
-    // slack, so the ceiling claims it rather than banking it.
-    ceiling: 13696,
+    // Lowered once more by the troll mount (#3399): the rideable-mount
+    // lifecycle (build, live swap, teardown, rider seating, carried lamps, the
+    // summon/dismount FX) moved to src/render/mount_lifecycle.ts. The
+    // extraction earns the slack, so the ceiling claims it rather than banking
+    // it: 13730 to 13696.
+    // Back up nine to 13705 for the Chimeglass Tortoise, and no further. The
+    // tortoise's own logic is already extracted -- the halo animation lives in
+    // src/render/mount_glow.ts and the rider straddle in
+    // characters/visual.ts -- so what lands here is only what the coordinator
+    // must own: one import, the EntityView slot and its init, and two
+    // per-frame calls into those modules. That is the same shape carried mount
+    // lamps already have a few lines above. Net against the branch point this
+    // is still 25 lines down, and the ratchet's rule applies from here: any
+    // further growth reds again.
+    ceiling: 13705,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

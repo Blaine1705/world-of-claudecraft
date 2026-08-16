@@ -189,8 +189,11 @@ interface AttributionTargetFixture {
 // Re-minted for the Lanternback Troll: the rideable-mount lifecycle moved out of
 // renderer.ts into mount_lifecycle.ts, and renderer.ts is a provenance input.
 // No capture was retaken.
+// Re-minted again for the Chimeglass Tortoise: the rider straddle hook
+// (visual.setRidePose) and the per-frame updateMountGlows call move renderer.ts
+// once more. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'f1b5afa2ac38b7b7e0a8a3b44ee0632c0c83502857455e64ecfbaff4cf4ce691';
+  '4173586ac0ae35d0a96b941523e3d551c3dd9272c5b20b3e04f405ffa70c1262';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

@@ -428,6 +428,19 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
   },
+  // Developer-only on the same terms (DEVELOPER_MOUNTS in content/mounts.ts):
+  // no vendor, quest, creature, heroic or Rift source, soulbound so a dev grant
+  // cannot be traded in. Use /dev mounts or /dev give reins_chimeglass_tortoise.
+  reins_chimeglass_tortoise: {
+    id: 'reins_chimeglass_tortoise',
+    name: "Roadwarden's Bellstrap: Tolliver",
+    kind: 'mount',
+    mount: 'chimeglass_tortoise',
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
   mistveil_cord: {
     id: 'mistveil_cord',
     name: 'Mistveil Cord',

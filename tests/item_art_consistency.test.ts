@@ -333,8 +333,8 @@ describe('item-art consistency accepted-art provenance', () => {
       },
       {
         path: `${evidenceDir}/final-item-art-audit-verdict.json`,
-        acceptedSha256: '8f7df7e64740fe404bd34a28b5f6442fe8b3828ba627d45a3fec8e467adc8c79',
-        acceptedBytes: 108_801,
+        acceptedSha256: 'b77340d50027a9abe3fca2238747706190f5fdf37cffdd5d4c6f04dbf21b6aed',
+        acceptedBytes: 109_944,
       },
     ]);
     for (const evidence of [...value.sourceEvidence, ...value.generationReports]) {
@@ -449,9 +449,9 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(readme).toContain('node scripts/item_art_audit.mjs\n');
     expect(readme).toContain('node scripts/item_art_audit.mjs --refresh-verdict');
     const verdictBytes = readFileSync(path.join(repoRoot, verdictPath));
-    expect(verdictBytes.length).toBe(108_801);
+    expect(verdictBytes.length).toBe(109_944);
     expect(sha256(verdictBytes)).toBe(
-      '8f7df7e64740fe404bd34a28b5f6442fe8b3828ba627d45a3fec8e467adc8c79',
+      'b77340d50027a9abe3fca2238747706190f5fdf37cffdd5d4c6f04dbf21b6aed',
     );
     const verdict = JSON.parse(verdictBytes.toString('utf8')) as FinalAuditVerdict;
 
@@ -460,8 +460,8 @@ describe('item-art consistency accepted-art provenance', () => {
       baselineCommit: 'aee195551b5aef628eb7a72192117d7e3079818e',
       branch: 'feature/placeholder-art-completion-v036',
       shippingDirectory: 'public/ui/items',
-      itemArtFilesReviewed: 823,
-      liveItemDefinitions: 838,
+      itemArtFilesReviewed: 824,
+      liveItemDefinitions: 839,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
@@ -471,7 +471,7 @@ describe('item-art consistency accepted-art provenance', () => {
       manifest().targetSets.items.map((id) => `public/ui/items/${id}.webp`),
     );
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
-      823,
+      824,
     );
     expect(Object.keys(verdict.auditScope.groups)).toHaveLength(22);
     const shippingIds = new Set(
@@ -516,13 +516,13 @@ describe('item-art consistency accepted-art provenance', () => {
     ]);
     expect(verdict.visualVerdict).toMatchObject({
       status: 'pass',
-      passCount: 823,
+      passCount: 824,
       watchCount: 0,
       watch: [],
       rejectCount: 0,
       reject: [],
       summary:
-        'All 823 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, and the Lanternback Troll mount reins icon owner-supplied and passed on 2026-08-15.',
+        'All 824 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, the Lanternback Troll mount reins icon owner-supplied and passed on 2026-08-15, and the Chimeglass Tortoise mount reins icon rendered from its shipped mount model and owner-reviewed on 2026-08-15.',
     });
     expect(verdict.visualVerdict.passIds).toEqual(currentIds);
     expect(verdict.nonVisualContentWatch).toEqual([
@@ -562,8 +562,8 @@ describe('item-art consistency accepted-art provenance', () => {
 
     expect(verdict.evidence.catalog).toEqual({
       path: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      sha256: '533b7be98506a28bb8e40f17ce7f9cfc7800a2f37952ca1c43472308e57535eb',
-      bytes: 451_794,
+      sha256: '7b579121f18eb5ff259b594d9f74d4b28fb73c214cfbbef422fcede31bc5f67d',
+      bytes: 452_340,
     });
     expect(verdict.evidence.rendererFingerprint).toBe(
       'fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082',
@@ -616,7 +616,7 @@ describe('item-art consistency accepted-art provenance', () => {
       sheetSetDigest.update(`${sheet.path}\0${sheet.sha256}\0${sheet.bytes}\n`);
     }
     expect(verdict.evidence.sheetSetSha256).toBe(
-      '5ce34d184b33749b513e6b8bb1db12989f65d6c3f383ca88c8d14d057a66b536',
+      '716289d62ace747c133b47935a54ca5ce78d352eed37f7b5997d1edcb33a7c70',
     );
     expect(sheetSetDigest.digest('hex')).toBe(verdict.evidence.sheetSetSha256);
 
@@ -626,7 +626,7 @@ describe('item-art consistency accepted-art provenance', () => {
       shippingCatalogDigest.update(`${id}\0${sha256(bytes)}\0${bytes.length}\n`);
     }
     expect(verdict.evidence.shippingCatalogSha256).toBe(
-      '3e00a8806197dff2073ca9e7b4643cfafd441de4e7ef1af0b85dd1251ea6aef0',
+      'fbaac839dbf147c8a88d906f141e8b011a9a91434aa54d3842fbec7407d698fe',
     );
     expect(shippingCatalogDigest.digest('hex')).toBe(verdict.evidence.shippingCatalogSha256);
   });
@@ -736,7 +736,7 @@ describe('item-art consistency accepted-art provenance', () => {
       mapping.license,
       'no ordinary item inherits the retired CraftPix default',
     ).toBeUndefined();
-    expect(mapping.entries).toHaveLength(40);
+    expect(mapping.entries).toHaveLength(41);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
     expect(mapping.generatedBatches).toHaveLength(16);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
@@ -760,8 +760,8 @@ describe('item-art consistency accepted-art provenance', () => {
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(823);
-    expect(new Set(allCurrentOwnerIds).size).toBe(823);
+    expect(allCurrentOwnerIds).toHaveLength(824);
+    expect(new Set(allCurrentOwnerIds).size).toBe(824);
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
       `${evidenceDir}/supersession-audit.json`,
@@ -897,8 +897,8 @@ describe('item-art consistency accepted-art provenance', () => {
     for (const id of ownerIds) ownerCountById.set(id, (ownerCountById.get(id) ?? 0) + 1);
 
     const violations: string[] = [];
-    if (ownerIds.length !== 823) violations.push(`mapping owner count: ${ownerIds.length} != 823`);
-    if (fileIds.length !== 823) violations.push(`shipping WebP count: ${fileIds.length} != 823`);
+    if (ownerIds.length !== 824) violations.push(`mapping owner count: ${ownerIds.length} != 824`);
+    if (fileIds.length !== 824) violations.push(`shipping WebP count: ${fileIds.length} != 824`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

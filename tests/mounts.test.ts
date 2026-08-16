@@ -105,8 +105,8 @@ function ride(sim: Sim, pid: number, key: string): void {
 }
 
 describe('mount catalog', () => {
-  it('has exactly ten mounts with the horse first and the developer tank last', () => {
-    expect(MOUNT_KEYS).toHaveLength(10);
+  it('has exactly eleven mounts with the horse first and the developer tank last', () => {
+    expect(MOUNT_KEYS).toHaveLength(11);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(MOUNT_KEYS.at(-1)).toBe('terrorspark_groundshaker');
     expect(DEFAULT_MOUNT).toBe('valorsteed');
@@ -128,6 +128,7 @@ describe('mount catalog', () => {
     expect(spec('aether_hover_cycle')).toEqual(['epic', 0.8]);
     expect(spec('thunderstrut_gobbler')).toEqual(['epic', 0.8]);
     expect(spec('lanternback_troll')).toEqual(['epic', 0.8]);
+    expect(spec('chimeglass_tortoise')).toEqual(['epic', 0.8]);
     expect(spec('terrorspark_groundshaker')).toEqual(['epic', 0.8]);
     // The level field is GONE, not merely unused: it never fired (reins carry no
     // requiredLevel and every source is level-20 content) and leaving it would

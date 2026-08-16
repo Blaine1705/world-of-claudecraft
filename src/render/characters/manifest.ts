@@ -18,6 +18,22 @@ export interface EmoteClipSpec {
 
 export interface ClipMap {
   idle: string;
+  /** Extra standing-still clips, played one at a time in place of `idle` and
+   *  then handed back to it over the standard one-shot crossfade. Purely
+   *  cosmetic idle-breakers ("fidgets"): author each to END on the idle pose,
+   *  because leaving idle CANCELS one mid-clip and the rig cuts straight back
+   *  over a 0.18s fade. Empty/absent for every rig that just breathes.
+   *
+   *  These fire from ONE shared, jittered timer and are picked at random, so a
+   *  given clip's own cadence falls as the pool grows. A clip that has to show
+   *  up on a schedule belongs in `idleBeat` instead. */
+  idleVariants?: string[];
+  /** A signature idle on a FIXED cadence, scheduled independently of the
+   *  `idleVariants` pool. Same contract as a fidget (one-shot, must end on the
+   *  idle pose, cancelled the moment the rig stops standing still); the
+   *  difference is only that it keeps its own clock, so "every N seconds"
+   *  actually means it. */
+  idleBeat?: { clip: string; everySec: number; jitterSec?: number };
   walk: string;
   run: string;
   /** one-shot swing clips, rotated per attack */
@@ -232,6 +248,28 @@ const MOUNT_RIGGED: ClipMap = {
   run: 'Run',
   attack: [],
   death: 'Death',
+};
+
+// The Chimeglass Tortoise ships three authored idle-breakers on top of the
+// breathing Idle: he looks about him, rears up to paw the air, and stamps his
+// front feet one at a time. Each ends back on the idle pose so the hand-off is
+// seamless.
+const MOUNT_TORTOISE: ClipMap = {
+  ...MOUNT_RIGGED,
+  idleVariants: ['Idle_Look', 'Idle_Rear', 'Idle_Stamp', 'Idle_Groove'],
+  // The wet-dog head shake is his signature, so it keeps its own clock rather
+  // than taking a one-in-five share of the pool's 20-45s draw (which would have
+  // put it 100-225s apart). Small jitter only, so a paddock of them does not
+  // shake in lockstep.
+  idleBeat: { clip: 'Idle_Shake', everySec: 20, jitterSec: 4 },
+  // Naming `land` opts this rig into the HELD-jump treatment (visual.ts
+  // isOnce): `Jump` stops looping and clamps on its last frame — the airborne
+  // tuck — for as long as the body is off the ground, and `Land` fires as a
+  // one-shot on the touchdown edge. So `Jump` is only the spring and the tuck;
+  // the arc itself is the game's, and the clip must not carry a rise or the
+  // mount would still be held above the ground when it touches down.
+  jump: 'Jump',
+  land: 'Land',
 };
 
 // The Drakelands dragonkin brood (tmp/dragonkin_build.mjs bakes): artist
@@ -1689,6 +1727,29 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: MOUNT_RIGGED,
     walkRef: 5.6,
     runRef: 12.6,
+    lazyPreload: true,
+  },
+  // The Chimeglass Tortoise. Low and broad: 3.6 puts the crown of his shell
+  // near a horse's saddle without pretending he is horse-shaped.
+  //
+  // walkRef/runRef are a CADENCE choice, not a foot match, and the gap is not
+  // small — say so plainly rather than calling it a slide. His legs rest 99.6%
+  // extended, so the reach envelope caps his stride at 0.092 model units, about
+  // 0.33yd here. At a mounted 12.6 yd/s (RUN_SPEED 7 x +80%) a true foot match
+  // would need ~38 strides/sec. Nothing recovers that, so his feet carry only
+  // ~5% of the ground he covers and the refs buy a readable gait instead.
+  //
+  // The numbers are picked to land INSIDE locomotionTimeScale's clamp rather
+  // than against it: run clamps to [0.6, 1.6] and walk to [0.6, 1.8], so any
+  // runRef at or under 7.9 would saturate at 1.6 and every value in that range
+  // would render identically. 10 gives 1.26 (about 1.7 strides/sec) — brisk for
+  // a tortoise without reading as a wind-up toy.
+  mount_chimeglass_tortoise: {
+    url: `${MOUNTS_DIR}/chimeglass_tortoise.glb`,
+    height: 3.6,
+    clips: MOUNT_TORTOISE,
+    walkRef: 3.6,
+    runRef: 10,
     lazyPreload: true,
   },
   // Compact fantasy tank. One wheel revolution per locomotion clip matches

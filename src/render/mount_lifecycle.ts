@@ -17,6 +17,7 @@ import * as THREE from 'three';
 import type { CharacterVisual } from './characters';
 import { createMountVisual } from './characters';
 import { mountAssetsReady, preloadMountAssets } from './characters/assets';
+import { attachMountGlows, disposeMountGlows, type MountGlows } from './mount_glow';
 import { attachMountLamps, disposeMountLamps, type MountLamps } from './mount_lamps';
 import type { MountVisualSpec } from './mount_visuals';
 
@@ -27,6 +28,10 @@ export interface MountViewState {
   /** '' = none; diffed each frame so a live mount swap rebuilds. */
   mountVisualKey: string;
   mountLamps: MountLamps | null;
+  /** Additive halos the mount wears on its own rig (the tortoise's lenses).
+   *  Unlike the lamps these are pure draw cost, so they never touch the
+   *  renderer's light budget and need no reconcile. */
+  mountGlows: MountGlows | null;
   mountCompilePending: boolean;
   /** Resolved seat bone, cached across frames (cleared on a mount swap). */
   mountSeatBone: THREE.Object3D | null;
@@ -44,6 +49,10 @@ export interface MountViewHost {
 
 function teardown(v: MountViewState, host: MountViewHost): void {
   v.mountSeatBone = null;
+  if (v.mountGlows) {
+    disposeMountGlows(v.mountGlows);
+    v.mountGlows = null;
+  }
   if (v.mountLamps) {
     disposeMountLamps(v.mountLamps);
     v.mountLamps = null;
@@ -85,10 +94,11 @@ export function syncMountVisual(
   v.group.add(v.mountVisual.root); // group.scale already carries e.scale
   v.mountVisualKey = spec.visualKey;
   // Lamps a mount carries on its own rig (the Lanternback's pair of storm
-  // lanterns) hang off its bones, so they join the ranked point-light budget
-  // the moment the mount appears.
+  // lanterns, the Chimeglass Tortoise's spectacle light) hang off its bones, so
+  // they join the ranked point-light budget the moment the mount appears.
   v.mountLamps = attachMountLamps(v.mountVisual.root, spec);
   if (v.mountLamps) host.reconcileViewLights();
+  v.mountGlows = attachMountGlows(v.mountVisual.root, spec);
   v.mountCompilePending = true;
   host.gateSwapFlagOnCompile(v.mountVisual.root, () => {
     v.mountCompilePending = false;
@@ -181,6 +191,10 @@ export function placeRider(
  *  has already pulled this view's lights out of the renderer-wide pool, so
  *  this does not reconcile. */
 export function disposeMountView(v: MountViewState): void {
+  if (v.mountGlows) {
+    disposeMountGlows(v.mountGlows);
+    v.mountGlows = null;
+  }
   if (v.mountLamps) {
     disposeMountLamps(v.mountLamps);
     v.mountLamps = null;

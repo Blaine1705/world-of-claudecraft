@@ -5,8 +5,8 @@
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 823,
-    "liveItemDefinitions": 838,
+    "itemArtFilesReviewed": 824,
+    "liveItemDefinitions": 839,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -304,7 +304,7 @@
       "food": 21,
       "held_offhand": 9,
       "junk": 81,
-      "mount": 10,
+      "mount": 11,
       "potion": 13,
       "quest": 97,
       "tool": 45,
@@ -340,6 +340,18 @@
           "public/ui/items/mapping.json"
         ],
         "note": "The Lanternback Troll mount reins icon. The owner supplied the painted 624x624 master and directed its use for this item; it was downscaled to the 128px opaque woc-item-icon-v1 shipping format with no other change, and owner-reviewed pass on 2026-08-15. The 2026-08-09 campaign review of the prior 817 files and the 2026-08-10 review of the five class-overhaul integration additions both stand unchanged."
+      },
+      {
+        "reviewedAt": "2026-08-15",
+        "branch": "feature/turtle-mount",
+        "reviewer": "owner",
+        "addedIds": [
+          "reins_chimeglass_tortoise"
+        ],
+        "provenance": [
+          "public/ui/items/mapping.json"
+        ],
+        "note": "The Chimeglass Tortoise mount reins icon. Rendered from the shipped mount model (public/models/mounts/chimeglass_tortoise.glb) as a three-quarter head study, background keyed and flattened to the 128px opaque woc-item-icon-v1 shipping format, and owner-reviewed pass on 2026-08-15. Re-rendered on 2026-08-16 alongside the mount's lens-glow pass, which restyled the glowing lens pair the icon frames: same three-quarter head study, same shipping format, 3062 to 3784 bytes, owner-reviewed pass again on 2026-08-16. The 2026-08-09 campaign review of the prior 817 files, the 2026-08-10 review of the five class-overhaul integration additions, and the 2026-08-15 Lanternback Troll review all stand unchanged."
       }
     ]
   },
@@ -382,7 +394,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 823,
+    "passCount": 824,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -935,6 +947,7 @@
       "reedwoven_trousers",
       "reinforced_pauldrons",
       "reins_aether_hover_cycle",
+      "reins_chimeglass_tortoise",
       "reins_drakemaw_raptor",
       "reins_grag_bear",
       "reins_lanternback_troll",
@@ -1212,7 +1225,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 823 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, and the Lanternback Troll mount reins icon owner-supplied and passed on 2026-08-15."
+    "summary": "All 824 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, the Lanternback Troll mount reins icon owner-supplied and passed on 2026-08-15, and the Chimeglass Tortoise mount reins icon rendered from its shipped mount model and owner-reviewed on 2026-08-15."
   },
   "nonVisualContentWatch": [
     {
@@ -1369,8 +1382,8 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "533b7be98506a28bb8e40f17ce7f9cfc7800a2f37952ca1c43472308e57535eb",
-      "bytes": 451794
+      "sha256": "7b579121f18eb5ff259b594d9f74d4b28fb73c214cfbbef422fcede31bc5f67d",
+      "bytes": 452340
     },
     "rendererFingerprint": "fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082",
     "sheetCount": 208,
@@ -1384,7 +1397,7 @@
       "small-multiview": 26,
       "identity": 26
     },
-    "sheetSetSha256": "5ce34d184b33749b513e6b8bb1db12989f65d6c3f383ca88c8d14d057a66b536",
+    "sheetSetSha256": "716289d62ace747c133b47935a54ca5ce78d352eed37f7b5997d1edcb33a7c70",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -2540,66 +2553,66 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--128-color.png",
-        "sha256": "52aa4263eea0a30856aff93dc16ad0dec47be01e1fb070e53cc01ba36399df49",
-        "bytes": 374810,
+        "sha256": "8927443e4b432b37dda276ee26babbe168cf4bf02b460459f70acb1e57a7218c",
+        "bytes": 416429,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--40-color.png",
-        "sha256": "a39d1b9772151bbcab7bb25cebff40f97809eb951347bc2684b6d858649ce664",
-        "bytes": 67274,
+        "sha256": "f0e4a18d29c8871e563978fcb8ec8ae1dc5bb6b3fabf676ebdae2bb3d7add877",
+        "bytes": 75572,
         "width": 1600,
-        "height": 166,
+        "height": 288,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--28-color.png",
-        "sha256": "a1db1c8fd00e1950bfd9d6fb8022dd89cfb26ae2e16a8067cf5e1be3fea11a41",
-        "bytes": 45893,
+        "sha256": "366d4491e25c9aa8493a88c0ddf758d728dcbc7aa079853fb40135bc32dc1dec",
+        "bytes": 52169,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--22-color.png",
-        "sha256": "388ed1325eee867a01e0f41f7e6ecf8b362d6d03850b9561b7822674ede01fd5",
-        "bytes": 36676,
+        "sha256": "6fd390832f42051d78518c65c15efbdce985696f4d0da19dff0625c01a13ade6",
+        "bytes": 41686,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--28-grayscale.png",
-        "sha256": "4f4d272d5c194c032f631a672d30ee0aa0f1a7c7d77eec03a3264967bcc4ecdf",
-        "bytes": 34685,
+        "sha256": "dac0e8bcd15b4ee1bffa349a59b77cd3a2da8de1bc1f0d3d62a8f6593c8526e8",
+        "bytes": 40260,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--64-circle.png",
-        "sha256": "4fa4fde3795ce8655e32a7de2b1fe66e06300ec57e4529884d64ff0d036bb24b",
-        "bytes": 113434,
+        "sha256": "29243cf2c916e2a97f5fe877845bc86c4df2ac081b4248e57df174045c1cf95f",
+        "bytes": 126936,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--small-multiview.png",
-        "sha256": "e382a9a7c606846a2f5b85d15d6e141425bedd06a12644d4eb852f2a7c0b4bdb",
-        "bytes": 205918,
+        "sha256": "3b35533536f57665ceafe4743e9fc70f23ddb6702050b282648ecc1e926f9bc7",
+        "bytes": 230549,
         "width": 1800,
-        "height": 262,
+        "height": 480,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--identity.png",
-        "sha256": "ac0f6644cacf49bddab77f22097cde7345549e0d7ef06a1ce7d4c66b1d264c1c",
-        "bytes": 393148,
+        "sha256": "0bffdf8d0cdbfcdc933b03d282c4fec18e4430c0759c473fbadb14a20978f74b",
+        "bytes": 438028,
         "width": 1800,
-        "height": 248,
+        "height": 452,
         "format": "png"
       },
       {
@@ -3051,6 +3064,6 @@
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "3e00a8806197dff2073ca9e7b4643cfafd441de4e7ef1af0b85dd1251ea6aef0"
+    "shippingCatalogSha256": "fbaac839dbf147c8a88d906f141e8b011a9a91434aa54d3842fbec7407d698fe"
   }
 }

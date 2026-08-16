@@ -9,6 +9,7 @@ import {
   MOUNT_LAMP_COLOR,
   MOUNT_LAMP_DISTANCE,
   MOUNT_LAMP_INTENSITY,
+  MOUNT_LENS_COLOR,
   MOUNT_VISUAL_SPECS,
   mountBobY,
   mountLampFlicker,
@@ -206,7 +207,39 @@ describe('procedural bob math', () => {
     expect(mountBobY(spec, 0.7, true)).toBe(0);
   });
 
-  it('the Lanternback Troll is the only mount that carries lamps, one per chain', () => {
+  it('seats the Chimeglass rider on the carapace, not over the neck', () => {
+    const spec = MOUNT_VISUAL_SPECS.chimeglass_tortoise;
+    const def = VISUALS.mount_chimeglass_tortoise;
+    // He is low and broad: shorter than the griffin (4.1) and far under the
+    // Lanternback (7.0), but tall enough to ride.
+    expect(def.height).toBe(3.6);
+    expect(spec.rigged).toBe(true);
+    // No procedural bob: his authored plod carries what bounce a tortoise has.
+    expect(mountBobY(spec, 0.7, true)).toBe(0);
+
+    // The rider rides the SHELL bone, because the carapace rolls under him
+    // every stride and a fixed lift would let it slide through him.
+    expect(spec.seatBone?.bone).toBe('saddle');
+    const offset = spec.seatBone!.offset;
+    // In that bone's local frame +Y runs up the bone and -Z runs toward the
+    // tail. The rider must be lifted clear of the bone head AND set back: the
+    // head sits at model y -0.02 while the carapace centres near +0.03, so
+    // seating him on the head alone perches him over the neck.
+    expect(offset[1]).toBeGreaterThan(0);
+    expect(offset[2]).toBeLessThan(0);
+    // ...but not so far back that he slides off the tail. The shell runs about
+    // 0.37 model units nose-to-tail, so half of that is the outer bound.
+    expect(Math.abs(offset[2])).toBeLessThan(0.185);
+    expect(offset[0]).toBe(0); // centred across the shell
+
+    // `seat`/`seatFwd` are only the pre-load fallback and the nameplate anchor
+    // once seatBone resolves, but they still have to be sane: the shell crown
+    // sits at model z 0.5 of a 1.0-tall model, so at height 3.6 that is ~1.8.
+    expect(spec.seat).toBeGreaterThan(1.8);
+    expect(spec.seat).toBeLessThan(2.6);
+  });
+
+  it('only the Lanternback and the Chimeglass carry lamps, on their own terms', () => {
     for (const key of MOUNT_KEYS) {
       const lamps = MOUNT_VISUAL_SPECS[key].lamps;
       if (key === 'lanternback_troll') {
@@ -218,6 +251,26 @@ describe('procedural bob math', () => {
           expect(Math.abs(lamp.offset[0])).toBeLessThan(0.02);
           expect(Math.abs(lamp.offset[2])).toBeLessThan(0.02);
         }
+        // He takes the shared lantern defaults rather than overriding them.
+        for (const lamp of lamps) {
+          expect(lamp.color ?? MOUNT_LAMP_COLOR).toBe(MOUNT_LAMP_COLOR);
+          expect(lamp.intensity ?? MOUNT_LAMP_INTENSITY).toBe(MOUNT_LAMP_INTENSITY);
+        }
+      } else if (key === 'chimeglass_tortoise') {
+        // ONE light for the pair of lenses, hung off the single spectacle bone
+        // so it tracks his head. Two would be the two nearest dynamic lights on
+        // screen by construction (the camera rides this mount) and would evict
+        // two world lights from the ranked budget for no visible gain.
+        expect(lamps.map((l) => l.bone)).toEqual(['lens']);
+        // Cold blue, and far dimmer/tighter than a storm lantern: spectacles
+        // should read as eyes, not floodlight the road. Steady, not guttering:
+        // enchanted glass has no wick.
+        for (const lamp of lamps) {
+          expect(lamp.color).toBe(MOUNT_LENS_COLOR);
+          expect(lamp.intensity).toBeLessThan(MOUNT_LAMP_INTENSITY);
+          expect(lamp.distance).toBeLessThan(MOUNT_LAMP_DISTANCE);
+          expect(lamp.flicker).toBe('steady');
+        }
       } else {
         expect(lamps, `${key} must carry no lamps`).toEqual([]);
       }
@@ -226,6 +279,7 @@ describe('procedural bob math', () => {
     expect(MOUNT_LAMP_COLOR).toBe(0xff8c32);
     expect(MOUNT_LAMP_INTENSITY).toBe(6.5);
     expect(MOUNT_LAMP_DISTANCE).toBe(17);
+    expect(MOUNT_LENS_COLOR).toBe(0x3d8cff);
   });
 
   it('lamp flicker stays inside the band that keeps the light budget stable', () => {

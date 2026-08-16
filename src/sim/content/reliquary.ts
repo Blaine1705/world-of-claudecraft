@@ -267,6 +267,7 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   'thunderstrut_gobbler',
   'drakemaw_raptor',
   'lanternback_troll',
+  'chimeglass_tortoise',
   'terrorspark_groundshaker',
 ] as const;
 
@@ -283,12 +284,12 @@ export const RELIQUARY_HORIZON_MOUNTS = [
 // def in content/zone3.ts), so a quest hint there would name a door that hands
 // out nothing.
 //
-// drakemaw_raptor, lanternback_troll, and terrorspark_groundshaker are absent,
-// and that absence IS the answer: no live table awards any of them
-// (drakemaw_raptor has no acquisition path; the other two are DEVELOPER_MOUNTS,
-// dev-grant only). They are the catalog's three SOURCE_PENDING_RULING mounts;
-// masterwork:engineering on the professions shelf is the fourth pending slot
-// (QA ruling 2026-08-07).
+// drakemaw_raptor, lanternback_troll, chimeglass_tortoise and
+// terrorspark_groundshaker are absent, and that absence IS the answer: no live
+// table awards any of them (drakemaw_raptor has no acquisition path; the other
+// three are DEVELOPER_MOUNTS, dev-grant only). They are the catalog's four
+// SOURCE_PENDING_RULING mounts; masterwork:engineering on the professions shelf
+// is the fifth pending slot (QA ruling 2026-08-07).
 //
 // Keys are typed against the live mount ladder so a misspelled or renamed key
 // fails tsc at the authoring site instead of falling through to the pending

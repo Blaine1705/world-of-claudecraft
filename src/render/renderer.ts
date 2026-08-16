@@ -350,6 +350,7 @@ import { buildMailboxPillar } from './mailbox';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
+import { type MountGlows, updateMountGlows } from './mount_glow';
 import { type MountLamps, updateMountLamps } from './mount_lamps';
 import {
   disposeMountView,
@@ -1083,6 +1084,7 @@ export interface EntityView {
   mountVisual: CharacterVisual | null; // rideable mount under a player, built lazily
   mountVisualKey: string; // '' = none; diffed each frame for live mount swaps
   mountLamps: MountLamps | null; // point lights the mount carries on its own bones
+  mountGlows: MountGlows | null; // additive halos the mount carries on its own bones
   mountSeatBone: THREE.Object3D | null; // resolved seat bone the rider anchors to
   /** world-unit rider saddle lift while mounted (0 dismounted); the nameplate,
    *  chat-bubble, and sloppy-pick overhead anchors add it (scaled by e.scale) */
@@ -8868,6 +8870,7 @@ export class Renderer {
       mountVisual: null,
       mountVisualKey: '',
       mountLamps: null,
+      mountGlows: null,
       mountSeatBone: null,
       mountLift: 0,
       metamorphVisual: null,
@@ -11417,6 +11420,11 @@ export class Renderer {
       // the seat height while mounted; 0 whenever the mount is absent/hidden.
       // seatFwd slides the rider along facing onto saddles that sit off the
       // model origin (the toad's is well back toward the tail).
+      // A mount with a straddle spec re-poses the rider's legs around its
+      // barrel (characters/visual.ts setRidePose). The seated loop stays the
+      // base underneath: it is what carries his hips down onto the saddle, and
+      // every seat offset in this file was fitted against it.
+      v.visual.setRidePose(mountShown && mountSpec ? mountSpec.ride : null);
       placeRider(v, v.visual.root, mountSpec, v.mountLift, 0);
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual && resolvedForm !== 'fireball');
@@ -12017,6 +12025,7 @@ export class Renderer {
           // Carried lamps are DYNAMIC budget lights: the pass only ever zeroes
           // them, so the flame level has to be re-driven here, ahead of it.
           if (v.mountLamps) updateMountLamps(v.mountLamps, this.time);
+          if (v.mountGlows) updateMountGlows(v.mountGlows, this.time);
         } else {
           v.mountVisual.advanceOffscreen(dt);
         }

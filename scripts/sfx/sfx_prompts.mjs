@@ -128,6 +128,14 @@ export const SFX = [
     custom: true,
   },
   {
+    // Synthesised for the same reason as the troll above: the cue is a bronze
+    // bell over a soft clawed pad, and a bell's inharmonic partial set is
+    // easier to author than to prompt for. Source:
+    // scripts/gen_chimeglass_tortoise_sfx.mjs.
+    key: 'mount_run_chimeglass_tortoise',
+    custom: true,
+  },
+  {
     key: 'mount_run_terrorspark_groundshaker_start',
     custom: true,
   },

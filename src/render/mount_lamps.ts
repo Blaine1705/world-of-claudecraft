@@ -1,5 +1,6 @@
-// Lit lamps carried on a mount's own skeleton (the Lanternback Troll's pair of
-// storm lanterns, hung off the iron throne he wears).
+// Lit lamps carried on a mount's own skeleton: the Lanternback Troll's pair of
+// storm lanterns hung off the iron throne he wears, and the Chimeglass
+// Tortoise's single blue light behind his storm-glass spectacles.
 //
 // The lights are parented to the SWINGING BONE, not to the mount root, so the
 // flame stays inside its glass through every swing of the run cycle for free:
@@ -14,9 +15,10 @@
 // why `updateMountLamps` re-drives the level every frame from before the pass
 // (the same contract weapon_vfx.ts lights keep).
 //
-// The GLASS itself is not this module's job. The lamp material in the GLB is
-// named `lantern_Glow`, and buildTintedClone (characters/assets.ts) already
-// pins any material whose name contains `Glow` to EMISSIVE_GLOW, the intensity
+// The GLASS itself is not this module's job. The lamp materials in the GLBs are
+// named `lantern_Glow` and `lens_Glow`, and buildTintedClone
+// (characters/assets.ts) pins any material whose name CONTAINS `Glow` to
+// EMISSIVE_GLOW — which is why both names work unchanged — the intensity
 // calibrated against the bloom threshold. Re-boosting it here would fight that
 // one calibration from a second place, and would not even reach: the low
 // graphics tier rebuilds materials as Lambert and drops their names.
@@ -32,6 +34,13 @@ import {
 
 export interface MountLamps {
   lights: THREE.PointLight[];
+  /** Whether each light gutters like a wick, parallel to `lights`. */
+  flickers: boolean[];
+  /** Peak intensity per light, parallel to `lights`. The budget pass zeroes a
+   *  dynamic light and never restores it, so the per-frame update has to know
+   *  what level to drive each one back to — and that level is per-lamp now
+   *  (a lantern and a spectacle lens do not burn at the same brightness). */
+  peaks: number[];
 }
 
 /**
@@ -48,13 +57,15 @@ export function attachMountLamps(root: THREE.Object3D, spec: MountVisualSpec): M
     if (!bones.has(object.name)) bones.set(object.name, object);
   });
   const lights: THREE.PointLight[] = [];
+  const peaks: number[] = [];
+  const flickers: boolean[] = [];
   for (const lamp of spec.lamps) {
     const bone = bones.get(lamp.bone);
     if (!bone) continue;
     const light = new THREE.PointLight(
-      MOUNT_LAMP_COLOR,
-      MOUNT_LAMP_INTENSITY,
-      MOUNT_LAMP_DISTANCE,
+      lamp.color ?? MOUNT_LAMP_COLOR,
+      lamp.intensity ?? MOUNT_LAMP_INTENSITY,
+      lamp.distance ?? MOUNT_LAMP_DISTANCE,
       2,
     );
     light.position.set(lamp.offset[0], lamp.offset[1], lamp.offset[2]);
@@ -66,15 +77,18 @@ export function attachMountLamps(root: THREE.Object3D, spec: MountVisualSpec): M
     light.userData.budgetDynamic = true;
     bone.add(light);
     lights.push(light);
+    peaks.push(lamp.intensity ?? MOUNT_LAMP_INTENSITY);
+    flickers.push((lamp.flicker ?? 'flame') === 'flame');
   }
-  return lights.length > 0 ? { lights } : null;
+  return lights.length > 0 ? { lights, peaks, flickers } : null;
 }
 
 /** Re-drive each lamp's flame level for this frame. Must run BEFORE the point
  *  light budget pass; the budget zeroes what it will not shine. */
 export function updateMountLamps(lamps: MountLamps, timeSec: number): void {
   for (let i = 0; i < lamps.lights.length; i++) {
-    lamps.lights[i].intensity = MOUNT_LAMP_INTENSITY * mountLampFlicker(timeSec, i);
+    const level = lamps.flickers[i] ? mountLampFlicker(timeSec, i) : 1;
+    lamps.lights[i].intensity = lamps.peaks[i] * level;
   }
 }
 
@@ -85,4 +99,6 @@ export function disposeMountLamps(lamps: MountLamps): void {
     light.dispose();
   }
   lamps.lights.length = 0;
+  lamps.peaks.length = 0;
+  lamps.flickers.length = 0;
 }
