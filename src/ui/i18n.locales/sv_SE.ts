@@ -10901,7 +10901,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     'Skrämmer fiender i närheten i upp till 3 sek. Skada kan bryta effekten. (häxmästartalang)',
   'entities.abilities.ice_block.description':
-    'Innesluter er i fast is i 8 sek. och gör er immuna mot all skada. Tar bort vanliga skadliga effekter och förhindrar att nya tillämpas. Vissa stridseffekter kan inte tas bort eller förhindras. Kan användas medan ni är bedövade eller förvandlade. Ni kan inte agera medan ni är inneslutna. Kasta igen för att avbryta. (magiker)',
+    'Innesluter er i fast is i 8 sek. och gör er immuna mot all skada. Tar bort befintliga vanliga skadliga effekter och förhindrar att nya vanliga kontrolleffekter tillämpas. Kan användas medan ni är bedövade eller förvandlade. Ni kan inte agera medan ni är inneslutna. Kasta igen för att avbryta. (magiker)',
   'entities.abilities.inner_focus.description': 'Gör er nästa prästbesvärjelse gratis och omöjlig att avbryta. Varar 60 sek.',
   'entities.abilities.innervate.description':
     'Levande sav väller upp i dig i 10 sek. och återställer 20 av din aktuella resurs i vågor: mana, raseri eller energi. Formbyte avbryter den inte. Sömn, bedövning eller stasis stoppar saven. (druidtalang)',

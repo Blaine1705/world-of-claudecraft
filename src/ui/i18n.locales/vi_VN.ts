@@ -10808,7 +10808,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     'Khiến kẻ địch ở gần sợ hãi trong tối đa 3 giây. Sát thương có thể phá hiệu ứng. (thiên phú Warlock)',
   'entities.abilities.ice_block.description':
-    'Bao bọc bạn trong băng cứng suốt 8 giây, khiến bạn miễn nhiễm mọi sát thương. Xóa các hiệu ứng có hại thông thường và ngăn hiệu ứng mới được áp dụng. Một số hiệu ứng đặc thù của cuộc chạm trán không thể bị xóa hoặc ngăn chặn. Có thể dùng khi bị choáng hoặc biến hình. Bạn không thể hành động khi bị bao bọc. Dùng lại để hủy. (pháp sư)',
+    'Bao bọc bạn trong băng cứng suốt 8 giây, khiến bạn miễn nhiễm mọi sát thương. Xóa các hiệu ứng có hại thông thường đang tồn tại và ngăn các hiệu ứng khống chế thông thường mới được áp dụng. Có thể dùng khi bị choáng hoặc biến hình. Bạn không thể hành động khi bị bao bọc. Dùng lại để hủy. (pháp sư)',
   'entities.abilities.inner_focus.description': 'Khiến phép tu sĩ kế tiếp của bạn miễn phí và không thể bị ngắt. Kéo dài 60 giây.',
   'entities.abilities.innervate.description':
     'Nhựa sống trào dâng trong bạn trong 10 giây và hồi 20 tài nguyên hiện tại theo từng đợt: mana, nộ khí hoặc năng lượng. Biến hình không làm gián đoạn. Ngủ, choáng hoặc đình trệ sẽ làm dòng nhựa ngừng lại. (thiên phú Druid)',

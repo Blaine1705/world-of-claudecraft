@@ -10614,7 +10614,7 @@ export const pt_BR: EnTranslations = {
       },
       "ice_block": {
         "name": "Caixão Frio",
-        "description": "Envolve você em gelo sólido por 8 s, tornando-o imune a todo dano. Remove efeitos nocivos comuns e impede a aplicação de novos. Alguns efeitos de encontro não podem ser removidos nem impedidos. Pode ser usado enquanto estiver atordoado ou transformado. Você não pode agir enquanto estiver envolto. Conjure novamente para cancelar. (mago)"
+        "description": "Envolve você em gelo sólido por 8 s, tornando-o imune a todo dano. Remove efeitos nocivos comuns já ativos e impede a aplicação de novos efeitos de controle comuns. Pode ser usado enquanto estiver atordoado ou transformado. Você não pode agir enquanto estiver envolto. Conjure novamente para cancelar. (mago)"
       },
       "inner_focus": {
         "name": "Mente Serena",

@@ -9382,7 +9382,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     '使附近的敵人恐懼，最多持續3秒。受到傷害可能打破該效果。（術士天賦）',
   'entities.abilities.ice_block.description':
-    '將你封入堅冰8秒，使你免疫所有傷害。移除一般有害效果，並阻止新的此類效果施加於你。部分遭遇戰效果無法被移除或阻止。可在昏迷或變形狀態下使用。被封凍期間無法行動。再次施放可取消。（法師）',
+    '將你封入堅冰8秒，使你免疫所有傷害。移除已存在的一般有害效果，並阻止新的一般控制效果施加於你。可在昏迷或變形狀態下使用。被封凍期間無法行動。再次施放可取消。（法師）',
   'entities.abilities.inner_focus.description': '使你的下一個牧師法術免費且無法被打斷。持續 60 秒。',
   'entities.abilities.innervate.description':
     '生命樹液在你體內湧動10秒，分波恢復20點當前資源，可恢復法力、怒氣或能量。變形不會中斷效果。睡眠、昏迷或停滯會使樹液停止湧動。（德魯伊天賦）',

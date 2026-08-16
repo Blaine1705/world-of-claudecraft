@@ -10614,7 +10614,7 @@ export const de_DE: EnTranslations = {
       },
       "ice_block": {
         "name": "Kalter Sarg",
-        "description": "Schließt Euch 8 Sek. lang in festes Eis ein und macht Euch gegen jeglichen Schaden immun. Entfernt gewöhnliche schädliche Effekte und verhindert, dass neue angewendet werden. Einige Begegnungseffekte können weder entfernt noch verhindert werden. Kann während Betäubung oder Verwandlung eingesetzt werden. Ihr könnt währenddessen nicht handeln. Erneut wirken, um den Effekt abzubrechen. (Magier)"
+        "description": "Schließt Euch 8 Sek. lang in festes Eis ein und macht Euch gegen jeglichen Schaden immun. Entfernt bestehende gewöhnliche schädliche Effekte und verhindert neue gewöhnliche Kontroll-Effekte. Kann während Betäubung oder Verwandlung eingesetzt werden. Ihr könnt währenddessen nicht handeln. Erneut wirken, um den Effekt abzubrechen. (Magier)"
       },
       "inner_focus": {
         "name": "Stiller Geist",

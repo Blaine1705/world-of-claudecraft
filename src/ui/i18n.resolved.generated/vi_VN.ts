@@ -10614,7 +10614,7 @@ export const vi_VN: EnTranslations = {
       },
       "ice_block": {
         "name": "Quan Tài Lạnh",
-        "description": "Bao bọc bạn trong băng cứng suốt 8 giây, khiến bạn miễn nhiễm mọi sát thương. Xóa các hiệu ứng có hại thông thường và ngăn hiệu ứng mới được áp dụng. Một số hiệu ứng đặc thù của cuộc chạm trán không thể bị xóa hoặc ngăn chặn. Có thể dùng khi bị choáng hoặc biến hình. Bạn không thể hành động khi bị bao bọc. Dùng lại để hủy. (pháp sư)"
+        "description": "Bao bọc bạn trong băng cứng suốt 8 giây, khiến bạn miễn nhiễm mọi sát thương. Xóa các hiệu ứng có hại thông thường đang tồn tại và ngăn các hiệu ứng khống chế thông thường mới được áp dụng. Có thể dùng khi bị choáng hoặc biến hình. Bạn không thể hành động khi bị bao bọc. Dùng lại để hủy. (pháp sư)"
       },
       "inner_focus": {
         "name": "Tâm Trí Tĩnh",

@@ -11158,7 +11158,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     'Amedronta os inimigos próximos por até 3 s. O dano pode interromper o efeito. (talento de Bruxo)',
   'entities.abilities.ice_block.description':
-    'Envolve você em gelo sólido por 8 s, tornando-o imune a todo dano. Remove efeitos nocivos comuns e impede a aplicação de novos. Alguns efeitos de encontro não podem ser removidos nem impedidos. Pode ser usado enquanto estiver atordoado ou transformado. Você não pode agir enquanto estiver envolto. Conjure novamente para cancelar. (mago)',
+    'Envolve você em gelo sólido por 8 s, tornando-o imune a todo dano. Remove efeitos nocivos comuns já ativos e impede a aplicação de novos efeitos de controle comuns. Pode ser usado enquanto estiver atordoado ou transformado. Você não pode agir enquanto estiver envolto. Conjure novamente para cancelar. (mago)',
   'entities.abilities.inner_focus.description': 'Torna vossa próxima magia de sacerdote gratuita e ininterrompível. Dura 60 s.',
   'entities.abilities.innervate.description':
     'A seiva viva brota em você por 10 s e restaura em ondas 20 do seu recurso atual: mana, raiva ou energia. Mudar de forma não interrompe o efeito. Sono, atordoamento ou estase imobilizam a seiva. (talento de Druida)',
