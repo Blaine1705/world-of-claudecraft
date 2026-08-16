@@ -1,9 +1,11 @@
 // Typed game-server client for the economy service's $WOC marketplace surface
 // (the claudium_proxy.ts sibling; same service, same secret-gated internal
 // API, same contract). ALL token math lives in the service: the USD to $WOC
-// conversion, the oracle (time-weighted price, multiple liquidity sources,
-// deviation and freshness limits), the 90/3/7 split, transaction building,
-// finality confirmation, and bond escrow refunds/forfeits. The game passes
+// conversion, the oracle (a time-weighted price over one approved venue
+// behind a liquidity floor, a spot-versus-average deviation limit, and
+// freshness judged on the venue's publish time), the 90/3/7 split,
+// transaction building, finality confirmation, and bond escrow
+// refunds/forfeits. The game passes
 // USD cents in and renders what comes back, verbatim.
 //
 // GRACEFUL DEGRADATION IS THE CONTRACT. If WOC_MARKET_SERVICE_URL or
