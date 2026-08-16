@@ -26,6 +26,7 @@
 // through the seam.
 
 import { isStunned, isUnbreakableControlAura } from '../combat/cc';
+import { resetLongCooldownsForRaidWipe } from '../combat/raid_wipe_cooldowns';
 import { ITEMS, MOBS, NPCS, QUESTS } from '../data';
 import * as deedsMod from '../deeds';
 import { createMob, createNpc } from '../entity';
@@ -263,6 +264,7 @@ export function initNythraxisEncounter(boss: Entity): NonNullable<Entity['nythra
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      attemptParticipantIds: [],
     };
   }
   return boss.nythraxis;
@@ -296,6 +298,11 @@ export function resetNythraxisEncounter(ctx: SimContext, boss: Entity): void {
 // health, clear his adds/Aldric/wards/auras, and drop combat so the sealed
 // doors reopen and the raid can run back in for another attempt.
 export function wipeNythraxisEncounter(ctx: SimContext, boss: Entity): void {
+  for (const playerId of boss.nythraxis?.attemptParticipantIds ?? []) {
+    const player = ctx.entities.get(playerId);
+    const meta = ctx.players.get(playerId);
+    if (player?.kind === 'player' && meta) resetLongCooldownsForRaidWipe(player, meta.known);
+  }
   boss.pos = { ...boss.spawnPos };
   boss.prevPos = { ...boss.spawnPos };
   ctx.rebucket(boss);
@@ -304,6 +311,11 @@ export function wipeNythraxisEncounter(ctx: SimContext, boss: Entity): void {
 
 export function updateNythraxisEncounter(ctx: SimContext, boss: Entity): void {
   const st = initNythraxisEncounter(boss);
+  const room = playersInNythraxisRoom(ctx, boss);
+  for (const player of room) {
+    if (!st.attemptParticipantIds?.includes(player.id)) st.attemptParticipantIds?.push(player.id);
+  }
+  st.attemptParticipantIds?.sort((a, b) => a - b);
   if (!st.introSpoken) {
     st.introSpoken = true;
     nythraxisDialogueSet(ctx, boss, [
@@ -319,7 +331,6 @@ export function updateNythraxisEncounter(ctx: SimContext, boss: Entity): void {
   // Wipe-or-kill is the only reset: if every player in the arena is dead the
   // encounter resets for a retry; otherwise keep the boss locked onto a live
   // target so kiting him out of melee never sends him home.
-  const room = playersInNythraxisRoom(ctx, boss);
   if (room.length === 0) {
     wipeNythraxisEncounter(ctx, boss);
     return;

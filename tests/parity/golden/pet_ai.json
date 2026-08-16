@@ -139,8 +139,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 968,
-      "state": "964bd0e4",
-      "events": "e31e35d7",
+      "state": "920ae3b2",
+      "events": "655a9fc5",
       "rng": {
         "draws": 15,
         "digest": "dcdb7070"
@@ -150,7 +150,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 968,
-      "state": "296e3d73",
+      "state": "7b4e034d",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -161,8 +161,8 @@
       "tick": 60,
       "time": 3,
       "nextId": 968,
-      "state": "c6a9a5a8",
-      "events": "94a99c99",
+      "state": "c51283a9",
+      "events": "b980a398",
       "rng": {
         "draws": 189,
         "digest": "eabb997f"
@@ -172,7 +172,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 968,
-      "state": "90a0bf23",
+      "state": "2a5bb6dc",
       "events": "741638a5",
       "rng": {
         "draws": 359,
@@ -183,8 +183,8 @@
       "tick": 100,
       "time": 5,
       "nextId": 968,
-      "state": "cb30bf0d",
-      "events": "6cfcc498",
+      "state": "c8bd1cbc",
+      "events": "2524e38f",
       "rng": {
         "draws": 552,
         "digest": "c15240f7"
@@ -194,7 +194,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 968,
-      "state": "ae0cdf16",
+      "state": "fe355139",
       "events": "741638a5",
       "rng": {
         "draws": 743,
@@ -205,7 +205,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 968,
-      "state": "26f1b2a9",
+      "state": "3018fd6a",
       "events": "741638a5",
       "rng": {
         "draws": 743,
@@ -354,13 +354,13 @@
           "facing": 1.459182,
           "fallStartY": 13.618492,
           "fiveSecondRule": 99,
-          "hp": 134,
+          "hp": 200,
           "id": 964,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
           "lootFfaTimer": "Infinity",
-          "maxHp": 162,
+          "maxHp": 227,
           "moveSpeed": 5.2,
           "onGround": true,
           "overpowerUntil": -1,
@@ -378,13 +378,13 @@
             "z": -1000
           },
           "stats": {
-            "armor": 88
+            "armor": 132
           },
           "swingTimer": 0.05,
           "templateId": "emberkin",
           "weapon": {
-            "max": 21,
-            "min": 14,
+            "max": 25,
+            "min": 16,
             "speed": 2
           }
         },
@@ -400,7 +400,7 @@
           "fallStartY": -9.3,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49951,
+          "hp": 49943,
           "id": 965,
           "inCombat": true,
           "kind": "mob",
@@ -436,7 +436,7 @@
           "threat": [
             [
               964,
-              50
+              58
             ]
           ],
           "wanderTarget": {
@@ -566,7 +566,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 968,
-      "state": "2f77b7ba",
+      "state": "76d09895",
       "events": "741638a5",
       "rng": {
         "draws": 964,
@@ -577,7 +577,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 968,
-      "state": "f59b2465",
+      "state": "84410686",
       "events": "741638a5",
       "rng": {
         "draws": 1184,
@@ -588,7 +588,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 968,
-      "state": "afbf7922",
+      "state": "6e93f4e7",
       "events": "741638a5",
       "rng": {
         "draws": 1446,
@@ -599,7 +599,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 968,
-      "state": "afbf7922",
+      "state": "6e93f4e7",
       "events": "741638a5",
       "rng": {
         "draws": 1446,
@@ -747,12 +747,12 @@
           "facing": 1.570796,
           "fallStartY": 13.618492,
           "fiveSecondRule": 99,
-          "hp": 137,
+          "hp": 205,
           "id": 964,
           "kind": "mob",
           "level": 12,
           "lootFfaTimer": "Infinity",
-          "maxHp": 162,
+          "maxHp": 227,
           "moveSpeed": 5.2,
           "onGround": true,
           "overpowerUntil": -1,
@@ -770,12 +770,12 @@
             "z": -1000
           },
           "stats": {
-            "armor": 88
+            "armor": 132
           },
           "templateId": "emberkin",
           "weapon": {
-            "max": 21,
-            "min": 14,
+            "max": 25,
+            "min": 16,
             "speed": 2
           }
         },
@@ -791,7 +791,7 @@
           "fallStartY": -9.3,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49951,
+          "hp": 49943,
           "id": 965,
           "inCombat": true,
           "kind": "mob",

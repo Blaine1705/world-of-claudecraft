@@ -130,6 +130,9 @@ describe('warlock class talent tree', () => {
   });
 
   it('makes Pact Deepened double Fiendhide armor', () => {
+    expect(ABILITIES.demon_skin.description).toContain(
+      'Pact Deepened doubles this armor and reduces magic damage taken by 5% while Fiendhide is active',
+    );
     const base = rig({});
     const deepened = rig({ 11: 'wlk_r11_improved_life_tap' });
     const baseArmor = base.player.stats.armor;
@@ -140,6 +143,11 @@ describe('warlock class talent tree', () => {
 
     expect(base.player.stats.armor - baseArmor).toBe(80);
     expect(deepened.player.stats.armor - deepenedArmor).toBe(160);
+    expect(base.player.auras.find((aura) => aura.id === 'demon_skin')?.value2).toBeUndefined();
+    expect(deepened.player.auras.find((aura) => aura.id === 'demon_skin')).toMatchObject({
+      value: 160,
+      value2: 0.05,
+    });
   });
 
   it('makes Pact Deepened reduce magic damage by 5% only while Fiendhide is active', () => {
@@ -158,6 +166,35 @@ describe('warlock class talent tree', () => {
     player.hp = hpBefore;
     dealDamage(sim.ctx, source, player, 100, false, 'physical', 'Test Strike', 'hit');
     expect(player.hp).toBe(hpBefore - 100);
+  });
+
+  it('keeps an active Fiendhide aura synchronized when Pact Deepened changes', () => {
+    const { sim, player } = rig({});
+    const baseArmor = player.stats.armor;
+    sim.castAbility('demon_skin');
+    expect(player.auras.find((aura) => aura.id === 'demon_skin')).toMatchObject({
+      value: 80,
+      value2: undefined,
+    });
+
+    expect(
+      sim.applyTalents({
+        spec: 'destruction',
+        rows: { 11: 'wlk_r11_improved_life_tap' },
+      }),
+    ).toBe(true);
+    expect(player.auras.find((aura) => aura.id === 'demon_skin')).toMatchObject({
+      value: 160,
+      value2: 0.05,
+    });
+    expect(player.stats.armor - baseArmor).toBe(160);
+
+    expect(sim.applyTalents({ spec: 'destruction', rows: {} })).toBe(true);
+    expect(player.auras.find((aura) => aura.id === 'demon_skin')).toMatchObject({
+      value: 80,
+      value2: undefined,
+    });
+    expect(player.stats.armor - baseArmor).toBe(80);
   });
 
   it('awards one or two Shadow Credit charges from real specialization spending', () => {
