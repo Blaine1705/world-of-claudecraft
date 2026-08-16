@@ -9383,7 +9383,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     '使附近的敌人恐惧，最多持续3秒。受到伤害可能打破该效果。（术士天赋）',
   'entities.abilities.ice_block.description':
-    '将你封入坚冰8秒，使你免疫所有伤害和效果，并移除所有有害效果。可在昏迷或变形状态下使用。被封冻期间无法行动。再次施放可取消。（法师）',
+    '将你封入坚冰8秒，使你免疫所有伤害。移除普通有害效果，并阻止新的此类效果施加于你。部分遭遇战效果无法被移除或阻止。可在昏迷或变形状态下使用。被封冻期间无法行动。再次施放可取消。（法师）',
   'entities.abilities.inner_focus.description': '使你的下一个牧师法术免费且无法被打断。持续 60 秒。',
   'entities.abilities.innervate.description':
     '生命树液在你体内涌动10秒，分波恢复20点当前资源，可恢复法力、怒气或能量。变形不会中断效果。睡眠、昏迷或停滞会使树液停止涌动。（德鲁伊天赋）',

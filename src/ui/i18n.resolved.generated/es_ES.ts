@@ -10614,7 +10614,7 @@ export const es_ES: EnTranslations = {
       },
       "ice_block": {
         "name": "Ataúd Helado",
-        "description": "Te encierra en hielo sólido durante 8 s, haciéndote inmune a todo el daño y los efectos y eliminando todos los efectos perjudiciales. Se puede usar mientras estás aturdido o transformado. No puedes actuar mientras estás encerrado. Vuelve a lanzarlo para cancelar. (mago)"
+        "description": "Te encierra en hielo sólido durante 8 s, haciéndote inmune a todo el daño. Elimina los efectos perjudiciales comunes e impide que se apliquen otros nuevos. Algunos efectos de encuentro no se pueden eliminar ni impedir. Se puede usar mientras estás aturdido o transformado. No puedes actuar mientras estás encerrado. Vuelve a lanzarlo para cancelar. (mago)"
       },
       "inner_focus": {
         "name": "Mente Serena",

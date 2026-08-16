@@ -11438,7 +11438,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     'Aterroriza a los enemigos cercanos hasta 3 s. El daño puede romper el efecto. (talento de Brujo)',
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo sólido durante 8 s, haciéndote inmune a todo el daño y los efectos y eliminando todos los efectos perjudiciales. Se puede usar mientras estás aturdido o transformado. No puedes actuar mientras estás encerrado. Vuelve a lanzarlo para cancelar. (mago)',
+    'Te encierra en hielo sólido durante 8 s, haciéndote inmune a todo el daño. Elimina los efectos perjudiciales comunes e impide que se apliquen otros nuevos. Algunos efectos de encuentro no se pueden eliminar ni impedir. Se puede usar mientras estás aturdido o transformado. No puedes actuar mientras estás encerrado. Vuelve a lanzarlo para cancelar. (mago)',
   'entities.abilities.inner_focus.description': 'Hace que tu próximo hechizo de sacerdote sea gratuito e ininterrumpible. Dura 60 s.',
   'entities.abilities.innervate.description':
     'La savia viva brota en ti durante 10 s y restaura en oleadas 20 de tu recurso actual: maná, ira o energía. Cambiar de forma no la interrumpe. El sueño, el aturdimiento o la estasis detienen la savia. (talento de Druida)',

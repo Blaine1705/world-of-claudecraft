@@ -10614,7 +10614,7 @@ export const tr_TR: EnTranslations = {
       },
       "ice_block": {
         "name": "Soğuk Tabut",
-        "description": "Seni 8 sn boyunca katı buzun içine hapseder, tüm hasar ve etkilere karşı bağışıklık kazandırır ve tüm zararlı etkileri kaldırır. Sersemlemiş veya polimorfa uğramışken kullanılabilir. Hapsedilmişken eylemde bulunamazsın. İptal etmek için tekrar kullan. (büyücü)"
+        "description": "Seni 8 sn boyunca katı buzun içine hapseder ve tüm hasara karşı bağışıklık kazandırır. Sıradan zararlı etkileri kaldırır ve yenilerinin uygulanmasını engeller. Bazı karşılaşma etkileri kaldırılamaz veya engellenemez. Sersemlemiş veya polimorfa uğramışken kullanılabilir. Hapsedilmişken eylemde bulunamazsın. İptal etmek için tekrar kullan. (büyücü)"
       },
       "inner_focus": {
         "name": "Dingin Zihin",

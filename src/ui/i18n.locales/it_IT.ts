@@ -11329,7 +11329,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     'Terrorizza i nemici vicini per un massimo di 3 sec. I danni possono interrompere l’effetto. (talento dello Stregone)',
   'entities.abilities.ice_block.description':
-    'Ti racchiude nel ghiaccio solido per 8 s, rendendoti immune a tutti i danni e gli effetti e rimuovendo ogni effetto dannoso. Utilizzabile mentre sei stordito o trasformato. Non puoi agire mentre sei racchiuso. Lancia di nuovo per annullare. (mago)',
+    'Ti racchiude nel ghiaccio solido per 8 s, rendendoti immune a tutti i danni. Rimuove gli effetti dannosi comuni e impedisce che ne vengano applicati di nuovi. Alcuni effetti degli scontri non possono essere rimossi né impediti. Utilizzabile mentre sei stordito o trasformato. Non puoi agire mentre sei racchiuso. Lancia di nuovo per annullare. (mago)',
   'entities.abilities.inner_focus.description': 'Rende il vostro prossimo incantesimo da sacerdote gratuito e non interrompibile. Dura 60 sec.',
   'entities.abilities.innervate.description':
     'La linfa vivente scorre in te per 10 sec. e ripristina a ondate 20 della tua risorsa attuale: mana, rabbia o energia. Cambiare forma non la interrompe. Sonno, stordimento o stasi arrestano la linfa. (talento del Druido)',

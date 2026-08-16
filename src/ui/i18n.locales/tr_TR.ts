@@ -10881,7 +10881,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     'Yakındaki düşmanları 3 sn. kadar korkutur. Hasar etkiyi bozabilir. (Karabüyücü yeteneği)',
   'entities.abilities.ice_block.description':
-    'Seni 8 sn boyunca katı buzun içine hapseder, tüm hasar ve etkilere karşı bağışıklık kazandırır ve tüm zararlı etkileri kaldırır. Sersemlemiş veya polimorfa uğramışken kullanılabilir. Hapsedilmişken eylemde bulunamazsın. İptal etmek için tekrar kullan. (büyücü)',
+    'Seni 8 sn boyunca katı buzun içine hapseder ve tüm hasara karşı bağışıklık kazandırır. Sıradan zararlı etkileri kaldırır ve yenilerinin uygulanmasını engeller. Bazı karşılaşma etkileri kaldırılamaz veya engellenemez. Sersemlemiş veya polimorfa uğramışken kullanılabilir. Hapsedilmişken eylemde bulunamazsın. İptal etmek için tekrar kullan. (büyücü)',
   'entities.abilities.inner_focus.description': 'Bir sonraki rahip büyünü bedava ve kesintiye uğratılamaz kılar. 60 sn sürer.',
   'entities.abilities.innervate.description':
     'Canlı özsu 10 sn. boyunca içinde kabarır ve mevcut kaynağından dalgalar halinde 20 yeniler: mana, öfke veya enerji. Form değiştirmek bunu bozmaz. Uyku, sersemletme veya durağanlık özsuyu durdurur. (Druid yeteneği)',

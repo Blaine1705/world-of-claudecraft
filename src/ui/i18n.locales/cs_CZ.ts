@@ -7314,7 +7314,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     'Vyděsí blízké nepřátele až na 3 s. Poškození může účinek zrušit. (černokněžnický talent)',
   'entities.abilities.ice_block.description':
-    'Uzavře tě na 8 s do pevného ledu, čímž tě učiní imunním vůči veškerému poškození a efektům a odstraní všechny škodlivé efekty. Lze použít při omráčení nebo proměnění. Během uvěznění nemůžeš jednat. Opětovným sesláním efekt zrušíš. (mág)',
+    'Uzavře tě na 8 s do pevného ledu a učiní tě imunním vůči veškerému poškození. Odstraní běžné škodlivé efekty a zabrání aplikaci nových. Některé efekty střetnutí nelze odstranit ani jim zabránit. Lze použít při omráčení nebo proměnění. Během uvěznění nemůžeš jednat. Opětovným sesláním efekt zrušíš. (mág)',
   'entities.abilities.inner_focus.description': 'Tvé další kouzlo kněze bude zdarma a nepřerušitelné. Trvá 60 s.',
   'entities.abilities.innervate.description':
     'Po dobu 10 s ve vás proudí živá míza a ve vlnách obnoví 20 bodů vašeho aktuálního zdroje: many, zuřivosti nebo energie. Změna podoby ji nepřeruší. Spánek, omráčení nebo stáze proud mízy zastaví. (druidský talent)',

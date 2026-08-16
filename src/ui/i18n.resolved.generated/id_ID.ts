@@ -10614,7 +10614,7 @@ export const id_ID: EnTranslations = {
       },
       "ice_block": {
         "name": "Peti Es",
-        "description": "Membungkusmu dalam es padat selama 8 detik, membuatmu kebal terhadap semua kerusakan dan efek serta menghapus semua efek berbahaya. Dapat digunakan saat terkena stun atau polymorph. Kamu tidak dapat bertindak selama terbungkus. Rapal lagi untuk membatalkan. (mage)"
+        "description": "Membungkusmu dalam es padat selama 8 detik, membuatmu kebal terhadap semua kerusakan. Menghapus efek berbahaya biasa dan mencegah penerapan efek baru. Beberapa efek pertempuran tidak dapat dihapus atau dicegah. Dapat digunakan saat terkena stun atau polymorph. Kamu tidak dapat bertindak selama terbungkus. Rapal lagi untuk membatalkan. (mage)"
       },
       "inner_focus": {
         "name": "Pikiran Hening",

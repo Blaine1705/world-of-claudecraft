@@ -10614,7 +10614,7 @@ export const cs_CZ: EnTranslations = {
       },
       "ice_block": {
         "name": "Ledová rakev",
-        "description": "Uzavře tě na 8 s do pevného ledu, čímž tě učiní imunním vůči veškerému poškození a efektům a odstraní všechny škodlivé efekty. Lze použít při omráčení nebo proměnění. Během uvěznění nemůžeš jednat. Opětovným sesláním efekt zrušíš. (mág)"
+        "description": "Uzavře tě na 8 s do pevného ledu a učiní tě imunním vůči veškerému poškození. Odstraní běžné škodlivé efekty a zabrání aplikaci nových. Některé efekty střetnutí nelze odstranit ani jim zabránit. Lze použít při omráčení nebo proměnění. Během uvěznění nemůžeš jednat. Opětovným sesláním efekt zrušíš. (mág)"
       },
       "inner_focus": {
         "name": "Ztišená mysl",

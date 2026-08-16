@@ -10969,7 +10969,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     'Jaagt nabije vijanden tot 3 sec. angst aan. Schade kan het effect verbreken. (tovenaarstalent)',
   'entities.abilities.ice_block.description':
-    'Sluit u 8 sec. lang op in massief ijs, maakt u immuun voor alle schade en effecten en verwijdert alle schadelijke effecten. Kan worden gebruikt terwijl u verdoofd of veranderd bent. U kunt niet handelen zolang u opgesloten bent. Werp opnieuw om te annuleren. (magiër)',
+    'Sluit u 8 sec. lang op in massief ijs en maakt u immuun voor alle schade. Verwijdert gewone schadelijke effecten en voorkomt dat nieuwe worden toegepast. Sommige gevechtseffecten kunnen niet worden verwijderd of voorkomen. Kan worden gebruikt terwijl u verdoofd of veranderd bent. U kunt niet handelen zolang u opgesloten bent. Werp opnieuw om te annuleren. (magiër)',
   'entities.abilities.inner_focus.description': 'Maakt uw volgende priesterspreuk gratis en niet te onderbreken. Duurt 60 sec.',
   'entities.abilities.innervate.description':
     'Levend sap welt 10 sec. in je op en herstelt in golven 20 van je huidige hulpbron: mana, woede of energie. Van gedaante wisselen onderbreekt het niet. Slaap, verdoving of stasis brengt het sap tot stilstand. (druïdetalent)',

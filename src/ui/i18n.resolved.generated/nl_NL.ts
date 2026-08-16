@@ -10614,7 +10614,7 @@ export const nl_NL: EnTranslations = {
       },
       "ice_block": {
         "name": "Koude kist",
-        "description": "Sluit u 8 sec. lang op in massief ijs, maakt u immuun voor alle schade en effecten en verwijdert alle schadelijke effecten. Kan worden gebruikt terwijl u verdoofd of veranderd bent. U kunt niet handelen zolang u opgesloten bent. Werp opnieuw om te annuleren. (magiër)"
+        "description": "Sluit u 8 sec. lang op in massief ijs en maakt u immuun voor alle schade. Verwijdert gewone schadelijke effecten en voorkomt dat nieuwe worden toegepast. Sommige gevechtseffecten kunnen niet worden verwijderd of voorkomen. Kan worden gebruikt terwijl u verdoofd of veranderd bent. U kunt niet handelen zolang u opgesloten bent. Werp opnieuw om te annuleren. (magiër)"
       },
       "inner_focus": {
         "name": "Gestilde geest",
