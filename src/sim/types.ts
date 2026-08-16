@@ -5077,12 +5077,15 @@ export type UnstuckEvent =
 
 // A player resurrection that has been offered but not yet accepted. The Sim owns
 // one authoritative offer per dead target. The cast-time destination is retained
-// only as a fallback if the caster no longer exists when the target accepts.
+// as a fallback if the caster no longer exists, has died, or has left resurrection
+// reach of the body when the target accepts; maxRange is the reach the producing
+// cast enforced, re-applied to the arrival anchor at accept time.
 export interface PendingResurrection {
   casterId: number;
   hpFrac: number;
   fallbackDestination: Vec3;
   expiresAt: number;
+  maxRange: number;
 }
 
 export type DamageEventKind = 'hit' | 'miss' | 'dodge' | 'parry' | 'block' | 'resist' | 'evade';
