@@ -184,8 +184,12 @@ interface AttributionTargetFixture {
 // Re-minted for the r185 frozen-camera aim fix: updateCamera now aims through
 // lookAtFrozen, so renderer.ts moves and the composite follows its bytes. No
 // capture was retaken.
+// Re-minted for the sky KTX2 UASTC HDR conversion: the renderer publishes the
+// sky module's held textures into the residency table and its idle sky upload
+// comment follows the compressed path, so renderer.ts moves and the composite
+// follows its bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '3a7cd67799cc945ebbe4c271905a2d59ff43ca890c5ae737ff02ea6bd4fdd090';
+  '407f326b579bcda2e9a6d3818a3fd65a67c8d9b324512bfb29376d234a46716c';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
