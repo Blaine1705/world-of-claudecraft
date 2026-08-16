@@ -477,15 +477,23 @@ For off-box safety, sync the directory to S3 occasionally:
   same economy service's `/v1/market/` surface and is a SEPARATE knob from the
   claudium URL above (the market proxy refuses to fall back to it; with the
   market knob unset the Exchange reports itself unavailable). Same host
-  guidance as above. Health: probe `GET /v1/market/price` on this base (the
-  game mirrors it at `/api/woc-market/status`); do not key market monitoring
-  on the service's `/v1/health` rail matrix, which has no market-settlement
-  rail (its `marketplace` rail is the character-marketplace rail and names
-  keys this market never reads). Deploy coupling: the bond-quote contract is
-  service-owned (the game sends the BID, the service answers the bond), so
-  enable the market only with BOTH sides at or after the contract tips; a
-  version skew in either direction refuses bond quotes fail-safe (no money
-  moves, bids lapse on their TTL). The contract also reserves the confirm
+  guidance as above. Health: probe `GET /v1/market/price` on this base (send
+  the shared `x-woc-economy-secret` header if the service requires it; the
+  game mirrors the reading at `/api/woc-market/status`, which needs a player
+  bearer token, so the service base is the operator probe); do not key market
+  monitoring on the service's `/v1/health` rail matrix, which has no
+  market-settlement rail (its `marketplace` rail is the character-marketplace
+  rail and names keys this market never reads). Deploy coupling: the
+  bond-quote contract is service-owned (the game sends the BID, the service
+  answers the bond), so enable the market only with BOTH sides at or after
+  the contract tips: for the service, the PR #31 build whose bond-quote
+  response carries `bondCents` (the probe: quote a bond and check the field);
+  for the game, the build that sends `bidCents`. An old GAME against the new
+  service refuses bond quotes fail-safe (the service demands the bid; no
+  money moves, bids lapse on their TTL). A new game against an OLD service is
+  TOLERATED by design: a quote without `bondCents` falls back to the game's
+  ceil mirror at the same knobs, so keep the knobs in lockstep until both
+  sides are current. The contract also reserves the confirm
   verdict word `awaiting_finality` for LEDGER-MATCHED payments (the game's
   anti-snipe extension trusts exactly that reservation); a service build that
   starts emitting it optimistically is a breaking change, not a copy tweak.

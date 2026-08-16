@@ -7231,8 +7231,12 @@ describe('service vocabulary drift is visible on the dev channel', () => {
       expect(driftLines).toHaveLength(1);
       expect(driftLines[0], 'the newline is replaced, never emitted').not.toContain('\n');
       expect(driftLines[0]).toContain('?');
-      // logSafe bounds the identifier at 256 (the intake screen's bound, so a
-      // real 88-char signature elsewhere survives whole for reconciliation).
+      // logSafe bounds the identifier at 256, the intake screen's bound: a
+      // real 88-char signature elsewhere must survive WHOLE for an exact
+      // reconciliation grep, so the clamp must not regress to a shorter
+      // slice. The 150-char run proves well past the old 64 survived; the
+      // length ceiling proves the 300-char tail was still cut.
+      expect(driftLines[0]).toContain('x'.repeat(150));
       expect(driftLines[0].length).toBeLessThan(340);
     } finally {
       spy.mockRestore();

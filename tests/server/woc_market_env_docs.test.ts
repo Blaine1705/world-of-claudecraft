@@ -41,6 +41,9 @@ function readNames(): Set<string> {
     // \benv\. covers both process.env.NAME and config.ts's bound
     // env: NodeJS.ProcessEnv parameter (env.NAME).
     for (const m of src.matchAll(/\benv\.([A-Z][A-Z0-9_]+)/g)) names.add(m[1]);
+    // The bracket-literal form: process.env['NAME'] (none today, but a
+    // refactor to it must not flip the forward check vacuous).
+    for (const m of src.matchAll(/\benv\[\s*'([A-Z][A-Z0-9_]+)'\s*\]/g)) names.add(m[1]);
     // The named-constant indirection: const X_ENV = 'NAME' later read as
     // process.env[gate.envVar]. Capture the literal at its definition.
     for (const m of src.matchAll(/_ENV\s*=\s*'([A-Z][A-Z0-9_]+)'/g)) names.add(m[1]);
@@ -88,14 +91,67 @@ describe('market env documentation matches the code', () => {
 
   it('the corpus itself stays real: every listed file reads at least one market name', () => {
     // A renamed module would silently shrink the sweep; this fails the rename
-    // toward updating CORPUS.
+    // toward updating CORPUS. The constant-form regex derives from PREFIXES
+    // so a fourth prefix updates every check together, not two of three.
+    const constantForm = new RegExp(`_ENV\\s*=\\s*'(?:${PREFIXES.join('|')})[A-Z0-9_]*'`);
     for (const rel of CORPUS) {
       const src = stripComments(read(rel));
       const hits =
         [...src.matchAll(/\benv\.([A-Z][A-Z0-9_]+)/g)].some((m) =>
           PREFIXES.some((p) => m[1].startsWith(p)),
-        ) || /_ENV\s*=\s*'(?:WOC_MARKET_|WOC_ECONOMY_|DASHBOARD_)[A-Z0-9_]*'/.test(src);
+        ) || constantForm.test(src);
       expect(hits, `${rel} no longer reads any market env name; update CORPUS`).toBe(true);
     }
+  });
+
+  it('no market env reader exists OUTSIDE the corpus (the new-file drift signal)', () => {
+    // The explicit CORPUS is the design, but without this walk a brand-new
+    // module reading a brand-new WOC_MARKET_* name would be invisible to
+    // BOTH directions above. The walk greps every server/src/headless source
+    // for a market-prefixed literal in any env-read-capable position and
+    // fails toward adding the file to CORPUS. Prefix LITERALS in source are
+    // the net: even a renamed gate constant still names its env var.
+    const { readdirSync, statSync } = require('node:fs') as typeof import('node:fs');
+    const { fileURLToPath } = require('node:url') as typeof import('node:url');
+    const path = require('node:path') as typeof import('node:path');
+    const root = fileURLToPath(new URL('../../', import.meta.url));
+    const roots = ['server', 'src', 'headless'];
+    const skipDirs = new Set(['node_modules', 'i18n.resolved.generated']);
+    const files: string[] = [];
+    const walk = (dir: string): void => {
+      for (const entry of readdirSync(dir)) {
+        if (skipDirs.has(entry)) continue;
+        const full = path.join(dir, entry);
+        const st = statSync(full);
+        if (st.isDirectory()) walk(full);
+        else if (entry.endsWith('.ts')) files.push(full);
+      }
+    };
+    for (const r of roots) walk(path.join(root, r));
+    // A reader is a file whose COMMENT-STRIPPED source both mentions a
+    // market-prefixed name and touches the environment at all; prose-only
+    // mentions (constants re-exported, wire fields) do not count.
+    const prefixLiteral = new RegExp(`'(?:${PREFIXES.join('|')})[A-Z0-9_]*'`);
+    const outside: string[] = [];
+    for (const full of files) {
+      const rel = path.relative(root, full).replaceAll(path.sep, '/');
+      if (CORPUS.includes(rel)) continue;
+      const src = stripComments(readFileSync(full, 'utf8'));
+      const readsEnv = /\bprocess\.env\b/.test(src) || /\benv\.[A-Z]/.test(src);
+      if (!readsEnv) continue;
+      const marketName = PREFIXES.some((p) => src.includes(`env.${p}`))
+        ? true
+        : prefixLiteral.test(src);
+      if (marketName) outside.push(rel);
+    }
+    // The walk is real: it visited the corpus files themselves (positive
+    // control against a broken root or extension filter).
+    expect(files.map((f) => path.relative(root, f).replaceAll(path.sep, '/'))).toContain(
+      'server/woc_market_routes.ts',
+    );
+    expect(
+      outside,
+      'market env readers outside CORPUS; add each file to CORPUS so both guard directions see it',
+    ).toEqual([]);
   });
 });
