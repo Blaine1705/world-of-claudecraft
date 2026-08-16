@@ -8962,6 +8962,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.quoteSign': 'Подписать и оплатить',
   'hudChrome.wocMarket.quoteRefresh': 'Новая котировка',
   'hudChrome.wocMarket.quoteCancel': 'Не сейчас',
+  'hudChrome.wocMarket.activityCancelPending': 'Ожидает отмены',
+  'hudChrome.wocMarket.activityDirected': 'Прямая продажа',
   'hudChrome.wocMarket.quoteBondFor': 'Возвращаемый залог за ставку: {usd}',
   'hudChrome.wocMarket.quoteSettlementFor': 'Расчёт за {item}: {usd}',
   'hudChrome.wocMarket.signing': 'Ожидание вашего кошелька...',

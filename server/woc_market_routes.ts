@@ -338,8 +338,11 @@ function listingView(row: WocListingRow, viewerAccount: number | null): Record<s
     // who reloads cannot see that their cancel was accepted (the listing
     // reads plainly active) or that a row in their Activity tab is a
     // directed sale rather than a public auction. Booleans only; the
-    // buyer's account id stays server-side.
-    cancelPending: row.cancelRequestedAtMs !== null,
+    // buyer's account id stays server-side. The status gate mirrors every
+    // server-side consumer of the stamp: cancel_requested_at is never
+    // cleared, so a closed listing would otherwise report a pending cancel
+    // forever.
+    cancelPending: row.status === 'active' && row.cancelRequestedAtMs !== null,
     directed: row.directedBuyerAccount !== null,
     endsAtMs: row.endsAtMs,
     createdAtMs: row.createdAtMs,

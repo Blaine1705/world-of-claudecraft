@@ -1325,7 +1325,14 @@ export class WocMarketService {
       return;
     }
     chan.words.add(word);
-    console.warn(`[woc_market] unrecognized ${kind} confirm verdict ${word}`);
+    // Two literals, not one interpolated shape: the pending line predates the
+    // fail channel and is pinned byte-for-byte, and "fail confirm verdict"
+    // reads wrong for a word that arrived on a bond refusal.
+    if (kind === 'pending') {
+      console.warn(`[woc_market] unrecognized pending confirm verdict ${word}`);
+    } else {
+      console.warn(`[woc_market] unrecognized fail verdict ${word}`);
+    }
   }
 
   /** Next time the delivered-residue arm may run (minute-scale: it converges
@@ -2414,6 +2421,11 @@ export class WocMarketService {
       // screen: the player deserves to know WHICH pending this is.
       return { ok: true, standing: false, pending: true, reason: confirmed.reason };
     }
+    // The bond leg is where the fail channel matters MOST: this refusal
+    // drops the word and lapseBid records no reason, so unlike a settlement
+    // row there is no verbatim column an operator could query after the
+    // fact. The sighting line is the only trace.
+    this.noteFailVerdict(confirmed.reason);
     return refuse('confirm_failed');
   }
 
@@ -2503,9 +2515,13 @@ export class WocMarketService {
           // reach (a fabricated string never settles), and the math no-ops
           // once the auction is already over. Best-effort like the confirm
           // site: a contended extension only fails toward a shorter auction.
+          // A FRESH clock read, not the pass-entry nowMs: the pass walks up
+          // to SWEEP_BATCH chain round trips, and a stale anchor would deny
+          // an honest bidder the window their verdict actually landed in.
+          const observedAtMs = this.now();
           await this.deps.db
             .extendAuctionForBondProgress(this.cfg.realm, bid.listingId, (row) =>
-              antiSnipeExtendedEndMs(nowMs, row.endsAtMs, row.baseEndsAtMs),
+              antiSnipeExtendedEndMs(observedAtMs, row.endsAtMs, row.baseEndsAtMs),
             )
             .catch(() => {});
           await this.holdBondAndActivate(bid.id);
@@ -2515,7 +2531,9 @@ export class WocMarketService {
           // refuses the lapse (the reorg carve-out): park THAT row like a
           // never-decided one, or it re-owns the batch head every pass and
           // burns one confirm RPC forever, the exact starvation the park
-          // mechanism exists to prevent.
+          // mechanism exists to prevent. The refusal word leaves no row
+          // behind on this leg, so the drift channel is its only trace.
+          this.noteFailVerdict(confirmed.reason);
           const lapsed = await this.deps.db.lapseBid(bid.id);
           if (!lapsed) {
             this.parkedBondPolls.set(bid.id, nowMs + WocMarketService.PARK_RETRY_MS);

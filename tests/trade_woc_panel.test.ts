@@ -16,7 +16,6 @@ import {
   type WocTradePanelDeps,
   wireWocTradeArm,
   wocOfferPhase,
-  wocSettlementInFlight,
   wocTradeArmHtml,
   wocTradeModelFrom,
   wocTradeMoneyText,
@@ -727,14 +726,16 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
   });
 
   it('treats an operator-parked review payment as still in flight, never settled', () => {
-    // A review-parked settlement is neither settled nor lost; announcing
-    // "settled" for money awaiting an operator verdict is the custody-lie
-    // class the row-label rule already bans. The behavioral arm below is
-    // what fails if 'review' leaves the set.
-    expect(wocSettlementInFlight('review')).toBe(true);
-    expect(wocSettlementInFlight('confirming')).toBe(true);
-    expect(wocSettlementInFlight('delivered')).toBe(false);
-    expect(wocSettlementInFlight('offered')).toBe(false);
+    // A review-parked settlement is neither settled nor lost; the offer face
+    // must stay 'paying' (the pending face), not fall to awaiting_payment
+    // with a live Pay control under money an operator is deciding. Pinned
+    // through the REAL consumer (wocOfferPhase over SETTLING_STATES; the old
+    // wocSettlementInFlight wrapper had no production caller and is gone).
+    const row = { listingId: 41, listingStatus: 'settling', listingResolution: null };
+    expect(wocOfferPhase({ ...row, settlementState: 'review' })).toBe('paying');
+    expect(wocOfferPhase({ ...row, settlementState: 'confirming' })).toBe('paying');
+    expect(wocOfferPhase({ ...row, settlementState: 'delivered' })).toBe('awaiting_payment');
+    expect(wocOfferPhase({ ...row, settlementState: null })).toBe('awaiting_payment');
   });
 });
 

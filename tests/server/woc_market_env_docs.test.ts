@@ -111,44 +111,61 @@ describe('market env documentation matches the code', () => {
     // for a market-prefixed literal in any env-read-capable position and
     // fails toward adding the file to CORPUS. Prefix LITERALS in source are
     // the net: even a renamed gate constant still names its env var.
-    const { readdirSync, statSync } = require('node:fs') as typeof import('node:fs');
+    const { lstatSync, readdirSync } = require('node:fs') as typeof import('node:fs');
     const { fileURLToPath } = require('node:url') as typeof import('node:url');
     const path = require('node:path') as typeof import('node:path');
     const root = fileURLToPath(new URL('../../', import.meta.url));
     const roots = ['server', 'src', 'headless'];
     const skipDirs = new Set(['node_modules', 'i18n.resolved.generated']);
     const files: string[] = [];
-    const walk = (dir: string): void => {
+    // lstat plus a depth bound, the repo's scan-guard convention: statSync
+    // follows symlinks, so a linked directory cycle would hang the suite.
+    const walk = (dir: string, depth: number): void => {
+      if (depth > 12) throw new Error(`walk too deep at ${dir}; raise the bound deliberately`);
       for (const entry of readdirSync(dir)) {
         if (skipDirs.has(entry)) continue;
         const full = path.join(dir, entry);
-        const st = statSync(full);
-        if (st.isDirectory()) walk(full);
-        else if (entry.endsWith('.ts')) files.push(full);
+        const st = lstatSync(full);
+        if (st.isDirectory()) walk(full, depth + 1);
+        else if (st.isFile() && entry.endsWith('.ts')) files.push(full);
       }
     };
-    for (const r of roots) walk(path.join(root, r));
+    for (const r of roots) walk(path.join(root, r), 0);
     // A reader is a file whose COMMENT-STRIPPED source both mentions a
     // market-prefixed name and touches the environment at all; prose-only
-    // mentions (constants re-exported, wire fields) do not count.
+    // mentions (constants re-exported, wire fields) do not count. The
+    // env-touch gate accepts the named-constant indirection form too (a
+    // future require_internal_secret twin whose process.env read lives in
+    // another module). KNOWN evasions, verified non-classifying and accepted:
+    // a gate constant IMPORTED from a module that itself reads no env and
+    // carries no market literal, and a template-built name
+    // (process.env[`WOC_MARKET_${suffix}`]); both are outside this net.
     const prefixLiteral = new RegExp(`'(?:${PREFIXES.join('|')})[A-Z0-9_]*'`);
+    const isMarketEnvReader = (src: string): boolean => {
+      const readsEnv =
+        /\bprocess\.env\b/.test(src) || /\benv\.[A-Z]/.test(src) || /_ENV\s*=\s*'/.test(src);
+      if (!readsEnv) return false;
+      return PREFIXES.some((p) => src.includes(`env.${p}`)) || prefixLiteral.test(src);
+    };
     const outside: string[] = [];
     for (const full of files) {
       const rel = path.relative(root, full).replaceAll(path.sep, '/');
       if (CORPUS.includes(rel)) continue;
-      const src = stripComments(readFileSync(full, 'utf8'));
-      const readsEnv = /\bprocess\.env\b/.test(src) || /\benv\.[A-Z]/.test(src);
-      if (!readsEnv) continue;
-      const marketName = PREFIXES.some((p) => src.includes(`env.${p}`))
-        ? true
-        : prefixLiteral.test(src);
-      if (marketName) outside.push(rel);
+      if (isMarketEnvReader(stripComments(readFileSync(full, 'utf8')))) outside.push(rel);
     }
-    // The walk is real: it visited the corpus files themselves (positive
-    // control against a broken root or extension filter).
+    // TWO positive controls: the walk visited the corpus files (a broken
+    // root or extension filter fails here), and the CLASSIFIER itself
+    // recognizes a known reader (a corpus file is exempted by the CORPUS
+    // check above, not by the classifier, so this proves both detector
+    // regexes still fire; without it a broken stripComments or regex would
+    // leave `outside` empty forever and the guard would pass vacuously).
     expect(files.map((f) => path.relative(root, f).replaceAll(path.sep, '/'))).toContain(
       'server/woc_market_routes.ts',
     );
+    expect(
+      isMarketEnvReader(stripComments(read('server/woc_market_proxy.ts'))),
+      'the classifier no longer recognizes a known market env reader',
+    ).toBe(true);
     expect(
       outside,
       'market env readers outside CORPUS; add each file to CORPUS so both guard directions see it',

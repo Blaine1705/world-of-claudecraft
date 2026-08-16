@@ -3935,6 +3935,8 @@ export const ja_JP: EnTranslations = {
       "signing": "ウォレットの承認を待っています...",
       "signFailed": "ウォレットが支払いを完了できませんでした。ウォレットを確認して、もう一度お試しください。",
       "confirming": "チェーン上で確認中...",
+      "activityCancelPending": "キャンセル待ち",
+      "activityDirected": "直接取引",
       "bidPlacedStanding": "入札が有効になりました。あなたが現在の最高入札者です。",
       "bidPlacedOutbid": "保証金は確認されましたが、先により高い入札が入りました。",
       "purchaseComplete": "購入が完了しました。アイテムはレイヴンポスト便で届きます。",

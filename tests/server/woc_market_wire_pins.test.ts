@@ -613,11 +613,22 @@ describe('the confirm handlers answer the screened pending verdict', () => {
 // ---------------------------------------------------------------------------
 
 describe('listingView state booleans', () => {
-  it('cancelPending follows the cancel-intent stamp', async () => {
+  it('cancelPending follows the cancel-intent stamp, on ACTIVE listings only', async () => {
     expect((await browseListingView()).cancelPending).toBe(false);
     expect(
       (await browseListingView({ cancelRequestedAtMs: 1_799_000_000_000 })).cancelPending,
     ).toBe(true);
+    // The stamp is never cleared; a closed listing must not report a pending
+    // cancel forever (every server-side consumer of the column pairs it with
+    // status = 'active', and the wire follows).
+    expect(
+      (
+        await browseListingView({
+          cancelRequestedAtMs: 1_799_000_000_000,
+          status: 'closed',
+        })
+      ).cancelPending,
+    ).toBe(false);
   });
 
   it('directed follows the directed-buyer stamp without leaking the account', async () => {
@@ -675,9 +686,15 @@ describe('response wrappers expose exactly their pinned key sets', () => {
         'settlementWindowSeconds',
       ].sort(),
     );
-    expect(Object.keys(body.price as Record<string, unknown>).sort()).toEqual(
-      ['asOfMs', 'available', 'healthy', 'tokensPerUsd'].sort(),
-    );
+    // Keys AND values in one pin: the fixture's polarities differ (available
+    // true, healthy false), so a swapped or hard-coded projection goes red;
+    // healthy is what the client's paused banner derives from.
+    expect(body.price).toEqual({
+      available: true,
+      healthy: false,
+      tokensPerUsd: 100,
+      asOfMs: 1_799_000_400_000,
+    });
     expect(JSON.stringify(body)).not.toContain('operator_paused_v9');
   });
 

@@ -1302,6 +1302,23 @@ describe('woc_market_window: payment verdicts reach the player', () => {
     const activity = code.slice(from, to);
     expect(activity).toContain('s.failDetailReason != null');
     expect(activity).toContain('wocSettlementFailText(s.failDetailReason)');
+    // The class pairs with the components.css rule that gives the sentence
+    // its own wrapped row (the wm-inline-busy precedent): a rename on either
+    // side silently squeezes the Pay control at ru/ja fill widths.
+    expect(activity).toContain('wm-fail-why');
+  });
+
+  it('renders the listing state booleans the wire carries for this surface', () => {
+    // cancelPending and directed exist for exactly this render: a reloading
+    // seller must see an accepted cancel intent, and a directed sale must not
+    // read as a public auction. Gated on the view-core booleans, keyed copy.
+    const from = code.indexOf('private activityHtml(');
+    const to = code.indexOf('private quoteHtml(', from);
+    const activity = code.slice(from, to);
+    expect(activity).toContain('l.cancelPending');
+    expect(activity).toContain('hudChrome.wocMarket.activityCancelPending');
+    expect(activity).toContain('l.directed');
+    expect(activity).toContain('hudChrome.wocMarket.activityDirected');
   });
 
   it('answers a pending confirm with the reason-specific line on both legs', () => {
@@ -1310,7 +1327,11 @@ describe('woc_market_window: payment verdicts reach the player', () => {
     // LAST method: the count below goes red the moment a method is appended
     // after it (the slice would silently widen and the toHaveLength ordering
     // pins would stop meaning what they say), forcing a bounded re-anchor.
-    expect(sign.match(/private (?:async )?\w+\(/g)).toHaveLength(1);
+    expect(
+      sign.match(/\n  (?:private |public |protected )?(?:async )?\w+\(|\n(?:export |function )/g) ??
+        [],
+      'a declaration now follows signPendingQuote; re-anchor this slice with a real end bound',
+    ).toHaveLength(0);
     // Bond leg: the pending arm routes through the mapper, not a fixed key.
     // Settlement leg: a still-confirming answer must never toast purchase
     // complete (that is a delivery claim about money the chain has not
@@ -1337,16 +1358,25 @@ describe('woc_market_window: payment verdicts reach the player', () => {
     expect(sign).not.toContain('!pending.quote.signatureRequired');
     // The wallet call survives on the other arm (the skip is not a bypass).
     expect(sign).toContain('signAndSendTransactionBase64');
+    // BRANCH ORDER: the devsig mint sits in the === false arm and the wallet
+    // call after it. An inverted ladder (wallet on false, devsig otherwise)
+    // hands a fabricated devsig to a real wallet-signed charge while every
+    // presence pin above still passes.
+    expect(sign.indexOf('signatureRequired === false')).toBeLessThan(sign.indexOf('devsig:'));
+    expect(sign.indexOf('devsig:')).toBeLessThan(sign.indexOf('signAndSendTransactionBase64'));
   });
 
   it('a bond re-quote re-labels the prompt from the quote it adopted', () => {
     // The payBond rule holds on refresh: the drift-adopt path re-prices the
     // bond server-side, and a prompt labeled with the stale figure while the
     // wallet is handed the new one contradicts itself about the money.
-    const refresh = between(
-      'private async refreshPendingQuote(',
-      'private async signPendingQuote(',
-    );
+    // Sliced from the comment-STRIPPED text, per the file's own discipline:
+    // between() reads the raw painter, which a comment could satisfy.
+    const from = code.indexOf('private async refreshPendingQuote(');
+    const to = code.indexOf('private async signPendingQuote(', from);
+    expect(from).toBeGreaterThanOrEqual(0);
+    expect(to).toBeGreaterThan(from);
+    const refresh = code.slice(from, to);
     expect(refresh).toContain('usdCents: out.bond.bondCents ?? pending.usdCents');
   });
 });

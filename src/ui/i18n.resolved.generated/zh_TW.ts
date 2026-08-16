@@ -3935,6 +3935,8 @@ export const zh_TW: EnTranslations = {
       "signing": "等待錢包確認...",
       "signFailed": "你的錢包未能完成付款。請檢查錢包後重試。",
       "confirming": "正在鏈上確認...",
+      "activityCancelPending": "待取消",
+      "activityDirected": "定向出售",
       "bidPlacedStanding": "你的出價已生效，你是目前最高出價者。",
       "bidPlacedOutbid": "你的保證金已確認，但有人搶先出了更高的價。",
       "purchaseComplete": "購買完成。物品將經烏鴉郵局寄達。",

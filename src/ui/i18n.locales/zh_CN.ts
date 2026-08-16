@@ -8434,6 +8434,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.quoteSign': '签名并付款',
   'hudChrome.wocMarket.quoteRefresh': '新报价',
   'hudChrome.wocMarket.quoteCancel': '暂不',
+  'hudChrome.wocMarket.activityCancelPending': '待取消',
+  'hudChrome.wocMarket.activityDirected': '定向出售',
   'hudChrome.wocMarket.quoteBondFor': '可退还的出价保证金：{usd}',
   'hudChrome.wocMarket.quoteSettlementFor': '{item} 的结算：{usd}',
   'hudChrome.wocMarket.signing': '等待钱包确认...',

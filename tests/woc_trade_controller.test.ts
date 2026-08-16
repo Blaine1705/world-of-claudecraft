@@ -340,11 +340,18 @@ describe('the completion report', () => {
     const r = rig();
     const row: FinishRow = { id: 5, usdCents: 100, role: 'seller', itemId: null };
     const finish = finishOf(r);
+    (r.controller as unknown as { wocTradeSplit: unknown }).wocTradeSplit = {
+      sellerCents: 90,
+      burnCents: 3,
+      treasuryCents: 7,
+    };
     finish(row);
     finish(row);
     expect(r.host.logs).toHaveLength(1);
     expect(r.host.balanceRefreshes).toBe(1);
     expect(r.host.closed).toBe(1);
+    // The settled deal's split dies at the finish clear site too.
+    expect((r.controller as unknown as { wocTradeSplit: unknown }).wocTradeSplit).toBeNull();
     // CLOSE, never cancel: a cancel would contradict the payment line just
     // printed, and the sale succeeded.
     expect(r.host.cancelled).toBe(0);
@@ -960,12 +967,17 @@ describe('withdrawing the standing offer', () => {
     // No openTrade: same poll-race rationale as the accept-body suite above.
     const c = r.controller as unknown as {
       wocTradeOffer: WocPendingOffer | null;
+      wocTradeSplit: unknown;
       cancelWocTradeOffer(action: 'decline' | 'withdraw'): Promise<void>;
     };
     c.wocTradeOffer = heldOffer();
+    c.wocTradeSplit = { sellerCents: 90, burnCents: 3, treasuryCents: 7 };
     await c.cancelWocTradeOffer('withdraw');
     expect(h.state.calls.resolveOffers).toEqual([[7, 'withdraw']]);
     expect(c.wocTradeOffer).toBeNull();
+    // The dead deal's split dies with it, at this clear site like the poll's:
+    // a later compose form must not paint its Fee / You receive lines.
+    expect(c.wocTradeSplit).toBeNull();
   });
 });
 

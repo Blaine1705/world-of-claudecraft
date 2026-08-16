@@ -124,12 +124,6 @@ export function wocOfferPhase(
  */
 const SETTLING_STATES = new Set(['confirming', 'confirmed', 'delivering', 'review']);
 
-/** Whether a settlement state means the payment is still in flight. Exported so
- *  the HUD does not announce delivery while the chain is still confirming. */
-export function wocSettlementInFlight(state: string | null | undefined): boolean {
-  return SETTLING_STATES.has(state ?? '');
-}
-
 export function wocTradeModelFrom(deps: WocTradePanelDeps): WocTradeModel {
   return buildWocTradeModel({
     marketEnabled: deps.marketEnabled,

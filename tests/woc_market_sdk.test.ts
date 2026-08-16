@@ -44,7 +44,7 @@ const client = (token: string | null = 'tok-1'): WocMarketClient =>
 
 const statusBody = {
   enabled: true,
-  price: { available: true, healthy: true, reason: null, tokensPerUsd: 100, asOfMs: 900_000 },
+  price: { available: true, healthy: true, tokensPerUsd: 100, asOfMs: 900_000 },
   maxActiveListings: 12,
   durationsHours: [12, 24, 48],
   minPriceCents: 25,

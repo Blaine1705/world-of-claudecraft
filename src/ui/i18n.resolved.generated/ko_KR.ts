@@ -3935,6 +3935,8 @@ export const ko_KR: EnTranslations = {
       "signing": "지갑 승인을 기다리는 중...",
       "signFailed": "지갑이 결제를 완료하지 못했습니다. 지갑을 확인한 뒤 다시 시도하세요.",
       "confirming": "체인에서 확인 중...",
+      "activityCancelPending": "취소 대기 중",
+      "activityDirected": "직접 거래",
       "bidPlacedStanding": "입찰이 확정되었습니다. 현재 최고 입찰자입니다.",
       "bidPlacedOutbid": "보증금은 확인되었지만 더 높은 입찰이 먼저 들어왔습니다.",
       "purchaseComplete": "구매가 완료되었습니다. 아이템은 레이븐포스트 우편으로 도착합니다.",

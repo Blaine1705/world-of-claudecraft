@@ -936,6 +936,13 @@ describe('every game-written fail_reason word is a vocabulary member or a pinned
   // affected buyer the generic line with no red test and no log. Expired-only
   // words are excluded ON PURPOSE (never rendered: failDetailReason gates to
   // failed rows, and these three are stamped on rows leaving through expiry).
+  // KNOWN scan limits, accepted: the writer corpus is the two files below (a
+  // third writer file would need adding here; today only woc_market.ts calls
+  // transitionSettlement and only woc_market_db.ts writes fail_reason SQL
+  // literals); a 4th argument built from a template literal or a call result
+  // yields no word (the ?? 'refused' fallback keeps a literal in every such
+  // call today); and an exclusion member whose SQL write disappears goes dead
+  // silently (the positive controls below cover two of the three).
   const EXPIRED_ONLY_EXCLUSIONS = ['listing_cancelled', 'listing_suspended', 'schema_dedupe'];
 
   /** The 4th argument of every transitionSettlement(...) call, by a depth

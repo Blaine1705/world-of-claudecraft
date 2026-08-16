@@ -3935,6 +3935,8 @@ export const en_CA: EnTranslations = {
       "signing": "Waiting for your wallet...",
       "signFailed": "Your wallet did not complete the payment. Check the wallet and try again.",
       "confirming": "Confirming on chain...",
+      "activityCancelPending": "Cancel pending",
+      "activityDirected": "Directed sale",
       "bidPlacedStanding": "Your bid stands. You are the high bidder.",
       "bidPlacedOutbid": "Your bond confirmed, but a higher bid landed first.",
       "purchaseComplete": "Purchase complete. Your item arrives by Ravenpost mail.",

@@ -69,6 +69,10 @@ export interface WocListingView {
   /** Server-computed bond for a bid at minNextBidCents (client computes none). */
   minNextBidBondCents: number;
   buyNowLocked: boolean;
+  /** Cancel intent stamped on an active listing. Absent from an older server. */
+  cancelPending?: boolean;
+  /** Directed p2p sale, never a public auction. Absent from an older server. */
+  directed?: boolean;
   endsAtMs: number;
   createdAtMs: number;
 }
@@ -179,6 +183,11 @@ export interface WocListingRowModel {
   selected: boolean;
   status: string;
   resolution: string | null;
+  /** The seller asked to cancel a locked listing; it closes on its own after
+   *  an unpaid window. Absent from an older server reads as false. */
+  cancelPending: boolean;
+  /** A directed p2p sale minted from a trade offer, not a public auction. */
+  directed: boolean;
 }
 
 export interface WocDetailModel {
@@ -310,6 +319,8 @@ function listingRow(
     selected: listing.id === selectedId,
     status: listing.status,
     resolution: listing.resolution,
+    cancelPending: listing.cancelPending === true,
+    directed: listing.directed === true,
   };
 }
 
@@ -429,7 +440,9 @@ export function wocMarketViewSig(model: WocMarketViewModel): string {
   const sell = model.sell.rows.map((r) => `${r.index}:${r.itemId}`).join(',');
   const activity = model.activity
     ? [
-        model.activity.listings.map((l) => `${l.id}:${l.status}:${l.resolution ?? ''}`).join(','),
+        model.activity.listings
+          .map((l) => `${l.id}:${l.status}:${l.resolution ?? ''}:${l.cancelPending ? 1 : 0}`)
+          .join(','),
         model.activity.bids
           .map(
             // bondConfirming is folded in because NOTHING else here moves when a

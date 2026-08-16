@@ -8837,6 +8837,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.quoteSign': '署名して支払う',
   'hudChrome.wocMarket.quoteRefresh': '新しい見積もり',
   'hudChrome.wocMarket.quoteCancel': 'あとで',
+  'hudChrome.wocMarket.activityCancelPending': 'キャンセル待ち',
+  'hudChrome.wocMarket.activityDirected': '直接取引',
   'hudChrome.wocMarket.quoteBondFor': '返金可能な入札保証金: {usd}',
   'hudChrome.wocMarket.quoteSettlementFor': '{item} の決済: {usd}',
   'hudChrome.wocMarket.signing': 'ウォレットの承認を待っています...',

@@ -1112,12 +1112,23 @@ export class WocMarketWindow {
       }
     };
     const listings = a.listings
-      .map(
-        (l) =>
+      .map((l) => {
+        // The two state booleans the wire carries for exactly this surface:
+        // without them a reloading seller cannot tell an accepted cancel
+        // intent from a plainly active listing, or a directed sale minted by
+        // a trade offer from a public auction.
+        const cancelBadge = l.cancelPending
+          ? ` <span class="wm-inline-busy">${esc(t('hudChrome.wocMarket.activityCancelPending'))}</span>`
+          : '';
+        const directedBadge = l.directed
+          ? ` <span>${esc(t('hudChrome.wocMarket.activityDirected'))}</span>`
+          : '';
+        return (
           `<li>${this.itemCellHtml(l.itemId, l.quality, `activity:${l.id}`, l.instance)} ` +
           `<span>${l.currentCents === null ? esc(this.usd(l.startCents)) : esc(this.usd(l.currentCents))}</span> ` +
-          `<span>${esc(listingStatus(l.status, l.resolution))}</span></li>`,
-      )
+          `<span>${esc(listingStatus(l.status, l.resolution))}</span>${directedBadge}${cancelBadge}</li>`
+        );
+      })
       .join('');
     const bids = a.bids
       .map((b) => {
@@ -1160,7 +1171,10 @@ export class WocMarketWindow {
           s.failDetailReason != null
             ? ` <span class="wm-fail-why">${esc(wocSettlementFailText(s.failDetailReason) ?? '')}</span>`
             : '';
-        return `<li><span>${esc(this.usd(s.amountCents))}</span> <span>${esc(t(settlementKey(s.state)))}</span>${failDetail}${deadline}${pay}</li>`;
+        // The WHY sentence LAST: its flex-basis takes a full wrapped row, and
+        // sitting mid-row would push the deadline and Pay control onto a
+        // third line under it.
+        return `<li><span>${esc(this.usd(s.amountCents))}</span> <span>${esc(t(settlementKey(s.state)))}</span>${deadline}${pay}${failDetail}</li>`;
       })
       .join('');
     const strikes =
