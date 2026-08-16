@@ -265,7 +265,7 @@ korzul_the_gravewyrm (0,146)  sanctum_drakonid (-5,144) (5,144)
 
 **Boss mechanics summary** (only 2 NEW sim mechanics across the whole expansion, both deterministic, both also used in the Bastion — see §7): summonAdds (Vael, Velkhar), enrage (Korgath, Korzul). aoePulse reused everywhere (Voss, Vael, Drogmar, Korzul). Frontal breath DEFERRED (facing-cone math not worth it).
 
-**Loot:** Korgath → korgaths_chainwraps (50%) + 50s coin. Velkhar → one of three blues (boneguard_breastplate / staff_of_velkhar / shadowmeld_tunic) + 50s. Korzul → one of three EPIC weapons (wyrmfang_greatblade / staff_of_the_gravewyrm / fang_of_korzul, ~1/3 each) + 1.5g coin. Quest blues (q_gravewyrm chest pieces) guarantee every archetype a best-in-slot chest on completion. Trash: 3–3.5s coin/elite + junk.
+**Loot:** Korgath → korgaths_chainwraps (50%) + 50s coin. Velkhar → one of three blues (boneguard_breastplate / staff_of_velkhar / shadowmeld_tunic) + 50s. Korzul → one of three EPIC weapons (wyrmfang_greatblade / staff_of_the_gravewyrm / fang_of_korzul, ~1/3 each) + 1.5g coin. Quest blues (q_gravewyrm chest pieces) guarantee every archetype a best-in-slot chest on completion. Trash: 3 to 3.5s coin/elite + junk.
 
 **XP reality (corrected per judge verdict):** full clear = 18 trash × (140×2×1.43÷5 ≈ 80) + 3 bosses ≈ **1,700 XP/member**. A loot/story event — the level-20 push comes from the lead-up chain, by design.
 

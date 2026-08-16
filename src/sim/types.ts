@@ -1422,6 +1422,13 @@ export const DEFAULT_PARTY_LOOT_STRATEGIES: LootStrategies = {
 export interface LootEntry {
   itemId?: string;
   copper?: number;
+  // Heroic-claim money base: when the kill carries a live heroic instance
+  // claim, the loot roller substitutes this for `copper` as the roll base
+  // (same 0.6x to 1.4x band on the same single draw). Authored only on
+  // dungeon final bosses via the HEROIC_FINALE_COPPER /
+  // NYTHRAXIS_HEROIC_COPPER bases in content/dungeon_difficulty.ts, and it
+  // always rides a truthy `copper` (the roller's money arm gates on copper).
+  heroicCopper?: number;
   chance: number; // 0..1
   questId?: string; // only drops while this quest is active and not complete
   // Entries sharing a rollGroup are exclusive: one rng draw is partitioned by

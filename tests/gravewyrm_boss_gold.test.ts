@@ -5,6 +5,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
+import type { LootEntry } from '../src/sim/types';
 
 // Gravewyrm Sanctum gold-farm fix: Korzul the Gravewyrm paid a guaranteed
 // 50000c base, rolled to 3g to 7g per kill by the loot roller's 0.6x to 1.4x
@@ -16,9 +17,12 @@ import { Sim } from '../src/sim/sim';
 // is the closest fit to the intended 1g to 2g the fixed variance allows,
 // still a 3x finale premium over the sibling bosses.
 const KORZUL_BASE_COPPER = 15000;
+const KORZUL_HEROIC_COPPER = 100000; // the shared 10g heroic finale base
 const SIBLING_BOSS_COPPER = 5000;
 const ROLLED_MIN_COPPER = 9000; // ceil(15000 * 0.6)
 const ROLLED_MAX_COPPER = 21000; // ceil(15000 * 1.4)
+const HEROIC_ROLLED_MIN_COPPER = 60000; // ceil(100000 * 0.6)
+const HEROIC_ROLLED_MAX_COPPER = 140000; // ceil(100000 * 1.4)
 // How close to each band edge the sampled rolls must reach. Over 2000 uniform
 // draws the chance of missing a 100-wide edge window is about 2e-7 per edge,
 // so this cannot flake, while a roller band narrowed by even ~0.7% fails.
@@ -28,7 +32,7 @@ const EDGE_SLACK_COPPER = 100;
 // truthiness gate (loot_roll.ts skips a copper: 0 row) ON PURPOSE: the test
 // counts every authored copper field, so it over-reports rather than letting
 // a zero-valued row sit unexamined.
-function copperEntries(loot: { copper?: number; chance: number }[] | undefined) {
+function copperEntries(loot: LootEntry[] | undefined) {
   return (loot ?? []).filter((entry) => entry.copper !== undefined);
 }
 
@@ -79,6 +83,7 @@ describe('Gravewyrm Sanctum end-boss gold (farm fix)', () => {
     const money = copperEntries(MOBS.korzul_the_gravewyrm.loot);
     expect(money).toHaveLength(1);
     expect(money[0].copper).toBe(KORZUL_BASE_COPPER);
+    expect(money[0].heroicCopper).toBe(KORZUL_HEROIC_COPPER);
     expect(money[0].chance).toBe(1);
   });
 
@@ -130,14 +135,16 @@ describe('Gravewyrm Sanctum end-boss gold (farm fix)', () => {
     expect(new Set(amounts).size).toBeGreaterThan(1000);
   });
 
-  it('heroic Korzul pays the same band through the real heroic death path', () => {
-    // The heroic claim path shares the base money entry: no multiplier, no
-    // heroic copper append. Under the old 50000c base every heroic kill paid
-    // at least 30000c, so a single sample outside the band is decisive.
+  it('heroic Korzul pays the 10g finale band through the real heroic death path', () => {
+    // The daily-lockout heroic clear substitutes the 100000c finale base on
+    // the same money entry (LootEntry.heroicCopper): every heroic kill pays
+    // 60000c to 140000c. Both the normal band (9000c to 21000c) and the old
+    // 50000c base (30000c to 70000c) are disjoint from parts of this band,
+    // and no sample may fall outside it.
     for (let seed = 1; seed <= 8; seed++) {
       const copper = heroicKillCopper(seed);
-      expect(copper, `seed ${seed}`).toBeGreaterThanOrEqual(ROLLED_MIN_COPPER);
-      expect(copper, `seed ${seed}`).toBeLessThanOrEqual(ROLLED_MAX_COPPER);
+      expect(copper, `seed ${seed}`).toBeGreaterThanOrEqual(HEROIC_ROLLED_MIN_COPPER);
+      expect(copper, `seed ${seed}`).toBeLessThanOrEqual(HEROIC_ROLLED_MAX_COPPER);
     }
   });
 });
