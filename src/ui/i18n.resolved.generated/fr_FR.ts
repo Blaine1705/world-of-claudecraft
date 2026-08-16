@@ -10615,7 +10615,7 @@ export const fr_FR: EnTranslations = {
       },
       "ice_block": {
         "name": "Cercueil froid",
-        "description": "Vous enferme dans la glace pendant 8 s, vous immunisant contre tous les dégâts et effets et supprimant tous les effets néfastes. Utilisable lorsque vous êtes étourdi ou métamorphosé. Vous ne pouvez pas agir pendant cet effet. Lancez-le à nouveau pour l’annuler. (Mage)"
+        "description": "Vous enferme dans la glace pendant 8 s, vous immunisant contre tous les dégâts. Supprime les effets néfastes ordinaires déjà actifs et empêche les nouveaux effets de contrôle ordinaires. Utilisable lorsque vous êtes étourdi ou métamorphosé. Vous ne pouvez pas agir pendant cet effet. Relancez la capacité pour l’annuler. (Mage)"
       },
       "inner_focus": {
         "name": "Esprit apaisé",
