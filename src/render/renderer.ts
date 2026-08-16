@@ -19,7 +19,6 @@ import {
   defaultDelveModules,
   delveAt,
   delveModuleStackEndRelZ,
-  delveModuleZOffset,
   delveOrigin,
   delveSlotAt,
   dungeonAt,
@@ -218,7 +217,7 @@ import {
   warmDuskGrade,
 } from './day_night_core';
 import { shouldPlayDeedFirework } from './deed_fx_gate';
-import { buildDelveModule } from './delve_interiors';
+import { DelveInteriorTracker } from './delve_interior_tracker';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
 import { detailHorizonStarved } from './detail_horizon_core';
 import { buildDoorBody, buildRiftGateBody, buildRiftPuzzleProp } from './door_portal';
@@ -330,7 +329,6 @@ import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
 import { buildImpactSite, type ImpactSiteView, MIREFEN_IMPACT_SITE } from './impact_site';
 import * as encounterPrewarm from './interior_encounter_prewarm_pass';
-import { ensureDelveInteriorKit } from './interior_kit';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { stepLichHeartbeat } from './lich_audio_state_core';
@@ -9353,9 +9351,14 @@ export class Renderer {
   private readonly umbralAnchorMarker = new UmbralAnchorMarker(this.groundSample);
   // The approved Maledict Eye is cosmetic: one local, non-targetable Affliction familiar.
   private readonly afflictionFamiliar = new AfflictionFamiliar();
-  // Delve module interiors build asynchronously; track in-flight keys so a
-  // per-frame ensureDelveInteriorsNear does not re-schedule a build mid-load.
-  private pendingInteriors = new Set<string>();
+  // Delve module interiors build asynchronously; the tracker also retires a
+  // position's stale geometry when a new run puts a different module there
+  // (see delve_interior_tracker.ts).
+  private delveInteriors = new DelveInteriorTracker(
+    () => this.ensureDungeons(),
+    (group) => this.retireInteriorGroup(group),
+    this.builtInteriors,
+  );
   // Re-applied rift fog is keyed by the floor descriptor (seed:floorIndex) so a
   // descent (same 'rift' fogState, different palette) still refreshes the fog.
   private riftFogKey: string | null = null;
@@ -9628,27 +9631,6 @@ export class Renderer {
       : (this.scene.fog as THREE.Fog).far;
   }
 
-  private scheduleDelveModuleBuild(
-    key: string,
-    moduleId: DelveModuleId,
-    ox: number,
-    oz: number,
-  ): void {
-    if (this.builtInteriors.has(key) || this.pendingInteriors.has(key)) return;
-    this.pendingInteriors.add(key);
-    void buildDelveModule(this.ensureDungeons(), moduleId, ox, oz)
-      .then(() => {
-        this.builtInteriors.add(key);
-        this.pendingInteriors.delete(key);
-      })
-      .catch((err) => {
-        this.pendingInteriors.delete(key);
-        if (import.meta.env?.DEV) {
-          console.warn('Failed to build delve interior:', moduleId, 'at', ox, oz, err);
-        }
-      });
-  }
-
   /** Build every module in a delve run at its stacked z offset (parallel async). */
   private buildAllDelveModules(
     delveId: string,
@@ -9656,14 +9638,7 @@ export class Renderer {
     origin: { x: number; z: number },
     modules: readonly DelveModuleId[],
   ): void {
-    void ensureDelveInteriorKit().catch(() => undefined);
-    for (let mi = 0; mi < modules.length; mi++) {
-      const moduleId = modules[mi];
-      const key = `delve:${delveId}:${slot}:${moduleId}`;
-      if (this.builtInteriors.has(key) || this.pendingInteriors.has(key)) continue;
-      const zOff = delveModuleZOffset(modules, mi);
-      this.scheduleDelveModuleBuild(key, moduleId, origin.x, origin.z + zOff);
-    }
+    this.delveInteriors.buildAll(delveId, slot, origin, modules);
   }
 
   /** Prebuild the full module stack when a delve run starts (offline + online). */
