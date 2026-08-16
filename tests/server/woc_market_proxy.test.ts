@@ -119,7 +119,12 @@ describe('the wire contract with the service', () => {
         await economy.estimate(1234);
         break;
       case 'bondQuote':
-        await economy.bondQuote({ memoRef: 'woc_bond:1', usdCents: 125, buyerWallet: BUYER });
+        await economy.bondQuote({
+          memoRef: 'woc_bond:1',
+          bidCents: 2500,
+          usdCents: 125,
+          buyerWallet: BUYER,
+        });
         break;
       case 'settlementQuote':
         await economy.settlementQuote({
@@ -146,8 +151,20 @@ describe('the wire contract with the service', () => {
   it('sends the exact body fields the service reads', async () => {
     respond = () => ({ status: 200, body: { ok: true } });
     const economy = createWocMarketEconomyProxy();
-    await economy.bondQuote({ memoRef: 'woc_bond:7', usdCents: 125, buyerWallet: BUYER });
-    expect(seen[0].body).toEqual({ memoRef: 'woc_bond:7', usdCents: 125, buyerWallet: BUYER });
+    // bidCents is what the service computes the bond FROM; usdCents stays the
+    // optional echo of a stored figure. Both cross the wire verbatim.
+    await economy.bondQuote({
+      memoRef: 'woc_bond:7',
+      bidCents: 2500,
+      usdCents: 125,
+      buyerWallet: BUYER,
+    });
+    expect(seen[0].body).toEqual({
+      memoRef: 'woc_bond:7',
+      bidCents: 2500,
+      usdCents: 125,
+      buyerWallet: BUYER,
+    });
 
     seen = [];
     await economy.settlementQuote({
@@ -207,11 +224,42 @@ describe('graceful degradation is the contract', () => {
     respond = () => ({ status: 200, body: { ok: false, reason: 'operator_paused' } });
     const quote = await createWocMarketEconomyProxy().bondQuote({
       memoRef: 'woc_bond:1',
+      bidCents: 2500,
       usdCents: 125,
       buyerWallet: BUYER,
     });
     expect(quote.ok).toBe(false);
     expect(quote.reason).toBe('operator_paused');
+  });
+
+  it('a bond_amount_drift refusal carries the expected bondCents to adopt', async () => {
+    respond = () => ({
+      status: 200,
+      body: { ok: false, reason: 'bond_amount_drift', bondCents: 126 },
+    });
+    const quote = await createWocMarketEconomyProxy().bondQuote({
+      memoRef: 'woc_bond:1',
+      bidCents: 2500,
+      usdCents: 125,
+      buyerWallet: BUYER,
+    });
+    expect(quote.ok).toBe(false);
+    expect(quote.reason).toBe('bond_amount_drift');
+    expect(quote.bondCents).toBe(126);
+  });
+
+  it('screens a junk bondCents to null rather than adopting it', async () => {
+    respond = () => ({
+      status: 200,
+      body: { ok: true, reference: 'WMB_x', expiresAtMs: 42, bondCents: -5 },
+    });
+    const quote = await createWocMarketEconomyProxy().bondQuote({
+      memoRef: 'woc_bond:1',
+      bidCents: 2500,
+      buyerWallet: BUYER,
+    });
+    expect(quote.ok).toBe(true);
+    expect(quote.bondCents).toBeNull();
   });
 
   it('an HTTP error becomes an unavailable result, never an exception', async () => {
@@ -222,7 +270,12 @@ describe('graceful degradation is the contract', () => {
     await expect(economy.price()).resolves.toMatchObject({ available: false, healthy: false });
     await expect(economy.estimate(100)).resolves.toMatchObject({ available: false });
     await expect(
-      economy.bondQuote({ memoRef: 'woc_bond:1', usdCents: 125, buyerWallet: BUYER }),
+      economy.bondQuote({
+        memoRef: 'woc_bond:1',
+        bidCents: 2500,
+        usdCents: 125,
+        buyerWallet: BUYER,
+      }),
     ).resolves.toMatchObject({ ok: false, reason: 'service_unavailable' });
     await expect(economy.refundBond('WMB_x')).resolves.toEqual({
       done: false,

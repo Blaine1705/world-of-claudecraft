@@ -589,7 +589,12 @@ export interface WocMarketDb {
   ): Promise<'extended' | 'skip' | 'contended'>;
   /** CAS: applies only to an unpaid quote (status pending_bond AND no
    *  recorded signature); false = nothing written. See PgWocMarketDb. */
-  setBidBondQuote(bidId: number, reference: string, expiresAtMs: number): Promise<boolean>;
+  setBidBondQuote(
+    bidId: number,
+    reference: string,
+    expiresAtMs: number,
+    bondCents: number,
+  ): Promise<boolean>;
   /** Record the bidder's signature while the chain is still deciding;
    *  nowMs stamps bond_signature_at (first recording wins). Success returns
    *  the STAMPED moment (the first arrival, not this retry), the extension
@@ -821,6 +826,12 @@ export interface WocQuoteIntent {
   seller: WocQuoteLeg | null;
   burn: WocQuoteLeg | null;
   treasury: WocQuoteLeg | null;
+  /** The SERVICE-computed bond for a bond quote (pure bps ceil of the bid,
+   *  clamped): the game renders and persists this figure, it never derives
+   *  the money. Null on settlement quotes. Also carried on a
+   *  bond_amount_drift refusal, so the caller can adopt the expected figure
+   *  and re-quote instead of stranding the bid. */
+  bondCents: number | null;
   expiresAtMs: number | null;
   reason: string | null;
 }
@@ -830,7 +841,12 @@ export interface WocMarketEconomy {
   estimate(usdCents: number): Promise<WocEstimate>;
   bondQuote(args: {
     memoRef: string;
-    usdCents: number;
+    /** The BID being bonded: the service computes the bond from it. */
+    bidCents: number;
+    /** Optional echo of the bond the caller expects (the stored figure on a
+     *  refresh). A mismatch refuses bond_amount_drift carrying the service's
+     *  bondCents; never the request's bond input. */
+    usdCents?: number;
     buyerWallet: string;
   }): Promise<WocQuoteIntent>;
   settlementQuote(args: {
@@ -1980,19 +1996,24 @@ export class WocMarketService {
       minNext: (row) => minNextBidCents(row.currentBidCents, row.startCents),
     });
     if (!inserted.ok) return refuse(inserted.reason);
+    // The SERVICE owns the bond figure: send the bid, no echo (nothing has
+    // been shown to the player for this bid yet), and adopt the bondCents the
+    // quote answers. The local estimate above only sized the balance guard.
     const intent = await this.deps.economy.bondQuote({
       memoRef: `woc_bond:${inserted.bid.id}`,
-      usdCents: bond,
+      bidCents: args.amountCents,
       buyerWallet: wallet,
     });
     if (!intent.ok || intent.reference === null || intent.expiresAtMs === null) {
       // The pending bid lapses on its own TTL; nothing was transferred.
       return refuse('quote_unavailable');
     }
+    const adoptedBondCents = intent.bondCents ?? bond;
     const applied = await this.deps.db.setBidBondQuote(
       inserted.bid.id,
       intent.reference,
       intent.expiresAtMs,
+      adoptedBondCents,
     );
     if (!applied) {
       // Only reachable if this brand-new bid left 'pending_bond' (or somehow
@@ -2000,7 +2021,11 @@ export class WocMarketService {
       // plain contention, retryable, with nothing written.
       return refuse('contended');
     }
-    return { ok: true, bid: { ...inserted.bid, bondReference: intent.reference }, bond: intent };
+    return {
+      ok: true,
+      bid: { ...inserted.bid, bondReference: intent.reference, bondCents: adoptedBondCents },
+      bond: intent,
+    };
   }
 
   /**
@@ -2098,11 +2123,25 @@ export class WocMarketService {
     if (this.now() + WOC_MARKET_QUOTE_TTL_SECONDS * 1000 > lapseAtMs) {
       return refuse('bond_window_closed');
     }
-    const intent = await this.deps.economy.bondQuote({
+    // The refresh ECHOES the stored figure (the one the player has been
+    // shown). If the service's bond policy moved since, it refuses
+    // bond_amount_drift CARRYING its expected bondCents: adopt that figure
+    // and re-quote once, so a knob change re-prices the bond instead of
+    // stranding the bid behind an endless refusal.
+    let intent = await this.deps.economy.bondQuote({
       memoRef: `woc_bond:${bid.id}`,
+      bidCents: bid.amountCents,
       usdCents: bid.bondCents,
       buyerWallet: bid.wallet,
     });
+    if (!intent.ok && intent.reason === 'bond_amount_drift' && intent.bondCents !== null) {
+      intent = await this.deps.economy.bondQuote({
+        memoRef: `woc_bond:${bid.id}`,
+        bidCents: bid.amountCents,
+        usdCents: intent.bondCents,
+        buyerWallet: bid.wallet,
+      });
+    }
     if (!intent.ok || intent.reference === null || intent.expiresAtMs === null) {
       return refuse('quote_unavailable');
     }
@@ -2117,6 +2156,7 @@ export class WocMarketService {
       bid.id,
       intent.reference,
       intent.expiresAtMs,
+      intent.bondCents ?? bid.bondCents,
     );
     if (!applied) {
       // The CAS lost a race: a signature landed (or the bid left pending)

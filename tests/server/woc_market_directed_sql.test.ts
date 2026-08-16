@@ -1163,11 +1163,15 @@ describe('the delivery close tail is ONE transaction, in SQL', () => {
 
 describe('the bond and lock lifecycle statements, in SQL', () => {
   it('setBidBondQuote refreshes only an UNPAID quote, in the statement', async () => {
-    const { pool, sql } = recordingPool();
-    await new PgWocMarketDb(pool).setBidBondQuote(3, 'ref', 1_000);
+    const { pool, sql, params } = recordingPool();
+    await new PgWocMarketDb(pool).setBidBondQuote(3, 'ref', 1_000, 82);
     const [text] = sql();
     expect(text).toContain("status = 'pending_bond'");
     expect(text, 'the signature arm is the CAS').toContain('bond_signature IS NULL');
+    expect(text, 'the adopted service figure rides the same guarded write').toContain(
+      'bond_cents = $4',
+    );
+    expect(params()[0]).toEqual([3, 'ref', 1_000, 82]);
   });
 
   it('abandonPendingBid refuses to void a signed bond, in the statement', async () => {

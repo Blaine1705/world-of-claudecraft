@@ -1398,12 +1398,19 @@ export class FakeWocMarketDb implements WocMarketDb {
   }
 
   /** Mirrors the real CAS: a quote applies only to an UNPAID bond (status
-   *  pending_bond AND no recorded signature); false = nothing written. */
-  async setBidBondQuote(bidId: number, reference: string, expiresAtMs: number): Promise<boolean> {
+   *  pending_bond AND no recorded signature); false = nothing written. The
+   *  adopted service bondCents rides the same write, like the real UPDATE. */
+  async setBidBondQuote(
+    bidId: number,
+    reference: string,
+    expiresAtMs: number,
+    bondCents: number,
+  ): Promise<boolean> {
     const bid = this.bids.get(bidId);
     if (!bid || bid.status !== 'pending_bond' || bid.bondSignature !== null) return false;
     bid.bondReference = reference;
     bid.bondQuoteExpiresAtMs = expiresAtMs;
+    bid.bondCents = bondCents;
     return true;
   }
 

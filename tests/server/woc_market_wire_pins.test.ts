@@ -206,6 +206,7 @@ function quoteIntent(over: Partial<WocQuoteIntent> = {}): WocQuoteIntent {
     seller: { base: '22500000000', tokens: 22.5 },
     burn: { base: '750000000', tokens: 0.75 },
     treasury: { base: '1750000000', tokens: 1.75 },
+    bondCents: null,
     expiresAtMs: FAR_FUTURE_MS,
     reason: null,
     ...over,
@@ -390,6 +391,7 @@ describe('market wire views expose exactly their pinned key sets', () => {
     expect(Object.keys(body.quote as Record<string, unknown>).sort()).toEqual(
       [
         'amount',
+        'bondCents',
         'burn',
         'expiresAtMs',
         'reference',

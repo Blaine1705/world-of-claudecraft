@@ -408,6 +408,9 @@ function quoteView(intent: WocQuoteIntent): Record<string, unknown> {
     seller: intent.seller,
     burn: intent.burn,
     treasury: intent.treasury,
+    // The service-owned bond figure (bond quotes only; null on settlements):
+    // the client renders it, it never computes money.
+    bondCents: intent.bondCents,
     expiresAtMs: intent.expiresAtMs,
   };
 }

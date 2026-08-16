@@ -308,10 +308,18 @@ export function antiSnipeExtendedEndMs(
   return extended > endsAtMs ? extended : null;
 }
 
-/** The refundable bid bond for a bid: 5% clamped to $1 .. $50, never above
- *  the bid itself. */
+/**
+ * The refundable bid bond for a bid: 5% clamped to $1 .. $50, never above the
+ * bid itself. A RENDER-ONLY mirror of the service's clampedBondCentsForBid
+ * (pure bps ceil, then the clamp, then min with the bid): the SERVICE owns the
+ * bond figure, computes it from the bid on every bond quote, and the game
+ * adopts the quoted figure onto the bid row. This mirror only pre-labels
+ * listing views before any quote exists, so it must agree with the service at
+ * the same knobs; ceil, not round, or the half-cent boundaries disagree by a
+ * cent with the figure the quote then adopts.
+ */
 export function bondCents(bidCents: number): number {
-  const raw = Math.round((bidCents * WOC_MARKET_BOND_RATE_BPS) / 10_000);
+  const raw = Math.ceil((bidCents * WOC_MARKET_BOND_RATE_BPS) / 10_000);
   const clamped = Math.min(Math.max(raw, WOC_MARKET_BOND_MIN_CENTS), WOC_MARKET_BOND_MAX_CENTS);
   return Math.min(clamped, bidCents);
 }

@@ -33,6 +33,7 @@ import type {
   WocQuoteIntent,
 } from './woc_market';
 import {
+  bondCents,
   WOC_MARKET_CONFIRM_UNAVAILABLE_REASON,
   WOC_MARKET_QUOTE_TTL_SECONDS,
 } from './woc_market_rules';
@@ -122,6 +123,7 @@ const QUOTE_UNAVAILABLE: WocQuoteIntent = {
   seller: null,
   burn: null,
   treasury: null,
+  bondCents: null,
   expiresAtMs: null,
   signatureRequired: true,
   reason: 'service_unavailable',
@@ -154,6 +156,7 @@ interface WireQuote {
   seller?: WireLeg | null;
   burn?: WireLeg | null;
   treasury?: WireLeg | null;
+  bondCents?: number | null;
   expiresAtMs?: number | null;
   reason?: string | null;
 }
@@ -197,10 +200,18 @@ function estimateSplit(value: WireEstimate['split'], usdCents: number): WocEstim
   };
 }
 
+function bondCentsOf(wire: WireQuote): number | null {
+  const value = wire.bondCents;
+  return typeof value === 'number' && Number.isInteger(value) && value > 0 ? value : null;
+}
+
 function toQuote(wire: WireQuote | null): WocQuoteIntent {
   if (!wire) return QUOTE_UNAVAILABLE;
   if (wire.ok !== true) {
-    return { ...QUOTE_UNAVAILABLE, reason: wire.reason ?? 'refused' };
+    // bondCents survives the refusal arm ON PURPOSE: a bond_amount_drift
+    // refusal carries the service's expected figure, and dropping it here
+    // would leave the caller nothing to adopt.
+    return { ...QUOTE_UNAVAILABLE, reason: wire.reason ?? 'refused', bondCents: bondCentsOf(wire) };
   }
   return {
     ok: true,
@@ -213,6 +224,7 @@ function toQuote(wire: WireQuote | null): WocQuoteIntent {
     seller: leg(wire.seller),
     burn: leg(wire.burn),
     treasury: leg(wire.treasury),
+    bondCents: bondCentsOf(wire),
     expiresAtMs: wire.expiresAtMs ?? null,
     reason: null,
   };
@@ -374,12 +386,16 @@ export function createDevWocMarketEconomy(now: () => number = Date.now): WocMark
   const openQuotes = new Map<string, { expiresAtMs: number }>();
   const settledRefs = new Set<string>();
 
-  const quote = (usdCents: number, split: boolean): WocQuoteIntent => {
+  const quote = (usdCents: number, split: boolean, bondCents: number | null): WocQuoteIntent => {
     const price = devPriceMicroUsd();
     const reference = `dev_woc_${nextRef++}`;
     const expiresAtMs = now() + WOC_MARKET_QUOTE_TTL_SECONDS * 1000;
     openQuotes.set(reference, { expiresAtMs });
     const amount = devLeg(usdCents, price);
+    // The settlement legs reuse devSplit's ceil-and-remainder arithmetic (the
+    // service's rule): the old floor-based 90/3 here disagreed with the
+    // split the estimate showed by a cent on the odd amounts.
+    const legs = devSplit(usdCents);
     return {
       ok: true,
       reference,
@@ -387,14 +403,10 @@ export function createDevWocMarketEconomy(now: () => number = Date.now): WocMark
       // The in-memory dev economy has no chain and no signable transaction.
       signatureRequired: false,
       amount,
-      seller: split ? devLeg(Math.floor((usdCents * 90) / 100), price) : null,
-      burn: split ? devLeg(Math.floor((usdCents * 3) / 100), price) : null,
-      treasury: split
-        ? devLeg(
-            usdCents - Math.floor((usdCents * 90) / 100) - Math.floor((usdCents * 3) / 100),
-            price,
-          )
-        : null,
+      seller: split ? devLeg(legs.sellerCents, price) : null,
+      burn: split ? devLeg(legs.burnCents, price) : null,
+      treasury: split ? devLeg(legs.treasuryCents, price) : null,
+      bondCents,
       expiresAtMs,
       reason: null,
     };
@@ -420,10 +432,18 @@ export function createDevWocMarketEconomy(now: () => number = Date.now): WocMark
       };
     },
     async bondQuote(args): Promise<WocQuoteIntent> {
-      return quote(args.usdCents, false);
+      // The service contract, simulated: the BOND is computed from the bid
+      // (the game's bondCents mirror IS the service rule), and a stale echo
+      // refuses bond_amount_drift carrying the expected figure so the dev
+      // build exercises the same adopt-and-requote path production takes.
+      const bond = bondCents(args.bidCents);
+      if (args.usdCents !== undefined && args.usdCents !== bond) {
+        return { ...QUOTE_UNAVAILABLE, reason: 'bond_amount_drift', bondCents: bond };
+      }
+      return quote(bond, false, bond);
     },
     async settlementQuote(args): Promise<WocQuoteIntent> {
-      return quote(args.usdCents, true);
+      return quote(args.usdCents, true, null);
     },
     async confirm(reference, signature) {
       const open = openQuotes.get(reference);

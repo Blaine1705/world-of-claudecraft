@@ -240,6 +240,16 @@ describe('bondCents: 5% clamped to $1 .. $50, never above the bid', () => {
   it('never exceeds the bid itself', () => {
     expect(bondCents(50)).toBe(50);
   });
+
+  it('rounds a fractional cent UP, matching the service ceil rule exactly', () => {
+    // The service owns the bond figure (clampedBondCentsForBid: pure bps
+    // ceil, then the clamp, then min with the bid). This mirror exists for
+    // display only, and it must agree at half-cent boundaries or the figure
+    // the player was shown differs from the one they are quoted: 2001 cents
+    // at 500 bps is 100.05, which ceils to 101 where round gave 100.
+    expect(bondCents(2001)).toBe(101);
+    expect(bondCents(2019)).toBe(101);
+  });
 });
 
 describe('strikeSuspensionMs: the progressive suspension ladder', () => {

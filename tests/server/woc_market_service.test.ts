@@ -28,6 +28,7 @@ import type {
   WocMarketCustody,
   WocMarketDeps,
   WocMarketEconomy,
+  WocQuoteIntent,
   WocSettlementRow,
 } from '../../server/woc_market';
 import { WocMarketService } from '../../server/woc_market';
@@ -1656,6 +1657,7 @@ describe('confirmBond', () => {
           seller: null,
           burn: null,
           treasury: null,
+          bondCents: null,
           reason: null,
           expiresAtMs: h.now() + WOC_MARKET_BOND_PENDING_TTL_SECONDS * 1000 + 60_000,
         }),
@@ -6389,5 +6391,182 @@ describe('the seller notice can fail or be lost without touching the sale', () =
       await h.db.salesForItem(REALM, EPIC_ITEM, 10),
       'exactly one sale, unharmed',
     ).toHaveLength(1);
+  });
+});
+
+describe('the service-owned bond quote contract', () => {
+  const okIntent = (over: Partial<WocQuoteIntent>): WocQuoteIntent => ({
+    ok: true,
+    reference: 'WMB_svc',
+    transactionBase64: null,
+    signatureRequired: true,
+    amount: null,
+    seller: null,
+    burn: null,
+    treasury: null,
+    bondCents: null,
+    expiresAtMs: 0,
+    reason: null,
+    ...over,
+  });
+  const refusedIntent = (over: Partial<WocQuoteIntent>): WocQuoteIntent => ({
+    ok: false,
+    reference: null,
+    transactionBase64: null,
+    signatureRequired: true,
+    amount: null,
+    seller: null,
+    burn: null,
+    treasury: null,
+    bondCents: null,
+    expiresAtMs: null,
+    reason: 'refused',
+    ...over,
+  });
+  type BondQuoteArgs = {
+    memoRef: string;
+    bidCents: number;
+    usdCents?: number;
+    buyerWallet: string;
+  };
+
+  it('placeBid sends the BID and adopts the service bondCents everywhere', async () => {
+    // The service computes the bond from the bid (ceil bps, clamped); the
+    // game's local figure only sizes the balance guard. Whatever the quote
+    // answers is what the row, the response bid, and the intent all carry.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const calls: BondQuoteArgs[] = [];
+    const svc = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        bondQuote: async (args) => {
+          calls.push(args);
+          return okIntent({ bondCents: 321, expiresAtMs: h.now() + 60_000 });
+        },
+      },
+    });
+    const placed = unwrap(
+      await svc.placeBid({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+        acceptTerms: true,
+      }),
+      'placeBid',
+    );
+    // No echo on the FIRST quote: nothing has been shown for this bid yet.
+    expect(calls).toEqual([
+      { memoRef: `woc_bond:${placed.bid.id}`, bidCents: 5000, buyerWallet: 'wallet-a' },
+    ]);
+    expect(placed.bid.bondCents, 'the response bid carries the adopted figure').toBe(321);
+    expect(placed.bond.bondCents, 'and the intent shows the service figure').toBe(321);
+    expect((await getBid(h, placed.bid.id)).bondCents, 'persisted on the row').toBe(321);
+  });
+
+  it('refreshBondQuote echoes the stored figure and adopts through a drift refusal', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const storedBond = (await getBid(h, placed.bid.id)).bondCents;
+    const calls: BondQuoteArgs[] = [];
+    const svc = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        bondQuote: async (args) => {
+          calls.push(args);
+          if (args.usdCents !== 279) {
+            return refusedIntent({ reason: 'bond_amount_drift', bondCents: 279 });
+          }
+          return okIntent({
+            reference: 'WMB_fresh',
+            bondCents: 279,
+            expiresAtMs: h.now() + 60_000,
+          });
+        },
+      },
+    });
+    const out = unwrap(await svc.refreshBondQuote(BUYER_A, placed.bid.id), 'refreshBondQuote');
+    // One drift round trip, then exactly one re-quote with the ADOPTED echo.
+    expect(calls.map((c) => ({ bid: c.bidCents, echo: c.usdCents }))).toEqual([
+      { bid: 5000, echo: storedBond },
+      { bid: 5000, echo: 279 },
+    ]);
+    expect(out.bond.bondCents).toBe(279);
+    const after = await getBid(h, placed.bid.id);
+    expect(after.bondCents, 'the row adopts the re-priced bond').toBe(279);
+    expect(after.bondReference).toBe('WMB_fresh');
+  });
+
+  it('a drift refusal carrying NO figure refuses quote_unavailable after one call', async () => {
+    // Nothing to adopt means nothing to retry with: a blind second quote
+    // would spin on the same refusal.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    let callCount = 0;
+    const svc = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        bondQuote: async () => {
+          callCount++;
+          return refusedIntent({ reason: 'bond_amount_drift', bondCents: null });
+        },
+      },
+    });
+    expect(await svc.refreshBondQuote(BUYER_A, placed.bid.id)).toEqual({
+      ok: false,
+      reason: 'quote_unavailable',
+    });
+    expect(callCount).toBe(1);
+  });
+
+  it('the dev economy mirrors the contract: ceil bond from the bid, drift on a stale echo', async () => {
+    const economy = createDevWocMarketEconomy(() => BASE_MS);
+    // ceil(2001 * 5%) = 101 where round gave 100: the half-cent boundary.
+    const fresh = await economy.bondQuote({
+      memoRef: 'woc_bond:1',
+      bidCents: 2001,
+      buyerWallet: 'w',
+    });
+    expect(fresh.ok).toBe(true);
+    expect(fresh.bondCents).toBe(101);
+    const drift = await economy.bondQuote({
+      memoRef: 'woc_bond:1',
+      bidCents: 2001,
+      usdCents: 100,
+      buyerWallet: 'w',
+    });
+    expect(drift.ok).toBe(false);
+    expect(drift.reason).toBe('bond_amount_drift');
+    expect(drift.bondCents, 'the refusal carries the figure to adopt').toBe(101);
+    const echoed = await economy.bondQuote({
+      memoRef: 'woc_bond:1',
+      bidCents: 2001,
+      usdCents: 101,
+      buyerWallet: 'w',
+    });
+    expect(echoed.ok).toBe(true);
+    expect(echoed.bondCents).toBe(101);
   });
 });

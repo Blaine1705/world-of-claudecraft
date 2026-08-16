@@ -292,7 +292,8 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
 
   async function bidRow(id: number): Promise<Record<string, unknown>> {
     const res = await pool.query(
-      `SELECT status, bond_state, bond_reference, bond_signature FROM woc_market_bids WHERE id = $1`,
+      `SELECT status, bond_state, bond_reference, bond_signature, bond_cents
+         FROM woc_market_bids WHERE id = $1`,
       [id],
     );
     return res.rows[0] as Record<string, unknown>;
@@ -329,7 +330,7 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       economy.verdict = { settled: false, pending: true, reason: null };
       const out = await service.confirmBond(buyer, bidId, 'sig-near-expiry');
       // Tracked, not refused: the payment may be real and merely unfinalized.
-      expect(out).toEqual({ ok: true, standing: false, pending: true });
+      expect(out).toEqual({ ok: true, standing: false, pending: true, reason: null });
       expect(await bidRow(bidId)).toMatchObject({
         status: 'pending_bond',
         bond_signature: 'sig-near-expiry',
@@ -494,16 +495,17 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       });
       // The poller re-checks reference+signature as a PAIR: the old
       // unconditional UPDATE overwrote the reference and read the real
-      // payment as refused.
-      expect(await marketDb.setBidBondQuote(bidId, 'fresh-ref', BASE_MS + 90_000)).toBe(false);
-      expect(await bidRow(bidId)).toMatchObject({ bond_reference: paidRef });
-      // An UNSIGNED bond still refreshes.
+      // payment as refused. The adopted bond figure rides the same fence:
+      // a possibly-paid bond keeps the figure its payment was sized to.
+      expect(await marketDb.setBidBondQuote(bidId, 'fresh-ref', BASE_MS + 90_000, 999)).toBe(false);
+      expect(await bidRow(bidId)).toMatchObject({ bond_reference: paidRef, bond_cents: 70 });
+      // An UNSIGNED bond still refreshes, and adopts the quoted figure.
       const freshRef = `fresh-ref-${seq}`;
       const unsignedId = await seedBid(realm, listingId, await seedAccount(), {
         bondReference: `unsigned-ref-${seq}`,
       });
-      expect(await marketDb.setBidBondQuote(unsignedId, freshRef, BASE_MS + 90_000)).toBe(true);
-      expect(await bidRow(unsignedId)).toMatchObject({ bond_reference: freshRef });
+      expect(await marketDb.setBidBondQuote(unsignedId, freshRef, BASE_MS + 90_000, 82)).toBe(true);
+      expect(await bidRow(unsignedId)).toMatchObject({ bond_reference: freshRef, bond_cents: 82 });
     });
 
     it('abandonPendingBid refuses to void a signed bond', async () => {
@@ -966,7 +968,12 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
         outage,
         'sig-during-outage',
       );
-      expect(outageOut).toEqual({ ok: true, standing: false, pending: true });
+      expect(outageOut).toEqual({
+        ok: true,
+        standing: false,
+        pending: true,
+        reason: 'service_unavailable',
+      });
       expect(Number((await listingRow(listingId)).ends_ms)).toBe(endsAtMs);
       // A verdict the chain has SEEN (pending finality) earns the extension.
       const paying = await seedBid(realm, listingId, pendingBuyer, {

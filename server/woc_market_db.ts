@@ -3104,13 +3104,22 @@ export class PgWocMarketDb implements WocMarketDb {
    *  signature means a payment may already be broadcast against the CURRENT
    *  reference, and the poller re-checks reference and signature as a pair:
    *  overwriting the reference would read a real payment as refused and lapse
-   *  a funded bond (the H4 awaiting-finality loss). False = nothing written. */
-  async setBidBondQuote(bidId: number, reference: string, expiresAtMs: number): Promise<boolean> {
+   *  a funded bond (the H4 awaiting-finality loss). The bond figure rides the
+   *  same fence: it is the SERVICE-computed bondCents the quote carried, and
+   *  adopting it is only safe while no payment can exist against the row.
+   *  False = nothing written. */
+  async setBidBondQuote(
+    bidId: number,
+    reference: string,
+    expiresAtMs: number,
+    bondCents: number,
+  ): Promise<boolean> {
     const res = await this.pool.query(
       `UPDATE woc_market_bids
-          SET bond_reference = $2, bond_quote_expires = to_timestamp($3 / 1000.0)
+          SET bond_reference = $2, bond_quote_expires = to_timestamp($3 / 1000.0),
+              bond_cents = $4
         WHERE id = $1 AND status = 'pending_bond' AND bond_signature IS NULL`,
-      [bidId, reference, expiresAtMs],
+      [bidId, reference, expiresAtMs, bondCents],
     );
     return (res.rowCount ?? 0) > 0;
   }
