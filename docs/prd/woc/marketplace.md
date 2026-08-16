@@ -111,9 +111,10 @@ $WOC balance at bid time (`server/woc_balance.ts` cached read), an established
 account, acceptance of the variable-token settlement terms (recorded), and TOTP
 2FA (`server/totp.ts`) for bids at or above a configured USD threshold. That
 TOTP requirement was never enforced server-side (the
-`WOC_MARKET_TOTP_THRESHOLD_CENTS` knob is documented only as a commented-out
-`.env.example` line and the error surface exists, while no code consults
-either, finding B6) and is SUPERSEDED: the adopted direction (ruling R1 in the
+`WOC_MARKET_TOTP_THRESHOLD_CENTS` knob has been deleted from `.env.example`,
+where a guard test now forbids documenting a knob no code reads; the error
+surface still exists while no code consults it, finding B6) and is
+SUPERSEDED: the adopted direction (ruling R1 in the
 hardening packet, `docs/woc-marketplace-hardening/`) is wallet-signature
 step-up on the custody-moving operations instead, with the phantom TOTP
 scaffolding deleted; the packet's step-up work owns building it pre-enable.

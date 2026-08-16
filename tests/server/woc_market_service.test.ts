@@ -7106,3 +7106,49 @@ describe('bond adoption bounds and fallbacks (the review round pins)', () => {
     expect((await getListing(h, listing.id)).endsAtMs).toBe(listing.endsAtMs);
   });
 });
+
+describe('service vocabulary drift is visible on the dev channel', () => {
+  it('warns ONCE per unrecognized pending word, never for the known vocabulary', async () => {
+    // The anti-snipe allowlist fails silently toward never extending if the
+    // service renames its ledger-matched word; the once-per-word warn is the
+    // only signal that a drift happened.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const verdict = { settled: false, pending: true, reason: 'ledger_matched_v2' as string };
+    const scripted = new WocMarketService({
+      ...h.deps,
+      economy: {
+        ...h.economy,
+        confirm: async () => ({ settled: false, pending: true, reason: verdict.reason }),
+      },
+    });
+    const warned: string[] = [];
+    const spy = vi.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
+      warned.push(args.map(String).join(' '));
+    });
+    try {
+      unwrap(await scripted.confirmBond(BUYER_A, placed.bid.id, 'sig-drift-word'), 'confirmBond');
+      unwrap(await scripted.confirmBond(BUYER_A, placed.bid.id, 'sig-drift-word'), 'confirmBond');
+      const driftLines = warned.filter((w) => w.includes('unrecognized pending confirm verdict'));
+      expect(driftLines, 'once per word, not per sighting').toHaveLength(1);
+      expect(driftLines[0]).toContain('ledger_matched_v2');
+      verdict.reason = 'awaiting_finality';
+      unwrap(await scripted.confirmBond(BUYER_A, placed.bid.id, 'sig-drift-word'), 'confirmBond');
+      expect(
+        warned.filter((w) => w.includes('unrecognized pending confirm verdict')),
+        'a known vocabulary word never warns',
+      ).toHaveLength(1);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+});

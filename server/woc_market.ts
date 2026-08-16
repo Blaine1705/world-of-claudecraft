@@ -48,6 +48,7 @@ import {
   WOC_MARKET_QUOTE_TTL_SECONDS,
   WOC_MARKET_SETTLEMENT_WINDOW_SECONDS,
   WOC_MARKET_STRANDED_RECLAIM_SECONDS,
+  WOC_MARKET_WIRE_PENDING_REASONS,
   type WocBidStatus,
   type WocEligibilityPolicy,
   type WocEligibilityRefusal,
@@ -1210,6 +1211,14 @@ interface WocDeliveryScope {
   parked: number;
 }
 
+/** Log-channel clamp for wire-supplied identifiers: printable ASCII only,
+ *  bounded, so a hostile or corrupt value cannot forge log lines or flood
+ *  the channel (the same discipline the route layer's signature screen
+ *  applies at intake; this belt covers values that predate it). */
+function logSafe(value: string): string {
+  return value.replace(/[^\x20-\x7e]/g, '?').slice(0, 64);
+}
+
 export class WocMarketService {
   constructor(private readonly deps: WocMarketDeps) {}
 
@@ -1258,6 +1267,25 @@ export class WocMarketService {
    *  poll head (60s backoff) instead of occupying one of the batch's slots
    *  every pass forever; young confirming bonds keep the full poll cadence. */
   private readonly parkedBondPolls = new Map<number, number>();
+
+  /** Pending confirm words already warned about (once per word per process). */
+  private readonly warnedPendingWords = new Set<string>();
+
+  /**
+   * Dev-channel visibility for service vocabulary drift. The anti-snipe
+   * allowlist fails SILENTLY toward never extending when the service stops
+   * emitting the exact ledger-matched word, and the wire screen collapses an
+   * unknown word to 'other' with no trace: the first sighting of each
+   * unrecognized pending word is worth one line so a service drift is
+   * visible instead of invisible.
+   */
+  private notePendingVerdict(reason: string | null): void {
+    if (reason === null) return;
+    if ((WOC_MARKET_WIRE_PENDING_REASONS as readonly string[]).includes(reason)) return;
+    if (this.warnedPendingWords.has(reason)) return;
+    this.warnedPendingWords.add(reason);
+    console.warn(`[woc_market] unrecognized pending confirm verdict ${logSafe(reason)}`);
+  }
 
   /** Next time the delivered-residue arm may run (minute-scale: it converges
    *  an OLDER binary's crash residue, so every-pass cost bought nothing). */
@@ -2329,6 +2357,7 @@ export class WocMarketService {
       // not re-anchor on a fresh clock, or it holds the close at now plus
       // the extension continuously to the cap for free.
       if (confirmed.reason === WOC_MARKET_LEDGER_MATCHED_REASON) await extend(anchorMs);
+      this.notePendingVerdict(confirmed.reason);
       // The verbatim service word rides the ok-shape for the route layer to
       // screen: the player deserves to know WHICH pending this is.
       return { ok: true, standing: false, pending: true, reason: confirmed.reason };
@@ -2388,6 +2417,7 @@ export class WocMarketService {
         const confirmed = await this.deps.economy
           .confirm(bid.bondReference, bid.bondSignature)
           .catch(() => null);
+        if (confirmed?.pending) this.notePendingVerdict(confirmed.reason);
         if (!confirmed || confirmed.pending) {
           // Undecided. YOUNG bonds (inside the park window, the normal
           // finality span) keep the full poll cadence; a bond the chain
@@ -2585,7 +2615,7 @@ export class WocMarketService {
         // (settlementCustodyRef of the id), which is what actually anchors
         // reconciliation.
         console.warn(
-          `[woc_market] settlement ${settlement.id} retires quote reference ${settlement.quoteReference} with recorded signature ${settlement.txSignature}`,
+          `[woc_market] settlement ${settlement.id} retires quote reference ${logSafe(settlement.quoteReference)} with recorded signature ${logSafe(settlement.txSignature)}`,
         );
       }
       const stamped = await this.deps.db.setSettlementQuote(
@@ -2709,7 +2739,10 @@ export class WocMarketService {
     }
     // The verbatim service word rides the ok-shape for the route layer to
     // screen (same contract as the bond leg's pending arm).
-    if (confirmed.pending) return { ok: true, state: 'confirming', reason: confirmed.reason };
+    if (confirmed.pending) {
+      this.notePendingVerdict(confirmed.reason);
+      return { ok: true, state: 'confirming', reason: confirmed.reason };
+    }
     await this.deps.db.transitionSettlement(
       settlement.id,
       ['confirming'],
@@ -3392,6 +3425,7 @@ export class WocMarketService {
         const confirmed = await this.deps.economy
           .confirm(settlement.quoteReference, settlement.txSignature)
           .catch(() => null);
+        if (confirmed?.pending) this.notePendingVerdict(confirmed.reason);
         if (!confirmed || confirmed.pending) continue;
         if (confirmed.settled) {
           await this.deps.db.transitionSettlement(settlement.id, ['confirming'], 'confirmed');

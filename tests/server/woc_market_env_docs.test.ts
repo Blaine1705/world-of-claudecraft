@@ -94,7 +94,7 @@ describe('market env documentation matches the code', () => {
       const hits =
         [...src.matchAll(/\benv\.([A-Z][A-Z0-9_]+)/g)].some((m) =>
           PREFIXES.some((p) => m[1].startsWith(p)),
-        ) || /_ENV\s*=\s*'[A-Z][A-Z0-9_]+'/.test(src);
+        ) || /_ENV\s*=\s*'(?:WOC_MARKET_|WOC_ECONOMY_|DASHBOARD_)[A-Z0-9_]*'/.test(src);
       expect(hits, `${rel} no longer reads any market env name; update CORPUS`).toBe(true);
     }
   });
