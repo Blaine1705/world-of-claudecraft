@@ -26,7 +26,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 10 | chain-verifier | service | DONE | 02713f2 | SERVICE repo (origin/master already contained at df09756); B4 closed with red-first proofs (three redirect shapes reproduced MATCHED on the old verifier); the two R5 items this file owns RULED by Fernando at session start and implemented (commitment split ratified as code-owned MATCH_COMMITMENT/CREDIT_COMMITMENT; five hour confirming bound MAX_CONFIRMING_AGE_MS, both stores, new pg partial index, one minute sweep driver in buildMarketApps, previously NOTHING drove expiry in production); undecided confirm answers split (not_yet_visible vs awaiting_finality, the anti-snipe service half); two fresh lenses + a fresh re-review of the fix round, every finding applied or judged (the re-review REFUTED the round's multisig-impossibility claim with the parser's count-based labeling, arm restored money-safe); 15 mutants BIT + 1 judged environment survivor (pg ORDER BY delete coincides with partial-index order; the DESC variant bites); suite 508 to 536 (530 + 6 env-gated skips default; 536/536 zero skips with CLAUDIUM_TEST_DATABASE_URL); 6 commits, tip ba7df0b, LOCAL not pushed per R4 |
 | 10 QA | phase-10-qa | service | DONE | ba7df0b | PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open (section below); SERVICE repo (origin/master still df09756, contained; syncs pre-done by the sync-only session, re-fetched at the end: nothing new); seven audit lanes (56-shape hostile hunt with ZERO accepted_dishonest and the real wallet shape verified; security; correctness; coverage; docs; red-proof: all six registry claims REPRODUCED-RED on the 02713f2 build; mutation: 27 of 31 bit, the 4 survivors real pin gaps, all closed); the refuter stage hit the session limit after 15 of 68, every finding judged in the main loop with the file open and primary sources (agave parse_token.rs / parse_instruction.rs, spl-token processor.rs: the multisig restoration CORRECT, agave labels both token programs spl-token); the round's own fixes: the signature SHAPE screen before the first write (SEC-2, a junk string minted the game's service_unavailable exemption via the RPC's -32602 500), the payer-leg netting with owesOthers plus the escrow-bidder refusal (the fix-round re-review caught the bond self-leg vacuity), burn_authority_mismatch, the stray-owner log (once per memo, clamped), the sweep failure/recovery warn with in-flight guard, expirePastDue non-positive budget, attention.confirmingExpired24h on its own read, doc truth-ups (bound measured from expiry, ordering a two-knob precondition, the RPC-horizon premise re-anchored, vocabulary table, recovery caveat, deploy note); pins closed incl. the pg EvalPlanQual race rig on BOTH sweep arms; 21 + 11 mutants BIT over the committed rounds; suite 536 to 560 (553 + 7 env-gated skips default; 560/560 zero skips with CLAUDIUM_TEST_DATABASE_URL); 5 commits, tip 8da6c03, PUSHED per R4 (service ba7df0b..8da6c03 updates PR #31; game after the release check: 0 behind origin/release/v0.39.0, origin/main moved to the v0.38.2 hotfix tip which the next game session's sync picks up through v0.39.0) |
 | 11 | oracle-health | service | DONE | 8da6c03 | SERVICE repo (origin/master already contained at df09756); R3 RULED by Fernando at session start (single-venue posture, spot 500 bps; recorded BEFORE code in game commit e2f189e9a4) and implemented; H3's shared-instance half (already fixed in 08) pinned decisively under mocked timers with the quiet-period proof and a negative control; publish-time freshness on the wire (asOfMs) and the honest venue surface (per-venue age and verdict, configured/live counts, crossVenueGateArmed, distinctPrints, effective bounds); the dead Pyth venue path and its knob removed, the inert cross-venue knob retired (code default kept), spot 1000 -> 500; two fresh lenses (security/ops 14 findings, correctness 21) plus a fresh re-review of the fix round, every finding applied or judged with the file open; the fix round made the ORACLE the one judge of freshness per venue (an over-age print is refused as stale WITH its print time instead of dying at the source as no_price), env knobs may only tighten, the heartbeat feeds an edge-triggered halted/recovered operator signal; the cold-boot single-print exposure RULED record-and-document (Fernando 2026-08-16); the re-review round bounded every env knob in both directions, capped the sample buffer and made a paused refusal read the last heartbeat reading; PRD claim revised in the game repo (c5ce2793e7); 41 mutants BIT by name; suite 560 to 590 (583 + 7 env-gated skips default; 590/590 zero skips with CLAUDIUM_TEST_DATABASE_URL); 5 commits, tip 03df5de, LOCAL not pushed per R4 |
-| 11 QA | phase-11-qa | service | NOT STARTED | | |
+| 11 QA | phase-11-qa | service | DONE | 03df5de | PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open (section below); SERVICE repo (origin/master already contained at df09756); eight audit lanes over 8da6c03..03df5de (correctness with the four probes, security/ops, test decisiveness, dead code and docs, red proof, three mutation groups): 0 blocking, 44 findings; red proof 11/11 REPRODUCED-RED on the named old builds; mutation 42 run, 41 BIT, the ONE survivor (overview crossVenueGateArmed hardcode) closed by a two-venue overview arm and re-proven; the fix round re-sized the two tightening floors from the venue cadence (staleness tight end 15 to 45 min, sample minimum 90 to 60, an R3-amendment note records it), pruned the refusal readout NON-MUTATINGLY, wired a parse-time warn for every mis-set oracle knob, put the window depth on the recovered line (the breaker-reset shape is visible in the log), mirrored spot/twap onto the overview, and trued every lagging doc; round-2 workflow over the fix round (two fresh lenses 13 findings 0 blocking, ALL applied; 16 new-pin mutants ALL BIT; completeness critic); suite 590 to 595 (588 + 7 env-gated skips default; 595/595 zero skips with CLAUDIUM_TEST_DATABASE_URL); 5 commits, tip 270e337, PUSHED per R4 (service updates PR #31; game docs pushed with it) |
 | 12 | wire-completeness | game | NOT STARTED | | |
 | 12 QA | phase-12-qa | game | NOT STARTED | | |
 | 13 | listing-step-up | game | NOT STARTED | | R1 resolved: wallet signature; confirm threshold posture at start |
@@ -49,6 +49,101 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 21 QA | phase-21-qa | service + game | NOT STARTED | | |
 | 22 | close-out | all three | NOT STARTED | | teardown offer lives in 22 QA |
 | 22 QA | phase-22-qa | all three | NOT STARTED | | |
+
+## 11 QA round (verdict PASS-WITH-FOLLOWUPS, every finding applied or judged)
+
+Service repo, worktree woc-rewards-service-pr31; session start 03df5de (clean,
+origin/master already contained at df09756), QA range 8da6c03..03df5de; fix
+round 5 commits, tip 270e337, pushed per R4 with the game docs. Baseline
+re-verified at 03df5de before any audit (build clean; 590 tests, 583 pass, 7
+env-gated skips default tier; 590/590 zero skips with
+CLAUDIUM_TEST_DATABASE_URL against the dev Postgres).
+
+Eight audit lanes in one workflow over the range (correctness with the four
+probes from the QA spec; security/ops on the stalled-venue and
+freshness-overstatement questions; test decisiveness against the vacuous-pin
+classes; dead code and doc staleness; red proof; three mutation groups), then
+a two-lens refute pass (51 of 88 votes landed before the workflow runner
+stalled and was killed; both refutations matched the dispositions already
+taken; every finding was judged in the main loop with the file open) and a
+fresh ROUND-2 workflow over the fix round itself (two fresh lenses, sixteen
+new-pin mutants, a completeness critic over all 44 dispositions).
+
+Range verdicts:
+- RED PROOF: all eleven registry claims REPRODUCED-RED on the named old
+  builds (8da6c03; 83d7d00 for the oracle claims; a616f73 for the re-review
+  claims) and green at the tip by the pin tests and by identical probes
+  against the tip dist.
+- MUTATION round 1: the QA registry named 42 mutants (the implement round's
+  41 plus the .env.example min-samples drift), 41 BIT by name under
+  full-file runs plus sub-variants, ONE SURVIVED: the admin overview
+  hardcoding crossVenueGateArmed false passed because the only wire pin
+  asserted false under a single-venue rig; closed in the fix round by a
+  two-venue overview arm and re-proven (round-2 mutant 14 BIT). Two pins
+  were deliberately renamed by the fix round (annotated in the state.md
+  registry bullet for any by-name re-run).
+- FINDINGS: 44 (0 blocking, 8 should-fix, the rest nits and observations),
+  every one applied or judged with the file open; dispositions in the
+  state.md 11 QA ROUND bullet.
+
+The fix round (5 commits):
+- 5236897 sizes the oracle tightening floors from the venue cadence
+  (staleness tight end 15 to 45 minutes, sample minimum 90 to 60 with the
+  setInterval-lateness margin: a legal tightening to the old floors could
+  refuse the print as stale for the tail of every republish cycle, reset the
+  breaker at any thirty-minute gap, or park a quiet realm on a permanent
+  insufficient_samples), judges the refusal readout window against the poll
+  clock, adds the parse-time warn for every mis-set oracle knob, and states
+  the two exposure corollaries in the header (sub-bound moves compound; the
+  breaker has no predecessor after ANY recording gap longer than the window).
+  New pins: cap eviction direction, off-default bounds, literal tight ends,
+  parser warn lines, exact skew and staleness edges, the healthy 38-minute
+  venue row, MAX_ORACLE_SAMPLES and VENUE_AGE_SCREEN_OFF_MS as literals.
+- 9c60aa9 wires the parser warn to the boot operator channel, puts the
+  window depth on the recovered line (samples and prints, so a breaker reset
+  reads differently from an ordinary recovery) with a zero floor on the
+  duration, mirrors spotUsdPerToken and twapUsdPerToken onto the admin
+  overview, and adds the decisive pins: the two-venue overview arm, paused
+  settlementQuote, the cold-pause null, request reads not moving the signal.
+- b865c56 trues every doc the audit caught lagging the one-judge design
+  (.env.example no_price-forever and plural-venue wording, the compose
+  override comment, the cold-boot sentence corrected to WHEN the breaker
+  reads zero, the recording-gap siblings and their runbook lines including
+  the host-clock diagnosability note, the warm-up pair timing, the
+  latest()/still-halted/median-fresh precision, the Birdeye venue row in the
+  environment table, the CLAUDE.md bullet trimmed to rules plus pointer, the
+  TODOS anchor widened to in-process gaps) and adds the .env.example
+  discovery sweep to compose_conformance.
+- 5a97aa9 rides a tightened env bound through buildMarketApps to the health
+  surface in one pin.
+- 270e337 applies the round-2 lenses: the refusal arms report the window
+  through a NON-MUTATING view (a refusal must tell the truth but never
+  destroy it; one read with a spuriously future clock must not discard
+  samples nothing recorded over, and the pin asserts the buffer survives),
+  the window knob's ceiling-invariant warn quotes what the operator actually
+  wrote (the two-line clamp-plus-outrun case pinned), the two-venue arm pins
+  twapUsdPerToken by value (the one mirror field a hardcode could still
+  satisfy), and the comment truth-ups ride along.
+Game repo: the proxy header's multiple-liquidity-sources claim reworded to
+the single-venue truth (server/woc_market_proxy.ts, comment only, DC-04).
+
+ROUND-2 verdicts (the fixes are unreviewed code): docs/ops lens 7 findings
+(0 blocking, 4 nits applied, 2 ruled-class observations, 1 optional applied);
+correctness lens 6 findings (0 blocking; the twap-mirror decisiveness gap and
+the outrun-warn precision applied; the commit-attribution nit fixed by
+rewording the two local-only commit messages; the destructive-prune
+observation hardened into the non-mutating view; the count observation was
+the lens measuring the worktree tip one test-commit ahead of its range; the
+sweep-regex observation no action by its own text); 16 round-2 mutants ALL
+BIT in two groups against 2246046 (same trees as b865c56), worktrees left
+clean; the four rework pins (view dropped, view bypassed on the stale arm,
+outrun quote dropped, twap hardcode) proven BIT against the final tip by
+compiled-dist mutation.
+
+Validation after the fix round: build clean; 595 tests, 588 pass, 0 fail, 7
+env-gated skips default tier; 595/595 zero skips with
+CLAUDIUM_TEST_DATABASE_URL. Copy floor clean both repos (no dashes, no
+emojis, no reserved words in code or commits); game ci:changed exit 0.
 
 ## Sync-only session ahead of 10 QA (2026-08-15, both repos, LOCAL)
 

@@ -5,14 +5,35 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-11-qa.md`
-  (SERVICE repo, worktree `/Users/fernando/Documents/woc-rewards-service-pr31`,
-  fresh session, own origin/master sync first; QA diffs 8da6c03..03df5de and
-  pushes on PASS per R4). Game-side note for the next GAME session's sync:
-  origin/main moved to the v0.38.2 hotfix tip (1fd1f2e247), a patch line off
-  the shipped 0.38 that release/v0.39.0 has not absorbed yet; the newest
-  release line is still v0.39.0, and the hotfix flows in through the
-  maintainers' main sync (this service session did not touch the game sync).
+- Next file to run: `docs/woc-marketplace-hardening/phase-12-wire-completeness.md`
+  (GAME repo, worktree `/Users/fernando/Documents/wocc-marketplace`, fresh
+  session, newest origin/release/** sync first per the plan; at the 11 QA
+  session's end the branch was 0 behind origin/release/v0.39.0 and
+  origin/main still carried the v0.38.2 hotfix tip (1fd1f2e247), which flows
+  in through the maintainers' main sync, but re-check both at session start).
+  LOUD handoff unchanged: the service must never deploy ahead of 12's
+  bond-quote contract adoption; 12 also owes tolerating TWO settled quotes
+  per memoRef AND the new verifier reasons (not_yet_visible pending;
+  burn_missing / burn_mismatch / burn_authority_mismatch / unexpected_credit
+  terminal) AND gating anti-snipe on awaiting_finality; the 11 rounds add
+  NOTHING new owed by 12 (asOfMs stays number|null and passes through).
+- 11 QA COMPLETE (PASS-WITH-FOLLOWUPS, every finding applied or judged with
+  the file open, PUSHED per R4: service 8da6c03..270e337 to
+  feature/woc-market-settlement updating PR #31; game docs pushed with it).
+  Eight audit lanes over 8da6c03..03df5de: 0 blocking, 44 findings; red
+  proof 11/11 REPRODUCED-RED; mutation 42 run, 41 BIT, the one survivor
+  (overview crossVenueGateArmed hardcode) closed by a two-venue overview arm
+  and re-proven. Fix round 5 commits, tip 270e337: floors re-sized from the
+  venue cadence (staleness tight end 45 min, sample minimum 60; recorded as
+  an R3 amendment note), refusal readout via a NON-MUTATING poll-clock view,
+  parse-time warns for mis-set oracle knobs, window depth on the recovered
+  line, spot/twap mirrored onto the overview, doc truth-ups everywhere the
+  audit caught the prose lagging the one-judge design. Round-2 workflow over
+  the fix round: two fresh lenses (13 findings, 0 blocking, all applied or
+  judged), 16 new-pin mutants ALL BIT, completeness critic; the four rework
+  pins proven by compiled-dist mutation. Suite 590 to 595 (588 + 7 env-gated
+  skips default; 595/595 zero skips with CLAUDIUM_TEST_DATABASE_URL). The 11
+  QA ROUND bullet in the ledger below is the registry 12 consumes.
 - 11 COMPLETE (SERVICE repo, LOCAL not pushed per R4; session start 8da6c03,
   tip 03df5de, 5 commits; game docs commits e2f189e9a4 (the R3 ruling record,
   BEFORE code), c5ce2793e7 (PRD claim revised) and this entry's commit,
@@ -450,6 +471,21 @@ Resolved (Fernando, 2026-08-11):
     last-accepted-print anchor that survives restarts, age-bounded so a long
     outage cannot halt the market forever (needs its own ruling; a candidate
     for a numbered phase per R7 or for 17's DB work).
+  AMENDED by the 11 QA round (2026-08-16, the eight-lane audit and its fix
+  round; principle unchanged, values re-sized): the tightening floors the
+  review round chose were sized to the window alone, and the audit showed a
+  LEGAL tightening could halt the market for the tail of every republish
+  cycle (staleness floor 15 min at a 25-to-38-minute cadence), reset the
+  breaker at any thirty-minute gap, or park a quiet realm on a permanent
+  insufficient_samples (sample floor 90 at the 10 s heartbeat's real-world
+  lateness). The floors are now sized from the venue cadence: staleness down
+  to 45 minutes (three windows; the observed 38-minute print stays fresh and
+  ceiling plus window keeps the breaker-reset gap at an hour), samples up to
+  60 (two thirds of the window's heartbeat capacity). Every knob whose
+  effective value differs from what the environment asked for is named in a
+  boot warn line. The refusal arms report the poll-clock window through a
+  non-mutating view, and the recovered operator line carries the window
+  depth it reopened on, so a breaker reset is visible in the log.
 - R4 (all phases): RESOLVED: push after each QA PASS (or PASS-WITH-FOLLOWUPS with fixes
   applied), repos the pair touched; implement sessions never push; FAIL pushes nothing.
   Exact push commands live in implementation-plan.md commit rules.
@@ -746,6 +782,80 @@ Still open (a phase that hits one asks at session start):
     allowance logged a negative age. The one-instance claim's red form is
     structural (fixed in 08): the private second oracle mutant fails four
     tests by name.
+  - 11 QA ROUND (2026-08-16, PASS-WITH-FOLLOWUPS, every finding applied or
+    judged with the file open, 5 commits 03df5de..270e337, PUSHED per R4;
+    suite 590 to 595, 588 + 7 env-gated skips default, 595/595 zero skips
+    with CLAUDIUM_TEST_DATABASE_URL; the fix-round chain was REWORDED via a
+    local-only rebase for commit-message attribution, content unchanged:
+    trees 5236897=cda1277, 9c60aa9=7209c52, b865c56=2246046, 5a97aa9=ee19b1c,
+    so round evidence citing the old hashes cites identical trees). The
+    registry 12 consumes:
+    - VERDICTS over 8da6c03..03df5de: red proof 11/11 REPRODUCED-RED on the
+      named old builds; mutation: the QA registry named 42 mutants (the
+      implement round's 41 plus the .env.example min-samples drift), 41 BIT,
+      ONE SURVIVED (the admin overview hardcoding
+      crossVenueGateArmed false: the only wire pin asserted false under a
+      single-venue rig), closed by a two-venue overview arm and re-proven;
+      44 findings, 0 blocking. Registry annotation for any by-name re-run:
+      two pins were deliberately renamed by the fix round ('a print the
+      VENUE SOURCE accepts is never rejected by the oracle as stale' is now
+      'a 38-minute print inside the one ceiling prices healthy end to end
+      through the real venue source'; 'recovery logs once with the duration
+      and the reason it recovered from' now ends 'and the window depth').
+    - FIXES at symbol level: ORACLE_BOUND_RANGES re-sized from the venue
+      cadence (maxAgeMs.tightest 3 windows = 45 min, minSamples.tightest 60;
+      the R3 amendment note in Rulings records the rationale); read()
+      reports refusal windows through the non-mutating windowSamples(nowMs)
+      view (samples / distinctPrints / twapUsdPerToken mean what they say
+      beside reason: stale, and a spuriously future clock cannot destroy
+      state; the stale-spell pin asserts both); marketOracleConfigFromEnv
+      gains a warn callback naming every knob whose effective value differs
+      from what was written (range clamp, widening fallback, junk, the
+      window-outruns-ceiling invariant quoting the operator's raw text, the
+      retired cross-venue knob), wired to console.warn in buildMarketApps;
+      createPriceGateSignal's recovered line carries the window depth
+      (samples and prints; new PriceGateReading type) and floors the
+      duration at zero; MarketAdminOverview.price gains spotUsdPerToken and
+      twapUsdPerToken; the oracle header states the sub-bound compounding
+      corollary and the recording-gap predecessor exposure (cold boot, venue
+      silence past ceiling plus window, outage, liquidity-floor dip: one
+      recorded class).
+    - PINS CLOSED (16 round-2 mutants BIT in two groups, plus the four
+      rework pins BIT by compiled-dist mutation at the final tip): cap
+      eviction direction (oldest out, price-step fixture), off-default
+      bounds all five fields, literal tight ends with the cadence and margin
+      asserts, parser warn lines exact incl. the two-line clamp-plus-outrun
+      case, exact skew and staleness boundary edges, both healthy 38-minute
+      venue rows, the env-to-surface bounds arm through buildMarketApps, the
+      two-venue overview arm (armed flag, median spot AND twap by value),
+      paused settlementQuote and the cold-pause null, request reads not
+      moving the operator signal, MAX_ORACLE_SAMPLES and
+      VENUE_AGE_SCREEN_OFF_MS as literals, the .env.example discovery sweep
+      in compose_conformance.
+    - JUDGED, no code change (do not re-raise): the structural construction
+      scan stays belt-only (re-affirmed); the boot warm-up pair's 10s/20s
+      arithmetic assumes a quiet healthy-venue boot (the doc says so); the
+      compose and template sweeps see bare line-anchored numerics only
+      (house style, tolerable until the template grows commented values);
+      the future-print venue row stays nulls (the real source screens future
+      prints to null before the oracle sees them, so the row cannot carry
+      what never arrives; the host-clock runbook note covers diagnosis);
+      commit subjects near 80 columns (ruled class).
+    - DEFERRED with owners (amends the implement round's list): 19
+      (dashboard) also renders spotUsdPerToken / twapUsdPerToken beside the
+      deviations and the recovered line's depth vocabulary if it surfaces
+      logs; 16 (game hot path) plus 22 (economics) own the recorded SEC-9
+      mechanism: request-path reads record oracle samples and the game
+      proxy's estimate cache is keyed per usdCents, so a client varying the
+      amount can shorten the effective averaging window under the sample cap
+      (candidates: heartbeat-only recording or a per-second recording
+      limit); 22 also owns the adapter body-timeout observation (the venue
+      fetch timeout covers headers only; a stalled body parks every poll on
+      undici's default for minutes, fail-closed) alongside the runbook, the
+      economics and the cold-boot anchor ruling; 21 (devnet) observes the
+      halted/recovered lines now carrying the window depth, and the real
+      Birdeye updateUnixTime semantics; 14 unchanged (the as-of copy); 12
+      unchanged (nothing new owed; asOfMs stays number|null pass-through).
 - 10 chain-verifier (2026-08-14, SERVICE repo, session start 02713f2 = the
   09 QA tip, origin/master already contained at df09756; 6 commits, tip
   ba7df0b, LOCAL not pushed per R4; validation npm run build + npm test in
