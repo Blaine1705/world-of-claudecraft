@@ -123,10 +123,14 @@ await shot('gauntlet-elbow');
 await look({ x: -322, z: -31.5 }, { x: -335, z: -33 }, { dist: 9, pitch: 0.2 });
 await shot('gauntlet-finish');
 
-// The relay's north leg: Tidewarden Nel on the rise, castaway crates dropped
-// along her path toward camp.
-await look({ x: -330, z: 15 }, { x: -338, z: 9.5 }, { dist: 10, pitch: 0.22 });
+// The relay's north leg: Tidewarden Nel just up from the wreck line, the
+// first castaway crates on her long path toward camp behind her.
+await look({ x: -378, z: -20 }, { x: -368, z: -10 }, { dist: 11, pitch: 0.25 });
 await shot('relay-north');
+
+// The widened practice yard: five effigies over an 11-yard spread.
+await look({ x: -324, z: -16 }, { x: -338, z: -14 }, { dist: 12, pitch: 0.3 });
+await shot('practice-yard');
 
 // The widened camp from its east gate: Maren at the junction, the stall row
 // on the north edge, tents by the muster fire, and the perimeter rail.

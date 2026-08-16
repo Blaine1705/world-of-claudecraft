@@ -277,9 +277,20 @@ describe('proving shore placement', () => {
     expect(effigy.dummy).toBe(true);
     expect(effigy.dmgBase).toBe(0);
     expect(effigy.respawnSeconds).toBe(5);
-    // Five targets for one required fell: no queueing even in a rush.
-    const yard = PROVING_SHORE_CAMPS.find((c) => c.mobId === 'training_effigy');
-    expect(yard?.count).toBe(5);
+    // Five targets for one required fell: no queueing even in a rush. Spread
+    // as five single-mob camps (a camp spawns at its center and an effigy
+    // never wanders, so one count-5 camp would stack them on one point),
+    // every pair at least 4 yards apart.
+    const yards = PROVING_SHORE_CAMPS.filter((c) => c.mobId === 'training_effigy');
+    expect(yards.reduce((sum, c) => sum + c.count, 0)).toBe(5);
+    for (const a of yards) {
+      for (const b of yards) {
+        if (a === b) continue;
+        expect(
+          Math.hypot(a.center.x - b.center.x, a.center.z - b.center.z),
+        ).toBeGreaterThanOrEqual(4);
+      }
+    }
     expect(PROVING_SHORE_QUESTS.q_ps_strike_true.objectives[0].count).toBe(1);
     // The scuttlers stay a real (gentle) fight: the whole point of Shell and
     // Claw is a target that finally hits back.

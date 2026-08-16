@@ -322,13 +322,14 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     greeting:
       'Straw first, shells second, $N. An effigy teaches your arm the swing; the scuttlers down the strand teach it to land on something that minds.',
   },
-  // The north bluff's watcher: takes the scuttler cull in and sends the
-  // salvage up the rise to Dawnrest Camp.
+  // The strand's watcher, standing just up the path from the wreck line's
+  // scuttlers: takes the cull in on the spot and sends the salvage up the
+  // long rise to Dawnrest Camp.
   tidewarden_nel: {
     id: 'tidewarden_nel',
     name: 'Tidewarden Nel',
     title: 'Keeper of the Strand',
-    pos: { x: -339, z: 9 },
+    pos: { x: -371, z: -13 },
     // Facing south-west down her path toward the wreck line.
     facing: (3 * Math.PI) / 4,
     color: 0x3a6a6a,
@@ -515,7 +516,16 @@ export const PROVING_SHORE_ITEMS: Record<string, ItemDef> = {
 // adding the tutorial island leaves the rest of the world's generation
 // bit-identical.
 export const PROVING_SHORE_CAMPS: CampDef[] = [
-  { mobId: 'training_effigy', center: { x: -336, z: -14 }, radius: 6, count: 5, offStream: true },
+  // A wide, airy yard: five effigies spread over about ten yards, so no two
+  // recruits ever crowd one target. Five single-mob camps rather than one
+  // count-5 camp ON PURPOSE: a camp spawns AT its center (the radius is only
+  // the wander leash), and an effigy never wanders (moveSpeed 0), so a
+  // shared center would stack all five on one point forever.
+  { mobId: 'training_effigy', center: { x: -336, z: -14 }, radius: 4, count: 1, offStream: true },
+  { mobId: 'training_effigy', center: { x: -341, z: -17 }, radius: 4, count: 1, offStream: true },
+  { mobId: 'training_effigy', center: { x: -331, z: -11 }, radius: 4, count: 1, offStream: true },
+  { mobId: 'training_effigy', center: { x: -334, z: -20 }, radius: 4, count: 1, offStream: true },
+  { mobId: 'training_effigy', center: { x: -339, z: -9 }, radius: 4, count: 1, offStream: true },
   // The wreck line lives on the FAR strand past the practice yard (the path
   // from the yard leads straight to it), leaving the south strand nearest
   // camp free for the Gauntlet movement course. Counts stay halved: the
@@ -529,10 +539,14 @@ export const PROVING_SHORE_OBJECTS: GroundObjectDef[] = [
   {
     itemId: 'ps_castaway_crate',
     name: 'Castaway Crate',
-    // The Wreck Line (q_ps_the_wreck_line): salvage dropped along Tidewarden
-    // Nel's path up the rise toward Dawnrest Camp, so collecting it IS the
-    // walk to the hand-in at Finch's stall.
+    // The Wreck Line (q_ps_the_wreck_line): salvage dropped the whole way
+    // along Tidewarden Nel's path up the rise toward Dawnrest Camp, so
+    // collecting it IS the walk to the hand-in at Finch's stall. Six crates
+    // for a count of three: a newcomer never has to hunt the last one.
     positions: [
+      { x: -362, z: -8 },
+      { x: -352, z: -2 },
+      { x: -345, z: 4 },
       { x: -334, z: 17 },
       { x: -327, z: 24 },
       { x: -320, z: 31 },

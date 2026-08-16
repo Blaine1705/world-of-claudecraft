@@ -15,7 +15,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 988,
+      "nextId": 991,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -29,9 +29,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 997,
-      "state": "beca29f1",
-      "events": "7e71b5f6",
+      "nextId": 1000,
+      "state": "8720ac6c",
+      "events": "ccf7b4a7",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -40,8 +40,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 997,
-      "state": "189e3615",
+      "nextId": 1000,
+      "state": "2cf0791e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -51,9 +51,9 @@
     {
       "tick": 54,
       "time": 2.7,
-      "nextId": 997,
-      "state": "7bdf7729",
-      "events": "97254e42",
+      "nextId": 1000,
+      "state": "74098bf2",
+      "events": "d7ab3b72",
       "rng": {
         "draws": 109,
         "digest": "a1d3b665"
@@ -128,7 +128,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 988,
+          "entityId": 991,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -227,7 +227,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 989,
+          "entityId": 992,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -326,7 +326,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 990,
+          "entityId": 993,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -427,7 +427,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 991,
+          "entityId": 994,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -520,7 +520,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 992,
+          "entityId": 995,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -576,7 +576,7 @@
           "fiveSecondRule": 0.15,
           "hitBonus": 1,
           "hp": 50000,
-          "id": 988,
+          "id": 991,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -608,7 +608,7 @@
             "sta": 38,
             "str": 10
           },
-          "targetId": 993,
+          "targetId": 996,
           "templateId": "priest",
           "weapon": {
             "max": 6,
@@ -627,7 +627,7 @@
               "name": "Battle Stance",
               "remaining": 3597.3,
               "school": "physical",
-              "sourceId": 989
+              "sourceId": 992
             },
             {
               "duration": 30,
@@ -636,7 +636,7 @@
               "name": "Psalm of Warding",
               "remaining": 27.3,
               "school": "holy",
-              "sourceId": 988,
+              "sourceId": 991,
               "value": 322,
               "value2": 322
             },
@@ -647,7 +647,7 @@
               "name": "Doctrine",
               "remaining": 27.3,
               "school": "holy",
-              "sourceId": 988,
+              "sourceId": 991,
               "value": 0.3
             }
           ],
@@ -661,7 +661,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 101.7,
           "hp": 431,
-          "id": 989,
+          "id": 992,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -719,7 +719,7 @@
           "gcdRemaining": 1.4,
           "hitBonus": 1,
           "hp": 50000,
-          "id": 990,
+          "id": 993,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -751,7 +751,7 @@
             "sta": 32,
             "str": 10
           },
-          "targetId": 991,
+          "targetId": 994,
           "templateId": "priest",
           "weapon": {
             "max": 6,
@@ -770,7 +770,7 @@
               "name": "Battle Stance",
               "remaining": 3597.3,
               "school": "physical",
-              "sourceId": 991
+              "sourceId": 994
             }
           ],
           "blockChance": 0.05,
@@ -782,7 +782,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 101.7,
           "hp": 426,
-          "id": 991,
+          "id": 994,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -835,7 +835,7 @@
           "fiveSecondRule": 101.7,
           "hitBonus": 1,
           "hp": 50000,
-          "id": 992,
+          "id": 995,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -884,7 +884,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 50000,
-          "id": 993,
+          "id": 996,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -921,7 +921,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 50000,
-          "id": 994,
+          "id": 997,
           "kind": "mob",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -957,7 +957,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 50000,
-          "id": 995,
+          "id": 998,
           "kind": "mob",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -993,7 +993,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 50000,
-          "id": 996,
+          "id": 999,
           "kind": "mob",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1023,9 +1023,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 997,
-      "state": "7cd728db",
-      "events": "52526dde",
+      "nextId": 1000,
+      "state": "2641a5e0",
+      "events": "c22cdd94",
       "rng": {
         "draws": 155,
         "digest": "bea68f72"
@@ -1034,8 +1034,8 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 997,
-      "state": "ebb538f1",
+      "nextId": 1000,
+      "state": "b3779076",
       "events": "741638a5",
       "rng": {
         "draws": 325,
@@ -1045,8 +1045,8 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 997,
-      "state": "7c7b3b05",
+      "nextId": 1000,
+      "state": "002eaf3c",
       "events": "741638a5",
       "rng": {
         "draws": 507,
@@ -1056,9 +1056,9 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 997,
-      "state": "9c7e74fa",
-      "events": "877901aa",
+      "nextId": 1000,
+      "state": "7ba61c00",
+      "events": "2a8b0ea7",
       "rng": {
         "draws": 717,
         "digest": "91d30ebb"
@@ -1067,9 +1067,9 @@
     {
       "tick": 140,
       "time": 7,
-      "nextId": 997,
-      "state": "b10594e2",
-      "events": "38188883",
+      "nextId": 1000,
+      "state": "8941198a",
+      "events": "2b6560e3",
       "rng": {
         "draws": 935,
         "digest": "a2b82b09"
@@ -1078,9 +1078,9 @@
     {
       "tick": 160,
       "time": 8,
-      "nextId": 997,
-      "state": "27d8b5b4",
-      "events": "9251051b",
+      "nextId": 1000,
+      "state": "2c7fa4b1",
+      "events": "729865bb",
       "rng": {
         "draws": 1164,
         "digest": "786e2737"
@@ -1089,8 +1089,8 @@
     {
       "tick": 180,
       "time": 9,
-      "nextId": 997,
-      "state": "30134f68",
+      "nextId": 1000,
+      "state": "6d810109",
       "events": "741638a5",
       "rng": {
         "draws": 1403,
@@ -1100,9 +1100,9 @@
     {
       "tick": 200,
       "time": 10,
-      "nextId": 997,
-      "state": "b9f8c971",
-      "events": "3314051e",
+      "nextId": 1000,
+      "state": "b1968bee",
+      "events": "fad94b82",
       "rng": {
         "draws": 1691,
         "digest": "f97d41da"
@@ -1111,9 +1111,9 @@
     {
       "tick": 220,
       "time": 11,
-      "nextId": 997,
-      "state": "c53164be",
-      "events": "fb3a4eac",
+      "nextId": 1000,
+      "state": "9ac4d9ec",
+      "events": "bab98b1a",
       "rng": {
         "draws": 1860,
         "digest": "d4d9425d"
@@ -1122,8 +1122,8 @@
     {
       "tick": 240,
       "time": 12,
-      "nextId": 997,
-      "state": "bec732de",
+      "nextId": 1000,
+      "state": "8c5fc2c8",
       "events": "741638a5",
       "rng": {
         "draws": 2022,
@@ -1133,9 +1133,9 @@
     {
       "tick": 260,
       "time": 13,
-      "nextId": 997,
-      "state": "7d863719",
-      "events": "aebf0044",
+      "nextId": 1000,
+      "state": "870166e2",
+      "events": "82604779",
       "rng": {
         "draws": 2171,
         "digest": "0516cd41"
@@ -1144,9 +1144,9 @@
     {
       "tick": 280,
       "time": 14,
-      "nextId": 997,
-      "state": "90885a9f",
-      "events": "2d8224f4",
+      "nextId": 1000,
+      "state": "c2801877",
+      "events": "562259ef",
       "rng": {
         "draws": 2335,
         "digest": "651e7d74"
@@ -1155,8 +1155,8 @@
     {
       "tick": 300,
       "time": 15,
-      "nextId": 997,
-      "state": "7dfb569e",
+      "nextId": 1000,
+      "state": "c91cb984",
       "events": "741638a5",
       "rng": {
         "draws": 2501,
@@ -1166,8 +1166,8 @@
     {
       "tick": 301,
       "time": 15.05,
-      "nextId": 997,
-      "state": "a78d9dae",
+      "nextId": 1000,
+      "state": "ea89da7c",
       "events": "741638a5",
       "rng": {
         "draws": 2513,
@@ -1246,7 +1246,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 988,
+          "entityId": 991,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1345,7 +1345,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 989,
+          "entityId": 992,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1447,7 +1447,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 990,
+          "entityId": 993,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1548,7 +1548,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 991,
+          "entityId": 994,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1645,7 +1645,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 992,
+          "entityId": 995,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1695,7 +1695,7 @@
           "fiveSecondRule": 4.5,
           "hitBonus": 1,
           "hp": 50000,
-          "id": 988,
+          "id": 991,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1728,7 +1728,7 @@
             "sta": 38,
             "str": 10
           },
-          "targetId": 996,
+          "targetId": 999,
           "templateId": "priest",
           "weapon": {
             "max": 6,
@@ -1747,7 +1747,7 @@
               "name": "Battle Stance",
               "remaining": 3584.95,
               "school": "physical",
-              "sourceId": 989
+              "sourceId": 992
             },
             {
               "duration": 30,
@@ -1756,7 +1756,7 @@
               "name": "Psalm of Warding",
               "remaining": 14.95,
               "school": "holy",
-              "sourceId": 988,
+              "sourceId": 991,
               "value": 322,
               "value2": 322
             },
@@ -1767,7 +1767,7 @@
               "name": "Doctrine",
               "remaining": 14.95,
               "school": "holy",
-              "sourceId": 988,
+              "sourceId": 991,
               "value": 0.3
             }
           ],
@@ -1781,7 +1781,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 114.05,
           "hp": 822,
-          "id": 989,
+          "id": 992,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1839,7 +1839,7 @@
           "fiveSecondRule": 9.1,
           "hitBonus": 1,
           "hp": 50000,
-          "id": 990,
+          "id": 993,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1871,7 +1871,7 @@
             "sta": 32,
             "str": 10
           },
-          "targetId": 991,
+          "targetId": 994,
           "templateId": "priest",
           "weapon": {
             "max": 6,
@@ -1890,7 +1890,7 @@
               "name": "Battle Stance",
               "remaining": 3584.95,
               "school": "physical",
-              "sourceId": 991
+              "sourceId": 994
             }
           ],
           "blockChance": 0.05,
@@ -1903,7 +1903,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 114.05,
           "hp": 568,
-          "id": 991,
+          "id": 994,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1954,7 +1954,7 @@
               "name": "Gloomtithe",
               "remaining": 15,
               "school": "shadow",
-              "sourceId": 992,
+              "sourceId": 995,
               "stacks": 1
             }
           ],
@@ -1973,7 +1973,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 1.55,
           "hp": 387,
-          "id": 992,
+          "id": 995,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -2006,7 +2006,7 @@
             "sta": 32,
             "str": 10
           },
-          "targetId": 993,
+          "targetId": 996,
           "templateId": "priest",
           "weapon": {
             "max": 6,
@@ -2024,7 +2024,7 @@
               "name": "Dirge of Decay",
               "remaining": 9.3,
               "school": "shadow",
-              "sourceId": 992,
+              "sourceId": 995,
               "tickInterval": 3,
               "tickTimer": 0.3,
               "value": 37
@@ -2036,7 +2036,7 @@
               "name": "Effigy",
               "remaining": 9.3,
               "school": "shadow",
-              "sourceId": 992,
+              "sourceId": 995,
               "value": 0.3
             }
           ],
@@ -2049,7 +2049,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 49654,
-          "id": 993,
+          "id": 996,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -2075,19 +2075,19 @@
             "z": 6
           },
           "stats": {},
-          "tappedById": 988,
+          "tappedById": 991,
           "templateId": "training_dummy",
           "threat": [
             [
-              988,
+              991,
               91
             ],
             [
-              990,
+              993,
               29
             ],
             [
-              992,
+              995,
               226
             ]
           ],
@@ -2105,7 +2105,7 @@
               "name": "Dirge of Decay",
               "remaining": 10.8,
               "school": "shadow",
-              "sourceId": 992,
+              "sourceId": 995,
               "tickInterval": 3,
               "tickTimer": 1.8,
               "value": 37
@@ -2120,7 +2120,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 49850,
-          "id": 994,
+          "id": 997,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -2146,15 +2146,15 @@
             "z": 7
           },
           "stats": {},
-          "tappedById": 990,
+          "tappedById": 993,
           "templateId": "training_dummy",
           "threat": [
             [
-              990,
+              993,
               30
             ],
             [
-              992,
+              995,
               120
             ]
           ],
@@ -2172,7 +2172,7 @@
               "name": "Dirge of Decay",
               "remaining": 12.45,
               "school": "shadow",
-              "sourceId": 992,
+              "sourceId": 995,
               "tickInterval": 3,
               "tickTimer": 0.45,
               "value": 37
@@ -2187,7 +2187,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 49917,
-          "id": 995,
+          "id": 998,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -2213,11 +2213,11 @@
             "z": 7
           },
           "stats": {},
-          "tappedById": 992,
+          "tappedById": 995,
           "templateId": "training_dummy",
           "threat": [
             [
-              992,
+              995,
               83
             ]
           ],
@@ -2235,7 +2235,7 @@
               "name": "Dirge of Decay",
               "remaining": 13.85,
               "school": "shadow",
-              "sourceId": 988,
+              "sourceId": 991,
               "tickInterval": 3,
               "tickTimer": 1.85,
               "value": 20
@@ -2250,7 +2250,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 49980,
-          "id": 996,
+          "id": 999,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -2276,11 +2276,11 @@
             "z": 8
           },
           "stats": {},
-          "tappedById": 988,
+          "tappedById": 991,
           "templateId": "training_dummy",
           "threat": [
             [
-              988,
+              991,
               20
             ]
           ],
@@ -2293,9 +2293,9 @@
     {
       "tick": 320,
       "time": 16,
-      "nextId": 998,
-      "state": "990b44e4",
-      "events": "8f10ec39",
+      "nextId": 1001,
+      "state": "4ede03a2",
+      "events": "05fae00e",
       "rng": {
         "draws": 2692,
         "digest": "ebe1f40c"
@@ -2304,9 +2304,9 @@
     {
       "tick": 340,
       "time": 17,
-      "nextId": 998,
-      "state": "7063b3a4",
-      "events": "3c21e8a1",
+      "nextId": 1001,
+      "state": "0bf16b8c",
+      "events": "0d3e8613",
       "rng": {
         "draws": 2874,
         "digest": "f5ef12e4"
@@ -2315,9 +2315,9 @@
     {
       "tick": 360,
       "time": 18,
-      "nextId": 998,
-      "state": "8fca9e29",
-      "events": "21d255f4",
+      "nextId": 1001,
+      "state": "d6cc76a3",
+      "events": "dcc21c5b",
       "rng": {
         "draws": 3051,
         "digest": "83c545d5"
@@ -2326,9 +2326,9 @@
     {
       "tick": 380,
       "time": 19,
-      "nextId": 998,
-      "state": "6f087c3b",
-      "events": "2ac5b551",
+      "nextId": 1001,
+      "state": "1c3dae97",
+      "events": "929c6f6e",
       "rng": {
         "draws": 3233,
         "digest": "62b92d82"
@@ -2337,9 +2337,9 @@
     {
       "tick": 393,
       "time": 19.65,
-      "nextId": 998,
-      "state": "0ec9123e",
-      "events": "c10eccab",
+      "nextId": 1001,
+      "state": "9dd48a1e",
+      "events": "1f70a107",
       "rng": {
         "draws": 3362,
         "digest": "b9dec2e4"
@@ -2417,7 +2417,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 988,
+          "entityId": 991,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2516,7 +2516,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 989,
+          "entityId": 992,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2618,7 +2618,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 990,
+          "entityId": 993,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2719,7 +2719,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 991,
+          "entityId": 994,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2816,7 +2816,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 992,
+          "entityId": 995,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2866,7 +2866,7 @@
           "fiveSecondRule": 9.1,
           "hitBonus": 1,
           "hp": 50000,
-          "id": 988,
+          "id": 991,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -2899,7 +2899,7 @@
             "sta": 38,
             "str": 10
           },
-          "targetId": 996,
+          "targetId": 999,
           "templateId": "priest",
           "weapon": {
             "max": 6,
@@ -2918,7 +2918,7 @@
               "name": "Battle Stance",
               "remaining": 3580.35,
               "school": "physical",
-              "sourceId": 989
+              "sourceId": 992
             },
             {
               "duration": 30,
@@ -2927,7 +2927,7 @@
               "name": "Psalm of Warding",
               "remaining": 10.35,
               "school": "holy",
-              "sourceId": 988,
+              "sourceId": 991,
               "value": 322,
               "value2": 322
             },
@@ -2938,7 +2938,7 @@
               "name": "Doctrine",
               "remaining": 10.35,
               "school": "holy",
-              "sourceId": 988,
+              "sourceId": 991,
               "value": 0.3
             }
           ],
@@ -2952,7 +2952,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 118.65,
           "hp": 822,
-          "id": 989,
+          "id": 992,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3010,7 +3010,7 @@
           "fiveSecondRule": 13.7,
           "hitBonus": 1,
           "hp": 50000,
-          "id": 990,
+          "id": 993,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3042,7 +3042,7 @@
             "sta": 32,
             "str": 10
           },
-          "targetId": 991,
+          "targetId": 994,
           "templateId": "priest",
           "weapon": {
             "max": 6,
@@ -3061,7 +3061,7 @@
               "name": "Battle Stance",
               "remaining": 3580.35,
               "school": "physical",
-              "sourceId": 991
+              "sourceId": 994
             }
           ],
           "blockChance": 0.05,
@@ -3074,7 +3074,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 118.65,
           "hp": 608,
-          "id": 991,
+          "id": 994,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3135,7 +3135,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 4.6,
           "hp": 483,
-          "id": 992,
+          "id": 995,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3167,7 +3167,7 @@
             "sta": 38,
             "str": 10
           },
-          "targetId": 993,
+          "targetId": 996,
           "templateId": "priest",
           "weapon": {
             "max": 6,
@@ -3186,7 +3186,7 @@
               "name": "Dirge of Decay",
               "remaining": 4.7,
               "school": "shadow",
-              "sourceId": 992,
+              "sourceId": 995,
               "tickInterval": 3,
               "tickTimer": 1.7,
               "value": 37
@@ -3201,7 +3201,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 49498,
-          "id": 993,
+          "id": 996,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -3227,23 +3227,23 @@
             "z": 6
           },
           "stats": {},
-          "tappedById": 988,
+          "tappedById": 991,
           "templateId": "training_dummy",
           "threat": [
             [
-              988,
+              991,
               91
             ],
             [
-              990,
+              993,
               29
             ],
             [
-              992,
+              995,
               300
             ],
             [
-              997,
+              1000,
               82
             ]
           ],
@@ -3261,7 +3261,7 @@
               "name": "Dirge of Decay",
               "remaining": 6.2,
               "school": "shadow",
-              "sourceId": 992,
+              "sourceId": 995,
               "tickInterval": 3,
               "tickTimer": 0.2,
               "value": 37
@@ -3276,7 +3276,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 49801,
-          "id": 994,
+          "id": 997,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -3302,15 +3302,15 @@
             "z": 7
           },
           "stats": {},
-          "tappedById": 990,
+          "tappedById": 993,
           "templateId": "training_dummy",
           "threat": [
             [
-              990,
+              993,
               30
             ],
             [
-              992,
+              995,
               169
             ]
           ],
@@ -3328,7 +3328,7 @@
               "name": "Dirge of Decay",
               "remaining": 7.85,
               "school": "shadow",
-              "sourceId": 992,
+              "sourceId": 995,
               "tickInterval": 3,
               "tickTimer": 1.85,
               "value": 37
@@ -3343,7 +3343,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 49831,
-          "id": 995,
+          "id": 998,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -3369,11 +3369,11 @@
             "z": 7
           },
           "stats": {},
-          "tappedById": 992,
+          "tappedById": 995,
           "templateId": "training_dummy",
           "threat": [
             [
-              992,
+              995,
               169
             ]
           ],
@@ -3391,7 +3391,7 @@
               "name": "Dirge of Decay",
               "remaining": 9.25,
               "school": "shadow",
-              "sourceId": 988,
+              "sourceId": 991,
               "tickInterval": 3,
               "tickTimer": 0.25,
               "value": 20
@@ -3406,7 +3406,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 49960,
-          "id": 996,
+          "id": 999,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -3432,11 +3432,11 @@
             "z": 8
           },
           "stats": {},
-          "tappedById": 988,
+          "tappedById": 991,
           "templateId": "training_dummy",
           "threat": [
             [
-              988,
+              991,
               40
             ]
           ],
@@ -3449,8 +3449,8 @@
     {
       "tick": 393,
       "time": 19.65,
-      "nextId": 998,
-      "state": "0ec9123e",
+      "nextId": 1001,
+      "state": "9dd48a1e",
       "events": "741638a5",
       "rng": {
         "draws": 3362,
@@ -3529,7 +3529,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 988,
+          "entityId": 991,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -3628,7 +3628,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 989,
+          "entityId": 992,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -3730,7 +3730,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 990,
+          "entityId": 993,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -3831,7 +3831,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 991,
+          "entityId": 994,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -3928,7 +3928,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 992,
+          "entityId": 995,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -3978,7 +3978,7 @@
           "fiveSecondRule": 9.1,
           "hitBonus": 1,
           "hp": 50000,
-          "id": 988,
+          "id": 991,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -4011,7 +4011,7 @@
             "sta": 38,
             "str": 10
           },
-          "targetId": 996,
+          "targetId": 999,
           "templateId": "priest",
           "weapon": {
             "max": 6,
@@ -4030,7 +4030,7 @@
               "name": "Battle Stance",
               "remaining": 3580.35,
               "school": "physical",
-              "sourceId": 989
+              "sourceId": 992
             },
             {
               "duration": 30,
@@ -4039,7 +4039,7 @@
               "name": "Psalm of Warding",
               "remaining": 10.35,
               "school": "holy",
-              "sourceId": 988,
+              "sourceId": 991,
               "value": 322,
               "value2": 322
             },
@@ -4050,7 +4050,7 @@
               "name": "Doctrine",
               "remaining": 10.35,
               "school": "holy",
-              "sourceId": 988,
+              "sourceId": 991,
               "value": 0.3
             }
           ],
@@ -4064,7 +4064,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 118.65,
           "hp": 822,
-          "id": 989,
+          "id": 992,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -4122,7 +4122,7 @@
           "fiveSecondRule": 13.7,
           "hitBonus": 1,
           "hp": 50000,
-          "id": 990,
+          "id": 993,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -4154,7 +4154,7 @@
             "sta": 32,
             "str": 10
           },
-          "targetId": 991,
+          "targetId": 994,
           "templateId": "priest",
           "weapon": {
             "max": 6,
@@ -4173,7 +4173,7 @@
               "name": "Battle Stance",
               "remaining": 3580.35,
               "school": "physical",
-              "sourceId": 991
+              "sourceId": 994
             }
           ],
           "blockChance": 0.05,
@@ -4186,7 +4186,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 118.65,
           "hp": 608,
-          "id": 991,
+          "id": 994,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -4247,7 +4247,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 4.6,
           "hp": 483,
-          "id": 992,
+          "id": 995,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -4279,7 +4279,7 @@
             "sta": 38,
             "str": 10
           },
-          "targetId": 993,
+          "targetId": 996,
           "templateId": "priest",
           "weapon": {
             "max": 6,
@@ -4298,7 +4298,7 @@
               "name": "Dirge of Decay",
               "remaining": 4.7,
               "school": "shadow",
-              "sourceId": 992,
+              "sourceId": 995,
               "tickInterval": 3,
               "tickTimer": 1.7,
               "value": 37
@@ -4313,7 +4313,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 49498,
-          "id": 993,
+          "id": 996,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -4339,23 +4339,23 @@
             "z": 6
           },
           "stats": {},
-          "tappedById": 988,
+          "tappedById": 991,
           "templateId": "training_dummy",
           "threat": [
             [
-              988,
+              991,
               91
             ],
             [
-              990,
+              993,
               29
             ],
             [
-              992,
+              995,
               300
             ],
             [
-              997,
+              1000,
               82
             ]
           ],
@@ -4373,7 +4373,7 @@
               "name": "Dirge of Decay",
               "remaining": 6.2,
               "school": "shadow",
-              "sourceId": 992,
+              "sourceId": 995,
               "tickInterval": 3,
               "tickTimer": 0.2,
               "value": 37
@@ -4388,7 +4388,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 49801,
-          "id": 994,
+          "id": 997,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -4414,15 +4414,15 @@
             "z": 7
           },
           "stats": {},
-          "tappedById": 990,
+          "tappedById": 993,
           "templateId": "training_dummy",
           "threat": [
             [
-              990,
+              993,
               30
             ],
             [
-              992,
+              995,
               169
             ]
           ],
@@ -4440,7 +4440,7 @@
               "name": "Dirge of Decay",
               "remaining": 7.85,
               "school": "shadow",
-              "sourceId": 992,
+              "sourceId": 995,
               "tickInterval": 3,
               "tickTimer": 1.85,
               "value": 37
@@ -4455,7 +4455,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 49831,
-          "id": 995,
+          "id": 998,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -4481,11 +4481,11 @@
             "z": 7
           },
           "stats": {},
-          "tappedById": 992,
+          "tappedById": 995,
           "templateId": "training_dummy",
           "threat": [
             [
-              992,
+              995,
               169
             ]
           ],
@@ -4503,7 +4503,7 @@
               "name": "Dirge of Decay",
               "remaining": 9.25,
               "school": "shadow",
-              "sourceId": 988,
+              "sourceId": 991,
               "tickInterval": 3,
               "tickTimer": 0.25,
               "value": 20
@@ -4518,7 +4518,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 49960,
-          "id": 996,
+          "id": 999,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -4544,11 +4544,11 @@
             "z": 8
           },
           "stats": {},
-          "tappedById": 988,
+          "tappedById": 991,
           "templateId": "training_dummy",
           "threat": [
             [
-              988,
+              991,
               40
             ]
           ],

@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 989,
-      "state": "95d02dc2",
+      "nextId": 992,
+      "state": "9aa4b0ef",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -54,7 +54,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 984,
+          "entityId": 987,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -95,7 +95,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 984
+              "sourceId": 987
             }
           ],
           "blockChance": 0.05,
@@ -108,7 +108,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 984,
+          "id": 987,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -152,9 +152,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 991,
-      "state": "8a2a96d7",
-      "events": "e77c85fe",
+      "nextId": 994,
+      "state": "b6befee8",
+      "events": "6acfed08",
       "rng": {
         "draws": 4,
         "digest": "0d8664bb"
@@ -163,8 +163,8 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 991,
-      "state": "deeabf1e",
+      "nextId": 994,
+      "state": "33db288d",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -174,8 +174,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 991,
-      "state": "8759325a",
+      "nextId": 994,
+      "state": "dde75441",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -227,7 +227,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 984,
+          "entityId": 987,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -270,7 +270,7 @@
               "name": "Battle Stance",
               "remaining": 3599.75,
               "school": "physical",
-              "sourceId": 984
+              "sourceId": 987
             }
           ],
           "blockChance": 0.05,
@@ -283,7 +283,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.25,
           "hp": 50000,
-          "id": 984,
+          "id": 987,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -327,8 +327,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 991,
-      "state": "72cdb0a4",
+      "nextId": 994,
+      "state": "9527b4e0",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -380,7 +380,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 984,
+          "entityId": 987,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -432,7 +432,7 @@
           "fiveSecondRule": 99.25,
           "ghost": true,
           "hp": 442,
-          "id": 984,
+          "id": 987,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -476,9 +476,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 991,
-      "state": "b4d1ef0a",
-      "events": "1a287b9b",
+      "nextId": 994,
+      "state": "1f8609fb",
+      "events": "e02e155a",
       "rng": {
         "draws": 4,
         "digest": "0d8664bb"
@@ -529,7 +529,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 984,
+          "entityId": 987,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -572,7 +572,7 @@
               "name": "Resurrection Sickness",
               "remaining": 60,
               "school": "shadow",
-              "sourceId": 984,
+              "sourceId": 987,
               "undispellable": true,
               "value": -0.75
             }
@@ -587,7 +587,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.25,
           "hp": 44,
-          "id": 984,
+          "id": 987,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -631,9 +631,9 @@
     {
       "tick": 6,
       "time": 0.3,
-      "nextId": 991,
-      "state": "f0c83fc0",
-      "events": "3b4dc783",
+      "nextId": 994,
+      "state": "7920af4c",
+      "events": "af8ad601",
       "rng": {
         "draws": 4,
         "digest": "0d8664bb"
@@ -642,8 +642,8 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 991,
-      "state": "d39431f9",
+      "nextId": 994,
+      "state": "41b3ceb3",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -695,7 +695,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 984,
+          "entityId": 987,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -738,7 +738,7 @@
               "name": "Resurrection Sickness",
               "remaining": 59.9,
               "school": "shadow",
-              "sourceId": 984,
+              "sourceId": 987,
               "undispellable": true,
               "value": -0.75
             },
@@ -749,7 +749,7 @@
               "name": "Battle Stance",
               "remaining": 3599.9,
               "school": "physical",
-              "sourceId": 984
+              "sourceId": 987
             }
           ],
           "blockChance": 0.05,
@@ -762,7 +762,7 @@
           "fallStartY": 1.511848,
           "fiveSecondRule": 99.35,
           "hp": 44,
-          "id": 984,
+          "id": 987,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
