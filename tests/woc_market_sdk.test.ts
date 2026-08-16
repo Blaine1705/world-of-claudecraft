@@ -124,7 +124,7 @@ describe('status()', () => {
     await expect(client().status()).resolves.toEqual({
       ok: false,
       enabled: false,
-      price: { available: false, healthy: false, reason: null, tokensPerUsd: null, asOfMs: null },
+      price: { available: false, healthy: false, tokensPerUsd: null, asOfMs: null },
       maxActiveListings: 0,
       durationsHours: [],
       minPriceCents: 0,

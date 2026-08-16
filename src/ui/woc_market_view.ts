@@ -31,7 +31,6 @@ export interface WocQuoteLegView {
 export interface WocPriceView {
   available: boolean;
   healthy: boolean;
-  reason: string | null;
   tokensPerUsd: number | null;
   asOfMs: number | null;
 }
@@ -445,7 +444,11 @@ export function wocMarketViewSig(model: WocMarketViewModel): string {
           .map(
             (s) =>
               // failDetailReason joins the digest: a revival can change the
-              // WHY line while state stays 'failed', and a signature that
+              // WHY line while state stays 'failed'. The ':' delimiters stay
+              // collision-safe because the reason is the server's SCREENED
+              // vocabulary (no member contains ':' and unknown words collapse
+              // to 'other'), a property of the screen, not of this digest.
+              // A signature that
               // misses it leaves the old accusation on screen.
               `${s.id}:${s.state}:${s.failDetailReason ?? ''}:${countdownSigBucket(s.deadlineRemainingMs)}:${Math.floor((s.quoteRemainingMs ?? -1000) / 1000)}`,
           )

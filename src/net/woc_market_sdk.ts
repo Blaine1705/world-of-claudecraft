@@ -23,7 +23,6 @@ export interface WocQuoteLegView {
 export interface WocPriceView {
   available: boolean;
   healthy: boolean;
-  reason: string | null;
   tokensPerUsd: number | null;
   asOfMs: number | null;
 }
@@ -64,6 +63,12 @@ export interface WocListingView {
   minNextBidCents: number;
   minNextBidBondCents: number;
   buyNowLocked: boolean;
+  /** The seller asked to cancel a locked listing; it closes automatically
+   *  after an unpaid window. Absent from an older server. */
+  cancelPending?: boolean;
+  /** A directed p2p sale minted from a trade offer, not a public auction.
+   *  Absent from an older server. */
+  directed?: boolean;
   endsAtMs: number;
   createdAtMs: number;
 }
@@ -73,8 +78,10 @@ export interface WocEstimateView {
   usdCents: number;
   amount: WocQuoteLegView | null;
   asOfMs: number | null;
-  /** The server's USD fee split for this amount. Null when unavailable, or on
-   *  an economy service too old to send it: the client NEVER derives it. */
+  /** The server's USD fee split for this amount. Null when unavailable or on
+   *  an economy service too old to send it; ABSENT from a game server too old
+   *  to serialize it (treated exactly like null): the client NEVER derives
+   *  it. */
   split?: { sellerCents: number; burnCents: number; treasuryCents: number } | null;
 }
 
@@ -255,7 +262,7 @@ export class WocMarketClient {
       return {
         ok: false,
         enabled: false,
-        price: { available: false, healthy: false, reason: null, tokensPerUsd: null, asOfMs: null },
+        price: { available: false, healthy: false, tokensPerUsd: null, asOfMs: null },
         maxActiveListings: 0,
         durationsHours: [],
         minPriceCents: 0,

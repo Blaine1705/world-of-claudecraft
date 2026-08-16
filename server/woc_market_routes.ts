@@ -327,10 +327,20 @@ function listingView(row: WocListingRow, viewerAccount: number | null): Record<s
     currentBidCents: row.currentBidCents,
     minNextBidCents: minNextBidCents(row.currentBidCents, row.startCents),
     minNextBidBondCents: bondCents(minNextBidCents(row.currentBidCents, row.startCents)),
+    // The lock EXPIRY is withheld on purpose (only the boolean crosses):
+    // broadcasting the exact lapse moment would let a re-claim sniper camp
+    // it, the griefing the reclaim cooldown exists to price.
     buyNowLocked:
       row.buyNowLockAccount !== null &&
       row.buyNowLockExpiresMs !== null &&
       row.buyNowLockExpiresMs > Date.now(),
+    // Player-meaningful state, not bookkeeping: without these two the seller
+    // who reloads cannot see that their cancel was accepted (the listing
+    // reads plainly active) or that a row in their Activity tab is a
+    // directed sale rather than a public auction. Booleans only; the
+    // buyer's account id stays server-side.
+    cancelPending: row.cancelRequestedAtMs !== null,
+    directed: row.directedBuyerAccount !== null,
     endsAtMs: row.endsAtMs,
     createdAtMs: row.createdAtMs,
   };
@@ -437,7 +447,16 @@ async function statusHandler(ctx: Ctx): Promise<void> {
   const policy = wocMarketConfig().policy;
   json(ctx.res, 200, {
     enabled: status.enabled,
-    price: status.price,
+    // Projected, not passed through: price.reason is the service's verbatim
+    // operational word (operator_paused, oracle health states), the one field
+    // that would otherwise carry unscreened service text to players. No
+    // client consumes it; the paused banner derives from `healthy`.
+    price: {
+      available: status.price.available,
+      healthy: status.price.healthy,
+      tokensPerUsd: status.price.tokensPerUsd,
+      asOfMs: status.price.asOfMs,
+    },
     maxActiveListings: status.maxActiveListings,
     durationsHours: WOC_MARKET_DURATION_HOURS,
     minPriceCents: WOC_MARKET_MIN_PRICE_CENTS,

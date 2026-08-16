@@ -228,8 +228,10 @@ function estimate(over: Partial<WocEstimate> = {}): WocEstimate {
 // Drivers: each returns the serialized view straight off the wire body.
 // ---------------------------------------------------------------------------
 
-async function browseListingView(): Promise<Record<string, unknown>> {
-  service({ browse: async () => ({ rows: [listingRow()], hasMore: false }) });
+async function browseListingView(
+  over: Partial<WocListingRow> = {},
+): Promise<Record<string, unknown>> {
+  service({ browse: async () => ({ rows: [listingRow(over)], hasMore: false }) });
   const ctx = readCtx();
   await handlerFor('GET', '/api/woc-market/listings')(ctx);
   const { status, body } = sent(ctx);
@@ -312,8 +314,10 @@ describe('market wire views expose exactly their pinned key sets', () => {
       [
         'buyNowCents',
         'buyNowLocked',
+        'cancelPending',
         'createdAtMs',
         'currentBidCents',
+        'directed',
         'endsAtMs',
         'format',
         'hasReserve',
@@ -600,5 +604,119 @@ describe('the confirm handlers answer the screened pending verdict', () => {
   it('settlement: a decided state answers a null reason', async () => {
     const body = await confirmSettlementBody({ ok: true, state: 'confirmed' });
     expect(body).toEqual({ state: 'confirmed', reason: null });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Listing state booleans: player-meaningful state, never the accounts behind
+// it (the cancel-intent and directed markers carry no ids).
+// ---------------------------------------------------------------------------
+
+describe('listingView state booleans', () => {
+  it('cancelPending follows the cancel-intent stamp', async () => {
+    expect((await browseListingView()).cancelPending).toBe(false);
+    expect(
+      (await browseListingView({ cancelRequestedAtMs: 1_799_000_000_000 })).cancelPending,
+    ).toBe(true);
+  });
+
+  it('directed follows the directed-buyer stamp without leaking the account', async () => {
+    expect((await browseListingView()).directed).toBe(false);
+    const view = await browseListingView({ directedBuyerAccount: 4242 });
+    expect(view.directed).toBe(true);
+    expect(JSON.stringify(view)).not.toContain('4242');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Wrapper key sets: the same drop-a-field failure mode exists one level up
+// (a new top-level response field must land in a pin, not silently).
+// ---------------------------------------------------------------------------
+
+describe('response wrappers expose exactly their pinned key sets', () => {
+  it('GET /me', async () => {
+    const body = await meBody({});
+    expect(Object.keys(body).sort()).toEqual(
+      ['bids', 'listings', 'settlements', 'strikes', 'termsAcceptedAtMs', 'walletLinked'].sort(),
+    );
+  });
+
+  it('GET /status, with the price PROJECTED (reason never crosses)', async () => {
+    service({
+      status: async () => ({
+        enabled: true,
+        price: {
+          available: true,
+          healthy: false,
+          // The service's verbatim operational word: the one field the
+          // status pass-through used to leak. The projection drops it.
+          reason: 'operator_paused_v9',
+          tokensPerUsd: 100,
+          asOfMs: 1_799_000_400_000,
+        },
+        maxActiveListings: 12,
+      }),
+    });
+    const ctx = readCtx({ url: '/api/woc-market/status' });
+    await handlerFor('GET', '/api/woc-market/status')(ctx);
+    const { status, body } = sent(ctx);
+    expect(status).toBe(200);
+    expect(Object.keys(body).sort()).toEqual(
+      [
+        'enabled',
+        'price',
+        'maxActiveListings',
+        'durationsHours',
+        'minPriceCents',
+        'maxPriceCents',
+        'qualityFloor',
+        'allowMounts',
+        'allowMechChromas',
+        'settlementWindowSeconds',
+      ].sort(),
+    );
+    expect(Object.keys(body.price as Record<string, unknown>).sort()).toEqual(
+      ['asOfMs', 'available', 'healthy', 'tokensPerUsd'].sort(),
+    );
+    expect(JSON.stringify(body)).not.toContain('operator_paused_v9');
+  });
+
+  it('POST /bids/:id/bond-quote wraps quoteView as { bond }', async () => {
+    service({ refreshBondQuote: async () => ({ ok: true as const, bond: quoteIntent() }) });
+    const ctx = readCtx({
+      method: 'POST',
+      url: '/api/woc-market/bids/8/bond-quote',
+      params: { id: '8' },
+      body: {},
+    });
+    await handlerFor('POST', '/api/woc-market/bids/:id/bond-quote')(ctx);
+    const { status, body } = sent(ctx);
+    expect(status).toBe(200);
+    expect(Object.keys(body)).toEqual(['bond']);
+  });
+
+  it('POST /settlements/:id/quote wraps quoteView as { quote }', async () => {
+    const body = await settlementQuoteBody(quoteIntent());
+    expect(Object.keys(body)).toEqual(['quote']);
+  });
+
+  it('POST /listings/:id/buy-now wraps as { settlement, quote }', async () => {
+    service({
+      buyNow: async () => ({
+        ok: true as const,
+        settlement: settlementRow(),
+        quote: quoteIntent(),
+      }),
+    });
+    const ctx = readCtx({
+      method: 'POST',
+      url: '/api/woc-market/listings/41/buy-now',
+      params: { id: '41' },
+      body: { characterId: 3, acceptTerms: true },
+    });
+    await handlerFor('POST', '/api/woc-market/listings/:id/buy-now')(ctx);
+    const { status, body } = sent(ctx);
+    expect(status).toBe(200);
+    expect(Object.keys(body).sort()).toEqual(['quote', 'settlement'].sort());
   });
 });

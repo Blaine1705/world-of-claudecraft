@@ -85,7 +85,7 @@ const rareEquipId = findId(
 const makeStatus = (over: Partial<WocMarketStatus> = {}): WocMarketStatus => ({
   ok: true,
   enabled: true,
-  price: { available: true, healthy: true, reason: null, tokensPerUsd: 100, asOfMs: 900_000 },
+  price: { available: true, healthy: true, tokensPerUsd: 100, asOfMs: 900_000 },
   maxActiveListings: 12,
   durationsHours: [12, 24, 48],
   minPriceCents: 25,
@@ -238,14 +238,14 @@ describe('gate states', () => {
 describe('paused derivation', () => {
   it('pauses when the price feed is unavailable', () => {
     const status = makeStatus({
-      price: { available: false, healthy: true, reason: null, tokensPerUsd: null, asOfMs: null },
+      price: { available: false, healthy: true, tokensPerUsd: null, asOfMs: null },
     });
     expect(ready(makeInput({ status })).paused).toBe(true);
   });
 
   it('pauses when the price feed is unhealthy', () => {
     const status = makeStatus({
-      price: { available: true, healthy: false, reason: 'stale', tokensPerUsd: 100, asOfMs: 1 },
+      price: { available: true, healthy: false, tokensPerUsd: 100, asOfMs: 1 },
     });
     expect(ready(makeInput({ status })).paused).toBe(true);
   });
