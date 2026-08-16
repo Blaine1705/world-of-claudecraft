@@ -68,8 +68,22 @@ to the next eligible bidder or ends without a sale.
 The $WOC/USD price and all token math live in the economy service (the same
 authority that already quotes the Claudium WOC rail). The proposal's oracle
 requirements bind on the service: a time-weighted price rather than a single
-trade, multiple approved liquidity sources, maximum source-deviation limits,
-minimum-liquidity requirements, and freshness checks.
+trade, a minimum-liquidity requirement, a spot-versus-average deviation limit,
+and freshness checks judged on the venue's publication time.
+
+Deviation from the proposal, recorded deliberately (product ruling, 2026-08-16):
+the proposal asks for multiple approved liquidity sources with a maximum
+source-deviation limit. The service runs a SINGLE approved venue
+(Birdeye, aggregating the on-chain DEX pools where all $WOC trading happens,
+behind a liquidity floor). No independent $WOC price discovery exists: every
+configurable venue is a lens on the same pools, no $WOC Pyth feed exists, and
+the only other adapter available publishes no print time, which would defeat
+the freshness check. The service's oracle stays venue-count agnostic and its
+cross-venue deviation gate re-arms by itself if a second real venue is ever
+wired in code, but the operator surface says outright that it is unarmed
+today; the spot-versus-average limit (500 bps against a fifteen-minute
+average) is the automatic circuit breaker, and the price the player sees
+carries the venue's publish time as its "as of", never the poll time.
 
 The game side enforces what it can observe, and fails closed:
 
