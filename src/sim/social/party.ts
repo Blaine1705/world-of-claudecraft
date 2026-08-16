@@ -536,7 +536,9 @@ export class PartyMachine {
     for (const sourcePid of party.members) {
       const source = this.ctx.resolve(sourcePid)?.e;
       if (!source || source.dead) continue;
-      for (const aura of source.auras) {
+      const sourceAuras = source.auras;
+      if (!Array.isArray(sourceAuras)) continue;
+      for (const aura of sourceAuras) {
         if (!isPersistentPaladinAura(aura) || aura.sourceId !== sourcePid) continue;
         for (const memberPid of party.members) {
           if (memberPid === sourcePid) continue;
