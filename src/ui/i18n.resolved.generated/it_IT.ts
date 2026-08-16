@@ -10615,7 +10615,7 @@ export const it_IT: EnTranslations = {
       },
       "ice_block": {
         "name": "Bara Fredda",
-        "description": "Ti racchiude nel ghiaccio solido per 8 s, rendendoti immune a tutti i danni. Rimuove gli effetti dannosi comuni e impedisce che ne vengano applicati di nuovi. Alcuni effetti degli scontri non possono essere rimossi né impediti. Utilizzabile mentre sei stordito o trasformato. Non puoi agire mentre sei racchiuso. Lancia di nuovo per annullare. (mago)"
+        "description": "Ti racchiude nel ghiaccio solido per 8 s, rendendoti immune a tutti i danni. Rimuove gli effetti dannosi comuni già attivi e impedisce l’applicazione di nuovi effetti di controllo comuni. Utilizzabile mentre sei stordito o trasformato. Non puoi agire mentre sei racchiuso. Lancia di nuovo per annullare. (mago)"
       },
       "inner_focus": {
         "name": "Mente Quietata",

@@ -10615,7 +10615,7 @@ export const pl_PL: EnTranslations = {
       },
       "ice_block": {
         "name": "Zimna Trumna",
-        "description": "Zamyka cię w litym lodzie na 8 sek., zapewniając odporność na wszystkie obrażenia. Usuwa zwykłe szkodliwe efekty i zapobiega nakładaniu nowych. Niektórych efektów starcia nie można usunąć ani im zapobiec. Można użyć podczas ogłuszenia lub przemiany. W zamknięciu nie możesz działać. Użyj ponownie, aby anulować. (mag)"
+        "description": "Zamyka cię w litym lodzie na 8 sek., zapewniając odporność na wszystkie obrażenia. Usuwa istniejące zwykłe szkodliwe efekty i zapobiega nakładaniu nowych zwykłych efektów kontroli. Można użyć podczas ogłuszenia lub przemiany. W zamknięciu nie możesz działać. Użyj ponownie, aby anulować. (mag)"
       },
       "inner_focus": {
         "name": "Wyciszony Umysł",

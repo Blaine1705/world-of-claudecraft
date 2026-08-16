@@ -10615,7 +10615,7 @@ export const sv_SE: EnTranslations = {
       },
       "ice_block": {
         "name": "Kall kista",
-        "description": "Innesluter er i fast is i 8 sek. och gör er immuna mot all skada. Tar bort vanliga skadliga effekter och förhindrar att nya tillämpas. Vissa stridseffekter kan inte tas bort eller förhindras. Kan användas medan ni är bedövade eller förvandlade. Ni kan inte agera medan ni är inneslutna. Kasta igen för att avbryta. (magiker)"
+        "description": "Innesluter er i fast is i 8 sek. och gör er immuna mot all skada. Tar bort befintliga vanliga skadliga effekter och förhindrar att nya vanliga kontrolleffekter tillämpas. Kan användas medan ni är bedövade eller förvandlade. Ni kan inte agera medan ni är inneslutna. Kasta igen för att avbryta. (magiker)"
       },
       "inner_focus": {
         "name": "Stillat sinne",

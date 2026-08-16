@@ -10884,7 +10884,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     'Skræmmer fjender i nærheden i op til 3 sek. Skade kan bryde effekten. (troldmandstalent)',
   'entities.abilities.ice_block.description':
-    'Indkapsler jer i fast is i 8 sek. og gør jer immune over for al skade. Fjerner almindelige skadelige effekter og forhindrer, at nye bliver påført. Visse kampeffekter kan ikke fjernes eller forhindres. Kan bruges, mens I er bedøvede eller forvandlede. I kan ikke handle, mens I er indkapslet. Kast igen for at annullere. (magiker)',
+    'Indkapsler jer i fast is i 8 sek. og gør jer immune over for al skade. Fjerner eksisterende almindelige skadelige effekter og forhindrer, at nye almindelige kontroleffekter bliver påført. Kan bruges, mens I er bedøvede eller forvandlede. I kan ikke handle, mens I er indkapslet. Kast igen for at annullere. (magiker)',
   'entities.abilities.inner_focus.description': 'Gør jeres næste præstebesværgelse gratis og umulig at afbryde. Varer 60 sek.',
   'entities.abilities.innervate.description':
     'Levende saft vælder op i dig i 10 sek. og genopretter 20 af din aktuelle ressource i bølger: mana, raseri eller energi. Formskifte afbryder den ikke. Søvn, bedøvelse eller stase standser saften. (druidentalent)',

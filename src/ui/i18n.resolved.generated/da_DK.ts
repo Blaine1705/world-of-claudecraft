@@ -10615,7 +10615,7 @@ export const da_DK: EnTranslations = {
       },
       "ice_block": {
         "name": "Kold kiste",
-        "description": "Indkapsler jer i fast is i 8 sek. og gør jer immune over for al skade. Fjerner almindelige skadelige effekter og forhindrer, at nye bliver påført. Visse kampeffekter kan ikke fjernes eller forhindres. Kan bruges, mens I er bedøvede eller forvandlede. I kan ikke handle, mens I er indkapslet. Kast igen for at annullere. (magiker)"
+        "description": "Indkapsler jer i fast is i 8 sek. og gør jer immune over for al skade. Fjerner eksisterende almindelige skadelige effekter og forhindrer, at nye almindelige kontroleffekter bliver påført. Kan bruges, mens I er bedøvede eller forvandlede. I kan ikke handle, mens I er indkapslet. Kast igen for at annullere. (magiker)"
       },
       "inner_focus": {
         "name": "Stillet sind",

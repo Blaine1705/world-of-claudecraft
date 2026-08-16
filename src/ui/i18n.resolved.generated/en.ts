@@ -10615,7 +10615,7 @@ export const en: EnTranslations = {
       },
       "ice_block": {
         "name": "Cold Coffin",
-        "description": "Encases you in solid ice for 8 sec, making you immune to all damage. Removes ordinary harmful effects and prevents new ones. Some encounter effects cannot be removed or prevented. Usable while stunned or polymorphed. You cannot act while encased. Recast to cancel. (Mage)"
+        "description": "Encases you in solid ice for 8 sec, making you immune to all damage. Removes existing ordinary harmful effects and prevents new ordinary control effects. Usable while stunned or polymorphed. You cannot act while encased. Recast to cancel. (Mage)"
       },
       "inner_focus": {
         "name": "Stilled Mind",

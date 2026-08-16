@@ -11096,7 +11096,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     'Przeraża pobliskich wrogów na maksymalnie 3 sek. Obrażenia mogą przerwać efekt. (talent Czarnoksiężnika)',
   'entities.abilities.ice_block.description':
-    'Zamyka cię w litym lodzie na 8 sek., zapewniając odporność na wszystkie obrażenia. Usuwa zwykłe szkodliwe efekty i zapobiega nakładaniu nowych. Niektórych efektów starcia nie można usunąć ani im zapobiec. Można użyć podczas ogłuszenia lub przemiany. W zamknięciu nie możesz działać. Użyj ponownie, aby anulować. (mag)',
+    'Zamyka cię w litym lodzie na 8 sek., zapewniając odporność na wszystkie obrażenia. Usuwa istniejące zwykłe szkodliwe efekty i zapobiega nakładaniu nowych zwykłych efektów kontroli. Można użyć podczas ogłuszenia lub przemiany. W zamknięciu nie możesz działać. Użyj ponownie, aby anulować. (mag)',
   'entities.abilities.inner_focus.description': 'Sprawia, że twoje następne zaklęcie kapłana jest darmowe i nieprzerywalne. Trwa 60 s.',
   'entities.abilities.innervate.description':
     'Żywe soki wzbierają w tobie przez 10 sek. i falami przywracają 20 twojego bieżącego zasobu: many, szału lub energii. Zmiana postaci ich nie przerywa. Sen, ogłuszenie lub zastój zatrzymują przepływ soków. (talent Druida)',
