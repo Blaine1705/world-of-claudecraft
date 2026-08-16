@@ -801,6 +801,11 @@ export const de_DE: EnTranslations = {
       "resetAction": "Zurücksetzen",
       "note": "Ziehe die Chat-Reiterleiste, um das Fenster zu verschieben, oder den Eckgriff, um die Größe zu ändern. Zurücksetzen stellt die Standardposition und -größe wieder her."
     },
+    "chatQuota": {
+      "limitReached": "Allgemein-Chat-Limit erreicht. Versuche es in {seconds} erneut.",
+      "pending": "Deine vorherige Nachricht im Allgemein-Chat wird noch gesendet. Versuche es gleich noch einmal.",
+      "unavailable": "Der Allgemein-Chat ist vorübergehend nicht verfügbar. Versuche es bald erneut."
+    },
     "swing": {
       "ready": "Schwung",
       "seconds": "{seconds}s"
@@ -928,12 +933,12 @@ export const de_DE: EnTranslations = {
       "update": "Aktualisieren"
     },
     "otaUpdate": {
-      "title": "Game Update",
-      "downloading": "Downloading update: {percent}",
-      "applying": "Update downloaded. Restarting the game to apply it.",
-      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
-      "continueAnyway": "Continue without updating",
-      "progressLabel": "Update download progress"
+      "title": "Spiel-Update",
+      "downloading": "Update wird heruntergeladen: {percent}",
+      "applying": "Update heruntergeladen. Das Spiel wird neu gestartet, um es anzuwenden.",
+      "incompatible": "Zum Spielen ist ein Update erforderlich. Es wird angewendet, sobald der Download abgeschlossen ist.",
+      "continueAnyway": "Ohne Update fortfahren",
+      "progressLabel": "Fortschritt des Update-Downloads"
     },
     "cameraPrompt": {
       "title": "Kamera wahlen",
@@ -1396,6 +1401,10 @@ export const de_DE: EnTranslations = {
       "showWalletOnCharacterScreen": "Wallet auf dem Charakterbildschirm anzeigen",
       "showWalletOnPlayerCard": "Wallet auf der Spielerkarte anzeigen",
       "showPlaytime": "Spielzeit auf dem Charakterbildschirm anzeigen",
+      "forceHighPerfGpu": "Dedizierte Gaming-GPU verwenden",
+      "forceHighPerfGpuNote": "Standardmäßig aktiviert: Die Desktop-App fordert von diesem Computer die dedizierte Gaming-GPU an. Schalte dies aus, wenn das Spiel nicht startet, nur einen schwarzen Bildschirm zeigt oder das Laptop-Display schwarz bleibt. Wird erst beim nächsten Spielstart wirksam.",
+      "discordPresence": "Discord-Aktivitätsanzeige",
+      "discordPresenceNote": "Zeigt die Zone, in der du dich befindest, und wie lange du diese Sitzung schon spielst, als deine Discord-Aktivität an, und jeder, der dein Discord-Profil sehen kann, kann beides sehen. Geteilt werden nur der Zonenname, deine Sitzungszeit und das Spiel, niemals dein Charakter, dein Konto oder mit wem du spielst. Erfordert, dass die Discord-App auf diesem Computer läuft.",
       "showDevBadges": "Entwicklerabzeichen anzeigen",
       "showOwnNameplate": "Eigene Namensplakette anzeigen",
       "showPlayerNameplates": "Spieler-Namensplaketten anzeigen",
@@ -1768,6 +1777,7 @@ export const de_DE: EnTranslations = {
       "notEnoughHonor": "Nicht genug Ehre.",
       "reasons": {
         "arenaWin": "Arenasieg",
+        "arenaComplete": "Arenakampf ausgetragen",
         "fiestaKill": "Fiesta-Ausschaltung",
         "fiestaComplete": "Fiesta abgeschlossen",
         "fiestaWin": "Fiesta-Sieg",
@@ -1874,6 +1884,7 @@ export const de_DE: EnTranslations = {
       "joinChannels": "Tipp: Gebt /join world oder /join lfg ein, um mit Spielern in der ganzen Welt zu chatten."
     },
     "itemHeroicTag": "[HEROISCH]",
+    "itemHeroicLabel": "Heroisch",
     "itemSoulbound": "Seelengebunden",
     "itemUniqueEquipped": "Einzigartig (ausgerüstet)",
     "itemSet": {
@@ -2228,6 +2239,10 @@ export const de_DE: EnTranslations = {
       "itemAriaBound": "{item}, Menge {count}, gebundene Kopie",
       "itemAriaMasterwork": "{item}, Menge {count}, Meisterwerk",
       "itemAriaQuest": "{item}, Menge {count}, Questgegenstand",
+      "itemAriaLocked": "{item}, Anzahl {count}, gesperrt",
+      "itemLockedLine": "Gesperrt",
+      "lockItem": "Gegenstand sperren",
+      "unlockItem": "Gegenstand entsperren",
       "filterGroupAria": "Taschen nach Kategorie filtern",
       "filterAll": "Alle",
       "filterWeapon": "Waffen",
@@ -2487,7 +2502,8 @@ export const de_DE: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Schummler >"
     },
     "mobTooltip": {
       "levelFamily": "Stufe {level} {family}",
@@ -3258,6 +3274,7 @@ export const de_DE: EnTranslations = {
       "craftedToast": "Hergestellt: {name}",
       "craftedToastQty": "Hergestellt: {name} x{qty}",
       "insufficientMaterials": "Dafür fehlen Ihnen die Materialien.",
+      "reagentLocked": "Ein Reagenz dafür ist gesperrt.",
       "unknownRecipe": "Dieses Rezept existiert nicht.",
       "comboRequirementUnmet": "Ihr besitzt nicht beide erforderlichen Berufe auf der nötigen Stufe für dieses Rezept.",
       "comboRequires": "Abstimmung: {craftA} + {craftB}, Stufe {tier}.",
@@ -3364,6 +3381,7 @@ export const de_DE: EnTranslations = {
       "notHeld": "Du hast diesen Gegenstand nicht.",
       "notDisenchantable": "Du kannst das nicht entzaubern.",
       "notSalvageable": "Du kannst das nicht zerlegen.",
+      "salvageLocked": "Dieser Gegenstand ist gesperrt.",
       "disenchantBusy": "Du bist beschäftigt.",
       "salvageBusy": "Du bist beschäftigt.",
       "enchantBusy": "Du bist beschäftigt.",
@@ -3957,6 +3975,12 @@ export const de_DE: EnTranslations = {
       "genesis_token_claimed": "Dieser Seeker Genesis Token wurde bereits beansprucht.",
       "entitlement_required": "Eine verifizierte Seeker-Berechtigung ist erforderlich.",
       "current_ownership_required": "Der Seeker Genesis Token muss sich aktuell in deinem Besitz befinden."
+    },
+    "cheater_mark": {
+      "admin_target": "Operatorkonten können nicht markiert werden.",
+      "reason_required": "Ein Grund ist erforderlich.",
+      "invalid_duration": "Gib eine Markierungsdauer von mindestens einer Sekunde ein.",
+      "not_marked": "Dieses Konto ist nicht markiert."
     }
   },
   "guide": {
@@ -6579,6 +6603,7 @@ export const de_DE: EnTranslations = {
     "email": "E-Mail",
     "emailPlaceholder": "du@example.com",
     "emailError": "Bitte gib eine gültige E-Mail-Adresse ein.",
+    "marketingOptIn": "Schick mir Neuigkeiten und Updates zum Spiel per E-Mail (optional)",
     "showPassword": "Passwort anzeigen",
     "hidePassword": "Passwort ausblenden",
     "logIn": "Einloggen",
@@ -6679,6 +6704,19 @@ export const de_DE: EnTranslations = {
     "style": "Stil",
     "resetLook": "Aussehen zurücksetzen",
     "resetShort": "Zurücksetzen",
+    "shareTab": "Teilen",
+    "designCode": "Aussehenscode",
+    "designCodeHint": "Kopiere diesen Code, um dieses Aussehen zu speichern oder zu teilen. Füge hier einen Code ein und importiere ihn, um das Aussehen zu laden.",
+    "copyCode": "Code kopieren",
+    "importCode": "Importieren",
+    "designCodeCopied": "Aussehenscode kopiert.",
+    "designCodeCopyManual": "Automatisches Kopieren ist hier gesperrt. Der Code ist ausgewählt; kopiere ihn mit der Tastatur.",
+    "designCodeImported": "Aussehen importiert.",
+    "designCodeImportedPartial": "Aussehen importiert. Werte, die diese Version nicht kennt, wurden übersprungen.",
+    "designCodeErrEmpty": "Füge zuerst einen Aussehenscode ein.",
+    "designCodeErrHeader": "Das sieht nicht wie ein Aussehenscode aus.",
+    "designCodeErrVersion": "Dieser Aussehenscode stammt aus einer neueren Spielversion.",
+    "designCodeErrMalformed": "Dieser Aussehenscode ist beschädigt. Kopiere den vollständigen Code und versuche es erneut.",
     "browFlat": "Flach",
     "browArched": "Gebogen",
     "browThin": "Dünn",
@@ -7795,7 +7833,15 @@ export const de_DE: EnTranslations = {
       "readyBody": "Es wird beim Beenden installiert, oder starte jetzt neu.",
       "restart": "Jetzt neu starten",
       "later": "Später",
-      "dismiss": "Schließen"
+      "dismiss": "Schließen",
+      "whatsNew": "Änderungen im Browser ansehen"
+    },
+    "notify": {
+      "updateReadyTitle": "Update {version} ist bereit",
+      "updateReadyTitleNoVersion": "Update ist bereit",
+      "updateReadyBody": "Starte World of ClaudeCraft neu, um das Update zu übernehmen.",
+      "partyInviteTitle": "Gruppeneinladung",
+      "partyInviteBody": "{name} hat dich zu einer Gruppe eingeladen."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7807,6 +7853,7 @@ export const de_DE: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "Das Spiel läuft ohne GPU-Beschleunigung und wird langsam sein. Aktualisiere deine Grafiktreiber und starte das Spiel neu. Unter Windows stelle das Spiel außerdem unter Einstellungen > System > Anzeige > Grafik auf Hohe Leistung ein.",
+    "bodyDiscreteInactive": "Das Spiel nutzt nicht die dedizierte (Gaming-)GPU und läuft stattdessen auf der stromsparenden GPU, sodass die Leistung darunter leidet. Aktualisiere deine Grafiktreiber und starte das Spiel neu. Unter Windows stelle das Spiel außerdem unter Einstellungen > System > Anzeige > Grafik auf Hohe Leistung ein.",
     "bodyWeb": "Das Spiel läuft ohne GPU-Beschleunigung und wird langsam sein. Aktiviere die Hardwarebeschleunigung in deinen Browsereinstellungen, aktualisiere deine Grafiktreiber und starte deinen Browser neu.",
     "hybridBodyWindows": "Diese Sitzung wird auf der integrierten (stromsparenden) GPU gerendert. Falls dieser Computer auch eine dedizierte Gaming-GPU besitzt, stelle deinen Browser unter Einstellungen > System > Anzeige > Grafik auf Hohe Leistung ein und starte ihn anschließend neu. Die Desktop-App wählt die dedizierte GPU automatisch aus.",
     "hybridBodyLinux": "Diese Sitzung wird auf der integrierten (stromsparenden) GPU gerendert. Falls dieser Computer auch eine dedizierte Gaming-GPU besitzt, bieten dein Browser oder Grafiktreiber möglicherweise eine eigene GPU-Auswahl an, oder deine Distribution stellt ein Tool zum Wechseln der GPU bereit (etwa PRIME oder optimus-manager). Die Desktop-App wählt die dedizierte GPU automatisch aus.",
@@ -8030,7 +8077,111 @@ export const de_DE: EnTranslations = {
       "zoomIn": "Heranzoomen",
       "zoomOut": "Herauszoomen",
       "mapCanvasLabel": "Karte",
-      "mapSummary": "Karte von {zone}."
+      "mapSummary": "Karte von {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Keine relevanten Markierungen sichtbar.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "Weitere Markierungen: {count}.",
+      "mapMarkerDirections": {
+        "center": "in der Mitte",
+        "north": "nördlich",
+        "northeast": "nordöstlich",
+        "east": "östlich",
+        "southeast": "südöstlich",
+        "south": "südlich",
+        "southwest": "südwestlich",
+        "west": "westlich",
+        "northwest": "nordwestlich"
+      },
+      "mapMarkerDistances": {
+        "near": "in der Nähe",
+        "medium": "in mittlerer Entfernung",
+        "far": "weit entfernt"
+      },
+      "mapMarkerLabels": {
+        "you": "Du",
+        "availableQuest": "Verfügbare Quest",
+        "readyQuest": "Quest zur Abgabe bereit",
+        "repeatQuest": "Wiederholbare Quest",
+        "cooldownQuest": "Quest in Abklingzeit",
+        "questObjective": "Questzielgebiet",
+        "readyOre": "Verfügbare Erzader",
+        "readyWood": "Verfügbare Baumgruppe",
+        "readyHerb": "Verfügbare Kräuterpflanze",
+        "readyLockedOre": "Verfügbare Erzader, Werkzeug gesperrt",
+        "readyLockedWood": "Verfügbare Baumgruppe, Werkzeug gesperrt",
+        "readyLockedHerb": "Verfügbare Kräuterpflanze, Werkzeug gesperrt",
+        "cooldownOre": "Erschöpfte Erzader",
+        "cooldownWood": "Abgeholzte Baumgruppe",
+        "cooldownHerb": "Abgeerntete Kräuterpflanze",
+        "cooldownLockedOre": "Erschöpfte Erzader, Werkzeug gesperrt",
+        "cooldownLockedWood": "Abgeholzte Baumgruppe, Werkzeug gesperrt",
+        "cooldownLockedHerb": "Abgeerntete Kräuterpflanze, Werkzeug gesperrt",
+        "station": "Handwerksstation: {name}",
+        "service": "Dienst: {name}",
+        "partyMember": "Gruppenmitglied: {name}",
+        "deadPartyMember": "Gefallenes Gruppenmitglied: {name}",
+        "partyMemberGeneric": "Gruppenmitglied",
+        "deadPartyMemberGeneric": "Gefallenes Gruppenmitglied",
+        "friend": "Freund: {name}",
+        "guildMember": "Gildenmitglied: {name}",
+        "pointOfInterest": "Interessanter Ort: {name}",
+        "dungeonEntrance": "Dungeon-Eingang: {name}",
+        "dungeonExit": "Dungeon-Ausgang",
+        "delveEntrance": "Tiefgang-Eingang: {name}",
+        "worldPassage": "Durchgang nach {zone}",
+        "riftEntrance": "Riss-Eingang: {name}",
+        "hostileEnemy": "Feindliches Ziel",
+        "aggressiveEnemy": "Gegner greift dich an",
+        "lootableEnemy": "Plünderbarer Gegner",
+        "corpse": "Dein Leichnam",
+        "deathZone": "Gefahrenzone",
+        "teammate": "Teammitglied",
+        "deadTeammate": "Gefallenes Teammitglied",
+        "flagCarrier": "Teammitglied mit der Flagge",
+        "ownFlagStand": "Dein Flaggenständer",
+        "enemyFlagStand": "Gegnerischer Flaggenständer",
+        "riftDescent": "Abstieg in den Riss",
+        "riftReturnBeacon": "Rückkehrsignal",
+        "riftReturnExit": "Rückkehrausgang",
+        "ranked": "{marker}, Rang {rank}",
+        "riftTreasureAvailable": "Verfügbarer Schatz",
+        "riftTreasureLocked": "Verschlossener Schatz",
+        "riftTreasureOpened": "Geöffneter Schatz",
+        "riftTreasureJammed": "Schatz mit verklemmtem Schloss",
+        "riftCacheAvailable": "Verfügbarer Risshort",
+        "riftCacheLocked": "Verschlossener Hort",
+        "riftCacheOpened": "Geöffneter Hort",
+        "riftCacheJammed": "Hort mit verklemmtem Schloss",
+        "pylonUnlit": "Erloschener Runenpylon",
+        "pylonLit": "Leuchtender Runenpylon",
+        "sequenceRuneUnlit": "Erloschene Sequenzrune",
+        "sequenceRuneLit": "Leuchtende Sequenzrune",
+        "iceGoal": "Eisziel",
+        "boulderPad": "Felsbrockenziel",
+        "boulderMovable": "Beweglicher Felsbrocken",
+        "boulderPlaced": "Platzierter Felsbrocken",
+        "gateSealed": "Versiegeltes Tor",
+        "gateOpen": "Offenes Tor",
+        "switchReady": "Einsatzbereiter Schalter",
+        "switchOn": "Aktivierter Schalter",
+        "orbDormant": "Ruhende Kugel",
+        "orbActive": "Aktive Kugel",
+        "rollerHazard": "Gefährlicher rollender Felsbrocken",
+        "delvePassageSealed": "Versiegelter Durchgang",
+        "delvePassageOpen": "Offener Durchgang",
+        "delveSurfaceExit": "Ausgang zur Oberfläche",
+        "delveCacheLocked": "Verschlossene Tiefgangstruhe",
+        "delveCacheReady": "Tiefgangstruhe bereit",
+        "delveCacheActive": "Tiefgangstruhe aktiv",
+        "delveCacheOpened": "Geöffnete Tiefgangstruhe",
+        "delveReliquaryLocked": "Verschlossenes Reliquiar",
+        "delveReliquaryReady": "Reliquiar bereit",
+        "delveReliquaryActive": "Reliquiar-Ritus aktiv",
+        "delveReliquaryOpened": "Geöffnetes Reliquiar",
+        "bountiful": "{marker} mit reicher Beute"
+      }
     },
     "options": {
       "gameMenu": "Spielmenü",
@@ -8070,6 +8221,9 @@ export const de_DE: EnTranslations = {
       "graphicsReloadNote": "Grafikqualität und Geländedetail werden nach dem Neuladen angewendet.",
       "reloadNow": "Jetzt neu laden",
       "fullscreen": "Vollbild",
+      "displayMode": "Anzeigemodus",
+      "displayModeBorderless": "Randloses Vollbild",
+      "displayModeWindowed": "Fenstermodus",
       "touchLookSpeed": "Touch-Kamerageschwindigkeit",
       "joystickSize": "Joystick-Größe",
       "buttonSize": "Schaltflächengröße",
@@ -8946,6 +9100,10 @@ export const de_DE: EnTranslations = {
       "filterPrimaryStatAll": "Beliebiges Primärattribut",
       "filterRarity": "Seltenheit",
       "filterRarityAll": "Alle Seltenheiten",
+      "filterSort": "Sortieren",
+      "sortName": "Name (A-Z)",
+      "sortPriceAsc": "Preis: niedrig bis hoch",
+      "collapseLowest": "Nur den niedrigsten Preis anzeigen",
       "weaponSword": "Schwerter",
       "weaponDagger": "Dolche",
       "weaponStaff": "Stäbe",
@@ -8976,6 +9134,8 @@ export const de_DE: EnTranslations = {
       "quantity": "Menge",
       "quantityOf": "von {count}",
       "priceEach": "Preis je Stück",
+      "lowestPriceLabel": "Aktuell niedrigster Angebotspreis",
+      "lowestPriceNone": "Für diesen Gegenstand gibt es noch keine aktiven Angebote.",
       "listButton": "Auf dem Weltmarkt einstellen",
       "minPriceError": "Nennt einen Preis von mindestens 1 Kupfer.",
       "collectEmpty": "Nichts wartet. Verkaufserlöse und abgelaufene Angebote werden hier abgeholt.",
@@ -9403,6 +9563,7 @@ export const de_DE: EnTranslations = {
       "cheap_shot": {
         "name": "Magenhieb",
         "description": "Trefft das Ziel für {damage} Schaden und betäubt es 4 Sek. lang. Erfordert Verstohlenheit. Gewährt 2 Combopunkte.",
+        "descriptionNoStealth": "Trefft das Ziel für {damage} Schaden und betäubt es 4 Sek. lang. Gewährt 2 Combopunkte.",
         "specNote_subtlety": "Aus Duskveil eingesetzt fügt dies 1 Dämmer hinzu (max. 3). Bei 3 Dämmer könnt Ihr es OHNE Verstohlenheit einsetzen: Dieser Einsatz kostet nichts, verbraucht alle 3 Dämmer und startet den 6 Sek. langen Schattenschleier."
       },
       "sap": {
@@ -9615,7 +9776,7 @@ export const de_DE: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Brennender Eid",
-        "description": "Erhöht passiv die durch euren Heiligschaden erzeugte Bedrohung um 60%. Nur für Glaubenswächter."
+        "description": "Erhöht passiv die durch euren Heiligschaden erzeugte Bedrohung um 30%. Nur für Glaubenswächter."
       },
       "retribution_aura": {
         "name": "Aura der Vergeltung",
@@ -9731,7 +9892,7 @@ export const de_DE: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Stonebound-Waffe",
-        "description": "Erfüllt eure Waffe 30 Min. lang. Jeder Schlag verursacht {damage} zusätzlichen Schaden. Verstärkung gewinnt zudem 30% Rüstung, erleidet 10% weniger Schaden und erzeugt doppelt so viel Bedrohung. Erdstoß zwingt sein Ziel, euch 3 Sek. lang anzugreifen, und Donnerschild gewährt 3 Sek. lang 10% Schadensminderung."
+        "description": "Erfüllt eure Waffe 30 Min. lang. Jeder Schlag verursacht {damage} zusätzlichen Schaden. Verstärkung gewinnt zudem 40% Rüstung und 20% Ausdauer, erleidet 15% weniger Schaden und ist immun gegen kritische Treffer von Kreaturen und erzeugt das 2,75-Fache an Bedrohung. Erdstoß zwingt sein Ziel, euch 3 Sek. lang anzugreifen, und Donnerschild gewährt 3 Sek. lang 10% Schadensminderung."
       },
       "healing_wave": {
         "name": "Heilende Wasser",
@@ -9910,7 +10071,7 @@ export const de_DE: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin-Gestalt",
-        "description": "Verwandelt euch in einen Bären: Rüstung +130%, stark erhöhte Angriffskraft, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Erneut wirken, um zur Zauberergestalt zurückzukehren."
+        "description": "Verwandelt euch in einen Bären: Rüstung +110%, maximale Gesundheit +30%, stark erhöhte Angriffskraft, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Erneut wirken, um zur Zauberergestalt zurückzukehren."
       },
       "maul": {
         "name": "Knochenmalmer",
@@ -9920,6 +10081,10 @@ export const de_DE: EnTranslations = {
       "growl": {
         "name": "Bedrohen",
         "description": "Knurrt das Ziel an: Eure Bedrohung steigt auf die seines meistgehassten Gegners und es wird 3 Sek. lang gezwungen, euch anzugreifen. Nur in Bruin Form."
+      },
+      "challenging_roar": {
+        "name": "Unheilvolles Gebrüll",
+        "description": "Ein unheilvolles Gebrüll: Jeder Gegner im Umkreis von 10 m wird verspottet, seine Bedrohung Euch gegenüber steigt auf die seines meistgehassten Gegners, und er wird 3 Sek. lang gezwungen, Euch anzugreifen. Nur in Bruin Form."
       },
       "cat_form": {
         "name": "Wolfsgestalt",

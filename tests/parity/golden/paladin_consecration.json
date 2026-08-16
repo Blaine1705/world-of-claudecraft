@@ -148,7 +148,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 993,
-      "state": "777ce0d9",
+      "state": "65670cd9",
       "events": "4775928c",
       "rng": {
         "draws": 6,
@@ -159,7 +159,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 993,
-      "state": "a66c5984",
+      "state": "cab7eb48",
       "events": "2e4d1715",
       "rng": {
         "draws": 7,
@@ -170,7 +170,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 993,
-      "state": "76b5782f",
+      "state": "5f15e9e4",
       "events": "81f8f1b3",
       "rng": {
         "draws": 191,
@@ -181,7 +181,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 993,
-      "state": "f73288bb",
+      "state": "e3400daa",
       "events": "2e4d1715",
       "rng": {
         "draws": 348,
@@ -192,7 +192,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 993,
-      "state": "eacbdd74",
+      "state": "73e5f37c",
       "events": "f5bd27d3",
       "rng": {
         "draws": 547,
@@ -203,7 +203,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 993,
-      "state": "3d98c62c",
+      "state": "be380da0",
       "events": "bc7a5eab",
       "rng": {
         "draws": 750,
@@ -214,7 +214,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 993,
-      "state": "f5e16e5a",
+      "state": "4897c84e",
       "events": "d4d0daee",
       "rng": {
         "draws": 974,
@@ -225,7 +225,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 993,
-      "state": "aeeb32b5",
+      "state": "a1589cc9",
       "events": "e5a1f1f0",
       "rng": {
         "draws": 1211,
@@ -236,7 +236,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 993,
-      "state": "e92c729d",
+      "state": "d5468140",
       "events": "77b370fd",
       "rng": {
         "draws": 1444,
@@ -247,7 +247,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 993,
-      "state": "529f0cde",
+      "state": "25ae4a23",
       "events": "741638a5",
       "rng": {
         "draws": 1709,
@@ -258,7 +258,7 @@
       "tick": 201,
       "time": 10.05,
       "nextId": 993,
-      "state": "2ab72029",
+      "state": "378f7aa4",
       "events": "741638a5",
       "rng": {
         "draws": 1713,
@@ -485,7 +485,7 @@
           "threat": [
             [
               987,
-              1714.6
+              759.03
             ]
           ],
           "wanderTarget": {

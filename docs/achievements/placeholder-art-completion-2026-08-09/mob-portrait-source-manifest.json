@@ -3,32 +3,32 @@
   "purpose": "Binds every shipped mob portrait to the actual renderer job, model, attachment, tint, renderer, and output bytes.",
   "bootstrapReview": {
     "path": "docs/achievements/placeholder-art-completion-2026-08-09/portrait-manifest-bootstrap-review.md",
-    "bytes": 1532,
-    "sha256": "bfcef01e1be303722e0c3d5414837a61f8fa735c638ef097d08fe4ba6c0a3e31"
+    "bytes": 1510,
+    "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "64e33380971a090143bee4aaa80a2f970619ff2a33649f87c0fed2be6d801599",
+  "rendererFingerprint": "48dc152f5aa71cf79d26aa38146ac462da5ee8550cadca7f7d57203a10321976",
   "renderer": {
     "trackedFiles": [
       {
         "path": "scripts/render_finder_portraits.mjs",
-        "bytes": 11242,
-        "sha256": "45df4ba938de3c512a8fd0255aad05417d614eca9bc1b8947ff5a15a4d3bb516"
+        "bytes": 10988,
+        "sha256": "5f9b0357f3062fee9cc2021a0bfbd43691b2a30b09e90c96d989171c0f89cec7"
       },
       {
         "path": "scripts/lib/mob_portrait_jobs.mjs",
-        "bytes": 8790,
-        "sha256": "917d38140c06b658302748cef680a559b9741ef3dfdf479eee91c7321c31f8ab"
+        "bytes": 8547,
+        "sha256": "8811b612d40a20c55800e2f15ab58ee1580a905fa3a8cf81574cfc6e3853077b"
       },
       {
         "path": "scripts/lib/mob_portrait_background.mjs",
-        "bytes": 1392,
-        "sha256": "93038bf1a45a2505484318a726e3ad438459253fc007d4be6dc37c18f13a77d7"
+        "bytes": 1356,
+        "sha256": "ab4f2b23cebeb6e346856786b9d3fe95010b2db058ef0d990bb1ee34847533ed"
       }
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 3841531,
-      "sha256": "8b04a5cadcd6e77c86f8963b540a560e225349d1225db76bf2e9fc11790c4be8",
+      "bytes": 3823392,
+      "sha256": "bf4b228a191aa849fd084e5585d8bc53f98df56ee1ec5fe05c78f65d52985ca2",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -40,7 +40,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 232,
+  "portraitCount": 230,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -2769,7 +2769,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
-        "hover": null,
+        "hover": -0.07,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -2781,11 +2781,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8c5f8738f47b14d6552cae1dee2f65e73e948467835d4723f3f2ce7f416af6fb",
+      "sourceFingerprint": "567650aac78238ad2cab1193fe4b46a530e663aec185e3ca66c730639c7d6994",
       "output": {
         "path": "public/ui/mobs/grix_the_tunnelking.webp",
-        "bytes": 2848,
-        "sha256": "a3dd07d0266886f22d94f012b5cad6f0e0eed9d879e31f0cfe2eca571737c507"
+        "bytes": 2830,
+        "sha256": "1478390b23f574f1676e6c4102661ba0cb8620a0bb09be259f911c71e4e7baa3"
       }
     },
     {
@@ -6271,40 +6271,6 @@
       }
     },
     {
-      "id": "shore_scuttler",
-      "family": "beast",
-      "finderEncounter": false,
-      "visualKey": "mob_crab",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/crabenemy.glb",
-          "path": "public/models/creatures/crabenemy.glb",
-          "bytes": 62156,
-          "sha256": "8d3c9c7a231c9835a1ee618c18e27d4285c0d369bfac10a2ff9680400bd7b06b"
-        },
-        "idle": "Idle",
-        "height": 1.7,
-        "yaw": null,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": 0.35
-      },
-      "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#7a5a3a",
-        "strength": 0.35
-      },
-      "sourceFingerprint": "5410bf927da41fef18efaec05fbd45e67553daa2cf80644d204ae2136d061cb4",
-      "output": {
-        "path": "public/ui/mobs/shore_scuttler.webp",
-        "bytes": 2066,
-        "sha256": "a72b6acad9930057143395ff64c832dabf99604e32a4dfd84d97c46a26d7ab9a"
-      }
-    },
-    {
       "id": "sister_nhalia",
       "family": "humanoid",
       "finderEncounter": false,
@@ -7284,40 +7250,6 @@
       }
     },
     {
-      "id": "training_effigy",
-      "family": "humanoid",
-      "finderEncounter": false,
-      "visualKey": "mob_training_dummy",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/training_dummy.glb",
-          "path": "public/models/creatures/training_dummy.glb",
-          "bytes": 885308,
-          "sha256": "e29aa3fb8ea7472d51f86176bdf5051c921794f62ac7af5941e0cd3fa560ab92"
-        },
-        "idle": "Idle",
-        "height": 2.3,
-        "yaw": null,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": 0.35
-      },
-      "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#9a7b4f",
-        "strength": 0.35
-      },
-      "sourceFingerprint": "e1dccb172f7d36ec3c89bf242071bfb6b0c7d567ff86f9d5df691bc9389b86c7",
-      "output": {
-        "path": "public/ui/mobs/training_effigy.webp",
-        "bytes": 1802,
-        "sha256": "722830cc2e9b19b8b9787482eae76cb3b242201566e00ca40cab6cd96ba26cd7"
-      }
-    },
-    {
       "id": "treant_elder",
       "family": "ogre",
       "finderEncounter": false,
@@ -7366,7 +7298,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
-        "hover": null,
+        "hover": -0.2,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -7378,11 +7310,11 @@
         "resolved": "#9c640c",
         "strength": 0.12
       },
-      "sourceFingerprint": "d19ee3b2692349523e7ade48a684084ba842f30fb1c7a51507397787dc8a5030",
+      "sourceFingerprint": "820c237cca9f63dfd62ee7459dd0a9c220558db87ee0d0cd5cde52b78e231610",
       "output": {
         "path": "public/ui/mobs/tunnel_rat.webp",
-        "bytes": 2530,
-        "sha256": "b2dece799b8d9a4e2d1b099d49aa3ed5c3e48e58e22ea847652fc705f27ca559"
+        "bytes": 2560,
+        "sha256": "f9cd6552c6514dc9832fff101740cacc2c021dd978e3a1b120f484c07ba1640b"
       }
     },
     {
