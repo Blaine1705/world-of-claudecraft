@@ -211,11 +211,11 @@ describe('Affliction Warlock', () => {
     expect(maledictGazeDamage(19)).toBe(9);
     expect(maledictGazeDamage(20)).toBe(10);
     expect(ABILITIES.needle_of_fate.description).toContain(
-      'Completing a cast against your primary Evil Eye adds a Fate Thread',
+      'Completing a cast moves your primary Evil Eye to the target and adds a Fate Thread',
     );
     expect(ABILITIES.needle_of_fate.description).not.toContain('Each hit');
     expect(en.entities.abilities.needle_of_fate.description).toContain(
-      'Completing a cast against your primary Evil Eye adds a Fate Thread',
+      'Completing a cast moves your primary Evil Eye to the target and adds a Fate Thread',
     );
     expect(en.entities.abilities.needle_of_fate.description).toContain(
       'generates 7 Condemnation on impact',
@@ -493,7 +493,7 @@ describe('Affliction Warlock', () => {
     expect(doomValue(sim.player)).toBe(58);
   });
 
-  it('does not double Hour of Judgment generation through a secondary Eye', () => {
+  it('promotes a Coven target before applying Hour of Judgment Needle generation', () => {
     const sim = makeAffliction();
     const primary = addTarget(sim, 8);
     const secondary = addTarget(sim, 10);
@@ -504,7 +504,9 @@ describe('Affliction Warlock', () => {
 
     finishCast(sim, 'needle_of_fate', secondary);
 
-    expect(doomValue(sim.player)).toBe(45);
+    expect(eye(primary, sim.playerId, true)).toBe(true);
+    expect(eye(secondary, sim.playerId)).toBe(true);
+    expect(doomValue(sim.player)).toBe(58);
   });
 
   it('refunds 50 Condemnation from only the first Sentence during Hour of Judgment', () => {
@@ -741,7 +743,7 @@ describe('Affliction Warlock', () => {
     ).toBe(false);
   });
 
-  it('lets Needle auto-mark only when no eye exists and awards 7 Condemnation on impact', () => {
+  it('moves the primary Eye to each Needle target and awards 7 Condemnation on impact', () => {
     const sim = makeAffliction();
     const first = addTarget(sim, 8);
     const second = addTarget(sim, 12);
@@ -768,10 +770,41 @@ describe('Affliction Warlock', () => {
     );
     while (sim.player.gcdRemaining > 0) sim.tick();
 
-    finishCast(sim, 'needle_of_fate', second);
-    expect(eye(first, sim.playerId)).toBe(true);
-    expect(eye(second, sim.playerId)).toBe(false);
+    while (ctx(sim).tickCount % 40 !== 1) sim.tick();
+    sim.targetEntity(second.id);
+    sim.player.resource = sim.player.maxResource;
+    const manaBeforeMove = sim.player.resource;
+    sim.castAbility('needle_of_fate');
+    while (sim.player.castingAbility) sim.tick();
+
+    expect(ctx(sim).pendingProjectiles.length).toBeGreaterThan(0);
+    expect(eye(first, sim.playerId)).toBe(false);
+    expect(eye(second, sim.playerId)).toBe(true);
+    expect(ownedFateThreads(sim.player)).toBe(2);
+    // Rank 3 costs 35, reduced to 32 by the Hexcraft baseline. Moving the Eye
+    // must not also charge Evil Eye's separate mana cost.
+    expect(manaBeforeMove - sim.player.resource).toBe(32);
     expect(doomValue(sim.player)).toBe(7);
+
+    while (ctx(sim).pendingProjectiles.length > 0) sim.tick();
+    expect(doomValue(sim.player)).toBe(14);
+  });
+
+  it('keeps the current primary Eye timing stable when Needle stays on target', () => {
+    const sim = makeAffliction();
+    const target = addTarget(sim, 8);
+    finishCast(sim, 'evil_eye', target);
+    const primary = target.auras.find((aura) => aura.kind === 'affliction_eye');
+    if (!primary) throw new Error('Expected primary Evil Eye');
+    primary.remaining = 321;
+    primary.tickTimer = 0.75;
+
+    completeNeedleOfFateCast(ctx(sim), sim.player, target);
+
+    expect(target.auras.find((aura) => aura.kind === 'affliction_eye')).toBe(primary);
+    expect(primary.remaining).toBe(321);
+    expect(primary.tickTimer).toBe(0.75);
+    expect(ownedFateThreads(sim.player)).toBe(1);
   });
 
   it('keeps cast-completion Threads but grants no Condemnation when Needle is resisted', () => {
@@ -1854,6 +1887,70 @@ describe('Affliction Warlock', () => {
     expect(secondary.filter((target) => eye(target, sim.playerId, true))).toHaveLength(4);
   });
 
+  it('swaps a selected Coven Eye with the primary Eye without losing resources', () => {
+    const sim = makeAffliction();
+    const primary = addTarget(sim, 8);
+    const selectedSecondary = addTarget(sim, 10);
+    const otherSecondary = addTarget(sim, 12);
+    finishCast(sim, 'evil_eye', primary);
+    finishCast(sim, 'coven', primary);
+    const selectedAura = selectedSecondary.auras.find(
+      (aura) => aura.kind === 'affliction_eye_secondary',
+    );
+    if (!selectedAura) throw new Error('Expected selected Coven Eye');
+    selectedAura.remaining = 6;
+    gainDoom(ctx(sim), sim.player, 40);
+    completeNeedleOfFateCast(ctx(sim), sim.player, primary);
+
+    completeNeedleOfFateCast(ctx(sim), sim.player, selectedSecondary);
+
+    expect(eye(selectedSecondary, sim.playerId)).toBe(true);
+    expect(eye(selectedSecondary, sim.playerId, true)).toBe(false);
+    expect(eye(primary, sim.playerId)).toBe(false);
+    expect(eye(primary, sim.playerId, true)).toBe(true);
+    expect(primary.auras.find((aura) => aura.kind === 'affliction_eye_secondary')?.remaining).toBe(
+      6,
+    );
+    expect(eye(otherSecondary, sim.playerId, true)).toBe(true);
+    expect([...sim.entities.values()].filter((entity) => eye(entity, sim.playerId))).toHaveLength(
+      1,
+    );
+    expect(ownedFateThreads(sim.player)).toBe(2);
+    expect(doomValue(sim.player)).toBe(40);
+  });
+
+  it('keeps each Coven target enemy-action lockout when their Eye roles swap', () => {
+    const sim = makeAffliction();
+    const primary = addTarget(sim, 8);
+    const selectedSecondary = addTarget(sim, 10);
+    finishCast(sim, 'evil_eye', primary);
+    finishCast(sim, 'coven', primary);
+    consumeDoom(ctx(sim), sim.player);
+
+    onAfflictionDamage(ctx(sim), primary, sim.player, 10);
+    for (let tick = 0; tick < 5; tick++) sim.tick();
+    onAfflictionDamage(ctx(sim), selectedSecondary, sim.player, 10);
+    expect(doomValue(sim.player)).toBe(3);
+    const primaryLockout = primary.auras.find(
+      (aura) => aura.kind === 'affliction_eye',
+    )?.actionGainLockout;
+    const secondaryLockout = selectedSecondary.auras.find(
+      (aura) => aura.kind === 'affliction_eye_secondary',
+    )?.actionGainLockout;
+
+    completeNeedleOfFateCast(ctx(sim), sim.player, selectedSecondary);
+
+    expect(
+      selectedSecondary.auras.find((aura) => aura.kind === 'affliction_eye')?.actionGainLockout,
+    ).toBe(secondaryLockout);
+    expect(
+      primary.auras.find((aura) => aura.kind === 'affliction_eye_secondary')?.actionGainLockout,
+    ).toBe(primaryLockout);
+    onAfflictionDamage(ctx(sim), primary, sim.player, 10);
+    onAfflictionDamage(ctx(sim), selectedSecondary, sim.player, 10);
+    expect(doomValue(sim.player)).toBe(3);
+  });
+
   it('applies Coven immediately without a projectile or resist roll', () => {
     const sim = makeAffliction();
     const primary = addTarget(sim, 8);
@@ -1891,7 +1988,7 @@ describe('Affliction Warlock', () => {
     ).toBe(false);
   });
 
-  it('halves generation on a secondary Eye and echoes Sentence for 35%', () => {
+  it('promotes a Coven target and echoes Sentence into the former primary Eye', () => {
     const sim = makeAffliction();
     const primary = addTarget(sim, 8);
     const secondary = addTarget(sim, 10);
@@ -1900,13 +1997,15 @@ describe('Affliction Warlock', () => {
     expect(eye(secondary, sim.playerId, true)).toBe(true);
 
     finishCast(sim, 'needle_of_fate', secondary);
-    expect(doomValue(sim.player)).toBe(4);
-    expect(ownedFateThreads(sim.player)).toBe(0);
+    expect(doomValue(sim.player)).toBe(7);
+    expect(ownedFateThreads(sim.player)).toBe(1);
+    expect(eye(primary, sim.playerId, true)).toBe(true);
+    expect(eye(secondary, sim.playerId)).toBe(true);
 
-    gainDoom(ctx(sim), sim.player, 16);
-    const secondaryHp = secondary.hp;
-    const events = finishCast(sim, 'sentence', primary);
-    expect(secondaryHp - secondary.hp).toBe(29);
+    gainDoom(ctx(sim), sim.player, 13);
+    const formerPrimaryHp = primary.hp;
+    const events = finishCast(sim, 'sentence', secondary);
+    expect(formerPrimaryHp - primary.hp).toBe(31);
     expect(sentenceBursts(events)).toHaveLength(1);
   });
 
@@ -1959,7 +2058,7 @@ describe('Affliction Warlock', () => {
     expect(sentenceBursts(events)).toHaveLength(0);
   });
 
-  it('halves the complete possessed Needle and Hex generation package on secondary Eyes', () => {
+  it('uses the full possessed Needle and Hex package after promoting a Coven Eye', () => {
     const sim = makeAffliction();
     const primary = addTarget(sim, 8);
     const secondary = addTarget(sim, 10);
@@ -1972,11 +2071,11 @@ describe('Affliction Warlock', () => {
     finishCast(sim, 'possess_evil_eye', primary);
 
     finishCast(sim, 'needle_of_fate', secondary);
-    expect(doomValue(sim.player)).toBe(40);
+    expect(doomValue(sim.player)).toBe(44);
 
     finishCast(sim, 'hex_of_violence', secondary);
     ctx(sim).dealDamage(secondary, victim, 10, false, 'physical', 'Claw', 'hit');
-    expect(doomValue(sim.player)).toBe(45);
+    expect(doomValue(sim.player)).toBe(53);
   });
 
   it('feeds Condemnation and refreshes the expiry when a primary Eye target dies', () => {

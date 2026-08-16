@@ -5051,7 +5051,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Pierces the enemy for $d Shadow damage and generates 7 Condemnation on impact if it bears your Evil Eye. Completing a cast against your primary Evil Eye adds a Fate Thread for 12 sec, up to 3. Fate Threads stay with you when the Eye moves or its target dies. If no Evil Eye exists, the completed cast first marks its target.',
+      'Pierces the enemy for $d Shadow damage and generates 7 Condemnation on impact if it still bears your Evil Eye. Completing a cast moves your primary Evil Eye to the target and adds a Fate Thread for 12 sec, up to 3. Fate Threads stay with you when the Eye moves or its target dies. Targeting a secondary Coven Eye swaps it with the primary Eye.',
   },
   sentence: {
     id: 'sentence',

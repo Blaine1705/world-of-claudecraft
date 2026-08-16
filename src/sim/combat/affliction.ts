@@ -367,13 +367,20 @@ function triggerLitanyOfGuilt(ctx: SimContext, warlock: Entity): void {
 }
 
 export function moveEvilEye(ctx: SimContext, warlock: Entity, target: Entity): void {
+  const current = primaryEye(ctx, warlock.id);
+  const currentAura = current?.auras.find(
+    (aura) => aura.kind === 'affliction_eye' && aura.sourceId === warlock.id,
+  );
+  const secondary = target.auras.find(
+    (aura) => aura.kind === 'affliction_eye_secondary' && aura.sourceId === warlock.id,
+  );
   for (const entity of ctx.entities.values()) {
     const existing = entity.auras.find(
       (aura) => aura.kind === 'affliction_eye' && aura.sourceId === warlock.id,
     );
-    if (!existing) continue;
-    removeOwnedAura(ctx, entity, existing);
+    if (existing) removeOwnedAura(ctx, entity, existing);
   }
+  if (secondary) removeOwnedAura(ctx, target, secondary);
   ctx.applyAura(target, {
     id: 'evil_eye',
     name: 'Evil Eye',
@@ -385,7 +392,14 @@ export function moveEvilEye(ctx: SimContext, warlock: Entity, target: Entity): v
     tickTimer: MALEDICT_GAZE_INTERVAL,
     sourceId: warlock.id,
     school: 'shadow',
+    actionGainLockout: secondary?.actionGainLockout,
   });
+  // Selecting an existing Coven Eye swaps the two roles. The old primary
+  // inherits the secondary Eye's remaining lifetime, so target switching does
+  // not create an extra Coven mark or extend the talent's temporary coverage.
+  if (current && current.id !== target.id && secondary) {
+    ctx.applyAura(current, { ...secondary, actionGainLockout: currentAura?.actionGainLockout });
+  }
 }
 
 export function maledictGazeDamage(level: number): number {
@@ -464,7 +478,7 @@ export function completeNeedleOfFateCast(ctx: SimContext, warlock: Entity, targe
   // Commit the resource when the cast finishes, before the visual projectile
   // lands, so a queued Sentence can release without an unnecessary fourth Needle.
   const current = primaryEye(ctx, warlock.id);
-  if (!current) moveEvilEye(ctx, warlock, target);
+  if (current?.id !== target.id) moveEvilEye(ctx, warlock, target);
   const eye = eyeAura(target, warlock.id);
   if (eye?.kind !== 'affliction_eye') return;
   const threads = fateThreadAura(warlock);
