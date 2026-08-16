@@ -348,6 +348,44 @@ Resolved (Fernando, 2026-08-11):
   posture (recommended: step-up on every custody-moving call).
 - R2 (phase 09): RESOLVED: forfeited bonds follow the PRD treasury + burn split, one
   code path with the settlement fee split.
+- R3 (phase 11, H3, resolved Fernando 2026-08-16, proposed and confirmed at the
+  11 session start): SINGLE-VENUE posture, honestly stated. Grounds: no
+  independent $WOC price discovery exists (every configurable venue is a lens on
+  the same on-chain DEX pools); the only configurable-today second source,
+  Jupiter's price API, publishes NO print time (the existing adapter stamps
+  poll time, which under the oracle's newest-publish staleness key would make
+  the whole oracle permanently un-stale with Birdeye frozen), and Birdeye's
+  measured ~25-minute print cadence against a near-live second print would
+  halt trading as venue_deviation on every 5% move between prints. Ruled:
+  - Remove the dead Pyth venue path (pythSource) and its
+    WOC_MARKET_PYTH_WOC_FEED_ID knob from bootstrap, compose, .env.example
+    and docs; the oracle stays N-venue capable (median/deviation logic and
+    tests kept; the cross-venue gate re-arms by itself when a second REAL
+    source is ever constructed) but the inert WOC_MARKET_MAX_VENUE_DEVIATION_BPS
+    env knob is retired (code default 500 bps stays; a knob for a gate that
+    cannot arm is a false affordance; it returns with any future second venue
+    and is re-judged against that venue's real behaviour then).
+  - Staleness stays 3600000 ms (one hour): measured, not tightened; two
+    tighter values halted the market on real prints (a 38-minute print is on
+    record) and compose, oracle and source share the constant by design. The
+    compensation is honesty: asOfMs becomes the newest venue PUBLISH time on
+    the wire (the player's "as of" shows the print time, not the poll), and
+    the ops surface reports per-venue age, configured and live venue counts,
+    whether the cross-venue gate is armed, and the distinct-print count
+    behind the TWAP.
+  - Spot-vs-TWAP deviation TIGHTENS 1000 -> 500 bps (code constant; compose
+    and .env.example stay blank so the constant rules): the sole automatic
+    circuit breaker under one venue, the same disagreement bound the design
+    already accepted between two venues, halving the walk a manipulator can
+    push through per 15-minute window (about 18% -> 9.5% by the TWAP
+    arithmetic); a legitimate 5%+ jump between prints halts until the TWAP
+    converges, self-clearing within one window.
+  - The PRD claim (docs/prd/woc/marketplace.md, "multiple approved liquidity
+    sources, maximum source-deviation limits") is revised to the single-venue
+    truth in this session's game-side docs commit (07 did not take it).
+  - Observation for 22, not this phase: the real manipulation cost is set by
+    WOC_MARKET_MIN_LIQUIDITY_USD against WOC_MARKET_MAX_USD_CENTS; no oracle
+    bound fixes that ratio.
 - R4 (all phases): RESOLVED: push after each QA PASS (or PASS-WITH-FOLLOWUPS with fixes
   applied), repos the pair touched; implement sessions never push; FAIL pushes nothing.
   Exact push commands live in implementation-plan.md commit rules.
@@ -370,9 +408,6 @@ Resolved (Fernando, 2026-08-11):
 
 Still open (a phase that hits one asks at session start):
 
-- R3 (phase 11, H3): oracle venue posture. The PRD requires a cross-venue deviation gate
-  but Pyth has no $WOC feed. Options: add a second real venue, or revise the claim to
-  single-venue with tightened staleness/deviation bounds. Needs a product call.
 - R5 (phases 09/10/21): the chain-wiring operational decisions. The two 09
   items are RESOLVED (Fernando, 2026-08-14, proposed and confirmed at the 09
   session start):
