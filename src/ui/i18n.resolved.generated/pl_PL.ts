@@ -3930,7 +3930,7 @@ export const pl_PL: EnTranslations = {
       "quoteSign": "Sign and pay",
       "quoteRefresh": "New quote",
       "quoteCancel": "Not now",
-      "quoteBondFor": "Bid bond for your {usd} bid",
+      "quoteBondFor": "Refundable bid bond: {usd}",
       "quoteSettlementFor": "Settlement for {item}: {usd}",
       "signing": "Waiting for your wallet...",
       "signFailed": "Your wallet did not complete the payment. Check the wallet and try again.",

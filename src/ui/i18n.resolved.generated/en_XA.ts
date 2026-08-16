@@ -3930,7 +3930,7 @@ export const en_XA: EnTranslations = {
       "quoteSign": "[Šíĝñ áñð þáý]",
       "quoteRefresh": "[Ñéŵ ɋúóţé]",
       "quoteCancel": "[Ñóţ ñóŵ]",
-      "quoteBondFor": "[Ɓíð ƀóñð ƒóŕ ýóúŕ {usd} ƀíð]",
+      "quoteBondFor": "[Ŕéƒúñðáƀļé ƀíð ƀóñð: {usd}]",
       "quoteSettlementFor": "[Šéţţļéɱéñţ ƒóŕ {item}: {usd}]",
       "signing": "[Ŵáíţíñĝ ƒóŕ ýóúŕ ŵáļļéţ...]",
       "signFailed": "[Ýóúŕ ŵáļļéţ ðíð ñóţ çóɱþļéţé ţĥé þáýɱéñţ. Çĥéçķ ţĥé ŵáļļéţ áñð ţŕý áĝáíñ.]",

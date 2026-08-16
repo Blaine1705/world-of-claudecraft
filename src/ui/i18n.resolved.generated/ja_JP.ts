@@ -3930,7 +3930,7 @@ export const ja_JP: EnTranslations = {
       "quoteSign": "署名して支払う",
       "quoteRefresh": "新しい見積もり",
       "quoteCancel": "あとで",
-      "quoteBondFor": "{usd} の入札に対する保証金",
+      "quoteBondFor": "返金可能な入札保証金: {usd}",
       "quoteSettlementFor": "{item} の決済: {usd}",
       "signing": "ウォレットの承認を待っています...",
       "signFailed": "ウォレットが支払いを完了できませんでした。ウォレットを確認して、もう一度お試しください。",

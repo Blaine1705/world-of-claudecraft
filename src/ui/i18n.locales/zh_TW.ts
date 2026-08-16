@@ -8434,7 +8434,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.quoteSign': '簽名並付款',
   'hudChrome.wocMarket.quoteRefresh': '新報價',
   'hudChrome.wocMarket.quoteCancel': '暫不',
-  'hudChrome.wocMarket.quoteBondFor': '你 {usd} 出價的保證金',
+  'hudChrome.wocMarket.quoteBondFor': '可退還的出價保證金：{usd}',
   'hudChrome.wocMarket.quoteSettlementFor': '{item} 的結算：{usd}',
   'hudChrome.wocMarket.signing': '等待錢包確認...',
   'hudChrome.wocMarket.signFailed': '你的錢包未能完成付款。請檢查錢包後重試。',

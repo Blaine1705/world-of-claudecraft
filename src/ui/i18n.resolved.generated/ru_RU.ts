@@ -3930,7 +3930,7 @@ export const ru_RU: EnTranslations = {
       "quoteSign": "Подписать и оплатить",
       "quoteRefresh": "Новая котировка",
       "quoteCancel": "Не сейчас",
-      "quoteBondFor": "Залог для вашей ставки {usd}",
+      "quoteBondFor": "Возвращаемый залог за ставку: {usd}",
       "quoteSettlementFor": "Расчёт за {item}: {usd}",
       "signing": "Ожидание вашего кошелька...",
       "signFailed": "Ваш кошелёк не завершил оплату. Проверьте кошелёк и попробуйте снова.",

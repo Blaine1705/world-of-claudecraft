@@ -3930,7 +3930,7 @@ export const ko_KR: EnTranslations = {
       "quoteSign": "서명하고 결제",
       "quoteRefresh": "새 견적",
       "quoteCancel": "나중에",
-      "quoteBondFor": "{usd} 입찰에 대한 보증금",
+      "quoteBondFor": "환불 가능한 입찰 보증금: {usd}",
       "quoteSettlementFor": "{item} 정산: {usd}",
       "signing": "지갑 승인을 기다리는 중...",
       "signFailed": "지갑이 결제를 완료하지 못했습니다. 지갑을 확인한 뒤 다시 시도하세요.",

@@ -8803,7 +8803,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.quoteSign': '서명하고 결제',
   'hudChrome.wocMarket.quoteRefresh': '새 견적',
   'hudChrome.wocMarket.quoteCancel': '나중에',
-  'hudChrome.wocMarket.quoteBondFor': '{usd} 입찰에 대한 보증금',
+  'hudChrome.wocMarket.quoteBondFor': '환불 가능한 입찰 보증금: {usd}',
   'hudChrome.wocMarket.quoteSettlementFor': '{item} 정산: {usd}',
   'hudChrome.wocMarket.signing': '지갑 승인을 기다리는 중...',
   'hudChrome.wocMarket.signFailed':

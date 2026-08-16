@@ -3930,7 +3930,7 @@ export const zh_CN: EnTranslations = {
       "quoteSign": "签名并付款",
       "quoteRefresh": "新报价",
       "quoteCancel": "暂不",
-      "quoteBondFor": "你 {usd} 出价的保证金",
+      "quoteBondFor": "可退还的出价保证金：{usd}",
       "quoteSettlementFor": "{item} 的结算：{usd}",
       "signing": "等待钱包确认...",
       "signFailed": "你的钱包未能完成付款。请检查钱包后重试。",
