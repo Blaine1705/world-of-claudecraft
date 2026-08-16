@@ -358,6 +358,7 @@ import { buildMailboxPillar } from './mailbox';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
+import { buildMountPrewarmVisual, mountPrewarmKeys } from './mount_prewarm';
 import { mountBobY, mountVisualSpec } from './mount_visuals';
 import { NameplatePainter } from './nameplate_painter';
 import {
@@ -6030,6 +6031,7 @@ export class Renderer {
     let foliagePrewarmGroup: THREE.Group | null = null;
     let greatTreePrewarmGroup: THREE.Group | null = null;
     let weaponVfxPrewarmGroup: THREE.Group | null = null;
+    let mountPrewarmGroup: THREE.Group | null = null;
     let landmarkPrewarmGroup: THREE.Group | null = null;
     let weatherPrewarmActive = false;
     let surfaceDetailTexturesWarmed = 0;
@@ -6130,6 +6132,7 @@ export class Renderer {
       ['foliage', foliagePrewarmGroup],
       ['great-tree', greatTreePrewarmGroup],
       ['weapon-vfx', weaponVfxPrewarmGroup],
+      ['mounts', mountPrewarmGroup],
       ['landmark', landmarkPrewarmGroup],
     ];
 
@@ -6443,6 +6446,7 @@ export class Renderer {
         ghostVariantPrewarmGroup,
         foliagePrewarmGroup,
         weaponVfxPrewarmGroup,
+        mountPrewarmGroup,
         landmarkPrewarmGroup,
       ]) {
         if (group) group.visible = false;
@@ -6492,6 +6496,9 @@ export class Renderer {
       // Removed, never disposed: disposing a material releases its linked
       // program, which is exactly what this group exists to warm.
       if (weaponVfxPrewarmGroup) this.scene.remove(weaponVfxPrewarmGroup);
+      // Same reason: a mount rig removed here keeps its program cached, it
+      // just stops taking a scene-graph traversal slot every frame.
+      if (mountPrewarmGroup) this.scene.remove(mountPrewarmGroup);
       if (landmarkPrewarmGroup) this.scene.remove(landmarkPrewarmGroup);
       if (weatherPrewarmActive) this.weather.endPrewarm();
       doorPrewarmGroup = null;
@@ -6509,6 +6516,7 @@ export class Renderer {
       foliagePrewarmGroup = null;
       greatTreePrewarmGroup = null;
       weaponVfxPrewarmGroup = null;
+      mountPrewarmGroup = null;
       landmarkPrewarmGroup = null;
       weatherPrewarmActive = false;
     };
@@ -6998,6 +7006,36 @@ export class Renderer {
           for (const texture of weaponVfxPrewarmTextures()) this.prewarmTexture(texture);
         },
         detail: () => `objects=${weaponVfxPrewarmGroup?.children.length ?? 0}`,
+      },
+      {
+        // Rideable mounts: worn by whoever is riding one, so the FIRST
+        // sighting of any given mount links its programs the moment it
+        // appears, exactly like vfx.weapon-skins above. The runtime fallback
+        // (gateSwapFlagOnCompile at the mount-swap site, see updateEntity) is
+        // a no-op without KHR_parallel_shader_compile, so on that hardware
+        // this entry is the only mitigation there ever was (#2571). Mount
+        // GLBs are lazyPreload (characters/assets.ts): one resumable unit per
+        // mount so a slow fetch lands in idle time after world entry, never
+        // the loading screen's critical path, and a failed fetch drops only
+        // that one mount instead of the whole entry.
+        id: 'vfx.mount-programs',
+        category: 'vfx',
+        priority: 63,
+        required: false,
+        resumeUnits: () =>
+          mountPrewarmKeys().map((key) => ({
+            id: `mount:${key}`,
+            run: async () => {
+              const visual = await buildMountPrewarmVisual(key);
+              if (!visual) return;
+              mountPrewarmGroup ??= new THREE.Group();
+              mountPrewarmGroup.add(visual.root);
+              this.scene.add(visual.root);
+              await this.compilePrewarmColorPrograms(visual.root, false);
+            },
+          })),
+        run: () => {},
+        detail: () => `mounts=${mountPrewarmGroup?.children.length ?? 0}`,
       },
       {
         // Spawn one of every pooled ability-VFX primitive (rings, decals,

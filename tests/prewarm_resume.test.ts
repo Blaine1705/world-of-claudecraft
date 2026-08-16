@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
   CONSTRAINED_PREWARM_KEEP,
+  CONSTRAINED_PREWARM_RESUME,
   materialProgramSignature,
   prewarmProgramContentKeys,
   skyAssetInlineWaitMs,
@@ -533,6 +534,48 @@ describe('resumeDroppedPrewarmEntries', () => {
 
   it('leaves the weapon-skin warm off the constrained keep-list', () => {
     expect(CONSTRAINED_PREWARM_KEEP).not.toContain('vfx.weapon-skins');
+  });
+
+  // Mounts had ZERO prewarm coverage before this entry (#2571): the runtime
+  // fallback (gateSwapFlagOnCompile at the mount-swap site) is a no-op
+  // without KHR_parallel_shader_compile, so the first sighting of any mount
+  // could freeze a live frame with no mitigation at all on that hardware.
+  it('warms every mount program as one resumable unit per catalog key', () => {
+    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const start = source.indexOf("id: 'vfx.mount-programs'");
+    const end = source.indexOf("id: 'vfx.ability-primitives'", start);
+    const entryBlock = source.slice(start, end);
+
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    expect(entryBlock).toContain("category: 'vfx'");
+    expect(entryBlock).toContain('required: false');
+    // Derived from the real catalog, never a hand-maintained list: this is
+    // exactly the property that kept vfx.weapon-skins from drifting the way
+    // mounts did, and mount_prewarm.test.ts pins the derivation itself.
+    expect(entryBlock).toContain('mountPrewarmKeys().map((key) => ({');
+    expect(entryBlock).toContain('id: `mount:${key}`');
+    expect(entryBlock).toContain('await buildMountPrewarmVisual(key)');
+    expect(entryBlock).toContain('await this.compilePrewarmColorPrograms(visual.root, false)');
+    // A failed fetch for one mount must not throw or block its siblings.
+    expect(entryBlock).toContain('if (!visual) return;');
+
+    // The staged group is torn out of the scene by both cleanup paths and
+    // hidden between resumed entries, exactly like every other prewarm group.
+    expect(source).toContain('if (mountPrewarmGroup) this.scene.remove(mountPrewarmGroup)');
+    expect(source).toContain('mountPrewarmGroup = null;');
+    const hideStart = source.indexOf('const hidePrewarmArtifacts = ');
+    const hideEnd = source.indexOf('const cleanupPrewarmArtifacts = ', hideStart);
+    expect(source.slice(hideStart, hideEnd)).toContain('mountPrewarmGroup,');
+    expect(source).toContain("['mounts', mountPrewarmGroup],");
+  });
+
+  it('resumes the mount warm in the background lane on constrained devices too', () => {
+    // Same rationale as ability-primitives: cheap, one mount at a time, and a
+    // constrained device's weaker (or absent) parallel-compile support is
+    // exactly the hardware #2571 identified as having no other mitigation.
+    expect(CONSTRAINED_PREWARM_RESUME).toContain('vfx.mount-programs');
+    expect(CONSTRAINED_PREWARM_KEEP).not.toContain('vfx.mount-programs');
   });
 });
 

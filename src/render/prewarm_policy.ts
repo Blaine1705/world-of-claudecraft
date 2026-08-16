@@ -42,8 +42,16 @@ export const CONSTRAINED_PREWARM_KEEP: readonly string[] = [
  * minimal manifest skips is skipped for GPU-footprint reasons (the phone-class
  * per-process memory ceiling) and must stay skipped. An id here is by
  * construction NOT in CONSTRAINED_PREWARM_KEEP.
+ *
+ * vfx.mount-programs joins it for the same reason: its resumable units are
+ * cheap one-at-a-time GLB fetch + link passes, not a whole-manifest cost, and
+ * a constrained device's weaker (or absent) KHR_parallel_shader_compile
+ * support is exactly the hardware this entry protects (#2571).
  */
-export const CONSTRAINED_PREWARM_RESUME: readonly string[] = ['vfx.ability-primitives'];
+export const CONSTRAINED_PREWARM_RESUME: readonly string[] = [
+  'vfx.ability-primitives',
+  'vfx.mount-programs',
+];
 
 /** Whole-scene GPU submits that can synchronously link every visible program
  * when KHR_parallel_shader_compile is unavailable. They cannot be interrupted
