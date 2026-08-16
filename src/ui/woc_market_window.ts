@@ -40,6 +40,7 @@ import { svgIcon } from './ui_icons';
 import { verifiedWocBalance } from './wallet_balance';
 import { overWalletBalance } from './woc_affordable_core';
 import { anyBondAwaitingChain, shouldPollWocMarket } from './woc_market_poll_core';
+import { wocPaymentPendingText, wocSettlementFailText } from './woc_market_reason_text';
 import {
   buildWocMarketView,
   type WocMarketTab,
@@ -1153,7 +1154,14 @@ export class WocMarketWindow {
           s.state === 'offered' || s.state === 'failed'
             ? ` <span>${esc(t('hudChrome.wocMarket.activityDeadline', { duration: this.countdown(s.deadlineRemainingMs / 1000) }))}</span>`
             : '';
-        return `<li><span>${esc(this.usd(s.amountCents))}</span> <span>${esc(t(settlementKey(s.state)))}</span>${deadline}${pay}</li>`;
+        // WHY it failed, on failed rows only (wocSettlementFailText's contract
+        // explains the expired-row exclusion): the screened verdict is the
+        // difference between "try again" and "your transaction was wrong".
+        const failDetail =
+          s.state === 'failed' && s.failReason != null
+            ? ` <span>${esc(wocSettlementFailText(s.failReason) ?? '')}</span>`
+            : '';
+        return `<li><span>${esc(this.usd(s.amountCents))}</span> <span>${esc(t(settlementKey(s.state)))}</span>${failDetail}${deadline}${pay}</li>`;
       })
       .join('');
     const strikes =
@@ -1927,14 +1935,17 @@ export class WocMarketWindow {
         }
         // Three outcomes, not two. "Not standing" used to cover both being
         // outbid and the chain simply not having decided yet, which told a
-        // player their good payment had lost.
-        this.ok(
-          out.pending
-            ? 'hudChrome.wocMarket.bidBondConfirming'
-            : out.standing
+        // player their good payment had lost. A pending outcome now says
+        // WHICH pending (ledger-matched, nothing visible, service down).
+        if (out.pending) {
+          this.notice = { text: wocPaymentPendingText(out.reason), error: false };
+        } else {
+          this.ok(
+            out.standing
               ? 'hudChrome.wocMarket.bidPlacedStanding'
               : 'hudChrome.wocMarket.bidPlacedOutbid',
-        );
+          );
+        }
       } else {
         const out = await hooks.client.confirmSettlement(pending.settlementId, signature);
         if (!out.ok) {
@@ -1945,12 +1956,16 @@ export class WocMarketWindow {
         // arm answers its state on a recorded-signature retry, and toasting
         // "purchase complete" for money awaiting an operator verdict is the
         // custody lie the row label rule already bans. The row itself
-        // renders the same key.
-        this.ok(
-          out.state === 'review'
-            ? 'hudChrome.wocMarket.settlementReview'
-            : 'hudChrome.wocMarket.purchaseComplete',
-        );
+        // renders the same key. The same rule for a still-CONFIRMING answer:
+        // it used to toast "purchase complete" while the chain had not
+        // decided; it now says which pending it is.
+        if (out.state === 'review') {
+          this.ok('hudChrome.wocMarket.settlementReview');
+        } else if (out.state === 'confirming') {
+          this.notice = { text: wocPaymentPendingText(out.reason), error: false };
+        } else {
+          this.ok('hudChrome.wocMarket.purchaseComplete');
+        }
       }
       this.pendingQuote = null;
       await this.reload();

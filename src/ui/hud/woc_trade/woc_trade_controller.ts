@@ -46,6 +46,7 @@ import {
 import { svgIcon } from '../../ui_icons';
 import { unknownItemIconHtml } from '../../unknown_item_icon';
 import { verifiedWocBalance } from '../../wallet_balance';
+import { wocPaymentPendingText } from '../../woc_market_reason_text';
 import type { WocMarketHooks } from '../../woc_market_window';
 import { adoptedWocOffer, selectStandingWocOffer, wocOfferPollStep } from './woc_trade_offer_view';
 
@@ -230,6 +231,10 @@ export class WocTradeController {
       const est = await hooks.client.estimate(mine.usdCents);
       if (this.sim.tradeInfo?.otherName !== otherName) return;
       this.wocTradeOffer = adoptedWocOffer(mine, phase, est?.amount?.tokens ?? null);
+      // The split rides the same estimate: without this an ADOPTED offer (the
+      // window reopened mid-deal) showed tokens but blank Fee and You receive
+      // lines, because only the typing-time estimate ever stored one.
+      this.wocTradeSplit = est?.split ?? null;
       this.lastTradeSig = '';
     });
   }
@@ -452,9 +457,13 @@ export class WocTradeController {
       // that means delivery. A correct payment can come back still confirming
       // (finality takes tens of seconds), and announcing arrival then is the
       // same mistake in reverse as rejecting it: the poll finishes the deal when
-      // the chain does, and the pending face stays up until it has.
+      // the chain does, and the pending face stays up until it has. The interim
+      // line says WHICH pending the verdict was (ledger-matched, nothing
+      // visible yet, or the payment service down).
       if (!wocSettlementInFlight(done.state)) {
         this.log(t('hudChrome.trade.woc.settled'), '#7fdc4f');
+      } else {
+        this.log(wocPaymentPendingText(done.reason), '#ffd100');
       }
     } finally {
       this.wocTradePaying = false;

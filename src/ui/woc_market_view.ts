@@ -105,6 +105,9 @@ export interface WocSettlementView {
   state: string;
   quoteReference: string | null;
   quoteExpiresAtMs: number | null;
+  /** The screened verdict behind a failed payment (server vocabulary; an
+   *  unknown service word arrives as 'other'). Absent from an older server. */
+  failReason?: string | null;
   deadlineAtMs: number;
   createdAtMs: number;
 }

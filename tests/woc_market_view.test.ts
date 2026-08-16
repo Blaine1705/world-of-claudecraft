@@ -487,6 +487,21 @@ describe('activity mapping', () => {
     expect(a.settlements[1]?.quoteRemainingMs).toBeNull();
   });
 
+  it('passes the screened failReason through the settlement model untouched', () => {
+    // The painter renders the WHY line for a failed payment from this field;
+    // a model that drops it turns every failure back into a bare label.
+    const a = activityModel(
+      makeActivity({
+        settlements: [
+          makeSettlement({ id: 1, state: 'failed', failReason: 'burn_missing' }),
+          makeSettlement({ id: 2 }),
+        ],
+      }),
+    );
+    expect(a.settlements[0]?.failReason).toBe('burn_missing');
+    expect(a.settlements[1]?.failReason ?? null).toBeNull();
+  });
+
   it('defaults strikes to 0 with no strike record', () => {
     const a = activityModel(makeActivity({ strikes: null }));
     expect(a.strikes).toBe(0);

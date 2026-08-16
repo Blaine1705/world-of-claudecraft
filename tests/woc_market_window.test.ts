@@ -1286,3 +1286,30 @@ describe('woc_market_window: the open window re-asks the server on its own caden
     expect(poll, 'the poll mutates state only').not.toContain('this.render()');
   });
 });
+
+describe('woc_market_window: payment verdicts reach the player', () => {
+  it('renders the WHY line for failed settlement rows, from the screened vocabulary', () => {
+    const activity = between('private activityHtml(', 'private quoteHtml(');
+    // Failed rows only: an expired row keeps a chain-refused try's reason
+    // (the sweep COALESCEs it), and a mismatch line under "Expired unpaid"
+    // would accuse a buyer who simply walked away.
+    expect(activity).toContain("s.state === 'failed' && s.failReason != null");
+    expect(activity).toContain('wocSettlementFailText(s.failReason)');
+  });
+
+  it('answers a pending confirm with the reason-specific line on both legs', () => {
+    const sign = painter.slice(painter.indexOf('private async signPendingQuote('));
+    // Bond leg: the pending arm routes through the mapper, not a fixed key.
+    // Settlement leg: a still-confirming answer must never toast purchase
+    // complete (that is a delivery claim about money the chain has not
+    // decided); it takes the same mapper line.
+    expect(sign.match(/wocPaymentPendingText\(out\.reason\)/g)).toHaveLength(2);
+    expect(sign).toContain("out.state === 'confirming'");
+    // purchaseComplete stays reachable only on the ELSE arm after review and
+    // confirming are both handled.
+    const settlementArm = sign.slice(sign.indexOf("out.state === 'review'"));
+    expect(settlementArm.indexOf("out.state === 'confirming'")).toBeLessThan(
+      settlementArm.indexOf('purchaseComplete'),
+    );
+  });
+});

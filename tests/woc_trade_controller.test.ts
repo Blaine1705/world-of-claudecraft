@@ -442,6 +442,28 @@ describe('the standing-offer poll ($WOC hooks attached)', () => {
     ).toBeNull();
   });
 
+  it('the adoption estimate stores the fee split, not only the tokens', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+    const h = fakeHooks();
+    h.state.estimateImpl = () =>
+      Promise.resolve({
+        amount: { tokens: 800 },
+        split: { sellerCents: 90, burnCents: 3, treasuryCents: 7 },
+      });
+    h.state.offersResult = { ok: true, offers: [offerRow()] };
+    const r = rig(h.hooks);
+    openTrade(r);
+    await flushAsync();
+    r.controller.updateTradeWindow();
+    await flushAsync();
+    // No compose-time estimate ever ran here (nothing was typed): the split
+    // must ride the ADOPTION estimate, or a window reopened mid-deal shows
+    // blank Fee and You receive lines on the $WOC tab.
+    const c = r.controller as unknown as { wocTradeSplit: unknown };
+    expect(c.wocTradeSplit).toEqual({ sellerCents: 90, burnCents: 3, treasuryCents: 7 });
+  });
+
   it('a slower earlier estimate never clobbers a newer answer (last write wins)', async () => {
     vi.useFakeTimers();
     const h = fakeHooks();

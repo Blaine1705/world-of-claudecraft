@@ -116,6 +116,10 @@ export interface WocQuoteView {
   seller: WocQuoteLegView | null;
   burn: WocQuoteLegView | null;
   treasury: WocQuoteLegView | null;
+  /** The SERVICE-computed bond figure on a bond quote (null on settlements;
+   *  absent from an older server). Display only: the client never derives
+   *  money. */
+  bondCents?: number | null;
   expiresAtMs: number | null;
 }
 
@@ -143,6 +147,10 @@ export interface WocSettlementView {
   state: string;
   quoteReference: string | null;
   quoteExpiresAtMs: number | null;
+  /** Why a failed payment failed: the server's SCREENED verdict vocabulary
+   *  (an unknown service word arrives as the stable 'other'). Null while
+   *  nothing failed; absent from an older server. */
+  failReason?: string | null;
   deadlineAtMs: number;
   createdAtMs: number;
 }
@@ -435,12 +443,16 @@ export class WocMarketClient {
   async confirmBond(
     bidId: number,
     signature: string,
-  ): Promise<{ ok: true; standing: boolean; pending?: boolean } | WocMarketFail> {
-    const out = await this.request<{ standing: boolean; pending?: boolean }>(
-      'POST',
-      `/api/woc-market/bids/${bidId}/bond`,
-      { signature },
-    );
+  ): Promise<
+    { ok: true; standing: boolean; pending?: boolean; reason?: string | null } | WocMarketFail
+  > {
+    const out = await this.request<{
+      standing: boolean;
+      pending?: boolean;
+      /** Screened pending verdict: which pending this is (ledger-matched,
+       *  nothing visible yet, or the service was unreachable). */
+      reason?: string | null;
+    }>('POST', `/api/woc-market/bids/${bidId}/bond`, { signature });
     return out.ok ? { ok: true, ...out.data } : out;
   }
 
@@ -466,8 +478,8 @@ export class WocMarketClient {
   async confirmSettlement(
     id: number,
     signature: string,
-  ): Promise<{ ok: true; state: string } | WocMarketFail> {
-    const out = await this.request<{ state: string }>(
+  ): Promise<{ ok: true; state: string; reason?: string | null } | WocMarketFail> {
+    const out = await this.request<{ state: string; reason?: string | null }>(
       'POST',
       `/api/woc-market/settlements/${id}/confirm`,
       { signature },
