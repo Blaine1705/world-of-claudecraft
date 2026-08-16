@@ -16,6 +16,7 @@ import {
   abilityDurationValue,
   abilityOverTimeEffect,
   abilityTemporalHourglassValues,
+  auraBuffDisplayValue,
 } from './ability_damage';
 import { type AbilitySpecNoteField, tEntity, tEntityOptional } from './entity_i18n';
 import { formatNumber, type InterpolationValues, t } from './i18n';
@@ -62,13 +63,19 @@ export function abilityDescriptionField(
 // the primary hit, {overTime} ($o) a hybrid's dot/hot total, {buff} ($b) the
 // first buff's value, {duration} ($t) the first timed effect's duration. All are
 // rank- and talent-resolved, so the prose can never drift from what a cast does.
+// `auraOverride`'s `$b` comes from an already-APPLIED aura's own (kind, value)
+// instead of `res`: `res` is only ever resolved from the VIEWER's known
+// abilities (talents included), so on another player's buff it must not
+// override the real applied strength (e.g. Pact Deepened doubling Fiendhide's
+// armor for its owner, which must still read doubled on every other screen).
 export function abilityDisplayDescription(
   res: ResolvedAbility,
   damageText: string,
   scaling?: AbilityScaling,
+  auraOverride?: { kind: string; value: number },
   spec?: string | null,
 ): string {
-  const buff = abilityBuffValue(res);
+  const buff = auraOverride ? auraBuffDisplayValue(auraOverride) : abilityBuffValue(res);
   const duration = abilityDurationValue(res);
   const hourglass = abilityTemporalHourglassValues(res);
   // {rage} splices the RESOLVED gainResource total, so a talent that raises the
