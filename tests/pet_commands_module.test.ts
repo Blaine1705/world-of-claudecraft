@@ -573,6 +573,40 @@ describe('pet_commands module (P1b)', () => {
     expect(target.forcedTargetId).not.toBe(pet.id);
   });
 
+  it('manual hunter Growl does not seed combat, threat, cooldown, or pending against quest-gated eggs', () => {
+    const { sim, hid, hunter } = hunterWorld();
+    const tame = spawnWolf(sim, hunter);
+    completeTame(sim.ctx, hunter, tame);
+    const pet = petOf(sim.ctx, hid) as AnyEntity;
+    const egg = spawnBroodmotherEgg(sim, pet);
+    hunter.targetId = egg.id;
+
+    pet.pos = { ...egg.pos };
+    pet.prevPos = { ...pet.pos };
+    pet.petTauntTimer = 0;
+    pet.aggroTargetId = null;
+    pet.inCombat = false;
+    petTaunt(sim.ctx, hid);
+
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.inCombat).toBe(false);
+    expect(pet.petTauntTimer).toBe(0);
+    expect(pet.petManualTauntPending).toBe(false);
+    expect(egg.threat.has(pet.id)).toBe(false);
+    expect(egg.forcedTargetId).not.toBe(pet.id);
+
+    pet.pos = { x: egg.pos.x + 24, y: egg.pos.y, z: egg.pos.z };
+    pet.prevPos = { ...pet.pos };
+    petTaunt(sim.ctx, hid);
+
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.inCombat).toBe(false);
+    expect(pet.petTauntTimer).toBe(0);
+    expect(pet.petManualTauntPending).toBe(false);
+    expect(egg.threat.has(pet.id)).toBe(false);
+    expect(egg.forcedTargetId).not.toBe(pet.id);
+  });
+
   it('setPetAutoTaunt cannot arm auto-taunt on a ranged warlock pet', () => {
     const sim = new Sim({
       seed: 22,

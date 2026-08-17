@@ -7421,12 +7421,12 @@ export class Sim {
 
   // Taunt/Growl, classic semantics: never misses, lifts the caster's threat to
   // the top of the table, and forces the mob onto the caster for 3 seconds.
-  private applyTaunt(p: Entity, mob: Entity): void {
+  private applyTaunt(p: Entity, mob: Entity): boolean {
     // The one shared taunt entry (single-target, area, hunter/warlock pet growl,
     // necromancy undead): a quest-gated mob must stay untouchable in this direction
     // too, or an area taunt swept over a hidden Broodmother egg would still seed
     // threat/forcedTargetId and force it into combat with a non-quester.
-    if (questGateBlocksAggro(this.players, mob, p)) return;
+    if (questGateBlocksAggro(this.players, mob, p)) return false;
     const top = topThreatValue(mob);
     const mine = mob.threat.get(p.id) ?? 0;
     mob.threat.set(p.id, Math.max(mine, top, 1));
@@ -7436,11 +7436,11 @@ export class Sim {
     // aggroed it permanently and pinned the attacker in combat forever.
     if (MOBS[mob.templateId]?.ignoreTaunt || MOBS[mob.templateId]?.dummy) {
       this.enterCombat(p, mob);
-      return;
+      return true;
     }
     if (p.ownerId !== null && MOBS[mob.templateId]?.boss) {
       this.enterCombat(p, mob);
-      return;
+      return true;
     }
     mob.forcedTargetId = p.id;
     mob.forcedTargetTimer = TAUNT_FORCE_SECONDS;
@@ -7453,6 +7453,7 @@ export class Sim {
       mob.fleeReturnTimer = 0;
     }
     this.enterCombat(p, mob);
+    return true;
   }
 
   // -------------------------------------------------------------------------

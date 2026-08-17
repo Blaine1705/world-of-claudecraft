@@ -164,9 +164,10 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
         pet.petTauntTimer <= 0 &&
         (pet.petAutoTaunt || pet.petManualTauntPending)
       ) {
-        ctx.applyTaunt(pet, target);
-        pet.petManualTauntPending = false;
-        pet.petTauntTimer = PET_GROWL_INTERVAL;
+        if (ctx.applyTaunt(pet, target)) {
+          pet.petManualTauntPending = false;
+          pet.petTauntTimer = PET_GROWL_INTERVAL;
+        }
       }
       // Water Elemental: auto-cast Water Jet on cooldown when the owner armed its
       // autocast (right-click), the same idiom as the Growl autocast above. The jet

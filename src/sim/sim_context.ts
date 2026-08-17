@@ -535,7 +535,7 @@ export interface SimContextCallbacks {
   breakStealth(entity: Entity): void;
 
   // Shared entry point (stays on Sim, exposed here): taunt forces a mob's target.
-  applyTaunt(target: Entity, mob: Entity): void;
+  applyTaunt(target: Entity, mob: Entity): boolean;
 
   // P1 pet lifecycle.
   summonPet(owner: Entity, templateId: string): void;

@@ -687,7 +687,7 @@ export function petTaunt(ctx: SimContext, pid?: number): void {
     pet.petManualTauntPending = true;
     return;
   }
-  ctx.applyTaunt(pet, target);
+  if (!ctx.applyTaunt(pet, target)) return;
   pet.petManualTauntPending = false;
   pet.petTauntTimer = PET_GROWL_INTERVAL;
 }
