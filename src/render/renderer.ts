@@ -107,6 +107,7 @@ import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
 import { buildCastleFeatures, type CastleFeaturesView } from './castle_features';
 import { buildCelestialSprites, type CelestialSprites } from './celestial_sprites';
+import { buildCharacterEffectPrewarmGroup } from './character_effect_prewarm';
 import {
   type CharacterWeaponAura,
   characterRuneTintColor,
@@ -346,7 +347,11 @@ import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { stepLichHeartbeat } from './lich_audio_state_core';
 import { LightPulses } from './light_pulses';
-import { createPrewarmPacing, type PrewarmPacing } from './link_rate_budget';
+import {
+  createPrewarmPacing,
+  markPrewarmPacingReveal,
+  type PrewarmPacingHandle,
+} from './link_rate_budget';
 import { runLinkedProgramTouchLane } from './linked_program_touch_lane';
 import { renderLoadMeasure } from './load_marks';
 import {
@@ -618,6 +623,7 @@ import { nationColors } from './vale_cup_flags';
 import { ValeCupPracticeSky } from './vale_cup_practice_sky';
 import { buildValeCupStadium, type ValeCupStadiumView } from './vale_cup_stadium';
 import { buildValeCupTeamRings, type ValeCupTeamRingsView } from './vale_cup_team_ring';
+import { createVariantPrewarmSlot } from './variant_prewarm_slot';
 import { SCHOOL_COLORS, Vfx } from './vfx';
 import { createOffsetVfxAnchor, createVfxAnchor, type VfxAnchorPose } from './vfx_anchor';
 import {
@@ -1992,11 +1998,7 @@ export class Renderer {
   };
   private lastPrewarmStats: RendererPrewarmStats | null = null;
   private gpuHitchCompileLifecycle: PrewarmCompileLifecycle | null = null;
-  private gpuHitchPacing: {
-    controller: PrewarmPacing;
-    compileBatchRoots: number;
-    hardMaxMs: number;
-  } | null = null;
+  private gpuHitchPacing: PrewarmPacingHandle | null = null;
   private readonly renderDiagnostics = new RenderDiagnostics({
     counters: () => ({
       programs: this.webgl.info.programs?.length ?? 0,
@@ -4468,16 +4470,7 @@ export class Renderer {
   /** Diagnostic-only lifecycle boundary, called immediately before curtain fade. */
   markGpuHitchReveal(): void {
     this.gpuHitchCompileLifecycle?.markReveal();
-    this.gpuHitchPacing?.controller.markReveal();
-    if (this.lastPrewarmStats?.prewarmPacing && this.gpuHitchPacing) {
-      Object.assign(
-        this.lastPrewarmStats.prewarmPacing,
-        this.gpuHitchPacing.controller.receipt(
-          this.gpuHitchPacing.compileBatchRoots,
-          this.gpuHitchPacing.hardMaxMs,
-        ),
-      );
-    }
+    markPrewarmPacingReveal(this.gpuHitchPacing, this.lastPrewarmStats);
   }
 
   /** Overlay-gated hitch correlation: enabled by the ?perf monitor only. */
@@ -5859,7 +5852,20 @@ export class Renderer {
     let playerPrewarmInstances: CharacterVisual[] = [];
     let objectPrewarmGroup: THREE.Group | null = null;
     let propMaterialPrewarmGroup: THREE.Group | null = null;
-    let ghostVariantPrewarmGroup: THREE.Group | null = null;
+    const variantSlotHost = {
+      scene: this.scene,
+      compileColorPrograms: (group: THREE.Group) => this.compilePrewarmColorPrograms(group, false),
+    };
+    const ghostVariantSlot = createVariantPrewarmSlot(
+      variantSlotHost,
+      'ghost-fade-variants',
+      buildGhostVariantPrewarmGroup,
+    );
+    const characterEffectSlot = createVariantPrewarmSlot(
+      variantSlotHost,
+      'character-effect-variants',
+      buildCharacterEffectPrewarmGroup,
+    );
     let foliagePrewarmGroup: THREE.Group | null = null;
     let greatTreePrewarmGroup: THREE.Group | null = null;
     let weaponVfxPrewarmGroup: THREE.Group | null = null;
@@ -5959,7 +5965,8 @@ export class Renderer {
       ['npcs', npcPrewarmGroup],
       ['objects', objectPrewarmGroup],
       ['props', propMaterialPrewarmGroup],
-      ['ghost-fade-variants', ghostVariantPrewarmGroup],
+      ghostVariantSlot.staged(),
+      characterEffectSlot.staged(),
       ['foliage', foliagePrewarmGroup],
       ['great-tree', greatTreePrewarmGroup],
       ['weapon-vfx', weaponVfxPrewarmGroup],
@@ -6273,13 +6280,14 @@ export class Renderer {
         playerPrewarmGroup,
         objectPrewarmGroup,
         propMaterialPrewarmGroup,
-        ghostVariantPrewarmGroup,
         foliagePrewarmGroup,
         weaponVfxPrewarmGroup,
         landmarkPrewarmGroup,
       ]) {
         if (group) group.visible = false;
       }
+      ghostVariantSlot.hide();
+      characterEffectSlot.hide();
     };
 
     // Tear down every temp prewarm group staged so far. Shared by the main
@@ -6316,10 +6324,8 @@ export class Renderer {
         this.scene.remove(objectPrewarmGroup);
       }
       if (propMaterialPrewarmGroup) this.scene.remove(propMaterialPrewarmGroup);
-      // Removed, never disposed (same reason as the weapon-VFX group below):
-      // these twins hold the only reference keeping each ghost material's
-      // TRANSPARENT program linked once the live structures are still opaque.
-      if (ghostVariantPrewarmGroup) this.scene.remove(ghostVariantPrewarmGroup);
+      ghostVariantSlot.cleanup();
+      characterEffectSlot.cleanup();
       if (foliagePrewarmGroup) this.scene.remove(foliagePrewarmGroup);
       if (greatTreePrewarmGroup) this.scene.remove(greatTreePrewarmGroup);
       // Removed, never disposed: disposing a material releases its linked
@@ -6338,7 +6344,6 @@ export class Renderer {
       playerPrewarmGroup = null;
       objectPrewarmGroup = null;
       propMaterialPrewarmGroup = null;
-      ghostVariantPrewarmGroup = null;
       foliagePrewarmGroup = null;
       greatTreePrewarmGroup = null;
       weaponVfxPrewarmGroup = null;
@@ -6575,30 +6580,25 @@ export class Renderer {
         // Two bounded units: stage the twins, then link them. Both read the
         // live scene, so a resume after world entry still sees the same
         // hideables the entry pass would have.
-        resumeUnits: () => [
-          {
-            id: 'ghost-fade-variants:group',
-            run: () => {
-              ghostVariantPrewarmGroup = buildGhostVariantPrewarmGroup(this.scene);
-              setRenderCategory(ghostVariantPrewarmGroup, 'prewarm');
-              this.scene.add(ghostVariantPrewarmGroup);
-            },
-          },
-          {
-            id: 'ghost-fade-variants:compile',
-            run: async () => {
-              if (ghostVariantPrewarmGroup) {
-                await this.compilePrewarmColorPrograms(ghostVariantPrewarmGroup, false);
-              }
-            },
-          },
-        ],
-        run: () => {
-          ghostVariantPrewarmGroup = buildGhostVariantPrewarmGroup(this.scene);
-          setRenderCategory(ghostVariantPrewarmGroup, 'prewarm');
-          this.scene.add(ghostVariantPrewarmGroup);
-        },
-        detail: () => `objects=${ghostVariantPrewarmGroup?.children.length ?? 0}`,
+        resumeUnits: ghostVariantSlot.resumeUnits,
+        run: ghostVariantSlot.run,
+        detail: ghostVariantSlot.detail,
+      },
+      {
+        // The character effect treatments (ghost run, stealth, shadowform,
+        // moonkin) flip `transparent` on clones of the rig materials, so every
+        // rig material owns a second, transparent program (two for a
+        // double-sided one) that linked cold the first time a body faded in a
+        // crowd (production: 4.8 s on one link, then 115 to 130 ms per
+        // material). One hidden SkinnedMesh twin per distinct program, built
+        // through the same effect-material factory the live swap uses.
+        id: 'entities.character-effect-variants',
+        category: 'entities',
+        priority: 47,
+        required: false,
+        resumeUnits: characterEffectSlot.resumeUnits,
+        run: characterEffectSlot.run,
+        detail: characterEffectSlot.detail,
       },
       {
         // Compile every foliage shader (tree/rock/dressing species + far-tree

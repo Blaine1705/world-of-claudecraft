@@ -188,6 +188,31 @@ export interface PrewarmPacing {
   receipt(compileBatchRoots: number, hardMaxMs: number): PrewarmPacingReceipt;
 }
 
+/** The renderer's handle on the boot pacing lane: the controller plus the two
+ *  knobs its receipt is stamped with. */
+export interface PrewarmPacingHandle {
+  controller: PrewarmPacing;
+  compileBatchRoots: number;
+  hardMaxMs: number;
+}
+
+/** Curtain-fade boundary: mark the reveal on the lane and re-stamp the boot
+ *  receipt already published on the prewarm stats, so the post-reveal state
+ *  (window, backoffs, last settlement) reaches the capture. */
+export function markPrewarmPacingReveal(
+  pacing: PrewarmPacingHandle | null,
+  receiptSink: { prewarmPacing?: PrewarmPacingReceipt } | null | undefined,
+): void {
+  if (!pacing) return;
+  pacing.controller.markReveal();
+  if (receiptSink?.prewarmPacing) {
+    Object.assign(
+      receiptSink.prewarmPacing,
+      pacing.controller.receipt(pacing.compileBatchRoots, pacing.hardMaxMs),
+    );
+  }
+}
+
 export const ADAPTIVE_PREWARM_LINK_CONFIG: AdaptiveLinkBudgetConfig = {
   initialWindowLinks: 16,
   minWindowLinks: 8,

@@ -53,6 +53,13 @@ import {
   takeFarBakeBudget,
   tintedFarMaterials,
 } from './assets';
+import {
+  createGhostEffectMaterial,
+  createMoonkinEffectMaterial,
+  createShadowformEffectMaterial,
+  type GhostStyle,
+  ghostEffectOpacity,
+} from './effect_materials';
 import { farMeshShown, shadowProxyShown } from './far_lod_reveal_core';
 import { HairSwayDriver } from './hair_sway';
 import { buildHalo } from './halo';
@@ -268,16 +275,6 @@ const MIXER_DT_CAP = 0.3; // throttled entities never integrate a huge step
 const SPIN_RATE = 14;
 const SPIN_ATTACK_TIMESCALE = 1.6;
 const SPIN_ONCE_RATE = 18;
-const GHOST_OPACITY = 0.34;
-// Stealth (Duskveil/Smokestep) reads as a faded-but-solid silhouette, a touch
-// denser than the spirit run's 0.34 (owner: stealth was "too transparent").
-const STEALTH_OPACITY = 0.45;
-const SHADOWFORM_OPACITY = 0.9;
-const SHADOWFORM_TINT = new THREE.Color(0x5a2a8f);
-// Moonkin Form: a brighter, more luminous violet than the ghost run (owner's brief: a
-// purplish tint like ghost form but a bit brighter).
-const MOONKIN_OPACITY = 0.72;
-const MOONKIN_TINT = new THREE.Color(0x9d6bff);
 // Metamorphosis: a monstrous demon shell, deep fel-purple body with a hot glow
 // (the fire aura around it comes from vfx.formAura, not the material). Kept
 // dark enough that the body still shades and the flames read against it.
@@ -291,9 +288,7 @@ const FEROCITY_EMISSIVE = [0x2a0802, 0x4a0803, 0x6a0803] as const;
 const FEROCITY_EMISSIVE_STRENGTH = [0.08, 0.15, 0.23] as const;
 const ASCENSION_TINT = new THREE.Color(0xffe49a);
 
-/** Translucent-rig flavor: 'spirit' is the thin ghost run (released spirits,
- *  ghost wolf, the graveyard angel); 'stealth' is the denser Duskveil fade. */
-export type GhostStyle = 'spirit' | 'stealth';
+export type { GhostStyle } from './effect_materials';
 
 /** The live mixer facts the pure watchdog decides on (see anim_state.ts). */
 function readActionWeight(a: THREE.AnimationAction, into?: AnimActionWeight): AnimActionWeight {
@@ -481,9 +476,26 @@ export class CharacterVisual {
    *  mesh counts as absent: the articulated rig keeps drawing and the far
    *  mesh + shadow proxy stay hidden (far_lod_reveal_core). */
   private farCompilePending = false;
-  /** The compile gate the renderer installs; null (previews, tests, hosts
-   *  without one) reveals a fresh far bake immediately, as before the gate. */
+  /** The compile gate the renderer installs. ONE injected gate serves both
+   *  uses: a fresh far bake (below) and the transparent effect-clone swap
+   *  (stageEffectSwap). Null (previews, tests, hosts without one) keeps the
+   *  immediate behaviour both paths had before the gate. */
   private farBakeGate: FarBakeGate | null = null;
+  /** Effect clones (ghost / stealth / shadowform / moonkin) whose programs are
+   *  known linked: either a gate settle landed on them, or they were mounted
+   *  with no gate at all. A later toggle of an effect on the same source
+   *  materials swaps immediately, so a ghost run or a death treatment that
+   *  MUST show is never held back twice. */
+  private linkedEffectMaterials = new WeakSet<THREE.Material>();
+  /** The hidden scratch group staging effect clones that are still linking.
+   *  Never contains the rig's own meshes: the BODY IS NEVER HIDDEN, it keeps
+   *  drawing its current (already linked) materials until the swap commits. */
+  private effectSwapScratch: THREE.Group | null = null;
+  /** Set by the gate callback, consumed by update(): committing materials from
+   *  inside the callback can land between frames, and a swap that changes what
+   *  three counts for a frame belongs on the per-frame path (the
+   *  numPointLights hazard the far-bake mint reveal documents). */
+  private effectSwapSettled = false;
   /** The renderer's per-frame shadow-plan answer for the far shadow proxy,
    *  kept so a proxy that could not show yet (mint still linking) reveals on
    *  settle without waiting for the next plan write. */
@@ -827,6 +839,9 @@ export class CharacterVisual {
   /** `animate=false` skips mixer integration (distance throttling); state
    *  edges still latch so the pose catches up when the entity nears. */
   update(dt: number, s: AnimState, animate: boolean, reducedMotion = false): void {
+    // A transparent effect whose clones finished linking: swap them in HERE,
+    // on the per-frame path, never in the gate callback (see effectSwapSettled).
+    if (this.effectSwapSettled) this.commitPendingEffectSwap();
     // A far crossing that lost the bake-budget race retries here until its
     // part set gets a slot (or someone else bakes it, making the peek free).
     if (this.farBakePending && this.far && !this.farBakeTried) {
@@ -1596,6 +1611,9 @@ export class CharacterVisual {
     this.farBakeGate = gate;
     this.dropPendingFarMaterials();
     this.farCompilePending = false;
+    // Same reason as the far arm: a settle the old renderer generation dropped
+    // must not leave this visual waiting forever on an effect it already wears.
+    this.dropPendingEffectSwap();
   }
 
   /** Route a freshly minted far bake (mesh + shadow proxy) through the compile
@@ -1828,13 +1846,138 @@ export class CharacterVisual {
     this.applyVisualMaterials();
   }
 
-  private applyVisualMaterials(): void {
+  /** Mount the material set the current effect state asks for. This is the
+   *  synchronous half; applyVisualMaterials decides whether it runs now or
+   *  after a compile gate settles. */
+  private commitVisualMaterials(): void {
     for (const [mesh, original] of this.originalMaterials) {
       mesh.material = this.effectMaterial(original);
     }
     if (this.farMesh && this.farMaterials) {
       this.farMesh.material = this.effectMaterial(this.farMaterials);
     }
+  }
+
+  /**
+   * An overlay that flips `transparent` is a NEW program per rig material
+   * (three keys `opaque`), and swapping it onto a visible rig links it on the
+   * next draw: the 4808 ms `paladin_metallic` stall of the 2026-08-17 crowd
+   * capture. So the first time a given clone set is mounted, the rig keeps
+   * drawing its current materials and the clones compile hidden on a scratch
+   * mesh set, exactly the shape stageFarMaterials uses for a re-skin.
+   *
+   * The body is NEVER hidden by this: it is a deferred SWAP, not a gate on the
+   * entity. Stealth or a shapeshift tint reading a few frames late is the whole
+   * cost, and it is paid once per clone set: the second toggle is immediate.
+   */
+  private applyVisualMaterials(): void {
+    // A newer effect supersedes anything still linking (a stale settle must
+    // never commit over a state the visual has already left).
+    this.dropPendingEffectSwap();
+    const staged = this.collectUnlinkedEffectMaterials();
+    if (staged.length === 0) {
+      this.commitVisualMaterials();
+      return;
+    }
+    this.stageEffectSwap(staged);
+  }
+
+  /**
+   * The clone/geometry pairs this effect state would mount whose program is not
+   * known linked yet. Only clones that flip `transparent` qualify: every other
+   * overlay (ferocity, ascension, rune tint, aura glow) keeps the source's
+   * program cache key through cloneMaterialWithHooks, so it costs no link and
+   * must not be delayed. Empty without a gate, which keeps previews, tests and
+   * hosts with no async compile on the immediate path.
+   */
+  private collectUnlinkedEffectMaterials(): {
+    geometry: THREE.BufferGeometry;
+    material: THREE.Material;
+  }[] {
+    const staged: { geometry: THREE.BufferGeometry; material: THREE.Material }[] = [];
+    if (!this.farBakeGate) return staged;
+    const consider = (geometry: THREE.BufferGeometry | null, source: THREE.Material): void => {
+      if (!geometry) return;
+      const next = this.effectSingleMaterial(source);
+      if (next === source || next.transparent === source.transparent) return;
+      if (this.linkedEffectMaterials.has(next)) return;
+      staged.push({ geometry, material: next });
+    };
+    for (const [mesh, original] of this.originalMaterials) {
+      const geometry = mesh.geometry ?? null;
+      for (const source of Array.isArray(original) ? original : [original]) {
+        consider(geometry, source);
+      }
+    }
+    if (this.farMesh && this.farMaterials) {
+      const farMats = this.farMaterials;
+      for (const source of Array.isArray(farMats) ? farMats : [farMats]) {
+        consider(this.farMesh.geometry, source);
+      }
+    }
+    return staged;
+  }
+
+  /** Compile the staged clones hidden, on meshes carrying the same geometry and
+   *  skinning as the rig so three keys the same programs, and let update()
+   *  commit the swap once the gate settles. */
+  private stageEffectSwap(
+    staged: readonly { geometry: THREE.BufferGeometry; material: THREE.Material }[],
+  ): void {
+    const gate = this.farBakeGate;
+    if (!gate) {
+      this.commitVisualMaterials();
+      return;
+    }
+    const scratch = new THREE.Group();
+    scratch.name = 'character_effect_compile_scratch';
+    scratch.visible = false;
+    for (const entry of staged) {
+      const mesh = new THREE.SkinnedMesh(entry.geometry, entry.material);
+      mesh.visible = false;
+      mesh.frustumCulled = false;
+      scratch.add(mesh);
+    }
+    this.effectSwapScratch = scratch;
+    this.poseWrap.add(scratch);
+    try {
+      gate(scratch, () => {
+        if (this.disposed || this.effectSwapScratch !== scratch) return;
+        this.effectSwapSettled = true;
+      });
+    } catch (err) {
+      // A gate that rejects outright leaves the rig on its current, linked
+      // materials rather than throwing out of a material sweep; the next state
+      // change retries. Dev channel on purpose.
+      console.warn('character effect compile gate rejected', err);
+      this.dropPendingEffectSwap();
+    }
+  }
+
+  /** Take the settled clone set live, and remember it as linked so every later
+   *  toggle of that effect swaps immediately. */
+  private commitPendingEffectSwap(): void {
+    this.effectSwapSettled = false;
+    const scratch = this.effectSwapScratch;
+    if (!scratch) return;
+    for (const child of scratch.children) {
+      const mats = (child as THREE.Mesh).material;
+      for (const material of Array.isArray(mats) ? mats : [mats]) {
+        this.linkedEffectMaterials.add(material);
+      }
+    }
+    this.dropPendingEffectSwap();
+    this.commitVisualMaterials();
+  }
+
+  /** Detach a scratch set without disposing anything: its materials ARE the
+   *  live clones the effect caches own. */
+  private dropPendingEffectSwap(): void {
+    this.effectSwapSettled = false;
+    if (!this.effectSwapScratch) return;
+    this.effectSwapScratch.removeFromParent();
+    this.effectSwapScratch.clear();
+    this.effectSwapScratch = null;
   }
 
   /** Re-tint this visual for a new owner entity (pooled reuse across per-instance
@@ -2502,6 +2645,8 @@ export class CharacterVisual {
   }
 
   private disposeEffectMaterials(): void {
+    // The scratch set wears clones this sweep is about to dispose.
+    this.dropPendingEffectSwap();
     const materials = new Set<THREE.Material>([
       ...this.ghostMaterials.values(),
       ...this.soulRendMaterials.values(),
@@ -2633,6 +2778,7 @@ export class CharacterVisual {
     releaseTintedMaterials(this.tintedFarClaims);
     this.tintedFarClaims.clear();
     this.dropPendingFarMaterials();
+    this.dropPendingEffectSwap();
     this.mixer.stopAllAction();
     this.mixer.uncacheRoot(this.model);
     this.skeletonUpdates.dispose();
@@ -2802,7 +2948,7 @@ export class CharacterVisual {
   }
 
   private ghostMaterial(material: THREE.Material): THREE.Material {
-    const opacity = this.ghostStyle === 'stealth' ? STEALTH_OPACITY : GHOST_OPACITY;
+    const opacity = ghostEffectOpacity(this.ghostStyle);
     const cached = this.ghostMaterials.get(material);
     if (cached) {
       // one cache serves both flavors; rewrite the opacity on style flips
@@ -2810,14 +2956,7 @@ export class CharacterVisual {
       cached.opacity = opacity;
       return cached;
     }
-    const ghost = cloneMaterialWithHooks(material);
-    ghost.transparent = true;
-    ghost.opacity = opacity;
-    // depthWrite stays ON: with it off the whole rig depth-blends against
-    // itself, so back faces and far limbs shine through the chest - the x-ray
-    // the owner reported on Duskveil. Writing depth lets nearer faces occlude
-    // farther ones and the body reads as one uniformly faded silhouette.
-    ghost.depthWrite = true;
+    const ghost = createGhostEffectMaterial(material, this.ghostStyle);
     this.ghostMaterials.set(material, ghost);
     return ghost;
   }
@@ -2833,20 +2972,7 @@ export class CharacterVisual {
   private shadowformMaterial(material: THREE.Material): THREE.Material {
     const cached = this.shadowformMaterials.get(material);
     if (cached) return cached;
-    const marked = cloneMaterialWithHooks(material);
-    marked.transparent = true;
-    marked.opacity = SHADOWFORM_OPACITY;
-    marked.depthWrite = true;
-    const withColor = marked as THREE.Material & {
-      color?: THREE.Color;
-      emissive?: THREE.Color;
-      emissiveIntensity?: number;
-    };
-    if (withColor.color) withColor.color.copy(SHADOWFORM_TINT);
-    if (withColor.emissive) {
-      withColor.emissive.setHex(0x2a0a4a);
-      withColor.emissiveIntensity = Math.max(withColor.emissiveIntensity ?? 0, 0.4);
-    }
+    const marked = createShadowformEffectMaterial(material);
     this.shadowformMaterials.set(material, marked);
     return marked;
   }
@@ -2854,20 +2980,7 @@ export class CharacterVisual {
   private moonkinMaterial(material: THREE.Material): THREE.Material {
     const cached = this.moonkinMaterials.get(material);
     if (cached) return cached;
-    const marked = cloneMaterialWithHooks(material);
-    marked.transparent = true;
-    marked.opacity = MOONKIN_OPACITY;
-    marked.depthWrite = true;
-    const withColor = marked as THREE.Material & {
-      color?: THREE.Color;
-      emissive?: THREE.Color;
-      emissiveIntensity?: number;
-    };
-    if (withColor.color) withColor.color.copy(MOONKIN_TINT);
-    if (withColor.emissive) {
-      withColor.emissive.setHex(0x6a3fd0);
-      withColor.emissiveIntensity = Math.max(withColor.emissiveIntensity ?? 0, 0.55);
-    }
+    const marked = createMoonkinEffectMaterial(material);
     this.moonkinMaterials.set(material, marked);
     return marked;
   }

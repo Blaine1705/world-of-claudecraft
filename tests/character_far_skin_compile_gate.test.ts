@@ -154,28 +154,40 @@ describe('a far re-skin swaps in only once its programs are linked', () => {
 
     // The far mesh draws effectMaterial(farMaterials): with a ghost on, the
     // gated scratch must wear the overlay clones (a clone is another program
-    // key), not the raw set.
+    // key), not the raw set. setGhost now stages those clones behind the SAME
+    // injected gate (the character-effect swap, tests/
+    // character_effect_compile_gate.test.ts), so the far scratch is picked by
+    // name rather than by call index.
+    const farScratchCalls = () =>
+      gateCalls.filter((call) => call.target.name === 'character_far_skin_scratch');
     visual.setGhost(true);
+    expect(gateCalls[3].target.name).toBe('character_effect_compile_scratch');
     visual.setSkin(0);
-    const ghosted = gateCalls[3].target as THREE.Mesh;
-    const ghostMats = ghosted.material as THREE.MeshStandardMaterial[];
+    const ghostedCall = farScratchCalls()[farScratchCalls().length - 1];
+    const ghostMats = (ghostedCall.target as THREE.Mesh).material as THREE.MeshStandardMaterial[];
     expect(ghostMats[0].transparent).toBe(true);
-    gateCalls[3].settle();
-    expect((farMesh.material as THREE.MeshStandardMaterial[])[0].transparent).toBe(true);
+    ghostedCall.settle();
+    // The new set is committed, but the rig's MOUNT of the overlay waits on
+    // the effect gate, so the far mesh still draws the linked set it had.
+    expect(farMapName(farMesh)).toBe(altSkinUrl);
     visual.setGhost(false);
+    expect(farMapName(farMesh)).toBe(defaultMap);
 
     // Without a gate the rebuild lands immediately (the pre-gate behaviour,
     // and what previews get).
     visual.setFarBakeGate(null);
+    const ungatedCalls = gateCalls.length;
     visual.setSkin(1);
-    expect(gateCalls).toHaveLength(4);
+    expect(gateCalls).toHaveLength(ungatedCalls);
     expect(farMapName(farMesh)).toBe(altSkinUrl);
 
     // A dispose with a set still in flight releases that set's lease and
     // detaches its scratch.
     visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
     visual.setSkin(0);
-    const inFlight = gateCalls[4].target;
+    const inFlightCall = gateCalls[gateCalls.length - 1];
+    const inFlight = inFlightCall.target;
+    expect(inFlight.name).toBe('character_far_skin_scratch');
     expect(inFlight.parent).toBe(farWrap);
     released.mockClear();
     visual.dispose();
@@ -185,7 +197,7 @@ describe('a far re-skin swaps in only once its programs are linked', () => {
     expect(released).toHaveBeenCalledTimes(3);
     const releasedSets = released.mock.calls.map((call) => call[0]);
     expect(new Set(releasedSets).size).toBe(3);
-    gateCalls[4].settle();
+    inFlightCall.settle();
     expect(released).toHaveBeenCalledTimes(3);
     vi.doUnmock('../src/render/assets/loader');
     vi.resetModules();
