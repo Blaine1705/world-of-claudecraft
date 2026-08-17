@@ -9981,7 +9981,7 @@ export const cs_CZ: EnTranslations = {
       },
       "fear": {
         "name": "Děs",
-        "description": "Vžene nepříteli hrůzu a nechá ho krčit se až 8 s. Jakékoli poškození efekt přeruší."
+        "description": "Vžene nepříteli hrůzu a nechá ho krčit se až 5 s. Poškození v součtu 8 % maximálního zdraví cíle účinek přeruší."
       },
       "searing_pain": {
         "name": "Sežehnutí",
@@ -10227,7 +10227,7 @@ export const cs_CZ: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Na 12 s označí nepřítele a ukládá 20 % poškození způsobeného tebou a tvými nemrtvými. Seslej znovu pro odpálení. Pokud označený nepřítel zemře, vybuchne v okruhu 6 yardů a vytvoří 1 Úlomek duše."
+        "description": "Na 15 s označí nepřítele a ukládá 20 % poškození způsobeného tebou a tvými nemrtvými. Seslej znovu pro odpálení. Pokud označený nepřítel zemře, vybuchne v okruhu 6 yardů a vytvoří 1 Úlomek duše."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10611,7 +10611,7 @@ export const cs_CZ: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Děsivé zavytí",
-        "description": "Vyděsí blízké nepřátele až na 3 s. Poškození může účinek zrušit. (černokněžnický talent)"
+        "description": "Vyděsí blízké nepřátele až na 5 s. Poškození v součtu 8 % maximálního zdraví cíle přeruší jeho strach. (černokněžnický talent)"
       },
       "ice_block": {
         "name": "Ledová rakev",

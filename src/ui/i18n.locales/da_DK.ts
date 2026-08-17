@@ -4212,7 +4212,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Rustningsbrud',
   'entities.abilities.faerie_fire.name': 'Hekselys',
   'entities.abilities.fear.description':
-    'Slår rædsel i fjenden, så den kryber sammen i op til 8 sek. Enhver skade bryder effekten.',
+    'Slår rædsel i fjenden, så den kryber sammen i op til 5 sek. Skade svarende til 8% af målets maksimale helbred bryder effekten.',
   'entities.abilities.fear.name': 'Hjemsøg',
   'entities.abilities.ferocious_bite.name': 'Blodbid',
   'entities.abilities.fire_blast.description':
@@ -10883,7 +10883,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Genopretter 120 helbred hos et allieret mål over 12 sek. (shamantalent)',
   'entities.abilities.howl_of_terror.description':
-    'Skræmmer fjender i nærheden i op til 3 sek. Skade kan bryde effekten. (troldmandstalent)',
+    'Skræmmer fjender i nærheden i op til 5 sek. Skade svarende til 8% af målets maksimale helbred bryder deres frygt. (troldmandstalent)',
   'entities.abilities.ice_block.description':
     'Indkapsler jer i fast is i 8 sek. og gør jer immune over for al skade. Fjerner eksisterende almindelige skadelige effekter og forhindrer, at nye almindelige kontroleffekter bliver påført. Kan bruges, mens I er bedøvede eller forvandlede. I kan ikke handle, mens I er indkapslet. Kast igen for at annullere. (magiker)',
   'entities.abilities.inner_focus.description': 'Gør jeres næste præstebesværgelse gratis og umulig at afbryde. Varer 60 sek.',
@@ -12709,7 +12709,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Gennemborer fjenden for {damage} Skyggeskade og genererer 5 Fordømmelse, hvis den bærer dit Evil Eye. Hvert træf på dit primære Evil Eye tilføjer en Skæbnetråd i 12 sek., op til 3. Findes intet Evil Eye, mærker Needle of Fate først sit mål.',
   'entities.abilities.needle_of_fate.name': 'Needle of Fate',
   'entities.abilities.ossuary_mark.description':
-    'Mærker en fjende i 12 sek. og opbevarer 20% af skaden, du og dine udøde gør. Kast igen for at detonere det. Hvis det mærkede mål dør, eksploderer det inden for 6 m og skaber 1 Sjælesplint.',
+    'Mærker en fjende i 15 sek. og opbevarer 20% af skaden, du og dine udøde gør. Kast igen for at detonere det. Hvis det mærkede mål dør, eksploderer det inden for 6 yards og skaber 1 Sjælesplint.',
   'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
   'entities.abilities.possess_evil_eye.description':
     'Maledictor besætter dit primære Evil Eye i 15 sek. og genererer 35 Fordømmelse. Needle of Fate kastes på 1 sek. og genererer 2 ekstra Fordømmelse, Fortær kan kanaliseres, mens du bevæger dig, og Sentence gør 25% mere skade og udløser et forsinket ekko for 60% skade, aftagende til 30% hen over niveau 17 til 20.',

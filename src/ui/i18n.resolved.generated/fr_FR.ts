@@ -9981,7 +9981,7 @@ export const fr_FR: EnTranslations = {
       },
       "fear": {
         "name": "Tourment",
-        "description": "Terrifie l'ennemi et le laisse tremblant pendant un maximum de 8 s. Tout dégât interrompt l'effet."
+        "description": "Terrifie l'ennemi et le laisse tremblant pendant un maximum de 5 s. Les dégâts cumulés équivalant à 8% du maximum de points de vie de la cible interrompent l'effet."
       },
       "searing_pain": {
         "name": "Cautérisation",
@@ -10227,7 +10227,7 @@ export const fr_FR: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Marque de l'ossuaire",
-        "description": "Marque un ennemi pendant 12 s, stockant 20% des dégâts infligés par vous et vos morts-vivants. Relancez pour la faire détoner. Si l'ennemi marqué meurt, elle explose dans un rayon de 6 m et crée 1 Fragment d'âme."
+        "description": "Marque un ennemi pendant 15 s, stockant 20% des dégâts infligés par vous et vos morts-vivants. Relancez pour la faire détoner. Si l'ennemi marqué meurt, elle explose dans un rayon de 6 mètres et crée 1 Fragment d'âme."
       },
       "unholy_command": {
         "name": "Commandement impie",
@@ -10611,7 +10611,7 @@ export const fr_FR: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Hurlement d’effroi",
-        "description": "Effraie les ennemis proches pendant un maximum de 3 s. Les dégâts peuvent interrompre l'effet. (talent de Démoniste)"
+        "description": "Effraie les ennemis proches pendant un maximum de 5 s. Les dégâts cumulés équivalant à 8% du maximum de points de vie d'une cible interrompent sa peur. (talent de Démoniste)"
       },
       "ice_block": {
         "name": "Cercueil froid",

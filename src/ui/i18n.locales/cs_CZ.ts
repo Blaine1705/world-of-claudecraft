@@ -6656,7 +6656,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Průraz zbroje',
   'entities.abilities.faerie_fire.name': 'Čarodějné světlo',
   'entities.abilities.fear.description':
-    'Vžene nepříteli hrůzu a nechá ho krčit se až 8 s. Jakékoli poškození efekt přeruší.',
+    'Vžene nepříteli hrůzu a nechá ho krčit se až 5 s. Poškození v součtu 8 % maximálního zdraví cíle účinek přeruší.',
   'entities.abilities.fear.name': 'Děs',
   'entities.abilities.ferocious_bite.name': 'Krvavý skus',
   'entities.abilities.fire_blast.description':
@@ -7312,7 +7312,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Během 12 s obnoví spojeneckému cíli 120 bodů zdraví. (šamanský talent)',
   'entities.abilities.howl_of_terror.description':
-    'Vyděsí blízké nepřátele až na 3 s. Poškození může účinek zrušit. (černokněžnický talent)',
+    'Vyděsí blízké nepřátele až na 5 s. Poškození v součtu 8 % maximálního zdraví cíle přeruší jeho strach. (černokněžnický talent)',
   'entities.abilities.ice_block.description':
     'Uzavře tě na 8 s do pevného ledu a učiní tě imunním vůči veškerému poškození. Odstraní již aktivní běžné škodlivé efekty a zabrání aplikaci nových běžných ovládacích efektů. Lze použít při omráčení nebo proměnění. Během uvěznění nemůžeš jednat. Opětovným sesláním efekt zrušíš. (mág)',
   'entities.abilities.inner_focus.description': 'Tvé další kouzlo kněze bude zdarma a nepřerušitelné. Trvá 60 s.',
@@ -12671,7 +12671,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Probodne nepřítele za {damage} stínového poškození a vygeneruje 5 Odsouzení, pokud nese tvé Evil Eye. Každý zásah tvého primárního Evil Eye přidá na 12 s Nit osudu, až do 3. Pokud neexistuje žádné Evil Eye, Needle nejprve označí svůj cíl.',
   'entities.abilities.needle_of_fate.name': 'Needle of Fate',
   'entities.abilities.ossuary_mark.description':
-    'Na 12 s označí nepřítele a ukládá 20 % poškození způsobeného tebou a tvými nemrtvými. Seslej znovu pro odpálení. Pokud označený nepřítel zemře, vybuchne v okruhu 6 yardů a vytvoří 1 Úlomek duše.',
+    'Na 15 s označí nepřítele a ukládá 20 % poškození způsobeného tebou a tvými nemrtvými. Seslej znovu pro odpálení. Pokud označený nepřítel zemře, vybuchne v okruhu 6 yardů a vytvoří 1 Úlomek duše.',
   'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
   'entities.abilities.possess_evil_eye.description':
     'Maledictor posedne tvé primární Evil Eye na 15 s a vygeneruje 35 Odsouzení. Needle of Fate se sešle za 1 s a vygeneruje 2 Odsouzení navíc, Vysát lze kanálovat za pohybu a Sentence způsobí o 25 % více poškození a uvolní opožděnou ozvěnu za 60 % poškození, která na úrovních 17-20 klesá na 30 %.',

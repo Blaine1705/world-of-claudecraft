@@ -9981,7 +9981,7 @@ export const it_IT: EnTranslations = {
       },
       "fear": {
         "name": "Tormento",
-        "description": "Terrorizza il nemico, lasciandolo tremante per un massimo di 8 s. Qualsiasi danno interrompe l'effetto."
+        "description": "Terrorizza il nemico, lasciandolo tremante per un massimo di 5 s. I danni pari in totale all'8% della salute massima del bersaglio interrompono l'effetto."
       },
       "searing_pain": {
         "name": "Bruciatura",
@@ -10227,7 +10227,7 @@ export const it_IT: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Marchia un nemico per 12 sec, accumulando il 20% dei danni inflitti da te e dai tuoi non morti. Rilancia per farlo detonare. Se il nemico marchiato muore, esplode entro 6 metri e crea 1 Frammento d'Anima."
+        "description": "Marchia un nemico per 15 sec, accumulando il 20% dei danni inflitti da te e dai tuoi non morti. Rilancia per farlo detonare. Se il nemico marchiato muore, esplode entro 6 metri e crea 1 Frammento d'Anima."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10611,7 +10611,7 @@ export const it_IT: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Ululato del Terrore",
-        "description": "Terrorizza i nemici vicini per un massimo di 3 sec. I danni possono interrompere l’effetto. (talento dello Stregone)"
+        "description": "Terrorizza i nemici vicini per un massimo di 5 sec. I danni pari in totale all'8% della salute massima del bersaglio interrompono la sua paura. (talento dello Stregone)"
       },
       "ice_block": {
         "name": "Bara Fredda",

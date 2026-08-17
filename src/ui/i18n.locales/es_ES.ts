@@ -427,7 +427,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.specNote_feral':
     'Cada golpe que conecta añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Quiebramédula: un golpe de 78 a 96 de daño con mucha amenaza; por debajo de la mitad de salud, en su lugar te protege con un escudo equivalente al 18% de tu salud máxima y te devuelve 15 de ira.',
   'entities.abilities.ossuary_mark.description':
-    'Marca a un enemigo durante 12 s, almacenando el 20% del daño que tú y tus no muertos infligís. Vuelve a lanzarla para detonarla. Si el enemigo marcado muere, explota en un radio de 6 m y crea 1 Fragmento de alma.',
+    'Marca a un enemigo durante 15 s, almacenando el 20% del daño que tú y tus no muertos infligís. Vuelve a lanzarla para detonarla. Si el enemigo marcado muere, explota en un radio de 6 yardas y crea 1 Fragmento de alma.',
   'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
   'entities.abilities.rake.specNote_feral':
     'Cada golpe que conecta añade 1 de Sangre Antigua (máx. 3).',

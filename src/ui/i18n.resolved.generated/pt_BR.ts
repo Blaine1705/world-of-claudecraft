@@ -9981,7 +9981,7 @@ export const pt_BR: EnTranslations = {
       },
       "fear": {
         "name": "Atormentar",
-        "description": "Aterroriza o inimigo, deixando-o acuado por até 8 s. Qualquer dano quebra o efeito."
+        "description": "Aterroriza o inimigo, deixando-o acuado por até 5 s. Dano acumulado equivalente a 8% da vida máxima do alvo quebra o efeito."
       },
       "searing_pain": {
         "name": "Cauterizar",
@@ -10227,7 +10227,7 @@ export const pt_BR: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Marca um inimigo por 12 s, armazenando 20% do dano causado por você e seus mortos-vivos. Lance novamente para detoná-la. Se o inimigo marcado morrer, ela explode num raio de 6 m e cria 1 Fragmento de Alma."
+        "description": "Marca um inimigo por 15 s, armazenando 20% do dano causado por você e seus mortos-vivos. Lance novamente para detoná-la. Se o inimigo marcado morrer, ela explode num raio de 6 jardas e cria 1 Fragmento de Alma."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10611,7 +10611,7 @@ export const pt_BR: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Uivo de Terror",
-        "description": "Amedronta os inimigos próximos por até 3 s. O dano pode interromper o efeito. (talento de Bruxo)"
+        "description": "Amedronta os inimigos próximos por até 5 s. Dano acumulado equivalente a 8% da vida máxima de um alvo quebra seu medo. (talento de Bruxo)"
       },
       "ice_block": {
         "name": "Caixão Frio",

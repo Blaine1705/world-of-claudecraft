@@ -4468,7 +4468,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Pantserbres',
   'entities.abilities.faerie_fire.name': 'Heksenlicht',
   'entities.abilities.fear.description':
-    'Jaagt de vijand de stuipen op het lijf, waardoor het maximaal 8 sec ineenkrimpt. Elke schade verbreekt het effect.',
+    'Jaagt de vijand de stuipen op het lijf, waardoor die maximaal 5 sec ineenkrimpt. Schade ter waarde van in totaal 8% van de maximale gezondheid van het doelwit verbreekt het effect.',
   'entities.abilities.fear.name': 'Teisteren',
   'entities.abilities.ferocious_bite.name': 'Bloedbeet',
   'entities.abilities.fire_blast.description':
@@ -10968,7 +10968,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Herstelt 120 gezondheid van een bevriend doelwit gedurende 12 sec. (sjamaantalent)',
   'entities.abilities.howl_of_terror.description':
-    'Jaagt nabije vijanden tot 3 sec. angst aan. Schade kan het effect verbreken. (tovenaarstalent)',
+    'Jaagt nabije vijanden tot 5 sec. angst aan. Schade ter waarde van in totaal 8% van de maximale gezondheid van een doelwit verbreekt de angst. (tovenaarstalent)',
   'entities.abilities.ice_block.description':
     'Sluit u 8 sec. lang op in massief ijs en maakt u immuun voor alle schade. Verwijdert bestaande gewone schadelijke effecten en voorkomt dat nieuwe gewone controle-effecten worden toegepast. Kan worden gebruikt terwijl u verdoofd of veranderd bent. U kunt niet handelen zolang u opgesloten bent. Werp opnieuw om te annuleren. (magiër)',
   'entities.abilities.inner_focus.description': 'Maakt uw volgende priesterspreuk gratis en niet te onderbreken. Duurt 60 sec.',
@@ -12858,7 +12858,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Doorboort de vijand voor {damage} Schaduwschade en genereert 5 Verdoemenis als het je Evil Eye draagt. Elke treffer op je primaire Evil Eye voegt een Lotsdraad toe voor 12 sec, tot 3. Als er geen Evil Eye bestaat, markeert de Needle eerst zijn doelwit.',
   'entities.abilities.needle_of_fate.name': 'Needle of Fate',
   'entities.abilities.ossuary_mark.description':
-    'Markeert een vijand gedurende 12 sec, en slaat 20% van de schade op die jij en je ondoden toebrengen. Werp opnieuw om het te laten ontploffen. Als de gemarkeerde vijand sterft, ontploft het binnen 6 m en creëert 1 Zielfragment.',
+    'Markeert een vijand gedurende 15 sec, en slaat 20% van de schade op die jij en je ondoden toebrengen. Werp opnieuw om het te laten ontploffen. Als de gemarkeerde vijand sterft, ontploft het binnen 6 yards en creëert 1 Zielfragment.',
   'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
   'entities.abilities.possess_evil_eye.description':
     'De Maledictor bezit je primaire Evil Eye gedurende 15 sec en genereert 35 Verdoemenis. Needle of Fate wordt in 1 sec gespreukt en genereert 2 extra Verdoemenis, Verteren kan worden gekanaliseerd terwijl je beweegt, en Sentence brengt 25% meer schade toe en laat een vertraagde echo los voor 60% schade, aflopend tot 30% over de niveaus 17-20.',

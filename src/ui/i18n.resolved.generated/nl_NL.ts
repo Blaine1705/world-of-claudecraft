@@ -9981,7 +9981,7 @@ export const nl_NL: EnTranslations = {
       },
       "fear": {
         "name": "Teisteren",
-        "description": "Jaagt de vijand de stuipen op het lijf, waardoor het maximaal 8 sec ineenkrimpt. Elke schade verbreekt het effect."
+        "description": "Jaagt de vijand de stuipen op het lijf, waardoor die maximaal 5 sec ineenkrimpt. Schade ter waarde van in totaal 8% van de maximale gezondheid van het doelwit verbreekt het effect."
       },
       "searing_pain": {
         "name": "Schroeien",
@@ -10227,7 +10227,7 @@ export const nl_NL: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Markeert een vijand gedurende 12 sec, en slaat 20% van de schade op die jij en je ondoden toebrengen. Werp opnieuw om het te laten ontploffen. Als de gemarkeerde vijand sterft, ontploft het binnen 6 m en creëert 1 Zielfragment."
+        "description": "Markeert een vijand gedurende 15 sec, en slaat 20% van de schade op die jij en je ondoden toebrengen. Werp opnieuw om het te laten ontploffen. Als de gemarkeerde vijand sterft, ontploft het binnen 6 yards en creëert 1 Zielfragment."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10611,7 +10611,7 @@ export const nl_NL: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Huiveringwekkende huil",
-        "description": "Jaagt nabije vijanden tot 3 sec. angst aan. Schade kan het effect verbreken. (tovenaarstalent)"
+        "description": "Jaagt nabije vijanden tot 5 sec. angst aan. Schade ter waarde van in totaal 8% van de maximale gezondheid van een doelwit verbreekt de angst. (tovenaarstalent)"
       },
       "ice_block": {
         "name": "Koude kist",

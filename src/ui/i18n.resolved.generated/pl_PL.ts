@@ -9981,7 +9981,7 @@ export const pl_PL: EnTranslations = {
       },
       "fear": {
         "name": "Trwoga",
-        "description": "Wzbudza w przeciwniku przerażenie, zmuszając go do kulenia się przez nawet 8 sek. Każde obrażenie przerywa efekt."
+        "description": "Wzbudza w przeciwniku przerażenie, zmuszając go do kulenia się przez maksymalnie 5 sek. Obrażenia równe łącznie 8% maksymalnego zdrowia celu przerywają efekt."
       },
       "searing_pain": {
         "name": "Przypalenie",
@@ -10227,7 +10227,7 @@ export const pl_PL: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Oznacza wroga na 12 sekund, gromadząc 20% obrażeń zadanych przez ciebie i twoich nieumarłych. Rzuć ponownie, aby zdetonować znak. Jeśli oznaczony wróg umrze, znak eksploduje w promieniu 6 m i tworzy 1 Odłamek Duszy."
+        "description": "Oznacza wroga na 15 sekund, gromadząc 20% obrażeń zadanych przez ciebie i twoich nieumarłych. Rzuć ponownie, aby zdetonować znak. Jeśli oznaczony wróg umrze, znak eksploduje w promieniu 6 jardów i tworzy 1 Odłamek Duszy."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10611,7 +10611,7 @@ export const pl_PL: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Wycie Grozy",
-        "description": "Przeraża pobliskich wrogów na maksymalnie 3 sek. Obrażenia mogą przerwać efekt. (talent Czarnoksiężnika)"
+        "description": "Przeraża pobliskich wrogów na maksymalnie 5 sek. Obrażenia równe łącznie 8% maksymalnego zdrowia celu przerywają jego strach. (talent Czarnoksiężnika)"
       },
       "ice_block": {
         "name": "Zimna Trumna",

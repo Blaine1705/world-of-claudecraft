@@ -6328,7 +6328,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.drain_life.description': "Consume la vitalité de la cible, infligeant {damage} points de dégâts d'Ombre chaque seconde et vous en transférant 70% sous forme de vie. Affliction en transfère la totalité à la place. Canalisé sur votre Mauvais œil principal, il consomme tous les Fils du destin au départ, et chaque Fil génère 1 Condamnation supplémentaire par tic.",
   'entities.abilities.fear.name': 'Tourment',
   'entities.abilities.fear.description':
-    "Terrifie l'ennemi et le laisse tremblant pendant un maximum de 8 s. Tout dégât interrompt l'effet.",
+    "Terrifie l'ennemi et le laisse tremblant pendant un maximum de 5 s. Les dégâts cumulés équivalant à 8% du maximum de points de vie de la cible interrompent l'effet.",
   'entities.abilities.searing_pain.name': 'Cautérisation',
   'entities.abilities.searing_pain.description':
     "Brûle l'ennemi d'un feu atroce pour {damage} points de dégâts de Feu. Incantation rapide.",
@@ -11449,7 +11449,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Rend 120 points de vie à une cible alliée en 12 s. (talent de Chaman)',
   'entities.abilities.howl_of_terror.description':
-    "Effraie les ennemis proches pendant un maximum de 3 s. Les dégâts peuvent interrompre l'effet. (talent de Démoniste)",
+    "Effraie les ennemis proches pendant un maximum de 5 s. Les dégâts cumulés équivalant à 8% du maximum de points de vie d'une cible interrompent sa peur. (talent de Démoniste)",
   'entities.abilities.ice_block.description':
     'Vous enferme dans la glace pendant 8 s, vous immunisant contre tous les dégâts. Supprime les effets néfastes ordinaires déjà actifs et empêche les nouveaux effets de contrôle ordinaires. Utilisable lorsque vous êtes étourdi ou métamorphosé. Vous ne pouvez pas agir pendant cet effet. Relancez la capacité pour l’annuler. (Mage)',
   'entities.abilities.inner_focus.description': 'Rend votre prochain sort de prêtre gratuit et ininterruptible. Dure 60 s.',
@@ -12980,7 +12980,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonfire.specNote_balance': 'Entretenez le feu : Graine lunaire le prolonge de 6 s.',
   'entities.abilities.needle_of_fate.description': "Transperce l'ennemi pour {damage} points de dégâts d'Ombre et génère 5 Condamnation s'il porte votre Mauvais œil. Chaque coup sur votre Mauvais œil principal ajoute un Fil du destin pendant 12 s, jusqu'à 3. Si aucun Mauvais œil n'existe, l'Aiguille marque d'abord sa cible.",
   'entities.abilities.needle_of_fate.name': 'Aiguille du destin',
-  'entities.abilities.ossuary_mark.description': "Marque un ennemi pendant 12 s, stockant 20% des dégâts infligés par vous et vos morts-vivants. Relancez pour la faire détoner. Si l'ennemi marqué meurt, elle explose dans un rayon de 6 m et crée 1 Fragment d'âme.",
+  'entities.abilities.ossuary_mark.description': "Marque un ennemi pendant 15 s, stockant 20% des dégâts infligés par vous et vos morts-vivants. Relancez pour la faire détoner. Si l'ennemi marqué meurt, elle explose dans un rayon de 6 mètres et crée 1 Fragment d'âme.",
   'entities.abilities.ossuary_mark.name': "Marque de l'ossuaire",
   'entities.abilities.possess_evil_eye.description': "Le Maudisseur possède votre Mauvais œil principal pendant 15 s et génère 35 Condamnation. Aiguille du destin s'incante en 1 s et génère 2 Condamnation supplémentaire, Consumer peut être canalisé en mouvement, et Sentence inflige 25% de dégâts en plus et libère un écho différé pour 60% de dégâts, dégressif jusqu'à 30% entre les niveaux 17 et 20.",
   'entities.abilities.possess_evil_eye.name': 'Posséder le Mauvais œil',
