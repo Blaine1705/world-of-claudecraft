@@ -212,7 +212,7 @@ interface AttributionTargetFixture {
 // resolved renderer bytes combine the delve tracker extraction with later
 // wrapper fixes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '650e09440090f2367a5e326c81da9725645f77e78f138018573cef7faa2beb2d';
+  '6f80a3f324beb9bd04db23aeb69bd860d2270628e8a26272bf57fdebaf6c3eb4';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

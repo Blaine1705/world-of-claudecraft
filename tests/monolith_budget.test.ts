@@ -117,10 +117,11 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again by the castle branch's interior_light_rig.ts extraction;
     // after merging main the merged file lands below both prior pins, so the
     // ceiling is the exact merged count.
-    // Merging approved PR #3425 into the moved-base v0.39 wrapper keeps the
-    // delve tracker extraction while preserving the wrapper's later renderer
-    // wiring, so the ceiling is the exact resolved count.
-    ceiling: 13729,
+    // Merging approved PRs #3425 and #3447 into the moved-base v0.39 wrapper
+    // keeps the delve tracker and mount prewarm extractions while preserving
+    // the wrapper's later renderer wiring, so the ceiling is the exact
+    // resolved count.
+    ceiling: 13744,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
