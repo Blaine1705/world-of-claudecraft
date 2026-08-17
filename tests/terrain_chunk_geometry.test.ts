@@ -140,8 +140,12 @@ describe('generated chunk geometry is stable', () => {
     // applyValeCoast (the low beach shelf under the grey cliff foot submerged
     // so the bay water meets the cliff; its window x -211.5..-132.5,
     // z 116.5..145.5 straddles the rect edge into the island's cell, where it
-    // composes with the island appliers). Digest stable across two runs.
-    expect(digestOf(inRect)).toBe('b9545eede4635f3a131d625ccde8cf9a');
+    // composes with the island appliers). Re-minted once more on the
+    // release/v0.39.0 castles merge, whose vale terrain edits (the
+    // walk-in castle grounds era; the release's own terrain-height fixture
+    // moved in the same merge) reshape these chunks again on the merged
+    // tree. Digest stable across two runs.
+    expect(digestOf(inRect)).toBe('1f26294da5b10f2dcf8bbce9572f6e4f');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.

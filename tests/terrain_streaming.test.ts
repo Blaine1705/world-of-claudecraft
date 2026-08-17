@@ -384,9 +384,12 @@ describe('chunk-level ground residency', () => {
 
     expect(isPending(hubCx, hubCz)).toBe(false);
     // Exactly this zone's OWNED cells settled, and nothing outside them: the
-    // 36 in-rect cells plus the 21 gap cells nearest-rect ownership assigns
-    // the Vale (see the gap-fill notes in terrain.ts).
-    expect(before - pendingCount()).toBe(57);
+    // Vale's 36 in-rect cells. The 21 western gap cells its nearest-rect
+    // ownership used to absorb belong to the Proving Shore now: the tutorial
+    // island's zone rectangle (x -540..-180, z -180..180) tiles the west
+    // column outright, so those cells build with the island, not the Vale
+    // (see the gap-fill notes in terrain.ts).
+    expect(before - pendingCount()).toBe(36);
     terrain.cancelStreaming();
   });
 
@@ -459,22 +462,26 @@ describe('terrain covers the whole world, gaps between zone rectangles included'
       return x >= box.min.x && x <= box.max.x && z >= box.min.z && z <= box.max.z;
     });
 
-  it('meshes the walkable ground at (-195, 161), in the gap west of Eastbrook Vale', async () => {
+  it('meshes the ground at (-195, 161), west of Eastbrook Vale on the island strait', async () => {
     vi.resetModules();
     mockEmptyAssetLoads();
     const { buildTerrain } = await import('../src/render/terrain');
     const { ZONES } = await import('../src/sim/data');
     const { terrainHeight, WATER_LEVEL } = await import('../src/sim/world');
 
-    // Pin the premise on the shipped world seed: this really is dry land, not
-    // seabed under the water plane, so a missing chunk here is ground the
-    // player walks onto and falls through.
-    expect(terrainHeight(-195, 161, WORLD_SEED)).toBeGreaterThan(WATER_LEVEL);
+    // This column was a no-zone gap (dry walkable ground) before the Proving
+    // Shore: the tutorial island's zone rectangle now tiles it, and its coast
+    // recipe turns the spot into the open strait between the island and the
+    // vale. Pin the premise on the shipped world seed: honest seabed BELOW
+    // the water plane, which still needs a meshed chunk under it or a
+    // swimming player sees a hole where the sea floor should be.
+    expect(terrainHeight(-195, 161, WORLD_SEED)).toBeLessThan(WATER_LEVEL);
 
     const terrain = buildTerrain(WORLD_SEED);
-    // The two realms the gap abuts, which is what the renderer's streaming
-    // horizon prepares from either side of the border.
-    for (const id of ['eastbrook_vale', 'willowfen']) {
+    // The cell belongs to the island's zone now, so its build is what meshes
+    // the spot; the vale-side neighbor builds alongside it the way the
+    // renderer's streaming horizon would approaching the strait.
+    for (const id of ['proving_shore', 'eastbrook_vale']) {
       const zone = ZONES.find((candidate) => candidate.id === id);
       if (!zone) throw new Error(`missing zone ${id}`);
       const task = terrain.ensureZone(zone);
@@ -508,7 +515,10 @@ describe('terrain covers the whole world, gaps between zone rectangles included'
         await task;
       }
       vi.useRealTimers();
-    });
+      // Every zone now includes the Proving Shore's cells on top of the ~800
+      // the comment above counts, which outruns the 10s default hook budget
+      // on a loaded runner.
+    }, 60000);
 
     afterAll(() => {
       terrain.cancelStreaming();

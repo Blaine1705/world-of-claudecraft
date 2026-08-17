@@ -15640,13 +15640,17 @@ export class Hud {
       // tick (offline has no authoritative-delta hook to ride).
       this.refreshOpenCraftingIfReagentsChanged();
     };
+    // Quest-gated rows (vendorQuestGates) hide until their quest is in the
+    // log; the sim's buyItem enforces the same gate authoritatively. Hoisted
+    // out of the call so the tool-gate source scan
+    // (tests/professions_tool_gate.test.ts) reads the buildVendorView
+    // argument list whole, with no nested call closing a line inside it.
+    const visibleStock = visibleVendorStock(npc, this.sim.questLog, this.sim.questsDone);
     renderVendorWindow(
       $('#vendor-window'),
       entityDisplayName(npc),
       buildVendorView(
-        // Quest-gated rows (vendorQuestGates) hide until their quest is in
-        // the log; the sim's buyItem enforces the same gate authoritatively.
-        visibleVendorStock(npc, this.sim.questLog, this.sim.questsDone),
+        visibleStock,
         this.sim.vendorBuyback,
         ITEMS,
         {

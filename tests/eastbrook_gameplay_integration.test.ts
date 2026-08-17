@@ -512,6 +512,10 @@ describe('Eastbrook authored gameplay data integration', () => {
       { x: 314, z: 816 },
       { x: 427, z: 355 },
       { x: 299, z: 76 },
+      // The Proving Shore tutorial island's camp mailbox (Dawnrest Camp hub
+      // at (-300, 50) offset (-6, 6)), the one authored row carrying a
+      // facing (rotated to face the camp ground).
+      { x: -306, z: 56, facing: Math.PI },
     ]);
     expect(PLAYER_START).toEqual({ x: 2, z: -2 });
     expect(EASTBROOK_LAYOUT.services.graveyard.position).toEqual({ x: -14, z: -14 });

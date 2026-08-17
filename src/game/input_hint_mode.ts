@@ -24,15 +24,26 @@ export type InputHintMode = 'keyboard' | 'touch' | 'pad';
 
 export const PAD_ACTIVE_CLASS = 'pad-active';
 
+// The GamepadManager poll calls markPadActivity from plain Node in its unit
+// suite (tests/gamepad.test.ts runs without a DOM, and its focus arms stub a
+// partial document whose body classList carries no add), so every
+// document/window touch here is guarded on the full classList surface:
+// headless the signal is simply inert and the hint mode stays 'keyboard'.
+const hasDom = (): boolean =>
+  typeof document !== 'undefined' &&
+  typeof document.body?.classList?.add === 'function' &&
+  typeof document.body.classList.contains === 'function';
+
 let clearsInstalled = false;
 
 function clearPadActivity(): void {
-  document.body.classList.remove(PAD_ACTIVE_CLASS);
+  if (hasDom()) document.body.classList.remove(PAD_ACTIVE_CLASS);
 }
 
 /** Called by GamepadManager.poll whenever the pad produced real input this
  *  frame. Cheap when already marked (a classList.add no-op). */
 export function markPadActivity(): void {
+  if (!hasDom()) return;
   if (!clearsInstalled) {
     clearsInstalled = true;
     window.addEventListener('keydown', clearPadActivity);
@@ -43,6 +54,7 @@ export function markPadActivity(): void {
 
 /** The control family hint text should speak for right now. */
 export function currentInputHintMode(): InputHintMode {
+  if (!hasDom()) return 'keyboard';
   if (document.body.classList.contains('mobile-touch')) return 'touch';
   if (document.body.classList.contains(PAD_ACTIVE_CLASS)) return 'pad';
   return 'keyboard';

@@ -1075,6 +1075,18 @@ export const VOICE_ALIAS = {
   // The camp's Gilded Strongbox desk: Eastbrook's own bursar register, the
   // same institutional voice the brand speaks with in every town.
   bursar_wick: 'bursar_fernando',
+  // Keeper of the Gauntlet cheering a first run down his lanes: the Fenbridge
+  // warden's steady, patrol-worn encouragement.
+  warden_tam: 'warden_fenwick',
+  // Gauntlet Overseer clocking every run from the finish: the foreman's dry,
+  // seen-it-all worksite judgment.
+  overseer_pell: 'foreman_odell',
+  // Yard Master turning footwork into swordwork: the marshal's parade-ground
+  // bark, softened by a teacher's patience.
+  drillmaster_rook: 'marshal_redbrook',
+  // Keeper of the Strand tallying shells and salvage: the harbor captain's
+  // weathered, water-wise authority.
+  tidewarden_nel: 'captain_thessaly',
 };
 
 /** Resolve any NPC content id to the id of the voice that should speak for it. */

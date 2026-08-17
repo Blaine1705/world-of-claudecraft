@@ -56,7 +56,14 @@ const MONOLITHS: MonolithRow[] = [
     // LastKeepMapPainter declarations and the two walk-in map branches on the
     // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
     // count: any further growth reds again.
-    ceiling: 19488,
+    // Re-pinned 19488 -> 19620 for the Proving Shore tutorial island, a
+    // maintainer decision prepared for PR review: the island's logic lives in
+    // extracted modules (bootcamp.ts + bootcamp_view.ts, noticeboard_popup.ts,
+    // the sim-side credit modules) and hud.ts carries only their drive calls,
+    // the noticeboard event arm, and the vendor-stock hoist the tool-gate
+    // source scan needs, plus the changed-files biome pass's line splits over
+    // this branch's hunks. Exact merged count: any further growth reds again.
+    ceiling: 19620,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -80,7 +87,11 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again by the castle branch's interior_light_rig.ts extraction;
     // after merging main the merged file lands below both prior pins, so the
     // ceiling is the exact merged count.
-    ceiling: 13689,
+    // Re-pinned 13689 -> 13716 for the Proving Shore tutorial island: the
+    // island's visuals live in extracted modules (quest_beacon_core.ts,
+    // decor_torch_fx.ts) and the renderer carries only their hookup plus the
+    // changed-files biome pass's line splits. Exact merged count.
+    ceiling: 13716,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -90,12 +101,21 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/main.ts',
-    ceiling: 11490,
+    // Re-pinned 11490 -> 11533 for the Proving Shore tutorial island: the
+    // arrival cinematic and teleport camera snap live in src/game/ modules
+    // (arrival_cinematic.ts, teleport_camera.ts, ferry_prewarm.ts) and
+    // main.ts carries only their wiring behind the zone-warm gate, plus the
+    // changed-files biome pass's line splits. Exact merged count.
+    ceiling: 11533,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
     file: 'server/game.ts',
-    ceiling: 10900,
+    // Re-pinned 10900 -> 10909 for the Proving Shore branch: no island logic
+    // lands here (the ferry and greeting live in sim modules); the growth is
+    // entirely the changed-files biome pass splitting long lines in this
+    // branch's touched hunks. Exact merged count.
+    ceiling: 10909,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

@@ -23,9 +23,15 @@ const BUILTIN_NOTICEBOARDS = BUILTIN_WORLD.services?.noticeboards ?? [];
 describe('Eastbrook town grass exclusion', () => {
   it('snapshots every built-in town footprint, service apron, civic prop, and wall chord', () => {
     const exclusions = eastbrookGrassExclusions(PROPS.buildings, true, BUILTIN_NOTICEBOARDS);
-    expect(BUILTIN_NOTICEBOARDS).toHaveLength(1);
-    // Includes Eastbrook footprints plus Fenbridge rebuild aprons (see fenbridge_layout).
-    expect(exclusions).toHaveLength(113);
+    // Eastbrook's board plus the Proving Shore tutorial island's camp
+    // signpost (content/noticeboards.ts): the island board rides the same
+    // canonical def, so it enters the built-in service list and earns its
+    // own grass exclusion like any other civic prop.
+    expect(BUILTIN_NOTICEBOARDS).toHaveLength(2);
+    // Includes Eastbrook footprints plus Fenbridge rebuild aprons (see
+    // fenbridge_layout) plus the island signpost's board and reading-spot
+    // exclusions.
+    expect(exclusions).toHaveLength(115);
     for (const building of [
       ...EASTBROOK_LAYOUT.preservedBuildings,
       ...EASTBROOK_LAYOUT.buildings,
