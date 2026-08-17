@@ -1,7 +1,7 @@
 import type * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { DungeonInteriors } from '../src/render/dungeon';
 import { DelveInteriorTracker } from '../src/render/delve_interior_tracker';
+import type { DungeonInteriors } from '../src/render/dungeon';
 import { delveModuleZOffset } from '../src/sim/data';
 import type { DelveModuleId } from '../src/sim/delve_layout';
 
