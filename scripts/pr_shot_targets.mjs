@@ -9413,6 +9413,80 @@ export const TARGETS = [
       return {};
     },
   },
+  {
+    key: 'practice-row',
+    label: 'The Highwatch practice row seen from the approach',
+    when: ['practice_dummies'],
+    // Deliberately branch-agnostic: the camera is staged from FIXED world
+    // coordinates and the target frame locks onto whichever dummy stands
+    // furthest east, so the same recipe runs unchanged on the base commit (one
+    // training dummy) and on the branch (four). That is what makes the before
+    // and after frames comparable instead of two differently-composed shots.
+    variants: [
+      { key: 'desktop', charClass: 'priest', charName: 'Wardmara', beforeLoad: lowGraphicsSeed },
+      {
+        key: 'mobile',
+        charClass: 'priest',
+        charName: 'Wardmara',
+        mobile: true,
+        beforeLoad: lowGraphicsSeed,
+      },
+    ],
+    async capture(page) {
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          const ui = document.querySelector('#ui');
+          return (
+            document.body.classList.contains('game-active') &&
+            !!ui &&
+            getComputedStyle(ui).display !== 'none' &&
+            !!loading &&
+            !loading.classList.contains('visible')
+          );
+        },
+        { timeout: 90000, polling: 200 },
+      );
+      const staged = await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        sim.setPlayerLevel?.(20, player.id);
+        // The anchor is the shipped training dummy, which exists on both sides
+        // of this comparison; its ground height is what the viewpoint stands on.
+        const anchor = [...sim.entities.values()].find(
+          (e) => e.templateId === 'training_dummy' && !e.dead && e.name !== 'Healing Dummy',
+        );
+        if (!anchor) return { ok: false, reason: 'the training dummy is unavailable' };
+        // Ten yards south of the row, looking north up the hill, so all of it is
+        // in frame with room for the nameplates.
+        player.pos.x = anchor.pos.x + 1;
+        player.pos.y = anchor.pos.y;
+        player.pos.z = anchor.pos.z - 10;
+        player.prevPos = { ...player.pos };
+        player.facing = 0;
+        player.prevFacing = 0;
+        sim.rebucket?.(player);
+        const eastmost = [...sim.entities.values()]
+          .filter((e) => e.kind === 'mob' && !e.dead && e.name.toLowerCase().includes('dummy'))
+          .sort((a, b) => b.pos.x - a.pos.x)[0];
+        if (eastmost) sim.targetEntity(eastmost.id, player.id);
+        return { ok: true, targetName: eastmost?.name ?? '', dummies: eastmost ? 1 : 0 };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      // Moving across zones can start the streaming overlay on the next frame.
+      await wait(1500);
+      await page.waitForFunction(
+        () => !document.querySelector('#loading-screen')?.classList.contains('visible'),
+        { timeout: 90000, polling: 200 },
+      );
+      await wait(2500);
+      return {};
+    },
+  },
 ];
 
 // Grant one staged stack (a plain count, or a specific ItemInstancePayload) and
