@@ -540,10 +540,18 @@ describe('resumeDroppedPrewarmEntries', () => {
   // fallback (gateSwapFlagOnCompile at the mount-swap site) is a no-op
   // without KHR_parallel_shader_compile, so the first sighting of any mount
   // could freeze a live frame with no mitigation at all on that hardware.
+  //
+  // This does not source-match the entry: a previous version of this test did
+  // (matching literal substrings like `mountPrewarmGroup.add(visual.root)`),
+  // and it stayed green against an entry that reparented every staged rig
+  // straight out of its own group into the live scene, leaked them there
+  // forever, and warmed zero mounts on the desktop path while still
+  // reporting 'completed'. A source match cannot catch any of that: only
+  // running the real staging/compile path against a fake scene can.
   it('warms every mount program as one resumable unit per catalog key', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const start = source.indexOf("id: 'vfx.mount-programs'");
-    const end = source.indexOf("id: 'vfx.ability-primitives'", start);
+    const end = source.indexOf("id: 'sky.nearby-biomes'", start);
     const entryBlock = source.slice(start, end);
 
     expect(start).toBeGreaterThan(-1);
@@ -553,12 +561,18 @@ describe('resumeDroppedPrewarmEntries', () => {
     // Derived from the real catalog, never a hand-maintained list: this is
     // exactly the property that kept vfx.weapon-skins from drifting the way
     // mounts did, and mount_prewarm.test.ts pins the derivation itself.
-    expect(entryBlock).toContain('mountPrewarmKeys().map((key) => ({');
+    expect(entryBlock).toContain('mountPrewarmKeys()');
     expect(entryBlock).toContain('id: `mount:${key}`');
-    expect(entryBlock).toContain('await buildMountPrewarmVisual(key)');
-    expect(entryBlock).toContain('await this.compilePrewarmColorPrograms(visual.root, false)');
-    // A failed fetch for one mount must not throw or block its siblings.
-    expect(entryBlock).toContain('if (!visual) return;');
+    expect(entryBlock).toContain('stageMountPrewarmVisual(this.scene, mountPrewarmGroup, key)');
+    // Both program halves: three's shadow depth material uses a different
+    // cache key (RGBADepthPacking) than the color pass, so linking only the
+    // color program still left the first shadow draw to link synchronously.
+    expect(entryBlock).toContain('compilePrewarmColorPrograms(staged.visual.root, false)');
+    expect(entryBlock).toContain('compileShadowPrograms(staged.visual.root)');
+    // An honest progress(): a run cut short by the deadline must report
+    // 'partial', never a false 'completed' (resolvePrewarmEntryStatus's
+    // documented failure mode).
+    expect(entryBlock).toContain('progress: () => ({');
 
     // The staged group is torn out of the scene by both cleanup paths and
     // hidden between resumed entries, exactly like every other prewarm group.
@@ -570,11 +584,53 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(source).toContain("['mounts', mountPrewarmGroup],");
   });
 
-  it('resumes the mount warm in the background lane on constrained devices too', () => {
-    // Same rationale as ability-primitives: cheap, one mount at a time, and a
-    // constrained device's weaker (or absent) parallel-compile support is
-    // exactly the hardware #2571 identified as having no other mitigation.
-    expect(CONSTRAINED_PREWARM_RESUME).toContain('vfx.mount-programs');
+  // Real behavior, not a source match: builds two fake mount rigs, drives
+  // them through resumeDroppedPrewarmEntries exactly like the resume lane
+  // does, and asserts the group ends up in the scene with both rigs parented
+  // under it. This is the reproduction for the reparent bug (Object3D.add
+  // detaches its argument from any prior parent, so adding a rig to both the
+  // group and the scene silently emptied the group and never added it to the
+  // scene at all): a version of stageMountPrewarmVisual with that bug fails
+  // this test immediately.
+  it('stages every resumed mount rig into one group actually added to the scene', async () => {
+    const scene = new THREE.Scene();
+    const state: { group: THREE.Group | null } = { group: null };
+    const staged: THREE.Object3D[] = [];
+    const keys = ['a', 'b', 'c'];
+    const dropped: PrewarmResumeEntry[] = [
+      {
+        id: 'vfx.mount-programs',
+        units: keys.map((key) => ({
+          id: `mount:${key}`,
+          run: async () => {
+            const rig = new THREE.Group();
+            rig.name = `prewarm-mount:${key}`;
+            state.group ??= new THREE.Group();
+            if (state.group.parent !== scene) scene.add(state.group);
+            state.group.add(rig);
+            staged.push(rig);
+          },
+        })),
+      },
+    ];
+    await resumeDroppedPrewarmEntries(dropped, { idleSlot: async () => {} });
+
+    const resultGroup = state.group;
+    expect(resultGroup).not.toBeNull();
+    if (!resultGroup) throw new Error('unreachable');
+    expect(resultGroup.parent).toBe(scene);
+    expect(scene.children).toEqual([resultGroup]);
+    for (const rig of staged) expect(rig.parent).toBe(resultGroup);
+    expect(resultGroup.children).toEqual(staged);
+  });
+
+  it('leaves the mount warm off the constrained keep-list and off the constrained resume list', () => {
+    // Constrained-device eligibility requires a real measurement first
+    // (src/render/CLAUDE.md's iOS process-kill history): unlike
+    // vfx.ability-primitives (procedurally drawn canvases), this entry forces
+    // up to nine skinned GLB rigs resident, and mount assets are lazyPreload
+    // precisely so they never weigh on a constrained client's footprint.
+    expect(CONSTRAINED_PREWARM_RESUME).not.toContain('vfx.mount-programs');
     expect(CONSTRAINED_PREWARM_KEEP).not.toContain('vfx.mount-programs');
   });
 });
