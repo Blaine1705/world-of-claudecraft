@@ -184,8 +184,11 @@ interface AttributionTargetFixture {
 // Re-minted for the r185 frozen-camera aim fix: updateCamera now aims through
 // lookAtFrozen, so renderer.ts moves and the composite follows its bytes. No
 // capture was retaken.
+// Re-minted for the Duskfall gate occluder-fade fix: renderer.ts wires
+// hollowGates into the shared per-frame occluder update, so renderer.ts moves
+// and the composite follows its bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '63eae2164f990137dccffd0df83eb3c048a1c8927d125501b717ea3b27b39495';
+  'be5300cdac7967b6e6ee0c24ea7aa3d538d60d680a857e468cb709f8f2910c50';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
