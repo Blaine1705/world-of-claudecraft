@@ -294,6 +294,7 @@ import {
   setFoliageShadowVolume,
 } from './foliage';
 import { activeFarFieldPolicy } from './foliage_impostor';
+import { roundMs, summarizeMs } from './frame_ms_stats_core';
 import { type FramePresentHost, presentFrame } from './frame_present';
 import {
   type FrostNovaRootVisual,
@@ -1170,28 +1171,6 @@ function collectCasters(root: THREE.Object3D, into: THREE.Object3D[]): void {
   });
 }
 
-function roundMs(v: number): number {
-  return Math.round(v * 100) / 100;
-}
-
-function summarizeMs(values: number[]): {
-  count: number;
-  avg: number;
-  p95: number;
-  max: number;
-} {
-  if (values.length === 0) return { count: 0, avg: 0, p95: 0, max: 0 };
-  const sorted = [...values].sort((a, b) => a - b);
-  const total = values.reduce((a, b) => a + b, 0);
-  const p95Idx = Math.min(sorted.length - 1, Math.max(0, Math.ceil(sorted.length * 0.95) - 1));
-  return {
-    count: values.length,
-    avg: roundMs(total / values.length),
-    p95: roundMs(sorted[p95Idx]),
-    max: roundMs(sorted[sorted.length - 1]),
-  };
-}
-
 function emptyFramePhaseMs(): RendererFramePhaseMs {
   return {
     setup: 0,
@@ -1739,6 +1718,8 @@ export class Renderer {
   };
   /** The props reveal gate (far cells at construction, bands at world entry). */
   private propsRevealGate: RevealGateCore | null = null;
+  /** The foliage bucket reveal gate (armed at world entry, like the bands). */
+  private foliageRevealGate: RevealGateCore | null = null;
   private eastbrookTownView!: EastbrookTownView;
   private fenbridgeTownView!: FenbridgeTownView;
   private lightRank: RankedPointLight[] = [];
@@ -2645,6 +2626,7 @@ export class Renderer {
       this.fenbridgeTownView.setRevealGate(
         createRevealGate(revealHost, () => this.fenbridgeTownView.staticRevealRoots()),
       );
+      this.foliageRevealGate = createRevealGate(revealHost, (key) => this.foliage.revealRoots(key));
     }
 
     // Map-editor play-test: freely placed GLB models (cosmetic, render-only). Loads
@@ -7546,6 +7528,7 @@ export class Renderer {
     // World entry: from here every prop band's first fog reveal is gated
     // (props.ts setBandRevealGate explains why not under the curtain).
     this.propsView.setBandRevealGate(this.propsRevealGate);
+    this.foliage.setRevealGate(this.foliageRevealGate);
     // Dev-channel diagnostic (pairs with main.ts's "[entry-guard] scene built"): one
     // line naming where the entry-time main-thread budget went, for isolating
     // world-entry process kills on real devices.
