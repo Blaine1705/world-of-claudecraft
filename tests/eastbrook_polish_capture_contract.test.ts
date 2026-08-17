@@ -187,8 +187,12 @@ interface AttributionTargetFixture {
 // Re-minted for the vfx.mount-programs prewarm entry (#2571): renderer.ts and
 // prewarm_policy.ts both move, so the composite follows their bytes. No
 // capture was retaken.
+// Re-minted for the vfx.mount-programs review fixes (scene-reparent bug,
+// honest desktop-path progress, depth compile, timeout-bounded fetch,
+// constrained-device removal): renderer.ts and prewarm_policy.ts both move
+// again, so the composite follows their bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'c7e435decc05d8e96748cb5e506cd2fc0a66d47323de2a35b3c53423fb6cc75e';
+  '565d96a752e2f1ef224449f85b8d1fda45dda0a64585c3aae0af437be719d573';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

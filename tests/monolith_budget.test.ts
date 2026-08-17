@@ -75,12 +75,23 @@ const MONOLITHS: MonolithRow[] = [
     // Raised +38 for the vfx.mount-programs manifest entry (#2571: mounts had
     // ZERO prewarm coverage, so the first sighting of any mount could freeze a
     // live frame, worse on hardware without KHR_parallel_shader_compile where
-    // the runtime fallback gate is a no-op). The rig-building logic itself is
-    // extracted to src/render/mount_prewarm.ts; this is the coordinator's
+    // the runtime fallback gate is a no-op). The rig-building logic itself was
+    // extracted to src/render/mount_prewarm.ts; this was the coordinator's
     // unavoidable thin-wiring cost (the manifest entry, its group bookkeeping,
-    // and cleanup/hide registration), which is exactly the seam this ratchet
-    // exists to bound, not grow unchecked.
-    ceiling: 13792,
+    // and cleanup/hide registration).
+    // Raised a further +34 (13792 -> 13826) in review response: the group-
+    // staging/scene-bookkeeping logic that first cut left inline here (and
+    // that inline copy is what hid the bug, an `Object3D.add` reparent that
+    // silently detached every staged rig from its group) moved into
+    // mount_prewarm.ts's stageMountPrewarmVisual too, but run() also grew
+    // real synchronous-desktop-path work plus an honest progress() (the
+    // entry's run() was previously a no-op that still reported 'completed'),
+    // and resumeUnits now links the shadow-depth program half it was missing.
+    // What remains is the manifest entry itself, the shared
+    // mountPrewarmGroup/mountPrewarmWarmed variables, and cleanup/hide
+    // registration: exactly the seam this ratchet exists to bound, not grow
+    // unchecked.
+    ceiling: 13826,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
