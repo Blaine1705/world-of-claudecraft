@@ -326,6 +326,11 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       'vfx.ability-primitives',
       'sky.current-zone',
       'render.settle-passes',
+      // Converted to prewarm slots (variant_prewarm_slot.ts): a landmark
+      // clone and two precipitation maps, both first-use-on-a-specific-event
+      // warm-ups rather than ambient scene debt.
+      'weather.materials',
+      'landmarks.impact-site',
     ];
     // Same per-entry block split as parsedManifestEntries, so an entry's
     // resumeUnits can never be attributed to its neighbour. Comments are
@@ -333,7 +338,9 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     // manifest explains itself in prose beside the code, and lines like
     // `// No resumeUnits: this spawns real particles` are a substring match.
     // Counting those padded the floor to 10 over 7 real declarations, so the
-    // count could have halved and the pin stayed green.
+    // count could have halved and the pin stayed green. Raised to 10 real
+    // declarations when weather.materials and landmarks.impact-site became
+    // prewarm slots.
     const start = renderer.indexOf('const manifest: PrewarmManifestEntry[] = [');
     const end = renderer.indexOf('const byId = new Map(', start);
     const manifestCode = codeWithoutLineComments(renderer.slice(start, end)).replace(
@@ -348,7 +355,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       .filter((id): id is string => Boolean(id) && manifestIds.has(id as string));
     // The real declaration count, measured against the source above. A drop
     // here means a resume lane was deleted, not that a comment was reworded.
-    expect(resumable.length).toBeGreaterThanOrEqual(7);
+    expect(resumable.length).toBeGreaterThanOrEqual(10);
     // Every id counted must own a real property declaration, so a block that
     // only TALKS about resumeUnits can never be one of them.
     for (const id of resumable) {
@@ -364,6 +371,50 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
         prewarmResumeIsDebt(id) || COSMETIC_RESUME_IDS.includes(id),
         `manifest entry ${id} declares resumeUnits but is classified neither debt nor cosmetic`,
       ).toBe(true);
+    }
+  });
+
+  it('binds the landmark and weather entries to the shared prewarm slot', () => {
+    // Both entries used to hold their artifact in a manifest-local `let` that
+    // the cleanup nulled, which is why neither could resume: the slot keeps it
+    // in its own closure instead (variant_prewarm_slot.ts, its own Vitest).
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    expect(renderer).toContain(
+      "createVariantPrewarmSlot(variantSlotHost, 'landmarks.impact-site', () =>",
+    );
+    expect(renderer).toContain('buildImpactSitePrewarmGroup(this.impactSite.group, p.pos)');
+    expect(renderer).toContain("createPrewarmGroupSlot(variantSlotHost, 'weather.materials', {");
+    // The weather artifact is no group, so the slot's hide arm is the only
+    // thing that can take the staged precipitation draw back out of a live
+    // frame before its uploads run.
+    expect(renderer).toContain('hide: () => this.weather.hidePrewarm(),');
+    expect(renderer).toContain(
+      "units: (textures) => textureResumeUnits('weather-materials', textures),",
+    );
+    expect(renderer).toContain('cleanup: () => this.weather.endPrewarm(),');
+    // The manifest-local mutable state is gone with them.
+    expect(renderer).not.toContain('landmarkPrewarmGroup');
+    expect(renderer).not.toContain('weatherPrewarmActive');
+    // Both entries bind the slot rather than re-implementing the staging.
+    for (const [id, slot] of [
+      ['weather.materials', 'weatherSlot'],
+      ['landmarks.impact-site', 'landmarkSlot'],
+    ]) {
+      const start = renderer.indexOf(`id: '${id}'`);
+      const entry = renderer.slice(start, renderer.indexOf('      {\n        id:', start + 1));
+      expect(entry, id).toContain(`resumeUnits: ${slot}.resumeUnits,`);
+      expect(entry, id).toContain(`run: ${slot}.run,`);
+    }
+    // Hidden at world entry and torn down with every other staged artifact.
+    for (const slot of ['landmarkSlot', 'weatherSlot']) {
+      const hideStart = renderer.indexOf('const hidePrewarmArtifacts = ');
+      const hideEnd = renderer.indexOf('const cleanupPrewarmArtifacts = ', hideStart);
+      expect(renderer.slice(hideStart, hideEnd), slot).toContain(`${slot}.hide();`);
+      const cleanupEnd = renderer.indexOf('doorPrewarmGroup = null;', hideEnd);
+      expect(renderer.slice(hideEnd, cleanupEnd), slot).toContain(`${slot}.cleanup();`);
     }
   });
 

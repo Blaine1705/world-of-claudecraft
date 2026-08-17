@@ -102,7 +102,11 @@ const MONOLITHS: MonolithRow[] = [
     // soft-deadline binding by extracting the shared reveal compile host
     // (link, shadow arm, touch tail, learned soft deadline) into
     // src/render/reveal_compile_host.ts (net -15).
-    ceiling: 13562,
+    // Lowered again by the prewarm slot generalization: the landmark and
+    // weather manifest entries became createPrewarmGroupSlot bindings and the
+    // impact-site prewarm clone moved to its own subsystem module,
+    // buildImpactSitePrewarmGroup in src/render/impact_site.ts (net -2).
+    ceiling: 13560,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

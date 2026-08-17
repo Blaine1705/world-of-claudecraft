@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
-import { createVariantPrewarmSlot } from '../src/render/variant_prewarm_slot';
+import { buildImpactSitePrewarmGroup } from '../src/render/impact_site';
+import {
+  createPrewarmGroupSlot,
+  createVariantPrewarmSlot,
+} from '../src/render/variant_prewarm_slot';
 
 function host() {
   const scene = new THREE.Scene();
@@ -70,5 +74,155 @@ describe('createVariantPrewarmSlot', () => {
     expect(slot.group).toBeNull();
     expect(slot.staged()).toEqual(['ghost-fade-variants', null]);
     slot.cleanup();
+  });
+});
+
+describe('createPrewarmGroupSlot', () => {
+  it('links through a custom link step instead of the group compile', async () => {
+    const h = host();
+    const linked: THREE.Group[] = [];
+    const twin = new THREE.Group();
+    const slot = createPrewarmGroupSlot(h.api, 'custom-link', {
+      stage: () => twin,
+      link: async (artifact) => {
+        linked.push(artifact);
+      },
+    });
+    const units = slot.resumeUnits();
+    await units[0].run();
+    await units[1].run();
+    expect(linked).toEqual([twin]);
+    expect(h.compiled).toEqual([]);
+  });
+
+  it('runs the per-piece units after the stage, in order, on the staged artifact', async () => {
+    const h = host();
+    const textures = [new THREE.Texture(), new THREE.Texture()];
+    const uploaded: THREE.Texture[] = [];
+    const slot = createPrewarmGroupSlot(h.api, 'weather.materials', {
+      stage: () => textures as readonly THREE.Texture[],
+      units: (staged) =>
+        staged.map((texture, index) => ({
+          id: `weather-materials:${index}`,
+          run: () => {
+            uploaded.push(texture);
+          },
+        })),
+    });
+    const units = slot.resumeUnits();
+    expect(units.map((unit) => unit.id)).toEqual([
+      'weather.materials:stage',
+      'weather.materials:units',
+    ]);
+    // The pieces never run against an unstaged artifact.
+    await units[1].run();
+    expect(uploaded).toEqual([]);
+    await units[0].run();
+    await units[1].run();
+    expect(uploaded).toEqual(textures);
+    // No group: nothing was attached to the scene, and none is reported.
+    expect(slot.group).toBeNull();
+    expect(slot.artifact).toBe(textures);
+    expect(h.scene.children).toEqual([]);
+  });
+
+  it('runs the per-piece work inline at the manifest entry, staged VISIBLE', async () => {
+    // The boot pass draws behind the loading screen, so the entry stages the
+    // artifact as it stands and does its own piece work; only a resume hides.
+    const h = host();
+    const events: string[] = [];
+    const slot = createPrewarmGroupSlot(h.api, 'weather.materials', {
+      stage: () => {
+        events.push('stage');
+        return ['flake', 'streak'];
+      },
+      hide: () => void events.push('hide'),
+      units: (maps) => maps.map((map) => ({ id: map, run: () => void events.push(map) })),
+    });
+    await slot.run();
+    expect(events).toEqual(['stage', 'flake', 'streak']);
+  });
+
+  it('hides a group-less artifact through the custom hide, before its pieces run', async () => {
+    const h = host();
+    const events: string[] = [];
+    const slot = createPrewarmGroupSlot(h.api, 'weather.materials', {
+      stage: () => {
+        events.push('stage');
+        return { live: true };
+      },
+      hide: (artifact) => {
+        artifact.live = false;
+        events.push('hide');
+      },
+      units: () => [{ id: 'weather-materials:0', run: () => void events.push('upload') }],
+      cleanup: () => void events.push('end'),
+    });
+    const units = slot.resumeUnits();
+    await units[0].run();
+    // Staged and hidden inside ONE unit: no frame can land between them.
+    expect(events).toEqual(['stage', 'hide']);
+    expect(slot.artifact).toEqual({ live: false });
+    await units[1].run();
+    slot.cleanup();
+    expect(events).toEqual(['stage', 'hide', 'upload', 'end']);
+    expect(slot.artifact).toBeNull();
+    slot.cleanup();
+    expect(events).toEqual(['stage', 'hide', 'upload', 'end']);
+  });
+
+  it('re-stages after a cleanup, so a resume still reaches the artifact', async () => {
+    const h = host();
+    const built: THREE.Group[] = [];
+    const slot = createPrewarmGroupSlot(h.api, 'landmarks.impact-site', {
+      stage: () => {
+        const group = new THREE.Group();
+        built.push(group);
+        return group;
+      },
+    });
+    slot.run();
+    slot.cleanup();
+    expect(slot.artifact).toBeNull();
+    const units = slot.resumeUnits();
+    await units[0].run();
+    await units[1].run();
+    expect(built).toHaveLength(2);
+    expect(slot.group).toBe(built[1]);
+    expect(h.compiled).toEqual([built[1]]);
+  });
+
+  it('stages every resumed group HIDDEN, so no live frame draws it before it links', async () => {
+    const h = host();
+    // The real landmark artifact: a clone of the live impact site, translated
+    // in front of the player. A resume runs while the world is live.
+    const source = new THREE.Group();
+    source.add(new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial()));
+    const visibleAtLink: boolean[] = [];
+    const api = {
+      scene: h.scene,
+      compileColorPrograms: async (group: THREE.Group) => {
+        visibleAtLink.push(group.visible);
+        h.compiled.push(group);
+      },
+    };
+    const slot = createVariantPrewarmSlot(api, 'landmarks.impact-site', () =>
+      buildImpactSitePrewarmGroup(source, { x: 10, y: 2, z: 30 }),
+    );
+    // The boot path keeps the clone visible: it is drawn behind the loading
+    // screen. Only the resume path stages it hidden.
+    slot.run();
+    expect(slot.group?.visible).toBe(true);
+    slot.cleanup();
+
+    const units = slot.resumeUnits();
+    await units[0].run();
+    const group = slot.group as THREE.Group;
+    expect(group.parent).toBe(h.scene);
+    expect(group.visible).toBe(false);
+    expect(group.userData.renderCategory).toBe('prewarm');
+    await units[1].run();
+    expect(h.compiled).toEqual([group]);
+    expect(visibleAtLink).toEqual([false]);
   });
 });

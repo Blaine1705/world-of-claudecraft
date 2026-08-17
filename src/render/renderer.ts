@@ -339,7 +339,7 @@ import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { buildHollowGates } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
-import { buildImpactSite, type ImpactSiteView, MIREFEN_IMPACT_SITE } from './impact_site';
+import { buildImpactSite, buildImpactSitePrewarmGroup, type ImpactSiteView } from './impact_site';
 import * as encounterPrewarm from './interior_encounter_prewarm_pass';
 import { ensureDelveInteriorKit } from './interior_kit';
 import { applyInteriorLightRig, applyRiftLightRig, type FogSceneState } from './interior_light_rig';
@@ -622,7 +622,7 @@ import { nationColors } from './vale_cup_flags';
 import { ValeCupPracticeSky } from './vale_cup_practice_sky';
 import { buildValeCupStadium, type ValeCupStadiumView } from './vale_cup_stadium';
 import { buildValeCupTeamRings, type ValeCupTeamRingsView } from './vale_cup_team_ring';
-import { createVariantPrewarmSlot } from './variant_prewarm_slot';
+import { createPrewarmGroupSlot, createVariantPrewarmSlot } from './variant_prewarm_slot';
 import { SCHOOL_COLORS, Vfx } from './vfx';
 import { createOffsetVfxAnchor, createVfxAnchor, type VfxAnchorPose } from './vfx_anchor';
 import {
@@ -5869,8 +5869,9 @@ export class Renderer {
     let foliagePrewarmGroup: THREE.Group | null = null;
     let greatTreePrewarmGroup: THREE.Group | null = null;
     let weaponVfxPrewarmGroup: THREE.Group | null = null;
-    let landmarkPrewarmGroup: THREE.Group | null = null;
-    let weatherPrewarmActive = false;
+    const landmarkSlot = createVariantPrewarmSlot(variantSlotHost, 'landmarks.impact-site', () =>
+      buildImpactSitePrewarmGroup(this.impactSite.group, p.pos),
+    );
     let surfaceDetailTexturesWarmed = 0;
 
     let renderPasses = 0;
@@ -5970,7 +5971,7 @@ export class Renderer {
       ['foliage', foliagePrewarmGroup],
       ['great-tree', greatTreePrewarmGroup],
       ['weapon-vfx', weaponVfxPrewarmGroup],
-      ['landmark', landmarkPrewarmGroup],
+      landmarkSlot.staged(),
     ];
 
     const compileEntryUnits = (
@@ -6281,12 +6282,13 @@ export class Renderer {
         propMaterialPrewarmGroup,
         foliagePrewarmGroup,
         weaponVfxPrewarmGroup,
-        landmarkPrewarmGroup,
       ]) {
         if (group) group.visible = false;
       }
       ghostVariantSlot.hide();
       characterEffectSlot.hide();
+      landmarkSlot.hide();
+      weatherSlot.hide();
     };
 
     // Tear down every temp prewarm group staged so far. Shared by the main
@@ -6330,8 +6332,8 @@ export class Renderer {
       // Removed, never disposed: disposing a material releases its linked
       // program, which is exactly what this group exists to warm.
       if (weaponVfxPrewarmGroup) this.scene.remove(weaponVfxPrewarmGroup);
-      if (landmarkPrewarmGroup) this.scene.remove(landmarkPrewarmGroup);
-      if (weatherPrewarmActive) this.weather.endPrewarm();
+      landmarkSlot.cleanup();
+      weatherSlot.cleanup();
       doorPrewarmGroup = null;
       interiorPrewarmGroup = null;
       if (opts.publishPools) {
@@ -6346,8 +6348,6 @@ export class Renderer {
       foliagePrewarmGroup = null;
       greatTreePrewarmGroup = null;
       weaponVfxPrewarmGroup = null;
-      landmarkPrewarmGroup = null;
-      weatherPrewarmActive = false;
     };
 
     const settleMinPasses = this.lowGfx ? 8 : 10;
@@ -6360,6 +6360,13 @@ export class Renderer {
         id: `${idPrefix}:${index}`,
         run: () => this.prewarmTexture(texture),
       }));
+
+    const weatherSlot = createPrewarmGroupSlot(variantSlotHost, 'weather.materials', {
+      stage: () => this.weather.beginPrewarm(),
+      hide: () => this.weather.hidePrewarm(),
+      units: (textures) => textureResumeUnits('weather-materials', textures),
+      cleanup: () => this.weather.endPrewarm(),
+    });
 
     const manifest: PrewarmManifestEntry[] = [
       {
@@ -6711,32 +6718,21 @@ export class Renderer {
         category: 'world',
         priority: 47,
         required: false,
-        run: () => {
-          weatherPrewarmActive = true;
-          for (const texture of this.weather.beginPrewarm()) this.prewarmTexture(texture);
-        },
+        // Cosmetic resume: stage HIDDEN (the slot's hide arm: no group here).
+        resumeUnits: weatherSlot.resumeUnits,
+        run: weatherSlot.run,
       },
       {
-        // The Mirefen impact site exists from boot but sits hundreds of yards
-        // outside the spawn frustum. A translated clone shares its real
-        // geometry/materials and warms the custom scorch + ember programs.
+        // A translated clone of the out-of-frustum impact site (impact_site.ts).
         id: 'landmarks.impact-site',
         category: 'props',
         priority: 48,
         required: false,
-        run: () => {
-          landmarkPrewarmGroup = this.impactSite.group.clone(true);
-          landmarkPrewarmGroup.name = 'prewarm-mirefen-impact-site';
-          landmarkPrewarmGroup.visible = true;
-          landmarkPrewarmGroup.position.set(
-            p.pos.x - MIREFEN_IMPACT_SITE.x,
-            p.pos.y,
-            p.pos.z - 18 - MIREFEN_IMPACT_SITE.z,
-          );
-          setRenderCategory(landmarkPrewarmGroup, 'prewarm');
-          this.scene.add(landmarkPrewarmGroup);
-        },
-        detail: () => `objects=${landmarkPrewarmGroup?.children.length ?? 0}`,
+        // Cosmetic resume, the ghost-fade-variants shape: stage the clone
+        // HIDDEN (it stands right in front of the live player), then link it.
+        resumeUnits: landmarkSlot.resumeUnits,
+        run: landmarkSlot.run,
+        detail: landmarkSlot.detail,
       },
       {
         // One full non-submitting frame tick (prewarmWorldFrame advances the
@@ -6753,6 +6749,8 @@ export class Renderer {
         category: 'world',
         priority: 49,
         required: true,
+        // No resumeUnits: after the reveal this would double-advance the
+        // renderer clock, LOD bands and fog off the LIVE camera.
         run: () => {
           this.prewarmWorldFrame(1 / 60);
         },
@@ -7184,7 +7182,7 @@ export class Renderer {
         category: this.post ? 'post' : 'world',
         priority: 100,
         required: false,
-        // No resumeUnits: this is a tight loop of real presented renders.
+        // No resumeUnits, and none needed: after the reveal the live frames ARE the passes.
         run: () => {
           while (renderPasses < settleMinPasses && performance.now() < gpuSubmitDeadline) {
             this.renderPrewarmPass(1 / 60);

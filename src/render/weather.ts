@@ -215,8 +215,21 @@ export class Weather {
     return [this.textures.flake, this.textures.streak];
   }
 
-  endPrewarm(): void {
+  /**
+   * Take the staged precipitation draw back out of the frame without ending
+   * the prewarm. This is what "hidden" means for the weather prewarm slot,
+   * which owns no group: the boot pass wants the draw, but a resume after
+   * world entry stages this material while live frames are presenting, and
+   * the loading screen that justified a visible cloud is long gone. The
+   * intensity is deliberately left alone, so a zone that really is raining
+   * keeps its fade (update() re-derives `points.visible` from it every frame).
+   */
+  hidePrewarm(): void {
     this.points.visible = false;
+  }
+
+  endPrewarm(): void {
+    this.hidePrewarm();
     this.intensity = 0;
     this.material.opacity = 0;
   }
