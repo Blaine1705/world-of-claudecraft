@@ -33,6 +33,7 @@ describe('gpu preparation event ring', () => {
       'reveal-soft-deadline': 0,
       'attach-watchdog': 0,
       'gate-timeout': 0,
+      'submit-stop': 0,
     });
     expect(snapshot.reveal).toEqual({
       keysHeld: 0,
@@ -55,6 +56,7 @@ describe('gpu preparation event ring', () => {
       atMs: 10,
       readyRoots: 0,
       totalRoots: 0,
+      units: 0,
     });
   });
 
@@ -69,6 +71,7 @@ describe('gpu preparation event ring', () => {
       'reveal-soft-deadline': 0,
       'attach-watchdog': 1,
       'gate-timeout': 2,
+      'submit-stop': 0,
     });
     expect(snapshot.events.map((event) => event.key)).toEqual([
       'view:mob',
@@ -129,7 +132,7 @@ describe('gpu preparation event ring', () => {
     expect(snapshot.total).toBe(0);
     expect(snapshot.dropped).toBe(0);
     expect(snapshot.events).toEqual([]);
-    expect(Object.values(snapshot.counts)).toEqual([0, 0, 0, 0]);
+    expect(Object.values(snapshot.counts)).toEqual([0, 0, 0, 0, 0]);
   });
 
   it('serves the injected clock, and the default one is restored on release', () => {
@@ -170,6 +173,34 @@ describe('gpu preparation reveal counters', () => {
     expect(wrapped.key).toBe('wrapped');
     expect(wrapped.readyRoots).toBe(0);
     expect(wrapped.totalRoots).toBe(0);
+    expect(wrapped.units).toBe(0);
+  });
+
+  it('carries the boot submit lane hard stop, keyed by the rule that fired', () => {
+    // A truncated manifest is otherwise inferred from a short entry list: this
+    // event says which rule stopped the compile-submit lane, how long the lane
+    // had been submitting, and how many units it got out (the 17/08 production
+    // login spent 11843.9 ms of a 12 s budget here).
+    recordGpuPrepEvent({
+      kind: 'submit-stop',
+      key: 'lane-max',
+      ageMs: 6_000,
+      units: 812,
+    });
+    const snapshot = gpuPrepEventsSnapshot();
+    expect(snapshot.counts['submit-stop']).toBe(1);
+    expect(snapshot.events[0]).toEqual({
+      kind: 'submit-stop',
+      key: 'lane-max',
+      ageMs: 6_000,
+      atMs: 10,
+      readyRoots: 0,
+      totalRoots: 0,
+      units: 812,
+    });
+    // Junk unit counts cannot poison a lifetime readout a capture trusts.
+    recordGpuPrepEvent({ kind: 'submit-stop', key: 'no-useful-link', ageMs: 12, units: -3 });
+    expect(gpuPrepEventsSnapshot().events[1].units).toBe(0);
   });
 
   it('aggregates the reveal counters so a trace can attribute a first-draw stall', () => {

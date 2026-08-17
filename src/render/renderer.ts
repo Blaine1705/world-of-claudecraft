@@ -5845,6 +5845,9 @@ export class Renderer {
     let entityPrewarmPool: { key: string; visual: CharacterVisual }[] = [];
     let npcPrewarmPool: { key: string; visual: CharacterVisual }[] = [];
     let deferPoolPublication = false;
+    const poolsAwaitPublication = (): boolean =>
+      (entityPrewarmPool.length > 0 && (entityPrewarmGroup?.children.length ?? 0) > 0) ||
+      (npcPrewarmPool.length > 0 && (npcPrewarmGroup?.children.length ?? 0) > 0);
     let playerPrewarmGroup: THREE.Group | null = null;
     let playerPrewarmInstances: CharacterVisual[] = [];
     let objectPrewarmGroup: THREE.Group | null = null;
@@ -6144,6 +6147,7 @@ export class Renderer {
           performance.now(),
           deadlineMs,
           policy.finishFullManifestBeforeReveal,
+          pacing.shouldStop(performance.now()),
         );
       for (let i = 0; i < pending.length; i++) {
         // Deadline-aware, checked BETWEEN units: one uninterrupted submit loop
@@ -6158,9 +6162,7 @@ export class Renderer {
           // finally block with unlinked programs: the settle-then-publish
           // arm below publishes them once the resume lane drains (same
           // contract as the compile entry's whole-deferral path).
-          deferPoolPublication ||=
-            (entityPrewarmPool.length > 0 && (entityPrewarmGroup?.children.length ?? 0) > 0) ||
-            (npcPrewarmPool.length > 0 && (npcPrewarmGroup?.children.length ?? 0) > 0);
+          deferPoolPublication ||= poolsAwaitPublication();
           return;
         }
         const unit = pending[i];
@@ -7025,9 +7027,7 @@ export class Renderer {
         // this.scene or another whole manifest entry.
         resumeUnits: () => {
           if (!this.asyncCompileSupported || !this.webgl.compileAsync) return [];
-          deferPoolPublication =
-            (entityPrewarmPool.length > 0 && (entityPrewarmGroup?.children.length ?? 0) > 0) ||
-            (npcPrewarmPool.length > 0 && (npcPrewarmGroup?.children.length ?? 0) > 0);
+          deferPoolPublication = poolsAwaitPublication();
           // Already-submitted groups are in flight off-thread; resuming them
           // would double-submit every unit. Only the never-submitted remainder
           // takes the resume lane.

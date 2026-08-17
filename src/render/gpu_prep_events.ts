@@ -20,13 +20,15 @@ export type GpuPrepEventKind =
   | 'reveal-watchdog'
   | 'reveal-soft-deadline'
   | 'attach-watchdog'
-  | 'gate-timeout';
+  | 'gate-timeout'
+  | 'submit-stop';
 
 export const GPU_PREP_EVENT_KINDS: readonly GpuPrepEventKind[] = [
   'reveal-watchdog',
   'reveal-soft-deadline',
   'attach-watchdog',
   'gate-timeout',
+  'submit-stop',
 ];
 
 /** Newest events are kept; older ones fall out of the ring and only survive in
@@ -47,6 +49,11 @@ export interface GpuPrepEvent {
    *  the console line could never say which. 0/0 for the other kinds. */
   readyRoots: number;
   totalRoots: number;
+  /** Units the reporting lane had handled when the event fired. For a
+   *  submit-stop that is how many compile units the boot lane submitted
+   *  before the stop truncated it, which is what makes a truncated manifest
+   *  attributable from the capture alone. 0 for the other kinds. */
+  units: number;
 }
 
 export interface GpuPrepEventInput {
@@ -55,6 +62,7 @@ export interface GpuPrepEventInput {
   ageMs: number;
   readyRoots?: number;
   totalRoots?: number;
+  units?: number;
 }
 
 /**
@@ -111,6 +119,7 @@ const counts: Record<GpuPrepEventKind, number> = {
   'reveal-soft-deadline': 0,
   'attach-watchdog': 0,
   'gate-timeout': 0,
+  'submit-stop': 0,
 };
 
 const reveal: GpuPrepRevealCounters = {
@@ -145,6 +154,7 @@ export function recordGpuPrepEvent(event: GpuPrepEventInput): void {
   const atMs = clock();
   const readyRoots = countOf(event.readyRoots);
   const totalRoots = countOf(event.totalRoots);
+  const units = countOf(event.units);
   if (ring.length < GPU_PREP_EVENT_RING_SIZE) {
     ring.push({
       kind: event.kind,
@@ -153,6 +163,7 @@ export function recordGpuPrepEvent(event: GpuPrepEventInput): void {
       atMs,
       readyRoots,
       totalRoots,
+      units,
     });
   } else {
     const slot = ring[writeIndex];
@@ -162,6 +173,7 @@ export function recordGpuPrepEvent(event: GpuPrepEventInput): void {
     slot.atMs = atMs;
     slot.readyRoots = readyRoots;
     slot.totalRoots = totalRoots;
+    slot.units = units;
   }
   writeIndex = (writeIndex + 1) % GPU_PREP_EVENT_RING_SIZE;
   counts[event.kind] += 1;

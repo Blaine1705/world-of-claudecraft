@@ -529,6 +529,7 @@ const RENDER_PURE_CORES = [
   'src/render/paladin_ascension_core.ts',
   'src/render/paladin_sun_verdict_core.ts',
   'src/render/prewarm_compile_submission_core.ts',
+  'src/render/prewarm_submit_stop_core.ts',
   // Bare-named, so the on-disk *_core sweep cannot find them: registered
   // voluntarily (the prewarm_policy.ts precedent). Both are injected-clock pure
   // logic with no three and no DOM, and the pacing pair is exactly the kind of

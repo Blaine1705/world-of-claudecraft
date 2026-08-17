@@ -29,6 +29,7 @@ import {
   skyAssetInlineWaitMs,
   withRestoredPrewarmState,
 } from '../src/render/prewarm_policy';
+import { PREWARM_SUBMIT_LANE_MAX_MS } from '../src/render/prewarm_submit_stop_core';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 // The real desktop constants (renderer.ts), injected so the test pins the actual
@@ -213,6 +214,40 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     // finishFullManifestBeforeReveal (desktop Insane) submits without bound:
     // its contract is a complete manifest behind the cover.
     expect(prewarmSubmitShouldStop(20_000, 14_000, true)).toBe(false);
+    // An absent or not-yet-stopped lane verdict changes none of the above.
+    expect(prewarmSubmitShouldStop(13_999, 14_000, false, null)).toBe(false);
+    expect(
+      prewarmSubmitShouldStop(20_000, 14_000, true, {
+        stop: false,
+        reason: null,
+        elapsedMs: 5_999,
+        submissions: 40,
+      }),
+    ).toBe(false);
+  });
+
+  it('stops on the lane hard stop even where the deadline is exempted', () => {
+    // The deadline clause is the only exemptible one: the lane's own stop
+    // (prewarm_submit_stop_core) binds every arm, which is what the Insane
+    // arm was missing when one compile-submit entry ate 11.8 s of a 12 s
+    // budget and the twelve entries behind it timed out.
+    const laneMax = {
+      stop: true,
+      reason: 'lane-max',
+      elapsedMs: PREWARM_SUBMIT_LANE_MAX_MS,
+      submissions: 812,
+    } as const;
+    expect(prewarmSubmitShouldStop(0, 14_000, true, laneMax)).toBe(true);
+    expect(prewarmSubmitShouldStop(0, 14_000, false, laneMax)).toBe(true);
+    const noUsefulLink = {
+      stop: true,
+      reason: 'no-useful-link',
+      elapsedMs: 12,
+      submissions: 8,
+    } as const;
+    // Both rules stop the lane long before either deadline reading.
+    expect(prewarmSubmitShouldStop(0, 14_000, true, noUsefulLink)).toBe(true);
+    expect(prewarmSubmitShouldStop(0, Number.POSITIVE_INFINITY, true, noUsefulLink)).toBe(true);
   });
 
   it('classifies exactly the link/upload debt entries for BOOT_DEBT resume', () => {
@@ -406,11 +441,13 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     // lane, never a drop (the pins below).
     expect(compileEntry).not.toContain('performance.now() >= gpuSubmitDeadline');
     // The submit loop consults the pure decision BETWEEN units, with the
-    // caller-chosen deadline and the Insane exemption flag: without this
-    // wiring the 22 s production overrun comes back with every unit test
-    // green (QA finding B2).
+    // caller-chosen deadline, the Insane exemption flag, and the pacing
+    // lane's own hard-stop verdict: without this wiring the 22 s production
+    // overrun comes back with every unit test green (QA finding B2), and
+    // without the fourth argument the Insane arm has no stop at all (the
+    // 11.8 s compile-submit entry of the 17/08 production login).
     expect(renderer).toContain(
-      'prewarmSubmitShouldStop(\n          performance.now(),\n          deadlineMs,\n          policy.finishFullManifestBeforeReveal,\n        )',
+      'prewarmSubmitShouldStop(\n          performance.now(),\n          deadlineMs,\n          policy.finishFullManifestBeforeReveal,\n          pacing.shouldStop(performance.now()),\n        )',
     );
     expect(renderer).toContain('if (!(await pacing.awaitSlot(outOfTime))) {');
     expect(renderer).toContain(

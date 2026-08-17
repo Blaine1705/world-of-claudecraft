@@ -16,6 +16,7 @@
 // renderer.ts is the thin consumer that runs the manifest the policy describes.
 
 import { EASTBROOK_LAYOUT } from '../sim/eastbrook_layout';
+import type { PrewarmSubmitStopVerdict } from './prewarm_submit_stop_core';
 
 /** Manifest entries a constrained device still runs; everything else is skipped. */
 export const CONSTRAINED_PREWARM_KEEP: readonly string[] = [
@@ -276,15 +277,24 @@ export function prewarmEntryShouldDefer(
  * prologue is synchronous main-thread work, and one uninterrupted loop
  * measured 22 s in production against the 15 s hard deadline, which dropped
  * every entry behind it, the deadline-exempt debt payers included
- * (hitch-hunt S1/S2). The check runs BETWEEN units, never preemptively, and
- * the Insane finish-full-manifest arm keeps submitting without bound: its
- * contract is a complete manifest behind the cover.
+ * (hitch-hunt S1/S2). The check runs BETWEEN units, never preemptively.
+ *
+ * Two independent clauses, and only ONE of them is exemptible:
+ * - the manifest DEADLINE, which the Insane finish-full-manifest arm ignores
+ *   (its contract is a complete manifest behind the loading cover), and
+ * - the lane's own HARD STOP (prewarm_submit_stop_core.ts), which nothing
+ *   exempts. Without it that arm had no stop at all, and one lane ate 11.8 s
+ *   of a 12 s budget while twelve entries behind it timed out. The verdict is
+ *   passed in rather than computed here so this stays a pure decision over
+ *   readings the caller already holds.
  */
 export function prewarmSubmitShouldStop(
   nowMs: number,
   gpuSubmitDeadlineMs: number,
   finishFullManifestBeforeReveal: boolean,
+  laneVerdict?: PrewarmSubmitStopVerdict | null,
 ): boolean {
+  if (laneVerdict?.stop === true) return true;
   if (finishFullManifestBeforeReveal) return false;
   return nowMs >= gpuSubmitDeadlineMs;
 }
