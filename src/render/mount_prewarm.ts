@@ -25,7 +25,7 @@ import { setRenderCategory } from './renderer_diagnostics';
  * keeps running in the background (still memoized for a later successful
  * pass); this just stops THIS pass waiting on it, same as a genuine failure.
  */
-const MOUNT_PREWARM_FETCH_TIMEOUT_MS = 8000;
+export const MOUNT_PREWARM_FETCH_TIMEOUT_MS = 8000;
 
 function raceTimeout<T>(promise: Promise<T>, ms: number): Promise<T | 'timeout'> {
   return new Promise((resolve) => {
@@ -60,12 +60,16 @@ export function mountPrewarmKeys(): MountKey[] {
  * idle pass retries it, exactly like every other lazy character asset miss
  * in this renderer (never a synchronous throw on the render path).
  */
-export async function buildMountPrewarmVisual(key: MountKey): Promise<CharacterVisual | null> {
+export async function buildMountPrewarmVisual(
+  key: MountKey,
+  fetchTimeoutMs = MOUNT_PREWARM_FETCH_TIMEOUT_MS,
+): Promise<CharacterVisual | null> {
   const { visualKey } = MOUNT_VISUAL_SPECS[key];
   if (!mountAssetsReady(visualKey)) {
+    if (fetchTimeoutMs <= 0) return null;
     await raceTimeout(
       preloadMountAssets(visualKey).catch(() => undefined),
-      MOUNT_PREWARM_FETCH_TIMEOUT_MS,
+      Math.min(MOUNT_PREWARM_FETCH_TIMEOUT_MS, fetchTimeoutMs),
     );
   }
   if (!mountAssetsReady(visualKey)) return null;
@@ -100,8 +104,9 @@ export async function stageMountPrewarmVisual(
   scene: THREE.Scene,
   group: THREE.Group | null,
   key: MountKey,
+  fetchTimeoutMs = MOUNT_PREWARM_FETCH_TIMEOUT_MS,
 ): Promise<MountPrewarmStageResult | null> {
-  const visual = await buildMountPrewarmVisual(key);
+  const visual = await buildMountPrewarmVisual(key, fetchTimeoutMs);
   if (!visual) return null;
   let targetGroup = group;
   if (!targetGroup) {

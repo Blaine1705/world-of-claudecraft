@@ -201,7 +201,7 @@ interface AttributionTargetFixture {
 // and vfx.mount-programs both move the runtime inputs, so the composite follows
 // the actual merged tree bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '3dbec74706dd0b7b6707e750ce8ddce0255989ec90aba72b1ba90bd9be3bab31';
+  '1b985de8906fa2aea6e53ab3156d21dd509b090a52153d1ecf9a86010c5d159d';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

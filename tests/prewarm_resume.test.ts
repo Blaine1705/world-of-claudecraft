@@ -541,13 +541,11 @@ describe('resumeDroppedPrewarmEntries', () => {
   // without KHR_parallel_shader_compile, so the first sighting of any mount
   // could freeze a live frame with no mitigation at all on that hardware.
   //
-  // This does not source-match the entry: a previous version of this test did
-  // (matching literal substrings like `mountPrewarmGroup.add(visual.root)`),
-  // and it stayed green against an entry that reparented every staged rig
-  // straight out of its own group into the live scene, leaked them there
-  // forever, and warmed zero mounts on the desktop path while still
-  // reporting 'completed'. A source match cannot catch any of that: only
-  // running the real staging/compile path against a fake scene can.
+  // The structural checks pin the renderer wiring, while the behavior test
+  // below catches the scene-parenting regression that source matches missed:
+  // an entry that reparented every staged rig straight out of its own group
+  // into the live scene, leaked them there forever, and warmed zero mounts on
+  // the desktop path while still reporting 'completed'.
   it('warms every mount program as one resumable unit per catalog key', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const start = source.indexOf("id: 'vfx.mount-programs'");
@@ -562,13 +560,23 @@ describe('resumeDroppedPrewarmEntries', () => {
     // exactly the property that kept vfx.weapon-skins from drifting the way
     // mounts did, and mount_prewarm.test.ts pins the derivation itself.
     expect(entryBlock).toContain('mountPrewarmKeys()');
-    expect(entryBlock).toContain('id: `mount:${key}`');
-    expect(entryBlock).toContain('stageMountPrewarmVisual(this.scene, mountPrewarmGroup, key)');
+    expect(source).toContain('id: `mount:$' + '{key}`');
+    expect(source).toContain('const mountPrewarmWarmedKeys = new Set<string>();');
+    expect(source).toContain('.filter((key) => !mountPrewarmWarmedKeys.has(key))');
+    expect(entryBlock).toContain('const remainingMs = mountDeadline - performance.now();');
+    expect(entryBlock).toContain('if (remainingMs <= 0) break;');
+    expect(entryBlock).toContain(
+      'stageMountPrewarmVisual(this.scene, mountPrewarmGroup, key, remainingMs)',
+    );
+    expect(entryBlock).toContain('const units = mountPrewarmResumeUnits();');
+    expect(source).toContain(
+      "if (units.length > 0) droppedEntries.push({ id: 'vfx.mount-programs', units });",
+    );
     // Both program halves: three's shadow depth material uses a different
     // cache key (RGBADepthPacking) than the color pass, so linking only the
     // color program still left the first shadow draw to link synchronously.
-    expect(entryBlock).toContain('compilePrewarmColorPrograms(staged.visual.root, false)');
-    expect(entryBlock).toContain('compileShadowPrograms(staged.visual.root)');
+    expect(source).toContain('compilePrewarmColorPrograms(staged.visual.root, false)');
+    expect(source).toContain('compileShadowPrograms(staged.visual.root)');
     // An honest progress(): a run cut short by the deadline must report
     // 'partial', never a false 'completed' (resolvePrewarmEntryStatus's
     // documented failure mode).
