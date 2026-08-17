@@ -29,6 +29,8 @@
 // suite proves the real predicates.
 
 import { createHash, randomBytes } from 'node:crypto';
+import { itemCopyPin } from '../src/sim/item_copy_ref';
+import type { ItemInstancePayload } from '../src/sim/types';
 import { verifySolanaSignature } from './wallet_link';
 
 /** Challenge lifetime. Five minutes: the flow is immediate (the wallet popup
@@ -45,11 +47,18 @@ export type WocStepUpBinding =
   | {
       operation: 'create_listing';
       itemId: string;
+      /** The exact copy the player is listing, as they claimed it. Bound so a
+       *  signature for a junk roll cannot escrow the best-rolled copy of the
+       *  same id (a compromised-client copy swap); null for a plain stack. */
+      expectInstance: ItemInstancePayload | null;
       format: string;
       startCents: number;
       reserveCents: number | null;
       buyNowCents: number | null;
       durationHours: number;
+      /** The second-chance-to-the-next-bidder routing: it decides where the
+       *  item goes on a settlement failure, so it is bound too. */
+      offerNext: boolean;
     }
   | {
       operation: 'accept_directed_offer';
@@ -102,12 +111,19 @@ export function stepUpBindingDigest(binding: WocStepUpBinding): string {
       ? [
           'v1',
           binding.operation,
-          binding.itemId,
+          // The full copy identity (id + instance payload), not just the id:
+          // itemCopyPin is the repo's canonical per-copy fingerprint.
+          itemCopyPin({
+            itemId: binding.itemId,
+            count: 1,
+            ...(binding.expectInstance === null ? {} : { instance: binding.expectInstance }),
+          }),
           binding.format,
           String(binding.startCents),
           binding.reserveCents === null ? '-' : String(binding.reserveCents),
           binding.buyNowCents === null ? '-' : String(binding.buyNowCents),
           String(binding.durationHours),
+          binding.offerNext ? '1' : '0',
         ]
       : [
           'v1',
@@ -117,6 +133,18 @@ export function stepUpBindingDigest(binding: WocStepUpBinding): string {
           String(binding.usdCents),
         ];
   return createHash('sha256').update(parts.join('|')).digest('hex');
+}
+
+/** A short human descriptor of the copy for the signed message: the rolled
+ *  quality and enchant a player recognizes, so "list <id>" names WHICH copy
+ *  leaves the bags. Empty when the copy carries no distinguishing payload. */
+function copyDescriptor(instance: ItemInstancePayload | null): string {
+  if (!instance) return '';
+  const bits: string[] = [];
+  if (instance.rolled?.quality) bits.push(instance.rolled.quality);
+  if (instance.enchant) bits.push('enchanted');
+  if (instance.signer) bits.push(`crafted by ${instance.signer}`);
+  return bits.join(', ');
 }
 
 const usd = (cents: number): string => `$${(cents / 100).toFixed(2)}`;
@@ -132,6 +160,7 @@ export function buildStepUpMessage(opts: {
   binding: WocStepUpBinding;
   accountId: number;
   wallet: string;
+  realm: string;
   nonce: string;
   expiresAtIso: string;
 }): string {
@@ -140,11 +169,15 @@ export function buildStepUpMessage(opts: {
     b.operation === 'create_listing'
       ? [
           `Action: list ${b.itemId} on the $WOC Exchange`,
+          ...(copyDescriptor(b.expectInstance) === ''
+            ? []
+            : [`Copy: ${copyDescriptor(b.expectInstance)}`]),
           `Format: ${b.format}`,
           `Starting price: ${usd(b.startCents)}`,
           `Reserve: ${b.reserveCents === null ? 'none' : usd(b.reserveCents)}`,
           `Buy now: ${b.buyNowCents === null ? 'none' : usd(b.buyNowCents)}`,
           `Duration: ${b.durationHours}h`,
+          `Second chance to next bidder: ${b.offerNext ? 'yes' : 'no'}`,
         ]
       : [
           `Action: accept directed offer #${b.offerId} on the $WOC Exchange`,
@@ -157,6 +190,7 @@ export function buildStepUpMessage(opts: {
     ...action,
     '',
     `Account: #${opts.accountId}`,
+    `Realm: ${opts.realm}`,
     `Wallet: ${opts.wallet}`,
     `Nonce: ${opts.nonce}`,
     `Expires At: ${opts.expiresAtIso}`,

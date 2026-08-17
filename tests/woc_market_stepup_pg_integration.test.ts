@@ -44,11 +44,13 @@ const TTL_MS = 5 * 60_000;
 const BINDING: WocStepUpBinding = {
   operation: 'create_listing',
   itemId: 'valorplate_chest',
+  expectInstance: null,
   format: 'auction',
   startCents: 5000,
   reserveCents: null,
   buyNowCents: null,
   durationHours: 12,
+  offerNext: false,
 };
 
 describeDb('woc market step-up challenges against real Postgres', () => {
@@ -114,6 +116,7 @@ describeDb('woc market step-up challenges against real Postgres', () => {
         binding: BINDING,
         accountId,
         wallet: 'wallet-stepup',
+        realm: REALM,
         nonce,
         expiresAtIso: new Date(expiresAtMs).toISOString(),
       }),

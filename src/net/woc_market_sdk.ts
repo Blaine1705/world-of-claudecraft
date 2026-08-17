@@ -225,11 +225,15 @@ export type WocStepUpChallengeRequest =
   | {
       operation: 'create_listing';
       itemId: string;
+      /** The exact copy being listed (bound into the challenge so the signed
+       *  message names which copy leaves the bags); null for a plain stack. */
+      expectInstance: ItemInstancePayload | null;
       format: 'auction' | 'buy_now' | 'auction_buy_now';
       startCents: number;
       reserveCents: number | null;
       buyNowCents: number | null;
       durationHours: number;
+      offerNext: boolean;
     }
   | { operation: 'accept_directed_offer'; offerId: number };
 

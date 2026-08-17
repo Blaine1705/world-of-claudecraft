@@ -257,11 +257,13 @@ async function createListing(rig: Rig) {
   const issue = await rig.service.issueStepUpChallenge(SELLER, {
     operation: 'create_listing',
     itemId: EPIC_ITEM,
+    expectInstance: null,
     format: params.format,
     startCents: params.startCents,
     reserveCents: params.reserveCents,
     buyNowCents: params.buyNowCents,
     durationHours: params.durationHours,
+    offerNext: params.offerNext,
   });
   if (!issue.ok) throw new Error(`issueStepUpChallenge refused: ${issue.reason}`);
   return rig.service.createListing({

@@ -32,11 +32,13 @@ const NOW = 1_755_000_000_000;
 const LIST_BINDING: WocStepUpBinding = {
   operation: 'create_listing',
   itemId: 'valorplate_chest',
+  expectInstance: { rolled: { quality: 'epic' } },
   format: 'auction_buy_now',
   startCents: 5000,
   reserveCents: 6000,
   buyNowCents: 9000,
   durationHours: 12,
+  offerNext: false,
 };
 
 const ACCEPT_BINDING: WocStepUpBinding = {
@@ -66,6 +68,7 @@ function challengeRow(
       binding,
       accountId: ACCOUNT,
       wallet: WALLET,
+      realm: 'Claudemoon',
       nonce,
       expiresAtIso: new Date(expiresAtMs).toISOString(),
     }),
@@ -103,6 +106,11 @@ describe('the binding digest covers every figure the wallet showed', () => {
     const base = stepUpBindingDigest(LIST_BINDING);
     const variants: WocStepUpBinding[] = [
       { ...LIST_BINDING, itemId: 'other_item' },
+      // The COPY, not just the id: a different roll of the same id must move
+      // the digest, so a signature for a junk copy cannot escrow a better one.
+      { ...LIST_BINDING, expectInstance: { rolled: { quality: 'legendary' } } },
+      { ...LIST_BINDING, expectInstance: { enchant: 'fiery' } },
+      { ...LIST_BINDING, expectInstance: null },
       { ...LIST_BINDING, format: 'auction' },
       { ...LIST_BINDING, startCents: 5001 },
       { ...LIST_BINDING, reserveCents: 6001 },
@@ -110,6 +118,8 @@ describe('the binding digest covers every figure the wallet showed', () => {
       { ...LIST_BINDING, buyNowCents: 9001 },
       { ...LIST_BINDING, buyNowCents: null },
       { ...LIST_BINDING, durationHours: 13 },
+      // offerNext routes the item on a settlement failure, so it is bound too.
+      { ...LIST_BINDING, offerNext: true },
     ];
     for (const v of variants) expect(stepUpBindingDigest(v), JSON.stringify(v)).not.toBe(base);
   });
@@ -119,8 +129,10 @@ describe('the binding digest covers every figure the wallet showed', () => {
     expect(stepUpBindingDigest({ ...ACCEPT_BINDING, offerId: 312 })).not.toBe(base);
     expect(stepUpBindingDigest({ ...ACCEPT_BINDING, itemId: 'other_item' })).not.toBe(base);
     expect(stepUpBindingDigest({ ...ACCEPT_BINDING, usdCents: 7501 })).not.toBe(base);
-    // The operation tag itself separates the two shapes: a listing challenge
-    // can never digest-collide with an accept challenge.
+    // The two operations differ in shape (part count and content), so a listing
+    // challenge can never digest-collide with an accept challenge; the leading
+    // 'v1' tag and the operation tag are future-proofing rather than what
+    // separates the two today (the shape disjointness is).
     expect(stepUpBindingDigest(LIST_BINDING)).not.toBe(base);
   });
 
@@ -132,15 +144,25 @@ describe('the binding digest covers every figure the wallet showed', () => {
 });
 
 describe('the signed message', () => {
-  it('names the action, every money figure, the nonce, and the expiry', () => {
+  it('names the action, the copy, every money figure, the realm, the nonce, and the expiry', () => {
     const row = challengeRow();
     expect(row.message).toContain('list valorplate_chest');
+    // The copy the wallet is authorizing, so the player sees WHICH one leaves.
+    expect(row.message).toContain('Copy: epic');
     expect(row.message).toContain('$50.00');
     expect(row.message).toContain('$60.00');
     expect(row.message).toContain('$90.00');
     expect(row.message).toContain('12h');
+    expect(row.message).toContain('Second chance to next bidder: no');
+    expect(row.message).toContain('Realm: Claudemoon');
     expect(row.message).toContain(`Nonce: ${row.nonce}`);
     expect(row.message).toContain(new Date(row.expiresAtMs).toISOString());
+  });
+
+  it('omits the Copy line for a plain stack, and flips the second-chance line', () => {
+    const plain = challengeRow({ ...LIST_BINDING, expectInstance: null, offerNext: true });
+    expect(plain.message).not.toContain('Copy:');
+    expect(plain.message).toContain('Second chance to next bidder: yes');
   });
 
   it('names the offer and agreed price on the directed arm', () => {

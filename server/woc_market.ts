@@ -1643,13 +1643,21 @@ export class WocMarketService {
       if (!offer || offer.sellerAccount !== account) return refuse('not_found');
       if (offer.status !== 'pending') return refuse('not_pending');
       if (offer.expiresAtMs <= this.now()) return refuse('offer_expired');
+      // A legacy pre-pin offer with no item names nothing to sign for, and its
+      // acceptance would refuse item_mismatch on the null pin anyway; refuse
+      // rather than mint a blank "Item: " authorization.
+      if (!offer.itemId) return refuse('not_found');
       binding = {
         operation: 'accept_directed_offer',
         offerId: request.offerId,
-        itemId: offer.itemId ?? '',
+        itemId: offer.itemId,
         usdCents: offer.usdCents,
       };
     } else {
+      // The item must be real BEFORE the wallet is asked to sign for it: a
+      // free-text id (a newline forging a line in the popup, or a nonexistent
+      // id createListing would refuse) never mints a challenge.
+      if (!Object.hasOwn(ITEMS, request.itemId)) return refuse('unknown_item');
       binding = request;
     }
     // Issue-time prune: what bounds the table (plus the rate limiter).
@@ -1660,6 +1668,7 @@ export class WocMarketService {
       binding,
       accountId: account,
       wallet,
+      realm: this.cfg.realm,
       nonce,
       expiresAtIso: new Date(expiresAtMs).toISOString(),
     });
@@ -1704,21 +1713,28 @@ export class WocMarketService {
     if (gate) return gate;
     const wallet = await this.deps.verifiedWallet(args.account);
     if (!wallet) return refuse('wallet_required');
-    // Step-up BEFORE any business validation: an unauthorized bearer learns
-    // nothing about params or eligibility. The binding digests the RAW params
-    // the client asked the challenge for, so challenge and request agree
-    // byte-for-byte or refuse. The directed arm's proof was consumed at the
-    // seller's acceptance; the public route can never set args.directed
-    // (pinned by the routes suite), so this skip is unreachable from outside.
+    // Step-up BEFORE any business validation, deliberately: an unauthorized
+    // bearer learns nothing about params or eligibility (no oracle). The one
+    // accepted cost is that an honest seller who typo'd a price combination
+    // signs the wallet popup and only then hears the params are invalid; the
+    // client pre-validates the common cases (the buy-now-above-start check), so
+    // this is an edge, and preserving the clean no-oracle posture on a custody
+    // path outweighs it. The binding digests the RAW params the client asked
+    // the challenge for, so challenge and request agree byte-for-byte or
+    // refuse. The directed arm's proof was consumed at the seller's acceptance;
+    // the public route can never set args.directed (pinned by the routes
+    // suite), so this skip is unreachable from outside.
     if (!args.directed) {
       const gateUp = await this.guardStepUp(args.account, wallet, args.stepUp, {
         operation: 'create_listing',
         itemId: args.itemRef.itemId,
+        expectInstance: args.itemRef.expectInstance ?? null,
         format: args.params.format,
         startCents: args.params.startCents,
         reserveCents: args.params.reserveCents,
         buyNowCents: args.params.buyNowCents,
         durationHours: args.params.durationHours,
+        offerNext: args.params.offerNext,
       });
       if (gateUp) return gateUp;
     }

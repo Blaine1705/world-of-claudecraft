@@ -1821,11 +1821,15 @@ export class WocMarketWindow {
       const issued = await hooks.client.stepUpChallenge({
         operation: 'create_listing',
         itemId: slot.itemId,
+        // The exact copy, so the signed message names which one leaves the
+        // bags and the server binds it (matches the createListing body below).
+        expectInstance: slot.instance ?? null,
         format: submitFormat,
         startCents,
         reserveCents: listingReserve,
         buyNowCents: listingBuyNow,
         durationHours,
+        offerNext,
       });
       if (!issued.ok) {
         this.fail(issued.code);

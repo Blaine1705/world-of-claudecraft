@@ -580,14 +580,15 @@ async function stepUpChallengeHandler(ctx: Ctx): Promise<void> {
   const body = bodyOf(ctx);
   const operation = body.operation;
   const account = ctxAccountId(ctx);
+  const expectInstance = optionalInstance(body.expectInstance);
+  const format = String(body.format);
   const out =
     operation === 'create_listing'
       ? await useService().issueStepUpChallenge(account, {
           operation: 'create_listing',
           itemId: stringField(body.itemId, 128),
-          format: LISTING_FORMATS.has(String(body.format))
-            ? (body.format as string)
-            : (invalid() as never),
+          expectInstance: expectInstance ?? null,
+          format: LISTING_FORMATS.has(format) ? (format as WocListingFormat) : (invalid() as never),
           startCents: intField(
             body.startCents,
             WOC_MARKET_MIN_PRICE_CENTS,
@@ -596,6 +597,7 @@ async function stepUpChallengeHandler(ctx: Ctx): Promise<void> {
           reserveCents: optionalCents(body.reserveCents),
           buyNowCents: optionalCents(body.buyNowCents),
           durationHours: intField(body.durationHours, 1, 1_000),
+          offerNext: body.offerNext === true,
         })
       : operation === 'accept_directed_offer'
         ? await useService().issueStepUpChallenge(account, {
@@ -624,8 +626,10 @@ async function createListingHandler(ctx: Ctx): Promise<void> {
       ...(expectInstance === undefined ? {} : { expectInstance }),
     },
     params: {
+      // Use the coerced string as the value, not the raw body: `["auction"]`
+      // must not pass the allowlist and then flow through as an array.
       format: LISTING_FORMATS.has(String(body.format))
-        ? (body.format as WocListingFormat)
+        ? (String(body.format) as WocListingFormat)
         : (invalid() as never),
       startCents: intField(body.startCents, WOC_MARKET_MIN_PRICE_CENTS, WOC_MARKET_MAX_PRICE_CENTS),
       reserveCents: optionalCents(body.reserveCents),

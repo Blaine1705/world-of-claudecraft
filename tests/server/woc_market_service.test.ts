@@ -47,6 +47,7 @@ import {
   WOC_MARKET_BOND_PENDING_TTL_SECONDS,
   WOC_MARKET_BOND_POLL_PARK_SECONDS,
   WOC_MARKET_BUY_NOW_LOCK_SECONDS,
+  WOC_MARKET_DIRECTED_OFFER_TTL_SECONDS,
   WOC_MARKET_MAX_ACTIVE_LISTINGS,
   WOC_MARKET_OFFER_CONVERGE_MAX_AGE_SECONDS,
   WOC_MARKET_OFFER_CONVERGE_SECONDS,
@@ -408,16 +409,22 @@ function listingParams(over: Partial<WocListingParams> = {}): WocListingParams {
 }
 
 /** The listing-shaped step-up binding for `params`, the same fields the route
- *  hands the challenge issue. */
-function listBindingFor(itemId: string, params: WocListingParams) {
+ *  hands the challenge issue (including the exact copy and offerNext). */
+function listBindingFor(
+  itemId: string,
+  params: WocListingParams,
+  expectInstance: ItemInstancePayload | null = null,
+) {
   return {
     operation: 'create_listing' as const,
     itemId,
+    expectInstance,
     format: params.format,
     startCents: params.startCents,
     reserveCents: params.reserveCents,
     buyNowCents: params.buyNowCents,
     durationHours: params.durationHours,
+    offerNext: params.offerNext,
   };
 }
 
@@ -440,7 +447,11 @@ async function createListingSteppedUp(
 ): Promise<Awaited<ReturnType<WocMarketService['createListing']>>> {
   return h.service.createListing({
     ...args,
-    stepUp: await stepUpFor(h, args.account, listBindingFor(args.itemRef.itemId, args.params)),
+    stepUp: await stepUpFor(
+      h,
+      args.account,
+      listBindingFor(args.itemRef.itemId, args.params, args.itemRef.expectInstance ?? null),
+    ),
   });
 }
 
@@ -674,6 +685,163 @@ describe('step-up enforcement on the custody movers (B6/R1)', () => {
       expect(res).toEqual({ ok: false, reason: 'stepup_binding_mismatch' });
     }
     expect(bagsOf(h, SELLER_CHAR)).toHaveLength(2);
+  });
+
+  it('binds the exact COPY: a proof for one roll cannot escrow a different roll of the same id', async () => {
+    // The compromised-client copy swap: the wallet signed for a junk roll, the
+    // client submits the best-rolled copy of the same id. The binding covers
+    // the instance, not just the id, so the swap refuses.
+    const h = makeHarness();
+    h.custody.bags.set(SELLER_CHAR, [
+      { itemId: EPIC_ITEM, count: 1, instance: { rolled: { quality: 'epic' } } },
+    ]);
+    const params = listingParams();
+    const proofForJunk = await stepUpFor(
+      h,
+      SELLER,
+      listBindingFor(EPIC_ITEM, params, { rolled: { quality: 'common' } }),
+    );
+    const res = await h.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM, expectInstance: { rolled: { quality: 'epic' } } },
+      params,
+      stepUp: proofForJunk,
+    });
+    expect(res).toEqual({ ok: false, reason: 'stepup_binding_mismatch' });
+    // The matching proof for the real copy lists it.
+    const good = await createListingSteppedUp(h, {
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM, expectInstance: { rolled: { quality: 'epic' } } },
+      params,
+    });
+    expect(good.ok).toBe(true);
+  });
+
+  it('binds offerNext: a proof for offerNext false cannot list with it on', async () => {
+    const h = makeHarness();
+    const proof = await stepUpFor(h, SELLER, listBindingFor(EPIC_ITEM, listingParams()));
+    const res = await h.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams({ offerNext: true }),
+      stepUp: proof,
+    });
+    expect(res).toEqual({ ok: false, reason: 'stepup_binding_mismatch' });
+  });
+
+  it('keeps ELIGIBILITY behind the guard: a bearer-only listing of an ineligible item still reads stepup_required', async () => {
+    // Coverage's oracle concern: moving guardStepUp below the eligibility check
+    // would leak whether the item is listable to a stolen bearer. An ineligible
+    // item (a rare, below the epic floor) and a locked copy both answer
+    // stepup_required, NOT their eligibility reason, when no proof is attached.
+    const h = makeHarness();
+    const rare = await h.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 1, itemId: RARE_ITEM },
+      params: listingParams(),
+    });
+    expect(rare).toEqual({ ok: false, reason: 'stepup_required' });
+    h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1, instance: { locked: true } }]);
+    const locked = await h.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams(),
+    });
+    expect(locked).toEqual({ ok: false, reason: 'stepup_required' });
+  });
+
+  it('the challenge issue refuses an unknown item id before minting anything', async () => {
+    // Security: a free-text or nonexistent id must never mint a challenge the
+    // wallet would then display (a newline-forged line, or an id createListing
+    // would refuse anyway).
+    const h = makeHarness();
+    const res = await h.service.issueStepUpChallenge(SELLER, {
+      operation: 'create_listing',
+      itemId: 'no_such_item\nAgreed price: $999.99',
+      expectInstance: null,
+      format: 'auction',
+      startCents: 5000,
+      reserveCents: null,
+      buyNowCents: null,
+      durationHours: 12,
+      offerNext: false,
+    });
+    expect(res).toEqual({ ok: false, reason: 'unknown_item' });
+    expect(h.db.stepUpChallengeCount()).toBe(0);
+  });
+
+  it('the shape screen refuses a malformed nonce WITHOUT touching the store', async () => {
+    // The nonce regex and signature cap keep attacker-controlled strings away
+    // from the store; a decided refusal, no query.
+    const h = makeHarness();
+    const consumeSpy = vi.spyOn(h.db, 'consumeStepUpChallenge');
+    const res = await h.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams(),
+      stepUp: { nonce: 'NOT-hex-and-too-punctuated', signature: 'x' },
+    });
+    expect(res).toEqual({ ok: false, reason: 'stepup_challenge_invalid' });
+    expect(consumeSpy).not.toHaveBeenCalled();
+    consumeSpy.mockRestore();
+  });
+
+  it('the prune runs on every issue: a stale challenge is swept when a fresh one is minted', async () => {
+    // The table's growth bound. Seed an expired row, issue a fresh challenge,
+    // and the stale one is gone (the count reflects only the live row).
+    const h = makeHarness();
+    await h.db.createStepUpChallenge({
+      nonce: 'a'.repeat(32),
+      realm: REALM,
+      accountId: SELLER,
+      wallet: 'wallet-seller',
+      operation: 'create_listing',
+      bindingDigest: 'x',
+      message: 'stale',
+      expiresAtMs: BASE_MS - 1,
+    });
+    expect(h.db.stepUpChallengeCount()).toBe(1);
+    await stepUpFor(h, SELLER, listBindingFor(EPIC_ITEM, listingParams()));
+    // The stale row pruned; only the freshly minted one remains.
+    expect(h.db.stepUpChallengeCount()).toBe(1);
+    expect(await h.db.consumeStepUpChallenge(REALM, 'a'.repeat(32), SELLER)).toBeNull();
+  });
+
+  it('the issue refuses not_pending and offer_expired on the directed arm', async () => {
+    const h = makeHarness();
+    h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
+    const offer = await h.service.createDirectedOffer({
+      account: BUYER_A,
+      characterId: CHAR_A,
+      sellerCharacterName: 'Selara',
+      usdCents: 7500,
+      item: { itemId: EPIC_ITEM },
+      acceptTerms: true,
+    });
+    if (!offer.ok) throw new Error(`offer refused: ${offer.reason}`);
+    // Expired: advance past the TTL.
+    h.setNow(BASE_MS + WOC_MARKET_DIRECTED_OFFER_TTL_SECONDS * 1000 + 1);
+    expect(
+      await h.service.issueStepUpChallenge(SELLER, {
+        operation: 'accept_directed_offer',
+        offerId: offer.offer.id,
+      }),
+    ).toEqual({ ok: false, reason: 'offer_expired' });
+    // Not pending: resolve it, then issue.
+    h.setNow(BASE_MS);
+    await h.service.resolveDirectedOffer(BUYER_A, offer.offer.id, 'withdraw');
+    expect(
+      await h.service.issueStepUpChallenge(SELLER, {
+        operation: 'accept_directed_offer',
+        offerId: offer.offer.id,
+      }),
+    ).toEqual({ ok: false, reason: 'not_pending' });
   });
 
   it('refuses another account riding a stolen proof, and the owner keeps their challenge', async () => {

@@ -1205,11 +1205,19 @@ describe('the step-up surface at the route layer (B6/R1)', () => {
       { ...base, startCents: 100_001 },
       { ...base, format: 'raffle' },
       { ...base, durationHours: 0 },
+      { ...base, durationHours: 1_001 },
       { ...base, itemId: '' },
+      // The two optional money figures the wallet displays go through
+      // optionalCents and must honor the same range.
+      { ...base, reserveCents: 1 },
+      { ...base, reserveCents: 100_001 },
+      { ...base, buyNowCents: 1 },
+      { ...base, buyNowCents: 100_001 },
     ]) {
       const ctx = postCtx('/api/woc-market/step-up/challenge', bad);
       await expect(
         handlerFor('POST', '/api/woc-market/step-up/challenge')(ctx),
+        JSON.stringify(bad),
       ).rejects.toMatchObject({ code: 'woc_market.invalid_input' });
     }
   });
