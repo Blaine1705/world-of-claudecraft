@@ -47,7 +47,6 @@ import {
   coachFocus,
   coachKeycaps,
   computeBootcampStep,
-  nextWreckCrateTarget,
 } from './bootcamp_view';
 import { tEntity } from './entity_i18n';
 import { formatNumber, t } from './i18n';
@@ -68,10 +67,6 @@ export class BootcampOverlay {
   // closing bell card only follows a graduation, never a casual revisit.
   private sawSail = false;
   private bellPhase = false;
-  // The crate line's live arrow target: the next un-looted crate along the
-  // authored line, recomputed only when the pickup tally moves.
-  private wreckTarget: { x: number; z: number } | null = null;
-  private lastWreckCounts = -1;
 
   private root: HTMLElement | null = null;
   private titleEl!: HTMLElement;
@@ -126,26 +121,6 @@ export class BootcampOverlay {
       this.cameraLastYaw = null;
     }
     const cameraTurned = this.cameraTravel >= CAMERA_LESSON_TRAVEL_RAD;
-
-    // The crate line's arrow walks the line with the player: retarget the
-    // next un-looted crate whenever the pickup tally moves (cheap: one
-    // entity sweep per pickup, not per frame).
-    if (focus?.questId === 'q_ps_the_wreck_line' && focus.state === 'active') {
-      const counts = world.questLog.get(focus.questId)?.counts?.[0] ?? 0;
-      if (counts !== this.lastWreckCounts) {
-        this.lastWreckCounts = counts;
-        const spots: { x: number; z: number }[] = [];
-        for (const e of world.entities.values()) {
-          if (e.kind === 'object' && e.objectItemId === 'ps_castaway_crate' && e.lootable) {
-            spots.push(e.pos);
-          }
-        }
-        this.wreckTarget = nextWreckCrateTarget(spots);
-      }
-    } else {
-      this.wreckTarget = null;
-      this.lastWreckCounts = -1;
-    }
 
     this.engaged = true;
     const mode = currentInputHintMode();
@@ -348,11 +323,9 @@ export class BootcampOverlay {
       ? bellCardPlan(this.lastMode).arrow
       : this.step !== null
         ? bootcampArrowTarget(this.step, this.lastCounts)
-        : this.wreckTarget
-          ? this.wreckTarget
-          : this.lastFocus
-            ? coachCardPlan(this.lastFocus, this.lastMode).arrow
-            : null;
+        : this.lastFocus
+          ? coachCardPlan(this.lastFocus, this.lastMode).arrow
+          : null;
     if (!target) {
       this.hideArrow();
       return;

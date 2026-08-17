@@ -192,12 +192,14 @@ export function coachFocus(stateOf: (questId: string) => CoachState | null): Coa
 
 /** Where the arrow points while each quest's task is underway (the giver and
  *  turn-in states aim at the NPCs themselves). Coordinates mirror the quest
- *  content: the effigy yard, the wreck line, the first stray crate, Finch's
- *  stall, the signpost's reading spot, and Odo at the crossing. */
-export const COACH_ACTIVE_TARGETS: Readonly<Record<string, { x: number; z: number }>> = {
+ *  content: the effigy yard, the scuttler strand's anchor, Finch's stall,
+ *  the signpost's reading spot, and Odo at the crossing. The crate line
+ *  deliberately carries NO marker (null): the crates line the path itself,
+ *  and the card says so. */
+export const COACH_ACTIVE_TARGETS: Readonly<Record<string, { x: number; z: number } | null>> = {
   q_ps_strike_true: { x: -336, z: -14 },
-  q_ps_shell_and_claw: { x: -391, z: -33 },
-  q_ps_the_wreck_line: { x: -362, z: -8 },
+  q_ps_shell_and_claw: { x: -380, z: -42 },
+  q_ps_the_wreck_line: null,
   q_ps_pouch_and_purse: PROVING_SHORE_NPCS.quartermaster_finch.pos,
   q_ps_the_signpost: { x: -312, z: 42.5 },
   q_ps_set_sail: PROVING_SHORE_NPCS.ferryman_odo.pos,
@@ -220,7 +222,8 @@ export interface CoachCardPlan {
   /** Whose localized name fills {npc}: the giver on the way in, the turn-in
    *  on the way back (also the active state's arrow fallback). */
   npcId: string;
-  arrow: { x: number; z: number };
+  /** Null hides the guidance arrow for this card (the crate line's choice). */
+  arrow: { x: number; z: number } | null;
 }
 
 const COACH_BODY: Record<CoachState, Record<BootcampInputMode, TranslationKey>> = {
@@ -331,7 +334,11 @@ export function coachCardPlan(focus: CoachFocus, mode: BootcampInputMode): Coach
       params: mode === 'keyboard' ? (override ? override.params : ['mapKey']) : [],
       bodyHasNpc: override?.bodyHasNpc ?? false,
       npcId: override?.npcRole === 'giver' ? quest.giverNpcId : quest.turnInNpcId,
-      arrow: COACH_ACTIVE_TARGETS[focus.questId] ?? turnIn.pos,
+      // An authored null means NO marker; only a missing entry falls back.
+      arrow:
+        COACH_ACTIVE_TARGETS[focus.questId] === undefined
+          ? turnIn.pos
+          : COACH_ACTIVE_TARGETS[focus.questId],
     };
   }
   const override = COACH_READY_OVERRIDES[focus.questId];
@@ -392,25 +399,4 @@ export function bellCardPlan(mode: BootcampInputMode): BellCardPlan {
     params: mode === 'keyboard' ? ['interactKey'] : [],
     arrow: BELL_STEP_TARGET,
   };
-}
-
-/** The crate line's live arrow: the first authored crate spot that still has
- *  a lootable crate standing on it, so the marker walks the line WITH the
- *  player, hopping to the next box as each one is picked up. Falls back to
- *  any live spot (a respawn out of authored order), then the first authored
- *  spot (nothing mirrored yet, or everything looted while the count waits
- *  out a respawn). */
-export const WRECK_CRATE_POSITIONS: readonly { x: number; z: number }[] =
-  PROVING_SHORE_OBJECTS.find((o) => o.itemId === 'ps_castaway_crate')?.positions ?? [];
-
-export function nextWreckCrateTarget(lootableSpots: readonly { x: number; z: number }[]): {
-  x: number;
-  z: number;
-} {
-  for (const authored of WRECK_CRATE_POSITIONS) {
-    if (lootableSpots.some((s) => Math.hypot(s.x - authored.x, s.z - authored.z) <= 2)) {
-      return authored;
-    }
-  }
-  return lootableSpots[0] ?? WRECK_CRATE_POSITIONS[0] ?? { x: 0, z: 0 };
 }

@@ -49,7 +49,7 @@ export const PROVING_SHORE_ZONE: ZoneDef = {
     { x: -300, z: 50, label: 'Dawnrest Camp', id: 'dawnrest_camp' },
     { x: -280, z: 0, label: 'The Old Pier', id: 'the_old_pier' },
     { x: -336, z: -14, label: 'The Practice Yard', id: 'the_practice_yard' },
-    { x: -391, z: -33, label: 'The Wreck Line', id: 'the_wreck_line' },
+    { x: -380, z: -42, label: 'The Wreck Line', id: 'the_wreck_line' },
     { x: -306, z: -22, label: 'The Gauntlet', id: 'the_gauntlet' },
   ],
   welcome:
@@ -102,13 +102,15 @@ export const PROVING_SHORE_ROADS: { x: number; z: number }[][] = [
     { x: -352, z: -18 },
     { x: -370, z: -28 },
     { x: -390, z: -33 },
-  ], // the Practice Yard -> the Wreck Line (the far strand)
+    { x: -383, z: -41 },
+  ], // the Practice Yard -> the Wreck Line (the south-west strand)
   [
     { x: -335, z: -33 },
     { x: -337, z: -24 },
     { x: -336, z: -14 },
   ], // the Gauntlet's finish (Overseer Pell) -> the Practice Yard
   [
+    { x: -380, z: -41 },
     { x: -388, z: -28 },
     { x: -370, z: -14 },
     { x: -354, z: -3 },
@@ -576,12 +578,15 @@ export const PROVING_SHORE_CAMPS: CampDef[] = [
   // camp free for the Gauntlet movement course. Counts stay halved: the
   // wreck line is a looting lesson, and a crate ringed by crabs turned it
   // into a fight the quest never asked for.
-  // Three well-separated pairs rather than two piles, ten-plus yards between
-  // camps: with the very short aggro leash above, each crab met along the
-  // line is a single fight, and a bad pull has room to retreat.
-  { mobId: 'shore_scuttler', center: { x: -380, z: -19 }, radius: 5, count: 2, offStream: true },
-  { mobId: 'shore_scuttler', center: { x: -388, z: -28 }, radius: 5, count: 2, offStream: true },
-  { mobId: 'shore_scuttler', center: { x: -398, z: -33 }, radius: 5, count: 2, offStream: true },
+  // Three well-separated pairs on the island's SOUTH-WEST strand, anchored
+  // at (-380, -42): a full thirty yards from Tidewarden Nel's watch on the
+  // north rise, so her path stays a safe walk and the cull ground reads as
+  // its own place. Ten-plus yards between camps: with the very short aggro
+  // leash above, each crab met along the strand is a single fight, and a
+  // bad pull has room to retreat.
+  { mobId: 'shore_scuttler', center: { x: -380, z: -42 }, radius: 4, count: 2, offStream: true },
+  { mobId: 'shore_scuttler', center: { x: -372, z: -48 }, radius: 4, count: 2, offStream: true },
+  { mobId: 'shore_scuttler', center: { x: -390, z: -40 }, radius: 4, count: 2, offStream: true },
 ];
 
 export const PROVING_SHORE_OBJECTS: GroundObjectDef[] = [

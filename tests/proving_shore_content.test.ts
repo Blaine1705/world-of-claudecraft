@@ -350,6 +350,15 @@ describe('proving shore placement', () => {
         ).toBeGreaterThanOrEqual(10);
       }
     }
+    // The cull ground lives on the SOUTH-WEST strand, well away from
+    // Tidewarden Nel's watch: her path stays a safe walk.
+    const nel = PROVING_SHORE_NPCS.tidewarden_nel;
+    for (const c of shells) {
+      expect(
+        Math.hypot(c.center.x - nel.pos.x, c.center.z - nel.pos.z),
+        'scuttler camp keeps its distance from Nel',
+      ).toBeGreaterThanOrEqual(25);
+    }
     // The crate line asks for six opens and authors exactly six crates: the
     // quest IS clearing the line, and OBJECT_RESPAWN covers a shared island.
     expect(PROVING_SHORE_QUESTS.q_ps_the_wreck_line.objectives[0].count).toBe(6);

@@ -12892,11 +12892,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bootcamp.taskShellBodyPad':
     '掠蟹是會回擊的。按下目標鍵，再按下第一個動作鍵揮刀。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。',
   'hudChrome.bootcamp.taskWreckLineBody':
-    '跟著箭頭去找貨箱線。走到一只漂流貨箱跟前，直到它的名字顯示出來，然後按 {interactKey}，或用滑鼠左鍵點擊貨箱，把它撿起來。湊滿六只，這批海貨就齊了。',
+    '漂流貨箱沿著通往晨憩營地的小路一路排開。走到一只漂流貨箱跟前，直到它的名字顯示出來，然後按 {interactKey}，或用滑鼠左鍵點擊貨箱，把它撿起來。湊滿六只，這批海貨就齊了。',
   'hudChrome.bootcamp.taskWreckLineBodyTouch':
-    '跟著箭頭去找貨箱線。走到一只漂流貨箱跟前，直到它的名字顯示出來，然後點按貨箱，或點按使用按鈕，把它撿起來。湊滿六只，這批海貨就齊了。',
+    '漂流貨箱沿著通往晨憩營地的小路一路排開。走到一只漂流貨箱跟前，直到它的名字顯示出來，然後點按貨箱，或點按使用按鈕，把它撿起來。湊滿六只，這批海貨就齊了。',
   'hudChrome.bootcamp.taskWreckLineBodyPad':
-    '跟著箭頭去找貨箱線。走到一只漂流貨箱跟前，直到它的名字顯示出來，然後按下互動鍵把它撿起來。湊滿六只，這批海貨就齊了。',
+    '漂流貨箱沿著通往晨憩營地的小路一路排開。走到一只漂流貨箱跟前，直到它的名字顯示出來，然後按下互動鍵把它撿起來。湊滿六只，這批海貨就齊了。',
   'hudChrome.bootcamp.taskPouchBody':
     '對著{npc}按 {interactKey}，或用滑鼠左鍵點擊對方，打開貨攤，然後用滑鼠左鍵點擊亞麻小袋買下它。',
   'hudChrome.bootcamp.taskPouchBodyTouch': '點按{npc}打開貨攤，然後點按亞麻小袋買下它。',

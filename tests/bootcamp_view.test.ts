@@ -31,8 +31,6 @@ import {
   coachFocus,
   coachKeycaps,
   computeBootcampStep,
-  nextWreckCrateTarget,
-  WRECK_CRATE_POSITIONS,
 } from '../src/ui/bootcamp_view';
 import { t } from '../src/ui/i18n';
 
@@ -183,13 +181,23 @@ describe('the rail coach', () => {
       expect(coachCardPlan({ questId, state: 'available' }, 'keyboard').arrow).toEqual(giver.pos);
       expect(coachCardPlan({ questId, state: 'ready' }, 'keyboard').arrow).toEqual(turnIn.pos);
       const active = coachCardPlan({ questId, state: 'active' }, 'keyboard').arrow;
-      expect(active).toEqual(COACH_ACTIVE_TARGETS[questId] ?? turnIn.pos);
+      expect(active).toEqual(
+        COACH_ACTIVE_TARGETS[questId] === undefined ? turnIn.pos : COACH_ACTIVE_TARGETS[questId],
+      );
     }
-    // Every quest after the Gauntlet has an authored task target (the head
-    // quest's active card is the lesson ladder, which aims at the flags).
+    // Every quest after the Gauntlet has an authored task-target ENTRY (the
+    // head quest's active card is the lesson ladder, which aims at the
+    // flags). The crate line's entry is deliberately null: the crates line
+    // the path itself, so its active card shows NO marker at all.
     for (const questId of PROVING_SHORE_QUEST_ORDER.slice(1)) {
-      expect(COACH_ACTIVE_TARGETS[questId], `${questId} task target`).toBeTruthy();
+      expect(questId in COACH_ACTIVE_TARGETS, `${questId} task target entry`).toBe(true);
     }
+    expect(COACH_ACTIVE_TARGETS.q_ps_the_wreck_line).toBeNull();
+    expect(
+      coachCardPlan({ questId: 'q_ps_the_wreck_line', state: 'active' }, 'touch').arrow,
+    ).toBeNull();
+    // The scuttler strand's marker sits on the relocated south-west anchor.
+    expect(COACH_ACTIVE_TARGETS.q_ps_shell_and_claw).toEqual({ x: -380, z: -42 });
   });
 
   it('the npc whose name the card splices is the giver in, the turn-in back', () => {
@@ -262,24 +270,6 @@ describe('the rail coach', () => {
     // Quests without an override keep the generic three-state copy.
     const generic = coachCardPlan({ questId: 'q_ps_set_sail', state: 'active' }, 'keyboard');
     expect(generic.bodyKey).toBe('hudChrome.bootcamp.coachTaskBody');
-  });
-});
-
-describe('the crate line arrow', () => {
-  it('walks the authored line, hopping to the next un-looted crate', () => {
-    expect(WRECK_CRATE_POSITIONS.length).toBe(6);
-    // Everything standing: the first crate.
-    expect(nextWreckCrateTarget(WRECK_CRATE_POSITIONS)).toEqual(WRECK_CRATE_POSITIONS[0]);
-    // The first two picked up: the third is next.
-    expect(nextWreckCrateTarget(WRECK_CRATE_POSITIONS.slice(2))).toEqual(WRECK_CRATE_POSITIONS[2]);
-    // Only the last stands: aim there.
-    expect(nextWreckCrateTarget([WRECK_CRATE_POSITIONS[5]])).toEqual(WRECK_CRATE_POSITIONS[5]);
-    // A crate slightly off its authored spot (the entity's live pos) still
-    // matches its authored anchor.
-    const off = { x: WRECK_CRATE_POSITIONS[3].x + 0.5, z: WRECK_CRATE_POSITIONS[3].z - 0.5 };
-    expect(nextWreckCrateTarget([off])).toEqual(WRECK_CRATE_POSITIONS[3]);
-    // Nothing mirrored yet: fall back to the line's start.
-    expect(nextWreckCrateTarget([])).toEqual(WRECK_CRATE_POSITIONS[0]);
   });
 });
 

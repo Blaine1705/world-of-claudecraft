@@ -12886,11 +12886,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bootcamp.taskShellBodyPad':
     '掠蟹是会回击的。按下目标键，再按下第一个动作键挥刀。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。',
   'hudChrome.bootcamp.taskWreckLineBody':
-    '跟着箭头去找货箱线。走到一只漂流货箱跟前，直到它的名字显示出来，然后按 {interactKey}，或者用鼠标左键点击货箱，把它捡起来。凑满六只，这批海货就齐了。',
+    '漂流货箱沿着通往晨憩营地的小路一路排开。走到一只漂流货箱跟前，直到它的名字显示出来，然后按 {interactKey}，或者用鼠标左键点击货箱，把它捡起来。凑满六只，这批海货就齐了。',
   'hudChrome.bootcamp.taskWreckLineBodyTouch':
-    '跟着箭头去找货箱线。走到一只漂流货箱跟前，直到它的名字显示出来，然后点按货箱，或点按使用按钮，把它捡起来。凑满六只，这批海货就齐了。',
+    '漂流货箱沿着通往晨憩营地的小路一路排开。走到一只漂流货箱跟前，直到它的名字显示出来，然后点按货箱，或点按使用按钮，把它捡起来。凑满六只，这批海货就齐了。',
   'hudChrome.bootcamp.taskWreckLineBodyPad':
-    '跟着箭头去找货箱线。走到一只漂流货箱跟前，直到它的名字显示出来，然后按下互动键把它捡起来。凑满六只，这批海货就齐了。',
+    '漂流货箱沿着通往晨憩营地的小路一路排开。走到一只漂流货箱跟前，直到它的名字显示出来，然后按下互动键把它捡起来。凑满六只，这批海货就齐了。',
   'hudChrome.bootcamp.taskPouchBody':
     '对着{npc}按 {interactKey}，或者用鼠标左键点击对方，打开货摊，然后用鼠标左键点击亚麻小袋买下它。',
   'hudChrome.bootcamp.taskPouchBodyTouch': '点按{npc}打开货摊，然后点按亚麻小袋买下它。',
