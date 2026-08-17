@@ -10074,7 +10074,7 @@ export const id_ID: EnTranslations = {
       "ferocious_bite": {
         "name": "Gigitan Berdarah",
         "description": "Jurus penutup yang menyebabkan {damage}. Hanya dalam Wujud Serigala.",
-        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Redharvest: gigitan sebesar 70 plus 43 per poin combo yang juga seketika menimbulkan seluruh kerusakan yang masih akan diberikan Flense dan Bloodrift-mu, dan memulihkan 30 energi."
+        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Redharvest, yang menghabiskan Darah Tua untuk serangan yang lebih kuat, juga seketika menimbulkan seluruh kerusakan yang masih akan diberikan Flense dan Bloodrift-mu, dan memulihkan energi."
       },
       "swipe": {
         "name": "Cakar Menyapu",
@@ -10137,7 +10137,7 @@ export const id_ID: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Darah Serigala",
-        "description": "Meningkatkan daya serang sebesar {buff} selama {duration} detik. Hanya Wujud Serigala."
+        "description": "Memunculkan {rage} energi dan meningkatkan daya serang sebesar {buff} selama {duration} detik. Hanya Wujud Serigala."
       },
       "rip": {
         "name": "Celah Darah",
@@ -10358,7 +10358,7 @@ export const id_ID: EnTranslations = {
       },
       "redharvest": {
         "name": "Panen Merah",
-        "description": "Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, langsung memberikan semua kerusakan yang masih akan diberikan Kupasan dan Robekan milikmu, menghapus kedua pendarahan, dan memulihkan 30 energi. Berfungsi tanpa poin combo."
+        "description": "Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, langsung memberikan semua kerusakan yang masih akan diberikan Kupasan dan Robekan milikmu, menghapus kedua pendarahan, dan memulihkan {rage} energi. Berfungsi tanpa poin combo."
       },
       "marrowbreak": {
         "name": "Pematah Sumsum",
@@ -10606,7 +10606,7 @@ export const id_ID: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Pemulihan Liar",
-        "description": "Memulihkan 180 nyawa selama 10 detik. Hanya dalam Bentuk Beruang. (talenta Druid)"
+        "description": "Memulihkan 40% nyawa maksimummu selama 10 detik. Hanya dalam Bentuk Beruang. (talenta Druid)"
       },
       "frost_trap": {
         "name": "Jerat Rima",

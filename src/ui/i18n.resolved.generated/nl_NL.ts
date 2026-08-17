@@ -10074,7 +10074,7 @@ export const nl_NL: EnTranslations = {
       "ferocious_bite": {
         "name": "Bloedbeet",
         "description": "Afmaakactie die {damage} veroorzaakt. Alleen in Wolfsgedaante.",
-        "specNote_feral": "Elke slag die raakt voegt 1 Oud Bloed toe; bij 3 Oud Bloed wordt deze knop Rode Oogst: een beet voor 70 plus 43 per combopunt die ook meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, en 30 energie herstelt."
+        "specNote_feral": "Elke slag die raakt voegt 1 Oud Bloed toe; bij 3 Oud Bloed wordt deze knop Rode Oogst, die je Oude Bloed verbruikt voor een krachtigere slag die ook meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, en energie herstelt."
       },
       "swipe": {
         "name": "Vegende Klauwen",
@@ -10137,7 +10137,7 @@ export const nl_NL: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Wolvenbloed",
-        "description": "Verhoogt de aanvalskracht met {buff} gedurende {duration} sec. Alleen in Wolfsgedaante."
+        "description": "Wekt {rage} energie op en verhoogt de aanvalskracht met {buff} gedurende {duration} sec. Alleen in Wolfsgedaante."
       },
       "rip": {
         "name": "Bloedscheur",
@@ -10358,7 +10358,7 @@ export const nl_NL: EnTranslations = {
       },
       "redharvest": {
         "name": "Rode Oogst",
-        "description": "Verbruikt je 3 Oud Bloed: een slag voor {damage} die meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, beide bloedingen verwijdert en 30 energie herstelt. Werkt ook zonder combopunten."
+        "description": "Verbruikt je 3 Oud Bloed: een slag voor {damage} die meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, beide bloedingen verwijdert en {rage} energie herstelt. Werkt ook zonder combopunten."
       },
       "marrowbreak": {
         "name": "Mergbreker",
@@ -10606,7 +10606,7 @@ export const nl_NL: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Wilde genezing",
-        "description": "Herstelt 180 gezondheid gedurende 10 sec. Alleen in Berenvorm. (druïdetalent)"
+        "description": "Herstelt 40% van je maximale gezondheid gedurende 10 sec. Alleen in Berenvorm. (druïdetalent)"
       },
       "frost_trap": {
         "name": "Rijpval",
