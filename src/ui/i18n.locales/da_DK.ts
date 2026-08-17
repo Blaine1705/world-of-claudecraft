@@ -4489,9 +4489,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'Månekinform',
   'entities.abilities.moonkin_form.description':
     'Antag månekinform, som styrker besværgelser, indtil du skifter tilbage. Kast igen for at vende tilbage til normal form. (Balancesignatur)',
-  'entities.abilities.feral_charge.name': 'Vild ladning',
+  'entities.abilities.feral_charge.name': 'Urkraftsbølge',
   'entities.abilities.feral_charge.description':
-    'Storm mod en fjende og rodfæst den i 1 sek. 8-25 m rækkevidde. (Vildskabssignatur)',
+    'Udløs en urkraftsbølge. I Ulveform øges jeres energiregenerering med 100% i 10 sek. I Bruin-form får I øjeblikkeligt 50 raseri. (Vildskabssignatur)',
   'entities.abilities.swiftmend.name': 'Hurtig heling',
   'entities.abilities.crusader_strike.name': 'Korsfarerslag',
   'entities.abilities.crusader_strike.description':
@@ -10872,7 +10872,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     'Øger din undvigelseschance med 50 procentpoint i 10 sek. (jægertalent)',
   'entities.abilities.earthbind.description': 'Rodfæster fjender inden for 4 m fra målpunktet i 2 sek. og sinker dem derefter med 40% i 6 sek. (Shamantalent)',
-  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (magikertalent)',
+  'entities.abilities.evocation.description':
+    'Kanaliser i 6 sek.: Hvert sekund genopretter I 100 mana og opbygger 8 besværgelseskraft. Bonussen stables under kanaliseringen og varer 15 sek. (magikertalent)',
   'entities.abilities.frenzied_regeneration.description':
     'Genopretter 180 helbred over 10 sek. Kun i Bjørneform. (druidentalent)',
   'entities.abilities.frost_trap.description':
@@ -10883,7 +10884,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     'Skræmmer fjender i nærheden i op til 3 sek. Skade kan bryde effekten. (troldmandstalent)',
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sek. (magikertalent)',
+    'Indkapsler jer i fast is i 8 sek. og gør jer immune over for al skade. Fjerner eksisterende almindelige skadelige effekter og forhindrer, at nye almindelige kontroleffekter bliver påført. Kan bruges, mens I er bedøvede eller forvandlede. I kan ikke handle, mens I er indkapslet. Kast igen for at annullere. (magiker)',
   'entities.abilities.inner_focus.description': 'Gør jeres næste præstebesværgelse gratis og umulig at afbryde. Varer 60 sek.',
   'entities.abilities.innervate.description':
     'Levende saft vælder op i dig i 10 sek. og genopretter 20 af din aktuelle ressource i bølger: mana, raseri eller energi. Formskifte afbryder den ikke. Søvn, bedøvelse eller stase standser saften. (druidentalent)',
@@ -10899,7 +10900,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.preparation.description':
     'Afslutter nedkølingen på Sprint, Undvigelse og Forsvinden. (slyngeltalent)',
   'entities.abilities.presence_of_mind.description':
-    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sek. (magikertalent)',
+    'Gør jeres næste besværgelse med kastetid øjeblikkelig. Varer 60 sek. (magikertalent)',
   'entities.abilities.psychic_scream.description': 'Skræmmer fjender inden for 8 m i op til 4 sek. Skade kan bryde effekten.',
   'entities.abilities.shadowstep.description':
     'Træder gennem skyggerne mod dit mål. (slyngeltalent)',

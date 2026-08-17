@@ -7302,7 +7302,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     'Na 10 s zvýší vaši šanci na úhyb o 50 procentních bodů. (lovecký talent)',
   'entities.abilities.earthbind.description': 'Zakoření nepřátele do 4 m od cílového bodu na 2 s a poté je zpomalí o 40 % na 6 s. (Talent šamana)',
-  'entities.abilities.evocation.description': 'Restaura manu rápidamente. (mágovský talent)',
+  'entities.abilities.evocation.description':
+    'Kanalizuje po dobu 6 s: každou sekundu obnoví 100 many a získá 8 síly kouzel. Bonus se během kanalizování sčítá a trvá 15 s. (mágovský talent)',
   'entities.abilities.frenzied_regeneration.description':
     'Během 10 s obnoví 180 bodů zdraví. Pouze v Medvědí podobě. (druidský talent)',
   'entities.abilities.frost_trap.description':
@@ -7313,7 +7314,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     'Vyděsí blízké nepřátele až na 3 s. Poškození může účinek zrušit. (černokněžnický talent)',
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (mágovský talent)',
+    'Uzavře tě na 8 s do pevného ledu a učiní tě imunním vůči veškerému poškození. Odstraní již aktivní běžné škodlivé efekty a zabrání aplikaci nových běžných ovládacích efektů. Lze použít při omráčení nebo proměnění. Během uvěznění nemůžeš jednat. Opětovným sesláním efekt zrušíš. (mág)',
   'entities.abilities.inner_focus.description': 'Tvé další kouzlo kněze bude zdarma a nepřerušitelné. Trvá 60 s.',
   'entities.abilities.innervate.description':
     'Po dobu 10 s ve vás proudí živá míza a ve vlnách obnoví 20 bodů vašeho aktuálního zdroje: many, zuřivosti nebo energie. Změna podoby ji nepřeruší. Spánek, omráčení nebo stáze proud mízy zastaví. (druidský talent)',
@@ -7332,7 +7333,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.preparation.description':
     'Dokončí přebíjení Sprintu, Úhybu a Zmizení. (lotrovský talent)',
   'entities.abilities.presence_of_mind.description':
-    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (mágovský talent)',
+    'Tvé další kouzlo s dobou sesílání bude okamžité. Trvá 60 s. (mágovský talent)',
   'entities.abilities.psychic_scream.description': 'Vyděsí nepřátele do 8 m až na 4 s. Poškození může efekt zlomit.',
   'entities.abilities.pummel.name': 'Drtič čelistí',
   'entities.abilities.pummel.description':

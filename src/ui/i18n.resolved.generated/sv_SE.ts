@@ -10326,8 +10326,8 @@ export const sv_SE: EnTranslations = {
         "description": "Anta månugglaform och stärk besvärjelser tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Balanssignatur)"
       },
       "feral_charge": {
-        "name": "Vild rusning",
-        "description": "Rusa mot en fiende och rota den i 1 sek. 8-25 m räckvidd. (Vildhetssignatur)"
+        "name": "Urvåg",
+        "description": "Släpp lös en urvåg. I Vargform ökar er energiregenerering med 100% i 10 sek. I Bruinform får ni omedelbart 50 raseri. (Vildhetssignatur)"
       },
       "swiftmend": {
         "name": "Snabb läkning",
@@ -10583,7 +10583,7 @@ export const sv_SE: EnTranslations = {
       },
       "evocation": {
         "name": "Eterbrunn",
-        "description": "Restaura mana rápidamente. (magikertalang)"
+        "description": "Kanalisera i 6 sek.: varje sekund återställer ni 100 mana och bygger upp 8 besvärjelsekraft. Bonusen staplas under kanaliseringen och varar i 15 sek. (magikertalang)"
       },
       "flurry_of_knives": {
         "name": "Knivstorm",
@@ -10615,7 +10615,7 @@ export const sv_SE: EnTranslations = {
       },
       "ice_block": {
         "name": "Kall kista",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sek. (magikertalang)"
+        "description": "Innesluter er i fast is i 8 sek. och gör er immuna mot all skada. Tar bort befintliga vanliga skadliga effekter och förhindrar att nya vanliga kontrolleffekter tillämpas. Kan användas medan ni är bedövade eller förvandlade. Ni kan inte agera medan ni är inneslutna. Kasta igen för att avbryta. (magiker)"
       },
       "inner_focus": {
         "name": "Stillat sinne",
@@ -10707,7 +10707,7 @@ export const sv_SE: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Rusande sinne",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sek. (magikertalang)"
+        "description": "Gör er nästa besvärjelse med kasttid omedelbar. Varar i 60 sek. (magikertalang)"
       },
       "psychic_scream": {
         "name": "Psykiskt skrik",

@@ -6077,9 +6077,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'Forma de lechúcico lunar',
   'entities.abilities.moonkin_form.description':
     'Adopta Forma de lechúcico lunar, potenciando el lanzamiento de hechizos hasta que vuelvas a cambiar. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Equilibrio)',
-  'entities.abilities.feral_charge.name': 'Carga feral',
+  'entities.abilities.feral_charge.name': 'Oleada primigenia',
   'entities.abilities.feral_charge.description':
-    'Carga contra un enemigo y lo enraíza durante 1 s. Alcance de 8-25 m. (habilidad distintiva de Feral)',
+    'Desata una oleada primigenia. En Forma de lobo, aumenta la regeneración de energía un 100% durante 10 s. En Forma de Bruin, genera 50 p. de ira al instante. (habilidad distintiva de Feral)',
   'entities.abilities.swiftmend.name': 'Alivio presto',
   'entities.abilities.crusader_strike.name': 'Golpe de cruzado',
   'entities.abilities.crusader_strike.description':
@@ -11427,7 +11427,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Aumenta tu probabilidad de esquivar en 50 puntos porcentuales durante 10 s. (talento de Cazador)',
   'entities.abilities.earthbind.description': 'Inmoviliza a los enemigos en 4 m alrededor del punto objetivo durante 2 s, y luego los ralentiza un 40% durante 6 s. (Talento de chamán)',
   'entities.abilities.evocation.description':
-    'Canaliza durante 6 s: cada segundo restaura 40 de maná y acumula 8 de poder con hechizos mientras canalizas. (talento de mago)',
+    'Canaliza durante 6 s: cada segundo restaura 100 de maná y acumula 8 de poder con hechizos. La bonificación se acumula mientras canalizas y dura 15 s. (talento de mago)',
   'entities.abilities.frenzied_regeneration.description':
     'Restaura 180 de salud durante 10 s. Solo en Forma de Oso. (talento de Druida)',
   'entities.abilities.frost_trap.description':
@@ -11438,7 +11438,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     'Aterroriza a los enemigos cercanos hasta 3 s. El daño puede romper el efecto. (talento de Brujo)',
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talento de mago)',
+    'Te encierra en hielo sólido durante 8 s, haciéndote inmune a todo el daño. Elimina los efectos perjudiciales comunes ya activos e impide que se apliquen nuevos efectos de control comunes. Se puede usar mientras estás aturdido o transformado. No puedes actuar mientras estás encerrado. Vuelve a lanzarlo para cancelar. (mago)',
   'entities.abilities.inner_focus.description': 'Hace que tu próximo hechizo de sacerdote sea gratuito e ininterrumpible. Dura 60 s.',
   'entities.abilities.innervate.description':
     'La savia viva brota en ti durante 10 s y restaura en oleadas 20 de tu recurso actual: maná, ira o energía. Cambiar de forma no la interrumpe. El sueño, el aturdimiento o la estasis detienen la savia. (talento de Druida)',
