@@ -7345,7 +7345,7 @@ function renderClassDetails(
             // A combo-point bleed finisher (rupture, rip): `total` alone is the
             // damage at zero combo points, a state the caster can never reach.
             // Render base plus per-combo-point, the same composition the
-            // finisherDamage arm above and abilityEffectText in the HUD use.
+            // finisherDamage arm above and the shared abilityEffectText formatter use.
             dmgText = t('abilityUi.tooltip.finisherDamage', {
               base: formatClassDetailNumber(secondaryEffect.total),
               perCombo: formatClassDetailNumber(secondaryEffect.perCombo),

@@ -7,7 +7,7 @@
 // This only changes the NUMBERS spliced into the description placeholders ($d
 // damage, $o over-time total, $b buff value, $t duration), never adds a string,
 // so it needs no new i18n keys. It also owns the placeholder EFFECT PICKERS
-// (which effect each placeholder reads), so hud.ts and the tooltip-consistency
+// (which effect each placeholder reads), so ability_description.ts and the tooltip-consistency
 // guard test share one definition and cannot drift. Unit-tested in
 // tests/ability_damage.test.ts; hud.ts is the thin consumer.
 import type { ResolvedAbility } from '../sim/sim';
@@ -118,6 +118,10 @@ export function abilityDamageBonus(
       return Math.round(scaling.rangedPower * eff.rangedPowerCoeff * (eff.damageMult ?? 1));
     case 'hunterStampede':
       return Math.round(scaling.rangedPower * eff.rangedPowerCoeff);
+    case 'afflictionLitany':
+      // Litany is a flat, rank-resolved pulse. It gains Hexcraft's ability
+      // modifier during resolution but has no Spell Power coefficient.
+      return 0;
     default:
       return 0;
   }
@@ -153,7 +157,8 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
       eff.type === 'faerieFire' ||
       eff.type === 'lifeTap' ||
       eff.type === 'hunterBloodhook' ||
-      eff.type === 'hunterStampede',
+      eff.type === 'hunterStampede' ||
+      eff.type === 'afflictionLitany',
   );
 }
 
