@@ -5,15 +5,18 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-13-listing-step-up.md`
-  (GAME repo, worktree `/Users/fernando/Documents/wocc-marketplace`, fresh
-  session, newest origin/release/** sync first per the plan; at the 12 QA
-  session the branch was 0 behind origin/release/v0.39.0 tip d2d1a8ad5c and
-  the sync was a no-op, but re-check at session start). 13 OPENS with the R1
-  threshold posture ask (wallet-signature step-up per the resolved ruling,
-  including deleting the phantom TOTP code scaffolding whose .env.example
-  row 12 already removed). The 12 ledger entry below, INCLUDING its 12 QA
-  ROUND bullet, is the registry 13 consumes.
+- Next file to run: `docs/woc-marketplace-hardening/phase-13-qa.md` (GAME repo,
+  worktree `/Users/fernando/Documents/wocc-marketplace`, FRESH session, newest
+  origin/release/** sync first; at the 13 build session the branch was 0 behind
+  origin/release/v0.39.0 tip d2d1a8ad5c, sync a no-op, re-check at session
+  start). 13 build COMPLETE (LOCAL, not pushed per R4; the 13-qa session pushes
+  on PASS). The 13 ledger entry below is the registry 13-qa consumes; read its
+  JUDGED-no-change and DEFERRED lists and do NOT re-raise them, and consume the
+  RED-FIRST REGISTRY for the QA red-proof lane. Both session-start rulings are
+  RESOLVED and recorded (R1 threshold: step-up on EVERY custody-moving call, no
+  env knob; R10: locked copies refuse $WOC listing). NEW open ruling R11 (the
+  relink follow-up) is a pre-enable launch gate for Fernando, NOT a 13-qa
+  blocker.
 - LOUD deploy handoff (DEPLOY.md records it): enable the market only with
   BOTH sides at or after the contract tips (game: the build that sends
   bidCents; service: PR #31 270e337+, the build whose bond quote answers
@@ -719,6 +722,162 @@ Still open (a phase that hits one asks at session start):
 
 ## Per-phase ledger (append as phases complete)
 
+- 13 listing-step-up (2026-08-16/17, GAME repo, session start 19e4cd87ce =
+  the 12 QA docs tip, release sync a no-op at 0 behind origin/release/v0.39.0
+  tip d2d1a8ad5c; ~16 code and doc commits to tip 813e2a51e0, LOCAL not pushed
+  per R4; validation npx tsc --noEmit clean, all market suites +
+  snapshots/env_protocol/bandwidth + architecture + monolith + i18n gates
+  green, FIVE market pg suites green zero skips WITH TEST_DATABASE_URL,
+  ci:changed exit 0). Closes B6 and the browser-only-gate medium. The registry
+  the 13-qa session needs:
+  - BOTH RULINGS RECORDED FIRST (docs commit 6e4664e9a1, before code): R1
+    threshold = step-up on EVERY custody-moving call, NO env knob (a low-value
+    carve-out is the B6 attack surface; no knob = no misconfiguration surface).
+    R10 = a locked item copy (issue 3042) REFUSES $WOC exchange listing with a
+    typed woc_market.item_locked code, matching the salvage/craft/vendor
+    posture; the gold-market allow posture and the inherited-mark hygiene are a
+    deferred follow-up (22).
+  - THE STEP-UP PROTOCOL (its OWN sibling module server/woc_market_stepup.ts,
+    never grown into woc_market.ts): a single-use, 5-min, server-built
+    wallet-signed challenge. verifyStepUpProof owns the refusal ladder
+    (invalid / expired / wallet-relink / binding / ed25519 via
+    verifySolanaSignature); stepUpBindingDigest is a sha256 over operation +
+    the COPY fingerprint (itemCopyPin: id + instance, not just id) + format +
+    every money figure + offerNext (create) or offerId + item + agreed price
+    (accept). buildStepUpMessage names the action, the copy (sanitized:
+    copyDescriptor strips control chars by code point + length-caps, so an
+    attacker instance string cannot line-forge the popup), the realm, nonce,
+    expiry. The store rides the WocMarketDb seam: createStepUpChallenge,
+    consumeStepUpChallenge (atomic DELETE ... RETURNING scoped realm+account,
+    expiry NOT judged in SQL so the verifier answers expired honestly),
+    pruneStepUpChallenges (issue-time, the growth bound + the realm-leading
+    index woc_market_stepup_challenges_realm_expiry which DROPs the superseded
+    single-column one). DDL is additive/idempotent inside WOC_MARKET_SCHEMA
+    with the accounts FK cascade + operation CHECK.
+  - ENFORCEMENT IN THE SERVICE METHODS, never middleware: guardStepUp runs
+    inside createListing (public arm only; args.directed skips it because the
+    seller's acceptance already spent an offer-bound proof, and the public
+    route structurally cannot set directed, pinned) and inside
+    acceptDirectedOffer (side==='seller' only; the buyer stays bearer-only,
+    their money path signs its own payment). The public arm FORCES
+    expectInstance present (null if omitted) so the extraction's stale_copy
+    check always runs and the signed = claimed = extracted copy (closes the
+    opt-out swap the re-review found). Step-up runs BEFORE business validation
+    (no params/eligibility oracle; the accepted cost is a wasted signature on a
+    bad param, documented). issueStepUpChallenge validates itemId against ITEMS
+    before minting (closes the itemId newline-forge), and the directed arm
+    refuses not_found for a legacy null-item offer. Six new refusal codes
+    (stepup_required + five verifier reasons) with five non-Latin fills each,
+    plus woc_market.item_locked; challenge issue endpoint
+    POST /api/woc-market/step-up/challenge on its OWN rate bucket
+    (WOC_MARKET_STEPUP_POLICY, 20/min = double the list bucket). The devsig arm
+    (signatureRequired false + accept devsig:<nonce>) rides the SAME
+    double-gated ALLOW_DEV_COMMANDS + WOC_MARKET_DEV_SERVICE switch as the dev
+    economy, so it is production-unreachable; prod verifies real ed25519.
+  - DIRECTED REOPEN money-safety: reopenDirectedOffer now resets
+    seller_accepted + item_ref (KEEPS buyer_accepted, a liveness choice) so a
+    spent step-up proof cannot re-drive custody after a proved-rollback reopen,
+    and a relink between the two attempts is re-verified by the fresh seller
+    proof.
+  - CLIENT (both surfaces): the Exchange window submitListing and the trade
+    panel's SELLER acceptance mint the challenge, sign the SERVER message via
+    hooks.signMessageBase58 (the same lazy wallet bridge as the payment
+    signer, one new hook field wired through woc_market_wiring.ts keeping the
+    lazy-load pin green), and send the proof; devsig skips the wallet ONLY on
+    an explicit signatureRequired false. Honest states: the trade Accept has a
+    re-entrancy guard (wocTradeAccepting) AND a disabled Waiting pending face
+    that JOINS the repaint signature (it never painted before the re-review
+    caught it) and resets on window close; the decline copy is
+    hudChrome.wocMarket.signFailedConfirm (no "payment", since no funds move)
+    and the listing busy label is hudChrome.wocMarket.listing (not "Confirming
+    on chain"); the locked-copy hint (hintAcceptLocked) fires only when the
+    lock is the SOLE obstacle (not an ineligible-category copy). The $WOC
+    market is OFF the IWorld seam by design, so no offline mirror; the sim
+    token firewall is untouched (isItemLocked extracted to a dependency-free
+    item_lock_flag.ts leaf so exchange_eligibility stays a runtime leaf).
+  - TOTP RETIRED per R1: the .wm-totp CSS, stale comments, PRD prose, and the
+    dead threshold knob (12 removed the .env.example row) are gone; the two
+    woc_market.totp_* error codes + their catalog/overlay rows STAY by the
+    append-only AIP-193 contract (precedent commit 108665ec2d), each
+    comment-marked retired-never-enforced. A scoped guard test asserts the
+    market service, routes, step-up module, and styles carry no totp remnant.
+    JUDGED DEVIATION (do not re-raise): the phase spec said delete the codes
+    "end to end"; that collides with the append-only catalog + the parity
+    test's set-equality dimension, so the codes are kept-and-retired, matching
+    the paying-side precedent.
+  - REVIEWS: four fresh lanes over 19e4cd87ce..1641015d0d
+    (privacy-security-review, frontend-seam-reviewer, cross-platform-sync,
+    test-coverage-auditor via Agent); the fix round re-reviewed FRESH by three
+    lanes (security 1 blocking + 5 should-fix + 6 nits; coverage 3 blocking +
+    ~10 should-fix; frontend 1 blocking + 3 should-fix + 6 notes) - the two
+    blocking classes BOTH re-reviewers converged on (the copyDescriptor
+    line-forge and the expectInstance opt-out swap) plus the frontend blocking
+    (the pending face never painted) were all closed in fix-round-2; every
+    finding applied or judged with the file open. qa-checklist ran LAST and
+    returned READY (0 blocking, 2 should-fix observations); its adversarial
+    pass named migration-safety + database-performance as the two lanes not yet
+    run, both then dispatched: BOTH returned PASS/no-critical, converging on one
+    WARNING (the account_id FK had no covering index, FIXED here with
+    woc_market_stepup_challenges_account + a pg index-existence pin) and INFO
+    (the operation CHECK is a future-value trap, commented with the
+    settlement-state evolution precedent; the retention_sweep registration is
+    recommended-not-required, deferred to 17). Mutation: the 10 implement-round
+    mutants + 7 first-fix mutants + 5 fix-round-2 mutants (FM8 sanitizer, FM9
+    opt-out normalization, FM10 seller-only reopen, FM11 locked-category gate,
+    FM12 pending-face sig arm) ALL BIT by name.
+  - JUDGED, no code change (do not re-raise): step-up before validation is a
+    tiny wasted-signature edge, not an oracle (documented; client pre-validates
+    common params); the unknown_item refusal at challenge issue is a nil-leak
+    oracle (item ids are public wiki data); resetting only seller_accepted on
+    reopen is the deliberate liveness choice (buyer consent is not a custody
+    proof); the itemCopyPin `c`/craftedRecipeId slot is null on the public arm
+    by design (extraction ignores it too, so binding and extraction agree);
+    characterId/itemIndex are unbound because the COPY identity (bound) is what
+    matters and is pinned; the window-suite step-up pins stay source-scan
+    (comment-stripped betweenCode) with the live-DOM arm deferred to the
+    browser suite, since the identical ladder is behaviorally proven in the
+    trade-controller rig; the pg suites stay env-gated by standing repo posture
+    (20 owns real-SQL gating; this session ran them green zero skips).
+  - DEFERRED with owners: 14 (UX honesty / error i18n OWNS localizing the
+    wallet bridge's own thrown English strings in src/net/wallet.ts +
+    mobile_wallet_deeplink.ts, a pre-existing gap shared with the payment path,
+    so the step-up decline still shows English from the bridge on an ordinary
+    decline; also the as-of copy carried from 11/12); 15 (screenshot pass MUST
+    capture the step-up prompt on desktop AND mobile at the lowest preset, and
+    re-capture the TOTP-field "after" shots H13 flagged as stale); 16 (the
+    woc_market.ts extraction: guardStepUp/issueStepUpChallenge are thin
+    coordinator consumers but the file is still ~4300 untracked lines - 16 owns
+    the module_budget row + extraction); 17 (DB retention/indexes OWNS the
+    RECOMMENDED-not-required retention_sweep registration for
+    woc_market_stepup_challenges: both DB reviewers ruled prune-on-issue + the
+    rate limiter + 5-min TTL SUFFICIENT for safety, so 13 added only the
+    account-leading FK-cascade index and the CHECK-evolution note; a
+    pruneStepUpChallengesBatch + tables[] entry would add the dead-realm drain,
+    prune observability, and best-effort prune LIMIT the reviewers noted as P2);
+    21 (devnet: observe the real step-up end to end); 22 (the R11 relink
+    follow-up is a pre-enable launch gate - see Rulings; also DELETE
+    /api/wallet/link's missing rate limit).
+  - R11 RAISED (see Rulings, UNANSWERED, pre-enable launch gate): the step-up
+    RAISES the bar but is not an absolute "a stolen bearer cannot move custody"
+    guarantee, because relinking the wallet needs only the INCOMING wallet's
+    signature; a bearer thief can relink first, then sign. Fernando ruled 13
+    handles it by the honest-claim framing (module header + DEPLOY.md corrected)
+    + this deferral; the wallet-link flow is out of 13's scope. Do NOT re-raise
+    as a 13 blocker.
+  - RED-FIRST REGISTRY for the QA red-proof lane (each reproduced before its
+    fix): (1) a bearer-only createListing and a bearer-only seller
+    acceptDirectedOffer both listed/escrowed on the 19e4cd87ce build (no
+    stepup_required); (2) a locked copy listed successfully on both the claimed
+    and extracted arms pre-39a244f50c; (3) bondCents-style N/A here; (4) the
+    seven fix-round mutants and five fix-round-2 mutants each bit exactly their
+    named tests (drop expectInstance, drop offerNext, remove itemId-at-issue,
+    keep-accepts-on-reopen, dead locked-hint, remove re-entrancy guard,
+    never-disable pending face, remove sanitizer, revert opt-out normalization,
+    keep-seller-accept-on-reopen, remove locked-category gate, remove
+    pending-face sig arm); (5) the copyDescriptor line-forge reproduced by
+    direct execution (attacker instance strings forged lines) before the
+    sanitizer; (6) the opt-out swap reproduced (omit expectInstance -> escrow a
+    different copy) before the public-arm normalization.
 - 12 wire-completeness (2026-08-16, GAME repo, session start a6ff42f1c5 =
   the 11 QA tip, release sync no-op at 0 behind origin/release/v0.39.0
   d2d1a8ad5c; 8 code and doc commits to tip bd089672f9 plus this entry's

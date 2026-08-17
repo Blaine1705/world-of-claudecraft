@@ -730,6 +730,11 @@ CREATE TABLE IF NOT EXISTS woc_market_stepup_challenges (
   realm TEXT NOT NULL,
   account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
   wallet TEXT NOT NULL,
+  -- Adding a THIRD operation later cannot just edit this inline CHECK: the
+  -- table is CREATE TABLE IF NOT EXISTS, so an existing box keeps the old
+  -- constraint and the first insert of the new value would 23514. A new value
+  -- needs a gated DROP CONSTRAINT + ADD CONSTRAINT ... NOT VALID block, exactly
+  -- like the settlement-state CHECK evolution above.
   operation TEXT NOT NULL CHECK (operation IN ('create_listing', 'accept_directed_offer')),
   binding_digest TEXT NOT NULL,
   message TEXT NOT NULL,
@@ -746,6 +751,12 @@ CREATE TABLE IF NOT EXISTS woc_market_stepup_challenges (
 DROP INDEX IF EXISTS woc_market_stepup_challenges_expiry;
 CREATE INDEX IF NOT EXISTS woc_market_stepup_challenges_realm_expiry
   ON woc_market_stepup_challenges (realm, expires_at);
+-- The accounts FK-cascade scan: the composite above leads with realm, so an
+-- accounts row DELETE would seq-scan this table without an account-leading
+-- index. Matches the sibling tables' convention (woc_market_buy_now_abandons,
+-- woc_market_bids index their account FK for exactly this).
+CREATE INDEX IF NOT EXISTS woc_market_stepup_challenges_account
+  ON woc_market_stepup_challenges (account_id);
 `;
 
 /** Lock-wait ceiling for the escrow transaction's accounts row. Short on

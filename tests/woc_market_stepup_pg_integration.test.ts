@@ -220,7 +220,7 @@ describeDb('woc market step-up challenges against real Postgres', () => {
     expect(await marketDb.consumeStepUpChallenge(REALM, row.nonce, account)).toBeNull();
   });
 
-  it('deleting the account cascades its challenges away', async () => {
+  it('deleting the account cascades its challenges away, with the FK cascade indexed', async () => {
     const account = await seedAccount();
     const row = challenge(account);
     await marketDb.createStepUpChallenge(row);
@@ -229,6 +229,15 @@ describeDb('woc market step-up challenges against real Postgres', () => {
       row.nonce,
     ]);
     expect(left.rowCount).toBe(0);
+    // The cascade seek has an account-leading index (the composite leads with
+    // realm), so an account delete is an index probe, not a seq scan.
+    const idx = await pool.query(
+      `SELECT indexdef FROM pg_indexes
+        WHERE tablename = 'woc_market_stepup_challenges'
+          AND indexname = 'woc_market_stepup_challenges_account'`,
+    );
+    expect(idx.rowCount).toBe(1);
+    expect(idx.rows[0].indexdef).toContain('(account_id)');
   });
 
   it('refuses a duplicate nonce at the primary key', async () => {

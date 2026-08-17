@@ -29,7 +29,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 11 QA | phase-11-qa | service | DONE | 03df5de | PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open (section below); SERVICE repo (origin/master already contained at df09756); eight audit lanes over 8da6c03..03df5de (correctness with the four probes, security/ops, test decisiveness, dead code and docs, red proof, three mutation groups): 0 blocking, 44 findings; red proof 11/11 REPRODUCED-RED on the named old builds; mutation 42 run, 41 BIT, the ONE survivor (overview crossVenueGateArmed hardcode) closed by a two-venue overview arm and re-proven; the fix round re-sized the two tightening floors from the venue cadence (staleness tight end 15 to 45 min, sample minimum 90 to 60, an R3-amendment note records it), pruned the refusal readout NON-MUTATINGLY, wired a parse-time warn for every mis-set oracle knob, put the window depth on the recovered line (the breaker-reset shape is visible in the log), mirrored spot/twap onto the overview, and trued every lagging doc; round-2 workflow over the fix round (two fresh lenses 13 findings 0 blocking, ALL applied; 16 new-pin mutants ALL BIT; completeness critic); suite 590 to 595 (588 + 7 env-gated skips default; 595/595 zero skips with CLAUDIUM_TEST_DATABASE_URL); 5 commits, tip 270e337, PUSHED per R4 (service updates PR #31, all four test checks GREEN after the push; game docs pushed with it, pre-push floor green) |
 | 12 | wire-completeness | game | DONE (QA PASS) | a6ff42f1c5 | release sync no-op (0 behind origin/release/v0.39.0 tip d2d1a8ad5c); H8 + env truth + health-rail honesty closed AND the four cross-repo owed items adopted (service-owned bond quote, anti-snipe awaiting_finality allowlist, two-settled-per-memoRef tolerance, verdict localization; asOfMs pass-through verified untouched); 8 code and doc commits to tip bd089672f9 plus the ledger docs commit; four review lanes + a fresh fix-round re-review + qa-checklist READY (0 blocking), every finding applied or judged; ~12 mutants bit by name incl. wire-pin drop/rename, vocab delete, echo recompute, sig drop, env guard both directions; real-SQL suites green zero skips WITH TEST_DATABASE_URL; gate GREEN at the docs tip (gate_select full-suite fallback, all 12 steps, 2854 files / 40604 tests, browser 129, WITH TEST_DATABASE_URL); LOCAL, not pushed per R4 |
 | 12 QA | phase-12-qa | game | DONE | 90c007e36f | PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open (section below); release sync no-op (0 behind origin/release/v0.39.0 tip d2d1a8ad5c); ten audit lanes over a6ff42f1c5..bd089672f9 (cross-platform-sync, frontend-seam, test-coverage via Agent; server/client correctness, serializer sweep, fee edges, env sweep, dead code, docs truth via workflow) + red proof (all 7 registry claims reproduced or verified, wire pins exactly 14 red on the pre-fix build) + three mutation batteries (17 round-1: 16 BIT, the one survivor a REAL devSplit pin gap; 18/18 new-pin; 10/10 wave-3); seven fix commits (spine in the section below), the fix round re-reviewed FRESH (two lenses: 1 blocking test gap + 11 should-fix, all applied); qa-checklist READY (0 blocking, 0 should-fix; its adversarial pass independently cleared the ladder, the devsig arm, the browse booleans, the ceil change, and SETTLING_STATES); gate GREEN at 4377a38458 (gate_select full-suite fallback, all 12 steps, 2854 files / 40635 tests + 2 expected fails, browser 129, WITH TEST_DATABASE_URL; the final ledger amendment rides on top docs-only); pushed per R4 (no open PR on this branch, pre-push floor green) |
-| 13 | listing-step-up | game | IN PROGRESS | 19e4cd87ce | release sync no-op (0 behind origin/release/v0.39.0 tip d2d1a8ad5c); BOTH session-start rulings recorded first (R1 threshold: step-up on every custody-moving call, no env knob; R10: locked copies refuse $WOC exchange listing) |
+| 13 | listing-step-up | game | DONE | 19e4cd87ce | release sync no-op (0 behind origin/release/v0.39.0 tip d2d1a8ad5c); B6 + browser-only-gate medium closed; both rulings recorded first (R1 threshold: step-up on every custody-moving call, no env knob; R10: locked copies refuse listing); step-up challenge protocol (own sibling module + store, real-SQL pg suite), enforcement in both service methods, client flows in both surfaces, TOTP retired; four fresh review lanes + a fresh three-lane re-review of the fix round, every finding applied or judged; 7 fix-round + 10 implement-round mutants all bit; tsc clean, ci:changed exit 0, five market pg suites green zero skips WITH TEST_DATABASE_URL; section below; LOCAL, not pushed per R4 (13-qa pushes on PASS) |
 | 13 QA | phase-13-qa | game | NOT STARTED | | |
 | 14 | ux-honesty | game | NOT STARTED | | |
 | 14 QA | phase-14-qa | game | NOT STARTED | | |
@@ -49,6 +49,47 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 21 QA | phase-21-qa | service + game | NOT STARTED | | |
 | 22 | close-out | all three | NOT STARTED | | teardown offer lives in 22 QA |
 | 22 QA | phase-22-qa | all three | NOT STARTED | | |
+
+## 13 implement round (step-up authorization for custody-moving ops)
+
+Session start 19e4cd87ce (the 12 QA docs tip; release sync a no-op, 0 behind
+origin/release/v0.39.0 tip d2d1a8ad5c). BOTH session-start rulings recorded
+FIRST as their own docs commit 6e4664e9a1 (R1 threshold: step-up on every
+custody-moving call, no env knob; R10: locked copies refuse $WOC exchange
+listing). B6 and the browser-only-gate medium closed.
+
+Commit spine (LOCAL, not pushed per R4): 6e4664e9a1 (the two rulings),
+39a244f50c (R10 item-lock refusal end to end + item_locked code with five
+fills), dbc4445f0c (the step-up challenge protocol module + store, real-SQL
+pg suite), 1f50feb96a (server enforcement on both custody movers + challenge
+endpoint + six refusal codes with fills), a5de327458 (SDK contract),
+b88508bd53 (client flows in both surfaces), 679edc4e15 (TOTP retirement +
+doc truth-ups), 1641015d0d + fd3c60b40b (format + the gate-caught controller
+rig gap). Reviews: four fresh lanes (privacy-security, frontend-seam,
+cross-platform-sync, test-coverage via Agent) over 19e4cd87ce..1641015d0d.
+
+FIX ROUND (all findings applied or judged; the fix round re-reviewed FRESH by
+three lanes): bc1bdf98cb (extract isItemLocked to an item_lock_flag.ts leaf so
+exchange_eligibility keeps its runtime-leaf property; parity test carries the
+R10 asymmetry explicitly), 714f20cc53 (bind the copy fingerprint + offerNext +
+realm into the step-up, validate itemId at issue, name the copy in the signed
+message; closes the copy-swap flagged by three reviewers), 15e8f1b8fb (reset
+both accepts + item_ref on a directed reopen so a spent proof cannot re-drive
+custody), 64ce5e361a (seller-accept re-entrancy guard, pending face, listing-
+flavored decline copy + label, locked-copy hint arm; new behavioral controller
+arms for the real-wallet sign, decline abort, one-mint re-entrancy, disabled
+in-flight button), ad806a26f7 (rate-bucket literal pins, realm-leading prune
+index, TOTP-remnant guard, decode bounds), 4ff75d8eef (honest-claim framing for
+the relink gap per Fernando's ruling), b1c6384ade (import sort). Fix round
+mutation-proven: seven fix-round mutants all BIT (drop expectInstance, drop
+offerNext, remove itemId-at-issue, keep accepts on reopen, dead locked-hint,
+remove re-entrancy guard, never-disable pending face); the ten
+implement-round mutants also all bit. Validation: npx tsc --noEmit clean;
+market suites + snapshots/env_protocol/bandwidth + architecture + monolith +
+i18n gates green; the FIVE market pg suites (incl. the new
+woc_market_stepup_pg_integration) green zero skips WITH TEST_DATABASE_URL;
+ci:changed exit 0. The 13 ledger entry in state.md is the registry the 13-qa
+session consumes.
 
 ## 12 QA round (verdict PASS-WITH-FOLLOWUPS, every finding applied or judged)
 
