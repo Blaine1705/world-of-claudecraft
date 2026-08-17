@@ -637,6 +637,110 @@ describe('pet_commands module (P1b)', () => {
     expect(egg.threat.has(pet.id)).toBe(true);
   });
 
+  it('manual Gloomshade chain does not move or aggro quest-gated eggs', () => {
+    const sim = new Sim({
+      seed: 24,
+      playerClass: 'warlock',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    }) as AnySim;
+    const pid = sim.addPlayer('warlock', 'Demonist') as number;
+    sim.setPlayerLevel(12, pid);
+    const warlock = sim.entities.get(pid) as AnyEntity;
+    summonPet(sim.ctx, warlock, 'gloomshade');
+    const pet = petOf(sim.ctx, pid) as AnyEntity;
+    const egg = spawnBroodmotherEgg(sim, pet);
+    egg.pos = { x: pet.pos.x, y: pet.pos.y, z: pet.pos.z + 12 };
+    egg.prevPos = { ...egg.pos };
+    warlock.targetId = egg.id;
+    pet.aggroTargetId = null;
+    pet.inCombat = false;
+    const eggBefore = { ...egg.pos };
+
+    petSpecial(sim.ctx, pid);
+
+    expect(egg.pos).toEqual(eggBefore);
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.inCombat).toBe(false);
+    expect(pet.petSkillTimer).toBe(0);
+    expect(egg.threat.has(pet.id)).toBe(false);
+    expect(egg.inCombat).toBe(false);
+    expect(
+      sim
+        .drainEvents()
+        .some((event: SimEvent) => event.type === 'spellfx' && event.sourceId === pet.id),
+    ).toBe(false);
+  });
+
+  it('manual ranged pet special does not fire or aggro quest-gated eggs', () => {
+    const sim = new Sim({
+      seed: 25,
+      playerClass: 'warlock',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    }) as AnySim;
+    const pid = sim.addPlayer('warlock', 'Demonist') as number;
+    const warlock = sim.entities.get(pid) as AnyEntity;
+    summonPet(sim.ctx, warlock, 'emberkin');
+    const pet = petOf(sim.ctx, pid) as AnyEntity;
+    const egg = spawnBroodmotherEgg(sim, pet);
+    egg.pos = { x: pet.pos.x, y: pet.pos.y, z: pet.pos.z + 12 };
+    egg.prevPos = { ...egg.pos };
+    warlock.targetId = egg.id;
+    pet.aggroTargetId = null;
+    pet.inCombat = false;
+    const projectilesBefore = sim.ctx.pendingProjectiles.length;
+
+    petSpecial(sim.ctx, pid);
+
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.inCombat).toBe(false);
+    expect(pet.petSkillTimer).toBe(0);
+    expect(egg.threat.has(pet.id)).toBe(false);
+    expect(egg.inCombat).toBe(false);
+    expect(sim.ctx.pendingProjectiles).toHaveLength(projectilesBefore);
+    expect(
+      sim
+        .drainEvents()
+        .some((event: SimEvent) => event.type === 'spellfx' && event.sourceId === pet.id),
+    ).toBe(false);
+  });
+
+  it('manual Water Jet does not channel, aura, or aggro quest-gated eggs', () => {
+    const sim = new Sim({
+      seed: 26,
+      playerClass: 'mage',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    }) as AnySim;
+    const pid = sim.addPlayer('mage', 'Frostbite') as number;
+    const mage = sim.entities.get(pid) as AnyEntity;
+    summonPet(sim.ctx, mage, 'water_elemental');
+    const pet = petOf(sim.ctx, pid) as AnyEntity;
+    const egg = spawnBroodmotherEgg(sim, pet);
+    egg.pos = { x: pet.pos.x, y: pet.pos.y, z: pet.pos.z + 12 };
+    egg.prevPos = { ...egg.pos };
+    mage.targetId = egg.id;
+    pet.aggroTargetId = null;
+    pet.inCombat = false;
+
+    petWaterJet(sim.ctx, pid);
+
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.inCombat).toBe(false);
+    expect(pet.castingAbility).toBeNull();
+    expect(pet.channeling).toBe(false);
+    expect(pet.petTauntTimer).toBe(0);
+    expect(egg.auras.some((a) => a.id === 'water_jet' || a.id === 'water_jet_slow')).toBe(false);
+    expect(egg.threat.has(pet.id)).toBe(false);
+    expect(egg.inCombat).toBe(false);
+    expect(
+      sim
+        .drainEvents()
+        .some((event: SimEvent) => event.type === 'spellfx' && event.sourceId === pet.id),
+    ).toBe(false);
+  });
+
   it('setPetAutoTaunt cannot arm auto-taunt on a ranged warlock pet', () => {
     const sim = new Sim({
       seed: 22,

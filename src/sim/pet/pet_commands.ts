@@ -702,6 +702,7 @@ export function petWaterJet(ctx: SimContext, pid?: number): void {
   if (!pet || !jet || pet.dead || pet.castingAbility || pet.petTauntTimer > 0) return;
   const target = r.e.targetId !== null ? ctx.entities.get(r.e.targetId) : null;
   if (!target || target.dead || !ctx.isHostileTo(pet, target)) return;
+  if (questGateBlocksAggro(ctx.players, target, pet)) return;
   const range = MOBS[pet.templateId]?.petRanged?.range ?? 0;
   if (dist2d(pet.pos, target.pos) > range) return;
   pet.aggroTargetId = target.id;
@@ -734,9 +735,7 @@ export function petSpecial(ctx: SimContext, pid?: number): void {
     ctx.error(r.e.id, 'Your pet needs a hostile target.');
     return;
   }
-  if (target.kind === 'mob' && target.hostile && questGateBlocksAggro(ctx.players, target, pet)) {
-    return;
-  }
+  if (questGateBlocksAggro(ctx.players, target, pet)) return;
   if (!useWarlockPetSkill(ctx, pet, target, petRangedAttack)) return;
   pet.aggroTargetId = target.id;
   pet.inCombat = true;
