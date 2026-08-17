@@ -224,10 +224,14 @@ function battlegroundWallTrap(ctx: SimContext, p: Entity): boolean {
   return Math.hypot(resolved.x - p.pos.x, resolved.z - p.pos.z) > POSITION_EPS;
 }
 
-function motionBlock(ctx: SimContext, p: Entity): UnstuckBlockedReason | null {
+function motionBlock(
+  ctx: SimContext,
+  p: Entity,
+  trappedInBattlegroundWall = battlegroundWallTrap(ctx, p),
+): UnstuckBlockedReason | null {
   if (isFrozenCorpse(p)) return null;
   if (forcedAction(p)) return 'moving';
-  if (battlegroundWallTrap(ctx, p)) return null;
+  if (trappedInBattlegroundWall) return null;
   if (!p.onGround || p.jumping) return 'falling';
   if (Math.hypot(p.vx, p.vy, p.vz) > POSITION_EPS) return 'moving';
   return null;
@@ -237,14 +241,15 @@ function blockedReason(ctx: SimContext, meta: PlayerMeta, p: Entity): UnstuckBlo
   if (p.jailed) return 'jailed';
   if (p.inCombat || p.combatTimer < 5) return 'combat';
   if (isStunned(p) || isRooted(p)) return 'controlled';
-  const motion = motionBlock(ctx, p);
+  const trappedInBattlegroundWall = battlegroundWallTrap(ctx, p);
+  const motion = motionBlock(ctx, p, trappedInBattlegroundWall);
   if (motion) return motion;
   if (p.castingAbility !== null || isConsuming(p) || p.sitting) return 'busy';
   if (bgCarryingFlag(ctx, p.id)) return 'competitive';
   if (competitive(ctx, p.id, p)) return 'competitive';
   if (ctx.tradeFor(p.id)) return 'trading';
   if (!unstuckLocationAt(ctx, p.id, p.pos)) return 'invalid_area';
-  if (hasMoveInput(meta)) return 'moving';
+  if (hasMoveInput(meta) && !trappedInBattlegroundWall) return 'moving';
   return null;
 }
 
@@ -310,8 +315,10 @@ function cancelReason(
   if (p.inCombat || p.combatTimer < 5) return 'combat';
   if (p.castingAbility !== null || isConsuming(p) || p.sitting) return 'busy';
   if (pending.area.kind === 'battleground' && bgCarryingFlag(ctx, p.id)) return 'state_changed';
+  const trappedInBattlegroundWall =
+    pending.area.kind === 'battleground' && battlegroundWallTrap(ctx, p);
   if (
-    hasMoveInput(meta) ||
+    (hasMoveInput(meta) && !trappedInBattlegroundWall) ||
     (pending.area.kind !== 'battleground' &&
       (Math.hypot(p.pos.x - pending.origin.x, p.pos.z - pending.origin.z) > CANCEL_MOVE_DISTANCE ||
         Math.abs(p.pos.y - pending.origin.y) > CANCEL_VERTICAL_DISTANCE))
@@ -325,7 +332,7 @@ function cancelReason(
     p.jailed ||
     isStunned(p) ||
     isRooted(p) ||
-    motionBlock(ctx, p) !== null ||
+    motionBlock(ctx, p, trappedInBattlegroundWall) !== null ||
     competitive(ctx, p.id, p) ||
     ctx.tradeFor(p.id)
   )
