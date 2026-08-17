@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createBackgroundGpuQueue } from '../src/render/background_gpu_queue';
 import {
   awaitCompileGate,
@@ -7,6 +7,15 @@ import {
   SerialGateLane,
   settlePendingSwap,
 } from '../src/render/compile_gate';
+import { gpuPrepEventsSnapshot, resetGpuPrepEventsForTest } from '../src/render/gpu_prep_events';
+
+beforeEach(() => {
+  resetGpuPrepEventsForTest();
+});
+
+afterEach(() => {
+  resetGpuPrepEventsForTest();
+});
 
 function fakeScheduler(): CompileGateScheduler & {
   fire: () => void;
@@ -78,6 +87,83 @@ describe('awaitCompileGate', () => {
     await expect(gate).resolves.toEqual({ failed: false, timedOut: true });
   });
 
+  it('records the timeout in the GPU-preparation ring even with no onTimeout caller', async () => {
+    // The whole timeout arm used to be inert in production: nothing passes
+    // onTimeout, and timedOut is never read, so a driver that blew the deadline
+    // left no trace at all. The default record is what makes it countable.
+    const scheduler = fakeScheduler();
+    let resolveCompile!: () => void;
+    const gate = awaitCompileGate(
+      () => new Promise<void>((resolve) => (resolveCompile = resolve)),
+      1500,
+      { scheduler, label: 'view:mob-archetype' },
+    );
+    scheduler.fire();
+
+    const snapshot = gpuPrepEventsSnapshot();
+    expect(snapshot.counts['gate-timeout']).toBe(1);
+    expect(snapshot.events[0].kind).toBe('gate-timeout');
+    expect(snapshot.events[0].key).toBe('view:mob-archetype');
+    expect(snapshot.events[0].ageMs).toBe(1500);
+
+    // Fail-soft semantics unchanged: the event is telemetry, nothing released
+    // early, and the gate still resolves only on the real settle.
+    resolveCompile();
+    await expect(gate).resolves.toEqual({ failed: false, timedOut: true });
+  });
+
+  it('falls back to a generic key when the gate carries no label', async () => {
+    const scheduler = fakeScheduler();
+    let resolveCompile!: () => void;
+    const gate = awaitCompileGate(
+      () => new Promise<void>((resolve) => (resolveCompile = resolve)),
+      900,
+      { scheduler },
+    );
+    scheduler.fire();
+    expect(gpuPrepEventsSnapshot().events[0].key).toBe('compile-gate');
+    resolveCompile();
+    await gate;
+  });
+
+  it('still calls a caller-supplied onTimeout alongside the record', async () => {
+    const scheduler = fakeScheduler();
+    const onTimeout = vi.fn();
+    let resolveCompile!: () => void;
+    const gate = awaitCompileGate(
+      () => new Promise<void>((resolve) => (resolveCompile = resolve)),
+      1500,
+      { scheduler, onTimeout, label: 'far-bake' },
+    );
+    scheduler.fire();
+    expect(onTimeout).toHaveBeenCalledTimes(1);
+    expect(gpuPrepEventsSnapshot().counts['gate-timeout']).toBe(1);
+    resolveCompile();
+    await gate;
+  });
+
+  it('records nothing for a gate that settles inside its deadline', async () => {
+    const scheduler = fakeScheduler();
+    await awaitCompileGate(() => Promise.resolve(), 1500, { scheduler, label: 'fast' });
+    expect(gpuPrepEventsSnapshot().total).toBe(0);
+  });
+
+  it('honours the opt-out for a gate that reports its own timeouts', async () => {
+    const scheduler = fakeScheduler();
+    const onTimeout = vi.fn();
+    let resolveCompile!: () => void;
+    const gate = awaitCompileGate(
+      () => new Promise<void>((resolve) => (resolveCompile = resolve)),
+      1500,
+      { scheduler, onTimeout, recordTimeoutEvent: false },
+    );
+    scheduler.fire();
+    expect(onTimeout).toHaveBeenCalledTimes(1);
+    expect(gpuPrepEventsSnapshot().total).toBe(0);
+    resolveCompile();
+    await gate;
+  });
+
   it('settles fail-soft after a rejection or synchronous throw', async () => {
     const rejected = awaitCompileGate(() => Promise.reject(new Error('link failed')), 1500);
     await expect(rejected).resolves.toEqual({ failed: true, timedOut: false });
@@ -138,6 +224,26 @@ describe('CompileGateQueue', () => {
     await first;
     await second;
     expect(secondCompile).toHaveBeenCalledTimes(1);
+  });
+
+  it('records a queued gate timeout under the gate label', async () => {
+    // CompileGateQueue.run delegates to awaitCompileGate, so the queued path
+    // must carry the same telemetry: this is the path every streamed view
+    // actually takes.
+    const scheduler = fakeScheduler();
+    const queue = new CompileGateQueue();
+    let resolveCompile!: () => void;
+    const gate = queue.run(() => new Promise<void>((resolve) => (resolveCompile = resolve)), 1500, {
+      scheduler,
+      label: 'queued-view',
+    });
+    await Promise.resolve();
+    scheduler.fire();
+    const snapshot = gpuPrepEventsSnapshot();
+    expect(snapshot.counts['gate-timeout']).toBe(1);
+    expect(snapshot.events[0].key).toBe('queued-view');
+    resolveCompile();
+    await expect(gate).resolves.toEqual({ failed: false, timedOut: true });
   });
 
   it('uses a shared GPU arbiter, forwards live priority, and declares its tail releasable', async () => {

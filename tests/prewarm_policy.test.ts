@@ -291,17 +291,37 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       'render.settle-passes',
     ];
     // Same per-entry block split as parsedManifestEntries, so an entry's
-    // resumeUnits can never be attributed to its neighbour.
+    // resumeUnits can never be attributed to its neighbour. Comments are
+    // stripped and the match is anchored to the PROPERTY syntax first: the
+    // manifest explains itself in prose beside the code, and lines like
+    // `// No resumeUnits: this spawns real particles` are a substring match.
+    // Counting those padded the floor to 10 over 7 real declarations, so the
+    // count could have halved and the pin stayed green.
     const start = renderer.indexOf('const manifest: PrewarmManifestEntry[] = [');
     const end = renderer.indexOf('const byId = new Map(', start);
-    const resumable = renderer
-      .slice(start, end)
+    const manifestCode = codeWithoutLineComments(renderer.slice(start, end)).replace(
+      /\/\*[\s\S]*?\*\//g,
+      '',
+    );
+    const resumable = manifestCode
       .split(/\n {6}\{\n/)
       .slice(1)
-      .filter((block) => block.includes('resumeUnits:'))
+      .filter((block) => /^\s*resumeUnits:/m.test(block))
       .map((block) => /id: '([^']+)'/.exec(block)?.[1])
       .filter((id): id is string => Boolean(id) && manifestIds.has(id as string));
-    expect(resumable.length).toBeGreaterThanOrEqual(10);
+    // The real declaration count, measured against the source above. A drop
+    // here means a resume lane was deleted, not that a comment was reworded.
+    expect(resumable.length).toBeGreaterThanOrEqual(7);
+    // Every id counted must own a real property declaration, so a block that
+    // only TALKS about resumeUnits can never be one of them.
+    for (const id of resumable) {
+      const block = manifestCode
+        .split(/\n {6}\{\n/)
+        .find((candidate) => candidate.includes(`id: '${id}'`));
+      expect(block && /^\s*resumeUnits:/m.test(block), `${id} has no resumeUnits property`).toBe(
+        true,
+      );
+    }
     for (const id of resumable) {
       expect(
         prewarmResumeIsDebt(id) || COSMETIC_RESUME_IDS.includes(id),

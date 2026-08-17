@@ -9,6 +9,7 @@
 // queue's released-tail cap, or strict serialization on the local fallback.
 
 import type { GpuWorkRunOptions } from './background_gpu_queue';
+import { recordGpuPrepEvent } from './gpu_prep_events';
 
 export interface CompileGateScheduler {
   setTimeout: (cb: () => void, ms: number) => number;
@@ -22,6 +23,9 @@ export interface CompileGateResult {
 
 export interface CompileGateOptions {
   onTimeout?: () => void;
+  /** Off switches the default `gate-timeout` telemetry for this gate; the
+   *  caller's own onTimeout still runs. */
+  recordTimeoutEvent?: boolean;
   priority?: number;
   /** Names this gate's unit in the shared queue's per-unit timing stats. */
   label?: string;
@@ -47,6 +51,12 @@ const defaultScheduler: CompileGateScheduler = {
  * driver and may notify diagnostics, but never resolves the gate early. A
  * rejection or synchronous throw is fail-soft because no compile remains
  * active and the caller can safely fall back to first-draw compilation.
+ *
+ * The timeout also lands in the GPU-preparation ring by default, so a capture
+ * can count slow links instead of the timeout being inert whenever no caller
+ * passes onTimeout. That record is write-only telemetry: the gate's own
+ * decisions never read it back, which is what keeps this module deterministic
+ * (its ageMs is the deadline that elapsed, not a clock reading).
  */
 export function awaitCompileGate(
   compile: () => Promise<unknown>,
@@ -60,6 +70,13 @@ export function awaitCompileGate(
     const guard = scheduler.setTimeout(() => {
       if (settled) return;
       timedOut = true;
+      if (options.recordTimeoutEvent !== false) {
+        recordGpuPrepEvent({
+          kind: 'gate-timeout',
+          key: options.label ?? 'compile-gate',
+          ageMs: timeoutMs,
+        });
+      }
       options.onTimeout?.();
     }, timeoutMs);
     const finish = (failed: boolean): void => {

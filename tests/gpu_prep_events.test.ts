@@ -1,0 +1,224 @@
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import {
+  GPU_PREP_EVENT_RING_SIZE,
+  gpuPrepEventsSnapshot,
+  gpuPrepNow,
+  noteRevealKeyHeld,
+  noteRevealRootPiecewise,
+  noteRevealRootsAtWatchdog,
+  recordGpuPrepEvent,
+  resetGpuPrepEventsForTest,
+  setGpuPrepClockForTest,
+} from '../src/render/gpu_prep_events';
+
+beforeEach(() => {
+  resetGpuPrepEventsForTest();
+  let t = 0;
+  setGpuPrepClockForTest(() => (t += 10));
+});
+
+afterEach(() => {
+  setGpuPrepClockForTest(null);
+  resetGpuPrepEventsForTest();
+});
+
+describe('gpu preparation event ring', () => {
+  it('starts empty and counts every kind at zero', () => {
+    const snapshot = gpuPrepEventsSnapshot();
+    expect(snapshot.total).toBe(0);
+    expect(snapshot.dropped).toBe(0);
+    expect(snapshot.events).toEqual([]);
+    expect(snapshot.counts).toEqual({
+      'reveal-watchdog': 0,
+      'reveal-soft-deadline': 0,
+      'attach-watchdog': 0,
+      'gate-timeout': 0,
+    });
+    expect(snapshot.reveal).toEqual({
+      keysHeld: 0,
+      rootsHeld: 0,
+      rootsPiecewise: 0,
+      rootsAtWatchdog: 0,
+    });
+  });
+
+  it('records an event with its kind, key, age, and a clock stamp', () => {
+    recordGpuPrepEvent({ kind: 'reveal-watchdog', key: 'cull:townsquare', ageMs: 10_000 });
+    const snapshot = gpuPrepEventsSnapshot();
+    expect(snapshot.total).toBe(1);
+    expect(snapshot.counts['reveal-watchdog']).toBe(1);
+    expect(snapshot.events).toHaveLength(1);
+    expect(snapshot.events[0]).toEqual({
+      kind: 'reveal-watchdog',
+      key: 'cull:townsquare',
+      ageMs: 10_000,
+      atMs: 10,
+      readyRoots: 0,
+      totalRoots: 0,
+    });
+  });
+
+  it('counts each kind separately and keeps the ring in arrival order', () => {
+    recordGpuPrepEvent({ kind: 'gate-timeout', key: 'view:mob', ageMs: 1500 });
+    recordGpuPrepEvent({ kind: 'attach-watchdog', key: 'eastbrook', ageMs: 10_000 });
+    recordGpuPrepEvent({ kind: 'gate-timeout', key: 'view:npc', ageMs: 1500 });
+    const snapshot = gpuPrepEventsSnapshot();
+    expect(snapshot.total).toBe(3);
+    expect(snapshot.counts).toEqual({
+      'reveal-watchdog': 0,
+      'reveal-soft-deadline': 0,
+      'attach-watchdog': 1,
+      'gate-timeout': 2,
+    });
+    expect(snapshot.events.map((event) => event.key)).toEqual([
+      'view:mob',
+      'eastbrook',
+      'view:npc',
+    ]);
+  });
+
+  it('bounds the ring and keeps the NEWEST events, oldest first', () => {
+    // A stuck lane fires these steadily for as long as it stays stuck, so the
+    // ring must not grow with it, and the entries worth keeping are the recent
+    // ones. The lifetime counts still see every fire.
+    const overflow = GPU_PREP_EVENT_RING_SIZE + 5;
+    for (let i = 0; i < overflow; i++) {
+      recordGpuPrepEvent({ kind: 'gate-timeout', key: `key-${i}`, ageMs: i });
+    }
+    const snapshot = gpuPrepEventsSnapshot();
+    expect(snapshot.events).toHaveLength(GPU_PREP_EVENT_RING_SIZE);
+    expect(snapshot.total).toBe(overflow);
+    expect(snapshot.counts['gate-timeout']).toBe(overflow);
+    expect(snapshot.dropped).toBe(overflow - GPU_PREP_EVENT_RING_SIZE);
+    expect(snapshot.events[0].key).toBe(`key-${overflow - GPU_PREP_EVENT_RING_SIZE}`);
+    expect(snapshot.events[GPU_PREP_EVENT_RING_SIZE - 1].key).toBe(`key-${overflow - 1}`);
+    // Strictly increasing ages prove the wrap did not shuffle the order.
+    const ages = snapshot.events.map((event) => event.ageMs);
+    expect(ages).toEqual([...ages].sort((a, b) => a - b));
+  });
+
+  it('allocates no new slot once the ring is full', () => {
+    for (let i = 0; i < GPU_PREP_EVENT_RING_SIZE; i++) {
+      recordGpuPrepEvent({ kind: 'gate-timeout', key: `key-${i}`, ageMs: i });
+    }
+    const before = gpuPrepEventsSnapshot().events[0];
+    recordGpuPrepEvent({ kind: 'reveal-watchdog', key: 'wrapped', ageMs: 1 });
+    // The oldest slot object is REUSED for the wrapped write, so it is the same
+    // object with new fields rather than a fresh allocation.
+    const after = gpuPrepEventsSnapshot();
+    expect(after.events[GPU_PREP_EVENT_RING_SIZE - 1]).toBe(before);
+    expect(after.events[GPU_PREP_EVENT_RING_SIZE - 1].key).toBe('wrapped');
+  });
+
+  it('reuses the snapshot object and its array across calls', () => {
+    recordGpuPrepEvent({ kind: 'attach-watchdog', key: 'a', ageMs: 1 });
+    const first = gpuPrepEventsSnapshot();
+    const firstEvents = first.events;
+    recordGpuPrepEvent({ kind: 'attach-watchdog', key: 'b', ageMs: 2 });
+    const second = gpuPrepEventsSnapshot();
+    expect(second).toBe(first);
+    expect(second.events).toBe(firstEvents);
+    expect(second.events.map((event) => event.key)).toEqual(['a', 'b']);
+  });
+
+  it('reset clears the ring and every count', () => {
+    recordGpuPrepEvent({ kind: 'reveal-watchdog', key: 'a', ageMs: 1 });
+    recordGpuPrepEvent({ kind: 'gate-timeout', key: 'b', ageMs: 2 });
+    resetGpuPrepEventsForTest();
+    const snapshot = gpuPrepEventsSnapshot();
+    expect(snapshot.total).toBe(0);
+    expect(snapshot.dropped).toBe(0);
+    expect(snapshot.events).toEqual([]);
+    expect(Object.values(snapshot.counts)).toEqual([0, 0, 0, 0]);
+  });
+
+  it('serves the injected clock, and the default one is restored on release', () => {
+    expect(gpuPrepNow()).toBe(10);
+    expect(gpuPrepNow()).toBe(20);
+    setGpuPrepClockForTest(null);
+    const a = gpuPrepNow();
+    const b = gpuPrepNow();
+    expect(typeof a).toBe('number');
+    expect(b).toBeGreaterThanOrEqual(a);
+  });
+});
+
+describe('gpu preparation reveal counters', () => {
+  it('carries the ready/total root counts of the key an escape fired on', () => {
+    // Without them a capture shows THAT a town revealed at its watchdog and
+    // not how much of it had linked, which is exactly what decides whether the
+    // reveal frame paid for one building or for forty.
+    recordGpuPrepEvent({
+      kind: 'reveal-soft-deadline',
+      key: 'eastbrook-town-static',
+      ageMs: 2400,
+      readyRoots: 9,
+      totalRoots: 41,
+    });
+    const snapshot = gpuPrepEventsSnapshot();
+    expect(snapshot.counts['reveal-soft-deadline']).toBe(1);
+    expect(snapshot.events[0].readyRoots).toBe(9);
+    expect(snapshot.events[0].totalRoots).toBe(41);
+  });
+
+  it('never leaks a previous event counts into a reused ring slot', () => {
+    for (let i = 0; i < GPU_PREP_EVENT_RING_SIZE; i++) {
+      recordGpuPrepEvent({ kind: 'gate-timeout', key: `key-${i}`, ageMs: i, totalRoots: 7 });
+    }
+    recordGpuPrepEvent({ kind: 'attach-watchdog', key: 'wrapped', ageMs: 1 });
+    const wrapped = gpuPrepEventsSnapshot().events[GPU_PREP_EVENT_RING_SIZE - 1];
+    expect(wrapped.key).toBe('wrapped');
+    expect(wrapped.readyRoots).toBe(0);
+    expect(wrapped.totalRoots).toBe(0);
+  });
+
+  it('aggregates the reveal counters so a trace can attribute a first-draw stall', () => {
+    noteRevealKeyHeld(41);
+    noteRevealKeyHeld(1);
+    noteRevealRootPiecewise();
+    noteRevealRootPiecewise();
+    noteRevealRootsAtWatchdog(3);
+    const snapshot = gpuPrepEventsSnapshot();
+    expect(snapshot.reveal).toEqual({
+      keysHeld: 2,
+      rootsHeld: 42,
+      rootsPiecewise: 2,
+      rootsAtWatchdog: 3,
+    });
+    // Roots revealed when their key warmed are the remainder, so the three
+    // populations partition the held roots without a fourth counter.
+    const atWarm =
+      snapshot.reveal.rootsHeld - snapshot.reveal.rootsPiecewise - snapshot.reveal.rootsAtWatchdog;
+    expect(atWarm).toBe(37);
+  });
+
+  it('the reveal counters are a module-owned object the snapshot reuses', () => {
+    const first = gpuPrepEventsSnapshot().reveal;
+    noteRevealKeyHeld(2);
+    const second = gpuPrepEventsSnapshot().reveal;
+    expect(second).toBe(first);
+    expect(second.keysHeld).toBe(1);
+  });
+
+  it('ignores a nonsense root count instead of poisoning the totals', () => {
+    noteRevealKeyHeld(Number.NaN);
+    noteRevealRootsAtWatchdog(-4);
+    const snapshot = gpuPrepEventsSnapshot();
+    expect(snapshot.reveal.keysHeld).toBe(1);
+    expect(snapshot.reveal.rootsHeld).toBe(0);
+    expect(snapshot.reveal.rootsAtWatchdog).toBe(0);
+  });
+
+  it('reset clears the reveal counters too', () => {
+    noteRevealKeyHeld(5);
+    noteRevealRootPiecewise();
+    noteRevealRootsAtWatchdog(2);
+    resetGpuPrepEventsForTest();
+    expect(gpuPrepEventsSnapshot().reveal).toEqual({
+      keysHeld: 0,
+      rootsHeld: 0,
+      rootsPiecewise: 0,
+      rootsAtWatchdog: 0,
+    });
+  });
+});

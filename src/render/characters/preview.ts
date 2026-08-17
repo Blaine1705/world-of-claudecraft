@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { CLASSES } from '../../sim/data';
 import type { PlayerClass } from '../../sim/types';
 import { trackWebGLContext } from '../context_release';
+import { shaderDebugRequested } from '../shader_debug_flag';
 import {
   collectPrewarmTextures,
   uploadTexturesInSlices,
@@ -121,6 +122,7 @@ export class CharacterPreview {
       antialias: policy.antialias,
       preserveDrawingBuffer: policy.preserveDrawingBuffer,
     });
+    this.renderer.debug.checkShaderErrors = shaderDebugRequested();
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, policy.pixelRatioCap));
     const initialWidth = this.container.clientWidth;
     const initialHeight = this.container.clientHeight;

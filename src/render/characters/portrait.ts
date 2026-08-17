@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { PlayerClass } from '../../sim/types';
 import { assetsReady } from '../assets/preload';
 import { trackWebGLContext } from '../context_release';
+import { shaderDebugRequested } from '../shader_debug_flag';
 import {
   collectPrewarmTextures,
   uploadTexturesInSlices,
@@ -109,6 +110,7 @@ function ensureRig(): PortraitRig {
     antialias: true,
     preserveDrawingBuffer: true,
   });
+  newRenderer.debug.checkShaderErrors = shaderDebugRequested();
   newRenderer.setPixelRatio(1);
   newRenderer.setSize(PORTRAIT_SIZE, PORTRAIT_SIZE, false);
   newRenderer.shadowMap.enabled = false;
