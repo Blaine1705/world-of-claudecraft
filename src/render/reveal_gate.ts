@@ -1,7 +1,8 @@
 // Host adapter over reveal_gate_core: wires a cull's first-reveal hold to the
 // renderer's live compile gate. One gate instance per consumer (the props
-// far-cell swap, each town's static cull), each with its own key namespace
-// and roots provider. The compile itself rides the caller-supplied host, so
+// view, each town's static cull), each with its own roots provider and key
+// namespace (the props gate serves two disjoint ones: the far-cell grid keys
+// and the `cull:` band keys). The compile itself rides the caller-supplied host, so
 // this module owns only the settle plumbing, and its contract is absolute:
 // every requested key MUST settle, whatever the compiles do, or scenery
 // stays hidden forever. Three independent escapes guarantee it: per-root

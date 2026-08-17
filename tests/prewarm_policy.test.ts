@@ -215,12 +215,15 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
   });
 
   it('classifies exactly the link/upload debt entries for BOOT_DEBT resume', () => {
-    // Positive arm: the four debt payers whose unpaid remainder surfaces as
+    // Positive arm: the debt payers whose unpaid remainder surfaces as
     // first-draw stalls in live frames.
     expect(prewarmResumeIsDebt('programs.compile')).toBe(true);
     expect(prewarmResumeIsDebt('programs.compile-submit')).toBe(true);
     expect(prewarmResumeIsDebt('textures.scene')).toBe(true);
     expect(prewarmResumeIsDebt('surface-detail.textures')).toBe(true);
+    // The foliage species stream in with travel (ambient scene, not an
+    // event), so their dropped material units are debt too.
+    expect(prewarmResumeIsDebt('foliage.materials')).toBe(true);
     // Negative arm over REACHABLE inputs: these three entries declare real
     // resumeUnits, so they are the ids a misclassification would actually
     // route to BOOT_DEBT. They stay cosmetic (below the preview lane) by the
@@ -298,7 +301,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       .filter((block) => block.includes('resumeUnits:'))
       .map((block) => /id: '([^']+)'/.exec(block)?.[1])
       .filter((id): id is string => Boolean(id) && manifestIds.has(id as string));
-    expect(resumable.length).toBeGreaterThanOrEqual(5);
+    expect(resumable.length).toBeGreaterThanOrEqual(10);
     for (const id of resumable) {
       expect(
         prewarmResumeIsDebt(id) || COSMETIC_RESUME_IDS.includes(id),
@@ -1265,9 +1268,9 @@ describe('constrained entry view creation ramp', () => {
       collectionStart,
     );
     const collectionMethod = renderer.slice(collectionStart, collectionEnd);
-    expect(collectionMethod).toContain('this.collectObjectTextures(this.scene, true)');
+    expect(collectionMethod).toContain('collectObjectTextures(this.scene, true)');
     expect(collectionMethod).toContain('for (const view of this.views.values())');
-    expect(collectionMethod).toContain('this.collectObjectTextures(view.group, false, textures)');
+    expect(collectionMethod).toContain('collectObjectTextures(view.group, false, textures)');
 
     const methodStart = renderer.indexOf('private async prewarmInitialSceneTexturesBatched(');
     const methodEnd = renderer.indexOf('\n  private renderPrewarmPass(', methodStart);

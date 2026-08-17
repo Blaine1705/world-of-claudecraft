@@ -538,6 +538,7 @@ const RENDER_PURE_CORES = [
   'src/render/opaque_draw_order_core.ts',
   'src/render/perceptual_lod_core.ts',
   'src/render/prop_cell_core.ts',
+  'src/render/prop_cull_core.ts',
   'src/render/race_line_core.ts',
   'src/render/renderer_frame_telemetry_core.ts',
   'src/render/rift_death_zone_core.ts',

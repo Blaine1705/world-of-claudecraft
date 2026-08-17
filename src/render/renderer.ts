@@ -358,6 +358,7 @@ import {
 } from './mage_barrier_visual';
 import { MageGroundFx } from './mage_ground_fx';
 import { buildMailboxPillar } from './mailbox';
+import { collectObjectTextures, materialSlotTextures } from './material_texture_slots';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
@@ -515,7 +516,6 @@ import {
   measureFeatureFootprint,
   setRenderCategory,
   type TextureBackedMaterial,
-  type TextureMaterialKey,
 } from './renderer_diagnostics';
 import {
   beginRendererFrameTelemetry,
@@ -523,6 +523,7 @@ import {
   type RendererWorldPhaseMs,
 } from './renderer_frame_telemetry_core';
 import { createRevealGate } from './reveal_gate';
+import type { RevealGateCore } from './reveal_gate_core';
 import { collectRiftAmbientSources } from './rift_ambience';
 import { buildRiftRankBadge } from './rift_rank';
 import { syncRigMatrixFreeze, unfreezeRigMatrices } from './rig_visibility_freeze';
@@ -1736,9 +1737,12 @@ export class Renderer {
       dt: number,
       reducedMotion?: boolean,
     ): void;
-    setFarCellRevealGate(gate: { allow(key: string): boolean } | null): void;
-    farCellRevealRoots(key: string): readonly THREE.Object3D[];
+    setRevealGate(gate: { allow(key: string): boolean } | null): void;
+    setBandRevealGate(gate: { allow(key: string): boolean } | null): void;
+    revealRoots(key: string): readonly THREE.Object3D[];
   };
+  /** The props reveal gate (far cells at construction, bands at world entry). */
+  private propsRevealGate: RevealGateCore | null = null;
   private eastbrookTownView!: EastbrookTownView;
   private fenbridgeTownView!: FenbridgeTownView;
   private lightRank: RankedPointLight[] = [];
@@ -2611,7 +2615,8 @@ export class Renderer {
 
     // First-reveal compile gates (hitch-hunt P3a): a cull flipping world
     // content visible for the first time holds it one representation back
-    // until its programs are linked off-thread. Without async compile the
+    // (a far cell's near twin, or hidden for a fog band or a town's first
+    // approach) until its programs are linked off-thread. Without async compile the
     // gate itself would be the synchronous stall, so the views stay ungated
     // there and keep their historical immediate reveal. Reveal compiles ride
     // BELOW the live entity gates (VISIBLE_PREWARM, not LIVE_VIEW): a
@@ -2634,9 +2639,10 @@ export class Renderer {
           );
         },
       };
-      this.propsView.setFarCellRevealGate(
-        createRevealGate(revealHost, (key) => this.propsView.farCellRevealRoots(key)),
+      this.propsRevealGate = createRevealGate(revealHost, (key) =>
+        this.propsView.revealRoots(key),
       );
+      this.propsView.setRevealGate(this.propsRevealGate);
       this.eastbrookTownView.setRevealGate(
         createRevealGate(revealHost, () => this.eastbrookTownView.staticRevealRoots()),
       );
@@ -3756,6 +3762,8 @@ export class Renderer {
       // draw (getUniforms queries ACTIVE_UNIFORMS synchronously), which was a
       // measured multi-hundred-ms stall per new biome. compileAsync resolves
       // only once the programs report ready, so the live render never pays it.
+      // Both arms: the colour variant AND the shadow-pass depth variant of the
+      // zone's casters, so the sun pass never links either at first draw.
       if (opts?.pace === 'idle') {
         try {
           await withHiddenPrewarmGroups(featureGroups, async () => {
@@ -3766,7 +3774,10 @@ export class Renderer {
                 // another unit. Submit one object at a time so live work can
                 // jump queued visible-zone prewarm without overlapping it.
                 await this.backgroundGpuWork.run(
-                  () => this.compilePrewarmColorPrograms(obj, false),
+                  () =>
+                    this.compilePrewarmColorPrograms(obj, false).then(() =>
+                      this.compileShadowPrograms(obj),
+                    ),
                   GPU_WORK_PRIORITY.VISIBLE_PREWARM,
                   `zone-prepare-compile:${obj.name || obj.type}`,
                 );
@@ -3889,7 +3900,7 @@ export class Renderer {
               const group = groupLike as THREE.Group;
               const childRoot = child as THREE.Object3D;
               const units: { label: string; run: () => void }[] = [];
-              const textures = [...this.collectObjectTextures(childRoot, false)];
+              const textures = [...collectObjectTextures(childRoot, false)];
               for (let i = 0; i < textures.length; i += PREWARM_TEXTURE_UNIT_BATCH) {
                 const batch = textures.slice(i, i + PREWARM_TEXTURE_UNIT_BATCH);
                 units.push({
@@ -5521,24 +5532,8 @@ export class Renderer {
 
   private prewarmMaterialTextures(material: THREE.Material | THREE.Material[] | undefined): void {
     const mats = Array.isArray(material) ? material : material ? [material] : [];
-    const textureKeys: TextureMaterialKey[] = [
-      'map',
-      'alphaMap',
-      'aoMap',
-      'bumpMap',
-      'displacementMap',
-      'emissiveMap',
-      'envMap',
-      'lightMap',
-      'metalnessMap',
-      'normalMap',
-      'roughnessMap',
-      'specularMap',
-      'gradientMap',
-    ];
     for (const mat of mats) {
-      const textureMat = mat as TextureBackedMaterial;
-      for (const key of textureKeys) this.prewarmTexture(textureMat[key]);
+      for (const texture of materialSlotTextures(mat)) this.prewarmTexture(texture);
       // ShaderMaterials (ability-vfx pools, custom fx) hold their textures in
       // uniforms, invisible to the standard-key walk above.
       const shaderMat = mat as THREE.ShaderMaterial;
@@ -5669,53 +5664,13 @@ export class Renderer {
   // the canvas. Lazily built once and kept: 8x8 RGBA plus depth is negligible.
   private prewarmRenderTarget: THREE.WebGLRenderTarget | null = null;
 
-  private collectObjectTextures(
-    obj: THREE.Object3D,
-    visibleOnly: boolean,
-    textures = new Set<THREE.Texture>(),
-  ): Set<THREE.Texture> {
-    const textureKeys: TextureMaterialKey[] = [
-      'map',
-      'alphaMap',
-      'aoMap',
-      'bumpMap',
-      'displacementMap',
-      'emissiveMap',
-      'envMap',
-      'lightMap',
-      'metalnessMap',
-      'normalMap',
-      'roughnessMap',
-      'specularMap',
-      'gradientMap',
-    ];
-    const collect = (child: THREE.Object3D): void => {
-      const renderable = child as RenderableDiagnosticObject;
-      const materials = Array.isArray(renderable.material)
-        ? renderable.material
-        : renderable.material
-          ? [renderable.material]
-          : [];
-      for (const material of materials) {
-        const textureMaterial = material as TextureBackedMaterial;
-        for (const key of textureKeys) {
-          const texture = textureMaterial[key];
-          if (texture) textures.add(texture);
-        }
-      }
-    };
-    if (visibleOnly) obj.traverseVisible(collect);
-    else obj.traverse(collect);
-    return textures;
-  }
-
   private collectInitialSceneTextures(): THREE.Texture[] {
-    const textures = this.collectObjectTextures(this.scene, true);
+    const textures = collectObjectTextures(this.scene, true);
     // Async shader compilation temporarily hides non-self entity groups. Include
     // those already-created views explicitly so their textures do not all upload
     // during the first live submit when the compile gate restores visibility.
     for (const view of this.views.values()) {
-      this.collectObjectTextures(view.group, false, textures);
+      collectObjectTextures(view.group, false, textures);
     }
     return [...textures];
   }
@@ -6730,6 +6685,35 @@ export class Renderer {
         category: 'props',
         priority: 46,
         required: false,
+        // Droppable, so it MUST resume: without these units a deadline drop
+        // meant the pine casters and far impostors were never linked at all,
+        // and every one of them paid its colour AND shadow link mid-travel.
+        // The ghost-fade-variants shape: stage the group HIDDEN (its meshes
+        // are frustumCulled=false casters, so a visible stage would let the
+        // next live frame link every species synchronously before the compile
+        // units run; compileAsync walks hidden subtrees), then link both arms
+        // (the species cast shadows) one species per unit, so the debt lane's
+        // held tail never parks a live gate behind the whole family.
+        resumeUnits: () => {
+          const group = buildFoliageMaterialPrewarmGroup();
+          group.visible = false;
+          return [
+            {
+              id: 'foliage-materials:group',
+              run: () => {
+                foliagePrewarmGroup = group;
+                this.scene.add(group);
+              },
+            },
+            ...group.children.map((child, index) => ({
+              id: `foliage-materials:compile:${index}`,
+              run: async () => {
+                await this.compilePrewarmColorPrograms(child, false);
+                await this.compileShadowPrograms(child);
+              },
+            })),
+          ];
+        },
         run: () => {
           foliagePrewarmGroup = buildFoliageMaterialPrewarmGroup();
           this.scene.add(foliagePrewarmGroup);
@@ -7563,6 +7547,9 @@ export class Renderer {
     };
     this.lastPrewarmStats = stats;
     this.prewarmedZonePrograms.add(activeZone.id);
+    // World entry: from here every prop band's first fog reveal is gated
+    // (props.ts setBandRevealGate explains why not under the curtain).
+    this.propsView.setBandRevealGate(this.propsRevealGate);
     // Dev-channel diagnostic (pairs with main.ts's "[entry-guard] scene built"): one
     // line naming where the entry-time main-thread budget went, for isolating
     // world-entry process kills on real devices.

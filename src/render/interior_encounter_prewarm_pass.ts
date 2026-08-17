@@ -20,6 +20,7 @@ import {
   vfxWeaponSkinIds,
 } from './interior_encounter_prewarm';
 import type { InteriorEncounterPrewarmHost } from './interior_encounter_prewarm_host';
+import { collectObjectTextures } from './material_texture_slots';
 import { runBackgroundPrewarm } from './prewarm_pass';
 import { setRenderCategory } from './renderer_diagnostics';
 import { WEAPON_VFX } from './weapon_vfx';
@@ -292,14 +293,14 @@ async function compileEncounterPrewarmGroup(
         );
       },
       prepareChildAssets: (child) => {
-        for (const texture of host.collectObjectTextures(child as THREE.Object3D, false)) {
+        for (const texture of collectObjectTextures(child as THREE.Object3D, false)) {
           host.webgl.initTexture(texture);
         }
       },
       warmChildUnits: (groupLike, child) => {
         const childRoot = child as THREE.Object3D;
         const units: { label: string; run: () => void }[] = [];
-        const textures = [...host.collectObjectTextures(childRoot, false)];
+        const textures = [...collectObjectTextures(childRoot, false)];
         for (let i = 0; i < textures.length; i += TEXTURE_BATCH) {
           const batch = textures.slice(i, i + TEXTURE_BATCH);
           units.push({

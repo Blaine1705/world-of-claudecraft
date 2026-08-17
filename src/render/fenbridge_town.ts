@@ -1213,12 +1213,14 @@ function buildFromTemplates(
   }
 
   const hideTargets: BuildingHideTarget[] = [];
+  const buildingGroups: THREE.Object3D[] = [];
   for (const building of FENBRIDGE_LAYOUT.buildings) {
     const template = templates.get(building.assetId);
     if (!template) throw new Error(`Fenbridge town template is missing: ${building.assetId}`);
     const built = buildBuilding(building, template, groundAt, textures);
     group.add(built.group);
     hideTargets.push(built.hideTarget);
+    buildingGroups.push(built.group);
   }
 
   const microBatches = buildMicroBatches(templates, groundAt, textures);
@@ -1250,6 +1252,12 @@ function buildFromTemplates(
 
   const repeatedBatches = [...wallBatches, ...gateBatches, ...boardwalkBatches];
   const staticCullTargets: THREE.Object3D[] = [...microBatches, ...repeatedBatches];
+  // The reveal gate compiles the buildings with the static batches: their
+  // per-building materials (the emissive lantern variant above all) are not
+  // shared with any batch, so a building outside the roots linked cold on the
+  // frame its own fog cull first showed it (the prod 220 ms
+  // fenbridgeTownEmissive row).
+  const staticRevealRoots: THREE.Object3D[] = [...staticCullTargets, ...buildingGroups];
   const visibilityPlan = newFenbridgeBuildingVisibilityPlan();
   const setCaptureOverlay = (visible: boolean): void => {
     overlay.visible = visible;
@@ -1297,7 +1305,7 @@ function buildFromTemplates(
       revealGate = gate;
     },
     staticRevealRoots(): readonly THREE.Object3D[] {
-      return staticCullTargets;
+      return staticRevealRoots;
     },
     update(
       camX: number,
@@ -1332,6 +1340,11 @@ function buildFromTemplates(
       for (let index = 0; index < staticCullTargets.length; index++) {
         staticCullTargets[index].visible = staticVisible;
       }
+      // Buildings keep their own fog cull and camera fade, but their FIRST
+      // reveal rides the same hold as the batches: while the gate compiles
+      // the town they stay hidden, and once revealed the latch above never
+      // consults the gate again (a fog re-entry is a plain cull flip).
+      const buildingsHeld = reveal === 'held';
       for (let index = 0; index < hideTargets.length; index++) {
         const target = hideTargets[index];
         fenbridgeBuildingVisibilityPlanInto(
@@ -1346,7 +1359,7 @@ function buildFromTemplates(
           eyeZ,
           fogFar,
         );
-        target.group.visible = visibilityPlan.visible;
+        target.group.visible = visibilityPlan.visible && !buildingsHeld;
         if (!visibilityPlan.visible) continue;
         target.hidden = visibilityPlan.hidden;
         if (occluderFadeSettled(target.alpha, target.hidden)) continue;
