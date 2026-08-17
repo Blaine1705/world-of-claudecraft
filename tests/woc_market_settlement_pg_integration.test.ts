@@ -1452,4 +1452,16 @@ describeDb('woc market settlement guards against real Postgres', () => {
       expect(await bidRow(wonBid)).toEqual({ status: 'cancelled', bondState: 'refund_due' });
     });
   });
+  describe('activity reads are item-named (the real SQL, not just the fake twin)', () => {
+    it('settlementsByAccount joins the listed item onto every row', async () => {
+      const realm = `settlements-itemized-${Date.now()}`;
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      await seedSettlement(realm, listingId, buyer);
+      const rows = await marketDb.settlementsByAccount(realm, buyer, 10);
+      expect(rows).toHaveLength(1);
+      expect(rows[0].itemId, 'the correlated listing lookup').toBe('crown_of_embers');
+    });
+  });
 });

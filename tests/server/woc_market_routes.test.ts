@@ -20,7 +20,10 @@ process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_woc_marke
 
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it } from 'vitest';
+import { compose } from '../../server/http/compose';
 import { WOC_MARKET_STEPUP_POLICY } from '../../server/http/middleware/rate_limit';
+import { withErrors } from '../../server/http/middleware/with_errors';
+import type { Middleware } from '../../server/http/types';
 import {
   WOC_MARKET_LIST_MAX_PER_MINUTE,
   WOC_MARKET_STEPUP_MAX_PER_MINUTE,
@@ -1567,5 +1570,40 @@ describe('the step-up surface at the route layer (B6/R1)', () => {
         }),
       ),
     ).rejects.toMatchObject({ code: 'woc_market.invalid_input' });
+  });
+});
+
+describe('the admin envelope renders the CODE end to end (the operator wire)', () => {
+  it('a suspend refusal serializes as { success:false, data:null, error: <code> }', async () => {
+    // The full onion, not just the throw: the handler's HttpError must cross
+    // withErrors on the admin surface and come out as the coded envelope the
+    // production comment promises operators.
+    service({
+      adminSuspendListing: async () => ({ ok: false, reason: 'settlement_in_flight' }),
+    });
+    const ctx = fakeCtx({
+      method: 'POST',
+      url: '/admin/api/woc-market/listings/41/suspend',
+      params: { id: '41' },
+    });
+    ctx.state.set('adminTargetId', 41);
+    const route = routes.find(
+      (r) => r.method === 'POST' && r.path === '/admin/api/woc-market/listings/:id/suspend',
+    );
+    if (!route) throw new Error('suspend route missing');
+    const stack: Middleware[] = [
+      withErrors({ surface: route.meta?.envelope }),
+      (async (c) => {
+        await route.handler(c);
+      }) as Middleware,
+    ];
+    await compose(stack)(ctx);
+    const { status, body } = sent(ctx);
+    expect(status).toBe(409);
+    expect(body).toEqual({
+      success: false,
+      data: null,
+      error: 'woc_market.settlement_in_flight',
+    });
   });
 });

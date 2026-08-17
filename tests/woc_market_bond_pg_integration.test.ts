@@ -1621,4 +1621,19 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       expect((await listingRow(listingId)).status).toBe('active');
     });
   });
+  describe('activity reads are item-named (the real SQL, not just the fake twin)', () => {
+    it('bidsByAccount joins the listed item onto every row', async () => {
+      const realm = `bids-itemized-${++seq}`;
+      const seller = await seedAccount();
+      const bidder = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      await seedBid(realm, listingId, bidder, { status: 'active' });
+      const rows = await marketDb.bidsByAccount(realm, bidder, 10);
+      expect(rows).toHaveLength(1);
+      expect(rows[0].itemId, 'the correlated listing lookup').toBe('crown_of_embers');
+      // The pruned-listing '' arm is UNREACHABLE against real referential
+      // integrity (bids CASCADE with their listing), so the guard is
+      // defensive; the wire's empty-to-null collapse is pinned separately.
+    });
+  });
 });

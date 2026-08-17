@@ -1375,4 +1375,48 @@ describeDb('woc market directed rail against real Postgres', () => {
       expect(Number(offer.rows[0].listing_id)).toBe(listing.id);
     });
   });
+  describe('a just-resolved offer lingers for the grace window (the verdict read)', () => {
+    it('declined stays visible inside the grace bound and leaves after it', async () => {
+      // The non-resolving side's poll reads the verdict off this lingering
+      // row; filtered out the instant it resolved, the arm emptied silently.
+      const marketDbMod = await import('../server/woc_market_db');
+      const realm = `resolved-grace-${Date.now()}`;
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const nowMs = Date.now();
+      const offerId = await seedOffer(realm, seller, buyer, {
+        status: 'declined',
+        updatedAtMs: nowMs - 1_000,
+      });
+      const within = await marketDb.directedOffersForAccount(realm, buyer, nowMs);
+      expect(within.map((o) => o.id)).toContain(offerId);
+      expect(within.find((o) => o.id === offerId)?.status).toBe('declined');
+      const after = await marketDb.directedOffersForAccount(
+        realm,
+        buyer,
+        nowMs + marketDbMod.SETTLED_OFFER_GRACE_MS + 2_000,
+      );
+      expect(after.map((o) => o.id)).not.toContain(offerId);
+    });
+
+    it('an expired offer lingers the same way; a stale resolved row never returns', async () => {
+      const marketDbMod = await import('../server/woc_market_db');
+      const realm = `resolved-grace-exp-${Date.now()}`;
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const nowMs = Date.now();
+      const fresh = await seedOffer(realm, seller, buyer, {
+        status: 'expired',
+        updatedAtMs: nowMs - 1_000,
+      });
+      const stale = await seedOffer(realm, seller, buyer, {
+        status: 'withdrawn',
+        updatedAtMs: nowMs - marketDbMod.SETTLED_OFFER_GRACE_MS - 60_000,
+      });
+      const rows = await marketDb.directedOffersForAccount(realm, buyer, nowMs);
+      const ids = rows.map((o) => o.id);
+      expect(ids).toContain(fresh);
+      expect(ids).not.toContain(stale);
+    });
+  });
 });

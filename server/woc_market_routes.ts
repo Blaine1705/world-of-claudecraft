@@ -236,13 +236,19 @@ export const REFUSAL_ERRORS: Record<WocMarketRefusal, { status: number; code: Er
   stepup_signature_invalid: { status: 403, code: 'woc_market.stepup_signature_invalid' },
 };
 
-/** Params must be passed BY THE CALLER when the refusal carries them (the
- *  Refused.params channel): a handler that drops them ships a code whose
- *  declared placeholders never render. Codes with params today:
- *  woc_market.claim_cooldown (retryAfterSeconds). */
-function throwRefusal(reason: WocMarketRefusal, params?: Record<string, string | number>): never {
-  const mapped = REFUSAL_ERRORS[reason] ?? { status: 400, code: 'woc_market.invalid_input' };
-  throw new HttpError(mapped.status, mapped.code, params);
+/** Takes the WHOLE refusal so its params channel can never be dropped at a
+ *  call site: a handler that forwarded only the reason would ship a code
+ *  whose declared placeholders never render (codes with params today:
+ *  woc_market.claim_cooldown, retryAfterSeconds). */
+function throwRefusal(refusal: {
+  reason: WocMarketRefusal;
+  params?: Record<string, string | number>;
+}): never {
+  const mapped = REFUSAL_ERRORS[refusal.reason] ?? {
+    status: 400,
+    code: 'woc_market.invalid_input',
+  };
+  throw new HttpError(mapped.status, mapped.code, refusal.params);
 }
 
 const invalid = (): never => {
@@ -617,7 +623,7 @@ async function stepUpChallengeHandler(ctx: Ctx): Promise<void> {
             offerId: intField(body.offerId, 1, Number.MAX_SAFE_INTEGER),
           })
         : (invalid() as never);
-  if (!out.ok) throwRefusal(out.reason);
+  if (!out.ok) throwRefusal(out);
   json(ctx.res, 200, { challenge: out.challenge });
 }
 
@@ -663,13 +669,13 @@ async function createListingHandler(ctx: Ctx): Promise<void> {
       directedBuyerAccount: null,
     },
   });
-  if (!out.ok) throwRefusal(out.reason);
+  if (!out.ok) throwRefusal(out);
   json(ctx.res, 200, { listing: listingView(out.listing, ctxAccountId(ctx)) });
 }
 
 async function cancelListingHandler(ctx: Ctx): Promise<void> {
   const out = await useService().cancelListing(ctxAccountId(ctx), idParam(ctx));
-  if (!out.ok) throwRefusal(out.reason);
+  if (!out.ok) throwRefusal(out);
   // cancelPending: the cancel was ACCEPTED as intent on a locked listing (no
   // new claims or bids; it closes when the current window ends unpaid).
   json(ctx.res, 200, out.cancelPending === true ? { ok: true, cancelPending: true } : { ok: true });
@@ -684,19 +690,19 @@ async function placeBidHandler(ctx: Ctx): Promise<void> {
     amountCents: intField(body.amountCents, 1, WOC_MARKET_MAX_PRICE_CENTS),
     acceptTerms: body.acceptTerms === true,
   });
-  if (!out.ok) throwRefusal(out.reason);
+  if (!out.ok) throwRefusal(out);
   json(ctx.res, 200, { bid: bidView(out.bid), bond: quoteView(out.bond) });
 }
 
 async function bondQuoteHandler(ctx: Ctx): Promise<void> {
   const out = await useService().refreshBondQuote(ctxAccountId(ctx), idParam(ctx));
-  if (!out.ok) throwRefusal(out.reason);
+  if (!out.ok) throwRefusal(out);
   json(ctx.res, 200, { bond: quoteView(out.bond) });
 }
 
 async function abandonBidHandler(ctx: Ctx): Promise<void> {
   const out = await useService().abandonBid(ctxAccountId(ctx), idParam(ctx));
-  if (!out.ok) throwRefusal(out.reason);
+  if (!out.ok) throwRefusal(out);
   json(ctx.res, 200, { abandoned: true });
 }
 
@@ -707,7 +713,7 @@ async function confirmBondHandler(ctx: Ctx): Promise<void> {
     idParam(ctx),
     signatureField(body.signature),
   );
-  if (!out.ok) throwRefusal(out.reason);
+  if (!out.ok) throwRefusal(out);
   // `pending` is the honest third answer: paid, but the chain has not decided.
   // Collapsing it into standing:false would read as "outbid" to the client.
   // The screened reason says WHICH pending: the ledger saw the payment
@@ -727,7 +733,7 @@ async function buyNowHandler(ctx: Ctx): Promise<void> {
     listingId: idParam(ctx),
     acceptTerms: body.acceptTerms === true,
   });
-  if (!out.ok) throwRefusal(out.reason, out.params);
+  if (!out.ok) throwRefusal(out);
   json(ctx.res, 200, {
     settlement: settlementView(out.settlement),
     quote: quoteView(out.quote),
@@ -736,7 +742,7 @@ async function buyNowHandler(ctx: Ctx): Promise<void> {
 
 async function settlementQuoteHandler(ctx: Ctx): Promise<void> {
   const out = await useService().settlementQuote(ctxAccountId(ctx), idParam(ctx));
-  if (!out.ok) throwRefusal(out.reason);
+  if (!out.ok) throwRefusal(out);
   json(ctx.res, 200, { quote: quoteView(out.quote) });
 }
 
@@ -747,7 +753,7 @@ async function confirmSettlementHandler(ctx: Ctx): Promise<void> {
     idParam(ctx),
     signatureField(body.signature),
   );
-  if (!out.ok) throwRefusal(out.reason);
+  if (!out.ok) throwRefusal(out);
   // Same contract as the bond leg: a confirming state names its screened
   // pending verdict; every decided state answers null.
   json(ctx.res, 200, { state: out.state, reason: screenWirePendingReason(out.reason ?? null) });
@@ -949,7 +955,7 @@ async function createOfferHandler(ctx: Ctx): Promise<void> {
     },
     acceptTerms: body.acceptTerms === true,
   });
-  if (!out.ok) throwRefusal(out.reason);
+  if (!out.ok) throwRefusal(out);
   json(ctx.res, 200, { offer: offerView(out.offer, ctxAccountId(ctx)) });
 }
 
@@ -975,7 +981,7 @@ async function acceptOfferHandler(ctx: Ctx): Promise<void> {
     // side sends none and the service demands none of them.
     optionalStepUp(body.stepUp),
   );
-  if (!out.ok) throwRefusal(out.reason);
+  if (!out.ok) throwRefusal(out);
   // A null listing means "agreed, still waiting on the other side": the deal is
   // live but nothing has escrowed, and the client must not treat it as done.
   json(ctx.res, 200, {
@@ -985,13 +991,13 @@ async function acceptOfferHandler(ctx: Ctx): Promise<void> {
 
 async function declineOfferHandler(ctx: Ctx): Promise<void> {
   const out = await useService().resolveDirectedOffer(ctxAccountId(ctx), idParam(ctx), 'decline');
-  if (!out.ok) throwRefusal(out.reason);
+  if (!out.ok) throwRefusal(out);
   json(ctx.res, 200, { ok: true });
 }
 
 async function withdrawOfferHandler(ctx: Ctx): Promise<void> {
   const out = await useService().resolveDirectedOffer(ctxAccountId(ctx), idParam(ctx), 'withdraw');
-  if (!out.ok) throwRefusal(out.reason);
+  if (!out.ok) throwRefusal(out);
   json(ctx.res, 200, { ok: true });
 }
 

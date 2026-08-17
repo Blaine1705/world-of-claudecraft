@@ -1521,11 +1521,12 @@ describe('woc_market_window: the Activity tab is an honest, actionable ledger (H
     expect(activity).toContain('`activity:settle:${s.id}`');
   });
 
-  it('the seller cancel renders on active unbid listing rows, with the browse-pane gate', () => {
+  it('the seller cancel renders on active unbid listing rows, strictly gated', () => {
     // A directed listing never passes through the browse detail pane, so this
-    // row is its seller's ONLY cancel surface; the gate mirrors the pane
-    // (active, no cancel-intent stamped, no bids) and the server's guards
-    // stay the authority for everything else.
+    // row is its seller's ONLY cancel surface. The gate is STRICTLY STRONGER
+    // than the pane's (mine && unbid): every My-listings row is mine, and
+    // this one also requires active status and no cancel-intent stamp; the
+    // server's guards stay the authority for everything else.
     expect(activity).toContain(
       "l.status === 'active' && !l.cancelPending && l.currentCents === null",
     );

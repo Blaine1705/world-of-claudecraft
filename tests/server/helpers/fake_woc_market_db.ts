@@ -37,6 +37,7 @@ import type {
   WocStrikeRow,
   WocStuckCustodyClasses,
 } from '../../../server/woc_market';
+import { SETTLED_OFFER_GRACE_MS } from '../../../server/woc_market_db';
 import type { WocBidStatus, WocSettlementState } from '../../../server/woc_market_rules';
 import {
   WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS,
@@ -508,12 +509,41 @@ export class FakeWocMarketDb implements WocMarketDb {
   }
 
   async directedOffersForAccount(realm: string, account: number): Promise<WocDirectedOfferRow[]> {
-    return [...this.offers.values()].filter(
-      (o) =>
-        o.realm === realm &&
-        o.status === 'pending' &&
-        (o.buyerAccount === account || o.sellerAccount === account),
-    );
+    // Full Pg fidelity (the read used to return 'pending' rows only, which
+    // hid the whole payment-phase machinery from every fake-driven test):
+    // pending AND accepted rows; a just-RESOLVED row (declined / withdrawn /
+    // expired) for the grace window, so the non-resolving side can read the
+    // verdict; the closed-listing grace clause; and the listing/settlement
+    // join fields the arm derives its phase from.
+    const graceCutoffMs = this.now() - SETTLED_OFFER_GRACE_MS;
+    return [...this.offers.values()]
+      .filter(
+        (o) => o.realm === realm && (o.buyerAccount === account || o.sellerAccount === account),
+      )
+      .filter(
+        (o) =>
+          o.status === 'pending' ||
+          o.status === 'accepted' ||
+          (this.offerUpdatedMs.get(o.id) ?? 0) > graceCutoffMs,
+      )
+      .filter((o) => {
+        if (o.listingId === null) return true;
+        const l = this.listings.get(o.listingId);
+        if (!l || l.status !== 'closed') return true;
+        return (this.listingTouchMs.get(o.listingId) ?? 0) > graceCutoffMs;
+      })
+      .map((o) => {
+        const l = o.listingId === null ? undefined : this.listings.get(o.listingId);
+        const latest = [...this.settlements.values()]
+          .filter((s) => s.listingId === o.listingId)
+          .sort((a, b) => b.id - a.id)[0];
+        return {
+          ...o,
+          listingStatus: l?.status ?? null,
+          listingResolution: l?.resolution ?? null,
+          settlementState: o.listingId === null ? null : (latest?.state ?? null),
+        };
+      });
   }
 
   async resolveDirectedOffer(

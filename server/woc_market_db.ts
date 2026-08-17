@@ -1645,7 +1645,16 @@ export class PgWocMarketDb implements WocMarketDb {
             ORDER BY id DESC LIMIT 1
          ) s ON o.listing_id IS NOT NULL
         WHERE o.realm = $1
-          AND o.status IN ('pending', 'accepted')
+          AND (
+            o.status IN ('pending', 'accepted')
+            -- A just-RESOLVED offer rides the same grace precedent: the side
+            -- that did NOT resolve it learns the verdict (declined /
+            -- withdrawn / expired) off the lingering row and says so once.
+            -- Filtered out the instant it resolved, the arm emptied silently,
+            -- which reads as a glitch (resolve and the expiry sweep both
+            -- stamp updated_at, so the window bound is real).
+            OR o.updated_at > $3
+          )
           AND (o.buyer_account = $2 OR o.seller_account = $2)
           -- A finished sale is history, not a live deal: left visible forever a
           -- completed offer sits in both trade windows showing "Paid" and blocks

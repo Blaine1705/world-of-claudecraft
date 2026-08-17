@@ -184,6 +184,10 @@ describe('ERROR_CODES catalog', () => {
     expect(ERROR_CODES['moderation.suspended_until'].params).toEqual(['date']);
   });
 
+  it('declares the buy-now cooldown remaining time (the client renders it as a duration)', () => {
+    expect(ERROR_CODES['woc_market.claim_cooldown'].params).toEqual(['retryAfterSeconds']);
+  });
+
   it('gives every code a params array of non-empty strings', () => {
     for (const [code, value] of Object.entries(ERROR_CODES)) {
       expect(Array.isArray(value.params), code).toBe(true);

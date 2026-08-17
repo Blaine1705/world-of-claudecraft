@@ -274,3 +274,27 @@ describe('cancelListing()', () => {
     });
   });
 });
+
+describe('the params channel carries CODE PARAMS, not just the code echo', () => {
+  it('a param riding beside the code survives into params (retryAfterSeconds)', async () => {
+    // The three code-only cases above pass with `params: { code }`; this is
+    // the case the channel exists for.
+    stubFetch(() => ({
+      status: 409,
+      body: { code: 'woc_market.claim_cooldown', retryAfterSeconds: 55 },
+    }));
+    await expect(client().cancelListing(41)).resolves.toEqual({
+      ok: false,
+      code: 'woc_market.claim_cooldown',
+      params: { code: 'woc_market.claim_cooldown', retryAfterSeconds: 55 },
+    });
+  });
+
+  it('a codeless error body declares NO params (the apiErrorFromBody convention)', async () => {
+    stubFetch(() => ({ status: 500, body: { detail: 'wreckage' } }));
+    await expect(client().cancelListing(41)).resolves.toEqual({
+      ok: false,
+      code: WOC_MARKET_UNAVAILABLE,
+    });
+  });
+});

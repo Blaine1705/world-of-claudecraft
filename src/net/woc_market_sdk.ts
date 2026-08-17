@@ -295,11 +295,14 @@ export class WocMarketClient {
       if (!res.ok) {
         const body =
           data && typeof data === 'object' ? (data as Record<string, unknown>) : undefined;
-        const code =
-          typeof body?.code === 'string' ? (body.code as string) : WOC_MARKET_UNAVAILABLE;
-        // The whole parsed body rides as params (the ApiError convention):
-        // code params are top-level extension members of the problem envelope.
-        return body === undefined ? { ok: false, code } : { ok: false, code, params: body };
+        const code = typeof body?.code === 'string' ? (body.code as string) : undefined;
+        // The whole parsed body rides as params (the ApiError convention:
+        // code params are top-level extension members of the problem
+        // envelope), and ONLY beside a real code, matching apiErrorFromBody
+        // in src/net/online.ts: a codeless body declares no params.
+        return code === undefined
+          ? { ok: false, code: WOC_MARKET_UNAVAILABLE }
+          : { ok: false, code, params: body };
       }
       if (data === null) return { ok: false, code: WOC_MARKET_UNAVAILABLE };
       return { ok: true, data: data as T };

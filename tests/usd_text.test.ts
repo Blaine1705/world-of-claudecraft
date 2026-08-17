@@ -55,15 +55,21 @@ describe('the grep-proof: zero hardcoded currency prefixes in src/ui', () => {
     return out;
   }
 
-  it('no src/ui module concatenates a literal dollar before an interpolation', () => {
+  it('no client presentation module concatenates a literal dollar before an interpolation', () => {
     // The `$${...}` template shape IS the defect class the review named
     // (wocUsdText, the Claudium pack labels, the daily-rewards prize lines):
     // a literal "$" glued to a localized number. Catalog English (the
-    // translatable "{usd} USD" copy) does not match this shape.
+    // translatable "{usd} USD" copy) does not match this shape. Swept over
+    // src/ui, src/game, and src/net on COMMENT-STRIPPED source, so a money
+    // surface moving directories or a commented example cannot skew it.
+    const stripComments = (src: string): string =>
+      src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
     const offenders: string[] = [];
-    for (const file of tsFilesUnder('src/ui')) {
-      const src = readFileSync(file, 'utf8');
-      if (/`[^`]*\$\$\{/.test(src) || /'\$' \+|"\$" \+/.test(src)) offenders.push(file);
+    for (const dir of ['src/ui', 'src/game', 'src/net']) {
+      for (const file of tsFilesUnder(dir)) {
+        const src = stripComments(readFileSync(file, 'utf8'));
+        if (/`[^`]*\$\$\{/.test(src) || /'\$' \+|"\$" \+/.test(src)) offenders.push(file);
+      }
     }
     expect(offenders, 'hardcoded "$" money prefixes (use usd_text.ts)').toEqual([]);
   });

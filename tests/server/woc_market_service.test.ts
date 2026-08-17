@@ -3764,9 +3764,10 @@ describe('settlement expiry', () => {
     expect((await getSettlement(h, settlement.id)).state).toBe('expired');
     const bid = await getBid(h, standing.bidId);
     expect(bid.status).toBe('defaulted');
-    // Queued for forfeiture even mid-outage; never back to the bidder.
-    expect(bid.bondState).not.toBe('held');
-    expect(bid.bondState).not.toBe('refund_due');
+    // Forfeited in the SAME pass even mid-outage (the dev economy's forfeit
+    // is not price-gated); the load-bearing claim is it never routes back to
+    // the bidder, and the exact state pins that.
+    expect(bid.bondState).toBe('forfeited');
     expect((await h.db.strikeInfo(BUYER_A))?.strikes ?? 0).toBe(0);
     // Durable-state control: the expiry CAS fired once, so a later HEALTHY
     // pass drains the forfeit but can never retro-strike the outage window.
@@ -8359,5 +8360,91 @@ describe('service vocabulary drift is visible on the dev channel', () => {
     } finally {
       spy.mockRestore();
     }
+  });
+});
+
+describe('review-round closures (the shared strike gate and the cooldown params)', () => {
+  it('the AUCTION default arm spares the strike on the exempt refusal class too', async () => {
+    // The other fairness dimension of strikeDefaultingBuyer (the outage test
+    // covers oracle health): a chain-plausible refusal class recorded on the
+    // settlement spares the strike under a HEALTHY oracle, exactly as the
+    // directed rail does. Default and forfeit still land.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const standing = await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    h.setNow(listing.endsAtMs + 1);
+    await h.service.sweepPass();
+    const settlement = await liveSettlement(h, listing.id);
+    unwrap(await h.service.settlementQuote(BUYER_A, settlement.id), 'settlementQuote');
+    expect(await h.db.submitSettlementSignature(settlement.id, 'sig-auction-outage')).toBe('ok');
+    expect(
+      await h.db.transitionSettlement(
+        settlement.id,
+        ['confirming'],
+        'failed',
+        'service_unavailable',
+      ),
+    ).toBe(true);
+    h.setNow(settlement.deadlineAtMs + 1);
+    await h.service.sweepPass();
+    expect((await getSettlement(h, settlement.id)).state).toBe('expired');
+    const bid = await getBid(h, standing.bidId);
+    expect(bid.status).toBe('defaulted');
+    expect((await h.db.strikeInfo(BUYER_A))?.strikes ?? 0).toBe(0);
+  });
+
+  it('the cooldown remaining time is floored at ONE second, never zero', async () => {
+    // Unreachable through the fake's own ledger (its retry moments are
+    // always strictly future), so drive the boundary at the db seam.
+    const h = makeHarness();
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+    const original = h.db.claimBuyNowLock.bind(h.db);
+    h.db.claimBuyNowLock = async () =>
+      ({ refusal: 'claim_cooldown', retryAtMs: h.now() - 5_000 }) as never;
+    try {
+      expect(
+        await h.service.buyNow({
+          account: BUYER_A,
+          characterId: CHAR_A,
+          listingId: listing.id,
+          acceptTerms: true,
+        }),
+      ).toEqual({
+        ok: false,
+        reason: 'claim_cooldown',
+        params: { retryAfterSeconds: 1 },
+      });
+    } finally {
+      h.db.claimBuyNowLock = original;
+    }
+  });
+
+  it('the hourly cap arm carries ITS drain moment through the fake too', async () => {
+    // The cap arm's retry moment (the cap-th newest abandon leaving the
+    // rolling window) is pinned exactly in the Pg suite; this is the
+    // fake-side twin so a non-Postgres leg still pins the arm.
+    const h = makeHarness();
+    for (let i = 0; i < 3; i++) {
+      // One epic copy per listing: the harness stocks the seller with one.
+      h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
+      const other = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+      await h.db.recordBuyNowAbandon(REALM, other.id, BUYER_A, BASE_MS - (i + 1) * 60_000);
+    }
+    h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
+    const fresh = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+    const out = await h.service.buyNow({
+      account: BUYER_A,
+      characterId: CHAR_A,
+      listingId: fresh.id,
+      acceptTerms: true,
+    });
+    // Cap-th newest sits at BASE_MS - 3 min; it leaves the rolling window
+    // WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS later.
+    const retryAtMs = BASE_MS - 3 * 60_000 + 3_600_000;
+    expect(out).toEqual({
+      ok: false,
+      reason: 'claim_cooldown',
+      params: { retryAfterSeconds: Math.ceil((retryAtMs - h.now()) / 1000) },
+    });
   });
 });

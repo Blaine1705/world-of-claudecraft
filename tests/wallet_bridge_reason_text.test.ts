@@ -14,6 +14,12 @@ import {
   walletBridgeReason,
 } from '../src/ui/wallet_bridge_reason_text';
 
+// Comment-stripped before any pin reads a source, or a commented-out throw
+// site keeps a mapping "alive" (the comment-gameable trap; the URL-guarded
+// line strip the sibling market-window pins use).
+const stripCommentsForPin = (src: string): string =>
+  src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+
 describe('classification', () => {
   it('classifies the two cancel NAMES structurally, whatever the message says', () => {
     for (const name of ['WalletSelectionCancelled', 'WalletConnectionCancelled']) {
@@ -106,7 +112,7 @@ describe('the drift pin: every mapped literal exists verbatim in a bridge source
     // The launcher modal's rejections propagate through the deeplink request.
     'src/ui/mobile_wallet_launcher.ts',
   ];
-  const corpus = sources.map((p) => readFileSync(p, 'utf8')).join('\n');
+  const corpus = sources.map((p) => stripCommentsForPin(readFileSync(p, 'utf8'))).join('\n');
 
   it('finds each mapped message in the bridge corpus', () => {
     for (const message of Object.keys(WALLET_BRIDGE_MESSAGE_REASONS)) {
@@ -120,5 +126,45 @@ describe('the drift pin: every mapped literal exists verbatim in a bridge source
 
   it('the missing-field prefix family exists at its throw site', () => {
     expect(corpus).toContain('wallet response is missing ${');
+  });
+});
+
+describe('classification hardening from the review round', () => {
+  it('a prototype-key provider message stays unknown (hasOwn, not a bare index)', async () => {
+    const { walletBridgeReason } = await import('../src/ui/wallet_bridge_reason_text');
+    for (const name of ['toString', 'constructor', 'valueOf', 'hasOwnProperty']) {
+      expect(walletBridgeReason(new Error(name)), name).toBe('unknown');
+    }
+  });
+
+  it('the Claudium channel never rewrites its own localized throws into the cancel copy', async () => {
+    // The strict (no-prose) classification: a checkout sentence whose FILL
+    // contains a cancel-family word must pass through, not become "the
+    // wallet request was cancelled" for money that may have moved.
+    const { claudiumCheckoutErrorText } = await import('../src/ui/wallet_bridge_reason_text');
+    const localized = 'La transaccion fue cancelada por el emisor, revisa tu compra.';
+    expect(claudiumCheckoutErrorText(new Error(localized))).toBe(localized);
+    // The MARKET flavor still applies the heuristic to the same prose (its
+    // channel carries only bridge/provider errors).
+    const { walletBridgeReason } = await import('../src/ui/wallet_bridge_reason_text');
+    expect(walletBridgeReason(new Error(localized))).toBe('cancelled');
+    // Structural cancels still classify in the strict channel.
+    const err = new Error('whatever');
+    err.name = 'WalletConnectionCancelled';
+    expect(claudiumCheckoutErrorText(err)).not.toBe('whatever');
+  });
+});
+
+describe('the Claudium checkout wires the classifier (main.ts)', () => {
+  it('main.ts routes the checkout catch through claudiumCheckoutErrorText, regex ladder gone', () => {
+    // RAW source, deliberately: main.ts carries /*-bearing glob strings that
+    // the naive block-comment strip would swallow (and the anti-pins below
+    // fail LOUDLY, not silently, if a comment ever quotes the old ladder).
+    const main = readFileSync('src/main.ts', 'utf8');
+    expect(main).toContain('claudiumCheckoutErrorText(err)');
+    // The raw-message ladder this replaced must stay gone: its regexes were
+    // the only thing between provider prose and the checkout UI.
+    expect(main).not.toContain('/connect a wallet first/i');
+    expect(main).not.toContain('/wallet cannot sign and send transactions/i');
   });
 });

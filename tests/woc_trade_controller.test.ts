@@ -16,7 +16,7 @@ import {
   WocTradeController,
   type WocTradeControllerDeps,
 } from '../src/ui/hud/woc_trade/woc_trade_controller';
-import { t } from '../src/ui/i18n';
+import { formatDateTime, t } from '../src/ui/i18n';
 import { wocUsdText } from '../src/ui/trade_woc_panel';
 import type { WocPendingOffer } from '../src/ui/trade_woc_view';
 import type { WocMarketHooks } from '../src/ui/woc_market_window';
@@ -1865,5 +1865,182 @@ describe('informed commitment (R9 + the quote review)', () => {
     const c = r.controller as unknown as { wocTradeTermsAccepted: boolean };
     expect(c.wocTradeTermsAccepted).toBe(false);
     vi.useRealTimers();
+  });
+});
+
+describe('review-round closures: the arms the first audit found unpinned', () => {
+  it('the OFFER SEND carries false when nothing consented, and records a consented send (R9)', async () => {
+    // The exact mutant the R9 criterion exists to kill: acceptTerms: true
+    // hard-coded back into sendWocTradeOffer passes every other test.
+    const h = fakeHooks();
+    h.state.createOfferImpl = () =>
+      Promise.resolve({
+        ok: true,
+        offer: { id: 12, usdCents: 250, expiresAtMs: 1_800_000_000_000 },
+      });
+    const r = rig(h.hooks);
+    const agreed = { itemId: 'worn_sword', count: 1 };
+    r.host.tradeInfo = {
+      otherPid: 2,
+      otherName: 'Borin',
+      myOffer: { items: [], copper: 0 },
+      theirOffer: { items: [agreed], copper: 0 },
+      myAccepted: false,
+      theirAccepted: false,
+    } as unknown as typeof r.host.tradeInfo;
+    const c = r.controller as unknown as {
+      wocTradeMode: 'gold' | 'woc';
+      wocTradeUsdCents: number | null;
+      wocTradePartner: { name: string; walletVerified: boolean } | null;
+      wocTradePartnerResolved: boolean;
+      wocTradeTermsAccepted: boolean;
+      wocTradeTermsChecked: boolean;
+      wocTradeOffer: WocPendingOffer | null;
+      sendWocTradeOffer(otherName: string): Promise<void>;
+    };
+    c.wocTradeMode = 'woc';
+    c.wocTradeUsdCents = 250;
+    c.wocTradePartner = { name: 'Borin', walletVerified: true };
+    c.wocTradePartnerResolved = true;
+    c.wocTradeTermsAccepted = false;
+    c.wocTradeTermsChecked = false;
+    await c.sendWocTradeOffer('Borin');
+    expect(h.state.lastCreateBody?.acceptTerms, 'unconsented send carries FALSE').toBe(false);
+    // The fake answered ok despite the false flag, which against the REAL
+    // server can only mean durable acceptance already existed (guardTerms
+    // refuses terms_required otherwise), so learning it locally is correct.
+    expect(c.wocTradeTermsAccepted, 'an ok answer implies durable acceptance').toBe(true);
+    c.wocTradeTermsAccepted = false;
+    // Ticked: the send carries it, the durable flag records, and the held
+    // offer carries the response expiry. The first send's held offer must
+    // clear first (a standing offer replaces the form).
+    c.wocTradeOffer = null;
+    c.wocTradeTermsChecked = true;
+    await c.sendWocTradeOffer('Borin');
+    expect(h.state.lastCreateBody?.acceptTerms).toBe(true);
+    expect(c.wocTradeTermsAccepted, 'the consented send records durably').toBe(true);
+    // Fresh cast: TS keeps the null narrowing from the assignment above and
+    // would type the re-populated field as never.
+    const held = (c as { wocTradeOffer: WocPendingOffer | null }).wocTradeOffer;
+    expect(held?.expiresAtMs, 'the send adopts the response expiry').toBe(1_800_000_000_000);
+  });
+
+  it('a declined offer cannot be RE-ADOPTED while the row still reads pending (the retired ledger)', async () => {
+    // The wocTradeFinished.add in cancelWocTradeOffer is what blocks
+    // re-adoption when the next poll read races the resolve and still shows
+    // the row standing; without it the declined deal reopens under the
+    // seller.
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+    const h = fakeHooks();
+    h.state.tradePartnerImpl = () => Promise.resolve({ name: 'Bree', walletVerified: true });
+    h.state.offersResult = { ok: true, offers: [offerRow({ role: 'seller', buyerName: 'Bree' })] };
+    const r = rig(h.hooks);
+    openTrade(r);
+    await flushAsync();
+    r.controller.updateTradeWindow();
+    document.querySelector<HTMLElement>('#trade-window [data-woc-decline]')?.click();
+    await flushAsync();
+    const c = r.controller as unknown as { wocTradeOffer: WocPendingOffer | null };
+    expect(c.wocTradeOffer).toBeNull();
+    // The next poll still returns the row as PENDING (the racing read).
+    vi.setSystemTime(1_002_500);
+    r.controller.updateTradeWindow();
+    await flushAsync();
+    expect(c.wocTradeOffer, 'the retired id blocks re-adoption').toBeNull();
+    expect(r.host.logs.filter((l) => l === t('hudChrome.trade.woc.youDeclined'))).toHaveLength(1);
+    vi.useRealTimers();
+  });
+
+  it('close-time honesty covers ALL the arms: unpaid buyer, silent seller, and the exact expiry', async () => {
+    // Arm 1: the buyer with an UNPAID escrowed deal.
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+    const awaiting = offerRow({
+      status: 'accepted',
+      listingId: 41,
+      listingStatus: 'active',
+      buyerAccepted: true,
+      sellerAccepted: true,
+    });
+    let h = fakeHooks();
+    h.state.offersResult = { ok: true, offers: [awaiting] };
+    let r = rig(h.hooks);
+    openTrade(r);
+    await flushAsync();
+    r.host.tradeInfo = null;
+    r.controller.updateTradeWindow();
+    await flushAsync();
+    expect(r.host.logs).toContain(t('hudChrome.trade.woc.dealAwaitsPayment'));
+
+    // Arm 2: the pending-offer buyer gets the EXACT expiry-bearing line.
+    h = fakeHooks();
+    h.state.offersResult = { ok: true, offers: [offerRow({ expiresAtMs: 1_900_000_000_000 })] };
+    r = rig(h.hooks);
+    openTrade(r);
+    await flushAsync();
+    r.host.tradeInfo = null;
+    r.controller.updateTradeWindow();
+    await flushAsync();
+    expect(r.host.logs).toContain(
+      t('hudChrome.trade.woc.offerStandsUntil', {
+        time: formatDateTime(1_900_000_000_000, { timeStyle: 'short' }),
+      }),
+    );
+
+    // Arm 3: the SELLER of a still-pending offer gets NO line (their next
+    // move reopens a trade anyway, and the offer lapses on its own).
+    h = fakeHooks();
+    h.state.offersResult = {
+      ok: true,
+      offers: [offerRow({ role: 'seller', buyerName: 'Bree' })],
+    };
+    r = rig(h.hooks);
+    openTrade(r);
+    await flushAsync();
+    const before = r.host.logs.length;
+    r.host.tradeInfo = null;
+    r.controller.updateTradeWindow();
+    await flushAsync();
+    expect(r.host.logs.length, 'no close-time line for the seller').toBe(before);
+    vi.useRealTimers();
+  });
+
+  it('the confirm answer CARRIES onto the held offer (settlementState, behaviorally)', async () => {
+    const h = fakeHooks();
+    h.state.buyNowImpl = () =>
+      Promise.resolve({ ok: true, settlement: { id: 5, amountCents: 100 }, quote: null });
+    h.state.settlementQuoteImpl = () =>
+      Promise.resolve({
+        ok: true,
+        quote: {
+          reference: 'ref_1',
+          transactionBase64: 'dHg=',
+          signatureRequired: false,
+          amount: null,
+          seller: null,
+          burn: null,
+          treasury: null,
+          bondCents: null,
+          expiresAtMs: 9_999_999_999_999,
+        },
+      });
+    h.state.confirmSettlementImpl = () => Promise.resolve({ ok: true, state: 'confirmed' });
+    const r = rig(h.hooks);
+    const c = r.controller as unknown as {
+      wocTradeOffer: WocPendingOffer | null;
+      payWocTradeOffer(): Promise<void>;
+      signWocTradeQuote(): Promise<void>;
+    };
+    c.wocTradeOffer = heldOffer({
+      role: 'buyer',
+      phase: 'awaiting_payment',
+      listingId: 41,
+      buyerAccepted: true,
+      sellerAccepted: true,
+    });
+    await c.payWocTradeOffer();
+    await c.signWocTradeQuote();
+    expect(c.wocTradeOffer?.settlementState, 'the answer rides the held offer').toBe('confirmed');
   });
 });

@@ -88,7 +88,18 @@ const GENERIC_KEYS: Readonly<Record<'sign' | 'payment', TranslationKey>> = {
  *  only words that unambiguously mean the PLAYER said no. */
 const DECLINE_PROSE = /reject|declin|cancel|denied/i;
 
-export function walletBridgeReason(err: unknown): WalletBridgeReason {
+export function walletBridgeReason(
+  err: unknown,
+  opts?: {
+    /** Whether the provider decline-prose heuristic may run. Default true
+     *  for the market sinks, whose channel carries ONLY bridge/provider
+     *  errors. A channel that MIXES its own localized throws (the Claudium
+     *  checkout) must pass false: a fill containing "cancelado" would
+     *  otherwise convert an unrelated localized sentence into the cancel
+     *  copy, a custody-lie class. */
+    proseDeclines?: boolean;
+  },
+): WalletBridgeReason {
   if (err && typeof err === 'object') {
     const name = (err as { name?: unknown }).name;
     if (name === 'WalletSelectionCancelled' || name === 'WalletConnectionCancelled') {
@@ -96,11 +107,17 @@ export function walletBridgeReason(err: unknown): WalletBridgeReason {
     }
   }
   const message = err instanceof Error ? err.message : typeof err === 'string' ? err : '';
-  const mapped = WALLET_BRIDGE_MESSAGE_REASONS[message];
-  if (mapped !== undefined) return mapped;
+  // hasOwn, not a bare index: a provider message of exactly 'toString' or
+  // 'constructor' would otherwise read an inherited function off the object
+  // literal and escape the reason union.
+  if (Object.hasOwn(WALLET_BRIDGE_MESSAGE_REASONS, message)) {
+    return WALLET_BRIDGE_MESSAGE_REASONS[message];
+  }
   // The deeplink's field-name family: 'wallet response is missing <field>'.
   if (message.startsWith('wallet response is missing ')) return 'bad_response';
-  if (message !== '' && DECLINE_PROSE.test(message)) return 'cancelled';
+  if (opts?.proseDeclines !== false && message !== '' && DECLINE_PROSE.test(message)) {
+    return 'cancelled';
+  }
   return 'unknown';
 }
 
@@ -128,7 +145,10 @@ export function walletBridgeErrorText(err: unknown, flavor: 'sign' | 'payment'):
  * now scoped to exactly that remainder).
  */
 export function claudiumCheckoutErrorText(err: unknown): string {
-  const reason = walletBridgeReason(err);
+  // STRICT classification (no decline-prose heuristic): this channel carries
+  // the checkout's own localized sentences, and a locale whose fill contains
+  // a "cancel"-family word must never be rewritten into the cancel copy.
+  const reason = walletBridgeReason(err, { proseDeclines: false });
   if (reason === 'not_connected') return t('hudChrome.claudium.checkoutWalletRequired');
   if (reason === 'unsupported') return t('hudChrome.claudium.checkoutWalletUnsupported');
   if (reason !== 'unknown') return walletBridgeReasonText(reason, 'payment');

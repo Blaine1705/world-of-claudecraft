@@ -660,3 +660,64 @@ describe('a staged slot resolves to its INVENTORY index', () => {
     expect(inventoryIndexOfStaged(craftedFirst, crafted)).toBe(0);
   });
 });
+
+describe('the confirmed-awaiting-delivery status sentences', () => {
+  const base = {
+    marketEnabled: true,
+    selfWalletVerified: true,
+    partner: { name: 'Bree', walletVerified: true },
+    partnerResolved: true,
+    staged: [],
+    theirStaged: [],
+    items: {},
+    mode: 'woc' as const,
+    usdCents: null,
+    tokens: null,
+    split: null,
+    goldOffered: false,
+    walletTokens: null,
+  };
+  const paying = (role: 'buyer' | 'seller', settlementState: string) => ({
+    id: 7,
+    usdCents: 100,
+    tokens: null,
+    role,
+    phase: 'paying' as const,
+    listingId: 41,
+    buyerAccepted: true,
+    sellerAccepted: true,
+    settlementState,
+  });
+
+  it('confirmed and delivering take the per-role DECIDED sentence, never the confirming one', () => {
+    for (const state of ['confirmed', 'delivering']) {
+      const buyer = buildWocTradeModel({ ...base, pendingOffer: paying('buyer', state) });
+      expect(buyer.statusKey, `buyer ${state}`).toBe('hudChrome.trade.woc.statusConfirmedBuyer');
+      const seller = buildWocTradeModel({ ...base, pendingOffer: paying('seller', state) });
+      expect(seller.statusKey, `seller ${state}`).toBe('hudChrome.trade.woc.statusConfirmedSeller');
+    }
+    // The still-undecided state keeps the confirming sentences.
+    expect(
+      buildWocTradeModel({ ...base, pendingOffer: paying('buyer', 'confirming') }).statusKey,
+    ).toBe('hudChrome.trade.woc.statusPayingBuyer');
+    expect(
+      buildWocTradeModel({ ...base, pendingOffer: paying('seller', 'confirming') }).statusKey,
+    ).toBe('hudChrome.trade.woc.statusPayingSeller');
+  });
+
+  it('the quote review renders on the paying phase too (the wallet-return repaint)', () => {
+    const model = buildWocTradeModel({
+      ...base,
+      pendingOffer: paying('buyer', 'confirming'),
+      quote: { totalTokens: 5, usdCents: 100, expiresAtMs: null },
+    });
+    expect(model.quoteReview).not.toBeNull();
+    // Never for the seller, whatever the phase.
+    const seller = buildWocTradeModel({
+      ...base,
+      pendingOffer: paying('seller', 'confirming'),
+      quote: { totalTokens: 5, usdCents: 100, expiresAtMs: null },
+    });
+    expect(seller.quoteReview).toBeNull();
+  });
+});
