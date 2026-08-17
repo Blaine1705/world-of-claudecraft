@@ -188,8 +188,20 @@ interface AttributionTargetFixture {
 // conversion: the merged renderer keeps the wrapper repairs and moves again
 // for the compressed sky residency path, so the composite follows its bytes.
 // No capture was retaken.
+// Re-minted for the vfx.mount-programs prewarm entry (#2571): renderer.ts and
+// prewarm_policy.ts both move, so the composite follows their bytes. No
+// capture was retaken.
+// Re-minted for the vfx.mount-programs review fixes (scene-reparent bug,
+// honest desktop-path progress, depth compile, timeout-bounded fetch,
+// constrained-device removal): renderer.ts and prewarm_policy.ts both move
+// again, so the composite follows their bytes. No capture was retaken.
+// Re-minted for the rebase onto release/v0.39.0: renderer.ts moves again with
+// the base merge, so the composite follows its bytes. No capture was retaken.
+// Re-minted for this merge resolution: the wrapper renderer/provenance repairs
+// and vfx.mount-programs both move the runtime inputs, so the composite follows
+// the actual merged tree bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'b736a595a4147e153c270832e9710d113e4f00e0bf25d3564586a3c6841d13eb';
+  '3dbec74706dd0b7b6707e750ce8ddce0255989ec90aba72b1ba90bd9be3bab31';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

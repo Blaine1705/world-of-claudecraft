@@ -356,6 +356,7 @@ import { buildMailboxPillar } from './mailbox';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
+import { mountPrewarmKeys, stageMountPrewarmVisual } from './mount_prewarm';
 import { mountBobY, mountVisualSpec } from './mount_visuals';
 import { NameplatePainter } from './nameplate_painter';
 import {
@@ -6020,6 +6021,8 @@ export class Renderer {
     let foliagePrewarmGroup: THREE.Group | null = null;
     let greatTreePrewarmGroup: THREE.Group | null = null;
     let weaponVfxPrewarmGroup: THREE.Group | null = null;
+    let mountPrewarmGroup: THREE.Group | null = null;
+    let mountPrewarmWarmed = 0;
     let landmarkPrewarmGroup: THREE.Group | null = null;
     let weatherPrewarmActive = false;
     let surfaceDetailTexturesWarmed = 0;
@@ -6120,6 +6123,7 @@ export class Renderer {
       ['foliage', foliagePrewarmGroup],
       ['great-tree', greatTreePrewarmGroup],
       ['weapon-vfx', weaponVfxPrewarmGroup],
+      ['mounts', mountPrewarmGroup],
       ['landmark', landmarkPrewarmGroup],
     ];
 
@@ -6433,6 +6437,7 @@ export class Renderer {
         ghostVariantPrewarmGroup,
         foliagePrewarmGroup,
         weaponVfxPrewarmGroup,
+        mountPrewarmGroup,
         landmarkPrewarmGroup,
       ]) {
         if (group) group.visible = false;
@@ -6482,6 +6487,9 @@ export class Renderer {
       // Removed, never disposed: disposing a material releases its linked
       // program, which is exactly what this group exists to warm.
       if (weaponVfxPrewarmGroup) this.scene.remove(weaponVfxPrewarmGroup);
+      // Same reason: a mount rig removed here keeps its program cached, it
+      // just stops taking a scene-graph traversal slot every frame.
+      if (mountPrewarmGroup) this.scene.remove(mountPrewarmGroup);
       if (landmarkPrewarmGroup) this.scene.remove(landmarkPrewarmGroup);
       if (weatherPrewarmActive) this.weather.endPrewarm();
       doorPrewarmGroup = null;
@@ -6499,6 +6507,7 @@ export class Renderer {
       foliagePrewarmGroup = null;
       greatTreePrewarmGroup = null;
       weaponVfxPrewarmGroup = null;
+      mountPrewarmGroup = null;
       landmarkPrewarmGroup = null;
       weatherPrewarmActive = false;
     };
@@ -7032,6 +7041,69 @@ export class Renderer {
             this.prewarmMaterialTextures(renderable.material);
           });
         },
+      },
+      {
+        // Rideable mounts: worn by whoever is riding one, so the FIRST
+        // sighting of any given mount links its programs the moment it
+        // appears, exactly like vfx.weapon-skins above. The runtime fallback
+        // (gateSwapFlagOnCompile at the mount-swap site, see updateEntity) is
+        // a no-op without KHR_parallel_shader_compile, so on that hardware
+        // this entry is the only mitigation there ever was (#2571). Mount
+        // GLBs are lazyPreload (characters/assets.ts): a fetch failure or a
+        // timed-out one (mount_prewarm.ts's MOUNT_PREWARM_FETCH_TIMEOUT_MS)
+        // drops only that one mount, never the whole entry.
+        //
+        // run() and resumeUnits do the SAME work (stage, then link both the
+        // color and shadow-depth programs, matching what `programs.compile`
+        // does for every other staged prewarm group): on the immediate
+        // desktop path run() warms every mount inline; on a deadline-dropped
+        // pass each mount becomes its own bounded resumable unit instead, so
+        // a slow fetch lands in idle time after world entry rather than
+        // blocking the loading screen. progress() reports every mount the
+        // immediate path warmed so a run cut short by prewarmEntryShouldDefer
+        // (desktop tiers below Insane defer past the soft deadline) reports
+        // 'partial', never a false 'completed' (the exact failure mode
+        // prewarm_policy.ts's resolvePrewarmEntryStatus docblock warns
+        // about): before this fix run() was a no-op, so an unconstrained
+        // desktop reaching this entry before the deadline warmed nothing and
+        // still reported completed.
+        id: 'vfx.mount-programs',
+        category: 'vfx',
+        priority: 63,
+        required: false,
+        resumeUnits: () =>
+          mountPrewarmKeys().map((key) => ({
+            id: `mount:${key}`,
+            run: async () => {
+              const staged = await stageMountPrewarmVisual(this.scene, mountPrewarmGroup, key);
+              if (!staged) return;
+              mountPrewarmGroup = staged.group;
+              await this.compilePrewarmColorPrograms(staged.visual.root, false);
+              await this.compileShadowPrograms(staged.visual.root);
+              mountPrewarmWarmed++;
+            },
+          })),
+        // Immediate path only STAGES each mount (never compiles inline): the
+        // group it builds is picked up by stagedCompileGroupsNow() below, so
+        // the shared 'programs.compile' entry links both program halves for
+        // it exactly like every other staged prewarm group, matching
+        // vfx.weapon-skins/props.ghost-fade-variants beside it. Only the
+        // deferred resumeUnits path above self-compiles: by the time it
+        // runs, 'programs.compile' has already finished.
+        run: async () => {
+          for (const key of mountPrewarmKeys()) {
+            const staged = await stageMountPrewarmVisual(this.scene, mountPrewarmGroup, key);
+            if (!staged) continue;
+            mountPrewarmGroup = staged.group;
+            mountPrewarmWarmed++;
+          }
+        },
+        progress: () => ({
+          done: mountPrewarmWarmed,
+          planned: mountPrewarmKeys().length,
+          trimmed: mountPrewarmWarmed < mountPrewarmKeys().length,
+        }),
+        detail: () => `mounts=${mountPrewarmGroup?.children.length ?? 0}`,
       },
       {
         // A 2k RGBA16F dome upload blocked a live Mirefen frame for 183ms.
