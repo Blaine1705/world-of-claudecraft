@@ -623,7 +623,15 @@ async function createListingHandler(ctx: Ctx): Promise<void> {
     itemRef: {
       index: intField(body.itemIndex, 0, 10_000),
       itemId: stringField(body.itemId, 128),
-      ...(expectInstance === undefined ? {} : { expectInstance }),
+      // Default a MISSING expectInstance to explicit null, never omitted: the
+      // extraction skips its copy check when expectInstance is undefined, so an
+      // omitting client could sign a challenge with no copy detail and then
+      // escrow a different (better-rolled) copy at the named index. Forcing null
+      // makes the stale_copy check always run (an equipment copy at that index
+      // then fails against null), and the step-up binding is over this same
+      // value, so the signed copy, the claimed copy, and the extracted copy are
+      // one. The honest client already sends slot.instance ?? null.
+      expectInstance: expectInstance ?? null,
     },
     params: {
       // Use the coerced string as the value, not the raw body: `["auction"]`

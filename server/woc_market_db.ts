@@ -738,7 +738,12 @@ CREATE TABLE IF NOT EXISTS woc_market_stepup_challenges (
 );
 -- The issue-time prune's seek. Realm-leading because the prune DELETE filters
 -- realm = $1 AND expires_at <= $2, so a multi-realm deployment matches the
--- predicate instead of scanning the whole expiry range and filtering.
+-- predicate instead of scanning the whole expiry range and filtering. Drop the
+-- superseded single-column index (any box that booted the earlier build kept
+-- it): the composite covers the same seek, so the old one is pure write
+-- amplification the planner never chooses (the drop idiom this file uses for
+-- every superseded index).
+DROP INDEX IF EXISTS woc_market_stepup_challenges_expiry;
 CREATE INDEX IF NOT EXISTS woc_market_stepup_challenges_realm_expiry
   ON woc_market_stepup_challenges (realm, expires_at);
 `;
@@ -1731,16 +1736,18 @@ export class PgWocMarketDb implements WocMarketDb {
     // statement's subquery snapshot and its index write still raises 23505,
     // which means exactly "the pair is occupied", the same no-op.
     try {
-      // Reset BOTH side-accept flags (and the seller's named item) on reopen:
-      // the escrow provably did not happen, so the deal restarts from pending
-      // and each side must re-accept. Critically the SELLER must re-accept,
-      // which re-runs guardStepUp with a FRESH proof (B6/R1): the spent
-      // challenge cannot re-drive custody, and a wallet relinked between the
-      // two attempts is re-checked against the new authorization.
+      // Reset the SELLER's acceptance and named item on reopen: the escrow
+      // provably did not happen, and the seller must re-accept, which re-runs
+      // guardStepUp with a FRESH proof (B6/R1) against the CURRENT wallet, so a
+      // spent challenge cannot re-drive custody and a wallet relinked between
+      // the two attempts is re-checked. The BUYER's acceptance is deliberately
+      // kept: it carries no custody proof, only their standing consent to the
+      // immutable deal (usd_cents and item_pin never change), so re-consenting
+      // would be pure liveness cost (the buyer may be offline for the retry).
       const res = await this.pool.query(
         `UPDATE woc_market_directed_offers o
             SET status = 'pending', updated_at = now(),
-                buyer_accepted = false, seller_accepted = false, item_ref = NULL
+                seller_accepted = false, item_ref = NULL
           WHERE o.realm = $1 AND o.id = $2 AND o.status = 'accepted' AND o.listing_id IS NULL
             AND NOT EXISTS (
               SELECT 1 FROM woc_market_directed_offers p

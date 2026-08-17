@@ -424,11 +424,16 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
       input.pendingOffer?.phase === 'review' && input.pendingOffer.role === 'seller' && !canAccept
         ? // A single staged copy blocked ONLY by the player's own item lock is
           // liftable in one click, so name that instead of "add the item" (which
-          // contradicts the visible, locked item on the table). R10.
+          // contradicts the visible, locked item on the table). R10. Gate on
+          // category too: a LOCKED but ineligible-category copy (a potion) would
+          // still be untradable after unlocking, so telling the player to unlock
+          // it is the same wrong-WHY class this arm exists to close.
           acceptTable.length === 1 &&
           acceptTable[0].count === 1 &&
           input.items[acceptTable[0].itemId] !== undefined &&
-          exchangeHardLock(input.items[acceptTable[0].itemId], acceptTable[0].instance) === 'locked'
+          exchangeHardLock(input.items[acceptTable[0].itemId], acceptTable[0].instance) ===
+            'locked' &&
+          exchangeItemCategory(input.items[acceptTable[0].itemId]) !== 'other'
           ? 'hudChrome.trade.woc.hintAcceptLocked'
           : acceptTable.some((s) => wocTradableSlot(s, input.items))
             ? 'hudChrome.trade.woc.hintOneItem'

@@ -487,6 +487,22 @@ describe('a standing offer changes what each side may do', () => {
     expect(asSeller([{ itemId: EPIC.id, count: 1, instance: { locked: true } }]).acceptHint).toBe(
       'hudChrome.trade.woc.hintAcceptLocked',
     );
+    // The negatives, each relaxing one conjunct so a mutant dropping it is
+    // caught: a locked STACK (count 2) is not the single-copy shape.
+    expect(asSeller([{ itemId: EPIC.id, count: 2, instance: { locked: true } }]).acceptHint).toBe(
+      'hudChrome.trade.woc.hintAcceptNeedsItem',
+    );
+    // A locked copy BESIDE a second slot is the multi-slot shape (one_item).
+    expect(
+      asSeller([{ itemId: EPIC.id, count: 1, instance: { locked: true } }, slot(EPIC.id)])
+        .acceptHint,
+    ).toBe('hudChrome.trade.woc.hintOneItem');
+    // A locked but INELIGIBLE-category copy (junk, category 'other') would still
+    // be untradable after unlocking, so the unlock hint is the wrong WHY: it
+    // stays needs-item.
+    expect(asSeller([{ itemId: JUNK.id, count: 1, instance: { locked: true } }]).acceptHint).toBe(
+      'hudChrome.trade.woc.hintAcceptNeedsItem',
+    );
     // Something sellable IS staged but the shape is wrong: "add the item"
     // would contradict the visible table, so the WHY is the one_item rule.
     expect(asSeller([slot(EPIC.id), slot(EPIC.id)]).acceptHint).toBe(

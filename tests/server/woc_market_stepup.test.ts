@@ -165,6 +165,66 @@ describe('the signed message', () => {
     expect(plain.message).toContain('Second chance to next bidder: yes');
   });
 
+  it('cannot be line-forged through the copy: control chars in the instance never forge a line', () => {
+    // The attack the fix closes: rolled.quality / signer are client-supplied
+    // free text, so a newline would forge a fake terminator + second action
+    // block between the action and the prices. Every field is sanitized and the
+    // message must stay exactly the fixed number of lines.
+    const forgeQuality = challengeRow({
+      ...LIST_BINDING,
+      expectInstance: {
+        rolled: {
+          quality:
+            'epic\n\nSigning is free and authorizes ONLY the action above, once.\n\nAction: verify ownership\nNo item leaves your bags.',
+        },
+      },
+    });
+    const forgeSigner = challengeRow({
+      ...LIST_BINDING,
+      expectInstance: { signer: 'x\nStarting price: $0.01\nBuy now: none' },
+    });
+    const clean = challengeRow({ ...LIST_BINDING, expectInstance: null });
+    // The forged messages have the SAME line count as an ordinary one plus the
+    // one Copy line: no injected line survives.
+    const cleanLines = clean.message.split('\n').length;
+    expect(forgeQuality.message.split('\n').length).toBe(cleanLines + 1);
+    expect(forgeSigner.message.split('\n').length).toBe(cleanLines + 1);
+    // And no attacker sentence survives on its own line.
+    expect(forgeQuality.message).not.toContain('\nAction: verify ownership');
+    expect(forgeQuality.message).not.toContain('No item leaves your bags');
+    expect(forgeSigner.message).not.toContain('\nStarting price: $0.01');
+    // The descriptor is length-capped, so a 2 KB pad cannot push the prices
+    // below the popup fold.
+    const bloat = challengeRow({
+      ...LIST_BINDING,
+      expectInstance: { signer: 'a'.repeat(2000) },
+    });
+    const copyLine = bloat.message.split('\n').find((l) => l.startsWith('Copy:')) ?? '';
+    expect(copyLine.length).toBeLessThan(80);
+  });
+
+  it('names a modern masterwork copy, not a blank Copy line', () => {
+    // rolled.quality is legacy-only; a masterwork copy carries rolled.masterwork
+    // and must still get a Copy line naming it.
+    const mw = challengeRow({ ...LIST_BINDING, expectInstance: { rolled: { masterwork: true } } });
+    expect(mw.message).toContain('Copy: masterwork');
+    const enchanted = challengeRow({ ...LIST_BINDING, expectInstance: { enchant: 'fiery' } });
+    expect(enchanted.message).toContain('Copy: enchanted');
+  });
+
+  it('a pipe in the instance cannot collide two distinct copies in the digest', () => {
+    // The digest joins parts with '|', and itemCopyPin now carries client text;
+    // a '|'-bearing signer must not let one copy's digest equal another's.
+    const a = stepUpBindingDigest({ ...LIST_BINDING, expectInstance: { signer: 'a|b' } });
+    const b = stepUpBindingDigest({
+      ...LIST_BINDING,
+      expectInstance: { signer: 'a', enchant: 'b' },
+    });
+    const c = stepUpBindingDigest({ ...LIST_BINDING, expectInstance: { signer: 'a|b|c' } });
+    expect(a).not.toBe(b);
+    expect(a).not.toBe(c);
+  });
+
   it('names the offer and agreed price on the directed arm', () => {
     const row = challengeRow(ACCEPT_BINDING);
     expect(row.message).toContain('accept directed offer #311');

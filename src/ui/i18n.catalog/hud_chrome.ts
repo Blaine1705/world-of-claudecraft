@@ -5143,7 +5143,7 @@ export const hudChromeStrings = {
     signFailed: 'Your wallet did not complete the payment. Check the wallet and try again.',
     // The step-up (listing / directed acceptance) authorization is a message
     // signature that moves NO funds, so its failure must not say "payment".
-    signFailedListing: 'Your wallet did not sign the confirmation. Check the wallet and try again.',
+    signFailedConfirm: 'Your wallet did not sign the confirmation. Check the wallet and try again.',
     confirming: 'Confirming on chain...',
     // The listing submit's second phase is a plain REST create, not an on-chain
     // settlement: it must not borrow the payment path's "Confirming on chain".

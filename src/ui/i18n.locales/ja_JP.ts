@@ -8858,7 +8858,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.signing': 'ウォレットの承認を待っています...',
   'hudChrome.wocMarket.signFailed':
     'ウォレットが支払いを完了できませんでした。ウォレットを確認して、もう一度お試しください。',
-  'hudChrome.wocMarket.signFailedListing':
+  'hudChrome.wocMarket.signFailedConfirm':
     'ウォレットで確認に署名できませんでした。ウォレットを確認して再試行してください。',
   'hudChrome.wocMarket.listing': '出品しています...',
   'hudChrome.wocMarket.confirming': 'チェーン上で確認中...',

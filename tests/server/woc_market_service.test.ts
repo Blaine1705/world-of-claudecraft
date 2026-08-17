@@ -789,7 +789,111 @@ describe('step-up enforcement on the custody movers (B6/R1)', () => {
     });
     expect(res).toEqual({ ok: false, reason: 'stepup_challenge_invalid' });
     expect(consumeSpy).not.toHaveBeenCalled();
+    // Positive control: a WELL-FORMED but unknown nonce DOES reach the store
+    // (proving the spy fires on the querying path), and still refuses.
+    const good = await h.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams(),
+      stepUp: { nonce: 'a'.repeat(32), signature: 'b'.repeat(80) },
+    });
+    expect(good).toEqual({ ok: false, reason: 'stepup_challenge_invalid' });
+    expect(consumeSpy).toHaveBeenCalledTimes(1);
     consumeSpy.mockRestore();
+  });
+
+  it('the shape screen ALSO refuses an over-long signature without a query', async () => {
+    // The other arm of the || shape screen: a 257-char signature is refused
+    // before the store, so the store never sees an unbounded string.
+    const h = makeHarness();
+    const consumeSpy = vi.spyOn(h.db, 'consumeStepUpChallenge');
+    const res = await h.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams(),
+      stepUp: { nonce: 'a'.repeat(32), signature: 'x'.repeat(257) },
+    });
+    expect(res).toEqual({ ok: false, reason: 'stepup_challenge_invalid' });
+    expect(consumeSpy).not.toHaveBeenCalled();
+    consumeSpy.mockRestore();
+  });
+
+  it('a proof for a plain-stack (null) copy cannot escrow an INSTANCED copy at the index', async () => {
+    // The omission attack: sign a challenge with no copy detail (expectInstance
+    // null), then submit an index pointing at a rolled copy. The public arm
+    // forces expectInstance present, so the extraction runs the stale check and
+    // the instanced copy at the index fails against null.
+    const h = makeHarness();
+    h.custody.bags.set(SELLER_CHAR, [
+      { itemId: EPIC_ITEM, count: 1, instance: { rolled: { quality: 'epic' } } },
+    ]);
+    const params = listingParams();
+    const proofForNull = await stepUpFor(h, SELLER, listBindingFor(EPIC_ITEM, params, null));
+    const res = await h.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      // expectInstance OMITTED (undefined): the service must normalize to null.
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params,
+      stepUp: proofForNull,
+    });
+    expect(res.ok, 'the instanced copy cannot escrow under a null-copy proof').toBe(false);
+    expect(bagsOf(h, SELLER_CHAR), 'nothing escrowed').toHaveLength(1);
+  });
+
+  it('the challenge issue rejects a prototype-polluting item id', async () => {
+    const h = makeHarness();
+    for (const itemId of ['constructor', 'toString', '__proto__']) {
+      const res = await h.service.issueStepUpChallenge(SELLER, {
+        operation: 'create_listing',
+        itemId,
+        expectInstance: null,
+        format: 'auction',
+        startCents: 5000,
+        reserveCents: null,
+        buyNowCents: null,
+        durationHours: 12,
+        offerNext: false,
+      });
+      expect(res, itemId).toEqual({ ok: false, reason: 'unknown_item' });
+    }
+  });
+
+  it('the signed message carries the service realm, not a client value', async () => {
+    const h = makeHarness();
+    const issue = await h.service.issueStepUpChallenge(
+      SELLER,
+      listBindingFor(EPIC_ITEM, listingParams()),
+    );
+    if (!issue.ok) throw new Error(`issue refused: ${issue.reason}`);
+    expect(issue.challenge.message).toContain(`Realm: ${REALM}`);
+  });
+
+  it('the directed challenge issue refuses a legacy offer with no item to sign for', async () => {
+    // A pre-pin offer with a null item names nothing; its challenge issue
+    // refuses not_found rather than minting a blank "Item: " authorization.
+    const h = makeHarness();
+    h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
+    const offer = await h.service.createDirectedOffer({
+      account: BUYER_A,
+      characterId: CHAR_A,
+      sellerCharacterName: 'Selara',
+      usdCents: 7500,
+      item: { itemId: EPIC_ITEM },
+      acceptTerms: true,
+    });
+    if (!offer.ok) throw new Error(`offer refused: ${offer.reason}`);
+    // Null out the item on the stored row (a legacy pre-pin shape).
+    const row = await h.db.directedOfferById(REALM, offer.offer.id);
+    if (row) (row as { itemId: string | null }).itemId = null;
+    expect(
+      await h.service.issueStepUpChallenge(SELLER, {
+        operation: 'accept_directed_offer',
+        offerId: offer.offer.id,
+      }),
+    ).toEqual({ ok: false, reason: 'not_found' });
   });
 
   it('the prune runs on every issue: a stale challenge is swept when a fresh one is minted', async () => {
@@ -1078,16 +1182,18 @@ describe('createListing', () => {
     expect(h.db.escrowSaves).toHaveLength(0);
   });
 
-  it('refuses locked on the authoritative extracted copy even when the claim omits the flag', async () => {
-    // The client claim skips the instance check entirely (expectInstance
-    // omitted), so only the in-job extraction can see the real payload: the
-    // lock must refuse there and the copy must restore to the bags.
+  it('refuses locked on the AUTHORITATIVE extracted copy, and restores it', async () => {
+    // The honest client claims the locked copy it sees; the in-job extraction
+    // re-decides eligibility against the real payload and refuses the lock,
+    // restoring the copy to the bags. (A client that instead claimed null while
+    // the copy is locked refuses stale_copy at the same extraction, since the
+    // public arm forces expectInstance present; either way nothing escrows.)
     const h = makeHarness();
     h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1, instance: { locked: true } }]);
     const res = await createListingSteppedUp(h, {
       account: SELLER,
       characterId: SELLER_CHAR,
-      itemRef: { index: 0, itemId: EPIC_ITEM },
+      itemRef: { index: 0, itemId: EPIC_ITEM, expectInstance: { locked: true } },
       params: listingParams(),
     });
     expect(res).toEqual({ ok: false, reason: 'locked' });
@@ -4384,10 +4490,12 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     expect((await h.db.directedOfferById(REALM, made.offer.id))?.status).toBe('pending');
   });
 
-  it('a reopen resets both accepts, so a spent proof cannot re-drive the seller custody move', async () => {
+  it('a reopen resets the seller accept and item, keeps the buyer consent, so a spent proof cannot re-drive custody', async () => {
     // Security: after a reopen the seller's step-up challenge is consumed. If
-    // the accept flags survived, a lone buyer re-press would re-consummate on
-    // the spent authorization. The reset forces a FRESH seller acceptance.
+    // the seller accept survived, a lone buyer re-press would re-consummate on
+    // the spent authorization. The reset forces a FRESH seller acceptance. The
+    // buyer's standing consent is deliberately KEPT (it carries no custody
+    // proof), so the seller alone re-accepting consummates the retry.
     const h = stocked();
     const made = await h.service.createDirectedOffer(offerArgs());
     if (!made.ok) throw new Error('offer refused');
@@ -4397,13 +4505,11 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     await acceptSteppedUp(h, SELLER, made.offer.id, { index: 0, itemId: EPIC_ITEM }, SELLER_CHAR);
     const reopened = await h.db.directedOfferById(REALM, made.offer.id);
     expect(reopened?.status).toBe('pending');
-    expect(reopened?.buyerAccepted, 'the buyer accept reset').toBe(false);
+    expect(reopened?.buyerAccepted, 'the buyer consent survives the reopen').toBe(true);
     expect(reopened?.sellerAccepted, 'the seller accept reset').toBe(false);
-    // A buyer-only re-press now agrees but does NOT consummate (still waiting
-    // on the seller), so no custody moves on the spent proof.
-    const buyerAgain = await h.service.acceptDirectedOffer(BUYER_A, made.offer.id, null, CHAR_A);
-    expect(buyerAgain).toEqual({ ok: true, listing: null });
-    // The seller's fresh acceptance (a new proof) is what consummates it.
+    expect(reopened?.itemRef, 'the named item cleared').toBeNull();
+    // The seller's fresh acceptance (a new proof) alone consummates it, because
+    // the buyer's consent was kept; no custody moved on the spent proof.
     const sellerAgain = await acceptSteppedUp(
       h,
       SELLER,
@@ -4411,7 +4517,7 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
       { index: 0, itemId: EPIC_ITEM },
       SELLER_CHAR,
     );
-    expect(sellerAgain.ok, 'a fresh proof consummates the retry').toBe(true);
+    expect(sellerAgain.ok, 'a fresh seller proof consummates the retry').toBe(true);
   });
 
   it('a THROWING reopen never replaces the typed refusal, and reports offer_reopen', async () => {
@@ -4992,15 +5098,14 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     expect((await h.db.directedOfferById(REALM, stuck.offer.id))?.status).toBe('pending');
     expect((await h.db.directedOfferById(REALM, done.offer.id))?.status).toBe('accepted');
     // Wedge the SAME deal again, and this time let its TTL lapse: the converge
-    // arm expires a dead deal instead of reopening it. Both accept flags were
-    // RESET by the reopen (the money-safe restart), so re-wedging needs BOTH
-    // sides to re-accept, the seller with a fresh proof.
+    // arm expires a dead deal instead of reopening it. The reopen kept the
+    // buyer's consent and reset only the seller, so re-wedging needs just the
+    // seller to re-accept with a fresh proof.
     const lapsed = await h.db.directedOfferById(REALM, stuck.offer.id);
     if (!lapsed) throw new Error('offer vanished');
-    expect(lapsed.buyerAccepted).toBe(false);
+    expect(lapsed.buyerAccepted).toBe(true);
     expect(lapsed.sellerAccepted).toBe(false);
     h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
-    await h.service.acceptDirectedOffer(BUYER_A, stuck.offer.id, null, CHAR_A);
     h.db.failNextEscrowThrow = new Error('socket died again');
     await expect(
       acceptSteppedUp(h, SELLER, stuck.offer.id, { index: 0, itemId: EPIC_ITEM }, SELLER_CHAR),

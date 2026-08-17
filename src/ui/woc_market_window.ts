@@ -1850,7 +1850,7 @@ export class WocMarketWindow {
             text:
               err instanceof Error && err.message
                 ? err.message
-                : t('hudChrome.wocMarket.signFailedListing'),
+                : t('hudChrome.wocMarket.signFailedConfirm'),
             error: true,
           };
           return;

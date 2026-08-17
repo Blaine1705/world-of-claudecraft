@@ -8824,7 +8824,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.signing': '지갑 승인을 기다리는 중...',
   'hudChrome.wocMarket.signFailed':
     '지갑이 결제를 완료하지 못했습니다. 지갑을 확인한 뒤 다시 시도하세요.',
-  'hudChrome.wocMarket.signFailedListing':
+  'hudChrome.wocMarket.signFailedConfirm':
     '지갑에서 확인에 서명하지 못했습니다. 지갑을 확인한 후 다시 시도하세요.',
   'hudChrome.wocMarket.listing': '아이템을 등록하는 중...',
   'hudChrome.wocMarket.confirming': '체인에서 확인 중...',

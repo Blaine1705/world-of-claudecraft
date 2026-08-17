@@ -406,7 +406,7 @@ export class WocTradeController {
             this.log(
               err instanceof Error && err.message
                 ? err.message
-                : t('hudChrome.wocMarket.signFailedListing'),
+                : t('hudChrome.wocMarket.signFailedConfirm'),
               '#ff6b6b',
             );
             return;
@@ -641,6 +641,12 @@ export class WocTradeController {
         // wocTradeOffer itself, so the assignment it replaces is not repeated.
         this.resolveClosedWocTrade();
         this.wocTradeOfferPolledAtMs = 0;
+        // Clear any in-flight guard on close: the desktop wallet-standard signer
+        // has no timeout, so a dismissed popup would otherwise leave the Accept
+        // (or Pay) button stuck disabled for the rest of the session on the next
+        // trade. Closing the window abandons the round trip.
+        this.wocTradeAccepting = false;
+        this.wocTradePaying = false;
         this.lastTradeSig = '';
         if ($('#bags').style.display !== 'none') this.renderBags();
       }
@@ -684,6 +690,10 @@ export class WocTradeController {
       this.wocTradeMode,
       this.wocTradePartner,
       this.wocTradeOffer,
+      // The seller's step-up round trip changes the Accept button (Waiting +
+      // disabled), so it must invalidate the signature or the pending face is
+      // elided and the button reads Accept through the whole wallet handoff.
+      this.wocTradeAccepting,
     ]);
     if (sig === this.lastTradeSig) return;
     // The rebuild below replaces the whole subtree, so a seller typing a $WOC

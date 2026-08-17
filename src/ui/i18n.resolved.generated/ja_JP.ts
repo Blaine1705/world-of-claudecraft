@@ -3935,7 +3935,7 @@ export const ja_JP: EnTranslations = {
       "quoteSettlementFor": "{item} の決済: {usd}",
       "signing": "ウォレットの承認を待っています...",
       "signFailed": "ウォレットが支払いを完了できませんでした。ウォレットを確認して、もう一度お試しください。",
-      "signFailedListing": "ウォレットで確認に署名できませんでした。ウォレットを確認して再試行してください。",
+      "signFailedConfirm": "ウォレットで確認に署名できませんでした。ウォレットを確認して再試行してください。",
       "confirming": "チェーン上で確認中...",
       "listing": "出品しています...",
       "activityCancelPending": "キャンセル待ち",

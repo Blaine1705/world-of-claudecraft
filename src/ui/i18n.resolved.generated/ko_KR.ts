@@ -3935,7 +3935,7 @@ export const ko_KR: EnTranslations = {
       "quoteSettlementFor": "{item} 정산: {usd}",
       "signing": "지갑 승인을 기다리는 중...",
       "signFailed": "지갑이 결제를 완료하지 못했습니다. 지갑을 확인한 뒤 다시 시도하세요.",
-      "signFailedListing": "지갑에서 확인에 서명하지 못했습니다. 지갑을 확인한 후 다시 시도하세요.",
+      "signFailedConfirm": "지갑에서 확인에 서명하지 못했습니다. 지갑을 확인한 후 다시 시도하세요.",
       "confirming": "체인에서 확인 중...",
       "listing": "아이템을 등록하는 중...",
       "activityCancelPending": "취소 대기 중",

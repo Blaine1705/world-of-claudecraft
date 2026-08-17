@@ -3935,7 +3935,7 @@ export const zh_CN: EnTranslations = {
       "quoteSettlementFor": "{item} 的结算：{usd}",
       "signing": "等待钱包确认...",
       "signFailed": "你的钱包未能完成付款。请检查钱包后重试。",
-      "signFailedListing": "你的钱包未能签署确认。请检查钱包后重试。",
+      "signFailedConfirm": "你的钱包未能签署确认。请检查钱包后重试。",
       "confirming": "正在链上确认...",
       "listing": "正在上架你的物品...",
       "activityCancelPending": "待取消",

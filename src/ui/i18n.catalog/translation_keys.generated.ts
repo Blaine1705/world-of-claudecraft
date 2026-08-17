@@ -10296,7 +10296,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.wocMarket.settlementOffered'
   | 'hudChrome.wocMarket.settlementReview'
   | 'hudChrome.wocMarket.signFailed'
-  | 'hudChrome.wocMarket.signFailedListing'
+  | 'hudChrome.wocMarket.signFailedConfirm'
   | 'hudChrome.wocMarket.signing'
   | 'hudChrome.wocMarket.sortEnding'
   | 'hudChrome.wocMarket.sortLabel'

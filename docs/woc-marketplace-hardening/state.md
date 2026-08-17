@@ -628,6 +628,24 @@ Still open (a phase that hits one asks at session start):
   player's real choice once 07's terms drafts exist. Either way the pre-enable
   audit (22) must not pass while the panel records consent it never showed.
   07 owns the terms drafts, 14/15 own the panel surface.
+- R11 (phase 13 security follow-up, raised by the 13 fresh security re-review
+  2026-08-17, UNANSWERED; a pre-enable launch gate): the step-up RAISES the bar
+  on a stolen bearer but is NOT an absolute "a stolen session cannot move
+  custody" guarantee, because the wallet-link RELINK path
+  (`POST /api/wallet/link`) needs only the INCOMING wallet's signature and is
+  an upsert (and `DELETE /api/wallet/link` needs no signature at all), so a
+  bearer thief can relink to their own wallet FIRST, then sign every step-up
+  challenge and take sale proceeds to their own wallet. The step-up's live
+  wallet re-read closes the issue-to-use window but not a relink BEFORE
+  issuance. The wallet-link flow is out of phase 13's scope, so 13 corrected
+  the over-claim in the module header and DEPLOY.md and records this. Options
+  (need Fernando's ruling; the wallet-link flow is the surface): (a) require
+  the OUTGOING wallet's signature (or password/TOTP re-auth) to relink/unlink;
+  (b) a link-age cooldown so a wallet linked under N hours cannot authorize a
+  custody move (`wallet_links.linked_at` exists); (c) refuse relink while the
+  account holds live escrowed listings. Inert while WOC_MARKET_ENABLED stays
+  off; the pre-enable audit (22) must resolve it. Also close `DELETE
+  /api/wallet/link`'s missing rate limit in the same pass.
 
 ## Locked decisions
 

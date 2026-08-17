@@ -1142,6 +1142,143 @@ describe('the step-up surface at the route layer (B6/R1)', () => {
     ).toBe(false);
   });
 
+  it('forwards the bound copy and offerNext into createListing, defaulting a MISSING expectInstance to null', async () => {
+    // Critical: an omitted expectInstance must reach the service as explicit
+    // null, never absent, or the extraction skips its copy check and an
+    // omitting client escrows a different copy at the named index. offerNext
+    // and the real instance must forward too (a dropped line breaks every
+    // rolled/offerNext listing with a binding mismatch).
+    const cap: { v: { itemRef?: { expectInstance?: unknown }; params?: { offerNext?: unknown } } } =
+      { v: {} };
+    service({
+      createListing: async (args: unknown) => {
+        cap.v = args as typeof cap.v;
+        return { ok: true, listing: listingRow() } as never;
+      },
+    });
+    // Body OMITS expectInstance entirely.
+    await handlerFor(
+      'POST',
+      '/api/woc-market/listings',
+    )(postCtx('/api/woc-market/listings', { ...LISTING_BODY, stepUp: PROOF, offerNext: true }));
+    expect(cap.v.itemRef && 'expectInstance' in cap.v.itemRef, 'expectInstance is present').toBe(
+      true,
+    );
+    expect(cap.v.itemRef?.expectInstance, 'omitted -> explicit null').toBeNull();
+    expect(cap.v.params?.offerNext).toBe(true);
+    // And a real instance forwards verbatim.
+    await handlerFor(
+      'POST',
+      '/api/woc-market/listings',
+    )(
+      postCtx('/api/woc-market/listings', {
+        ...LISTING_BODY,
+        stepUp: PROOF,
+        expectInstance: { rolled: { quality: 'epic' } },
+      }),
+    );
+    expect(cap.v.itemRef?.expectInstance).toEqual({ rolled: { quality: 'epic' } });
+  });
+
+  it('forwards expectInstance and offerNext into the challenge issue', async () => {
+    const cap: { v: Record<string, unknown> } = { v: {} };
+    service({
+      issueStepUpChallenge: async (_account: number, req: unknown) => {
+        cap.v = req as Record<string, unknown>;
+        return {
+          ok: true,
+          challenge: {
+            nonce: 'a'.repeat(32),
+            message: 'm',
+            expiresAtMs: 1,
+            signatureRequired: true,
+          },
+        } as never;
+      },
+    });
+    await handlerFor(
+      'POST',
+      '/api/woc-market/step-up/challenge',
+    )(
+      postCtx('/api/woc-market/step-up/challenge', {
+        operation: 'create_listing',
+        itemId: 'deathlord_warplate',
+        expectInstance: { rolled: { quality: 'epic' } },
+        format: 'auction',
+        startCents: 2500,
+        reserveCents: null,
+        buyNowCents: null,
+        durationHours: 12,
+        offerNext: true,
+      }),
+    );
+    expect(cap.v.expectInstance).toEqual({ rolled: { quality: 'epic' } });
+    expect(cap.v.offerNext).toBe(true);
+    // A missing expectInstance forwards as explicit null here too.
+    await handlerFor(
+      'POST',
+      '/api/woc-market/step-up/challenge',
+    )(
+      postCtx('/api/woc-market/step-up/challenge', {
+        operation: 'create_listing',
+        itemId: 'deathlord_warplate',
+        format: 'auction',
+        startCents: 2500,
+        reserveCents: null,
+        buyNowCents: null,
+        durationHours: 12,
+      }),
+    );
+    expect(cap.v.expectInstance).toBeNull();
+  });
+
+  it('the step-up ROUTE binds the step-up rate policy, not another bucket', () => {
+    // The middleware factory closes over the policy without exposing it, so the
+    // decisive pin is over the source: the challenge RouteDef must wire
+    // rateLimit(WOC_MARKET_STEPUP_POLICY). Swapping to WOC_MARKET_READ_POLICY
+    // (120/min) changes this exact text.
+    const route = routes.find(
+      (r) => r.method === 'POST' && r.path === '/api/woc-market/step-up/challenge',
+    );
+    expect(route, 'the challenge route exists').toBeTruthy();
+    const src = readFileSync(new URL('../../server/woc_market_routes.ts', import.meta.url), 'utf8');
+    const block = src.slice(
+      src.indexOf("path: '/api/woc-market/step-up/challenge'"),
+      src.indexOf('handler: stepUpChallengeHandler'),
+    );
+    expect(block).toContain('rateLimit(WOC_MARKET_STEPUP_POLICY)');
+    expect(block).not.toContain('WOC_MARKET_READ_POLICY');
+    expect(block).not.toContain('WOC_MARKET_LIST_POLICY');
+  });
+
+  it('rejects a malformed expectInstance shape (array or non-object) as invalid_input', async () => {
+    service({
+      issueStepUpChallenge: async () => {
+        throw new Error('must not be reached');
+      },
+    });
+    for (const bad of [[], 'x', 42]) {
+      await expect(
+        handlerFor(
+          'POST',
+          '/api/woc-market/step-up/challenge',
+        )(
+          postCtx('/api/woc-market/step-up/challenge', {
+            operation: 'create_listing',
+            itemId: 'deathlord_warplate',
+            expectInstance: bad,
+            format: 'auction',
+            startCents: 2500,
+            reserveCents: null,
+            buyNowCents: null,
+            durationHours: 12,
+          }),
+        ),
+        JSON.stringify(bad),
+      ).rejects.toMatchObject({ code: 'woc_market.invalid_input' });
+    }
+  });
+
   it('passes the proof to acceptDirectedOffer as the fifth argument', async () => {
     let seenStepUp: unknown = 'unset';
     service({

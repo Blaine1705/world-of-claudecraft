@@ -8447,7 +8447,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.quoteSettlementFor': '{item} 的结算：{usd}',
   'hudChrome.wocMarket.signing': '等待钱包确认...',
   'hudChrome.wocMarket.signFailed': '你的钱包未能完成付款。请检查钱包后重试。',
-  'hudChrome.wocMarket.signFailedListing': '你的钱包未能签署确认。请检查钱包后重试。',
+  'hudChrome.wocMarket.signFailedConfirm': '你的钱包未能签署确认。请检查钱包后重试。',
   'hudChrome.wocMarket.listing': '正在上架你的物品...',
   'hudChrome.wocMarket.confirming': '正在链上确认...',
   'hudChrome.wocMarket.bidPlacedStanding': '你的出价已生效，你是当前最高出价者。',

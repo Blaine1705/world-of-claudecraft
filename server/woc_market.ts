@@ -1725,6 +1725,19 @@ export class WocMarketService {
     // the public route can never set args.directed (pinned by the routes
     // suite), so this skip is unreachable from outside.
     if (!args.directed) {
+      // Force expectInstance PRESENT (null if omitted) on the public arm: the
+      // extraction skips its copy check when expectInstance is undefined, so an
+      // omitting client could sign a challenge with no copy detail and escrow a
+      // different copy at the named index (a compromised-client swap). With it
+      // pinned to null-or-the-claimed-copy, the extraction's stale_copy check
+      // always runs and the step-up binding is over this same value, so the
+      // signed copy equals the claimed copy equals the extracted copy. The
+      // directed arm keeps its own itemRef (its H10 itemPin re-check pins the
+      // authoritative copy), so this normalization is public-arm only.
+      args = {
+        ...args,
+        itemRef: { ...args.itemRef, expectInstance: args.itemRef.expectInstance ?? null },
+      };
       const gateUp = await this.guardStepUp(args.account, wallet, args.stepUp, {
         operation: 'create_listing',
         itemId: args.itemRef.itemId,
@@ -2057,9 +2070,10 @@ export class WocMarketService {
       // acceptance is what authorizes their copy to escrow, whichever side
       // presses Accept last, so the proof is demanded HERE and never from
       // the buyer (whose money path signs its own payment). Bound to the
-      // AUTHORITATIVE offer row's item and agreed price, not client input;
-      // a legacy pre-pin row digests its null item as the same empty string
-      // the challenge issue derived from the same row.
+      // AUTHORITATIVE offer row's item and agreed price, not client input.
+      // A legacy null-item offer never reaches here: its challenge issue
+      // already refused not_found (nothing to sign for), so offer.itemId is
+      // non-null by the time a valid proof exists.
       const gateUp = await this.guardStepUp(account, wallet, stepUp, {
         operation: 'accept_directed_offer',
         offerId,

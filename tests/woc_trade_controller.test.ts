@@ -784,8 +784,12 @@ describe('the accept request body (seller escrow)', () => {
     // First click: parks awaiting the wallet signature.
     const first = c.acceptWocTradeOffer();
     await flushAsync();
-    // Second click while the first is outstanding: the guard returns early.
-    await c.acceptWocTradeOffer();
+    // Second click while the first is outstanding: the guard returns early. Do
+    // NOT await it (without the guard it would park on the same deferred sign
+    // and the test would fail by timeout instead of by this assertion); the
+    // guard makes it resolve synchronously, and the mint count is the pin.
+    void c.acceptWocTradeOffer();
+    await flushAsync();
     expect(h.state.calls.stepUpChallenges, 'exactly one mint').toHaveLength(1);
     // Release the wallet and let the first click finish.
     releaseSign();
@@ -793,7 +797,50 @@ describe('the accept request body (seller escrow)', () => {
     expect(h.state.calls.acceptOffers, 'exactly one accept').toEqual([7]);
   });
 
-  it('disables the Accept button while the seller acceptance is in flight (pending face)', async () => {
+  it('disables the Accept button while the seller acceptance is in flight, and the flag is in the repaint signature', () => {
+    const h = fakeHooks();
+    const r = rig(h.hooks);
+    const c = r.controller as unknown as {
+      wocTradeOffer: WocPendingOffer | null;
+      wocTradeAccepting: boolean;
+      wocTradeOfferPolledAtMs: number;
+    };
+    openTrade(r, [{ itemId: 'worn_sword', count: 1 }]);
+    // Disable the REST poll for the test (a far-future stamp keeps it throttled)
+    // so the planted standing offer is not cleared by an empty poll result.
+    c.wocTradeOfferPolledAtMs = Date.now() + 1_000_000;
+    c.wocTradeOffer = heldOffer({ role: 'seller' });
+    // Commit the signature with the offer present and the flag DOWN: the button
+    // reads Accept, enabled (production's steady state before the click).
+    r.controller.updateTradeWindow();
+    const before = [
+      ...document.querySelectorAll<HTMLButtonElement>('#trade-window button.btn'),
+    ].find((b) => b.textContent === t('hud.trade.accept'));
+    expect(before, 'the button reads Accept before the round trip').toBeTruthy();
+    expect(before?.disabled).toBe(false);
+    // Flip ONLY the in-flight flag and repaint: because wocTradeAccepting is in
+    // the signature, the render is NOT elided (the whole point of the fix), and
+    // the button flips to a disabled Waiting.
+    c.wocTradeAccepting = true;
+    r.controller.updateTradeWindow();
+    const during = [
+      ...document.querySelectorAll<HTMLButtonElement>('#trade-window button.btn'),
+    ].find((b) => b.textContent === t('hud.trade.waiting'));
+    expect(during, 'the flag flip repainted a disabled Waiting button').toBeTruthy();
+    expect(during?.disabled).toBe(true);
+    // And back down: the finally's reset repaints an actionable button again.
+    c.wocTradeAccepting = false;
+    r.controller.updateTradeWindow();
+    const after = [
+      ...document.querySelectorAll<HTMLButtonElement>('#trade-window button.btn'),
+    ].find((b) => b.textContent === t('hud.trade.accept'));
+    expect(after, 'the button is not stuck at Waiting after the round trip').toBeTruthy();
+    expect(after?.disabled).toBe(false);
+  });
+
+  it('the seller accept flips the in-flight flag across its real wallet round trip', async () => {
+    // The behavioral half: the flag is true while the wallet sign is
+    // outstanding and false once it settles (drives the face above).
     const h = fakeHooks();
     h.state.stepUpSignatureRequired = true;
     let releaseSign!: () => void;
@@ -802,24 +849,34 @@ describe('the accept request body (seller escrow)', () => {
         releaseSign = () => resolve('REALSIG');
       });
     const r = rig(h.hooks);
-    // The seller's staged item rides tradeInfo.myOffer so canAccept passes and
-    // the accept reaches its wallet round trip.
-    openTrade(r, [{ itemId: 'worn_sword', count: 1 }]);
-    (r.controller as unknown as { wocTradeOffer: WocPendingOffer | null }).wocTradeOffer =
-      heldOffer({ role: 'seller' });
+    r.host.staged.items.push({ itemId: 'worn_sword', count: 1 });
     r.host.inventory.push({ itemId: 'worn_sword', count: 1 });
-    const started = (
-      r.controller as unknown as { acceptWocTradeOffer(): Promise<void> }
-    ).acceptWocTradeOffer();
+    const c = r.controller as unknown as {
+      wocTradeOffer: WocPendingOffer | null;
+      wocTradeAccepting: boolean;
+      acceptWocTradeOffer(): Promise<void>;
+    };
+    c.wocTradeOffer = heldOffer({ role: 'seller' });
+    const started = c.acceptWocTradeOffer();
     await flushAsync();
-    // The wallet is outstanding: the accept button reads Waiting and disables.
-    const btn = [...document.querySelectorAll<HTMLButtonElement>('#trade-window button.btn')].find(
-      (b) => b.textContent === t('hud.trade.waiting'),
-    );
-    expect(btn, 'the button flipped to Waiting').toBeTruthy();
-    expect(btn?.disabled).toBe(true);
+    expect(c.wocTradeAccepting, 'true while the wallet sign is outstanding').toBe(true);
     releaseSign();
     await started;
+    expect(c.wocTradeAccepting, 'false once it settles').toBe(false);
+  });
+
+  it('resets the in-flight flag on close, so a dismissed wallet does not stick the next trade', () => {
+    const h = fakeHooks();
+    const r = rig(h.hooks);
+    const c = r.controller as unknown as { wocTradeAccepting: boolean };
+    // Open the window first (the close-reset lives in the was-open branch), then
+    // simulate a wallet round trip left in flight (desktop signer has no
+    // timeout), then close: the flag must clear so the next trade is not stuck.
+    openTrade(r);
+    c.wocTradeAccepting = true;
+    r.host.tradeInfo = null;
+    r.controller.updateTradeWindow();
+    expect(c.wocTradeAccepting, 'closing the window abandons the round trip').toBe(false);
   });
 
   it('refuses a stale accept over a MULTI-SLOT staged table with the one_item WHY', async () => {

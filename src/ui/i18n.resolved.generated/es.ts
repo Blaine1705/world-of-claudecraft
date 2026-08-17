@@ -3935,7 +3935,7 @@ export const es: EnTranslations = {
       "quoteSettlementFor": "Settlement for {item}: {usd}",
       "signing": "Waiting for your wallet...",
       "signFailed": "Your wallet did not complete the payment. Check the wallet and try again.",
-      "signFailedListing": "Your wallet did not sign the confirmation. Check the wallet and try again.",
+      "signFailedConfirm": "Your wallet did not sign the confirmation. Check the wallet and try again.",
       "confirming": "Confirming on chain...",
       "listing": "Listing your item...",
       "activityCancelPending": "Cancel pending",

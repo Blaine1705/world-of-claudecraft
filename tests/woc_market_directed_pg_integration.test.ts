@@ -696,6 +696,20 @@ describeDb('woc market directed rail against real Postgres', () => {
     };
   }
 
+  async function offerAcceptState(
+    id: number,
+  ): Promise<{ buyerAccepted: boolean; sellerAccepted: boolean; itemRefNull: boolean }> {
+    const res = await pool.query(
+      `SELECT buyer_accepted, seller_accepted, item_ref FROM woc_market_directed_offers WHERE id = $1`,
+      [id],
+    );
+    return {
+      buyerAccepted: res.rows[0].buyer_accepted === true,
+      sellerAccepted: res.rows[0].seller_accepted === true,
+      itemRefNull: res.rows[0].item_ref === null,
+    };
+  }
+
   describe('the accepted-offer converge arm, in real SQL', () => {
     it('reopens an aged unstamped acceptance, expires a lapsed one, and skips a stamped one', async () => {
       const realm = 'directed-converge';
@@ -707,6 +721,12 @@ describeDb('woc market directed rail against real Postgres', () => {
         buyerAccepted: true,
         sellerAccepted: true,
       });
+      // Give it a non-null item_ref (the seller's named copy) so the reopen's
+      // clear-to-NULL is observable rather than vacuously already-null.
+      await pool.query(
+        `UPDATE woc_market_directed_offers SET item_ref = '{"index":0,"itemId":"amber_crimson_armor_plate"}'::jsonb WHERE id = $1`,
+        [reopenable],
+      );
       const lapsed = await seedOffer(realm, seller, buyer, {
         status: 'accepted',
         expiresAtMs: BASE_MS - MINUTE_MS,
@@ -725,6 +745,15 @@ describeDb('woc market directed rail against real Postgres', () => {
       expect(await offerRow(reopenable)).toEqual({ status: 'pending', listingId: null });
       expect(await offerRow(lapsed)).toEqual({ status: 'expired', listingId: null });
       expect(await offerRow(stamped)).toEqual({ status: 'accepted', listingId });
+      // The REAL reopen UPDATE resets the seller accept and clears the named
+      // item so a spent step-up proof cannot re-drive custody, while keeping
+      // the buyer's standing consent (B6/R1). This is the production SQL the
+      // FakeWocMarketDb mirror stands in for elsewhere.
+      expect(await offerAcceptState(reopenable)).toEqual({
+        buyerAccepted: true,
+        sellerAccepted: false,
+        itemRefNull: true,
+      });
     });
 
     it('keeps a YOUNG unstamped acceptance out of the batch (the in-flight guard)', async () => {

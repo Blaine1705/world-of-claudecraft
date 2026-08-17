@@ -909,7 +909,7 @@ describe('woc_market_window: listing requires the wallet step-up (B6/R1)', () =>
     // A wallet decline renders its player-facing message, with the listing
     // catalog line (not the payment one) as the message-less fallback; a
     // challenge refusal rides fail().
-    expect(submit).toContain('hudChrome.wocMarket.signFailedListing');
+    expect(submit).toContain('hudChrome.wocMarket.signFailedConfirm');
     expect(submit).not.toContain("t('hudChrome.wocMarket.signFailed')");
     expect(submit).toContain('this.fail(issued.code)');
   });

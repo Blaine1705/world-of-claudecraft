@@ -577,10 +577,10 @@ export class FakeWocMarketDb implements WocMarketDb {
         return false;
       }
     }
-    // Reset both side-accepts and the named item: the deal restarts and the
-    // seller must re-accept (a fresh step-up proof), mirroring the Pg UPDATE.
+    // Reset the SELLER's acceptance and named item; keep the buyer's standing
+    // consent. The seller must re-accept with a fresh step-up proof, mirroring
+    // the Pg UPDATE.
     row.status = 'pending';
-    row.buyerAccepted = false;
     row.sellerAccepted = false;
     row.itemRef = null;
     this.offerUpdatedMs.set(id, this.now());
