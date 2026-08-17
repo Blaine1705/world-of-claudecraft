@@ -156,7 +156,7 @@ cadence logic of its own. Narrow helpers:
   parsed-GLB contract test, and its own thin `src/render/<asset>.ts` adapter
   (exemplars: `banker_chest.ts`, `eastbrook_grand_armoury.ts`, `noticeboard.ts`).
 ## Asset loading (`assets/`)
-`loader.ts` (`loadGltf`/`loadHdr`/`loadTexture`, one parse per URL) plus these
+`loader.ts` (`loadGltf`/`loadTexture`/`loadKtx2Texture`, one parse per URL) plus these
 rules, all CI-enforced:
 - **Cache results are IMMUTABLE: clone before mutating.** `releaseGltf(url)` drops
   the cache entry after geometry is extracted.

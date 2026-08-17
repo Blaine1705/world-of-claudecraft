@@ -189,8 +189,15 @@ interface AttributionTargetFixture {
 // Re-minted again for the login preview/self-spirit prewarm merge with the
 // delve interior tracker extraction. Renderer/prewarm bytes moved; captures
 // were adopted verbatim.
+// Re-minted for the sky KTX2 UASTC HDR conversion: the renderer publishes the
+// sky module's held textures into the residency table and its idle sky upload
+// comment follows the compressed path, so renderer.ts moves and the composite
+// follows its bytes. No capture was retaken.
+// Re-minted for the corrected PR #3446 merge: the v0.39 wrapper renderer and
+// prewarm repairs combine with the sky KTX2 renderer bytes, so the merged tree
+// mints a value matching neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'a9564213367eec51236eb8c6851947510b056c8332fa2d30cdd4746bbcbb4e6b';
+  '35b3c6fd77caf4b3f6d82400e5057210e09dd7bf85c01a133284f3ee298bc85a';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

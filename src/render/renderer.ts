@@ -553,6 +553,7 @@ import {
   type SkyKey,
   type SkyView,
   skyBiomesAt,
+  skyResidencyTextures,
 } from './sky';
 import { zoneArrivalReady } from './sky_residency_core';
 import { SkyResidencyDriver } from './sky_residency_driver';
@@ -2793,6 +2794,7 @@ export class Renderer {
               label: 'foliage parse cache',
               objects: foliageResidencySources().parsedScenes,
             },
+            { label: 'sky', textures: skyResidencyTextures() },
             {
               // The cost side of the KTX2 mip release: source bytes retained
               // for the context-loss re-transcode (the released mip chains
@@ -3667,11 +3669,9 @@ export class Renderer {
         for (const key of skyKeys) this.prewarmTexture(this.skyView.domeTexture(key));
         return;
       }
-      // A DataTexture upload is synchronous even from requestIdleCallback. The
-      // installed 0.185 ships native update ranges, so the idle arm row-batches
-      // the HDRI instead of paying one full upload. Either way each atomic
-      // WebGL call enters the shared queue so it cannot overlap a live shader
-      // compile.
+      // A texture upload is synchronous even from requestIdleCallback, and a
+      // CompressedTexture has no row-addressable buffer to range over, so the
+      // sky is ONE queued call rather than a DataTexture's row batches.
       await this.prewarmTextureInIdle(this.skyView.envTexture(zone.biome));
       // PMREM generation is indivisible in three (0.185 included). Defer two
       // timed-out callbacks before deliberately paying that single unit under
