@@ -7600,6 +7600,22 @@
   .trade-woc-block {
     color: #d8b46a;
   }
+  /* The consent row (R9): checkbox beside its caption, the terms link on the
+     same visual tier as the warnings so it reads as part of the commitment. */
+  .trade-woc-terms {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    font-size: 11px;
+    color: #d8b46a;
+  }
+  .trade-woc-terms-link {
+    font-size: 11px;
+    color: var(--color-text-link, #d8b46a);
+    text-decoration: underline;
+  }
   /* Empty derived lines collapse instead of leaving gaps in the flex column. */
   .trade-woc-equiv:empty,
   .trade-woc-fee:empty,

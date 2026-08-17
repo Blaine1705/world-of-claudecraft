@@ -8812,6 +8812,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '당신은 USD 가치를 $WOC로 지불하기로 약정합니다. 정확한 토큰 수량은 결제 요청 시의 새 견적으로 확정되며 추정치와 다를 수 있습니다.',
   'hudChrome.wocMarket.claimCooldownRetry':
     '최근에 즉시 구매를 중도 포기했습니다. {duration} 후에 다시 시도하세요.',
+  'hudChrome.wocMarket.termsLink': '마켓 약관 보기',
+  'hudChrome.wocMarket.quoteExpiresAt': '견적은 {time}에 만료됩니다.',
+  'hudChrome.wocMarket.bidBindingNote':
+    '보증금 거래에 서명하는 순간 입찰은 확정됩니다. 입찰은 철회할 수 없으며, 낙찰 후 결제하지 않으면 보증금이 몰수되고 계정에 마켓 위반이 기록됩니다.',
+  'hudChrome.wocMarket.bidCloseNote':
+    '마감 직전 몇 분 사이에 확인된 결제는 경매를 몇 분 연장할 수 있습니다. 경매가 끝난 뒤 도착한 결제는 경매를 다시 열지 않고 환불됩니다.',
+  'hudChrome.wocMarket.offerNextNote':
+    '낙찰자가 결제하지 않으면 판매자는 다음 입찰자에게 그 입찰자 자신의 입찰가로 아이템을 제안할 수 있습니다.',
   'hudChrome.wocMarket.settlementDeadlineNote':
     '낙찰되면 경매 종료 후 {duration} 안에 결제해야 합니다.',
   'hudChrome.wocMarket.termsLabel': '가변 토큰 정산 약관에 동의합니다.',
@@ -13370,6 +13378,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.statusConfirmedBuyer': '결제가 확인되었습니다. 전달을 완료하는 중입니다...',
   'hudChrome.trade.woc.statusConfirmedSeller': '결제가 확인되었습니다. 거래를 완료하는 중입니다...',
   'hudChrome.trade.woc.hintBelowMin': '거래소 최저 가격은 {usd}입니다.',
+  'hudChrome.trade.woc.termsLabel': '마켓 약관에 동의합니다.',
   'hudChrome.trade.woc.paidSeller': '{item}에 대한 {price} 결제를 받았습니다.',
   'hudChrome.trade.woc.paidBuyer': '{item}에 대해 {price}를 결제했습니다.',
   'hudChrome.bags.lockItem': '아이템 잠그기',

@@ -163,6 +163,24 @@ export interface WocTradeInput {
    */
   minPriceCents?: number | null;
   /**
+   * Whether this account's Marketplace terms acceptance is durably recorded
+   * (from /me, or observed on a send this session). False or absent means
+   * show the consent control: the sends carry the player's REAL choice, and
+   * hard-coding acceptTerms while showing nothing recorded consent the
+   * player never gave (R9).
+   */
+  termsAccepted?: boolean;
+  /** The consent checkbox's current state (painter-owned, like the Exchange
+   *  window's). Read only to re-render it across rebuilds. */
+  termsChecked?: boolean;
+  /**
+   * The held settlement quote awaiting the buyer's explicit sign-off, or
+   * null/absent when none is staged. Its presence is what turns the pay face
+   * into the review panel: H13's finding was the p2p Pay flow going straight
+   * from click to wallet with nothing showing the token total or expiry.
+   */
+  quote?: { totalTokens: number | null; usdCents: number; expiresAtMs: number | null } | null;
+  /**
    * The VERIFIED wallet's $WOC balance, or null when it is not known.
    *
    * Null is deliberately NOT treated as zero. The balance is fetched
@@ -234,6 +252,20 @@ export interface WocTradeModel {
   acceptHint: TranslationKey | null;
   /** Whether the BUYER may start paying: escrow is done and it is their turn. */
   canPay: boolean;
+  /** Whether to render the terms consent row: a money commitment affordance
+   *  is on screen for the VIEWER (the buyer's compose form or pay face) and
+   *  acceptance is not durably recorded. The seller's surfaces never show it:
+   *  their accept is not terms-gated server-side. */
+  showTerms: boolean;
+  /** The consent checkbox state to re-render (see input.termsChecked). */
+  termsChecked: boolean;
+  /** The staged settlement quote to review before signing, or null. Non-null
+   *  only on the buyer's own pay surface. */
+  quoteReview: {
+    totalTokens: number | null;
+    usdCents: number;
+    expiresAtMs: number | null;
+  } | null;
   /** Whether "Send offer" may be pressed. */
   canSend: boolean;
   /** The i18n key explaining why it may not, or null when it may. */
@@ -488,6 +520,23 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
       input.pendingOffer?.phase === 'awaiting_payment' &&
       input.pendingOffer.role === 'buyer' &&
       input.pendingOffer.listingId !== null,
+    // The consent row rides exactly the surfaces whose SEND is terms-gated
+    // server-side (guardTerms: the offer create and buyNow, both the buyer's):
+    // the compose form and the pay face. Durable acceptance hides it, the
+    // Exchange checkbox's own contract.
+    showTerms:
+      input.termsAccepted !== true &&
+      ((wocMode && input.pendingOffer === null) ||
+        (input.pendingOffer?.role === 'buyer' && input.pendingOffer.phase === 'awaiting_payment')),
+    termsChecked: input.termsChecked === true,
+    // The staged quote renders only on the buyer's own pay surface: a quote
+    // leaking onto the seller's wait face would show them the buyer's money.
+    quoteReview:
+      input.quote != null &&
+      input.pendingOffer?.role === 'buyer' &&
+      (input.pendingOffer.phase === 'awaiting_payment' || input.pendingOffer.phase === 'paying')
+        ? input.quote
+        : null,
     // A standing offer replaces the form: you cannot send a second one over it.
     canSend: wocMode && hint === null && input.pendingOffer === null,
     sendHint: wocMode && hint !== null ? SEND_HINT_KEYS[hint] : null,

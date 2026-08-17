@@ -53,6 +53,13 @@ export interface WocTradePanelDeps {
   /** The Exchange's minimum listing price from /status. Null or absent
    *  while unknown (the courtesy hint arm; unknown never blocks). */
   minPriceCents?: number | null;
+  /** Durable Marketplace-terms acceptance (from /me or a consented send);
+   *  false/absent shows the consent row on the buyer's money surfaces (R9). */
+  termsAccepted?: boolean;
+  /** The consent checkbox's controller-held state (survives rebuilds). */
+  termsChecked?: boolean;
+  /** The staged settlement quote awaiting the buyer's explicit sign-off. */
+  quote?: { totalTokens: number | null; usdCents: number; expiresAtMs: number | null } | null;
   pendingOffer: WocPendingOffer | null;
   onModeChange(mode: 'gold' | 'woc'): void;
   onPriceInput(usdCents: number | null): void;
@@ -66,6 +73,12 @@ export interface WocTradePanelDeps {
    *  (the PRD's own mitigation, previously unreachable). */
   onCancelSale(): void;
   onPayOffer(): void;
+  /** The consent checkbox moved (R9: the send carries this real choice). */
+  onTermsChange(checked: boolean): void;
+  /** The buyer signs the reviewed quote (the wallet step follows). */
+  onSignQuote(): void;
+  /** The buyer backs out of the reviewed quote; the deal stays payable. */
+  onQuoteCancel(): void;
 }
 
 /** USD cents as a localized currency string (the shared usd_text core, so
@@ -110,6 +123,9 @@ export function wocTradeModelFrom(deps: WocTradePanelDeps): WocTradeModel {
     tokens: deps.tokens,
     split: deps.split,
     minPriceCents: deps.minPriceCents ?? null,
+    termsAccepted: deps.termsAccepted,
+    termsChecked: deps.termsChecked,
+    quote: deps.quote,
     pendingOffer: deps.pendingOffer,
     goldOffered: deps.goldCopper > 0 || deps.partnerGoldCopper > 0,
     walletTokens: deps.walletTokens,
@@ -121,6 +137,19 @@ export function wocTradeModelFrom(deps: WocTradePanelDeps): WocTradeModel {
  *  discard the listeners that window attaches after its own. */
 export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): string {
   if (!model.armVisible) return '';
+  // The consent control, the Exchange checkbox's model made compliant: the
+  // terms are LINKED at the moment of acceptance (draft Terms 10.3), and the
+  // send carries this checkbox's real state instead of a hard-coded true
+  // (R9). Rendered only where the model says a terms-gated send is on
+  // screen; checked state is controller-held so it survives rebuilds.
+  const termsRow = model.showTerms
+    ? `<label class="trade-woc-terms"><input type="checkbox" data-woc-terms${
+        model.termsChecked ? ' checked' : ''
+      } /> ${esc(t('hudChrome.trade.woc.termsLabel'))}</label>
+      <a class="trade-woc-terms-link" href="/terms" target="_blank" rel="noopener">${esc(
+        t('hudChrome.wocMarket.termsLink'),
+      )}</a>`
+    : '';
   const modeTabs = `
     <div class="trade-woc-modes" role="tablist" aria-label="${esc(t('hudChrome.trade.woc.tabWoc'))}">
       <button type="button" role="tab" class="btn trade-woc-mode${model.mode === 'gold' ? ' active' : ''}" aria-selected="${model.mode === 'gold'}" data-woc-mode="gold"${model.wocDealStanding ? ' disabled' : ''}>${esc(t('hudChrome.trade.woc.tabGold'))}</button>
@@ -154,9 +183,47 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
       // The status line is announced: a state the player cannot see change (a
       // chain confirmation) is exactly the case a screen reader must be told
       // about, and it replaces the only feedback a sighted player gets.
+      // The quote-review panel outranks the Pay button: once a quote is
+      // staged, the buyer must SEE what signing costs (the token total, the
+      // expiry) before the wallet takes over. Going straight from click to
+      // wallet was the H13 informed-commitment gap.
+      if (model.quoteReview !== null && o.role === 'buyer') {
+        const q = model.quoteReview;
+        const total =
+          q.totalTokens === null
+            ? ''
+            : `<p>${esc(
+                t('hudChrome.wocMarket.quoteTotal', {
+                  tokens: formatNumber(q.totalTokens, { maximumFractionDigits: 4 }),
+                }),
+              )}</p>`;
+        const quoteExpiry =
+          q.expiresAtMs === null
+            ? ''
+            : `<p class="trade-woc-note">${esc(
+                t('hudChrome.wocMarket.quoteExpiresAt', {
+                  time: formatDateTime(q.expiresAtMs, { timeStyle: 'short' }),
+                }),
+              )}</p>`;
+        return `<div class="trade-woc-arm">${modeTabs}
+          <p>${esc(t('hudChrome.wocMarket.quoteTitle'))}</p>
+          <p>${esc(t('hudChrome.trade.woc.payNow', { usd: usd(q.usdCents) }))}</p>
+          ${total}
+          ${quoteExpiry}
+          <p class="trade-woc-warn">${esc(t('hudChrome.wocMarket.variableTokenWarning'))}</p>
+          ${termsRow}
+          <button type="button" class="btn trade-woc-pay" data-woc-sign>${esc(
+            t('hudChrome.wocMarket.quoteSign'),
+          )}</button>
+          <button type="button" class="btn trade-woc-cancel" data-woc-quote-cancel>${esc(
+            t('hudChrome.wocMarket.quoteCancel'),
+          )}</button>
+          <p class="trade-woc-hint" data-woc-hint role="status"></p>
+        </div>`;
+      }
       const body =
         model.canPay && o.role === 'buyer'
-          ? `<button type="button" class="btn trade-woc-pay" data-woc-pay>${esc(
+          ? `${termsRow}<button type="button" class="btn trade-woc-pay" data-woc-pay>${esc(
               t('hudChrome.trade.woc.payNow', { usd: usd(o.usdCents) }),
             )}</button>`
           : `<p class="trade-woc-waiting" role="status">${
@@ -167,7 +234,7 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
           ? `<button type="button" class="btn trade-woc-cancel" data-woc-cancel-sale>${esc(
               t('hudChrome.trade.woc.cancelSale'),
             )}</button>`
-          : `<button type="button" class="btn trade-woc-cancel" data-woc-decline>${esc(t('hudChrome.trade.woc.decline'))}</button>`;
+          : '';
       return `<div class="trade-woc-arm">${modeTabs}
         ${body}
         ${cancelSale}
@@ -213,6 +280,7 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
     <p class="trade-woc-note" data-woc-ineligible></p>
     <p class="trade-woc-warn">${esc(t('hudChrome.trade.woc.variableWarning'))}</p>
     <p class="trade-woc-warn">${esc(t('hudChrome.trade.woc.notInstant'))}</p>
+    ${termsRow}
     <button type="button" class="btn trade-woc-send" data-woc-send>${esc(t('hudChrome.trade.woc.sendOffer'))}</button>
     <p class="trade-woc-hint" data-woc-hint role="status"></p>
   </div>`;
@@ -335,4 +403,12 @@ export function wireWocTradeArm(root: ParentNode, deps: WocTradePanelDeps): void
   root
     .querySelector<HTMLElement>('[data-woc-pay]')
     ?.addEventListener('click', () => deps.onPayOffer());
+  const terms = root.querySelector<HTMLInputElement>('[data-woc-terms]');
+  terms?.addEventListener('change', () => deps.onTermsChange(terms.checked));
+  root
+    .querySelector<HTMLElement>('[data-woc-sign]')
+    ?.addEventListener('click', () => deps.onSignQuote());
+  root
+    .querySelector<HTMLElement>('[data-woc-quote-cancel]')
+    ?.addEventListener('click', () => deps.onQuoteCancel());
 }

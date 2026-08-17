@@ -297,11 +297,15 @@ export const hudChromeStrings = {
       // Decided money whose delivery has not finished: its own sentence, so
       // "confirming on the network" never describes a confirmed payment and
       // "on its way by mail" never predates the delivery.
-      paymentConfirmed: 'Payment confirmed. Your item arrives by Ravenpost mail once delivery completes.',
+      paymentConfirmed:
+        'Payment confirmed. Your item arrives by Ravenpost mail once delivery completes.',
       statusConfirmedBuyer: 'Payment confirmed. Delivery is completing...',
       statusConfirmedSeller: 'Payment confirmed. The sale is completing...',
       // The courtesy floor hint (the server's refusal stays the authority).
       hintBelowMin: 'The Exchange minimum price is {usd}.',
+      // The consent control (R9): the send carries this checkbox's real
+      // state, and the Marketplace terms are linked beside it (10.3).
+      termsLabel: 'I accept the Marketplace terms.',
     },
   },
   wocStore: {
@@ -5177,6 +5181,15 @@ export const hudChromeStrings = {
     cancelAria: 'Cancel your listing of {item}',
     bidBondNote:
       'Placing a bid holds a refundable bond of {usd}, paid in $WOC. It is returned if you are outbid and forfeited only if you win and do not pay.',
+    // The pre-bid commitment disclosures (draft Terms 10.4/10.5), shown
+    // BEFORE the first bond charge: a bid binds once its bond is signed.
+    bidBindingNote:
+      'A bid is binding once you sign its bond transaction: it cannot be withdrawn, and if you win and do not pay, the bond is forfeited and your account earns a Marketplace strike.',
+    bidCloseNote:
+      'A payment confirming in the closing minutes can extend the auction by a few minutes. After it closes, a late payment cannot reopen it and is refunded.',
+    // Bidder-facing second-chance disclosure, shown when the seller opted in.
+    offerNextNote:
+      'If the winner does not pay, the seller may offer the item to the next bidder at their own bid.',
     variableTokenWarning:
       'You are committing to pay a USD value in $WOC. The exact token amount is set by a fresh quote when payment is requested and may differ from the estimate.',
     settlementDeadlineNote: 'If you win, payment is due within {duration} of the auction closing.',
@@ -5185,13 +5198,19 @@ export const hudChromeStrings = {
     // here because the apiError catalog is a strict bijection with the
     // server code set).
     claimCooldownRetry: 'You recently walked away from a Buy Now. Try again in {duration}.',
-    termsLabel: 'I accept the variable-token settlement terms.',
+    // Named after the document it links (10.3: presented, or clearly linked,
+    // at the moment of acceptance), not a settlement-mechanics nickname.
+    termsLabel: 'I accept the Marketplace terms.',
+    termsLink: 'View the Marketplace terms',
     quoteTitle: 'Confirm payment',
     quoteTotal: 'Total: {tokens} $WOC',
     quoteSeller: 'Seller receives: {tokens} $WOC',
     quoteBurn: 'Burned: {tokens} $WOC',
     quoteTreasury: 'Treasury: {tokens} $WOC',
     quoteExpires: 'Quote expires in {duration}',
+    // The static-time twin for cold surfaces with no countdown driver (the
+    // trade arm's review panel).
+    quoteExpiresAt: 'Quote expires at {time}.',
     quoteExpired: 'The quote expired. Request a fresh one.',
     quoteSign: 'Sign and pay',
     quoteRefresh: 'New quote',

@@ -894,6 +894,13 @@ export class WocMarketWindow {
         // the client computes no money (the PRD rule).
         t('hudChrome.wocMarket.bidBondNote', { usd: this.usd(d.row.minNextBidBondCents) }),
       )}</p>` +
+      // The commitment disclosures, BEFORE the first bond charge: a bid binds
+      // once its bond is signed (no withdraw), the close can move a few
+      // minutes for a confirming payment, and a late payment refunds rather
+      // than reopening (H13's pre-bid disclosure gap).
+      `<p class="wm-note">${esc(t('hudChrome.wocMarket.bidBindingNote'))}</p>` +
+      `<p class="wm-note">${esc(t('hudChrome.wocMarket.bidCloseNote'))}</p>` +
+      (d.offerNext ? `<p class="wm-note">${esc(t('hudChrome.wocMarket.offerNextNote'))}</p>` : '') +
       `<p class="wm-note">${esc(t('hudChrome.wocMarket.variableTokenWarning'))}</p>` +
       `<p class="wm-note">${esc(
         t('hudChrome.wocMarket.settlementDeadlineNote', {
@@ -921,11 +928,16 @@ export class WocMarketWindow {
    * is the only kind the local database held.
    */
   private confirmFieldsHtml(model: Extract<WocMarketViewModel, { kind: 'ready' }>): string {
+    // The terms are LINKED at the moment of acceptance (draft Terms 10.3):
+    // a checkbox naming a document the player cannot reach recorded consent
+    // to nothing (the R9 cluster's Exchange half).
     const termsRow = model.activity?.termsAccepted
       ? ''
       : `<label class="wm-terms"><input type="checkbox" data-field="accept-terms" data-focus-key="wm-terms" ${this.acceptTerms ? 'checked' : ''} /> ${esc(
           t('hudChrome.wocMarket.termsLabel'),
-        )}</label>`;
+        )}</label> <a class="wm-terms-link" href="/terms" target="_blank" rel="noopener">${esc(
+          t('hudChrome.wocMarket.termsLink'),
+        )}</a>`;
     return termsRow;
   }
 

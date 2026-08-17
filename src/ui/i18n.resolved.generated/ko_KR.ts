@@ -543,7 +543,8 @@ export const ko_KR: EnTranslations = {
         "paymentConfirmed": "결제가 확인되었습니다. 전달이 완료되면 아이템이 우편으로 도착합니다.",
         "statusConfirmedBuyer": "결제가 확인되었습니다. 전달을 완료하는 중입니다...",
         "statusConfirmedSeller": "결제가 확인되었습니다. 거래를 완료하는 중입니다...",
-        "hintBelowMin": "거래소 최저 가격은 {usd}입니다."
+        "hintBelowMin": "거래소 최저 가격은 {usd}입니다.",
+        "termsLabel": "마켓 약관에 동의합니다."
       }
     },
     "wocStore": {
@@ -3950,16 +3951,21 @@ export const ko_KR: EnTranslations = {
       "cancelButton": "등록 취소",
       "cancelAria": "{item} 등록 취소",
       "bidBondNote": "입찰 시 {usd} 상당의 환불 가능한 보증금($WOC)을 예치합니다. 상회 입찰이 나오면 반환되며, 낙찰 후 결제하지 않은 경우에만 몰수됩니다.",
+      "bidBindingNote": "보증금 거래에 서명하는 순간 입찰은 확정됩니다. 입찰은 철회할 수 없으며, 낙찰 후 결제하지 않으면 보증금이 몰수되고 계정에 마켓 위반이 기록됩니다.",
+      "bidCloseNote": "마감 직전 몇 분 사이에 확인된 결제는 경매를 몇 분 연장할 수 있습니다. 경매가 끝난 뒤 도착한 결제는 경매를 다시 열지 않고 환불됩니다.",
+      "offerNextNote": "낙찰자가 결제하지 않으면 판매자는 다음 입찰자에게 그 입찰자 자신의 입찰가로 아이템을 제안할 수 있습니다.",
       "variableTokenWarning": "당신은 USD 가치를 $WOC로 지불하기로 약정합니다. 정확한 토큰 수량은 결제 요청 시의 새 견적으로 확정되며 추정치와 다를 수 있습니다.",
       "settlementDeadlineNote": "낙찰되면 경매 종료 후 {duration} 안에 결제해야 합니다.",
       "claimCooldownRetry": "최근에 즉시 구매를 중도 포기했습니다. {duration} 후에 다시 시도하세요.",
       "termsLabel": "가변 토큰 정산 약관에 동의합니다.",
+      "termsLink": "마켓 약관 보기",
       "quoteTitle": "결제 확인",
       "quoteTotal": "합계: {tokens} $WOC",
       "quoteSeller": "판매자 수령액: {tokens} $WOC",
       "quoteBurn": "소각: {tokens} $WOC",
       "quoteTreasury": "트레저리: {tokens} $WOC",
       "quoteExpires": "견적 만료까지 {duration}",
+      "quoteExpiresAt": "견적은 {time}에 만료됩니다.",
       "quoteExpired": "견적이 만료되었습니다. 새 견적을 요청하세요.",
       "quoteSign": "서명하고 결제",
       "quoteRefresh": "새 견적",

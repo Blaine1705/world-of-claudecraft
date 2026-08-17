@@ -8971,6 +8971,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вы обязуетесь оплатить сумму в USD токенами $WOC. Точное количество токенов фиксируется свежей котировкой при запросе оплаты и может отличаться от оценки.',
   'hudChrome.wocMarket.claimCooldownRetry':
     'Вы недавно отказались от быстрой покупки. Повторите попытку через {duration}.',
+  'hudChrome.wocMarket.termsLink': 'Открыть условия Торговой площадки',
+  'hudChrome.wocMarket.quoteExpiresAt': 'Расчёт истекает в {time}.',
+  'hudChrome.wocMarket.bidBindingNote':
+    'Ставка становится обязательной, как только вы подписываете транзакцию залога: отозвать её нельзя, а если вы выиграете и не оплатите покупку, залог будет удержан, и на счёт запишут нарушение правил Торговой площадки.',
+  'hudChrome.wocMarket.bidCloseNote':
+    'Платёж, подтверждающийся в последние минуты, может продлить аукцион на несколько минут. После завершения аукциона запоздавший платёж не открывает его заново, а возвращается.',
+  'hudChrome.wocMarket.offerNextNote':
+    'Если победитель не оплатит покупку, продавец может предложить предмет следующему участнику по его собственной ставке.',
   'hudChrome.wocMarket.settlementDeadlineNote':
     'Если вы выиграете, оплата должна поступить в течение {duration} после закрытия аукциона.',
   'hudChrome.wocMarket.termsLabel': 'Я принимаю условия расчёта с плавающим количеством токенов.',
@@ -13539,6 +13547,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.statusConfirmedBuyer': 'Оплата подтверждена. Доставка завершается...',
   'hudChrome.trade.woc.statusConfirmedSeller': 'Оплата подтверждена. Сделка завершается...',
   'hudChrome.trade.woc.hintBelowMin': 'Минимальная цена на бирже: {usd}.',
+  'hudChrome.trade.woc.termsLabel': 'Я принимаю условия Торговой площадки.',
   'hudChrome.trade.woc.paidSeller': 'Вы получили платёж {price} за ваш предмет {item}.',
   'hudChrome.trade.woc.paidBuyer': 'Вы отправили платёж {price} за {item}.',
   'hudChrome.bags.lockItem': 'Заблокировать предмет',

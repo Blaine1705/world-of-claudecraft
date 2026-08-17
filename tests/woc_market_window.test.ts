@@ -1527,3 +1527,29 @@ describe('woc_market_window: the Activity tab is an honest, actionable ledger (H
     expect(activity).toContain('wm-activity-cancel-${l.id}');
   });
 });
+
+describe('woc_market_window: informed commitment before the first charge (H13/R9)', () => {
+  const bidForm = betweenCode('private bidFormHtml(', 'private confirmFieldsHtml(');
+  const confirmFields = betweenCode('private confirmFieldsHtml(', 'private sellHtml(');
+
+  it('the pre-bid disclosures precede the Place bid control', () => {
+    // Binding-bid (no withdraw after the bond signs), the close-movement
+    // honesty pair (anti-snipe extension; a late payment refunds), and the
+    // seller's second-chance disclosure when opted in.
+    expect(bidForm).toContain('hudChrome.wocMarket.bidBindingNote');
+    expect(bidForm).toContain('hudChrome.wocMarket.bidCloseNote');
+    expect(bidForm).toContain(
+      "d.offerNext ? `<p class=\"wm-note\">${esc(t('hudChrome.wocMarket.offerNextNote'))}</p>` : ''",
+    );
+    // BEFORE the button, where the player still decides.
+    expect(bidForm.indexOf('bidBindingNote')).toBeLessThan(bidForm.indexOf('place-bid'));
+  });
+
+  it('the consent checkbox LINKS the Marketplace terms at the moment of acceptance (10.3)', () => {
+    expect(confirmFields).toContain('hudChrome.wocMarket.termsLabel');
+    expect(confirmFields).toContain('href="/terms"');
+    expect(confirmFields).toContain('hudChrome.wocMarket.termsLink');
+    // Still hidden once acceptance is durably recorded.
+    expect(confirmFields).toContain('model.activity?.termsAccepted');
+  });
+});

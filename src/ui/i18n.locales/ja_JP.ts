@@ -8845,6 +8845,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'あなたは USD 建ての金額を $WOC で支払うことを約束します。正確なトークン数は支払い要求時の新しい見積もりで確定し、概算と異なる場合があります。',
   'hudChrome.wocMarket.claimCooldownRetry':
     '最近、即時購入を途中で放棄しています。{duration}後にもう一度お試しください。',
+  'hudChrome.wocMarket.termsLink': 'マーケット利用規約を見る',
+  'hudChrome.wocMarket.quoteExpiresAt': '見積もりは {time} に失効します。',
+  'hudChrome.wocMarket.bidBindingNote':
+    '保証金のトランザクションに署名した時点で入札は確定します。入札は取り下げられず、落札して支払わなかった場合は保証金が没収され、アカウントにマーケット違反が記録されます。',
+  'hudChrome.wocMarket.bidCloseNote':
+    '終了間際の数分間に確認された支払いは、オークションを数分延長することがあります。終了後に届いた支払いはオークションを再開せず、返金されます。',
+  'hudChrome.wocMarket.offerNextNote': '落札者が支払わなかった場合、出品者は次の入札者に、その入札者自身の入札額でアイテムを提供できます。',
   'hudChrome.wocMarket.settlementDeadlineNote':
     '落札した場合、オークション終了後 {duration} 以内に支払う必要があります。',
   'hudChrome.wocMarket.termsLabel': '変動トークン決済の条件に同意します。',
@@ -13373,6 +13380,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.statusConfirmedBuyer': '支払いが確認されました。配送を完了しています...',
   'hudChrome.trade.woc.statusConfirmedSeller': '支払いが確認されました。取引を完了しています...',
   'hudChrome.trade.woc.hintBelowMin': '取引所の最低価格は {usd} です。',
+  'hudChrome.trade.woc.termsLabel': 'マーケット利用規約に同意します。',
   'hudChrome.trade.woc.paidSeller': '{item} の代金 {price} を受け取りました。',
   'hudChrome.trade.woc.paidBuyer': '{item} の代金 {price} を支払いました。',
   'hudChrome.bags.lockItem': 'アイテムをロック',

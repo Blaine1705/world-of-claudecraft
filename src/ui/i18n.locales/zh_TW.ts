@@ -8436,6 +8436,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.variableTokenWarning':
     '你承諾以 $WOC 支付一筆美元價值。具體代幣數量由請求付款時的最新報價確定，可能與估算不同。',
   'hudChrome.wocMarket.claimCooldownRetry': '你最近放棄過一次直購。請在{duration}後再試。',
+  'hudChrome.wocMarket.termsLink': '查看市場條款',
+  'hudChrome.wocMarket.quoteExpiresAt': '報價將於 {time} 失效。',
+  'hudChrome.wocMarket.bidBindingNote':
+    '一旦簽署保證金交易，出價即具有約束力：出價無法撤回；若你得標卻未付款，保證金將被沒收，且你的帳號會記一次市場違約。',
+  'hudChrome.wocMarket.bidCloseNote': '在拍賣臨近結束的幾分鐘內確認的付款可能使拍賣延長幾分鐘。拍賣結束後，遲到的付款不會重新開啟拍賣，而是會被退款。',
+  'hudChrome.wocMarket.offerNextNote': '若得標者未付款，賣家可以按下一位出價者自己的出價將物品轉讓給對方。',
   'hudChrome.wocMarket.settlementDeadlineNote': '若你得標，須在拍賣結束後 {duration} 內付款。',
   'hudChrome.wocMarket.termsLabel': '我接受浮動代幣結算條款。',
   'hudChrome.wocMarket.quoteTitle': '確認付款',
@@ -13094,6 +13100,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.statusConfirmedBuyer': '付款已確認。正在完成配送...',
   'hudChrome.trade.woc.statusConfirmedSeller': '付款已確認。交易正在完成...',
   'hudChrome.trade.woc.hintBelowMin': '交易所最低價格為 {usd}。',
+  'hudChrome.trade.woc.termsLabel': '我接受市場條款。',
   'hudChrome.trade.woc.paidSeller': '你的 {item} 已收到 {price} 的付款。',
   'hudChrome.trade.woc.paidBuyer': '你已為 {item} 支付 {price}。',
   'hudChrome.bags.lockItem': '鎖定物品',

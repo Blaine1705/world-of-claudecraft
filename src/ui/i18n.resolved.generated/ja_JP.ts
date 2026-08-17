@@ -543,7 +543,8 @@ export const ja_JP: EnTranslations = {
         "paymentConfirmed": "支払いが確認されました。配送が完了するとアイテムはメールで届きます。",
         "statusConfirmedBuyer": "支払いが確認されました。配送を完了しています...",
         "statusConfirmedSeller": "支払いが確認されました。取引を完了しています...",
-        "hintBelowMin": "取引所の最低価格は {usd} です。"
+        "hintBelowMin": "取引所の最低価格は {usd} です。",
+        "termsLabel": "マーケット利用規約に同意します。"
       }
     },
     "wocStore": {
@@ -3950,16 +3951,21 @@ export const ja_JP: EnTranslations = {
       "cancelButton": "出品を取り下げる",
       "cancelAria": "{item} の出品を取り下げる",
       "bidBondNote": "入札時に {usd} 相当の返還可能な保証金（$WOC 建て）を預けます。上回られた場合は返還され、落札したのに支払わなかった場合にのみ没収されます。",
+      "bidBindingNote": "保証金のトランザクションに署名した時点で入札は確定します。入札は取り下げられず、落札して支払わなかった場合は保証金が没収され、アカウントにマーケット違反が記録されます。",
+      "bidCloseNote": "終了間際の数分間に確認された支払いは、オークションを数分延長することがあります。終了後に届いた支払いはオークションを再開せず、返金されます。",
+      "offerNextNote": "落札者が支払わなかった場合、出品者は次の入札者に、その入札者自身の入札額でアイテムを提供できます。",
       "variableTokenWarning": "あなたは USD 建ての金額を $WOC で支払うことを約束します。正確なトークン数は支払い要求時の新しい見積もりで確定し、概算と異なる場合があります。",
       "settlementDeadlineNote": "落札した場合、オークション終了後 {duration} 以内に支払う必要があります。",
       "claimCooldownRetry": "最近、即時購入を途中で放棄しています。{duration}後にもう一度お試しください。",
       "termsLabel": "変動トークン決済の条件に同意します。",
+      "termsLink": "マーケット利用規約を見る",
       "quoteTitle": "支払いの確認",
       "quoteTotal": "合計: {tokens} $WOC",
       "quoteSeller": "出品者の受取额: {tokens} $WOC",
       "quoteBurn": "バーン: {tokens} $WOC",
       "quoteTreasury": "トレジャリー: {tokens} $WOC",
       "quoteExpires": "見積もりの有効期限: あと {duration}",
+      "quoteExpiresAt": "見積もりは {time} に失効します。",
       "quoteExpired": "見積もりの期限が切れました。新しい見積もりを取得してください。",
       "quoteSign": "署名して支払う",
       "quoteRefresh": "新しい見積もり",

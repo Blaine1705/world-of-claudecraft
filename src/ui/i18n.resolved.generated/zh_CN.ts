@@ -543,7 +543,8 @@ export const zh_CN: EnTranslations = {
         "paymentConfirmed": "付款已确认。配送完成后物品将通过邮件送达。",
         "statusConfirmedBuyer": "付款已确认。正在完成配送...",
         "statusConfirmedSeller": "付款已确认。交易正在完成...",
-        "hintBelowMin": "交易所最低价格为 {usd}。"
+        "hintBelowMin": "交易所最低价格为 {usd}。",
+        "termsLabel": "我接受市场条款。"
       }
     },
     "wocStore": {
@@ -3950,16 +3951,21 @@ export const zh_CN: EnTranslations = {
       "cancelButton": "取消挂单",
       "cancelAria": "取消你的 {item} 挂单",
       "bidBondNote": "出价时会冻结 {usd} 的可退还保证金（以 $WOC 支付）。被超越时退还；只有当你中标却未付款时才会被没收。",
+      "bidBindingNote": "一旦签署保证金交易，出价即具有约束力：出价无法撤回；若你中标却未付款，保证金将被没收，且你的账号会记一次市场违约。",
+      "bidCloseNote": "在拍卖临近结束的几分钟内确认的付款可能使拍卖延长几分钟。拍卖结束后，迟到的付款不会重新开启拍卖，而是会被退款。",
+      "offerNextNote": "若中标者未付款，卖家可以按下一位出价者自己的出价将物品转让给对方。",
       "variableTokenWarning": "你承诺以 $WOC 支付一笔美元价值。具体代币数量由请求付款时的最新报价确定，可能与估算不同。",
       "settlementDeadlineNote": "若你中标，须在拍卖结束后 {duration} 内付款。",
       "claimCooldownRetry": "你最近放弃过一次直购。请在{duration}后再试。",
       "termsLabel": "我接受浮动代币结算条款。",
+      "termsLink": "查看市场条款",
       "quoteTitle": "确认付款",
       "quoteTotal": "合计：{tokens} $WOC",
       "quoteSeller": "卖家所得：{tokens} $WOC",
       "quoteBurn": "销毁：{tokens} $WOC",
       "quoteTreasury": "国库：{tokens} $WOC",
       "quoteExpires": "报价将在 {duration} 后过期",
+      "quoteExpiresAt": "报价将于 {time} 失效。",
       "quoteExpired": "报价已过期，请重新获取。",
       "quoteSign": "签名并付款",
       "quoteRefresh": "新报价",

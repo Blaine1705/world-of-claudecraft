@@ -66,6 +66,12 @@ function deps(over: Partial<WocTradePanelDeps> = {}): WocTradePanelDeps {
     onDeclineOffer: vi.fn(),
     onCancelSale: vi.fn(),
     onPayOffer: vi.fn(),
+    onTermsChange: vi.fn(),
+    onSignQuote: vi.fn(),
+    onQuoteCancel: vi.fn(),
+    // Durable acceptance by default so the standing render tests keep their
+    // face shapes; the consent-row tests flip it off explicitly.
+    termsAccepted: true,
     ...over,
   };
 }
@@ -863,7 +869,9 @@ describe('the wallet is skipped only on explicit server permission', () => {
     // Fail-safe direction: a service that omits the field is not saying "no
     // signature needed". A truthiness check here would skip signing whenever
     // the field were missing, which is the one mistake that must not happen.
-    expect(CONTROLLER).toContain('quoted.quote.signatureRequired === false');
+    // The staged (reviewed) quote carries the flag; the sign step reads it.
+    expect(CONTROLLER).toContain('staged.signatureRequired === false');
+    expect(CONTROLLER).not.toContain('!staged.signatureRequired');
     expect(CONTROLLER).not.toContain('!quoted.quote.signatureRequired');
   });
 
@@ -967,5 +975,72 @@ describe('the Hud side of the seam, and the E2E reach-through', () => {
     expect(moneyShot).toContain('hud.wocTrade.lastTradeSig');
     const localization = stripComments(readFileSync('scripts/localization_e2e.mjs', 'utf8'));
     expect(localization).toContain('hud.wocTrade.updateTradeWindow()');
+  });
+});
+
+describe('the consent row and the quote review (R9 + informed commitment)', () => {
+  const payable = {
+    id: 7,
+    usdCents: 100,
+    tokens: 7812.5,
+    role: 'buyer' as const,
+    phase: 'awaiting_payment' as const,
+    listingId: 41,
+    buyerAccepted: true,
+    sellerAccepted: true,
+  };
+
+  it('the compose face shows the consent row with a live terms link until accepted', () => {
+    const d = deps({ termsAccepted: false });
+    const root = paint(d);
+    const box = root.querySelector<HTMLInputElement>('[data-woc-terms]');
+    expect(box).not.toBeNull();
+    const link = root.querySelector<HTMLAnchorElement>('.trade-woc-terms-link');
+    expect(link?.getAttribute('href')).toBe('/terms');
+    box?.click();
+    box?.dispatchEvent(new Event('change'));
+    expect(d.onTermsChange).toHaveBeenCalledWith(true);
+  });
+
+  it('durable acceptance hides the row (the Exchange checkbox contract)', () => {
+    expect(paint(deps({ termsAccepted: true })).querySelector('[data-woc-terms]')).toBeNull();
+  });
+
+  it('the pay face carries the consent row too: buyNow is terms-gated server-side', () => {
+    const root = paint(deps({ termsAccepted: false, pendingOffer: payable }));
+    expect(root.querySelector('[data-woc-pay]')).not.toBeNull();
+    expect(root.querySelector('[data-woc-terms]')).not.toBeNull();
+    // The SELLER's surfaces never show it: their accept is not terms-gated.
+    const seller = paint(
+      deps({ termsAccepted: false, pendingOffer: { ...payable, role: 'seller' as const } }),
+    );
+    expect(seller.querySelector('[data-woc-terms]')).toBeNull();
+  });
+
+  it('a staged quote replaces Pay with the review panel: total, expiry, sign, back out', () => {
+    const d = deps({
+      pendingOffer: payable,
+      quote: { totalTokens: 812.5, usdCents: 100, expiresAtMs: 1_800_000_000_000 },
+    });
+    const root = paint(d);
+    expect(root.querySelector('[data-woc-pay]'), 'Pay yields to the review').toBeNull();
+    const text = root.textContent ?? '';
+    expect(text).toContain('812.5');
+    const sign = root.querySelector<HTMLElement>('[data-woc-sign]');
+    expect(sign?.textContent).toBe(t('hudChrome.wocMarket.quoteSign'));
+    sign?.click();
+    expect(d.onSignQuote).toHaveBeenCalled();
+    root.querySelector<HTMLElement>('[data-woc-quote-cancel]')?.click();
+    expect(d.onQuoteCancel).toHaveBeenCalled();
+  });
+
+  it('the review never renders on the seller side: the quote is the buyer money', () => {
+    const root = paint(
+      deps({
+        pendingOffer: { ...payable, role: 'seller' as const },
+        quote: { totalTokens: 812.5, usdCents: 100, expiresAtMs: null },
+      }),
+    );
+    expect(root.querySelector('[data-woc-sign]')).toBeNull();
   });
 });

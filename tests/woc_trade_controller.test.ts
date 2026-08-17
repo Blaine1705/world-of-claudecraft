@@ -185,6 +185,7 @@ function fakeHooks(): {
     settlementQuoteImpl: () => Promise<unknown>;
     confirmSettlementImpl: () => Promise<unknown>;
     statusImpl: () => Promise<unknown>;
+    meImpl: () => Promise<unknown>;
     tradePartnerImpl: () => Promise<unknown>;
     cancelListingImpl: () => Promise<unknown>;
     lastAcceptBody: Record<string, unknown> | null;
@@ -223,6 +224,10 @@ function fakeHooks(): {
     confirmSettlementImpl: (): Promise<unknown> =>
       Promise.resolve({ ok: false, code: 'woc_market.disabled' }),
     statusImpl: (): Promise<unknown> => Promise.resolve({ ok: false }),
+    // Durable acceptance by default: the standing tests exercise the deal
+    // machinery, not the consent row; the R9 tests override to pending.
+    meImpl: (): Promise<unknown> =>
+      Promise.resolve({ ok: true, activity: { termsAcceptedAtMs: 1 } }),
     // Null = the lookup answered "cannot be paid" (the historical default
     // here); the offer-face tests override with a verified partner, since a
     // REAL standing deal always has one (createOffer refuses otherwise).
@@ -313,6 +318,7 @@ function fakeHooks(): {
         state.calls.statuses++;
         return state.statusImpl();
       },
+      me: () => state.meImpl(),
       cancelListing: (id: number) => {
         state.calls.cancelListings.push(id);
         return state.cancelListingImpl();
@@ -1118,6 +1124,9 @@ describe('the createOffer request body (buyer send)', () => {
     c.wocTradeUsdCents = 250;
     c.wocTradePartner = { name: 'Borin', walletVerified: true };
     c.wocTradePartnerResolved = true;
+    // R9: the send carries the consent row's REAL state; the ticked box is
+    // what makes the sent acceptTerms true.
+    (c as unknown as { wocTradeTermsChecked: boolean }).wocTradeTermsChecked = true;
 
     await c.sendWocTradeOffer('Borin');
 
@@ -1164,6 +1173,9 @@ describe('the createOffer request body (buyer send)', () => {
     c.wocTradeUsdCents = 250;
     c.wocTradePartner = { name: 'Borin', walletVerified: true };
     c.wocTradePartnerResolved = true;
+    // R9: the send carries the consent row's REAL state; the ticked box is
+    // what makes the sent acceptTerms true.
+    (c as unknown as { wocTradeTermsChecked: boolean }).wocTradeTermsChecked = true;
 
     await c.sendWocTradeOffer('Borin');
 
@@ -1314,7 +1326,9 @@ describe('the pay verdict ladder matches the Exchange window', () => {
       buyerAccepted: true,
       sellerAccepted: true,
     });
+    // The two-step flow: Pay stages the quote for review, Sign spends it.
     await c.payWocTradeOffer();
+    await (c as unknown as { signWocTradeQuote(): Promise<void> }).signWocTradeQuote();
     return r.host.logs;
   }
 
@@ -1391,7 +1405,11 @@ describe('the pay verdict ladder matches the Exchange window', () => {
       buyerAccepted: true,
       sellerAccepted: true,
     });
+    // The two-step flow: staging the quote must NOT touch the wallet; only
+    // the explicit sign step drives it (absent still means sign there).
     await c.payWocTradeOffer();
+    expect(h.state.calls.signAndSends, 'review first: no wallet call on Pay').toEqual([]);
+    await (c as unknown as { signWocTradeQuote(): Promise<void> }).signWocTradeQuote();
     expect(h.state.calls.signAndSends, 'the wallet transaction signer WAS driven').toEqual([
       'dHg=',
     ]);
@@ -1731,6 +1749,118 @@ describe('informed waiting: expiry, close-time honesty, fresh money lines', () =
     openTrade(r);
     await flushAsync();
     expect(h.state.calls.statuses).toBe(1);
+    vi.useRealTimers();
+  });
+});
+
+describe('informed commitment (R9 + the quote review)', () => {
+  function buyerDeal(h: ReturnType<typeof fakeHooks>) {
+    h.state.buyNowImpl = () =>
+      Promise.resolve({ ok: true, settlement: { id: 5, amountCents: 100 }, quote: null });
+    h.state.settlementQuoteImpl = () =>
+      Promise.resolve({
+        ok: true,
+        quote: {
+          reference: 'ref_q1',
+          transactionBase64: 'dHg=',
+          signatureRequired: false,
+          amount: { base: '100', tokens: 812.5 },
+          seller: null,
+          burn: null,
+          treasury: null,
+          bondCents: null,
+          expiresAtMs: 9_999_999_999_999,
+        },
+      });
+    const r = rig(h.hooks);
+    const c = r.controller as unknown as {
+      wocTradeOffer: WocPendingOffer | null;
+      wocTradeQuote: { totalTokens: number | null } | null;
+      wocTradeSettlementId: number | null;
+      wocTradeTermsAccepted: boolean;
+      wocTradeTermsChecked: boolean;
+      payWocTradeOffer(): Promise<void>;
+      signWocTradeQuote(): Promise<void>;
+    };
+    c.wocTradeOffer = heldOffer({
+      role: 'buyer',
+      phase: 'awaiting_payment',
+      listingId: 41,
+      buyerAccepted: true,
+      sellerAccepted: true,
+    });
+    return { r, c };
+  }
+
+  it('Pay stages the quote for review and touches no wallet; Sign is the spend', async () => {
+    const h = fakeHooks();
+    const { c } = buyerDeal(h);
+    await c.payWocTradeOffer();
+    expect(c.wocTradeQuote?.totalTokens).toBe(812.5);
+    expect(h.state.calls.signAndSends).toEqual([]);
+    expect(h.state.calls.buyNows).toBe(1);
+  });
+
+  it('Not now keeps the deal payable: the next Pay re-quotes WITHOUT a second buy-now', async () => {
+    // A second buyNow would refuse over the buyer's own live lock
+    // (buy_now_locked); the stored settlement id is what makes retry work.
+    const h = fakeHooks();
+    const { c } = buyerDeal(h);
+    await c.payWocTradeOffer();
+    c.wocTradeQuote = null; // the Not now handler's effect
+    await c.payWocTradeOffer();
+    expect(c.wocTradeQuote, 're-quoted').not.toBeNull();
+    expect(h.state.calls.buyNows, 'one lock claim for the whole deal').toBe(1);
+  });
+
+  it('the buy-now send carries the REAL consent state, never a hard-coded true (R9)', async () => {
+    const h = fakeHooks();
+    let sentTerms: unknown = 'unset';
+    const clientWithSpy = h.hooks as unknown as {
+      client: { buyNow: (req: Record<string, unknown>) => Promise<unknown> };
+    };
+    const orig = clientWithSpy.client.buyNow;
+    clientWithSpy.client.buyNow = (req) => {
+      sentTerms = req.acceptTerms;
+      return orig(req);
+    };
+    const { c } = buyerDeal(h);
+    c.wocTradeTermsAccepted = false;
+    c.wocTradeTermsChecked = false;
+    await c.payWocTradeOffer();
+    expect(sentTerms, 'unchecked box sends false; the server refuses honestly').toBe(false);
+    // Ticked: the send carries it, and the recorded acceptance flips durable.
+    c.wocTradeQuote = null;
+    c.wocTradeSettlementId = null;
+    c.wocTradeTermsChecked = true;
+    await c.payWocTradeOffer();
+    expect(sentTerms).toBe(true);
+    expect(c.wocTradeTermsAccepted, 'the send that carried consent records it').toBe(true);
+  });
+
+  it('learns durable acceptance from /me at trade open, so the consent row hides', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+    const h = fakeHooks();
+    h.state.meImpl = () => Promise.resolve({ ok: true, activity: { termsAcceptedAtMs: 123 } });
+    const r = rig(h.hooks);
+    openTrade(r);
+    await flushAsync();
+    const c = r.controller as unknown as { wocTradeTermsAccepted: boolean };
+    expect(c.wocTradeTermsAccepted).toBe(true);
+    vi.useRealTimers();
+  });
+
+  it('a pending /me answer leaves the consent row SHOWN (fail toward asking)', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+    const h = fakeHooks();
+    h.state.meImpl = () => Promise.resolve({ ok: true, activity: { termsAcceptedAtMs: null } });
+    const r = rig(h.hooks);
+    openTrade(r);
+    await flushAsync();
+    const c = r.controller as unknown as { wocTradeTermsAccepted: boolean };
+    expect(c.wocTradeTermsAccepted).toBe(false);
     vi.useRealTimers();
   });
 });

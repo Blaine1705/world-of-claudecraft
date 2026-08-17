@@ -100,6 +100,27 @@ export class WocTradeController {
   /** The Exchange's minimum listing price, fetched once from /status for the
    *  courtesy below-min hint. Null until it answers; null never blocks. */
   private wocTradeMinPriceCents: number | null = null;
+  /** Durable Marketplace-terms acceptance (from /me, or observed on a send
+   *  that carried real consent). Gates the consent row's visibility (R9). */
+  private wocTradeTermsAccepted = false;
+  /** The consent checkbox's state, controller-held so it survives the
+   *  window's wholesale rebuilds (the Exchange window's acceptTerms idiom).
+   *  Reset per trade: consent is per commitment until durably recorded. */
+  private wocTradeTermsChecked = false;
+  /** The buy-now settlement this deal already claimed, so backing out of the
+   *  quote review and pressing Pay again re-quotes THAT settlement instead
+   *  of re-claiming a lock the buyer already holds (buy_now_locked). */
+  private wocTradeSettlementId: number | null = null;
+  /** The staged settlement quote awaiting the buyer's explicit Sign and pay.
+   *  Its presence renders the review panel; spent or abandoned, it clears. */
+  private wocTradeQuote: {
+    totalTokens: number | null;
+    usdCents: number;
+    expiresAtMs: number | null;
+    reference: string | null;
+    transactionBase64: string | null;
+    signatureRequired?: boolean;
+  } | null = null;
   private wocTradePartner: WocTradePartner | null = null;
   /** Whether the lookup has ANSWERED, which null alone cannot express. */
   private wocTradePartnerResolved = false;
@@ -195,6 +216,9 @@ export class WocTradeController {
       tokens: this.wocTradeTokens,
       split: this.wocTradeSplit,
       minPriceCents: this.wocTradeMinPriceCents,
+      termsAccepted: this.wocTradeTermsAccepted,
+      termsChecked: this.wocTradeTermsChecked,
+      quote: this.wocTradeQuote,
       onModeChange: (mode) => {
         this.wocTradeMode = mode;
         this.lastTradeSig = '';
@@ -205,6 +229,18 @@ export class WocTradeController {
       onDeclineOffer: () => void this.cancelWocTradeOffer('decline'),
       onCancelSale: () => void this.cancelWocDirectedSale(),
       onPayOffer: () => void this.payWocTradeOffer(),
+      onTermsChange: (checked) => {
+        // No repaint owed: the DOM checkbox already shows the new state, and
+        // rebuilding here would eat the click's focus (the Exchange idiom).
+        this.wocTradeTermsChecked = checked;
+      },
+      onSignQuote: () => void this.signWocTradeQuote(),
+      onQuoteCancel: () => {
+        // Backing out spends nothing: the settlement stays offered with its
+        // own deadline, and Pay re-quotes it.
+        this.wocTradeQuote = null;
+        this.lastTradeSig = '';
+      },
       pendingOffer: this.wocTradeOffer,
     };
   }
@@ -234,6 +270,8 @@ export class WocTradeController {
           const gone = res.offers.find((o) => o.id === this.wocTradeOffer?.id);
           this.reportResolvedWocOffer(this.wocTradeOffer.id, gone?.status);
           this.wocTradeOffer = null;
+          this.wocTradeQuote = null;
+          this.wocTradeSettlementId = null;
           // The adoption-stored split dies with the deal it described, or a
           // later compose form paints the dead deal's Fee / You receive lines.
           this.wocTradeSplit = null;
@@ -310,6 +348,8 @@ export class WocTradeController {
     this.deps.refreshWocBalance();
     this.wocTradeOffer = null;
     this.wocTradeSplit = null;
+    this.wocTradeQuote = null;
+    this.wocTradeSettlementId = null;
     this.lastTradeSig = '';
     // Closing the trade itself is the sim's call, not a display change: the
     // other player's client must learn the trade is over too. CLOSE, not
@@ -346,6 +386,8 @@ export class WocTradeController {
     this.log(t(CLOSED_KEYS[reason]), '#ff6b6b');
     this.wocTradeOffer = null;
     this.wocTradeSplit = null;
+    this.wocTradeQuote = null;
+    this.wocTradeSettlementId = null;
     this.lastTradeSig = '';
   }
 
@@ -388,6 +430,8 @@ export class WocTradeController {
     const offer = this.wocTradeOffer;
     this.wocTradeOffer = null;
     this.wocTradeSplit = null;
+    this.wocTradeQuote = null;
+    this.wocTradeSettlementId = null;
     if (!hooks || !offer || this.wocTradeFinished.has(offer.id)) return;
     void hooks.client.offers().then((res) => {
       if (!res.ok) return;
@@ -549,37 +593,46 @@ export class WocTradeController {
   }
 
   /**
-   * The buyer pays, from the trade window.
+   * The buyer presses Pay: claim the lock and stage the quote FOR REVIEW.
    *
-   * Exactly the Exchange's own sequence, reused rather than reimplemented: take
-   * the buy-now lock, ask for a settlement quote, hand the SERVER-BUILT
-   * transaction to the wallet bridge, then confirm with the signature. The
-   * client never assembles a transaction, and nothing here computes an amount.
+   * The Exchange's own sequence up to the quote, reused rather than
+   * reimplemented: take the buy-now lock, ask for a settlement quote. It then
+   * STOPS: the review panel shows the token total and the expiry, and only
+   * the explicit Sign and pay hands the SERVER-BUILT transaction to the
+   * wallet (H13: click-to-wallet with nothing shown in between was the
+   * informed-commitment gap). The client never assembles a transaction, and
+   * nothing here computes an amount.
    */
   private async payWocTradeOffer(): Promise<void> {
     const hooks = this.wocMarketHooks;
     const offer = this.wocTradeOffer;
     if (!hooks || !offer || offer.listingId === null || this.wocTradePaying) return;
+    if (this.wocTradeQuote !== null) return; // already under review
     this.wocTradePaying = true;
-    // Show the pending face NOW, not when the next poll happens to notice. The
-    // wallet takes over the screen from here, and coming back to a Pay button
-    // that still looks pressable is what made a successful payment read as a
-    // click that did nothing.
-    this.wocTradeOffer = { ...offer, phase: 'paying' };
-    this.lastTradeSig = '';
     try {
-      const bought = await hooks.client.buyNow({
-        listingId: offer.listingId,
-        characterId: hooks.characterId() ?? 0,
-        // Terms were accepted when the offer was made; the server records them
-        // once per account and this flag is only the per-call assertion.
-        acceptTerms: true,
-      });
-      if (!bought.ok) {
-        this.log(userFacingApiError({ code: bought.code, params: bought.params }), '#ff6b6b');
-        return;
+      // Re-entry after Not now (or a lapsed quote): the buyer already holds
+      // the settlement, and a second buyNow would refuse over their own lock.
+      let settlementId = this.wocTradeSettlementId;
+      let usdCents = offer.usdCents;
+      if (settlementId === null) {
+        const bought = await hooks.client.buyNow({
+          listingId: offer.listingId,
+          characterId: hooks.characterId() ?? 0,
+          // The player's REAL consent state (R9): durable acceptance, or the
+          // consent row's checkbox on this very face. Never a bare true.
+          acceptTerms: this.wocTradeTermsAccepted || this.wocTradeTermsChecked,
+        });
+        if (!bought.ok) {
+          this.log(userFacingApiError({ code: bought.code, params: bought.params }), '#ff6b6b');
+          return;
+        }
+        // The server recorded the acceptance this send carried.
+        this.wocTradeTermsAccepted = true;
+        settlementId = bought.settlement.id;
+        usdCents = bought.settlement.amountCents ?? offer.usdCents;
+        this.wocTradeSettlementId = settlementId;
       }
-      const quoted = await hooks.client.settlementQuote(bought.settlement.id);
+      const quoted = await hooks.client.settlementQuote(settlementId);
       if (!quoted.ok || !quoted.quote.transactionBase64) {
         this.log(
           userFacingApiError(
@@ -591,28 +644,70 @@ export class WocTradeController {
         );
         return;
       }
+      this.wocTradeQuote = {
+        totalTokens: quoted.quote.amount?.tokens ?? null,
+        usdCents,
+        expiresAtMs: quoted.quote.expiresAtMs ?? null,
+        reference: quoted.quote.reference ?? null,
+        transactionBase64: quoted.quote.transactionBase64,
+        ...(quoted.quote.signatureRequired === undefined
+          ? {}
+          : { signatureRequired: quoted.quote.signatureRequired }),
+      };
+      this.lastTradeSig = '';
+    } finally {
+      this.wocTradePaying = false;
+    }
+  }
+
+  /**
+   * The buyer signs the REVIEWED quote: the wallet step and the confirm.
+   */
+  private async signWocTradeQuote(): Promise<void> {
+    const hooks = this.wocMarketHooks;
+    const offer = this.wocTradeOffer;
+    const staged = this.wocTradeQuote;
+    const settlementId = this.wocTradeSettlementId;
+    if (!hooks || !offer || staged === null || settlementId === null || this.wocTradePaying) {
+      return;
+    }
+    this.wocTradePaying = true;
+    // Show the pending face NOW, not when the next poll happens to notice. The
+    // wallet takes over the screen from here, and coming back to a button
+    // that still looks pressable is what made a successful payment read as a
+    // click that did nothing. The staged quote is SPENT either way: a decline
+    // or refusal sends the buyer back to Pay, which re-quotes.
+    this.wocTradeQuote = null;
+    this.wocTradeOffer = { ...offer, phase: 'paying' };
+    this.lastTradeSig = '';
+    try {
       let signature: string;
-      if (quoted.quote.signatureRequired === false) {
+      if (staged.signatureRequired === false) {
         // The service's dev chain: its stand-in transaction is not signable by
         // any wallet, and its verifier matches on the built memo rather than on
         // signature bytes. Handing it to a real wallet threw at atob() before
         // the wallet could even reject it. Explicit permission only, so an
         // absent flag still goes through the wallet.
-        signature = `devsig:${quoted.quote.reference ?? ''}`;
+        signature = `devsig:${staged.reference ?? ''}`;
       } else {
         this.log(t('hudChrome.trade.woc.paying'), '#ffd100');
         try {
-          signature = await hooks.signAndSendTransactionBase64(quoted.quote.transactionBase64);
+          signature = await hooks.signAndSendTransactionBase64(staged.transactionBase64 ?? '');
         } catch (err) {
           // The wallet bridge throws player-facing text already.
           this.log(
             err instanceof Error && err.message ? err.message : t('hudChrome.wocMarket.loadFailed'),
             '#ff6b6b',
           );
+          // Back to the payable face: the decline spent the staged quote,
+          // not the deal.
+          if (this.wocTradeOffer?.id === offer.id) {
+            this.wocTradeOffer = { ...this.wocTradeOffer, phase: 'awaiting_payment' };
+          }
           return;
         }
       }
-      const done = await hooks.client.confirmSettlement(bought.settlement.id, signature);
+      const done = await hooks.client.confirmSettlement(settlementId, signature);
       if (!done.ok) {
         this.log(userFacingApiError({ code: done.code, params: done.params }), '#ff6b6b');
         return;
@@ -668,6 +763,8 @@ export class WocTradeController {
       );
       this.wocTradeOffer = null;
       this.wocTradeSplit = null;
+      this.wocTradeQuote = null;
+      this.wocTradeSettlementId = null;
       this.lastTradeSig = '';
     } else {
       this.log(userFacingApiError({ code: res.code, params: res.params }), '#ff6b6b');
@@ -702,6 +799,8 @@ export class WocTradeController {
     this.log(t('hudChrome.wocMarket.listingCancelled'), '#ffd100');
     this.wocTradeOffer = null;
     this.wocTradeSplit = null;
+    this.wocTradeQuote = null;
+    this.wocTradeSettlementId = null;
     this.lastTradeSig = '';
   }
 
@@ -758,16 +857,15 @@ export class WocTradeController {
       ...(agreed.craftedRecipeId === undefined
         ? {}
         : { itemCraftedRecipeId: agreed.craftedRecipeId }),
-      // The server records acceptance once per account (guardTerms) and this
-      // send is what makes the pay arm's "terms were accepted when the offer
-      // was made" premise hold. IMPLIED consent, deliberately: the panel
-      // renders no terms text yet, the same posture the pay arm below has
-      // always shipped, acceptable only while the market stays config-OFF.
-      // Before enable, the panel owes a real terms affordance (the recorded
-      // pre-enable obligation; the Exchange window's checkbox is the model).
-      acceptTerms: true,
+      // The player's REAL consent (R9): durable acceptance from /me, or the
+      // consent row rendered ON this compose face. The hard-coded true this
+      // replaces recorded acceptance the panel never showed; guardTerms
+      // refuses terms_required honestly when neither holds.
+      acceptTerms: this.wocTradeTermsAccepted || this.wocTradeTermsChecked,
     });
     if (res.ok) {
+      // The server recorded the acceptance this send carried.
+      this.wocTradeTermsAccepted = true;
       // The window STAYS OPEN. The offer now sits in it for both players to
       // read, and the seller accepts from there; closing it here left both
       // sides staring at nothing, with no way to agree.
@@ -836,6 +934,18 @@ export class WocTradeController {
           }
         });
       }
+      // Fresh consent per trade until durably recorded; then learn the
+      // durable state so the row hides for a player who already accepted
+      // (the Exchange window's own contract, via the same /me field).
+      this.wocTradeTermsChecked = false;
+      if (this.wocMarketHooks !== null && !this.wocTradeTermsAccepted) {
+        void this.wocMarketHooks.client.me().then((res) => {
+          if (res.ok && res.activity.termsAcceptedAtMs !== null) {
+            this.wocTradeTermsAccepted = true;
+            this.lastTradeSig = '';
+          }
+        });
+      }
     }
     // Once per counterparty: whether they can be paid in $WOC is server data the
     // sim cannot know (src/sim/social/trade.ts is inside the token firewall), so
@@ -865,6 +975,11 @@ export class WocTradeController {
       this.wocTradeMode,
       this.wocTradePartner,
       this.wocTradeOffer,
+      // The staged quote review and the consent row's visibility are both
+      // structural render state; the CHECKBOX state is deliberately absent
+      // (toggling must not rebuild the subtree under the click).
+      this.wocTradeQuote,
+      this.wocTradeTermsAccepted,
       // The seller's step-up round trip changes the Accept button (Waiting +
       // disabled), so it must invalidate the signature or the pending face is
       // elided and the button reads Accept through the whole wallet handoff.

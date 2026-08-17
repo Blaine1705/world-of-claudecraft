@@ -16762,6 +16762,13 @@
     gap: 6px;
     font-size: 13px;
   }
+  /* The terms link beside the consent checkbox (draft Terms 10.3: linked at
+     the moment of acceptance). */
+  #woc-market-window .wm-terms-link {
+    font-size: 12px;
+    color: var(--gold);
+    text-decoration: underline;
+  }
   #woc-market-window .wm-detail-item {
     display: flex;
     align-items: center;
