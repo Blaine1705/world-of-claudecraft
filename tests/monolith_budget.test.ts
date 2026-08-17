@@ -80,7 +80,12 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again by the castle branch's interior_light_rig.ts extraction;
     // after merging main the merged file lands below both prior pins, so the
     // ceiling is the exact merged count.
-    ceiling: 13689,
+    // Merging release/v0.39.0 again: this branch also extracted the delve
+    // interior build-cache scheduling (the position-keyed rebuild/retire
+    // decision plus the async build loop) into
+    // src/render/delve_interior_tracker.ts, and the merged file lands between
+    // the two pins, so the ceiling is the exact merged count.
+    ceiling: 13664,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
