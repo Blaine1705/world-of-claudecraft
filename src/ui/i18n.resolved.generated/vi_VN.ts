@@ -9997,7 +9997,7 @@ export const vi_VN: EnTranslations = {
       },
       "fear": {
         "name": "Giày Vò",
-        "description": "Gieo nỗi kinh hoàng vào kẻ địch, khiến nó co rúm sợ hãi trong tối đa 8 giây. Mọi sát thương sẽ phá vỡ hiệu ứng."
+        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect."
       },
       "searing_pain": {
         "name": "Nung Đốt",
@@ -10243,7 +10243,7 @@ export const vi_VN: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Dấu Ấn Cốt Táng",
-        "description": "Đánh dấu một kẻ địch trong 12 giây, lưu trữ 20% sát thương gây ra bởi bạn và thuộc hạ Bất Tử của bạn. Thi triển lại để kích nổ nó. Nếu kẻ địch bị đánh dấu chết, nó sẽ nổ trong bán kính 6 thước và tạo 1 Mảnh Linh Hồn."
+        "description": "Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
       },
       "unholy_command": {
         "name": "Mệnh Lệnh Tà Ác",
@@ -10627,7 +10627,7 @@ export const vi_VN: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Tiếng Hú Kinh Hoàng",
-        "description": "Khiến kẻ địch ở gần sợ hãi trong tối đa 3 giây. Sát thương có thể phá hiệu ứng. (thiên phú Warlock)"
+        "description": "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)"
       },
       "ice_block": {
         "name": "Quan Tài Lạnh",

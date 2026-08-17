@@ -9997,7 +9997,7 @@ export const fr_CA: EnTranslations = {
       },
       "fear": {
         "name": "Tourment",
-        "description": "Terrifie l'ennemi et le laisse tremblant pendant un maximum de 8 s. Tout dégât interrompt l'effet."
+        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect."
       },
       "searing_pain": {
         "name": "Cautérisation",
@@ -10243,7 +10243,7 @@ export const fr_CA: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Marque de l'ossuaire",
-        "description": "Marque un ennemi pendant 12 s, stockant 20% des dégâts infligés par vous et vos morts-vivants. Relancez pour la faire détoner. Si l'ennemi marqué meurt, elle explose dans un rayon de 6 m et crée 1 Fragment d'âme."
+        "description": "Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
       },
       "unholy_command": {
         "name": "Commandement impie",
@@ -10627,7 +10627,7 @@ export const fr_CA: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Hurlement d’effroi",
-        "description": "Effraie les ennemis proches pendant un maximum de 3 s. Les dégâts peuvent interrompre l'effet. (talent de Démoniste)"
+        "description": "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)"
       },
       "ice_block": {
         "name": "Cercueil froid",

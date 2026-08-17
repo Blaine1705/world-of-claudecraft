@@ -4367,8 +4367,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.exorcism.name': 'Ritus Pengusiran',
   'entities.abilities.expose_armor.name': 'Tembus Zirah',
   'entities.abilities.faerie_fire.name': 'Cahaya Sihir',
-  'entities.abilities.fear.description':
-    'Menanamkan teror ke dalam musuh, membuatnya gemetar ketakutan hingga 8 detik. Kerusakan apa pun mematahkan efeknya.',
   'entities.abilities.fear.name': 'Cekaman',
   'entities.abilities.ferocious_bite.name': 'Gigitan Berdarah',
   'entities.abilities.fire_blast.description':
@@ -10988,8 +10986,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hammer_of_wrath.description': 'Melontarkan palu suci sebesar {damage} kerusakan dan menghasilkan 1 Pengabdian. Bisa dipakai di bawah 20% nyawa, atau selama Kenaikan Ilahi maupun Murka Pembalas. Murka Fajar memberi satu rapalan tambahan terhadap sasaran mana pun yang mengabaikan waktu jedanya yang sedang berjalan dan memberi 20% kerusakan lebih besar. Kenaikan meningkatkan kerusakannya sebesar 30%.',
   'entities.abilities.healing_stream.description':
     'Memulihkan 120 nyawa target sekutu selama 12 detik. (talenta Shaman)',
-  'entities.abilities.howl_of_terror.description':
-    'Membuat musuh di dekatnya ketakutan hingga 3 detik. Kerusakan dapat membatalkan efek ini. (talenta Warlock)',
   'entities.abilities.ice_block.description':
     'Membungkusmu dalam es padat selama 8 detik, membuatmu kebal terhadap semua kerusakan. Menghapus efek berbahaya biasa yang sudah aktif dan mencegah penerapan efek pengendalian biasa yang baru. Dapat digunakan saat terpana atau berubah wujud. Kamu tidak dapat bertindak selama terbungkus. Rapal lagi untuk membatalkan. (mage)',
   'entities.abilities.inner_focus.description': 'Membuat mantra pendeta berikutnya gratis dan tak bisa diinterupsi. Bertahan 60 dtk.',
@@ -12852,8 +12848,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.needle_of_fate.description':
     'Menusuk musuh sebesar {damage} kerusakan Bayangan dan menghasilkan 5 Kecaman jika musuh itu menyandang Evil Eye-mu. Setiap pukulan pada Evil Eye utamamu menambah 1 Benang Takdir selama 12 detik, hingga 3. Jika tidak ada Evil Eye, Needle terlebih dahulu menandai targetnya.',
   'entities.abilities.needle_of_fate.name': 'Needle of Fate',
-  'entities.abilities.ossuary_mark.description':
-    'Menandai musuh selama 12 detik, menyimpan 20% dari kerusakan yang diberikan olehmu dan mayat hidupmu. Rapal ulang untuk meledakkannya. Jika musuh yang ditandai mati, ia meledak dalam radius 6 m dan menciptakan 1 Serpihan Jiwa.',
   'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
   'entities.abilities.possess_evil_eye.description':
     'Maledictor merasuki Evil Eye utamamu selama 15 detik dan menghasilkan 35 Kecaman. Needle of Fate dirapal dalam 1 detik dan menghasilkan 2 Kecaman tambahan, Melahap dapat disalurkan sambil bergerak, dan Sentence memberikan 25% kerusakan lebih besar dan melepaskan gema tertunda sebesar 60% kerusakan, menurun menjadi 30% sepanjang level 17-20.',

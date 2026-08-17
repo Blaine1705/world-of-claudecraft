@@ -9997,7 +9997,7 @@ export const es_ES: EnTranslations = {
       },
       "fear": {
         "name": "Espanto",
-        "description": "Siembra terror en el enemigo y lo deja encogido durante hasta 8 s. Cualquier daño rompe el efecto."
+        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect."
       },
       "searing_pain": {
         "name": "Abrasar",
@@ -10243,7 +10243,7 @@ export const es_ES: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Marca a un enemigo durante 12 s, almacenando el 20% del daño que tú y tus no muertos infligís. Vuelve a lanzarla para detonarla. Si el enemigo marcado muere, explota en un radio de 6 m y crea 1 Fragmento de alma."
+        "description": "Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
       },
       "unholy_command": {
         "name": "Mandato profano",
@@ -10627,7 +10627,7 @@ export const es_ES: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Aullido Pavoroso",
-        "description": "Aterroriza a los enemigos cercanos hasta 3 s. El daño puede romper el efecto. (talento de Brujo)"
+        "description": "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)"
       },
       "ice_block": {
         "name": "Ataúd Helado",

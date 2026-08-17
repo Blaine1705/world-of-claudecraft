@@ -3056,7 +3056,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.drain_life.description': '吞噬目標的生命力，每秒造成 {damage} 點暗影傷害，並將其中的 70% 轉化為生命傳給你。痛苦則改為全部轉化。當引導在你的主邪眼之上時，它會在開始時消耗全部命運絲線，而每一根絲線都會讓每一跳額外產生 1 點譴罪。',
   'entities.abilities.fear.name': '折魂',
   'entities.abilities.fear.description':
-    '使敵人陷入恐懼並畏縮，最多持續 8 秒。任何傷害都會打破效果。',
+    '使敵人陷入恐懼並畏縮，最多持續 5 秒。累計達到目標最大生命值 8% 的傷害會打破效果。',
   'entities.abilities.searing_pain.name': '焦灼',
   'entities.abilities.searing_pain.description':
     '以痛苦烈焰灼燒敵人，造成 {damage} 點火焰傷害。施法迅速。',
@@ -9387,7 +9387,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     '在12秒內為一個友方目標恢復120點生命值。（薩滿天賦）',
   'entities.abilities.howl_of_terror.description':
-    '使附近的敵人恐懼，最多持續3秒。受到傷害可能打破該效果。（術士天賦）',
+    '使附近的敵人恐懼，最多持續 5 秒。累計達到目標最大生命值 8% 的傷害會打破其恐懼效果。（術士天賦）',
   'entities.abilities.ice_block.description':
     '將你封入堅冰8秒，使你免疫所有傷害。移除已存在的一般有害效果，並阻止新的一般控制效果施加於你。可在昏迷或變形狀態下使用。被封凍期間無法行動。再次施放可取消。（法師）',
   'entities.abilities.inner_focus.description': '使你的下一個牧師法術免費且無法被打斷。持續 60 秒。',
@@ -11482,7 +11482,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '立即用神聖鎖鏈束縛一名遠處敵人。敵人以每秒 18 公尺的速度向你移動，直至距離 3 公尺，隨後移動速度降低 50%，持續 4 秒。昇華期間還會束縛附近的第二名敵人。',
   'entities.abilities.oath_chain.name': '誓約鎖鏈',
   'entities.abilities.ossuary_mark.description':
-    '為敵人標記12秒，儲存你與你的亡靈所造成傷害的20%。再次施放可將其引爆。若被標記的敵人死亡，印記會在6碼內爆炸，並產生1枚靈魂碎片。',
+    '為敵人標記15秒，儲存你與你的亡靈所造成傷害的20%。再次施放可將其引爆。若被標記的敵人死亡，印記會在6碼內爆炸，並產生1枚靈魂碎片。',
   'entities.abilities.ossuary_mark.name': '骸骨印記',
   'entities.abilities.overbloom.description':
     '消耗5層繁茂。收割你在所有盟友身上的持續治療，以其剩餘治療量的60%立即治療，移除這些效果，並在目標身上種下一次新的野性綻放。',

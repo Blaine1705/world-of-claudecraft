@@ -9997,7 +9997,7 @@ export const pt_BR: EnTranslations = {
       },
       "fear": {
         "name": "Atormentar",
-        "description": "Aterroriza o inimigo, deixando-o acuado por até 8 s. Qualquer dano quebra o efeito."
+        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect."
       },
       "searing_pain": {
         "name": "Cauterizar",
@@ -10243,7 +10243,7 @@ export const pt_BR: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Marca um inimigo por 12 s, armazenando 20% do dano causado por você e seus mortos-vivos. Lance novamente para detoná-la. Se o inimigo marcado morrer, ela explode num raio de 6 m e cria 1 Fragmento de Alma."
+        "description": "Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10627,7 +10627,7 @@ export const pt_BR: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Uivo de Terror",
-        "description": "Amedronta os inimigos próximos por até 3 s. O dano pode interromper o efeito. (talento de Bruxo)"
+        "description": "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)"
       },
       "ice_block": {
         "name": "Caixão Frio",

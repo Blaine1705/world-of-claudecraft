@@ -9997,7 +9997,7 @@ export const zh_CN: EnTranslations = {
       },
       "fear": {
         "name": "惊惧",
-        "description": "使敌人陷入恐惧并畏缩，最多持续 8 秒。任何伤害都会打破效果。"
+        "description": "使敌人陷入恐惧并畏缩，最多持续 5 秒。累计达到目标最大生命值 8% 的伤害会打破效果。"
       },
       "searing_pain": {
         "name": "焦灼",
@@ -10243,7 +10243,7 @@ export const zh_CN: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "骸骨印记",
-        "description": "为敌人标记12秒，储存你与你的亡灵所造成伤害的20%。再次施放可将其引爆。若被标记的敌人死亡，印记会在6码内爆炸，并生成1枚灵魂碎片。"
+        "description": "为敌人标记15秒，储存你与你的亡灵所造成伤害的20%。再次施放可将其引爆。若被标记的敌人死亡，印记会在6码内爆炸，并生成1枚灵魂碎片。"
       },
       "unholy_command": {
         "name": "邪秽号令",
@@ -10627,7 +10627,7 @@ export const zh_CN: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "恐惧嚎叫",
-        "description": "使附近的敌人恐惧，最多持续3秒。受到伤害可能打破该效果。（术士天赋）"
+        "description": "使附近的敌人恐惧，最多持续 5 秒。累计达到目标最大生命值 8% 的伤害会打破其恐惧效果。（术士天赋）"
       },
       "ice_block": {
         "name": "寒冰棺",

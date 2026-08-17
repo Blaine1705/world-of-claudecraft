@@ -3054,7 +3054,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.drain_life.description': '吞噬目标的生命力，每秒造成 {damage} 点暗影伤害，并将其中的 70% 转化为生命传给你。痛苦则改为全部转化。当引导在你的主邪眼之上时，它会在开始时消耗全部命运丝线，而每一根丝线都会让每一跳额外产生 1 点谴罪。',
   'entities.abilities.fear.name': '惊惧',
   'entities.abilities.fear.description':
-    '使敌人陷入恐惧并畏缩，最多持续 8 秒。任何伤害都会打破效果。',
+    '使敌人陷入恐惧并畏缩，最多持续 5 秒。累计达到目标最大生命值 8% 的伤害会打破效果。',
   'entities.abilities.searing_pain.name': '焦灼',
   'entities.abilities.searing_pain.description':
     '以痛苦烈焰灼烧敌人，造成 {damage} 点火焰伤害。施法迅速。',
@@ -9388,7 +9388,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     '在12秒内为一个友方目标恢复120点生命值。（萨满天赋）',
   'entities.abilities.howl_of_terror.description':
-    '使附近的敌人恐惧，最多持续3秒。受到伤害可能打破该效果。（术士天赋）',
+    '使附近的敌人恐惧，最多持续 5 秒。累计达到目标最大生命值 8% 的伤害会打破其恐惧效果。（术士天赋）',
   'entities.abilities.ice_block.description':
     '将你封入坚冰8秒，使你免疫所有伤害。移除已存在的普通有害效果，并阻止新的普通控制效果施加于你。可在昏迷或变形状态下使用。被封冻期间无法行动。再次施放可取消。（法师）',
   'entities.abilities.inner_focus.description': '使你的下一个牧师法术免费且无法被打断。持续 60 秒。',
@@ -11479,7 +11479,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '立即用神圣锁链束缚一名远处敌人。敌人以每秒 18 米的速度向你移动，直至距离 3 米，随后移动速度降低 50%，持续 4 秒。升华期间还会束缚附近的第二名敌人。',
   'entities.abilities.oath_chain.name': '誓约锁链',
   'entities.abilities.ossuary_mark.description':
-    '为敌人标记12秒，储存你与你的亡灵所造成伤害的20%。再次施放可将其引爆。若被标记的敌人死亡，印记会在6码内爆炸，并生成1枚灵魂碎片。',
+    '为敌人标记15秒，储存你与你的亡灵所造成伤害的20%。再次施放可将其引爆。若被标记的敌人死亡，印记会在6码内爆炸，并生成1枚灵魂碎片。',
   'entities.abilities.ossuary_mark.name': '骸骨印记',
   'entities.abilities.overbloom.description':
     '消耗你的5层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的60%，这些效果随之移除，并为目标种下一个新的野性绽放。',

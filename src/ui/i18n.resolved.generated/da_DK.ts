@@ -9997,7 +9997,7 @@ export const da_DK: EnTranslations = {
       },
       "fear": {
         "name": "Hjemsøg",
-        "description": "Slår rædsel i fjenden, så den kryber sammen i op til 8 sek. Enhver skade bryder effekten."
+        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect."
       },
       "searing_pain": {
         "name": "Svid",
@@ -10243,7 +10243,7 @@ export const da_DK: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Mærker en fjende i 12 sek. og opbevarer 20% af skaden, du og dine udøde gør. Kast igen for at detonere det. Hvis det mærkede mål dør, eksploderer det inden for 6 m og skaber 1 Sjælesplint."
+        "description": "Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10627,7 +10627,7 @@ export const da_DK: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Rædselshyl",
-        "description": "Skræmmer fjender i nærheden i op til 3 sek. Skade kan bryde effekten. (troldmandstalent)"
+        "description": "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)"
       },
       "ice_block": {
         "name": "Kold kiste",
