@@ -8,7 +8,7 @@ import { ABILITIES } from '../src/sim/content/classes';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import { DT, type Entity } from '../src/sim/types';
 
 function rig(rows: Record<number, string>, spec = 'destruction') {
   const sim = new Sim({ seed: 73, playerClass: 'warlock', autoEquip: true });
@@ -69,7 +69,7 @@ describe('warlock class talent tree', () => {
     expect(player.auras.some((aura) => aura.id === 'sacrilegious_march')).toBe(false);
   });
 
-  it('makes Leaden Hex a 15% maximum snare followed by a 1.5 sec root', () => {
+  it('makes Leaden Hex a 15% maximum snare followed by a 3.5 sec root', () => {
     const { sim, player } = rig({ 8: 'wlk_r8_curse_of_exhaustion' });
     const target = addTarget(sim);
 
@@ -84,7 +84,7 @@ describe('warlock class talent tree', () => {
     expect(target.auras.some((aura) => aura.id === 'wlk_leaden_hex_slow')).toBe(false);
     expect(target.auras.find((aura) => aura.id === 'wlk_leaden_hex_root')).toMatchObject({
       kind: 'root',
-      remaining: 1.5,
+      remaining: 3.5,
     });
     expect(target.auras.find((aura) => aura.id === 'wlk_leaden_hex_root_lock')).toMatchObject({
       kind: 'internal_cd',
@@ -355,6 +355,7 @@ describe('warlock class talent tree', () => {
     const hpBefore = target.hp;
     sim.castAbility('abyssal_rift', undefined, center);
     expect(target.hp).toBeLessThan(hpBefore);
+    expect(player.cooldowns.get('abyssal_rift')).toBe(45);
     expect(Math.hypot(target.pos.x - center.x, target.pos.z - center.z)).toBeLessThan(
       beforeDistance,
     );
@@ -362,6 +363,27 @@ describe('warlock class talent tree', () => {
       kind: 'stun',
       remaining: 2,
     });
+
+    player.gcdRemaining = 0;
+    player.resource = player.maxResource;
+    const hpDuringCooldown = target.hp;
+    sim.castAbility('abyssal_rift', undefined, center);
+    expect(target.hp).toBe(hpDuringCooldown);
+
+    target.hostile = false;
+    player.maxHp = player.hp = 1_000_000;
+    tick(sim, 20 * 45 - 1);
+    expect(player.cooldowns.get('abyssal_rift')).toBeGreaterThan(0);
+    tick(sim, 1);
+    expect(player.cooldowns.get('abyssal_rift')).toBeLessThan(DT);
+    tick(sim, 1);
+    expect(player.cooldowns.has('abyssal_rift')).toBe(false);
+
+    target.hostile = true;
+    player.gcdRemaining = 0;
+    player.resource = player.maxResource;
+    sim.castAbility('abyssal_rift', undefined, center);
+    expect(player.cooldowns.get('abyssal_rift')).toBe(45);
   });
 
   it('damages bosses with Abyssal Rift without pulling or stunning them', () => {

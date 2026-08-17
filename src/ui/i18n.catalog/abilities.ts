@@ -1587,7 +1587,7 @@ const classAbilityNamesEn = {
       [
         'fear',
         'Harrow',
-        'Strikes terror into the enemy, leaving it cowering for up to 8 sec. Any damage breaks the effect.',
+        "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect.",
       ],
       [
         'searing_pain',
@@ -1884,7 +1884,7 @@ const classAbilityNamesEn = {
       [
         'ossuary_mark',
         'Ossuary Mark',
-        'Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment.',
+        'Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment.',
       ],
       [
         'unholy_command',
@@ -2352,7 +2352,7 @@ const classAbilityNamesEn = {
       [
         'howl_of_terror',
         'Dread Chorus',
-        'Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)',
+        "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)",
       ],
       [
         'ice_block',
