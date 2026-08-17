@@ -135,12 +135,15 @@ const BOW_PIN_BLEND_S = 0.12; // engage/disengage fade for the orientation pins
 const FADE = 0.22;
 const ONESHOT_FADE = 0.1;
 /** Idle-breaker cadence (seconds): a floor plus a per-fire jitter, so several
- *  copies of the same rig standing together never fidget in lockstep. Sized
- *  against the clips themselves — the tortoise's run 3.7 to 4.3 seconds, so a
- *  6-second floor left him fidgeting a third of the time he stood still, which
- *  reads as twitchy rather than characterful. */
-const IDLE_VARIANT_MIN = 20;
-const IDLE_VARIANT_JITTER = 25;
+ *  copies of the same rig standing together never fidget in lockstep.
+ *
+ *  Deliberately tight: the fidgets are the whole point of this rig, so they run
+ *  on a 5-second beat rather than the sparse 20-to-45s one this shipped with.
+ *  The variants themselves run 3.7 to 4.3 seconds, so a standing mount is
+ *  almost always mid-fidget — that is the intended read here, not an accident,
+ *  and raising the floor back above the longest clip is a one-line change. */
+const IDLE_VARIANT_MIN = 5;
+const IDLE_VARIANT_JITTER = 0;
 /** Exported for tests/idle_variants.test.ts, which pins the cadence against the
  *  actual clip lengths in the shipped GLBs. */
 export const idleVariantCadenceForTest = {

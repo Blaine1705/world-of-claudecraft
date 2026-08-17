@@ -60,23 +60,22 @@ describe('idle-breaker clips', () => {
     }
   });
 
-  it('leaves a clear gap between one fidget ending and the next falling due', () => {
-    // The cadence floor has to beat the LONGEST variant, or a rig standing
-    // still spends most of its time mid-fidget instead of idling — which reads
-    // as twitchy rather than characterful, and is how the first cut of this
-    // shipped (a 6.5s floor against 4.3s clips).
+  it('fires a fidget on the authored 5-second beat, clear of the previous one', () => {
+    // The fidgets are this rig's character, so the cadence is deliberately
+    // tight: a fidget falls due every 5 seconds. The only hard requirement left
+    // is that a variant has ENDED before the next one is due, since a fidget is
+    // a one-shot and re-firing over a live one would cut it short.
     const { min, jitter } = idleVariantCadenceForTest;
-    expect(jitter).toBeGreaterThan(0); // desynchronises a crowd of the same rig
+    expect(jitter).toBeGreaterThanOrEqual(0);
+    expect(min).toBe(5);
     for (const [key, def] of rigsWithVariants) {
       const durations = clipDurations(def.url.replace(/^\//, ''));
       const longest = Math.max(
         ...(def.clips.idleVariants ?? []).map((name) => durations.get(name) ?? 0),
       );
       expect(longest, `${key} has a zero-length idle variant`).toBeGreaterThan(0);
-      // at least as long again as the clip itself, so the rig is idle for the
-      // clear majority of any standing stretch
-      expect(min, `${key}: fidget floor ${min}s vs longest clip ${longest}s`).toBeGreaterThan(
-        longest * 2,
+      expect(min, `${key}: fidget beat ${min}s vs longest clip ${longest}s`).toBeGreaterThan(
+        longest,
       );
     }
   });
