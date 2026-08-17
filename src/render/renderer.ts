@@ -5677,14 +5677,18 @@ export class Renderer {
     await compilePromise;
   }
 
-  // Link the local player's own body spirit (ghost) transparent variants off-thread,
-  // so a later spirit release reuses cached programs instead of linking inline.
-  // Applies ghost materials to the real skinned meshes, runs compileAsync's prologue,
-  // then restores the opaque originals before awaiting the linker.
-  private async warmSelfSpirit(): Promise<void> {
-    if (!this.asyncCompileSupported || this.sim.player.ghost) return;
+  // Link the local player's own body spirit (ghost) transparent variants
+  // off-thread so a later spirit release reuses cached programs instead of
+  // linking ~20 inline on the ungated self view (the ~2.2 s death stall).
+  // Applies the ghost materials to the REAL skinned meshes (so the variant
+  // matches the flip's skinning/morph), runs compileAsync's synchronous
+  // prologue, then restores the opaque originals BEFORE awaiting the linker
+  // (the compileShadowPrograms restore-early pattern): no frame draws the ghost,
+  // and the clones the flip reuses stay cached on the visual.
+  private async warmSelfSpirit(): Promise<boolean> {
+    if (!this.asyncCompileSupported || this.sim.player.ghost) return false;
     const visual = this.views.get(this.sim.player.id)?.visual;
-    if (!visual) return;
+    if (!visual) return false;
     const previousTarget = this.webgl.getRenderTarget();
     // Composer tiers link the ghost variant against their offscreen colour space.
     if (this.post) this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
@@ -5698,6 +5702,7 @@ export class Renderer {
       visual.setGhost(false);
     }
     await compilePromise;
+    return true;
   }
 
   // A tiny throwaway target for background child uploads, so a prewarm root
@@ -11162,7 +11167,7 @@ export class Renderer {
       if (!v.visual) continue;
       // Warm the local player's own spirit variants once per distinct look, so
       // a death spirit-release never links them inline on the ungated self view.
-      if (e.id === this.sim.player.id) {
+      if (e.id === this.sim.player.id && this.asyncCompileSupported && !this.sim.player.ghost) {
         this.selfSpirit.observe(v.visual, e.skin, e.mainhandItemId, e.offhandItemId);
       }
       if (iceBlockActivated) this.activeVisual(v)?.playEmote('wave', 1);
