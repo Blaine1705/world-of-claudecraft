@@ -65,8 +65,10 @@ export interface PortraitChipOpts {
 }
 
 /** Class crest data URL — the placeholder before the 3D portrait is ready and
- *  the small class badge overlaid on the portrait. */
-function crestUrl(cls: PlayerClass): string {
+ *  the small class badge overlaid on the portrait. Exported for the
+ *  paperdoll cold-open stand-in (preview_stand_in.ts), which climbs the same
+ *  ladder while the preview's programs link. */
+export function crestUrl(cls: PlayerClass): string {
   return iconDataUrl('crest', `class_${cls}`, 96);
 }
 
@@ -99,7 +101,13 @@ export function portraitChipHtml(opts: PortraitChipOpts): string {
   const source = src ? ` src="${src}"` : '';
   const crestId = `class_${cls}`;
   const fallbackAttrs = crestImageFallbackAttributes(crestId, 96);
-  const portraitFallbackAttrs = !portrait && !deferSource ? ` ${fallbackAttrs}` : '';
+  // A chip with no embedded portrait carries the crest fallback, INCLUDING the
+  // deferSource one: it ships with no src at all, so without this a hydration
+  // that never lands (or lands with the portrait still capturing) leaves a
+  // permanently empty box. The attributes cost no data URL in the markup;
+  // hydrateCrestImageFallbacks paints the crest after mount and
+  // hydratePortraits clears it when the real headshot arrives.
+  const portraitFallbackAttrs = portrait && !deferSource ? '' : ` ${fallbackAttrs}`;
   const pending = portrait && !deferSource ? '' : ' data-portrait-pending="1"';
   const fallbackCls = portrait && !deferSource ? '' : ' is-fallback';
   // A composed chip built before assets were ready holds the crest, and
@@ -158,5 +166,11 @@ export function hydratePortraits(
 onPortraitsReady(() => hydratePortraits(document));
 onPortraitUpdate((visualKey, skin) => {
   if (!visualKey.startsWith('player_')) return;
+  // A mech chip carries the WEARER's class in data-cls and the chroma in
+  // data-skin, so no class filter can name it: rehydrate the whole page.
+  if (visualKey === 'player_mech') {
+    hydratePortraits(document);
+    return;
+  }
   hydratePortraits(document, visualKey.slice('player_'.length) as PlayerClass, skin);
 });

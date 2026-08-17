@@ -38,6 +38,24 @@ describe('portrait chip deferred source', () => {
     expect(html).toContain('decoding="async"');
   });
 
+  it('marks the deferred chip for the crest fallback, so it is never an empty box', () => {
+    // deferSource ships no src at all: without the marker a hydration that
+    // never lands (the portrait is still capturing, or the pass is missed)
+    // leaves the ring blank forever. hydrateCrestImageFallbacks paints the
+    // crest into it after mount, still with no data URL in the markup.
+    const html = portraitChipHtml({
+      cls: 'mage',
+      name: 'Mage',
+      badge: false,
+      deferSource: true,
+    });
+    const portraitTag = html.match(/<img class="portrait-img"[^>]+>/)?.[0] ?? '';
+    expect(portraitTag).toContain('data-crest-fallback-id="class_mage"');
+    expect(portraitTag).toContain('data-crest-fallback-size="96"');
+    expect(portraitTag).not.toContain('src=');
+    expect(html).not.toContain('base64');
+  });
+
   it('draws the mech body for a mech-catalog chip, ignoring any look', () => {
     const html = portraitChipHtml({
       cls: 'mage',

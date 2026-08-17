@@ -448,6 +448,7 @@ const RENDER_PURE_CORES = [
   'src/render/quest_object_gate_core.ts',
   'src/render/adaptive_link_budget_core.ts',
   'src/render/affliction_familiar_core.ts',
+  'src/render/characters/portrait_capture_lane_core.ts',
   'src/render/characters/portrait_prewarm_core.ts',
   'src/render/characters/soul_rend_prewarm_core.ts',
   'src/render/characters/design_code_core.ts',

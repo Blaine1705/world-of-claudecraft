@@ -56,7 +56,12 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   drives it live via `setModular`) with `preview_appearance.ts`,
   `preview_policy.ts`, `preview_framing.ts`.
 - Portraits: `portrait.ts` (offscreen-WebGL headshot factory, caches data
-  URLs) + `portrait_framing.ts` (pure framing math per `PortraitFraming`).
+  URLs) + `portrait_framing.ts` (pure framing math per `PortraitFraming`) +
+  `portrait_prewarm_core.ts` (the async capture's step order) +
+  `portrait_capture_lane_core.ts` (one live capture per cache key). The LIVE
+  getters never capture on the calling frame: a miss answers null, kicks the
+  async capture through the lane, and fires `onPortraitUpdate` when it lands
+  (the composed `modularPortraitDataUrl` is still synchronous).
 - Weapons/props: `weapon_grip.ts`, `held_item_grips.ts`, `back_grips.ts`,
   `stow_transition.ts`, `skin_attack.ts`, `weapon_skin_materials.ts`, and
   `weapon_attack_style_core.ts`, a CROSS-SUBSYSTEM seam
