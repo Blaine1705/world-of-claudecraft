@@ -9483,7 +9483,11 @@ export const TARGETS = [
         () => !document.querySelector('#loading-screen')?.classList.contains('visible'),
         { timeout: 90000, polling: 200 },
       );
-      await wait(2500);
+      // The dummy body is lazy-preloaded (manifest.ts mob_training_dummy): the
+      // fetch only starts once one is in view, so a short settle races it and
+      // the mobile frame shot an empty hillside. This settle is sized for that
+      // round trip under SwiftShader, not for the HUD.
+      await wait(15000);
       return {};
     },
   },
