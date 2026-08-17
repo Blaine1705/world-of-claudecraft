@@ -270,7 +270,7 @@ import {
   sanitizeItemInstancePayloadOnLoad,
   warnDroppedInstanceKeys,
 } from './item_instance_load';
-import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
+import { canStackInstancePayloads } from './item_instance_merge';
 import { meetsLevelRequirement } from './item_level_req';
 import { setItemLocked as setItemLockedCmd } from './item_lock';
 import * as items from './items';
@@ -3158,9 +3158,10 @@ export class Sim {
       }
       // The shared tamper ceiling (bags.ts instancedCountCap, same rule as the
       // bank arm below): a counted instanced slot loads capped at what
-      // identical-payload merges could legitimately have built, and a
-      // charge-bearing payload stays one-per-slot, so a hand-edited count can
-      // never launder into independent copies via a later deposit or trade.
+      // identical-payload merges or an in-place whole-stack lock could
+      // legitimately have built, and a charge-bearing payload stays
+      // one-per-slot, so a hand-edited count can never launder into
+      // independent copies via a later deposit or trade.
       meta.inventory = s.inventory.map((raw) => {
         const slot = cloneInvSlot(raw);
         slot.count = Math.min(slot.count, instancedCountCap(ITEMS[slot.itemId], slot.instance));
@@ -3230,9 +3231,10 @@ export class Sim {
       // merges past the stack cap are legitimate here (recordVendorBuyback
       // merges an entire multi-unit sale into one row, and buyBackItem
       // re-splits on the way out). The one arm that must clamp is charges: a
-      // charge-bearing payload can never merge, so a legitimate charge row is
-      // always count 1, and a hand-edited count would mint independent
-      // charge-bearing copies through the grant's fresh-slot clone.
+      // charge-bearing payload shares mutable state across the counted row,
+      // and a hand-edited count would mint independent charge-bearing copies
+      // through the grant's fresh-slot clone. A player lock alone is not a
+      // charge payload, so it does not make a saved counted row lossy.
       meta.vendorBuyback = (s.vendorBuyback ?? []).map((raw) => {
         const slot = cloneInvSlot(raw);
         // Rift rebuild FIRST, the same order as the bags arm above (the
@@ -3255,7 +3257,7 @@ export class Sim {
           if (payload) slot.instance = payload;
           else delete slot.instance;
         }
-        if (slot.instance && !isMergeableInstancePayload(slot.instance)) slot.count = 1;
+        if (slot.instance?.charges !== undefined) slot.count = 1;
         return slot;
       });
       // Bank sanitizes on load (never destroys items; a pre-bank save has no `bank`
