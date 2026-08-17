@@ -4,6 +4,7 @@ import {
   awaitCompileGate,
   CompileGateQueue,
   type CompileGateScheduler,
+  SerialGateLane,
   settlePendingSwap,
 } from '../src/render/compile_gate';
 
@@ -188,6 +189,61 @@ describe('CompileGateQueue', () => {
     void gate('three');
     for (let index = 0; index < 12; index++) await Promise.resolve();
     expect(started).toEqual(['one', 'two']);
+  });
+});
+
+describe('SerialGateLane', () => {
+  // A promise chain settles over a few microtasks; a macrotask hop is the
+  // robust "everything queued has run" boundary.
+  const tick = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+
+  it('starts one gate at a time, in arrival order, and runs each caller reaction on its settle', async () => {
+    const lane = new SerialGateLane();
+    const started: string[] = [];
+    const settles: Record<string, () => void> = {};
+    const reactions: string[] = [];
+    for (const name of ['a', 'b', 'c']) {
+      lane.enqueue(
+        (settled) => {
+          started.push(name);
+          settles[name] = settled;
+        },
+        () => reactions.push(name),
+      );
+    }
+    expect(lane.pending).toBe(3);
+    await tick();
+    // only the head started
+    expect(started).toEqual(['a']);
+    settles.a();
+    // a double settle is inert
+    settles.a();
+    expect(reactions).toEqual(['a']);
+    await tick();
+    expect(started).toEqual(['a', 'b']);
+    expect(lane.pending).toBe(2);
+    settles.b();
+    await tick();
+    expect(started).toEqual(['a', 'b', 'c']);
+    settles.c();
+    expect(reactions).toEqual(['a', 'b', 'c']);
+    expect(lane.pending).toBe(0);
+  });
+
+  it('a gate that settles synchronously frees the lane for the next at once', async () => {
+    const lane = new SerialGateLane();
+    const started: string[] = [];
+    lane.enqueue((settled) => {
+      started.push('sync');
+      settled();
+    });
+    lane.enqueue((settled) => {
+      started.push('next');
+      settled();
+    });
+    await tick();
+    expect(started).toEqual(['sync', 'next']);
+    expect(lane.pending).toBe(0);
   });
 });
 

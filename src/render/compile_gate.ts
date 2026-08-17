@@ -109,6 +109,48 @@ export class CompileGateQueue {
 }
 
 /**
+ * Strictly serial lane for gates whose targets arrive in a BURST and whose
+ * first draw pays for every link still in flight on the driver: the composed
+ * far bakes of a crowd crossing the far band (twenty wraps minted inside a
+ * second). Released tails let all of their links pile onto the driver's compile
+ * threads at once, and on drivers that finish a program lazily at its first
+ * use (measured on the Intel iGPU: 360 to 380 ms for one settled program
+ * behind a dozen queued links) the settled bake still stalled. One gate's link
+ * at a time, in arrival order, keeps that queue one wrap deep. `start` runs the
+ * gate and must call the settle callback exactly once (also on failure), or the
+ * lane stalls; the renderer's gates always do (recovery calls it too).
+ */
+export class SerialGateLane {
+  private tail: Promise<void> = Promise.resolve();
+  private depth = 0;
+
+  /** Gates enqueued and not yet settled (diagnostics and tests). */
+  get pending(): number {
+    return this.depth;
+  }
+
+  /** Queue one gate: `start` runs when the lane is free and gets the settle
+   *  callback to hand to the gate; `onSettled` (the caller's own reaction)
+   *  runs on that settle, before the next gate starts. */
+  enqueue(start: (settled: () => void) => void, onSettled: () => void = () => {}): void {
+    this.depth++;
+    this.tail = this.tail.then(
+      () =>
+        new Promise<void>((resolve) => {
+          let done = false;
+          start(() => {
+            if (done) return;
+            done = true;
+            this.depth--;
+            onSettled();
+            resolve();
+          });
+        }),
+    );
+  }
+}
+
+/**
  * Clears a shared "which target is this pending swap for" token, but only if it
  * still names `owner`. Some renderer.ts call sites reuse ONE EntityView field
  * across a family of mutually exclusive gated swaps instead of one pending flag

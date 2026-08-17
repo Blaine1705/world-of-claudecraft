@@ -53,6 +53,7 @@ import {
   takeFarBakeBudget,
   tintedFarMaterials,
 } from './assets';
+import { farMeshShown, shadowProxyShown } from './far_lod_reveal_core';
 import { HairSwayDriver } from './hair_sway';
 import { buildHalo } from './halo';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
@@ -88,6 +89,12 @@ import {
 } from './weapon_skin_materials';
 
 export type { AnimState, BaseState } from './anim_state';
+
+/** The renderer's live compile gate for a far LOD minted (or re-skinned) after
+ *  the view's own creation gate ran: compile `target` hidden, off-thread, and
+ *  call `onSettled` once its programs are linked (or immediately when async
+ *  compile is unsupported). Mirrors renderer `gateSwapFlagOnCompile`. */
+export type FarBakeGate = (target: THREE.Object3D, onSettled: () => void) => void;
 
 // Current canvas height in device pixels, pushed by the renderer on resolution
 // changes so newly created weapon-skin VFX rigs size their point sprites right.
@@ -466,6 +473,28 @@ export class CharacterVisual {
    *  visual stays articulated meanwhile (correct, just not yet cheap). */
   private farBakePending = false;
   private shadowProxy: THREE.Mesh | null = null;
+  /** The far mesh and its shadow proxy under one node, so the compile gate
+   *  walks both (colour + depth arms) in one pass. */
+  private farWrap: THREE.Group | null = null;
+  /** The far LOD's freshly minted materials are still linking off-thread
+   *  behind the renderer's compile gate (setFarBakeGate). While true the far
+   *  mesh counts as absent: the articulated rig keeps drawing and the far
+   *  mesh + shadow proxy stay hidden (far_lod_reveal_core). */
+  private farCompilePending = false;
+  /** The compile gate the renderer installs; null (previews, tests, hosts
+   *  without one) reveals a fresh far bake immediately, as before the gate. */
+  private farBakeGate: FarBakeGate | null = null;
+  /** The renderer's per-frame shadow-plan answer for the far shadow proxy,
+   *  kept so a proxy that could not show yet (mint still linking) reveals on
+   *  settle without waiting for the next plan write. */
+  private proxyShadowWanted = false;
+  /** Skin swap-on-settle: the far material set a skin change rebuilt is
+   *  compiled hidden on `farSkinScratch` (same geometry and flags as the far
+   *  mesh, so three keys the same programs) while the far mesh keeps drawing
+   *  its current set, and swapped in when the gate settles. `pendingFarClaims`
+   *  is that set's tinted-material lease until then. */
+  private farSkinScratch: THREE.Mesh | null = null;
+  private pendingFarClaims: TintedMaterialClaims | null = null;
   private casters: THREE.Mesh[] = [];
   private originalMaterials = new Map<THREE.Mesh, THREE.Material | THREE.Material[]>();
   /** The halo's build-time shared additive material. Re-snapshots after a
@@ -802,10 +831,7 @@ export class CharacterVisual {
     // part set gets a slot (or someone else bakes it, making the peek free).
     if (this.farBakePending && this.far && !this.farBakeTried) {
       this.attemptComposedFar();
-      if (this.farMesh) {
-        this.modelWrap.visible = false;
-        this.farMesh.visible = true;
-      }
+      this.syncFarVisibility();
     }
     this.hitCooldown = Math.max(0, this.hitCooldown - dt);
     this.updateMetamorphWings(dt, s, reducedMotion);
@@ -1498,7 +1524,8 @@ export class CharacterVisual {
   }
 
   setProxyShadow(on: boolean): void {
-    if (this.shadowProxy && this.shadowProxy.visible !== on) this.shadowProxy.visible = on;
+    this.proxyShadowWanted = on;
+    this.syncShadowProxyVisibility();
   }
 
   setActive(on: boolean): void {
@@ -1517,18 +1544,75 @@ export class CharacterVisual {
   }
 
   setFar(far: boolean): void {
-    if (far === this.far) return;
-    this.far = far;
-    // First crossing of a composed body: mint its far LOD, BUDGETED. Cached
-    // per part set, so a crowd in one haircut pays for one bake between them,
-    // but a camera leaving a capital crosses every peer in one frame, so only
-    // one genuinely new part set bakes per window and the rest go pending and
-    // retry from update(). A part set someone already baked is free (the peek)
-    // and never competes for the slot.
-    if (far && !this.farMesh && this.look && !this.farBakeTried) this.attemptComposedFar();
-    if (!far) this.farBakePending = false;
-    this.modelWrap.visible = !far || !this.farMesh;
-    if (this.farMesh) this.farMesh.visible = far;
+    if (far !== this.far) {
+      this.far = far;
+      // First crossing of a composed body: mint its far LOD, BUDGETED. Cached
+      // per part set, so a crowd in one haircut pays for one bake between them,
+      // but a camera leaving a capital crosses every peer in one frame, so only
+      // one genuinely new part set bakes per window and the rest go pending and
+      // retry from update(). A part set someone already baked is free (the peek)
+      // and never competes for the slot.
+      if (far && !this.farMesh && this.look && !this.farBakeTried) this.attemptComposedFar();
+      if (!far) this.farBakePending = false;
+    }
+    // Every frame, not only on the edge: the compile gate's settle only clears
+    // its flag (below), and the reveal it unlocks must land HERE, inside the
+    // renderer's per-frame pass, never in the settle callback. A rig hidden
+    // between frames takes its budgeted weapon lights out of three's counted
+    // set behind the light budget's back, and numPointLights sits in every
+    // program cache key (the measured relink storm). Write-elided, so the
+    // steady state costs three compares.
+    this.syncFarVisibility();
+  }
+
+  /** The one place the rig/far-mesh handoff is written (far_lod_reveal_core):
+   *  the LOD edge, the budget retry and the per-frame setFar all land here, so
+   *  a far mesh whose materials are still linking never draws early and the
+   *  articulated rig never hides without a ready stand-in. */
+  private syncFarVisibility(): void {
+    const showFar = farMeshShown(this.far, this.farMesh !== null, this.farCompilePending);
+    const showRig = !showFar;
+    if (this.modelWrap.visible !== showRig) this.modelWrap.visible = showRig;
+    if (this.farMesh && this.farMesh.visible !== showFar) this.farMesh.visible = showFar;
+    this.syncShadowProxyVisibility();
+  }
+
+  private syncShadowProxyVisibility(): void {
+    if (!this.shadowProxy) return;
+    const show = shadowProxyShown(
+      this.proxyShadowWanted,
+      this.farMesh !== null,
+      this.farCompilePending,
+    );
+    if (this.shadowProxy.visible !== show) this.shadowProxy.visible = show;
+  }
+
+  /** Install (or clear) the renderer's compile gate for far bakes minted after
+   *  the view's creation gate ran. Installing also resets any bake or re-skin
+   *  still pending from a previous life (pool re-acquire): a settle the old
+   *  renderer generation dropped must not strand this visual articulated or
+   *  keep a superseded far set's tinted lease. */
+  setFarBakeGate(gate: FarBakeGate | null): void {
+    this.farBakeGate = gate;
+    this.dropPendingFarMaterials();
+    this.farCompilePending = false;
+  }
+
+  /** Route a freshly minted far bake (mesh + shadow proxy) through the compile
+   *  gate: hidden until its programs link, the articulated rig standing in
+   *  meanwhile. Without a gate the bake reveals immediately (previous
+   *  behaviour, and what previews and tests without a renderer get). */
+  private gateFarMint(): void {
+    const wrap = this.farWrap;
+    if (!wrap || !this.farBakeGate) return;
+    this.farCompilePending = true;
+    this.farBakeGate(wrap, () => {
+      // A visual disposed, or re-baked, while the link was in flight: the
+      // settle belongs to a node this visual no longer draws. Flag only: the
+      // next per-frame setFar reveals (see setFar for why not here).
+      if (this.disposed || this.farWrap !== wrap) return;
+      this.farCompilePending = false;
+    });
   }
 
   /** One budgeted attempt at the composed far LOD. Free when the part set is
@@ -1548,18 +1632,22 @@ export class CharacterVisual {
    *  pose wrapper. Shared by the fixed-rig path in the constructor and the
    *  composed path below so the two cannot drift. */
   private buildFarMeshes(geo: THREE.BufferGeometry, mats: THREE.Material[]): void {
+    const wrap = new THREE.Group();
+    wrap.name = 'character_far_wrap';
+    this.farWrap = wrap;
     this.farMesh = new THREE.Mesh(geo, mats);
     this.farMaterials = this.farMesh.material;
     this.farMesh.name = 'character_far_mesh';
     this.farMesh.visible = false;
-    this.poseWrap.add(this.farMesh);
+    wrap.add(this.farMesh);
     if (GFX.tier !== 'low') {
       this.shadowProxy = new THREE.Mesh(geo, shadowOnlyMat());
       this.shadowProxy.name = 'character_shadow_proxy';
       this.shadowProxy.castShadow = true;
       this.shadowProxy.visible = false;
-      this.poseWrap.add(this.shadowProxy);
+      wrap.add(this.shadowProxy);
     }
+    this.poseWrap.add(wrap);
   }
 
   /** Bake (or reuse) this composed body's far LOD. Leaves farMesh null if the
@@ -1587,10 +1675,6 @@ export class CharacterVisual {
         this.tintedFarClaims,
       ),
     );
-    // The shadow proxy is normally shown by the renderer's own band check,
-    // which already ran for this frame against a null proxy; sync it to the
-    // state the mesh was just built into.
-    if (this.shadowProxy) this.shadowProxy.visible = false;
     // This mesh is minted lazily, on the first crossing into the far band, so
     // any effect state (ghost, soul rend, shadowform, moonkin, metamorph, rune
     // tint) that edged on before that crossing never touched it: every setter
@@ -1598,6 +1682,12 @@ export class CharacterVisual {
     // this is the only place a fresh farMesh comes from outside the constructor.
     // Catch it up now, on the same material set the rig itself is already wearing.
     this.applyVisualMaterials();
+    // Brand-new programs (the near body's minus the skinning bit, plus the
+    // proxy's depth arm): link them hidden, the rig standing in until then.
+    // The reveal itself is the caller's syncFarVisibility, since the shadow
+    // proxy also answers to the renderer's per-frame plan (setProxyShadow),
+    // which already ran this frame against a null proxy.
+    this.gateFarMint();
   }
 
   get isFar(): boolean {
@@ -1835,20 +1925,79 @@ export class CharacterVisual {
     if (this.farMesh) {
       const prep = prepareVisual(this.key);
       const composed = this.look ? modularFarBake(this.key, this.look) : null;
-      const prevFarClaims = this.tintedFarClaims;
-      this.tintedFarClaims = new Set();
-      this.farMaterials = tintedFarMaterials(
+      const claims: TintedMaterialClaims = new Set();
+      const mats = tintedFarMaterials(
         this.def,
         this.entityColor,
         composed ? farSourceMaterials(this.model, composed.isBody.length) : prep.idleSrcMats,
         composed ? composed.isBody : prep.idleSrcIsBody,
         skinTexture(this.key, skinIndex),
         skinEmissiveTexture(this.key, skinIndex),
-        this.tintedFarClaims,
+        claims,
       );
-      releaseTintedMaterials(prevFarClaims);
+      this.stageFarMaterials(mats, claims);
     }
     this.applyVisualMaterials();
+  }
+
+  /** Take a rebuilt far material set live: claim the new lease, release the
+   *  old one AFTER (a key kept across the swap never dips to zero claims). */
+  private commitFarMaterials(mats: THREE.Material[], claims: TintedMaterialClaims): void {
+    const prevFarClaims = this.tintedFarClaims;
+    this.tintedFarClaims = claims;
+    this.farMaterials = mats;
+    releaseTintedMaterials(prevFarClaims);
+  }
+
+  /** A re-skinned far set is new programs too (an emissive atlas toggles a
+   *  define). Behind a gate it links hidden on a scratch mesh while the far
+   *  mesh keeps drawing its current, linked set, and swaps in on settle: no
+   *  hole and no LOD pop for a distant player who changes skin. A newer skin
+   *  before settle supersedes the one in flight. */
+  private stageFarMaterials(mats: THREE.Material[], claims: TintedMaterialClaims): void {
+    const farMesh = this.farMesh;
+    const wrap = this.farWrap;
+    // A newer set supersedes one still linking on either path (a stale settle
+    // must never commit over a set that already landed).
+    this.dropPendingFarMaterials();
+    if (!this.farBakeGate || !farMesh || !wrap) {
+      this.commitFarMaterials(mats, claims);
+      return;
+    }
+    // The far mesh draws effectMaterial(farMaterials), the overlay clones when
+    // a ghost/soul-rend/rune tint is on, and a clone is a different program
+    // key: gate the set the mesh will actually wear (the mint path applies
+    // its overlays before gating for the same reason).
+    const scratch = new THREE.Mesh(farMesh.geometry, this.effectMaterial(mats));
+    scratch.name = 'character_far_skin_scratch';
+    scratch.visible = false;
+    scratch.castShadow = farMesh.castShadow;
+    scratch.receiveShadow = farMesh.receiveShadow;
+    this.farSkinScratch = scratch;
+    this.pendingFarClaims = claims;
+    wrap.add(scratch);
+    this.farBakeGate(scratch, () => {
+      if (this.disposed || this.farSkinScratch !== scratch) return;
+      // Unlike the mint's reveal (see setFar), this settle may land between
+      // frames: it swaps materials on a mesh and detaches a hidden node, and
+      // neither changes an ancestor's visibility or three's counted light set.
+      this.farSkinScratch = null;
+      this.pendingFarClaims = null;
+      scratch.removeFromParent();
+      this.commitFarMaterials(mats, claims);
+      this.applyVisualMaterials();
+    });
+  }
+
+  private dropPendingFarMaterials(): void {
+    if (this.farSkinScratch) {
+      this.farSkinScratch.removeFromParent();
+      this.farSkinScratch = null;
+    }
+    if (this.pendingFarClaims) {
+      releaseTintedMaterials(this.pendingFarClaims);
+      this.pendingFarClaims = null;
+    }
   }
 
   /** Swap the held mainhand weapon model at runtime (gear equip/unequip); no-op if
@@ -2262,12 +2411,14 @@ export class CharacterVisual {
     // something no pixel can show: `setFar` hides `modelWrap`, and a held
     // weapon (with its rig) hangs off a bone INSIDE it.
     //
-    // Gated on farMesh as well as `far`, and that is the load-bearing half:
-    // `setFar` leaves `modelWrap` VISIBLE when there is no baked mesh to stand
-    // in for it, while `isFar` reads true either way. Skipping on `far` alone
-    // would freeze a rig that is still drawing, leaving its motes hanging in
-    // the air and its light stuck at whatever the last flicker wrote.
-    if (this.far && this.farMesh) return;
+    // Gated on the far mesh ACTUALLY standing in (farMeshShown), not on `far`
+    // alone, and that is the load-bearing half: `setFar` leaves `modelWrap`
+    // VISIBLE when there is no baked mesh, or one whose materials are still
+    // linking behind the compile gate, while `isFar` reads true either way.
+    // Skipping on `far` alone would freeze a rig that is still drawing,
+    // leaving its motes hanging in the air and its light stuck at whatever
+    // the last flicker wrote.
+    if (farMeshShown(this.far, this.farMesh !== null, this.farCompilePending)) return;
     this.applyWeaponVfxShed(shed);
     for (const handle of this.weaponVfx) handle.update(dt);
   }
@@ -2481,6 +2632,7 @@ export class CharacterVisual {
     this.tintedRigClaims.clear();
     releaseTintedMaterials(this.tintedFarClaims);
     this.tintedFarClaims.clear();
+    this.dropPendingFarMaterials();
     this.mixer.stopAllAction();
     this.mixer.uncacheRoot(this.model);
     this.skeletonUpdates.dispose();

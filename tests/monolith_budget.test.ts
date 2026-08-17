@@ -80,11 +80,13 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again by the castle branch's interior_light_rig.ts extraction;
     // after merging main the merged file lands below both prior pins, so the
     // ceiling is the exact merged count.
-    // Lowered 13689 -> 13646 after extracting the shadow-depth prewarm material
-    // factory into src/render/prewarm_depth_material.ts, merged with
-    // release/v0.39.0 (the ratchet's own rule: an extraction lowers the ceiling,
-    // never raises it). Exact merged count.
-    ceiling: 13646,
+    // Lowered again on the integration branch: the shadow-depth prewarm material
+    // factory moved to src/render/prewarm_depth_material.ts (PR #3468) and the
+    // character-visual pool take/store halves moved to
+    // src/render/characters/pooled_visual_lifecycle.ts (PR #3473, the far-bake
+    // compile gate rides that seam). The merged file lands below both PRs' own
+    // pins, so the ceiling is the exact merged count per the ratchet's rule.
+    ceiling: 13644,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

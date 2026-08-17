@@ -1,9 +1,13 @@
 import { readFileSync } from 'node:fs';
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
+  browserFlags,
   buildCapture,
+  crowdCenter,
   parseArgs,
   prepareOnlineGearedRoster,
+  runTimedWindow,
 } from '../scripts/gpu_hitch_capture.mjs';
 import {
   GPU_HITCH_SCHEMA_VERSION,
@@ -119,6 +123,190 @@ describe('gpu hitch capture CLI', () => {
       repetition: 2,
       order: 4,
     });
+  });
+
+  it('parses the far-band scenario options and records them for provenance', () => {
+    const args = parseArgs([
+      '--mode',
+      'online-geared',
+      '--observer',
+      '0,640',
+      '--crowd-offset',
+      '80,-0.5',
+      '--hop',
+      '35000:0,640',
+      '--hop',
+      '15000:80,640',
+      '--duration-ms',
+      '60000',
+    ]);
+    expect(args.crowdOffset).toEqual({ dx: 80, dz: -0.5 });
+    // kept in command-line order here; runTimedWindow sorts by delay
+    expect(args.hops).toEqual([
+      { atMs: 35000, x: 0, z: 640 },
+      { atMs: 15000, x: 80, z: 640 },
+    ]);
+    // the camera-relative form, and the browser GPU backend passthrough
+    const relative = parseArgs([
+      '--mode',
+      'online-geared',
+      '--hop',
+      '20000:retreat:82',
+      '--hop',
+      '55000:retreat:-82',
+      '--angle',
+      'gl-egl',
+    ]);
+    expect(relative.hops).toEqual([
+      { atMs: 20000, retreat: 82 },
+      { atMs: 55000, retreat: -82 },
+    ]);
+    expect(relative.angle).toBe('gl-egl');
+    expect(parseArgs([]).angle).toBeNull();
+    expect(crowdCenter({ x: 0, z: 640 }, args.crowdOffset)).toEqual({ x: 80, z: 639.5 });
+    expect(crowdCenter({ x: 0, z: 640 }, null)).toEqual({ x: 0, z: 640 });
+    // both change what is measured, so both land in the artifact
+    const snapshot = {
+      startedAtEpochMs: 0,
+      elapsedMs: 1,
+      stopReason: 'duration',
+      transitions: [],
+      links: [],
+      queries: [],
+      frames: [],
+      longTasks: [],
+      uploads: [],
+      programs: [],
+      sceneRoots: [],
+      rendererStats: null,
+    };
+    const raw = buildCapture({
+      args,
+      url: 'http://localhost:5173/?perf',
+      snapshot,
+      browserVersion: 'Chrome/1',
+      flags: [],
+      provenance: {},
+    });
+    expect(raw.capture.crowdOffset).toEqual({ dx: 80, dz: -0.5 });
+    expect(raw.capture.hops).toHaveLength(2);
+    // defaults: no offset, no hops, so an existing campaign artifact reads the same
+    const plain = parseArgs(['--mode', 'online-geared']);
+    expect(plain.crowdOffset).toBeNull();
+    expect(plain.hops).toEqual([]);
+  });
+
+  it('rejects far-band options that cannot mean anything', () => {
+    expect(() => parseArgs(['--crowd-offset', '80,0'])).toThrow(/online-geared/);
+    expect(() => parseArgs(['--mode', 'online-geared', '--crowd-offset', '80'])).toThrow(/DX,DZ/);
+    expect(() => parseArgs(['--hop', '1000:0,0'])).toThrow(/online-geared/);
+    expect(() => parseArgs(['--mode', 'online-geared', '--hop', '0,0'])).toThrow(/MS:X,Z/);
+    expect(() => parseArgs(['--mode', 'online-geared', '--hop', '5:retreat:x'])).toThrow(/MS:X,Z/);
+    expect(() => parseArgs(['--angle', 'gl egl'])).toThrow(/identifier/);
+    expect(() =>
+      parseArgs(['--mode', 'online-geared', '--duration-ms', '5000', '--hop', '5000:0,0']),
+    ).toThrow(/inside --duration-ms/);
+  });
+
+  it('anchors hops on the reveal after the entry teleport, fires them in delay order, records the landing, keeps the window from the anchor', async () => {
+    // A fake clock: waits advance it; the cover-up wait costs 1 s and the
+    // reveal wait 6 s, so hop delays and the window count from +7 s.
+    let clock = 1000;
+    const waits = [];
+    const teleports = [];
+    let waitCalls = 0;
+    const page = {
+      waitForFunction: async () => {
+        waitCalls++;
+        clock += waitCalls === 1 ? 1000 : 6000;
+      },
+      // The hop body runs for real against a fake page global: identity
+      // camera (forward is -Z), player at the observer spot.
+      evaluate: async (fn, entry) => {
+        globalThis.window = {
+          __game: {
+            world: { player: { pos: { x: 0, y: 0, z: 640 } } },
+            renderer: { camera: { matrixWorld: { elements: new THREE.Matrix4().elements } } },
+            online: { devCmd: (cmd) => teleports.push(cmd) },
+          },
+        };
+        try {
+          return await fn(entry);
+        } finally {
+          globalThis.window = undefined;
+        }
+      },
+    };
+    const wait = async (ms) => {
+      waits.push(ms);
+      clock += ms;
+    };
+    const hops = [
+      { atMs: 35000, x: 5, z: 6 },
+      { atMs: 15000, retreat: 82 },
+    ];
+    const args = { durationMs: 60000, hops };
+    await runTimedWindow(page, args, wait, () => clock);
+    // retreat backs away from the facing (+Z here), the absolute hop lands as given
+    expect(teleports).toEqual([
+      { cmd: 'dev_teleport', x: 0, z: 722 },
+      { cmd: 'dev_teleport', x: 5, z: 6 },
+    ]);
+    // reveal anchor at +7 s: hop 1 at +22 s, hop 2 at +42 s, window closes at anchor + 60 s
+    expect(waits).toEqual([15000, 20000, 25000]);
+    expect(args.hopAnchorMs).toBe(7000);
+    expect(hops[1]).toMatchObject({
+      firedAtMs: 22000,
+      from: { x: 0, z: 640 },
+      to: { x: 0, z: 722 },
+    });
+    expect(hops[0]).toMatchObject({ firedAtMs: 42000, to: { x: 5, z: 6 } });
+    // a negative retreat advances
+    const advance = [{ atMs: 0, retreat: -10 }];
+    teleports.length = 0;
+    waitCalls = 0;
+    await runTimedWindow(page, { durationMs: 1000, hops: advance }, wait, () => clock);
+    expect(teleports[0]).toEqual({ cmd: 'dev_teleport', x: 0, z: 630 });
+    // no hops: no reveal wait, one wait for the whole window from its opening
+    waits.length = 0;
+    await runTimedWindow(page, { durationMs: 1234, hops: [] }, wait, () => clock);
+    expect(waits).toEqual([1234]);
+  });
+
+  it('a hop whose page call fails is recorded and the window still runs to its end', async () => {
+    let clock = 0;
+    const waits = [];
+    const page = {
+      waitForFunction: async () => {},
+      evaluate: async () => {
+        throw new Error('page gone');
+      },
+    };
+    const hops = [{ atMs: 100, x: 1, z: 2 }];
+    await runTimedWindow(
+      page,
+      { durationMs: 5000, hops },
+      async (ms) => {
+        waits.push(ms);
+        clock += ms;
+      },
+      () => clock,
+    );
+    expect(hops[0].error).toBe('page gone');
+    expect(waits).toEqual([100, 4900]);
+  });
+
+  it('runs the timed window (with its hops) in capture, never a flat sleep (source pin)', () => {
+    const source = codeWithoutLineComments(
+      readFileSync(new URL('../scripts/gpu_hitch_capture.mjs', import.meta.url), 'utf8'),
+    );
+    const captureStart = source.indexOf('export async function capture(');
+    const captureBody = source.slice(
+      captureStart,
+      source.indexOf('\nif (import.meta.url', captureStart),
+    );
+    expect(captureBody).toContain('await runTimedWindow(page, args);');
+    expect(captureBody).not.toContain('await sleep(args.durationMs)');
   });
 
   it('rejects unknown modes, profiles, and non-positive durations', () => {
@@ -419,6 +607,47 @@ describe('gpu hitch capture CLI', () => {
 
     expect(prepared).toBe(roster);
     expect(events).toEqual(['capability:http://localhost:8787', 'construct:2', 'prepare']);
+  });
+
+  it('places the crowd at observer + --crowd-offset, and around the observer without it', async () => {
+    const centers = [];
+    const roster = { prepare: async ({ center }) => centers.push(center) };
+    const common = {
+      runId: 'capture-2',
+      databaseUrl: 'postgres://localhost/test',
+      checkCapability: async () => {},
+      rosterFactory: () => roster,
+    };
+    await prepareOnlineGearedRoster({
+      ...common,
+      args: {
+        url: 'http://localhost:5173/?perf',
+        serverUrl: 'http://localhost:8787',
+        bots: 2,
+        observer: { x: 0, z: 640 },
+        crowdOffset: { dx: 80, dz: -0.5 },
+      },
+    });
+    await prepareOnlineGearedRoster({
+      ...common,
+      args: {
+        url: 'http://localhost:5173/?perf',
+        serverUrl: 'http://localhost:8787',
+        bots: 2,
+        observer: { x: 0, z: 640 },
+        crowdOffset: null,
+      },
+    });
+    expect(centers).toEqual([
+      { x: 80, z: 639.5 },
+      { x: 0, z: 640 },
+    ]);
+  });
+
+  it('passes --angle to the browser as --use-angle and records it in the flags', () => {
+    const viewport = { width: 1600, height: 900 };
+    expect(browserFlags(true, viewport, 'gl-egl')).toContain('--use-angle=gl-egl');
+    expect(browserFlags(true, viewport, null).some((f) => f.startsWith('--use-angle'))).toBe(false);
   });
 
   it('closes a roster whose prepare failed partway through', async () => {

@@ -47,6 +47,10 @@ const BROWSER_ARGS = Object.freeze([
   '--mute-audio',
 ]);
 
+// How long after the observer's entry teleport a loading cover may take to
+// appear before the hop anchor falls back to the window opening.
+const HOP_COVER_GRACE_MS = 3000;
+
 const usage = `GPU hitch capture
 
   node scripts/gpu_hitch_capture.mjs [options]
@@ -62,6 +66,22 @@ const usage = `GPU hitch capture
                          (default 0,0). Changing it changes what is measured:
                          a different town streams different content, so a leg
                          here is only comparable with another at the same spot.
+  --crowd-offset DX,DZ   online-geared only: place the crowd at observer+offset
+                         instead of around the observer, so peers stream in
+                         already in the far LOD band (58 yd and beyond, inside
+                         the interest range) instead of the near band.
+  --hop MS:X,Z | MS:retreat:D
+                         online-geared only, repeatable: MS after the observer's
+                         arrival reveal, teleport the observer to X,Z, or back it
+                         D yards straight away from the camera facing (negative
+                         = advance), so a crowd walked away from stays in view.
+                         With hops the timed window also counts from that
+                         reveal. Where each hop landed is recorded in the
+                         artifact; changes what is measured like --observer does.
+  --angle BACKEND        pass --use-angle=BACKEND to the browser (gl-egl lets the
+                         EGL vendor env pick the GPU: unset for the Intel iGPU,
+                         __EGL_VENDOR_LIBRARY_FILENAMES=.../10_nvidia.json for
+                         the discrete card). Recorded in the browser flags.
   --out FILE             JSON output (default tmp/gpu-hitch_<stamp>.json)
   --group-id TOKEN       A/B campaign identifier (requires leg/repetition/order)
   --leg TOKEN            leg label inside the A/B campaign
@@ -94,6 +114,40 @@ function observerSpot(value) {
   return { x, z };
 }
 
+function crowdOffset(value) {
+  const match = /^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/.exec(value);
+  const dx = Number(match?.[1]);
+  const dz = Number(match?.[2]);
+  if (!Number.isFinite(dx) || !Number.isFinite(dz))
+    throw new Error('--crowd-offset must use DX,DZ with finite numbers');
+  return { dx, dz };
+}
+
+function hop(value) {
+  const absolute = /^(\d+):(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/.exec(value);
+  if (absolute) {
+    const atMs = Number(absolute[1]);
+    const x = Number(absolute[2]);
+    const z = Number(absolute[3]);
+    if (!Number.isInteger(atMs) || atMs < 0 || !Number.isFinite(x) || !Number.isFinite(z))
+      throw new Error('--hop must use MS:X,Z or MS:retreat:D');
+    return { atMs, x, z };
+  }
+  const relative = /^(\d+):retreat:(-?\d+(?:\.\d+)?)$/.exec(value);
+  const atMs = Number(relative?.[1]);
+  const retreat = Number(relative?.[2]);
+  if (!Number.isInteger(atMs) || atMs < 0 || !Number.isFinite(retreat))
+    throw new Error('--hop must use MS:X,Z or MS:retreat:D');
+  return { atMs, retreat };
+}
+
+/** The spot the geared crowd is placed around: the observer, or the observer
+ *  displaced by --crowd-offset so the crowd streams in already far. */
+export function crowdCenter(observer, offset) {
+  if (!offset) return observer;
+  return { x: observer.x + offset.dx, z: observer.z + offset.dz };
+}
+
 function viewport(value) {
   const match = /^(\d+)x(\d+)$/i.exec(value);
   const width = Number(match?.[1]);
@@ -114,6 +168,9 @@ export function parseArgs(argv) {
     durationMs: DEFAULT_DURATION_MS,
     viewport: { ...DEFAULT_VIEWPORT },
     observer: null,
+    crowdOffset: null,
+    hops: [],
+    angle: null,
     out: null,
     groupId: null,
     leg: null,
@@ -148,6 +205,9 @@ export function parseArgs(argv) {
     } else if (option === '--duration-ms') args.durationMs = integer(next(), '--duration-ms');
     else if (option === '--viewport') args.viewport = viewport(next());
     else if (option === '--observer') args.observer = observerSpot(next());
+    else if (option === '--crowd-offset') args.crowdOffset = crowdOffset(next());
+    else if (option === '--hop') args.hops.push(hop(next()));
+    else if (option === '--angle') args.angle = campaignToken(next(), '--angle');
     else if (option === '--out') args.out = next();
     else if (option === '--group-id') args.groupId = campaignToken(next(), '--group-id');
     else if (option === '--leg') args.leg = campaignToken(next(), '--leg');
@@ -170,6 +230,12 @@ export function parseArgs(argv) {
     campaignFields.some((value) => value === null)
   )
     throw new Error('--group-id, --leg, --repetition, and --order must be supplied together');
+  if (args.crowdOffset && args.mode !== 'online-geared')
+    throw new Error('--crowd-offset only applies to --mode online-geared');
+  if (args.hops.some((entry) => entry.atMs >= args.durationMs))
+    throw new Error('every --hop must land inside --duration-ms');
+  if (args.hops.length > 0 && args.mode !== 'online-geared')
+    throw new Error('--hop only applies to --mode online-geared');
   return args;
 }
 
@@ -224,14 +290,18 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function browserArgs(viewportSize) {
-  return [`--window-size=${viewportSize.width + 20},${viewportSize.height + 60}`, ...BROWSER_ARGS];
+function browserArgs(viewportSize, angle = null) {
+  return [
+    `--window-size=${viewportSize.width + 20},${viewportSize.height + 60}`,
+    ...BROWSER_ARGS,
+    ...(angle ? [`--use-angle=${angle}`] : []),
+  ];
 }
 
-function browserFlags(headless, viewportSize) {
+export function browserFlags(headless, viewportSize, angle = null) {
   return [
     '--user-data-dir=<temporary-profile>',
-    ...browserArgs(viewportSize),
+    ...browserArgs(viewportSize, angle),
     ...(headless ? ['--headless=new'] : []),
   ];
 }
@@ -330,6 +400,9 @@ export function buildCapture({ args, url, snapshot, browserVersion, flags, prove
       url: sanitizedUrl,
       zone: snapshot.rendererStats?.currentZoneId ?? null,
       observer: args.observer ?? null,
+      crowdOffset: args.crowdOffset ?? null,
+      hops: args.hops ?? [],
+      hopAnchorMs: args.hopAnchorMs ?? null,
       fixture: args.fixtureEvidence ?? null,
     },
     provenance: {
@@ -412,6 +485,79 @@ async function enterOnlineGearedGame(page, args, runId) {
   );
 }
 
+/** The timed window. With hops, delays count from the observer's ARRIVAL
+ *  reveal (the online entry teleports the observer and that destination
+ *  streams under a cover for a variable time), never from the window opening,
+ *  and the window itself is --duration-ms from that same anchor, so the last
+ *  hop always keeps its tail inside the capture. Without hops the window is
+ *  --duration-ms from its opening, unchanged. The anchor is the FIRST reveal
+ *  after the entry teleport's cover-up: a `live` phase left over from the
+ *  login reveal is not it, and if no cover-up follows the teleport within a
+ *  short grace the anchor is the opening. Each hop fires through the same
+ *  online dev command the entry uses to place the observer, in delay order;
+ *  an absolute hop teleports to X,Z, a `retreat` hop backs the observer D
+ *  yards straight away from the camera facing (negative = advance), so the
+ *  crowd it walks away from stays in view. A hop whose page call fails is
+ *  recorded (`error`) and the run continues: the artifact keeps its provenance
+ *  instead of vanishing with the browser. */
+export async function runTimedWindow(page, args, wait = sleep, now = () => Date.now()) {
+  const opened = now();
+  const hops = [...args.hops].sort((a, b) => a.atMs - b.atMs);
+  let anchor = opened;
+  if (hops.length > 0) {
+    const covered = await page
+      .waitForFunction(() => window.__wocGpuHitchProbe?.snapshot().phase === 'cover', {
+        timeout: HOP_COVER_GRACE_MS,
+        polling: 250,
+      })
+      .then(
+        () => true,
+        () => false,
+      );
+    if (covered) {
+      await page
+        .waitForFunction(() => window.__wocGpuHitchProbe?.snapshot().phase === 'live', {
+          timeout: Math.max(1000, args.durationMs),
+          polling: 250,
+        })
+        .catch(() => {});
+    }
+    anchor = now();
+    args.hopAnchorMs = anchor - opened;
+  }
+  for (const entry of hops) {
+    await wait(Math.max(0, anchor + entry.atMs - now()));
+    entry.firedAtMs = Math.round(now() - opened);
+    try {
+      const landed = await page.evaluate(({ x, z, retreat }) => {
+        const game = window.__game;
+        const pos = game.world.player.pos;
+        const from = { x: pos.x, z: pos.z };
+        let tx = x;
+        let tz = z;
+        if (retreat !== undefined) {
+          const e = game.renderer.camera.matrixWorld.elements;
+          // camera forward is -Z of its world matrix; back away along it in XZ
+          const fx = -e[8];
+          const fz = -e[10];
+          const len = Math.hypot(fx, fz) || 1;
+          tx = pos.x - (fx / len) * retreat;
+          tz = pos.z - (fz / len) * retreat;
+        }
+        game.online.devCmd({ cmd: 'dev_teleport', x: tx, z: tz });
+        return { from, to: { x: tx, z: tz } };
+      }, entry);
+      // Recorded on the entry itself (buildCapture copies args.hops into the
+      // artifact), so a reader can tell where the observer actually stood.
+      entry.from = landed.from;
+      entry.to = landed.to;
+    } catch (error) {
+      entry.error = String(error?.message ?? error).slice(0, 300);
+    }
+  }
+  await wait(Math.max(0, anchor + args.durationMs - now()));
+}
+
 export async function prepareOnlineGearedRoster({
   args,
   runId,
@@ -441,7 +587,9 @@ export async function prepareOnlineGearedRoster({
   // already created: the caller's finally only sees a roster this function
   // RETURNED. Close it here, then rethrow the original failure.
   try {
-    await roster.prepare({ center: args.observer ?? GEARED_ARRIVAL_OBSERVER });
+    await roster.prepare({
+      center: crowdCenter(args.observer ?? GEARED_ARRIVAL_OBSERVER, args.crowdOffset),
+    });
   } catch (error) {
     await roster.close().catch(() => {});
     throw error;
@@ -476,7 +624,7 @@ export async function capture(args) {
   const profileDir = fs.mkdtempSync(path.join(os.tmpdir(), PROFILE_PREFIX));
   fs.mkdirSync(path.join(ROOT, 'tmp'), { recursive: true });
   const captureId = `${new Date().toISOString()}-${Math.random().toString(36).slice(2, 8)}`;
-  const flags = browserFlags(args.headless, args.viewport);
+  const flags = browserFlags(args.headless, args.viewport, args.angle);
   const provenance = makeProvenance({
     gitHead: git(['rev-parse', '--short=12', 'HEAD']),
     branch: git(['rev-parse', '--abbrev-ref', 'HEAD']),
@@ -499,7 +647,7 @@ export async function capture(args) {
       executablePath: requireBrowserPath(),
       headless: args.headless ? 'new' : false,
       userDataDir: profileDir,
-      args: browserArgs(args.viewport),
+      args: browserArgs(args.viewport, args.angle),
       defaultViewport: args.viewport,
     });
     // Reuse Chrome's initially focused tab. Opening a second tab makes Chrome
@@ -531,7 +679,7 @@ export async function capture(args) {
     } else {
       await enterOnlineGearedGame(page, { ...args, url: requestedUrl.toString() }, captureId);
     }
-    await sleep(args.durationMs);
+    await runTimedWindow(page, args);
     const snapshot = await page.evaluate(() => window.__wocGpuHitchProbe?.stop('duration'));
     if (!snapshot) throw new Error('GPU hitch probe was not installed');
     const browserVersion = await browser.version();

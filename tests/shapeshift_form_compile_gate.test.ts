@@ -105,7 +105,7 @@ describe('shapeshift-form compile gate (#2571)', () => {
   it('imports settlePendingSwap from the shared compile_gate core', () => {
     const source = renderer();
     expect(source).toContain(
-      "import { CompileGateQueue, settlePendingSwap } from './compile_gate';",
+      "import { CompileGateQueue, SerialGateLane, settlePendingSwap } from './compile_gate';",
     );
   });
 });

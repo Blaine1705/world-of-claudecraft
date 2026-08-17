@@ -110,8 +110,11 @@ describe('Renderer.compileShadowPrograms', () => {
       // ...that draws the SAME variant as three's shadow pass (default packing).
       expect(material.depthPacking).toBe(new THREE.MeshDepthMaterial().depthPacking);
     }
-    // A non-caster keeps its own material at compile time.
-    expect(swapped.get(noShadow)).toBe(cloth);
+    // A non-caster is compiled through NO material at all: left in place its
+    // colour material would relink as a fog-less twin the scene never draws.
+    expect(swapped.get(noShadow)).toBeNull();
+    // ...and it is back on the mesh before the awaited link resolves.
+    expect(noShadow.material).toBe(cloth);
     // Distinct shapes get distinct instances (skinned x morph 0/4/9, rigid), so
     // compileAsync's per-material currentProgram poll awaits every depth
     // program; identical shapes share one.

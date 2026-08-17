@@ -137,6 +137,7 @@ import {
   type CharacterVisual,
   createCharacterVisual,
   createMountVisual,
+  type FarBakeGate,
   modularLookFor,
   setWeaponVfxViewportHeight,
 } from './characters';
@@ -172,6 +173,7 @@ import {
 } from './characters/form_visual_selection_core';
 import { skinCount, visualKeyFor } from './characters/manifest';
 import { modularLookChanged } from './characters/player_look_core';
+import { PooledVisualLifecycle } from './characters/pooled_visual_lifecycle';
 import {
   playerRangedAttackAlreadyStarted,
   playerRangedAttackStartsAtLaunch,
@@ -182,7 +184,7 @@ import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack
 import { fogFarForBuiltGround, groundViewConeHalfAngle } from './chunk_residency_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { buildCliffScree, type CliffScreeView } from './cliff_scree';
-import { CompileGateQueue, settlePendingSwap } from './compile_gate';
+import { CompileGateQueue, SerialGateLane, settlePendingSwap } from './compile_gate';
 import { preflightWebGL2ContextRecycle, type RecycledRendererContext } from './context_recycle';
 import { trackWebGLContext } from './context_release';
 import {
@@ -339,6 +341,7 @@ import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features'
 import { stepLichHeartbeat } from './lich_audio_state_core';
 import { LightPulses } from './light_pulses';
 import { createPrewarmPacing, type PrewarmPacing } from './link_rate_budget';
+import { touchLinkedPrograms } from './linked_program_touch';
 import { renderLoadMeasure } from './load_marks';
 import {
   type LocoState,
@@ -2037,6 +2040,10 @@ export class Renderer {
   private appliedBudgetLevels: RenderBudgetState['levels'] | null = null;
   private lastQualityChange: RendererQualityChangeStats | null = null;
   private visualPool = new CharacterVisualPool<CharacterVisual>();
+  private readonly pooledVisuals = new PooledVisualLifecycle(this.visualPool, {
+    farBakeGate: () => this.farBakeGate,
+    maxPooled: () => GFX.maxPooledCharacterVisuals,
+  });
   private objectPool = new Map<string, PooledObjectView[]>();
   private pooledObjectCount = 0;
   private prewarmDepthMaterials = new Map<string, THREE.MeshDepthMaterial>();
@@ -3927,8 +3934,8 @@ export class Renderer {
         // Only publish visuals to the live pool after the warm pass. Background
         // gameplay can otherwise take one out of its T-pose grid while the
         // prewarm awaits idle compile slots, leaving its shadow variant cold.
-        for (const item of mobPrewarm.pooled) this.storePooledVisual(item.key, item.visual);
-        for (const item of npcPrewarm.pooled) this.storePooledVisual(item.key, item.visual);
+        for (const item of mobPrewarm.pooled) this.pooledVisuals.store(item.key, item.visual);
+        for (const item of npcPrewarm.pooled) this.pooledVisuals.store(item.key, item.visual);
         this.lastZonePrewarmStats = {
           zoneId,
           buildMs: Math.round(tBuild - t0),
@@ -4957,10 +4964,20 @@ export class Renderer {
     const now = performance.now();
     if (!this.viewCreateRetry.canAttempt(e.id, slot, now)) return null;
     const visual = createCharacterVisual(e, formKey);
-    if (visual) this.viewCreateRetry.markSucceeded(e.id, slot);
-    else this.viewCreateRetry.markFailed(e.id, slot, now);
+    if (visual) {
+      this.viewCreateRetry.markSucceeded(e.id, slot);
+      visual.setFarBakeGate(this.farBakeGate);
+    } else this.viewCreateRetry.markFailed(e.id, slot, now);
     return visual;
   }
+
+  // A composed body's far LOD (and a re-skinned far set) is minted AFTER the
+  // view's creation gate walked the rig, so it linked cold at first draw (the
+  // prod 100-160 ms far-crossing stalls). The visual owns that reveal through
+  // per-frame flags, so it gets the gate as a callback, one bake at a time.
+  private readonly farBakeLane = new SerialGateLane();
+  private readonly farBakeGate: FarBakeGate = (target, onSettled) =>
+    this.farBakeLane.enqueue((settled) => this.gateSwapFlagOnCompile(target, settled), onSettled);
 
   /** Build one lazy FORM rig into its view slot. A null build leaves the slot
    *  unset; the shared gate retries after its cooldown. A freshly built form
@@ -5198,39 +5215,6 @@ export class Renderer {
     // travel hitch (Skeleton.dispose via CharacterVisual.dispose in
     // removeView, pinned by GPU-upload profiling). Players never pool (A6).
     return characterVisualPoolKey(e);
-  }
-
-  private takePooledVisual(key: string, entityColor: number): CharacterVisual | null {
-    const visual = this.visualPool.take(key);
-    if (!visual) return null;
-    visual.root.removeFromParent();
-    visual.root.visible = true;
-    visual.root.position.set(0, 0, 0);
-    visual.root.rotation.set(0, 0, 0);
-    visual.root.scale.set(1, 1, 1);
-    visual.setFar(false);
-    visual.setGhost(false);
-    // The pool key is per-template, so the pooled tint may belong to another
-    // instance (rift spawns jitter mob.color per mob): re-tint to THIS
-    // entity's color from the shared tinted-material cache. No-op when the
-    // color already matches; entity scale is applied at the view group by the
-    // caller, exactly as for a freshly built visual.
-    visual.setEntityColor(entityColor);
-    return visual;
-  }
-
-  private storePooledVisual(key: string, visual: CharacterVisual): void {
-    visual.root.removeFromParent();
-    visual.root.visible = false;
-    visual.root.position.set(0, 0, 0);
-    visual.root.rotation.set(0, 0, 0);
-    visual.root.scale.set(1, 1, 1);
-    // Bounded, least-recently-released-first: the pool disposes the coldest
-    // overflow (or the incoming visual when pooling is disabled) so eviction
-    // genuinely frees the per-instance Skeleton + GPU bone-matrix DataTexture
-    // while the hot working set keeps its reuse. An evicted key transparently
-    // rebuilds from the live entity on its next request.
-    this.visualPool.store(key, visual, GFX.maxPooledCharacterVisuals);
   }
 
   private storePooledObject(key: string, object: PooledObjectView): void {
@@ -5625,16 +5609,26 @@ export class Renderer {
   private async compileShadowPrograms(root: THREE.Object3D): Promise<void> {
     if (!GFX.dynamicShadows || !this.asyncCompileSupported) return;
     const swaps: { mesh: THREE.Mesh; material: THREE.Material | THREE.Material[] }[] = [];
-    root.traverse((obj) => {
-      const mesh = obj as THREE.Mesh;
-      if (!mesh.isMesh || !mesh.castShadow) return;
-      const material = mesh.material;
-      swaps.push({ mesh, material });
-      mesh.material = Array.isArray(material)
-        ? material.map((item) => prewarmDepthMaterial(this.prewarmDepthMaterials, item, mesh))
-        : prewarmDepthMaterial(this.prewarmDepthMaterials, material, mesh);
-    });
-    if (swaps.length === 0) return;
+    let casters = 0;
+    // Walked inside the try below so a throw mid-walk still restores every swap.
+    const swapMaterials = (): void => {
+      root.traverse((obj) => {
+        const mesh = obj as THREE.Mesh;
+        if (!mesh.isMesh) return;
+        const material = mesh.material;
+        swaps.push({ mesh, material });
+        if (mesh.castShadow) {
+          casters++;
+          mesh.material = Array.isArray(material)
+            ? material.map((item) => prewarmDepthMaterial(this.prewarmDepthMaterials, item, mesh))
+            : prewarmDepthMaterial(this.prewarmDepthMaterials, material, mesh);
+        } else {
+          // A non-caster has no shadow program: left in place its colour material
+          // relinks as a fog-less twin the scene never draws. compile skips null.
+          mesh.material = null as unknown as THREE.Material;
+        }
+      });
+    };
     // Match the real shadow pass's program key exactly. A bare
     // compileAsync(root, shadowCamera) uses the canvas output colour space
     // and sees no scene lights, producing a skinned depth program that still
@@ -5652,11 +5646,14 @@ export class Renderer {
     this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
     const previousTarget = this.webgl.getRenderTarget();
     const previousFog = this.scene.fog;
-    let compilePromise: Promise<THREE.Object3D>;
+    let compilePromise: Promise<THREE.Object3D> | null = null;
     try {
-      this.scene.fog = null;
-      this.webgl.setRenderTarget(this.prewarmRenderTarget);
-      compilePromise = this.webgl.compileAsync(root, this.sun.shadow.camera, this.scene);
+      swapMaterials();
+      if (casters > 0) {
+        this.scene.fog = null;
+        this.webgl.setRenderTarget(this.prewarmRenderTarget);
+        compilePromise = this.webgl.compileAsync(root, this.sun.shadow.camera, this.scene);
+      }
     } finally {
       this.webgl.setRenderTarget(previousTarget);
       this.scene.fog = previousFog;
@@ -5664,7 +5661,7 @@ export class Renderer {
     }
     // Do not race a timer here. The underlying linker cannot be cancelled,
     // so a timeout only lets it overlap the next child and gameplay.
-    await compilePromise;
+    if (compilePromise) await compilePromise;
   }
 
   // A tiny throwaway target for background child uploads, so a prewarm root
@@ -6424,8 +6421,8 @@ export class Renderer {
       if (entityPrewarmGroup) this.scene.remove(entityPrewarmGroup);
       if (npcPrewarmGroup) this.scene.remove(npcPrewarmGroup);
       if (opts.publishPools) {
-        for (const item of entityPrewarmPool) this.storePooledVisual(item.key, item.visual);
-        for (const item of npcPrewarmPool) this.storePooledVisual(item.key, item.visual);
+        for (const item of entityPrewarmPool) this.pooledVisuals.store(item.key, item.visual);
+        for (const item of npcPrewarmPool) this.pooledVisuals.store(item.key, item.visual);
       }
       if (playerPrewarmGroup) this.scene.remove(playerPrewarmGroup);
       for (const visual of playerPrewarmInstances) visual.dispose();
@@ -8705,7 +8702,7 @@ export class Renderer {
         return;
       }
       visualPoolKey = this.visualPoolKeyFor(e);
-      visual = visualPoolKey ? this.takePooledVisual(visualPoolKey, e.color) : null;
+      visual = visualPoolKey ? this.pooledVisuals.take(visualPoolKey, e.color) : null;
       if (!visual) {
         // Pool MISS: build a fresh visual but KEEP its pool key so removeView returns
         // it to the pool (which self-sizes to demand) instead of disposing it. Disposing
@@ -8940,12 +8937,13 @@ export class Renderer {
     // still linked the real program synchronously (the measured 300-500ms
     // border-crossing stall). The colour pass binds the tier-correct target;
     // the skinned depth pass covers the renderer-owned shadow material that
-    // the colour walk cannot enumerate.
+    // the colour walk cannot enumerate; the touch tail warms the linked
+    // programs' uniform tables so the reveal draw issues no synchronous query.
     return this.liveCompileGates.run(
       () =>
-        this.compilePrewarmColorPrograms(target, false).then(() =>
-          this.compileShadowPrograms(target),
-        ),
+        this.compilePrewarmColorPrograms(target, false)
+          .then(() => this.compileShadowPrograms(target))
+          .then(() => touchLinkedPrograms(this.webgl.properties, target)),
       VIEW_COMPILE_GATE_MAX_MS,
       { priority, label: `live-gate:${target.name || target.type}` },
     );
@@ -10398,7 +10396,7 @@ export class Renderer {
     if (v.visual) {
       // Character geometry/materials are shared per-asset caches and must
       // survive interest churn, dispose only per-instance mixer bindings.
-      if (!terminal && v.visualPoolKey) this.storePooledVisual(v.visualPoolKey, v.visual);
+      if (!terminal && v.visualPoolKey) this.pooledVisuals.store(v.visualPoolKey, v.visual);
       else v.visual.dispose();
       v.sheepVisual?.dispose();
       v.bearVisual?.dispose();

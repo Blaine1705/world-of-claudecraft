@@ -79,7 +79,15 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   code and registered per ability; the template future ability-animation work
   follows.
 - Pure selection cores: `modular.ts` (composed bodies, below),
-  `player_look_core.ts`, `form_visual_selection_core.ts`.
+  `player_look_core.ts`, `form_visual_selection_core.ts`,
+  `far_lod_reveal_core.ts` (the rig/far-mesh/shadow-proxy handoff rule: the
+  baked far mesh stands in only once it exists AND its materials linked
+  behind the renderer's far-bake compile gate; `visual.ts` is a thin consumer
+  via `setFarBakeGate`, `tests/character_far_compile_gate.test.ts`). The far
+  mesh mounts its OWN tinted clones (`tintedMaterial(..., mount: 'far')`):
+  three's `compileAsync` polls a material's `currentProgram`, so a clone shared
+  with the skinned rig would let the far bake's gate settle on the rig's
+  variant (`tests/tinted_material.test.ts`).
 
 ## Keys & dispatch
 Every drawable is a `VisualDef` in `VISUALS` (player classes, creature families,
@@ -117,13 +125,16 @@ live in `manifest.ts`), falling back to `mob_bandit`; NPCs to `NPC_KEYS`. Forms
   full weight); the per-frame `scanAnimRepair` watchdog (`anim_state.ts`) is the
   backstop that re-drives the base pose after 3 starved frames.
 
-## The visual reuse pool (`visual_pool.ts` + `visual_pool_policy.ts`)
+## The visual reuse pool (`visual_pool.ts` + `visual_pool_policy.ts` + `pooled_visual_lifecycle.ts`)
 `renderer.ts` routes non-player character visuals through a bounded,
 release-ordered (LRU) `CharacterVisualPool`: on despawn a poolable visual is
 detached and STORED instead of disposed, and `store` evicts + disposes
 least-recently-released entries past the `GFX.maxPooledCharacterVisuals` cap,
 so visiting new populations cannot grow GPU memory monotonically
-(`tests/character_visual_pool.test.ts`). Contract points:
+(`tests/character_visual_pool.test.ts`). The renderer's take/store halves
+(transform reset, near LOD, un-ghost, per-instance re-tint, the far-bake
+compile gate re-installed on re-acquire) are `PooledVisualLifecycle`, bound
+once to the pool and the live cap. Contract points:
 - Players deliberately never pool (their visual key varies with cosmetics/mech
   state): `characterVisualPoolKey` returns null and those visuals are disposed
   directly as before.

@@ -211,7 +211,10 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   their programs because compile traverses via `scene.traverse`, not
   `traverseVisible`).
 - Shared machinery: `compile_gate.ts` (fail-soft async shader-compile gating
-  that also BOUNDS in-flight driver links during snapshot bursts),
+  that also BOUNDS in-flight driver links during snapshot bursts, plus the
+  `SerialGateLane` for gates that arrive in a burst), `linked_program_touch.ts`
+  (the gate's tail: fetch every linked variant's uniform tables so the reveal
+  draw issues no synchronous first-use query),
   `background_gpu_queue.ts` (the one priority arbiter for idle-time work that
   reaches WebGL), `idle_queue.ts` (idle-slot queue draining),
   `prewarm_depth_material.ts` (the shadow arm's depth material: it must link
@@ -312,7 +315,10 @@ collision/movement.
   VFX) stops being drawn without any of its own flags changing; a per-frame
   driver over such a subtree should skip. Check the swap ACTUALLY happened
   (`CharacterVisual.setFar` keeps the rig visible when no baked mesh exists,
-  while `isFar` reads true either way), never just the intent flag.
+  or while a fresh bake's materials are still linking behind the far-bake
+  compile gate, while `isFar` reads true either way), never just the intent
+  flag: `farMeshShown` in `characters/far_lod_reveal_core.ts` is that
+  predicate.
 - **Cloning a material? Use `material_clone_hooks.ts`.** `Material.clone()` copies
   userData but silently DROPS `onBeforeCompile`, and three keys its program cache
   on `customProgramCacheKey()`, whose default return value IS
