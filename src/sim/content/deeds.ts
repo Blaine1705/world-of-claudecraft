@@ -2818,11 +2818,35 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'manual' },
     reward: { kind: 'title', text: 'Light of the Sanctum' },
   },
+
+  // The walk-in castle visits, appended per the append-only DEED_ORDER
+  // contract. The Last Keep one retro-fixes a rule gap: the keep shipped
+  // without its deeds (every new conquerable content authors deeds in the
+  // same change; docs/design/deeds.md). Both key on the dungeon: visit mark
+  // enterDungeon writes, the drowned_temple moongate precedent.
+  exp_the_last_keep: {
+    id: 'exp_the_last_keep',
+    name: 'The Quiet Halls',
+    desc: 'Step through the doors of the Last Keep and walk its silent halls.',
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'dungeon:the_last_keep' },
+  },
+  exp_dawnhold_castle: {
+    id: 'exp_dawnhold_castle',
+    name: 'An Open Door in the Garden',
+    desc: 'Call on Dawnhold Castle and wander its sunlit garden halls.',
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'dungeon:dawnhold_castle' },
+  },
   // The Proving Shore graduation: every lesson on the tutorial island handed
   // in, then the ferry bell rung for the ride home. The stat is bumped by
   // interactions/ferry_bell.ts on the island bell's home crossing, only once
   // the whole rail sits in questsDone, so the deed can never fire on a
-  // mid-lesson misclick ride or a veteran's refresher visit.
+  // mid-lesson misclick ride or a veteran's refresher visit. Appended at the
+  // release merge behind the castle visits, keeping both sides' tails in
+  // their own authored order.
   prog_ready_for_an_adventure: {
     id: 'prog_ready_for_an_adventure',
     name: 'Ready for an Adventure',

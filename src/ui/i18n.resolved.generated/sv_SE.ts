@@ -1021,6 +1021,22 @@ export const sv_SE: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
+    },
     "compass": {
       "N": "N",
       "NE": "NÖ",
@@ -12460,6 +12476,9 @@ export const sv_SE: EnTranslations = {
       "ps_ferry_bell": {
         "name": "Ferry Bell"
       },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
+      },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"
       },
@@ -17085,6 +17104,11 @@ export const sv_SE: EnTranslations = {
         "name": "Sista fästet",
         "enterText": "Du kliver in i de kalla, tysta hallarna i Sista fästet.",
         "leaveText": "Du drar igen fästningsporten och kliver ut i Drakländernas vind."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "Det dränkta templet",
