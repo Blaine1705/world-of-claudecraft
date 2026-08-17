@@ -3,7 +3,7 @@
 import type * as THREE from 'three';
 import { delveModuleZOffset } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
-import { delveInteriorBuildAction } from './delve_interior_cache_core';
+import { type DelveInteriorPlacement, delveInteriorBuildAction } from './delve_interior_cache_core';
 import { buildDelveModule } from './delve_interiors';
 import type { DungeonInteriors } from './dungeon';
 import { ensureDelveInteriorKit } from './interior_kit';
@@ -19,7 +19,7 @@ import { ensureDelveInteriorKit } from './interior_kit';
  */
 export class DelveInteriorTracker {
   private pending = new Set<string>();
-  private moduleAt = new Map<string, DelveModuleId>();
+  private placementAt = new Map<string, DelveInteriorPlacement>();
   private groups = new Map<string, THREE.Group>();
 
   constructor(
@@ -31,15 +31,17 @@ export class DelveInteriorTracker {
   ) {}
 
   private schedule(key: string, moduleId: DelveModuleId, ox: number, oz: number): void {
+    const placement: DelveInteriorPlacement = { moduleId, ox, oz };
     const action = delveInteriorBuildAction(
-      this.moduleAt.get(key),
-      moduleId,
+      this.placementAt.get(key),
+      placement,
       this.pending.has(key),
     );
     if (action === 'skip') return;
     if (action === 'rebuild') {
       const stale = this.groups.get(key);
       if (stale) this.retire(stale);
+      this.placementAt.delete(key);
       this.groups.delete(key);
       this.built.delete(key);
       this.moduleAt.delete(key);
@@ -47,7 +49,7 @@ export class DelveInteriorTracker {
     this.pending.add(key);
     void buildDelveModule(this.dungeons(), moduleId, ox, oz)
       .then((group) => {
-        this.moduleAt.set(key, moduleId);
+        this.placementAt.set(key, placement);
         this.groups.set(key, group);
         this.built.add(key);
         this.pending.delete(key);
