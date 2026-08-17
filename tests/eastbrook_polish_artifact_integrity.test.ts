@@ -766,12 +766,10 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the r185 frozen-camera aim fix: the first-order composite
 // follows renderer.ts, then this seal follows the swept evidence bytes. No
 // capture was retaken.
-// Re-minted again after extracting the delve interior build-cache scheduling
-// into src/render/delve_interior_tracker.ts (renderer.ts moved, no capture retaken).
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '80920e22bd9d4f2224f8b285ea692b1c6fced9c09841ce1db2f0df4cb7bea075';
+  '66fe27c8adb3003812c249d05c65c73d2fe79e123c367569d8f75649db48e65e';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'f2c08dc012f05502a6a230a2c6d695918d32cb7c90aae03343bfc9e05ce2fe78';
+  'd310f1e999ab4e7c9b8a139d82ab4aa93677cc254e356a6a900dceeac51966b6';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1774,12 +1772,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-minted for the r185 frozen-camera aim fix. The first-order composite
     // follows renderer.ts, then this second-order performance seal follows the
     // swept evidence bytes. No capture was retaken.
-    // Re-minted again after extracting the delve interior build-cache
-    // scheduling into src/render/delve_interior_tracker.ts. No capture retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('0c39176f1d37c6831dcd7d2cf263cd822e170358f9a599cf301ba4daac9d61c4');
+    ).toBe('3926268b0c08ed5a46cf7f75343b5a7542531150d412574fd63fdc33fd6189d8');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
