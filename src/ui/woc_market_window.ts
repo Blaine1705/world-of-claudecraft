@@ -237,6 +237,14 @@ export class WocMarketWindow {
     this.deps.hideTooltip();
     this.deps.restoreFocus(this.opener);
     this.opener = null;
+    // Clear any in-flight guard on close, matching the trade controller: since
+    // submitListing became a wallet round trip (B6/R1), a browser-extension
+    // signer with no timeout can leave a dismissed popup's withBusy finally
+    // unreached, which would otherwise brick every Exchange button and suppress
+    // the poll for the rest of the session. The step-up challenge is single-use
+    // and the extract is idempotent, so abandoning the round trip is safe.
+    this.busy = false;
+    this.busyLabel = null;
   }
 
   /** Full refetch (open, tab change, after a mutation). */

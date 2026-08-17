@@ -169,6 +169,16 @@ describe('woc_market_window: focus management and dialog chrome', () => {
     expect(close).toContain('this.deps.restoreFocus(this.opener)');
   });
 
+  it('close() clears the in-flight busy guard so a stranded signer cannot brick the window', () => {
+    // submitListing is a wallet round trip (B6/R1); a browser-extension signer
+    // with no timeout can leave withBusy's finally unreached, so close() must
+    // clear the guard (matching the trade controller) or every Exchange button
+    // stays disabled and the poll suppressed for the rest of the session.
+    const close = betweenCode('close(): void {', 'reload(): Promise<void> {');
+    expect(close).toContain('this.busy = false');
+    expect(close).toContain('this.busyLabel = null');
+  });
+
   it('marks the dialog root with the title as its one accessible name', () => {
     expect(painter).toContain("markDialogRoot(root, { labelledBy: 'woc-market-title' })");
   });
