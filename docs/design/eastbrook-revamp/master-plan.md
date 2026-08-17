@@ -267,6 +267,16 @@ maintainer's, and slices S5 to S7 depend on them.
    with the ORKADIA "Undreamt" precedent in the lore rework plan.
 6. Bram's rehoming (S9), and whether a future venue elsewhere ever revives
    boarball (affects how aggressively S2 deletes vs quarantines).
+7. The opt-in five-seed balance full sweep (WOC_FULL_BALANCE_SWEEP=1 over
+   tests/owned_class_balance_role_bands.test.ts) is known-red on the merged
+   v0.39 base itself, measured BEFORE the demolition landed: the merged
+   castle-plus-headland tip reads warspirit area/single 1.0849 against the
+   1.1 full floor and the warspirit/vespers boss pair 1.2519 against the
+   1.2 full ceiling. The demolition tree improves both (area/single back
+   inside the floor, boss pair 1.2185) but the ceiling still trips. The
+   diet lanes the gate runs are re-anchored and green; both FULL arms are
+   deliberately left untouched for the owned-class re-author the test
+   comment already reserves. Actuals are recorded at the pin site.
 
 ## 7. Phase 2, OPEN: build New Eastbrook (the harbor town)
 
