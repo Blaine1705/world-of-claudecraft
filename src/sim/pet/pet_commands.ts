@@ -640,6 +640,7 @@ export function petAttack(ctx: SimContext, pid?: number): void {
     ctx.error(r.e.id, 'Your pet needs a hostile target.');
     return;
   }
+  if (questGateBlocksAggro(ctx.players, target, pets[0])) return;
   for (const pet of pets) {
     if (target.kind === 'mob' && target.hostile && questGateBlocksAggro(ctx.players, target, pet)) {
       continue;

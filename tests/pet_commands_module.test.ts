@@ -607,6 +607,36 @@ describe('pet_commands module (P1b)', () => {
     expect(egg.forcedTargetId).not.toBe(pet.id);
   });
 
+  it('manual hunter petAttack does not seed combat or threat against quest-gated eggs', () => {
+    const { sim, hid, hunter } = hunterWorld();
+    const tame = spawnWolf(sim, hunter);
+    completeTame(sim.ctx, hunter, tame);
+    const pet = petOf(sim.ctx, hid) as AnyEntity;
+    const egg = spawnBroodmotherEgg(sim, pet);
+    hunter.targetId = egg.id;
+
+    pet.aggroTargetId = null;
+    pet.inCombat = false;
+    petAttack(sim.ctx, hid);
+
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.inCombat).toBe(false);
+    expect(egg.threat.has(pet.id)).toBe(false);
+    expect(egg.inCombat).toBe(false);
+    expect(egg.forcedTargetId).not.toBe(pet.id);
+
+    sim.players.get(hid)?.questLog.set('q_broodmother', {
+      questId: 'q_broodmother',
+      counts: [0, 0],
+      state: 'active',
+    });
+    petAttack(sim.ctx, hid);
+
+    expect(pet.aggroTargetId).toBe(egg.id);
+    expect(pet.inCombat).toBe(true);
+    expect(egg.threat.has(pet.id)).toBe(true);
+  });
+
   it('setPetAutoTaunt cannot arm auto-taunt on a ranged warlock pet', () => {
     const sim = new Sim({
       seed: 22,
