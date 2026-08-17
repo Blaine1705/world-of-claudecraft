@@ -987,7 +987,8 @@ describe('woc_market_window: a fixed-price listing can satisfy the guards buyNow
     const detail = between('private detailPaneHtml(', 'private bidFormHtml(');
     expect(detail).toContain('this.confirmFieldsHtml(model)');
     // Only when the bid form is absent: a combined listing would otherwise render
-    // the same data-field twice and totpValue() would read whichever came first.
+    // the same data-field twice and a reader keyed on it would pick whichever
+    // came first.
     expect(detail).toContain("bidForm === ''");
     // The COMPOSITION, not the declarations. Asserting the order with indexOf over
     // the whole method was vacuous both ways: `buyNowFields` appears first in its

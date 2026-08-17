@@ -753,6 +753,17 @@ describe('step-up enforcement on the custody movers (B6/R1)', () => {
       params: listingParams(),
     });
     expect(locked).toEqual({ ok: false, reason: 'stepup_required' });
+    // The PARAMS half of the same no-oracle posture: an invalid price combo
+    // (reserve below start) must ALSO read stepup_required, not bad_reserve, or
+    // a stolen bearer could probe which price combinations validate. Moving
+    // guardStepUp below validListingParams reds exactly here.
+    const badParams = await h.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 1, itemId: RARE_ITEM },
+      params: listingParams({ reserveCents: 3000 }),
+    });
+    expect(badParams).toEqual({ ok: false, reason: 'stepup_required' });
   });
 
   it('the challenge issue refuses an unknown item id before minting anything', async () => {
@@ -839,7 +850,12 @@ describe('step-up enforcement on the custody movers (B6/R1)', () => {
       params,
       stepUp: proofForNull,
     });
-    expect(res.ok, 'the instanced copy cannot escrow under a null-copy proof').toBe(false);
+    // The exact rung is the point: the refusal must come from the copy check
+    // (stale_copy), not drift to some other reason that would still be ok:false.
+    expect(res, 'the instanced copy cannot escrow under a null-copy proof').toEqual({
+      ok: false,
+      reason: 'stale_copy',
+    });
     expect(bagsOf(h, SELLER_CHAR), 'nothing escrowed').toHaveLength(1);
   });
 
@@ -1112,6 +1128,41 @@ describe('step-up enforcement on the custody movers (B6/R1)', () => {
     expect(minted.challenge.message).toContain('$75.00');
     expect(minted.challenge.signatureRequired, 'dev harness answers false').toBe(false);
   });
+
+  it('refuses a directed-accept proof minted before a seller relink', async () => {
+    // The directed rail shares guardStepUp, so the live wallet re-read closes
+    // the issue-to-use window here too. Pinned independently of the createListing
+    // arm: a regression that skipped the wallet re-read on the accept path would
+    // pass every createListing relink test and only red here.
+    const h = makeHarness();
+    h.wallets.set(SELLER, 'wallet-seller');
+    h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
+    const offer = await h.service.createDirectedOffer({
+      account: BUYER_A,
+      characterId: CHAR_A,
+      sellerCharacterName: 'Selara',
+      usdCents: 7500,
+      item: { itemId: EPIC_ITEM },
+      acceptTerms: true,
+    });
+    if (!offer.ok) throw new Error(`offer refused: ${offer.reason}`);
+    const minted = await h.service.issueStepUpChallenge(SELLER, {
+      operation: 'accept_directed_offer',
+      offerId: offer.offer.id,
+    });
+    if (!minted.ok) throw new Error(`issue refused: ${minted.reason}`);
+    // Relink AFTER minting, BEFORE the seller presses Accept.
+    h.wallets.set(SELLER, 'wallet-seller-relinked');
+    const res = await h.service.acceptDirectedOffer(
+      SELLER,
+      offer.offer.id,
+      { index: 0, itemId: EPIC_ITEM },
+      SELLER_CHAR,
+      { nonce: minted.challenge.nonce, signature: `devsig:${minted.challenge.nonce}` },
+    );
+    expect(res).toEqual({ ok: false, reason: 'stepup_wallet_mismatch' });
+    expect(bagsOf(h, SELLER_CHAR)).toHaveLength(1);
+  });
 });
 
 describe('createListing', () => {
@@ -1182,21 +1233,27 @@ describe('createListing', () => {
     expect(h.db.escrowSaves).toHaveLength(0);
   });
 
-  it('refuses locked on the AUTHORITATIVE extracted copy, and restores it', async () => {
-    // The honest client claims the locked copy it sees; the in-job extraction
-    // re-decides eligibility against the real payload and refuses the lock,
-    // restoring the copy to the bags. (A client that instead claimed null while
-    // the copy is locked refuses stale_copy at the same extraction, since the
-    // public arm forces expectInstance present; either way nothing escrows.)
+  it('a null-claim over a locked live copy is caught at extraction, not slipped through', async () => {
+    // A client that LIES about a locked copy by omitting the instance cannot
+    // slip it into escrow: the public arm forces expectInstance present (null),
+    // so the in-job extraction compares the claimed null to the locked live
+    // slot and refuses BEFORE any custody write, and the copy stays in the bags
+    // still locked. (The honest claimed-locked case refuses at the pre-check,
+    // the test above; the extracted-copy LOCKED reason itself is exercised by
+    // the directed rail, whose itemRef carries no claim to compare.) This is
+    // the non-vacuous half: the extraction runs here, unlike the pre-check.
     const h = makeHarness();
     h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1, instance: { locked: true } }]);
     const res = await createListingSteppedUp(h, {
       account: SELLER,
       characterId: SELLER_CHAR,
-      itemRef: { index: 0, itemId: EPIC_ITEM, expectInstance: { locked: true } },
+      // No expectInstance: the public arm forces it to null, so the extraction
+      // (not the claimed-instance pre-check) is what runs and refuses.
+      itemRef: { index: 0, itemId: EPIC_ITEM },
       params: listingParams(),
     });
-    expect(res).toEqual({ ok: false, reason: 'locked' });
+    expect(res).toEqual({ ok: false, reason: 'stale_copy' });
+    expect(h.custody.extractAttempts).toContain(SELLER_CHAR);
     expect(bagsOf(h, SELLER_CHAR)).toHaveLength(1);
     expect(bagsOf(h, SELLER_CHAR)[0]?.instance?.locked).toBe(true);
     expect(h.db.escrowSaves).toHaveLength(0);

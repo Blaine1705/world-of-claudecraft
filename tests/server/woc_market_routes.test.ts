@@ -1075,6 +1075,31 @@ describe('the phantom TOTP scaffolding stays deleted (B6/R1)', () => {
   });
 });
 
+describe('the devsig arm is production-unreachable by wiring (B6/R1)', () => {
+  it('derives stepUpDevSig from the double-gated dev switch, never a literal', () => {
+    // The service HONORS the flag in both directions (the service suite proves
+    // a real ed25519 signature end to end with it false), but mutating
+    // server/main.ts's wiring to stepUpDevSig: true would accept devsig:<nonce>
+    // in production for every challenge, a total bypass, with every other test
+    // still green. WOC_MARKET_DEV_SERVICE otherwise appears in no test. Pin the
+    // wiring: the switch is the ALLOW_DEV_COMMANDS AND WOC_MARKET_DEV_SERVICE
+    // conjunction, and stepUpDevSig reads that const, never a bare boolean.
+    const main = readFileSync(new URL('../../server/main.ts', import.meta.url), 'utf8');
+    const i = main.indexOf('const wocMarketDevService');
+    expect(i).toBeGreaterThanOrEqual(0);
+    const decl = main.slice(i, main.indexOf(';', i) + 1);
+    expect(decl).toContain("process.env.ALLOW_DEV_COMMANDS === '1'");
+    expect(decl).toContain("process.env.WOC_MARKET_DEV_SERVICE === '1'");
+    expect(decl).toContain('&&');
+    // The assignment reads the double-gated const, never a bare boolean.
+    const j = main.indexOf('stepUpDevSig:');
+    expect(j).toBeGreaterThanOrEqual(0);
+    const assign = main.slice(j, main.indexOf('\n', j));
+    expect(assign).toContain('stepUpDevSig: wocMarketDevService');
+    expect(assign).not.toMatch(/stepUpDevSig:\s*(?:true|false)\b/);
+  });
+});
+
 describe('the step-up rate bucket (B6/R1)', () => {
   it('has its OWN bucket at double the list limit, so the mint-then-create pair never halves listing throughput', () => {
     // A literal pin: swapping the route to WOC_MARKET_READ_POLICY or deleting
@@ -1241,7 +1266,11 @@ describe('the step-up surface at the route layer (B6/R1)', () => {
       (r) => r.method === 'POST' && r.path === '/api/woc-market/step-up/challenge',
     );
     expect(route, 'the challenge route exists').toBeTruthy();
-    const src = readFileSync(new URL('../../server/woc_market_routes.ts', import.meta.url), 'utf8');
+    // Comment-stripped so a swapped policy left behind in a comment inside the
+    // RouteDef block cannot keep this pin green.
+    const src = readFileSync(new URL('../../server/woc_market_routes.ts', import.meta.url), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, ' ')
+      .replace(/\/\/[^\n]*/g, ' ');
     const block = src.slice(
       src.indexOf("path: '/api/woc-market/step-up/challenge'"),
       src.indexOf('handler: stepUpChallengeHandler'),
@@ -1448,5 +1477,51 @@ describe('the step-up surface at the route layer (B6/R1)', () => {
     await expect(
       handlerFor('POST', '/api/woc-market/step-up/challenge')(ctx),
     ).rejects.toMatchObject({ status: 403, code: 'woc_market.wallet_required' });
+  });
+
+  it('bounds the directed offerId: a zero or negative id is invalid_input, never minted', async () => {
+    service({
+      issueStepUpChallenge: async () => {
+        throw new Error('must not be reached');
+      },
+    });
+    for (const offerId of [0, -1, 1.5]) {
+      await expect(
+        handlerFor(
+          'POST',
+          '/api/woc-market/step-up/challenge',
+        )(
+          postCtx('/api/woc-market/step-up/challenge', {
+            operation: 'accept_directed_offer',
+            offerId,
+          }),
+        ),
+        String(offerId),
+      ).rejects.toMatchObject({ code: 'woc_market.invalid_input' });
+    }
+  });
+
+  it('a malformed expectInstance refuses invalid_input even on the directed shape that ignores it', async () => {
+    // expectInstance and format decode BEFORE the operation branch, so a bad
+    // instance on an accept request refuses at decode rather than being
+    // ignored. Surprising but safe (the directed arm never reads it); pinned
+    // so a decode reorder that swallowed it would red here.
+    service({
+      issueStepUpChallenge: async () => {
+        throw new Error('must not be reached');
+      },
+    });
+    await expect(
+      handlerFor(
+        'POST',
+        '/api/woc-market/step-up/challenge',
+      )(
+        postCtx('/api/woc-market/step-up/challenge', {
+          operation: 'accept_directed_offer',
+          offerId: 41,
+          expectInstance: [],
+        }),
+      ),
+    ).rejects.toMatchObject({ code: 'woc_market.invalid_input' });
   });
 });

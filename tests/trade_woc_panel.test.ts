@@ -611,7 +611,11 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
     // player-facing message with the catalog fallback.
     expect(accept).toContain('issued.challenge.signatureRequired === false');
     expect(accept).toContain('devsig:${issued.challenge.nonce}');
-    expect(accept).toContain('hudChrome.wocMarket.signFailed');
+    // The listing-flavored decline copy, NOT the payment path's signFailed:
+    // signFailedConfirm is a superstring of signFailed, so the anti-pin below
+    // is what actually holds the change (mirrors the market-window twin).
+    expect(accept).toContain('hudChrome.wocMarket.signFailedConfirm');
+    expect(accept).not.toContain("t('hudChrome.wocMarket.signFailed')");
   });
 
   it('drives the Accept button from the OFFER, not the sim trade', () => {

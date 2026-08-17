@@ -115,9 +115,10 @@ The custody-moving operations (`createListing` and the seller side of
 signed by the linked wallet, bound to the operation and every money figure it
 authorizes, verified in the service (`server/woc_market_stepup.ts`). This
 replaced the PRD's original TOTP threshold design, which was never enforced
-server-side; the phantom scaffolding is deleted (the two `woc_market.totp_*`
-error codes alone remain, retired-and-commented, per the append-only
-error-code contract).
+server-side; the phantom scaffolding is deleted. The two `woc_market.totp_*`
+error codes are kept by the append-only error-code contract, so their whole
+localization surface stays with them (the catalog rows, the api_error mapping
+rows, and the per-locale fills), each comment-marked retired and never raised.
 
 Balance checks do not guarantee later possession, so every bid posts a small
 refundable bond, denominated in USD and paid in $WOC when the bid is placed

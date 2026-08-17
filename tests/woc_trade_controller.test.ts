@@ -187,6 +187,7 @@ function fakeHooks(): {
     lastAcceptBody: Record<string, unknown> | null;
     lastCreateBody: Record<string, unknown> | null;
     stepUpSignatureRequired: boolean;
+    stepUpOmitSignatureRequired: boolean;
     stepUpGate: Promise<void> | null;
     signMessageImpl: (message: string) => Promise<string>;
     calls: {
@@ -220,6 +221,9 @@ function fakeHooks(): {
     // signatureRequired true and/or defer resolution to exercise the real
     // wallet arm and the in-flight face.
     stepUpSignatureRequired: false as boolean,
+    // When true the challenge answer OMITS signatureRequired entirely, so the
+    // absent-means-sign contract can be exercised behaviorally.
+    stepUpOmitSignatureRequired: false as boolean,
     stepUpGate: null as null | Promise<void>,
     // The wallet message-signer. Default resolves; a test can reject it (a
     // decline) or count calls.
@@ -264,7 +268,11 @@ function fakeHooks(): {
             nonce,
             message: `step-up message ${nonce}`,
             expiresAtMs: 4_000_000_000_000,
-            signatureRequired: state.stepUpSignatureRequired,
+            // An older server may not send the field at all; the client must
+            // then default to requiring a signature, never skip it.
+            ...(state.stepUpOmitSignatureRequired
+              ? {}
+              : { signatureRequired: state.stepUpSignatureRequired }),
           },
         };
       },
@@ -865,18 +873,44 @@ describe('the accept request body (seller escrow)', () => {
     expect(c.wocTradeAccepting, 'false once it settles').toBe(false);
   });
 
-  it('resets the in-flight flag on close, so a dismissed wallet does not stick the next trade', () => {
+  it('resets BOTH in-flight guards on close, so a dismissed wallet does not stick the next trade', () => {
     const h = fakeHooks();
     const r = rig(h.hooks);
-    const c = r.controller as unknown as { wocTradeAccepting: boolean };
+    const c = r.controller as unknown as { wocTradeAccepting: boolean; wocTradePaying: boolean };
     // Open the window first (the close-reset lives in the was-open branch), then
-    // simulate a wallet round trip left in flight (desktop signer has no
-    // timeout), then close: the flag must clear so the next trade is not stuck.
+    // simulate BOTH wallet round trips left in flight (desktop signer has no
+    // timeout): the accept guard AND the pay guard must clear on close, or the
+    // next trade is stuck on whichever one was left set.
     openTrade(r);
     c.wocTradeAccepting = true;
+    c.wocTradePaying = true;
     r.host.tradeInfo = null;
     r.controller.updateTradeWindow();
-    expect(c.wocTradeAccepting, 'closing the window abandons the round trip').toBe(false);
+    expect(c.wocTradeAccepting, 'closing the window abandons the accept round trip').toBe(false);
+    expect(c.wocTradePaying, 'closing the window abandons the pay round trip').toBe(false);
+  });
+
+  it('an absent signatureRequired still drives the wallet (absent means sign)', async () => {
+    // The SDK field is optional, so a server that stops sending it must not be
+    // read as permission to skip signing. The other tests always set the flag
+    // explicitly, so this is the only behavioral cover of the absent case.
+    const h = fakeHooks();
+    h.state.stepUpOmitSignatureRequired = true;
+    const r = rig(h.hooks);
+    r.host.staged.items.push({ itemId: 'worn_sword', count: 1 });
+    r.host.inventory.push({ itemId: 'worn_sword', count: 1 });
+    const c = r.controller as unknown as {
+      wocTradeOffer: WocPendingOffer | null;
+      acceptWocTradeOffer(): Promise<void>;
+    };
+    c.wocTradeOffer = heldOffer({ role: 'seller' });
+    await c.acceptWocTradeOffer();
+    // The wallet WAS driven: a devsig short-circuit would have left this empty.
+    expect(h.state.calls.signMessages).toEqual(['step-up message nonce-1']);
+    expect(h.state.lastAcceptBody?.stepUp).toMatchObject({
+      nonce: 'nonce-1',
+      signature: 'walletsig',
+    });
   });
 
   it('refuses a stale accept over a MULTI-SLOT staged table with the one_item WHY', async () => {

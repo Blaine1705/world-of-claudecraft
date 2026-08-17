@@ -238,6 +238,24 @@ describeDb('woc market step-up challenges against real Postgres', () => {
     );
     expect(idx.rowCount).toBe(1);
     expect(idx.rows[0].indexdef).toContain('(account_id)');
+    // The issue-time prune seek: realm-leading so a multi-realm prune matches
+    // realm = $1 AND expires_at <= $2 instead of scanning the whole expiry
+    // range. Reverting to the superseded single-column expiry index (or
+    // dropping the composite) reds here.
+    const prune = await pool.query(
+      `SELECT indexdef FROM pg_indexes
+        WHERE tablename = 'woc_market_stepup_challenges'
+          AND indexname = 'woc_market_stepup_challenges_realm_expiry'`,
+    );
+    expect(prune.rowCount).toBe(1);
+    expect(prune.rows[0].indexdef).toContain('(realm, expires_at)');
+    // The superseded single-column index must be gone (write amplification).
+    const superseded = await pool.query(
+      `SELECT 1 FROM pg_indexes
+        WHERE tablename = 'woc_market_stepup_challenges'
+          AND indexname = 'woc_market_stepup_challenges_expiry'`,
+    );
+    expect(superseded.rowCount).toBe(0);
   });
 
   it('refuses a duplicate nonce at the primary key', async () => {
