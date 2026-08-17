@@ -502,6 +502,14 @@ For off-box safety, sync the directory to S3 occasionally:
   no transaction, no funds), so a seller whose wallet is linked but
   unavailable at the moment cannot list; no knob controls this and no env
   change accompanies it (the dev economy pair alone enables the devsig arm).
+  Security framing (be precise with operators): the step-up RAISES THE BAR and
+  makes a custody move require a live, attributable wallet signature; it is not
+  by itself an absolute "a stolen session cannot move custody" guarantee,
+  because the wallet-link relink path needs only the incoming wallet's
+  signature, so a bearer thief could relink to their own wallet first. Closing
+  that (outgoing-wallet signature on relink, a link-age cooldown, or refusing
+  relink while escrow is live) is a tracked pre-enable security follow-up in
+  docs/woc-marketplace-hardening/state.md.
 - **Ops dashboard market reads**: `DASHBOARD_INTERNAL_SECRET` gates the ops
   dashboard's `/internal/woc-market/*` reads; unset leaves them 404 (names
   only here, the values live in deployment secrets).

@@ -1,7 +1,20 @@
 // Wallet-signature step-up for the $WOC Exchange's custody-moving operations
 // (B6/R1): createListing and the seller side of acceptDirectedOffer require a
-// fresh server-issued challenge signed by the account's LINKED wallet, so a
-// stolen session bearer alone can no longer move item custody.
+// fresh server-issued challenge signed by the account's LINKED wallet.
+//
+// SCOPE OF THE GUARANTEE (be honest about it): this raises the bar and makes a
+// custody move loud and attributable (it demands a live wallet signature, not
+// the bearer alone), but it is NOT an absolute "a stolen bearer cannot move
+// custody" bar on its own, because relinking the account's wallet
+// (POST /api/wallet/link) needs only the INCOMING wallet's signature and is an
+// upsert. A bearer thief can relink to their own wallet FIRST, then sign every
+// challenge. The module's live re-read closes the issue-to-use window (a relink
+// between issuance and use refuses), but not a relink BEFORE issuance. Closing
+// that is a named security follow-up in the wallet-link flow (out of this
+// change's scope): require the OUTGOING wallet's signature to relink/unlink, or
+// a link-age cooldown before a freshly linked wallet may authorize custody, or
+// refuse relink while the account holds live escrowed listings. Tracked in
+// docs/woc-marketplace-hardening/state.md.
 //
 // Protocol shape (the wallet_link_challenges rules, tightened):
 // - The server builds and stores the FULL signed message; the client can never
