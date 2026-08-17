@@ -184,8 +184,10 @@ interface AttributionTargetFixture {
 // Re-minted for the r185 frozen-camera aim fix: updateCamera now aims through
 // lookAtFrozen, so renderer.ts moves and the composite follows its bytes. No
 // capture was retaken.
+// Re-minted for the release/v0.39 integrated gate: the current merged tree
+// computes this composite from clean provenance inputs. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'd310f1e999ab4e7c9b8a139d82ab4aa93677cc254e356a6a900dceeac51966b6';
+  '3c34cc4a9231d521aec458709f89257e6738fc0d313cc6d54790f53f997ab5d1';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
