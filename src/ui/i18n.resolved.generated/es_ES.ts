@@ -953,6 +953,22 @@ export const es_ES: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
+    },
     "compass": {
       "N": "N",
       "NE": "NE",
@@ -12379,6 +12395,9 @@ export const es_ES: EnTranslations = {
       "pristine_claw": {
         "name": "Garra Prístina"
       },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
+      },
       "conjured_water4": {
         "name": "Agua de Manantial Invocada"
       },
@@ -16862,6 +16881,11 @@ export const es_ES: EnTranslations = {
         "name": "La Última Fortaleza",
         "enterText": "Entras en los fríos y silenciosos salones del Last Keep.",
         "leaveText": "Cierras tras de ti la puerta de la fortaleza y vuelves al viento de los Drakelands."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "El Templo Ahogado",

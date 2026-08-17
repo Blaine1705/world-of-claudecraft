@@ -206,8 +206,10 @@ interface AttributionTargetFixture {
 // Re-minted for the PR #3447 merge: the v0.39 wrapper, corrected PR #3446 sky
 // KTX2 renderer bytes, and mount-program prewarm bytes combine in one tree. No
 // capture was retaken.
+// Re-minted for the moved-base v0.39 wrapper refresh: the castle renderer bytes
+// and v0.39 wrapper bytes combine in one tree. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '83a6e1ea7e9b56e05787114e29f536c8e28247ef171f54f160eb178cbbc03f51';
+  '4659473f081bbf0bd0d6e04c8451831787dba2b05cf367107a6b8efc702f3c69';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

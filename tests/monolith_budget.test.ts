@@ -56,7 +56,14 @@ const MONOLITHS: MonolithRow[] = [
     // buildPostEntryPreviewPrewarmUnits) that has no clean branch-owned
     // extraction, landing on upstream's zero-slack re-pin. Maintainer decision,
     // exact merged count: any further growth reds again.
-    ceiling: 19442,
+    // Re-pinned 19433 -> 19488 when the castle branch merged main: the castle
+    // additions are thin-consumer wiring to extracted modules (the two
+    // LastKeepMapPainter declarations and the two walk-in map branches on the
+    // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
+    // count: any further growth reds again.
+    // Re-pinned to the moved-base v0.39 wrapper merge output. The combined tree
+    // lands below both branch ceilings, so keep the exact merged count.
+    ceiling: 19387,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -107,7 +114,13 @@ const MONOLITHS: MonolithRow[] = [
     // unchecked.
     // Merging PR #3447 onto the corrected PR #3446 v0.39 wrapper leaves the
     // renderer below this bound; any further growth reds again.
-    ceiling: 13826,
+    // Lowered again by the castle branch's interior_light_rig.ts extraction;
+    // after merging main the merged file lands below both prior pins, so the
+    // ceiling is the exact merged count.
+    // Re-pinned to the moved-base v0.39 wrapper merge output. The combined tree
+    // lands above the castle-side pin but below the v0.39 mount-prewarm pin, so
+    // keep the exact merged count.
+    ceiling: 13731,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
