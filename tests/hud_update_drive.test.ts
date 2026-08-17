@@ -696,9 +696,9 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.actionBarPainter.paint',
     band: 'frame',
-    gate: '',
+    gate: '!this.isMobileLayout()',
     surface: 'chrome',
-    why: 'the desktop action bar, facet-routed',
+    why: 'the desktop action bar, facet-routed; skipped on touch where hud.mobile.css sets #actionbar/#actionbar2/#actionbar3 to display:none the whole time (the mobile action ring below supersedes it), so ticking + painting it was pure waste every frame',
   },
   {
     call: 'this.currentMobileActionPage',
