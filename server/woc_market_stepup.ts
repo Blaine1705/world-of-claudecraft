@@ -159,15 +159,28 @@ export function stepUpBindingDigest(binding: WocStepUpBinding): string {
  *  is length-capped before it can reach the wallet popup. The binding digest
  *  covers the REAL fields regardless; this is purely the human-readable line. */
 function safeMessagePiece(raw: string): string {
-  // Drop control chars (newlines especially, the forge vector) by code point,
-  // no regex, then collapse runs of whitespace and length-cap.
-  const printable = Array.from(raw)
+  // Coerce first: the route's optionalInstance is a size-capped UNCHECKED cast
+  // (server/woc_market_routes.ts), so a client can send a non-string in a
+  // descriptor slot. String() keeps a malformed body a decode-class refusal
+  // instead of a 500 from calling a char method on a non-char.
+  const text = typeof raw === 'string' ? raw : String(raw);
+  // Drop control chars by code point (no control-char regex, so biome's
+  // noControlCharactersInRegex stays quiet): C0 and DEL are the newline-forge
+  // vector, and C1 (0x80 to 0x9f, e.g. NEL) can read as a line break in some
+  // wallet renderers. Then strip Unicode format chars (Cf: bidi overrides and
+  // isolates, zero-width joiners) that would misrender the copy line, collapse
+  // runs of whitespace, and length-cap.
+  const controlsStripped = Array.from(text)
     .filter((ch) => {
-      const code = ch.charCodeAt(0);
-      return code >= 0x20 && code !== 0x7f;
+      const code = ch.codePointAt(0) ?? 0;
+      return code >= 0x20 && code !== 0x7f && !(code >= 0x80 && code <= 0x9f);
     })
     .join('');
-  return printable.replace(/\s+/g, ' ').trim().slice(0, 48);
+  return controlsStripped
+    .replace(/\p{Cf}/gu, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 48);
 }
 
 /** A short human descriptor of the copy for the signed message: the rolled

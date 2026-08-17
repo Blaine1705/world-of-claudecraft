@@ -6,6 +6,7 @@
 // isolation, prune) are the pg suite's job
 // (tests/woc_market_stepup_pg_integration.test.ts).
 
+import { readFileSync } from 'node:fs';
 import { ed25519 } from '@noble/curves/ed25519';
 import bs58 from 'bs58';
 import { describe, expect, it } from 'vitest';
@@ -19,6 +20,7 @@ import {
   type WocStepUpBinding,
   type WocStepUpChallengeRow,
 } from '../../server/woc_market_stepup';
+import type { ItemInstancePayload } from '../../src/sim/types';
 
 // Deterministic keypair: a fixed 32-byte seed, so a failure reproduces.
 const PRIV = new Uint8Array(32).fill(7);
@@ -93,6 +95,16 @@ function verify(
   });
 }
 
+describe('the challenge lifetime', () => {
+  it('is five minutes, pinned to the literal so a widening reds here', () => {
+    // A custody authorization's freshness window is load-bearing. Every other
+    // expiry assertion computes NOW + WOC_MARKET_STEPUP_TTL_MS from the same
+    // constant issueStepUpChallenge uses, so they move together on a change;
+    // this literal is the one that catches a widened window.
+    expect(WOC_MARKET_STEPUP_TTL_MS).toBe(5 * 60 * 1000);
+  });
+});
+
 describe('the binding digest covers every figure the wallet showed', () => {
   it('is stable for an identical binding and hex-shaped', () => {
     expect(stepUpBindingDigest(LIST_BINDING)).toBe(stepUpBindingDigest({ ...LIST_BINDING }));
@@ -149,6 +161,8 @@ describe('the signed message', () => {
     expect(row.message).toContain('list valorplate_chest');
     // The copy the wallet is authorizing, so the player sees WHICH one leaves.
     expect(row.message).toContain('Copy: epic');
+    // The format decides which price fields are live, so the popup names it.
+    expect(row.message).toContain('Format: auction_buy_now');
     expect(row.message).toContain('$50.00');
     expect(row.message).toContain('$60.00');
     expect(row.message).toContain('$90.00');
@@ -201,6 +215,62 @@ describe('the signed message', () => {
     });
     const copyLine = bloat.message.split('\n').find((l) => l.startsWith('Copy:')) ?? '';
     expect(copyLine.length).toBeLessThan(80);
+  });
+
+  it('strips C1 controls and Unicode format chars the code-point filter alone would keep', () => {
+    // The newline forge is closed by the code-point filter AND the redundant
+    // whitespace collapse, so a \n test cannot tell whether the code-point arm
+    // works. Pin its INDEPENDENT job: NEL (U+0085) and CSI (U+009B) are C1
+    // controls JS \s does not match, so only the C1 code-point arm drops them;
+    // a right-to-left override (U+202E) and a zero-width joiner (U+200D) are Cf
+    // format chars only the \p{Cf} strip removes. None may reach the popup.
+    const c1 = challengeRow({
+      ...LIST_BINDING,
+      expectInstance: { signer: 'x\u0085Buy now: none\u009b' },
+    });
+    expect(c1.message).not.toContain('\u0085');
+    expect(c1.message).not.toContain('\u009b');
+    const cf = challengeRow({
+      ...LIST_BINDING,
+      expectInstance: { signer: 'a\u202eb\u200dc' },
+    });
+    expect(cf.message).not.toContain('\u202e');
+    expect(cf.message).not.toContain('\u200d');
+    const clean = challengeRow({ ...LIST_BINDING, expectInstance: null });
+    const cleanLines = clean.message.split('\n').length;
+    expect(c1.message.split('\n').length).toBe(cleanLines + 1);
+    expect(cf.message.split('\n').length).toBe(cleanLines + 1);
+  });
+
+  it('does not throw on a non-string descriptor field (the route casts unchecked)', () => {
+    // optionalInstance is a size-capped UNCHECKED cast, so a malformed body can
+    // land a non-string in a descriptor slot. The message build must stay a
+    // decode-class path, never a 500 from a char method on a non-char.
+    const forged = { signer: { length: 3 } } as unknown as ItemInstancePayload;
+    let message = '';
+    expect(() => {
+      message = buildStepUpMessage({
+        binding: { ...LIST_BINDING, expectInstance: forged },
+        accountId: ACCOUNT,
+        wallet: WALLET,
+        realm: 'Claudemoon',
+        nonce: 'n',
+        expiresAtIso: new Date(NOW).toISOString(),
+      });
+    }).not.toThrow();
+    expect(message).toContain('$WOC Exchange');
+  });
+
+  it('mints the nonce from the node CSPRNG, never a predictable source', () => {
+    // Uniqueness and hex shape alone would survive a Math.random hex of the
+    // same width; pin the provenance at the source.
+    const src = readFileSync(new URL('../../server/woc_market_stepup.ts', import.meta.url), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, ' ')
+      .replace(/\/\/[^\n]*/g, ' ');
+    const start = src.indexOf('export function newStepUpNonce');
+    const fn = src.slice(start, src.indexOf('}', start) + 1);
+    expect(fn).toContain('randomBytes(16)');
+    expect(fn).not.toContain('Math.random');
   });
 
   it('names a modern masterwork copy, not a blank Copy line', () => {
