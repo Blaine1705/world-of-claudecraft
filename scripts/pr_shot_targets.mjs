@@ -9419,9 +9419,10 @@ export const TARGETS = [
     when: ['practice_dummies'],
     // Deliberately branch-agnostic: the camera is staged from FIXED world
     // coordinates and the target frame locks onto whichever dummy stands
-    // furthest east, so the same recipe runs unchanged on the base commit (one
-    // training dummy) and on the branch (four). That is what makes the before
-    // and after frames comparable instead of two differently-composed shots.
+    // furthest west (the heroic end of the row; engine east is minus x), so the
+    // same recipe runs unchanged on the base commit (one training dummy) and on
+    // the branch (four). That is what makes the before and after frames
+    // comparable instead of two differently-composed shots.
     variants: [
       { key: 'desktop', charClass: 'priest', charName: 'Wardmara', beforeLoad: lowGraphicsSeed },
       {
@@ -9470,11 +9471,11 @@ export const TARGETS = [
         player.facing = 0;
         player.prevFacing = 0;
         sim.rebucket?.(player);
-        const eastmost = [...sim.entities.values()]
+        const westmost = [...sim.entities.values()]
           .filter((e) => e.kind === 'mob' && !e.dead && e.name.toLowerCase().includes('dummy'))
           .sort((a, b) => b.pos.x - a.pos.x)[0];
-        if (eastmost) sim.targetEntity(eastmost.id, player.id);
-        return { ok: true, targetName: eastmost?.name ?? '', dummies: eastmost ? 1 : 0 };
+        if (westmost) sim.targetEntity(westmost.id, player.id);
+        return { ok: true, targetName: westmost?.name ?? '', dummies: westmost ? 1 : 0 };
       });
       if (!staged.ok) throw new Error(staged.reason);
       // Moving across zones can start the streaming overlay on the next frame.

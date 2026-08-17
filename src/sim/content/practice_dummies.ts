@@ -123,8 +123,9 @@ export const PRACTICE_DUMMY_MOBS: Record<string, MobTemplate> = {
   },
 };
 
-// The row runs west to east along the hill above Highwatch at a fixed 2 yard
-// pitch, in ascending order of what it represents: ally, normal trash, normal
+// The row runs east to west along the hill above Highwatch (the engine compass
+// puts east at minus x, so ascending x walks west) at a fixed 2 yard pitch, in
+// ascending order of what it represents: ally, normal trash, normal
 // boss, heroic boss. The original training dummy holds its shipped spot at
 // x -40 (zone3.ts owns that camp entry and the deed that names it), so the row
 // is anchored on it and the three new marks are measured off it rather than the
@@ -133,7 +134,7 @@ export const PRACTICE_ROW_Z = 648;
 export const PRACTICE_ROW_SPACING = 2;
 export const PRACTICE_ROW_TRAINING_DUMMY_X = -40;
 
-// Position in the row, west (0) to east (3). The training dummy is slot 1.
+// Position in the row, east (0) to west (3). The training dummy is slot 1.
 export const PRACTICE_ROW_ORDER: readonly string[] = [
   FRIENDLY_PLAYER_DUMMY_ID,
   'training_dummy',

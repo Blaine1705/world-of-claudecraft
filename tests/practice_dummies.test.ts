@@ -86,7 +86,8 @@ describe('the Highwatch practice row', () => {
     const sim = makeWorld();
     const xs = PRACTICE_ROW_ORDER.map((id) => dummyOf(sim, id).pos.x);
 
-    // The requested order, west to east, at the requested pitch.
+    // The requested order, east to west (ascending x; engine east is minus x),
+    // at the requested pitch.
     expect(xs.map(Math.round)).toEqual([-42, -40, -38, -36]);
     for (let i = 1; i < xs.length; i++) {
       expect(Math.round(xs[i] - xs[i - 1])).toBe(PRACTICE_ROW_SPACING);
