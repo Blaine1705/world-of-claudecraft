@@ -578,13 +578,13 @@ describe('the refusal-to-wire mapping', () => {
       account: { accountId: VIEWER, scope: 'full' },
       body: { characterId: 3, acceptTerms: true },
     });
-    await expect(handlerFor('POST', '/api/woc-market/listings/:id/buy-now')(ctx)).rejects.toMatchObject(
-      {
-        status: 409,
-        code: 'woc_market.claim_cooldown',
-        params: { retryAfterSeconds: 55 },
-      },
-    );
+    await expect(
+      handlerFor('POST', '/api/woc-market/listings/:id/buy-now')(ctx),
+    ).rejects.toMatchObject({
+      status: 409,
+      code: 'woc_market.claim_cooldown',
+      params: { retryAfterSeconds: 55 },
+    });
   });
 
   it('the admin suspend handler throws REGISTERED codes, never inline English', async () => {

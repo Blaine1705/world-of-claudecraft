@@ -3406,11 +3406,7 @@ export class PgWocMarketDb implements WocMarketDb {
     return res.rowCount ?? 0;
   }
 
-  async bidsByAccount(
-    realm: string,
-    account: number,
-    limit: number,
-  ): Promise<WocActivityBidRow[]> {
+  async bidsByAccount(realm: string, account: number, limit: number): Promise<WocActivityBidRow[]> {
     // Item-named for the Activity surface. A correlated PK lookup, not a JOIN:
     // the shared BID_COLS list is unqualified and both tables carry id/realm/
     // status, so a join would make it ambiguous; the subquery is one index hit

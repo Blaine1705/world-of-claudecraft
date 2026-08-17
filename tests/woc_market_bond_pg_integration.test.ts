@@ -1374,7 +1374,8 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
         ]);
         expect(verdict).toEqual({
           refusal: 'claim_cooldown',
-          retryAtMs: BASE_MS - MINUTE_MS + rulesMod.WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS * 1000,
+          retryAtMs:
+            BASE_MS - MINUTE_MS + rulesMod.WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS * 1000,
         });
         await client.query('ROLLBACK');
       } finally {

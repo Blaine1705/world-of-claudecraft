@@ -122,7 +122,9 @@ describe('userFacingApiError parametric codes', () => {
       code: 'woc_market.claim_cooldown',
       params: { retryAfterSeconds: 1800 },
     });
-    expect(err).toBe(t('hudChrome.wocMarket.claimCooldownRetry', { duration: formatDuration(1800) }));
+    expect(err).toBe(
+      t('hudChrome.wocMarket.claimCooldownRetry', { duration: formatDuration(1800) }),
+    );
     expect(err).toContain(formatDuration(1800));
   });
 

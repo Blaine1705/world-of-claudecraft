@@ -1140,9 +1140,7 @@ export class FakeWocMarketDb implements WocMarketDb {
       const mine = this.buyNowAbandons.filter((a) => a.realm === realm && a.account === account);
       // Both arms are probed and the LATER retry moment wins, mirroring the
       // Pg probe: the refusal names WHEN a retry can first succeed.
-      const reclaimHits = mine.filter(
-        (a) => a.listingId === id && a.lockExpiresMs > reclaimCutoff,
-      );
+      const reclaimHits = mine.filter((a) => a.listingId === id && a.lockExpiresMs > reclaimCutoff);
       const reclaimAtMs =
         reclaimHits.length === 0
           ? null
@@ -1564,11 +1562,7 @@ export class FakeWocMarketDb implements WocMarketDb {
     return due.length;
   }
 
-  async bidsByAccount(
-    realm: string,
-    account: number,
-    limit: number,
-  ): Promise<WocActivityBidRow[]> {
+  async bidsByAccount(realm: string, account: number, limit: number): Promise<WocActivityBidRow[]> {
     // Item-named like the Pg read; empty string when the listing is gone.
     return [...this.bids.values()]
       .filter((bid) => bid.realm === realm && bid.account === account)

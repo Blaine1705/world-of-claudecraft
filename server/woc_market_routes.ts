@@ -240,10 +240,7 @@ export const REFUSAL_ERRORS: Record<WocMarketRefusal, { status: number; code: Er
  *  Refused.params channel): a handler that drops them ships a code whose
  *  declared placeholders never render. Codes with params today:
  *  woc_market.claim_cooldown (retryAfterSeconds). */
-function throwRefusal(
-  reason: WocMarketRefusal,
-  params?: Record<string, string | number>,
-): never {
+function throwRefusal(reason: WocMarketRefusal, params?: Record<string, string | number>): never {
   const mapped = REFUSAL_ERRORS[reason] ?? { status: 400, code: 'woc_market.invalid_input' };
   throw new HttpError(mapped.status, mapped.code, params);
 }

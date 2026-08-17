@@ -805,7 +805,7 @@ describe('woc_market_window: the sell tab is an ARIA combobox', () => {
     const sell = between('private sellHtml(', 'private activityHtml(');
     expect(sell).toContain('this.tooltipTargets.set(`opt:${r.index}`');
     expect(sell).toContain('instance: r.instance');
-    expect(sell).toContain('data-tt-key="opt:${r.index}"');
+    expect(sell).toContain(`data-tt-key="opt:\${r.index}"`);
     // The key rides on the icon and NOT on the name: a card chasing the pointer
     // across every row of a 70-item list is noise, so the icon is the deliberate
     // target. Pinned by position, since both live in the same option div.
@@ -1531,7 +1531,7 @@ describe('woc_market_window: the Activity tab is an honest, actionable ledger (H
     );
     expect(activity).toContain('data-action="cancel-listing"');
     // Focus survives the poll rebuild (the window-family focus-key contract).
-    expect(activity).toContain('wm-activity-cancel-${l.id}');
+    expect(activity).toContain(`wm-activity-cancel-\${l.id}`);
   });
 });
 
