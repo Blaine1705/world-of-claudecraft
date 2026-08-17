@@ -169,14 +169,43 @@ describe('woc_market_window: focus management and dialog chrome', () => {
     expect(close).toContain('this.deps.restoreFocus(this.opener)');
   });
 
-  it('close() clears the in-flight busy guard so a stranded signer cannot brick the window', () => {
+  it('close() clears the busy guard AND bumps the generation so a stranded signer cannot brick or double-submit', () => {
     // submitListing is a wallet round trip (B6/R1); a browser-extension signer
-    // with no timeout can leave withBusy's finally unreached, so close() must
-    // clear the guard (matching the trade controller) or every Exchange button
-    // stays disabled and the poll suppressed for the rest of the session.
+    // with no timeout can leave withBusy's finally unreached. close() clears the
+    // guard so the window is usable again AND bumps busyGen: without the bump,
+    // resetting busy would break the invariant that `busy` means "a mutation is
+    // in flight" (pollFromServer gates on it) and an abandoned run's finally
+    // would clear a newer run's guard. FOLLOW-UP (phase 15, window UX honesty):
+    // a live-DOM behavioral rig for WocMarketWindow, which has no instantiation
+    // harness today, to prove the abandoned run bails rather than pin structure.
     const close = betweenCode('close(): void {', 'reload(): Promise<void> {');
     expect(close).toContain('this.busy = false');
     expect(close).toContain('this.busyLabel = null');
+    expect(close).toContain('this.busyGen++');
+  });
+
+  it('withBusy settles only when its generation still owns the guard', () => {
+    // The finally must be generation-guarded, or an abandoned wallet round trip
+    // resolving after a close (or a newer run) clears the current owner's busy
+    // and repaints over its state.
+    const withBusy = betweenCode('private async withBusy(', 'private stillOwns(');
+    expect(withBusy).toContain('const gen = ++this.busyGen');
+    expect(withBusy).toContain('if (this.busyGen === gen)');
+  });
+
+  it('submitListing captures the index up front and bails after each await if the window was closed', () => {
+    // The body reads the captured itemIndex (never this.sellIndex live after the
+    // await, which a close-and-reopen could have moved) and abandons on a stale
+    // generation both after the challenge mint and after the wallet sign, so a
+    // late signature cannot escrow a copy the player navigated away from.
+    const submit = betweenCode('private async submitListing(', 'private async payBond(');
+    expect(submit).toContain('const itemIndex = this.sellIndex');
+    expect(submit).toContain('itemIndex,');
+    expect(submit).not.toContain('itemIndex: this.sellIndex ?? 0');
+    // A stillOwns bail after the mint, after the sign, and after the create.
+    expect(submit.match(/if \(!this\.stillOwns\(gen\)\) return;/g)?.length ?? 0).toBeGreaterThanOrEqual(
+      3,
+    );
   });
 
   it('marks the dialog root with the title as its one accessible name', () => {

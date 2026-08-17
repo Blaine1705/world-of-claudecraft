@@ -201,6 +201,13 @@ export class WocMarketWindow {
   }
   private busy = false;
   private busyLabel: TranslationKey | null = null;
+  /** Bumped every time a mutation starts AND every time the window closes. A
+   *  withBusy run captures it and settles only if it still owns it, so a wallet
+   *  round trip abandoned by a close (the desktop signer has no timeout) can
+   *  neither clear a newer run's guard nor write over its state on late
+   *  resolution. `busy` stays a truthful "a mutation is in flight" for the poll
+   *  gate. */
+  private busyGen = 0;
   private notice: { text: string; error: boolean } | null = null;
   /** Background-poll bookkeeping. The stamp is when the last poll STARTED (see
    *  shouldPollWocMarket); both are read only by pollFromServer. */
@@ -237,14 +244,19 @@ export class WocMarketWindow {
     this.deps.hideTooltip();
     this.deps.restoreFocus(this.opener);
     this.opener = null;
-    // Clear any in-flight guard on close, matching the trade controller: since
-    // submitListing became a wallet round trip (B6/R1), a browser-extension
-    // signer with no timeout can leave a dismissed popup's withBusy finally
-    // unreached, which would otherwise brick every Exchange button and suppress
-    // the poll for the rest of the session. The step-up challenge is single-use
-    // and the extract is idempotent, so abandoning the round trip is safe.
+    // Clear any in-flight guard on close: since submitListing became a wallet
+    // round trip (B6/R1), a browser-extension signer with no timeout can leave a
+    // dismissed popup's withBusy finally unreached, which would otherwise brick
+    // every Exchange button and suppress the poll for the rest of the session.
+    // Bumping busyGen is what makes this safe: the abandoned run's finally and
+    // its post-await body both see a stale generation and no-op, so a late
+    // resolution can neither re-enable a newer run's buttons nor send a second
+    // request. (This is why the Exchange needs more than the trade window's flat
+    // reset: closing the trade tears down its session, but the Exchange keeps
+    // sellIndex and the quote one click from re-entry.)
     this.busy = false;
     this.busyLabel = null;
+    this.busyGen++;
   }
 
   /** Full refetch (open, tab change, after a mutation). */
@@ -1669,16 +1681,30 @@ export class WocMarketWindow {
 
   private async withBusy(label: TranslationKey, run: () => Promise<void>): Promise<void> {
     if (this.busy) return;
+    const gen = ++this.busyGen;
     this.busy = true;
     this.busyLabel = label;
     this.render();
     try {
       await run();
     } finally {
-      this.busy = false;
-      this.busyLabel = null;
-      this.render();
+      // Only settle if THIS run still owns the busy state. A close() or a
+      // superseding run bumps busyGen; an abandoned wallet round trip resolving
+      // late must not clear a newer run's guard or repaint over its state.
+      if (this.busyGen === gen) {
+        this.busy = false;
+        this.busyLabel = null;
+        this.render();
+      }
     }
+  }
+
+  /** Whether the mutation that owns generation `gen` is still the current one.
+   *  A run awaiting a wallet checks this after each await and bails when it is
+   *  false: a close() reset the window under it, so proceeding would send a
+   *  request and write state a newer run now owns. */
+  private stillOwns(gen: number): boolean {
+    return this.busyGen === gen;
   }
 
   private acceptTermsChecked(): boolean {
@@ -1781,8 +1807,13 @@ export class WocMarketWindow {
   private async submitListing(): Promise<void> {
     const hooks = this.deps.hooks();
     if (!hooks || this.sellIndex === null) return;
+    // Capture the index WITH the slot: the body reads it back after the wallet
+    // await, and this.sellIndex can move (or clear) if the window is closed and
+    // reopened under a hung signer, which would send the captured slot at the
+    // wrong index.
+    const itemIndex = this.sellIndex;
     const inventory = this.deps.world().inventory;
-    const slot = inventory[this.sellIndex];
+    const slot = inventory[itemIndex];
     if (!slot) {
       this.fail('woc_market.stale_item');
       this.render();
@@ -1824,6 +1855,7 @@ export class WocMarketWindow {
     const listingReserve = submitFormat === 'buy_now' ? null : reserveCents;
     const listingBuyNow = submitFormat === 'auction' ? null : buyNowCents;
     await this.withBusy('hudChrome.wocMarket.signing', async () => {
+      const gen = this.busyGen;
       // Step-up (B6/R1): a fresh server-built challenge, signed by the linked
       // wallet, authorizes THIS listing. The wallet popup shows the message.
       const issued = await hooks.client.stepUpChallenge({
@@ -1839,6 +1871,9 @@ export class WocMarketWindow {
         durationHours,
         offerNext,
       });
+      // Bail if the window was closed under the mint: a newer run now owns the
+      // state, and proceeding would fail or send a stale request.
+      if (!this.stillOwns(gen)) return;
       if (!issued.ok) {
         this.fail(issued.code);
         return;
@@ -1864,12 +1899,16 @@ export class WocMarketWindow {
           return;
         }
       }
+      // The wallet handoff is the long pole a close can straddle: if it did,
+      // abandon before sending so a late signature cannot escrow a copy the
+      // player already navigated away from.
+      if (!this.stillOwns(gen)) return;
       // A plain REST create, not an on-chain settlement: its own honest label.
       this.busyLabel = 'hudChrome.wocMarket.listing';
       this.render();
       const out = await hooks.client.createListing({
         characterId: hooks.characterId(),
-        itemIndex: this.sellIndex ?? 0,
+        itemIndex,
         itemId: slot.itemId,
         expectInstance: slot.instance ?? null,
         format: submitFormat,
@@ -1888,6 +1927,9 @@ export class WocMarketWindow {
         this.fail(out.code);
         return;
       }
+      // The create landed; if a close straddled it, the reopened window reloads
+      // on its own, so do not write this session's success state over it.
+      if (!this.stillOwns(gen)) return;
       this.ok('hudChrome.wocMarket.listingCreated');
       this.sellIndex = null;
       await this.reload();

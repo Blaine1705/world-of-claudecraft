@@ -190,6 +190,7 @@ function fakeHooks(): {
     stepUpOmitSignatureRequired: boolean;
     stepUpGate: Promise<void> | null;
     signMessageImpl: (message: string) => Promise<string>;
+    signAndSendImpl: (tx: string) => Promise<string>;
     calls: {
       offers: number;
       estimates: number[];
@@ -197,6 +198,7 @@ function fakeHooks(): {
       acceptOffers: number[];
       stepUpChallenges: Record<string, unknown>[];
       signMessages: string[];
+      signAndSends: string[];
       createOffers: number;
       resolveOffers: [number, string][];
     };
@@ -228,6 +230,9 @@ function fakeHooks(): {
     // The wallet message-signer. Default resolves; a test can reject it (a
     // decline) or count calls.
     signMessageImpl: (_message: string): Promise<string> => Promise.resolve('walletsig'),
+    // The transaction signer. Default resolves; a test can count calls to prove
+    // the pay path drove the wallet rather than the devsig short-circuit.
+    signAndSendImpl: (_tx: string): Promise<string> => Promise.resolve('walletTxSig'),
     calls: {
       offers: 0,
       estimates: [] as number[],
@@ -235,6 +240,7 @@ function fakeHooks(): {
       acceptOffers: [] as number[],
       stepUpChallenges: [] as Record<string, unknown>[],
       signMessages: [] as string[],
+      signAndSends: [] as string[],
       createOffers: 0,
       resolveOffers: [] as [number, string][],
     },
@@ -296,7 +302,10 @@ function fakeHooks(): {
     },
     characterId: () => 1,
     walletLinked: () => true,
-    signAndSendTransactionBase64: () => Promise.reject(new Error('unused')),
+    signAndSendTransactionBase64: (tx: string) => {
+      state.calls.signAndSends.push(tx);
+      return state.signAndSendImpl(tx);
+    },
     signMessageBase58: (message: string) => {
       state.calls.signMessages.push(message);
       return state.signMessageImpl(message);
@@ -750,6 +759,26 @@ describe('the accept request body (seller escrow)', () => {
     // The decline aborts BEFORE acceptOffer: no custody moves on a refused sign.
     expect(h.state.calls.acceptOffers).toEqual([]);
     expect(r.host.logs.at(-1)).toBe('user declined in wallet');
+  });
+
+  it('a message-less sign rejection falls back to the listing decline copy', async () => {
+    // The bridge usually throws player-facing text, but a message-less throw
+    // must land on the catalog fallback, NOT the empty string; behaviorally
+    // pinned since the source scan cannot tell the two branches apart.
+    const h = fakeHooks();
+    h.state.stepUpSignatureRequired = true;
+    h.state.signMessageImpl = () => Promise.reject(new Error(''));
+    const r = rig(h.hooks);
+    r.host.staged.items.push({ itemId: 'worn_sword', count: 1 });
+    r.host.inventory.push({ itemId: 'worn_sword', count: 1 });
+    const c = r.controller as unknown as {
+      wocTradeOffer: WocPendingOffer | null;
+      acceptWocTradeOffer(): Promise<void>;
+    };
+    c.wocTradeOffer = heldOffer({ role: 'seller' });
+    await c.acceptWocTradeOffer();
+    expect(h.state.calls.acceptOffers).toEqual([]);
+    expect(r.host.logs.at(-1)).toBe(t('hudChrome.wocMarket.signFailedConfirm'));
   });
 
   it('a real signature reaches the accept body as the proof', async () => {
@@ -1278,6 +1307,58 @@ describe('the pay verdict ladder matches the Exchange window', () => {
     const logs = await payTo({ ok: true, state: 'confirmed' });
     expect(logs).toContain(t('hudChrome.trade.woc.settled'));
     expect(logs).not.toContain(t('hudChrome.wocMarket.paymentPendingGeneric'));
+  });
+
+  it('an absent quote signatureRequired still drives the wallet on the PAY path (absent means sign)', async () => {
+    // The same absent-means-sign contract as the accept path, on the money leg:
+    // a quote that OMITS signatureRequired must go through the wallet, never the
+    // devsig short-circuit that would send a stand-in string to confirm.
+    const h = fakeHooks();
+    let confirmedWith = 'unset';
+    h.state.buyNowImpl = () => Promise.resolve({ ok: true, settlement: { id: 5 }, quote: null });
+    h.state.settlementQuoteImpl = () =>
+      Promise.resolve({
+        ok: true,
+        quote: {
+          reference: 'ref_1',
+          transactionBase64: 'dHg=',
+          // signatureRequired OMITTED on purpose.
+          amount: null,
+          seller: null,
+          burn: null,
+          treasury: null,
+          bondCents: null,
+          expiresAtMs: 9_999_999_999_999,
+        },
+      });
+    h.state.confirmSettlementImpl = () => Promise.resolve({ ok: true, state: 'confirmed' });
+    const hooksWithConfirmSpy = h.hooks as unknown as {
+      client: { confirmSettlement: (id: number, sig: string) => Promise<unknown> };
+    };
+    const origConfirm = hooksWithConfirmSpy.client.confirmSettlement;
+    hooksWithConfirmSpy.client.confirmSettlement = (id: number, sig: string) => {
+      confirmedWith = sig;
+      return origConfirm(id, sig);
+    };
+    const r = rig(h.hooks);
+    const c = r.controller as unknown as {
+      wocTradeOffer: WocPendingOffer | null;
+      payWocTradeOffer(): Promise<void>;
+    };
+    c.wocTradeOffer = heldOffer({
+      role: 'buyer',
+      phase: 'awaiting_payment',
+      listingId: 41,
+      buyerAccepted: true,
+      sellerAccepted: true,
+    });
+    await c.payWocTradeOffer();
+    expect(h.state.calls.signAndSends, 'the wallet transaction signer WAS driven').toEqual([
+      'dHg=',
+    ]);
+    expect(confirmedWith, 'confirm got the real wallet signature, not a devsig').toBe(
+      'walletTxSig',
+    );
   });
 });
 

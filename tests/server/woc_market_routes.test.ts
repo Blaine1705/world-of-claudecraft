@@ -44,6 +44,7 @@ import {
   wocMarketConfig,
 } from '../../server/woc_market_routes';
 import { WOC_MARKET_RESTRICTED_POLICY } from '../../server/woc_market_rules';
+import { stripComments } from '../helpers/strip_comments';
 import { type FakeCtxOverrides, type FakeRes, fakeCtx } from './helpers';
 import { FakeWocMarketDb } from './helpers/fake_woc_market_db';
 
@@ -1084,7 +1085,13 @@ describe('the devsig arm is production-unreachable by wiring (B6/R1)', () => {
     // still green. WOC_MARKET_DEV_SERVICE otherwise appears in no test. Pin the
     // wiring: the switch is the ALLOW_DEV_COMMANDS AND WOC_MARKET_DEV_SERVICE
     // conjunction, and stepUpDevSig reads that const, never a bare boolean.
-    const main = readFileSync(new URL('../../server/main.ts', import.meta.url), 'utf8');
+    // Comment-stripped, or a doc comment quoting the wiring above a `true`
+    // assignment would satisfy this while shipping the bypass; and pinned to
+    // exactly ONE stepUpDevSig so a second WocMarketService construction cannot
+    // hide the real one behind the first match.
+    const main = stripComments(
+      readFileSync(new URL('../../server/main.ts', import.meta.url), 'utf8'),
+    );
     const i = main.indexOf('const wocMarketDevService');
     expect(i).toBeGreaterThanOrEqual(0);
     const decl = main.slice(i, main.indexOf(';', i) + 1);
@@ -1092,8 +1099,9 @@ describe('the devsig arm is production-unreachable by wiring (B6/R1)', () => {
     expect(decl).toContain("process.env.WOC_MARKET_DEV_SERVICE === '1'");
     expect(decl).toContain('&&');
     // The assignment reads the double-gated const, never a bare boolean.
-    const j = main.indexOf('stepUpDevSig:');
-    expect(j).toBeGreaterThanOrEqual(0);
+    const sites = [...main.matchAll(/stepUpDevSig:/g)];
+    expect(sites, 'exactly one stepUpDevSig wiring site').toHaveLength(1);
+    const j = sites[0].index ?? -1;
     const assign = main.slice(j, main.indexOf('\n', j));
     expect(assign).toContain('stepUpDevSig: wocMarketDevService');
     expect(assign).not.toMatch(/stepUpDevSig:\s*(?:true|false)\b/);
@@ -1266,11 +1274,12 @@ describe('the step-up surface at the route layer (B6/R1)', () => {
       (r) => r.method === 'POST' && r.path === '/api/woc-market/step-up/challenge',
     );
     expect(route, 'the challenge route exists').toBeTruthy();
-    // Comment-stripped so a swapped policy left behind in a comment inside the
-    // RouteDef block cannot keep this pin green.
-    const src = readFileSync(new URL('../../server/woc_market_routes.ts', import.meta.url), 'utf8')
-      .replace(/\/\*[\s\S]*?\*\//g, ' ')
-      .replace(/\/\/[^\n]*/g, ' ');
+    // Comment-stripped (via the shared helper, which does not trip on a `://`
+    // in a string literal) so a swapped policy left behind in a comment inside
+    // the RouteDef block cannot keep this pin green.
+    const src = stripComments(
+      readFileSync(new URL('../../server/woc_market_routes.ts', import.meta.url), 'utf8'),
+    );
     const block = src.slice(
       src.indexOf("path: '/api/woc-market/step-up/challenge'"),
       src.indexOf('handler: stepUpChallengeHandler'),
@@ -1485,7 +1494,9 @@ describe('the step-up surface at the route layer (B6/R1)', () => {
         throw new Error('must not be reached');
       },
     });
-    for (const offerId of [0, -1, 1.5]) {
+    // Numeric-bound dimension (0, -1, 1.5) AND the type dimension (a string or
+    // an omitted id): intField refuses both, and nothing is minted.
+    for (const offerId of [0, -1, 1.5, '41', undefined]) {
       await expect(
         handlerFor(
           'POST',

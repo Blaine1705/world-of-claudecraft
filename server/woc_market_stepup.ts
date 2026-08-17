@@ -159,28 +159,31 @@ export function stepUpBindingDigest(binding: WocStepUpBinding): string {
  *  is length-capped before it can reach the wallet popup. The binding digest
  *  covers the REAL fields regardless; this is purely the human-readable line. */
 function safeMessagePiece(raw: string): string {
-  // Coerce first: the route's optionalInstance is a size-capped UNCHECKED cast
-  // (server/woc_market_routes.ts), so a client can send a non-string in a
-  // descriptor slot. String() keeps a malformed body a decode-class refusal
-  // instead of a 500 from calling a char method on a non-char.
-  const text = typeof raw === 'string' ? raw : String(raw);
+  // Guard, do NOT coerce: the route's optionalInstance is a size-capped
+  // UNCHECKED cast (server/woc_market_routes.ts), so a client can send a
+  // non-string in a descriptor slot. String() itself throws on an object whose
+  // toString and valueOf are both non-callable ({toString:1}), which would 500
+  // the challenge issue; a non-string descriptor has no human-readable value
+  // anyway (the digest binds the REAL field), so it collapses to empty here.
+  const text = typeof raw === 'string' ? raw : '';
   // Drop control chars by code point (no control-char regex, so biome's
   // noControlCharactersInRegex stays quiet): C0 and DEL are the newline-forge
   // vector, and C1 (0x80 to 0x9f, e.g. NEL) can read as a line break in some
   // wallet renderers. Then strip Unicode format chars (Cf: bidi overrides and
-  // isolates, zero-width joiners) that would misrender the copy line, collapse
-  // runs of whitespace, and length-cap.
-  const controlsStripped = Array.from(text)
+  // isolates, zero-width joiners) that would misrender the copy line, and lone
+  // surrogates (Cs) that node-pg would mangle to U+FFFD and desync the stored
+  // message from the signed one. Collapse whitespace, then cap by CODE POINT so
+  // an astral pair is never split into a broken surrogate at the boundary.
+  const cleaned = Array.from(text)
     .filter((ch) => {
       const code = ch.codePointAt(0) ?? 0;
       return code >= 0x20 && code !== 0x7f && !(code >= 0x80 && code <= 0x9f);
     })
-    .join('');
-  return controlsStripped
-    .replace(/\p{Cf}/gu, '')
+    .join('')
+    .replace(/[\p{Cf}\p{Cs}]/gu, '')
     .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, 48);
+    .trim();
+  return Array.from(cleaned).slice(0, 48).join('');
 }
 
 /** A short human descriptor of the copy for the signed message: the rolled

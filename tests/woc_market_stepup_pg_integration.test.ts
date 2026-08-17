@@ -249,13 +249,26 @@ describeDb('woc market step-up challenges against real Postgres', () => {
     );
     expect(prune.rowCount).toBe(1);
     expect(prune.rows[0].indexdef).toContain('(realm, expires_at)');
-    // The superseded single-column index must be gone (write amplification).
+    // The superseded single-column index must be DROPPED by the upgrade path,
+    // not merely absent on a fresh DB. Recreate it by hand (an old box booted
+    // the earlier build), re-run the real boot, and prove the DROP INDEX IF
+    // EXISTS removed it. Asserting rowCount 0 alone was vacuous: the old index
+    // is never created here, so deleting the DROP would still pass.
+    await pool.query(
+      'CREATE INDEX IF NOT EXISTS woc_market_stepup_challenges_expiry ON woc_market_stepup_challenges (expires_at)',
+    );
+    const seeded = await pool.query(
+      `SELECT 1 FROM pg_indexes WHERE tablename = 'woc_market_stepup_challenges'
+          AND indexname = 'woc_market_stepup_challenges_expiry'`,
+    );
+    expect(seeded.rowCount, 'the legacy index seeded').toBe(1);
+    await db.ensureSchema();
     const superseded = await pool.query(
       `SELECT 1 FROM pg_indexes
         WHERE tablename = 'woc_market_stepup_challenges'
           AND indexname = 'woc_market_stepup_challenges_expiry'`,
     );
-    expect(superseded.rowCount).toBe(0);
+    expect(superseded.rowCount, 'the boot dropped the superseded index').toBe(0);
   });
 
   it('refuses a duplicate nonce at the primary key', async () => {

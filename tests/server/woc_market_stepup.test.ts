@@ -21,6 +21,7 @@ import {
   type WocStepUpChallengeRow,
 } from '../../server/woc_market_stepup';
 import type { ItemInstancePayload } from '../../src/sim/types';
+import { stripComments } from '../helpers/strip_comments';
 
 // Deterministic keypair: a fixed 32-byte seed, so a failure reproduces.
 const PRIV = new Uint8Array(32).fill(7);
@@ -225,11 +226,14 @@ describe('the signed message', () => {
     // a right-to-left override (U+202E) and a zero-width joiner (U+200D) are Cf
     // format chars only the \p{Cf} strip removes. None may reach the popup.
     const c1 = challengeRow({
+      // A real \n rides along so the line-count assertion below is not vacuous:
+      // it stays cleanLines + 1 only because the newline is collapsed too.
       ...LIST_BINDING,
-      expectInstance: { signer: 'x\u0085Buy now: none\u009b' },
+      expectInstance: { signer: 'x\u0085Buy now: none\u009b\nForged action line' },
     });
     expect(c1.message).not.toContain('\u0085');
     expect(c1.message).not.toContain('\u009b');
+    expect(c1.message).not.toContain('\nForged action line');
     const cf = challengeRow({
       ...LIST_BINDING,
       expectInstance: { signer: 'a\u202eb\u200dc' },
@@ -245,32 +249,57 @@ describe('the signed message', () => {
   it('does not throw on a non-string descriptor field (the route casts unchecked)', () => {
     // optionalInstance is a size-capped UNCHECKED cast, so a malformed body can
     // land a non-string in a descriptor slot. The message build must stay a
-    // decode-class path, never a 500 from a char method on a non-char.
-    const forged = { signer: { length: 3 } } as unknown as ItemInstancePayload;
-    let message = '';
-    expect(() => {
-      message = buildStepUpMessage({
-        binding: { ...LIST_BINDING, expectInstance: forged },
+    // decode-class path, never a 500. {toString:1} is the REACHABLE trigger: a
+    // guard that coerced with String() would throw here ("Cannot convert object
+    // to primitive value") because toString and valueOf are non-callable, while
+    // an object carrying a callable inherited toString ({length:3}) would slip
+    // past it, so this case is what actually pins the guard.
+    const build = (signer: unknown): string =>
+      buildStepUpMessage({
+        binding: {
+          ...LIST_BINDING,
+          expectInstance: { signer } as unknown as ItemInstancePayload,
+        },
         accountId: ACCOUNT,
         wallet: WALLET,
         realm: 'Claudemoon',
         nonce: 'n',
         expiresAtIso: new Date(NOW).toISOString(),
       });
+    let message = '';
+    expect(() => {
+      message = build({ toString: 1 });
     }).not.toThrow();
+    // The non-string field contributes nothing readable (it is not bound), so
+    // the popup never shows "[object Object]" or a raw cast.
     expect(message).toContain('$WOC Exchange');
+    expect(message).not.toContain('[object Object]');
+    // A callable-toString object must also not throw.
+    expect(() => build({ length: 3 })).not.toThrow();
+  });
+
+  it('drops a lone surrogate so the stored message cannot desync from the signed one', () => {
+    // A lone surrogate is not a control point, not \p{Cf}, and not \s, so it
+    // would survive; node-pg then re-encodes it to U+FFFD and the row's message
+    // differs from the one the wallet signed, making the challenge unverifiable.
+    const row = challengeRow({ ...LIST_BINDING, expectInstance: { signer: 'x\ud800y' } });
+    expect(row.message).not.toContain('\ud800');
+    expect(row.message).toContain('crafted by xy');
   });
 
   it('mints the nonce from the node CSPRNG, never a predictable source', () => {
     // Uniqueness and hex shape alone would survive a Math.random hex of the
     // same width; pin the provenance at the source.
-    const src = readFileSync(new URL('../../server/woc_market_stepup.ts', import.meta.url), 'utf8')
-      .replace(/\/\*[\s\S]*?\*\//g, ' ')
-      .replace(/\/\/[^\n]*/g, ' ');
+    const src = stripComments(
+      readFileSync(new URL('../../server/woc_market_stepup.ts', import.meta.url), 'utf8'),
+    );
     const start = src.indexOf('export function newStepUpNonce');
     const fn = src.slice(start, src.indexOf('}', start) + 1);
     expect(fn).toContain('randomBytes(16)');
     expect(fn).not.toContain('Math.random');
+    // randomBytes must be the node:crypto CSPRNG, not a shadowed local.
+    expect(src).toContain("from 'node:crypto'");
+    expect(src).toMatch(/import \{[^}]*randomBytes[^}]*\} from 'node:crypto'/);
   });
 
   it('names a modern masterwork copy, not a blank Copy line', () => {
