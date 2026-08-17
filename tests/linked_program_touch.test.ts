@@ -5,8 +5,10 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import {
+  collectLinkedPrograms,
   type LinkedProgramLike,
   type MaterialPropertiesLike,
+  touchLinkedProgram,
   touchLinkedPrograms,
 } from '../src/render/linked_program_touch';
 
@@ -79,5 +81,51 @@ describe('touchLinkedPrograms', () => {
   it('touches nothing on a target without meshes', () => {
     const props = propertiesFor(new Map());
     expect(touchLinkedPrograms(props, new THREE.Group())).toBe(0);
+  });
+});
+
+// The two halves the renderer schedules apart: the walk is one cheap pass, the
+// touching is one driver round trip per program and therefore the unit a
+// per-frame budget admits (src/render/linked_program_touch_lane.ts).
+describe('collectLinkedPrograms and touchLinkedProgram', () => {
+  it('collects every ready variant once, in walk order, and touches none of them', () => {
+    const shared = new THREE.MeshStandardMaterial({ name: 'shared' });
+    const other = new THREE.MeshStandardMaterial({ name: 'other' });
+    const skinned = program(true);
+    const far = program(true);
+    const linking = program(false);
+    const otherFar = program(true);
+    const props = propertiesFor(
+      new Map<THREE.Material, Map<string, LinkedProgramLike> | undefined>([
+        [
+          shared,
+          new Map([
+            ['skinned', skinned],
+            ['far', far],
+            ['linking', linking],
+          ]),
+        ],
+        [other, new Map([['far', otherFar]])],
+      ]),
+    );
+    const wrap = new THREE.Group();
+    // the same material on two meshes: one entry, not two
+    wrap.add(new THREE.Mesh(new THREE.BufferGeometry(), [shared, other]));
+    wrap.add(new THREE.Mesh(new THREE.BufferGeometry(), shared));
+
+    expect(collectLinkedPrograms(props, wrap)).toEqual([skinned, far, otherFar]);
+    for (const p of [skinned, far, otherFar, linking]) {
+      expect(p.uniforms).not.toHaveBeenCalled();
+      expect(p.attributes).not.toHaveBeenCalled();
+    }
+  });
+
+  it('touches one program: both tables, which is what the reveal draw would otherwise query', () => {
+    const one = program(true);
+
+    touchLinkedProgram(one);
+
+    expect(one.uniforms).toHaveBeenCalledTimes(1);
+    expect(one.attributes).toHaveBeenCalledTimes(1);
   });
 });

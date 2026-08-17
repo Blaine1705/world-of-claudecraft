@@ -269,6 +269,7 @@ function snapshot(): PerfSnapshot {
             waitMs: 2.4,
             frameGapMs: 18.7,
             sharedFrameGap: 1,
+            deferredFrames: 0,
           },
           {
             label: 'texture-chunk',
@@ -279,6 +280,7 @@ function snapshot(): PerfSnapshot {
             waitMs: 940.5,
             frameGapMs: 310.5,
             sharedFrameGap: 2,
+            deferredFrames: 0,
           },
         ],
         blockiest: [
@@ -291,6 +293,7 @@ function snapshot(): PerfSnapshot {
             waitMs: 940.5,
             frameGapMs: 310.5,
             sharedFrameGap: 2,
+            deferredFrames: 0,
           },
           {
             label: 'live-view-compile',
@@ -301,6 +304,7 @@ function snapshot(): PerfSnapshot {
             waitMs: 2.4,
             frameGapMs: 18.7,
             sharedFrameGap: 1,
+            deferredFrames: 0,
           },
         ],
         pending: 0,
@@ -320,6 +324,7 @@ function snapshot(): PerfSnapshot {
             tails: ['preview:armory:skin'],
           },
         ],
+        admission: { enabled: false, deferred: 0, parks: 0 },
         recent: {
           windowMs: 30000,
           units: 2,
@@ -349,6 +354,38 @@ function snapshot(): PerfSnapshot {
         },
       },
       nightAmount: 0,
+      gpuPrep: {
+        budget: {
+          frameEmaMs: 16.7,
+          headroomMs: 1.5,
+          spentThisFrameMs: 0,
+          legacy: false,
+          degrading: false,
+          kinds: [{ kind: 'touch', emaMs: 0.4, samples: 12 }],
+          decisions: {
+            'actionable-floor': 0,
+            fits: 12,
+            starvation: 0,
+            legacy: 0,
+            'first-sample': 1,
+            'no-headroom': 3,
+            'unknown-cap': 0,
+            pressure: 0,
+          },
+        },
+        events: {
+          total: 0,
+          dropped: 0,
+          counts: {
+            'reveal-watchdog': 0,
+            'reveal-soft-deadline': 0,
+            'attach-watchdog': 0,
+            'gate-timeout': 0,
+          },
+          events: [],
+          reveal: { keysHeld: 0, rootsHeld: 0, rootsPiecewise: 0, rootsAtWatchdog: 0 },
+        },
+      },
       autoGovernor: true,
       budget: {
         targetFps: 60,
@@ -741,6 +778,7 @@ describe('perf reporter payload', () => {
       ],
       worstWaitMs: 0,
       longestWaits: [],
+      admission: { enabled: false, deferred: 0, parks: 0 },
       recent: {
         windowMs: 30000,
         units: 0,

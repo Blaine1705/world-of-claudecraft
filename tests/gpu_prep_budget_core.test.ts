@@ -1,0 +1,402 @@
+import { describe, expect, it } from 'vitest';
+import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
+import {
+  createGpuPrepBudget,
+  DEFAULT_GPU_PREP_BUDGET_CONFIG,
+  type GpuPrepBudgetConfig,
+  gpuPrepClassForPriority,
+  gpuPrepKindOfLabel,
+} from '../src/render/gpu_prep_budget_core';
+
+// targetFrameMs 24 with a 2 ms floor makes every headroom below an exact
+// integer, so a wrong clamp or a missed spend shows up as a number, not as a
+// tolerance. frameEmaAlpha 1 makes noteFrame set the average outright.
+const CONFIG: GpuPrepBudgetConfig = {
+  targetFrameMs: 24,
+  minSliceMs: 2,
+  maxDeferFrames: 5,
+  unknownCostMs: 9,
+  emaAlpha: 0.5,
+  frameEmaAlpha: 1,
+};
+
+const budgetAt = (frameMs: number, over: Partial<GpuPrepBudgetConfig> = {}) => {
+  const budget = createGpuPrepBudget({ ...CONFIG, ...over });
+  budget.noteFrame(frameMs);
+  return budget;
+};
+
+describe('gpu prep class mapping', () => {
+  it('maps every queue priority constant onto its admission class', () => {
+    expect(gpuPrepClassForPriority(GPU_WORK_PRIORITY.ACTIONABLE_VIEW)).toBe('actionable');
+    expect(gpuPrepClassForPriority(GPU_WORK_PRIORITY.LIVE_VIEW)).toBe('visible');
+    expect(gpuPrepClassForPriority(GPU_WORK_PRIORITY.VISIBLE_PREWARM)).toBe('approaching');
+    // The load-bearing one: unpaid link debt surfaces as a live first-draw
+    // stall, so it must NOT fall in with the cosmetic warmers below it.
+    expect(gpuPrepClassForPriority(GPU_WORK_PRIORITY.BOOT_DEBT)).toBe('approaching');
+    expect(gpuPrepClassForPriority(GPU_WORK_PRIORITY.BACKGROUND)).toBe('cosmetic');
+    expect(gpuPrepClassForPriority(GPU_WORK_PRIORITY.BOOT_RESUME)).toBe('cosmetic');
+  });
+
+  it('puts each boundary on the lower class and survives junk priorities', () => {
+    expect(gpuPrepClassForPriority(GPU_WORK_PRIORITY.ACTIONABLE_VIEW - 1)).toBe('visible');
+    expect(gpuPrepClassForPriority(GPU_WORK_PRIORITY.LIVE_VIEW - 1)).toBe('approaching');
+    expect(gpuPrepClassForPriority(GPU_WORK_PRIORITY.BOOT_DEBT - 1)).toBe('cosmetic');
+    expect(gpuPrepClassForPriority(GPU_WORK_PRIORITY.ACTIONABLE_VIEW + 100)).toBe('actionable');
+    expect(gpuPrepClassForPriority(-5)).toBe('cosmetic');
+    expect(gpuPrepClassForPriority(Number.NaN)).toBe('cosmetic');
+  });
+});
+
+describe('gpu prep kind of label', () => {
+  it('keeps the prefix up to the first colon, so instances share one estimate', () => {
+    expect(gpuPrepKindOfLabel('live-gate:Group')).toBe('live-gate');
+    expect(gpuPrepKindOfLabel('reveal-gate:eastbrookBuilding:x')).toBe('reveal-gate');
+    expect(gpuPrepKindOfLabel('preview:char-skin:0')).toBe('preview');
+  });
+
+  it('leaves a colon-free label alone and falls back to unlabeled on nothing', () => {
+    expect(gpuPrepKindOfLabel('texture-chunk-upload')).toBe('texture-chunk-upload');
+    expect(gpuPrepKindOfLabel('unlabeled')).toBe('unlabeled');
+    expect(gpuPrepKindOfLabel('')).toBe('unlabeled');
+    expect(gpuPrepKindOfLabel(':x')).toBe('unlabeled');
+    expect(gpuPrepKindOfLabel('   :x')).toBe('unlabeled');
+  });
+
+  it('bounds the key length, because the label is caller-supplied', () => {
+    const kind = gpuPrepKindOfLabel('k'.repeat(200));
+    expect(kind.length).toBe(48);
+    expect(gpuPrepKindOfLabel(`${'k'.repeat(200)}:tail`).length).toBe(48);
+  });
+});
+
+describe('gpu prep headroom arithmetic', () => {
+  it('is the target minus the measured frame', () => {
+    expect(budgetAt(20).headroomMs()).toBe(4);
+  });
+
+  it('floors at minSliceMs when the frame already overruns the target', () => {
+    expect(budgetAt(40).headroomMs()).toBe(2);
+    // Not the negative the raw subtraction would give, and not zero either:
+    // the slowest machine is the one carrying the most preparation debt.
+    expect(budgetAt(24).headroomMs()).toBe(2);
+  });
+
+  it('shrinks as the frame is charged and never goes below zero', () => {
+    const budget = budgetAt(20);
+    budget.spend(1.5);
+    expect(budget.headroomMs()).toBe(2.5);
+    budget.spend(10);
+    expect(budget.headroomMs()).toBe(0);
+  });
+
+  it('resets the frame spend on the next frame', () => {
+    const budget = budgetAt(20);
+    budget.spend(4);
+    expect(budget.headroomMs()).toBe(0);
+    budget.noteFrame(20);
+    expect(budget.headroomMs()).toBe(4);
+  });
+
+  it('ignores a junk spend and a junk frame duration', () => {
+    const budget = budgetAt(20);
+    budget.spend(Number.NaN);
+    budget.spend(-5);
+    expect(budget.headroomMs()).toBe(4);
+    budget.noteFrame(Number.NaN);
+    expect(budget.snapshot().frameEmaMs).toBe(20);
+    budget.noteFrame(-3);
+    expect(budget.snapshot().frameEmaMs).toBe(20);
+  });
+
+  it('seeds the frame average at the target, so nothing is spent on an unmeasured frame', () => {
+    expect(createGpuPrepBudget(CONFIG).headroomMs()).toBe(2);
+  });
+
+  it('smooths later frames instead of tracking the last one', () => {
+    const budget = createGpuPrepBudget({ ...CONFIG, frameEmaAlpha: 0.5 });
+    budget.noteFrame(20);
+    expect(budget.snapshot().frameEmaMs).toBe(20);
+    budget.noteFrame(16);
+    expect(budget.snapshot().frameEmaMs).toBe(18);
+  });
+});
+
+describe('gpu prep cost ledger', () => {
+  it('predicts the unknown prior until a kind has a sample', () => {
+    const budget = createGpuPrepBudget(CONFIG);
+    expect(budget.predictMs('reveal-gate:tavern')).toBe(9);
+    budget.record('reveal-gate:tavern', 3);
+    expect(budget.predictMs('reveal-gate:tavern')).toBe(3);
+    // The estimate is per KIND, so a sibling instance inherits it and an
+    // unrelated kind does not.
+    expect(budget.predictMs('reveal-gate:forge:2')).toBe(3);
+    expect(budget.predictMs('texture-chunk-upload')).toBe(9);
+  });
+
+  it('sets on the first sample, then blends at emaAlpha', () => {
+    const budget = createGpuPrepBudget(CONFIG);
+    budget.record('live-gate:Group', 10);
+    expect(budget.predictMs('live-gate:Group')).toBe(10);
+    budget.record('live-gate:Other', 20);
+    expect(budget.predictMs('live-gate:x')).toBe(15);
+    budget.record('live-gate:x', 5);
+    expect(budget.predictMs('live-gate:x')).toBe(10);
+    expect(budget.snapshot().kinds).toEqual([{ kind: 'live-gate', emaMs: 10, samples: 3 }]);
+  });
+
+  it('ignores a non-finite or negative sample rather than poisoning the estimate', () => {
+    const budget = createGpuPrepBudget(CONFIG);
+    budget.record('preview:0', 4);
+    budget.record('preview:1', Number.NaN);
+    budget.record('preview:2', Number.POSITIVE_INFINITY);
+    budget.record('preview:3', -2);
+    expect(budget.predictMs('preview')).toBe(4);
+    expect(budget.snapshot().kinds).toEqual([{ kind: 'preview', emaMs: 4, samples: 1 }]);
+  });
+
+  it('bounds the kinds map and keeps learning the kinds it already holds', () => {
+    const budget = createGpuPrepBudget(CONFIG);
+    for (let index = 0; index < 64; index++) budget.record(`kind-${index}`, 1);
+    expect(budget.snapshot().kinds.length).toBe(64);
+    budget.record('kind-overflow', 7);
+    expect(budget.snapshot().kinds.length).toBe(64);
+    expect(budget.predictMs('kind-overflow')).toBe(9);
+    // The bound drops the new kind, never the learning on a resident one.
+    budget.record('kind-0', 3);
+    expect(budget.predictMs('kind-0')).toBe(2);
+  });
+});
+
+describe('gpu prep admission rules, in order', () => {
+  it('admits actionable work with no headroom at all', () => {
+    const budget = budgetAt(40);
+    budget.spend(2);
+    expect(budget.headroomMs()).toBe(0);
+    budget.record('live-gate:Group', 8);
+    expect(budget.admit({ kind: 'live-gate:Group', cls: 'actionable', deferredFrames: 0 })).toEqual(
+      { admit: true, reason: 'actionable-floor', predictedMs: 8 },
+    );
+    // Same kind, same zero headroom: only the class saved it.
+    expect(budget.admit({ kind: 'live-gate:Group', cls: 'visible', deferredFrames: 0 })).toEqual({
+      admit: false,
+      reason: 'no-headroom',
+      predictedMs: 8,
+      headroomMs: 0,
+    });
+  });
+
+  it('admits at exactly maxDeferFrames and not one frame earlier', () => {
+    const budget = budgetAt(40);
+    budget.spend(2);
+    budget.record('bg-warm:0', 8);
+    expect(budget.admit({ kind: 'bg-warm:1', cls: 'cosmetic', deferredFrames: 4 })).toMatchObject({
+      admit: false,
+      reason: 'no-headroom',
+    });
+    expect(budget.admit({ kind: 'bg-warm:1', cls: 'cosmetic', deferredFrames: 5 })).toEqual({
+      admit: true,
+      reason: 'starvation',
+      predictedMs: 8,
+    });
+  });
+
+  it('defers cosmetic work under pressure, and only cosmetic work', () => {
+    const budget = budgetAt(20);
+    budget.record('bg-warm:0', 1);
+    budget.record('live-gate:0', 1);
+    budget.notePressure(true);
+    expect(budget.admit({ kind: 'bg-warm:1', cls: 'cosmetic', deferredFrames: 0 })).toEqual({
+      admit: false,
+      reason: 'pressure',
+      predictedMs: 1,
+      headroomMs: 4,
+    });
+    expect(budget.admit({ kind: 'live-gate:1', cls: 'visible', deferredFrames: 0 })).toMatchObject({
+      admit: true,
+      reason: 'fits',
+    });
+    expect(
+      budget.admit({ kind: 'live-gate:1', cls: 'approaching', deferredFrames: 0 }),
+    ).toMatchObject({ admit: true, reason: 'fits' });
+    expect(
+      budget.admit({ kind: 'live-gate:1', cls: 'actionable', deferredFrames: 0 }),
+    ).toMatchObject({ admit: true, reason: 'actionable-floor' });
+    // Pressure delays; the starvation bound still ends the delay.
+    expect(budget.admit({ kind: 'bg-warm:1', cls: 'cosmetic', deferredFrames: 5 })).toMatchObject({
+      admit: true,
+      reason: 'starvation',
+    });
+    budget.notePressure(false);
+    expect(budget.admit({ kind: 'bg-warm:1', cls: 'cosmetic', deferredFrames: 0 })).toMatchObject({
+      admit: true,
+      reason: 'fits',
+    });
+  });
+
+  it('lets one unmeasured kind through per frame, then caps the rest', () => {
+    const budget = budgetAt(40);
+    budget.spend(2);
+    // Zero headroom, and the prior (9 ms) would never fit: the first-sample
+    // slot is what turns a guess into a measurement.
+    expect(budget.headroomMs()).toBe(0);
+    expect(budget.admit({ kind: 'reveal-gate:a', cls: 'visible', deferredFrames: 0 })).toEqual({
+      admit: true,
+      reason: 'first-sample',
+      predictedMs: 9,
+    });
+    expect(
+      budget.admit({ kind: 'texture-chunk-upload', cls: 'visible', deferredFrames: 0 }),
+    ).toEqual({ admit: false, reason: 'unknown-cap', predictedMs: 9, headroomMs: 0 });
+    // Still unknown until something is recorded, slot spent either way.
+    expect(
+      budget.admit({ kind: 'reveal-gate:b', cls: 'visible', deferredFrames: 0 }),
+    ).toMatchObject({ admit: false, reason: 'unknown-cap' });
+    budget.noteFrame(20);
+    expect(
+      budget.admit({ kind: 'texture-chunk-upload', cls: 'visible', deferredFrames: 0 }),
+    ).toMatchObject({ admit: true, reason: 'first-sample' });
+    // Once measured, the kind is priced instead of slotted.
+    budget.record('texture-chunk-upload', 1);
+    budget.noteFrame(20);
+    expect(
+      budget.admit({ kind: 'texture-chunk-upload', cls: 'visible', deferredFrames: 0 }),
+    ).toMatchObject({ admit: true, reason: 'fits' });
+    expect(
+      budget.admit({ kind: 'reveal-gate:c', cls: 'visible', deferredFrames: 0 }),
+    ).toMatchObject({ admit: true, reason: 'first-sample' });
+  });
+
+  it('flips from fits to no-headroom exactly at predicted === headroom', () => {
+    const budget = budgetAt(20);
+    budget.record('reveal-gate:a', 4);
+    budget.record('texture-chunk-upload', 4.5);
+    expect(budget.headroomMs()).toBe(4);
+    // Equality admits.
+    expect(budget.admit({ kind: 'reveal-gate:b', cls: 'visible', deferredFrames: 0 })).toEqual({
+      admit: true,
+      reason: 'fits',
+      predictedMs: 4,
+    });
+    // Half a millisecond over the same headroom does not.
+    expect(
+      budget.admit({ kind: 'texture-chunk-upload', cls: 'visible', deferredFrames: 0 }),
+    ).toEqual({ admit: false, reason: 'no-headroom', predictedMs: 4.5, headroomMs: 4 });
+    // ...and the charged frame moves the line under the kind that just fitted.
+    budget.spend(0.5);
+    expect(budget.admit({ kind: 'reveal-gate:b', cls: 'visible', deferredFrames: 0 })).toEqual({
+      admit: false,
+      reason: 'no-headroom',
+      predictedMs: 4,
+      headroomMs: 3.5,
+    });
+  });
+
+  it('treats a junk deferredFrames as zero rather than as starvation', () => {
+    const budget = budgetAt(40);
+    budget.spend(2);
+    budget.record('bg-warm:0', 8);
+    expect(
+      budget.admit({ kind: 'bg-warm:1', cls: 'cosmetic', deferredFrames: Number.NaN }),
+    ).toMatchObject({ admit: false, reason: 'no-headroom' });
+  });
+});
+
+describe('gpu prep legacy switch', () => {
+  it('admits everything while on and still learns, and restores the policy when off', () => {
+    const budget = budgetAt(40);
+    budget.spend(2);
+    budget.notePressure(true);
+    budget.setLegacy(true);
+    expect(budget.admit({ kind: 'bg-warm:1', cls: 'cosmetic', deferredFrames: 0 })).toEqual({
+      admit: true,
+      reason: 'legacy',
+      predictedMs: 9,
+    });
+    budget.record('bg-warm:1', 6);
+    expect(budget.predictMs('bg-warm')).toBe(6);
+    expect(budget.snapshot()).toMatchObject({ legacy: true, degrading: true });
+    budget.setLegacy(false);
+    expect(budget.admit({ kind: 'bg-warm:1', cls: 'cosmetic', deferredFrames: 0 })).toMatchObject({
+      admit: false,
+      reason: 'pressure',
+    });
+  });
+});
+
+describe('gpu prep snapshot', () => {
+  it('counts decisions per reason since creation and leads with the costliest kind', () => {
+    const budget = budgetAt(20);
+    budget.record('cheap:0', 1);
+    budget.record('dear:0', 12);
+    budget.admit({ kind: 'cheap:1', cls: 'visible', deferredFrames: 0 });
+    budget.admit({ kind: 'dear:1', cls: 'visible', deferredFrames: 0 });
+    budget.admit({ kind: 'dear:1', cls: 'actionable', deferredFrames: 0 });
+    budget.admit({ kind: 'fresh:1', cls: 'visible', deferredFrames: 0 });
+    budget.admit({ kind: 'fresh:2', cls: 'visible', deferredFrames: 0 });
+    budget.admit({ kind: 'dear:1', cls: 'visible', deferredFrames: 5 });
+    budget.notePressure(true);
+    budget.admit({ kind: 'cheap:1', cls: 'cosmetic', deferredFrames: 0 });
+    budget.setLegacy(true);
+    budget.admit({ kind: 'cheap:1', cls: 'cosmetic', deferredFrames: 0 });
+    budget.spend(0.5);
+
+    const snapshot = budget.snapshot();
+    expect(snapshot.decisions).toEqual({
+      'actionable-floor': 1,
+      fits: 1,
+      starvation: 1,
+      legacy: 1,
+      'first-sample': 1,
+      'no-headroom': 1,
+      'unknown-cap': 1,
+      pressure: 1,
+    });
+    expect(snapshot.kinds).toEqual([
+      { kind: 'dear', emaMs: 12, samples: 1 },
+      { kind: 'cheap', emaMs: 1, samples: 1 },
+    ]);
+    expect(snapshot).toMatchObject({
+      frameEmaMs: 20,
+      headroomMs: 3.5,
+      spentThisFrameMs: 0.5,
+      legacy: true,
+      degrading: true,
+    });
+  });
+});
+
+describe('gpu prep defaults', () => {
+  it('keeps a frame-rate-agnostic target and a pessimistic unknown prior', () => {
+    expect(DEFAULT_GPU_PREP_BUDGET_CONFIG.targetFrameMs).toBeCloseTo(1000 / 60, 6);
+    expect(DEFAULT_GPU_PREP_BUDGET_CONFIG.minSliceMs).toBeGreaterThan(0);
+    expect(DEFAULT_GPU_PREP_BUDGET_CONFIG.unknownCostMs).toBeGreaterThan(
+      DEFAULT_GPU_PREP_BUDGET_CONFIG.minSliceMs,
+    );
+    expect(DEFAULT_GPU_PREP_BUDGET_CONFIG.maxDeferFrames).toBeGreaterThanOrEqual(1);
+    expect(DEFAULT_GPU_PREP_BUDGET_CONFIG.emaAlpha).toBeGreaterThan(
+      DEFAULT_GPU_PREP_BUDGET_CONFIG.frameEmaAlpha,
+    );
+  });
+
+  it('falls back to a default for every junk config field', () => {
+    const budget = createGpuPrepBudget({
+      targetFrameMs: Number.NaN,
+      minSliceMs: -1,
+      maxDeferFrames: 0,
+      unknownCostMs: Number.POSITIVE_INFINITY,
+      emaAlpha: 0,
+      frameEmaAlpha: 2,
+    });
+    budget.noteFrame(1000);
+    expect(budget.headroomMs()).toBe(DEFAULT_GPU_PREP_BUDGET_CONFIG.minSliceMs);
+    expect(budget.predictMs('anything')).toBe(DEFAULT_GPU_PREP_BUDGET_CONFIG.unknownCostMs);
+    expect(
+      budget.admit({
+        kind: 'anything',
+        cls: 'cosmetic',
+        deferredFrames: DEFAULT_GPU_PREP_BUDGET_CONFIG.maxDeferFrames,
+      }),
+    ).toMatchObject({ admit: true, reason: 'starvation' });
+  });
+});

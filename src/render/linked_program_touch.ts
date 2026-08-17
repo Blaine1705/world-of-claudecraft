@@ -30,18 +30,21 @@ interface MaterialProgramsLike {
 }
 
 /**
- * Warm the uniform and attribute tables of every LINKED program under
- * `target`. Every variant of the material, not `currentProgram`: a tinted
- * clone can be shared between a skinned rig and its rigid far mesh, and that
- * slot names whichever variant drew last. A variant still linking is skipped:
- * its first use would block on the link, which is exactly what the gate
- * exists to avoid. Returns how many programs were touched.
+ * Every LINKED program under `target`, deduped. Every variant of the material,
+ * not `currentProgram`: a tinted clone can be shared between a skinned rig and
+ * its rigid far mesh, and that slot names whichever variant drew last. A
+ * variant still linking is skipped: its first use would block on the link,
+ * which is exactly what the gate exists to avoid.
+ *
+ * Split from the touch itself so the walk (cheap, one pass) and the touching
+ * (the expensive part, one driver round trip per program) can be scheduled
+ * apart: the renderer runs each program as its own budgeted queue unit.
  */
-export function touchLinkedPrograms(
+export function collectLinkedPrograms(
   properties: MaterialPropertiesLike,
   target: THREE.Object3D,
-): number {
-  let touched = 0;
+): LinkedProgramLike[] {
+  const ready: LinkedProgramLike[] = [];
   const seen = new Set<LinkedProgramLike>();
   target.traverse((obj) => {
     const mesh = obj as THREE.Mesh;
@@ -54,11 +57,32 @@ export function touchLinkedPrograms(
       for (const program of programs.values()) {
         if (seen.has(program) || !program.isReady()) continue;
         seen.add(program);
-        program.getUniforms();
-        program.getAttributes();
-        touched++;
+        ready.push(program);
       }
     }
   });
-  return touched;
+  return ready;
+}
+
+/** Warm ONE linked program's uniform and attribute tables. This is the piece
+ *  that costs a driver round trip, so it is also the unit a pacing budget
+ *  admits. */
+export function touchLinkedProgram(program: LinkedProgramLike): void {
+  program.getUniforms();
+  program.getAttributes();
+}
+
+/**
+ * Warm every linked program under `target` in one synchronous burst, and
+ * return how many were touched. The unpaced composition of the two functions
+ * above: paths that must not spread the cost over frames (a headless host, a
+ * test) keep using it.
+ */
+export function touchLinkedPrograms(
+  properties: MaterialPropertiesLike,
+  target: THREE.Object3D,
+): number {
+  const programs = collectLinkedPrograms(properties, target);
+  for (const program of programs) touchLinkedProgram(program);
+  return programs.length;
 }

@@ -1,6 +1,11 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
+import {
+  createBackgroundGpuQueue,
+  GPU_WORK_PRIORITY,
+  type GpuWorkAdmission,
+  type GpuWorkAdmissionCandidate,
+} from '../src/render/background_gpu_queue';
 import { withHiddenPrewarmGroups } from '../src/render/prewarm_pass';
 
 describe('createBackgroundGpuQueue', () => {
@@ -1176,6 +1181,8 @@ describe('createBackgroundGpuQueue', () => {
       // charged and no span was shared.
       frameGapMs: 0,
       sharedFrameGap: 0,
+      // No admission installed here, so nothing was ever refused.
+      deferredFrames: 0,
     });
     // A multi-second link is still a recorded stall, settled: the release
     // changes who waits behind it, not whether it is worth seeing.
@@ -1318,7 +1325,9 @@ describe('createBackgroundGpuQueue', () => {
     const archetypes = method('async prewarmZoneAt(', '\n  /** Blocking-path neighborhood prepare');
     const texture = method('private prewarmTextureInIdle(', '\n  private prewarmMaterialTextures(');
     const initial = method('async prewarmInitialScene(', '\n  // Visual reactions to sim events');
-    expect(source).toContain('private backgroundGpuWork = createBackgroundGpuQueue()');
+    expect(source).toContain(
+      'private backgroundGpuWork = createBackgroundGpuQueue({\n    admission: createGpuPrepAdmission(this.gpuPrepBudget),\n  });',
+    );
     expect(sky).toContain('this.backgroundGpuWork.run(');
     expect(features).toContain('this.backgroundGpuWork.run(');
     expect(archetypes).toContain('this.backgroundGpuWork.run(');
@@ -1355,5 +1364,230 @@ describe('createBackgroundGpuQueue', () => {
     expect(sync.indexOf('if (this.shutdownStarted) return;')).toBeLessThan(
       sync.indexOf('this.backgroundGpuWork.noteFrame('),
     );
+  });
+});
+
+// The AMOUNT half of the lane (see the queue header's admission paragraph):
+// order is decided above, and this decides how much of it fits in the frame
+// about to be drawn.
+describe('createBackgroundGpuQueue admission', () => {
+  const settle = async (rounds = 12): Promise<void> => {
+    for (let index = 0; index < rounds; index++) await Promise.resolve();
+  };
+
+  interface AdmissionProbe {
+    admission: GpuWorkAdmission;
+    seen: GpuWorkAdmissionCandidate[];
+    spent: { syncMs: number; label: string }[];
+  }
+
+  const probe = (verdict: (candidate: GpuWorkAdmissionCandidate) => boolean): AdmissionProbe => {
+    const seen: GpuWorkAdmissionCandidate[] = [];
+    const spent: { syncMs: number; label: string }[] = [];
+    return {
+      seen,
+      spent,
+      admission: {
+        admit: (candidate) => {
+          seen.push({ ...candidate });
+          return verdict(candidate);
+        },
+        spend: (syncMs, label) => spent.push({ syncMs, label }),
+      },
+    };
+  };
+
+  it('leaves the admission out of it until the host feeds a frame: boot has no live frame to protect', async () => {
+    // World entry pushes dozens of units through before requestAnimationFrame
+    // is armed. Consulting a per-frame budget there would park the loop under
+    // the curtain with nothing able to wake it.
+    const refuseAll = probe(() => false);
+    const queue = createBackgroundGpuQueue({ now: () => 0, admission: refuseAll.admission });
+    const ran: string[] = [];
+
+    await queue.run(
+      () => {
+        ran.push('boot');
+      },
+      GPU_WORK_PRIORITY.BOOT_RESUME,
+      'zone-prepare:eastbrook',
+    );
+
+    expect(ran).toEqual(['boot']);
+    expect(refuseAll.seen).toEqual([]);
+    // and the ledger still learns from it, which is the point of spending
+    // whether or not the admission is armed
+    expect(refuseAll.spent).toEqual([{ syncMs: 0, label: 'zone-prepare:eastbrook' }]);
+    expect(queue.stats().admission).toEqual({ enabled: true, deferred: 0, parks: 0 });
+  });
+
+  it('defers a refused unit and runs it once a later frame admits it', async () => {
+    let admit = false;
+    const gate = probe(() => admit);
+    const queue = createBackgroundGpuQueue({ admission: gate.admission });
+    const ran: string[] = [];
+    queue.noteFrame(0);
+
+    const pending = queue.run(
+      () => {
+        ran.push('reveal');
+      },
+      GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+      'reveal-gate:tavern',
+    );
+    await settle();
+    expect(ran).toEqual([]);
+    expect(queue.stats().pending).toBe(1);
+
+    admit = true;
+    queue.noteFrame(16);
+    await pending;
+
+    expect(ran).toEqual(['reveal']);
+    // deferral is counted in FRAMES since the first refusal, and the frame that
+    // admitted it is the one it had waited through
+    expect(gate.seen.map((candidate) => candidate.deferredFrames)).toEqual([0, 1]);
+    expect(queue.stats().slowest[0].deferredFrames).toBe(1);
+  });
+
+  it('runs an admissible lower-priority unit while a costly higher-priority one is deferred', async () => {
+    // Intended, and the inversion the budget core bounds: the deferred unit
+    // ages one frame per noteFrame and its starvation rule admits it regardless
+    // once it has waited long enough, so pacing delays a piece, never drops it.
+    const gate = probe((candidate) => candidate.label !== 'reveal-gate:cathedral');
+    const queue = createBackgroundGpuQueue({ admission: gate.admission });
+    const ran: string[] = [];
+    queue.noteFrame(0);
+
+    const costly = queue.run(
+      () => {
+        ran.push('cathedral');
+      },
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+      'reveal-gate:cathedral',
+    );
+    const cheap = queue.run(
+      () => {
+        ran.push('crate');
+      },
+      GPU_WORK_PRIORITY.BACKGROUND,
+      'touch:program',
+    );
+
+    await cheap;
+    expect(ran).toEqual(['crate']);
+    // the refused one is still pending, considered first every pass
+    expect(gate.seen.map((candidate) => candidate.label)).toEqual([
+      'reveal-gate:cathedral',
+      'touch:program',
+      'reveal-gate:cathedral',
+    ]);
+    expect(queue.stats().pending).toBe(1);
+    await settle();
+    expect(ran).toEqual(['crate']);
+    void costly;
+  });
+
+  it('parks with work pending when everything is refused, and wakes on the next frame', async () => {
+    let admit = false;
+    const gate = probe(() => admit);
+    const queue = createBackgroundGpuQueue({ admission: gate.admission });
+    const ran: string[] = [];
+    queue.noteFrame(0);
+
+    const first = queue.run(() => void ran.push('a'), GPU_WORK_PRIORITY.BACKGROUND, 'touch:a');
+    const second = queue.run(() => void ran.push('b'), GPU_WORK_PRIORITY.BACKGROUND, 'touch:b');
+    await settle();
+    expect(queue.stats().admission.parks).toBe(1);
+    expect(queue.stats().admission.deferred).toBe(2);
+    expect(queue.stats().active).toBeNull();
+
+    admit = true;
+    queue.noteFrame(16);
+    await Promise.all([first, second]);
+
+    expect(ran).toEqual(['a', 'b']);
+    expect(queue.stats().admission.parks).toBe(1);
+  });
+
+  it('wakes a parked loop on a new arrival the budget has room for', async () => {
+    // A park is not a sleep until the next frame: an arrival can be admissible
+    // when none of the parked candidates were, and nothing else would notice.
+    const gate = probe((candidate) => candidate.priority >= GPU_WORK_PRIORITY.ACTIONABLE_VIEW);
+    const queue = createBackgroundGpuQueue({ admission: gate.admission });
+    const ran: string[] = [];
+    queue.noteFrame(0);
+
+    const cosmetic = queue.run(() => void ran.push('cosmetic'), GPU_WORK_PRIORITY.BACKGROUND, 'bg');
+    await settle();
+    expect(queue.stats().admission.parks).toBe(1);
+
+    await queue.run(
+      () => void ran.push('actionable'),
+      GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
+      'live-gate:target',
+    );
+
+    expect(ran).toEqual(['actionable']);
+    expect(queue.stats().pending).toBe(1);
+    void cosmetic;
+  });
+
+  it('reports the prologue slice, not the awaited tail, to the admission', async () => {
+    let clock = 0;
+    const gate = probe(() => true);
+    const queue = createBackgroundGpuQueue({ now: () => clock, admission: gate.admission });
+    queue.noteFrame(0);
+    let release!: () => void;
+    const tail = new Promise<void>((resolve) => (release = resolve));
+
+    const pending = queue.run(
+      () => {
+        clock += 7;
+        return tail;
+      },
+      GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+      'reveal-gate:forge',
+      { releaseTail: true },
+    );
+    await settle();
+    // charged the moment the prologue returned, with the released tail still
+    // settling: the tail is off-thread, the prologue is what cost the frame
+    expect(gate.spent).toEqual([{ syncMs: 7, label: 'reveal-gate:forge' }]);
+    clock += 400;
+    release();
+    await pending;
+
+    expect(gate.spent).toEqual([{ syncMs: 7, label: 'reveal-gate:forge' }]);
+  });
+
+  it('starts every unit on sight when no admission is installed', async () => {
+    const queue = createBackgroundGpuQueue();
+    const ran: string[] = [];
+    queue.noteFrame(0);
+
+    await queue.run(() => void ran.push('a'), GPU_WORK_PRIORITY.BACKGROUND, 'a');
+    await queue.run(() => void ran.push('b'), GPU_WORK_PRIORITY.LIVE_VIEW, 'b');
+
+    expect(ran).toEqual(['a', 'b']);
+    const stats = queue.stats();
+    expect(stats.admission).toEqual({ enabled: false, deferred: 0, parks: 0 });
+    expect(stats.slowest.every((unit) => unit.deferredFrames === 0)).toBe(true);
+  });
+
+  it('releases a loop parked on the admission when the queue shuts down', async () => {
+    // Nothing feeds a frame after shutdown and the pending set just emptied, so
+    // without an explicit wake the shutdown promise would never settle.
+    const gate = probe(() => false);
+    const queue = createBackgroundGpuQueue({ admission: gate.admission });
+    queue.noteFrame(0);
+    const parked = queue.run(() => undefined, GPU_WORK_PRIORITY.BACKGROUND, 'bg');
+    await settle();
+    expect(queue.stats().admission.parks).toBe(1);
+
+    const stopped = queue.shutdown(new Error('renderer shut down'));
+
+    await expect(parked).rejects.toThrow('renderer shut down');
+    await expect(stopped).resolves.toBeUndefined();
   });
 });

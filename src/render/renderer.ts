@@ -320,6 +320,9 @@ import {
   urlForcedTier,
 } from './gfx';
 import { GlacialFrontVisual } from './glacial_front_visual';
+import { createGpuPrepAdmission } from './gpu_prep_admission';
+import { createGpuPrepBudget } from './gpu_prep_budget_core';
+import { gpuPrepEventsSnapshot } from './gpu_prep_events';
 import { bakeGrassGroundTexture, setGrassGroundBake } from './grass_ground_bake';
 import { buildGreatTreePrewarmGroup } from './great_tree_prewarm';
 import { GroundAimReticleVisual } from './ground_aim_reticle_visual';
@@ -343,7 +346,7 @@ import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features'
 import { stepLichHeartbeat } from './lich_audio_state_core';
 import { LightPulses } from './light_pulses';
 import { createPrewarmPacing, type PrewarmPacing } from './link_rate_budget';
-import { touchLinkedPrograms } from './linked_program_touch';
+import { runLinkedProgramTouchLane } from './linked_program_touch_lane';
 import { renderLoadMeasure } from './load_marks';
 import {
   type LocoState,
@@ -508,6 +511,7 @@ import {
   type RenderBudgetState,
   renderBudgetShaderPrewarmLevels,
 } from './render_budget';
+import { gpuPrepMode } from './render_dev_flags';
 import {
   emptyRenderDiagnosticsSnapshot,
   type RenderableDiagnosticObject,
@@ -520,6 +524,13 @@ import {
   type RendererFramePhaseMs,
   type RendererWorldPhaseMs,
 } from './renderer_frame_telemetry_core';
+import type {
+  RendererFrameStats,
+  RendererPerfStats,
+  RendererPhase,
+  RendererPhaseStats,
+  RendererQualityChangeStats,
+} from './renderer_perf_stats';
 import { createRevealGate } from './reveal_gate';
 import type { RevealGateCore } from './reveal_gate_core';
 import { collectRiftAmbientSources } from './rift_ambience';
@@ -967,7 +978,6 @@ function prewarmPlayerSkinVariantCount(): number {
   return ALL_CLASSES.reduce((sum, cls) => sum + skinCount(`player_${cls}`), 0);
 }
 
-type RendererPhase = 'setup' | 'entities' | 'world' | 'nameplates' | 'submit' | 'total';
 type RendererWorldPhase =
   | 'lights'
   | 'water'
@@ -985,37 +995,6 @@ type RendererWorldPhase =
   | 'sky'
   | 'sunSprites'
   | 'godRays';
-type RendererPhaseStats = Record<
-  RendererPhase,
-  { count: number; avg: number; p95: number; max: number }
->;
-
-interface RendererFrameStats {
-  phaseMs: RendererFramePhaseMs;
-  worldPhaseMs: RendererWorldPhaseMs;
-  foliage: FoliagePerfStats;
-  renderDiagnostics: RenderDiagnosticsSnapshot;
-  cameraPosition: { x: number; y: number; z: number };
-  playerPosition: { x: number; y: number; z: number };
-  biome: BiomeId;
-  lastQualityChange: RendererQualityChangeStats | null;
-  createdViews: number;
-  createdViewTypes: string[];
-  removedViews: number;
-  candidateViews: number;
-  activeViews: number;
-  visibleViews: number;
-}
-
-interface RendererQualityChangeStats {
-  atMs: number;
-  ageMs: number;
-  mode: RenderBudgetState['mode'];
-  reason: RenderBudgetState['reason'];
-  previousLevels: RenderBudgetState['levels'];
-  levels: RenderBudgetState['levels'];
-}
-
 interface ClickMarkerSlot {
   group: THREE.Group;
   ring: THREE.Mesh;
@@ -1769,7 +1748,13 @@ export class Renderer {
   private pendingZonePrewarms = new Map<string, Promise<void>>();
   // One shared lane for background work that touches WebGL. Idle callbacks from
   // independent zone/sky/archetype tasks can otherwise all start in one frame.
-  private backgroundGpuWork = createBackgroundGpuQueue();
+  // The tier's drop-frame threshold IS the preparation headroom: a frame over
+  // it is a dropped frame, so what fits under it is what preparation may cost
+  // before the frame it lands in stops being a frame the player got.
+  private gpuPrepBudget = createGpuPrepBudget({ targetFrameMs: GFX.budget.dropFrameMs });
+  private backgroundGpuWork = createBackgroundGpuQueue({
+    admission: createGpuPrepAdmission(this.gpuPrepBudget),
+  });
   // Serial tail for spirit-puppet construction: several models resolve at once
   // when a class is first sighted, so the builds queue behind one another and
   // each spends its own idle slot instead of stacking into one combat frame.
@@ -2052,6 +2037,9 @@ export class Renderer {
     this.questObjectHidden = makeQuestObjectGate(options);
     this.nameplateLayer = nameplateLayer;
     this.travelSpeedFx = new TravelSpeedFxPainter(nameplateLayer);
+    // ?prep=legacy: admit every unit as before, while the ledger keeps learning
+    // so a capture from the legacy arm still carries the costs to compare.
+    if (gpuPrepMode() === 'legacy') this.gpuPrepBudget.setLegacy(true);
     // biome-ignore format: Keep the established constructor body stable inside the failure guard.
     try {
     // Dev-channel build-phase telemetry (English, console.info, Release-silent):
@@ -4408,58 +4396,7 @@ export class Renderer {
     };
   }
 
-  perfStats(): {
-    graphicsConfigVersion: number;
-    tier: string;
-    currentZoneId: string | null;
-    qualityBuckets: {
-      version: number;
-      bands: GfxBucketBands;
-      baseline: GfxBucketLevels;
-      levels: GfxBucketLevels;
-      features: {
-        composer: boolean;
-        ao: boolean;
-        standardMaterials: boolean;
-        lowPlus: boolean;
-        leanFoliage: boolean;
-        terrainSplat: boolean;
-        windSway: boolean;
-        maxPointLights: number;
-        activePointLights: number;
-        shadowMap: number;
-        iosMemoryProfile: boolean;
-      };
-    };
-    autoGovernor: boolean;
-    budget: typeof GFX.budget;
-    renderScale: number;
-    effectiveRenderScale: number;
-    renderBudget: RenderBudgetState;
-    shadowCadenceHalfRate: boolean;
-    pixelRatio: number;
-    width: number;
-    height: number;
-    calls: number;
-    triangles: number;
-    geometries: number;
-    textures: number;
-    programs: number;
-    views: number;
-    pooledVisuals: number;
-    foliage: FoliagePerfStats;
-    glVendor: string;
-    glRenderer: string;
-    contextLost: number;
-    contextRestored: number;
-    /** 0 = full day, 1 = deep night; the night-visibility layers key off it. */
-    nightAmount: number;
-    phaseMs: RendererPhaseStats;
-    renderDiagnostics: RenderDiagnosticsSnapshot;
-    lastFrame?: RendererFrameStats;
-    prewarm: RendererPrewarmStats | null;
-    gpuQueue: BackgroundGpuQueueStats;
-  } {
+  perfStats(): RendererPerfStats {
     const info = this.webgl.info;
     const renderBudget = this.renderBudgetGovernor.state();
     const drawStatsFrame = this.drawStats ? this.drawStats.currentFrame() : null;
@@ -4527,6 +4464,7 @@ export class Renderer {
       lastFrame: this.snapshotLastFrameStats(),
       prewarm: this.lastPrewarmStats,
       gpuQueue: this.backgroundGpuWork.stats(),
+      gpuPrep: { budget: this.gpuPrepBudget.snapshot(), events: gpuPrepEventsSnapshot() },
     };
   }
 
@@ -4748,6 +4686,13 @@ export class Renderer {
     sample.minRenderScale = resolutionRange.minRenderScale;
     sample.maxRenderScale = resolutionRange.maxRenderScale;
     const state = this.renderBudgetGovernor.update(sample, this.renderBudgetState);
+    // sample.frameMs is the PREVIOUS frame's wall period (dt), clamped past a
+    // tab-hide discontinuity: the right signal for pacing, because preparation
+    // admitted last frame lands in exactly that number, which a submit-only
+    // measure would never see. Pressure follows the governor: while it is
+    // shedding quality, cosmetic preparation waits.
+    this.gpuPrepBudget.noteFrame(sample.frameMs);
+    this.gpuPrepBudget.notePressure(state.mode === 'degrading');
     this.frameMsEma = state.frameMsEma;
     this.adaptiveCooldown = state.cooldownSeconds;
     this.stableFrameTime = state.stableSeconds;
@@ -8902,13 +8847,30 @@ export class Renderer {
     // the skinned depth pass covers the renderer-owned shadow material that
     // the colour walk cannot enumerate; the touch tail warms the linked
     // programs' uniform tables so the reveal draw issues no synchronous query.
-    return this.liveCompileGates.run(
+    const linked = this.liveCompileGates.run(
       () =>
-        this.compilePrewarmColorPrograms(target, false)
-          .then(() => this.compileShadowPrograms(target))
-          .then(() => touchLinkedPrograms(this.webgl.properties, target)),
+        this.compilePrewarmColorPrograms(target, false).then(() =>
+          this.compileShadowPrograms(target),
+        ),
       VIEW_COMPILE_GATE_MAX_MS,
       { priority, label: `live-gate:${target.name || target.type}` },
+    );
+    // The touch tail rides OUTSIDE the gate's own queue unit, and must: its
+    // pieces are queue units themselves, so awaiting them from inside a unit
+    // holding a released-tail cap slot would park the drain loop on a slot only
+    // that unit can free. The gate still settles after them, so a gated reveal
+    // is no earlier than it was before.
+    return linked.then(() => this.touchLinkedProgramsGated(target, priority));
+  }
+
+  /** The gate's tail: every linked program under `target`, one budgeted queue
+   *  unit at a time (src/render/linked_program_touch_lane.ts). */
+  private touchLinkedProgramsGated(target: THREE.Object3D, priority: number): Promise<number> {
+    return runLinkedProgramTouchLane(
+      this.backgroundGpuWork,
+      this.webgl.properties,
+      target,
+      priority,
     );
   }
 

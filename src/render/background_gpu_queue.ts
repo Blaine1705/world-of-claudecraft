@@ -59,6 +59,23 @@
 // ambiguous. `sharedFrameGap === 1` therefore means "no other queue unit was in
 // flight", NOT "this unit did it". Proving cause needs an exclusive run, which
 // is what a probe driving one unit at a time is for.
+//
+// ADMISSION (the amount half). This file arbitrates ORDER; an optional
+// `admission` hook arbitrates AMOUNT: before a unit starts, the host's policy
+// (src/render/gpu_prep_budget_core.ts through gpu_prep_admission.ts) is asked
+// whether the frame about to be drawn has room for it. It is consulted in the
+// same order the queue would have started units in, and the first candidate it
+// admits runs, so a cheap lower-priority unit can go while an expensive
+// higher-priority one waits. That inversion is deliberate and bounded: the
+// refused candidate ages one deferral per noteFrame and the policy's starvation
+// rule admits it regardless once it has waited long enough, so pacing delays a
+// piece, never drops it. When every candidate is refused the loop PARKS until
+// the next frame or the next arrival, and it is ARMED BY THE FRAME CLOCK: until
+// the host feeds its first noteFrame the admission is not consulted at all.
+// Boot is why. World entry pushes dozens of units through before
+// requestAnimationFrame is ever armed, so a queue that admitted against a
+// budget with no frames to protect would park under the curtain with nothing
+// able to wake it. There is no live frame to protect before the first one.
 import { createGpuQueueWindow, type GpuQueueWindowStats } from './gpu_queue_window_core';
 
 export const GPU_WORK_PRIORITY = {
@@ -74,6 +91,40 @@ export const GPU_WORK_PRIORITY = {
   LIVE_VIEW: 30,
   ACTIONABLE_VIEW: 40,
 } as const;
+
+/** What the admission is told about a candidate. Kept as a queue-local shape
+ *  rather than an import of the budget core: that core imports
+ *  GPU_WORK_PRIORITY from here, so the dependency runs one way only. */
+export interface GpuWorkAdmissionCandidate {
+  label: string;
+  priority: number;
+  /** Frames counted since this candidate was FIRST REFUSED, not since it was
+   *  enqueued: the starvation bound must measure time the policy actually held
+   *  the unit back, never time it merely spent behind another unit. */
+  deferredFrames: number;
+}
+
+/** The per-frame budget seam (see the header's admission paragraph). */
+export interface GpuWorkAdmission {
+  admit(candidate: GpuWorkAdmissionCandidate): boolean;
+  /** The main-thread cost the admitted unit's synchronous prologue really had,
+   *  reported the moment it returns so a second admission in the same frame
+   *  prices the smaller headroom it actually has. Called for the released-tail
+   *  case too: the prologue is main-thread work whatever the tail does. */
+  spend(syncMs: number, label: string): void;
+}
+
+export interface GpuWorkAdmissionStats {
+  /** Whether an admission is installed. It only GATES once the frame clock is
+   *  running (see the header), so `deferred`/`parks` are what say it is live. */
+  enabled: boolean;
+  /** admit() refusals, counted per refusal and not per unit: one candidate
+   *  refused across ten frames counts ten. */
+  deferred: number;
+  /** Times the drain loop parked with work pending because EVERY candidate was
+   *  refused. */
+  parks: number;
+}
 
 /** Per-unit scheduling options; see the tail policy in the header. */
 export interface GpuWorkRunOptions {
@@ -104,6 +155,14 @@ interface PendingGpuWork<T> {
    *  counter advance and reports no cap wait, despite having waited on exactly
    *  that. The counter alone can confirm a cap wait but never rule one out. */
   parkedOnTailCapAtEnqueue: boolean;
+  /** Frames counted since the first admission refusal; 0 until one happens. */
+  deferredFrames: number;
+  /** Whether the admission has refused this candidate at least once, i.e.
+   *  whether its deferral counter is running. */
+  refusedAdmission: boolean;
+  /** Selection pass that last refused this candidate, so one pass considers
+   *  every pending unit exactly once without allocating an ordered copy. */
+  refusedPass: number;
   work: () => T | Promise<T>;
   resolve: (value: T | PromiseLike<T>) => void;
   reject: (reason?: unknown) => void;
@@ -139,6 +198,9 @@ export interface GpuWorkUnitStat {
    *  gets counted at all). Read the trio (frameGapMs, syncMs, sharedFrameGap)
    *  together, never frameGapMs alone. */
   sharedFrameGap: number;
+  /** Frames this unit spent refused by the admission before it was granted.
+   *  Zero without an admission, and zero for a unit admitted on sight. */
+  deferredFrames: number;
 }
 
 /** The unit the drain loop is awaiting right now. Every pending unit waits
@@ -261,6 +323,8 @@ export interface BackgroundGpuQueueStats {
    *  while costing nothing itself, and that is precisely the priority-inversion
    *  shape, so it can never surface in a cost-ordered list. */
   longestWaits: GpuWorkWaitStat[];
+  /** What the per-frame admission decided, cumulatively. */
+  admission: GpuWorkAdmissionStats;
   /** The RECENT interval, per priority lane. Every other field on this object is
    *  cumulative or a lifetime maximum; this one is the only arm two runs of a
    *  pacing experiment can be compared on. See gpu_queue_window_core.ts. */
@@ -340,6 +404,9 @@ export function createBackgroundGpuQueue(opts?: {
   frameGapIgnoreMs?: number;
   recentWindowMs?: number;
   recentSampleLimit?: number;
+  /** Per-frame budget. Absent, the queue starts every unit as soon as its turn
+   *  comes, which is the behaviour every host had before this seam. */
+  admission?: GpuWorkAdmission;
 }): BackgroundGpuQueue {
   const now = opts?.now ?? ((): number => performance.now());
   const slowestLimit = Math.max(1, opts?.slowestLimit ?? DEFAULT_SLOWEST_LIMIT);
@@ -347,6 +414,7 @@ export function createBackgroundGpuQueue(opts?: {
   const stallLimit = Math.max(1, opts?.stallLimit ?? DEFAULT_STALL_LIMIT);
   const tailLimit = Math.max(1, opts?.tailLimit ?? DEFAULT_TAIL_LIMIT);
   const frameGapIgnoreMs = Math.max(1, opts?.frameGapIgnoreMs ?? DEFAULT_FRAME_GAP_IGNORE_MS);
+  const admission = opts?.admission;
   const pending: PendingGpuWork<unknown>[] = [];
   const slowest: GpuWorkUnitStat[] = [];
   const blockiest: GpuWorkUnitStat[] = [];
@@ -362,6 +430,10 @@ export function createBackgroundGpuQueue(opts?: {
   let worstSyncMs = 0;
   let worstWaitMs = 0;
   let tailCapParks = 0;
+  let admissionDeferred = 0;
+  let admissionParks = 0;
+  let selectionPass = 0;
+  let admissionNotify: (() => void) | null = null;
   // True while the drain loop is parked waiting for a cap slot. Read at enqueue
   // so a unit arriving mid-park is attributed the wait it really had.
   let parkedOnTailCap = false;
@@ -476,6 +548,7 @@ export function createBackgroundGpuQueue(opts?: {
       waitMs: unit.waitMs,
       frameGapMs: unit.worstFrameGapMs,
       sharedFrameGap: unit.worstFrameGapShared,
+      deferredFrames: unit.entry.deferredFrames,
     };
     if (stat.waitMs > worstWaitMs) worstWaitMs = stat.waitMs;
     // Keyed on SETTLE time, not stat.atMs (the start): released tails settle out
@@ -551,6 +624,59 @@ export function createBackgroundGpuQueue(opts?: {
     }
   };
 
+  /** Wake a loop parked on the admission. Idempotent: a park that already
+   *  ended has no notifier left to call. */
+  const wakeAdmission = (): void => {
+    const notify = admissionNotify;
+    admissionNotify = null;
+    notify?.();
+  };
+
+  const outranks = (a: PendingGpuWork<unknown>, b: PendingGpuWork<unknown>): boolean =>
+    a.priority > b.priority || (a.priority === b.priority && a.order < b.order);
+
+  /**
+   * Index of the unit to start next: highest priority, FIFO within a priority,
+   * and with an armed admission the first such candidate it admits. Returns -1
+   * only when every pending candidate was refused.
+   *
+   * Allocation-free by design (this runs per unit start, and the pending array
+   * is the one thing a burst makes long): candidates are marked with the pass
+   * that refused them instead of being copied into a sorted list.
+   */
+  const selectNext = (): number => {
+    if (!admission || lastFrameAt === null) {
+      let selectedIndex = 0;
+      for (let index = 1; index < pending.length; index++) {
+        if (outranks(pending[index], pending[selectedIndex])) selectedIndex = index;
+      }
+      return selectedIndex;
+    }
+    selectionPass++;
+    for (;;) {
+      let selectedIndex = -1;
+      for (let index = 0; index < pending.length; index++) {
+        const candidate = pending[index];
+        if (candidate.refusedPass === selectionPass) continue;
+        if (selectedIndex < 0 || outranks(candidate, pending[selectedIndex])) selectedIndex = index;
+      }
+      if (selectedIndex < 0) return -1;
+      const candidate = pending[selectedIndex];
+      if (
+        admission.admit({
+          label: candidate.label,
+          priority: candidate.priority,
+          deferredFrames: candidate.deferredFrames,
+        })
+      ) {
+        return selectedIndex;
+      }
+      candidate.refusedPass = selectionPass;
+      candidate.refusedAdmission = true;
+      admissionDeferred++;
+    }
+  };
+
   const drain = async (): Promise<void> => {
     while (pending.length > 0) {
       // The released-tail cap gates STARTING units, so the bound covers the
@@ -578,16 +704,16 @@ export function createBackgroundGpuQueue(opts?: {
       // above: re-check emptiness before selecting, or the resumed iteration
       // dereferences a unit that no longer exists.
       if (pending.length === 0) break;
-      let selectedIndex = 0;
-      for (let index = 1; index < pending.length; index++) {
-        const candidate = pending[index];
-        const selected = pending[selectedIndex];
-        if (
-          candidate.priority > selected.priority ||
-          (candidate.priority === selected.priority && candidate.order < selected.order)
-        ) {
-          selectedIndex = index;
-        }
+      const selectedIndex = selectNext();
+      if (selectedIndex < 0) {
+        // Every candidate refused: nothing this loop can do until the frame
+        // clock advances their deferral (noteFrame) or a new arrival brings a
+        // candidate the budget has room for (run). Both wake this park.
+        admissionParks++;
+        await new Promise<void>((resolve) => {
+          admissionNotify = resolve;
+        });
+        continue;
       }
       const [next] = pending.splice(selectedIndex, 1);
       const startedAt = now();
@@ -610,6 +736,9 @@ export function createBackgroundGpuQueue(opts?: {
       try {
         const returned = next.work();
         syncMs = now() - unit.startedAt;
+        // Charged whether or not the tail is released, and whether or not the
+        // admission is armed yet: the ledger learns from boot units too.
+        admission?.spend(syncMs, next.label);
         if (
           next.releaseTail &&
           returned !== null &&
@@ -669,15 +798,28 @@ export function createBackgroundGpuQueue(opts?: {
           enqueuedAt: now(),
           tailCapParksAtEnqueue: tailCapParks,
           parkedOnTailCapAtEnqueue: parkedOnTailCap,
+          deferredFrames: 0,
+          refusedAdmission: false,
+          refusedPass: 0,
           work,
           resolve,
           reject,
         } as PendingGpuWork<unknown>);
       });
       scheduleDrain();
+      // A parked loop is already active, so scheduleDrain returns without
+      // reconsidering: this arrival may be the admissible one.
+      wakeAdmission();
       return result;
     },
     noteFrame(atMs: number): void {
+      if (admission) {
+        // A refused candidate ages in FRAMES, which is the unit the starvation
+        // bound counts in, and the new frame re-opens the budget: wake the loop
+        // so it reconsiders everything it parked on.
+        for (const entry of pending) if (entry.refusedAdmission) entry.deferredFrames++;
+        wakeAdmission();
+      }
       const previous = lastFrameAt;
       lastFrameAt = atMs;
       const inFlight = (running ? 1 : 0) + waitingTails.size;
@@ -754,6 +896,11 @@ export function createBackgroundGpuQueue(opts?: {
           waitMs: round1(wait.waitMs),
           tails: [...wait.tails],
         })),
+        admission: {
+          enabled: admission !== undefined,
+          deferred: admissionDeferred,
+          parks: admissionParks,
+        },
         recent: recent.stats(now()),
       };
     },
@@ -762,6 +909,9 @@ export function createBackgroundGpuQueue(opts?: {
       accepting = false;
       shutdownReason = reason;
       for (const entry of pending.splice(0)) entry.reject(reason);
+      // A loop parked on the admission has no other way out: nothing will feed
+      // it a frame after shutdown, and its pending set just emptied.
+      wakeAdmission();
       shutdownPromise = new Promise<void>((resolve) => {
         resolveShutdown = resolve;
       });
