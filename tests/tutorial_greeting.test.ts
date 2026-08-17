@@ -4,13 +4,11 @@
 
 import { describe, expect, it } from 'vitest';
 import { PROVING_SHORE_ARRIVAL } from '../src/sim/content/proving_shore';
+import { NPCS } from '../src/sim/data';
 import { FERRY_BELL_TOWN_LANDING } from '../src/sim/interactions/ferry_bell';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
-import {
-  maybeEmitTutorialGreeting,
-  updateTutorialGreeting,
-} from '../src/sim/tutorial/greeting';
+import { maybeEmitTutorialGreeting, updateTutorialGreeting } from '../src/sim/tutorial/greeting';
 import type { SimEvent } from '../src/sim/types';
 
 function makeSim(seed = 4120): Sim {
@@ -160,8 +158,9 @@ describe('startTutorial (the ferry)', () => {
     sim.events = [];
     sim.startTutorial();
     const e = sim.entities.get(sim.playerId)!;
-    expect(Math.hypot(e.pos.x - PROVING_SHORE_ARRIVAL.x, e.pos.z - PROVING_SHORE_ARRIVAL.z))
-      .toBeLessThan(1);
+    expect(
+      Math.hypot(e.pos.x - PROVING_SHORE_ARRIVAL.x, e.pos.z - PROVING_SHORE_ARRIVAL.z),
+    ).toBeLessThan(1);
     expect(e.facing).toBe(PROVING_SHORE_ARRIVAL.facing);
     // The text-free arrival marker Odo's welcome note keys off: a character
     // who has not started the rail is taught, whatever this device has seen.
@@ -230,8 +229,9 @@ describe('the ferry bells (the clicked crossing)', () => {
     p.pos.z = island.pos.z;
     sim.events = [];
     sim.pickUpObject(island.id);
-    expect(Math.hypot(p.pos.x - FERRY_BELL_TOWN_LANDING.x, p.pos.z - FERRY_BELL_TOWN_LANDING.z))
-      .toBeLessThan(1);
+    expect(
+      Math.hypot(p.pos.x - FERRY_BELL_TOWN_LANDING.x, p.pos.z - FERRY_BELL_TOWN_LANDING.z),
+    ).toBeLessThan(1);
     // The text-free homecoming marker the HUD keys its one-time twin-bell
     // pointer off (a possible misclick ride).
     expect(sim.events).toContainEqual({ type: 'ferryBellHome', pid: sim.playerId });
@@ -246,8 +246,9 @@ describe('the ferry bells (the clicked crossing)', () => {
     p.pos.z = town.pos.z;
     sim.events = [];
     sim.pickUpObject(town.id);
-    expect(Math.hypot(p.pos.x - PROVING_SHORE_ARRIVAL.x, p.pos.z - PROVING_SHORE_ARRIVAL.z))
-      .toBeLessThan(1);
+    expect(
+      Math.hypot(p.pos.x - PROVING_SHORE_ARRIVAL.x, p.pos.z - PROVING_SHORE_ARRIVAL.z),
+    ).toBeLessThan(1);
     // No homecoming marker on the OUTBOUND ride (the pointer is only for
     // arrivals in town); the island-arrival marker fires instead.
     expect(sim.events.filter((e) => e.type === 'ferryBellHome')).toEqual([]);
@@ -367,17 +368,36 @@ describe('the quest-gated vendor row (the pouch lock-out guard)', () => {
     sim.turnInQuest('q_ps_pouch_and_purse');
     expect(sim.questsDone.has('q_ps_pouch_and_purse')).toBe(true);
     expect(meta.copper).toBe(before + 120);
-    expect(meta.bags.filter((b) => b === 'linen_pouch'), 'Maren kept her hands off it').toHaveLength(
-      1,
-    );
+    expect(
+      meta.bags.filter((b) => b === 'linen_pouch'),
+      'Maren kept her hands off it',
+    ).toHaveLength(1);
   });
 
   it('ungated rows sell as before (the gate narrows nothing else)', () => {
+    // Finch's stall now stocks ONLY the gated pouch (the softlock guard), so
+    // the ungated-row proof rides a town vendor instead: any Eastbrook
+    // provisioner row without a vendorQuestGates entry sells to a fresh
+    // character with no quest state at all.
     const sim = makeSim();
-    const finch = standAtFinch(sim);
+    const vendor = [...sim.entities.values()].find(
+      (e) =>
+        e.kind === 'npc' &&
+        (NPCS[e.templateId]?.vendorItems ?? []).some(
+          (id) => !(NPCS[e.templateId]?.vendorQuestGates ?? {})[id],
+        ),
+    )!;
+    expect(vendor, 'an ungated vendor row exists somewhere').toBeTruthy();
+    const npcDef = NPCS[vendor.templateId]!;
+    const ungated = (npcDef.vendorItems ?? []).find((id) => !(npcDef.vendorQuestGates ?? {})[id])!;
+    const p = sim.entities.get(sim.playerId)!;
+    p.pos.x = vendor.pos.x + 1;
+    p.pos.z = vendor.pos.z;
     const meta = sim.players.get(sim.playerId)!;
-    meta.copper = 1000;
-    sim.buyItem(finch.id, 'minor_healing_potion');
-    expect(sim.countItem('minor_healing_potion')).toBe(1);
+    meta.copper = 100000;
+    sim.buyItem(vendor.id, ungated);
+    // Some provisioner rows sell in stacks; owning ANY of it proves the
+    // ungated purchase went through.
+    expect(sim.countItem(ungated)).toBeGreaterThanOrEqual(1);
   });
 });

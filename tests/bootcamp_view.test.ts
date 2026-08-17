@@ -23,6 +23,7 @@ import {
   bootcampBodyPlan,
   bootcampKeycaps,
   bootcampTitleKey,
+  CAMERA_LESSON_TRAVEL_RAD,
   COACH_ACTIVE_TARGETS,
   COACH_GAUNTLET_QUEST_ID,
   type CoachState,
@@ -30,8 +31,8 @@ import {
   coachFocus,
   coachKeycaps,
   computeBootcampStep,
-  ISLAND_STEP_TOTAL,
-  islandStepInfo,
+  nextWreckCrateTarget,
+  WRECK_CRATE_POSITIONS,
 } from '../src/ui/bootcamp_view';
 import { t } from '../src/ui/i18n';
 
@@ -58,6 +59,9 @@ describe('computeBootcampStep', () => {
     expect(
       computeBootcampStep({ questActive: true, checkpointsReached: 3, cameraTurned: true }),
     ).toBe('done');
+    // One deliberate drag completes the camera lesson immediately: the
+    // travel ask stays a fraction of a turn, never a full circle.
+    expect(CAMERA_LESSON_TRAVEL_RAD).toBeLessThanOrEqual(0.5);
   });
 });
 
@@ -209,10 +213,12 @@ describe('the rail coach', () => {
     expect(at('q_ps_shell_and_claw', 'available', 'keyboard')).toEqual(['F']);
     expect(at('q_ps_shell_and_claw', 'ready', 'keyboard')).toEqual(['F']);
     // The generic task card's only param is the map key, which stays an
-    // aside in the copy, never a chip.
-    expect(at('q_ps_shell_and_claw', 'active', 'keyboard')).toEqual([]);
+    // aside in the copy, never a chip (Set Sail is the one generic task).
+    expect(at('q_ps_set_sail', 'active', 'keyboard')).toEqual([]);
     expect(at('q_ps_strike_true', 'active', 'keyboard')).toEqual(['Tab', '1']);
+    expect(at('q_ps_shell_and_claw', 'active', 'keyboard')).toEqual(['Tab', '1']);
     expect(at('q_ps_the_wreck_line', 'active', 'keyboard')).toEqual(['F']);
+    expect(at('q_ps_pouch_and_purse', 'active', 'keyboard')).toEqual(['F']);
     expect(at('q_ps_pouch_and_purse', 'ready', 'keyboard')).toEqual(['B', 'F']);
     expect(at('q_ps_shell_and_claw', 'available', 'touch')).toEqual([]);
     expect(at('q_ps_strike_true', 'active', 'pad')).toEqual([]);
@@ -229,6 +235,24 @@ describe('the rail coach', () => {
     const wreck = coachCardPlan({ questId: 'q_ps_the_wreck_line', state: 'active' }, 'keyboard');
     expect(wreck.params).toEqual(['interactKey']);
     expect(t(wreck.bodyKey, { interactKey: 'F' })).toMatch(/crate/i);
+    // The scuttler cull's card carries the retreat warning.
+    const shell = coachCardPlan({ questId: 'q_ps_shell_and_claw', state: 'active' }, 'keyboard');
+    expect(shell.params).toEqual(['targetKey', 'attackKey']);
+    const shellBody = t(shell.bodyKey, { targetKey: 'Tab', attackKey: '1' });
+    expect(shellBody).toMatch(/retreat/i);
+    expect(shellBody).not.toMatch(/\{\w+\}/);
+    // The pouch lesson's ACTIVE card walks the stall purchase, naming the
+    // GIVER (Quartermaster Finch, who runs the stall), not the turn-in.
+    const pouchBuy = coachCardPlan(
+      { questId: 'q_ps_pouch_and_purse', state: 'active' },
+      'keyboard',
+    );
+    expect(pouchBuy.params).toEqual(['interactKey']);
+    expect(pouchBuy.bodyHasNpc).toBe(true);
+    expect(pouchBuy.npcId).toBe('quartermaster_finch');
+    const pouchBuyBody = t(pouchBuy.bodyKey, { interactKey: 'F', npc: 'X' });
+    expect(pouchBuyBody).toMatch(/pouch/i);
+    expect(pouchBuyBody).not.toMatch(/\{\w+\}/);
     const pouch = coachCardPlan({ questId: 'q_ps_pouch_and_purse', state: 'ready' }, 'keyboard');
     expect(pouch.params).toEqual(['bagsKey', 'interactKey']);
     expect(pouch.bodyHasNpc).toBe(true);
@@ -236,40 +260,26 @@ describe('the rail coach', () => {
     expect(pouchBody).toMatch(/bag/i);
     expect(pouchBody).not.toMatch(/\{\w+\}/);
     // Quests without an override keep the generic three-state copy.
-    const generic = coachCardPlan({ questId: 'q_ps_shell_and_claw', state: 'active' }, 'keyboard');
+    const generic = coachCardPlan({ questId: 'q_ps_set_sail', state: 'active' }, 'keyboard');
     expect(generic.bodyKey).toBe('hudChrome.bootcamp.coachTaskBody');
   });
 });
 
-describe('the one island step ladder', () => {
-  it('numbers every card of the whole tutorial as one sequence', () => {
-    // Six ladder cards, three coach cards per later rail quest, one bell.
-    expect(ISLAND_STEP_TOTAL).toBe(6 + (PROVING_SHORE_QUEST_ORDER.length - 1) * 3 + 1);
-    expect(islandStepInfo({ kind: 'ladder', step: 'talk' })).toEqual({
-      current: 1,
-      total: ISLAND_STEP_TOTAL,
-    });
-    expect(islandStepInfo({ kind: 'ladder', step: 'camera' }).current).toBe(5);
-    expect(islandStepInfo({ kind: 'ladder', step: 'done' }).current).toBe(6);
-    // The first coach quest picks up right after the ladder...
-    expect(
-      islandStepInfo({ kind: 'coach', focus: { questId: 'q_ps_strike_true', state: 'available' } })
-        .current,
-    ).toBe(7);
-    // ...and every later card advances monotonically to the bell.
-    let prev = 6;
-    for (const questId of PROVING_SHORE_QUEST_ORDER.slice(1)) {
-      for (const state of ['available', 'active', 'ready'] as CoachState[]) {
-        const { current } = islandStepInfo({ kind: 'coach', focus: { questId, state } });
-        expect(current).toBe(prev + 1);
-        prev = current;
-      }
-    }
-    expect(islandStepInfo({ kind: 'bell' })).toEqual({
-      current: ISLAND_STEP_TOTAL,
-      total: ISLAND_STEP_TOTAL,
-    });
-    expect(prev + 1).toBe(ISLAND_STEP_TOTAL);
+describe('the crate line arrow', () => {
+  it('walks the authored line, hopping to the next un-looted crate', () => {
+    expect(WRECK_CRATE_POSITIONS.length).toBe(6);
+    // Everything standing: the first crate.
+    expect(nextWreckCrateTarget(WRECK_CRATE_POSITIONS)).toEqual(WRECK_CRATE_POSITIONS[0]);
+    // The first two picked up: the third is next.
+    expect(nextWreckCrateTarget(WRECK_CRATE_POSITIONS.slice(2))).toEqual(WRECK_CRATE_POSITIONS[2]);
+    // Only the last stands: aim there.
+    expect(nextWreckCrateTarget([WRECK_CRATE_POSITIONS[5]])).toEqual(WRECK_CRATE_POSITIONS[5]);
+    // A crate slightly off its authored spot (the entity's live pos) still
+    // matches its authored anchor.
+    const off = { x: WRECK_CRATE_POSITIONS[3].x + 0.5, z: WRECK_CRATE_POSITIONS[3].z - 0.5 };
+    expect(nextWreckCrateTarget([off])).toEqual(WRECK_CRATE_POSITIONS[3]);
+    // Nothing mirrored yet: fall back to the line's start.
+    expect(nextWreckCrateTarget([])).toEqual(WRECK_CRATE_POSITIONS[0]);
   });
 });
 

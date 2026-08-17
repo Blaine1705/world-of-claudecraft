@@ -11,6 +11,7 @@
 // position cannot fork the deterministic draw order. `src/sim`-pure.
 
 import { PROVING_SHORE_ARRIVAL, PROVING_SHORE_QUEST_ORDER } from '../content/proving_shore';
+import { bumpDeedStat } from '../deeds';
 import { displacePlayer } from '../displacement';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -66,6 +67,14 @@ export function tryRingFerryBell(
     // the first time (its own localStorage one-shot), in case the ride was a
     // misclick. Emitted every ride; the one-shot is presentation-only.
     ctx.emit({ type: 'ferryBellHome', pid: p.id });
+    // The graduation moment ("Ready for an Adventure",
+    // content/deeds.ts prog_ready_for_an_adventure): this home ride with the
+    // whole rail handed in. The rail is strict (each quest requires the
+    // previous), so its final quest in questsDone means all of it is.
+    const finalQuestId = PROVING_SHORE_QUEST_ORDER[PROVING_SHORE_QUEST_ORDER.length - 1];
+    if (meta.questsDone.has(finalQuestId)) {
+      bumpDeedStat(ctx, meta, 'tutorialGraduations', 1);
+    }
   } else {
     displacePlayer(
       ctx,

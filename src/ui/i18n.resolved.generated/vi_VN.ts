@@ -935,9 +935,15 @@ export const vi_VN: EnTranslations = {
       "taskStrikeTrueBody": "Walk up to a straw effigy and press {targetKey}, or left-click it, to make it your target. Then press {attackKey}, or click the first button on the action bar, to swing. Keep striking until one gives out.",
       "taskStrikeTrueBodyTouch": "Walk up to a straw effigy and tap it to make it your target. Then tap the first button on the action bar to swing. Keep striking until one gives out.",
       "taskStrikeTrueBodyPad": "Walk up to a straw effigy and press your target button to make it your target. Then press your first action button to swing. Keep striking until one gives out.",
+      "taskShellBody": "The scuttlers pinch back. Target one with {targetKey}, or left-click it, then press {attackKey} to swing, and keep striking. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskShellBodyTouch": "The scuttlers pinch back. Tap one to target it, then tap the first action bar button to swing. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskShellBodyPad": "The scuttlers pinch back. Press your target button, then your first action button to swing. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
       "taskWreckLineBody": "Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then press {interactKey}, or left-click the crate, to pick it up. Six fill the haul.",
       "taskWreckLineBodyTouch": "Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then tap the crate, or tap the Use button, to pick it up. Six fill the haul.",
       "taskWreckLineBodyPad": "Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then press your interact button to pick it up. Six fill the haul.",
+      "taskPouchBody": "Press {interactKey} on {npc}, or left-click them, to open the stall, then left-click the Linen Pouch to buy it.",
+      "taskPouchBodyTouch": "Tap {npc} to open the stall, then tap the Linen Pouch to buy it.",
+      "taskPouchBodyPad": "Press your interact button on {npc} to open the stall, then choose the Linen Pouch to buy it.",
       "readyPouchBody": "Pouch bought. Press {bagsKey} to open your bags and left-click the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and press {interactKey} to show it off.",
       "readyPouchBodyTouch": "Pouch bought. Open your bags and tap the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and tap them to show it off.",
       "readyPouchBodyPad": "Pouch bought. Open your bags and choose the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and press your interact button to show it off.",
@@ -14394,12 +14400,12 @@ export const vi_VN: EnTranslations = {
       "quartermaster_finch": {
         "name": "Quartermaster Finch",
         "title": "Camp Outfitter",
-        "greeting": "Bread, water, a draught for when practice gets ahead of you, and a spare pouch for what you pick up along the way. Coin buys them, and work earns the coin. That is the whole economy, {playerName}, and it never gets more complicated. Only bigger."
+        "greeting": "My counter keeps exactly one thing for sale, {playerName}: a spare pouch for what you pick up along the way, when your lesson calls for it. Everything else here is salvage bound for the vale. Coin buys the pouch, and work earns the coin. That is the whole economy, and it never gets more complicated. Only bigger."
       },
       "ferryman_odo": {
         "name": "Ferryman Odo",
         "title": "Keeper of the Crossing",
-        "greeting": "Fresh off the crossing, {playerName}? Warden Tam keeps the Gauntlet on the strand just south of my pier: run his lanes first and your legs will thank you. After that, Instructor Maren at Dawnrest Camp has your first task. When the vale calls you back, ring the bell standing beside my pier and the crossing will set you down in Eastbrook town."
+        "greeting": "Fresh off the crossing, {playerName}? Warden Tam keeps the Gauntlet on the strand just south of my pier: run his lanes first and your legs will thank you. Every keeper on this shore hands you to the next when your work is done, and the card at the top of your screen always knows the way. When the vale calls you back, ring the bell standing beside my pier and the crossing will set you down in Eastbrook town."
       },
       "bursar_wick": {
         "name": "Bursar Wick",

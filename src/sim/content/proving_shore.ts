@@ -240,16 +240,18 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     pos: { x: -312, z: 57.2 },
     facing: Math.PI,
     color: 0x6b6b3a,
-    // Provisions and a starter bag, NEVER professions tools (the R37 vendor
+    // The stall sells EXACTLY the bank lesson's Linen Pouch: no provisions
+    // (a newcomer who spent their lesson copper on bread was softlocked out
+    // of the pouch purchase) and NEVER professions tools (the R37 vendor
     // rule): the chain's copper is sized so a graduate buys the full tier-1
-    // tool kit from the vale's own counters on arrival. The Linen Pouch is
-    // the bank lesson's purchase, quest-gated so an early buy cannot strand
-    // the lesson's copper (types.ts vendorQuestGates).
-    vendorItems: ['minor_healing_potion', 'baked_bread', 'spring_water', 'linen_pouch'],
+    // tool kit from the vale's own counters on arrival. The pouch is
+    // quest-gated so an early buy cannot strand the lesson's copper
+    // (types.ts vendorQuestGates).
+    vendorItems: ['linen_pouch'],
     vendorQuestGates: { linen_pouch: 'q_ps_pouch_and_purse' },
     questIds: ['q_ps_the_wreck_line', 'q_ps_pouch_and_purse'],
     greeting:
-      'Bread, water, a draught for when practice gets ahead of you, and a spare pouch for what you pick up along the way. Coin buys them, and work earns the coin. That is the whole economy, $N, and it never gets more complicated. Only bigger.',
+      'My counter keeps exactly one thing for sale, $N: a spare pouch for what you pick up along the way, when your lesson calls for it. Everything else here is salvage bound for the vale. Coin buys the pouch, and work earns the coin. That is the whole economy, and it never gets more complicated. Only bigger.',
   },
   // The camp's Gilded Strongbox desk: a real banker (the same vault as every
   // town bursar), and the voice of the bank-and-bags lesson.
@@ -281,7 +283,7 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     color: 0x4a6a8a,
     questIds: ['q_ps_set_sail'],
     greeting:
-      'Fresh off the crossing, $N? Warden Tam keeps the Gauntlet on the strand just south of my pier: run his lanes first and your legs will thank you. After that, Instructor Maren at Dawnrest Camp has your first task. When the vale calls you back, ring the bell standing beside my pier and the crossing will set you down in Eastbrook town.',
+      'Fresh off the crossing, $N? Warden Tam keeps the Gauntlet on the strand just south of my pier: run his lanes first and your legs will thank you. Every keeper on this shore hands you to the next when your work is done, and the card at the top of your screen always knows the way. When the vale calls you back, ring the bell standing beside my pier and the crossing will set you down in Eastbrook town.',
   },
   // The Gauntlet's keeper: the first pair of hands a newcomer is sent to,
   // standing beside the course's open east mouth, where the arrival facing
@@ -574,11 +576,12 @@ export const PROVING_SHORE_CAMPS: CampDef[] = [
   // camp free for the Gauntlet movement course. Counts stay halved: the
   // wreck line is a looting lesson, and a crate ringed by crabs turned it
   // into a fight the quest never asked for.
-  // Three well-separated pairs rather than two piles: with the very short
-  // aggro leash above, each crab met along the line is a single fight.
-  { mobId: 'shore_scuttler', center: { x: -383, z: -22 }, radius: 6, count: 2, offStream: true },
-  { mobId: 'shore_scuttler', center: { x: -390, z: -30 }, radius: 6, count: 2, offStream: true },
-  { mobId: 'shore_scuttler', center: { x: -394, z: -36 }, radius: 6, count: 2, offStream: true },
+  // Three well-separated pairs rather than two piles, ten-plus yards between
+  // camps: with the very short aggro leash above, each crab met along the
+  // line is a single fight, and a bad pull has room to retreat.
+  { mobId: 'shore_scuttler', center: { x: -380, z: -19 }, radius: 5, count: 2, offStream: true },
+  { mobId: 'shore_scuttler', center: { x: -388, z: -28 }, radius: 5, count: 2, offStream: true },
+  { mobId: 'shore_scuttler', center: { x: -398, z: -33 }, radius: 5, count: 2, offStream: true },
 ];
 
 export const PROVING_SHORE_OBJECTS: GroundObjectDef[] = [
@@ -672,7 +675,10 @@ export const PROVING_SHORE_PROPS: ZonePropsDef = {
     { x1: -284, z1: -20, x2: -304, z2: -20 }, // lane 1 south wall
     { x1: -312, z1: -12, x2: -312, z2: -28 }, // lane 2 west wall
     { x1: -304, z1: -20, x2: -304, z2: -33 }, // lane 2 east wall
-    { x1: -312, z1: -28, x2: -335, z2: -28 }, // lane 3 north wall
+    // Lane 3's north wall stops short of the finish: its old west end at
+    // (-335, -28) jutted into the yard path a finishing run walks up to
+    // Overseer Pell, and a runner rounding the red flag snagged on it.
+    { x1: -312, z1: -28, x2: -330, z2: -28 }, // lane 3 north wall
     { x1: -304, z1: -33, x2: -335, z2: -36 }, // lane 3 south wall, to the finish
     //   (the west end past the red flag stays open: Overseer Pell stands
     //   there, and the finish line hands straight onto his yard path)
@@ -725,7 +731,6 @@ export const PROVING_SHORE_PROPS: ZonePropsDef = {
     { key: 'kcasTorch', x: -320, z: -35.8 },
     { key: 'kcasTorch', x: -328, z: -36 },
     { key: 'kcasTorch', x: -334, z: -36 },
-    { key: 'kcasTorch', x: -333, z: -28 },
   ],
   // The Old Pier, scaled up to read against a character: the classic pier is
   // a rowboat jetty, and this one is the island's whole front door

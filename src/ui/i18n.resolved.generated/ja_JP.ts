@@ -909,9 +909,9 @@ export const ja_JP: EnTranslations = {
       "turnwalkBodyTouch": "旗一本目、よし。（移動スティックではなく）世界を指でドラッグして回り、南へ延びる柵のレーンを正面に見たら、スティックを上に倒して二本目の旗まで歩こう。",
       "turnwalkBodyPad": "旗一本目、よし。右スティックを倒して回り、南へ延びる柵のレーンを正面に見たら、左スティックを上に倒して二本目の旗まで歩こう。",
       "strafeTitle": "最後のレーンを横歩き",
-      "strafeBody": "横に動く方法はもうひとつある。{turnKey}を押したまま、下ってきたレーンをさかのぼる向きになるまで回り、それから{strafeKey}を押したまま最後のレーンを赤い旗まで横歩きしよう。横歩きなら視線を敵に置いたまま動ける。いつか戦いでそう動く日が来る。",
-      "strafeBodyTouch": "横に動く方法はもうひとつある。下ってきたレーンをさかのぼる向きになるまで回り、それから移動スティックを左に倒して最後のレーンを赤い旗まで横滑りしよう。",
-      "strafeBodyPad": "横に動く方法はもうひとつある。右スティックを倒して、下ってきたレーンをさかのぼる向きになるまで回り、それから左スティックを左に倒して最後のレーンを赤い旗まで横滑りしよう。",
+      "strafeBody": "横に動く方法はもうひとつある。{strafeKey}を押したまま、赤い旗が背後に来るまで最後のレーンを横歩きしよう。横歩きなら視線を敵に置いたまま動ける。いつか戦いでそう動く日が来る。",
+      "strafeBodyTouch": "横に動く方法はもうひとつある。移動スティックを左に倒して、赤い旗が背後に来るまで最後のレーンを横滑りしよう。",
+      "strafeBodyPad": "横に動く方法はもうひとつある。左スティックを左に倒して、赤い旗が背後に来るまで最後のレーンを横滑りしよう。",
       "cameraTitle": "視点を回す",
       "cameraBody": "走りを納める前に最後の一課だ。マウスの右ボタンを押したままドラッグして、視点を自分のまわりでぐるりと一周させよう。背後に何が立っているかを知る者が、戦いを制する。",
       "cameraBodyTouch": "走りを納める前に最後の一課だ。世界を指でドラッグして、視点を自分のまわりでぐるりと一周させよう。背後に何が立っているかを知る者が、戦いを制する。",
@@ -932,19 +932,25 @@ export const ja_JP: EnTranslations = {
       "coachReadyBody": "{npc}のもとへ戻り、{interactKey}を押すか、左クリックして納め、報酬を受け取ろう。",
       "coachReadyBodyTouch": "{npc}のもとへ戻り、相手をタップして納め、報酬を受け取ろう。",
       "coachReadyBodyPad": "{npc}のもとへ戻り、インタラクトボタンを押して納め、報酬を受け取ろう。",
-      "taskStrikeTrueBody": "Walk up to a straw effigy and press {targetKey}, or left-click it, to make it your target. Then press {attackKey}, or click the first button on the action bar, to swing. Keep striking until one gives out.",
-      "taskStrikeTrueBodyTouch": "Walk up to a straw effigy and tap it to make it your target. Then tap the first button on the action bar to swing. Keep striking until one gives out.",
-      "taskStrikeTrueBodyPad": "Walk up to a straw effigy and press your target button to make it your target. Then press your first action button to swing. Keep striking until one gives out.",
-      "taskWreckLineBody": "Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then press {interactKey}, or left-click the crate, to pick it up. Six fill the haul.",
-      "taskWreckLineBodyTouch": "Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then tap the crate, or tap the Use button, to pick it up. Six fill the haul.",
-      "taskWreckLineBodyPad": "Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then press your interact button to pick it up. Six fill the haul.",
-      "readyPouchBody": "Pouch bought. Press {bagsKey} to open your bags and left-click the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and press {interactKey} to show it off.",
-      "readyPouchBodyTouch": "Pouch bought. Open your bags and tap the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and tap them to show it off.",
-      "readyPouchBodyPad": "Pouch bought. Open your bags and choose the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and press your interact button to show it off.",
-      "bellTitle": "Ring the bell",
-      "bellBody": "Your crossing is earned. Walk to the ferry bell beside the pier and press {interactKey}, or left-click it, to sail for Eastbrook.",
-      "bellBodyTouch": "Your crossing is earned. Walk to the ferry bell beside the pier and tap it to sail for Eastbrook.",
-      "bellBodyPad": "Your crossing is earned. Walk to the ferry bell beside the pier and press your interact button on it to sail for Eastbrook."
+      "taskStrikeTrueBody": "藁のかかしに歩み寄り、{targetKey}を押すか、左クリックしてターゲットにしよう。次に{attackKey}を押すか、アクションバーの最初のボタンをクリックして打ち込もう。一体が崩れるまで打ち続けること。",
+      "taskStrikeTrueBodyTouch": "藁のかかしに歩み寄り、タップしてターゲットにしよう。次にアクションバーの最初のボタンをタップして打ち込もう。一体が崩れるまで打ち続けること。",
+      "taskStrikeTrueBodyPad": "藁のかかしに歩み寄り、ターゲットボタンを押してターゲットにしよう。次に最初のアクションボタンを押して打ち込もう。一体が崩れるまで打ち続けること。",
+      "taskShellBody": "浜辺ガニは挟み返してくる。{targetKey}を押すか、左クリックして一匹をターゲットにし、{attackKey}を押して打ち込み、そのまま打ち続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。",
+      "taskShellBodyTouch": "浜辺ガニは挟み返してくる。一匹をタップしてターゲットにし、アクションバーの最初のボタンをタップして打ち込もう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。",
+      "taskShellBodyPad": "浜辺ガニは挟み返してくる。ターゲットボタンを押し、次に最初のアクションボタンを押して打ち込もう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。",
+      "taskWreckLineBody": "矢印をたどって木箱の列へ。名前が見えるところまで漂着した木箱に歩み寄り、{interactKey}を押すか、木箱を左クリックして拾い上げよう。六つで荷は満ちる。",
+      "taskWreckLineBodyTouch": "矢印をたどって木箱の列へ。名前が見えるところまで漂着した木箱に歩み寄り、木箱をタップするか、使用ボタンをタップして拾い上げよう。六つで荷は満ちる。",
+      "taskWreckLineBodyPad": "矢印をたどって木箱の列へ。名前が見えるところまで漂着した木箱に歩み寄り、インタラクトボタンを押して拾い上げよう。六つで荷は満ちる。",
+      "taskPouchBody": "{npc}に向かって{interactKey}を押すか、左クリックして露店を開き、亜麻のポーチを左クリックして買おう。",
+      "taskPouchBodyTouch": "{npc}をタップして露店を開き、亜麻のポーチをタップして買おう。",
+      "taskPouchBodyPad": "{npc}に向かってインタラクトボタンを押して露店を開き、亜麻のポーチを選んで買おう。",
+      "readyPouchBody": "ポーチは買えた。{bagsKey}を押してバッグを開き、亜麻のポーチを左クリックして空いた鞄留めに締めよう。それから{npc}のもとへ戻り、{interactKey}を押して見せに行こう。",
+      "readyPouchBodyTouch": "ポーチは買えた。バッグを開き、亜麻のポーチをタップして空いた鞄留めに締めよう。それから{npc}のもとへ戻り、相手をタップして見せに行こう。",
+      "readyPouchBodyPad": "ポーチは買えた。バッグを開き、亜麻のポーチを選んで空いた鞄留めに締めよう。それから{npc}のもとへ戻り、インタラクトボタンを押して見せに行こう。",
+      "bellTitle": "鐘を鳴らす",
+      "bellBody": "渡りは勝ち取った。桟橋のそばの渡しの鐘まで歩き、{interactKey}を押すか、左クリックして、イーストブルックへ出航しよう。",
+      "bellBodyTouch": "渡りは勝ち取った。桟橋のそばの渡しの鐘まで歩き、鐘をタップして、イーストブルックへ出航しよう。",
+      "bellBodyPad": "渡りは勝ち取った。桟橋のそばの渡しの鐘まで歩き、インタラクトボタンを押して、イーストブルックへ出航しよう。"
     },
     "widgets": {
       "clockTitle": "現地時刻 - クリックで12/24時間表記を切り替え",
@@ -2856,8 +2862,8 @@ export const ja_JP: EnTranslations = {
     },
     "noticeboard": {
       "empty": "何も貼られていないようだ。",
-      "popupTitle": "Guild Signpost",
-      "close": "Close"
+      "popupTitle": "ギルドの掲示柱",
+      "close": "閉じる"
     },
     "bank": {
       "title": "銀行",
@@ -14394,12 +14400,12 @@ export const ja_JP: EnTranslations = {
       "quartermaster_finch": {
         "name": "補給係フィンチ",
         "title": "野営地の商人",
-        "greeting": "パンに水、稽古が過ぎたときのための薬、それに道すがら拾ったものを入れる予備のポーチ。銅貨があれば買えるし、銅貨は働いて稼ぐもの。それが経済のすべてだよ、{playerName}。これ以上難しくはならない。大きくなるだけさ。"
+        "greeting": "私の店先に並ぶ売り物はきっかり一つだけだよ、{playerName}。道すがら拾ったものを入れる予備のポーチ、それも課題がそれを求めたときだけ。ほかにここにあるのは全部、渓谷へ送る引き揚げ品さ。銅貨がポーチを買い、働きが銅貨を稼ぐ。それが経済のすべてで、これ以上難しくはならない。大きくなるだけさ。"
       },
       "ferryman_odo": {
         "name": "渡し守オド",
         "title": "渡し場の番人",
-        "greeting": "渡ってきたばかりかい、{playerName}？ウォーデン・タムが桟橋のすぐ南の浜でガントレットを預かっている。まず彼のレーンを走ってくれば、足が礼を言うだろう。そのあとは暁の野営地の教官マレンが最初の仕事をくれる。渓谷が君を呼び戻したら、私の桟橋のそばに立つ鐘を鳴らせば、渡しがイーストブルックの町まで送り届けてくれる。"
+        "greeting": "渡ってきたばかりかい、{playerName}？ウォーデン・タムが桟橋のすぐ南の浜でガントレットを預かっている。まず彼のレーンを走ってくれば、足が礼を言うだろう。この浜の番人たちは、仕事を終えるたびに君を次の一人へ引き継いでくれるし、画面の上のカードはいつでも次の道を知っている。渓谷が君を呼び戻したら、私の桟橋のそばに立つ鐘を鳴らせば、渡しがイーストブルックの町まで送り届けてくれる。"
       },
       "bursar_wick": {
         "name": "出納係ウィック",

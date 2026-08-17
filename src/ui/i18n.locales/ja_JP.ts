@@ -13109,12 +13109,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '藁のかかしに歩み寄り、タップしてターゲットにしよう。次にアクションバーの最初のボタンをタップして打ち込もう。一体が崩れるまで打ち続けること。',
   'hudChrome.bootcamp.taskStrikeTrueBodyPad':
     '藁のかかしに歩み寄り、ターゲットボタンを押してターゲットにしよう。次に最初のアクションボタンを押して打ち込もう。一体が崩れるまで打ち続けること。',
+  'hudChrome.bootcamp.taskShellBody':
+    '浜辺ガニは挟み返してくる。{targetKey}を押すか、左クリックして一匹をターゲットにし、{attackKey}を押して打ち込み、そのまま打ち続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+  'hudChrome.bootcamp.taskShellBodyTouch':
+    '浜辺ガニは挟み返してくる。一匹をタップしてターゲットにし、アクションバーの最初のボタンをタップして打ち込もう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+  'hudChrome.bootcamp.taskShellBodyPad':
+    '浜辺ガニは挟み返してくる。ターゲットボタンを押し、次に最初のアクションボタンを押して打ち込もう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
   'hudChrome.bootcamp.taskWreckLineBody':
     '矢印をたどって木箱の列へ。名前が見えるところまで漂着した木箱に歩み寄り、{interactKey}を押すか、木箱を左クリックして拾い上げよう。六つで荷は満ちる。',
   'hudChrome.bootcamp.taskWreckLineBodyTouch':
     '矢印をたどって木箱の列へ。名前が見えるところまで漂着した木箱に歩み寄り、木箱をタップするか、使用ボタンをタップして拾い上げよう。六つで荷は満ちる。',
   'hudChrome.bootcamp.taskWreckLineBodyPad':
     '矢印をたどって木箱の列へ。名前が見えるところまで漂着した木箱に歩み寄り、インタラクトボタンを押して拾い上げよう。六つで荷は満ちる。',
+  'hudChrome.bootcamp.taskPouchBody':
+    '{npc}に向かって{interactKey}を押すか、左クリックして露店を開き、亜麻のポーチを左クリックして買おう。',
+  'hudChrome.bootcamp.taskPouchBodyTouch':
+    '{npc}をタップして露店を開き、亜麻のポーチをタップして買おう。',
+  'hudChrome.bootcamp.taskPouchBodyPad':
+    '{npc}に向かってインタラクトボタンを押して露店を開き、亜麻のポーチを選んで買おう。',
   'hudChrome.bootcamp.readyPouchBody':
     'ポーチは買えた。{bagsKey}を押してバッグを開き、亜麻のポーチを左クリックして空いた鞄留めに締めよう。それから{npc}のもとへ戻り、{interactKey}を押して見せに行こう。',
   'hudChrome.bootcamp.readyPouchBodyTouch':
@@ -13144,11 +13156,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.quartermaster_finch.name': '補給係フィンチ',
   'entities.npcs.quartermaster_finch.title': '野営地の商人',
   'entities.npcs.quartermaster_finch.greeting':
-    'パンに水、稽古が過ぎたときのための薬、それに道すがら拾ったものを入れる予備のポーチ。銅貨があれば買えるし、銅貨は働いて稼ぐもの。それが経済のすべてだよ、{playerName}。これ以上難しくはならない。大きくなるだけさ。',
+    '私の店先に並ぶ売り物はきっかり一つだけだよ、{playerName}。道すがら拾ったものを入れる予備のポーチ、それも課題がそれを求めたときだけ。ほかにここにあるのは全部、渓谷へ送る引き揚げ品さ。銅貨がポーチを買い、働きが銅貨を稼ぐ。それが経済のすべてで、これ以上難しくはならない。大きくなるだけさ。',
   'entities.npcs.ferryman_odo.name': '渡し守オド',
   'entities.npcs.ferryman_odo.title': '渡し場の番人',
   'entities.npcs.ferryman_odo.greeting':
-    '渡ってきたばかりかい、{playerName}？ウォーデン・タムが桟橋のすぐ南の浜でガントレットを預かっている。まず彼のレーンを走ってくれば、足が礼を言うだろう。そのあとは暁の野営地の教官マレンが最初の仕事をくれる。渓谷が君を呼び戻したら、私の桟橋のそばに立つ鐘を鳴らせば、渡しがイーストブルックの町まで送り届けてくれる。',
+    '渡ってきたばかりかい、{playerName}？ウォーデン・タムが桟橋のすぐ南の浜でガントレットを預かっている。まず彼のレーンを走ってくれば、足が礼を言うだろう。この浜の番人たちは、仕事を終えるたびに君を次の一人へ引き継いでくれるし、画面の上のカードはいつでも次の道を知っている。渓谷が君を呼び戻したら、私の桟橋のそばに立つ鐘を鳴らせば、渡しがイーストブルックの町まで送り届けてくれる。',
   'entities.npcs.warden_tam.name': 'ウォーデン・タム',
   'entities.npcs.warden_tam.title': 'ガントレットの番人',
   'entities.npcs.warden_tam.greeting':

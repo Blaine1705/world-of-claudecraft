@@ -46,9 +46,9 @@ export const BOOTCAMP_STEP_ORDER: readonly BootcampStep[] = [
 ];
 
 /** How far (radians of accumulated view travel) the camera lesson asks the
- *  player to swing before it counts as learned: most of a full circle, so
- *  they have genuinely looked around, with slack for direction changes. */
-export const CAMERA_LESSON_TRAVEL_RAD = 2.5;
+ *  player to swing before it counts as learned: one deliberate drag, about a
+ *  quarter turn, and the card moves straight on to the hand-in. */
+export const CAMERA_LESSON_TRAVEL_RAD = 0.5;
 
 export interface BootcampSnapshot {
   /** The run quest sits in the quest log (accepted at Warden Tam). */
@@ -243,13 +243,16 @@ const COACH_BODY: Record<CoachState, Record<BootcampInputMode, TranslationKey>> 
 
 /** Per-quest mechanic lessons that replace the generic bodies: the ACTIVE
  *  card teaches the quest's own hands (targeting and the swing for the
- *  effigy fell, the pickup press for the crate line), and the pouch lesson's
- *  READY card walks the buckle-on before the hand-in. */
+ *  effigy fell, the pinch-and-retreat rules for the scuttler cull, the
+ *  pickup press for the crate line, the stall purchase for the pouch), and
+ *  the pouch lesson's READY card walks the buckle-on before the hand-in. */
 interface CoachBodyOverride {
   keys: Record<BootcampInputMode, TranslationKey>;
   /** Keyboard-arm bind labels the body splices. */
   params: readonly CoachParam[];
   bodyHasNpc: boolean;
+  /** Whose localized name fills {npc} when bodyHasNpc: default 'turnIn'. */
+  npcRole?: 'giver' | 'turnIn';
 }
 
 const COACH_ACTIVE_OVERRIDES: Readonly<Record<string, CoachBodyOverride>> = {
@@ -262,6 +265,15 @@ const COACH_ACTIVE_OVERRIDES: Readonly<Record<string, CoachBodyOverride>> = {
     params: ['targetKey', 'attackKey'],
     bodyHasNpc: false,
   },
+  q_ps_shell_and_claw: {
+    keys: {
+      keyboard: 'hudChrome.bootcamp.taskShellBody',
+      touch: 'hudChrome.bootcamp.taskShellBodyTouch',
+      pad: 'hudChrome.bootcamp.taskShellBodyPad',
+    },
+    params: ['targetKey', 'attackKey'],
+    bodyHasNpc: false,
+  },
   q_ps_the_wreck_line: {
     keys: {
       keyboard: 'hudChrome.bootcamp.taskWreckLineBody',
@@ -270,6 +282,16 @@ const COACH_ACTIVE_OVERRIDES: Readonly<Record<string, CoachBodyOverride>> = {
     },
     params: ['interactKey'],
     bodyHasNpc: false,
+  },
+  q_ps_pouch_and_purse: {
+    keys: {
+      keyboard: 'hudChrome.bootcamp.taskPouchBody',
+      touch: 'hudChrome.bootcamp.taskPouchBodyTouch',
+      pad: 'hudChrome.bootcamp.taskPouchBodyPad',
+    },
+    params: ['interactKey'],
+    bodyHasNpc: true,
+    npcRole: 'giver',
   },
 };
 
@@ -308,7 +330,7 @@ export function coachCardPlan(focus: CoachFocus, mode: BootcampInputMode): Coach
       bodyKey: override ? override.keys[mode] : COACH_BODY.active[mode],
       params: mode === 'keyboard' ? (override ? override.params : ['mapKey']) : [],
       bodyHasNpc: override?.bodyHasNpc ?? false,
-      npcId: quest.turnInNpcId,
+      npcId: override?.npcRole === 'giver' ? quest.giverNpcId : quest.turnInNpcId,
       arrow: COACH_ACTIVE_TARGETS[focus.questId] ?? turnIn.pos,
     };
   }
@@ -372,38 +394,23 @@ export function bellCardPlan(mode: BootcampInputMode): BellCardPlan {
   };
 }
 
-/** The whole island tutorial reads as ONE numbered sequence: the six ladder
- *  cards, then three cards per later rail quest (next / task / hand in),
- *  then the closing bell card. Every card shows "Step k of N" from here. */
-export type IslandCard =
-  | { kind: 'ladder'; step: BootcampStep }
-  | { kind: 'coach'; focus: CoachFocus }
-  | { kind: 'bell' };
+/** The crate line's live arrow: the first authored crate spot that still has
+ *  a lootable crate standing on it, so the marker walks the line WITH the
+ *  player, hopping to the next box as each one is picked up. Falls back to
+ *  any live spot (a respawn out of authored order), then the first authored
+ *  spot (nothing mirrored yet, or everything looted while the count waits
+ *  out a respawn). */
+export const WRECK_CRATE_POSITIONS: readonly { x: number; z: number }[] =
+  PROVING_SHORE_OBJECTS.find((o) => o.itemId === 'ps_castaway_crate')?.positions ?? [];
 
-const LADDER_STEP_INDEX: Record<BootcampStep, number> = {
-  talk: 1,
-  forward: 2,
-  turnwalk: 3,
-  strafe: 4,
-  camera: 5,
-  done: 6,
-};
-
-const COACH_STATE_OFFSET: Record<CoachState, number> = {
-  available: 1,
-  active: 2,
-  ready: 3,
-};
-
-export const ISLAND_STEP_TOTAL = 6 + (PROVING_SHORE_QUEST_ORDER.length - 1) * 3 + 1;
-
-export function islandStepInfo(card: IslandCard): { current: number; total: number } {
-  const total = ISLAND_STEP_TOTAL;
-  if (card.kind === 'ladder') return { current: LADDER_STEP_INDEX[card.step], total };
-  if (card.kind === 'bell') return { current: total, total };
-  const at = PROVING_SHORE_QUEST_ORDER.indexOf(card.focus.questId);
-  // The rail head shows its own ladder; a coach card only exists for later
-  // quests, so a miss (or the head itself) falls back to the ladder's end.
-  if (at <= 0) return { current: 6, total };
-  return { current: 6 + (at - 1) * 3 + COACH_STATE_OFFSET[card.focus.state], total };
+export function nextWreckCrateTarget(lootableSpots: readonly { x: number; z: number }[]): {
+  x: number;
+  z: number;
+} {
+  for (const authored of WRECK_CRATE_POSITIONS) {
+    if (lootableSpots.some((s) => Math.hypot(s.x - authored.x, s.z - authored.z) <= 2)) {
+      return authored;
+    }
+  }
+  return lootableSpots[0] ?? WRECK_CRATE_POSITIONS[0] ?? { x: 0, z: 0 };
 }

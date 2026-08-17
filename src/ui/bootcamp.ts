@@ -47,7 +47,7 @@ import {
   coachFocus,
   coachKeycaps,
   computeBootcampStep,
-  islandStepInfo,
+  nextWreckCrateTarget,
 } from './bootcamp_view';
 import { tEntity } from './entity_i18n';
 import { formatNumber, t } from './i18n';
@@ -68,6 +68,10 @@ export class BootcampOverlay {
   // closing bell card only follows a graduation, never a casual revisit.
   private sawSail = false;
   private bellPhase = false;
+  // The crate line's live arrow target: the next un-looted crate along the
+  // authored line, recomputed only when the pickup tally moves.
+  private wreckTarget: { x: number; z: number } | null = null;
+  private lastWreckCounts = -1;
 
   private root: HTMLElement | null = null;
   private titleEl!: HTMLElement;
@@ -122,6 +126,26 @@ export class BootcampOverlay {
       this.cameraLastYaw = null;
     }
     const cameraTurned = this.cameraTravel >= CAMERA_LESSON_TRAVEL_RAD;
+
+    // The crate line's arrow walks the line with the player: retarget the
+    // next un-looted crate whenever the pickup tally moves (cheap: one
+    // entity sweep per pickup, not per frame).
+    if (focus?.questId === 'q_ps_the_wreck_line' && focus.state === 'active') {
+      const counts = world.questLog.get(focus.questId)?.counts?.[0] ?? 0;
+      if (counts !== this.lastWreckCounts) {
+        this.lastWreckCounts = counts;
+        const spots: { x: number; z: number }[] = [];
+        for (const e of world.entities.values()) {
+          if (e.kind === 'object' && e.objectItemId === 'ps_castaway_crate' && e.lootable) {
+            spots.push(e.pos);
+          }
+        }
+        this.wreckTarget = nextWreckCrateTarget(spots);
+      }
+    } else {
+      this.wreckTarget = null;
+      this.lastWreckCounts = -1;
+    }
 
     this.engaged = true;
     const mode = currentInputHintMode();
@@ -220,13 +244,6 @@ export class BootcampOverlay {
     else this.renderCoachPanel(keybinds);
   }
 
-  private setStepLabel(info: { current: number; total: number }): void {
-    this.stepEl.textContent = t('hud.tutorial.stepLabel', {
-      current: formatNumber(info.current),
-      total: formatNumber(info.total),
-    });
-  }
-
   private coachLabels(keybinds: Keybinds): Readonly<Record<CoachParam, string>> {
     const unbound = t('hud.options.unbound');
     return {
@@ -260,7 +277,7 @@ export class BootcampOverlay {
     this.bodyEl.textContent = t(plan.bodyKey, params);
 
     this.paintKeycaps(bootcampKeycaps(this.step!, mode, labels));
-    this.setStepLabel(islandStepInfo({ kind: 'ladder', step: this.step! }));
+    this.stepEl.textContent = '';
 
     if (this.step !== 'done' && this.step !== 'talk' && this.step !== 'camera') {
       this.progressEl.textContent = this.courseProgress();
@@ -291,7 +308,7 @@ export class BootcampOverlay {
     this.bodyEl.textContent = t(plan.bodyKey, params);
 
     this.paintKeycaps(coachKeycaps(plan, mode, labels));
-    this.setStepLabel(islandStepInfo({ kind: 'coach', focus }));
+    this.stepEl.textContent = '';
     this.progressEl.style.display = 'none';
     this.root!.classList.remove('tut-done');
   }
@@ -308,7 +325,7 @@ export class BootcampOverlay {
     this.titleEl.textContent = t(plan.titleKey);
     this.bodyEl.textContent = t(plan.bodyKey, params);
     this.paintKeycaps(coachKeycaps(plan, mode, labels));
-    this.setStepLabel(islandStepInfo({ kind: 'bell' }));
+    this.stepEl.textContent = '';
     this.progressEl.style.display = 'none';
     this.root!.classList.add('tut-done');
   }
@@ -331,9 +348,11 @@ export class BootcampOverlay {
       ? bellCardPlan(this.lastMode).arrow
       : this.step !== null
         ? bootcampArrowTarget(this.step, this.lastCounts)
-        : this.lastFocus
-          ? coachCardPlan(this.lastFocus, this.lastMode).arrow
-          : null;
+        : this.wreckTarget
+          ? this.wreckTarget
+          : this.lastFocus
+            ? coachCardPlan(this.lastFocus, this.lastMode).arrow
+            : null;
     if (!target) {
       this.hideArrow();
       return;

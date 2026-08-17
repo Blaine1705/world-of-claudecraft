@@ -909,9 +909,9 @@ export const zh_TW: EnTranslations = {
       "turnwalkBodyTouch": "第一面旗到手。用手指拖動世界畫面（不是移動搖桿）來轉身，直到正對向南延伸的圍欄跑道，然後把搖桿推向上方，沿跑道走到第二面旗。",
       "turnwalkBodyPad": "第一面旗到手。推動右搖桿轉身，直到正對向南延伸的圍欄跑道，然後把左搖桿推向上方，沿跑道走到第二面旗。",
       "strafeTitle": "橫移走完最後一條跑道",
-      "strafeBody": "側向移動還有另一種辦法。按住 {turnKey} 轉身，直到回望你剛走下來的那條跑道，然後按住 {strafeKey}，沿最後一條跑道橫移到紅旗處。橫移能讓你移動時視線始終鎖在目標上：總有一天你會這樣作戰。",
-      "strafeBodyTouch": "側向移動還有另一種辦法。轉身直到回望你剛走下來的那條跑道，然後把移動搖桿推向左邊，沿最後一條跑道滑步橫移到紅旗處。",
-      "strafeBodyPad": "側向移動還有另一種辦法。推動右搖桿轉身，直到回望你剛走下來的那條跑道，然後把左搖桿推向左邊，沿最後一條跑道滑步橫移到紅旗處。",
+      "strafeBody": "側向移動還有另一種辦法。按住 {strafeKey}，沿最後一條跑道橫移，直到紅旗被你甩在身後。橫移能讓你移動時視線始終鎖在目標上：總有一天你會這樣作戰。",
+      "strafeBodyTouch": "側向移動還有另一種辦法。把移動搖桿推向左邊，沿最後一條跑道橫移，直到紅旗被你甩在身後。",
+      "strafeBodyPad": "側向移動還有另一種辦法。把左搖桿推向左邊，沿最後一條跑道橫移，直到紅旗被你甩在身後。",
       "cameraTitle": "轉動視角",
       "cameraBody": "交上成績之前還有最後一課：按住滑鼠右鍵並拖動，把視角繞著自己整整轉上一圈。知道身後站著什麼，才能打贏仗。",
       "cameraBodyTouch": "交上成績之前還有最後一課：用手指拖動世界畫面，把視角繞著自己整整轉上一圈。知道身後站著什麼，才能打贏仗。",
@@ -932,19 +932,25 @@ export const zh_TW: EnTranslations = {
       "coachReadyBody": "回到{npc}身邊，按 {interactKey}，或用滑鼠左鍵點擊對方，交上差事，領取報酬。",
       "coachReadyBodyTouch": "回到{npc}身邊，點按對方，交上差事，領取報酬。",
       "coachReadyBodyPad": "回到{npc}身邊，按下互動鍵，交上差事，領取報酬。",
-      "taskStrikeTrueBody": "Walk up to a straw effigy and press {targetKey}, or left-click it, to make it your target. Then press {attackKey}, or click the first button on the action bar, to swing. Keep striking until one gives out.",
-      "taskStrikeTrueBodyTouch": "Walk up to a straw effigy and tap it to make it your target. Then tap the first button on the action bar to swing. Keep striking until one gives out.",
-      "taskStrikeTrueBodyPad": "Walk up to a straw effigy and press your target button to make it your target. Then press your first action button to swing. Keep striking until one gives out.",
-      "taskWreckLineBody": "Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then press {interactKey}, or left-click the crate, to pick it up. Six fill the haul.",
-      "taskWreckLineBodyTouch": "Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then tap the crate, or tap the Use button, to pick it up. Six fill the haul.",
-      "taskWreckLineBodyPad": "Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then press your interact button to pick it up. Six fill the haul.",
-      "readyPouchBody": "Pouch bought. Press {bagsKey} to open your bags and left-click the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and press {interactKey} to show it off.",
-      "readyPouchBodyTouch": "Pouch bought. Open your bags and tap the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and tap them to show it off.",
-      "readyPouchBodyPad": "Pouch bought. Open your bags and choose the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and press your interact button to show it off.",
-      "bellTitle": "Ring the bell",
-      "bellBody": "Your crossing is earned. Walk to the ferry bell beside the pier and press {interactKey}, or left-click it, to sail for Eastbrook.",
-      "bellBodyTouch": "Your crossing is earned. Walk to the ferry bell beside the pier and tap it to sail for Eastbrook.",
-      "bellBodyPad": "Your crossing is earned. Walk to the ferry bell beside the pier and press your interact button on it to sail for Eastbrook."
+      "taskStrikeTrueBody": "走到一個草人跟前，按 {targetKey}，或用滑鼠左鍵點擊它，把它設為目標。然後按 {attackKey}，或點擊動作列上的第一個按鈕，揮出這一刀。一直打到一個散架為止。",
+      "taskStrikeTrueBodyTouch": "走到一個草人跟前，點按它，把它設為目標。然後點按動作列上的第一個按鈕，揮出這一刀。一直打到一個散架為止。",
+      "taskStrikeTrueBodyPad": "走到一個草人跟前，按下目標鍵把它設為目標。然後按下第一個動作鍵，揮出這一刀。一直打到一個散架為止。",
+      "taskShellBody": "掠蟹是會回擊的。按 {targetKey}，或用滑鼠左鍵點擊一隻，把牠設為目標，然後按 {attackKey} 揮刀，不停攻擊。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。",
+      "taskShellBodyTouch": "掠蟹是會回擊的。點按一隻把牠設為目標，然後點按動作列上的第一個按鈕揮刀。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。",
+      "taskShellBodyPad": "掠蟹是會回擊的。按下目標鍵，再按下第一個動作鍵揮刀。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。",
+      "taskWreckLineBody": "跟著箭頭去找貨箱線。走到一只漂流貨箱跟前，直到它的名字顯示出來，然後按 {interactKey}，或用滑鼠左鍵點擊貨箱，把它撿起來。湊滿六只，這批海貨就齊了。",
+      "taskWreckLineBodyTouch": "跟著箭頭去找貨箱線。走到一只漂流貨箱跟前，直到它的名字顯示出來，然後點按貨箱，或點按使用按鈕，把它撿起來。湊滿六只，這批海貨就齊了。",
+      "taskWreckLineBodyPad": "跟著箭頭去找貨箱線。走到一只漂流貨箱跟前，直到它的名字顯示出來，然後按下互動鍵把它撿起來。湊滿六只，這批海貨就齊了。",
+      "taskPouchBody": "對著{npc}按 {interactKey}，或用滑鼠左鍵點擊對方，打開貨攤，然後用滑鼠左鍵點擊亞麻小袋買下它。",
+      "taskPouchBodyTouch": "點按{npc}打開貨攤，然後點按亞麻小袋買下它。",
+      "taskPouchBodyPad": "對著{npc}按下互動鍵打開貨攤，然後選中亞麻小袋買下它。",
+      "readyPouchBody": "小袋已買下。按 {bagsKey} 打開背包，用滑鼠左鍵點擊亞麻小袋，把它繫進一個空著的袋扣。然後回到{npc}身邊，按 {interactKey}，把小袋亮給對方看。",
+      "readyPouchBodyTouch": "小袋已買下。打開背包，點按亞麻小袋，把它繫進一個空著的袋扣。然後回到{npc}身邊，點按對方，把小袋亮給對方看。",
+      "readyPouchBodyPad": "小袋已買下。打開背包，選中亞麻小袋，把它繫進一個空著的袋扣。然後回到{npc}身邊，按下互動鍵，把小袋亮給對方看。",
+      "bellTitle": "敲響渡船鈴",
+      "bellBody": "你的航程已經掙到了。走到碼頭旁的渡船鈴跟前，按 {interactKey}，或用滑鼠左鍵點擊它，揚帆前往東溪鎮。",
+      "bellBodyTouch": "你的航程已經掙到了。走到碼頭旁的渡船鈴跟前，點按它，揚帆前往東溪鎮。",
+      "bellBodyPad": "你的航程已經掙到了。走到碼頭旁的渡船鈴跟前，按下互動鍵，揚帆前往東溪鎮。"
     },
     "widgets": {
       "clockTitle": "本地時間 - 點擊切換 12／24 小時制",
@@ -2856,8 +2862,8 @@ export const zh_TW: EnTranslations = {
     },
     "noticeboard": {
       "empty": "看起來沒有張貼任何內容。",
-      "popupTitle": "Guild Signpost",
-      "close": "Close"
+      "popupTitle": "公會告示柱",
+      "close": "關閉"
     },
     "bank": {
       "title": "銀行",
@@ -14394,12 +14400,12 @@ export const zh_TW: EnTranslations = {
       "quartermaster_finch": {
         "name": "軍需官芬奇",
         "title": "營地補給商",
-        "greeting": "麵包、清水、一瓶練過頭時救急的藥劑，還有一只裝路上零碎的備用小袋。銅板能買下它們，而銅板要靠幹活掙來。這就是全部的經濟學，{playerName}，它永遠不會變得更複雜。只會變得更大。"
+        "greeting": "我的櫃檯只賣一樣東西，{playerName}：一只裝路上零碎的備用小袋，等課業用得著它的時候才賣。這裡其餘的都是要運回谷地的打撈貨。銅板能買下小袋，而銅板要靠幹活掙來。這就是全部的經濟學，它永遠不會變得更複雜。只會變得更大。"
       },
       "ferryman_odo": {
         "name": "渡船人奧多",
         "title": "渡口看守",
-        "greeting": "剛下渡船嗎，{playerName}？看守塔姆就在碼頭正南的海灘上守著試煉跑道：先去跑一趟他的跑道，你的雙腿會感謝你的。之後晨憩營地的教官瑪倫會交給你第一件差事。等谷地召喚你回去時，敲響立在我碼頭旁的那口鈴，渡航會把你送到東溪鎮上。"
+        "greeting": "剛下渡船嗎，{playerName}？看守塔姆就在碼頭正南的海灘上守著試煉跑道：先去跑一趟他的跑道，你的雙腿會感謝你的。這片海濱的每一位看守都會在你辦完差事後把你交給下一位，螢幕頂端的那張卡片永遠知道下一步該往哪兒走。等谷地召喚你回去時，敲響立在我碼頭旁的那口鈴，渡航會把你送到東溪鎮上。"
       },
       "bursar_wick": {
         "name": "司庫威克",

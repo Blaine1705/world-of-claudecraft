@@ -729,12 +729,23 @@ export const hudChromeStrings = {
       'Walk up to a straw effigy and tap it to make it your target. Then tap the first button on the action bar to swing. Keep striking until one gives out.',
     taskStrikeTrueBodyPad:
       'Walk up to a straw effigy and press your target button to make it your target. Then press your first action button to swing. Keep striking until one gives out.',
+    taskShellBody:
+      'The scuttlers pinch back. Target one with {targetKey}, or left-click it, then press {attackKey} to swing, and keep striking. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
+    taskShellBodyTouch:
+      'The scuttlers pinch back. Tap one to target it, then tap the first action bar button to swing. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
+    taskShellBodyPad:
+      'The scuttlers pinch back. Press your target button, then your first action button to swing. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
     taskWreckLineBody:
       'Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then press {interactKey}, or left-click the crate, to pick it up. Six fill the haul.',
     taskWreckLineBodyTouch:
       'Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then tap the crate, or tap the Use button, to pick it up. Six fill the haul.',
     taskWreckLineBodyPad:
       'Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then press your interact button to pick it up. Six fill the haul.',
+    taskPouchBody:
+      'Press {interactKey} on {npc}, or left-click them, to open the stall, then left-click the Linen Pouch to buy it.',
+    taskPouchBodyTouch: 'Tap {npc} to open the stall, then tap the Linen Pouch to buy it.',
+    taskPouchBodyPad:
+      'Press your interact button on {npc} to open the stall, then choose the Linen Pouch to buy it.',
     readyPouchBody:
       'Pouch bought. Press {bagsKey} to open your bags and left-click the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and press {interactKey} to show it off.',
     readyPouchBodyTouch:

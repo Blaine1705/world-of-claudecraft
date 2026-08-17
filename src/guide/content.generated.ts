@@ -5596,6 +5596,13 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "feat": false,
     "rewardTitle": "Light of the Sanctum",
     "crest": "/ui/deeds/col_reliquary_illum_gravewyrm_heroic.webp"
+  },
+  {
+    "id": "prog_ready_for_an_adventure",
+    "name": "Ready for an Adventure",
+    "category": "progression",
+    "renown": 5,
+    "feat": false
   }
 ];
 

@@ -63,20 +63,22 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 271 deeds worth 3145 total Renown', () => {
+  it('ships exactly 272 deeds worth 3150 total Renown', () => {
     // Release base (262 / 3145 after the WARFARE lifetime-honor ladder) plus
-    // four Reliquary Curator rank bridges and the five Phase 18 completion
-    // ladder deeds (all nine renown 0, so the Renown sum is UNCHANGED from
-    // the release base: catalog prestige never scores the board).
-    expect(DEED_ORDER.length).toBe(271);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3145);
+    // four Reliquary Curator rank bridges, the five Phase 18 completion
+    // ladder deeds (all nine renown 0: catalog prestige never scores the
+    // board), and the Proving Shore graduation deed
+    // (prog_ready_for_an_adventure, renown 5).
+    expect(DEED_ORDER.length).toBe(272);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3150);
   });
 
   it('ships the audited per-category counts', () => {
     const byCategory: Record<string, number> = {};
     for (const d of ALL) byCategory[d.category] = (byCategory[d.category] ?? 0) + 1;
     expect(byCategory).toEqual({
-      progression: 57,
+      // +1 the Proving Shore graduation (prog_ready_for_an_adventure).
+      progression: 58,
       combat: 10,
       // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank).
       dungeon: 31,
@@ -214,6 +216,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'col_reliquary_illum_nythraxis_heroic',
       'col_reliquary_illum_thunzharr',
       'col_reliquary_illum_gravewyrm_heroic',
+      'prog_ready_for_an_adventure',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -555,7 +558,10 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // dead-end The Whole Book; see the reachability pin below). No other
   // trigger or renown changed (verified by reconstructing the pre-phase
   // catalog, which reproduces the previous literal exactly).
-  const FROZEN_CATALOG_SHA256 = 'e372e3f95f7b6063f461b9f00561eecf97849300f543dc88ddda97e487afe683';
+  // Re-baselined for the Proving Shore graduation deed
+  // (prog_ready_for_an_adventure, one appended row on the new
+  // tutorialGraduations stat); no shipped trigger or renown changed.
+  const FROZEN_CATALOG_SHA256 = '75d263e1f3f1258839a8d617ae2845397ba59da8a3c3d8164d7a79f02a0975bd';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -753,9 +759,9 @@ describe('table shape', () => {
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    // The Phase 18 Reliquary completion ladder appends after the WARFARE
-    // ladder; the Gravewyrm Illumination deed closes the tail.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('col_reliquary_illum_gravewyrm_heroic');
+    // The Proving Shore graduation deed closes the tail (appended after the
+    // Phase 18 Reliquary completion ladder).
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_ready_for_an_adventure');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

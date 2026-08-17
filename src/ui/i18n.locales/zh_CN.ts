@@ -12879,12 +12879,23 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '走到一个草人跟前，点按它，把它设为目标。然后点按动作条上的第一个按钮，挥出这一刀。一直打到一个散架为止。',
   'hudChrome.bootcamp.taskStrikeTrueBodyPad':
     '走到一个草人跟前，按下目标键把它设为目标。然后按下第一个动作键，挥出这一刀。一直打到一个散架为止。',
+  'hudChrome.bootcamp.taskShellBody':
+    '掠蟹是会回击的。按 {targetKey}，或者用鼠标左键点击一只，把它设为目标，然后按 {attackKey} 挥刀，不停攻击。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。',
+  'hudChrome.bootcamp.taskShellBodyTouch':
+    '掠蟹是会回击的。点按一只把它设为目标，然后点按动作条上的第一个按钮挥刀。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。',
+  'hudChrome.bootcamp.taskShellBodyPad':
+    '掠蟹是会回击的。按下目标键，再按下第一个动作键挥刀。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。',
   'hudChrome.bootcamp.taskWreckLineBody':
     '跟着箭头去找货箱线。走到一只漂流货箱跟前，直到它的名字显示出来，然后按 {interactKey}，或者用鼠标左键点击货箱，把它捡起来。凑满六只，这批海货就齐了。',
   'hudChrome.bootcamp.taskWreckLineBodyTouch':
     '跟着箭头去找货箱线。走到一只漂流货箱跟前，直到它的名字显示出来，然后点按货箱，或点按使用按钮，把它捡起来。凑满六只，这批海货就齐了。',
   'hudChrome.bootcamp.taskWreckLineBodyPad':
     '跟着箭头去找货箱线。走到一只漂流货箱跟前，直到它的名字显示出来，然后按下互动键把它捡起来。凑满六只，这批海货就齐了。',
+  'hudChrome.bootcamp.taskPouchBody':
+    '对着{npc}按 {interactKey}，或者用鼠标左键点击对方，打开货摊，然后用鼠标左键点击亚麻小袋买下它。',
+  'hudChrome.bootcamp.taskPouchBodyTouch': '点按{npc}打开货摊，然后点按亚麻小袋买下它。',
+  'hudChrome.bootcamp.taskPouchBodyPad':
+    '对着{npc}按下互动键打开货摊，然后选中亚麻小袋买下它。',
   'hudChrome.bootcamp.readyPouchBody':
     '小袋已买下。按 {bagsKey} 打开背包，用鼠标左键点击亚麻小袋，把它系进一个空着的袋扣。然后回到{npc}身边，按 {interactKey}，把小袋亮给对方看。',
   'hudChrome.bootcamp.readyPouchBodyTouch':
@@ -12914,11 +12925,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.quartermaster_finch.name': '军需官芬奇',
   'entities.npcs.quartermaster_finch.title': '营地补给商',
   'entities.npcs.quartermaster_finch.greeting':
-    '面包、清水、一瓶练过头时救急的药剂，还有一只装路上零碎的备用小袋。铜板能买下它们，而铜板要靠干活挣来。这就是全部的经济学，{playerName}，它永远不会变得更复杂。只会变得更大。',
+    '我的柜台只卖一样东西，{playerName}：一只装路上零碎的备用小袋，等课业用得着它的时候才卖。这里其余的都是要运回谷地的打捞货。铜板能买下小袋，而铜板要靠干活挣来。这就是全部的经济学，它永远不会变得更复杂。只会变得更大。',
   'entities.npcs.ferryman_odo.name': '渡船人奥多',
   'entities.npcs.ferryman_odo.title': '渡口看守',
   'entities.npcs.ferryman_odo.greeting':
-    '刚下渡船吗，{playerName}？看守塔姆就在码头正南的海滩上守着试炼跑道：先去跑一趟他的跑道，你的双腿会感谢你的。之后晨憩营地的教官玛伦会交给你第一件差事。等谷地召唤你回去时，敲响立在我码头旁的那口铃，渡航会把你送到东溪镇上。',
+    '刚下渡船吗，{playerName}？看守塔姆就在码头正南的海滩上守着试炼跑道：先去跑一趟他的跑道，你的双腿会感谢你的。这片海滨的每一位看守都会在你办完差事后把你交给下一位，屏幕顶端的那张卡片永远知道下一步该往哪儿走。等谷地召唤你回去时，敲响立在我码头旁的那口铃，渡航会把你送到东溪镇上。',
   'entities.npcs.warden_tam.name': '看守塔姆',
   'entities.npcs.warden_tam.title': '试炼跑道的看守',
   'entities.npcs.warden_tam.greeting':

@@ -909,9 +909,9 @@ export const ko_KR: EnTranslations = {
       "turnwalkBodyTouch": "깃발 하나 통과. (이동 스틱이 아니라) 세상 화면을 손가락으로 드래그해 돌아 남쪽으로 뻗은 울타리 길을 정면에 두고, 스틱을 위로 밀어 두 번째 깃발까지 걸어가세요.",
       "turnwalkBodyPad": "깃발 하나 통과. 오른쪽 스틱을 밀어 돌아 남쪽으로 뻗은 울타리 길을 정면에 두고, 왼쪽 스틱을 위로 밀어 두 번째 깃발까지 걸어가세요.",
       "strafeTitle": "마지막 길은 옆걸음으로",
-      "strafeBody": "옆으로 움직이는 또 다른 방법이 있습니다. {turnKey}를 누른 채 돌아 내려온 길을 거슬러 바라본 다음, {strafeKey}를 누른 채 마지막 길을 붉은 깃발까지 옆걸음하세요. 옆걸음은 시선을 표적에 둔 채 움직이게 해 줍니다. 언젠가 전투에서 이렇게 움직이게 될 거예요.",
-      "strafeBodyTouch": "옆으로 움직이는 또 다른 방법이 있습니다. 내려온 길을 거슬러 바라볼 때까지 돈 다음, 이동 스틱을 왼쪽으로 밀어 마지막 길을 붉은 깃발까지 옆걸음하세요.",
-      "strafeBodyPad": "옆으로 움직이는 또 다른 방법이 있습니다. 오른쪽 스틱을 밀어 내려온 길을 거슬러 바라볼 때까지 돈 다음, 왼쪽 스틱을 왼쪽으로 밀어 마지막 길을 붉은 깃발까지 옆걸음하세요.",
+      "strafeBody": "옆으로 움직이는 또 다른 방법이 있습니다. {strafeKey}를 누른 채 붉은 깃발이 등 뒤로 갈 때까지 마지막 길을 옆걸음하세요. 옆걸음은 시선을 표적에 둔 채 움직이게 해 줍니다. 언젠가 전투에서 이렇게 움직이게 될 거예요.",
+      "strafeBodyTouch": "옆으로 움직이는 또 다른 방법이 있습니다. 이동 스틱을 왼쪽으로 밀어 붉은 깃발이 등 뒤로 갈 때까지 마지막 길을 옆걸음하세요.",
+      "strafeBodyPad": "옆으로 움직이는 또 다른 방법이 있습니다. 왼쪽 스틱을 왼쪽으로 밀어 붉은 깃발이 등 뒤로 갈 때까지 마지막 길을 옆걸음하세요.",
       "cameraTitle": "시점 돌리기",
       "cameraBody": "완주를 보고하기 전 마지막 가르침입니다. 마우스 오른쪽 버튼을 누른 채 드래그해 시점을 몸 주위로 한 바퀴 빙 돌려 보세요. 등 뒤에 무엇이 서 있는지 아는 쪽이 싸움에서 이깁니다.",
       "cameraBodyTouch": "완주를 보고하기 전 마지막 가르침입니다. 세상 화면을 손가락으로 드래그해 시점을 몸 주위로 한 바퀴 빙 돌려 보세요. 등 뒤에 무엇이 서 있는지 아는 쪽이 싸움에서 이깁니다.",
@@ -932,19 +932,25 @@ export const ko_KR: EnTranslations = {
       "coachReadyBody": "{npc}에게 돌아가 {interactKey}를 누르거나 왼쪽 클릭해 임무를 보고하고 보상을 받으세요.",
       "coachReadyBodyTouch": "{npc}에게 돌아가 상대를 탭해 임무를 보고하고 보상을 받으세요.",
       "coachReadyBodyPad": "{npc}에게 돌아가 상호작용 버튼을 눌러 임무를 보고하고 보상을 받으세요.",
-      "taskStrikeTrueBody": "Walk up to a straw effigy and press {targetKey}, or left-click it, to make it your target. Then press {attackKey}, or click the first button on the action bar, to swing. Keep striking until one gives out.",
-      "taskStrikeTrueBodyTouch": "Walk up to a straw effigy and tap it to make it your target. Then tap the first button on the action bar to swing. Keep striking until one gives out.",
-      "taskStrikeTrueBodyPad": "Walk up to a straw effigy and press your target button to make it your target. Then press your first action button to swing. Keep striking until one gives out.",
-      "taskWreckLineBody": "Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then press {interactKey}, or left-click the crate, to pick it up. Six fill the haul.",
-      "taskWreckLineBodyTouch": "Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then tap the crate, or tap the Use button, to pick it up. Six fill the haul.",
-      "taskWreckLineBodyPad": "Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then press your interact button to pick it up. Six fill the haul.",
-      "readyPouchBody": "Pouch bought. Press {bagsKey} to open your bags and left-click the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and press {interactKey} to show it off.",
-      "readyPouchBodyTouch": "Pouch bought. Open your bags and tap the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and tap them to show it off.",
-      "readyPouchBodyPad": "Pouch bought. Open your bags and choose the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and press your interact button to show it off.",
-      "bellTitle": "Ring the bell",
-      "bellBody": "Your crossing is earned. Walk to the ferry bell beside the pier and press {interactKey}, or left-click it, to sail for Eastbrook.",
-      "bellBodyTouch": "Your crossing is earned. Walk to the ferry bell beside the pier and tap it to sail for Eastbrook.",
-      "bellBodyPad": "Your crossing is earned. Walk to the ferry bell beside the pier and press your interact button on it to sail for Eastbrook."
+      "taskStrikeTrueBody": "짚 허수아비에게 다가가 {targetKey}를 누르거나 왼쪽 클릭해 대상으로 잡으세요. 그런 다음 {attackKey}를 누르거나 행동 단축바의 첫 번째 버튼을 클릭해 내리치세요. 하나가 무너질 때까지 계속 치세요.",
+      "taskStrikeTrueBodyTouch": "짚 허수아비에게 다가가 탭해 대상으로 잡으세요. 그런 다음 행동 단축바의 첫 번째 버튼을 탭해 내리치세요. 하나가 무너질 때까지 계속 치세요.",
+      "taskStrikeTrueBodyPad": "짚 허수아비에게 다가가 대상 버튼을 눌러 대상으로 잡으세요. 그런 다음 첫 번째 행동 버튼을 눌러 내리치세요. 하나가 무너질 때까지 계속 치세요.",
+      "taskShellBody": "종종게는 마주 집게를 휘두릅니다. {targetKey}를 누르거나 왼쪽 클릭해 한 마리를 대상으로 잡고, {attackKey}를 눌러 내리치며 계속 공격하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.",
+      "taskShellBodyTouch": "종종게는 마주 집게를 휘두릅니다. 한 마리를 탭해 대상으로 잡고, 행동 단축바의 첫 번째 버튼을 탭해 내리치세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.",
+      "taskShellBodyPad": "종종게는 마주 집게를 휘두릅니다. 대상 버튼을 누르고, 이어서 첫 번째 행동 버튼을 눌러 내리치세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.",
+      "taskWreckLineBody": "화살표를 따라 상자 길로 가세요. 이름이 보일 때까지 표류 상자에 다가가 {interactKey}를 누르거나 상자를 왼쪽 클릭해 집어 드세요. 여섯이면 짐이 다 찹니다.",
+      "taskWreckLineBodyTouch": "화살표를 따라 상자 길로 가세요. 이름이 보일 때까지 표류 상자에 다가가 상자를 탭하거나 사용 버튼을 탭해 집어 드세요. 여섯이면 짐이 다 찹니다.",
+      "taskWreckLineBodyPad": "화살표를 따라 상자 길로 가세요. 이름이 보일 때까지 표류 상자에 다가가 상호작용 버튼을 눌러 집어 드세요. 여섯이면 짐이 다 찹니다.",
+      "taskPouchBody": "{npc}에게 {interactKey}를 누르거나 상대를 왼쪽 클릭해 좌판을 열고, 아마천 주머니를 왼쪽 클릭해 구입하세요.",
+      "taskPouchBodyTouch": "{npc}를 탭해 좌판을 열고, 아마천 주머니를 탭해 구입하세요.",
+      "taskPouchBodyPad": "{npc}에게 상호작용 버튼을 눌러 좌판을 열고, 아마천 주머니를 골라 구입하세요.",
+      "readyPouchBody": "주머니를 샀습니다. {bagsKey}를 눌러 가방을 열고 아마천 주머니를 왼쪽 클릭해 빈 가방 고리에 채우세요. 그런 다음 {npc}에게 돌아가 {interactKey}를 눌러 보여 주세요.",
+      "readyPouchBodyTouch": "주머니를 샀습니다. 가방을 열고 아마천 주머니를 탭해 빈 가방 고리에 채우세요. 그런 다음 {npc}에게 돌아가 상대를 탭해 보여 주세요.",
+      "readyPouchBodyPad": "주머니를 샀습니다. 가방을 열고 아마천 주머니를 골라 빈 가방 고리에 채우세요. 그런 다음 {npc}에게 돌아가 상호작용 버튼을 눌러 보여 주세요.",
+      "bellTitle": "종 울리기",
+      "bellBody": "건널 자격은 얻었습니다. 부두 옆 나룻배 종으로 걸어가 {interactKey}를 누르거나 왼쪽 클릭해 이스트브룩으로 출항하세요.",
+      "bellBodyTouch": "건널 자격은 얻었습니다. 부두 옆 나룻배 종으로 걸어가 종을 탭해 이스트브룩으로 출항하세요.",
+      "bellBodyPad": "건널 자격은 얻었습니다. 부두 옆 나룻배 종으로 걸어가 상호작용 버튼을 눌러 이스트브룩으로 출항하세요."
     },
     "widgets": {
       "clockTitle": "현지 시각 - 클릭하면 12/24시간제 전환",
@@ -2856,8 +2862,8 @@ export const ko_KR: EnTranslations = {
     },
     "noticeboard": {
       "empty": "게시된 내용이 없는 것 같습니다.",
-      "popupTitle": "Guild Signpost",
-      "close": "Close"
+      "popupTitle": "길드 게시 기둥",
+      "close": "닫기"
     },
     "bank": {
       "title": "은행",
@@ -14394,12 +14400,12 @@ export const ko_KR: EnTranslations = {
       "quartermaster_finch": {
         "name": "보급관 핀치",
         "title": "야영지 물자상",
-        "greeting": "빵과 물, 연습이 과했을 때를 위한 물약, 그리고 길에서 주운 것들을 담을 여분의 주머니죠. 동전이면 살 수 있고, 동전은 일해서 버는 것. 그게 경제의 전부예요, {playerName}. 더 복잡해지는 일은 없어요. 더 커질 뿐이지."
+        "greeting": "내 좌판에 파는 물건은 딱 하나예요, {playerName}. 길에서 주운 것들을 담을 여분의 주머니, 그것도 수업이 필요로 할 때만요. 그 밖의 것들은 전부 골짜기로 보낼 인양품이죠. 동전이 주머니를 사고, 일이 동전을 벌어요. 그게 경제의 전부예요. 더 복잡해지는 일은 없어요. 더 커질 뿐이지."
       },
       "ferryman_odo": {
         "name": "뱃사공 오도",
         "title": "나루터지기",
-        "greeting": "방금 건너오셨나요, {playerName}? 워든 탐이 부두 바로 남쪽 바닷가에서 건틀릿을 지키고 있습니다. 먼저 그의 길을 달려 보세요. 다리가 고마워할 겁니다. 그다음에는 새벽쉼터 야영지의 교관 마렌이 첫 임무를 줄 거예요. 골짜기가 다시 부르거든 내 부두 옆에 선 종을 울리세요. 건너기가 이스트브룩 마을에 내려 줄 겁니다."
+        "greeting": "방금 건너오셨나요, {playerName}? 워든 탐이 부두 바로 남쪽 바닷가에서 건틀릿을 지키고 있습니다. 먼저 그의 길을 달려 보세요. 다리가 고마워할 겁니다. 이 해안의 지기들은 맡은 일이 끝날 때마다 당신을 다음 사람에게 넘겨주고, 화면 위쪽의 카드는 언제나 다음 길을 알고 있죠. 골짜기가 다시 부르거든 내 부두 옆에 선 종을 울리세요. 건너기가 이스트브룩 마을에 내려 줄 겁니다."
       },
       "bursar_wick": {
         "name": "경리관 윅",

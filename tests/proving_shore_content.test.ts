@@ -234,7 +234,9 @@ describe('proving shore placement', () => {
     // sized to buy the pouch mid-chain and the tier-1 tool kit at the vale's
     // own counters after.
     const stocked = PROVING_SHORE_NPCS.quartermaster_finch.vendorItems ?? [];
-    expect(stocked).toContain('linen_pouch');
+    // EXACTLY the pouch: a newcomer who could spend their lesson copper on
+    // provisions was able to softlock themselves out of the pouch purchase.
+    expect(stocked).toEqual(['linen_pouch']);
     for (const id of stocked) {
       expect(ITEMS[id]?.use?.type === 'gatherTool', `${id} is a professions tool`).toBe(false);
     }
@@ -345,7 +347,7 @@ describe('proving shore placement', () => {
         expect(
           Math.hypot(a.center.x - b.center.x, a.center.z - b.center.z),
           'scuttler camps stay spread',
-        ).toBeGreaterThanOrEqual(7);
+        ).toBeGreaterThanOrEqual(10);
       }
     }
     // The crate line asks for six opens and authors exactly six crates: the

@@ -7121,7 +7121,10 @@ export type DeedStatKey =
   | 'masterworksCrafted'
   | 'salvagesPerformed'
   | 'riftClears'
-  | 'riftSRankClears';
+  | 'riftSRankClears'
+  // Rides home rung on the island ferry bell AFTER the Proving Shore rail is
+  // fully handed in (interactions/ferry_bell.ts): the graduation moment.
+  | 'tutorialGraduations';
 
 // The canonical counter key list (init/serialize iterate it in this fixed
 // order so equal states always serialize byte-equal).
@@ -7152,6 +7155,7 @@ export const DEED_STAT_KEYS: readonly DeedStatKey[] = [
   'salvagesPerformed',
   'riftClears',
   'riftSRankClears',
+  'tutorialGraduations',
 ];
 
 // Numeric readings computed from already-persisted PlayerMeta state (never new

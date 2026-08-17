@@ -13118,12 +13118,24 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '짚 허수아비에게 다가가 탭해 대상으로 잡으세요. 그런 다음 행동 단축바의 첫 번째 버튼을 탭해 내리치세요. 하나가 무너질 때까지 계속 치세요.',
   'hudChrome.bootcamp.taskStrikeTrueBodyPad':
     '짚 허수아비에게 다가가 대상 버튼을 눌러 대상으로 잡으세요. 그런 다음 첫 번째 행동 버튼을 눌러 내리치세요. 하나가 무너질 때까지 계속 치세요.',
+  'hudChrome.bootcamp.taskShellBody':
+    '종종게는 마주 집게를 휘두릅니다. {targetKey}를 누르거나 왼쪽 클릭해 한 마리를 대상으로 잡고, {attackKey}를 눌러 내리치며 계속 공격하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
+  'hudChrome.bootcamp.taskShellBodyTouch':
+    '종종게는 마주 집게를 휘두릅니다. 한 마리를 탭해 대상으로 잡고, 행동 단축바의 첫 번째 버튼을 탭해 내리치세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
+  'hudChrome.bootcamp.taskShellBodyPad':
+    '종종게는 마주 집게를 휘두릅니다. 대상 버튼을 누르고, 이어서 첫 번째 행동 버튼을 눌러 내리치세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
   'hudChrome.bootcamp.taskWreckLineBody':
     '화살표를 따라 상자 길로 가세요. 이름이 보일 때까지 표류 상자에 다가가 {interactKey}를 누르거나 상자를 왼쪽 클릭해 집어 드세요. 여섯이면 짐이 다 찹니다.',
   'hudChrome.bootcamp.taskWreckLineBodyTouch':
     '화살표를 따라 상자 길로 가세요. 이름이 보일 때까지 표류 상자에 다가가 상자를 탭하거나 사용 버튼을 탭해 집어 드세요. 여섯이면 짐이 다 찹니다.',
   'hudChrome.bootcamp.taskWreckLineBodyPad':
     '화살표를 따라 상자 길로 가세요. 이름이 보일 때까지 표류 상자에 다가가 상호작용 버튼을 눌러 집어 드세요. 여섯이면 짐이 다 찹니다.',
+  'hudChrome.bootcamp.taskPouchBody':
+    '{npc}에게 {interactKey}를 누르거나 상대를 왼쪽 클릭해 좌판을 열고, 아마천 주머니를 왼쪽 클릭해 구입하세요.',
+  'hudChrome.bootcamp.taskPouchBodyTouch':
+    '{npc}를 탭해 좌판을 열고, 아마천 주머니를 탭해 구입하세요.',
+  'hudChrome.bootcamp.taskPouchBodyPad':
+    '{npc}에게 상호작용 버튼을 눌러 좌판을 열고, 아마천 주머니를 골라 구입하세요.',
   'hudChrome.bootcamp.readyPouchBody':
     '주머니를 샀습니다. {bagsKey}를 눌러 가방을 열고 아마천 주머니를 왼쪽 클릭해 빈 가방 고리에 채우세요. 그런 다음 {npc}에게 돌아가 {interactKey}를 눌러 보여 주세요.',
   'hudChrome.bootcamp.readyPouchBodyTouch':
@@ -13153,11 +13165,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.quartermaster_finch.name': '보급관 핀치',
   'entities.npcs.quartermaster_finch.title': '야영지 물자상',
   'entities.npcs.quartermaster_finch.greeting':
-    '빵과 물, 연습이 과했을 때를 위한 물약, 그리고 길에서 주운 것들을 담을 여분의 주머니죠. 동전이면 살 수 있고, 동전은 일해서 버는 것. 그게 경제의 전부예요, {playerName}. 더 복잡해지는 일은 없어요. 더 커질 뿐이지.',
+    '내 좌판에 파는 물건은 딱 하나예요, {playerName}. 길에서 주운 것들을 담을 여분의 주머니, 그것도 수업이 필요로 할 때만요. 그 밖의 것들은 전부 골짜기로 보낼 인양품이죠. 동전이 주머니를 사고, 일이 동전을 벌어요. 그게 경제의 전부예요. 더 복잡해지는 일은 없어요. 더 커질 뿐이지.',
   'entities.npcs.ferryman_odo.name': '뱃사공 오도',
   'entities.npcs.ferryman_odo.title': '나루터지기',
   'entities.npcs.ferryman_odo.greeting':
-    '방금 건너오셨나요, {playerName}? 워든 탐이 부두 바로 남쪽 바닷가에서 건틀릿을 지키고 있습니다. 먼저 그의 길을 달려 보세요. 다리가 고마워할 겁니다. 그다음에는 새벽쉼터 야영지의 교관 마렌이 첫 임무를 줄 거예요. 골짜기가 다시 부르거든 내 부두 옆에 선 종을 울리세요. 건너기가 이스트브룩 마을에 내려 줄 겁니다.',
+    '방금 건너오셨나요, {playerName}? 워든 탐이 부두 바로 남쪽 바닷가에서 건틀릿을 지키고 있습니다. 먼저 그의 길을 달려 보세요. 다리가 고마워할 겁니다. 이 해안의 지기들은 맡은 일이 끝날 때마다 당신을 다음 사람에게 넘겨주고, 화면 위쪽의 카드는 언제나 다음 길을 알고 있죠. 골짜기가 다시 부르거든 내 부두 옆에 선 종을 울리세요. 건너기가 이스트브룩 마을에 내려 줄 겁니다.',
   'entities.npcs.warden_tam.name': '워든 탐',
   'entities.npcs.warden_tam.title': '건틀릿의 파수꾼',
   'entities.npcs.warden_tam.greeting':
