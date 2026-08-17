@@ -26,8 +26,8 @@
 // through the seam.
 
 import { isStunned, isUnbreakableControlAura } from '../combat/cc';
-import { resurrectionArrivalAnchor } from '../combat/resurrection_offer';
 import { resetLongCooldownsForRaidWipe } from '../combat/raid_wipe_cooldowns';
+import { resurrectionArrivalAnchor } from '../combat/resurrection_offer';
 import { ITEMS, MOBS, NPCS, QUESTS } from '../data';
 import * as deedsMod from '../deeds';
 import { createMob, createNpc } from '../entity';
