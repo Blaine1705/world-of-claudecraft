@@ -208,8 +208,11 @@ interface AttributionTargetFixture {
 // capture was retaken.
 // Re-minted for the moved-base v0.39 wrapper refresh: the castle renderer bytes
 // and v0.39 wrapper bytes combine in one tree. No capture was retaken.
+// Re-minted for the approved PR #3425 merge into the v0.39 wrapper: the
+// resolved renderer bytes combine the delve tracker extraction with later
+// wrapper fixes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '4659473f081bbf0bd0d6e04c8451831787dba2b05cf367107a6b8efc702f3c69';
+  '650e09440090f2367a5e326c81da9725645f77e78f138018573cef7faa2beb2d';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
