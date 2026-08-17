@@ -56,7 +56,12 @@ const MONOLITHS: MonolithRow[] = [
     // warming the Armory catalog on a schedule and moved the ability
     // description prose out to src/ui/ability_description.ts, so the merged
     // file landed SMALLER again and the ratchet follows it down (exact count).
-    ceiling: 19120,
+    // Re-pinned 19120 -> 19170 at the second v0.39.0 sync merge (release tip
+    // f48c7a3a9b): the castle-branch merge grew hud.ts on the release side
+    // (its row went to 19488 there), and the merged file here lands at exactly
+    // 19170. Re-derived from the merged tree, not taken from either side,
+    // keeping the zero-headroom posture: the next line added fails.
+    ceiling: 19170,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -77,7 +82,10 @@ const MONOLITHS: MonolithRow[] = [
     // (zone_prewarm_templates_core.ts, the buildFormVisual fold), and the merged
     // file lands between the two pins, so the ceiling is the exact merged count
     // per the ratchet's rule: any further growth reds again.
-    ceiling: 13754,
+    // Lowered again by the castle branch's interior_light_rig.ts extraction;
+    // after merging main the merged file lands below both prior pins, so the
+    // ceiling is the exact merged count.
+    ceiling: 13689,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
