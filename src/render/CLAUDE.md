@@ -213,8 +213,12 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
 - Shared machinery: `compile_gate.ts` (fail-soft async shader-compile gating
   that also BOUNDS in-flight driver links during snapshot bursts),
   `background_gpu_queue.ts` (the one priority arbiter for idle-time work that
-  reaches WebGL), `idle_queue.ts` (idle-slot queue draining). Use these, never
-  a bespoke idle loop.
+  reaches WebGL), `idle_queue.ts` (idle-slot queue draining),
+  `prewarm_depth_material.ts` (the shadow arm's depth material: it must link
+  the SAME program three's `WebGLShadowMap` draws, so it never sets
+  `depthPacking` and keys one instance per caster shape; a three bump is
+  re-read from three's source, pinned by `tests/prewarm_depth_material.test.ts`,
+  never guessed). Use these, never a bespoke idle loop.
 - **A program only ONE encounter can reach warms at that interior's attach,
   never in the boot manifest** (`interior_encounter_prewarm.ts` spec +
   `_pass.ts` + `_host.ts`, kill switch `?encounterPrewarm=0`). The Nythraxis

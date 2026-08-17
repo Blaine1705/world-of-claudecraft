@@ -185,7 +185,7 @@ interface AttributionTargetFixture {
 // lookAtFrozen, so renderer.ts moves and the composite follows its bytes. No
 // capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '63eae2164f990137dccffd0df83eb3c048a1c8927d125501b717ea3b27b39495';
+  '9b571712bf55f33cd0901cada698fcf784dc7a9bc0af749e83b9169412b51074';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

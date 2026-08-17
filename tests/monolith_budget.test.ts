@@ -80,7 +80,11 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again by the castle branch's interior_light_rig.ts extraction;
     // after merging main the merged file lands below both prior pins, so the
     // ceiling is the exact merged count.
-    ceiling: 13689,
+    // Lowered 13689 -> 13646 after extracting the shadow-depth prewarm material
+    // factory into src/render/prewarm_depth_material.ts, merged with
+    // release/v0.39.0 (the ratchet's own rule: an extraction lowers the ceiling,
+    // never raises it). Exact merged count.
+    ceiling: 13646,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
