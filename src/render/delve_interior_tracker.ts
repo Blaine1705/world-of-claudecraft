@@ -42,6 +42,7 @@ export class DelveInteriorTracker {
       if (stale) this.retire(stale);
       this.groups.delete(key);
       this.built.delete(key);
+      this.moduleAt.delete(key);
     }
     this.pending.add(key);
     void buildDelveModule(this.dungeons(), moduleId, ox, oz)
