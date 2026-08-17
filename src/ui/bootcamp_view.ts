@@ -24,6 +24,7 @@
 import {
   BOOTCAMP_COURSE_CHECKPOINTS,
   PROVING_SHORE_NPCS,
+  PROVING_SHORE_OBJECTS,
   PROVING_SHORE_QUEST_ORDER,
   PROVING_SHORE_QUESTS,
 } from '../sim/content/proving_shore';
@@ -96,7 +97,7 @@ const KEYBOARD: Record<BootcampStep, BootcampBodyPlan> = {
   talk: { bodyKey: 'hudChrome.bootcamp.talkBody', params: ['interactKey'] },
   forward: { bodyKey: 'hudChrome.bootcamp.forwardBody', params: ['forwardKey'] },
   turnwalk: { bodyKey: 'hudChrome.bootcamp.turnwalkBody', params: ['turnKey', 'forwardKey'] },
-  strafe: { bodyKey: 'hudChrome.bootcamp.strafeBody', params: ['turnKey', 'strafeKey'] },
+  strafe: { bodyKey: 'hudChrome.bootcamp.strafeBody', params: ['strafeKey'] },
   camera: { bodyKey: 'hudChrome.bootcamp.cameraBody', params: [] },
   done: { bodyKey: 'hudChrome.bootcamp.doneBody', params: ['interactKey'] },
 };
@@ -150,7 +151,7 @@ export function bootcampKeycaps(
     talk: [labels.interactKey],
     forward: [labels.forwardKey],
     turnwalk: [labels.turnKey, labels.forwardKey],
-    strafe: [labels.turnKey, labels.strafeKey],
+    strafe: [labels.strafeKey],
     camera: [],
     done: [labels.interactKey],
   };
@@ -202,7 +203,7 @@ export const COACH_ACTIVE_TARGETS: Readonly<Record<string, { x: number; z: numbe
   q_ps_set_sail: PROVING_SHORE_NPCS.ferryman_odo.pos,
 };
 
-export type CoachParam = 'interactKey' | 'mapKey';
+export type CoachParam = 'interactKey' | 'mapKey' | 'targetKey' | 'attackKey' | 'bagsKey';
 
 export interface CoachCardPlan {
   /** Null on the active state: the overlay titles that card with the quest's
@@ -240,16 +241,59 @@ const COACH_BODY: Record<CoachState, Record<BootcampInputMode, TranslationKey>> 
   },
 };
 
+/** Per-quest mechanic lessons that replace the generic bodies: the ACTIVE
+ *  card teaches the quest's own hands (targeting and the swing for the
+ *  effigy fell, the pickup press for the crate line), and the pouch lesson's
+ *  READY card walks the buckle-on before the hand-in. */
+interface CoachBodyOverride {
+  keys: Record<BootcampInputMode, TranslationKey>;
+  /** Keyboard-arm bind labels the body splices. */
+  params: readonly CoachParam[];
+  bodyHasNpc: boolean;
+}
+
+const COACH_ACTIVE_OVERRIDES: Readonly<Record<string, CoachBodyOverride>> = {
+  q_ps_strike_true: {
+    keys: {
+      keyboard: 'hudChrome.bootcamp.taskStrikeTrueBody',
+      touch: 'hudChrome.bootcamp.taskStrikeTrueBodyTouch',
+      pad: 'hudChrome.bootcamp.taskStrikeTrueBodyPad',
+    },
+    params: ['targetKey', 'attackKey'],
+    bodyHasNpc: false,
+  },
+  q_ps_the_wreck_line: {
+    keys: {
+      keyboard: 'hudChrome.bootcamp.taskWreckLineBody',
+      touch: 'hudChrome.bootcamp.taskWreckLineBodyTouch',
+      pad: 'hudChrome.bootcamp.taskWreckLineBodyPad',
+    },
+    params: ['interactKey'],
+    bodyHasNpc: false,
+  },
+};
+
+const COACH_READY_OVERRIDES: Readonly<Record<string, CoachBodyOverride>> = {
+  q_ps_pouch_and_purse: {
+    keys: {
+      keyboard: 'hudChrome.bootcamp.readyPouchBody',
+      touch: 'hudChrome.bootcamp.readyPouchBodyTouch',
+      pad: 'hudChrome.bootcamp.readyPouchBodyPad',
+    },
+    params: ['bagsKey', 'interactKey'],
+    bodyHasNpc: true,
+  },
+};
+
 export function coachCardPlan(focus: CoachFocus, mode: BootcampInputMode): CoachCardPlan {
   const quest = PROVING_SHORE_QUESTS[focus.questId];
   const giver = PROVING_SHORE_NPCS[quest.giverNpcId];
   const turnIn = PROVING_SHORE_NPCS[quest.turnInNpcId];
-  const bodyKey = COACH_BODY[focus.state][mode];
   if (focus.state === 'available') {
     return {
       titleKey: 'hudChrome.bootcamp.coachNextTitle',
       titleHasNpc: true,
-      bodyKey,
+      bodyKey: COACH_BODY.available[mode],
       params: mode === 'keyboard' ? ['interactKey'] : [],
       bodyHasNpc: true,
       npcId: quest.giverNpcId,
@@ -257,35 +301,109 @@ export function coachCardPlan(focus: CoachFocus, mode: BootcampInputMode): Coach
     };
   }
   if (focus.state === 'active') {
+    const override = COACH_ACTIVE_OVERRIDES[focus.questId];
     return {
       titleKey: null,
       titleHasNpc: false,
-      bodyKey,
-      params: mode === 'keyboard' ? ['mapKey'] : [],
-      bodyHasNpc: false,
+      bodyKey: override ? override.keys[mode] : COACH_BODY.active[mode],
+      params: mode === 'keyboard' ? (override ? override.params : ['mapKey']) : [],
+      bodyHasNpc: override?.bodyHasNpc ?? false,
       npcId: quest.turnInNpcId,
       arrow: COACH_ACTIVE_TARGETS[focus.questId] ?? turnIn.pos,
     };
   }
+  const override = COACH_READY_OVERRIDES[focus.questId];
   return {
     titleKey: 'hudChrome.bootcamp.coachReadyTitle',
     titleHasNpc: false,
-    bodyKey,
-    params: mode === 'keyboard' ? ['interactKey'] : [],
-    bodyHasNpc: true,
+    bodyKey: override ? override.keys[mode] : COACH_BODY.ready[mode],
+    params: mode === 'keyboard' ? (override ? override.params : ['interactKey']) : [],
+    bodyHasNpc: override?.bodyHasNpc ?? true,
     npcId: quest.turnInNpcId,
     arrow: turnIn.pos,
   };
 }
 
-/** Keycap chips for the generic coach cards: the interact key on the way in
- *  and back, nothing while the task itself runs. Keyboard only, the ladder's
- *  rule. */
+/** Keycap chips for the coach cards: the plan's own bind labels, minus the
+ *  map key (a wayfinding aside, not a button the lesson is about). Keyboard
+ *  only, the ladder's rule. */
 export function coachKeycaps(
-  state: CoachState,
+  plan: Pick<CoachCardPlan, 'params'>,
   mode: BootcampInputMode,
-  interactKeyLabel: string,
+  labels: Readonly<Record<CoachParam, string>>,
 ): readonly string[] {
-  if (mode !== 'keyboard' || state === 'active') return [];
-  return [interactKeyLabel].filter(Boolean);
+  if (mode !== 'keyboard') return [];
+  return plan.params
+    .filter((p) => p !== 'mapKey')
+    .map((p) => labels[p])
+    .filter(Boolean);
+}
+
+// ---------------------------------------------------------------------------
+// The closing bell step and the one island-wide step ladder.
+// ---------------------------------------------------------------------------
+
+/** The island ferry bell's authored spot (the strait column entry of the
+ *  ps_ferry_bell ground object), the final card's arrow target. */
+export const BELL_STEP_TARGET: { x: number; z: number } = (() => {
+  const bell = PROVING_SHORE_OBJECTS.find((o) => o.itemId === 'ps_ferry_bell');
+  return bell?.positions.find((p) => p.x < -180) ?? { x: -279, z: -10 };
+})();
+
+export interface BellCardPlan {
+  titleKey: TranslationKey;
+  bodyKey: TranslationKey;
+  params: readonly CoachParam[];
+  arrow: { x: number; z: number };
+}
+
+/** The card shown once the whole rail is handed in: ring the bell home. */
+export function bellCardPlan(mode: BootcampInputMode): BellCardPlan {
+  const bodies: Record<BootcampInputMode, TranslationKey> = {
+    keyboard: 'hudChrome.bootcamp.bellBody',
+    touch: 'hudChrome.bootcamp.bellBodyTouch',
+    pad: 'hudChrome.bootcamp.bellBodyPad',
+  };
+  return {
+    titleKey: 'hudChrome.bootcamp.bellTitle',
+    bodyKey: bodies[mode],
+    params: mode === 'keyboard' ? ['interactKey'] : [],
+    arrow: BELL_STEP_TARGET,
+  };
+}
+
+/** The whole island tutorial reads as ONE numbered sequence: the six ladder
+ *  cards, then three cards per later rail quest (next / task / hand in),
+ *  then the closing bell card. Every card shows "Step k of N" from here. */
+export type IslandCard =
+  | { kind: 'ladder'; step: BootcampStep }
+  | { kind: 'coach'; focus: CoachFocus }
+  | { kind: 'bell' };
+
+const LADDER_STEP_INDEX: Record<BootcampStep, number> = {
+  talk: 1,
+  forward: 2,
+  turnwalk: 3,
+  strafe: 4,
+  camera: 5,
+  done: 6,
+};
+
+const COACH_STATE_OFFSET: Record<CoachState, number> = {
+  available: 1,
+  active: 2,
+  ready: 3,
+};
+
+export const ISLAND_STEP_TOTAL = 6 + (PROVING_SHORE_QUEST_ORDER.length - 1) * 3 + 1;
+
+export function islandStepInfo(card: IslandCard): { current: number; total: number } {
+  const total = ISLAND_STEP_TOTAL;
+  if (card.kind === 'ladder') return { current: LADDER_STEP_INDEX[card.step], total };
+  if (card.kind === 'bell') return { current: total, total };
+  const at = PROVING_SHORE_QUEST_ORDER.indexOf(card.focus.questId);
+  // The rail head shows its own ladder; a coach card only exists for later
+  // quests, so a miss (or the head itself) falls back to the ladder's end.
+  if (at <= 0) return { current: 6, total };
+  return { current: 6 + (at - 1) * 3 + COACH_STATE_OFFSET[card.focus.state], total };
 }

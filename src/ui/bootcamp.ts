@@ -1,27 +1,27 @@
 // The Proving Shore coach overlay: the island sibling of the Eastbrook
-// new-adventurer coachmark (tutorial.ts), sharing its card CSS family and its
-// whole shape, and now the top-of-screen helper for the WHOLE quest rail.
-//
-// The rail's head quest (Warden Tam's Gauntlet) keeps its ordered lesson
-// ladder: talk to Tam (press F), hold forward down lane 1, turn with the
-// turn key and walk the south lane, turn back and strafe the last lane, then
-// swing the camera at the finish, then hand the run to Overseer Pell. Every
-// LATER quest on the relay shows the generic three-state coach card instead
-// (walk to the giver, do the task, return to the turn-in), so the helper
-// text persists from the pier landing to the crossing home. Copy follows the
-// player's live input family (keyboard, touch, or gamepad;
-// src/game/input_hint_mode.ts), the physical keycaps show as on-screen
-// chips, and the guidance arrow leads to the current station.
+// new-adventurer coachmark (tutorial.ts), sharing its card CSS family, and
+// the ONE top-of-screen helper for the whole island tutorial. Every card is
+// a numbered step of a single sequence (islandStepInfo): the Gauntlet's
+// lesson ladder (talk to Tam, forward, turn-and-walk, strafe, the camera
+// swing, hand in), then three coach cards per later rail quest (walk to the
+// giver, do the task, return to the turn-in; quests with their own mechanics
+// carry bespoke lesson bodies: targeting and the swing for Strike True, the
+// pickup press for the Wreck Line, the buckle-on for the pouch), and the
+// closing card that points at the ferry bell once Ferryman Odo has taken the
+// last hand-in. There is deliberately NO skip button: the card is compact,
+// stays out of the way at the top, and folds itself when the island is done
+// or left.
 //
 // The flag tally is the QUEST'S OWN objective count (the sim credits one
 // count per flag passed in order, tutorial/gauntlet_run.ts), so the card,
 // the quest tracker, and the server can never disagree about a tag, and
 // progress survives reloads with the character rather than the device. The
 // end-of-course camera lesson is the one client-side tally (accumulated
-// view-yaw travel): it teaches a camera the sim never sees. The card folds
-// away when the rail runs out or the player leaves the island. Reads world
-// state, writes none, and runs identically against the offline Sim and the
-// online ClientWorld.
+// view-yaw travel): it teaches a camera the sim never sees. While a card is
+// up the body carries the bc-coach-up class, and the quest dialog shifts
+// down below the card (styles/hud.css) so an NPC's dialogue never covers
+// the lesson. Reads world state, writes none, and runs identically against
+// the offline Sim and the online ClientWorld.
 
 import { currentInputHintMode, type InputHintMode } from '../game/input_hint_mode';
 import type { Keybinds } from '../game/keybinds';
@@ -32,43 +32,42 @@ import { groundHeight, WATER_LEVEL } from '../sim/world';
 import { WORLD_SEED } from '../sim/world_seed';
 import type { IWorld } from '../world_api';
 import {
-  BOOTCAMP_STEP_ORDER,
   type BootcampParam,
   type BootcampStep,
+  bellCardPlan,
   bootcampArrowTarget,
   bootcampBodyPlan,
   bootcampKeycaps,
   bootcampTitleKey,
   CAMERA_LESSON_TRAVEL_RAD,
   type CoachFocus,
+  type CoachParam,
   type CoachState,
   coachCardPlan,
   coachFocus,
   coachKeycaps,
   computeBootcampStep,
+  islandStepInfo,
 } from './bootcamp_view';
 import { tEntity } from './entity_i18n';
 import { formatNumber, t } from './i18n';
 
-// The closing card lingers, then dismisses itself (the tutorial.ts pattern);
-// shorter than Eastbrook's because there is no tip list under it.
-const DONE_LINGER_MS = 10000;
 // The island column: the card never shows east of the strait.
 const ISLAND_MAX_X = -180;
 
 export class BootcampOverlay {
-  // Session-only dismissal: the skip button folds the card away until the
-  // rail moves to another quest or state.
-  private dismissedKey: string | null = null;
   private engaged = false;
   private step: BootcampStep | null = null;
   private renderKey: string | null = null;
-  private doneSince = 0;
   private lastMode: InputHintMode = 'keyboard';
   private lastCounts = 0;
   // The camera lesson's client-side tally: accumulated view-yaw travel.
   private cameraTravel = 0;
   private cameraLastYaw: number | null = null;
+  // Latched when the rail's last quest is seen moving this session, so the
+  // closing bell card only follows a graduation, never a casual revisit.
+  private sawSail = false;
+  private bellPhase = false;
 
   private root: HTMLElement | null = null;
   private titleEl!: HTMLElement;
@@ -76,7 +75,6 @@ export class BootcampOverlay {
   private bodyEl!: HTMLElement;
   private keysEl!: HTMLElement;
   private progressEl!: HTMLElement;
-  private skipBtn!: HTMLButtonElement;
   private arrow: HTMLElement | null = null;
   private lastFocus: CoachFocus | null = null;
   private lastKeybinds: Keybinds | null = null;
@@ -89,17 +87,25 @@ export class BootcampOverlay {
 
     const onIsland = (p.pos?.x ?? 0) < ISLAND_MAX_X;
     const focus = onIsland ? coachFocus((questId) => railQuestState(world, questId)) : null;
+    if (focus?.questId === 'q_ps_set_sail') this.sawSail = true;
+
     if (!focus) {
-      // Rail finished, not offered, or ferried away: fold the card and
-      // re-arm any dismissal for a later visit.
-      if (this.engaged) this.disengage();
-      this.dismissedKey = null;
-      return;
+      // Rail finished or not offered. A graduate still standing on the
+      // island gets the closing bell card; leaving the island (the bell
+      // ride itself) folds everything and clears the graduation latch.
+      this.bellPhase = onIsland && this.sawSail;
+      if (!onIsland) this.sawSail = false;
+      if (!this.bellPhase) {
+        if (this.engaged) this.disengage();
+        return;
+      }
+    } else {
+      this.bellPhase = false;
     }
 
     this.lastFocus = focus;
     this.lastKeybinds = keybinds;
-    const isGauntlet = focus.questId === GAUNTLET_QUEST_ID;
+    const isGauntlet = focus?.questId === GAUNTLET_QUEST_ID;
     this.lastCounts = isGauntlet ? questCounts(world) : 0;
 
     // The camera lesson's yaw tally runs off the live renderer view. It only
@@ -117,18 +123,15 @@ export class BootcampOverlay {
     }
     const cameraTurned = this.cameraTravel >= CAMERA_LESSON_TRAVEL_RAD;
 
-    const focusKey = `${focus.questId}:${focus.state}`;
-    if (this.dismissedKey !== null) {
-      if (this.dismissedKey === focusKey) return; // skipped; wait for the rail to move
-      this.dismissedKey = null;
-    }
     this.engaged = true;
-
     const mode = currentInputHintMode();
     let nextRenderKey: string;
-    if (isGauntlet) {
+    if (this.bellPhase) {
+      this.step = null;
+      nextRenderKey = `bell:${mode}`;
+    } else if (isGauntlet) {
       const next = computeBootcampStep({
-        questActive: focus.state !== 'available',
+        questActive: focus!.state !== 'available',
         checkpointsReached: this.lastCounts,
         cameraTurned,
       });
@@ -136,26 +139,13 @@ export class BootcampOverlay {
       nextRenderKey = `gauntlet:${next}:${mode}`;
     } else {
       this.step = null;
-      nextRenderKey = `${focusKey}:${mode}`;
+      nextRenderKey = `${focus!.questId}:${focus!.state}:${mode}`;
     }
 
     if (this.renderKey !== nextRenderKey) {
       this.renderKey = nextRenderKey;
       this.lastMode = mode;
-      if (this.step === 'done' && this.doneSince === 0) this.doneSince = performance.now();
-      if (this.step !== 'done') this.doneSince = 0;
       this.renderPanel(keybinds);
-    }
-
-    if (this.step === 'done') {
-      // The done card asks for the hand-in at Overseer Pell beside the red
-      // flag; it lingers, then folds until the rail moves on (the hand-in
-      // changes the focus, which re-opens the card for the next quest).
-      if (performance.now() - this.doneSince >= DONE_LINGER_MS) {
-        this.dismissedKey = focusKey;
-        this.disengage();
-        return;
-      }
     }
 
     this.updateArrow(renderer);
@@ -208,14 +198,11 @@ export class BootcampOverlay {
     this.progressEl = document.createElement('div');
     this.progressEl.className = 'tut-progress';
 
-    this.skipBtn = document.createElement('button');
-    this.skipBtn.className = 'tut-skip';
-    this.skipBtn.type = 'button';
-    this.skipBtn.addEventListener('click', () => this.finish());
-
-    root.append(header, this.bodyEl, this.keysEl, this.progressEl, this.skipBtn);
+    root.append(header, this.bodyEl, this.keysEl, this.progressEl);
     ui.appendChild(root);
     this.root = root;
+    // The quest dialog shifts down below the card while this class is up.
+    document.body.classList.add('bc-coach-up');
 
     const arrow = document.createElement('div');
     arrow.className = 'tut-arrow';
@@ -228,8 +215,28 @@ export class BootcampOverlay {
   private renderPanel(keybinds: Keybinds): void {
     this.ensureDom();
     if (!this.root) return;
-    if (this.step !== null) this.renderLadderPanel(keybinds);
+    if (this.bellPhase) this.renderBellPanel(keybinds);
+    else if (this.step !== null) this.renderLadderPanel(keybinds);
     else this.renderCoachPanel(keybinds);
+  }
+
+  private setStepLabel(info: { current: number; total: number }): void {
+    this.stepEl.textContent = t('hud.tutorial.stepLabel', {
+      current: formatNumber(info.current),
+      total: formatNumber(info.total),
+    });
+  }
+
+  private coachLabels(keybinds: Keybinds): Readonly<Record<CoachParam, string>> {
+    const unbound = t('hud.options.unbound');
+    return {
+      interactKey: keybinds.primaryLabel('interact') || unbound,
+      mapKey: keybinds.primaryLabel('map') || unbound,
+      targetKey: keybinds.primaryLabel('target') || unbound,
+      // Slot 0 is the first action bar button (Attack, default Digit1).
+      attackKey: keybinds.primaryLabel('slot0') || unbound,
+      bagsKey: keybinds.primaryLabel('bags') || unbound,
+    };
   }
 
   /** The Gauntlet's own lesson-ladder card (the rail's head quest). */
@@ -253,15 +260,7 @@ export class BootcampOverlay {
     this.bodyEl.textContent = t(plan.bodyKey, params);
 
     this.paintKeycaps(bootcampKeycaps(this.step!, mode, labels));
-
-    const idx = BOOTCAMP_STEP_ORDER.indexOf(this.step!);
-    this.stepEl.textContent =
-      idx >= 0
-        ? t('hud.tutorial.stepLabel', {
-            current: formatNumber(idx + 1),
-            total: formatNumber(BOOTCAMP_STEP_ORDER.length),
-          })
-        : '';
+    this.setStepLabel(islandStepInfo({ kind: 'ladder', step: this.step! }));
 
     if (this.step !== 'done' && this.step !== 'talk' && this.step !== 'camera') {
       this.progressEl.textContent = this.courseProgress();
@@ -269,9 +268,6 @@ export class BootcampOverlay {
     } else {
       this.progressEl.style.display = 'none';
     }
-
-    this.skipBtn.textContent =
-      this.step === 'done' ? t('hud.tutorial.dismiss') : t('hud.tutorial.skip');
     this.root!.classList.toggle('tut-done', this.step === 'done');
   }
 
@@ -282,29 +278,39 @@ export class BootcampOverlay {
     const mode = currentInputHintMode();
     this.lastMode = mode;
 
-    const unbound = t('hud.options.unbound');
-    const interactKey = keybinds.primaryLabel('interact') || unbound;
-    const mapKey = keybinds.primaryLabel('map') || unbound;
-
+    const labels = this.coachLabels(keybinds);
     const plan = coachCardPlan(focus, mode);
     const npc = tEntity({ kind: 'npc', id: plan.npcId, field: 'name' });
     const params: Record<string, string> = {};
     if (plan.bodyHasNpc) params.npc = npc;
-    for (const key of plan.params) params[key] = key === 'interactKey' ? interactKey : mapKey;
+    for (const key of plan.params) params[key] = labels[key];
 
     this.titleEl.textContent = plan.titleKey
       ? t(plan.titleKey, plan.titleHasNpc ? { npc } : undefined)
       : tEntity({ kind: 'quest', id: focus.questId, field: 'title' });
     this.bodyEl.textContent = t(plan.bodyKey, params);
 
-    this.paintKeycaps(coachKeycaps(focus.state, mode, interactKey));
-
-    // The step ladder and flag tally belong to the Gauntlet card alone.
-    this.stepEl.textContent = '';
+    this.paintKeycaps(coachKeycaps(plan, mode, labels));
+    this.setStepLabel(islandStepInfo({ kind: 'coach', focus }));
     this.progressEl.style.display = 'none';
-
-    this.skipBtn.textContent = t('hud.tutorial.skip');
     this.root!.classList.remove('tut-done');
+  }
+
+  /** The closing card: the rail is done, ring the bell home. */
+  private renderBellPanel(keybinds: Keybinds): void {
+    const mode = currentInputHintMode();
+    this.lastMode = mode;
+    const labels = this.coachLabels(keybinds);
+    const plan = bellCardPlan(mode);
+    const params: Record<string, string> = {};
+    for (const key of plan.params) params[key] = labels[key];
+
+    this.titleEl.textContent = t(plan.titleKey);
+    this.bodyEl.textContent = t(plan.bodyKey, params);
+    this.paintKeycaps(coachKeycaps(plan, mode, labels));
+    this.setStepLabel(islandStepInfo({ kind: 'bell' }));
+    this.progressEl.style.display = 'none';
+    this.root!.classList.add('tut-done');
   }
 
   private paintKeycaps(caps: readonly string[]): void {
@@ -321,8 +327,9 @@ export class BootcampOverlay {
   // Points the shared course arrow at the current lesson's target.
   private updateArrow(renderer: Renderer): void {
     if (!this.arrow) return;
-    const target =
-      this.step !== null
+    const target = this.bellPhase
+      ? bellCardPlan(this.lastMode).arrow
+      : this.step !== null
         ? bootcampArrowTarget(this.step, this.lastCounts)
         : this.lastFocus
           ? coachCardPlan(this.lastFocus, this.lastMode).arrow
@@ -366,17 +373,12 @@ export class BootcampOverlay {
     this.engaged = false;
     this.step = null;
     this.renderKey = null;
-    this.doneSince = 0;
+    this.bellPhase = false;
     this.root?.remove();
     this.arrow?.remove();
     this.root = null;
     this.arrow = null;
-  }
-
-  private finish(): void {
-    const focus = this.lastFocus;
-    this.dismissedKey = focus ? `${focus.questId}:${focus.state}` : null;
-    this.disengage();
+    document.body.classList.remove('bc-coach-up');
   }
 }
 

@@ -202,22 +202,28 @@ describe('proving shore placement', () => {
     }
   });
 
-  it('the chain graduates a fresh character at level 3, no higher by quests alone', () => {
-    // The rail's XP plus the kill XP its own objectives force must clear the
-    // level 3 threshold, and the quest XP alone must not already clear level
-    // 4: the island hands the vale a level 3, not a level 4.
+  it('level 3 lands ON the final hand-in, counting the forced kills, never before', () => {
+    // The rail's XP budget is quest XP PLUS the kill XP its own objectives
+    // force (one effigy, three scuttlers): the total must clear the level 3
+    // threshold at Set Sail's hand-in even when every kill pays its minimum,
+    // and must still be short of level 3 before that hand-in even when every
+    // kill pays its maximum. Quest XP alone stays far from level 4.
     const toLevel3 = xpForLevel(1) + xpForLevel(2);
     const toLevel4 = toLevel3 + xpForLevel(3);
     const questXp = PROVING_SHORE_QUEST_ORDER.reduce(
       (sum, id) => sum + PROVING_SHORE_QUESTS[id].xpReward,
       0,
     );
-    // Forced kills: one effigy (Strike True) and the scuttler cull, valued
-    // at the WORST case (killed as late as level 2, level-1 mobs).
     const forcedKills = PROVING_SHORE_QUESTS.q_ps_strike_true.objectives[0].count ?? 0;
     const forcedCrabs = PROVING_SHORE_QUESTS.q_ps_shell_and_claw.objectives[0].count ?? 0;
+    // Worst case low: every forced kill is a level-1 mob felled as late as
+    // player level 2. Worst case high: the effigy is a level-1 mob at player
+    // level 1, and every scuttler spawns level 2 and dies at player level 1.
     const minKillXp = (forcedKills + forcedCrabs) * mobXpValue(1, 2);
+    const maxKillXp = forcedKills * mobXpValue(1, 1) + forcedCrabs * mobXpValue(2, 1);
+    const sailXp = PROVING_SHORE_QUESTS.q_ps_set_sail.xpReward;
     expect(questXp + minKillXp).toBeGreaterThanOrEqual(toLevel3);
+    expect(questXp - sailXp + maxKillXp).toBeLessThan(toLevel3);
     expect(questXp).toBeLessThan(toLevel4);
   });
 
@@ -323,12 +329,25 @@ describe('proving shore placement', () => {
     expect(PROVING_SHORE_QUESTS.q_ps_strike_true.objectives[0].count).toBe(1);
     // The scuttlers stay a real (gentle) fight: the whole point of Shell and
     // Claw is a target that finally hits back. Six of them on a 7-second
-    // respawn so a shared wreck line never queues the cull.
+    // respawn so a shared wreck line never queues the cull, on a VERY short
+    // aggro leash and spread over three well-separated camps, so a newcomer
+    // only ever fights the crab they walked onto.
     expect(PROVING_SHORE_MOBS.shore_scuttler.dummy).toBeUndefined();
     expect(PROVING_SHORE_MOBS.shore_scuttler.dmgBase).toBeGreaterThan(0);
     expect(PROVING_SHORE_MOBS.shore_scuttler.respawnSeconds).toBe(7);
+    expect(PROVING_SHORE_MOBS.shore_scuttler.aggroRadius).toBeLessThanOrEqual(2);
     const shells = PROVING_SHORE_CAMPS.filter((c) => c.mobId === 'shore_scuttler');
+    expect(shells.length).toBeGreaterThanOrEqual(3);
     expect(shells.reduce((sum, c) => sum + c.count, 0)).toBe(6);
+    for (const a of shells) {
+      for (const b of shells) {
+        if (a === b) continue;
+        expect(
+          Math.hypot(a.center.x - b.center.x, a.center.z - b.center.z),
+          'scuttler camps stay spread',
+        ).toBeGreaterThanOrEqual(7);
+      }
+    }
     // The crate line asks for six opens and authors exactly six crates: the
     // quest IS clearing the line, and OBJECT_RESPAWN covers a shared island.
     expect(PROVING_SHORE_QUESTS.q_ps_the_wreck_line.objectives[0].count).toBe(6);

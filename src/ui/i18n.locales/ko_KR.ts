@@ -8543,8 +8543,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_points': '포인트가 부족합니다.',
   'hudChrome.mailbox.title': '우편함',
   'hudChrome.noticeboard.empty': '게시된 내용이 없는 것 같습니다.',
-  'hudChrome.noticeboard.listingsBanner': '게시판에 붙은 공고가 {count}건 있습니다.',
-  'hudChrome.noticeboard.listingLine': '{guild}: {note}',
+  'hudChrome.noticeboard.popupTitle': '길드 게시 기둥',
+  'hudChrome.noticeboard.close': '닫기',
   'hudChrome.mailbox.subtitle': '레이븐포스트',
   'hudChrome.mailbox.close': '우편함 닫기',
   'hudChrome.mailbox.tabInbox': '받은 편지함',
@@ -13072,11 +13072,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '깃발 하나 통과. 오른쪽 스틱을 밀어 돌아 남쪽으로 뻗은 울타리 길을 정면에 두고, 왼쪽 스틱을 위로 밀어 두 번째 깃발까지 걸어가세요.',
   'hudChrome.bootcamp.strafeTitle': '마지막 길은 옆걸음으로',
   'hudChrome.bootcamp.strafeBody':
-    '옆으로 움직이는 또 다른 방법이 있습니다. {turnKey}를 누른 채 돌아 내려온 길을 거슬러 바라본 다음, {strafeKey}를 누른 채 마지막 길을 붉은 깃발까지 옆걸음하세요. 옆걸음은 시선을 표적에 둔 채 움직이게 해 줍니다. 언젠가 전투에서 이렇게 움직이게 될 거예요.',
+    '옆으로 움직이는 또 다른 방법이 있습니다. {strafeKey}를 누른 채 붉은 깃발이 등 뒤로 갈 때까지 마지막 길을 옆걸음하세요. 옆걸음은 시선을 표적에 둔 채 움직이게 해 줍니다. 언젠가 전투에서 이렇게 움직이게 될 거예요.',
   'hudChrome.bootcamp.strafeBodyTouch':
-    '옆으로 움직이는 또 다른 방법이 있습니다. 내려온 길을 거슬러 바라볼 때까지 돈 다음, 이동 스틱을 왼쪽으로 밀어 마지막 길을 붉은 깃발까지 옆걸음하세요.',
+    '옆으로 움직이는 또 다른 방법이 있습니다. 이동 스틱을 왼쪽으로 밀어 붉은 깃발이 등 뒤로 갈 때까지 마지막 길을 옆걸음하세요.',
   'hudChrome.bootcamp.strafeBodyPad':
-    '옆으로 움직이는 또 다른 방법이 있습니다. 오른쪽 스틱을 밀어 내려온 길을 거슬러 바라볼 때까지 돈 다음, 왼쪽 스틱을 왼쪽으로 밀어 마지막 길을 붉은 깃발까지 옆걸음하세요.',
+    '옆으로 움직이는 또 다른 방법이 있습니다. 왼쪽 스틱을 왼쪽으로 밀어 붉은 깃발이 등 뒤로 갈 때까지 마지막 길을 옆걸음하세요.',
   'hudChrome.bootcamp.cameraTitle': '시점 돌리기',
   'hudChrome.bootcamp.cameraBody':
     '완주를 보고하기 전 마지막 가르침입니다. 마우스 오른쪽 버튼을 누른 채 드래그해 시점을 몸 주위로 한 바퀴 빙 돌려 보세요. 등 뒤에 무엇이 서 있는지 아는 쪽이 싸움에서 이깁니다.',
@@ -13112,6 +13112,31 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '{npc}에게 돌아가 상대를 탭해 임무를 보고하고 보상을 받으세요.',
   'hudChrome.bootcamp.coachReadyBodyPad':
     '{npc}에게 돌아가 상호작용 버튼을 눌러 임무를 보고하고 보상을 받으세요.',
+  'hudChrome.bootcamp.taskStrikeTrueBody':
+    '짚 허수아비에게 다가가 {targetKey}를 누르거나 왼쪽 클릭해 대상으로 잡으세요. 그런 다음 {attackKey}를 누르거나 행동 단축바의 첫 번째 버튼을 클릭해 내리치세요. 하나가 무너질 때까지 계속 치세요.',
+  'hudChrome.bootcamp.taskStrikeTrueBodyTouch':
+    '짚 허수아비에게 다가가 탭해 대상으로 잡으세요. 그런 다음 행동 단축바의 첫 번째 버튼을 탭해 내리치세요. 하나가 무너질 때까지 계속 치세요.',
+  'hudChrome.bootcamp.taskStrikeTrueBodyPad':
+    '짚 허수아비에게 다가가 대상 버튼을 눌러 대상으로 잡으세요. 그런 다음 첫 번째 행동 버튼을 눌러 내리치세요. 하나가 무너질 때까지 계속 치세요.',
+  'hudChrome.bootcamp.taskWreckLineBody':
+    '화살표를 따라 상자 길로 가세요. 이름이 보일 때까지 표류 상자에 다가가 {interactKey}를 누르거나 상자를 왼쪽 클릭해 집어 드세요. 여섯이면 짐이 다 찹니다.',
+  'hudChrome.bootcamp.taskWreckLineBodyTouch':
+    '화살표를 따라 상자 길로 가세요. 이름이 보일 때까지 표류 상자에 다가가 상자를 탭하거나 사용 버튼을 탭해 집어 드세요. 여섯이면 짐이 다 찹니다.',
+  'hudChrome.bootcamp.taskWreckLineBodyPad':
+    '화살표를 따라 상자 길로 가세요. 이름이 보일 때까지 표류 상자에 다가가 상호작용 버튼을 눌러 집어 드세요. 여섯이면 짐이 다 찹니다.',
+  'hudChrome.bootcamp.readyPouchBody':
+    '주머니를 샀습니다. {bagsKey}를 눌러 가방을 열고 아마천 주머니를 왼쪽 클릭해 빈 가방 고리에 채우세요. 그런 다음 {npc}에게 돌아가 {interactKey}를 눌러 보여 주세요.',
+  'hudChrome.bootcamp.readyPouchBodyTouch':
+    '주머니를 샀습니다. 가방을 열고 아마천 주머니를 탭해 빈 가방 고리에 채우세요. 그런 다음 {npc}에게 돌아가 상대를 탭해 보여 주세요.',
+  'hudChrome.bootcamp.readyPouchBodyPad':
+    '주머니를 샀습니다. 가방을 열고 아마천 주머니를 골라 빈 가방 고리에 채우세요. 그런 다음 {npc}에게 돌아가 상호작용 버튼을 눌러 보여 주세요.',
+  'hudChrome.bootcamp.bellTitle': '종 울리기',
+  'hudChrome.bootcamp.bellBody':
+    '건널 자격은 얻었습니다. 부두 옆 나룻배 종으로 걸어가 {interactKey}를 누르거나 왼쪽 클릭해 이스트브룩으로 출항하세요.',
+  'hudChrome.bootcamp.bellBodyTouch':
+    '건널 자격은 얻었습니다. 부두 옆 나룻배 종으로 걸어가 종을 탭해 이스트브룩으로 출항하세요.',
+  'hudChrome.bootcamp.bellBodyPad':
+    '건널 자격은 얻었습니다. 부두 옆 나룻배 종으로 걸어가 상호작용 버튼을 눌러 이스트브룩으로 출항하세요.',
   'entities.zones.proving_shore.pois.4.label': '건틀릿',
   'entities.items.ps_castaway_crate.name': '표류 상자',
   'entities.items.ps_ferry_bell.name': '나룻배 종',

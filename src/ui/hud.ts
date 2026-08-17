@@ -579,6 +579,7 @@ import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_labels';
 import { MountRaceControls } from './mount_race_controls';
 import { MountRaceStrip } from './mount_race_strip';
 import { MovableFrame } from './movable_frame';
+import { NoticeboardPopup } from './noticeboard_popup';
 import { NPC_WINDOW_CLOSE_RANGE } from './npc_service_range';
 import { OptionsWindow } from './options_window';
 import {
@@ -2021,6 +2022,7 @@ export class Hud {
   private readonly targetAurasWindow: TargetAurasWindow;
   private tutorial = new TutorialOverlay();
   private bootcamp = new BootcampOverlay();
+  private noticeboardPopup = new NoticeboardPopup();
   private lastPetBarSig = '';
   // Value-diffed body-class flag: true while a live pet bar is shown. The mobile
   // top-band layout reads body.mobile-pet-active to yield the top-centre line to the
@@ -6509,6 +6511,7 @@ export class Hud {
     this.lockpickController.relocalize();
     this.tutorial.relocalize(this.sim, this.keybinds);
     this.bootcamp.relocalize(this.sim, this.keybinds);
+    this.noticeboardPopup.relocalize();
     // The ring latches its page indicator on the page/count pair; dropping the
     // latch relabels it on the next paint (mobile layouts only build the ring).
     this.mobileActionRingPainter?.relocalize();
@@ -12583,27 +12586,14 @@ export class Hud {
           break;
         case 'noticeboard':
           // The structured private event keeps this feedback localized and
-          // identical offline and online. Mobile keeps the chat log collapsed
-          // during normal play, so mirror the durable/live-announced log
-          // lines into the shared transient banner instead of making a
-          // successful interaction look inert. A board carrying listings
-          // banners the count and logs each notice (guild names and notes
-          // are world data, spliced verbatim like player names).
+          // identical offline and online. A board carrying listings opens
+          // the signpost popup (guild names and notes are world data,
+          // spliced verbatim like player names); an empty board mirrors the
+          // durable log line into the shared transient banner instead of
+          // making a successful interaction look inert (mobile keeps the
+          // chat log collapsed during normal play).
           if (ev.state === 'listings') {
-            const banner = t('hudChrome.noticeboard.listingsBanner', {
-              count: formatNumber(ev.listings.length),
-            });
-            this.showBanner(banner);
-            this.log(banner, '#c8b98f');
-            for (const listing of ev.listings) {
-              this.log(
-                t('hudChrome.noticeboard.listingLine', {
-                  guild: listing.guild,
-                  note: listing.note,
-                }),
-                '#c8b98f',
-              );
-            }
+            this.noticeboardPopup.show(ev.listings);
           } else {
             const message = t('hudChrome.noticeboard.empty');
             this.showBanner(message);

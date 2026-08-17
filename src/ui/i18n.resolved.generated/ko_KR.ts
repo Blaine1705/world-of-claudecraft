@@ -931,7 +931,20 @@ export const ko_KR: EnTranslations = {
       "coachReadyTitle": "임무 완료",
       "coachReadyBody": "{npc}에게 돌아가 {interactKey}를 누르거나 왼쪽 클릭해 임무를 보고하고 보상을 받으세요.",
       "coachReadyBodyTouch": "{npc}에게 돌아가 상대를 탭해 임무를 보고하고 보상을 받으세요.",
-      "coachReadyBodyPad": "{npc}에게 돌아가 상호작용 버튼을 눌러 임무를 보고하고 보상을 받으세요."
+      "coachReadyBodyPad": "{npc}에게 돌아가 상호작용 버튼을 눌러 임무를 보고하고 보상을 받으세요.",
+      "taskStrikeTrueBody": "Walk up to a straw effigy and press {targetKey}, or left-click it, to make it your target. Then press {attackKey}, or click the first button on the action bar, to swing. Keep striking until one gives out.",
+      "taskStrikeTrueBodyTouch": "Walk up to a straw effigy and tap it to make it your target. Then tap the first button on the action bar to swing. Keep striking until one gives out.",
+      "taskStrikeTrueBodyPad": "Walk up to a straw effigy and press your target button to make it your target. Then press your first action button to swing. Keep striking until one gives out.",
+      "taskWreckLineBody": "Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then press {interactKey}, or left-click the crate, to pick it up. Six fill the haul.",
+      "taskWreckLineBodyTouch": "Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then tap the crate, or tap the Use button, to pick it up. Six fill the haul.",
+      "taskWreckLineBodyPad": "Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then press your interact button to pick it up. Six fill the haul.",
+      "readyPouchBody": "Pouch bought. Press {bagsKey} to open your bags and left-click the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and press {interactKey} to show it off.",
+      "readyPouchBodyTouch": "Pouch bought. Open your bags and tap the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and tap them to show it off.",
+      "readyPouchBodyPad": "Pouch bought. Open your bags and choose the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and press your interact button to show it off.",
+      "bellTitle": "Ring the bell",
+      "bellBody": "Your crossing is earned. Walk to the ferry bell beside the pier and press {interactKey}, or left-click it, to sail for Eastbrook.",
+      "bellBodyTouch": "Your crossing is earned. Walk to the ferry bell beside the pier and tap it to sail for Eastbrook.",
+      "bellBodyPad": "Your crossing is earned. Walk to the ferry bell beside the pier and press your interact button on it to sail for Eastbrook."
     },
     "widgets": {
       "clockTitle": "현지 시각 - 클릭하면 12/24시간제 전환",
@@ -2843,8 +2856,8 @@ export const ko_KR: EnTranslations = {
     },
     "noticeboard": {
       "empty": "게시된 내용이 없는 것 같습니다.",
-      "listingsBanner": "게시판에 붙은 공고가 {count}건 있습니다.",
-      "listingLine": "{guild}: {note}"
+      "popupTitle": "Guild Signpost",
+      "close": "Close"
     },
     "bank": {
       "title": "은행",

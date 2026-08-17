@@ -135,13 +135,12 @@ export const PROVING_SHORE_ROADS: { x: number; z: number }[][] = [
 export const PROVING_SHORE_PORTALS: PortalDef[] = [];
 
 /** Where the tutorial greeting's accept path sets a new adventurer down: at
- *  the Gauntlet's open east mouth, facing straight down lane 1 toward its
- *  first flag (atan2 of the lane direction; forward = (-sin f, cos f)). The
- *  client snaps the chase camera to this facing on any teleport-scale
- *  displacement (game/teleport_camera.ts), and the first-visit arrival
- *  cinematic settles onto the same view, so the first thing a newcomer SEES
- *  is the walled course they are about to run. */
-export const PROVING_SHORE_ARRIVAL = { x: -281, z: -18, facing: 1.5 } as const;
+ *  the Gauntlet's open east mouth, facing due east (forward = (-sin f,
+ *  cos f), so -PI/2 points at +x), toward the pier, the ferry bell, and the
+ *  water they just crossed. The client snaps the chase camera to this facing
+ *  on any teleport-scale displacement (game/teleport_camera.ts), and the
+ *  first-visit arrival cinematic settles onto the same view. */
+export const PROVING_SHORE_ARRIVAL = { x: -281, z: -18, facing: -Math.PI / 2 } as const;
 
 export const PROVING_SHORE_MOBS: Record<string, MobTemplate> = {
   // Built to be hit: the practice yard's straw-and-timber targets. True
@@ -186,7 +185,9 @@ export const PROVING_SHORE_MOBS: Record<string, MobTemplate> = {
     attackSpeed: 2.0,
     armorPerLevel: 4,
     moveSpeed: 7,
-    aggroRadius: 6,
+    // Very short leash ON PURPOSE: a newcomer looting the wreck line should
+    // only ever fight the crab they walked onto, never a pile.
+    aggroRadius: 2,
     loot: [{ copper: 4, chance: 1 }],
     scale: 0.8,
     color: 0x7a5a3a,
@@ -371,7 +372,11 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
         label: 'Gauntlet flag passed',
       },
     ],
-    xpReward: 150,
+    // The rail's XP is budgeted as one number: quest XP (1140 total) plus the
+    // kill XP the objectives force (one effigy, three scuttlers) crosses the
+    // level 3 threshold AT the final hand-in, never before (the window is
+    // pinned in tests/proving_shore_content.test.ts).
+    xpReward: 120,
     copperReward: 40,
     itemRewards: {},
   },
@@ -386,7 +391,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     objectives: [
       { type: 'kill', targetMobId: 'training_effigy', count: 1, label: 'Training Effigy felled' },
     ],
-    xpReward: 150,
+    xpReward: 130,
     copperReward: 60,
     itemRewards: {},
     requiresQuest: 'q_ps_the_gauntlet',
@@ -404,7 +409,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     objectives: [
       { type: 'kill', targetMobId: 'shore_scuttler', count: 3, label: 'Shore Scuttler culled' },
     ],
-    xpReward: 250,
+    xpReward: 200,
     copperReward: 80,
     itemRewards: {},
     requiresQuest: 'q_ps_strike_true',
@@ -425,7 +430,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
         label: 'Castaway Crate opened',
       },
     ],
-    xpReward: 250,
+    xpReward: 220,
     copperReward: 80,
     itemRewards: {},
     requiresQuest: 'q_ps_shell_and_claw',
@@ -455,7 +460,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     // a bag socket, and Maren must not take back the bag Finch just taught
     // them to wear.
     keepsCollectedItems: true,
-    xpReward: 250,
+    xpReward: 200,
     copperReward: 120,
     itemRewards: {},
     requiresQuest: 'q_ps_the_wreck_line',
@@ -484,7 +489,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
         label: 'Guild signpost read',
       },
     ],
-    xpReward: 100,
+    xpReward: 120,
     copperReward: 30,
     itemRewards: {},
     requiresQuest: 'q_ps_pouch_and_purse',
@@ -569,8 +574,11 @@ export const PROVING_SHORE_CAMPS: CampDef[] = [
   // camp free for the Gauntlet movement course. Counts stay halved: the
   // wreck line is a looting lesson, and a crate ringed by crabs turned it
   // into a fight the quest never asked for.
-  { mobId: 'shore_scuttler', center: { x: -389, z: -30 }, radius: 8, count: 3, offStream: true },
-  { mobId: 'shore_scuttler', center: { x: -394, z: -36 }, radius: 7, count: 3, offStream: true },
+  // Three well-separated pairs rather than two piles: with the very short
+  // aggro leash above, each crab met along the line is a single fight.
+  { mobId: 'shore_scuttler', center: { x: -383, z: -22 }, radius: 6, count: 2, offStream: true },
+  { mobId: 'shore_scuttler', center: { x: -390, z: -30 }, radius: 6, count: 2, offStream: true },
+  { mobId: 'shore_scuttler', center: { x: -394, z: -36 }, radius: 6, count: 2, offStream: true },
 ];
 
 export const PROVING_SHORE_OBJECTS: GroundObjectDef[] = [
@@ -696,7 +704,9 @@ export const PROVING_SHORE_PROPS: ZonePropsDef = {
     // render/streetlamp_layout.ts). All lit by the renderer's torch-glow
     // pass (render/decor_torch_fx.ts).
     { key: 'kcasTorch', x: -282.9, z: -22.6 },
-    { key: 'kcasTorch', x: -335.4, z: -33 },
+    // Pell's lantern stands at his flank, not on the lane a finishing run
+    // walks up to him (his station flag holds the other flank).
+    { key: 'kcasTorch', x: -337, z: -35 },
     { key: 'kcasTorch', x: -343.9, z: -9.9 },
     { key: 'kcasTorch', x: -369.9, z: -11.9 },
     { key: 'kcasTorch', x: -312, z: 58.8 },

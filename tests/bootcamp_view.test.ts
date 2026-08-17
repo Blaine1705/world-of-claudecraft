@@ -10,12 +10,15 @@ import { describe, expect, it } from 'vitest';
 import {
   BOOTCAMP_COURSE_CHECKPOINTS,
   PROVING_SHORE_NPCS,
+  PROVING_SHORE_OBJECTS,
   PROVING_SHORE_QUEST_ORDER,
   PROVING_SHORE_QUESTS,
 } from '../src/sim/content/proving_shore';
 import {
+  BELL_STEP_TARGET,
   BOOTCAMP_STEP_ORDER,
   type BootcampStep,
+  bellCardPlan,
   bootcampArrowTarget,
   bootcampBodyPlan,
   bootcampKeycaps,
@@ -27,6 +30,8 @@ import {
   coachFocus,
   coachKeycaps,
   computeBootcampStep,
+  ISLAND_STEP_TOTAL,
+  islandStepInfo,
 } from '../src/ui/bootcamp_view';
 import { t } from '../src/ui/i18n';
 
@@ -91,12 +96,13 @@ describe('copy plans', () => {
     }
   });
 
-  it('the strafe lesson turns with the turn key, never the camera', () => {
-    // The camera got its own end-of-course lesson; the strafe copy must not
-    // reintroduce mouse-drag view control on the keyboard arm.
+  it('the strafe lesson asks for the strafe key alone', () => {
+    // The camera got its own end-of-course lesson, and the turn lesson
+    // already happened a lane ago: the strafe copy names ONE key and must
+    // reintroduce neither mouse-drag view control nor the turn key.
     const plan = bootcampBodyPlan('strafe', 'keyboard');
-    expect(plan.params).toEqual(['turnKey', 'strafeKey']);
-    const body = t(plan.bodyKey, { turnKey: 'D', strafeKey: 'Q' });
+    expect(plan.params).toEqual(['strafeKey']);
+    const body = t(plan.bodyKey, { strafeKey: 'Q' });
     expect(body).not.toMatch(/mouse/i);
   });
 
@@ -114,7 +120,7 @@ describe('copy plans', () => {
     expect(bootcampKeycaps('talk', 'keyboard', labels)).toEqual(['F']);
     expect(bootcampKeycaps('forward', 'keyboard', labels)).toEqual(['W']);
     expect(bootcampKeycaps('turnwalk', 'keyboard', labels)).toEqual(['D', 'W']);
-    expect(bootcampKeycaps('strafe', 'keyboard', labels)).toEqual(['D', 'Q']);
+    expect(bootcampKeycaps('strafe', 'keyboard', labels)).toEqual(['Q']);
     // The camera lesson is mouse/stick work: no keycaps anywhere.
     expect(bootcampKeycaps('camera', 'keyboard', labels)).toEqual([]);
     expect(bootcampKeycaps('done', 'keyboard', labels)).toEqual(['F']);
@@ -190,11 +196,98 @@ describe('the rail coach', () => {
     }
   });
 
-  it('coach keycaps: the interact key going in and back, nothing mid-task', () => {
-    expect(coachKeycaps('available', 'keyboard', 'F')).toEqual(['F']);
-    expect(coachKeycaps('ready', 'keyboard', 'F')).toEqual(['F']);
-    expect(coachKeycaps('active', 'keyboard', 'F')).toEqual([]);
-    expect(coachKeycaps('available', 'touch', 'F')).toEqual([]);
-    expect(coachKeycaps('ready', 'pad', 'F')).toEqual([]);
+  it('coach keycaps mirror the card plan params, minus the map-key aside', () => {
+    const labels = {
+      interactKey: 'F',
+      mapKey: 'M',
+      targetKey: 'Tab',
+      attackKey: '1',
+      bagsKey: 'B',
+    };
+    const at = (questId: string, state: CoachState, mode: 'keyboard' | 'touch' | 'pad') =>
+      coachKeycaps(coachCardPlan({ questId, state }, mode), mode, labels);
+    expect(at('q_ps_shell_and_claw', 'available', 'keyboard')).toEqual(['F']);
+    expect(at('q_ps_shell_and_claw', 'ready', 'keyboard')).toEqual(['F']);
+    // The generic task card's only param is the map key, which stays an
+    // aside in the copy, never a chip.
+    expect(at('q_ps_shell_and_claw', 'active', 'keyboard')).toEqual([]);
+    expect(at('q_ps_strike_true', 'active', 'keyboard')).toEqual(['Tab', '1']);
+    expect(at('q_ps_the_wreck_line', 'active', 'keyboard')).toEqual(['F']);
+    expect(at('q_ps_pouch_and_purse', 'ready', 'keyboard')).toEqual(['B', 'F']);
+    expect(at('q_ps_shell_and_claw', 'available', 'touch')).toEqual([]);
+    expect(at('q_ps_strike_true', 'active', 'pad')).toEqual([]);
+  });
+
+  it('quest-mechanic overrides replace the generic bodies with real lessons', () => {
+    // Strike True teaches targeting and the swing; the Wreck Line teaches
+    // the pickup press; the pouch lesson's hand-in card walks the buckle-on.
+    const strike = coachCardPlan({ questId: 'q_ps_strike_true', state: 'active' }, 'keyboard');
+    expect(strike.params).toEqual(['targetKey', 'attackKey']);
+    const strikeBody = t(strike.bodyKey, { targetKey: 'Tab', attackKey: '1' });
+    expect(strikeBody).toMatch(/target/i);
+    expect(strikeBody).not.toMatch(/\{\w+\}/);
+    const wreck = coachCardPlan({ questId: 'q_ps_the_wreck_line', state: 'active' }, 'keyboard');
+    expect(wreck.params).toEqual(['interactKey']);
+    expect(t(wreck.bodyKey, { interactKey: 'F' })).toMatch(/crate/i);
+    const pouch = coachCardPlan({ questId: 'q_ps_pouch_and_purse', state: 'ready' }, 'keyboard');
+    expect(pouch.params).toEqual(['bagsKey', 'interactKey']);
+    expect(pouch.bodyHasNpc).toBe(true);
+    const pouchBody = t(pouch.bodyKey, { bagsKey: 'B', interactKey: 'F', npc: 'X' });
+    expect(pouchBody).toMatch(/bag/i);
+    expect(pouchBody).not.toMatch(/\{\w+\}/);
+    // Quests without an override keep the generic three-state copy.
+    const generic = coachCardPlan({ questId: 'q_ps_shell_and_claw', state: 'active' }, 'keyboard');
+    expect(generic.bodyKey).toBe('hudChrome.bootcamp.coachTaskBody');
+  });
+});
+
+describe('the one island step ladder', () => {
+  it('numbers every card of the whole tutorial as one sequence', () => {
+    // Six ladder cards, three coach cards per later rail quest, one bell.
+    expect(ISLAND_STEP_TOTAL).toBe(6 + (PROVING_SHORE_QUEST_ORDER.length - 1) * 3 + 1);
+    expect(islandStepInfo({ kind: 'ladder', step: 'talk' })).toEqual({
+      current: 1,
+      total: ISLAND_STEP_TOTAL,
+    });
+    expect(islandStepInfo({ kind: 'ladder', step: 'camera' }).current).toBe(5);
+    expect(islandStepInfo({ kind: 'ladder', step: 'done' }).current).toBe(6);
+    // The first coach quest picks up right after the ladder...
+    expect(
+      islandStepInfo({ kind: 'coach', focus: { questId: 'q_ps_strike_true', state: 'available' } })
+        .current,
+    ).toBe(7);
+    // ...and every later card advances monotonically to the bell.
+    let prev = 6;
+    for (const questId of PROVING_SHORE_QUEST_ORDER.slice(1)) {
+      for (const state of ['available', 'active', 'ready'] as CoachState[]) {
+        const { current } = islandStepInfo({ kind: 'coach', focus: { questId, state } });
+        expect(current).toBe(prev + 1);
+        prev = current;
+      }
+    }
+    expect(islandStepInfo({ kind: 'bell' })).toEqual({
+      current: ISLAND_STEP_TOTAL,
+      total: ISLAND_STEP_TOTAL,
+    });
+    expect(prev + 1).toBe(ISLAND_STEP_TOTAL);
+  });
+});
+
+describe('the closing bell card', () => {
+  it('aims at the authored island ferry bell and resolves all three arms', () => {
+    const bell = PROVING_SHORE_OBJECTS.find((o) => o.itemId === 'ps_ferry_bell');
+    const island = bell?.positions.find((p) => p.x < -180);
+    expect(BELL_STEP_TARGET).toEqual(island);
+    for (const mode of ['keyboard', 'touch', 'pad'] as const) {
+      const plan = bellCardPlan(mode);
+      expect(plan.arrow).toEqual(island);
+      const params: Record<string, string> = {};
+      for (const p of plan.params) params[p] = 'X';
+      const body = t(plan.bodyKey, params);
+      expect(body, `bell/${mode}`).toBeTruthy();
+      expect(body).not.toMatch(/\{\w+\}/);
+      expect(t(plan.titleKey)).toBeTruthy();
+      if (mode !== 'keyboard') expect(plan.params).toHaveLength(0);
+    }
   });
 });

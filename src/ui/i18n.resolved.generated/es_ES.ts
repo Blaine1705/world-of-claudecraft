@@ -908,10 +908,10 @@ export const es_ES: EnTranslations = {
       "turnwalkBody": "Flag one down. Hold {turnKey} to rotate on the spot until you face down the walled lane heading south, then hold {forwardKey} again and walk it to the second flag.",
       "turnwalkBodyTouch": "Flag one down. Drag a finger across the world (not the movement stick) to turn until you face down the walled lane heading south, then push the stick up and walk it to the second flag.",
       "turnwalkBodyPad": "Flag one down. Push the right stick to turn until you face down the walled lane heading south, then push the left stick up and walk it to the second flag.",
-      "strafeTitle": "Sidestep the last lane",
-      "strafeBody": "There is another way to move sideways. Hold {turnKey} until you face back up the lane you came down, then hold {strafeKey} to sidestep along the last lane to the red flag. Sidestepping keeps your eyes on a target while you move: you will fight this way one day.",
-      "strafeBodyTouch": "There is another way to move sideways. Turn until you face back up the lane you came down, then push the movement stick left to slip sideways along the last lane to the red flag.",
-      "strafeBodyPad": "There is another way to move sideways. Push the right stick to turn until you face back up the lane you came down, then push the left stick left to slip sideways along the last lane to the red flag.",
+      "strafeTitle": "Strafe the last lane",
+      "strafeBody": "There is another way to move sideways. Hold {strafeKey} to strafe down the last lane until the red flag is behind you. Strafing keeps your eyes on a target while you move: you will fight this way one day.",
+      "strafeBodyTouch": "There is another way to move sideways. Push the movement stick left to strafe down the last lane until the red flag is behind you.",
+      "strafeBodyPad": "There is another way to move sideways. Push the left stick left to strafe down the last lane until the red flag is behind you.",
       "cameraTitle": "Swing the camera",
       "cameraBody": "One last lesson before you hand the run in: hold the right mouse button and drag to swing the camera all the way around you. Knowing what stands behind you wins fights.",
       "cameraBodyTouch": "One last lesson before you hand the run in: drag a finger across the world to swing the camera all the way around you. Knowing what stands behind you wins fights.",
@@ -931,7 +931,20 @@ export const es_ES: EnTranslations = {
       "coachReadyTitle": "Task complete",
       "coachReadyBody": "Return to {npc} and press {interactKey}, or left-click them, to hand it in and take your reward.",
       "coachReadyBodyTouch": "Return to {npc} and tap them to hand it in and take your reward.",
-      "coachReadyBodyPad": "Return to {npc} and press your interact button to hand it in and take your reward."
+      "coachReadyBodyPad": "Return to {npc} and press your interact button to hand it in and take your reward.",
+      "taskStrikeTrueBody": "Walk up to a straw effigy and press {targetKey}, or left-click it, to make it your target. Then press {attackKey}, or click the first button on the action bar, to swing. Keep striking until one gives out.",
+      "taskStrikeTrueBodyTouch": "Walk up to a straw effigy and tap it to make it your target. Then tap the first button on the action bar to swing. Keep striking until one gives out.",
+      "taskStrikeTrueBodyPad": "Walk up to a straw effigy and press your target button to make it your target. Then press your first action button to swing. Keep striking until one gives out.",
+      "taskWreckLineBody": "Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then press {interactKey}, or left-click the crate, to pick it up. Six fill the haul.",
+      "taskWreckLineBodyTouch": "Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then tap the crate, or tap the Use button, to pick it up. Six fill the haul.",
+      "taskWreckLineBodyPad": "Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then press your interact button to pick it up. Six fill the haul.",
+      "readyPouchBody": "Pouch bought. Press {bagsKey} to open your bags and left-click the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and press {interactKey} to show it off.",
+      "readyPouchBodyTouch": "Pouch bought. Open your bags and tap the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and tap them to show it off.",
+      "readyPouchBodyPad": "Pouch bought. Open your bags and choose the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and press your interact button to show it off.",
+      "bellTitle": "Ring the bell",
+      "bellBody": "Your crossing is earned. Walk to the ferry bell beside the pier and press {interactKey}, or left-click it, to sail for Eastbrook.",
+      "bellBodyTouch": "Your crossing is earned. Walk to the ferry bell beside the pier and tap it to sail for Eastbrook.",
+      "bellBodyPad": "Your crossing is earned. Walk to the ferry bell beside the pier and press your interact button on it to sail for Eastbrook."
     },
     "widgets": {
       "clockTitle": "Hora local: haz clic para alternar 12/24 horas",
@@ -2843,8 +2856,8 @@ export const es_ES: EnTranslations = {
     },
     "noticeboard": {
       "empty": "Parece que no hay nada publicado.",
-      "listingsBanner": "The board carries {count} posted notices.",
-      "listingLine": "{guild}: {note}"
+      "popupTitle": "Guild Signpost",
+      "close": "Close"
     },
     "bank": {
       "title": "Banco",

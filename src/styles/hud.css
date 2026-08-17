@@ -537,6 +537,47 @@
     outline: 2px solid var(--gold);
     outline-offset: 2px;
   }
+  /* While the island coach card is up (bootcamp.ts toggles bc-coach-up on
+     body), the quest dialog opens BELOW the card instead of at its default
+     10vh, so an NPC's dialogue never covers the lesson. Desktop only: the
+     mobile sheet layout owns its own quest-dialog pin. */
+  body.bc-coach-up:not(.mobile-touch) #quest-dialog {
+    top: max(10vh, 235px);
+  }
+  /* The guild-signpost popup (noticeboard_popup.ts): the tutorial card
+     family's chrome, centered rather than top-pinned, one block per posted
+     notice. */
+  .tut-card.nb-popup {
+    top: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 380px;
+    animation: none;
+  }
+  .nb-list {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  .nb-item {
+    border: 1px solid #ffffff14;
+    border-radius: 8px;
+    padding: 8px 10px;
+    background: #00000022;
+  }
+  .nb-guild {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+  .nb-note {
+    margin-top: 3px;
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: #d8d0bc;
+  }
   .tut-arrow {
     position: absolute;
     left: 0;

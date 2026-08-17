@@ -8572,8 +8572,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_points': 'ポイントが足りません。',
   'hudChrome.mailbox.title': 'メールボックス',
   'hudChrome.noticeboard.empty': '何も貼られていないようだ。',
-  'hudChrome.noticeboard.listingsBanner': '掲示板には{count}件の貼り紙が出ている。',
-  'hudChrome.noticeboard.listingLine': '{guild}：{note}',
+  'hudChrome.noticeboard.popupTitle': 'ギルドの掲示柱',
+  'hudChrome.noticeboard.close': '閉じる',
   'hudChrome.mailbox.subtitle': 'レイヴンポスト',
   'hudChrome.mailbox.close': 'メールボックスを閉じる',
   'hudChrome.mailbox.tabInbox': '受信箱',
@@ -13063,11 +13063,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '旗一本目、よし。右スティックを倒して回り、南へ延びる柵のレーンを正面に見たら、左スティックを上に倒して二本目の旗まで歩こう。',
   'hudChrome.bootcamp.strafeTitle': '最後のレーンを横歩き',
   'hudChrome.bootcamp.strafeBody':
-    '横に動く方法はもうひとつある。{turnKey}を押したまま、下ってきたレーンをさかのぼる向きになるまで回り、それから{strafeKey}を押したまま最後のレーンを赤い旗まで横歩きしよう。横歩きなら視線を敵に置いたまま動ける。いつか戦いでそう動く日が来る。',
+    '横に動く方法はもうひとつある。{strafeKey}を押したまま、赤い旗が背後に来るまで最後のレーンを横歩きしよう。横歩きなら視線を敵に置いたまま動ける。いつか戦いでそう動く日が来る。',
   'hudChrome.bootcamp.strafeBodyTouch':
-    '横に動く方法はもうひとつある。下ってきたレーンをさかのぼる向きになるまで回り、それから移動スティックを左に倒して最後のレーンを赤い旗まで横滑りしよう。',
+    '横に動く方法はもうひとつある。移動スティックを左に倒して、赤い旗が背後に来るまで最後のレーンを横滑りしよう。',
   'hudChrome.bootcamp.strafeBodyPad':
-    '横に動く方法はもうひとつある。右スティックを倒して、下ってきたレーンをさかのぼる向きになるまで回り、それから左スティックを左に倒して最後のレーンを赤い旗まで横滑りしよう。',
+    '横に動く方法はもうひとつある。左スティックを左に倒して、赤い旗が背後に来るまで最後のレーンを横滑りしよう。',
   'hudChrome.bootcamp.cameraTitle': '視点を回す',
   'hudChrome.bootcamp.cameraBody':
     '走りを納める前に最後の一課だ。マウスの右ボタンを押したままドラッグして、視点を自分のまわりでぐるりと一周させよう。背後に何が立っているかを知る者が、戦いを制する。',
@@ -13103,6 +13103,31 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '{npc}のもとへ戻り、相手をタップして納め、報酬を受け取ろう。',
   'hudChrome.bootcamp.coachReadyBodyPad':
     '{npc}のもとへ戻り、インタラクトボタンを押して納め、報酬を受け取ろう。',
+  'hudChrome.bootcamp.taskStrikeTrueBody':
+    '藁のかかしに歩み寄り、{targetKey}を押すか、左クリックしてターゲットにしよう。次に{attackKey}を押すか、アクションバーの最初のボタンをクリックして打ち込もう。一体が崩れるまで打ち続けること。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyTouch':
+    '藁のかかしに歩み寄り、タップしてターゲットにしよう。次にアクションバーの最初のボタンをタップして打ち込もう。一体が崩れるまで打ち続けること。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyPad':
+    '藁のかかしに歩み寄り、ターゲットボタンを押してターゲットにしよう。次に最初のアクションボタンを押して打ち込もう。一体が崩れるまで打ち続けること。',
+  'hudChrome.bootcamp.taskWreckLineBody':
+    '矢印をたどって木箱の列へ。名前が見えるところまで漂着した木箱に歩み寄り、{interactKey}を押すか、木箱を左クリックして拾い上げよう。六つで荷は満ちる。',
+  'hudChrome.bootcamp.taskWreckLineBodyTouch':
+    '矢印をたどって木箱の列へ。名前が見えるところまで漂着した木箱に歩み寄り、木箱をタップするか、使用ボタンをタップして拾い上げよう。六つで荷は満ちる。',
+  'hudChrome.bootcamp.taskWreckLineBodyPad':
+    '矢印をたどって木箱の列へ。名前が見えるところまで漂着した木箱に歩み寄り、インタラクトボタンを押して拾い上げよう。六つで荷は満ちる。',
+  'hudChrome.bootcamp.readyPouchBody':
+    'ポーチは買えた。{bagsKey}を押してバッグを開き、亜麻のポーチを左クリックして空いた鞄留めに締めよう。それから{npc}のもとへ戻り、{interactKey}を押して見せに行こう。',
+  'hudChrome.bootcamp.readyPouchBodyTouch':
+    'ポーチは買えた。バッグを開き、亜麻のポーチをタップして空いた鞄留めに締めよう。それから{npc}のもとへ戻り、相手をタップして見せに行こう。',
+  'hudChrome.bootcamp.readyPouchBodyPad':
+    'ポーチは買えた。バッグを開き、亜麻のポーチを選んで空いた鞄留めに締めよう。それから{npc}のもとへ戻り、インタラクトボタンを押して見せに行こう。',
+  'hudChrome.bootcamp.bellTitle': '鐘を鳴らす',
+  'hudChrome.bootcamp.bellBody':
+    '渡りは勝ち取った。桟橋のそばの渡しの鐘まで歩き、{interactKey}を押すか、左クリックして、イーストブルックへ出航しよう。',
+  'hudChrome.bootcamp.bellBodyTouch':
+    '渡りは勝ち取った。桟橋のそばの渡しの鐘まで歩き、鐘をタップして、イーストブルックへ出航しよう。',
+  'hudChrome.bootcamp.bellBodyPad':
+    '渡りは勝ち取った。桟橋のそばの渡しの鐘まで歩き、インタラクトボタンを押して、イーストブルックへ出航しよう。',
   'entities.zones.proving_shore.pois.4.label': 'ガントレット',
   'entities.items.ps_castaway_crate.name': '漂着した木箱',
   'entities.items.ps_ferry_bell.name': '渡しの鐘',

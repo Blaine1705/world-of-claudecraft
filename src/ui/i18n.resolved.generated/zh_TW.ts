@@ -931,7 +931,20 @@ export const zh_TW: EnTranslations = {
       "coachReadyTitle": "差事辦妥",
       "coachReadyBody": "回到{npc}身邊，按 {interactKey}，或用滑鼠左鍵點擊對方，交上差事，領取報酬。",
       "coachReadyBodyTouch": "回到{npc}身邊，點按對方，交上差事，領取報酬。",
-      "coachReadyBodyPad": "回到{npc}身邊，按下互動鍵，交上差事，領取報酬。"
+      "coachReadyBodyPad": "回到{npc}身邊，按下互動鍵，交上差事，領取報酬。",
+      "taskStrikeTrueBody": "Walk up to a straw effigy and press {targetKey}, or left-click it, to make it your target. Then press {attackKey}, or click the first button on the action bar, to swing. Keep striking until one gives out.",
+      "taskStrikeTrueBodyTouch": "Walk up to a straw effigy and tap it to make it your target. Then tap the first button on the action bar to swing. Keep striking until one gives out.",
+      "taskStrikeTrueBodyPad": "Walk up to a straw effigy and press your target button to make it your target. Then press your first action button to swing. Keep striking until one gives out.",
+      "taskWreckLineBody": "Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then press {interactKey}, or left-click the crate, to pick it up. Six fill the haul.",
+      "taskWreckLineBodyTouch": "Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then tap the crate, or tap the Use button, to pick it up. Six fill the haul.",
+      "taskWreckLineBodyPad": "Follow the arrow to the crate line. Walk up to a castaway crate until its name shows, then press your interact button to pick it up. Six fill the haul.",
+      "readyPouchBody": "Pouch bought. Press {bagsKey} to open your bags and left-click the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and press {interactKey} to show it off.",
+      "readyPouchBodyTouch": "Pouch bought. Open your bags and tap the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and tap them to show it off.",
+      "readyPouchBodyPad": "Pouch bought. Open your bags and choose the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and press your interact button to show it off.",
+      "bellTitle": "Ring the bell",
+      "bellBody": "Your crossing is earned. Walk to the ferry bell beside the pier and press {interactKey}, or left-click it, to sail for Eastbrook.",
+      "bellBodyTouch": "Your crossing is earned. Walk to the ferry bell beside the pier and tap it to sail for Eastbrook.",
+      "bellBodyPad": "Your crossing is earned. Walk to the ferry bell beside the pier and press your interact button on it to sail for Eastbrook."
     },
     "widgets": {
       "clockTitle": "本地時間 - 點擊切換 12／24 小時制",
@@ -2843,8 +2856,8 @@ export const zh_TW: EnTranslations = {
     },
     "noticeboard": {
       "empty": "看起來沒有張貼任何內容。",
-      "listingsBanner": "告示板上貼著 {count} 張告示。",
-      "listingLine": "{guild}：{note}"
+      "popupTitle": "Guild Signpost",
+      "close": "Close"
     },
     "bank": {
       "title": "銀行",

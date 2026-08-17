@@ -1857,6 +1857,7 @@ const UI_DOM_MODULES = [
   'src/ui/aura_overlay_settings.ts',
   'src/ui/movable_frame.ts',
   'src/ui/native_update_prompt.ts',
+  'src/ui/noticeboard_popup.ts',
   'src/ui/options_window.ts',
   'src/ui/ota_update_overlay.ts',
   'src/ui/perf_metrics_sampler.ts',

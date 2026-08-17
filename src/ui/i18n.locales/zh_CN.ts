@@ -8202,8 +8202,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_points': '积分不足。',
   'hudChrome.mailbox.title': '邮箱',
   'hudChrome.noticeboard.empty': '看起来没有张贴任何内容。',
-  'hudChrome.noticeboard.listingsBanner': '告示板上贴着 {count} 张告示。',
-  'hudChrome.noticeboard.listingLine': '{guild}：{note}',
+  'hudChrome.noticeboard.popupTitle': '公会告示柱',
+  'hudChrome.noticeboard.close': '关闭',
   'hudChrome.mailbox.subtitle': '渡鸦邮驿',
   'hudChrome.mailbox.close': '关闭邮箱',
   'hudChrome.mailbox.tabInbox': '收件箱',
@@ -12834,11 +12834,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '第一面旗到手。推动右摇杆转身，直到正对向南延伸的围栏跑道，然后把左摇杆推向上方，沿跑道走到第二面旗。',
   'hudChrome.bootcamp.strafeTitle': '横移走完最后一条跑道',
   'hudChrome.bootcamp.strafeBody':
-    '侧向移动还有另一种办法。按住 {turnKey} 转身，直到回望你刚走下来的那条跑道，然后按住 {strafeKey}，沿最后一条跑道横移到红旗处。横移能让你移动时视线始终锁在目标上：总有一天你会这样作战。',
+    '侧向移动还有另一种办法。按住 {strafeKey}，沿最后一条跑道横移，直到红旗被你甩在身后。横移能让你移动时视线始终锁在目标上：总有一天你会这样作战。',
   'hudChrome.bootcamp.strafeBodyTouch':
-    '侧向移动还有另一种办法。转身直到回望你刚走下来的那条跑道，然后把移动摇杆推向左边，沿最后一条跑道滑步横移到红旗处。',
+    '侧向移动还有另一种办法。把移动摇杆推向左边，沿最后一条跑道横移，直到红旗被你甩在身后。',
   'hudChrome.bootcamp.strafeBodyPad':
-    '侧向移动还有另一种办法。推动右摇杆转身，直到回望你刚走下来的那条跑道，然后把左摇杆推向左边，沿最后一条跑道滑步横移到红旗处。',
+    '侧向移动还有另一种办法。把左摇杆推向左边，沿最后一条跑道横移，直到红旗被你甩在身后。',
   'hudChrome.bootcamp.cameraTitle': '转动视角',
   'hudChrome.bootcamp.cameraBody':
     '交上成绩之前还有最后一课：按住鼠标右键并拖动，把视角绕着自己整整转上一圈。知道身后站着什么，才能打赢仗。',
@@ -12873,6 +12873,31 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bootcamp.coachReadyBodyTouch': '回到{npc}身边，点按对方，交上差事，领取报酬。',
   'hudChrome.bootcamp.coachReadyBodyPad':
     '回到{npc}身边，按下互动键，交上差事，领取报酬。',
+  'hudChrome.bootcamp.taskStrikeTrueBody':
+    '走到一个草人跟前，按 {targetKey}，或者用鼠标左键点击它，把它设为目标。然后按 {attackKey}，或者点击动作条上的第一个按钮，挥出这一刀。一直打到一个散架为止。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyTouch':
+    '走到一个草人跟前，点按它，把它设为目标。然后点按动作条上的第一个按钮，挥出这一刀。一直打到一个散架为止。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyPad':
+    '走到一个草人跟前，按下目标键把它设为目标。然后按下第一个动作键，挥出这一刀。一直打到一个散架为止。',
+  'hudChrome.bootcamp.taskWreckLineBody':
+    '跟着箭头去找货箱线。走到一只漂流货箱跟前，直到它的名字显示出来，然后按 {interactKey}，或者用鼠标左键点击货箱，把它捡起来。凑满六只，这批海货就齐了。',
+  'hudChrome.bootcamp.taskWreckLineBodyTouch':
+    '跟着箭头去找货箱线。走到一只漂流货箱跟前，直到它的名字显示出来，然后点按货箱，或点按使用按钮，把它捡起来。凑满六只，这批海货就齐了。',
+  'hudChrome.bootcamp.taskWreckLineBodyPad':
+    '跟着箭头去找货箱线。走到一只漂流货箱跟前，直到它的名字显示出来，然后按下互动键把它捡起来。凑满六只，这批海货就齐了。',
+  'hudChrome.bootcamp.readyPouchBody':
+    '小袋已买下。按 {bagsKey} 打开背包，用鼠标左键点击亚麻小袋，把它系进一个空着的袋扣。然后回到{npc}身边，按 {interactKey}，把小袋亮给对方看。',
+  'hudChrome.bootcamp.readyPouchBodyTouch':
+    '小袋已买下。打开背包，点按亚麻小袋，把它系进一个空着的袋扣。然后回到{npc}身边，点按对方，把小袋亮给对方看。',
+  'hudChrome.bootcamp.readyPouchBodyPad':
+    '小袋已买下。打开背包，选中亚麻小袋，把它系进一个空着的袋扣。然后回到{npc}身边，按下互动键，把小袋亮给对方看。',
+  'hudChrome.bootcamp.bellTitle': '敲响渡船铃',
+  'hudChrome.bootcamp.bellBody':
+    '你的航程已经挣到了。走到码头旁的渡船铃跟前，按 {interactKey}，或者用鼠标左键点击它，扬帆前往东溪镇。',
+  'hudChrome.bootcamp.bellBodyTouch':
+    '你的航程已经挣到了。走到码头旁的渡船铃跟前，点按它，扬帆前往东溪镇。',
+  'hudChrome.bootcamp.bellBodyPad':
+    '你的航程已经挣到了。走到码头旁的渡船铃跟前，按下互动键，扬帆前往东溪镇。',
   'entities.zones.proving_shore.pois.4.label': '试炼跑道',
   'entities.items.ps_castaway_crate.name': '漂流货箱',
   'entities.items.ps_ferry_bell.name': '渡船铃',
