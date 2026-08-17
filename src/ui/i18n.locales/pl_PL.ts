@@ -4384,8 +4384,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.exorcism.name': 'Rytuał wygnania',
   'entities.abilities.expose_armor.name': 'Wyłom w pancerzu',
   'entities.abilities.faerie_fire.name': 'Wiedźmie światło',
-  'entities.abilities.fear.description':
-    'Wzbudza w przeciwniku przerażenie, zmuszając go do kulenia się przez nawet 8 sek. Każde obrażenie przerywa efekt.',
   'entities.abilities.fear.name': 'Trwoga',
   'entities.abilities.ferocious_bite.name': 'Krwawe ukąszenie',
   'entities.abilities.fire_blast.description':
@@ -11093,8 +11091,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hammer_of_wrath.description': 'Ciska świętym młotem za {damage} obrażeń i generuje 1 Oddanie. Użyteczny poniżej 20% zdrowia albo podczas Boskiego Wzniesienia lub Mściwego gniewu. Gniew Świtu daje dodatkowe rzucenie przeciw dowolnemu celowi, które ignoruje trwający czas odnowienia i zadaje o 20% więcej obrażeń. Wzniesienie zwiększa jego obrażenia o 30%.',
   'entities.abilities.healing_stream.description':
     'Przywraca sojuszniczemu celowi 120 zdrowia przez 12 sek. (talent Szamana)',
-  'entities.abilities.howl_of_terror.description':
-    'Przeraża pobliskich wrogów na maksymalnie 3 sek. Obrażenia mogą przerwać efekt. (talent Czarnoksiężnika)',
   'entities.abilities.ice_block.description':
     'Zamyka cię w litym lodzie na 8 sek., zapewniając odporność na wszystkie obrażenia. Usuwa istniejące zwykłe szkodliwe efekty i zapobiega nakładaniu nowych zwykłych efektów kontroli. Można użyć podczas ogłuszenia lub przemiany. W zamknięciu nie możesz działać. Użyj ponownie, aby anulować. (mag)',
   'entities.abilities.inner_focus.description': 'Sprawia, że twoje następne zaklęcie kapłana jest darmowe i nieprzerywalne. Trwa 60 s.',
@@ -12799,8 +12795,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.needle_of_fate.description':
     'Przebija wroga za {damage} obrażeń od Cienia i generuje 5 Potępienia, jeśli nosi on twoje Evil Eye. Każde trafienie w twoje główne Evil Eye dodaje Nić Przeznaczenia na 12 sekund, maksymalnie do 3. Jeśli nie istnieje żadne Evil Eye, Needle najpierw oznacza swój cel.',
   'entities.abilities.needle_of_fate.name': 'Needle of Fate',
-  'entities.abilities.ossuary_mark.description':
-    'Oznacza wroga na 12 sekund, gromadząc 20% obrażeń zadanych przez ciebie i twoich nieumarłych. Rzuć ponownie, aby zdetonować znak. Jeśli oznaczony wróg umrze, znak eksploduje w promieniu 6 m i tworzy 1 Odłamek Duszy.',
   'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
   'entities.abilities.possess_evil_eye.description':
     'Maledyktor opętuje twoje główne Evil Eye na 15 sekund i generuje 35 Potępienia. Needle of Fate rzuca się w 1 sekundę i generuje 2 dodatkowe Potępienia, Pochłonięcie można kanalizować podczas ruchu, a Sentence zadaje o 25% więcej obrażeń i uwalnia opóźnione echo za 60% obrażeń, malejące do 30% między poziomem 17 a 20.',

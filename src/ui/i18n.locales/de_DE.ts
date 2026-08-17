@@ -5884,8 +5884,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.drain_life.name': 'Verzehren',
   'entities.abilities.drain_life.description': 'Zehrt die Lebenskraft des Ziels aus, verursacht jede Sekunde {damage} Schattenschaden und überträgt euch 70% davon als Gesundheit. Gebrechen überträgt stattdessen alles. Auf euer vorrangiges Evil Eye kanalisiert, verbraucht der Zauber zu Beginn alle Schicksalsfäden, und jeder Faden erzeugt 1 zusätzliche Verdammnis je Tick.',
   'entities.abilities.fear.name': 'Heimsuchung',
-  'entities.abilities.fear.description':
-    'Versetzt den Gegner in Schrecken und lässt ihn bis zu 8 Sek. lang kauern. Jeder Schaden bricht den Effekt.',
   'entities.abilities.searing_pain.name': 'Versengen',
   'entities.abilities.searing_pain.description':
     'Versengt den Gegner mit qualvollem Feuer für {damage} Feuerschaden. Schnell zu wirken.',
@@ -10226,8 +10224,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hammer_of_wrath.description': 'Schleudert einen heiligen Hammer für {damage} Schaden und erzeugt 1 Hingabe. Einsetzbar unter 20% Gesundheit oder während Göttlicher Aufstieg oder Zornige Vergeltung. Zorn der Dämmerung gewährt einen zusätzlichen Einsatz gegen jedes Ziel, der seine laufende Abklingzeit übergeht und 20% mehr Schaden verursacht. Aufstieg erhöht seinen Schaden um 30%.',
   'entities.abilities.healing_stream.description':
     'Stellt bei einem verbündeten Ziel im Verlauf von 12 Sek. 120 Gesundheit wieder her. (Schamanentalent)',
-  'entities.abilities.howl_of_terror.description':
-    'Versetzt Gegner in der Nähe bis zu 3 Sek. lang in Furcht. Schaden kann den Effekt aufheben. (Hexenmeistertalent)',
   'entities.abilities.ice_block.description':
     'Schließt Euch 8 Sek. lang in festes Eis ein und macht Euch gegen jeglichen Schaden immun. Entfernt bestehende gewöhnliche schädliche Effekte und verhindert neue gewöhnliche Kontroll-Effekte. Kann während Betäubung oder Verwandlung eingesetzt werden. Ihr könnt währenddessen nicht handeln. Erneut wirken, um den Effekt abzubrechen. (Magier)',
   'entities.abilities.inner_focus.description': 'Euer nächster Priesterzauber kostet nichts und ist nicht unterbrechbar. Hält 60 Sek. lang an.',
@@ -12963,8 +12959,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.needle_of_fate.description':
     'Durchbohrt den Gegner für {damage} Schattenschaden und erzeugt 5 Verdammnis, wenn er Euer Evil Eye trägt. Jeder Treffer auf Euer primäres Evil Eye fügt für 12 Sek. einen Schicksalsfaden hinzu, bis zu 3. Existiert kein Evil Eye, markiert die Needle zuerst ihr Ziel.',
   'entities.abilities.needle_of_fate.name': 'Needle of Fate',
-  'entities.abilities.ossuary_mark.description':
-    'Markiert einen Gegner 12 Sek. lang und speichert 20% des von Euch und Euren Untoten verursachten Schadens. Erneutes Wirken lässt es detonieren. Stirbt der markierte Gegner, explodiert es im Umkreis von 6 m und erschafft 1 Seelenfragment.',
   'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
   'entities.abilities.possess_evil_eye.description':
     'Der Maledictor besetzt Euer primäres Evil Eye 15 Sek. lang und erzeugt 35 Verdammnis. Needle of Fate wirkt in 1 Sek. und erzeugt 2 zusätzliche Verdammnis, Verzehren kann während der Bewegung kanalisiert werden, und Sentence verursacht 25% mehr Schaden und löst ein verzögertes Echo für 60% Schaden aus, das über die Stufen 17-20 auf 30% abnimmt.',

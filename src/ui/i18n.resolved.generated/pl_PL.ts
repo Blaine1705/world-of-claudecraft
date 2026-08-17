@@ -9997,7 +9997,7 @@ export const pl_PL: EnTranslations = {
       },
       "fear": {
         "name": "Trwoga",
-        "description": "Wzbudza w przeciwniku przerażenie, zmuszając go do kulenia się przez nawet 8 sek. Każde obrażenie przerywa efekt."
+        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect."
       },
       "searing_pain": {
         "name": "Przypalenie",
@@ -10243,7 +10243,7 @@ export const pl_PL: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Oznacza wroga na 12 sekund, gromadząc 20% obrażeń zadanych przez ciebie i twoich nieumarłych. Rzuć ponownie, aby zdetonować znak. Jeśli oznaczony wróg umrze, znak eksploduje w promieniu 6 m i tworzy 1 Odłamek Duszy."
+        "description": "Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10627,7 +10627,7 @@ export const pl_PL: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Wycie Grozy",
-        "description": "Przeraża pobliskich wrogów na maksymalnie 3 sek. Obrażenia mogą przerwać efekt. (talent Czarnoksiężnika)"
+        "description": "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)"
       },
       "ice_block": {
         "name": "Zimna Trumna",

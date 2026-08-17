@@ -9997,7 +9997,7 @@ export const de_DE: EnTranslations = {
       },
       "fear": {
         "name": "Heimsuchung",
-        "description": "Versetzt den Gegner in Schrecken und lässt ihn bis zu 8 Sek. lang kauern. Jeder Schaden bricht den Effekt."
+        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect."
       },
       "searing_pain": {
         "name": "Versengen",
@@ -10243,7 +10243,7 @@ export const de_DE: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Markiert einen Gegner 12 Sek. lang und speichert 20% des von Euch und Euren Untoten verursachten Schadens. Erneutes Wirken lässt es detonieren. Stirbt der markierte Gegner, explodiert es im Umkreis von 6 m und erschafft 1 Seelenfragment."
+        "description": "Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10627,7 +10627,7 @@ export const de_DE: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Schreckensheulen",
-        "description": "Versetzt Gegner in der Nähe bis zu 3 Sek. lang in Furcht. Schaden kann den Effekt aufheben. (Hexenmeistertalent)"
+        "description": "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)"
       },
       "ice_block": {
         "name": "Kalter Sarg",

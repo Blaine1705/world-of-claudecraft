@@ -3154,7 +3154,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.drain_life.description': '대상의 생명력을 집어삼켜 매초 {damage}의 암흑 피해를 입히고 그중 70%를 생명력으로 당신에게 옮깁니다. 고통은 대신 전부를 옮깁니다. 주된 사안에 정신을 집중하면 시작할 때 운명의 실타래를 모두 소모하고, 실타래마다 매 주기 단죄를 1씩 더 만듭니다.',
   'entities.abilities.fear.name': '번민',
   'entities.abilities.fear.description':
-    '적에게 공포를 심어 최대 8초 동안 떨게 만듭니다. 피해를 받으면 효과가 해제됩니다.',
+    '적에게 공포를 심어 최대 5초 동안 떨게 만듭니다. 대상 최대 생명력의 8%에 해당하는 누적 피해를 받으면 효과가 해제됩니다.',
   'entities.abilities.searing_pain.name': '지지기',
   'entities.abilities.searing_pain.description':
     '고통스러운 불길로 적을 태워 {damage}의 화염 피해를 입힙니다. 빠르게 시전합니다.',
@@ -9796,7 +9796,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     '12초에 걸쳐 아군 대상의 생명력을 120 회복합니다. (주술사 특성)',
   'entities.abilities.howl_of_terror.description':
-    '주위 적을 최대 3초 동안 공포에 빠뜨립니다. 피해를 받으면 효과가 해제될 수 있습니다. (흑마법사 특성)',
+    '주위 적을 최대 5초 동안 공포에 빠뜨립니다. 대상 최대 생명력의 8%에 해당하는 누적 피해를 받으면 공포가 해제됩니다. (흑마법사 특성)',
   'entities.abilities.ice_block.description':
     '8초 동안 단단한 얼음 속에 자신을 가두어 모든 피해에 면역이 됩니다. 이미 활성화된 일반적인 해로운 효과를 제거하고 새로운 일반 제어 효과가 적용되는 것을 방지합니다. 기절 또는 변이 상태에서도 사용할 수 있습니다. 갇힌 동안에는 행동할 수 없습니다. 다시 사용하면 취소됩니다. (마법사)',
   'entities.abilities.inner_focus.description': '다음 사제 주문을 소모 없이, 그리고 방해받지 않게 만듭니다. 60초 지속됩니다.',
@@ -11964,7 +11964,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '멀리 있는 적을 성스러운 사슬로 즉시 결박합니다. 적은 자신에게서 3미터 거리까지 초당 18미터의 속도로 끌려오며, 도착하면 4초 동안 이동 속도가 50% 감소합니다. 승천 중에는 주변의 두 번째 적도 결박합니다.',
   'entities.abilities.oath_chain.name': '맹세의 사슬',
   'entities.abilities.ossuary_mark.description':
-    '적에게 12초 동안 표식을 남겨 당신과 당신의 언데드가 입힌 피해의 20%를 저장합니다. 다시 시전하면 표식을 터뜨립니다. 표식이 남은 적이 죽으면 6미터 안에서 폭발하고 영혼 조각 1개를 생성합니다.',
+    '적에게 15초 동안 표식을 남겨 당신과 당신의 언데드가 입힌 피해의 20%를 저장합니다. 다시 시전하면 표식을 터뜨립니다. 표식이 남은 적이 죽으면 6미터 안에서 폭발하고 영혼 조각 1개를 생성합니다.',
   'entities.abilities.ossuary_mark.name': '납골 표식',
   'entities.abilities.overbloom.description':
     '푸른 생장 5단계를 소모합니다: 자신의 지속 치유 효과를 지닌 모든 아군이 해당 효과의 남은 치유량 중 60%를 즉시 회복하고, 해당 효과는 제거되며, 대상에게 새로운 야생 개화를 심습니다.',

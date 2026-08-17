@@ -10,6 +10,9 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.abilities.fear.description",
+    "entities.abilities.howl_of_terror.description",
+    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -25,6 +28,9 @@ export const pending: Record<string, readonly string[]> = {
     "sim.delve.enemiesRemain"
   ],
   "es_ES": [
+    "entities.abilities.fear.description",
+    "entities.abilities.howl_of_terror.description",
+    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -40,6 +46,9 @@ export const pending: Record<string, readonly string[]> = {
     "sim.delve.enemiesRemain"
   ],
   "fr_FR": [
+    "entities.abilities.fear.description",
+    "entities.abilities.howl_of_terror.description",
+    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -55,6 +64,9 @@ export const pending: Record<string, readonly string[]> = {
     "sim.delve.enemiesRemain"
   ],
   "fr_CA": [
+    "entities.abilities.fear.description",
+    "entities.abilities.howl_of_terror.description",
+    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -71,6 +83,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.abilities.fear.description",
+    "entities.abilities.howl_of_terror.description",
+    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -86,6 +101,9 @@ export const pending: Record<string, readonly string[]> = {
     "sim.delve.enemiesRemain"
   ],
   "de_DE": [
+    "entities.abilities.fear.description",
+    "entities.abilities.howl_of_terror.description",
+    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -117,6 +135,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.title"
   ],
   "pt_BR": [
+    "entities.abilities.fear.description",
+    "entities.abilities.howl_of_terror.description",
+    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -136,6 +157,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.title"
   ],
   "cs_CZ": [
+    "entities.abilities.fear.description",
+    "entities.abilities.howl_of_terror.description",
+    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -151,6 +175,9 @@ export const pending: Record<string, readonly string[]> = {
     "sim.delve.enemiesRemain"
   ],
   "nl_NL": [
+    "entities.abilities.fear.description",
+    "entities.abilities.howl_of_terror.description",
+    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -166,6 +193,9 @@ export const pending: Record<string, readonly string[]> = {
     "sim.delve.enemiesRemain"
   ],
   "pl_PL": [
+    "entities.abilities.fear.description",
+    "entities.abilities.howl_of_terror.description",
+    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -181,6 +211,9 @@ export const pending: Record<string, readonly string[]> = {
     "sim.delve.enemiesRemain"
   ],
   "id_ID": [
+    "entities.abilities.fear.description",
+    "entities.abilities.howl_of_terror.description",
+    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -196,6 +229,9 @@ export const pending: Record<string, readonly string[]> = {
     "sim.delve.enemiesRemain"
   ],
   "tr_TR": [
+    "entities.abilities.fear.description",
+    "entities.abilities.howl_of_terror.description",
+    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -211,6 +247,9 @@ export const pending: Record<string, readonly string[]> = {
     "sim.delve.enemiesRemain"
   ],
   "sv_SE": [
+    "entities.abilities.fear.description",
+    "entities.abilities.howl_of_terror.description",
+    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -226,6 +265,9 @@ export const pending: Record<string, readonly string[]> = {
     "sim.delve.enemiesRemain"
   ],
   "vi_VN": [
+    "entities.abilities.fear.description",
+    "entities.abilities.howl_of_terror.description",
+    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -241,6 +283,9 @@ export const pending: Record<string, readonly string[]> = {
     "sim.delve.enemiesRemain"
   ],
   "da_DK": [
+    "entities.abilities.fear.description",
+    "entities.abilities.howl_of_terror.description",
+    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
