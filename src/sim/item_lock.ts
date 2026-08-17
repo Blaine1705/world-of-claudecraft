@@ -18,8 +18,8 @@
 // (enforced by tests/architecture.test.ts). Draws no rng.
 
 import { bagCapacity, canGrantItemInstance } from './bags';
-import { isItemLocked } from './item_lock_flag';
 import { selectedInventorySlot } from './item_copy_ref';
+import { isItemLocked } from './item_lock_flag';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { InvSlot, ItemInstancePayload } from './types';
