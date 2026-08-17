@@ -10,14 +10,30 @@ the site plan, then phased work).
 
 ## 1. Program goal
 
-Build New Eastbrook: the town grows south out of its walls into the vale's
-southern basin. Two tenants hold that ground today, and the program clears
-both:
+Build New Eastbrook: a coastal harbor town in the vale's southern basin,
+the arrival shore of the whole game. The owner's brief (2026-08-17, locked
+in section 3): new players finish a tutorial on an island offshore to the
+east (a SEPARATE workstream, not this program) and are ferried across the
+sea into Eastbrook's docks, stepping off a pier straight into town. The
+town itself is a FULL REBUILD, not an extension: much larger than the old
+circle, deliberately spaced out, NON-circular layout, NPCs distributed
+instead of clustered, because every new player funnels through Eastbrook
+and the old tight ring overwhelms.
+
+The land changes that follow from the brief:
 
 - The Sowfield boarball stadium (the Vale Cup minigame's home) is REMOVED
-  from the game.
-- The Copper Dig (the tunnel rat diggers' mine) is MOVED out of the basin
-  flank. DONE: phase 0 shipped in this PR's foundation commits, see section 4.
+  from the game; the town rises on its basin.
+- The old walled town circle at the origin is DISMANTLED once the new town
+  stands; its ground becomes the NEW Wolf Run (the wolves move inland and
+  reclaim the old town's fields).
+- The Copper Dig moves to the vale's NORTHEAST, near Mirror Lake on the way
+  to the Mirefen border. Phase 0's coastal dig headland (built before the
+  harbor decision existed) REVERTS to open sea: that water is the ferry
+  lane and harbor mouth.
+- The docks rise on the town's eastern flank, on the ground the dig vacated
+  in phase 0, with the sea carved in to meet clean walkable piers, ships,
+  and the ferry berth.
 
 Everything else in this plan happens as sub-work on the epic branch, by any
 contributor, one concern per PR, gate green at every merge
@@ -38,27 +54,58 @@ contributor, one concern per PR, gate green at every merge
   southeast of town. Screen-space "west" in older docs (the Vale Cup PRD) is
   in-fiction east.
 
-## 3. The land plan
+## 3. The land plan (v2, the owner's 2026-08-17 brief)
 
-The reserved New Eastbrook footprint, as of this foundation (the build-out
-phase may refine it):
+Compass reminder: +z is north, +x is WEST, so east is negative x. The
+tutorial island sits offshore beyond the vale's east coast; it is another
+contributor's workstream and this program never builds it, only the shore
+that receives its ferry.
 
-- The Sowfield parcel: the stadium's decoration-exclusion shell,
-  `SOWFIELD_EXCLUDE` in `src/sim/vale_cup_layout.ts` (x [-66, 44],
-  z [-151, -73]). A flat, buildable 90 by 66 basin at height -2.6 once the
-  stadium goes, with its own terrain plateau arm already shaping it.
-- The freed dig flank: the old Copper Dig cluster's ground on the basin's
-  northeast shoulder, x [-104, -65], z [-82, -29]. Cleared by phase 0.
-- The approach: the unroaded x = 0 column from the town's south wall past
-  Reliquary Hill (POI at (-5, -52), the Collapsed Reliquary delve door and
-  ruin ring) and the Vale Chapel Yard graveyard at (4, -56). Those three
-  landmarks stay; they become New Eastbrook's northern neighbors.
-- Standing neighbors that do NOT move: the bandit camps and Gorrak (x +50 to
-  +95), the Sableweb spider camp, the extended mine road (it now runs through
-  the freed flank out to the dig headland, and the town build should adopt
-  it as its southeast road).
+The macro moves, as one rotation of the map's northwest-to-southeast axis:
+
+- THE TOWN: New Eastbrook fills the southern basin (the Sowfield parcel,
+  `SOWFIELD_EXCLUDE` x [-66, 44], z [-151, -73], flat at -2.6 once the
+  stadium goes) and spreads onto the freed dig flank to its northeast
+  (x [-104, -65], z [-82, -29]). Full rebuild: spawn, every town NPC, and
+  every service moves here. Layout requirements from the owner: much larger
+  footprint than the old circle, generously spaced, NON-circular (no rings,
+  no radial wall), NPCs distributed across districts instead of pooled at
+  one center, because the whole playerbase funnels through this town.
+- THE DOCKS: on the town's east flank around the old dig ground, the sea
+  carved in to meet them (the harbor takes a bite of the pastures coast).
+  Clean walkable piers, moored ships, a ferry berth facing the open east
+  water where the tutorial-island ferry arrives. Classic coastal town:
+  docks against the town, a harborfront street, the arrival experience IS
+  the town's front door.
+- THE FERRY LANE: the east water from the harbor mouth outward stays OPEN
+  SEA. Phase 0's dig headland (lobe + stamp + relocated cluster) sits in
+  exactly that water and REVERTS in phase 0b.
+- OLD TOWN TO WOLF RUN: the walled circle at the origin is dismantled after
+  the new town takes over. The wolves move inland onto that ground: the new
+  Wolf Run is the old town's fields (Old Greyjaw prowling the leftover
+  foundations is encouraged scenery). Their old northern range frees up.
+- THE COPPER DIG: re-relocates NORTHEAST, near Mirror Lake on the way to
+  the Mirefen border (the band northeast of the lake toward the north road,
+  roughly x [-40, -90], z [90, 140], exact site probed like phase 0). Its
+  neighbors there (the murloc shore camp, the lake herb field, the fishing
+  dock) constrain placement; the gather-node margin suites arbitrate.
+- LANDMARKS THAT STAY: Reliquary Hill (POI (-5, -52), delve door, ruin
+  ring) and the Vale Chapel Yard graveyard (4, -56) become the green seam
+  between the new town and the old-town-turned-Wolf-Run. The bandit camps
+  and Gorrak (x +50 to +95), Sableweb, Boar Meadow, and Mirror Lake itself
+  do not move.
+- DIRECTION PROSE: the town hub MOVES, so every "direction of town" phrase
+  in quest and guide text re-derives from the new hub. The compass-truth
+  suites enforce the sweep mechanically; budget for it in the town slice.
 
 ## 4. Phase 0, DONE in this PR: the Copper Dig relocation
+
+SUPERSEDED IN PART by the v2 land plan: the harbor decision puts open sea
+where phase 0 authored the dig headland, so phase 0b (section 4b) reverts
+the headland coast authoring and moves the cluster to its northeast home.
+The rest of phase 0 stands (the basin flank stays clear, the relocation
+machinery and its test lanes are the template phase 0b reuses). The record
+below stays as shipped history.
 
 The whole mine cluster translated rigidly by (-60, -24) to a new coastal
 headland, keeping every intra-cluster distance, the town bearing (still
@@ -111,6 +158,27 @@ Consequences carried in the same change:
   `tests/eastbrook_camp_spacing.test.ts` (spawnability probe at the new
   site), the compass-truth and quest-direction suites (unchanged text still
   true), threat, guide freshness, and the full parity suite.
+
+## 4b. Phase 0b, OPEN: dig to the northeast, headland back to sea
+
+The reverse-and-redo of phase 0's placement, same rigid-cluster machinery:
+
+- Remove the dig headland lobe from `VALE_LAND_LOBES` and the
+  `COPPER_DIG_TERRAIN_EDITS` level stamp: the east water reopens for the
+  ferry lane and harbor mouth.
+- Translate the whole cluster (POI, camp, Grix, portal, campfire, six
+  veins) to the probed northeast site near Mirror Lake; re-route the mine
+  road tail off the old southeast spur and onto the northern road network.
+  The southeast road reverts to a harbor approach the town slice owns.
+- The murloc camp, lake herb field, fishing dock, and Mirror Lake's
+  waterline are the placement constraints; the same suites that gated
+  phase 0 arbitrate (camp spacing, gather margins, copper_dig_pathing,
+  compass truth: the direction word re-derives from whichever hub is
+  current when the slice lands, so sequence this AFTER the town hub moves
+  or budget two prose touches).
+- Expect the full phase-0 ripple again (parity, terrain fixture, plates,
+  chunk digests, seeded hunts, balance diet lanes) plus a layout epoch
+  bump riding whichever slice lands first in a release window.
 
 ## 5. Phase 1, OPEN: remove the Sowfield and retire the Vale Cup
 
@@ -200,26 +268,45 @@ maintainer's, and slices S5 to S7 depend on them.
 6. Bram's rehoming (S9), and whether a future venue elsewhere ever revives
    boarball (affects how aggressively S2 deletes vs quarantines).
 
-## 7. Phase 2, OPEN: build New Eastbrook
+## 7. Phase 2, OPEN: build New Eastbrook (the harbor town)
 
-Deliberately unplanned here beyond the land plan: the town's program (what New
-Eastbrook IS: districts, buildings, walls, services, NPC moves) is design
-work the epic's contributors and the maintainer shape together. What is
-already decided:
+The town program per the owner's brief, to be detailed in this directory's
+next artifact (a measured site plan in the fenbridge-rebuild shape, with a
+locked gameplay contract) before world-mutating code lands:
 
-- The build follows the shipped town-rebuild pipeline: a measured site plan
-  and locked gameplay contract first (`docs/design/fenbridge-rebuild/
-  master-plan.md` is the template), GLBs through the `image-to-glb` skill and
-  `docs/image-to-glb-asset-workflow.md`, the Eastbrook surface atlas reused,
-  before/after screenshots under `docs/screenshots/`.
-- Terrain authoring for the basin should prefer the data lanes phase 0 used
-  (coast lobes + `terrainEdits` stamps) over new bespoke world.ts arms, and
-  it inherits the Sowfield parcel's plateau only until S1 deletes that arm.
-- Every layout-shaping slice bumps `ONLINE_WORLD_LAYOUT_VERSION` (or rides a
-  slice that does).
-- Content obligations apply per slice: deeds for new conquerable content,
-  reliquary pages for unique loot, wiki regen, world-entity i18n names,
-  webp art per new item id.
+- Layout language: NOT circular. A harbor town grown along streets: a
+  harborfront running the dock edge, a main street climbing west into the
+  basin, districts off it (market, civic, crafts, chapel-side green toward
+  Reliquary Hill), open squares instead of one center. Generous spacing
+  everywhere: this is the town every new player stands in, and crowd room
+  is a stated design requirement, not polish.
+- NPC distribution: the sixteen town NPCs (plus Bram's successor decision,
+  section 6) spread by function across districts so quest pickup does not
+  pool at one point. The quest-camp bearing suites and the NPC payload pin
+  re-baseline with the move.
+- The docks: piers on the carved harbor, ships, the ferry berth for the
+  tutorial-island arrival (the berth and its arrival point land here; the
+  island and the ferry ride itself are the other workstream's). Dock
+  geometry follows the physics/parkour contracts (standable pier decks,
+  honest collision, no wedge pockets).
+- Spawn and arrival: new-character spawn moves to the new town (the ferry
+  berth becomes the fiction of arrival; actual spawn placement decided in
+  the site plan). `ONLINE_WORLD_LAYOUT_VERSION` bumps with the first
+  layout-shaping slice of each release window.
+- Old-town dismantling and the Wolf Run rotation land only after the new
+  town carries spawn, NPCs, and services (no homeless-NPC window). The
+  preserved Grand Armoury's fate is a site-plan decision (it is a
+  landmark asset with its own capture contract).
+- Pipeline: measured site plan first, GLBs through the `image-to-glb`
+  skill and `docs/image-to-glb-asset-workflow.md`, the Eastbrook surface
+  atlas reused, terrain via coast lobes + `terrainEdits` stamps (never new
+  bespoke world.ts arms), before/after screenshots per the `pr-screenshots`
+  skill, content obligations per slice (deeds, reliquary, wiki regen,
+  world-entity i18n, webp art).
+- Suggested slice order: S1/S2 demolition and phase 0b land moves first
+  (they free the ground and the water), then the site plan, then terrain
+  and streets, then buildings by district, then NPC/spawn migration, then
+  old-town dismantling + Wolf Run, then dressing and polish.
 
 ## 8. Regen lanes cheat sheet (every slice needs some of these)
 
