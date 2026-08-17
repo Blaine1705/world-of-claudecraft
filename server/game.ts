@@ -273,6 +273,7 @@ import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
 import { keepaliveSweepDelayed } from './keepalive_sweep';
 import { LINKDEAD_GRACE_MS, planJoin } from './linkdead';
+import { EMPTY_ACCOUNT_COSMETICS, reconcileWornMechChromaForJoin } from './mech_chroma_reconcile';
 import {
   consumeListReadToken,
   createListReadGuard,
@@ -3666,7 +3667,7 @@ export class GameServer {
    *  character's independently chosen look is left alone. */
   private unequipAccountMechChroma(session: ClientSession, chromaId: string): void {
     const skin = mechChromaSkinIndex(chromaId);
-    if (skin < 0 || !session.accountCosmetics.mechChromaIds.includes(chromaId)) return;
+    if (skin < 0) return;
     const e = this.sim.entities.get(session.pid);
     if (e?.skinCatalog === 'mech' && e.skin === skin) {
       this.sim.setPlayerSkin(session.pid, 0, 'class');
@@ -3843,15 +3844,14 @@ export class GameServer {
         console.error('pbe boost kit top-up failed:', err);
       }
     }
-    const accountCosmetics = this.rememberAccountCosmetics(
-      accountId,
-      meta.accountCosmetics ?? {
-        completedQuestIds: [],
-        mechChromaIds: [],
-        weaponSkinIds: [],
-        weaponSkinLoadout: {},
-      },
-    );
+    const accountCosmetics = reconcileWornMechChromaForJoin({
+      accountCosmetics: meta.accountCosmetics ?? EMPTY_ACCOUNT_COSMETICS,
+      catalog: player?.skinCatalog,
+      skin: player?.skin ?? 0,
+      remember: (cosmetics) => this.rememberAccountCosmetics(accountId, cosmetics),
+      grant: (chromaId) => grantAccountMechChroma(accountId, chromaId),
+      updateLive: (cosmetics) => this.updateLiveAccountCosmetics(accountId, cosmetics),
+    });
     this.applyAccountQuestLockouts(pid, accountCosmetics);
     // Seed the account-wide weapon-skin loadout onto the fresh sim entity so the
     // applied skin shows from the first snapshot (owned skins only).

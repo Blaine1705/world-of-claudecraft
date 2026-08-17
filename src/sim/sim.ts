@@ -178,6 +178,7 @@ import {
   withWeaponSkinApplied,
 } from './content/weapon_skin_rules';
 import { WEAPON_SKINS } from './content/weapon_skins';
+import { accountCosmeticsWithWornMechChroma } from './mech_chroma_ownership';
 import {
   type AbilityChargeState,
   applyCooldowns,
@@ -3062,6 +3063,11 @@ export class Sim {
     this.players.set(player.id, meta);
     player.skinCatalog = meta.skinCatalog;
     player.skin = meta.skin; // mirror onto the entity so the renderer + wire can read it
+    this.accountCosmetics = accountCosmeticsWithWornMechChroma(
+      this.accountCosmetics,
+      meta.skinCatalog,
+      meta.skin,
+    );
     if (this.primaryId === -1) this.primaryId = player.id;
 
     if (savedState) {
@@ -4651,7 +4657,6 @@ export class Sim {
     if (!r) return false;
     const skin = mechChromaSkinIndex(chromaId);
     if (skin < 0) return false;
-    if (!this.accountCosmetics.mechChromaIds.includes(chromaId)) return false;
     const { meta } = r;
     if (meta.skinCatalog !== 'mech' || meta.skin !== skin) return false;
     this.setPlayerSkin(meta.entityId, 0, 'class');

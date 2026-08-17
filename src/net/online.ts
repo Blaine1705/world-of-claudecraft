@@ -4596,8 +4596,12 @@ export class ClientWorld implements IWorld {
     // like a purchased Armory weapon skin: this only reverts the local
     // player's OWN display, it never revokes ownership.
     const skin = mechChromaSkinIndex(chromaId);
-    if (skin >= 0 && this.accountCosmetics.mechChromaIds.includes(chromaId)) {
-      const current = this.entities.get(this.playerId);
+    const current = this.entities.get(this.playerId);
+    if (
+      skin >= 0 &&
+      (this.accountCosmetics.mechChromaIds.includes(chromaId) ||
+        (current?.skinCatalog === 'mech' && current.skin === skin))
+    ) {
       if (current?.skinCatalog === 'mech' && current.skin === skin) {
         current.skin = 0;
         current.skinCatalog = 'class';
