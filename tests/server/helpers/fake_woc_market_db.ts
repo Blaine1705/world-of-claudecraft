@@ -453,7 +453,9 @@ export class FakeWocMarketDb implements WocMarketDb {
       itemRef: null,
       status: 'pending',
       listingId: null,
-      createdAtMs: 0,
+      // Pg stamps created_at DEFAULT now(); the poll read orders by it, so
+      // the fake must carry the real clock or its ordering mirror is a lie.
+      createdAtMs: this.now(),
       buyerAccepted: false,
       sellerAccepted: false,
       listingStatus: null,
@@ -516,34 +518,41 @@ export class FakeWocMarketDb implements WocMarketDb {
     // verdict; the closed-listing grace clause; and the listing/settlement
     // join fields the arm derives its phase from.
     const graceCutoffMs = this.now() - SETTLED_OFFER_GRACE_MS;
-    return [...this.offers.values()]
-      .filter(
-        (o) => o.realm === realm && (o.buyerAccount === account || o.sellerAccount === account),
-      )
-      .filter(
-        (o) =>
-          o.status === 'pending' ||
-          o.status === 'accepted' ||
-          (this.offerUpdatedMs.get(o.id) ?? 0) > graceCutoffMs,
-      )
-      .filter((o) => {
-        if (o.listingId === null) return true;
-        const l = this.listings.get(o.listingId);
-        if (!l || l.status !== 'closed') return true;
-        return (this.listingTouchMs.get(o.listingId) ?? 0) > graceCutoffMs;
-      })
-      .map((o) => {
-        const l = o.listingId === null ? undefined : this.listings.get(o.listingId);
-        const latest = [...this.settlements.values()]
-          .filter((s) => s.listingId === o.listingId)
-          .sort((a, b) => b.id - a.id)[0];
-        return {
-          ...o,
-          listingStatus: l?.status ?? null,
-          listingResolution: l?.resolution ?? null,
-          settlementState: o.listingId === null ? null : (latest?.state ?? null),
-        };
-      });
+    return (
+      [...this.offers.values()]
+        .filter(
+          (o) => o.realm === realm && (o.buyerAccount === account || o.sellerAccount === account),
+        )
+        .filter(
+          (o) =>
+            o.status === 'pending' ||
+            o.status === 'accepted' ||
+            (this.offerUpdatedMs.get(o.id) ?? 0) > graceCutoffMs,
+        )
+        .filter((o) => {
+          if (o.listingId === null) return true;
+          const l = this.listings.get(o.listingId);
+          if (!l || l.status !== 'closed') return true;
+          return (this.listingTouchMs.get(o.listingId) ?? 0) > graceCutoffMs;
+        })
+        // Mirror the Pg read's ORDER BY o.created_at DESC LIMIT 50 (id breaks
+        // same-clock ties deterministically), so an ordering or truncation
+        // assumption cannot pass here and fail against Postgres.
+        .sort((a, b) => b.createdAtMs - a.createdAtMs || b.id - a.id)
+        .slice(0, 50)
+        .map((o) => {
+          const l = o.listingId === null ? undefined : this.listings.get(o.listingId);
+          const latest = [...this.settlements.values()]
+            .filter((s) => s.listingId === o.listingId)
+            .sort((a, b) => b.id - a.id)[0];
+          return {
+            ...o,
+            listingStatus: l?.status ?? null,
+            listingResolution: l?.resolution ?? null,
+            settlementState: o.listingId === null ? null : (latest?.state ?? null),
+          };
+        })
+    );
   }
 
   async resolveDirectedOffer(

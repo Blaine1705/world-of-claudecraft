@@ -170,6 +170,15 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
         <p class="trade-woc-done">${esc(t('hudChrome.trade.woc.settled'))}</p>
       </div>`;
     }
+    if (o.phase === 'closed') {
+      // The controller reports the honest reason and clears the offer in the
+      // same synchronous step, so this face is unreachable in practice. It
+      // exists so a dead deal can NEVER fall through to the review face below
+      // and offer Decline or Withdraw on a listing the server already closed.
+      return `<div class="trade-woc-arm">${modeTabs}
+        <p class="trade-woc-hint" data-woc-hint role="status"></p>
+      </div>`;
+    }
     if (o.phase === 'awaiting_payment' || o.phase === 'paying') {
       // The goods are already in escrow. Exactly one face here is actionable
       // per side: the buyer's Pay button while the payment has not started,

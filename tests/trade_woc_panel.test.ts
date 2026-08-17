@@ -579,6 +579,27 @@ describe('the payment phase, in the window rather than elsewhere', () => {
     }
   });
 
+  it('offers NO action on a closed deal, for either side', () => {
+    // The controller clears a closed offer synchronously, so this face should
+    // be unreachable; the pin exists because without an explicit arm a closed
+    // row falls through to the review face and offers Decline / Withdraw on a
+    // listing the server already closed.
+    const actions = [
+      '[data-woc-decline]',
+      '[data-woc-cancel]',
+      '[data-woc-pay]',
+      '[data-woc-sign]',
+      '[data-woc-cancel-sale]',
+      '[data-woc-send]',
+    ];
+    for (const role of ['buyer', 'seller'] as const) {
+      const root = paint(deps({ pendingOffer: { ...paying, role, phase: 'closed' } }));
+      for (const sel of actions) {
+        expect(root.querySelector(sel), `${role} ${sel}`).toBeNull();
+      }
+    }
+  });
+
   it('reports a pay press', () => {
     const d = deps({ pendingOffer: paying });
     paint(d).querySelector<HTMLElement>('[data-woc-pay]')?.click();

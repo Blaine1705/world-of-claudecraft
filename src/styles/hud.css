@@ -7613,7 +7613,7 @@
   }
   .trade-woc-terms-link {
     font-size: 11px;
-    color: var(--color-text-link, #d8b46a);
+    color: var(--gold);
     text-decoration: underline;
   }
   /* Empty derived lines collapse instead of leaving gaps in the flex column. */

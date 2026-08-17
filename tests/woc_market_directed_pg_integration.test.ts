@@ -1418,5 +1418,19 @@ describeDb('woc market directed rail against real Postgres', () => {
       expect(ids).toContain(fresh);
       expect(ids).not.toContain(stale);
     });
+
+    it('the schema carries the non-partial account indexes this poll read runs on', async () => {
+      // The grace arm above means the read's predicate (status IN
+      // pending,accepted OR updated_at inside the window) can NEVER use the
+      // pending-only partial indexes, so without these two every 2-second
+      // poll seq-scans a table that grows per offer. Existence-pinned so a
+      // schema edit cannot silently put the seq scan back.
+      const res = await pool.query(
+        `SELECT indexname FROM pg_indexes WHERE tablename = 'woc_market_directed_offers'`,
+      );
+      const names = res.rows.map((r) => String(r.indexname));
+      expect(names).toContain('woc_market_offers_buyer_all');
+      expect(names).toContain('woc_market_offers_seller_all');
+    });
   });
 });

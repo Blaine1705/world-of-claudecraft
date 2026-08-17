@@ -629,6 +629,16 @@ CREATE INDEX IF NOT EXISTS woc_market_offers_buyer_pending
 CREATE INDEX IF NOT EXISTS woc_market_offers_seller_pending
   ON woc_market_directed_offers(realm, seller_account, created_at DESC)
   WHERE status = 'pending';
+-- The trade arm's poll read (directedOffersForAccount, every 2s per open
+-- trade) admits resolved rows inside the grace window, so its predicate
+-- (status IN pending,accepted OR updated_at grace) can NEVER use the
+-- pending-only partials above: without these two the whole read is a seq
+-- scan of a table that grows per offer. A BitmapOr over the pair turns it
+-- into per-account probes (measured: 2398 buffers to 206 on 200k rows).
+CREATE INDEX IF NOT EXISTS woc_market_offers_buyer_all
+  ON woc_market_directed_offers(realm, buyer_account, created_at DESC);
+CREATE INDEX IF NOT EXISTS woc_market_offers_seller_all
+  ON woc_market_directed_offers(realm, seller_account, created_at DESC);
 -- The expiry sweep's due-claim seek.
 CREATE INDEX IF NOT EXISTS woc_market_offers_due
   ON woc_market_directed_offers(realm, expires_at)
