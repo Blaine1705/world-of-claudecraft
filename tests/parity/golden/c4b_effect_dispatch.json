@@ -1026,7 +1026,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 971,
-      "state": "a9c72662",
+      "state": "213bf9c2",
       "events": "64a1536a",
       "rng": {
         "draws": 4,
@@ -1037,7 +1037,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 971,
-      "state": "9543713b",
+      "state": "9addf423",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -1048,7 +1048,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 971,
-      "state": "c606d002",
+      "state": "56f7b562",
       "events": "741638a5",
       "rng": {
         "draws": 48,
@@ -1059,7 +1059,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 971,
-      "state": "954f053c",
+      "state": "6289b01c",
       "events": "741638a5",
       "rng": {
         "draws": 80,
@@ -1070,7 +1070,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 971,
-      "state": "2e3c5df8",
+      "state": "1dcb3606",
       "events": "741638a5",
       "rng": {
         "draws": 113,
@@ -1081,7 +1081,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 971,
-      "state": "549046dd",
+      "state": "ef5e0017",
       "events": "741638a5",
       "rng": {
         "draws": 137,
@@ -1092,7 +1092,7 @@
       "tick": 65,
       "time": 3.25,
       "nextId": 971,
-      "state": "dad34319",
+      "state": "b501a7af",
       "events": "741638a5",
       "rng": {
         "draws": 176,
@@ -1103,7 +1103,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 971,
-      "state": "93f40bc4",
+      "state": "1e8c61b2",
       "events": "741638a5",
       "rng": {
         "draws": 221,
@@ -1114,7 +1114,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 971,
-      "state": "0732db91",
+      "state": "b978be0d",
       "events": "741638a5",
       "rng": {
         "draws": 268,
@@ -1125,7 +1125,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 971,
-      "state": "3aec82d1",
+      "state": "0f1f55cd",
       "events": "741638a5",
       "rng": {
         "draws": 306,
@@ -1136,7 +1136,7 @@
       "tick": 85,
       "time": 4.25,
       "nextId": 971,
-      "state": "5b60add0",
+      "state": "5d544234",
       "events": "741638a5",
       "rng": {
         "draws": 355,
@@ -1147,7 +1147,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 971,
-      "state": "1ae800ab",
+      "state": "1b21cd17",
       "events": "741638a5",
       "rng": {
         "draws": 402,
@@ -1158,7 +1158,7 @@
       "tick": 95,
       "time": 4.75,
       "nextId": 971,
-      "state": "e965d51d",
+      "state": "3e345b77",
       "events": "741638a5",
       "rng": {
         "draws": 455,
@@ -1169,7 +1169,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 971,
-      "state": "a3cd79f1",
+      "state": "e7e66857",
       "events": "741638a5",
       "rng": {
         "draws": 514,
@@ -1180,7 +1180,7 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 971,
-      "state": "dfe36402",
+      "state": "7efc2b04",
       "events": "741638a5",
       "rng": {
         "draws": 566,
@@ -1191,7 +1191,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 971,
-      "state": "cacf31cd",
+      "state": "d4e3c3a3",
       "events": "741638a5",
       "rng": {
         "draws": 609,
@@ -1202,7 +1202,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 971,
-      "state": "3a147bc4",
+      "state": "3f64067c",
       "events": "741638a5",
       "rng": {
         "draws": 662,
@@ -1213,7 +1213,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 971,
-      "state": "1d06c07c",
+      "state": "2acb2574",
       "events": "741638a5",
       "rng": {
         "draws": 718,
@@ -1224,7 +1224,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 971,
-      "state": "883e5e4e",
+      "state": "d9c49e3e",
       "events": "741638a5",
       "rng": {
         "draws": 777,
@@ -1235,7 +1235,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 971,
-      "state": "ed3dd412",
+      "state": "19b0c402",
       "events": "741638a5",
       "rng": {
         "draws": 825,
@@ -1246,8 +1246,8 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 972,
-      "state": "a117dbc1",
-      "events": "3fdb1b5f",
+      "state": "3b60f079",
+      "events": "db6de5f3",
       "rng": {
         "draws": 852,
         "digest": "4b51a7f0"
@@ -2122,20 +2122,6 @@
         {
           "aggroTargetId": 969,
           "aiState": "chase",
-          "auras": [
-            {
-              "breakChanceScale": 0.1,
-              "breaksOnDamage": true,
-              "duration": 8,
-              "id": "fear_incap",
-              "kind": "incapacitate",
-              "name": "Harrow",
-              "remaining": 3,
-              "school": "shadow",
-              "sourceId": 969,
-              "value": -0.601012
-            }
-          ],
           "combatTimer": 5,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -2200,7 +2186,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 973,
-      "state": "7a576b3c",
+      "state": "41358a74",
       "events": "768e4c12",
       "rng": {
         "draws": 853,
@@ -3079,20 +3065,6 @@
         {
           "aggroTargetId": 969,
           "aiState": "chase",
-          "auras": [
-            {
-              "breakChanceScale": 0.1,
-              "breaksOnDamage": true,
-              "duration": 8,
-              "id": "fear_incap",
-              "kind": "incapacitate",
-              "name": "Harrow",
-              "remaining": 3,
-              "school": "shadow",
-              "sourceId": 969,
-              "value": -0.601012
-            }
-          ],
           "combatTimer": 5,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -3223,7 +3195,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 975,
-      "state": "509aa6ae",
+      "state": "7d87b346",
       "events": "9c9bcf36",
       "rng": {
         "draws": 855,
@@ -4107,20 +4079,6 @@
         {
           "aggroTargetId": 969,
           "aiState": "chase",
-          "auras": [
-            {
-              "breakChanceScale": 0.1,
-              "breaksOnDamage": true,
-              "duration": 8,
-              "id": "fear_incap",
-              "kind": "incapacitate",
-              "name": "Harrow",
-              "remaining": 3,
-              "school": "shadow",
-              "sourceId": 969,
-              "value": -0.601012
-            }
-          ],
           "combatTimer": 5,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -4359,7 +4317,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 976,
-      "state": "ffc6cd83",
+      "state": "838d5da9",
       "events": "e53b6e4f",
       "rng": {
         "draws": 860,
@@ -5255,20 +5213,6 @@
         {
           "aggroTargetId": 969,
           "aiState": "chase",
-          "auras": [
-            {
-              "breakChanceScale": 0.1,
-              "breaksOnDamage": true,
-              "duration": 8,
-              "id": "fear_incap",
-              "kind": "incapacitate",
-              "name": "Harrow",
-              "remaining": 3,
-              "school": "shadow",
-              "sourceId": 969,
-              "value": -0.601012
-            }
-          ],
           "combatTimer": 5,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -5572,7 +5516,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 977,
-      "state": "d835e015",
+      "state": "1fb2dcfd",
       "events": "16077003",
       "rng": {
         "draws": 861,
@@ -6505,20 +6449,6 @@
         {
           "aggroTargetId": 969,
           "aiState": "chase",
-          "auras": [
-            {
-              "breakChanceScale": 0.1,
-              "breaksOnDamage": true,
-              "duration": 8,
-              "id": "fear_incap",
-              "kind": "incapacitate",
-              "name": "Harrow",
-              "remaining": 3,
-              "school": "shadow",
-              "sourceId": 969,
-              "value": -0.601012
-            }
-          ],
           "combatTimer": 5,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -6873,7 +6803,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 978,
-      "state": "f80ae7d5",
+      "state": "731c173d",
       "events": "c4c0318b",
       "rng": {
         "draws": 861,
@@ -7819,20 +7749,6 @@
         {
           "aggroTargetId": 969,
           "aiState": "chase",
-          "auras": [
-            {
-              "breakChanceScale": 0.1,
-              "breaksOnDamage": true,
-              "duration": 8,
-              "id": "fear_incap",
-              "kind": "incapacitate",
-              "name": "Harrow",
-              "remaining": 3,
-              "school": "shadow",
-              "sourceId": 969,
-              "value": -0.601012
-            }
-          ],
           "combatTimer": 5,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -8228,7 +8144,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 978,
-      "state": "f80ae7d5",
+      "state": "731c173d",
       "events": "741638a5",
       "rng": {
         "draws": 861,
@@ -9174,20 +9090,6 @@
         {
           "aggroTargetId": 969,
           "aiState": "chase",
-          "auras": [
-            {
-              "breakChanceScale": 0.1,
-              "breaksOnDamage": true,
-              "duration": 8,
-              "id": "fear_incap",
-              "kind": "incapacitate",
-              "name": "Harrow",
-              "remaining": 3,
-              "school": "shadow",
-              "sourceId": 969,
-              "value": -0.601012
-            }
-          ],
           "combatTimer": 5,
           "comboUntil": -1,
           "critChance": 0.05,
