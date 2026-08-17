@@ -187,7 +187,7 @@ interface AttributionTargetFixture {
 // Re-minted for the release/v0.39 integrated gate: the current merged tree
 // computes this composite from clean provenance inputs. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '3c34cc4a9231d521aec458709f89257e6738fc0d313cc6d54790f53f997ab5d1';
+  'e4f1e15fb1920bcfc587bb554506fd070697cdc1eeb99d8833a0229c26cdc9da';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

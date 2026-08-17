@@ -5677,14 +5677,9 @@ export class Renderer {
     await compilePromise;
   }
 
-  // Link the local player's own body spirit (ghost) transparent variants
-  // off-thread so a later spirit release reuses cached programs instead of
-  // linking ~20 inline on the ungated self view (the ~2.2 s death stall).
-  // Applies the ghost materials to the REAL skinned meshes (so the variant
-  // matches the flip's skinning/morph), runs compileAsync's synchronous
-  // prologue, then restores the opaque originals BEFORE awaiting the linker
-  // (the compileShadowPrograms restore-early pattern): no frame draws the ghost,
-  // and the clones the flip reuses stay cached on the visual.
+  // Link the local player's body-spirit variants off-thread so a later spirit
+  // release reuses cached programs instead of linking inline on the self view.
+  // Apply ghost materials to real skinned meshes, then restore opaque originals.
   private async warmSelfSpirit(): Promise<boolean> {
     if (!this.asyncCompileSupported || this.sim.player.ghost) return false;
     const visual = this.views.get(this.sim.player.id)?.visual;
