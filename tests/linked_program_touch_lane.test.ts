@@ -141,8 +141,10 @@ describe('runLinkedProgramTouchLane', () => {
     expect(linkedProgramTouchPriority(GPU_WORK_PRIORITY.VISIBLE_PREWARM)).toBe(
       GPU_WORK_PRIORITY.TAIL_PIECE,
     );
-    expect(GPU_WORK_PRIORITY.TAIL_PIECE).toBeLessThan(GPU_WORK_PRIORITY.VISIBLE_PREWARM);
-    expect(GPU_WORK_PRIORITY.TAIL_PIECE).toBeGreaterThan(GPU_WORK_PRIORITY.BOOT_DEBT);
+    // Below every link submission, the boot-debt resume included, and above
+    // the cosmetic warmers.
+    expect(GPU_WORK_PRIORITY.TAIL_PIECE).toBeLessThan(GPU_WORK_PRIORITY.BOOT_DEBT);
+    expect(GPU_WORK_PRIORITY.TAIL_PIECE).toBeGreaterThan(GPU_WORK_PRIORITY.BACKGROUND);
     const actionable = program(true);
     const { properties, target } = targetWith(new Map([['skinned', actionable]]));
     const queue = stubQueue();

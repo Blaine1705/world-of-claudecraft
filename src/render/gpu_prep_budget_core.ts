@@ -44,8 +44,11 @@ export function gpuPrepClassForPriority(priority: number): GpuPrepClass {
   if (priority >= GPU_WORK_PRIORITY.LIVE_VIEW) return 'visible';
   // BOOT_DEBT sits with VISIBLE_PREWARM rather than with the cosmetic warmers:
   // unpaid link debt surfaces as a first-draw stall in a live frame, so it is
-  // work the player is about to arrive at, not work for its own sake.
+  // work the player is about to arrive at, not work for its own sake. A gate's
+  // tail pieces queue BELOW the debt (a piece finishes a link, a submission
+  // starts one) but are the same kind of work: approaching, never cosmetic.
   if (priority >= GPU_WORK_PRIORITY.BOOT_DEBT) return 'approaching';
+  if (priority === GPU_WORK_PRIORITY.TAIL_PIECE) return 'approaching';
   return 'cosmetic';
 }
 

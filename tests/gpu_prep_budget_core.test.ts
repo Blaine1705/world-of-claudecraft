@@ -38,6 +38,9 @@ describe('gpu prep class mapping', () => {
     // The load-bearing one: unpaid link debt surfaces as a live first-draw
     // stall, so it must NOT fall in with the cosmetic warmers below it.
     expect(gpuPrepClassForPriority(GPU_WORK_PRIORITY.BOOT_DEBT)).toBe('approaching');
+    // A gate's tail pieces queue below the debt but are never cosmetic.
+    expect(gpuPrepClassForPriority(GPU_WORK_PRIORITY.TAIL_PIECE)).toBe('approaching');
+    expect(gpuPrepClassForPriority(GPU_WORK_PRIORITY.TAIL_PIECE - 1)).toBe('cosmetic');
     expect(gpuPrepClassForPriority(GPU_WORK_PRIORITY.BACKGROUND)).toBe('cosmetic');
     expect(gpuPrepClassForPriority(GPU_WORK_PRIORITY.BOOT_RESUME)).toBe('cosmetic');
   });
