@@ -901,12 +901,14 @@ function buildFromTemplates(
   }
 
   const roofHideTargets: RoofHideTarget[] = [];
+  const buildingGroups: THREE.Object3D[] = [];
   for (const building of EASTBROOK_LAYOUT.buildings) {
     const template = templates.get(building.assetId);
     if (!template) throw new Error(`Eastbrook town template is missing: ${building.assetId}`);
     const built = buildBuilding(building, template, groundAt, atlas);
     group.add(built.group);
     roofHideTargets.push(built.hideTarget);
+    buildingGroups.push(built.group);
   }
   const microBuild = buildMicroBatches(templates, groundAt, atlas);
   const microBatches = microBuild.batches;
@@ -917,6 +919,11 @@ function buildFromTemplates(
   const wallBatches = buildWallBatches(wallTemplate, groundAt, atlas);
   for (const batch of wallBatches) group.add(batch);
   const staticCullTargets: THREE.Object3D[] = [...microBatches, ...wallBatches];
+  // The reveal gate compiles the buildings with the static batches: their
+  // per-building materials are not shared with any batch, so a building
+  // outside the roots linked cold on the frame its own fog cull first showed
+  // it (the Fenbridge shape, same fix).
+  const staticRevealRoots: THREE.Object3D[] = [...staticCullTargets, ...buildingGroups];
   const roofVisibilityPlan = newEastbrookRoofVisibilityPlan();
 
   group.userData.buildingIds = EASTBROOK_LAYOUT.buildings.map((building) => building.id);
@@ -946,7 +953,7 @@ function buildFromTemplates(
       revealGate = gate;
     },
     staticRevealRoots(): readonly THREE.Object3D[] {
-      return staticCullTargets;
+      return staticRevealRoots;
     },
     update(
       camX: number,
@@ -975,6 +982,11 @@ function buildFromTemplates(
       for (let index = 0; index < staticCullTargets.length; index++) {
         staticCullTargets[index].visible = staticVisible;
       }
+      // Buildings keep their own fog cull and roof fade, but their FIRST
+      // reveal rides the same hold as the batches: while the gate compiles
+      // the town they stay hidden, and once revealed the latch above never
+      // consults the gate again (a fog re-entry is a plain cull flip).
+      const buildingsHeld = reveal === 'held';
       for (let index = 0; index < roofHideTargets.length; index++) {
         const target = roofHideTargets[index];
         eastbrookRoofVisibilityPlanInto(
@@ -989,7 +1001,7 @@ function buildFromTemplates(
           eyeZ,
           fogFar,
         );
-        target.group.visible = roofVisibilityPlan.visible;
+        target.group.visible = roofVisibilityPlan.visible && !buildingsHeld;
         if (!roofVisibilityPlan.visible) continue;
         target.hidden = roofVisibilityPlan.hidden;
         if (occluderFadeSettled(target.alpha, target.hidden)) continue;

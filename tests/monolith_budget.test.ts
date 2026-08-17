@@ -80,7 +80,10 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again by the castle branch's interior_light_rig.ts extraction;
     // after merging main the merged file lands below both prior pins, so the
     // ceiling is the exact merged count.
-    ceiling: 13689,
+    // Lowered again after extracting the material texture-slot walk
+    // (material_texture_slots.ts) that two renderer methods each carried a
+    // copy of; the streamed-decor gate wiring rode inside that headroom.
+    ceiling: 13676,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

@@ -307,12 +307,16 @@ export function prewarmSubmitShouldStop(
  * `programs.compile-submit` here names the SYNTHETIC dropped entry the
  * deferred-submit hand-off pushes (the manifest entry of that id declares no
  * resumeUnits, so no other resume entry can carry it).
+ * `foliage.materials` IS ambient-scene debt: the species it links stream in
+ * with every step of travel (the distant-only pines and far impostors), not on
+ * a specific event, so its dropped units pay on the debt arm too.
  */
 const PREWARM_DEBT_RESUME_IDS: ReadonlySet<string> = new Set([
   'programs.compile',
   'programs.compile-submit',
   'textures.scene',
   'surface-detail.textures',
+  'foliage.materials',
 ]);
 
 /** True when a dropped entry's resume units are hitch-causing debt. */
