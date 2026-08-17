@@ -348,12 +348,13 @@ describe('the open transition', () => {
 describe('the unstage click mutates the LIVE staged object', () => {
   it('decrements the very array the host holds and pushes the offer', () => {
     const r = rig();
-    openTrade(r);
+    // Open with the wolf_fang already in the sim's own-side offer (the cleaned
+    // table the row renders from), avoiding a non-null assertion on tradeInfo.
+    openTrade(r, [{ itemId: 'wolf_fang', count: 2 }]);
     // Stage after the open reset, exactly as the bags window does: by writing
     // into the same object staged() returns.
     const live = r.host.staged;
     live.items.push({ itemId: 'wolf_fang', count: 2 });
-    r.host.tradeInfo!.myOffer.items = [{ itemId: 'wolf_fang', count: 2 }];
     r.controller.updateTradeWindow();
     const mine = document.querySelector<HTMLElement>('#trade-window .trade-item.mine');
     expect(mine).not.toBeNull();

@@ -203,9 +203,9 @@ describe('woc_market_window: focus management and dialog chrome', () => {
     expect(submit).toContain('itemIndex,');
     expect(submit).not.toContain('itemIndex: this.sellIndex ?? 0');
     // A stillOwns bail after the mint, after the sign, and after the create.
-    expect(submit.match(/if \(!this\.stillOwns\(gen\)\) return;/g)?.length ?? 0).toBeGreaterThanOrEqual(
-      3,
-    );
+    expect(
+      submit.match(/if \(!this\.stillOwns\(gen\)\) return;/g)?.length ?? 0,
+    ).toBeGreaterThanOrEqual(3);
   });
 
   it('marks the dialog root with the title as its one accessible name', () => {
