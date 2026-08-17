@@ -247,6 +247,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'sim.delve.duringArena': 'No puedes entrar en una Profundidad durante un combate de arena.',
   'sim.delve.duringDuel': 'No puedes entrar en una Profundidad durante un duelo.',
   'sim.delve.graveFalters': 'El rito sepulcral vacila.',
+  'sim.delve.enemiesRemain': 'Elimina primero a los enemigos restantes.',
   'sim.delve.levelRequired': 'Debes ser nivel {level} para entrar en {name}.',
   'sim.delve.mechanismOpen':
     'Un mecanismo se abre con un chasquido cerca. Se abre un pasaje hacia el norte. Busca el portal de salida más adelante.',

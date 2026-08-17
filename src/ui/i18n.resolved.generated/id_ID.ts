@@ -7171,7 +7171,7 @@ export const id_ID: EnTranslations = {
       "shopMarksRequired": "Kamu butuh {marks} Tanda Delve untuk membeli {name}.",
       "shopSealPremiumOnly": "Segel ini hanya tunduk pada tangan sang ahli. Hanya taruhan Premium yang dapat membukanya.",
       "passageSealed": "Lorong itu tersegel.",
-      "enemiesRemain": "Clear the remaining enemies first.",
+      "enemiesRemain": "Kalahkan musuh yang tersisa terlebih dahulu.",
       "moveCloserPassage": "Mendekatlah ke lorong.",
       "moveCloserChest": "Mendekatlah ke peti.",
       "moveCloserReliquary": "Mendekatlah ke relikuari.",

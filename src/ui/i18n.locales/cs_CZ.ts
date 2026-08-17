@@ -9024,6 +9024,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.delvesPage.whereHeading': 'Kde nějakou najít',
   'guide.delvesPage.whereBody':
     'První výprava, Zhroucený relikviář, se otevírá na Vrchu relikviáře v počátečním Eastbrookském údolí. Bratr Halven tam drží tabuli a pošle tě dolů, až budeš připraven. Jeho pochůzky tam ale nekončí: za Trollími mohylami na severním okraji Mirefenského močálu tentýž správce otevírá Utopenou litanii výpravníkům, kteří už mají něco za sebou.',
+  'sim.delve.enemiesRemain': 'Nejprve poraz zbývající nepřátele.',
   'guide.talentsPage.heading': 'Talenty a specializace',
   'guide.talentsPage.intro':
     'Talenty jsou způsob, jak udělat třídu vlastní. Jsou volitelné, odpouštějí chyby a snadno se mění, takže můžeš experimentovat bez strachu.',

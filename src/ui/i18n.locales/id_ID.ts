@@ -9414,6 +9414,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'sim.delve.unknownTier': 'Tingkat delve tak dikenal.',
   'sim.delve.wayOutNotOpen': 'Jalan keluar belum terbuka.',
   'sim.delve.whileTrading': 'Kamu tidak dapat memasuki delve saat berdagang.',
+  'sim.delve.enemiesRemain': 'Kalahkan musuh yang tersisa terlebih dahulu.',
   'sim.lockpick.alreadyInProgress': 'Seseorang sudah sedang membobol kunci.',
   'sim.lockpick.cannotPickThat': 'Kamu tidak dapat membobol itu.',
   'sim.lockpick.chooseAnte': 'Pilih 1, 2, atau 3 cungkil.',

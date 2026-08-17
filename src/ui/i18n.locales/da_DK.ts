@@ -8633,6 +8633,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'sim.delve.unknownTier': 'Ukendt delve-niveau.',
   'sim.delve.wayOutNotOpen': 'Vejen ud er endnu ikke åben.',
   'sim.delve.whileTrading': 'Du kan ikke gå ind i et delve, mens du handler.',
+  'sim.delve.enemiesRemain': 'Besejr først de resterende fjender.',
   'sim.lockpick.alreadyInProgress': 'Nogen arbejder allerede på låsen.',
   'sim.lockpick.cannotPickThat': 'Du kan ikke dirke den op.',
   'sim.lockpick.chooseAnte': 'Vælg 1, 2 eller 3 dirke.',

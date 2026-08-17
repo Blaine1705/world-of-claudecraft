@@ -9505,6 +9505,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'worldContent.delveSurfaceExitInteract': 'Appuyez sur F pour remonter',
   'sim.delve.objectiveClearRoom': 'Nettoyez la salle.',
   'sim.delve.objectiveDefeatBoss': 'Vainquez le boss.',
+  'sim.delve.enemiesRemain': "Éliminez d'abord les ennemis restants.",
   'sim.rift.allUnstable': 'Toutes les failles sont instables pour le moment. Réessayez bientôt.',
   'sim.rift.alreadyCleared': 'Cette faille a déjà été nettoyée par {names}.',
   'sim.rift.deadEntry': 'Vous ne pouvez pas entrer dans une faille tant que vous êtes mort.',

@@ -9310,6 +9310,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'sim.delve.unknownTier': 'Cấp bậc hầm thám hiểm không xác định.',
   'sim.delve.wayOutNotOpen': 'Lối ra vẫn chưa mở.',
   'sim.delve.whileTrading': 'Bạn không thể vào hầm thám hiểm khi đang giao dịch.',
+  'sim.delve.enemiesRemain': 'Hãy đánh bại những kẻ địch còn lại trước.',
   'sim.lockpick.alreadyInProgress': 'Đã có người đang cạy ổ khóa.',
   'sim.lockpick.cannotPickThat': 'Bạn không thể cạy thứ đó.',
   'sim.lockpick.chooseAnte': 'Chọn 1, 2 hoặc 3 cây cạy.',

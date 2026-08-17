@@ -9022,6 +9022,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'worldContent.delveSurfaceExitInteract': 'Premi F per risalire',
   'sim.delve.objectiveClearRoom': 'Ripulisci la stanza.',
   'sim.delve.objectiveDefeatBoss': 'Sconfiggi il boss.',
+  'sim.delve.enemiesRemain': 'Elimina prima i nemici rimasti.',
   'sim.rift.allUnstable': 'Tutti gli squarci sono instabili in questo momento. Riprova a breve.',
   'sim.rift.alreadyCleared': 'Questo squarcio è già stato completato da {names}.',
   'sim.rift.deadEntry': 'Non puoi entrare in uno squarcio mentre sei morto.',

@@ -8801,6 +8801,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'sim.delve.unknownTier': 'Onbekende delve-tier.',
   'sim.delve.wayOutNotOpen': 'De weg naar buiten is nog niet open.',
   'sim.delve.whileTrading': 'Je kunt geen delve betreden terwijl je handelt.',
+  'sim.delve.enemiesRemain': 'Versla eerst de overgebleven vijanden.',
   'sim.lockpick.alreadyInProgress': 'Iemand is al bezig met het slot.',
   'sim.lockpick.cannotPickThat': 'Dat kun je niet openpeuteren.',
   'sim.lockpick.chooseAnte': 'Kies 1, 2 of 3 lopers.',

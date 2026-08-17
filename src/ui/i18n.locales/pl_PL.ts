@@ -8820,6 +8820,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'sim.delve.unknownTier': 'Nieznany poziom trudności eskapady.',
   'sim.delve.wayOutNotOpen': 'Droga wyjścia jeszcze się nie otworzyła.',
   'sim.delve.whileTrading': 'Nie możesz wejść do eskapady podczas handlu.',
+  'sim.delve.enemiesRemain': 'Najpierw pokonaj pozostałych wrogów.',
   'sim.lockpick.alreadyInProgress': 'Ktoś już majstruje przy zamku.',
   'sim.lockpick.cannotPickThat': 'Tego nie da się otworzyć wytrychem.',
   'sim.lockpick.chooseAnte': 'Wybierz 1, 2 lub 3 wytrychy.',

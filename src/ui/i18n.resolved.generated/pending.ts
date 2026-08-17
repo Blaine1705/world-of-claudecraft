@@ -9,55 +9,25 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "sim.delve.enemiesRemain"
-  ],
-  "es_ES": [
-    "sim.delve.enemiesRemain"
-  ],
-  "fr_FR": [
-    "sim.delve.enemiesRemain"
-  ],
-  "fr_CA": [
-    "sim.delve.enemiesRemain"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "sim.delve.enemiesRemain"
-  ],
-  "de_DE": [
-    "sim.delve.enemiesRemain"
-  ],
+  "it_IT": [],
+  "de_DE": [],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [
-    "sim.delve.enemiesRemain"
-  ],
+  "pt_BR": [],
   "ru_RU": [],
-  "cs_CZ": [
-    "sim.delve.enemiesRemain"
-  ],
-  "nl_NL": [
-    "sim.delve.enemiesRemain"
-  ],
-  "pl_PL": [
-    "sim.delve.enemiesRemain"
-  ],
-  "id_ID": [
-    "sim.delve.enemiesRemain"
-  ],
-  "tr_TR": [
-    "sim.delve.enemiesRemain"
-  ],
-  "sv_SE": [
-    "sim.delve.enemiesRemain"
-  ],
-  "vi_VN": [
-    "sim.delve.enemiesRemain"
-  ],
-  "da_DK": [
-    "sim.delve.enemiesRemain"
-  ]
+  "cs_CZ": [],
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };

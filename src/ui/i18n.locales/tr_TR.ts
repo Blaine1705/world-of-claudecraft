@@ -9321,6 +9321,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'sim.delve.unknownTier': 'Bilinmeyen delve kademesi.',
   'sim.delve.wayOutNotOpen': 'Çıkış yolu henüz açık değil.',
   'sim.delve.whileTrading': 'Takas yaparken delveye giremezsin.',
+  'sim.delve.enemiesRemain': 'Önce kalan düşmanları temizle.',
   'sim.lockpick.alreadyInProgress': 'Birisi kilidi zaten kurcalıyor.',
   'sim.lockpick.cannotPickThat': 'Onun kilidini açamazsın.',
   'sim.lockpick.chooseAnte': '1, 2 veya 3 maymuncuk seç.',

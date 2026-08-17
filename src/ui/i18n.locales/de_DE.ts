@@ -8843,6 +8843,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'worldContent.delveSurfaceExitInteract': 'Drücke F, um hinaufzuklettern',
   'sim.delve.objectiveClearRoom': 'Den Raum räumen.',
   'sim.delve.objectiveDefeatBoss': 'Den Boss erschlagen.',
+  'sim.delve.enemiesRemain': 'Erledige zuerst die verbleibenden Gegner.',
   'hudChrome.auraEffect.dot': 'Verursacht alle {interval} s {value} {school}schaden',
   'hudChrome.auraEffect.hot': 'Stellt alle {interval} s {value} Gesundheit wieder her',
   'hudChrome.auraEffect.absorb': 'Absorbiert {value} Schaden',

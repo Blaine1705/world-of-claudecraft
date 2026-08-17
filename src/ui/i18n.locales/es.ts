@@ -9084,6 +9084,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'worldContent.delveSurfaceExitInteract': 'Pulsa F para trepar',
   'sim.delve.objectiveClearRoom': 'Despeja la sala.',
   'sim.delve.objectiveDefeatBoss': 'Derrota al jefe.',
+  'sim.delve.enemiesRemain': 'Elimina primero a los enemigos restantes.',
   'sim.rift.allUnstable':
     'Todas las brechas están inestables en este momento. Vuelve a intentarlo pronto.',
   'sim.rift.alreadyCleared': 'Esta brecha ya ha sido despejada por {names}.',

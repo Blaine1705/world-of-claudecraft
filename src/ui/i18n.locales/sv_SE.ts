@@ -8587,6 +8587,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'sim.delve.unknownTier': 'Okänd fördjupningsnivå.',
   'sim.delve.wayOutNotOpen': 'Vägen ut är inte öppen ännu.',
   'sim.delve.whileTrading': 'Du kan inte gå in i en fördjupning medan du handlar.',
+  'sim.delve.enemiesRemain': 'Besegra de återstående fienderna först.',
   'sim.lockpick.alreadyInProgress': 'Någon arbetar redan med låset.',
   'sim.lockpick.cannotPickThat': 'Du kan inte dyrka upp det.',
   'sim.lockpick.chooseAnte': 'Välj 1, 2 eller 3 dyrkar.',

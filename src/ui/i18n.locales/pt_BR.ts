@@ -8899,6 +8899,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'worldContent.delveSurfaceExitInteract': 'Pressione F para subir',
   'sim.delve.objectiveClearRoom': 'Limpe a sala.',
   'sim.delve.objectiveDefeatBoss': 'Derrote o chefe.',
+  'sim.delve.enemiesRemain': 'Elimine primeiro os inimigos restantes.',
   'sim.rift.allUnstable': 'Todas as fendas estão instáveis no momento. Tente novamente em breve.',
   'sim.rift.alreadyCleared': 'Esta fenda já foi concluída por {names}.',
   'sim.rift.deadEntry': 'Você não pode entrar em uma fenda enquanto estiver morto.',
