@@ -846,6 +846,12 @@
     height: 44%;
     color: #ffdf9c;
   }
+  /* Vale Cup remaps the fixed primary seat to the first sport move. The shared
+     action-bar painter marks that state as an ability, so the painted move can
+     replace the hydrated Attack sword instead of stacking underneath it. */
+  body.mobile-touch #mobile-action-attack.ability .ui-icon {
+    display: none;
+  }
   body.mobile-touch #mobile-action-ring button .cd-overlay {
     position: absolute;
     inset: 0;

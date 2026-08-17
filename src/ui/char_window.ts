@@ -456,7 +456,7 @@ export class CharWindow {
       const unequip = document.createElement('button');
       unequip.type = 'button';
       unequip.className = 'equip-unequip-btn';
-      unequip.textContent = '×';
+      unequip.innerHTML = svgIcon('close');
       unequip.setAttribute(
         'aria-label',
         t('hudChrome.paperdoll.unequipAria', { item: itemDisplayName(item) }),
