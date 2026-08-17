@@ -203,7 +203,7 @@ interface AttributionTargetFixture {
 // Re-minted for the v0.39 gate repair: renderer.ts formatting moved under
 // Biome, so the composite follows the actual tree bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '66291e62071590dae04d4f978879e96b2fd636afd9221046a44bd16197dcc45c';
+  'fca3953548bbeb9d3311f380cf12814bd55fea7c7b57420f6cbc0cd849e0177c';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

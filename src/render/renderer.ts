@@ -5642,8 +5642,8 @@ export class Renderer {
       const material = mesh.material;
       swaps.push({ mesh, material });
       mesh.material = Array.isArray(material)
-        ? material.map((item) => prewarmDepthMaterial(this.prewarmDepthMaterials, item))
-        : prewarmDepthMaterial(this.prewarmDepthMaterials, material);
+        ? material.map((item) => prewarmDepthMaterial(this.prewarmDepthMaterials, item, mesh))
+        : prewarmDepthMaterial(this.prewarmDepthMaterials, material, mesh);
     });
     if (swaps.length === 0) return;
     // Match the real shadow pass's program key exactly. A bare

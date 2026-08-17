@@ -123,7 +123,9 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned after merging the wrapper renderer repairs with
     // vfx.mount-programs: the merged file is the exact count below, so any
     // further growth reds again.
-    ceiling: 13733,
+    // Merged with PR #3468's mesh-shaped shadow-depth prewarm call; the
+    // exact merged count is lower than the wrapper pin, so tighten again.
+    ceiling: 13731,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
