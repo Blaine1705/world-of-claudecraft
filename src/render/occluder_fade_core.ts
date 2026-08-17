@@ -93,3 +93,39 @@ export function occluderSegmentHitsBox(
   if (tmin < 0 || tmin > 1) return false;
   return eyeY + (camY - eyeY) * tmin < topY;
 }
+
+/**
+ * Whether the eye-to-camera segment crosses a circular footprint below its
+ * top (XZ distance test, Y checked at the entry point). Either endpoint
+ * standing inside the circle below the top also counts as a hit, mirroring
+ * `occluderSegmentHitsBox`.
+ */
+export function occluderSegmentHitsCircle(
+  circleX: number,
+  circleZ: number,
+  r: number,
+  topY: number,
+  eyeX: number,
+  eyeY: number,
+  eyeZ: number,
+  camX: number,
+  camY: number,
+  camZ: number,
+): boolean {
+  const eyeInside = (eyeX - circleX) ** 2 + (eyeZ - circleZ) ** 2 < r * r;
+  const camInside = (camX - circleX) ** 2 + (camZ - circleZ) ** 2 < r * r;
+  if ((eyeY < topY && eyeInside) || (camY < topY && camInside)) return true;
+  const dx = camX - eyeX;
+  const dz = camZ - eyeZ;
+  const a = dx * dx + dz * dz;
+  if (a < 1e-9) return false;
+  const fx = eyeX - circleX;
+  const fz = eyeZ - circleZ;
+  const b = 2 * (fx * dx + fz * dz);
+  const c = fx * fx + fz * fz - r * r;
+  const disc = b * b - 4 * a * c;
+  if (disc < 0) return false;
+  const t = (-b - Math.sqrt(disc)) / (2 * a);
+  if (t < 0 || t > 1) return false;
+  return eyeY + (camY - eyeY) * t < topY;
+}

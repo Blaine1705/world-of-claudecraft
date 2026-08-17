@@ -80,7 +80,12 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again by the castle branch's interior_light_rig.ts extraction;
     // after merging main the merged file lands below both prior pins, so the
     // ceiling is the exact merged count.
-    ceiling: 13689,
+    // Lowered again wiring the hollow-gate occluder fade (buildHollowGates):
+    // hoisting the repeated camera/look-at reads the new update() call needed
+    // into shared locals collapsed the four existing per-frame view calls
+    // beside it, more than paying for the new call's own lines, so the
+    // merged file lands below the castle branch's own pin too.
+    ceiling: 13681,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

@@ -3,6 +3,7 @@ import {
   OCCLUDER_FADE_ALPHA,
   occluderFadeSettled,
   occluderSegmentHitsBox,
+  occluderSegmentHitsCircle,
   stepOccluderFade,
 } from '../src/render/occluder_fade_core';
 
@@ -100,5 +101,42 @@ describe('occluderSegmentHitsBox', () => {
     expect(hits([-2, 4.9, 0], [4, 11, 0])).toBe(false);
     // Descending ray: enters below the top.
     expect(hits([-2, 4.5, 0], [4, 2, 0])).toBe(true);
+  });
+});
+
+describe('occluderSegmentHitsCircle', () => {
+  // A radius-2 footprint at the origin, 5 units tall.
+  const hits = (eye: [number, number, number], cam: [number, number, number], topY = 5): boolean =>
+    occluderSegmentHitsCircle(0, 0, 2, topY, eye[0], eye[1], eye[2], cam[0], cam[1], cam[2]);
+
+  it('hits when the segment crosses the footprint below the top', () => {
+    expect(hits([-5, 2, 0], [5, 2, 0])).toBe(true);
+    expect(hits([0, 2, -5], [0, 2, 5])).toBe(true);
+  });
+
+  it('misses when the segment passes beside or fully over the circle', () => {
+    expect(hits([-5, 2, 3], [5, 2, 3])).toBe(false);
+    expect(hits([-5, 8, 0], [5, 8, 0])).toBe(false);
+  });
+
+  it('hits when either endpoint stands inside the footprint below the top', () => {
+    expect(hits([0.5, 2, 0.5], [5, 2, 5])).toBe(true);
+    expect(hits([5, 2, 5], [0.5, 2, 0.5])).toBe(true);
+    expect(hits([0.5, 8, 0.5], [5, 8, 5])).toBe(false);
+  });
+
+  it('misses when the circle sits behind the eye rather than between the endpoints', () => {
+    expect(hits([3, 2, 0], [5, 2, 0])).toBe(false);
+  });
+
+  it('uses the height at the circle entry point, not the endpoints alone', () => {
+    // Rising ray: enters the footprint above the top even though the eye is low.
+    expect(hits([-5, 4.9, 0], [5, 11, 0])).toBe(false);
+    // Descending ray: enters below the top.
+    expect(hits([-2, 4.5, 0], [4, 2, 0])).toBe(true);
+  });
+
+  it('misses a segment that only grazes the far side of an unrelated span', () => {
+    expect(hits([-10, 2, 0], [-8, 2, 0])).toBe(false);
   });
 });

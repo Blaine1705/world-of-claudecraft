@@ -6,17 +6,54 @@
 // REALM_PORTALS trigger points so walking into a mouth is walking into the
 // portal; sim/colliders.ts flanks each mouth from the same records. A ring
 // of pink flowers marks the Thornpeak entrance.
+//
+// The two gate models are wide (their generated footprint runs well past the
+// "compact" width the placement assumed, see the occluder radius below), and
+// their authored landings sit only ~5yd out so a portal never bounces an
+// arrival straight back in. That leaves an arriving player's own camera
+// standing inside the rock a step or two after landing: unlike every other
+// large static prop (buildings, great trees, mine mounds, all wired into
+// props.ts's `registerHideable`), the gate meshes never faded when the
+// eye-to-camera segment crossed them, so the screen just stayed full of
+// opaque rock until the player walked far enough away. Mirrors the same
+// occluder-fade pattern dungeon.ts and yumi_maze.ts use for their own
+// standalone hideables (props.ts's version is private to `buildProps`).
 import * as THREE from 'three';
 import { REALM_PORTALS } from '../sim/content/realm';
 import { hash2 } from '../sim/rng';
 import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { cloneMaterialWithHooks } from './material_clone_hooks';
+import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
+import {
+  occluderFadeSettled,
+  occluderSegmentHitsCircle,
+  stepOccluderFade,
+} from './occluder_fade_core';
 import { flowerTuftTexture } from './textures';
+
+interface GateOccluder {
+  x: number;
+  z: number;
+  r: number;
+  topY: number;
+  mats: OccluderFadeMat[];
+  alpha: number;
+}
 
 export interface HollowGatesView {
   group: THREE.Group;
-  update(time: number): void;
+  update(
+    camX: number,
+    camY: number,
+    camZ: number,
+    eyeX: number,
+    eyeY: number,
+    eyeZ: number,
+    dt: number,
+    reducedMotion?: boolean,
+  ): void;
 }
 
 const GATE_URLS = {
@@ -39,6 +76,7 @@ const GATE_HEIGHT = 12;
 export function buildHollowGates(seed: number): HollowGatesView {
   const group = new THREE.Group();
   group.name = 'hollow-gates';
+  const occluders: GateOccluder[] = [];
   const portal = REALM_PORTALS[0];
   if (!portal) return { group, update: () => {} };
 
@@ -53,6 +91,18 @@ export function buildHollowGates(seed: number): HollowGatesView {
     const s = GATE_HEIGHT / Math.max(size.y, 0.001);
     const cx = (box.min.x + box.max.x) / 2;
     const cz = (box.min.z + box.max.z) / 2;
+    // The circle that safely contains the whole rebased XZ footprint
+    // (the model's own corner is its worst case, whichever way `facing`
+    // ultimately rotates it), so the occluder fade below always covers the
+    // rock a player can actually be standing inside, not just the narrow
+    // sim colliders that only fence off walking around the mouth.
+    const footprintRadius =
+      Math.max(
+        Math.hypot(box.min.x - cx, box.min.z - cz),
+        Math.hypot(box.max.x - cx, box.max.z - cz),
+        Math.hypot(box.min.x - cx, box.max.z - cz),
+        Math.hypot(box.max.x - cx, box.min.z - cz),
+      ) * s;
     const inner = new THREE.Group();
     inner.position.set(-cx, -box.min.y, -cz);
     inner.add(gate);
@@ -73,14 +123,24 @@ export function buildHollowGates(seed: number): HollowGatesView {
     }
     outer.position.set(x, seatY - 0.35, z);
     outer.rotation.y = facing;
+    const mats: OccluderFadeMat[] = [];
+    const seenMats = new Map<THREE.Material, OccluderFadeMat>();
     outer.traverse((o) => {
       const mesh = o as THREE.Mesh;
-      if (mesh.isMesh) {
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
+      if (!mesh.isMesh) return;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      const src = mesh.material as THREE.Material;
+      let fade = seenMats.get(src);
+      if (!fade) {
+        fade = occluderFadeMat(cloneMaterialWithHooks(src));
+        seenMats.set(src, fade);
+        mats.push(fade);
       }
+      mesh.material = fade.mat;
     });
     group.add(outer);
+    occluders.push({ x, z, r: footprintRadius, topY: seatY + GATE_HEIGHT, mats, alpha: 1 });
   };
   // the mouth faces the arrival landing (the direction players walk out)
   const facingOf = (side: { x: number; z: number; landing: { x: number; z: number } }): number =>
@@ -139,8 +199,26 @@ export function buildHollowGates(seed: number): HollowGatesView {
 
   return {
     group,
-    update(): void {
-      // still stone and still petals; the portal's magic is the teleport
+    update(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, reducedMotion = false): void {
+      // Petals never move; only the gate rock fades when it stands between
+      // the eye and the camera (see the header note on why this exists).
+      for (const o of occluders) {
+        const hide = occluderSegmentHitsCircle(
+          o.x,
+          o.z,
+          o.r,
+          o.topY,
+          eyeX,
+          eyeY,
+          eyeZ,
+          camX,
+          camY,
+          camZ,
+        );
+        if (occluderFadeSettled(o.alpha, hide)) continue;
+        o.alpha = stepOccluderFade(o.alpha, hide, dt, reducedMotion);
+        applyOccluderFade(o.mats, o.alpha);
+      }
     },
   };
 }
