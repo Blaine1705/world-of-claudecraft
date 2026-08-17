@@ -240,14 +240,20 @@ async function browseListingView(
 }
 
 async function meBody(over: {
-  bids?: WocBidRow[];
-  settlements?: WocSettlementRow[];
+  bids?: (WocBidRow & { itemId?: string })[];
+  settlements?: (WocSettlementRow & { itemId?: string })[];
 }): Promise<Record<string, unknown>> {
   service({
     myActivity: async () => ({
       listings: [listingRow()],
-      bids: over.bids ?? [bidRow()],
-      settlements: over.settlements ?? [settlementRow()],
+      // The activity reads are item-named (the joined listing's item); the
+      // default fixture carries one like the real read, and a test may pass
+      // its own (including '' for the pruned-listing arm).
+      bids: (over.bids ?? [bidRow()]).map((b) => ({ itemId: 'deathlord_warplate', ...b })),
+      settlements: (over.settlements ?? [settlementRow()]).map((s) => ({
+        itemId: 'deathlord_warplate',
+        ...s,
+      })),
       strikes: strikeRow(),
       termsAcceptedAtMs: 1_799_000_000_000,
       wallet: 'BIDDERWALLETPUBKEY111111111111111111111111',
@@ -350,6 +356,7 @@ describe('market wire views expose exactly their pinned key sets', () => {
         'bondReference',
         'bondState',
         'id',
+        'itemId',
         'listingId',
         'placedAtMs',
         'status',
@@ -368,6 +375,7 @@ describe('market wire views expose exactly their pinned key sets', () => {
         'deadlineAtMs',
         'failReason',
         'id',
+        'itemId',
         'listingId',
         'quoteExpiresAtMs',
         'quoteReference',
@@ -493,6 +501,42 @@ describe('the place-bid response wraps bidView and quoteView', () => {
     expect(Object.keys(body).sort()).toEqual(['bid', 'bond']);
     expect((body.bond as Record<string, unknown>).bondCents).toBe(250);
     expect((body.bid as Record<string, unknown>).bondCents).toBe(250);
+  });
+});
+
+describe('activity rows name the listed item (the pay-row identity)', () => {
+  it('carries the joined item id on bid and settlement rows', async () => {
+    const body = await meBody({});
+    expect((body.bids as Record<string, unknown>[])[0].itemId).toBe('deathlord_warplate');
+    expect((body.settlements as Record<string, unknown>[])[0].itemId).toBe('deathlord_warplate');
+  });
+
+  it('collapses a pruned-listing empty id to null', async () => {
+    const body = await meBody({
+      bids: [{ ...bidRow(), itemId: '' }],
+      settlements: [{ ...settlementRow(), itemId: '' }],
+    });
+    expect((body.bids as Record<string, unknown>[])[0].itemId).toBeNull();
+    expect((body.settlements as Record<string, unknown>[])[0].itemId).toBeNull();
+  });
+
+  it('sends null on a mutation response whose row is not item-joined', async () => {
+    service({
+      placeBid: async () => ({
+        ok: true as const,
+        bid: bidRow({ bondCents: 250 }),
+        bond: quoteIntent({ reference: 'WMB_ref1', bondCents: 250 }),
+      }),
+    });
+    const ctx = readCtx({
+      method: 'POST',
+      url: '/api/woc-market/listings/41/bids',
+      params: { id: '41' },
+      body: { characterId: 3, amountCents: 5000, acceptTerms: true },
+    });
+    await handlerFor('POST', '/api/woc-market/listings/:id/bids')(ctx);
+    const { body } = sent(ctx);
+    expect((body.bid as Record<string, unknown>).itemId).toBeNull();
   });
 });
 

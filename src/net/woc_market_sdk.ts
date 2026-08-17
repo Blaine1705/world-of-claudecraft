@@ -133,6 +133,10 @@ export interface WocQuoteView {
 export interface WocBidView {
   id: number;
   listingId: number;
+  /** The listed item this bid is for, on the Activity read; null on the
+   *  mutation responses (the caller already knows the listing) and on an
+   *  older server (absent reads as null). */
+  itemId?: string | null;
   amountCents: number;
   status: string;
   bondCents: number;
@@ -149,6 +153,9 @@ export interface WocBidView {
 export interface WocSettlementView {
   id: number;
   listingId: number;
+  /** The listed item this payment is for, on the Activity read; null on the
+   *  mutation responses and on an older server (absent reads as null). */
+  itemId?: string | null;
   attempt: number;
   amountCents: number;
   state: string;
@@ -182,7 +189,15 @@ export interface WocActivityView {
 }
 
 /** Every mutating call resolves to this: ok, or the server's stable code. */
-export type WocMarketFail = { ok: false; code: string };
+export type WocMarketFail = {
+  ok: false;
+  code: string;
+  /** The parsed error body, when the server sent one: code params (e.g.
+   *  retryAfterSeconds) ride top-level alongside the code in the problem
+   *  envelope, and the matcher (userFacingApiError) reads them from here.
+   *  Mirrors ApiError.params in src/net/online.ts. */
+  params?: Record<string, unknown>;
+};
 export const WOC_MARKET_UNAVAILABLE = 'woc_market.quote_unavailable';
 
 export interface CreateListingRequest {
@@ -278,11 +293,12 @@ export class WocMarketClient {
       });
       const data = await res.json().catch(() => null);
       if (!res.ok) {
-        const code =
-          data && typeof data === 'object' && typeof (data as { code?: unknown }).code === 'string'
-            ? (data as { code: string }).code
-            : WOC_MARKET_UNAVAILABLE;
-        return { ok: false, code };
+        const body =
+          data && typeof data === 'object' ? (data as Record<string, unknown>) : undefined;
+        const code = typeof body?.code === 'string' ? (body.code as string) : WOC_MARKET_UNAVAILABLE;
+        // The whole parsed body rides as params (the ApiError convention):
+        // code params are top-level extension members of the problem envelope.
+        return body === undefined ? { ok: false, code } : { ok: false, code, params: body };
       }
       if (data === null) return { ok: false, code: WOC_MARKET_UNAVAILABLE };
       return { ok: true, data: data as T };
@@ -416,8 +432,10 @@ export class WocMarketClient {
     return out.ok ? { ok: true, ...out.data } : out;
   }
 
-  /** decline is the buyer's verb, withdraw the seller's; the server enforces
-   *  which one the caller is entitled to. */
+  /** decline is the SELLER refusing the incoming offer, withdraw is the BUYER
+   *  pulling the offer they made (the buyer creates the offer); the server
+   *  enforces which one the caller is entitled to and answers a stranger or
+   *  the wrong side not_found. */
   async resolveOffer(
     id: number,
     action: 'decline' | 'withdraw',

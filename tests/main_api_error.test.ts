@@ -116,6 +116,27 @@ describe('userFacingApiError parametric codes', () => {
     // The prose arm for the Discord bare "rate limited" maps to tooManyAttempts.
     expect(userFacingApiError(err)).toBe(t('errors.api.tooManyAttempts'));
   });
+
+  it('names the buy-now cooldown remaining time as a localized duration', () => {
+    const err = userFacingApiError({
+      code: 'woc_market.claim_cooldown',
+      params: { retryAfterSeconds: 1800 },
+    });
+    expect(err).toBe(t('hudChrome.wocMarket.claimCooldownRetry', { duration: formatDuration(1800) }));
+    expect(err).toContain(formatDuration(1800));
+  });
+
+  it('renders the plain cooldown sentence when no remaining time rides (older server)', () => {
+    // NEVER the prose fallback here: the plain apiError copy is real text, so
+    // a param-less refusal still explains itself instead of leaking the code.
+    expect(userFacingApiError({ code: 'woc_market.claim_cooldown' })).toBe(
+      t('apiError.woc_market.claim_cooldown'),
+    );
+    // A junk param value takes the plain arm too, not a NaN duration.
+    expect(
+      userFacingApiError({ code: 'woc_market.claim_cooldown', params: { retryAfterSeconds: 'x' } }),
+    ).toBe(t('apiError.woc_market.claim_cooldown'));
+  });
 });
 
 describe('userFacingApiError transport / server-unreachable failures', () => {

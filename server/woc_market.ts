@@ -119,10 +119,10 @@ export interface WocListingRow {
 }
 
 export type WocDirectedOfferStatus =
-  | 'pending' // awaiting the named buyer
+  | 'pending' // awaiting resolution by either side
   | 'accepted' // became a directed listing; the item is now in escrow
-  | 'declined' // the buyer said no
-  | 'withdrawn' // the seller pulled it before acceptance
+  | 'declined' // the SELLER said no to the incoming offer
+  | 'withdrawn' // the BUYER pulled the offer they had made
   | 'expired'; // the TTL elapsed unanswered
 
 export interface WocDirectedOfferRow {
@@ -218,6 +218,14 @@ export interface WocSettlementRow {
   deadlineAtMs: number;
   createdAtMs: number;
 }
+
+/** The Activity tab's bid row: the bid plus the listed item's id, joined at
+ *  read time so a pay row can NAME what the money is for (a bare "$4.00
+ *  Active" told the player nothing once they held two bids). */
+export type WocActivityBidRow = WocBidRow & { itemId: string };
+
+/** The Activity tab's settlement row, item-named for the same reason. */
+export type WocActivitySettlementRow = WocSettlementRow & { itemId: string };
 
 export interface WocSaleRow {
   id: number;
@@ -570,7 +578,10 @@ export interface WocMarketDb {
     | 'no_buy_now'
     | 'own_listing'
     | 'cancel_pending'
-    | 'claim_cooldown'
+    // The abandon cooldown, with WHEN a retry can first succeed (the later of
+    // the per-listing re-claim cooldown and the hourly-cap drain), so the
+    // refusal can name a remaining time instead of a bare "later".
+    | { refusal: 'claim_cooldown'; retryAtMs: number }
     | 'contended'
   >;
   /** Release a lock, HOLDER-guarded: only holderAccount's lock clears. */
@@ -663,7 +674,9 @@ export interface WocMarketDb {
   ): Promise<'activated' | 'superseded' | 'listing_closed' | 'not_pending' | 'contended'>;
   markBondHeld(bidId: number): Promise<void>;
   lapsePendingBids(realm: string, cutoffMs: number, limit: number): Promise<number>;
-  bidsByAccount(realm: string, account: number, limit: number): Promise<WocBidRow[]>;
+  /** The Activity surface's read: each row also names the listing's item so
+   *  the client can say WHAT a bid or payment is for, not just how much. */
+  bidsByAccount(realm: string, account: number, limit: number): Promise<WocActivityBidRow[]>;
   bidsForListing(listingId: number): Promise<WocBidRow[]>;
   /** Cascade pick: the highest 'outbid' bid meeting `minCents` whose account
    *  is not among `excludedAccounts`. Selection only; the 'won' stamp rides
@@ -711,7 +724,12 @@ export interface WocMarketDb {
     WocSettlementRow | 'live_settlement_exists' | 'listing_closed' | 'winner_gone' | 'contended'
   >;
   settlementById(id: number): Promise<WocSettlementRow | null>;
-  settlementsByAccount(realm: string, account: number, limit: number): Promise<WocSettlementRow[]>;
+  /** Activity read, item-named like bidsByAccount (same rationale). */
+  settlementsByAccount(
+    realm: string,
+    account: number,
+    limit: number,
+  ): Promise<WocActivitySettlementRow[]>;
   liveSettlementForListing(listingId: number): Promise<WocSettlementRow | null>;
   setSettlementQuote(
     id: number,
@@ -1163,8 +1181,17 @@ export type WocMarketRefusal =
   // (server/woc_market_stepup.ts).
   | WocStepUpRefusal;
 
-export type Refused = { ok: false; reason: WocMarketRefusal };
-const refuse = (reason: WocMarketRefusal): Refused => ({ ok: false, reason });
+/** Optional per-refusal values for the route's error envelope. The code's
+ *  declared placeholder list in server/http/error_codes.ts is the contract;
+ *  a refusal carrying params only renders them when the route passes them
+ *  through (throwRefusal's params arm). */
+export type Refused = {
+  ok: false;
+  reason: WocMarketRefusal;
+  params?: Record<string, string | number>;
+};
+const refuse = (reason: WocMarketRefusal, params?: Record<string, string | number>): Refused =>
+  params === undefined ? { ok: false, reason } : { ok: false, reason, params };
 
 // Sweep pass budgets: every arm is bounded per pass so one huge backlog can
 // never starve the others; the next pass continues where this one stopped.
@@ -1490,8 +1517,8 @@ export class WocMarketService {
 
   async myActivity(account: number): Promise<{
     listings: WocListingRow[];
-    bids: WocBidRow[];
-    settlements: WocSettlementRow[];
+    bids: WocActivityBidRow[];
+    settlements: WocActivitySettlementRow[];
     strikes: WocStrikeRow | null;
     termsAcceptedAtMs: number | null;
     wallet: string | null;
@@ -2830,7 +2857,14 @@ export class WocMarketService {
     if (claimed === 'no_buy_now') return refuse('no_buy_now');
     if (claimed === 'own_listing') return refuse('own_listing');
     if (claimed === 'cancel_pending') return refuse('cancel_pending');
-    if (claimed === 'claim_cooldown') return refuse('claim_cooldown');
+    if (typeof claimed === 'object' && 'refusal' in claimed) {
+      // Honest remaining time, never zero: the store computed WHEN a retry can
+      // first succeed, and a floor of one second keeps a boundary race from
+      // telling the player to retry "in 0 seconds" while still refused.
+      return refuse('claim_cooldown', {
+        retryAfterSeconds: Math.max(1, Math.ceil((claimed.retryAtMs - nowMs) / 1000)),
+      });
+    }
     if (claimed === 'contended') return refuse('contended');
 
     const settlement = await this.deps.db.insertSettlement({
@@ -3281,8 +3315,11 @@ export class WocMarketService {
   }
 
   /**
-   * The DIRECTED buyer's non-payment strike, with the two fairness gates a
-   * strike presumes.
+   * The defaulting buyer's non-payment strike, with the two fairness gates a
+   * strike presumes. ONE path for BOTH rails: the directed arms and the
+   * auction-default arm ride it, so the fairness gates can never drift apart
+   * (the auction arm used to call strikeAccount bare, and a public winner
+   * locked out by a pricing pause was struck for the outage).
    *
    * A strike punishes a payment DEFAULT, so it presumes payment was possible:
    * while the price oracle or economy service is unhealthy, buyNow and
@@ -3292,7 +3329,10 @@ export class WocMarketService {
    * pauses). The health read here is the same one guardEnabledHealthy makes,
    * probed at STRIKE time: a blip earlier inside the window is not visible
    * from here and is accepted (recorded residual; the buyer had the rest of
-   * the window).
+   * the window). The gate spares the STRIKE only: the auction arm's bond
+   * forfeiture stays ungated (the R2-ruled contractual consequence; whether
+   * an outage window should also spare the bond is recorded as an open
+   * pre-enable question for the close-out audit, not decided here).
    *
    * And a recorded refusal class that says the chain plausibly saw money
    * spares the strike on the SAME vocabulary the public rail's abandon
@@ -3307,7 +3347,7 @@ export class WocMarketService {
    * HEALTH probe above is the live gate. The arm stays because the exempt
    * list is the one seam that vocabulary lands on when R5 delivers.
    */
-  private async strikeDirectedBuyer(
+  private async strikeDefaultingBuyer(
     account: number,
     nowMs: number,
     failReason: string | null,
@@ -3374,7 +3414,7 @@ export class WocMarketService {
           return;
         }
         if (!(await this.deps.db.everSettledForListing(listing.id))) {
-          await this.strikeDirectedBuyer(listing.directedBuyerAccount, nowMs, null);
+          await this.strikeDefaultingBuyer(listing.directedBuyerAccount, nowMs, null);
         }
         return;
       }
@@ -3610,10 +3650,14 @@ export class WocMarketService {
       // The close-time winner defaulted: forfeit the held bond, strike them.
       // CAS from 'won': a bid something else already resolved (a suspend's
       // CTE cancelled it with its refund queued) must not be re-labelled a
-      // default on top of that resolution.
+      // default on top of that resolution. The strike rides the SHARED
+      // fairness gate (oracle health plus the exempt refusal vocabulary):
+      // a winner locked out by a pricing pause is not struck for the outage.
+      // The forfeit itself stays ungated (R2's ruled consequence; the
+      // outage-window forfeit question is recorded for the pre-enable audit).
       await this.deps.db.markBidStatus(settlement.bidId, 'defaulted', ['won']);
       await this.deps.db.setBondState(settlement.bidId, ['held'], 'forfeit_due');
-      await this.strikeAccount(settlement.buyerAccount, nowMs);
+      await this.strikeDefaultingBuyer(settlement.buyerAccount, nowMs, settlement.failReason);
     } else {
       // An abandoned buy-now. On a PUBLIC listing the buyer committed no
       // money, the lock clears and the listing resumes for the next person,
@@ -3667,7 +3711,7 @@ export class WocMarketService {
         if (!(await this.deps.db.closeListingIfNoOpenSettlement(listing.id, 'unsettled'))) {
           await this.deps.db.markListingSettling(listing.id);
         }
-        await this.strikeDirectedBuyer(settlement.buyerAccount, nowMs, settlement.failReason);
+        await this.strikeDefaultingBuyer(settlement.buyerAccount, nowMs, settlement.failReason);
       }
       return;
     }

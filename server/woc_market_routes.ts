@@ -236,9 +236,16 @@ export const REFUSAL_ERRORS: Record<WocMarketRefusal, { status: number; code: Er
   stepup_signature_invalid: { status: 403, code: 'woc_market.stepup_signature_invalid' },
 };
 
-function throwRefusal(reason: WocMarketRefusal): never {
+/** Params must be passed BY THE CALLER when the refusal carries them (the
+ *  Refused.params channel): a handler that drops them ships a code whose
+ *  declared placeholders never render. Codes with params today:
+ *  woc_market.claim_cooldown (retryAfterSeconds). */
+function throwRefusal(
+  reason: WocMarketRefusal,
+  params?: Record<string, string | number>,
+): never {
   const mapped = REFUSAL_ERRORS[reason] ?? { status: 400, code: 'woc_market.invalid_input' };
-  throw new HttpError(mapped.status, mapped.code);
+  throw new HttpError(mapped.status, mapped.code, params);
 }
 
 const invalid = (): never => {
@@ -377,10 +384,16 @@ function listingView(row: WocListingRow, viewerAccount: number | null): Record<s
   };
 }
 
-function bidView(row: WocBidRow): Record<string, unknown> {
+function bidView(row: WocBidRow & { itemId?: string }): Record<string, unknown> {
   return {
     id: row.id,
     listingId: row.listingId,
+    // What the money is FOR. Item-named on the Activity read (the joined
+    // listing's item); null on the responses whose caller already knows the
+    // listing (placeBid, bond confirms), and null rather than absent so the
+    // key set stays one pinned shape. Empty (a pruned listing) collapses to
+    // null too: the client's "name the item" arm keys on a real id.
+    itemId: row.itemId ? row.itemId : null,
     amountCents: row.amountCents,
     status: row.status,
     bondCents: row.bondCents,
@@ -403,10 +416,12 @@ function bidView(row: WocBidRow): Record<string, unknown> {
   };
 }
 
-function settlementView(row: WocSettlementRow): Record<string, unknown> {
+function settlementView(row: WocSettlementRow & { itemId?: string }): Record<string, unknown> {
   return {
     id: row.id,
     listingId: row.listingId,
+    // Same shape and rationale as bidView.itemId above.
+    itemId: row.itemId ? row.itemId : null,
     attempt: row.attempt,
     amountCents: row.amountCents,
     state: row.state,
@@ -715,7 +730,7 @@ async function buyNowHandler(ctx: Ctx): Promise<void> {
     listingId: idParam(ctx),
     acceptTerms: body.acceptTerms === true,
   });
-  if (!out.ok) throwRefusal(out.reason);
+  if (!out.ok) throwRefusal(out.reason, out.params);
   json(ctx.res, 200, {
     settlement: settlementView(out.settlement),
     quote: quoteView(out.quote),
@@ -788,26 +803,17 @@ async function adminListingsHandler(ctx: Ctx): Promise<void> {
 async function adminSuspendListingHandler(ctx: Ctx): Promise<void> {
   const out = await useService().adminSuspendListing(adminTargetId(ctx));
   if (!out.ok) {
+    // Registered codes, never inline English: the admin envelope serializer
+    // puts the CODE in `error`, and operators are users (the i18n rule), so
+    // these arms ride the same registry the player routes use. 409 for both
+    // retryable classes; `contended` is plain row contention (a guard
+    // transaction briefly holds the listing), where a 404 would read as
+    // "gone" and stop the operator retrying.
     if (out.reason === 'settlement_in_flight') {
-      json(ctx.res, 409, {
-        success: false,
-        data: null,
-        error: 'a payment for this listing is settling; retry once it resolves',
-      });
-      return;
+      throw new HttpError(409, 'woc_market.settlement_in_flight');
     }
-    if (out.reason === 'contended') {
-      // Plain row contention (a guard transaction briefly holds the listing):
-      // a 404 here would read as "gone" and stop the operator retrying.
-      json(ctx.res, 409, {
-        success: false,
-        data: null,
-        error: 'the listing is busy with another operation; retry now',
-      });
-      return;
-    }
-    json(ctx.res, 404, { success: false, data: null, error: 'listing not found or closed' });
-    return;
+    if (out.reason === 'contended') throw new HttpError(409, 'woc_market.contended');
+    throw new HttpError(404, 'woc_market.not_found');
   }
   json(ctx.res, 200, { success: true, data: { suspended: true } });
 }
@@ -815,23 +821,16 @@ async function adminSuspendListingHandler(ctx: Ctx): Promise<void> {
 async function adminSaleExcludedHandler(ctx: Ctx): Promise<void> {
   const body = bodyOf(ctx);
   if (typeof body.excluded !== 'boolean') {
-    json(ctx.res, 400, { success: false, data: null, error: 'invalid input' });
-    return;
+    throw new HttpError(400, 'woc_market.invalid_input');
   }
   const out = await useService().adminSetSaleExcluded(adminTargetId(ctx), body.excluded);
   if (!out.ok) {
-    // Distinct operator answers: a missing row versus a correction blocked by
-    // a standing non-excluded sale row for the same listing.
-    if (out.reason === 'sale_conflict') {
-      json(ctx.res, 409, {
-        success: false,
-        data: null,
-        error: 'another live sale row stands for this listing; exclude it first',
-      });
-      return;
-    }
-    json(ctx.res, 404, { success: false, data: null, error: 'sale not found' });
-    return;
+    // Distinct operator answers, as registered codes (the admin envelope
+    // serializer carries the code; operators are users): a missing row
+    // versus a correction blocked by a standing non-excluded sale row for
+    // the same listing.
+    if (out.reason === 'sale_conflict') throw new HttpError(409, 'woc_market.sale_conflict');
+    throw new HttpError(404, 'woc_market.not_found');
   }
   json(ctx.res, 200, { success: true, data: { excluded: body.excluded } });
 }

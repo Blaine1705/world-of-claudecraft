@@ -8969,6 +8969,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ставка удерживает возвращаемый залог {usd}, оплачиваемый в $WOC. Он возвращается, если вас перебили, и удерживается лишь если вы выиграли и не заплатили.',
   'hudChrome.wocMarket.variableTokenWarning':
     'Вы обязуетесь оплатить сумму в USD токенами $WOC. Точное количество токенов фиксируется свежей котировкой при запросе оплаты и может отличаться от оценки.',
+  'hudChrome.wocMarket.claimCooldownRetry':
+    'Вы недавно отказались от быстрой покупки. Повторите попытку через {duration}.',
   'hudChrome.wocMarket.settlementDeadlineNote':
     'Если вы выиграете, оплата должна поступить в течение {duration} после закрытия аукциона.',
   'hudChrome.wocMarket.termsLabel': 'Я принимаю условия расчёта с плавающим количеством токенов.',

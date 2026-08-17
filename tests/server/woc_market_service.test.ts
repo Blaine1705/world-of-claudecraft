@@ -47,6 +47,7 @@ import {
   WOC_MARKET_BOND_PENDING_TTL_SECONDS,
   WOC_MARKET_BOND_POLL_PARK_SECONDS,
   WOC_MARKET_BUY_NOW_LOCK_SECONDS,
+  WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS,
   WOC_MARKET_DIRECTED_OFFER_TTL_SECONDS,
   WOC_MARKET_MAX_ACTIVE_LISTINGS,
   WOC_MARKET_OFFER_CONVERGE_MAX_AGE_SECONDS,
@@ -2992,7 +2993,14 @@ describe('buy-now claim cooldown', () => {
         listingId: listing.id,
         acceptTerms: true,
       }),
-    ).toEqual({ ok: false, reason: 'claim_cooldown' });
+    ).toEqual({
+      ok: false,
+      reason: 'claim_cooldown',
+      // The refusal names the remaining time: the abandon's window end plus
+      // the re-claim cooldown, minus the one ms the clock has advanced,
+      // ceiled back up to the full cooldown.
+      params: { retryAfterSeconds: WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS },
+    });
     const other = await h.service.buyNow({
       account: BUYER_C,
       characterId: CHAR_C,
@@ -3730,6 +3738,42 @@ describe('settlement expiry', () => {
     expect(h.custody.parcels.map((p) => p.custodyRef)).toEqual([
       listingReturnCustodyRef(listing.id),
     ]);
+  });
+
+  it('spares the auction-default strike during an oracle outage; default and forfeit still land', async () => {
+    // The shared fairness gate (strikeDefaultingBuyer, the directed arms'
+    // gate): payment was impossible while pricing was down (settlementQuote
+    // and confirmSettlement refuse market_paused in the same window), so the
+    // outage costs the winner no strike. The default stamp and the bond
+    // forfeiture stay: the forfeit is the R2-ruled consequence, deliberately
+    // ungated here (the outage-forfeit question is recorded for the
+    // pre-enable audit, not decided by this arm).
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const standing = await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    h.setNow(listing.endsAtMs + 1);
+    await h.service.sweepPass();
+    const settlement = await liveSettlement(h, listing.id);
+    const healthyPrice = h.economy.price.bind(h.economy);
+    h.economy.price = (async () => ({
+      available: false,
+      healthy: false,
+    })) as unknown as typeof h.economy.price;
+    h.setNow(settlement.deadlineAtMs + 1);
+    await h.service.sweepPass();
+    expect((await getSettlement(h, settlement.id)).state).toBe('expired');
+    const bid = await getBid(h, standing.bidId);
+    expect(bid.status).toBe('defaulted');
+    // Queued for forfeiture even mid-outage; never back to the bidder.
+    expect(bid.bondState).not.toBe('held');
+    expect(bid.bondState).not.toBe('refund_due');
+    expect((await h.db.strikeInfo(BUYER_A))?.strikes ?? 0).toBe(0);
+    // Durable-state control: the expiry CAS fired once, so a later HEALTHY
+    // pass drains the forfeit but can never retro-strike the outage window.
+    h.economy.price = healthyPrice;
+    await h.service.sweepPass();
+    expect((await getBid(h, standing.bidId)).bondState).toBe('forfeited');
+    expect((await h.db.strikeInfo(BUYER_A))?.strikes ?? 0).toBe(0);
   });
 
   it('offerNext cascades to the outbid bidder at their own amount, attempt 2', async () => {

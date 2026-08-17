@@ -247,6 +247,22 @@ function resolveByCode(code: string, params: Record<string, unknown> | undefined
     return t(key, { seconds: formatDuration(seconds) });
   }
 
+  if (code === 'woc_market.claim_cooldown') {
+    // With the server-computed remaining time, say WHEN a retry can succeed.
+    // The retry sentence lives under hudChrome (the apiError catalog is a
+    // strict bijection with the server code set, so a client-side variant
+    // leaf cannot live there); an older server sends no params and the plain
+    // apiError sentence still renders (never null: "later" is honest, just
+    // less useful).
+    const seconds = params?.retryAfterSeconds;
+    if (typeof seconds === 'number' && Number.isFinite(seconds) && seconds > 0) {
+      return t('hudChrome.wocMarket.claimCooldownRetry', {
+        duration: formatDuration(seconds),
+      });
+    }
+    return t(key);
+  }
+
   return t(key);
 }
 

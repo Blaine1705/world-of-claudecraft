@@ -3936,6 +3936,7 @@ export const zh_CN: EnTranslations = {
       "bidBondNote": "出价时会冻结 {usd} 的可退还保证金（以 $WOC 支付）。被超越时退还；只有当你中标却未付款时才会被没收。",
       "variableTokenWarning": "你承诺以 $WOC 支付一笔美元价值。具体代币数量由请求付款时的最新报价确定，可能与估算不同。",
       "settlementDeadlineNote": "若你中标，须在拍卖结束后 {duration} 内付款。",
+      "claimCooldownRetry": "你最近放弃过一次直购。请在{duration}后再试。",
       "termsLabel": "我接受浮动代币结算条款。",
       "quoteTitle": "确认付款",
       "quoteTotal": "合计：{tokens} $WOC",

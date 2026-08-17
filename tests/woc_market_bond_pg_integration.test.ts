@@ -1066,7 +1066,13 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
         BASE_MS,
         BASE_MS + 270_000,
       );
-      expect(again).toBe('claim_cooldown');
+      // The refusal names WHEN a retry can first succeed: the just-recorded
+      // abandon's window end plus the re-claim cooldown (the only live arm:
+      // one abandon sits under the hourly cap).
+      expect(again).toEqual({
+        refusal: 'claim_cooldown',
+        retryAtMs: BASE_MS - 1_000 + rulesMod.WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS * 1000,
+      });
       const ledger = await pool.query(
         `SELECT account FROM woc_market_buy_now_abandons WHERE listing_id = $1`,
         [listingId],
@@ -1097,7 +1103,10 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       // lifts by itself (a permanent per-listing ban would fail here).
       expect(
         await marketDb.claimBuyNowLock(realm, listingId, buyer, BASE_MS, BASE_MS + 270_000),
-      ).toBe('claim_cooldown');
+      ).toEqual({
+        refusal: 'claim_cooldown',
+        retryAtMs: BASE_MS - 1_000 + rulesMod.WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS * 1000,
+      });
       const later = BASE_MS + rulesMod.WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS * 1000;
       const ok = await marketDb.claimBuyNowLock(realm, listingId, buyer, later, later + 270_000);
       expect(typeof ok).not.toBe('string');
@@ -1131,9 +1140,15 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       const third = await seedListing(realm, seller);
       await marketDb.recordBuyNowAbandon(realm, third, griefer, BASE_MS - 3 * MINUTE_MS);
       const fresh = await seedListing(realm, seller);
+      // Cap-only refusal (a FRESH listing, no per-listing arm): the retry
+      // moment is the cap-th newest abandon leaving the rolling window.
       expect(
         await marketDb.claimBuyNowLock(realm, fresh, griefer, BASE_MS, BASE_MS + 270_000),
-      ).toBe('claim_cooldown');
+      ).toEqual({
+        refusal: 'claim_cooldown',
+        retryAtMs:
+          BASE_MS - 3 * MINUTE_MS + rulesMod.WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS * 1000,
+      });
       // The window is ROLLING: once the abandons age out, the claim works.
       const later = BASE_MS + rulesMod.WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS * 1000;
       const ok = await marketDb.claimBuyNowLock(realm, fresh, griefer, later, later + 270_000);
@@ -1357,7 +1372,10 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
           marketDb.claimBuyNowLock(realm, listingId, cooled, BASE_MS, BASE_MS + 270_000),
           new Promise<'blocked'>((r) => setTimeout(() => r('blocked'), 500)),
         ]);
-        expect(verdict).toBe('claim_cooldown');
+        expect(verdict).toEqual({
+          refusal: 'claim_cooldown',
+          retryAtMs: BASE_MS - MINUTE_MS + rulesMod.WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS * 1000,
+        });
         await client.query('ROLLBACK');
       } finally {
         client.release();
@@ -1382,9 +1400,16 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
         lockAccount: abuser,
         lockExpiresAtMs: BASE_MS - MINUTE_MS,
       });
+      // Both arms refuse here and the LATER moment wins: the hourly cap's
+      // drain (the cap-th newest of the now-four in-window rows, at -3s,
+      // leaving the rolling window) is later than this listing's re-claim
+      // cooldown (-60s + 30 min), pinning the max-combining rule.
       expect(
         await marketDb.claimBuyNowLock(realm, listingId, abuser, BASE_MS, BASE_MS + 270_000),
-      ).toBe('claim_cooldown');
+      ).toEqual({
+        refusal: 'claim_cooldown',
+        retryAtMs: BASE_MS - 3_000 + rulesMod.WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS * 1000,
+      });
       const booked = await pool.query(
         `SELECT 1 FROM woc_market_buy_now_abandons WHERE listing_id = $1 AND account = $2`,
         [listingId, abuser],

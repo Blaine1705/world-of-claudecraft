@@ -5149,6 +5149,11 @@ export const hudChromeStrings = {
     variableTokenWarning:
       'You are committing to pay a USD value in $WOC. The exact token amount is set by a fresh quote when payment is requested and may differ from the estimate.',
     settlementDeadlineNote: 'If you win, payment is due within {duration} of the auction closing.',
+    // The claim_cooldown refusal's parametric variant: rendered by the
+    // api_error matcher when the server names the remaining time (it lives
+    // here because the apiError catalog is a strict bijection with the
+    // server code set).
+    claimCooldownRetry: 'You recently walked away from a Buy Now. Try again in {duration}.',
     termsLabel: 'I accept the variable-token settlement terms.',
     quoteTitle: 'Confirm payment',
     quoteTotal: 'Total: {tokens} $WOC',

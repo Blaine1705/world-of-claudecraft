@@ -10212,6 +10212,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.wocMarket.buyNowLockedBadge'
   | 'hudChrome.wocMarket.cancelAria'
   | 'hudChrome.wocMarket.cancelButton'
+  | 'hudChrome.wocMarket.claimCooldownRetry'
   | 'hudChrome.wocMarket.close'
   | 'hudChrome.wocMarket.colBuyNow'
   | 'hudChrome.wocMarket.colCurrentBid'

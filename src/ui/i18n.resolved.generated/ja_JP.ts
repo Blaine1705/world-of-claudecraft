@@ -3936,6 +3936,7 @@ export const ja_JP: EnTranslations = {
       "bidBondNote": "入札時に {usd} 相当の返還可能な保証金（$WOC 建て）を預けます。上回られた場合は返還され、落札したのに支払わなかった場合にのみ没収されます。",
       "variableTokenWarning": "あなたは USD 建ての金額を $WOC で支払うことを約束します。正確なトークン数は支払い要求時の新しい見積もりで確定し、概算と異なる場合があります。",
       "settlementDeadlineNote": "落札した場合、オークション終了後 {duration} 以内に支払う必要があります。",
+      "claimCooldownRetry": "最近、即時購入を途中で放棄しています。{duration}後にもう一度お試しください。",
       "termsLabel": "変動トークン決済の条件に同意します。",
       "quoteTitle": "支払いの確認",
       "quoteTotal": "合計: {tokens} $WOC",

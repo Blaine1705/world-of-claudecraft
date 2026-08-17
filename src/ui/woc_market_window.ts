@@ -1675,8 +1675,8 @@ export class WocMarketWindow {
     this.notice = { text: t(key), error: false };
   }
 
-  private fail(code: string): void {
-    this.notice = { text: userFacingApiError({ code }), error: true };
+  private fail(code: string, params?: Record<string, unknown>): void {
+    this.notice = { text: userFacingApiError({ code, params }), error: true };
   }
 
   private async withBusy(label: TranslationKey, run: () => Promise<void>): Promise<void> {
@@ -1729,7 +1729,7 @@ export class WocMarketWindow {
         acceptTerms: this.acceptTermsChecked(),
       });
       if (!out.ok) {
-        this.fail(out.code);
+        this.fail(out.code, out.params);
         return;
       }
       this.notice = null;
@@ -1768,7 +1768,7 @@ export class WocMarketWindow {
         acceptTerms: this.acceptTermsChecked(),
       });
       if (!out.ok) {
-        this.fail(out.code);
+        this.fail(out.code, out.params);
         return;
       }
       this.notice = null;
@@ -1788,7 +1788,7 @@ export class WocMarketWindow {
     await this.withBusy('hudChrome.wocMarket.confirming', async () => {
       const out = await hooks.client.cancelListing(listingId);
       if (!out.ok) {
-        this.fail(out.code);
+        this.fail(out.code, out.params);
         return;
       }
       // cancelPending: the cancel was accepted as intent (a buyer holds the
@@ -1875,7 +1875,7 @@ export class WocMarketWindow {
       // state, and proceeding would fail or send a stale request.
       if (!this.stillOwns(gen)) return;
       if (!issued.ok) {
-        this.fail(issued.code);
+        this.fail(issued.code, issued.params);
         return;
       }
       let stepUpSignature: string;
@@ -1924,7 +1924,7 @@ export class WocMarketWindow {
         stepUp: { nonce: issued.challenge.nonce, signature: stepUpSignature },
       });
       if (!out.ok) {
-        this.fail(out.code);
+        this.fail(out.code, out.params);
         return;
       }
       // The create landed; if a close straddled it, the reopened window reloads
@@ -1943,7 +1943,7 @@ export class WocMarketWindow {
     await this.withBusy('hudChrome.wocMarket.confirming', async () => {
       const out = await hooks.client.bondQuote(bidId);
       if (!out.ok) {
-        this.fail(out.code);
+        this.fail(out.code, out.params);
         return;
       }
       this.pendingQuote = {
@@ -1967,7 +1967,7 @@ export class WocMarketWindow {
     await this.withBusy('hudChrome.wocMarket.confirming', async () => {
       const out = await hooks.client.settlementQuote(settlementId);
       if (!out.ok) {
-        this.fail(out.code);
+        this.fail(out.code, out.params);
         return;
       }
       this.pendingQuote = {
@@ -2006,7 +2006,7 @@ export class WocMarketWindow {
       // A failure here is worth saying out loud rather than swallowing: the bid
       // is still holding the lock, and the player needs to know why their next
       // bid is refused. The TTL remains the backstop either way.
-      if (!out.ok) this.fail(out.code);
+      if (!out.ok) this.fail(out.code, out.params);
       await this.reload();
     });
   }
@@ -2028,11 +2028,11 @@ export class WocMarketWindow {
             quote: out.bond,
             usdCents: out.bond.bondCents ?? pending.usdCents,
           };
-        } else this.fail(out.code);
+        } else this.fail(out.code, out.params);
       } else {
         const out = await hooks.client.settlementQuote(pending.settlementId);
         if (out.ok) this.pendingQuote = { ...pending, quote: out.quote };
-        else this.fail(out.code);
+        else this.fail(out.code, out.params);
       }
     });
   }
@@ -2072,7 +2072,7 @@ export class WocMarketWindow {
       if (pending.kind === 'bond') {
         const out = await hooks.client.confirmBond(pending.bidId, signature);
         if (!out.ok) {
-          this.fail(out.code);
+          this.fail(out.code, out.params);
           return;
         }
         // Three outcomes, not two. "Not standing" used to cover both being
@@ -2091,7 +2091,7 @@ export class WocMarketWindow {
       } else {
         const out = await hooks.client.confirmSettlement(pending.settlementId, signature);
         if (!out.ok) {
-          this.fail(out.code);
+          this.fail(out.code, out.params);
           return;
         }
         // A review-parked payment is neither settled nor lost: the outcome

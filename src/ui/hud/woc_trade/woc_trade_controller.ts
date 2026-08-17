@@ -390,7 +390,7 @@ export class WocTradeController {
           offerId: offer.id,
         });
         if (!issued.ok) {
-          this.log(userFacingApiError({ code: issued.code }), '#ff6b6b');
+          this.log(userFacingApiError({ code: issued.code, params: issued.params }), '#ff6b6b');
           return;
         }
         let signature: string;
@@ -420,7 +420,7 @@ export class WocTradeController {
         ...stepUpFields,
       });
       if (!res.ok) {
-        this.log(userFacingApiError({ code: res.code }), '#ff6b6b');
+        this.log(userFacingApiError({ code: res.code, params: res.params }), '#ff6b6b');
         return;
       }
       if (res.listing === null) {
@@ -473,13 +473,17 @@ export class WocTradeController {
         acceptTerms: true,
       });
       if (!bought.ok) {
-        this.log(userFacingApiError({ code: bought.code }), '#ff6b6b');
+        this.log(userFacingApiError({ code: bought.code, params: bought.params }), '#ff6b6b');
         return;
       }
       const quoted = await hooks.client.settlementQuote(bought.settlement.id);
       if (!quoted.ok || !quoted.quote.transactionBase64) {
         this.log(
-          userFacingApiError({ code: quoted.ok ? 'woc_market.quote_unavailable' : quoted.code }),
+          userFacingApiError(
+            quoted.ok
+              ? { code: 'woc_market.quote_unavailable' }
+              : { code: quoted.code, params: quoted.params },
+          ),
           '#ff6b6b',
         );
         return;
@@ -507,7 +511,7 @@ export class WocTradeController {
       }
       const done = await hooks.client.confirmSettlement(bought.settlement.id, signature);
       if (!done.ok) {
-        this.log(userFacingApiError({ code: done.code }), '#ff6b6b');
+        this.log(userFacingApiError({ code: done.code, params: done.params }), '#ff6b6b');
         return;
       }
       // The Exchange window's ladder, verbatim: two surfaces describing the
@@ -542,7 +546,7 @@ export class WocTradeController {
       this.wocTradeSplit = null;
       this.lastTradeSig = '';
     } else {
-      this.log(userFacingApiError({ code: res.code }), '#ff6b6b');
+      this.log(userFacingApiError({ code: res.code, params: res.params }), '#ff6b6b');
     }
   }
 
@@ -621,7 +625,7 @@ export class WocTradeController {
       };
       this.lastTradeSig = '';
     } else {
-      this.log(userFacingApiError({ code: res.code }), '#ff6b6b');
+      this.log(userFacingApiError({ code: res.code, params: res.params }), '#ff6b6b');
     }
   }
 

@@ -20,6 +20,8 @@
 import type {
   CharacterSaveArgs,
   NewWocListing,
+  WocActivityBidRow,
+  WocActivitySettlementRow,
   WocBidRow,
   WocBondState,
   WocBrowseQuery,
@@ -1102,7 +1104,7 @@ export class FakeWocMarketDb implements WocMarketDb {
     | 'no_buy_now'
     | 'own_listing'
     | 'cancel_pending'
-    | 'claim_cooldown'
+    | { refusal: 'claim_cooldown'; retryAtMs: number }
     | 'contended'
   > {
     const row = this.listings.get(id);
@@ -1136,14 +1138,32 @@ export class FakeWocMarketDb implements WocMarketDb {
       const reclaimCutoff = nowMs - WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS * 1000;
       const windowCutoff = nowMs - WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS * 1000;
       const mine = this.buyNowAbandons.filter((a) => a.realm === realm && a.account === account);
-      if (mine.some((a) => a.listingId === id && a.lockExpiresMs > reclaimCutoff)) {
-        return 'claim_cooldown';
-      }
-      if (
-        mine.filter((a) => a.lockExpiresMs > windowCutoff).length >=
-        WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR
-      ) {
-        return 'claim_cooldown';
+      // Both arms are probed and the LATER retry moment wins, mirroring the
+      // Pg probe: the refusal names WHEN a retry can first succeed.
+      const reclaimHits = mine.filter(
+        (a) => a.listingId === id && a.lockExpiresMs > reclaimCutoff,
+      );
+      const reclaimAtMs =
+        reclaimHits.length === 0
+          ? null
+          : Math.max(...reclaimHits.map((a) => a.lockExpiresMs)) +
+            WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS * 1000;
+      const inWindow = mine
+        .filter((a) => a.lockExpiresMs > windowCutoff)
+        .sort((a, b) => b.lockExpiresMs - a.lockExpiresMs);
+      const capBoundary =
+        inWindow.length >= WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR
+          ? inWindow[WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR - 1].lockExpiresMs
+          : null;
+      const capDrainsAtMs =
+        capBoundary === null
+          ? null
+          : capBoundary + WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS * 1000;
+      if (reclaimAtMs !== null || capDrainsAtMs !== null) {
+        return {
+          refusal: 'claim_cooldown',
+          retryAtMs: Math.max(reclaimAtMs ?? 0, capDrainsAtMs ?? 0),
+        };
       }
     }
     row.buyNowLockAccount = account;
@@ -1544,12 +1564,17 @@ export class FakeWocMarketDb implements WocMarketDb {
     return due.length;
   }
 
-  async bidsByAccount(realm: string, account: number, limit: number): Promise<WocBidRow[]> {
+  async bidsByAccount(
+    realm: string,
+    account: number,
+    limit: number,
+  ): Promise<WocActivityBidRow[]> {
+    // Item-named like the Pg read; empty string when the listing is gone.
     return [...this.bids.values()]
       .filter((bid) => bid.realm === realm && bid.account === account)
       .sort((a, b) => b.placedAtMs - a.placedAtMs || b.id - a.id)
       .slice(0, limit)
-      .map((b) => this.bidOut(b));
+      .map((b) => ({ ...this.bidOut(b), itemId: this.listings.get(b.listingId)?.itemId ?? '' }));
   }
 
   async bidsForListing(listingId: number): Promise<WocBidRow[]> {
@@ -1776,12 +1801,16 @@ export class FakeWocMarketDb implements WocMarketDb {
     realm: string,
     account: number,
     limit: number,
-  ): Promise<WocSettlementRow[]> {
+  ): Promise<WocActivitySettlementRow[]> {
+    // Item-named like the Pg read; empty string when the listing is gone.
     return [...this.settlements.values()]
       .filter((s) => s.realm === realm && s.buyerAccount === account)
       .sort((a, b) => b.createdAtMs - a.createdAtMs || b.id - a.id)
       .slice(0, limit)
-      .map((s) => this.settlementOut(s));
+      .map((s) => ({
+        ...this.settlementOut(s),
+        itemId: this.listings.get(s.listingId)?.itemId ?? '',
+      }));
   }
 
   async liveSettlementForListing(listingId: number): Promise<WocSettlementRow | null> {

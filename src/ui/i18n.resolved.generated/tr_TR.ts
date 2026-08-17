@@ -3936,6 +3936,7 @@ export const tr_TR: EnTranslations = {
       "bidBondNote": "Placing a bid holds a refundable bond of {usd}, paid in $WOC. It is returned if you are outbid and forfeited only if you win and do not pay.",
       "variableTokenWarning": "You are committing to pay a USD value in $WOC. The exact token amount is set by a fresh quote when payment is requested and may differ from the estimate.",
       "settlementDeadlineNote": "If you win, payment is due within {duration} of the auction closing.",
+      "claimCooldownRetry": "You recently walked away from a Buy Now. Try again in {duration}.",
       "termsLabel": "I accept the variable-token settlement terms.",
       "quoteTitle": "Confirm payment",
       "quoteTotal": "Total: {tokens} $WOC",

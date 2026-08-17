@@ -8810,6 +8810,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '입찰 시 {usd} 상당의 환불 가능한 보증금($WOC)을 예치합니다. 상회 입찰이 나오면 반환되며, 낙찰 후 결제하지 않은 경우에만 몰수됩니다.',
   'hudChrome.wocMarket.variableTokenWarning':
     '당신은 USD 가치를 $WOC로 지불하기로 약정합니다. 정확한 토큰 수량은 결제 요청 시의 새 견적으로 확정되며 추정치와 다를 수 있습니다.',
+  'hudChrome.wocMarket.claimCooldownRetry':
+    '최근에 즉시 구매를 중도 포기했습니다. {duration} 후에 다시 시도하세요.',
   'hudChrome.wocMarket.settlementDeadlineNote':
     '낙찰되면 경매 종료 후 {duration} 안에 결제해야 합니다.',
   'hudChrome.wocMarket.termsLabel': '가변 토큰 정산 약관에 동의합니다.',

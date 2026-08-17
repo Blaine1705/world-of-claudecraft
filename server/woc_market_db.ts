@@ -17,6 +17,8 @@ import { DB_HEAVY_STATEMENT_TIMEOUT_MS, saveCharacterStateOnClient } from './db'
 import type {
   CharacterSaveArgs,
   NewWocListing,
+  WocActivityBidRow,
+  WocActivitySettlementRow,
   WocBidRow,
   WocBondState,
   WocBrowseQuery,
@@ -2569,7 +2571,7 @@ export class PgWocMarketDb implements WocMarketDb {
     | 'no_buy_now'
     | 'own_listing'
     | 'cancel_pending'
-    | 'claim_cooldown'
+    | { refusal: 'claim_cooldown'; retryAtMs: number }
     | 'contended'
   > {
     // The REFUSAL path stays LOCK-FREE (the old single-UPDATE's property):
@@ -2628,28 +2630,45 @@ export class PgWocMarketDb implements WocMarketDb {
     // the advisory pass CANNOT see is a self-steal's own abandon, which is
     // recorded moments earlier in the same transaction and is exactly why
     // the in-tx re-check stays.
-    const cooldownRefused = async (q: Pick<Pool, 'query'>): Promise<boolean> => {
+    // Answers WHEN a retry can first succeed (retryAtMs), or null when not
+    // refused, so the refusal can name a remaining time. Both arms are
+    // probed even when the first refuses: the honest retry moment is the
+    // LATER of the two (a 5-minute per-listing answer while the hourly cap
+    // still holds for 40 would send the player back too early), and the
+    // second probe only runs on the refusal path, which the rate limiter
+    // already bounds.
+    const cooldownRefused = async (q: Pick<Pool, 'query'>): Promise<number | null> => {
+      // Per-listing re-claim cooldown: the NEWEST in-window abandon of this
+      // listing sets the clock. max() over the unique index prefix
+      // (listing_id, account, lock_expires) is an index-tail read.
       const cooled = await q.query(
-        `SELECT 1 FROM woc_market_buy_now_abandons
+        `SELECT max(lock_expires) AS latest FROM woc_market_buy_now_abandons
           WHERE listing_id = $1 AND account = $2
-            AND lock_expires > to_timestamp($3 / 1000.0)
-          LIMIT 1`,
+            AND lock_expires > to_timestamp($3 / 1000.0)`,
         [id, account, nowMs - WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS * 1000],
       );
-      if ((cooled.rowCount ?? 0) > 0) return true;
-      // Saturating count: the LIMIT caps what is COUNTED, but the plan
-      // still materializes the account's in-window index entries before
-      // the limit applies, so the read is O(this account's last-hour
-      // rows), which the cap's own refusals bound to a handful.
+      const latest: Date | null = cooled.rows[0]?.latest ?? null;
+      const reclaimAtMs =
+        latest === null ? null : ms(latest) + WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS * 1000;
+      // Account-wide hourly cap. A row exists at OFFSET cap-1 exactly when
+      // the in-window count reaches the cap (the old saturating count's
+      // predicate, same O(cap) index walk); that cap-th-newest row leaving
+      // the window is the first moment the count can drop below the cap.
       const capped = await q.query(
-        `SELECT count(*)::int AS n FROM (
-           SELECT 1 FROM woc_market_buy_now_abandons
-            WHERE account = $1 AND realm = $2
-              AND lock_expires > to_timestamp($3 / 1000.0)
-            LIMIT ${WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR}) c`,
+        `SELECT lock_expires AS at FROM woc_market_buy_now_abandons
+          WHERE account = $1 AND realm = $2
+            AND lock_expires > to_timestamp($3 / 1000.0)
+          ORDER BY lock_expires DESC
+          OFFSET ${WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR - 1} LIMIT 1`,
         [account, realm, nowMs - WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS * 1000],
       );
-      return Number(capped.rows[0]?.n ?? 0) >= WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR;
+      const capBoundary: Date | null = capped.rows[0]?.at ?? null;
+      const capDrainsAtMs =
+        capBoundary === null
+          ? null
+          : ms(capBoundary) + WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS * 1000;
+      if (reclaimAtMs === null && capDrainsAtMs === null) return null;
+      return Math.max(reclaimAtMs ?? 0, capDrainsAtMs ?? 0);
     };
     // The advisory reads share the transaction path's contention mapping: a
     // plain SELECT can still block on boot DDL's AccessExclusive hold, and
@@ -2680,10 +2699,10 @@ export class PgWocMarketDb implements WocMarketDb {
       // committed row.
       if (
         peek.rows[0].directed_buyer_account === null &&
-        peek.rows[0].buy_now_lock_account === null &&
-        (await cooldownRefused(this.pool))
+        peek.rows[0].buy_now_lock_account === null
       ) {
-        return 'claim_cooldown' as const;
+        const retryAtMs = await cooldownRefused(this.pool);
+        if (retryAtMs !== null) return { refusal: 'claim_cooldown', retryAtMs } as const;
       }
     } catch (err) {
       if (isLockContention(err)) return 'contended' as const;
@@ -2773,8 +2792,9 @@ export class PgWocMarketDb implements WocMarketDb {
         // own strike). Runs under the held listing lock, AFTER the recording
         // above, so a self-steal's own fresh abandon refuses it in the same
         // transaction, which the advisory copy of these probes can never see.
-        if (row.directed_buyer_account === null && (await cooldownRefused(client))) {
-          return 'claim_cooldown' as const;
+        if (row.directed_buyer_account === null) {
+          const retryAtMs = await cooldownRefused(client);
+          if (retryAtMs !== null) return { refusal: 'claim_cooldown', retryAtMs } as const;
         }
         // The wallet-twin predicate rides the claim itself too (the atomic
         // half of H14): the row lock is already held by this transaction, so
@@ -3386,14 +3406,29 @@ export class PgWocMarketDb implements WocMarketDb {
     return res.rowCount ?? 0;
   }
 
-  async bidsByAccount(realm: string, account: number, limit: number): Promise<WocBidRow[]> {
+  async bidsByAccount(
+    realm: string,
+    account: number,
+    limit: number,
+  ): Promise<WocActivityBidRow[]> {
+    // Item-named for the Activity surface. A correlated PK lookup, not a JOIN:
+    // the shared BID_COLS list is unqualified and both tables carry id/realm/
+    // status, so a join would make it ambiguous; the subquery is one index hit
+    // per row, bounded by the LIMIT. Empty string when the listing row is gone
+    // (retention), which the client's unknown-item arm already renders.
     const res = await this.pool.query(
-      `SELECT ${BID_COLS} FROM woc_market_bids
+      `SELECT ${BID_COLS},
+              (SELECT l.item_id FROM woc_market_listings l WHERE l.id = listing_id)
+                AS activity_item_id
+         FROM woc_market_bids
         WHERE realm = $1 AND account = $2
         ORDER BY placed_at DESC LIMIT $3`,
       [realm, account, limit],
     );
-    return res.rows.map(toBid);
+    return res.rows.map((r) => ({
+      ...toBid(r),
+      itemId: r.activity_item_id === null ? '' : String(r.activity_item_id),
+    }));
   }
 
   async bidsForListing(listingId: number): Promise<WocBidRow[]> {
@@ -3573,14 +3608,21 @@ export class PgWocMarketDb implements WocMarketDb {
     realm: string,
     account: number,
     limit: number,
-  ): Promise<WocSettlementRow[]> {
+  ): Promise<WocActivitySettlementRow[]> {
+    // Item-named like bidsByAccount above (same correlated-lookup rationale).
     const res = await this.pool.query(
-      `SELECT ${SETTLEMENT_COLS} FROM woc_market_settlements
+      `SELECT ${SETTLEMENT_COLS},
+              (SELECT l.item_id FROM woc_market_listings l WHERE l.id = listing_id)
+                AS activity_item_id
+         FROM woc_market_settlements
         WHERE realm = $1 AND buyer_account = $2
         ORDER BY created_at DESC LIMIT $3`,
       [realm, account, limit],
     );
-    return res.rows.map(toSettlement);
+    return res.rows.map((r) => ({
+      ...toSettlement(r),
+      itemId: r.activity_item_id === null ? '' : String(r.activity_item_id),
+    }));
   }
 
   async liveSettlementForListing(listingId: number): Promise<WocSettlementRow | null> {

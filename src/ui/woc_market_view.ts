@@ -87,6 +87,9 @@ export interface WocEstimateView {
 export interface WocBidView {
   id: number;
   listingId: number;
+  /** The listed item this bid is for (the Activity read names it); null or
+   *  absent from an older server or a pruned listing. */
+  itemId?: string | null;
   amountCents: number;
   status: string;
   bondCents: number;
@@ -103,6 +106,9 @@ export interface WocBidView {
 export interface WocSettlementView {
   id: number;
   listingId: number;
+  /** The listed item this payment is for; null or absent from an older
+   *  server or a pruned listing. */
+  itemId?: string | null;
   attempt: number;
   amountCents: number;
   state: string;

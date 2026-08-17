@@ -8435,6 +8435,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '出價時會凍結 {usd} 的可退還保證金（以 $WOC 支付）。被超越時退還；只有當你得標卻未付款時才會被沒收。',
   'hudChrome.wocMarket.variableTokenWarning':
     '你承諾以 $WOC 支付一筆美元價值。具體代幣數量由請求付款時的最新報價確定，可能與估算不同。',
+  'hudChrome.wocMarket.claimCooldownRetry': '你最近放棄過一次直購。請在{duration}後再試。',
   'hudChrome.wocMarket.settlementDeadlineNote': '若你得標，須在拍賣結束後 {duration} 內付款。',
   'hudChrome.wocMarket.termsLabel': '我接受浮動代幣結算條款。',
   'hudChrome.wocMarket.quoteTitle': '確認付款',
