@@ -88,13 +88,13 @@ describe('parties', () => {
       const paladin = sim.addPlayer('paladin', 'Paladin');
       const member = sim.addPlayer('warrior', 'Member');
       sim.setPlayerLevel(16, paladin);
-      sim.partyInvite(member, paladin);
-      sim.partyAccept(member);
 
       const paladinEntity = sim.entities.get(paladin);
       if (!paladinEntity) throw new Error('missing paladin entity');
       sim.castAbility(persistentAura, paladin);
       paladinEntity.gcdRemaining = 0;
+      sim.partyInvite(member, paladin);
+      sim.partyAccept(member);
       sim.castAbility('dawn_devotion', paladin);
       expect(sim.entities.get(member)?.auras.find((a) => a.id === persistentAura)).toBeDefined();
       expect(sim.entities.get(member)?.auras.find((a) => a.id === 'dawn_devotion')).toBeDefined();
