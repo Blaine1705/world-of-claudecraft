@@ -203,13 +203,11 @@ interface AttributionTargetFixture {
 // honest desktop-path progress, depth compile, timeout-bounded fetch,
 // constrained-device removal): renderer.ts and prewarm_policy.ts both move
 // again, so the composite follows their bytes. No capture was retaken.
-// Re-minted for the PR #3447 merge: the v0.39 wrapper, corrected PR #3446 sky
-// KTX2 renderer bytes, and mount-program prewarm bytes combine in one tree. No
-// capture was retaken.
-// Re-minted for the moved-base v0.39 wrapper refresh: the castle renderer bytes
-// and v0.39 wrapper bytes combine in one tree. No capture was retaken.
+// Re-minted for the final PR #3447 v0.39 wrapper merge: the wrapper's
+// resident-only prewarm review fixes and the PR head's mount-program coverage
+// combine in one renderer tree. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '4659473f081bbf0bd0d6e04c8451831787dba2b05cf367107a6b8efc702f3c69';
+  'ec202deb21f3a8c23fc28c26267ecaf76ce8cbbc732dbc36962a5078a693c36c';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

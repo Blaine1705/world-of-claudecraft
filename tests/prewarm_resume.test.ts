@@ -546,10 +546,10 @@ describe('resumeDroppedPrewarmEntries', () => {
   // could freeze a live frame with no mitigation at all on that hardware.
   //
   // This source pin is paired with the behavior test below: a previous
-  // source-only version stayed green against an entry that reparented every
-  // staged rig straight out of its own group into the live scene, leaked them
-  // there forever, and warmed zero mounts on the desktop path while still
-  // reporting 'completed'.
+  // source-only version could not catch the scene reparent bug, but it still
+  // pins the merge-critical contract: loading-cover staging is resident-only
+  // while missing keys resume as bounded per-mount units that self-compile
+  // both color and shadow programs.
   it('stages resident mounts inline and resumes missing keys one unit at a time', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const helperStart = source.indexOf('const mountPrewarmResumeUnits = ');

@@ -785,18 +785,14 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // constrained-device removal): the first-order composite follows renderer.ts
 // and prewarm_policy.ts, then this seal follows the swept evidence bytes. No
 // capture was retaken.
-// Re-minted for the PR #3447 merge: the first-order composite follows the
-// combined v0.39 wrapper, corrected PR #3446 sky KTX2 renderer bytes, and
-// mount-program prewarm bytes, then this seal follows the swept evidence bytes.
+// Re-minted for the final PR #3447 v0.39 wrapper merge: the first-order
+// composite follows the combined resident-only prewarm review fixes and
+// mount-program coverage, then this seal follows the swept evidence bytes.
 // No capture was retaken.
-// Re-minted for the moved-base v0.39 wrapper refresh: the first-order
-// composite follows the combined castle renderer bytes and v0.39 wrapper
-// bytes, then this seal follows the swept evidence bytes. No capture was
-// retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '8b0ed55cfbcb7b6ddba76b895440ec332a5e76ae26a1a74e72425da909208a13';
+  '2bcb09e7816ff282ffbd50b1e7ea15d604c1fa4eea8f2da4432c785ee330192c';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '4659473f081bbf0bd0d6e04c8451831787dba2b05cf367107a6b8efc702f3c69';
+  'ec202deb21f3a8c23fc28c26267ecaf76ce8cbbc732dbc36962a5078a693c36c';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1812,18 +1808,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // constrained-device removal). The first-order composite follows
     // renderer.ts and prewarm_policy.ts, then this second-order performance
     // seal follows the swept evidence bytes. No capture was retaken.
-    // Re-minted for the PR #3447 merge. The first-order composite follows the
-    // combined v0.39 wrapper, corrected PR #3446 sky KTX2 renderer bytes, and
-    // mount-program prewarm bytes, then this second-order performance seal
-    // follows the swept evidence bytes. No capture was retaken.
-    // Re-minted for the moved-base v0.39 wrapper refresh. The first-order
-    // composite follows the combined castle renderer bytes and v0.39 wrapper
-    // bytes, then this second-order performance seal follows the swept
-    // evidence bytes. No capture was retaken.
+    // Re-minted for the final PR #3447 v0.39 wrapper merge. The first-order
+    // composite follows the combined resident-only prewarm review fixes and
+    // mount-program coverage, then this second-order performance seal follows
+    // the swept evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('6051fc3436f07d0cb2274d642056e27b7bb1fdf650b66759363b270bae961c45');
+    ).toBe('f3fc94bcffbca78fbbbca80fa3122381bd2caf42d2d762bac1459325578d69fb');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

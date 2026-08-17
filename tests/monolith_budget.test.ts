@@ -118,9 +118,9 @@ const MONOLITHS: MonolithRow[] = [
     // after merging main the merged file lands below both prior pins, so the
     // ceiling is the exact merged count.
     // Re-pinned to the moved-base v0.39 wrapper merge output. The combined tree
-    // lands above the castle-side pin but below the v0.39 mount-prewarm pin, so
-    // keep the exact merged count.
-    ceiling: 13731,
+    // keeps the exact merged count after preserving the resident-only mount
+    // prewarm review fix and the PR head's resume compile coverage.
+    ceiling: 13746,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
