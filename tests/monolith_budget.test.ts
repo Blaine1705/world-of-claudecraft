@@ -88,7 +88,21 @@ const MONOLITHS: MonolithRow[] = [
     // (src/render/material_texture_slots.ts, the streamed-decor reveal gate).
     // The merged file lands below all three branches' own pins, so the ceiling
     // is the exact merged count per the ratchet's rule: any growth reds again.
-    ceiling: 13627,
+    // Lowered again by the foliage reveal-gate wiring, which paid for its four
+    // lines by extracting the millisecond rollup into
+    // src/render/frame_ms_stats_core.ts (net -15).
+    // Lowered again by the GPU-preparation admission wiring, which paid for its
+    // lines by extracting the perfStats return-type literal and the renderer's
+    // frame/phase stat shapes into src/render/renderer_perf_stats.ts, so the
+    // report's contract is nameable instead of inline (net -32).
+    // The compile-gate stand-in wiring paid for itself in place: the form/base
+    // visibility fan-out moved to src/render/entity_gate_stand_in_core.ts, which
+    // covers the lines the shapeshift and base-swap stand-ins added (net 0).
+    // Lowered again by the piecewise reveal-gate wiring, which paid for its
+    // soft-deadline binding by extracting the shared reveal compile host
+    // (link, shadow arm, touch tail, learned soft deadline) into
+    // src/render/reveal_compile_host.ts (net -15).
+    ceiling: 13562,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

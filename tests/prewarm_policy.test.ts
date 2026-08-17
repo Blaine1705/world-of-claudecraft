@@ -1261,9 +1261,18 @@ describe('constrained entry view creation ramp', () => {
       budgetMethodStart,
     );
     const budgetMethod = renderer.slice(budgetMethodStart, budgetMethodEnd);
-    const budgetAt = budgetMethod.indexOf('const base = constrainedEntryViewCreateBudget(');
-    const zeroGuardAt = budgetMethod.indexOf('if (base === 0) return 0;');
-    const backoffAt = budgetMethod.indexOf('if (this.viewCreateBackoff > 0)');
+    // The decision itself lives in view_create_budget_core.ts (its own Vitest);
+    // the renderer feeds it and consumes the count before creating candidates.
+    expect(budgetMethod).toContain(
+      'return runtimeViewCreateBudget(input, this.viewCreateBudgetState);',
+    );
+    const core = readFileSync(
+      new URL('../src/render/view_create_budget_core.ts', import.meta.url),
+      'utf8',
+    );
+    const budgetAt = core.indexOf('const base = constrainedEntryViewCreateBudget(');
+    const zeroGuardAt = core.indexOf('if (base === 0) return 0;');
+    const backoffAt = core.indexOf('if (state.backoffSeconds > 0)');
     const createAt = renderer.indexOf('this.createCandidateViews(', budgetMethodEnd);
     const elapsedIncrementAt = renderer.indexOf(
       'this.runtimeEntryElapsedMs += Math.min(250, Math.max(0, dt * 1000))',

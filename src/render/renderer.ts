@@ -468,7 +468,6 @@ import {
   withHiddenPrewarmGroups,
 } from './prewarm_pass';
 import {
-  constrainedEntryViewCreateBudget,
   mandatoryLandmarkViewsReady,
   materialProgramSignature,
   orderedPrewarmIds,
@@ -631,6 +630,11 @@ import {
   type ViewCandidate,
   writeViewCandidate,
 } from './view_candidate_pool_core';
+import {
+  runtimeViewCreateBudget,
+  type ViewCreateBudgetInput,
+  type ViewCreateBudgetState,
+} from './view_create_budget_core';
 import { ViewCreateRetryGate } from './view_create_retry';
 import {
   routeWarlockMeteorSpellfxAt,
@@ -689,11 +693,6 @@ const ENTITY_DRAW_RANGE = 80;
 const ENTITY_VIEW_CREATE_RANGE_SQ = ENTITY_DRAW_RANGE * ENTITY_DRAW_RANGE;
 export const ENTITY_VIEW_DESTROY_RANGE = 96;
 const ENTITY_VIEW_DESTROY_RANGE_SQ = ENTITY_VIEW_DESTROY_RANGE * ENTITY_VIEW_DESTROY_RANGE;
-const VIEW_CREATE_BUDGET_LOW = 2;
-const VIEW_CREATE_BUDGET_HIGH = 8;
-const VIEW_CREATE_SLOW_FRAME_MS = 33;
-const VIEW_CREATE_HITCH_FRAME_MS = 50;
-const VIEW_CREATE_BACKOFF_SECONDS = 0.75;
 // Cooldown before re-attempting a view whose assets failed to build (the
 // fail-soft path, issue #2079). Without it a permanently failing entity
 // consumes a view-creation budget slot every frame; under the hitch backoff
@@ -1410,7 +1409,15 @@ export class Renderer {
   private adaptiveCooldown = 0;
   // biome-ignore lint/correctness/noUnusedPrivateClassMembers: write-only render-budget restore state (pre-existing); read path not yet wired.
   private stableFrameTime = 0;
-  private viewCreateBackoff = 0;
+  private readonly viewCreateBudgetState: ViewCreateBudgetState = { backoffSeconds: 0 };
+  private readonly viewCreateBudgetInput: ViewCreateBudgetInput = {
+    lowGfx: false,
+    constrainedMemory: false,
+    entryElapsedMs: 0,
+    dt: 0,
+    frameMsEma: 0,
+    dropFrameMs: 0,
+  };
   private runtimeEntryElapsedMs = 0;
   private entityViewCreateRangeSq = ENTITY_VIEW_CREATE_RANGE_SQ;
   private entityViewDestroyRangeSq = ENTITY_VIEW_DESTROY_RANGE_SQ;
@@ -4712,24 +4719,14 @@ export class Renderer {
   }
 
   private runtimeViewCreateBudget(dt: number): number {
-    const normalBase = this.lowGfx ? VIEW_CREATE_BUDGET_LOW : VIEW_CREATE_BUDGET_HIGH;
-    const base = constrainedEntryViewCreateBudget(
-      GFX.constrainedMemory,
-      this.runtimeEntryElapsedMs,
-      normalBase,
-    );
-    if (base === 0) return 0;
-    if (!Number.isFinite(dt) || dt <= 0) return base;
-    const frameMs = Math.min(250, dt * 1000);
-    if (frameMs >= VIEW_CREATE_HITCH_FRAME_MS) this.viewCreateBackoff = VIEW_CREATE_BACKOFF_SECONDS;
-    if (this.viewCreateBackoff > 0) {
-      this.viewCreateBackoff = Math.max(0, this.viewCreateBackoff - dt);
-      return 1;
-    }
-    if (frameMs >= VIEW_CREATE_SLOW_FRAME_MS || this.frameMsEma >= GFX.budget.dropFrameMs) {
-      return Math.max(1, Math.ceil(base / 2));
-    }
-    return base;
+    const input = this.viewCreateBudgetInput;
+    input.lowGfx = this.lowGfx;
+    input.constrainedMemory = GFX.constrainedMemory;
+    input.entryElapsedMs = this.runtimeEntryElapsedMs;
+    input.dt = dt;
+    input.frameMsEma = this.frameMsEma;
+    input.dropFrameMs = GFX.budget.dropFrameMs;
+    return runtimeViewCreateBudget(input, this.viewCreateBudgetState);
   }
 
   private collectMissingViewCandidates(
@@ -8817,7 +8814,7 @@ export class Renderer {
   // already scoped to the single target, never the whole scene; only the light
   // GATHERING walk re-scans `this.scene` on every call, and it is a plain
   // isLight check over the scene graph, not a shader compile. At the runtime
-  // view-create budget (see VIEW_CREATE_BUDGET_HIGH; the boot prewarm's much
+  // view-create budget (see view_create_budget_core.ts; the boot prewarm's much
   // larger manifest is a separate, one-time pass with its own budgets), a
   // worst-case frame pays that redundant light-gather walk a handful of times,
   // never a redundant scene-wide shader compile. Batching multiple targets into
