@@ -331,7 +331,6 @@ import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
 import { buildImpactSite, type ImpactSiteView, MIREFEN_IMPACT_SITE } from './impact_site';
 import * as encounterPrewarm from './interior_encounter_prewarm_pass';
-import { ensureDelveInteriorKit } from './interior_kit';
 import { applyInteriorLightRig, applyRiftLightRig, type FogSceneState } from './interior_light_rig';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
@@ -9678,7 +9677,6 @@ export class Renderer {
     origin: { x: number; z: number },
     modules: readonly DelveModuleId[],
   ): void {
-    void ensureDelveInteriorKit().catch(() => undefined);
     this.delveInteriors.buildAll(delveId, slot, origin, modules);
   }
 
