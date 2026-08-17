@@ -56,7 +56,13 @@ tested sibling module here, never as more methods on `online.ts`. Exemplars
   Exchange client (`woc_market_sdk.ts`, typed and never-throws like
   `economy_sdk.ts`; marketplace bond and settlement transactions are
   service-built and signed through the same Wallet Standard path as the
-  Claudium purchase, config-off behind `WOC_MARKET_ENABLED`). The contracts: the account-to-wallet LINK is always challenge+signature
+  Claudium purchase, config-off behind `WOC_MARKET_ENABLED`; a failed call's
+  `WocMarketFail` carries the parsed error body as `params` so parametric
+  codes such as `woc_market.claim_cooldown` can render their values, the
+  `ApiError.params` convention). Wallet-bridge throws are classified for
+  players by `src/ui/wallet_bridge_reason_text.ts`, whose byte-exact message
+  map is drift-pinned against this directory's sources: rewording a bridge
+  throw string updates that map in the same change. The contracts: the account-to-wallet LINK is always challenge+signature
   verified server-side (`server/wallet.ts`), nothing here is imported by `src/sim/`, and
   `economy_sdk.ts` is same-origin only (the game server's `/api/claudium/*` proxy, never
   the economy service) and NEVER throws into render: every failure resolves to the typed

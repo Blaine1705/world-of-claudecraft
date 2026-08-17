@@ -248,7 +248,10 @@ export const apiErrorStrings = {
     already_pending: 'Confirm or abandon your pending bid on this listing first.',
     insufficient_balance: 'Your wallet does not hold enough $WOC for this bid and its bond.',
     quote_unavailable: 'A price quote could not be issued right now. Try again shortly.',
-    quote_expired: 'That quote expired. Request a fresh one.',
+    // Also answers the lapse-straddle refresh (a bond seat that closed while
+    // the quote aged), where no fresh quote will come: the second sentence
+    // must not promise one.
+    quote_expired: 'That quote expired. Request a fresh one; if none is offered, that window has closed.',
     not_pending: 'That bid is no longer awaiting its bond.',
     confirm_failed: 'The transaction could not be confirmed. Request a fresh quote and try again.',
     confirm_in_flight: 'Your payment is still confirming. Try again once it resolves.',

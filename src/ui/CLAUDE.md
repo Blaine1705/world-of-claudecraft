@@ -612,16 +612,22 @@ same file), and each module's header carries its own contract.
   payment signer), and sends the proof with the request; the trade window's $WOC arm
   does the same on the SELLER's acceptance only. Devsig skips the wallet ONLY on an
   explicit `signatureRequired: false`; absent means sign.
-  Payment-verdict words (the server's screened vocabulary: pending kinds, settlement
-  fail reasons) localize through `woc_market_reason_text.ts`, which owns the
-  word-to-copy maps with a generic fallback in each direction; never map a verdict
-  word to text inline in a painter.
-  The trade window's $WOC arm (panel `trade_woc_view.ts`/`trade_woc_panel.ts`, driven
-  from `src/ui/hud/woc_trade/`) does NOT follow that model yet: it hard-codes
-  `acceptTerms: true` with no terms shown, the recorded R9 pre-enable obligation
-  (`docs/woc-marketplace-hardening/state.md`); the Exchange checkbox is the model
-  for the acceptance CONTROL, but it shows no terms text or link itself and owes
-  that affordance pre-enable too (draft Terms 10.3).
+  Payment-verdict words (the server's screened vocabulary: pending kinds incl. the
+  bond leg's own voice, settlement fail reasons) localize through
+  `woc_market_reason_text.ts`, which owns the word-to-copy maps with a generic
+  fallback in each direction; never map a verdict word to text inline in a painter.
+  Wallet-bridge failures classify through `wallet_bridge_reason_text.ts` (structural
+  cancel names, a byte-exact map over the bridge's thrown strings with a drift pin,
+  caller-flavored generics): a catch site never renders `err.message`, it logs the
+  raw error on the dev channel and renders the classified line. The window's toast
+  (`notice`) stores UNRESOLVED state (keys, codes, screened words) and resolves at
+  render via `resolveNotice`, so a language switch never strands stale text. USD
+  amounts spell through `usd_text.ts` (Intl currency; the src/ui-wide grep pin in
+  `tests/usd_text.test.ts` keeps the hardcoded-`$` class extinct).
+  Both consent controls satisfy draft Terms 10.3: the Exchange checkbox and the
+  trade arm's consent row (`trade_woc_panel.ts`) each name the Marketplace terms,
+  link them (`/terms`), and send the player's REAL choice; the R9 hard-coded
+  `acceptTerms: true` posture is closed (`docs/woc-marketplace-hardening/state.md`).
 - **woc_store_view.ts** (+ **char_skin_window.ts**, **armory_inspect.ts**,
   **armory_labels.ts**, **store_promo_card.ts**, **preview_prewarm_core.ts**): the WOC Store
   and Season 1 Armory. The pure projection reads the skin catalog
