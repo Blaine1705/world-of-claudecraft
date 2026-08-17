@@ -728,7 +728,10 @@ Still open (a phase that hits one asks at session start):
   per R4; validation npx tsc --noEmit clean, all market suites +
   snapshots/env_protocol/bandwidth + architecture + monolith + i18n gates
   green, FIVE market pg suites green zero skips WITH TEST_DATABASE_URL,
-  ci:changed exit 0). Closes B6 and the browser-only-gate medium. The registry
+  ci:changed exit 0; GATE GREEN at ae1ba36b87: node scripts/gate_select.mjs
+  full-suite fallback, all 12 steps, 2855 test files (1 env-gated skip) +
+  browser 19 files + all builds, run WITH TEST_DATABASE_URL so every pg suite
+  executed inside it). Closes B6 and the browser-only-gate medium. The registry
   the 13-qa session needs:
   - BOTH RULINGS RECORDED FIRST (docs commit 6e4664e9a1, before code): R1
     threshold = step-up on EVERY custody-moving call, NO env knob (a low-value
