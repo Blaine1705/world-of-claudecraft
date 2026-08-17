@@ -10599,7 +10599,7 @@ export const id_ID: EnTranslations = {
       },
       "evocation": {
         "name": "Sumur Eter",
-        "description": "Menyalurkan selama 6 detik: setiap detik memulihkan 100 mana dan menambah 8 spell power. Bonus menumpuk selama penyaluran dan bertahan 15 detik. (talenta mage)"
+        "description": "Menyalurkan selama 6 detik: setiap detik memulihkan 100 mana dan menambah 8 Kekuatan Mantra. Bonus menumpuk selama penyaluran dan bertahan 15 detik. (talenta mage)"
       },
       "flurry_of_knives": {
         "name": "Rentetan Pisau",
@@ -10631,7 +10631,7 @@ export const id_ID: EnTranslations = {
       },
       "ice_block": {
         "name": "Peti Es",
-        "description": "Membungkusmu dalam es padat selama 8 detik, membuatmu kebal terhadap semua kerusakan. Menghapus efek berbahaya biasa yang sudah aktif dan mencegah penerapan efek pengendalian biasa yang baru. Dapat digunakan saat terkena stun atau polymorph. Kamu tidak dapat bertindak selama terbungkus. Rapal lagi untuk membatalkan. (mage)"
+        "description": "Membungkusmu dalam es padat selama 8 detik, membuatmu kebal terhadap semua kerusakan. Menghapus efek berbahaya biasa yang sudah aktif dan mencegah penerapan efek pengendalian biasa yang baru. Dapat digunakan saat terpana atau berubah wujud. Kamu tidak dapat bertindak selama terbungkus. Rapal lagi untuk membatalkan. (mage)"
       },
       "inner_focus": {
         "name": "Pikiran Hening",

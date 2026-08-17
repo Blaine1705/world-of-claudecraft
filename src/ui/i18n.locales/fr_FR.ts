@@ -2707,10 +2707,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Un signal sifflé galvanise votre groupe : vitesse d’attaque, d’incantation et de canalisation augmentée de 10% pendant 10 s. Les alliés récemment touchés par une accélération de groupe sont trop épuisés pour en profiter. (talent de Voleur)',
   'entities.abilities.venomrend.name': 'Déchirure venimeuse',
   'entities.abilities.venomrend.description':
-    'Consume le Rituel du venin : frappe pour 22 plus 26 par point de combo, fait détoner les dégâts restants de vos saignements et rend 25 points d’énergie. (moteur Art des lames)',
+    'Consomme le Rituel du venin : frappe pour 22 plus 26 par point de combo, fait détoner les dégâts restants de vos saignements et rend 25 points d’énergie. (moteur Art des lames)',
   'entities.abilities.veilstrike.name': 'Frappe du voile',
   'entities.abilities.veilstrike.description':
-    'Consume la réserve de Pénombre pour vous envelopper d’ombre pendant 6 s : vos ouvertures furtives fonctionnent à découvert et vous infligez 25% de dégâts supplémentaires. (moteur Fourberie)',
+    'Consomme la réserve de Pénombre pour vous envelopper d’ombre pendant 6 s : vos ouvertures furtives fonctionnent à découvert et vous infligez 25% de dégâts supplémentaires. (moteur Fourberie)',
   'entities.abilities.body_blow.name': 'Coup au corps',
   'entities.abilities.body_blow.description':
     'Un coup puissant infligeant 130% des dégâts de l’arme plus 10, qui confère 2 points de combo et approfondit la Redline d’un cran. (moteur Thuggery)',

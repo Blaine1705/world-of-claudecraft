@@ -10792,11 +10792,11 @@ export const fr_FR: EnTranslations = {
       },
       "veilstrike": {
         "name": "Frappe du voile",
-        "description": "Consume la réserve de Pénombre pour vous envelopper d’ombre pendant 6 s : vos ouvertures furtives fonctionnent à découvert et vous infligez 25% de dégâts supplémentaires. (moteur Fourberie)"
+        "description": "Consomme la réserve de Pénombre pour vous envelopper d’ombre pendant 6 s : vos ouvertures furtives fonctionnent à découvert et vous infligez 25% de dégâts supplémentaires. (moteur Fourberie)"
       },
       "venomrend": {
         "name": "Déchirure venimeuse",
-        "description": "Consume le Rituel du venin : frappe pour 22 plus 26 par point de combo, fait détoner les dégâts restants de vos saignements et rend 25 points d’énergie. (moteur Art des lames)"
+        "description": "Consomme le Rituel du venin : frappe pour 22 plus 26 par point de combo, fait détoner les dégâts restants de vos saignements et rend 25 points d’énergie. (moteur Art des lames)"
       },
       "typhoon": {
         "name": "Typhon",
