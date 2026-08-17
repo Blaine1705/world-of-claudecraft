@@ -88,6 +88,35 @@ describe('rallyFleeingAllies', () => {
     expect(FLEE_HELP_RADIUS).toBe(5);
   });
 
+  it('does not pull a quest-gated same-family ally onto a player without the quest', () => {
+    // A Broodmother egg (spider_egg, family 'spider', requiresQuestId q_broodmother)
+    // parked beside a fleeing Mirefen Widow (also family 'spider') must stay inert
+    // scenery for a non-quester, same as the direct idle-scan aggro path (sim.ts
+    // aggroMob / mob/quest_gated_aggro.ts questGateBlocksAggro).
+    const sim = makeSim();
+    const [fleer, egg] = wildMobs(sim);
+    fleer.templateId = 'mire_widow';
+    fleer.pos = { x: sim.player.pos.x + 3, z: sim.player.pos.z, y: sim.player.pos.y };
+    placeAlly(egg, fleer, 2, 'spider_egg');
+
+    (sim as any).grid.refresh(sim.entities.values());
+    const pulled = rallyFleeingAllies((sim as any).ctx, fleer, sim.player);
+
+    expect(pulled).toBe(0);
+    expect(egg.aiState).toBe('idle');
+    expect(egg.inCombat).toBe(false);
+
+    // The same egg DOES join once the player is on the gating quest.
+    sim.questLog.set('q_broodmother', {
+      questId: 'q_broodmother',
+      counts: [0, 0],
+      state: 'active',
+    });
+    const pulledOnQuest = rallyFleeingAllies((sim as any).ctx, fleer, sim.player);
+    expect(pulledOnQuest).toBe(1);
+    expect(egg.aiState).toBe('chase');
+  });
+
   it('is deterministic: same setup pulls the same allies', () => {
     const run = () => {
       const sim = makeSim();
