@@ -3023,6 +3023,9 @@ export class Renderer {
       60,
     );
     this.abilityVfxFx.setSpiritBuildScheduler((build) => this.queueSpiritPuppetBuild(build));
+    this.abilityVfxFx.setSpiritCompileGate(
+      this.asyncCompileSupported ? (root: THREE.Object3D) => this.compileGate(root) : null,
+    );
     this.abilityVfx = new AbilityVfx({
       vfx: this.vfx,
       fx: this.abilityVfxFx,

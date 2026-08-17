@@ -1,0 +1,244 @@
+// The spirit puppets warmed themselves by DRAWING: a freshly built puppet rode
+// one frame with the compile group visible so its shared ghost material's
+// program would link at warm time. A visible one-frame draw is a synchronous
+// link on the live path, and production caught it four times in a row, at
+// reveal + 0.3 to 0.6 s, on the same `+skinning -opaque` MeshBasicMaterial
+// program (268, 150, 59 and 35 ms). The pool now takes the host's live compile
+// gate and links a HIDDEN root off-thread instead; hosts without a gate (the
+// editor viewport, headless, these tests) keep the historical pass.
+
+import * as THREE from 'three';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { SpiritApparitions } from '../src/render/ability_vfx/spirits';
+
+const loadGltf = vi.fn();
+
+vi.mock('../src/render/assets/loader', () => ({
+  loadGltf: (url: string) => loadGltf(url),
+}));
+
+// warmForClass resolves its models from the authored spec table; the shaman's
+// Ghost Wolf is the stable single-model case.
+const WOLF = 'wolf';
+
+/**
+ * A resolved GLB carrying a real rig: the puppet material is SKINNED (the
+ * production program key's differing segment is `+skinning`), so a compile
+ * root that does not contain a SkinnedMesh wearing it keys a different
+ * program from the one the first spawn draws with.
+ */
+function skinnedGltf(): { scene: THREE.Object3D; animations: THREE.AnimationClip[] } {
+  const root = new THREE.Group();
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const count = geometry.getAttribute('position').count;
+  const index = new Uint16Array(count * 4);
+  const weight = new Float32Array(count * 4);
+  for (let i = 0; i < count; i++) weight[i * 4] = 1;
+  geometry.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(index, 4));
+  geometry.setAttribute('skinWeight', new THREE.Float32BufferAttribute(weight, 4));
+  const bone = new THREE.Bone();
+  bone.name = 'root';
+  const mesh = new THREE.SkinnedMesh(geometry, new THREE.MeshStandardMaterial());
+  mesh.name = 'body';
+  mesh.add(bone);
+  mesh.bind(new THREE.Skeleton([bone]));
+  root.add(mesh);
+  return { scene: root, animations: [] };
+}
+
+interface PuppetProbe {
+  puppets: Map<string, { root: THREE.Object3D; mat: THREE.Material; compiled: boolean }>;
+  compileGroup: THREE.Group;
+}
+
+function makePool(): { pool: SpiritApparitions; probe: PuppetProbe } {
+  const pool = new SpiritApparitions(new THREE.Scene(), () => 0);
+  return { pool, probe: pool as unknown as PuppetProbe };
+}
+
+/** Record every write to `visible`, not just its value at the end of a frame:
+ *  a single visible frame anywhere is the whole bug. */
+function watchVisible(object: THREE.Object3D): boolean[] {
+  const writes: boolean[] = [];
+  let value = object.visible;
+  Object.defineProperty(object, 'visible', {
+    configurable: true,
+    get: () => value,
+    set: (next: boolean) => {
+      writes.push(next);
+      value = next;
+    },
+  });
+  return writes;
+}
+
+async function warmOnePuppet(pool: SpiritApparitions, probe: PuppetProbe): Promise<void> {
+  pool.warmForClass('shaman');
+  await vi.waitFor(() => expect(probe.puppets.has(WOLF)).toBe(true));
+}
+
+beforeEach(() => {
+  loadGltf.mockReset();
+  loadGltf.mockResolvedValue(skinnedGltf());
+});
+
+describe('the gated puppet warm-up', () => {
+  it('never makes the compile group visible', async () => {
+    const { pool, probe } = makePool();
+    pool.setCompileGate(() => new Promise(() => {}));
+    const writes = watchVisible(probe.compileGroup);
+    await warmOnePuppet(pool, probe);
+    for (let frame = 0; frame < 8; frame++) pool.update(1 / 60);
+    expect(writes).not.toContain(true);
+    expect(probe.compileGroup.visible).toBe(false);
+  });
+
+  it('hands the gate a hidden root with the puppet material on a skinned mesh', async () => {
+    const { pool, probe } = makePool();
+    const roots: THREE.Object3D[] = [];
+    pool.setCompileGate((root) => {
+      roots.push(root);
+      return new Promise(() => {});
+    });
+    await warmOnePuppet(pool, probe);
+    pool.update(1 / 60);
+
+    expect(roots).toHaveLength(1);
+    const puppet = probe.puppets.get(WOLF);
+    expect(puppet).toBeDefined();
+    if (!puppet) return;
+    // The root is staged inside the hidden compile group, never on its own.
+    expect(roots[0]).toBe(puppet.root);
+    expect(roots[0].parent).toBe(probe.compileGroup);
+    expect(probe.compileGroup.visible).toBe(false);
+
+    const skinned: THREE.SkinnedMesh[] = [];
+    roots[0].traverse((o) => {
+      const mesh = o as THREE.SkinnedMesh;
+      if (mesh.isSkinnedMesh && mesh.material === puppet.mat) skinned.push(mesh);
+    });
+    expect(skinned.length).toBeGreaterThan(0);
+  });
+
+  it('flips readiness only after the gate resolves, and only inside update()', async () => {
+    const { pool, probe } = makePool();
+    let resolveGate: (() => void) | null = null;
+    pool.setCompileGate(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveGate = resolve;
+        }),
+    );
+    await warmOnePuppet(pool, probe);
+    pool.update(1 / 60);
+    const puppet = probe.puppets.get(WOLF);
+    expect(puppet).toBeDefined();
+    if (!puppet) return;
+
+    // In flight: staged, hidden, not ready.
+    pool.update(1 / 60);
+    expect(puppet.compiled).toBe(false);
+    expect(puppet.root.parent).toBe(probe.compileGroup);
+
+    expect(resolveGate).not.toBeNull();
+    (resolveGate as unknown as () => void)();
+    // Resolved, but no frame has run: the callback itself must not move nodes
+    // or flip readiness (numPointLights rides three's program cache key).
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(puppet.compiled).toBe(false);
+    expect(puppet.root.parent).toBe(probe.compileGroup);
+
+    pool.update(1 / 60);
+    expect(puppet.compiled).toBe(true);
+    expect(puppet.root.parent).not.toBe(probe.compileGroup);
+  });
+
+  it('takes one puppet at a time, so two builds do not stage together', async () => {
+    const { pool, probe } = makePool();
+    const settles: Array<() => void> = [];
+    pool.setCompileGate(
+      () =>
+        new Promise<void>((resolve) => {
+          settles.push(resolve);
+        }),
+    );
+    pool.warmForClass('druid');
+    await vi.waitFor(() => expect(probe.puppets.size).toBeGreaterThan(1));
+    for (let frame = 0; frame < 4; frame++) pool.update(1 / 60);
+    expect(settles).toHaveLength(1);
+    expect(probe.compileGroup.children).toHaveLength(1);
+  });
+});
+
+describe('a gate that rejects', () => {
+  it('settles the puppet without throwing and without a visible frame', async () => {
+    const { pool, probe } = makePool();
+    pool.setCompileGate(() => Promise.reject(new Error('context lost')));
+    const writes = watchVisible(probe.compileGroup);
+    await warmOnePuppet(pool, probe);
+    expect(() => pool.update(1 / 60)).not.toThrow();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(() => pool.update(1 / 60)).not.toThrow();
+
+    const puppet = probe.puppets.get(WOLF);
+    expect(puppet?.compiled).toBe(true);
+    expect(puppet?.root.parent).not.toBe(probe.compileGroup);
+    expect(writes).not.toContain(true);
+  });
+
+  it('survives a gate that throws synchronously', async () => {
+    const { pool, probe } = makePool();
+    pool.setCompileGate(() => {
+      throw new Error('no renderer');
+    });
+    const writes = watchVisible(probe.compileGroup);
+    await warmOnePuppet(pool, probe);
+    expect(() => pool.update(1 / 60)).not.toThrow();
+    expect(() => pool.update(1 / 60)).not.toThrow();
+    expect(probe.puppets.get(WOLF)?.compiled).toBe(true);
+    expect(writes).not.toContain(true);
+  });
+});
+
+describe('without a gate the historical compile pass is unchanged', () => {
+  it('still rides one visible frame per fresh puppet', async () => {
+    const { pool, probe } = makePool();
+    const writes = watchVisible(probe.compileGroup);
+    await warmOnePuppet(pool, probe);
+    const puppet = probe.puppets.get(WOLF);
+    expect(puppet).toBeDefined();
+    if (!puppet) return;
+
+    pool.update(1 / 60);
+    expect(writes).toContain(true);
+    expect(probe.compileGroup.visible).toBe(true);
+    expect(puppet.root.parent).toBe(probe.compileGroup);
+    expect(puppet.compiled).toBe(false);
+
+    // The next frame ends the pass and empties the group again.
+    pool.update(1 / 60);
+    expect(puppet.compiled).toBe(true);
+    expect(puppet.root.parent).not.toBe(probe.compileGroup);
+    expect(probe.compileGroup.visible).toBe(false);
+  });
+
+  it('is what a pool gets back when the gate is cleared', async () => {
+    const { pool, probe } = makePool();
+    pool.setCompileGate(() => new Promise(() => {}));
+    pool.setCompileGate(null);
+    await warmOnePuppet(pool, probe);
+    pool.update(1 / 60);
+    expect(probe.compileGroup.visible).toBe(true);
+  });
+});
+
+describe('the renderer host wiring', () => {
+  it('routes the gate through the AbilityVfxFx seam, next to the build scheduler', async () => {
+    const { readFileSync } = await import('node:fs');
+    const fx = readFileSync(new URL('../src/render/ability_vfx/fx.ts', import.meta.url), 'utf8');
+    expect(fx).toContain('setSpiritCompileGate(gate: SpiritCompileGate | null): void {');
+    expect(fx).toContain('this.spirits.setCompileGate(gate);');
+  });
+});
