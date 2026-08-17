@@ -512,11 +512,7 @@ import {
   RenderDiagnostics,
   type RenderDiagnosticsSnapshot,
 } from './render_diagnostics';
-import {
-  measureFeatureFootprint,
-  setRenderCategory,
-  type TextureBackedMaterial,
-} from './renderer_diagnostics';
+import { measureFeatureFootprint, setRenderCategory } from './renderer_diagnostics';
 import {
   beginRendererFrameTelemetry,
   type RendererFramePhaseMs,

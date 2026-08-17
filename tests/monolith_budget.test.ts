@@ -88,7 +88,7 @@ const MONOLITHS: MonolithRow[] = [
     // (src/render/material_texture_slots.ts, the streamed-decor reveal gate).
     // The merged file lands below all three branches' own pins, so the ceiling
     // is the exact merged count per the ratchet's rule: any growth reds again.
-    ceiling: 13631,
+    ceiling: 13627,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
