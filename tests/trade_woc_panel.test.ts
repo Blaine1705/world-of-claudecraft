@@ -10,12 +10,12 @@
 import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { InvSlot, ItemDef } from '../src/sim/types';
+import { wocOfferPhase } from '../src/ui/hud/woc_trade/woc_trade_offer_view';
 import { t } from '../src/ui/i18n';
 import {
   refreshWocTradeArm,
   type WocTradePanelDeps,
   wireWocTradeArm,
-  wocOfferPhase,
   wocTradeArmHtml,
   wocTradeModelFrom,
   wocTradeMoneyText,
@@ -62,8 +62,9 @@ function deps(over: Partial<WocTradePanelDeps> = {}): WocTradePanelDeps {
     onModeChange: vi.fn(),
     onPriceInput: vi.fn(),
     onSendOffer: vi.fn(),
-    onAcceptOffer: vi.fn(),
     onCancelOffer: vi.fn(),
+    onDeclineOffer: vi.fn(),
+    onCancelSale: vi.fn(),
     onPayOffer: vi.fn(),
     ...over,
   };
@@ -392,6 +393,82 @@ describe('a standing offer becomes a REVIEW surface for both sides', () => {
     paint(buyer).querySelector<HTMLElement>('[data-woc-cancel]')?.click();
     expect(buyer.onCancelOffer).toHaveBeenCalled();
   });
+
+  it('gives the SELLER a live Decline on the review face, and the buyer never sees it', () => {
+    // H13's dead wiring: the seller had no way out of an incoming offer. Each
+    // side gets exactly its own way out, never the other's.
+    const seller = deps({ pendingOffer: { ...offer, role: 'seller' as const } });
+    const sellerRoot = paint(seller);
+    const decline = sellerRoot.querySelector<HTMLElement>('[data-woc-decline]');
+    expect(decline?.textContent).toBe(t('hudChrome.trade.woc.decline'));
+    expect(sellerRoot.querySelector('[data-woc-cancel]'), 'withdraw is the buyer verb').toBeNull();
+    decline?.click();
+    expect(seller.onDeclineOffer).toHaveBeenCalled();
+    expect(seller.onCancelOffer).not.toHaveBeenCalled();
+    const buyerRoot = paint(deps({ pendingOffer: offer }));
+    expect(buyerRoot.querySelector('[data-woc-decline]')).toBeNull();
+  });
+
+  it('says when the offer lapses, and stays silent when the wire did not say', () => {
+    const withExpiry = paint(deps({ pendingOffer: { ...offer, expiresAtMs: 1_800_000_000_000 } }));
+    expect(withExpiry.querySelector('.trade-woc-note')?.textContent ?? '').not.toBe('');
+    const without = paint(deps({ pendingOffer: offer }));
+    // No fabricated deadline: absent means say nothing (the notInstant warn
+    // still renders, so scope the check to the expiry note class).
+    const notes = [...without.querySelectorAll('.trade-woc-note')];
+    expect(notes).toHaveLength(0);
+  });
+});
+
+describe('the seller cancel-sale control', () => {
+  const escrowed = {
+    id: 7,
+    usdCents: 100,
+    tokens: 7812.5,
+    role: 'seller' as const,
+    phase: 'awaiting_payment' as const,
+    listingId: 41,
+    buyerAccepted: true,
+    sellerAccepted: true,
+  };
+
+  it('renders for the seller while the buyer has not paid, and reports the press', () => {
+    const d = deps({ pendingOffer: escrowed });
+    const root = paint(d);
+    const btn = root.querySelector<HTMLElement>('[data-woc-cancel-sale]');
+    expect(btn?.textContent).toBe(t('hudChrome.trade.woc.cancelSale'));
+    btn?.click();
+    expect(d.onCancelSale).toHaveBeenCalled();
+  });
+
+  it('disappears once a payment is in flight, and never renders for the buyer', () => {
+    // The server would refuse settlement_in_flight; offering the button then
+    // is a control that cannot work.
+    const payingSeller = paint(deps({ pendingOffer: { ...escrowed, phase: 'paying' as const } }));
+    expect(payingSeller.querySelector('[data-woc-cancel-sale]')).toBeNull();
+    const buyer = paint(deps({ pendingOffer: { ...escrowed, role: 'buyer' as const } }));
+    expect(buyer.querySelector('[data-woc-cancel-sale]')).toBeNull();
+  });
+});
+
+describe('the below-minimum courtesy hint', () => {
+  it('names the floor when the typed price is under it', () => {
+    const d = deps({ usdCents: 50, minPriceCents: 100, theirStaged: [slot(EPIC.id)] });
+    const root = paint(d);
+    const hint = root.querySelector('[data-woc-hint]')?.textContent ?? '';
+    expect(hint).toBe(t('hudChrome.trade.woc.hintBelowMin', { usd: '$1.00' }));
+  });
+
+  it('an unknown floor never blocks: no hint, send stays live', () => {
+    const model = wocTradeModelFrom(deps({ usdCents: 50, minPriceCents: null }));
+    expect(model.sendHint).toBeNull();
+    expect(model.canSend).toBe(true);
+  });
+
+  it('at the floor exactly, the hint clears (the bound is exclusive)', () => {
+    const model = wocTradeModelFrom(deps({ usdCents: 100, minPriceCents: 100 }));
+    expect(model.sendHint).toBeNull();
+  });
 });
 
 describe('the payment phase, in the window rather than elsewhere', () => {
@@ -686,8 +763,12 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
       CONTROLLER.indexOf('private async acceptWocTradeOffer'),
     );
     expect(close, 'it re-reads the offer off the window entirely').toContain('client.offers()');
-    expect(close).toContain("wocOfferPhase(row) === 'settled'");
+    expect(close).toContain("if (phase === 'settled')");
     expect(close).toContain('this.finishWocTrade(row)');
+    // The dead-deal twin: a cancelled/suspended/unpaid close found after the
+    // window closed reports its honest reason, never the paid line.
+    expect(close).toContain("if (phase === 'closed')");
+    expect(close).toContain('this.finishClosedWocTrade(row)');
     // And the cleanup branch must actually call it, or it is dead code.
     const updateStart = CONTROLLER.indexOf('updateTradeWindow(): void {');
     // updateTradeWindow is the LAST member, so the method close is the file's
@@ -728,11 +809,12 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
   it('does not announce DELIVERY while the chain is still confirming', () => {
     // The mirror of the loss that cost real money: a correct payment can come
     // back still confirming, and "on its way by mail" is a claim about
-    // delivery. The ladder is the Exchange window's, verbatim: review parks
-    // to its own line, only 'confirming' takes the pending mapper, and a
-    // DECIDED state (confirmed / delivering / delivered; a failed retry is
-    // refused server-side and never reaches the ok arm) takes the settled
-    // line, so the two surfaces make the same claim about the same answer.
+    // delivery. The ladder: review parks to its own line, only 'confirming'
+    // takes the pending mapper, a CONFIRMED or DELIVERING answer takes its
+    // own decided-but-undelivered sentence (claiming the mail before the
+    // finalize ran was the softer half of the same lie), and only the
+    // remaining decided arm (delivered; a failed retry is refused
+    // server-side and never reaches the ok arm) takes the settled line.
     const pay = CONTROLLER.slice(
       CONTROLLER.indexOf('private async payWocTradeOffer'),
       CONTROLLER.indexOf('private async cancelWocTradeOffer'),
@@ -741,10 +823,19 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
     expect(pay).toContain("done.state === 'confirming'");
     expect(pay).toContain('wocPaymentPendingText(done.reason)');
     expect(pay).toContain('hudChrome.wocMarket.settlementReview');
-    // The pending arm must be decided BEFORE the settled else-arm.
+    expect(pay).toContain("done.state === 'confirmed' || done.state === 'delivering'");
+    expect(pay).toContain('hudChrome.trade.woc.paymentConfirmed');
+    // The pending arm must be decided BEFORE the confirmed arm, and that
+    // before the settled else-arm.
     expect(pay.indexOf("done.state === 'confirming'")).toBeLessThan(
+      pay.indexOf('hudChrome.trade.woc.paymentConfirmed'),
+    );
+    expect(pay.indexOf('hudChrome.trade.woc.paymentConfirmed')).toBeLessThan(
       pay.indexOf('hudChrome.trade.woc.settled'),
     );
+    // The held offer adopts the answered settlement state, so the status
+    // sentence stops claiming "confirming" for decided money.
+    expect(pay).toContain('settlementState: done.state');
     // And the buyer sees the pending face the instant they commit, not when a
     // poll next happens to notice.
     expect(pay).toContain("phase: 'paying'");

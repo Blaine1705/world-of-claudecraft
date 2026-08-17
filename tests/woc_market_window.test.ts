@@ -950,7 +950,7 @@ describe('woc_market_window: listing requires the wallet step-up (B6/R1)', () =>
     // challenge refusal rides fail().
     expect(submit).toContain('hudChrome.wocMarket.signFailedConfirm');
     expect(submit).not.toContain("t('hudChrome.wocMarket.signFailed')");
-    expect(submit).toContain('this.fail(issued.code)');
+    expect(submit).toContain('this.fail(issued.code, issued.params)');
   });
 });
 
@@ -1498,5 +1498,32 @@ describe('woc_market_window: payment verdicts reach the player', () => {
     expect(to).toBeGreaterThan(from);
     const refresh = code.slice(from, to);
     expect(refresh).toContain('usdCents: out.bond.bondCents ?? pending.usdCents');
+  });
+});
+
+describe('woc_market_window: the Activity tab is an honest, actionable ledger (H13)', () => {
+  const activity = betweenCode('private activityHtml(', 'private quoteHtml(');
+
+  it('pay rows name the item: bid and settlement rows render the item cell off the wire id', () => {
+    // The wire ships the joined listing item id; a row without one (older
+    // server, pruned listing) renders as before instead of an unknown-item
+    // box, so BOTH the render call and its non-empty gate are pinned.
+    expect(activity).toContain("b.itemId != null && b.itemId !== ''");
+    expect(activity).toContain('`activity:bid:${b.id}`');
+    expect(activity).toContain("s.itemId != null && s.itemId !== ''");
+    expect(activity).toContain('`activity:settle:${s.id}`');
+  });
+
+  it('the seller cancel renders on active unbid listing rows, with the browse-pane gate', () => {
+    // A directed listing never passes through the browse detail pane, so this
+    // row is its seller's ONLY cancel surface; the gate mirrors the pane
+    // (active, no cancel-intent stamped, no bids) and the server's guards
+    // stay the authority for everything else.
+    expect(activity).toContain(
+      "l.status === 'active' && !l.cancelPending && l.currentCents === null",
+    );
+    expect(activity).toContain('data-action="cancel-listing"');
+    // Focus survives the poll rebuild (the window-family focus-key contract).
+    expect(activity).toContain('wm-activity-cancel-${l.id}');
   });
 });

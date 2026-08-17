@@ -325,6 +325,7 @@ const UI_PURE_CORES = [
   'src/ui/market_name_color.ts',
   'src/ui/market_armor_badge.ts',
   'src/ui/market_buy_confirm_core.ts',
+  'src/ui/usd_text.ts',
   'src/ui/woc_affordable_core.ts',
   'src/ui/woc_market_poll_core.ts',
   'src/ui/woc_market_reason_text.ts',
@@ -610,6 +611,7 @@ const BARE_NAMED = [
   'src/ui/item_name_color.ts',
   'src/ui/market_name_color.ts',
   'src/ui/market_armor_badge.ts',
+  'src/ui/usd_text.ts',
   'src/ui/woc_market_reason_text.ts',
   'src/render/foliage_lod.ts',
   'src/render/frame_present.ts',
@@ -1719,6 +1721,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/tool_effect_tooltip.ts',
   'src/ui/unit_frame.ts',
   'src/ui/unit_portrait.ts',
+  'src/ui/usd_text.ts',
   'src/ui/woc_market_reason_text.ts',
   'src/ui/xp_bar.ts',
 ];

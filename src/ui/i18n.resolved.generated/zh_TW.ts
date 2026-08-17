@@ -527,7 +527,23 @@ export const zh_TW: EnTranslations = {
         "statusPayingBuyer": "正在網路上確認你的付款……",
         "statusPayingSeller": "已收到付款。正在網路上確認……",
         "paidSeller": "你的 {item} 已收到 {price} 的付款。",
-        "paidBuyer": "你已為 {item} 支付 {price}。"
+        "paidBuyer": "你已為 {item} 支付 {price}。",
+        "closedCancelled": "本次交易已取消。物品將透過郵件退還賣家。",
+        "closedSuspended": "本次交易已被遊戲管理員中止。物品將透過郵件退還賣家。",
+        "closedUnpaid": "本次交易因未付款而結束。物品將透過郵件退還賣家。",
+        "cancelSale": "取消出售",
+        "youDeclined": "你已拒絕該報價。",
+        "youWithdrew": "你已撤回報價。",
+        "offerDeclined": "$WOC 報價已被拒絕。",
+        "offerWithdrawn": "$WOC 報價已被撤回。",
+        "offerExpired": "$WOC 報價已過期。",
+        "offerExpiresAt": "報價將於 {time} 過期。",
+        "offerStandsUntil": "你的 $WOC 報價在 {time} 前仍然有效。若對方接受，請再次與賣家交易以完成這筆交易。",
+        "dealAwaitsPayment": "你的 $WOC 購買尚未付款。請再次與賣家交易以付款；否則交易將自動過期。",
+        "paymentConfirmed": "付款已確認。配送完成後物品將透過郵件送達。",
+        "statusConfirmedBuyer": "付款已確認。正在完成配送...",
+        "statusConfirmedSeller": "付款已確認。交易正在完成...",
+        "hintBelowMin": "交易所最低價格為 {usd}。"
       }
     },
     "wocStore": {

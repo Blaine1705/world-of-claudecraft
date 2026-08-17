@@ -17,8 +17,72 @@ export interface WocOfferRowLike {
   sellerName: string;
   usdCents: number;
   listingId: number | null;
+  listingStatus?: string | null;
+  listingResolution?: string | null;
+  settlementState?: string | null;
+  expiresAtMs?: number | null;
   buyerAccepted: boolean;
   sellerAccepted: boolean;
+}
+
+/**
+ * Which face of the deal a server-side offer row is showing.
+ *
+ * Derived from the listing rather than the offer's own status, because the
+ * offer says only "agreed": what decides whether money is still owed is the
+ * LISTING, which exists from acceptance and closes when the deal ends.
+ *
+ * 'settled' requires resolution === 'sold', never bare closed-ness: a listing
+ * closes cancelled, suspended, and unpaid too, and treating any close as
+ * settled printed "You have received a payment" to a seller whose buyer never
+ * paid (H13). Those ends are 'closed'; wocOfferClosedReason names which.
+ */
+export function wocOfferPhase(
+  row: {
+    listingId: number | null;
+    listingStatus: string | null;
+    listingResolution: string | null;
+    settlementState?: string | null;
+  },
+  /** The viewer's own payment is in flight locally. The buyer knows this before
+   *  any server round trip, and waiting for the poll to catch up is a visible
+   *  gap where their click appears to have done nothing. */
+  payingLocally = false,
+): WocOfferPhase {
+  if (row.listingId === null) return 'review';
+  if (row.listingResolution === 'sold') return 'settled';
+  if (row.listingStatus === 'closed') return 'closed';
+  if (payingLocally || SETTLING_STATES.has(row.settlementState ?? '')) return 'paying';
+  return 'awaiting_payment';
+}
+
+/**
+ * Settlement states that mean money is moving.
+ *
+ * 'offered' is deliberately ABSENT: a quote exists but nothing has been signed,
+ * so the buyer still has to act and their button must stay live. Treating it as
+ * in-flight would show a spinner to a player whose next move is to press Pay.
+ * 'review' is PRESENT: an operator-parked payment is not settled and not lost,
+ * and announcing delivery for it would tell the buyer of money under review
+ * that the purchase completed (the custody-lie class the row label rule
+ * already covers); the poll finishes the deal when the resolution does.
+ */
+const SETTLING_STATES = new Set(['confirming', 'confirmed', 'delivering', 'review']);
+
+/** How a dead deal died, for the honest report line. 'unpaid' covers every
+ *  closed-unsold resolution (no_bids / reserve_not_met / unsettled) AND any
+ *  future resolution word this bundle predates: the safe reading of an
+ *  unknown close is "it did not sell", never a fabricated cause. */
+export type WocOfferClosedReason = 'cancelled' | 'suspended' | 'unpaid';
+
+export function wocOfferClosedReason(row: {
+  listingStatus: string | null;
+  listingResolution: string | null;
+}): WocOfferClosedReason | null {
+  if (row.listingStatus !== 'closed' || row.listingResolution === 'sold') return null;
+  if (row.listingResolution === 'cancelled') return 'cancelled';
+  if (row.listingResolution === 'suspended') return 'suspended';
+  return 'unpaid';
 }
 
 /**
@@ -46,6 +110,7 @@ export function selectStandingWocOffer<T extends WocOfferRowLike>(
 
 export type WocOfferPollStep =
   | { readonly kind: 'settle' }
+  | { readonly kind: 'closed' }
   | { readonly kind: 'keep' }
   | { readonly kind: 'adopt' };
 
@@ -53,11 +118,14 @@ export type WocOfferPollStep =
  * What the poll does with the row it found.
  *
  * 'settle': the deal is DONE and gets reported exactly once, then the window
- * has nothing left to offer. 'keep': nothing a repaint would show has moved.
- * Compare the phase AND the acceptance flags, not just the id: one side
- * accepting moves neither the id nor the phase, so an id-and-phase check left
- * the button reading "Accept" after the player had already accepted, and the
- * other side never learned they were waited on.
+ * has nothing left to offer. 'closed': the deal DIED (cancelled / suspended /
+ * unpaid) and the honest reason gets reported exactly once, then the arm
+ * returns to the compose form. 'keep': nothing a repaint would show has moved.
+ * Compare the phase AND the acceptance flags AND the settlement state, not
+ * just the id: one side accepting moves neither the id nor the phase, so an
+ * id-and-phase check left the button reading "Accept" after the player had
+ * already accepted; and a payment moving from confirming to confirmed keeps
+ * phase 'paying' while the status sentence it owes the player changes.
  */
 export function wocOfferPollStep(
   cur: WocPendingOffer | null,
@@ -65,11 +133,13 @@ export function wocOfferPollStep(
   phase: WocOfferPhase,
 ): WocOfferPollStep {
   if (phase === 'settled') return { kind: 'settle' };
+  if (phase === 'closed') return { kind: 'closed' };
   if (
     cur?.id === mine.id &&
     cur.phase === phase &&
     cur.buyerAccepted === mine.buyerAccepted &&
-    cur.sellerAccepted === mine.sellerAccepted
+    cur.sellerAccepted === mine.sellerAccepted &&
+    (cur.settlementState ?? null) === (mine.settlementState ?? null)
   ) {
     return { kind: 'keep' };
   }
@@ -92,5 +162,7 @@ export function adoptedWocOffer(
     listingId: mine.listingId,
     buyerAccepted: mine.buyerAccepted,
     sellerAccepted: mine.sellerAccepted,
+    expiresAtMs: mine.expiresAtMs ?? null,
+    settlementState: mine.settlementState ?? null,
   };
 }

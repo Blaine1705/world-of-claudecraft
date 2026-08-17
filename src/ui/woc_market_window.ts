@@ -1148,10 +1148,22 @@ export class WocMarketWindow {
         const directedBadge = l.directed
           ? ` <span>${esc(t('hudChrome.wocMarket.activityDirected'))}</span>`
           : '';
+        // The seller's own cancel, HERE where their listings actually render:
+        // a directed listing never passes through the browse detail pane (the
+        // only prior cancel surface), so its seller had no way to reach the
+        // cancel the PRD promised. Same gate as the browse pane (active and
+        // unbid; the server's guards decide the rest, including the
+        // cancel-pending conversion on a locked window).
+        const cancel =
+          l.status === 'active' && !l.cancelPending && l.currentCents === null
+            ? ` <button type="button" data-action="cancel-listing" data-listing="${l.id}" ${this.busy ? 'disabled' : ''} ` +
+              `aria-label="${esc(t('hudChrome.wocMarket.cancelAria', { item: this.itemName(l.itemId) }))}" data-focus-key="wm-activity-cancel-${l.id}">` +
+              `${esc(t('hudChrome.wocMarket.cancelButton'))}</button>`
+            : '';
         return (
           `<li>${this.itemCellHtml(l.itemId, l.quality, `activity:${l.id}`, l.instance)} ` +
           `<span>${l.currentCents === null ? esc(this.usd(l.startCents)) : esc(this.usd(l.currentCents))}</span> ` +
-          `<span>${esc(listingStatus(l.status, l.resolution))}</span>${directedBadge}${cancelBadge}</li>`
+          `<span>${esc(listingStatus(l.status, l.resolution))}</span>${directedBadge}${cancelBadge}${cancel}</li>`
         );
       })
       .join('');
@@ -1174,7 +1186,14 @@ export class WocMarketWindow {
               : ` <button type="button" data-action="pay-bond" data-bid="${b.id}" ${this.busy ? 'disabled' : ''} ` +
                 `aria-label="${esc(t('hudChrome.wocMarket.bidBondPayAria', { id: formatNumber(b.listingId) }))}" data-focus-key="wm-bond-${b.id}">` +
                 `${esc(t('hudChrome.wocMarket.bidBondPay'))}</button>`;
-        return `<li><span>${esc(this.usd(b.amountCents))}</span> <span>${esc(t(bidStatusKey(b.status)))}</span>${payBond}</li>`;
+        // Name WHAT the bid is for (H13: pay rows never named the item). The
+        // wire ships the joined item id; a null (older server, pruned
+        // listing) renders the row as before rather than an unknown-item box.
+        const item =
+          b.itemId != null && b.itemId !== ''
+            ? `${this.itemCellHtml(b.itemId, ITEMS[b.itemId]?.quality ?? 'common', `activity:bid:${b.id}`)} `
+            : '';
+        return `<li>${item}<span>${esc(this.usd(b.amountCents))}</span> <span>${esc(t(bidStatusKey(b.status)))}</span>${payBond}</li>`;
       })
       .join('');
     const settlements = a.settlements
@@ -1199,7 +1218,13 @@ export class WocMarketWindow {
         // The WHY sentence LAST: its flex-basis takes a full wrapped row, and
         // sitting mid-row would push the deadline and Pay control onto a
         // third line under it.
-        return `<li><span>${esc(this.usd(s.amountCents))}</span> <span>${esc(t(settlementKey(s.state)))}</span>${deadline}${pay}${failDetail}</li>`;
+        // Item identity on the payment row itself (H13), same shape as the
+        // bid rows above.
+        const item =
+          s.itemId != null && s.itemId !== ''
+            ? `${this.itemCellHtml(s.itemId, ITEMS[s.itemId]?.quality ?? 'common', `activity:settle:${s.id}`)} `
+            : '';
+        return `<li>${item}<span>${esc(this.usd(s.amountCents))}</span> <span>${esc(t(settlementKey(s.state)))}</span>${deadline}${pay}${failDetail}</li>`;
       })
       .join('');
     const strikes =

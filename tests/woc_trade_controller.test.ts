@@ -184,6 +184,9 @@ function fakeHooks(): {
     createOfferImpl: () => Promise<unknown>;
     settlementQuoteImpl: () => Promise<unknown>;
     confirmSettlementImpl: () => Promise<unknown>;
+    statusImpl: () => Promise<unknown>;
+    tradePartnerImpl: () => Promise<unknown>;
+    cancelListingImpl: () => Promise<unknown>;
     lastAcceptBody: Record<string, unknown> | null;
     lastCreateBody: Record<string, unknown> | null;
     stepUpSignatureRequired: boolean;
@@ -201,6 +204,8 @@ function fakeHooks(): {
       signAndSends: string[];
       createOffers: number;
       resolveOffers: [number, string][];
+      statuses: number;
+      cancelListings: number[];
     };
   };
 } {
@@ -216,6 +221,13 @@ function fakeHooks(): {
     settlementQuoteImpl: (): Promise<unknown> =>
       Promise.resolve({ ok: false, code: 'woc_market.disabled' }),
     confirmSettlementImpl: (): Promise<unknown> =>
+      Promise.resolve({ ok: false, code: 'woc_market.disabled' }),
+    statusImpl: (): Promise<unknown> => Promise.resolve({ ok: false }),
+    // Null = the lookup answered "cannot be paid" (the historical default
+    // here); the offer-face tests override with a verified partner, since a
+    // REAL standing deal always has one (createOffer refuses otherwise).
+    tradePartnerImpl: (): Promise<unknown> => Promise.resolve(null),
+    cancelListingImpl: (): Promise<unknown> =>
       Promise.resolve({ ok: false, code: 'woc_market.disabled' }),
     lastAcceptBody: null as Record<string, unknown> | null,
     lastCreateBody: null as Record<string, unknown> | null,
@@ -243,6 +255,8 @@ function fakeHooks(): {
       signAndSends: [] as string[],
       createOffers: 0,
       resolveOffers: [] as [number, string][],
+      statuses: 0,
+      cancelListings: [] as number[],
     },
   };
   const hooks = {
@@ -291,6 +305,18 @@ function fakeHooks(): {
         state.calls.resolveOffers.push([id, action]);
         return Promise.resolve({ ok: true });
       },
+      // The realm floor for the courtesy below-min hint, fetched once at
+      // trade open. ok:false by default so existing cases exercise the
+      // unknown-floor arm (unknown never blocks); a test overrides statusImpl
+      // to drive the hint.
+      status: () => {
+        state.calls.statuses++;
+        return state.statusImpl();
+      },
+      cancelListing: (id: number) => {
+        state.calls.cancelListings.push(id);
+        return state.cancelListingImpl();
+      },
       settlementQuote: () => state.settlementQuoteImpl(),
       confirmSettlement: () => state.confirmSettlementImpl(),
       createOffer: (body: Record<string, unknown>) => {
@@ -298,7 +324,7 @@ function fakeHooks(): {
         state.lastCreateBody = body;
         return state.createOfferImpl();
       },
-      tradePartner: () => Promise.resolve(null),
+      tradePartner: () => state.tradePartnerImpl(),
     },
     characterId: () => 1,
     walletLinked: () => true,
@@ -1304,8 +1330,20 @@ describe('the pay verdict ladder matches the Exchange window', () => {
     expect(logs).not.toContain(t('hudChrome.trade.woc.settled'));
   });
 
-  it('a DECIDED payment (confirmed, delivery owed) logs the settled line, as the Exchange does', async () => {
-    const logs = await payTo({ ok: true, state: 'confirmed' });
+  it('a DECIDED payment with delivery owed logs the confirmed line, never a delivery claim', async () => {
+    // Confirmed money whose finalize has not run: its own sentence. The old
+    // settled line ("on its way by mail") claimed a delivery that had not
+    // happened; the poll's settled report still closes the loop when it does.
+    for (const state of ['confirmed', 'delivering']) {
+      const logs = await payTo({ ok: true, state });
+      expect(logs, state).toContain(t('hudChrome.trade.woc.paymentConfirmed'));
+      expect(logs, state).not.toContain(t('hudChrome.trade.woc.settled'));
+      expect(logs, state).not.toContain(t('hudChrome.wocMarket.paymentPendingGeneric'));
+    }
+  });
+
+  it('a DELIVERED answer logs the settled line', async () => {
+    const logs = await payTo({ ok: true, state: 'delivered' });
     expect(logs).toContain(t('hudChrome.trade.woc.settled'));
     expect(logs).not.toContain(t('hudChrome.wocMarket.paymentPendingGeneric'));
   });
@@ -1394,6 +1432,305 @@ describe('the adoption-stored split dies with its deal', () => {
     await flushAsync();
     expect(c.wocTradeOffer, 'the dead deal is gone').toBeNull();
     expect(c.wocTradeSplit, 'and its split with it').toBeNull();
+    vi.useRealTimers();
+  });
+});
+
+describe('honest deal endings (H13): closed is not settled', () => {
+  it('a closed-cancelled deal logs the cancelled line ONCE, never the paid line, and keeps the session', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+    const h = fakeHooks();
+    h.state.offersResult = {
+      ok: true,
+      offers: [
+        offerRow({
+          role: 'seller',
+          buyerName: 'Bree',
+          status: 'accepted',
+          listingId: 41,
+          listingStatus: 'closed',
+          listingResolution: 'cancelled',
+          buyerAccepted: true,
+          sellerAccepted: true,
+        }),
+      ],
+    };
+    const r = rig(h.hooks);
+    openTrade(r);
+    await flushAsync();
+    expect(r.host.logs).toContain(t('hudChrome.trade.woc.closedCancelled'));
+    expect(r.host.logs.join('\n')).not.toContain('received a payment');
+    // The session STAYS OPEN (a dead deal leaves two players at a live trade
+    // window), unlike the settled path which closes it.
+    expect(r.host.closed).toBe(0);
+    // Exactly once: the row lingers for the grace window, but the retired-id
+    // set holds the report.
+    vi.setSystemTime(1_002_500);
+    r.controller.updateTradeWindow();
+    await flushAsync();
+    expect(r.host.logs.filter((l) => l === t('hudChrome.trade.woc.closedCancelled'))).toHaveLength(
+      1,
+    );
+    vi.useRealTimers();
+  });
+
+  it('an unpaid close and a suspension each log their own honest reason', async () => {
+    for (const [resolution, key] of [
+      ['unsettled', 'hudChrome.trade.woc.closedUnpaid'],
+      ['suspended', 'hudChrome.trade.woc.closedSuspended'],
+    ] as const) {
+      vi.useFakeTimers();
+      vi.setSystemTime(1_000_000);
+      const h = fakeHooks();
+      h.state.offersResult = {
+        ok: true,
+        offers: [
+          offerRow({
+            status: 'accepted',
+            listingId: 41,
+            listingStatus: 'closed',
+            listingResolution: resolution,
+            buyerAccepted: true,
+            sellerAccepted: true,
+          }),
+        ],
+      };
+      const r = rig(h.hooks);
+      openTrade(r);
+      await flushAsync();
+      expect(r.host.logs, resolution).toContain(t(key));
+      expect(r.host.logs.join('\n'), resolution).not.toContain('received a payment');
+      vi.useRealTimers();
+    }
+  });
+
+  it('reports the other side resolving the offer (declined / withdrawn / expired), once', async () => {
+    for (const [status, key] of [
+      ['declined', 'hudChrome.trade.woc.offerDeclined'],
+      ['withdrawn', 'hudChrome.trade.woc.offerWithdrawn'],
+      ['expired', 'hudChrome.trade.woc.offerExpired'],
+    ] as const) {
+      vi.useFakeTimers();
+      vi.setSystemTime(1_000_000);
+      const h = fakeHooks();
+      h.state.offersResult = { ok: true, offers: [offerRow()] };
+      const r = rig(h.hooks);
+      openTrade(r);
+      await flushAsync();
+      // The counterparty resolves it; the lingering row carries the verdict.
+      h.state.offersResult = { ok: true, offers: [offerRow({ status })] };
+      vi.setSystemTime(1_002_500);
+      r.controller.updateTradeWindow();
+      await flushAsync();
+      expect(r.host.logs, status).toContain(t(key));
+      // Once: the retired-id set holds it across further polls.
+      vi.setSystemTime(1_005_000);
+      r.controller.updateTradeWindow();
+      await flushAsync();
+      expect(
+        r.host.logs.filter((l) => l === t(key)),
+        status,
+      ).toHaveLength(1);
+      vi.useRealTimers();
+    }
+  });
+});
+
+describe('seller controls (H13): decline and cancel sale, end to end', () => {
+  it('the seller review face carries a live Decline that reaches the decline route', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+    const h = fakeHooks();
+    h.state.tradePartnerImpl = () => Promise.resolve({ name: 'Bree', walletVerified: true });
+    h.state.offersResult = {
+      ok: true,
+      offers: [offerRow({ role: 'seller', buyerName: 'Bree' })],
+    };
+    const r = rig(h.hooks);
+    openTrade(r);
+    await flushAsync();
+    r.controller.updateTradeWindow();
+    const btn = document.querySelector<HTMLElement>('#trade-window [data-woc-decline]');
+    expect(btn, 'the decline control renders for the seller').not.toBeNull();
+    btn?.click();
+    await flushAsync();
+    expect(h.state.calls.resolveOffers).toEqual([[7, 'decline']]);
+    expect(r.host.logs).toContain(t('hudChrome.trade.woc.youDeclined'));
+    vi.useRealTimers();
+  });
+
+  it('the buyer keeps Withdraw and never sees Decline; a withdraw logs its own line', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+    const h = fakeHooks();
+    h.state.tradePartnerImpl = () => Promise.resolve({ name: 'Bree', walletVerified: true });
+    h.state.offersResult = { ok: true, offers: [offerRow()] };
+    const r = rig(h.hooks);
+    openTrade(r);
+    await flushAsync();
+    r.controller.updateTradeWindow();
+    expect(document.querySelector('#trade-window [data-woc-decline]')).toBeNull();
+    const btn = document.querySelector<HTMLElement>('#trade-window [data-woc-cancel]');
+    expect(btn).not.toBeNull();
+    btn?.click();
+    await flushAsync();
+    expect(h.state.calls.resolveOffers).toEqual([[7, 'withdraw']]);
+    expect(r.host.logs).toContain(t('hudChrome.trade.woc.youWithdrew'));
+    vi.useRealTimers();
+  });
+
+  it('the seller can cancel an unpaid directed sale from the awaiting-payment face', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+    const h = fakeHooks();
+    h.state.tradePartnerImpl = () => Promise.resolve({ name: 'Bree', walletVerified: true });
+    h.state.cancelListingImpl = () => Promise.resolve({ ok: true });
+    h.state.offersResult = {
+      ok: true,
+      offers: [
+        offerRow({
+          role: 'seller',
+          buyerName: 'Bree',
+          status: 'accepted',
+          listingId: 41,
+          listingStatus: 'active',
+          buyerAccepted: true,
+          sellerAccepted: true,
+        }),
+      ],
+    };
+    const r = rig(h.hooks);
+    openTrade(r);
+    await flushAsync();
+    r.controller.updateTradeWindow();
+    const btn = document.querySelector<HTMLElement>('#trade-window [data-woc-cancel-sale]');
+    expect(btn, 'the cancel-sale control renders for the seller').not.toBeNull();
+    btn?.click();
+    await flushAsync();
+    expect(h.state.calls.cancelListings).toEqual([41]);
+    expect(r.host.logs).toContain(t('hudChrome.wocMarket.listingCancelled'));
+    const c = r.controller as unknown as { wocTradeOffer: WocPendingOffer | null };
+    expect(c.wocTradeOffer, 'the dead deal cleared').toBeNull();
+    vi.useRealTimers();
+  });
+
+  it('a cancel answered CANCEL-PENDING keeps the deal held: the buyer may still pay', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+    const h = fakeHooks();
+    h.state.tradePartnerImpl = () => Promise.resolve({ name: 'Bree', walletVerified: true });
+    h.state.cancelListingImpl = () => Promise.resolve({ ok: true, cancelPending: true });
+    h.state.offersResult = {
+      ok: true,
+      offers: [
+        offerRow({
+          role: 'seller',
+          buyerName: 'Bree',
+          status: 'accepted',
+          listingId: 41,
+          listingStatus: 'active',
+          buyerAccepted: true,
+          sellerAccepted: true,
+        }),
+      ],
+    };
+    const r = rig(h.hooks);
+    openTrade(r);
+    await flushAsync();
+    r.controller.updateTradeWindow();
+    document.querySelector<HTMLElement>('#trade-window [data-woc-cancel-sale]')?.click();
+    await flushAsync();
+    expect(r.host.logs).toContain(t('hudChrome.wocMarket.listingCancelPending'));
+    const c = r.controller as unknown as { wocTradeOffer: WocPendingOffer | null };
+    expect(c.wocTradeOffer, 'the deal stays held; the poll resolves it').not.toBeNull();
+    vi.useRealTimers();
+  });
+
+  it('the buyer face never renders cancel-sale', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+    const h = fakeHooks();
+    h.state.tradePartnerImpl = () => Promise.resolve({ name: 'Bree', walletVerified: true });
+    h.state.offersResult = {
+      ok: true,
+      offers: [
+        offerRow({
+          status: 'accepted',
+          listingId: 41,
+          listingStatus: 'active',
+          buyerAccepted: true,
+          sellerAccepted: true,
+        }),
+      ],
+    };
+    const r = rig(h.hooks);
+    openTrade(r);
+    await flushAsync();
+    r.controller.updateTradeWindow();
+    expect(document.querySelector('#trade-window [data-woc-cancel-sale]')).toBeNull();
+    vi.useRealTimers();
+  });
+});
+
+describe('informed waiting: expiry, close-time honesty, fresh money lines', () => {
+  it('tells a buyer who closes the window that a LIVE offer still stands, with its expiry', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+    const h = fakeHooks();
+    h.state.offersResult = { ok: true, offers: [offerRow()] };
+    const r = rig(h.hooks);
+    openTrade(r);
+    await flushAsync();
+    // The window closes with the offer still pending.
+    r.host.tradeInfo = null;
+    r.controller.updateTradeWindow();
+    await flushAsync();
+    const line = r.host.logs.find((l) =>
+      l.startsWith(t('hudChrome.trade.woc.offerStandsUntil', { time: '' }).slice(0, 12)),
+    );
+    expect(line, 'the still-stands line').toBeTruthy();
+    vi.useRealTimers();
+  });
+
+  it('a price edit blanks the derived money lines IMMEDIATELY, not after the debounce', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+    const h = fakeHooks();
+    const r = rig(h.hooks);
+    openTrade(r);
+    const c = r.controller as unknown as {
+      onWocTradePrice(cents: number | null): void;
+      wocTradeTokens: number | null;
+      wocTradeSplit: unknown;
+    };
+    c.wocTradeTokens = 800;
+    c.wocTradeSplit = { sellerCents: 90, burnCents: 3, treasuryCents: 7 };
+    c.onWocTradePrice(7500);
+    // BEFORE the debounce fires or any estimate lands: the old figures
+    // described the previous price and must not sit under the new one.
+    expect(c.wocTradeTokens).toBeNull();
+    expect(c.wocTradeSplit).toBeNull();
+    vi.useRealTimers();
+  });
+
+  it('fetches the Exchange floor once per trade and threads it into the hint model', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+    const h = fakeHooks();
+    h.state.statusImpl = () => Promise.resolve({ ok: true, enabled: true, minPriceCents: 100 });
+    const r = rig(h.hooks);
+    openTrade(r);
+    await flushAsync();
+    expect(h.state.calls.statuses).toBe(1);
+    const c = r.controller as unknown as { wocTradeMinPriceCents: number | null };
+    expect(c.wocTradeMinPriceCents).toBe(100);
+    // Re-open: the realm-static floor is not re-fetched.
+    r.host.tradeInfo = null;
+    r.controller.updateTradeWindow();
+    openTrade(r);
+    await flushAsync();
+    expect(h.state.calls.statuses).toBe(1);
     vi.useRealTimers();
   });
 });

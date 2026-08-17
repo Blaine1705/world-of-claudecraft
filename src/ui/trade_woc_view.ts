@@ -18,6 +18,7 @@ import { exchangeHardLock, exchangeItemCategory } from '../sim/exchange_eligibil
 import { itemInstancePayloadsEqual } from '../sim/item_instance_merge';
 import type { InvSlot, ItemDef } from '../sim/types';
 import type { TranslationKey } from './i18n.catalog';
+import { usdText } from './usd_text';
 import { overWalletBalance } from './woc_affordable_core';
 
 /** What the window knows about the other side, fed by the server (never by the
@@ -37,7 +38,7 @@ export interface WocTradeSplit {
 export type WocTradeMode = 'gold' | 'woc';
 
 /**
- * Where a $WOC deal has got to. The window shows one of four faces.
+ * Where a $WOC deal has got to. The window shows one of these faces.
  *
  *  - review: agreed price on the table, each side yet to accept.
  *  - awaiting_payment: both accepted, the goods are in escrow, and the BUYER
@@ -45,14 +46,20 @@ export type WocTradeMode = 'gold' | 'woc';
  *    what their face should say.
  *  - paying: the payment is in flight. The buyer has signed and the chain has
  *    not finished confirming, which takes tens of seconds on mainnet.
- *  - settled: paid; the item is on its way by mail.
+ *  - settled: SOLD, and only sold (listingResolution === 'sold'). It used to
+ *    mean "the listing closed", which told a seller whose deal was cancelled,
+ *    suspended, or simply never paid that they had received a payment: the
+ *    H13 false-payment line. A closed-not-sold listing is 'closed'.
+ *  - closed: the deal died without a sale (cancelled / suspended / unpaid).
+ *    The controller reports the honest reason once and returns the arm to
+ *    the compose form; no face renders this phase.
  *
  * `paying` is not cosmetic. Without it the window sat on `awaiting_payment`
  * through the whole confirmation and then emptied, so a buyer signing in their
  * wallet and a buyer who walked away looked identical to the seller, and the
  * sale appeared to complete with no payment ever shown.
  */
-export type WocOfferPhase = 'review' | 'awaiting_payment' | 'paying' | 'settled';
+export type WocOfferPhase = 'review' | 'awaiting_payment' | 'paying' | 'settled' | 'closed';
 
 /** A sent-but-unresolved $WOC offer, as both sides see it. */
 export interface WocPendingOffer {
@@ -70,6 +77,14 @@ export interface WocPendingOffer {
    *  sim trade and those flags therefore never move. */
   buyerAccepted: boolean;
   sellerAccepted: boolean;
+  /** When the un-accepted offer lapses (the server's TTL), so the review face
+   *  can say so instead of silently reverting to the form. Null or absent
+   *  when the wire did not carry it (absent reads as null). */
+  expiresAtMs?: number | null;
+  /** The live settlement's coarse state, so the paying face can distinguish
+   *  "confirming on the network" from "confirmed, delivery under way". Null
+   *  or absent while none exists (absent reads as null). */
+  settlementState?: string | null;
 }
 
 /** Why the $WOC arm is unavailable, or null when it is offerable. */
@@ -93,6 +108,7 @@ export type WocSendHint =
   | 'await_their_items' // they have staged nothing eligible to buy yet
   | 'one_item' // a directed deal pins EXACTLY one copy; more than one is ambiguous
   | 'enter_price'
+  | 'below_min' // under the Exchange's minimum price (the server would refuse)
   | 'gold_offered'
   | 'insufficient_balance'; // the quote is more $WOC than the wallet holds
 
@@ -140,6 +156,12 @@ export interface WocTradeInput {
    * pair would then have agreed a deal neither half could carry.
    */
   goldOffered: boolean;
+  /**
+   * The Exchange's minimum listing price in cents, from /status. Null or
+   * absent while unknown, and unknown never blocks (the hint is a courtesy;
+   * the server's own refusal is the authority), like walletTokens below.
+   */
+  minPriceCents?: number | null;
   /**
    * The VERIFIED wallet's $WOC balance, or null when it is not known.
    *
@@ -216,6 +238,10 @@ export interface WocTradeModel {
   canSend: boolean;
   /** The i18n key explaining why it may not, or null when it may. */
   sendHint: TranslationKey | null;
+  /** Values the sendHint copy interpolates (the below_min floor), or null
+   *  when the hint takes none. Resolved HERE so the painter renders the key
+   *  verbatim and derives nothing. */
+  sendHintParams: Record<string, string> | null;
   /** The exact copy the offer pins (H10): the partner's ONE eligible staged
    *  item, or null while the table is empty or ambiguous. Non-null whenever
    *  canSend is true, by the hint ladder's one_item arm. */
@@ -242,6 +268,17 @@ const STATUS_KEYS: Partial<Record<`${WocOfferPhase}:${'buyer' | 'seller'}`, Tran
   'paying:seller': 'hudChrome.trade.woc.statusPayingSeller',
 };
 
+/** A CONFIRMED payment whose delivery is still completing is not "confirming
+ *  on the network" (decided money) and not yet "on its way by mail" (the
+ *  finalize has not run): its own honest sentence, per side. */
+const DELIVERING_STATUS_KEYS: Record<'buyer' | 'seller', TranslationKey> = {
+  buyer: 'hudChrome.trade.woc.statusConfirmedBuyer',
+  seller: 'hudChrome.trade.woc.statusConfirmedSeller',
+};
+
+/** Settlement states where the money is DECIDED and delivery is completing. */
+const DELIVERING_STATES = new Set(['confirmed', 'delivering']);
+
 const BLOCK_KEYS: Record<WocArmBlock, TranslationKey> = {
   market_disabled: 'hudChrome.trade.woc.blockDisabled',
   no_wallet: 'hudChrome.trade.woc.blockNoWallet',
@@ -254,6 +291,7 @@ const SEND_HINT_KEYS: Record<WocSendHint, TranslationKey> = {
   await_their_items: 'hudChrome.trade.woc.hintAwaitTheirItems',
   one_item: 'hudChrome.trade.woc.hintOneItem',
   enter_price: 'hudChrome.trade.woc.hintEnterPrice',
+  below_min: 'hudChrome.trade.woc.hintBelowMin',
   gold_offered: 'hudChrome.trade.woc.hintGoldOffered',
   insufficient_balance: 'hudChrome.trade.woc.hintInsufficientBalance',
 };
@@ -357,9 +395,14 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
           ? 'one_item'
           : input.usdCents === null || input.usdCents <= 0
             ? 'enter_price'
-            : shortfall
-              ? 'insufficient_balance'
-              : null;
+            : // Courtesy pre-check of the server's floor: with the floor
+              // unknown (null/absent) nothing blocks, and the server's own
+              // refusal stays the authority either way.
+              input.minPriceCents != null && input.usdCents < input.minPriceCents
+              ? 'below_min'
+              : shortfall
+                ? 'insufficient_balance'
+                : null;
 
   // Only the seller accepts, and only with the agreed shape on the table:
   // acceptance is what escrows the goods, so there must be goods, and the
@@ -448,6 +491,10 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
     // A standing offer replaces the form: you cannot send a second one over it.
     canSend: wocMode && hint === null && input.pendingOffer === null,
     sendHint: wocMode && hint !== null ? SEND_HINT_KEYS[hint] : null,
+    sendHintParams:
+      wocMode && hint === 'below_min' && input.minPriceCents != null
+        ? { usd: usdText(input.minPriceCents) }
+        : null,
     agreedItem:
       input.theirStaged.length === 1 && eligible.length === 1 && eligible[0].count === 1
         ? eligible[0]
@@ -455,7 +502,10 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
     statusKey:
       input.pendingOffer === null
         ? null
-        : (STATUS_KEYS[`${input.pendingOffer.phase}:${input.pendingOffer.role}`] ?? null),
+        : input.pendingOffer.phase === 'paying' &&
+            DELIVERING_STATES.has(input.pendingOffer.settlementState ?? '')
+          ? DELIVERING_STATUS_KEYS[input.pendingOffer.role]
+          : (STATUS_KEYS[`${input.pendingOffer.phase}:${input.pendingOffer.role}`] ?? null),
     // Only the payment itself spins. Waiting on the other player to press a
     // button is not progress and must not look like it, or every wait reads as
     // "something is happening" and the player never knows when to act.

@@ -10,9 +10,10 @@ import {
   adoptedWocOffer,
   selectStandingWocOffer,
   type WocOfferRowLike,
+  wocOfferClosedReason,
+  wocOfferPhase,
   wocOfferPollStep,
 } from '../src/ui/hud/woc_trade/woc_trade_offer_view';
-import { wocOfferPhase } from '../src/ui/trade_woc_panel';
 import type { WocPendingOffer } from '../src/ui/trade_woc_view';
 
 type Row = WocOfferRowLike & {
@@ -147,11 +148,25 @@ describe('adoptedWocOffer', () => {
       listingId: 41,
       buyerAccepted: true,
       sellerAccepted: false,
+      expiresAtMs: null,
+      settlementState: null,
     });
   });
 
   it('carries a missing quote as null rather than inventing a figure', () => {
     expect(adoptedWocOffer(row(), 'review', null).tokens).toBeNull();
+  });
+
+  it('carries the expiry and the settlement state when the row names them', () => {
+    // The review face renders the expiry, and the paying face's status
+    // sentence keys on the settlement state (confirmed is not "confirming").
+    const projected = adoptedWocOffer(
+      row({ expiresAtMs: 1_800_000_000_000, settlementState: 'confirmed' }),
+      'paying',
+      null,
+    );
+    expect(projected.expiresAtMs).toBe(1_800_000_000_000);
+    expect(projected.settlementState).toBe('confirmed');
   });
 });
 
@@ -187,6 +202,67 @@ describe('the canonical deal walks review -> awaiting_payment -> paying -> settl
     phase = wocOfferPhase(mine, false);
     expect(phase).toBe('settled');
     expect(wocOfferPollStep(cur, mine, phase)).toEqual({ kind: 'settle' });
+  });
+
+  it("a closed listing is 'settled' ONLY when it sold (the H13 false-payment fix)", () => {
+    // The old derivation treated ANY closed listing as settled, so a
+    // cancelled directed sale logged "You have received a payment" to the
+    // seller. Sold is the one resolution that means money moved.
+    const base = {
+      listingId: 41,
+      listingStatus: 'closed',
+      settlementState: null as string | null,
+    };
+    expect(wocOfferPhase({ ...base, listingResolution: 'sold' })).toBe('settled');
+    for (const resolution of ['cancelled', 'suspended', 'unsettled', 'no_bids', null]) {
+      expect(wocOfferPhase({ ...base, listingResolution: resolution }), String(resolution)).toBe(
+        'closed',
+      );
+    }
+  });
+
+  it('names WHY a dead deal died, and unknown resolutions read as unpaid, never invented', () => {
+    const closed = (listingResolution: string | null) =>
+      wocOfferClosedReason({ listingStatus: 'closed', listingResolution });
+    expect(closed('cancelled')).toBe('cancelled');
+    expect(closed('suspended')).toBe('suspended');
+    for (const r of ['unsettled', 'no_bids', 'reserve_not_met', null, 'future_word']) {
+      expect(closed(r), String(r)).toBe('unpaid');
+    }
+    // Not closed, or sold: nothing to explain.
+    expect(wocOfferClosedReason({ listingStatus: 'active', listingResolution: null })).toBeNull();
+    expect(wocOfferClosedReason({ listingStatus: 'closed', listingResolution: 'sold' })).toBeNull();
+  });
+
+  it("the poll answers 'closed' for a dead deal, decisively over any held state", () => {
+    const dead = row({ listingId: 41, listingStatus: 'closed', listingResolution: 'cancelled' });
+    expect(wocOfferPollStep(null, dead, wocOfferPhase(dead))).toEqual({ kind: 'closed' });
+    expect(wocOfferPollStep(held({ phase: 'paying' }), dead, wocOfferPhase(dead))).toEqual({
+      kind: 'closed',
+    });
+  });
+
+  it('a settlement-state move alone forces a repaint (confirming -> confirmed)', () => {
+    // Phase stays 'paying' across the move, but the status sentence the
+    // player reads changes; an id-phase-flags comparison kept the stale
+    // "confirming on the network" through the whole delivery.
+    const mine = row({
+      status: 'accepted',
+      buyerAccepted: true,
+      sellerAccepted: true,
+      listingId: 41,
+      listingStatus: 'open',
+      settlementState: 'confirmed',
+    });
+    const heldConfirming = adoptedWocOffer(
+      { ...mine, settlementState: 'confirming' },
+      'paying',
+      null,
+    );
+    expect(wocOfferPollStep(heldConfirming, mine, 'paying')).toEqual({ kind: 'adopt' });
+    expect(wocOfferPollStep(adoptedWocOffer(mine, 'paying', null), mine, 'paying')).toEqual({
+      kind: 'keep',
+    });
   });
 
   it("the row's settlementState alone reads as paying: the seller has no local click", () => {

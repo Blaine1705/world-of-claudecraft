@@ -271,6 +271,37 @@ export const hudChromeStrings = {
       statusPayingSeller: 'Payment received. Confirming on the network...',
       paidSeller: 'You have received a payment of {price} for your {item}.',
       paidBuyer: 'You have sent a payment of {price} for {item}.',
+      // The honest ends of a deal that DID NOT sell (the H13 fix: a closed
+      // listing used to render as settled and print the paid line).
+      closedCancelled: 'This sale was cancelled. The item returns to the seller by Ravenpost mail.',
+      closedSuspended:
+        'This sale was suspended by a Game Master. The item returns to the seller by Ravenpost mail.',
+      closedUnpaid:
+        'This sale ended without payment. The item returns to the seller by Ravenpost mail.',
+      // The seller's way out of an incoming offer and of an unpaid directed
+      // sale (the dead wiring H13 named).
+      cancelSale: 'Cancel sale',
+      youDeclined: 'You declined the offer.',
+      youWithdrew: 'You withdrew your offer.',
+      // What the OTHER side sees when a standing offer stops standing.
+      offerDeclined: 'The $WOC offer was declined.',
+      offerWithdrawn: 'The $WOC offer was withdrawn.',
+      offerExpired: 'The $WOC offer expired.',
+      // Informed waiting: when the offer lapses, and what closing the window
+      // mid-deal does and does not end.
+      offerExpiresAt: 'Offer expires at {time}.',
+      offerStandsUntil:
+        'Your $WOC offer still stands until {time}. Trade with the seller again to finish the deal if they accept.',
+      dealAwaitsPayment:
+        'Your $WOC purchase is still unpaid. Trade with the seller again to pay; the deal expires on its own if you do not.',
+      // Decided money whose delivery has not finished: its own sentence, so
+      // "confirming on the network" never describes a confirmed payment and
+      // "on its way by mail" never predates the delivery.
+      paymentConfirmed: 'Payment confirmed. Your item arrives by Ravenpost mail once delivery completes.',
+      statusConfirmedBuyer: 'Payment confirmed. Delivery is completing...',
+      statusConfirmedSeller: 'Payment confirmed. The sale is completing...',
+      // The courtesy floor hint (the server's refusal stays the authority).
+      hintBelowMin: 'The Exchange minimum price is {usd}.',
     },
   },
   wocStore: {

@@ -177,7 +177,13 @@ describe('browse()', () => {
     stubFetch(() => ({ status: 409, body: { code: 'woc_market.paused' } }));
     await expect(
       client().browse({ page: 0, sort: 'ending', quality: null, format: null, itemIds: null }),
-    ).resolves.toEqual({ ok: false, code: 'woc_market.paused' });
+    ).resolves.toEqual({
+      ok: false,
+      code: 'woc_market.paused',
+      // The parsed error body rides as params (the ApiError convention), so
+      // parametric codes can render their values (e.g. retryAfterSeconds).
+      params: { code: 'woc_market.paused' },
+    });
   });
 
   it('falls back to WOC_MARKET_UNAVAILABLE on a non-2xx with no code', async () => {
@@ -223,6 +229,7 @@ describe('confirmSettlement()', () => {
     await expect(client().confirmSettlement(4, 'sig-1')).resolves.toEqual({
       ok: false,
       code: 'woc_market.quote_expired',
+      params: { code: 'woc_market.quote_expired' },
     });
   });
 });
@@ -263,6 +270,7 @@ describe('cancelListing()', () => {
     await expect(client().cancelListing(41)).resolves.toEqual({
       ok: false,
       code: 'woc_market.settlement_in_flight',
+      params: { code: 'woc_market.settlement_in_flight' },
     });
   });
 });

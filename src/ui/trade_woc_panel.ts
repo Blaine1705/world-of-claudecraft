@@ -18,15 +18,15 @@
 import type { InvSlot, ItemDef } from '../sim/types';
 import { esc } from './esc';
 import { restoreFirstEnabled } from './focus_restore';
-import { formatNumber, t } from './i18n';
+import { formatDateTime, formatNumber, t } from './i18n';
 import {
   buildWocTradeModel,
-  type WocOfferPhase,
   type WocPendingOffer,
   type WocTradeModel,
   type WocTradePartner,
   type WocTradeSplit,
 } from './trade_woc_view';
+import { usdText } from './usd_text';
 
 export interface WocTradePanelDeps {
   staged: readonly InvSlot[];
@@ -50,21 +50,30 @@ export interface WocTradePanelDeps {
   usdCents: number | null;
   tokens: number | null;
   split: WocTradeSplit | null;
+  /** The Exchange's minimum listing price from /status. Null or absent
+   *  while unknown (the courtesy hint arm; unknown never blocks). */
+  minPriceCents?: number | null;
   pendingOffer: WocPendingOffer | null;
   onModeChange(mode: 'gold' | 'woc'): void;
   onPriceInput(usdCents: number | null): void;
   onSendOffer(): void;
-  onAcceptOffer(): void;
+  /** The buyer pulls the offer they made ('withdraw'). */
   onCancelOffer(): void;
+  /** The seller refuses the incoming offer ('decline'): the dead wiring H13
+   *  named, now a real control on the seller's review face. */
+  onDeclineOffer(): void;
+  /** The seller cancels the directed listing while the buyer has not paid
+   *  (the PRD's own mitigation, previously unreachable). */
+  onCancelSale(): void;
   onPayOffer(): void;
 }
 
-/** USD cents as a localized money string. Cents in: the caller parses the
- *  field once and owns the number, so nothing economic is derived here. */
-/** USD cents as "$1.00". Exported because the HUD's completion message names
- *  the same price, and two spellings of one figure in one trade is a defect. */
+/** USD cents as a localized currency string (the shared usd_text core, so
+ *  the trade arm and the Exchange window spell the same dollar identically).
+ *  Exported because the HUD's completion message names the same price, and
+ *  two spellings of one figure in one trade is a defect. */
 export function wocUsdText(cents: number): string {
-  return `$${formatNumber(cents / 100, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return usdText(cents);
 }
 const usd = wocUsdText;
 
@@ -86,44 +95,6 @@ export function wocTradeMoneyText(offer: WocPendingOffer | null): string {
   })}`;
 }
 
-/**
- * Which face of the deal a server-side offer row is showing.
- *
- * Derived from the listing rather than the offer's own status, because the
- * offer says only "agreed": what decides whether money is still owed is the
- * LISTING, which exists from acceptance and closes when the sale settles.
- */
-export function wocOfferPhase(
-  row: {
-    listingId: number | null;
-    listingStatus: string | null;
-    listingResolution: string | null;
-    settlementState?: string | null;
-  },
-  /** The viewer's own payment is in flight locally. The buyer knows this before
-   *  any server round trip, and waiting for the poll to catch up is a visible
-   *  gap where their click appears to have done nothing. */
-  payingLocally = false,
-): WocOfferPhase {
-  if (row.listingId === null) return 'review';
-  if (row.listingResolution === 'sold' || row.listingStatus === 'closed') return 'settled';
-  if (payingLocally || SETTLING_STATES.has(row.settlementState ?? '')) return 'paying';
-  return 'awaiting_payment';
-}
-
-/**
- * Settlement states that mean money is moving.
- *
- * 'offered' is deliberately ABSENT: a quote exists but nothing has been signed,
- * so the buyer still has to act and their button must stay live. Treating it as
- * in-flight would show a spinner to a player whose next move is to press Pay.
- * 'review' is PRESENT: an operator-parked payment is not settled and not lost,
- * and announcing delivery for it would tell the buyer of money under review
- * that the purchase completed (the custody-lie class the row label rule
- * already covers); the poll finishes the deal when the resolution does.
- */
-const SETTLING_STATES = new Set(['confirming', 'confirmed', 'delivering', 'review']);
-
 export function wocTradeModelFrom(deps: WocTradePanelDeps): WocTradeModel {
   return buildWocTradeModel({
     marketEnabled: deps.marketEnabled,
@@ -138,6 +109,7 @@ export function wocTradeModelFrom(deps: WocTradePanelDeps): WocTradeModel {
     usdCents: deps.usdCents,
     tokens: deps.tokens,
     split: deps.split,
+    minPriceCents: deps.minPriceCents ?? null,
     pendingOffer: deps.pendingOffer,
     goldOffered: deps.goldCopper > 0 || deps.partnerGoldCopper > 0,
     walletTokens: deps.walletTokens,
@@ -170,10 +142,13 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
       </div>`;
     }
     if (o.phase === 'awaiting_payment' || o.phase === 'paying') {
-      // The goods are already in escrow. Exactly one face here is actionable:
-      // the buyer's Pay button, and only while the payment has not started. Every
-      // other combination is a WAIT, and each says whose wait it is, because the
-      // seller watching a confirmation and the buyer watching their own
+      // The goods are already in escrow. Exactly one face here is actionable
+      // per side: the buyer's Pay button while the payment has not started,
+      // and the seller's Cancel sale while the buyer has not paid (the
+      // directed listing's own cancel; it disappears the moment a payment is
+      // in flight, because the server would refuse it then anyway). Every
+      // other combination is a WAIT, and each says whose wait it is, because
+      // the seller watching a confirmation and the buyer watching their own
       // transaction are not the same sentence.
       //
       // The status line is announced: a state the player cannot see change (a
@@ -187,20 +162,41 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
           : `<p class="trade-woc-waiting" role="status">${
               model.busy ? '<span class="trade-woc-spinner" aria-hidden="true"></span>' : ''
             }${esc(t(model.statusKey ?? 'hudChrome.trade.woc.awaitingPayment'))}</p>`;
+      const cancelSale =
+        o.role === 'seller' && o.phase === 'awaiting_payment'
+          ? `<button type="button" class="btn trade-woc-cancel" data-woc-cancel-sale>${esc(
+              t('hudChrome.trade.woc.cancelSale'),
+            )}</button>`
+          : `<button type="button" class="btn trade-woc-cancel" data-woc-decline>${esc(t('hudChrome.trade.woc.decline'))}</button>`;
       return `<div class="trade-woc-arm">${modeTabs}
         ${body}
+        ${cancelSale}
         <p class="trade-woc-hint" data-woc-hint role="status"></p>
       </div>`;
     }
     // No Accept button of its own: agreement rides the trade window's existing
-    // Accept, on both sides, exactly as a gold trade does. The only action here
-    // is the buyer's withdraw, which has no equivalent in the window's chrome.
+    // Accept, on both sides, exactly as a gold trade does. The arm's own
+    // actions are each side's way OUT of the deal: the buyer withdraws the
+    // offer they made, the seller declines the incoming one (H13's dead
+    // wiring, now live).
     const action =
       o.role === 'buyer'
         ? `<button type="button" class="btn trade-woc-cancel" data-woc-cancel>${esc(t('hudChrome.trade.woc.withdraw'))}</button>`
-        : '';
+        : `<button type="button" class="btn trade-woc-cancel" data-woc-decline>${esc(t('hudChrome.trade.woc.decline'))}</button>`;
+    // The offer is not open-ended, so say when it lapses; static text on
+    // purpose (a per-second countdown would rebuild the subtree for no
+    // decision the player can take differently).
+    const expiry =
+      o.expiresAtMs == null
+        ? ''
+        : `<p class="trade-woc-note">${esc(
+            t('hudChrome.trade.woc.offerExpiresAt', {
+              time: formatDateTime(o.expiresAtMs, { timeStyle: 'short' }),
+            }),
+          )}</p>`;
     return `<div class="trade-woc-arm">${modeTabs}
       <p class="trade-woc-warn">${esc(t('hudChrome.trade.woc.notInstant'))}</p>
+      ${expiry}
       ${action}
       <p class="trade-woc-hint" data-woc-hint role="status"></p>
     </div>`;
@@ -276,7 +272,8 @@ export function refreshWocTradeArm(root: ParentNode, model: WocTradeModel): void
   // A disabled affordance always says why: the hint rides beside it and
   // clears the moment the action becomes available. The model picks the
   // accept-side key (nothing sellable staged vs a table holding more than
-  // the one agreed copy), so the panel renders it verbatim.
+  // the one agreed copy) AND resolves any values the copy interpolates (the
+  // below_min floor), so the panel renders it verbatim.
   setText(
     '[data-woc-hint]',
     model.pendingOffer !== null
@@ -285,7 +282,7 @@ export function refreshWocTradeArm(root: ParentNode, model: WocTradeModel): void
         : t(model.acceptHint)
       : model.sendHint === null
         ? ''
-        : t(model.sendHint),
+        : t(model.sendHint, model.sendHintParams ?? undefined),
   );
   const send = root.querySelector<HTMLButtonElement>('[data-woc-send]');
   if (send && send.disabled !== !model.canSend) send.disabled = !model.canSend;
@@ -327,11 +324,14 @@ export function wireWocTradeArm(root: ParentNode, deps: WocTradePanelDeps): void
     .querySelector<HTMLElement>('[data-woc-send]')
     ?.addEventListener('click', () => deps.onSendOffer());
   root
-    .querySelector<HTMLElement>('[data-woc-accept]')
-    ?.addEventListener('click', () => deps.onAcceptOffer());
-  root
     .querySelector<HTMLElement>('[data-woc-cancel]')
     ?.addEventListener('click', () => deps.onCancelOffer());
+  root
+    .querySelector<HTMLElement>('[data-woc-decline]')
+    ?.addEventListener('click', () => deps.onDeclineOffer());
+  root
+    .querySelector<HTMLElement>('[data-woc-cancel-sale]')
+    ?.addEventListener('click', () => deps.onCancelSale());
   root
     .querySelector<HTMLElement>('[data-woc-pay]')
     ?.addEventListener('click', () => deps.onPayOffer());

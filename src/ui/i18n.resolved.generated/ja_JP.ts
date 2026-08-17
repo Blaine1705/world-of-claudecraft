@@ -527,7 +527,23 @@ export const ja_JP: EnTranslations = {
         "statusPayingBuyer": "ネットワーク上で支払いを確認しています...",
         "statusPayingSeller": "支払いを受け取りました。ネットワーク上で確認しています...",
         "paidSeller": "{item} の代金 {price} を受け取りました。",
-        "paidBuyer": "{item} の代金 {price} を支払いました。"
+        "paidBuyer": "{item} の代金 {price} を支払いました。",
+        "closedCancelled": "この取引はキャンセルされました。アイテムはメールで出品者に返送されます。",
+        "closedSuspended": "この取引はゲームマスターにより停止されました。アイテムはメールで出品者に返送されます。",
+        "closedUnpaid": "この取引は支払いがないまま終了しました。アイテムはメールで出品者に返送されます。",
+        "cancelSale": "販売をキャンセル",
+        "youDeclined": "オファーを拒否しました。",
+        "youWithdrew": "オファーを取り下げました。",
+        "offerDeclined": "$WOC のオファーは拒否されました。",
+        "offerWithdrawn": "$WOC のオファーは取り下げられました。",
+        "offerExpired": "$WOC のオファーは期限切れになりました。",
+        "offerExpiresAt": "オファーは {time} に期限切れになります。",
+        "offerStandsUntil": "あなたの $WOC オファーは {time} まで有効です。相手が承諾したら、もう一度出品者と取引して手続きを完了してください。",
+        "dealAwaitsPayment": "あなたの $WOC 購入はまだ未払いです。もう一度出品者と取引して支払ってください。支払いがない場合、取引は自動的に期限切れになります。",
+        "paymentConfirmed": "支払いが確認されました。配送が完了するとアイテムはメールで届きます。",
+        "statusConfirmedBuyer": "支払いが確認されました。配送を完了しています...",
+        "statusConfirmedSeller": "支払いが確認されました。取引を完了しています...",
+        "hintBelowMin": "取引所の最低価格は {usd} です。"
       }
     },
     "wocStore": {

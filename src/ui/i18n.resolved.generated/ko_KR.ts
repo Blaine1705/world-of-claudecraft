@@ -527,7 +527,23 @@ export const ko_KR: EnTranslations = {
         "statusPayingBuyer": "네트워크에서 결제를 확인하는 중입니다...",
         "statusPayingSeller": "결제를 받았습니다. 네트워크에서 확인하는 중입니다...",
         "paidSeller": "{item}에 대한 {price} 결제를 받았습니다.",
-        "paidBuyer": "{item}에 대해 {price}를 결제했습니다."
+        "paidBuyer": "{item}에 대해 {price}를 결제했습니다.",
+        "closedCancelled": "이 거래가 취소되었습니다. 아이템은 우편으로 판매자에게 반환됩니다.",
+        "closedSuspended": "이 거래는 게임 마스터에 의해 중단되었습니다. 아이템은 우편으로 판매자에게 반환됩니다.",
+        "closedUnpaid": "이 거래는 결제 없이 종료되었습니다. 아이템은 우편으로 판매자에게 반환됩니다.",
+        "cancelSale": "판매 취소",
+        "youDeclined": "제안을 거절했습니다.",
+        "youWithdrew": "제안을 철회했습니다.",
+        "offerDeclined": "$WOC 제안이 거절되었습니다.",
+        "offerWithdrawn": "$WOC 제안이 철회되었습니다.",
+        "offerExpired": "$WOC 제안이 만료되었습니다.",
+        "offerExpiresAt": "제안은 {time}에 만료됩니다.",
+        "offerStandsUntil": "당신의 $WOC 제안은 {time}까지 유효합니다. 상대가 수락하면 판매자와 다시 거래하여 거래를 완료하세요.",
+        "dealAwaitsPayment": "$WOC 구매가 아직 결제되지 않았습니다. 판매자와 다시 거래하여 결제하세요. 결제하지 않으면 거래는 자동으로 만료됩니다.",
+        "paymentConfirmed": "결제가 확인되었습니다. 전달이 완료되면 아이템이 우편으로 도착합니다.",
+        "statusConfirmedBuyer": "결제가 확인되었습니다. 전달을 완료하는 중입니다...",
+        "statusConfirmedSeller": "결제가 확인되었습니다. 거래를 완료하는 중입니다...",
+        "hintBelowMin": "거래소 최저 가격은 {usd}입니다."
       }
     },
     "wocStore": {

@@ -13518,6 +13518,27 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.statusAwaitingBuyer': 'Ожидание оплаты от покупателя.',
   'hudChrome.trade.woc.statusPayingBuyer': 'Подтверждение вашего платежа в сети...',
   'hudChrome.trade.woc.statusPayingSeller': 'Платёж получен. Подтверждение в сети...',
+  'hudChrome.trade.woc.closedCancelled': 'Эта сделка отменена. Предмет вернётся продавцу почтой.',
+  'hudChrome.trade.woc.closedSuspended':
+    'Эта сделка приостановлена гейм-мастером. Предмет вернётся продавцу почтой.',
+  'hudChrome.trade.woc.closedUnpaid':
+    'Эта сделка завершилась без оплаты. Предмет вернётся продавцу почтой.',
+  'hudChrome.trade.woc.cancelSale': 'Отменить продажу',
+  'hudChrome.trade.woc.youDeclined': 'Вы отклонили предложение.',
+  'hudChrome.trade.woc.youWithdrew': 'Вы отозвали своё предложение.',
+  'hudChrome.trade.woc.offerDeclined': 'Предложение $WOC отклонено.',
+  'hudChrome.trade.woc.offerWithdrawn': 'Предложение $WOC отозвано.',
+  'hudChrome.trade.woc.offerExpired': 'Срок предложения $WOC истёк.',
+  'hudChrome.trade.woc.offerExpiresAt': 'Предложение истекает в {time}.',
+  'hudChrome.trade.woc.offerStandsUntil':
+    'Ваше предложение $WOC действует до {time}. Если продавец примет его, снова откройте обмен с ним, чтобы завершить сделку.',
+  'hudChrome.trade.woc.dealAwaitsPayment':
+    'Ваша покупка за $WOC ещё не оплачена. Снова откройте обмен с продавцом, чтобы оплатить; иначе сделка истечёт сама.',
+  'hudChrome.trade.woc.paymentConfirmed':
+    'Оплата подтверждена. Предмет придёт почтой, как только завершится доставка.',
+  'hudChrome.trade.woc.statusConfirmedBuyer': 'Оплата подтверждена. Доставка завершается...',
+  'hudChrome.trade.woc.statusConfirmedSeller': 'Оплата подтверждена. Сделка завершается...',
+  'hudChrome.trade.woc.hintBelowMin': 'Минимальная цена на бирже: {usd}.',
   'hudChrome.trade.woc.paidSeller': 'Вы получили платёж {price} за ваш предмет {item}.',
   'hudChrome.trade.woc.paidBuyer': 'Вы отправили платёж {price} за {item}.',
   'hudChrome.bags.lockItem': 'Заблокировать предмет',
