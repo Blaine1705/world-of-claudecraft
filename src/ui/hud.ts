@@ -165,7 +165,7 @@ import {
   auraEffectMaximumFractionDigits,
 } from './aura_effect';
 import { auraGainLogKeyFor, findAuraForGainEvent } from './aura_gain_log';
-import { auraIconCssBackground, createAuraIconResolver } from './aura_icon_view';
+import { resolveHudAuraIconId, resolveHudAuraIconUrl } from './aura_icon_runtime';
 import { AuraOverlayController } from './aura_overlay_controller';
 import { renderAuraTooltipBodyHtml } from './aura_tooltip';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
@@ -247,7 +247,7 @@ import {
   craftOwnsTab,
 } from './crafting_view';
 import { craftCastStripElements, renderCraftingWindow, stationNameText } from './crafting_window';
-import { classCrestId, crestIconUrl } from './crest_icon_art';
+import { classCrestId } from './crest_icon_art';
 import { hydrateCrestImageFallbacks } from './crest_image_fallback';
 import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow } from './daily_rewards_window';
@@ -491,16 +491,7 @@ import {
   tOptional,
   tPlural,
 } from './i18n';
-import {
-  abilityImageUrl,
-  cachedProceduralIconDataUrl,
-  hasAbilityIconIdentity,
-  hasAuraRecipe,
-  iconDataUrl,
-  proceduralIconDataUrl,
-  QUALITY_COLOR,
-  raidMarkerDataUrl,
-} from './icons';
+import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
 import { InspectWindow } from './inspect_window';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
@@ -895,17 +886,6 @@ const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.quer
 // painter's repaint gate never fires for it; the constant just pins the key so the
 // gate stays a no-op (target/party pass a per-unit key).
 const PLAYER_PORTRAIT_KEY = 'player';
-const resolveHudAuraIconId = createAuraIconResolver(hasAbilityIconIdentity, hasAuraRecipe);
-const HUD_AURA_STATIC_FALLBACK_URL = crestIconUrl('status_combat');
-if (!HUD_AURA_STATIC_FALLBACK_URL) throw new Error('Missing painted combat-status crest');
-const resolveHudAuraIconUrl = (iconId: string): string =>
-  auraIconCssBackground(
-    iconId,
-    abilityImageUrl,
-    (id) => cachedProceduralIconDataUrl('aura', id),
-    HUD_AURA_STATIC_FALLBACK_URL,
-    (id) => proceduralIconDataUrl('aura', id),
-  );
 // Vale Cup hold-to-charge shoot: full power after this long held, and the charge
 // a NON-held tap (touch / gamepad / a mouse click on the slot) fires at.
 const SHOOT_CHARGE_MS = 850;
