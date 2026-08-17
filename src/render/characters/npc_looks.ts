@@ -19,9 +19,10 @@
 // - `props` picks a fixed held-prop def (manifest.ts NPC_MODULAR_PROP_SETS):
 //   NPC gear never changes, so props are authored attaches, never weapon swaps.
 //
-// tests/npc_looks.test.ts pins: every NpcDef id resolves to a look, every
-// authored value survives normalizeAppearance unchanged (a typo'd style id
-// would silently clamp to the default), and no two NPCs share an appearance.
+// tests/npc_looks.test.ts pins: every NpcDef id resolves to a look EXCEPT
+// Brother Aldric (see aldricKeepsHisRig), every authored value survives
+// normalizeAppearance unchanged (a typo'd style id would silently clamp to the
+// default), and no two NPCs share an appearance.
 
 import {
   type ArmorLoadout,
@@ -178,25 +179,10 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     worn: kit('druid'),
     props: 'none',
   },
-  // Brother Aldric, Priest of the Vale (all his suffixed hub ids share this):
-  // the old brown-robed shepherd of the dead, bald, white-bearded, kind-eyed.
-  brother_aldric: {
-    app: {
-      gender: 'male',
-      hair: 'bald',
-      ...hair(30, 0.05, 0.8),
-      beard: 'wizard',
-      brows: 'worried',
-      eyeShape: 'droopy',
-      ...eyes(210, 0.25, 0.45),
-      ...skin(25, 0.4, 0.58),
-      mouth: 'smile',
-      face: face({ cheeks: -0.2, brow: 0.1 }),
-      outfit: 'ember',
-    },
-    worn: kit('mage'),
-    props: 'staff',
-  },
+  // Brother Aldric is DELIBERATELY ABSENT, in every hub (see ALDRIC_KEEPS_HIS_RIG
+  // below). He keeps the pre-v0.7 `npc_aldric` model with the staff built into
+  // the mesh: the community adopted that exact silhouette, so recomposing him
+  // would be a regression, not an upgrade, however good the composed body looks.
   // Smith Haldren: the Vale armorer, all shoulders, horseshoe moustache.
   smith_haldren: {
     app: {
@@ -1779,10 +1765,25 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
   },
 };
 
+/**
+ * The one NPC this module deliberately does NOT compose, under any of the hub
+ * ids he recurs at (`brother_aldric`, `_fen`, `_highwatch`, `_raid`).
+ *
+ * Brother Aldric renders the pre-v0.7 `npc_aldric` model, restored on purpose
+ * once already (PR #499) after a model change moved him off it. The community
+ * knows him by that exact silhouette, staff baked into the mesh and all, so a
+ * composed replacement would be a regression no matter how good the new body
+ * is. `npcLookFor` returns null for him, which is the same "keep the fixed
+ * rig" answer a pre-creator player character gets, so nothing special-cases
+ * him downstream. Pinned by tests/npc_looks.test.ts.
+ */
+export function aldricKeepsHisRig(templateId: string): boolean {
+  return templateId.startsWith('brother_aldric');
+}
+
 /** Suffixed hub ids that share one person's look (the same character recurs
  *  across zones under new templateIds). */
 function baseId(templateId: string): string {
-  if (templateId.startsWith('brother_aldric')) return 'brother_aldric';
   if (templateId === 'scout_maren_highwatch') return 'scout_maren';
   if (templateId === 'brother_halven_marsh') return 'brother_halven';
   return templateId;
@@ -1796,6 +1797,7 @@ const resolved = new Map<string, ModularLook | null>();
 /** The authored look for an NPC templateId, or null for one with no entry
  *  (which keeps its fixed rig, the same null the player path uses). */
 export function npcLookFor(templateId: string): ModularLook | null {
+  if (aldricKeepsHisRig(templateId)) return null;
   const id = baseId(templateId);
   let look = resolved.get(id);
   if (look === undefined) {

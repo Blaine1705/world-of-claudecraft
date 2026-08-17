@@ -57,8 +57,11 @@ console.log(JSON.stringify(rows));
   ).trim(),
 );
 
+// --town visits placed NPCs by templateId and never reads the roster, so it
+// can shoot an id the roster deliberately omits (Brother Aldric keeps his
+// fixed rig, so verifying HIM is exactly a town shot).
 const targets = ONLY ? roster.filter((r) => ONLY.includes(r.id)) : roster;
-if (targets.length === 0) throw new Error('no targets matched');
+if (!TOWN && targets.length === 0) throw new Error('no targets matched');
 
 const browser = await puppeteer.launch({
   executablePath: BROWSER_PATH,

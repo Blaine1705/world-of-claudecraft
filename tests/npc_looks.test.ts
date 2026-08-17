@@ -9,6 +9,7 @@ import { describe, expect, it } from 'vitest';
 import { VISUALS } from '../src/render/characters/manifest';
 import { ARMOR_SETS, ARMOR_SLOTS, normalizeAppearance } from '../src/render/characters/modular';
 import {
+  aldricKeepsHisRig,
   NPC_LOOKS,
   NPC_PROP_SET_IDS,
   npcLookFor,
@@ -17,9 +18,25 @@ import {
 import { NPCS } from '../src/sim/data';
 
 describe('npc looks roster', () => {
-  it('covers every NpcDef id (every world NPC composes)', () => {
-    const missing = Object.keys(NPCS).filter((id) => npcLookFor(id) === null);
+  it('covers every NpcDef id except Brother Aldric (every other world NPC composes)', () => {
+    const missing = Object.keys(NPCS).filter(
+      (id) => !aldricKeepsHisRig(id) && npcLookFor(id) === null,
+    );
     expect(missing).toEqual([]);
+  });
+
+  // Brother Aldric renders the pre-v0.7 npc_aldric model on purpose (the
+  // community knows him by that silhouette; PR #499 already restored it once).
+  // Composing him would be a regression, so his hub ids must resolve to null
+  // AND carry no roster entry a later edit could quietly re-activate.
+  it('never composes Brother Aldric, at any of his hub ids', () => {
+    const aldricIds = Object.keys(NPCS).filter((id) => id.startsWith('brother_aldric'));
+    expect(aldricIds.length).toBeGreaterThan(1);
+    for (const id of aldricIds) {
+      expect(aldricKeepsHisRig(id), id).toBe(true);
+      expect(npcLookFor(id), id).toBeNull();
+    }
+    expect(Object.keys(NPC_LOOKS).filter((id) => id.startsWith('brother_aldric'))).toEqual([]);
   });
 
   it('covers the NPC-bodied quest actors and the dev vendor', () => {
@@ -34,11 +51,12 @@ describe('npc looks roster', () => {
     }
   });
 
+  // Aldric's hub ids are covered by the dedicated null test above; asserting
+  // alias equality on him here would compare null to null and pass vacuously.
   it('recurring characters share one look across their hub ids', () => {
-    expect(npcLookFor('brother_aldric_fen')).toBe(npcLookFor('brother_aldric'));
-    expect(npcLookFor('brother_aldric_highwatch')).toBe(npcLookFor('brother_aldric'));
-    expect(npcLookFor('brother_aldric_raid')).toBe(npcLookFor('brother_aldric'));
+    expect(npcLookFor('scout_maren')).not.toBeNull();
     expect(npcLookFor('scout_maren_highwatch')).toBe(npcLookFor('scout_maren'));
+    expect(npcLookFor('brother_halven')).not.toBeNull();
     expect(npcLookFor('brother_halven_marsh')).toBe(npcLookFor('brother_halven'));
   });
 
