@@ -72,7 +72,10 @@ const MONOLITHS: MonolithRow[] = [
     // (zone_prewarm_templates_core.ts, the buildFormVisual fold), and the merged
     // file lands between the two pins, so the ceiling is the exact merged count
     // per the ratchet's rule: any further growth reds again.
-    ceiling: 13754,
+    // Lowered 13754 -> 13711 after extracting the shadow-depth prewarm material
+    // factory into src/render/prewarm_depth_material.ts (the ratchet's own rule:
+    // an extraction lowers the ceiling, never raises it). Exact count.
+    ceiling: 13711,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
