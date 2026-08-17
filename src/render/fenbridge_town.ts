@@ -34,7 +34,12 @@ import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import type { RevealGateCore } from './reveal_gate_core';
-import { townStaticReveal } from './town_reveal_core';
+import {
+  newTownPiecewiseReveal,
+  townPiecewiseRevealInto,
+  townRootVisible,
+  townStaticReveal,
+} from './town_reveal_core';
 import { modulateEmissiveByVertexColor } from './vertex_color_emissive';
 
 const ROOT_NAME = 'fenbridgeTownRebuild';
@@ -42,6 +47,8 @@ const OVERLAY_NAME = 'fenbridgeCaptureOverlay';
 const FOUNDATION_OVERLAP = 0.03;
 const FOUNDATION_COLOR = 0x4e5650;
 const TOWN_CULL_RADIUS = FENBRIDGE_LAYOUT.hub.radius + FENBRIDGE_LAYOUT.wall.maximumSegmentSpan / 2;
+/** The one reveal-gate key of the town's static content. */
+const STATIC_REVEAL_KEY = 'fenbridge-town-static';
 
 const PROP_ASSET_URLS = Object.freeze([
   ...FENBRIDGE_LAYOUT.buildings.map((building) => building.assetId),
@@ -1258,6 +1265,22 @@ function buildFromTemplates(
   // frame its own fog cull first showed it (the prod 220 ms
   // fenbridgeTownEmissive row).
   const staticRevealRoots: THREE.Object3D[] = [...staticCullTargets, ...buildingGroups];
+  // Piecewise reveal anchors, in staticRevealRoots order: a batch spans the
+  // whole town so it anchors at the hub centre, a building at its own
+  // footprint. hideTargets is built in the buildingGroups loop, so the two
+  // stay index-aligned by construction.
+  const rootX: number[] = staticCullTargets.map(() => FENBRIDGE_LAYOUT.hub.center.x);
+  const rootZ: number[] = staticCullTargets.map(() => FENBRIDGE_LAYOUT.hub.center.z);
+  for (const target of hideTargets) {
+    rootX.push(target.x);
+    rootZ.push(target.z);
+  }
+  const staticPiecewise = newTownPiecewiseReveal(
+    STATIC_REVEAL_KEY,
+    staticRevealRoots,
+    rootX,
+    rootZ,
+  );
   const visibilityPlan = newFenbridgeBuildingVisibilityPlan();
   const setCaptureOverlay = (visible: boolean): void => {
     overlay.visible = visible;
@@ -1333,18 +1356,21 @@ function buildFromTemplates(
         hubDx * hubDx + hubDz * hubDz,
         TOWN_CULL_RADIUS,
         revealGate,
-        'fenbridge-town-static',
+        STATIC_REVEAL_KEY,
       );
       if (reveal === 'revealed') staticRevealed = true;
-      const staticVisible = reveal === 'revealed';
+      // While the key is held, each root that has linked comes in on its own,
+      // nearest first: the whole town no longer waits for its slowest program.
+      townPiecewiseRevealInto(staticPiecewise, reveal, camX, camZ, revealGate);
       for (let index = 0; index < staticCullTargets.length; index++) {
-        staticCullTargets[index].visible = staticVisible;
+        staticCullTargets[index].visible = townRootVisible(reveal, staticPiecewise, index);
       }
       // Buildings keep their own fog cull and camera fade, but their FIRST
       // reveal rides the same hold as the batches: while the gate compiles
-      // the town they stay hidden, and once revealed the latch above never
-      // consults the gate again (a fog re-entry is a plain cull flip).
-      const buildingsHeld = reveal === 'held';
+      // the town they stay hidden until their own group has linked, and once
+      // the key is revealed the latch above never consults the gate again (a
+      // fog re-entry is a plain cull flip).
+      const buildingRootBase = staticCullTargets.length;
       for (let index = 0; index < hideTargets.length; index++) {
         const target = hideTargets[index];
         fenbridgeBuildingVisibilityPlanInto(
@@ -1359,7 +1385,9 @@ function buildFromTemplates(
           eyeZ,
           fogFar,
         );
-        target.group.visible = visibilityPlan.visible && !buildingsHeld;
+        target.group.visible =
+          visibilityPlan.visible &&
+          townRootVisible(reveal, staticPiecewise, buildingRootBase + index);
         if (!visibilityPlan.visible) continue;
         target.hidden = visibilityPlan.hidden;
         if (occluderFadeSettled(target.alpha, target.hidden)) continue;

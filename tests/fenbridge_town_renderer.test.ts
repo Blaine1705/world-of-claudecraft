@@ -699,6 +699,41 @@ describe('Fenbridge dedicated town renderer', () => {
     for (const group of buildingGroups) expect(group.visible).toBe(true);
   });
 
+  it('reveals each root as its own compile lands, without waiting for the whole town', () => {
+    // The town key covers every batch plus every building group. Holding all
+    // of them until the slowest link settles turns the settle frame into the
+    // one-frame first-draw burst the gate exists to prevent, so a root whose
+    // own compile has landed draws while the rest keep waiting.
+    setGfx({ standardMaterials: false, dynamicShadows: false, surfaceDetail: false });
+    const view = fenbridgeTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
+    const gate = createRevealGateCore((key) => gate.noteRoots(key, view.staticRevealRoots()));
+    view.setRevealGate(gate);
+    const first = FENBRIDGE_LAYOUT.buildings[0];
+    const firstGroup = view.group.getObjectByName(`fenbridgeBuilding:${first.id}`);
+    const second = FENBRIDGE_LAYOUT.buildings[1];
+    const secondGroup = view.group.getObjectByName(`fenbridgeBuilding:${second.id}`);
+    const micro = view.group.getObjectByName('fenbridgeTownMicroOpaqueBatch');
+    if (!firstGroup || !secondGroup || !micro) throw new Error('renderer fixture lost a town node');
+
+    const hub = FENBRIDGE_LAYOUT.hub.center;
+    const cullRadius = FENBRIDGE_LAYOUT.hub.radius + FENBRIDGE_LAYOUT.wall.maximumSegmentSpan / 2;
+    const approachX = hub.x + cullRadius + 20;
+    view.update(approachX, 2, hub.z, approachX - 5, 2, hub.z, 400, 0.05);
+    expect(firstGroup.visible).toBe(false);
+
+    gate.settleRoot('fenbridge-town-static', firstGroup);
+    view.update(approachX, 2, hub.z, approachX - 5, 2, hub.z, 400, 0.05);
+    expect(gate.state('fenbridge-town-static')).toBe('compiling');
+    expect(firstGroup.visible).toBe(true);
+    // Nothing else moved: the batches and the other buildings are still cold.
+    expect(micro.visible).toBe(false);
+    expect(secondGroup.visible).toBe(false);
+
+    // A revealed root is never taken back while the key is still held.
+    view.update(approachX, 2, hub.z, approachX - 5, 2, hub.z, 400, 0.05);
+    expect(firstGroup.visible).toBe(true);
+  });
+
   it('never holds the buildings when the camera is already inside the town', () => {
     setGfx({ standardMaterials: false, dynamicShadows: false, surfaceDetail: false });
     const view = fenbridgeTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);

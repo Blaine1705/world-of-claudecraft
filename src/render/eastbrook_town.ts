@@ -37,7 +37,12 @@ import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import type { RevealGateCore } from './reveal_gate_core';
-import { townStaticReveal } from './town_reveal_core';
+import {
+  newTownPiecewiseReveal,
+  townPiecewiseRevealInto,
+  townRootVisible,
+  townStaticReveal,
+} from './town_reveal_core';
 import { modulateEmissiveByVertexColor } from './vertex_color_emissive';
 
 const ROOT_NAME = 'eastbrookTownRebuild';
@@ -45,6 +50,8 @@ const FOUNDATION_OVERLAP = 0.03;
 const FOUNDATION_COLOR = 0x46505e;
 const TOWN_CULL_RADIUS =
   EASTBROOK_LAYOUT.wall.radius + EASTBROOK_LAYOUT.wall.maximumSegmentSpan / 2;
+/** The one reveal-gate key of the town's static content. */
+const STATIC_REVEAL_KEY = 'eastbrook-town-static';
 
 const NEW_ASSET_URLS = Object.freeze([
   ...EASTBROOK_LAYOUT.buildings.map((building) => building.assetId),
@@ -924,6 +931,22 @@ function buildFromTemplates(
   // outside the roots linked cold on the frame its own fog cull first showed
   // it (the Fenbridge shape, same fix).
   const staticRevealRoots: THREE.Object3D[] = [...staticCullTargets, ...buildingGroups];
+  // Piecewise reveal anchors, in staticRevealRoots order: a batch spans the
+  // whole town so it anchors at the centre (Eastbrook sits on the world
+  // origin), a building at its own footprint. roofHideTargets is built in the
+  // buildingGroups loop, so the two stay index-aligned by construction.
+  const rootX: number[] = staticCullTargets.map(() => 0);
+  const rootZ: number[] = staticCullTargets.map(() => 0);
+  for (const target of roofHideTargets) {
+    rootX.push(target.x);
+    rootZ.push(target.z);
+  }
+  const staticPiecewise = newTownPiecewiseReveal(
+    STATIC_REVEAL_KEY,
+    staticRevealRoots,
+    rootX,
+    rootZ,
+  );
   const roofVisibilityPlan = newEastbrookRoofVisibilityPlan();
 
   group.userData.buildingIds = EASTBROOK_LAYOUT.buildings.map((building) => building.id);
@@ -975,18 +998,21 @@ function buildFromTemplates(
         camX * camX + camZ * camZ,
         TOWN_CULL_RADIUS,
         revealGate,
-        'eastbrook-town-static',
+        STATIC_REVEAL_KEY,
       );
       if (reveal === 'revealed') staticRevealed = true;
-      const staticVisible = reveal === 'revealed';
+      // While the key is held, each root that has linked comes in on its own,
+      // nearest first: the whole town no longer waits for its slowest program.
+      townPiecewiseRevealInto(staticPiecewise, reveal, camX, camZ, revealGate);
       for (let index = 0; index < staticCullTargets.length; index++) {
-        staticCullTargets[index].visible = staticVisible;
+        staticCullTargets[index].visible = townRootVisible(reveal, staticPiecewise, index);
       }
       // Buildings keep their own fog cull and roof fade, but their FIRST
       // reveal rides the same hold as the batches: while the gate compiles
-      // the town they stay hidden, and once revealed the latch above never
-      // consults the gate again (a fog re-entry is a plain cull flip).
-      const buildingsHeld = reveal === 'held';
+      // the town they stay hidden until their own group has linked, and once
+      // the key is revealed the latch above never consults the gate again (a
+      // fog re-entry is a plain cull flip).
+      const buildingRootBase = staticCullTargets.length;
       for (let index = 0; index < roofHideTargets.length; index++) {
         const target = roofHideTargets[index];
         eastbrookRoofVisibilityPlanInto(
@@ -1001,7 +1027,9 @@ function buildFromTemplates(
           eyeZ,
           fogFar,
         );
-        target.group.visible = roofVisibilityPlan.visible && !buildingsHeld;
+        target.group.visible =
+          roofVisibilityPlan.visible &&
+          townRootVisible(reveal, staticPiecewise, buildingRootBase + index);
         if (!roofVisibilityPlan.visible) continue;
         target.hidden = roofVisibilityPlan.hidden;
         if (occluderFadeSettled(target.alpha, target.hidden)) continue;

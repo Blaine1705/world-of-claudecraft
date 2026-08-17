@@ -532,6 +532,7 @@ import type {
   RendererPhaseStats,
   RendererQualityChangeStats,
 } from './renderer_perf_stats';
+import { createRevealCompileHost, REVEAL_GATE_PREP_KIND } from './reveal_compile_host';
 import { createRevealGate } from './reveal_gate';
 import type { RevealGateCore } from './reveal_gate_core';
 import { collectRiftAmbientSources } from './rift_ambience';
@@ -2592,26 +2593,18 @@ export class Renderer {
     // BELOW the live entity gates (VISIBLE_PREWARM, not LIVE_VIEW): a
     // teleport can queue dozens of far cells at once, and cosmetic scenery
     // must never delay an actionable mob or player reveal.
+    // A key's soft deadline comes from the budget's learned reveal cost: past
+    // it the gate reports how much of the key linked and keeps waiting, so
+    // only the hard watchdog ever reveals an unlinked root (reveal_gate.ts).
     if (this.asyncCompileSupported) {
-      const revealHost = {
-        compile: (root: object) => {
-          const target = root as THREE.Object3D;
-          return this.liveCompileGates.run(
-            () =>
-              this.compilePrewarmColorPrograms(target, false).then(() =>
-                this.compileShadowPrograms(target),
-              ),
-            VIEW_COMPILE_GATE_MAX_MS,
-            {
-              priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM,
-              label: `reveal-gate:${target.name || target.type}`,
-            },
-          );
-        },
-      };
-      this.propsRevealGate = createRevealGate(revealHost, (key) =>
-        this.propsView.revealRoots(key),
-      );
+      const revealHost = createRevealCompileHost({
+        gate: (work, options) => this.liveCompileGates.run(work, VIEW_COMPILE_GATE_MAX_MS, options),
+        compileColor: (target) => this.compilePrewarmColorPrograms(target, false),
+        compileShadow: (target) => this.compileShadowPrograms(target),
+        touch: (target, priority) => this.touchLinkedProgramsGated(target, priority),
+        predictRevealMs: () => this.gpuPrepBudget.predictMs(REVEAL_GATE_PREP_KIND),
+      });
+      this.propsRevealGate = createRevealGate(revealHost, (key) => this.propsView.revealRoots(key));
       this.propsView.setRevealGate(this.propsRevealGate);
       this.eastbrookTownView.setRevealGate(
         createRevealGate(revealHost, () => this.eastbrookTownView.staticRevealRoots()),

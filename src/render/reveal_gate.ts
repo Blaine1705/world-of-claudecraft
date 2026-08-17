@@ -11,12 +11,41 @@
 // covers a link that never resolves (compile-gate timeouts are
 // diagnostic-only and cannot resolve early; see compile_gate.ts). The timer
 // is cleared on the winning path so a settled key leaves nothing pending,
-// and a watchdog reveal says so on the dev channel (the gated_scene_attach
-// shape).
+// and a watchdog reveal says so on the dev channel and records a
+// machine-readable gpu-prep event (the gated_scene_attach shape).
+//
+// Each root is reported to the core as its own compile lands, so a consumer
+// with independently revealable roots (a town: every static batch plus every
+// building group) can show them one at a time instead of paying the whole
+// key's first draw in the frame the last link settles.
+//
+// Between the two there is a SOFT deadline, derived from the learned cost of
+// a reveal compile when the host offers one. It is a report, never an escape:
+// past it the gate records how much of the key linked and keeps waiting, so
+// the only thing that ever reveals an unlinked root early is still the hard
+// watchdog. That distinction is the whole point: revealing early is exactly
+// the stall the gate exists to prevent, and what a capture was missing was
+// not another escape but the evidence that a key was slow.
 
-import { createRevealGateCore, type RevealGateCore } from './reveal_gate_core';
+import {
+  gpuPrepNow,
+  noteRevealKeyHeld,
+  noteRevealRootPiecewise,
+  noteRevealRootsAtWatchdog,
+  recordGpuPrepEvent,
+} from './gpu_prep_events';
+import {
+  createRevealGateCore,
+  type RevealGateCore,
+  type RevealGateReadiness,
+} from './reveal_gate_core';
 
 export const REVEAL_GATE_WATCHDOG_MS = 10_000;
+
+/** The floor of the soft deadline. Below it a single slow frame, a tab
+ *  restore or one queued unit ahead in the lane would fire it, and a report
+ *  that fires on healthy sessions reports nothing. */
+export const REVEAL_SOFT_DEADLINE_MIN_MS = 1_000;
 
 export interface RevealCompileHost {
   /** Compile one root's programs; resolves (or rejects) when settled. */
@@ -24,6 +53,17 @@ export interface RevealCompileHost {
   /** Injectable watchdog scheduler; returns a cancel function. Defaults to
    *  setTimeout/clearTimeout. */
   schedule?: (onTimeout: () => void, ms: number) => () => void;
+  /** How long this key's compiles are expected to take, from the host's
+   *  learned cost model. Absent (or at/above the watchdog) arms no soft
+   *  deadline, which is the historical behaviour. */
+  expectedMs?: (key: string, rootCount: number) => number;
+}
+
+export interface RevealGate extends RevealGateCore {
+  /** A consumer revealed one root before its key warmed. Telemetry only: the
+   *  gate never decides anything from it, so a consumer that does not report
+   *  loses a counter, never a reveal. */
+  noteRootRevealed(key: string): void;
 }
 
 const defaultSchedule = (onTimeout: () => void, ms: number): (() => void) => {
@@ -31,39 +71,101 @@ const defaultSchedule = (onTimeout: () => void, ms: number): (() => void) => {
   return () => clearTimeout(timer);
 };
 
+const noCancel = (): void => undefined;
+
+/**
+ * The soft deadline for a key whose roots each cost about `perRootMs` to
+ * link, clamped into [REVEAL_SOFT_DEADLINE_MIN_MS, REVEAL_GATE_WATCHDOG_MS].
+ * An unlearned or nonsense cost falls back to the floor rather than to no
+ * deadline at all: a budget with no samples is exactly when a report helps.
+ */
+export function revealSoftDeadlineMs(perRootMs: number, rootCount: number): number {
+  const roots = Number.isFinite(rootCount) && rootCount > 1 ? Math.floor(rootCount) : 1;
+  const predicted = Number.isFinite(perRootMs) && perRootMs > 0 ? perRootMs * roots : 0;
+  if (predicted <= REVEAL_SOFT_DEADLINE_MIN_MS) return REVEAL_SOFT_DEADLINE_MIN_MS;
+  return predicted < REVEAL_GATE_WATCHDOG_MS ? predicted : REVEAL_GATE_WATCHDOG_MS;
+}
+
+/** Module-owned scratch for the readiness reads, which only ever happen
+ *  synchronously inside one escape callback. */
+const readiness: RevealGateReadiness = { ready: 0, total: 0 };
+
 export function createRevealGate(
   host: RevealCompileHost,
   rootsFor: (key: string) => readonly object[],
-): RevealGateCore {
+): RevealGate {
   const schedule = host.schedule ?? defaultSchedule;
   const gate: RevealGateCore = createRevealGateCore((key) => {
+    const requestedAtMs = gpuPrepNow();
     let roots: readonly object[] = [];
     try {
       roots = rootsFor(key);
     } catch (error) {
       console.error('Reveal gate roots lookup failed', key, error);
     }
+    gate.noteRoots(key, roots);
+    const rootCount = gate.readiness(key, readiness).total;
+    noteRevealKeyHeld(rootCount);
     const compiles = roots.map((root) => {
+      const settleRoot = (): void => gate.settleRoot(key, root);
       try {
-        return Promise.resolve(host.compile(root)).catch(() => undefined);
+        return Promise.resolve(host.compile(root)).then(settleRoot, settleRoot);
       } catch (error) {
         console.error('Reveal gate compile request failed', key, error);
+        settleRoot();
         return undefined;
       }
     });
     let settled = false;
+    let cancelSoftDeadline: () => void = noCancel;
     const cancelWatchdog = schedule(() => {
       if (settled) return;
       settled = true;
+      cancelSoftDeadline();
       console.warn(`Reveal gate watchdog revealed ${key} before its compiles settled`);
+      const { ready, total } = gate.readiness(key, readiness);
+      recordGpuPrepEvent({
+        kind: 'reveal-watchdog',
+        key,
+        ageMs: gpuPrepNow() - requestedAtMs,
+        readyRoots: ready,
+        totalRoots: total,
+      });
+      noteRevealRootsAtWatchdog(total - ready);
       gate.settle(key);
     }, REVEAL_GATE_WATCHDOG_MS);
+    let softMs = 0;
+    if (host.expectedMs) {
+      try {
+        softMs = host.expectedMs(key, rootCount);
+      } catch (error) {
+        console.error('Reveal gate expected-cost lookup failed', key, error);
+      }
+    }
+    if (Number.isFinite(softMs) && softMs > 0 && softMs < REVEAL_GATE_WATCHDOG_MS) {
+      cancelSoftDeadline = schedule(() => {
+        if (settled || gate.state(key) === 'warm') return;
+        const { ready, total } = gate.readiness(key, readiness);
+        recordGpuPrepEvent({
+          kind: 'reveal-soft-deadline',
+          key,
+          ageMs: gpuPrepNow() - requestedAtMs,
+          readyRoots: ready,
+          totalRoots: total,
+        });
+      }, softMs);
+    }
     void Promise.all(compiles).then(() => {
       cancelWatchdog();
+      cancelSoftDeadline();
       if (settled) return;
       settled = true;
       gate.settle(key);
     });
   });
-  return gate;
+  return Object.assign(gate, {
+    noteRootRevealed(_key: string): void {
+      noteRevealRootPiecewise();
+    },
+  });
 }

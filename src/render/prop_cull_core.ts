@@ -92,7 +92,13 @@ export function propCullKey(index: number): string {
 
 /** The compile roots behind one props gate key: a far cell's bake meshes,
  *  or the one band object behind a cullable key, or nothing for a stranger
- *  (which the gate then settles at once, the fail-soft arm). */
+ *  (which the gate then settles at once, the fail-soft arm).
+ *
+ *  Neither consult reveals piecewise, unlike the towns. A band key is one
+ *  root, so there is nothing to split. A far cell has several bake meshes but
+ *  swaps as ONE representation (the near individuals hide as the bake shows),
+ *  and revealing half a bake beside the individuals it replaces would draw
+ *  that half twice. */
 export function propRevealRoots<T>(
   farCells: { get(key: string): { meshes: readonly T[] } | undefined },
   bands: { get(key: string): { obj: T } | undefined },

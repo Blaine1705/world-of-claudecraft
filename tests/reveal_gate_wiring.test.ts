@@ -29,17 +29,47 @@ function anchor(source: string, needle: string): number {
 describe('reveal gate wiring (source pins)', () => {
   const rendererSource = read('../src/render/renderer.ts');
 
-  it('the renderer wires all three gates behind async-compile support', () => {
-    const wiring = rendererSource.slice(
-      anchor(rendererSource, 'if (this.asyncCompileSupported) {\n      const revealHost = {'),
-      anchor(rendererSource, 'this.fenbridgeTownView.setRevealGate') + 400,
+  it('the shared reveal compile host links, arms shadows, then runs the touch tail', () => {
+    // The host moved out of the renderer constructor, so the pins move with
+    // it: what must not drift is the lane it rides (below the live entity
+    // gates), the label its cost model is keyed on, and the order of the
+    // three arms, since a touch tail before the link warms nothing.
+    const host = read('../src/render/reveal_compile_host.ts');
+    expect(host).toContain("export const REVEAL_GATE_PREP_KIND = 'reveal-gate';");
+    expect(host).toContain('priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM,');
+    expect(host).toContain('label: `${REVEAL_GATE_PREP_KIND}:${target.name || target.type}`,');
+    const colourAt = anchor(
+      host,
+      'deps.compileColor(target).then(() => deps.compileShadow(target))',
     );
-    expect(wiring).toContain('priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM,');
-    expect(wiring).toContain('label: `reveal-gate:${target.name || target.type}`,');
-    expect(wiring).toContain('this.compilePrewarmColorPrograms(target, false).then(() =>');
-    expect(wiring).toContain('this.compileShadowPrograms(target),');
-    expect(wiring).toContain('this.propsRevealGate = createRevealGate(revealHost, (key) =>');
-    expect(wiring).toContain('this.propsView.revealRoots(key),');
+    const touchAt = anchor(host, 'linked.then(() => deps.touch(target, GPU_WORK_PRIORITY');
+    expect(colourAt).toBeLessThan(touchAt);
+    // The soft deadline is the budget's learned cost times the key's roots,
+    // and it is the host's answer, not a second policy in the renderer.
+    expect(host).toContain('return revealSoftDeadlineMs(deps.predictRevealMs(), rootCount);');
+  });
+
+  it('the renderer wires all four gates behind async-compile support', () => {
+    const wiring = rendererSource.slice(
+      anchor(rendererSource, 'if (this.asyncCompileSupported) {\n      const revealHost ='),
+      anchor(rendererSource, 'this.foliageRevealGate = createRevealGate') + 200,
+    );
+    expect(wiring).toContain('const revealHost = createRevealCompileHost({');
+    expect(wiring).toContain(
+      'compileColor: (target) => this.compilePrewarmColorPrograms(target, false),',
+    );
+    expect(wiring).toContain('compileShadow: (target) => this.compileShadowPrograms(target),');
+    expect(wiring).toContain(
+      'touch: (target, priority) => this.touchLinkedProgramsGated(target, priority),',
+    );
+    // The soft deadline reads the LEARNED cost of a reveal compile, under the
+    // same kind the host labels its units with.
+    expect(wiring).toContain(
+      'predictRevealMs: () => this.gpuPrepBudget.predictMs(REVEAL_GATE_PREP_KIND),',
+    );
+    expect(wiring).toContain(
+      'this.propsRevealGate = createRevealGate(revealHost, (key) => this.propsView.revealRoots(key));',
+    );
     expect(wiring).toContain('this.propsView.setRevealGate(this.propsRevealGate);');
     // The band arm of the props gate arms at WORLD ENTRY (the tail of the
     // boot prewarm), never in the constructor: armed under the curtain, the
@@ -53,13 +83,27 @@ describe('reveal gate wiring (source pins)', () => {
     const constructorBody = rendererSource.slice(constructorStart, constructorEnd);
     expect(constructorBody).toContain('this.propsView.setRevealGate(this.propsRevealGate);');
     expect(constructorBody).not.toContain('setBandRevealGate');
+    // Same reason for the foliage buckets: armed under the curtain, every
+    // bucket past half the fog would queue a compile beside the manifest's
+    // near-first units for content the initial frame links anyway.
+    expect(constructorBody).not.toContain('this.foliage.setRevealGate');
     const entryTail = rendererSource.slice(
       anchor(rendererSource, 'this.prewarmedZonePrograms.add(activeZone.id);'),
       anchor(rendererSource, '[entry-guard] prewarm done:'),
     );
     expect(entryTail).toContain('this.propsView.setBandRevealGate(this.propsRevealGate);');
+    expect(entryTail).toContain('this.foliage.setRevealGate(this.foliageRevealGate);');
     expect(wiring).toContain('this.eastbrookTownView.setRevealGate(');
     expect(wiring).toContain('this.fenbridgeTownView.setRevealGate(');
+    // The foliage buckets ride the SAME host and the same queue: one more
+    // createRevealGate, never a second host (foliage.ts revealRoots hands back
+    // the one representative bucket mesh per program key).
+    expect(wiring).toContain(
+      'this.foliageRevealGate = createRevealGate(revealHost, (key) => this.foliage.revealRoots(key));',
+    );
+    expect(
+      rendererSource.match(/const revealHost = createRevealCompileHost\(/g) ?? [],
+    ).toHaveLength(1);
   });
 
   it('props threads the gate into the per-frame far-cell and band updates', () => {
@@ -95,48 +139,87 @@ describe('reveal gate wiring (source pins)', () => {
     expect(propsSource.match(rawBandWrite) ?? []).toHaveLength(0);
   });
 
+  it('foliage threads the gate into the per-frame bucket cull', () => {
+    const foliageSource = read('../src/render/foliage.ts');
+    expect(foliageSource).toContain('setRevealGate(gate: FoliageBucketRevealGate | null): void {');
+    expect(foliageSource).toContain('revealRoots(key: string): readonly THREE.Object3D[] {');
+    // Both bucket arms go through the gated entry: the camera-window rows and
+    // the light-volume shadow rows.
+    expect(foliageSource.match(/foliageBucketVisible\(/g) ?? []).toHaveLength(2);
+    expect(foliageSource).toContain('? bucketVisible(bucketWindow)');
+    const shadowGateAt = anchor(foliageSource, 'Math.sqrt(sdx * sdx + sdz * sdz) - b.radius),');
+    expect(shadowGateAt).toBeLessThan(anchor(foliageSource, 'b.mesh.visible = visible;'));
+    // The reveal key IS the roots-map key: if these diverge, revealRoots
+    // returns [] for every consult and the gate degrades to an immediate
+    // reveal no behavior test can see.
+    expect(foliageSource).toContain('revealRootByKey.set(b.reveal.key, b.mesh);');
+    expect(foliageSource).toContain('const root = revealRootByKey.get(key);');
+    // Every bucket goes through the ONE gated entry: no raw `b.mesh.visible =`
+    // write left in the cull loop. The matcher is proven on a fixture first,
+    // so the zero is not vacuous.
+    const rawWrite = /b\.mesh\.visible = (?!b\.reveal|visible;)/g;
+    expect('b.mesh.visible = bucketVisible(bucketWindow);'.match(rawWrite)).toHaveLength(1);
+    expect(foliageSource.match(rawWrite) ?? []).toHaveLength(0);
+  });
+
   it.each([
     [
       'eastbrook',
       '../src/render/eastbrook_town.ts',
       'eastbrook-town-static',
-      'target.group.visible = roofVisibilityPlan.visible && !buildingsHeld;',
+      'roofVisibilityPlan.visible &&\n          townRootVisible(reveal, staticPiecewise, buildingRootBase + index);',
     ],
     [
       'fenbridge',
       '../src/render/fenbridge_town.ts',
       'fenbridge-town-static',
-      'target.group.visible = visibilityPlan.visible && !buildingsHeld;',
+      'visibilityPlan.visible &&\n          townRootVisible(reveal, staticPiecewise, buildingRootBase + index);',
     ],
   ])(
     '%s resolves its static cull and its buildings through the town reveal policy',
     (_town, path, key, buildingWrite) => {
       const source = read(path);
-      // The policy call must decide the SAME staticVisible the cull loop
-      // applies, in that order: policy, latch, then the visibility writes,
-      // batches first and then the buildings under the same hold.
+      // The policy call must decide what the cull loop applies, in that order:
+      // policy, latch, the per-root piecewise pass, then the visibility
+      // writes, batches first and then the buildings under the same hold.
       const policyAt = anchor(source, 'const reveal = townStaticReveal(');
-      const keyAt = anchor(source, `'${key}',`);
+      const keyAt = anchor(source, 'STATIC_REVEAL_KEY,\n      );');
       const latchAt = anchor(source, "if (reveal === 'revealed') staticRevealed = true;");
-      const applyAt = anchor(source, "const staticVisible = reveal === 'revealed';");
-      const cullAt = anchor(source, 'staticCullTargets[index].visible = staticVisible;');
-      const heldAt = anchor(source, "const buildingsHeld = reveal === 'held';");
+      const piecewiseAt = anchor(
+        source,
+        'townPiecewiseRevealInto(staticPiecewise, reveal, camX, camZ, revealGate);',
+      );
+      const cullAt = anchor(
+        source,
+        'staticCullTargets[index].visible = townRootVisible(reveal, staticPiecewise, index);',
+      );
+      const baseAt = anchor(source, 'const buildingRootBase = staticCullTargets.length;');
       const buildingAt = anchor(source, buildingWrite);
       expect(policyAt).toBeLessThan(keyAt);
       expect(keyAt).toBeLessThan(latchAt);
-      expect(latchAt).toBeLessThan(applyAt);
-      expect(applyAt).toBeLessThan(cullAt);
-      expect(cullAt).toBeLessThan(heldAt);
-      expect(heldAt).toBeLessThan(buildingAt);
+      expect(latchAt).toBeLessThan(piecewiseAt);
+      expect(piecewiseAt).toBeLessThan(cullAt);
+      expect(cullAt).toBeLessThan(baseAt);
+      expect(baseAt).toBeLessThan(buildingAt);
+      // The key is one constant both the policy call and the piecewise state
+      // read: two literals could drift and the gate would answer for a key
+      // nobody holds.
+      expect(source).toContain(`const STATIC_REVEAL_KEY = '${key}';`);
+      expect(source).toContain('newTownPiecewiseReveal(');
       // The roots provider hands the gate the batch set the cull flips PLUS
       // every building group: a building outside the roots links its
-      // unshared materials cold on its own first fog reveal.
+      // unshared materials cold on its own first fog reveal. The piecewise
+      // anchors are built in the SAME order, so root index i is root i.
       expect(source).toContain(
         'const staticRevealRoots: THREE.Object3D[] = [...staticCullTargets, ...buildingGroups];',
       );
       expect(source).toContain('buildingGroups.push(built.group);');
       expect(source).toContain('staticRevealRoots(): readonly THREE.Object3D[] {');
       expect(source).toContain('return staticRevealRoots;');
+      const anchorsAt = anchor(source, 'const rootX: number[] = staticCullTargets.map(');
+      expect(anchorsAt).toBeGreaterThan(
+        anchor(source, 'const staticRevealRoots: THREE.Object3D[] ='),
+      );
     },
   );
 

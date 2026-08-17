@@ -310,6 +310,39 @@ describe('Eastbrook town renderer', () => {
     for (const group of buildingGroups) expect(group.visible).toBe(true);
   });
 
+  it('reveals each root as its own compile lands, without waiting for the whole town', () => {
+    // The town key covers every batch plus every building group. Holding all
+    // of them until the slowest link settles turns the settle frame into the
+    // one-frame first-draw burst the gate exists to prevent, so a root whose
+    // own compile has landed draws while the rest keep waiting.
+    const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
+    const gate = createRevealGateCore((key) => gate.noteRoots(key, view.staticRevealRoots()));
+    view.setRevealGate(gate);
+    const bank = EASTBROOK_LAYOUT.buildings[0];
+    const bankGroup = view.group.getObjectByName(`eastbrookBuilding:${bank.id}`);
+    const other = EASTBROOK_LAYOUT.buildings[1];
+    const otherGroup = view.group.getObjectByName(`eastbrookBuilding:${other.id}`);
+    const micro = view.group.getObjectByName('eastbrookTownMicroOpaqueBatch');
+    if (!bankGroup || !otherGroup || !micro) throw new Error('renderer fixture lost a town node');
+
+    const cullRadius = EASTBROOK_LAYOUT.wall.radius + EASTBROOK_LAYOUT.wall.maximumSegmentSpan / 2;
+    const approachX = cullRadius + 20;
+    view.update(approachX, 2, 0, approachX - 5, 2, 0, 400, 0.05);
+    expect(bankGroup.visible).toBe(false);
+
+    gate.settleRoot('eastbrook-town-static', bankGroup);
+    view.update(approachX, 2, 0, approachX - 5, 2, 0, 400, 0.05);
+    expect(gate.state('eastbrook-town-static')).toBe('compiling');
+    expect(bankGroup.visible).toBe(true);
+    // Nothing else moved: the batches and the other buildings are still cold.
+    expect(micro.visible).toBe(false);
+    expect(otherGroup.visible).toBe(false);
+
+    // A revealed root is never taken back while the key is still held.
+    view.update(approachX, 2, 0, approachX - 5, 2, 0, 400, 0.05);
+    expect(bankGroup.visible).toBe(true);
+  });
+
   it('never holds the buildings when the camera is already inside the town', () => {
     const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
     const requested: string[] = [];

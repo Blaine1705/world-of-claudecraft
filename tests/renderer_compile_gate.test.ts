@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import * as characters from '../src/render/characters';
 import { type EntityView, Renderer } from '../src/render/renderer';
 
@@ -186,7 +187,7 @@ describe('Renderer live shader compile rejection recovery', () => {
     // linear one: route through the same variant pair the boot prewarm uses.
     expect(gateMethod).toContain('this.compilePrewarmColorPrograms(target, false)');
     expect(gateMethod).toContain('this.compileShadowPrograms(target)');
-    expect(gateMethod).toContain('touchLinkedPrograms(this.webgl.properties, target)');
+    expect(gateMethod).toContain('this.touchLinkedProgramsGated(target, priority)');
     expect(gateMethod).not.toContain('this.webgl.compileAsync');
   });
 
@@ -264,6 +265,110 @@ describe('Renderer live shader compile rejection recovery', () => {
 
     expect(target.visible).toBe(false);
     expect(report).not.toHaveBeenCalled();
+  });
+});
+
+// The gate's tail used to be ONE call that warmed every linked program under
+// the target in a single synchronous burst. It is now one queue unit per
+// program, which is what the per-frame admission can pace; the gate still
+// settles only after the last piece, so a gated reveal is no earlier.
+describe('the compile gate touch tail, per program', () => {
+  function touchHarness(
+    programs: number,
+  ): CompileGateHarness &
+    Record<string, unknown> & { queued: { label?: string; priority?: number }[]; order: string[] } {
+    const renderer = harness();
+    const order: string[] = [];
+    const queued: { label?: string; priority?: number }[] = [];
+    renderer.sim = { player: { targetId: null } };
+    renderer.liveCompileGates = { run: (fn: () => Promise<unknown>) => fn() };
+    renderer.compilePrewarmColorPrograms = () => {
+      order.push('color');
+      return Promise.resolve();
+    };
+    renderer.compileShadowPrograms = () => {
+      order.push('shadow');
+      return Promise.resolve();
+    };
+    renderer.backgroundGpuWork = {
+      run: (work: () => unknown, priority?: number, label?: string) => {
+        queued.push({ label, priority });
+        order.push(`unit:${queued.length}`);
+        work();
+        return Promise.resolve();
+      },
+    };
+    const material = new THREE.MeshStandardMaterial();
+    const linked = new Map(
+      Array.from({ length: programs }, (_unused, index) => [
+        `variant${index}`,
+        { isReady: () => true, getUniforms: vi.fn(), getAttributes: vi.fn() },
+      ]),
+    );
+    renderer.webgl = {
+      properties: {
+        get: (queried: unknown) => ({ programs: queried === material ? linked : undefined }),
+      },
+    };
+    const target = new THREE.Group();
+    target.add(new THREE.Mesh(new THREE.BufferGeometry(), material));
+    renderer.touchTarget = target;
+    renderer.queued = queued;
+    renderer.order = order;
+    return renderer as CompileGateHarness &
+      Record<string, unknown> & {
+        queued: { label?: string; priority?: number }[];
+        order: string[];
+      };
+  }
+
+  it('issues one touch:program unit per linked program, after the compiles, in order', async () => {
+    const renderer = touchHarness(3);
+
+    await renderer.compileGate(renderer.touchTarget as THREE.Object3D);
+
+    expect(renderer.order).toEqual(['color', 'shadow', 'unit:1', 'unit:2', 'unit:3']);
+    expect(renderer.queued).toEqual([
+      { label: 'touch:program', priority: GPU_WORK_PRIORITY.LIVE_VIEW },
+      { label: 'touch:program', priority: GPU_WORK_PRIORITY.LIVE_VIEW },
+      { label: 'touch:program', priority: GPU_WORK_PRIORITY.LIVE_VIEW },
+    ]);
+  });
+
+  it('carries the gate priority onto the pieces, so a targeted tail outranks a bystander', async () => {
+    const renderer = touchHarness(1);
+    const target = renderer.touchTarget as THREE.Object3D;
+    target.userData.entityId = 42;
+    renderer.sim = { player: { targetId: 42 } };
+
+    await renderer.compileGate(target);
+
+    expect(renderer.queued).toEqual([
+      { label: 'touch:program', priority: GPU_WORK_PRIORITY.ACTIONABLE_VIEW },
+    ]);
+  });
+
+  it('is the same tail on the reveal host, and neither gate keeps the one-shot burst (source pins)', () => {
+    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    // The reveal host is its own module now; the renderer binds the tail into
+    // it, and the module composes it after the link.
+    const host = readFileSync(
+      new URL('../src/render/reveal_compile_host.ts', import.meta.url),
+      'utf8',
+    );
+    expect(source).toContain(
+      'touch: (target, priority) => this.touchLinkedProgramsGated(target, priority),',
+    );
+    // Streamed decor paid the uniform-table round trip on its reveal DRAW
+    // (40 to 390 ms on the Intel iGPU) because the reveal host's chain ended at
+    // the shadow arm: it now pays the same tail the live gates do.
+    expect(host).toContain(
+      'linked.then(() => deps.touch(target, GPU_WORK_PRIORITY.VISIBLE_PREWARM))',
+    );
+    // The one-shot burst is gone from the renderer entirely: it cannot be paced,
+    // and a call left behind would silently reinstate the whole cost in one frame.
+    expect(source).not.toContain('touchLinkedPrograms(');
+    expect(source).toContain('runLinkedProgramTouchLane(');
   });
 });
 
@@ -461,5 +566,121 @@ describe('the far-bake compile gate handed to character visuals', () => {
     // Both live build paths install it: fresh builds and pool re-acquires.
     expect(rendererSource).toContain('visual.setFarBakeGate(this.farBakeGate);');
     expect(rendererSource).toContain('farBakeGate: () => this.farBakeGate,');
+  });
+});
+
+describe('Renderer base-visual swap keeps a body on screen', () => {
+  // The stand-in invariant (src/render/CLAUDE.md): a race or mech swap builds a
+  // COLD rig, so its reveal is gated. Disposing the outgoing rig first left the
+  // character completely invisible until that gate settled; it now keeps
+  // drawing and is disposed on settle instead.
+  interface SwapHarness {
+    updateBaseVisual(e: unknown, v: unknown): void;
+  }
+
+  function stubVisual(): Record<string, unknown> {
+    return {
+      root: new THREE.Group(),
+      height: 2,
+      clickProxy: Object.assign(new THREE.Object3D(), { userData: {} }),
+      dispose: vi.fn(),
+      setShadow: vi.fn(),
+      setFar: vi.fn(),
+      setActive: vi.fn(),
+    };
+  }
+
+  function swapHarness(next: Record<string, unknown>) {
+    const renderer = harness() as unknown as SwapHarness & Record<string, unknown>;
+    renderer.compileGate = () => Promise.resolve();
+    renderer.viewCreateRetry = {
+      canAttempt: () => true,
+      markSucceeded: () => {},
+      markFailed: () => {},
+    };
+    renderer.createCharacterVisualWithRetry = () => next;
+    renderer.reconcileViewLights = () => {};
+    renderer.clickTargets = [];
+    return renderer;
+  }
+
+  function swapView(outgoing: Record<string, unknown>) {
+    const group = new THREE.Group();
+    group.add(outgoing.root as THREE.Object3D);
+    return {
+      group,
+      visual: outgoing,
+      visualKey: 'stale_key',
+      clickTarget: new THREE.Object3D(),
+      shadowOn: false,
+      isFar: false,
+      visualCompilePending: false,
+      height: 2,
+      skin: 0,
+      mainhandItemId: null,
+      offhandItemId: null,
+      weaponSkinId: null,
+      weaponStowed: false,
+    } as unknown as EntityView;
+  }
+
+  const entity = {
+    id: 42,
+    kind: 'mob',
+    templateId: 'wolf',
+    skin: 0,
+    mainhandItemId: null,
+    offhandItemId: null,
+  };
+
+  it('keeps the outgoing rig attached and drawing until the new rig links', async () => {
+    const outgoing = stubVisual();
+    const next = stubVisual();
+    const renderer = swapHarness(next);
+    const v = swapView(outgoing);
+
+    renderer.updateBaseVisual(entity, v);
+
+    expect(v.visualCompilePending).toBe(true);
+    expect(v.visual).toBe(next);
+    // the stand-in: still parented, still visible, not disposed
+    expect((outgoing.root as THREE.Object3D).parent).toBe(v.group);
+    expect((outgoing.root as THREE.Object3D).visible).toBe(true);
+    expect(outgoing.dispose).not.toHaveBeenCalled();
+
+    await flushGate();
+
+    expect(v.visualCompilePending).toBe(false);
+    expect((outgoing.root as THREE.Object3D).parent).toBeNull();
+    expect(outgoing.dispose).toHaveBeenCalledOnce();
+  });
+
+  it('refuses a second swap while one is in flight, so exactly one rig stands in', () => {
+    const outgoing = stubVisual();
+    const next = stubVisual();
+    const renderer = swapHarness(next);
+    const v = swapView(outgoing);
+    v.visualCompilePending = true;
+
+    renderer.updateBaseVisual(entity, v);
+
+    expect(v.visual).toBe(outgoing); // untouched: the key diff retries next frame
+    expect(outgoing.dispose).not.toHaveBeenCalled();
+  });
+
+  it('still disposes the stand-in when the gate is rejected', async () => {
+    const outgoing = stubVisual();
+    const next = stubVisual();
+    const renderer = swapHarness(next);
+    renderer.compileGate = () => Promise.reject(new Error('base swap link rejected'));
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const v = swapView(outgoing);
+
+    renderer.updateBaseVisual(entity, v);
+    await flushGate();
+
+    expect(v.visualCompilePending).toBe(false);
+    expect((outgoing.root as THREE.Object3D).parent).toBeNull();
+    expect(outgoing.dispose).toHaveBeenCalledOnce();
   });
 });
