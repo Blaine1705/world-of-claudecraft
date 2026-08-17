@@ -216,12 +216,60 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   (the gate's tail: fetch every linked variant's uniform tables so the reveal
   draw issues no synchronous first-use query),
   `background_gpu_queue.ts` (the one priority arbiter for idle-time work that
-  reaches WebGL), `idle_queue.ts` (idle-slot queue draining),
+  reaches WebGL). That queue decides ORDER; it also admits under the per-frame
+  BUDGET of `gpu_prep_budget_core.ts` (wired by `gpu_prep_admission.ts`), which
+  learns a syncMs per label kind and spends the headroom left by the tier's
+  drop-frame threshold, defers a refused unit frame by frame under a starvation
+  bound, and arms only once the frame clock runs, with `?prep=legacy` restoring
+  the old admit-everything behaviour. The touch tail runs as one budgeted queue
+  unit PER PROGRAM (`linked_program_touch_lane.ts`) on the live gates AND on the
+  reveal host, which previously ended at the shadow arm and left streamed decor
+  paying the uniform-table round trip on its reveal draw. `idle_queue.ts`
+  (idle-slot queue draining),
   `prewarm_depth_material.ts` (the shadow arm's depth material: it must link
   the SAME program three's `WebGLShadowMap` draws, so it never sets
   `depthPacking` and keys one instance per caster shape; a three bump is
   re-read from three's source, pinned by `tests/prewarm_depth_material.test.ts`,
   never guessed). Use these, never a bespoke idle loop.
+- **Streamed decor reveals PIECEWISE, per root, nearest first.** The reveal
+  gates (`reveal_gate_core.ts` policy, `reveal_gate.ts` host adapter over the
+  one `reveal_compile_host.ts`) hold a cull's FIRST hidden-to-visible flip
+  until the subtree's programs are linked. A key still warms only once every
+  root behind it is ready, but the core also tracks each root (`rootReady`),
+  so a consumer whose roots draw independently shows each one as its own
+  compile lands: the towns do exactly that (`town_reveal_core.ts`
+  `townPiecewiseRevealInto`, closest root to the camera first, at most
+  `TOWN_PIECEWISE_REVEALS_PER_FRAME` per frame), because a town key is every
+  static batch plus every building group and flipping all of them on the frame
+  the slowest link settles IS the burst the gate exists to prevent. A root
+  once shown is never hidden again (`numPointLights` is in three's program
+  cache key, so a hide and re-show links fresh programs). The props bands and
+  the foliage buckets are one root per key, and a far cell's bake meshes swap
+  as one representation, so those consults stay all-or-nothing.
+  Two deadlines, and only one of them reveals: a SOFT deadline per key, from
+  the budget's learned reveal cost times the root count clamped into
+  [`REVEAL_SOFT_DEADLINE_MIN_MS`, `REVEAL_GATE_WATCHDOG_MS`], records a
+  `reveal-soft-deadline` gpu-prep event with the key's ready/total roots and
+  changes nothing; the 10 s hard watchdog still reveals ungated and now
+  carries the same counts, plus the `reveal` aggregate in
+  `gpu_prep_events.ts` (keys held, roots held, roots revealed piecewise, roots
+  still compiling at a watchdog), so a capture can attribute a first-draw
+  stall to the roots that never linked in time.
+- **Every gate names its stand-in: NEVER LEAVE AN ENTITY WITH NO REPRESENTATION.**
+  A gate hides a still-linking object so its reveal draw cannot stall the frame;
+  the link is not cancellable and the gate timeout is diagnostic only, so the
+  hidden window is UNBOUNDED. That is fair only while something else still tells
+  the player the entity is there. The reference is the far-bake gate
+  (`characters/far_lod_reveal_core.ts` `farMeshShown`: the articulated rig keeps
+  drawing until the baked mesh links). `entity_gate_stand_in_core.ts` holds the
+  rule: `ENTITY_GATE_STAND_INS` (one row per gate call site, naming what it hides
+  and what still draws), `applyCharacterFormVisibility` (the base body is the
+  stand-in for a linking FORM rig, held there by `characterFormReadyMask`, which
+  treats a rig behind its gate as absent), and `entityHasNoBody`, which the
+  nameplate painter uses to force a plate on OVER the player's nameplate toggles
+  for the one gate with no in-world stand-in (the arrival gate hides the whole
+  group). A new gate adds a row AND a case to `tests/entity_gate_stand_in.test.ts`;
+  its coverage pin reds on any unregistered call site.
 - **A program only ONE encounter can reach warms at that interior's attach,
   never in the boot manifest** (`interior_encounter_prewarm.ts` spec +
   `_pass.ts` + `_host.ts`, kill switch `?encounterPrewarm=0`). The Nythraxis
@@ -324,7 +372,8 @@ collision/movement.
   on `customProgramCacheKey()`, whose default return value IS
   `onBeforeCompile.toString()`. So a bare clone of a patched material (rim glow,
   the worn surface-detail layer, the armour dye that carries a player's outfit
-  colorway, `characters/armor_dye.ts`) both renders un-patched AND links a whole new
+  colorway `characters/armor_dye.ts`, the vertex-colour emissive layer both towns'
+  lit building materials carry, `vertex_color_emissive.ts`) both renders un-patched AND links a whole new
   program on its first draw, wherever that draw lands. `cloneMaterialWithHooks`
   re-attaches exactly the layers the source carried, in the source's order, so
   the composed key comes out identical and the clone reuses the linked program.
