@@ -319,7 +319,7 @@ import * as lifecycle from './mob/lifecycle';
 import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
 import { findNearbyAllies } from './mob/nearby_allies';
-import { questGateBlocksAggro } from './mob/quest_gated_aggro';
+import { questGateBlocksAggro, questGateBlocksCombat } from './mob/quest_gated_aggro';
 import {
   createMobScanCounters,
   type MobScanCounters,
@@ -7666,7 +7666,8 @@ export class Sim {
     );
   }
 
-  private enterCombat(a: Entity, b: Entity): void {
+  private enterCombat(a: Entity, b: Entity): boolean {
+    if (questGateBlocksCombat(this.players, a, b)) return false;
     a.combatTimer = 0;
     b.combatTimer = 0;
     a.inCombat = true;
@@ -7694,6 +7695,7 @@ export class Sim {
     ) {
       this.aggroMob(a, b, false);
     }
+    return true;
   }
 
   private handleDeath(e: Entity, killer: Entity | null, killerAbility?: string | null): void {

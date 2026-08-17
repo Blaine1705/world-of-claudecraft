@@ -21,6 +21,7 @@ import { logCascadeCast, recordCascadeInitial } from '../dev/cascade_playtest';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
 import { SCRIPTED_INTERRUPTIBLE_CHANNELS } from '../mob/healer_channel';
+import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import {
   activateDivineAscension,
   ascensionImpactKind,
@@ -1610,8 +1611,8 @@ export function runEffects(
             fx: 'fearImpact',
             ability: ability.id,
           });
-          ctx.enterCombat(p, hostile);
-          if (hostile.kind === 'mob' && hostile.hostile) {
+          const enteredCombat = ctx.enterCombat(p, hostile);
+          if (enteredCombat && hostile.kind === 'mob' && hostile.hostile) {
             addThreat(hostile, p.id, 10 * ctx.threatMod(p, ability.school));
           }
         }
@@ -2790,8 +2791,8 @@ export function runEffects(
               school: ability.school,
             });
           }
-          ctx.enterCombat(p, m);
-          if (m.kind === 'mob' && m.hostile)
+          const enteredCombat = ctx.enterCombat(p, m);
+          if (enteredCombat && m.kind === 'mob' && m.hostile)
             addThreat(m, p.id, 10 * ctx.threatMod(p, ability.school));
         }
         break;
@@ -2821,8 +2822,8 @@ export function runEffects(
             sourceId: p.id,
             school: ability.school,
           });
-          ctx.enterCombat(p, m);
-          if (m.kind === 'mob' && m.hostile)
+          const enteredCombat = ctx.enterCombat(p, m);
+          if (enteredCombat && m.kind === 'mob' && m.hostile)
             addThreat(m, p.id, 10 * ctx.threatMod(p, ability.school));
         }
         break;
@@ -3956,6 +3957,7 @@ export function runEffects(
           });
         }
         // sunder deals no damage: its threat is the flat value, stance-scaled
+        if (questGateBlocksAggro(ctx.players, target, p)) break;
         addThreat(target, p.id, res.threatFlat * ctx.threatMod(p, 'physical'));
         ctx.enterCombat(p, target);
         break;
