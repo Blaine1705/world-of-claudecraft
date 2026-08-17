@@ -287,9 +287,10 @@ describe('isHarvestableCorpse', () => {
     // `excluded` into this list, never through `untagged`. (184 before the
     // v0.32.0 base merge, plus the untagged dragonkin egg from the brood and
     // the four untagged camp mobs the quest-dedupe pass added, minus
-    // shoal_scuttler once it gained a mapped tag.)
+    // shoal_scuttler once it gained a mapped tag, minus vale_cup_ball once it
+    // retired with the Vale Cup.)
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(185);
+    expect(untagged).toHaveLength(184);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

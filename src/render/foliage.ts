@@ -17,7 +17,6 @@ import { inDawnholdBailey } from '../sim/dawnhold_layout';
 import { ROCK_SINK_UNITS, rockHeightOf } from '../sim/decoration_dims';
 import { galeDeckSurface } from '../sim/gale_harbor';
 import type { BiomeId } from '../sim/types';
-import { isInSowfieldShell } from '../sim/vale_cup_layout';
 import type { Decoration } from '../sim/world';
 import {
   generateDecorations,
@@ -2174,7 +2173,6 @@ function generateDressing(seed: number): DressingSpot[] {
       if (roadDistance(x, z) < 4) continue;
       if (terrainHeight(x, z, seed) < WATER_LEVEL + 1.2) continue;
       if (tooSteep(x, z, seed)) continue;
-      if (isInSowfieldShell(x, z)) continue; // keep bushes/plants off the football ground
       // no scrub in the worked stable yard or up through the harbor decks
       if (biome === 'gale' && (inStableYard(x, z) || onHarborDeck(x, z, seed))) continue;
       // the fen's floor dressing grows in CLUMPED patches, not an even
@@ -2970,7 +2968,6 @@ function buildGrassRing(
         if (insideGrassHubExclusion(activeContent.zones, x, z)) continue;
         if (roadDistance(x, z) < 3.2) continue;
         if (insideEastbrookGrassExclusion(townExclusions, x, z, GRASS_BUILDING_PADDING)) continue;
-        if (isInSowfieldShell(x, z)) continue; // the Sowfield is a mown pitch, not meadow
         // the stable yard is worked dirt; deck planks grow nothing through
         if (tuftBiome === 'gale' && (inStableYard(x, z) || onHarborDeck(x, z, seed))) continue;
         // Dawnhold's bailey is paved wall to wall: no tuft, and so no flower

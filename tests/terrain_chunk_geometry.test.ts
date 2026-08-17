@@ -149,7 +149,16 @@ describe('generated chunk geometry is stable', () => {
     // z -155..-3 (the old flatten disc union the new headland), the town
     // core reads byte-identical, and the largest move is 6.33 at the new
     // coast. An intended, looked-at world change, not drift.
-    expect(digestOf(inRect)).toBe('8993beb96186457b8a994103722efccd');
+    // Re-minted for the Sowfield demolition (the New Eastbrook program,
+    // docs/design/eastbrook-revamp/master-plan.md): the stadium's flatten arm,
+    // stand lift, and decoration exclusion left with the minigame, so the
+    // southern basin returns to natural vale ground. Localization checked on a
+    // 1yd lattice over x -100..80, z -180..20 at the production seed against
+    // the pre-demolition tree: 7,656 of 36,381 points move, every one inside
+    // x -63..41, z -148..-74 (the flatten rect plus its 8yd apron), the town
+    // core reads byte-identical, and the largest move is 13.90 where the
+    // stand tiers stood. An intended, looked-at world change, not drift.
+    expect(digestOf(inRect)).toBe('09e45c7a643439c1bbedd54066ae1ea6');
     // The gap super-chunks take the same re-mint.
     expect(digestOf(gapFill)).toBe('4df7ccbb3d29fffbec733ce0e95e31f9');
 

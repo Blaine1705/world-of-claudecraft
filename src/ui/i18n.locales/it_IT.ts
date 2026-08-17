@@ -1375,14 +1375,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.actionBar.resetConfirmTitle': 'Ripristinare i tasti della barra delle azioni?',
   'hudChrome.actionBar.resetConfirmBody':
     "La prima barra torna ai suoi tasti predefiniti. La seconda e la terza restano senza tasti assegnati. L'operazione non può essere annullata.",
-  'hudChrome.vcup.rolesSmallBracketNote':
-    'Nei formati 1c1 e 2c2 ogni giocatore usa il kit del Tuttocampista. Le imprese che richiedono il formato 3c3 o superiore non si possono ottenere qui.',
-  'hudChrome.vcup.practiceUnratedNote':
-    'Gli incontri di allenamento non valgono per la classifica: i bilanci e i progressi del Libro delle Imprese non contano.',
-  'hudChrome.vcup.briefing.unratedNote':
-    'Ci sono bot in campo, quindi questo incontro non è valido per la classifica: i bilanci non cambiano e le imprese per gol, parate e porte inviolate non contano.',
-  'hudChrome.vcup.briefing.practiceUnratedNote':
-    'Questo è un incontro di allenamento, quindi non è valido per la classifica: i bilanci non cambiano e i progressi del Libro delle Imprese non contano.',
   'hudChrome.bags.filterTool': 'Strumenti',
   'hudChrome.materialHint.fineGrade':
     'Grado pregiato. Raccolto da un filone di pieno livello con uno strumento di rango superiore al materiale, e vale come la versione ordinaria ovunque ne venga richiesta una.',
@@ -2710,58 +2702,10 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sport_shoulder.description':
     "Una spallata leale da tregua del raccolto. Manda l'avversario a ruzzolare lontano dalla palla.",
   'entities.abilities.sport_shoulder.name': 'Spallata',
-  'entities.npcs.groundskeeper_bram.greeting':
-    'La tregua regge al Campo della Scrofa, {className}: solo calci e spallate. Ti va di giocare per il Secchio di Rame?',
-  'entities.npcs.groundskeeper_bram.name': 'Guardacampo Bram',
-  'entities.npcs.groundskeeper_bram.title': 'Custode del Campo della Scrofa',
   'entities.zones.eastbrook_vale.pois.10.label': 'Il Campo della Scrofa',
   'guide.nav.professions': 'Professioni',
-  'guide.nav.valeCup': 'Coppa della Valle',
   'guide.professions.intro':
     "Oltre al combattimento e alle missioni, il mondo ti ricompensa per il lavoro della terra e della forgia: raccogliere materie prime, trasformarle in equipaggiamento e beni attraverso dieci mestieri artigiani e assumere un'identità come uno dei dieci archetipi che quei mestieri rappresentano.",
-  'guide.valeCupPage.heading': 'La Coppa della Valle',
-  'guide.valeCupPage.howHeading': 'Come si gioca',
-  'guide.valeCupPage.howMatch':
-    "Al calcio d'inizio il tuo kit di classe viene sostituito da un kit sportivo e ripristinato esattamente alla fine. I calci mirano al reticolo a terra, la palla rimbalza sulle sponde e dribblare significa semplicemente correre con la palla. Segna più gol dell'altra squadra prima del fischio finale; un pareggio va al gol d'oro.",
-  'guide.valeCupPage.howQueue':
-    "Mettiti in coda da qualsiasi luogo tramite la finestra della Coppa della Valle, oppure parla con il Guardacampo Bram al cancello del Campo della Scrofa. Scegli un formato dall'uno contro uno fino al cinque contro cinque, una nazione del vessillo e un ruolo sportivo; entra in coda da solo o porta il tuo gruppo.",
-  'guide.valeCupPage.howTruce':
-    'Nessuno sanguina al Campo della Scrofa: i contrasti fanno solo ruzzolare, niente fa male e i famigli restano fuori dalla partita.',
-  'guide.valeCupPage.intro':
-    'Palla di cinghiale al Campo della Scrofa: scegli un vessillo, scegli un ruolo e calcia una pelle di cinghiale imbottita oltre un portiere per il Secchio di Rame. Niente sangue, niente bottino, solo il boato degli spalti.',
-  'guide.valeCupPage.loreHeading': 'La palla di cinghiale e la tregua del raccolto',
-  'guide.valeCupPage.loreOldSow':
-    'Molto prima che i morti si destassero, i braccianti di Eastbrook giocavano a palla di cinghiale sui campi di stoppie dopo il raccolto: due torme, una pelle di cinghiale imbottita di paglia e due cancelli da carro trascinati ai due capi del prato. La prima palla, la Vecchia Scrofa, pende bronzata sopra il focolare della taverna.',
-  'guide.valeCupPage.loreTruce':
-    'Quando il Colosseo Cinereo cominciò a patrocinare giochi di guerra, il Maresciallo Redbrook rispose con qualcosa di più gentile: una tregua del raccolto permanente sul vecchio prato. I cancelli da carro divennero pali delle porte, il prato ebbe muri, spalti e un nome, il Campo della Scrofa, e il premio fu sempre lo stesso secchio del latte ammaccato da cui bevevano i vincitori: il Secchio di Rame.',
-  'guide.valeCupPage.nationChoir':
-    'Azzurro pallido e argento sotto la campana: inquietanti, precisi e molto silenziosi.',
-  'guide.valeCupPage.nationColiseum':
-    'Rosso e nero con le spade incrociate: giocano come se fosse ancora un gioco di guerra.',
-  'guide.valeCupPage.nationCopperdig':
-    'Rame e marrone con il piccone: scavatori che non smettono mai di correre.',
-  'guide.valeCupPage.nationMirefen':
-    "Verde acqua e grigio sotto l'airone: pazienti, dalle gambe lunghe, mai frettolosi.",
-  'guide.valeCupPage.nationMoon':
-    'Viola e argento sotto la falce di luna: giocatori notturni, leggeri sui piedi.',
-  'guide.valeCupPage.nationOgre':
-    "Arancio e terra d'ombra dietro il pugno: prima la spallata, e ne vanno fieri.",
-  'guide.valeCupPage.nationThornpeak':
-    'Blu ghiaccio e bianco sotto la vetta: dal passo sicuro e testardi.',
-  'guide.valeCupPage.nationVale':
-    'Verde e oro, con il covone di grano al vento: la squadra di casa, braccianti fino al midollo.',
-  'guide.valeCupPage.nationsBody':
-    'Ogni squadra gioca sotto un vessillo. Il capitano sceglie la nazione e, se entrambe le squadre battono lo stesso vessillo, quella in trasferta gioca con i colori invertiti.',
-  'guide.valeCupPage.nationsHeading': 'Le otto nazioni del vessillo',
-  'guide.valeCupPage.rewardsBody':
-    'Le regole della tregua significano niente esperienza e niente bottino: una partita decisa conta per il tuo bilancio e per il tabellone dei vincitori, e una vittoria conta anche per i compiti delle ricompense del giorno. Disertare una partita mette in panchina il tuo posto, e il Guardacampo non dimentica.',
-  'guide.valeCupPage.rewardsHeading': 'Le regole della tregua',
-  'guide.valeCupPage.rolesBody':
-    'Il tuo ruolo decide il kit che porti in campo. Tutti calciano; il resto è temperamento. Nelle categorie a uno e a due per squadra tutti giocano con il kit tuttofare, perciò le scelte di ruolo entrano in gioco davvero dalle tre per squadra in su.',
-  'guide.valeCupPage.rolesHeading': 'Ruoli sportivi',
-  'guide.valeCupPage.spectateBody':
-    'Allo stadio si gioca una partita alla volta, e chiunque può avvicinarsi e guardare dagli spalti.',
-  'hudChrome.keybinds.valecup': 'Coppa della Valle',
   'hudChrome.mobile.dailyRewards': 'Negozio',
   'hudChrome.perf.labels.predLead': 'Anticipo di predizione',
   'hudChrome.townFocus.budgetLabel': 'Punti rimanenti: {remaining} / {budget}',
@@ -2775,140 +2719,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Ogni {points} punti su un componente aumentano il suo livello di raccolta di un grado, fino a {steps} gradi; meno di {points} punti aumentano comunque la resa.',
   'hudChrome.townFocus.title': 'Priorità della città',
   'hudChrome.townFocus.townOnlyHint': 'Il focus puo essere modificato solo mentre sei in citta.',
-  'hudChrome.vcup.awayNote':
-    'Se entrambe le squadre battono lo stesso vessillo, quella in trasferta gioca con i colori invertiti.',
-  'hudChrome.vcup.bannerCountdown': "Calcio d'inizio tra {seconds}...",
-  'hudChrome.vcup.bannerDraw': 'Pareggio al Campo della Scrofa.',
-  'hudChrome.vcup.bannerEnd': 'Fischio finale: {nationA} {scoreA}, {nationB} {scoreB}',
-  'hudChrome.vcup.bannerFound': 'La Coppa della Valle chiama: {nationA} contro {nationB}!',
-  'hudChrome.vcup.bannerGoal': 'GOL! Segna {nation}!',
-  'hudChrome.vcup.bannerGolden': "GOL D'ORO: il prossimo gol vince!",
-  'hudChrome.vcup.bannerKickoff': "CALCIO D'INIZIO!",
-  'hudChrome.vcup.bannerLoss': 'Sconfitta al Campo della Scrofa.',
-  'hudChrome.vcup.bannerSave': '{name} PARA!',
-  'hudChrome.vcup.bannerWin': 'Vittoria al Campo della Scrofa!',
-  'hudChrome.vcup.bet.aria': 'Scommesse sulla partita della Coppa della Valle',
-  'hudChrome.vcup.bet.back': 'Punta su {team}',
-  'hudChrome.vcup.bet.closed': 'Scommesse chiuse',
-  'hudChrome.vcup.bet.closesIn': 'Le scommesse chiudono tra {seconds}s',
-  'hudChrome.vcup.bet.collapse': 'Nascondi le scommesse',
-  'hudChrome.vcup.bet.expand': 'Vedi le scommesse e punta',
-  'hudChrome.vcup.bet.form': '{wins}V-{losses}S',
-  'hudChrome.vcup.bet.lostLog': 'Hai perso la tua scommessa sulla Coppa della Valle: {amount}.',
-  'hudChrome.vcup.bet.mine': 'La tua scommessa: {amount} su {team}',
-  'hudChrome.vcup.bet.none': 'Non hai ancora scommesso su questa partita.',
-  'hudChrome.vcup.bet.oddsLabel': 'Paga',
-  'hudChrome.vcup.bet.prize': 'Montepremi {amount}',
-  'hudChrome.vcup.bet.record': 'Bilancio scommesse: {wins}V-{losses}S, {sign}{net}',
-  'hudChrome.vcup.bet.refundLog':
-    'Scommesse annullate, la tua puntata di {amount} è stata restituita.',
-  'hudChrome.vcup.bet.splitAria': 'Quota del montepremi puntata su ciascuna squadra',
-  'hudChrome.vcup.bet.title': 'Scommesse sulla partita',
-  'hudChrome.vcup.bet.wonBanner': 'La tua scommessa ha vinto!',
-  'hudChrome.vcup.bet.wonLog':
-    'La tua scommessa sulla Coppa della Valle ha vinto: {amount} restituiti.',
-  'hudChrome.vcup.blockNation': 'Scegli prima una nazione del vessillo.',
-  'hudChrome.vcup.blockNotLeader': 'Solo il capogruppo può mettere in coda la squadra.',
-  'hudChrome.vcup.blockPartySize': 'Quel formato richiede un gruppo più piccolo.',
-  'hudChrome.vcup.boardEmpty': 'Nessun vincitore registrato finora. Il Secchio di Rame attende.',
-  'hudChrome.vcup.boardHeading': 'Tabellone dei vincitori',
-  'hudChrome.vcup.boardWins': '{count} vittorie',
-  'hudChrome.vcup.bracketLabel': '{n}c{n}',
-  'hudChrome.vcup.bracketsAria': 'Formato della partita',
-  'hudChrome.vcup.briefing.bot': 'Bot',
-  'hudChrome.vcup.briefing.kitHeading': 'Il tuo kit',
-  'hudChrome.vcup.briefing.kitNote':
-    'Queste mosse sostituiscono le tue abilità di classe per la partita.',
-  'hudChrome.vcup.briefing.ready': 'Sono pronto',
-  'hudChrome.vcup.briefing.readyAria': "Dichiarati pronto per il calcio d'inizio",
-  'hudChrome.vcup.briefing.readyCount': '{ready} pronti su {total}',
-  'hudChrome.vcup.briefing.readyDone': 'Pronto',
-  'hudChrome.vcup.briefing.rosterHeading': 'La distinta',
-  'hudChrome.vcup.briefing.rule1': 'Calcia o passa la palla nella porta avversaria per segnare.',
-  'hudChrome.vcup.briefing.rule2':
-    'Vince chi per primo arriva a 5 gol, o chi ne ha di più al fischio finale.',
-  'hudChrome.vcup.briefing.rule3':
-    "Una partita in parità al fischio finale va al gol d'oro: il prossimo gol vince.",
-  'hudChrome.vcup.briefing.rule4':
-    'I contrasti ti fanno solo ruzzolare. Nessuno si fa male sotto la tregua del raccolto.',
-  'hudChrome.vcup.briefing.rule5': 'Chiunque può avvicinarsi e fare il tifo dagli spalti.',
-  'hudChrome.vcup.briefing.rulesHeading': 'Come si gioca',
-  'hudChrome.vcup.briefing.subtitle': 'Riunione pre-partita',
-  'hudChrome.vcup.briefing.vs': 'vs',
-  'hudChrome.vcup.briefing.waiting': "In attesa che l'altra squadra si dichiari pronta...",
-  'hudChrome.vcup.briefing.whistle': 'Il fischio arriva tra {seconds}s.',
-  'hudChrome.vcup.briefing.you': 'Tu',
-  'hudChrome.vcup.clock': '{minutes}:{seconds}',
-  'hudChrome.vcup.close': 'Chiudi la finestra della Coppa della Valle',
-  'hudChrome.vcup.deserterNote':
-    'Il Guardacampo non dimentica. Potrai rimetterti in coda tra {seconds} sec.',
-  'hudChrome.vcup.enterAsGuild': 'Entra sotto il vessillo di {guild}',
-  'hudChrome.vcup.gossipOpen': 'Il libro degli incontri',
-  'hudChrome.vcup.gossipOpenAria': 'Apri la finestra della Coppa della Valle',
-  'hudChrome.vcup.guildBoardEmpty': 'Nessuna gilda è ancora scesa in campo. Batti il tuo vessillo!',
-  'hudChrome.vcup.guildBoardHeading': 'Vessilli di gilda',
-  'hudChrome.vcup.guildBoardWl': '{wins} V, {losses} S',
-  'hudChrome.vcup.guildRecordLine':
-    'Bilancio della tua gilda: {wins} vittorie, {losses} sconfitte.',
-  'hudChrome.vcup.inMatchNote': 'La tua squadra è in campo. Gioca!',
-  'hudChrome.vcup.indicatorLive': 'Coppa della Valle',
-  'hudChrome.vcup.indicatorOpen': 'Apri la finestra della Coppa della Valle',
-  'hudChrome.vcup.indicatorQueued':
-    'Coda della Coppa della Valle: {bracket}, posizione {position} di {count}',
-  'hudChrome.vcup.leaveQueue': 'Lascia la coda',
-  'hudChrome.vcup.liveAria': 'Coppa della Valle: {nationA} {scoreA}, {nationB} {scoreB}',
-  'hudChrome.vcup.liveHeading': 'Ora al Campo della Scrofa',
-  'hudChrome.vcup.logDraw': "L'incontro al Campo della Scrofa finisce in pareggio.",
-  'hudChrome.vcup.logFound':
-    'La tua partita della Coppa della Valle è pronta: {nationA} contro {nationB}.',
-  'hudChrome.vcup.logGoal': '{name} segna per {nation}! {nationA} {scoreA}, {nationB} {scoreB}.',
-  'hudChrome.vcup.logLoss': "Perdi l'incontro al Campo della Scrofa.",
-  'hudChrome.vcup.logQueued':
-    'Entri nella coda della Coppa della Valle per {bracket} (posizione {position}).',
-  'hudChrome.vcup.logRoster': 'La tua squadra: {allies}. La loro: {enemies}.',
-  'hudChrome.vcup.logSave': '{name} compie la parata!',
-  'hudChrome.vcup.logUnqueued': 'Lasci la coda della Coppa della Valle.',
-  'hudChrome.vcup.logWin': "Vinci l'incontro al Campo della Scrofa.",
-  'hudChrome.vcup.mobileLabel': 'Coppa',
-  'hudChrome.vcup.nation.choir': 'Il Coro Pallido',
-  'hudChrome.vcup.nation.coliseum': 'Il Colosseo Cinereo',
-  'hudChrome.vcup.nation.copperdig': 'Lo Scavo di Rame',
-  'hudChrome.vcup.nation.mirefen': 'Il Mirefen',
-  'hudChrome.vcup.nation.moon': 'La Luna Pallida',
-  'hudChrome.vcup.nation.ogre': 'I Clan degli Ogre',
-  'hudChrome.vcup.nation.thornpeak': 'Thornpeak',
-  'hudChrome.vcup.nation.vale': 'Valle di Eastbrook',
-  'hudChrome.vcup.nationsHeading': 'Nazione del vessillo',
-  'hudChrome.vcup.noLive': 'Il campo è tranquillo. Nessuna partita in corso.',
-  'hudChrome.vcup.offlineNote':
-    'Il libro degli incontri è chiuso. La Coppa della Valle non è disponibile al momento.',
-  'hudChrome.vcup.phaseCountdown': "Calcio d'inizio tra {seconds}",
-  'hudChrome.vcup.phaseGoal': 'GOL!',
-  'hudChrome.vcup.phaseGolden': "GOL D'ORO",
-  'hudChrome.vcup.phaseOver': 'FISCHIO FINALE',
-  'hudChrome.vcup.practice': 'Allenamento contro i bot',
-  'hudChrome.vcup.practiceNote':
-    'Avvia subito una partita privata contro i bot sul tuo campo di allenamento.',
-  'hudChrome.vcup.practicingNow': 'In allenamento ora ({count}):',
-  'hudChrome.vcup.queue': 'Entra in coda',
-  'hudChrome.vcup.queueNote':
-    'Mettiti in coda da qualsiasi luogo; il fischio ti chiamerà al Campo della Scrofa.',
-  'hudChrome.vcup.queuedStatus': 'In coda per {bracket}: posizione {position} di {count}.',
-  'hudChrome.vcup.recordLine':
-    'Il tuo bilancio: {wins} vittorie, {losses} sconfitte, {draws} pareggi.',
-  'hudChrome.vcup.role.allrounder.desc': "Un po' di tutto: calcio, calcione e una spallata leale.",
-  'hudChrome.vcup.role.allrounder.name': 'Tuttocampista',
-  'hudChrome.vcup.role.keeper.desc': "Difende l'area di porta con presa, tuffo e rinvio.",
-  'hudChrome.vcup.role.keeper.name': 'Portiere',
-  'hudChrome.vcup.role.striker.desc': 'Vive per il calcione lungo e lo scatto laterale.',
-  'hudChrome.vcup.role.striker.name': 'Attaccante',
-  'hudChrome.vcup.role.sweeper.desc': 'Sbalza gli avversari lontano dalla palla e la spazza via.',
-  'hudChrome.vcup.role.sweeper.name': 'Libero',
-  'hudChrome.vcup.rolesHeading': 'Ruolo sportivo',
-  'hudChrome.vcup.shootPower': 'POTENZA',
-  'hudChrome.vcup.title': 'La Coppa della Valle',
-  'hudChrome.vcup.waitingCount': '{count} in attesa',
-  'hudChrome.vcup.walkUp': 'Avvicinati al Campo della Scrofa per guardare dagli spalti.',
   'hudChrome.archetypeTitle.label': 'Titolo',
   'hudChrome.archetypeTitle.none': 'Nessuno',
   'entities.itemSets.crownforged.bonus4':
@@ -3560,7 +3370,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.spider_egg_sac.name': 'Sacca di Uova di Ragno',
   'entities.mobs.sump_troll_devourer.name': 'Troll Divoratore del Pantano',
   'entities.mobs.tolling_bell.name': 'Campana Rintoccante',
-  'entities.mobs.vale_cup_ball.name': 'Palla di cinghiale',
   'entities.npcs.brother_halven_marsh.greeting':
     'La pista portava a nord. Un altro reliquiario, un altro rito. Scegli la difficoltà, e io terrò la corda finché non torni.',
   'entities.npcs.brother_halven_marsh.name': 'Fratello Halven',
@@ -10754,7 +10563,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.controls.petBar':
     'Barra del famiglio: Attacca, Ferma, Provoca, Difensivo, Aggressivo (con un famiglio del cacciatore o dello stregone evocato)',
   'guide.controls.runForward': 'Corri in avanti',
-  'guide.controls.valeCup': 'Coppa della Valle',
   'guide.dungeonsPage.heroicBody':
     "Ogni dungeon da cinque giocatori, e l'incursione stessa, ha una versione eroica che ti attende oltre il livello massimo. Le stesse sale, rifatte per un gruppo di fine gioco ben equipaggiato: tutto colpisce più forte, nulla si può seminare a piedi, e i boss ignorano del tutto stordimenti e rallentamenti. Supera prima le versioni normali; l'eroica dà per scontato che tu l'abbia fatto.",
   'guide.dungeonsPage.heroicHowBody': "Scegli la difficoltà prima che il gruppo rivendichi l'istanza: digita /dungeon heroic, oppure scegli Imposta difficoltà dungeon nel menu del tuo ritratto. Da solo la imposti tu; in gruppo può farlo solo il capogruppo, e la scelta vale per tutti e si blocca sulla porta, così una sessione resta ciò per cui è stata rivendicata.",
@@ -10854,12 +10662,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "La Celerità è la statistica che velocizza tutto ciò che fai: fendenti in mischia, tiri a distanza e lancio di incantesimi accelerano tutti insieme. Proviene dall'equipaggiamento, soprattutto dai bonus dei set di armatura, mentre alcune abilità concedono una breve raffica di colpi più rapidi. La tua scheda la mostra come Grado di Celerità.",
   'guide.stats.hasteTitle': 'Celerità',
   'guide.talentsPage.choiceNote': 'Ogni fila è un bivio: offre tre opzioni e tu ti impegni su una di esse. Il tuo prossimo azzeramento riapre ognuna di quelle scelte.',
-  'guide.valeCupPage.bettingBody':
-    'Gli spettatori al Campo della Scrofa possono puntare su una squadra mentre una partita si sta formando: le poste confluiscono in un unico piatto, e al fischio finale i vincitori si spartiscono il piatto dei perdenti in proporzione a quanto hanno puntato. Una partita in pareggio, o un esito a sorpresa su cui nessuno ha puntato, rimborsa ogni moneta. I giocatori schierati nella partita non possono scommettervi, e il parapetto conserva il tuo bilancio a vita di vittorie, sconfitte e monete nette.',
-  'guide.valeCupPage.bettingHeading': 'Una puntata al parapetto',
-  'guide.valeCupPage.practiceBody':
-    "La finestra della Coppa della Valle offre anche l'allenamento: una copia privata del campo dove i bot riempiono entrambe le squadre e nulla conta per il tuo bilancio. Ti manca un giocatore o due per fare sul serio? Dopo una breve attesa, i bot completano le squadre, e ogni partita con bot in campo è amichevole, mai classificata. E quando il Campo della Scrofa resta inattivo, i bot mettono in scena un'esibizione che puoi guardare, e su cui puoi scommettere, dagli spalti; nell'istante in cui giocatori veri si dichiarano pronti, l'esibizione cede il campo e ogni posta viene restituita.",
-  'guide.valeCupPage.practiceHeading': 'Incontri di allenamento e il campo inattivo',
   'guide.worldPage.worldBossBody':
     "In alto su Thornpeak, la tempesta sopra Stormcrag a volte prende forma. Thunzharr, la Vetta Risvegliata si erge lì con un ritmo costante, un elementale della potenza di un'incursione affrontato nel mondo aperto da chiunque risponda alla chiamata, e diventa più possente quanto più sfidanti gli si oppongono. Chiunque si unisca allo scontro guadagna il proprio tiro sul suo bottino, onorato secondo le regole di blocco d'incursione, e la sua caduta indugia abbastanza a lungo perché i caduti possano tornare di corsa a reclamare il dovuto. Raduna più spade di quante pensi ti servano.",
   'guide.worldPage.worldBossTitle': 'Quando la vetta si desta: il boss del mondo',

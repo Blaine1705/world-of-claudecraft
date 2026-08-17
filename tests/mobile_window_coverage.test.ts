@@ -339,7 +339,6 @@ describe('mobile window coverage (Phase 5 parity)', () => {
       'mailbox-window',
       'emote-editor',
       'arena-window',
-      'valecup-window',
       'delve-board',
       'leaderboard-window',
       'loot-settings-window',

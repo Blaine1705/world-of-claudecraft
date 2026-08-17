@@ -59,8 +59,10 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // auto-merged identical numbers before while the real total was higher; the
 // merged tree carries BOTH sides' pairs. Only the suite says what they really
 // are, and the numbers below were set from a run, not from this narrative.
-const EXPECTED_SEND_COUNT = 199;
-const EXPECTED_DISPATCH_COUNT = 212;
+// The New Eastbrook program then retires the Vale Cup minigame, removing its
+// six vcup_* send + dispatch pairs (docs/design/eastbrook-revamp/master-plan.md).
+const EXPECTED_SEND_COUNT = 193;
+const EXPECTED_DISPATCH_COUNT = 206;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

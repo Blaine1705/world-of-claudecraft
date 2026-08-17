@@ -258,13 +258,11 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'herb_eastbrook_4',
     zoneId: 'eastbrook_vale',
     type: 'herb',
-    // Moved off (23,-99): that spot sat INSIDE the boarball pitch, in the east
-    // goal's corner (vale_cup_layout PITCH is x -48..26 by z -127..-97), so the
-    // patch grew on the playing surface of a live match and a gatherer working
-    // it was swept off by the pitch police. Now on the meadow above the ground,
-    // 4 yards clear of the whole Sowfield shell the terrain flatten and the
-    // decoration screen already reserve (SOWFIELD_EXCLUDE), with 8.0yd of sea
-    // freeboard and 5.4yd of it across the whole harvest reach.
+    // Moved off (23,-99) in the boarball era: that spot sat inside the old
+    // Sowfield pitch. The stadium is gone (the New Eastbrook program builds
+    // the harbor town on that basin), but the meadow spot above the ground
+    // keeps 8.0yd of sea freeboard and 5.4yd across the whole harvest reach,
+    // and the basin below is reserved construction ground now anyway.
     pos: { x: 6, z: -69 },
     level: 4,
     tier: 1,

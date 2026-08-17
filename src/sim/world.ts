@@ -65,7 +65,6 @@ import {
 } from './terrain_region_index';
 import { cragLayer, highlandMask, reliefBase, ridged2, warpedCoords } from './terrain_relief';
 import type { BiomeId, HeightStamp, ZoneDef } from './types';
-import { isInSowfieldShell, SOWFIELD_FLAT, sowfieldStandLift } from './vale_cup_layout';
 import { wildheartFieldHeight } from './wildheart_field';
 
 // Terrain is a pure function of (x, z, seed): both the sim (ground clamping)
@@ -3651,24 +3650,6 @@ function applyEditLayer(x: number, z: number, h0: number): number {
   return h;
 }
 
-// The Sowfield boarball ground (docs/prd/vale-cup.md): the southern Eastbrook
-// basin leveled into a crisp rectangular plateau with a smoothstep apron ring.
-// Blend weight of the flatten at (x, z): 1 inside the rectangle, easing to 0
-// over SOWFIELD_FLAT.falloff yards outside it. Height stamps are circles-only,
-// so like MIREFEN_IMPACT_CRATER this is a bespoke hand-authored arm; it applies
-// for ANY active content. The apron's influence ends at z = SOWFIELD_FLAT.zMin -
-// falloff (-149), north of the world rim's z = -150 onset, so the rim wall is
-// untouched by construction (tests/terrain_walls.test.ts sweeps that band).
-export function sowfieldFlattenWeight(x: number, z: number): number {
-  const f = SOWFIELD_FLAT;
-  const dx = Math.max(0, f.xMin - x, x - f.xMax);
-  const dz = Math.max(0, f.zMin - z, z - f.zMax);
-  if (dx === 0 && dz === 0) return 1;
-  const d = Math.sqrt(dx * dx + dz * dz);
-  if (d >= f.falloff) return 0;
-  return 1 - smoothstep(0, 1, d / f.falloff);
-}
-
 // The Highwatch stables paddock plateau (STABLE_FLAT): the worked yard leveled
 // to one height so the show-jumping course sits on fair, flat ground. The
 // smooth apron keeps movement, collision, props, and terrain rendering on the
@@ -3978,7 +3959,6 @@ export function groundHeight(x: number, z: number, seed: number): number {
   // and its flat top is the wall-walk.
   const terrain =
     terrainHeight(x, z, seed) +
-    sowfieldStandLift(x, z) +
     beaconSpiralLift(x, z) +
     castleLift(x, z) +
     dawnholdLift(x, z) +
@@ -4612,12 +4592,6 @@ function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = f
   if (terrainRegionHas(region, TERRAIN_APPLIER.fenSouthShore)) {
     h = applyFenSouthShore(x, z, h);
   }
-  // The Sowfield plateau (Vale Cup) is the LAST word on the southern-vale
-  // terrain: a LEVEL pull toward the pitch height applied AFTER every coast, rim,
-  // and sea pass (like the Tablecrag / Veilspires bespoke plateaus above), so the
-  // football pitch stays dead flat and dry no matter what the grid's vale coast
-  // does beneath it. Its influence ends north of the world-rim onset (z >= -149,
-  // see sowfieldFlattenWeight), so it never fights the rim wall.
   // Gradual shores on every declared lake: the last shaping word before the
   // stand lift and the editor's stamps, so nothing above can re-steepen a
   // shore a player must wade out of.
@@ -4628,10 +4602,6 @@ function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = f
   if (terrainRegionHas(region, TERRAIN_APPLIER.glacierTarnRamp)) {
     h = applyGlacierTarnRamp(x, z, h);
   }
-  const sow = terrainRegionHas(region, TERRAIN_APPLIER.sowfieldFlatten)
-    ? sowfieldFlattenWeight(x, z)
-    : 0;
-  if (sow > 0) h = lerp(h, SOWFIELD_FLAT.height, sow);
   // The Highwatch paddock is another authored level pull. It sits deep inside
   // Thornpeak, so it does not compete with a realm border or coast.
   const stable = terrainRegionHas(region, TERRAIN_APPLIER.stableFlatten)
@@ -4659,7 +4629,7 @@ export const STEEPNESS_SAMPLE = 0.35; // yards; about one movement tick of run
 // (the bug that made the lighthouse stair unclimbable for a real player).
 function steepnessGroundHeight(x: number, z: number, seed: number): number {
   if (x > DUNGEON_X_THRESHOLD) return DUNGEON_FLOOR_Y;
-  return terrainHeight(x, z, seed) + sowfieldStandLift(x, z);
+  return terrainHeight(x, z, seed);
 }
 export function terrainSteepness(x: number, z: number, seed: number): number {
   const e = STEEPNESS_SAMPLE;
@@ -5168,9 +5138,6 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
   const x = gx + ox,
     z = gz + oz;
   if (isExcludedDecoration(x, z)) return null;
-  // The Sowfield stadium footprint grows no trees or rocks (hash-based
-  // placement, so skipping here shifts no other decoration or rng draw).
-  if (isInSowfieldShell(x, z)) return null;
   // The Galecrest paddock is a worked yard and race course. Keep the same
   // deterministic decoration field out of its apron so no tree becomes an
   // invisible obstacle across a jump line.

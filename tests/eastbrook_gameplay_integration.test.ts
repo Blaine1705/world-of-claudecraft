@@ -324,7 +324,6 @@ describe('Eastbrook authored gameplay data integration', () => {
       'foreman_odell',
       'bursar_fernando',
       'card_master',
-      'groundskeeper_bram',
       'chronicler_saul',
       'forgemistress_darva',
       'cook_marlow',
@@ -355,6 +354,10 @@ describe('Eastbrook authored gameplay data integration', () => {
     // never evaluated in the one case they exist to describe. Ordered this way
     // a drift in some OTHER field of some other NPC moves the hash while these
     // three stay green, which is the diagnostic the digest alone cannot give.
+    //
+    // Re-minted a third time when the Sowfield demolition retired Groundskeeper
+    // Bram with the Vale Cup module: his whole record (the one dynamic payload)
+    // left the table, and no other def or placement field moved.
     expect(ZONE1_NPCS.trader_wilkes.vendorItems).toEqual([
       'baked_bread',
       'spring_water',
@@ -380,7 +383,7 @@ describe('Eastbrook authored gameplay data integration', () => {
       'arcanite_bar',
     ]);
     expect(createHash('sha256').update(JSON.stringify(stableTownNpcPayload())).digest('hex')).toBe(
-      '4c9400baeef7c04572881440cd4ba97e231f23f08ea0af355a3e7bac249cd1c2',
+      '1195be83990758fcddd9fb49fdec6b34d217999281c66b8af0cae7691c0a0003',
     );
     expect(ZONE1_TOWN_NPC_IDS).toHaveLength(15);
     for (const id of ZONE1_TOWN_NPC_IDS) {
@@ -388,11 +391,6 @@ describe('Eastbrook authored gameplay data integration', () => {
       expect(ZONE1_NPCS[id].pos).toEqual(placement.position);
       expect(ZONE1_NPCS[id].facing).toBe(placement.facing);
     }
-    expect(ZONE1_NPCS.groundskeeper_bram).toMatchObject({
-      pos: { x: -6, z: -82 },
-      facing: Math.PI,
-      dynamic: true,
-    });
   });
 
   it('spawns layout-authored FURY under a reserved id without shifting nextId or RNG', () => {

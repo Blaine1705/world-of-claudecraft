@@ -16,7 +16,6 @@ import { DEEDS } from '../src/sim/content/deeds';
 import { isFinderListingTag, isFinderRole } from '../src/sim/content/dungeon_finder';
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
-import { SPORT_ROLES, VC_NATION_IDS } from '../src/sim/content/vale_cup';
 import { withWeaponSkinApplied } from '../src/sim/content/weapon_skin_rules';
 import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
@@ -80,7 +79,6 @@ import type { CharacterState, PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { drainBgOutcomes } from '../src/sim/social/battleground_outcomes';
 import { RAID_MAX } from '../src/sim/social/party';
-import type { VcMatch } from '../src/sim/social/vale_cup';
 import {
   parseTalentAllocation,
   parseTalentLoadoutIndex,
@@ -104,12 +102,8 @@ import {
   PLAYER_INTEREST_DROP_RADIUS,
   RUN_SPEED,
   type SimEvent,
-  type SportRole,
   type UnstuckBlockedReason,
-  type VcBracket,
-  type VcNationId,
 } from '../src/sim/types';
-import { isAtSowfield } from '../src/sim/vale_cup_layout';
 import { WORLD_SEED } from '../src/sim/world_seed';
 import {
   type BankBonusSource,
@@ -122,8 +116,6 @@ import {
   type PetSpecialWireVersion,
   STABLE_TIMER_WIRE_VERSION,
   type StableTimerWireVersion,
-  type VcSharedCupInfo,
-  type VcViewerReadout,
 } from '../src/world_api';
 import { type ActionBarLayout, sanitizeActionBarLayout } from '../src/world_api/action_bar';
 import { sameAppearance } from '../src/world_api/appearance';
@@ -542,7 +534,6 @@ export const SELF_WIRE_PHASES = [
   'timers', // lockouts, corpse, auras, cooldowns, node cooldowns, charges, stats, weapon
   'social', // party, marks, trade, duel, cardDuel, honor, arena
   'bg',
-  'vcup',
   'df',
   'market',
   'mail',
@@ -552,7 +543,7 @@ export const SELF_WIRE_PHASES = [
   'prof', // prof, cprof, mst
   'corder',
   'craft', // enchant outcomes, town focus, gathering, tool slots, mounts, renown, title
-  'heavy', // the wireRev-gated heavy block + sport
+  'heavy', // the wireRev-gated heavy block
   'assemble', // the final base-JSON + extras splice (multi-KB copy on a heavy payload)
 ].map((n) => `self.${n}`);
 
@@ -594,11 +585,6 @@ const BG_WIRE_RESET_EVENTS = new Set([
 // whole match instead (bgRespawnRefreshPids), the shape the bgKill events
 // already have because the sim emits one copy per member.
 const BG_RESPAWN_EVENT = 'respawn';
-// Vale Cup readout cadence: the CupInfo payload carries whole-second clocks and
-// queue sizes, so 2 Hz keeps the window/indicator live without re-serializing
-// the rosters at 20 Hz. Instant transitions ride the pid-scoped vcup* events.
-const VC_WIRE_HZ = 2;
-const VC_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * VC_WIRE_HZ)));
 // Dungeon Finder personal readout cadence: the `df` payload carries
 // whole-second clocks (queue wait, proposal countdown), so 2 Hz keeps the
 // window live without re-serializing it at 20 Hz. The shared `dfb` board rides
@@ -749,23 +735,6 @@ function isPickAction(value: unknown): value is PickAction {
   return typeof value === 'string' && LOCKPICK_ACTIONS.has(value as PickAction);
 }
 
-// Vale Cup wire validation (anti-cheat: every field type-checked against the
-// known token sets before the sim is touched, the LOCKPICK_ACTIONS pattern).
-const VC_NATION_SET: ReadonlySet<string> = new Set(VC_NATION_IDS);
-const SPORT_ROLE_SET: ReadonlySet<string> = new Set(SPORT_ROLES);
-
-function isVcNationId(value: unknown): value is VcNationId {
-  return typeof value === 'string' && VC_NATION_SET.has(value);
-}
-
-function isSportRole(value: unknown): value is SportRole {
-  return typeof value === 'string' && SPORT_ROLE_SET.has(value);
-}
-
-function isVcBracket(value: unknown): value is VcBracket {
-  return typeof value === 'number' && Number.isInteger(value) && value >= 1 && value <= 5;
-}
-
 // Heavy, rarely-changing self fields (inventory, equipment, stats, talents,
 // quests, milestones, cosmetics) are re-serialized into a snapshot only when a
 // command or sim event that can change them lands for that session, or on a
@@ -797,9 +766,6 @@ const LANE_DROP_CAUSE = {
 const JAILED_BLOCKED_COMMANDS = new Set<string>([
   'arena_queue',
   'bg_queue',
-  'vcup_queue',
-  'vcup_ready',
-  'vcup_practice',
   'enter_dungeon',
   'enter_crypt',
   'enter_delve',
@@ -828,7 +794,6 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'buy',
   'sell',
   'buyback',
-  'vcup_bet', // debits copper: refresh the self snapshot so the purse updates
   'loot',
   'harvestCorpse',
   'pickup',
@@ -874,7 +839,6 @@ const HEAVY_SELF_CMDS = new Set<string>([
 ]);
 const HEAVY_SELF_EVENTS = new Set<string>([
   'loot',
-  'vcupBetSettled', // credits copper to the bettor: refresh their purse
   'mailArrived',
   'mailResult',
   'levelup',
@@ -1895,10 +1859,6 @@ export class GameServer {
     aggroTargets: ReturnType<typeof partyFrameAggroTargets>;
     incomingHeals: ReturnType<typeof partyFrameIncomingHeals>;
   } | null = null;
-  // Realm-wide Vale Cup readout, built and stringified once per broadcast pass and
-  // shared across every viewer (keyed on sim.tickCount inside selfWireJson), the
-  // same once-per-tick memo shape as wireCache / partyFrameGlobalsCache.
-  private readonly realmReadout = createRealmReadoutMemo<VcSharedCupInfo>();
   // Realm-wide dungeon-finder board (`dfb`), the memo's second tenant: the board
   // is viewer-independent (dungeonFinderBoardView takes no pid), so sessions whose
   // per-session cadence gates open on the same tick share one build + stringify
@@ -1917,10 +1877,6 @@ export class GameServer {
   // When the realm-wide Vale Cup readout is next due, tracked realm-global (not
   // per session) so every viewer still gates together in one pass and the memo
   // above builds once. `>=` against this, never `tickCount % interval`:
-  // broadcastSnapshots runs once per callback OUTSIDE the catch-up loop, so
-  // tickCount can stride past an interval multiple under load and a modulo gate
-  // would skip the aligned pass. Init a full interval back so the first pass is due.
-  private lastVcupWireTick = -VC_WIRE_INTERVAL_TICKS;
   private readonly partyFrameProjectionCache = new PartyFrameProjectionCache();
   private lastWireSweepTick = 0;
   private interval: NodeJS.Timeout | null = null;
@@ -1934,10 +1890,6 @@ export class GameServer {
   private playtimeInterval: NodeJS.Timeout | null = null;
   private lastPlaytimeGrantAt = new Map<number, number>(); // accountId -> sim time of last grant
   private dailyRewardActivityInterval: NodeJS.Timeout | null = null;
-  private readonly valeCupRewardCompletions = new WeakMap<
-    VcMatch,
-    { completionId: string; completedAtIso: string }
-  >();
   private relayCooldown = new Map<number, number>(); // accountId -> last "!" relay post (ms)
   // pids whose holder tier was forced via the dev /woctier command — the chain
   // refresh leaves them alone so the override sticks during testing (dev only).
@@ -2141,7 +2093,6 @@ export class GameServer {
         }
         this.simLapMark = t;
       },
-      valeCupShowcase: true, // idle Sowfield auto-runs a bot exhibition to watch/bet on
     });
     this.riftUpgrader = new RiftUpgradeCoordinator(riftUpgraderConfigFromEnv());
     this.riftAssets = new RiftAssetCoordinator(riftAssetConfigFromEnv());
@@ -2429,8 +2380,6 @@ export class GameServer {
     // arenaMatches entry behind silently gated releaseSpirit for the rest of
     // the mode's duration (and let the arena timeout teleport a prisoner).
     this.sim.arenaResolveDesertion(target.pid);
-    this.sim.vcupQueueLeave(target.pid);
-    this.sim.vcupResolveDesertion(target.pid);
     this.sim.leaveCardMinigameEntirely(target.pid);
     // Thornhollow Fields: leave the queue and desert any live match (the deserter takes
     // the rating loss; the team fights on) so the jail sweep never fights the
@@ -2569,13 +2518,7 @@ export class GameServer {
     // AFK is the lowest-priority active state: a dead/instanced/in-combat player
     // reports that first, but an idle /afk player shows 'afk' over plain 'online'.
     else if (this.sim.meta(session.pid)?.away?.mode === 'afk') status = 'afk';
-    // The Sowfield is overworld ground (no instance band, no status change),
-    // but the stadium is the presence players expect on match days: fighters
-    // and walk-up spectators inside the footprint report the venue, not the
-    // vale. English at the source like the dungeon/delve names above; the
-    // client re-localizes the label (src/ui/server_i18n.ts localizeZone).
-    const zone =
-      instanceZone ?? (isAtSowfield(pos.x, pos.z) ? 'The Sowfield' : zoneAt(pos.x, pos.z).name);
+    const zone = instanceZone ?? zoneAt(pos.x, pos.z).name;
     return { zone, status, x: pos.x, z: pos.z };
   }
 
@@ -4347,10 +4290,6 @@ export class GameServer {
         console.error('failed to close play session:', err),
       );
     }
-    // Deserting a live Vale Cup match resolves BEFORE the leave save so the
-    // benched slot and the counted loss are in the state serializeCharacter
-    // persists (idempotent: removePlayer runs it again harmlessly below).
-    this.sim.vcupResolveDesertion(session.pid);
     // Arena forfeit accounting also resolves before persistence. This keeps the
     // remaining player's win/honor durable if both combatants disconnect close
     // together; removePlayer repeats the idempotent cleanup after the save.
@@ -7822,41 +7761,6 @@ export class GameServer {
         sim.forfeitCardDuel(pid);
         break;
 
-      // The Vale Cup (boarball queue at the Sowfield, docs/prd/vale-cup.md).
-      // Deliberately NOT in HEAVY_SELF_CMDS: queueing mutates no heavy self
-      // field (queue state rides the throttled 'vcup' delta key + the pid-
-      // scoped vcup* events), and the kickoff kit swap happens at match start
-      // inside the sim tick, where the wireRev bump already forces the heavy
-      // refresh for that session.
-      case 'vcup_queue':
-        if (isVcBracket(msg.bracket) && isVcNationId(msg.nation) && isSportRole(msg.role))
-          sim.vcupQueueJoin(msg.bracket, msg.nation, msg.role, msg.guild === true, pid);
-        break;
-      case 'vcup_leave':
-        sim.vcupQueueLeave(pid);
-        break;
-      case 'vcup_role':
-        if (isSportRole(msg.role)) sim.vcupSetRole(msg.role, pid);
-        break;
-      case 'vcup_ready':
-        sim.vcupReady(pid);
-        break;
-      case 'vcup_practice':
-        // Private instanced practice bout vs bots (parallel to the real match).
-        if (isVcBracket(msg.bracket)) sim.vcupPracticeStart(msg.bracket, pid);
-        break;
-      case 'vcup_bet':
-        // Server-authoritative: the Sim re-validates the window, proximity, side,
-        // and balance, and debits copper. Amount clamped to a sane integer here.
-        if (
-          (msg.side === 'A' || msg.side === 'B') &&
-          typeof msg.amount === 'number' &&
-          Number.isFinite(msg.amount)
-        ) {
-          sim.vcupBet(msg.side, Math.floor(msg.amount), pid);
-        }
-        break;
-
       // Dungeon Finder (docs/prd/dungeon-finder.md). Deliberately NOT in
       // HEAVY_SELF_CMDS: finder state rides its own `df`/`dfb` delta keys, and
       // group formation bumps the party key through the normal snapshot path.
@@ -8478,14 +8382,6 @@ export class GameServer {
     this.partyFrameProjectionCache.beginBroadcast();
     const tick = this.sim.tickCount;
     // Vale Cup wire dueness, decided ONCE per broadcast pass and realm-global so the
-    // shared readout memo still builds a single time this pass, then threaded into
-    // every session's selfWireJson. `>=` a per-pass tracker, never a modulo of
-    // tickCount: this pass runs once per callback outside the catch-up loop, so
-    // tickCount can jump past a VC_WIRE_INTERVAL_TICKS multiple under load and a
-    // modulo gate would skip the aligned pass and stall the readout (the arena,
-    // Dungeon Finder, and wire-cache sibling gates all use `>=` for this reason).
-    const vcupDue = tick - this.lastVcupWireTick >= VC_WIRE_INTERVAL_TICKS;
-    if (vcupDue) this.lastVcupWireTick = tick;
     // tickHz rides the head at ~2 Hz, not on every snapshot: it is omitted while
     // the meter warms up (first ~1s, so a fresh server never shows a bogus
     // reading), and between-emissions the client holds the last value. A warmed
@@ -8672,13 +8568,7 @@ export class GameServer {
         }
         const selfStart = this.perfDetailActive ? process.hrtime.bigint() : 0n;
         if (this.perfDetailActive) this.bcastGridNs += selfStart - gridStart;
-        const selfJson = this.selfWireJson(
-          session,
-          anchorEntity,
-          anchorMeta,
-          anchorSession,
-          vcupDue,
-        );
+        const selfJson = this.selfWireJson(session, anchorEntity, anchorMeta, anchorSession);
         if (this.perfDetailActive) this.bcastSelfNs += process.hrtime.bigint() - selfStart;
         const keepJson = keep.length > 0 ? `,"keep":[${keep.join(',')}]` : '';
         // Ground-AoE warnings (frost rings, temporal hourglasses) are anonymous
@@ -8908,7 +8798,6 @@ export class GameServer {
     p: Entity,
     meta: PlayerMeta,
     anchorSession: ClientSession = session,
-    vcupDue = false,
   ): string {
     // Per-bucket attribution for bcastSelf (SELF_WIRE_PHASES): one clock read
     // per bucket boundary, active only during a detailed capture, accumulated
@@ -9161,70 +9050,13 @@ export class GameServer {
       session.lastBgWireTick = this.sim.tickCount;
       // The live online ladder inside that readout is realm-wide and identical
       // for every viewer, so it is built once per broadcast pass through the
-      // realm-readout memo and reused (the dfb/vcupb precedent).
+      // realm-readout memo and reused (the dfb precedent).
       const ladder = realmReadoutObject(this.bgLadderReadout, this.sim.tickCount, () =>
         this.sim.bgLadder(),
       );
       maybe('bg', this.sim.bgInfoFor(anchorSession.pid, ladder));
     }
     selfLap?.('self.bg');
-    // Vale Cup readout at its own UI cadence (VC_WIRE_HZ). Dueness (`vcupDue`) is
-    // decided once per broadcast pass in broadcastSnapshots and realm-global, so the
-    // shared bundle is built once per due pass rather than on each session's own
-    // offset gate. The per-viewer remainder (standing, queue slot, my match/spectate
-    // view, my bets, my guild line) rides `vcup`; the realm-wide fragment (queue
-    // sizes, the live strip, the winners and guild boards, who is practicing) rides
-    // `vcupb`, serialized ONCE per broadcast pass by the realm-readout memo and
-    // reused across every viewer. A fresh join or a spectate enter/exit clears
-    // lastSent, so the `sent.vcup === undefined` arm re-ships both keys
-    // immediately even between due passes (the old per-session negative-init did
-    // this; the dueness gate alone would not, so keep this arm).
-    if (vcupDue || sent.vcup === undefined) {
-      const shared = realmReadoutObject(this.realmReadout, this.sim.tickCount, () =>
-        this.sim.cupSharedInfoFor(),
-      );
-      const full = this.sim.cupInfoFor(anchorSession.pid, shared);
-      if (full) {
-        // liveHidden: this viewer is off in a private practice instance, so the
-        // Sowfield live strip carried in the shared fragment must be suppressed for
-        // them. Derived from the two values we already hold (the raw shared live is
-        // non-null but this viewer's effective live is null), so this per-viewer
-        // suppression needs no flag of its own on the match sub-object
-        // (VcMatchInfo.practice describes the MATCH for the briefing copy, not
-        // this viewer's live-strip visibility); the client reapplies liveHidden
-        // on recompose and never surfaces it on CupInfo. The raw strip still rides vcupb to every
-        // viewer (it is public match state, no PII), so a practicer receives the
-        // bytes but this per-viewer flag keeps their client from ever rendering it.
-        const liveHidden = shared.live !== null && full.live === null;
-        // Typed as VcViewerReadout so a future CupInfo per-viewer field addition
-        // fails compile here rather than silently dropping from the wire remainder.
-        const viewerReadout: VcViewerReadout = {
-          standing: full.standing,
-          queued: full.queued,
-          bracket: full.bracket,
-          nation: full.nation,
-          role: full.role,
-          position: full.position,
-          deserterFor: full.deserterFor,
-          match: full.match,
-          spectate: full.spectate,
-          betRecord: full.betRecord,
-          myGuild: full.myGuild,
-          guildStanding: full.guildStanding,
-          liveHidden,
-        };
-        maybe('vcup', viewerReadout);
-        maybeRaw(
-          'vcupb',
-          realmReadoutJson(this.realmReadout, this.sim.tickCount, () =>
-            this.sim.cupSharedInfoFor(),
-          ),
-        );
-      } else {
-        maybe('vcup', null);
-      }
-    }
-    selfLap?.('self.vcup');
     // Dungeon Finder at its own UI cadence (DF_WIRE_HZ): the personal `df`
     // blob carries whole-second clocks (queue wait, proposal countdown), so
     // re-evaluating every tick would re-serialize it 20 times per visible
@@ -9524,13 +9356,6 @@ export class GameServer {
       // value, so lastSent-diffing sends it exactly once and a later client save
       // never round-trips back to clobber an in-flight edit.
       maybe('hbl', session.initialHotbarLayout);
-      // Vale Cup sport-kit flag ({ role } | null): while set, the client's
-      // action bar rebuilds the role kit instead of the class kit. Rides the
-      // wireRev-gated block because the sim bumps wireRev on BOTH the kickoff
-      // swap and the restore, so maybe() serializes each flip, including the
-      // restore's EXPLICIT null (delta omission means "unchanged" and would
-      // strand the client on the sport kit).
-      maybe('sport', meta.sportRole ? { role: meta.sportRole } : null);
     }
     selfLap?.('self.heavy');
     const assembled = extra === '' ? json : `${json.slice(0, -1)}${extra}}`;
@@ -9644,20 +9469,6 @@ export class GameServer {
   // Public profile URL for a character name, or null when no public origin is set.
   private profileUrlFor(name: string): string | null {
     return REALM_PUBLIC_ORIGIN ? `${REALM_PUBLIC_ORIGIN}/c/${encodeURIComponent(name)}` : null;
-  }
-
-  private valeCupRewardCompletion(match: VcMatch): {
-    completionId: string;
-    completedAtIso: string;
-  } {
-    const existing = this.valeCupRewardCompletions.get(match);
-    if (existing) return existing;
-    const completion = {
-      completionId: randomUUID(),
-      completedAtIso: new Date().toISOString(),
-    };
-    this.valeCupRewardCompletions.set(match, completion);
-    return completion;
   }
 
   // Scan a tick's events for "significant activity" (max-level ding, rare drop,
@@ -9971,66 +9782,6 @@ export class GameServer {
             if (points > 0) this.sendDailyRewardPointsGained(s, points);
           })
           .catch((err) => console.error('daily reward delve chest task failed:', err));
-      } else if (ev.type === 'vcupResult' && !ev.draw && ev.pid !== undefined) {
-        // A decided Vale Cup bout. The match record survives through the
-        // 'over' aftermath. Rated wins earn the full task value; bot-filled
-        // and practice wins earn the reduced bot-match value. Bots have no
-        // session, so this.clients.get filters bot result events naturally.
-        const s = this.clients.get(ev.pid);
-        if (!s) continue;
-        const match = this.sim.vcupMatchOf(ev.pid);
-        if (!match) continue;
-        const practice = Boolean(match.practice);
-        const matchHasBots =
-          practice || [...match.rosterA, ...match.rosterB].some((player) => player.bot);
-        if (!match.rated && !matchHasBots) continue;
-        if (!ev.won) continue;
-        const completion = this.valeCupRewardCompletion(match);
-        void dailyRewardService
-          .recordValeCupResult(s.accountId, {
-            won: true,
-            bracket: match.bracket,
-            matchId: match.id,
-            rated: match.rated,
-            hasBots: matchHasBots,
-            practice,
-            completionId: completion.completionId,
-            completedAt: new Date(completion.completedAtIso),
-          })
-          .then((points) => {
-            if (points > 0) this.sendDailyRewardPointsGained(s, points);
-          })
-          .catch((err) => console.error('daily reward vale cup task failed:', err));
-        if (!match.rated) continue;
-        // One card per decided match: every winner's vcupResult lands on the
-        // same tick and the match-id dedupe key collapses them, so the first
-        // one enumerates the whole winning side (linked teammates get tagged
-        // on the one card, the duel [winner, loser] convention).
-        const winnerPids = match.teamA.includes(ev.pid) ? match.teamA : match.teamB;
-        const accountIds = [s.accountId];
-        const names = [s.name];
-        for (const pid of winnerPids) {
-          if (pid === ev.pid) continue;
-          const ally = this.clients.get(pid);
-          if (!ally) continue;
-          accountIds.push(ally.accountId);
-          names.push(ally.name);
-        }
-        enqueueActivity(
-          {
-            kind: 'vale_cup',
-            accountIds,
-            names,
-            realm: REALM,
-            profileUrl: this.profileUrlFor(s.name),
-            bracket: match.bracket,
-            scoreA: match.scoreA,
-            scoreB: match.scoreB,
-            winnerNation: match.teamA.includes(ev.pid) ? match.nationA : match.nationB,
-          },
-          `vale_cup:${match.id}`,
-          now,
-        );
       }
     }
     // Durability ordering: the authoritative blob otherwise persists only on

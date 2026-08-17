@@ -28,6 +28,7 @@ import {
   GATHER_NODE_TYPES,
   GATHER_NODES,
   MOBS,
+  PROPS,
   STRIP_MAX_X,
   STRIP_MIN_X,
   WORLD_MAX_X,
@@ -43,13 +44,6 @@ import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '.
 import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
 import { GATHER_NODE_BODIES } from '../src/sim/prop_layout';
 import { INTERACT_RANGE } from '../src/sim/types';
-import {
-  GOAL_LINE_EAST_X,
-  GOAL_LINE_WEST_X,
-  isOnPitch,
-  PITCH_CENTER,
-  SOWFIELD_EXCLUDE,
-} from '../src/sim/vale_cup_layout';
 import {
   DECORATION_MAX_SLOPE,
   groundHeight,
@@ -367,7 +361,9 @@ const ON_MAZE_WALL_POCKET = { x: -232, z: 452 };
 // pocket), so computing it twice bought nothing but wall time.
 const MAZE_WALL_FLOOD_BOX = boxAround([ZONES[0].hub, ON_MAZE_WALL_POCKET]);
 const MAZE_WALL_FLOOD = floodFrom(ZONES[0].hub, MAZE_WALL_FLOOD_BOX);
-const ON_SOWFIELD_STAND = { x: -41, z: -137 }; // groundHeight adds the stand lift here
+// The Eastbrook lake dock's plank surface: groundHeight rides dockSurfaceHeight
+// above the shore terrain here, so the two really differ.
+const ON_A_DOCK_PLANK = { x: PROPS.docks[0].x, z: PROPS.docks[0].z };
 const INSIDE_A_TOWN_COLLIDER = { x: -29, z: 0 };
 // Genuinely enclosed, not merely overlapping: the nearest ground a player
 // can hold is 4.5yd away, three times the widest clearance a node's own
@@ -581,58 +577,6 @@ describe('gather node placement: every node sits on ground a player can work', (
     }
     expect(tightest, `tightest in-reach clearance is ${who}`).toBeGreaterThanOrEqual(0);
     expect(tightest, `tightest in-reach clearance is ${who}`).toBeLessThan(0.5);
-  });
-
-  it('no node grows inside the Sowfield boarball ground', () => {
-    // A gather node is a world prop, and SOWFIELD_EXCLUDE is the footprint
-    // world.ts generateDecorations already refuses to seat one in: the pitch,
-    // its goal pockets, both stands, the gate approach and the terrain
-    // flatten's falloff apron. Nothing applied that screen to authored nodes,
-    // and herb_eastbrook_4 shipped at (23,-99), INSIDE the pitch rectangle in
-    // the east goal's corner (the second half of the player report that opened
-    // this change: "one of the fine sheenleaf herb is inside the football game
-    // in eastbrook"). Every other arm passed it: the flattened pitch is dry,
-    // level, unblocked and reachable. The ground is a match venue, so a node
-    // on it is worked at the pitch police's pleasure (social/vale_cup.ts
-    // ejects any non-fighter standing there, cancelling the gather cast) and
-    // the patch grows on the playing surface. Reusing the shipped exclusion
-    // rather than a fresh rectangle keeps ONE definition of the venue's
-    // footprint for the terrain, the decorations and the nodes.
-    for (const node of GATHER_NODES) {
-      const { x, z } = node.pos;
-      const inside =
-        x >= SOWFIELD_EXCLUDE.xMin &&
-        x <= SOWFIELD_EXCLUDE.xMax &&
-        z >= SOWFIELD_EXCLUDE.zMin &&
-        z <= SOWFIELD_EXCLUDE.zMax;
-      expect(inside, `${node.id} at (${x},${z}) sits inside the Sowfield boarball ground`).toBe(
-        false,
-      );
-    }
-  });
-
-  it('the Sowfield arm rejects the old herb spot and the pitch it stood on', () => {
-    const inSowfield = (x: number, z: number) =>
-      x >= SOWFIELD_EXCLUDE.xMin &&
-      x <= SOWFIELD_EXCLUDE.xMax &&
-      z >= SOWFIELD_EXCLUDE.zMin &&
-      z <= SOWFIELD_EXCLUDE.zMax;
-    // The shipped-then-moved spot, and the property that made it a defect:
-    // it was not merely inside the exclusion apron, it was on the pitch.
-    expect(inSowfield(23, -99)).toBe(true);
-    expect(isOnPitch(23, -99)).toBe(true);
-    // The exclusion really does contain the whole playing surface, so the
-    // screen above cannot pass a node standing in a goal mouth either.
-    expect(inSowfield(PITCH_CENTER.x, PITCH_CENTER.z)).toBe(true);
-    expect(inSowfield(GOAL_LINE_WEST_X, PITCH_CENTER.z)).toBe(true);
-    expect(inSowfield(GOAL_LINE_EAST_X, PITCH_CENTER.z)).toBe(true);
-    // And it is a screen, not a blanket: the relocated patch is outside it,
-    // with real clearance rather than sitting on the boundary.
-    const moved = GATHER_NODES.find((n) => n.id === 'herb_eastbrook_4');
-    expect(moved, 'herb_eastbrook_4 names a live node').toBeDefined();
-    if (!moved) return;
-    expect(inSowfield(moved.pos.x, moved.pos.z)).toBe(false);
-    expect(moved.pos.z - SOWFIELD_EXCLUDE.zMax).toBeGreaterThanOrEqual(2);
   });
 
   it('the sea-plane arm rejects the Wickharbor cove floor, so it can fail', () => {
@@ -1574,9 +1518,9 @@ describe('gather node placement: every node sits on ground a player can work', (
   it('render anchor: groundHeight and terrainHeight agree at every node', () => {
     // src/render/gather_nodes.ts seats each node prop at terrainHeight, while
     // every check above (and all movement) uses groundHeight, which adds the
-    // Sowfield stand lift and dock plank surfaces on top of the same baseline.
+    // dock plank and raised-walkway surfaces on top of the same baseline.
     // Where the two disagree the prop renders sunk into the platform a player is
-    // standing on, so a node authored onto a dock or a stand tier is a bug even
+    // standing on, so a node authored onto a dock or a walkway tier is a bug even
     // though it is dry, level, clear and reachable.
     for (const node of GATHER_NODES) {
       const { x, z } = node.pos;
@@ -1619,8 +1563,8 @@ describe('gather node placement: every node sits on ground a player can work', (
     ).toBeGreaterThanOrEqual(WATER_MARGIN);
   });
 
-  it('the anchor arm rejects a Sowfield stand tier, where the two really differ', () => {
-    const { x, z } = ON_SOWFIELD_STAND;
+  it('the anchor arm rejects a dock plank, where the two really differ', () => {
+    const { x, z } = ON_A_DOCK_PLANK;
     const lift = groundHeight(x, z, WORLD_SEED) - terrainHeight(x, z, WORLD_SEED);
     expect(lift).toBeGreaterThan(0.2);
     expect(groundHeight(x, z, WORLD_SEED)).not.toBeCloseTo(terrainHeight(x, z, WORLD_SEED), 9);

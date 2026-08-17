@@ -6,7 +6,6 @@ import {
   instanceMusicDecision,
 } from '../src/game/instance_music';
 import { DELVE_X_MIN, ZONES } from '../src/sim/data';
-import { SOWFIELD_CENTER } from '../src/sim/vale_cup_layout';
 
 const eastbrookFixture = ZONES.find((zone) => zone.id === 'eastbrook_vale');
 if (!eastbrookFixture) throw new Error('eastbrook_vale fixture is missing');
@@ -22,7 +21,6 @@ function input(overrides: Partial<InstanceMusicInput> = {}): InstanceMusicInput 
     zone: eastbrook,
     inDungeon: false,
     entities: [],
-    cupInfo: null,
     riftFloor: null,
     ...overrides,
   };
@@ -47,7 +45,6 @@ describe('instance music policy', () => {
       resetForDungeonEntry: vi.fn(),
       update: vi.fn(),
       setBossCombat: vi.fn(),
-      setSowfieldTrack: vi.fn(),
     };
     const controller = new InstanceMusicController(port);
     const delveInput = input({
@@ -66,55 +63,5 @@ describe('instance music policy', () => {
       'dungeon_hollow_crypt',
     );
     expect(port.update).toHaveBeenLastCalledWith('dungeon_hollow_crypt', false);
-  });
-
-  it('selects the Sowfield music zone and follows its public match phase', () => {
-    const waiting = instanceMusicDecision(
-      input({
-        playerPos: SOWFIELD_CENTER,
-        cupInfo: null,
-      }),
-    );
-    expect(waiting.atSowfield).toBe(true);
-    expect(waiting.zone).toBe('vale_cup');
-    expect(waiting.sowfieldTrack).toBe('waiting');
-
-    const active = instanceMusicDecision(
-      input({
-        playerPos: SOWFIELD_CENTER,
-        cupInfo: {
-          match: { phase: 'active', origin: { x: 0, z: 0 } },
-          spectate: null,
-        },
-      }),
-    );
-    expect(active.atSowfield).toBe(true);
-    expect(active.zone).toBe('vale_cup');
-    expect(active.sowfieldTrack).toBe('match');
-  });
-
-  it('routes private-practice phases through the Vale Cup tracks', () => {
-    const practice = instanceMusicDecision(
-      input({
-        playerPos: { x: 30000, z: 0 },
-        inDungeon: true,
-        cupInfo: {
-          match: { phase: 'active', origin: { x: 30000, z: 0 } },
-          spectate: null,
-        },
-      }),
-    );
-    expect(practice.sowfieldTrack).toBe('match');
-
-    const waiting = instanceMusicDecision(
-      input({
-        playerPos: { x: 0, z: 0 },
-        cupInfo: {
-          match: null,
-          spectate: { phase: 'briefing', origin: { x: 0, z: 0 } },
-        },
-      }),
-    );
-    expect(waiting.sowfieldTrack).toBeNull();
   });
 });

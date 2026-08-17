@@ -6,7 +6,7 @@
 // see a driver that lives in the coordinator (#2497 recorded that gap and filed this issue as
 // the close). The premise a reader would assume is false in this tree: a `*_window.ts` is NOT
 // cold. `Hud.update()` polls about half of them. `spellbookWindow.tickOpen()` runs EVERY
-// FRAME while the window is open; arena / dungeon_finder / vale_cup / card_duel `render()` on
+// FRAME while the window is open; arena / dungeon_finder / card_duel `render()` on
 // the 250 ms band behind only a display check; social / market / mailbox / bank / bags /
 // deeds / professions / calendar get `refreshIfChanged()` on the 500 ms band.
 //
@@ -173,7 +173,7 @@ interface DriveRow {
 }
 
 const SIG_RETURN = 'if (sig === this.lastSig) return;';
-const VIEW_SIG_RETURN = 'if (view.sig === this.lastSig) return;';
+const _VIEW_SIG_RETURN = 'if (view.sig === this.lastSig) return;';
 // The merged PvP window guards its two tab arms with the same shape against the same
 // field, so the Thornhollow Fields arm names its signature apart to stay pinnable.
 const RAVENRIFT_SIG_RETURN = 'if (ravenriftSig === this.lastSig) return;';
@@ -939,43 +939,6 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the arena match strip, facet-routed',
   },
   {
-    call: 'this.vcupIndicator.update',
-    band: 'medium',
-    gate: '',
-    surface: 'chrome',
-    why: 'the Vale Cup minimap indicator button',
-  },
-  {
-    call: 'this.vcupMatchHud.update',
-    band: 'medium',
-    gate: '',
-    surface: 'chrome',
-    why: 'the Vale Cup in-match strip',
-  },
-  {
-    call: 'this.vcupBriefing.update',
-    band: 'medium',
-    gate: '',
-    surface: 'window',
-    guard: { kind: 'module', module: 'vale_cup_briefing.ts', proof: VIEW_SIG_BLOCK },
-    why: 'the Vale Cup briefing card, a self-mounting full-screen panel',
-  },
-  {
-    call: 'this.vcupBetting.update',
-    band: 'medium',
-    gate: '',
-    surface: 'window',
-    guard: { kind: 'module', module: 'vale_cup_betting.ts', proof: VIEW_SIG_BLOCK },
-    why: 'the Vale Cup betting banner and card',
-  },
-  {
-    call: 'this.updateShootCharge',
-    band: 'medium',
-    gate: '',
-    surface: 'chrome',
-    why: 'the Vale Cup shot-charge meter',
-  },
-  {
     call: 'this.updateMapWindow',
     band: 'medium',
     gate: "$('#map-window').style.display === 'block'",
@@ -1029,14 +992,6 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
       proof: VIEW_SIG_BLOCK,
     },
     why: 'the battleground queue-pop prompt; a *_popup name the painter gate does not sweep either',
-  },
-  {
-    call: 'this.valeCupWindow.render',
-    band: 'medium',
-    gate: "$('#valecup-window').style.display === 'block'",
-    surface: 'window',
-    guard: { kind: 'module', module: 'vale_cup_window.ts', proof: VIEW_SIG_RETURN },
-    why: 'the Vale Cup queue window',
   },
   {
     call: 'this.cardDuelWindow.toggle',
@@ -1131,14 +1086,6 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     surface: 'window',
     guard: { kind: 'callsite' },
     why: "the same edge close when a Thornhollow Fields match seats: the queue lives on that window's Thornhollow Fields tab",
-  },
-  {
-    call: 'this.valeCupWindow.close',
-    band: 'frame',
-    gate: "inVcupMatch && !this.vcupMatchSeen && $('#valecup-window').style.display === 'block'",
-    surface: 'window',
-    guard: { kind: 'callsite' },
-    why: 'the same edge close for the Vale Cup queue window',
   },
   {
     call: 'this.updateMinimap',
@@ -1644,7 +1591,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // release's own window/chrome churn), so it cannot be reconciled by
       // arithmetic across a merge. The numbers below were set from a suite run
       // on the merged tree, not from either side's narrative.
-    ).toEqual({ window: 47, chrome: 82, none: 17 });
+    ).toEqual({ window: 43, chrome: 79, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1660,12 +1607,14 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // both land on this pin; keep both counts, do not drop either side.
       // 24 = both sides of the v0.36.0 sync counted 23 alone (the branch's
       // reliquary module guard vs the release's new module-guarded row).
-      module: 24,
+      // Down to 21 with the Vale Cup retirement (the New Eastbrook program):
+      // the cup window/briefing/betting module guards left with their painters.
+      module: 21,
       // 7 = Phase 20's refreshCharSheetIfChanged. Its latch is a HUD field
       // (lastCharSheetSig), like its profession sibling, because the cold
       // char_window painter holds no signature of its own to diff.
       hud: 7,
-      callsite: 12,
+      callsite: 11,
       none: 4,
     });
     // ...and the honest-exception list by NAME, because that is the one that should never
@@ -1731,9 +1680,6 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         // per-frame allocation.
         'spellbook_window.ts: if (this.knownChanged(this.deps.world().known)) {',
         'target_auras_window.ts: if (this.cleared) return;',
-        'vale_cup_betting.ts: if (view.sig !== this.lastSig) {',
-        'vale_cup_briefing.ts: if (view.sig !== this.lastSig) {',
-        'vale_cup_window.ts: if (view.sig === this.lastSig) return;',
       ].sort(),
     );
     expect(
@@ -1762,8 +1708,6 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       'meters.ts',
       'mount_race_controls.ts',
       'mount_race_strip.ts',
-      'vale_cup_betting.ts',
-      'vale_cup_briefing.ts',
     ]);
   });
 });

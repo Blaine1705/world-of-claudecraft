@@ -1367,14 +1367,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.actionBar.resetConfirmTitle': '¿Restablecer las teclas de la barra de acción?',
   'hudChrome.actionBar.resetConfirmBody':
     'La primera barra vuelve a sus teclas predeterminadas. La segunda y la tercera quedan sin asignar. Esto no se puede deshacer.',
-  'hudChrome.vcup.rolesSmallBracketNote':
-    'En las categorías 1v1 y 2v2 todos los combatientes juegan con la equipación de Polivalente. Las gestas que exigen la categoría 3v3 o mayor no se pueden conseguir aquí.',
-  'hudChrome.vcup.practiceUnratedNote':
-    'Los encuentros de práctica no son puntuables: la clasificación y el progreso del Libro de Gestas no cuentan.',
-  'hudChrome.vcup.briefing.unratedNote':
-    'Hay bots en el campo, así que este encuentro no es puntuable: la clasificación no se mueve y las gestas por goles, paradas y porterías a cero no cuentan.',
-  'hudChrome.vcup.briefing.practiceUnratedNote':
-    'Este es un encuentro de práctica, así que no es puntuable: la clasificación no se mueve y el progreso del Libro de Gestas no cuenta.',
   'hudChrome.bags.filterTool': 'Herramientas',
   'hudChrome.materialHint.fineGrade':
     'Calidad fina. Recolectada de una veta de nivel completo con una herramienta de rango superior al material, y cuenta como la versión ordinaria dondequiera que se pida una.',
@@ -2774,58 +2766,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sport_shoulder.description':
     'Un hombrazo limpio, digno de la tregua de la cosecha. Los manda rodando lejos del balón.',
   'entities.abilities.sport_shoulder.name': 'Hombrazo',
-  'entities.npcs.groundskeeper_bram.greeting':
-    'La tregua se respeta en el Sembradal, {className}: solo patadas y hombrazos. ¿Te animas a jugar por el Cubo de Cobre?',
-  'entities.npcs.groundskeeper_bram.name': 'Guardacampo Bram',
-  'entities.npcs.groundskeeper_bram.title': 'Guarda del Sembradal',
   'entities.zones.eastbrook_vale.pois.10.label': 'El Sembradal',
   'guide.nav.professions': 'Oficios',
-  'guide.nav.valeCup': 'Copa del Valle',
   'guide.professions.intro':
     'Más allá del combate y las misiones, el mundo te recompensa por trabajar la tierra y la fragua: recolectar materias primas, convertirlas en equipo y bienes a lo largo de diez oficios de artesanía, y asentarte en una identidad como uno de los diez arquetipos que esos oficios representan.',
-  'guide.valeCupPage.heading': 'La Copa del Valle',
-  'guide.valeCupPage.howHeading': 'Cómo se juega',
-  'guide.valeCupPage.howMatch':
-    'Al saque inicial, tus habilidades de clase se cambian por una equipación deportiva y se restauran exactamente al terminar. Las patadas apuntan a la retícula del suelo, el balón rebota en las vallas y regatear es simplemente correr con el balón. Marca más goles que el rival antes del final del tiempo; un empate se decide con gol de oro.',
-  'guide.valeCupPage.howQueue':
-    'Ponte en cola desde cualquier lugar mediante la ventana de la Copa del Valle, o habla con el Guardacampo Bram en la puerta del Sembradal. Elige una categoría, desde uno contra uno hasta cinco contra cinco, una nación de estandarte y un rol deportivo; entra en cola en solitario o trae a tu grupo.',
-  'guide.valeCupPage.howTruce':
-    'Nadie sangra en el Sembradal: las entradas solo te hacen rodar, nada duele y las mascotas se quedan fuera del partido.',
-  'guide.valeCupPage.intro':
-    'Balonjabalí en el Sembradal: elige un estandarte, elige un rol y cuela una piel de jabalí rellena más allá del guardameta para ganar el Cubo de Cobre. Sin sangre, sin botín, solo el rugido de las gradas.',
-  'guide.valeCupPage.loreHeading': 'El balonjabalí y la tregua de la cosecha',
-  'guide.valeCupPage.loreOldSow':
-    'Mucho antes de que despertaran los muertos, los peones de Eastbrook jugaban al balonjabalí en los rastrojos tras la cosecha: dos cuadrillas, una piel de jabalí rellena de paja y dos portones de carreta arrastrados a cada extremo del prado. El primer balón, la Vieja Cerda, cuelga, bañado en bronce, sobre la chimenea de la taberna.',
-  'guide.valeCupPage.loreTruce':
-    'Cuando el Coliseo Cinéreo empezó a sancionar juegos de guerra, el mariscal Redbrook respondió con algo más amable: una tregua de la cosecha permanente sobre el viejo prado. Los portones de carreta se volvieron porterías; el prado ganó muros, gradas y un nombre, el Sembradal; y el premio fue siempre el mismo cubo de leche abollado del que bebían los vencedores: el Cubo de Cobre.',
-  'guide.valeCupPage.nationChoir':
-    'Azul pálido y plata bajo la campana: inquietantes, precisos y muy silenciosos.',
-  'guide.valeCupPage.nationColiseum':
-    'Rojo y negro con espadas cruzadas: juegan como si aún fuera un juego de guerra.',
-  'guide.valeCupPage.nationCopperdig':
-    'Cobre y marrón con el pico: excavadores que nunca dejan de correr.',
-  'guide.valeCupPage.nationMirefen':
-    'Verde azulado y gris bajo la garza: pacientes, zancudos, nunca con prisa.',
-  'guide.valeCupPage.nationMoon':
-    'Violeta y plata bajo la luna creciente: jugadores nocturnos, de pies ligeros.',
-  'guide.valeCupPage.nationOgre':
-    'Naranja y tierra tras el puño: hombro por delante, y orgullosos de ello.',
-  'guide.valeCupPage.nationThornpeak':
-    'Azul hielo y blanco bajo el pico de la montaña: de paso firme y tozudos.',
-  'guide.valeCupPage.nationVale':
-    'Verde y oro, con la gavilla de trigo al viento: el equipo local, peones de campo hasta la médula.',
-  'guide.valeCupPage.nationsBody':
-    'Cada equipo juega bajo un estandarte. El capitán elige la nación, y si ambos bandos lucen el mismo, el equipo visitante juega con la paleta invertida.',
-  'guide.valeCupPage.nationsHeading': 'Las ocho naciones de estandarte',
-  'guide.valeCupPage.rewardsBody':
-    'Las reglas de la tregua implican que no hay experiencia ni botín: un partido decidido cuenta para tu historial y el tablón de vencedores, y una victoria también cuenta para las tareas de recompensa del día. Desertar de un partido suspende tu plaza, y el Guardacampo lo recuerda.',
-  'guide.valeCupPage.rewardsHeading': 'Reglas de la tregua',
-  'guide.valeCupPage.rolesBody':
-    'Tu rol decide la equipación que llevas al campo. Todos patean; el resto es cuestión de temperamento. En las categorías de uno contra uno y dos contra dos todos juegan con la equipación polivalente, así que la elección de rol cobra sentido a partir de tres contra tres.',
-  'guide.valeCupPage.rolesHeading': 'Roles deportivos',
-  'guide.valeCupPage.spectateBody':
-    'En el estadio se juega un partido a la vez, y cualquiera puede acercarse y mirar desde las gradas.',
-  'hudChrome.keybinds.valecup': 'Copa del Valle',
   'hudChrome.mobile.dailyRewards': 'Tienda',
   'hudChrome.perf.labels.predLead': 'Adelanto de predicción',
   'hudChrome.townFocus.budgetLabel': 'Puntos restantes: {remaining} / {budget}',
@@ -2836,141 +2780,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.notInTownHint': 'Debes estar en el pueblo para fijar tu enfoque.',
   'hudChrome.townFocus.saveButton': 'Guardar enfoque',
   'hudChrome.townFocus.title': 'Enfoque del pueblo',
-  'hudChrome.vcup.awayNote':
-    'Si ambos bandos lucen el mismo estandarte, el visitante juega con la paleta invertida.',
-  'hudChrome.vcup.bannerCountdown': 'Saque inicial en {seconds}...',
-  'hudChrome.vcup.bannerDraw': 'Empate en el Sembradal.',
-  'hudChrome.vcup.bannerEnd': 'Final: {nationA} {scoreA}, {nationB} {scoreB}',
-  'hudChrome.vcup.bannerFound': '¡La Copa del Valle llama: {nationA} contra {nationB}!',
-  'hudChrome.vcup.bannerGoal': '¡GOL! ¡{nation} marca!',
-  'hudChrome.vcup.bannerGolden': 'GOL DE ORO: ¡el próximo tanto gana!',
-  'hudChrome.vcup.bannerKickoff': '¡SAQUE INICIAL!',
-  'hudChrome.vcup.bannerLoss': 'Derrota en el Sembradal.',
-  'hudChrome.vcup.bannerSave': '¡{name} LA PARA!',
-  'hudChrome.vcup.bannerWin': '¡Victoria en el Sembradal!',
-  'hudChrome.vcup.bet.aria': 'Apuestas del partido de la Copa del Valle',
-  'hudChrome.vcup.bet.back': 'Apostar por {team}',
-  'hudChrome.vcup.bet.closed': 'Apuestas cerradas',
-  'hudChrome.vcup.bet.closesIn': 'Las apuestas cierran en {seconds} s',
-  'hudChrome.vcup.bet.collapse': 'Ocultar apuestas',
-  'hudChrome.vcup.bet.expand': 'Ver apuestas y apostar',
-  'hudChrome.vcup.bet.form': '{wins}V-{losses}D',
-  'hudChrome.vcup.bet.lostLog': 'Perdiste tu apuesta de la Copa del Valle: {amount}.',
-  'hudChrome.vcup.bet.mine': 'Tu apuesta: {amount} a {team}',
-  'hudChrome.vcup.bet.none': 'Aún no tienes apuesta en este partido.',
-  'hudChrome.vcup.bet.oddsLabel': 'Paga',
-  'hudChrome.vcup.bet.prize': 'Bote {amount}',
-  'hudChrome.vcup.bet.record': 'Historial de apuestas: {wins}V-{losses}D, {sign}{net}',
-  'hudChrome.vcup.bet.refundLog': 'Apuestas anuladas: se devolvió tu apuesta de {amount}.',
-  'hudChrome.vcup.bet.splitAria': 'Proporción del bote de apuestas en cada equipo',
-  'hudChrome.vcup.bet.title': 'Apuestas del partido',
-  'hudChrome.vcup.bet.wonBanner': '¡Tu apuesta ganó!',
-  'hudChrome.vcup.bet.wonLog': 'Tu apuesta de la Copa del Valle ganó: recibes {amount}.',
-  'hudChrome.vcup.blockNation': 'Primero elige una nación de estandarte.',
-  'hudChrome.vcup.blockNotLeader': 'Solo el líder del grupo puede poner al equipo en cola.',
-  'hudChrome.vcup.blockPartySize': 'Esa categoría requiere un grupo más pequeño.',
-  'hudChrome.vcup.boardEmpty': 'Aún no hay vencedores registrados. El Cubo de Cobre espera.',
-  'hudChrome.vcup.boardHeading': 'Tablón de vencedores',
-  'hudChrome.vcup.boardWins': '{count} victorias',
-  'hudChrome.vcup.bracketLabel': '{n}v{n}',
-  'hudChrome.vcup.bracketsAria': 'Categoría del partido',
-  'hudChrome.vcup.briefing.bot': 'Bot',
-  'hudChrome.vcup.briefing.kitHeading': 'Tu equipación',
-  'hudChrome.vcup.briefing.kitNote':
-    'Estos movimientos sustituyen a tus habilidades de clase durante el partido.',
-  'hudChrome.vcup.briefing.ready': 'Estoy listo',
-  'hudChrome.vcup.briefing.readyAria': 'Prepararse para el saque inicial',
-  'hudChrome.vcup.briefing.readyCount': '{ready} de {total} preparados',
-  'hudChrome.vcup.briefing.readyDone': 'Listo',
-  'hudChrome.vcup.briefing.rosterHeading': 'La alineación',
-  'hudChrome.vcup.briefing.rule1':
-    'Mete el balón en la portería rival de una patada o un pase para marcar.',
-  'hudChrome.vcup.briefing.rule2':
-    'Gana el primero en llegar a 5 goles, o quien tenga más goles cuando suene el final.',
-  'hudChrome.vcup.briefing.rule3':
-    'Un partido igualado al final del tiempo se decide con gol de oro: el próximo tanto gana.',
-  'hudChrome.vcup.briefing.rule4':
-    'Las entradas solo te hacen rodar. Nadie sale herido bajo la tregua de la cosecha.',
-  'hudChrome.vcup.briefing.rule5': 'Cualquiera puede acercarse y animarte desde las gradas.',
-  'hudChrome.vcup.briefing.rulesHeading': 'Cómo se juega',
-  'hudChrome.vcup.briefing.subtitle': 'Charla previa al partido',
-  'hudChrome.vcup.briefing.vs': 'vs',
-  'hudChrome.vcup.briefing.waiting': 'Esperando a que el otro bando se prepare...',
-  'hudChrome.vcup.briefing.whistle': 'El silbato sonará en {seconds} s.',
-  'hudChrome.vcup.briefing.you': 'Tú',
-  'hudChrome.vcup.clock': '{minutes}:{seconds}',
-  'hudChrome.vcup.close': 'Cerrar la ventana de la Copa del Valle',
-  'hudChrome.vcup.deserterNote':
-    'El Guardacampo lo recuerda. Podrás volver a la cola en {seconds} s.',
-  'hudChrome.vcup.enterAsGuild': 'Entrar bajo el estandarte de {guild}',
-  'hudChrome.vcup.gossipOpen': 'El libro de encuentros',
-  'hudChrome.vcup.gossipOpenAria': 'Abrir la ventana de la Copa del Valle',
-  'hudChrome.vcup.guildBoardEmpty':
-    'Ninguna hermandad ha saltado al campo aún. ¡Iza tu estandarte!',
-  'hudChrome.vcup.guildBoardHeading': 'Estandartes de hermandad',
-  'hudChrome.vcup.guildBoardWl': '{wins} V, {losses} D',
-  'hudChrome.vcup.guildRecordLine':
-    'Historial de tu hermandad: {wins} victorias, {losses} derrotas.',
-  'hudChrome.vcup.inMatchNote': 'Tu equipo está en el campo. ¡A jugar!',
-  'hudChrome.vcup.indicatorLive': 'Copa del Valle',
-  'hudChrome.vcup.indicatorOpen': 'Abrir la ventana de la Copa del Valle',
-  'hudChrome.vcup.indicatorQueued':
-    'Cola de la Copa del Valle: {bracket}, posición {position} de {count}',
-  'hudChrome.vcup.leaveQueue': 'Salir de la cola',
-  'hudChrome.vcup.liveAria': 'Copa del Valle: {nationA} {scoreA}, {nationB} {scoreB}',
-  'hudChrome.vcup.liveHeading': 'Ahora en el Sembradal',
-  'hudChrome.vcup.logDraw': 'El encuentro en el Sembradal termina en empate.',
-  'hudChrome.vcup.logFound':
-    'Tu partido de la Copa del Valle está listo: {nationA} contra {nationB}.',
-  'hudChrome.vcup.logGoal': '¡{name} marca para {nation}! {nationA} {scoreA}, {nationB} {scoreB}.',
-  'hudChrome.vcup.logLoss': 'Pierdes el encuentro en el Sembradal.',
-  'hudChrome.vcup.logQueued':
-    'Entras en la cola de la Copa del Valle para {bracket} (posición {position}).',
-  'hudChrome.vcup.logRoster': 'Tu bando: {allies}. Su bando: {enemies}.',
-  'hudChrome.vcup.logSave': '¡{name} hace la parada!',
-  'hudChrome.vcup.logUnqueued': 'Sales de la cola de la Copa del Valle.',
-  'hudChrome.vcup.logWin': 'Ganas el encuentro en el Sembradal.',
-  'hudChrome.vcup.mobileLabel': 'Copa',
-  'hudChrome.vcup.nation.choir': 'El Coro Pálido',
-  'hudChrome.vcup.nation.coliseum': 'El Coliseo Cinéreo',
-  'hudChrome.vcup.nation.copperdig': 'La Excavación de Cobre',
-  'hudChrome.vcup.nation.mirefen': 'El Mirefen',
-  'hudChrome.vcup.nation.moon': 'La Luna Pálida',
-  'hudChrome.vcup.nation.ogre': 'Los Clanes Ogros',
-  'hudChrome.vcup.nation.thornpeak': 'Thornpeak',
-  'hudChrome.vcup.nation.vale': 'Valle de Eastbrook',
-  'hudChrome.vcup.nationsHeading': 'Nación de estandarte',
-  'hudChrome.vcup.noLive': 'El campo está en silencio. No se juega ningún partido.',
-  'hudChrome.vcup.offlineNote':
-    'El libro de encuentros está cerrado. La Copa del Valle no está disponible ahora mismo.',
-  'hudChrome.vcup.phaseCountdown': 'Saque inicial en {seconds}',
-  'hudChrome.vcup.phaseGoal': '¡GOL!',
-  'hudChrome.vcup.phaseGolden': 'GOL DE ORO',
-  'hudChrome.vcup.phaseOver': 'FINAL DEL PARTIDO',
-  'hudChrome.vcup.practice': 'Práctica contra bots',
-  'hudChrome.vcup.practiceNote':
-    'Inicia de inmediato un partido privado contra bots en tu propio campo de práctica.',
-  'hudChrome.vcup.practicingNow': 'Practicando ahora ({count}):',
-  'hudChrome.vcup.queue': 'Unirse a la cola',
-  'hudChrome.vcup.queueNote':
-    'Ponte en cola desde cualquier lugar; el silbato te llamará al Sembradal.',
-  'hudChrome.vcup.queuedStatus': 'En cola para {bracket}: posición {position} de {count}.',
-  'hudChrome.vcup.recordLine':
-    'Tu historial: {wins} victorias, {losses} derrotas, {draws} empates.',
-  'hudChrome.vcup.role.allrounder.desc':
-    'Un poco de cada cosa: patada, patadón y un hombrazo limpio.',
-  'hudChrome.vcup.role.allrounder.name': 'Polivalente',
-  'hudChrome.vcup.role.keeper.desc': 'Defiende el área con agarre, estirada y saque largo.',
-  'hudChrome.vcup.role.keeper.name': 'Guardameta',
-  'hudChrome.vcup.role.striker.desc': 'Vive para el patadón largo y el quiebro rápido.',
-  'hudChrome.vcup.role.striker.name': 'Delantero',
-  'hudChrome.vcup.role.sweeper.desc': 'Aparta a los corredores del balón y lo despeja lejos.',
-  'hudChrome.vcup.role.sweeper.name': 'Líbero',
-  'hudChrome.vcup.rolesHeading': 'Rol deportivo',
-  'hudChrome.vcup.shootPower': 'POTENCIA',
-  'hudChrome.vcup.title': 'La Copa del Valle',
-  'hudChrome.vcup.waitingCount': '{count} en espera',
-  'hudChrome.vcup.walkUp': 'Acércate al Sembradal para mirar desde las gradas.',
   'hudChrome.archetypeTitle.label': 'Título',
   'hudChrome.archetypeTitle.none': 'Ninguno',
   'entities.itemSets.crownforged.bonus4':
@@ -3622,7 +3431,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.spider_egg_sac.name': 'Saco de huevos de araña',
   'entities.mobs.sump_troll_devourer.name': 'Trol devorador del sumidero',
   'entities.mobs.tolling_bell.name': 'Campana doliente',
-  'entities.mobs.vale_cup_ball.name': 'Balón de jabalí',
   'entities.npcs.brother_halven_marsh.greeting':
     'El rastro llevaba al norte. Otro relicario, otro rito. Elige tu dificultad y yo sujetaré la cuerda hasta que vuelvas.',
   'entities.npcs.brother_halven_marsh.name': 'Hermano Halven',
@@ -10827,7 +10635,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.controls.petBar':
     'Barra de mascota: Atacar, Detener, Provocar, Defensivo, Agresivo (con una mascota de cazador o brujo activa)',
   'guide.controls.runForward': 'Correr hacia adelante',
-  'guide.controls.valeCup': 'Copa del Valle',
   'guide.dungeonsPage.heroicBody':
     'Cada mazmorra de cinco jugadores, y la propia banda, tiene una versión heroica que aguarda pasado el límite de nivel. Los mismos salones, rehechos para un grupo de final de juego bien equipado: cada enemigo golpea más fuerte, nada puede dejarse atrás a pie y los jefes ignoran por completo los aturdimientos y las ralentizaciones. Supera antes las versiones normales; el modo heroico da por hecho que ya lo has hecho.',
   'guide.dungeonsPage.heroicHowBody': 'Elige la dificultad antes de que tu grupo reclame la instancia: escribe /dungeon heroic, o elige Fijar dificultad de mazmorra en el menú de tu propio retrato. En solitario la fijas tú mismo; en grupo solo puede el líder, y la elección cubre a todos y se cierra en la puerta, así que una incursión sigue siendo aquello por lo que se reclamó.',
@@ -10927,12 +10734,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'La Celeridad es una característica que acelera cuanto haces: los golpes cuerpo a cuerpo, los disparos a distancia y el lanzamiento de hechizos se agilizan juntos. Proviene del equipo, en especial de las bonificaciones de conjunto de armadura, mientras que unas pocas habilidades conceden un breve arranque de golpes más veloces. Tu hoja la muestra como Índice de celeridad.',
   'guide.stats.hasteTitle': 'Celeridad',
   'guide.talentsPage.choiceNote': 'Cada fila es una encrucijada: ofrece tres opciones y te comprometes con una de ellas. Tu próximo restablecimiento reabre todas y cada una de esas elecciones.',
-  'guide.valeCupPage.bettingBody':
-    'Los espectadores en el Sembradal pueden apostar por un bando mientras se forma un partido: las apuestas se juntan en un fondo, y al pitido final los ganadores se reparten el fondo de los perdedores en proporción a lo que apostaron. Un partido empatado, o una sorpresa que nadie apostó, reembolsa cada moneda. Los jugadores sentados en el partido no pueden apostar en él, y la baranda guarda tu historial de por vida de victorias, derrotas y saldo neto de monedas.',
-  'guide.valeCupPage.bettingHeading': 'Una apuestilla en la baranda',
-  'guide.valeCupPage.practiceBody':
-    'La ventana de la Copa del Valle también ofrece entrenamiento: una copia privada del campo donde los bots llenan ambos bandos y nada cuenta para tu historial. ¿Te falta un jugador o dos para lo de verdad? Tras una breve espera, los bots completan los equipos, y cualquier partido con bots en el campo es amistoso, nunca clasificatorio. Y cuando el Sembradal está inactivo, los bots montan una exhibición que puedes ver, y apostar, desde las gradas; en cuanto jugadores reales se declaran listos, la exhibición cede el campo y se devuelve cada apuesta.',
-  'guide.valeCupPage.practiceHeading': 'Combates de práctica y el campo inactivo',
   'guide.worldPage.worldBossBody':
     'En lo alto de Thornpeak, la tormenta sobre Stormcrag a veces cobra forma. Thunzharr, la Cima Despierta se alza allí con un ritmo constante, un elemental con fuerza de banda al que se combate en el mundo abierto por quienquiera que responda a la llamada, y se vuelve más poderoso cuantos más retadores se le enfrentan. Cada quien que se une al combate gana su propia tirada de su botín, respetada según las reglas de bloqueo de banda, y su caída perdura lo bastante para que los caídos vuelvan corriendo y reclamen lo suyo. Reúne más espadas de las que crees necesitar.',
   'guide.worldPage.worldBossTitle': 'Cuando la cima despierta: el jefe del mundo',

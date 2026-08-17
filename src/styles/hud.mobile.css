@@ -2695,70 +2695,13 @@
      hard and seat them against the very top edge (the #banner recipe above is the
      precedent) so they hug the frame. Behaviour is unchanged: no dismissal is added
      and the strip stays pointer-events:none (components.css). The arena-status
-     stacking exception (components.css #arena-status[style*="block"] ~ #vcup-indicator)
      keeps a higher specificity, so when an arena match is live it still nudges the
      compacted indicator below the arena banner. */
-  body.mobile-touch #vcup-indicator {
-    top: calc(env(safe-area-inset-top) + 6px);
-    gap: 4px;
-    padding: 2px 8px;
-    font-size: 10px;
-  }
-  body.mobile-touch #vcup-indicator .vcupi-title {
-    font-size: 10px;
-    letter-spacing: 0.2px;
-  }
-  body.mobile-touch #vcup-indicator .vcupi-score {
-    font-size: 12px;
-  }
-  body.mobile-touch #vcup-indicator .vcupi-clock {
-    font-size: 9.5px;
-  }
-  body.mobile-touch #vcup-match-hud {
-    top: calc(env(safe-area-inset-top) + 6px);
-    min-width: auto;
-    gap: 1px;
-    padding: 3px 10px 2px;
-  }
-  body.mobile-touch #vcup-match-hud .vcuph-row {
-    gap: 8px;
-  }
-  body.mobile-touch #vcup-match-hud .vcuph-side {
-    min-width: 0;
-    gap: 4px;
-  }
-  body.mobile-touch #vcup-match-hud .vcuph-name {
-    font-size: 10px;
-  }
-  body.mobile-touch #vcup-match-hud .vcuph-score {
-    font-size: 16px;
-    min-width: 16px;
-  }
-  body.mobile-touch #vcup-match-hud .vcuph-colon {
-    margin: 0 3px;
-    font-size: 13px;
-  }
-  body.mobile-touch #vcup-match-hud .vcuph-clock {
-    font-size: 10px;
-  }
-  body.mobile-touch #vcup-match-hud .vcuph-phase {
-    font-size: 10px;
-  }
   /* The Vale Cup indicator/strip hug the top edge, but they yield the top-centre
      line to whatever else needs it: the sideways consumables row when it is open
      (no pet), and the pet bar when a pet is out. Drop one band in either case; drop
      a second band when BOTH a pet is out (pet bar on the top line) AND the row is
      open (it took the pet bar's usual second band), so the three never stack. */
-  body.mobile-touch.mobile-consumables-open #vcup-indicator,
-  body.mobile-touch.mobile-pet-active #vcup-indicator,
-  body.mobile-touch.mobile-consumables-open #vcup-match-hud,
-  body.mobile-touch.mobile-pet-active #vcup-match-hud {
-    top: calc(env(safe-area-inset-top) + 64px);
-  }
-  body.mobile-touch.mobile-pet-active.mobile-consumables-open #vcup-indicator,
-  body.mobile-touch.mobile-pet-active.mobile-consumables-open #vcup-match-hud {
-    top: calc(env(safe-area-inset-top) + 122px);
-  }
   body.mobile-touch .window {
     max-width: calc(var(--app-vw, 100vw) / var(--window-scale, 1) - 20px);
     /* --window-scale, never --ui-scale: this generic rule also governs the
@@ -3032,7 +2975,6 @@
   body.mobile-touch #emote-editor,
   body.mobile-touch #arena-window,
   body.mobile-touch #dungeon-finder-window,
-  body.mobile-touch #valecup-window,
   body.mobile-touch #card-duel-window,
   body.mobile-touch #delve-board,
   body.mobile-touch #leaderboard-window,
@@ -4950,11 +4892,6 @@
   }
   /* Vale Cup: the join/leave .btn and the guild-record toggle (its pickers already
      carry a pointer:coarse floor). */
-  body.mobile-touch #valecup-window .btn,
-  body.mobile-touch #valecup-window .vcup-guild-toggle {
-    min-height: 40px;
-    box-sizing: border-box;
-  }
   /* Mailbox: the folder tab strip and the "back to inbox" link. The Send-tab
      parcel chip is now a non-interactive span (the +/- stepper and remove
      button are the real controls); their own pointer: coarse 40x40 floor

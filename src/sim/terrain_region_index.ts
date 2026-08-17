@@ -55,9 +55,8 @@ export const TERRAIN_APPLIER = {
   frostTerraces: 29,
   fenBraids: 30,
   glacierTarnRamp: 31,
-  sowfieldFlatten: 32,
-  stableFlatten: 33,
-  fenSouthShore: 34,
+  stableFlatten: 32,
+  fenSouthShore: 33,
 } as const;
 
 function bounds(minX: number, maxX: number, minZ: number, maxZ: number): TerrainRegionBounds {
@@ -102,7 +101,6 @@ export const TERRAIN_APPLIER_BOUNDS: readonly (readonly TerrainRegionBounds[] | 
   [bounds(-178, 178, 1460, 1960)],
   [bounds(-380, -184, 240, 620)],
   [bounds(25.5, 57, 1631.5, 1649)],
-  [bounds(-64, 42, -149, -75)],
   [bounds(320, 436, 536, 616)],
   // The fen's south shore: west of the world bound skirt out to the corner
   // where its bay meets the vale headland (FEN_SHORE_CORNER_X), and from the

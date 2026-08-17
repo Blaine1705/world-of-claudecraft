@@ -1368,14 +1368,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.actionBar.resetConfirmTitle': 'Aktionsleisten-Tasten zurücksetzen?',
   'hudChrome.actionBar.resetConfirmBody':
     'Die erste Leiste kehrt zu ihren Standardtasten zurück. Die zweite und dritte Leiste verlieren ihre Belegung. Das lässt sich nicht rückgängig machen.',
-  'hudChrome.vcup.rolesSmallBracketNote':
-    'In den Staffeln 1v1 und 2v2 spielt jeder Kämpfer das Allrounder-Repertoire. Taten, die die Staffel 3v3 oder größer verlangen, lassen sich hier nicht erringen.',
-  'hudChrome.vcup.practiceUnratedNote':
-    'Trainingsspiele sind ungewertet: Siegertafel und Fortschritt im Buch der Taten zählen nicht.',
-  'hudChrome.vcup.briefing.unratedNote':
-    'Bots stehen auf dem Platz, daher ist diese Partie ungewertet: Die Siegertafel bewegt sich nicht, und Taten für Tore, Paraden und Spiele ohne Gegentor zählen nicht.',
-  'hudChrome.vcup.briefing.practiceUnratedNote':
-    'Dies ist ein Trainingsspiel und damit ungewertet: Die Siegertafel bewegt sich nicht, und Fortschritt im Buch der Taten zählt nicht.',
   'hudChrome.bags.filterTool': 'Werkzeuge',
   'hudChrome.materialHint.fineGrade':
     'Feine Güte. An einer Ader voller Stufe mit einem Werkzeug über dem Rang des Materials gesammelt; zählt überall dort als die gewöhnliche Version, wo diese verlangt wird.',
@@ -2691,58 +2683,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sport_shoulder.description':
     'Ein fairer Rempler nach den Regeln des Erntefriedens. Wirft den Gegner purzelnd vom Ball.',
   'entities.abilities.sport_shoulder.name': 'Rempler',
-  'entities.npcs.groundskeeper_bram.greeting':
-    'Auf dem Saufeld gilt der Erntefrieden, {className}: nur Kicks und Rempler. Lust auf ein Spiel um den Kupfereimer?',
-  'entities.npcs.groundskeeper_bram.name': 'Platzwart Bram',
-  'entities.npcs.groundskeeper_bram.title': 'Hüter des Saufelds',
   'entities.zones.eastbrook_vale.pois.10.label': 'Das Saufeld',
   'guide.nav.professions': 'Berufe',
-  'guide.nav.valeCup': 'Talpokal',
   'guide.professions.intro':
     'Jenseits von Kampf und Quests belohnt dich die Welt für die Arbeit an Land und Esse: Rohstoffe sammeln, sie über zehn Handwerksgewerbe hinweg zu Ausrüstung und Waren verarbeiten und in eine Identität als einer der zehn Archetypen hineinwachsen, für die diese Gewerbe stehen.',
-  'guide.valeCupPage.heading': 'Der Talpokal',
-  'guide.valeCupPage.howHeading': 'So wird gespielt',
-  'guide.valeCupPage.howMatch':
-    'Beim Anstoß werden deine Klassenfähigkeiten gegen eine Sportausrüstung getauscht und danach exakt wiederhergestellt. Kicks zielen auf das Fadenkreuz am Boden, der Ball prallt von der Bande ab, und Dribbeln heißt einfach, mit dem Ball zu laufen. Erziele bis zum Abpfiff mehr Tore als die Gegenseite; ein Unentschieden geht ins Golden Goal.',
-  'guide.valeCupPage.howQueue':
-    'Stell dich von überall über das Talpokal-Fenster an, oder sprich mit Platzwart Bram am Tor des Saufelds. Wähle eine Staffel von eins gegen eins bis fünf gegen fünf, eine Bannernation und eine Sportrolle; stell dich allein an oder bring deine Gruppe mit.',
-  'guide.valeCupPage.howTruce':
-    'Auf dem Saufeld blutet niemand: Tacklings lassen dich nur purzeln, nichts tut weh, und Begleiter setzen das Spiel aus.',
-  'guide.valeCupPage.intro':
-    'Keilerball auf dem Saufeld: Wähle ein Banner, wähle eine Rolle und schieß eine ausgestopfte Eberhaut an einem Torhüter vorbei, um den Kupfereimer zu holen. Kein Blut, keine Beute, nur das Tosen der Ränge.',
-  'guide.valeCupPage.loreHeading': 'Keilerball und der Erntefrieden',
-  'guide.valeCupPage.loreOldSow':
-    'Lange bevor die Toten erwachten, spielten Eastbrooks Feldarbeiter nach der Ernte Keilerball auf den Stoppelfeldern: zwei Haufen Leute, eine mit Stroh ausgestopfte Eberhaut und zwei Wagentore, an beide Enden des Angers gezerrt. Der erste Ball, die Alte Sau, hängt in Bronze über dem Kamin der Taverne.',
-  'guide.valeCupPage.loreTruce':
-    'Als das Aschene Kolosseum begann, Kriegsspiele auszurichten, antwortete Marschall Redbrook mit etwas Sanfterem: einem ständigen Erntefrieden auf dem alten Anger. Die Wagentore wurden zu Torpfosten, der Anger bekam Wände, Ränge und einen Namen, das Saufeld, und der Preis war immer derselbe verbeulte Milcheimer, aus dem die Sieger tranken: der Kupfereimer.',
-  'guide.valeCupPage.nationChoir':
-    'Fahlblau und Silber unter der Glocke: unheimlich, präzise und sehr still.',
-  'guide.valeCupPage.nationColiseum':
-    'Rot und Schwarz mit gekreuzten Schwertern: Sie spielen, als wäre es noch immer ein Kriegsspiel.',
-  'guide.valeCupPage.nationCopperdig':
-    'Kupfer und Braun mit der Spitzhacke: Schaufler, die nie aufhören zu rennen.',
-  'guide.valeCupPage.nationMirefen':
-    'Blaugrün und Grau unter dem Reiher: geduldig, langbeinig, nie in Eile.',
-  'guide.valeCupPage.nationMoon':
-    'Violett und Silber unter der Mondsichel: Nachtspieler, leicht auf den Beinen.',
-  'guide.valeCupPage.nationOgre':
-    'Orange und Umbra hinter der Faust: Schulter voran und stolz darauf.',
-  'guide.valeCupPage.nationThornpeak':
-    'Eisblau und Weiß unter dem Berggipfel: trittsicher und stur.',
-  'guide.valeCupPage.nationVale':
-    'Grün und Gold unter der Weizengarbe: die Heimmannschaft, Feldarbeiter bis ins Mark.',
-  'guide.valeCupPage.nationsBody':
-    'Jedes Team spielt unter einem Banner. Der Kapitän wählt die Nation, und fliegen beide Seiten dasselbe Banner, spielt die Auswärtsseite in den umgekehrten Farben.',
-  'guide.valeCupPage.nationsHeading': 'Die acht Bannernationen',
-  'guide.valeCupPage.rewardsBody':
-    'Friedensregeln bedeuten keine Erfahrung und keine Beute: Ein entschiedenes Spiel zählt für deine Bilanz und die Siegertafel, und ein Sieg zählt zudem für die täglichen Belohnungsaufgaben. Wer ein Spiel im Stich lässt, kassiert eine Sperre auf seinem Platz, und der Platzwart vergisst nicht.',
-  'guide.valeCupPage.rewardsHeading': 'Friedensregeln',
-  'guide.valeCupPage.rolesBody':
-    'Deine Rolle bestimmt die Ausrüstung, die du auf den Platz trägst. Kicken kann jeder; der Rest ist Temperament. In den Wertungsklassen eins gegen eins und zwei gegen zwei spielen alle das Allrounder-Repertoire, sodass die Rollenwahl erst ab drei gegen drei zur Geltung kommt.',
-  'guide.valeCupPage.rolesHeading': 'Sportrollen',
-  'guide.valeCupPage.spectateBody':
-    'Im Stadion läuft immer nur ein Spiel, und jeder kann einfach vorbeikommen und von den Rängen aus zusehen.',
-  'hudChrome.keybinds.valecup': 'Talpokal',
   'hudChrome.mobile.dailyRewards': 'Shop',
   'hudChrome.perf.labels.predLead': 'Prädiktionsvorlauf',
   'hudChrome.townFocus.budgetLabel': 'Verbleibende Punkte: {remaining} / {budget}',
@@ -2753,140 +2697,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.notInTownHint': 'Du musst in der Stadt sein, um deinen Fokus festzulegen.',
   'hudChrome.townFocus.saveButton': 'Fokus speichern',
   'hudChrome.townFocus.title': 'Stadtfokus',
-  'hudChrome.vcup.awayNote':
-    'Fliegen beide Seiten dasselbe Banner, spielt die Auswärtsseite in den umgekehrten Farben.',
-  'hudChrome.vcup.bannerCountdown': 'Anstoß in {seconds}...',
-  'hudChrome.vcup.bannerDraw': 'Unentschieden auf dem Saufeld.',
-  'hudChrome.vcup.bannerEnd': 'Abpfiff: {nationA} {scoreA}, {nationB} {scoreB}',
-  'hudChrome.vcup.bannerFound': 'Der Talpokal ruft: {nationA} gegen {nationB}!',
-  'hudChrome.vcup.bannerGoal': 'TOR! {nation} trifft!',
-  'hudChrome.vcup.bannerGolden': 'GOLDEN GOAL: Der nächste Treffer gewinnt!',
-  'hudChrome.vcup.bannerKickoff': 'ANSTOSS!',
-  'hudChrome.vcup.bannerLoss': 'Niederlage auf dem Saufeld.',
-  'hudChrome.vcup.bannerSave': '{name} HÄLT!',
-  'hudChrome.vcup.bannerWin': 'Sieg auf dem Saufeld!',
-  'hudChrome.vcup.bet.aria': 'Talpokal-Spielwetten',
-  'hudChrome.vcup.bet.back': 'Auf {team} setzen',
-  'hudChrome.vcup.bet.closed': 'Wetten geschlossen',
-  'hudChrome.vcup.bet.closesIn': 'Wettschluss in {seconds}s',
-  'hudChrome.vcup.bet.collapse': 'Wetten ausblenden',
-  'hudChrome.vcup.bet.expand': 'Wetten ansehen und setzen',
-  'hudChrome.vcup.bet.form': '{wins}S-{losses}N',
-  'hudChrome.vcup.bet.lostLog': 'Deine Talpokal-Wette ist verloren: {amount}.',
-  'hudChrome.vcup.bet.mine': 'Deine Wette: {amount} auf {team}',
-  'hudChrome.vcup.bet.none': 'Du hast auf dieses Spiel noch keine Wette platziert.',
-  'hudChrome.vcup.bet.oddsLabel': 'Quote',
-  'hudChrome.vcup.bet.prize': 'Topf {amount}',
-  'hudChrome.vcup.bet.record': 'Wettbilanz: {wins}S-{losses}N, {sign}{net}',
-  'hudChrome.vcup.bet.refundLog':
-    'Wetten annulliert, dein Einsatz von {amount} wurde zurückgezahlt.',
-  'hudChrome.vcup.bet.splitAria': 'Anteil des Wett-Topfs je Team',
-  'hudChrome.vcup.bet.title': 'Spielwetten',
-  'hudChrome.vcup.bet.wonBanner': 'Deine Wette hat gewonnen!',
-  'hudChrome.vcup.bet.wonLog': 'Deine Talpokal-Wette hat gewonnen: {amount} ausgezahlt.',
-  'hudChrome.vcup.blockNation': 'Wähle zuerst eine Bannernation.',
-  'hudChrome.vcup.blockNotLeader':
-    'Nur der Gruppenanführer kann das Team in die Warteschlange stellen.',
-  'hudChrome.vcup.blockPartySize': 'Diese Staffel braucht eine kleinere Gruppe.',
-  'hudChrome.vcup.boardEmpty': 'Noch keine Sieger verzeichnet. Der Kupfereimer wartet.',
-  'hudChrome.vcup.boardHeading': 'Siegertafel',
-  'hudChrome.vcup.boardWins': '{count} Siege',
-  'hudChrome.vcup.bracketLabel': '{n}v{n}',
-  'hudChrome.vcup.bracketsAria': 'Spielstaffel',
-  'hudChrome.vcup.briefing.bot': 'Bot',
-  'hudChrome.vcup.briefing.kitHeading': 'Deine Ausrüstung',
-  'hudChrome.vcup.briefing.kitNote':
-    'Diese Manöver ersetzen für das Spiel deine Klassenfähigkeiten.',
-  'hudChrome.vcup.briefing.ready': 'Ich bin bereit',
-  'hudChrome.vcup.briefing.readyAria': 'Bereit machen für den Anstoß',
-  'hudChrome.vcup.briefing.readyCount': '{ready} von {total} bereit',
-  'hudChrome.vcup.briefing.readyDone': 'Bereit',
-  'hudChrome.vcup.briefing.rosterHeading': 'Die Aufstellung',
-  'hudChrome.vcup.briefing.rule1':
-    'Schieße oder passe den Ball ins gegnerische Tor, um zu punkten.',
-  'hudChrome.vcup.briefing.rule2':
-    'Wer zuerst 5 Tore erzielt, gewinnt, oder wer beim Abpfiff die meisten Tore hat.',
-  'hudChrome.vcup.briefing.rule3':
-    'Steht es beim Abpfiff unentschieden, geht es ins Golden Goal: Der nächste Treffer gewinnt.',
-  'hudChrome.vcup.briefing.rule4':
-    'Tacklings werfen dich nur um. Unter dem Erntefrieden wird niemand verletzt.',
-  'hudChrome.vcup.briefing.rule5': 'Jeder kann vorbeikommen und dich von den Rängen aus anfeuern.',
-  'hudChrome.vcup.briefing.rulesHeading': 'So wird gespielt',
-  'hudChrome.vcup.briefing.subtitle': 'Besprechung vor dem Spiel',
-  'hudChrome.vcup.briefing.vs': 'gegen',
-  'hudChrome.vcup.briefing.waiting': 'Warte, bis die andere Seite bereit ist...',
-  'hudChrome.vcup.briefing.whistle': 'Der Anpfiff ertönt in {seconds}s.',
-  'hudChrome.vcup.briefing.you': 'Du',
-  'hudChrome.vcup.clock': '{minutes}:{seconds}',
-  'hudChrome.vcup.close': 'Das Talpokal-Fenster schließen',
-  'hudChrome.vcup.deserterNote':
-    'Der Platzwart vergisst nicht. Du kannst dich in {seconds} Sek. wieder anstellen.',
-  'hudChrome.vcup.enterAsGuild': 'Unter dem Banner von {guild} antreten',
-  'hudChrome.vcup.gossipOpen': 'Das Spielplanbuch',
-  'hudChrome.vcup.gossipOpenAria': 'Das Talpokal-Fenster öffnen',
-  'hudChrome.vcup.guildBoardEmpty': 'Noch keine Gilde hat den Platz betreten. Zeig dein Banner!',
-  'hudChrome.vcup.guildBoardHeading': 'Gildenbanner',
-  'hudChrome.vcup.guildBoardWl': '{wins} S, {losses} N',
-  'hudChrome.vcup.guildRecordLine': 'Deine Gildenbilanz: {wins} Siege, {losses} Niederlagen.',
-  'hudChrome.vcup.inMatchNote': 'Dein Team steht auf dem Platz. Weiterspielen!',
-  'hudChrome.vcup.indicatorLive': 'Talpokal',
-  'hudChrome.vcup.indicatorOpen': 'Das Talpokal-Fenster öffnen',
-  'hudChrome.vcup.indicatorQueued':
-    'Talpokal-Warteschlange: {bracket}, Position {position} von {count}',
-  'hudChrome.vcup.leaveQueue': 'Warteschlange verlassen',
-  'hudChrome.vcup.liveAria': 'Talpokal: {nationA} {scoreA}, {nationB} {scoreB}',
-  'hudChrome.vcup.liveHeading': 'Jetzt auf dem Saufeld',
-  'hudChrome.vcup.logDraw': 'Die Partie auf dem Saufeld endet unentschieden.',
-  'hudChrome.vcup.logFound': 'Dein Talpokal-Spiel ist bereit: {nationA} gegen {nationB}.',
-  'hudChrome.vcup.logGoal': '{name} trifft für {nation}! {nationA} {scoreA}, {nationB} {scoreB}.',
-  'hudChrome.vcup.logLoss': 'Du verlierst die Partie auf dem Saufeld.',
-  'hudChrome.vcup.logQueued':
-    'Du reihst dich in die Talpokal-Warteschlange für {bracket} ein (Position {position}).',
-  'hudChrome.vcup.logRoster': 'Deine Seite: {allies}. Die Gegenseite: {enemies}.',
-  'hudChrome.vcup.logSave': '{name} hält den Ball!',
-  'hudChrome.vcup.logUnqueued': 'Du verlässt die Talpokal-Warteschlange.',
-  'hudChrome.vcup.logWin': 'Du gewinnst die Partie auf dem Saufeld.',
-  'hudChrome.vcup.mobileLabel': 'Pokal',
-  'hudChrome.vcup.nation.choir': 'Der Bleiche Chor',
-  'hudChrome.vcup.nation.coliseum': 'Das Aschene Kolosseum',
-  'hudChrome.vcup.nation.copperdig': 'Die Kupfergrube',
-  'hudChrome.vcup.nation.mirefen': 'Das Mirefen',
-  'hudChrome.vcup.nation.moon': 'Der Bleiche Mond',
-  'hudChrome.vcup.nation.ogre': 'Die Oger-Clans',
-  'hudChrome.vcup.nation.thornpeak': 'Thornpeak',
-  'hudChrome.vcup.nation.vale': 'Eastbrook-Tal',
-  'hudChrome.vcup.nationsHeading': 'Bannernation',
-  'hudChrome.vcup.noLive': 'Der Platz ruht. Es wird gerade kein Spiel gespielt.',
-  'hudChrome.vcup.offlineNote':
-    'Das Spielplanbuch ist geschlossen. Der Talpokal ist gerade nicht verfügbar.',
-  'hudChrome.vcup.phaseCountdown': 'Anstoß in {seconds}',
-  'hudChrome.vcup.phaseGoal': 'TOR!',
-  'hudChrome.vcup.phaseGolden': 'GOLDEN GOAL',
-  'hudChrome.vcup.phaseOver': 'ABPFIFF',
-  'hudChrome.vcup.practice': 'Training gegen Bots',
-  'hudChrome.vcup.practiceNote':
-    'Startet sofort ein privates Bot-Spiel auf deinem eigenen Trainingsplatz.',
-  'hudChrome.vcup.practicingNow': 'Gerade im Training ({count}):',
-  'hudChrome.vcup.queue': 'In die Warteschlange',
-  'hudChrome.vcup.queueNote': 'Stell dich von überall an; der Anpfiff ruft dich zum Saufeld.',
-  'hudChrome.vcup.queuedStatus':
-    'In der Warteschlange für {bracket}: Position {position} von {count}.',
-  'hudChrome.vcup.recordLine':
-    'Deine Bilanz: {wins} Siege, {losses} Niederlagen, {draws} Unentschieden.',
-  'hudChrome.vcup.role.allrounder.desc':
-    'Von allem etwas: Kick, Weitschlag und ein fairer Rempler.',
-  'hudChrome.vcup.role.allrounder.name': 'Allrounder',
-  'hudChrome.vcup.role.keeper.desc': 'Hütet den Torraum mit Griff, Hechtsprung und Abschlag.',
-  'hudChrome.vcup.role.keeper.name': 'Torhüter',
-  'hudChrome.vcup.role.striker.desc': 'Lebt für den weiten Schlag und den schnellen Haken.',
-  'hudChrome.vcup.role.striker.name': 'Stürmer',
-  'hudChrome.vcup.role.sweeper.desc': 'Rempelt Läufer vom Ball und schlägt ihn weit nach vorn.',
-  'hudChrome.vcup.role.sweeper.name': 'Ausputzer',
-  'hudChrome.vcup.rolesHeading': 'Sportrolle',
-  'hudChrome.vcup.shootPower': 'KRAFT',
-  'hudChrome.vcup.title': 'Der Talpokal',
-  'hudChrome.vcup.waitingCount': 'Wartende: {count}',
-  'hudChrome.vcup.walkUp': 'Komm zum Saufeld, um von den Rängen aus zuzusehen.',
   'hudChrome.archetypeTitle.label': 'Titel',
   'hudChrome.archetypeTitle.none': 'Keiner',
   'entities.itemSets.crownforged.bonus4':
@@ -3589,7 +3399,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.spider_egg_sac.name': 'Spinnen-Eikokon',
   'entities.mobs.sump_troll_devourer.name': 'Sumpftroll-Verschlinger',
   'entities.mobs.tolling_bell.name': 'Läutende Glocke',
-  'entities.mobs.vale_cup_ball.name': 'Keilerball',
   'entities.npcs.brother_halven_marsh.greeting':
     'Die Spur führte nach Norden. Ein weiteres Reliquiar, ein weiterer Ritus. Wähle deine Schwierigkeit, und ich halte das Seil, bis du zurückkehrst.',
   'entities.npcs.brother_halven_marsh.name': 'Bruder Halven',
@@ -9720,7 +9529,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.controls.petBar':
     'Begleiterleiste: Angriff, Stopp, Spott, Defensiv, Aggressiv (wenn ein Jäger- oder Hexenmeister-Begleiter beschworen ist)',
   'guide.controls.runForward': 'Vorwärtslaufen',
-  'guide.controls.valeCup': 'Talpokal',
   'guide.dungeonsPage.heroicBody':
     'Jeder Fünf-Spieler-Dungeon, und der Schlachtzug selbst, hat jenseits der Höchststufe eine heroische Fassung, die auf dich wartet. Dieselben Hallen, neu geschaffen für eine gut ausgerüstete Endgame-Gruppe: Alles schlägt härter zu, nichts lässt sich zu Fuß abhängen, und die Bosse schütteln Betäubungen und Fesseln gänzlich ab. Wachse zuerst über die normalen Fassungen hinaus; der heroische Modus setzt das voraus.',
   'guide.dungeonsPage.heroicHowBody': 'Wähle den Schwierigkeitsgrad, bevor deine Gruppe die Instanz beansprucht: Tippe /dungeon heroic, oder wähle Dungeon-Schwierigkeit festlegen im Menü deines eigenen Porträts. Allein stellst du sie selbst ein; in einer Gruppe kann das nur der Anführer, und die Wahl gilt für alle und wird an der Tür festgelegt, sodass ein Durchgang das bleibt, als was er beansprucht wurde.',
@@ -9820,12 +9628,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Tempo ist ein Wert, der alles beschleunigt, was du tust: Nahkampfschwünge, Fernkampfschüsse und das Zaubern werden allesamt zusammen schneller. Es stammt aus Ausrüstung, allen voran aus Rüstungsset-Boni, während ein paar Fähigkeiten einen kurzen Schub schnellerer Schwünge gewähren. Dein Charakterbogen weist es als Tempowertung aus.',
   'guide.stats.hasteTitle': 'Tempo',
   'guide.talentsPage.choiceNote': 'Jede Reihe ist eine Weggabelung: Sie bietet drei Optionen, und du legst dich auf eine fest. Dein nächstes Zurücksetzen öffnet jede einzelne dieser Entscheidungen wieder.',
-  'guide.valeCupPage.bettingBody':
-    'Zuschauer am Saufeld können auf eine Seite setzen, während sich ein Spiel zusammenfindet: Die Einsätze werden zusammengelegt, und beim Schlusspfiff teilen sich die Gewinner den Topf der Verlierer im Verhältnis zu ihrem Einsatz. Ein Unentschieden, oder eine Überraschung, auf die niemand gesetzt hat, erstattet jede Münze zurück. Spieler, die im Spiel sitzen, können nicht darauf wetten, und die Bande führt deine Gesamtbilanz aus Siegen, Niederlagen und Nettomünzen.',
-  'guide.valeCupPage.bettingHeading': 'Ein kleiner Einsatz an der Bande',
-  'guide.valeCupPage.practiceBody':
-    'Das Talpokal-Fenster bietet auch ein Training: eine private Kopie des Platzes, auf der Bots beide Seiten füllen und nichts für deine Bilanz zählt. Fehlt dir für das echte Spiel ein Spieler oder zwei? Nach einer kurzen Wartezeit füllen Bots die Mannschaften auf, und jedes Spiel mit Bots auf dem Platz ist ein Freundschaftsspiel, nie gewertet. Und wenn das Saufeld leer steht, geben die Bots eine Vorführung, die du von den Rängen aus ansehen und beim Wetten begleiten kannst; sobald echte Spieler sich bereit melden, gibt die Vorführung den Platz frei und jeder Einsatz wird zurückerstattet.',
-  'guide.valeCupPage.practiceHeading': 'Übungsspiele und das leere Feld',
   'guide.worldPage.worldBossBody':
     'Hoch auf dem Thornpeak nimmt der Sturm über Stormcrag zuweilen Gestalt an. Thunzharr, der Erwachende Gipfel erhebt sich dort in stetigem Rhythmus, ein Elementar von Schlachtzugsstärke, in der offenen Welt von allen bekämpft, die dem Ruf folgen, und er wird umso mächtiger, je mehr Herausforderer sich ihm entgegenstellen. Jeder, der sich dem Kampf anschließt, verdient seinen eigenen Wurf auf seine Beute, nach den Regeln der Schlachtzugssperre gewährt, und sein Fall währt lange genug, dass die Gefallenen zurücklaufen und ihr Recht einfordern können. Sammle mehr Schwerter, als du zu brauchen glaubst.',
   'guide.worldPage.worldBossTitle': 'Wenn der Gipfel erwacht: der Weltboss',

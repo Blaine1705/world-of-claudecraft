@@ -1345,14 +1345,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.actionBar.resetConfirmTitle': 'Resetovat klávesy akční lišty?',
   'hudChrome.actionBar.resetConfirmBody':
     'První lišta se vrátí ke svým výchozím klávesám. Druhá a třetí lišta zůstanou bez přiřazení. Tuto akci nelze vzít zpět.',
-  'hudChrome.vcup.rolesSmallBracketNote':
-    'V kategoriích 1 na 1 a 2 na 2 hraje každý bojovník s výbavou Univerzála. Skutky, které vyžadují kategorii 3 na 3 nebo větší, tu získat nelze.',
-  'hudChrome.vcup.practiceUnratedNote':
-    'Tréninkové zápasy jsou nehodnocené: tabulka ani postup v Knize skutků se nepočítají.',
-  'hudChrome.vcup.briefing.unratedNote':
-    'Na hřišti jsou boti, takže je tento zápas nehodnocený: tabulkou to nepohne a skutky za góly, zákroky a čistá konta se nepočítají.',
-  'hudChrome.vcup.briefing.practiceUnratedNote':
-    'Tohle je tréninkový zápas, takže je nehodnocený: tabulkou to nepohne a postup v Knize skutků se nepočítá.',
   'hudChrome.bags.filterTool': 'Nástroje',
   'hudChrome.materialHint.fineGrade':
     'Jemná jakost. Sesbírána z naleziště plné úrovně nástrojem vyššího stupně, než je materiál, a počítá se jako běžná verze všude, kde je běžná verze potřeba.',
@@ -2582,58 +2574,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sport_shoulder.description':
     'Férové rameno podle žňového příměří. Odhodí soupeře od míče.',
   'entities.abilities.sport_shoulder.name': 'Rameno',
-  'entities.mobs.vale_cup_ball.name': 'Kančbal',
-  'entities.npcs.groundskeeper_bram.greeting':
-    'Na Prasečím poli platí příměří, {className}: jen kopy a ramena. Chceš si zahrát o Měděný kbelík?',
-  'entities.npcs.groundskeeper_bram.name': 'Správce hřiště Bram',
-  'entities.npcs.groundskeeper_bram.title': 'Správce Prasečího pole',
   'entities.zones.eastbrook_vale.pois.10.label': 'Prasečí pole',
   'guide.nav.professions': 'Profese',
-  'guide.nav.valeCup': 'Pohár údolí',
   'guide.professions.intro':
     'Kromě boje a úkolů tě svět odměňuje i za práci na poli a u výhně: za sběr surovin, jejich proměnu ve výbavu a zboží napříč deseti výrobními řemesly a za přijetí identity jednoho z deseti archetypů, které tato řemesla představují.',
-  'guide.valeCupPage.heading': 'Pohár údolí',
-  'guide.valeCupPage.howHeading': 'Jak hrát',
-  'guide.valeCupPage.howMatch':
-    'Při výkopu se tvá třídní výbava vymění za sportovní a po zápase se přesně obnoví. Kopy míří na zaměřovač na zemi, míč se odráží od mantinelů a driblink je prostě běh s míčem. Dej víc gólů než druhá strana, než zazní konec; remíza jde do zlatého gólu.',
-  'guide.valeCupPage.howQueue':
-    'Do fronty se zapiš odkudkoli přes okno Poháru údolí, nebo si promluv se správcem hřiště Bramem u brány Prasečího pole. Vyber kategorii od jednoho hráče na každé straně až po pět, národní zástavu a sportovní roli; do fronty se postav sám, nebo přiveď svou skupinu.',
-  'guide.valeCupPage.howTruce':
-    'Na Prasečím poli nikdo nekrvácí: skluzy jen povalí, nic nebolí a mazlíčci zápas prosedí venku.',
-  'guide.valeCupPage.intro':
-    'Kančbal na Prasečím poli: vyber si zástavu, vyber si roli a dostaň vycpanou kančí kůži za brankáře. Hraje se o Měděný kbelík: žádná krev, žádná kořist, jen řev tribun.',
-  'guide.valeCupPage.loreHeading': 'Kančbal a žňové příměří',
-  'guide.valeCupPage.loreOldSow':
-    'Dávno předtím, než se mrtví probudili, hrávali eastbrookští čeledíni kančbal na strništích po žních: dva houfy, jedna kančí kůže vycpaná slámou a dvě vozové brány dovlečené na oba konce louky. První míč, Stará prasnice, visí pokrytý bronzem nad krbem v hospodě.',
-  'guide.valeCupPage.loreTruce':
-    'Když Popelavé koloseum začalo pořádat válečné hry, maršál Redbrook odpověděl něčím laskavějším: stálým žňovým příměřím na staré louce. Z vozových bran se staly branky, louka dostala mantinely, tribuny i jméno, Prasečí pole, a cenou byl vždycky tentýž promáčklý kbelík na mléko, ze kterého vítězové pili: Měděný kbelík.',
-  'guide.valeCupPage.nationChoir':
-    'Bledě modrá a stříbrná pod zvonem: strašidelní, přesní a velmi tiší.',
-  'guide.valeCupPage.nationColiseum':
-    'Červená a černá se zkříženými meči: hrají, jako by to pořád byla válečná hra.',
-  'guide.valeCupPage.nationCopperdig':
-    'Měděná a hnědá s krumpáčem: kopáči, kteří nikdy nepřestanou běhat.',
-  'guide.valeCupPage.nationMirefen':
-    'Modrozelená a šedá pod volavkou: trpěliví, dlouhonozí, nikdy ve spěchu.',
-  'guide.valeCupPage.nationMoon':
-    'Fialová a stříbrná pod srpkem měsíce: noční hráči, lehcí na nohou.',
-  'guide.valeCupPage.nationOgre': 'Oranžová a umbrová za pěstí: napřed ramenem a jsou na to hrdí.',
-  'guide.valeCupPage.nationThornpeak':
-    'Ledově modrá a bílá pod horským štítem: jistí v kroku a tvrdohlaví.',
-  'guide.valeCupPage.nationVale':
-    'Zelená a zlatá pod snopem pšenice: domácí strana, čeledíni tělem i duší.',
-  'guide.valeCupPage.nationsBody':
-    'Každý tým hraje pod zástavou. Národ vybírá kapitán, a pokud obě strany hrají pod stejnou, hostující strana nastoupí v obrácených barvách.',
-  'guide.valeCupPage.nationsHeading': 'Osm národních zástav',
-  'guide.valeCupPage.rewardsBody':
-    'Pravidla příměří znamenají žádné zkušenosti a žádnou kořist: rozhodnutý zápas se počítá do tvé bilance a na tabuli vítězů a výhra se počítá i do denních úkolů o odměny. Dezerce ze zápasu ti zablokuje místo a správce hřiště si to pamatuje.',
-  'guide.valeCupPage.rewardsHeading': 'Pravidla příměří',
-  'guide.valeCupPage.rolesBody':
-    'Tvá role určuje výbavu, kterou si neseš na hřiště. Kopou všichni; zbytek je povaha. V bracketech jeden na jednoho a dva na dva hrají všichni všestrannou výbavu, takže volba role přijde ke slovu až od tří na tři výš.',
-  'guide.valeCupPage.rolesHeading': 'Sportovní role',
-  'guide.valeCupPage.spectateBody':
-    'Na stadionu se hraje vždy jen jeden zápas a kdokoli může přijít a sledovat ho z tribun.',
-  'hudChrome.keybinds.valecup': 'Pohár údolí',
   'hudChrome.mobile.dailyRewards': 'Obchod',
   'hudChrome.perf.labels.predLead': 'Náskok predikce',
   'hudChrome.perf.labels.serverTick': 'Frekvence tiků serveru',
@@ -2648,132 +2592,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Každých {points} bodů na komponentě zvýší její úroveň sklizně o jeden stupeň, až o {steps} stupňů; méně než {points} bodů přesto zvýší výnos.',
   'hudChrome.townFocus.title': 'Zaměření města',
   'hudChrome.townFocus.townOnlyHint': 'Tato nastavení platí pouze ve vašem domovském městě.',
-  'hudChrome.vcup.awayNote':
-    'Pokud obě strany hrají pod stejnou zástavou, hostující strana nastoupí v obrácených barvách.',
-  'hudChrome.vcup.bannerCountdown': 'Výkop za {seconds}...',
-  'hudChrome.vcup.bannerDraw': 'Remíza na Prasečím poli.',
-  'hudChrome.vcup.bannerEnd': 'Konec zápasu: {nationA} {scoreA}, {nationB} {scoreB}',
-  'hudChrome.vcup.bannerFound': 'Pohár údolí volá: {nationA} proti {nationB}!',
-  'hudChrome.vcup.bannerGoal': 'GÓL! {nation} skóruje!',
-  'hudChrome.vcup.bannerGolden': 'ZLATÝ GÓL: další branka vítězí!',
-  'hudChrome.vcup.bannerKickoff': 'VÝKOP!',
-  'hudChrome.vcup.bannerLoss': 'Porážka na Prasečím poli.',
-  'hudChrome.vcup.bannerSave': '{name} CHYTÁ!',
-  'hudChrome.vcup.bannerWin': 'Vítězství na Prasečím poli!',
-  'hudChrome.vcup.bet.aria': 'Sázky na zápas Poháru údolí',
-  'hudChrome.vcup.bet.back': 'Vsadit na {team}',
-  'hudChrome.vcup.bet.closed': 'Sázky uzavřeny',
-  'hudChrome.vcup.bet.closesIn': 'Sázky se uzavírají za {seconds} s',
-  'hudChrome.vcup.bet.collapse': 'Skrýt sázky',
-  'hudChrome.vcup.bet.expand': 'Zobrazit sázky a vsadit',
-  'hudChrome.vcup.bet.form': '{wins}V-{losses}P',
-  'hudChrome.vcup.bet.lostLog': 'Tvá sázka na Pohár údolí prohrála: {amount}.',
-  'hudChrome.vcup.bet.mine': 'Tvá sázka: {amount} na {team}',
-  'hudChrome.vcup.bet.none': 'Na tento zápas zatím nemáš žádnou sázku.',
-  'hudChrome.vcup.bet.oddsLabel': 'Vyplácí',
-  'hudChrome.vcup.bet.prize': 'Bank {amount}',
-  'hudChrome.vcup.bet.record': 'Sázkařská bilance: {wins}V-{losses}P, {sign}{net}',
-  'hudChrome.vcup.bet.refundLog': 'Sázky zrušeny, tvůj vklad {amount} byl vrácen.',
-  'hudChrome.vcup.bet.splitAria': 'Rozdělení sázkového banku mezi jednotlivé týmy',
-  'hudChrome.vcup.bet.title': 'Sázky na zápas',
-  'hudChrome.vcup.bet.wonBanner': 'Tvá sázka vyhrála!',
-  'hudChrome.vcup.bet.wonLog': 'Tvá sázka na Pohár údolí vyhrála: vráceno {amount}.',
-  'hudChrome.vcup.blockNation': 'Nejdřív si vyber národní zástavu.',
-  'hudChrome.vcup.blockNotLeader': 'Tým může do fronty zapsat jen vůdce skupiny.',
-  'hudChrome.vcup.blockPartySize': 'Tato kategorie vyžaduje menší skupinu.',
-  'hudChrome.vcup.boardEmpty': 'Zatím nejsou zaznamenáni žádní vítězové. Měděný kbelík čeká.',
-  'hudChrome.vcup.boardHeading': 'Tabule vítězů',
-  'hudChrome.vcup.boardWins': '{count} výher',
-  'hudChrome.vcup.bracketLabel': '{n} na {n}',
-  'hudChrome.vcup.bracketsAria': 'Kategorie zápasu',
-  'hudChrome.vcup.briefing.bot': 'Bot',
-  'hudChrome.vcup.briefing.kitHeading': 'Tvá výbava',
-  'hudChrome.vcup.briefing.kitNote':
-    'Tyto dovednosti po dobu zápasu nahrazují tvé třídní schopnosti.',
-  'hudChrome.vcup.briefing.ready': 'Jsem připraven(a)',
-  'hudChrome.vcup.briefing.readyAria': 'Připravit se na výkop',
-  'hudChrome.vcup.briefing.readyCount': '{ready} z {total} připraveno',
-  'hudChrome.vcup.briefing.readyDone': 'Připraven(a)',
-  'hudChrome.vcup.briefing.rosterHeading': 'Soupiska',
-  'hudChrome.vcup.briefing.rule1': 'Skóruj kopnutím nebo přihrávkou míče do soupeřovy branky.',
-  'hudChrome.vcup.briefing.rule2':
-    'Vyhrává, kdo první dá 5 gólů, nebo kdo jich má víc, když zazní konec.',
-  'hudChrome.vcup.briefing.rule3':
-    'Nerozhodný stav na konci jde do zlatého gólu: další branka vítězí.',
-  'hudChrome.vcup.briefing.rule4':
-    'Skluzy tě jen povalí. Pod žňovým příměřím se nikomu nic nestane.',
-  'hudChrome.vcup.briefing.rule5': 'Kdokoli může přijít a fandit ti z tribun.',
-  'hudChrome.vcup.briefing.rulesHeading': 'Jak hrát',
-  'hudChrome.vcup.briefing.subtitle': 'Předzápasová porada',
-  'hudChrome.vcup.briefing.vs': 'proti',
-  'hudChrome.vcup.briefing.waiting': 'Čeká se, až se připraví druhá strana...',
-  'hudChrome.vcup.briefing.whistle': 'Píšťalka zazní za {seconds} s.',
-  'hudChrome.vcup.briefing.you': 'Ty',
-  'hudChrome.vcup.clock': '{minutes}:{seconds}',
-  'hudChrome.vcup.close': 'Zavřít okno Poháru údolí',
-  'hudChrome.vcup.deserterNote':
-    'Správce hřiště si to pamatuje. Do fronty se můžeš znovu zapsat za {seconds} s.',
-  'hudChrome.vcup.enterAsGuild': 'Nastoupit pod zástavou cechu {guild}',
-  'hudChrome.vcup.gossipOpen': 'Kniha zápasů',
-  'hudChrome.vcup.gossipOpenAria': 'Otevřít okno Poháru údolí',
-  'hudChrome.vcup.guildBoardEmpty': 'Žádný cech zatím nenastoupil na hřiště. Vyvěs svou zástavu!',
-  'hudChrome.vcup.guildBoardHeading': 'Cechovní zástavy',
-  'hudChrome.vcup.guildBoardWl': '{wins} V, {losses} P',
-  'hudChrome.vcup.guildRecordLine': 'Bilance tvého cechu: {wins} výher, {losses} proher.',
-  'hudChrome.vcup.inMatchNote': 'Tvůj tým je na hřišti. Hraje se dál!',
-  'hudChrome.vcup.indicatorLive': 'Pohár údolí',
-  'hudChrome.vcup.indicatorOpen': 'Otevřít okno Poháru údolí',
-  'hudChrome.vcup.indicatorQueued': 'Fronta Poháru údolí: {bracket}, pozice {position} z {count}',
-  'hudChrome.vcup.leaveQueue': 'Opustit frontu',
-  'hudChrome.vcup.liveAria': 'Pohár údolí: {nationA} {scoreA}, {nationB} {scoreB}',
-  'hudChrome.vcup.liveHeading': 'Právě na Prasečím poli',
-  'hudChrome.vcup.logDraw': 'Zápas na Prasečím poli končí remízou.',
-  'hudChrome.vcup.logFound': 'Tvůj zápas Poháru údolí je připraven: {nationA} proti {nationB}.',
-  'hudChrome.vcup.logGoal': '{name} skóruje za {nation}! {nationA} {scoreA}, {nationB} {scoreB}.',
-  'hudChrome.vcup.logLoss': 'Prohráváš zápas na Prasečím poli.',
-  'hudChrome.vcup.logQueued':
-    'Zapisuješ se do fronty Poháru údolí na {bracket} (pozice {position}).',
-  'hudChrome.vcup.logRoster': 'Tvá strana: {allies}. Jejich strana: {enemies}.',
-  'hudChrome.vcup.logSave': '{name} předvádí zákrok!',
-  'hudChrome.vcup.logUnqueued': 'Opouštíš frontu Poháru údolí.',
-  'hudChrome.vcup.logWin': 'Vyhráváš zápas na Prasečím poli.',
-  'hudChrome.vcup.mobileLabel': 'Pohár',
-  'hudChrome.vcup.nation.choir': 'Bledý chór',
-  'hudChrome.vcup.nation.coliseum': 'Popelavé koloseum',
-  'hudChrome.vcup.nation.copperdig': 'Měděný důl',
-  'hudChrome.vcup.nation.mirefen': 'Mirefen',
-  'hudChrome.vcup.nation.moon': 'Bledý měsíc',
-  'hudChrome.vcup.nation.ogre': 'Zlobří klany',
-  'hudChrome.vcup.nation.thornpeak': 'Thornpeak',
-  'hudChrome.vcup.nation.vale': 'Eastbrookské údolí',
-  'hudChrome.vcup.nationsHeading': 'Národní zástava',
-  'hudChrome.vcup.noLive': 'Hřiště je tiché. Žádný zápas se nehraje.',
-  'hudChrome.vcup.offlineNote': 'Kniha zápasů je zavřená. Pohár údolí teď není dostupný.',
-  'hudChrome.vcup.phaseCountdown': 'Výkop za {seconds}',
-  'hudChrome.vcup.phaseGoal': 'GÓL!',
-  'hudChrome.vcup.phaseGolden': 'ZLATÝ GÓL',
-  'hudChrome.vcup.phaseOver': 'KONEC ZÁPASU',
-  'hudChrome.vcup.practice': 'Trénink proti botům',
-  'hudChrome.vcup.practiceNote':
-    'Okamžitě spustí soukromý zápas s boty na tvém vlastním tréninkovém hřišti.',
-  'hudChrome.vcup.practicingNow': 'Právě trénují ({count}):',
-  'hudChrome.vcup.queue': 'Vstoupit do fronty',
-  'hudChrome.vcup.queueNote': 'Do fronty se zapiš odkudkoli; píšťalka tě zavolá na Prasečí pole.',
-  'hudChrome.vcup.queuedStatus': 'Ve frontě na {bracket}: pozice {position} z {count}.',
-  'hudChrome.vcup.recordLine': 'Tvá bilance: {wins} výher, {losses} proher, {draws} remíz.',
-  'hudChrome.vcup.role.allrounder.desc': 'Od všeho trochu: kop, odkop a férové rameno.',
-  'hudChrome.vcup.role.allrounder.name': 'Univerzál',
-  'hudChrome.vcup.role.keeper.desc': 'Střeží brankoviště chytáním, rybičkou a výkopem.',
-  'hudChrome.vcup.role.keeper.name': 'Brankář',
-  'hudChrome.vcup.role.striker.desc': 'Žije pro dlouhý odkop a rychlou kličku.',
-  'hudChrome.vcup.role.striker.name': 'Útočník',
-  'hudChrome.vcup.role.sweeper.desc': 'Odstrkuje běžce od míče a odkopává ho do bezpečí.',
-  'hudChrome.vcup.role.sweeper.name': 'Zadák',
-  'hudChrome.vcup.rolesHeading': 'Sportovní role',
-  'hudChrome.vcup.shootPower': 'SÍLA',
-  'hudChrome.vcup.title': 'Pohár údolí',
-  'hudChrome.vcup.waitingCount': '{count} čeká',
-  'hudChrome.vcup.walkUp': 'Přijď k Prasečímu poli a sleduj zápas z tribun.',
   'hudChrome.archetypeTitle.label': 'Titul',
   'hudChrome.archetypeTitle.none': 'Žádný',
   'entities.itemSets.crownforged.bonus4':
@@ -10414,7 +10232,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.controls.petBar':
     'Lišta mazlíčka: Útok, Stát, Provokace, Obranný, Útočný (když máš venku mazlíčka lovce nebo černokněžníka)',
   'guide.controls.runForward': 'Běh vpřed',
-  'guide.controls.valeCup': 'Pohár údolí',
   'guide.dungeonsPage.heroicBody':
     'Každý pětičlenný dungeon, a stejně tak samotný raid, má za hranicí maxima úrovní připravenou hrdinskou verzi. Tytéž síně, přetvořené pro vybavenou endgame partu: všechno bije tvrději, ničemu neutečeš po svých a bossové zcela setřesou omráčení i zpomalení. Nejdřív přeroste normální verze; hrdinský režim počítá s tím, že už jsi.',
   'guide.dungeonsPage.heroicHowBody': 'Zvol obtížnost dřív, než si tvá skupina nárokuje instanci: napiš /dungeon heroic, nebo vyber Nastavit obtížnost dungeonu v nabídce vlastního portrétu. Sám si ji nastavíš ty; ve skupině to může jen vůdce a volba platí pro všechny a zamkne se u dveří, takže běh zůstane tím, jako co byl nárokován.',
@@ -10514,12 +10331,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Rychlost je statistika, která zrychlí vše, co děláš: švihy na blízko, střelbu na dálku i sesílání kouzel, všechno zrychlí naráz. Pochází z výbavy, hlavně z bonusů sad zbroje, a několik schopností udělí krátký nával rychlejších švihů. Na kartě postavy ji uvidíš jako Haste Rating.',
   'guide.stats.hasteTitle': 'Rychlost',
   'guide.talentsPage.choiceNote': 'Každá řada je rozcestí: nabízí tři možnosti a ty se zavážeš k jedné z nich. Tvůj další reset otevře každou z těch voleb znovu.',
-  'guide.valeCupPage.bettingBody':
-    'Diváci na Prasečím poli mohou vsadit na jednu stranu, dokud se zápas teprve utváří: sázky se slévají dohromady a při závěrečném hvizdu si vítězové rozdělí balík poražených v poměru k tomu, co vsadili. Remíza, nebo překvapení, na které nikdo nevsadil, vrátí každou minci. Hráči nasazení v zápase na něj sázet nemohou a zábradlí uchovává tvou celoživotní bilanci výher, proher a čistého zisku.',
-  'guide.valeCupPage.bettingHeading': 'Sázka u zábradlí',
-  'guide.valeCupPage.practiceBody':
-    'Okno Poháru údolí nabízí i trénink: soukromou kopii hřiště, kde obě strany zaplní boti a nic se nepočítá do tvé bilance. Chybí ti hráč nebo dva na skutečný zápas? Po krátkém čekání týmy doplní boti a jakýkoli zápas s boty na hřišti je přátelák, nikdy hodnocený. A když Prasečí pole zahálí, boti předvedou exhibici, na kterou se můžeš z tribuny dívat, i sázet; v okamžiku, kdy se skuteční hráči připraví, exhibice hřiště uvolní a každá sázka se vrátí.',
-  'guide.valeCupPage.practiceHeading': 'Tréninkové zápasy a zahálející hřiště',
   'guide.worldPage.worldBossBody':
     'Vysoko na Thornpeaku bouře nad Bouřným skalním štítem občas nabere tvar. Thunzharr, Probouzející se štít tam povstává v pravidelném rytmu, elementál o síle raidu, s nímž v otevřeném světě bojuje kdokoli odpoví na volání, a čím víc vyzyvatelů se proti němu postaví, tím je mocnější. Každý, kdo se do boje zapojí, získá vlastní hod o jeho kořist, ctěný za podmínek raidového zámku, a jeho pád doznívá dost dlouho, aby padlí stihli doběhnout zpět a nárokovat, co jim náleží. Sesbírej víc mečů, než si myslíš, že potřebuješ.',
   'guide.worldPage.worldBossTitle': 'Když se štít probudí: světový boss',

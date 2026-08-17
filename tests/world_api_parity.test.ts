@@ -75,7 +75,6 @@ import type { IWorldTalents } from '../src/world_api/talents';
 import type { IWorldTargeting } from '../src/world_api/targeting';
 import type { IWorldTelemetry } from '../src/world_api/telemetry';
 import type { IWorldTrade } from '../src/world_api/trade';
-import type { IWorldValeCup } from '../src/world_api/vale_cup';
 
 type IWorldMemberKind = 'method' | 'data';
 
@@ -207,7 +206,6 @@ export const IWORLD_MEMBERS = [
   { name: 'leaveCardDuelQueue', kind: 'method' },
   { name: 'playCardInDuel', kind: 'method' },
   { name: 'forfeitCardDuel', kind: 'method' },
-  { name: 'cupInfo', kind: 'data' },
   { name: 'marketInfo', kind: 'data' },
   { name: 'marketCollectPending', kind: 'data' },
   // --- party / raid commands + marker read ---
@@ -271,13 +269,6 @@ export const IWORLD_MEMBERS = [
   { name: 'bgQueueLeave', kind: 'method' },
   { name: 'bgRespond', kind: 'method' },
   { name: 'bgFlagAction', kind: 'method' },
-  // --- the Vale Cup boarball minigame (IWorldValeCup) ---
-  { name: 'vcupQueueJoin', kind: 'method' },
-  { name: 'vcupQueueLeave', kind: 'method' },
-  { name: 'vcupSetRole', kind: 'method' },
-  { name: 'vcupReady', kind: 'method' },
-  { name: 'vcupBet', kind: 'method' },
-  { name: 'vcupPracticeStart', kind: 'method' },
   // --- market commands ---
   { name: 'marketSearch', kind: 'method' },
   { name: 'marketSellPriceCheck', kind: 'method' },
@@ -596,7 +587,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // (IWorldInventory, a method), leaving 321. Civic service anchors add
     // civicServicePlacements (IWorldInteraction, data), leaving 322. The market
     // Sell-tab price reference adds marketSellPriceCheck (IWorldMarket, a
-    // method), leaving 323.
+    // method), leaving 323. The New Eastbrook program then retires the Vale Cup
+    // facet (docs/design/eastbrook-revamp/master-plan.md), removing cupInfo
+    // (data) plus the six vcup commands, leaving 316.
     //
     // NOTE for the next merge, four syncs run now: BOTH sides of this pin move
     // it independently every cycle. Twice git merged identical numbers with no
@@ -606,9 +599,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(323);
-    expect(DATA_MEMBERS.length).toBe(86);
-    expect(METHOD_MEMBERS.length).toBe(237);
+    expect(IWORLD_MEMBERS.length).toBe(316);
+    expect(DATA_MEMBERS.length).toBe(85);
+    expect(METHOD_MEMBERS.length).toBe(231);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -687,7 +680,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'craftItem',
       'craftSkills',
       'craftingIdentity',
-      'cupInfo',
       'dailyRewardHistory',
       'dailyRewardLeaderboard',
       'dailyRewards',
@@ -934,12 +926,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'unstuck',
       'upgradeRiftItem',
       'useItem',
-      'vcupBet',
-      'vcupPracticeStart',
-      'vcupQueueJoin',
-      'vcupQueueLeave',
-      'vcupReady',
-      'vcupSetRole',
       'vendorBuyback',
       'xp',
     ]);
@@ -971,7 +957,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'copper',
       'craftSkills',
       'craftingIdentity',
-      'cupInfo',
       'deedStats',
       'deedsEarned',
       'delveDaily',
@@ -1269,12 +1254,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'unstuck',
       'upgradeRiftItem',
       'useItem',
-      'vcupBet',
-      'vcupPracticeStart',
-      'vcupQueueJoin',
-      'vcupQueueLeave',
-      'vcupReady',
-      'vcupSetRole',
     ]);
   });
 });
@@ -1703,17 +1682,6 @@ type _ExhaustTelemetry = AssertNever<
   Exclude<keyof IWorldTelemetry, (typeof FACET_TELEMETRY)[number]>
 >;
 
-const FACET_VALE_CUP = [
-  'cupInfo',
-  'vcupQueueJoin',
-  'vcupQueueLeave',
-  'vcupSetRole',
-  'vcupReady',
-  'vcupBet',
-  'vcupPracticeStart',
-] as const satisfies readonly (keyof IWorldValeCup)[];
-type _ExhaustValeCup = AssertNever<Exclude<keyof IWorldValeCup, (typeof FACET_VALE_CUP)[number]>>;
-
 const FACET_MOUNTS = [
   'ownedMounts',
   'ridingTrained',
@@ -1845,7 +1813,6 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   dailyRewards: FACET_DAILY_REWARDS,
   telemetry: FACET_TELEMETRY,
   professions: FACET_PROFESSIONS,
-  valeCup: FACET_VALE_CUP,
   mounts: FACET_MOUNTS,
   dungeonFinder: FACET_DUNGEON_FINDER,
   deeds: FACET_DEEDS,
@@ -1856,8 +1823,9 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
 describe('W1: aggregate IWorld member set equals the disjoint union of the facets', () => {
   it('pins the facet count', () => {
     // +1 battleground facet (Thornhollow Fields) on the release line; +1
-    // Reliquary facet on this branch: 33 total.
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(33);
+    // Reliquary facet on this branch: 33 total; -1 for the New Eastbrook
+    // program's Vale Cup retirement: 32 total.
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(32);
   });
 
   it('each facet array is non-empty and internally duplicate-free', () => {
@@ -1885,8 +1853,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(323);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(323);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(316);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(316);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

@@ -17,10 +17,7 @@
 
 import type { MusicZone } from './music';
 
-/** Streamed remaster for each zone cue. null means the zone has no stream:
- *  vale_cup is only ever active at the Sowfield stadium, where the dedicated
- *  sowfield-waiting/sowfield-match tracks own the mix and the zone bus is
- *  ducked to silence, so streaming a file for it would only waste bandwidth. */
+/** Streamed remaster for each zone cue. */
 export const ZONE_STREAM_URLS: Record<MusicZone, string | null> = {
   town_eastbrook: '/audio/music/town_eastbrook.mp3?v=251c46caf6ce',
   town_fenbridge: '/audio/music/town_fenbridge.mp3?v=1a94215a28f8',
@@ -46,7 +43,6 @@ export const ZONE_STREAM_URLS: Record<MusicZone, string | null> = {
   garden: '/audio/music/garden.mp3?v=9ec0e18f6d81',
   gale: '/audio/music/gale.mp3?v=a940defc3275',
   farshore: '/audio/music/farshore.mp3?v=69d713cd3f3c',
-  vale_cup: null,
   dungeon_hollow_crypt: '/audio/music/dungeon_hollow_crypt.mp3?v=4bb48c2d90fc',
   dungeon_sunken_bastion: '/audio/music/dungeon_sunken_bastion.mp3?v=db67d7df0f4b',
   dungeon_gravewyrm_sanctum: '/audio/music/dungeon_gravewyrm_sanctum.mp3?v=19f49e28f3af',

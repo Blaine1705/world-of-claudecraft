@@ -306,7 +306,7 @@ describe('client HTML shell', () => {
   });
 
   it('keeps live graphics rebuilds bound to the existing world and online session', () => {
-    const buildAt = mainTs.indexOf('buildRenderer: (target, recycled) => {');
+    const buildAt = mainTs.indexOf('buildRenderer: (_target, recycled) => {');
     const prepareAt = mainTs.indexOf('prepareCurrentZone:', buildAt);
     const build = mainTs.slice(buildAt, prepareAt);
     expect(buildAt).toBeGreaterThan(-1);

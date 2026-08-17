@@ -184,8 +184,12 @@ interface AttributionTargetFixture {
 // Re-minted for the r185 frozen-camera aim fix: updateCamera now aims through
 // lookAtFrozen, so renderer.ts moves and the composite follows its bytes. No
 // capture was retaken.
+// Re-minted for the Sowfield demolition: the Vale Cup removal strips the set
+// piece, ball, team rings, practice sky and fireworks arms from renderer.ts,
+// so the rendererIntegration leaf moves and the composite follows its bytes.
+// No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '63eae2164f990137dccffd0df83eb3c048a1c8927d125501b717ea3b27b39495';
+  '934253e0843a03fa49e37aa9d2c77aa86e98bb50eb515502a1d60340854072eb';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
