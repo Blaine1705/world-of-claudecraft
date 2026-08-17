@@ -1341,6 +1341,18 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     requireOwnedExpected: REQUIRE_OWNED.publicRead,
   },
   {
+    // Step-up challenge issuance (B6/R1): mints the single-use wallet
+    // challenge the two custody movers verify; its own rate bucket.
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/woc-market/step-up/challenge',
+    handler: 'server/woc_market_routes.ts stepUpChallengeHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: 'wocMarketMutationRateLimited',
+    requireOwnedExpected: null,
+  },
+  {
     dispatcher: DISPATCH.mainApi,
     method: 'POST',
     path: '/api/woc-market/listings',

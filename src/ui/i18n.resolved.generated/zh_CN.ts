@@ -4187,7 +4187,13 @@ export const zh_CN: EnTranslations = {
       "not_eligible": "该物品不能在 $WOC 交易所挂单。",
       "invalid_params": "请检查起拍价、底价、一口价与拍卖时长。",
       "signature_reused": "该交易已提交过。",
-      "item_locked": "该物品已锁定。出售前请先在背包中解锁。"
+      "item_locked": "该物品已锁定。出售前请先在背包中解锁。",
+      "stepup_required": "在交易所出售需要已绑定钱包的签名。",
+      "stepup_challenge_invalid": "该钱包确认已失效。请重新发起出售。",
+      "stepup_challenge_expired": "钱包确认已过期。请重新发起出售。",
+      "stepup_wallet_mismatch": "该确认签发后绑定的钱包已变更。请重新发起出售。",
+      "stepup_binding_mismatch": "该钱包确认与本次出售不符。请重新发起出售。",
+      "stepup_signature_invalid": "钱包签名验证失败。请重新发起出售。"
     }
   },
   "guide": {

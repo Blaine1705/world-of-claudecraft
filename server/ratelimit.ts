@@ -751,7 +751,13 @@ export const WOC_MARKET_CONFIRM_MAX_PER_MINUTE = 60;
 
 export const WOC_MARKET_READ_MAX_PER_MINUTE = 120;
 
-export type WocMarketMutationAction = 'list' | 'bid' | 'quote' | 'confirm' | 'read';
+// Step-up challenge issuance (B6/R1): its OWN bucket, sized at double the
+// list bucket, so the challenge-then-create pair never halves the effective
+// listing throughput (both custody routes ride the shared 'list' bucket) and
+// a declined wallet popup leaves room to retry.
+export const WOC_MARKET_STEPUP_MAX_PER_MINUTE = 20;
+
+export type WocMarketMutationAction = 'list' | 'bid' | 'quote' | 'confirm' | 'read' | 'stepup';
 
 const wocMarketMutationIpAttempts = new Map<string, number[]>();
 const wocMarketMutationAccountAttempts = new Map<string, number[]>();
@@ -768,6 +774,8 @@ export function wocMarketMutationLimit(action: WocMarketMutationAction): number 
       return WOC_MARKET_CONFIRM_MAX_PER_MINUTE;
     case 'read':
       return WOC_MARKET_READ_MAX_PER_MINUTE;
+    case 'stepup':
+      return WOC_MARKET_STEPUP_MAX_PER_MINUTE;
   }
 }
 

@@ -8892,6 +8892,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.invalid_params':
     'Проверьте стартовую ставку, резервную цену, цену выкупа и длительность.',
   'apiError.woc_market.signature_reused': 'Эта транзакция уже была отправлена.',
+  'apiError.woc_market.stepup_required':
+    'Для продажи на бирже нужна подпись привязанного кошелька.',
+  'apiError.woc_market.stepup_challenge_invalid':
+    'Это подтверждение кошелька больше недействительно. Начните продажу заново.',
+  'apiError.woc_market.stepup_challenge_expired':
+    'Срок подтверждения кошелька истёк. Начните продажу заново.',
+  'apiError.woc_market.stepup_wallet_mismatch':
+    'Привязанный кошелёк изменился после выдачи этого подтверждения. Начните продажу заново.',
+  'apiError.woc_market.stepup_binding_mismatch':
+    'Это подтверждение кошелька не соответствует этой продаже. Начните продажу заново.',
+  'apiError.woc_market.stepup_signature_invalid':
+    'Подпись кошелька не прошла проверку. Начните продажу заново.',
   'hudChrome.wocMarket.title': 'Биржа $WOC',
   'hudChrome.wocMarket.close': 'Закрыть биржу',
   'hudChrome.wocMarket.launcherLabel': 'Биржа $WOC',

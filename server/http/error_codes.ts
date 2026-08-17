@@ -338,6 +338,20 @@ export const ERROR_CODES = deepFreeze({
   // the bags is the fix, so it gets its own code, not a not_eligible collapse
   // (400).
   'woc_market.item_locked': { params: [] },
+  // Wallet step-up on the custody movers (B6/R1): listing and directed
+  // acceptance require a fresh challenge signed by the linked wallet.
+  // Moving custody without one (403).
+  'woc_market.stepup_required': { params: [] },
+  // The challenge is unknown, already used, or not this account's (403).
+  'woc_market.stepup_challenge_invalid': { params: [] },
+  // The challenge lapsed before it was used; request a fresh one (410).
+  'woc_market.stepup_challenge_expired': { params: [] },
+  // The linked wallet changed since the challenge was issued (403).
+  'woc_market.stepup_wallet_mismatch': { params: [] },
+  // The challenge authorizes a different action, item, or price (403).
+  'woc_market.stepup_binding_mismatch': { params: [] },
+  // The wallet signature did not verify against the challenge (403).
+  'woc_market.stepup_signature_invalid': { params: [] },
 } as const);
 
 /** A stable error code: one of the keys of ERROR_CODES. */

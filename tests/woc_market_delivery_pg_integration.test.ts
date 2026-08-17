@@ -275,6 +275,7 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       custody,
       verifiedWallet: async () => 'wallet-fixture',
       balanceTokens: async () => 1_000_000,
+      stepUpDevSig: true,
       config: {
         enabled: true,
         realm,

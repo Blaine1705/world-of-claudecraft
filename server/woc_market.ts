@@ -22,7 +22,18 @@ import { itemCopyPin } from '../src/sim/item_copy_ref';
 import type { CharacterState } from '../src/sim/sim';
 import type { InvSlot, ItemInstancePayload } from '../src/sim/types';
 import { throwProvedRollback } from './pg_rollback_proof';
-import type { NewWocStepUpChallenge, WocStepUpChallengeRow } from './woc_market_stepup';
+import {
+  buildStepUpMessage,
+  newStepUpNonce,
+  stepUpBindingDigest,
+  verifyStepUpProof,
+  WOC_MARKET_STEPUP_TTL_MS,
+  type NewWocStepUpChallenge,
+  type WocStepUpBinding,
+  type WocStepUpChallengeRow,
+  type WocStepUpProof,
+  type WocStepUpRefusal,
+} from './woc_market_stepup';
 import {
   adoptableBondCents,
   antiSnipeExtendedEndMs,
@@ -1071,6 +1082,11 @@ export interface WocMarketDeps {
   custody: WocMarketCustody;
   verifiedWallet(account: number): Promise<string | null>;
   balanceTokens(pubkey: string): Promise<number | null>;
+  /** True ONLY when the in-memory dev economy is live (the double-gated
+   *  ALLOW_DEV_COMMANDS + WOC_MARKET_DEV_SERVICE switch): step-up challenges
+   *  then answer signatureRequired false and accept the devsig form. In
+   *  production this is false and every proof is a real ed25519 signature. */
+  stepUpDevSig: boolean;
   config: WocMarketConfig;
   now?: () => number;
   /** Per-pass observability sink (main.ts logs it). `saturated` names every arm
@@ -1141,7 +1157,11 @@ export type WocMarketRefusal =
   | 'offer_expired'
   | ExtractRefusal
   | WocEligibilityRefusal
-  | ListingParamsRefusal;
+  | ListingParamsRefusal
+  // Wallet step-up on the custody movers (B6/R1): stepup_required is the
+  // bearer-only arm; the rest come out of the challenge verifier
+  // (server/woc_market_stepup.ts).
+  | WocStepUpRefusal;
 
 export type Refused = { ok: false; reason: WocMarketRefusal };
 const refuse = (reason: WocMarketRefusal): Refused => ({ ok: false, reason });
@@ -1553,6 +1573,105 @@ export class WocMarketService {
     return balance >= estimate.amount.tokens ? null : refuse('insufficient_balance');
   }
 
+  /**
+   * Consume-and-verify a step-up proof (B6/R1). Enforcement lives IN the two
+   * service methods that move custody, never in route middleware a future
+   * route could miss. A consumed challenge is spent even when verification
+   * refuses (single-use by design: no retry oracle); `wallet` is the CURRENT
+   * linked wallet the caller just re-read, the same canonical record the
+   * payment path trusts.
+   */
+  private async guardStepUp(
+    account: number,
+    wallet: string,
+    proof: WocStepUpProof | undefined,
+    binding: WocStepUpBinding,
+  ): Promise<Refused | null> {
+    if (!proof) return refuse('stepup_required');
+    // Shape screens before the store sees attacker-controlled strings: a
+    // decided refusal, no query. The nonce shape is the issuer's own hex form;
+    // the signature cap comfortably holds a base58 ed25519 signature and the
+    // dev form.
+    if (!/^[0-9a-f]{32}$/.test(proof.nonce) || proof.signature.length > 256) {
+      return refuse('stepup_challenge_invalid');
+    }
+    const row = await this.deps.db.consumeStepUpChallenge(this.cfg.realm, proof.nonce, account);
+    const verdict = verifyStepUpProof({
+      row,
+      proof,
+      expectedDigest: stepUpBindingDigest(binding),
+      accountId: account,
+      currentWallet: wallet,
+      nowMs: this.now(),
+      devSig: this.deps.stepUpDevSig,
+    });
+    return verdict.ok ? null : refuse(verdict.reason);
+  }
+
+  /**
+   * Issue a step-up challenge for one intended custody move. The directed arm
+   * takes ONLY the offer id and derives item and price from the authoritative
+   * offer row (seller-scoped, anti-enumeration not_found for anyone else), so
+   * the wallet always shows the figures the deal actually carries.
+   */
+  async issueStepUpChallenge(
+    account: number,
+    request:
+      | Extract<WocStepUpBinding, { operation: 'create_listing' }>
+      | { operation: 'accept_directed_offer'; offerId: number },
+  ): Promise<{
+    ok: true;
+    challenge: { nonce: string; message: string; expiresAtMs: number; signatureRequired: boolean };
+  } | Refused> {
+    const gate = (await this.guardEnabledHealthy()) ?? (await this.guardSuspended(account));
+    if (gate) return gate;
+    const wallet = await this.deps.verifiedWallet(account);
+    if (!wallet) return refuse('wallet_required');
+    let binding: WocStepUpBinding;
+    if (request.operation === 'accept_directed_offer') {
+      const offer = await this.deps.db.directedOfferById(this.cfg.realm, request.offerId);
+      // Only the SELLER's acceptance needs a proof, so only the seller can
+      // mint one; not_found for everyone else, the directed convention.
+      if (!offer || offer.sellerAccount !== account) return refuse('not_found');
+      if (offer.status !== 'pending') return refuse('not_pending');
+      if (offer.expiresAtMs <= this.now()) return refuse('offer_expired');
+      binding = {
+        operation: 'accept_directed_offer',
+        offerId: request.offerId,
+        itemId: offer.itemId ?? '',
+        usdCents: offer.usdCents,
+      };
+    } else {
+      binding = request;
+    }
+    // Issue-time prune: what bounds the table (plus the rate limiter).
+    await this.deps.db.pruneStepUpChallenges(this.cfg.realm, this.now());
+    const nonce = newStepUpNonce();
+    const expiresAtMs = this.now() + WOC_MARKET_STEPUP_TTL_MS;
+    const message = buildStepUpMessage({
+      binding,
+      accountId: account,
+      wallet,
+      nonce,
+      expiresAtIso: new Date(expiresAtMs).toISOString(),
+    });
+    const row: NewWocStepUpChallenge = {
+      nonce,
+      realm: this.cfg.realm,
+      accountId: account,
+      wallet,
+      operation: binding.operation,
+      bindingDigest: stepUpBindingDigest(binding),
+      message,
+      expiresAtMs,
+    };
+    await this.deps.db.createStepUpChallenge(row);
+    return {
+      ok: true,
+      challenge: { nonce, message, expiresAtMs, signatureRequired: !this.deps.stepUpDevSig },
+    };
+  }
+
   // -------------------------------------------------------------------------
   // Listing lifecycle (seller)
   // -------------------------------------------------------------------------
@@ -1566,6 +1685,10 @@ export class WocMarketService {
      *  agreed copy's fingerprint. The escrow stamps the offer atomically and
      *  the in-job re-check refuses a copy whose pin does not match (H10). */
     directed?: { offerId: number; itemPin: string | null };
+    /** The wallet step-up proof (B6/R1). Required on every PUBLIC listing;
+     *  the directed consummation arm skips it because the SELLER's own
+     *  acceptance already verified an offer-bound proof. */
+    stepUp?: WocStepUpProof;
   }): Promise<{ ok: true; listing: WocListingRow } | Refused> {
     // A suspended defaulter cannot list either, not just bid: the suspension is
     // a marketplace-wide hold (PRD "Integrity").
@@ -1573,6 +1696,24 @@ export class WocMarketService {
     if (gate) return gate;
     const wallet = await this.deps.verifiedWallet(args.account);
     if (!wallet) return refuse('wallet_required');
+    // Step-up BEFORE any business validation: an unauthorized bearer learns
+    // nothing about params or eligibility. The binding digests the RAW params
+    // the client asked the challenge for, so challenge and request agree
+    // byte-for-byte or refuse. The directed arm's proof was consumed at the
+    // seller's acceptance; the public route can never set args.directed
+    // (pinned by the routes suite), so this skip is unreachable from outside.
+    if (!args.directed) {
+      const gateUp = await this.guardStepUp(args.account, wallet, args.stepUp, {
+        operation: 'create_listing',
+        itemId: args.itemRef.itemId,
+        format: args.params.format,
+        startCents: args.params.startCents,
+        reserveCents: args.params.reserveCents,
+        buyNowCents: args.params.buyNowCents,
+        durationHours: args.params.durationHours,
+      });
+      if (gateUp) return gateUp;
+    }
     const params = validListingParams(args.params);
     if (!params.ok) return refuse(params.reason);
     // Own-property lookup, same as the offer intake: a prototype key would
@@ -1871,6 +2012,7 @@ export class WocMarketService {
     offerId: number,
     itemRef: ExtractRef | null,
     characterId: number,
+    stepUp?: WocStepUpProof,
   ): Promise<{ ok: true; listing: WocListingRow | null } | Refused> {
     const gate = (await this.guardEnabledHealthy()) ?? (await this.guardSuspended(account));
     if (gate) return gate;
@@ -1882,10 +2024,25 @@ export class WocMarketService {
     if (side === null) return refuse('not_found');
     if (offer.status !== 'pending') return refuse('not_pending');
     if (offer.expiresAtMs <= this.now()) return refuse('offer_expired');
-    if (!(await this.deps.verifiedWallet(account))) return refuse('wallet_required');
+    const wallet = await this.deps.verifiedWallet(account);
+    if (!wallet) return refuse('wallet_required');
     // The seller's acceptance carries the goods, because acceptance is the only
     // moment they are known; the buyer brings only money.
     if (side === 'seller') {
+      // The custody-committing act on this rail (B6/R1): the seller's
+      // acceptance is what authorizes their copy to escrow, whichever side
+      // presses Accept last, so the proof is demanded HERE and never from
+      // the buyer (whose money path signs its own payment). Bound to the
+      // AUTHORITATIVE offer row's item and agreed price, not client input;
+      // a legacy pre-pin row digests its null item as the same empty string
+      // the challenge issue derived from the same row.
+      const gateUp = await this.guardStepUp(account, wallet, stepUp, {
+        operation: 'accept_directed_offer',
+        offerId,
+        itemId: offer.itemId ?? '',
+        usdCents: offer.usdCents,
+      });
+      if (gateUp) return gateUp;
       if (!itemRef) return refuse('character_invalid');
       const eligible = listingEligibility(
         Object.hasOwn(ITEMS, itemRef.itemId) ? ITEMS[itemRef.itemId] : undefined,

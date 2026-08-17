@@ -2778,14 +2778,18 @@ configureReliquaryRuntime({
 // GameServer (lazily via liveGame(): the game boots after module load).
 // Feature config is read once at boot; WOC_MARKET_ENABLED=0 leaves every
 // mutating route answering woc_market.disabled and the sweep unstarted.
-const wocMarketEconomy =
-  process.env.ALLOW_DEV_COMMANDS === '1' && process.env.WOC_MARKET_DEV_SERVICE === '1'
-    ? createDevWocMarketEconomy()
-    : createWocMarketEconomyProxy();
+const wocMarketDevService =
+  process.env.ALLOW_DEV_COMMANDS === '1' && process.env.WOC_MARKET_DEV_SERVICE === '1';
+const wocMarketEconomy = wocMarketDevService
+  ? createDevWocMarketEconomy()
+  : createWocMarketEconomyProxy();
 const wocMarketDb = new PgWocMarketDb(pool);
 const wocMarketService = new WocMarketService({
   db: wocMarketDb,
   economy: wocMarketEconomy,
+  // The step-up devsig arm rides the SAME double-gated switch as the dev
+  // economy: impossible to reach in production, and one truth for "dev".
+  stepUpDevSig: wocMarketDevService,
   custody: createWocMarketCustody({
     get sim() {
       return liveGame().sim;

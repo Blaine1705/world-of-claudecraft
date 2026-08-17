@@ -184,6 +184,12 @@ export const API_ERROR_KEYS = {
   'woc_market.invalid_params': 'apiError.woc_market.invalid_params',
   'woc_market.signature_reused': 'apiError.woc_market.signature_reused',
   'woc_market.item_locked': 'apiError.woc_market.item_locked',
+  'woc_market.stepup_required': 'apiError.woc_market.stepup_required',
+  'woc_market.stepup_challenge_invalid': 'apiError.woc_market.stepup_challenge_invalid',
+  'woc_market.stepup_challenge_expired': 'apiError.woc_market.stepup_challenge_expired',
+  'woc_market.stepup_wallet_mismatch': 'apiError.woc_market.stepup_wallet_mismatch',
+  'woc_market.stepup_binding_mismatch': 'apiError.woc_market.stepup_binding_mismatch',
+  'woc_market.stepup_signature_invalid': 'apiError.woc_market.stepup_signature_invalid',
 } satisfies Record<string, TranslationKey>;
 
 /** The message of an Error, or the string form of any other thrown value. */

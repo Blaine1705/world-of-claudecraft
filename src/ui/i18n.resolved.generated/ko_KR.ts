@@ -4187,7 +4187,13 @@ export const ko_KR: EnTranslations = {
       "not_eligible": "해당 아이템은 $WOC 거래소에 등록할 수 없습니다.",
       "invalid_params": "시작가, 최저가, 즉시 구매가, 기간을 확인하세요.",
       "signature_reused": "해당 트랜잭션은 이미 제출되었습니다.",
-      "item_locked": "해당 아이템은 잠겨 있습니다. 판매하기 전에 가방에서 잠금을 해제하세요."
+      "item_locked": "해당 아이템은 잠겨 있습니다. 판매하기 전에 가방에서 잠금을 해제하세요.",
+      "stepup_required": "거래소에서 판매하려면 연동된 지갑의 서명이 필요합니다.",
+      "stepup_challenge_invalid": "해당 지갑 확인은 더 이상 유효하지 않습니다. 판매를 다시 시작하세요.",
+      "stepup_challenge_expired": "지갑 확인이 만료되었습니다. 판매를 다시 시작하세요.",
+      "stepup_wallet_mismatch": "이 확인이 발급된 후 연동된 지갑이 변경되었습니다. 판매를 다시 시작하세요.",
+      "stepup_binding_mismatch": "해당 지갑 확인은 이 판매와 일치하지 않습니다. 판매를 다시 시작하세요.",
+      "stepup_signature_invalid": "지갑 서명을 확인할 수 없습니다. 판매를 다시 시작하세요."
     }
   },
   "guide": {

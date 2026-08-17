@@ -8734,6 +8734,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.not_eligible': '해당 아이템은 $WOC 거래소에 등록할 수 없습니다.',
   'apiError.woc_market.invalid_params': '시작가, 최저가, 즉시 구매가, 기간을 확인하세요.',
   'apiError.woc_market.signature_reused': '해당 트랜잭션은 이미 제출되었습니다.',
+  'apiError.woc_market.stepup_required':
+    '거래소에서 판매하려면 연동된 지갑의 서명이 필요합니다.',
+  'apiError.woc_market.stepup_challenge_invalid':
+    '해당 지갑 확인은 더 이상 유효하지 않습니다. 판매를 다시 시작하세요.',
+  'apiError.woc_market.stepup_challenge_expired':
+    '지갑 확인이 만료되었습니다. 판매를 다시 시작하세요.',
+  'apiError.woc_market.stepup_wallet_mismatch':
+    '이 확인이 발급된 후 연동된 지갑이 변경되었습니다. 판매를 다시 시작하세요.',
+  'apiError.woc_market.stepup_binding_mismatch':
+    '해당 지갑 확인은 이 판매와 일치하지 않습니다. 판매를 다시 시작하세요.',
+  'apiError.woc_market.stepup_signature_invalid':
+    '지갑 서명을 확인할 수 없습니다. 판매를 다시 시작하세요.',
   'hudChrome.wocMarket.title': '$WOC 거래소',
   'hudChrome.wocMarket.close': '거래소 닫기',
   'hudChrome.wocMarket.launcherLabel': '$WOC 거래소',

@@ -58,6 +58,7 @@ import {
   WOC_MARKET_LIST_MAX_PER_MINUTE,
   WOC_MARKET_QUOTE_MAX_PER_MINUTE,
   WOC_MARKET_READ_MAX_PER_MINUTE,
+  WOC_MARKET_STEPUP_MAX_PER_MINUTE,
   type WocMarketMutationAction,
   walletLinkRateLimited,
   wocBalanceRateLimited,
@@ -380,6 +381,14 @@ export const WOC_MARKET_READ_POLICY: RateLimitPolicy = wocMarketMutationPolicy(
   'woc_market_read',
   'read',
   WOC_MARKET_READ_MAX_PER_MINUTE,
+);
+// Step-up challenge issuance (B6/R1): its own bucket so the challenge-then-
+// create pair never halves the shared list bucket (rationale at the limit
+// constant in server/ratelimit.ts).
+export const WOC_MARKET_STEPUP_POLICY: RateLimitPolicy = wocMarketMutationPolicy(
+  'woc_market_stepup',
+  'stepup',
+  WOC_MARKET_STEPUP_MAX_PER_MINUTE,
 );
 
 // The character-mutation policies. Each is 'ip+account' (so it must be

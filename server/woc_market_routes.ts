@@ -25,6 +25,7 @@ import {
   WOC_MARKET_LIST_POLICY,
   WOC_MARKET_QUOTE_POLICY,
   WOC_MARKET_READ_POLICY,
+  WOC_MARKET_STEPUP_POLICY,
 } from './http/middleware/rate_limit';
 import type { AdminAuthDb } from './http/middleware/require_admin';
 import {
@@ -222,6 +223,17 @@ export const REFUSAL_ERRORS: Record<WocMarketRefusal, { status: number; code: Er
   recipient_wallet_required: { status: 403, code: 'woc_market.recipient_wallet_required' },
   self_offer: { status: 400, code: 'woc_market.self_offer' },
   offer_expired: { status: 410, code: 'woc_market.offer_expired' },
+  // Wallet step-up on the custody movers (B6/R1). All 403 auth-class except
+  // the expired challenge, which is a 410 lapse like offer_expired: the fix
+  // is a fresh challenge, not different credentials. invalid deliberately
+  // covers unknown, replayed, AND cross-account nonces with one word, so
+  // challenge existence never leaks.
+  stepup_required: { status: 403, code: 'woc_market.stepup_required' },
+  stepup_challenge_invalid: { status: 403, code: 'woc_market.stepup_challenge_invalid' },
+  stepup_challenge_expired: { status: 410, code: 'woc_market.stepup_challenge_expired' },
+  stepup_wallet_mismatch: { status: 403, code: 'woc_market.stepup_wallet_mismatch' },
+  stepup_binding_mismatch: { status: 403, code: 'woc_market.stepup_binding_mismatch' },
+  stepup_signature_invalid: { status: 403, code: 'woc_market.stepup_signature_invalid' },
 };
 
 function throwRefusal(reason: WocMarketRefusal): never {
@@ -280,6 +292,18 @@ function signatureField(value: unknown): string {
   const sig = stringField(value, 256);
   if (!SIGNATURE_SHAPE.test(sig)) invalid();
   return sig;
+}
+
+/** The optional step-up proof (B6/R1). ABSENT stays absent, so the service
+ *  answers its honest stepup_required; a PRESENT but malformed shape is the
+ *  generic invalid_input like every other decode. The signature reuses the
+ *  transaction-signature screen: same printable-safe rationale, and the
+ *  devsig form fits it. */
+function optionalStepUp(value: unknown): { nonce: string; signature: string } | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (typeof value !== 'object' || Array.isArray(value)) invalid();
+  const v = value as { nonce?: unknown; signature?: unknown };
+  return { nonce: stringField(v.nonce, 64), signature: signatureField(v.signature) };
 }
 
 /** A real instance payload (rolled stats, enchant, signer, provenance)
@@ -548,10 +572,50 @@ async function estimateHandler(ctx: Ctx): Promise<void> {
   json(ctx.res, 200, estimateView(await useService().estimate(cents)));
 }
 
+async function stepUpChallengeHandler(ctx: Ctx): Promise<void> {
+  // Issue a wallet step-up challenge (B6/R1) for ONE intended custody move.
+  // The listing shape carries the exact figures the createListing call will
+  // send (the binding digests them); the directed shape names only the offer,
+  // whose authoritative row supplies the figures the wallet shows.
+  const body = bodyOf(ctx);
+  const operation = body.operation;
+  const account = ctxAccountId(ctx);
+  const out =
+    operation === 'create_listing'
+      ? await useService().issueStepUpChallenge(account, {
+          operation: 'create_listing',
+          itemId: stringField(body.itemId, 128),
+          format: LISTING_FORMATS.has(String(body.format))
+            ? (body.format as string)
+            : (invalid() as never),
+          startCents: intField(
+            body.startCents,
+            WOC_MARKET_MIN_PRICE_CENTS,
+            WOC_MARKET_MAX_PRICE_CENTS,
+          ),
+          reserveCents: optionalCents(body.reserveCents),
+          buyNowCents: optionalCents(body.buyNowCents),
+          durationHours: intField(body.durationHours, 1, 1_000),
+        })
+      : operation === 'accept_directed_offer'
+        ? await useService().issueStepUpChallenge(account, {
+            operation: 'accept_directed_offer',
+            offerId: intField(body.offerId, 1, Number.MAX_SAFE_INTEGER),
+          })
+        : (invalid() as never);
+  if (!out.ok) throwRefusal(out.reason);
+  json(ctx.res, 200, { challenge: out.challenge });
+}
+
 async function createListingHandler(ctx: Ctx): Promise<void> {
   const body = bodyOf(ctx);
   const expectInstance = optionalInstance(body.expectInstance);
+  const stepUp = optionalStepUp(body.stepUp);
   const out = await useService().createListing({
+    // The step-up proof (B6/R1). This handler NEVER passes `directed` (the
+    // in-service consummation marker), so the service's directed skip is
+    // unreachable from the public surface; the routes suite pins it.
+    ...(stepUp === undefined ? {} : { stepUp }),
     account: ctxAccountId(ctx),
     characterId: intField(body.characterId, 1, Number.MAX_SAFE_INTEGER),
     itemRef: {
@@ -899,6 +963,9 @@ async function acceptOfferHandler(ctx: Ctx): Promise<void> {
         }
       : null,
     intField(body.characterId, 1, Number.MAX_SAFE_INTEGER),
+    // The seller side owes the offer-bound step-up proof (B6/R1); the buyer
+    // side sends none and the service demands none of them.
+    optionalStepUp(body.stepUp),
   );
   if (!out.ok) throwRefusal(out.reason);
   // A null listing means "agreed, still waiting on the other side": the deal is
@@ -1028,6 +1095,14 @@ export const routes: RouteDef[] = [
     middleware: [readAccount],
     meta: NO_OWNER,
     handler: historyHandler,
+  },
+  {
+    // Step-up challenge issuance (B6/R1): its own bucket, see the policy.
+    method: 'POST',
+    path: '/api/woc-market/step-up/challenge',
+    surface: 'api',
+    middleware: [activeAccount, rateLimit(WOC_MARKET_STEPUP_POLICY), withBody()],
+    handler: stepUpChallengeHandler,
   },
   {
     method: 'POST',

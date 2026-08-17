@@ -262,6 +262,7 @@ describeDb('woc market directed rail against real Postgres', () => {
       custody,
       verifiedWallet: async (account) => opts.wallets.get(account) ?? null,
       balanceTokens: async () => 1_000_000,
+      stepUpDevSig: true,
       config: {
         enabled: true,
         realm,
@@ -303,6 +304,13 @@ describeDb('woc market directed rail against real Postgres', () => {
     } as Parameters<WocMarketService['createDirectedOffer']>[0]);
     if (!created.ok) return created as { ok: false; reason: string };
     const offerId = (created as { ok: true; offer: { id: number } }).offer.id;
+    // The seller's custody-committing acceptance carries the offer-bound
+    // step-up proof (B6/R1), minted devsig through the real issue path.
+    const minted = await args.service.issueStepUpChallenge(args.seller, {
+      operation: 'accept_directed_offer',
+      offerId,
+    });
+    if (!minted.ok) return minted as { ok: false; reason: string };
     const sellerSide = await args.service.acceptDirectedOffer(
       args.seller,
       offerId,
@@ -314,6 +322,7 @@ describeDb('woc market directed rail against real Postgres', () => {
           : { expectInstance: args.acceptRef.expectInstance }),
       },
       args.sellerCharacter,
+      { nonce: minted.challenge.nonce, signature: `devsig:${minted.challenge.nonce}` },
     );
     if (!sellerSide.ok) return sellerSide as { ok: false; reason: string };
     const buyerSide = await args.service.acceptDirectedOffer(

@@ -17,6 +17,8 @@
 // the requireOwned 404. Every scenario asserts BOTH the returned values and
 // the resulting fake-db/custody state.
 
+import { ed25519 } from '@noble/curves/ed25519';
+import bs58 from 'bs58';
 import { describe, expect, it, vi } from 'vitest';
 import type {
   Refused,
@@ -33,6 +35,7 @@ import type {
 } from '../../server/woc_market';
 import { WocMarketService } from '../../server/woc_market';
 import { createDevWocMarketEconomy } from '../../server/woc_market_proxy';
+import { WOC_MARKET_STEPUP_TTL_MS } from '../../server/woc_market_stepup';
 import type { WocListingParams } from '../../server/woc_market_rules';
 import {
   bondCents,
@@ -354,6 +357,11 @@ function makeHarness(): Harness {
     custody,
     verifiedWallet: async (account) => wallets.get(account) ?? null,
     balanceTokens: async (pubkey) => balances.get(pubkey) ?? null,
+    // devsig proofs (the double-gated dev switch) so every flow test can mint
+    // its step-up cheaply; the ladder itself is unit-proven with real ed25519
+    // keys in woc_market_stepup.test.ts, and one arm below runs the REAL
+    // signature path end to end with stepUpDevSig false.
+    stepUpDevSig: true,
     config: {
       enabled: true,
       realm: REALM,
@@ -400,8 +408,62 @@ function listingParams(over: Partial<WocListingParams> = {}): WocListingParams {
   };
 }
 
+/** The listing-shaped step-up binding for `params`, the same fields the route
+ *  hands the challenge issue. */
+function listBindingFor(itemId: string, params: WocListingParams) {
+  return {
+    operation: 'create_listing' as const,
+    itemId,
+    format: params.format,
+    startCents: params.startCents,
+    reserveCents: params.reserveCents,
+    buyNowCents: params.buyNowCents,
+    durationHours: params.durationHours,
+  };
+}
+
+/** Mint a devsig step-up proof through the real issue path (consumes a
+ *  challenge row exactly as production does). */
+async function stepUpFor(
+  h: Harness,
+  account: number,
+  request: Parameters<WocMarketService['issueStepUpChallenge']>[1],
+): Promise<{ nonce: string; signature: string }> {
+  const out = await h.service.issueStepUpChallenge(account, request);
+  if (!out.ok) throw new Error(`issueStepUpChallenge refused: ${out.reason}`);
+  return { nonce: out.challenge.nonce, signature: `devsig:${out.challenge.nonce}` };
+}
+
+/** createListing with a fresh matching proof, the honest-flow shorthand. */
+async function createListingSteppedUp(
+  h: Harness,
+  args: Omit<Parameters<WocMarketService['createListing']>[0], 'stepUp'>,
+): Promise<Awaited<ReturnType<WocMarketService['createListing']>>> {
+  return h.service.createListing({
+    ...args,
+    stepUp: await stepUpFor(h, args.account, listBindingFor(args.itemRef.itemId, args.params)),
+  });
+}
+
+/** acceptDirectedOffer with a fresh offer-bound proof (the seller side). */
+async function acceptSteppedUp(
+  h: Harness,
+  account: number,
+  offerId: number,
+  itemRef: Parameters<WocMarketService['acceptDirectedOffer']>[2],
+  characterId: number,
+): Promise<Awaited<ReturnType<WocMarketService['acceptDirectedOffer']>>> {
+  return h.service.acceptDirectedOffer(
+    account,
+    offerId,
+    itemRef,
+    characterId,
+    await stepUpFor(h, account, { operation: 'accept_directed_offer', offerId }),
+  );
+}
+
 async function listEpic(h: Harness, over: Partial<WocListingParams> = {}): Promise<WocListingRow> {
-  const res = await h.service.createListing({
+  const res = await createListingSteppedUp(h, {
     account: SELLER,
     characterId: SELLER_CHAR,
     itemRef: { index: 0, itemId: EPIC_ITEM },
@@ -489,6 +551,303 @@ describe('woc market fixtures', () => {
   });
 });
 
+describe('step-up enforcement on the custody movers (B6/R1)', () => {
+  it('refuses a bearer-only createListing with stepup_required, touching nothing', async () => {
+    // The B6 vector: a stolen session bearer lists the victim's valuables.
+    // With no proof attached the refusal lands before any custody action.
+    const h = makeHarness();
+    const res = await h.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams(),
+    });
+    expect(res).toEqual({ ok: false, reason: 'stepup_required' });
+    expect(bagsOf(h, SELLER_CHAR)).toHaveLength(2);
+    expect(h.db.escrowSaves).toHaveLength(0);
+  });
+
+  it('refuses a bearer-only SELLER acceptance with stepup_required', async () => {
+    // The seller's acceptance is the custody-committing act on the directed
+    // rail, so it demands the same proof; the buyer's does not (their money
+    // path signs its own payment).
+    const h = makeHarness();
+    h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
+    const offer = await h.service.createDirectedOffer({
+      account: BUYER_A,
+      characterId: CHAR_A,
+      sellerCharacterName: 'Selara',
+      usdCents: 7500,
+      item: { itemId: EPIC_ITEM },
+      acceptTerms: true,
+    });
+    if (!offer.ok) throw new Error(`offer refused: ${offer.reason}`);
+    const res = await h.service.acceptDirectedOffer(
+      SELLER,
+      offer.offer.id,
+      { index: 0, itemId: EPIC_ITEM },
+      SELLER_CHAR,
+    );
+    expect(res).toEqual({ ok: false, reason: 'stepup_required' });
+    expect(bagsOf(h, SELLER_CHAR)).toHaveLength(1);
+  });
+
+  it('refuses a REPLAYED proof: the same challenge cannot authorize twice', async () => {
+    const h = makeHarness();
+    h.custody.bags.set(SELLER_CHAR, [
+      { itemId: EPIC_ITEM, count: 1 },
+      { itemId: EPIC_ITEM, count: 1 },
+    ]);
+    const params = listingParams();
+    const proof = await stepUpFor(h, SELLER, listBindingFor(EPIC_ITEM, params));
+    const args = {
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params,
+      stepUp: proof,
+    };
+    expect((await h.service.createListing(args)).ok).toBe(true);
+    expect(await h.service.createListing(args)).toEqual({
+      ok: false,
+      reason: 'stepup_challenge_invalid',
+    });
+    expect(bagsOf(h, SELLER_CHAR), 'the second copy never escrowed').toHaveLength(1);
+  });
+
+  it('refuses an EXPIRED challenge with its own honest reason', async () => {
+    const h = makeHarness();
+    const params = listingParams();
+    const proof = await stepUpFor(h, SELLER, listBindingFor(EPIC_ITEM, params));
+    h.setNow(BASE_MS + WOC_MARKET_STEPUP_TTL_MS);
+    const res = await h.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params,
+      stepUp: proof,
+    });
+    expect(res).toEqual({ ok: false, reason: 'stepup_challenge_expired' });
+    expect(bagsOf(h, SELLER_CHAR)).toHaveLength(2);
+  });
+
+  it('refuses a listing challenge replayed onto the OTHER operation', async () => {
+    const h = makeHarness();
+    h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
+    const offer = await h.service.createDirectedOffer({
+      account: BUYER_A,
+      characterId: CHAR_A,
+      sellerCharacterName: 'Selara',
+      usdCents: 7500,
+      item: { itemId: EPIC_ITEM },
+      acceptTerms: true,
+    });
+    if (!offer.ok) throw new Error(`offer refused: ${offer.reason}`);
+    const listingProof = await stepUpFor(h, SELLER, listBindingFor(EPIC_ITEM, listingParams()));
+    const res = await h.service.acceptDirectedOffer(
+      SELLER,
+      offer.offer.id,
+      { index: 0, itemId: EPIC_ITEM },
+      SELLER_CHAR,
+      listingProof,
+    );
+    expect(res).toEqual({ ok: false, reason: 'stepup_binding_mismatch' });
+    expect(bagsOf(h, SELLER_CHAR)).toHaveLength(1);
+  });
+
+  it('refuses a proof whose item or any money figure moved after signing', async () => {
+    // The B6 replay: sign for one listing, submit another. Item and start
+    // price each get their own arm; the full member sweep is the unit
+    // suite's digest test.
+    const h = makeHarness();
+    const params = listingParams();
+    for (const drifted of [
+      { itemRef: { index: 1, itemId: RARE_ITEM }, params },
+      { itemRef: { index: 0, itemId: EPIC_ITEM }, params: listingParams({ startCents: 25 }) },
+    ]) {
+      const proof = await stepUpFor(h, SELLER, listBindingFor(EPIC_ITEM, params));
+      const res = await h.service.createListing({
+        account: SELLER,
+        characterId: SELLER_CHAR,
+        ...drifted,
+        stepUp: proof,
+      });
+      expect(res).toEqual({ ok: false, reason: 'stepup_binding_mismatch' });
+    }
+    expect(bagsOf(h, SELLER_CHAR)).toHaveLength(2);
+  });
+
+  it('refuses another account riding a stolen proof, and the owner keeps their challenge', async () => {
+    // WALLET_TWIN owns a character and shares the seller's wallet string, so
+    // every pre-step gate passes and the refusal is attributable to the
+    // step-up alone. The victim's challenge survives the theft attempt.
+    const h = makeHarness();
+    h.custody.bags.set(CHAR_TWIN, [{ itemId: EPIC_ITEM, count: 1 }]);
+    h.custody.owners.set(CHAR_TWIN, WALLET_TWIN);
+    const params = listingParams();
+    const proof = await stepUpFor(h, SELLER, listBindingFor(EPIC_ITEM, params));
+    const stolen = await h.service.createListing({
+      account: WALLET_TWIN,
+      characterId: CHAR_TWIN,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params,
+      stepUp: proof,
+    });
+    expect(stolen).toEqual({ ok: false, reason: 'stepup_challenge_invalid' });
+    const owner = await h.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params,
+      stepUp: proof,
+    });
+    expect(owner.ok, 'the owner consumes their own challenge untouched').toBe(true);
+  });
+
+  it('refuses a proof issued to a FORMERLY linked wallet after a relink', async () => {
+    const h = makeHarness();
+    const params = listingParams();
+    const proof = await stepUpFor(h, SELLER, listBindingFor(EPIC_ITEM, params));
+    h.wallets.set(SELLER, 'wallet-seller-relinked');
+    const res = await h.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params,
+      stepUp: proof,
+    });
+    expect(res).toEqual({ ok: false, reason: 'stepup_wallet_mismatch' });
+    expect(bagsOf(h, SELLER_CHAR)).toHaveLength(2);
+  });
+
+  it('refuses the devsig form when the dev switch is off, and a REAL signature passes', async () => {
+    // The production posture end to end at the service seam: stepUpDevSig
+    // false means only a genuine ed25519 signature over the stored message
+    // verifies (the ladder itself is unit-proven; this is the wiring proof).
+    const priv = new Uint8Array(32).fill(5);
+    const wallet = bs58.encode(ed25519.getPublicKey(priv));
+    const h = makeHarness();
+    (h.deps as { stepUpDevSig: boolean }).stepUpDevSig = false;
+    h.wallets.set(SELLER, wallet);
+    const params = listingParams();
+    const issue = await h.service.issueStepUpChallenge(
+      SELLER,
+      listBindingFor(EPIC_ITEM, params),
+    );
+    if (!issue.ok) throw new Error(`issue refused: ${issue.reason}`);
+    expect(issue.challenge.signatureRequired, 'production answers signatureRequired').toBe(true);
+    const args = (signature: string) => ({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params,
+      stepUp: { nonce: issue.challenge.nonce, signature },
+    });
+    expect(await h.service.createListing(args(`devsig:${issue.challenge.nonce}`))).toEqual({
+      ok: false,
+      reason: 'stepup_signature_invalid',
+    });
+    // The devsig attempt consumed the challenge (single-use, no retry
+    // oracle), so the real signature signs a FRESH one.
+    const second = await h.service.issueStepUpChallenge(
+      SELLER,
+      listBindingFor(EPIC_ITEM, params),
+    );
+    if (!second.ok) throw new Error(`issue refused: ${second.reason}`);
+    const signature = bs58.encode(
+      ed25519.sign(new TextEncoder().encode(second.challenge.message), priv),
+    );
+    const real = await h.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params,
+      stepUp: { nonce: second.challenge.nonce, signature },
+    });
+    expect(real.ok, 'a genuine wallet signature moves custody').toBe(true);
+  });
+
+  it('never demands a proof from the BUYER side of an acceptance', async () => {
+    const h = makeHarness();
+    h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
+    const offer = await h.service.createDirectedOffer({
+      account: BUYER_A,
+      characterId: CHAR_A,
+      sellerCharacterName: 'Selara',
+      usdCents: 7500,
+      item: { itemId: EPIC_ITEM },
+      acceptTerms: true,
+    });
+    if (!offer.ok) throw new Error(`offer refused: ${offer.reason}`);
+    const buyer = await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id, null, CHAR_A);
+    expect(buyer.ok, 'the buyer agrees bearer-only; their money path signs later').toBe(true);
+  });
+
+  it('consummates through the internal directed call WITHOUT a second proof', async () => {
+    // The seller's own acceptance carried the offer-bound proof; the escrow
+    // then runs createListing internally with args.directed set. One proof
+    // per custody move, spent at the decision, is the design.
+    const h = makeHarness();
+    h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
+    const offer = await h.service.createDirectedOffer({
+      account: BUYER_A,
+      characterId: CHAR_A,
+      sellerCharacterName: 'Selara',
+      usdCents: 7500,
+      item: { itemId: EPIC_ITEM },
+      acceptTerms: true,
+    });
+    if (!offer.ok) throw new Error(`offer refused: ${offer.reason}`);
+    const seller = await acceptSteppedUp(
+      h,
+      SELLER,
+      offer.offer.id,
+      { index: 0, itemId: EPIC_ITEM },
+      SELLER_CHAR,
+    );
+    expect(seller.ok).toBe(true);
+    expect(h.db.stepUpChallengeCount(), 'the accept spent the only challenge').toBe(0);
+    const buyer = await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id, null, CHAR_A);
+    expect(buyer.ok).toBe(true);
+    if (buyer.ok) expect(buyer.listing, 'the consummation escrowed').not.toBeNull();
+  });
+
+  it('the challenge issue itself refuses without a wallet and derives directed figures from the offer', async () => {
+    const h = makeHarness();
+    h.wallets.delete(SELLER);
+    expect(await h.service.issueStepUpChallenge(SELLER, listBindingFor(EPIC_ITEM, listingParams())))
+      .toEqual({ ok: false, reason: 'wallet_required' });
+    h.wallets.set(SELLER, 'wallet-seller');
+    h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
+    const offer = await h.service.createDirectedOffer({
+      account: BUYER_A,
+      characterId: CHAR_A,
+      sellerCharacterName: 'Selara',
+      usdCents: 7500,
+      item: { itemId: EPIC_ITEM },
+      acceptTerms: true,
+    });
+    if (!offer.ok) throw new Error(`offer refused: ${offer.reason}`);
+    // Only the SELLER can mint an accept challenge; the buyer and a stranger
+    // read not_found, the directed anti-enumeration convention.
+    expect(
+      await h.service.issueStepUpChallenge(BUYER_A, {
+        operation: 'accept_directed_offer',
+        offerId: offer.offer.id,
+      }),
+    ).toEqual({ ok: false, reason: 'not_found' });
+    const minted = await h.service.issueStepUpChallenge(SELLER, {
+      operation: 'accept_directed_offer',
+      offerId: offer.offer.id,
+    });
+    if (!minted.ok) throw new Error(`issue refused: ${minted.reason}`);
+    // The wallet shows the AUTHORITATIVE agreed figures from the offer row.
+    expect(minted.challenge.message).toContain(`accept directed offer #${offer.offer.id}`);
+    expect(minted.challenge.message).toContain('$75.00');
+    expect(minted.challenge.signatureRequired, 'dev harness answers false').toBe(false);
+  });
+});
+
 describe('createListing', () => {
   it('escrows the copy out of the bags and persists the listing row', async () => {
     const h = makeHarness();
@@ -529,7 +888,7 @@ describe('createListing', () => {
 
   it('refuses below_quality_floor for a rare item before any custody action', async () => {
     const h = makeHarness();
-    const res = await h.service.createListing({
+    const res = await createListingSteppedUp(h, {
       account: SELLER,
       characterId: SELLER_CHAR,
       itemRef: { index: 1, itemId: RARE_ITEM },
@@ -546,7 +905,7 @@ describe('createListing', () => {
     // the flag, so the advisory pre-check refuses with zero custody work.
     const h = makeHarness();
     h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1, instance: { locked: true } }]);
-    const res = await h.service.createListing({
+    const res = await createListingSteppedUp(h, {
       account: SELLER,
       characterId: SELLER_CHAR,
       itemRef: { index: 0, itemId: EPIC_ITEM, expectInstance: { locked: true } },
@@ -563,7 +922,7 @@ describe('createListing', () => {
     // lock must refuse there and the copy must restore to the bags.
     const h = makeHarness();
     h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1, instance: { locked: true } }]);
-    const res = await h.service.createListing({
+    const res = await createListingSteppedUp(h, {
       account: SELLER,
       characterId: SELLER_CHAR,
       itemRef: { index: 0, itemId: EPIC_ITEM },
@@ -577,7 +936,7 @@ describe('createListing', () => {
 
   it('runs the custody critical section through runSerialized for the listed character', async () => {
     const h = makeHarness();
-    const res = await h.service.createListing({
+    const res = await createListingSteppedUp(h, {
       account: SELLER,
       characterId: SELLER_CHAR,
       itemRef: { index: 0, itemId: EPIC_ITEM },
@@ -596,7 +955,7 @@ describe('createListing', () => {
     // so the compensation split must take the restore arm.
     h.db.failNextEscrowThrow = Object.assign(new Error('canceling statement'), { code: '57014' });
     await expect(
-      h.service.createListing({
+      createListingSteppedUp(h, {
         account: SELLER,
         characterId: SELLER_CHAR,
         itemRef: { index: 0, itemId: EPIC_ITEM },
@@ -615,7 +974,7 @@ describe('createListing', () => {
     h.db.failNextEscrowThrow = Object.assign(new Error('broken pipe'), { code: 'EPIPE' });
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     await expect(
-      h.service.createListing({
+      createListingSteppedUp(h, {
         account: SELLER,
         characterId: SELLER_CHAR,
         itemRef: { index: 0, itemId: EPIC_ITEM },
@@ -634,7 +993,7 @@ describe('createListing', () => {
   it('a lease-fenced escrow write kicks the displaced zombie after restoring', async () => {
     const h = makeHarness();
     h.db.failNextEscrow = 'lease_lost';
-    const res = await h.service.createListing({
+    const res = await createListingSteppedUp(h, {
       account: SELLER,
       characterId: SELLER_CHAR,
       itemRef: { index: 0, itemId: EPIC_ITEM },
@@ -650,7 +1009,7 @@ describe('createListing', () => {
     // CHAR_A belongs to BUYER_A: the seller naming it must not reach the
     // FIFO, the flush, or the depth cap (that slot belongs to the victim).
     h.custody.bags.set(CHAR_A, [{ itemId: EPIC_ITEM, count: 1 }]);
-    const res = await h.service.createListing({
+    const res = await createListingSteppedUp(h, {
       account: SELLER,
       characterId: CHAR_A,
       itemRef: { index: 0, itemId: EPIC_ITEM },
@@ -663,7 +1022,7 @@ describe('createListing', () => {
   it("a db-level 'contended' escrow refusal restores the copy and answers the typed refusal", async () => {
     const h = makeHarness();
     h.db.failNextEscrow = 'contended';
-    const res = await h.service.createListing({
+    const res = await createListingSteppedUp(h, {
       account: SELLER,
       characterId: SELLER_CHAR,
       itemRef: { index: 0, itemId: EPIC_ITEM },
@@ -678,7 +1037,7 @@ describe('createListing', () => {
   it("maps the serialized-job 'contended' to the typed refusal with nothing extracted", async () => {
     const h = makeHarness();
     h.custody.failNextRunSerialized = true;
-    const res = await h.service.createListing({
+    const res = await createListingSteppedUp(h, {
       account: SELLER,
       characterId: SELLER_CHAR,
       itemRef: { index: 0, itemId: EPIC_ITEM },
@@ -691,7 +1050,7 @@ describe('createListing', () => {
 
   it('refuses bad_reserve when the reserve sits below the starting bid', async () => {
     const h = makeHarness();
-    const res = await h.service.createListing({
+    const res = await createListingSteppedUp(h, {
       account: SELLER,
       characterId: SELLER_CHAR,
       itemRef: { index: 0, itemId: EPIC_ITEM },
@@ -712,7 +1071,7 @@ describe('createListing', () => {
     );
     for (let i = 0; i < WOC_MARKET_MAX_ACTIVE_LISTINGS; i++) await listEpic(h);
     expect(await h.db.countActiveBySeller(REALM, SELLER)).toBe(WOC_MARKET_MAX_ACTIVE_LISTINGS);
-    const res = await h.service.createListing({
+    const res = await createListingSteppedUp(h, {
       account: SELLER,
       characterId: SELLER_CHAR,
       itemRef: { index: 0, itemId: EPIC_ITEM },
@@ -726,7 +1085,7 @@ describe('createListing', () => {
   it('restores the extracted copy when the escrow transaction reports cap_reached', async () => {
     const h = makeHarness();
     h.db.failNextEscrow = 'cap_reached';
-    const res = await h.service.createListing({
+    const res = await createListingSteppedUp(h, {
       account: SELLER,
       characterId: SELLER_CHAR,
       itemRef: { index: 0, itemId: EPIC_ITEM },
@@ -742,7 +1101,7 @@ describe('createListing', () => {
   it('restores the extracted copy when the escrow save loses the lease', async () => {
     const h = makeHarness();
     h.db.failNextEscrow = 'lease_lost';
-    const res = await h.service.createListing({
+    const res = await createListingSteppedUp(h, {
       account: SELLER,
       characterId: SELLER_CHAR,
       itemRef: { index: 0, itemId: EPIC_ITEM },
@@ -3556,7 +3915,7 @@ describe('a directed sale is visible and buyable only to its two parties', () =>
     // one, so it counts and is counted.
     const h = stocked();
     for (let i = 0; i < WOC_MARKET_MAX_ACTIVE_LISTINGS; i += 1) await listEpic(h);
-    const blocked = await h.service.createListing({
+    const blocked = await createListingSteppedUp(h, {
       account: SELLER,
       characterId: SELLER_CHAR,
       itemRef: { index: 0, itemId: EPIC_ITEM },
@@ -3566,7 +3925,7 @@ describe('a directed sale is visible and buyable only to its two parties', () =>
       ok: false,
       reason: 'cap_reached',
     });
-    const directed = await h.service.createListing({
+    const directed = await createListingSteppedUp(h, {
       account: SELLER,
       characterId: SELLER_CHAR,
       itemRef: { index: 0, itemId: EPIC_ITEM },
@@ -3581,7 +3940,7 @@ describe('a directed sale is visible and buyable only to its two parties', () =>
     const h2 = stocked();
     for (let i = 0; i < WOC_MARKET_MAX_ACTIVE_LISTINGS; i += 1) {
       h2.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
-      const row = await h2.service.createListing({
+      const row = await createListingSteppedUp(h2, {
         account: SELLER,
         characterId: SELLER_CHAR,
         itemRef: { index: 0, itemId: EPIC_ITEM },
@@ -3590,7 +3949,7 @@ describe('a directed sale is visible and buyable only to its two parties', () =>
       expect(row.ok, `directed listing ${i} under the cap`).toBe(true);
     }
     h2.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
-    const publicBlocked = await h2.service.createListing({
+    const publicBlocked = await createListingSteppedUp(h2, {
       account: SELLER,
       characterId: SELLER_CHAR,
       itemRef: { index: 0, itemId: EPIC_ITEM },
@@ -3660,9 +4019,10 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     acceptTerms: true,
     ...over,
   });
-  /** The seller's half: names the copy. */
+  /** The seller's half: names the copy, carrying the offer-bound proof the
+   *  custody-committing side owes. */
   const sellerAccepts = (h: Harness, id: number) =>
-    h.service.acceptDirectedOffer(SELLER, id, { index: 0, itemId: EPIC_ITEM }, SELLER_CHAR);
+    acceptSteppedUp(h, SELLER, id, { index: 0, itemId: EPIC_ITEM }, SELLER_CHAR);
   /** The buyer's half: money only, no item. */
   const buyerAccepts = (h: Harness, id: number) =>
     h.service.acceptDirectedOffer(BUYER_A, id, null, CHAR_A);
@@ -3716,7 +4076,8 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     const offer = unwrap(await h.service.createDirectedOffer(offerArgs()), 'createDirectedOffer');
     expect((await buyerAccepts(h, offer.offer.id)).ok).toBe(true);
     h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1, instance: { locked: true } }]);
-    const res = await h.service.acceptDirectedOffer(
+    const res = await acceptSteppedUp(
+      h,
       SELLER,
       offer.offer.id,
       { index: 0, itemId: EPIC_ITEM },
@@ -3810,7 +4171,8 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     const first = await h.service.acceptDirectedOffer(BUYER_A, made.offer.id, null, CHAR_A);
     expect(first.ok).toBe(true);
     h.custody.bags.set(SELLER_CHAR, [{ itemId: otherEpic, count: 1 }]);
-    const second = await h.service.acceptDirectedOffer(
+    const second = await acceptSteppedUp(
+      h,
       SELLER,
       made.offer.id,
       { index: 0, itemId: otherEpic },
@@ -3843,7 +4205,8 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     if (!made.ok) throw new Error('offer refused');
     await h.service.acceptDirectedOffer(BUYER_A, made.offer.id, null, CHAR_A);
     h.db.failNextEscrow = 'not_pending';
-    const out = await h.service.acceptDirectedOffer(
+    const out = await acceptSteppedUp(
+      h,
       SELLER,
       made.offer.id,
       { index: 0, itemId: EPIC_ITEM },
@@ -3873,7 +4236,8 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     h.db.reopenDirectedOffer = async () => {
       throw new Error('timeout exceeded when trying to connect');
     };
-    const out = await h.service.acceptDirectedOffer(
+    const out = await acceptSteppedUp(
+      h,
       SELLER,
       made.offer.id,
       { index: 0, itemId: EPIC_ITEM },
@@ -3903,7 +4267,8 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
       throw new Error('timeout exceeded when trying to connect');
     };
     await expect(
-      h.service.acceptDirectedOffer(
+      acceptSteppedUp(
+        h,
         SELLER,
         made.offer.id,
         { index: 0, itemId: EPIC_ITEM },
@@ -4217,7 +4582,8 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     const first = await h.service.acceptDirectedOffer(BUYER_A, made.offer.id, null, CHAR_A);
     expect(first.ok).toBe(true);
     h.wallets.set(BUYER_A, 'wallet-seller');
-    const second = await h.service.acceptDirectedOffer(
+    const second = await acceptSteppedUp(
+      h,
       SELLER,
       made.offer.id,
       { index: 0, itemId: EPIC_ITEM },
@@ -4245,7 +4611,8 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
       instance: { rolled: { stats: { str: 3 } } } as InvSlot['instance'],
     };
     h.custody.bags.set(SELLER_CHAR, [swapped]);
-    const second = await h.service.acceptDirectedOffer(
+    const second = await acceptSteppedUp(
+      h,
       SELLER,
       offer.offer.id,
       { index: 0, itemId: EPIC_ITEM, expectInstance: swapped.instance },
@@ -4271,7 +4638,8 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     if (!offer.ok) throw new Error(`offer refused: ${(offer as { reason: string }).reason}`);
     const first = await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id, null, CHAR_A);
     if (!first.ok) throw new Error('buyer accept refused');
-    return h.service.acceptDirectedOffer(
+    return acceptSteppedUp(
+      h,
       SELLER,
       offer.offer.id,
       {
@@ -4385,7 +4753,8 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     await h.service.acceptDirectedOffer(BUYER_A, proven.offer.id, null, CHAR_A);
     h.db.failNextEscrowThrow = Object.assign(new Error('unique violation'), { code: '23505' });
     await expect(
-      h.service.acceptDirectedOffer(
+      acceptSteppedUp(
+        h,
         SELLER,
         proven.offer.id,
         { index: 0, itemId: EPIC_ITEM },
@@ -4402,7 +4771,8 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     await h.service.acceptDirectedOffer(BUYER_A, ambiguous.offer.id, null, CHAR_A);
     h.db.failNextEscrowThrow = new Error('socket died mid-commit');
     await expect(
-      h.service.acceptDirectedOffer(
+      acceptSteppedUp(
+        h,
         SELLER,
         ambiguous.offer.id,
         { index: 0, itemId: EPIC_ITEM },
@@ -4420,7 +4790,8 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     const done = await h.service.createDirectedOffer(offerArgs());
     if (!done.ok) throw new Error('offer refused');
     await h.service.acceptDirectedOffer(BUYER_A, done.offer.id, null, CHAR_A);
-    const completed = await h.service.acceptDirectedOffer(
+    const completed = await acceptSteppedUp(
+      h,
       SELLER,
       done.offer.id,
       { index: 0, itemId: EPIC_ITEM },
@@ -4434,7 +4805,8 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     await h.service.acceptDirectedOffer(BUYER_A, stuck.offer.id, null, CHAR_A);
     h.db.failNextEscrowThrow = new Error('socket died mid-commit');
     await expect(
-      h.service.acceptDirectedOffer(
+      acceptSteppedUp(
+        h,
         SELLER,
         stuck.offer.id,
         { index: 0, itemId: EPIC_ITEM },
@@ -4477,7 +4849,8 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     await h.service.acceptDirectedOffer(BUYER_A, stuck.offer.id, null, CHAR_A);
     h.db.failNextEscrowThrow = new Error('socket died mid-commit');
     await expect(
-      h.service.acceptDirectedOffer(
+      acceptSteppedUp(
+        h,
         SELLER,
         stuck.offer.id,
         { index: 0, itemId: EPIC_ITEM },
@@ -5217,7 +5590,7 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     h.custody.bags.set(CHAR_TWIN, [{ itemId: EPIC_ITEM, count: 1 }]);
     const first = await listEpic(h);
     const second = unwrap(
-      await h.service.createListing({
+      await createListingSteppedUp(h, {
         account: WALLET_TWIN,
         characterId: CHAR_TWIN,
         itemRef: { index: 0, itemId: EPIC_ITEM },
@@ -5284,7 +5657,7 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     h.custody.owners.set(CHAR_TWIN, WALLET_TWIN);
     h.custody.bags.set(CHAR_TWIN, [{ itemId: EPIC_ITEM, count: 1 }]);
     const second = unwrap(
-      await h.service.createListing({
+      await createListingSteppedUp(h, {
         account: WALLET_TWIN,
         characterId: CHAR_TWIN,
         itemRef: { index: 0, itemId: EPIC_ITEM },
@@ -5431,8 +5804,8 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     const h = stocked();
     const offer = await h.service.createDirectedOffer(offerArgs());
     if (!offer.ok) throw new Error('offer refused');
-    const res = await h.service.acceptDirectedOffer(SELLER, offer.offer.id, null, SELLER_CHAR);
-    expect(res.ok).toBe(false);
+    const res = await acceptSteppedUp(h, SELLER, offer.offer.id, null, SELLER_CHAR);
+    expect(res).toEqual({ ok: false, reason: 'character_invalid' });
   });
 
   it('a sequential second accept is also refused', async () => {
@@ -5525,7 +5898,8 @@ describe('a directed sale carries the consequences of the rail it rides', () => 
     if (!offer.ok) throw new Error('offer refused');
     const first = await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id, null, CHAR_A);
     if (!first.ok) throw new Error('buyer accept refused');
-    const accepted = await h.service.acceptDirectedOffer(
+    const accepted = await acceptSteppedUp(
+      h,
       SELLER,
       offer.offer.id,
       { index: 0, itemId: EPIC_ITEM },
@@ -5734,6 +6108,9 @@ describe('the sweep expires unanswered directed offers', () => {
     if (!made.ok) throw new Error('offer refused');
     h.setNow(made.offer.expiresAtMs + 1);
     await h.service.sweepPass();
+    // Deliberately bearer-only: the expired-offer refusal lands BEFORE the
+    // step-up gate (status precedes proof in the ladder), so no proof is
+    // mintable for it either (the challenge issue refuses the same way).
     const res = await h.service.acceptDirectedOffer(
       SELLER,
       made.offer.id,
@@ -6027,7 +6404,8 @@ async function directedSale(h: Harness, signature: string): Promise<{ listingId:
     'buyer accept',
   );
   const accepted = unwrap(
-    await h.service.acceptDirectedOffer(
+    await acceptSteppedUp(
+      h,
       SELLER,
       offer.offer.id,
       { index: 0, itemId: EPIC_ITEM },

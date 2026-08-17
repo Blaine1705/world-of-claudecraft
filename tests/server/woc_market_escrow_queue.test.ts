@@ -224,6 +224,7 @@ function makeRig(
     custody,
     verifiedWallet: async () => 'wallet-seller',
     balanceTokens: async () => 100_000_000,
+    stepUpDevSig: true,
     config: {
       enabled: true,
       realm: REALM,
@@ -249,12 +250,29 @@ function makeRig(
   };
 }
 
-function createListing(rig: Rig) {
+async function createListing(rig: Rig) {
+  // The step-up proof (B6/R1), minted devsig through the real issue path so
+  // this suite keeps exercising the escrow queue, not the challenge ladder.
+  const params = listingParams();
+  const issue = await rig.service.issueStepUpChallenge(SELLER, {
+    operation: 'create_listing',
+    itemId: EPIC_ITEM,
+    format: params.format,
+    startCents: params.startCents,
+    reserveCents: params.reserveCents,
+    buyNowCents: params.buyNowCents,
+    durationHours: params.durationHours,
+  });
+  if (!issue.ok) throw new Error(`issueStepUpChallenge refused: ${issue.reason}`);
   return rig.service.createListing({
     account: SELLER,
     characterId: SELLER_CHAR,
     itemRef: { index: rig.itemIndex(), itemId: EPIC_ITEM },
-    params: listingParams(),
+    params,
+    stepUp: {
+      nonce: issue.challenge.nonce,
+      signature: `devsig:${issue.challenge.nonce}`,
+    },
   });
 }
 

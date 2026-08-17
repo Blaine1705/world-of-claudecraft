@@ -8766,6 +8766,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.invalid_params':
     '開始価格、最低落札価格、即決価格、期間を確認してください。',
   'apiError.woc_market.signature_reused': 'そのトランザクションは既に送信されています。',
+  'apiError.woc_market.stepup_required':
+    '取引所で販売するには、連携済みウォレットの署名が必要です。',
+  'apiError.woc_market.stepup_challenge_invalid':
+    'そのウォレット確認は無効になりました。販売をやり直してください。',
+  'apiError.woc_market.stepup_challenge_expired':
+    'ウォレット確認の期限が切れました。販売をやり直してください。',
+  'apiError.woc_market.stepup_wallet_mismatch':
+    'この確認の発行後に連携済みウォレットが変更されました。販売をやり直してください。',
+  'apiError.woc_market.stepup_binding_mismatch':
+    'そのウォレット確認はこの販売と一致しません。販売をやり直してください。',
+  'apiError.woc_market.stepup_signature_invalid':
+    'ウォレット署名を検証できませんでした。販売をやり直してください。',
   'hudChrome.wocMarket.title': '$WOC 取引所',
   'hudChrome.wocMarket.close': '取引所を閉じる',
   'hudChrome.wocMarket.launcherLabel': '$WOC 取引所',

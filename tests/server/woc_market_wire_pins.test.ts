@@ -645,6 +645,50 @@ describe('listingView state booleans', () => {
 // ---------------------------------------------------------------------------
 
 describe('response wrappers expose exactly their pinned key sets', () => {
+  it('POST /step-up/challenge wraps as { challenge } with the exact key set and values', async () => {
+    // The step-up issue response (B6/R1): everything the client needs to run
+    // the wallet flow and NOTHING else (no digest, no wallet echo, no realm).
+    service({
+      issueStepUpChallenge: async () => ({
+        ok: true,
+        challenge: {
+          nonce: 'a'.repeat(32),
+          message: 'World of ClaudeCraft $WOC Exchange: authorize moving an item into escrow.',
+          expiresAtMs: FAR_FUTURE_MS,
+          signatureRequired: true,
+        },
+      }),
+    });
+    const ctx = readCtx({
+      method: 'POST',
+      url: '/api/woc-market/step-up/challenge',
+      account: { accountId: VIEWER, scope: 'full' },
+      body: {
+        operation: 'create_listing',
+        itemId: 'deathlord_warplate',
+        format: 'auction',
+        startCents: 2500,
+        reserveCents: null,
+        buyNowCents: null,
+        durationHours: 12,
+      },
+    });
+    await handlerFor('POST', '/api/woc-market/step-up/challenge')(ctx);
+    const { status, body } = sent(ctx);
+    expect(status).toBe(200);
+    expect(Object.keys(body).sort()).toEqual(['challenge']);
+    const challenge = body.challenge as Record<string, unknown>;
+    expect(Object.keys(challenge).sort()).toEqual([
+      'expiresAtMs',
+      'message',
+      'nonce',
+      'signatureRequired',
+    ]);
+    expect(challenge.nonce).toBe('a'.repeat(32));
+    expect(challenge.expiresAtMs).toBe(FAR_FUTURE_MS);
+    expect(challenge.signatureRequired).toBe(true);
+  });
+
   it('GET /me', async () => {
     const body = await meBody({});
     expect(Object.keys(body).sort()).toEqual(

@@ -166,6 +166,7 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       custody: inertCustody,
       verifiedWallet: async () => 'wallet-fixture',
       balanceTokens: async () => 1_000_000,
+      stepUpDevSig: true,
       config: {
         enabled: true,
         realm,

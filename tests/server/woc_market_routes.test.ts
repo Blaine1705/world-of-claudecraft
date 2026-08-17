@@ -35,6 +35,10 @@ import {
   routes,
   wocMarketConfig,
 } from '../../server/woc_market_routes';
+import { WocMarketService as WocMarketServiceReal } from '../../server/woc_market';
+import { createDevWocMarketEconomy } from '../../server/woc_market_proxy';
+import { WOC_MARKET_RESTRICTED_POLICY } from '../../server/woc_market_rules';
+import { FakeWocMarketDb } from './helpers/fake_woc_market_db';
 import { type FakeCtxOverrides, type FakeRes, fakeCtx } from './helpers';
 
 const VIEWER = 7;
@@ -121,7 +125,7 @@ describe('the refusal-to-wire mapping', () => {
     const rows = Object.entries(REFUSAL_ERRORS);
     // The EXACT count, not a floor. A floor of 35 let four union members vanish
     // silently; tsc catches a deleted Record key but not a shrunken union.
-    expect(rows).toHaveLength(52);
+    expect(rows).toHaveLength(58);
     for (const [reason, mapped] of rows) {
       expect(mapped.code, reason).toMatch(/^woc_market\./);
       expect(mapped.status, reason).toBeGreaterThanOrEqual(400);
@@ -220,6 +224,15 @@ describe('the refusal-to-wire mapping', () => {
     ['recipient_wallet_required', 403, 'woc_market.recipient_wallet_required'],
     ['self_offer', 400, 'woc_market.self_offer'],
     ['offer_expired', 410, 'woc_market.offer_expired'],
+    // Wallet step-up on the custody movers (B6/R1): 403 auth-class, except
+    // the lapsed challenge, a 410 like offer_expired (the fix is a fresh
+    // challenge, not different credentials).
+    ['stepup_required', 403, 'woc_market.stepup_required'],
+    ['stepup_challenge_invalid', 403, 'woc_market.stepup_challenge_invalid'],
+    ['stepup_challenge_expired', 410, 'woc_market.stepup_challenge_expired'],
+    ['stepup_wallet_mismatch', 403, 'woc_market.stepup_wallet_mismatch'],
+    ['stepup_binding_mismatch', 403, 'woc_market.stepup_binding_mismatch'],
+    ['stepup_signature_invalid', 403, 'woc_market.stepup_signature_invalid'],
   ];
 
   it('pins EVERY refusal in the map, with no row left to the generic sweep', () => {
@@ -852,7 +865,7 @@ describe('the :id parameter', () => {
 describe('the route table shape', () => {
   it('gates every route behind a guard, and every mutation behind a limiter too', () => {
     const api = routes.filter((r) => r.surface === 'api');
-    expect(api).toHaveLength(21);
+    expect(api).toHaveLength(22);
     for (const route of api) {
       expect(route.middleware?.length ?? 0, `${route.method} ${route.path}`).toBeGreaterThan(0);
     }
@@ -1034,5 +1047,208 @@ describe('the confirming-review bound env knob', () => {
     expect(wocMarketConfig().confirmingReviewMs).toBe(720 * HOUR_MS);
     process.env[KEY] = '719';
     expect(wocMarketConfig().confirmingReviewMs).toBe(719 * HOUR_MS);
+  });
+});
+
+describe('the step-up surface at the route layer (B6/R1)', () => {
+  const LISTING_BODY = {
+    characterId: 12,
+    itemIndex: 0,
+    itemId: 'deathlord_warplate',
+    format: 'auction',
+    startCents: 2500,
+    reserveCents: null,
+    buyNowCents: null,
+    durationHours: 12,
+    offerNext: false,
+  };
+  const PROOF = { nonce: 'a'.repeat(32), signature: 'b'.repeat(87) };
+
+  function postCtx(url: string, body: Record<string, unknown>, over: FakeCtxOverrides = {}) {
+    return fakeCtx({
+      method: 'POST',
+      url,
+      account: { accountId: VIEWER, scope: 'full' },
+      body,
+      ...over,
+    });
+  }
+
+  it('passes the proof through to createListing verbatim, and NEVER a directed marker', async () => {
+    // The service skips re-verification when args.directed is set (the
+    // internal consummation call), so this handler must be structurally
+    // unable to set it: a hostile body smuggling a directed key changes
+    // nothing about what the service receives.
+    let seen: Record<string, unknown> | null = null;
+    service({
+      createListing: async (args: unknown) => {
+        seen = args as Record<string, unknown>;
+        return { ok: true, listing: listingRow() } as never;
+      },
+    });
+    const ctx = postCtx('/api/woc-market/listings', {
+      ...LISTING_BODY,
+      stepUp: PROOF,
+      directed: { offerId: 1, itemPin: 'forged' },
+    });
+    await handlerFor('POST', '/api/woc-market/listings')(ctx);
+    expect(seen).not.toBeNull();
+    expect((seen as unknown as { stepUp: unknown }).stepUp).toEqual(PROOF);
+    expect(
+      Object.hasOwn(seen as unknown as object, 'directed'),
+      'directed is handler-owned, never decoded',
+    ).toBe(false);
+  });
+
+  it('passes the proof to acceptDirectedOffer as the fifth argument', async () => {
+    let seenStepUp: unknown = 'unset';
+    service({
+      acceptDirectedOffer: async (
+        _account: number,
+        _id: number,
+        _ref: unknown,
+        _char: number,
+        stepUp?: unknown,
+      ) => {
+        seenStepUp = stepUp;
+        return { ok: true, listing: null } as never;
+      },
+    });
+    const ctx = postCtx(
+      '/api/woc-market/offers/41/accept',
+      { characterId: 12, stepUp: PROOF },
+      { params: { id: '41' } },
+    );
+    await handlerFor('POST', '/api/woc-market/offers/:id/accept')(ctx);
+    expect(seenStepUp).toEqual(PROOF);
+  });
+
+  it('an ABSENT proof decodes to absent (the service answers stepup_required, not the router)', async () => {
+    let seen: Record<string, unknown> | null = null;
+    service({
+      createListing: async (args: unknown) => {
+        seen = args as Record<string, unknown>;
+        return { ok: false, reason: 'stepup_required' } as never;
+      },
+    });
+    const ctx = postCtx('/api/woc-market/listings', LISTING_BODY);
+    await expect(handlerFor('POST', '/api/woc-market/listings')(ctx)).rejects.toMatchObject({
+      status: 403,
+      code: 'woc_market.stepup_required',
+    });
+    expect(Object.hasOwn(seen as unknown as object, 'stepUp')).toBe(false);
+  });
+
+  it('a malformed proof shape refuses invalid_input BEFORE the service runs', async () => {
+    let called = 0;
+    service({
+      createListing: async () => {
+        called += 1;
+        return { ok: true, listing: listingRow() } as never;
+      },
+    });
+    for (const stepUp of ['garbage', 42, [], { nonce: 'x' }, { signature: 'y' }, { nonce: '', signature: 'z' }]) {
+      const ctx = postCtx('/api/woc-market/listings', { ...LISTING_BODY, stepUp });
+      await expect(
+        handlerFor('POST', '/api/woc-market/listings')(ctx),
+        JSON.stringify(stepUp),
+      ).rejects.toMatchObject({ code: 'woc_market.invalid_input' });
+    }
+    expect(called).toBe(0);
+  });
+
+  it('challenge decode: an unknown operation refuses invalid_input without a service call', async () => {
+    let called = 0;
+    service({
+      issueStepUpChallenge: async () => {
+        called += 1;
+        return { ok: false, reason: 'not_found' } as never;
+      },
+    });
+    for (const operation of ['refund_everything', '', 7, undefined]) {
+      const ctx = postCtx('/api/woc-market/step-up/challenge', {
+        operation,
+        itemId: 'deathlord_warplate',
+      });
+      await expect(
+        handlerFor('POST', '/api/woc-market/step-up/challenge')(ctx),
+        String(operation),
+      ).rejects.toMatchObject({ code: 'woc_market.invalid_input' });
+    }
+    expect(called).toBe(0);
+  });
+
+  it('challenge decode: the listing shape holds the same bounds as the listing intake', async () => {
+    service({
+      issueStepUpChallenge: async () => {
+        throw new Error('must not be reached');
+      },
+    });
+    const base = {
+      operation: 'create_listing',
+      itemId: 'deathlord_warplate',
+      format: 'auction',
+      startCents: 2500,
+      reserveCents: null,
+      buyNowCents: null,
+      durationHours: 12,
+    };
+    for (const bad of [
+      { ...base, startCents: 1 },
+      { ...base, startCents: 100_001 },
+      { ...base, format: 'raffle' },
+      { ...base, durationHours: 0 },
+      { ...base, itemId: '' },
+    ]) {
+      const ctx = postCtx('/api/woc-market/step-up/challenge', bad);
+      await expect(handlerFor('POST', '/api/woc-market/step-up/challenge')(ctx)).rejects
+        .toMatchObject({ code: 'woc_market.invalid_input' });
+    }
+  });
+
+  it('a bearer-only custody move refuses stepup_required through the REAL service, whatever the client claims to be', async () => {
+    // Deliverable 4's posture pin: enforcement lives in the service on the
+    // PROOF alone, so no header a client controls (a native app, a desktop
+    // shell, a scripted bearer) changes the answer. Real WocMarketService,
+    // real refusal table; custody is a cast stub because the refusal lands
+    // before any custody call.
+    const db = new FakeWocMarketDb({ characters: [] });
+    configureWocMarketRuntime({
+      service: new WocMarketServiceReal({
+        db,
+        economy: createDevWocMarketEconomy(),
+        custody: {} as never,
+        verifiedWallet: async () => 'SELLERWALLETPUBKEY111111111111111111111111',
+        balanceTokens: async () => 1_000_000,
+        stepUpDevSig: false,
+        config: {
+          enabled: true,
+          realm: 'Claudemoon',
+          policy: WOC_MARKET_RESTRICTED_POLICY,
+          confirmingReviewMs: 6 * 3_600_000,
+        },
+      }),
+    });
+    for (const userAgent of [
+      'Mozilla/5.0 (Macintosh) Chrome/126 browser-web',
+      'WoCC-Native-Android/1.0 (Capacitor)',
+      'curl/8.6.0',
+    ]) {
+      const ctx = postCtx('/api/woc-market/listings', LISTING_BODY, {
+        headers: { 'user-agent': userAgent },
+      });
+      await expect(handlerFor('POST', '/api/woc-market/listings')(ctx), userAgent).rejects
+        .toMatchObject({ status: 403, code: 'woc_market.stepup_required' });
+    }
+  });
+
+  it('challenge refusals ride the refusal table: a wallet-less account reads wallet_required', async () => {
+    service({ issueStepUpChallenge: async () => ({ ok: false, reason: 'wallet_required' }) });
+    const ctx = postCtx('/api/woc-market/step-up/challenge', {
+      operation: 'accept_directed_offer',
+      offerId: 41,
+    });
+    await expect(handlerFor('POST', '/api/woc-market/step-up/challenge')(ctx)).rejects
+      .toMatchObject({ status: 403, code: 'woc_market.wallet_required' });
   });
 });

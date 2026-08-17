@@ -163,6 +163,12 @@ const KNOWN_CODES = [
   'woc_market.invalid_params',
   'woc_market.signature_reused',
   'woc_market.item_locked',
+  'woc_market.stepup_required',
+  'woc_market.stepup_challenge_invalid',
+  'woc_market.stepup_challenge_expired',
+  'woc_market.stepup_wallet_mismatch',
+  'woc_market.stepup_binding_mismatch',
+  'woc_market.stepup_signature_invalid',
 ];
 
 // The parametric contract pins: the matcher
