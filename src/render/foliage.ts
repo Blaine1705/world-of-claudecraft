@@ -41,6 +41,7 @@ import {
   insideEastbrookGrassExclusion,
   insideGrassHubExclusion,
 } from './foliage_core';
+import { survivesLeanDecimation } from './foliage_decimation_core';
 import {
   createImpostorSession,
   type ImpostorBucketHandle,
@@ -1613,16 +1614,7 @@ function buildTrees(
   );
   const sourceDecos = !GFX.leanFoliage
     ? decos
-    : decos.filter((d) => {
-        const keep = GFX.standardMaterials
-          ? d.kind === 'rock'
-            ? 0.74
-            : 0.68
-          : d.kind === 'rock'
-            ? 0.55
-            : 0.46;
-        return hashAt(d.x, d.z, 83) < keep;
-      });
+    : decos.filter((d) => survivesLeanDecimation(d, hashAt(d.x, d.z, 83), GFX.standardMaterials));
   const buckets = new Map<string, Bucket>();
   for (const d of sourceDecos) {
     const col = d.x < 0 ? 0 : 1;
