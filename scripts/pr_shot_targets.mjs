@@ -2518,8 +2518,8 @@ export const TARGETS = [
         sim.acceptQuest?.('q_prof_intro');
         if (sim.questState?.('q_prof_intro') !== 'active')
           return { ok: false, reason: `quest state ${sim.questState?.('q_prof_intro')}` };
-        p.pos.x = -84; // Copper Dig, Eastbrook Vale
-        p.pos.z = -64;
+        p.pos.x = -144; // Copper Dig, Eastbrook Vale (the dig headland)
+        p.pos.z = -88;
         const el = document.querySelector('#map-window');
         // Force hidden first so pollForSize cannot pass on a window that was already
         // up from an earlier target in the same run (the market recipe's precedent).
@@ -3011,7 +3011,7 @@ export const TARGETS = [
         try {
           // The vein sits inside the Copper Dig mob camp: silence the camp
           // FIRST (the test-suite despawnMobs idiom) or the level-1 subject
-          // dies mid-hover, then teleport beside ore_eastbrook_1 at (-70,-53).
+          // dies mid-hover, then teleport beside ore_eastbrook_1 at (-130,-77).
           for (const e of sim?.entities?.values?.() ?? []) {
             if (e.kind !== 'mob') continue;
             e.dead = true;
@@ -3021,7 +3021,7 @@ export const TARGETS = [
             e.corpseTimer = 9999;
             e.inCombat = false;
           }
-          sim?.chat?.('/dev tp -70 -52');
+          sim?.chat?.('/dev tp -130 -76');
           if (mode === 'tooled') sim?.addItem?.('copper_mining_pick', 1);
           // A tier-2 pick at mining 0: covering but unwieldable, the state
           // R22 added. The tooltip must show the wield line, not a downgrade.

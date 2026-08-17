@@ -84,7 +84,11 @@ const PINNED_ROSTER: { mobId: string; count: number }[] = [
 // silently shrink when a camp is pushed past the starter band. A packed camp is one
 // with at least two mobs (a named rare spawns alone, so it has no intra-camp
 // spacing to fix) whose disc reaches into the starter band.
-const GOVERNED_INDICES = [0, 1, 3, 4, 6, 7, 8, 9, 12];
+// Camp 8 (tunnel_rat) left this set 2026-08: the Copper Dig cluster relocated
+// to the dig headland for the New Eastbrook program (a 5.9 degree, 63 yd
+// outward move along its shipped bearing; docs/design/eastbrook-revamp/
+// master-plan.md), which carries its disc out of the starter band entirely.
+const GOVERNED_INDICES = [0, 1, 3, 4, 6, 7, 9, 12];
 
 // Where each governed camp sat BEFORE this retune, so the fix is provably an
 // outward push along the same bearing rather than a relocation. Index-aligned with
@@ -96,7 +100,6 @@ const SHIPPED_PLACEMENT: { x: number; z: number }[] = [
   { x: 80, z: -15 },
   { x: -60, z: 5 },
   { x: -75, z: 57 },
-  { x: -82, z: -62 },
   { x: 65, z: -65 },
   { x: 80, z: 78 },
 ];

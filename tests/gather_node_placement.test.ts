@@ -1303,9 +1303,11 @@ describe('gather node placement: every node sits on ground a player can work', (
     const reach = grix.radius + scaledAggro(mob.aggroRadius, mob.maxLevel, 1);
     const clearanceAt = (x: number, z: number) =>
       Math.hypot(x - grix.center.x, z - grix.center.z) - reach - REACH;
-    // The shipped-then-moved spots: both inside the scaled reach.
-    expect(clearanceAt(-99, -56)).toBeLessThan(0);
-    expect(clearanceAt(-76, -79)).toBeLessThan(0);
+    // The shipped-then-moved spots, carried through the 2026-08 headland
+    // translation (-60,-24) so they keep their original offsets from Grix:
+    // both inside the scaled reach.
+    expect(clearanceAt(-159, -80)).toBeLessThan(0);
+    expect(clearanceAt(-136, -103)).toBeLessThan(0);
     // Their replacements clear it with real margin.
     const five = GATHER_NODES.find((n) => n.id === 'ore_eastbrook_5');
     const six = GATHER_NODES.find((n) => n.id === 'ore_eastbrook_6');

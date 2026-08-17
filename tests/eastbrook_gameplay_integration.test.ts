@@ -252,7 +252,7 @@ describe('Eastbrook authored gameplay data integration', () => {
       EASTBROOK_LAYOUT.fences.map((fence) => fence.id),
     );
 
-    expect(ZONE1_PROPS.mines).toEqual([{ x: -88, z: -68, rot: 0.8 }]);
+    expect(ZONE1_PROPS.mines).toEqual([{ x: -148, z: -92, rot: 0.8 }]);
     expect(ZONE1_PROPS.docks).toEqual([
       { x: -64, z: 60, rot: -2.2, hutLocal: { x: 2.8, z: 2.4, hw: 1.7, hd: 1.5 } },
     ]);
@@ -272,7 +272,7 @@ describe('Eastbrook authored gameplay data integration', () => {
     expect(ZONE1_PROPS.campfires).toEqual([
       [65, -65],
       [90, -90],
-      [-80, -60],
+      [-140, -84],
       [-61, 56],
     ]);
     expect(ZONE1_PROPS.mudHuts).toEqual([
@@ -307,7 +307,7 @@ describe('Eastbrook authored gameplay data integration', () => {
       { x: 55, z: 12 },
       { x: 65, z: -65 },
       { x: -66, z: 58 },
-      { x: -70, z: -55 },
+      { x: -132, z: -82 },
       { x: 78, z: 74 },
     ]);
   });

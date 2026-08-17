@@ -1230,19 +1230,22 @@ describe('zone-map gather nodes', () => {
   it('culls nodes outside the zoomed view rect (pan pays only for what is on screen)', () => {
     // zoom 3 framed at the player (0, 0): the visible square is 120yd wide
     // and the cull pads it by the marker margin, so the band runs to +-84yd.
-    // The Copper Dig west field stays inside the pad; the far-west veins and
-    // the outlying wood / herb spawns drop. Both sides of the z bound are
-    // named: the Sowfield herb sits 15yd inside it and the boar-downs herb
-    // well outside, so a cull that stopped culling and one that culled
-    // everything both red.
+    // The whole Copper Dig ore field sits on the dig headland since the New
+    // Eastbrook relocation, entirely west of the pad, so every vein culls;
+    // the near-edge discrimination the old vein pair gave comes from
+    // wood_eastbrook_3 (16yd inside the west bound) and herb_eastbrook_5
+    // (5yd past the east bound). Both sides of the z bound are named too, so
+    // a cull that stopped culling and one that culled everything both red.
     const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), 3));
     const kept = new Set(model.gatherNodes.map((n) => n.nodeId));
     expect(kept.has('wood_eastbrook_2')).toBe(true); // (-57, -6): in view
-    expect(kept.has('ore_eastbrook_1')).toBe(true); // (-70, -53): inside the pad
-    expect(kept.has('ore_eastbrook_4')).toBe(false); // (-92, -48): west of the pad
+    expect(kept.has('wood_eastbrook_3')).toBe(true); // (-68, 18): inside the pad
+    expect(kept.has('ore_eastbrook_1')).toBe(false); // (-130, -77): headland, west of the pad
+    expect(kept.has('ore_eastbrook_4')).toBe(false); // (-152, -72): west of the pad
+    expect(kept.has('herb_eastbrook_5')).toBe(false); // (89, -27): just past the east bound
     expect(kept.has('herb_eastbrook_4')).toBe(true); // (6, -69): inside the pad
     expect(kept.has('wood_eastbrook_5')).toBe(false); // (7, 140): north of the pad
-    expect(model.gatherNodes).toHaveLength(9);
+    expect(model.gatherNodes).toHaveLength(5);
   });
 
   it('never leaks nodes from another zone into the committed zone model', () => {

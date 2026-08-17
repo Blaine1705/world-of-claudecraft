@@ -1578,6 +1578,7 @@ const VALE_LAND_LOBES = [
   { x: 168, z: 172, r: 42 }, // the northeast border corner
   { x: -100, z: 85, r: 70 }, // the western downs and Mirror Lake's shore
   { x: -95, z: -55, r: 70 }, // the southwest pastures (Grix's tunnel)
+  { x: -138, z: -95, r: 58 }, // the dig headland: holds the relocated Copper Dig (New Eastbrook program)
   { x: 45, z: -85, r: 84 }, // the south fields (the bandit camp)
   { x: 108, z: -52, r: 60 }, // the southwest rise (mogger's hollow)
   { x: 100, z: 70, r: 62 }, // the west meadows

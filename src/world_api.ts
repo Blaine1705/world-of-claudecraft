@@ -122,7 +122,10 @@ export type {
 // before either binary loads a character into a differently shaped world.
 // 6 = the class-overhauls integration layout on top of the v0.35.0 base layout
 // (both sides of the 2026-08 base merge bumped independently: 4 and 5).
-export const ONLINE_WORLD_LAYOUT_VERSION = 6 as const;
+// 7 = the New Eastbrook program's Copper Dig relocation to the dig headland
+// (new coast lobe, dig terrain stamp, moved camps/props/veins and colliders;
+// docs/design/eastbrook-revamp/master-plan.md).
+export const ONLINE_WORLD_LAYOUT_VERSION = 7 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI

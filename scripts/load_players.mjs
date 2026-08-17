@@ -73,7 +73,7 @@ const SPOTS = [
   { name: 'boars ridge', x: 84, z: -27, radius: 23.5 },
   { name: 'spiders', x: -68, z: 2, radius: 28.5 },
   { name: 'murlocs', x: -75, z: 57, radius: 15 },
-  { name: 'rats', x: -82, z: -62, radius: 33 },
+  { name: 'rats', x: -142, z: -86, radius: 33 },
   { name: 'bandits west', x: 50, z: -72, radius: 28.5 },
   { name: 'bandits east', x: 90, z: -90, radius: 16 },
   { name: 'bones', x: 82, z: 78, radius: 28.5 },

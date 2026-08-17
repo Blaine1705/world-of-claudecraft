@@ -63,14 +63,21 @@ export const GATHER_NODES: GatherNodeDef[] = [
   // zone's mine-themed POI, zone1.ts pois); moved here from Boar Meadow (a
   // wolf/boar mob area with no mining flavor and no discoverable landmark)
   // so q_prof_intro's ore veins actually sit somewhere players can find them.
-  // Nudged toward the town-facing edge of the tunnel_rat camp (center -82,-62,
-  // radius 20) so a level 1-2 miner picking up q_prof_intro can reach ore
+  // Nudged toward the town-facing edge of the tunnel_rat camp (center -142,-86,
+  // radius 33) so a level 1-2 miner picking up q_prof_intro can reach ore
   // without crossing all the way to the camp's interior first.
+  //
+  // 2026-08: the whole field translated rigidly by (-60,-24) with the rest of
+  // the Copper Dig cluster (camp, POI, portal, Grix) to the dig headland, for
+  // the New Eastbrook program (docs/design/eastbrook-revamp/master-plan.md).
+  // Every distance in the notes below is intra-cluster and survived the
+  // translation unchanged; absolute coordinates in the two "Moved off" notes
+  // refer to the old site and are kept as history.
   {
     id: 'ore_eastbrook_1',
     zoneId: 'eastbrook_vale',
     type: 'ore',
-    pos: { x: -70, z: -53 },
+    pos: { x: -130, z: -77 },
     level: 4,
     tier: 1,
   },
@@ -78,7 +85,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'ore_eastbrook_2',
     zoneId: 'eastbrook_vale',
     type: 'ore',
-    pos: { x: -73, z: -49 },
+    pos: { x: -133, z: -73 },
     level: 4,
     tier: 1,
   },
@@ -86,7 +93,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'ore_eastbrook_3',
     zoneId: 'eastbrook_vale',
     type: 'ore',
-    pos: { x: -67, z: -57 },
+    pos: { x: -127, z: -81 },
     level: 4,
     tier: 1,
   },
@@ -98,7 +105,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
   // Grix clearance below deciding their exact spots.
   //
   // The whole field keeps clear of Grix the Tunnelking, the zone's rare
-  // elite, who spawns at (-95, -78) with a 4-yard ring and a 13-yard BASE
+  // elite, who spawns at (-155, -102) with a 4-yard ring and a 13-yard BASE
   // aggro radius. Base is not the real reach: aggro is level-scaled
   // (src/sim/mob/locomotion.ts, 1.5 yards per level over the player, clamped
   // at MAX_AGGRO_RADIUS), so against the level-1 characters q_prof_intro
@@ -116,7 +123,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'ore_eastbrook_4',
     zoneId: 'eastbrook_vale',
     type: 'ore',
-    pos: { x: -92, z: -48 },
+    pos: { x: -152, z: -72 },
     level: 4,
     tier: 1,
   },
@@ -128,7 +135,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'ore_eastbrook_5',
     zoneId: 'eastbrook_vale',
     type: 'ore',
-    pos: { x: -87, z: -45 },
+    pos: { x: -147, z: -69 },
     level: 4,
     tier: 1,
   },
@@ -139,7 +146,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'ore_eastbrook_6',
     zoneId: 'eastbrook_vale',
     type: 'ore',
-    pos: { x: -65, z: -69 },
+    pos: { x: -125, z: -93 },
     level: 4,
     tier: 1,
   },

@@ -12,6 +12,7 @@ import { WORK_ORDER_CADENCE_TICKS } from '../professions/cadence';
 import type {
   CampDef,
   GroundObjectDef,
+  HeightStamp,
   MobTemplate,
   NpcDef,
   QuestDef,
@@ -21,6 +22,15 @@ import type {
 
 export const TOWN_RADIUS = 26;
 export const GRAVEYARD_POS = { ...EASTBROOK_LAYOUT.services.graveyard.legacyReleasePoint };
+// The dig headland: the Copper Dig site moved out of the southern basin for the
+// New Eastbrook program (docs/design/eastbrook-revamp/master-plan.md). The
+// headland lobe in world.ts VALE_LAND_LOBES makes the ground land instead of
+// sea; this level stamp holds the site itself at working grade above the shore
+// profile (the jail's cage pad is the mode: 'level' precedent). Radius covers
+// the full kobold scatter disc, every ore vein, and Grix's camp.
+export const COPPER_DIG_TERRAIN_EDITS: HeightStamp[] = [
+  { x: -142, z: -86, radius: 70, delta: -0.6, falloff: 'smooth', mode: 'level' },
+];
 // Basin carved into the heightfield. Pushed to the far northeast so its
 // shoreline meets the fishing dock and the murloc camp instead of drowning them.
 export const LAKE = { x: -92, z: 88, radius: 30 };
@@ -41,7 +51,7 @@ export const ZONE1_ZONE: ZoneDef = {
     { x: 65, z: 0, label: 'Boar Meadow', id: 'boar_meadow' },
     { x: -88, z: 82, label: 'Mirror Lake', id: 'mirror_lake' },
     { x: -60, z: 4, label: 'Sableweb', id: 'sableweb' },
-    { x: -84, z: -64, label: 'Copper Dig', id: 'copper_dig' },
+    { x: -144, z: -88, label: 'Copper Dig', id: 'copper_dig' },
     { x: 76, z: -76, label: 'Bandit Camp', id: 'bandit_camp' },
     { x: 80, z: 80, label: 'Fallen Chapel', id: 'fallen_chapel' },
     { x: -5, z: -52, label: 'Reliquary Hill', id: 'reliquary_hill' },
@@ -1579,8 +1589,11 @@ export const ZONE1_CAMPS: CampDef[] = [
   // the documented exception and the lake guard live in
   // tests/eastbrook_camp_spacing.test.ts.
   { mobId: 'mudfin_murloc', center: { x: -75, z: 57 }, radius: 15, count: 5 },
-  // Kobolds: mine southeast. Held in place (the mine and its colliders are here).
-  { mobId: 'tunnel_rat', center: { x: -82, z: -62 }, radius: 33, count: 8 },
+  // Kobolds: mine southeast. Moved with the whole Copper Dig cluster from
+  // (-82,-62) to the dig headland (a rigid -60,-24 translation, same bearing
+  // from town so "southeast" stays true) to free the southern basin flank for
+  // the New Eastbrook program (docs/design/eastbrook-revamp/master-plan.md).
+  { mobId: 'tunnel_rat', center: { x: -142, z: -86 }, radius: 33, count: 8 },
   // Bandits: southwest camp. Shifted off its own campfire collider and clear of the
   // boar meadow; the tents, crates and supply drops all stay inside the disc, and it
   // no longer merges with the outpost below.
@@ -1648,7 +1661,15 @@ export const ZONE1_ROADS: { x: number; z: number }[][] = [
   [...EASTBROOK_LAYOUT.roads[1].points, { x: 30, z: 8 }, { x: 55, z: 12 }], // west to boars
   [...EASTBROOK_LAYOUT.roads[2].points, { x: 30, z: -30 }, { x: 50, z: -50 }, { x: 65, z: -65 }], // southwest to bandits
   [...EASTBROOK_LAYOUT.roads[3].points, { x: -35, z: 25 }, { x: -58, z: 48 }, { x: -66, z: 58 }], // northeast to lake
-  [...EASTBROOK_LAYOUT.roads[4].points, { x: -30, z: -28 }, { x: -55, z: -45 }, { x: -70, z: -55 }], // southeast to mine
+  [
+    ...EASTBROOK_LAYOUT.roads[4].points,
+    { x: -30, z: -28 },
+    { x: -55, z: -45 },
+    { x: -70, z: -55 },
+    { x: -96, z: -66 },
+    { x: -120, z: -76 },
+    { x: -132, z: -82 },
+  ], // southeast to the mine, out across the flank to the dig headland
   [...EASTBROOK_LAYOUT.roads[5].points, { x: 35, z: 35 }, { x: 60, z: 60 }, { x: 78, z: 74 }], // northwest to ruins
 ];
 
@@ -1700,7 +1721,7 @@ export const ZONE1_PROPS: ZonePropsDef = {
     height: stall.height,
     canopyVariant: stall.canopyVariant,
   })),
-  mines: [{ x: -88, z: -68, rot: 0.8 }],
+  mines: [{ x: -148, z: -92, rot: 0.8 }],
   docks: [{ x: -64, z: 60, rot: -2.2, hutLocal: { x: 2.8, z: 2.4, hw: 1.7, hd: 1.5 } }],
   tents: [
     { x: 62, z: -61, rot: 0.4, scale: 1 },
@@ -1718,7 +1739,7 @@ export const ZONE1_PROPS: ZonePropsDef = {
   campfires: [
     [65, -65],
     [90, -90],
-    [-80, -60],
+    [-140, -84],
     [-61, 56],
   ],
   mudHuts: [
