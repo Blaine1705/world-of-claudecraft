@@ -3225,9 +3225,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': '枭兽形态',
   'entities.abilities.moonkin_form.description':
     '进入枭兽形态，强化施法直到你切换回来。再次施放可返回普通形态。（平衡专精招牌）',
-  'entities.abilities.feral_charge.name': '野性冲锋',
+  'entities.abilities.feral_charge.name': '原始涌动',
   'entities.abilities.feral_charge.description':
-    '冲向敌人并使其定身1秒。8-25码距离。（野性专精招牌）',
+    '释放一股原始涌动。狼形态下，能量恢复速度提高100%，持续10秒。巨熊形态下，立即产生50点怒气。（野性专精招牌）',
   'entities.abilities.swiftmend.name': '迅捷治愈',
   'entities.abilities.swiftmend.description': '消耗友方目标身上的一个持续治疗效果，治疗其 {damage} 点生命。野性绽放与二度绽放的播撒会累加青翠；在 5 层青翠时，此按钮会变为盛放，立即为每一位带有你持续治疗效果的盟友治疗这些效果所剩余量的 60%。（恢复标志技能）',
   'entities.abilities.crusader_strike.name': '十字军打击',
@@ -9377,7 +9377,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     '使你的躲闪几率提高50个百分点，持续10秒。（猎人天赋）',
   'entities.abilities.earthbind.description': '将目标点 4 米内的敌人定身 2 秒，随后使其减速 40%，持续 6 秒。（萨满天赋）',
-  'entities.abilities.evocation.description': '快速恢复法力。（法师天赋）',
+  'entities.abilities.evocation.description':
+    '引导6秒：每秒恢复100点法力并获得8点法术强度，效果在引导期间叠加并持续15秒。（法师天赋）',
   'entities.abilities.frenzied_regeneration.description':
     '在10秒内恢复180点生命值。只能在熊形态下使用。（德鲁伊天赋）',
   'entities.abilities.frost_trap.description':
@@ -9389,7 +9390,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.howl_of_terror.description':
     '使附近的敌人恐惧，最多持续3秒。受到伤害可能打破该效果。（术士天赋）',
   'entities.abilities.ice_block.description':
-    '将你封入寒冰之中，吸收大量伤害，持续 8 秒。（法师天赋）',
+    '将你封入坚冰8秒，使你免疫所有伤害。移除已存在的普通有害效果，并阻止新的普通控制效果施加于你。可在昏迷或变形状态下使用。被封冻期间无法行动。再次施放可取消。（法师）',
   'entities.abilities.inner_focus.description': '使你的下一个牧师法术免费且无法被打断。持续 60 秒。',
   'entities.abilities.innervate.description':
     '生命树液在你体内涌动10秒，分波恢复20点当前资源，可恢复法力、怒气或能量。变形不会中断效果。睡眠、昏迷或停滞会使树液停止涌动。（德鲁伊天赋）',

@@ -10342,8 +10342,8 @@ export const pt_BR: EnTranslations = {
         "description": "Assume Forma de Luniscante, fortalecendo a conjuração até você voltar. Lance novamente para retornar à forma normal. (assinatura Equilíbrio)"
       },
       "feral_charge": {
-        "name": "Investida Feral",
-        "description": "Investe contra um inimigo e o enraíza por 1 s. Alcance de 8-25 m. (assinatura Feral)"
+        "name": "Surto Primevo",
+        "description": "Libera um surto primevo. Na Forma de Lobo, a regeneração de energia aumenta em 100% por 10 s. Na Forma de Bruin, gera instantaneamente 50 de raiva. (assinatura Feral)"
       },
       "swiftmend": {
         "name": "Recuperação Rápida",
@@ -10599,7 +10599,7 @@ export const pt_BR: EnTranslations = {
       },
       "evocation": {
         "name": "Poço Etéreo",
-        "description": "Restaura mana rápidamente. (talento de mago)"
+        "description": "Canaliza por 6 s: a cada segundo, restaura 100 de mana e acumula 8 de poder mágico. O bônus acumula durante a canalização e dura 15 s. (talento de mago)"
       },
       "flurry_of_knives": {
         "name": "Rajada de Facas",
@@ -10631,7 +10631,7 @@ export const pt_BR: EnTranslations = {
       },
       "ice_block": {
         "name": "Caixão Frio",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talento de mago)"
+        "description": "Envolve você em gelo sólido por 8 s, tornando-o imune a todo dano. Remove efeitos nocivos comuns já ativos e impede a aplicação de novos efeitos de controle comuns. Pode ser usado enquanto estiver atordoado ou transformado. Você não pode agir enquanto estiver envolto. Conjure novamente para cancelar. (mago)"
       },
       "inner_focus": {
         "name": "Mente Serena",
@@ -10723,7 +10723,7 @@ export const pt_BR: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Mente Acelerada",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talento de mago)"
+        "description": "Faz com que seu próximo feitiço com tempo de lançamento seja instantâneo. Dura 60 s. (talento de mago)"
       },
       "psychic_scream": {
         "name": "Grito Psíquico",

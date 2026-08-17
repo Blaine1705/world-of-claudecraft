@@ -10342,8 +10342,8 @@ export const vi_VN: EnTranslations = {
         "description": "Nhận dạng cú mặt trăng, cường hóa thi triển phép cho đến khi bạn đổi lại. Thi triển lần nữa để trở về dạng thường. (dấu ấn Cân Bằng)"
       },
       "feral_charge": {
-        "name": "Xung Phong Hoang Dã",
-        "description": "Xung phong vào kẻ địch và trói chân chúng trong 1 giây. Tầm 8-25 m. (dấu ấn Hoang Dã)"
+        "name": "Dâng Trào Nguyên Thủy",
+        "description": "Giải phóng một đợt dâng trào nguyên thủy. Trong Hình Sói, tốc độ hồi Năng Lượng tăng 100% trong 10 giây. Trong Hình Bruin, lập tức tạo 50 Nộ Khí. (dấu ấn Hoang Dã)"
       },
       "swiftmend": {
         "name": "Hồi Phục Nhanh",
@@ -10599,7 +10599,7 @@ export const vi_VN: EnTranslations = {
       },
       "evocation": {
         "name": "Giếng Ête",
-        "description": "Restaura mana rápidamente. (thiên phú pháp sư)"
+        "description": "Vận sức trong 6 giây: mỗi giây hồi 100 mana và cộng dồn 8 sức mạnh phép thuật. Hiệu ứng cộng dồn trong khi vận sức và kéo dài 15 giây. (thiên phú pháp sư)"
       },
       "flurry_of_knives": {
         "name": "Loạt Dao Xoáy",
@@ -10631,7 +10631,7 @@ export const vi_VN: EnTranslations = {
       },
       "ice_block": {
         "name": "Quan Tài Lạnh",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 giây. (thiên phú pháp sư)"
+        "description": "Bao bọc bạn trong băng cứng suốt 8 giây, khiến bạn miễn nhiễm mọi sát thương. Xóa các hiệu ứng có hại thông thường đang tồn tại và ngăn các hiệu ứng khống chế thông thường mới được áp dụng. Có thể dùng khi bị choáng hoặc biến hình. Bạn không thể hành động khi bị bao bọc. Dùng lại để hủy. (pháp sư)"
       },
       "inner_focus": {
         "name": "Tâm Trí Tĩnh",
@@ -10723,7 +10723,7 @@ export const vi_VN: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Tâm Trí Tăng Tốc",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 giây. (thiên phú pháp sư)"
+        "description": "Khiến phép tiếp theo có thời gian niệm của bạn được thi triển tức thì. Kéo dài 60 giây. (thiên phú pháp sư)"
       },
       "psychic_scream": {
         "name": "Tiếng Thét Tâm Linh",

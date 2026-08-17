@@ -10342,8 +10342,8 @@ export const it_IT: EnTranslations = {
         "description": "Assume Forma di Lunagufo, potenziando il lancio di incantesimi finché non cambi di nuovo. Lancia ancora per tornare alla forma normale. (firma Equilibrio)"
       },
       "feral_charge": {
-        "name": "Carica Ferina",
-        "description": "Carica un nemico e lo immobilizza per 1 s. Portata 8-25 m. (firma Aggressore Ferino)"
+        "name": "Impeto Primordiale",
+        "description": "Scatena un impeto primordiale. In Forma del Lupo, la rigenerazione dell’energia aumenta del 100% per 10 s. In Forma di Bruin, genera istantaneamente 50 rabbia. (firma Aggressore Ferino)"
       },
       "swiftmend": {
         "name": "Rapidità di Guarigione",
@@ -10599,7 +10599,7 @@ export const it_IT: EnTranslations = {
       },
       "evocation": {
         "name": "Pozzo d’Etere",
-        "description": "Restaura mana rápidamente. (talento da mago)"
+        "description": "Canalizza per 6 s: ogni secondo ripristina 100 mana e accumula 8 potere magico. Il bonus si accumula durante la canalizzazione e dura 15 s. (talento da mago)"
       },
       "flurry_of_knives": {
         "name": "Raffica di coltelli",
@@ -10631,7 +10631,7 @@ export const it_IT: EnTranslations = {
       },
       "ice_block": {
         "name": "Bara Fredda",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talento da mago)"
+        "description": "Ti racchiude nel ghiaccio solido per 8 s, rendendoti immune a tutti i danni. Rimuove gli effetti dannosi comuni già attivi e impedisce l’applicazione di nuovi effetti di controllo comuni. Utilizzabile mentre sei stordito o trasformato. Non puoi agire mentre sei racchiuso. Lancia di nuovo per annullare. (mago)"
       },
       "inner_focus": {
         "name": "Mente Quietata",
@@ -10723,7 +10723,7 @@ export const it_IT: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Mente Rapida",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talento da mago)"
+        "description": "Rende istantaneo il prossimo incantesimo con tempo di lancio. Dura 60 s. (talento da mago)"
       },
       "psychic_scream": {
         "name": "Urlo Psichico",

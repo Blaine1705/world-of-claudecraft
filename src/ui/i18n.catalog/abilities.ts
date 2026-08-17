@@ -2313,7 +2313,7 @@ const classAbilityNamesEn = {
       [
         'evocation',
         'Aetherwell',
-        'Channel for 6 sec: each second restores 100 mana and builds 8 spell power, stacking while you channel. (Mage talent)',
+        'Channel for 6 sec: each second restores 100 mana and builds 8 spell power, stacking while you channel and lasting 15 sec. (Mage talent)',
       ],
       [
         'flurry_of_knives',
@@ -2353,7 +2353,7 @@ const classAbilityNamesEn = {
       [
         'ice_block',
         'Cold Coffin',
-        'Encases you in ice, absorbing a massive amount of damage for 8 sec. (Mage talent)',
+        'Encases you in solid ice for 8 sec, making you immune to all damage. Removes existing ordinary harmful effects and prevents new ordinary control effects. Usable while stunned or polymorphed. You cannot act while encased. Recast to cancel. (Mage)',
       ],
       [
         'inner_focus',
