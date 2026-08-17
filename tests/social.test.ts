@@ -106,6 +106,25 @@ describe('parties', () => {
     }
   });
 
+  it('removes persistent paladin auras from a non-paladin member who leaves', () => {
+    for (const persistentAura of ['devotion_ward', 'retribution_aura'] as const) {
+      const sim = makeWorld();
+      const paladin = sim.addPlayer('paladin', 'Paladin');
+      const member = sim.addPlayer('warrior', 'Member');
+      sim.setPlayerLevel(16, paladin);
+      sim.partyInvite(member, paladin);
+      sim.partyAccept(member);
+
+      sim.castAbility(persistentAura, paladin);
+      expect(sim.entities.get(member)?.auras.find((a) => a.id === persistentAura)).toBeDefined();
+
+      sim.partyLeave(member);
+
+      expect(sim.entities.get(member)?.auras.find((a) => a.id === persistentAura)).toBeUndefined();
+      expect(sim.entities.get(paladin)?.auras.find((a) => a.id === persistentAura)).toBeDefined();
+    }
+  });
+
   it('does not replace a pending party invite', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');

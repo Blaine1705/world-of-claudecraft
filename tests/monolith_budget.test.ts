@@ -83,9 +83,10 @@ const MONOLITHS: MonolithRow[] = [
     // Extracted the shadow-depth material factory into
     // src/render/prewarm_depth_material.ts so the self-spirit prewarm could add
     // Renderer.warmSelfSpirit + the per-frame observe without growing the file.
-    // Merging the delve tracker and prewarm work leaves renderer.ts at the exact
-    // count below; any further growth reds again.
-    ceiling: 13726,
+    // Merging the delve tracker and prewarm work plus the release-owned
+    // weapon-skin identity repair leaves renderer.ts at the exact count below;
+    // any further growth reds again.
+    ceiling: 13732,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

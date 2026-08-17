@@ -33,10 +33,17 @@ type WarmedLook = {
   skin: number;
   mainhand: string | null;
   offhand: string | null;
+  weaponSkin: string | null;
 };
 
 export class SelfSpiritPrewarmer {
-  private warmed: WarmedLook = { visual: null, skin: -1, mainhand: null, offhand: null };
+  private warmed: WarmedLook = {
+    visual: null,
+    skin: -1,
+    mainhand: null,
+    offhand: null,
+    weaponSkin: null,
+  };
   private inFlight = false;
   private pending = false;
 
@@ -45,17 +52,24 @@ export class SelfSpiritPrewarmer {
   /** Call once per frame for the local player once its visual exists. A change
    *  in the visual instance (a recompose) or in the skin/weapon ids re-arms the
    *  warm; an identical call is a no-op. */
-  observe(visual: object, skin: number, mainhand: string | null, offhand: string | null): void {
+  observe(
+    visual: object,
+    skin: number,
+    mainhand: string | null,
+    offhand: string | null,
+    weaponSkin: string | null,
+  ): void {
     const w = this.warmed;
     if (
       visual === w.visual &&
       skin === w.skin &&
       mainhand === w.mainhand &&
-      offhand === w.offhand
+      offhand === w.offhand &&
+      weaponSkin === w.weaponSkin
     ) {
       return;
     }
-    this.warmed = { visual, skin, mainhand, offhand };
+    this.warmed = { visual, skin, mainhand, offhand, weaponSkin };
     this.schedule();
   }
 

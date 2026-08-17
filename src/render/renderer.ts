@@ -11228,7 +11228,13 @@ export class Renderer {
       // Warm the local player's own spirit variants once per distinct look, so
       // a death spirit-release never links them inline on the ungated self view.
       if (e.id === this.sim.player.id) {
-        this.selfSpirit.observe(v.visual, e.skin, e.mainhandItemId, e.offhandItemId);
+        this.selfSpirit.observe(
+          v.visual,
+          e.skin,
+          e.mainhandItemId,
+          e.offhandItemId,
+          e.weaponSkinId,
+        );
       }
       if (iceBlockActivated) this.activeVisual(v)?.playEmote('wave', 1);
 

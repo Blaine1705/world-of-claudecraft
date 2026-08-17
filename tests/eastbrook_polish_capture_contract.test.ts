@@ -190,7 +190,7 @@ interface AttributionTargetFixture {
 // delve interior tracker extraction. Renderer/prewarm bytes moved; captures
 // were adopted verbatim.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '47fdab737a808a4734f59e9f30732d49a0315db7a03ad4f442c23058c8a5ac3d';
+  'a9564213367eec51236eb8c6851947510b056c8332fa2d30cdd4746bbcbb4e6b';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
