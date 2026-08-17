@@ -10839,7 +10839,7 @@ export const pl_PL: EnTranslations = {
       },
       "prowl": {
         "name": "Podchody",
-        "description": "Wchodzi w skradanie w postaci wilka, poruszając się o 50% wolniej. Nie można użyć w walce."
+        "description": "Wchodzi w skradanie w postaci wilka, poruszając się o 5% wolniej. Nie można użyć w walce."
       },
       "rake": {
         "name": "Zdzieranie",

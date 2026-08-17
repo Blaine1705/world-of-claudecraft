@@ -5975,7 +5975,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Demoralizza i nemici vicini, riducendone la potenza d'attacco di 20 per 20 sec. Solo in Forma di Bruin.",
   'entities.abilities.prowl.name': 'Appostamento',
   'entities.abilities.prowl.description':
-    'Entra in furtività mentre sei in Forma del Lupo, muovendoti il 50% più lentamente. Non utilizzabile in combattimento.',
+    'Entra in furtività mentre sei in Forma del Lupo, muovendoti il 5% più lentamente. Non utilizzabile in combattimento.',
   'entities.abilities.rake.name': 'Scarnificare',
   'entities.abilities.revive_pet.name': 'Rattoppare',
   'entities.abilities.revive_pet.description':

@@ -3336,7 +3336,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Деморализует врагов поблизости, снижая их силу атаки на 20 на 20 сек. Только в облике бурого.',
   'entities.abilities.prowl.name': 'Скрадывание',
   'entities.abilities.prowl.description':
-    'Переход в скрытность в облике волка: вы двигаетесь на 50% медленнее. Нельзя использовать в бою.',
+    'Переход в скрытность в облике волка: вы двигаетесь на 5% медленнее. Нельзя использовать в бою.',
   'entities.abilities.rake.name': 'Свежевание',
   'entities.abilities.rake.description': 'Полосует врага на урон оружия плюс {damage} и вызывает кровотечение на 18 сек. Даёт 1 серию приёмов. Только в облике волка.',
   'entities.abilities.revive_pet.name': 'Подлатать',

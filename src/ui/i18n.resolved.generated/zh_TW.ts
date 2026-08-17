@@ -10839,7 +10839,7 @@ export const zh_TW: EnTranslations = {
       },
       "prowl": {
         "name": "潛獵",
-        "description": "在狼形態下進入隱匿狀態，移動速度降低 50%。無法於戰鬥中使用。"
+        "description": "在狼形態下進入隱匿狀態，移動速度降低 5%。無法於戰鬥中使用。"
       },
       "rake": {
         "name": "剮擊",

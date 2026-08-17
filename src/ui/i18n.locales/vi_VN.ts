@@ -4420,7 +4420,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_word_shield.description': 'Khiên chắn cho một mục tiêu đồng minh, hấp thụ {damage} sát thương trong 30 giây. Kỷ Luật còn liên kết mục tiêu ấy với sát thương Thần Thánh của bạn trong 30 giây.',
   'entities.abilities.power_word_shield.name': 'Thánh Thi Hộ Mệnh',
   'entities.abilities.prowl.description':
-    'Vào trạng thái ẩn thân khi ở Hình Sói, di chuyển chậm hơn 50%. Không thể dùng trong chiến đấu.',
+    'Vào trạng thái ẩn thân khi ở Hình Sói, di chuyển chậm hơn 5%. Không thể dùng trong chiến đấu.',
   'entities.abilities.prowl.name': 'Rình Rập',
   'entities.abilities.pyroblast.description':
     'Ném ra một tảng lửa khổng lồ gây {damage} sát thương Hỏa cùng sát thương cộng dồn theo thời gian.',

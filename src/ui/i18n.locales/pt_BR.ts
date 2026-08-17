@@ -5924,7 +5924,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Desmoraliza os inimigos próximos, reduzindo seu poder de ataque em 20 por 20 s. Apenas Forma de Bruin.',
   'entities.abilities.prowl.name': 'Espreitar',
   'entities.abilities.prowl.description':
-    'Entra em furtividade enquanto na Forma de Lobo, movendo-se 50% mais devagar. Não pode ser usado em combate.',
+    'Entra em furtividade enquanto na Forma de Lobo, movendo-se 5% mais devagar. Não pode ser usado em combate.',
   'entities.abilities.rake.name': 'Esfolar',
   'entities.abilities.revive_pet.name': 'Remendar',
   'entities.abilities.revive_pet.description':

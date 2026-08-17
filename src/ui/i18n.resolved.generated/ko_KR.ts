@@ -10839,7 +10839,7 @@ export const ko_KR: EnTranslations = {
       },
       "prowl": {
         "name": "몰래 접근",
-        "description": "늑대 변신 상태에서 은신하고 이동 속도가 50% 감소합니다. 전투 중에는 사용할 수 없습니다."
+        "description": "늑대 변신 상태에서 은신하고 이동 속도가 5% 감소합니다. 전투 중에는 사용할 수 없습니다."
       },
       "rake": {
         "name": "저미기",

@@ -10839,7 +10839,7 @@ export const ja_JP: EnTranslations = {
       },
       "prowl": {
         "name": "つけ狙い",
-        "description": "ウルフフォーム中にステルス状態に入り、移動速度が50%低下する。戦闘中は使用できない。"
+        "description": "ウルフフォーム中にステルス状態に入り、移動速度が5%低下する。戦闘中は使用できない。"
       },
       "rake": {
         "name": "皮剥ぎ",

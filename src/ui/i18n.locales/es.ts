@@ -6031,7 +6031,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Desmoraliza a los enemigos cercanos, reduciendo su poder de ataque en 20 durante 20 s. Solo en forma de Bruin.',
   'entities.abilities.prowl.name': 'Acechar',
   'entities.abilities.prowl.description':
-    'Entra en sigilo mientras estás en Forma de lobo y te mueves un 50% más lento. No puede usarse en combate.',
+    'Entra en sigilo mientras estás en Forma de lobo y te mueves un 5% más lento. No puede usarse en combate.',
   'entities.abilities.rake.name': 'Desollar',
   'entities.abilities.revive_pet.name': 'Remendar',
   'entities.abilities.revive_pet.description':

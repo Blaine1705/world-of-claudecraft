@@ -6775,7 +6775,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_word_shield.description': 'Zaštítí spřátelený cíl a pohltí {damage} poškození po 30 s. Věrouka navíc spojí cíl s tvým svatým poškozením na 30 s.',
   'entities.abilities.power_word_shield.name': 'Žalm ochrany',
   'entities.abilities.prowl.description':
-    'Vstoupíš do plížení ve vlčí podobě a pohybuješ se o 50 % pomaleji. Nelze použít v boji.',
+    'Vstoupíš do plížení ve vlčí podobě a pohybuješ se o 5 % pomaleji. Nelze použít v boji.',
   'entities.abilities.prowl.name': 'Plížení',
   'entities.abilities.pyroblast.description':
     'Vrhe obrovský ohnivý balvan, který způsobí {damage} ohnivého poškození plus další poškození v čase.',

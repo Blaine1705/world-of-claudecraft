@@ -10839,7 +10839,7 @@ export const sv_SE: EnTranslations = {
       },
       "prowl": {
         "name": "Smygjaga",
-        "description": "Gå i smyg medan du är i vargform och rör dig 50 % långsammare. Kan inte användas i strid."
+        "description": "Gå i smyg medan du är i vargform och rör dig 5 % långsammare. Kan inte användas i strid."
       },
       "rake": {
         "name": "Flå",

@@ -259,7 +259,7 @@ describe('druid spell pack — casting applies effects', () => {
     const base = distanceOver(false);
     const prowl = distanceOver(true);
     expect(base).toBeGreaterThan(0);
-    expect(prowl / base).toBeCloseTo(0.5, 1);
+    expect(prowl / base).toBeCloseTo(0.95, 1);
   });
 
   it('Travel Form toggles off cleanly, removing the form and the speed', () => {
@@ -387,7 +387,7 @@ describe('druid spell pack — casting applies effects', () => {
     sim.castAbility('prowl', pid);
     sim.tick();
     expect(e.auras.some((a) => a.id === 'prowl' && a.kind === 'stealth')).toBe(true);
-    expect((sim as any).moveSpeedMult(e)).toBeCloseTo(0.5);
+    expect((sim as any).moveSpeedMult(e)).toBeCloseTo(0.95);
     advanceTicks(sim, 40);
 
     e.resource = e.maxResource;

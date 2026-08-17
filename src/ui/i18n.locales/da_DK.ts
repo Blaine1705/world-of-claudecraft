@@ -4338,7 +4338,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_word_shield.description': 'Skjolder et venligt mål og absorberer {damage} skade i 30 sek. Disciplin forbinder desuden målet med jeres Hellige skade i 30 sek.',
   'entities.abilities.power_word_shield.name': 'Værnets Salme',
   'entities.abilities.prowl.description':
-    'Gå i sneg-tilstand mens du er i Ulveform, og bevæg dig 50 % langsommere. Kan ikke bruges i kamp.',
+    'Gå i sneg-tilstand mens du er i Ulveform, og bevæg dig 5 % langsommere. Kan ikke bruges i kamp.',
   'entities.abilities.prowl.name': 'Snig',
   'entities.abilities.pyroblast.description':
     'Slynger en enorm flammende kampesten, der volder {damage} ildskade plus yderligere skade over tid.',

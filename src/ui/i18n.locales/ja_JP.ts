@@ -3309,7 +3309,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '周囲の敵を萎縮させ、20秒間その攻撃力を20低下させる。ブルーインフォーム時のみ使用可能。',
   'entities.abilities.prowl.name': 'つけ狙い',
   'entities.abilities.prowl.description':
-    'ウルフフォーム中にステルス状態に入り、移動速度が50%低下する。戦闘中は使用できない。',
+    'ウルフフォーム中にステルス状態に入り、移動速度が5%低下する。戦闘中は使用できない。',
   'entities.abilities.rake.name': '皮剥ぎ',
   'entities.abilities.rake.description': '敵を切り裂いて武器ダメージに{damage}を加え、18秒間の出血ダメージを与えます。コンボポイントを1与えます。狼の姿専用。',
   'entities.abilities.revive_pet.name': '応急処置',

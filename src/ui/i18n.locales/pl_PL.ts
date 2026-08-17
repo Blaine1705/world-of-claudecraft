@@ -4511,7 +4511,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_word_shield.description': 'Osłania sprzymierzony cel, pochłaniając {damage} obrażeń przez 30 s. Dyscyplina dodatkowo wiąże cel z twoimi obrażeniami świętymi na 30 s.',
   'entities.abilities.power_word_shield.name': 'Psalm ochrony',
   'entities.abilities.prowl.description':
-    'Wchodzi w skradanie w postaci wilka, poruszając się o 50% wolniej. Nie można użyć w walce.',
+    'Wchodzi w skradanie w postaci wilka, poruszając się o 5% wolniej. Nie można użyć w walce.',
   'entities.abilities.prowl.name': 'Podchody',
   'entities.abilities.pyroblast.description':
     'Ciska ogromnym ognistym głazem, który zadaje {damage} obrażeń od ognia oraz dodatkowe obrażenia w czasie.',

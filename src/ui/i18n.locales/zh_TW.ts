@@ -3178,7 +3178,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '挫敗附近敵人的士氣，使其攻擊強度降低 20，持續 20 秒。僅限巨熊形態。',
   'entities.abilities.prowl.name': '潛獵',
   'entities.abilities.prowl.description':
-    '在狼形態下進入隱匿狀態，移動速度降低 50%。無法於戰鬥中使用。',
+    '在狼形態下進入隱匿狀態，移動速度降低 5%。無法於戰鬥中使用。',
   'entities.abilities.rake.name': '剮擊',
   'entities.abilities.rake.description': '撕裂敵人，造成武器傷害外加 {damage} 點，並造成持續 18 秒的流血傷害。給予 1 點連擊點。僅限狼形態。',
   'entities.abilities.revive_pet.name': '修補',

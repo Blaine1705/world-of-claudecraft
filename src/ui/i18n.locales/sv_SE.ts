@@ -4332,7 +4332,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_word_shield.description': 'Skyddar ett vänligt mål och absorberar {damage} skada i 30 sek. Disciplin länkar dessutom målet till er Heliga skada i 30 sek.',
   'entities.abilities.power_word_shield.name': 'Värnpsalm',
   'entities.abilities.prowl.description':
-    'Gå i smyg medan du är i vargform och rör dig 50 % långsammare. Kan inte användas i strid.',
+    'Gå i smyg medan du är i vargform och rör dig 5 % långsammare. Kan inte användas i strid.',
   'entities.abilities.prowl.name': 'Smygjaga',
   'entities.abilities.pyroblast.description':
     'Slungar ett väldigt brinnande stenblock som vållar {damage} eldskada plus ytterligare skada över tid.',

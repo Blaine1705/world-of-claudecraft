@@ -3176,7 +3176,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '震慑附近的敌人，使其攻击强度降低 20 点，持续 20 秒。仅限巨熊形态使用。',
   'entities.abilities.prowl.name': '潜行',
   'entities.abilities.prowl.description':
-    '在狼形态下进入潜行状态，移动速度降低 50%。无法在战斗中使用。',
+    '在狼形态下进入潜行状态，移动速度降低 5%。无法在战斗中使用。',
   'entities.abilities.rake.name': '剐削',
   'entities.abilities.rake.description': '撕裂敌人，造成武器伤害外加 {damage} 点，并造成持续 18 秒的流血伤害。给予 1 点连击点。仅限狼形态。',
   'entities.abilities.revive_pet.name': '修补',

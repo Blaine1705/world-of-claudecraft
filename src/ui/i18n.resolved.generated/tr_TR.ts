@@ -10839,7 +10839,7 @@ export const tr_TR: EnTranslations = {
       },
       "prowl": {
         "name": "Sinsi Sokulma",
-        "description": "Kurt Formundayken gizliliğe geçer ve 50% daha yavaş hareket edersin. Dövüş sırasında kullanılamaz."
+        "description": "Kurt Formundayken gizliliğe geçer ve 5% daha yavaş hareket edersin. Dövüş sırasında kullanılamaz."
       },
       "rake": {
         "name": "Deri Yüzme",

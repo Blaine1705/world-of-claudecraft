@@ -4463,7 +4463,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_word_shield.description': 'Dost bir hedefi kalkanlar ve 30 sn boyunca {damage} hasar emer. Disiplin ayrıca hedefi 30 sn boyunca Kutsal hasarına bağlar.',
   'entities.abilities.power_word_shield.name': 'Koruma Mezmuru',
   'entities.abilities.prowl.description':
-    'Kurt Formundayken gizliliğe geçer ve 50% daha yavaş hareket edersin. Dövüş sırasında kullanılamaz.',
+    'Kurt Formundayken gizliliğe geçer ve 5% daha yavaş hareket edersin. Dövüş sırasında kullanılamaz.',
   'entities.abilities.prowl.name': 'Sinsi Sokulma',
   'entities.abilities.pyroblast.description':
     'Devasa ateşli bir kaya fırlatarak {damage} Ateş hasarı ve ek olarak zamana yayılı hasar verir.',

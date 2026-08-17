@@ -6407,8 +6407,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     requiresForm: 'cat',
     requiresOutOfCombat: true,
-    effects: [{ type: 'selfBuff', kind: 'stealth', value: 0.5, duration: 3600 }],
-    description: 'Enter stealth while in Wolf Form, moving 50% slower. Cannot be used in combat.',
+    // 0.95: stealth at near-full speed is the feral scouting identity; the
+    // rogue Duskveil family deliberately keeps its slower 0.5 crawl.
+    effects: [{ type: 'selfBuff', kind: 'stealth', value: 0.95, duration: 3600 }],
+    description: 'Enter stealth while in Wolf Form, moving 5% slower. Cannot be used in combat.',
   },
   rake: {
     id: 'rake',

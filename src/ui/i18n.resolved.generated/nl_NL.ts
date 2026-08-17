@@ -10839,7 +10839,7 @@ export const nl_NL: EnTranslations = {
       },
       "prowl": {
         "name": "Besluipen",
-        "description": "Ga in sluiptocht terwijl je in Wolfsgedaante bent en beweeg 50% trager. Kan niet in gevecht worden gebruikt."
+        "description": "Ga in sluiptocht terwijl je in Wolfsgedaante bent en beweeg 5% trager. Kan niet in gevecht worden gebruikt."
       },
       "rake": {
         "name": "Villen",

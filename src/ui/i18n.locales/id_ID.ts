@@ -4495,7 +4495,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_word_shield.description': 'Melindungi sasaran sekutu, menyerap {damage} kerusakan selama 30 dtk. Disiplin juga menautkan sasaran itu pada kerusakan Sucimu selama 30 dtk.',
   'entities.abilities.power_word_shield.name': 'Mazmur Penangkal',
   'entities.abilities.prowl.description':
-    'Masuk ke siluman saat dalam Wujud Serigala, bergerak 50% lebih lambat. Tidak dapat digunakan dalam pertempuran.',
+    'Masuk ke siluman saat dalam Wujud Serigala, bergerak 5% lebih lambat. Tidak dapat digunakan dalam pertempuran.',
   'entities.abilities.prowl.name': 'Mengintai',
   'entities.abilities.pyroblast.description':
     'Melontarkan bongkahan berkobar raksasa yang menimbulkan {damage} kerusakan Api ditambah kerusakan tambahan seiring waktu.',

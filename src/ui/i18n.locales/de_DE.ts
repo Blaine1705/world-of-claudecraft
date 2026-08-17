@@ -5988,7 +5988,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Demoralisiert nahe Gegner und senkt ihre Angriffskraft 20 Sek. lang um 20. Nur in Bruin Form.',
   'entities.abilities.prowl.name': 'Anpirschen',
   'entities.abilities.prowl.description':
-    'Geht in Wolfsgestalt in den Schleichmodus über und bewegt Euch 50% langsamer. Im Kampf nicht einsetzbar.',
+    'Geht in Wolfsgestalt in den Schleichmodus über und bewegt Euch 5% langsamer. Im Kampf nicht einsetzbar.',
   'entities.abilities.rake.name': 'Schinden',
   'entities.abilities.revive_pet.name': 'Zusammenflicken',
   'entities.abilities.revive_pet.description':

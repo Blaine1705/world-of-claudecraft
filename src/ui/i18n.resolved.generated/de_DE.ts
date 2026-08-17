@@ -10839,7 +10839,7 @@ export const de_DE: EnTranslations = {
       },
       "prowl": {
         "name": "Anpirschen",
-        "description": "Geht in Wolfsgestalt in den Schleichmodus über und bewegt Euch 50% langsamer. Im Kampf nicht einsetzbar."
+        "description": "Geht in Wolfsgestalt in den Schleichmodus über und bewegt Euch 5% langsamer. Im Kampf nicht einsetzbar."
       },
       "rake": {
         "name": "Schinden",

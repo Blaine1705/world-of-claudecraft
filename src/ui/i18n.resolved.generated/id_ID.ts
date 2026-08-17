@@ -10839,7 +10839,7 @@ export const id_ID: EnTranslations = {
       },
       "prowl": {
         "name": "Mengintai",
-        "description": "Masuk ke siluman saat dalam Wujud Serigala, bergerak 50% lebih lambat. Tidak dapat digunakan dalam pertempuran."
+        "description": "Masuk ke siluman saat dalam Wujud Serigala, bergerak 5% lebih lambat. Tidak dapat digunakan dalam pertempuran."
       },
       "rake": {
         "name": "Kupasan",
