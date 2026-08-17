@@ -366,9 +366,44 @@ export class WocTradeController {
         ...(first.instance === undefined ? {} : { expectInstance: first.instance }),
       };
     }
+    // The SELLER's acceptance is the custody-committing act, so it carries
+    // the wallet step-up proof (B6/R1): a fresh offer-bound challenge signed
+    // through the same bridge the payment path uses. The buyer sends none.
+    let stepUpFields: { stepUp?: { nonce: string; signature: string } } = {};
+    if (offer.role === 'seller') {
+      const issued = await hooks.client.stepUpChallenge({
+        operation: 'accept_directed_offer',
+        offerId: offer.id,
+      });
+      if (!issued.ok) {
+        this.log(userFacingApiError({ code: issued.code }), '#ff6b6b');
+        return;
+      }
+      let signature: string;
+      if (issued.challenge.signatureRequired === false) {
+        // The dev economy's devsig arm, mirrored from the payment path:
+        // explicit permission only; an absent flag still goes to the wallet.
+        signature = `devsig:${issued.challenge.nonce}`;
+      } else {
+        this.log(t('hudChrome.wocMarket.signing'), '#ffd100');
+        try {
+          signature = await hooks.signMessageBase58(issued.challenge.message);
+        } catch (err) {
+          this.log(
+            err instanceof Error && err.message
+              ? err.message
+              : t('hudChrome.wocMarket.signFailed'),
+            '#ff6b6b',
+          );
+          return;
+        }
+      }
+      stepUpFields = { stepUp: { nonce: issued.challenge.nonce, signature } };
+    }
     const res = await hooks.client.acceptOffer(offer.id, {
       characterId: hooks.characterId() ?? 0,
       ...itemFields,
+      ...stepUpFields,
     });
     if (!res.ok) {
       this.log(userFacingApiError({ code: res.code }), '#ff6b6b');

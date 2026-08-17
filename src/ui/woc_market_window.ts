@@ -62,6 +62,11 @@ export interface WocMarketHooks {
    *  client-assembled). Resolves the signature; throws an Error whose
    *  message is already player-facing. */
   signAndSendTransactionBase64(transactionBase64: string): Promise<string>;
+  /** Sign the SERVER-BUILT step-up challenge message (B6/R1) with the linked
+   *  wallet (no transaction, no funds). Same bridge and same contract as the
+   *  transaction signer: resolves the base58 signature; throws an Error whose
+   *  message is already player-facing. */
+  signMessageBase58(message: string): Promise<string>;
 }
 
 export interface WocMarketWindowDeps {
@@ -1805,7 +1810,50 @@ export class WocMarketWindow {
         return;
       }
     }
-    await this.withBusy('hudChrome.wocMarket.confirming', async () => {
+    // The exact figures the wallet is asked to authorize; the challenge binds
+    // them server-side, so these and the createListing body below must agree
+    // byte for byte or the server refuses the pair.
+    const listingReserve = submitFormat === 'buy_now' ? null : reserveCents;
+    const listingBuyNow = submitFormat === 'auction' ? null : buyNowCents;
+    await this.withBusy('hudChrome.wocMarket.signing', async () => {
+      // Step-up (B6/R1): a fresh server-built challenge, signed by the linked
+      // wallet, authorizes THIS listing. The wallet popup shows the message.
+      const issued = await hooks.client.stepUpChallenge({
+        operation: 'create_listing',
+        itemId: slot.itemId,
+        format: submitFormat,
+        startCents,
+        reserveCents: listingReserve,
+        buyNowCents: listingBuyNow,
+        durationHours,
+      });
+      if (!issued.ok) {
+        this.fail(issued.code);
+        return;
+      }
+      let stepUpSignature: string;
+      if (issued.challenge.signatureRequired === false) {
+        // The dev economy's devsig arm, mirrored from the payment path:
+        // explicit permission only; an absent flag still goes to the wallet.
+        stepUpSignature = `devsig:${issued.challenge.nonce}`;
+      } else {
+        try {
+          stepUpSignature = await hooks.signMessageBase58(issued.challenge.message);
+        } catch (err) {
+          // The bridge throws player-facing English; the catalog line is the
+          // fallback for a message-less throw.
+          this.notice = {
+            text:
+              err instanceof Error && err.message
+                ? err.message
+                : t('hudChrome.wocMarket.signFailed'),
+            error: true,
+          };
+          return;
+        }
+      }
+      this.busyLabel = 'hudChrome.wocMarket.confirming';
+      this.render();
       const out = await hooks.client.createListing({
         characterId: hooks.characterId(),
         itemIndex: this.sellIndex ?? 0,
@@ -1814,13 +1862,14 @@ export class WocMarketWindow {
         format: submitFormat,
         startCents,
         // A pure buy-now carries no reserve; an auction, combined or not, may.
-        reserveCents: submitFormat === 'buy_now' ? null : reserveCents,
+        reserveCents: listingReserve,
         // Only a plain auction sends no price. Both buy-now-bearing formats
         // require one, and validListingParams refuses a format and a price that
         // disagree in either direction.
-        buyNowCents: submitFormat === 'auction' ? null : buyNowCents,
+        buyNowCents: listingBuyNow,
         durationHours,
         offerNext,
+        stepUp: { nonce: issued.challenge.nonce, signature: stepUpSignature },
       });
       if (!out.ok) {
         this.fail(out.code);

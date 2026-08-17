@@ -33,11 +33,16 @@ function makeDeps() {
   const online = { characterId: 41 };
   let linked: string | null = null;
   const signCalls: string[] = [];
+  const messageSignCalls: string[] = [];
   let loads = 0;
   const walletModule = {
     signAndSendTransactionBase64: async (transactionBase64: string) => {
       signCalls.push(transactionBase64);
       return `sig:${transactionBase64}`;
+    },
+    signMessageBase58: async (message: string) => {
+      messageSignCalls.push(message);
+      return `msgsig:${message}`;
     },
   };
   const deps = {
@@ -65,6 +70,7 @@ function makeDeps() {
       linked = value;
     },
     signCalls,
+    messageSignCalls,
     loads: () => loads,
   };
 }
@@ -139,6 +145,21 @@ describe('woc_market_wiring: the hook composition on browser web', () => {
     await expect(hooks.signAndSendTransactionBase64('AQID')).resolves.toBe('sig:AQID');
     expect(rig.loads()).toBe(1);
     expect(rig.signCalls).toEqual(['AQID']);
+  });
+
+  it('signs step-up messages through the SAME lazy bridge, still zero loads at attach', async () => {
+    const rig = makeDeps();
+    attachWocMarketExchange(rig.deps, WEB);
+    const hooks = rig.attached[0];
+    // The step-up signer must not eagerly load the bridge either.
+    expect(rig.loads()).toBe(0);
+    await expect(hooks.signMessageBase58('challenge text')).resolves.toBe('msgsig:challenge text');
+    expect(rig.loads()).toBe(1);
+    expect(rig.messageSignCalls).toEqual(['challenge text']);
+    // Both signers delegate through the same wallet.load() seam (the real
+    // loader memoizes the dynamic import; the rig counts delegations).
+    await hooks.signAndSendTransactionBase64('AQID');
+    expect(rig.loads()).toBe(2);
   });
 });
 

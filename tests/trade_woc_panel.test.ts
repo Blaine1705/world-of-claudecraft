@@ -590,6 +590,30 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
     expect(accept, 'it should advance the phase instead').toContain("phase: 'awaiting_payment'");
   });
 
+  it('the SELLER acceptance mints and signs the step-up; the buyer sends none (B6/R1)', () => {
+    const accept = CONTROLLER.slice(
+      CONTROLLER.indexOf('private async acceptWocTradeOffer'),
+      CONTROLLER.indexOf('private async payWocTradeOffer'),
+    );
+    // The mint sits INSIDE the seller-role branch, so a buyer accept stays
+    // bearer-only (their money path signs its own payment later).
+    const iRole = accept.indexOf("if (offer.role === 'seller') {", accept.indexOf('stepUpFields'));
+    const iMint = accept.indexOf('client.stepUpChallenge({');
+    const iSign = accept.indexOf('hooks.signMessageBase58(issued.challenge.message)');
+    const iSend = accept.indexOf('client.acceptOffer(');
+    expect(iRole, 'the seller-role gate').toBeGreaterThanOrEqual(0);
+    expect(iMint, 'the mint').toBeGreaterThan(iRole);
+    expect(iSign, 'the wallet signs the server message').toBeGreaterThan(iMint);
+    expect(iSend, 'the accept send comes last').toBeGreaterThan(iSign);
+    expect(accept).toContain("operation: 'accept_directed_offer'");
+    expect(accept).toContain('stepUp: { nonce: issued.challenge.nonce, signature }');
+    // Devsig is explicit-permission-only, and a wallet decline logs the
+    // player-facing message with the catalog fallback.
+    expect(accept).toContain('issued.challenge.signatureRequired === false');
+    expect(accept).toContain('devsig:${issued.challenge.nonce}');
+    expect(accept).toContain('hudChrome.wocMarket.signFailed');
+  });
+
   it('drives the Accept button from the OFFER, not the sim trade', () => {
     // A $WOC deal never confirms the sim trade, so info.myAccepted never moves:
     // reading it left the button saying "Accept" after the player had accepted.

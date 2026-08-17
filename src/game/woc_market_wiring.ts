@@ -25,6 +25,7 @@ export interface WocMarketWiringDeps {
     /** The lazily loaded wallet bridge (src/net/wallet.ts), loaded on first sign. */
     load(): Promise<{
       signAndSendTransactionBase64(transactionBase64: string): Promise<string>;
+      signMessageBase58(message: string): Promise<string>;
     }>;
   };
 }
@@ -47,6 +48,9 @@ export function attachWocMarketExchange(
     walletLinked: () => wallet.linkedPubkey() !== null,
     signAndSendTransactionBase64: async (transactionBase64) =>
       (await wallet.load()).signAndSendTransactionBase64(transactionBase64),
+    // The step-up prompt's signer (B6/R1): same lazy bridge, loaded on first
+    // sign, so attaching the Exchange still costs no wallet code.
+    signMessageBase58: async (message) => (await wallet.load()).signMessageBase58(message),
   });
   return true;
 }

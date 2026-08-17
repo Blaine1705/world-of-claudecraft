@@ -824,15 +824,70 @@ describe('woc_market_window: a combined listing is opted into by price, not by p
       "format === 'auction' && buyNowCents !== null ? 'auction_buy_now' : format",
     );
     // And the derived value, not the picked one, is what reaches the wire and
-    // decides which of the two price fields is dropped.
+    // decides which of the two price fields is dropped. The pair is hoisted
+    // once so the step-up challenge and the createListing body cannot
+    // disagree about what the wallet authorized.
     expect(submit).toContain('format: submitFormat');
-    expect(submit).toContain("reserveCents: submitFormat === 'buy_now' ? null : reserveCents");
-    expect(submit).toContain("buyNowCents: submitFormat === 'auction' ? null : buyNowCents");
+    expect(submit).toContain("const listingReserve = submitFormat === 'buy_now' ? null : reserveCents");
+    expect(submit).toContain("const listingBuyNow = submitFormat === 'auction' ? null : buyNowCents");
+    expect(submit).toContain('reserveCents: listingReserve');
+    expect(submit).toContain('buyNowCents: listingBuyNow');
+    // Both sends, byte for byte: the challenge request and the listing body.
+    expect(submit.match(/reserveCents: listingReserve/g)?.length).toBe(2);
+    expect(submit.match(/buyNowCents: listingBuyNow/g)?.length).toBe(2);
   });
 
   it('renders all three formats: read and write agree again', () => {
     const view = readFileSync(new URL('../src/ui/woc_market_view.ts', import.meta.url), 'utf8');
     expect(view).toContain("'auction' | 'buy_now' | 'auction_buy_now'");
+  });
+});
+
+describe('woc_market_window: listing requires the wallet step-up (B6/R1)', () => {
+  it('mints the challenge, signs the SERVER-built message, then sends the proof, in that order', () => {
+    const submit = between(
+      'private async submitListing(): Promise<void> {',
+      'private async payBond(',
+    );
+    const iChallenge = submit.indexOf('client.stepUpChallenge({');
+    const iSign = submit.indexOf('hooks.signMessageBase58(issued.challenge.message)');
+    const iCreate = submit.indexOf('client.createListing({');
+    expect(iChallenge, 'the challenge mint').toBeGreaterThanOrEqual(0);
+    expect(iSign, 'the wallet signs the server message, never client text').toBeGreaterThan(
+      iChallenge,
+    );
+    expect(iCreate, 'the listing send comes last').toBeGreaterThan(iSign);
+    // The proof rides the listing body verbatim.
+    expect(submit).toContain(
+      'stepUp: { nonce: issued.challenge.nonce, signature: stepUpSignature }',
+    );
+  });
+
+  it('skips the wallet ONLY on an explicit signatureRequired false, the devsig rule', () => {
+    const submit = between(
+      'private async submitListing(): Promise<void> {',
+      'private async payBond(',
+    );
+    // Explicit permission only: absent must still go through the wallet.
+    expect(submit).toContain('issued.challenge.signatureRequired === false');
+    expect(submit).not.toContain('issued.challenge.signatureRequired !== true');
+    expect(submit).toContain('devsig:${issued.challenge.nonce}');
+  });
+
+  it('renders honest pending and failure states around the wallet wait', () => {
+    const submit = between(
+      'private async submitListing(): Promise<void> {',
+      'private async payBond(',
+    );
+    // The busy ladder: signing while the popup is open, then confirming.
+    const iSigning = submit.indexOf("withBusy('hudChrome.wocMarket.signing'");
+    const iConfirming = submit.indexOf("busyLabel = 'hudChrome.wocMarket.confirming'");
+    expect(iSigning).toBeGreaterThanOrEqual(0);
+    expect(iConfirming).toBeGreaterThan(iSigning);
+    // A wallet decline renders its player-facing message, with the catalog
+    // line as the message-less fallback; a challenge refusal rides fail().
+    expect(submit).toContain('hudChrome.wocMarket.signFailed');
+    expect(submit).toContain('this.fail(issued.code)');
   });
 });
 
