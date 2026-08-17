@@ -36,13 +36,17 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // The roster comes from the real tables so the catalog cannot drift from the
 // shipped data: every NPC_LOOKS id, with the NpcDef display name where one
 // exists (the stage nameplate identifies each shot).
-const roster = JSON.parse(
-  execFileSync(
-    'npx',
-    [
-      'tsx',
-      '-e',
-      `
+const tsxJson = (source) =>
+  JSON.parse(execFileSync('npx', ['tsx', '-e', source], { encoding: 'utf8' }).trim());
+
+// The roster comes from NPC_LOOKS so the catalog cannot drift from the shipped
+// table. A checkout WITHOUT that module (the base commit, when capturing the
+// before half of a PR comparison) has no roster to read, so an explicit --only
+// list falls back to the sim's NPC names alone and shoots the same subjects
+// wearing whatever rig that checkout gives them.
+let roster;
+try {
+  roster = tsxJson(`
 import { NPC_LOOKS } from './src/render/characters/npc_looks';
 import { NPCS } from './src/sim/data';
 const rows = Object.keys(NPC_LOOKS).map((id) => ({
@@ -51,11 +55,20 @@ const rows = Object.keys(NPC_LOOKS).map((id) => ({
   title: NPCS[id]?.title ?? '',
 }));
 console.log(JSON.stringify(rows));
-`,
-    ],
-    { encoding: 'utf8' },
-  ).trim(),
-);
+`);
+} catch (err) {
+  if (!ONLY) throw err;
+  console.log('[npc-looks] no roster module here (base checkout?); using --only ids');
+  roster = tsxJson(`
+import { NPCS } from './src/sim/data';
+const ids = ${JSON.stringify(ONLY)};
+console.log(JSON.stringify(ids.map((id) => ({
+  id,
+  name: NPCS[id]?.name ?? id,
+  title: NPCS[id]?.title ?? '',
+}))));
+`);
+}
 
 // --town visits placed NPCs by templateId and never reads the roster, so it
 // can shoot an id the roster deliberately omits (Brother Aldric keeps his
@@ -76,6 +89,19 @@ const browser = await puppeteer.launch({
 });
 const page = await browser.newPage();
 page.on('pageerror', (e) => console.log('PAGEERROR:', e.message));
+
+// Standing capture rule: seed the LOWEST graphics preset before the app boots,
+// so every rig shoots the same tier and an unseeded default cannot drift the
+// comparison. Composed faces, hair, builds and props all read at this tier;
+// the outfit-dye shader layer does not (it is a high-tier-only richness the
+// player path sheds the same way), so use --gfx high to review colorways.
+await page.evaluateOnNewDocument(() => {
+  try {
+    localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1 }));
+  } catch {
+    /* ignore */
+  }
+});
 
 await page.goto(URL, { waitUntil: 'load', timeout: 60000 });
 // The shared entry helper drives Play Offline through Enter World and
@@ -161,7 +187,35 @@ if (TOWN) {
       console.log(`TOWN MISS: ${id} not placed`);
       continue;
     }
-    await settle(4);
+    // A hub in another zone streams in after the teleport, and the loading
+    // screen covers the canvas while it does: wait for the overlay to lift AND
+    // the subject's own rig to exist, or the shot is a picture of the loader.
+    let ready = false;
+    for (let i = 0; i < 60 && !ready; i++) {
+      await settle(1);
+      ready = await page.evaluate((npcId) => {
+        const g = window.__game;
+        const npc = [...g.world.entities.values()].find(
+          (e) => e.kind === 'npc' && e.templateId === npcId,
+        );
+        if (!npc) return false;
+        const view = g.renderer.views?.get?.(npc.id);
+        const screen = document.querySelector('#loading-screen');
+        const covering = screen && getComputedStyle(screen).display !== 'none';
+        return !!view?.visual && !covering;
+      }, id);
+    }
+    if (!ready) console.log(`TOWN SLOW: ${id} never settled, shooting anyway`);
+    // The crossing fade and the dolly's own rig both come back with the zone
+    // (a rebuilt view drops the pending flag), so re-hide and let the curtain
+    // finish before the frame that counts.
+    await settle(10);
+    await page.evaluate(() => {
+      const g = window.__game;
+      const selfView = g.renderer.views?.get?.(g.world.playerId);
+      if (selfView) selfView.visualCompilePending = true;
+    });
+    await settle(2);
     await page.screenshot({ path: `tmp/npc_looks/town_${id}.png` });
     console.log(`town shot: ${id}`);
   }
