@@ -41,11 +41,13 @@ positions, and frontal geometry derive from `src/sim/ignivar_arena.ts`.
 6. A struck conduit becomes active and produces a water-cleanse zone.
 7. Marked players cross the water separately to remove their mark.
 8. Water removes the complete mark regardless of its current stack count. The
-   conduit enters cooldown and the cycle repeats using another station.
+   conduit is then spent for the rest of the pull, so the cycle must use another
+   station.
 
 Current tuning is three marks per cycle, one tick every two seconds, one cycle
-every 28 seconds, a three-second frontal cast, a ten-second water window, and a
-35-second conduit cooldown. These are playtest values, not final balance pins.
+every 28 seconds, a three-second frontal cast, and a ten-second water window.
+All four conduits reset only when the encounter resets. These are playtest
+values, not final balance pins.
 During the frontal cast, a fire vortex and body glow build around Ignivar. Its
 release sends a fiery fissure from the boss to the end of the aimed cone, where
 the heavy impact stack adds flame pillars, smoke, embers, light, and screen
@@ -93,9 +95,10 @@ recoverable while repeated contact remains lethal.
 After a 44-second opening delay, Forge Wave begins a 46-second recharge. Ignivar
 locks to one of eight deterministic arena facings and casts for 2.5 seconds. Two
 opposite 30-degree safe lanes remain fixed for the complete cast. On release, a
-thin circular fire wall expands from Ignivar to 28 units over three seconds.
-Crossing the wall outside either gap deals 35% maximum health as fire damage and
-knocks the player four units directly away from Ignivar. Each player can be hit
+thin circular fire wall expands across the complete room over three seconds,
+including when Ignivar is tanked against a wall. Crossing the wall outside either
+gap deals 35% maximum health as fire damage and knocks the player directly away
+from Ignivar until arena collision seats them at the wall. Each player can be hit
 only once per wave.
 
 The windup draws both safe lanes at every graphics tier. The release combines a
@@ -109,11 +112,13 @@ remove the safe lanes.
 
 After a 24-second opening delay and every 34 seconds thereafter, Ignivar marks a
 non-tank player with Shared Pyre for six seconds. The target gains a visible
-5.5-unit orange gathering circle. At least four living players, including the
-target, must stand inside when it resolves. A successful soak splits 120% maximum
-health across every participant. Fewer than four players causes an 80% maximum
-health raid-wide blast. Normal avoids selecting a Brand of the Pyre carrier when
-an unbranded non-tank is available.
+5.5-unit orange gathering circle. The intended group solution uses at least four
+living players. On resolution, the circle always splits 120% maximum health across
+only the living players inside it; players outside never take Shared Pyre damage.
+Fewer participants each receive a larger share, while an immune target can absorb a
+solo resolution without harming the raid. If the marked player dies first, the
+circle still resolves at their final position. Normal avoids selecting a Brand of
+the Pyre carrier when an unbranded non-tank is available.
 
 ## Tank swap
 
@@ -154,11 +159,12 @@ The impacts deal no damage because players are expected to enter the marked safe
 refuge during the warning. For the remaining eight seconds, fire covers the whole
 arena and pulses for 12% maximum health every 0.5 seconds everywhere except the
 single 5.5-yard safe footprint. The two decoy shelters offer no protection.
-Entering the intermission extinguishes every existing Brand of the Pyre, and the
-water conduits remain frozen in their current state. No rotating rays or other
-boss mechanics run during the intermission. All three shelters shatter with heavy
-fire releases when it ends, then regular mechanics resume after a short recovery
-window.
+On Normal, entering the intermission extinguishes every existing Brand of the
+Pyre. On Heroic, every Brand persists for the full intermission. The water
+conduits remain frozen in their current state on both difficulties. No rotating
+rays or other boss mechanics run during the intermission. All three shelters
+shatter with heavy fire releases when it ends, then regular mechanics resume
+after a short recovery window.
 
 Two simultaneous adds are a Heroic candidate, not a Normal requirement. The party
 split and DPS check must be tested with the intended 2-2-6 composition before that
@@ -168,7 +174,7 @@ variant is accepted.
 
 - Contact with a primary fire mark applies a secondary mark.
 - Secondary marks require water but cannot propagate again.
-- Fewer conduits are available per cycle or their cooldown is longer.
+- Fewer conduits begin available or their active water window is shorter.
 - Two Apocalypse adds may force a controlled party split.
 
 ## Delivery slices

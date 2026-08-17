@@ -1,5 +1,8 @@
+import type { ActiveIgnivarMeteorWarning } from '../sim/ignivar_meteors';
 import type { ResolvedAbility } from '../sim/sim';
 import type { WorldInteractionOutcome } from './interaction';
+
+export type { ActiveIgnivarMeteorWarning } from '../sim/ignivar_meteors';
 
 export interface ActiveFrostRing {
   id: string;
@@ -24,6 +27,7 @@ export interface IWorldCombat {
   known: ResolvedAbility[];
   /** Server-authored persistent traps currently visible to this world view. */
   activeFrostRings: ActiveFrostRing[];
+  activeIgnivarMeteors: ActiveIgnivarMeteorWarning[];
   activeTemporalHourglasses: ActiveTemporalHourglass[];
   /** Remaining server-authoritative lifetime of a reactive ability window. */
   reactiveAbilityWindowRemaining(abilityId: string): number;

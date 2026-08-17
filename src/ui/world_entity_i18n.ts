@@ -570,6 +570,7 @@ const DUNGEON_IDS = [
   'nythraxis_crypt',
   'nythraxis_boss_arena',
   'ignivar_raid_arena',
+  'ignivar_inner_crucible',
   'wildheart_basin',
   'the_last_keep',
 ] as const;

@@ -2822,6 +2822,7 @@ export interface DungeonObjectSpawn {
   templateId?:
     | 'dungeon_door'
     | 'dungeon_exit'
+    | 'ignivar_raid_gate_locked'
     | 'ignivar_water_conduit_ready'
     | 'ignivar_water_conduit_active'
     | 'ignivar_water_conduit_cooldown';
@@ -2846,7 +2847,15 @@ export interface DungeonDef {
   bossExitPortal?: { x: number; z: number };
   spawns: DungeonSpawn[];
   objects?: DungeonObjectSpawn[];
-  interior: 'crypt' | 'sanctum' | 'temple' | 'nythraxis' | 'ignivar' | 'wildheart' | 'lastkeep'; // renderer + collider interior builder key
+  interior:
+    | 'crypt'
+    | 'sanctum'
+    | 'temple'
+    | 'nythraxis'
+    | 'ignivar'
+    | 'ignivar_depths'
+    | 'wildheart'
+    | 'lastkeep'; // renderer + collider interior builder key
   /**
    * What dresses this dungeon's wall-side obstacle slots (matches the render
    * variant): coffins get one standable lid, cargo splits into the crate
@@ -3908,9 +3917,9 @@ export interface Entity extends ClientMirroredEntityFields {
   // [dev] /dev god cheat state, kept OFF the production gm flag so it never touches a
   // real game master (who could otherwise deal 100x or have their invuln toggled).
   devGod?: boolean;
-  /** Profiler-only invulnerability. The dev-gated server command sets this
-   *  idempotently so combat presentation remains active without /dev god's
-   *  outgoing damage multiplier. Server-private and never persisted. */
+  /** Dev-only invulnerability used by /dev immortal and profiler tooling so
+   *  combat presentation remains active without /dev god's outgoing damage
+   *  multiplier. Server-private and never persisted. */
   profilerInvulnerable?: boolean;
   /** Owner of a mob created by /dev spawn. Server-private and never persisted. */
   devSpawnOwnerId?: number;
@@ -4205,8 +4214,15 @@ export interface IgnivarEncounterState {
   skyfireCastRemaining: number;
   skyfireFacing: number;
   meteorTimer: number;
+  meteorCastKey: number;
   meteorImpactRemaining: number;
   meteorPoints: Array<{ x: number; z: number }>;
+  forgeChainsTimer: number;
+  forgeChainsRemaining: number;
+  forgeChainsAttachGraceRemaining: number;
+  forgeChainsStrainSeconds: number[];
+  forgeChainsPlayerIds: [number, number][] | null;
+  forgeChainsLastPositions: Array<{ playerId: number; x: number; z: number }>;
   rotatingRaysTimer: number;
   rotatingRaysWindupRemaining: number;
   rotatingRaysActiveRemaining: number;
@@ -5032,6 +5048,7 @@ export type SimEvent = { pid?: number } & (
         | 'nova'
         | 'orb'
         | 'meteorFall'
+        | 'meteorImpact'
         | 'ambientMeteorFall'
         | 'runeCircle'
         | 'snowZone'
@@ -5051,6 +5068,9 @@ export type SimEvent = { pid?: number } & (
       // 'meteorFall' only: seconds where the ground warning is visible before
       // the falling body appears. Included inside duration, so impact timing stays shared.
       warningLead?: number;
+      // Stable id for a persistent warning also carried by the snapshot. A
+      // renderer deduplicates the live event against reconnect reconstruction.
+      persistentId?: string;
       // 'orb' only: which flight moment this is. 'release' starts the local
       // animation; 'halt'/'resume' freeze and restart it at the server's real
       // coordinates when the orb latches onto (and outlives) an enemy.

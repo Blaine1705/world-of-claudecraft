@@ -2149,7 +2149,7 @@ export const id_ID: EnTranslations = {
       "mail": "Zirah rantai"
     },
     "auraEffect": {
-      "sharedPyre": "Requires at least {players} players inside the circle",
+      "sharedPyre": "Splits its damage between players inside the circle; {players} players recommended",
       "dot": "Memberikan {value} kerusakan {school} setiap {interval} dtk",
       "hot": "Memulihkan {value} kesehatan setiap {interval} dtk",
       "absorb": "Menyerap {value} kerusakan",
@@ -15839,6 +15839,11 @@ export const id_ID: EnTranslations = {
         "name": "Crucible of the Last Spring",
         "enterText": "Heat shimmers above the sealed waters of the Crucible.",
         "leaveText": "You step away from the Crucible and breathe freely again."
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "Cekungan Hati Liar",

@@ -2149,7 +2149,7 @@ export const ko_KR: EnTranslations = {
       "mail": "사슬"
     },
     "auraEffect": {
-      "sharedPyre": "Requires at least {players} players inside the circle",
+      "sharedPyre": "원 안에 최소 {players}명의 플레이어가 있어야 합니다",
       "dot": "{interval}초마다 {value}의 {school} 피해를 입힙니다",
       "hot": "{interval}초마다 생명력을 {value} 회복합니다",
       "absorb": "{value}의 피해를 흡수합니다",
@@ -15839,6 +15839,11 @@ export const ko_KR: EnTranslations = {
         "name": "마지막 샘의 도가니",
         "enterText": "도가니의 봉인된 물 위로 열기가 아른거립니다.",
         "leaveText": "도가니를 벗어나 다시 편히 숨을 쉽니다."
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "야생심장 분지",

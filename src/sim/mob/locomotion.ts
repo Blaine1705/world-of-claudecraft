@@ -45,6 +45,7 @@ import {
   updateIgnivarEncounter,
 } from '../encounters/ignivar';
 import { isEscortNpcTemplate } from '../escort';
+import { unlockIgnivarRaidGate } from '../ignivar_raid_progression';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import { noteMatchPetUnravelled } from '../pet/pet_match_return';
 import {
@@ -142,7 +143,10 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     mob.despawnTimer = undefined;
   }
   if (mob.dead) {
-    if (mob.templateId === IGNIVAR_BOSS_ID && mob.ignivar) resetIgnivarEncounter(ctx, mob);
+    if (mob.templateId === IGNIVAR_BOSS_ID) {
+      if (mob.ignivar) resetIgnivarEncounter(ctx, mob);
+      unlockIgnivarRaidGate(ctx, mob);
+    }
     ctx.onBossDeath(mob);
     if (mob.ownerId !== null && MOBS[mob.templateId]?.family !== 'demon') return;
     mob.corpseTimer -= DT;
@@ -339,7 +343,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       )
         return;
     } else if (isIgnivar) {
-      updateIgnivarEncounter(ctx, mob);
+      updateIgnivarEncounter(ctx, mob, true);
       return;
     } else {
       ctx.updateBossMechanics(mob);
@@ -372,7 +376,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
 
   switch (mob.aiState) {
     case 'idle': {
-      if (mob.templateId === NYTHRAXIS_BOSS_ID && !mob.inCombat) {
+      if ((isNythraxis || isIgnivar) && !mob.inCombat) {
         mob.wanderTarget = null;
         mob.wanderTimer = 3;
         mob.pos = { ...mob.spawnPos };

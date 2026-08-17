@@ -2149,7 +2149,7 @@ export const ja_JP: EnTranslations = {
       "mail": "鎖"
     },
     "auraEffect": {
-      "sharedPyre": "Requires at least {players} players inside the circle",
+      "sharedPyre": "サークル内に少なくとも{players}人のプレイヤーが必要",
       "dot": "{interval}秒ごとに{value}の{school}ダメージを与える",
       "hot": "{interval}秒ごとに体力を{value}回復する",
       "absorb": "{value}のダメージを吸収する",
@@ -15839,6 +15839,11 @@ export const ja_JP: EnTranslations = {
         "name": "最後の泉のるつぼ",
         "enterText": "るつぼの封じられた水面に熱気が揺らめいています。",
         "leaveText": "るつぼを離れ、再び自由に息をつきます。"
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "ワイルドハート盆地",

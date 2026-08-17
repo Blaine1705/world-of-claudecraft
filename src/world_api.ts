@@ -157,7 +157,11 @@ export type {
 } from './world_api/battleground';
 export type { CardMinigameInfo } from './world_api/card_minigame';
 export { isOverheadEmoteId, OVERHEAD_EMOTES } from './world_api/chat';
-export type { ActiveFrostRing, ActiveTemporalHourglass } from './world_api/combat';
+export type {
+  ActiveFrostRing,
+  ActiveIgnivarMeteorWarning,
+  ActiveTemporalHourglass,
+} from './world_api/combat';
 export type { AccountCosmetics } from './world_api/cosmetics';
 export type {
   DailyRewardEligibilityView,

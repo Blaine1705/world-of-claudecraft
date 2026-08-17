@@ -2149,7 +2149,7 @@ export const cs_CZ: EnTranslations = {
       "mail": "Kroužková zbroj"
     },
     "auraEffect": {
-      "sharedPyre": "Requires at least {players} players inside the circle",
+      "sharedPyre": "Splits its damage between players inside the circle; {players} players recommended",
       "dot": "Způsobuje {value} {school} poškození každých {interval} s",
       "hot": "Obnovuje {value} zdraví každých {interval} s",
       "absorb": "Absorbuje {value} poškození",
@@ -15839,6 +15839,11 @@ export const cs_CZ: EnTranslations = {
         "name": "Crucible of the Last Spring",
         "enterText": "Heat shimmers above the sealed waters of the Crucible.",
         "leaveText": "You step away from the Crucible and breathe freely again."
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "Kotlina Divokého srdce",

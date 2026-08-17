@@ -7431,6 +7431,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemArmorType.mail': '鎖',
   'hudChrome.auraEffect.dot': '{interval}秒ごとに{value}の{school}ダメージを与える',
   'hudChrome.auraEffect.hot': '{interval}秒ごとに体力を{value}回復する',
+  'hudChrome.auraEffect.sharedPyre': 'サークル内に少なくとも{players}人のプレイヤーが必要',
   'hudChrome.auraEffect.absorb': '{value}のダメージを吸収する',
   'hudChrome.auraEffect.healAbsorb': '受ける回復を{value}吸収する',
   'hudChrome.auraEffect.thorns': '攻撃者に{value}の{school}ダメージを与える',

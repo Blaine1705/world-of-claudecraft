@@ -1,13 +1,20 @@
-// Procedural graybox for Ignivar's four water conduits. The final GLB can
-// replace this module without changing the encounter object ids or renderer
-// integration. The active template adds a tier-independent water-jet silhouette.
+// Procedural landmark for Ignivar's four water conduits. All three state
+// templates stay in one cloned view so authoritative template swaps only
+// change visibility. The cleanse footprint is actionable and tier-independent.
 
 import * as THREE from 'three';
+import { IGNIVAR_WATER_CLEANSE_RADIUS } from '../sim/encounters/ignivar';
 import { type IgnivarConduitState, ignivarConduitStateForTemplate } from '../sim/ignivar_arena';
 import { EMISSIVE_GLOW, GFX, surfaceMat } from './gfx';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
 const HEIGHT = 3.6;
+const CLEANSE_EDGE_WIDTH = 0.16;
+
+export const IGNIVAR_CONDUIT_CLEANSE_FOOTPRINT_NAME = 'ignivarWaterCleanseFootprint';
+export const IGNIVAR_CONDUIT_CLEANSE_BOUNDARY_NAME = 'ignivarWaterCleanseBoundary';
+export const IGNIVAR_CONDUIT_ACTIVATION_RUNE_NAME = 'ignivarWaterActivationRune';
+
 const templates = new Map<IgnivarConduitState, THREE.Group>();
 let stableTemplate: THREE.Group | null = null;
 
@@ -23,9 +30,202 @@ function mesh(geometry: THREE.BufferGeometry, material: THREE.Material, y: numbe
   return part;
 }
 
+function waterGlowMaterial(
+  color: number,
+  opacity: number,
+  blending: THREE.Blending = THREE.AdditiveBlending,
+): THREE.MeshBasicMaterial {
+  return markSharedMaterial(
+    new THREE.MeshBasicMaterial({
+      color,
+      transparent: true,
+      opacity,
+      depthWrite: false,
+      blending,
+      side: THREE.DoubleSide,
+      toneMapped: false,
+    }),
+  );
+}
+
+function horizontalMesh(
+  geometry: THREE.BufferGeometry,
+  material: THREE.Material,
+  y: number,
+): THREE.Mesh {
+  const part = mesh(geometry, material, y);
+  part.rotation.x = -Math.PI / 2;
+  part.castShadow = false;
+  part.receiveShadow = false;
+  return part;
+}
+
+function addReadyVisual(group: THREE.Group): void {
+  const readyMaterial = waterGlowMaterial(0x5bdcf3, 0.78);
+  const coreMaterial = waterGlowMaterial(0x9af3ff, 0.92, THREE.NormalBlending);
+  const marker = new THREE.Group();
+  marker.name = 'ignivarWaterReadyMarker';
+  marker.userData.ignivarConduitLayer = 'readyBeacon';
+
+  const core = mesh(new THREE.SphereGeometry(0.3, 12, 8), coreMaterial, 1.58);
+  core.name = 'ignivarWaterReadyCore';
+  core.castShadow = false;
+  core.receiveShadow = false;
+  core.renderOrder = 3;
+  marker.add(core);
+
+  const halo = horizontalMesh(new THREE.TorusGeometry(0.62, 0.065, 6, 24), readyMaterial, 1.58);
+  halo.name = 'ignivarWaterReadyHalo';
+  halo.renderOrder = 2;
+  marker.add(halo);
+
+  const lowerHalo = horizontalMesh(
+    new THREE.TorusGeometry(0.46, 0.045, 6, 20),
+    readyMaterial,
+    1.18,
+  );
+  lowerHalo.name = 'ignivarWaterReadyLowerHalo';
+  lowerHalo.rotation.z = Math.PI / 8;
+  marker.add(lowerHalo);
+  group.add(marker);
+}
+
+function addCooldownVisual(group: THREE.Group, sealMaterial: THREE.Material): void {
+  const capMaterial = sharedMaterial({
+    color: 0x202a2d,
+    roughness: 0.98,
+    metalness: 0.02,
+    flatShading: !GFX.standardMaterials,
+  });
+  const cap = mesh(new THREE.CylinderGeometry(1.2, 1.2, 0.13, 16), capMaterial, 0.92);
+  cap.name = 'ignivarWaterCooldownCap';
+  group.add(cap);
+
+  const cooldownSeal = new THREE.Group();
+  cooldownSeal.name = 'ignivarWaterCooldownSeal';
+  cooldownSeal.userData.ignivarConduitLayer = 'closedSeal';
+  const firstBar = mesh(new THREE.BoxGeometry(1.95, 0.24, 0.38), sealMaterial, 1.04);
+  firstBar.rotation.y = Math.PI / 4;
+  const secondBar = firstBar.clone();
+  secondBar.rotation.y = -Math.PI / 4;
+  cooldownSeal.add(firstBar, secondBar);
+  group.add(cooldownSeal);
+}
+
+function buildActivationRune(): THREE.Group {
+  const rune = new THREE.Group();
+  rune.name = IGNIVAR_CONDUIT_ACTIVATION_RUNE_NAME;
+  rune.userData.ignivarConduitLayer = 'activationRune';
+  const runeMaterial = waterGlowMaterial(0x45dcff, 0.9);
+
+  const outer = horizontalMesh(new THREE.RingGeometry(2.5, 2.78, 8), runeMaterial, 0.055);
+  outer.name = 'ignivarWaterActivationRuneGlow';
+  outer.renderOrder = 4;
+  rune.add(outer);
+
+  const inner = horizontalMesh(new THREE.RingGeometry(1.03, 1.17, 8), runeMaterial, 0.915);
+  inner.name = 'ignivarWaterActivationRuneInner';
+  inner.rotation.z = Math.PI / 8;
+  inner.renderOrder = 4;
+  rune.add(inner);
+
+  const spokeGeometry = new THREE.BoxGeometry(0.085, 0.025, 1.35);
+  for (let index = 0; index < 4; index++) {
+    const spoke = mesh(spokeGeometry, runeMaterial, 0.925);
+    spoke.name = `ignivarWaterActivationRuneSpoke:${index}`;
+    spoke.rotation.y = (index * Math.PI) / 4;
+    spoke.castShadow = false;
+    spoke.receiveShadow = false;
+    spoke.renderOrder = 4;
+    rune.add(spoke);
+  }
+  return rune;
+}
+
+function buildSteamEnergy(material: THREE.Material): THREE.Group {
+  const steam = new THREE.Group();
+  steam.name = 'ignivarWaterSteamEnergy';
+  steam.userData.ignivarConduitLayer = 'steamEnergy';
+  const halos = [
+    { name: 'ignivarWaterSteamHaloLow', radius: 0.78, y: 1.42, tilt: -0.16 },
+    { name: 'ignivarWaterSteamHaloMid', radius: 0.94, y: 2.45, tilt: 0.2 },
+    { name: 'ignivarWaterSteamHaloHigh', radius: 1.1, y: 3.38, tilt: -0.12 },
+  ];
+  for (const [index, haloSpec] of halos.entries()) {
+    const halo = horizontalMesh(
+      new THREE.TorusGeometry(haloSpec.radius, 0.075, 6, 28),
+      material,
+      haloSpec.y,
+    );
+    halo.name = haloSpec.name;
+    halo.rotation.y = haloSpec.tilt;
+    halo.rotation.z = index * 0.42;
+    halo.renderOrder = 5;
+    steam.add(halo);
+  }
+  return steam;
+}
+
+function addActiveVisual(group: THREE.Group): void {
+  const footprintMaterial = waterGlowMaterial(0x269dcc, 0.14, THREE.NormalBlending);
+  const boundaryMaterial = waterGlowMaterial(0x55e6ff, 0.82);
+  const columnMaterial = waterGlowMaterial(0x4bdcf6, 0.48, THREE.NormalBlending);
+  const coreMaterial = waterGlowMaterial(0xb8f8ff, 0.78);
+  const steamMaterial = waterGlowMaterial(0xa8f5ff, 0.25, THREE.NormalBlending);
+
+  const cleanseZone = new THREE.Group();
+  cleanseZone.name = 'ignivarWaterCleanseZone';
+  cleanseZone.userData.ignivarConduitLayer = 'cleanseFootprint';
+  const footprint = horizontalMesh(
+    new THREE.CircleGeometry(IGNIVAR_WATER_CLEANSE_RADIUS, 48),
+    footprintMaterial,
+    0.025,
+  );
+  footprint.name = IGNIVAR_CONDUIT_CLEANSE_FOOTPRINT_NAME;
+  footprint.renderOrder = 1;
+  cleanseZone.add(footprint);
+
+  const boundary = horizontalMesh(
+    new THREE.RingGeometry(
+      IGNIVAR_WATER_CLEANSE_RADIUS - CLEANSE_EDGE_WIDTH,
+      IGNIVAR_WATER_CLEANSE_RADIUS,
+      48,
+    ),
+    boundaryMaterial,
+    0.04,
+  );
+  boundary.name = IGNIVAR_CONDUIT_CLEANSE_BOUNDARY_NAME;
+  boundary.renderOrder = 3;
+  cleanseZone.add(boundary, buildActivationRune());
+  group.add(cleanseZone);
+
+  const jet = new THREE.Group();
+  jet.name = 'ignivarWaterJet';
+  jet.userData.ignivarConduitLayer = 'waterColumn';
+  const outer = mesh(
+    new THREE.CylinderGeometry(0.9, 0.58, 2.75, 16, 1, true),
+    columnMaterial,
+    2.15,
+  );
+  outer.name = 'ignivarWaterColumnOuter';
+  outer.castShadow = false;
+  outer.receiveShadow = false;
+  outer.renderOrder = 4;
+  jet.add(outer);
+
+  const core = mesh(new THREE.CylinderGeometry(0.34, 0.46, 2.95, 14, 1, true), coreMaterial, 2.15);
+  core.name = 'ignivarWaterColumnCore';
+  core.castShadow = false;
+  core.receiveShadow = false;
+  core.renderOrder = 5;
+  jet.add(core, buildSteamEnergy(steamMaterial));
+  group.add(jet);
+}
+
 function buildTemplate(state: IgnivarConduitState): THREE.Group {
   const group = new THREE.Group();
   group.name = `ignivarWaterConduit:${state}`;
+  group.userData.ignivarConduitState = state;
 
   const basalt = sharedMaterial({
     color: 0x302b2b,
@@ -40,11 +240,12 @@ function buildTemplate(state: IgnivarConduitState): THREE.Group {
     flatShading: !GFX.standardMaterials,
   });
   const water = sharedMaterial({
-    color: state === 'cooldown' ? 0x39434a : 0x4bd8ee,
+    color: state === 'ready' ? 0x34b3ca : state === 'active' ? 0x56deed : 0x35464c,
     roughness: 0.24,
     metalness: 0,
-    emissive: state === 'cooldown' ? 0x10181c : 0x24aeca,
-    emissiveIntensity: state === 'cooldown' ? 0.4 : EMISSIVE_GLOW,
+    emissive: state === 'ready' ? 0x176f83 : state === 'active' ? 0x27bdd4 : 0x10191c,
+    emissiveIntensity:
+      state === 'active' ? EMISSIVE_GLOW : state === 'ready' ? EMISSIVE_GLOW * 0.62 : 0.35,
   });
 
   group.add(mesh(new THREE.CylinderGeometry(2.15, 2.4, 0.55, 12), basalt, 0.275));
@@ -59,60 +260,13 @@ function buildTemplate(state: IgnivarConduitState): THREE.Group {
   group.add(mesh(new THREE.BoxGeometry(2.95, 0.55, 0.8), rim, 3.0));
 
   const basin = mesh(new THREE.CylinderGeometry(1.18, 1.18, 0.08, 16), water, 0.86);
+  basin.name = 'ignivarWaterBasin';
   basin.castShadow = false;
   group.add(basin);
 
-  if (state === 'ready') {
-    const readyMarker = mesh(new THREE.ConeGeometry(0.42, 1.05, 6), water, 1.48);
-    readyMarker.name = 'ignivarWaterReadyMarker';
-    readyMarker.castShadow = false;
-    group.add(readyMarker);
-  }
-
-  if (state === 'cooldown') {
-    const cooldownSeal = new THREE.Group();
-    cooldownSeal.name = 'ignivarWaterCooldownSeal';
-    const firstBar = mesh(new THREE.BoxGeometry(1.95, 0.24, 0.38), rim, 1.04);
-    firstBar.rotation.y = Math.PI / 4;
-    const secondBar = firstBar.clone();
-    secondBar.rotation.y = -Math.PI / 4;
-    cooldownSeal.add(firstBar, secondBar);
-    group.add(cooldownSeal);
-  }
-
-  if (state === 'active') {
-    const jetMaterial = markSharedMaterial(
-      new THREE.MeshBasicMaterial({
-        color: 0x8cecff,
-        transparent: true,
-        opacity: 0.72,
-        depthWrite: false,
-      }),
-    );
-    const jet = mesh(new THREE.CylinderGeometry(0.42, 0.7, 2.65, 12, 1, true), jetMaterial, 2.15);
-    jet.castShadow = false;
-    jet.receiveShadow = false;
-    jet.renderOrder = 2;
-    jet.name = 'ignivarWaterJet';
-    group.add(jet);
-
-    const cleanseMaterial = markSharedMaterial(
-      new THREE.MeshBasicMaterial({
-        color: 0x52dcff,
-        transparent: true,
-        opacity: 0.34,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-        side: THREE.DoubleSide,
-      }),
-    );
-    const cleanseZone = mesh(new THREE.RingGeometry(2.95, 3.25, 48), cleanseMaterial, 0.06);
-    cleanseZone.rotation.x = -Math.PI / 2;
-    cleanseZone.castShadow = false;
-    cleanseZone.receiveShadow = false;
-    cleanseZone.name = 'ignivarWaterCleanseZone';
-    group.add(cleanseZone);
-  }
+  if (state === 'ready') addReadyVisual(group);
+  if (state === 'cooldown') addCooldownVisual(group, rim);
+  if (state === 'active') addActiveVisual(group);
 
   return group;
 }

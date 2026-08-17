@@ -2149,7 +2149,7 @@ export const zh_TW: EnTranslations = {
       "mail": "鎖甲"
     },
     "auraEffect": {
-      "sharedPyre": "Requires at least {players} players inside the circle",
+      "sharedPyre": "圈內至少需要 {players} 名玩家",
       "dot": "每 {interval} 秒造成 {value} 點{school}傷害",
       "hot": "每 {interval} 秒恢復 {value} 點生命值",
       "absorb": "吸收 {value} 點傷害",
@@ -15839,6 +15839,11 @@ export const zh_TW: EnTranslations = {
         "name": "最後泉源熔爐",
         "enterText": "熱浪在熔爐封印的水源上方翻湧。",
         "leaveText": "你離開熔爐，終於再次暢快呼吸。"
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "荒野之心盆地",

@@ -2149,7 +2149,7 @@ export const vi_VN: EnTranslations = {
       "mail": "Giáp lưới"
     },
     "auraEffect": {
-      "sharedPyre": "Requires at least {players} players inside the circle",
+      "sharedPyre": "Splits its damage between players inside the circle; {players} players recommended",
       "dot": "Gây {value} sát thương {school} mỗi {interval} giây",
       "hot": "Hồi {value} máu mỗi {interval} giây",
       "absorb": "Hấp thụ {value} sát thương",
@@ -15839,6 +15839,11 @@ export const vi_VN: EnTranslations = {
         "name": "Crucible of the Last Spring",
         "enterText": "Heat shimmers above the sealed waters of the Crucible.",
         "leaveText": "You step away from the Crucible and breathe freely again."
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "Lòng Chảo Trái Tim Hoang Dã",

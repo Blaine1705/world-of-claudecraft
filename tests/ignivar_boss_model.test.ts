@@ -31,8 +31,8 @@ import { IGNIVAR_BOSS_ID } from '../src/sim/types';
 const REPO_ROOT = path.join(__dirname, '..');
 const ASSET_PATH = path.join(REPO_ROOT, 'public/models/creatures/ignivar_herald.glb');
 const EXPECTED_SOURCE_FINGERPRINT =
-  '29405f7d7153d1013749a948159471b40453fbfb7f3c588421cce176dea38555';
-const EXPECTED_ASSET_SHA256 = 'c449599855e79cbfd7de52b262200d48c6f69f315f2745793af7c755e07928b4';
+  '2d841e74e33f7d94e8f80d9b553fd134fbcadf993624bc3ab957a3760e8acab1';
+const EXPECTED_ASSET_SHA256 = '21863c665439a1f04197e8b328f0b4393e49eb4b8adbed8f0b58f0805b056a0c';
 const SHIPPED_CLIPS = [
   'Death_A',
   'Hit_A',
@@ -41,6 +41,7 @@ const SHIPPED_CLIPS = [
   'Cheer',
   'ForgeIdle',
   'ForgeCast',
+  'ForgeHit',
   'ForgeSlam',
 ];
 
@@ -83,7 +84,7 @@ describe('Ignivar boss model', () => {
         run: 'Running_A',
         attack: ['ForgeSlam'],
         cast: 'ForgeCast',
-        hit: ['Hit_A'],
+        hit: ['ForgeHit'],
         death: 'Death_A',
         flourish: 'Cheer',
       },
@@ -127,7 +128,7 @@ describe('Ignivar boss model', () => {
     const bytes = readFileSync(ASSET_PATH);
     const sha256 = createHash('sha256').update(bytes).digest('hex');
     expect(sha256).toBe(EXPECTED_ASSET_SHA256);
-    expect(bytes).toHaveLength(850_420);
+    expect(bytes).toHaveLength(860_388);
     expect(MEDIA_ASSETS['models/creatures/ignivar_herald.glb']).toBe(
       `/media/models/creatures/ignivar_herald.${sha256.slice(0, 12)}.glb`,
     );
@@ -159,7 +160,13 @@ describe('Ignivar boss model', () => {
     const scene = root.listScenes()[0];
     const sceneRoot = scene.listChildren()[0];
     expect(sceneRoot.getName()).toBe('IgnivarHerald');
-    expect(sceneRoot.listChildren().map((node) => node.getName())).toEqual(['Rig_Medium', 'body']);
+    expect(sceneRoot.listChildren().map((node) => node.getName())).toEqual(['IgnivarRigidMotion']);
+    expect(
+      sceneRoot
+        .listChildren()[0]
+        .listChildren()
+        .map((node) => node.getName()),
+    ).toEqual(['Rig_Medium', 'body']);
     expect(sceneRoot.getExtras()).toMatchObject({
       assetId: 'ignivar_herald',
       assetType: 'kaykit-native-skinned-raid-boss',
@@ -262,7 +269,7 @@ describe('Ignivar boss model', () => {
     expect(shoulderVerticesBoundToHead).toBe(0);
   });
 
-  it('keeps hands and arms fixed throughout cast while the chest supplies a restrained pulse', async () => {
+  it('keeps cast and hit reactions planted while the slam moves only the rigid model root', async () => {
     await MeshoptDecoder.ready;
     const io = new NodeIO()
       .registerExtensions(ALL_EXTENSIONS)
@@ -272,9 +279,11 @@ describe('Ignivar boss model', () => {
 
     const idle = root.listAnimations().find((animation) => animation.getName() === 'ForgeIdle');
     const cast = root.listAnimations().find((animation) => animation.getName() === 'ForgeCast');
+    const hit = root.listAnimations().find((animation) => animation.getName() === 'ForgeHit');
     const slam = root.listAnimations().find((animation) => animation.getName() === 'ForgeSlam');
     expect(idle).toBeDefined();
     expect(cast).toBeDefined();
+    expect(hit).toBeDefined();
     expect(slam).toBeDefined();
     expect(idle?.listChannels().some(channelChanges)).toBe(false);
 
@@ -299,16 +308,28 @@ describe('Ignivar boss model', () => {
         expect(channelChanges(channel)).toBe(false);
       }
     }
+    expect(hit?.listChannels().some(channelChanges)).toBe(false);
 
     const slamChanges = slam?.listChannels().filter(channelChanges);
-    expect(slamChanges?.map((channel) => channel.getTargetNode()?.getName())).toEqual(
-      expect.arrayContaining(['upperarm.r', 'lowerarm.r']),
+    const trackKey = (channel: AnimationChannel) =>
+      `${channel.getTargetNode()?.getName() ?? ''}|${channel.getTargetPath()}`;
+    expect(slam?.listChannels().map(trackKey).sort()).toEqual(
+      [...(idle?.listChannels().map(trackKey) ?? []), 'IgnivarRigidMotion|translation'].sort(),
     );
     expect(
-      slamChanges?.some((channel) =>
-        ['upperarm.l', 'lowerarm.l'].includes(channel.getTargetNode()?.getName() ?? ''),
-      ),
-    ).toBe(false);
+      slamChanges?.map((channel) => [channel.getTargetNode()?.getName(), channel.getTargetPath()]),
+    ).toEqual([['IgnivarRigidMotion', 'translation']]);
+    const rigidLunge = slamChanges?.[0].getSampler()?.getOutput();
+    if (!rigidLunge) throw new Error('ForgeSlam rigid lunge track is missing');
+    const value = [0, 0, 0];
+    const translations = Array.from({ length: rigidLunge.getCount() }, (_, index) => {
+      rigidLunge.getElement(index, value);
+      return [...value];
+    });
+    expect(translations[0]).toEqual([0, 0, 0]);
+    expect(translations.at(-1)).toEqual([0, 0, 0]);
+    expect(Math.max(...translations.map((translation) => translation[2]))).toBeCloseTo(0.18, 3);
+    expect(Math.min(...translations.map((translation) => translation[1]))).toBeCloseTo(-0.04, 3);
   });
 
   it('authors idempotent runtime VFX sockets and attaches forge fire to all three emitters', () => {

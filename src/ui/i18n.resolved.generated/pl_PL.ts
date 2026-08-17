@@ -2149,7 +2149,7 @@ export const pl_PL: EnTranslations = {
       "mail": "Kolczuga"
     },
     "auraEffect": {
-      "sharedPyre": "Requires at least {players} players inside the circle",
+      "sharedPyre": "Splits its damage between players inside the circle; {players} players recommended",
       "dot": "Zadaje {value} obrażeń od {school} co {interval} s",
       "hot": "Przywraca {value} zdrowia co {interval} s",
       "absorb": "Pochłania {value} obrażeń",
@@ -15839,6 +15839,11 @@ export const pl_PL: EnTranslations = {
         "name": "Crucible of the Last Spring",
         "enterText": "Heat shimmers above the sealed waters of the Crucible.",
         "leaveText": "You step away from the Crucible and breathe freely again."
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "Kotlina Dzikiego Serca",

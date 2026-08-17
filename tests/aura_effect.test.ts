@@ -4,7 +4,7 @@ import { type AuraEffectInput, auraEffectDescriptor } from '../src/ui/aura_effec
 const desc = (a: AuraEffectInput) => auraEffectDescriptor(a);
 
 describe('auraEffectDescriptor', () => {
-  it('explains the four-player requirement on Ignivar Shared Pyre', () => {
+  it('explains that Ignivar Shared Pyre splits damage inside its circle', () => {
     expect(desc({ id: 'ignivar_shared_pyre', kind: 'vulnerability', value: 0 })).toEqual({
       key: 'hudChrome.auraEffect.sharedPyre',
       nums: { players: 4 },

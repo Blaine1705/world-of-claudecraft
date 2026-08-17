@@ -7119,6 +7119,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemArmorType.mail': '鎖甲',
   'hudChrome.auraEffect.dot': '每 {interval} 秒造成 {value} 點{school}傷害',
   'hudChrome.auraEffect.hot': '每 {interval} 秒恢復 {value} 點生命值',
+  'hudChrome.auraEffect.sharedPyre': '圈內至少需要 {players} 名玩家',
   'hudChrome.auraEffect.absorb': '吸收 {value} 點傷害',
   'hudChrome.auraEffect.healAbsorb': '吸收 {value} 點受到的治療',
   'hudChrome.auraEffect.thorns': '對攻擊者造成 {value} 點{school}傷害',

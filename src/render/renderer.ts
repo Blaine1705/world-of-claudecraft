@@ -288,6 +288,11 @@ import { buildHollowGates } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
 import {
+  applyIgnivarArenaFog,
+  applyIgnivarArenaLighting,
+  IGNIVAR_ARENA_LIGHTING,
+} from './ignivar_arena_atmosphere';
+import {
   buildIgnivarWaterConduit,
   isIgnivarWaterConduitTemplate,
   isStableIgnivarWaterConduitTransition,
@@ -297,9 +302,14 @@ import {
   disposeIgnivarEncounterVisuals,
   hasVisibleIgnivarEncounterTelegraph,
   syncIgnivarEncounterVisuals,
+  syncIgnivarPlayerChainVisual,
 } from './ignivar_encounter';
-import { ignivarEncounterBypassesCharacterCulling } from './ignivar_encounter_core';
+import {
+  ignivarEncounterBypassesCharacterCulling,
+  ignivarEncounterViewVisibleDuringCompile,
+} from './ignivar_encounter_core';
 import { attachIgnivarModelVfx } from './ignivar_model_vfx';
+import { buildIgnivarRaidGate, ignivarRaidGatePlan } from './ignivar_raid_gate';
 import { buildImpactSite, type ImpactSiteView, MIREFEN_IMPACT_SITE } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
 import { buildJailScene, type JailSceneView } from './jail_scene';
@@ -4805,6 +4815,7 @@ export class Renderer {
     this.vfx.update(dt);
     this.vfx.prepareDraw(this.camera);
     this.frozenOrbFx.update(dt);
+    this.mageGroundFx.syncMeteorWarnings(this.sim.activeIgnivarMeteors);
     this.mageGroundFx.update(dt);
     this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);
     this.ringOfFrostVisuals.update(dt);
@@ -6796,6 +6807,10 @@ export class Renderer {
         // roaming orb) that its one-shot sequences would read worse than, so
         // their dedicated arms below stay authoritative.
         if (this.abilityVfx.handleSpellfxAt(ev)) break;
+        if (ev.fx === 'meteorImpact' && ev.persistentId) {
+          this.mageGroundFx.impactMeteor(ev.persistentId, ev.x, ev.z);
+          break;
+        }
         // The Frozen Orb flight, animated locally from its three moments:
         // 'release' starts the drift, 'halt'/'resume' freeze and restart it at
         // the server's real coordinates when the orb latches onto an enemy.
@@ -6809,6 +6824,7 @@ export class Renderer {
             duration: ev.duration ?? 2,
             showTelegraph: ev.fx !== 'ambientMeteorFall',
             warningLead: ev.warningLead,
+            persistentId: ev.persistentId,
           });
           break;
         }
@@ -7308,7 +7324,13 @@ export class Renderer {
     // (rift_portal) and the in-rift descent are "entering" portals; the egress is a
     // "leaving" portal. Pylons and the other puzzle props are bespoke procedural
     // bodies (handled in the next branch).
-    if (
+    const raidGatePlan =
+      e.kind === 'object' ? ignivarRaidGatePlan(e.templateId, e.dungeonId) : null;
+    if (raidGatePlan) {
+      body = buildIgnivarRaidGate(raidGatePlan.open);
+      height = raidGatePlan.height;
+      objectMesh = body;
+    } else if (
       e.kind === 'object' &&
       (e.templateId === 'dungeon_door' ||
         e.templateId === 'dungeon_exit' ||
@@ -7676,7 +7698,14 @@ export class Renderer {
     // the compilePending flag (only the non-self loop does), so gating it would
     // strand the player invisible. Other entities un-hide via that loop.
     if (view && e.id !== this.sim.player.id) {
-      view.compileReady = this.gateViewOnCompile(view, group);
+      // Ignivar's floor telegraphs are actionable during a cold/late-join load.
+      // Compile the complete view against the live light state, but gate only the
+      // cosmetic rig so the entity anchor remains visible for those overlays.
+      view.compileReady = this.gateViewOnCompile(
+        view,
+        group,
+        e.templateId === IGNIVAR_BOSS_ID && view.visual ? view.visual.root : group,
+      );
     }
   }
 
@@ -7761,12 +7790,18 @@ export class Renderer {
   // prewarm cannot anticipate (e.g. the env-map-lit material that links only when
   // you walk into a biome) never hitch in-world. The prewarm stays a pure
   // optimization: already-compiled spawn content resolves instantly, no pop-in.
-  private gateViewOnCompile(view: EntityView, group: THREE.Group): Promise<void> | null {
+  private gateViewOnCompile(
+    view: EntityView,
+    group: THREE.Group,
+    visibilityTarget: THREE.Object3D = group,
+  ): Promise<void> | null {
     if (!this.asyncCompileSupported) return null;
     const generation = this.lifecycleGeneration;
-    const priorVisibility = group.visible;
+    const priorVisibility = visibilityTarget.visible;
+    const gatesOnlyCharacterRig = visibilityTarget !== group;
     view.compilePending = true;
-    group.visible = false;
+    if (gatesOnlyCharacterRig) view.visualCompilePending = true;
+    visibilityTarget.visible = false;
     // The canvas nameplate (name, target marker, health, and cast bar) keeps
     // painting while the 3D group is gated, so actionable information has an
     // immediate placeholder without first-drawing a still-linking shader.
@@ -7774,12 +7809,15 @@ export class Renderer {
       () => {
         if (!this.shutdownStarted && generation === this.lifecycleGeneration) {
           view.compilePending = false;
+          if (gatesOnlyCharacterRig) view.visualCompilePending = false;
+          visibilityTarget.visible = priorVisibility;
         }
       },
       (error) => {
         this.recoverRejectedCompileGate(error, generation, () => {
           view.compilePending = false;
-          group.visible = priorVisibility;
+          if (gatesOnlyCharacterRig) view.visualCompilePending = false;
+          visibilityTarget.visible = priorVisibility;
         });
       },
     );
@@ -8077,6 +8115,7 @@ export class Renderer {
     | 'dungeon'
     | 'temple'
     | 'nythraxis'
+    | 'ignivar'
     | 'delve'
     | 'yumiMaze'
     | 'battleground'
@@ -8598,6 +8637,7 @@ export class Renderer {
         : null;
     const inTemple = interior === 'temple';
     const inNythraxis = interior === 'nythraxis';
+    const inIgnivar = interior === 'ignivar' || interior === 'ignivar_depths';
     // Wildheart is an OPEN-AIR jungle caldera, not a closed room: it keeps the
     // sky dome and the daylight rig and only swaps in its own field haze.
     const inWildheartField = interior === 'wildheart';
@@ -8614,21 +8654,23 @@ export class Renderer {
               ? 'temple'
               : inNythraxis
                 ? 'nythraxis'
-                : inWildheartField
-                  ? 'wildheartField'
-                  : inLastKeep
-                    ? 'lastkeep'
-                    : inside
-                      ? 'dungeon'
-                      : camY <
-                          waterLevelAt(
-                            this.camera.position.x,
-                            this.camera.position.z,
-                            this.sim.cfg.seed,
-                          ) -
-                            0.05
-                        ? 'underwater'
-                        : 'outdoor';
+                : inIgnivar
+                  ? 'ignivar'
+                  : inWildheartField
+                    ? 'wildheartField'
+                    : inLastKeep
+                      ? 'lastkeep'
+                      : inside
+                        ? 'dungeon'
+                        : camY <
+                            waterLevelAt(
+                              this.camera.position.x,
+                              this.camera.position.z,
+                              this.sim.cfg.seed,
+                            ) -
+                              0.05
+                          ? 'underwater'
+                          : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     // Procedural rift: dynamic fog from the generated floor style, re-applied when
     // the floor changes (descent keeps fogState='rift' but swaps the palette).
@@ -8676,6 +8718,11 @@ export class Renderer {
         fog.color.setHex(0x020106);
         fog.near = 20;
         fog.far = 80;
+      } else if (desired === 'ignivar') {
+        // A warm, smoky forge grade with enough depth to read the complete
+        // 66-yard octagon. The atmosphere module owns these literals so its
+        // floor accents and the room lighting cannot drift into two palettes.
+        applyIgnivarArenaFog(fog);
       } else if (desired === 'wildheartField') {
         // Sunlit humid depth keeps the full caldera readable while the rear
         // shrine and limestone shell settle into a warm green atmospheric veil.
@@ -8740,10 +8787,12 @@ export class Renderer {
         const mazeNight = desired === 'yumiMaze';
         const wildheartSun = desired === 'wildheartField';
         const keepHearth = desired === 'lastkeep';
+        const ignivarForge = desired === 'ignivar';
         const underground =
           desired === 'dungeon' ||
           desired === 'temple' ||
           desired === 'nythraxis' ||
+          ignivarForge ||
           desired === 'delve';
         // The maze runs its own night rig; otherwise returning outdoors restores the
         // full daylight rig scaled by the current day/night grade, so stepping out
@@ -8754,36 +8803,44 @@ export class Renderer {
             ? WILDHEART_SUN_INTENSITY
             : keepHearth
               ? LASTKEEP_SUN_INTENSITY
-              : underground
-                ? DUNGEON_SUN_INTENSITY
-                : SUN_INTENSITY * this.dnGrade.lightScale;
+              : ignivarForge
+                ? IGNIVAR_ARENA_LIGHTING.sunIntensity
+                : underground
+                  ? DUNGEON_SUN_INTENSITY
+                  : SUN_INTENSITY * this.dnGrade.lightScale;
         this.hemi.intensity = mazeNight
           ? YUMI_MAZE_HEMI_INTENSITY
           : wildheartSun
             ? WILDHEART_HEMI_INTENSITY
             : keepHearth
               ? LASTKEEP_HEMI_INTENSITY
-              : underground
-                ? DUNGEON_HEMI_INTENSITY
-                : hemiOutdoorIntensity() * this.dnGrade.ambientScale;
+              : ignivarForge
+                ? IGNIVAR_ARENA_LIGHTING.hemiIntensity
+                : underground
+                  ? DUNGEON_HEMI_INTENSITY
+                  : hemiOutdoorIntensity() * this.dnGrade.ambientScale;
         this.scene.environmentIntensity = mazeNight
           ? YUMI_MAZE_ENV_INTENSITY
           : wildheartSun
             ? WILDHEART_ENV_INTENSITY
             : keepHearth
               ? LASTKEEP_ENV_INTENSITY
-              : underground
-                ? DUNGEON_ENV_INTENSITY
-                : this.envOutdoorIntensity * this.dnGrade.ambientScale;
+              : ignivarForge
+                ? IGNIVAR_ARENA_LIGHTING.envIntensity
+                : underground
+                  ? DUNGEON_ENV_INTENSITY
+                  : this.envOutdoorIntensity * this.dnGrade.ambientScale;
         sharedUniforms.uRimBoost.value = mazeNight
           ? YUMI_MAZE_RIM_BOOST
           : wildheartSun
             ? WILDHEART_RIM_BOOST
             : keepHearth
               ? LASTKEEP_RIM_BOOST
-              : underground
-                ? DUNGEON_RIM_BOOST
-                : 1;
+              : ignivarForge
+                ? IGNIVAR_ARENA_LIGHTING.rimIntensity
+                : underground
+                  ? DUNGEON_RIM_BOOST
+                  : 1;
         if (wildheartSun) {
           this.sun.color.setHex(0xffd48c);
           this.hemi.color.setHex(0xd8ebca);
@@ -8794,6 +8851,19 @@ export class Renderer {
           this.sun.color.setHex(LASTKEEP_SUN_COLOR);
           this.hemi.color.setHex(LASTKEEP_HEMI_SKY_COLOR);
           this.hemi.groundColor.setHex(LASTKEEP_HEMI_GROUND_COLOR);
+        } else if (ignivarForge) {
+          applyIgnivarArenaLighting({
+            sun: this.sun,
+            hemi: this.hemi,
+            scene: this.scene,
+            rim: sharedUniforms.uRimBoost,
+          });
+        } else if (underground) {
+          // Clear any bespoke interior tint when moving directly between two
+          // instance bands without crossing the outdoor day/night re-grade.
+          this.sun.color.setHex(0xffd99a);
+          this.hemi.color.setHex(0xdcefff);
+          this.hemi.groundColor.setHex(0x465f39);
         }
       }
       return;
@@ -9505,7 +9575,7 @@ export class Renderer {
         // the view is torn down anyway); while hidden, show only within 80yd.
         // hidden until its shaders finish linking off-thread (async-compile gate);
         // the object branch below may still re-hide loot
-        v.group.visible = !v.compilePending;
+        v.group.visible = ignivarEncounterViewVisibleDuringCompile(e.templateId, v.compilePending);
         // The graveyard resurrection angel is present only to a released spirit: hide
         // it from the living local player. It stays in the sim for the ghost and for
         // server-side resurrect-range checks, and other ghosts still see it. The
@@ -9719,7 +9789,22 @@ export class Renderer {
         this.updateValeCupBall(e, v, dt);
         continue;
       }
-      if (!v.visual) continue;
+      syncIgnivarPlayerChainVisual(v.group, e, this.views, dt, this.sim.entities);
+      if (!v.visual) {
+        if (e.kind === 'player' && ignivarEncounterBypassesCharacterCulling(e)) {
+          syncIgnivarEncounterVisuals(
+            v.group,
+            e,
+            dt,
+            this.vfx,
+            undefined,
+            false,
+            undefined,
+            this.sim.entities,
+          );
+        }
+        continue;
+      }
       // Decide visibility from the real world position before presentation work.
       // Audio and state derivation below remain active even for hidden actors.
       let characterBodyOnScreen = true;
@@ -9737,7 +9822,16 @@ export class Renderer {
         runCharacterPresentation ||
         (e.templateId === IGNIVAR_BOSS_ID && hasVisibleIgnivarEncounterTelegraph(v.group))
       ) {
-        syncIgnivarEncounterVisuals(v.group, e, dt, this.vfx, v.visual.root, characterBodyOnScreen);
+        syncIgnivarEncounterVisuals(
+          v.group,
+          e,
+          dt,
+          this.vfx,
+          v.visual.root,
+          characterBodyOnScreen,
+          undefined,
+          this.sim.entities,
+        );
       }
 
       let iceBlockActivated = false;
@@ -10867,6 +10961,7 @@ export class Renderer {
     );
     this.abilityVfx.update(dt);
     this.frozenOrbFx.update(dt);
+    this.mageGroundFx.syncMeteorWarnings(this.sim.activeIgnivarMeteors);
     this.mageGroundFx.update(dt);
     this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);
     this.ringOfFrostVisuals.update(dt);

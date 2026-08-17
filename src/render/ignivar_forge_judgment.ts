@@ -10,14 +10,18 @@ import {
   ignivarForgeShelterOffsets,
 } from '../sim/ignivar_forge_judgment';
 import { sharedUniforms } from './gfx';
+import { buildIgnivarFireBeam } from './ignivar_fire_beams';
 
 export const IGNIVAR_JUDGMENT_VISUAL_NAME = 'ignivarForgeJudgment';
 export const IGNIVAR_JUDGMENT_WARNINGS_NAME = 'ignivarForgeJudgmentWarnings';
 export const IGNIVAR_JUDGMENT_FIRE_NAME = 'ignivarForgeJudgmentFire';
 export const IGNIVAR_JUDGMENT_SHELTERS_NAME = 'ignivarForgeJudgmentShelters';
 export const IGNIVAR_JUDGMENT_SAFE_MARKER_NAME = 'ignivarForgeJudgmentSafeMarker';
+export const IGNIVAR_JUDGMENT_CUES_NAME = 'ignivarForgeJudgmentCues';
+export const IGNIVAR_JUDGMENT_DANGER_SCAR_NAME = 'ignivarForgeJudgmentDangerScar';
 
 const FIRE_SEGMENTS = 96;
+const CUE_BEAM_BASE_RANGE = 18.25;
 
 function additiveMaterial(color: number, opacity: number): THREE.MeshBasicMaterial {
   return new THREE.MeshBasicMaterial({
@@ -193,8 +197,73 @@ function buildWarning(index: number): THREE.Group {
   rim.name = 'ignivarForgeJudgmentWarningRim';
   rim.rotation.x = -Math.PI / 2;
   rim.position.y = 0.1;
-  warning.add(fill, rim, buildSafeMarker());
+  const dangerScar = new THREE.Group();
+  dangerScar.name = IGNIVAR_JUDGMENT_DANGER_SCAR_NAME;
+  const scarRing = new THREE.Mesh(
+    new THREE.RingGeometry(
+      IGNIVAR_JUDGMENT_SHELTER_RADIUS - 0.85,
+      IGNIVAR_JUDGMENT_SHELTER_RADIUS - 0.58,
+      32,
+    ),
+    additiveMaterial(0x681405, 0.34),
+  );
+  scarRing.rotation.x = -Math.PI / 2;
+  scarRing.position.y = 0.105;
+  const scarLines: THREE.Vector3[] = [];
+  for (let scar = 0; scar < 7; scar++) {
+    const angle = (scar * Math.PI * 2) / 7 + index * 0.37;
+    scarLines.push(
+      new THREE.Vector3(Math.sin(angle) * 1.2, 0.115, Math.cos(angle) * 1.2),
+      new THREE.Vector3(
+        Math.sin(angle + 0.13) * (IGNIVAR_JUDGMENT_SHELTER_RADIUS - 1.05),
+        0.115,
+        Math.cos(angle + 0.13) * (IGNIVAR_JUDGMENT_SHELTER_RADIUS - 1.05),
+      ),
+    );
+  }
+  const fissures = new THREE.LineSegments(
+    new THREE.BufferGeometry().setFromPoints(scarLines),
+    new THREE.LineBasicMaterial({
+      color: 0x7a1908,
+      transparent: true,
+      opacity: 0.42,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    }),
+  );
+  dangerScar.add(scarRing, fissures);
+  dangerScar.visible = false;
+  warning.add(fill, rim, buildSafeMarker(), dangerScar);
   return warning;
+}
+
+function forEachCueMaterial(root: THREE.Object3D, visit: (material: THREE.Material) => void): void {
+  root.traverse((object) => {
+    const renderable = object as THREE.Object3D & {
+      material?: THREE.Material | THREE.Material[];
+    };
+    if (!renderable.material) return;
+    const materials = Array.isArray(renderable.material)
+      ? renderable.material
+      : [renderable.material];
+    for (const material of materials) visit(material);
+  });
+}
+
+function buildCue(index: number): THREE.Group {
+  const cue = buildIgnivarFireBeam({
+    innerRange: 2.8,
+    range: CUE_BEAM_BASE_RANGE,
+    startHalfWidth: 0.62,
+    endHalfWidth: 1.55,
+  });
+  cue.name = `ignivarForgeJudgmentCue:${index}`;
+  cue.userData.baseRange = CUE_BEAM_BASE_RANGE;
+  forEachCueMaterial(cue, (material) => {
+    material.userData.ignivarBaseOpacity = material.opacity;
+  });
+  cue.visible = false;
+  return cue;
 }
 
 function buildFire(): THREE.Group {
@@ -239,7 +308,12 @@ function setGroupPosition(group: THREE.Object3D, x: number, z: number): void {
   group.position.set(x, 0, z);
 }
 
-function syncShelterIdentity(group: THREE.Object3D, safe: boolean): void {
+function syncShelterIdentity(
+  group: THREE.Object3D,
+  safe: boolean,
+  phase: 'warning' | 'active',
+  cueRevealed: boolean,
+): void {
   group.userData.safeShelter = safe;
   const foundation = group.getObjectByName('ignivarForgeJudgmentShelterFoundation') as
     | THREE.Mesh
@@ -254,12 +328,28 @@ function syncShelterIdentity(group: THREE.Object3D, safe: boolean): void {
   if (foundation)
     (foundation.material as THREE.MeshBasicMaterial).color.setHex(safe ? 0x123b32 : 0x180a08);
   if (rim) (rim.material as THREE.MeshBasicMaterial).color.setHex(safe ? 0xfff2a3 : 0xff4318);
-  if (warningFill)
-    (warningFill.material as THREE.MeshBasicMaterial).color.setHex(safe ? 0x42ffb0 : 0xff1d08);
-  if (warningRim)
-    (warningRim.material as THREE.MeshBasicMaterial).color.setHex(safe ? 0xffffff : 0xff3b0a);
+  if (warningFill) (warningFill.material as THREE.MeshBasicMaterial).color.setHex(0xff1d08);
+  if (warningRim) (warningRim.material as THREE.MeshBasicMaterial).color.setHex(0xff3b0a);
   const marker = group.getObjectByName(IGNIVAR_JUDGMENT_SAFE_MARKER_NAME);
-  if (marker) marker.visible = safe;
+  if (marker) marker.visible = phase === 'active' && safe;
+  const dangerScar = group.getObjectByName(IGNIVAR_JUDGMENT_DANGER_SCAR_NAME);
+  if (dangerScar) dangerScar.visible = phase === 'warning' && cueRevealed && !safe;
+}
+
+function syncCue(
+  cue: THREE.Object3D,
+  offset: { x: number; z: number },
+  visible: boolean,
+  intensity: number,
+): void {
+  const distance = Math.hypot(offset.x, offset.z);
+  cue.rotation.y = Math.atan2(offset.x, offset.z);
+  cue.scale.set(1, 0.72 + intensity * 0.38, distance / CUE_BEAM_BASE_RANGE);
+  cue.visible = visible;
+  forEachCueMaterial(cue, (material) => {
+    const baseOpacity = Number(material.userData.ignivarBaseOpacity ?? material.opacity);
+    material.opacity = baseOpacity * (0.38 + intensity * 0.62);
+  });
 }
 
 function syncFireSafeCenter(fire: THREE.Object3D, x: number, z: number): void {
@@ -276,12 +366,15 @@ export function buildIgnivarForgeJudgmentVisual(): THREE.Group {
   warnings.name = IGNIVAR_JUDGMENT_WARNINGS_NAME;
   const shelters = new THREE.Group();
   shelters.name = IGNIVAR_JUDGMENT_SHELTERS_NAME;
+  const cues = new THREE.Group();
+  cues.name = IGNIVAR_JUDGMENT_CUES_NAME;
   for (let index = 0; index < IGNIVAR_JUDGMENT_SHELTER_COUNT; index++) {
     warnings.add(buildWarning(index));
     shelters.add(buildShelter(index));
+    cues.add(buildCue(index));
   }
   const fire = buildFire();
-  root.add(warnings, fire, shelters);
+  root.add(warnings, cues, fire, shelters);
   root.userData.ignivarJudgmentFire = fire;
   root.userData.ignivarSafeOffsetX = 0;
   root.userData.ignivarSafeOffsetZ = 0;
@@ -296,6 +389,8 @@ export function syncIgnivarForgeJudgmentVisual(
   rotation: number,
   safeIndex: IgnivarJudgmentShelterIndex,
   inverseEntityScale: number,
+  cueIntensity = 0,
+  cueRevealed = false,
 ): void {
   if (phase === 'hidden') {
     root.visible = false;
@@ -303,7 +398,7 @@ export function syncIgnivarForgeJudgmentVisual(
     return;
   }
   const fire = root.userData.ignivarJudgmentFire as THREE.Object3D;
-  const syncKey = `${phase}:${rotation}:${safeIndex}:${inverseEntityScale}`;
+  const syncKey = `${phase}:${rotation}:${safeIndex}:${inverseEntityScale}:${cueIntensity}:${cueRevealed}`;
   if (root.userData.ignivarJudgmentSync === syncKey) return;
   root.userData.ignivarJudgmentSync = syncKey;
   root.visible = true;
@@ -311,20 +406,30 @@ export function syncIgnivarForgeJudgmentVisual(
   root.userData.safeShelterIndex = safeIndex;
   const warnings = root.getObjectByName(IGNIVAR_JUDGMENT_WARNINGS_NAME);
   const shelters = root.getObjectByName(IGNIVAR_JUDGMENT_SHELTERS_NAME);
+  const cues = root.getObjectByName(IGNIVAR_JUDGMENT_CUES_NAME);
   const offsets = ignivarForgeShelterOffsets(rotation);
   for (let index = 0; index < offsets.length; index++) {
     const warning = warnings?.children[index];
     const shelter = shelters?.children[index];
     if (warning) {
       setGroupPosition(warning, offsets[index].x, offsets[index].z);
-      syncShelterIdentity(warning, index === safeIndex);
+      syncShelterIdentity(warning, index === safeIndex, 'warning', cueRevealed);
     }
     if (shelter) {
       setGroupPosition(shelter, offsets[index].x, offsets[index].z);
-      syncShelterIdentity(shelter, index === safeIndex);
+      syncShelterIdentity(shelter, index === safeIndex, 'active', cueRevealed);
     }
+    const cue = cues?.children[index];
+    if (cue)
+      syncCue(
+        cue,
+        offsets[index],
+        phase === 'warning' && index !== safeIndex && cueIntensity > 0.01,
+        cueIntensity,
+      );
   }
   if (warnings) warnings.visible = phase === 'warning';
+  if (cues) cues.visible = phase === 'warning';
   if (fire) {
     fire.visible = phase === 'active';
     const safe = offsets[safeIndex];

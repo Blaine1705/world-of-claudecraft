@@ -298,6 +298,40 @@ export const IGNIVAR_LAYOUT: DungeonLayout = {
   shellPole: { x: 0, z: 0 },
 };
 
+// The raid's second encounter room. It stays mechanically neutral until its boss
+// is authored: a larger twelve-sided floor, no pillars, and no line-of-sight
+// blockers. The extra space leaves room for a future encounter without changing
+// Ignivar's carefully tuned arena geometry.
+export const IGNIVAR_SECOND_WING_LAYOUT: DungeonLayout = {
+  zMin: -40,
+  zMax: 40,
+  sideWallZ: 0,
+  sideWallHd: 40,
+  wallX: 40,
+  endWallHw: 40,
+  floorHalfX: 40,
+  doorZ: -40,
+  pillars: [],
+  tombs: [],
+  stubs: [],
+  dais: { x: 0, z: 0, r: 10 },
+  shellPolygon: [
+    { x: -16, z: -40 },
+    { x: 16, z: -40 },
+    { x: 32, z: -32 },
+    { x: 40, z: -16 },
+    { x: 40, z: 16 },
+    { x: 32, z: 32 },
+    { x: 16, z: 40 },
+    { x: -16, z: 40 },
+    { x: -32, z: 32 },
+    { x: -40, z: 16 },
+    { x: -40, z: -16 },
+    { x: -32, z: -32 },
+  ],
+  shellPole: { x: 0, z: 0 },
+};
+
 export const TEMPLE_LAYOUT: DungeonLayout = (() => {
   const pillars: GridPoint[] = [];
   for (const z of [10, 25, 40, 55, 80, 95, 110]) {

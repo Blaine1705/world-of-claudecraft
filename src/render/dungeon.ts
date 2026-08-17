@@ -29,6 +29,7 @@ import {
   type DungeonLayout,
   type GridPoint,
   IGNIVAR_LAYOUT,
+  IGNIVAR_SECOND_WING_LAYOUT,
   type InteriorStyle,
   LASTKEEP_LAYOUT,
   NYTHRAXIS_LAYOUT,
@@ -60,7 +61,8 @@ import {
 } from './delve_marsh_dressing';
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
 import { attachSceneGroupGated } from './gated_scene_attach';
-import { EMISSIVE_LIGHT, GFX, sharedUniforms } from './gfx';
+import { EMISSIVE_LIGHT, sharedUniforms } from './gfx';
+import { buildIgnivarArenaAtmosphere } from './ignivar_arena_atmosphere';
 import { buildLastKeepDressing, ensureLastKeepDressing } from './lastkeep_dressing';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
@@ -809,12 +811,14 @@ export class DungeonInteriors {
               ? NYTHRAXIS_LAYOUT
               : interior === 'ignivar'
                 ? IGNIVAR_LAYOUT
-                : interior === 'lastkeep'
-                  ? // The Last Keep: an authored room-graph castle interior; its
-                    // rooms/doors/decor route the build through the authored path
-                    // below, exactly like the citadel's set-piece floors.
-                    LASTKEEP_LAYOUT
-                  : CRYPT_LAYOUT);
+                : interior === 'ignivar_depths'
+                  ? IGNIVAR_SECOND_WING_LAYOUT
+                  : interior === 'lastkeep'
+                    ? // The Last Keep: an authored room-graph castle interior; its
+                      // rooms/doors/decor route the build through the authored path
+                      // below, exactly like the citadel's set-piece floors.
+                      LASTKEEP_LAYOUT
+                    : CRYPT_LAYOUT);
     const variant = opts?.style?.kit ?? opts?.variant ?? this.variantFor(interior, ox, oz);
     const torch = opts?.style?.torch ?? TORCH_COLORS[variant];
     const daisRaised = opts?.style?.daisRaised;
@@ -926,6 +930,9 @@ export class DungeonInteriors {
     }
 
     this.emit(group, p, variant);
+    if (interior === 'ignivar') {
+      group.add(buildIgnivarArenaAtmosphere({ lowGfx: this.lowGfx }));
+    }
     if (arenaWalls) {
       for (const wall of arenaWalls.all) this.emitArenaHideable(group, wall, variant);
     }
@@ -1338,7 +1345,7 @@ export class DungeonInteriors {
         : 'arena';
     }
     if (interior === 'nythraxis') return 'nythraxis';
-    if (interior === 'ignivar') return 'ignivar';
+    if (interior === 'ignivar' || interior === 'ignivar_depths') return 'ignivar';
     if (interior === 'sanctum') return 'sanctum';
     if (interior === 'temple') return 'temple';
     // The Last Keep gets its own warm castle grade (clean stone, candle light,

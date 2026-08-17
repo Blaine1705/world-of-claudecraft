@@ -3,8 +3,9 @@
 // The stock Spellcasting clip waves both hands, which reads poorly on a
 // top-heavy forge titan. ForgeIdle and ForgeCast instead freeze a planted
 // KayKit pose; ForgeCast moves only chest/head as the furnace charges.
-// ForgeSlam keeps the proven right-arm Punch_A motion while pinning the magma
-// arm, so the oversized forge gauntlet is the clear source of the hit.
+// ForgeSlam keeps every bone planted. A common parent moves the complete mesh and
+// skeleton through a short rigid lunge, adding impact without deforming the
+// gauntlet, torso, or head. ForgeHit stays fully planted under incoming damage.
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
@@ -36,17 +37,31 @@ const io = new NodeIO()
   .registerDependencies({ 'meshopt.decoder': MeshoptDecoder, 'meshopt.encoder': MeshoptEncoder });
 const document = await io.read(inFile);
 const root = document.getRoot();
+const scene = root.listScenes()[0];
+if (!scene) throw new Error('Rig_Medium source must contain a scene');
 const buffer = root.listBuffers()[0];
 const animations = new Map(
   root.listAnimations().map((animation) => [animation.getName(), animation]),
 );
 const plantedSource = animations.get('Spellcasting');
-const slamSource = animations.get('Punch_A');
-if (!plantedSource || !slamSource) {
-  throw new Error('Rig_Medium source must contain Spellcasting and Punch_A');
+if (!plantedSource) {
+  throw new Error('Rig_Medium source must contain Spellcasting');
 }
 
-for (const name of ['ForgeIdle', 'ForgeCast', 'ForgeSlam']) animations.get(name)?.dispose();
+for (const name of ['ForgeIdle', 'ForgeCast', 'ForgeHit', 'ForgeSlam']) {
+  animations.get(name)?.dispose();
+}
+
+let rigidMotion = root.listNodes().find((node) => node.getName() === 'IgnivarRigidMotion');
+if (!rigidMotion) {
+  rigidMotion = document.createNode('IgnivarRigidMotion');
+  const originalChildren = [...scene.listChildren()];
+  for (const child of originalChildren) {
+    scene.removeChild(child);
+    rigidMotion.addChild(child);
+  }
+  scene.addChild(rigidMotion);
+}
 
 function channelFirstValue(channel) {
   const sampler = channel.getSampler();
@@ -120,53 +135,25 @@ function authorFrozenPose(name, times, chestPitchDegrees = null) {
 
 authorFrozenPose('ForgeIdle', [0, 3.2]);
 authorFrozenPose('ForgeCast', [0, 0.28, 0.7, 1.16, 1.46], [0, -2, -5, -5, 0]);
-
-const pinnedLeft = new Set(['upperarm.l', 'lowerarm.l', 'wrist.l', 'hand.l', 'handslot.l']);
-const plantedChannels = new Map(
-  plantedSource
-    .listChannels()
-    .filter((channel) => channel.getTargetNode())
-    .map((channel) => [
-      `${channel.getTargetNode().getName()}|${channel.getTargetPath()}`,
-      channelFirstValue(channel),
-    ]),
+authorFrozenPose('ForgeHit', [0, 0.24]);
+const slam = authorFrozenPose('ForgeSlam', [0, 0.8]);
+addTrack(
+  slam,
+  'rigid_lunge',
+  rigidMotion,
+  'translation',
+  'VEC3',
+  [0, 0.12, 0.28, 0.42, 0.62, 0.8],
+  [
+    [0, 0, 0],
+    [0, 0.01, 0.035],
+    [0, -0.025, 0.13],
+    [0, -0.04, 0.18],
+    [0, -0.01, 0.045],
+    [0, 0, 0],
+  ],
 );
-const slam = document.createAnimation('ForgeSlam');
-for (const sourceChannel of slamSource.listChannels()) {
-  const node = sourceChannel.getTargetNode();
-  const sampler = sourceChannel.getSampler();
-  if (!node || !sampler?.getInput() || !sampler.getOutput()) continue;
-  if (pinnedLeft.has(node.getName())) {
-    const planted = plantedChannels.get(`${node.getName()}|${sourceChannel.getTargetPath()}`);
-    if (!planted) continue;
-    const duration = 0.7;
-    addTrack(
-      slam,
-      `${node.getName()}_${sourceChannel.getTargetPath()}`,
-      node,
-      sourceChannel.getTargetPath(),
-      planted.type,
-      [0, duration],
-      [[...planted.value], [...planted.value]],
-    );
-    continue;
-  }
-  const clonedSampler = document
-    .createAnimationSampler()
-    .setInput(sampler.getInput())
-    .setOutput(sampler.getOutput())
-    .setInterpolation(sampler.getInterpolation());
-  slam
-    .addSampler(clonedSampler)
-    .addChannel(
-      document
-        .createAnimationChannel()
-        .setTargetNode(node)
-        .setTargetPath(sourceChannel.getTargetPath())
-        .setSampler(clonedSampler),
-    );
-}
 
 await io.write(outFile, document);
 console.log(`${inFile} -> ${outFile}`);
-console.log('authored: ForgeIdle, ForgeCast (planted), ForgeSlam (right gauntlet)');
+console.log('authored: ForgeIdle, ForgeCast/ForgeHit (planted), ForgeSlam (rigid lunge)');

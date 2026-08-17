@@ -2,6 +2,7 @@
 // lists, and the DungeonDef registry merged by sim/data.ts.
 
 import { IGNIVAR_CONDUITS, IGNIVAR_WATER_CONDUIT_TEMPLATES } from '../ignivar_arena';
+import { IGNIVAR_GATE_LOCKED_TEMPLATE, IGNIVAR_SECOND_WING_ID } from '../ignivar_raid_ids';
 import type { DungeonDef, DungeonSpawn, MobTemplate } from '../types';
 
 export const DUNGEON_MOBS: Record<string, MobTemplate> = {
@@ -23,7 +24,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     dmgPerLevel: 10,
     attackSpeed: 2.6,
     armorPerLevel: 42,
-    moveSpeed: 0,
+    moveSpeed: 7,
     aggroRadius: 30,
     loot: [],
     scale: 3.4,
@@ -1284,17 +1285,45 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     entry: { x: 0, z: -27 },
     exitOffset: { x: 0, z: -30 },
     spawns: IGNIVAR_RAID_SPAWN_LIST,
-    objects: IGNIVAR_CONDUITS.map((conduit) => ({
-      itemId: '',
-      name: `${conduit.id} Water Conduit`,
-      x: conduit.x,
-      z: conduit.z,
-      templateId: IGNIVAR_WATER_CONDUIT_TEMPLATES.ready,
-      lootable: false,
-    })),
+    objects: [
+      ...IGNIVAR_CONDUITS.map((conduit) => ({
+        itemId: '',
+        name: `${conduit.id} Water Conduit`,
+        x: conduit.x,
+        z: conduit.z,
+        templateId: IGNIVAR_WATER_CONDUIT_TEMPLATES.ready,
+        lootable: false,
+      })),
+      {
+        itemId: '',
+        name: 'Sealed Inner Crucible Gate',
+        x: 0,
+        z: 31.5,
+        templateId: IGNIVAR_GATE_LOCKED_TEMPLATE,
+        dungeonId: IGNIVAR_SECOND_WING_ID,
+        lootable: false,
+      },
+    ],
     interior: 'ignivar',
     suggestedPlayers: 10,
     enterText: 'Heat shimmers above the sealed waters of the Crucible.',
     leaveText: 'You step away from the Crucible and breathe freely again.',
+  },
+  ignivar_inner_crucible: {
+    id: 'ignivar_inner_crucible',
+    name: 'The Inner Crucible',
+    index: 10,
+    // Internal raid wing reached only through the gate behind Ignivar.
+    doorPos: { x: 0, z: 0 },
+    overworldDoor: false,
+    guideVisible: false,
+    entry: { x: 0, z: -34 },
+    exitOffset: { x: 0, z: -38 },
+    // The room is intentionally empty until the second boss is designed.
+    spawns: [],
+    interior: 'ignivar_depths',
+    suggestedPlayers: 10,
+    enterText: 'The opened gate leads deeper into the Crucible.',
+    leaveText: 'You leave the silent depths of the Crucible.',
   },
 };

@@ -7423,6 +7423,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemArmorType.mail': '사슬',
   'hudChrome.auraEffect.dot': '{interval}초마다 {value}의 {school} 피해를 입힙니다',
   'hudChrome.auraEffect.hot': '{interval}초마다 생명력을 {value} 회복합니다',
+  'hudChrome.auraEffect.sharedPyre': '원 안에 최소 {players}명의 플레이어가 있어야 합니다',
   'hudChrome.auraEffect.absorb': '{value}의 피해를 흡수합니다',
   'hudChrome.auraEffect.healAbsorb': '들어오는 치유를 {value}만큼 흡수합니다',
   'hudChrome.auraEffect.thorns': '공격자에게 {value}의 {school} 피해를 입힙니다',

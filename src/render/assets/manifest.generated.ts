@@ -352,7 +352,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/greyjaw.glb": "/media/models/creatures/greyjaw.b78718b95a66.glb",
   "models/creatures/greyjaw_ability_anims.glb": "/media/models/creatures/greyjaw_ability_anims.dfa720196375.glb",
   "models/creatures/grubjaw.glb": "/media/models/creatures/grubjaw.6d109e187a99.glb",
-  "models/creatures/ignivar_herald.glb": "/media/models/creatures/ignivar_herald.c449599855e7.glb",
+  "models/creatures/ignivar_herald.glb": "/media/models/creatures/ignivar_herald.21863c665439.glb",
   "models/creatures/kobold_ability_anims.glb": "/media/models/creatures/kobold_ability_anims.f2d51c66b479.glb",
   "models/creatures/leaping_fish.glb": "/media/models/creatures/leaping_fish.3df008156018.glb",
   "models/creatures/murloc_ability_anims.glb": "/media/models/creatures/murloc_ability_anims.71d64c63e2ca.glb",

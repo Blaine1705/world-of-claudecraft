@@ -2149,7 +2149,7 @@ export const ru_RU: EnTranslations = {
       "mail": "Кольчуга"
     },
     "auraEffect": {
-      "sharedPyre": "Requires at least {players} players inside the circle",
+      "sharedPyre": "В круге должно находиться не менее {players} игроков",
       "dot": "Наносит {value} единиц урона ({school}) каждые {interval} сек",
       "hot": "Восстанавливает {value} здоровья каждые {interval} сек",
       "absorb": "Поглощает {value} единиц урона",
@@ -15839,6 +15839,11 @@ export const ru_RU: EnTranslations = {
         "name": "Горнило Последнего Источника",
         "enterText": "Жар дрожит над запечатанными водами Горнила.",
         "leaveText": "Вы покидаете Горнило и снова дышите свободно."
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "Котловина Дикого Сердца",

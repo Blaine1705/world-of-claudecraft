@@ -9,6 +9,20 @@ export interface IgnivarMeteorPoint {
   z: number;
 }
 
+export interface ActiveIgnivarMeteorWarning extends IgnivarMeteorPoint {
+  id: string;
+  radius: number;
+  duration: number;
+  remaining: number;
+  warningLead: number;
+}
+
+export interface IgnivarMeteorWarningState {
+  meteorCastKey: number;
+  meteorImpactRemaining: number;
+  meteorPoints: readonly IgnivarMeteorPoint[];
+}
+
 export const IGNIVAR_METEOR_COUNT = 5;
 export const IGNIVAR_METEOR_RADIUS = 2.4;
 export const IGNIVAR_METEOR_MIN_RANGE = 9;
@@ -22,6 +36,31 @@ export const IGNIVAR_METEOR_REVEAL_DELAY_SECONDS = 0.75;
 export const IGNIVAR_METEOR_DAMAGE_MAX_HP = 0.35;
 
 const IGNIVAR_METEOR_CANDIDATES = 48;
+
+export function ignivarMeteorWarningId(
+  bossId: number,
+  castKey: number,
+  meteorIndex: number,
+): string {
+  return `${bossId}:${castKey}:${meteorIndex}`;
+}
+
+/** Projects the authoritative cast into persistent, reconnect-safe presentation state. */
+export function activeIgnivarMeteorWarnings(
+  bossId: number,
+  state: IgnivarMeteorWarningState,
+): ActiveIgnivarMeteorWarning[] {
+  if (state.meteorImpactRemaining <= 0) return [];
+  return state.meteorPoints.map((point, meteorIndex) => ({
+    id: ignivarMeteorWarningId(bossId, state.meteorCastKey, meteorIndex),
+    x: point.x,
+    z: point.z,
+    radius: IGNIVAR_METEOR_RADIUS,
+    duration: IGNIVAR_METEOR_TELEGRAPH_SECONDS,
+    remaining: Math.min(state.meteorImpactRemaining, IGNIVAR_METEOR_TELEGRAPH_SECONDS),
+    warningLead: IGNIVAR_METEOR_REVEAL_DELAY_SECONDS,
+  }));
+}
 
 function meteorCandidate(
   castKey: number,

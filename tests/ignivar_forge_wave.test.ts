@@ -11,10 +11,10 @@ import {
 describe('Ignivar Forge Wave geometry', () => {
   it('expands linearly from the boss to the arena edge', () => {
     expect(IGNIVAR_FORGE_WAVE_ACTIVE_SECONDS).toBe(3);
-    expect(IGNIVAR_FORGE_WAVE_RANGE).toBe(28);
+    expect(IGNIVAR_FORGE_WAVE_RANGE).toBe(72);
     expect(ignivarForgeWaveRadius(IGNIVAR_FORGE_WAVE_ACTIVE_SECONDS)).toBe(0);
-    expect(ignivarForgeWaveRadius(IGNIVAR_FORGE_WAVE_ACTIVE_SECONDS / 2)).toBe(14);
-    expect(ignivarForgeWaveRadius(0)).toBe(28);
+    expect(ignivarForgeWaveRadius(IGNIVAR_FORGE_WAVE_ACTIVE_SECONDS / 2)).toBe(36);
+    expect(ignivarForgeWaveRadius(0)).toBe(72);
   });
 
   it('cuts two opposite safe gaps out of the expanding fire wall', () => {

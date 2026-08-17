@@ -11,11 +11,15 @@ export const IGNIVAR_FIRST_FORGE_WAVE_SECONDS = 44;
 export const IGNIVAR_FORGE_WAVE_EVERY = 46;
 export const IGNIVAR_FORGE_WAVE_WINDUP_SECONDS = 2.5;
 export const IGNIVAR_FORGE_WAVE_ACTIVE_SECONDS = 3;
-export const IGNIVAR_FORGE_WAVE_RANGE = 28;
+// Covers the farthest pair of vertices in the 66 by 66 octagonal arena even
+// when Ignivar is tanked against one wall (ceil(hypot(66, 28))).
+export const IGNIVAR_FORGE_WAVE_RANGE = 72;
 export const IGNIVAR_FORGE_WAVE_GAP_HALF_ANGLE = Math.PI / 12;
 export const IGNIVAR_FORGE_WAVE_WALL_HALF_THICKNESS = 0.75;
 export const IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP = 0.35;
-export const IGNIVAR_FORGE_WAVE_KNOCKBACK = 4;
+// The shared collision sweep seats the victim at the opposite wall, so the
+// shove always completes backward without tunneling out of the room.
+export const IGNIVAR_FORGE_WAVE_KNOCKBACK = IGNIVAR_FORGE_WAVE_RANGE;
 
 const TAU = Math.PI * 2;
 

@@ -6,6 +6,7 @@ import {
 } from '../src/render/ability_vfx/encounter_specs';
 import { sharedUniforms } from '../src/render/gfx';
 import { ignivarEncounterVisualPlan } from '../src/render/ignivar_encounter_core';
+import { IGNIVAR_FIRE_BEAM_CORE_NAME } from '../src/render/ignivar_fire_beams';
 import {
   buildIgnivarForgeJudgmentVisual,
   IGNIVAR_JUDGMENT_FIRE_NAME,
@@ -49,16 +50,24 @@ import {
   ignivarClosestForgeShelterIndex,
   ignivarForgeLayoutFacing,
   ignivarForgeLayoutFromFacing,
+  ignivarForgeShelterOffsets,
   ignivarForgeShelterPoints,
   ignivarPointInForgeShelter,
   ignivarPointOnJudgmentFire,
 } from '../src/sim/ignivar_forge_judgment';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
-import { DT, IGNIVAR_BOSS_ID, type PlayerClass, type SimEvent } from '../src/sim/types';
+import {
+  DT,
+  type Entity,
+  IGNIVAR_BOSS_ID,
+  type PlayerClass,
+  type SimEvent,
+} from '../src/sim/types';
 
-function claimedEncounter(seed = 42) {
+function claimedEncounter(seed = 42, difficulty: 'normal' | 'heroic' = 'normal') {
   const sim = new Sim({ seed, playerClass: 'warrior', devCommands: true });
+  if (difficulty === 'heroic') sim.setDungeonDifficulty('heroic', sim.player.id);
   expect(enterDungeon(sim.ctx, 'ignivar_raid_arena', sim.player.id, true)).toBe(true);
   const boss = [...sim.entities.values()].find((entity) => entity.templateId === IGNIVAR_BOSS_ID);
   if (!boss) throw new Error('Ignivar did not spawn');
@@ -95,6 +104,25 @@ function addEncounterPlayer(
   player.pos = { x: boss.pos.x, y: boss.pos.y, z: boss.pos.z };
   player.prevPos = { ...player.pos };
   return player;
+}
+
+function applyBrand(player: Entity, boss: Entity): void {
+  player.auras.push({
+    id: IGNIVAR_BRAND_AURA_ID,
+    name: 'Brand of the Pyre',
+    kind: 'dot',
+    remaining: 600,
+    duration: 600,
+    value: Math.ceil(player.maxHp * 0.15),
+    tickInterval: 2,
+    tickTimer: 1,
+    stacks: 3,
+    maxTickStacks: 3,
+    sourceId: boss.id,
+    school: 'fire',
+    finalDamage: true,
+    encounterOwned: true,
+  });
 }
 
 function finaleTrace(seed: number) {
@@ -249,15 +277,13 @@ describe('Ignivar Forge Judgment', () => {
       safeIndex,
     });
     expect(
-      warningEvents
-        .filter(
-          (event): event is Extract<SimEvent, { type: 'spellfxAt' }> =>
-            event.type === 'spellfxAt' &&
-            event.fx === 'meteorFall' &&
-            event.ability === IGNIVAR_JUDGMENT_CAST_ID,
-        )
-        .map((event) => ({ x: event.x, z: event.z })),
-    ).toEqual(shelters);
+      warningEvents.filter(
+        (event) =>
+          event.type === 'spellfxAt' &&
+          event.fx === 'meteorFall' &&
+          event.ability === IGNIVAR_JUDGMENT_CAST_ID,
+      ),
+    ).toHaveLength(0);
 
     const wrongRefuge = addEncounterPlayer(sim, boss, 'Wrong Refuge');
     const otherWrongRefuge = addEncounterPlayer(sim, boss, 'Other Wrong Refuge');
@@ -276,13 +302,15 @@ describe('Ignivar Forge Judgment', () => {
     expect(boss.channeling).toBe(true);
     expect(boss.castingAbility).toBe(IGNIVAR_JUDGMENT_CAST_ID);
     expect(
-      impactEvents.filter(
-        (event) =>
-          event.type === 'spellfxAt' &&
-          event.fx === 'burst' &&
-          event.ability === IGNIVAR_JUDGMENT_CAST_ID,
-      ),
-    ).toHaveLength(3);
+      impactEvents
+        .filter(
+          (event): event is Extract<SimEvent, { type: 'spellfxAt' }> =>
+            event.type === 'spellfxAt' &&
+            event.fx === 'burst' &&
+            event.ability === IGNIVAR_JUDGMENT_CAST_ID,
+        )
+        .map((event) => ({ x: event.x, z: event.z })),
+    ).toEqual(decoys);
     expect([sim.player, wrongRefuge, otherWrongRefuge, exposed].map((player) => player.hp)).toEqual(
       impactHealth,
     );
@@ -346,38 +374,8 @@ describe('Ignivar Forge Judgment', () => {
     boss.ignivar.soakTimer = 13;
     const brandedAlly = addEncounterPlayer(sim, boss, 'Branded Ally');
     brandedAlly.devGod = true;
-    sim.player.auras.push({
-      id: IGNIVAR_BRAND_AURA_ID,
-      name: 'Brand of the Pyre',
-      kind: 'dot',
-      remaining: 600,
-      duration: 600,
-      value: Math.ceil(sim.player.maxHp * 0.15),
-      tickInterval: 2,
-      tickTimer: 1,
-      stacks: 3,
-      maxTickStacks: 3,
-      sourceId: boss.id,
-      school: 'fire',
-      finalDamage: true,
-      encounterOwned: true,
-    });
-    brandedAlly.auras.push({
-      id: IGNIVAR_BRAND_AURA_ID,
-      name: 'Brand of the Pyre',
-      kind: 'dot',
-      remaining: 600,
-      duration: 600,
-      value: Math.ceil(brandedAlly.maxHp * 0.15),
-      tickInterval: 2,
-      tickTimer: 1,
-      stacks: 3,
-      maxTickStacks: 3,
-      sourceId: boss.id,
-      school: 'fire',
-      finalDamage: true,
-      encounterOwned: true,
-    });
+    applyBrand(sim.player, boss);
+    applyBrand(brandedAlly, boss);
     const conduit = [...sim.entities.values()].find(
       (entity) => entity.templateId === IGNIVAR_WATER_CONDUIT_TEMPLATES.ready,
     );
@@ -444,6 +442,29 @@ describe('Ignivar Forge Judgment', () => {
     expect(boss.ignivar.conduitTimers.north_west).toBe(5);
     sim.tick();
     expect(boss.ignivar.conduitTimers.north_west).toBe(5 - DT);
+  });
+
+  it('preserves every Brand when Heroic Judgment begins', () => {
+    const { sim, boss } = claimedEncounter(7319, 'heroic');
+    const brandedAlly = addEncounterPlayer(sim, boss, 'Heroic Branded Ally');
+    sim.player.devGod = true;
+    brandedAlly.devGod = true;
+    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+    applyBrand(sim.player, boss);
+    applyBrand(brandedAlly, boss);
+    boss.hp = Math.floor(boss.maxHp * IGNIVAR_JUDGMENT_HP_THRESHOLD);
+
+    sim.tick();
+
+    expect(boss.ignivar.forgeJudgmentPhase).toBe('warning');
+    expect(sim.player.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID)).toBe(true);
+    expect(brandedAlly.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID)).toBe(true);
+
+    for (let tick = 0; tick < IGNIVAR_JUDGMENT_DURATION_SECONDS / DT; tick++) sim.tick();
+
+    expect(boss.ignivar.forgeJudgmentPhase).toBe('done');
+    expect(sim.player.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID)).toBe(true);
+    expect(brandedAlly.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID)).toBe(true);
   });
 
   it('draws the random layout deterministically from the encounter RNG', () => {
@@ -691,7 +712,47 @@ describe('Ignivar Forge Judgment', () => {
     expect(warning.judgmentPhase).toBe('warning');
     expect(warning.judgmentRotation).toBe(rotation);
     expect(warning.judgmentSafeIndex).toBe(safeIndex);
+    expect(warning.judgmentCueIntensity).toBe(0);
+    expect(warning.judgmentCueRevealed).toBe(false);
     expect(warning.rotatingRaysVisible).toBe(false);
+
+    const firstCue = ignivarEncounterVisualPlan({
+      kind: 'mob',
+      templateId: IGNIVAR_BOSS_ID,
+      castingAbility: IGNIVAR_JUDGMENT_CAST_ID,
+      castRemaining: IGNIVAR_JUDGMENT_ACTIVE_SECONDS + IGNIVAR_JUDGMENT_WARNING_SECONDS * 0.86,
+      castTotal: IGNIVAR_JUDGMENT_DURATION_SECONDS,
+      channeling: false,
+      facing,
+      auras: [],
+    });
+    expect(firstCue.judgmentCueIntensity).toBeGreaterThan(0.9);
+    expect(firstCue.judgmentCueRevealed).toBe(true);
+
+    const secondCue = ignivarEncounterVisualPlan({
+      kind: 'mob',
+      templateId: IGNIVAR_BOSS_ID,
+      castingAbility: IGNIVAR_JUDGMENT_CAST_ID,
+      castRemaining: IGNIVAR_JUDGMENT_ACTIVE_SECONDS + IGNIVAR_JUDGMENT_WARNING_SECONDS * 0.585,
+      castTotal: IGNIVAR_JUDGMENT_DURATION_SECONDS,
+      channeling: false,
+      facing,
+      auras: [],
+    });
+    expect(secondCue.judgmentCueIntensity).toBeGreaterThan(0.9);
+
+    const memoryWindow = ignivarEncounterVisualPlan({
+      kind: 'mob',
+      templateId: IGNIVAR_BOSS_ID,
+      castingAbility: IGNIVAR_JUDGMENT_CAST_ID,
+      castRemaining: IGNIVAR_JUDGMENT_ACTIVE_SECONDS + IGNIVAR_JUDGMENT_WARNING_SECONDS * 0.2,
+      castTotal: IGNIVAR_JUDGMENT_DURATION_SECONDS,
+      channeling: false,
+      facing,
+      auras: [],
+    });
+    expect(memoryWindow.judgmentCueIntensity).toBe(0);
+    expect(memoryWindow.judgmentCueRevealed).toBe(true);
 
     const active = ignivarEncounterVisualPlan({
       kind: 'mob',
@@ -725,15 +786,71 @@ describe('Ignivar Forge Judgment', () => {
       warning.judgmentRotation,
       warning.judgmentSafeIndex,
       1,
+      firstCue.judgmentCueIntensity,
+      firstCue.judgmentCueRevealed,
     );
     expect(visual.getObjectByName(IGNIVAR_JUDGMENT_WARNINGS_NAME)?.visible).toBe(true);
     expect(visual.getObjectByName(IGNIVAR_JUDGMENT_SHELTERS_NAME)?.visible).toBe(false);
+    const warningGroups = visual.getObjectByName(IGNIVAR_JUDGMENT_WARNINGS_NAME)?.children ?? [];
+    expect(
+      warningGroups.map((group) =>
+        (
+          group.getObjectByName('ignivarForgeJudgmentWarningFill') as THREE.Mesh<
+            THREE.BufferGeometry,
+            THREE.MeshBasicMaterial
+          >
+        ).material.color.getHex(),
+      ),
+    ).toEqual([0xff1d08, 0xff1d08, 0xff1d08]);
+    expect(
+      warningGroups.map(
+        (group) => group.getObjectByName(IGNIVAR_JUDGMENT_SAFE_MARKER_NAME)?.visible,
+      ),
+    ).toEqual([false, false, false]);
+    expect(
+      visual.getObjectByName('ignivarForgeJudgmentCues')?.children.map((cue) => cue.visible),
+    ).toEqual([true, true, false]);
+    visual.updateMatrixWorld(true);
+    const offsets = ignivarForgeShelterOffsets(rotation);
+    const cues = visual.getObjectByName('ignivarForgeJudgmentCues')?.children ?? [];
+    for (let index = 0; index < cues.length; index++) {
+      if (index === safeIndex) continue;
+      const core = cues[index].getObjectByName(IGNIVAR_FIRE_BEAM_CORE_NAME) as THREE.Mesh;
+      const positions = core.geometry.getAttribute('position');
+      let beamEnd = 0;
+      for (let vertex = 0; vertex < positions.count; vertex++) {
+        beamEnd = Math.max(beamEnd, positions.getZ(vertex));
+      }
+      const endpoint = cues[index].localToWorld(new THREE.Vector3(0, 0, beamEnd));
+      expect(endpoint.x).toBeCloseTo(offsets[index].x, 5);
+      expect(endpoint.z).toBeCloseTo(offsets[index].z, 5);
+    }
+
+    syncIgnivarForgeJudgmentVisual(
+      visual,
+      memoryWindow.judgmentPhase,
+      memoryWindow.judgmentRotation,
+      memoryWindow.judgmentSafeIndex,
+      1,
+      memoryWindow.judgmentCueIntensity,
+      memoryWindow.judgmentCueRevealed,
+    );
+    expect(
+      visual.getObjectByName('ignivarForgeJudgmentCues')?.children.map((cue) => cue.visible),
+    ).toEqual([false, false, false]);
+    expect(
+      warningGroups.map(
+        (group) => group.getObjectByName('ignivarForgeJudgmentDangerScar')?.visible,
+      ),
+    ).toEqual([true, true, false]);
     syncIgnivarForgeJudgmentVisual(
       visual,
       active.judgmentPhase,
       active.judgmentRotation,
       active.judgmentSafeIndex,
       1,
+      active.judgmentCueIntensity,
+      active.judgmentCueRevealed,
     );
     expect(visual.getObjectByName(IGNIVAR_JUDGMENT_WARNINGS_NAME)?.visible).toBe(false);
     expect(visual.getObjectByName(IGNIVAR_JUDGMENT_SHELTERS_NAME)?.visible).toBe(true);
@@ -776,7 +893,7 @@ describe('Ignivar Forge Judgment', () => {
       ),
     ).toEqual([false, false, true]);
 
-    syncIgnivarForgeJudgmentVisual(visual, 'hidden', rotation, safeIndex, 1);
+    syncIgnivarForgeJudgmentVisual(visual, 'hidden', rotation, safeIndex, 1, 0, false);
     expect(visual.visible).toBe(false);
   });
 

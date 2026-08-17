@@ -634,14 +634,15 @@ const WATER_ELEMENTAL: ClipMap = {
 
 // Ignivar uses the same KayKit Rig_Medium skeleton as player characters, but
 // its three boss clips deliberately avoid the stock two-hand spellcasting
-// gestures: ForgeCast stays planted, ForgeSlam drives the forge gauntlet, and
-// ForgeIdle holds the asymmetric arms without hand waving.
+// gestures: ForgeCast stays restrained, ForgeSlam moves the complete rig through
+// one rigid lunge, and ForgeIdle holds the asymmetric arms without hand waving.
+// ForgeHit remains planted because stock Hit_A deforms this custom boss skin.
 const IGNIVAR: ClipMap = {
   idle: 'ForgeIdle',
   walk: 'Walking_A',
   run: 'Running_A',
   attack: ['ForgeSlam'],
-  hit: ['Hit_A'],
+  hit: ['ForgeHit'],
   death: 'Death_A',
   cast: 'ForgeCast',
   flourish: 'Cheer',

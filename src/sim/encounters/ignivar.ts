@@ -16,14 +16,17 @@ import {
   ignivarPointInRotatingRay,
 } from '../ignivar_arena';
 import {
+  clearIgnivarForgeChainAura,
+  IGNIVAR_FORGE_CHAINS_FIRST_SECONDS,
+  updateIgnivarForgeChains,
+} from '../ignivar_forge_chains';
+import {
   IGNIVAR_JUDGMENT_ACTIVE_SECONDS,
   IGNIVAR_JUDGMENT_BURN_DAMAGE_MAX_HP,
   IGNIVAR_JUDGMENT_DURATION_SECONDS,
   IGNIVAR_JUDGMENT_HP_THRESHOLD,
   IGNIVAR_JUDGMENT_LAYOUT_SLOTS,
   IGNIVAR_JUDGMENT_PULSE_SECONDS,
-  IGNIVAR_JUDGMENT_SHELTER_RADIUS,
-  IGNIVAR_JUDGMENT_WARNING_SECONDS,
   type IgnivarJudgmentShelterIndex,
   ignivarForgeLayoutFacing,
   ignivarForgeShelterPoints,
@@ -48,10 +51,15 @@ import {
   IGNIVAR_METEOR_REVEAL_DELAY_SECONDS,
   IGNIVAR_METEOR_TELEGRAPH_SECONDS,
   ignivarMeteorPattern,
+  ignivarMeteorWarningId,
   pointInIgnivarMeteor,
 } from '../ignivar_meteors';
 import { applyDungeonMobTuning, mobTemplateForDungeonDifficulty } from '../instances/difficulty';
-import { mobEffectiveMeleeRange, tryMobMeleeSwingInRange } from '../mob/combat_profile';
+import {
+  mobCombatProfile,
+  mobEffectiveMeleeRange,
+  tryMobMeleeSwingInRange,
+} from '../mob/combat_profile';
 import { updateMobTarget } from '../mob/targeting';
 import { emitMobYell } from '../mob/yells';
 import type { SimContext } from '../sim_context';
@@ -62,6 +70,7 @@ import {
   type Entity,
   IGNIVAR_BOSS_ID,
   type IgnivarEncounterState,
+  steadyAngleTo,
 } from '../types';
 
 export const IGNIVAR_BRAND_AURA_ID = 'ignivar_brand_of_the_pyre';
@@ -75,6 +84,8 @@ export const IGNIVAR_BRAND_EVERY = 28;
 export const IGNIVAR_BRAND_TICK_SECONDS = 2;
 export const IGNIVAR_BRAND_MAX_STACKS = 3;
 export const IGNIVAR_BRAND_RADIUS = 4.5;
+export const IGNIVAR_CLEANSING_BACKLASH_ID = 'Cleansing Backlash';
+export const IGNIVAR_CLEANSING_BACKLASH_DAMAGE_MAX_HP = 0.18;
 export const IGNIVAR_FORGE_STRIKE_ID = 'Forge Strike';
 export const IGNIVAR_FORGE_STRIKE_EVERY = 14;
 export const IGNIVAR_FORGE_STRIKE_MAX_HP = 0.35;
@@ -87,7 +98,6 @@ export const IGNIVAR_FRONTAL_EVERY = 28;
 export const IGNIVAR_FRONTAL_CAST_SECONDS = 3;
 export const IGNIVAR_FRONTAL_VFX_DISTANCE = 30;
 export const IGNIVAR_CONDUIT_ACTIVE_SECONDS = 10;
-export const IGNIVAR_CONDUIT_COOLDOWN_SECONDS = 35;
 export const IGNIVAR_WATER_CLEANSE_RADIUS = 3.25;
 export const IGNIVAR_LAST_INFERNO_AURA_ID = 'ignivar_last_inferno';
 export const IGNIVAR_LAST_INFERNO_HP_THRESHOLD = 0.2;
@@ -122,7 +132,6 @@ export const IGNIVAR_SOAK_EVERY = 34;
 export const IGNIVAR_SOAK_REQUIRED_PLAYERS = 4;
 export const IGNIVAR_SOAK_RADIUS = 5.5;
 export const IGNIVAR_SOAK_SHARED_MAX_HP = 1.2;
-export const IGNIVAR_SOAK_FAILURE_MAX_HP = 0.8;
 
 const IGNIVAR_FIRST_BRAND_SECONDS = 2;
 const IGNIVAR_FIRST_FORGE_STRIKE_SECONDS = 12;
@@ -201,8 +210,15 @@ function initIgnivarEncounter(boss: Entity): IgnivarEncounterState {
       skyfireCastRemaining: 0,
       skyfireFacing: boss.facing,
       meteorTimer: IGNIVAR_FIRST_METEOR_SECONDS,
+      meteorCastKey: 0,
       meteorImpactRemaining: 0,
       meteorPoints: [],
+      forgeChainsTimer: IGNIVAR_FORGE_CHAINS_FIRST_SECONDS,
+      forgeChainsRemaining: 0,
+      forgeChainsAttachGraceRemaining: 0,
+      forgeChainsStrainSeconds: [],
+      forgeChainsPlayerIds: null,
+      forgeChainsLastPositions: [],
       rotatingRaysTimer: IGNIVAR_FIRST_ROTATING_RAYS_SECONDS,
       rotatingRaysWindupRemaining: 0,
       rotatingRaysActiveRemaining: 0,
@@ -431,12 +447,12 @@ function startForgeJudgment(
   boss: Entity,
   st: IgnivarEncounterState,
   players: readonly Entity[],
+  heroic: boolean,
 ): void {
-  const origin = holdIgnivarAtJudgmentOrigin(ctx, boss);
+  holdIgnivarAtJudgmentOrigin(ctx, boss);
   const layoutSlot = ctx.rng.int(0, IGNIVAR_JUDGMENT_LAYOUT_SLOTS - 1);
   st.forgeJudgmentRotation = (layoutSlot * Math.PI * 2) / IGNIVAR_JUDGMENT_LAYOUT_SLOTS;
   st.forgeJudgmentSafeIndex = ctx.rng.int(0, 2) as IgnivarJudgmentShelterIndex;
-  const shelters = ignivarForgeShelterPoints(origin, st.forgeJudgmentRotation);
   st.forgeJudgmentPhase = 'warning';
   st.forgeJudgmentRemaining = IGNIVAR_JUDGMENT_DURATION_SECONDS;
   st.forgeJudgmentPulseTimer = IGNIVAR_JUDGMENT_PULSE_SECONDS;
@@ -450,22 +466,10 @@ function startForgeJudgment(
   boss.castTargetId = null;
   boss.castAim = null;
   boss.channeling = false;
-  for (const player of players) clearIgnivarBrand(player, boss.id);
-  emitMobYell(ctx, boss, 'The sky itself will burn!');
-  for (const shelter of shelters) {
-    ctx.emit({
-      type: 'spellfxAt',
-      x: shelter.x,
-      z: shelter.z,
-      school: 'fire',
-      fx: 'meteorFall',
-      ability: IGNIVAR_JUDGMENT_CAST_ID,
-      radius: IGNIVAR_JUDGMENT_SHELTER_RADIUS,
-      duration: IGNIVAR_JUDGMENT_WARNING_SECONDS,
-      warningLead: IGNIVAR_METEOR_REVEAL_DELAY_SECONDS,
-      sourceId: boss.id,
-    });
+  if (!heroic) {
+    for (const player of players) clearIgnivarBrand(player, boss.id);
   }
+  emitMobYell(ctx, boss, 'The sky itself will burn!');
 }
 
 function activateForgeJudgment(
@@ -474,7 +478,10 @@ function activateForgeJudgment(
   st: IgnivarEncounterState,
   origin: { x: number; z: number },
 ): void {
-  for (const shelter of ignivarForgeShelterPoints(origin, st.forgeJudgmentRotation)) {
+  const shelters = ignivarForgeShelterPoints(origin, st.forgeJudgmentRotation);
+  for (let index = 0; index < shelters.length; index++) {
+    if (index === st.forgeJudgmentSafeIndex) continue;
+    const shelter = shelters[index];
     ctx.emit({
       type: 'spellfxAt',
       x: shelter.x,
@@ -528,9 +535,10 @@ function updateForgeJudgment(
   boss: Entity,
   st: IgnivarEncounterState,
   players: readonly Entity[],
+  heroic: boolean,
 ): boolean {
   if (ignivarCanStartForgeJudgment(boss, st)) {
-    startForgeJudgment(ctx, boss, st, players);
+    startForgeJudgment(ctx, boss, st, players, heroic);
     return true;
   }
   if (st.forgeJudgmentPhase !== 'warning' && st.forgeJudgmentPhase !== 'active') return false;
@@ -745,10 +753,12 @@ function startMeteorRain(ctx: SimContext, boss: Entity, st: IgnivarEncounterStat
   const instance = encounterInstance(ctx, boss);
   const arenaOrigin = instance ? ctx.instanceOriginOf(instance) : boss.pos;
   const castKey = (Math.imul(ctx.tickCount, 0x9e3779b1) ^ boss.id) >>> 0;
+  st.meteorCastKey = castKey;
   st.meteorPoints = ignivarMeteorPattern(castKey, arenaOrigin);
   st.meteorImpactRemaining = IGNIVAR_METEOR_TELEGRAPH_SECONDS;
   st.meteorTimer = st.lastInfernoTriggered ? IGNIVAR_FINAL_METEOR_EVERY : IGNIVAR_METEOR_EVERY;
-  for (const impact of st.meteorPoints) {
+  for (let meteorIndex = 0; meteorIndex < st.meteorPoints.length; meteorIndex++) {
+    const impact = st.meteorPoints[meteorIndex];
     ctx.emit({
       type: 'spellfxAt',
       x: impact.x,
@@ -759,6 +769,7 @@ function startMeteorRain(ctx: SimContext, boss: Entity, st: IgnivarEncounterStat
       radius: IGNIVAR_METEOR_RADIUS,
       duration: IGNIVAR_METEOR_TELEGRAPH_SECONDS,
       warningLead: IGNIVAR_METEOR_REVEAL_DELAY_SECONDS,
+      persistentId: ignivarMeteorWarningId(boss.id, castKey, meteorIndex),
       sourceId: boss.id,
     });
   }
@@ -786,6 +797,19 @@ function resolveMeteorImpacts(
       false,
       true,
     );
+  }
+  for (let meteorIndex = 0; meteorIndex < st.meteorPoints.length; meteorIndex++) {
+    const impact = st.meteorPoints[meteorIndex];
+    ctx.emit({
+      type: 'spellfxAt',
+      x: impact.x,
+      z: impact.z,
+      school: 'fire',
+      fx: 'meteorImpact',
+      ability: IGNIVAR_METEOR_CAST_ID,
+      persistentId: ignivarMeteorWarningId(boss.id, st.meteorCastKey, meteorIndex),
+      sourceId: boss.id,
+    });
   }
   st.meteorPoints = [];
   st.meteorImpactRemaining = 0;
@@ -829,6 +853,7 @@ function spaceIgnivarMajorAbilities(st: IgnivarEncounterState): void {
   st.rotatingRaysTimer = Math.max(st.rotatingRaysTimer, IGNIVAR_MAJOR_ABILITY_GAP_SECONDS);
   st.forgeWaveTimer = Math.max(st.forgeWaveTimer, IGNIVAR_MAJOR_ABILITY_GAP_SECONDS);
   st.soakTimer = Math.max(st.soakTimer, IGNIVAR_MAJOR_ABILITY_GAP_SECONDS);
+  st.forgeChainsTimer = Math.max(st.forgeChainsTimer, IGNIVAR_MAJOR_ABILITY_GAP_SECONDS);
 }
 
 function ignivarMajorAbilityActive(st: IgnivarEncounterState): boolean {
@@ -1127,43 +1152,20 @@ function resolveSharedPyre(
   players: readonly Entity[],
 ): void {
   const target = st.soakTargetId === null ? undefined : ctx.entities.get(st.soakTargetId);
-  const targetIsActive =
-    target !== undefined && !target.dead && players.some((player) => player.id === target.id);
-  const soakers = targetIsActive
+  const soakers = target
     ? players.filter(
         (player) =>
           Math.hypot(player.pos.x - target.pos.x, player.pos.z - target.pos.z) <=
           IGNIVAR_SOAK_RADIUS,
       )
     : [];
-  if (
-    targetIsActive &&
-    soakers.some((player) => player.id === target.id) &&
-    soakers.length >= IGNIVAR_SOAK_REQUIRED_PLAYERS
-  ) {
+  if (soakers.length > 0) {
     const fraction = IGNIVAR_SOAK_SHARED_MAX_HP / soakers.length;
     for (const player of soakers) {
       ctx.dealDamage(
         boss,
         player,
         Math.ceil(player.maxHp * fraction),
-        false,
-        'fire',
-        'Shared Pyre',
-        'hit',
-        true,
-        undefined,
-        false,
-        false,
-        true,
-      );
-    }
-  } else {
-    for (const player of players) {
-      ctx.dealDamage(
-        boss,
-        player,
-        Math.ceil(player.maxHp * IGNIVAR_SOAK_FAILURE_MAX_HP),
         false,
         'fire',
         'Shared Pyre',
@@ -1308,12 +1310,16 @@ function updateBrandOverlap(ctx: SimContext, boss: Entity, players: readonly Ent
 
 function cleansePlayersAtActiveConduits(
   ctx: SimContext,
+  boss: Entity,
   players: readonly Entity[],
   conduits: ReadonlyMap<IgnivarConduitId, Entity>,
+  heroic: boolean,
 ): void {
+  let heroicCleanses = 0;
   for (const conduit of conduits.values()) {
     if (conduit.templateId !== IGNIVAR_WATER_CONDUIT_TEMPLATES.active) continue;
     for (const player of players) {
+      if (player.dead) continue;
       if (
         Math.hypot(player.pos.x - conduit.pos.x, player.pos.z - conduit.pos.z) >
         IGNIVAR_WATER_CLEANSE_RADIUS
@@ -1330,6 +1336,33 @@ function cleansePlayersAtActiveConduits(
         school: 'frost',
         fx: 'nova',
       });
+      if (heroic) heroicCleanses++;
+    }
+  }
+  for (let cleanse = 0; cleanse < heroicCleanses; cleanse++) {
+    for (const target of players) {
+      if (target.dead) continue;
+      ctx.emit({
+        type: 'spellfx',
+        sourceId: boss.id,
+        targetId: target.id,
+        school: 'fire',
+        fx: 'nova',
+      });
+      ctx.dealDamage(
+        boss,
+        target,
+        Math.ceil(target.maxHp * IGNIVAR_CLEANSING_BACKLASH_DAMAGE_MAX_HP),
+        false,
+        'fire',
+        IGNIVAR_CLEANSING_BACKLASH_ID,
+        'hit',
+        true,
+        undefined,
+        false,
+        false,
+        true,
+      );
     }
   }
 }
@@ -1340,24 +1373,17 @@ function updateConduitStates(
 ): void {
   for (const [id, conduit] of conduits) {
     const state = ignivarConduitStateForTemplate(conduit.templateId);
-    if (state === 'ready') {
+    if (state !== 'active') {
       delete st.conduitTimers[id];
       continue;
     }
-    const defaultTimer =
-      state === 'active' ? IGNIVAR_CONDUIT_ACTIVE_SECONDS : IGNIVAR_CONDUIT_COOLDOWN_SECONDS;
-    const remaining = (st.conduitTimers[id] ?? defaultTimer) - DT;
+    const remaining = (st.conduitTimers[id] ?? IGNIVAR_CONDUIT_ACTIVE_SECONDS) - DT;
     if (remaining > 0) {
       st.conduitTimers[id] = remaining;
       continue;
     }
-    if (state === 'active') {
-      conduit.templateId = IGNIVAR_WATER_CONDUIT_TEMPLATES.cooldown;
-      st.conduitTimers[id] = IGNIVAR_CONDUIT_COOLDOWN_SECONDS;
-    } else {
-      conduit.templateId = IGNIVAR_WATER_CONDUIT_TEMPLATES.ready;
-      delete st.conduitTimers[id];
-    }
+    conduit.templateId = IGNIVAR_WATER_CONDUIT_TEMPLATES.cooldown;
+    delete st.conduitTimers[id];
   }
 }
 
@@ -1372,6 +1398,21 @@ function startFrontal(boss: Entity, target: Entity, st: IgnivarEncounterState): 
   boss.castTargetId = target.id;
   boss.castAim = { ...target.pos };
   boss.channeling = false;
+}
+
+function trackFrontalTarget(
+  boss: Entity,
+  st: IgnivarEncounterState,
+  players: readonly Entity[],
+  fallback: Entity,
+): void {
+  const target = players.find((player) => player.id === boss.castTargetId) ?? fallback;
+  const dx = target.pos.x - boss.pos.x;
+  const dz = target.pos.z - boss.pos.z;
+  if (Math.hypot(dx, dz) > 1e-4) st.frontalFacing = Math.atan2(dx, dz);
+  boss.facing = st.frontalFacing;
+  boss.castTargetId = target.id;
+  boss.castAim = { ...target.pos };
 }
 
 function releaseFrontal(
@@ -1477,6 +1518,7 @@ export function clearIgnivarBrand(player: Entity, sourceId?: number): void {
 }
 
 export function clearIgnivarEncounterAuras(player: Entity, sourceId?: number): void {
+  clearIgnivarForgeChainAura(player, sourceId);
   player.auras = player.auras.filter(
     (aura) =>
       (aura.id !== IGNIVAR_BRAND_AURA_ID &&
@@ -1486,7 +1528,7 @@ export function clearIgnivarEncounterAuras(player: Entity, sourceId?: number): v
   );
 }
 
-export function updateIgnivarEncounter(ctx: SimContext, boss: Entity): void {
+export function updateIgnivarEncounter(ctx: SimContext, boss: Entity, pursueTarget = false): void {
   if (boss.templateId !== IGNIVAR_BOSS_ID || boss.dead) return;
   let players = playersInEncounter(ctx, boss);
   if (players.length === 0) {
@@ -1505,12 +1547,35 @@ export function updateIgnivarEncounter(ctx: SimContext, boss: Entity): void {
   boss.inCombat = true;
   boss.aiState = 'attack';
 
+  const heroic = encounterInstance(ctx, boss)?.difficulty === 'heroic';
+  if (heroic && st.forgeChainsPlayerIds !== null) {
+    // Active Chains owns the ordinary encounter tick, but water remains usable:
+    // players must still be able to cleanse and pay the Heroic raid backlash.
+    updateConduitStates(st, conduits);
+    cleansePlayersAtActiveConduits(ctx, boss, players, conduits, heroic);
+    const chains = updateIgnivarForgeChains(ctx, boss, st, players, false);
+    if (chains === 'resolved') spaceIgnivarMajorAbilities(st);
+    return;
+  }
   if (updateApocalypse(ctx, boss, st, players)) return;
-  if (updateForgeJudgment(ctx, boss, st, players)) return;
+  if (updateForgeJudgment(ctx, boss, st, players, heroic)) return;
   updateConduitStates(st, conduits);
-  cleansePlayersAtActiveConduits(ctx, players, conduits);
+  cleansePlayersAtActiveConduits(ctx, boss, players, conduits, heroic);
   if (updateLastInferno(ctx, boss, st, players)) return;
   const finalPhase = st.lastInfernoTriggered;
+  if (heroic && !finalPhase) {
+    const chains = updateIgnivarForgeChains(
+      ctx,
+      boss,
+      st,
+      players,
+      !ignivarMajorAbilityActive(st) && st.soakTargetId === null && st.meteorPoints.length === 0,
+    );
+    if (chains !== 'idle') {
+      if (chains === 'resolved') spaceIgnivarMajorAbilities(st);
+      return;
+    }
+  }
   const sharedPyreBusy =
     !finalPhase && updateSharedPyre(ctx, boss, st, players, !ignivarMajorAbilityActive(st));
   updateMeteorRain(ctx, boss, st, players);
@@ -1521,7 +1586,7 @@ export function updateIgnivarEncounter(ctx: SimContext, boss: Entity): void {
   if (st.frontalCastRemaining > 0) {
     tickIgnivarCastTimers(st);
     st.frontalCastRemaining = Math.max(0, st.frontalCastRemaining - DT);
-    boss.facing = st.frontalFacing;
+    trackFrontalTarget(boss, st, players, target);
     boss.castingAbility = IGNIVAR_FRONTAL_CAST_ID;
     boss.castRemaining = st.frontalCastRemaining;
     if (st.frontalCastRemaining <= 0) releaseFrontal(ctx, boss, st, players, conduits);
@@ -1624,4 +1689,21 @@ export function updateIgnivarEncounter(ctx: SimContext, boss: Entity): void {
 
   boss.swingTimer = Math.max(0, boss.swingTimer - DT);
   tryMobMeleeSwingInRange(ctx, boss, target);
+  if (!pursueTarget) return;
+  const profile = mobCombatProfile(boss);
+  if (dist2d(boss.pos, target.pos) > profile.desiredRange) {
+    if (!ctx.isRooted(boss)) {
+      ctx.moveToward(
+        boss,
+        target.pos,
+        boss.moveSpeed * profile.chaseSpeedMult * ctx.moveSpeedMult(boss),
+      );
+    } else {
+      boss.facing = steadyAngleTo(boss.pos, target.pos, boss.facing);
+    }
+  } else {
+    boss.facing = steadyAngleTo(boss.pos, target.pos, boss.facing);
+  }
+  tryMobMeleeSwingInRange(ctx, boss, target);
+  boss.aiState = dist2d(boss.pos, target.pos) <= profile.meleeRange ? 'attack' : 'chase';
 }

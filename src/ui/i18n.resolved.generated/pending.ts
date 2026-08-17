@@ -10,6 +10,9 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.dungeons.ignivar_inner_crucible.enterText",
+    "entities.dungeons.ignivar_inner_crucible.leaveText",
+    "entities.dungeons.ignivar_inner_crucible.name",
     "entities.dungeons.ignivar_raid_arena.enterText",
     "entities.dungeons.ignivar_raid_arena.leaveText",
     "entities.dungeons.ignivar_raid_arena.name",
@@ -735,6 +738,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "es_ES": [
+    "entities.dungeons.ignivar_inner_crucible.enterText",
+    "entities.dungeons.ignivar_inner_crucible.leaveText",
+    "entities.dungeons.ignivar_inner_crucible.name",
     "entities.dungeons.ignivar_raid_arena.enterText",
     "entities.dungeons.ignivar_raid_arena.leaveText",
     "entities.dungeons.ignivar_raid_arena.name",
@@ -1460,6 +1466,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "fr_FR": [
+    "entities.dungeons.ignivar_inner_crucible.enterText",
+    "entities.dungeons.ignivar_inner_crucible.leaveText",
+    "entities.dungeons.ignivar_inner_crucible.name",
     "entities.dungeons.ignivar_raid_arena.enterText",
     "entities.dungeons.ignivar_raid_arena.leaveText",
     "entities.dungeons.ignivar_raid_arena.name",
@@ -2187,6 +2196,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "fr_CA": [
+    "entities.dungeons.ignivar_inner_crucible.enterText",
+    "entities.dungeons.ignivar_inner_crucible.leaveText",
+    "entities.dungeons.ignivar_inner_crucible.name",
     "entities.dungeons.ignivar_raid_arena.enterText",
     "entities.dungeons.ignivar_raid_arena.leaveText",
     "entities.dungeons.ignivar_raid_arena.name",
@@ -2915,6 +2927,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.dungeons.ignivar_inner_crucible.enterText",
+    "entities.dungeons.ignivar_inner_crucible.leaveText",
+    "entities.dungeons.ignivar_inner_crucible.name",
     "entities.dungeons.ignivar_raid_arena.enterText",
     "entities.dungeons.ignivar_raid_arena.leaveText",
     "entities.dungeons.ignivar_raid_arena.name",
@@ -3642,6 +3657,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "de_DE": [
+    "entities.dungeons.ignivar_inner_crucible.enterText",
+    "entities.dungeons.ignivar_inner_crucible.leaveText",
+    "entities.dungeons.ignivar_inner_crucible.name",
     "entities.dungeons.ignivar_raid_arena.enterText",
     "entities.dungeons.ignivar_raid_arena.leaveText",
     "entities.dungeons.ignivar_raid_arena.name",
@@ -4369,6 +4387,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "zh_CN": [
+    "entities.dungeons.ignivar_inner_crucible.enterText",
+    "entities.dungeons.ignivar_inner_crucible.leaveText",
+    "entities.dungeons.ignivar_inner_crucible.name",
     "guide.classPage.formName.form_cat",
     "guide.gear.slotOffhand",
     "guide.glossary.claudiumTerm",
@@ -4376,10 +4397,12 @@ export const pending: Record<string, readonly string[]> = {
     "guide.howToPlay.step0Title",
     "guide.interfacePage.framePetTitle",
     "guide.interfacePage.winBagsTitle",
-    "guide.riftsPage.rankFmt",
-    "hudChrome.auraEffect.sharedPyre"
+    "guide.riftsPage.rankFmt"
   ],
   "zh_TW": [
+    "entities.dungeons.ignivar_inner_crucible.enterText",
+    "entities.dungeons.ignivar_inner_crucible.leaveText",
+    "entities.dungeons.ignivar_inner_crucible.name",
     "guide.classPage.formName.form_cat",
     "guide.gear.slotOffhand",
     "guide.glossary.claudiumTerm",
@@ -4387,10 +4410,12 @@ export const pending: Record<string, readonly string[]> = {
     "guide.howToPlay.step0Title",
     "guide.interfacePage.framePetTitle",
     "guide.interfacePage.winBagsTitle",
-    "guide.riftsPage.rankFmt",
-    "hudChrome.auraEffect.sharedPyre"
+    "guide.riftsPage.rankFmt"
   ],
   "ko_KR": [
+    "entities.dungeons.ignivar_inner_crucible.enterText",
+    "entities.dungeons.ignivar_inner_crucible.leaveText",
+    "entities.dungeons.ignivar_inner_crucible.name",
     "guide.classPage.formName.form_cat",
     "guide.gear.slotOffhand",
     "guide.glossary.claudiumTerm",
@@ -4398,10 +4423,12 @@ export const pending: Record<string, readonly string[]> = {
     "guide.howToPlay.step0Title",
     "guide.interfacePage.framePetTitle",
     "guide.interfacePage.winBagsTitle",
-    "guide.riftsPage.rankFmt",
-    "hudChrome.auraEffect.sharedPyre"
+    "guide.riftsPage.rankFmt"
   ],
   "ja_JP": [
+    "entities.dungeons.ignivar_inner_crucible.enterText",
+    "entities.dungeons.ignivar_inner_crucible.leaveText",
+    "entities.dungeons.ignivar_inner_crucible.name",
     "guide.classPage.formName.form_cat",
     "guide.gear.slotOffhand",
     "guide.glossary.claudiumTerm",
@@ -4409,10 +4436,12 @@ export const pending: Record<string, readonly string[]> = {
     "guide.howToPlay.step0Title",
     "guide.interfacePage.framePetTitle",
     "guide.interfacePage.winBagsTitle",
-    "guide.riftsPage.rankFmt",
-    "hudChrome.auraEffect.sharedPyre"
+    "guide.riftsPage.rankFmt"
   ],
   "pt_BR": [
+    "entities.dungeons.ignivar_inner_crucible.enterText",
+    "entities.dungeons.ignivar_inner_crucible.leaveText",
+    "entities.dungeons.ignivar_inner_crucible.name",
     "entities.dungeons.ignivar_raid_arena.enterText",
     "entities.dungeons.ignivar_raid_arena.leaveText",
     "entities.dungeons.ignivar_raid_arena.name",
@@ -5140,6 +5169,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "ru_RU": [
+    "entities.dungeons.ignivar_inner_crucible.enterText",
+    "entities.dungeons.ignivar_inner_crucible.leaveText",
+    "entities.dungeons.ignivar_inner_crucible.name",
     "guide.classPage.formName.form_cat",
     "guide.gear.slotOffhand",
     "guide.glossary.claudiumTerm",
@@ -5147,10 +5179,12 @@ export const pending: Record<string, readonly string[]> = {
     "guide.howToPlay.step0Title",
     "guide.interfacePage.framePetTitle",
     "guide.interfacePage.winBagsTitle",
-    "guide.riftsPage.rankFmt",
-    "hudChrome.auraEffect.sharedPyre"
+    "guide.riftsPage.rankFmt"
   ],
   "cs_CZ": [
+    "entities.dungeons.ignivar_inner_crucible.enterText",
+    "entities.dungeons.ignivar_inner_crucible.leaveText",
+    "entities.dungeons.ignivar_inner_crucible.name",
     "entities.dungeons.ignivar_raid_arena.enterText",
     "entities.dungeons.ignivar_raid_arena.leaveText",
     "entities.dungeons.ignivar_raid_arena.name",
@@ -5878,6 +5912,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "nl_NL": [
+    "entities.dungeons.ignivar_inner_crucible.enterText",
+    "entities.dungeons.ignivar_inner_crucible.leaveText",
+    "entities.dungeons.ignivar_inner_crucible.name",
     "entities.dungeons.ignivar_raid_arena.enterText",
     "entities.dungeons.ignivar_raid_arena.leaveText",
     "entities.dungeons.ignivar_raid_arena.name",
@@ -6605,6 +6642,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "pl_PL": [
+    "entities.dungeons.ignivar_inner_crucible.enterText",
+    "entities.dungeons.ignivar_inner_crucible.leaveText",
+    "entities.dungeons.ignivar_inner_crucible.name",
     "entities.dungeons.ignivar_raid_arena.enterText",
     "entities.dungeons.ignivar_raid_arena.leaveText",
     "entities.dungeons.ignivar_raid_arena.name",
@@ -7332,6 +7372,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "id_ID": [
+    "entities.dungeons.ignivar_inner_crucible.enterText",
+    "entities.dungeons.ignivar_inner_crucible.leaveText",
+    "entities.dungeons.ignivar_inner_crucible.name",
     "entities.dungeons.ignivar_raid_arena.enterText",
     "entities.dungeons.ignivar_raid_arena.leaveText",
     "entities.dungeons.ignivar_raid_arena.name",
@@ -8059,6 +8102,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "tr_TR": [
+    "entities.dungeons.ignivar_inner_crucible.enterText",
+    "entities.dungeons.ignivar_inner_crucible.leaveText",
+    "entities.dungeons.ignivar_inner_crucible.name",
     "entities.dungeons.ignivar_raid_arena.enterText",
     "entities.dungeons.ignivar_raid_arena.leaveText",
     "entities.dungeons.ignivar_raid_arena.name",
@@ -8786,6 +8832,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "sv_SE": [
+    "entities.dungeons.ignivar_inner_crucible.enterText",
+    "entities.dungeons.ignivar_inner_crucible.leaveText",
+    "entities.dungeons.ignivar_inner_crucible.name",
     "entities.dungeons.ignivar_raid_arena.enterText",
     "entities.dungeons.ignivar_raid_arena.leaveText",
     "entities.dungeons.ignivar_raid_arena.name",
@@ -9513,6 +9562,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "vi_VN": [
+    "entities.dungeons.ignivar_inner_crucible.enterText",
+    "entities.dungeons.ignivar_inner_crucible.leaveText",
+    "entities.dungeons.ignivar_inner_crucible.name",
     "entities.dungeons.ignivar_raid_arena.enterText",
     "entities.dungeons.ignivar_raid_arena.leaveText",
     "entities.dungeons.ignivar_raid_arena.name",
@@ -10240,6 +10292,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "da_DK": [
+    "entities.dungeons.ignivar_inner_crucible.enterText",
+    "entities.dungeons.ignivar_inner_crucible.leaveText",
+    "entities.dungeons.ignivar_inner_crucible.name",
     "entities.dungeons.ignivar_raid_arena.enterText",
     "entities.dungeons.ignivar_raid_arena.leaveText",
     "entities.dungeons.ignivar_raid_arena.name",

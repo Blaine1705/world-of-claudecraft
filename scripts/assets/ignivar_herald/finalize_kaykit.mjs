@@ -115,6 +115,7 @@ const shippedClips = new Set([
   'Running_A',
   'ForgeSlam',
   'ForgeCast',
+  'ForgeHit',
   'Hit_A',
   'Death_A',
   'Cheer',

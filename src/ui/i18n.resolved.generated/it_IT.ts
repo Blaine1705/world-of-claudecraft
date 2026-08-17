@@ -2149,7 +2149,7 @@ export const it_IT: EnTranslations = {
       "mail": "Maglia"
     },
     "auraEffect": {
-      "sharedPyre": "Requires at least {players} players inside the circle",
+      "sharedPyre": "Splits its damage between players inside the circle; {players} players recommended",
       "dot": "Infligge {value} danni da {school} ogni {interval} s",
       "hot": "Ripristina {value} salute ogni {interval} s",
       "absorb": "Assorbe {value} danni",
@@ -15839,6 +15839,11 @@ export const it_IT: EnTranslations = {
         "name": "Crucible of the Last Spring",
         "enterText": "Heat shimmers above the sealed waters of the Crucible.",
         "leaveText": "You step away from the Crucible and breathe freely again."
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "Il Bacino di Wildheart",

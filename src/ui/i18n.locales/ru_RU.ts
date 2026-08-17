@@ -7537,6 +7537,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemArmorType.mail': 'Кольчуга',
   'hudChrome.auraEffect.dot': 'Наносит {value} единиц урона ({school}) каждые {interval} сек',
   'hudChrome.auraEffect.hot': 'Восстанавливает {value} здоровья каждые {interval} сек',
+  'hudChrome.auraEffect.sharedPyre': 'В круге должно находиться не менее {players} игроков',
   'hudChrome.auraEffect.absorb': 'Поглощает {value} единиц урона',
   'hudChrome.auraEffect.healAbsorb': 'Поглощает {value} единиц входящего исцеления',
   'hudChrome.auraEffect.thorns': 'Наносит {value} единиц урона ({school}) атакующим',
