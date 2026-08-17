@@ -9897,7 +9897,7 @@ export const en: EnTranslations = {
       },
       "demon_skin": {
         "name": "Fiendhide",
-        "description": "Demonic skin increases your armor by {buff} for 30 min."
+        "description": "Demonic skin increases your armor by {buff} for 30 min. Pact Deepened doubles this armor and reduces magic damage taken by 5% while Fiendhide is active."
       },
       "immolate": {
         "name": "Burning Pact",
@@ -10235,7 +10235,7 @@ export const en: EnTranslations = {
       },
       "reaping_command": {
         "name": "Reaping Command",
-        "description": "Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit."
+        "description": "Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit. Reaping Command ignores and does not reset each servant's own ability cooldown."
       },
       "sacrifice_undead": {
         "name": "Sacrifice Undead",

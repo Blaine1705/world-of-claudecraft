@@ -1483,7 +1483,11 @@ const classAbilityNamesEn = {
         'Gloom Bolt',
         'Sends a shadowy bolt at the enemy for {damage} Shadow damage.',
       ],
-      ['demon_skin', 'Fiendhide', 'Demonic skin increases your armor by {buff} for 30 min.'],
+      [
+        'demon_skin',
+        'Fiendhide',
+        'Demonic skin increases your armor by {buff} for 30 min. Pact Deepened doubles this armor and reduces magic damage taken by 5% while Fiendhide is active.',
+      ],
       [
         'immolate',
         'Burning Pact',
@@ -1890,7 +1894,7 @@ const classAbilityNamesEn = {
       [
         'reaping_command',
         'Reaping Command',
-        'Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit.',
+        "Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit. Reaping Command ignores and does not reset each servant's own ability cooldown.",
       ],
       [
         'sacrifice_undead',
