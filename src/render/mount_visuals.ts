@@ -9,6 +9,10 @@ import type { MountKey } from '../sim/content/mounts';
 import { MOUNTS } from '../sim/content/mounts';
 
 export interface MountVisualSpec {
+  /** Tip nose-up on a jump and right itself before landing (see
+   *  mount_jump_attitude). Vehicles only: a creature's legs already absorb a
+   *  launch, and pitching one reads as a bug. */
+  jumpTips: boolean;
   /** VISUALS key (src/render/characters/manifest.ts, lazyPreload). */
   visualKey: string;
   /** World-unit rider lift onto the saddle at e.scale = 1. */
@@ -40,6 +44,7 @@ const spec = (
   bob?: { amp: number; hz: number; idle?: boolean; shape?: 'hover' | 'hop' },
   seatFwd = 0,
   fx: 'slime' | 'exhaust' | null = null,
+  jumpTips = false,
 ): MountVisualSpec => ({
   visualKey,
   seat,
@@ -50,6 +55,7 @@ const spec = (
   bobIdle: bob?.idle ?? false,
   bobShape: bob?.shape ?? 'hop',
   fx,
+  jumpTips,
 });
 
 export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
@@ -102,7 +108,18 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // bob the cart WITHOUT the puller, swinging the shaft harness collar +-0.05
   // against a belt overlap with only 0.034 of margin, and the harness would
   // visibly come off his waist every cycle.
-  rickshaw_mount: spec('mount_rickshaw_mount', 2.24, false, { amp: 0.05, hz: 2.4 }, -0.3),
+  // jumpTips: a two-wheeled cart with no suspension and no legs. It tips
+  // nose-up off a jump and rights itself before landing; the puller rides that
+  // rotation with it, keeping the shafts in its hands.
+  rickshaw_mount: spec(
+    'mount_rickshaw_mount',
+    2.24,
+    false,
+    { amp: 0.05, hz: 2.4 },
+    -0.3,
+    null,
+    true,
+  ),
 };
 
 /** Spec for an entity's active mountKey, or null when dismounted/unknown. */
