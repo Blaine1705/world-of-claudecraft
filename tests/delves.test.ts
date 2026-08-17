@@ -1028,6 +1028,70 @@ describe('delve reward chest + surface exit flow', () => {
     expect(offer).toBeDefined();
   });
 
+  it('direct lockpickEngage cannot bypass a live boss-summoned add', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
+    const run = enterFinale(sim);
+    killBoss(sim, run);
+    const chestId = run.rewardChestId!;
+    const chestEnt = sim.entities.get(chestId)!;
+    sim.player.pos = { ...chestEnt.pos };
+    sim.player.prevPos = { ...chestEnt.pos };
+
+    const add = createMob((sim as any).nextId++, MOBS.reliquary_ledger_wraith, 9, {
+      ...chestEnt.pos,
+    });
+    (sim as any).addEntity(add);
+    run.mobIds.push(add.id);
+
+    sim.lockpickEngage(chestId, 1);
+    expect(run.lockpick).toBeNull();
+    expect(run.completed).toBe(false);
+    expect(run.objectState[chestId].open).toBe(false);
+    expect(run.surfaceExitId).toBeNull();
+    expect(sim.drainEvents()).toContainEqual({
+      type: 'error',
+      text: 'Clear the remaining enemies first.',
+      pid: sim.playerId,
+    });
+
+    add.dead = true;
+    sim.lockpickEngage(chestId, 1);
+    expect(run.lockpick).not.toBeNull();
+  });
+
+  it('does not resolve an in-progress lockpick session while a new add is live', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
+    const run = enterFinale(sim);
+    killBoss(sim, run);
+    const chestId = run.rewardChestId!;
+    const chestEnt = sim.entities.get(chestId)!;
+    sim.player.pos = { ...chestEnt.pos };
+    sim.player.prevPos = { ...chestEnt.pos };
+    sim.lockpickEngage(chestId, 1);
+    expect(run.lockpick).not.toBeNull();
+
+    const add = createMob((sim as any).nextId++, MOBS.reliquary_ledger_wraith, 9, {
+      ...chestEnt.pos,
+    });
+    (sim as any).addEntity(add);
+    run.mobIds.push(add.id);
+
+    const actions = solveLockActions(run.lockpick!.pages[run.lockpick!.pageIndex])!;
+    for (const a of actions) sim.lockpickAction(a);
+
+    expect(run.lockpick?.state).toBe('IN_PROGRESS');
+    expect(run.completed).toBe(false);
+    expect(run.objectState[chestId].looted).not.toBe(true);
+    expect(run.surfaceExitId).toBeNull();
+    expect(sim.drainEvents()).toContainEqual({
+      type: 'error',
+      text: 'Clear the remaining enemies first.',
+      pid: sim.playerId,
+    });
+  });
+
   it('flawless solve grants marks (premium tier), completes the run, and spawns the surface exit', () => {
     const sim = makeSim();
     sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
@@ -3644,6 +3708,38 @@ describe('The Drowned Litany (Phase 7 Drowned Reliquary Rite)', () => {
     (sim as Sim).delveRiteChoose('hard');
     expect(run.drownedLitanyRite?.awaitingChoice).toBe(false);
     expect(run.drownedLitanyRite?.sequence.length).toBe(6);
+  });
+
+  it('does not show the rite difficulty prompt while a boss-summoned add is still alive', () => {
+    const sim = makeSim();
+    const run = enterLitanyApse(sim);
+    killNhalia(sim);
+    const reliquaryId = run.drownedLitanyRite!.reliquaryId;
+    const reliquary = sim.entities.get(reliquaryId)!;
+    sim.player.pos = { ...reliquary.pos };
+    sim.player.prevPos = { ...reliquary.pos };
+
+    const add = createMob((sim as any).nextId++, MOBS.drowned_cantor, 15, { ...reliquary.pos });
+    (sim as any).addEntity(add);
+    run.mobIds.push(add.id);
+
+    expect(sim.delveInteract(reliquaryId)).toBe(false);
+    const events = sim.drainEvents();
+    expect(events).toContainEqual({
+      type: 'error',
+      text: 'Clear the remaining enemies first.',
+      pid: sim.playerId,
+    });
+    expect(events.some((e) => e.type === 'delveRiteChoosePrompt')).toBe(false);
+    expect(run.drownedLitanyRite?.awaitingChoice).toBe(true);
+
+    add.dead = true;
+    expect(sim.delveInteract(reliquaryId)).toBe(true);
+    expect(sim.drainEvents()).toContainEqual({
+      type: 'delveRiteChoosePrompt',
+      reliquaryId,
+      pid: sim.playerId,
+    });
   });
 
   it('surfaces the rite phase on delveRun for the HUD guidance', () => {

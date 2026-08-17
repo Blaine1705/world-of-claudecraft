@@ -61,7 +61,12 @@ import {
   dist2d,
   type Entity,
 } from '../types';
-import { delveBonusMarksFor, grantDelveRewards, openDelveSurfaceExit } from './runs';
+import {
+  delveBonusMarksFor,
+  delveHasLiveMobs,
+  grantDelveRewards,
+  openDelveSurfaceExit,
+} from './runs';
 
 /** Resolve the locked-chest object + run for an acting player, with all the
  * proximity/eligibility guards. Returns null (after emitting an error) on any
@@ -93,6 +98,10 @@ function resolveLockChest(
   }
   if (dist2d(r.e.pos, obj.pos) > DELVE_PLATE_RADIUS + 2) {
     ctx.error(r.meta.entityId, 'Move closer to the chest.');
+    return null;
+  }
+  if (!state.looted && delveHasLiveMobs(ctx, run)) {
+    ctx.error(r.meta.entityId, 'Clear the remaining enemies first.');
     return null;
   }
   return { r, run, state, obj };
@@ -193,6 +202,7 @@ function armLockpickStep(ctx: SimContext, session: LockSession): void {
 export function tickLockpickTimeout(ctx: SimContext, run: DelveRun): void {
   const s = run.lockpick;
   if (s?.state !== 'IN_PROGRESS') return;
+  if (delveHasLiveMobs(ctx, run)) return;
   if (ctx.tickCount >= s.stepDeadlineTick) lockpickStepTimeout(ctx, run, s);
 }
 
@@ -251,6 +261,10 @@ export function lockpickAction(
     return;
   }
   if (session.state !== 'IN_PROGRESS') return;
+  if (delveHasLiveMobs(ctx, run)) {
+    ctx.error(r.meta.entityId, 'Clear the remaining enemies first.');
+    return;
+  }
 
   if (action === 'abort') {
     lockpickAbort(ctx, r.meta.entityId, session.sessionId);
@@ -375,6 +389,10 @@ function lockpickSucceed(
   session: LockSession,
   solved: boolean,
 ): void {
+  if (delveHasLiveMobs(ctx, run)) {
+    ctx.error(session.ownerId, 'Clear the remaining enemies first.');
+    return;
+  }
   session.state = 'SUCCESS';
   const state = run.objectState[session.chestId];
   const obj = ctx.entities.get(session.chestId);
