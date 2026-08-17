@@ -256,6 +256,10 @@ interface Harness {
 function makeHarness(): Harness {
   const dir = mkdtempSync(join(tmpdir(), 'woc-watchdog-'));
   harnessDirs.push(dir);
+  // Some workers set TMPDIR inside this repo. Pin the shim package mode so the
+  // extensionless Node `timeout` executable below stays CommonJS even under an
+  // ancestor package.json with `"type": "module"`.
+  writeFileSync(join(dir, 'package.json'), '{"type":"commonjs"}\n');
   const dockerShim = `#!/usr/bin/env bash
 if [ "$1" = "inspect" ]; then
   if [ "\${SHIM_INSPECT_HANG:-0}" = "1" ]; then exec sleep 5; fi
