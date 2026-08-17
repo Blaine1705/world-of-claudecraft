@@ -9997,7 +9997,7 @@ export const nl_NL: EnTranslations = {
       },
       "fear": {
         "name": "Teisteren",
-        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Enough damage breaks the effect."
+        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect."
       },
       "searing_pain": {
         "name": "Schroeien",

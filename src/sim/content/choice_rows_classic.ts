@@ -1574,7 +1574,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'wlk_r8_voidfeast',
-          name: 'Abyssal Gag',
+          name: 'Improved Abyssal Gag',
           description:
             'Improves Abyssal Gag and grants it two levels early. It interrupts the enemy and silences all of its spells for 4 sec.',
           icon: 'wlk_r8_voidfeast',
