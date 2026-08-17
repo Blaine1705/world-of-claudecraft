@@ -420,8 +420,21 @@ implementation-plan.md).
 Resolved (Fernando, 2026-08-11):
 
 - R1 (phase 13, B6): RESOLVED: wallet-signature step-up on custody-moving ops; delete
-  the phantom TOTP scaffolding. Open sub-point for phase 13 session start: threshold
-  posture (recommended: step-up on every custody-moving call).
+  the phantom TOTP scaffolding. THRESHOLD SUB-POINT RESOLVED (Fernando, 2026-08-16,
+  proposed and confirmed at the 13 session start): step-up on EVERY custody-moving
+  call, NO threshold env knob at all. Grounds: a low-value carve-out is exactly the
+  B6 attack surface (floor-priced listings to a confederate), and no knob means no
+  misconfiguration surface, which satisfies the unset-means-more-protection
+  constraint by construction.
+- R10 (phase 13, the item-lock question parked by the 04 QA round; resolved Fernando,
+  2026-08-16, proposed and confirmed at the 13 session start): a LOCKED item copy
+  (player item lock, issue 3042) REFUSES $WOC exchange listing with a typed refusal
+  and honest copy; the seller unlocks first, matching the salvage/craft/vendor
+  posture. Scoped to the $WOC surface this packet owns. Deferred with owners: the
+  gold-market listing path keeps its current allow posture (a follow-up outside the
+  packet, noted for the 22 close-out audit alongside the R7 queue), and the
+  buyer-inherits-mark hygiene issue (a copy sold on the gold market still arrives
+  wearing the seller's lock flag) rides the same follow-up.
 - R2 (phase 09): RESOLVED: forfeited bonds follow the PRD treasury + burn split, one
   code path with the settlement fee split.
 - R3 (phase 11, H3, resolved Fernando 2026-08-16, proposed and confirmed at the
