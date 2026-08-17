@@ -4665,6 +4665,7 @@ export interface Entity extends ClientMirroredEntityFields {
   // through objectItemId; this authority data never needs to reach clients.
   soulwell?: {
     ownerId: number;
+    partyId: number | null;
     eligiblePlayerIds: number[];
     wardAbsorbPctMax: number;
     wardedPlayerIds: number[];
