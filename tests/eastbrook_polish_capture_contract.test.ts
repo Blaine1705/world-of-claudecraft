@@ -196,8 +196,18 @@ interface AttributionTargetFixture {
 // Re-minted for the corrected PR #3446 merge: the v0.39 wrapper renderer and
 // prewarm repairs combine with the sky KTX2 renderer bytes, so the merged tree
 // mints a value matching neither parent. No capture was retaken.
+// Re-minted for the vfx.mount-programs prewarm entry (#2571): renderer.ts and
+// prewarm_policy.ts both move, so the composite follows their bytes. No
+// capture was retaken.
+// Re-minted for the vfx.mount-programs review fixes (scene-reparent bug,
+// honest desktop-path progress, depth compile, timeout-bounded fetch,
+// constrained-device removal): renderer.ts and prewarm_policy.ts both move
+// again, so the composite follows their bytes. No capture was retaken.
+// Re-minted for the PR #3447 merge: the v0.39 wrapper, corrected PR #3446 sky
+// KTX2 renderer bytes, and mount-program prewarm bytes combine in one tree. No
+// capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '35b3c6fd77caf4b3f6d82400e5057210e09dd7bf85c01a133284f3ee298bc85a';
+  '737a814f2ab706890aec02a89c5445f9ec5cb0386651d4e8bb7871b7050b3c8a';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

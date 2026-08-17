@@ -777,10 +777,22 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the corrected PR #3446 merge: the v0.39 wrapper renderer and
 // prewarm repairs combine with the sky KTX2 renderer bytes, then this seal
 // follows the swept evidence bytes. No capture was retaken.
+// Re-minted for the vfx.mount-programs prewarm entry (#2571): the first-order
+// composite follows renderer.ts and prewarm_policy.ts, then this seal follows
+// the swept evidence bytes. No capture was retaken.
+// Re-minted for the vfx.mount-programs review fixes (scene-reparent bug,
+// honest desktop-path progress, depth compile, timeout-bounded fetch,
+// constrained-device removal): the first-order composite follows renderer.ts
+// and prewarm_policy.ts, then this seal follows the swept evidence bytes. No
+// capture was retaken.
+// Re-minted for the PR #3447 merge: the first-order composite follows the
+// combined v0.39 wrapper, corrected PR #3446 sky KTX2 renderer bytes, and
+// mount-program prewarm bytes, then this seal follows the swept evidence bytes.
+// No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '2bcd3625495590aa810d07798b130c386222a274738861581bdfe62938a221f2';
+  'eaec5ee5a02a1cf75fb8e9a8b26322c132b9ca4809dad4a03dfd76f8770b50c6';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '35b3c6fd77caf4b3f6d82400e5057210e09dd7bf85c01a133284f3ee298bc85a';
+  '737a814f2ab706890aec02a89c5445f9ec5cb0386651d4e8bb7871b7050b3c8a';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1787,10 +1799,23 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // scheduling into src/render/delve_interior_tracker.ts. No capture retaken.
     // Re-minted again for the merged prewarm and delve-tracker runtime inputs.
     // No capture retaken.
+    // Re-minted for the vfx.mount-programs prewarm entry (#2571). The
+    // first-order composite follows renderer.ts and prewarm_policy.ts, then
+    // this second-order performance seal follows the swept evidence bytes. No
+    // capture was retaken.
+    // Re-minted for the vfx.mount-programs review fixes (scene-reparent bug,
+    // honest desktop-path progress, depth compile, timeout-bounded fetch,
+    // constrained-device removal). The first-order composite follows
+    // renderer.ts and prewarm_policy.ts, then this second-order performance
+    // seal follows the swept evidence bytes. No capture was retaken.
+    // Re-minted for the PR #3447 merge. The first-order composite follows the
+    // combined v0.39 wrapper, corrected PR #3446 sky KTX2 renderer bytes, and
+    // mount-program prewarm bytes, then this second-order performance seal
+    // follows the swept evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('8265e9c9e3fc4a282be88b6d762640e51955556cee9693019a914e631819563c');
+    ).toBe('928cd1c3beec9c9de553b6ff3d405a8b859019728405d0b1f8fe2a3980217959');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
