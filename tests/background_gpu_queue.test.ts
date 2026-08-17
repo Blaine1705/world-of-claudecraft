@@ -256,9 +256,9 @@ describe('createBackgroundGpuQueue', () => {
   it('marks a wait spent behind the released-tail cap', async () => {
     // The mechanism a RELEASED tail still delays a live gate with: releasing the
     // tail frees the serial slot but keeps a cap slot, and the drain loop refuses
-    // to START anything while the cap is full. Without this flag that wait is
-    // indistinguishable from waiting behind an ordinary holder, and the two call
-    // for opposite fixes.
+    // to START another tail-releasing unit while the cap is full. Without this
+    // flag that wait is indistinguishable from waiting behind an ordinary
+    // holder, and the two call for opposite fixes.
     let clock = 0;
     const queue = createBackgroundGpuQueue({ now: () => clock, tailLimit: 1 });
     let settleLink!: () => void;
@@ -282,6 +282,7 @@ describe('createBackgroundGpuQueue', () => {
       },
       GPU_WORK_PRIORITY.LIVE_VIEW,
       'live-gate',
+      { releaseTail: true },
     );
     await flush();
     clock += 900;
@@ -379,12 +380,16 @@ describe('createBackgroundGpuQueue', () => {
     );
     await flush();
     // First arrival makes the loop park on the full cap.
-    const early = queue.run(() => {}, GPU_WORK_PRIORITY.BACKGROUND, 'early');
+    const early = queue.run(() => {}, GPU_WORK_PRIORITY.BACKGROUND, 'early', {
+      releaseTail: true,
+    });
     await flush();
     // This one arrives while that park is ALREADY under way, and the same park
     // releases both, so no counter advance happens during its wait.
     clock += 500;
-    const late = queue.run(() => {}, GPU_WORK_PRIORITY.LIVE_VIEW, 'late-gate');
+    const late = queue.run(() => {}, GPU_WORK_PRIORITY.LIVE_VIEW, 'late-gate', {
+      releaseTail: true,
+    });
     clock += 300;
     settleLink();
     await Promise.all([tail, early, late]);
@@ -1037,12 +1042,13 @@ describe('createBackgroundGpuQueue', () => {
       },
       GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
       'actionable-gate',
+      { releaseTail: true },
     );
     await flush();
-    // Two tails in flight fill the cap: NOTHING else starts, not even the
-    // higher-priority unit (the cap is what bounds concurrent driver work).
-    // The documented cap-limited readout is the triple: pending grows,
-    // active null, waitingTails full.
+    // Two tails in flight fill the cap: no unit that would add a THIRD tail
+    // starts, not even the higher-priority one (the cap is what bounds
+    // concurrent driver work). The documented cap-limited readout is the
+    // triple: pending grows, active null, waitingTails full.
     expect(events).toEqual(['first:prologue', 'second:prologue']);
     const capped = queue.stats();
     expect(capped.pending).toBe(2);
@@ -1058,6 +1064,53 @@ describe('createBackgroundGpuQueue', () => {
     links[2]();
     await Promise.all([first, second, third, actionable]);
     expect(queue.stats().waitingTails).toEqual([]);
+  });
+
+  it('starts a tail-free unit under a full cap and keeps tail-releasing units waiting', async () => {
+    // A per-program touch piece holds no tail: it adds nothing to the driver's
+    // link queue, and it is what settles the gates whose tails hold the cap.
+    // Parking it behind two slow crowd links kept every reveal gate compiling
+    // past its soft deadline on the iGPU crowd bench.
+    const queue = createBackgroundGpuQueue({ tailLimit: 2 });
+    const events: string[] = [];
+    const links: Array<() => void> = [];
+    const gate = (name: string) =>
+      queue.run(
+        () => {
+          events.push(`${name}:prologue`);
+          return new Promise<void>((resolve) => {
+            links.push(resolve);
+          });
+        },
+        GPU_WORK_PRIORITY.LIVE_VIEW,
+        name,
+        { releaseTail: true },
+      );
+    const first = gate('first');
+    const second = gate('second');
+    await flush();
+    const third = gate('third');
+    const touch = queue.run(
+      () => {
+        events.push('touch');
+      },
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+      'touch:program',
+    );
+    await flush();
+    // The touch piece ran under the full cap; the third gate is still parked.
+    expect(events).toEqual(['first:prologue', 'second:prologue', 'touch']);
+    expect(queue.stats().pending).toBe(1);
+    expect(queue.stats().waitingTails.map((tail) => tail.label)).toEqual(['first', 'second']);
+    // Bound kept: at most tailLimit tails plus the one running unit.
+    links[0]();
+    await flush();
+    expect(events).toEqual(['first:prologue', 'second:prologue', 'touch', 'third:prologue']);
+    links[1]();
+    links[2]();
+    await Promise.all([first, second, third, touch]);
+    const wait = queue.stats().longestWaits.find((entry) => entry.label === 'third');
+    expect(wait?.waitedOnTailCap).toBe(true);
   });
 
   it('caps released tails at 2 by default: the snapshot-burst bound', async () => {
@@ -1263,8 +1316,11 @@ describe('createBackgroundGpuQueue', () => {
     const first = gate('first');
     const second = gate('second');
     await flush();
-    // Cap saturated; this unit parks the drain loop on the tail-cap wait.
-    const parked = queue.run(async () => 'parked', GPU_WORK_PRIORITY.LIVE_VIEW, 'parked');
+    // Cap saturated; this tail-releasing unit parks the drain loop on the
+    // tail-cap wait.
+    const parked = queue.run(async () => 'parked', GPU_WORK_PRIORITY.LIVE_VIEW, 'parked', {
+      releaseTail: true,
+    });
     await flush();
 
     const shutdownError = new Error('renderer generation ended');

@@ -83,8 +83,13 @@ export interface GpuPrepBudgetConfig {
   minSliceMs: number;
   /** A candidate deferred this many frames is admitted regardless of headroom
    *  or pressure. The starvation bound: pacing may delay a piece, never drop
-   *  it. */
+   *  it. Applies to the approaching class; the visible class has the per-frame
+   *  progress rule below and the cosmetic class its own longer bound. */
   maxDeferFrames: number;
+  /** The cosmetic starvation bound. Long on purpose: a cosmetic piece that
+   *  cannot fit (a whole preview warm on a slow machine) should wait for a
+   *  quiet frame rather than be forced into a busy one every half second. */
+  cosmeticMaxDeferFrames: number;
   /** Predicted cost of a kind with no sample yet. Pessimistic on purpose: an
    *  unmeasured kind is admitted on the first-sample slot below, not on a
    *  flattering guess. */
@@ -100,6 +105,7 @@ export const DEFAULT_GPU_PREP_BUDGET_CONFIG: GpuPrepBudgetConfig = {
   targetFrameMs: 1000 / 60,
   minSliceMs: 1.5,
   maxDeferFrames: 30,
+  cosmeticMaxDeferFrames: 240,
   unknownCostMs: 4,
   emaAlpha: 0.3,
   frameEmaAlpha: 0.2,
@@ -115,6 +121,7 @@ export interface GpuPrepAdmitInput {
 export type GpuPrepAdmitReason =
   | 'actionable-floor'
   | 'fits'
+  | 'progress'
   | 'starvation'
   | 'legacy'
   | 'first-sample'
@@ -125,7 +132,7 @@ export type GpuPrepAdmitReason =
 export type GpuPrepAdmitDecision =
   | {
       admit: true;
-      reason: 'actionable-floor' | 'fits' | 'starvation' | 'legacy' | 'first-sample';
+      reason: 'actionable-floor' | 'fits' | 'progress' | 'starvation' | 'legacy' | 'first-sample';
       predictedMs: number;
     }
   | {
@@ -194,6 +201,10 @@ export function createGpuPrepBudget(config?: Partial<GpuPrepBudgetConfig>): GpuP
     targetFrameMs: positiveMs(config?.targetFrameMs, defaults.targetFrameMs),
     minSliceMs: positiveMs(config?.minSliceMs, defaults.minSliceMs),
     maxDeferFrames: frameCount(config?.maxDeferFrames, defaults.maxDeferFrames),
+    cosmeticMaxDeferFrames: frameCount(
+      config?.cosmeticMaxDeferFrames,
+      defaults.cosmeticMaxDeferFrames,
+    ),
     unknownCostMs: positiveMs(config?.unknownCostMs, defaults.unknownCostMs),
     emaAlpha: alpha(config?.emaAlpha, defaults.emaAlpha),
     frameEmaAlpha: alpha(config?.frameEmaAlpha, defaults.frameEmaAlpha),
@@ -202,6 +213,7 @@ export function createGpuPrepBudget(config?: Partial<GpuPrepBudgetConfig>): GpuP
   const decisions: Record<GpuPrepAdmitReason, number> = {
     'actionable-floor': 0,
     fits: 0,
+    progress: 0,
     starvation: 0,
     legacy: 0,
     'first-sample': 0,
@@ -216,6 +228,7 @@ export function createGpuPrepBudget(config?: Partial<GpuPrepBudgetConfig>): GpuP
   let frameSamples = 0;
   let spentThisFrameMs = 0;
   let firstSampleUsedThisFrame = false;
+  let progressUsedThisFrame = false;
   let degrading = false;
   let legacy = false;
 
@@ -226,7 +239,7 @@ export function createGpuPrepBudget(config?: Partial<GpuPrepBudgetConfig>): GpuP
   const ledgerOf = (kind: string): KindLedger | undefined => kinds.get(gpuPrepKindOfLabel(kind));
   const predict = (kind: string): number => ledgerOf(kind)?.emaMs ?? cfg.unknownCostMs;
   const admitted = (
-    reason: 'actionable-floor' | 'fits' | 'starvation' | 'legacy' | 'first-sample',
+    reason: 'actionable-floor' | 'fits' | 'progress' | 'starvation' | 'legacy' | 'first-sample',
     predictedMs: number,
   ): GpuPrepAdmitDecision => {
     decisions[reason]++;
@@ -244,6 +257,7 @@ export function createGpuPrepBudget(config?: Partial<GpuPrepBudgetConfig>): GpuP
     noteFrame(frameMs: number): void {
       spentThisFrameMs = 0;
       firstSampleUsedThisFrame = false;
+      progressUsedThisFrame = false;
       if (!Number.isFinite(frameMs) || frameMs < 0) return;
       // The first measurement SETS the average. Blending it against the
       // target-derived seed would make the first several frames report a frame
@@ -274,8 +288,25 @@ export function createGpuPrepBudget(config?: Partial<GpuPrepBudgetConfig>): GpuP
       if (legacy) return admitted('legacy', predictedMs);
       if (input.cls === 'actionable') return admitted('actionable-floor', predictedMs);
       const deferredFrames = Number.isFinite(input.deferredFrames) ? input.deferredFrames : 0;
-      if (deferredFrames >= cfg.maxDeferFrames) return admitted('starvation', predictedMs);
+      const starvationBound =
+        input.cls === 'cosmetic' ? cfg.cosmeticMaxDeferFrames : cfg.maxDeferFrames;
+      if (deferredFrames >= starvationBound) return admitted('starvation', predictedMs);
       if (input.cls === 'cosmetic' && degrading) return deferred('pressure', predictedMs);
+      // Visible work (a live gate and its pieces: the body the player is
+      // waiting for) always makes progress: one piece per frame even when it
+      // does not fit, because delaying it never makes the frame faster and a
+      // gated root revealed by an escape before its pieces are done pays the
+      // whole link on the live path, which costs more than the piece.
+      if (
+        input.cls === 'visible' &&
+        spentThisFrameMs === 0 &&
+        !progressUsedThisFrame &&
+        ledgerOf(input.kind) !== undefined &&
+        predictedMs > headroom()
+      ) {
+        progressUsedThisFrame = true;
+        return admitted('progress', predictedMs);
+      }
       if (ledgerOf(input.kind) === undefined) {
         // An unmeasured kind is priced by a guess, so let exactly one through
         // per frame: that is what turns the guess into a sample without letting

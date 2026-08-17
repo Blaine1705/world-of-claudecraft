@@ -15,6 +15,7 @@ const CONFIG: GpuPrepBudgetConfig = {
   targetFrameMs: 24,
   minSliceMs: 2,
   maxDeferFrames: 5,
+  cosmeticMaxDeferFrames: 5,
   unknownCostMs: 9,
   emaAlpha: 0.5,
   frameEmaAlpha: 1,
@@ -278,9 +279,10 @@ describe('gpu prep admission rules, in order', () => {
       reason: 'fits',
       predictedMs: 4,
     });
-    // Half a millisecond over the same headroom does not.
+    // Half a millisecond over the same headroom does not (approaching: the
+    // visible class would take the per-frame progress slot here instead).
     expect(
-      budget.admit({ kind: 'texture-chunk-upload', cls: 'visible', deferredFrames: 0 }),
+      budget.admit({ kind: 'texture-chunk-upload', cls: 'approaching', deferredFrames: 0 }),
     ).toEqual({ admit: false, reason: 'no-headroom', predictedMs: 4.5, headroomMs: 4 });
     // ...and the charged frame moves the line under the kind that just fitted.
     budget.spend(0.5);
@@ -345,10 +347,11 @@ describe('gpu prep snapshot', () => {
     expect(snapshot.decisions).toEqual({
       'actionable-floor': 1,
       fits: 1,
+      progress: 1,
       starvation: 1,
       legacy: 1,
       'first-sample': 1,
-      'no-headroom': 1,
+      'no-headroom': 0,
       'unknown-cap': 1,
       pressure: 1,
     });
@@ -395,8 +398,89 @@ describe('gpu prep defaults', () => {
       budget.admit({
         kind: 'anything',
         cls: 'cosmetic',
-        deferredFrames: DEFAULT_GPU_PREP_BUDGET_CONFIG.maxDeferFrames,
+        deferredFrames: DEFAULT_GPU_PREP_BUDGET_CONFIG.cosmeticMaxDeferFrames,
       }),
     ).toMatchObject({ admit: true, reason: 'starvation' });
+  });
+});
+
+describe('gpu prep budget: progress and class-specific starvation', () => {
+  it('lets one oversized visible piece through per frame while nothing was spent', () => {
+    const budget = budgetAt(40); // headroom = floor 2 ms
+    budget.record('touch:0', 15);
+    expect(budget.admit({ kind: 'touch:1', cls: 'visible', deferredFrames: 0 })).toEqual({
+      admit: true,
+      reason: 'progress',
+      predictedMs: 15,
+    });
+    // The second oversized visible piece of the frame waits.
+    expect(budget.admit({ kind: 'touch:2', cls: 'visible', deferredFrames: 0 })).toMatchObject({
+      admit: false,
+      reason: 'no-headroom',
+    });
+    // The next frame re-arms the rule.
+    budget.noteFrame(40);
+    expect(budget.admit({ kind: 'touch:3', cls: 'visible', deferredFrames: 0 })).toMatchObject({
+      admit: true,
+      reason: 'progress',
+    });
+  });
+
+  it('does not use the progress slot once the frame has spent, and never for approaching or cosmetic', () => {
+    const budget = budgetAt(40);
+    budget.record('touch:0', 15);
+    budget.spend(0.5);
+    expect(budget.admit({ kind: 'touch:1', cls: 'visible', deferredFrames: 0 })).toMatchObject({
+      admit: false,
+      reason: 'no-headroom',
+    });
+    const fresh = budgetAt(40);
+    fresh.record('touch:0', 15);
+    expect(fresh.admit({ kind: 'touch:1', cls: 'approaching', deferredFrames: 0 })).toMatchObject({
+      admit: false,
+      reason: 'no-headroom',
+    });
+    expect(fresh.admit({ kind: 'touch:1', cls: 'cosmetic', deferredFrames: 0 })).toMatchObject({
+      admit: false,
+      reason: 'no-headroom',
+    });
+  });
+
+  it('leaves an unmeasured visible kind to the first-sample slot, not to progress', () => {
+    const budget = budgetAt(40);
+    expect(budget.admit({ kind: 'fresh:1', cls: 'visible', deferredFrames: 0 })).toMatchObject({
+      admit: true,
+      reason: 'first-sample',
+    });
+    expect(budget.admit({ kind: 'other:1', cls: 'visible', deferredFrames: 0 })).toMatchObject({
+      admit: false,
+      reason: 'unknown-cap',
+    });
+    // The progress slot is still free for a MEASURED oversized visible piece.
+    budget.record('touch:0', 15);
+    expect(budget.admit({ kind: 'touch:1', cls: 'visible', deferredFrames: 0 })).toMatchObject({
+      admit: true,
+      reason: 'progress',
+    });
+  });
+
+  it('gives cosmetic work its own, longer starvation bound', () => {
+    const budget = budgetAt(40, { maxDeferFrames: 5, cosmeticMaxDeferFrames: 8 });
+    budget.record('warm:0', 30);
+    expect(budget.admit({ kind: 'warm:1', cls: 'cosmetic', deferredFrames: 5 })).toMatchObject({
+      admit: false,
+      reason: 'no-headroom',
+    });
+    expect(budget.admit({ kind: 'warm:1', cls: 'cosmetic', deferredFrames: 8 })).toMatchObject({
+      admit: true,
+      reason: 'starvation',
+    });
+    expect(budget.admit({ kind: 'warm:1', cls: 'approaching', deferredFrames: 5 })).toMatchObject({
+      admit: true,
+      reason: 'starvation',
+    });
+    expect(DEFAULT_GPU_PREP_BUDGET_CONFIG.cosmeticMaxDeferFrames).toBeGreaterThan(
+      DEFAULT_GPU_PREP_BUDGET_CONFIG.maxDeferFrames,
+    );
   });
 });

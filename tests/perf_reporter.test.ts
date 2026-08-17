@@ -365,6 +365,7 @@ function snapshot(): PerfSnapshot {
           decisions: {
             'actionable-floor': 0,
             fits: 12,
+            progress: 0,
             starvation: 0,
             legacy: 0,
             'first-sample': 1,

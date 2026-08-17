@@ -14,9 +14,13 @@
 // higher-priority actionable gates waiting behind it). The cap is what keeps
 // the original guarantee (#2753): driver link work stays bounded, never one
 // per streamed view during an online snapshot burst. Priority applies when a
-// unit STARTS: a higher-priority arrival can still wait on a full cap, but
-// that wait is bounded by the shortest in-flight tail instead of the whole
-// serial hold, so it is never longer than the pre-release policy's.
+// unit STARTS: a higher-priority arrival that would add a tail can still wait
+// on a full cap, but that wait is bounded by the shortest in-flight tail
+// instead of the whole serial hold, so it is never longer than the
+// pre-release policy's. A unit that holds NO tail (a per-program touch piece,
+// a synchronous upload) starts under a full cap: it adds nothing to the
+// driver's link queue and the bound (tailLimit tails plus the one running
+// unit) holds unchanged.
 //
 // The OTHER half of the policy (hitch-hunt P1): boot-debt resume batches keep
 // their tail HELD on purpose. Released tails let every debt batch's links
@@ -644,11 +648,13 @@ export function createBackgroundGpuQueue(opts?: {
    * is the one thing a burst makes long): candidates are marked with the pass
    * that refused them instead of being copied into a sorted list.
    */
-  const selectNext = (): number => {
+  const selectNext = (tailFreeOnly: boolean): number => {
     if (!admission || lastFrameAt === null) {
-      let selectedIndex = 0;
-      for (let index = 1; index < pending.length; index++) {
-        if (outranks(pending[index], pending[selectedIndex])) selectedIndex = index;
+      let selectedIndex = -1;
+      for (let index = 0; index < pending.length; index++) {
+        const candidate = pending[index];
+        if (tailFreeOnly && candidate.releaseTail) continue;
+        if (selectedIndex < 0 || outranks(candidate, pending[selectedIndex])) selectedIndex = index;
       }
       return selectedIndex;
     }
@@ -658,6 +664,7 @@ export function createBackgroundGpuQueue(opts?: {
       for (let index = 0; index < pending.length; index++) {
         const candidate = pending[index];
         if (candidate.refusedPass === selectionPass) continue;
+        if (tailFreeOnly && candidate.releaseTail) continue;
         if (selectedIndex < 0 || outranks(candidate, pending[selectedIndex])) selectedIndex = index;
       }
       if (selectedIndex < 0) return -1;
@@ -679,33 +686,41 @@ export function createBackgroundGpuQueue(opts?: {
 
   const drain = async (): Promise<void> => {
     while (pending.length > 0) {
-      // The released-tail cap gates STARTING units, so the bound covers the
-      // running unit's own driver work too: at most tailLimit + 1 units'
-      // driver work can be in flight at any instant.
-      while (waitingTails.size >= tailLimit) {
-        // Counted, not just awaited: this park is the one way a RELEASED tail
-        // still delays a higher-priority arrival, and without the count a long
-        // wait cannot be told apart from waiting behind an ordinary holder.
-        tailCapParks++;
-        lastCapOccupants = [...waitingTails].map((tail) => tail.entry.label);
-        parkedOnTailCap = true;
-        try {
-          await new Promise<void>((resolve) => {
-            tailNotify = resolve;
-          });
-        } finally {
-          // Backstop only: the settle path above clears this the moment a slot
-          // frees. This covers the paths that leave the park without one
-          // (shutdown), and re-clearing is idempotent.
-          parkedOnTailCap = false;
-        }
-      }
-      // shutdown() splices pending while the loop is parked on the cap wait
-      // above: re-check emptiness before selecting, or the resumed iteration
-      // dereferences a unit that no longer exists.
-      if (pending.length === 0) break;
-      const selectedIndex = selectNext();
+      // The released-tail cap gates STARTING units that would add a tail, so
+      // the bound covers the running unit's own driver work too: at most
+      // tailLimit + 1 units' driver work can be in flight at any instant. A
+      // unit that holds NO tail (a per-program touch piece, a synchronous
+      // upload) still starts under a full cap: it adds nothing to the driver's
+      // link queue, and it is what settles the gates whose tails hold the cap
+      // (a touch piece parked behind two slow crowd links kept every reveal
+      // gate compiling past its soft deadline, measured on the iGPU crowd
+      // bench, where the same tail ran inside the gate before it was a piece).
+      const capFull = waitingTails.size >= tailLimit;
+      const selectedIndex = selectNext(capFull);
       if (selectedIndex < 0) {
+        if (capFull) {
+          // Counted, not just awaited: this park is the one way a RELEASED
+          // tail still delays a higher-priority arrival, and without the count
+          // a long wait cannot be told apart from waiting behind an ordinary
+          // holder. A tail settling wakes it; so does the frame clock or an
+          // arrival, in case a tail-free candidate was only budget-refused.
+          tailCapParks++;
+          lastCapOccupants = [...waitingTails].map((tail) => tail.entry.label);
+          parkedOnTailCap = true;
+          try {
+            await new Promise<void>((resolve) => {
+              tailNotify = resolve;
+              admissionNotify = resolve;
+            });
+          } finally {
+            // Backstop only: the settle path above clears this the moment a
+            // slot frees. This covers the paths that leave the park without
+            // one (shutdown), and re-clearing is idempotent.
+            parkedOnTailCap = false;
+            admissionNotify = null;
+          }
+          continue;
+        }
         // Every candidate refused: nothing this loop can do until the frame
         // clock advances their deferral (noteFrame) or a new arrival brings a
         // candidate the budget has room for (run). Both wake this park.

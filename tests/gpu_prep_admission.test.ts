@@ -80,15 +80,24 @@ describe('createGpuPrepAdmission', () => {
   });
 
   it('honours the starvation bound the queue counts for it', () => {
-    const budget = createGpuPrepBudget({ targetFrameMs: 16.7, maxDeferFrames: 4 });
+    const budget = createGpuPrepBudget({
+      targetFrameMs: 16.7,
+      maxDeferFrames: 4,
+      cosmeticMaxDeferFrames: 6,
+    });
     const admission = createGpuPrepAdmission(budget);
     budget.noteFrame(60);
     budget.record('touch', 99);
 
+    // BACKGROUND is cosmetic: its own, longer bound applies.
     const candidate = { label: 'touch:program', priority: GPU_WORK_PRIORITY.BACKGROUND };
-    expect(admission.admit({ ...candidate, deferredFrames: 3 })).toBe(false);
-    expect(admission.admit({ ...candidate, deferredFrames: 4 })).toBe(true);
-    expect(budget.snapshot().decisions.starvation).toBe(1);
+    expect(admission.admit({ ...candidate, deferredFrames: 4 })).toBe(false);
+    expect(admission.admit({ ...candidate, deferredFrames: 6 })).toBe(true);
+    // VISIBLE_PREWARM is approaching: the general bound.
+    const approaching = { label: 'touch:program', priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM };
+    expect(admission.admit({ ...approaching, deferredFrames: 3 })).toBe(false);
+    expect(admission.admit({ ...approaching, deferredFrames: 4 })).toBe(true);
+    expect(budget.snapshot().decisions.starvation).toBe(2);
   });
 
   it('spends the frame it charges, so a second piece sees the smaller headroom', () => {
