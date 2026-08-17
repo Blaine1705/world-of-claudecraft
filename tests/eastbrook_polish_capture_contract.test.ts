@@ -191,8 +191,10 @@ interface AttributionTargetFixture {
 // honest desktop-path progress, depth compile, timeout-bounded fetch,
 // constrained-device removal): renderer.ts and prewarm_policy.ts both move
 // again, so the composite follows their bytes. No capture was retaken.
+// Re-minted for the rebase onto release/v0.39.0: renderer.ts moves again with
+// the base merge, so the composite follows its bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '565d96a752e2f1ef224449f85b8d1fda45dda0a64585c3aae0af437be719d573';
+  '3bafffc1173183f6eba9bcd44c0168c7c4507a7fa9ccf161f6edcac6339464ff';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

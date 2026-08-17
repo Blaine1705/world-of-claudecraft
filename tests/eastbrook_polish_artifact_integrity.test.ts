@@ -774,10 +774,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // constrained-device removal): the first-order composite follows renderer.ts
 // and prewarm_policy.ts, then this seal follows the swept evidence bytes. No
 // capture was retaken.
+// Re-minted for the rebase onto release/v0.39.0: the first-order composite
+// follows renderer.ts, then this seal follows the swept evidence bytes. No
+// capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '3e8d9049101326b168c6dfc232a9d065f8be5ca69fd1149c3186f118eb9ebb0c';
+  '1f86533bc2d03edf82908e900fffdb36b07429054e6bd36422b7a727fa421c08';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '565d96a752e2f1ef224449f85b8d1fda45dda0a64585c3aae0af437be719d573';
+  '3bafffc1173183f6eba9bcd44c0168c7c4507a7fa9ccf161f6edcac6339464ff';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1789,10 +1792,13 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // constrained-device removal). The first-order composite follows
     // renderer.ts and prewarm_policy.ts, then this second-order performance
     // seal follows the swept evidence bytes. No capture was retaken.
+    // Re-minted for the rebase onto release/v0.39.0. The first-order composite
+    // follows renderer.ts, then this second-order performance seal follows
+    // the swept evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('18f04868e138fb943a29a7dac0aa4db85c05f99559ef3b418185a0f7beb45c65');
+    ).toBe('1ec8d6fef34219b12875512738faa7ac015154d0dc679983c9b32a089104ac11');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
