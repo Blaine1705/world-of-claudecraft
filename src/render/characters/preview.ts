@@ -1,7 +1,14 @@
 import * as THREE from 'three';
 import { CLASSES } from '../../sim/data';
 import type { PlayerClass } from '../../sim/types';
+import { GPU_WORK_PRIORITY } from '../background_gpu_queue';
 import { trackWebGLContext } from '../context_release';
+import { gpuPrepNow, recordGpuPrepEvent } from '../gpu_prep_events';
+import {
+  type LinkedProgramTouchQueue,
+  PREVIEW_LINKED_PROGRAM_TOUCH_LABEL,
+  runLinkedProgramTouchLane,
+} from '../linked_program_touch_lane';
 import { shaderDebugRequested } from '../shader_debug_flag';
 import {
   collectPrewarmTextures,
@@ -22,10 +29,26 @@ import {
   previewAppearanceVisual,
 } from './preview_appearance';
 import { PREVIEW_FRAMING, type PreviewFramingName } from './preview_framing';
+import { createPreviewOpenGate, type PreviewOpenGate } from './preview_open_gate_core';
 import { characterPreviewFrameVisible, resolveCharacterPreviewPolicy } from './preview_policy';
 import { CharacterVisual } from './visual';
 
 export type { PreviewAppearance } from './preview_appearance';
+
+/** The 2D layer the HUD paints over the empty canvas while the open gate
+ *  holds. Structural on purpose: the DOM lives in src/ui/preview_stand_in.ts,
+ *  so nothing here reaches into the UI layer. */
+export interface PreviewOpenStandIn {
+  show(): void;
+  hide(): void;
+}
+
+/** The gpu-prep key the bounded escape records under. The existing
+ *  `gate-timeout` KIND is reused rather than minting a preview-specific one:
+ *  it already means "a compile gate's bounded fail-soft escape fired", which
+ *  is exactly this, and every capture reader, perf-overlay row and test that
+ *  enumerates GpuPrepEventKind keeps working with the union at four members. */
+export const PREVIEW_OPEN_ESCAPE_EVENT_KEY = 'preview-open';
 
 export interface CharacterPreviewPose {
   clips: readonly string[];
@@ -100,6 +123,22 @@ export class CharacterPreview {
   // instead of the renderActive it captured at entry, so a window opened or
   // closed mid-warmup is never clobbered back to a stale snapshot.
   private pendingActive: boolean | null = null;
+  // The cold-open gate: while it is armed, both live draw sites (syncSize and
+  // the animate loop) withhold their render and the HUD's stand-in covers the
+  // empty canvas. It also carries the linked signature prewarm() shares.
+  private openGate: PreviewOpenGate = createPreviewOpenGate();
+  private standIn: PreviewOpenStandIn | null = null;
+  // The container a revealed frame is still standing in. A gear change rebuilds
+  // the body without resizing, so that RETAINED frame is the truest stand-in
+  // available and the crest layer would only dim it; a mount into a different
+  // container (Inspect, a reopened sheet) has no such frame and gets the crest.
+  private revealedContainer: HTMLElement | null = null;
+  // The WORLD renderer's background GPU queue, injected by the HUD. Right on a
+  // foreign context because the queue arbitrates MAIN-THREAD time, not
+  // programs: a getUniforms/getAttributes round trip blocks the same thread
+  // and the same frame whichever context owns the program.
+  private touchQueue: LinkedProgramTouchQueue | null = null;
+  private yieldToMain: () => Promise<void> = yieldToMainThread;
   private destroyed = false;
 
   // Drag controls
@@ -269,6 +308,10 @@ export class CharacterPreview {
       this.characterGroup.remove(this.currentVisual.root);
       this.currentVisual.dispose();
       this.currentVisual = null;
+      // three releases a program with the last material holding it, so a
+      // signature linked before this rebuild can be cold again afterwards:
+      // the gate must not skip the warm on a return to an old look.
+      this.openGate.forgetLinked();
     }
     this.currentVisualSig = null;
 
@@ -361,11 +404,118 @@ export class CharacterPreview {
     const height = this.container.clientHeight;
     this.renderActive = width > 0 && height > 0;
     if (width > 0 && height > 0) {
+      // The buffer, camera and aspect still follow the container while the
+      // open gate holds: only the DRAW waits, so the reveal needs no resize.
       this.renderer.setSize(width, height, false);
       this.camera.aspect = width / height;
       this.camera.updateProjectionMatrix();
-      this.renderer.render(this.scene, this.camera);
+      if (this.gateAllowsDraw()) this.renderer.render(this.scene, this.camera);
     }
+  }
+
+  /** Inject the world renderer's background GPU queue, the one arbiter that
+   *  paces main-thread preparation work. Without it the open gate still links
+   *  and uploads; only its touch tail is skipped. */
+  setTouchQueue(queue: LinkedProgramTouchQueue | null): void {
+    this.touchQueue = queue;
+  }
+
+  /** The visual signature whose programs are linked on this context, written
+   *  by BOTH prewarm() and the open gate so neither compiles what the other
+   *  already did. */
+  get linkedVisualSig(): string | null {
+    return this.openGate.linkedSig();
+  }
+
+  /**
+   * Arm the cold-open gate for whatever is mounted right now: hold both draw
+   * sites, show `standIn`, then link, upload and touch before the first frame
+   * the player sees. A no-op when the mounted signature is already linked (the
+   * warm open, and the reason nothing pays twice).
+   *
+   * Called from every mount (Hud.mountSharedPreview), so the sheet, the skin
+   * picker and Inspect all arm on the same rule; Inspect is the case the
+   * background lane can never cover, because it mounts a peer's class rig this
+   * context may never have linked.
+   */
+  armOpen(standIn: PreviewOpenStandIn | null = null): void {
+    if (this.destroyed) return;
+    const sig = this.currentVisualSig;
+    if (!this.openGate.arm(sig, gpuPrepNow())) return;
+    this.hideStandIn();
+    if (this.revealedContainer !== this.container) {
+      this.standIn = standIn;
+      standIn?.show();
+    }
+    const token = this.openGate.beginWarm();
+    if (token === null) return;
+    void this.prepareOpen(token, sig);
+  }
+
+  /** LINK, then UPLOAD, then TOUCH, then reveal. compileAsync in three r185
+   *  both submits and polls COMPLETION_STATUS_KHR, so its resolution IS the
+   *  settle and no separate wait step exists; the touch tail is what removes
+   *  the first-use uniform-table query the reveal draw would otherwise pay. */
+  private async prepareOpen(token: number, sig: string | null): Promise<void> {
+    try {
+      await this.renderer.compileAsync(this.scene, this.camera);
+      if (this.destroyed) return;
+      const textures = new Set<THREE.Texture>();
+      collectPrewarmTextures(this.scene, textures);
+      await uploadTexturesInSlices(this.renderer, textures, {
+        yieldToMain: this.yieldToMain,
+        isCancelled: () => this.destroyed,
+      });
+      if (this.destroyed) return;
+      // ACTIONABLE_VIEW because a player CLICKED: the actionable floor is what
+      // guarantees the open is never starved behind background preparation,
+      // and one budgeted piece per program is what keeps a 15 to 17 ms driver
+      // round trip out of the frame that carries the click.
+      if (this.touchQueue) {
+        await runLinkedProgramTouchLane(
+          this.touchQueue,
+          this.renderer.properties,
+          this.characterGroup,
+          GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
+          PREVIEW_LINKED_PROGRAM_TOUCH_LABEL,
+        );
+      }
+    } catch (err) {
+      // Fail-soft, like every other gate here: a refused context or a rejected
+      // compile must reveal the character, never strand the panel empty.
+      console.warn('[preview] cold-open warm failed', err);
+    } finally {
+      if (!this.destroyed && this.openGate.finishWarm(token, sig)) this.revealOpen();
+    }
+  }
+
+  /** Whether a live draw site may draw, and the one place the bounded escape
+   *  fires: past the soft deadline the gate releases, the escape is recorded
+   *  once, and the frame draws whatever is ready. */
+  private gateAllowsDraw(): boolean {
+    const now = gpuPrepNow();
+    const escapedAgeMs = this.openGate.takeEscape(now);
+    if (escapedAgeMs !== null) {
+      recordGpuPrepEvent({
+        kind: 'gate-timeout',
+        key: PREVIEW_OPEN_ESCAPE_EVENT_KEY,
+        ageMs: escapedAgeMs,
+      });
+      this.hideStandIn();
+    }
+    return this.openGate.shouldRender(now);
+  }
+
+  private revealOpen(): void {
+    this.hideStandIn();
+    if (!this.renderActive) return;
+    this.renderer.render(this.scene, this.camera);
+    this.revealedContainer = this.container;
+  }
+
+  private hideStandIn(): void {
+    this.standIn?.hide();
+    this.standIn = null;
   }
 
   /** Compile and upload the current preview while a loading screen is visible.
@@ -388,7 +538,15 @@ export class CharacterPreview {
       this.camera.aspect = 320 / 400;
       this.camera.updateProjectionMatrix();
       this.currentVisual.update(0, PREVIEW_ANIM_STATE, true);
-      await this.renderer.compileAsync(this.scene, this.camera);
+      // One linked signature, shared with the open gate: a scheduled warm and
+      // a player's open never compile the same visual twice, and the per-skin
+      // units after the first still do their texture work while skipping a
+      // compile that would link nothing new.
+      const warmSig = this.currentVisualSig;
+      if (!this.openGate.isLinked(warmSig)) {
+        await this.renderer.compileAsync(this.scene, this.camera);
+        this.openGate.noteLinked(warmSig);
+      }
       // A chroma swap rebinds body textures. Upload every class variant now so
       // clicking a skin swatch cannot turn the preview's next rAF into a first-
       // use texture upload. The uploads themselves are prepaid in bounded
@@ -522,6 +680,9 @@ export class CharacterPreview {
     this.timer.update();
     const dt = Math.min(this.timer.getDelta(), 0.1); // cap dt to prevent huge jumps
     if (!this.renderActive) return;
+    // The second live draw site: a gate covering only syncSize is not a gate,
+    // because the loop draws the same cold scene on the very next frame.
+    if (!this.gateAllowsDraw()) return;
 
     // No idle auto-rotation: the character holds its face-on pose (the classic
     // character-screen behavior) and only the player's drag spins the turntable.
@@ -685,10 +846,16 @@ export class CharacterPreview {
     }
     this.cleanupDragControls?.();
     this.cleanupDragControls = null;
+    this.openGate.cancel();
+    this.hideStandIn();
     if (this.currentVisual) {
       this.characterGroup.remove(this.currentVisual.root);
       this.currentVisual.dispose();
       this.currentVisual = null;
+      // three releases a program with the last material holding it, so a
+      // signature linked before this rebuild can be cold again afterwards:
+      // the gate must not skip the warm on a return to an old look.
+      this.openGate.forgetLinked();
     }
     this.currentVisualSig = null;
     this.closeupCache.clear();

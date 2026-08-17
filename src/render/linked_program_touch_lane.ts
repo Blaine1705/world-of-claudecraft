@@ -40,6 +40,14 @@ export function linkedProgramTouchPriority(gatePriority: number): number {
     : GPU_WORK_PRIORITY.TAIL_PIECE;
 }
 
+/** The PREVIEW context's own kind. Deliberately not the world label: the world
+ *  touch kind has learned an EMA near zero over thousands of samples (its
+ *  programs are warm by the time the tail runs), while a paperdoll program on
+ *  a second context measures 15 to 17 ms per first-use query on the Intel
+ *  iGPU. Sharing one estimate would let the budget admit a whole open's worth
+ *  of preview pieces into one frame. */
+export const PREVIEW_LINKED_PROGRAM_TOUCH_LABEL = 'touch-preview:program';
+
 /**
  * Run one queue unit per linked program under `target`, in order, and resolve
  * with how many were touched. The programs are collected ONCE up front: the
@@ -52,6 +60,8 @@ export async function runLinkedProgramTouchLane(
   properties: MaterialPropertiesLike,
   target: THREE.Object3D,
   gatePriority: number,
+  // A caller on a SECOND context passes its own label so the budget prices it
+  // apart from the world tail; see the preview label above.
   label: string = LINKED_PROGRAM_TOUCH_LABEL,
 ): Promise<number> {
   const programs = collectLinkedPrograms(properties, target);

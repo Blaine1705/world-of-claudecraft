@@ -609,6 +609,7 @@ import {
   type PreviewPrewarmUnit,
   runPreviewPrewarmSchedule,
 } from './preview_prewarm_core';
+import { armPreviewOpen } from './preview_stand_in';
 import { procAuraConsumeSelfNoteText, procAuraGainSelfNoteText } from './proc_fct_notes';
 import { buildProcOverlay } from './proc_overlay_dom';
 import { attachOverlayDrag } from './proc_overlay_drag';
@@ -17043,6 +17044,9 @@ export class Hud {
     this.charPreview.setSkin(opts.skin);
     this.charPreview.setWeaponSkin(opts.weaponSkinId);
     this.charPreview.setFraming(opts.framing);
+    // Cold open: hold the first draw behind the class-crest stand-in while this
+    // context links, uploads and touches what was just mounted (armPreviewOpen).
+    armPreviewOpen(this.charPreview, container, { cls: opts.cls }, this.renderer);
   }
 
   /** Char-sheet / skin-picker mount: the SELF character with both currently

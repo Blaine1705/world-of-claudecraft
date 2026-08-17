@@ -1382,7 +1382,7 @@ describe('createBackgroundGpuQueue', () => {
     const texture = method('private prewarmTextureInIdle(', '\n  private prewarmMaterialTextures(');
     const initial = method('async prewarmInitialScene(', '\n  // Visual reactions to sim events');
     expect(source).toContain(
-      'private backgroundGpuWork = createBackgroundGpuQueue({\n    admission: createGpuPrepAdmission(this.gpuPrepBudget),\n  });',
+      'readonly backgroundGpuWork = createBackgroundGpuQueue({\n    admission: createGpuPrepAdmission(this.gpuPrepBudget),\n  });',
     );
     expect(sky).toContain('this.backgroundGpuWork.run(');
     expect(features).toContain('this.backgroundGpuWork.run(');

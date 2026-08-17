@@ -270,6 +270,17 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   for the one gate with no in-world stand-in (the arrival gate hides the whole
   group). A new gate adds a row AND a case to `tests/entity_gate_stand_in.test.ts`;
   its coverage pin reds on any unregistered call site.
+  The rule has a SECOND-CONTEXT arm: the paperdoll / Inspect preview holds its
+  own draws on a cold open (`characters/preview_open_gate_core.ts`, armed from
+  `Hud.mountSharedPreview`) while that context links, uploads and touches, and
+  its stand-in is a 2D layer, the class crest or a cached portrait, painted
+  over the empty canvas by `src/ui/preview_stand_in.ts` with `aria-busy` (a
+  rebuild in the SAME container keeps the retained previous frame instead: no
+  resize, so the canvas still holds it, and it is truer than any crest). It
+  needs no `ENTITY_GATE_STAND_INS` row: that table is world ENTITIES the
+  renderer hides in the live scene, and this gate hides nothing in the world.
+  Its escape is the reveal gates' rule, a soft deadline that records a
+  `gate-timeout` gpu-prep event under the `preview-open` key and draws anyway.
 - **A program only ONE encounter can reach warms at that interior's attach,
   never in the boot manifest** (`interior_encounter_prewarm.ts` spec +
   `_pass.ts` + `_host.ts`, kill switch `?encounterPrewarm=0`). The Nythraxis

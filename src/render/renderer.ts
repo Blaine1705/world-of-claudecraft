@@ -1767,7 +1767,7 @@ export class Renderer {
   // it is a dropped frame, so what fits under it is what preparation may cost
   // before the frame it lands in stops being a frame the player got.
   private gpuPrepBudget = createGpuPrepBudget({ targetFrameMs: GFX.budget.dropFrameMs });
-  private backgroundGpuWork = createBackgroundGpuQueue({
+  readonly backgroundGpuWork = createBackgroundGpuQueue({
     admission: createGpuPrepAdmission(this.gpuPrepBudget),
   });
   // Serial tail for spirit-puppet construction: several models resolve at once

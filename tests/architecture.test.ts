@@ -450,6 +450,7 @@ const RENDER_PURE_CORES = [
   'src/render/affliction_familiar_core.ts',
   'src/render/characters/portrait_capture_lane_core.ts',
   'src/render/characters/portrait_prewarm_core.ts',
+  'src/render/characters/preview_open_gate_core.ts',
   'src/render/characters/soul_rend_prewarm_core.ts',
   'src/render/characters/design_code_core.ts',
   'src/render/reveal_gate_core.ts',
@@ -1881,6 +1882,7 @@ const UI_DOM_MODULES = [
   'src/ui/proc_overlay_drag.ts',
   'src/ui/profession_identity_card.ts',
   'src/ui/profession_tutorial_window.ts',
+  'src/ui/preview_stand_in.ts',
   'src/ui/prompt_dialog.ts',
   // professions_window.ts is BACK on the ledger: the focus_restore move left
   // it host-free for a while, but armSentGuard's one-shot re-arm timer is a
