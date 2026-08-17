@@ -21,6 +21,7 @@ import {
   abilityBuffValue,
   abilityDamageBonus,
   abilityTemporalHourglassValues,
+  auraBuffDisplayValue,
 } from '../src/ui/ability_damage';
 import { abilityEffectText } from '../src/ui/hud';
 
@@ -216,5 +217,15 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
     expect(abilityDamageBonus(rof, eff, SC)).toBe(
       directHitBonus(SC.spellPower, rof.def, rof.castTime, true),
     );
+  });
+});
+
+describe("auraBuffDisplayValue (an APPLIED aura, not the viewer's resolved ability)", () => {
+  it('reads a flat buff straight off the aura value', () => {
+    expect(auraBuffDisplayValue({ kind: 'buff_armor', value: 160 })).toBe(160);
+  });
+
+  it('converts a form_fireball speed multiplier to a whole percent, like abilityBuffValue', () => {
+    expect(auraBuffDisplayValue({ kind: 'form_fireball', value: 1.4 })).toBeCloseTo(40);
   });
 });
