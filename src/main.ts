@@ -469,7 +469,7 @@ import {
   isCompleteTotpCode,
 } from './ui/two_factor_setup';
 import { UiEffectsApplier } from './ui/ui_effects_applier';
-import { hydrateIcons } from './ui/ui_icons';
+import { hydrateIcons, svgIcon } from './ui/ui_icons';
 import {
   resolveWocBalanceUpdate,
   setWalletConnectionAddresses,
@@ -8071,7 +8071,7 @@ function showWalletPicker(
     closeBtn.type = 'button';
     closeBtn.className = 'x-btn wallet-picker-close';
     closeBtn.setAttribute('aria-label', t('skinEvent.close'));
-    closeBtn.textContent = '×';
+    closeBtn.innerHTML = svgIcon('close');
     titleRow.append(title, closeBtn);
 
     const help = document.createElement('p');

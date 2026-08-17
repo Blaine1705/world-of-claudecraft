@@ -4330,7 +4330,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_word_shield.description': 'Skyddar ett vänligt mål och absorberar {damage} skada i 30 sek. Disciplin länkar dessutom målet till er Heliga skada i 30 sek.',
   'entities.abilities.power_word_shield.name': 'Värnpsalm',
   'entities.abilities.prowl.description':
-    'Gå i smyg medan du är i vargform och rör dig 50 % långsammare. Kan inte användas i strid.',
+    'Gå i smyg medan du är i vargform och rör dig 5 % långsammare. Kan inte användas i strid.',
   'entities.abilities.prowl.name': 'Smygjaga',
   'entities.abilities.pyroblast.description':
     'Slungar ett väldigt brinnande stenblock som vållar {damage} eldskada plus ytterligare skada över tid.',
@@ -4426,7 +4426,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Spränger närliggande fiender för {damage} skada och saktar ner deras attacker med 10 % i 10 sek.',
   'entities.abilities.thunder_clap.name': 'Skälvande slag',
   'entities.abilities.tigers_fury.description':
-    'Ökar attackstyrkan med {buff} i {duration} sek. Endast vargform.',
+    'Frigör {rage} energi och ökar attackstyrkan med {buff} i {duration} sek. Endast vargform.',
   'entities.abilities.tigers_fury.name': 'Vargblod',
   'entities.abilities.travel_form.description':
     'Skiftar omedelbart till en snabb Fleetform och ökar förflyttningshastigheten med 40 %. Du kan inte använda andra förmågor i skepnaden, men kan skifta in eller ut i strid, idealiskt för flykt.',
@@ -10890,7 +10890,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.evocation.description':
     'Kanalisera i 6 sek.: varje sekund återställer ni 100 mana och bygger upp 8 besvärjelsekraft. Bonusen staplas under kanaliseringen och varar i 15 sek. (magikertalang)',
   'entities.abilities.frenzied_regeneration.description':
-    'Återställer 180 hälsa under 10 sek. Endast i Björngestalt. (druidtalang)',
+    'Återställer 40% av din maximala hälsa under 10 sek. Endast i Björngestalt. (druidtalang)',
   'entities.abilities.frost_trap.description':
     'Fryser fiender i målområdet i 3 sek. så att de varken kan röra sig eller agera. (jägartalang)',
   'entities.abilities.hammer_of_wrath.description': 'Slungar en helig hammare för {damage} skada och alstrar 1 Hängivenhet. Kan användas under 20% hälsa, eller under Gudomlig upphöjelse eller Hämnande vrede. Gryningens vrede ger en extra kastning mot vilket mål som helst som bortser från dess pågående nedkylning och vållar 20% mer skada. Upphöjelse ökar dess skada med 30%.',
@@ -12433,7 +12433,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Förbrukar 5 Grönska. Skördar varje läkning över tid du äger på alla allierade för 60% av dess återstående läkning, tar bort de effekterna och planterar en färsk Vildblomning på målet.',
   'entities.abilities.redharvest.name': 'Röd Skörd',
   'entities.abilities.redharvest.description':
-    'Förbrukar dina 3 Gammalt Blod: ett slag för {damage} som omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, tar bort båda blödningarna och återställer 30 energi. Fungerar utan kombopoäng.',
+    'Förbrukar dina 3 Gammalt Blod: ett slag för {damage} som omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, tar bort båda blödningarna och återställer {rage} energi. Fungerar utan kombopoäng.',
   'entities.abilities.sunlance.name': 'Solspår',
   'entities.abilities.sunlance.description':
     'Förbrukar dina 3 Månflod för ett slag som ger {damage} naturskada plus en brännskada på {overTime} under 9 sek och återställer 35 mana: manavalet. Månsvall förbrukar samma 3 Månflod, så välj ett.',
@@ -12688,7 +12688,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Avslutande drag som orsakar {damage}. Endast i Vargform.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Röd Skörd: ett bett för 70 plus 43 per kombopoäng som också omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, och återställer 30 energi.',
+    'Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Röd Skörd, som förbrukar ditt Gamla Blod för ett kraftigare slag som också omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, och återställer energi.',
   'entities.abilities.funeral_harvest.description':
     'När en fiende som nyligen skadats av dig eller dina odöda dör får du 1 Själfragment. Detta kan inträffa högst en gång var 3:e sek.',
   'entities.abilities.funeral_harvest.name': 'Funeral Harvest',
