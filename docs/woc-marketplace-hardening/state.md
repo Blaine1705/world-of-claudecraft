@@ -959,6 +959,21 @@ Still open (a phase that hits one asks at session start):
       removal). NEW deferral: a live-DOM behavioral rig for WocMarketWindow
       (which has no instantiation harness today, so the busyGen fix is source
       -pinned for structure) is owed to 15, the window UX-honesty phase.
+    GATE REMEDIATION (two merge-induced infra reds, neither a marketplace
+      defect; commits 2d597f6395 and 4835b3ce8c): (1) the v0.39.0 sync widened
+      the ci:changed base scope, surfacing a pre-existing non-null assertion in
+      a trade-controller test and a line-wrap the busyGen pin left unformatted -
+      both fixed on the touched files. (2) The merge updated
+      patches/three@0.185.1.patch and the lockfile, so node_modules was stale
+      and the release's degenerate-normal three-bundle test failed; a
+      pnpm install --frozen-lockfile re-applied the patch (LESSON: any merge
+      touching patches/ or the lockfile needs a reinstall). (3) The merge's union
+      of both parents' new test files dropped the shard-weight table below the
+      95% coverage floor (each parent was just above it; ci_shard_partition
+      completeness pin) - refreshed by merging real local durations for the 151
+      newly-uncovered non-browser suites, preserving every CI-harvested weight so
+      the balance/heavy pins are undisturbed. Gate GREEN after these on the final
+      tip.
     JUDGED, no code change (do NOT re-raise): the frontend BLOCKING (the R10
     hintAcceptLocked dead end) is RECLASSIFIED should-fix and DEFERRED to 15 -
     it is not a custody bypass (the spec's blocking bar), and there is NO

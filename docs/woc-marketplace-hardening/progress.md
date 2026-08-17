@@ -91,6 +91,16 @@ CORRECTIONS, and the deferrals-with-owners (incl. the WocMarketWindow
 behavioral-rig follow-up owed to 15) are in the 13 QA ROUND bullet of the
 state.md ledger entry.
 
+The full gate then surfaced two MERGE-INDUCED infra reds (neither a marketplace
+defect), fixed in commits 2d597f6395 (a pre-existing non-null assertion + an
+unformatted line the widened ci:changed scope exposed), a pnpm reinstall (the
+merge updated patches/three@0.185.1.patch, so node_modules was stale and the
+release's three-bundle test failed), and 4835b3ce8c (the merge's union of both
+parents' new test files dropped the shard-weight table below its 95% coverage
+floor; refreshed by merging real local durations for the 151 newly-uncovered
+non-browser suites, existing CI-harvested weights preserved). Gate GREEN on the
+final tip.
+
 ## 13 implement round (step-up authorization for custody-moving ops)
 
 Session start 19e4cd87ce (the 12 QA docs tip; release sync a no-op, 0 behind
