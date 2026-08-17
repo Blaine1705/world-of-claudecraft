@@ -3,7 +3,7 @@ import {
   OCCLUDER_FADE_ALPHA,
   occluderFadeSettled,
   occluderSegmentHitsBox,
-  occluderSegmentHitsCircle,
+  occluderSegmentHitsObb,
   stepOccluderFade,
 } from '../src/render/occluder_fade_core';
 
@@ -104,17 +104,17 @@ describe('occluderSegmentHitsBox', () => {
   });
 });
 
-describe('occluderSegmentHitsCircle', () => {
-  // A radius-2 footprint at the origin, 5 units tall.
+describe('occluderSegmentHitsObb', () => {
+  // A 2x2 footprint at the origin (hw=1, hd=1), unrotated, 5 units tall.
   const hits = (eye: [number, number, number], cam: [number, number, number], topY = 5): boolean =>
-    occluderSegmentHitsCircle(0, 0, 2, topY, eye[0], eye[1], eye[2], cam[0], cam[1], cam[2]);
+    occluderSegmentHitsObb(0, 0, 1, 1, 0, topY, eye[0], eye[1], eye[2], cam[0], cam[1], cam[2]);
 
   it('hits when the segment crosses the footprint below the top', () => {
     expect(hits([-5, 2, 0], [5, 2, 0])).toBe(true);
     expect(hits([0, 2, -5], [0, 2, 5])).toBe(true);
   });
 
-  it('misses when the segment passes beside or fully over the circle', () => {
+  it('misses when the segment passes beside or fully over the box', () => {
     expect(hits([-5, 2, 3], [5, 2, 3])).toBe(false);
     expect(hits([-5, 8, 0], [5, 8, 0])).toBe(false);
   });
@@ -125,18 +125,35 @@ describe('occluderSegmentHitsCircle', () => {
     expect(hits([0.5, 8, 0.5], [5, 8, 5])).toBe(false);
   });
 
-  it('misses when the circle sits behind the eye rather than between the endpoints', () => {
+  it('misses when the box sits behind the eye rather than between the endpoints', () => {
     expect(hits([3, 2, 0], [5, 2, 0])).toBe(false);
   });
 
-  it('uses the height at the circle entry point, not the endpoints alone', () => {
+  it('uses the height at the entry point, not the endpoints alone', () => {
     // Rising ray: enters the footprint above the top even though the eye is low.
     expect(hits([-5, 4.9, 0], [5, 11, 0])).toBe(false);
-    // Descending ray: enters below the top.
-    expect(hits([-2, 4.5, 0], [4, 2, 0])).toBe(true);
+    // Descending ray, entry well clear of the eye-clearance guard: enters below the top.
+    expect(hits([-3, 4.5, 0], [4, 2, 0])).toBe(true);
   });
 
-  it('misses a segment that only grazes the far side of an unrelated span', () => {
-    expect(hits([-10, 2, 0], [-8, 2, 0])).toBe(false);
+  it('rotates the footprint with rot, three.js rotation.y convention', () => {
+    // hw=1 (local x half-width), hd=2 (local z half-depth): unrotated, the
+    // footprint spans world z in (-2, 2), so a segment at z=1.5 crosses it.
+    const hitsAt = (rot: number): boolean =>
+      occluderSegmentHitsObb(0, 0, 1, 2, rot, 5, -5, 2, 1.5, 5, 2, 1.5);
+    expect(hitsAt(0)).toBe(true);
+    // Rotated a quarter turn, the local axes swap: the footprint now spans
+    // world z in (-1, 1), and z=1.5 falls outside it.
+    expect(hitsAt(Math.PI / 2)).toBe(false);
+  });
+
+  it('suppresses a hit whose entry sits within the eye-clearance guard', () => {
+    // A body standing pressed to the wall: the entry point is ~0.05 units
+    // from the eye, well inside OCCLUDER_HIDE_EYE_CLEARANCE.
+    const hitsFrom = (eyeX: number): boolean =>
+      occluderSegmentHitsObb(0, 0, 1, 1, 0, 5, eyeX, 2, 0, 5, 2, 0);
+    expect(hitsFrom(-1.05)).toBe(false);
+    // Backed off a couple of units, the same approach hits normally.
+    expect(hitsFrom(-3)).toBe(true);
   });
 });
