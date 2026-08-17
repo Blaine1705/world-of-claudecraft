@@ -7187,6 +7187,7 @@ export const pt_BR: EnTranslations = {
       "shopMarksRequired": "Você precisa de {marks} Selos de Incursão para comprar {name}.",
       "shopSealPremiumOnly": "Este selo só cede à mão de um mestre: apenas a aposta Superior pode abri-lo.",
       "passageSealed": "A passagem está selada.",
+      "enemiesRemain": "Clear the remaining enemies first.",
       "moveCloserPassage": "Aproxime-se da passagem.",
       "moveCloserChest": "Aproxime-se do baú.",
       "moveCloserReliquary": "Aproxime-se do relicário.",

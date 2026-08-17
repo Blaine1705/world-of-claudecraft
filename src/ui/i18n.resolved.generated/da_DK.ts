@@ -7187,6 +7187,7 @@ export const da_DK: EnTranslations = {
       "shopMarksRequired": "Du skal bruge {marks} Delve-mærker for at købe {name}.",
       "shopSealPremiumOnly": "Dette segl giver kun efter for en mesters hånd. Kun Premium-indsatsen kan åbne det.",
       "passageSealed": "Passagen er forseglet.",
+      "enemiesRemain": "Clear the remaining enemies first.",
       "moveCloserPassage": "Gå tættere på passagen.",
       "moveCloserChest": "Gå tættere på kisten.",
       "moveCloserReliquary": "Gå tættere på relikvariet.",
