@@ -174,6 +174,17 @@ describe('extractTradableCopy (pure leaf)', () => {
       expect(inventory).toHaveLength(1);
     });
 
+    it('refuses a copy the owner item-locked, at the extraction seam (R10)', () => {
+      // The 'locked' member of ExtractRefusal is PRODUCED here: extraction runs
+      // exchangeHardLock on the live slot, which returns 'locked' for an
+      // owner-locked copy, and the copy stays in the bags.
+      const inventory = inv({ itemId: 'blade', count: 1, instance: { locked: true } });
+      const out = extractTradableCopy(inventory, { index: 0, itemId: 'blade' }, def());
+      expect(out).toEqual({ ok: false, reason: 'locked' });
+      expect(inventory).toHaveLength(1);
+      expect(inventory[0]?.instance?.locked).toBe(true);
+    });
+
     it('refuses a stale instance reference (the payload the caller saw is gone)', () => {
       const inventory = inv({ itemId: 'blade', count: 1, instance: { signer: 'Belra' } });
       const out = extractTradableCopy(

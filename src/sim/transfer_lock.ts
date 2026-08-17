@@ -10,11 +10,11 @@ import type { ItemInstancePayload } from './types';
  *  listing, mail attachment): armed (bindOnTrade) or bound (boundTo). The
  *  def-level rules (soulbound/quest/noMarketList) stay with each pipe; this is
  *  only the per-copy lock. A plain copy is never locked. NOT the same axis as
- *  the PLAYER item lock (item_lock.ts `locked`, issue 3042): that one is the
- *  owner's own salvage/craft/vendor safety mark and is deliberately not
- *  consulted by the pipes, matching the gold market's treatment; whether
- *  exchange listings should honor it is an open design call (recorded for the
- *  listing step-up work). */
+ *  the PLAYER item lock (item_lock_flag.ts `locked`, issue 3042): that one is
+ *  the owner's own salvage/craft/vendor safety mark, still not consulted by the
+ *  gold market, Ravenpost, or the guild bank. The $WOC exchange is the one pipe
+ *  that DOES honor it now (ruling R10): exchangeHardLock adds a `locked` arm, so
+ *  a locked copy refuses listing while the seller can lift it in one click. */
 export function isTransferLockedInstance(instance: ItemInstancePayload | undefined): boolean {
   return (
     instance !== undefined && (instance.bindOnTrade === true || instance.boundTo !== undefined)

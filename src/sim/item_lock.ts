@@ -18,23 +18,22 @@
 // (enforced by tests/architecture.test.ts). Draws no rng.
 
 import { bagCapacity, canGrantItemInstance } from './bags';
+import { isItemLocked } from './item_lock_flag';
 import { selectedInventorySlot } from './item_copy_ref';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { InvSlot, ItemInstancePayload } from './types';
+
+// The predicate itself lives in the dependency-free leaf so exchange_eligibility
+// can read the flag without pulling this module's content-tree graph; re-exported
+// here so the lock system's own callers keep one import home.
+export { isItemLocked } from './item_lock_flag';
 
 export interface SetItemLockedResult {
   ok: boolean;
   itemId: string;
   locked: boolean;
   reason?: 'not_held' | 'no_bag_space';
-}
-
-/** True when this copy is locked by its owner against salvage, profession
- *  craft consumption, and vendor sell. A plain (no payload) copy, or one
- *  whose payload never had the flag set, is never locked. */
-export function isItemLocked(instance: ItemInstancePayload | undefined): boolean {
-  return instance?.locked === true;
 }
 
 /** Units of `itemId` held in `meta`'s bags that are NOT locked: the gate every

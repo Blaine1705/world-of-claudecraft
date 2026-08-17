@@ -162,10 +162,15 @@ describe('exchangeHardLock: which locks a category tolerates', () => {
   });
 });
 
-describe('the exchange rail refuses exactly what the sibling pipes refuse', () => {
+describe('the exchange rail refuses exactly what the sibling TRANSFER-lock pipes refuse', () => {
   // The gold market, Ravenpost mail and the guild bank all gate a per-copy state
   // through isTransferLockedInstance. The exchange is a fourth anonymous pipe, so
-  // any state one of them refuses and this one accepts is a laundering route.
+  // any TRANSFER-lock state one of them refuses and this one accepts is a
+  // laundering route. The ONE deliberate asymmetry (ruling R10) is the player
+  // item lock: the $WOC rail refuses it, the sibling pipes do not; it is a
+  // separate axis (item_lock_flag.ts, not isTransferLockedInstance) and is
+  // pinned as an explicit carve-out below, kept out of the parity table so the
+  // parity claim stays exactly about the transfer-lock axis.
   const tradable = def({ slot: 'chest' });
   const STATES: [string, ItemInstancePayload, ExchangeLock | null][] = [
     ['a plain copy', {}, null],
@@ -180,16 +185,23 @@ describe('the exchange rail refuses exactly what the sibling pipes refuse', () =
     expect(exchangeHardLock(tradable, instance)).toBe(expected);
   });
 
-  // What this pins is DELEGATION, not the predicate's content: exchangeHardLock
+  // What this pins is DELEGATION on the transfer-lock axis: exchangeHardLock
   // calls isTransferLockedInstance, so a mutation of the predicate moves both
   // sides of the comparison together and this stays green by construction. The
   // direction it does catch is the rail re-implementing the rule (a second copy
-  // that could drift) or adding a per-copy refusal of its own that no sibling
-  // pipe makes, either of which breaks the equality. The predicate's own
-  // content is pinned by the literal state table above and by
-  // tests/transfer_lock.test.ts.
-  it.each(STATES)('%s reaches the same verdict on both rails', (_name, instance) => {
+  // that could drift). The predicate's own content is pinned by the literal
+  // state table above and by tests/transfer_lock.test.ts.
+  it.each(STATES)('%s reaches the same transfer-lock verdict on both rails', (_name, instance) => {
     expect(exchangeHardLock(tradable, instance) !== null).toBe(isTransferLockedInstance(instance));
+  });
+
+  it('the player item lock is the deliberate asymmetry: exchange refuses, transfer-lock ignores', () => {
+    // R10: a copy the owner locked is NOT a transfer lock, so the sibling pipes
+    // pass it, but the $WOC rail refuses it (the seller unlocks first). This is
+    // the one state where the two rails part, and it is intentional.
+    const lockedCopy: ItemInstancePayload = { locked: true };
+    expect(isTransferLockedInstance(lockedCopy)).toBe(false);
+    expect(exchangeHardLock(tradable, lockedCopy)).toBe('locked');
   });
 });
 

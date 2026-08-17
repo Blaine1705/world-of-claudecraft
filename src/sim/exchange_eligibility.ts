@@ -34,13 +34,15 @@
 // entitled to decide them.
 //
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no rng, no clock. It
-// is a leaf (no SimContext, and the one predicate it borrows brings none at
-// runtime), so a Vitest imports it directly. It carries no wallet, token, or
+// is a leaf (no SimContext, and the two predicates it borrows come from
+// dependency-free leaves of their own, transfer_lock.ts and item_lock_flag.ts,
+// so neither drags a runtime graph), so a Vitest imports it directly. It
+// carries no wallet, token, or
 // settlement vocabulary, so the token firewall over src/sim
 // (tests/architecture.test.ts) still holds with this file inside it.
 // ---------------------------------------------------------------------------
 
-import { isItemLocked } from './item_lock';
+import { isItemLocked } from './item_lock_flag';
 import { isTransferLockedInstance } from './transfer_lock';
 import type { ItemDef, ItemInstancePayload } from './types';
 
