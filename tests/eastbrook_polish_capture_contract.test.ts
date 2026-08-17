@@ -207,7 +207,7 @@ interface AttributionTargetFixture {
 // KTX2 renderer bytes, and mount-program prewarm bytes combine in one tree. No
 // capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '737a814f2ab706890aec02a89c5445f9ec5cb0386651d4e8bb7871b7050b3c8a';
+  '83a6e1ea7e9b56e05787114e29f536c8e28247ef171f54f160eb178cbbc03f51';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

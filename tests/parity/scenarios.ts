@@ -3933,6 +3933,12 @@ function c4bEffectDispatch(): Scenario {
       ready(eWarlock);
       sim.castAbility('fear', warlock); // 1.5s cast -> incapacitate fear-angle rng.range(-PI,PI)
       rec.tick(32); // finish fear
+      for (let i = 0; i < 48 && !mobL.auras.some((a) => a.id === 'fear_incap'); i++) {
+        rec.tick(1);
+      }
+      rec.notes.warlockFearApplied = mobL.auras.some(
+        (a) => a.id === 'fear_incap' && a.kind === 'incapacitate',
+      );
       rec.snapshot('warlock-fear');
       ready(eWarlock);
       sim.castAbility('summon_imp', warlock); // 5s cast -> summonDemon -> ctx.summonPet
