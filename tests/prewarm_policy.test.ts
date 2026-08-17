@@ -1184,6 +1184,28 @@ describe('mandatory interaction-landmark prewarm', () => {
   });
 });
 
+describe('self-spirit prewarm queue wiring', () => {
+  it('preserves the idle delay and runs the compile through the shared GPU queue', () => {
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    const start = renderer.indexOf('private selfSpirit = new SelfSpiritPrewarmer({');
+    const end = renderer.indexOf('\n  // Static terrain/water/features', start);
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const wiring = renderer.slice(start, end);
+    const idleAt = wiring.indexOf('idle: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS)');
+    const queueAt = wiring.indexOf('this.backgroundGpuWork.run(');
+    expect(idleAt).toBeGreaterThan(-1);
+    expect(queueAt).toBeGreaterThan(-1);
+    expect(wiring).toContain('() => this.warmSelfSpirit()');
+    expect(wiring).toContain('GPU_WORK_PRIORITY.VISIBLE_PREWARM');
+    expect(wiring).toContain("'self-spirit'");
+    expect(wiring).toContain('{ releaseTail: true }');
+  });
+});
+
 describe('constrained entry view creation ramp', () => {
   it('creates no optional view on the first live frame, then streams one at a time', () => {
     expect(constrainedEntryViewCreateBudget(true, 0, 8)).toBe(0);

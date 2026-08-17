@@ -1788,11 +1788,15 @@ export class Renderer {
   // when a class is first sighted, so the builds queue behind one another and
   // each spends its own idle slot instead of stacking into one combat frame.
   private spiritBuildLane: Promise<unknown> = Promise.resolve();
-  // Warms the local player's own body spirit (ghost) shader variants ahead of
-  // death, so the ungated self view never links them inline on a spirit release
-  // (the measured ~2.2 s death stall). See self_spirit_prewarm.ts + warmSelfSpirit.
+  // Schedules the local player's own ghost variants at idle, then queues the compile.
   private selfSpirit = new SelfSpiritPrewarmer({
-    warm: () => this.warmSelfSpirit(),
+    warm: () =>
+      this.backgroundGpuWork.run(
+        () => this.warmSelfSpirit(),
+        GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+        'self-spirit',
+        { releaseTail: true },
+      ),
     idle: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS),
   });
   // Static terrain/water/features just beyond the current zone are built in a
@@ -5673,14 +5677,10 @@ export class Renderer {
     await compilePromise;
   }
 
-  // Link the local player's own body spirit (ghost) transparent variants
-  // off-thread so a later spirit release reuses cached programs instead of
-  // linking ~20 inline on the ungated self view (the ~2.2 s death stall).
-  // Applies the ghost materials to the REAL skinned meshes (so the variant
-  // matches the flip's skinning/morph), runs compileAsync's synchronous
-  // prologue, then restores the opaque originals BEFORE awaiting the linker
-  // (the compileShadowPrograms restore-early pattern): no frame draws the ghost,
-  // and the clones the flip reuses stay cached on the visual.
+  // Link the local player's own body spirit (ghost) transparent variants off-thread,
+  // so a later spirit release reuses cached programs instead of linking inline.
+  // Applies ghost materials to the real skinned meshes, runs compileAsync's prologue,
+  // then restores the opaque originals before awaiting the linker.
   private async warmSelfSpirit(): Promise<void> {
     if (!this.asyncCompileSupported || this.sim.player.ghost) return;
     const visual = this.views.get(this.sim.player.id)?.visual;
