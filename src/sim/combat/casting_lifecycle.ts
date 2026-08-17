@@ -85,9 +85,14 @@ import {
   afflictionTargetCastError,
   clearAfflictionConsumeThreads,
   completeAfflictionDrain,
+  completeNeedleOfFateCast,
   consumeFateThreadsForDrain,
   gainDoom,
 } from './affliction';
+import {
+  shouldBufferSentenceDuringGcd,
+  shouldPreserveQueuedSentence,
+} from './affliction_sentence_queue';
 import {
   hasUnbreakableMovementLock,
   isInStasis,
@@ -873,6 +878,11 @@ export function castAbility(
     ability.castTime === 0 &&
     (ability.usableWhileCasting === true ||
       (abilityId === 'blink' && ctx.playerMods(meta).global.blinkCast > 0));
+  // Sentence is Hexcraft's release and may already be waiting for the cast or
+  // GCD that produced its final Thread. Repeated generator or release presses
+  // must not jump ahead during either guard, including the one-tick gap after
+  // the GCD timer reaches zero but before updateCasting retries the queue.
+  if (shouldPreserveQueuedSentence(p.queuedCastAbility, abilityId)) return;
   if (p.castingAbility) {
     if (!blinkThrough) {
       // classic-era spell queue: a press during the tail of the current cast
@@ -898,7 +908,13 @@ export function castAbility(
   // (including this GCD check). fireQueuedCast holds the slot instead of calling
   // in when the GCD is still running, so this early return only fires for a
   // same-tick player press racing the GCD, not for a queued follow-up.
-  if (!ability.offGcd && p.gcdRemaining > 0 && !blinkThrough) return; // silent, classic spams this
+  if (!ability.offGcd && p.gcdRemaining > 0 && !blinkThrough) {
+    if (shouldBufferSentenceDuringGcd(abilityId, p.gcdRemaining)) {
+      p.queuedCastAbility = abilityId;
+      p.queuedCastAim = aim ?? null;
+    }
+    return; // silent, classic spams this
+  }
   const togglingOff = isToggleBuff(ability) && p.auras.some((a) => a.id === ability.id);
   // sharedCooldownIds generalizes the release's shaman-shock special case (it
   // returns the same SHAMAN_SHOCK_COOLDOWN_IDS for those ids), so the shock
@@ -2503,6 +2519,9 @@ function applyAbility(
     spendAbilityCost(ctx, p, meta, res, target);
     armAbilityCooldownWithReflection(ctx, p, meta, res, togglingOff);
     res = reserveRuinousBrandCopy(ctx, p, meta, target, res);
+    if (res.effects.some((effect) => effect.type === 'afflictionNeedle')) {
+      completeNeedleOfFateCast(ctx, p, target);
+    }
     ctx.emit({
       type: 'spellfx',
       sourceId: p.id,
