@@ -3491,7 +3491,11 @@ export function runEffects(
           // value2/value3 are shared secondary slots: the generic selfBuff
           // passthrough and the Warlock drain/disable knobs both ride them, so
           // the explicit value wins and the Warlock knob is the fallback.
-          value2: eff.value2 ?? eff.healthDrainPctMax,
+          value2:
+            eff.value2 ??
+            (ability.id === 'demon_skin' && mods.global.warlockFiendhideMagicDrPct > 0
+              ? mods.global.warlockFiendhideMagicDrPct
+              : eff.healthDrainPctMax),
           value3: eff.value3 ?? eff.disableBelowHpPct,
           tickInterval: eff.healthDrainPctMax !== undefined ? 1 : undefined,
           tickTimer: eff.healthDrainPctMax !== undefined ? 1 : undefined,
