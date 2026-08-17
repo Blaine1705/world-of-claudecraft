@@ -5125,6 +5125,19 @@ export const hudChromeStrings = {
   // Every USD amount renders through formatNumber currency options and every
   // timestamp through formatDateTime (UTC plus local, per the PRD); the
   // window never composes numbers into these strings by concatenation.
+  // Wallet-bridge failure classes (src/ui/wallet_bridge_reason_text.ts): the
+  // bridge throws English prose and provider Errors, and these are the
+  // player-facing lines the classifier resolves instead of rendering
+  // err.message raw. Shared by every surface the bridge signs for (the
+  // Exchange, the trade arm, the Claudium checkout).
+  walletBridge: {
+    cancelled: 'The wallet request was cancelled. Nothing was sent.',
+    timeout: 'Your wallet did not respond in time. Open the wallet and try again.',
+    notConnected: 'Connect and verify a wallet, then try again.',
+    unsupported: 'This wallet cannot complete that action. Connect a different wallet.',
+    unavailable: 'No wallet connection is available here. Reconnect your wallet and try again.',
+    badResponse: 'Your wallet returned an unusable answer. Try again.',
+  },
   wocMarket: {
     title: '$WOC Exchange',
     close: 'Close the Exchange',
@@ -5136,9 +5149,10 @@ export const hudChromeStrings = {
     loadFailed: 'The Exchange could not be reached. Try again shortly.',
     disabledRealm: 'The $WOC Exchange is not available on this realm.',
     pausedBanner:
-      'Trading is paused while $WOC pricing recovers. Auctions keep counting down; no sale settles until pricing is healthy again.',
+      'Trading is paused while $WOC pricing recovers. Auctions keep counting down; new bids and payments wait until pricing is healthy, and a payment already sent still settles.',
     walletBanner: 'Link and verify a wallet to bid, buy, or sell on the Exchange.',
-    rateNote: 'Current rate: about {tokens} $WOC per USD, as of {time}.',
+    rateNote:
+      'Current rate: about {tokens} $WOC per USD, from the latest venue price print ({time}).',
     estimateNote:
       'About {tokens} $WOC at the current rate. The final amount is fixed only when payment is requested.',
     browseEmpty: 'No listings right now. Check back soon.',
@@ -5262,7 +5276,7 @@ export const hudChromeStrings = {
     sellSubmit: 'List item',
     sellSubmitAria: 'List {item} on the Exchange',
     sellFeeNote:
-      'Completed sales pay a 10 percent fee: 90 percent to you, 3 percent burned, 7 percent to the treasury. Proceeds arrive at your linked wallet in the settlement transaction.',
+      'Completed sales pay a fee of about 10 percent: 3 percent burned and 7 percent to the treasury, each rounded up, and you receive the exact remainder (about 90 percent). Proceeds arrive at your linked wallet in the settlement transaction.',
     activityListings: 'My listings',
     activityBids: 'My bids',
     activitySettlements: 'My settlements',
@@ -5291,6 +5305,15 @@ export const hudChromeStrings = {
     settlementFailBurnMismatch: 'The payment burned the wrong token amount.',
     settlementFailBurnAuthority: 'The token burn came from a wallet this purchase did not name.',
     settlementFailUnexpectedCredit: 'The transaction paid a wallet outside this purchase.',
+    // The common non-forensic ends, each its own sentence (the generic line
+    // used to cover them all and explained nothing).
+    settlementFailQuoteExpired:
+      'The payment quote expired before it was used. Request a fresh one and pay again.',
+    settlementFailTransaction:
+      'The payment transaction failed on the network. Request a fresh quote and try again.',
+    settlementFailRefunded: 'This payment was returned to your wallet.',
+    settlementFailSuperseded: 'This payment attempt was replaced by a newer one.',
+    settlementFailConfirmingOverdue: 'This payment took too long to confirm and is under review.',
     settlementFailGeneric: 'This payment could not be completed.',
     paymentSeenAwaitingFinality: 'Payment seen on the ledger. Waiting for final confirmation.',
     paymentNotYetVisible:
@@ -5298,6 +5321,14 @@ export const hudChromeStrings = {
     paymentServiceUnreachable:
       'The payment service is unreachable. Your payment stays recorded and will be re-checked.',
     paymentPendingGeneric: 'Your payment is submitted and awaiting confirmation.',
+    // The bond leg's own pending voice: "payment seen" reads as the purchase
+    // money, and the figure in flight here is the refundable bid bond.
+    bondSeenAwaitingFinality: 'Bond payment seen on the ledger. Waiting for final confirmation.',
+    bondNotYetVisible:
+      'No bond payment is visible on the ledger yet. It can take a moment to appear.',
+    bondServiceUnreachable:
+      'The payment service is unreachable. Your bond payment stays recorded and will be re-checked.',
+    bondPendingGeneric: 'Your bond payment is submitted and awaiting confirmation.',
     listingStatusActive: 'Active',
     listingStatusSettling: 'Awaiting payment',
     listingStatusSold: 'Sold',

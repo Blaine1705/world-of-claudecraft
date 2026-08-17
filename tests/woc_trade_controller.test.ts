@@ -791,7 +791,10 @@ describe('the accept request body (seller escrow)', () => {
     expect(h.state.calls.signMessages).toEqual(['step-up message nonce-1']);
     // The decline aborts BEFORE acceptOffer: no custody moves on a refused sign.
     expect(h.state.calls.acceptOffers).toEqual([]);
-    expect(r.host.logs.at(-1)).toBe('user declined in wallet');
+    // The player line is the CLASSIFIED cancel copy, never the wallet's raw
+    // prose (the wallet-bridge i18n medium).
+    expect(r.host.logs.at(-1)).toBe(t('hudChrome.walletBridge.cancelled'));
+    expect(r.host.logs.join('\n')).not.toContain('user declined in wallet');
   });
 
   it('a message-less sign rejection falls back to the listing decline copy', async () => {

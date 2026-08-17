@@ -8979,6 +8979,31 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Платёж, подтверждающийся в последние минуты, может продлить аукцион на несколько минут. После завершения аукциона запоздавший платёж не открывает его заново, а возвращается.',
   'hudChrome.wocMarket.offerNextNote':
     'Если победитель не оплатит покупку, продавец может предложить предмет следующему участнику по его собственной ставке.',
+  'hudChrome.walletBridge.cancelled': 'Запрос к кошельку отменён. Ничего не отправлено.',
+  'hudChrome.walletBridge.timeout':
+    'Кошелёк не ответил вовремя. Откройте кошелёк и повторите попытку.',
+  'hudChrome.walletBridge.notConnected':
+    'Сначала подключите и подтвердите кошелёк, затем повторите попытку.',
+  'hudChrome.walletBridge.unsupported':
+    'Этот кошелёк не может выполнить это действие. Подключите другой кошелёк.',
+  'hudChrome.walletBridge.unavailable':
+    'Здесь нет доступного подключения к кошельку. Переподключите кошелёк и повторите попытку.',
+  'hudChrome.walletBridge.badResponse': 'Кошелёк вернул непригодный ответ. Повторите попытку.',
+  'hudChrome.wocMarket.bondSeenAwaitingFinality':
+    'Платёж залога виден в реестре. Ожидается окончательное подтверждение.',
+  'hudChrome.wocMarket.bondNotYetVisible':
+    'Платёж залога пока не виден в реестре. Он может появиться через некоторое время.',
+  'hudChrome.wocMarket.bondServiceUnreachable':
+    'Платёжный сервис недоступен. Ваш платёж залога записан и будет проверен повторно.',
+  'hudChrome.wocMarket.bondPendingGeneric': 'Ваш платёж залога отправлен и ожидает подтверждения.',
+  'hudChrome.wocMarket.settlementFailQuoteExpired':
+    'Расчёт платежа истёк до использования. Запросите новый и оплатите ещё раз.',
+  'hudChrome.wocMarket.settlementFailTransaction':
+    'Платёжная транзакция не прошла в сети. Запросите новый расчёт и повторите попытку.',
+  'hudChrome.wocMarket.settlementFailRefunded': 'Этот платёж возвращён в ваш кошелёк.',
+  'hudChrome.wocMarket.settlementFailSuperseded': 'Эта попытка оплаты заменена более новой.',
+  'hudChrome.wocMarket.settlementFailConfirmingOverdue':
+    'Этот платёж подтверждался слишком долго и находится на проверке.',
   'hudChrome.wocMarket.settlementDeadlineNote':
     'Если вы выиграете, оплата должна поступить в течение {duration} после закрытия аукциона.',
   'hudChrome.wocMarket.termsLabel': 'Я принимаю условия расчёта с плавающим количеством токенов.',

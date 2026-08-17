@@ -3898,6 +3898,14 @@ export const ja_JP: EnTranslations = {
     "arenaGate": {
       "minLevelNote": "レベル {level} が必要です"
     },
+    "walletBridge": {
+      "cancelled": "ウォレットへのリクエストはキャンセルされました。何も送信されていません。",
+      "timeout": "ウォレットが時間内に応答しませんでした。ウォレットを開いてもう一度お試しください。",
+      "notConnected": "まずウォレットを接続して認証してから、もう一度お試しください。",
+      "unsupported": "このウォレットではその操作を完了できません。別のウォレットを接続してください。",
+      "unavailable": "ここで利用できるウォレット接続がありません。ウォレットを接続し直してもう一度お試しください。",
+      "badResponse": "ウォレットが利用できない応答を返しました。もう一度お試しください。"
+    },
     "wocMarket": {
       "title": "$WOC 取引所",
       "close": "取引所を閉じる",
@@ -4038,11 +4046,20 @@ export const ja_JP: EnTranslations = {
       "settlementFailBurnMismatch": "支払いでバーンされたトークン量が正しくありません。",
       "settlementFailBurnAuthority": "トークンのバーンが、この購入で指定されていないウォレットから行われました。",
       "settlementFailUnexpectedCredit": "この購入とは関係のないウォレットへ送金されたトランザクションです。",
+      "settlementFailQuoteExpired": "支払いの見積もりが使用前に失効しました。新しい見積もりを取得して再度支払ってください。",
+      "settlementFailTransaction": "支払いトランザクションがネットワーク上で失敗しました。新しい見積もりを取得してもう一度お試しください。",
+      "settlementFailRefunded": "この支払いはウォレットに返金されました。",
+      "settlementFailSuperseded": "この支払いの試行は、より新しい試行に置き換えられました。",
+      "settlementFailConfirmingOverdue": "この支払いは確認に時間がかかりすぎたため、審査中です。",
       "settlementFailGeneric": "この支払いを完了できませんでした。",
       "paymentSeenAwaitingFinality": "台帳で支払いを確認しました。最終確定を待っています。",
       "paymentNotYetVisible": "台帳にまだ支払いが見えません。表示まで少し時間がかかることがあります。",
       "paymentServiceUnreachable": "決済サービスに接続できません。支払いは記録済みで、後で再確認されます。",
       "paymentPendingGeneric": "支払いは送信済みで、確認を待っています。",
+      "bondSeenAwaitingFinality": "保証金の支払いが台帳で確認されました。最終確認を待っています。",
+      "bondNotYetVisible": "保証金の支払いはまだ台帳に表示されていません。表示まで少し時間がかかることがあります。",
+      "bondServiceUnreachable": "決済サービスに接続できません。保証金の支払いは記録されており、後で再確認されます。",
+      "bondPendingGeneric": "保証金の支払いは送信済みで、確認を待っています。",
       "listingStatusActive": "出品中",
       "listingStatusSettling": "支払い待ち",
       "listingStatusSold": "売却済み",

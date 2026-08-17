@@ -8820,6 +8820,22 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '마감 직전 몇 분 사이에 확인된 결제는 경매를 몇 분 연장할 수 있습니다. 경매가 끝난 뒤 도착한 결제는 경매를 다시 열지 않고 환불됩니다.',
   'hudChrome.wocMarket.offerNextNote':
     '낙찰자가 결제하지 않으면 판매자는 다음 입찰자에게 그 입찰자 자신의 입찰가로 아이템을 제안할 수 있습니다.',
+  'hudChrome.walletBridge.cancelled': '지갑 요청이 취소되었습니다. 아무것도 전송되지 않았습니다.',
+  'hudChrome.walletBridge.timeout': '지갑이 제시간에 응답하지 않았습니다. 지갑을 열고 다시 시도하세요.',
+  'hudChrome.walletBridge.notConnected': '먼저 지갑을 연결하고 인증한 뒤 다시 시도하세요.',
+  'hudChrome.walletBridge.unsupported': '이 지갑으로는 해당 작업을 완료할 수 없습니다. 다른 지갑을 연결하세요.',
+  'hudChrome.walletBridge.unavailable': '여기서 사용할 수 있는 지갑 연결이 없습니다. 지갑을 다시 연결하고 시도하세요.',
+  'hudChrome.walletBridge.badResponse': '지갑이 사용할 수 없는 응답을 반환했습니다. 다시 시도하세요.',
+  'hudChrome.wocMarket.bondSeenAwaitingFinality': '보증금 결제가 원장에서 확인되었습니다. 최종 확인을 기다리는 중입니다.',
+  'hudChrome.wocMarket.bondNotYetVisible': '보증금 결제가 아직 원장에 보이지 않습니다. 나타나기까지 잠시 걸릴 수 있습니다.',
+  'hudChrome.wocMarket.bondServiceUnreachable':
+    '결제 서비스에 연결할 수 없습니다. 보증금 결제는 기록되어 있으며 나중에 다시 확인됩니다.',
+  'hudChrome.wocMarket.bondPendingGeneric': '보증금 결제가 제출되어 확인을 기다리는 중입니다.',
+  'hudChrome.wocMarket.settlementFailQuoteExpired': '결제 견적이 사용 전에 만료되었습니다. 새 견적을 받아 다시 결제하세요.',
+  'hudChrome.wocMarket.settlementFailTransaction': '결제 트랜잭션이 네트워크에서 실패했습니다. 새 견적을 받아 다시 시도하세요.',
+  'hudChrome.wocMarket.settlementFailRefunded': '이 결제는 지갑으로 반환되었습니다.',
+  'hudChrome.wocMarket.settlementFailSuperseded': '이 결제 시도는 더 새로운 시도로 대체되었습니다.',
+  'hudChrome.wocMarket.settlementFailConfirmingOverdue': '이 결제는 확인이 너무 오래 걸려 검토 중입니다.',
   'hudChrome.wocMarket.settlementDeadlineNote':
     '낙찰되면 경매 종료 후 {duration} 안에 결제해야 합니다.',
   'hudChrome.wocMarket.termsLabel': '가변 토큰 정산 약관에 동의합니다.',

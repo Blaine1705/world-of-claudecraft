@@ -45,6 +45,7 @@ import {
 import { svgIcon } from '../../ui_icons';
 import { unknownItemIconHtml } from '../../unknown_item_icon';
 import { verifiedWocBalance } from '../../wallet_balance';
+import { walletBridgeErrorText } from '../../wallet_bridge_reason_text';
 import { wocPaymentPendingText } from '../../woc_market_reason_text';
 import type { WocMarketHooks } from '../../woc_market_window';
 import {
@@ -550,12 +551,11 @@ export class WocTradeController {
           try {
             signature = await hooks.signMessageBase58(issued.challenge.message);
           } catch (err) {
-            this.log(
-              err instanceof Error && err.message
-                ? err.message
-                : t('hudChrome.wocMarket.signFailedConfirm'),
-              '#ff6b6b',
-            );
+            // Dev channel keeps the raw error; the player line is CLASSIFIED
+            // (a decline, a timeout, a missing wallet), never the bridge's or
+            // a wallet extension's raw English.
+            console.warn('[wallet bridge] step-up signature failed', err);
+            this.log(walletBridgeErrorText(err, 'sign'), '#ff6b6b');
             return;
           }
         }
@@ -694,11 +694,10 @@ export class WocTradeController {
         try {
           signature = await hooks.signAndSendTransactionBase64(staged.transactionBase64 ?? '');
         } catch (err) {
-          // The wallet bridge throws player-facing text already.
-          this.log(
-            err instanceof Error && err.message ? err.message : t('hudChrome.wocMarket.loadFailed'),
-            '#ff6b6b',
-          );
+          // Dev channel keeps the raw error; the player line is classified,
+          // never rendered from err.message (the wallet-bridge i18n medium).
+          console.warn('[wallet bridge] payment signature failed', err);
+          this.log(walletBridgeErrorText(err, 'payment'), '#ff6b6b');
           // Back to the payable face: the decline spent the staged quote,
           // not the deal.
           if (this.wocTradeOffer?.id === offer.id) {

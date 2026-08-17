@@ -81,7 +81,6 @@ describe('the maps stay inside the server wire vocabularies', () => {
     const generic = [...rules.WOC_MARKET_WIRE_FAIL_REASONS].filter((w) => !mapped.has(w)).sort();
     expect(generic).toEqual([
       'bad_signature',
-      'confirming_overdue',
       'expired',
       'forfeited',
       'invalid_signature',
@@ -89,15 +88,11 @@ describe('the maps stay inside the server wire vocabularies', () => {
       'memo_mismatch',
       'payer_debit_mismatch',
       'payer_mismatch',
-      'quote_expired',
-      'refunded',
       'refused',
       'rejected',
       'signature_already_settled',
       'signature_conflict',
       'signature_did_not_match_quote',
-      'superseded',
-      'transaction_failed',
       'unknown_reference',
       'window_elapsed',
     ]);
@@ -114,5 +109,47 @@ describe('the maps stay inside the server wire vocabularies', () => {
     const mapped = new Set(Object.keys(WOC_MARKET_REASON_TEXT_KEYS.pending));
     const generic = [...rules.WOC_MARKET_WIRE_PENDING_REASONS].filter((w) => !mapped.has(w)).sort();
     expect(generic).toEqual([]);
+  });
+});
+
+describe('the bond-flavored pending voice', () => {
+  it('every bond-pending word is a wire vocabulary member too', async () => {
+    const rules = await import('../server/woc_market_rules');
+    const { WOC_MARKET_REASON_TEXT_KEYS } = await import('../src/ui/woc_market_reason_text');
+    for (const word of Object.keys(WOC_MARKET_REASON_TEXT_KEYS.bondPending)) {
+      expect(rules.WOC_MARKET_WIRE_PENDING_REASONS, `bond map: ${word}`).toContain(word);
+    }
+  });
+
+  it('names the BOND, and never collapses into the payment voice', async () => {
+    const { wocBondPendingText, wocPaymentPendingText } = await import(
+      '../src/ui/woc_market_reason_text'
+    );
+    for (const word of ['awaiting_finality', 'not_yet_visible', 'service_unavailable', null]) {
+      const bond = wocBondPendingText(word);
+      expect(bond, String(word)).not.toBe(wocPaymentPendingText(word));
+      expect(bond.toLowerCase(), String(word)).toContain('bond');
+    }
+    // Unknown words take the bond generic, not the payment generic.
+    expect(wocBondPendingText('future_word').toLowerCase()).toContain('bond');
+  });
+});
+
+describe('the five common non-forensic fail reasons explain themselves', () => {
+  it('each renders its own sentence, distinct from the generic and from each other', async () => {
+    const { wocSettlementFailText } = await import('../src/ui/woc_market_reason_text');
+    const words = [
+      'quote_expired',
+      'transaction_failed',
+      'refunded',
+      'superseded',
+      'confirming_overdue',
+    ];
+    const lines = words.map((w) => wocSettlementFailText(w));
+    const generic = wocSettlementFailText('some_unknown_word');
+    for (const [i, line] of lines.entries()) {
+      expect(line, words[i]).not.toBe(generic);
+    }
+    expect(new Set(lines).size, 'five distinct sentences').toBe(5);
   });
 });

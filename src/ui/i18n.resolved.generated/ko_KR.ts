@@ -3898,6 +3898,14 @@ export const ko_KR: EnTranslations = {
     "arenaGate": {
       "minLevelNote": "레벨 {level} 필요"
     },
+    "walletBridge": {
+      "cancelled": "지갑 요청이 취소되었습니다. 아무것도 전송되지 않았습니다.",
+      "timeout": "지갑이 제시간에 응답하지 않았습니다. 지갑을 열고 다시 시도하세요.",
+      "notConnected": "먼저 지갑을 연결하고 인증한 뒤 다시 시도하세요.",
+      "unsupported": "이 지갑으로는 해당 작업을 완료할 수 없습니다. 다른 지갑을 연결하세요.",
+      "unavailable": "여기서 사용할 수 있는 지갑 연결이 없습니다. 지갑을 다시 연결하고 시도하세요.",
+      "badResponse": "지갑이 사용할 수 없는 응답을 반환했습니다. 다시 시도하세요."
+    },
     "wocMarket": {
       "title": "$WOC 거래소",
       "close": "거래소 닫기",
@@ -4038,11 +4046,20 @@ export const ko_KR: EnTranslations = {
       "settlementFailBurnMismatch": "결제에서 소각된 토큰 수량이 올바르지 않습니다.",
       "settlementFailBurnAuthority": "이 구매에서 지정하지 않은 지갑에서 토큰이 소각되었습니다.",
       "settlementFailUnexpectedCredit": "이 구매와 무관한 지갑으로 송금된 트랜잭션입니다.",
+      "settlementFailQuoteExpired": "결제 견적이 사용 전에 만료되었습니다. 새 견적을 받아 다시 결제하세요.",
+      "settlementFailTransaction": "결제 트랜잭션이 네트워크에서 실패했습니다. 새 견적을 받아 다시 시도하세요.",
+      "settlementFailRefunded": "이 결제는 지갑으로 반환되었습니다.",
+      "settlementFailSuperseded": "이 결제 시도는 더 새로운 시도로 대체되었습니다.",
+      "settlementFailConfirmingOverdue": "이 결제는 확인이 너무 오래 걸려 검토 중입니다.",
       "settlementFailGeneric": "이 결제를 완료할 수 없었습니다.",
       "paymentSeenAwaitingFinality": "원장에서 결제가 확인되었습니다. 최종 확정을 기다리는 중입니다.",
       "paymentNotYetVisible": "원장에 아직 결제가 보이지 않습니다. 표시되기까지 잠시 걸릴 수 있습니다.",
       "paymentServiceUnreachable": "결제 서비스에 연결할 수 없습니다. 결제는 기록되어 있으며 나중에 다시 확인됩니다.",
       "paymentPendingGeneric": "결제가 제출되어 확인을 기다리고 있습니다.",
+      "bondSeenAwaitingFinality": "보증금 결제가 원장에서 확인되었습니다. 최종 확인을 기다리는 중입니다.",
+      "bondNotYetVisible": "보증금 결제가 아직 원장에 보이지 않습니다. 나타나기까지 잠시 걸릴 수 있습니다.",
+      "bondServiceUnreachable": "결제 서비스에 연결할 수 없습니다. 보증금 결제는 기록되어 있으며 나중에 다시 확인됩니다.",
+      "bondPendingGeneric": "보증금 결제가 제출되어 확인을 기다리는 중입니다.",
       "listingStatusActive": "진행 중",
       "listingStatusSettling": "결제 대기 중",
       "listingStatusSold": "판매됨",

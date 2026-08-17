@@ -8852,6 +8852,22 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.bidCloseNote':
     '終了間際の数分間に確認された支払いは、オークションを数分延長することがあります。終了後に届いた支払いはオークションを再開せず、返金されます。',
   'hudChrome.wocMarket.offerNextNote': '落札者が支払わなかった場合、出品者は次の入札者に、その入札者自身の入札額でアイテムを提供できます。',
+  'hudChrome.walletBridge.cancelled': 'ウォレットへのリクエストはキャンセルされました。何も送信されていません。',
+  'hudChrome.walletBridge.timeout': 'ウォレットが時間内に応答しませんでした。ウォレットを開いてもう一度お試しください。',
+  'hudChrome.walletBridge.notConnected': 'まずウォレットを接続して認証してから、もう一度お試しください。',
+  'hudChrome.walletBridge.unsupported': 'このウォレットではその操作を完了できません。別のウォレットを接続してください。',
+  'hudChrome.walletBridge.unavailable': 'ここで利用できるウォレット接続がありません。ウォレットを接続し直してもう一度お試しください。',
+  'hudChrome.walletBridge.badResponse': 'ウォレットが利用できない応答を返しました。もう一度お試しください。',
+  'hudChrome.wocMarket.bondSeenAwaitingFinality': '保証金の支払いが台帳で確認されました。最終確認を待っています。',
+  'hudChrome.wocMarket.bondNotYetVisible': '保証金の支払いはまだ台帳に表示されていません。表示まで少し時間がかかることがあります。',
+  'hudChrome.wocMarket.bondServiceUnreachable': '決済サービスに接続できません。保証金の支払いは記録されており、後で再確認されます。',
+  'hudChrome.wocMarket.bondPendingGeneric': '保証金の支払いは送信済みで、確認を待っています。',
+  'hudChrome.wocMarket.settlementFailQuoteExpired': '支払いの見積もりが使用前に失効しました。新しい見積もりを取得して再度支払ってください。',
+  'hudChrome.wocMarket.settlementFailTransaction':
+    '支払いトランザクションがネットワーク上で失敗しました。新しい見積もりを取得してもう一度お試しください。',
+  'hudChrome.wocMarket.settlementFailRefunded': 'この支払いはウォレットに返金されました。',
+  'hudChrome.wocMarket.settlementFailSuperseded': 'この支払いの試行は、より新しい試行に置き換えられました。',
+  'hudChrome.wocMarket.settlementFailConfirmingOverdue': 'この支払いは確認に時間がかかりすぎたため、審査中です。',
   'hudChrome.wocMarket.settlementDeadlineNote':
     '落札した場合、オークション終了後 {duration} 以内に支払う必要があります。',
   'hudChrome.wocMarket.termsLabel': '変動トークン決済の条件に同意します。',

@@ -37,10 +37,20 @@ import { iconDataUrl, QUALITY_COLOR } from './icons';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import { svgIcon } from './ui_icons';
+import { usdText } from './usd_text';
 import { verifiedWocBalance } from './wallet_balance';
+import {
+  type WalletBridgeReason,
+  walletBridgeReason,
+  walletBridgeReasonText,
+} from './wallet_bridge_reason_text';
 import { overWalletBalance } from './woc_affordable_core';
 import { anyBondAwaitingChain, shouldPollWocMarket } from './woc_market_poll_core';
-import { wocPaymentPendingText, wocSettlementFailText } from './woc_market_reason_text';
+import {
+  wocBondPendingText,
+  wocPaymentPendingText,
+  wocSettlementFailText,
+} from './woc_market_reason_text';
 import {
   buildWocMarketView,
   type WocMarketTab,
@@ -134,6 +144,21 @@ type PendingQuote =
 
 const PAGE_SIZE = 25;
 
+/** The toast strip's UNRESOLVED state: keys, codes, and screened reason
+ *  words, resolved at render by resolveNotice() so a runtime language switch
+ *  never leaves a stale-locale sentence on screen. */
+type WocNotice =
+  | { kind: 'key'; key: TranslationKey; error: boolean }
+  | { kind: 'api'; code: string; params?: Record<string, unknown>; error: boolean }
+  | { kind: 'pending'; reason: string | null; error: boolean }
+  | { kind: 'bondPending'; reason: string | null; error: boolean }
+  | {
+      kind: 'bridge';
+      reason: WalletBridgeReason;
+      flavor: 'sign' | 'payment';
+      error: boolean;
+    };
+
 export class WocMarketWindow {
   private built = false;
   private opener: HTMLElement | null = null;
@@ -208,7 +233,12 @@ export class WocMarketWindow {
    *  resolution. `busy` stays a truthful "a mutation is in flight" for the poll
    *  gate. */
   private busyGen = 0;
-  private notice: { text: string; error: boolean } | null = null;
+  /** The toast strip's state, stored UNRESOLVED (keys, codes, screened
+   *  reason words) and resolved at render time by resolveNotice(): a stored
+   *  resolved string survived a runtime language switch in the old locale
+   *  (the longest-lived one was the pending-payment toast). The bridge arm
+   *  stores the CLASSIFIED reason, never provider prose. */
+  private notice: WocNotice | null = null;
   /** Background-poll bookkeeping. The stamp is when the last poll STARTED (see
    *  shouldPollWocMarket); both are read only by pollFromServer. */
   private pollStartedMs: number | null = null;
@@ -551,7 +581,7 @@ export class WocMarketWindow {
   }
 
   private usd(cents: number): string {
-    return formatNumber(cents / 100, { style: 'currency', currency: 'USD' });
+    return usdText(cents);
   }
 
   /** Multi-unit countdown (days/hours/minutes/seconds through the Intl unit
@@ -695,7 +725,7 @@ export class WocMarketWindow {
         : '');
 
     const notice = this.notice
-      ? `<div class="wm-notice ${this.notice.error ? 'wm-notice-error' : ''}" role="status">${esc(this.notice.text)}</div>`
+      ? `<div class="wm-notice ${this.notice.error ? 'wm-notice-error' : ''}" role="status">${esc(this.resolveNotice(this.notice))}</div>`
       : '';
     const busy = this.busy
       ? `<div class="wm-busy" role="status">${esc(t(this.busyLabel ?? 'hudChrome.wocMarket.confirming'))}</div>`
@@ -1709,11 +1739,29 @@ export class WocMarketWindow {
   }
 
   private ok(key: TranslationKey): void {
-    this.notice = { text: t(key), error: false };
+    this.notice = { kind: 'key', key, error: false };
   }
 
   private fail(code: string, params?: Record<string, unknown>): void {
-    this.notice = { text: userFacingApiError({ code, params }), error: true };
+    this.notice = { kind: 'api', code, params, error: true };
+  }
+
+  /** Resolve the stored notice to the CURRENT locale's text. Dispatch only:
+   *  every sentence comes from the pure mappers (api_error_i18n,
+   *  woc_market_reason_text, wallet_bridge_reason_text) or the catalog. */
+  private resolveNotice(n: WocNotice): string {
+    switch (n.kind) {
+      case 'key':
+        return t(n.key);
+      case 'api':
+        return userFacingApiError({ code: n.code, params: n.params });
+      case 'pending':
+        return wocPaymentPendingText(n.reason);
+      case 'bondPending':
+        return wocBondPendingText(n.reason);
+      case 'bridge':
+        return walletBridgeReasonText(n.reason, n.flavor);
+    }
   }
 
   private async withBusy(label: TranslationKey, run: () => Promise<void>): Promise<void> {
@@ -1881,7 +1929,7 @@ export class WocMarketWindow {
     if (buyNowCents !== null) {
       const floor = Math.max(startCents, reserveCents ?? 0);
       if (buyNowCents <= floor) {
-        this.notice = { text: t('hudChrome.wocMarket.sellBuyNowAboveStart'), error: true };
+        this.notice = { kind: 'key', key: 'hudChrome.wocMarket.sellBuyNowAboveStart', error: true };
         this.render();
         return;
       }
@@ -1924,13 +1972,15 @@ export class WocMarketWindow {
         try {
           stepUpSignature = await hooks.signMessageBase58(issued.challenge.message);
         } catch (err) {
-          // The bridge throws player-facing English; the catalog line is the
-          // fallback for a message-less throw.
+          // Dev channel keeps the raw error; the player line is CLASSIFIED
+          // (decline, timeout, missing wallet), never err.message raw (the
+          // wallet-bridge i18n medium). A message signature moves no funds,
+          // so the generic arm stays the no-"payment" copy.
+          console.warn('[wallet bridge] step-up signature failed', err);
           this.notice = {
-            text:
-              err instanceof Error && err.message
-                ? err.message
-                : t('hudChrome.wocMarket.signFailedConfirm'),
+            kind: 'bridge',
+            reason: walletBridgeReason(err),
+            flavor: 'sign',
             error: true,
           };
           return;
@@ -2094,11 +2144,12 @@ export class WocMarketWindow {
             pending.quote.transactionBase64 ?? '',
           );
         } catch (err) {
+          // Same classification rule as the step-up arm, payment-flavored.
+          console.warn('[wallet bridge] payment signature failed', err);
           this.notice = {
-            text:
-              err instanceof Error && err.message
-                ? err.message
-                : t('hudChrome.wocMarket.loadFailed'),
+            kind: 'bridge',
+            reason: walletBridgeReason(err),
+            flavor: 'payment',
             error: true,
           };
           return;
@@ -2117,7 +2168,9 @@ export class WocMarketWindow {
         // player their good payment had lost. A pending outcome now says
         // WHICH pending (ledger-matched, nothing visible, service down).
         if (out.pending) {
-          this.notice = { text: wocPaymentPendingText(out.reason), error: false };
+          // BOND-flavored copy: "payment seen" reads as the purchase money,
+          // and the figure in flight here is the refundable bid bond.
+          this.notice = { kind: 'bondPending', reason: out.reason ?? null, error: false };
         } else {
           this.ok(
             out.standing
@@ -2141,7 +2194,7 @@ export class WocMarketWindow {
         if (out.state === 'review') {
           this.ok('hudChrome.wocMarket.settlementReview');
         } else if (out.state === 'confirming') {
-          this.notice = { text: wocPaymentPendingText(out.reason), error: false };
+          this.notice = { kind: 'pending', reason: out.reason ?? null, error: false };
         } else {
           this.ok('hudChrome.wocMarket.purchaseComplete');
         }

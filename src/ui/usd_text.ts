@@ -15,3 +15,10 @@ import { formatNumber } from './i18n';
 export function usdText(cents: number): string {
   return formatNumber(cents / 100, { style: 'currency', currency: 'USD' });
 }
+
+/** The dollar-unit twin for surfaces whose wire figure is already dollars
+ *  (daily-rewards prize pools, the Claudium pack labels). Kept separate so
+ *  no caller multiplies units at the call site. */
+export function usdDollarsText(dollars: number): string {
+  return formatNumber(dollars, { style: 'currency', currency: 'USD' });
+}

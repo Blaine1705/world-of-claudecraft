@@ -17,6 +17,7 @@ import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import { formatNumber, t } from './i18n';
 import { svgIcon } from './ui_icons';
+import { usdDollarsText } from './usd_text';
 import type { WalletConnectionView } from './wallet_connection_view';
 
 export type ClaudiumRail = 'stripe' | 'sol' | 'usdc' | 'woc';
@@ -446,7 +447,8 @@ export class ClaudiumWindow {
   }
 
   private usdLabel(usd: number): string {
-    return `$${formatNumber(usd, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}`;
+    // Intl currency, never a hardcoded "$" prefix (the shared usd_text rule).
+    return usdDollarsText(usd);
   }
 
   private packArt(claudium: number): string {

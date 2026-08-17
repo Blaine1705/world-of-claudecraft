@@ -21,23 +21,49 @@ const PENDING_KEYS: Readonly<Record<string, TranslationKey>> = {
   service_unavailable: 'hudChrome.wocMarket.paymentServiceUnreachable',
 };
 
+/** The bond leg's own pending copy: the same screened vocabulary, but the
+ *  figure in flight is the refundable bid bond, and "payment seen" reads as
+ *  the purchase money to a bidder. */
+const BOND_PENDING_KEYS: Readonly<Record<string, TranslationKey>> = {
+  awaiting_finality: 'hudChrome.wocMarket.bondSeenAwaitingFinality',
+  not_yet_visible: 'hudChrome.wocMarket.bondNotYetVisible',
+  service_unavailable: 'hudChrome.wocMarket.bondServiceUnreachable',
+};
+
 /** Terminal fail reasons a FAILED settlement row explains to its buyer. */
 const FAIL_KEYS: Readonly<Record<string, TranslationKey>> = {
   burn_missing: 'hudChrome.wocMarket.settlementFailBurnMissing',
   burn_mismatch: 'hudChrome.wocMarket.settlementFailBurnMismatch',
   burn_authority_mismatch: 'hudChrome.wocMarket.settlementFailBurnAuthority',
   unexpected_credit: 'hudChrome.wocMarket.settlementFailUnexpectedCredit',
+  // The common non-forensic ends, each its own sentence (the generic line
+  // used to cover all of them and explained nothing).
+  quote_expired: 'hudChrome.wocMarket.settlementFailQuoteExpired',
+  transaction_failed: 'hudChrome.wocMarket.settlementFailTransaction',
+  refunded: 'hudChrome.wocMarket.settlementFailRefunded',
+  superseded: 'hudChrome.wocMarket.settlementFailSuperseded',
+  confirming_overdue: 'hudChrome.wocMarket.settlementFailConfirmingOverdue',
 };
 
 /** The word-to-key maps, exported for the vocabulary drift pin: the test
  *  asserts every mapped word is a member of the server wire vocabulary and
  *  pins the deliberately-generic remainder. */
-export const WOC_MARKET_REASON_TEXT_KEYS = { pending: PENDING_KEYS, fail: FAIL_KEYS } as const;
+export const WOC_MARKET_REASON_TEXT_KEYS = {
+  pending: PENDING_KEYS,
+  bondPending: BOND_PENDING_KEYS,
+  fail: FAIL_KEYS,
+} as const;
 
 /** Player copy for a pending confirm answer; generic when the word is new. */
 export function wocPaymentPendingText(reason: string | null | undefined): string {
   const key = reason == null ? undefined : PENDING_KEYS[reason];
   return t(key ?? 'hudChrome.wocMarket.paymentPendingGeneric');
+}
+
+/** The bond-leg twin of wocPaymentPendingText. */
+export function wocBondPendingText(reason: string | null | undefined): string {
+  const key = reason == null ? undefined : BOND_PENDING_KEYS[reason];
+  return t(key ?? 'hudChrome.wocMarket.bondPendingGeneric');
 }
 
 /**

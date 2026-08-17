@@ -945,11 +945,15 @@ describe('woc_market_window: listing requires the wallet step-up (B6/R1)', () =>
     const iListing = submit.indexOf("busyLabel = 'hudChrome.wocMarket.listing'");
     expect(iSigning).toBeGreaterThanOrEqual(0);
     expect(iListing).toBeGreaterThan(iSigning);
-    // A wallet decline renders its player-facing message, with the listing
-    // catalog line (not the payment one) as the message-less fallback; a
-    // challenge refusal rides fail().
-    expect(submit).toContain('hudChrome.wocMarket.signFailedConfirm');
-    expect(submit).not.toContain("t('hudChrome.wocMarket.signFailed')");
+    // A wallet failure renders the CLASSIFIED sign-flavored line, never
+    // err.message raw (the wallet-bridge i18n medium); the raw error logs on
+    // the dev channel, and a challenge refusal rides fail().
+    expect(submit).toContain("kind: 'bridge'");
+    expect(submit).toContain('walletBridgeReason(err)');
+    expect(submit).toContain("flavor: 'sign'");
+    expect(submit).not.toContain("flavor: 'payment'");
+    expect(submit).not.toContain('err.message');
+    expect(submit).toContain('console.warn');
     expect(submit).toContain('this.fail(issued.code, issued.params)');
   });
 });
@@ -1452,11 +1456,14 @@ describe('woc_market_window: payment verdicts reach the player', () => {
       ) ?? [],
       'a declaration now follows signPendingQuote; re-anchor this slice with a real end bound',
     ).toHaveLength(0);
-    // Bond leg: the pending arm routes through the mapper, not a fixed key.
+    // Bond leg: the pending arm stores the BOND-flavored notice kind (the
+    // "payment seen" wording read as the purchase money to a bidder).
     // Settlement leg: a still-confirming answer must never toast purchase
     // complete (that is a delivery claim about money the chain has not
-    // decided); it takes the same mapper line.
-    expect(sign.match(/wocPaymentPendingText\(out\.reason\)/g)).toHaveLength(2);
+    // decided); it stores the payment-pending kind. Both resolve at RENDER
+    // (resolveNotice), so a language switch never strands the toast.
+    expect(sign).toContain("kind: 'bondPending', reason: out.reason ?? null");
+    expect(sign).toContain("kind: 'pending', reason: out.reason ?? null");
     expect(sign).toContain("out.state === 'confirming'");
     // purchaseComplete stays reachable only on the ELSE arm after review and
     // confirming are both handled.

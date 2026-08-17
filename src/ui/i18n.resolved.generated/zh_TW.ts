@@ -3898,6 +3898,14 @@ export const zh_TW: EnTranslations = {
     "arenaGate": {
       "minLevelNote": "需要等級 {level}"
     },
+    "walletBridge": {
+      "cancelled": "錢包請求已取消。未傳送任何內容。",
+      "timeout": "你的錢包未及時回應。請開啟錢包後重試。",
+      "notConnected": "請先連接並驗證錢包，然後重試。",
+      "unsupported": "此錢包無法完成該操作。請連接其他錢包。",
+      "unavailable": "目前沒有可用的錢包連接。請重新連接錢包後重試。",
+      "badResponse": "你的錢包回傳了無法使用的結果。請重試。"
+    },
     "wocMarket": {
       "title": "$WOC 交易所",
       "close": "關閉交易所",
@@ -4038,11 +4046,20 @@ export const zh_TW: EnTranslations = {
       "settlementFailBurnMismatch": "付款銷毀的代幣數量不正確。",
       "settlementFailBurnAuthority": "代幣銷毀來自本次購買未指定的錢包。",
       "settlementFailUnexpectedCredit": "該交易向本次購買之外的錢包付了款。",
+      "settlementFailQuoteExpired": "付款報價在使用前已過期。請取得新的報價後再次付款。",
+      "settlementFailTransaction": "付款交易在網路上失敗。請取得新的報價後重試。",
+      "settlementFailRefunded": "這筆付款已退回你的錢包。",
+      "settlementFailSuperseded": "這次付款嘗試已被較新的一次取代。",
+      "settlementFailConfirmingOverdue": "這筆付款確認耗時過長，正在接受審核。",
       "settlementFailGeneric": "這筆付款未能完成。",
       "paymentSeenAwaitingFinality": "帳本上已看到付款。正在等待最終確認。",
       "paymentNotYetVisible": "帳本上尚未看到付款。可能需要片刻才會出現。",
       "paymentServiceUnreachable": "無法連接支付服務。你的付款已被記錄，稍後會重新核驗。",
       "paymentPendingGeneric": "你的付款已提交，正在等待確認。",
+      "bondSeenAwaitingFinality": "帳本上已看到保證金付款。正在等待最終確認。",
+      "bondNotYetVisible": "帳本上尚未看到保證金付款。可能需要片刻才會出現。",
+      "bondServiceUnreachable": "無法連接支付服務。你的保證金付款已被記錄，稍後會重新核驗。",
+      "bondPendingGeneric": "你的保證金付款已提交，正在等待確認。",
       "listingStatusActive": "進行中",
       "listingStatusSettling": "等待付款",
       "listingStatusSold": "已售出",
