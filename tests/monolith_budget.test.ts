@@ -51,7 +51,12 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned 19432 -> 19433: the release/v0.38.0 merge into this branch
     // grew hud.ts by one line at HEAD without updating the row, so the gate
     // arrived red. Same exact-count, zero-slack intent as above.
-    ceiling: 19433,
+    // Raised 19433 -> 19442 (+9) for the login preview-prewarm trim: thin-consumer
+    // wiring (a `looksModular` read plus three flag args to the pure
+    // buildPostEntryPreviewPrewarmUnits) that has no clean branch-owned
+    // extraction, landing on upstream's zero-slack re-pin. Maintainer decision,
+    // exact merged count: any further growth reds again.
+    ceiling: 19442,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -75,7 +80,12 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again after extracting the delve interior build-cache scheduling
     // (the position-keyed rebuild/retire decision plus the async build loop)
     // into src/render/delve_interior_tracker.ts.
-    ceiling: 13730,
+    // Extracted the shadow-depth material factory into
+    // src/render/prewarm_depth_material.ts so the self-spirit prewarm could add
+    // Renderer.warmSelfSpirit + the per-frame observe without growing the file.
+    // Merging the delve tracker and prewarm work leaves renderer.ts at the exact
+    // count below; any further growth reds again.
+    ceiling: 13726,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
