@@ -1422,6 +1422,13 @@ export const DEFAULT_PARTY_LOOT_STRATEGIES: LootStrategies = {
 export interface LootEntry {
   itemId?: string;
   copper?: number;
+  // Heroic-claim money base: when the kill carries a live heroic instance
+  // claim, the loot roller substitutes this for `copper` as the roll base
+  // (same 0.6x to 1.4x band on the same single draw). Authored only on
+  // dungeon final bosses via the HEROIC_FINALE_COPPER /
+  // NYTHRAXIS_HEROIC_COPPER bases in content/dungeon_difficulty.ts, and it
+  // always rides a truthy `copper` (the roller's money arm gates on copper).
+  heroicCopper?: number;
   chance: number; // 0..1
   questId?: string; // only drops while this quest is active and not complete
   // Entries sharing a rollGroup are exclusive: one rng draw is partitioned by
@@ -5087,12 +5094,15 @@ export type UnstuckEvent =
 
 // A player resurrection that has been offered but not yet accepted. The Sim owns
 // one authoritative offer per dead target. The cast-time destination is retained
-// only as a fallback if the caster no longer exists when the target accepts.
+// as a fallback if the caster no longer exists, has died, or has left resurrection
+// reach of the body when the target accepts; maxRange is the reach the producing
+// cast enforced, re-applied to the arrival anchor at accept time.
 export interface PendingResurrection {
   casterId: number;
   hpFrac: number;
   fallbackDestination: Vec3;
   expiresAt: number;
+  maxRange: number;
 }
 
 export type DamageEventKind = 'hit' | 'miss' | 'dodge' | 'parry' | 'block' | 'resist' | 'evade';

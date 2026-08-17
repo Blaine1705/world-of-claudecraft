@@ -2,6 +2,7 @@
 // lists, and the DungeonDef registry merged by sim/data.ts.
 
 import type { DungeonDef, DungeonSpawn, ItemDef, MobTemplate } from '../types';
+import { HEROIC_FINALE_COPPER, NYTHRAXIS_HEROIC_COPPER } from './dungeon_difficulty';
 
 // Keepsake ground-object items owned by the walk-in castle interiors below
 // (their zone item modules are other workstreams' files), merged into ITEMS
@@ -153,7 +154,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 16,
     aoePulse: { min: 12, max: 18, radius: 12, every: 10, name: 'Shadow Pulse' },
     loot: [
-      { copper: 2500, chance: 1 },
+      { copper: 2500, heroicCopper: HEROIC_FINALE_COPPER, chance: 1 },
       { itemId: 'cryptbone_greaves', chance: 0.34, rollGroup: 'morthen_guaranteed_uncommon' },
       { itemId: 'quilted_trousers', chance: 0.33, rollGroup: 'morthen_guaranteed_uncommon' },
       { itemId: 'oiled_boots', chance: 0.33, rollGroup: 'morthen_guaranteed_uncommon' },
@@ -310,7 +311,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     aoePulse: { min: 16, max: 24, radius: 12, every: 10, name: 'Mist Surge' },
     summonAdds: { mobId: 'drowned_thrall', count: 2, atHpPct: [0.6, 0.3] },
     loot: [
-      { copper: 5000, chance: 1 },
+      { copper: 5000, heroicCopper: HEROIC_FINALE_COPPER, chance: 1 },
       { itemId: 'trollhide_leggings', chance: 0.34, rollGroup: 'vael_guaranteed_uncommon' },
       { itemId: 'marshstrider_boots', chance: 0.33, rollGroup: 'vael_guaranteed_uncommon' },
       { itemId: 'fenmist_robe', chance: 0.33, rollGroup: 'vael_guaranteed_uncommon' },
@@ -528,7 +529,14 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     },
     enrage: { belowHpPct: 0.3, dmgMult: 1.5, hasteMult: 1.3 },
     loot: [
-      { copper: 50000, chance: 1 },
+      // 15000c base rolls to 9000c to 21000c (the 0.6x to 1.4x loot band):
+      // roughly the 1g to 2g finale payout, a 3x premium over the 5000c the
+      // other Sanctum bosses pay. The old 50000c base paid 3g to 7g per pop
+      // on a lockout-free, skip-pullable finale, the prime repeat gold-farm
+      // target (Zulgar in Wildheart took the same nerf). The daily-lockout
+      // heroic clear pays the 10g finale base instead;
+      // tests/gravewyrm_boss_gold.test.ts pins both bands.
+      { copper: 15000, heroicCopper: HEROIC_FINALE_COPPER, chance: 1 },
       { itemId: 'boneplate_vest', chance: 0.34, rollGroup: 'korzul_guaranteed_uncommon' },
       { itemId: 'revenant_silk_robe', chance: 0.33, rollGroup: 'korzul_guaranteed_uncommon' },
       { itemId: 'nightwalk_jerkin', chance: 0.33, rollGroup: 'korzul_guaranteed_uncommon' },
@@ -697,7 +705,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // existing four groups, with the set-piece chances rebalanced; group 3 is
     // the offhand group and carries two (the caster orb and the hunter quiver).
     loot: [
-      { copper: 150000, chance: 1 },
+      { copper: 150000, heroicCopper: NYTHRAXIS_HEROIC_COPPER, chance: 1 },
       { itemId: 'deathless_heartwood', chance: 0.03, rollGroup: 'nythraxis_drop_1' },
       { itemId: 'bonewrought_greatsword', chance: 0.13, rollGroup: 'nythraxis_drop_1' },
       { itemId: 'crownforged_dreadhelm', chance: 0.14, rollGroup: 'nythraxis_drop_1' },
