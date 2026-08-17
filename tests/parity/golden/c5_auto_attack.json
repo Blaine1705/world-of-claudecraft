@@ -35,7 +35,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 973,
-      "state": "899a9f6e",
+      "state": "b51e013e",
       "events": "6df1efc2",
       "rng": {
         "draws": 25,
@@ -46,7 +46,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 973,
-      "state": "13f843cb",
+      "state": "aca842d1",
       "events": "741638a5",
       "rng": {
         "draws": 25,
@@ -57,7 +57,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 973,
-      "state": "fc33f0a2",
+      "state": "d397a84e",
       "events": "0ed959a7",
       "rng": {
         "draws": 28,
@@ -68,7 +68,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 973,
-      "state": "f1ea33d1",
+      "state": "350e494f",
       "events": "78c49920",
       "rng": {
         "draws": 31,
@@ -79,7 +79,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 973,
-      "state": "055b9094",
+      "state": "9637b878",
       "events": "741638a5",
       "rng": {
         "draws": 31,
@@ -90,7 +90,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 973,
-      "state": "1de8852d",
+      "state": "97129087",
       "events": "741638a5",
       "rng": {
         "draws": 31,
@@ -101,7 +101,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 973,
-      "state": "4ed0a1f4",
+      "state": "82bf4508",
       "events": "eed989d1",
       "rng": {
         "draws": 34,
@@ -112,7 +112,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 973,
-      "state": "d14739ac",
+      "state": "1bc604de",
       "events": "c995eea6",
       "rng": {
         "draws": 40,
@@ -123,7 +123,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 973,
-      "state": "77974053",
+      "state": "870222f7",
       "events": "4607ebf4",
       "rng": {
         "draws": 94,
@@ -134,7 +134,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 973,
-      "state": "f6e221ed",
+      "state": "400f117b",
       "events": "e1d1011e",
       "rng": {
         "draws": 137,
@@ -145,7 +145,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 973,
-      "state": "1b23da0b",
+      "state": "bf7ac4e3",
       "events": "741638a5",
       "rng": {
         "draws": 167,
@@ -156,7 +156,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 973,
-      "state": "0e719544",
+      "state": "743c6aea",
       "events": "806e2576",
       "rng": {
         "draws": 208,
@@ -167,7 +167,7 @@
       "tick": 65,
       "time": 3.25,
       "nextId": 973,
-      "state": "58524551",
+      "state": "16cb83c9",
       "events": "eed989d1",
       "rng": {
         "draws": 252,
@@ -178,7 +178,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 973,
-      "state": "a5c5da96",
+      "state": "a6fb3828",
       "events": "741638a5",
       "rng": {
         "draws": 285,
@@ -189,7 +189,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 973,
-      "state": "0182aa20",
+      "state": "13a69e7c",
       "events": "fdb2afeb",
       "rng": {
         "draws": 326,
@@ -200,7 +200,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 973,
-      "state": "8afcbef3",
+      "state": "6ae43d0d",
       "events": "741638a5",
       "rng": {
         "draws": 368,
@@ -211,7 +211,7 @@
       "tick": 85,
       "time": 4.25,
       "nextId": 973,
-      "state": "ef1b8ac5",
+      "state": "7f215bfd",
       "events": "4dc87e9e",
       "rng": {
         "draws": 426,
@@ -222,7 +222,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 973,
-      "state": "24a279fd",
+      "state": "d6f43f9f",
       "events": "1cd44ebc",
       "rng": {
         "draws": 480,
@@ -233,7 +233,7 @@
       "tick": 95,
       "time": 4.75,
       "nextId": 973,
-      "state": "1510fd1f",
+      "state": "890c3d43",
       "events": "eed989d1",
       "rng": {
         "draws": 525,
@@ -244,7 +244,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 973,
-      "state": "37266bdc",
+      "state": "5db9bf5e",
       "events": "741638a5",
       "rng": {
         "draws": 570,
@@ -255,7 +255,7 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 973,
-      "state": "37c8acfe",
+      "state": "5c97f4d6",
       "events": "ee25d43a",
       "rng": {
         "draws": 636,
@@ -266,7 +266,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 973,
-      "state": "62d906c5",
+      "state": "e8d75913",
       "events": "c995eea6",
       "rng": {
         "draws": 694,
@@ -277,7 +277,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 973,
-      "state": "9027ac3e",
+      "state": "d05b1b9a",
       "events": "741638a5",
       "rng": {
         "draws": 746,
@@ -288,7 +288,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 973,
-      "state": "62d3e125",
+      "state": "96e4842b",
       "events": "50d26369",
       "rng": {
         "draws": 812,
@@ -299,7 +299,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 973,
-      "state": "62d3e125",
+      "state": "96e4842b",
       "events": "741638a5",
       "rng": {
         "draws": 812,
@@ -737,7 +737,7 @@
           "critChance": 0.067,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.067,
-          "fallStartY": -0.927754,
+          "fallStartY": -1.810034,
           "fiveSecondRule": 105,
           "hp": 79988,
           "id": 963,
@@ -754,7 +754,7 @@
           "petMode": "defensive",
           "pos": {
             "x": -60,
-            "y": -0.927754,
+            "y": -1.810034,
             "z": -45
           },
           "potionCooldownUntil": -1,
@@ -794,7 +794,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0835,
           "dualWielding": true,
-          "fallStartY": -2.969274,
+          "fallStartY": -3.128763,
           "fiveSecondRule": 105,
           "hp": 79985,
           "id": 964,
@@ -818,7 +818,7 @@
           "petMode": "defensive",
           "pos": {
             "x": -30,
-            "y": -2.969274,
+            "y": -3.128763,
             "z": -45
           },
           "potionCooldownUntil": -1,
@@ -1020,7 +1020,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 3.141593,
-          "fallStartY": -0.935789,
+          "fallStartY": -1.784828,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 499852,
@@ -1029,7 +1029,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": -60,
-            "y": -0.935789,
+            "y": -1.784828,
             "z": -43.5
           },
           "level": 3,
@@ -1041,13 +1041,13 @@
           "petMode": "defensive",
           "pos": {
             "x": -60,
-            "y": -0.935789,
+            "y": -1.784828,
             "z": -43.5
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -60,
-            "y": -0.927754,
+            "y": -1.810034,
             "z": -43.5
           },
           "stats": {
@@ -1077,7 +1077,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 3.141593,
-          "fallStartY": -2.998379,
+          "fallStartY": -3.119671,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 499901,
@@ -1086,7 +1086,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": -30,
-            "y": -2.998379,
+            "y": -3.119671,
             "z": -43.5
           },
           "level": 6,
@@ -1098,13 +1098,13 @@
           "petMode": "defensive",
           "pos": {
             "x": -30,
-            "y": -2.998379,
+            "y": -3.119671,
             "z": -43.5
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -30,
-            "y": -2.969274,
+            "y": -3.128763,
             "z": -43.5
           },
           "stats": {
@@ -1309,7 +1309,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 973,
-      "state": "ac6d0349",
+      "state": "0270590d",
       "events": "e9dd197e",
       "rng": {
         "draws": 865,
@@ -1320,7 +1320,7 @@
       "tick": 126,
       "time": 6.3,
       "nextId": 973,
-      "state": "e38c70d1",
+      "state": "d6c50dc3",
       "events": "741638a5",
       "rng": {
         "draws": 877,
@@ -1758,7 +1758,7 @@
           "critChance": 0.067,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.067,
-          "fallStartY": -0.927754,
+          "fallStartY": -1.810034,
           "fiveSecondRule": 105.3,
           "hp": 79986,
           "id": 963,
@@ -1775,7 +1775,7 @@
           "petMode": "defensive",
           "pos": {
             "x": -60,
-            "y": -0.927754,
+            "y": -1.810034,
             "z": -45
           },
           "potionCooldownUntil": -1,
@@ -1813,7 +1813,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0835,
           "dualWielding": true,
-          "fallStartY": -2.969274,
+          "fallStartY": -3.128763,
           "fiveSecondRule": 105.3,
           "hp": 79985,
           "id": 964,
@@ -1837,7 +1837,7 @@
           "petMode": "defensive",
           "pos": {
             "x": -30,
-            "y": -2.969274,
+            "y": -3.128763,
             "z": -45
           },
           "potionCooldownUntil": -1,
@@ -2039,7 +2039,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 3.141593,
-          "fallStartY": -0.935789,
+          "fallStartY": -1.784828,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 499802,
@@ -2048,7 +2048,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": -60,
-            "y": -0.935789,
+            "y": -1.784828,
             "z": -43.5
           },
           "level": 3,
@@ -2060,13 +2060,13 @@
           "petMode": "defensive",
           "pos": {
             "x": -60,
-            "y": -0.935789,
+            "y": -1.784828,
             "z": -43.5
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -60,
-            "y": -0.927754,
+            "y": -1.810034,
             "z": -43.5
           },
           "stats": {
@@ -2096,7 +2096,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 3.141593,
-          "fallStartY": -2.998379,
+          "fallStartY": -3.119671,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 499901,
@@ -2105,7 +2105,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": -30,
-            "y": -2.998379,
+            "y": -3.119671,
             "z": -43.5
           },
           "level": 6,
@@ -2117,13 +2117,13 @@
           "petMode": "defensive",
           "pos": {
             "x": -30,
-            "y": -2.998379,
+            "y": -3.119671,
             "z": -43.5
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -30,
-            "y": -2.969274,
+            "y": -3.128763,
             "z": -43.5
           },
           "stats": {
@@ -2328,7 +2328,7 @@
       "tick": 126,
       "time": 6.3,
       "nextId": 973,
-      "state": "e38c70d1",
+      "state": "d6c50dc3",
       "events": "741638a5",
       "rng": {
         "draws": 877,
@@ -2766,7 +2766,7 @@
           "critChance": 0.067,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.067,
-          "fallStartY": -0.927754,
+          "fallStartY": -1.810034,
           "fiveSecondRule": 105.3,
           "hp": 79986,
           "id": 963,
@@ -2783,7 +2783,7 @@
           "petMode": "defensive",
           "pos": {
             "x": -60,
-            "y": -0.927754,
+            "y": -1.810034,
             "z": -45
           },
           "potionCooldownUntil": -1,
@@ -2821,7 +2821,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0835,
           "dualWielding": true,
-          "fallStartY": -2.969274,
+          "fallStartY": -3.128763,
           "fiveSecondRule": 105.3,
           "hp": 79985,
           "id": 964,
@@ -2845,7 +2845,7 @@
           "petMode": "defensive",
           "pos": {
             "x": -30,
-            "y": -2.969274,
+            "y": -3.128763,
             "z": -45
           },
           "potionCooldownUntil": -1,
@@ -3047,7 +3047,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 3.141593,
-          "fallStartY": -0.935789,
+          "fallStartY": -1.784828,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 499802,
@@ -3056,7 +3056,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": -60,
-            "y": -0.935789,
+            "y": -1.784828,
             "z": -43.5
           },
           "level": 3,
@@ -3068,13 +3068,13 @@
           "petMode": "defensive",
           "pos": {
             "x": -60,
-            "y": -0.935789,
+            "y": -1.784828,
             "z": -43.5
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -60,
-            "y": -0.927754,
+            "y": -1.810034,
             "z": -43.5
           },
           "stats": {
@@ -3104,7 +3104,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 3.141593,
-          "fallStartY": -2.998379,
+          "fallStartY": -3.119671,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 499901,
@@ -3113,7 +3113,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": -30,
-            "y": -2.998379,
+            "y": -3.119671,
             "z": -43.5
           },
           "level": 6,
@@ -3125,13 +3125,13 @@
           "petMode": "defensive",
           "pos": {
             "x": -30,
-            "y": -2.998379,
+            "y": -3.119671,
             "z": -43.5
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -30,
-            "y": -2.969274,
+            "y": -3.128763,
             "z": -43.5
           },
           "stats": {
