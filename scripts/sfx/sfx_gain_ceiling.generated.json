@@ -2480,6 +2480,17 @@
       }
     ]
   },
+  "mount_summon_rickshaw_mount": {
+    "ceilingDb": 6.3,
+    "tracks": [
+      {
+        "filename": "mount_summon_rickshaw_mount.mp3",
+        "sha256": "4f9ba1123aa480436c91e1222e9b55d2922b21f41d4ddc535df1475dc902560d",
+        "size": 38913,
+        "peakDb": -7.3
+      }
+    ]
+  },
   "move_jump": {
     "ceilingDb": 4.6,
     "tracks": [

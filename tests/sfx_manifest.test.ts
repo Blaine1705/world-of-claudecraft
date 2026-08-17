@@ -169,9 +169,9 @@ describe('buildManifest', () => {
   // adds 1 key on top: mount_loop_rickshaw_mount. The rickshaw ships no
   // mount_run_ stride cue at all (mountRun no-ops for any mount with a
   // continuous loop, see the "mount running audio" suite in sfx.test.ts).
-  it('keeps the release catalog, all 10 mount cues, and all 63 UI cues in one 266-key inventory', () => {
+  it('keeps the release catalog, all 10 mount cues, the rickshaw summon call, and all 63 UI cues in one 267-key inventory', () => {
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(266);
+    expect(keys.size).toBe(267);
     expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(63);
     expect(keys.has('ui_craft_cast')).toBe(true);
     for (const key of [
@@ -197,6 +197,9 @@ describe('buildManifest', () => {
       // the Bonebound Rickshaw, the tenth mount: a continuous rolling loop
       // only, no per-stride cue (see mountRun/mountLoop in src/game/sfx.ts)
       'mount_loop_rickshaw_mount',
+      // the first mount_summon_* cue on this branch: the Bonebound Rickshaw's
+      // call on the summon channel's completion edge
+      'mount_summon_rickshaw_mount',
       'fear_shout',
       'fear',
       'intimidating_shout',
@@ -252,7 +255,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(266); // see the re-baseline note above
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(267); // see the re-baseline note above
   });
 });
 

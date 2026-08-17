@@ -153,6 +153,14 @@ export const SFX = [
     loop: true,
   },
   {
+    // The Bonebound Rickshaw's summon call, fired once when the summon channel
+    // completes and the mount appears. Never on dismount, and never for a rider
+    // already mounted when they come into view. Silent for any mount without an
+    // authored take, so this key is the whole opt-in.
+    key: 'mount_summon_rickshaw_mount',
+    custom: true,
+  },
+  {
     key: 'move_jump',
     custom: true,
     duration: 0.5,
