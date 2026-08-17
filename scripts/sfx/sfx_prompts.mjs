@@ -119,22 +119,13 @@ export const SFX = [
     key: 'mount_run_thunderstrut_gobbler',
     custom: true,
   },
-  {
-    // Synthesised rather than generated: one stride of a loaded troll is a
-    // 36 Hz body drop with the lantern chains ringing a beat behind it, and
-    // the layer timing that sells the weight is easier to author than to
-    // prompt for. Source: tmp_troll_step.mjs in the mount's build change.
-    key: 'mount_run_lanternback_troll',
-    custom: true,
-  },
-  {
-    // Synthesised for the same reason as the troll above: the cue is a bronze
-    // bell over a soft clawed pad, and a bell's inharmonic partial set is
-    // easier to author than to prompt for. Source:
-    // scripts/gen_chimeglass_tortoise_sfx.mjs.
-    key: 'mount_run_chimeglass_tortoise',
-    custom: true,
-  },
+  // The Lanternback Troll and the Chimeglass Tortoise deliberately have NO
+  // mount_run_ entry. Both shipped synthesised cues and both read as cheap and
+  // nagging at the mounted gallop's ~0.46s stride beat; rather than keep
+  // tuning a synth, they now borrow the player's own surface footfall
+  // (foot_<surface>) through Sfx.mountRun's fallback branch. A mount is opted
+  // into that fallback purely by the ABSENCE of its key here, so adding one
+  // back is all it takes to give either of them a bespoke stride again.
   {
     key: 'mount_run_terrorspark_groundshaker_start',
     custom: true,

@@ -2359,17 +2359,6 @@
       }
     ]
   },
-  "mount_run_chimeglass_tortoise": {
-    "ceilingDb": 5.2,
-    "tracks": [
-      {
-        "filename": "mount_run_chimeglass_tortoise.mp3",
-        "sha256": "d650a08d4f9262375c1405346f76e5e6f9eb29e75459f8fc43880e3934a5137b",
-        "size": 15716,
-        "peakDb": -6.2
-      }
-    ]
-  },
   "mount_run_drakemaw_raptor": {
     "ceilingDb": 5.2,
     "tracks": [
@@ -2389,17 +2378,6 @@
         "sha256": "eba127f1f8219e5d6a7512c4797735399e154e9f129bfc8c67a187941cb59fe7",
         "size": 18224,
         "peakDb": -6.3
-      }
-    ]
-  },
-  "mount_run_lanternback_troll": {
-    "ceilingDb": 5.2,
-    "tracks": [
-      {
-        "filename": "mount_run_lanternback_troll.mp3",
-        "sha256": "c4a23db07f7436818b35ae521336d879c4abf18e932526f3df74edd751695f18",
-        "size": 16343,
-        "peakDb": -6.2
       }
     ]
   },

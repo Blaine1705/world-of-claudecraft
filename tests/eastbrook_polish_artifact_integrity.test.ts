@@ -768,10 +768,14 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // capture was retaken.
 // Re-minted again after extracting the delve interior build-cache scheduling
 // into src/render/delve_interior_tracker.ts (renderer.ts moved, no capture retaken).
+// Re-minted again after mountRun took a `surface` argument so the two
+// footfall-fallback mounts could reach it: the first-order composite follows
+// renderer.ts, then this seal follows the swept evidence bytes. No capture was
+// retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '21a674239b8e94674d0274907da2d5966c2c26d8f181c2b97f7e6de46598f672';
+  '410e4195c431ba2b9b8e702ccc47714d6360fb96d193cd7683dcc52d4ccfe998';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '4173586ac0ae35d0a96b941523e3d551c3dd9272c5b20b3e04f405ffa70c1262';
+  'e50922762b997951a098dc272e89d4c5ea5af1c7eb766c2aee4a866b63b11a52';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1779,7 +1783,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('05d50f7b26007df2d115f3c975164442a6e9bb26176ba8877d349268bb37d6c5');
+      // Re-minted again after mountRun took a `surface` argument so the two
+      // footfall-fallback mounts could reach it. No capture was retaken.
+    ).toBe('c05e177d6fdd118d15fb5bfcb1f651ac38b279c3f676373fc38b82490aec64ae');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

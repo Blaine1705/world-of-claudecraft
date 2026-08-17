@@ -192,8 +192,10 @@ interface AttributionTargetFixture {
 // Re-minted again for the Chimeglass Tortoise: the rider straddle hook
 // (visual.setRidePose) and the per-frame updateMountGlows call move renderer.ts
 // once more. No capture was retaken.
+// Re-minted again after mountRun took a `surface` argument so the two
+// footfall-fallback mounts could reach it. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '4173586ac0ae35d0a96b941523e3d551c3dd9272c5b20b3e04f405ffa70c1262';
+  'e50922762b997951a098dc272e89d4c5ea5af1c7eb766c2aee4a866b63b11a52';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
