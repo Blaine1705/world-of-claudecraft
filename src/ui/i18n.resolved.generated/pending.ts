@@ -21,13 +21,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.lastkeepMap.title"
   ],
   "es_ES": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -41,13 +35,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.lastkeepMap.title"
   ],
   "fr_FR": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -61,13 +49,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.lastkeepMap.title"
   ],
   "fr_CA": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -81,13 +63,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.lastkeepMap.title"
   ],
   "en_CA": [],
   "it_IT": [
@@ -102,13 +78,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.lastkeepMap.title"
   ],
   "de_DE": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -122,13 +92,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.lastkeepMap.title"
   ],
   "zh_CN": [
     "hudChrome.dawnholdMap.title",
@@ -158,13 +122,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.lastkeepMap.title"
   ],
   "ru_RU": [
     "hudChrome.dawnholdMap.title",
@@ -182,13 +140,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.lastkeepMap.title"
   ],
   "nl_NL": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -202,13 +154,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.lastkeepMap.title"
   ],
   "pl_PL": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -222,13 +168,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.lastkeepMap.title"
   ],
   "id_ID": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -242,13 +182,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.lastkeepMap.title"
   ],
   "tr_TR": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -262,13 +196,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.lastkeepMap.title"
   ],
   "sv_SE": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -282,13 +210,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.lastkeepMap.title"
   ],
   "vi_VN": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -302,13 +224,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.lastkeepMap.title"
   ],
   "da_DK": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -322,12 +238,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "hudChrome.otaUpdate.applying",
-    "hudChrome.otaUpdate.continueAnyway",
-    "hudChrome.otaUpdate.downloading",
-    "hudChrome.otaUpdate.incompatible",
-    "hudChrome.otaUpdate.progressLabel",
-    "hudChrome.otaUpdate.title"
+    "hudChrome.lastkeepMap.title"
   ]
 };
