@@ -78,7 +78,13 @@ describe('Hunter v0.29 deterministic DPS alignment', () => {
       // Lane-diet re-measure at two seeds: 0.8768, so the
       // measurement-anchored floor re-pins to 0.83 at the same relative
       // margin; the 1.15 ceiling is the design bound in both configs.
-      expect(dps.beast_mastery / nextBest).toBeGreaterThanOrEqual(band(0.8, 0.83));
+      // Diet floor re-pinned 0.83 to 0.78 for the Copper Dig headland
+      // relocation (docs/design/eastbrook-revamp/master-plan.md): the moved
+      // camps shift the world-gen draw stream and the two diet seeds now
+      // measure 0.8225; the five-seed full sweep passes its 0.8 floor
+      // unchanged, so the lead itself is intact and only the thin-lane
+      // anchor moved (same relative margin at the new actual).
+      expect(dps.beast_mastery / nextBest).toBeGreaterThanOrEqual(band(0.8, 0.78));
       expect(dps.beast_mastery / nextBest).toBeLessThanOrEqual(1.15);
     },
     TEST_TIMEOUT_MS,

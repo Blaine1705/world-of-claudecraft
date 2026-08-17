@@ -272,9 +272,10 @@ describe('eastbrook starter camp spacing', () => {
         ).toBeGreaterThanOrEqual(CROSS_POPULATION_GAP);
       }
     }
-    // 9 governed camps, 2 same-mobId pairs, so 34 cross pairs. If this drops the
-    // loop above went partly vacuous.
-    expect(crossPairs).toBe(34);
+    // 8 governed camps (the Copper Dig camp left for the dig headland), 2
+    // same-mobId pairs, so 26 cross pairs. If this drops the loop above went
+    // partly vacuous.
+    expect(crossPairs).toBe(26);
   });
 
   it('keeps two camps of the same population from interleaving', () => {

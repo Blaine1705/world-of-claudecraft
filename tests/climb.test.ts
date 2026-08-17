@@ -254,15 +254,45 @@ describe('the climb move', () => {
     // canopy's pitched gable, well short of its 2.54 ridge, so the overhead
     // above the floor lands inside vault reach.
     //
-    // The shared SPOT fixture (used everywhere else in this file, where only
-    // "flat enough to be collider-free" matters) can resolve to a spot with a
-    // subtle residual terrain grade that this probe is sensitive to (it reads
-    // an exact overhead value, not just presence/absence of a collider), so
-    // this one test finds its own interior, near-zero-grade spot instead.
+    // This probe is a threshold identity, so its fixture must be built, not
+    // found. The pitched-canopy grab resolves at a fixed height above the
+    // jumping hand (startY plus a hand-band constant), so measured from the
+    // ground the body jumped off, the overhead is ALWAYS 2.04, a hair above
+    // the 2.025 ceiling. What the vault rule actually measures from is the
+    // SUPPORT floor under the mid-flight body, and the historical fixture
+    // only sat below the ceiling because a scatter prop's standable top
+    // happened to slide under the body and raise that floor; a streetlamp
+    // respacing later moved the found spot and broke the accident. The
+    // deliberate version: a civic-spec bench (drawn top 0.40) under the body
+    // supplies the raised support floor, and a level terrain stamp (the jail
+    // pad mechanism) under the approach kills grade sensitivity. Prop
+    // seating reads the un-stamped heightfield by design (the skipEdits arm
+    // in src/sim/world.ts), so the stamp steadies the floor without tilting
+    // the fixture.
     const spot = findLevelSpot();
     const sz = spot.z + 2.2;
-    setActiveWorldContent(world({ stalls: [{ x: spot.x, z: sz, rot: 0, r: 1.7 }] }));
+    const levelH = terrainHeight(spot.x, spot.z, SEED);
     const bodyZ = sz - 0.6 - (R + 0.5);
+    setActiveWorldContent({
+      ...world({
+        stalls: [{ x: spot.x, z: sz, rot: 0, r: 1.7 }],
+        benches: [
+          {
+            id: 'probe_support_bench',
+            assetId: '/models/dungeon/bench.glb',
+            x: spot.x,
+            z: bodyZ,
+            rot: 0,
+            w: 1.8,
+            d: 0.6,
+            height: 0.9,
+          },
+        ],
+      }),
+      terrainEdits: [
+        { x: spot.x, z: spot.z + 1, radius: 12, delta: levelH, falloff: 'flat', mode: 'level' },
+      ],
+    });
     const startY = groundHeight(spot.x, bodyZ, SEED) + 0.6;
     const grab = findLedgeGrab(q(), spot.x, startY, bodyZ);
     expect(grab).not.toBeNull();

@@ -305,8 +305,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     }
     // Hunted literal (seed 4242, after every beat above), re-recorded with the
     // craft-cast system: shared-stream draws shift vs the instant-craft era.
-    // The merged world lands the koi on session index 20.
-    expect(koiSession).toBe(20);
+    // The merged world lands the koi on session index 24 (re-hunted for the
+    // Copper Dig headland relocation: the moved camps and terrain shift every
+    // shared-stream draw downstream, the quest-dedupe pass precedent).
+    expect(koiSession).toBe(24);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -332,19 +334,23 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     sim.addItem('gathering_sickle', 1, pid);
     // Hunted literals (seed 4242, after every beat above): the harvest index
     // where each flavor's 1-in-90 event fires under the shared stream.
+    // Re-hunted 2026-08 for the Copper Dig headland relocation
+    // (docs/design/eastbrook-revamp/master-plan.md): the moved camps, veins,
+    // road, and terrain shift the world-gen draws and so every shared-stream
+    // index downstream, the same cause as the quest-dedupe re-record above.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 128 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 72 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 116,
+        hitAt: 185,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 4,
+        hitAt: 175,
       },
     ];
     for (const hunt of hunts) {
@@ -404,8 +410,9 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     }
     // Hunted literal (seed 4242, after every beat above), re-recorded with the
     // craft-cast system: the rare-or-better rarity roll that mints the signed
-    // specimen lands on attempt index 8.
-    expect(hitAt).toBe(8);
+    // specimen lands on attempt index 1 (re-hunted for the Copper Dig
+    // headland relocation, same cause as the beat 12 to 14 hunts).
+    expect(hitAt).toBe(1);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);

@@ -139,9 +139,19 @@ describe('generated chunk geometry is stable', () => {
     // points, 0.5 percent, every one inside x -211.5..-132.5, z 116.5..145.5,
     // and nothing rises anywhere. Both digests move because that window
     // straddles the rect edge at x = -180.
-    expect(digestOf(inRect)).toBe('39afe77d61ac348961d01e890aaddb00');
+    // Re-minted for the Copper Dig relocation to the dig headland (New
+    // Eastbrook program, docs/design/eastbrook-revamp/master-plan.md): the
+    // dig-headland coast lobe, the site's mode level terrain stamp, the
+    // relocated cluster's own camp flatten, and the VACATED old camp's
+    // flatten disc reverting all reshape the vale's southeast. Localization
+    // checked on a 1yd lattice over x -220..60, z -180..20 at the production
+    // seed: 20,704 of 56,481 points move, every one inside x -211..-18,
+    // z -155..-3 (the old flatten disc union the new headland), the town
+    // core reads byte-identical, and the largest move is 6.33 at the new
+    // coast. An intended, looked-at world change, not drift.
+    expect(digestOf(inRect)).toBe('8993beb96186457b8a994103722efccd');
     // The gap super-chunks take the same re-mint.
-    expect(digestOf(gapFill)).toBe('c4839177e825dbcf8dc5bcf501336fc2');
+    expect(digestOf(gapFill)).toBe('4df7ccbb3d29fffbec733ce0e95e31f9');
 
     terrain.cancelStreaming();
   });

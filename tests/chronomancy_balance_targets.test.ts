@@ -65,8 +65,12 @@ describe('Chronomancy Phase 3 balance targets', () => {
     // construction-order changes (88.0s alone): the slower drain gives the
     // trickle longer to act, measuring 112.7s on the composed tree. The
     // rotation still runs dry, so the mana economy holds.
-    expect(consOff.oom).toBeGreaterThanOrEqual(108);
-    expect(consOff.oom).toBeLessThanOrEqual(118);
+    // Re-banded 104.9 at the same relative margins for the Copper Dig
+    // headland relocation (docs/design/eastbrook-revamp/master-plan.md):
+    // the moved camps shift the world-gen draw stream, so the seeded crit
+    // sequence lands differently; the drain economy itself is untouched.
+    expect(consOff.oom).toBeGreaterThanOrEqual(100);
+    expect(consOff.oom).toBeLessThanOrEqual(110);
   });
 
   it('conservative + reactive heals lasts ~55-65s to OOM', () => {

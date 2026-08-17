@@ -50,9 +50,12 @@ describe('the continent derives the right border set', () => {
   });
 
   it('keeps the production terrain path sparse at town coordinates', () => {
+    // camps 17 to 16 (2026-08): the Copper Dig kobold camp relocated to the
+    // dig headland (docs/design/eastbrook-revamp/master-plan.md), carrying
+    // its flatten disc out of the town sample's candidate radius.
     expect(terrainRegionCandidateCountsAt(2, -2)).toEqual({
       appliers: 9,
-      camps: 17,
+      camps: 16,
       hubs: 1,
     });
   });
