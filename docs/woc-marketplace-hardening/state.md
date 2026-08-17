@@ -902,19 +902,27 @@ Still open (a phase that hits one asks at session start):
     item_lock_flag leaf and no `return 'locked'` arm) and by the guard-removal
     mutation direction. Reviews: privacy-security, frontend-seam, test-coverage
     via Agent + seven probe lanes via workflow; the fix round re-reviewed FRESH
-    (security + coverage lenses).
-    THE ROUND'S OWN FIXES (commits a996d3c023, 379610f66d, cd689125d4):
-    * CODE: safeMessagePiece now coerces a non-string descriptor field (the
-      route's optionalInstance is a size-capped UNCHECKED cast, so a
-      `{signer:{length:1}}` reached charCodeAt and answered 500) and strips C1
-      (0x80-0x9f, e.g. NEL) by code point plus the Cf format class (\p{Cf}: bidi
-      overrides, zero-width) that survived into the wallet popup; the newline
-      forge was double-covered by the whitespace collapse, which is why the
-      code-point arm was both unpinned and incomplete. woc_market_window.close()
-      now clears busy/busyLabel (a browser-extension signer with no timeout
-      could leave withBusy's finally unreached and brick every Exchange button
-      for the session; single-use challenge + idempotent extract make the reset
-      safe), matching the trade-controller close-reset.
+    (security + coverage lenses), which CAUGHT the first fix round's own defects
+    and drove a fourth commit (see the RE-REVIEW CORRECTIONS below).
+    THE ROUND'S OWN FIXES (commits a996d3c023, 379610f66d, cd689125d4, then the
+    correction 234cc9b708):
+    * CODE: safeMessagePiece GUARDS a non-string descriptor field to empty
+      (the route's optionalInstance is a size-capped UNCHECKED cast, so a
+      `{signer:{length:1}}` reached charCodeAt and answered 500; the first fix
+      used String(), which the re-review showed STILL throws on {toString:1},
+      so the final form is typeof-guard-to-empty) and strips C1 (0x80-0x9f,
+      e.g. NEL) by code point plus the Cf format class and lone surrogates (Cs,
+      which node-pg would mangle to U+FFFD and desync the stored message from
+      the signed one), capping by code point so an astral pair never splits; the
+      newline forge was double-covered by the whitespace collapse, which is why
+      the code-point arm was both unpinned and incomplete. woc_market_window
+      close now rides a GENERATION COUNTER (busyGen), not a flat busy reset: the
+      re-review showed a flat reset breaks the invariant that busy means "a
+      mutation is in flight" (pollFromServer gates on it) and lets an abandoned
+      run's finally clear a newer run's guard, enabling a second createListing
+      (a double-escrow for two identical copies). close() bumps busyGen, withBusy
+      settles only if it still owns the generation, and submitListing captures
+      the index up front and bails after each await when a close moved the gen.
     * TESTS (every new load-bearing pin mutation-proven by name): a
       devsig-wiring source pin over server/main.ts (stepUpDevSig is the
       ALLOW_DEV_COMMANDS && WOC_MARKET_DEV_SERVICE conjunction, never a literal;
@@ -931,6 +939,26 @@ Still open (a phase that hits one asks at session start):
       absent-signatureRequired behavioral case (the client still signs); the
       wocTradePaying close-reset assertion; C1/Cf/non-string sanitizer +
       Format-line + CSPRNG-source pins.
+    RE-REVIEW CORRECTIONS (commit 234cc9b708, driven by the FRESH re-review of
+      the fix round - the fixes were unreviewed code): (1) the String() coercion
+      still threw on {toString:1} and the pin missed it because {length:3} has a
+      callable toString - the sanitizer now guards to empty and the test uses the
+      reachable trigger; (2) the flat window busy-reset broke two documented
+      invariants and enabled a double-escrow - replaced with the busyGen
+      generation counter + capture-index-up-front + post-await bails; (3) the
+      devsig-wiring pin was comment-gameable (a comment quoting the wiring above
+      a `true` line would ship the bypass green) - now comment-stripped AND
+      bounded to exactly one stepUpDevSig site; (4) the superseded-index pin was
+      vacuous (the old index is never created on a fresh DB) - now seeds the old
+      index and re-runs the real boot to prove the DROP removes it. Also added
+      the PAY-path absent-signatureRequired behavioral cover, the message-less
+      decline fallback pin, the offerId type dimension, the node:crypto nonce
+      provenance, the lone-surrogate sanitizer arm, and routed the two new source
+      scans through the shared stripComments. Every corrected pin re-mutation
+      -proven by name (the three sanitizer arms, the devsig flip, the DROP-index
+      removal). NEW deferral: a live-DOM behavioral rig for WocMarketWindow
+      (which has no instantiation harness today, so the busyGen fix is source
+      -pinned for structure) is owed to 15, the window UX-honesty phase.
     JUDGED, no code change (do NOT re-raise): the frontend BLOCKING (the R10
     hintAcceptLocked dead end) is RECLASSIFIED should-fix and DEFERRED to 15 -
     it is not a custody bypass (the spec's blocking bar), and there is NO

@@ -74,20 +74,22 @@ op; pre-R10 builds had no item_lock_flag leaf and no `return 'locked'` arm) plus
 the guard-removal mutation direction. Baseline: all market suites + the five pg
 suites green zero skips WITH TEST_DATABASE_URL (142/142 pg).
 
-Fix commits (LOCAL until the R4 push): a996d3c023 (sanitizer C1/Cf + non-string
-coerce, with the C1/Cf/non-string/Format/CSPRNG pins), 379610f66d (window
-close-reset + its source pin), cd689125d4 (the test-pin batch: devsig-wiring
-source pin over main.ts, TTL literal pin, no-oracle PARAMS half, directed-accept
-relink, realm-leading prune index + superseded-absent, directed offerId decode +
-pre-branch expectInstance decode, the rewritten locked-extraction test, the exact
-stale_copy reason, the comment-stripped route-policy scan, the trade-panel
-signFailed anti-pin, the absent-signatureRequired behavioral case, the
-wocTradePaying close-reset assertion; plus the marketplace PRD keeper-surface
-correction and a stale totp comment). Every new load-bearing pin mutation-proven
-by name (MC1/MC2/MC3 for the sanitizer arms, the devsig-wiring flip, the
-close-reset removal). The fix round re-reviewed FRESH (security + coverage
-lenses). Details, the JUDGED-no-change list, and the deferrals-with-owners are in
-the 13 QA ROUND bullet of the state.md ledger entry.
+Fix commits (LOCAL until the R4 push): a996d3c023 (sanitizer + its pins),
+379610f66d (window close-reset + its source pin), cd689125d4 (the test-pin
+batch). The fix round was then re-reviewed FRESH (security + coverage lenses),
+which caught FOUR defects in the fixes themselves and drove a correction commit
+234cc9b708: the String() coercion still threw on {toString:1} (guard to empty
+instead); the flat window busy-reset broke the poll/withBusy invariants and
+enabled a double-escrow (replaced with a busyGen generation counter +
+capture-index + post-await bails); the devsig-wiring pin was comment-gameable
+(comment-stripped + bounded to one site); the superseded-index pin was vacuous
+(now seeds the old index and re-runs the boot to prove the DROP). Every new and
+corrected load-bearing pin mutation-proven by name (the three sanitizer arms
+RC1/RC2/RC3 on the robust version, the devsig flip, the DROP-index removal, the
+close-reset removal). Details, the JUDGED-no-change list, the RE-REVIEW
+CORRECTIONS, and the deferrals-with-owners (incl. the WocMarketWindow
+behavioral-rig follow-up owed to 15) are in the 13 QA ROUND bullet of the
+state.md ledger entry.
 
 ## 13 implement round (step-up authorization for custody-moving ops)
 
