@@ -7719,10 +7719,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Redharvest',
     class: 'druid',
     specs: ['feral'],
-    // Rank 1 lands at 5 so a new feral has its signature finisher from the
-    // first wolf-form level (combo points used to accrue unspendable until
-    // 14); rank 3 restores the pre-rank live values, so level-20 balance and
-    // existing parses are untouched.
+    // The rank ladder starts at 5 where spec commitment does, but the
+    // finisher is REACHED through the transforming Gorebite button, which
+    // learns at 8: that is the first level the ladder is castable (combo
+    // points used to accrue unspendable until 14). Rank 3 restores the
+    // pre-rank live values, so level-20 balance and existing parses are
+    // untouched.
     learnLevel: 5,
     cost: 35,
     castTime: 0,

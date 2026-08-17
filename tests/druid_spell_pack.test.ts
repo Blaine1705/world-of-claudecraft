@@ -140,14 +140,19 @@ describe('druid spell pack — casting applies effects', () => {
     const e = sim.entities.get(a)!;
     sim.setPlayerLevel(20, a);
     giveForm(sim, a, 'form_cat', 'Wolf Form');
-    // Free cast with a 30 energy surge, exactly as the tooltip promises: start
-    // below cap so the surge is measurable, and prove no cost was charged.
-    e.resource = 40;
+    // The giveForm shortcut leaves the pool mid-conversion (still mana), and
+    // the next cast finishes the switch by refilling to max, which would mask
+    // the surge. Settle the pool as energy FIRST, then the free cast plus 30
+    // surge is exact: 10 becomes 40 before the next tick's regen, and both a
+    // charged cost and a doubled surge fail.
+    e.resourceType = 'energy';
+    e.maxResource = 100;
+    e.resource = 10;
     sim.castAbility('tigers_fury', a);
+    expect(e.resource).toBe(40);
     sim.tick();
     const buff = e.auras.find((au) => au.kind === 'buff_ap' && au.value === 40);
     expect(buff, 'tigers_fury should apply a +40 buff_ap aura').toBeTruthy();
-    expect(e.resource).toBeGreaterThanOrEqual(70);
   });
 
   it('Enrage generates rage in bear form', () => {

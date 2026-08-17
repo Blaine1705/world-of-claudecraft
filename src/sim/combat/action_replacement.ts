@@ -50,6 +50,7 @@ export function replaceResolvedAbility(
   let cost = replacement.cost;
   let castTime = replacement.castTime;
   let effects = replacement.effects;
+  let threatFlat = replacement.threat?.flat ?? 0;
   if (actorLevel !== undefined) {
     for (const r of replacement.ranks ?? []) {
       if (r.level <= actorLevel) {
@@ -57,6 +58,7 @@ export function replaceResolvedAbility(
         cost = r.cost;
         effects = r.effects;
         if (r.castTime !== undefined) castTime = r.castTime;
+        if (r.threatFlat !== undefined) threatFlat = r.threatFlat;
       }
     }
   }
@@ -67,7 +69,7 @@ export function replaceResolvedAbility(
     castTime,
     cooldown: replacement.cooldown,
     effects: effects.map((effect) => ({ ...effect })),
-    threatFlat: replacement.threat?.flat ?? 0,
+    threatFlat,
     threatMult: replacement.threat?.mult ?? 1,
     castWhileMoving: replacement.castWhileMoving,
     charges: replacement.maxCharges,
