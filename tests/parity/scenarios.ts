@@ -1459,6 +1459,14 @@ function drownedLitany(): Scenario {
         );
         bossTicks(40);
         lethal(sim, p, boss);
+        // Nhalia's own summoned cantors/choir thralls (phase-2 adds, Final Bell's
+        // thralls) can still be alive when she dies. The rite gate now waits for
+        // them (delveHasLiveMobs), so clear the room the same way the choir loft
+        // did above before advancing to the rite choose step.
+        for (const id of [...run.mobIds]) {
+          const m = sim.entities.get(id) as AnyEntity | undefined;
+          if (m) m.dead = true;
+        }
       }
       rec.tick(6); // reliquary + shrines rise, rite awaits the intensity choice
       const reliquary = [...run.objectIds]

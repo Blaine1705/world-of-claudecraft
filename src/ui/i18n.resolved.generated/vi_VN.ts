@@ -7171,6 +7171,7 @@ export const vi_VN: EnTranslations = {
       "shopMarksRequired": "Bạn cần {marks} Dấu Ấn Thám Hiểm để mua {name}.",
       "shopSealPremiumOnly": "Dấu niêm này chỉ chịu khuất phục trước bàn tay bậc thầy. Chỉ có mức cược Cao Cấp mới mở được nó.",
       "passageSealed": "Lối đi đã bị niêm phong.",
+      "enemiesRemain": "Clear the remaining enemies first.",
       "moveCloserPassage": "Hãy lại gần lối đi hơn.",
       "moveCloserChest": "Hãy lại gần chiếc rương hơn.",
       "moveCloserReliquary": "Hãy lại gần hộp thánh tích hơn.",
