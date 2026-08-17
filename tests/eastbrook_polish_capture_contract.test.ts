@@ -184,10 +184,12 @@ interface AttributionTargetFixture {
 // Re-minted for the r185 frozen-camera aim fix: updateCamera now aims through
 // lookAtFrozen, so renderer.ts moves and the composite follows its bytes. No
 // capture was retaken.
-// Re-minted for the release/v0.39 integrated gate: the current merged tree
-// computes this composite from clean provenance inputs. No capture was retaken.
+// Re-minted for the release/v0.39 integrated gate plus the sky KTX2 UASTC HDR
+// conversion: the merged renderer keeps the wrapper repairs and moves again
+// for the compressed sky residency path, so the composite follows its bytes.
+// No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'e4f1e15fb1920bcfc587bb554506fd070697cdc1eeb99d8833a0229c26cdc9da';
+  'b736a595a4147e153c270832e9710d113e4f00e0bf25d3564586a3c6841d13eb';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
