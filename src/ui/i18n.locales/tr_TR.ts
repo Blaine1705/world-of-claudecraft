@@ -2647,6 +2647,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleError': 'Apple ile oturum açılamadı. Lütfen tekrar dene.',
   'hudChrome.auth.appleLoginCta': 'Apple ile Devam Et',
   'hudChrome.dailyRewards.reason.banned': 'Günlük Ödüllerden yasaklandın. Gerekçe: {reason}',
+  'hudChrome.itemHeroicLabel': 'Heroik',
   'hudChrome.itemHeroicTag': '[KAHRAMANCA]',
   'hudChrome.interfaceTabs.chat': 'Sohbet',
   'hudChrome.interfaceTabs.combat': 'Savaş',
@@ -4245,7 +4246,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Bir düşmana hücum ederek 9 öfke üretir ve onu 1 saniye sersemletir. 8-25 yarda menzil. Yalnızca Bruin Formu.',
   'entities.abilities.bear_charge.name': 'Bruin Hücumu',
   'entities.abilities.bear_form.description':
-    'Bir ayıya dönüş: zırh +%130, saldırı gücü büyük ölçüde artar, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. Büyücü formuna dönmek için tekrar kullan.',
+    'Bir ayıya dönüş: zırh +%110, azami sağlık +%30, saldırı gücü büyük ölçüde artar, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. Büyücü formuna dönmek için tekrar kullan.',
   'entities.abilities.bear_form.name': 'Bruin Formu',
   'entities.abilities.berserker_rage.description':
     'Kaynayan bir gazaba kapılarak 20 öfke üretir. (Savaşçı yeteneği)',
@@ -4462,7 +4463,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_word_shield.description': 'Dost bir hedefi kalkanlar ve 30 sn boyunca {damage} hasar emer. Disiplin ayrıca hedefi 30 sn boyunca Kutsal hasarına bağlar.',
   'entities.abilities.power_word_shield.name': 'Koruma Mezmuru',
   'entities.abilities.prowl.description':
-    'Kurt Formundayken gizliliğe geçer ve 50% daha yavaş hareket edersin. Dövüş sırasında kullanılamaz.',
+    'Kurt Formundayken gizliliğe geçer ve 5% daha yavaş hareket edersin. Dövüş sırasında kullanılamaz.',
   'entities.abilities.prowl.name': 'Sinsi Sokulma',
   'entities.abilities.pyroblast.description':
     'Devasa ateşli bir kaya fırlatarak {damage} Ateş hasarı ve ek olarak zamana yayılı hasar verir.',
@@ -4483,10 +4484,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.description':
     'Evcilinin yaralarını sarar. Yaşıyorsa 12 saniye boyunca her 3 saniyede bir iyileştirerek toplam {overTime} can yeniler. Ölüyse %35 canla diriltir.',
   'entities.abilities.revive_pet.name': 'Yarasını Sar',
-  'entities.abilities.righteous_fury.description': 'Kutsal hasarının ürettiği tehdidi pasif olarak %60 artırır. Yalnızca İnanç muhafızı.',
+  'entities.abilities.righteous_fury.description': 'Kutsal hasarının ürettiği tehdidi pasif olarak %30 artırır. Yalnızca İnanç muhafızı.',
   'entities.abilities.righteous_fury.name': 'Yanan Yemin',
   'entities.abilities.rip.name': 'Kanlı Yarık',
-  'entities.abilities.rockbiter_weapon.description': 'Silahına 30 dakika boyunca işler. Her savurma {damage} ek hasar verir. Güçlendirme ayrıca %30 zırh kazanır, %10 daha az hasar alır ve iki katı tehdit üretir. Toprak Sarsıntısı hedefini 3 sn boyunca sana saldırmaya zorlar ve Gök Gürültüsü Siperi 3 sn boyunca %10 hasar azaltımı verir.',
+  'entities.abilities.rockbiter_weapon.description': 'Silahına 30 dakika boyunca işler. Her savurma {damage} ek hasar verir. Güçlendirme ayrıca %40 zırh ve %20 Dayanıklılık kazanır, %15 daha az hasar alır ve yaratıkların kritik vuruşlarına karşı bağışıktır ve 2,75 katı tehdit üretir. Toprak Sarsıntısı hedefini 3 sn boyunca sana saldırmaya zorlar ve Gök Gürültüsü Siperi 3 sn boyunca %10 hasar azaltımı verir.',
   'entities.abilities.rockbiter_weapon.name': 'Stonebound Silahı',
   'entities.abilities.rupture.name': 'Kan Kaybı',
   'entities.abilities.sap.description':
@@ -4558,7 +4559,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Yakındaki düşmanları {damage} hasar için patlatır ve saldırılarını 10 saniye boyunca %10 yavaşlatır.',
   'entities.abilities.thunder_clap.name': 'Sarsan Darbe',
   'entities.abilities.tigers_fury.description':
-    'Saldırı gücünü {duration} saniye boyunca {buff} artırır. Yalnızca Kurt Formu.',
+    'Anında {rage} enerji kazandırır ve saldırı gücünü {duration} saniye boyunca {buff} artırır. Yalnızca Kurt Formu.',
   'entities.abilities.tigers_fury.name': 'Kurt Kanı',
   'entities.abilities.travel_form.description':
     "Anında hızlı bir Fleet Formu'na bürünerek hareket hızını %40 artırır. Bürünmüşken diğer yetenekleri kullanamazsın, ancak dövüşte ya da dövüş dışında bürünebilirsin; kaçmak için idealdir.",
@@ -10626,6 +10627,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} Onur',
   'hudChrome.warfare.honorGain': '{amount} Onur ({reason}) kazanırsınız.',
   'hudChrome.warfare.notEnoughHonor': 'Yeterli Onur yok.',
+  'hudChrome.warfare.reasons.arenaComplete': 'Arena müsabakası yapıldı',
   'hudChrome.warfare.reasons.arenaWin': 'Arena zaferi',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta tamamlandı',
   'hudChrome.warfare.reasons.fiestaKill': 'Fiesta avlaması',
@@ -10869,7 +10871,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description': 'Hedef noktanın 4 m çevresindeki düşmanları 2 sn kökler, ardından 6 sn boyunca %40 yavaşlatır. (Şaman yeteneği)',
   'entities.abilities.evocation.description': 'Restaura manayı rápidamente. (büyücü yeteneği)',
   'entities.abilities.frenzied_regeneration.description':
-    '10 sn. boyunca 180 sağlık yeniler. Yalnızca Ayı Formunda kullanılabilir. (Druid yeteneği)',
+    '10 sn. boyunca azami sağlığının %40 kadarını yeniler. Yalnızca Ayı Formunda kullanılabilir. (Druid yeteneği)',
   'entities.abilities.frost_trap.description':
     'Hedef alandaki düşmanları 3 sn. boyunca dondurarak hareket etmelerini ve eyleme geçmelerini engeller. (Avcı yeteneği)',
   'entities.abilities.hammer_of_wrath.description': "{damage} hasar için kutsal bir çekiç savurur ve 1 Adanmışlık üretir. Canın %20'nin altındayken ya da Kutsal Yüceliş veya İntikam Gazabı sırasında kullanılabilir. Şafağın Gazabı, herhangi bir hedefe karşı, süregelen bekleme süresini yok sayan ve %20 daha fazla hasar veren fazladan bir kullanım verir. Yüceliş hasarını %30 artırır.",
@@ -12449,7 +12451,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     '5 Yeşillik tüketir. Tüm müttefiklerdeki her süreli iyileştirmeni kalan iyileştirmesinin 60% kadarıyla hasat eder, o etkileri kaldırır ve hedefe taze bir Yaban Çiçeği eker.',
   'entities.abilities.redharvest.name': 'Kızıl Hasat',
   'entities.abilities.redharvest.description':
-    '3 Kadim Kanı tüketir: {damage} hasarlık bir vuruş yapar, Deri Yüzme ve Parçalamanın hedefe vereceği kalan tüm hasarı anında verir, iki kanamayı da kaldırır ve 30 enerji geri kazandırır. Sıfır combo puanıyla da çalışır.',
+    '3 Kadim Kanı tüketir: {damage} hasarlık bir vuruş yapar, Deri Yüzme ve Parçalamanın hedefe vereceği kalan tüm hasarı anında verir, iki kanamayı da kaldırır ve {rage} enerji geri kazandırır. Sıfır combo puanıyla da çalışır.',
   'entities.abilities.sunlance.name': 'Güneş İzi',
   'entities.abilities.sunlance.description':
     '3 Ay Gelgitini, {damage} Doğa hasarı ve 9 saniyede {overTime} yanık veren bir vuruş için tüketir ve 35 mana geri kazandırır: mana seçimi. Ay Kabarışı da aynı 3 Ay Gelgitini tüketir, o yüzden birini seç.',
@@ -12679,7 +12681,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.description': 'Hedefi 30 sn boyunca açığa çıkaran bitirici hamle: harcanan her kombo puanı zırhını %2 azaltır (5 kombo puanı: %{damage}).',
   'entities.abilities.faerie_fire.description': 'Hedefin zırhını 40 sn boyunca %{damage} azaltır.',
   'entities.abilities.ferocious_bite.description': '{damage} veren bitirici hamle. Yalnızca Kurt Formu.',
-  'entities.abilities.ferocious_bite.specNote_feral': 'İsabet eden her vuruş 1 Kadim Kan ekler; 3 Kadim Kanda bu düğme Kızıl Hasata dönüşür: kombo puanı başına 70 artı 43 hasar veren, ayrıca Deri Yüzme ve Parçalamanın kalan tüm hasarını anında vuran ve 30 enerji geri kazandıran bir ısırık.',
+  'entities.abilities.ferocious_bite.specNote_feral': 'İsabet eden her vuruş 1 Kadim Kan ekler; 3 Kadim Kanda bu düğme Kızıl Hasata dönüşür: Kadim Kanı harcayarak daha güçlü bir ısırık gerçekleştirir, ayrıca Deri Yüzme ve Parçalamanın kalan tüm hasarını anında vurur ve enerji geri kazandırır.',
   'entities.abilities.funeral_harvest.description': 'Senin ya da ölülerinin yakın zamanda hasar verdiği bir düşman öldüğünde, 1 Ruh Parçası kazanırsın. Bu en fazla 3 sn\'de bir gerçekleşebilir.',
   'entities.abilities.funeral_harvest.name': 'Cenaze Hasadı',
   'entities.abilities.garrote.description': 'Düşmanın boğazına bir tel dola: hemen {damage} hasar verir ve 18 sn boyunca {overTime} kanama hasarı verir. Gizlenmiş olmalısın. 1 kombo puanı kazandırır.',
@@ -13093,4 +13095,21 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'auth.designCodeErrVersion': 'Bu görünüm kodu oyunun daha yeni bir sürümünden geliyor.',
   'auth.designCodeErrMalformed': 'Bu görünüm kodu bozuk. Kodun tamamını kopyalayıp yeniden dene.',
   'hudChrome.nameplate.cheaterTag': '< Hileci >',
+  'hud.options.displayMode': 'Görüntü Modu',
+  'hud.options.displayModeBorderless': 'Kenarlıksız Tam Ekran',
+  'hud.options.displayModeWindowed': 'Pencereli',
+  'hudChrome.options.discordPresence': 'Discord Zengin Durumu',
+  'hudChrome.options.discordPresenceNote': 'Bulunduğun bölgeyi ve bu oturumda ne kadar süredir oynadığını Discord etkinliğin olarak gösterir, Discord profilini görebilen herkes ikisini de görebilir. Yalnızca bölge adı, oturum süren ve oyun paylaşılır; karakterin, hesabın ya da kiminle oynadığın asla paylaşılmaz. Bu bilgisayarda Discord uygulamasının çalışıyor olması gerekir.',
+  'hudChrome.options.forceHighPerfGpu': 'Ayrık Oyun GPU\'sunu Kullan',
+  'hudChrome.options.forceHighPerfGpuNote': 'Varsayılan olarak açık: masaüstü uygulaması bu bilgisayardan ayrık oyun GPU\'sunu ister. Oyun başlamıyorsa, siyah bir ekranla açılıyorsa ya da dizüstü bilgisayarın ekranı karararsa bunu kapat. Değişiklik oyunun bir sonraki başlangıcında etkili olur.',
+  'desktop.notify.partyInviteBody': '{name} seni grubuna davet etti.',
+  'desktop.notify.partyInviteTitle': 'Grup daveti',
+  'desktop.notify.updateReadyBody': 'Güncellemeyi uygulamak için World of ClaudeCraft\'ı yeniden başlat.',
+  'desktop.notify.updateReadyTitle': '{version} güncellemesi hazır',
+  'desktop.notify.updateReadyTitleNoVersion': 'Güncelleme hazır',
+  'desktop.update.whatsNew': 'Değişiklikleri Tarayıcında Gör',
+  'entities.abilities.challenging_roar.description': 'Uğursuz bir kükreme: 10 yarda içindeki her düşman kışkırtılır, tehdidi onun en nefret ettiği düşmanla eşitlenir ve 3 saniye boyunca sana saldırmaya zorlanır. Yalnızca Bruin Formu.',
+  'entities.abilities.challenging_roar.name': 'Uğursuz Kükreme',
+  'entities.abilities.cheap_shot.descriptionNoStealth': 'Hedefe {damage} hasar vererek onu 4 sn sersemlet. 2 kombo puanı kazandırır.',
+  'gpuNotice.bodyDiscreteInactive': 'Oyun, ayrık (oyun) GPU\'sunu kullanmıyor ve bunun yerine güç tasarruflu GPU üzerinde çalışıyor, bu yüzden performans düşecek. Grafik sürücülerini güncelleyip oyunu yeniden başlat. Windows\'ta ayrıca oyunu Ayarlar > Sistem > Ekran > Grafikler altında Yüksek performans olarak ayarla.',
 };

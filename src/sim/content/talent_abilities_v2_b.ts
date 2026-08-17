@@ -217,10 +217,18 @@ export const TALENT_ABILITIES_V2_B = {
     description:
       'Living sap wells up in you for 10 sec, restoring 20 of your current resource in waves: mana, Rage, or Energy, and shifting forms does not break it. Sleep, stun, or stasis stills the sap. (Druid talent)',
   },
+  // Wildfang's in-form heal. Authored for the Talents 2.0 L17 row, but that row
+  // shipped granting Gladesong instead and left this stranded: fully defined,
+  // iconed, and wired through the HUD heal-tick arm, yet granted by nothing and
+  // so unreachable in play. It is a Wildfang spec ability now rather than a row
+  // grant, which is why the level gate and the "(Druid talent)" framing are
+  // gone. A shapeshifted druid cannot cast its healing spells, so this is the
+  // only heal Bruin Form has.
   frenzied_regeneration: {
     id: 'frenzied_regeneration',
     name: 'Savage Mending',
     class: 'druid',
+    specs: ['feral'],
     learnLevel: 10,
     cost: 10,
     castTime: 0,
@@ -229,8 +237,11 @@ export const TALENT_ABILITIES_V2_B = {
     school: 'nature',
     requiresTarget: false,
     requiresForm: 'bear',
-    effects: [{ type: 'hot', total: 180, duration: 10, interval: 2 }],
-    description: 'Restores 180 health over 10 sec. Bruin Form only. (Druid talent)',
+    // 40% of max health (was a flat 180, about 8% of a best-geared bear pool):
+    // a percentage keeps the heal meaningful as gear grows and scales through
+    // any future bear pool retune. total remains as the no-pct fallback value.
+    effects: [{ type: 'hot', total: 180, duration: 10, interval: 2, pctOfMax: 0.4 }],
+    description: 'Restores 40% of your maximum health over 10 sec. Bruin Form only.',
   },
   berserk: {
     id: 'berserk',

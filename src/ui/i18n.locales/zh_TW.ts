@@ -480,6 +480,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.checkoutWalletUnsupported': '此錢包無法簽署及傳送 Solana 交易。',
   'hudChrome.claudium.checkoutNotSettled': '交易已傳送，但 Claudium 尚未入帳，請稍後再試。',
   'hudChrome.itemHeroicTag': '[英雄]',
+  'hudChrome.itemHeroicLabel': '英雄',
   'hudChrome.readyCheck.notInPartyError': '你必須加入隊伍才能發起就緒確認。',
   'hudChrome.readyCheck.inProgressError': '就緒確認已在進行中。',
   'entities.abilities.collective_reversal.name': '集體逆轉',
@@ -785,6 +786,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorial.nextTipQuestLog': '開啟任務日誌（{key}）尋找附近的下一個任務。',
   'hudChrome.tutorial.nextTipMap': '查看世界地圖（{key}）了解任務所在位置。',
   'hudChrome.tutorial.nextTipSocial': '開啟社交面板（{key}）尋找隊伍應對更強的戰鬥。',
+  'hudChrome.lastkeepMap.story.undercroft': '地下穹室',
+  'hudChrome.lastkeepMap.story.state': '正殿層',
+  'hudChrome.lastkeepMap.story.residence': '起居層',
+  'hudChrome.lastkeepMap.story.tower': '瞭望塔',
+  'hudChrome.dawnholdMap.story.ground': '庭園層',
+  'hudChrome.dawnholdMap.story.solar': '日光廳',
   'hudChrome.raidLockout.title': '團隊副本鎖定',
   'hudChrome.raidLockout.allReady': '所有團隊副本就緒',
   'hudChrome.raidLockout.daysHours': '{d}天{h}小時',
@@ -948,6 +955,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorGain': '你獲得了 {amount} 點榮譽（{reason}）。',
   'hudChrome.warfare.notEnoughHonor': '榮譽不足。',
   'hudChrome.warfare.reasons.arenaWin': '競技場勝利',
+  'hudChrome.warfare.reasons.arenaComplete': '競技場參戰',
   'hudChrome.warfare.reasons.fiestaKill': '嘉年華擊倒',
   'hudChrome.warfare.reasons.fiestaComplete': '完成嘉年華',
   'hudChrome.warfare.reasons.fiestaWin': '嘉年華勝利',
@@ -1260,6 +1268,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnCharacterScreen': '在角色畫面顯示錢包',
   'hudChrome.options.showPlaytime': '在角色畫面顯示遊戲時長',
   'hudChrome.options.showWalletOnPlayerCard': '在玩家卡片顯示錢包',
+  'hudChrome.options.forceHighPerfGpu': '使用獨立遊戲顯示卡',
+  'hudChrome.options.forceHighPerfGpuNote':
+    '預設開啟：桌面版會向本機要求使用獨立遊戲顯示卡。若遊戲無法啟動、啟動後黑屏，或筆記型電腦螢幕沒有畫面，請關閉此選項。此設定會在下次啟動遊戲時生效。',
+  'hudChrome.options.discordPresence': 'Discord 遊戲狀態',
+  'hudChrome.options.discordPresenceNote':
+    '遊玩時將你目前所在的區域以及本次遊戲時長顯示為你的 Discord 活動狀態，任何能看到你 Discord 個人資料的人都能看到這兩項。只會分享區域名稱、本次遊戲時長和遊戲名稱，絕不會分享你的角色、帳號或與你同行的人。需要本機正在執行 Discord 應用程式。',
   'hudChrome.options.showDevBadges': '顯示開發者徽章',
   'hudChrome.options.showOwnNameplate': '顯示我的姓名板',
   'hudChrome.options.showPlayerNameplates': '顯示玩家姓名板',
@@ -1977,6 +1991,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.options.invertLook': '反轉視角（觸控）',
   'hud.options.graphicsReloadNote': '圖形品質和地形細節會在重新載入後生效。',
   'hud.options.reloadNow': '立即重新載入',
+  'hud.options.displayMode': '顯示模式',
+  'hud.options.displayModeBorderless': '無邊框全螢幕',
+  'hud.options.displayModeWindowed': '視窗',
   'hud.options.fullscreen': '全螢幕',
   'hud.options.touchLookSpeed': '觸控視角速度',
   'hud.options.joystickSize': '搖桿大小',
@@ -2890,6 +2907,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cheap_shot.name': '掏腹重擊',
   'entities.abilities.cheap_shot.description':
     '攻擊目標，造成 {damage} 點傷害，使其昏迷 4 秒。必須處於潛行狀態。獎勵 2 個連擊點。',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    '攻擊目標，造成 {damage} 點傷害，使其昏迷 4 秒。獎勵 2 個連擊點。',
   'entities.abilities.sap.name': '悶棍',
   'entities.abilities.sap.description':
     '使目標無法行動，持續 8 秒。必須處於潛行狀態且脫離戰鬥。任何傷害都會破除此效果。',
@@ -2941,7 +2960,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.consecration.name': '聖化之地',
   'entities.abilities.consecration.description': '淨化你腳下的土地，持續 9 秒，每秒造成 {damage} 點神聖傷害並產生高額威脅。首次命中產生 1 點虔誠。信仰守衛站在其中時受到的傷害降低 10%。昇華會提高其傷害。',
   'entities.abilities.righteous_fury.name': '燃燒誓言',
-  'entities.abilities.righteous_fury.description': '被動地將你的神聖傷害所產生的威脅提高 60%。僅限信仰守衛。',
+  'entities.abilities.righteous_fury.description': '被動地將你的神聖傷害所產生的威脅提高 30%。僅限信仰守衛。',
   'entities.abilities.retribution_aura.name': '報償光環',
   'entities.abilities.retribution_aura.description':
     '以神聖能量環繞你和隊伍成員，直到死亡或被替換。近戰攻擊受影響盟友的敵人將受到{buff}點神聖傷害，受影響的盟友普通攻擊額外造成{buff}點神聖傷害。替換你自己的壁壘堅定。另一名聖騎士施放報償光環時將刷新而非疊加。',
@@ -2996,7 +3015,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lightning_bolt.name': '電弧箭',
   'entities.abilities.lightning_bolt.description': '造成 {damage} 點自然傷害。傷害隨法術強度提升。元素：命中可給予 1 點雷霆。',
   'entities.abilities.rockbiter_weapon.name': '縛石武器',
-  'entities.abilities.rockbiter_weapon.description': '為你的武器附魔 30 分鐘。每次揮擊額外造成 {damage} 點傷害。強化還會獲得 30% 護甲，受到的傷害降低 10%，並產生兩倍的威脅。大地震擊迫使其目標攻擊你 3 秒，而雷霆守護則給予 3 秒 10% 的傷害減免。',
+  'entities.abilities.rockbiter_weapon.description': '為你的武器附魔 30 分鐘。每次揮擊額外造成 {damage} 點傷害。強化還會獲得 40% 護甲和 20% 耐力，受到的傷害降低 15%，免疫生物的致命一擊，並產生 2.75 倍的威脅。大地震擊迫使其目標攻擊你 3 秒，而雷霆守護則給予 3 秒 10% 的傷害減免。',
   'entities.abilities.healing_wave.name': '療癒之水',
   'entities.abilities.healing_wave.description': '治療一個友方目標 {damage} 點生命。治療量隨法術強度提升。恢復：將完整治療量的 50% 在過量治療之前存為治癒湧流，持續 12 秒，至多為目標最大生命值的 30%。',
   'entities.abilities.chain_heal.name': '層疊治癒',
@@ -3061,10 +3080,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.description': '將目標纏繞在原地，最多持續 12 秒。',
   'entities.abilities.bear_form.name': '巨熊形態',
   'entities.abilities.bear_form.description':
-    '變形為熊：護甲 +130%，攻擊強度大幅提高，你的攻擊會產生怒氣並額外產生 30% 威脅值。再次施放可返回施法者形態。',
+    '變形為熊：護甲 +110%，最大生命值 +30%，攻擊強度大幅提高，你的攻擊會產生怒氣並額外產生 30% 威脅值。再次施放可返回施法者形態。',
   'entities.abilities.maul.name': '碎骨擊',
   'entities.abilities.maul.description':
     '一次猛擊攻擊，使近戰傷害提高 {damage}，並產生大量威脅值。在你的下一次揮擊時觸發。僅限巨熊形態。',
+  'entities.abilities.challenging_roar.description':
+    '發出挑釁的咆哮：10 碼內的每個敵人都被嘲諷，其對你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。僅限巨熊形態。',
+  'entities.abilities.challenging_roar.name': '挑釁咆哮',
   'entities.abilities.growl.name': '威嚇',
   'entities.abilities.growl.description':
     '對目標低吼：你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。僅限巨熊形態。',
@@ -3113,7 +3135,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '敵人被蟲群侵襲，在 12 秒內受到 {damage} 點自然傷害。',
   'entities.abilities.tigers_fury.name': '狼血之力',
   'entities.abilities.tigers_fury.description':
-    '使攻擊強度提高 {buff}，持續 {duration} 秒。僅限狼形態。',
+    '湧起{rage}點能量，並使攻擊強度提高 {buff}，持續 {duration} 秒。僅限狼形態。',
   'entities.abilities.rip.name': '血隙',
   'entities.abilities.rip.description': '終結技，使目標每 2 秒流血一次，持續 24 秒：36 點傷害外加每消耗 1 點連擊點 24 點（5 點連擊點：共 {damage} 點）。僅限狼形態。',
   'entities.abilities.mortal_strike.name': '致殘打擊',
@@ -3156,7 +3178,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '挫敗附近敵人的士氣，使其攻擊強度降低 20，持續 20 秒。僅限巨熊形態。',
   'entities.abilities.prowl.name': '潛獵',
   'entities.abilities.prowl.description':
-    '在狼形態下進入隱匿狀態，移動速度降低 50%。無法於戰鬥中使用。',
+    '在狼形態下進入隱匿狀態，移動速度降低 5%。無法於戰鬥中使用。',
   'entities.abilities.rake.name': '剮擊',
   'entities.abilities.rake.description': '撕裂敵人，造成武器傷害外加 {damage} 點，並造成持續 18 秒的流血傷害。給予 1 點連擊點。僅限狼形態。',
   'entities.abilities.revive_pet.name': '修補',
@@ -7523,6 +7545,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'desktop.update.restart': '立即重新啟動',
   'desktop.update.later': '稍後',
   'desktop.update.dismiss': '關閉',
+  'desktop.update.whatsNew': '在瀏覽器中查看更新內容',
+  'desktop.notify.updateReadyTitle': '更新 {version} 已就緒',
+  'desktop.notify.updateReadyTitleNoVersion': '更新已就緒',
+  'desktop.notify.updateReadyBody': '重新啟動 World of ClaudeCraft 以套用更新。',
+  'desktop.notify.partyInviteTitle': '組隊邀請',
+  'desktop.notify.partyInviteBody': '{name} 邀請你加入隊伍。',
   'desktop.crash.title': 'World of ClaudeCraft',
   'desktop.crash.body': '遊戲畫面已停止運作。要重新載入嗎？',
   'desktop.crash.reload': '重新載入',
@@ -7530,6 +7558,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.fatalBody': 'World of ClaudeCraft 發生未預期的錯誤，必須關閉。',
   'gpuNotice.bodyDesktop':
     '遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。',
+  'gpuNotice.bodyDiscreteInactive':
+    '遊戲並未使用獨立（遊戲）顯示卡，而是在省電顯示晶片上執行，因此效能會下降。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。',
   'gpuNotice.bodyWeb':
     '遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請在瀏覽器設定中啟用硬體加速，更新顯示卡驅動程式，然後重新啟動瀏覽器。',
   'gpuNotice.hybridBodyWindows':
@@ -9350,7 +9380,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description': '將目標點 4 公尺內的敵人定身 2 秒，隨後使其減速 40%，持續 6 秒。（薩滿天賦）',
   'entities.abilities.evocation.description': '快速恢復法力。（法師天賦）',
   'entities.abilities.frenzied_regeneration.description':
-    '在10秒內恢復180點生命值。只能在熊形態下使用。（德魯伊天賦）',
+    '在10秒內恢復相當於最大生命值40%的生命。只能在熊形態下使用。（德魯伊天賦）',
   'entities.abilities.frost_trap.description':
     '凍結目標區域內的敵人3秒，使其無法移動或行動。（獵人天賦）',
   'entities.abilities.ghostly_strike.description': '以武器傷害外加 {damage} 點擊打敵人，並將你的閃避機率提高 15%，持續 7 秒。給予 1 點連擊點。（盜賊天賦）',
@@ -9909,11 +9939,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '溫熱的雨水在古老石面上嘶嘶作響。荒野之心盆地在你眼前展開。',
   'entities.dungeons.wildheart_basin.leaveText': '你從石牙之下穿回棕櫚之境的陽光中。',
   'entities.dungeons.the_last_keep.name': '最後的堡壘',
-  'entities.dungeons.the_last_keep.enterText': '你踏入最後的堡壘那冰冷而寂靜的大廳。',
   'entities.items.last_keep_signet.name': '最後的堡壘印戒',
+  'entities.dungeons.the_last_keep.enterText': '你踏入最後的堡壘那冰冷而寂靜的大廳。',
   'entities.items.reins_terrorspark_groundshaker.name': '驚雷撼地者點火鑰匙',
   'entities.items.reins_rickshaw_mount.name': '白骨人力車縛繩',
   'entities.dungeons.the_last_keep.leaveText': '你帶上堡門，重新走進龍裔荒原的寒風中。',
+  'entities.dungeons.dawnhold_castle.name': '晨曦堡',
+  'entities.items.dawnhold_posy.name': '晨曦堡花園小花束',
+  'entities.dungeons.dawnhold_castle.enterText': '你走進晨曦堡溫暖而花香四溢的廳堂。',
+  'entities.dungeons.dawnhold_castle.leaveText': '你回到陽光灑落的花園草坪上。',
   'entities.items.wildheart_tuskblade.name': '荒野之心獠牙巨刃',
   'entities.items.wildheart_hexwood_staff.name': '盆地巫木法杖',
   'entities.items.wildheart_fangknife.name': '祖爾加的獠牙匕首',
@@ -11367,7 +11401,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '在 8 秒內，你受到的下一次敵人攻擊將被回敬：至多抵消 {buff} 點傷害，並以等量神聖傷害返還給攻擊者，同時你獲得 1 點虔誠。只回敬一次攻擊。昇華使可回敬的數值提高 50%。',
   'entities.abilities.faithforged_guard.name': '聖光之債',
   'entities.abilities.ferocious_bite.specNote_feral':
-    '每次命中的攻擊累積 1 層古血；古血達 3 層時，此按鈕變為血收：撕咬造成 91 點傷害，每個連擊點額外造成 55 點，並立即引爆你的剮擊與血裂的剩餘傷害，恢復 30 點能量。',
+    '每次命中的攻擊累積 1 層古血；古血達 3 層時，此按鈕變為血收：消耗古血發動更強的撕咬，立即引爆你的剮擊與血裂的剩餘傷害，並恢復能量。',
   'entities.abilities.fieldcraft_reentry.description':
     '被動：斷跡會刷新狩獵動能，並使你在12秒內的下一次剖膛打擊或血鉤獲得再入強化。剖膛打擊每層造成15%額外傷害。血鉤造成18至24點額外物理傷害，每層再提高15%，並隨遠程攻擊強度提高。達到3層時，任一攻擊都會消耗狩獵動能。（野戰技藝）',
   'entities.abilities.fieldcraft_reentry.name': '蓄勢再入',
@@ -11493,7 +11527,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '使一名死亡的隊伍成員復活，並恢復 35% 的生命值和法力值。',
   'entities.abilities.recall_the_fallen.name': '喚回逝者',
   'entities.abilities.redharvest.description':
-    '消耗3層古血：造成{damage}點傷害，立即引爆你的剮擊與血裂的剩餘傷害，移除這兩個流血效果，並恢復30點能量。沒有連擊點也能使用。',
+    '消耗3層古血：造成{damage}點傷害，立即引爆你的剮擊與血裂的剩餘傷害，移除這兩個流血效果，並恢復{rage}點能量。沒有連擊點也能使用。',
   'entities.abilities.redharvest.name': '血收',
   'entities.abilities.regrowth.specNote_restoration': '種下全新的綻放累積 1 層繁茂（最多 5 層）。',
   'entities.abilities.rejuvenation.specNote_restoration':

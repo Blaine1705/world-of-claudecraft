@@ -2,7 +2,7 @@ import { audio } from '../game/audio';
 import { corpseLootAvailability, localPartyMemberIds } from '../game/corpse_loot_availability';
 import type { GamepadKind } from '../game/gamepad_map';
 import type { GraphicsSettingsSnapshot } from '../game/graphics_rebuild_core';
-import { InstanceMusicController } from '../game/instance_music';
+import { InstanceMusicController, type InstanceMusicDecision } from '../game/instance_music';
 import { type Keybinds, keyCapLabel, keyLabel } from '../game/keybinds';
 import { music } from '../game/music';
 import type { GameSettings, Settings } from '../game/settings';
@@ -151,14 +151,11 @@ import {
 } from '../world_api';
 import {
   type AbilityScaling,
-  abilityBuffValue,
   abilityDamageBonus,
-  abilityDurationValue,
-  abilityOverTimeEffect,
   abilityPrimaryEffect,
   abilitySecondaryEffect,
-  abilityTemporalHourglassValues,
 } from './ability_damage';
+import { abilityDisplayDescription, formatAbilityNumber } from './ability_description';
 import { abilityDisplayName, abilityDisplayNameFromSource } from './ability_display_name';
 import { ArenaWindow } from './arena_window';
 import { auraDisplayNameForHud, auraDisplayNameFromSource } from './aura_display_name';
@@ -168,7 +165,7 @@ import {
   auraEffectMaximumFractionDigits,
 } from './aura_effect';
 import { auraGainLogKeyFor, findAuraForGainEvent } from './aura_gain_log';
-import { auraIconCssBackground, createAuraIconResolver } from './aura_icon_view';
+import { resolveHudAuraIconId, resolveHudAuraIconUrl } from './aura_icon_runtime';
 import { AuraOverlayController } from './aura_overlay_controller';
 import { renderAuraTooltipBodyHtml } from './aura_tooltip';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
@@ -250,7 +247,7 @@ import {
   craftOwnsTab,
 } from './crafting_view';
 import { craftCastStripElements, renderCraftingWindow, stationNameText } from './crafting_window';
-import { classCrestId, crestIconUrl } from './crest_icon_art';
+import { classCrestId } from './crest_icon_art';
 import { hydrateCrestImageFallbacks } from './crest_image_fallback';
 import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow } from './daily_rewards_window';
@@ -290,7 +287,6 @@ import {
   salvageResultToast,
 } from './enchanting_view';
 import {
-  type AbilitySpecNoteField,
   classDisplayName,
   dungeonDisplayName,
   itemDisplayName,
@@ -339,7 +335,10 @@ import {
   shouldShowHealLanding,
 } from './heal_landing_feedback_core';
 import { honorFloatText } from './honor_float_view';
-import { abilityRequirementKeys } from './hud/action_bar/ability_requirement_keys';
+import {
+  type AbilityRequirementResolve,
+  abilityRequirementKeys,
+} from './hud/action_bar/ability_requirement_keys';
 import {
   type ActionBarBindState,
   actionBarBindEnter,
@@ -492,16 +491,7 @@ import {
   tOptional,
   tPlural,
 } from './i18n';
-import {
-  abilityImageUrl,
-  cachedProceduralIconDataUrl,
-  hasAbilityIconIdentity,
-  hasAuraRecipe,
-  iconDataUrl,
-  proceduralIconDataUrl,
-  QUALITY_COLOR,
-  raidMarkerDataUrl,
-} from './icons';
+import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
 import { InspectWindow } from './inspect_window';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
@@ -521,6 +511,8 @@ import { itemNameColor } from './item_name_color';
 import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
 import { itemSlotLabel as itemSlotName } from './item_slot_labels';
 import { knownItemDef, ownEntry } from './known_item';
+import { DAWNHOLD_MAP_PAINTER_SPEC, LastKeepMapPainter } from './lastkeep_map_painter';
+import { dawnholdMapActive, lastKeepMapActive } from './lastkeep_map_view';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { isCombatFlavorLog } from './log_event_route';
@@ -896,17 +888,6 @@ const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.quer
 // painter's repaint gate never fires for it; the constant just pins the key so the
 // gate stays a no-op (target/party pass a per-unit key).
 const PLAYER_PORTRAIT_KEY = 'player';
-const resolveHudAuraIconId = createAuraIconResolver(hasAbilityIconIdentity, hasAuraRecipe);
-const HUD_AURA_STATIC_FALLBACK_URL = crestIconUrl('status_combat');
-if (!HUD_AURA_STATIC_FALLBACK_URL) throw new Error('Missing painted combat-status crest');
-const resolveHudAuraIconUrl = (iconId: string): string =>
-  auraIconCssBackground(
-    iconId,
-    abilityImageUrl,
-    (id) => cachedProceduralIconDataUrl('aura', id),
-    HUD_AURA_STATIC_FALLBACK_URL,
-    (id) => proceduralIconDataUrl('aura', id),
-  );
 // Vale Cup hold-to-charge shoot: full power after this long held, and the charge
 // a NON-held tap (touch / gamepad / a mouse click on the slot) fires at.
 const SHOOT_CHARGE_MS = 850;
@@ -1071,6 +1052,7 @@ const MOTD_RESULT_KEYS: Record<MotdResultCode, TranslationKey> = {
 };
 const HONOR_REASON_KEYS: Record<HonorReason, TranslationKey> = {
   arena_win: 'hudChrome.warfare.reasons.arenaWin',
+  arena_complete: 'hudChrome.warfare.reasons.arenaComplete',
   fiesta_kill: 'hudChrome.warfare.reasons.fiestaKill',
   fiesta_complete: 'hudChrome.warfare.reasons.fiestaComplete',
   fiesta_win: 'hudChrome.warfare.reasons.fiestaWin',
@@ -1616,6 +1598,11 @@ export class Hud {
   private subzoneTimer: number | undefined;
   private lastSubzone: string | null = null;
   private readonly instanceMusic = new InstanceMusicController(music);
+  // The last music-machine decision, computed ABOVE the paint cut (music keeps
+  // playing on hidden frames, so its transitions must too); the paint half
+  // reads this instead of driving the machine itself. Null only before the
+  // first medium-band tick.
+  private lastMusicDecision: InstanceMusicDecision | null = null;
   private minimapCtx: CanvasRenderingContext2D;
   private minimapBg: HTMLCanvasElement;
   private clockEl: HTMLElement | null = null;
@@ -4142,6 +4129,16 @@ export class Hud {
     this.mapMarkerArt,
     this.mapMarkerProfile,
   );
+  // The Last Keep interior map (the castle floor plan): both surfaces routed
+  // by the lastKeepMapActive position guard, exactly like the delve branch.
+  private readonly lastKeepMapPainter = new LastKeepMapPainter(this.writerFacet, classCss);
+  // Dawnhold Castle rides the same parameterized painter with its own spec
+  // (plates, title keys, and pure-core builders), routed by dawnholdMapActive.
+  private readonly dawnholdMapPainter = new LastKeepMapPainter(
+    this.writerFacet,
+    classCss,
+    DAWNHOLD_MAP_PAINTER_SPEC,
+  );
   // The Protect Yumi match strip + bench overlay (yumi_match_painter.ts):
   // facet-routed; structure from arenaInfo.match.yumi, dynamics from the
   // yumiStatus/yumiDown events fed in handleEvents. Runs on the mediumHud
@@ -6593,7 +6590,10 @@ export class Hud {
         });
       }
     }
-    const requirements = abilityRequirementLines(a, this.sim.talents.spec);
+    // Pass the RESOLVED ability, not just its def: a talent that retires a
+    // requirement (Cheap Trick on Gut Punch) must retire its line with it, the
+    // same way the resolved cost / cast / cooldown above beat the def's.
+    const requirements = abilityRequirementLines(a, this.sim.talents.spec, res);
     if (requirements.length) {
       html += requirements.map((line) => `<div class="tt-sub">${esc(line)}</div>`).join('');
     }
@@ -6765,16 +6765,20 @@ export class Hud {
     this.castSportMove(abilityId, abilityId === 'sport_shoot' ? SHOOT_TAP_CHARGE * range : range);
   }
 
-  // My first sport move (Shoot) while seated in a Vale Cup match, else null. Used
-  // so key 1 (the class Attack slot, inert under the harvest truce) casts a real
-  // move on the pitch instead of toggling a useless auto-attack.
-  private firstSportAbilityId(): string | null {
+  // My first sport move (Shoot) while seated in a Vale Cup match, else null. The
+  // fixed primary action seat uses this same resolved record for its cast, art,
+  // cooldown, range state, accessible name, and tooltip.
+  private firstSportAbility(): ResolvedAbility | null {
     // Seated in a match => my known list IS the sport kit (Shoot first). Keyed off
     // cupInfo.match, not the bar form, so it holds the instant the whistle swaps
     // the kit in (the bar-form flip can lag a frame behind).
     if (!this.sim.cupInfo?.match) return null;
     const first = this.sim.known[0];
-    return first && this.isSportAbilityId(first.def.id) ? first.def.id : null;
+    return first && this.isSportAbilityId(first.def.id) ? first : null;
+  }
+
+  private firstSportAbilityId(): string | null {
+    return this.firstSportAbility()?.def.id ?? null;
   }
 
   // The ability a bar slot would cast right now (slot 0 remaps to the first sport
@@ -6790,7 +6794,7 @@ export class Hud {
   }
 
   private shootRangeForSlot(slot: number): number {
-    if (slot === 0) return this.sim.known[0]?.def.range ?? MELEE_RANGE;
+    if (slot === 0) return this.firstSportAbility()?.def.range ?? MELEE_RANGE;
     return this.abilityForSlot(slot)?.def.range ?? MELEE_RANGE;
   }
 
@@ -6978,9 +6982,9 @@ export class Hud {
     // On the pitch, key 1 casts your first sport move (Kick) instead of the
     // harvest-truce-inert auto-attack, which would be a dead key with no useful
     // effect. Off the pitch it is the normal auto-attack toggle.
-    const sportFirst = this.firstSportAbilityId();
+    const sportFirst = this.firstSportAbility();
     if (sportFirst) {
-      this.castSportTap(sportFirst, this.sim.known[0]?.def.range ?? MELEE_RANGE);
+      this.castSportTap(sportFirst.def.id, sportFirst.def.range);
       this.flashActionSlot(0);
       return;
     }
@@ -7262,6 +7266,8 @@ export class Hud {
       });
       this.attachTooltip(btn, () => {
         if (slot === 0 && this.attackSlotIsAttack()) {
+          const sportFirst = this.firstSportAbility();
+          if (sportFirst) return this.abilityTooltip(sportFirst);
           return `<div class="tt-title">${esc(t('abilityUi.actionBar.attackName'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackTooltip'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackRemoveHint'))}</div>`;
         }
         const known = this.abilityForSlot(slot);
@@ -7489,12 +7495,16 @@ export class Hud {
             slotIndex: i,
             // Live accessor: slot 0 stops being the Attack toggle when the player
             // removes it (Interface option showAttackButton off / right-click).
-            isAttack: () => i === 0 && this.attackSlotIsAttack(),
+            isAttack: () =>
+              i === 0 && this.attackSlotIsAttack() && this.firstSportAbility() === null,
             // Raw binding presence (any assigned slot, even one whose ability is
             // unlearned or item id is unknown): the many-spells count source, kept
             // byte-identical to the former hotbarActions.filter(a => a !== null).
             hasAction: () => this.actionForSlot(i) !== null,
-            ability: () => this.abilityForSlot(i),
+            ability: () =>
+              i === 0 && this.attackSlotIsAttack()
+                ? this.firstSportAbility()
+                : this.abilityForSlot(i),
             item: () => this.itemForSlot(i),
             keybindLabel: () => keyCapLabel(this.keybinds.primaryLabel(slotKey)),
           };
@@ -7593,6 +7603,11 @@ export class Hud {
       this.hideTooltip();
       audio.click();
       const p = this.sim.player;
+      if (this.firstSportAbility()) {
+        this.activateFixedAttackSlot();
+        attackBtn.blur();
+        return;
+      }
       const target = p.targetId !== null ? this.sim.entities.get(p.targetId) : null;
       const hasLiveHostileTarget = !!target && !target.dead && target.hostile;
       handleMobileAttackTap(
@@ -7644,9 +7659,9 @@ export class Hud {
         slots: [
           {
             slotIndex: 0,
-            isAttack: () => true,
-            hasAction: () => false,
-            ability: () => null,
+            isAttack: () => this.firstSportAbility() === null,
+            hasAction: () => this.firstSportAbility() !== null,
+            ability: () => this.firstSportAbility(),
             item: () => null,
             keybindLabel: () => '',
           },
@@ -8867,7 +8882,7 @@ export class Hud {
       });
   }
 
-  update(): void {
+  update(paint = true): void {
     const sim = this.sim;
     const p = sim.player;
     const now = performance.now();
@@ -8894,12 +8909,43 @@ export class Hud {
     if (fastHud) this.chatAnnouncer.flush(now);
 
     this.questDialog.updateVoice();
+    // Self-contained timer controller: a roll must keep expiring on schedule
+    // whether or not this frame paints.
+    this.lootRolls.update(now);
+    // The zone/combat/boss music state machine, hoisted above the cut (phase 4
+    // QA F1): music keeps PLAYING on hidden frames, so its transitions (combat
+    // over, zone change, boss engage, Sowfield) must keep executing or a
+    // minimized player hears the stale track until restore. Same medium
+    // cadence the painted path always drove it at; the paint half reads the
+    // stored decision instead of driving the machine itself.
+    if (mediumHud) {
+      this.lastMusicDecision = this.instanceMusic.update({
+        now,
+        lastCombatEventAt: this.lastCombatEventAt,
+        lastBossCombatEventAt: this.lastNythraxisCombatEventAt,
+        playerId: sim.playerId,
+        playerPos: p.pos,
+        zone: zoneAt(p.pos.x, p.pos.z),
+        inDungeon: p.pos.x > DUNGEON_X_THRESHOLD,
+        entities: sim.entities.values(),
+        cupInfo: sim.cupInfo,
+        riftFloor: sim.riftFloor,
+      });
+    }
+
+    // The cut between the non-paint half of the frame and the paint half. A
+    // hidden desktop window calls update(false) and still runs everything
+    // above: the fast-tier reconcileSfx sweep (which unloops a stale
+    // cast:<id> loop the player would otherwise keep hearing after the caster
+    // leaves interest, and prunes the mob bark maps), the idle-bark sweep, the
+    // combat and chat live-region flushes, quest voice, the loot timers, and
+    // the music state machine. Nothing below this line does anything but paint.
+    if (!paint) return;
     this.meters.update();
     this.mountRaceStrip.repaintIfChanged();
     this.mountRaceControls.update();
     this.lockpickController.repaintIfChanged();
     this.tutorial.update(sim, this.renderer, this.keybinds);
-    this.lootRolls.update(now);
     if (slowHud) this.updateRaidLockoutBadge();
     if (slowHud) this.refreshDailyRewardsLauncher();
     this.maybeRestoreActionBarLayout();
@@ -9569,20 +9615,11 @@ export class Hud {
         }
       }
 
-      const musicState = this.instanceMusic.update({
-        now,
-        lastCombatEventAt: this.lastCombatEventAt,
-        lastBossCombatEventAt: this.lastNythraxisCombatEventAt,
-        playerId: sim.playerId,
-        playerPos: p.pos,
-        zone: currentZone,
-        inDungeon,
-        entities: sim.entities.values(),
-        cupInfo: sim.cupInfo,
-        riftFloor: sim.riftFloor,
-      });
-      const inCombat = musicState.inCombat;
-      const { atSowfield } = musicState;
+      // The music machine ran in the non-paint head this same frame (same
+      // mediumHud divider); this half only reads its decision.
+      const musicState = this.lastMusicDecision;
+      const inCombat = musicState?.inCombat === true;
+      const atSowfield = musicState?.atSowfield === true;
 
       // classic combat indicator: crossed swords + red ring on the player portrait.
       // Routed through the cached ref + the elided toggleClass writer: a counted,
@@ -10633,6 +10670,29 @@ export class Hud {
       );
       return;
     }
+    // Inside The Last Keep: the baked floor plan for the player's current
+    // story, with the '#zone-label' story title (the delve branch pattern).
+    if (lastKeepMapActive(this.sim)) {
+      this.lastKeepMapPainter.paintMinimap(
+        ctx,
+        this.sim,
+        $('#zone-label'),
+        MINIMAP_SIZE,
+        this.minimapZoom,
+      );
+      return;
+    }
+    // Inside Dawnhold Castle: the same castle-plan surface, dawnhold spec.
+    if (dawnholdMapActive(this.sim)) {
+      this.dawnholdMapPainter.paintMinimap(
+        ctx,
+        this.sim,
+        $('#zone-label'),
+        MINIMAP_SIZE,
+        this.minimapZoom,
+      );
+      return;
+    }
     // The overworld minimap: a pure marker core (minimap_markers) + the thin canvas
     // painter. It owns the cached terrain blit + the marker draws and writes
     // '#zone-label' through the write-elision facet. It blits the current zone's
@@ -10942,6 +11002,26 @@ export class Hud {
       return;
     }
     this.continentRegions = [];
+
+    // Inside The Last Keep: the whole-plan floor plate for the player's
+    // current story (title drawn on-canvas, the delve branch pattern); the
+    // continent overview above still wins when the player toggles up to it.
+    if (lastKeepMapActive(this.sim)) {
+      this.clearMapHitState(canvas);
+      const title = this.lastKeepMapPainter.paintWorldMap(ctx, this.sim, S);
+      this.setText(summaryEl, t('hud.core.mapSummary', { zone: title }));
+      this.setText(markerSummaryEl, this.mapMarkerInteraction.semantics.updateSimple(title, S));
+      return;
+    }
+
+    // Inside Dawnhold Castle: the same castle-plan surface, dawnhold spec.
+    if (dawnholdMapActive(this.sim)) {
+      this.clearMapHitState(canvas);
+      const title = this.dawnholdMapPainter.paintWorldMap(ctx, this.sim, S);
+      this.setText(summaryEl, t('hud.core.mapSummary', { zone: title }));
+      this.setText(markerSummaryEl, this.mapMarkerInteraction.semantics.updateSimple(title, S));
+      return;
+    }
 
     // inside an instance, show the zone the dungeon's door is in (dungeonAt owns
     // the instance x-band layout); outdoors, follow the committed zone so
@@ -16658,7 +16738,6 @@ export class Hud {
       allClasses: ALL_CLASSES,
       skinCount,
       cardPoses: CARD_POSES,
-      armorySkinIds: this.dailyRewardsWindow.armoryPrewarmSkinIds(),
       includeCharFamily,
       renderCharShell: () => {
         if (!this.charPreview) this.charWindow.render();
@@ -16670,11 +16749,6 @@ export class Hud {
       // paced unit never books the 43 to 201 ms cold-capture block.
       renderPortrait: (portraitClass, skin, framing) =>
         prewarmPlayerPortrait(portraitClass as PlayerClass, skin, framing),
-      prewarmArmorySkin: (skinId, armoryMode) =>
-        this.dailyRewardsWindow.prewarmArmoryPreviewSkins([skinId], [armoryMode], {
-          keepWarmupBuffer: true,
-        }),
-      finishArmoryPrewarm: () => this.dailyRewardsWindow.finishArmoryPreviewPrewarm(),
     });
   }
 
@@ -16721,8 +16795,7 @@ export class Hud {
     this.previewPrewarmHandle?.cancel();
     const handle = runPreviewPrewarmSchedule(this.postEntryPreviewPrewarmUnits(includeCharFamily), {
       enqueue: (label, run) => this.renderer.queueSecondaryPreviewPrewarm(label, run),
-      isFamilyBusy: (family) =>
-        family === 'char' ? this.isCharPreviewSurfaceVisible() : this.dailyRewardsWindow.isOpen,
+      isFamilyBusy: () => this.isCharPreviewSurfaceVisible(),
       // Pause while the FPS governor reports a struggling frame; the core's
       // poll cap keeps ambient pressure from starving the warmup forever.
       hasHeadroom: () => this.renderer.perfStats().renderBudget.mode !== 'degrading',
@@ -16760,10 +16833,11 @@ export class Hud {
     if (this.restoreCharPreviewAfterGraphicsRebuild) this.charWindow.renderIfOpen();
     this.restoreCharPreviewAfterGraphicsRebuild = false;
     this.dailyRewardsWindow.restoreArmoryPreviewAfterGraphicsRebuild();
-    // Fresh contexts start cold; re-run the paced schedule so armory and
-    // portrait first-open stay covered after a rebuild exactly like they are
-    // after boot. The char family (the shell plus its dependent skin/pose
-    // units) is excluded here: unlike boot, this restart runs with no curtain
+    // Fresh contexts start cold; re-run the paced schedule so the portrait
+    // caches stay covered after a rebuild exactly like they are after boot.
+    // (The armory is not in that schedule: it warms per inspected card.)
+    // The char family (the shell plus its dependent skin/pose units) is
+    // excluded here: unlike boot, this restart runs with no curtain
     // up (resetGraphicsPreviewContexts already dropped it before this point),
     // so building the ~700 ms paperdoll shell + its secondary WebGL context as
     // a schedule unit would hitch a live frame, the exact stall class the
@@ -18299,7 +18373,7 @@ export class Hud {
         current === i
           ? t('hud.markers.markerSelectedAria', { marker: markerName })
           : t('hud.markers.markerAria', { marker: markerName });
-      const check = current === i ? ' ✓' : '';
+      const check = current === i ? `<span class="ctx-selected">${svgIcon('check')}</span>` : '';
       html += `<div class="ctx-item" role="button" tabindex="0" data-act="m${i}" aria-label="${esc(aria)}"><span class="ctx-mark" style="background-image:url(${raidMarkerDataUrl(i)})"></span>${esc(markerName)}${check}</div>`;
     }
     html += `<div class="ctx-item" role="button" tabindex="0" data-act="clear">${esc(t('hud.markers.clear'))}</div>`;
@@ -19080,60 +19154,6 @@ function describeAbilitySummary(
   return parts.join(' · ');
 }
 
-// Fills every description placeholder from the RESOLVED ability: {damage} ($d)
-// the primary hit, {overTime} ($o) a hybrid's dot/hot total, {buff} ($b) the
-// first buff's value, {duration} ($t) the first timed effect's duration. All are
-// rank- and talent-resolved, so the prose can never drift from what a cast does.
-function abilityDisplayDescription(
-  res: ResolvedAbility,
-  damageText: string,
-  scaling?: AbilityScaling,
-  spec?: string | null,
-): string {
-  const buff = abilityBuffValue(res);
-  const duration = abilityDurationValue(res);
-  const hourglass = abilityTemporalHourglassValues(res);
-  // {rage} splices the RESOLVED gainResource total, so a talent that raises the
-  // granted amount (Blood Offering on Blood Toll) shows in the tooltip.
-  const rageGained = res.effects.reduce(
-    (sum, eff) => sum + (eff.type === 'gainResource' ? eff.amount : 0),
-    0,
-  );
-  const rageText = rageGained > 0 ? formatAbilityNumber(rageGained) : '';
-  const text = tEntity({
-    kind: 'ability',
-    id: res.def.id,
-    field: 'description',
-    values: {
-      damage: damageText,
-      overTime: abilityOverTimeText(res, scaling),
-      buff: buff === null ? '' : formatAbilityNumber(buff),
-      duration: duration === null ? '' : formatAbilityNumber(duration),
-      healing: hourglass === null ? '' : formatAbilityNumber(hourglass.healing),
-      selfCooldownRecovery:
-        hourglass === null ? '' : formatAbilityNumber(hourglass.selfCooldownRecovery),
-      allyCooldownRecovery:
-        hourglass === null ? '' : formatAbilityNumber(hourglass.allyCooldownRecovery),
-      hostilePveDuration:
-        hourglass === null ? '' : formatAbilityNumber(hourglass.hostilePveDuration),
-      hostilePvpDuration:
-        hourglass === null ? '' : formatAbilityNumber(hourglass.hostilePvpDuration),
-      groundDuration: hourglass === null ? '' : formatAbilityNumber(hourglass.groundDuration),
-      rage: rageText,
-    },
-  });
-  // Spec-aware teaching line: a shared button explains its interaction ONLY
-  // for the player's current spec, so a new player never reads another
-  // spec's rules on their own tooltip.
-  const note = spec ? res.def.specNotes?.[spec] : undefined;
-  if (!note) return text;
-  return `${text} ${tEntity({
-    kind: 'ability',
-    id: res.def.id,
-    field: `specNote_${spec}` as AbilitySpecNoteField,
-  })}`;
-}
-
 function itemDisplayNameFromSource(name: string): string {
   const item = Object.values(ITEMS).find((candidate) => candidate.name === name);
   return item ? itemDisplayName(item) : name;
@@ -19250,10 +19270,6 @@ function parseSimMoney(text: string): number | null {
   return matched ? copper : null;
 }
 
-function formatAbilityNumber(value: number): string {
-  return formatNumber(value, { maximumFractionDigits: 1 });
-}
-
 function abilityRangeLine(def: AbilityDef): string | null {
   if (def.range <= 0) return null;
   if (def.minRange !== undefined) {
@@ -19300,8 +19316,12 @@ function abilityCastLine(known: ResolvedAbility, spellHaste = 0): string {
 
 // Thin i18n mapper over the pure resolver (ability_requirement_keys.ts), which
 // owns the truth table incl. the Skulduggery-only stealth-bypass line.
-export function abilityRequirementLines(def: AbilityDef, spec?: string | null): string[] {
-  return abilityRequirementKeys(def, spec).map((req) => {
+export function abilityRequirementLines(
+  def: AbilityDef,
+  spec?: string | null,
+  resolved?: AbilityRequirementResolve,
+): string[] {
+  return abilityRequirementKeys(def, spec, resolved).map((req) => {
     switch (req.key) {
       case 'requiresForm':
         if (req.form) {
@@ -19439,26 +19459,6 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
     default:
       return '';
   }
-}
-
-// Builds the `$o` over-time string (a hybrid's dot/hot TOTAL) the same way
-// abilityEffectText builds `$d`, including the "(+N)" scaling callout (which the
-// bonus helper zeroes for hybrid riders, matching combat's no-double-dip rule).
-function abilityOverTimeText(res: ResolvedAbility, scaling?: AbilityScaling): string {
-  const eff = abilityOverTimeEffect(res);
-  if (!eff) return '';
-  const b = scaling ? abilityDamageBonus(res, eff, scaling) : 0;
-  const bonus =
-    b > 0 ? ` ${t('hudChrome.abilityScaling.bonus', { value: formatAbilityNumber(b) })}` : '';
-  if (eff.type === 'dot' && eff.perCombo !== undefined) {
-    return (
-      t('abilityUi.tooltip.finisherDamage', {
-        base: formatAbilityNumber(eff.total),
-        perCombo: formatAbilityNumber(eff.perCombo),
-      }) + bonus
-    );
-  }
-  return formatAbilityNumber(eff.total) + bonus;
 }
 
 function abilityAmountRange(min: number, max: number): string {

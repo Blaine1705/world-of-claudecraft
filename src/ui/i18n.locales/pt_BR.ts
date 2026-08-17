@@ -5725,7 +5725,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.consecration.description':
     'Consagra o chão por 9 s e causa {damage} de dano Sagrado a cada segundo. Guardiões da Fé sofrem 10% menos dano enquanto estiverem dentro.',
   'entities.abilities.righteous_fury.name': 'Juramento Ardente',
-  'entities.abilities.righteous_fury.description': 'Aumenta passivamente em 60% a ameaça gerada por vosso dano Sagrado. Apenas Guardião da fé.',
+  'entities.abilities.righteous_fury.description': 'Aumenta passivamente em 30% a ameaça gerada por vosso dano Sagrado. Apenas Guardião da fé.',
   'entities.abilities.retribution_aura.name': 'Aura de Represália',
   'entities.abilities.retribution_aura.description':
     'Envolve você e seu grupo em energia sagrada até a morte ou substituição. Inimigos que atingirem um aliado afetado corpo a corpo sofrem {buff} de dano Sagrado, e aliados afetados causam {buff} de dano Sagrado adicional com ataques automáticos.',
@@ -5780,7 +5780,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lightning_bolt.name': 'Raio em Arco',
   'entities.abilities.lightning_bolt.description': 'Causa {damage} de dano de Natureza. O dano aumenta com o Poder Mágico. Elemental: um acerto concede 1 de Trovão.',
   'entities.abilities.rockbiter_weapon.name': 'Arma Pétrea',
-  'entities.abilities.rockbiter_weapon.description': 'Impregna vossa arma por 30 min. Cada golpe causa {damage} de dano adicional. Aprimoramento ganha ainda 30% de armadura, sofre 10% menos dano e gera o dobro de ameaça. Abalo Terreno força seu alvo a vos atacar por 3 s, e Salvaguarda do Trovão concede 10% de redução de dano por 3 s.',
+  'entities.abilities.rockbiter_weapon.description': 'Impregna vossa arma por 30 min. Cada golpe causa {damage} de dano adicional. Aprimoramento ganha ainda 40% de armadura e 20% de Vigor, sofre 15% menos dano e é imune a acertos críticos de criaturas e gera 2,75 vezes mais ameaça. Abalo Terreno força seu alvo a vos atacar por 3 s, e Salvaguarda do Trovão concede 10% de redução de dano por 3 s.',
   'entities.abilities.healing_wave.name': 'Águas Restauradoras',
   'entities.abilities.healing_wave.description': 'Cura um alvo aliado em {damage}. A cura aumenta com o Poder Mágico. Restauração: guarda 50% da cura cheia antes do excesso como Corrente Curativa por 12 s, até 30% da vida máxima do alvo.',
   'entities.abilities.earth_shock.name': 'Abalo Terreno',
@@ -5842,7 +5842,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.description': 'Enraíza o alvo no lugar por até 12 s.',
   'entities.abilities.bear_form.name': 'Forma de Bruin',
   'entities.abilities.bear_form.description':
-    'Assume a forma de urso: armadura +130%, poder de ataque muito aumentado, seus ataques geram raiva e 30% mais ameaça. Lance de novo para voltar à forma de conjurador.',
+    'Assume a forma de urso: armadura +110%, vida máxima +30%, poder de ataque muito aumentado, seus ataques geram raiva e 30% mais ameaça. Lance de novo para voltar à forma de conjurador.',
   'entities.abilities.maul.name': 'Esmaga-Ossos',
   'entities.abilities.growl.name': 'Ameaçar',
   'entities.abilities.growl.description':
@@ -5880,7 +5880,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'O inimigo é atacado por um enxame de insetos, sofrendo {damage} de dano de Natureza ao longo de 12 s.',
   'entities.abilities.tigers_fury.name': 'Sangue de Lobo',
   'entities.abilities.tigers_fury.description':
-    'Aumenta o poder de ataque em {buff} por {duration} s. Apenas Forma de Lobo.',
+    'Gera {rage} de energia e aumenta o poder de ataque em {buff} por {duration} s. Apenas Forma de Lobo.',
   'entities.abilities.rip.name': 'Fenda Sangrenta',
   'entities.abilities.mortal_strike.name': 'Golpe Mutilador',
   'entities.abilities.mortal_strike.description':
@@ -5924,7 +5924,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Desmoraliza os inimigos próximos, reduzindo seu poder de ataque em 20 por 20 s. Apenas Forma de Bruin.',
   'entities.abilities.prowl.name': 'Espreitar',
   'entities.abilities.prowl.description':
-    'Entra em furtividade enquanto na Forma de Lobo, movendo-se 50% mais devagar. Não pode ser usado em combate.',
+    'Entra em furtividade enquanto na Forma de Lobo, movendo-se 5% mais devagar. Não pode ser usado em combate.',
   'entities.abilities.rake.name': 'Esfolar',
   'entities.abilities.revive_pet.name': 'Remendar',
   'entities.abilities.revive_pet.description':
@@ -10502,6 +10502,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleLoginCta': 'Continuar com a Apple',
   'hudChrome.dailyRewards.reason.banned':
     'Você está banido das Recompensas Diárias. Motivo: {reason}',
+  'hudChrome.itemHeroicLabel': 'Heroico',
   'hudChrome.itemHeroicTag': '[HEROICO]',
   'hudChrome.itemSoulbound': 'Vinculado à alma',
   'hudChrome.keybinds.categoryPet': 'Mascote',
@@ -10900,6 +10901,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} de Honra',
   'hudChrome.warfare.honorGain': 'Você recebe {amount} de Honra ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Honra insuficiente.',
+  'hudChrome.warfare.reasons.arenaComplete': 'combate na arena disputado',
   'hudChrome.warfare.reasons.arenaWin': 'Vitória na arena',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta concluída',
   'hudChrome.warfare.reasons.fiestaKill': 'Eliminação na Fiesta',
@@ -11146,7 +11148,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description': 'Enraíza os inimigos a até 4 m do ponto alvo por 2 s, e depois os lentifica em 40% por 6 s. (Talento de xamã)',
   'entities.abilities.evocation.description': 'Restaura mana rápidamente. (talento de mago)',
   'entities.abilities.frenzied_regeneration.description':
-    'Restaura 180 de vida ao longo de 10 s. Somente em Forma de Urso. (talento de Druida)',
+    'Restaura 40% da sua vida máxima ao longo de 10 s. Somente em Forma de Urso. (talento de Druida)',
   'entities.abilities.frost_trap.description':
     'Congela os inimigos na área-alvo por 3 s, impedindo que se movam ou ajam. (talento de Caçador)',
   'entities.abilities.hammer_of_wrath.description': 'Arremessa um martelo sagrado causando {damage} de dano e gera 1 de Devoção. Utilizável abaixo de 20% de vida, ou durante Ascensão Divina ou Ira Vingadora. Ira da Alvorada concede uma conjuração adicional contra qualquer alvo que ignora seu tempo de recarga em curso e causa 20% mais dano. Ascensão aumenta seu dano em 30%.',
@@ -12611,7 +12613,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Consome 5 de Verdor. Colhe cada cura ao longo do tempo sua em todos os aliados por 60% da cura restante, remove esses efeitos e planta um Florescer Selvagem novo no alvo.',
   'entities.abilities.redharvest.name': 'Colheita Vermelha',
   'entities.abilities.redharvest.description':
-    'Consome seus 3 de Sangue Antigo: golpeia por {damage}, causa instantaneamente todo o dano que seus Esfolar e Rasgar ainda causariam, remove os dois sangramentos e restaura 30 de energia. Funciona sem pontos de combo.',
+    'Consome seus 3 de Sangue Antigo: golpeia por {damage}, causa instantaneamente todo o dano que seus Esfolar e Rasgar ainda causariam, remove os dois sangramentos e restaura {rage} de energia. Funciona sem pontos de combo.',
   'entities.abilities.sunlance.name': 'Esteira Solar',
   'entities.abilities.sunlance.description':
     'Consome seus 3 de Maré Lunar para um golpe de {damage} de dano de Natureza mais uma queimadura de {overTime} ao longo de 9 s, e restaura 35 de mana: a escolha de mana. Onda Lunar consome os mesmos 3 de Maré Lunar, então escolha um.',
@@ -12830,7 +12832,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Movimento finalizador que causa {damage}. Apenas Forma de Lobo.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Cada acerto adiciona 1 de Sangue Antigo; em 3 de Sangue Antigo, este botão se torna Colheita Vermelha: uma mordida por 70 mais 43 por ponto de combo que também causa instantaneamente todo o dano que seus Esfolar e Rasgar ainda causariam, e restaura 30 de energia.',
+    'Cada acerto adiciona 1 de Sangue Antigo; em 3 de Sangue Antigo, este botão se torna Colheita Vermelha, que consome o Sangue Antigo em uma mordida mais forte que também causa instantaneamente todo o dano que seus Esfolar e Rasgar ainda causariam, e restaura energia.',
   'entities.abilities.funeral_harvest.description':
     'Quando um inimigo recentemente ferido por você ou por seus mortos-vivos morre, você ganha 1 Fragmento de Alma. Isso pode ocorrer uma vez a cada 3 s.',
   'entities.abilities.funeral_harvest.name': 'Funeral Harvest',
@@ -13343,4 +13345,21 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'auth.designCodeErrVersion': 'Esse código de aparência veio de uma versão mais recente do jogo.',
   'auth.designCodeErrMalformed': 'Esse código de aparência está corrompido. Copie o código inteiro e tente novamente.',
   'hudChrome.nameplate.cheaterTag': '< Trapaceiro >',
+  'hud.options.displayMode': 'Modo de exibição',
+  'hud.options.displayModeBorderless': 'Tela cheia sem bordas',
+  'hud.options.displayModeWindowed': 'Janela',
+  'hudChrome.options.discordPresence': 'Rich Presence do Discord',
+  'hudChrome.options.discordPresenceNote': 'Mostra a zona em que você está e há quanto tempo está jogando nesta sessão como sua atividade do Discord, e qualquer pessoa que possa ver seu perfil do Discord pode ver ambos. Só o nome da zona, seu tempo de sessão e o jogo são compartilhados, nunca seu personagem, sua conta, ou com quem você está jogando. Requer o aplicativo do Discord em execução neste computador.',
+  'hudChrome.options.forceHighPerfGpu': 'Usar a GPU dedicada para jogos',
+  'hudChrome.options.forceHighPerfGpuNote': 'Ativado por padrão: o aplicativo para computador pede a este computador sua GPU dedicada para jogos. Desative se o jogo não iniciar, abrir em uma tela preta, ou se a tela do laptop ficar em branco. Tem efeito na próxima vez que o jogo iniciar.',
+  'desktop.notify.partyInviteBody': '{name} convidou você para um grupo.',
+  'desktop.notify.partyInviteTitle': 'Convite de grupo',
+  'desktop.notify.updateReadyBody': 'Reinicie o World of ClaudeCraft para aplicar a atualização.',
+  'desktop.notify.updateReadyTitle': 'A atualização {version} está pronta',
+  'desktop.notify.updateReadyTitleNoVersion': 'A atualização está pronta',
+  'desktop.update.whatsNew': 'Ver o que mudou no navegador',
+  'entities.abilities.challenging_roar.description': 'Um rugido funesto: todos os inimigos em um raio de 10 m são provocados, sua ameaça subindo para igualar a do inimigo mais odiado por eles, e são forçados a atacar você por 3 s. Apenas Forma de Bruin.',
+  'entities.abilities.challenging_roar.name': 'Rugido Funesto',
+  'entities.abilities.cheap_shot.descriptionNoStealth': 'Golpeia o alvo causando {damage} de dano, atordoando-o por 4 s. Concede 2 pontos de combo.',
+  'gpuNotice.bodyDiscreteInactive': 'O jogo não está usando a GPU dedicada (para jogos) e está sendo executado na GPU de economia de energia, o que prejudicará o desempenho. Atualize os drivers de placa de vídeo e reinicie o jogo. No Windows, defina o jogo como Alto desempenho em Configurações > Sistema > Vídeo > Gráficos.',
 };
