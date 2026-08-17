@@ -62,6 +62,17 @@ function spawnWolf(sim: AnySim, near: AnyEntity, level = 2): AnyEntity {
   return wolf;
 }
 
+function spawnBroodmotherEgg(sim: AnySim, near: AnyEntity): AnyEntity {
+  const egg = createMob(sim.nextId++, MOBS.spider_egg, 12, {
+    x: near.pos.x + 3,
+    y: near.pos.y,
+    z: near.pos.z,
+  }) as AnyEntity;
+  egg.hostile = true;
+  sim.addEntity(egg);
+  return egg;
+}
+
 describe('pet_commands module (P1b)', () => {
   it('commands Gloomshade signature skill and exposes its independent autocast toggle', () => {
     const sim = new Sim({
@@ -121,6 +132,33 @@ describe('pet_commands module (P1b)', () => {
     petTaunt(sim.ctx, pid);
     expect(pet.petTauntTimer).toBe(0);
     expect(target.forcedTargetId).not.toBe(pet.id);
+  });
+
+  it('does not seed pet attack threat against a quest-gated mob for a non-quester', () => {
+    const { sim, hid, hunter } = hunterWorld(1311);
+    summonPet(sim.ctx, hunter, 'forest_wolf');
+    const pet = petOf(sim.ctx, hid) as AnyEntity;
+    const egg = spawnBroodmotherEgg(sim, pet);
+    hunter.targetId = egg.id;
+
+    petAttack(sim.ctx, hid);
+
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.inCombat).toBe(false);
+    expect(egg.inCombat).toBe(false);
+    expect(egg.aiState).toBe('idle');
+    expect(egg.threat.has(pet.id)).toBe(false);
+
+    sim.players.get(hid)?.questLog.set('q_broodmother', {
+      questId: 'q_broodmother',
+      counts: [0, 0],
+      state: 'active',
+    });
+    petAttack(sim.ctx, hid);
+
+    expect(pet.aggroTargetId).toBe(egg.id);
+    expect(pet.inCombat).toBe(true);
+    expect(egg.threat.has(pet.id)).toBe(true);
   });
 
   it('preserves an explicit autocast preference and defaults legacy pet state safely', () => {

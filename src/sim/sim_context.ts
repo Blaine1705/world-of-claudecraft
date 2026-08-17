@@ -638,7 +638,7 @@ export interface SimContextCallbacks {
   // except dealDamage/handleDeath/grantXp, which delegate to the module). enterCombat
   // is a shared combat-entry helper that STAYS on Sim, exposed here for the hub.
   grantXp(amount: number, meta: PlayerMeta, opts?: { fromKill?: boolean }): void;
-  enterCombat(a: Entity, b: Entity): void;
+  enterCombat(a: Entity, b: Entity): boolean;
   hexOutputMult(source: Entity | null): number;
   critVulnBonus(target: Entity): number;
   pvpController(e: Entity | null): Entity | null;
