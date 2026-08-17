@@ -4384,6 +4384,36 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     expect((await h.db.directedOfferById(REALM, made.offer.id))?.status).toBe('pending');
   });
 
+  it('a reopen resets both accepts, so a spent proof cannot re-drive the seller custody move', async () => {
+    // Security: after a reopen the seller's step-up challenge is consumed. If
+    // the accept flags survived, a lone buyer re-press would re-consummate on
+    // the spent authorization. The reset forces a FRESH seller acceptance.
+    const h = stocked();
+    const made = await h.service.createDirectedOffer(offerArgs());
+    if (!made.ok) throw new Error('offer refused');
+    await h.service.acceptDirectedOffer(BUYER_A, made.offer.id, null, CHAR_A);
+    h.db.failNextEscrow = 'not_pending';
+    // The seller accepts with a proof; the escrow refuses and reopens.
+    await acceptSteppedUp(h, SELLER, made.offer.id, { index: 0, itemId: EPIC_ITEM }, SELLER_CHAR);
+    const reopened = await h.db.directedOfferById(REALM, made.offer.id);
+    expect(reopened?.status).toBe('pending');
+    expect(reopened?.buyerAccepted, 'the buyer accept reset').toBe(false);
+    expect(reopened?.sellerAccepted, 'the seller accept reset').toBe(false);
+    // A buyer-only re-press now agrees but does NOT consummate (still waiting
+    // on the seller), so no custody moves on the spent proof.
+    const buyerAgain = await h.service.acceptDirectedOffer(BUYER_A, made.offer.id, null, CHAR_A);
+    expect(buyerAgain).toEqual({ ok: true, listing: null });
+    // The seller's fresh acceptance (a new proof) is what consummates it.
+    const sellerAgain = await acceptSteppedUp(
+      h,
+      SELLER,
+      made.offer.id,
+      { index: 0, itemId: EPIC_ITEM },
+      SELLER_CHAR,
+    );
+    expect(sellerAgain.ok, 'a fresh proof consummates the retry').toBe(true);
+  });
+
   it('a THROWING reopen never replaces the typed refusal, and reports offer_reopen', async () => {
     // The swallow's own contract: a reopen transport failure (pool timeout,
     // reset) is reported through the sweep-error channel rather than
@@ -4961,15 +4991,19 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     expect(stats?.convergedOffers).toBe(1);
     expect((await h.db.directedOfferById(REALM, stuck.offer.id))?.status).toBe('pending');
     expect((await h.db.directedOfferById(REALM, done.offer.id))?.status).toBe('accepted');
-    // Wedge the SAME deal again (both accept flags survived the reopen, so
-    // one buyer accept re-completes it), and this time let its TTL lapse:
-    // the converge arm expires a dead deal instead of reopening it.
+    // Wedge the SAME deal again, and this time let its TTL lapse: the converge
+    // arm expires a dead deal instead of reopening it. Both accept flags were
+    // RESET by the reopen (the money-safe restart), so re-wedging needs BOTH
+    // sides to re-accept, the seller with a fresh proof.
     const lapsed = await h.db.directedOfferById(REALM, stuck.offer.id);
     if (!lapsed) throw new Error('offer vanished');
+    expect(lapsed.buyerAccepted).toBe(false);
+    expect(lapsed.sellerAccepted).toBe(false);
     h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
+    await h.service.acceptDirectedOffer(BUYER_A, stuck.offer.id, null, CHAR_A);
     h.db.failNextEscrowThrow = new Error('socket died again');
     await expect(
-      h.service.acceptDirectedOffer(BUYER_A, stuck.offer.id, null, CHAR_A),
+      acceptSteppedUp(h, SELLER, stuck.offer.id, { index: 0, itemId: EPIC_ITEM }, SELLER_CHAR),
     ).rejects.toThrow();
     h.setNow(lapsed.expiresAtMs + (WOC_MARKET_OFFER_CONVERGE_SECONDS + 1) * 1000);
     stats = await h.service.sweepPass();

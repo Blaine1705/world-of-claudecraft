@@ -1729,9 +1729,16 @@ export class PgWocMarketDb implements WocMarketDb {
     // statement's subquery snapshot and its index write still raises 23505,
     // which means exactly "the pair is occupied", the same no-op.
     try {
+      // Reset BOTH side-accept flags (and the seller's named item) on reopen:
+      // the escrow provably did not happen, so the deal restarts from pending
+      // and each side must re-accept. Critically the SELLER must re-accept,
+      // which re-runs guardStepUp with a FRESH proof (B6/R1): the spent
+      // challenge cannot re-drive custody, and a wallet relinked between the
+      // two attempts is re-checked against the new authorization.
       const res = await this.pool.query(
         `UPDATE woc_market_directed_offers o
-            SET status = 'pending', updated_at = now()
+            SET status = 'pending', updated_at = now(),
+                buyer_accepted = false, seller_accepted = false, item_ref = NULL
           WHERE o.realm = $1 AND o.id = $2 AND o.status = 'accepted' AND o.listing_id IS NULL
             AND NOT EXISTS (
               SELECT 1 FROM woc_market_directed_offers p
