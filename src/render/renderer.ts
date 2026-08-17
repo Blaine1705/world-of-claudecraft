@@ -7083,7 +7083,12 @@ export class Renderer {
           for (const key of mountPrewarmKeys()) {
             const remainingMs = mountDeadline - performance.now();
             if (remainingMs <= 0) break;
-            const staged = await stageMountPrewarmVisual(this.scene, mountPrewarmGroup, key, remainingMs);
+            const staged = await stageMountPrewarmVisual(
+              this.scene,
+              mountPrewarmGroup,
+              key,
+              remainingMs,
+            );
             if (!staged) continue;
             mountPrewarmGroup = staged.group;
             mountPrewarmWarmedKeys.add(key);
