@@ -2983,9 +2983,7 @@ export function inHollowOpenSea(x: number, z: number): boolean {
     // walk, never open sea.
     if (Math.abs(x) > 620 || z < -215) return false; // the far void keeps legacy rules
     if (onCauseway(x, z)) return false;
-    return (
-      valeLandness(x, z) < 0.02 && isleLandness(x, z) < 0.02 && provingLandness(x, z) < 0.02
-    );
+    return valeLandness(x, z) < 0.02 && isleLandness(x, z) < 0.02 && provingLandness(x, z) < 0.02;
   }
   if (z <= 960) {
     // the columns' southern outer coasts: open ocean to the world edge

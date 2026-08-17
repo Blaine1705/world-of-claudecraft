@@ -30,7 +30,9 @@ describe('ferry prewarm target', () => {
     // is not streaming a ferry destination at all times.
     const near = ferryPrewarmTargetFor(islandBell.x, islandBell.z + FERRY_PREWARM_RADIUS_YD - 1);
     expect(near?.id).toBe('eastbrook_town');
-    expect(ferryPrewarmTargetFor(islandBell.x, islandBell.z + FERRY_PREWARM_RADIUS_YD + 5)).toBeNull();
+    expect(
+      ferryPrewarmTargetFor(islandBell.x, islandBell.z + FERRY_PREWARM_RADIUS_YD + 5),
+    ).toBeNull();
   });
 
   it('is null out in the world, away from either bell', () => {

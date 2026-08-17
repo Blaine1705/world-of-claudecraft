@@ -104,8 +104,6 @@ import {
   stepLandingDetector,
 } from './camera_feel_core';
 import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
-import { buildDecorTorchFx, type DecorTorchFxView } from './decor_torch_fx';
-import { beaconNpcIds } from './quest_beacon_core';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
 import { buildCastleFeatures, type CastleFeaturesView } from './castle_features';
 import { buildCelestialSprites, type CelestialSprites } from './celestial_sprites';
@@ -221,6 +219,7 @@ import {
   usesLiveDayNightLighting,
   warmDuskGrade,
 } from './day_night_core';
+import { buildDecorTorchFx, type DecorTorchFxView } from './decor_torch_fx';
 import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
@@ -492,6 +491,7 @@ import {
 import { createPrewarmResumeLedger } from './prewarm_resume_ledger_core';
 import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_markers_visual';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
+import { beaconNpcIds } from './quest_beacon_core';
 import { makeQuestObjectGate, type QuestObjectGateOptions } from './quest_object_gate_core';
 import { buildGroundQuestObject } from './quest_objects';
 import { RaceLine } from './race_line';

@@ -10,6 +10,13 @@ import {
   syncAppViewport as syncAppViewportShared,
   syncSettledAppViewport,
 } from './game/app_viewport';
+import {
+  arrivalCinematicActive,
+  cancelArrivalCinematic,
+  createArrivalCinematic,
+  startArrivalCinematic,
+  stepArrivalCinematic,
+} from './game/arrival_cinematic';
 import { audio } from './game/audio';
 import { AutoLoot } from './game/autoloot';
 import {
@@ -69,6 +76,7 @@ import {
   stopActiveEntryDiagnostics,
   suspendActiveEntryDiagnostics,
 } from './game/entry_diagnostics';
+import { ferryPrewarmTargetFor } from './game/ferry_prewarm';
 import { GamepadManager } from './game/gamepad';
 import { createGamepadActivityNotifier } from './game/gamepad_activity_notify';
 import { GamepadBindings } from './game/gamepad_bindings';
@@ -160,6 +168,7 @@ import {
 } from './game/spawn_cinematic';
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
+import { teleportCameraYaw } from './game/teleport_camera';
 import {
   loadingCurtainFadeMs,
   resolveUiEffectsProfile,
@@ -168,15 +177,6 @@ import {
 import { currentResetDay, currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
 import { telemetryZoneId } from './game/world_telemetry';
-import {
-  arrivalCinematicActive,
-  cancelArrivalCinematic,
-  createArrivalCinematic,
-  startArrivalCinematic,
-  stepArrivalCinematic,
-} from './game/arrival_cinematic';
-import { ferryPrewarmTargetFor } from './game/ferry_prewarm';
-import { teleportCameraYaw } from './game/teleport_camera';
 import { zoneWarmupMode } from './game/zone_transition';
 import { createZoneWarmTracker } from './game/zone_warm_tracker';
 import {

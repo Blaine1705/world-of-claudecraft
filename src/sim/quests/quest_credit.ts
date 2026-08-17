@@ -16,7 +16,6 @@ import { QUESTS } from '../data';
 import { countAcrossGrades, materialGradeIds } from '../professions/material_grades';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { ownedItemCount } from './quest_owned_count';
 import {
   type Entity,
   type GatherNodeDef,
@@ -24,6 +23,7 @@ import {
   type QuestProgress,
   questObjectiveRequired,
 } from '../types';
+import { ownedItemCount } from './quest_owned_count';
 
 function emitQuestProgress(
   ctx: SimContext,

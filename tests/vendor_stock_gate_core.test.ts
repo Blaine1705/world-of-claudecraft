@@ -19,11 +19,7 @@ describe('vendor stock gate core', () => {
   });
 
   it('shows the gated row while the quest is active, and once done', () => {
-    const active = visibleVendorStock(
-      FINCH,
-      new Map([['q_ps_pouch_and_purse', {}]]),
-      new Set(),
-    );
+    const active = visibleVendorStock(FINCH, new Map([['q_ps_pouch_and_purse', {}]]), new Set());
     expect(active).toContain('linen_pouch');
     const done = visibleVendorStock(FINCH, new Map(), new Set(['q_ps_pouch_and_purse']));
     expect(done).toContain('linen_pouch');

@@ -215,4 +215,3 @@ describe('command schema parity (W0b)', () => {
     }
   });
 });
-

@@ -598,7 +598,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // civicServicePlacements (IWorldInteraction, data), leaving 322. The market
     // Sell-tab price reference adds marketSellPriceCheck (IWorldMarket, a
     // method), leaving 323, and this branch's tutorial greeting startTutorial
-  // (IWorldQuests, a method) makes 324.
+    // (IWorldQuests, a method) makes 324.
     //
     // NOTE for the next merge, four syncs run now: BOTH sides of this pin move
     // it independently every cycle. Twice git merged identical numbers with no
@@ -1922,4 +1922,3 @@ describe('world_api/chat overhead-emote id set stays exhaustive vs sim/types', (
     expect(isOverheadEmoteId(undefined)).toBe(false);
   });
 });
-
