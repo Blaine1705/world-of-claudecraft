@@ -201,6 +201,19 @@ export function abilityBuffValue(res: ResolvedAbility): number | null {
   return null;
 }
 
+/** The `$b` value for an already-APPLIED aura, read straight off its live
+ *  (kind, value) rather than re-resolved through anyone's talents. A buff/debuff
+ *  tooltip viewed on another entity must show what that aura actually IS, not what
+ *  the viewer's own copy of the ability would grant (Pact Deepened doubling
+ *  Fiendhide's armor for its owner must still read doubled on every other
+ *  player's screen). Mirrors abilityBuffValue's one non-identity case
+ *  (form_fireball's multiplier -> whole-percent conversion) so the two functions
+ *  can never disagree on the same aura. */
+export function auraBuffDisplayValue(a: { kind: string; value: number }): number {
+  if (a.kind === 'form_fireball') return (a.value - 1) * 100;
+  return a.value;
+}
+
 /** The value `$t` displays: the first timed effect's resolved duration in seconds
  *  (rank-resolved, so Deep Gash's longer rank-3 bleed and Bewitch's longer rank-2
  *  sleep read true). Null when no effect carries a duration. */
