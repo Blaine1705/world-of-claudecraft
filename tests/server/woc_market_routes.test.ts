@@ -20,6 +20,12 @@ process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_woc_marke
 
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it } from 'vitest';
+import { WOC_MARKET_STEPUP_POLICY } from '../../server/http/middleware/rate_limit';
+import {
+  WOC_MARKET_LIST_MAX_PER_MINUTE,
+  WOC_MARKET_STEPUP_MAX_PER_MINUTE,
+  wocMarketMutationLimit,
+} from '../../server/ratelimit';
 import type {
   WocBidRow,
   WocBrowseQuery,
@@ -1047,6 +1053,42 @@ describe('the confirming-review bound env knob', () => {
     expect(wocMarketConfig().confirmingReviewMs).toBe(720 * HOUR_MS);
     process.env[KEY] = '719';
     expect(wocMarketConfig().confirmingReviewMs).toBe(719 * HOUR_MS);
+  });
+});
+
+describe('the phantom TOTP scaffolding stays deleted (B6/R1)', () => {
+  it('no market logic file mentions totp, and no .wm-totp CSS survives', () => {
+    // The two woc_market.totp_* codes stay in error_codes.ts by the append-only
+    // contract, but nothing may PRODUCE or read them again: the market service,
+    // its routes, the step-up module, and the styles carry zero totp remnant, so
+    // the retired control cannot silently regrow a producer.
+    const url = (p: string) => new URL(`../../${p}`, import.meta.url);
+    for (const p of [
+      'server/woc_market.ts',
+      'server/woc_market_routes.ts',
+      'server/woc_market_stepup.ts',
+    ]) {
+      expect(readFileSync(url(p), 'utf8').toLowerCase(), p).not.toContain('totp');
+    }
+    const css = readFileSync(url('src/styles/components.css'), 'utf8');
+    expect(css).not.toContain('wm-totp');
+  });
+});
+
+describe('the step-up rate bucket (B6/R1)', () => {
+  it('has its OWN bucket at double the list limit, so the mint-then-create pair never halves listing throughput', () => {
+    // A literal pin: swapping the route to WOC_MARKET_READ_POLICY or deleting
+    // the 'stepup' case from wocMarketMutationLimit both leave the counting
+    // tests green otherwise.
+    expect(WOC_MARKET_STEPUP_MAX_PER_MINUTE).toBe(20);
+    expect(WOC_MARKET_STEPUP_MAX_PER_MINUTE).toBe(2 * WOC_MARKET_LIST_MAX_PER_MINUTE);
+    expect(wocMarketMutationLimit('stepup')).toBe(WOC_MARKET_STEPUP_MAX_PER_MINUTE);
+    // Its own named policy, ip+account keyed with a global tier-2, distinct
+    // from every other market bucket by name.
+    expect(WOC_MARKET_STEPUP_POLICY.name).toBe('woc_market_stepup');
+    expect(WOC_MARKET_STEPUP_POLICY.limit).toBe(20);
+    expect(WOC_MARKET_STEPUP_POLICY.keyClass).toBe('ip+account');
+    expect(WOC_MARKET_STEPUP_POLICY.tier2).toBe('global');
   });
 });
 

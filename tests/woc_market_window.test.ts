@@ -963,17 +963,17 @@ describe('woc_market_window: the picker prompt counts correctly', () => {
 });
 
 describe('woc_market_window: a fixed-price listing can satisfy the guards buyNow runs', () => {
-  it('renders the terms and two-factor fields when there is no bid form to carry them', () => {
+  it('renders the terms field when there is no bid form to carry it', () => {
     // The defect this pins was UNREACHABLE in local testing and total in effect.
-    // buyNow() sends totpCode and acceptTerms, and the server's buyNow gate chain
-    // runs guardTotp and guardTerms exactly as placeBid does. But both inputs used
-    // to live ONLY inside bidFormHtml, which returns '' for a buy_now listing. So a
-    // fixed-price listing at or above the two-factor threshold refused with
-    // totp_required while offering no field to type a code into, and a buyer who
+    // buyNow() sends acceptTerms, and the server's buyNow gate chain runs
+    // guardTerms exactly as placeBid does. But the terms input used to live ONLY
+    // inside bidFormHtml, which returns '' for a buy_now listing. So a buyer who
     // had never accepted the terms got terms_required with no checkbox: unbuyable,
     // permanently, with no way out from the UI. Every listing in the local database
     // was the legacy combined format, whose bid form DOES render, which is exactly
-    // why nothing caught it.
+    // why nothing caught it. (The two-factor field this once also carried is gone:
+    // 2FA came off the paying side, and the custody side now uses the wallet
+    // step-up, never a typed code.)
     const detail = between('private detailPaneHtml(', 'private bidFormHtml(');
     expect(detail).toContain('this.confirmFieldsHtml(model)');
     // Only when the bid form is absent: a combined listing would otherwise render

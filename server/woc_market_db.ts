@@ -736,9 +736,11 @@ CREATE TABLE IF NOT EXISTS woc_market_stepup_challenges (
   expires_at TIMESTAMPTZ NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
--- The issue-time prune's seek (expired rows, oldest first).
-CREATE INDEX IF NOT EXISTS woc_market_stepup_challenges_expiry
-  ON woc_market_stepup_challenges (expires_at);
+-- The issue-time prune's seek. Realm-leading because the prune DELETE filters
+-- realm = $1 AND expires_at <= $2, so a multi-realm deployment matches the
+-- predicate instead of scanning the whole expiry range and filtering.
+CREATE INDEX IF NOT EXISTS woc_market_stepup_challenges_realm_expiry
+  ON woc_market_stepup_challenges (realm, expires_at);
 `;
 
 /** Lock-wait ceiling for the escrow transaction's accounts row. Short on
