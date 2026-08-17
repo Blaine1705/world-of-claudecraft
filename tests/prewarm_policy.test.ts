@@ -1186,7 +1186,11 @@ describe('mandatory interaction-landmark prewarm', () => {
     expect(compileGate).toContain('this.liveCompileGates.run(');
     expect(compileGate).toContain('VIEW_COMPILE_GATE_MAX_MS');
     expect(compileGate).not.toContain('onTimeout');
-    expect(renderer).toContain('return GPU_WORK_PRIORITY.ACTIONABLE_VIEW;');
+    // The target-ancestry walk lives in compile_priority_core.ts (its own
+    // Vitest); the renderer stays a thin caller.
+    expect(renderer).toContain(
+      'return compilePriorityForTarget(target, this.sim.player.targetId);',
+    );
     expect(renderer).toContain(
       'private readonly liveCompileGates = new CompileGateQueue(this.backgroundGpuWork)',
     );

@@ -185,6 +185,7 @@ import { fogFarForBuiltGround, groundViewConeHalfAngle } from './chunk_residency
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { buildCliffScree, type CliffScreeView } from './cliff_scree';
 import { CompileGateQueue, SerialGateLane, settlePendingSwap } from './compile_gate';
+import { compilePriorityForTarget } from './compile_priority_core';
 import { preflightWebGL2ContextRecycle, type RecycledRendererContext } from './context_recycle';
 import { trackWebGLContext } from './context_release';
 import {
@@ -2473,6 +2474,9 @@ export class Renderer {
     });
     setRenderCategory(this.fish.group, 'fish');
     this.scene.add(this.fish.group);
+    this.fish.setCompileGate(
+      this.asyncCompileSupported ? (root: THREE.Object3D) => this.compileGate(root) : null,
+    );
     this.motes = buildMotes(this.sim.cfg.seed);
     setRenderCategory(this.motes.group, 'ambient');
     this.scene.add(this.motes.group);
@@ -8883,14 +8887,7 @@ export class Renderer {
   // already correctly scoped, and a real batch would cost more than it saves,
   // this stays one call per target.
   private compilePriorityFor(target: THREE.Object3D): number {
-    let current: THREE.Object3D | null = target;
-    while (current) {
-      if (current.userData.entityId === this.sim.player.targetId) {
-        return GPU_WORK_PRIORITY.ACTIONABLE_VIEW;
-      }
-      current = current.parent;
-    }
-    return GPU_WORK_PRIORITY.LIVE_VIEW;
+    return compilePriorityForTarget(target, this.sim.player.targetId);
   }
 
   private compileGate(target: THREE.Object3D): Promise<unknown> {
