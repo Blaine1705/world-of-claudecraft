@@ -110,10 +110,13 @@ describe('druid spell pack — definitions', () => {
 describe('druid spell pack — level gating', () => {
   it('gates each pack spell at its learn level and teaches everything by 20', () => {
     // The choice-row unlock guard moved travel_form (11), bash (8), and rip (14)
-    // earlier so the rows that modify them are live at unlock; the rest of the
-    // pack still lands 16 to 20.
+    // earlier so the rows that modify them are live at unlock, and the feral
+    // enablement pass moved pounce to 8 so Stalk has an early payoff; the rest
+    // of the pack still lands 16 to 20.
     const known15 = abilitiesKnownAt('druid', 15).map((k) => k.def.id);
-    const stillLate = NEW_DRUID.filter((id) => !['travel_form', 'bash', 'rip'].includes(id));
+    const stillLate = NEW_DRUID.filter(
+      (id) => !['travel_form', 'bash', 'rip', 'pounce'].includes(id),
+    );
     for (const id of stillLate) expect(known15).not.toContain(id);
     for (const id of NEW_DRUID) {
       const before = abilitiesKnownAt('druid', ABILITIES[id].learnLevel - 1).map((k) => k.def.id);
@@ -137,11 +140,14 @@ describe('druid spell pack — casting applies effects', () => {
     const e = sim.entities.get(a)!;
     sim.setPlayerLevel(20, a);
     giveForm(sim, a, 'form_cat', 'Wolf Form');
-    e.resource = 100;
+    // Free cast with a 30 energy surge, exactly as the tooltip promises: start
+    // below cap so the surge is measurable, and prove no cost was charged.
+    e.resource = 40;
     sim.castAbility('tigers_fury', a);
     sim.tick();
     const buff = e.auras.find((au) => au.kind === 'buff_ap' && au.value === 40);
     expect(buff, 'tigers_fury should apply a +40 buff_ap aura').toBeTruthy();
+    expect(e.resource).toBeGreaterThanOrEqual(70);
   });
 
   it('Enrage generates rage in bear form', () => {
