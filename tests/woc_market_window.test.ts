@@ -828,8 +828,12 @@ describe('woc_market_window: a combined listing is opted into by price, not by p
     // once so the step-up challenge and the createListing body cannot
     // disagree about what the wallet authorized.
     expect(submit).toContain('format: submitFormat');
-    expect(submit).toContain("const listingReserve = submitFormat === 'buy_now' ? null : reserveCents");
-    expect(submit).toContain("const listingBuyNow = submitFormat === 'auction' ? null : buyNowCents");
+    expect(submit).toContain(
+      "const listingReserve = submitFormat === 'buy_now' ? null : reserveCents",
+    );
+    expect(submit).toContain(
+      "const listingBuyNow = submitFormat === 'auction' ? null : buyNowCents",
+    );
     expect(submit).toContain('reserveCents: listingReserve');
     expect(submit).toContain('buyNowCents: listingBuyNow');
     // Both sends, byte for byte: the challenge request and the listing body.
@@ -1383,8 +1387,9 @@ describe('woc_market_window: payment verdicts reach the player', () => {
     // after it (the slice would silently widen and the toHaveLength ordering
     // pins would stop meaning what they say), forcing a bounded re-anchor.
     expect(
-      sign.match(/\n  (?:private |public |protected )?(?:async )?\w+\(|\n(?:export |function )/g) ??
-        [],
+      sign.match(
+        /\n {2}(?:private |public |protected )?(?:async )?\w+\(|\n(?:export |function )/g,
+      ) ?? [],
       'a declaration now follows signPendingQuote; re-anchor this slice with a real end bound',
     ).toHaveLength(0);
     // Bond leg: the pending arm routes through the mapper, not a fixed key.

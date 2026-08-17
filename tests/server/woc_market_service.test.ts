@@ -35,7 +35,6 @@ import type {
 } from '../../server/woc_market';
 import { WocMarketService } from '../../server/woc_market';
 import { createDevWocMarketEconomy } from '../../server/woc_market_proxy';
-import { WOC_MARKET_STEPUP_TTL_MS } from '../../server/woc_market_stepup';
 import type { WocListingParams } from '../../server/woc_market_rules';
 import {
   bondCents,
@@ -56,6 +55,7 @@ import {
   WOC_MARKET_SETTLEMENT_WINDOW_SECONDS,
   WOC_MARKET_STRANDED_RECLAIM_SECONDS,
 } from '../../server/woc_market_rules';
+import { WOC_MARKET_STEPUP_TTL_MS } from '../../server/woc_market_stepup';
 import { ITEMS } from '../../src/sim/data';
 import type { ExtractRef } from '../../src/sim/inventory_extract';
 import { extractTradableCopy } from '../../src/sim/inventory_extract';
@@ -729,10 +729,7 @@ describe('step-up enforcement on the custody movers (B6/R1)', () => {
     (h.deps as { stepUpDevSig: boolean }).stepUpDevSig = false;
     h.wallets.set(SELLER, wallet);
     const params = listingParams();
-    const issue = await h.service.issueStepUpChallenge(
-      SELLER,
-      listBindingFor(EPIC_ITEM, params),
-    );
+    const issue = await h.service.issueStepUpChallenge(SELLER, listBindingFor(EPIC_ITEM, params));
     if (!issue.ok) throw new Error(`issue refused: ${issue.reason}`);
     expect(issue.challenge.signatureRequired, 'production answers signatureRequired').toBe(true);
     const args = (signature: string) => ({
@@ -748,10 +745,7 @@ describe('step-up enforcement on the custody movers (B6/R1)', () => {
     });
     // The devsig attempt consumed the challenge (single-use, no retry
     // oracle), so the real signature signs a FRESH one.
-    const second = await h.service.issueStepUpChallenge(
-      SELLER,
-      listBindingFor(EPIC_ITEM, params),
-    );
+    const second = await h.service.issueStepUpChallenge(SELLER, listBindingFor(EPIC_ITEM, params));
     if (!second.ok) throw new Error(`issue refused: ${second.reason}`);
     const signature = bs58.encode(
       ed25519.sign(new TextEncoder().encode(second.challenge.message), priv),
@@ -814,8 +808,9 @@ describe('step-up enforcement on the custody movers (B6/R1)', () => {
   it('the challenge issue itself refuses without a wallet and derives directed figures from the offer', async () => {
     const h = makeHarness();
     h.wallets.delete(SELLER);
-    expect(await h.service.issueStepUpChallenge(SELLER, listBindingFor(EPIC_ITEM, listingParams())))
-      .toEqual({ ok: false, reason: 'wallet_required' });
+    expect(
+      await h.service.issueStepUpChallenge(SELLER, listBindingFor(EPIC_ITEM, listingParams())),
+    ).toEqual({ ok: false, reason: 'wallet_required' });
     h.wallets.set(SELLER, 'wallet-seller');
     h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
     const offer = await h.service.createDirectedOffer({
@@ -4266,13 +4261,7 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
       throw new Error('timeout exceeded when trying to connect');
     };
     await expect(
-      acceptSteppedUp(
-        h,
-        SELLER,
-        made.offer.id,
-        { index: 0, itemId: EPIC_ITEM },
-        SELLER_CHAR,
-      ),
+      acceptSteppedUp(h, SELLER, made.offer.id, { index: 0, itemId: EPIC_ITEM }, SELLER_CHAR),
     ).rejects.toThrow('unique violation');
     // COUNT, not presence: deleting the proved-rollback restoreCopy call
     // must fail this line (this describe's stocked() seeds TWO copies).
@@ -4752,13 +4741,7 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     await h.service.acceptDirectedOffer(BUYER_A, proven.offer.id, null, CHAR_A);
     h.db.failNextEscrowThrow = Object.assign(new Error('unique violation'), { code: '23505' });
     await expect(
-      acceptSteppedUp(
-        h,
-        SELLER,
-        proven.offer.id,
-        { index: 0, itemId: EPIC_ITEM },
-        SELLER_CHAR,
-      ),
+      acceptSteppedUp(h, SELLER, proven.offer.id, { index: 0, itemId: EPIC_ITEM }, SELLER_CHAR),
     ).rejects.toThrow('unique violation');
     expect((await h.db.directedOfferById(REALM, proven.offer.id))?.status).toBe('pending');
 
@@ -4770,13 +4753,7 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     await h.service.acceptDirectedOffer(BUYER_A, ambiguous.offer.id, null, CHAR_A);
     h.db.failNextEscrowThrow = new Error('socket died mid-commit');
     await expect(
-      acceptSteppedUp(
-        h,
-        SELLER,
-        ambiguous.offer.id,
-        { index: 0, itemId: EPIC_ITEM },
-        SELLER_CHAR,
-      ),
+      acceptSteppedUp(h, SELLER, ambiguous.offer.id, { index: 0, itemId: EPIC_ITEM }, SELLER_CHAR),
     ).rejects.toThrow('socket died mid-commit');
     expect((await h.db.directedOfferById(REALM, ambiguous.offer.id))?.status).toBe('accepted');
     expect(h.custody.sessionLost.at(-1)?.kind).toBe('ambiguous');
@@ -4804,13 +4781,7 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     await h.service.acceptDirectedOffer(BUYER_A, stuck.offer.id, null, CHAR_A);
     h.db.failNextEscrowThrow = new Error('socket died mid-commit');
     await expect(
-      acceptSteppedUp(
-        h,
-        SELLER,
-        stuck.offer.id,
-        { index: 0, itemId: EPIC_ITEM },
-        SELLER_CHAR,
-      ),
+      acceptSteppedUp(h, SELLER, stuck.offer.id, { index: 0, itemId: EPIC_ITEM }, SELLER_CHAR),
     ).rejects.toThrow();
     // Too young: the converge age keeps a possibly-in-flight acceptance out
     // of the batch entirely.
@@ -4848,13 +4819,7 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     await h.service.acceptDirectedOffer(BUYER_A, stuck.offer.id, null, CHAR_A);
     h.db.failNextEscrowThrow = new Error('socket died mid-commit');
     await expect(
-      acceptSteppedUp(
-        h,
-        SELLER,
-        stuck.offer.id,
-        { index: 0, itemId: EPIC_ITEM },
-        SELLER_CHAR,
-      ),
+      acceptSteppedUp(h, SELLER, stuck.offer.id, { index: 0, itemId: EPIC_ITEM }, SELLER_CHAR),
     ).rejects.toThrow();
     // Age the row past the far bound. Its TTL and the young bound are both
     // long since cleared, so the OLD bound is the only thing that can hold it
@@ -6403,13 +6368,7 @@ async function directedSale(h: Harness, signature: string): Promise<{ listingId:
     'buyer accept',
   );
   const accepted = unwrap(
-    await acceptSteppedUp(
-      h,
-      SELLER,
-      offer.offer.id,
-      { index: 0, itemId: EPIC_ITEM },
-      SELLER_CHAR,
-    ),
+    await acceptSteppedUp(h, SELLER, offer.offer.id, { index: 0, itemId: EPIC_ITEM }, SELLER_CHAR),
     'seller accept',
   );
   if (!accepted.listing) throw new Error('the seller acceptance produced no listing');

@@ -256,9 +256,10 @@ describe('verifyStepUpProof: the refusal ladder', () => {
     // The dev switch loosens nothing else: a real signature still verifies
     // and a wrong binding still refuses under devSig.
     expect(verify(row, { devSig: true })).toEqual({ ok: true });
-    expect(
-      verify(row, { devSig: true, proof: devProof, expectedDigest: 'ffff' }),
-    ).toEqual({ ok: false, reason: 'stepup_binding_mismatch' });
+    expect(verify(row, { devSig: true, proof: devProof, expectedDigest: 'ffff' })).toEqual({
+      ok: false,
+      reason: 'stepup_binding_mismatch',
+    });
   });
 
   it('pins the refusal order: expiry before wallet before binding before signature', () => {
@@ -278,8 +279,9 @@ describe('verifyStepUpProof: the refusal ladder', () => {
       ok: false,
       reason: 'stepup_wallet_mismatch',
     });
-    expect(verify(row, { expectedDigest: 'ffff', proof: { nonce: row.nonce, signature: 'g' } }))
-      .toEqual({ ok: false, reason: 'stepup_binding_mismatch' });
+    expect(
+      verify(row, { expectedDigest: 'ffff', proof: { nonce: row.nonce, signature: 'g' } }),
+    ).toEqual({ ok: false, reason: 'stepup_binding_mismatch' });
   });
 });
 

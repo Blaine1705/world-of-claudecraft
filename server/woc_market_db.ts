@@ -32,7 +32,6 @@ import type {
   WocStrikeRow,
   WocStuckCustodyClasses,
 } from './woc_market';
-import type { NewWocStepUpChallenge, WocStepUpChallengeRow } from './woc_market_stepup';
 import type { WocBidStatus, WocSettlementState } from './woc_market_rules';
 import {
   WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS,
@@ -41,6 +40,7 @@ import {
   WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS,
   WOC_MARKET_MAX_ACTIVE_LISTINGS,
 } from './woc_market_rules';
+import type { NewWocStepUpChallenge, WocStepUpChallengeRow } from './woc_market_stepup';
 
 /** The OPEN settlement states, shared VERBATIM between the one-open-settlement
  *  unique index predicate and every liveness check (the LIFETIME_XP_EXPR

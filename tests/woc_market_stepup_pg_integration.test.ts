@@ -15,9 +15,9 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { PgWocMarketDb } from '../server/woc_market_db';
 import {
   buildStepUpMessage,
+  type NewWocStepUpChallenge,
   newStepUpNonce,
   stepUpBindingDigest,
-  type NewWocStepUpChallenge,
   type WocStepUpBinding,
 } from '../server/woc_market_stepup';
 
@@ -165,9 +165,7 @@ describeDb('woc market step-up challenges against real Postgres', () => {
     const row = challenge(owner);
     await marketDb.createStepUpChallenge(row);
     expect(await marketDb.consumeStepUpChallenge(REALM, row.nonce, attacker)).toBeNull();
-    expect((await marketDb.consumeStepUpChallenge(REALM, row.nonce, owner))?.nonce).toBe(
-      row.nonce,
-    );
+    expect((await marketDb.consumeStepUpChallenge(REALM, row.nonce, owner))?.nonce).toBe(row.nonce);
   });
 
   it('a cross-realm consume returns null and leaves the row intact', async () => {
@@ -207,8 +205,7 @@ describeDb('woc market step-up challenges against real Postgres', () => {
     // The expired row is gone; the other realm's row is untouched.
     expect(await marketDb.consumeStepUpChallenge(REALM, expired.nonce, account)).toBeNull();
     expect(
-      (await marketDb.consumeStepUpChallenge('elsewhere', otherRealmExpired.nonce, account))
-        ?.nonce,
+      (await marketDb.consumeStepUpChallenge('elsewhere', otherRealmExpired.nonce, account))?.nonce,
     ).toBe(otherRealmExpired.nonce);
   });
 
@@ -225,10 +222,9 @@ describeDb('woc market step-up challenges against real Postgres', () => {
     const row = challenge(account);
     await marketDb.createStepUpChallenge(row);
     await pool.query('DELETE FROM accounts WHERE id = $1', [account]);
-    const left = await pool.query(
-      'SELECT 1 FROM woc_market_stepup_challenges WHERE nonce = $1',
-      [row.nonce],
-    );
+    const left = await pool.query('SELECT 1 FROM woc_market_stepup_challenges WHERE nonce = $1', [
+      row.nonce,
+    ]);
     expect(left.rowCount).toBe(0);
   });
 
@@ -236,8 +232,9 @@ describeDb('woc market step-up challenges against real Postgres', () => {
     const account = await seedAccount();
     const row = challenge(account);
     await marketDb.createStepUpChallenge(row);
-    await expect(marketDb.createStepUpChallenge(challenge(account, { nonce: row.nonce }))).rejects
-      .toThrow();
+    await expect(
+      marketDb.createStepUpChallenge(challenge(account, { nonce: row.nonce })),
+    ).rejects.toThrow();
   });
 
   it('refuses an operation word outside the two custody movers at the CHECK', async () => {

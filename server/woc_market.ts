@@ -23,18 +23,6 @@ import type { CharacterState } from '../src/sim/sim';
 import type { InvSlot, ItemInstancePayload } from '../src/sim/types';
 import { throwProvedRollback } from './pg_rollback_proof';
 import {
-  buildStepUpMessage,
-  newStepUpNonce,
-  stepUpBindingDigest,
-  verifyStepUpProof,
-  WOC_MARKET_STEPUP_TTL_MS,
-  type NewWocStepUpChallenge,
-  type WocStepUpBinding,
-  type WocStepUpChallengeRow,
-  type WocStepUpProof,
-  type WocStepUpRefusal,
-} from './woc_market_stepup';
-import {
   adoptableBondCents,
   antiSnipeExtendedEndMs,
   bondCents,
@@ -69,6 +57,18 @@ import {
   type WocListingParams,
   type WocSettlementState,
 } from './woc_market_rules';
+import {
+  buildStepUpMessage,
+  type NewWocStepUpChallenge,
+  newStepUpNonce,
+  stepUpBindingDigest,
+  verifyStepUpProof,
+  WOC_MARKET_STEPUP_TTL_MS,
+  type WocStepUpBinding,
+  type WocStepUpChallengeRow,
+  type WocStepUpProof,
+  type WocStepUpRefusal,
+} from './woc_market_stepup';
 
 // ---------------------------------------------------------------------------
 // Row shapes (persisted by woc_market_db.ts)
@@ -1619,10 +1619,18 @@ export class WocMarketService {
     request:
       | Extract<WocStepUpBinding, { operation: 'create_listing' }>
       | { operation: 'accept_directed_offer'; offerId: number },
-  ): Promise<{
-    ok: true;
-    challenge: { nonce: string; message: string; expiresAtMs: number; signatureRequired: boolean };
-  } | Refused> {
+  ): Promise<
+    | {
+        ok: true;
+        challenge: {
+          nonce: string;
+          message: string;
+          expiresAtMs: number;
+          signatureRequired: boolean;
+        };
+      }
+    | Refused
+  > {
     const gate = (await this.guardEnabledHealthy()) ?? (await this.guardSuspended(account));
     if (gate) return gate;
     const wallet = await this.deps.verifiedWallet(account);

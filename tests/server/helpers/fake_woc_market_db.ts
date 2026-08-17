@@ -35,10 +35,6 @@ import type {
   WocStrikeRow,
   WocStuckCustodyClasses,
 } from '../../../server/woc_market';
-import type {
-  NewWocStepUpChallenge,
-  WocStepUpChallengeRow,
-} from '../../../server/woc_market_stepup';
 import type { WocBidStatus, WocSettlementState } from '../../../server/woc_market_rules';
 import {
   WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS,
@@ -47,6 +43,10 @@ import {
   WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS,
   WOC_MARKET_MAX_ACTIVE_LISTINGS,
 } from '../../../server/woc_market_rules';
+import type {
+  NewWocStepUpChallenge,
+  WocStepUpChallengeRow,
+} from '../../../server/woc_market_stepup';
 import type { ExtractRef } from '../../../src/sim/inventory_extract';
 
 export interface FakeWocMarketCharacter {

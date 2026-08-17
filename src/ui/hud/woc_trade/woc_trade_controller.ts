@@ -390,9 +390,7 @@ export class WocTradeController {
           signature = await hooks.signMessageBase58(issued.challenge.message);
         } catch (err) {
           this.log(
-            err instanceof Error && err.message
-              ? err.message
-              : t('hudChrome.wocMarket.signFailed'),
+            err instanceof Error && err.message ? err.message : t('hudChrome.wocMarket.signFailed'),
             '#ff6b6b',
           );
           return;

@@ -27,6 +27,8 @@ import type {
   WocMarketRefusal,
   WocMarketService,
 } from '../../server/woc_market';
+import { WocMarketService as WocMarketServiceReal } from '../../server/woc_market';
+import { createDevWocMarketEconomy } from '../../server/woc_market_proxy';
 import {
   configureWocMarketRuntime,
   REFUSAL_ERRORS,
@@ -35,11 +37,9 @@ import {
   routes,
   wocMarketConfig,
 } from '../../server/woc_market_routes';
-import { WocMarketService as WocMarketServiceReal } from '../../server/woc_market';
-import { createDevWocMarketEconomy } from '../../server/woc_market_proxy';
 import { WOC_MARKET_RESTRICTED_POLICY } from '../../server/woc_market_rules';
-import { FakeWocMarketDb } from './helpers/fake_woc_market_db';
 import { type FakeCtxOverrides, type FakeRes, fakeCtx } from './helpers';
+import { FakeWocMarketDb } from './helpers/fake_woc_market_db';
 
 const VIEWER = 7;
 const SELLER = 99;
@@ -1147,7 +1147,14 @@ describe('the step-up surface at the route layer (B6/R1)', () => {
         return { ok: true, listing: listingRow() } as never;
       },
     });
-    for (const stepUp of ['garbage', 42, [], { nonce: 'x' }, { signature: 'y' }, { nonce: '', signature: 'z' }]) {
+    for (const stepUp of [
+      'garbage',
+      42,
+      [],
+      { nonce: 'x' },
+      { signature: 'y' },
+      { nonce: '', signature: 'z' },
+    ]) {
       const ctx = postCtx('/api/woc-market/listings', { ...LISTING_BODY, stepUp });
       await expect(
         handlerFor('POST', '/api/woc-market/listings')(ctx),
@@ -1201,8 +1208,9 @@ describe('the step-up surface at the route layer (B6/R1)', () => {
       { ...base, itemId: '' },
     ]) {
       const ctx = postCtx('/api/woc-market/step-up/challenge', bad);
-      await expect(handlerFor('POST', '/api/woc-market/step-up/challenge')(ctx)).rejects
-        .toMatchObject({ code: 'woc_market.invalid_input' });
+      await expect(
+        handlerFor('POST', '/api/woc-market/step-up/challenge')(ctx),
+      ).rejects.toMatchObject({ code: 'woc_market.invalid_input' });
     }
   });
 
@@ -1237,8 +1245,10 @@ describe('the step-up surface at the route layer (B6/R1)', () => {
       const ctx = postCtx('/api/woc-market/listings', LISTING_BODY, {
         headers: { 'user-agent': userAgent },
       });
-      await expect(handlerFor('POST', '/api/woc-market/listings')(ctx), userAgent).rejects
-        .toMatchObject({ status: 403, code: 'woc_market.stepup_required' });
+      await expect(
+        handlerFor('POST', '/api/woc-market/listings')(ctx),
+        userAgent,
+      ).rejects.toMatchObject({ status: 403, code: 'woc_market.stepup_required' });
     }
   });
 
@@ -1248,7 +1258,8 @@ describe('the step-up surface at the route layer (B6/R1)', () => {
       operation: 'accept_directed_offer',
       offerId: 41,
     });
-    await expect(handlerFor('POST', '/api/woc-market/step-up/challenge')(ctx)).rejects
-      .toMatchObject({ status: 403, code: 'woc_market.wallet_required' });
+    await expect(
+      handlerFor('POST', '/api/woc-market/step-up/challenge')(ctx),
+    ).rejects.toMatchObject({ status: 403, code: 'woc_market.wallet_required' });
   });
 });
