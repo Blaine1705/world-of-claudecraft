@@ -186,12 +186,16 @@ function fakeHooks(): {
     confirmSettlementImpl: () => Promise<unknown>;
     lastAcceptBody: Record<string, unknown> | null;
     lastCreateBody: Record<string, unknown> | null;
+    stepUpSignatureRequired: boolean;
+    stepUpGate: Promise<void> | null;
+    signMessageImpl: (message: string) => Promise<string>;
     calls: {
       offers: number;
       estimates: number[];
       buyNows: number;
       acceptOffers: number[];
       stepUpChallenges: Record<string, unknown>[];
+      signMessages: string[];
       createOffers: number;
       resolveOffers: [number, string][];
     };
@@ -212,12 +216,21 @@ function fakeHooks(): {
       Promise.resolve({ ok: false, code: 'woc_market.disabled' }),
     lastAcceptBody: null as Record<string, unknown> | null,
     lastCreateBody: null as Record<string, unknown> | null,
+    // The challenge answer. Default devsig (wallet-free); a test can flip
+    // signatureRequired true and/or defer resolution to exercise the real
+    // wallet arm and the in-flight face.
+    stepUpSignatureRequired: false as boolean,
+    stepUpGate: null as null | Promise<void>,
+    // The wallet message-signer. Default resolves; a test can reject it (a
+    // decline) or count calls.
+    signMessageImpl: (_message: string): Promise<string> => Promise.resolve('walletsig'),
     calls: {
       offers: 0,
       estimates: [] as number[],
       buyNows: 0,
       acceptOffers: [] as number[],
       stepUpChallenges: [] as Record<string, unknown>[],
+      signMessages: [] as string[],
       createOffers: 0,
       resolveOffers: [] as [number, string][],
     },
@@ -239,18 +252,21 @@ function fakeHooks(): {
       // The step-up mint the SELLER accept runs first (B6/R1). The devsig
       // answer keeps these behavioral tests wallet-free while still proving
       // the proof rides the accept body (nonce recorded per call).
-      stepUpChallenge: (req: Record<string, unknown>) => {
+      stepUpChallenge: async (req: Record<string, unknown>) => {
         state.calls.stepUpChallenges.push(req);
+        // Optional gate to hold the mint open (the in-flight face / re-entrancy
+        // tests await this before resolving).
+        if (state.stepUpGate) await state.stepUpGate;
         const nonce = `nonce-${state.calls.stepUpChallenges.length}`;
-        return Promise.resolve({
+        return {
           ok: true,
           challenge: {
             nonce,
             message: `step-up message ${nonce}`,
             expiresAtMs: 4_000_000_000_000,
-            signatureRequired: false,
+            signatureRequired: state.stepUpSignatureRequired,
           },
-        });
+        };
       },
       acceptOffer: (id: number, body: Record<string, unknown>) => {
         state.calls.acceptOffers.push(id);
@@ -273,6 +289,10 @@ function fakeHooks(): {
     characterId: () => 1,
     walletLinked: () => true,
     signAndSendTransactionBase64: () => Promise.reject(new Error('unused')),
+    signMessageBase58: (message: string) => {
+      state.calls.signMessages.push(message);
+      return state.signMessageImpl(message);
+    },
   } as unknown as WocMarketHooks;
   return { hooks, state };
 }
@@ -699,6 +719,107 @@ describe('the accept request body (seller escrow)', () => {
     await c.acceptWocTradeOffer();
     expect(h.state.calls.acceptOffers).toEqual([]);
     expect(r.host.logs.at(-1)).toBe(t('hudChrome.trade.woc.hintAcceptNeedsItem'));
+  });
+
+  it('signs the SERVER message on the real-wallet arm, and a DECLINE sends no accept (B6/R1)', async () => {
+    // Coverage's untested branch: the fake defaults devsig, so the real
+    // signMessageBase58 path never ran. Flip signatureRequired true and reject
+    // the sign: the accept must NOT be sent, and the decline copy shows.
+    const h = fakeHooks();
+    h.state.stepUpSignatureRequired = true;
+    h.state.signMessageImpl = () => Promise.reject(new Error('user declined in wallet'));
+    const r = rig(h.hooks);
+    r.host.staged.items.push({ itemId: 'worn_sword', count: 1 });
+    r.host.inventory.push({ itemId: 'worn_sword', count: 1 });
+    const c = r.controller as unknown as {
+      wocTradeOffer: WocPendingOffer | null;
+      acceptWocTradeOffer(): Promise<void>;
+    };
+    c.wocTradeOffer = heldOffer({ role: 'seller' });
+    await c.acceptWocTradeOffer();
+    // The wallet was asked to sign the exact server message.
+    expect(h.state.calls.signMessages).toEqual(['step-up message nonce-1']);
+    // The decline aborts BEFORE acceptOffer: no custody moves on a refused sign.
+    expect(h.state.calls.acceptOffers).toEqual([]);
+    expect(r.host.logs.at(-1)).toBe('user declined in wallet');
+  });
+
+  it('a real signature reaches the accept body as the proof', async () => {
+    const h = fakeHooks();
+    h.state.stepUpSignatureRequired = true;
+    h.state.signMessageImpl = () => Promise.resolve('REALSIG');
+    const r = rig(h.hooks);
+    r.host.staged.items.push({ itemId: 'worn_sword', count: 1 });
+    r.host.inventory.push({ itemId: 'worn_sword', count: 1 });
+    const c = r.controller as unknown as {
+      wocTradeOffer: WocPendingOffer | null;
+      acceptWocTradeOffer(): Promise<void>;
+    };
+    c.wocTradeOffer = heldOffer({ role: 'seller' });
+    await c.acceptWocTradeOffer();
+    expect(h.state.lastAcceptBody).toMatchObject({
+      stepUp: { nonce: 'nonce-1', signature: 'REALSIG' },
+    });
+  });
+
+  it('a double-click during the wallet round trip mints exactly one challenge (re-entrancy)', async () => {
+    // Frontend blocking: the Accept button stays labeled Accept during the
+    // multi-second wallet handoff; without the guard a second click mints a
+    // second challenge and races two acceptances into escrow.
+    const h = fakeHooks();
+    h.state.stepUpSignatureRequired = true;
+    let releaseSign!: () => void;
+    h.state.signMessageImpl = () =>
+      new Promise<string>((resolve) => {
+        releaseSign = () => resolve('REALSIG');
+      });
+    const r = rig(h.hooks);
+    r.host.staged.items.push({ itemId: 'worn_sword', count: 1 });
+    r.host.inventory.push({ itemId: 'worn_sword', count: 1 });
+    const c = r.controller as unknown as {
+      wocTradeOffer: WocPendingOffer | null;
+      acceptWocTradeOffer(): Promise<void>;
+    };
+    c.wocTradeOffer = heldOffer({ role: 'seller' });
+    // First click: parks awaiting the wallet signature.
+    const first = c.acceptWocTradeOffer();
+    await flushAsync();
+    // Second click while the first is outstanding: the guard returns early.
+    await c.acceptWocTradeOffer();
+    expect(h.state.calls.stepUpChallenges, 'exactly one mint').toHaveLength(1);
+    // Release the wallet and let the first click finish.
+    releaseSign();
+    await first;
+    expect(h.state.calls.acceptOffers, 'exactly one accept').toEqual([7]);
+  });
+
+  it('disables the Accept button while the seller acceptance is in flight (pending face)', async () => {
+    const h = fakeHooks();
+    h.state.stepUpSignatureRequired = true;
+    let releaseSign!: () => void;
+    h.state.signMessageImpl = () =>
+      new Promise<string>((resolve) => {
+        releaseSign = () => resolve('REALSIG');
+      });
+    const r = rig(h.hooks);
+    // The seller's staged item rides tradeInfo.myOffer so canAccept passes and
+    // the accept reaches its wallet round trip.
+    openTrade(r, [{ itemId: 'worn_sword', count: 1 }]);
+    (r.controller as unknown as { wocTradeOffer: WocPendingOffer | null }).wocTradeOffer =
+      heldOffer({ role: 'seller' });
+    r.host.inventory.push({ itemId: 'worn_sword', count: 1 });
+    const started = (
+      r.controller as unknown as { acceptWocTradeOffer(): Promise<void> }
+    ).acceptWocTradeOffer();
+    await flushAsync();
+    // The wallet is outstanding: the accept button reads Waiting and disables.
+    const btn = [...document.querySelectorAll<HTMLButtonElement>('#trade-window button.btn')].find(
+      (b) => b.textContent === t('hud.trade.waiting'),
+    );
+    expect(btn, 'the button flipped to Waiting').toBeTruthy();
+    expect(btn?.disabled).toBe(true);
+    releaseSign();
+    await started;
   });
 
   it('refuses a stale accept over a MULTI-SLOT staged table with the one_item WHY', async () => {

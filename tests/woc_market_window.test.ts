@@ -22,6 +22,17 @@ const between = (start: string, end: string): string => {
 // `case 'review':` cannot satisfy them.
 const code = stripComments(painter);
 
+// Slice a method body from the COMMENT-STRIPPED source, so an ordering or
+// presence pin cannot be satisfied by a token that survives only in a comment
+// (a step-up block commented out would still leave its strings in `painter`).
+const betweenCode = (start: string, end: string): string => {
+  const from = code.indexOf(start);
+  expect(from, `anchor missing: ${start}`).toBeGreaterThanOrEqual(0);
+  const to = code.indexOf(end, from);
+  expect(to, `anchor missing after ${start}: ${end}`).toBeGreaterThan(from);
+  return code.slice(from, to);
+};
+
 describe('woc_market_window: no magic color values', () => {
   it('carries no raw hex color literal (QUALITY_COLOR + var(--...) are the only channels)', () => {
     // The (?<!&) guard skips the pager's numeric HTML entities (&#8249; and
@@ -819,7 +830,7 @@ describe('woc_market_window: a combined listing is opted into by price, not by p
     // The whole mapping, and the reason the picker can stay at two entries. A
     // submit that forwarded `format` verbatim would send 'auction' with a
     // buy-now price, which validListingParams refuses as bad_buy_now.
-    const submit = between('private async submitListing(', 'private async payBond(');
+    const submit = betweenCode('private async submitListing(', 'private async payBond(');
     expect(submit).toContain(
       "format === 'auction' && buyNowCents !== null ? 'auction_buy_now' : format",
     );
@@ -848,8 +859,13 @@ describe('woc_market_window: a combined listing is opted into by price, not by p
 });
 
 describe('woc_market_window: listing requires the wallet step-up (B6/R1)', () => {
+  // Source-scan pins over the COMMENT-STRIPPED body (betweenCode): the live-DOM
+  // behavioral arm (a decline that leaves busy stuck, a bound-figure disagree)
+  // is the opt-in browser suite's, per this file's header; the identical
+  // mint/sign/send/decline ladder is behaviorally proven in
+  // tests/woc_trade_controller.test.ts.
   it('mints the challenge, signs the SERVER-built message, then sends the proof, in that order', () => {
-    const submit = between(
+    const submit = betweenCode(
       'private async submitListing(): Promise<void> {',
       'private async payBond(',
     );
@@ -861,36 +877,40 @@ describe('woc_market_window: listing requires the wallet step-up (B6/R1)', () =>
       iChallenge,
     );
     expect(iCreate, 'the listing send comes last').toBeGreaterThan(iSign);
-    // The proof rides the listing body verbatim.
+    // The proof rides the listing body verbatim, and the challenge carries the
+    // exact copy so the signed message and the create body cannot disagree.
     expect(submit).toContain(
       'stepUp: { nonce: issued.challenge.nonce, signature: stepUpSignature }',
     );
+    expect(submit).toContain('expectInstance: slot.instance ?? null');
   });
 
   it('skips the wallet ONLY on an explicit signatureRequired false, the devsig rule', () => {
-    const submit = between(
+    const submit = betweenCode(
       'private async submitListing(): Promise<void> {',
       'private async payBond(',
     );
     // Explicit permission only: absent must still go through the wallet.
     expect(submit).toContain('issued.challenge.signatureRequired === false');
-    expect(submit).not.toContain('issued.challenge.signatureRequired !== true');
     expect(submit).toContain('devsig:${issued.challenge.nonce}');
   });
 
   it('renders honest pending and failure states around the wallet wait', () => {
-    const submit = between(
+    const submit = betweenCode(
       'private async submitListing(): Promise<void> {',
       'private async payBond(',
     );
-    // The busy ladder: signing while the popup is open, then confirming.
+    // The busy ladder: signing while the popup is open, then the listing send
+    // (a plain REST create, NOT an on-chain confirm, so its own honest label).
     const iSigning = submit.indexOf("withBusy('hudChrome.wocMarket.signing'");
-    const iConfirming = submit.indexOf("busyLabel = 'hudChrome.wocMarket.confirming'");
+    const iListing = submit.indexOf("busyLabel = 'hudChrome.wocMarket.listing'");
     expect(iSigning).toBeGreaterThanOrEqual(0);
-    expect(iConfirming).toBeGreaterThan(iSigning);
-    // A wallet decline renders its player-facing message, with the catalog
-    // line as the message-less fallback; a challenge refusal rides fail().
-    expect(submit).toContain('hudChrome.wocMarket.signFailed');
+    expect(iListing).toBeGreaterThan(iSigning);
+    // A wallet decline renders its player-facing message, with the listing
+    // catalog line (not the payment one) as the message-less fallback; a
+    // challenge refusal rides fail().
+    expect(submit).toContain('hudChrome.wocMarket.signFailedListing');
+    expect(submit).not.toContain("t('hudChrome.wocMarket.signFailed')");
     expect(submit).toContain('this.fail(issued.code)');
   });
 });

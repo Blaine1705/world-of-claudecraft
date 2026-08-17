@@ -1850,13 +1850,14 @@ export class WocMarketWindow {
             text:
               err instanceof Error && err.message
                 ? err.message
-                : t('hudChrome.wocMarket.signFailed'),
+                : t('hudChrome.wocMarket.signFailedListing'),
             error: true,
           };
           return;
         }
       }
-      this.busyLabel = 'hudChrome.wocMarket.confirming';
+      // A plain REST create, not an on-chain settlement: its own honest label.
+      this.busyLabel = 'hudChrome.wocMarket.listing';
       this.render();
       const out = await hooks.client.createListing({
         characterId: hooks.characterId(),

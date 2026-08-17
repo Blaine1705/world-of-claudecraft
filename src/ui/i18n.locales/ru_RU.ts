@@ -8983,6 +8983,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.signing': 'Ожидание вашего кошелька...',
   'hudChrome.wocMarket.signFailed':
     'Ваш кошелёк не завершил оплату. Проверьте кошелёк и попробуйте снова.',
+  'hudChrome.wocMarket.signFailedListing':
+    'Кошелёк не подписал подтверждение. Проверьте кошелёк и повторите попытку.',
+  'hudChrome.wocMarket.listing': 'Размещение предмета...',
   'hudChrome.wocMarket.confirming': 'Подтверждение в сети...',
   'hudChrome.wocMarket.bidPlacedStanding': 'Ваша ставка принята. Вы лидируете в торгах.',
   'hudChrome.wocMarket.bidPlacedOutbid': 'Ваш залог подтверждён, но кто-то успел поставить больше.',
@@ -13480,6 +13483,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Сделка за $WOC охватывает ровно один предмет. Оставьте только тот, который продаётся.',
   'hudChrome.trade.woc.sendOffer': 'Предложить $WOC',
   'hudChrome.trade.woc.incomingAccept': '{name} предлагает {price} за ваши предметы.',
+  'hudChrome.trade.woc.hintAcceptLocked': 'Этот предмет заблокирован. Снимите блокировку в сумке, прежде чем продавать его.',
   'hudChrome.trade.woc.hintAcceptNeedsItem': 'Прежде чем принять, добавьте предмет, который продаёте.',
   'hudChrome.trade.woc.hintEnterPrice': 'Укажите цену в долларах.',
   'hudChrome.trade.woc.hintGoldOffered': 'Сначала уберите предложение золота: обмен идёт либо за золото, либо за $WOC.',

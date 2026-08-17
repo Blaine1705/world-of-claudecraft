@@ -8858,6 +8858,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.signing': 'ウォレットの承認を待っています...',
   'hudChrome.wocMarket.signFailed':
     'ウォレットが支払いを完了できませんでした。ウォレットを確認して、もう一度お試しください。',
+  'hudChrome.wocMarket.signFailedListing':
+    'ウォレットで確認に署名できませんでした。ウォレットを確認して再試行してください。',
+  'hudChrome.wocMarket.listing': '出品しています...',
   'hudChrome.wocMarket.confirming': 'チェーン上で確認中...',
   'hudChrome.wocMarket.bidPlacedStanding': '入札が有効になりました。あなたが現在の最高入札者です。',
   'hudChrome.wocMarket.bidPlacedOutbid': '保証金は確認されましたが、先により高い入札が入りました。',
@@ -13313,6 +13316,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '$WOC の取引はアイテム1点のみが対象です。売る1点だけを出してください。',
   'hudChrome.trade.woc.sendOffer': '$WOC を提示',
   'hudChrome.trade.woc.incomingAccept': '{name} があなたのアイテムに {price} を提示しています。',
+  'hudChrome.trade.woc.hintAcceptLocked': 'そのアイテムはロックされています。売る前にバッグでロックを解除してください。',
   'hudChrome.trade.woc.hintAcceptNeedsItem': '承諾する前に、売却するアイテムを入れてください。',
   'hudChrome.trade.woc.hintEnterPrice': 'USD で価格を入力してください。',
   'hudChrome.trade.woc.hintGoldOffered':

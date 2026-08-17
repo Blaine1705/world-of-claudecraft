@@ -249,6 +249,7 @@ export const hudChromeStrings = {
       hintOneItem: 'A $WOC deal covers exactly one item. Leave only the one being sold.',
       hintEnterPrice: 'Enter a price in USD.',
       hintAcceptNeedsItem: 'Add the item you are selling before accepting.',
+      hintAcceptLocked: 'That item is locked. Unlock it in your bags before selling it.',
       hintGoldOffered: 'Remove your gold offer first: a trade is gold or $WOC, not both.',
       ineligibleNote: '{count} staged item(s) cannot be sold for $WOC.',
       incomingTitle: '$WOC offer from {name}',
@@ -5140,7 +5141,13 @@ export const hudChromeStrings = {
     quoteSettlementFor: 'Settlement for {item}: {usd}',
     signing: 'Waiting for your wallet...',
     signFailed: 'Your wallet did not complete the payment. Check the wallet and try again.',
+    // The step-up (listing / directed acceptance) authorization is a message
+    // signature that moves NO funds, so its failure must not say "payment".
+    signFailedListing: 'Your wallet did not sign the confirmation. Check the wallet and try again.',
     confirming: 'Confirming on chain...',
+    // The listing submit's second phase is a plain REST create, not an on-chain
+    // settlement: it must not borrow the payment path's "Confirming on chain".
+    listing: 'Listing your item...',
     activityCancelPending: 'Cancel pending',
     activityDirected: 'Directed sale',
     bidPlacedStanding: 'Your bid stands. You are the high bidder.',

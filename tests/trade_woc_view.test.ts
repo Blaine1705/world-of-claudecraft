@@ -481,6 +481,12 @@ describe('a standing offer changes what each side may do', () => {
     // Nothing sellable staged, table empty or not: "add the item" is true.
     expect(asSeller([]).acceptHint).toBe('hudChrome.trade.woc.hintAcceptNeedsItem');
     expect(asSeller([slot(QUEST.id)]).acceptHint).toBe('hudChrome.trade.woc.hintAcceptNeedsItem');
+    // A single staged copy blocked ONLY by the owner's item lock names the
+    // liftable obstacle, not "add the item" (which would contradict the
+    // visible, locked item on the table). R10.
+    expect(asSeller([{ itemId: EPIC.id, count: 1, instance: { locked: true } }]).acceptHint).toBe(
+      'hudChrome.trade.woc.hintAcceptLocked',
+    );
     // Something sellable IS staged but the shape is wrong: "add the item"
     // would contradict the visible table, so the WHY is the one_item rule.
     expect(asSeller([slot(EPIC.id), slot(EPIC.id)]).acceptHint).toBe(

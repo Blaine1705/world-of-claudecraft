@@ -8824,6 +8824,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.signing': '지갑 승인을 기다리는 중...',
   'hudChrome.wocMarket.signFailed':
     '지갑이 결제를 완료하지 못했습니다. 지갑을 확인한 뒤 다시 시도하세요.',
+  'hudChrome.wocMarket.signFailedListing':
+    '지갑에서 확인에 서명하지 못했습니다. 지갑을 확인한 후 다시 시도하세요.',
+  'hudChrome.wocMarket.listing': '아이템을 등록하는 중...',
   'hudChrome.wocMarket.confirming': '체인에서 확인 중...',
   'hudChrome.wocMarket.bidPlacedStanding': '입찰이 확정되었습니다. 현재 최고 입찰자입니다.',
   'hudChrome.wocMarket.bidPlacedOutbid': '보증금은 확인되었지만 더 높은 입찰이 먼저 들어왔습니다.',
@@ -13313,6 +13316,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '$WOC 거래는 아이템 하나만 다룹니다. 판매할 하나만 올려 두세요.',
   'hudChrome.trade.woc.sendOffer': '$WOC 제안',
   'hudChrome.trade.woc.incomingAccept': '{name} 님이 당신의 아이템에 {price}을(를) 제안했습니다.',
+  'hudChrome.trade.woc.hintAcceptLocked': '해당 아이템은 잠겨 있습니다. 판매하기 전에 가방에서 잠금을 해제하세요.',
   'hudChrome.trade.woc.hintAcceptNeedsItem': '수락하기 전에 판매할 아이템을 올려주세요.',
   'hudChrome.trade.woc.hintEnterPrice': 'USD 가격을 입력하세요.',
   'hudChrome.trade.woc.hintGoldOffered':

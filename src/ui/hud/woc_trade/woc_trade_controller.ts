@@ -105,6 +105,12 @@ export class WocTradeController {
   /** Re-entry guard: a second click mid-signature would take two lock+quote
    *  round trips for one purchase. */
   private wocTradePaying = false;
+  /** The seller's acceptance is in flight (the step-up challenge mint plus the
+   *  wallet round trip). Guards re-entrancy the same way wocTradePaying does
+   *  for the pay path, and drives the disabled/waiting face on the Accept
+   *  button so a multi-second wallet handoff cannot read as a dead click or
+   *  mint a second challenge. */
+  private wocTradeAccepting = false;
   /**
    * Offer ids whose outcome this client has already shown.
    *
@@ -313,7 +319,10 @@ export class WocTradeController {
   private async acceptWocTradeOffer(): Promise<void> {
     const hooks = this.wocMarketHooks;
     const offer = this.wocTradeOffer;
-    if (!hooks || !offer) return;
+    // Re-entrancy guard, mirroring the pay path: a second click during the
+    // seller's step-up wallet round trip must not mint a second challenge or
+    // race two acceptances into escrow.
+    if (!hooks || !offer || this.wocTradeAccepting) return;
     // The seller's staged copy is what escrows; the buyer brings only money, so
     // they send no item at all. The copy resolves from the SIM's cleaned offer
     // (tradeInfo.myOffer), never the HUD-local compose state: the local list
@@ -366,63 +375,74 @@ export class WocTradeController {
         ...(first.instance === undefined ? {} : { expectInstance: first.instance }),
       };
     }
-    // The SELLER's acceptance is the custody-committing act, so it carries
-    // the wallet step-up proof (B6/R1): a fresh offer-bound challenge signed
-    // through the same bridge the payment path uses. The buyer sends none.
-    let stepUpFields: { stepUp?: { nonce: string; signature: string } } = {};
-    if (offer.role === 'seller') {
-      const issued = await hooks.client.stepUpChallenge({
-        operation: 'accept_directed_offer',
-        offerId: offer.id,
-      });
-      if (!issued.ok) {
-        this.log(userFacingApiError({ code: issued.code }), '#ff6b6b');
-        return;
-      }
-      let signature: string;
-      if (issued.challenge.signatureRequired === false) {
-        // The dev economy's devsig arm, mirrored from the payment path:
-        // explicit permission only; an absent flag still goes to the wallet.
-        signature = `devsig:${issued.challenge.nonce}`;
-      } else {
-        this.log(t('hudChrome.wocMarket.signing'), '#ffd100');
-        try {
-          signature = await hooks.signMessageBase58(issued.challenge.message);
-        } catch (err) {
-          this.log(
-            err instanceof Error && err.message ? err.message : t('hudChrome.wocMarket.signFailed'),
-            '#ff6b6b',
-          );
+    // Commit to the async round trip: show the disabled/waiting face NOW (the
+    // wallet is about to take over the screen), and reset it in finally.
+    this.wocTradeAccepting = true;
+    this.updateTradeWindow();
+    try {
+      // The SELLER's acceptance is the custody-committing act, so it carries
+      // the wallet step-up proof (B6/R1): a fresh offer-bound challenge signed
+      // through the same bridge the payment path uses. The buyer sends none.
+      let stepUpFields: { stepUp?: { nonce: string; signature: string } } = {};
+      if (offer.role === 'seller') {
+        const issued = await hooks.client.stepUpChallenge({
+          operation: 'accept_directed_offer',
+          offerId: offer.id,
+        });
+        if (!issued.ok) {
+          this.log(userFacingApiError({ code: issued.code }), '#ff6b6b');
           return;
         }
+        let signature: string;
+        if (issued.challenge.signatureRequired === false) {
+          // The dev economy's devsig arm, mirrored from the payment path:
+          // explicit permission only; an absent flag still goes to the wallet.
+          signature = `devsig:${issued.challenge.nonce}`;
+        } else {
+          this.log(t('hudChrome.wocMarket.signing'), '#ffd100');
+          try {
+            signature = await hooks.signMessageBase58(issued.challenge.message);
+          } catch (err) {
+            this.log(
+              err instanceof Error && err.message
+                ? err.message
+                : t('hudChrome.wocMarket.signFailedListing'),
+              '#ff6b6b',
+            );
+            return;
+          }
+        }
+        stepUpFields = { stepUp: { nonce: issued.challenge.nonce, signature } };
       }
-      stepUpFields = { stepUp: { nonce: issued.challenge.nonce, signature } };
-    }
-    const res = await hooks.client.acceptOffer(offer.id, {
-      characterId: hooks.characterId() ?? 0,
-      ...itemFields,
-      ...stepUpFields,
-    });
-    if (!res.ok) {
-      this.log(userFacingApiError({ code: res.code }), '#ff6b6b');
-      return;
-    }
-    if (res.listing === null) {
-      // Agreed; the other side has not yet. Nothing has moved.
-      this.log(t('hudChrome.trade.woc.waitingOther'), '#ffd100');
+      const res = await hooks.client.acceptOffer(offer.id, {
+        characterId: hooks.characterId() ?? 0,
+        ...itemFields,
+        ...stepUpFields,
+      });
+      if (!res.ok) {
+        this.log(userFacingApiError({ code: res.code }), '#ff6b6b');
+        return;
+      }
+      if (res.listing === null) {
+        // Agreed; the other side has not yet. Nothing has moved.
+        this.log(t('hudChrome.trade.woc.waitingOther'), '#ffd100');
+        this.lastTradeSig = '';
+        return;
+      }
+      // The window STAYS OPEN and the offer stays in it: escrow is done, and
+      // the buyer's payment is the next thing that happens here. Closing at
+      // this point is what previously left the deal with nowhere to finish.
+      this.log(t('hudChrome.trade.woc.accepted'), '#7fdc4f');
+      this.wocTradeOffer = {
+        ...offer,
+        phase: 'awaiting_payment',
+        listingId: res.listing.id,
+      };
       this.lastTradeSig = '';
-      return;
+    } finally {
+      this.wocTradeAccepting = false;
+      this.updateTradeWindow();
     }
-    // The window STAYS OPEN and the offer stays in it: escrow is done, and the
-    // buyer's payment is the next thing that happens here. Closing at this
-    // point is what previously left the deal with nowhere to finish.
-    this.log(t('hudChrome.trade.woc.accepted'), '#7fdc4f');
-    this.wocTradeOffer = {
-      ...offer,
-      phase: 'awaiting_payment',
-      listingId: res.listing.id,
-    };
-    this.lastTradeSig = '';
   }
 
   /**
@@ -770,8 +790,13 @@ export class WocTradeController {
       // pays and the seller waits, both inside the arm.
       const acceptSpent =
         wocModel.pendingOffer !== null && wocModel.pendingOffer.phase !== 'review';
-      acceptBtn.textContent = accepted ? t('hud.trade.waiting') : t('hud.trade.accept');
-      acceptBtn.disabled = accepted || acceptSpent;
+      // The seller's acceptance is in flight (challenge mint plus wallet): the
+      // button reads "Waiting..." and disables, so the multi-second handoff
+      // never looks like a dead click (frontend pending-face contract).
+      const acceptInFlight = this.wocTradeAccepting;
+      acceptBtn.textContent =
+        accepted || acceptInFlight ? t('hud.trade.waiting') : t('hud.trade.accept');
+      acceptBtn.disabled = accepted || acceptSpent || acceptInFlight;
       acceptBtn.hidden = acceptSpent;
       acceptBtn.addEventListener('click', () => {
         // With a $WOC offer standing, the sim's confirm must NEVER run: it swaps

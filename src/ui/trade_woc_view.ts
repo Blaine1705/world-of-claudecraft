@@ -422,9 +422,17 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
     // name.
     acceptHint:
       input.pendingOffer?.phase === 'review' && input.pendingOffer.role === 'seller' && !canAccept
-        ? acceptTable.some((s) => wocTradableSlot(s, input.items))
-          ? 'hudChrome.trade.woc.hintOneItem'
-          : 'hudChrome.trade.woc.hintAcceptNeedsItem'
+        ? // A single staged copy blocked ONLY by the player's own item lock is
+          // liftable in one click, so name that instead of "add the item" (which
+          // contradicts the visible, locked item on the table). R10.
+          acceptTable.length === 1 &&
+          acceptTable[0].count === 1 &&
+          input.items[acceptTable[0].itemId] !== undefined &&
+          exchangeHardLock(input.items[acceptTable[0].itemId], acceptTable[0].instance) === 'locked'
+          ? 'hudChrome.trade.woc.hintAcceptLocked'
+          : acceptTable.some((s) => wocTradableSlot(s, input.items))
+            ? 'hudChrome.trade.woc.hintOneItem'
+            : 'hudChrome.trade.woc.hintAcceptNeedsItem'
         : null,
     // Only the buyer pays, and only once the goods are actually in escrow: a pay
     // button before that would take money for an item still in someone's bags.

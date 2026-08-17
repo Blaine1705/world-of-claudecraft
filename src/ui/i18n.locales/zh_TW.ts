@@ -8447,6 +8447,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.quoteSettlementFor': '{item} 的結算：{usd}',
   'hudChrome.wocMarket.signing': '等待錢包確認...',
   'hudChrome.wocMarket.signFailed': '你的錢包未能完成付款。請檢查錢包後重試。',
+  'hudChrome.wocMarket.signFailedListing': '你的錢包未能簽署確認。請檢查錢包後重試。',
+  'hudChrome.wocMarket.listing': '正在上架你的物品...',
   'hudChrome.wocMarket.confirming': '正在鏈上確認...',
   'hudChrome.wocMarket.bidPlacedStanding': '你的出價已生效，你是目前最高出價者。',
   'hudChrome.wocMarket.bidPlacedOutbid': '你的保證金已確認，但有人搶先出了更高的價。',
@@ -13043,6 +13045,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.hintOneItem': '$WOC 交易一次只包含一件物品。請只保留要出售的那一件。',
   'hudChrome.trade.woc.sendOffer': '出價 $WOC',
   'hudChrome.trade.woc.incomingAccept': '{name} 出價 {price} 購買你的物品。',
+  'hudChrome.trade.woc.hintAcceptLocked': '該物品已鎖定。出售前請先在背包中解鎖。',
   'hudChrome.trade.woc.hintAcceptNeedsItem': '接受前請先放入你要出售的物品。',
   'hudChrome.trade.woc.hintEnterPrice': '請輸入美元價格。',
   'hudChrome.trade.woc.hintGoldOffered':
