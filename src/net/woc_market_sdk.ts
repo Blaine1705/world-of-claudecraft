@@ -200,7 +200,38 @@ export interface CreateListingRequest {
   buyNowCents: number | null;
   durationHours: number;
   offerNext: boolean;
+  /** The wallet step-up proof (B6/R1): a fresh challenge signed by the linked
+   *  wallet. Omitting it refuses woc_market.stepup_required server-side. */
+  stepUp?: WocStepUpProof;
 }
+
+export interface WocStepUpProof {
+  nonce: string;
+  signature: string;
+}
+
+/** The step-up challenge the wallet signs. The MESSAGE is server-built and
+ *  shown by the wallet popup; the client never composes what gets signed. */
+export interface WocStepUpChallenge {
+  nonce: string;
+  message: string;
+  expiresAtMs: number;
+  /** False only under the server's dev economy (devsig). Absent is treated as
+   *  TRUE: a missing field must never be read as permission to skip signing. */
+  signatureRequired?: boolean;
+}
+
+export type WocStepUpChallengeRequest =
+  | {
+      operation: 'create_listing';
+      itemId: string;
+      format: 'auction' | 'buy_now' | 'auction_buy_now';
+      startCents: number;
+      reserveCents: number | null;
+      buyNowCents: number | null;
+      durationHours: number;
+    }
+  | { operation: 'accept_directed_offer'; offerId: number };
 
 export interface PlaceBidRequest {
   listingId: number;
@@ -347,8 +378,22 @@ export class WocMarketClient {
     return out.ok ? { ok: true, ...out.data } : out;
   }
 
-  /** Either side accepts. The SELLER names the copy; the buyer sends no item.
-   *  A null listing means "agreed, waiting on the other side". */
+  /** Issue a step-up challenge (B6/R1) for one intended custody move; the
+   *  returned message is what the wallet signs. */
+  async stepUpChallenge(
+    req: WocStepUpChallengeRequest,
+  ): Promise<{ ok: true; challenge: WocStepUpChallenge } | WocMarketFail> {
+    const out = await this.request<{ challenge: WocStepUpChallenge }>(
+      'POST',
+      '/api/woc-market/step-up/challenge',
+      req,
+    );
+    return out.ok ? { ok: true, ...out.data } : out;
+  }
+
+  /** Either side accepts. The SELLER names the copy plus the step-up proof;
+   *  the buyer sends no item and no proof. A null listing means "agreed,
+   *  waiting on the other side". */
   async acceptOffer(
     id: number,
     req: {
@@ -356,6 +401,7 @@ export class WocMarketClient {
       itemIndex?: number;
       itemId?: string;
       expectInstance?: ItemInstancePayload;
+      stepUp?: WocStepUpProof;
     },
   ): Promise<{ ok: true; listing: WocListingView | null } | WocMarketFail> {
     const out = await this.request<{ listing: WocListingView | null }>(
