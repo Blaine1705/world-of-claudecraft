@@ -108,16 +108,16 @@ settlement deadline that applies if the bid wins.
 
 Every bid requires: a verified linked wallet (`server/wallet.ts`), sufficient
 $WOC balance at bid time (`server/woc_balance.ts` cached read), an established
-account, acceptance of the variable-token settlement terms (recorded), and TOTP
-2FA (`server/totp.ts`) for bids at or above a configured USD threshold. That
-TOTP requirement was never enforced server-side (the
-`WOC_MARKET_TOTP_THRESHOLD_CENTS` knob has been deleted from `.env.example`,
-where a guard test now forbids documenting a knob no code reads; the error
-surface still exists while no code consults it, finding B6) and is
-SUPERSEDED: the adopted direction (ruling R1 in the
-hardening packet, `docs/woc-marketplace-hardening/`) is wallet-signature
-step-up on the custody-moving operations instead, with the phantom TOTP
-scaffolding deleted; the packet's step-up work owns building it pre-enable.
+account, and acceptance of the variable-token settlement terms (recorded).
+The custody-moving operations (`createListing` and the seller side of
+`acceptDirectedOffer`) additionally require a wallet-signature STEP-UP
+(ruling R1, closing finding B6): a fresh single-use server-built challenge
+signed by the linked wallet, bound to the operation and every money figure it
+authorizes, verified in the service (`server/woc_market_stepup.ts`). This
+replaced the PRD's original TOTP threshold design, which was never enforced
+server-side; the phantom scaffolding is deleted (the two `woc_market.totp_*`
+error codes alone remain, retired-and-commented, per the append-only
+error-code contract).
 
 Balance checks do not guarantee later possession, so every bid posts a small
 refundable bond, denominated in USD and paid in $WOC when the bid is placed

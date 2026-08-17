@@ -231,6 +231,9 @@ export const apiErrorStrings = {
     self_offer: 'You cannot send a $WOC offer to yourself.',
     offer_expired: 'That $WOC offer expired. Ask for a new one.',
     terms_required: 'Accept the Exchange settlement terms to continue.',
+    // RETIRED, never rendered (B6/R1): no server path raises either totp
+    // code; the rows stay because the catalog leaf set must equal the
+    // append-only ERROR_CODES (tests/api_error_code_parity.test.ts).
     totp_required:
       'This amount requires two-factor authentication. Enable it in account settings, then enter your code.',
     totp_invalid: 'That two-factor code did not verify. Try again.',

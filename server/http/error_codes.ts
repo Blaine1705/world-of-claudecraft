@@ -259,9 +259,13 @@ export const ERROR_CODES = deepFreeze({
   'woc_market.offer_expired': { params: [] },
   // The variable-token settlement terms must be accepted first (403).
   'woc_market.terms_required': { params: [] },
-  // 2FA is required at or above the configured USD threshold (403).
+  // RETIRED, never enforced (B6/R1): no server path has ever raised either
+  // totp code, and none ever will; the wallet step-up
+  // (woc_market.stepup_* below, server/woc_market_stepup.ts) is the real
+  // second factor on the custody movers. Both rows stay per the append-only
+  // contract above; their catalog entries stay with them (the parity test's
+  // set-equality dimension).
   'woc_market.totp_required': { params: [] },
-  // The provided 2FA code did not verify (403).
   'woc_market.totp_invalid': { params: [] },
   // The account is under a marketplace suspension from settlement defaults (403).
   'woc_market.suspended': { params: [] },

@@ -348,7 +348,6 @@ function makeHarness(): Harness {
     ['wallet-b', 100_000_000],
     ['wallet-c', 100_000_000],
   ]);
-  // BUYER_B stays deliberately unenrolled (the enroll-first TOTP refusal arm).
   const economy = createDevWocMarketEconomy(now);
   const sweepErrors: [string, unknown][] = [];
   const deps: WocMarketDeps = {

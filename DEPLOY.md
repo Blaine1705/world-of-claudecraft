@@ -497,6 +497,11 @@ For off-box safety, sync the directory to S3 occasionally:
   verdict word `awaiting_finality` for LEDGER-MATCHED payments (the game's
   anti-snipe extension trusts exactly that reservation); a service build that
   starts emitting it optimistically is a breaking change, not a copy tweak.
+  Player-visible behavior note: listing an item and the seller side of a
+  directed acceptance now require a wallet SIGNATURE (the step-up challenge;
+  no transaction, no funds), so a seller whose wallet is linked but
+  unavailable at the moment cannot list; no knob controls this and no env
+  change accompanies it (the dev economy pair alone enables the devsig arm).
 - **Ops dashboard market reads**: `DASHBOARD_INTERNAL_SECRET` gates the ops
   dashboard's `/internal/woc-market/*` reads; unset leaves them 404 (names
   only here, the values live in deployment secrets).

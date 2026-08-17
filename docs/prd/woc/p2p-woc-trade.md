@@ -223,15 +223,15 @@ which is the right shape.
 note below about whether it should also come off auctions.
 
 The reason it costs little is worth recording, because it is not obvious. The
-marketplace PRD specifies TOTP on `placeBid` and `buyNow` only, and both of
+marketplace PRD specified TOTP on `placeBid` and `buyNow` only, and both of
 those require the buyer's own wallet signature to move any money. A stolen
 session token does not carry the wallet key, so 2FA there is a step-up gate in
 front of an action that already demands a stronger second factor. (Truth-up,
 2026-08-13: that TOTP gate was specified but never enforced server-side, on any
-path; the threshold knob has no consumer, finding B6. The step-up work in the
-hardening packet, `docs/woc-marketplace-hardening/`, owns building enforcement
-where it belongs, which per this analysis is the custody-moving side, not the
-paying side.)
+path; finding B6. Built since: the wallet-signature step-up now guards the
+custody-moving side, which per this analysis is where it belongs. Listing and
+the SELLER's directed acceptance require a fresh challenge signed by the
+linked wallet, `server/woc_market_stepup.ts`.)
 
 **The gap it leaves untouched is on the other side.** `createListing` has NO 2FA at
 all, and that is where a session-token thief can actually steal: list the victim's

@@ -151,6 +151,7 @@ export const API_ERROR_KEYS = {
   'woc_market.self_offer': 'apiError.woc_market.self_offer',
   'woc_market.offer_expired': 'apiError.woc_market.offer_expired',
   'woc_market.terms_required': 'apiError.woc_market.terms_required',
+  // RETIRED, never raised (B6/R1); kept with their append-only codes.
   'woc_market.totp_required': 'apiError.woc_market.totp_required',
   'woc_market.totp_invalid': 'apiError.woc_market.totp_invalid',
   'woc_market.suspended': 'apiError.woc_market.suspended',

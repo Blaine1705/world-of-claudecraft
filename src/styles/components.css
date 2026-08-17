@@ -16701,10 +16701,10 @@
   }
   /* The money-entry controls. No sheet in this tree has a generic input/select
      rule (base.css normalizes only range/number/checkbox/radio and textarea),
-     so every window themes its own; without this the bid amount, the TOTP code
-     and all three dropdowns rendered as white browser chrome on a dark panel,
-     which is the same defect this batch set out to fix. The 16px coarse-pointer
-     font floor in base.css targets these controls directly and still wins. */
+     so every window themes its own; without this the bid amount and all three
+     dropdowns rendered as white browser chrome on a dark panel, which is the
+     same defect this batch set out to fix. The 16px coarse-pointer font floor
+     in base.css targets these controls directly and still wins. */
   #woc-market-window input[type="text"],
   #woc-market-window input[type="number"],
   #woc-market-window select {
@@ -16742,12 +16742,6 @@
     flex-direction: row;
     align-items: center;
     gap: 6px;
-    font-size: 13px;
-  }
-  #woc-market-window .wm-totp {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
     font-size: 13px;
   }
   #woc-market-window .wm-detail-item {

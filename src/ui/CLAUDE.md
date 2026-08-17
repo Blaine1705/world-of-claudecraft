@@ -607,6 +607,11 @@ same file), and each module's header carries its own contract.
 - **woc_market_window.ts** over the pure **woc_market_view.ts** core: the $WOC Exchange
   (config-off behind `WOC_MARKET_ENABLED`; `docs/prd/woc/marketplace.md`). Everything
   economic is a passthrough of server numbers; the terms-acceptance checkbox lives here.
+  Custody moves run the wallet STEP-UP first (B6/R1): the submit mints a challenge,
+  hands the SERVER-built message to `hooks.signMessageBase58` (same lazy bridge as the
+  payment signer), and sends the proof with the request; the trade window's $WOC arm
+  does the same on the SELLER's acceptance only. Devsig skips the wallet ONLY on an
+  explicit `signatureRequired: false`; absent means sign.
   Payment-verdict words (the server's screened vocabulary: pending kinds, settlement
   fail reasons) localize through `woc_market_reason_text.ts`, which owns the
   word-to-copy maps with a generic fallback in each direction; never map a verdict
