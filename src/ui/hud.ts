@@ -9032,16 +9032,7 @@ export class Hud {
     this.playerFramePainter.paint(unitFrameViewInto(this.playerFrameBuffer, playerFrame));
     this.updateLowHealthVignette(p.hp, p.maxHp);
     this.updateLowResource(p);
-    // Hoisted behind the spec check (review 3050): the thread count walks the
-    // whole entity map times each entity's auras, and for the eight other
-    // classes it produced a discarded 0 every frame.
-    const isAffliction = this.sim.talentSpec === 'affliction';
-    const fateThreads = isAffliction ? afflictionFateThreadCount(sim.entities.values(), p.id) : 0;
-    this.doomMeter.paint({
-      affliction: isAffliction,
-      auras: p.auras,
-      fateThreads,
-    });
+    const fateThreads = this.updateWarlockDoomMeter(p);
 
     // Energy users keep combo points on the character frame. Class resources
     // with their own identity are rendered by dedicated HUD overlays below.
@@ -9785,6 +9776,13 @@ export class Hud {
     if (slowHud && this.calendarWindow.isOpen) this.calendarWindow.refreshIfChanged();
     if (slowHud) this.updateMailIndicator();
     if (slowHud) this.updateMarketIndicator();
+  }
+
+  private updateWarlockDoomMeter(p: Entity): number {
+    const affliction = this.sim.talentSpec === 'affliction';
+    const fateThreads = affliction ? afflictionFateThreadCount(p.auras, p.id) : 0;
+    this.doomMeter.paint({ affliction, auras: p.auras, fateThreads });
+    return fateThreads;
   }
 
   private initMailIndicator(): void {
