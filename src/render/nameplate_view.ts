@@ -90,7 +90,13 @@ export function newNameplatePlan(): NameplatePlan {
  * player's. `showPlayerNameplates` is the other-players toggle (defaults on):
  * when off, other players' plates hide, except the current target so a clicked
  * player stays readable; the self plate stays governed by showOwnNameplate
- * alone, and mob/object plates are unaffected. Pure: same inputs give the same
+ * alone, and mob/object plates are unaffected. `standIn` says this entity has
+ * no in-world body at all right now (a compile gate hides it, see
+ * entity_gate_stand_in_core.ts): its plate is then the only thing telling the
+ * player an enemy is there, so it overrides BOTH nameplate toggles. It
+ * overrides nothing else: range, a looted corpse, a plateless object or door
+ * are not a hidden body, and the self plate stays the player's own choice
+ * (the local player's view is never gated). Pure: same inputs give the same
  * plan, no DOM/Three/i18n, no Math.random/Date.now/performance.now.
  */
 export function nameplatePlanInto(
@@ -101,6 +107,7 @@ export function nameplatePlanInto(
   showNameplates: boolean,
   showOwnNameplate: boolean,
   showPlayerNameplates: boolean,
+  standIn: boolean,
 ): NameplatePlan {
   const dx = e.pos.x - player.pos.x;
   const dz = e.pos.z - player.pos.z;
@@ -135,8 +142,9 @@ export function nameplatePlanInto(
     (e.kind === 'object' && !isDoor && !delveInteractNear) ||
     (isDoor && e.dungeonId === UNLABELED_DOOR_DUNGEON_ID) ||
     e.templateId === UNLABELED_MOB_TEMPLATE_ID ||
-    (!showNameplates && e.kind === 'mob' && !e.dead) ||
-    (!showPlayerNameplates && e.kind === 'player' && !isSelf && e.id !== player.targetId);
+    (!standIn &&
+      ((!showNameplates && e.kind === 'mob' && !e.dead) ||
+        (!showPlayerNameplates && e.kind === 'player' && !isSelf && e.id !== player.targetId)));
   out.anchorYOffset =
     viewHeight * e.scale +
     (isSelf && hasOverheadEmote && !showOwnNameplate

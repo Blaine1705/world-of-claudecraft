@@ -240,6 +240,7 @@ import {
 import { buildEastbrookTownView, type EastbrookTownView } from './eastbrook_town';
 import { buildEmberFeatures, type EmberFeaturesView } from './ember_features';
 import { buildEmberPools, type EmberPoolsView } from './ember_pools';
+import { applyCharacterFormVisibility } from './entity_gate_stand_in_core';
 import {
   entityViewCandidatePriority,
   entityViewDistanceSq,
@@ -8984,6 +8985,9 @@ export class Renderer {
     if (!v.visual) return;
     const nextKey = visualKeyFor(e);
     if (nextKey === v.visualKey) return;
+    // One base-rig swap in flight at a time: the outgoing rig stands in until
+    // the replacement links, and this per-frame key diff retries the next one.
+    if (v.visualCompilePending) return;
     const retrySlot = `base:${nextKey}`;
     if (!this.viewCreateRetry.canAttempt(e.id, retrySlot, performance.now())) return;
     if (nextKey === 'player_mech' && !mechAssetsReady()) {
@@ -9004,8 +9008,9 @@ export class Renderer {
     next.setFar(v.isFar);
     const oldClickTarget = v.clickTarget;
     const idx = this.clickTargets.indexOf(oldClickTarget);
-    v.visual.dispose();
-    v.group.remove(v.visual.root);
+    // Never leave the entity bodiless: the outgoing rig stays attached and
+    // drawing (frozen pose) until the replacement's gate settles below.
+    const outgoing = v.visual;
     if (!e.templateId.startsWith('vision_')) next.clickProxy.userData.entityId = e.id;
     if (idx >= 0) this.clickTargets[idx] = next.clickProxy;
     v.visual = next;
@@ -9029,6 +9034,8 @@ export class Renderer {
     v.visualCompilePending = true;
     this.gateSwapFlagOnCompile(next.root, () => {
       v.visualCompilePending = false;
+      v.group.remove(outgoing.root);
+      outgoing.dispose();
     });
   }
 
@@ -11161,27 +11168,21 @@ export class Renderer {
       if (metamorphForm && !v.metamorphVisual) {
         this.buildFormVisual(e, v, 'form_metamorph', 'metamorphVisual', false);
       }
+      // A form rig that is still linking is NOT ready: the mask holds the
+      // resolved form at 'base', so the BODY stands in and a polymorphed target
+      // turns into a sheep a few frames late instead of vanishing for the whole
+      // gate window (the stand-in invariant, src/render/CLAUDE.md).
       const formReadyMask = characterFormReadyMask(
         v.sheepVisual,
         v.bearVisual,
         v.catVisual,
         v.travelVisual,
         v.metamorphVisual,
+        v.formCompilePending,
       );
       const resolvedForm = resolvedCharacterForm(requestedForm, formReadyMask);
       const formVisibility = characterFormVisibility(resolvedForm);
-      // Gated per form root: the resolved visibility AND the compile-pending
-      // token both drive it, so a still-linking form pops in a frame or two
-      // late instead of stalling the frame it is entered on.
-      v.sheepVisual?.setActive(formVisibility.sheep && v.formCompilePending !== v.sheepVisual.root);
-      v.bearVisual?.setActive(formVisibility.bear && v.formCompilePending !== v.bearVisual.root);
-      v.catVisual?.setActive(formVisibility.cat && v.formCompilePending !== v.catVisual.root);
-      v.travelVisual?.setActive(
-        formVisibility.travel && v.formCompilePending !== v.travelVisual.root,
-      );
-      v.metamorphVisual?.setActive(
-        formVisibility.metamorph && v.formCompilePending !== v.metamorphVisual.root,
-      );
+      applyCharacterFormVisibility(v, formVisibility, v.visualCompilePending);
       // rideable mount under the player (the lazy form-visual pattern). Mount
       // GLBs are lazyPreload: the first sight of a rider kicks the fetch and
       // the visual appears once ready. A druid form replaces the whole body,
@@ -11261,7 +11262,6 @@ export class Renderer {
       // CharacterVisual driven by formVisibility.metamorph above.
       active.setAscended(veilboundState !== 'none');
       active.setRuneTint(characterRuneTintColor(e));
-      v.visual.setActive(formVisibility.base && !v.visualCompilePending);
       // saddle lift: the rider (click proxy included, a root child) sits at
       // the seat height while mounted; 0 whenever the mount is absent/hidden.
       // seatFwd slides the rider along facing onto saddles that sit off the
