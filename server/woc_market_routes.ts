@@ -202,6 +202,10 @@ export const REFUSAL_ERRORS: Record<WocMarketRefusal, { status: number; code: Er
   no_market_list: { status: 400, code: 'woc_market.not_eligible' },
   bound_copy: { status: 400, code: 'woc_market.not_eligible' },
   bind_armed: { status: 400, code: 'woc_market.not_eligible' },
+  // The player's own item lock (R10). Its own code, not a not_eligible
+  // collapse: this is the one refusal the player can lift themselves, and the
+  // copy has to say so (unlock it in your bags, then list it).
+  locked: { status: 400, code: 'woc_market.item_locked' },
   unknown_item: { status: 400, code: 'woc_market.not_eligible' },
   not_eligible_category: { status: 400, code: 'woc_market.not_eligible' },
   below_quality_floor: { status: 400, code: 'woc_market.not_eligible' },

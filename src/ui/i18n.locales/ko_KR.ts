@@ -8710,6 +8710,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.confirm_in_flight':
     '결제가 아직 확인 중입니다. 완료된 후 다시 시도하세요.',
   'apiError.woc_market.cancel_pending': '판매자가 이 판매글을 취소하는 중입니다.',
+  'apiError.woc_market.item_locked':
+    '해당 아이템은 잠겨 있습니다. 판매하기 전에 가방에서 잠금을 해제하세요.',
   'apiError.woc_market.item_mismatch':
     '구매자가 동의한 아이템과 일치하지 않습니다. 거래를 새로 시작하세요.',
   'apiError.woc_market.offer_pending':

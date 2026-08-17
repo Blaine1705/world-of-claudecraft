@@ -334,6 +334,10 @@ export const ERROR_CODES = deepFreeze({
   'woc_market.invalid_params': { params: [] },
   // That transaction signature was already submitted (409).
   'woc_market.signature_reused': { params: [] },
+  // The copy is under the owner's own item lock (issue 3042); unlocking it in
+  // the bags is the fix, so it gets its own code, not a not_eligible collapse
+  // (400).
+  'woc_market.item_locked': { params: [] },
 } as const);
 
 /** A stable error code: one of the keys of ERROR_CODES. */

@@ -8352,6 +8352,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.confirm_failed': '交易未能確認。請重新取得報價後再試。',
   'apiError.woc_market.confirm_in_flight': '你的付款仍在確認中。待其完成後再試。',
   'apiError.woc_market.cancel_pending': '賣家正在取消該掛單。',
+  'apiError.woc_market.item_locked': '該物品已鎖定。出售前請先在背包中解鎖。',
   'apiError.woc_market.item_mismatch': '這不是買家同意購買的那件物品。請重新發起一筆交易。',
   'apiError.woc_market.offer_pending': '你與該玩家已有一筆進行中的交易。請先處理完它。',
   'apiError.woc_market.bond_window_closed': '該出價已無法支付：付款視窗已關閉。請重新出價以取得新的付款視窗。',

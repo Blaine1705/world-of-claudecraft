@@ -77,6 +77,18 @@ describe('eligibility is shared with the server, not restated', () => {
     expect(wocTradableSlot(slot(JUNK.id), TABLE)).toBe(false);
   });
 
+  it('refuses a copy the owner item-locked, and the same copy unlocked stays tradable', () => {
+    // R10: the player lock reaches the trade window's exchange arm through the
+    // same shared predicate the server enforces, so the panel never stages a
+    // copy the escrow would refuse.
+    expect(wocTradableSlot({ itemId: EPIC.id, count: 1, instance: { locked: true } }, TABLE)).toBe(
+      false,
+    );
+    expect(wocTradableSlot({ itemId: EPIC.id, count: 1, instance: { locked: false } }, TABLE)).toBe(
+      true,
+    );
+  });
+
   it('refuses an id this bundle cannot resolve', () => {
     // A stale client must not offer to sell something it cannot identify.
     expect(wocTradableSlot(slot('no_such_item'), TABLE)).toBe(false);

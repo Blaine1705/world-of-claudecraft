@@ -31,7 +31,8 @@ export type ExtractRefusal =
   | 'quest_item'
   | 'no_market_list'
   | 'bound_copy' // instance.boundTo set (the bind-on-trade stamp has landed)
-  | 'bind_armed'; // instance.bindOnTrade set, no stamp yet (it binds on hand-off)
+  | 'bind_armed' // instance.bindOnTrade set, no stamp yet (it binds on hand-off)
+  | 'locked'; // the owner's own item lock (issue 3042); they unlock it first
 
 export type ExtractOutcome =
   | { ok: true; extracted: InvSlot }

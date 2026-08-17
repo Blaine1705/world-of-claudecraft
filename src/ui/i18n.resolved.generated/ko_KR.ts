@@ -4186,7 +4186,8 @@ export const ko_KR: EnTranslations = {
       "offer_pending": "이 플레이어와 진행 중인 거래가 이미 있습니다. 먼저 해결하세요.",
       "not_eligible": "해당 아이템은 $WOC 거래소에 등록할 수 없습니다.",
       "invalid_params": "시작가, 최저가, 즉시 구매가, 기간을 확인하세요.",
-      "signature_reused": "해당 트랜잭션은 이미 제출되었습니다."
+      "signature_reused": "해당 트랜잭션은 이미 제출되었습니다.",
+      "item_locked": "해당 아이템은 잠겨 있습니다. 판매하기 전에 가방에서 잠금을 해제하세요."
     }
   },
   "guide": {

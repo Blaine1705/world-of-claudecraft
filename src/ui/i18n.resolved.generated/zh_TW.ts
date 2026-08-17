@@ -4186,7 +4186,8 @@ export const zh_TW: EnTranslations = {
       "offer_pending": "你與該玩家已有一筆進行中的交易。請先處理完它。",
       "not_eligible": "該物品不能在 $WOC 交易所掛單。",
       "invalid_params": "請檢查起標價、底價、直購價與拍賣時長。",
-      "signature_reused": "該交易已提交過。"
+      "signature_reused": "該交易已提交過。",
+      "item_locked": "該物品已鎖定。出售前請先在背包中解鎖。"
     }
   },
   "guide": {

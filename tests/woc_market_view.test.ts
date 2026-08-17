@@ -300,6 +300,18 @@ describe('sellableRows: the sell-tab pre-filter over real ITEMS', () => {
     ]);
   });
 
+  it('hides a copy the owner item-locked, and offers the same copy unlocked', () => {
+    // R10: the lock is liftable in the bags, so the picker hides the locked
+    // copy (the server would refuse it) while the unlocked control proves the
+    // drop is attributable to the flag alone.
+    const locked: InvSlot[] = [{ itemId: epicEquipId, count: 1, instance: { locked: true } }];
+    expect(sellableRows(locked, 'epic', BOTH_ON)).toEqual([]);
+    const unlocked: InvSlot[] = [{ itemId: epicEquipId, count: 1, instance: { locked: false } }];
+    expect(sellableRows(unlocked, 'epic', BOTH_ON)).toEqual([
+      { index: 0, itemId: epicEquipId, quality: 'epic', instance: { locked: false } },
+    ]);
+  });
+
   it('lets a rolled epic quality lift a rare def over an epic floor', () => {
     const instance = { rolled: { quality: 'epic' } };
     expect(sellableRows([{ itemId: rareEquipId, count: 1, instance }], 'epic', BOTH_ON)).toEqual([

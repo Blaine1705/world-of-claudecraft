@@ -162,6 +162,7 @@ const KNOWN_CODES = [
   'woc_market.not_eligible',
   'woc_market.invalid_params',
   'woc_market.signature_reused',
+  'woc_market.item_locked',
 ];
 
 // The parametric contract pins: the matcher

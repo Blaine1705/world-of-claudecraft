@@ -540,6 +540,41 @@ describe('createListing', () => {
     expect(h.db.escrowSaves).toHaveLength(0);
   });
 
+  it('refuses locked for a copy the owner has item-locked, before any custody action', async () => {
+    // R10: the player item lock (issue 3042) gates the $WOC exchange exactly as
+    // it gates salvage, crafting, and vendor sale. The claimed instance carries
+    // the flag, so the advisory pre-check refuses with zero custody work.
+    const h = makeHarness();
+    h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1, instance: { locked: true } }]);
+    const res = await h.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM, expectInstance: { locked: true } },
+      params: listingParams(),
+    });
+    expect(res).toEqual({ ok: false, reason: 'locked' });
+    expect(bagsOf(h, SELLER_CHAR)).toHaveLength(1);
+    expect(h.db.escrowSaves).toHaveLength(0);
+  });
+
+  it('refuses locked on the authoritative extracted copy even when the claim omits the flag', async () => {
+    // The client claim skips the instance check entirely (expectInstance
+    // omitted), so only the in-job extraction can see the real payload: the
+    // lock must refuse there and the copy must restore to the bags.
+    const h = makeHarness();
+    h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1, instance: { locked: true } }]);
+    const res = await h.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams(),
+    });
+    expect(res).toEqual({ ok: false, reason: 'locked' });
+    expect(bagsOf(h, SELLER_CHAR)).toHaveLength(1);
+    expect(bagsOf(h, SELLER_CHAR)[0]?.instance?.locked).toBe(true);
+    expect(h.db.escrowSaves).toHaveLength(0);
+  });
+
   it('runs the custody critical section through runSerialized for the listed character', async () => {
     const h = makeHarness();
     const res = await h.service.createListing({
@@ -3659,6 +3694,38 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
       ok: false,
       reason: 'recipient_wallet_required',
     });
+  });
+
+  it('refuses an offer naming an item-locked copy, exactly as its acceptance would', async () => {
+    // R10 on the directed rail: the agreed copy carries the lock flag, so the
+    // static-fact invariant (an offer must not be creatable that its own
+    // acceptance refuses) makes this a creation-time refusal.
+    const h = stocked();
+    const res = await h.service.createDirectedOffer(
+      offerArgs({ item: { itemId: EPIC_ITEM, instance: { locked: true } } }),
+    );
+    expect(res).toEqual({ ok: false, reason: 'locked' });
+  });
+
+  it('refuses the escrow moment when the seller locked the copy after the offer was made', async () => {
+    // The offer named an unlocked copy; the seller locks it before the deal
+    // consummates. The authoritative in-job eligibility re-check refuses on
+    // the REAL payload, the copy stays in the bags still locked, and the offer
+    // reopens so the seller can unlock and accept again.
+    const h = stocked();
+    const offer = unwrap(await h.service.createDirectedOffer(offerArgs()), 'createDirectedOffer');
+    expect((await buyerAccepts(h, offer.offer.id)).ok).toBe(true);
+    h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1, instance: { locked: true } }]);
+    const res = await h.service.acceptDirectedOffer(
+      SELLER,
+      offer.offer.id,
+      { index: 0, itemId: EPIC_ITEM },
+      SELLER_CHAR,
+    );
+    expect(res).toEqual({ ok: false, reason: 'locked' });
+    expect(bagsOf(h, SELLER_CHAR)[0]?.instance?.locked).toBe(true);
+    const reopened = await h.db.directedOfferById(REALM, offer.offer.id);
+    expect(reopened?.status).toBe('pending');
   });
 
   it('refuses when the BUYER has no wallet to pay from', async () => {

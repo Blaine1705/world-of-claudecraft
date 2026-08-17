@@ -121,7 +121,7 @@ describe('the refusal-to-wire mapping', () => {
     const rows = Object.entries(REFUSAL_ERRORS);
     // The EXACT count, not a floor. A floor of 35 let four union members vanish
     // silently; tsc catches a deleted Record key but not a shrunken union.
-    expect(rows).toHaveLength(51);
+    expect(rows).toHaveLength(52);
     for (const [reason, mapped] of rows) {
       expect(mapped.code, reason).toMatch(/^woc_market\./);
       expect(mapped.status, reason).toBeGreaterThanOrEqual(400);
@@ -207,6 +207,9 @@ describe('the refusal-to-wire mapping', () => {
     ['not_eligible_category', 400, 'woc_market.not_eligible'],
     ['below_quality_floor', 400, 'woc_market.not_eligible'],
     ['excluded_item', 400, 'woc_market.not_eligible'],
+    // The one eligibility refusal that does NOT collapse (R10): the player's
+    // own item lock is liftable by them, so the copy must say so.
+    ['locked', 400, 'woc_market.item_locked'],
     // Malformed listing params share one code; the client validates the fields.
     ['bad_format', 400, 'woc_market.invalid_params'],
     ['bad_start', 400, 'woc_market.invalid_params'],

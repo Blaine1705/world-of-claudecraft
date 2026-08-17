@@ -183,6 +183,7 @@ export const API_ERROR_KEYS = {
   'woc_market.not_eligible': 'apiError.woc_market.not_eligible',
   'woc_market.invalid_params': 'apiError.woc_market.invalid_params',
   'woc_market.signature_reused': 'apiError.woc_market.signature_reused',
+  'woc_market.item_locked': 'apiError.woc_market.item_locked',
 } satisfies Record<string, TranslationKey>;
 
 /** The message of an Error, or the string form of any other thrown value. */

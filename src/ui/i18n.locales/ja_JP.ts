@@ -8740,6 +8740,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.confirm_in_flight':
     '支払いはまだ確認中です。完了してからもう一度お試しください。',
   'apiError.woc_market.cancel_pending': '出品者がこの出品を取り消そうとしています。',
+  'apiError.woc_market.item_locked':
+    'そのアイテムはロックされています。売る前にバッグでロックを解除してください。',
   'apiError.woc_market.item_mismatch':
     '買い手が同意したアイテムと一致しません。改めて取引をやり直してください。',
   'apiError.woc_market.offer_pending':

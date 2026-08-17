@@ -8867,6 +8867,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.confirm_in_flight':
     'Платеж ещё подтверждается. Повторите попытку, когда он завершится.',
   'apiError.woc_market.cancel_pending': 'Продавец отменяет этот лот.',
+  'apiError.woc_market.item_locked':
+    'Этот предмет заблокирован. Снимите блокировку в сумке, прежде чем продавать его.',
   'apiError.woc_market.item_mismatch':
     'Это не тот предмет, на который согласился покупатель. Начните новую сделку.',
   'apiError.woc_market.offer_pending':

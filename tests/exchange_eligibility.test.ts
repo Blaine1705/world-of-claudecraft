@@ -134,6 +134,32 @@ describe('exchangeHardLock: which locks a category tolerates', () => {
     expect(exchangeHardLock(def({ slot: 'chest' }), { bindOnTrade: false })).toBe(null);
     expect(exchangeHardLock(def({ slot: 'chest' }), { signer: 'Aldric' })).toBe(null);
   });
+
+  it('refuses a copy the owner item-locked, on every category the exchange trades', () => {
+    // R10: the player's own lock (issue 3042) reaches the $WOC rail exactly as
+    // it reaches salvage, crafting, and vendor sale. Every tradable category,
+    // because the mount and chroma tolerances above must not tunnel past it.
+    expect(exchangeHardLock(def({ slot: 'chest' }), { locked: true })).toBe('locked');
+    expect(exchangeHardLock(def({ kind: 'mount', mount: 'valorsteed' }), { locked: true })).toBe(
+      'locked',
+    );
+    // An explicit false and an absent flag both stay tradable.
+    expect(exchangeHardLock(def({ slot: 'chest' }), { locked: false })).toBe(null);
+  });
+
+  it('reports the permanent lock, not the liftable one, when a copy carries both', () => {
+    // Precedence: unlocking a bound copy in the bags would not make it listable,
+    // so the refusal the player sees must name the stronger fact.
+    expect(exchangeHardLock(def({ slot: 'chest' }), { locked: true, boundTo: 7 })).toBe(
+      'bound_copy',
+    );
+    expect(exchangeHardLock(def({ slot: 'chest' }), { locked: true, bindOnTrade: true })).toBe(
+      'bind_armed',
+    );
+    expect(exchangeHardLock(def({ slot: 'chest', soulbound: true }), { locked: true })).toBe(
+      'soulbound',
+    );
+  });
 });
 
 describe('the exchange rail refuses exactly what the sibling pipes refuse', () => {

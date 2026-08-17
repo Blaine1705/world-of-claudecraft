@@ -4186,7 +4186,8 @@ export const it_IT: EnTranslations = {
       "offer_pending": "You already have a deal standing with this player. Resolve it first.",
       "not_eligible": "That item cannot be listed on the $WOC Exchange.",
       "invalid_params": "Check the starting bid, reserve, buy-now price, and duration.",
-      "signature_reused": "That transaction was already submitted."
+      "signature_reused": "That transaction was already submitted.",
+      "item_locked": "That item is locked. Unlock it in your bags before selling it."
     }
   },
   "guide": {

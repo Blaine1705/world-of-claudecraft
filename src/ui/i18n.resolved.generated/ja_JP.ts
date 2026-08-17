@@ -4186,7 +4186,8 @@ export const ja_JP: EnTranslations = {
       "offer_pending": "このプレイヤーとの取引がすでに進行中です。先にそちらを解決してください。",
       "not_eligible": "そのアイテムは $WOC 取引所に出品できません。",
       "invalid_params": "開始価格、最低落札価格、即決価格、期間を確認してください。",
-      "signature_reused": "そのトランザクションは既に送信されています。"
+      "signature_reused": "そのトランザクションは既に送信されています。",
+      "item_locked": "そのアイテムはロックされています。売る前にバッグでロックを解除してください。"
     }
   },
   "guide": {

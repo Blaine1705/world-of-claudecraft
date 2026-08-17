@@ -196,6 +196,7 @@ export type TranslationKeyFlat =
   | 'apiError.woc_market.insufficient_balance'
   | 'apiError.woc_market.invalid_input'
   | 'apiError.woc_market.invalid_params'
+  | 'apiError.woc_market.item_locked'
   | 'apiError.woc_market.item_mismatch'
   | 'apiError.woc_market.no_buy_now'
   | 'apiError.woc_market.not_active'

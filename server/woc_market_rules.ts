@@ -504,6 +504,7 @@ export type WocEligibilityRefusal =
   | 'no_market_list'
   | 'bound_copy'
   | 'bind_armed'
+  | 'locked'
   | 'excluded_item';
 
 export interface WocEligibilityPolicy {

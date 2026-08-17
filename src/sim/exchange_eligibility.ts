@@ -40,6 +40,7 @@
 // (tests/architecture.test.ts) still holds with this file inside it.
 // ---------------------------------------------------------------------------
 
+import { isItemLocked } from './item_lock';
 import { isTransferLockedInstance } from './transfer_lock';
 import type { ItemDef, ItemInstancePayload } from './types';
 
@@ -111,7 +112,8 @@ export type ExchangeLock =
   | 'quest_item'
   | 'no_market_list'
   | 'bound_copy'
-  | 'bind_armed';
+  | 'bind_armed'
+  | 'locked';
 
 export function exchangeHardLock(
   def: ItemDef,
@@ -129,6 +131,14 @@ export function exchangeHardLock(
   }
   if (def.soulbound && category !== 'mount') return 'soulbound';
   if (def.noMarketList && category !== 'mech_chroma') return 'no_market_list';
+  // The player's own item lock (issue 3042, R10): a copy its owner locked
+  // against salvage, crafting, and vendor sale refuses the $WOC exchange the
+  // same way; the seller unlocks it first. Deliberately the LAST arm: the
+  // permanent locks above name the stronger fact, and only a copy nothing
+  // else refuses reports the one the player can lift themselves. The gold
+  // market keeps its allow posture by ruling; it does not consult this
+  // predicate.
+  if (isItemLocked(instance)) return 'locked';
   return null;
 }
 
