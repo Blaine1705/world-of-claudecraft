@@ -178,7 +178,6 @@ import {
   withWeaponSkinApplied,
 } from './content/weapon_skin_rules';
 import { WEAPON_SKINS } from './content/weapon_skins';
-import { accountCosmeticsWithWornMechChroma } from './mech_chroma_ownership';
 import {
   type AbilityChargeState,
   applyCooldowns,
@@ -307,6 +306,7 @@ import {
 import { type MailSave, PostOffice } from './mail/post_office';
 import { Market, type MarketListing, type MarketSave } from './market';
 import { defaultMarketQuery, type MarketQuery } from './market_query';
+import { accountCosmeticsWithWornMechChroma } from './mech_chroma_ownership';
 import {
   mobCombatProfile as mobCombatProfileFn,
   mobEffectiveMeleeRange as mobEffectiveMeleeRangeImpl,

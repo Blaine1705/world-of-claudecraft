@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import type { TranslationKey } from '../src/ui/i18n.catalog';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
 import { itemNames } from '../src/ui/i18n.catalog/items';
-import { pending, translations } from '../src/ui/i18n.resolved.generated';
 import { cs_CZ } from '../src/ui/i18n.locales/cs_CZ';
 import { da_DK } from '../src/ui/i18n.locales/da_DK';
 import { de_DE } from '../src/ui/i18n.locales/de_DE';
@@ -21,6 +20,7 @@ import { tr_TR } from '../src/ui/i18n.locales/tr_TR';
 import { vi_VN } from '../src/ui/i18n.locales/vi_VN';
 import { zh_CN } from '../src/ui/i18n.locales/zh_CN';
 import { zh_TW } from '../src/ui/i18n.locales/zh_TW';
+import { pending, translations } from '../src/ui/i18n.resolved.generated';
 
 const locales: Record<string, Partial<Record<TranslationKey, string>>> = {
   cs_CZ,
@@ -168,7 +168,9 @@ describe('reviewed localization semantics', () => {
       'entities.abilities.howl_of_terror.description',
       'entities.abilities.ossuary_mark.description',
     ];
-    const localeNames = Object.keys(translations).filter((lang) => lang !== 'en' && lang !== 'en_CA');
+    const localeNames = Object.keys(translations).filter(
+      (lang) => lang !== 'en' && lang !== 'en_CA',
+    );
 
     for (const lang of localeNames) {
       const table = translations[lang as keyof typeof translations];
@@ -178,7 +180,9 @@ describe('reviewed localization semantics', () => {
 
       expectStandaloneNumber(harrow, 5);
       expect(harrow, `${lang} Harrow break threshold`).toMatch(/8\s?%|%\s?8/);
-      expect(harrow, `${lang} Harrow old duration`).not.toMatch(/(^|\D)8\s*(s|sec|sek|秒|초|giây)/i);
+      expect(harrow, `${lang} Harrow old duration`).not.toMatch(
+        /(^|\D)8\s*(s|sec|sek|秒|초|giây)/i,
+      );
 
       expectStandaloneNumber(dreadChorus, 5);
       expect(dreadChorus, `${lang} Dread Chorus break threshold`).toMatch(/8\s?%|%\s?8/);
@@ -189,7 +193,9 @@ describe('reviewed localization semantics', () => {
       expect(ossuaryMark, `${lang} Ossuary Mark old duration`).not.toMatch(/(^|\D)12(\D|$)/);
 
       for (const key of reviewedKeys) {
-        expect(pending[lang as keyof typeof pending] ?? [], `${lang} ${key} pending`).not.toContain(key);
+        expect(pending[lang as keyof typeof pending] ?? [], `${lang} ${key} pending`).not.toContain(
+          key,
+        );
       }
     }
   });
