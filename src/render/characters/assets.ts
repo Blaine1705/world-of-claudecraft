@@ -1762,6 +1762,17 @@ export function releaseTintedMaterials(claims: Iterable<string>): void {
   for (const key of claims) matCache.release(key);
 }
 
+/** Which mesh family mounts a tinted clone. The far LOD gets its OWN clone
+ *  objects (same inputs, separate cache entry): three's compileAsync waits on
+ *  a material's `currentProgram`, the variant its LAST draw or compile picked,
+ *  and a clone shared between the skinned rig and the rigid far mesh flips
+ *  that slot to the rig's long-linked variant the frame after the far bake
+ *  compiles, so its gate settled before the far variant had linked (measured
+ *  as 70-160 ms NVIDIA / 360-390 ms iGPU raced first draws). Programs are
+ *  still shared by cache key across the clones; only the material objects,
+ *  and so the polled slot, differ. */
+export type TintedMount = 'rig' | 'far';
+
 export function tintedMaterial(
   src: THREE.Material,
   tint: number | null,
@@ -1770,6 +1781,7 @@ export function tintedMaterial(
   emisTex: THREE.Texture | null = null,
   role: MaterialRole = 'body',
   claims: TintedMaterialClaims | null = null,
+  mount: TintedMount = 'rig',
 ): THREE.Material {
   // A source with no color property (the weapon-skin fresnel shell's
   // ShaderMaterial) has nothing this factory can tint, lift, or polish.
@@ -1777,7 +1789,7 @@ export function tintedMaterial(
   // (its per-frame uTime/uStr writes would land on a material nothing
   // renders), and caching that clone would strand it forever.
   if (!(src as THREE.MeshStandardMaterial).color) return src;
-  const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}`;
+  const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}|${mount}`;
   const build = () =>
     buildTintedClone(src as THREE.MeshStandardMaterial, tint, strength, skinTex, emisTex, role);
   if (claims) {
@@ -1966,6 +1978,7 @@ export function tintedFarMaterials(
       isBody[i] ? emisTex : null,
       'body',
       claims,
+      'far',
     ),
   );
 }

@@ -84,7 +84,7 @@ const MONOLITHS: MonolithRow[] = [
     // halves into src/render/characters/pooled_visual_lifecycle.ts (the
     // far-bake compile gate rides that seam: a re-acquired visual gets the
     // renderer's gate there).
-    ceiling: 13685,
+    ceiling: 13687,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

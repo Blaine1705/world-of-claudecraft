@@ -83,7 +83,11 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   `far_lod_reveal_core.ts` (the rig/far-mesh/shadow-proxy handoff rule: the
   baked far mesh stands in only once it exists AND its materials linked
   behind the renderer's far-bake compile gate; `visual.ts` is a thin consumer
-  via `setFarBakeGate`, `tests/character_far_compile_gate.test.ts`).
+  via `setFarBakeGate`, `tests/character_far_compile_gate.test.ts`). The far
+  mesh mounts its OWN tinted clones (`tintedMaterial(..., mount: 'far')`):
+  three's `compileAsync` polls a material's `currentProgram`, so a clone shared
+  with the skinned rig would let the far bake's gate settle on the rig's
+  variant (`tests/tinted_material.test.ts`).
 
 ## Keys & dispatch
 Every drawable is a `VisualDef` in `VISUALS` (player classes, creature families,

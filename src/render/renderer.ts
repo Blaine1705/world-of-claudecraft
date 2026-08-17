@@ -184,7 +184,7 @@ import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack
 import { fogFarForBuiltGround, groundViewConeHalfAngle } from './chunk_residency_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { buildCliffScree, type CliffScreeView } from './cliff_scree';
-import { CompileGateQueue, settlePendingSwap } from './compile_gate';
+import { CompileGateQueue, SerialGateLane, settlePendingSwap } from './compile_gate';
 import { preflightWebGL2ContextRecycle, type RecycledRendererContext } from './context_recycle';
 import { trackWebGLContext } from './context_release';
 import {
@@ -341,6 +341,7 @@ import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features'
 import { stepLichHeartbeat } from './lich_audio_state_core';
 import { LightPulses } from './light_pulses';
 import { createPrewarmPacing, type PrewarmPacing } from './link_rate_budget';
+import { touchLinkedPrograms } from './linked_program_touch';
 import { renderLoadMeasure } from './load_marks';
 import {
   type LocoState,
@@ -4970,12 +4971,12 @@ export class Renderer {
   }
 
   // A composed body's far LOD (and a re-skinned far set) is minted AFTER the
-  // view's creation gate walked the rig: brand-new programs the gate never
-  // saw, linked cold at first draw (the prod 100-160 ms far-crossing stalls).
-  // The visual owns that reveal through per-frame flags, so it gets the gate
-  // as a callback (the gateSwapFlagOnCompile case). Bound once.
+  // view's creation gate walked the rig, so it linked cold at first draw (the
+  // prod 100-160 ms far-crossing stalls). The visual owns that reveal through
+  // per-frame flags, so it gets the gate as a callback, one bake at a time.
+  private readonly farBakeLane = new SerialGateLane();
   private readonly farBakeGate: FarBakeGate = (target, onSettled) =>
-    this.gateSwapFlagOnCompile(target, onSettled);
+    this.farBakeLane.enqueue((settled) => this.gateSwapFlagOnCompile(target, settled), onSettled);
 
   /** Build one lazy FORM rig into its view slot. A null build leaves the slot
    *  unset; the shared gate retries after its cooldown. A freshly built form
@@ -8979,12 +8980,13 @@ export class Renderer {
     // still linked the real program synchronously (the measured 300-500ms
     // border-crossing stall). The colour pass binds the tier-correct target;
     // the skinned depth pass covers the renderer-owned shadow material that
-    // the colour walk cannot enumerate.
+    // the colour walk cannot enumerate; the touch tail warms the linked
+    // programs' uniform tables so the reveal draw issues no synchronous query.
     return this.liveCompileGates.run(
       () =>
-        this.compilePrewarmColorPrograms(target, false).then(() =>
-          this.compileShadowPrograms(target),
-        ),
+        this.compilePrewarmColorPrograms(target, false)
+          .then(() => this.compileShadowPrograms(target))
+          .then(() => touchLinkedPrograms(this.webgl.properties, target)),
       VIEW_COMPILE_GATE_MAX_MS,
       { priority, label: `live-gate:${target.name || target.type}` },
     );

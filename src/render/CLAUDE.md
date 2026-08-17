@@ -211,7 +211,10 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   their programs because compile traverses via `scene.traverse`, not
   `traverseVisible`).
 - Shared machinery: `compile_gate.ts` (fail-soft async shader-compile gating
-  that also BOUNDS in-flight driver links during snapshot bursts),
+  that also BOUNDS in-flight driver links during snapshot bursts, plus the
+  `SerialGateLane` for gates that arrive in a burst), `linked_program_touch.ts`
+  (the gate's tail: fetch every linked variant's uniform tables so the reveal
+  draw issues no synchronous first-use query),
   `background_gpu_queue.ts` (the one priority arbiter for idle-time work that
   reaches WebGL), `idle_queue.ts` (idle-slot queue draining). Use these, never
   a bespoke idle loop.

@@ -160,11 +160,16 @@ describe('Renderer live shader compile rejection recovery', () => {
       order.push('shadow');
       return Promise.resolve();
     });
+    // the touch tail reads renderer.properties for the target's materials
+    const properties = { get: vi.fn(() => ({})) };
+    renderer.webgl = { properties };
     const target = new THREE.Group();
+    target.add(new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial()));
 
     await renderer.compileGate(target);
 
     expect(order).toEqual(['color:false', 'shadow']);
+    expect(properties.get).toHaveBeenCalledTimes(1);
     expect(renderer.compilePrewarmColorPrograms).toHaveBeenCalledWith(target, false);
     expect(renderer.compileShadowPrograms).toHaveBeenCalledWith(target);
   });
@@ -181,6 +186,7 @@ describe('Renderer live shader compile rejection recovery', () => {
     // linear one: route through the same variant pair the boot prewarm uses.
     expect(gateMethod).toContain('this.compilePrewarmColorPrograms(target, false)');
     expect(gateMethod).toContain('this.compileShadowPrograms(target)');
+    expect(gateMethod).toContain('touchLinkedPrograms(this.webgl.properties, target)');
     expect(gateMethod).not.toContain('this.webgl.compileAsync');
   });
 
@@ -431,10 +437,13 @@ describe('the far-bake compile gate handed to character visuals', () => {
       new URL('../src/render/renderer.ts', import.meta.url),
       'utf8',
     );
+    // ...and one crowd bake links at a time: the gate is enqueued on the
+    // renderer's SerialGateLane, the caller's settle riding the lane's.
     expect(rendererSource).toContain(
       'private readonly farBakeGate: FarBakeGate = (target, onSettled) =>\n' +
-        '    this.gateSwapFlagOnCompile(target, onSettled);',
+        '    this.farBakeLane.enqueue((settled) => this.gateSwapFlagOnCompile(target, settled), onSettled);',
     );
+    expect(rendererSource).toContain('private readonly farBakeLane = new SerialGateLane();');
     // Both live build paths install it: fresh builds and pool re-acquires.
     expect(rendererSource).toContain('visual.setFarBakeGate(this.farBakeGate);');
     expect(rendererSource).toContain('farBakeGate: () => this.farBakeGate,');
