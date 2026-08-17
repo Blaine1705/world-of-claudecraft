@@ -191,6 +191,7 @@ function fakeHooks(): {
       estimates: number[];
       buyNows: number;
       acceptOffers: number[];
+      stepUpChallenges: Record<string, unknown>[];
       createOffers: number;
       resolveOffers: [number, string][];
     };
@@ -216,6 +217,7 @@ function fakeHooks(): {
       estimates: [] as number[],
       buyNows: 0,
       acceptOffers: [] as number[],
+      stepUpChallenges: [] as Record<string, unknown>[],
       createOffers: 0,
       resolveOffers: [] as [number, string][],
     },
@@ -233,6 +235,22 @@ function fakeHooks(): {
       buyNow: () => {
         state.calls.buyNows++;
         return state.buyNowImpl();
+      },
+      // The step-up mint the SELLER accept runs first (B6/R1). The devsig
+      // answer keeps these behavioral tests wallet-free while still proving
+      // the proof rides the accept body (nonce recorded per call).
+      stepUpChallenge: (req: Record<string, unknown>) => {
+        state.calls.stepUpChallenges.push(req);
+        const nonce = `nonce-${state.calls.stepUpChallenges.length}`;
+        return Promise.resolve({
+          ok: true,
+          challenge: {
+            nonce,
+            message: `step-up message ${nonce}`,
+            expiresAtMs: 4_000_000_000_000,
+            signatureRequired: false,
+          },
+        });
       },
       acceptOffer: (id: number, body: Record<string, unknown>) => {
         state.calls.acceptOffers.push(id);
@@ -562,6 +580,10 @@ describe('the two window buttons', () => {
     accept?.click();
     await flushAsync();
     expect(h.state.calls.acceptOffers).toEqual([7]);
+    // The BUYER accept is bearer-only by role: no step-up mint, no proof
+    // field (their money path signs its own payment later).
+    expect(h.state.calls.stepUpChallenges).toEqual([]);
+    expect(Object.hasOwn(h.state.lastAcceptBody ?? {}, 'stepUp')).toBe(false);
     expect(r.host.confirmed).toBe(0);
   });
 
@@ -663,7 +685,13 @@ describe('the accept request body (seller escrow)', () => {
       characterId: 1,
       itemIndex: 1,
       itemId: 'worn_sword',
+      // The seller's proof (B6/R1): minted first, devsig under the fake's
+      // explicit signatureRequired false, riding the same body.
+      stepUp: { nonce: 'nonce-1', signature: 'devsig:nonce-1' },
     });
+    expect(h.state.calls.stepUpChallenges).toEqual([
+      { operation: 'accept_directed_offer', offerId: 7 },
+    ]);
     // The refusal arm: the staged copy is no longer in the bags. Not-found is
     // NOT index 0; refusing beats escrowing the wrong item.
     h.state.calls.acceptOffers.length = 0;
