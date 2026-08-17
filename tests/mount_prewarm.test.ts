@@ -77,6 +77,31 @@ describe('buildMountPrewarmVisual', () => {
     expect(loadGltf).toHaveBeenCalledWith(failingUrl);
   });
 
+  it('times out a stalled lazy fetch without waiting forever', async () => {
+    const loadGltf = vi.fn((_url: string) => Promise.resolve(stubGltf()));
+    const { buildMountPrewarmVisual, mountPrewarmKeys, mountAssetsReady } =
+      await importMountPrewarm(loadGltf);
+    const key = mountPrewarmKeys().find(
+      (candidate) => !mountAssetsReady(MOUNT_VISUAL_SPECS[candidate].visualKey),
+    );
+    if (!key) throw new Error('every mount asset is already resident after charactersReady()');
+    const stalledUrl = VISUALS[MOUNT_VISUAL_SPECS[key].visualKey]?.url;
+    expect(stalledUrl).toBeTruthy();
+    loadGltf.mockImplementation((url: string) =>
+      url === stalledUrl ? new Promise(() => undefined) : Promise.resolve(stubGltf()),
+    );
+
+    vi.useFakeTimers();
+    try {
+      const visual = buildMountPrewarmVisual(key);
+      await vi.advanceTimersByTimeAsync(8_000);
+      await expect(visual).resolves.toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+    expect(loadGltf).toHaveBeenCalledWith(stalledUrl);
+  });
+
   it('evicts a rejected fetch so a later sighting of the same mount can retry', async () => {
     const loadGltf = vi.fn((_url: string) => Promise.resolve(stubGltf()));
     const { buildMountPrewarmVisual, mountPrewarmKeys, mountAssetsReady } =
@@ -141,5 +166,28 @@ describe('stageMountPrewarmVisual', () => {
     const result = await stageMountPrewarmVisual(scene, null, key);
     expect(result).toBeNull();
     expect(scene.children).toEqual([]);
+  });
+
+  it('resident-only staging never starts a missing mount fetch', async () => {
+    const loadGltf = vi.fn((_url: string) => Promise.resolve(stubGltf()));
+    const { stageResidentMountPrewarmVisual, mountPrewarmKeys, mountAssetsReady } =
+      await importMountPrewarm(loadGltf);
+    const key = mountPrewarmKeys().find(
+      (candidate) => !mountAssetsReady(MOUNT_VISUAL_SPECS[candidate].visualKey),
+    );
+    if (!key) throw new Error('every mount asset is already resident after charactersReady()');
+    const missingUrl = VISUALS[MOUNT_VISUAL_SPECS[key].visualKey]?.url;
+    expect(missingUrl).toBeTruthy();
+    loadGltf.mockClear();
+    loadGltf.mockImplementation((url: string) =>
+      url === missingUrl ? new Promise(() => undefined) : Promise.resolve(stubGltf()),
+    );
+
+    const scene = new THREE.Scene();
+    const result = stageResidentMountPrewarmVisual(scene, null, key);
+
+    expect(result).toBeNull();
+    expect(scene.children).toEqual([]);
+    expect(loadGltf).not.toHaveBeenCalledWith(missingUrl);
   });
 });
