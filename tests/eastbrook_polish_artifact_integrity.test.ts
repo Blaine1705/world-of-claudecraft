@@ -783,10 +783,12 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for this merge resolution: the wrapper renderer/provenance repairs
 // and vfx.mount-programs both move the runtime inputs, then this seal follows
 // the swept evidence bytes. No capture was retaken.
+// Re-minted for the v0.39 gate repair: renderer.ts formatting moved under
+// Biome, then this seal follows the swept evidence bytes. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '2a0248484f60426646b3731ace4d7f4e091fbfc3c6dd6da6e20530fffbfe7902';
+  'd78736f06e455b14cd10d6f69bb112d3779a91d4ea449ff6427a71ccee9f8adb';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '1b985de8906fa2aea6e53ab3156d21dd509b090a52153d1ecf9a86010c5d159d';
+  '66291e62071590dae04d4f978879e96b2fd636afd9221046a44bd16197dcc45c';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1808,10 +1810,13 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // the wrapper renderer/provenance repairs plus vfx.mount-programs, then
     // this second-order performance seal follows the swept evidence bytes. No
     // capture was retaken.
+    // Re-minted for the v0.39 gate repair. Renderer.ts formatting moved under
+    // Biome, then this second-order performance seal follows the swept evidence
+    // bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('018695b921b237beaa3119aee8f79ee0e6fbd9e2a7b14b45109fc81666f7e71d');
+    ).toBe('b3350ac82d748e7820867d07d6ac5e9514711dda79d21bcd0e078fcec6f57c4a');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

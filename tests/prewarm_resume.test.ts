@@ -565,8 +565,8 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(source).toContain('.filter((key) => !mountPrewarmWarmedKeys.has(key))');
     expect(entryBlock).toContain('const remainingMs = mountDeadline - performance.now();');
     expect(entryBlock).toContain('if (remainingMs <= 0) break;');
-    expect(entryBlock).toContain(
-      'stageMountPrewarmVisual(this.scene, mountPrewarmGroup, key, remainingMs)',
+    expect(entryBlock.replace(/\s+/g, '')).toContain(
+      'stageMountPrewarmVisual(this.scene,mountPrewarmGroup,key,remainingMs,)',
     );
     expect(entryBlock).toContain('const units = mountPrewarmResumeUnits();');
     expect(source).toContain(

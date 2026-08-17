@@ -1486,7 +1486,7 @@ const classAbilityNamesEn = {
       [
         'demon_skin',
         'Fiendhide',
-        'Demonic skin increases your armor by {buff} for 30 min. Pact Deepened doubles this armor and reduces magic damage taken by 5% while Fiendhide is active.',
+        'Demonic skin increases your armor by {buff} for 30 min. Pact Deepened can double this armor and reduce magic damage taken while Fiendhide is active.',
       ],
       [
         'immolate',
@@ -1587,7 +1587,7 @@ const classAbilityNamesEn = {
       [
         'fear',
         'Harrow',
-        "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect.",
+        'Strikes terror into the enemy, leaving it cowering for up to 5 sec. Enough damage breaks the effect.',
       ],
       [
         'searing_pain',

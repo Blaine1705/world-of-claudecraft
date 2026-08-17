@@ -9997,7 +9997,7 @@ export const pt_BR: EnTranslations = {
       },
       "fear": {
         "name": "Atormentar",
-        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect."
+        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Enough damage breaks the effect."
       },
       "searing_pain": {
         "name": "Cauterizar",

@@ -200,8 +200,10 @@ interface AttributionTargetFixture {
 // Re-minted for this merge resolution: the wrapper renderer/provenance repairs
 // and vfx.mount-programs both move the runtime inputs, so the composite follows
 // the actual merged tree bytes. No capture was retaken.
+// Re-minted for the v0.39 gate repair: renderer.ts formatting moved under
+// Biome, so the composite follows the actual tree bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '1b985de8906fa2aea6e53ab3156d21dd509b090a52153d1ecf9a86010c5d159d';
+  '66291e62071590dae04d4f978879e96b2fd636afd9221046a44bd16197dcc45c';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
