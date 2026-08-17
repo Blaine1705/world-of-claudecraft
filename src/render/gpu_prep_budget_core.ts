@@ -81,6 +81,11 @@ export interface GpuPrepBudgetConfig {
    *  would admit nothing forever, which is exactly the machine carrying the
    *  most preparation debt. */
   minSliceMs: number;
+  /** The floor's share of a frame that already overruns the target: a machine
+   *  running 40 ms frames still gives preparation this fraction of each frame
+   *  (max with minSliceMs), because starving preparation on a slow frame does
+   *  not make the frame faster and only pushes the debt to a first draw. */
+  overrunSliceShare: number;
   /** A candidate deferred this many frames is admitted regardless of headroom
    *  or pressure. The starvation bound: pacing may delay a piece, never drop
    *  it. Applies to the approaching class; the visible class has the per-frame
@@ -104,6 +109,7 @@ export interface GpuPrepBudgetConfig {
 export const DEFAULT_GPU_PREP_BUDGET_CONFIG: GpuPrepBudgetConfig = {
   targetFrameMs: 1000 / 60,
   minSliceMs: 1.5,
+  overrunSliceShare: 0.12,
   maxDeferFrames: 30,
   cosmeticMaxDeferFrames: 240,
   unknownCostMs: 4,
@@ -193,6 +199,11 @@ const alpha = (value: number | undefined, fallback: number): number =>
 const frameCount = (value: number | undefined, fallback: number): number =>
   typeof value === 'number' && Number.isFinite(value) && value >= 1 ? Math.floor(value) : fallback;
 
+const share = (value: number | undefined, fallback: number): number =>
+  typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 1
+    ? value
+    : fallback;
+
 const round2 = (value: number): number => Math.round(value * 100) / 100;
 
 export function createGpuPrepBudget(config?: Partial<GpuPrepBudgetConfig>): GpuPrepBudget {
@@ -200,6 +211,7 @@ export function createGpuPrepBudget(config?: Partial<GpuPrepBudgetConfig>): GpuP
   const cfg: GpuPrepBudgetConfig = {
     targetFrameMs: positiveMs(config?.targetFrameMs, defaults.targetFrameMs),
     minSliceMs: positiveMs(config?.minSliceMs, defaults.minSliceMs),
+    overrunSliceShare: share(config?.overrunSliceShare, defaults.overrunSliceShare),
     maxDeferFrames: frameCount(config?.maxDeferFrames, defaults.maxDeferFrames),
     cosmeticMaxDeferFrames: frameCount(
       config?.cosmeticMaxDeferFrames,
@@ -233,7 +245,8 @@ export function createGpuPrepBudget(config?: Partial<GpuPrepBudgetConfig>): GpuP
   let legacy = false;
 
   const headroom = (): number => {
-    const slice = Math.max(cfg.minSliceMs, cfg.targetFrameMs - frameEmaMs) - spentThisFrameMs;
+    const floor = Math.max(cfg.minSliceMs, frameEmaMs * cfg.overrunSliceShare);
+    const slice = Math.max(floor, cfg.targetFrameMs - frameEmaMs) - spentThisFrameMs;
     return slice > 0 ? slice : 0;
   };
   const ledgerOf = (kind: string): KindLedger | undefined => kinds.get(gpuPrepKindOfLabel(kind));

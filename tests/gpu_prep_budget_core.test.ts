@@ -14,6 +14,9 @@ import {
 const CONFIG: GpuPrepBudgetConfig = {
   targetFrameMs: 24,
   minSliceMs: 2,
+  // The proportional overrun floor is exercised on its own below; zero here
+  // keeps every headroom an exact integer.
+  overrunSliceShare: 0,
   maxDeferFrames: 5,
   cosmeticMaxDeferFrames: 5,
   unknownCostMs: 9,
@@ -386,13 +389,14 @@ describe('gpu prep defaults', () => {
     const budget = createGpuPrepBudget({
       targetFrameMs: Number.NaN,
       minSliceMs: -1,
+      overrunSliceShare: 2,
       maxDeferFrames: 0,
       unknownCostMs: Number.POSITIVE_INFINITY,
       emaAlpha: 0,
       frameEmaAlpha: 2,
     });
     budget.noteFrame(1000);
-    expect(budget.headroomMs()).toBe(DEFAULT_GPU_PREP_BUDGET_CONFIG.minSliceMs);
+    expect(budget.headroomMs()).toBe(1000 * DEFAULT_GPU_PREP_BUDGET_CONFIG.overrunSliceShare);
     expect(budget.predictMs('anything')).toBe(DEFAULT_GPU_PREP_BUDGET_CONFIG.unknownCostMs);
     expect(
       budget.admit({
@@ -486,5 +490,31 @@ describe('gpu prep budget: progress and class-specific starvation', () => {
     expect(DEFAULT_GPU_PREP_BUDGET_CONFIG.cosmeticMaxDeferFrames).toBeGreaterThan(
       DEFAULT_GPU_PREP_BUDGET_CONFIG.maxDeferFrames,
     );
+  });
+});
+
+describe('gpu prep budget: the overrun floor is a share of the frame', () => {
+  it('gives a slow machine a proportional slice instead of the fixed floor', () => {
+    const budget = createGpuPrepBudget({ ...CONFIG, overrunSliceShare: 0.1 });
+    // 40 ms frames against a 24 ms target: the fixed floor would be 2 ms, the
+    // share gives 4 ms, and spend still comes off it.
+    budget.noteFrame(40);
+    expect(budget.headroomMs()).toBe(4);
+    budget.spend(1);
+    expect(budget.headroomMs()).toBe(3);
+    // Under the target the real headroom wins over the share.
+    budget.noteFrame(10);
+    expect(budget.headroomMs()).toBe(14);
+    // A tiny frame keeps the fixed floor.
+    budget.noteFrame(1);
+    expect(budget.headroomMs()).toBe(23);
+  });
+
+  it('never lets the share fall below minSliceMs', () => {
+    const budget = createGpuPrepBudget({ ...CONFIG, minSliceMs: 5, overrunSliceShare: 0.1 });
+    budget.noteFrame(30);
+    expect(budget.headroomMs()).toBe(5);
+    expect(DEFAULT_GPU_PREP_BUDGET_CONFIG.overrunSliceShare).toBeGreaterThan(0);
+    expect(DEFAULT_GPU_PREP_BUDGET_CONFIG.overrunSliceShare).toBeLessThan(0.5);
   });
 });
