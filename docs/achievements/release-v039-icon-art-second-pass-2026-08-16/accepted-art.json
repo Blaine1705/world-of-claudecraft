@@ -35,7 +35,7 @@
       "family": "runtime-auras",
       "acceptedCount": 82,
       "path": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-aura-art.json",
-      "sha256": "b68ef0a3831702ed54592382c8be5bc12e29f28bb2bfdc3fc0e8295af50b3bae"
+      "sha256": "bdf2aeaf3db9c63f0952f55fbcde2458d9c0706aa9f08cf9f26ab4eff9ec83fe"
     },
     {
       "family": "shared-elixir-aura",
@@ -92,7 +92,7 @@
       "assetCount": 129,
       "secondPassAssetCount": 128,
       "path": "public/ui/auras/mapping.json",
-      "sha256": "8f36da251cde6672e3d5fe3d91ebd05dcc603df8efd7dfae4e6e147ed5ef5697"
+      "sha256": "38d8f41e4b8f6194d827d21ffd6257738352a06fc97f959de41d213b8243313a"
     },
     {
       "family": "currency",

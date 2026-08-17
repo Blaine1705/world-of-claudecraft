@@ -157,7 +157,7 @@
       "intendedVisualSubject": "one exhausted battered gauntlet still clutching a dark flagpole, with a drooping Crimson-and-Azure banner barely visible above. The gauntlet's armor plates are progressively splitting under three concentric bands of thorned shadow pressure, and additional faint bands recede behind to imply stacks can keep growing. Deep crimson light leaks from the widening cracks while the grip remains intact.",
       "references": [
         {
-          "path": "tmp/imagegen/v039-second-pass/core-auras-a/raw/bg_carried_flag.png",
+          "path": "public/ui/auras/bg_carried_flag.webp",
           "role": "Approved repository style and semantic reference."
         },
         {

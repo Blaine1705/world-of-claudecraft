@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -20,7 +21,7 @@ describe('exact runtime aura paintings', () => {
   const mobManifest =
     'docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-mob-aura-art.json';
   const secondPassManifestSha256 =
-    'b68ef0a3831702ed54592382c8be5bc12e29f28bb2bfdc3fc0e8295af50b3bae';
+    'bdf2aeaf3db9c63f0952f55fbcde2458d9c0706aa9f08cf9f26ab4eff9ec83fe';
   const externalAuraArt = new Map([
     ['bad_air', '/ui/delve-affixes/bad_air.webp'],
     ['pow_berserker', '/ui/fiesta/powerups/pow_berserker.webp'],
@@ -30,6 +31,14 @@ describe('exact runtime aura paintings', () => {
   ]);
 
   it('keeps registry, files, and provenance in exact parity', async () => {
+    const trackedPaths = new Set(
+      execFileSync('git', ['ls-files'], {
+        cwd: process.cwd(),
+        encoding: 'utf8',
+      })
+        .trim()
+        .split('\n'),
+    );
     const mapping = JSON.parse(readFileSync(path.join(auraArtDir, 'mapping.json'), 'utf8')) as {
       schemaVersion: number;
       family: string;
@@ -313,6 +322,7 @@ describe('exact runtime aura paintings', () => {
       expect(asset.prompt, asset.auraId).toMatch(/\b(border|frame)\b/i);
       for (const reference of asset.references) {
         expect(reference.role.length, asset.auraId).toBeGreaterThan(0);
+        expect(trackedPaths.has(reference.path), `${asset.auraId}: ${reference.path}`).toBe(true);
         expect(existsSync(path.join(process.cwd(), reference.path)), asset.auraId).toBe(true);
       }
     }
