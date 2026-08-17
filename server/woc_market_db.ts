@@ -32,6 +32,7 @@ import type {
   WocStrikeRow,
   WocStuckCustodyClasses,
 } from './woc_market';
+import type { NewWocStepUpChallenge, WocStepUpChallengeRow } from './woc_market_stepup';
 import type { WocBidStatus, WocSettlementState } from './woc_market_rules';
 import {
   WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS,
@@ -716,6 +717,28 @@ END $woc_pair_idx$;
 CREATE UNIQUE INDEX IF NOT EXISTS ${WOC_MARKET_OFFERS_PAIR_PENDING_INDEX}
   ON woc_market_directed_offers(realm, buyer_account, seller_account)
   WHERE status = 'pending';
+-- Step-up challenges (B6/R1): single-use, short-lived, wallet-signed
+-- authorization for the custody-moving operations. The full signed message is
+-- stored server-side so the client can never choose what gets signed (the
+-- wallet_link_challenges rule); consuming DELETES the row, so a signature can
+-- never authorize twice, and the binding digest pins the operation plus every
+-- money figure the wallet showed (server/woc_market_stepup.ts). Growth is
+-- bounded: every issue prunes the expired set first, and the rate limiter
+-- bounds the live set per account.
+CREATE TABLE IF NOT EXISTS woc_market_stepup_challenges (
+  nonce TEXT PRIMARY KEY,
+  realm TEXT NOT NULL,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  wallet TEXT NOT NULL,
+  operation TEXT NOT NULL CHECK (operation IN ('create_listing', 'accept_directed_offer')),
+  binding_digest TEXT NOT NULL,
+  message TEXT NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+-- The issue-time prune's seek (expired rows, oldest first).
+CREATE INDEX IF NOT EXISTS woc_market_stepup_challenges_expiry
+  ON woc_market_stepup_challenges (expires_at);
 `;
 
 /** Lock-wait ceiling for the escrow transaction's accounts row. Short on
@@ -1515,6 +1538,65 @@ export class PgWocMarketDb implements WocMarketDb {
       [realm, id],
     );
     return res.rows[0] ? toOffer(res.rows[0]) : null;
+  }
+
+  // --- Step-up challenges (server/woc_market_stepup.ts owns the semantics) --
+
+  async createStepUpChallenge(row: NewWocStepUpChallenge): Promise<void> {
+    await this.pool.query(
+      `INSERT INTO woc_market_stepup_challenges
+         (nonce, realm, account_id, wallet, operation, binding_digest, message, expires_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, to_timestamp($8 / 1000.0))`,
+      [
+        row.nonce,
+        row.realm,
+        row.accountId,
+        row.wallet,
+        row.operation,
+        row.bindingDigest,
+        row.message,
+        row.expiresAtMs,
+      ],
+    );
+  }
+
+  async consumeStepUpChallenge(
+    realm: string,
+    nonce: string,
+    accountId: number,
+  ): Promise<WocStepUpChallengeRow | null> {
+    // Atomic single-use: the DELETE under the nonce primary key resolves a
+    // race of two operations on one challenge to exactly one returned row.
+    // Scoped to the account so a cross-account guess cannot burn the owner's
+    // challenge; deliberately NOT expiry-scoped (unlike the wallet-link
+    // consume): the verifier judges expiry from the returned row so the
+    // player hears expired, not unknown.
+    const res = await this.pool.query(
+      `DELETE FROM woc_market_stepup_challenges
+        WHERE realm = $1 AND nonce = $2 AND account_id = $3
+        RETURNING nonce, account_id, wallet, operation, binding_digest, message, expires_at`,
+      [realm, nonce, accountId],
+    );
+    const row = res.rows[0];
+    if (!row) return null;
+    return {
+      nonce: String(row.nonce),
+      accountId: Number(row.account_id),
+      wallet: String(row.wallet),
+      operation: row.operation as WocStepUpChallengeRow['operation'],
+      bindingDigest: String(row.binding_digest),
+      message: String(row.message),
+      expiresAtMs: ms(row.expires_at),
+    };
+  }
+
+  async pruneStepUpChallenges(realm: string, nowMs: number): Promise<number> {
+    const res = await this.pool.query(
+      `DELETE FROM woc_market_stepup_challenges
+        WHERE realm = $1 AND expires_at <= to_timestamp($2 / 1000.0)`,
+      [realm, nowMs],
+    );
+    return res.rowCount ?? 0;
   }
 
   async directedOffersForAccount(

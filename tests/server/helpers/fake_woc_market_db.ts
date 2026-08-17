@@ -35,6 +35,10 @@ import type {
   WocStrikeRow,
   WocStuckCustodyClasses,
 } from '../../../server/woc_market';
+import type {
+  NewWocStepUpChallenge,
+  WocStepUpChallengeRow,
+} from '../../../server/woc_market_stepup';
 import type { WocBidStatus, WocSettlementState } from '../../../server/woc_market_rules';
 import {
   WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS,
@@ -461,6 +465,44 @@ export class FakeWocMarketDb implements WocMarketDb {
   async directedOfferById(realm: string, id: number): Promise<WocDirectedOfferRow | null> {
     const row = this.offers.get(id);
     return row && row.realm === realm ? row : null;
+  }
+
+  // --- Step-up challenges (mirrors the Pg semantics: consume is an atomic
+  // delete scoped to realm + account, expiry deliberately NOT judged here) --
+
+  private readonly stepUpChallenges = new Map<string, NewWocStepUpChallenge>();
+
+  async createStepUpChallenge(row: NewWocStepUpChallenge): Promise<void> {
+    if (this.stepUpChallenges.has(row.nonce)) throw new Error('duplicate step-up nonce');
+    this.stepUpChallenges.set(row.nonce, structuredClone(row));
+  }
+
+  async consumeStepUpChallenge(
+    realm: string,
+    nonce: string,
+    accountId: number,
+  ): Promise<WocStepUpChallengeRow | null> {
+    const row = this.stepUpChallenges.get(nonce);
+    if (!row || row.realm !== realm || row.accountId !== accountId) return null;
+    this.stepUpChallenges.delete(nonce);
+    const { realm: _realm, ...rest } = row;
+    return structuredClone(rest);
+  }
+
+  async pruneStepUpChallenges(realm: string, nowMs: number): Promise<number> {
+    let pruned = 0;
+    for (const [nonce, row] of this.stepUpChallenges) {
+      if (row.realm === realm && row.expiresAtMs <= nowMs) {
+        this.stepUpChallenges.delete(nonce);
+        pruned += 1;
+      }
+    }
+    return pruned;
+  }
+
+  /** Test hook: how many live challenge rows the store holds. */
+  stepUpChallengeCount(): number {
+    return this.stepUpChallenges.size;
   }
 
   async directedOffersForAccount(realm: string, account: number): Promise<WocDirectedOfferRow[]> {

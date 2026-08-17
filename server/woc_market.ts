@@ -22,6 +22,7 @@ import { itemCopyPin } from '../src/sim/item_copy_ref';
 import type { CharacterState } from '../src/sim/sim';
 import type { InvSlot, ItemInstancePayload } from '../src/sim/types';
 import { throwProvedRollback } from './pg_rollback_proof';
+import type { NewWocStepUpChallenge, WocStepUpChallengeRow } from './woc_market_stepup';
 import {
   adoptableBondCents,
   antiSnipeExtendedEndMs,
@@ -309,6 +310,20 @@ export interface WocMarketDb {
     itemPin: string;
   }): Promise<WocDirectedOfferRow | 'offer_pending'>;
   directedOfferById(realm: string, id: number): Promise<WocDirectedOfferRow | null>;
+
+  // --- Step-up challenges (single-use custody authorization; semantics in
+  // server/woc_market_stepup.ts, R1) ---
+  createStepUpChallenge(row: NewWocStepUpChallenge): Promise<void>;
+  /** Atomic single-use consume: DELETE under the nonce key scoped to the
+   *  account, returning the row WITHOUT judging expiry (the verifier answers
+   *  expired honestly from the returned row). */
+  consumeStepUpChallenge(
+    realm: string,
+    nonce: string,
+    accountId: number,
+  ): Promise<WocStepUpChallengeRow | null>;
+  /** Delete expired challenges; every issue runs this first (bounded growth). */
+  pruneStepUpChallenges(realm: string, nowMs: number): Promise<number>;
   /** Pending offers this account may act on, both directions. */
   directedOffersForAccount(realm: string, account: number): Promise<WocDirectedOfferRow[]>;
   /**
