@@ -64,6 +64,7 @@ import {
   RIFT_LEGENDARY_ITEM_IDS,
   RIFT_RARE_ITEM_IDS,
 } from '../src/sim/content/rift/items';
+import { isStoreMountItemId } from '../src/sim/content/store_mounts';
 import { WEAPON_SKIN_LIST, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
   ALL_RECIPES,
@@ -79,6 +80,7 @@ import {
 } from '../src/sim/data';
 import { RARE_SLAIN_TEMPLATES } from '../src/sim/deeds';
 import type { LootTier } from '../src/sim/lockpick';
+import { mountItemId } from '../src/sim/mounts';
 import {
   ARMOR_SECONDARY_BY_TYPE,
   DISENCHANT_MATERIAL_BY_QUALITY,
@@ -354,7 +356,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // honor pieces and the 3 fishing additions (the koi and both rods):
     // 242 + 16 + 29 + 47 + 3 = 337, plus the three daggers the v0.36.0 release
     // merge added to live content (rimefang on the Rift page, duskwhisper on
-    // Wildheart Basin, boneglass_shiv on Spoils): 340. Catalog growth reverts
+    // Wildheart Basin, boneglass_shiv on Spoils): 340, plus the Cluckwork Mech
+    // Bird store mount on Horizons: 341. Catalog growth reverts
     // page completion for finished players, per docs/design/reliquary.md.
     // The two excludeFromCompletion pages add
     // slots and 0 to BOTH pairs: the Vault of Ages contributes four retired
@@ -362,7 +365,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // and the flag keeps each whole page out of owned AND total (the dedicated
     // vault and riftbound pins in this file and tests/reliquary_state.test.ts
     // hold both sides), so neither page moves these two literals.
-    expect(full).toEqual({ owned: 340, total: 340 });
+    expect(full).toEqual({ owned: 341, total: 341 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -373,7 +376,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // pair above, including the three release-merged daggers; marks are
     // character-scoped, so this trails the overview by the 29 account-scoped
     // weapon skins).
-    expect(character).toEqual({ owned: 311, total: 311 });
+    expect(character).toEqual({ owned: 312, total: 312 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -383,7 +386,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // catalog by 4, and the measured value wins), and the seven Phase 21
     // pages add 123 slots (16 Rift + 19 slain marks + 31 Spoils + 47
     // Warfare + 3 fishing + 4 retired vault + 3 Riftbound bands): 372, plus the
-    // three daggers the v0.36.0 release merge added to live content: 375 total.
+    // three daggers the v0.36.0 release merge added to live content and the
+    // Cluckwork Mech Bird store mount on Horizons: 376 total.
     // Slots, not unique relics: the two Spoils set repeats count again here,
     // and the seven excludeFromCompletion slots (four vault, three bands)
     // count here while adding zero to every completion pair, which is why this
@@ -394,7 +398,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(375);
+    ).toBe(376);
     // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
     // rare-slain proofs of conquerors_rares_of_the_realm.
     expect(
@@ -2474,7 +2478,10 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // (mining, logging, herbalism, fishing) + the rods' engineering craft and
   // their Litany board keeper (Phase 21).
   professions_specimens: 7,
-  horizons_mounts: 10,
+  // 11 = the four heroic bosses + the raid + Marla + rift A/B/S + the two
+  // pending-ruling absences resolve to nothing, plus the storefront carrying
+  // the Mech Bird (the 'store' door the Armory skins already opened).
+  horizons_mounts: 11,
   horizons_weapon_skins: 1,
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles.
@@ -3057,7 +3064,16 @@ describe('Reliquary source hints resolve against live content', () => {
       for (const hint of reliquaryRelicSource(page, relic)) {
         if (hint.sourceKind !== 'store') continue;
         checked += 1;
-        if (relic.kind !== 'weapon_skin') {
+        if (relic.kind === 'mount') {
+          // The second store-granted family: a mount slot may carry the store
+          // hint ONLY when its reins is a declared store SKU
+          // (content/store_mounts.ts; the spend gate in server/claudium.ts is
+          // widened by the same list, so this pins UI hint and server door to
+          // one authority).
+          if (!isStoreMountItemId(mountItemId(slotId) ?? '')) {
+            offenders.push(`${page.id}:${slotId} is not a declared store mount`);
+          }
+        } else if (relic.kind !== 'weapon_skin') {
           offenders.push(`${page.id}:${slotId} is a ${relic.kind} slot with a store hint`);
         } else if (!Object.hasOwn(WEAPON_SKINS, slotId)) {
           offenders.push(`${page.id}:${slotId} is not a live Armory skin`);
@@ -3806,10 +3822,12 @@ describe('Reliquary source hint coverage', () => {
         'mark x activity',
         'mark x boss',
         'mark x zone',
-        // mount: heroic tables, Marla's counter, the rift reins ladder.
+        // mount: heroic tables, Marla's counter, the rift reins ladder, and
+        // the storefront (the Mech Bird, walked by the store truth arm above).
         'mount x boss',
         'mount x vendor',
         'mount x rift',
+        'mount x store',
         // weapon_skin: the account storefront, page-wide.
         'weapon_skin x store',
         // title: the deed that grants it, always.

@@ -488,6 +488,8 @@ export const vi_VN: EnTranslations = {
       "tabsLabel": "Các phần của Cửa hàng WOC",
       "storeTab": "Cửa hàng",
       "rewardsTab": "Phần thưởng hàng ngày",
+      "mountsEyebrow": "Account Mounts",
+      "mountsTitle": "Machine Stable",
       "loading": "Đang tải Cửa hàng WOC...",
       "error": "Cửa hàng WOC hiện không khả dụng. Vui lòng thử lại trong thời gian ngắn.",
       "balance": "Số dư Claudium",
@@ -1077,6 +1079,7 @@ export const vi_VN: EnTranslations = {
       "name_thunderstrut_gobbler": "Thunderstrut, Gà Tây Vĩ Đại",
       "name_terrorspark_groundshaker": "Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất",
       "name_drakemaw_raptor": "Cuồng Long Drakemaw",
+      "name_mech_bird": "Cluckwork Mech Bird",
       "desc_valorsteed": "Một con chiến mã khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
       "desc_grag_bear": "Một chú gấu khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
       "desc_stalkglider_snail": "Một chú ốc sên bền bỉ, dẻo dai, giúp tăng tốc độ di chuyển.",
@@ -1085,7 +1088,8 @@ export const vi_VN: EnTranslations = {
       "desc_stormfeather_griffin": "Một con sư tử đầu chim bão uy nghi, rảo bước trên mặt đất bằng những móng vuốt được bọc rune, đôi cánh xếp gọn.",
       "desc_thunderstrut_gobbler": "Một con gà tây khổng lồ nở ra từ giông bão, sải bước xuống từ Đỉnh Tỉnh Thức, đuôi xòe rộng như đám mây giông.",
       "desc_terrorspark_groundshaker": "Một cỗ máy bọc giáp nhỏ gọn với bánh xích nặng, pháo nòng lớn và yên ngồi dành cho những người lái gan dạ.",
-      "desc_drakemaw_raptor": "Một con Cuồng Long thuộc bầy đàn đã được thuần yên cương từ Miệng Núi Lửa Drakemaw, toàn thân gân cốt và tốc lực, vẫn còn phảng phất mùi tro tàn."
+      "desc_drakemaw_raptor": "Một con Cuồng Long thuộc bầy đàn đã được thuần yên cương từ Miệng Núi Lửa Drakemaw, toàn thân gân cốt và tốc lực, vẫn còn phảng phất mùi tro tàn.",
+      "desc_mech_bird": "A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning."
     },
     "mountTraining": {
       "mountPrompt": "Nhấn {key} để cưỡi Valorsteed huấn luyện.",
@@ -12360,6 +12364,9 @@ export const vi_VN: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Dây Cương Cuồng Long Drakemaw"
+      },
+      "reins_mech_bird": {
+        "name": "Ignition Key: Cluckwork Mech Bird"
       },
       "rimefang": {
         "name": "Nanh Băng Giá"

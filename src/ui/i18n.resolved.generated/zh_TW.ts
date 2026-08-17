@@ -488,6 +488,8 @@ export const zh_TW: EnTranslations = {
       "tabsLabel": "WOC 商店分區",
       "storeTab": "商店",
       "rewardsTab": "每日獎勵",
+      "mountsEyebrow": "帳號坐騎",
+      "mountsTitle": "機械馬廄",
       "loading": "正在載入 WOC 商店…",
       "error": "WOC 商店目前無法使用，請稍後再試。",
       "balance": "Claudium 餘額",
@@ -1077,6 +1079,7 @@ export const zh_TW: EnTranslations = {
       "name_thunderstrut_gobbler": "雷霆闊步大火雞",
       "name_terrorspark_groundshaker": "驚雷撼地者",
       "name_drakemaw_raptor": "龍喉迅猛龍",
+      "name_mech_bird": "發條機械鳥",
       "desc_valorsteed": "一匹堅韌穩健的駿馬，可提升旅行速度。",
       "desc_grag_bear": "一頭堅韌穩健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一隻堅毅耐久的蝸牛，可提升旅行速度。",
@@ -1085,7 +1088,8 @@ export const zh_TW: EnTranslations = {
       "desc_stormfeather_griffin": "一頭威嚴的風暴獅鷲，收攏雙翼，以符文利爪行走於大地。",
       "desc_thunderstrut_gobbler": "一隻風暴所生的龐然大火雞，從覺醒之峰昂首闊步而下，尾羽如雷雲般展開。",
       "desc_terrorspark_groundshaker": "一台緊湊的裝甲機械，配備重型履帶、大口徑火炮，以及為無畏駕駛員打造的鞍座。",
-      "desc_drakemaw_raptor": "來自龍喉火山口的馴服巢生迅猛龍，渾身筋肉、疾若奔雷，身上仍帶著淡淡的灰燼氣味。"
+      "desc_drakemaw_raptor": "來自龍喉火山口的馴服巢生迅猛龍，渾身筋肉、疾若奔雷，身上仍帶著淡淡的灰燼氣味。",
+      "desc_mech_bird": "一隻手工打造的發條戰鬥雞，伺服關節鏗鏘疾馳，發條鑰匙仍在轉動。"
     },
     "mountTraining": {
       "mountPrompt": "按 {key} 鍵騎上訓練用英勇戰馬。",
@@ -12360,6 +12364,9 @@ export const zh_TW: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "龍喉迅猛龍的韁繩"
+      },
+      "reins_mech_bird": {
+        "name": "發條機械鳥點火鑰匙"
       },
       "rimefang": {
         "name": "霜牙"

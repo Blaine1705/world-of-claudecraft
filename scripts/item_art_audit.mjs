@@ -95,8 +95,10 @@ const build = await buildItemArtAudit({
   items,
   mapping,
   expected: {
-    catalogCount: 823,
-    liveItemCount: 838,
+    // 824 = the v0.39.0 catalog + the Mech Bird store mount reins icon
+    // (mech-bird PR); liveItemCount moves with it.
+    catalogCount: 824,
+    liveItemCount: 839,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,

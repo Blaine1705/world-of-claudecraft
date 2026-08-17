@@ -347,6 +347,7 @@ import {
 } from './static_cache';
 import { readStaticSfxSnapshot, type StaticSfxSnapshot } from './static_sfx';
 import { stopSteamMirror } from './steam/mirror';
+import { materializeStoreMountGrants } from './store_mount_grants';
 import { passesTurnstile } from './turnstile';
 import { pruneUnstuckReportsBatch } from './unstuck_db';
 import { stopUnstuckRecords, UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS } from './unstuck_records';
@@ -2843,6 +2844,13 @@ configureDiscordRuntime({
 configureClaudiumRuntime({
   grantWeaponSkins: (accountId, skinIds) =>
     liveGame().grantWeaponSkinsToAccount(accountId, skinIds),
+  // Store-mount purchases materialize the soulbound reins item directly through
+  // the grant module (server/store_mount_grants.ts): GameServer needs no method
+  // of its own, keeping the monolith at its ratchet ceiling.
+  grantStoreMounts: (accountId, itemIds) => {
+    const game = liveGame();
+    materializeStoreMountGrants(game.clients.values(), game.sim, accountId, itemIds);
+  },
 });
 
 // configureAdminRuntime(game) and configureInternalRuntime(game) pass the live

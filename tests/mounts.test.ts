@@ -30,6 +30,7 @@ import {
   normalizeSelectedMount,
   TRAINING_MOUNT_KEY,
 } from '../src/sim/content/mounts';
+import { isStoreMountItemId } from '../src/sim/content/store_mounts';
 import { ITEMS, MOBS, NPCS, QUESTS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { guildBankPipeRefusal } from '../src/sim/guild_bank';
@@ -103,8 +104,8 @@ function ride(sim: Sim, pid: number, key: string): void {
 }
 
 describe('mount catalog', () => {
-  it('has exactly nine mounts with the horse first and the developer tank last', () => {
-    expect(MOUNT_KEYS).toHaveLength(9);
+  it('has exactly ten mounts with the horse first and the developer tank last', () => {
+    expect(MOUNT_KEYS).toHaveLength(10);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(MOUNT_KEYS.at(-1)).toBe('terrorspark_groundshaker');
     expect(DEFAULT_MOUNT).toBe('valorsteed');
@@ -120,6 +121,9 @@ describe('mount catalog', () => {
     expect(spec('shadowjump_toad')).toEqual(['uncommon', 0.7]);
     expect(spec('grag_bear')).toEqual(['rare', 0.75]);
     expect(spec('stalkglider_snail')).toEqual(['rare', 0.75]);
+    // The store mount is deliberately RARE, never epic: real money buys the
+    // look, not the top speed tier (the paid design the weapon skins set).
+    expect(spec('mech_bird')).toEqual(['rare', 0.75]);
     expect(spec('aether_hover_cycle')).toEqual(['epic', 0.8]);
     expect(spec('thunderstrut_gobbler')).toEqual(['epic', 0.8]);
     expect(spec('terrorspark_groundshaker')).toEqual(['epic', 0.8]);
@@ -176,9 +180,11 @@ describe('mount reins items (the collection: owning the item is owning the mount
       expect(items).toHaveLength(1);
       const item = items[0];
       expect(mountItemId(key)).toBe(item.id);
-      if (key === 'terrorspark_groundshaker') {
-        // The developer-only tank stays soulbound: it has no player acquisition
-        // path, and tradability would turn a dev grant into a leak vector.
+      if (key === 'terrorspark_groundshaker' || key === 'mech_bird') {
+        // Two bound reins, for the same leak reason from different doors: the
+        // developer-only tank has no player acquisition path, and the store
+        // mount's reins is a real-money grant (server/claudium.ts). Either one
+        // trading hands would turn a grant into an economy leak.
         expect(item.soulbound).toBe(true);
       } else {
         // Player reins are NOT soulbound: they trade, mail, list, and store in
@@ -267,6 +273,26 @@ describe('mount reins items (the collection: owning the item is owning the mount
       const heroicEntries = Object.entries(HEROIC_BOSS_LOOT).flatMap(([bossId, entries]) =>
         entries.filter((l) => l.itemId === itemId).map((l) => ({ bossId, ...l })),
       );
+
+      // STORE MOUNT (owner ask, 2026-08-17): the Cluckwork Mech Bird sells for
+      // Claudium (content/store_mounts.ts; the spend route materializes the
+      // soulbound reins). It takes NO in-world path despite its rare tier: the
+      // heroic sweep above plus every rift pool stays empty of it, pinned so
+      // the store remains its only door and never quietly gains a drop twin.
+      if (isStoreMountItemId(itemId)) {
+        expect(heroicEntries, `${itemId} (store) must not be heroic-reachable`).toEqual([]);
+        for (const [pool, name] of [
+          [RIFT_EPIC_MOUNT_REINS, 'rift S'],
+          [RIFT_BLUE_MOUNT_REINS, 'rift blue'],
+          [RIFT_GREEN_MOUNT_REINS, 'rift green'],
+        ] as const) {
+          expect(
+            pool as readonly string[],
+            `${itemId} is store-only: not in ${name}`,
+          ).not.toContain(itemId);
+        }
+        continue;
+      }
 
       if (rarity === 'epic') {
         // Rift S clears are the sole source, EXCEPT a mount held sourceless on

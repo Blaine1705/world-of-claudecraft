@@ -14,6 +14,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
     "entities.items.dawnhold_posy.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.dawnholdMap.story.ground",
     "hudChrome.dawnholdMap.story.solar",
     "hudChrome.dawnholdMap.title",
@@ -21,13 +22,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "es_ES": [
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
     "entities.items.dawnhold_posy.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.dawnholdMap.story.ground",
     "hudChrome.dawnholdMap.story.solar",
     "hudChrome.dawnholdMap.title",
@@ -35,13 +41,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "fr_FR": [
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
     "entities.items.dawnhold_posy.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.dawnholdMap.story.ground",
     "hudChrome.dawnholdMap.story.solar",
     "hudChrome.dawnholdMap.title",
@@ -49,13 +60,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "fr_CA": [
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
     "entities.items.dawnhold_posy.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.dawnholdMap.story.ground",
     "hudChrome.dawnholdMap.story.solar",
     "hudChrome.dawnholdMap.title",
@@ -63,7 +79,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "en_CA": [],
   "it_IT": [
@@ -71,6 +91,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
     "entities.items.dawnhold_posy.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.dawnholdMap.story.ground",
     "hudChrome.dawnholdMap.story.solar",
     "hudChrome.dawnholdMap.title",
@@ -78,13 +99,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "de_DE": [
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
     "entities.items.dawnhold_posy.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.dawnholdMap.story.ground",
     "hudChrome.dawnholdMap.story.solar",
     "hudChrome.dawnholdMap.title",
@@ -92,7 +118,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "zh_CN": [
     "hudChrome.dawnholdMap.title",
@@ -115,6 +145,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
     "entities.items.dawnhold_posy.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.dawnholdMap.story.ground",
     "hudChrome.dawnholdMap.story.solar",
     "hudChrome.dawnholdMap.title",
@@ -122,7 +153,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "ru_RU": [
     "hudChrome.dawnholdMap.title",
@@ -133,6 +168,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
     "entities.items.dawnhold_posy.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.dawnholdMap.story.ground",
     "hudChrome.dawnholdMap.story.solar",
     "hudChrome.dawnholdMap.title",
@@ -140,13 +176,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "nl_NL": [
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
     "entities.items.dawnhold_posy.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.dawnholdMap.story.ground",
     "hudChrome.dawnholdMap.story.solar",
     "hudChrome.dawnholdMap.title",
@@ -154,13 +195,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "pl_PL": [
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
     "entities.items.dawnhold_posy.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.dawnholdMap.story.ground",
     "hudChrome.dawnholdMap.story.solar",
     "hudChrome.dawnholdMap.title",
@@ -168,13 +214,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "id_ID": [
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
     "entities.items.dawnhold_posy.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.dawnholdMap.story.ground",
     "hudChrome.dawnholdMap.story.solar",
     "hudChrome.dawnholdMap.title",
@@ -182,13 +233,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "tr_TR": [
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
     "entities.items.dawnhold_posy.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.dawnholdMap.story.ground",
     "hudChrome.dawnholdMap.story.solar",
     "hudChrome.dawnholdMap.title",
@@ -196,13 +252,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "sv_SE": [
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
     "entities.items.dawnhold_posy.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.dawnholdMap.story.ground",
     "hudChrome.dawnholdMap.story.solar",
     "hudChrome.dawnholdMap.title",
@@ -210,13 +271,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "vi_VN": [
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
     "entities.items.dawnhold_posy.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.dawnholdMap.story.ground",
     "hudChrome.dawnholdMap.story.solar",
     "hudChrome.dawnholdMap.title",
@@ -224,13 +290,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "da_DK": [
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
     "entities.items.dawnhold_posy.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.dawnholdMap.story.ground",
     "hudChrome.dawnholdMap.story.solar",
     "hudChrome.dawnholdMap.title",
@@ -238,6 +309,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ]
 };

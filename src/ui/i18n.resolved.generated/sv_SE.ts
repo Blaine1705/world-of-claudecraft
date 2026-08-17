@@ -488,6 +488,8 @@ export const sv_SE: EnTranslations = {
       "tabsLabel": "Delar av WOC-butiken",
       "storeTab": "Butik",
       "rewardsTab": "Dagliga belöningar",
+      "mountsEyebrow": "Account Mounts",
+      "mountsTitle": "Machine Stable",
       "loading": "Laddar WOC-butiken...",
       "error": "WOC-butiken är inte tillgänglig just nu. Försök igen om en stund.",
       "balance": "Claudium-saldo",
@@ -1077,6 +1079,7 @@ export const sv_SE: EnTranslations = {
       "name_thunderstrut_gobbler": "Åskstoltsern, Den stora kalkonen",
       "name_terrorspark_groundshaker": "Skräckgnista, markskakaren",
       "name_drakemaw_raptor": "Drakgapsraptor",
+      "name_mech_bird": "Cluckwork Mech Bird",
       "desc_valorsteed": "En uthållig, säkerfotad stridshäst som ger ökad reshastighet.",
       "desc_grag_bear": "En uthållig, säkerfotad björn som ger ökad reshastighet.",
       "desc_stalkglider_snail": "En robust, långsamt brinnande snigel som ger ökad reshastighet.",
@@ -1085,7 +1088,8 @@ export const sv_SE: EnTranslations = {
       "desc_stormfeather_griffin": "En kunglig stormgrip som smyger fram på runskodda klor, med vingarna hopfällda.",
       "desc_thunderstrut_gobbler": "En kolossal stormkläckt kalkon som stoltserar ner från Den vaknande toppen, med stjärten spretande som ett åskmoln.",
       "desc_terrorspark_groundshaker": "En kompakt bepansrad maskin med tunga larvband, en grovkalibrig kanon och en sadel byggd för orädda förare.",
-      "desc_drakemaw_raptor": "En sadeltämjd kullraptor från Drakgapets kaldera, ren sena och sprint, som fortfarande doftar svagt av aska."
+      "desc_drakemaw_raptor": "En sadeltämjd kullraptor från Drakgapets kaldera, ren sena och sprint, som fortfarande doftar svagt av aska.",
+      "desc_mech_bird": "A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning."
     },
     "mountTraining": {
       "mountPrompt": "Tryck på {key} för att sitta upp på övnings-Tapperhetshästen.",
@@ -12360,6 +12364,9 @@ export const sv_SE: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Tyglar till Drakgapsraptorn"
+      },
+      "reins_mech_bird": {
+        "name": "Ignition Key: Cluckwork Mech Bird"
       },
       "rimefang": {
         "name": "Rimtand"

@@ -451,6 +451,7 @@ const RENDER_PURE_CORES = [
   'src/render/characters/soul_rend_prewarm_core.ts',
   'src/render/characters/design_code_core.ts',
   'src/render/reveal_gate_core.ts',
+  'src/render/stride_audio_core.ts',
   'src/render/town_reveal_core.ts',
   'src/render/ability_vfx_core.ts',
   'src/render/characters/player_look_core.ts',

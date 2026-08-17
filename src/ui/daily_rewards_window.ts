@@ -1,3 +1,5 @@
+import { MOUNTS, type MountKey } from '../sim/content/mounts';
+import { ITEMS } from '../sim/data';
 import type { PlayerClass, WeaponSkinType } from '../sim/types';
 import type { DailyRewardHistory, DailyRewardStatus, IWorld } from '../world_api';
 import { ArmoryInspect } from './armory_inspect';
@@ -14,9 +16,10 @@ import {
   dailyRewardTaskDescription,
 } from './daily_rewards_view';
 import { markDialogRoot } from './dialog_root';
-import { tEntity } from './entity_i18n';
+import { itemDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { formatDateTime, formatNumber, t } from './i18n';
+import { MOUNT_DESC_KEYS } from './mount_labels';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { rovingTarget } from './roving_index';
 import { svgIcon } from './ui_icons';
@@ -24,6 +27,8 @@ import {
   type ArmorySection,
   type ArmorySkinRow,
   buildArmorySections,
+  buildStoreMountRows,
+  type StoreMountRow,
   type WocStoreItemInput,
 } from './woc_store_view';
 
@@ -130,6 +135,7 @@ export class DailyRewardsWindow {
   private tab: 'store' | 'rewards' = 'store';
   private storeBalance: number | null = null;
   private storeItems: WocStoreItemInput[] = [];
+  private storeMountRows: StoreMountRow[] = [];
   private armorySections: ArmorySection[] = [];
   private armoryInspect: ArmoryInspect | null = null;
   private armoryGraphicsRestoreSkinId: string | null = null;
@@ -371,6 +377,11 @@ export class DailyRewardsWindow {
       mainhandItemId: player.mainhandItemId,
       skinCatalog: player.skinCatalog,
     });
+    this.storeMountRows = buildStoreMountRows(
+      this.storeBalance,
+      this.storeItems,
+      world.ownedMounts(),
+    );
   }
 
   /** Live account-cosmetics change (another session's grant/apply, or a server
@@ -413,6 +424,7 @@ export class DailyRewardsWindow {
       `<div class="woc-store-hero"><div><span>${esc(t('hudChrome.wocStore.armoryEyebrow'))}</span><h2>${esc(t('hudChrome.wocStore.armoryTitle'))}</h2><p>${esc(t('hudChrome.wocStore.armoryBody'))}</p></div>` +
       `<div class="woc-store-balance"><img src="/claudium/icons/claudium_coin_64.webp" alt=""><span>${esc(t('hudChrome.wocStore.balance'))}</span><strong>${balance}</strong><button type="button" data-buy-claudium>${esc(t('hudChrome.wocStore.buyClaudium'))}</button></div></div>` +
       notice +
+      this.storeMountsSectionHtml() +
       armory;
     if (!this.replaceStoreBody(body, markup)) return;
     // Dense armory compatibility chips defer their repeated portrait data URLs
@@ -428,6 +440,107 @@ export class DailyRewardsWindow {
         if (row) this.openArmoryInspect(row);
       });
     });
+    body.querySelectorAll<HTMLButtonElement>('[data-store-mount-buy]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const row = this.storeMountRows.find((r) => r.itemId === button.dataset.storeMountBuy);
+        if (row) this.requestStoreMountPurchase(row);
+      });
+    });
+  }
+
+  /** The store's Mounts strip: account mounts sold for Claudium. Cards reuse
+   *  the shipped reins inventory art; the buy path is the same service spend
+   *  as the Armory with kind 'item', and the granted reins lands in the bags
+   *  through the server mirror (no client-side apply step). */
+  private storeMountsSectionHtml(): string {
+    if (this.storeMountRows.length === 0) return '';
+    const cards = this.storeMountRows
+      .map((row) => {
+        const def = ITEMS[row.itemId];
+        const mountKey = def?.kind === 'mount' ? def.mount : undefined;
+        const mount = mountKey ? MOUNTS[mountKey as MountKey] : undefined;
+        if (!def || !mount) return '';
+        const name = itemDisplayName(def);
+        const state = row.owned
+          ? `<span class="armory-state">${esc(t('hudChrome.wocStore.owned'))}</span>`
+          : row.costClaudium === null
+            ? `<span class="armory-state unavailable">${esc(t('hudChrome.wocStore.unavailable'))}</span>`
+            : `<button type="button" class="armory-buy" data-store-mount-buy="${esc(row.itemId)}">` +
+              `<img src="/claudium/icons/claudium_coin_64.webp" alt="">${formatNumber(row.costClaudium, { maximumFractionDigits: 0 })}</button>`;
+        return (
+          `<article class="armory-card store-mount-card rarity-${esc(mount.rarity)}">` +
+          `<img class="store-mount-icon" src="/ui/items/${esc(row.itemId)}.webp" alt="">` +
+          `<div><h4>${esc(name)}</h4>` +
+          `<p>${esc(t(MOUNT_DESC_KEYS[mount.key] ?? 'hudChrome.mounts.useToRide'))}</p>` +
+          `<p class="store-mount-spec">${esc(t('hudChrome.mounts.spec_speed', { pct: Math.round(mount.moveSpeedPct * 100) }))}</p></div>` +
+          `${state}</article>`
+        );
+      })
+      .join('');
+    if (!cards) return '';
+    return (
+      `<section class="armory-section store-mounts"><header><div>` +
+      `<span>${esc(t('hudChrome.wocStore.mountsEyebrow'))}</span>` +
+      `<h3>${esc(t('hudChrome.wocStore.mountsTitle'))}</h3></div></header>` +
+      `<div class="armory-grid">${cards}</div></section>`
+    );
+  }
+
+  private requestStoreMountPurchase(row: StoreMountRow): void {
+    if (row.owned || !row.purchasable || row.costClaudium === null) return;
+    const def = ITEMS[row.itemId];
+    if (!def) return;
+    const cost = formatNumber(row.costClaudium, { maximumFractionDigits: 0 });
+    if (!row.affordable) {
+      this.openClaudiumFromStore();
+      return;
+    }
+    this.deps.confirmDialog?.(
+      t('hudChrome.wocStore.confirmTitle'),
+      t('hudChrome.wocStore.confirmBody', { item: itemDisplayName(def), cost }),
+      t('hudChrome.wocStore.confirmPurchase'),
+      t('hudChrome.wocStore.cancel'),
+      () => void this.purchaseStoreMount(row),
+    );
+  }
+
+  /** Compact mirror of purchaseArmorySkin for a mount SKU: same spend call
+   *  (kind 'item'), same price-change and shortfall handling, no inspect
+   *  panel to refresh (ownership reflects through the store re-render and
+   *  the reins arriving in the bags). */
+  private async purchaseStoreMount(row: StoreMountRow): Promise<void> {
+    const expectedCostClaudium = row.costClaudium;
+    if (expectedCostClaudium === null) return;
+    this.storePriceChanged = false;
+    const result = await this.deps.spendStoreItem?.(row.itemId, 'item', expectedCostClaudium);
+    if (result?.reason === 'price_changed') {
+      this.storePriceChanged = true;
+      if (result.balance !== null) this.storeBalance = result.balance;
+      await this.renderStore(null);
+      const current = this.storeMountRows.find((r) => r.itemId === row.itemId);
+      if (
+        current &&
+        current.costClaudium !== null &&
+        current.costClaudium !== expectedCostClaudium
+      ) {
+        this.requestStoreMountPurchase(current);
+      }
+      return;
+    }
+    if (result?.reason === 'insufficient_balance') {
+      if (result.balance !== null) this.storeBalance = result.balance;
+      this.openClaudiumFromStore();
+      return;
+    }
+    await this.renderStore(null);
+    if (!result?.granted) {
+      const owned = this.storeMountRows.find((r) => r.itemId === row.itemId)?.owned ?? false;
+      if (!owned) {
+        this.storeError = true;
+        const body = this.deps.root().querySelector<HTMLElement>('.dr-body');
+        if (body) this.paintStore(body);
+      }
+    }
   }
 
   /** Keep background polling data-fresh without rebuilding an identical store
