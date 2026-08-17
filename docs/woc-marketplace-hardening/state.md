@@ -5,18 +5,19 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-13-qa.md` (GAME repo,
-  worktree `/Users/fernando/Documents/wocc-marketplace`, FRESH session, newest
-  origin/release/** sync first; at the 13 build session the branch was 0 behind
-  origin/release/v0.39.0 tip d2d1a8ad5c, sync a no-op, re-check at session
-  start). 13 build COMPLETE (LOCAL, not pushed per R4; the 13-qa session pushes
-  on PASS). The 13 ledger entry below is the registry 13-qa consumes; read its
-  JUDGED-no-change and DEFERRED lists and do NOT re-raise them, and consume the
-  RED-FIRST REGISTRY for the QA red-proof lane. Both session-start rulings are
-  RESOLVED and recorded (R1 threshold: step-up on EVERY custody-moving call, no
-  env knob; R10: locked copies refuse $WOC listing). NEW open ruling R11 (the
-  relink follow-up) is a pre-enable launch gate for Fernando, NOT a 13-qa
-  blocker.
+- Next file to run: `docs/woc-marketplace-hardening/phase-14-ux-honesty.md`
+  (GAME repo, worktree `/Users/fernando/Documents/wocc-marketplace`, FRESH
+  session, newest origin/release/** sync first). 13 QA COMPLETE
+  (PASS-WITH-FOLLOWUPS, 2026-08-17, PUSHED per R4: feature/woc-marketplace at
+  the 13 QA tip; the release sync merge 220b9b018f rode with it). The 13 ledger
+  entry below carries a 13 QA ROUND bullet: read its JUDGED-no-change and
+  DEFERRED lists and do NOT re-raise them. 14 OWNS (called out in the DEFERRED
+  list): the wallet bridge's own thrown English still renders untranslated at
+  the two step-up decline sinks (src/net/wallet.ts + mobile_wallet_deeplink.ts,
+  shared with the payment path). R11 (the relink follow-up) stays a pre-enable
+  launch gate for Fernando, NOT a 14 blocker. Both session-start rulings remain
+  RESOLVED (R1 threshold: step-up on EVERY custody-moving call, no env knob;
+  R10: locked copies refuse $WOC listing).
 - LOUD deploy handoff (DEPLOY.md records it): enable the market only with
   BOTH sides at or after the contract tips (game: the build that sends
   bidCents; service: PR #31 270e337+, the build whose bond quote answers
@@ -881,6 +882,95 @@ Still open (a phase that hits one asks at session start):
     direct execution (attacker instance strings forged lines) before the
     sanitizer; (6) the opt-out swap reproduced (omit expectInstance -> escrow a
     different copy) before the public-arm normalization.
+  - 13 QA ROUND (2026-08-17, GAME repo, verdict PASS-WITH-FOLLOWUPS, every
+    finding applied or judged with the file open; PUSHED per R4). Release sync
+    was NON-trivial this time: merge 220b9b018f brought origin/release/v0.39.0
+    tip f48c7a3a9b (80 commits: castle branch + icon-art passes), two conflicts
+    (generated i18n pending regenerated via i18n:gen; hud.ts monolith ceiling
+    re-derived to the exact merged 19170, not either side's number). The
+    release-merge-audit ran CLEAN: sim.ts/hud.ts/main.ts/index.html/play.html/
+    the styles all exact-union with zero loss, whole-repo tsc clean,
+    architecture 109/109, ci_workflow 25/25; the two trap lanes that died on a
+    Fable-5 usage limit were re-run inline (release touched NO server/ files, no
+    injected-helper signature change, the release-authored db-mock test passes
+    on the merged tree). QA range 19e4cd87ce..ae1ba36b87. Baseline: all market
+    suites + the FIVE pg suites green zero skips WITH TEST_DATABASE_URL (142/142
+    pg). Independent mutation battery: 22 mutants, 21 bit; the ONE survivor (the
+    safeMessagePiece code-point control-char arm) was a REAL code AND pin gap,
+    closed. Red proof: both reds confirmed at the source (pre-step-up builds
+    carried no stepUp param on either custody op; pre-R10 builds had no
+    item_lock_flag leaf and no `return 'locked'` arm) and by the guard-removal
+    mutation direction. Reviews: privacy-security, frontend-seam, test-coverage
+    via Agent + seven probe lanes via workflow; the fix round re-reviewed FRESH
+    (security + coverage lenses).
+    THE ROUND'S OWN FIXES (commits a996d3c023, 379610f66d, cd689125d4):
+    * CODE: safeMessagePiece now coerces a non-string descriptor field (the
+      route's optionalInstance is a size-capped UNCHECKED cast, so a
+      `{signer:{length:1}}` reached charCodeAt and answered 500) and strips C1
+      (0x80-0x9f, e.g. NEL) by code point plus the Cf format class (\p{Cf}: bidi
+      overrides, zero-width) that survived into the wallet popup; the newline
+      forge was double-covered by the whitespace collapse, which is why the
+      code-point arm was both unpinned and incomplete. woc_market_window.close()
+      now clears busy/busyLabel (a browser-extension signer with no timeout
+      could leave withBusy's finally unreached and brick every Exchange button
+      for the session; single-use challenge + idempotent extract make the reset
+      safe), matching the trade-controller close-reset.
+    * TESTS (every new load-bearing pin mutation-proven by name): a
+      devsig-wiring source pin over server/main.ts (stepUpDevSig is the
+      ALLOW_DEV_COMMANDS && WOC_MARKET_DEV_SERVICE conjunction, never a literal;
+      a flip to true is a TOTAL production bypass that left every other test
+      green); the TTL literal pin (was a constant-self-compare); the no-oracle
+      PARAMS half (a bad price combo reads stepup_required); the directed-accept
+      relink refusal; the realm-leading prune index + superseded-index-absent
+      pins; the directed offerId decode bound + the pre-branch expectInstance
+      decode; the mislabeled locked-extraction test rewritten so the extraction
+      actually runs (null-claim over a locked copy -> stale_copy, extractAttempt
+      recorded, copy restored); the null-copy escrow test's exact stale_copy
+      reason; the comment-stripped route-to-policy scan; the trade-panel
+      signFailed anti-pin (signFailedConfirm is a superstring); the
+      absent-signatureRequired behavioral case (the client still signs); the
+      wocTradePaying close-reset assertion; C1/Cf/non-string sanitizer +
+      Format-line + CSPRNG-source pins.
+    JUDGED, no code change (do NOT re-raise): the frontend BLOCKING (the R10
+    hintAcceptLocked dead end) is RECLASSIFIED should-fix and DEFERRED to 15 -
+    it is not a custody bypass (the spec's blocking bar), and there is NO
+    security or custody hole because createDirectedOffer refuses a locked copy
+    at listingEligibility -> exchangeHardLock, so the directed offer pin is
+    always UNLOCKED and the server would accept after an unlock; the bug is the
+    client's frozen sim.tradeInfo.myOffer snapshot, and `locked` is part of copy
+    identity (structurallyEqual / itemCopyPin), so a robust fix touches the sim
+    trade-snapshot refresh (with acceptance-reset side effects) and is out of
+    the B6/R10 charter. The two-ops race is proven at the store layer (atomic
+    DELETE...RETURNING) and guardStepUp is strictly consume-then-verify with no
+    verify-before-consume path, so no end-to-end two-createListing test is owed.
+    The shape screen caps signature at 256 vs decodeBase58's 128: a 129-256 char
+    sig passes the screen then fails decode as signature_invalid, a refusal
+    either way (defense in depth, left). directedBuyerAccount absent from the
+    create_listing binding is no live gap (createListingHandler hardcodes null;
+    a satisfies-exhaustiveness link is a future-value note). characterId/
+    itemIndex stay unbound because the COPY identity is bound and pinned. The
+    devsig "absent means sign" rule lives in four client sites, all source-scan
+    pinned; a shared resolver is optional.
+    DEFERRED with owners: 14 (ux-honesty) - the wallet bridge's own thrown
+    English (src/net/wallet.ts, mobile_wallet_deeplink.ts's "wallet app did not
+    return in time") still renders untranslated at BOTH new decline sinks
+    (window line ~1849, trade controller line ~406), pre-existing and shared
+    with the payment path; 15 (ui-polish) - the R10 lock-hint dead end (full
+    mechanism above; fix = re-push the offer on a staged copy's lock change, or
+    resolve the lock from live inventory), the Exchange sell picker silently
+    filtering locked copies with no "why" (woc_market_view.ts, unlike the trade
+    hint), re-capture the stale TOTP screenshots (4 of 10 in
+    docs/screenshots/woc-market/ still show the removed field, H13), and the
+    "Waiting for your wallet" busy label that shows before the mint and through
+    the dev arm; 17 (db-retention) - the retention_sweep registration for
+    woc_market_stepup_challenges (DB reviewers ruled prune-on-issue + rate limit
+    + 5-min TTL sufficient, unchanged); RELEASE MAINTAINER - the two retired
+    woc_market.totp_* keys sit in 15 locale pending blocks, so
+    I18N_RELEASE_TIER=1 hard-fails until filled (pre-existing; the keys predate
+    13). NOTE ONLY (out of scope, pre-existing, not in the 13 diff):
+    server/wallet_link.ts:35 carries an em dash in a comment; the gate copy scan
+    is changed-files-only so it does not red, but it is a standing rule
+    violation for a future unrelated cleanup.
 - 12 wire-completeness (2026-08-16, GAME repo, session start a6ff42f1c5 =
   the 11 QA tip, release sync no-op at 0 behind origin/release/v0.39.0
   d2d1a8ad5c; 8 code and doc commits to tip bd089672f9 plus this entry's

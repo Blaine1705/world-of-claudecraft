@@ -30,7 +30,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 12 | wire-completeness | game | DONE (QA PASS) | a6ff42f1c5 | release sync no-op (0 behind origin/release/v0.39.0 tip d2d1a8ad5c); H8 + env truth + health-rail honesty closed AND the four cross-repo owed items adopted (service-owned bond quote, anti-snipe awaiting_finality allowlist, two-settled-per-memoRef tolerance, verdict localization; asOfMs pass-through verified untouched); 8 code and doc commits to tip bd089672f9 plus the ledger docs commit; four review lanes + a fresh fix-round re-review + qa-checklist READY (0 blocking), every finding applied or judged; ~12 mutants bit by name incl. wire-pin drop/rename, vocab delete, echo recompute, sig drop, env guard both directions; real-SQL suites green zero skips WITH TEST_DATABASE_URL; gate GREEN at the docs tip (gate_select full-suite fallback, all 12 steps, 2854 files / 40604 tests, browser 129, WITH TEST_DATABASE_URL); LOCAL, not pushed per R4 |
 | 12 QA | phase-12-qa | game | DONE | 90c007e36f | PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open (section below); release sync no-op (0 behind origin/release/v0.39.0 tip d2d1a8ad5c); ten audit lanes over a6ff42f1c5..bd089672f9 (cross-platform-sync, frontend-seam, test-coverage via Agent; server/client correctness, serializer sweep, fee edges, env sweep, dead code, docs truth via workflow) + red proof (all 7 registry claims reproduced or verified, wire pins exactly 14 red on the pre-fix build) + three mutation batteries (17 round-1: 16 BIT, the one survivor a REAL devSplit pin gap; 18/18 new-pin; 10/10 wave-3); seven fix commits (spine in the section below), the fix round re-reviewed FRESH (two lenses: 1 blocking test gap + 11 should-fix, all applied); qa-checklist READY (0 blocking, 0 should-fix; its adversarial pass independently cleared the ladder, the devsig arm, the browse booleans, the ceil change, and SETTLING_STATES); gate GREEN at 4377a38458 (gate_select full-suite fallback, all 12 steps, 2854 files / 40635 tests + 2 expected fails, browser 129, WITH TEST_DATABASE_URL; the final ledger amendment rides on top docs-only); pushed per R4 (no open PR on this branch, pre-push floor green) |
 | 13 | listing-step-up | game | DONE | 19e4cd87ce | release sync no-op (0 behind origin/release/v0.39.0 tip d2d1a8ad5c); B6 + browser-only-gate medium closed; both rulings recorded first (R1 threshold: step-up on every custody-moving call, no env knob; R10: locked copies refuse listing); step-up challenge protocol (own sibling module + store, real-SQL pg suite), enforcement in both service methods, client flows in both surfaces, TOTP retired; four fresh review lanes + a fresh three-lane re-review of the fix round + qa-checklist READY + migration-safety & database-performance (both PASS, the account-id FK index fixed), every finding applied or judged; 22 mutants across three fix rounds all bit; R11 relink follow-up recorded (pre-enable gate); GATE GREEN at ae1ba36b87 (gate_select full-suite fallback, all 12 steps, 2855 files + browser 19, WITH TEST_DATABASE_URL); LOCAL, not pushed per R4 (13-qa pushes on PASS) |
-| 13 QA | phase-13-qa | game | NOT STARTED | | |
+| 13 QA | phase-13-qa | game | DONE (QA PASS) | 220b9b018f | PASS-WITH-FOLLOWUPS, every finding applied or judged; release/v0.39.0 re-synced (merge 220b9b018f, tip f48c7a3a9b, 2 conflicts: i18n pending regenerated + hud.ts ceiling re-derived to 19170; release-merge-audit CLEAN, both usage-limit trap lanes re-run inline); independent mutation battery 21/22 bit, the 1 survivor a REAL safeMessagePiece code+pin gap closed; two code fixes (sanitizer C1/Cf + non-string coerce; window close-reset) + a test-pin batch incl. the devsig-wiring total-bypass pin, all mutation-proven; the fe BLOCKING (R10 lock-hint dead end) reclassified should-fix and deferred to 15 (no custody hole; offer pin always unlocked); gate GREEN (see 13 QA ROUND); pushed per R4 |
 | 14 | ux-honesty | game | NOT STARTED | | |
 | 14 QA | phase-14-qa | game | NOT STARTED | | |
 | 15 | ui-polish | game | NOT STARTED | | |
@@ -49,6 +49,45 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 21 QA | phase-21-qa | service + game | NOT STARTED | | |
 | 22 | close-out | all three | NOT STARTED | | teardown offer lives in 22 QA |
 | 22 QA | phase-22-qa | all three | NOT STARTED | | |
+
+## 13 QA round (verdict PASS-WITH-FOLLOWUPS, every finding applied or judged)
+
+Session start 2c900682ef (the 13 build docs tip; code tip ae1ba36b87). Release
+sync was NON-trivial: merge 220b9b018f brought origin/release/v0.39.0 tip
+f48c7a3a9b (80 commits), two conflicts resolved (generated i18n pending
+regenerated with npm run i18n:gen; the hud.ts monolith ceiling re-derived to the
+exact merged 19170, not either side's number). The release-merge-audit ran CLEAN
+(sim.ts / hud.ts / main.ts / index.html / play.html / styles all exact-union,
+whole-repo tsc clean, architecture 109/109, ci_workflow 25/25); the two trap
+lanes that died on a Fable-5 usage limit were re-run inline (release touched no
+server/ files, no injected-helper signature change, the release db-mock test
+passes on the merged tree). QA range 19e4cd87ce..ae1ba36b87.
+
+Audit: privacy-security-review, frontend-seam-reviewer, test-coverage-auditor
+via Agent + seven probe lanes via workflow (attack-protocol, entry-points,
+canonical-wallet, totp-remnants, ux-honesty done; correctness + cleanup-docs
+died on the usage limit and were done inline). Independent mutation battery of
+22 named mutants: 21 bit; the one survivor (the safeMessagePiece code-point
+control-char arm) was a REAL code AND pin gap, closed. Red proof: both reds
+confirmed at the source (pre-step-up builds had no stepUp param on either custody
+op; pre-R10 builds had no item_lock_flag leaf and no `return 'locked'` arm) plus
+the guard-removal mutation direction. Baseline: all market suites + the five pg
+suites green zero skips WITH TEST_DATABASE_URL (142/142 pg).
+
+Fix commits (LOCAL until the R4 push): a996d3c023 (sanitizer C1/Cf + non-string
+coerce, with the C1/Cf/non-string/Format/CSPRNG pins), 379610f66d (window
+close-reset + its source pin), cd689125d4 (the test-pin batch: devsig-wiring
+source pin over main.ts, TTL literal pin, no-oracle PARAMS half, directed-accept
+relink, realm-leading prune index + superseded-absent, directed offerId decode +
+pre-branch expectInstance decode, the rewritten locked-extraction test, the exact
+stale_copy reason, the comment-stripped route-policy scan, the trade-panel
+signFailed anti-pin, the absent-signatureRequired behavioral case, the
+wocTradePaying close-reset assertion; plus the marketplace PRD keeper-surface
+correction and a stale totp comment). Every new load-bearing pin mutation-proven
+by name (MC1/MC2/MC3 for the sanitizer arms, the devsig-wiring flip, the
+close-reset removal). The fix round re-reviewed FRESH (security + coverage
+lenses). Details, the JUDGED-no-change list, and the deferrals-with-owners are in
+the 13 QA ROUND bullet of the state.md ledger entry.
 
 ## 13 implement round (step-up authorization for custody-moving ops)
 
