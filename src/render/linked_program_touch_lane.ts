@@ -15,6 +15,7 @@
 // still settles after the last piece, so a gated reveal is no earlier than it
 // was before.
 import type * as THREE from 'three';
+import { GPU_WORK_PRIORITY } from './background_gpu_queue';
 import {
   collectLinkedPrograms,
   type MaterialPropertiesLike,
@@ -30,21 +31,33 @@ export interface LinkedProgramTouchQueue {
  *  is what the budget learns a cost for, so all pieces share one estimate. */
 export const LINKED_PROGRAM_TOUCH_LABEL = 'touch:program';
 
+/** The queue priority a gate's touch pieces ride at: an actionable gate keeps
+ *  its own (the actionable floor); every other gate's pieces drop to
+ *  TAIL_PIECE, below every link submission (see GPU_WORK_PRIORITY). */
+export function linkedProgramTouchPriority(gatePriority: number): number {
+  return gatePriority >= GPU_WORK_PRIORITY.ACTIONABLE_VIEW
+    ? gatePriority
+    : GPU_WORK_PRIORITY.TAIL_PIECE;
+}
+
 /**
  * Run one queue unit per linked program under `target`, in order, and resolve
  * with how many were touched. The programs are collected ONCE up front: the
  * walk is cheap, and re-walking between pieces would re-touch what earlier
- * pieces already warmed.
+ * pieces already warmed. `gatePriority` is the GATE's priority; the pieces
+ * ride at `linkedProgramTouchPriority(gatePriority)`.
  */
 export async function runLinkedProgramTouchLane(
   queue: LinkedProgramTouchQueue,
   properties: MaterialPropertiesLike,
   target: THREE.Object3D,
-  priority: number,
+  gatePriority: number,
+  label: string = LINKED_PROGRAM_TOUCH_LABEL,
 ): Promise<number> {
   const programs = collectLinkedPrograms(properties, target);
+  const priority = linkedProgramTouchPriority(gatePriority);
   for (const program of programs) {
-    await queue.run(() => touchLinkedProgram(program), priority, LINKED_PROGRAM_TOUCH_LABEL);
+    await queue.run(() => touchLinkedProgram(program), priority, label);
   }
   return programs.length;
 }

@@ -41,8 +41,10 @@ describe('createGpuPrepAdmission', () => {
     expect(budget.snapshot().kinds).toEqual([{ kind: 'reveal-gate', emaMs: 40, samples: 1 }]);
 
     // ...so a DIFFERENT instance of the same family is priced by it, not by the
-    // unknown prior, and 40 ms does not fit a frame already at its target.
+    // unknown prior, and 40 ms does not fit a frame already at its target
+    // (the frame has spent, so the per-frame progress slot is closed).
     budget.noteFrame(16.7);
+    budget.spend(0.1);
     expect(
       admission.admit({
         label: 'reveal-gate:forge:7',
@@ -87,6 +89,7 @@ describe('createGpuPrepAdmission', () => {
     });
     const admission = createGpuPrepAdmission(budget);
     budget.noteFrame(60);
+    budget.spend(0.1);
     budget.record('touch', 99);
 
     // BACKGROUND is cosmetic: its own, longer bound applies.

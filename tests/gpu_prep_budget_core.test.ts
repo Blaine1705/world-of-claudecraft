@@ -279,10 +279,10 @@ describe('gpu prep admission rules, in order', () => {
       reason: 'fits',
       predictedMs: 4,
     });
-    // Half a millisecond over the same headroom does not (approaching: the
-    // visible class would take the per-frame progress slot here instead).
+    // Half a millisecond over the same headroom does not (cosmetic: the visible
+    // and approaching classes would take the per-frame progress slot instead).
     expect(
-      budget.admit({ kind: 'texture-chunk-upload', cls: 'approaching', deferredFrames: 0 }),
+      budget.admit({ kind: 'texture-chunk-upload', cls: 'cosmetic', deferredFrames: 0 }),
     ).toEqual({ admit: false, reason: 'no-headroom', predictedMs: 4.5, headroomMs: 4 });
     // ...and the charged frame moves the line under the kind that just fitted.
     budget.spend(0.5);
@@ -426,7 +426,7 @@ describe('gpu prep budget: progress and class-specific starvation', () => {
     });
   });
 
-  it('does not use the progress slot once the frame has spent, and never for approaching or cosmetic', () => {
+  it('does not use the progress slot once the frame has spent, and never for cosmetic', () => {
     const budget = budgetAt(40);
     budget.record('touch:0', 15);
     budget.spend(0.5);
@@ -434,13 +434,17 @@ describe('gpu prep budget: progress and class-specific starvation', () => {
       admit: false,
       reason: 'no-headroom',
     });
+    // Approaching work (a reveal-gate compile, a tail piece) shares the slot:
+    // a band's escape draws it cold if its compile waits behind the frame.
     const fresh = budgetAt(40);
     fresh.record('touch:0', 15);
     expect(fresh.admit({ kind: 'touch:1', cls: 'approaching', deferredFrames: 0 })).toMatchObject({
-      admit: false,
-      reason: 'no-headroom',
+      admit: true,
+      reason: 'progress',
     });
-    expect(fresh.admit({ kind: 'touch:1', cls: 'cosmetic', deferredFrames: 0 })).toMatchObject({
+    const cosmetic = budgetAt(40);
+    cosmetic.record('touch:0', 15);
+    expect(cosmetic.admit({ kind: 'touch:1', cls: 'cosmetic', deferredFrames: 0 })).toMatchObject({
       admit: false,
       reason: 'no-headroom',
     });

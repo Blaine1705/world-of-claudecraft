@@ -292,13 +292,14 @@ export function createGpuPrepBudget(config?: Partial<GpuPrepBudgetConfig>): GpuP
         input.cls === 'cosmetic' ? cfg.cosmeticMaxDeferFrames : cfg.maxDeferFrames;
       if (deferredFrames >= starvationBound) return admitted('starvation', predictedMs);
       if (input.cls === 'cosmetic' && degrading) return deferred('pressure', predictedMs);
-      // Visible work (a live gate and its pieces: the body the player is
-      // waiting for) always makes progress: one piece per frame even when it
-      // does not fit, because delaying it never makes the frame faster and a
-      // gated root revealed by an escape before its pieces are done pays the
-      // whole link on the live path, which costs more than the piece.
+      // Visible and approaching work (a live gate, a reveal-gate compile, and
+      // their pieces: the body or the band the player is about to see) always
+      // makes progress: one piece per frame even when it does not fit,
+      // because delaying it never makes the frame faster and a gated root
+      // revealed by an escape before its pieces are done pays the whole link
+      // on the live path, which costs more than the piece.
       if (
-        input.cls === 'visible' &&
+        (input.cls === 'visible' || input.cls === 'approaching') &&
         spentThisFrameMs === 0 &&
         !progressUsedThisFrame &&
         ledgerOf(input.kind) !== undefined &&

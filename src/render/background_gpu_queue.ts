@@ -91,6 +91,14 @@ export const GPU_WORK_PRIORITY = {
   // measured the preview lane starving it for minutes) but stays under the
   // streamed-zone prepare and every live gate.
   BOOT_DEBT: 15,
+  // The tail PIECES of a gate (one uniform-table touch per linked program):
+  // below every link SUBMISSION so a cheap prologue that starts async driver
+  // work always goes ahead of a piece that only finishes one. Measured on the
+  // iGPU crowd bench: hundreds of touch pieces at the gate's own LIVE_VIEW
+  // priority sat ahead of a props band's VISIBLE_PREWARM compile for 2.5 s,
+  // and the band's escape drew it cold. Actionable gates keep their pieces at
+  // ACTIONABLE_VIEW (the actionable floor).
+  TAIL_PIECE: 18,
   VISIBLE_PREWARM: 20,
   LIVE_VIEW: 30,
   ACTIONABLE_VIEW: 40,

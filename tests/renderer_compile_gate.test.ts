@@ -328,10 +328,11 @@ describe('the compile gate touch tail, per program', () => {
     await renderer.compileGate(renderer.touchTarget as THREE.Object3D);
 
     expect(renderer.order).toEqual(['color', 'shadow', 'unit:1', 'unit:2', 'unit:3']);
+    // A LIVE_VIEW gate's pieces ride at TAIL_PIECE, below every link submission.
     expect(renderer.queued).toEqual([
-      { label: 'touch:program', priority: GPU_WORK_PRIORITY.LIVE_VIEW },
-      { label: 'touch:program', priority: GPU_WORK_PRIORITY.LIVE_VIEW },
-      { label: 'touch:program', priority: GPU_WORK_PRIORITY.LIVE_VIEW },
+      { label: 'touch:program', priority: GPU_WORK_PRIORITY.TAIL_PIECE },
+      { label: 'touch:program', priority: GPU_WORK_PRIORITY.TAIL_PIECE },
+      { label: 'touch:program', priority: GPU_WORK_PRIORITY.TAIL_PIECE },
     ]);
   });
 

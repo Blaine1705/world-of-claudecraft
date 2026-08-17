@@ -5,10 +5,12 @@
 // without.
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
+import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import type { LinkedProgramLike, MaterialPropertiesLike } from '../src/render/linked_program_touch';
 import {
   LINKED_PROGRAM_TOUCH_LABEL,
   type LinkedProgramTouchQueue,
+  linkedProgramTouchPriority,
   runLinkedProgramTouchLane,
 } from '../src/render/linked_program_touch_lane';
 
@@ -55,7 +57,7 @@ function targetWith(programs: Map<string, LinkedProgramLike>): {
 }
 
 describe('runLinkedProgramTouchLane', () => {
-  it('issues one labelled unit per ready program, at the gate priority, one at a time', async () => {
+  it('issues one labelled unit per ready program, at the tail-piece priority, one at a time', async () => {
     const first = program(true);
     const second = program(true);
     const linking = program(false);
@@ -72,9 +74,12 @@ describe('runLinkedProgramTouchLane', () => {
 
     await expect(runLinkedProgramTouchLane(queue, properties, target, 30)).resolves.toBe(2);
 
+    // A LIVE_VIEW gate's pieces ride BELOW every link submission (TAIL_PIECE):
+    // a cheap prologue that starts async driver work goes ahead of a piece
+    // that only finishes one.
     expect(queue.units).toEqual([
-      { priority: 30, label: LINKED_PROGRAM_TOUCH_LABEL },
-      { priority: 30, label: LINKED_PROGRAM_TOUCH_LABEL },
+      { priority: GPU_WORK_PRIORITY.TAIL_PIECE, label: LINKED_PROGRAM_TOUCH_LABEL },
+      { priority: GPU_WORK_PRIORITY.TAIL_PIECE, label: LINKED_PROGRAM_TOUCH_LABEL },
     ]);
     // sequential: the pieces are main-thread work, so overlapping them would
     // only make one frame carry several driver round trips
@@ -124,5 +129,26 @@ describe('runLinkedProgramTouchLane', () => {
     await expect(runLinkedProgramTouchLane(failing, properties, target, 20)).rejects.toThrow(
       'queue shut down',
     );
+  });
+
+  it('keeps an actionable gate pieces at the actionable floor and drops every other gate to TAIL_PIECE', async () => {
+    expect(linkedProgramTouchPriority(GPU_WORK_PRIORITY.ACTIONABLE_VIEW)).toBe(
+      GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
+    );
+    expect(linkedProgramTouchPriority(GPU_WORK_PRIORITY.LIVE_VIEW)).toBe(
+      GPU_WORK_PRIORITY.TAIL_PIECE,
+    );
+    expect(linkedProgramTouchPriority(GPU_WORK_PRIORITY.VISIBLE_PREWARM)).toBe(
+      GPU_WORK_PRIORITY.TAIL_PIECE,
+    );
+    expect(GPU_WORK_PRIORITY.TAIL_PIECE).toBeLessThan(GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    expect(GPU_WORK_PRIORITY.TAIL_PIECE).toBeGreaterThan(GPU_WORK_PRIORITY.BOOT_DEBT);
+    const actionable = program(true);
+    const { properties, target } = targetWith(new Map([['skinned', actionable]]));
+    const queue = stubQueue();
+    await runLinkedProgramTouchLane(queue, properties, target, GPU_WORK_PRIORITY.ACTIONABLE_VIEW);
+    expect(queue.units).toEqual([
+      { priority: GPU_WORK_PRIORITY.ACTIONABLE_VIEW, label: LINKED_PROGRAM_TOUCH_LABEL },
+    ]);
   });
 });
