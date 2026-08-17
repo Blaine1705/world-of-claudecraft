@@ -168,7 +168,7 @@ import {
 } from './game/spawn_cinematic';
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
-import { teleportCameraYaw } from './game/teleport_camera';
+import { islandTeleportCameraYaw } from './game/teleport_camera';
 import {
   loadingCurtainFadeMs,
   resolveUiEffectsProfile,
@@ -2035,8 +2035,21 @@ async function startGame(
   // HUD signals the sim's per-character first visit; the frame loop below
   // steps the fall and any camera input from the player cancels it.
   const arrivalCinematic = createArrivalCinematic();
-  hud.onIslandFirstArrival = () =>
+  // The camDist the cinematic last applied: a differing value next frame
+  // means the player zoomed (the wheel writes camDist directly), which
+  // cancels the fall alongside isMouselookActive in the frame loop.
+  let cineAppliedDist: number | null = null;
+  hud.onIslandFirstArrival = () => {
+    // Reduce motion is the EFFECTIVE flag (OS query OR in-game switch, the
+    // spawn intro's contract below): a 4.5 s sweeping camera fall is exactly
+    // what that contract exists for, so it never starts and the arrival lands
+    // at the ordinary chase framing.
+    const osReduced =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (settings.get('reduceMotion') || osReduced) return;
     startArrivalCinematic(arrivalCinematic, input.camDist, input.camPitch);
+  };
 
   let lastOptionsOpen = hud.optionsOpen;
   let lastCharacterOpen = hud.characterOpen;
@@ -3805,6 +3818,13 @@ async function startGame(
   // covers that ordinary case).
   const warmTracker = createZoneWarmTracker(isRiftPos);
   const RIFT_EXIT_STREAM_RADIUS = 240;
+  // Last-evaluated position for the ferry camera-snap scoping: the snap needs
+  // the displacement's ORIGIN (the town bell ride lands off-island, so the
+  // landed point alone cannot tell a ferry ride from a hearthstone). Updated
+  // only when the tracker evaluates, so a hidden desktop span keeps its
+  // pre-hidden origin exactly like the tracker's own displacement.
+  let camSnapPrevX = world.player.pos.x;
+  let camSnapPrevZ = world.player.pos.z;
   // Ferry crossings are a CLICK, not a walk, so the far shore has to be
   // resident BEFORE the bell is rung or the arrival takes the blocking loading
   // screen. Warm it while the player is still walking up to the bell; the
@@ -3812,16 +3832,23 @@ async function startGame(
   // simply leaves the classic screen in place.
   const ferryPrewarmed = new Set<string>();
   const maybeWarmFerryDestination = (): void => {
+    // The hidden desktop shell rule (maybeWarmCurrentZone below) applies to
+    // this lane too: no zone-warm GPU work for a view nobody sees.
+    if (desktopPresentationHidden()) return;
     const target = ferryPrewarmTargetFor(world.player.pos.x, world.player.pos.z);
     if (!target || ferryPrewarmed.has(target.id)) return;
     ferryPrewarmed.add(target.id);
-    void renderer
-      .prepareZoneAt(target.x, target.z)
-      .then(() => renderer.prewarmZoneAt(target.x, target.z, { background: true }))
-      .catch(() => {
-        // Let a failed stream be retried the next time the player walks up.
-        ferryPrewarmed.delete(target.id);
-      });
+    // The visible-zone streaming lane's idiom (renderer.ts, processZoneQueue):
+    // prepare at IDLE pace beside a background prewarm. This warm fires in
+    // live play with no loading curtain, so the gating arm (synchronous sky
+    // PMREM, fast terrain batches) would cost visible frames; idle pace
+    // spends spare slots instead and simply finishes a little later.
+    const prepare = renderer.prepareZoneAt(target.x, target.z, undefined, { pace: 'idle' });
+    const prewarm = renderer.prewarmZoneAt(target.x, target.z, { background: true });
+    void Promise.all([prepare, prewarm]).catch(() => {
+      // Let a failed stream be retried the next time the player walks up.
+      ferryPrewarmed.delete(target.id);
+    });
   };
   const maybeWarmCurrentZone = (): void => {
     const player = world.player;
@@ -3837,21 +3864,21 @@ async function startGame(
     if (!warm) return;
     const { displacement, riftExit } = warm;
     // A teleport-scale jump snaps the chase camera behind the landed facing,
-    // so the player sees what the landing authored (game/teleport_camera.ts).
-    input.camYaw = teleportCameraYaw(displacement, player.facing, input.camYaw);
-    // The first-visit island arrival falls from the sky onto that same view;
-    // the player touching the camera cancels the remainder instantly.
-    if (arrivalCinematicActive(arrivalCinematic)) {
-      if (input.rightDown) {
-        cancelArrivalCinematic(arrivalCinematic);
-      } else {
-        const frame = stepArrivalCinematic(arrivalCinematic, 1 / 60);
-        if (frame) {
-          input.camDist = frame.dist;
-          input.camPitch = frame.pitch;
-        }
-      }
-    }
+    // so the player sees what the landing authored, SCOPED to the island's
+    // ferry crossings: a snap on every portal, dungeon door and hearthstone
+    // would be a global feel change riding in a tutorial change
+    // (game/teleport_camera.ts owns the pure decision and the scoping).
+    input.camYaw = islandTeleportCameraYaw(
+      camSnapPrevX,
+      camSnapPrevZ,
+      player.pos.x,
+      player.pos.z,
+      displacement,
+      player.facing,
+      input.camYaw,
+    );
+    camSnapPrevX = player.pos.x;
+    camSnapPrevZ = player.pos.z;
     if (zoneWarmup) return;
     if (!riftExit && renderer.isZoneReadyAt(player.pos.x, player.pos.z)) return;
     const zoneX = player.pos.x;
@@ -4329,6 +4356,29 @@ async function startGame(
     let frameDt = (now - last) / 1000;
     last = now;
     if (frameDt > 0.25) frameDt = 0.25;
+    // The first-visit island arrival fall (game/arrival_cinematic.ts), stepped
+    // ONCE per frame with the real frame dt: a fixed 1/60 ran the 4.5 s fall
+    // in 1.9 s at 144 Hz and 9 s at 30 fps, and living inside
+    // maybeWarmCurrentZone (which the offline path deliberately calls twice a
+    // frame) doubled it again. Any camera look input (mouse drag, touch drag,
+    // pad look via isMouselookActive) or a zoom change since the last applied
+    // frame (the wheel writes camDist directly) cancels the remainder.
+    if (arrivalCinematicActive(arrivalCinematic)) {
+      const userZoomed = cineAppliedDist !== null && input.camDist !== cineAppliedDist;
+      if (input.isMouselookActive() || userZoomed) {
+        cancelArrivalCinematic(arrivalCinematic);
+        cineAppliedDist = null;
+      } else {
+        const cine = stepArrivalCinematic(arrivalCinematic, frameDt);
+        if (cine) {
+          input.camDist = cine.dist;
+          input.camPitch = cine.pitch;
+          cineAppliedDist = cine.dist;
+        }
+      }
+    } else {
+      cineAppliedDist = null;
+    }
     // Not sampling a renderless frame reproduces the web hidden-tab shape (rAF
     // pauses there, so hidden frames never reach the sampler, and the reporter
     // is gated on this same shell signal via its shellHidden option below): the

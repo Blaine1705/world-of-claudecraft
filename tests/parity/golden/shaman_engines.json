@@ -32,7 +32,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 999,
-      "state": "6e88cf7b",
+      "state": "fbb051df",
       "events": "094d19b8",
       "rng": {
         "draws": 0,
@@ -43,7 +43,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 999,
-      "state": "d29d6f4f",
+      "state": "1e14c483",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -54,7 +54,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 999,
-      "state": "35357deb",
+      "state": "3ac5e68f",
       "events": "24cdc19e",
       "rng": {
         "draws": 154,
@@ -65,7 +65,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 999,
-      "state": "51ef3524",
+      "state": "6f0f2aa8",
       "events": "741638a5",
       "rng": {
         "draws": 328,
@@ -76,7 +76,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 999,
-      "state": "4f540080",
+      "state": "7d538c04",
       "events": "35d6d86c",
       "rng": {
         "draws": 508,
@@ -87,7 +87,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 999,
-      "state": "4f540080",
+      "state": "7d538c04",
       "events": "741638a5",
       "rng": {
         "draws": 508,
@@ -167,7 +167,6 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -264,7 +263,6 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -361,7 +359,6 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -455,7 +452,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -782,7 +778,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 999,
-      "state": "a341206c",
+      "state": "3afe1c04",
       "events": "3569f5ac",
       "rng": {
         "draws": 695,
@@ -793,7 +789,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 999,
-      "state": "f0f2f5eb",
+      "state": "6038550b",
       "events": "741638a5",
       "rng": {
         "draws": 923,
@@ -804,7 +800,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 999,
-      "state": "82a51498",
+      "state": "500d8110",
       "events": "5e39ca72",
       "rng": {
         "draws": 1157,
@@ -815,7 +811,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 999,
-      "state": "f9aa444c",
+      "state": "1ca8e6e4",
       "events": "741638a5",
       "rng": {
         "draws": 1413,
@@ -826,7 +822,7 @@
       "tick": 182,
       "time": 9.1,
       "nextId": 999,
-      "state": "1f527348",
+      "state": "3c72a8c0",
       "events": "741638a5",
       "rng": {
         "draws": 1440,
@@ -906,7 +902,6 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1008,7 +1003,6 @@
             "offhand": "training_mace"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1105,7 +1099,6 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1199,7 +1192,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1595,7 +1587,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 999,
-      "state": "8a0fdaf6",
+      "state": "8be422ee",
       "events": "2508f796",
       "rng": {
         "draws": 1681,
@@ -1606,7 +1598,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 999,
-      "state": "253f85f1",
+      "state": "c31eedd1",
       "events": "741638a5",
       "rng": {
         "draws": 1834,
@@ -1617,7 +1609,7 @@
       "tick": 224,
       "time": 11.2,
       "nextId": 999,
-      "state": "fdb4702a",
+      "state": "38fe4cf2",
       "events": "741638a5",
       "rng": {
         "draws": 1870,
@@ -1697,7 +1689,6 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1799,7 +1790,6 @@
             "offhand": "training_mace"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1896,7 +1886,6 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1990,7 +1979,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2406,7 +2394,7 @@
       "tick": 240,
       "time": 12,
       "nextId": 999,
-      "state": "ae211b84",
+      "state": "7608d1dc",
       "events": "2786e528",
       "rng": {
         "draws": 1978,
@@ -2417,7 +2405,7 @@
       "tick": 260,
       "time": 13,
       "nextId": 999,
-      "state": "488f00fe",
+      "state": "3849b112",
       "events": "85c55a55",
       "rng": {
         "draws": 2123,
@@ -2428,7 +2416,7 @@
       "tick": 280,
       "time": 14,
       "nextId": 999,
-      "state": "d0b77dd5",
+      "state": "a3e76939",
       "events": "debd4b0c",
       "rng": {
         "draws": 2315,
@@ -2439,7 +2427,7 @@
       "tick": 300,
       "time": 15,
       "nextId": 999,
-      "state": "881a3d2e",
+      "state": "da2878e2",
       "events": "b4f91fab",
       "rng": {
         "draws": 2513,
@@ -2450,7 +2438,7 @@
       "tick": 306,
       "time": 15.3,
       "nextId": 999,
-      "state": "02aa14c1",
+      "state": "dd14ad65",
       "events": "741638a5",
       "rng": {
         "draws": 2568,
@@ -2530,7 +2518,6 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2632,7 +2619,6 @@
             "offhand": "training_mace"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2729,7 +2715,6 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2823,7 +2808,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3238,7 +3222,7 @@
       "tick": 306,
       "time": 15.3,
       "nextId": 999,
-      "state": "02aa14c1",
+      "state": "dd14ad65",
       "events": "741638a5",
       "rng": {
         "draws": 2568,
@@ -3318,7 +3302,6 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3420,7 +3403,6 @@
             "offhand": "training_mace"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3517,7 +3499,6 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3611,7 +3592,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

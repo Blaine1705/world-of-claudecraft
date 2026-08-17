@@ -143,14 +143,13 @@ export interface WsAuthDeps {
   // Recomputes the account's bank bonus slots from live facts (email/Discord/wallet/
   // referrals) so a fresh join stamps the current entitlement into the character state.
   // Called on the FRESH-JOIN arm only, never on a resume (no mid-session recompute); a
-  // rejection fails the handshake exactly like a getCharacter failure.
+  // rejection fails the handshake exactly like a getCharacter failure. characterCount
+  // (the tutorial greeting's firstCharacter fact; the row being joined is already
+  // counted, so first means <= 1) rides the same single round trip rather than a
+  // second serial await on every handshake.
   bankBonusForAccount: (
     accountId: number,
-  ) => Promise<{ bonusSlots: number; sources: BankBonusSource[] }>;
-  // Account-wide character count (db.ts characterCountForAccount), read on the
-  // fresh-join arm to compute the tutorial greeting's firstCharacter account
-  // fact (the row being joined is already counted, so first means <= 1).
-  characterCountForAccount: (accountId: number) => Promise<number>;
+  ) => Promise<{ bonusSlots: number; sources: BankBonusSource[]; characterCount: number }>;
 }
 
 export interface WsAuthHandlers {
@@ -179,7 +178,6 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     acquireCharacterLease,
     releaseCharacterLease,
     bankBonusForAccount,
-    characterCountForAccount,
   } = deps;
 
   // Character ids whose lease-acquire-through-join section is in flight in THIS
@@ -439,8 +437,8 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
             // The tutorial greeting's account fact: this join's character is
             // the account's first when the account-wide count is at most 1
             // (the row being joined is already counted). Fresh-join arm only,
-            // like bankBonus; a resume keeps the session's stamped value.
-            const firstCharacter = (await characterCountForAccount(accountId)) <= 1;
+            // like bankBonus, whose single query carries the count.
+            const firstCharacter = bankBonus.characterCount <= 1;
             leaseNonce = randomUUID();
             const leased = await acquireCharacterLease(character.id, accountId, leaseNonce);
             if (!leased) {

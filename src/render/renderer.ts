@@ -6,6 +6,7 @@ import {
   emptyPriestMarkerState,
   priestMarkerStateForAuras,
 } from '../sim/combat/priest/presentation';
+import { isOnProvingShore } from '../sim/content/proving_shore';
 import {
   ABILITIES,
   ARENA_SLOT_COUNT,
@@ -492,6 +493,11 @@ import { createPrewarmResumeLedger } from './prewarm_resume_ledger_core';
 import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_markers_visual';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
 import { beaconNpcIds } from './quest_beacon_core';
+
+// The off-island beacon answer, shared so the per-frame memo never allocates
+// away from the shore.
+const EMPTY_BEACON_IDS: ReadonlySet<string> = new Set();
+
 import { makeQuestObjectGate, type QuestObjectGateOptions } from './quest_object_gate_core';
 import { buildGroundQuestObject } from './quest_objects';
 import { RaceLine } from './race_line';
@@ -11060,10 +11066,17 @@ export class Renderer {
         // The tutorial island's go-here-next beacon: a gentle holy fizz over
         // the rail NPC that currently offers or awaits the chain's quest
         // (quest_beacon_core.ts), so a brand-new player can see their next
-        // stop across the shore. The set is memoized once per frame.
+        // stop across the shore. Memoized once per frame AND gated on the
+        // island rectangle: off the shore the rail's seven questState reads
+        // (each an options-object plus attunement-copy allocation online)
+        // would otherwise run every frame for every player in the world.
         if (this.islandBeaconTime !== this.time) {
           this.islandBeaconTime = this.time;
-          this.islandBeaconIds = beaconNpcIds(this.sim);
+          const player = this.sim.player;
+          this.islandBeaconIds =
+            player && isOnProvingShore(player.pos.x, player.pos.z)
+              ? beaconNpcIds(this.sim)
+              : EMPTY_BEACON_IDS;
         }
         if (this.islandBeaconIds.has(e.templateId)) {
           this.vfx.castSparkle(e.id, 'holy', dt * 2.0);

@@ -21,7 +21,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 995,
-      "state": "552a0127",
+      "state": "1bd6e542",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -66,7 +66,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -158,7 +157,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 995,
-      "state": "db8dfb74",
+      "state": "98e4d689",
       "events": "69fd071c",
       "rng": {
         "draws": 2,
@@ -223,7 +222,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {
             "mining": 1
           },
@@ -340,7 +338,7 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 995,
-      "state": "e2043a82",
+      "state": "b72ddb2b",
       "events": "f8159551",
       "rng": {
         "draws": 4,
@@ -416,7 +414,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {
             "logging": 100,
             "mining": 1
@@ -542,7 +539,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 995,
-      "state": "8a6419ed",
+      "state": "43dc1fd2",
       "events": "4db63c8b",
       "rng": {
         "draws": 18,
@@ -553,7 +550,7 @@
       "tick": 1000,
       "time": 50,
       "nextId": 995,
-      "state": "ac05274f",
+      "state": "339d3284",
       "events": "e59d5951",
       "rng": {
         "draws": 38,
@@ -564,7 +561,7 @@
       "tick": 1500,
       "time": 75,
       "nextId": 995,
-      "state": "7c7758e1",
+      "state": "9842dbee",
       "events": "9a5ff4c6",
       "rng": {
         "draws": 58,
@@ -575,7 +572,7 @@
       "tick": 2000,
       "time": 100,
       "nextId": 995,
-      "state": "90977b3a",
+      "state": "cfa348a9",
       "events": "cfcd6d6d",
       "rng": {
         "draws": 78,
@@ -586,7 +583,7 @@
       "tick": 2500,
       "time": 125,
       "nextId": 995,
-      "state": "629e09d9",
+      "state": "a58af12a",
       "events": "65846785",
       "rng": {
         "draws": 96,
@@ -597,7 +594,7 @@
       "tick": 3000,
       "time": 150,
       "nextId": 995,
-      "state": "6149e7df",
+      "state": "9daadb6a",
       "events": "cfcd6d6d",
       "rng": {
         "draws": 116,
@@ -608,7 +605,7 @@
       "tick": 3500,
       "time": 175,
       "nextId": 995,
-      "state": "59d67de6",
+      "state": "67870679",
       "events": "c9497cac",
       "rng": {
         "draws": 136,
@@ -619,7 +616,7 @@
       "tick": 4000,
       "time": 200,
       "nextId": 995,
-      "state": "2a446531",
+      "state": "e4c0ac98",
       "events": "bd2b115d",
       "rng": {
         "draws": 156,
@@ -630,7 +627,7 @@
       "tick": 4500,
       "time": 225,
       "nextId": 995,
-      "state": "6e76df2d",
+      "state": "a297560e",
       "events": "62095526",
       "rng": {
         "draws": 176,
@@ -641,7 +638,7 @@
       "tick": 5000,
       "time": 250,
       "nextId": 995,
-      "state": "e0d17118",
+      "state": "cceb3033",
       "events": "b8c72085",
       "rng": {
         "draws": 194,
@@ -652,7 +649,7 @@
       "tick": 5206,
       "time": 260.3,
       "nextId": 995,
-      "state": "de6af996",
+      "state": "1f60cb8b",
       "events": "cae920d5",
       "rng": {
         "draws": 204,
@@ -748,7 +745,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {
             "herbalism": 1,
             "logging": 100,
@@ -885,7 +881,7 @@
       "tick": 5208,
       "time": 260.4,
       "nextId": 995,
-      "state": "7edb4919",
+      "state": "deeea5f0",
       "events": "741638a5",
       "rng": {
         "draws": 204,
@@ -981,7 +977,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {
             "herbalism": 1,
             "logging": 100,

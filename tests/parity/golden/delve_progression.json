@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 995,
-      "state": "552a0127",
+      "state": "1bd6e542",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -61,7 +61,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -153,7 +152,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1016,
-      "state": "8b6c030a",
+      "state": "9e450445",
       "events": "1914f501",
       "rng": {
         "draws": 1,
@@ -164,7 +163,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 1016,
-      "state": "ba5387ed",
+      "state": "884ae59a",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -219,7 +218,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -311,7 +309,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 1016,
-      "state": "0687b16b",
+      "state": "74b40674",
       "events": "62a4b15f",
       "rng": {
         "draws": 3,
@@ -374,7 +372,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -466,7 +463,7 @@
       "tick": 9,
       "time": 0.45,
       "nextId": 1016,
-      "state": "e8624862",
+      "state": "4c8f1c9d",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -529,7 +526,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

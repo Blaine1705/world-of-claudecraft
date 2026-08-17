@@ -29,7 +29,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 996,
-      "state": "c08a8a17",
+      "state": "bb5e3ab1",
       "events": "00d33b59",
       "rng": {
         "draws": 38,
@@ -40,7 +40,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 996,
-      "state": "70fe3fa0",
+      "state": "18842d6a",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -51,7 +51,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 996,
-      "state": "098f3a9e",
+      "state": "879793f0",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -62,7 +62,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 996,
-      "state": "90abda83",
+      "state": "90ff37a3",
       "events": "b4542b1b",
       "rng": {
         "draws": 38,
@@ -73,7 +73,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 996,
-      "state": "abc78354",
+      "state": "32b79e64",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -84,7 +84,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 996,
-      "state": "848740e9",
+      "state": "fccecc89",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -95,7 +95,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 996,
-      "state": "0e0fbe01",
+      "state": "e01ea9e1",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -106,7 +106,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 996,
-      "state": "49587078",
+      "state": "a3023278",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -117,7 +117,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 996,
-      "state": "50c66ba1",
+      "state": "35392701",
       "events": "741638a5",
       "rng": {
         "draws": 44,
@@ -164,7 +164,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -224,7 +223,6 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

@@ -2,6 +2,9 @@
 // cold destination behind, so the far shore is streamed while the player walks
 // up to the bell. Pinned against the shipped bell placements.
 
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { FERRY_PREWARM_RADIUS_YD, ferryPrewarmTargetFor } from '../src/game/ferry_prewarm';
 import { PROVING_SHORE_ARRIVAL, PROVING_SHORE_OBJECTS } from '../src/sim/content/proving_shore';
@@ -39,5 +42,32 @@ describe('ferry prewarm target', () => {
     // The Eastbrook spawn square is close to the town bell, so sample a real
     // elsewhere: the Mirefen hub, a zone away.
     expect(ferryPrewarmTargetFor(0, 400)).toBeNull();
+  });
+});
+
+// The main.ts wiring pin (PR #3467 review, finding 3): the pure target above
+// says WHERE to warm; this scan pins HOW the frame loop consumes it. The warm
+// fires in live play with no loading curtain, so it must take the idle-pace
+// prepare arm beside a background prewarm (the visible-zone streaming lane's
+// idiom), and it must honor the hidden-desktop-shell freeze the neighbouring
+// current-zone lane documents. A source scan is the honest tool here: the
+// bootstrap firewall has no seam to instantiate in Node.
+describe('ferry prewarm wiring (source scan)', () => {
+  const source = readFileSync(
+    path.join(path.dirname(fileURLToPath(import.meta.url)), '../src/main.ts'),
+    'utf8',
+  );
+  const block = source.slice(
+    source.indexOf('const maybeWarmFerryDestination'),
+    source.indexOf('const maybeWarmCurrentZone'),
+  );
+
+  it('prepares the destination at idle pace with a background prewarm', () => {
+    expect(block).toContain("{ pace: 'idle' }");
+    expect(block).toContain('{ background: true }');
+  });
+
+  it('freezes on a hidden desktop shell like the current-zone lane', () => {
+    expect(block).toContain('desktopPresentationHidden()');
   });
 });

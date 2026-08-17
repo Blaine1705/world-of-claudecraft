@@ -1796,8 +1796,10 @@ function applyIsleCoast(x: number, z: number, h: number): number {
 // The Proving Shore: the tutorial island in the starter sea west of Eastbrook
 // Vale (negative x; the Farshore recipe mirrored into the opposite column).
 // No land border and no causeway: the only ways over are the tutorial
-// greeting's ferry and the crossing-circle portal pair, and swim fatigue
-// guards the strait. Beaches all around, rising gently toward the heart.
+// greeting's ferry and the clicked ferry bells (PROVING_SHORE_PORTALS ships
+// empty on purpose: no walk-in portal ring, so the per-tick portal loop
+// never pays for the island), and swim fatigue guards the strait. Beaches
+// all around, rising gently toward the heart.
 // ---------------------------------------------------------------------------
 const PS_LAND_LOBES = [
   { x: -330, z: 20, r: 70 }, // the island's heart

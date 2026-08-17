@@ -18,7 +18,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 995,
-      "state": "552a0127",
+      "state": "1bd6e542",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -63,7 +63,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -155,7 +154,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 995,
-      "state": "df91799f",
+      "state": "7ceacf3c",
       "events": "87f73a18",
       "rng": {
         "draws": 2,
@@ -222,7 +221,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {
             "herbalism": 40,
             "mining": 70.5
@@ -336,7 +334,7 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 995,
-      "state": "dee8cdf8",
+      "state": "48366719",
       "events": "5fe0394b",
       "rng": {
         "draws": 4,
@@ -404,7 +402,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {
             "herbalism": 40,
             "mining": 70.75
@@ -526,7 +523,7 @@
       "tick": 157,
       "time": 7.85,
       "nextId": 995,
-      "state": "b5a3b159",
+      "state": "b0ac55c4",
       "events": "88a18499",
       "rng": {
         "draws": 6,
@@ -596,7 +593,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {
             "herbalism": 41,
             "mining": 70.75
@@ -726,7 +722,7 @@
       "tick": 159,
       "time": 7.95,
       "nextId": 995,
-      "state": "ba3ad77c",
+      "state": "b0191f79",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -796,7 +792,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {
             "herbalism": 41,
             "mining": 70.75

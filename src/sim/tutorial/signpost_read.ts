@@ -14,6 +14,7 @@
 // (tests/architecture.test.ts).
 
 import { QUESTS } from '../data';
+import { emitQuestProgress } from '../quests/quest_credit';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 
@@ -43,14 +44,6 @@ export function creditSignpostRead(
   if (current >= objective.count) return;
   qp.counts[0] = current + 1;
   meta.counters.questProgress++;
-  ctx.emit({
-    type: 'questProgress',
-    questId: qp.questId,
-    objectiveIndex: 0,
-    current: qp.counts[0],
-    required: objective.count,
-    text: `${objective.label}: ${qp.counts[0]}/${objective.count}`,
-    pid: meta.entityId,
-  });
+  emitQuestProgress(ctx, meta, qp, objective, 0);
   ctx.checkQuestReady(qp, meta);
 }

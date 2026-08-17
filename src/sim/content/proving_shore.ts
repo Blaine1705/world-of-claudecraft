@@ -33,13 +33,29 @@ import type {
 } from '../types';
 import { emptyZoneProps } from '../types';
 
+/** The island's zone rectangle, the one source for the ZoneDef below and the
+ *  isOnProvingShore predicate. */
+const PROVING_SHORE_RECT = { xMin: -540, xMax: -180, zMin: -180, zMax: 180 } as const;
+
+/** Whether a world position lies inside the Proving Shore's zone rectangle.
+ *  The island shares its x column (xMin -540 / xMax -180) with four mainland
+ *  zones (Willowfen, Palmreach, Nightbloom, Amberfall) that differ only by z,
+ *  so EVERY island gate, sim-side or client-side, must test BOTH axes through
+ *  this one predicate; a bare `x < -180` check puts level 18 to 20 zones on
+ *  the tutorial rail. */
+export function isOnProvingShore(x: number, z: number): boolean {
+  return (
+    x >= PROVING_SHORE_RECT.xMin &&
+    x < PROVING_SHORE_RECT.xMax &&
+    z >= PROVING_SHORE_RECT.zMin &&
+    z < PROVING_SHORE_RECT.zMax
+  );
+}
+
 export const PROVING_SHORE_ZONE: ZoneDef = {
   id: 'proving_shore',
   name: 'The Proving Shore',
-  zMin: -180,
-  zMax: 180,
-  xMin: -540,
-  xMax: -180,
+  ...PROVING_SHORE_RECT,
   levelRange: [1, 2],
   biome: 'vale',
   hub: { x: -300, z: 50, radius: 14, name: 'Dawnrest Camp' },

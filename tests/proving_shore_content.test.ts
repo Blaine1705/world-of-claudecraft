@@ -23,6 +23,7 @@ import {
   PROVING_SHORE_ZONE,
 } from '../src/sim/content/proving_shore';
 import { ITEMS, ZONES } from '../src/sim/data';
+import { FERRY_BELL_TOWN_LANDING } from '../src/sim/interactions/ferry_bell';
 import { mobXpValue, xpForLevel } from '../src/sim/types';
 import { groundHeight, provingLandness, terrainSteepnessAt, WATER_LEVEL } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
@@ -41,12 +42,26 @@ describe('proving shore placement', () => {
     expect(ZONES.some((zn) => zn.id === 'proving_shore')).toBe(true);
   });
 
+  it('pins the town landing literally, beside the spawn square', () => {
+    // The home ride's destination as bare literals (the ferry_prewarm suite
+    // compares constant to constant, which a bad edit moves in lockstep).
+    expect(FERRY_BELL_TOWN_LANDING).toEqual({ x: 4, z: -6, facing: 0.6 });
+  });
+
   it('hub, graveyard, pois, arrival, npcs, camps, and crates sit on dry walkable ground', () => {
     const points: { x: number; z: number; what: string }[] = [
       { ...PROVING_SHORE_ZONE.hub, what: 'hub' },
       { ...PROVING_SHORE_ZONE.graveyard, what: 'graveyard' },
       ...PROVING_SHORE_ZONE.pois.map((p) => ({ x: p.x, z: p.z, what: `poi:${p.id}` })),
       { x: PROVING_SHORE_ARRIVAL.x, z: PROVING_SHORE_ARRIVAL.z, what: 'arrival' },
+      // The home ride's landing too (interactions/ferry_bell.ts): the one
+      // teleport destination this sweep used to miss, so a landing dropped in
+      // the harbour could pass (PR #3467 review).
+      {
+        x: FERRY_BELL_TOWN_LANDING.x,
+        z: FERRY_BELL_TOWN_LANDING.z,
+        what: 'ferry town landing',
+      },
       ...Object.values(PROVING_SHORE_NPCS)
         .filter((n) => n.id !== 'wayfarer_bryn') // the greeter stands in Eastbrook
         .map((n) => ({ x: n.pos.x, z: n.pos.z, what: `npc:${n.id}` })),

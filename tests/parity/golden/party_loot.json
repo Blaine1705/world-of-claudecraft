@@ -28,7 +28,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 997,
-      "state": "c2f2cdf5",
+      "state": "c8d8ccc3",
       "events": "2418511a",
       "rng": {
         "draws": 2,
@@ -80,7 +80,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -146,7 +145,6 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

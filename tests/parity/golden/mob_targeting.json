@@ -31,7 +31,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 998,
-      "state": "d350d53f",
+      "state": "1ac80022",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -75,7 +75,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -131,7 +130,6 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -187,7 +185,6 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -442,7 +439,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 998,
-      "state": "324f250a",
+      "state": "30b4c117",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -486,7 +483,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -542,7 +538,6 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -598,7 +593,6 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -853,7 +847,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 998,
-      "state": "14056670",
+      "state": "cd2fbf39",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -897,7 +891,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -953,7 +946,6 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1009,7 +1001,6 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1264,7 +1255,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 998,
-      "state": "aa70eb53",
+      "state": "3d02cb76",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1308,7 +1299,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1364,7 +1354,6 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1420,7 +1409,6 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1675,7 +1663,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 998,
-      "state": "1af29025",
+      "state": "c6bafbcc",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1719,7 +1707,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1775,7 +1762,6 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1831,7 +1817,6 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2088,7 +2073,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 998,
-      "state": "91e820a9",
+      "state": "516bb920",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2132,7 +2117,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2188,7 +2172,6 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2244,7 +2227,6 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2501,7 +2483,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 998,
-      "state": "5d4ffe9e",
+      "state": "9a38b8bb",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2545,7 +2527,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2601,7 +2582,6 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2657,7 +2637,6 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2913,7 +2892,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 998,
-      "state": "e52c4a60",
+      "state": "a88ab3e9",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2957,7 +2936,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3013,7 +2991,6 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3069,7 +3046,6 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3325,7 +3301,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 998,
-      "state": "d938a42d",
+      "state": "655bb394",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -3369,7 +3345,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3425,7 +3400,6 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3481,7 +3455,6 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3722,7 +3695,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 998,
-      "state": "d938a42d",
+      "state": "655bb394",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -3766,7 +3739,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3822,7 +3794,6 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3878,7 +3849,6 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

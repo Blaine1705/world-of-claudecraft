@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 995,
-      "state": "552a0127",
+      "state": "1bd6e542",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -62,7 +62,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -154,7 +153,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 995,
-      "state": "d2553545",
+      "state": "c977340e",
       "events": "c4180aa0",
       "rng": {
         "draws": 0,
@@ -165,7 +164,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 995,
-      "state": "660ab606",
+      "state": "df2322d5",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -176,7 +175,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 995,
-      "state": "9ddb24c3",
+      "state": "9030aa9e",
       "events": "741638a5",
       "rng": {
         "draws": 149,
@@ -187,7 +186,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 995,
-      "state": "9ddb24c3",
+      "state": "9030aa9e",
       "events": "741638a5",
       "rng": {
         "draws": 149,
@@ -238,7 +237,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -333,7 +331,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 995,
-      "state": "e7fa5998",
+      "state": "d66e3a49",
       "events": "279565de",
       "rng": {
         "draws": 149,
@@ -386,7 +384,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -483,7 +480,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 995,
-      "state": "df542843",
+      "state": "3586c796",
       "events": "43d3a58d",
       "rng": {
         "draws": 149,
@@ -537,7 +534,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -634,7 +630,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 995,
-      "state": "19dfec4d",
+      "state": "a7e9af9a",
       "events": "ae1cabd7",
       "rng": {
         "draws": 149,
@@ -688,7 +684,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -785,7 +780,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 995,
-      "state": "2a7c111a",
+      "state": "36a60b59",
       "events": "58e695fa",
       "rng": {
         "draws": 149,
@@ -839,7 +834,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -936,7 +930,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 995,
-      "state": "2a7c111a",
+      "state": "36a60b59",
       "events": "741638a5",
       "rng": {
         "draws": 149,
@@ -990,7 +984,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1087,7 +1080,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 995,
-      "state": "2a7c111a",
+      "state": "36a60b59",
       "events": "741638a5",
       "rng": {
         "draws": 149,
@@ -1141,7 +1134,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

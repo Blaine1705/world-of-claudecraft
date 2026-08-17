@@ -1,4 +1,4 @@
-﻿// W0c: the IWorld structural-parity gate.
+// W0c: the IWorld structural-parity gate.
 //
 // `IWorld` is the ONE seam render/ui depend
 // on. `tsc` already proves both the offline `Sim` and the online `ClientWorld` satisfy

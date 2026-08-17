@@ -57,7 +57,9 @@ export function updateTutorialGreeting(ctx: SimContext): void {
 }
 
 /** The ferry ride the greeting's accept button books: the standard
- *  displacement recipe (portals.ts), gated so it can never be abused as a
+ *  displacement recipe (displacement.ts; the island ships NO walk-in portal
+ *  ring, PROVING_SHORE_PORTALS is deliberately empty and the crossing is a
+ *  clicked bell), gated so it can never be abused as a
  *  free escape teleport. Server-validated: level 1, alive (the caller's dead
  *  gate), out of combat, overworld only. The persisted flag guards only the
  *  greeting EMIT, so this command-side gate set is what keeps the wire token

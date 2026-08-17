@@ -487,7 +487,7 @@
     border: 1px solid #4a4a58;
     border-bottom-width: 3px;
     border-radius: 4px;
-    color: var(--gold, #d8c078);
+    color: var(--gold);
     font-weight: 700;
     font-size: 12px;
     line-height: 1;
@@ -542,7 +542,12 @@
      10vh, so an NPC's dialogue never covers the lesson. Desktop only: the
      mobile sheet layout owns its own quest-dialog pin. */
   body.bc-coach-up:not(.mobile-touch) #quest-dialog {
-    top: max(10vh, 235px);
+    /* 235px is the coach card family's tallest rendered height plus its top
+       margin (the three-line lesson card). Clamped against the JS-synced app
+       viewport (--app-vh, the tree's clamp idiom in layout.css), never raw
+       vh, and capped at 40% of it so a short landscape window can never push
+       the dialog's buttons below the fold. */
+    top: clamp(calc(var(--app-vh, 100vh) * 0.1), 235px, calc(var(--app-vh, 100vh) * 0.4));
   }
   /* The guild-signpost popup (noticeboard_popup.ts): the tutorial card
      family's chrome, centered rather than top-pinned, one block per posted
@@ -558,7 +563,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    max-height: 50vh;
+    max-height: calc(var(--app-vh, 100vh) * 0.5);
     overflow-y: auto;
   }
   .nb-item {

@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 995,
-      "state": "552a0127",
+      "state": "1bd6e542",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -61,7 +61,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -153,7 +152,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 995,
-      "state": "c0e53998",
+      "state": "972df1e7",
       "events": "d5cb301f",
       "rng": {
         "draws": 0,
@@ -198,7 +197,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -306,7 +304,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 1003,
-      "state": "e01989a4",
+      "state": "e5dec541",
       "events": "9e40d2dc",
       "rng": {
         "draws": 40,
@@ -380,7 +378,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -490,7 +487,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 1003,
-      "state": "9ce948a9",
+      "state": "a2e0ade4",
       "events": "7ff53ccb",
       "rng": {
         "draws": 40,
@@ -567,7 +564,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -666,7 +662,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1003,
-      "state": "fc79a55c",
+      "state": "81b15189",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -743,7 +739,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

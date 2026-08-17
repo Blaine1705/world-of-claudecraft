@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 995,
-      "state": "7ae0706a",
+      "state": "9856e617",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -60,7 +60,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -152,7 +151,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 997,
-      "state": "9efd4f69",
+      "state": "d3181b90",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -196,7 +195,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -365,7 +363,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 997,
-      "state": "3755dd17",
+      "state": "49c01752",
       "events": "7960b51c",
       "rng": {
         "draws": 0,
@@ -376,7 +374,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 997,
-      "state": "dbf0c25c",
+      "state": "3a1a9d0d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -387,7 +385,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 997,
-      "state": "2d538385",
+      "state": "cfdd9dbc",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -398,7 +396,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 997,
-      "state": "a88a3d5a",
+      "state": "46d203b7",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -409,7 +407,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 997,
-      "state": "a88a3d5a",
+      "state": "46d203b7",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -456,7 +454,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -629,7 +626,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 997,
-      "state": "a88a3d5a",
+      "state": "46d203b7",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -676,7 +673,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

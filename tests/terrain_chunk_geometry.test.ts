@@ -144,7 +144,14 @@ describe('generated chunk geometry is stable', () => {
     // release/v0.39.0 castles merge, whose vale terrain edits (the
     // walk-in castle grounds era; the release's own terrain-height fixture
     // moved in the same merge) reshape these chunks again on the merged
-    // tree. Digest stable across two runs.
+    // tree, AND because the island's zone rect adds two BORDER_EDGES rows
+    // whose gaussian ridge walls (RIDGE_SIGMA 26, both sides of each new
+    // edge) reshape the Willowfen's south shore band (z 204..244, moves up
+    // to +7.2yd), the vale's north-west corner past the carve at x -176
+    // (up to 7.5yd), and a few Mirefen points on the same edge; nothing in
+    // those bands crosses the waterline and the town centre is
+    // bit-identical (PR #3467 review, finding 2 measured base vs head).
+    // Digest stable across two runs.
     expect(digestOf(inRect)).toBe('1f26294da5b10f2dcf8bbce9572f6e4f');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins

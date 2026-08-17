@@ -30,7 +30,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 998,
-      "state": "9655149f",
+      "state": "7065b645",
       "events": "7ecf59eb",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 998,
-      "state": "0b902f9c",
+      "state": "371c71f2",
       "events": "f5e280c1",
       "rng": {
         "draws": 66,
@@ -52,7 +52,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 998,
-      "state": "c393a016",
+      "state": "02d0be94",
       "events": "91a69131",
       "rng": {
         "draws": 247,
@@ -63,7 +63,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 998,
-      "state": "ca33462f",
+      "state": "f033d915",
       "events": "ea2ec131",
       "rng": {
         "draws": 485,
@@ -74,7 +74,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 998,
-      "state": "ec1a02dc",
+      "state": "48b6bfa6",
       "events": "3271de7b",
       "rng": {
         "draws": 755,
@@ -85,7 +85,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 998,
-      "state": "a2f7cbcd",
+      "state": "5e464ed7",
       "events": "741638a5",
       "rng": {
         "draws": 1038,
@@ -96,7 +96,7 @@
       "tick": 163,
       "time": 8.15,
       "nextId": 998,
-      "state": "2aa69106",
+      "state": "6ae36500",
       "events": "b5b2478c",
       "rng": {
         "draws": 1176,
@@ -150,7 +150,6 @@
               "rows": {}
             }
           },
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "honor": 20,
@@ -223,7 +222,6 @@
               "rows": {}
             }
           },
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -303,7 +301,6 @@
               "rows": {}
             }
           },
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -373,7 +370,6 @@
               "rows": {}
             }
           },
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

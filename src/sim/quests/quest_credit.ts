@@ -25,7 +25,13 @@ import {
 } from '../types';
 import { ownedItemCount } from './quest_owned_count';
 
-function emitQuestProgress(
+/** The one questProgress emit: `${label}: ${cur}/${req}` text (matched by the
+ *  client i18n re-localizer, so every credit path must go through here rather
+ *  than hand-rolling the string) plus the wire fields the HUD tracker reads.
+ *  Exported for the island's sentinel-objective credit modules
+ *  (tutorial/gauntlet_run.ts, tutorial/signpost_read.ts), which bump their
+ *  count outside the discrete-objective walk below. */
+export function emitQuestProgress(
   ctx: SimContext,
   meta: PlayerMeta,
   qp: QuestProgress,

@@ -29,7 +29,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 996,
-      "state": "1f84ee43",
+      "state": "9536b59d",
       "events": "414a4be0",
       "rng": {
         "draws": 0,
@@ -73,7 +73,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -129,7 +128,6 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -275,7 +273,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 996,
-      "state": "1f84ee43",
+      "state": "9536b59d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -319,7 +317,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -375,7 +372,6 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -521,7 +517,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 996,
-      "state": "c394de0b",
+      "state": "8cc299cb",
       "events": "74103221",
       "rng": {
         "draws": 0,
@@ -567,7 +563,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -625,7 +620,6 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -771,7 +765,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 996,
-      "state": "2e4e05bf",
+      "state": "2a87b77f",
       "events": "3dbe4ad4",
       "rng": {
         "draws": 0,
@@ -817,7 +811,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -875,7 +868,6 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1036,7 +1028,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 996,
-      "state": "c394de0b",
+      "state": "8cc299cb",
       "events": "9127e3a8",
       "rng": {
         "draws": 0,
@@ -1082,7 +1074,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1140,7 +1131,6 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1286,7 +1276,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 996,
-      "state": "969d4f71",
+      "state": "8235764d",
       "events": "afe47816",
       "rng": {
         "draws": 0,
@@ -1338,7 +1328,6 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1403,7 +1392,6 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

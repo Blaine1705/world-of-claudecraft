@@ -26,7 +26,7 @@
 import { currentInputHintMode, type InputHintMode } from '../game/input_hint_mode';
 import type { Keybinds } from '../game/keybinds';
 import type { Renderer } from '../render/renderer';
-import { BOOTCAMP_COURSE_CHECKPOINTS } from '../sim/content/proving_shore';
+import { BOOTCAMP_COURSE_CHECKPOINTS, isOnProvingShore } from '../sim/content/proving_shore';
 import { GAUNTLET_QUEST_ID } from '../sim/tutorial/gauntlet_run';
 import { groundHeight, WATER_LEVEL } from '../sim/world';
 import { WORLD_SEED } from '../sim/world_seed';
@@ -51,8 +51,9 @@ import {
 import { tEntity } from './entity_i18n';
 import { formatNumber, t } from './i18n';
 
-// The island column: the card never shows east of the strait.
-const ISLAND_MAX_X = -180;
+// The island rectangle: the card never shows off the Proving Shore. Both
+// axes matter; the x column alone also covers four mainland zones
+// (isOnProvingShore's contract).
 
 export class BootcampOverlay {
   private engaged = false;
@@ -77,6 +78,14 @@ export class BootcampOverlay {
   private arrow: HTMLElement | null = null;
   private lastFocus: CoachFocus | null = null;
   private lastKeybinds: Keybinds | null = null;
+  // Per-frame arrow painting state (the write-elision ledger, the memoized
+  // terrain sample, and the resize-listener-cached viewport; see updateArrow).
+  private arrowPainted = { visible: false, sx: Number.NaN, sy: Number.NaN, rot: Number.NaN };
+  private arrowGroundKey = '';
+  private arrowGroundY = 0;
+  private arrowVw = 0;
+  private arrowVh = 0;
+  private onArrowResize: (() => void) | null = null;
 
   // Called every HUD frame. Cheap no-op while no rail quest is moving.
   update(world: IWorld, renderer: Renderer, keybinds: Keybinds): void {
@@ -84,7 +93,7 @@ export class BootcampOverlay {
     if (!p) return;
     if (world.playerId < 0 || p.id !== world.playerId) return;
 
-    const onIsland = (p.pos?.x ?? 0) < ISLAND_MAX_X;
+    const onIsland = isOnProvingShore(p.pos?.x ?? 0, p.pos?.z ?? 0);
     const focus = onIsland ? coachFocus((questId) => railQuestState(world, questId)) : null;
     if (focus?.questId === 'q_ps_set_sail') this.sawSail = true;
 
@@ -316,7 +325,13 @@ export class BootcampOverlay {
     this.keysEl.style.display = this.keysEl.childElementCount > 0 ? '' : 'none';
   }
 
-  // Points the shared course arrow at the current lesson's target.
+  // Points the shared course arrow at the current lesson's target. Runs every
+  // HUD frame, so it follows the per-frame painter contracts by hand (this is
+  // a bare-named overlay, not a *_painter on the PainterHost seam): the
+  // terrain sample is memoized per target, the viewport is a cached value a
+  // resize listener refreshes (never a layout-forcing innerWidth read at the
+  // tail of Hud.update), and every style write is elided against the last
+  // painted value, so a still camera writes nothing.
   private updateArrow(renderer: Renderer): void {
     if (!this.arrow) return;
     const target = this.bellPhase
@@ -332,32 +347,62 @@ export class BootcampOverlay {
     }
 
     // Targets are authored on dry ground; the max() is defensive for edited
-    // worlds so the marker never aims under the sea.
-    const y = Math.max(groundHeight(target.x, target.z, WORLD_SEED), WATER_LEVEL) + 2.2;
-    const v = renderer.worldToScreen(target.x, y, target.z);
+    // worlds so the marker never aims under the sea. Static per lesson, so
+    // one sample per target, not one per frame.
+    const groundKey = `${target.x},${target.z}`;
+    if (this.arrowGroundKey !== groundKey) {
+      this.arrowGroundKey = groundKey;
+      this.arrowGroundY = Math.max(groundHeight(target.x, target.z, WORLD_SEED), WATER_LEVEL) + 2.2;
+    }
+    if (!this.onArrowResize) {
+      const read = (): void => {
+        this.arrowVw = window.innerWidth;
+        this.arrowVh = window.innerHeight;
+      };
+      read();
+      this.onArrowResize = read;
+      window.addEventListener('resize', read);
+    }
+    const v = renderer.worldToScreen(target.x, this.arrowGroundY, target.z);
     const margin = 56;
-    const w = window.innerWidth;
-    const h = window.innerHeight;
+    const w = this.arrowVw;
+    const h = this.arrowVh;
     let sx = v.x;
     let sy = v.y;
     if (v.behind) {
       sx = w - v.x;
       sy = h - v.y;
     }
-    const cx = w / 2;
-    const cy = h / 2;
-    const angle = Math.atan2(sy - cy, sx - cx);
-    sx = Math.max(margin, Math.min(w - margin, sx));
-    sy = Math.max(margin, Math.min(h - margin, sy));
+    const angle = Math.atan2(sy - h / 2, sx - w / 2);
+    // Half-pixel quantization: enough resolution for a smooth glide, coarse
+    // enough that float jitter from a still camera elides to zero writes.
+    sx = Math.round(Math.max(margin, Math.min(w - margin, sx)) * 2) / 2;
+    sy = Math.round(Math.max(margin, Math.min(h - margin, sy)) * 2) / 2;
+    const rot = Math.round(angle * 200) / 200;
 
-    this.arrow.style.display = 'block';
-    this.arrow.style.left = `${sx}px`;
-    this.arrow.style.top = `${sy}px`;
-    this.arrow.style.transform = `translate(-50%, -50%) rotate(${angle}rad)`;
+    const last = this.arrowPainted;
+    if (!last.visible) {
+      this.arrow.style.display = 'block';
+      last.visible = true;
+    }
+    if (last.sx !== sx) {
+      this.arrow.style.left = `${sx}px`;
+      last.sx = sx;
+    }
+    if (last.sy !== sy) {
+      this.arrow.style.top = `${sy}px`;
+      last.sy = sy;
+    }
+    if (last.rot !== rot) {
+      this.arrow.style.transform = `translate(-50%, -50%) rotate(${rot}rad)`;
+      last.rot = rot;
+    }
   }
 
   private hideArrow(): void {
-    if (this.arrow) this.arrow.style.display = 'none';
+    if (!this.arrow || !this.arrowPainted.visible) return;
+    this.arrow.style.display = 'none';
+    this.arrowPainted.visible = false;
   }
 
   /** Fold the card away for now; the quest log decides any re-engage. */
@@ -370,6 +415,12 @@ export class BootcampOverlay {
     this.arrow?.remove();
     this.root = null;
     this.arrow = null;
+    if (this.onArrowResize) {
+      window.removeEventListener('resize', this.onArrowResize);
+      this.onArrowResize = null;
+    }
+    this.arrowPainted = { visible: false, sx: Number.NaN, sy: Number.NaN, rot: Number.NaN };
+    this.arrowGroundKey = '';
     document.body.classList.remove('bc-coach-up');
   }
 }

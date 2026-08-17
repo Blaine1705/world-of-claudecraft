@@ -5,6 +5,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { NOTICEBOARDS } from '../src/sim/content/noticeboards';
+import { isOnProvingShore } from '../src/sim/content/proving_shore';
 import { Sim } from '../src/sim/sim';
 import { SIGNPOST_NOTICEBOARD_ID, SIGNPOST_QUEST_ID } from '../src/sim/tutorial/signpost_read';
 import type { QuestProgress, SimEvent } from '../src/sim/types';
@@ -65,5 +66,32 @@ describe('the signpost read credit', () => {
     const events = sim.tick();
     expect(events.some((e) => e.type === 'noticeboard')).toBe(true);
     expect(events.some((e) => e.type === 'questProgress')).toBe(false);
+  });
+
+  it('a MAINLAND board read mid-quest reads normally and credits nothing', () => {
+    // The "only for the island board" claim's negative arm (PR #3467 review,
+    // finding 11): a player who ferries home mid-quest and reads Eastbrook's
+    // town board must get the plain notice feedback and no lesson credit.
+    const mainland = NOTICEBOARDS.find((b) => b.id !== SIGNPOST_NOTICEBOARD_ID);
+    expect(mainland).toBeTruthy();
+    const sim = makeSim();
+    const p = sim.entities.get(sim.playerId)!;
+    p.pos.x = mainland!.frontStandingPoint.x;
+    p.pos.z = mainland!.frontStandingPoint.z;
+    const qp = seedActiveQuest(sim);
+    sim.interact();
+    expect(qp.counts[0]).toBe(0);
+    expect(qp.state).toBe('active');
+    const events = sim.tick();
+    expect(events.some((e) => e.type === 'noticeboard')).toBe(true);
+    expect(events.some((e) => e.type === 'questProgress')).toBe(false);
+  });
+
+  it('the lesson id names the island board, by literal and by geography', () => {
+    // Repointing SIGNPOST_NOTICEBOARD_ID at a mainland board would leave the
+    // suite above green while moving the lesson off the island: pin the
+    // literal AND the board's authored position inside the island rectangle.
+    expect(SIGNPOST_NOTICEBOARD_ID).toBe('proving_shore_noticeboard');
+    expect(isOnProvingShore(board.frontStandingPoint.x, board.frontStandingPoint.z)).toBe(true);
   });
 });

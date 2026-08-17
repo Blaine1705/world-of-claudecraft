@@ -61,9 +61,10 @@ const MONOLITHS: MonolithRow[] = [
     // extracted modules (bootcamp.ts + bootcamp_view.ts, noticeboard_popup.ts,
     // the sim-side credit modules) and hud.ts carries only their drive calls,
     // the noticeboard event arm, and the vendor-stock hoist the tool-gate
-    // source scan needs, plus the changed-files biome pass's line splits over
-    // this branch's hunks. Exact merged count: any further growth reds again.
-    ceiling: 19620,
+    // source scan needs. Re-pinned 19620 -> 19623 by the review fixes: the
+    // greeting's island prewarm takes the idle-pace two-call streaming idiom
+    // (three lines). Exact count: any further growth reds again.
+    ceiling: 19623,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -89,9 +90,11 @@ const MONOLITHS: MonolithRow[] = [
     // ceiling is the exact merged count.
     // Re-pinned 13689 -> 13716 for the Proving Shore tutorial island: the
     // island's visuals live in extracted modules (quest_beacon_core.ts,
-    // decor_torch_fx.ts) and the renderer carries only their hookup plus the
-    // changed-files biome pass's line splits. Exact merged count.
-    ceiling: 13716,
+    // decor_torch_fx.ts) and the renderer carries their hookup, the beacon's
+    // per-frame memo, and the entity-loop sparkle arm. Re-pinned
+    // 13716 -> 13729 by the review fixes: the beacon memo gains its island
+    // rectangle gate and the shared off-island empty set. Exact count.
+    ceiling: 13729,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -104,17 +107,24 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned 11490 -> 11533 for the Proving Shore tutorial island: the
     // arrival cinematic and teleport camera snap live in src/game/ modules
     // (arrival_cinematic.ts, teleport_camera.ts, ferry_prewarm.ts) and
-    // main.ts carries only their wiring behind the zone-warm gate, plus the
-    // changed-files biome pass's line splits. Exact merged count.
-    ceiling: 11533,
+    // main.ts carries their frame-loop and warm-lane wiring. Re-pinned
+    // 11533 -> 11583 by the review fixes: the cinematic step moved out of
+    // maybeWarmCurrentZone into its own frame-loop block (real frameDt, the
+    // look/zoom cancel arms), the ferry warm gained its idle-pace and
+    // hidden-shell arms, the camera snap its origin tracking, and the
+    // greeting hook its reduce-motion gate; all consumers of the extracted
+    // modules, kept here because each needs the frame loop's private state.
+    // Exact count.
+    ceiling: 11583,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
     file: 'server/game.ts',
-    // Re-pinned 10900 -> 10909 for the Proving Shore branch: no island logic
-    // lands here (the ferry and greeting live in sim modules); the growth is
-    // entirely the changed-files biome pass splitting long lines in this
-    // branch's touched hunks. Exact merged count.
+    // Re-pinned 10900 -> 10909 for the Proving Shore branch: the +9 is the
+    // tutorial_start dispatch case (a thin delegate onto sim.startTutorial,
+    // where the real gates live) and the firstCharacter field on the join
+    // meta plumb; the island's ferry and greeting logic itself lives in sim
+    // modules. Exact merged count.
     ceiling: 10909,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },

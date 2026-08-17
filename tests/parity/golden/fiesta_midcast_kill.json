@@ -31,7 +31,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 998,
-      "state": "9655149f",
+      "state": "7065b645",
       "events": "f235a85f",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 998,
-      "state": "0b902f9c",
+      "state": "371c71f2",
       "events": "f5e280c1",
       "rng": {
         "draws": 64,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 998,
-      "state": "c393a016",
+      "state": "02d0be94",
       "events": "91a69131",
       "rng": {
         "draws": 280,
@@ -64,7 +64,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 998,
-      "state": "ca33462f",
+      "state": "f033d915",
       "events": "ea2ec131",
       "rng": {
         "draws": 530,
@@ -75,7 +75,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 998,
-      "state": "ed865442",
+      "state": "366d4a20",
       "events": "442a7d38",
       "rng": {
         "draws": 542,
@@ -129,7 +129,6 @@
               "rows": {}
             }
           },
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -200,7 +199,6 @@
               "rows": {}
             }
           },
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -277,7 +275,6 @@
               "rows": {}
             }
           },
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -347,7 +344,6 @@
               "rows": {}
             }
           },
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -606,7 +602,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 998,
-      "state": "490ae860",
+      "state": "dd804072",
       "events": "69cae17b",
       "rng": {
         "draws": 542,
@@ -660,7 +656,6 @@
               "rows": {}
             }
           },
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -731,7 +726,6 @@
               "rows": {}
             }
           },
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -808,7 +802,6 @@
               "rows": {}
             }
           },
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -878,7 +871,6 @@
               "rows": {}
             }
           },
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1135,7 +1127,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 998,
-      "state": "6f1bbbdd",
+      "state": "5208ed97",
       "events": "8f6b807e",
       "rng": {
         "draws": 542,
@@ -1190,7 +1182,6 @@
               "rows": {}
             }
           },
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "honor": 20,
@@ -1263,7 +1254,6 @@
               "rows": {}
             }
           },
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1341,7 +1331,6 @@
               "rows": {}
             }
           },
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1411,7 +1400,6 @@
               "rows": {}
             }
           },
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1668,7 +1656,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 998,
-      "state": "2ccb13c9",
+      "state": "4b1bc653",
       "events": "741638a5",
       "rng": {
         "draws": 788,
@@ -1679,7 +1667,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 998,
-      "state": "af0ff5d4",
+      "state": "b021519e",
       "events": "741638a5",
       "rng": {
         "draws": 972,
@@ -1734,7 +1722,6 @@
               "rows": {}
             }
           },
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "honor": 20,
@@ -1807,7 +1794,6 @@
               "rows": {}
             }
           },
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1885,7 +1871,6 @@
               "rows": {}
             }
           },
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1955,7 +1940,6 @@
               "rows": {}
             }
           },
-          "firstCharacter": true,
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

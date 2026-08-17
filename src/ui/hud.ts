@@ -14202,18 +14202,21 @@ export class Hud {
     // Warm the island WHILE the choice is read: main.ts skips the blocking
     // loading screen entirely once renderer.isZoneReadyAt is true at the
     // arrival, so the seconds a player spends on this dialog buy a seamless
-    // ferry ride. Fire-and-forget; an instant click degrades to the classic
+    // ferry ride. IDLE pace: this fires in live play behind a dialog, not a
+    // loading curtain, so the gating arm's synchronous sky PMREM and fast
+    // terrain batches would cost visible frames (the ferry-prewarm lane's
+    // rule). Fire-and-forget; an instant click degrades to the classic
     // screen rather than a void drop.
-    void this.renderer
-      .prepareZoneAt(PROVING_SHORE_ARRIVAL.x, PROVING_SHORE_ARRIVAL.z)
-      .then(() =>
-        this.renderer.prewarmZoneAt(PROVING_SHORE_ARRIVAL.x, PROVING_SHORE_ARRIVAL.z, {
-          background: true,
-        }),
-      )
-      .catch(() => {
-        /* offline asset hiccup: the arrival falls back to the loading screen */
-      });
+    void Promise.all([
+      this.renderer.prepareZoneAt(PROVING_SHORE_ARRIVAL.x, PROVING_SHORE_ARRIVAL.z, undefined, {
+        pace: 'idle',
+      }),
+      this.renderer.prewarmZoneAt(PROVING_SHORE_ARRIVAL.x, PROVING_SHORE_ARRIVAL.z, {
+        background: true,
+      }),
+    ]).catch(() => {
+      /* offline asset hiccup: the arrival falls back to the loading screen */
+    });
     const el = renderTutorialGreeting(buildTutorialGreetingModel(firstCharacter), {
       onPlay: () => {
         // Fire-and-forget by design: the server re-validates and the >30 yd

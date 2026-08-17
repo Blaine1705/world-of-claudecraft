@@ -72,4 +72,44 @@ describe('Ready for an Adventure', () => {
     expect(meta.deedStats.counters.tutorialGraduations).toBe(0);
     expect(meta.deedsEarned.has(DEED_ID)).toBe(false);
   });
+
+  it('the whole rail except Set Sail is NOT a graduation (the discriminating arm)', () => {
+    // A regression to "any rail quest done" (or "all but the last") must fail
+    // here: everything handed in except the final quest, then the ride home,
+    // no bump (PR #3467 review, finding 11).
+    const sim = makeSim();
+    const meta = sim.players.get(sim.playerId)!;
+    const p = sim.entities.get(sim.playerId)!;
+    const allButLast = PROVING_SHORE_QUEST_ORDER.slice(0, -1);
+    for (const questId of allButLast) {
+      const giver = PROVING_SHORE_NPCS[PROVING_SHORE_QUESTS[questId].giverNpcId];
+      p.pos.x = giver.pos.x + 1;
+      p.pos.z = giver.pos.z + 1;
+      sim.acceptQuest(questId);
+      sim.completeQuestForDev(questId);
+    }
+    expect(meta.questsDone.size).toBe(allButLast.length);
+    ringIslandBell(sim);
+    expect(meta.deedStats.counters.tutorialGraduations).toBe(0);
+    expect(meta.deedsEarned.has(DEED_ID)).toBe(false);
+  });
+
+  it('the TOWN bell never graduates, even a full graduate riding back out', () => {
+    // The stat is authored on the home ride specifically: a graduate ringing
+    // the town bell for an island refresher must not bump it again from the
+    // town side (the bump lives only in the island-bell arm).
+    const sim = makeSim();
+    const meta = sim.players.get(sim.playerId)!;
+    completeRail(sim);
+    const p = sim.entities.get(sim.playerId)!;
+    const townBell = [...sim.entities.values()].find(
+      (e) => e.kind === 'object' && e.objectItemId === 'ps_ferry_bell' && e.pos.x >= -180,
+    )!;
+    p.pos.x = townBell.pos.x + 1;
+    p.pos.z = townBell.pos.z;
+    sim.pickUpObject(townBell.id);
+    for (let i = 0; i < 40; i++) sim.tick();
+    expect(meta.deedStats.counters.tutorialGraduations).toBe(0);
+    expect(meta.deedsEarned.has(DEED_ID)).toBe(false);
+  });
 });

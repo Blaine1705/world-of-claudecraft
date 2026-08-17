@@ -10,7 +10,11 @@
 // Draws ZERO rng (displacePlayer only moves and emits), so the click's tick
 // position cannot fork the deterministic draw order. `src/sim`-pure.
 
-import { PROVING_SHORE_ARRIVAL, PROVING_SHORE_QUEST_ORDER } from '../content/proving_shore';
+import {
+  isOnProvingShore,
+  PROVING_SHORE_ARRIVAL,
+  PROVING_SHORE_QUEST_ORDER,
+} from '../content/proving_shore';
 import { bumpDeedStat } from '../deeds';
 import { displacePlayer } from '../displacement';
 import type { PlayerMeta } from '../sim';
@@ -56,7 +60,7 @@ export function tryRingFerryBell(
     ctx.error(p.id, 'You cannot set sail from here.');
     return true;
   }
-  if (obj.pos.x < -180) {
+  if (isOnProvingShore(obj.pos.x, obj.pos.z)) {
     displacePlayer(
       ctx,
       p,

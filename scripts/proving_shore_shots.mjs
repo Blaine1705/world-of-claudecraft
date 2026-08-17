@@ -1,4 +1,4 @@
-﻿// Proving Shore camp visuals: the Dawnrest Camp declutter (loose crates gone,
+// Proving Shore camp visuals: the Dawnrest Camp declutter (loose crates gone,
 // mailbox off the outfitter's stall), the guild notice board that replaced
 // them, the pier ferry bell stood clear of the planks, and the Eastbrook bell
 // beside the town mailbox. Offline flow (no server). Needs `npm run dev`.

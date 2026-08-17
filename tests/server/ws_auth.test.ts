@@ -123,8 +123,7 @@ function setup() {
     // Bank bonus deps: the fresh-join arm recomputes the bank bonus and stamps it into the join
     // meta. The default returns an empty grant so every existing case reaches game.join
     // unchanged; the stamp/resume branches are pinned in the bank-bonus block below.
-    bankBonusForAccount: vi.fn(async () => ({ bonusSlots: 0, sources: [] })),
-    characterCountForAccount: vi.fn(async () => 1),
+    bankBonusForAccount: vi.fn(async () => ({ bonusSlots: 0, sources: [], characterCount: 1 })),
     isConnectionRefused: vi.fn(() => false),
     bufferHandshakeMessages,
     requestMetadata: vi.fn(() => ({ ip: '1.2.3.4', userAgent: 'ua' })),
@@ -778,7 +777,7 @@ describe('createWsAuth: realm admission cap', () => {
     // createWsAuth destructures the deps at construction, so the three joins'
     // behaviors are queued up front: join 1 has its lease refused (a live foreign
     // lease), join 2 throws on the bank-bonus DB read, join 3 is clean.
-    const bankOk = { bonusSlots: 0, sources: [] };
+    const bankOk = { bonusSlots: 0, sources: [], characterCount: 1 };
     deps.bankBonusForAccount = vi
       .fn(async () => bankOk)
       .mockResolvedValueOnce(bankOk)
@@ -1070,6 +1069,7 @@ describe('createWsAuth: bank bonus stamp', () => {
     const { ws, game, deps, req } = setup();
     const grant = {
       bonusSlots: 6,
+      characterCount: 1,
       sources: [
         { id: 'email', slots: 2, maxSlots: 2 },
         { id: 'referral', slots: 4, maxSlots: 10, count: 2, cap: 5 },
@@ -1108,19 +1108,27 @@ describe('createWsAuth: bank bonus stamp', () => {
 describe('createWsAuth: firstCharacter stamp (the tutorial greeting account fact)', () => {
   it('stamps firstCharacter true when the account-wide count is at most 1', async () => {
     const { ws, game, deps, req } = setup();
-    deps.characterCountForAccount = vi.fn(async () => 1);
+    deps.bankBonusForAccount = vi.fn(async () => ({
+      bonusSlots: 0,
+      sources: [],
+      characterCount: 1,
+    }));
     const { authenticateWebSocket } = createWsAuth(deps);
     await authenticateWebSocket(asWs(ws), authRaw(), req);
 
-    expect(deps.characterCountForAccount).toHaveBeenCalledTimes(1);
-    expect(deps.characterCountForAccount).toHaveBeenCalledWith(1);
+    expect(deps.bankBonusForAccount).toHaveBeenCalledTimes(1);
+    expect(deps.bankBonusForAccount).toHaveBeenCalledWith(1);
     const joinMeta = (game.join as any).mock.calls[0][7] as { firstCharacter?: unknown };
     expect(joinMeta.firstCharacter).toBe(true);
   });
 
   it('stamps firstCharacter false for an account with other characters', async () => {
     const { ws, game, deps, req } = setup();
-    deps.characterCountForAccount = vi.fn(async () => 3);
+    deps.bankBonusForAccount = vi.fn(async () => ({
+      bonusSlots: 0,
+      sources: [],
+      characterCount: 3,
+    }));
     const { authenticateWebSocket } = createWsAuth(deps);
     await authenticateWebSocket(asWs(ws), authRaw(), req);
 
@@ -1134,7 +1142,7 @@ describe('createWsAuth: firstCharacter stamp (the tutorial greeting account fact
     const { authenticateWebSocket } = createWsAuth(deps);
     await authenticateWebSocket(asWs(ws), authRaw(), req);
 
-    expect(deps.characterCountForAccount).not.toHaveBeenCalled();
+    expect(deps.bankBonusForAccount).not.toHaveBeenCalled();
     const joinMeta = (game.join as any).mock.calls[0][7] as { firstCharacter?: unknown };
     expect(joinMeta.firstCharacter).toBeUndefined();
   });
