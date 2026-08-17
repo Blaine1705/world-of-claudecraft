@@ -77,6 +77,38 @@ describe('buildMountPrewarmVisual', () => {
     expect(loadGltf).toHaveBeenCalledWith(failingUrl);
   });
 
+  it('honors a caller-provided fetch timeout shorter than the default cap', async () => {
+    const loadGltf = vi.fn((_url: string) => Promise.resolve(stubGltf()));
+    const { buildMountPrewarmVisual, mountPrewarmKeys, mountAssetsReady } =
+      await importMountPrewarm(loadGltf);
+    const key = mountPrewarmKeys().find(
+      (candidate) => !mountAssetsReady(MOUNT_VISUAL_SPECS[candidate].visualKey),
+    );
+    if (!key) throw new Error('every mount asset is already resident after charactersReady()');
+    const stalledUrl = VISUALS[MOUNT_VISUAL_SPECS[key].visualKey]?.url;
+    expect(stalledUrl).toBeTruthy();
+    loadGltf.mockImplementation((url: string) =>
+      url === stalledUrl ? new Promise(() => undefined) : Promise.resolve(stubGltf()),
+    );
+
+    vi.useFakeTimers();
+    try {
+      let settled = false;
+      const result = buildMountPrewarmVisual(key, 25).then((value) => {
+        settled = true;
+        return value;
+      });
+
+      await vi.advanceTimersByTimeAsync(24);
+      expect(settled).toBe(false);
+      await vi.advanceTimersByTimeAsync(1);
+      await expect(result).resolves.toBeNull();
+      expect(settled).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('evicts a rejected fetch so a later sighting of the same mount can retry', async () => {
     const loadGltf = vi.fn((_url: string) => Promise.resolve(stubGltf()));
     const { buildMountPrewarmVisual, mountPrewarmKeys, mountAssetsReady } =

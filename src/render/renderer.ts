@@ -6022,7 +6022,7 @@ export class Renderer {
     let greatTreePrewarmGroup: THREE.Group | null = null;
     let weaponVfxPrewarmGroup: THREE.Group | null = null;
     let mountPrewarmGroup: THREE.Group | null = null;
-    let mountPrewarmWarmed = 0;
+    const mountPrewarmWarmedKeys = new Set<string>();
     let landmarkPrewarmGroup: THREE.Group | null = null;
     let weatherPrewarmActive = false;
     let surfaceDetailTexturesWarmed = 0;
@@ -6096,6 +6096,21 @@ export class Renderer {
     // loading deadline. Whole entry callbacks are never resumed live.
     const droppedEntries: PrewarmResumeEntry[] = [];
     const resumeLedger = createPrewarmResumeLedger();
+
+    const mountPrewarmResumeUnits = (): PrewarmResumeUnit[] =>
+      mountPrewarmKeys()
+        .filter((key) => !mountPrewarmWarmedKeys.has(key))
+        .map((key) => ({
+          id: `mount:${key}`,
+          run: async () => {
+            const staged = await stageMountPrewarmVisual(this.scene, mountPrewarmGroup, key);
+            if (!staged) return;
+            mountPrewarmGroup = staged.group;
+            await this.compilePrewarmColorPrograms(staged.visual.root, false);
+            await this.compileShadowPrograms(staged.visual.root);
+            mountPrewarmWarmedKeys.add(key);
+          },
+        }));
 
     // One shared dedupe store across EVERY compile collection in this entry
     // pass (early submission, the compile entry's tail, the live-scene
@@ -7043,46 +7058,19 @@ export class Renderer {
         },
       },
       {
-        // Rideable mounts: worn by whoever is riding one, so the FIRST
-        // sighting of any given mount links its programs the moment it
-        // appears, exactly like vfx.weapon-skins above. The runtime fallback
-        // (gateSwapFlagOnCompile at the mount-swap site, see updateEntity) is
-        // a no-op without KHR_parallel_shader_compile, so on that hardware
-        // this entry is the only mitigation there ever was (#2571). Mount
-        // GLBs are lazyPreload (characters/assets.ts): a fetch failure or a
-        // timed-out one (mount_prewarm.ts's MOUNT_PREWARM_FETCH_TIMEOUT_MS)
-        // drops only that one mount, never the whole entry.
+        // Rideable mounts: worn by whoever is riding one, so first sighting
+        // links programs like vfx.weapon-skins. Mount GLBs are lazyPreload
+        // (characters/assets.ts), and stalled fetches drop only that mount.
         //
-        // run() and resumeUnits do the SAME work (stage, then link both the
-        // color and shadow-depth programs, matching what `programs.compile`
-        // does for every other staged prewarm group): on the immediate
-        // desktop path run() warms every mount inline; on a deadline-dropped
-        // pass each mount becomes its own bounded resumable unit instead, so
-        // a slow fetch lands in idle time after world entry rather than
-        // blocking the loading screen. progress() reports every mount the
-        // immediate path warmed so a run cut short by prewarmEntryShouldDefer
-        // (desktop tiers below Insane defer past the soft deadline) reports
-        // 'partial', never a false 'completed' (the exact failure mode
-        // prewarm_policy.ts's resolvePrewarmEntryStatus docblock warns
-        // about): before this fix run() was a no-op, so an unconstrained
-        // desktop reaching this entry before the deadline warmed nothing and
-        // still reported completed.
+        // The immediate path only stages within the entry budget; unwarmed
+        // mounts become the same per-mount resume units used after a whole
+        // entry deferral. Those resumed units self-compile both color and
+        // shadow programs because programs.compile has already run.
         id: 'vfx.mount-programs',
         category: 'vfx',
         priority: 63,
         required: false,
-        resumeUnits: () =>
-          mountPrewarmKeys().map((key) => ({
-            id: `mount:${key}`,
-            run: async () => {
-              const staged = await stageMountPrewarmVisual(this.scene, mountPrewarmGroup, key);
-              if (!staged) return;
-              mountPrewarmGroup = staged.group;
-              await this.compilePrewarmColorPrograms(staged.visual.root, false);
-              await this.compileShadowPrograms(staged.visual.root);
-              mountPrewarmWarmed++;
-            },
-          })),
+        resumeUnits: mountPrewarmResumeUnits,
         // Immediate path only STAGES each mount (never compiles inline): the
         // group it builds is picked up by stagedCompileGroupsNow() below, so
         // the shared 'programs.compile' entry links both program halves for
@@ -7091,17 +7079,22 @@ export class Renderer {
         // deferred resumeUnits path above self-compiles: by the time it
         // runs, 'programs.compile' has already finished.
         run: async () => {
+          const mountDeadline = policy.finishFullManifestBeforeReveal ? hardDeadline : deadline;
           for (const key of mountPrewarmKeys()) {
-            const staged = await stageMountPrewarmVisual(this.scene, mountPrewarmGroup, key);
+            const remainingMs = mountDeadline - performance.now();
+            if (remainingMs <= 0) break;
+            const staged = await stageMountPrewarmVisual(this.scene, mountPrewarmGroup, key, remainingMs);
             if (!staged) continue;
             mountPrewarmGroup = staged.group;
-            mountPrewarmWarmed++;
+            mountPrewarmWarmedKeys.add(key);
           }
+          const units = mountPrewarmResumeUnits();
+          if (units.length > 0) droppedEntries.push({ id: 'vfx.mount-programs', units });
         },
         progress: () => ({
-          done: mountPrewarmWarmed,
+          done: mountPrewarmWarmedKeys.size,
           planned: mountPrewarmKeys().length,
-          trimmed: mountPrewarmWarmed < mountPrewarmKeys().length,
+          trimmed: mountPrewarmWarmedKeys.size < mountPrewarmKeys().length,
         }),
         detail: () => `mounts=${mountPrewarmGroup?.children.length ?? 0}`,
       },
