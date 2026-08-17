@@ -640,8 +640,14 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     expect(shadowStart).toBeGreaterThan(-1);
     expect(shadowEnd).toBeGreaterThan(shadowStart);
     const shadowMethod = renderer.slice(shadowStart, shadowEnd);
-    expect(shadowMethod).toContain('if (!mesh.isMesh || !mesh.castShadow) return;');
-    expect(shadowMethod).not.toContain('if (!mesh.isSkinnedMesh || !mesh.castShadow) return;');
+    expect(shadowMethod).toContain('if (!mesh.isMesh) return;');
+    expect(shadowMethod).toContain('if (mesh.castShadow) {');
+    expect(shadowMethod).not.toContain('isSkinnedMesh');
+    // ...and ONLY casters: a non-caster's colour material is taken off the
+    // mesh for the compile prologue (three skips a null material), or it
+    // would relink as a fog-less twin the scene pass never draws.
+    expect(shadowMethod).toContain('mesh.material = null as unknown as THREE.Material;');
+    expect(shadowMethod).toContain('for (const swap of swaps) swap.mesh.material = swap.material;');
   });
 
   it('keeps the required desktop compiler behind the loading cover after a slow first frame', () => {

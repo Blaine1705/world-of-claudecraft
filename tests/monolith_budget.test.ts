@@ -80,7 +80,11 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again by the castle branch's interior_light_rig.ts extraction;
     // after merging main the merged file lands below both prior pins, so the
     // ceiling is the exact merged count.
-    ceiling: 13689,
+    // Lowered again after extracting the character-visual pool take/store
+    // halves into src/render/characters/pooled_visual_lifecycle.ts (the
+    // far-bake compile gate rides that seam: a re-acquired visual gets the
+    // renderer's gate there).
+    ceiling: 13685,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

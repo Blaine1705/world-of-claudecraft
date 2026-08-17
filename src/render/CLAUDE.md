@@ -308,7 +308,10 @@ collision/movement.
   VFX) stops being drawn without any of its own flags changing; a per-frame
   driver over such a subtree should skip. Check the swap ACTUALLY happened
   (`CharacterVisual.setFar` keeps the rig visible when no baked mesh exists,
-  while `isFar` reads true either way), never just the intent flag.
+  or while a fresh bake's materials are still linking behind the far-bake
+  compile gate, while `isFar` reads true either way), never just the intent
+  flag: `farMeshShown` in `characters/far_lod_reveal_core.ts` is that
+  predicate.
 - **Cloning a material? Use `material_clone_hooks.ts`.** `Material.clone()` copies
   userData but silently DROPS `onBeforeCompile`, and three keys its program cache
   on `customProgramCacheKey()`, whose default return value IS

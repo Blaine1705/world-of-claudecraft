@@ -11,7 +11,7 @@ import { CharacterVisual } from './visual';
 export { CharacterPreview } from './preview';
 export type { PreviewAppearance } from './preview_appearance';
 export type { PreviewFramingName } from './preview_framing';
-export type { AnimState } from './visual';
+export type { AnimState, FarBakeGate } from './visual';
 export { CharacterVisual, setWeaponVfxViewportHeight } from './visual';
 
 // A composed (modular) body is opt-in per entity: the app installs a provider

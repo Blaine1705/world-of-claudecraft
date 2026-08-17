@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import * as characters from '../src/render/characters';
 import { type EntityView, Renderer } from '../src/render/renderer';
 
 interface CompileGateHarness {
@@ -257,5 +258,185 @@ describe('Renderer live shader compile rejection recovery', () => {
 
     expect(target.visible).toBe(false);
     expect(report).not.toHaveBeenCalled();
+  });
+});
+
+describe('the shadow arm compiles casters only', () => {
+  // A non-caster mesh (a composed far mesh, a click proxy, a halo) has no
+  // shadow-pass program. Left on the mesh during the shadow-camera compile
+  // its colour material relinks as a fog-less twin the scene pass never
+  // draws: four wasted driver links per far bake, queued ahead of the
+  // programs the reveal actually waits on (measured on both GPUs).
+  function shadowHarness() {
+    const renderer = harness();
+    renderer.sun = { shadow: { camera: new THREE.PerspectiveCamera() } };
+    renderer.scene = { fog: { name: 'fog' } };
+    renderer.prewarmDepthMaterials = new Map();
+    renderer.prewarmDepthMaterial = (material: THREE.Material) => {
+      const depth = new THREE.MeshDepthMaterial();
+      depth.name = `depth:${material.name}`;
+      return depth;
+    };
+    return renderer as typeof renderer & {
+      compileShadowPrograms(root: THREE.Object3D): Promise<void>;
+    };
+  }
+
+  it('swaps casters to depth materials and takes non-caster materials off for the prologue, restoring both BEFORE the awaited link', async () => {
+    const renderer = shadowHarness();
+    const seen: string[] = [];
+    let compiledRoot: THREE.Object3D | null = null;
+    let resolveLink!: (root: THREE.Object3D) => void;
+    renderer.webgl = {
+      getRenderTarget: () => null,
+      setRenderTarget: () => {},
+      compileAsync: (root: THREE.Object3D) => {
+        compiledRoot = root;
+        root.traverse((o) => {
+          const mesh = o as THREE.Mesh;
+          if (!mesh.isMesh) return;
+          const material = mesh.material as THREE.Material | THREE.Material[] | null;
+          seen.push(
+            `${mesh.name}:${material === null ? 'null' : Array.isArray(material) ? material.map((m) => m.name).join('|') : material.name}`,
+          );
+        });
+        return new Promise<THREE.Object3D>((resolve) => {
+          resolveLink = resolve;
+        });
+      },
+    };
+    const wrap = new THREE.Group();
+    const farMesh = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshStandardMaterial());
+    farMesh.name = 'far';
+    (farMesh.material as THREE.Material).name = 'far_body';
+    farMesh.castShadow = false;
+    const proxy = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial());
+    proxy.name = 'proxy';
+    (proxy.material as THREE.Material).name = 'shadow_only';
+    proxy.castShadow = true;
+    const multi = new THREE.Mesh(new THREE.BufferGeometry(), [
+      new THREE.MeshStandardMaterial({ name: 'a' }),
+      new THREE.MeshStandardMaterial({ name: 'b' }),
+    ]);
+    multi.name = 'multi';
+    multi.castShadow = true;
+    wrap.add(farMesh, proxy, multi);
+    const farMaterial = farMesh.material;
+    const proxyMaterial = proxy.material;
+    const multiMaterial = multi.material;
+
+    const pending = renderer.compileShadowPrograms(wrap);
+
+    expect(compiledRoot).toBe(wrap);
+    // during the prologue: casters wear their depth twins (each material of a
+    // multi-material caster), the non-caster nothing
+    expect(seen.sort()).toEqual(['far:null', 'multi:depth:a|depth:b', 'proxy:depth:shadow_only']);
+    // and every material is back on its mesh while the link is still pending
+    // (a late restore would draw a visible non-caster as NOTHING for the link)
+    expect(farMesh.material).toBe(farMaterial);
+    expect(proxy.material).toBe(proxyMaterial);
+    expect(multi.material).toBe(multiMaterial);
+    resolveLink(wrap);
+    await pending;
+  });
+
+  it('restores every swap when the walk throws part-way', async () => {
+    const renderer = shadowHarness();
+    renderer.prewarmDepthMaterial = (material: THREE.Material) => {
+      if (material.name === 'boom') throw new Error('unexpected slot');
+      return new THREE.MeshDepthMaterial();
+    };
+    const compileAsync = vi.fn();
+    renderer.webgl = { getRenderTarget: () => null, setRenderTarget: () => {}, compileAsync };
+    const first = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshStandardMaterial());
+    first.castShadow = false;
+    const second = new THREE.Mesh(
+      new THREE.BufferGeometry(),
+      new THREE.MeshStandardMaterial({ name: 'boom' }),
+    );
+    second.castShadow = true;
+    const root = new THREE.Group();
+    root.add(first, second);
+    const firstMaterial = first.material;
+    const secondMaterial = second.material;
+    await expect(renderer.compileShadowPrograms(root)).rejects.toThrow('unexpected slot');
+    expect(first.material).toBe(firstMaterial);
+    expect(second.material).toBe(secondMaterial);
+    expect(compileAsync).not.toHaveBeenCalled();
+  });
+
+  it('compiles nothing for a root without casters, and leaves its materials alone', async () => {
+    const renderer = shadowHarness();
+    const compileAsync = vi.fn(() => Promise.resolve());
+    renderer.webgl = { getRenderTarget: () => null, setRenderTarget: () => {}, compileAsync };
+    const mesh = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshStandardMaterial());
+    mesh.castShadow = false;
+    const material = mesh.material;
+    const root = new THREE.Group();
+    root.add(mesh);
+
+    await renderer.compileShadowPrograms(root);
+
+    expect(compileAsync).not.toHaveBeenCalled();
+    expect(mesh.material).toBe(material);
+  });
+});
+
+describe('the far-bake compile gate handed to character visuals', () => {
+  // A composed body bakes its far LOD on its first far crossing, AFTER the
+  // view's creation gate walked the rig, and a skin change rebuilds the far
+  // set: both are new programs the view gate never saw. The visual owns the
+  // reveal (its far/shadow flags are recomputed per frame), so the renderer
+  // hands it gateSwapFlagOnCompile as a callback at every live build.
+
+  it('installs the renderer gate on every visual createCharacterVisualWithRetry builds', () => {
+    const renderer = harness();
+    const sentinel = () => {};
+    renderer.farBakeGate = sentinel;
+    renderer.viewCreateRetry = {
+      canAttempt: () => true,
+      markSucceeded: vi.fn(),
+      markFailed: vi.fn(),
+    };
+    const setFarBakeGate = vi.fn();
+    vi.spyOn(characters, 'createCharacterVisual').mockReturnValue({
+      setFarBakeGate,
+    } as unknown as ReturnType<typeof characters.createCharacterVisual>);
+    const entity = { id: 7 } as Parameters<typeof characters.createCharacterVisual>[0];
+
+    const built = (
+      renderer as unknown as {
+        createCharacterVisualWithRetry(e: unknown, slot: string): unknown;
+      }
+    ).createCharacterVisualWithRetry(entity, 'view');
+
+    expect(built).not.toBeNull();
+    expect(setFarBakeGate).toHaveBeenCalledWith(sentinel);
+    // and a failed build installs nothing (there is no visual to install on)
+    vi.spyOn(characters, 'createCharacterVisual').mockReturnValue(null);
+    setFarBakeGate.mockClear();
+    (
+      renderer as unknown as {
+        createCharacterVisualWithRetry(e: unknown, slot: string): unknown;
+      }
+    ).createCharacterVisualWithRetry(entity, 'view');
+    expect(setFarBakeGate).not.toHaveBeenCalled();
+  });
+
+  it('is gateSwapFlagOnCompile, bound once (source pin)', () => {
+    // The gate is a class field (an arrow bound to the renderer), which an
+    // Object.create harness cannot construct; pin its shape here and rely on
+    // the gateSwapFlagOnCompile behaviours above for what it does.
+    const rendererSource = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    );
+    expect(rendererSource).toContain(
+      'private readonly farBakeGate: FarBakeGate = (target, onSettled) =>\n' +
+        '    this.gateSwapFlagOnCompile(target, onSettled);',
+    );
+    // Both live build paths install it: fresh builds and pool re-acquires.
+    expect(rendererSource).toContain('visual.setFarBakeGate(this.farBakeGate);');
+    expect(rendererSource).toContain('farBakeGate: () => this.farBakeGate,');
   });
 });
