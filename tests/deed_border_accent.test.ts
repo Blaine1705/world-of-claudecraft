@@ -19,8 +19,6 @@ import { charSheetRefreshSig } from '../src/ui/char_sheet_sig_core';
 import {
   BORDER_ACCENT_SLUGS,
   borderAccent,
-  CARTOUCHE_CHROME_CLASP_HEIGHT,
-  CARTOUCHE_CHROME_CLASP_WIDTH,
   CARTOUCHE_CHROME_PAD_X,
   CARTOUCHE_CHROME_PAD_Y,
   CARTOUCHE_CHROME_RADIUS,
@@ -523,13 +521,18 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
     expect(clasp).toContain('var(--border-accent-frame');
     expect(clasp).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
     const chrome = cartoucheChromeStyle();
-    expect(chrome).toContain(`${CARTOUCHE_CHROME_PAD_X}px`);
-    expect(chrome).toContain(`${CARTOUCHE_CHROME_PAD_Y}px`);
-    expect(chrome).toContain(`${CARTOUCHE_CHROME_RADIUS}px`);
-    expect(chrome).toContain(CARTOUCHE_CHROME_WELL_FILL);
-    expect(chrome).toContain(String(CARTOUCHE_CHROME_WELL_ALPHA));
-    expect(chrome).toContain(`${CARTOUCHE_CHROME_CLASP_WIDTH}px`);
-    expect(chrome).toContain(`${CARTOUCHE_CHROME_CLASP_HEIGHT}px`);
+    expect(CARTOUCHE_CHROME_PAD_X).toBe(9);
+    expect(CARTOUCHE_CHROME_PAD_Y).toBe(5);
+    expect(CARTOUCHE_CHROME_RADIUS).toBe(6);
+    expect(CARTOUCHE_CHROME_WELL_FILL).toBe('#14110c');
+    expect(CARTOUCHE_CHROME_WELL_ALPHA).toBe(0.4);
+    expect(chrome).toContain('--cartouche-pad-x:9px;');
+    expect(chrome).toContain('--cartouche-pad-y:5px;');
+    expect(chrome).toContain('--cartouche-radius:6px;');
+    expect(chrome).toContain('--cartouche-well-fill:#14110c;');
+    expect(chrome).toContain('--cartouche-well-alpha:0.4;');
+    expect(chrome).toContain('--cartouche-clasp-width:10px;');
+    expect(chrome).toContain('--cartouche-clasp-height:5px');
     const painter = read('src/ui/inspect_window.ts');
     expect(painter).toContain('cartoucheChromeStyle()');
     const forcedClasp = shell.match(
@@ -551,6 +554,8 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
     expect(clasp, 'portrait clasp rule missing').toBeTruthy();
     expect(clasp).toContain('left: 30px;');
     expect(clasp).toContain('top: -6px;');
+    expect(clasp).toContain('transform: translate(-50%, -50%);');
+    expect(clasp).toContain('border-radius: 2px;');
     expect(clasp).toContain('z-index: 2;');
     expect(clasp).toContain('var(--cartouche-clasp-width)');
     expect(clasp).toContain('var(--border-accent-frame');

@@ -274,6 +274,10 @@ describe('Book of Deeds border picker', () => {
       expect(style).toContain(`--border-accent-frame:${accent?.frame}`);
       expect(style).toContain(`--border-accent-edge:${accent?.edge}`);
       expect(style).toContain(`--border-accent-glow:${accent?.glow}`);
+      if (id === DEEPWARD) {
+        expect(accent?.frame).toBe('#4fb3c8');
+        expect(style).toContain('--border-accent-frame:#4fb3c8');
+      }
       expect(btn?.textContent).toContain(deedName(id));
     }
     expect(el.querySelector(`[data-border-pick="${DEEPWARD}"]`)?.classList.contains('active')).toBe(

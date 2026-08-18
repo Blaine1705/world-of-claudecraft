@@ -4842,12 +4842,7 @@ export const TARGETS = [
   {
     key: 'deed-border-picker',
     label: 'Book of Deeds Titles and Borders shelf: empty None plus earned 3-color swatches',
-    when: [
-      'ui/deed_border_view',
-      'ui/deeds_window',
-      'styles/components.css',
-      'render/nameplate_cartouche_core',
-    ],
+    when: ['ui/deed_border_view', 'ui/deeds_window', 'render/nameplate_cartouche_core'],
     variants: [
       { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
       { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },

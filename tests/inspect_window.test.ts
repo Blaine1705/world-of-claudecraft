@@ -384,9 +384,9 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
     // The SLUG, resolved from the deed id through deed_border_view's palette
     // gate, not the deed id itself: the stylesheet keys on the slug.
     expect(name?.getAttribute('data-border')).toBe('reliquary_gilt');
-    expect(name?.getAttribute('style')).toContain('--border-accent-frame');
-    expect(name?.getAttribute('style')).toContain('--cartouche-well-fill');
-    expect(name?.getAttribute('style')).toContain('--cartouche-radius');
+    expect(name?.getAttribute('style')).toContain('--border-accent-frame:#f4ca43;');
+    expect(name?.getAttribute('style')).toContain('--cartouche-well-fill:#14110c;');
+    expect(name?.getAttribute('style')).toContain('--cartouche-radius:6px;');
   });
 
   it('leaves data-border OFF a borderless name row (absence, not an empty value)', () => {
