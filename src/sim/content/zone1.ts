@@ -43,6 +43,28 @@ export const TOWN_PLAT_TERRAIN_EDITS: HeightStamp[] = [
   { x: -14, z: -112, radius: 80, delta: -1.0, falloff: 'smooth', mode: 'level' },
   { x: -48, z: -126, radius: 46, delta: -0.8, falloff: 'smooth', mode: 'level' },
 ];
+
+// The plat's beach apron (owner direction 2026-08-18: no cliff edges, smooth
+// beach shores). A row of wide, low level stamps centered on the waterline
+// arc pulls the last ~25yd of land down through the shore band (-4.3 to
+// -2.7) and eases the first ~15yd of seabed up to a wading shelf, so the
+// coast reads as beach the whole way. Applied after the plat stamps (array
+// order is application order), tuned against the shore profile probe:
+// slope through the band stays under 0.2 and the beach band runs 12yd plus
+// at every sampled x. Sea cells under a stamp stay sea (verified: below
+// waterline ground inside a stamp still reads water -4.3).
+export const SOWFIELD_BEACH_TERRAIN_EDITS: HeightStamp[] = [
+  { x: -64, z: -160, radius: 30, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: -52, z: -161, radius: 28, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: -40, z: -164, radius: 28, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: -28, z: -166, radius: 28, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: -16, z: -162, radius: 28, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: -4, z: -160, radius: 30, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: 8, z: -151, radius: 30, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: 20, z: -148, radius: 28, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: 32, z: -146, radius: 28, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: 44, z: -143, radius: 26, delta: -3.9, falloff: 'smooth', mode: 'level' },
+];
 // Basin carved into the heightfield. Pushed to the far northeast so its
 // shoreline meets the fishing dock and the murloc camp instead of drowning them.
 export const LAKE = { x: -92, z: 88, radius: 30 };

@@ -174,7 +174,17 @@ describe('generated chunk geometry is stable', () => {
     // reads byte-identical, and nothing between the windows moves. Both
     // digests move because the reverted headland straddles the rect edge at
     // x = -180. An intended, looked-at world change, not drift.
-    expect(digestOf(inRect)).toBe('342a52345373e1e9035a249e3da88fcb');
+    // Re-minted for the beach apron (owner direction: no cliff edges on the
+    // Sowfield coast, smooth beach shores). Ten SOWFIELD_BEACH_TERRAIN_EDITS
+    // level stamps ride the plat's south waterline arc: shore-band slopes
+    // drop from 1.9 to 0.07-0.18 and beach widths grow from 3-7yd to
+    // 23-30yd. Localization: 1yd lattice against a worktree at the plat
+    // commit, 8,871 of 128,331 points move, all inside x -93..69,
+    // z -193..-118 (the shore strip; max move 11.25 at (-68,-156) where the
+    // apron lifts old seabed into strand), town core zero. The gap-fill
+    // digest holds: the strip stays clear of the x = -180 rect edge.
+    // An intended, looked-at world change, not drift.
+    expect(digestOf(inRect)).toBe('e69073555723dc2c8f378eb9f9361522');
     // The gap super-chunks take the same re-mint.
     expect(digestOf(gapFill)).toBe('c4839177e825dbcf8dc5bcf501336fc2');
 

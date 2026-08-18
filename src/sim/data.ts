@@ -231,6 +231,7 @@ import {
   COPPER_DIG_TERRAIN_EDITS,
   GRAVEYARD_POS,
   LAKE,
+  SOWFIELD_BEACH_TERRAIN_EDITS,
   TOWN_PLAT_TERRAIN_EDITS,
   TOWN_RADIUS,
   ZONE1_CAMPS,
@@ -718,7 +719,12 @@ export const BUILTIN_WORLD: WorldContent = {
   // invisible collision walls: the moderation cage plus the Last Keep's
   // sealed building slot (castle_layout.ts CASTLE_BLOCKERS)
   blockers: [...JAIL_BLOCKERS, ...CASTLE_BLOCKERS],
-  terrainEdits: [...JAIL_TERRAIN_EDITS, ...COPPER_DIG_TERRAIN_EDITS, ...TOWN_PLAT_TERRAIN_EDITS],
+  terrainEdits: [
+    ...JAIL_TERRAIN_EDITS,
+    ...COPPER_DIG_TERRAIN_EDITS,
+    ...TOWN_PLAT_TERRAIN_EDITS,
+    ...SOWFIELD_BEACH_TERRAIN_EDITS,
+  ],
 };
 
 let activeWorld: WorldContent = BUILTIN_WORLD;
