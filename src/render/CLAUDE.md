@@ -369,6 +369,56 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   his spawn linking ZERO programs (the player bodies on screen already carry
   them).
 
+## GPU work: every new producer is a client of the scheduler
+The sections above are the machinery; this is the contract EVERY new producer of
+GPU work signs. Each rule names its seam and its guard.
+- **Every material a live frame can draw for the first time after the curtain has
+  a prewarm home:** a twin in an existing prewarm manifest entry, or a compile
+  gate at its first appearance (`compileGate`, `attachSceneGroupGated` in
+  `gated_scene_attach.ts`, a reveal gate). Never a bare `scene.add` of a group
+  carrying new materials after boot; never a module-scope material cache filled on
+  first cast without being registered. Guards:
+  `tests/ability_material_prewarm_sweep.test.ts`, the `buildInterior` gating pin in
+  `tests/renderer_compile_gate.test.ts`, and the `live-program` events in
+  `perfStats().gpuPrep`, whose count on an offline tour of the touched content is
+  the acceptance bar of a render PR.
+- **Every program-key change on a VISIBLE material rides a gated swap with a
+  stand-in.** The key inputs: texture-slot presence, `transparent` / `blending` /
+  `alphaToCoverage` / `alphaHash`, `defines`, `onBeforeCompile` /
+  `customProgramCacheKey` (three's default key IS the hook source), skinning and
+  instancing, and any `needsUpdate` on a drawn material.
+  `materialProgramSignature` (`prewarm_policy.ts`) is the enumeration, with its
+  dimension-by-dimension contract test in `tests/prewarm_policy.test.ts`; `live-program`
+  catches what it misses.
+- **Never add, remove, or hide a directional, hemisphere, spot, or rect-area light
+  after boot:** those counts are program-cache-key inputs, so one change relinks
+  every lit material in view. Re-GRADE the constructor's one sun/hemi pair through
+  `interior_light_rig.ts` instead. Point lights ride the pad budget
+  (`point_light_budget.ts`). Guards: `tests/render_light_census_pin.test.ts` (the
+  allowlist of every non-point light constructed under `src/render`) and
+  `tests/point_light_budget.test.ts`. The Wildheart caldera rig
+  (`wildheart_props.ts`) is the ONE named exception, pinned as such in
+  `tests/renderer_compile_gate.test.ts`; pre-linking a scene-wide light census is
+  a backlog item, not a precedent.
+- **Every new secondary GL context links (`compileAsync`) and uploads
+  (`uploadTexturesInSlices`, `texture_prewarm.ts`) before its first draw, and sets
+  `debug.checkShaderErrors = shaderDebugRequested()` on the renderer it just built,
+  ahead of that renderer's first `render()`.** Guard: the secondary-context pins in
+  `tests/shader_debug_flag.test.ts`.
+- **No new queue, no new lane, no fourth gate.** New work rides
+  `background_gpu_queue.ts` at an existing `GPU_WORK_PRIORITY`, carries a
+  `kind:instance` label whose kind the budget can learn (`gpuPrepKindOfLabel`),
+  and, if it holds a representation back, names its stand-in in
+  `ENTITY_GATE_STAND_INS` plus a case in `tests/entity_gate_stand_in.test.ts`. No
+  wall-clock constant calibrated on one machine inside a gate: the arrival lesson
+  is that a hold ends on evidence (its own compile settling), on the
+  `REVEAL_GATE_WATCHDOG_MS` watchdog, or on a reach floor, never on a tuned timer.
+- **Verify, do not assert.** `?perf`, then `__game.renderer.perfStats().gpuPrep`: the
+  budget snapshot, the event ring (`live-program`, `gate-timeout`, `reveal-watchdog`,
+  `reveal-soft-deadline`, `submit-stop`, `attach-watchdog`), and the reveal counters.
+  External capture: `node scripts/gpu_hitch_capture.mjs`. Dispatch
+  `render-performance-reviewer` on any diff that lands a producer under these rules.
+
 ## i18n: overhead labels are the only string surface here
 One deliberate exception: `scene_census_core.ts`'s table/format helpers feed the
 `?perf` overlay, a dev diagnostic that stays English by the `src/game/CLAUDE.md`
