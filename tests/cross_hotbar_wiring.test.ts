@@ -105,6 +105,19 @@ describe('crossHotbarResting', () => {
     // All SIXTEEN, not just one trigger's eight.
     expect(resting.slots).toEqual(Array.from({ length: 16 }, (_, i) => i));
     expect(resting.buttons).toEqual(crossHotbarButtonLabels('xbox'));
+    // Each half says which trigger opens it, in the connected pad's own names.
+    expect(resting.triggers).toEqual({ left: 'LT', right: 'RT' });
+  });
+
+  it('names the triggers for the connected brand', () => {
+    expect(crossHotbarResting(new CrossHotbarBindings(), 'playstation').triggers).toEqual({
+      left: 'L2',
+      right: 'R2',
+    });
+    expect(crossHotbarResting(new CrossHotbarBindings(), 'nintendo').triggers).toEqual({
+      left: 'ZL',
+      right: 'ZR',
+    });
   });
 });
 

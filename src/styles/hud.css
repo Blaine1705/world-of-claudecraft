@@ -9307,6 +9307,47 @@ body.xhb-mode #stancebar {
 .xhb-slot .keybind {
   display: none;
 }
+/* Each half names the trigger that opens it, so the two-trigger model is legible
+   without a trip to the options panel. Brand-resolved (LT/RT, L2/R2, ZL/ZR). */
+.xhb-trigger {
+  position: absolute;
+  top: -9px;
+  left: 10px;
+  padding: 1px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--panel-bg);
+  font-family: var(--ui-font);
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1.3;
+  color: var(--gold-dim);
+}
+.xhb-half {
+  position: relative;
+}
+.xhb-half.xhb-armed .xhb-trigger {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+/* The route to the second set: hold one trigger, tap the other. Sits under the bar
+   so it explains itself without competing with the icons. */
+.xhb-hint {
+  position: absolute;
+  left: 50%;
+  bottom: -15px;
+  transform: translateX(-50%);
+  font-family: var(--ui-font);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--gold-dim);
+  opacity: 0.75;
+  text-shadow: 0 1px 2px #000;
+}
+.xhb.xhb-expanded .xhb-hint {
+  color: var(--gold);
+  opacity: 1;
+}
 /* The hardware glyph under each cell, so the mapping reads itself without a trip
    to the options panel. Its own element: the shared action-bar painter owns
    `.keybind` and would overwrite a glyph parked there with the keyboard keycap. */

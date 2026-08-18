@@ -853,8 +853,10 @@ describe('GamepadManager cross hotbar', () => {
 
   it('preserves the flat layout exactly when the cross hotbar is off', () => {
     const h = setupCrossHotbar(false);
+    // The triggers ship unbound (they are the cross hotbar's modifiers), so with
+    // the cross hotbar OFF they simply do nothing until a player remaps them.
     h.press(GP.LT);
-    expect(h.onAction).toHaveBeenCalledWith('slot4');
+    expect(h.onAction).not.toHaveBeenCalled();
     h.press(GP.LT, GP.DPAD_UP);
     expect(h.onAction).toHaveBeenCalledWith('slot5');
     h.press();

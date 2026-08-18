@@ -67,6 +67,7 @@ describe('crossHotbarOverlayState', () => {
     slots,
     expanded,
     buttons: [],
+    triggers: { left: 'LT', right: 'RT' },
   });
 
   it('hides the bar only when there is no hold at all', () => {

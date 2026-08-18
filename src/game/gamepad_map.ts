@@ -217,8 +217,10 @@ export const DEFAULT_GAMEPAD_BINDINGS: Record<number, GamepadActionId> = {
   [GP.Y]: 'target',
   [GP.RB]: 'slot1',
   [GP.LB]: 'slot2',
-  [GP.RT]: 'slot3',
-  [GP.LT]: 'slot4',
+  // LT/RT are deliberately UNBOUND: they are the cross hotbar's two modifiers, and
+  // a modifier that also fires an ability reads as a random cast every time the
+  // player reaches for the bar. They stay free for a player who switches the cross
+  // hotbar off and wants them back.
   [GP.DPAD_UP]: 'slot5',
   [GP.DPAD_RIGHT]: 'slot6',
   [GP.DPAD_DOWN]: 'slot7',

@@ -10,6 +10,7 @@ import {
   CROSS_HOTBAR_EXPANDED_SET,
   CROSS_HOTBAR_LAYER_BUTTONS,
   CROSS_HOTBAR_PRIMARY_SET,
+  CROSS_HOTBAR_TRIGGERS,
   type CrossHotbarLayer,
 } from './cross_hotbar';
 import { CrossHotbarBindings } from './cross_hotbar_bindings';
@@ -22,6 +23,8 @@ export interface CrossHotbarHoldInfo {
   expanded: boolean;
   /** The hardware glyph under each cell, for the connected pad's brand. */
   buttons: readonly string[];
+  /** The two trigger glyphs (LT/RT, L2/R2, ZL/ZR) for the half labels. */
+  triggers: { left: string; right: string };
 }
 
 /** The HUD surface the overlay is driven through. */
@@ -85,6 +88,10 @@ export function crossHotbarHold(
     slots: bindings.setSlots(set),
     expanded: set === CROSS_HOTBAR_EXPANDED_SET,
     buttons: crossHotbarButtonLabels(kind),
+    triggers: {
+      left: gamepadButtonLabel(CROSS_HOTBAR_TRIGGERS.left, kind),
+      right: gamepadButtonLabel(CROSS_HOTBAR_TRIGGERS.right, kind),
+    },
   };
 }
 

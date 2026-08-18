@@ -76,6 +76,9 @@ export interface CrossHotbarHold {
   expanded: boolean;
   /** The hardware glyph under each cell, in CROSS_HOTBAR_CELLS order. */
   buttons: readonly string[];
+  /** The two trigger glyphs, so each half says which trigger opens it and the
+   *  bar can advertise the both-triggers route to the second set. */
+  triggers: { left: string; right: string };
 }
 
 /**

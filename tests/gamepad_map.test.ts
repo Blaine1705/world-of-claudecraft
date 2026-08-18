@@ -144,19 +144,30 @@ describe('default layout', () => {
     }
   });
 
-  it('assigns a default to every bindable button (catches a dropped binding)', () => {
+  it('leaves ONLY the two triggers unbound, and binds every other bindable button', () => {
     const bound = Object.keys(DEFAULT_GAMEPAD_BINDINGS)
       .map(Number)
       .sort((a, b) => a - b);
-    expect(bound).toEqual(BINDABLE_BUTTONS);
+    // The triggers are the cross hotbar's modifiers. A modifier that also fires an
+    // ability reads as a random cast every time the player reaches for the bar, so
+    // they ship unbound and stay free for anyone who turns the cross hotbar off.
+    expect(bound).toEqual(BINDABLE_BUTTONS.filter((b) => b !== GP.LT && b !== GP.RT));
+    expect(DEFAULT_GAMEPAD_BINDINGS[GP.LT]).toBeUndefined();
+    expect(DEFAULT_GAMEPAD_BINDINGS[GP.RT]).toBeUndefined();
   });
 
-  it('covers action-bar slots 0..8 exactly once (catches a dropped or duplicated slotN)', () => {
+  it('covers its action-bar slots exactly once (catches a dropped or duplicated slotN)', () => {
     const values = Object.values(DEFAULT_GAMEPAD_BINDINGS);
-    for (let slot = 0; slot <= 8; slot++) {
+    // slot3/slot4 left with the freed triggers: on the flat layout they are simply
+    // unreachable until remapped, and the cross hotbar (on by default) reaches all
+    // sixteen of a set regardless.
+    for (const slot of [0, 1, 2, 5, 6, 7, 8]) {
       // Exactly once: count 0 = a dropped slot, count >= 2 = a duplicated slot
       // (additive or displacing). The default layout binds each slot to one button.
       expect(values.filter((v) => v === `slot${slot}`).length, `slot${slot}`).toBe(1);
+    }
+    for (const slot of [3, 4]) {
+      expect(values.filter((v) => v === `slot${slot}`).length, `slot${slot}`).toBe(0);
     }
   });
 

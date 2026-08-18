@@ -28,6 +28,8 @@ const CELL_POSITION_ATTR = 'data-xhb-point';
 const CELL_INDEX_ATTR = 'data-xhb-index';
 const HALF_LAYER_ATTR = 'data-xhb-half';
 const GLYPH_CLASS = 'xhb-glyph';
+const TRIGGER_CLASS = 'xhb-trigger';
+const HINT_CLASS = 'xhb-hint';
 
 /** Mint one cell's inner spans, matching the action bar's element contract so the
  *  shared ActionBarPainter can write it unchanged. */
@@ -55,6 +57,8 @@ function buildCell(cell: CrossHotbarCell): ActionBarSlotElements {
 export class CrossHotbarController {
   private readonly painter: CrossHotbarPainter;
   private readonly glyphs: HTMLElement[] = [];
+  private readonly triggerLabels = new Map<string, HTMLElement>();
+  private readonly hint: HTMLElement;
   private state: CrossHotbarOverlayState = HIDDEN_CROSS_HOTBAR;
 
   private constructor(
@@ -70,6 +74,10 @@ export class CrossHotbarController {
         half = document.createElement('div');
         half.className = `${HALF_CLASS} ${HALF_CLASS}-${cell.layer}`;
         half.setAttribute(HALF_LAYER_ATTR, cell.layer);
+        const trigger = document.createElement('span');
+        trigger.className = `${TRIGGER_CLASS} ${TRIGGER_CLASS}-${cell.layer}`;
+        half.appendChild(trigger);
+        this.triggerLabels.set(cell.layer, trigger);
         halfEls.set(cell.layer, half);
         root.appendChild(half);
       }
@@ -89,6 +97,9 @@ export class CrossHotbarController {
       cluster.appendChild(els.btn);
       cells[cell.index] = els;
     }
+    this.hint = document.createElement('div');
+    this.hint.className = HINT_CLASS;
+    root.appendChild(this.hint);
     this.painter = new CrossHotbarPainter(
       writers,
       {
@@ -117,12 +128,19 @@ export class CrossHotbarController {
    *  `.keybind` and would overwrite a glyph parked there with the keyboard keycap. */
   setHold(hold: CrossHotbarHold | null): void {
     this.state = crossHotbarOverlayState(hold);
-    const labels = hold?.buttons;
-    if (!labels) return;
+    if (!hold) return;
+    const labels = hold.buttons;
     for (let i = 0; i < this.glyphs.length; i++) {
       const next = labels[i] ?? '';
       if (this.glyphs[i].textContent !== next) this.glyphs[i].textContent = next;
     }
+    for (const [layer, el] of this.triggerLabels) {
+      const next = layer === 'left' ? hold.triggers.left : hold.triggers.right;
+      if (el.textContent !== next) el.textContent = next;
+    }
+    // Advertises the route to the second set: hold one trigger, tap the other.
+    const hintText = `${hold.triggers.left} + ${hold.triggers.right}`;
+    if (this.hint.textContent !== hintText) this.hint.textContent = hintText;
   }
 
   /** Paint from the frame's already-ticked action-bar state. */
