@@ -22,6 +22,7 @@ import {
   surfaceMat,
   tierFromHints,
 } from '../src/render/gfx';
+import { tsFilesUnder } from './helpers/ts_files_under';
 
 const desktop: GfxRuntimeHints = {
   search: '',
@@ -1274,7 +1275,7 @@ describe('surfaceMat dedupe key', () => {
     const plain = surfaceMat(base);
     expect(surfaceMat({ ...base })).toBe(plain);
 
-    const metallic = surfaceMat({ ...base, metalness: 1, metalnessMap: response });
+    const metallic = surfaceMat({ ...base, metalnessMap: response });
 
     expect(metallic).not.toBe(plain);
     if (metallic instanceof THREE.MeshStandardMaterial) {
@@ -1283,9 +1284,28 @@ describe('surfaceMat dedupe key', () => {
     }
   });
 
-  it('leaves no consumer writing the slot onto a shared material', () => {
-    for (const file of ['quest_objects.ts', 'fenbridge_town.ts']) {
-      const source = readFileSync(new URL(`../src/render/${file}`, import.meta.url), 'utf8');
+  it('splits two option sets whose metalnessMap is a DIFFERENT texture', () => {
+    const base = { color: 0x707070, roughnessMap: new THREE.Texture() };
+    const first = surfaceMat({ ...base, metalnessMap: new THREE.Texture() });
+    const second = surfaceMat({ ...base, metalnessMap: new THREE.Texture() });
+
+    // The uuid is what the key folds, so two metallic callers with their own
+    // texture must not share the entry either.
+    expect(second).not.toBe(first);
+    if (first instanceof THREE.MeshStandardMaterial && second instanceof THREE.MeshStandardMaterial)
+      expect(second.metalnessMap).not.toBe(first.metalnessMap);
+  });
+
+  it('leaves no surfaceMat consumer writing the slot onto a shared material', () => {
+    // Every caller in the tree, not the two that once did it: the write is
+    // legal on a material a caller owns and a live relink on a shared one, and
+    // nothing tells the two apart at the call site.
+    const callers = tsFilesUnder(new URL('../src/render/', import.meta.url).pathname)
+      .map(({ file, full }) => ({ file, source: readFileSync(full, 'utf8') }))
+      .filter(({ source }) => source.includes('surfaceMat('));
+
+    expect(callers.length).toBeGreaterThanOrEqual(24);
+    for (const { file, source } of callers) {
       expect(source, `${file} writes metalnessMap after surfaceMat`).not.toMatch(
         /\.metalnessMap = /,
       );

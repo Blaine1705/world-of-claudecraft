@@ -319,14 +319,30 @@ describe('the gates that run the lane (source pins)', () => {
     expect(touchAt).toBeGreaterThan(uploadAt);
   });
 
+  it('hands the host exactly the two upload call sites, and nothing else', () => {
+    const lane = read('../src/render/texture_prep_lane.ts');
+    // The positive half: the chunk path and the whole-texture path, no third
+    // way in. Without it the negatives below say nothing, since a lane that
+    // uploaded nothing at all would satisfy every one of them.
+    expect(lane.split('host.initTexture(').length - 1).toBe(2);
+    expect(lane).toContain('uploadChunk: (chunk) => queue.run(() => host.initTexture(chunk)');
+    expect(lane).toContain('await queue.run(() => host.initTexture(texture), priority, label);');
+  });
+
   it('never wraps the uploads in the colour-target dance, and never re-arms needsUpdate', () => {
     const lane = read('../src/render/texture_prep_lane.ts');
+    // Each negative carries the control that proves the token is what a scan
+    // of this shape finds: a live user of it elsewhere in the tree.
     // initTexture dispatches on the texture's own flags and unbinds itself, so
-    // there is no bound target to restore; and a KTX2 texture whose CPU mips
-    // were released comes back black if anything forces a re-upload.
+    // there is no bound target to restore.
+    expect(read('../src/render/renderer.ts')).toContain('setRenderTarget');
     expect(lane).not.toContain('setRenderTarget');
+    // A KTX2 texture whose CPU mips were released comes back black if anything
+    // forces a re-upload.
+    expect(read('../src/render/texture_upload.ts')).toContain('needsUpdate');
     expect(lane).not.toContain('needsUpdate');
     // Uploads are main-thread driver work with no off-thread arm to release to.
+    expect(read('../src/render/preview_prewarm_lane.ts')).toContain('releaseTail');
     expect(lane).not.toContain('releaseTail');
   });
 });

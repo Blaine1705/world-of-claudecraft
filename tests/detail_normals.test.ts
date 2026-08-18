@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
 // The shared stone detail normal has TWO arms: null until its deferred preload
@@ -76,7 +77,10 @@ describe('stoneDetailNormal consumers', () => {
     const found = new Map<string, string>();
     for (const { file, full } of files) {
       if (file === 'detail_normals.ts') continue;
-      const source = readFileSync(full, 'utf8');
+      // Full-line // comments go first: both the consumer scan and the
+      // preload pin below are single lines of code the tree explains in prose
+      // right beside them, so a raw read would credit the prose.
+      const source = codeWithoutLineComments(readFileSync(full, 'utf8'));
       if (source.includes('stoneDetailNormal(')) found.set(file, source);
     }
 

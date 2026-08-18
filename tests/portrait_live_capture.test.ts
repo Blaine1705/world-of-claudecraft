@@ -278,6 +278,9 @@ describe('live portrait capture', () => {
     await settleCapture(modTag('notify'));
     // No (class, skin) pair describes a composed body, so the cache key is the
     // third argument and the skin is the non-index COMPOSED_PORTRAIT_SKIN.
+    // Pinned to the literal: a listener that indexes a catalog by it must get
+    // a miss, which only a value no catalog holds guarantees.
+    expect(COMPOSED_PORTRAIT_SKIN).toBe(-1);
     await vi.waitFor(() =>
       expect(updated).toHaveBeenCalledWith(MODULAR_KEY, COMPOSED_PORTRAIT_SKIN, modKey('notify')),
     );

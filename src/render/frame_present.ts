@@ -8,7 +8,8 @@
 //
 // The draw is also where a program ESCAPE is visible: a variant no prewarm
 // covered links synchronously inside this render call, so the live-program
-// watch brackets exactly it (absorb before, record after) and nothing else.
+// watch brackets exactly it (absorb before, record after) and nothing else. A
+// skipped frame absorbs too: see presentFrame.
 
 import {
   absorbLivePrograms,
@@ -33,12 +34,15 @@ export interface FramePresentHost {
  * leave a stale flash to pop the moment the window is shown again.
  */
 export function presentFrame(host: FramePresentHost, dt: number, present: boolean): boolean {
+  // Ahead of the skip: a program minted while frames are skipped is prep by
+  // definition (nothing drew it), so absorbing only on the drawing arm would
+  // hand a whole hidden-window backlog to the next real draw as escapes.
+  absorbLivePrograms(host.webgl);
   if (!present) {
     host.post?.updateScreenFx(dt);
     return false;
   }
   host.vfx.prepareDraw(host.camera);
-  absorbLivePrograms(host.webgl);
   if (host.post) {
     // screen-fx pass state (ripple re-projection, flash decay) advances
     // with the camera finalized for this frame

@@ -587,33 +587,40 @@ describe('buildWeaponVfxPrewarmGroup', () => {
     // present, metalnessMap and roughnessMap nulled), so the first skin sighted
     // in the world linked that program inside a live frame however complete the
     // boot entry looked.
-    const [key, spec] = Object.entries(WEAPON_VFX)[0];
+    const specs = Object.entries(WEAPON_VFX);
+    // Every spec, not the first: the branch is per host material, so one
+    // entry left on the flat-tint arm is exactly the escape this pins.
+    expect(specs.length).toBeGreaterThan(1);
     const group = buildWeaponVfxPrewarmGroup();
-    const host = group.getObjectByName(`prewarm-skin-host:${key}`) as THREE.Mesh;
-    const hostMat = host.material as THREE.MeshStandardMaterial;
 
-    const live = liveSkinMesh();
-    const rig = createWeaponVfx(live, spec, { grounded: false });
-    const liveMat = live.material as THREE.MeshStandardMaterial;
+    for (const [key, spec] of specs) {
+      const host = group.getObjectByName(`prewarm-skin-host:${key}`) as THREE.Mesh;
+      const hostMat = host.material as THREE.MeshStandardMaterial;
 
-    expect(liveMat.emissiveMap).not.toBeNull();
-    expect(hostMat.emissiveMap).toBeTruthy();
-    expect(hostMat.metalnessMap).toBeNull();
-    expect(materialProgramSignature(hostMat)).toBe(materialProgramSignature(liveMat));
+      const live = liveSkinMesh();
+      const rig = createWeaponVfx(live, spec, { grounded: false });
+      const liveMat = live.material as THREE.MeshStandardMaterial;
 
-    // The mapless host this replaced is the negative case: it never carried
-    // the live key, so the comparison above is not trivially true.
-    const mapless = new THREE.Mesh(
-      new THREE.BoxGeometry(0.1, 1, 0.1),
-      new THREE.MeshStandardMaterial({ color: 0xffffff }),
-    );
-    const maplessRig = createWeaponVfx(mapless, spec, { grounded: false });
-    expect(materialProgramSignature(mapless.material as THREE.MeshStandardMaterial)).not.toBe(
-      materialProgramSignature(liveMat),
-    );
+      expect(liveMat.emissiveMap, key).not.toBeNull();
+      expect(hostMat.emissiveMap, key).toBeTruthy();
+      expect(hostMat.metalnessMap, key).toBeNull();
+      expect(materialProgramSignature(hostMat), key).toBe(materialProgramSignature(liveMat));
 
-    rig.dispose();
-    maplessRig.dispose();
+      // The mapless host this replaced is the negative case: it never carried
+      // the live key, so the comparison above is not trivially true.
+      const mapless = new THREE.Mesh(
+        new THREE.BoxGeometry(0.1, 1, 0.1),
+        new THREE.MeshStandardMaterial({ color: 0xffffff }),
+      );
+      const maplessRig = createWeaponVfx(mapless, spec, { grounded: false });
+      expect(
+        materialProgramSignature(mapless.material as THREE.MeshStandardMaterial),
+        key,
+      ).not.toBe(materialProgramSignature(liveMat));
+
+      rig.dispose();
+      maplessRig.dispose();
+    }
   });
 
   it('builds one rig per REAL catalog spec through the live world path', () => {

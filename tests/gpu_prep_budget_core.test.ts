@@ -1,3 +1,4 @@
+import type * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import {
@@ -11,8 +12,13 @@ import { LINKED_PROGRAM_TOUCH_LABEL } from '../src/render/linked_program_touch_l
 import {
   PREVIEW_TEXTURE_PREP_LABEL,
   TEXTURE_PREP_LABEL,
+  texturePieceLabel,
   texturePrepPriority,
 } from '../src/render/texture_prep_lane';
+
+/** texturePieceLabel reads only these four fields off a texture. */
+const sizedTexture = (width: number, height: number): THREE.Texture =>
+  ({ image: { width, height }, name: 'slab', uuid: 'abcdef0123' }) as unknown as THREE.Texture;
 
 // targetFrameMs 24 with a 2 ms floor makes every headroom below an exact
 // integer, so a wrong clamp or a missed spend shows up as a number, not as a
@@ -119,6 +125,28 @@ describe('gpu prep budget: the gate upload pieces (upload:texture)', () => {
     budget.record(label, 3);
     expect(budget.predictMs(label)).toBe(3);
     expect(budget.predictMs('upload:whatever')).toBe(3);
+  });
+
+  it('gives every upload size class its own kind, straight off texturePieceLabel', () => {
+    expect(gpuPrepKindOfLabel(texturePieceLabel(label, sizedTexture(1024, 1024)))).toBe(
+      'upload-big',
+    );
+    expect(gpuPrepKindOfLabel(texturePieceLabel(label, sizedTexture(512, 512)))).toBe('upload-mid');
+    expect(gpuPrepKindOfLabel(texturePieceLabel(label, sizedTexture(64, 64)))).toBe('upload');
+    expect(gpuPrepKindOfLabel('upload-big:texture:slab:1024x1024u')).toBe('upload-big');
+    expect(gpuPrepKindOfLabel('upload-mid:texture:slab:512x512u')).toBe('upload-mid');
+  });
+
+  it('keeps the size classes separate ledgers, in both directions', () => {
+    const small = budgetAt(20);
+    small.record(label, 3);
+    expect(small.predictMs('upload-big:texture:slab:1024x1024u')).toBe(CONFIG.unknownCostMs);
+    expect(small.predictMs('upload:texture:pebble:64x64u')).toBe(3);
+
+    const big = budgetAt(20);
+    big.record('upload-big:texture:slab:1024x1024u', 300);
+    expect(big.predictMs('upload-big:texture:other:2048x2048c')).toBe(300);
+    expect(big.predictMs(label)).toBe(CONFIG.unknownCostMs);
   });
 });
 

@@ -3,9 +3,9 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { presentFrame } from '../src/render/frame_present';
 import { gpuPrepEventsSnapshot, resetGpuPrepEventsForTest } from '../src/render/gpu_prep_events';
 import {
-  absorbLivePrograms,
   armLiveProgramWatch,
   recordNewLivePrograms,
+  resetLiveProgramWatchForTest,
 } from '../src/render/live_program_watch';
 import {
   absorbLivePrograms as absorbCore,
@@ -122,6 +122,9 @@ describe('liveProgramWatch core, absorb before the draw', () => {
 describe('the renderer-facing watch', () => {
   afterEach(() => {
     resetGpuPrepEventsForTest();
+    // The watch is module state: without the disarm, the next case's arm sits
+    // on the previous case's baseline.
+    resetLiveProgramWatchForTest();
   });
 
   it('records one live-program event per program minted after the reveal', () => {
@@ -181,6 +184,37 @@ describe('the renderer-facing watch', () => {
     programs.push(program(4, 'MeshPhongMaterial'));
     expect(presentFrame(host, 1 / 60, false)).toBe(false);
     expect(gpuPrepEventsSnapshot().counts['live-program']).toBe(1);
-    absorbLivePrograms(webgl);
+  });
+
+  it('adopts what a SKIPPED frame minted, so the next real draw does not blame it', () => {
+    resetGpuPrepEventsForTest();
+    const programs = [program(1, 'MeshStandardMaterial')];
+    const webgl = {
+      info: { programs },
+      render(): void {},
+    };
+    armLiveProgramWatch(infoHost(programs));
+    const host = {
+      vfx: { prepareDraw(): void {} },
+      post: null,
+      webgl,
+      scene: {},
+      camera: {},
+    };
+
+    // A hidden window: a gate's compileAsync prologue keeps minting while
+    // nothing draws.
+    programs.push(program(2, 'MeshLambertMaterial'));
+    expect(presentFrame(host, 1 / 60, false)).toBe(false);
+
+    // Already adopted by the skipped frame itself, which is what the absorb
+    // ahead of the skip buys: the recorder the drawing arm ends on has
+    // nothing to say about it, whoever calls it next.
+    recordNewLivePrograms(webgl);
+    expect(gpuPrepEventsSnapshot().counts['live-program']).toBe(0);
+
+    // And the next real draw, which links nothing of its own, reports nothing.
+    expect(presentFrame(host, 1 / 60, true)).toBe(true);
+    expect(gpuPrepEventsSnapshot().counts['live-program']).toBe(0);
   });
 });

@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 // The COMPOSED portrait (the player's own face, src/render/characters/portrait.ts
 // modularPortraitDataUrl) is captured off the frame that asks for it, so both of
@@ -12,7 +13,11 @@ import { describe, expect, it } from 'vitest';
 // WebGL rig; the capture behavior it rides on is covered behaviorally in
 // portrait_live_capture.test.ts.
 
-const read = (path: string): string => readFileSync(new URL(path, import.meta.url), 'utf8');
+// Full-line // comments go first: every line pinned below is explained in
+// prose right beside itself, so a raw read lets the prose (or a commented-out
+// call) satisfy the pin over code that is no longer there.
+const read = (path: string): string =>
+  codeWithoutLineComments(readFileSync(new URL(path, import.meta.url), 'utf8'));
 const hud = read('../src/ui/hud.ts');
 const charWindow = read('../src/ui/char_window.ts');
 const chip = read('../src/ui/portrait_chip.ts');

@@ -79,7 +79,7 @@ describe('the env PMREM source width', () => {
     expect(view.envTexture(stranded)).toBe(view.envTexture(stranded));
   });
 
-  it('releases the resampled fallback with its biome', async () => {
+  it('releases the resampled fallback with its biome, and the dome exactly once', async () => {
     const sky = await import('../src/render/sky');
     // The env arm fails outright: the dome lands, the 512 source never does.
     loadHdr.mockImplementation((_url, opts) =>
@@ -90,12 +90,55 @@ describe('the env PMREM source width', () => {
     await sky.ensureSkyBiomeAssets(['vale', 'marsh']).catch(() => undefined);
     const view = sky.buildSky(false, new THREE.Vector3(90, 140, 50), 0, 40);
     const fallback = view.envTexture('marsh');
-    if (!fallback) throw new Error('expected a resampled marsh env fallback');
+    const dome = view.domeTexture('marsh');
+    if (!fallback || !dome) throw new Error('expected a resampled marsh env fallback');
     const disposed = vi.spyOn(fallback, 'dispose');
+    const domeDisposed = vi.spyOn(dome, 'dispose');
 
     expect(sky.releaseSkyBiomeAssets(['marsh'])).toEqual(['marsh']);
 
+    // The copy is this module's own, the dome is the loader's: disposing the
+    // dome on the fallback line too would hand the next ensure a dead texture.
+    expect(fallback).not.toBe(dome);
     expect(disposed).toHaveBeenCalled();
+    expect(domeDisposed).toHaveBeenCalledTimes(1);
+  });
+
+  it('hands back the dome ITSELF when it is already no wider than the env source', async () => {
+    const sky = await import('../src/render/sky');
+    loadHdr.mockImplementation((_url, opts) =>
+      opts?.maxWidth
+        ? Promise.reject(new Error('env hdr fetch failed'))
+        : Promise.resolve(hdrTexture(ENV_WIDTH)),
+    );
+    await sky.ensureSkyBiomeAssets(['vale', 'marsh']).catch(() => undefined);
+    const view = sky.buildSky(false, new THREE.Vector3(90, 140, 50), 0, 40);
+
+    // No resample, so no second copy to keep or release: the prefilter reads
+    // the dome pixels at exactly the one session width.
+    const source = view.envTexture('marsh');
+    expect(source).toBe(view.domeTexture('marsh'));
+    expect((source as THREE.DataTexture).image.width).toBe(ENV_WIDTH);
+  });
+
+  it('prefilters NOTHING for a dome whose pixels never decoded', async () => {
+    const sky = await import('../src/render/sky');
+    loadHdr.mockImplementation((_url, opts) => {
+      if (opts?.maxWidth) return Promise.reject(new Error('env hdr fetch failed'));
+      const dome = hdrTexture(DOME_WIDTH);
+      // Wide enough to need the resample, with no data to resample from.
+      dome.image = { width: DOME_WIDTH, height: DOME_WIDTH / 2 } as never;
+      return Promise.resolve(dome);
+    });
+    await sky.ensureSkyBiomeAssets(['vale', 'marsh']).catch(() => undefined);
+    const view = sky.buildSky(false, new THREE.Vector3(90, 140, 50), 0, 40);
+
+    // The dome itself IS resident: the null comes from the missing pixels, not
+    // from a biome that never landed. Null skips this biome's prefilter and
+    // leaves the previous IBL lighting the scene, rather than caching a
+    // wrong-width one for the session.
+    expect(view.domeTexture('marsh')).not.toBeNull();
+    expect(view.envTexture('marsh')).toBeNull();
   });
 
   it('still prefilters exactly the texture envTexture hands it', () => {
