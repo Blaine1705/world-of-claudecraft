@@ -46,6 +46,7 @@ import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
+import { buildAbilityMaterialPrewarmGroup } from './ability_material_prewarm';
 import {
   AbilityVfx,
   AbilityVfxFx,
@@ -101,6 +102,7 @@ import {
 } from './camera_feel_core';
 import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
+import { canvasDataUrlAsync } from './canvas_data_url';
 import { buildCastleFeatures, type CastleFeaturesView } from './castle_features';
 import { buildCelestialSprites, type CelestialSprites } from './celestial_sprites';
 import { buildCharacterEffectPrewarmGroup } from './character_effect_prewarm';
@@ -1192,38 +1194,6 @@ function emptyFoliagePerfStats(): FoliagePerfStats {
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => window.setTimeout(resolve, Math.max(0, ms)));
-}
-
-/** Encode a copied 2D canvas without paying Canvas.toDataURL's synchronous
- *  compression cost on the UI thread. FileReader keeps the server-facing data
- *  URL contract while both compression and blob reading happen asynchronously. */
-function canvasDataUrlAsync(
-  canvas: HTMLCanvasElement,
-  type: string,
-  quality?: number,
-): Promise<string | null> {
-  return new Promise((resolve) => {
-    try {
-      canvas.toBlob(
-        (blob) => {
-          if (!blob) {
-            resolve(null);
-            return;
-          }
-          const reader = new FileReader();
-          reader.addEventListener('load', () =>
-            resolve(typeof reader.result === 'string' ? reader.result : null),
-          );
-          reader.addEventListener('error', () => resolve(null));
-          reader.readAsDataURL(blob);
-        },
-        type,
-        quality,
-      );
-    } catch {
-      resolve(null);
-    }
-  });
 }
 
 export interface RendererCreateOptions extends QuestObjectGateOptions {
@@ -5816,6 +5786,11 @@ export class Renderer {
     const landmarkSlot = createVariantPrewarmSlot(variantSlotHost, 'landmarks.impact-site', () =>
       buildImpactSitePrewarmGroup(this.impactSite.group, p.pos),
     );
+    const abilityMaterialSlot = createVariantPrewarmSlot(
+      variantSlotHost,
+      'ability-materials',
+      buildAbilityMaterialPrewarmGroup,
+    );
     const postEffectLane = createPostEffectPrewarmLane({
       webgl: this.webgl,
       camera: this.camera,
@@ -5920,6 +5895,7 @@ export class Renderer {
       ['props', propMaterialPrewarmGroup],
       ghostVariantSlot.staged(),
       characterEffectSlot.staged(),
+      abilityMaterialSlot.staged(),
       ['foliage', foliagePrewarmGroup],
       ['great-tree', greatTreePrewarmGroup],
       ['weapon-vfx', weaponVfxPrewarmGroup],
@@ -6840,6 +6816,7 @@ export class Renderer {
               for (const texture of step.build()) this.prewarmTexture(texture);
             },
           })),
+          ...abilityMaterialSlot.resumeUnits(),
           ...collectAbilityVfxCompileTargets(this.scene).map((target) => ({
             id: `program:${target.id}`,
             run: () => this.compilePrewarmColorPrograms(target.object, false),
@@ -6847,6 +6824,9 @@ export class Renderer {
         ],
         run: () => {
           this.abilityVfxFx.prewarmSpawn(p.pos.x, p.pos.y, p.pos.z - 5, p.id);
+          // The lazily-minted spell materials (ability_material_prewarm.ts):
+          // staged hidden here, linked by the compile lane with the rest.
+          abilityMaterialSlot.run();
           this.scene.traverse((child) => {
             const renderable = child as RenderableDiagnosticObject;
             if (renderable.userData.renderCategory !== 'vfx' || !renderable.material) return;
