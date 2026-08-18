@@ -56,7 +56,11 @@ const MONOLITHS: MonolithRow[] = [
     // LastKeepMapPainter declarations and the two walk-in map branches on the
     // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
     // count: any further growth reds again.
-    ceiling: 19488,
+    // Re-pinned 19488 -> 19490 for the PR #3428 login preview-prewarm merge:
+    // thin-consumer wiring to the pure buildPostEntryPreviewPrewarmUnits rides
+    // on the castle branch's zero-slack pin. Exact merged count: any further
+    // growth reds again.
+    ceiling: 19490,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -85,7 +89,12 @@ const MONOLITHS: MonolithRow[] = [
     // decision plus the async build loop) into
     // src/render/delve_interior_tracker.ts, and the merged file lands between
     // the two pins, so the ceiling is the exact merged count.
-    ceiling: 13664,
+    // Extracted the shadow-depth material factory into
+    // src/render/prewarm_depth_material.ts so the self-spirit prewarm could add
+    // Renderer.warmSelfSpirit plus per-frame observe without growing the file.
+    // Merging PR #3428 into the batch branch leaves the merged file below both
+    // prior pins, so the ceiling is the exact merged count.
+    ceiling: 13661,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

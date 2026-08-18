@@ -186,8 +186,10 @@ interface AttributionTargetFixture {
 // capture was retaken.
 // Re-minted after extracting the delve interior build-cache scheduling into
 // src/render/delve_interior_tracker.ts (renderer.ts moved again, no capture retaken).
+// Re-minted for PR #3428's self-spirit/login-preview prewarm merge: the
+// combined renderer.ts bytes move the composite. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'f2c08dc012f05502a6a230a2c6d695918d32cb7c90aae03343bfc9e05ce2fe78';
+  '3bdf19b47f6b841e05e618752f8541da1221865704da7883ea29bc7b5358aeb7';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
