@@ -87,10 +87,12 @@ export function summonSoulwell(
   const well = createGroundObject(ctx.nextId++, SOULWELL_OBJECT_ITEM_ID, 'Soulwell', spawnPosition);
   well.templateId = SOULWELL_ABILITY_ID;
   well.despawnTimer = duration;
-  const partyMembers = ctx.partyOf(caster.id)?.members ?? [];
+  const party = ctx.partyOf(caster.id);
+  const partyMembers = party?.members ?? [];
   const ownerMeta = ctx.players.get(caster.id);
   well.soulwell = {
     ownerId: caster.id,
+    partyId: party?.id ?? null,
     eligiblePlayerIds: [...new Set([caster.id, ...partyMembers])],
     wardAbsorbPctMax: ownerMeta ? ctx.playerMods(ownerMeta).global.warlockSoulwellWardPct : 0,
     wardedPlayerIds: [],
@@ -114,7 +116,8 @@ export function interactSoulwell(ctx: SimContext, object: Entity, actorId: numbe
 
   const state = object.soulwell;
   const ownerParty = ctx.partyOf(state.ownerId);
-  const isCurrentGroupMember = ownerParty?.members.includes(actorId) ?? false;
+  const isCurrentGroupMember =
+    state.partyId !== null && ownerParty?.id === state.partyId && ownerParty.members.includes(actorId);
   if (!state.eligiblePlayerIds.includes(actorId) && !isCurrentGroupMember) {
     ctx.error(actorId, 'That ally is not in your group.');
     return true;

@@ -93,6 +93,7 @@ describe('Warlock Soulwell', () => {
     expect(first).toHaveLength(1);
     expect(first[0].soulwell).toEqual({
       ownerId,
+      partyId: sim.partyOf(ownerId)?.id,
       eligiblePlayerIds: [ownerId, allyId],
       wardAbsorbPctMax: 0,
       wardedPlayerIds: [],
@@ -141,6 +142,18 @@ describe('Warlock Soulwell', () => {
 
     expect(sim.pickUpObject(well.id, strangerId)).toBe(true);
     expect(sim.countItem(SOUL_STONE_ITEM_ID, strangerId)).toBe(3);
+  });
+
+  it('does not let the owner rotate an active well into a newly formed group', () => {
+    const { sim, owner, ownerId, allyId, strangerId } = world();
+    const well = summon(sim, owner);
+
+    sim.partyLeave(allyId);
+    sim.partyInvite(strangerId, ownerId);
+    sim.partyAccept(strangerId);
+
+    expect(sim.pickUpObject(well.id, strangerId)).toBe(true);
+    expect(sim.countItem(SOUL_STONE_ITEM_ID, strangerId)).toBe(0);
   });
 
   it('keeps the summoned group roster eligible after the owner disconnects', () => {
