@@ -1700,6 +1700,14 @@ export class CharacterVisual {
     // this is the only place a fresh farMesh comes from outside the constructor.
     // Catch it up now, on the same material set the rig itself is already wearing.
     this.applyVisualMaterials();
+    // The far clones of a ghosted / stealthed body would otherwise STAGE behind
+    // the effect gate while the mint gate below reveals the far mesh on its own
+    // settle: an opaque baked body for a stealther until the swap lands. The
+    // far mesh is hidden by the mint gate anyway, so mount its effect clones
+    // now and let them link inside that gate; deferral buys nothing here.
+    if (this.farMesh && this.farMaterials) {
+      this.farMesh.material = this.effectMaterial(this.farMaterials);
+    }
     // Brand-new programs (the near body's minus the skinning bit, plus the
     // proxy's depth arm): link them hidden, the rig standing in until then.
     // The reveal itself is the caller's syncFarVisibility, since the shadow
@@ -1883,36 +1891,42 @@ export class CharacterVisual {
   }
 
   /**
-   * The clone/geometry pairs this effect state would mount whose program is not
-   * known linked yet. Only clones that flip `transparent` qualify: every other
-   * overlay (ferocity, ascension, rune tint, aura glow) keeps the source's
+   * The clone/source-mesh pairs this effect state would mount whose program is
+   * not known linked yet. Only clones that flip `transparent` qualify: every
+   * other overlay (ferocity, ascension, rune tint, aura glow) keeps the source's
    * program cache key through cloneMaterialWithHooks, so it costs no link and
    * must not be delayed. Empty without a gate, which keeps previews, tests and
    * hosts with no async compile on the immediate path.
    */
   private collectUnlinkedEffectMaterials(): {
-    geometry: THREE.BufferGeometry;
+    source: THREE.Mesh;
     material: THREE.Material;
   }[] {
-    const staged: { geometry: THREE.BufferGeometry; material: THREE.Material }[] = [];
+    const staged: { source: THREE.Mesh; material: THREE.Material }[] = [];
     if (!this.farBakeGate) return staged;
-    const consider = (geometry: THREE.BufferGeometry | null, source: THREE.Material): void => {
-      if (!geometry) return;
+    // Nythraxis' Soul Rend mark is ACTIONABLE raid information (the marked
+    // player has to see it to react), so it is exempt from the deferral and
+    // swaps in on the frame it lands, whatever the link state
+    // (docs/design/graphics-settings-fairness.md). Its one-time link is the
+    // accepted cost, and the encounter prewarm (soulRendPrewarmTargets) is
+    // what usually pays it before the first mark.
+    if (this.soulRend) return staged;
+    const consider = (mesh: THREE.Mesh | null, source: THREE.Material): void => {
+      if (!mesh?.geometry) return;
       const next = this.effectSingleMaterial(source);
       if (next === source || next.transparent === source.transparent) return;
       if (this.linkedEffectMaterials.has(next)) return;
-      staged.push({ geometry, material: next });
+      staged.push({ source: mesh, material: next });
     };
     for (const [mesh, original] of this.originalMaterials) {
-      const geometry = mesh.geometry ?? null;
       for (const source of Array.isArray(original) ? original : [original]) {
-        consider(geometry, source);
+        consider(mesh, source);
       }
     }
     if (this.farMesh && this.farMaterials) {
       const farMats = this.farMaterials;
       for (const source of Array.isArray(farMats) ? farMats : [farMats]) {
-        consider(this.farMesh.geometry, source);
+        consider(this.farMesh, source);
       }
     }
     return staged;
@@ -1922,7 +1936,7 @@ export class CharacterVisual {
    *  skinning as the rig so three keys the same programs, and let update()
    *  commit the swap once the gate settles. */
   private stageEffectSwap(
-    staged: readonly { geometry: THREE.BufferGeometry; material: THREE.Material }[],
+    staged: readonly { source: THREE.Mesh; material: THREE.Material }[],
   ): void {
     const gate = this.farBakeGate;
     if (!gate) {
@@ -1933,7 +1947,17 @@ export class CharacterVisual {
     scratch.name = 'character_effect_compile_scratch';
     scratch.visible = false;
     for (const entry of staged) {
-      const mesh = new THREE.SkinnedMesh(entry.geometry, entry.material);
+      // Mirror the SOURCE mesh's kind: three keys `skinning` on isSkinnedMesh,
+      // so a SkinnedMesh twin of a plain source (an attached weapon, the class
+      // halo, the baked far mesh) links a variant the real draw never binds and
+      // the commit frame pays the synchronous link anyway. The shadow flags ride
+      // along for the same reason on the depth arm.
+      const source = entry.source;
+      const mesh = (source as THREE.SkinnedMesh).isSkinnedMesh
+        ? new THREE.SkinnedMesh(source.geometry, entry.material)
+        : new THREE.Mesh(source.geometry, entry.material);
+      mesh.castShadow = source.castShadow;
+      mesh.receiveShadow = source.receiveShadow;
       mesh.visible = false;
       mesh.frustumCulled = false;
       scratch.add(mesh);
@@ -1960,23 +1984,37 @@ export class CharacterVisual {
     this.effectSwapSettled = false;
     const scratch = this.effectSwapScratch;
     if (!scratch) return;
+    this.recordLinkedEffectMaterials(scratch);
+    this.dropPendingEffectSwap();
+    this.commitVisualMaterials();
+  }
+
+  /** A settled scratch set's programs ARE compiled, whether or not the swap
+   *  reached its commit frame, so record them: without this a set superseded
+   *  after its gate settled (stealth chained into a shapeshift) re-stages and
+   *  re-queues a compile-lane slot on every later toggle, forever. */
+  private recordLinkedEffectMaterials(scratch: THREE.Group): void {
     for (const child of scratch.children) {
       const mats = (child as THREE.Mesh).material;
       for (const material of Array.isArray(mats) ? mats : [mats]) {
         this.linkedEffectMaterials.add(material);
       }
     }
-    this.dropPendingEffectSwap();
-    this.commitVisualMaterials();
   }
 
   /** Detach a scratch set without disposing anything: its materials ARE the
-   *  live clones the effect caches own. */
-  private dropPendingEffectSwap(): void {
+   *  live clones the effect caches own, so a set that already settled stays
+   *  recorded as linked. `keepLinked = false` is for the paths that dispose
+   *  those clones on the way out (skin rebuild, teardown). */
+  private dropPendingEffectSwap(keepLinked = true): void {
+    const scratch = this.effectSwapScratch;
+    if (scratch && keepLinked && this.effectSwapSettled) {
+      this.recordLinkedEffectMaterials(scratch);
+    }
     this.effectSwapSettled = false;
-    if (!this.effectSwapScratch) return;
-    this.effectSwapScratch.removeFromParent();
-    this.effectSwapScratch.clear();
+    if (!scratch) return;
+    scratch.removeFromParent();
+    scratch.clear();
     this.effectSwapScratch = null;
   }
 
@@ -2645,8 +2683,9 @@ export class CharacterVisual {
   }
 
   private disposeEffectMaterials(): void {
-    // The scratch set wears clones this sweep is about to dispose.
-    this.dropPendingEffectSwap();
+    // The scratch set wears clones this sweep is about to dispose, so they are
+    // dropped WITHOUT being recorded as linked (a disposed program is not one).
+    this.dropPendingEffectSwap(false);
     const materials = new Set<THREE.Material>([
       ...this.ghostMaterials.values(),
       ...this.soulRendMaterials.values(),
@@ -2778,7 +2817,7 @@ export class CharacterVisual {
     releaseTintedMaterials(this.tintedFarClaims);
     this.tintedFarClaims.clear();
     this.dropPendingFarMaterials();
-    this.dropPendingEffectSwap();
+    this.dropPendingEffectSwap(false);
     this.mixer.stopAllAction();
     this.mixer.uncacheRoot(this.model);
     this.skeletonUpdates.dispose();

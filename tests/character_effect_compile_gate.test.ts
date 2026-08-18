@@ -45,7 +45,10 @@ const anim = (over: Partial<AnimState> = {}): AnimState => ({
 });
 
 /** A minimally real skinned GLB: the overlay clones the rig's own materials,
- *  so the harness has to carry real meshes with real materials. */
+ *  so the harness has to carry real meshes with real materials. It carries a
+ *  PLAIN prop mesh next to the skinned body on purpose: a rig's attached
+ *  weapons, its class halo and its baked far mesh are all unskinned, and three
+ *  keys `skinning` on isSkinnedMesh. */
 function stubGltf() {
   const scene = new THREE.Group();
   const rootBone = new THREE.Bone();
@@ -69,6 +72,12 @@ function stubGltf() {
   mesh.add(rootBone);
   mesh.bind(new THREE.Skeleton([rootBone, childBone]));
   scene.add(mesh);
+  const prop = new THREE.Mesh(
+    new THREE.BoxGeometry(0.2, 0.2, 0.9),
+    new THREE.MeshStandardMaterial(),
+  );
+  prop.name = 'prop_plank';
+  childBone.add(prop);
   const clip = (name: string) =>
     new THREE.AnimationClip(name, 1, [
       new THREE.NumberKeyframeTrack('RigChild.position[x]', [0, 1], [0, 1]),
@@ -93,6 +102,31 @@ function rigMaterials(visual: CharacterVisual): THREE.Material[] {
 function rigIsTranslucent(visual: CharacterVisual): boolean {
   const mats = rigMaterials(visual);
   return mats.length > 0 && mats.every((material) => material.transparent);
+}
+
+/** Every geometry a staged twin can be built over, mapped to whether the mesh
+ *  the rig actually DRAWS it with is skinned: the rig's own meshes plus the
+ *  baked far mesh. */
+function sourceIsSkinnedByGeometry(visual: CharacterVisual): Map<THREE.BufferGeometry, boolean> {
+  const priv = visual as unknown as { model: THREE.Object3D; farMesh: THREE.Mesh | null };
+  const out = new Map<THREE.BufferGeometry, boolean>();
+  const record = (mesh: THREE.Mesh | null): void => {
+    if (!mesh?.geometry) return;
+    out.set(mesh.geometry, (mesh as THREE.SkinnedMesh).isSkinnedMesh === true);
+  };
+  priv.model.traverse((object) => {
+    const mesh = object as THREE.Mesh;
+    if (mesh.isMesh) record(mesh);
+  });
+  record(priv.farMesh);
+  return out;
+}
+
+function meshNamed(visual: CharacterVisual, name: string): THREE.Mesh {
+  const priv = visual as unknown as { model: THREE.Object3D };
+  const found = priv.model.getObjectByName(name) as THREE.Mesh | undefined;
+  if (!found) throw new Error(`test harness lost the ${name} mesh`);
+  return found;
 }
 
 function scratchOf(visual: CharacterVisual): THREE.Group | null {
@@ -174,6 +208,95 @@ describe('a transparent character effect swaps in only once its programs are lin
     visual.setGhost(true);
     expect(rigIsTranslucent(visual)).toBe(true);
     expect(gateCalls).toHaveLength(1);
+    visual.dispose();
+  });
+
+  it('twins the SOURCE mesh kind, never a skinned stand-in over a plain source', async () => {
+    const visual = await makeVisual();
+    const gateCalls: GateCall[] = [];
+    visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
+
+    visual.setGhost(true);
+    expect(gateCalls).toHaveLength(1);
+    const staged = (gateCalls[0].target as THREE.Group).children as THREE.Mesh[];
+    const isSkinned = (mesh: THREE.Mesh): boolean =>
+      (mesh as THREE.SkinnedMesh).isSkinnedMesh === true;
+
+    // Both kinds are really in play here (a skinned body, a plain prop and the
+    // baked far mesh), so neither arm of the rule is vacuous.
+    expect(staged.filter(isSkinned).length).toBeGreaterThan(0);
+    expect(staged.filter((mesh) => !isSkinned(mesh)).length).toBeGreaterThan(0);
+
+    // three keys `skinning` on isSkinnedMesh: a twin of the wrong kind links a
+    // program the real draw never binds, and the commit frame pays the
+    // synchronous link the gate exists to avoid.
+    const kinds = sourceIsSkinnedByGeometry(visual);
+    for (const twin of staged) {
+      expect(kinds.get(twin.geometry)).toBe(isSkinned(twin));
+    }
+    const prop = meshNamed(visual, 'prop_plank');
+    const propTwin = staged.find((mesh) => mesh.geometry === prop.geometry);
+    expect(propTwin).toBeDefined();
+    expect(isSkinned(propTwin as THREE.Mesh)).toBe(false);
+
+    // The depth arm is a program too: the shadow flags ride along.
+    const body = meshNamed(visual, 'body');
+    const bodyTwin = staged.find((mesh) => mesh.geometry === body.geometry) as THREE.Mesh;
+    expect(bodyTwin.castShadow).toBe(body.castShadow);
+    expect(bodyTwin.receiveShadow).toBe(body.receiveShadow);
+    visual.dispose();
+  });
+
+  it('never defers the Soul Rend mark, which is actionable raid information', async () => {
+    const visual = await makeVisual();
+    const gateCalls: GateCall[] = [];
+    visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
+    const opaque = rigMaterials(visual);
+
+    // Nythraxis' mark tells the marked player to act, so it is exempt from the
+    // deferral (graphics-settings fairness): it shows on the frame it lands.
+    visual.setSoulRend(true);
+    expect(rigIsTranslucent(visual)).toBe(true);
+    expect(gateCalls).toHaveLength(0);
+    expect(scratchOf(visual)).toBeNull();
+    visual.setSoulRend(false);
+    expect(rigMaterials(visual)).toEqual(opaque);
+
+    // A cosmetic effect on the same rig still waits for its link...
+    visual.setGhost(true);
+    expect(gateCalls).toHaveLength(1);
+    expect(rigMaterials(visual)).toEqual(opaque);
+    // ...and a mark landing while that swap is still in flight wins outright.
+    visual.setSoulRend(true);
+    expect(rigIsTranslucent(visual)).toBe(true);
+    expect(gateCalls).toHaveLength(1);
+    expect(scratchOf(visual)).toBeNull();
+    visual.dispose();
+  });
+
+  it('remembers a set that linked but was superseded before its commit frame', async () => {
+    const visual = await makeVisual();
+    const gateCalls: GateCall[] = [];
+    visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
+
+    visual.setGhost(true);
+    expect(gateCalls).toHaveLength(1);
+    // The ghost clones ARE linked, but a shapeshift supersedes the swap before
+    // update() commits it. Ghost outranks Shadowform, so what the visual wants
+    // is exactly the set that just linked: it must swap in at once instead of
+    // re-staging and re-queueing a compile-lane slot for work already done.
+    gateCalls[0].settle();
+    visual.setShadowform(true);
+    expect(gateCalls).toHaveLength(1);
+    expect(rigIsTranslucent(visual)).toBe(true);
+
+    // A genuinely new clone set (Shadowform's) still gates once...
+    visual.setGhost(false);
+    expect(gateCalls).toHaveLength(2);
+    // ...and the ghost set stays immediate for every later toggle.
+    visual.setGhost(true);
+    expect(gateCalls).toHaveLength(2);
+    expect(rigIsTranslucent(visual)).toBe(true);
     visual.dispose();
   });
 

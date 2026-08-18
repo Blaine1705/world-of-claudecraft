@@ -32,7 +32,13 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   clone and cannot depend on the whole of `assets.ts` to do it; the spec rides
   `Material.userData.armorDye`, which `clone()` copies while it drops the hook.
 - `visual.ts`: `CharacterVisual`, the mixer + `BaseState` machine, LOD/shadow/
-  ghost plumbing, one-shot triggers, death/revive edge logic.
+  ghost plumbing, one-shot triggers, death/revive edge logic. A transparent
+  effect (ghost run, stealth, Shadowform, Moonkin) is a new program per rig
+  material, so its clones link hidden behind the same compile gate before the
+  swap commits (`stageEffectSwap`, twinning each source mesh's KIND because
+  three keys `skinning` on `isSkinnedMesh`); the Soul Rend mark is exempt and
+  commits at once, being actionable raid information
+  (`tests/character_effect_compile_gate.test.ts`).
 - `halo.ts`: the class halo (`buildHalo`, driven by `VisualDef.halo` +
   `haloUpOffset`/`haloRadius` overrides). Texture, per-color materials, and
   per-radius geometries are shared never-disposed caches, so radii MUST come
