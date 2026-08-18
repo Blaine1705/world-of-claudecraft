@@ -1197,6 +1197,33 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     expect(e.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
   });
 
+  it('still cancels ordinary battleground Unstuck when the fighter is displaced', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const e = must(sim.entities.get(pid), 'entity');
+    expectClearPlayerPosition(sim, e);
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+
+    e.pos = sim.ctx.groundPos(e.pos.x + 2, e.pos.z);
+    e.prevPos = { ...e.pos };
+    sim.ctx.rebucket(e);
+
+    expect(sim.tick()).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'cancelled',
+        reason: 'moved',
+        pid,
+      }),
+    );
+    expect(sim.meta(pid)?.pendingUnstuck).toBeNull();
+    expect(sim.bgMatchFor(pid)).toBe(match);
+  });
+
   it('combat still cancels a battleground wall-trap Unstuck countdown', () => {
     const { sim, pids } = tenInQueue();
     const match = must(sim.bgMatchFor(pids[0]), 'bg match');

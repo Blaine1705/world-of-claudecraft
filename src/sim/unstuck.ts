@@ -74,6 +74,8 @@ export interface PendingUnstuck {
    * which would make a pre-started /unstuck a cheaper alternative to the death loop.
    */
   startedDead: boolean;
+  /** True only for the Thornhollow wall-trap repair path. */
+  startedInBattlegroundWallTrap: boolean;
 }
 
 export type CancelledUnstuckEvent = Extract<UnstuckEvent, { phase: 'cancelled' }> & {
@@ -289,6 +291,7 @@ export function requestUnstuck(ctx: SimContext, pid?: number): boolean {
     damageTaken: meta.counters.damageTaken,
     lastAnnouncedSecond: UNSTUCK_COUNTDOWN_SECONDS,
     startedDead: p.dead || p.ghost,
+    startedInBattlegroundWallTrap: battlegroundWallTrap(ctx, p),
   };
   p.cooldowns.set(UNSTUCK_COOLDOWN_ID, UNSTUCK_RETRY_SECONDS);
   ctx.emit({
@@ -312,7 +315,7 @@ function cancelReason(
   if (pending.area.kind === 'battleground' && bgCarryingFlag(ctx, p.id)) return 'state_changed';
   if (
     hasMoveInput(meta) ||
-    (pending.area.kind !== 'battleground' &&
+    (!pending.startedInBattlegroundWallTrap &&
       (Math.hypot(p.pos.x - pending.origin.x, p.pos.z - pending.origin.z) > CANCEL_MOVE_DISTANCE ||
         Math.abs(p.pos.y - pending.origin.y) > CANCEL_VERTICAL_DISTANCE))
   )
