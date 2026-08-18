@@ -10,8 +10,8 @@
 import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { InvSlot, ItemDef } from '../src/sim/types';
+import { durationText } from '../src/ui/duration_text';
 import { captureFocusKey } from '../src/ui/focus_restore';
-import { wocOfferPhase } from '../src/ui/hud/woc_trade/woc_trade_offer_view';
 import { t } from '../src/ui/i18n';
 import {
   refreshWocTradeArm,
@@ -22,6 +22,8 @@ import {
   wocTradeModelFrom,
   wocTradeMoneyText,
 } from '../src/ui/trade_woc_panel';
+import type { WocTradeQuoteReview } from '../src/ui/trade_woc_view';
+import { usdText } from '../src/ui/usd_text';
 
 const EPIC: ItemDef = {
   id: 'panel_epic_blade',
@@ -286,17 +288,21 @@ describe('a standing offer becomes a REVIEW surface for both sides', () => {
   };
 
   it('renders the agreed price for the Money row, in the asked-for shape', () => {
-    // "$1.00 USD (~ 7,812.5 $WOC)". The tilde is load-bearing: the token figure
+    // "$1.00 (~ 7,812.5 $WOC)". The tilde is load-bearing: the token figure
     // is a preview, and the exact number is set by a fresh quote at payment.
+    // The currency comes from the Intl formatter alone: a ' USD' suffix on
+    // top of it doubled the code in every locale whose formatter already
+    // spells USD (pl 'USD USD', en-CA 'US$1.00 USD').
     const text = wocTradeMoneyText(offer);
-    expect(text).toContain('$1.00 USD');
+    expect(text).toContain(usdText(100));
+    expect(text).not.toContain(`${usdText(100)} USD`);
     expect(text).toContain('7,812.5');
     expect(text).toContain('~');
   });
 
   it('falls back to the USD alone when no quote is available', () => {
     const text = wocTradeMoneyText({ ...offer, tokens: null });
-    expect(text).toContain('$1.00 USD');
+    expect(text).toBe(usdText(100));
     expect(text).not.toContain('~');
   });
 
@@ -464,7 +470,7 @@ describe('the below-minimum courtesy hint', () => {
     const d = deps({ usdCents: 50, minPriceCents: 100, theirStaged: [slot(EPIC.id)] });
     const root = paint(d);
     const hint = root.querySelector('[data-woc-hint]')?.textContent ?? '';
-    expect(hint).toBe(t('hudChrome.trade.woc.hintBelowMin', { usd: '$1.00' }));
+    expect(hint).toBe(t('hudChrome.trade.woc.hintBelowMin', { usd: usdText(100) }));
   });
 
   it('an unknown floor never blocks: no hint, send stays live', () => {
@@ -490,66 +496,6 @@ describe('the payment phase, in the window rather than elsewhere', () => {
     buyerAccepted: true,
     sellerAccepted: true,
   };
-
-  it('derives the phase from the LISTING, not the offer status', () => {
-    // The offer says only "agreed"; what decides whether money is still owed is
-    // the listing, which exists from acceptance and closes when the sale settles.
-    expect(wocOfferPhase({ listingId: null, listingStatus: null, listingResolution: null })).toBe(
-      'review',
-    );
-    expect(wocOfferPhase({ listingId: 41, listingStatus: 'active', listingResolution: null })).toBe(
-      'awaiting_payment',
-    );
-    expect(
-      wocOfferPhase({ listingId: 41, listingStatus: 'closed', listingResolution: 'sold' }),
-    ).toBe('settled');
-  });
-
-  it('reports a payment IN FLIGHT, so a wait is distinguishable from an absence', () => {
-    // The shipped gap: from acceptance until the item vanished, the seller saw
-    // one unchanging "waiting" face whether the buyer was signing in their
-    // wallet or had walked away. The settlement state is what separates them.
-    const live = { listingId: 41, listingStatus: 'active', listingResolution: null };
-    for (const state of ['confirming', 'confirmed', 'delivering']) {
-      expect(wocOfferPhase({ ...live, settlementState: state }), state).toBe('paying');
-    }
-  });
-
-  it("does NOT spin on 'offered': the buyer still has to press Pay", () => {
-    // A quote exists but nothing is signed. Showing progress here would put a
-    // spinner in front of a player whose next move is to act, which is the
-    // opposite of what the indicator means.
-    expect(
-      wocOfferPhase({
-        listingId: 41,
-        listingStatus: 'active',
-        listingResolution: null,
-        settlementState: 'offered',
-      }),
-    ).toBe('awaiting_payment');
-  });
-
-  it('lets the BUYER see their own payment before the server confirms it', () => {
-    // The wallet takes over the screen; coming back to a live-looking Pay button
-    // is what made a successful payment read as a click that did nothing. The
-    // local flag closes that gap without waiting for a poll.
-    const live = { listingId: 41, listingStatus: 'active', listingResolution: null };
-    expect(wocOfferPhase(live, true)).toBe('paying');
-    expect(wocOfferPhase(live, false)).toBe('awaiting_payment');
-  });
-
-  it('a CLOSED listing outranks any in-flight settlement state', () => {
-    // Delivery is the last word. A stale 'delivering' row alongside a closed
-    // listing must not strand both windows on a spinner that never resolves.
-    expect(
-      wocOfferPhase({
-        listingId: 41,
-        listingStatus: 'closed',
-        listingResolution: 'sold',
-        settlementState: 'delivering',
-      }),
-    ).toBe('settled');
-  });
 
   it('gives the BUYER a pay button naming the agreed price', () => {
     const root = paint(deps({ pendingOffer: paying }));
@@ -873,19 +819,6 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
     // window held incidentally before it was narrowed to accept alone).
     expect(pay).not.toContain('tradeCancel');
   });
-
-  it('treats an operator-parked review payment as still in flight, never settled', () => {
-    // A review-parked settlement is neither settled nor lost; the offer face
-    // must stay 'paying' (the pending face), not fall to awaiting_payment
-    // with a live Pay control under money an operator is deciding. Pinned
-    // through the REAL consumer (wocOfferPhase over SETTLING_STATES; the old
-    // wocSettlementInFlight wrapper had no production caller and is gone).
-    const row = { listingId: 41, listingStatus: 'settling', listingResolution: null };
-    expect(wocOfferPhase({ ...row, settlementState: 'review' })).toBe('paying');
-    expect(wocOfferPhase({ ...row, settlementState: 'confirming' })).toBe('paying');
-    expect(wocOfferPhase({ ...row, settlementState: 'delivered' })).toBe('awaiting_payment');
-    expect(wocOfferPhase({ ...row, settlementState: null })).toBe('awaiting_payment');
-  });
 });
 
 describe('the wallet is skipped only on explicit server permission', () => {
@@ -1044,7 +977,14 @@ describe('the consent row and the quote review (R9 + informed commitment)', () =
   it('a staged quote replaces Pay with the review panel: total, expiry, sign, back out', () => {
     const d = deps({
       pendingOffer: payable,
-      quote: { totalTokens: 812.5, usdCents: 100, expiresAtMs: 1_800_000_000_000 },
+      quote: {
+        sellerTokens: null,
+        burnTokens: null,
+        treasuryTokens: null,
+        totalTokens: 812.5,
+        usdCents: 100,
+        expiresAtMs: 1_800_000_000_000,
+      },
     });
     const root = paint(d);
     expect(root.querySelector('[data-woc-pay]'), 'Pay yields to the review').toBeNull();
@@ -1062,7 +1002,14 @@ describe('the consent row and the quote review (R9 + informed commitment)', () =
     const root = paint(
       deps({
         pendingOffer: { ...payable, role: 'seller' as const },
-        quote: { totalTokens: 812.5, usdCents: 100, expiresAtMs: null },
+        quote: {
+          sellerTokens: null,
+          burnTokens: null,
+          treasuryTokens: null,
+          totalTokens: 812.5,
+          usdCents: 100,
+          expiresAtMs: null,
+        },
       }),
     );
     expect(root.querySelector('[data-woc-sign]')).toBeNull();
@@ -1080,8 +1027,11 @@ describe('the QA round faces: pressed Pay, expired Sign, keyed controls', () => 
     buyerAccepted: true,
     sellerAccepted: true,
   };
-  const quote: { totalTokens: number | null; usdCents: number; expiresAtMs: number | null } = {
+  const quote: WocTradeQuoteReview = {
     totalTokens: 5000,
+    sellerTokens: null,
+    burnTokens: null,
+    treasuryTokens: null,
     usdCents: 100,
     expiresAtMs: 1_000,
   };
@@ -1161,5 +1111,226 @@ describe('the QA round faces: pressed Pay, expired Sign, keyed controls', () => 
     root.innerHTML = wocTradeArmHtml(wocTradeModelFrom(d), d.usdCents);
     restoreWocTradeFocus(root, key);
     expect(document.activeElement?.hasAttribute('data-woc-terms')).toBe(true);
+  });
+});
+
+describe('the QA session faces: fee block, commitment note, quote legs, focus ladder', () => {
+  const escrowed = {
+    id: 7,
+    usdCents: 100,
+    tokens: 7812.5,
+    role: 'buyer' as const,
+    phase: 'awaiting_payment' as const,
+    listingId: 41,
+    buyerAccepted: true,
+    sellerAccepted: true,
+  };
+  const review = { ...escrowed, phase: 'review' as const, listingId: null };
+  const split = { sellerCents: 90, burnCents: 7, treasuryCents: 3 };
+
+  it("the review face carries the fee and the net for BOTH sides, in each side's own words", () => {
+    // The seller commits by accepting, so the fee and THEIR net must be on
+    // the review face before that click; the buyer reads the seller's net.
+    const seller = paint(
+      deps({ pendingOffer: { ...review, role: 'seller' }, split, mode: 'gold' }),
+    );
+    expect(seller.querySelector('[data-woc-fee]')?.textContent).toBe(
+      t('hudChrome.trade.woc.feeLine', { fee: usdText(10) }),
+    );
+    expect(seller.querySelector('[data-woc-net]')?.textContent).toBe(
+      t('hudChrome.trade.woc.netLine', { net: usdText(90) }),
+    );
+    const buyer = paint(deps({ pendingOffer: review, split, mode: 'gold' }));
+    expect(buyer.querySelector('[data-woc-net]')?.textContent).toBe(
+      t('hudChrome.trade.woc.netLineBuyer', { net: usdText(90) }),
+    );
+    // The waiting faces carry the block too; an unknown split renders nothing.
+    const waiting = paint(
+      deps({ pendingOffer: { ...escrowed, role: 'seller' }, split, mode: 'gold' }),
+    );
+    expect(waiting.querySelector('[data-woc-net]')?.textContent).toContain(usdText(90));
+    const unknown = paint(deps({ pendingOffer: review, split: null, mode: 'gold' }));
+    expect(unknown.querySelector('[data-woc-net]')?.textContent).toBe('');
+    // The compose face (the buyer's) reads the seller's net as well.
+    const compose = paint(deps({ split }));
+    expect(compose.querySelector('[data-woc-net]')?.textContent).toBe(
+      t('hudChrome.trade.woc.netLineBuyer', { net: usdText(90) }),
+    );
+  });
+
+  it('the buyer reads the payment hold and the strike BEFORE the shared Accept, and on the pay face', () => {
+    const timed = paint(deps({ pendingOffer: review, directedHoldSeconds: 600 }));
+    expect(timed.querySelector('[data-woc-binding]')?.textContent).toBe(
+      t('hudChrome.trade.woc.p2pBindingNote', { duration: durationText(600) }),
+    );
+    const untimed = paint(deps({ pendingOffer: review, directedHoldSeconds: null }));
+    expect(untimed.querySelector('[data-woc-binding]')?.textContent).toBe(
+      t('hudChrome.trade.woc.p2pBindingNoteUntimed'),
+    );
+    const pay = paint(deps({ pendingOffer: escrowed, directedHoldSeconds: 600 }));
+    expect(pay.querySelector('[data-woc-binding]')?.textContent).toContain(durationText(600));
+    // Never for the seller (their accept is not the one that owes payment).
+    const seller = paint(deps({ pendingOffer: { ...review, role: 'seller' } }));
+    expect(seller.querySelector('[data-woc-binding]')).toBeNull();
+    // A hold figure that never renders raw seconds.
+    expect(durationText(600)).not.toContain('600');
+  });
+
+  it('the quote face shows the fee legs beside the total, and says so when the quote lapsed', () => {
+    const quote: WocTradeQuoteReview = {
+      totalTokens: 5000,
+      sellerTokens: 4500,
+      burnTokens: 350,
+      treasuryTokens: 150,
+      usdCents: 100,
+      expiresAtMs: 1_000,
+    };
+    const live = paint(deps({ pendingOffer: escrowed, quote, nowMs: 500 }));
+    const text = live.textContent ?? '';
+    expect(text).toContain(t('hudChrome.wocMarket.quoteSeller', { tokens: '4,500' }));
+    expect(text).toContain(t('hudChrome.wocMarket.quoteBurn', { tokens: '350' }));
+    expect(text).toContain(t('hudChrome.wocMarket.quoteTreasury', { tokens: '150' }));
+    expect(text).not.toContain(t('hudChrome.wocMarket.quoteExpired'));
+    // No consent row here: the claim that staged the quote was the
+    // terms-gated send, so acceptance is durable by the time it renders.
+    expect(live.querySelector('[data-woc-terms]')).toBeNull();
+    const lapsed = paint(deps({ pendingOffer: escrowed, quote, nowMs: 2_000 }));
+    expect(lapsed.textContent).toContain(t('hudChrome.wocMarket.quoteExpired'));
+    expect(lapsed.querySelector<HTMLButtonElement>('[data-woc-sign]')?.disabled).toBe(true);
+    // Absent legs render nothing (an older service answers no split).
+    const bare = paint(
+      deps({
+        pendingOffer: escrowed,
+        quote: { ...quote, sellerTokens: null, burnTokens: null, treasuryTokens: null },
+      }),
+    );
+    expect(bare.textContent).not.toContain('Seller receives');
+  });
+
+  it('a resolve in flight disables Decline, Withdraw and Cancel sale (one click, one request)', () => {
+    const decline = paint(
+      deps({ pendingOffer: { ...review, role: 'seller' }, resolving: true, mode: 'gold' }),
+    );
+    expect(decline.querySelector<HTMLButtonElement>('[data-woc-decline]')?.disabled).toBe(true);
+    const withdraw = paint(deps({ pendingOffer: review, resolving: true, mode: 'gold' }));
+    expect(withdraw.querySelector<HTMLButtonElement>('[data-woc-cancel]')?.disabled).toBe(true);
+    const cancelSale = paint(
+      deps({ pendingOffer: { ...escrowed, role: 'seller' }, resolving: true, mode: 'gold' }),
+    );
+    expect(cancelSale.querySelector<HTMLButtonElement>('[data-woc-cancel-sale]')?.disabled).toBe(
+      true,
+    );
+    const idle = paint(deps({ pendingOffer: { ...review, role: 'seller' }, mode: 'gold' }));
+    expect(idle.querySelector<HTMLButtonElement>('[data-woc-decline]')?.disabled).toBe(false);
+  });
+
+  it('a pending cancel is RECORDED on the seller face: Cancel sale withdrawn, the wait says so', () => {
+    const pending = paint(
+      deps({ pendingOffer: { ...escrowed, role: 'seller' }, cancelPending: true, mode: 'gold' }),
+    );
+    expect(pending.querySelector('[data-woc-cancel-sale]')).toBeNull();
+    expect(pending.querySelector('.trade-woc-waiting')?.textContent).toBe(
+      t('hudChrome.trade.woc.cancelPendingSeller'),
+    );
+    const model = wocTradeModelFrom(
+      deps({ pendingOffer: { ...escrowed, role: 'seller' }, cancelPending: true, mode: 'gold' }),
+    );
+    expect(model.busy, 'a pending cancel is a wait, not progress').toBe(false);
+    // The buyer's face is untouched by the seller's local mark.
+    const buyer = paint(deps({ pendingOffer: escrowed, cancelPending: true }));
+    expect(buyer.querySelector('[data-woc-pay]')).not.toBeNull();
+  });
+
+  it('a payment under review reads as parked, per side, with no spinner', () => {
+    for (const role of ['buyer', 'seller'] as const) {
+      const d = deps({
+        pendingOffer: { ...escrowed, role, phase: 'paying', settlementState: 'review' },
+        mode: 'gold',
+      });
+      const model = wocTradeModelFrom(d);
+      expect(model.statusKey).toBe(
+        role === 'buyer'
+          ? 'hudChrome.trade.woc.statusReviewBuyer'
+          : 'hudChrome.trade.woc.statusReviewSeller',
+      );
+      expect(model.busy).toBe(false);
+      expect(paint(d).querySelector('.trade-woc-spinner')).toBeNull();
+    }
+    // Confirming still spins, and a delivered answer reads as decided money.
+    const confirming = wocTradeModelFrom(
+      deps({ pendingOffer: { ...escrowed, phase: 'paying', settlementState: 'confirming' } }),
+    );
+    expect(confirming.busy).toBe(true);
+    expect(confirming.statusKey).toBe('hudChrome.trade.woc.statusPayingBuyer');
+    const delivered = wocTradeModelFrom(
+      deps({ pendingOffer: { ...escrowed, phase: 'paying', settlementState: 'delivered' } }),
+    );
+    expect(delivered.statusKey).toBe('hudChrome.trade.woc.statusConfirmedBuyer');
+  });
+
+  it('the settled face speaks per side (the copy went to the BUYER)', () => {
+    const buyer = paint(deps({ pendingOffer: { ...escrowed, phase: 'settled' } }));
+    expect(buyer.textContent).toContain(t('hudChrome.trade.woc.settled'));
+    const seller = paint(deps({ pendingOffer: { ...escrowed, phase: 'settled', role: 'seller' } }));
+    expect(seller.textContent).toContain(t('hudChrome.trade.woc.settledSeller'));
+    expect(seller.textContent).not.toContain(t('hudChrome.trade.woc.settled'));
+  });
+
+  it('a rebuild that retires the focused control lands focus on the ladder, never on body', () => {
+    // Pressed Pay renders disabled through the claim: the single-candidate
+    // restore of old dropped focus to body; the ladder catches it.
+    const d = deps({ pendingOffer: escrowed });
+    const root = paint(d);
+    document.body.appendChild(root);
+    root.querySelector<HTMLButtonElement>('[data-woc-pay]')?.focus();
+    const key = captureFocusKey(root);
+    expect(key).toBe('trade-woc-pay');
+    const busy = deps({ pendingOffer: escrowed, paying: true, termsAccepted: false });
+    root.innerHTML = wocTradeArmHtml(wocTradeModelFrom(busy), busy.usdCents);
+    restoreWocTradeFocus(root, key);
+    expect(document.activeElement, 'not body').not.toBe(document.body);
+    expect(root.contains(document.activeElement)).toBe(true);
+    // The face change (pay -> quote review) drops the pay key entirely: focus
+    // lands on Sign, the first rung.
+    const quoted = deps({
+      pendingOffer: escrowed,
+      quote: {
+        totalTokens: 1,
+        sellerTokens: null,
+        burnTokens: null,
+        treasuryTokens: null,
+        usdCents: 100,
+        expiresAtMs: null,
+      },
+    });
+    root.innerHTML = wocTradeArmHtml(wocTradeModelFrom(quoted), quoted.usdCents);
+    restoreWocTradeFocus(root, 'trade-woc-pay');
+    expect(document.activeElement?.hasAttribute('data-woc-sign')).toBe(true);
+    // The tabs are keyed too.
+    expect(
+      root.querySelector('[data-woc-mode="gold"][data-focus-key="trade-woc-tab-gold"]'),
+    ).not.toBeNull();
+  });
+
+  it('the consent row names the same document on both surfaces, through one resolver', () => {
+    // One label key for the pair (the trade arm borrows the Exchange's), and
+    // the href from the shared terms_link resolver: same-origin here (the
+    // test document is an http origin outside the native app).
+    const compose = paint(deps({ termsAccepted: false }));
+    expect(compose.querySelector('.trade-woc-terms')?.textContent).toContain(
+      t('hudChrome.wocMarket.termsLabel'),
+    );
+    // Absent host input renders the site path; the controller supplies the
+    // shell-resolved href (it owns the browser state the painter must not
+    // read), and the painter renders exactly what it is handed.
+    expect(compose.querySelector('.trade-woc-terms-link')?.getAttribute('href')).toBe('/terms');
+    const native = paint(
+      deps({ termsAccepted: false, termsHref: 'https://worldofclaudecraft.com/terms' }),
+    );
+    expect(native.querySelector('.trade-woc-terms-link')?.getAttribute('href')).toBe(
+      'https://worldofclaudecraft.com/terms',
+    );
+    expect(CONTROLLER).toContain("termsHref: termsUrlFor(globalThis.location?.origin ?? '')");
+    expect(CONTROLLER).not.toContain('trade.woc.termsLabel');
   });
 });

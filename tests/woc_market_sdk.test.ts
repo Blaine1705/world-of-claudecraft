@@ -290,6 +290,20 @@ describe('the params channel carries CODE PARAMS, not just the code echo', () =>
     });
   });
 
+  it('resolveOffer maps decline and withdraw to their OWN routes (the seller vs buyer verbs)', async () => {
+    // The controller wires Decline to 'decline' and Withdraw to 'withdraw';
+    // the server binds decline to the seller and withdraw to the buyer. A
+    // swapped action-to-path mapping here would send the seller's Decline
+    // down the buyer's route (answered not_found) with every other pin green.
+    stubFetch(() => ({ status: 200, body: {} }));
+    await client().resolveOffer(7, 'decline');
+    expect(calls[0]?.url.endsWith('/api/woc-market/offers/7/decline')).toBe(true);
+    expect(calls[0]?.init?.method).toBe('POST');
+    calls = [];
+    await client().resolveOffer(7, 'withdraw');
+    expect(calls[0]?.url.endsWith('/api/woc-market/offers/7/withdraw')).toBe(true);
+  });
+
   it('a codeless error body declares NO params (the apiErrorFromBody convention)', async () => {
     stubFetch(() => ({ status: 500, body: { detail: 'wreckage' } }));
     await expect(client().cancelListing(41)).resolves.toEqual({

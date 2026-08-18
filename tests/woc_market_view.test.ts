@@ -4,6 +4,7 @@ import { exchangeHardLock, exchangeItemCategory } from '../src/sim/exchange_elig
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import {
   buildWocMarketView,
+  canCancelListing,
   countdownSigBucket,
   sellableRows,
   type WocActivityView,
@@ -693,5 +694,38 @@ describe('determinism', () => {
       }),
     });
     expect(buildWocMarketView(input)).toEqual(buildWocMarketView(input));
+  });
+});
+
+describe('canCancelListing (the one cancel gate both surfaces share)', () => {
+  const row = { status: 'active', currentCents: null as number | null, cancelPending: false };
+  it('offers Cancel on an active, unbid listing with no cancel intent', () => {
+    expect(canCancelListing(row)).toBe(true);
+  });
+  it('withholds it per dimension: a bid, a pending cancel, a non-active status', () => {
+    expect(canCancelListing({ ...row, currentCents: 500 }), 'bid landed').toBe(false);
+    expect(canCancelListing({ ...row, cancelPending: true }), 'cancel already asked').toBe(false);
+    expect(canCancelListing({ ...row, status: 'closed' }), 'not active').toBe(false);
+    expect(canCancelListing({ ...row, status: 'settling' })).toBe(false);
+  });
+});
+
+describe('wocMarketViewSig: the Activity listings digest', () => {
+  it("moves when a bid lands on one of the seller's own listings (currentCents)", () => {
+    // The seller's Cancel button is gated on an unbid listing and the price
+    // cell renders the bid; a poll that brings the first bid must repaint or
+    // the seller keeps a dead Cancel and the start price.
+    const withBid = (currentBidCents: number | null) =>
+      wocMarketViewSig(
+        buildWocMarketView(
+          makeInput({
+            tab: 'activity',
+            activity: makeActivity({
+              listings: [makeListing({ id: 9, mine: true, currentBidCents })],
+            }),
+          }),
+        ),
+      );
+    expect(withBid(null)).not.toBe(withBid(500));
   });
 });

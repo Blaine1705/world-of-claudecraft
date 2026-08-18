@@ -236,9 +236,17 @@ describe('woc_market_window: i18n and escaping discipline', () => {
     // must pick settlementReview, with purchaseComplete as its else.
     const arm = code.indexOf("out.state === 'review'");
     expect(arm, "anchor missing: out.state === 'review'").toBeGreaterThanOrEqual(0);
-    const window = code.slice(arm, arm + 300);
+    const window = code.slice(arm, arm + 700);
     expect(window).toContain("'hudChrome.wocMarket.settlementReview'");
+    // Decided money still delivering is its own toast (the trade arm's
+    // paymentConfirmed ladder mirrored); purchaseComplete is the else, for
+    // 'delivered' alone.
+    expect(window).toContain("out.state === 'confirmed' || out.state === 'delivering'");
+    expect(window).toContain("'hudChrome.wocMarket.paymentConfirmedDelivering'");
     expect(window).toContain("'hudChrome.wocMarket.purchaseComplete'");
+    expect(window.indexOf('paymentConfirmedDelivering')).toBeLessThan(
+      window.indexOf('purchaseComplete'),
+    );
   });
 
   it('toasts the cancel-pending outcome distinctly from a completed cancel', () => {
@@ -463,7 +471,7 @@ describe('woc_market_window: the item inspector on hover', () => {
     expect(cell).toContain('this.tooltipTargets.set(key, { itemId, instance });');
   });
 
-  it('tags every one of the five item surfaces with a namespaced, stable key', () => {
+  it('tags every item surface with a namespaced, stable key', () => {
     // Namespaced so the same item on two tabs cannot collide, and carrying the
     // row's own id so the hover target survives a poll rebuild.
     for (const key of [
@@ -471,11 +479,14 @@ describe('woc_market_window: the item inspector on hover', () => {
       '`detail:${d.row.id}`',
       // The sell tab keys off the CHOSEN row now, not a row in a rendered list.
       '`sell:${selected.index}`',
-      // ...and off each OPTION in the open picker, which is a fifth surface
+      // ...and off each OPTION in the open picker, which is a surface
       // registered directly rather than through itemCellHtml, because an option
       // is an icon plus a name in its own layout, not a shared cell.
       '`opt:${r.index}`',
       '`activity:${l.id}`',
+      // The item-named Activity pay rows (bids and settlements).
+      '`activity:bid:${b.id}`',
+      '`activity:settle:${s.id}`',
     ]) {
       expect(painter, `missing tooltip key ${key}`).toContain(key);
     }
@@ -1464,6 +1475,14 @@ describe('woc_market_window: payment verdicts reach the player', () => {
     // (resolveNotice), so a language switch never strands the toast.
     expect(sign).toContain("kind: 'bondPending', reason: out.reason ?? null");
     expect(sign).toContain("kind: 'pending', reason: out.reason ?? null");
+    // And the RESOLVE side keeps the two mappers apart: the bond kind renders
+    // through the bond voice, never the purchase-money copy (a swapped mapper
+    // survived the store-side pin alone).
+    const resolve = code.slice(code.indexOf('private resolveNotice('));
+    const bondArm = resolve.slice(resolve.indexOf("case 'bondPending':"));
+    expect(bondArm.slice(0, 120)).toContain('wocBondPendingText(n.reason)');
+    const pendingArm = resolve.slice(resolve.indexOf("case 'pending':"));
+    expect(pendingArm.slice(0, 120)).toContain('wocPaymentPendingText(n.reason)');
     expect(sign).toContain("out.state === 'confirming'");
     // purchaseComplete stays reachable only on the ELSE arm after review and
     // confirming are both handled.
@@ -1527,9 +1546,11 @@ describe('woc_market_window: the Activity tab is an honest, actionable ledger (H
     // than the pane's (mine && unbid): every My-listings row is mine, and
     // this one also requires active status and no cancel-intent stamp; the
     // server's guards stay the authority for everything else.
-    expect(activity).toContain(
-      "l.status === 'active' && !l.cancelPending && l.currentCents === null",
-    );
+    // ONE predicate for both cancel surfaces (woc_market_view.ts
+    // canCancelListing: active, no cancel intent, unbid); the browse detail
+    // pane rides the same one behind its mine check.
+    expect(activity).toContain('canCancelListing(l)');
+    expect(code).toContain('d.row.mine && canCancelListing(d.row)');
     expect(activity).toContain('data-action="cancel-listing"');
     // Focus survives the poll rebuild (the window-family focus-key contract).
     expect(activity).toContain(`wm-activity-cancel-\${l.id}`);
@@ -1555,7 +1576,11 @@ describe('woc_market_window: informed commitment before the first charge (H13/R9
 
   it('the consent checkbox LINKS the Marketplace terms at the moment of acceptance (10.3)', () => {
     expect(confirmFields).toContain('hudChrome.wocMarket.termsLabel');
-    expect(confirmFields).toContain('href="/terms"');
+    // The href comes from the shared shell-aware resolver (src/ui/terms_link.ts):
+    // same-origin on the site, the canonical page from the desktop and native
+    // shells, where a bare '/terms' was a dead link or an app reboot.
+    expect(confirmFields).toContain('termsUrlFor(globalThis.location?.origin');
+    expect(confirmFields).not.toContain('href="/terms"');
     expect(confirmFields).toContain('hudChrome.wocMarket.termsLink');
     // Still hidden once acceptance is durably recorded.
     expect(confirmFields).toContain('model.activity?.termsAccepted');

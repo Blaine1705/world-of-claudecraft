@@ -10,7 +10,8 @@ import {
   technicalErrorMessage,
   userFacingApiError,
 } from '../src/ui/api_error_i18n';
-import { formatDateTime, formatDuration, setLanguage, t } from '../src/ui/i18n';
+import { durationText } from '../src/ui/duration_text';
+import { formatDateTime, formatDuration, formatNumber, setLanguage, t } from '../src/ui/i18n';
 import { tServer } from '../src/ui/server_i18n';
 
 // The matcher and the formatters both default to the active language; pin English so
@@ -117,15 +118,21 @@ describe('userFacingApiError parametric codes', () => {
     expect(userFacingApiError(err)).toBe(t('errors.api.tooManyAttempts'));
   });
 
-  it('names the buy-now cooldown remaining time as a localized duration', () => {
+  it('names the buy-now cooldown remaining time as a multi-unit duration, never raw seconds', () => {
+    // The common answer is the half-hour per-listing cooldown: "30 minutes",
+    // not "1,800 seconds" (the old pin compared formatDuration against itself
+    // and could not see the raw count).
     const err = userFacingApiError({
       code: 'woc_market.claim_cooldown',
       params: { retryAfterSeconds: 1800 },
     });
-    expect(err).toBe(
-      t('hudChrome.wocMarket.claimCooldownRetry', { duration: formatDuration(1800) }),
-    );
-    expect(err).toContain(formatDuration(1800));
+    expect(err).toBe(t('hudChrome.wocMarket.claimCooldownRetry', { duration: durationText(1800) }));
+    expect(err).toContain(formatNumber(30, { style: 'unit', unit: 'minute', unitDisplay: 'long' }));
+    expect(err).not.toContain('1,800');
+    // Sub-minute answers keep the seconds phrase (the 1s floor case).
+    expect(
+      userFacingApiError({ code: 'woc_market.claim_cooldown', params: { retryAfterSeconds: 1 } }),
+    ).toContain(formatDuration(1));
   });
 
   it('renders the plain cooldown sentence when no remaining time rides (older server)', () => {

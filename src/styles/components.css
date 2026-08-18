@@ -16742,7 +16742,8 @@
   #woc-market-window .wm-row-open:focus-visible,
   #woc-market-window button:not(.x-btn):focus-visible,
   #woc-market-window input:focus-visible,
-  #woc-market-window select:focus-visible {
+  #woc-market-window select:focus-visible,
+  #woc-market-window .wm-terms-link:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }

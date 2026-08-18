@@ -66,8 +66,21 @@ export function wocOfferPhase(
  * and announcing delivery for it would tell the buyer of money under review
  * that the purchase completed (the custody-lie class the row label rule
  * already covers); the poll finishes the deal when the resolution does.
+ * 'delivered' rides too: the copy has moved but the sale's own finalize has
+ * not run, and the poll's settled line closes the loop when it does.
+ *
+ * Exported so the arm's status ladder (trade_woc_view.ts DELIVERING_STATES)
+ * can be pinned a SUBSET of this set: a delivering-class sentence only ever
+ * renders on the 'paying' face this set decides.
  */
-const SETTLING_STATES = new Set(['confirming', 'confirmed', 'delivering', 'review']);
+export const WOC_SETTLING_STATES: ReadonlySet<string> = new Set([
+  'confirming',
+  'confirmed',
+  'delivering',
+  'delivered',
+  'review',
+]);
+const SETTLING_STATES = WOC_SETTLING_STATES;
 
 /** How a dead deal died, for the honest report line. 'unpaid' covers every
  *  closed-unsold resolution (no_bids / reserve_not_met / unsettled) AND any

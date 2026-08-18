@@ -27,6 +27,7 @@ import type { IWorld } from '../world_api';
 import { userFacingApiError } from './api_error_i18n';
 import { markDialogRoot } from './dialog_root';
 import { dropdownKeyNav } from './dropdown_nav';
+import { durationText } from './duration_text';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
@@ -36,6 +37,7 @@ import { formatDateTime, formatDuration, formatNumber, t, tPlural } from './i18n
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
+import { termsUrlFor } from './terms_link';
 import { svgIcon } from './ui_icons';
 import { usdText } from './usd_text';
 import { verifiedWocBalance } from './wallet_balance';
@@ -53,6 +55,7 @@ import {
 } from './woc_market_reason_text';
 import {
   buildWocMarketView,
+  canCancelListing,
   type WocMarketTab,
   type WocMarketViewModel,
   type WocSellRowModel,
@@ -584,33 +587,11 @@ export class WocMarketWindow {
     return usdText(cents);
   }
 
-  /** Multi-unit countdown (days/hours/minutes/seconds through the Intl unit
-   *  formatter): auction and settlement windows span days, and a raw
-   *  formatDuration would render them as tens of thousands of seconds. */
+  /** Multi-unit countdown (the shared duration_text core: auction and
+   *  settlement windows span days, and a raw formatDuration would render
+   *  them as tens of thousands of seconds). */
   private countdown(seconds: number): string {
-    const s = Math.max(0, Math.ceil(seconds));
-    if (s >= 172_800) {
-      return formatNumber(Math.floor(s / 86_400), {
-        style: 'unit',
-        unit: 'day',
-        unitDisplay: 'long',
-      });
-    }
-    if (s >= 3_600) {
-      return formatNumber(Math.floor(s / 3_600), {
-        style: 'unit',
-        unit: 'hour',
-        unitDisplay: 'long',
-      });
-    }
-    if (s >= 60) {
-      return formatNumber(Math.floor(s / 60), {
-        style: 'unit',
-        unit: 'minute',
-        unitDisplay: 'long',
-      });
-    }
-    return formatDuration(s);
+    return durationText(seconds);
   }
 
   private tokens(value: number): string {
@@ -851,10 +832,16 @@ export class WocMarketWindow {
             ? `<p class="wm-over-balance">${esc(
                 t('hudChrome.trade.woc.hintInsufficientBalance'),
               )}</p>`
-            : '')
+            : '') +
+          // Buy now claims the listing and walking away has a cost (the
+          // re-claim cooldown and the hourly cap): said BEFORE the click,
+          // like the bid form's disclosures.
+          `<p class="wm-note">${esc(t('hudChrome.wocMarket.buyNowNote'))}</p>`
         : '';
+    // The shared cancel predicate (woc_market_view.ts canCancelListing): a
+    // cancel-pending listing offers no second Cancel here either.
     const cancel =
-      d.row.mine && d.row.currentCents === null
+      d.row.mine && canCancelListing(d.row)
         ? `<button type="button" data-action="cancel-listing" data-listing="${d.row.id}" ` +
           `aria-label="${esc(t('hudChrome.wocMarket.cancelAria', { item: name }))}" data-focus-key="wm-cancel">` +
           `${esc(t('hudChrome.wocMarket.cancelButton'))}</button>`
@@ -965,7 +952,7 @@ export class WocMarketWindow {
       ? ''
       : `<label class="wm-terms"><input type="checkbox" data-field="accept-terms" data-focus-key="wm-terms" ${this.acceptTerms ? 'checked' : ''} /> ${esc(
           t('hudChrome.wocMarket.termsLabel'),
-        )}</label> <a class="wm-terms-link" href="/terms" target="_blank" rel="noopener noreferrer">${esc(
+        )}</label> <a class="wm-terms-link" href="${esc(termsUrlFor(globalThis.location?.origin ?? ''))}" target="_blank" rel="noopener noreferrer">${esc(
           t('hudChrome.wocMarket.termsLink'),
         )}</a>`;
     return termsRow;
@@ -1160,9 +1147,13 @@ export class WocMarketWindow {
     const settlementKey = (state: string): TranslationKey => {
       switch (state) {
         case 'confirming':
+          return 'hudChrome.wocMarket.settlementConfirming';
+        // Decided money whose delivery has not finished: not "confirming"
+        // any more (the chain answered), not "delivered" yet (the trade arm
+        // says the same for the same server state).
         case 'confirmed':
         case 'delivering':
-          return 'hudChrome.wocMarket.settlementConfirming';
+          return 'hudChrome.wocMarket.settlementConfirmedDelivering';
         // The operator-review park: the payment is being verified by hand.
         // Deliberately NOT the default arm ('Payment due' would invite a
         // second payment for money that may already have landed).
@@ -1196,12 +1187,11 @@ export class WocMarketWindow {
         // cancel the PRD promised. Same gate as the browse pane (active and
         // unbid; the server's guards decide the rest, including the
         // cancel-pending conversion on a locked window).
-        const cancel =
-          l.status === 'active' && !l.cancelPending && l.currentCents === null
-            ? ` <button type="button" data-action="cancel-listing" data-listing="${l.id}" ${this.busy ? 'disabled' : ''} ` +
-              `aria-label="${esc(t('hudChrome.wocMarket.cancelAria', { item: this.itemName(l.itemId) }))}" data-focus-key="wm-activity-cancel-${l.id}">` +
-              `${esc(t('hudChrome.wocMarket.cancelButton'))}</button>`
-            : '';
+        const cancel = canCancelListing(l)
+          ? ` <button type="button" data-action="cancel-listing" data-listing="${l.id}" ${this.busy ? 'disabled' : ''} ` +
+            `aria-label="${esc(t('hudChrome.wocMarket.cancelAria', { item: this.itemName(l.itemId) }))}" data-focus-key="wm-activity-cancel-${l.id}">` +
+            `${esc(t('hudChrome.wocMarket.cancelButton'))}</button>`
+          : '';
         return (
           `<li>${this.itemCellHtml(l.itemId, l.quality, `activity:${l.id}`, l.instance)} ` +
           `<span>${l.currentCents === null ? esc(this.usd(l.startCents)) : esc(this.usd(l.currentCents))}</span> ` +
@@ -2195,6 +2185,11 @@ export class WocMarketWindow {
           this.ok('hudChrome.wocMarket.settlementReview');
         } else if (out.state === 'confirming') {
           this.notice = { kind: 'pending', reason: out.reason ?? null, error: false };
+        } else if (out.state === 'confirmed' || out.state === 'delivering') {
+          // Decided money, delivery still completing: "complete" would claim
+          // a finalize that has not run (the trade arm's paymentConfirmed
+          // ladder, mirrored).
+          this.ok('hudChrome.wocMarket.paymentConfirmedDelivering');
         } else {
           this.ok('hudChrome.wocMarket.purchaseComplete');
         }

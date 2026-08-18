@@ -56,6 +56,7 @@ import {
   minNextBidCents,
   screenWireFailReason,
   screenWirePendingReason,
+  WOC_MARKET_DIRECTED_HOLD_SECONDS,
   WOC_MARKET_DURATION_HOURS,
   WOC_MARKET_MAX_PRICE_CENTS,
   WOC_MARKET_MIN_PRICE_CENTS,
@@ -518,6 +519,9 @@ async function statusHandler(ctx: Ctx): Promise<void> {
     allowMounts: policy.allowMounts,
     allowMechChromas: policy.allowMechChromas,
     settlementWindowSeconds: WOC_MARKET_SETTLEMENT_WINDOW_SECONDS,
+    // The directed (p2p) payment hold, so the trade arm's commitment note can
+    // name the deadline whose lapse earns a strike instead of a guessed one.
+    directedHoldSeconds: WOC_MARKET_DIRECTED_HOLD_SECONDS,
   });
 }
 

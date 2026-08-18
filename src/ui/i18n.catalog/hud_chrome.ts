@@ -171,7 +171,8 @@ export const hudChromeStrings = {
     remainingDaysHours: '{days}d {hours}h',
     score: 'Score',
     walletValue: 'Wallet Value (WOC)',
-    usd: '{amount} USD',
+    // Intl already spells the currency; no code appended.
+    usd: '{amount}',
     sol: '{amount} SOL',
     unknown: 'Unknown',
     spinTitle: 'Daily Spin',
@@ -229,15 +230,21 @@ export const hudChromeStrings = {
       priceLabel: 'Price in USD',
       pricePlaceholder: '0.00',
       equivalent: 'About {tokens} $WOC at the current rate',
+      // The compose face is the BUYER's (offering $WOC buys what the other
+      // side staged), so its lines speak to the buyer; the seller's net rides
+      // netLine on the review and waiting faces, where the seller commits.
       variableWarning:
-        'The $WOC amount is a preview, not a fixed price. The exact number is set by a fresh quote when the buyer pays.',
-      feeLine: 'Exchange fee {fee}',
+        'The $WOC amount is a preview, not a fixed price. The exact number is set by a fresh quote when you pay.',
+      feeLine: 'Exchange fee {fee}, taken out of the price.',
       netLine: 'You receive {net}',
+      netLineBuyer: 'The seller receives {net}',
       sendOffer: 'Offer $WOC',
       offerSent: 'Offer sent. It expires in 10 minutes unless {name} accepts.',
       incomingAccept: '{name} offers {price} for your items.',
+      // Role-neutral: it renders on the buyer's compose face and on BOTH
+      // review faces.
       notInstant:
-        'A $WOC sale is not instant. Your item moves into escrow when they accept, and reaches them once payment is verified.',
+        'A $WOC sale is not instant. The item moves into escrow when the seller accepts, and reaches the buyer once payment is verified.',
       blockDisabled: 'The $WOC Exchange is not available on this realm.',
       blockNoWallet: 'Link and verify a wallet to sell items for $WOC.',
       blockPartnerUnknown: 'Checking whether that player can accept $WOC...',
@@ -254,13 +261,18 @@ export const hudChromeStrings = {
       ineligibleNote: '{count} staged item(s) cannot be sold for $WOC.',
       incomingTitle: '$WOC offer from {name}',
       incomingBody: '{name} offers to sell you {item} for {price}.',
-      moneyUsd: '{usd} USD',
+      // The formatter already spells the currency in every locale (US$,
+      // USD, $US), so the key adds no code of its own.
+      moneyUsd: '{usd}',
       moneyTokens: '(~ {tokens} $WOC)',
       waitingOther: 'Offer accepted. Waiting for the other player to accept.',
       payNow: 'Pay {usd}',
       awaitingPayment: 'Waiting for payment confirmation...',
       paying: 'Confirm the payment in your wallet...',
-      settled: 'Paid. The item is on its way by mail.',
+      // A directed sale hands the copy straight into the online buyer's bags;
+      // Ravenpost mail is the fallback (offline, or bags full).
+      settled: 'Paid. Your item is in your bags, or arrives by Ravenpost mail if they were full.',
+      settledSeller: 'Paid. The item was delivered to the buyer.',
       accept: 'Accept offer',
       accepted: 'Offer accepted. Your item is held until payment is verified.',
       decline: 'Decline',
@@ -268,7 +280,11 @@ export const hudChromeStrings = {
       hintInsufficientBalance: 'That is more $WOC than your connected wallet holds.',
       statusAwaitingBuyer: 'Waiting for the buyer to pay.',
       statusPayingBuyer: 'Confirming your payment on the network...',
-      statusPayingSeller: 'Payment received. Confirming on the network...',
+      statusPayingSeller: "The buyer's payment is confirming on the network...",
+      // A settlement parked under an operator verdict is neither confirming
+      // nor decided: its own sentence per side, and no spinner.
+      statusReviewBuyer: 'Your payment is under review.',
+      statusReviewSeller: "The buyer's payment is under review.",
       paidSeller: 'You have received a payment of {price} for your {item}.',
       paidBuyer: 'You have sent a payment of {price} for {item}.',
       // The honest ends of a deal that DID NOT sell (the H13 fix: a closed
@@ -278,11 +294,20 @@ export const hudChromeStrings = {
         'This sale was suspended by a Game Master. The item returns to the seller by Ravenpost mail.',
       closedUnpaid:
         'This sale ended without payment. The item returns to the seller by Ravenpost mail.',
+      closedUnpaidBuyer:
+        'This sale ended without your payment. The item returns to the seller by Ravenpost mail; not paying an accepted deal earns a Marketplace strike.',
       // The seller's way out of an incoming offer and of an unpaid directed
       // sale (the dead wiring H13 named).
       cancelSale: 'Cancel sale',
+      // The seller's cancel answered cancel-pending (a buyer holds the
+      // purchase window): the face records it instead of re-offering Cancel.
+      cancelPendingSeller:
+        'Cancel requested. The sale ends on its own unless the buyer pays first.',
       youDeclined: 'You declined the offer.',
       youWithdrew: 'You withdrew your offer.',
+      // A resolve that raced the other side (or a double tap): the trade
+      // arm's own words, not the bid-bond copy the shared code maps to.
+      offerNotPending: 'This offer is no longer pending.',
       // What the OTHER side sees when a standing offer stops standing.
       offerDeclined: 'The $WOC offer was declined.',
       offerWithdrawn: 'The $WOC offer was withdrawn.',
@@ -293,19 +318,34 @@ export const hudChromeStrings = {
       offerStandsUntil:
         'Your $WOC offer still stands until {time}. Trade with the seller again to finish the deal if they accept.',
       dealAwaitsPayment:
-        'Your $WOC purchase is still unpaid. Trade with the seller again to pay; the deal expires on its own if you do not.',
+        'Your $WOC purchase is still unpaid. Trade with the seller again to pay; the deal expires on its own if you do not, and not paying earns a Marketplace strike.',
+      // Close-time lines for the states the buyer arms above did not cover:
+      // the seller whose copy stays escrowed, and either side mid-payment.
+      closeSellerHold:
+        "Your item stays held for the buyer's payment. Cancel the sale from the Exchange's Activity tab if you change your mind.",
+      closePaymentContinuesBuyer:
+        'Your payment is still being confirmed. Delivery completes on its own.',
+      closePaymentContinuesSeller:
+        "The buyer's payment is still being confirmed. The sale completes on its own.",
+      // The p2p commitment disclosure (the auction arm's bidBindingNote,
+      // for the buyer whose accept escrows the copy): shown before the
+      // shared Accept and again on the pay face.
+      p2pBindingNote:
+        'Once both sides accept, payment is due within {duration}. Not paying earns a Marketplace strike.',
+      p2pBindingNoteUntimed:
+        'Once both sides accept, payment is due shortly after. Not paying earns a Marketplace strike.',
+      // Announced (and kept in the log) when the review face appears, so a
+      // screen reader hears the figures the face was built to show.
+      quoteStaged: 'Payment quote ready for {usd}: {tokens} $WOC, valid until {time}.',
       // Decided money whose delivery has not finished: its own sentence, so
       // "confirming on the network" never describes a confirmed payment and
       // "on its way by mail" never predates the delivery.
       paymentConfirmed:
-        'Payment confirmed. Your item arrives by Ravenpost mail once delivery completes.',
+        'Payment confirmed. Your item arrives in your bags, or by Ravenpost mail if they are full, once delivery completes.',
       statusConfirmedBuyer: 'Payment confirmed. Delivery is completing...',
       statusConfirmedSeller: 'Payment confirmed. The sale is completing...',
       // The courtesy floor hint (the server's refusal stays the authority).
       hintBelowMin: 'The Exchange minimum price is {usd}.',
-      // The consent control (R9): the send carries this checkbox's real
-      // state, and the Marketplace terms are linked beside it (10.3).
-      termsLabel: 'I accept the Marketplace terms.',
     },
   },
   wocStore: {
@@ -5194,16 +5234,21 @@ export const hudChromeStrings = {
     cancelButton: 'Cancel listing',
     cancelAria: 'Cancel your listing of {item}',
     bidBondNote:
-      'Placing a bid holds a refundable bond of {usd}, paid in $WOC. It is returned if you are outbid and forfeited only if you win and do not pay.',
+      'Placing a bid holds a refundable bond of {usd}, paid in $WOC. It is returned if you are outbid (unless a second-chance offer makes you the buyer) and forfeited only if you win and do not pay.',
     // The pre-bid commitment disclosures (draft Terms 10.4/10.5), shown
     // BEFORE the first bond charge: a bid binds once its bond is signed.
     bidBindingNote:
       'A bid is binding once you sign its bond transaction: it cannot be withdrawn, and if you win and do not pay, the bond is forfeited and your account earns a Marketplace strike.',
     bidCloseNote:
-      'A payment confirming in the closing minutes can extend the auction by a few minutes. After it closes, a late payment cannot reopen it and is refunded.',
-    // Bidder-facing second-chance disclosure, shown when the seller opted in.
+      'A bid whose bond confirms in the closing minutes can extend the auction by a few minutes. After it closes, a late payment cannot reopen it and is refunded.',
+    // Bidder-facing second-chance disclosure, shown when the seller opted in:
+    // the cascade is automatic (the bond is re-held and a settlement opens),
+    // not an offer the bidder accepts.
     offerNextNote:
-      'If the winner does not pay, the seller may offer the item to the next bidder at their own bid.',
+      'If the winner does not pay, you may become the buyer at your own bid: your bond is held again and payment is due within the settlement window. Not paying then forfeits the bond and earns a strike.',
+    // Buy now claims the listing; walking away has a cost of its own.
+    buyNowNote:
+      'Buy now holds this listing for you for a short time. Walking away without paying pauses your Buy Now for a while.',
     variableTokenWarning:
       'You are committing to pay a USD value in $WOC. The exact token amount is set by a fresh quote when payment is requested and may differ from the estimate.',
     settlementDeadlineNote: 'If you win, payment is due within {duration} of the auction closing.',
@@ -5245,6 +5290,10 @@ export const hudChromeStrings = {
     bidPlacedStanding: 'Your bid stands. You are the high bidder.',
     bidPlacedOutbid: 'Your bond confirmed, but a higher bid landed first.',
     purchaseComplete: 'Purchase complete. Your item arrives by Ravenpost mail.',
+    // A CONFIRMED or DELIVERING answer is decided money whose delivery has
+    // not finished: not "complete" yet, and not "confirming" any more.
+    paymentConfirmedDelivering:
+      'Payment confirmed. Your item arrives by Ravenpost mail once delivery completes.',
     listingCreated: 'Your listing is live.',
     listingCancelled: 'Listing cancelled. Your item returns by Ravenpost mail.',
     listingCancelPending:
@@ -5297,6 +5346,7 @@ export const hudChromeStrings = {
     bidBondPayAria: 'Pay the bond for your bid on listing {id}',
     settlementOffered: 'Payment due',
     settlementConfirming: 'Confirming',
+    settlementConfirmedDelivering: 'Payment confirmed, delivering',
     settlementReview: 'Payment under review',
     settlementDelivered: 'Delivered',
     settlementExpired: 'Expired unpaid',
@@ -5313,7 +5363,10 @@ export const hudChromeStrings = {
       'The payment transaction failed on the network. Request a fresh quote and try again.',
     settlementFailRefunded: 'This payment was returned to your wallet.',
     settlementFailSuperseded: 'This payment attempt was replaced by a newer one.',
-    settlementFailConfirmingOverdue: 'This payment took too long to confirm and is under review.',
+    // Rendered on a FAILED row only (a review row carries its own label), so
+    // it names the terminal outcome, never a review that is over.
+    settlementFailConfirmingOverdue:
+      'This payment took too long to confirm and could not be verified.',
     settlementFailGeneric: 'This payment could not be completed.',
     paymentSeenAwaitingFinality: 'Payment seen on the ledger. Waiting for final confirmation.',
     paymentNotYetVisible:

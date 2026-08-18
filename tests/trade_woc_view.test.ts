@@ -709,14 +709,28 @@ describe('the confirmed-awaiting-delivery status sentences', () => {
     const model = buildWocTradeModel({
       ...base,
       pendingOffer: paying('buyer', 'confirming'),
-      quote: { totalTokens: 5, usdCents: 100, expiresAtMs: null },
+      quote: {
+        sellerTokens: null,
+        burnTokens: null,
+        treasuryTokens: null,
+        totalTokens: 5,
+        usdCents: 100,
+        expiresAtMs: null,
+      },
     });
     expect(model.quoteReview).not.toBeNull();
     // Never for the seller, whatever the phase.
     const seller = buildWocTradeModel({
       ...base,
       pendingOffer: paying('seller', 'confirming'),
-      quote: { totalTokens: 5, usdCents: 100, expiresAtMs: null },
+      quote: {
+        sellerTokens: null,
+        burnTokens: null,
+        treasuryTokens: null,
+        totalTokens: 5,
+        usdCents: 100,
+        expiresAtMs: null,
+      },
     });
     expect(seller.quoteReview).toBeNull();
   });

@@ -32,6 +32,7 @@ import {
   resetWocMarketRuntimeForTests,
   routes,
 } from '../../server/woc_market_routes';
+import { WOC_MARKET_DIRECTED_HOLD_SECONDS } from '../../server/woc_market_rules';
 import { type FakeCtxOverrides, type FakeRes, fakeCtx } from './helpers';
 
 const VIEWER = 7;
@@ -772,8 +773,13 @@ describe('response wrappers expose exactly their pinned key sets', () => {
         'allowMounts',
         'allowMechChromas',
         'settlementWindowSeconds',
+        'directedHoldSeconds',
       ].sort(),
     );
+    // The p2p hold rides as the rules constant, a positive number of seconds
+    // (the trade arm's commitment note renders it through durationText).
+    expect(body.directedHoldSeconds).toBe(WOC_MARKET_DIRECTED_HOLD_SECONDS);
+    expect(body.directedHoldSeconds).toBeGreaterThan(0);
     // Keys AND values in one pin: the fixture's polarities differ (available
     // true, healthy false), so a swapped or hard-coded projection goes red;
     // healthy is what the client's paused banner derives from.

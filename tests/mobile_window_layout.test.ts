@@ -175,6 +175,30 @@ describe('mobile window layout CSS', () => {
     expect(mobileCss).not.toContain('body.mobile-touch .mkt-filters {');
   });
 
+  it('floors the money-surface consent controls and the bid field on touch (the Exchange and the trade arm)', () => {
+    // A checkbox cannot be 40px without looking broken, so the LABEL is the
+    // tap target and carries the floor; the terms link beside it is the
+    // smallest money-surface tap target and gets an inline-flex floor of its
+    // own; the box itself is sized 24px; the legal caption is floored to the
+    // window's 16px button size; the bid amount field joins the 40px floor.
+    // Literal mobile layout values, pinned here like their siblings.
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #woc-market-window label\.wm-terms,\s*body\.mobile-touch #woc-market-window label\.wm-offer-next,\s*body\.mobile-touch #trade-window \.trade-woc-terms \{\s*min-height: 40px;/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #woc-market-window \.wm-terms-link,\s*body\.mobile-touch #trade-window \.trade-woc-terms-link \{[^}]*display: inline-flex;[^}]*min-height: 40px;/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #woc-market-window label\.wm-terms input,\s*body\.mobile-touch #woc-market-window label\.wm-offer-next input,\s*body\.mobile-touch #trade-window \.trade-woc-terms input \{[^}]*width: 24px;[^}]*height: 24px;/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #trade-window \.trade-woc-terms,\s*body\.mobile-touch #trade-window \.trade-woc-terms-link \{\s*font-size: 16px;/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #woc-market-window \.wm-bid-form input\[data-field="bid-usd"\] \{\s*min-height: 40px;/,
+    );
+  });
+
   it('floors the vendor purchase-quantity controls at 40px under a coarse pointer (phase 21)', () => {
     // The control row lives in components.css beside the rest of the vendor
     // family; the coarse-pointer floor is the mobile tap-target contract the

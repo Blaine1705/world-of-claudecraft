@@ -20,6 +20,7 @@
 // the stable code + params structurally off the thrown value, never importing the
 // `net/` ApiError class (the src/ui -> net dependency ban).
 
+import { durationText } from './duration_text';
 import { formatDateTime, formatDuration, type TranslationKey, t } from './i18n';
 import { tServer } from './server_i18n';
 
@@ -254,10 +255,13 @@ function resolveByCode(code: string, params: Record<string, unknown> | undefined
     // leaf cannot live there); an older server sends no params and the plain
     // apiError sentence still renders (never null: "later" is honest, just
     // less useful).
+    // Through the shared multi-unit phrase, never a raw seconds count: the
+    // common answer is the half-hour per-listing cooldown, and formatDuration
+    // alone rendered "1,800 seconds".
     const seconds = params?.retryAfterSeconds;
     if (typeof seconds === 'number' && Number.isFinite(seconds) && seconds > 0) {
       return t('hudChrome.wocMarket.claimCooldownRetry', {
-        duration: formatDuration(seconds),
+        duration: durationText(seconds),
       });
     }
     return t(key);

@@ -14,6 +14,7 @@
 // *_controller.ts it holds the painter gate's cold contract (no forced-reflow
 // read, no repeating driver: the estimate debounce is a one-shot timeout).
 
+import type { WocQuoteView } from '../../../net/woc_market_sdk';
 import { ITEMS } from '../../../sim/data';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
@@ -21,9 +22,10 @@ import { userFacingApiError } from '../../api_error_i18n';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { captureFocusKey } from '../../focus_restore';
-import { formatDateTime, formatMoney as formatLocalizedMoney, t } from '../../i18n';
+import { formatDateTime, formatMoney as formatLocalizedMoney, formatNumber, t } from '../../i18n';
 import type { TranslationKey } from '../../i18n.catalog';
 import { knownItemDef } from '../../known_item';
+import { termsUrlFor } from '../../terms_link';
 import { buildTradeItemRow, tradeRowTooltipTarget } from '../../trade_view';
 import {
   refreshWocTradeArm,
@@ -33,17 +35,18 @@ import {
   wocTradeArmHtml,
   wocTradeModelFrom,
   wocTradeMoneyText,
-  wocUsdText,
 } from '../../trade_woc_panel';
 import {
   inventoryIndexOfStaged,
   type WocPendingOffer,
   type WocTradePartner,
+  type WocTradeQuoteReview,
   type WocTradeSplit,
   wocTradableSlot,
 } from '../../trade_woc_view';
 import { svgIcon } from '../../ui_icons';
 import { unknownItemIconHtml } from '../../unknown_item_icon';
+import { usdText } from '../../usd_text';
 import { verifiedWocBalance } from '../../wallet_balance';
 import { walletBridgeErrorText } from '../../wallet_bridge_reason_text';
 import { wocPaymentPendingText } from '../../woc_market_reason_text';
@@ -70,6 +73,10 @@ const WOC_TRADE_CLOSED_KEYS: Record<WocOfferClosedReason, TranslationKey> = {
   suspended: 'hudChrome.trade.woc.closedSuspended',
   unpaid: 'hudChrome.trade.woc.closedUnpaid',
 };
+
+/** The buyer's own unpaid ending names the consequence the pre-commitment
+ *  note disclosed (a Marketplace strike); the seller reads the plain line. */
+const WOC_TRADE_CLOSED_UNPAID_BUYER: TranslationKey = 'hudChrome.trade.woc.closedUnpaidBuyer';
 
 /** The host capabilities the controller borrows from Hud, per the domain
  *  contract (narrow closures, never the Hud class). */
@@ -108,6 +115,9 @@ export class WocTradeController {
   /** The Exchange's minimum listing price, fetched once from /status for the
    *  courtesy below-min hint. Null until it answers; null never blocks. */
   private wocTradeMinPriceCents: number | null = null;
+  /** The realm's directed payment hold from the same /status answer, for the
+   *  buyer's commitment note (the deadline whose lapse earns a strike). */
+  private wocTradeDirectedHoldSeconds: number | null = null;
   /** Durable Marketplace-terms acceptance (from /me, or observed on a send
    *  that carried real consent). Gates the consent row's visibility (R9). */
   private wocTradeTermsAccepted = false;
@@ -115,20 +125,28 @@ export class WocTradeController {
    *  window's wholesale rebuilds (the Exchange window's acceptTerms idiom).
    *  Reset per trade: consent is per commitment until durably recorded. */
   private wocTradeTermsChecked = false;
-  /** The buy-now settlement this deal already claimed, so backing out of the
-   *  quote review and pressing Pay again re-quotes THAT settlement instead
-   *  of re-claiming a lock the buyer already holds (buy_now_locked). */
-  private wocTradeSettlementId: number | null = null;
+  /** The buy-now settlement this deal already claimed, KEYED to the offer it
+   *  belongs to, so backing out of the quote review and pressing Pay again
+   *  re-quotes THAT settlement instead of re-claiming a lock the buyer
+   *  already holds (buy_now_locked), and so a settlement can never outlive
+   *  its deal: the poll drops it the moment a different offer is adopted,
+   *  and both the pay and sign paths refuse one that names another offer.
+   *  The USD it settles rides along (the re-quote path has no other
+   *  authoritative source for it). */
+  private wocTradeSettlement: { offerId: number; id: number; usdCents: number } | null = null;
   /** The staged settlement quote awaiting the buyer's explicit Sign and pay.
-   *  Its presence renders the review panel; spent or abandoned, it clears. */
-  private wocTradeQuote: {
-    totalTokens: number | null;
-    usdCents: number;
-    expiresAtMs: number | null;
-    reference: string | null;
-    transactionBase64: string | null;
-    signatureRequired?: boolean;
-  } | null = null;
+   *  Its presence renders the review panel; spent or abandoned, it clears.
+   *  The structural half (WocTradeQuoteReview) is what the face renders and
+   *  the repaint signature projects; the transaction blob and reference are
+   *  the sign path's own. */
+  private wocTradeQuote:
+    | (WocTradeQuoteReview & {
+        offerId: number;
+        reference: string | null;
+        transactionBase64: string;
+        signatureRequired?: boolean;
+      })
+    | null = null;
   private wocTradePartner: WocTradePartner | null = null;
   /** Whether the lookup has ANSWERED, which null alone cannot express. */
   private wocTradePartnerResolved = false;
@@ -142,8 +160,22 @@ export class WocTradeController {
   private wocTradeOffer: WocPendingOffer | null = null;
   private wocTradeOfferPolledAtMs = 0;
   /** Re-entry guard: a second click mid-signature would take two lock+quote
-   *  round trips for one purchase. */
+   *  round trips for one purchase. Also the busy face's input (the pressed
+   *  Pay disables and spins through the claim round trips). */
   private wocTradePaying = false;
+  /** True ONLY while a signature is out with the wallet and the confirm is
+   *  in flight: the one interval the poll may hold the buyer's face at
+   *  'paying' locally. Deliberately narrower than wocTradePaying, which also
+   *  spans the claim (buyNow + quote), where nothing was signed and a poll
+   *  beat must not read as a payment confirming. */
+  private wocTradeSigning = false;
+  /** A Decline / Withdraw / Cancel sale request in flight: one click, one
+   *  request, and the pressed control renders disabled meanwhile. */
+  private wocTradeResolving = false;
+  /** The seller's cancel was answered cancel-pending for THIS offer id (the
+   *  buyer keeps their purchase window): the face records it and withdraws
+   *  Cancel sale until the poll converges the outcome. */
+  private wocTradeCancelPendingFor: number | null = null;
   /** The seller's acceptance is in flight (the step-up challenge mint plus the
    *  wallet round trip). Guards re-entrancy the same way wocTradePaying does
    *  for the pay path, and drives the disabled/waiting face on the Accept
@@ -224,6 +256,10 @@ export class WocTradeController {
       tokens: this.wocTradeTokens,
       split: this.wocTradeSplit,
       minPriceCents: this.wocTradeMinPriceCents,
+      directedHoldSeconds: this.wocTradeDirectedHoldSeconds,
+      // The consent link per shell (this module owns the browser state the
+      // painter must not read).
+      termsHref: termsUrlFor(globalThis.location?.origin ?? ''),
       termsAccepted: this.wocTradeTermsAccepted,
       termsChecked: this.wocTradeTermsChecked,
       quote: this.wocTradeQuote,
@@ -231,6 +267,9 @@ export class WocTradeController {
       // must stop looking pressable the moment it is pressed, not when the
       // quote lands two RTTs later.
       paying: this.wocTradePaying,
+      resolving: this.wocTradeResolving,
+      cancelPending:
+        this.wocTradeOffer !== null && this.wocTradeCancelPendingFor === this.wocTradeOffer.id,
       // Paint-time clock for the staged quote's expiry face. Deliberately
       // NOT in the repaint signature: the face goes disabled on the next
       // repaint after lapse, and the sign handler re-checks at the click,
@@ -288,7 +327,8 @@ export class WocTradeController {
           this.reportResolvedWocOffer(this.wocTradeOffer.id, gone?.status);
           this.wocTradeOffer = null;
           this.wocTradeQuote = null;
-          this.wocTradeSettlementId = null;
+          this.wocTradeSettlement = null;
+          this.wocTradeCancelPendingFor = null;
           // The adoption-stored split dies with the deal it described, or a
           // later compose form paints the dead deal's Fee / You receive lines.
           this.wocTradeSplit = null;
@@ -296,7 +336,10 @@ export class WocTradeController {
         }
         return;
       }
-      const phase = wocOfferPhase(mine, this.wocTradePaying && mine.role === 'buyer');
+      // Only a signature out with the wallet holds the local 'paying' face:
+      // the claim round trips are NOT a payment, and a poll beat during them
+      // must not read as one confirming.
+      const phase = wocOfferPhase(mine, this.wocTradeSigning && mine.role === 'buyer');
       const step = wocOfferPollStep(this.wocTradeOffer, mine, phase);
       // The deal is DONE. Say so, in this side's own words, and get out of the
       // way: the window has nothing left to offer and leaving it open reads as
@@ -319,6 +362,20 @@ export class WocTradeController {
       // Quote the agreed price once, so both sides show the same token figure.
       const est = await hooks.client.estimate(mine.usdCents);
       if (this.sim.tradeInfo?.otherName !== otherName) return;
+      // A settlement, staged quote, or cancel-pending mark belongs to ONE
+      // deal: adopting a different offer id drops them, so a held settlement
+      // can never be re-quoted under a face that names another price.
+      if (this.wocTradeOffer?.id !== mine.id) {
+        if (this.wocTradeSettlement !== null && this.wocTradeSettlement.offerId !== mine.id) {
+          this.wocTradeSettlement = null;
+        }
+        if (this.wocTradeQuote !== null && this.wocTradeQuote.offerId !== mine.id) {
+          this.wocTradeQuote = null;
+        }
+        if (this.wocTradeCancelPendingFor !== null && this.wocTradeCancelPendingFor !== mine.id) {
+          this.wocTradeCancelPendingFor = null;
+        }
+      }
       this.wocTradeOffer = adoptedWocOffer(mine, phase, est?.amount?.tokens ?? null);
       // The split rides the same estimate: without this an ADOPTED offer (the
       // window reopened mid-deal) showed tokens but blank Fee and You receive
@@ -352,7 +409,7 @@ export class WocTradeController {
       t(
         row.role === 'seller' ? 'hudChrome.trade.woc.paidSeller' : 'hudChrome.trade.woc.paidBuyer',
         {
-          price: wocUsdText(row.usdCents),
+          price: usdText(row.usdCents),
           // The raw id is a last resort, not a blank: a message naming no item at
           // all is worse than one naming an id the player can at least search.
           item: item ? itemDisplayName(item) : (row.itemId ?? ''),
@@ -366,7 +423,8 @@ export class WocTradeController {
     this.wocTradeOffer = null;
     this.wocTradeSplit = null;
     this.wocTradeQuote = null;
-    this.wocTradeSettlementId = null;
+    this.wocTradeSettlement = null;
+    this.wocTradeCancelPendingFor = null;
     this.lastTradeSig = '';
     // Closing the trade itself is the sim's call, not a display change: the
     // other player's client must learn the trade is over too. CLOSE, not
@@ -389,17 +447,26 @@ export class WocTradeController {
    */
   private finishClosedWocTrade(row: {
     id: number;
+    role: 'buyer' | 'seller';
     listingStatus: string | null;
     listingResolution: string | null;
   }): void {
     if (this.wocTradeFinished.has(row.id)) return;
     this.wocTradeFinished.add(row.id);
     const reason = wocOfferClosedReason(row) ?? 'unpaid';
-    this.log(t(WOC_TRADE_CLOSED_KEYS[reason]), '#ff6b6b');
+    // The buyer whose deal lapsed unpaid reads the consequence the
+    // pre-commitment note disclosed; every other ending is one sentence for
+    // both sides.
+    const key =
+      reason === 'unpaid' && row.role === 'buyer'
+        ? WOC_TRADE_CLOSED_UNPAID_BUYER
+        : WOC_TRADE_CLOSED_KEYS[reason];
+    this.log(t(key), '#ff6b6b');
     this.wocTradeOffer = null;
     this.wocTradeSplit = null;
     this.wocTradeQuote = null;
-    this.wocTradeSettlementId = null;
+    this.wocTradeSettlement = null;
+    this.wocTradeCancelPendingFor = null;
     this.lastTradeSig = '';
   }
 
@@ -443,12 +510,19 @@ export class WocTradeController {
     this.wocTradeOffer = null;
     this.wocTradeSplit = null;
     this.wocTradeQuote = null;
-    this.wocTradeSettlementId = null;
+    this.wocTradeSettlement = null;
+    this.wocTradeCancelPendingFor = null;
     if (!hooks || !offer || this.wocTradeFinished.has(offer.id)) return;
     void hooks.client.offers().then((res) => {
       if (!res.ok) return;
       const row = res.offers.find((o) => o.id === offer.id);
       if (!row) return;
+      // The other side resolved it between this side's last poll and the
+      // close (or the TTL lapsed): the verdict is the news, once.
+      if (row.status !== 'pending' && row.status !== 'accepted') {
+        this.reportResolvedWocOffer(offer.id, row.status);
+        return;
+      }
       const phase = wocOfferPhase(row);
       if (phase === 'settled') {
         this.finishWocTrade(row);
@@ -458,10 +532,11 @@ export class WocTradeController {
         this.finishClosedWocTrade(row);
         return;
       }
-      // Still LIVE: the buyer who just closed the window must know the deal
-      // did not close with it, and what finishing it takes. The seller needs
-      // no line (their next move, accept or decline, reopens a trade anyway,
-      // and the offer lapses on its own).
+      // Still LIVE: whoever just closed the window must know the deal did
+      // not close with it, and what it still owes them. A pending offer's
+      // seller needs no line (their next move, accept or decline, reopens a
+      // trade anyway, and the offer lapses on its own); every other live
+      // state carries money or an escrowed copy and says so.
       if (row.status === 'pending' && row.role === 'buyer' && row.expiresAtMs) {
         this.log(
           t('hudChrome.trade.woc.offerStandsUntil', {
@@ -469,8 +544,31 @@ export class WocTradeController {
           }),
           '#ffd100',
         );
-      } else if (phase === 'awaiting_payment' && row.role === 'buyer') {
-        this.log(t('hudChrome.trade.woc.dealAwaitsPayment'), '#ffd100');
+      } else if (phase === 'awaiting_payment') {
+        this.log(
+          t(
+            row.role === 'buyer'
+              ? 'hudChrome.trade.woc.dealAwaitsPayment'
+              : 'hudChrome.trade.woc.closeSellerHold',
+          ),
+          '#ffd100',
+        );
+      } else if (phase === 'paying') {
+        // Under review, the parked sentence; otherwise the payment is still
+        // moving on its own.
+        const parked = row.settlementState === 'review';
+        this.log(
+          t(
+            row.role === 'buyer'
+              ? parked
+                ? 'hudChrome.trade.woc.statusReviewBuyer'
+                : 'hudChrome.trade.woc.closePaymentContinuesBuyer'
+              : parked
+                ? 'hudChrome.trade.woc.statusReviewSeller'
+                : 'hudChrome.trade.woc.closePaymentContinuesSeller',
+          ),
+          '#ffd100',
+        );
       }
     });
   }
@@ -607,12 +705,18 @@ export class WocTradeController {
    * The buyer presses Pay: claim the lock and stage the quote FOR REVIEW.
    *
    * The Exchange's own sequence up to the quote, reused rather than
-   * reimplemented: take the buy-now lock, ask for a settlement quote. It then
-   * STOPS: the review panel shows the token total and the expiry, and only
-   * the explicit Sign and pay hands the SERVER-BUILT transaction to the
-   * wallet (H13: click-to-wallet with nothing shown in between was the
-   * informed-commitment gap). The client never assembles a transaction, and
-   * nothing here computes an amount.
+   * reimplemented: take the buy-now lock (whose answer already carries a
+   * fresh quote), or re-quote the settlement this deal already holds. It then
+   * STOPS: the review panel shows the token total, the fee legs, and the
+   * expiry, and only the explicit Sign and pay hands the SERVER-BUILT
+   * transaction to the wallet (H13: click-to-wallet with nothing shown in
+   * between was the informed-commitment gap). The client never assembles a
+   * transaction, and nothing here computes an amount.
+   *
+   * Every write after an await is guarded on the deal still being THIS deal:
+   * a claim that answers after the trade ended (partner cancelled, window
+   * closed) must not leave a settlement or a staged quote behind for the
+   * next deal's Pay to spend on the OLD one.
    */
   private async payWocTradeOffer(): Promise<void> {
     const hooks = this.wocMarketHooks;
@@ -620,12 +724,19 @@ export class WocTradeController {
     if (!hooks || !offer || offer.listingId === null || this.wocTradePaying) return;
     if (this.wocTradeQuote !== null) return; // already under review
     this.wocTradePaying = true;
+    // The pressed face NOW (disabled + spinner), not on the next band tick.
+    this.lastTradeSig = '';
+    this.updateTradeWindow();
     try {
       // Re-entry after Not now (or a lapsed quote): the buyer already holds
-      // the settlement, and a second buyNow would refuse over their own lock.
-      let settlementId = this.wocTradeSettlementId;
-      let usdCents = offer.usdCents;
-      if (settlementId === null) {
+      // the settlement FOR THIS OFFER, and a second buyNow would refuse over
+      // their own lock. A settlement keyed to another offer is never reused.
+      let held =
+        this.wocTradeSettlement !== null && this.wocTradeSettlement.offerId === offer.id
+          ? this.wocTradeSettlement
+          : null;
+      let quote: WocQuoteView | null = null;
+      if (held === null) {
         const bought = await hooks.client.buyNow({
           listingId: offer.listingId,
           characterId: hooks.characterId() ?? 0,
@@ -633,41 +744,77 @@ export class WocTradeController {
           // consent row's checkbox on this very face. Never a bare true.
           acceptTerms: this.wocTradeTermsAccepted || this.wocTradeTermsChecked,
         });
+        if (this.wocTradeOffer?.id !== offer.id) return; // the deal moved on
         if (!bought.ok) {
           this.log(userFacingApiError({ code: bought.code, params: bought.params }), '#ff6b6b');
           return;
         }
         // The server recorded the acceptance this send carried.
         this.wocTradeTermsAccepted = true;
-        settlementId = bought.settlement.id;
-        usdCents = bought.settlement.amountCents ?? offer.usdCents;
-        this.wocTradeSettlementId = settlementId;
+        held = {
+          offerId: offer.id,
+          id: bought.settlement.id,
+          usdCents: bought.settlement.amountCents,
+        };
+        this.wocTradeSettlement = held;
+        // The claim's own quote is fresh: a second round trip would only
+        // supersede it service-side for nothing (the Exchange stages it too).
+        quote = bought.quote?.transactionBase64 ? bought.quote : null;
       }
-      const quoted = await hooks.client.settlementQuote(settlementId);
-      if (!quoted.ok || !quoted.quote.transactionBase64) {
-        this.log(
-          userFacingApiError(
-            quoted.ok
-              ? { code: 'woc_market.quote_unavailable' }
-              : { code: quoted.code, params: quoted.params },
-          ),
-          '#ff6b6b',
-        );
-        return;
+      if (quote === null) {
+        const quoted = await hooks.client.settlementQuote(held.id);
+        if (this.wocTradeOffer?.id !== offer.id) return; // the deal moved on
+        if (!quoted.ok || !quoted.quote.transactionBase64) {
+          this.log(
+            userFacingApiError(
+              quoted.ok
+                ? { code: 'woc_market.quote_unavailable' }
+                : { code: quoted.code, params: quoted.params },
+            ),
+            '#ff6b6b',
+          );
+          return;
+        }
+        quote = quoted.quote;
       }
+      // Guarded above; the type just cannot see it.
+      if (!quote.transactionBase64) return;
       this.wocTradeQuote = {
-        totalTokens: quoted.quote.amount?.tokens ?? null,
-        usdCents,
-        expiresAtMs: quoted.quote.expiresAtMs ?? null,
-        reference: quoted.quote.reference ?? null,
-        transactionBase64: quoted.quote.transactionBase64,
-        ...(quoted.quote.signatureRequired === undefined
+        offerId: offer.id,
+        totalTokens: quote.amount?.tokens ?? null,
+        sellerTokens: quote.seller?.tokens ?? null,
+        burnTokens: quote.burn?.tokens ?? null,
+        treasuryTokens: quote.treasury?.tokens ?? null,
+        // The USD the held settlement settles, never the face's price: the
+        // two agree today, and the settlement is the authority if they ever
+        // do not.
+        usdCents: held.usdCents,
+        expiresAtMs: quote.expiresAtMs ?? null,
+        reference: quote.reference ?? null,
+        transactionBase64: quote.transactionBase64,
+        ...(quote.signatureRequired === undefined
           ? {}
-          : { signatureRequired: quoted.quote.signatureRequired }),
+          : { signatureRequired: quote.signatureRequired }),
       };
+      // Say what the review face shows, in the log too: a live region minted
+      // WITH its content inside a rebuild is not reliably announced, and the
+      // figures the face exists to show should reach a screen reader as
+      // surely as a sighted player.
+      if (this.wocTradeQuote.totalTokens !== null && this.wocTradeQuote.expiresAtMs !== null) {
+        this.log(
+          t('hudChrome.trade.woc.quoteStaged', {
+            usd: usdText(held.usdCents),
+            tokens: formatNumber(this.wocTradeQuote.totalTokens, { maximumFractionDigits: 4 }),
+            time: formatDateTime(this.wocTradeQuote.expiresAtMs, { timeStyle: 'short' }),
+          }),
+          '#ffd100',
+        );
+      }
       this.lastTradeSig = '';
     } finally {
       this.wocTradePaying = false;
+      this.lastTradeSig = '';
+      this.updateTradeWindow();
     }
   }
 
@@ -678,8 +825,16 @@ export class WocTradeController {
     const hooks = this.wocMarketHooks;
     const offer = this.wocTradeOffer;
     const staged = this.wocTradeQuote;
-    const settlementId = this.wocTradeSettlementId;
-    if (!hooks || !offer || staged === null || settlementId === null || this.wocTradePaying) {
+    const held = this.wocTradeSettlement;
+    if (
+      !hooks ||
+      !offer ||
+      staged === null ||
+      staged.offerId !== offer.id ||
+      held === null ||
+      held.offerId !== offer.id ||
+      this.wocTradePaying
+    ) {
       return;
     }
     // A lapsed quote must never reach the wallet: signing it buys a refusal
@@ -693,6 +848,7 @@ export class WocTradeController {
       return;
     }
     this.wocTradePaying = true;
+    this.wocTradeSigning = true;
     // Show the pending face NOW, not when the next poll happens to notice. The
     // wallet takes over the screen from here, and coming back to a button
     // that still looks pressable is what made a successful payment read as a
@@ -701,6 +857,7 @@ export class WocTradeController {
     this.wocTradeQuote = null;
     this.wocTradeOffer = { ...offer, phase: 'paying' };
     this.lastTradeSig = '';
+    this.updateTradeWindow();
     try {
       let signature: string;
       if (staged.signatureRequired === false) {
@@ -713,7 +870,7 @@ export class WocTradeController {
       } else {
         this.log(t('hudChrome.trade.woc.paying'), '#ffd100');
         try {
-          signature = await hooks.signAndSendTransactionBase64(staged.transactionBase64 ?? '');
+          signature = await hooks.signAndSendTransactionBase64(staged.transactionBase64);
         } catch (err) {
           // Dev channel keeps the raw error; the player line is classified,
           // never rendered from err.message (the wallet-bridge i18n medium).
@@ -727,7 +884,7 @@ export class WocTradeController {
           return;
         }
       }
-      const done = await hooks.client.confirmSettlement(settlementId, signature);
+      const done = await hooks.client.confirmSettlement(held.id, signature);
       if (!done.ok) {
         this.log(userFacingApiError({ code: done.code, params: done.params }), '#ff6b6b');
         return;
@@ -758,36 +915,56 @@ export class WocTradeController {
         this.wocTradeOffer = { ...this.wocTradeOffer, settlementState: done.state };
       }
     } finally {
+      this.wocTradeSigning = false;
       this.wocTradePaying = false;
       this.lastTradeSig = '';
+      this.updateTradeWindow();
     }
   }
 
   private async cancelWocTradeOffer(action: 'decline' | 'withdraw'): Promise<void> {
     const hooks = this.wocMarketHooks;
     const offer = this.wocTradeOffer;
-    if (!hooks || !offer) return;
-    const res = await hooks.client.resolveOffer(offer.id, action);
-    if (res.ok) {
-      // Mark the offer reported BEFORE the next poll runs: the resolver got
-      // their feedback here, and the lingering resolved row must not earn
-      // them a second "offer was declined/withdrawn" line from the clear arm.
-      this.wocTradeFinished.add(offer.id);
-      this.log(
-        t(
-          action === 'decline'
-            ? 'hudChrome.trade.woc.youDeclined'
-            : 'hudChrome.trade.woc.youWithdrew',
-        ),
-        '#ffd100',
-      );
-      this.wocTradeOffer = null;
-      this.wocTradeSplit = null;
-      this.wocTradeQuote = null;
-      this.wocTradeSettlementId = null;
+    // One click, one request: a double tap (or a race with the other side)
+    // used to send two resolves and render the second answer's bid-bond copy.
+    if (!hooks || !offer || this.wocTradeResolving) return;
+    this.wocTradeResolving = true;
+    this.lastTradeSig = '';
+    this.updateTradeWindow();
+    try {
+      const res = await hooks.client.resolveOffer(offer.id, action);
+      if (res.ok) {
+        // Mark the offer reported BEFORE the next poll runs: the resolver got
+        // their feedback here, and the lingering resolved row must not earn
+        // them a second "offer was declined/withdrawn" line from the clear arm.
+        this.wocTradeFinished.add(offer.id);
+        this.log(
+          t(
+            action === 'decline'
+              ? 'hudChrome.trade.woc.youDeclined'
+              : 'hudChrome.trade.woc.youWithdrew',
+          ),
+          '#ffd100',
+        );
+        if (this.wocTradeOffer?.id === offer.id) {
+          this.wocTradeOffer = null;
+          this.wocTradeSplit = null;
+          this.wocTradeQuote = null;
+          this.wocTradeSettlement = null;
+          this.wocTradeCancelPendingFor = null;
+        }
+      } else if (res.code === 'woc_market.not_pending') {
+        // The other side resolved it first (or the escrow-failed transient
+        // moved it): the trade arm's own sentence, not the shared code's
+        // bid-bond copy. The poll reports the verdict itself.
+        this.log(t('hudChrome.trade.woc.offerNotPending'), '#ffd100');
+      } else {
+        this.log(userFacingApiError({ code: res.code, params: res.params }), '#ff6b6b');
+      }
+    } finally {
+      this.wocTradeResolving = false;
       this.lastTradeSig = '';
-    } else {
-      this.log(userFacingApiError({ code: res.code, params: res.params }), '#ff6b6b');
+      this.updateTradeWindow();
     }
   }
 
@@ -799,29 +976,51 @@ export class WocTradeController {
    * into CANCEL-PENDING (the buyer keeps their window; the listing closes on
    * its own unless they pay), and a paid window refuses settlement_in_flight
    * honestly. The deal stays held on cancel-pending, because it may still
-   * settle; a plain cancel ends it here and the return flight brings the
-   * copy home by mail.
+   * settle, and the face RECORDS the pending cancel (Cancel sale withdrawn,
+   * the waiting sentence says so) until the poll converges the outcome; a
+   * plain cancel ends it here and the return flight brings the copy home by
+   * mail.
    */
   private async cancelWocDirectedSale(): Promise<void> {
     const hooks = this.wocMarketHooks;
     const offer = this.wocTradeOffer;
-    if (!hooks || !offer || offer.listingId === null || offer.role !== 'seller') return;
-    const res = await hooks.client.cancelListing(offer.listingId);
-    if (!res.ok) {
-      this.log(userFacingApiError({ code: res.code, params: res.params }), '#ff6b6b');
+    if (
+      !hooks ||
+      !offer ||
+      offer.listingId === null ||
+      offer.role !== 'seller' ||
+      this.wocTradeResolving
+    ) {
       return;
     }
-    if (res.cancelPending === true) {
-      this.log(t('hudChrome.wocMarket.listingCancelPending'), '#ffd100');
-      return;
-    }
-    this.wocTradeFinished.add(offer.id);
-    this.log(t('hudChrome.wocMarket.listingCancelled'), '#ffd100');
-    this.wocTradeOffer = null;
-    this.wocTradeSplit = null;
-    this.wocTradeQuote = null;
-    this.wocTradeSettlementId = null;
+    this.wocTradeResolving = true;
     this.lastTradeSig = '';
+    this.updateTradeWindow();
+    try {
+      const res = await hooks.client.cancelListing(offer.listingId);
+      if (!res.ok) {
+        this.log(userFacingApiError({ code: res.code, params: res.params }), '#ff6b6b');
+        return;
+      }
+      if (res.cancelPending === true) {
+        this.log(t('hudChrome.wocMarket.listingCancelPending'), '#ffd100');
+        if (this.wocTradeOffer?.id === offer.id) this.wocTradeCancelPendingFor = offer.id;
+        return;
+      }
+      this.wocTradeFinished.add(offer.id);
+      this.log(t('hudChrome.wocMarket.listingCancelled'), '#ffd100');
+      if (this.wocTradeOffer?.id === offer.id) {
+        this.wocTradeOffer = null;
+        this.wocTradeSplit = null;
+        this.wocTradeQuote = null;
+        this.wocTradeSettlement = null;
+        this.wocTradeCancelPendingFor = null;
+      }
+    } finally {
+      this.wocTradeResolving = false;
+      this.lastTradeSig = '';
+      this.updateTradeWindow();
+    }
   }
 
   /** Debounced: one estimate per pause in typing, not one per keystroke. */
@@ -930,6 +1129,8 @@ export class WocTradeController {
         // trade. Closing the window abandons the round trip.
         this.wocTradeAccepting = false;
         this.wocTradePaying = false;
+        this.wocTradeSigning = false;
+        this.wocTradeResolving = false;
         this.lastTradeSig = '';
         if ($('#bags').style.display !== 'none') this.renderBags();
       }
@@ -951,6 +1152,13 @@ export class WocTradeController {
         void this.wocMarketHooks.client.status().then((status) => {
           if (status.ok && status.enabled) {
             this.wocTradeMinPriceCents = status.minPriceCents;
+            // The directed payment hold, for the buyer's commitment note
+            // (absent from an older server: the untimed note renders).
+            this.wocTradeDirectedHoldSeconds =
+              typeof status.directedHoldSeconds === 'number' ? status.directedHoldSeconds : null;
+            // Land the floor hint and the hold figure in place: both are
+            // derived lines, so no rebuild is owed.
+            this.refreshWocTradeArm();
           }
         });
       }
@@ -1004,13 +1212,21 @@ export class WocTradeController {
       this.wocTradeQuote === null
         ? null
         : [
+            this.wocTradeQuote.offerId,
             this.wocTradeQuote.totalTokens,
+            this.wocTradeQuote.sellerTokens,
+            this.wocTradeQuote.burnTokens,
+            this.wocTradeQuote.treasuryTokens,
             this.wocTradeQuote.usdCents,
             this.wocTradeQuote.expiresAtMs,
           ],
       this.wocTradeTermsAccepted,
-      // The Pay claim in flight disables the button, so it is render state.
+      // The Pay claim in flight disables the button, so it is render state;
+      // so are a resolve in flight (Decline / Withdraw / Cancel sale
+      // disabled) and the seller's recorded cancel-pending answer.
       this.wocTradePaying,
+      this.wocTradeResolving,
+      this.wocTradeCancelPendingFor,
       // The seller's step-up round trip changes the Accept button (Waiting +
       // disabled), so it must invalidate the signature or the pending face is
       // elided and the button reads Accept through the whole wallet handoff.

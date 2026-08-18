@@ -1,13 +1,15 @@
 // The shared USD spelling (src/ui/usd_text.ts): Intl currency bound to the
 // active locale, never a hardcoded "$" prefix. The sweep at the bottom is the
-// review's grep-proof made durable: no src/ui module may concatenate a dollar
-// sign in front of an interpolation again.
+// review's grep-proof made durable: no client module under src/ui, src/game,
+// or src/net may concatenate a dollar sign (or a currency code) around a
+// localized number again.
 
-import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { join } from 'node:path';
+import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it } from 'vitest';
 import { setLanguage } from '../src/ui/i18n';
 import { usdDollarsText, usdText } from '../src/ui/usd_text';
+import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
+import { tsFilesUnder } from './helpers/ts_files_under';
 
 afterEach(() => {
   setLanguage('en');
@@ -44,38 +46,49 @@ describe('formatting', () => {
   });
 });
 
-describe('the grep-proof: zero hardcoded currency prefixes in src/ui', () => {
-  function tsFilesUnder(dir: string): string[] {
-    const out: string[] = [];
-    for (const name of readdirSync(dir)) {
-      const p = join(dir, name);
-      if (statSync(p).isDirectory()) out.push(...tsFilesUnder(p));
-      else if (name.endsWith('.ts')) out.push(p);
-    }
-    return out;
-  }
+describe('the grep-proof: zero hardcoded currency spellings in src/ui, src/game, src/net', () => {
+  // The shapes the sweep hunts. Each is a literal currency glued to a
+  // localized number, which Intl exists to spell: a template `$${...}`, a
+  // quoted "$" concatenated on either side (any spacing), and a currency
+  // code appended after an interpolation.
+  const SHAPES: readonly RegExp[] = [
+    /`[^`]*\$\$\{/,
+    /['"]\$['"]\s*\+|\+\s*['"]\$['"]/,
+    /\$\{[^}]*\}\s*USD`/,
+  ];
+  const offends = (src: string): boolean => SHAPES.some((re) => re.test(src));
 
-  it('no client presentation module concatenates a literal dollar before an interpolation', () => {
+  it('no client presentation module concatenates a literal dollar or currency code', () => {
     // The `$${...}` template shape IS the defect class the review named
     // (wocUsdText, the Claudium pack labels, the daily-rewards prize lines):
-    // a literal "$" glued to a localized number. Catalog English (the
-    // translatable "{usd} USD" copy) does not match this shape. Swept over
-    // src/ui, src/game, and src/net on COMMENT-STRIPPED source, so a money
-    // surface moving directories or a commented example cannot skew it.
+    // a literal "$" glued to a localized number. Catalog English (translatable
+    // copy) does not match these shapes. Swept over src/ui, src/game, and
+    // src/net on COMMENT-STRIPPED source, so a money surface moving
+    // directories or a commented example cannot skew it.
     const stripComments = (src: string): string =>
       src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
     const offenders: string[] = [];
     for (const dir of ['src/ui', 'src/game', 'src/net']) {
       for (const file of tsFilesUnder(dir)) {
-        const src = stripComments(readFileSync(file, 'utf8'));
-        if (/`[^`]*\$\$\{/.test(src) || /'\$' \+|"\$" \+/.test(src)) offenders.push(file);
+        const src = stripComments(readFileSync(file.full, 'utf8'));
+        if (offends(src)) offenders.push(`${dir}/${file.file}`);
       }
     }
-    expect(offenders, 'hardcoded "$" money prefixes (use usd_text.ts)').toEqual([]);
+    expect(offenders, 'hardcoded currency spellings (use usd_text.ts / t() keys)').toEqual([]);
   });
 
-  it('positive control: the scanner sees the shape it hunts', () => {
-    expect(/`[^`]*\$\$\{/.test('const x = `$${amount}`;')).toBe(true);
-    expect(/`[^`]*\$\$\{/.test('const x = `${amount}`;')).toBe(false);
+  it('positive control: the scanner sees every shape it hunts, and not the clean forms', () => {
+    expect(offends('const x = `$${amount}`;')).toBe(true);
+    expect(offends("const x = '$' + amount;")).toBe(true);
+    expect(offends('const x = "$"+amount;')).toBe(true);
+    expect(offends("const x = amount + '$';")).toBe(true);
+    expect(offends('const x = `${amount} USD`;')).toBe(true);
+    expect(offends('const x = `${amount}`;')).toBe(false);
+    expect(offends('const x = usdText(cents);')).toBe(false);
+    expect(offends("t('hudChrome.trade.woc.moneyUsd', { usd })")).toBe(false);
+  });
+
+  it('walks the corpus through the shared walker only', () => {
+    expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
   });
 });

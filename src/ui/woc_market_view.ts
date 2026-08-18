@@ -196,6 +196,22 @@ export interface WocListingRowModel {
   directed: boolean;
 }
 
+/**
+ * Whether the seller may still cancel this listing from a client surface: an
+ * ACTIVE listing, unbid, with no cancel already requested (a cancel-pending
+ * listing closes on its own; a second press only re-answers the same). The
+ * server's guards decide the rest (has_bids, settlement_live, the
+ * cancel-pending conversion on a locked window); this is the one predicate the
+ * browse detail pane and the Activity rows share, which used to spell it two
+ * ways and disagree on the cancel-pending arm. Ownership is the caller's
+ * check (the Activity list is the seller's own; the browse row carries mine).
+ */
+export function canCancelListing(
+  row: Pick<WocListingRowModel, 'status' | 'currentCents' | 'cancelPending'>,
+): boolean {
+  return row.status === 'active' && !row.cancelPending && row.currentCents === null;
+}
+
 export interface WocDetailModel {
   row: WocListingRowModel;
   estimateAmount: WocQuoteLegView | null;
@@ -446,8 +462,14 @@ export function wocMarketViewSig(model: WocMarketViewModel): string {
   const sell = model.sell.rows.map((r) => `${r.index}:${r.itemId}`).join(',');
   const activity = model.activity
     ? [
+        // currentCents rides too: the seller's Cancel button is gated on an
+        // unbid listing and the price cell renders it, so a bid landing on
+        // the poll must move the digest or both go stale under the seller.
         model.activity.listings
-          .map((l) => `${l.id}:${l.status}:${l.resolution ?? ''}:${l.cancelPending ? 1 : 0}`)
+          .map(
+            (l) =>
+              `${l.id}:${l.status}:${l.resolution ?? ''}:${l.cancelPending ? 1 : 0}:${l.currentCents ?? ''}`,
+          )
           .join(','),
         model.activity.bids
           .map(

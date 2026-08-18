@@ -17,8 +17,8 @@ import {
   type WocTradeControllerDeps,
 } from '../src/ui/hud/woc_trade/woc_trade_controller';
 import { formatDateTime, t } from '../src/ui/i18n';
-import { wocUsdText } from '../src/ui/trade_woc_panel';
 import type { WocPendingOffer } from '../src/ui/trade_woc_view';
+import { usdText } from '../src/ui/usd_text';
 import type { WocMarketHooks } from '../src/ui/woc_market_window';
 import type { IWorld } from '../src/world_api';
 
@@ -456,10 +456,10 @@ describe('the completion report', () => {
     // The keys are literals HERE, so swapping the role selection in
     // finishWocTrade cannot satisfy both lines.
     expect(r.host.logs[0]).toBe(
-      t('hudChrome.trade.woc.paidSeller', { price: wocUsdText(100), item: '' }),
+      t('hudChrome.trade.woc.paidSeller', { price: usdText(100), item: '' }),
     );
     expect(r.host.logs[1]).toBe(
-      t('hudChrome.trade.woc.paidBuyer', { price: wocUsdText(100), item: '' }),
+      t('hudChrome.trade.woc.paidBuyer', { price: usdText(100), item: '' }),
     );
     expect(r.host.logs[0]).not.toBe(r.host.logs[1]);
     // One literal price so the formatter half is not a self-comparison.
@@ -1497,9 +1497,13 @@ describe('honest deal endings (H13): closed is not settled', () => {
   });
 
   it('an unpaid close and a suspension each log their own honest reason', async () => {
-    for (const [resolution, key] of [
-      ['unsettled', 'hudChrome.trade.woc.closedUnpaid'],
-      ['suspended', 'hudChrome.trade.woc.closedSuspended'],
+    // Per side for the unpaid end: the buyer whose deal lapsed reads the
+    // consequence the pre-commitment note disclosed (a strike); the seller
+    // and every suspension read the plain line.
+    for (const [resolution, role, key] of [
+      ['unsettled', 'buyer', 'hudChrome.trade.woc.closedUnpaidBuyer'],
+      ['unsettled', 'seller', 'hudChrome.trade.woc.closedUnpaid'],
+      ['suspended', 'buyer', 'hudChrome.trade.woc.closedSuspended'],
     ] as const) {
       vi.useFakeTimers();
       vi.setSystemTime(1_000_000);
@@ -1509,6 +1513,9 @@ describe('honest deal endings (H13): closed is not settled', () => {
         offers: [
           offerRow({
             status: 'accepted',
+            role,
+            // The counterparty is the trade partner (Bree) on either side.
+            ...(role === 'seller' ? { buyerName: 'Bree', sellerName: 'Aldric' } : {}),
             listingId: 41,
             listingStatus: 'closed',
             listingResolution: resolution,
@@ -1779,7 +1786,7 @@ describe('informed commitment (R9 + the quote review)', () => {
     const c = r.controller as unknown as {
       wocTradeOffer: WocPendingOffer | null;
       wocTradeQuote: { totalTokens: number | null } | null;
-      wocTradeSettlementId: number | null;
+      wocTradeSettlement: { offerId: number; id: number; usdCents: number } | null;
       wocTradeTermsAccepted: boolean;
       wocTradeTermsChecked: boolean;
       payWocTradeOffer(): Promise<void>;
@@ -1834,7 +1841,7 @@ describe('informed commitment (R9 + the quote review)', () => {
     expect(sentTerms, 'unchecked box sends false; the server refuses honestly').toBe(false);
     // Ticked: the send carries it, and the recorded acceptance flips durable.
     c.wocTradeQuote = null;
-    c.wocTradeSettlementId = null;
+    c.wocTradeSettlement = null;
     c.wocTradeTermsChecked = true;
     await c.payWocTradeOffer();
     expect(sentTerms).toBe(true);
@@ -2057,7 +2064,7 @@ describe('a lapsed staged quote never reaches the wallet', () => {
     const c = r.controller as unknown as {
       wocTradeOffer: WocPendingOffer | null;
       wocTradeQuote: unknown;
-      wocTradeSettlementId: number | null;
+      wocTradeSettlement: { offerId: number; id: number; usdCents: number } | null;
       signWocTradeQuote(): Promise<void>;
     };
     c.wocTradeOffer = heldOffer({
@@ -2067,9 +2074,13 @@ describe('a lapsed staged quote never reaches the wallet', () => {
       buyerAccepted: true,
       sellerAccepted: true,
     });
-    c.wocTradeSettlementId = 5;
+    c.wocTradeSettlement = { offerId: c.wocTradeOffer.id, id: 5, usdCents: 100 };
     c.wocTradeQuote = {
+      offerId: c.wocTradeOffer.id,
       totalTokens: 5,
+      sellerTokens: null,
+      burnTokens: null,
+      treasuryTokens: null,
       usdCents: 100,
       expiresAtMs: Date.now() - 1_000,
       reference: 'dev_woc_1',
@@ -2082,7 +2093,7 @@ describe('a lapsed staged quote never reaches the wallet', () => {
     expect(r.host.logs).toContain(t('apiError.woc_market.quote_expired'));
     // The held deal is untouched: Pay re-quotes against the same settlement.
     expect(c.wocTradeOffer?.phase).toBe('awaiting_payment');
-    expect(c.wocTradeSettlementId).toBe(5);
+    expect(c.wocTradeSettlement?.id).toBe(5);
   });
 
   it('a live quote still signs (the guard reads the clock, not the field)', async () => {
@@ -2120,5 +2131,426 @@ describe('a lapsed staged quote never reaches the wallet', () => {
     await c.payWocTradeOffer();
     await c.signWocTradeQuote();
     expect(r.host.logs).toContain(t('hudChrome.trade.woc.settled'));
+  });
+});
+
+describe('the QA session closures: settlement hygiene, the claim is not a payment, one click one request', () => {
+  const settled = (id = 5) => ({
+    ok: true,
+    settlement: { id, amountCents: 100 },
+    quote: {
+      reference: `ref_${id}`,
+      transactionBase64: 'dHg=',
+      signatureRequired: false,
+      amount: { base: '100', tokens: 812.5 },
+      seller: { base: '90', tokens: 731.25 },
+      burn: { base: '7', tokens: 56.875 },
+      treasury: { base: '3', tokens: 24.375 },
+      bondCents: null,
+      expiresAtMs: 9_999_999_999_999,
+    },
+  });
+  type Ctl = {
+    wocTradeOffer: WocPendingOffer | null;
+    wocTradeQuote: { offerId: number; totalTokens: number | null; usdCents: number } | null;
+    wocTradeSettlement: { offerId: number; id: number; usdCents: number } | null;
+    wocTradeCancelPendingFor: number | null;
+    wocTradeSigning: boolean;
+    wocTradePaying: boolean;
+    wocTradeDirectedHoldSeconds: number | null;
+    payWocTradeOffer(): Promise<void>;
+    signWocTradeQuote(): Promise<void>;
+    cancelWocTradeOffer(action: 'decline' | 'withdraw'): Promise<void>;
+    cancelWocDirectedSale(): Promise<void>;
+    resolveClosedWocTrade(): void;
+    updateTradeWindow(): void;
+  };
+  async function escrowedBuyer(h: ReturnType<typeof fakeHooks>) {
+    // A REAL standing deal always has a verified partner (createOffer refuses
+    // otherwise); the DOM assertions below need the arm past its block face.
+    h.state.tradePartnerImpl = () => Promise.resolve({ name: 'Bree', walletVerified: true });
+    const r = rig(h.hooks);
+    const c = r.controller as unknown as Ctl;
+    openTrade(r);
+    // Let the open's first poll (an empty read) settle BEFORE the held deal
+    // is staged, or its late answer clears the offer under the test.
+    await flushAsync();
+    c.wocTradeOffer = heldOffer({
+      role: 'buyer',
+      phase: 'awaiting_payment',
+      listingId: 41,
+      buyerAccepted: true,
+      sellerAccepted: true,
+    });
+    return { r, c };
+  }
+
+  it('the claim answer carries the quote: Pay stages it with its fee legs and no second round trip', async () => {
+    const h = fakeHooks();
+    h.state.buyNowImpl = () => Promise.resolve(settled());
+    let quotes = 0;
+    h.state.settlementQuoteImpl = () => {
+      quotes += 1;
+      return Promise.resolve({ ok: false, code: 'woc_market.disabled' });
+    };
+    const { r, c } = await escrowedBuyer(h);
+    await c.payWocTradeOffer();
+    expect(c.wocTradeQuote?.totalTokens).toBe(812.5);
+    expect(c.wocTradeQuote).toMatchObject({ sellerTokens: 731.25, burnTokens: 56.875 });
+    expect(quotes, "the claim's own quote is fresh; no re-quote").toBe(0);
+    // The staged figures are announced (and kept in the log) for the reader
+    // a live region minted mid-rebuild would miss.
+    expect(r.host.logs.some((l) => l.includes(usdText(100)) && l.includes('812.5'))).toBe(true);
+    // The settlement is keyed to THIS offer, with the USD it settles.
+    expect(c.wocTradeSettlement).toEqual({ offerId: 7, id: 5, usdCents: 100 });
+  });
+
+  it('a claim that answers after the deal ended leaves NOTHING behind for the next deal', async () => {
+    // The T1 leak: Pay pressed, the trade ends mid-claim (partner cancelled,
+    // window closed), the claim answers ok. The old code stored the settlement
+    // and staged the quote anyway, so the NEXT deal's Pay re-quoted the OLD
+    // settlement and Sign paid it.
+    const h = fakeHooks();
+    const gate = deferred<unknown>();
+    h.state.buyNowImpl = () => gate.promise;
+    const { c } = await escrowedBuyer(h);
+    const inFlight = c.payWocTradeOffer();
+    // The deal is gone before the claim answers.
+    c.wocTradeOffer = null;
+    gate.resolve(settled());
+    await inFlight;
+    expect(c.wocTradeSettlement, 'no settlement survives the deal').toBeNull();
+    expect(c.wocTradeQuote, 'no quote is staged for a dead deal').toBeNull();
+    // A NEW deal starts clean: its Pay claims its own lock.
+    c.wocTradeOffer = heldOffer({
+      id: 8,
+      role: 'buyer',
+      phase: 'awaiting_payment',
+      listingId: 42,
+      buyerAccepted: true,
+      sellerAccepted: true,
+    });
+    h.state.buyNowImpl = () => Promise.resolve(settled(9));
+    await c.payWocTradeOffer();
+    expect(h.state.calls.buyNows).toBe(2);
+    expect(c.wocTradeSettlement).toEqual({ offerId: 8, id: 9, usdCents: 100 });
+  });
+
+  it('adopting a DIFFERENT offer drops a held settlement and staged quote; Sign refuses a foreign one', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(10_000_000);
+    const h = fakeHooks();
+    h.state.buyNowImpl = () => Promise.resolve(settled());
+    const { r, c } = await escrowedBuyer(h);
+    await c.payWocTradeOffer();
+    expect(c.wocTradeSettlement?.id).toBe(5);
+    // The poll now sees a different accepted deal with the same partner.
+    vi.setSystemTime(10_003_000);
+    h.state.offersResult = {
+      ok: true,
+      offers: [
+        offerRow({
+          id: 8,
+          status: 'accepted',
+          listingId: 42,
+          usdCents: 500,
+          buyerAccepted: true,
+          sellerAccepted: true,
+          listingStatus: 'active',
+        }),
+      ],
+    };
+    r.controller.updateTradeWindow();
+    await flushAsync();
+    expect(c.wocTradeOffer?.id).toBe(8);
+    expect(c.wocTradeSettlement, 'the old settlement dies with its deal').toBeNull();
+    expect(c.wocTradeQuote, 'and so does its quote').toBeNull();
+    // A settlement smuggled in under another offer id never signs.
+    c.wocTradeSettlement = { offerId: 7, id: 5, usdCents: 100 };
+    c.wocTradeQuote = {
+      offerId: 7,
+      totalTokens: 1,
+      sellerTokens: null,
+      burnTokens: null,
+      treasuryTokens: null,
+      usdCents: 100,
+      expiresAtMs: null,
+      reference: 'x',
+      transactionBase64: 'dHg=',
+      signatureRequired: false,
+    } as unknown as Ctl['wocTradeQuote'];
+    let confirms = 0;
+    h.state.confirmSettlementImpl = () => {
+      confirms += 1;
+      return Promise.resolve({ ok: true, state: 'settled' });
+    };
+    await c.signWocTradeQuote();
+    expect(confirms).toBe(0);
+    vi.useRealTimers();
+  });
+
+  it('a poll beat DURING the claim never reads as a payment confirming (only a signature holds paying)', async () => {
+    const h = fakeHooks();
+    const gate = deferred<unknown>();
+    h.state.buyNowImpl = () => gate.promise;
+    vi.useFakeTimers();
+    vi.setSystemTime(10_000_000);
+    const { r, c } = await escrowedBuyer(h);
+    h.state.offersResult = {
+      ok: true,
+      offers: [
+        offerRow({
+          status: 'accepted',
+          listingId: 41,
+          listingStatus: 'active',
+          buyerAccepted: true,
+          sellerAccepted: true,
+        }),
+      ],
+    };
+    const inFlight = c.payWocTradeOffer();
+    expect(c.wocTradePaying).toBe(true);
+    expect(c.wocTradeSigning, 'nothing was signed').toBe(false);
+    // The 2s poll lands mid-claim.
+    vi.setSystemTime(10_003_000);
+    r.controller.updateTradeWindow();
+    await flushAsync();
+    expect(c.wocTradeOffer?.phase, 'the claim is not a payment').toBe('awaiting_payment');
+    // The claim is refused (terms_required): the face is back to Pay with the
+    // consent row, never a false 'Confirming your payment' spinner.
+    gate.resolve({ ok: false, code: 'woc_market.terms_required' });
+    await inFlight;
+    expect(c.wocTradeOffer?.phase).toBe('awaiting_payment');
+    expect(document.querySelector('#trade-window [data-woc-pay]')).not.toBeNull();
+    expect(document.querySelector('#trade-window .trade-woc-waiting')).toBeNull();
+    vi.useRealTimers();
+  });
+
+  it('a signature out with the wallet DOES hold the paying face across a poll beat', async () => {
+    const h = fakeHooks();
+    h.state.buyNowImpl = () => Promise.resolve(settled());
+    const gate = deferred<unknown>();
+    h.state.confirmSettlementImpl = () => gate.promise;
+    vi.useFakeTimers();
+    vi.setSystemTime(10_000_000);
+    const { r, c } = await escrowedBuyer(h);
+    h.state.offersResult = {
+      ok: true,
+      offers: [
+        offerRow({
+          status: 'accepted',
+          listingId: 41,
+          listingStatus: 'active',
+          buyerAccepted: true,
+          sellerAccepted: true,
+        }),
+      ],
+    };
+    await c.payWocTradeOffer();
+    const signing = c.signWocTradeQuote();
+    expect(c.wocTradeSigning).toBe(true);
+    vi.setSystemTime(10_003_000);
+    r.controller.updateTradeWindow();
+    await flushAsync();
+    expect(c.wocTradeOffer?.phase).toBe('paying');
+    gate.resolve({ ok: true, state: 'confirming' });
+    await signing;
+    expect(c.wocTradeSigning).toBe(false);
+    vi.useRealTimers();
+  });
+
+  it('a wallet decline on the PAY path restores the payable face with a classified line', async () => {
+    const h = fakeHooks();
+    h.state.buyNowImpl = () =>
+      Promise.resolve({ ...settled(), quote: { ...settled().quote, signatureRequired: true } });
+    h.state.signAndSendImpl = () => Promise.reject(new Error('User rejected the request.'));
+    let confirms = 0;
+    h.state.confirmSettlementImpl = () => {
+      confirms += 1;
+      return Promise.resolve({ ok: true, state: 'settled' });
+    };
+    const { r, c } = await escrowedBuyer(h);
+    await c.payWocTradeOffer();
+    await c.signWocTradeQuote();
+    expect(confirms, 'nothing was sent, nothing confirms').toBe(0);
+    expect(c.wocTradeOffer?.phase).toBe('awaiting_payment');
+    expect(c.wocTradeQuote, 'the declined quote is spent').toBeNull();
+    expect(c.wocTradeSettlement?.id, 'the held settlement survives for the re-quote').toBe(5);
+    expect(r.host.logs.join('\n')).not.toContain('User rejected the request.');
+    expect(r.host.logs).toContain(t('hudChrome.walletBridge.cancelled'));
+  });
+
+  it('a quote failure AFTER the claim keeps the settlement: the next Pay re-quotes without a second buyNow', async () => {
+    const h = fakeHooks();
+    h.state.buyNowImpl = () =>
+      Promise.resolve({ ...settled(), quote: { ...settled().quote, transactionBase64: null } });
+    let quotes = 0;
+    h.state.settlementQuoteImpl = () => {
+      quotes += 1;
+      return Promise.resolve(
+        quotes === 1
+          ? { ok: false, code: 'woc_market.quote_unavailable' }
+          : { ok: true, quote: settled().quote },
+      );
+    };
+    const { c } = await escrowedBuyer(h);
+    await c.payWocTradeOffer();
+    expect(c.wocTradeQuote).toBeNull();
+    expect(c.wocTradeSettlement?.id).toBe(5);
+    await c.payWocTradeOffer();
+    expect(c.wocTradeQuote?.totalTokens).toBe(812.5);
+    expect(h.state.calls.buyNows).toBe(1);
+    expect(quotes).toBe(2);
+  });
+
+  it("a double tap on Decline sends ONE resolve; a raced answer reads in the trade arm's words", async () => {
+    const h = fakeHooks();
+    const gate = deferred<void>();
+    const client = h.hooks as unknown as {
+      client: { resolveOffer: (id: number, action: string) => Promise<unknown> };
+    };
+    let calls = 0;
+    client.client.resolveOffer = async () => {
+      calls += 1;
+      await gate.promise;
+      return { ok: false, code: 'woc_market.not_pending' };
+    };
+    h.state.tradePartnerImpl = () => Promise.resolve({ name: 'Bree', walletVerified: true });
+    const r = rig(h.hooks);
+    const c = r.controller as unknown as Ctl;
+    openTrade(r);
+    await flushAsync();
+    c.wocTradeOffer = heldOffer({ role: 'seller' });
+    const first = c.cancelWocTradeOffer('decline');
+    const second = c.cancelWocTradeOffer('decline');
+    // While in flight the control renders disabled.
+    expect(
+      document.querySelector<HTMLButtonElement>('#trade-window [data-woc-decline]')?.disabled,
+    ).toBe(true);
+    gate.resolve();
+    await Promise.all([first, second]);
+    expect(calls).toBe(1);
+    expect(r.host.logs).toContain(t('hudChrome.trade.woc.offerNotPending'));
+    expect(r.host.logs.join('\n')).not.toContain(t('apiError.woc_market.not_pending'));
+  });
+
+  it('a cancel answered CANCEL-PENDING is recorded on the face until the deal moves on', async () => {
+    const h = fakeHooks();
+    h.state.cancelListingImpl = () => Promise.resolve({ ok: true, cancelPending: true });
+    h.state.tradePartnerImpl = () => Promise.resolve({ name: 'Bree', walletVerified: true });
+    const r = rig(h.hooks);
+    const c = r.controller as unknown as Ctl;
+    openTrade(r);
+    await flushAsync();
+    c.wocTradeOffer = heldOffer({
+      role: 'seller',
+      phase: 'awaiting_payment',
+      listingId: 41,
+      buyerAccepted: true,
+      sellerAccepted: true,
+    });
+    await c.cancelWocDirectedSale();
+    expect(c.wocTradeCancelPendingFor).toBe(7);
+    expect(document.querySelector('#trade-window [data-woc-cancel-sale]')).toBeNull();
+    expect(document.querySelector('#trade-window .trade-woc-waiting')?.textContent).toBe(
+      t('hudChrome.trade.woc.cancelPendingSeller'),
+    );
+    // A second press cannot happen (no control), and the mark dies with the deal.
+    c.wocTradeOffer = null;
+    c.resolveClosedWocTrade();
+    expect(c.wocTradeCancelPendingFor).toBeNull();
+  });
+
+  it("close-time lines: the resolved verdict, the seller's held copy, and a payment mid-flight", async () => {
+    const cases: [Partial<WocOfferView>, string][] = [
+      // The other side declined between the last poll and the close.
+      [{ status: 'declined' }, t('hudChrome.trade.woc.offerDeclined')],
+      // The seller closes while their copy is escrowed for the buyer's payment.
+      [
+        {
+          status: 'accepted',
+          role: 'seller',
+          buyerName: 'Bree',
+          sellerName: 'Aldric',
+          listingId: 41,
+          listingStatus: 'active',
+          buyerAccepted: true,
+          sellerAccepted: true,
+        },
+        t('hudChrome.trade.woc.closeSellerHold'),
+      ],
+      // Either side closes while the payment is confirming.
+      [
+        {
+          status: 'accepted',
+          listingId: 41,
+          listingStatus: 'active',
+          settlementState: 'confirming',
+          buyerAccepted: true,
+          sellerAccepted: true,
+        },
+        t('hudChrome.trade.woc.closePaymentContinuesBuyer'),
+      ],
+      [
+        {
+          status: 'accepted',
+          role: 'seller',
+          buyerName: 'Bree',
+          sellerName: 'Aldric',
+          listingId: 41,
+          listingStatus: 'active',
+          settlementState: 'delivering',
+          buyerAccepted: true,
+          sellerAccepted: true,
+        },
+        t('hudChrome.trade.woc.closePaymentContinuesSeller'),
+      ],
+      // Parked under review: the parked sentence, not "still being confirmed".
+      [
+        {
+          status: 'accepted',
+          listingId: 41,
+          listingStatus: 'active',
+          settlementState: 'review',
+          buyerAccepted: true,
+          sellerAccepted: true,
+        },
+        t('hudChrome.trade.woc.statusReviewBuyer'),
+      ],
+    ];
+    for (const [row, line] of cases) {
+      const h = fakeHooks();
+      h.state.offersResult = { ok: true, offers: [offerRow(row)] };
+      const r = rig(h.hooks);
+      const c = r.controller as unknown as Ctl;
+      openTrade(r);
+      c.wocTradeOffer = heldOffer({
+        role: row.role ?? 'buyer',
+        phase: row.status === 'declined' ? 'review' : 'awaiting_payment',
+        listingId: row.listingId ?? null,
+      });
+      r.host.tradeInfo = null;
+      r.controller.updateTradeWindow();
+      await flushAsync();
+      expect(r.host.logs, JSON.stringify(row)).toContain(line);
+    }
+  });
+
+  it('the /status answer supplies the payment hold the commitment note names', async () => {
+    const h = fakeHooks();
+    h.state.statusImpl = () =>
+      Promise.resolve({ ok: true, enabled: true, minPriceCents: 100, directedHoldSeconds: 600 });
+    const r = rig(h.hooks);
+    const c = r.controller as unknown as Ctl;
+    openTrade(r);
+    await flushAsync();
+    expect(c.wocTradeDirectedHoldSeconds).toBe(600);
+    // An older server without the field leaves the untimed note.
+    const h2 = fakeHooks();
+    h2.state.statusImpl = () => Promise.resolve({ ok: true, enabled: true, minPriceCents: 100 });
+    const r2 = rig(h2.hooks);
+    openTrade(r2);
+    await flushAsync();
+    expect((r2.controller as unknown as Ctl).wocTradeDirectedHoldSeconds).toBeNull();
   });
 });

@@ -102,8 +102,11 @@ const MONOLITHS: MonolithRow[] = [
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
+    // Lowered to the exact size after the Claudium checkout error ladder
+    // moved into src/ui/wallet_bridge_reason_text.ts (the ratchet only works
+    // if it tightens with every real extraction).
     file: 'src/main.ts',
-    ceiling: 11490,
+    ceiling: 11486,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

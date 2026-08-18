@@ -3121,6 +3121,20 @@
     align-items: center;
     min-height: 40px;
   }
+  /* The consent caption and its link are legal text on a phone: floored like
+     the window's buttons (16px) rather than the desktop's 11px, which the
+     UI-scale floor of 0.85 would render below 10px on a small screen. */
+  body.mobile-touch #woc-market-window label.wm-terms,
+  body.mobile-touch #woc-market-window .wm-terms-link,
+  body.mobile-touch #trade-window .trade-woc-terms,
+  body.mobile-touch #trade-window .trade-woc-terms-link {
+    font-size: 16px;
+  }
+  /* The bid amount field is a money-surface tap target too (the buttons
+     beside it are floored at 40px by the shared rule; the input was 37px). */
+  body.mobile-touch #woc-market-window .wm-bid-form input[data-field="bid-usd"] {
+    min-height: 40px;
+  }
   /* The combobox parts the desktop sheet sizes by padding alone. The options are
      the tap targets here, and the clear button inherits the shared .x-btn floor. */
   body.mobile-touch #woc-market-window .wm-combo-item {

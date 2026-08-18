@@ -18,6 +18,7 @@ import { exchangeHardLock, exchangeItemCategory } from '../sim/exchange_eligibil
 import { itemInstancePayloadsEqual } from '../sim/item_instance_merge';
 import type { InvSlot, ItemDef } from '../sim/types';
 import type { TranslationKey } from './i18n.catalog';
+import { TERMS_PATH } from './terms_link';
 import { usdText } from './usd_text';
 import { overWalletBalance } from './woc_affordable_core';
 
@@ -52,7 +53,9 @@ export type WocTradeMode = 'gold' | 'woc';
  *    H13 false-payment line. A closed-not-sold listing is 'closed'.
  *  - closed: the deal died without a sale (cancelled / suspended / unpaid).
  *    The controller reports the honest reason once and returns the arm to
- *    the compose form; no face renders this phase.
+ *    the compose form in the same synchronous step; the panel's closed face
+ *    is a belt that renders no action, so a dead deal can never fall through
+ *    to Decline or Withdraw.
  *
  * `paying` is not cosmetic. Without it the window sat on `awaiting_payment`
  * through the whole confirmation and then emptied, so a buyer signing in their
@@ -60,6 +63,19 @@ export type WocTradeMode = 'gold' | 'woc';
  * sale appeared to complete with no payment ever shown.
  */
 export type WocOfferPhase = 'review' | 'awaiting_payment' | 'paying' | 'settled' | 'closed';
+
+/** The staged settlement quote as the review face shows it: the token total
+ *  and the fee legs (null when the service did not answer one), the USD it
+ *  settles, and its expiry. Structural only: the transaction blob is not
+ *  render state and stays on the controller. */
+export interface WocTradeQuoteReview {
+  totalTokens: number | null;
+  sellerTokens: number | null;
+  burnTokens: number | null;
+  treasuryTokens: number | null;
+  usdCents: number;
+  expiresAtMs: number | null;
+}
 
 /** A sent-but-unresolved $WOC offer, as both sides see it. */
 export interface WocPendingOffer {
@@ -178,11 +194,27 @@ export interface WocTradeInput {
    * null/absent when none is staged. Its presence is what turns the pay face
    * into the review panel: H13's finding was the p2p Pay flow going straight
    * from click to wallet with nothing showing the token total or expiry.
+   * The fee legs ride beside the total (the Exchange's quote panel shows the
+   * same four figures for the same server answer).
    */
-  quote?: { totalTokens: number | null; usdCents: number; expiresAtMs: number | null } | null;
+  quote?: WocTradeQuoteReview | null;
   /** True while the Pay claim (buyNow + quote) round trips: the pressed Pay
    *  button must go disabled immediately, not when the quote lands. */
   paying?: boolean;
+  /** True while a Decline / Withdraw / Cancel sale request is in flight: the
+   *  pressed control disables (one click, one request). */
+  resolving?: boolean;
+  /** The seller's cancel was answered cancel-pending (a buyer holds the
+   *  purchase window): the face records it instead of re-offering Cancel. */
+  cancelPending?: boolean;
+  /** The realm's directed payment hold from /status (seconds), for the p2p
+   *  commitment disclosure; null or absent while unknown (the note then
+   *  names no figure rather than a guessed one). */
+  directedHoldSeconds?: number | null;
+  /** The href the consent link renders (src/ui/terms_link.ts resolves it per
+   *  shell; the host that knows the page origin passes it in, so this core
+   *  and its painter stay host-agnostic). Absent renders the site path. */
+  termsHref?: string;
   /** Paint-time clock for the staged quote's expiry face. Absent means the
    *  face never shows expired (the sign handler still guards the click). */
   nowMs?: number;
@@ -267,11 +299,25 @@ export interface WocTradeModel {
   termsChecked: boolean;
   /** The staged settlement quote to review before signing, or null. Non-null
    *  only on the buyer's own pay surface. */
-  quoteReview: {
-    totalTokens: number | null;
-    usdCents: number;
-    expiresAtMs: number | null;
-  } | null;
+  quoteReview: WocTradeQuoteReview | null;
+  /** Whether a Decline / Withdraw / Cancel sale request is in flight, so
+   *  the pressed control renders disabled. */
+  resolveBusy: boolean;
+  /** Whether the seller's cancel is pending (the buyer may still pay): the
+   *  waiting face says so and Cancel sale is withdrawn. */
+  cancelPending: boolean;
+  /** Which net line the fee block renders: the seller reads what THEY
+   *  receive, the buyer what the SELLER receives (the price is theirs to pay
+   *  in full). */
+  netKey: TranslationKey;
+  /** The directed payment hold in seconds when the realm has told us, for
+   *  the buyer's commitment note; null renders the note without a figure. */
+  holdSeconds: number | null;
+  /** Whether the buyer's p2p commitment note renders on this face: the
+   *  buyer's review face (before the shared Accept) and their pay face. */
+  showBindingNote: boolean;
+  /** The consent link's href (see input.termsHref). */
+  termsHref: string;
   /** True once the staged quote's deadline passed at paint time: Sign renders
    *  disabled. The click handler re-checks the clock either way (a face
    *  painted before the lapse keeps its enabled button until a repaint), so
@@ -319,8 +365,24 @@ const DELIVERING_STATUS_KEYS: Record<'buyer' | 'seller', TranslationKey> = {
   seller: 'hudChrome.trade.woc.statusConfirmedSeller',
 };
 
-/** Settlement states where the money is DECIDED and delivery is completing. */
-const DELIVERING_STATES = new Set(['confirmed', 'delivering']);
+/** Settlement states where the money is DECIDED and delivery is completing
+ *  ('delivered' included: the copy has moved but the sale's own finalize has
+ *  not run, so the poll's settled line still closes the loop). Exported for
+ *  the subset pin against WOC_SETTLING_STATES (woc_trade_offer_view.ts): a
+ *  state here that the settling set lacks would never render its sentence. */
+export const WOC_DELIVERING_STATES: ReadonlySet<string> = new Set([
+  'confirmed',
+  'delivering',
+  'delivered',
+]);
+const DELIVERING_STATES = WOC_DELIVERING_STATES;
+
+/** A settlement parked under an operator verdict: neither confirming nor
+ *  decided, so its own sentence per side and no spinner. */
+const REVIEW_STATUS_KEYS: Record<'buyer' | 'seller', TranslationKey> = {
+  buyer: 'hudChrome.trade.woc.statusReviewBuyer',
+  seller: 'hudChrome.trade.woc.statusReviewSeller',
+};
 
 const BLOCK_KEYS: Record<WocArmBlock, TranslationKey> = {
   market_disabled: 'hudChrome.trade.woc.blockDisabled',
@@ -496,7 +558,14 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
     wocDisabled: !offerable || input.goldOffered || input.staged.length > 0,
     insufficientBalance: shortfall,
     tokens: wocMode ? input.tokens : null,
-    split: wocMode ? input.split : null,
+    // The split renders on the compose face AND beside a standing deal: the
+    // seller commits by accepting, so the fee and their net must be on the
+    // review face before that click, not only on the buyer's compose form.
+    split: wocMode || input.pendingOffer !== null ? input.split : null,
+    netKey:
+      input.pendingOffer?.role === 'seller'
+        ? 'hudChrome.trade.woc.netLine'
+        : 'hudChrome.trade.woc.netLineBuyer',
     pendingOffer: input.pendingOffer,
     canAccept,
     // The WHY beside the (absent) accept affordance: the panel renders this
@@ -552,6 +621,16 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
       input.quote?.expiresAtMs != null &&
       input.nowMs != null &&
       input.nowMs > input.quote.expiresAtMs,
+    resolveBusy: input.resolving === true,
+    cancelPending: input.cancelPending === true,
+    holdSeconds:
+      typeof input.directedHoldSeconds === 'number' && input.directedHoldSeconds > 0
+        ? input.directedHoldSeconds
+        : null,
+    showBindingNote:
+      input.pendingOffer?.role === 'buyer' &&
+      (input.pendingOffer.phase === 'review' || input.pendingOffer.phase === 'awaiting_payment'),
+    termsHref: input.termsHref ?? TERMS_PATH,
     // A standing offer replaces the form: you cannot send a second one over it.
     canSend: wocMode && hint === null && input.pendingOffer === null,
     sendHint: wocMode && hint !== null ? SEND_HINT_KEYS[hint] : null,
@@ -566,15 +645,24 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
     statusKey:
       input.pendingOffer === null
         ? null
-        : input.pendingOffer.phase === 'paying' &&
-            DELIVERING_STATES.has(input.pendingOffer.settlementState ?? '')
-          ? DELIVERING_STATUS_KEYS[input.pendingOffer.role]
-          : (STATUS_KEYS[`${input.pendingOffer.phase}:${input.pendingOffer.role}`] ?? null),
+        : input.pendingOffer.phase === 'paying' && input.pendingOffer.settlementState === 'review'
+          ? REVIEW_STATUS_KEYS[input.pendingOffer.role]
+          : input.pendingOffer.phase === 'paying' &&
+              DELIVERING_STATES.has(input.pendingOffer.settlementState ?? '')
+            ? DELIVERING_STATUS_KEYS[input.pendingOffer.role]
+            : input.pendingOffer.role === 'seller' &&
+                input.pendingOffer.phase === 'awaiting_payment' &&
+                input.cancelPending === true
+              ? 'hudChrome.trade.woc.cancelPendingSeller'
+              : (STATUS_KEYS[`${input.pendingOffer.phase}:${input.pendingOffer.role}`] ?? null),
     // Only the payment itself spins. Waiting on the other player to press a
     // button is not progress and must not look like it, or every wait reads as
     // "something is happening" and the player never knows when to act. The
     // claim round trips (buyNow + quote) count as the payment: the pressed
     // Pay button must stop looking pressable immediately, not two RTTs later.
-    busy: input.pendingOffer?.phase === 'paying' || input.paying === true,
+    // A payment parked under review is waiting on an operator, not moving.
+    busy:
+      (input.pendingOffer?.phase === 'paying' && input.pendingOffer.settlementState !== 'review') ||
+      input.paying === true,
   };
 }

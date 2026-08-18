@@ -91,6 +91,17 @@ describe('the Claudium checkout channel', () => {
     expect(claudiumCheckoutErrorText(new Error('wallet app did not return in time'))).toBe(
       t('hudChrome.walletBridge.timeout'),
     );
+    // The desktop shell's browser hand-off (Electron): its bridge-authored
+    // strings classify too, so the checkout never renders them raw there.
+    expect(claudiumCheckoutErrorText(new Error('wallet authorization timed out'))).toBe(
+      t('hudChrome.walletBridge.timeout'),
+    );
+    expect(claudiumCheckoutErrorText(new Error('desktop wallet browser is unavailable'))).toBe(
+      t('hudChrome.walletBridge.unavailable'),
+    );
+    expect(
+      claudiumCheckoutErrorText(new Error('wallet returned an invalid transaction authorization')),
+    ).toBe(t('hudChrome.walletBridge.badResponse'));
   });
 
   it('passes an UNKNOWN message through: the channel mixes in the checkout own t() throws', () => {
@@ -111,8 +122,17 @@ describe('the drift pin: every mapped literal exists verbatim in a bridge source
     'src/net/native_solana_mobile.ts',
     // The launcher modal's rejections propagate through the deeplink request.
     'src/ui/mobile_wallet_launcher.ts',
+    // The desktop shell's browser hand-off (the Claudium checkout rides it on
+    // Electron).
+    'src/net/desktop_wallet_handoff.ts',
   ];
-  const corpus = sources.map((p) => stripCommentsForPin(readFileSync(p, 'utf8'))).join('\n');
+  // main.ts owns two more of the hand-off's throw strings; it joins RAW (the
+  // naive block-comment strip swallows its glob strings, the judged
+  // main.ts-pin posture), which only makes the presence check more lenient.
+  const corpus = [
+    ...sources.map((p) => stripCommentsForPin(readFileSync(p, 'utf8'))),
+    readFileSync('src/main.ts', 'utf8'),
+  ].join('\n');
 
   it('finds each mapped message in the bridge corpus', () => {
     for (const message of Object.keys(WALLET_BRIDGE_MESSAGE_REASONS)) {

@@ -7609,12 +7609,19 @@
     gap: 6px;
     margin: 0;
     font-size: 11px;
-    color: #d8b46a;
+    color: var(--gold-dim);
   }
   .trade-woc-terms-link {
     font-size: 11px;
     color: var(--gold);
     text-decoration: underline;
+  }
+  /* The consent link is a keyboard target on a money surface: a token ring,
+     not the UA fallback (the trade window's other controls are .btn / .x-btn,
+     which already carry theirs). */
+  .trade-woc-terms-link:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
   }
   /* Empty derived lines collapse instead of leaving gaps in the flex column. */
   .trade-woc-equiv:empty,

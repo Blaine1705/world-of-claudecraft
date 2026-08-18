@@ -42,6 +42,9 @@ export interface WocMarketStatus {
   allowMounts: boolean;
   allowMechChromas: boolean;
   settlementWindowSeconds: number;
+  /** The directed (p2p) payment hold in seconds: the buyer's commitment note
+   *  names it. Absent from an older server (the note then names no figure). */
+  directedHoldSeconds?: number;
 }
 
 export interface WocListingView {

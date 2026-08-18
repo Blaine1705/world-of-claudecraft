@@ -10,10 +10,12 @@
 // Classification is structural first (the two cancel names are the only
 // machine-readable signal the bridge has), then a byte-exact map over the
 // bridge-AUTHORED strings (the finite inventory below; the drift pin test
-// asserts each literal still exists verbatim under src/net, so a bridge
-// reword cannot silently strand a mapping), then a conservative prose
-// heuristic for provider-authored decline text, then a caller-flavored
-// generic (a failed SIGNATURE and a failed PAYMENT are different claims).
+// asserts each literal still exists verbatim in the bridge sources under
+// src/net plus the two client-side throw sites the launcher and the desktop
+// hand-off own, so a bridge reword cannot silently strand a mapping), then a
+// conservative prose heuristic for provider-authored decline text, then a
+// caller-flavored generic (a failed SIGNATURE and a failed PAYMENT are
+// different claims).
 //
 // The api_error_i18n / woc_market_reason_text pattern: DOM-free, exports its
 // tables for the drift pin (tests/wallet_bridge_reason_text.test.ts).
@@ -31,7 +33,8 @@ export type WalletBridgeReason =
 
 /** Byte-exact contracts with the bridge's own thrown strings (never provider
  *  text). Exported for the drift pin: each literal must exist verbatim in
- *  its src/net source, or the mapping is stranded prose. */
+ *  its source (src/net, the mobile launcher, the desktop hand-off and its
+ *  main.ts arm), or the mapping is stranded prose. */
 export const WALLET_BRIDGE_MESSAGE_REASONS: Readonly<Record<string, WalletBridgeReason>> = {
   // Cancels whose Error NAME did not survive a rethrow path.
   'wallet selection cancelled': 'cancelled',
@@ -40,6 +43,10 @@ export const WALLET_BRIDGE_MESSAGE_REASONS: Readonly<Record<string, WalletBridge
   // Timeouts.
   'wallet app did not return in time': 'timeout',
   'wallet connection timed out': 'timeout',
+  // The desktop shell's browser hand-off (src/net/desktop_wallet_handoff.ts):
+  // the Claudium checkout rides it on the Electron shell.
+  'wallet authorization timed out': 'timeout',
+  'wallet authorization expired': 'timeout',
   // Not connected.
   'connect a wallet first': 'not_connected',
   // Capability.
@@ -52,6 +59,8 @@ export const WALLET_BRIDGE_MESSAGE_REASONS: Readonly<Record<string, WalletBridge
   'connected Solana wallet provider is unavailable': 'unavailable',
   'native Solana Mobile bridge unavailable': 'unavailable',
   'wallet app could not be opened': 'unavailable',
+  'desktop wallet browser is unavailable': 'unavailable',
+  'could not open wallet authorization in the browser': 'unavailable',
   // Unusable answers.
   'wallet returned an invalid signature': 'bad_response',
   'wallet modified the message before signing': 'bad_response',
@@ -65,6 +74,8 @@ export const WALLET_BRIDGE_MESSAGE_REASONS: Readonly<Record<string, WalletBridge
   'native wallet returned no address': 'bad_response',
   'native wallet returned no signature': 'bad_response',
   'native wallet returned no transaction signature': 'bad_response',
+  'server returned an invalid wallet authorization': 'bad_response',
+  'wallet returned an invalid transaction authorization': 'bad_response',
 };
 
 const REASON_KEYS: Readonly<Record<Exclude<WalletBridgeReason, 'unknown'>, TranslationKey>> = {

@@ -7,15 +7,17 @@
 // The price field deliberately does NOT ride the window's repaint signature.
 // The window rebuilds its whole subtree when that signature changes, so putting
 // the typed price in it would destroy and recreate the input on every keystroke
-// and fight the caret. Instead the seller's typing updates only the DERIVED
+// and fight the caret. Instead the buyer's typing updates only the DERIVED
 // lines in place (`refreshWocTradeArm`), which is both cheaper and the reason
-// no focus-restore dance is needed here at all.
+// the PRICE FIELD needs no focus restore; the arm's buttons and consent box
+// are keyed and restored across rebuilds by `restoreWocTradeFocus`.
 //
 // It owns no state and never imports Hud: everything arrives on the injected
 // deps bag, which is what lets a test drive it against a plain object. All
 // interpolated player text passes through `esc`.
 
 import type { InvSlot, ItemDef } from '../sim/types';
+import { durationText } from './duration_text';
 import { esc } from './esc';
 import { restoreFirstEnabled } from './focus_restore';
 import { formatDateTime, formatNumber, t } from './i18n';
@@ -24,6 +26,7 @@ import {
   type WocPendingOffer,
   type WocTradeModel,
   type WocTradePartner,
+  type WocTradeQuoteReview,
   type WocTradeSplit,
 } from './trade_woc_view';
 import { usdText } from './usd_text';
@@ -59,10 +62,18 @@ export interface WocTradePanelDeps {
   /** The consent checkbox's controller-held state (survives rebuilds). */
   termsChecked?: boolean;
   /** The staged settlement quote awaiting the buyer's explicit sign-off. */
-  quote?: { totalTokens: number | null; usdCents: number; expiresAtMs: number | null } | null;
+  quote?: WocTradeQuoteReview | null;
   /** True while the Pay claim (buyNow + quote) is in flight, so the pressed
    *  button goes disabled immediately rather than two round trips later. */
   paying?: boolean;
+  /** True while a Decline / Withdraw / Cancel sale request is in flight. */
+  resolving?: boolean;
+  /** The seller's cancel was answered cancel-pending (the buyer may still pay). */
+  cancelPending?: boolean;
+  /** The realm's directed payment hold (seconds) from /status; null unknown. */
+  directedHoldSeconds?: number | null;
+  /** The consent link's href, resolved per shell by the host (terms_link.ts). */
+  termsHref?: string;
   /** Paint-time clock, for the staged quote's expiry face only. */
   nowMs?: number;
   pendingOffer: WocPendingOffer | null;
@@ -86,14 +97,9 @@ export interface WocTradePanelDeps {
   onQuoteCancel(): void;
 }
 
-/** USD cents as a localized currency string (the shared usd_text core, so
- *  the trade arm and the Exchange window spell the same dollar identically).
- *  Exported because the HUD's completion message names the same price, and
- *  two spellings of one figure in one trade is a defect. */
-export function wocUsdText(cents: number): string {
-  return usdText(cents);
-}
-const usd = wocUsdText;
+/** The shared usd_text core, so the trade arm and the Exchange window spell
+ *  the same dollar identically (usd_text.ts is the ONE USD spelling). */
+const usd = usdText;
 
 /**
  * The standing offer as it reads in the trade window's Money row.
@@ -132,6 +138,10 @@ export function wocTradeModelFrom(deps: WocTradePanelDeps): WocTradeModel {
     termsChecked: deps.termsChecked,
     quote: deps.quote,
     paying: deps.paying,
+    resolving: deps.resolving,
+    cancelPending: deps.cancelPending,
+    directedHoldSeconds: deps.directedHoldSeconds,
+    termsHref: deps.termsHref,
     nowMs: deps.nowMs,
     pendingOffer: deps.pendingOffer,
     goldOffered: deps.goldCopper > 0 || deps.partnerGoldCopper > 0,
@@ -148,19 +158,33 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
   // terms are LINKED at the moment of acceptance (draft Terms 10.3), and the
   // send carries this checkbox's real state instead of a hard-coded true
   // (R9). Rendered only where the model says a terms-gated send is on
-  // screen; checked state is controller-held so it survives rebuilds.
+  // screen; checked state is controller-held so it survives rebuilds. The
+  // href resolves per shell (src/ui/terms_link.ts, the host passes it in):
+  // same-origin on the site, the canonical page from the desktop and native
+  // shells.
   const termsRow = model.showTerms
     ? `<label class="trade-woc-terms"><input type="checkbox" data-woc-terms data-focus-key="trade-woc-terms"${
         model.termsChecked ? ' checked' : ''
-      } /> ${esc(t('hudChrome.trade.woc.termsLabel'))}</label>
-      <a class="trade-woc-terms-link" href="/terms" target="_blank" rel="noopener noreferrer">${esc(
+      } /> ${esc(t('hudChrome.wocMarket.termsLabel'))}</label>
+      <a class="trade-woc-terms-link" href="${esc(model.termsHref)}" target="_blank" rel="noopener noreferrer">${esc(
         t('hudChrome.wocMarket.termsLink'),
       )}</a>`
     : '';
+  // The fee block beside a standing deal: the seller commits by accepting,
+  // so the fee and THEIR net sit on the review face before that click; the
+  // buyer reads the seller's net. Filled in place by refreshWocTradeArm.
+  const feeLines = `<p class="trade-woc-fee" data-woc-fee></p>
+      <p class="trade-woc-net" data-woc-net></p>`;
+  // The p2p commitment note (the auction arm's bidBindingNote): the buyer's
+  // accept escrows the copy and starts a payment deadline whose lapse earns
+  // a strike, so it reads BEFORE the shared Accept and again on the pay face.
+  const bindingNote = model.showBindingNote
+    ? `<p class="trade-woc-warn" data-woc-binding></p>`
+    : '';
   const modeTabs = `
     <div class="trade-woc-modes" role="tablist" aria-label="${esc(t('hudChrome.trade.woc.tabWoc'))}">
-      <button type="button" role="tab" class="btn trade-woc-mode${model.mode === 'gold' ? ' active' : ''}" aria-selected="${model.mode === 'gold'}" data-woc-mode="gold"${model.wocDealStanding ? ' disabled' : ''}>${esc(t('hudChrome.trade.woc.tabGold'))}</button>
-      <button type="button" role="tab" class="btn trade-woc-mode${model.mode === 'woc' ? ' active' : ''}" aria-selected="${model.mode === 'woc'}" data-woc-mode="woc"${model.wocDisabled ? ' disabled' : ''}>${esc(t('hudChrome.trade.woc.tabWoc'))}</button>
+      <button type="button" role="tab" class="btn trade-woc-mode${model.mode === 'gold' ? ' active' : ''}" aria-selected="${model.mode === 'gold'}" data-woc-mode="gold" data-focus-key="trade-woc-tab-gold"${model.wocDealStanding ? ' disabled' : ''}>${esc(t('hudChrome.trade.woc.tabGold'))}</button>
+      <button type="button" role="tab" class="btn trade-woc-mode${model.mode === 'woc' ? ' active' : ''}" aria-selected="${model.mode === 'woc'}" data-woc-mode="woc" data-focus-key="trade-woc-tab-woc"${model.wocDisabled ? ' disabled' : ''}>${esc(t('hudChrome.trade.woc.tabWoc'))}</button>
     </div>`;
 
   if (model.blockKey !== null) {
@@ -169,12 +193,20 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
   }
   if (model.pendingOffer !== null) {
     const o = model.pendingOffer;
+    const busyResolve = model.resolveBusy ? ' disabled' : '';
     // Both sides read the SAME price, in the currency they agreed it in, with
     // the token figure as the server quoted it. The seller gets Accept; the
     // buyer gets Withdraw. Neither is offered an action that is not theirs.
     if (o.phase === 'settled') {
+      // Per side: the copy went to the BUYER's bags (or their mail).
       return `<div class="trade-woc-arm">${modeTabs}
-        <p class="trade-woc-done">${esc(t('hudChrome.trade.woc.settled'))}</p>
+        <p class="trade-woc-done">${esc(
+          t(
+            o.role === 'buyer'
+              ? 'hudChrome.trade.woc.settled'
+              : 'hudChrome.trade.woc.settledSeller',
+          ),
+        )}</p>
       </div>`;
     }
     if (o.phase === 'closed') {
@@ -191,43 +223,56 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
       // per side: the buyer's Pay button while the payment has not started,
       // and the seller's Cancel sale while the buyer has not paid (the
       // directed listing's own cancel; it disappears the moment a payment is
-      // in flight, because the server would refuse it then anyway). Every
-      // other combination is a WAIT, and each says whose wait it is, because
-      // the seller watching a confirmation and the buyer watching their own
-      // transaction are not the same sentence.
+      // in flight, because the server would refuse it then anyway, and once
+      // the seller's cancel is PENDING, since a second press only re-answers
+      // the same). Every other combination is a WAIT, and each says whose
+      // wait it is, because the seller watching a confirmation and the buyer
+      // watching their own transaction are not the same sentence.
       //
       // The status line is announced: a state the player cannot see change (a
       // chain confirmation) is exactly the case a screen reader must be told
       // about, and it replaces the only feedback a sighted player gets.
       // The quote-review panel outranks the Pay button: once a quote is
       // staged, the buyer must SEE what signing costs (the token total, the
-      // expiry) before the wallet takes over. Going straight from click to
-      // wallet was the H13 informed-commitment gap.
+      // fee legs, the expiry) before the wallet takes over. Going straight
+      // from click to wallet was the H13 informed-commitment gap.
       if (model.quoteReview !== null && o.role === 'buyer') {
         const q = model.quoteReview;
-        const total =
-          q.totalTokens === null
-            ? ''
-            : `<p>${esc(
-                t('hudChrome.wocMarket.quoteTotal', {
-                  tokens: formatNumber(q.totalTokens, { maximumFractionDigits: 4 }),
-                }),
-              )}</p>`;
-        const quoteExpiry =
-          q.expiresAtMs === null
+        const tokens = (value: number) => formatNumber(value, { maximumFractionDigits: 4 });
+        const leg = (
+          key:
+            | 'hudChrome.wocMarket.quoteTotal'
+            | 'hudChrome.wocMarket.quoteSeller'
+            | 'hudChrome.wocMarket.quoteBurn'
+            | 'hudChrome.wocMarket.quoteTreasury',
+          value: number | null,
+        ) => (value === null ? '' : `<p>${esc(t(key, { tokens: tokens(value) }))}</p>`);
+        // The Exchange's quote panel shows the same four legs for the same
+        // server answer; two surfaces of one economy disclose the same amounts.
+        const legs =
+          leg('hudChrome.wocMarket.quoteTotal', q.totalTokens) +
+          leg('hudChrome.wocMarket.quoteSeller', q.sellerTokens) +
+          leg('hudChrome.wocMarket.quoteBurn', q.burnTokens) +
+          leg('hudChrome.wocMarket.quoteTreasury', q.treasuryTokens);
+        // A lapsed quote SAYS so beside the disabled Sign (the Exchange's
+        // quoteExpired line), instead of a dead button under a past time.
+        const quoteExpiry = model.quoteExpired
+          ? `<p class="trade-woc-warn">${esc(t('hudChrome.wocMarket.quoteExpired'))}</p>`
+          : q.expiresAtMs === null
             ? ''
             : `<p class="trade-woc-note">${esc(
                 t('hudChrome.wocMarket.quoteExpiresAt', {
                   time: formatDateTime(q.expiresAtMs, { timeStyle: 'short' }),
                 }),
               )}</p>`;
+        // No consent row here: the claim that staged this quote was the
+        // terms-gated send, so acceptance is durable by the time it renders.
         return `<div class="trade-woc-arm">${modeTabs}
           <p role="status">${esc(t('hudChrome.wocMarket.quoteTitle'))}</p>
           <p>${esc(t('hudChrome.trade.woc.payNow', { usd: usd(q.usdCents) }))}</p>
-          ${total}
+          ${legs}
           ${quoteExpiry}
           <p class="trade-woc-warn">${esc(t('hudChrome.wocMarket.variableTokenWarning'))}</p>
-          ${termsRow}
           <button type="button" class="btn trade-woc-pay" data-woc-sign data-focus-key="trade-woc-sign"${
             model.quoteExpired ? ' disabled' : ''
           }>${esc(t('hudChrome.wocMarket.quoteSign'))}</button>
@@ -239,7 +284,7 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
       }
       const body =
         model.canPay && o.role === 'buyer'
-          ? `${termsRow}<button type="button" class="btn trade-woc-pay" data-woc-pay data-focus-key="trade-woc-pay"${
+          ? `${bindingNote}${termsRow}<button type="button" class="btn trade-woc-pay" data-woc-pay data-focus-key="trade-woc-pay"${
               model.busy ? ' disabled' : ''
             }>${
               model.busy ? '<span class="trade-woc-spinner" aria-hidden="true"></span>' : ''
@@ -248,12 +293,13 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
               model.busy ? '<span class="trade-woc-spinner" aria-hidden="true"></span>' : ''
             }${esc(t(model.statusKey ?? 'hudChrome.trade.woc.awaitingPayment'))}</p>`;
       const cancelSale =
-        o.role === 'seller' && o.phase === 'awaiting_payment'
-          ? `<button type="button" class="btn trade-woc-cancel" data-woc-cancel-sale data-focus-key="trade-woc-cancel-sale">${esc(
+        o.role === 'seller' && o.phase === 'awaiting_payment' && !model.cancelPending
+          ? `<button type="button" class="btn trade-woc-cancel" data-woc-cancel-sale data-focus-key="trade-woc-cancel-sale"${busyResolve}>${esc(
               t('hudChrome.trade.woc.cancelSale'),
             )}</button>`
           : '';
       return `<div class="trade-woc-arm">${modeTabs}
+        ${feeLines}
         ${body}
         ${cancelSale}
         <p class="trade-woc-hint" data-woc-hint role="status"></p>
@@ -263,11 +309,12 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
     // Accept, on both sides, exactly as a gold trade does. The arm's own
     // actions are each side's way OUT of the deal: the buyer withdraws the
     // offer they made, the seller declines the incoming one (H13's dead
-    // wiring, now live).
+    // wiring, now live). One click, one request: a resolve in flight
+    // disables the control.
     const action =
       o.role === 'buyer'
-        ? `<button type="button" class="btn trade-woc-cancel" data-woc-cancel data-focus-key="trade-woc-withdraw">${esc(t('hudChrome.trade.woc.withdraw'))}</button>`
-        : `<button type="button" class="btn trade-woc-cancel" data-woc-decline data-focus-key="trade-woc-decline">${esc(t('hudChrome.trade.woc.decline'))}</button>`;
+        ? `<button type="button" class="btn trade-woc-cancel" data-woc-cancel data-focus-key="trade-woc-withdraw"${busyResolve}>${esc(t('hudChrome.trade.woc.withdraw'))}</button>`
+        : `<button type="button" class="btn trade-woc-cancel" data-woc-decline data-focus-key="trade-woc-decline"${busyResolve}>${esc(t('hudChrome.trade.woc.decline'))}</button>`;
     // The offer is not open-ended, so say when it lapses; static text on
     // purpose (a per-second countdown would rebuild the subtree for no
     // decision the player can take differently).
@@ -280,7 +327,9 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
             }),
           )}</p>`;
     return `<div class="trade-woc-arm">${modeTabs}
+      ${feeLines}
       <p class="trade-woc-warn">${esc(t('hudChrome.trade.woc.notInstant'))}</p>
+      ${bindingNote}
       ${expiry}
       ${action}
       <p class="trade-woc-hint" data-woc-hint role="status"></p>
@@ -293,8 +342,7 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
     <label class="trade-woc-price-label" for="trade-woc-usd">${esc(t('hudChrome.trade.woc.priceLabel'))}</label>
     <input id="trade-woc-usd" class="coininput trade-woc-price" type="number" min="0" step="0.01" inputmode="decimal" value="${esc(priceValue)}" placeholder="${esc(t('hudChrome.trade.woc.pricePlaceholder'))}" data-focus-key="trade-woc-usd">
     <p class="trade-woc-equiv" data-woc-equiv></p>
-    <p class="trade-woc-fee" data-woc-fee></p>
-    <p class="trade-woc-net" data-woc-net></p>
+    ${feeLines}
     <p class="trade-woc-note" data-woc-ineligible></p>
     <p class="trade-woc-warn">${esc(t('hudChrome.trade.woc.variableWarning'))}</p>
     <p class="trade-woc-warn">${esc(t('hudChrome.trade.woc.notInstant'))}</p>
@@ -341,11 +389,26 @@ export function refreshWocTradeArm(root: ParentNode, model: WocTradeModel): void
           fee: usd(model.split.burnCents + model.split.treasuryCents),
         }),
   );
+  // Per side (the model picks the key): the seller reads what THEY receive,
+  // the buyer what the seller receives, since the price is the buyer's to
+  // pay in full.
   setText(
     '[data-woc-net]',
-    model.split === null
+    model.split === null ? '' : t(model.netKey, { net: usd(model.split.sellerCents) }),
+  );
+  // The p2p commitment note names the realm's payment hold once /status has
+  // answered it; until then its untimed twin still names the strike rather
+  // than a guessed figure. Rendered here (not in the markup) so the /status
+  // answer lands without a rebuild.
+  setText(
+    '[data-woc-binding]',
+    !model.showBindingNote
       ? ''
-      : t('hudChrome.trade.woc.netLine', { net: usd(model.split.sellerCents) }),
+      : model.holdSeconds === null
+        ? t('hudChrome.trade.woc.p2pBindingNoteUntimed')
+        : t('hudChrome.trade.woc.p2pBindingNote', {
+            duration: durationText(model.holdSeconds),
+          }),
   );
   setText(
     '[data-woc-ineligible]',
@@ -375,16 +438,40 @@ export function refreshWocTradeArm(root: ParentNode, model: WocTradeModel): void
 }
 
 /**
+ * The arm's actionable controls in the order a keyboard player would want
+ * focus to land when the control they held is gone or disabled: the payment
+ * commitments first, then the ways out, then the form. A ladder rather than
+ * one candidate, because a rebuild routinely retires the focused control (a
+ * pressed Pay renders disabled through the claim; the pay face becomes the
+ * quote face) and a single-candidate restore then drops focus to body, the
+ * exact failure src/ui/focus_restore.ts spells out.
+ */
+const WOC_TRADE_FOCUS_LADDER = [
+  'trade-woc-sign',
+  'trade-woc-quote-cancel',
+  'trade-woc-pay',
+  'trade-woc-send',
+  'trade-woc-decline',
+  'trade-woc-withdraw',
+  'trade-woc-cancel-sale',
+  'trade-woc-terms',
+  'trade-woc-usd',
+];
+
+/**
  * Re-focus the arm's own control after the trade window rebuilds.
  *
  * The restore lives HERE rather than in the caller because this module owns the
  * `data-focus-key` it emits, and `data-focus-key` is a namespace shared across
  * every window: the shared helper carries the containment check that stops one
- * window's repaint stealing focus from another (#2528).
+ * window's repaint stealing focus from another (#2528). The held key leads the
+ * ladder; the ladder is what catches focus when that control is gone.
  */
 export function restoreWocTradeFocus(root: ParentNode, focusKey: string | null): void {
   if (focusKey === null) return;
-  restoreFirstEnabled([root.querySelector<HTMLInputElement>(`[data-focus-key="${focusKey}"]`)]);
+  const byKey = (key: string) =>
+    root.querySelector<HTMLElement>(`[data-focus-key="${key.replace(/["\\]/g, '\\$&')}"]`);
+  restoreFirstEnabled([byKey(focusKey), ...WOC_TRADE_FOCUS_LADDER.map(byKey)]);
 }
 
 /** Attach the arm's listeners to a freshly painted root. */

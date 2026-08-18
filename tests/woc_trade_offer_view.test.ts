@@ -9,12 +9,13 @@ import { describe, expect, it } from 'vitest';
 import {
   adoptedWocOffer,
   selectStandingWocOffer,
+  WOC_SETTLING_STATES,
   type WocOfferRowLike,
   wocOfferClosedReason,
   wocOfferPhase,
   wocOfferPollStep,
 } from '../src/ui/hud/woc_trade/woc_trade_offer_view';
-import type { WocPendingOffer } from '../src/ui/trade_woc_view';
+import { WOC_DELIVERING_STATES, type WocPendingOffer } from '../src/ui/trade_woc_view';
 
 type Row = WocOfferRowLike & {
   listingStatus: string | null;
@@ -281,5 +282,100 @@ describe('the canonical deal walks review -> awaiting_payment -> paying -> settl
       expect(wocOfferPhase({ ...mine, settlementState: state }, false), state).toBe('paying');
     }
     expect(wocOfferPhase({ ...mine, settlementState: 'offered' }, false)).toBe('awaiting_payment');
+  });
+});
+
+describe('the two settlement-state vocabularies stay nested', () => {
+  it('every delivering-class state is a settling state, or its sentence could never render', () => {
+    // trade_woc_view.ts picks the delivering sentence only on the 'paying'
+    // face, and 'paying' is decided by WOC_SETTLING_STATES here: a state added
+    // to one literal but not the other silently loses its sentence.
+    for (const state of WOC_DELIVERING_STATES) {
+      expect(WOC_SETTLING_STATES.has(state), state).toBe(true);
+    }
+    // And the settling set alone decides 'paying' off the wire (no local click).
+    expect(WOC_SETTLING_STATES.has('offered'), 'a bare quote is not a payment').toBe(false);
+    expect(WOC_SETTLING_STATES.has('review'), 'parked money is still in flight').toBe(true);
+    expect(WOC_SETTLING_STATES.has('delivered')).toBe(true);
+  });
+});
+
+describe('wocOfferPhase (the direct pins, moved beside the module they test)', () => {
+  it('derives the phase from the LISTING, not the offer status', () => {
+    // The offer says only "agreed"; what decides whether money is still owed is
+    // the listing, which exists from acceptance and closes when the deal ends
+    // (sold, cancelled, suspended, or unpaid: the H13 fix splits those).
+    expect(wocOfferPhase({ listingId: null, listingStatus: null, listingResolution: null })).toBe(
+      'review',
+    );
+    expect(wocOfferPhase({ listingId: 41, listingStatus: 'active', listingResolution: null })).toBe(
+      'awaiting_payment',
+    );
+    expect(
+      wocOfferPhase({ listingId: 41, listingStatus: 'closed', listingResolution: 'sold' }),
+    ).toBe('settled');
+  });
+
+  it('reports a payment IN FLIGHT, so a wait is distinguishable from an absence', () => {
+    // The shipped gap: from acceptance until the item vanished, the seller saw
+    // one unchanging "waiting" face whether the buyer was signing in their
+    // wallet or had walked away. The settlement state is what separates them.
+    const live = { listingId: 41, listingStatus: 'active', listingResolution: null };
+    for (const state of ['confirming', 'confirmed', 'delivering']) {
+      expect(wocOfferPhase({ ...live, settlementState: state }), state).toBe('paying');
+    }
+  });
+
+  it("does NOT spin on 'offered': the buyer still has to press Pay", () => {
+    // A quote exists but nothing is signed. Showing progress here would put a
+    // spinner in front of a player whose next move is to act, which is the
+    // opposite of what the indicator means.
+    expect(
+      wocOfferPhase({
+        listingId: 41,
+        listingStatus: 'active',
+        listingResolution: null,
+        settlementState: 'offered',
+      }),
+    ).toBe('awaiting_payment');
+  });
+
+  it('lets the BUYER see their own payment before the server confirms it', () => {
+    // The wallet takes over the screen; coming back to a live-looking Pay button
+    // is what made a successful payment read as a click that did nothing. The
+    // local flag closes that gap without waiting for a poll.
+    const live = { listingId: 41, listingStatus: 'active', listingResolution: null };
+    expect(wocOfferPhase(live, true)).toBe('paying');
+    expect(wocOfferPhase(live, false)).toBe('awaiting_payment');
+  });
+
+  it('a CLOSED listing outranks any in-flight settlement state', () => {
+    // Delivery is the last word. A stale 'delivering' row alongside a closed
+    // listing must not strand both windows on a spinner that never resolves.
+    expect(
+      wocOfferPhase({
+        listingId: 41,
+        listingStatus: 'closed',
+        listingResolution: 'sold',
+        settlementState: 'delivering',
+      }),
+    ).toBe('settled');
+  });
+
+  it('treats an operator-parked review payment as still in flight, never settled', () => {
+    // A review-parked settlement is neither settled nor lost; the offer face
+    // must stay 'paying' (the pending face), not fall to awaiting_payment
+    // with a live Pay control under money an operator is deciding. Pinned
+    // through the REAL consumer (wocOfferPhase over SETTLING_STATES; the old
+    // wocSettlementInFlight wrapper had no production caller and is gone).
+    const row = { listingId: 41, listingStatus: 'settling', listingResolution: null };
+    expect(wocOfferPhase({ ...row, settlementState: 'review' })).toBe('paying');
+    expect(wocOfferPhase({ ...row, settlementState: 'confirming' })).toBe('paying');
+    // A DELIVERED settlement whose sale has not finalized is decided money
+    // (the copy has moved): still the pending face, never a live Pay button
+    // over a purchase already made.
+    expect(wocOfferPhase({ ...row, settlementState: 'delivered' })).toBe('paying');
+    expect(wocOfferPhase({ ...row, settlementState: 'offered' })).toBe('awaiting_payment');
+    expect(wocOfferPhase({ ...row, settlementState: null })).toBe('awaiting_payment');
   });
 });
