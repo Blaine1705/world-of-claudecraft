@@ -178,7 +178,7 @@ describe('pad mode', () => {
     wiring.syncPadMode(pad);
     expect(bodyClasses.has(PAD_MODE_CLASS)).toBe(true);
 
-    const store = { set: (_k: string, v: boolean) => v };
+    const store = { set: (_k: string, v: never) => v };
     expect(wiring.applySetting(pad, store, 'gamepadCrossHotbar', false)).toBe(true);
     expect(pad.setCrossHotbar).toHaveBeenCalledWith(false);
     // The desktop rows come back WITHOUT waiting for a reconnect.
@@ -210,7 +210,7 @@ describe('pad mode', () => {
 
   it('leaves an unrelated setting alone', () => {
     const wiring = createCrossHotbar(() => fakeHost());
-    const store = { set: (_k: string, v: boolean) => v };
+    const store = { set: (_k: string, v: never) => v };
     expect(wiring.applySetting(fakePad(true), store, 'gamepadInvertY', true)).toBe(false);
   });
 });
@@ -227,5 +227,34 @@ describe('onHold', () => {
     // Releasing must NOT close the bar: in pad mode it is the only hotbar. It just
     // stops arming a half.
     expect(host.setCrossHotbar).toHaveBeenLastCalledWith(expect.objectContaining({ layer: null }));
+  });
+});
+
+describe('the display preset', () => {
+  it('puts exactly one preset class on the body', () => {
+    // Each preset is a coherent look, so they are mutually exclusive: leaving two
+    // on would blend two designs and neither would be the one the player picked.
+    const wiring = createCrossHotbar(() => fakeHost());
+    const pad = fakePad(true);
+    const store = { set: (_k: string, v: never) => v };
+
+    expect(wiring.applySetting(pad, store, 'gamepadCrossHotbarDisplay', 1)).toBe(true);
+    expect(bodyClasses.has('xhb-compact')).toBe(true);
+    expect(bodyClasses.has('xhb-full')).toBe(false);
+    expect(bodyClasses.has('xhb-minimal')).toBe(false);
+
+    wiring.applySetting(pad, store, 'gamepadCrossHotbarDisplay', 2);
+    expect(bodyClasses.has('xhb-minimal')).toBe(true);
+    expect(bodyClasses.has('xhb-compact')).toBe(false);
+  });
+
+  it('falls back to full for a value that names no preset', () => {
+    // The value is persisted, so it is untrusted: a hand-edited or older setting
+    // must land on a real look rather than stripping every class.
+    const wiring = createCrossHotbar(() => fakeHost());
+    const pad = fakePad(true);
+    const store = { set: (_k: string, v: never) => v };
+    wiring.applySetting(pad, store, 'gamepadCrossHotbarDisplay', 99);
+    expect(bodyClasses.has('xhb-full')).toBe(true);
   });
 });

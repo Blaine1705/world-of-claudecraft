@@ -70,8 +70,14 @@ export interface CrossHotbarPadTarget {
 
 /** The persisted-settings store the arm writes through. */
 export interface CrossHotbarSettingsStore {
-  set(key: 'gamepadCrossHotbar' | 'gamepadCrossHotbarExpand', value: boolean): boolean;
+  set(key: CrossHotbarSettingKey, value: boolean): boolean;
+  set(key: CrossHotbarSettingKey, value: number): number;
 }
+
+export type CrossHotbarSettingKey =
+  | 'gamepadCrossHotbar'
+  | 'gamepadCrossHotbarExpand'
+  | 'gamepadCrossHotbarDisplay';
 
 /** The rebind surface the Controller options panel consumes. */
 export interface CrossHotbarPanelHooks {
@@ -159,6 +165,20 @@ export function crossHotbarButtonLabels(kind: GamepadKind): string[] {
 // pad keeps the desktop rows even though the setting defaults on, which is the
 // whole reason this is not just the setting.
 const PAD_MODE_CLASS = 'xhb-mode';
+// How much of itself the bar shows. A class per preset rather than a pile of
+// toggles: each is a coherent look, and CSS owns the whole difference.
+export const CROSS_HOTBAR_DISPLAY_CLASSES = ['xhb-full', 'xhb-compact', 'xhb-minimal'] as const;
+
+function applyDisplayClass(preset: number): void {
+  try {
+    const wanted = CROSS_HOTBAR_DISPLAY_CLASSES[preset] ?? CROSS_HOTBAR_DISPLAY_CLASSES[0];
+    for (const cls of CROSS_HOTBAR_DISPLAY_CLASSES) {
+      document.body.classList.toggle(cls, cls === wanted);
+    }
+  } catch {
+    /* no DOM (headless/tests) */
+  }
+}
 
 function applyPadModeClass(on: boolean): void {
   try {
@@ -211,6 +231,10 @@ export function createCrossHotbar(host: () => CrossHotbarOverlayHost): CrossHotb
       }
       if (key === 'gamepadCrossHotbarExpand') {
         pad.setCrossHotbarExpand(store.set(key, !!value));
+        return true;
+      }
+      if (key === 'gamepadCrossHotbarDisplay') {
+        applyDisplayClass(store.set(key, Number(value)));
         return true;
       }
       return false;

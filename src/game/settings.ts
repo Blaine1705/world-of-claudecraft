@@ -129,6 +129,10 @@ export const SETTING_RANGES = {
   gamepadCameraSpeed: { min: 0.5, max: 5, def: 2.4 },
   // Rumble intensity (0 silences haptics without disabling the pad entirely).
   gamepadVibration: { min: 0, max: 1, def: 1 },
+  // How much of itself the cross hotbar shows: 0 full (framed, both halves
+  // labelled), 1 compact (no frame, labels only on the armed half), 2 minimal
+  // (nothing until a trigger is held). A taste call, so it is a setting.
+  gamepadCrossHotbarDisplay: { min: 0, max: 2, def: 0 },
 
   // --- Interface & Comfort pack: presentational HUD tuning, applied via CSS
   // custom properties in main.ts. All default to 1.0 (unchanged look) and are

@@ -1910,6 +1910,33 @@ export class OptionsWindow {
     // the bar no longer stores, and thirty-two dropdowns was a miserable way to
     // arrange a bar you are looking at. Arranging happens on the bar itself now,
     // so this says how to get there.
+    // How much of itself the bar shows. A picker rather than a toggle: the three
+    // presets are points on one scale, and the right one is a taste call.
+    const displayRow = document.createElement('div');
+    displayRow.className = 'set-row';
+    const displayName = document.createElement('span');
+    displayName.className = 'set-name';
+    displayName.textContent = t('hudChrome.controller.crossHotbarDisplay');
+    displayRow.append(
+      displayName,
+      this.deps.buildDropdown(
+        [
+          { value: '0', label: t('hudChrome.controller.crossHotbarDisplayFull') },
+          { value: '1', label: t('hudChrome.controller.crossHotbarDisplayCompact') },
+          { value: '2', label: t('hudChrome.controller.crossHotbarDisplayMinimal') },
+        ],
+        String(hooks.settings.get('gamepadCrossHotbarDisplay') ?? 0),
+        (v) =>
+          hooks.onSettingChange(
+            'gamepadCrossHotbarDisplay',
+            hooks.settings.set('gamepadCrossHotbarDisplay', Number(v)),
+          ),
+        undefined,
+        { ariaLabel: t('hudChrome.controller.crossHotbarDisplay') },
+      ),
+    );
+    body.appendChild(displayRow);
+
     const editHelp = document.createElement('div');
     editHelp.className = 'set-note';
     editHelp.textContent = t('hudChrome.controller.crossHotbarEditHelp');

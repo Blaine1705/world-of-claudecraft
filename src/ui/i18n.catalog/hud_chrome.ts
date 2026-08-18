@@ -1534,6 +1534,10 @@ export const hudChromeStrings = {
     subcommandsAction: 'Subcommands / Map',
     cycleHudAction: 'Cycle Interface',
     cycleSetAction: 'Change Hotbar Set',
+    crossHotbarDisplay: 'Bar Display',
+    crossHotbarDisplayFull: 'Full',
+    crossHotbarDisplayCompact: 'Compact',
+    crossHotbarDisplayMinimal: 'Only While Held',
     crossHotbarArrangeChord: '{bumper} + {button} to arrange',
     crossHotbarCarrying: 'Carrying {action}: confirm on a cell to place it, cancel to put it back.',
     crossHotbarEditHint:

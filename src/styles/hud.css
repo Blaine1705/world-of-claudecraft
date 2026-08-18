@@ -9525,3 +9525,49 @@ body.pad-nav * {
   border-color: var(--gold);
   box-shadow: 0 0 10px rgba(255, 209, 0, 0.35);
 }
+
+/* Cross hotbar display presets. The bar's structure never changes: each preset is
+   a class on <body> and CSS owns the whole difference, so a player can flip
+   between them mid-session without the bar rebuilding.
+   Full is the default and needs no rules of its own. */
+
+/* Compact: the frame carries most of the bar's visual weight, so it goes first.
+   The cells alone still read as a bar, and the labels stay only where they are
+   still telling the player something (the half a trigger has armed). */
+body.xhb-compact .xhb {
+  background: none;
+  border-color: transparent;
+  box-shadow: none;
+}
+body.xhb-compact .xhb-hint,
+body.xhb-compact .xhb-half:not(.xhb-armed) .xhb-glyph,
+body.xhb-compact .xhb-half:not(.xhb-armed) .xhb-trigger {
+  display: none;
+}
+/* Arranging is the one time the frame earns its keep: it says the bar is a thing
+   being edited rather than played, so the preset stands aside for it. */
+body.xhb-compact .xhb.xhb-editing {
+  background: var(--panel-bg, rgba(12, 10, 8, 0.82));
+  border-color: var(--gold);
+}
+body.xhb-compact .xhb.xhb-editing .xhb-hint {
+  display: block;
+}
+
+/* Minimal: nothing at all until a trigger is held, for a player who knows the
+   layout and wants the screen back. The bar keeps its box (visibility, not
+   display) so the HUD above it never moves. */
+body.xhb-minimal .xhb {
+  background: none;
+  border-color: transparent;
+  box-shadow: none;
+}
+body.xhb-minimal .xhb-hint {
+  display: none;
+}
+body.xhb-minimal .xhb:not(.xhb-editing) .xhb-half:not(.xhb-armed) {
+  visibility: hidden;
+}
+body.xhb-minimal .xhb.xhb-editing .xhb-half {
+  visibility: visible;
+}
