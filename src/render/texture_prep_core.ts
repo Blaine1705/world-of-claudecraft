@@ -33,6 +33,9 @@ export interface TexturePrepTexture {
   readonly isRenderTargetTexture?: boolean;
   readonly isExternalTexture?: boolean;
   readonly isVideoTexture?: boolean;
+  /** The source three uploads from: null while a loader has not delivered
+   *  it, `complete === false` while an HTMLImageElement is still decoding. */
+  readonly image?: { readonly complete?: boolean } | null;
 }
 
 /** The slice of `WebGLRenderer.properties` this decision reads (three types the
@@ -75,12 +78,18 @@ export function isTextureResident(
 /**
  * Whether this lane may upload `texture` at all. A render-target texture lives
  * GPU-side already, an external and a video texture have no image source three
- * would upload from here, and three uploads nothing for version 0.
+ * would upload from here, three uploads nothing for version 0, and a texture
+ * whose image has not arrived (null) or not finished decoding (an
+ * HTMLImageElement with `complete === false`) is refused by three's
+ * setTexture2D with a warning and a stale __version: it would never read
+ * resident and be re-queued, and re-warned, at every gate.
  */
 export function isTexturePrepCandidate(texture: TexturePrepTexture): boolean {
   if (texture.isRenderTargetTexture === true) return false;
   if (texture.isExternalTexture === true) return false;
   if (texture.isVideoTexture === true) return false;
+  if (texture.image === null || texture.image === undefined) return false;
+  if (texture.image.complete === false) return false;
   return (texture.version ?? 0) > 0;
 }
 

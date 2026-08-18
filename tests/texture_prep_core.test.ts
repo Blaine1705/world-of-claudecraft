@@ -21,10 +21,14 @@ interface Tex extends TexturePrepTexture {
   name: string;
 }
 
+// Every stub carries a decoded image unless a case says otherwise: three's
+// setTexture2D uploads nothing for a null or still-decoding source, so the
+// candidate predicate refuses those before residency is even asked.
 const texture = (name: string, extra: Partial<Tex> = {}): Tex => ({
   isTexture: true,
   name,
   version: 1,
+  image: { complete: true },
   ...extra,
 });
 
@@ -64,12 +68,18 @@ describe('isTexturePrepCandidate', () => {
     ['external', { isExternalTexture: true }],
     ['video', { isVideoTexture: true }],
     ['version 0', { version: 0 }],
+    ['not yet loaded (image null)', { image: null }],
+    ['still decoding (image.complete false)', { image: { complete: false } }],
   ])('refuses a %s texture', (_name, extra) => {
     expect(isTexturePrepCandidate(texture('t', extra as Partial<Tex>))).toBe(false);
   });
 
   it('accepts an ordinary authored texture', () => {
     expect(isTexturePrepCandidate(texture('makeup', { version: 1 }))).toBe(true);
+  });
+
+  it('accepts a decoded source that has no complete flag at all (a DataTexture, a KTX2)', () => {
+    expect(isTexturePrepCandidate(texture('bones', { image: {} as Tex['image'] }))).toBe(true);
   });
 });
 

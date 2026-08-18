@@ -231,18 +231,23 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   `WebGLTextures`), so the same gates also run an upload lane: one budgeted
   queue unit per non-resident texture under the root (`texture_prep_lane.ts`,
   enumeration and the residency predicate in the pure `texture_prep_core.ts`,
-  label kind `upload:texture`, `upload-preview:texture` on a second context, with
-  the size class appended to the kind, `upload-mid` from 512x512 texels and
-  `upload-big` from 1024x1024, so a large upload is priced by its own class).
-  **The order inside a gate is LINK, then UPLOADS, then the TOUCH tail, then
-  settle**, because the touch's driver round trip flushes behind everything
-  already queued, so uploads paid after it are simply measured by it. The lane
-  never releases its tail (an upload is main-thread driver work with no
-  off-thread arm), never re-arms `needsUpdate` (a KTX2 texture whose CPU mips
-  were released comes back black), and never wraps its uploads in
-  `compilePrewarmColorPrograms`' render-target dance (`initTexture` dispatches
-  on the texture's own flags and unbinds itself, so there is nothing to
-  restore). `idle_queue.ts`
+  label kind `upload:texture` with the size class appended, `upload-mid` from
+  512x512 texels and `upload-big` from 1024x1024, so a large upload is priced by
+  its own class; a second context that moves onto the lane passes its own label,
+  `upload-preview:texture`, though the paperdoll and portrait contexts still run
+  their sliced upload today). A texture whose image has not arrived or not
+  finished decoding is not a candidate (three uploads nothing for it and would
+  leave it non-resident, so it would be re-queued at every gate). **The order
+  inside a gate is LINK, then UPLOADS, then the TOUCH tail, then settle**,
+  because the touch's driver round trip flushes behind everything already
+  queued, so uploads paid after it are simply measured by it. The lane never
+  releases its tail (an upload is main-thread driver work with no off-thread
+  arm), never re-arms `needsUpdate` on a texture it does not own (a KTX2 texture
+  whose CPU mips were released comes back black; the DataTexture chunk path
+  re-arms it per update range by design, that is how three consumes ranges),
+  and never wraps its uploads in `compilePrewarmColorPrograms`' render-target
+  dance (`initTexture` dispatches on the texture's own flags and unbinds
+  itself, so there is nothing to restore). `idle_queue.ts`
   (idle-slot queue draining),
   `prewarm_depth_material.ts` (the shadow arm's depth material: it must link
   the SAME program three's `WebGLShadowMap` draws, so it never sets

@@ -44,7 +44,8 @@ export interface TexturePrepQueue {
  *  `texture-chunk-upload`. */
 export const TEXTURE_PREP_LABEL = 'upload:texture';
 
-/** The second contexts' own kind (paperdoll, portrait): a preview upload runs
+/** The second contexts' own kind (paperdoll, portrait) for when they move onto
+ *  this lane (today they still run their sliced upload): a preview upload runs
  *  on its own GL context against a catalog rig, so sharing the world estimate
  *  would let the budget admit a whole open's worth of pieces into one frame.
  *  Mirrors PREVIEW_LINKED_PROGRAM_TOUCH_LABEL. */

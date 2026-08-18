@@ -57,6 +57,7 @@ const texture = (name: string, extra: Record<string, unknown> = {}): Record<stri
   isTexture: true,
   name,
   version: 1,
+  image: {},
   ...extra,
 });
 
