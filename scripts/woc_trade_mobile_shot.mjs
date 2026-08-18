@@ -29,6 +29,7 @@ import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
 import { enterOfflineGame } from './enter_offline_game.mjs';
 import { suppressGpuNotice } from './lib/gpu_notice_suppress.mjs';
+import { dismissPerfNudge } from './lib/perf_nudge_dismiss.mjs';
 
 const GAME_URL = process.env.GAME_URL ?? 'http://localhost:5173';
 const OUT = process.env.OUT ?? 'docs/screenshots/woc-market';
@@ -264,6 +265,9 @@ async function measure(label) {
 }
 
 async function shoot(name) {
+  // Same capture hygiene as the market rig: the perf-doctor nudge is pressed
+  // away right before the shot, or it lands in the frame's corner.
+  await dismissPerfNudge(page);
   await sleep(300);
   const file = `${OUT}/${SHOT_PREFIX}-${MOBILE ? 'mobile' : 'desktop'}-trade-${name}${SUFFIX}.png`;
   await page.screenshot({ path: file });

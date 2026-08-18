@@ -33,6 +33,7 @@ import puppeteer from 'puppeteer-core';
 import WebSocket from 'ws';
 import { BROWSER_PATH } from './browser_path.mjs';
 import { suppressGpuNotice } from './lib/gpu_notice_suppress.mjs';
+import { dismissPerfNudge } from './lib/perf_nudge_dismiss.mjs';
 import { worldAuthMessage } from './lib/world_auth.mjs';
 
 const GAME_URL = process.env.GAME_URL ?? 'http://localhost:5173';
@@ -622,6 +623,10 @@ async function openExchange(page) {
 }
 
 async function shoot(page, file, clip) {
+  // The perf-doctor nudge fires mid-session on any slow machine, and a headless
+  // swiftshader box is one: pressed away the way a player would, right before
+  // the shot, or it sits in the frame's corner over the window.
+  await dismissPerfNudge(page);
   // The camera-choice prompt mounts a beat after world entry and would
   // overlay the window; dismiss it (and any lingering tutorial chip) at the
   // last moment before every capture.
