@@ -61,7 +61,12 @@ import {
   dist2d,
   type Entity,
 } from '../types';
-import { delveBonusMarksFor, delveHasLiveMobs, grantDelveRewards, openDelveSurfaceExit } from './runs';
+import {
+  delveBonusMarksFor,
+  delveHasLiveMobs,
+  grantDelveRewards,
+  openDelveSurfaceExit,
+} from './runs';
 
 /** Resolve the locked-chest object + run for an acting player, with all the
  * proximity/eligibility guards. Returns null (after emitting an error) on any

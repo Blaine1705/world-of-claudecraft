@@ -2,8 +2,8 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { BG_GRAVEYARDS, bgFieldPlanWalls } from '../src/sim/battleground_layout';
 import { resolvePosition } from '../src/sim/colliders';
 import {
-  battlegroundOrigin,
   BUILTIN_WORLD,
+  battlegroundOrigin,
   DELVES,
   INSTANCE_X_BASE,
   isBgPos,
