@@ -17,9 +17,9 @@ export const IGNIVAR_FORGE_WAVE_RANGE = 72;
 export const IGNIVAR_FORGE_WAVE_GAP_HALF_ANGLE = Math.PI / 12;
 export const IGNIVAR_FORGE_WAVE_WALL_HALF_THICKNESS = 0.75;
 export const IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP = 0.35;
-// The shared collision sweep seats the victim at the opposite wall, so the
-// shove always completes backward without tunneling out of the room.
-export const IGNIVAR_FORGE_WAVE_KNOCKBACK = IGNIVAR_FORGE_WAVE_RANGE;
+// A brief nudge sells the impact without carrying the victim across the room;
+// the expanding wall then continues through them and can only damage once.
+export const IGNIVAR_FORGE_WAVE_KNOCKBACK = 4;
 
 const TAU = Math.PI * 2;
 

@@ -723,7 +723,7 @@ describe('Ignivar encounter', () => {
     expect(IGNIVAR_FORGE_WAVE_WINDUP_SECONDS).toBe(2.5);
     expect(IGNIVAR_FORGE_WAVE_ACTIVE_SECONDS).toBe(3);
     expect(IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP).toBe(0.35);
-    expect(IGNIVAR_FORGE_WAVE_KNOCKBACK).toBe(72);
+    expect(IGNIVAR_FORGE_WAVE_KNOCKBACK).toBe(4);
     expect(IGNIVAR_MOLTEN_ARMOR_DURATION).toBe(30);
     expect(IGNIVAR_MOLTEN_ARMOR_PER_STACK).toBe(0.35);
     expect(IGNIVAR_FRONTAL_CAST_SECONDS).toBe(3);
@@ -817,8 +817,7 @@ describe('Ignivar encounter', () => {
       unsafeHp - Math.ceil(sim.player.maxHp * IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP),
     );
     const pushedDistance = Math.hypot(sim.player.pos.x - boss.pos.x, sim.player.pos.z - boss.pos.z);
-    expect(pushedDistance).toBeGreaterThan(unsafeDistance + 20);
-    expect(pushedDistance).toBeLessThan(unsafeDistance + IGNIVAR_FORGE_WAVE_KNOCKBACK);
+    expect(pushedDistance).toBeCloseTo(unsafeDistance + IGNIVAR_FORGE_WAVE_KNOCKBACK, 5);
     expect(safe.hp).toBe(safeHp);
     expect(secondUnsafe.hp).toBe(
       secondUnsafeHp - Math.ceil(secondUnsafe.maxHp * IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP),
@@ -850,21 +849,15 @@ describe('Ignivar encounter', () => {
       name: 'straight wall',
       bossOffset: { x: -25, z: 0 },
       victimOffset: { x: 25, z: 0 },
-      wallCoordinate: (x: number, _z: number) => x,
-      wallCoordinateMin: 31,
-      wallCoordinateMax: 33,
     },
     {
       name: 'diagonal wall',
       bossOffset: { x: -22, z: -22 },
       victimOffset: { x: 22, z: 22 },
-      wallCoordinate: (x: number, z: number) => x + z,
-      wallCoordinateMin: 44.5,
-      wallCoordinateMax: 47,
     },
   ])(
-    'sweeps the opposite $name and seats its victim against the arena collision',
-    ({ bossOffset, victimOffset, wallCoordinate, wallCoordinateMin, wallCoordinateMax }) => {
+    'sweeps the opposite $name, damages once, and only nudges its victim',
+    ({ bossOffset, victimOffset }) => {
       const { sim, boss } = claimedEncounter(8126);
       const origin = instanceOrigin(DUNGEONS.ignivar_raid_arena.index, 0);
       boss.pos = { x: origin.x + bossOffset.x, y: boss.pos.y, z: origin.z + bossOffset.z };
@@ -887,6 +880,7 @@ describe('Ignivar encounter', () => {
       boss.castingAbility = IGNIVAR_FORGE_WAVE_CAST_ID;
       boss.channeling = true;
       const hpBefore = sim.player.hp;
+      const positionBefore = { ...sim.player.pos };
 
       for (let tick = 0; tick < IGNIVAR_FORGE_WAVE_ACTIVE_SECONDS / DT; tick++) {
         updateIgnivarEncounter(sim.ctx, boss);
@@ -898,15 +892,16 @@ describe('Ignivar encounter', () => {
         ...shell.flatMap((from) => shell.map((to) => Math.hypot(to.x - from.x, to.z - from.z))),
       );
       expect(IGNIVAR_FORGE_WAVE_RANGE).toBeGreaterThanOrEqual(roomDiameter);
-      expect(IGNIVAR_FORGE_WAVE_KNOCKBACK).toBeGreaterThanOrEqual(IGNIVAR_FORGE_WAVE_RANGE);
+      expect(IGNIVAR_FORGE_WAVE_KNOCKBACK).toBeLessThan(IGNIVAR_FORGE_WAVE_RANGE / 10);
       expect(sim.player.hp).toBe(
         hpBefore - Math.ceil(sim.player.maxHp * IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP),
       );
+      expect(
+        Math.hypot(sim.player.pos.x - positionBefore.x, sim.player.pos.z - positionBefore.z),
+      ).toBeLessThanOrEqual(IGNIVAR_FORGE_WAVE_KNOCKBACK);
       const localX = sim.player.pos.x - origin.x;
       const localZ = sim.player.pos.z - origin.z;
       expect(polygonContainsPoint(shell, localX, localZ)).toBe(true);
-      expect(wallCoordinate(localX, localZ)).toBeGreaterThan(wallCoordinateMin);
-      expect(wallCoordinate(localX, localZ)).toBeLessThan(wallCoordinateMax);
     },
   );
 

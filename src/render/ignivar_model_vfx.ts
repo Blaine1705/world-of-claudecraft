@@ -2,7 +2,12 @@
 // body. Geometry stays model-local so it follows character normalization,
 // facing, and entity scale; particles are emitted in world space.
 import * as THREE from 'three';
-import { IGNIVAR_FORGE_WAVE_CAST_ID } from '../sim/encounters/ignivar';
+import {
+  IGNIVAR_FORGE_WAVE_CAST_ID,
+  IGNIVAR_FRONTAL_CAST_ID,
+  IGNIVAR_ROTATING_RAYS_CAST_ID,
+  IGNIVAR_SKYFIRE_CAST_ID,
+} from '../sim/encounters/ignivar';
 import { GFX } from './gfx';
 import { attachIgnivarVfx, type IgnivarVfxHandle } from './ignivar_fire_vfx';
 import type { Vfx } from './vfx';
@@ -201,13 +206,18 @@ export function syncIgnivarModelVfx(
   const handle = owner?.userData[IGNIVAR_FIRE_VFX_HANDLE] as IgnivarVfxHandle | undefined;
   if (handle && owner) {
     const dead = state?.dead === true;
-    const channeling = state?.channeling === true && !dead;
     const castingAbility = state?.castingAbility ?? null;
-    const previousChanneling = owner?.userData.ignivarVfxChanneling === true;
+    const flameActive =
+      !dead &&
+      castingAbility !== IGNIVAR_ROTATING_RAYS_CAST_ID &&
+      (state?.channeling === true ||
+        castingAbility === IGNIVAR_FRONTAL_CAST_ID ||
+        castingAbility === IGNIVAR_SKYFIRE_CAST_ID);
+    const previousFlameActive = owner?.userData.ignivarVfxFlameActive === true;
     const previousCast = (owner?.userData.ignivarVfxCast as string | null | undefined) ?? null;
-    handle.setIntensity(dead ? 0 : channeling ? 1.35 : 1);
-    handle.setFlame(channeling);
-    if (previousChanneling && !channeling && !dead) handle.pulse();
+    handle.setIntensity(dead ? 0 : flameActive ? 1.35 : 1);
+    handle.setFlame(flameActive);
+    if (previousFlameActive && !flameActive && !dead) handle.pulse();
     if (
       previousCast === IGNIVAR_FORGE_WAVE_CAST_ID &&
       castingAbility !== IGNIVAR_FORGE_WAVE_CAST_ID &&
@@ -215,7 +225,7 @@ export function syncIgnivarModelVfx(
     ) {
       handle.shockwave();
     }
-    owner.userData.ignivarVfxChanneling = channeling;
+    owner.userData.ignivarVfxFlameActive = flameActive;
     owner.userData.ignivarVfxCast = castingAbility;
     handle.update(dt);
     return;
@@ -268,7 +278,7 @@ export function disposeIgnivarModelVfx(model: THREE.Object3D): void {
   if (handle && owner) {
     handle.dispose();
     delete owner.userData[IGNIVAR_FIRE_VFX_HANDLE];
-    delete owner.userData.ignivarVfxChanneling;
+    delete owner.userData.ignivarVfxFlameActive;
     delete owner.userData.ignivarVfxCast;
     return;
   }

@@ -14,6 +14,12 @@ import {
   disposeIgnivarModelVfx,
   syncIgnivarModelVfx,
 } from '../src/render/ignivar_model_vfx';
+import {
+  IGNIVAR_FORGE_WAVE_CAST_ID,
+  IGNIVAR_FRONTAL_CAST_ID,
+  IGNIVAR_ROTATING_RAYS_CAST_ID,
+  IGNIVAR_SKYFIRE_CAST_ID,
+} from '../src/sim/encounters/ignivar';
 import { IGNIVAR_BOSS_ID } from '../src/sim/types';
 
 const REPO_ROOT = path.join(__dirname, '..');
@@ -178,16 +184,55 @@ describe('Ignivar boss model', () => {
       'float s = 0.55 * (0.8 + 0.4 * uIntensity) * mscale;',
     );
 
-    syncIgnivarModelVfx(model, 1 / 60, undefined, {
-      dead: false,
-      castingAbility: 'Forge Wave',
-      channeling: true,
-    });
-    syncIgnivarModelVfx(model, 1 / 60, undefined, {
-      dead: false,
-      castingAbility: null,
-      channeling: false,
-    });
+    const coreFlame = model.getObjectByName('vfx_core__flame') as THREE.Mesh<
+      THREE.InstancedBufferGeometry,
+      THREE.ShaderMaterial
+    >;
+    for (let frame = 0; frame < 20; frame++) {
+      syncIgnivarModelVfx(model, 1 / 60, undefined, {
+        dead: false,
+        castingAbility: IGNIVAR_SKYFIRE_CAST_ID,
+        channeling: false,
+      });
+    }
+    expect(coreFlame.material.uniforms.uFlame.value).toBeGreaterThan(0.75);
+
+    for (let frame = 0; frame < 30; frame++) {
+      syncIgnivarModelVfx(model, 1 / 60, undefined, {
+        dead: false,
+        castingAbility: IGNIVAR_ROTATING_RAYS_CAST_ID,
+        channeling: true,
+      });
+    }
+    expect(coreFlame.material.uniforms.uFlame.value).toBeLessThan(0.3);
+
+    for (let frame = 0; frame < 20; frame++) {
+      syncIgnivarModelVfx(model, 1 / 60, undefined, {
+        dead: false,
+        castingAbility: IGNIVAR_FORGE_WAVE_CAST_ID,
+        channeling: true,
+      });
+    }
+    expect(coreFlame.material.uniforms.uFlame.value).toBeGreaterThan(0.75);
+
+    for (let frame = 0; frame < 30; frame++) {
+      syncIgnivarModelVfx(model, 1 / 60, undefined, {
+        dead: false,
+        castingAbility: IGNIVAR_ROTATING_RAYS_CAST_ID,
+        channeling: true,
+      });
+    }
+    expect(coreFlame.material.uniforms.uFlame.value).toBeLessThan(0.3);
+
+    for (let frame = 0; frame < 20; frame++) {
+      syncIgnivarModelVfx(model, 1 / 60, undefined, {
+        dead: false,
+        castingAbility: IGNIVAR_FRONTAL_CAST_ID,
+        channeling: false,
+      });
+    }
+    expect(coreFlame.material.uniforms.uFlame.value).toBeGreaterThan(0.75);
+
     disposeIgnivarModelVfx(model);
     expect(model.getObjectByName('ignivar__shockwave')).toBeUndefined();
     textureLoad.mockRestore();
