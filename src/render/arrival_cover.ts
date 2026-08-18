@@ -24,7 +24,8 @@
 // would otherwise keep reporting held keys for the rest of the session and
 // make every arrival wait its whole budget out.
 
-import { gpuPrepNow } from './gpu_prep_events';
+import { createArrivalDetector } from './arrival_event_core';
+import { gpuPrepNow, recordGpuPrepEvent } from './gpu_prep_events';
 
 /** The slice of a reveal gate the cover reads (reveal_gate_core). */
 export interface ArrivalRevealGate {
@@ -47,6 +48,9 @@ export interface ArrivalRevealWaitOptions {
 
 let coverActive = false;
 const gates = new Set<WeakRef<ArrivalRevealGate>>();
+// Module-level like the flag: a graphics rebuild mints a fresh renderer, and
+// the player's last position is not something a rebuild should forget.
+let arrivalDetector = createArrivalDetector();
 
 /** Live gates only; dead WeakRefs are pruned as they are encountered. */
 function* liveGates(): Generator<ArrivalRevealGate> {
@@ -125,7 +129,31 @@ export function awaitArrivalReveals(
   });
 }
 
+/**
+ * One teleport-class landing (arrival_event_core), recorded as an `arrival`
+ * GPU-prep event so a capture can line the escapes and the build ledger up
+ * against it. Reads only what this registry owns: whether the curtain was up
+ * and how many imminent keys were still held. `missingViews` is the entity
+ * views the landing frame still had to build.
+ */
+export function noteArrivalEvent(missingViews: number): void {
+  recordGpuPrepEvent({
+    kind: 'arrival',
+    key: coverActive ? 'cover' : 'no-cover',
+    ageMs: 0,
+    units: missingViews,
+    totalRoots: arrivalHeldImminentKeys(),
+  });
+}
+
+/** Per-frame entry: the local player's position this frame; records the
+ *  arrival event on the frame the displacement classifies as a teleport. */
+export function noteArrivalIfTeleported(x: number, z: number, missingViews: number): void {
+  if (arrivalDetector.observe(x, z)) noteArrivalEvent(missingViews);
+}
+
 export function resetArrivalCoverForTest(): void {
   coverActive = false;
   gates.clear();
+  arrivalDetector = createArrivalDetector();
 }

@@ -8,7 +8,10 @@
 // the one thing the prep machinery could not otherwise see.
 // The reveal gate also reports its SOFT deadline here, which escapes nothing
 // and exists only to leave that evidence, plus lifetime counters of where the
-// roots of a held key became visible.
+// roots of a held key became visible. `arrival` is a lifecycle mark, not an
+// escape either: one per teleport-class landing (arrival_event_core), so a
+// capture can line the escapes and the build ledger up against the moment
+// the camera was dropped somewhere new.
 //
 // Write-only telemetry: nothing here feeds a reveal, an admission, or any
 // other decision, so recording an event can never change what the renderer
@@ -25,7 +28,8 @@ export type GpuPrepEventKind =
   | 'attach-watchdog'
   | 'gate-timeout'
   | 'submit-stop'
-  | 'live-program';
+  | 'live-program'
+  | 'arrival';
 
 export const GPU_PREP_EVENT_KINDS: readonly GpuPrepEventKind[] = [
   'reveal-watchdog',
@@ -34,6 +38,7 @@ export const GPU_PREP_EVENT_KINDS: readonly GpuPrepEventKind[] = [
   'gate-timeout',
   'submit-stop',
   'live-program',
+  'arrival',
 ];
 
 /**
@@ -53,22 +58,30 @@ export const GPU_PREP_EVENT_RING_SIZE = 160;
 
 export interface GpuPrepEvent {
   kind: GpuPrepEventKind;
-  /** What the event is about: a reveal key, a group name, a gate label. */
+  /** What the event is about: a reveal key, a group name, a gate label. For
+   *  an `arrival`: `cover` when the arrival curtain was up on the landing
+   *  frame, `no-cover` when the player landed in live frames. */
   key: string;
-  /** How long the target had been waiting when the escape fired. */
+  /** How long the target had been waiting when the escape fired. 0 for an
+   *  `arrival`, which marks an instant. */
   ageMs: number;
   /** Clock reading at the fire, from the module clock. */
   atMs: number;
   /** For a multi-root reveal key: how many of its roots had linked when the
    *  escape fired, out of how many. A whole town revealed at its watchdog
    *  with 9 of 41 linked is a very different first draw from 40 of 41, and
-   *  the console line could never say which. 0/0 for the other kinds. */
+   *  the console line could never say which. For an `arrival`, totalRoots is
+   *  the imminent reveal keys still held across the registry on the landing
+   *  frame (arrival_cover arrivalHeldImminentKeys) and readyRoots stays 0.
+   *  0/0 for the other kinds. */
   readyRoots: number;
   totalRoots: number;
   /** Units the reporting lane had handled when the event fired. For a
    *  submit-stop that is how many compile units the boot lane submitted
    *  before the stop truncated it, which is what makes a truncated manifest
-   *  attributable from the capture alone. 0 for the other kinds. */
+   *  attributable from the capture alone. For an `arrival`, the entity views
+   *  still missing at the landing frame (the candidate scan's length). 0 for
+   *  the other kinds. */
   units: number;
 }
 
@@ -160,6 +173,7 @@ const counts: Record<GpuPrepEventKind, number> = {
   'gate-timeout': 0,
   'submit-stop': 0,
   'live-program': 0,
+  arrival: 0,
 };
 
 const reveal: GpuPrepRevealCounters = {

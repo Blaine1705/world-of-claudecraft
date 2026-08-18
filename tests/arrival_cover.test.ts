@@ -9,10 +9,13 @@ import {
   arrivalCoverActive,
   arrivalHeldImminentKeys,
   awaitArrivalReveals,
+  noteArrivalEvent,
+  noteArrivalIfTeleported,
   registerRevealGateForArrival,
   resetArrivalCoverForTest,
   setArrivalCover,
 } from '../src/render/arrival_cover';
+import { gpuPrepEventsSnapshot, resetGpuPrepEventsForTest } from '../src/render/gpu_prep_events';
 
 /** A gate whose held count the test drives. */
 function fakeGate(held: number): ArrivalRevealGate & { held: number } {
@@ -45,6 +48,44 @@ function fakeTimer() {
 
 afterEach(() => {
   resetArrivalCoverForTest();
+  resetGpuPrepEventsForTest();
+});
+
+describe('noteArrivalEvent', () => {
+  it('records one arrival event naming the cover state, missing views and held keys', () => {
+    const gate = fakeGate(3);
+    registerRevealGateForArrival(gate);
+    setArrivalCover(true);
+    noteArrivalEvent(17);
+    setArrivalCover(false);
+    gate.held = 0;
+    noteArrivalEvent(2);
+    const events = gpuPrepEventsSnapshot().events;
+    expect(events).toHaveLength(2);
+    expect(events[0]).toMatchObject({
+      kind: 'arrival',
+      key: 'cover',
+      units: 17,
+      totalRoots: 3,
+      readyRoots: 0,
+      ageMs: 0,
+    });
+    expect(events[1]).toMatchObject({ kind: 'arrival', key: 'no-cover', units: 2, totalRoots: 0 });
+    expect(gpuPrepEventsSnapshot().counts.arrival).toBe(2);
+  });
+
+  it('records the per-frame position only on the frame it jumps by a teleport', () => {
+    noteArrivalIfTeleported(100, 100, 5);
+    noteArrivalIfTeleported(101, 100.5, 5);
+    expect(gpuPrepEventsSnapshot().counts.arrival).toBe(0);
+    setArrivalCover(true);
+    noteArrivalIfTeleported(900, -200, 12);
+    const events = gpuPrepEventsSnapshot().events;
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({ kind: 'arrival', key: 'cover', units: 12 });
+    noteArrivalIfTeleported(900.4, -200, 3);
+    expect(gpuPrepEventsSnapshot().counts.arrival).toBe(1);
+  });
 });
 
 describe('arrival cover flag', () => {

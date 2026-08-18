@@ -21,7 +21,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "es_ES": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -35,7 +38,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "fr_FR": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -49,7 +55,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "fr_CA": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -63,7 +72,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "en_CA": [],
   "it_IT": [
@@ -78,7 +90,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "de_DE": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -92,7 +107,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "zh_CN": [
     "hudChrome.dawnholdMap.title",
@@ -122,7 +140,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "ru_RU": [
     "hudChrome.dawnholdMap.title",
@@ -140,7 +161,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "nl_NL": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -154,7 +178,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "pl_PL": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -168,7 +195,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "id_ID": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -182,7 +212,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "tr_TR": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -196,7 +229,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "sv_SE": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -210,7 +246,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "vi_VN": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -224,7 +263,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "da_DK": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -238,6 +280,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ]
 };

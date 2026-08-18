@@ -6,6 +6,7 @@
 // `ReturnType<Renderer['perfStats']>`.
 import type { BiomeId } from '../sim/types';
 import type { BackgroundGpuQueueStats } from './background_gpu_queue';
+import type { BuildLedgerSnapshot } from './build_ledger_core';
 import type { FoliagePerfStats } from './foliage';
 import type { GfxBucketBands, GfxBucketLevels, GfxRuntimeBudget } from './gfx';
 import type { GpuPrepBudgetSnapshot } from './gpu_prep_budget_core';
@@ -14,6 +15,7 @@ import type { RendererPrewarmStats } from './prewarm_compile_lifecycle';
 import type { RenderBudgetState } from './render_budget';
 import type { RenderDiagnosticsSnapshot } from './render_diagnostics';
 import type { RendererFramePhaseMs, RendererWorldPhaseMs } from './renderer_frame_telemetry_core';
+import type { ZoneStreamingStats } from './zone_prepare_stats';
 
 export type RendererPhase = 'setup' | 'entities' | 'world' | 'nameplates' | 'submit' | 'total';
 
@@ -107,4 +109,9 @@ export interface RendererPerfStats {
   prewarm: RendererPrewarmStats | null;
   gpuQueue: BackgroundGpuQueueStats;
   gpuPrep: RendererGpuPrepStats;
+  /** Main-thread construction ms by kind (view builds by class, zone feature
+   *  builders), the worst frame and the slowest single builds. */
+  buildLedger: BuildLedgerSnapshot;
+  /** Zone residency counts plus the stage wall-times of the last prepare. */
+  zoneStreaming: ZoneStreamingStats;
 }

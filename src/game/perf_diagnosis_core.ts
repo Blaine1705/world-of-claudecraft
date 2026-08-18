@@ -448,10 +448,22 @@ export function diagnosePerfSnapshot(
         files: ['src/render/assets/preload.ts', 'src/render/assets/loader.ts'],
       },
       {
+        key: 'zone-build' as const,
+        title: 'Zone streaming builds are causing hitches',
+        fix: 'Read perfStats().buildLedger for the zone:features builder that owns the frame, then slice or defer that builder in prepareZoneAt / ensureZoneFeatures instead of building the whole zone synchronously.',
+        files: ['src/render/renderer.ts', 'src/render/zone_streaming.ts'],
+      },
+      {
         key: 'view-create' as const,
         title: 'Entity view creation is causing hitches',
         fix: 'Pool or prewarm the recurring visual, and spread unavoidable construction over the existing world-streaming budget.',
         files: ['src/render/renderer.ts', 'src/render/view_create_retry.ts'],
+      },
+      {
+        key: 'off-frame' as const,
+        title: 'Long frames come from work outside the render callback',
+        fix: 'Rerun locally with ?perfTrace=1 and inspect devTrace.longTasks for the task that ran between two frame callbacks (garbage collection, snapshot apply, a background task).',
+        files: ['src/game/perf.ts', 'src/main.ts'],
       },
       {
         key: 'other' as const,
@@ -461,7 +473,10 @@ export function diagnosePerfSnapshot(
       },
     ];
     for (const rule of hitchRules) {
-      if (rule.key === 'other' && !slowFrames) continue;
+      // The renderer could not name a resource for these two, so they only
+      // count while the recent window is actually slow.
+      const unattributed = rule.key === 'other' || rule.key === 'off-frame';
+      if (unattributed && !slowFrames) continue;
       const count = hitches.byCause[rule.key];
       if (count <= 0) continue;
       // A single lazily streamed view on a 33 ms sample is expected open-world
@@ -481,12 +496,14 @@ export function diagnosePerfSnapshot(
       addFinding(findings, {
         id: `hitch-${rule.key}`,
         severity: count >= 3 ? 'critical' : 'warning',
-        confidence: rule.key === 'other' ? 'medium' : 'high',
+        confidence: unattributed ? 'medium' : 'high',
         title: rule.title,
         cause:
           rule.key === 'other'
-            ? 'Some sampled frames exceeded the renderer hitch threshold without a matching program, texture, or view-count change.'
-            : 'The renderer recorded a frame over the hitch threshold at the same time this resource count changed.',
+            ? 'Some sampled frames exceeded the renderer hitch threshold without a matching program, texture, zone build, or view-count change.'
+            : rule.key === 'off-frame'
+              ? 'Some sampled frames exceeded the renderer hitch threshold while the render callback itself used less than half of the frame.'
+              : 'The renderer recorded a frame over the hitch threshold at the same time this resource count changed.',
         evidence: [
           `${count} of ${hitches.hitches} recorded hitches were attributed to ${rule.key}.`,
           ...(rule.key === 'shader-compile'

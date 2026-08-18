@@ -265,7 +265,13 @@ export function censusTableLines(report: SceneCensusReport): string[] {
 // is up (zero cost otherwise); all timestamps come from the caller.
 // ---------------------------------------------------------------------------
 
-export type HitchCause = 'shader-compile' | 'texture-upload' | 'view-create' | 'other';
+export type HitchCause =
+  | 'shader-compile'
+  | 'texture-upload'
+  | 'zone-build'
+  | 'view-create'
+  | 'off-frame'
+  | 'other';
 
 export interface HitchFrameSample {
   atMs: number;
@@ -274,6 +280,12 @@ export interface HitchFrameSample {
   programs: number;
   textures: number;
   createdViews: number;
+  /** Main-thread zone streaming build ms the build ledger accumulated since
+   *  the previous frame (build_ledger_core zoneMs): includes the feature
+   *  builders that ran in idle callbacks between the two frame callbacks. */
+  zoneBuildMs: number;
+  /** The renderer frame callback's own total ms this frame. */
+  rendererMs: number;
 }
 
 export interface HitchEvent {
@@ -283,7 +295,24 @@ export interface HitchEvent {
   programDelta: number;
   textureDelta: number;
   createdViews: number;
+  zoneBuildMs: number;
+  rendererMs: number;
   cause: HitchCause;
+}
+
+/** The renderer's reused per-frame scratch, so the sample path allocates
+ *  nothing while the overlay is up. */
+export function emptyHitchFrameSample(): HitchFrameSample {
+  return {
+    atMs: 0,
+    frameMs: 0,
+    submitMs: 0,
+    programs: 0,
+    textures: 0,
+    createdViews: 0,
+    zoneBuildMs: 0,
+    rendererMs: 0,
+  };
 }
 
 export interface HitchSummary {
@@ -310,12 +339,36 @@ export interface HitchTracker {
 export const HITCH_FRAME_MS = 33;
 const HITCH_RECENT_LIMIT = 20;
 
-function hitchCause(programDelta: number, textureDelta: number, createdViews: number): HitchCause {
+/** The renderer callback's share of the frame below which the stall sits OFF
+ *  the render path (GC, network, a background task). One half is structural,
+ *  not a tuned constant: below it, more of the frame passed outside the
+ *  callback than inside it. */
+export const HITCH_OFF_FRAME_SHARE = 0.5;
+
+function hitchCause(
+  programDelta: number,
+  textureDelta: number,
+  createdViews: number,
+  zoneBuildMs: number,
+  rendererMs: number,
+  frameMs: number,
+): HitchCause {
   if (programDelta > 0) return 'shader-compile';
   if (textureDelta > 0) return 'texture-upload';
+  if (zoneBuildMs > 0) return 'zone-build';
   if (createdViews > 0) return 'view-create';
+  if (rendererMs < frameMs * HITCH_OFF_FRAME_SHARE) return 'off-frame';
   return 'other';
 }
+
+const emptyByCause = (): Record<HitchCause, number> => ({
+  'shader-compile': 0,
+  'texture-upload': 0,
+  'zone-build': 0,
+  'view-create': 0,
+  'off-frame': 0,
+  other: 0,
+});
 
 export function createHitchTracker(
   opts: { hitchFrameMs?: number; recentLimit?: number } = {},
@@ -324,12 +377,7 @@ export function createHitchTracker(
   const recentLimit = opts.recentLimit ?? HITCH_RECENT_LIMIT;
   let frames = 0;
   let hitches = 0;
-  let byCause: Record<HitchCause, number> = {
-    'shader-compile': 0,
-    'texture-upload': 0,
-    'view-create': 0,
-    other: 0,
-  };
+  let byCause = emptyByCause();
   let programGrowthFrames = 0;
   let programsAdded = 0;
   // Scalars, not an object: this runs per frame while the overlay is up, and
@@ -357,7 +405,16 @@ export function createHitchTracker(
         programDelta,
         textureDelta,
         createdViews: sample.createdViews,
-        cause: hitchCause(programDelta, textureDelta, sample.createdViews),
+        zoneBuildMs: Math.round(sample.zoneBuildMs * 100) / 100,
+        rendererMs: Math.round(sample.rendererMs * 100) / 100,
+        cause: hitchCause(
+          programDelta,
+          textureDelta,
+          sample.createdViews,
+          sample.zoneBuildMs,
+          sample.rendererMs,
+          sample.frameMs,
+        ),
       };
       hitches++;
       byCause[event.cause]++;
@@ -378,7 +435,7 @@ export function createHitchTracker(
     reset(): void {
       frames = 0;
       hitches = 0;
-      byCause = { 'shader-compile': 0, 'texture-upload': 0, 'view-create': 0, other: 0 };
+      byCause = emptyByCause();
       programGrowthFrames = 0;
       programsAdded = 0;
       lastPrograms = -1;

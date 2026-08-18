@@ -127,7 +127,12 @@ const MONOLITHS: MonolithRow[] = [
     // src/render/linked_program_readiness.ts) paid for itself in place: the
     // single-use compilePriorityFor wrapper folded into the one gate that
     // called it, the core it delegated to being its whole body (net 0).
-    ceiling: 13501,
+    // Lowered again by the build-ledger instrumentation, which paid for its
+    // producers (timed view and zone feature builds, the arrival mark, the
+    // hitch sample's two new fields) by moving the zone prepare report and its
+    // stat shapes into src/render/zone_prepare_stats.ts and the hitch scratch
+    // factory into scene_census_core.ts (net -1).
+    ceiling: 13500,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

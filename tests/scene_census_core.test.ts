@@ -283,7 +283,17 @@ describe('censusTableLines', () => {
 });
 
 describe('createHitchTracker', () => {
-  const base = { atMs: 1000, submitMs: 5, programs: 100, textures: 50, createdViews: 0 };
+  // rendererMs is the whole frame by default: the callback owns the stall,
+  // so the resource rules decide; the off-frame cases lower it explicitly.
+  const base = {
+    atMs: 1000,
+    submitMs: 5,
+    programs: 100,
+    textures: 50,
+    createdViews: 0,
+    zoneBuildMs: 0,
+    rendererMs: 250,
+  };
 
   it('records nothing for fast frames but still counts program growth', () => {
     const tracker = createHitchTracker();
@@ -331,6 +341,57 @@ describe('createHitchTracker', () => {
     expect(s.byCause['texture-upload']).toBe(1);
     expect(s.byCause['view-create']).toBe(1);
     expect(s.byCause.other).toBe(1);
+    expect(s.byCause['zone-build']).toBe(0);
+    expect(s.byCause['off-frame']).toBe(0);
+  });
+
+  it('files a frame with zone build spend under zone-build, ahead of view-create', () => {
+    const tracker = createHitchTracker();
+    tracker.frame({ ...base, frameMs: 10 });
+    const zone = tracker.frame({ ...base, frameMs: 60, zoneBuildMs: 41.234, createdViews: 3 });
+    expect(zone?.cause).toBe('zone-build');
+    expect(zone?.zoneBuildMs).toBe(41.23);
+    // Resource growth still wins over the ledger: a compile in the same frame
+    // is the older, surer signal.
+    const compile = tracker.frame({ ...base, frameMs: 60, zoneBuildMs: 41, programs: 101 });
+    expect(compile?.cause).toBe('shader-compile');
+    const upload = tracker.frame({
+      ...base,
+      frameMs: 60,
+      zoneBuildMs: 41,
+      programs: 101,
+      textures: 51,
+    });
+    expect(upload?.cause).toBe('texture-upload');
+    // No zone spend: the arm does not fire.
+    const view = tracker.frame({
+      ...base,
+      frameMs: 60,
+      programs: 101,
+      textures: 51,
+      createdViews: 1,
+    });
+    expect(view?.cause).toBe('view-create');
+    expect(tracker.summary().byCause['zone-build']).toBe(1);
+  });
+
+  it('files a stall the frame callback did not own under off-frame', () => {
+    const tracker = createHitchTracker();
+    tracker.frame({ ...base, frameMs: 10 });
+    // 20 of 100 ms inside the callback: the other 80 passed elsewhere.
+    const off = tracker.frame({ ...base, frameMs: 100, rendererMs: 20 });
+    expect(off?.cause).toBe('off-frame');
+    expect(off?.rendererMs).toBe(20);
+    // Exactly half stays with the callback (other): the share is a strict floor.
+    const half = tracker.frame({ ...base, frameMs: 100, rendererMs: 50 });
+    expect(half?.cause).toBe('other');
+    // A named cause beats off-frame even when the callback was short.
+    const view = tracker.frame({ ...base, frameMs: 100, rendererMs: 20, createdViews: 1 });
+    expect(view?.cause).toBe('view-create');
+    const zone = tracker.frame({ ...base, frameMs: 100, rendererMs: 20, zoneBuildMs: 5 });
+    expect(zone?.cause).toBe('zone-build');
+    expect(tracker.summary().byCause['off-frame']).toBe(1);
+    expect(tracker.summary().byCause.other).toBe(1);
   });
 
   it('treats the first frame as baseline: no deltas even on a long frame', () => {
@@ -356,6 +417,14 @@ describe('createHitchTracker', () => {
     expect(cleared.hitches).toBe(0);
     expect(cleared.programsAdded).toBe(0);
     expect(cleared.recent).toEqual([]);
+    expect(cleared.byCause).toEqual({
+      'shader-compile': 0,
+      'texture-upload': 0,
+      'zone-build': 0,
+      'view-create': 0,
+      'off-frame': 0,
+      other: 0,
+    });
   });
 });
 

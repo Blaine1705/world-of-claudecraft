@@ -443,7 +443,12 @@ GPU work signs. Each rule names its seam and its guard.
   `REVEAL_GATE_WATCHDOG_MS` watchdog, or on a reach floor, never on a tuned timer.
 - **Verify, do not assert.** `?perf`, then `__game.renderer.perfStats().gpuPrep`: the
   budget snapshot, the event ring (`live-program`, `gate-timeout`, `reveal-watchdog`,
-  `reveal-soft-deadline`, `submit-stop`, `attach-watchdog`), and the reveal counters.
+  `reveal-soft-deadline`, `submit-stop`, `attach-watchdog`, plus the `arrival` mark
+  one per teleport-class landing), and the reveal counters. The CPU side of the
+  same picture is `perfStats().buildLedger` (`build_ledger_core.ts`: main-thread ms
+  per view build class and per zone feature builder, the worst frame, the slowest
+  builds) and `perfStats().zoneStreaming` (the last prepare's stage wall-times);
+  the hitch tracker's `zone-build` and `off-frame` causes read from them.
   External capture: `node scripts/gpu_hitch_capture.mjs`. Dispatch
   `render-performance-reviewer` on any diff that lands a producer under these rules.
 

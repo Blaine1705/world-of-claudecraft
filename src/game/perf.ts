@@ -1219,7 +1219,7 @@ export class PerfMonitor {
     const mem = s.browser.memory;
     const h = s.hitches;
     const hitchLine = h
-      ? `hitch ${h.hitches} (compile ${h.byCause['shader-compile']} tex ${h.byCause['texture-upload']} view ${h.byCause['view-create']} other ${h.byCause.other})  prog +${h.programsAdded}`
+      ? `hitch ${h.hitches} (compile ${h.byCause['shader-compile']} tex ${h.byCause['texture-upload']} zone ${h.byCause['zone-build']} view ${h.byCause['view-create']} off ${h.byCause['off-frame']} other ${h.byCause.other})  prog +${h.programsAdded}`
       : null;
     const censusLines = this.lastCensusLines;
     // The hidden-skip counter's one live sink (phase 4 QA F11): sampled frames

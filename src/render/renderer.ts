@@ -62,6 +62,7 @@ import { AfflictionFamiliar } from './affliction_familiar';
 import { type AmberFeaturesView, buildAmberFeatures } from './amber_features';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
+import { noteArrivalIfTeleported } from './arrival_cover';
 import { ktx2RetainedSourceBytes } from './assets/ktx2_mip_release';
 import { formatResidencyBudget, residencyBudget } from './assets/residency_budget';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
@@ -83,6 +84,7 @@ import {
   createBlobShadowSlot,
 } from './blob_shadow_core';
 import { BlobShadows } from './blob_shadows';
+import { createBuildLedger } from './build_ledger_core';
 import { type BulwarkFeaturesView, buildBulwarkFeatures } from './bulwark_features';
 import { BurningPactMarkers } from './burning_pact_markers';
 import { createCameraBoom, stepCameraBoom } from './camera_boom_core';
@@ -247,6 +249,7 @@ import {
   entityViewIsAdmitted,
   isPersistentPortalObject,
   entityViewShouldDrop as shouldDropView,
+  viewBuildClass,
 } from './entity_view_policy_core';
 import { resolveEnvironmentPrefilterPlan } from './env_prefilter_core';
 import {
@@ -546,6 +549,7 @@ import { RingOfFrostVisuals } from './ring_of_frost_visual';
 import {
   captureSceneCensus,
   createHitchTracker,
+  emptyHitchFrameSample,
   type HitchSummary,
   type SceneCensusChild,
   type SceneCensusHost,
@@ -676,6 +680,11 @@ import {
   isZoneFeatureShadowCasting,
   isZoneFeatureVisible,
 } from './zone_feature_visibility_core';
+import {
+  reportZonePrepare,
+  type ZonePrewarmStats,
+  type ZoneStreamingStats,
+} from './zone_prepare_stats';
 import { zonePrewarmTemplateIds } from './zone_prewarm_templates_core';
 import {
   INITIAL_SKY_PREWARM_RADIUS,
@@ -1397,14 +1406,9 @@ export class Renderer {
   // reused scratch object so the per-frame path stays allocation-free.
   private readonly hitchTracker = createHitchTracker();
   private hitchLogEnabled = false;
-  private readonly hitchFrameScratch = {
-    atMs: 0,
-    frameMs: 0,
-    submitMs: 0,
-    programs: 0,
-    textures: 0,
-    createdViews: 0,
-  };
+  private readonly hitchFrameScratch = emptyHitchFrameSample();
+  // Write-only build telemetry (build_ledger_core), read back through perfStats().
+  private readonly buildLedger = createBuildLedger();
   // The census burst inflates the following frame's dt; skip that one sample
   // so the tracker never charges the census to the scene.
   private hitchSkipNextFrame = false;
@@ -1760,14 +1764,7 @@ export class Renderer {
    *  main.ts so presentation caches outside the renderer (the HUD's world-map
    *  background) prewarm alongside the zone itself. */
   onZonePrepared: ((zoneId: string) => void) | null = null;
-  private lastZonePrepareStats: {
-    zoneId: string;
-    totalMs: number;
-    skyMs: number;
-    terrainMs: number;
-    waterMs: number;
-    featuresMs: number;
-  } | null = null;
+  private lastZonePrepareStats: ZoneStreamingStats['last'] = null;
   private prewarmedMobTemplates = new Set<string>();
   private prewarmedNpcModels = new Set<string>();
   private prewarmedZonePrograms = new Set<string>();
@@ -3482,18 +3479,7 @@ export class Renderer {
     });
   }
 
-  zoneStreamingStats(): {
-    prepared: number;
-    pending: number;
-    last: {
-      zoneId: string;
-      totalMs: number;
-      skyMs: number;
-      terrainMs: number;
-      waterMs: number;
-      featuresMs: number;
-    } | null;
-  } {
+  zoneStreamingStats(): ZoneStreamingStats {
     return {
       prepared: this.preparedZones.size,
       pending: this.pendingZonePrepares.size + this.visibleZonePrepareQueue.length,
@@ -3716,24 +3702,15 @@ export class Renderer {
       // background prewarm here) piggyback on zone residency, so their own
       // caches are warm before the player can interact with the new zone.
       this.onZonePrepared?.(zone.id);
-      // Boot profiler lanes (aggregated by name across zones, nested under the
-      // caller's phase by containment; the whole-zone span carries the id).
-      renderLoadMeasure(`zone:${zone.id}`, started, prepareDone);
-      renderLoadMeasure('zone-prepare/sky', started, started + skyMs);
-      renderLoadMeasure('zone-prepare/terrain', terrainStarted, terrainDone);
-      renderLoadMeasure('zone-prepare/water', terrainDone, waterDone);
-      renderLoadMeasure('zone-prepare/features', waterDone, featuresDone);
-      // On a background prepare skyMs OVERLAPS terrainMs (the lanes run
-      // concurrently), so the stages no longer sum to totalMs. Each is still
-      // its own lane's wall time, which is what the pacing work reads them for.
-      this.lastZonePrepareStats = {
-        zoneId: zone.id,
-        totalMs: Math.round((prepareDone - started) * 10) / 10,
+      this.lastZonePrepareStats = reportZonePrepare(zone.id, this.buildLedger, {
+        started,
         skyMs,
-        terrainMs: Math.round((terrainDone - terrainStarted) * 10) / 10,
-        waterMs: Math.round((waterDone - terrainDone) * 10) / 10,
-        featuresMs: Math.round((featuresDone - waterDone) * 10) / 10,
-      };
+        terrainStarted,
+        terrainDone,
+        waterDone,
+        featuresDone,
+        prepareDone,
+      });
       onProgress?.(100, 100);
     })().finally(() => this.pendingZonePrepares.delete(zoneId));
     this.pendingZonePrepares.set(zoneId, task);
@@ -3741,12 +3718,7 @@ export class Renderer {
   }
 
   /** Stage wall-times of the most recent prewarmZoneAt, for perf tooling. */
-  lastZonePrewarmStats: {
-    zoneId: string;
-    buildMs: number;
-    compileMs: number;
-    passMs: number;
-  } | null = null;
+  lastZonePrewarmStats: ZonePrewarmStats | null = null;
 
   async prewarmZoneAt(x: number, z: number, opts?: { background?: boolean }): Promise<void> {
     if (this.shutdownStarted) return;
@@ -4115,7 +4087,7 @@ export class Renderer {
     switch (zone.biome) {
       case 'dusk':
         if (!this.realmFlora) {
-          this.realmFlora = buildRealmFlora(this.sim.cfg.seed);
+          this.realmFlora = this.timedBuild('buildRealmFlora', buildRealmFlora);
           this.attachZoneFeature(this.realmFlora);
           // the freeze above stills the whole subtree; foam swell and mist
           // drift move via object transforms, so they get their motion back
@@ -4125,73 +4097,82 @@ export class Renderer {
         break;
       case 'ember':
         if (!this.emberFeatures) {
-          this.emberFeatures = buildEmberFeatures(this.sim.cfg.seed);
+          this.emberFeatures = this.timedBuild('buildEmberFeatures', buildEmberFeatures);
           this.attachZoneFeature(this.emberFeatures);
         }
         if (!this.castleFeatures) {
-          this.castleFeatures = buildCastleFeatures();
+          this.castleFeatures = this.timedBuild('buildCastleFeatures', buildCastleFeatures);
           this.attachZoneFeature(this.castleFeatures);
         }
         if (!this.bulwarkFeatures) {
-          this.bulwarkFeatures = buildBulwarkFeatures();
+          this.bulwarkFeatures = this.timedBuild('buildBulwarkFeatures', buildBulwarkFeatures);
           this.attachZoneFeature(this.bulwarkFeatures);
         }
         break;
       case 'frost':
         if (!this.frostSky) {
-          this.frostSky = buildFrostSky(this.sim.cfg.seed);
+          this.frostSky = this.timedBuild('buildFrostSky', buildFrostSky);
           this.attachZoneFeature(this.frostSky, false);
         }
         break;
       case 'fen':
         if (!this.fenFeatures) {
-          this.fenFeatures = buildFenFeatures(this.sim.cfg.seed);
+          this.fenFeatures = this.timedBuild('buildFenFeatures', buildFenFeatures);
           this.attachZoneFeature(this.fenFeatures);
         }
         break;
       case 'amber':
         if (!this.amberFeatures) {
-          this.amberFeatures = buildAmberFeatures(this.sim.cfg.seed);
+          this.amberFeatures = this.timedBuild('buildAmberFeatures', buildAmberFeatures);
           this.attachZoneFeature(this.amberFeatures);
         }
         break;
       case 'night':
         if (!this.nightFeatures) {
-          this.nightFeatures = buildNightFeatures(this.sim.cfg.seed);
+          this.nightFeatures = this.timedBuild('buildNightFeatures', buildNightFeatures);
           this.attachZoneFeature(this.nightFeatures);
         }
         break;
       case 'haunt':
         if (!this.hauntFeatures) {
-          this.hauntFeatures = buildHauntFeatures(this.sim.cfg.seed);
+          this.hauntFeatures = this.timedBuild('buildHauntFeatures', buildHauntFeatures);
           this.attachZoneFeature(this.hauntFeatures, false);
         }
         break;
       case 'jungle':
         if (!this.jungleFeatures) {
-          this.jungleFeatures = buildJungleFeatures(this.sim.cfg.seed);
+          this.jungleFeatures = this.timedBuild('buildJungleFeatures', buildJungleFeatures);
           this.attachZoneFeature(this.jungleFeatures);
         }
         break;
       case 'garden':
         if (!this.gardenFeatures) {
-          this.gardenFeatures = buildGardenFeatures(this.sim.cfg.seed);
+          this.gardenFeatures = this.timedBuild('buildGardenFeatures', buildGardenFeatures);
           this.attachZoneFeature(this.gardenFeatures);
         }
         if (!this.dawnholdFeatures) {
-          this.dawnholdFeatures = buildDawnholdFeatures();
+          this.dawnholdFeatures = this.timedBuild('buildDawnholdFeatures', buildDawnholdFeatures);
           this.attachZoneFeature(this.dawnholdFeatures);
         }
         break;
       case 'gale':
         if (!this.galeFeatures) {
-          this.galeFeatures = buildGaleFeatures(this.sim.cfg.seed);
+          this.galeFeatures = this.timedBuild('buildGaleFeatures', buildGaleFeatures);
           this.attachZoneFeature(this.galeFeatures, false);
         }
         break;
       default:
         break;
     }
+  }
+
+  // Times one zone feature builder under `zone:features:<name>`; every builder
+  // takes the world seed (the seedless ones ignore it).
+  private timedBuild<T>(name: string, build: (seed: number) => T): T {
+    const started = performance.now();
+    const built = build(this.sim.cfg.seed);
+    this.buildLedger.record(`zone:features:${name}`, performance.now() - started, started);
+    return built;
   }
 
   /** Toggle biome-driven ambient precipitation (snow/rain). */
@@ -4409,6 +4390,8 @@ export class Renderer {
       prewarm: this.lastPrewarmStats,
       gpuQueue: this.backgroundGpuWork.stats(),
       gpuPrep: { budget: this.gpuPrepBudget.snapshot(), events: gpuPrepEventsSnapshot() },
+      buildLedger: this.buildLedger.snapshot(),
+      zoneStreaming: this.zoneStreamingStats(),
     };
   }
 
@@ -8309,6 +8292,15 @@ export class Renderer {
   }
 
   private createView(e: Entity): void {
+    const started = performance.now();
+    this.buildView(e);
+    const view = this.views.get(e.id);
+    if (!view) return;
+    const kind = viewBuildClass(e, this.sim.player.id, view.visual);
+    this.buildLedger.record(`view:${kind}`, performance.now() - started, started);
+  }
+
+  private buildView(e: Entity): void {
     const group = new THREE.Group();
     setRenderCategory(group, `entity:${e.kind}`);
     let visual: CharacterVisual | null = null;
@@ -11130,7 +11122,9 @@ export class Renderer {
         }
         v.mountVisualKey = '';
         if (mountAssetsReady(mountSpec.visualKey)) {
+          const mountStarted = performance.now();
           v.mountVisual = createMountVisual(mountSpec.visualKey);
+          this.buildLedger.record('view:mount', performance.now() - mountStarted, mountStarted);
           v.group.add(v.mountVisual.root); // group.scale already carries e.scale
           v.mountVisualKey = mountSpec.visualKey;
           // A newly summoned mount is exactly a brand-new rig's materials
@@ -12568,6 +12562,7 @@ export class Renderer {
     frameStats.candidateViews = this.viewCandidates.length;
     frameStats.activeViews = this.views.size;
     frameStats.visibleViews = visibleViews;
+    noteArrivalIfTeleported(p.pos.x, p.pos.z, this.viewCandidates.length);
     if (this.hitchLogEnabled && this.hitchSkipNextFrame) {
       this.hitchSkipNextFrame = false;
     } else if (this.hitchLogEnabled) {
@@ -12578,8 +12573,12 @@ export class Renderer {
       sample.programs = this.webgl.info.programs?.length ?? 0;
       sample.textures = this.webgl.info.memory.textures;
       sample.createdViews = createdViews;
+      // Zone spend since the previous frame: this callback plus the idle work between.
+      sample.zoneBuildMs = this.buildLedger.frameSpend().zoneMs;
+      sample.rendererMs = framePhaseMs.total;
       this.hitchTracker.frame(sample);
     }
+    this.buildLedger.beginFrame();
     this.runtimeEntryElapsedMs += Math.min(250, Math.max(0, dt * 1000));
   }
 

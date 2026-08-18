@@ -1568,6 +1568,7 @@ export const vi_VN: EnTranslations = {
           "render": "kết xuất  gửi {submit} ms | thế giới {world} ms | thực thể {entities} ms",
           "scene": "cảnh   {calls} lệnh vẽ | {triangles} tam giác | {views} khung nhìn",
           "hitches": "khựng hình {hitches} | shader {shaders} | tải lên {uploads} | khung nhìn {views}",
+          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "đang chờ"
         },
@@ -1619,7 +1620,9 @@ export const vi_VN: EnTranslations = {
             "eventCpu": "Xử lý sự kiện đang chiếm dụng khung hình",
             "shaderCompile": "Shader đang biên dịch trong lúc chơi",
             "textureUpload": "Tải Vân Bề Mặt lên đang gây khựng hình lối chơi",
+            "zoneBuild": "Zone streaming builds are causing hitches",
             "viewCreate": "Việc tạo khung nhìn thực thể đang gây khựng hình",
+            "offFrameHitch": "Long frames come from work outside the render callback",
             "otherHitch": "Vẫn còn khung hình dài chưa xác định được nguyên nhân",
             "assetStartup": "Khởi động trò chơi bị trì hoãn bởi việc xử lý tài nguyên",
             "longTasks": "Các tác vụ dài của trình duyệt đang chặn khung hình",

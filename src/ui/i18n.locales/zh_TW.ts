@@ -12685,6 +12685,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '場景   {calls} 次呼叫 | {triangles} 個三角形 | {views} 個視圖',
   'hudChrome.perf.diagnostics.metrics.hitches':
     '卡頓 {hitches} | 著色器 {shaders} | 上傳 {uploads} | 視圖 {views}',
+  'hudChrome.perf.diagnostics.metrics.hitchesBuild': '區域建置 {zoneBuilds} | 影格外 {offFrame}',
   'hudChrome.perf.diagnostics.metrics.gpu': 'GPU     {renderer}',
   'hudChrome.perf.diagnostics.metrics.waitingValue': '等待中',
   'hudChrome.perf.diagnostics.scoreHeadline': '{score}/100：{headline}',
@@ -12727,7 +12728,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.diagnosis.titles.eventCpu': '事件處理占用影格時間',
   'hudChrome.perf.diagnostics.diagnosis.titles.shaderCompile': '遊戲過程中正在編譯著色器',
   'hudChrome.perf.diagnostics.diagnosis.titles.textureUpload': '紋理上傳造成遊戲卡頓',
+  'hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild': '區域串流建置造成卡頓',
   'hudChrome.perf.diagnostics.diagnosis.titles.viewCreate': '實體視圖建立造成卡頓',
+  'hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch': '長影格來自渲染回呼之外的工作',
   'hudChrome.perf.diagnostics.diagnosis.titles.otherHitch': '仍有未歸因的長影格',
   'hudChrome.perf.diagnostics.diagnosis.titles.assetStartup': '資源處理延遲了遊戲啟動',
   'hudChrome.perf.diagnostics.diagnosis.titles.longTasks': '瀏覽器長任務正在阻塞影格',

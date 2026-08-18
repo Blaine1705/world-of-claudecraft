@@ -1568,6 +1568,7 @@ export const it_IT: EnTranslations = {
           "render": "render  invio {submit} ms | mondo {world} ms | entità {entities} ms",
           "scene": "scena   {calls} chiamate | {triangles} tri | {views} viste",
           "hitches": "scatti  {hitches} | shader {shaders} | upload {uploads} | viste {views}",
+          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "in attesa"
         },
@@ -1619,7 +1620,9 @@ export const it_IT: EnTranslations = {
             "eventCpu": "L'elaborazione degli eventi sta consumando il frame",
             "shaderCompile": "Gli shader si stanno compilando durante il gioco",
             "textureUpload": "I caricamenti delle texture stanno causando scatti di gioco",
+            "zoneBuild": "Zone streaming builds are causing hitches",
             "viewCreate": "La creazione delle viste entità sta causando scatti",
+            "offFrameHitch": "Long frames come from work outside the render callback",
             "otherHitch": "Restano frame lunghi non attribuiti",
             "assetStartup": "L'avvio del gioco è ritardato dal lavoro sulle risorse",
             "longTasks": "Attività lunghe del browser stanno bloccando i frame",

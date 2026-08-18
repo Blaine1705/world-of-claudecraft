@@ -1568,6 +1568,7 @@ export const ru_RU: EnTranslations = {
           "render": "рендер  отправка {submit} мс | мир {world} мс | объекты {entities} мс",
           "scene": "сцена   {calls} вызовов | {triangles} треугольников | {views} видов",
           "hitches": "рывки {hitches} | шейдеры {shaders} | загрузки {uploads} | виды {views}",
+          "hitchesBuild": "сборки зон {zoneBuilds} | вне кадра {offFrame}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "ожидание"
         },
@@ -1619,7 +1620,9 @@ export const ru_RU: EnTranslations = {
             "eventCpu": "Обработка событий занимает время кадра",
             "shaderCompile": "Шейдеры компилируются во время игры",
             "textureUpload": "Загрузка текстур вызывает рывки",
+            "zoneBuild": "Потоковая сборка зон вызывает рывки",
             "viewCreate": "Создание видов сущностей вызывает рывки",
+            "offFrameHitch": "Длинные кадры вызваны работой вне обратного вызова рендера",
             "otherHitch": "Остаются длинные кадры без установленной причины",
             "assetStartup": "Обработка ресурсов задерживает запуск игры",
             "longTasks": "Длинные задачи браузера блокируют кадры",

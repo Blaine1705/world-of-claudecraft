@@ -362,7 +362,14 @@ describe('perf monitor scene census wiring', () => {
       hitchStats: () => ({
         frames: 100,
         hitches: 2,
-        byCause: { 'shader-compile': 1, 'texture-upload': 0, 'view-create': 0, other: 1 },
+        byCause: {
+          'shader-compile': 1,
+          'texture-upload': 0,
+          'zone-build': 0,
+          'view-create': 0,
+          'off-frame': 0,
+          other: 1,
+        },
         programGrowthFrames: 1,
         programsAdded: 3,
         recent: [],

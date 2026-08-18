@@ -386,6 +386,7 @@ function snapshot(): PerfSnapshot {
             'gate-timeout': 0,
             'submit-stop': 0,
             'live-program': 0,
+            arrival: 0,
           },
           events: [],
           reveal: {
@@ -399,6 +400,8 @@ function snapshot(): PerfSnapshot {
           gates: { spiritSpawnsRefused: 0 },
         },
       },
+      buildLedger: { kinds: {}, worstFrame: { ms: 0, count: 0, atMs: 0 }, slowest: [] },
+      zoneStreaming: { prepared: 1, pending: 0, last: null },
       autoGovernor: true,
       budget: {
         targetFps: 60,

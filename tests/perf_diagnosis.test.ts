@@ -178,6 +178,7 @@ function baseSnapshot(): PerfSnapshot {
             'gate-timeout': 0,
             'submit-stop': 0,
             'live-program': 0,
+            arrival: 0,
           },
           events: [],
           reveal: {
@@ -191,6 +192,8 @@ function baseSnapshot(): PerfSnapshot {
           gates: { spiritSpawnsRefused: 0 },
         },
       },
+      buildLedger: { kinds: {}, worstFrame: { ms: 0, count: 0, atMs: 0 }, slowest: [] },
+      zoneStreaming: { prepared: 1, pending: 0, last: null },
     },
     hud: { hotDomWrites: 10, hotDomSkippedWrites: 90, hotDomSkipRate: 0.9 },
     assets: {
@@ -295,7 +298,14 @@ describe('diagnosePerfSnapshot', () => {
     snapshot.hitches = {
       frames: 600,
       hitches: 6,
-      byCause: { 'shader-compile': 3, 'texture-upload': 1, 'view-create': 2, other: 0 },
+      byCause: {
+        'shader-compile': 3,
+        'texture-upload': 1,
+        'zone-build': 0,
+        'view-create': 2,
+        'off-frame': 0,
+        other: 0,
+      },
       programGrowthFrames: 3,
       programsAdded: 8,
       recent: [],
@@ -315,7 +325,14 @@ describe('diagnosePerfSnapshot', () => {
     snapshot.hitches = {
       frames: 600,
       hitches: 80,
-      byCause: { 'shader-compile': 0, 'texture-upload': 0, 'view-create': 0, other: 80 },
+      byCause: {
+        'shader-compile': 0,
+        'texture-upload': 0,
+        'zone-build': 0,
+        'view-create': 0,
+        'off-frame': 0,
+        other: 80,
+      },
       programGrowthFrames: 0,
       programsAdded: 0,
       recent: [],
@@ -331,12 +348,77 @@ describe('diagnosePerfSnapshot', () => {
       diagnosePerfSnapshot(snapshot).findings.some((finding) => finding.id === 'hitch-other'),
     ).toBe(true);
   });
+  it('names zone streaming builds with the renderer streaming sources', () => {
+    const snapshot = baseSnapshot();
+    snapshot.hitches = {
+      frames: 600,
+      hitches: 3,
+      byCause: {
+        'shader-compile': 0,
+        'texture-upload': 0,
+        'zone-build': 3,
+        'view-create': 0,
+        'off-frame': 0,
+        other: 0,
+      },
+      programGrowthFrames: 0,
+      programsAdded: 0,
+      recent: [],
+    };
+    const finding = diagnosePerfSnapshot(snapshot).findings.find(
+      (item) => item.id === 'hitch-zone-build',
+    );
+    expect(finding?.severity).toBe('critical');
+    expect(finding?.confidence).toBe('high');
+    expect(finding?.sourceFiles).toEqual([
+      'src/render/renderer.ts',
+      'src/render/zone_streaming.ts',
+    ]);
+    expect(finding?.title).toBe('Zone streaming builds are causing hitches');
+  });
+
+  it('treats off-frame hitches like unattributed ones: only while the recent window is slow', () => {
+    const snapshot = baseSnapshot();
+    snapshot.hitches = {
+      frames: 600,
+      hitches: 5,
+      byCause: {
+        'shader-compile': 0,
+        'texture-upload': 0,
+        'zone-build': 0,
+        'view-create': 0,
+        'off-frame': 5,
+        other: 0,
+      },
+      programGrowthFrames: 0,
+      programsAdded: 0,
+      recent: [],
+    };
+    expect(
+      diagnosePerfSnapshot(snapshot).findings.some((item) => item.id === 'hitch-off-frame'),
+    ).toBe(false);
+    makeSlow(snapshot);
+    const finding = diagnosePerfSnapshot(snapshot).findings.find(
+      (item) => item.id === 'hitch-off-frame',
+    );
+    expect(finding?.confidence).toBe('medium');
+    expect(finding?.title).toBe('Long frames come from work outside the render callback');
+    expect(finding?.sourceFiles).toEqual(['src/game/perf.ts', 'src/main.ts']);
+  });
+
   it('requires a recurring or materially long view-create event before assigning blame', () => {
     const snapshot = baseSnapshot();
     snapshot.hitches = {
       frames: 600,
       hitches: 1,
-      byCause: { 'shader-compile': 0, 'texture-upload': 0, 'view-create': 1, other: 0 },
+      byCause: {
+        'shader-compile': 0,
+        'texture-upload': 0,
+        'zone-build': 0,
+        'view-create': 1,
+        'off-frame': 0,
+        other: 0,
+      },
       programGrowthFrames: 0,
       programsAdded: 0,
       recent: [
@@ -347,6 +429,8 @@ describe('diagnosePerfSnapshot', () => {
           programDelta: 0,
           textureDelta: 0,
           createdViews: 1,
+          zoneBuildMs: 0,
+          rendererMs: 30,
           cause: 'view-create',
         },
       ],
@@ -488,7 +572,14 @@ describe('diagnosePerfSnapshot', () => {
     snapshot.hitches = {
       frames: 600,
       hitches: 1,
-      byCause: { 'shader-compile': 1, 'texture-upload': 0, 'view-create': 0, other: 0 },
+      byCause: {
+        'shader-compile': 1,
+        'texture-upload': 0,
+        'zone-build': 0,
+        'view-create': 0,
+        'off-frame': 0,
+        other: 0,
+      },
       programGrowthFrames: 1,
       programsAdded: 2,
       recent: [],
