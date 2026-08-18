@@ -26,6 +26,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.zoomIn': '放大',
   'hudChrome.controller.zoomOut': '缩小',
   'hudChrome.controller.confirmAction': '确认 / 选择',
+  'hudChrome.controller.crossHotbarOwnsButtons': '十字热键栏启用时，扳机键和方向键归它所有，请在下方设置，而非此处。',
   'hudChrome.controller.crossHotbar': '十字热键栏',
   'hudChrome.controller.crossHotbarEnable': '启用十字热键栏',
   'hudChrome.controller.crossHotbarExpand': '双十字热键栏',

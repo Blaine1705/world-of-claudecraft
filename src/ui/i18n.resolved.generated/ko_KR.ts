@@ -1462,7 +1462,8 @@ export const ko_KR: EnTranslations = {
       "crossHotbarResetLayout": "크로스 핫바 초기화",
       "crossHotbarSlot": "액션 바 {slot}",
       "crossHotbarPosition": "{trigger} + {button}",
-      "crossHotbarOverlay": "크로스 핫바"
+      "crossHotbarOverlay": "크로스 핫바",
+      "crossHotbarOwnsButtons": "크로스 핫바가 켜져 있는 동안에는 트리거와 방향키를 크로스 핫바가 사용합니다. 여기가 아니라 아래에서 설정하세요."
     },
     "perf": {
       "title": "성능 오버레이",

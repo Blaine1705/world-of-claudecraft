@@ -1462,7 +1462,8 @@ export const ru_RU: EnTranslations = {
       "crossHotbarResetLayout": "Сбросить крестовую панель",
       "crossHotbarSlot": "Панель действий {slot}",
       "crossHotbarPosition": "{trigger} + {button}",
-      "crossHotbarOverlay": "Крестовая панель"
+      "crossHotbarOverlay": "Крестовая панель",
+      "crossHotbarOwnsButtons": "Пока крестовая панель включена, курки и крестовина принадлежат ей: настройте их ниже, а не здесь."
     },
     "perf": {
       "title": "Оверлей производительности",

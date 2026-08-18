@@ -26,6 +26,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.zoomIn': 'Приблизить',
   'hudChrome.controller.zoomOut': 'Отдалить',
   'hudChrome.controller.confirmAction': 'Подтвердить / выбрать',
+  'hudChrome.controller.crossHotbarOwnsButtons': 'Пока крестовая панель включена, курки и крестовина принадлежат ей: настройте их ниже, а не здесь.',
   'hudChrome.controller.crossHotbar': 'Крестовая панель',
   'hudChrome.controller.crossHotbarEnable': 'Включить крестовую панель',
   'hudChrome.controller.crossHotbarExpand': 'Двойная крестовая панель',

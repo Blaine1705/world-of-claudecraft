@@ -1462,7 +1462,8 @@ export const tr_TR: EnTranslations = {
       "crossHotbarResetLayout": "Reset Cross Hotbar",
       "crossHotbarSlot": "Action Bar {slot}",
       "crossHotbarPosition": "{trigger} + {button}",
-      "crossHotbarOverlay": "Cross hotbar"
+      "crossHotbarOverlay": "Cross hotbar",
+      "crossHotbarOwnsButtons": "The triggers and the d-pad belong to the cross hotbar while it is on, so they are set up below rather than here."
     },
     "perf": {
       "title": "Performans Katmanı",

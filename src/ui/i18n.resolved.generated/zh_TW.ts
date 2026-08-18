@@ -1462,7 +1462,8 @@ export const zh_TW: EnTranslations = {
       "crossHotbarResetLayout": "重置十字熱鍵欄",
       "crossHotbarSlot": "動作條 {slot}",
       "crossHotbarPosition": "{trigger} + {button}",
-      "crossHotbarOverlay": "十字熱鍵欄"
+      "crossHotbarOverlay": "十字熱鍵欄",
+      "crossHotbarOwnsButtons": "十字熱鍵欄啟用時，扳機鍵和方向鍵歸它所有，請在下方設定，而非此處。"
     },
     "perf": {
       "title": "效能監視器",

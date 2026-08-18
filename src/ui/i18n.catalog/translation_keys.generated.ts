@@ -8037,6 +8037,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.controller.crossHotbarExpandHelp'
   | 'hudChrome.controller.crossHotbarHelp'
   | 'hudChrome.controller.crossHotbarOverlay'
+  | 'hudChrome.controller.crossHotbarOwnsButtons'
   | 'hudChrome.controller.crossHotbarPosition'
   | 'hudChrome.controller.crossHotbarResetLayout'
   | 'hudChrome.controller.crossHotbarSet'

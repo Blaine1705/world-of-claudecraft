@@ -1528,6 +1528,8 @@ export const hudChromeStrings = {
     crossHotbarSlot: 'Action Bar {slot}',
     crossHotbarPosition: '{trigger} + {button}',
     crossHotbarOverlay: 'Cross hotbar',
+    crossHotbarOwnsButtons:
+      'The triggers and the d-pad belong to the cross hotbar while it is on, so they are set up below rather than here.',
   },
   // Performance overlay (the customizable in-game stats panel + its Options
   // sub-view). Player-facing, so every label is a key here; the live numbers in

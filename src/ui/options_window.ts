@@ -28,6 +28,7 @@ import {
   CROSS_HOTBAR_SLOTS_PER_SET,
   CROSS_HOTBAR_TRIGGERS,
   type CrossHotbarLayer,
+  isCrossHotbarButton,
 } from '../game/cross_hotbar';
 import { desktopDisplayModeSupported } from '../game/desktop_display_mode_sync';
 import { desktopGpuPrefSupported } from '../game/desktop_gpu_pref_sync';
@@ -1836,7 +1837,16 @@ export class OptionsWindow {
     if (hooks) {
       const opts = this.gamepadActionOptions();
       const kind = hooks.gamepad.kind();
+      // While the cross hotbar is on it OWNS the d-pad and both triggers: the
+      // triggers are its modifiers and the d-pad is four of its cells (plus HUD
+      // navigation on a bare press). Listing them here as freely rebindable is a
+      // lie the panel used to tell, so they are dropped from the flat list and
+      // the cross-hotbar section below is where those buttons are configured.
+      const crossHotbarOwned = hooks.settings.get('gamepadCrossHotbar');
       for (const { button, action } of hooks.gamepad.entries()) {
+        const isModifier =
+          button === CROSS_HOTBAR_TRIGGERS.left || button === CROSS_HOTBAR_TRIGGERS.right;
+        if (crossHotbarOwned && (isCrossHotbarButton(button) || isModifier)) continue;
         const row = document.createElement('div');
         row.className = 'set-row';
         const name = document.createElement('span');
@@ -1859,6 +1869,12 @@ export class OptionsWindow {
         );
         row.append(name, dd);
         body.appendChild(row);
+      }
+      if (crossHotbarOwned) {
+        const owned = document.createElement('div');
+        owned.className = 'set-note';
+        owned.textContent = t('hudChrome.controller.crossHotbarOwnsButtons');
+        body.appendChild(owned);
       }
       const reset = document.createElement('button');
       reset.type = 'button';

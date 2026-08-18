@@ -1462,7 +1462,8 @@ export const en_XA: EnTranslations = {
       "crossHotbarResetLayout": "[Ŕéšéţ Çŕóšš Ĥóţƀáŕ]",
       "crossHotbarSlot": "[Áçţíóñ Ɓáŕ {slot}]",
       "crossHotbarPosition": "[{trigger} + {button}]",
-      "crossHotbarOverlay": "[Çŕóšš ĥóţƀáŕ]"
+      "crossHotbarOverlay": "[Çŕóšš ĥóţƀáŕ]",
+      "crossHotbarOwnsButtons": "[Ţĥé ţŕíĝĝéŕš áñð ţĥé ð-þáð ƀéļóñĝ ţó ţĥé çŕóšš ĥóţƀáŕ ŵĥíļé íţ íš óñ, šó ţĥéý áŕé šéţ úþ ƀéļóŵ ŕáţĥéŕ ţĥáñ ĥéŕé.]"
     },
     "perf": {
       "title": "[Þéŕƒóŕɱáñçé Óʋéŕļáý]",

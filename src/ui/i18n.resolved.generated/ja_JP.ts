@@ -1462,7 +1462,8 @@ export const ja_JP: EnTranslations = {
       "crossHotbarResetLayout": "クロスホットバーをリセット",
       "crossHotbarSlot": "アクションバー {slot}",
       "crossHotbarPosition": "{trigger} + {button}",
-      "crossHotbarOverlay": "クロスホットバー"
+      "crossHotbarOverlay": "クロスホットバー",
+      "crossHotbarOwnsButtons": "クロスホットバーが有効な間、トリガーと方向キーはクロスホットバーが使用します。ここではなく下の項目で設定してください。"
     },
     "perf": {
       "title": "パフォーマンスオーバーレイ",
