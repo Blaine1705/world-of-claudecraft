@@ -11,6 +11,7 @@ import {
   syncSettledAppViewport,
 } from './game/app_viewport';
 import { audio } from './game/audio';
+import { nearestAutoTarget, shouldAutoTarget } from './game/auto_target';
 import { AutoLoot } from './game/autoloot';
 import {
   BROWSER_BODY_CLASSES,
@@ -2375,7 +2376,10 @@ async function startGame(
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
     onConnectionChange: () => crossHotbar.syncPadMode(gamepad),
     onActivity: createGamepadActivityNotifier(desktopBridge()),
-    onCrossHotbarCast: (action) => hud.castCrossHotbarAction(action),
+    onCrossHotbarCast: (action) => {
+      padAutoTarget(action);
+      hud.castCrossHotbarAction(action);
+    },
     onOpenSpellbook: () => hud.openSpellbook(),
     ...crossHotbar.padCallbacks(() => gamepad.getKind()),
   });
@@ -3487,6 +3491,26 @@ async function startGame(
         : (nearbyNpcs(world.entities.values(), world.player.pos, INTERACT_RANGE)[0]?.id ?? null);
     if (prefer !== null && prefer !== targeted) world.targetEntity(prefer);
     interactKey(prefer);
+  }
+
+  /**
+   * Choose an enemy for a pad press that needs one and has none. A mouse player
+   * targets by clicking what they can see; a pad player has no such gesture, so
+   * without this a new player who sees a wolf and presses the attack they know
+   * gets an error instead of a fight.
+   */
+  function padAutoTarget(action: { type: 'ability' | 'item'; id: string }): void {
+    if (action.type !== 'ability') return;
+    const current = world.player.targetId ?? null;
+    const targeted = current !== null ? world.entities.get(current) : undefined;
+    const activePvpOpponents = activePvpOpponentIds(world);
+    const attackable = (e: Parameters<typeof isAttackableEntity>[0]) =>
+      isAttackableEntity(e, world.playerId, activePvpOpponents);
+    if (!shouldAutoTarget(ABILITIES[action.id], !!targeted && attackable(targeted))) return;
+    const picked = nearestAutoTarget(world.entities.values(), world.player.pos, (e) =>
+      attackable(e as Parameters<typeof isAttackableEntity>[0]),
+    );
+    if (picked !== null) world.targetEntity(picked);
   }
 
   function attackNearest(): void {
