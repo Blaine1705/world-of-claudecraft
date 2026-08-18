@@ -9,6 +9,7 @@ import { ITEMS, MOBS } from '../../sim/data';
 import { ALL_CLASSES, type Entity, isMechWearer, type PlayerClass } from '../../sim/types';
 import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 import type { OverheadEmoteId } from '../../world_api';
+import { NPC_PROP_SET_IDS, type NpcPropSet } from './npc_looks';
 
 export interface EmoteClipSpec {
   clips: readonly string[];
@@ -2872,6 +2873,50 @@ for (const cls of ALL_CLASSES) {
 /** The composed-body variant of a class visual (every class has one). */
 export function modularVisualKey(cls: PlayerClass): string {
   return `player_${cls}_modular`;
+}
+
+// ---------------------------------------------------------------------------
+// NPC modular bodies: one `npc_modular_<propSet>` def per held-prop set
+// (npc_looks.ts authors WHICH set each NPC carries; this loop owns the
+// geometry). NPC gear never changes, so every prop is a FIXED attach (no
+// weaponSlots): with none, a composed NPC would inherit the warrior def's
+// default sword through modularKeyFor's class fallback. Clips ride the rogue
+// GLB exactly like npc_villager's fixed rig, so a composed villager idles,
+// walks, sits and dies with the same base clip set the town always used.
+// Driven by NPC_PROP_SET_IDS rather than a local list so a new prop set in
+// npc_looks.ts cannot ship without its def (tests/npc_looks.test.ts pins it).
+// ---------------------------------------------------------------------------
+const NPC_MODULAR_PROP_ATTACH: Record<NpcPropSet, AttachDef[]> = {
+  none: [],
+  staff: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
+  walking_staff: [{ url: `${WEAPONS}/brasscrown_walking_staff.glb`, bone: 'handslot.r' }],
+  oak_stave: [{ url: `${WEAPONS}/knotted_oak_stave.glb`, bone: 'handslot.r' }],
+  tome: [
+    { url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' },
+    { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', gripRef: 'Spellbook_open' },
+  ],
+  crossbow: [{ url: `${WEAPONS}/crossbow_1handed.glb`, bone: 'handslot.r' }],
+  hammer: [{ url: `${WEAPONS}/hammer_a.glb`, bone: 'handslot.r' }],
+  woodaxe: [{ url: `${WEAPONS}/notched_woodaxe.glb`, bone: 'handslot.r' }],
+  sword_shield: [
+    { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },
+    { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
+  ],
+  sword: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],
+  scythe: [{ url: `${WEAPONS}/scythe.glb`, bone: 'handslot.r' }],
+  knife: [{ url: `${WEAPONS}/whittler_s_knife.glb`, bone: 'handslot.r' }],
+  spear: [{ url: `${WEAPONS}/spear_a.glb`, bone: 'handslot.r' }],
+};
+
+for (const propSet of NPC_PROP_SET_IDS) {
+  VISUALS[`npc_modular_${propSet}`] = {
+    url: `${MODULAR}/warrior_modular.glb`,
+    modular: true,
+    height: HUMANOID_H,
+    clips: kaykit(['1H_Melee_Attack_Chop']),
+    animUrls: [`${PLAYERS}/rogue.glb`, `${PLAYERS}/rogue_hit_variety_anims.glb`],
+    attach: NPC_MODULAR_PROP_ATTACH[propSet],
+  };
 }
 
 // ---------------------------------------------------------------------------

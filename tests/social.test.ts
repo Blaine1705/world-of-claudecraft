@@ -53,20 +53,30 @@ describe('parties', () => {
     return { sim, a, b };
   }
 
-  function makePaladinAuraDuo(persistentAura: 'devotion_ward' | 'retribution_aura'): {
-    sim: Sim;
-    paladin: number;
-    member: number;
-  } {
+  function hasAura(sim: Sim, pid: number, auraId: string): boolean {
+    return sim.entities.get(pid)?.auras.some((a) => a.id === auraId) ?? false;
+  }
+
+  function makePaladinTrioWithAuras(persistentAura: 'devotion_ward' | 'retribution_aura') {
     const sim = makeWorld();
     const paladin = sim.addPlayer('paladin', 'Paladin');
     const member = sim.addPlayer('warrior', 'Member');
+    const remaining = sim.addPlayer('priest', 'Remaining');
     sim.setPlayerLevel(16, paladin);
-    sim.partyInvite(member, paladin);
-    sim.partyAccept(member);
+    for (const pid of [member, remaining]) {
+      sim.partyInvite(pid, paladin);
+      sim.partyAccept(pid);
+    }
+
+    const paladinEntity = sim.entities.get(paladin);
+    if (!paladinEntity) throw new Error('missing paladin entity');
     sim.castAbility(persistentAura, paladin);
-    expect(sim.entities.get(member)?.auras.find((a) => a.id === persistentAura)).toBeDefined();
-    return { sim, paladin, member };
+    paladinEntity.gcdRemaining = 0;
+    sim.castAbility('dawn_devotion', paladin);
+    expect(hasAura(sim, member, persistentAura)).toBe(true);
+    expect(hasAura(sim, remaining, persistentAura)).toBe(true);
+    expect(hasAura(sim, member, 'dawn_devotion')).toBe(true);
+    return { sim, paladin, member, remaining };
   }
 
   // Direct corpse construction (mirroring tests/loot_roll.test.ts's `deadCorpse`)
@@ -122,25 +132,52 @@ describe('parties', () => {
     }
   });
 
-  it('removes persistent paladin auras from a non-paladin who leaves', () => {
+  it('removes persistent paladin auras but keeps 30-minute devotion buffs when the recipient leaves', () => {
     for (const persistentAura of ['devotion_ward', 'retribution_aura'] as const) {
-      const { sim, member } = makePaladinAuraDuo(persistentAura);
+      const sim = makeWorld();
+      const paladin = sim.addPlayer('paladin', 'Paladin');
+      const member = sim.addPlayer('warrior', 'Member');
+      sim.setPlayerLevel(16, paladin);
+      sim.partyInvite(member, paladin);
+      sim.partyAccept(member);
+
+      const paladinEntity = sim.entities.get(paladin);
+      if (!paladinEntity) throw new Error('missing paladin entity');
+      sim.castAbility(persistentAura, paladin);
+      paladinEntity.gcdRemaining = 0;
+      sim.castAbility('dawn_devotion', paladin);
+      expect(sim.entities.get(member)?.auras.find((a) => a.id === persistentAura)).toBeDefined();
+      expect(sim.entities.get(member)?.auras.find((a) => a.id === 'dawn_devotion')).toBeDefined();
 
       sim.partyLeave(member);
 
-      expect(sim.partyOf(member)).toBe(null);
       expect(sim.entities.get(member)?.auras.find((a) => a.id === persistentAura)).toBeUndefined();
+      expect(sim.entities.get(member)?.auras.find((a) => a.id === 'dawn_devotion')).toBeDefined();
+      expect(sim.entities.get(paladin)?.auras.find((a) => a.id === persistentAura)).toBeDefined();
     }
   });
 
-  it('removes persistent paladin auras from a non-paladin who is kicked', () => {
+  it('removes persistent paladin auras from a non-caster who leaves while the paladin remains', () => {
     for (const persistentAura of ['devotion_ward', 'retribution_aura'] as const) {
-      const { sim, paladin, member } = makePaladinAuraDuo(persistentAura);
+      const { sim, member, remaining } = makePaladinTrioWithAuras(persistentAura);
+
+      sim.partyLeave(member);
+
+      expect(hasAura(sim, member, persistentAura)).toBe(false);
+      expect(hasAura(sim, member, 'dawn_devotion')).toBe(true);
+      expect(hasAura(sim, remaining, persistentAura)).toBe(true);
+    }
+  });
+
+  it('removes persistent paladin auras from a non-caster who is kicked while the paladin remains', () => {
+    for (const persistentAura of ['devotion_ward', 'retribution_aura'] as const) {
+      const { sim, paladin, member, remaining } = makePaladinTrioWithAuras(persistentAura);
 
       sim.partyKick(member, paladin);
 
-      expect(sim.partyOf(member)).toBe(null);
-      expect(sim.entities.get(member)?.auras.find((a) => a.id === persistentAura)).toBeUndefined();
+      expect(hasAura(sim, member, persistentAura)).toBe(false);
+      expect(hasAura(sim, member, 'dawn_devotion')).toBe(true);
+      expect(hasAura(sim, remaining, persistentAura)).toBe(true);
     }
   });
 

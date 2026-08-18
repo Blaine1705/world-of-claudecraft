@@ -56,11 +56,14 @@ const MONOLITHS: MonolithRow[] = [
     // LastKeepMapPainter declarations and the two walk-in map branches on the
     // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
     // count: any further growth reds again.
-    // Re-pinned 19488 -> 19490 for the PR #3428 login preview-prewarm merge:
-    // thin-consumer wiring to the pure buildPostEntryPreviewPrewarmUnits rides
-    // on the castle branch's zero-slack pin. Exact merged count: any further
-    // growth reds again.
-    ceiling: 19490,
+    // Raised 19433 -> 19442 (+9) for the login preview-prewarm trim: thin-consumer
+    // wiring (a `looksModular` read plus three flag args to the pure
+    // buildPostEntryPreviewPrewarmUnits) that has no clean branch-owned
+    // extraction, landing on upstream's zero-slack re-pin. Maintainer decision,
+    // exact merged count: any further growth reds again.
+    // Re-pinned after merging both changes: the combined file is the exact
+    // count below, so any further growth reds again.
+    ceiling: 19497,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -91,10 +94,38 @@ const MONOLITHS: MonolithRow[] = [
     // the two pins, so the ceiling is the exact merged count.
     // Extracted the shadow-depth material factory into
     // src/render/prewarm_depth_material.ts so the self-spirit prewarm could add
-    // Renderer.warmSelfSpirit plus per-frame observe without growing the file.
-    // Merging PR #3428 into the batch branch leaves the merged file below both
-    // prior pins, so the ceiling is the exact merged count.
-    ceiling: 13661,
+    // Renderer.warmSelfSpirit + the per-frame observe without growing the file.
+    // Merging release/v0.39.0: upstream re-pinned 13754 (its own extractions),
+    // this branch pinned 13680; the merged file is the exact count below, so the
+    // ceiling follows it per the ratchet's merge rule (any further growth reds).
+    // Re-pinned after merging both changes: the combined file is the exact
+    // count below, so any further growth reds again.
+    // Raised for the vfx.mount-programs manifest entry (#2571: mounts had
+    // ZERO prewarm coverage, so the first sighting of any mount could freeze a
+    // live frame, worse on hardware without KHR_parallel_shader_compile where
+    // the runtime fallback gate is a no-op). The rig-building logic itself was
+    // extracted to src/render/mount_prewarm.ts; this was the coordinator's
+    // unavoidable thin-wiring cost (the manifest entry, its group bookkeeping,
+    // and cleanup/hide registration).
+    // Raised a further +34 (13792 -> 13826) in review response: the group-
+    // staging/scene-bookkeeping logic that first cut left inline here (and
+    // that inline copy is what hid the bug, an `Object3D.add` reparent that
+    // silently detached every staged rig from its group) moved into
+    // mount_prewarm.ts's stageMountPrewarmVisual too, but run() also grew
+    // real synchronous-desktop-path work plus an honest progress() (the
+    // entry's run() was previously a no-op that still reported 'completed'),
+    // and resumeUnits now links the shadow-depth program half it was missing.
+    // What remains is the manifest entry itself, the shared
+    // mountPrewarmGroup/mountPrewarmWarmed variables, and cleanup/hide
+    // registration: exactly the seam this ratchet exists to bound, not grow
+    // unchecked. Rebased onto release/v0.39.0: the ceiling below is the exact
+    // post-rebase line count per the ratchet's rule.
+    // Re-pinned after merging the wrapper renderer repairs with
+    // vfx.mount-programs: the merged file is the exact count below, so any
+    // further growth reds again.
+    // Merged with PR #3468's mesh-shaped shadow-depth prewarm call; the
+    // exact merged count is lower than the wrapper pin, so tighten again.
+    ceiling: 13731,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

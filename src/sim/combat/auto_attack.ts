@@ -27,7 +27,8 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the shared
 // `ctx.rng` stream, drawn in the exact pre-move positions.
 
-import { CLASSES, isArenaPos, MOBS } from '../data';
+import { isArenaPos, MOBS } from '../data';
+import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import { forceDismount } from '../mounts';
 import { grantDevotionFromBlock } from '../paladin_devotion';
 import { scheduleProjectile } from '../projectile_travel';
@@ -167,6 +168,7 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
     t.ownerId === null &&
     t.aiState !== 'evade'
   ) {
+    if (questGateBlocksAggro(ctx.players, t, p)) return;
     if (t.aiState === 'idle') ctx.aggroMob(t, p, true);
     else if (t.aggroTargetId === null) t.aggroTargetId = p.id;
     addThreat(t, p.id, 1);

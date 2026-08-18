@@ -4668,6 +4668,7 @@ export interface Entity extends ClientMirroredEntityFields {
   // through objectItemId; this authority data never needs to reach clients.
   soulwell?: {
     ownerId: number;
+    partyId: number | null;
     eligiblePlayerIds: number[];
     wardAbsorbPctMax: number;
     wardedPlayerIds: number[];
@@ -4913,6 +4914,10 @@ export interface NythraxisEncounterState {
   wardChannels: NythraxisWardChannel[];
   finalStand: boolean;
   deathSpoken: boolean;
+  // Players seen alive inside the arena during this pull. Session-only attempt
+  // roster used for raid-wipe recovery, so a remote group member cannot farm
+  // cooldown resets without participating.
+  attemptParticipantIds?: number[];
 }
 
 export type ErrorReason = 'target_dead';

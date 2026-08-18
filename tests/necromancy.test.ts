@@ -180,6 +180,40 @@ describe('Necromancy Warlock', () => {
     }
   });
 
+  it('regenerates one Soul Fragment every 2 sec out of combat and stops at 3', () => {
+    const sim = makeNecromancer();
+
+    expect(fragmentCount(sim.player)).toBe(0);
+    for (let tick = 0; tick < 39; tick++) sim.tick();
+    expect(fragmentCount(sim.player)).toBe(0);
+    sim.tick();
+    expect(fragmentCount(sim.player)).toBe(1);
+    for (let tick = 0; tick < 39; tick++) sim.tick();
+    expect(fragmentCount(sim.player)).toBe(1);
+    sim.tick();
+    expect(fragmentCount(sim.player)).toBe(2);
+    for (let tick = 0; tick < 40; tick++) sim.tick();
+    expect(fragmentCount(sim.player)).toBe(3);
+    for (let tick = 0; tick < 40 * 3; tick++) sim.tick();
+    expect(fragmentCount(sim.player)).toBe(3);
+  });
+
+  it('does not passively generate Soul Fragments in combat or for another Warlock spec', () => {
+    const inCombat = makeNecromancer();
+    inCombat.player.inCombat = true;
+    inCombat.player.combatTimer = 0;
+    for (let tick = 0; tick < 40 * 2; tick++) inCombat.tick();
+    expect(fragmentCount(inCombat.player)).toBe(0);
+
+    for (const spec of [null, 'affliction', 'destruction'] as const) {
+      const other = new Sim({ seed: 42, playerClass: 'warlock', autoEquip: true });
+      other.setPlayerLevel(20);
+      if (spec) other.setSpec(spec);
+      for (let tick = 0; tick < 40 * 2; tick++) other.tick();
+      expect(fragmentCount(other.player), String(spec)).toBe(0);
+    }
+  });
+
   it('explains each summon role and the persistent two-slot Dominion in ability tooltips', () => {
     expect(ABILITIES.raise_graveguard.description).toContain('intercepts 20%');
     expect(ABILITIES.raise_graveguard.description).toContain('take 30% less damage for 4 sec');
@@ -284,7 +318,7 @@ describe('Necromancy Warlock', () => {
       effects: [
         {
           type: 'necromancyOssuaryMark',
-          duration: 12,
+          duration: 15,
           storedDamagePct: 0.2,
           soulLanceBonusPct: 0.5,
           deathRadius: 6,
@@ -350,6 +384,7 @@ describe('Necromancy Warlock', () => {
     const mark = target.auras.find((aura) => aura.kind === 'necromancy_ossuary_mark');
     const graveguard = sim.petOf(sim.playerId);
     if (!mark || !graveguard) throw new Error('Expected Ossuary Mark and Graveguard');
+    expect(mark.duration).toBe(15);
     const storedBefore = mark.damageAccrued ?? 0;
 
     sim.dealDamage(
@@ -436,6 +471,8 @@ describe('Necromancy Warlock', () => {
     const target = addTarget(sim);
     sim.player.hitBonus = 1;
     finishCast(sim, 'ossuary_mark');
+    const mark = target.auras.find((aura) => aura.kind === 'necromancy_ossuary_mark');
+    expect(mark?.duration).toBe(15);
     sim.dealDamage(
       sim.player,
       target,
@@ -470,7 +507,10 @@ describe('Necromancy Warlock', () => {
     const sim = makeNecromancer();
     const target = addTarget(sim);
     sim.player.hitBonus = 1;
-    finishCast(sim, 'ossuary_mark');
+    sim.castAbility('ossuary_mark');
+    const mark = target.auras.find((aura) => aura.kind === 'necromancy_ossuary_mark');
+    expect(mark?.duration).toBe(15);
+    expect(mark?.remaining).toBe(15);
     sim.dealDamage(
       sim.player,
       target,
@@ -490,14 +530,14 @@ describe('Necromancy Warlock', () => {
       true,
     );
     const hpBefore = target.hp;
+    if (!mark) throw new Error('Expected Ossuary Mark before expiry');
+    const ticksUntilExpiry = 20 * 15;
 
-    for (
-      let tick = 0;
-      tick < 20 * 15 && target.auras.some((aura) => aura.kind === 'necromancy_ossuary_mark');
-      tick++
-    ) {
-      sim.tick();
-    }
+    for (let tick = 0; tick < ticksUntilExpiry - 1; tick++) sim.tick();
+    expect(target.auras.some((aura) => aura.kind === 'necromancy_ossuary_mark')).toBe(true);
+    expect(target.hp).toBe(hpBefore);
+
+    sim.tick();
 
     expect(target.auras.some((aura) => aura.kind === 'necromancy_ossuary_mark')).toBe(false);
     expect(target.hp).toBe(hpBefore - 20);
@@ -597,6 +637,11 @@ describe('Necromancy Warlock', () => {
     expect(fragmentCount(sim.player)).toBe(2);
 
     const undead = ownedUndead(sim);
+    const servantsWithCooldowns = undead.filter(
+      (servant) =>
+        servant.templateId === 'graveguard' || servant.templateId === 'necromancy_skeletal_warrior',
+    );
+    for (const servant of servantsWithCooldowns) servant.petTauntTimer = 7;
     sim.targetEntity(primary.id);
     drain(sim);
     const events = finishCastEvents(sim, 'reaping_command');
@@ -618,6 +663,9 @@ describe('Necromancy Warlock', () => {
     expect(primaryHits).toHaveLength(undead.length);
     expect(new Set(primaryHits.map((event) => event.sourceId))).toEqual(
       new Set(undead.map((servant) => servant.id)),
+    );
+    expect(servantsWithCooldowns.map((servant) => servant.petTauntTimer)).toEqual(
+      servantsWithCooldowns.map(() => 7),
     );
     expect(secondaryHits).toHaveLength(1);
     expect(secondaryHits[0]?.sourceId).toBe(
@@ -651,6 +699,9 @@ describe('Necromancy Warlock', () => {
         }),
       ]),
     );
+    expect(ABILITIES.reaping_command.description).toContain(
+      "ignores and does not reset each servant's own ability cooldown",
+    );
   });
 
   it('lets Gravewing turn Reaping Command into an area vulnerability', () => {
@@ -663,9 +714,14 @@ describe('Necromancy Warlock', () => {
     sim.ctx.rebucket(secondary);
 
     finishCast(sim, 'army_of_the_dead');
+    const gravewing = ownedUndead(sim).find(
+      (servant) => servant.templateId === 'necromancy_gravewing',
+    );
+    if (!gravewing) throw new Error('Expected Gravewing');
+    gravewing.petTauntTimer = 7;
     addSoulFragments(sim.ctx, sim.player, 2);
     sim.targetEntity(primary.id);
-    finishCast(sim, 'reaping_command');
+    finishCastEvents(sim, 'reaping_command');
 
     for (const victim of [primary, secondary]) {
       expect(victim.auras).toEqual(
@@ -679,6 +735,7 @@ describe('Necromancy Warlock', () => {
         ]),
       );
     }
+    expect(gravewing.petTauntTimer).toBe(7);
   });
 
   it('Army of the Dead fills only the missing archetypes, never duplicating a standing servant', () => {
@@ -1942,7 +1999,7 @@ describe('Necromancy Warlock', () => {
     });
 
     expect(summonIds).toHaveLength(2);
-    expect(fragmentCount(sim.player)).toBe(3);
+    expect(fragmentCount(sim.player)).toBe(5);
     expect(sim.player.auras.some((aura) => aura.kind === 'form_lich')).toBe(true);
     expect(sim.setSpec('affliction')).toBe(true);
 

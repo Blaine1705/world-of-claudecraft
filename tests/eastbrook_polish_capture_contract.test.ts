@@ -184,12 +184,26 @@ interface AttributionTargetFixture {
 // Re-minted for the r185 frozen-camera aim fix: updateCamera now aims through
 // lookAtFrozen, so renderer.ts moves and the composite follows its bytes. No
 // capture was retaken.
-// Re-minted after extracting the delve interior build-cache scheduling into
-// src/render/delve_interior_tracker.ts (renderer.ts moved again, no capture retaken).
-// Re-minted for PR #3428's self-spirit/login-preview prewarm merge: the
-// combined renderer.ts bytes move the composite. No capture was retaken.
+// Re-minted for the release/v0.39 integrated gate plus the sky KTX2 UASTC HDR
+// conversion: the merged renderer keeps the wrapper repairs and moves again
+// for the compressed sky residency path, so the composite follows its bytes.
+// No capture was retaken.
+// Re-minted for the vfx.mount-programs prewarm entry (#2571): renderer.ts and
+// prewarm_policy.ts both move, so the composite follows their bytes. No
+// capture was retaken.
+// Re-minted for the vfx.mount-programs review fixes (scene-reparent bug,
+// honest desktop-path progress, depth compile, timeout-bounded fetch,
+// constrained-device removal): renderer.ts and prewarm_policy.ts both move
+// again, so the composite follows their bytes. No capture was retaken.
+// Re-minted for the rebase onto release/v0.39.0: renderer.ts moves again with
+// the base merge, so the composite follows its bytes. No capture was retaken.
+// Re-minted for this merge resolution: the wrapper renderer/provenance repairs
+// and vfx.mount-programs both move the runtime inputs, so the composite follows
+// the actual merged tree bytes. No capture was retaken.
+// Re-minted for the v0.39 gate repair: renderer.ts formatting moved under
+// Biome, so the composite follows the actual tree bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '3bdf19b47f6b841e05e618752f8541da1221865704da7883ea29bc7b5358aeb7';
+  'fca3953548bbeb9d3311f380cf12814bd55fea7c7b57420f6cbc0cd849e0177c';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

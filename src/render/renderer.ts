@@ -356,6 +356,7 @@ import { buildMailboxPillar } from './mailbox';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
+import { mountPrewarmKeys, stageMountPrewarmVisual } from './mount_prewarm';
 import { mountBobY, mountVisualSpec } from './mount_visuals';
 import { NameplatePainter } from './nameplate_painter';
 import {
@@ -556,6 +557,7 @@ import {
   type SkyKey,
   type SkyView,
   skyBiomesAt,
+  skyResidencyTextures,
 } from './sky';
 import { zoneArrivalReady } from './sky_residency_core';
 import { SkyResidencyDriver } from './sky_residency_driver';
@@ -1788,11 +1790,15 @@ export class Renderer {
   // when a class is first sighted, so the builds queue behind one another and
   // each spends its own idle slot instead of stacking into one combat frame.
   private spiritBuildLane: Promise<unknown> = Promise.resolve();
-  // Warms the local player's own body spirit (ghost) shader variants ahead of
-  // death, so the ungated self view never links them inline on a spirit release
-  // (the measured ~2.2 s death stall). See self_spirit_prewarm.ts + warmSelfSpirit.
+  // Schedules the local player's own ghost variants at idle, then queues the compile.
   private selfSpirit = new SelfSpiritPrewarmer({
-    warm: () => this.warmSelfSpirit(),
+    warm: () =>
+      this.backgroundGpuWork.run(
+        () => this.warmSelfSpirit(),
+        GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+        'self-spirit',
+        { releaseTail: true },
+      ),
     idle: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS),
   });
   // Static terrain/water/features just beyond the current zone are built in a
@@ -2761,6 +2767,7 @@ export class Renderer {
               label: 'foliage parse cache',
               objects: foliageResidencySources().parsedScenes,
             },
+            { label: 'sky', textures: skyResidencyTextures() },
             {
               // The cost side of the KTX2 mip release: source bytes retained
               // for the context-loss re-transcode (the released mip chains
@@ -3635,11 +3642,9 @@ export class Renderer {
         for (const key of skyKeys) this.prewarmTexture(this.skyView.domeTexture(key));
         return;
       }
-      // A DataTexture upload is synchronous even from requestIdleCallback. The
-      // installed 0.185 ships native update ranges, so the idle arm row-batches
-      // the HDRI instead of paying one full upload. Either way each atomic
-      // WebGL call enters the shared queue so it cannot overlap a live shader
-      // compile.
+      // A texture upload is synchronous even from requestIdleCallback, and a
+      // CompressedTexture has no row-addressable buffer to range over, so the
+      // sky is ONE queued call rather than a DataTexture's row batches.
       await this.prewarmTextureInIdle(this.skyView.envTexture(zone.biome));
       // PMREM generation is indivisible in three (0.185 included). Defer two
       // timed-out callbacks before deliberately paying that single unit under
@@ -5637,8 +5642,8 @@ export class Renderer {
       const material = mesh.material;
       swaps.push({ mesh, material });
       mesh.material = Array.isArray(material)
-        ? material.map((item) => prewarmDepthMaterial(this.prewarmDepthMaterials, item))
-        : prewarmDepthMaterial(this.prewarmDepthMaterials, material);
+        ? material.map((item) => prewarmDepthMaterial(this.prewarmDepthMaterials, item, mesh))
+        : prewarmDepthMaterial(this.prewarmDepthMaterials, material, mesh);
     });
     if (swaps.length === 0) return;
     // Match the real shadow pass's program key exactly. A bare
@@ -5673,18 +5678,13 @@ export class Renderer {
     await compilePromise;
   }
 
-  // Link the local player's own body spirit (ghost) transparent variants
-  // off-thread so a later spirit release reuses cached programs instead of
-  // linking ~20 inline on the ungated self view (the ~2.2 s death stall).
-  // Applies the ghost materials to the REAL skinned meshes (so the variant
-  // matches the flip's skinning/morph), runs compileAsync's synchronous
-  // prologue, then restores the opaque originals BEFORE awaiting the linker
-  // (the compileShadowPrograms restore-early pattern): no frame draws the ghost,
-  // and the clones the flip reuses stay cached on the visual.
-  private async warmSelfSpirit(): Promise<void> {
-    if (!this.asyncCompileSupported || this.sim.player.ghost) return;
+  // Link the local player's body-spirit variants off-thread so a later spirit
+  // release reuses cached programs instead of linking inline on the self view.
+  // Apply ghost materials to real skinned meshes, then restore opaque originals.
+  private async warmSelfSpirit(): Promise<boolean> {
+    if (!this.asyncCompileSupported || this.sim.player.ghost) return false;
     const visual = this.views.get(this.sim.player.id)?.visual;
-    if (!visual) return;
+    if (!visual) return false;
     const previousTarget = this.webgl.getRenderTarget();
     // Composer tiers link the ghost variant against their offscreen colour space.
     if (this.post) this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
@@ -5698,6 +5698,7 @@ export class Renderer {
       visual.setGhost(false);
     }
     await compilePromise;
+    return true;
   }
 
   // A tiny throwaway target for background child uploads, so a prewarm root
@@ -6020,6 +6021,8 @@ export class Renderer {
     let foliagePrewarmGroup: THREE.Group | null = null;
     let greatTreePrewarmGroup: THREE.Group | null = null;
     let weaponVfxPrewarmGroup: THREE.Group | null = null;
+    let mountPrewarmGroup: THREE.Group | null = null;
+    const mountPrewarmWarmedKeys = new Set<string>();
     let landmarkPrewarmGroup: THREE.Group | null = null;
     let weatherPrewarmActive = false;
     let surfaceDetailTexturesWarmed = 0;
@@ -6094,6 +6097,21 @@ export class Renderer {
     const droppedEntries: PrewarmResumeEntry[] = [];
     const resumeLedger = createPrewarmResumeLedger();
 
+    const mountPrewarmResumeUnits = (): PrewarmResumeUnit[] =>
+      mountPrewarmKeys()
+        .filter((key) => !mountPrewarmWarmedKeys.has(key))
+        .map((key) => ({
+          id: `mount:${key}`,
+          run: async () => {
+            const staged = await stageMountPrewarmVisual(this.scene, mountPrewarmGroup, key);
+            if (!staged) return;
+            mountPrewarmGroup = staged.group;
+            await this.compilePrewarmColorPrograms(staged.visual.root, false);
+            await this.compileShadowPrograms(staged.visual.root);
+            mountPrewarmWarmedKeys.add(key);
+          },
+        }));
+
     // One shared dedupe store across EVERY compile collection in this entry
     // pass (early submission, the compile entry's tail, the live-scene
     // re-collection, and the resume lane): a root or program signature any
@@ -6120,6 +6138,7 @@ export class Renderer {
       ['foliage', foliagePrewarmGroup],
       ['great-tree', greatTreePrewarmGroup],
       ['weapon-vfx', weaponVfxPrewarmGroup],
+      ['mounts', mountPrewarmGroup],
       ['landmark', landmarkPrewarmGroup],
     ];
 
@@ -6433,6 +6452,7 @@ export class Renderer {
         ghostVariantPrewarmGroup,
         foliagePrewarmGroup,
         weaponVfxPrewarmGroup,
+        mountPrewarmGroup,
         landmarkPrewarmGroup,
       ]) {
         if (group) group.visible = false;
@@ -6482,6 +6502,9 @@ export class Renderer {
       // Removed, never disposed: disposing a material releases its linked
       // program, which is exactly what this group exists to warm.
       if (weaponVfxPrewarmGroup) this.scene.remove(weaponVfxPrewarmGroup);
+      // Same reason: a mount rig removed here keeps its program cached, it
+      // just stops taking a scene-graph traversal slot every frame.
+      if (mountPrewarmGroup) this.scene.remove(mountPrewarmGroup);
       if (landmarkPrewarmGroup) this.scene.remove(landmarkPrewarmGroup);
       if (weatherPrewarmActive) this.weather.endPrewarm();
       doorPrewarmGroup = null;
@@ -6499,6 +6522,7 @@ export class Renderer {
       foliagePrewarmGroup = null;
       greatTreePrewarmGroup = null;
       weaponVfxPrewarmGroup = null;
+      mountPrewarmGroup = null;
       landmarkPrewarmGroup = null;
       weatherPrewarmActive = false;
     };
@@ -7032,6 +7056,52 @@ export class Renderer {
             this.prewarmMaterialTextures(renderable.material);
           });
         },
+      },
+      {
+        // Rideable mounts: worn by whoever is riding one, so first sighting
+        // links programs like vfx.weapon-skins. Mount GLBs are lazyPreload
+        // (characters/assets.ts), and stalled fetches drop only that mount.
+        //
+        // The immediate path only stages within the entry budget; unwarmed
+        // mounts become the same per-mount resume units used after a whole
+        // entry deferral. Those resumed units self-compile both color and
+        // shadow programs because programs.compile has already run.
+        id: 'vfx.mount-programs',
+        category: 'vfx',
+        priority: 63,
+        required: false,
+        resumeUnits: mountPrewarmResumeUnits,
+        // Immediate path only STAGES each mount (never compiles inline): the
+        // group it builds is picked up by stagedCompileGroupsNow() below, so
+        // the shared 'programs.compile' entry links both program halves for
+        // it exactly like every other staged prewarm group, matching
+        // vfx.weapon-skins/props.ghost-fade-variants beside it. Only the
+        // deferred resumeUnits path above self-compiles: by the time it
+        // runs, 'programs.compile' has already finished.
+        run: async () => {
+          const mountDeadline = policy.finishFullManifestBeforeReveal ? hardDeadline : deadline;
+          for (const key of mountPrewarmKeys()) {
+            const remainingMs = mountDeadline - performance.now();
+            if (remainingMs <= 0) break;
+            const staged = await stageMountPrewarmVisual(
+              this.scene,
+              mountPrewarmGroup,
+              key,
+              remainingMs,
+            );
+            if (!staged) continue;
+            mountPrewarmGroup = staged.group;
+            mountPrewarmWarmedKeys.add(key);
+          }
+          const units = mountPrewarmResumeUnits();
+          if (units.length > 0) droppedEntries.push({ id: 'vfx.mount-programs', units });
+        },
+        progress: () => ({
+          done: mountPrewarmWarmedKeys.size,
+          planned: mountPrewarmKeys().length,
+          trimmed: mountPrewarmWarmedKeys.size < mountPrewarmKeys().length,
+        }),
+        detail: () => `mounts=${mountPrewarmGroup?.children.length ?? 0}`,
       },
       {
         // A 2k RGBA16F dome upload blocked a live Mirefen frame for 183ms.
@@ -11162,7 +11232,7 @@ export class Renderer {
       if (!v.visual) continue;
       // Warm the local player's own spirit variants once per distinct look, so
       // a death spirit-release never links them inline on the ungated self view.
-      if (e.id === this.sim.player.id) {
+      if (e.id === this.sim.player.id && this.asyncCompileSupported && !this.sim.player.ghost) {
         this.selfSpirit.observe(v.visual, e.skin, e.mainhandItemId, e.offhandItemId);
       }
       if (iceBlockActivated) this.activeVisual(v)?.playEmote('wave', 1);

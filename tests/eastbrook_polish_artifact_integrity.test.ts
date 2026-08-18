@@ -766,15 +766,29 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the r185 frozen-camera aim fix: the first-order composite
 // follows renderer.ts, then this seal follows the swept evidence bytes. No
 // capture was retaken.
-// Re-minted again after extracting the delve interior build-cache scheduling
-// into src/render/delve_interior_tracker.ts (renderer.ts moved, no capture retaken).
-// Re-minted for PR #3428's self-spirit/login-preview prewarm merge: the
-// combined renderer.ts bytes move the first-order composite, then this seal
-// follows the swept evidence bytes. No capture was retaken.
+// Re-minted for the release/v0.39 integrated gate plus the sky KTX2 UASTC HDR
+// conversion: the first-order composite follows the merged renderer, then this
+// seal follows the swept evidence bytes. No capture was retaken.
+// Re-minted for the vfx.mount-programs prewarm entry (#2571): the first-order
+// composite follows renderer.ts and prewarm_policy.ts, then this seal follows
+// the swept evidence bytes. No capture was retaken.
+// Re-minted for the vfx.mount-programs review fixes (scene-reparent bug,
+// honest desktop-path progress, depth compile, timeout-bounded fetch,
+// constrained-device removal): the first-order composite follows renderer.ts
+// and prewarm_policy.ts, then this seal follows the swept evidence bytes. No
+// capture was retaken.
+// Re-minted for the rebase onto release/v0.39.0: the first-order composite
+// follows renderer.ts, then this seal follows the swept evidence bytes. No
+// capture was retaken.
+// Re-minted for this merge resolution: the wrapper renderer/provenance repairs
+// and vfx.mount-programs both move the runtime inputs, then this seal follows
+// the swept evidence bytes. No capture was retaken.
+// Re-minted for the v0.39 gate repair: renderer.ts formatting moved under
+// Biome, then this seal follows the swept evidence bytes. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'aee9fbaf6f5151aaae8da061e61e59f98cebc544c855309f2fdda7f3009889c8';
+  '6618a639b426d9effd8eab31b582a382ae42dbec1564b5b6c8fbf26dd789b216';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '3bdf19b47f6b841e05e618752f8541da1221865704da7883ea29bc7b5358aeb7';
+  'fca3953548bbeb9d3311f380cf12814bd55fea7c7b57420f6cbc0cd849e0177c';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1777,15 +1791,32 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-minted for the r185 frozen-camera aim fix. The first-order composite
     // follows renderer.ts, then this second-order performance seal follows the
     // swept evidence bytes. No capture was retaken.
-    // Re-minted again after extracting the delve interior build-cache
-    // scheduling into src/render/delve_interior_tracker.ts. No capture retaken.
-    // Re-minted for PR #3428's self-spirit/login-preview prewarm merge. The
-    // first-order composite follows renderer.ts, then this second-order seal
+    // Re-minted for the release/v0.39 integrated gate. The first-order
+    // composite follows the current merged tree, then this second-order seal
     // follows the swept evidence bytes. No capture was retaken.
+    // Re-minted for the vfx.mount-programs prewarm entry (#2571). The
+    // first-order composite follows renderer.ts and prewarm_policy.ts, then
+    // this second-order performance seal follows the swept evidence bytes. No
+    // capture was retaken.
+    // Re-minted for the vfx.mount-programs review fixes (scene-reparent bug,
+    // honest desktop-path progress, depth compile, timeout-bounded fetch,
+    // constrained-device removal). The first-order composite follows
+    // renderer.ts and prewarm_policy.ts, then this second-order performance
+    // seal follows the swept evidence bytes. No capture was retaken.
+    // Re-minted for the rebase onto release/v0.39.0. The first-order composite
+    // follows renderer.ts, then this second-order performance seal follows
+    // the swept evidence bytes. No capture was retaken.
+    // Re-minted for this merge resolution. The first-order composite follows
+    // the wrapper renderer/provenance repairs plus vfx.mount-programs, then
+    // this second-order performance seal follows the swept evidence bytes. No
+    // capture was retaken.
+    // Re-minted for the v0.39 gate repair. Renderer.ts formatting moved under
+    // Biome, then this second-order performance seal follows the swept evidence
+    // bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('9e8a6ab7bdd5db58d4deacd79850bebaf8dfc2aade7d2a98407f1bab7993d406');
+    ).toBe('25154852311442a0d7e2c1a5b1b9d582b81a00bd75e1aaba8ec6d8da74604e2d');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
