@@ -367,6 +367,9 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
     'ui_tier_knobs',
     'render_budget',
     'RenderBudgetGovernor',
+    '--fx-shadow',
+    'gfxTier',
+    'data-fx-level',
   ];
 
   it('reads no effects profile, tier knob, or FPS governor anywhere on the path', () => {

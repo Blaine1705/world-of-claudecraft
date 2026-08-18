@@ -98,6 +98,8 @@ function harness(
   targets: Entity[],
   options: {
     me?: Partial<Entity>;
+    includeSelf?: boolean;
+    showOwnNameplate?: () => boolean;
     isHostilePlayer?: (e: Entity) => boolean;
     markerFor?: (entityId: number) => number | null;
     questState?: (questId: string) => string;
@@ -110,6 +112,7 @@ function harness(
     ...options.me,
   });
   const views = new Map<number, EntityView>();
+  if (options.includeSelf) views.set(me.id, view());
   for (const target of targets) views.set(target.id, view());
   const camera = new THREE.PerspectiveCamera(60, VIEWPORT.width / VIEWPORT.height, 0.1, 500);
   camera.position.set(0, 3, 12);
@@ -133,7 +136,7 @@ function harness(
     getDevicePixelRatio: () => 1,
     showNameplates: () => true,
     showDevBadges: () => true,
-    showOwnNameplate: () => false,
+    showOwnNameplate: options.showOwnNameplate ?? (() => false),
     showPlayerNameplates: () => true,
     isHostilePlayer: options.isHostilePlayer ?? (() => false),
   });
@@ -250,6 +253,8 @@ describe('batched canvas nameplate state', () => {
     expect(state.border).toBe('prestige_laurels');
     expect(state.opacity).toBe(0.55);
     expect(state.badges).toHaveLength(3);
+    expect(state.badges[0]?.size).toBe(15);
+    expect(state.badges[1]?.size).toBe(15);
     expect(state.badges[2]).toMatchObject({
       url: 'https://example.com/avatar.png',
       size: 24,
@@ -323,15 +328,33 @@ describe('batched canvas nameplate state', () => {
     // title, so a border change repaints exactly like a title change. Every arm
     // here is a way a stale slug could survive onto the wrong plate.
     const bordered = entity({ id: 2, border: 'col_reliquary_rank_5' });
-    const mob = entity({ id: 3, kind: 'mob', templateId: 'wolf', hostile: true });
-    const object = entity({ id: 4, kind: 'object', templateId: 'delve_locked_chest' });
-    const { painter } = harness([bordered, mob, object]);
+    const mob = entity({
+      id: 3,
+      kind: 'mob',
+      templateId: 'wolf',
+      hostile: true,
+      border: 'col_reliquary_rank_5',
+    });
+    const object = entity({
+      id: 4,
+      kind: 'object',
+      templateId: 'delve_locked_chest',
+      border: 'col_reliquary_rank_5',
+    });
+    const npc = entity({
+      id: 5,
+      kind: 'npc',
+      templateId: 'marshal_redbrook',
+      border: 'col_reliquary_rank_5',
+    });
+    const { painter } = harness([bordered, mob, object, npc]);
 
     painter.update(true);
     expect(stateOf(painter, 2).border).toBe('reliquary_gilt');
-    // A mob and a world object never carry one, so the accent is player identity.
+    // A mob, an NPC, and a world object never carry one, so the accent is player identity.
     expect(stateOf(painter, 3).border).toBe('');
     expect(stateOf(painter, 4).border).toBe('');
+    expect(stateOf(painter, 5).border).toBe('');
 
     // Cleared selection: the reset must blank the slug the plate already holds.
     bordered.border = null;
@@ -346,6 +369,21 @@ describe('batched canvas nameplate state', () => {
     bordered.border = 'deed_that_no_longer_exists';
     painter.update(true);
     expect(stateOf(painter, 2).border).toBe('');
+  });
+
+  it('E18: a hidden self plate with an emote never keeps a worn slug', () => {
+    // Own-nameplate off still shows the self emote bubble, so resolveContent
+    // runs. suppressSelf must return after the reset blanks the slug, or the
+    // bubble path would leak a cartouche onto a hidden identity plate.
+    const { painter } = harness([], {
+      includeSelf: true,
+      showOwnNameplate: () => false,
+      me: { border: 'col_reliquary_rank_5', overheadEmoteId: 'wave' },
+    });
+    painter.update(true);
+    expect(stateOf(painter, 1).border).toBe('');
+    expect(stateOf(painter, 1).name).toBe('');
+    expect(stateOf(painter, 1).emoteIconUrl).not.toBe('');
   });
 
   it('maps object, quest NPC, boss, and lootable corpse presentation', () => {

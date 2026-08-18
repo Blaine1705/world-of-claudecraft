@@ -390,11 +390,13 @@ describe('shared hardware: four L-brackets and one top clasp', () => {
 
 describe('E17 extraLift is CSS pixels, never DPR-scaled', () => {
   it('takes no dpr / uiScale field and always reports the same lift', () => {
-    const keys = Object.keys(input());
-    expect(keys).not.toContain('dpr');
-    expect(keys).not.toContain('devicePixelRatio');
-    expect(keys).not.toContain('uiScale');
-    expect(keys).not.toContain('pixelRatio');
+    const source = read('src/render/nameplate_cartouche_core.ts');
+    for (const token of ['dpr', 'devicePixelRatio', 'uiScale', 'pixelRatio']) {
+      expect(source.includes(token), `core must not read ${token}`).toBe(false);
+    }
+    expect(source).toMatch(
+      /export interface NameplateCartoucheInput \{\s*screenX: number;\s*nameRowBottomY: number;\s*nameRowWidth: number;\s*nameRowHeight: number;\s*titleWidth: number;\s*slug: string;\s*\}/,
+    );
     expect(layout({ slug: 'deepward' }).extraLift).toBe(14);
     expect(layout({ slug: 'deepward', nameRowHeight: 24 }).extraLift).toBe(14);
   });
@@ -421,12 +423,9 @@ describe('E25 / E26 identity is tier-invariant in the core', () => {
       'data-fx-level',
       'gfxTier',
       'fxTier',
+      '--fx-shadow',
     ]) {
       expect(source.includes(token), `core must not read ${token}`).toBe(false);
     }
-    const keys = Object.keys(input());
-    expect(keys).not.toContain('gfx');
-    expect(keys).not.toContain('governor');
-    expect(keys).not.toContain('fxTier');
   });
 });

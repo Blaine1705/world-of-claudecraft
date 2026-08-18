@@ -75,6 +75,17 @@ describe('nameplate declutter', () => {
     expect(declutterNameplates(anchors)).toEqual(anchors);
   });
 
+  it('E24: two plates 25px apart vertically now collide (the old 18px window would miss them)', () => {
+    const anchors: NameplateAnchor[] = [
+      { id: 1, sx: 200, sy: 100 },
+      { id: 2, sx: 200, sy: 125 },
+    ];
+    const out = declutterNameplates(anchors);
+    expect(OVERLAP_THRESHOLD_Y_PX).toBe(32);
+    expect(STACK_OFFSET_PX).toBe(34);
+    expect(Math.abs((out[0]?.sy ?? 0) - (out[1]?.sy ?? 0))).toBe(34);
+  });
+
   it('separates two anchors that project to nearly the same spot', () => {
     const anchors: NameplateAnchor[] = [
       { id: 1, sx: 200, sy: 150 },

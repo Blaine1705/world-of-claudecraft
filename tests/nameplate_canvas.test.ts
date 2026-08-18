@@ -18,7 +18,10 @@ import { BORDER_ACCENT_SLUGS, borderAccent } from '../src/ui/deed_border_view';
 
 // jsdom rewrites a literal `new URL('...', import.meta.url)` to an http URL.
 // Keep the relative path in a variable so readFileSync still sees a file URL.
-const readSource = (rel: string): string => readFileSync(new URL(rel, import.meta.url), 'utf8');
+const readSource = (rel: string): string =>
+  readFileSync(new URL(rel, import.meta.url), 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:])\/\/.*$/gm, '$1');
 
 interface ContextTrace {
   canvas: HTMLCanvasElement;
@@ -84,6 +87,34 @@ interface SpriteCacheAccess {
 
 const spriteCount = (surface: NameplateCanvasSurface): number =>
   (surface as unknown as SpriteCacheAccess).text.size;
+
+interface CartoucheSurfaceAccess {
+  cartouche: {
+    well: { x: number; y: number; w: number; h: number };
+    outer: { x: number; y: number; w: number; h: number };
+    clasp: { x: number; y: number; w: number; h: number };
+    extraLift: number;
+    nameRowTop: number;
+    nameBaseline: number;
+    titleBaseline: number;
+    titleCenterX: number;
+  };
+  text: {
+    draw: (
+      ctx: CanvasRenderingContext2D,
+      text: string,
+      x: number,
+      y: number,
+      style: unknown,
+    ) => void;
+  };
+}
+
+const cartoucheOf = (surface: NameplateCanvasSurface): CartoucheSurfaceAccess['cartouche'] =>
+  (surface as unknown as CartoucheSurfaceAccess).cartouche;
+
+const textOf = (surface: NameplateCanvasSurface): CartoucheSurfaceAccess['text'] =>
+  (surface as unknown as CartoucheSurfaceAccess).text;
 
 let traces: ContextTrace[];
 
@@ -606,21 +637,30 @@ describe('nameplate canvas surface', () => {
     });
     const emoteBlits = (): unknown[][] =>
       traces[0].drawImage.mock.calls.filter(([source]) => source instanceof HTMLImageElement);
+    const drawSpy = vi.spyOn(textOf(surface), 'draw');
 
     surface.beginFrame(640, 360, 1);
     surface.drawBase(state, 320, 220);
     surface.drawEmote(state, 320, 220);
     const withoutAccent = emoteBlits().at(-1);
+    const nameWithout = drawSpy.mock.calls.find((call) => call[1] === 'Gilded One')?.[3];
     expect(withoutAccent).toBeDefined();
+    expect(nameWithout).toBeTypeOf('number');
 
+    drawSpy.mockClear();
     state.border = 'deepward';
     surface.beginFrame(640, 360, 1);
     surface.drawBase(state, 320, 220);
     surface.drawEmote(state, 320, 220);
     const withAccent = emoteBlits().at(-1);
+    const nameWith = drawSpy.mock.calls.find((call) => call[1] === 'Gilded One')?.[3];
+    const plaque = cartoucheOf(surface);
     expect(withAccent).toBeDefined();
     expect(withAccent?.[1]).toBe(withoutAccent?.[1]);
     expect(withAccent?.[2]).toBe((withoutAccent?.[2] as number) - NAMEPLATE_CARTOUCHE_EXTRA_LIFT);
+    expect(nameWith).toBe((nameWithout as number) - NAMEPLATE_CARTOUCHE_EXTRA_LIFT);
+    expect(plaque.well.y).toBeLessThan(nameWith as number);
+    expect(withAccent?.[2]).toBeLessThan(plaque.clasp.y);
     expect(NAMEPLATE_CARTOUCHE_EXTRA_LIFT).toBe(14);
   });
 
@@ -727,6 +767,7 @@ describe('nameplate canvas surface', () => {
       title: 'Gate Keeper',
       border: 'deepward',
     });
+    const drawSpy = vi.spyOn(textOf(surface), 'draw');
     surface.beginFrame(640, 360, 1);
     surface.drawBase(state, 320, 220);
     const rasterizedText = traces.flatMap((trace) =>
@@ -736,6 +777,55 @@ describe('nameplate canvas surface', () => {
     expect(rasterizedText).toContain('Gilded One');
     expect(traces[0].fillStyles).toContain(NAMEPLATE_CARTOUCHE_WELL_FILL);
     expect(traces[0].stroke).toHaveBeenCalledTimes(5);
+    const plaque = cartoucheOf(surface);
+    const title = drawSpy.mock.calls.find((call) => call[1] === 'Gate Keeper');
+    expect(title?.[2]).toBe(plaque.titleCenterX);
+    expect(title?.[3]).toBe(plaque.titleBaseline);
+    expect(plaque.titleCenterX).toBe(320);
+    expect(plaque.titleBaseline).toBeGreaterThan(plaque.nameRowTop);
+    expect(plaque.titleBaseline).toBeLessThan(plaque.well.y + plaque.well.h);
+    expect(plaque.well.y + plaque.well.h - plaque.titleBaseline).toBeGreaterThanOrEqual(5);
+  });
+
+  it('E5: a 15px holder badge stays inside the 16px row and does not kiss the well floor', () => {
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = createNameplateCanvasState();
+    Object.assign(state, {
+      initialized: true,
+      name: 'Holder',
+      border: 'deepward',
+      badges: [{ url: 'badge', size: 15 }],
+    });
+    surface.beginFrame(640, 360, 1);
+    surface.drawBase(state, 320, 220);
+    const plaque = cartoucheOf(surface);
+    expect(plaque.outer.h).toBe(26);
+    expect(plaque.nameRowTop - plaque.well.y).toBe(5);
+    expect(plaque.well.y + plaque.well.h - (plaque.nameRowTop + 15)).toBe(6);
+    expect(plaque.nameRowTop + 15).toBeLessThan(plaque.well.y + plaque.well.h);
+  });
+
+  it('E7: AI and Cheater chips draw on the shared name baseline inside the well', () => {
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = createNameplateCanvasState();
+    Object.assign(state, {
+      initialized: true,
+      name: 'Marked',
+      border: 'deepward',
+      aiLabel: '[AI]',
+      cheaterLabel: '< Cheater >',
+    });
+    const drawSpy = vi.spyOn(textOf(surface), 'draw');
+    surface.beginFrame(640, 360, 1);
+    surface.drawBase(state, 320, 220);
+    const plaque = cartoucheOf(surface);
+    const ai = drawSpy.mock.calls.find((call) => call[1] === '[AI]');
+    const cheater = drawSpy.mock.calls.find((call) => call[1] === '< Cheater >');
+    expect(ai?.[3]).toBe(plaque.nameBaseline);
+    expect(cheater?.[3]).toBe(plaque.nameBaseline);
+    expect(plaque.nameBaseline).toBeGreaterThan(plaque.well.y);
+    expect(plaque.nameBaseline).toBeLessThan(plaque.well.y + plaque.well.h);
+    expect(traces[0].fillStyles).toContain(NAMEPLATE_CARTOUCHE_WELL_FILL);
   });
 
   it('E9: draws the dev-tier name outline after the well, never under it', () => {
@@ -746,6 +836,21 @@ describe('nameplate canvas surface', () => {
     );
     expect(accentAt).toBeGreaterThan(-1);
     expect(outlineAt).toBeGreaterThan(accentAt);
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = createNameplateCanvasState();
+    Object.assign(state, {
+      initialized: true,
+      name: 'Outlined',
+      border: 'deepward',
+      devOutline: '#6ee7b7',
+    });
+    const drawSpy = vi.spyOn(textOf(surface), 'draw');
+    surface.beginFrame(640, 360, 1);
+    surface.drawBase(state, 320, 220);
+    expect(traces[0].fillStyles).toContain(NAMEPLATE_CARTOUCHE_WELL_FILL);
+    const wellFillOrder = traces[0].fill.mock.invocationCallOrder[0];
+    const outlineOrder = drawSpy.mock.invocationCallOrder[0];
+    expect(wellFillOrder).toBeLessThan(outlineOrder);
   });
 
   it('E11: guild stays outside the plaque, below the health bar and above the cartouche', () => {
@@ -763,6 +868,7 @@ describe('nameplate canvas surface', () => {
       guildLabel: '<The Testers>',
       border: 'deepward',
     });
+    const drawSpy = vi.spyOn(textOf(surface), 'draw');
     surface.beginFrame(640, 360, 1);
     surface.drawBase(state, 320, 220);
     const rasterizedText = traces.flatMap((trace) =>
@@ -770,6 +876,9 @@ describe('nameplate canvas surface', () => {
     );
     expect(rasterizedText).toContain('<The Testers>');
     expect(traces[0].fillStyles).toContain(NAMEPLATE_CARTOUCHE_WELL_FILL);
+    const guild = drawSpy.mock.calls.find((call) => call[1] === '<The Testers>');
+    const plaque = cartoucheOf(surface);
+    expect(guild?.[3]).toBeGreaterThan(plaque.well.y + plaque.well.h);
   });
 
   it('E12: HP, cast, combo, and raid-mark slots stay on their existing y-steps', () => {
@@ -779,6 +888,20 @@ describe('nameplate canvas surface', () => {
     expect(source).toContain('if (state.comboPips > 0) {\n      y -= 9;');
     expect(source).toContain('if (state.raidMarkerUrl) {\n      y -= 31;');
     expect(source).toContain('y -= 47;');
+    vi.spyOn(HTMLImageElement.prototype, 'complete', 'get').mockReturnValue(true);
+    vi.spyOn(HTMLImageElement.prototype, 'naturalWidth', 'get').mockReturnValue(30);
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = createNameplateCanvasState();
+    Object.assign(state, {
+      initialized: true,
+      name: 'Marked',
+      border: 'deepward',
+      raidMarkerUrl: 'raid-mark',
+    });
+    surface.beginFrame(640, 360, 1);
+    surface.drawBase(state, 320, 220);
+    const raid = traces[0].drawImage.mock.calls.find((call) => call[3] === 30 && call[4] === 30);
+    expect(raid?.[2]).toBeLessThan(cartoucheOf(surface).clasp.y);
   });
 
   it('E13: a dead player still draws the plaque when a border is worn', () => {
@@ -823,12 +946,15 @@ describe('nameplate canvas surface', () => {
       hostile: true,
       border: 'curators_gilt',
     });
+    const drawSpy = vi.spyOn(textOf(surface), 'draw');
     surface.beginFrame(640, 360, 1);
     surface.drawBase(state, 320, 220);
     expect(traces[0].strokeStyles).toEqual(
       expect.arrayContaining([accent?.frame, accent?.edge, accent?.glow]),
     );
     expect(traces[0].strokeStyles).not.toContain('#ff5555');
+    const rival = drawSpy.mock.calls.find((call) => call[1] === 'Rival');
+    expect((rival?.[4] as { fill?: string } | undefined)?.fill).toBe('#ff5555');
   });
 
   it('E21: a borderless plate draws no well and no hardware', () => {
@@ -871,7 +997,18 @@ describe('nameplate canvas surface', () => {
     expect(source).toContain('y -= this.cartoucheLift(state)');
     expect(source).not.toContain('cartoucheLift(state) *');
     expect(source).not.toContain('EXTRA_LIFT *');
+    expect(source).not.toContain('--fx-shadow');
     expect(NAMEPLATE_CARTOUCHE_EXTRA_LIFT).toBe(14);
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = createNameplateCanvasState();
+    Object.assign(state, { initialized: true, name: 'Scale', border: 'deepward' });
+    surface.beginFrame(640, 360, 1);
+    surface.drawBase(state, 320, 220);
+    const cssY = cartoucheOf(surface).well.y;
+    surface.beginFrame(640, 360, 2);
+    surface.drawBase(state, 320, 220);
+    expect(cartoucheOf(surface).well.y).toBe(cssY);
+    expect(cartoucheOf(surface).extraLift).toBe(14);
   });
 
   it('E18 / E20: self-hide and non-player paths never assign a worn slug after reset', () => {
