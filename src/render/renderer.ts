@@ -85,6 +85,7 @@ import {
 } from './blob_shadow_core';
 import { BlobShadows } from './blob_shadows';
 import { createBuildLedger } from './build_ledger_core';
+import { setBuildSpanSink } from './build_spans';
 import { type BulwarkFeaturesView, buildBulwarkFeatures } from './bulwark_features';
 import { BurningPactMarkers } from './burning_pact_markers';
 import { createCameraBoom, stepCameraBoom } from './camera_boom_core';
@@ -1407,8 +1408,7 @@ export class Renderer {
   private readonly hitchTracker = createHitchTracker();
   private hitchLogEnabled = false;
   private readonly hitchFrameScratch = emptyHitchFrameSample();
-  // Write-only build telemetry (build_ledger_core), read back through perfStats().
-  private readonly buildLedger = createBuildLedger();
+  private readonly buildLedger = createBuildLedger(); // write-only, read via perfStats()
   // The census burst inflates the following frame's dt; skip that one sample
   // so the tracker never charges the census to the scene.
   private hitchSkipNextFrame = false;
@@ -1986,6 +1986,7 @@ export class Renderer {
     // ?prep=legacy: admit every unit as before, while the ledger keeps learning
     // so a capture from the legacy arm still carries the costs to compare.
     if (gpuPrepMode() === 'legacy') this.gpuPrepBudget.setLegacy(true);
+    setBuildSpanSink(this.buildLedger.record); // view-part:* spans: 'other' lane, never view spend
     // biome-ignore format: Keep the established constructor body stable inside the failure guard.
     try {
     // Dev-channel build-phase telemetry (English, console.info, Release-silent):
@@ -2016,8 +2017,7 @@ export class Renderer {
     // dirty check for every auto-update descendant), defeating both the
     // static-subtree freeze and the hidden-rig gate below. Freeze the root:
     // children with auto-update still recompose themselves normally.
-    this.scene.updateMatrix();
-    this.scene.matrixAutoUpdate = false;
+    this.scene.updateMatrix(); this.scene.matrixAutoUpdate = false;
     this.ambientPointSources = buildWorldAmbientSources(this.sim.cfg.seed);
     // No default-framebuffer MSAA on any tier: high/ultra get AA from the
     // composer's MSAA HalfFloat target, low is meant to run without AA, and

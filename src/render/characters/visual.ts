@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import type { OverheadEmoteId } from '../../world_api';
+import { recordBuildSpan, timeBuildSpan } from '../build_spans';
 import { GFX } from '../gfx';
 import { cloneMaterialWithHooks } from '../material_clone_hooks';
 import {
@@ -677,7 +678,9 @@ export class CharacterVisual {
     // for a non-modular def, this makes the visual agree, so nothing
     // downstream can read a look the geometry never used.
     this.look = prep.def.modular ? look : null;
-    this.model = assembleModel(this.def, weaponItemId, offhandItemId, look);
+    this.model = timeBuildSpan('view-part:assemble', () =>
+      assembleModel(this.def, weaponItemId, offhandItemId, look),
+    );
     // Release-on-throw for everything below: the retry gate re-runs this whole
     // constructor when a streamed asset lands late (a designed path, not an
     // edge case), and assembleModel above RETAINED the composed part set.
@@ -686,13 +689,15 @@ export class CharacterVisual {
     // No-op for a fixed rig.
     try {
       configureTightBoneTextures(this.model);
-      applyMaterials(
-        this.model,
-        this.def,
-        entityColor,
-        skinTexture(key, skinIndex),
-        skinEmissiveTexture(key, skinIndex),
-        this.tintedRigClaims,
+      timeBuildSpan('view-part:materials', () =>
+        applyMaterials(
+          this.model,
+          this.def,
+          entityColor,
+          skinTexture(key, skinIndex),
+          skinEmissiveTexture(key, skinIndex),
+          this.tintedRigClaims,
+        ),
       );
       if (key === 'form_metamorph') {
         this.metamorphLeftWing = this.model.getObjectByName('metamorph_wing_left_hinge') ?? null;
@@ -718,10 +723,13 @@ export class CharacterVisual {
       // Added AFTER applyMaterials (its additive material must not be re-mapped)
       // and BEFORE the originalMaterials snapshot, so ghost/stealth material
       // swaps restore it like any other mesh.
-      if (this.def.halo !== undefined) {
+      const haloDef = this.def.halo;
+      if (haloDef !== undefined) {
         const head = this.model.getObjectByName('head');
         if (head) {
-          const halo = buildHalo(this.def.halo, this.def.haloUpOffset, this.def.haloRadius);
+          const halo = timeBuildSpan('view-part:halo', () =>
+            buildHalo(haloDef, this.def.haloUpOffset, this.def.haloRadius),
+          );
           this.haloBaseMaterial = halo.material;
           head.add(halo);
         }
@@ -761,17 +769,20 @@ export class CharacterVisual {
       // hair and outfit. Theirs is baked from their own part set instead, and
       // lazily (buildComposedFar), because most of a crowd stands close enough
       // that the mesh would never be drawn.
-      if (prep.idleGeo && !this.look) {
-        this.buildFarMeshes(
-          prep.idleGeo,
-          tintedFarMaterials(
-            prep.def,
-            entityColor,
-            prep.idleSrcMats,
-            prep.idleSrcIsBody,
-            skinTexture(key, skinIndex),
-            skinEmissiveTexture(key, skinIndex),
-            this.tintedFarClaims,
+      const idleGeo = prep.idleGeo;
+      if (idleGeo && !this.look) {
+        timeBuildSpan('view-part:far-bake', () =>
+          this.buildFarMeshes(
+            idleGeo,
+            tintedFarMaterials(
+              prep.def,
+              entityColor,
+              prep.idleSrcMats,
+              prep.idleSrcIsBody,
+              skinTexture(key, skinIndex),
+              skinEmissiveTexture(key, skinIndex),
+              this.tintedFarClaims,
+            ),
           ),
         );
       }
@@ -785,6 +796,7 @@ export class CharacterVisual {
       this.clickProxy.visible = false;
       this.root.add(this.clickProxy);
 
+      const mixerStarted = performance.now();
       this.mixer = new THREE.AnimationMixer(this.model);
       this.skeletonUpdates = new SkeletonUpdateCache(this.model);
       for (const name of [...clipNamesOf(prep.def), ...SKIN_ATTACK_CLIP_NAMES]) {
@@ -792,6 +804,7 @@ export class CharacterVisual {
         if (clip) this.actions.set(name, this.mixer.clipAction(clip));
       }
       this.mixer.addEventListener('finished', (ev) => this.onFinished(ev.action));
+      recordBuildSpan('view-part:mixer', performance.now() - mixerStarted, mixerStarted);
       if (key === 'player_paladin') {
         this.bastionSweepFx = new PaladinBastionSweepFx(this.model);
         this.templarsVerdictFx = new PaladinTemplarsVerdictFx(this.model);

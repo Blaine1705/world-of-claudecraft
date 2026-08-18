@@ -195,8 +195,10 @@ interface AttributionTargetFixture {
 // Re-minted for the build-ledger instrumentation (timed view and zone
 // builds, the arrival mark): renderer.ts and entity_view_policy_core.ts
 // moved, the seals follow the swept evidence bytes. No capture was retaken.
+// Re-minted for the build-span sink wiring (view-part sub-spans): renderer.ts
+// moved, the seals follow the swept evidence bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'e40f527a1b2139406f233d3184df56606ed4706dfdc8a89aa2121d8057c493b0';
+  '997134cbdd9544c6cefedf74bf65ef3f0152a174d067eeac2ef4531d6260c98a';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

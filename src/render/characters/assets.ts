@@ -20,6 +20,7 @@ import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { retryDelayMs as gltfRetryDelayMs } from '../assets/load_retry';
 import { loadGltf, loadKtx2Texture, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
+import { recordBuildSpan, timeBuildSpan } from '../build_spans';
 import { addRimGlow, EMISSIVE_GLOW, GFX, type GfxSettings } from '../gfx';
 import { applySurfaceDetail, riggedWornFamilyFor } from '../worn_stone';
 import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
@@ -1342,10 +1343,15 @@ export function assembleModular(
   offhandItemId?: string | null,
 ): THREE.Object3D {
   const names = modularPartNames(look.app, look.worn);
-  const variant = modularVariant(def.url, names);
-  const root = cloneSkinned(variant.root);
-  attachStubbleDecal(root, look);
-  attachMakeupDecal(root, look);
+  // Nested inside the visual's `view-part:assemble` span; the variant step is
+  // the cache miss (whole-GLB clone + part merge) or a map hit.
+  const variant = timeBuildSpan('view-part:assemble:variant', () => modularVariant(def.url, names));
+  const root = timeBuildSpan('view-part:assemble:parts', () => cloneSkinned(variant.root));
+  timeBuildSpan('view-part:assemble:decals', () => {
+    attachStubbleDecal(root, look);
+    attachMakeupDecal(root, look);
+  });
+  const recolorStarted = performance.now();
   root.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh) return;
@@ -1366,8 +1372,11 @@ export function assembleModular(
       ? mesh.material.map((m) => recolored(m, look, onMouth, onJewel, onBand))
       : recolored(mesh.material, look, onMouth, onJewel, onBand);
   });
-  applyMorphs(root, look);
-  attachAllProps(root, def, weaponItemId ?? null, null, false, offhandItemId ?? null);
+  recordBuildSpan('view-part:assemble:recolor', performance.now() - recolorStarted, recolorStarted);
+  timeBuildSpan('view-part:assemble:morphs', () => applyMorphs(root, look));
+  timeBuildSpan('view-part:assemble:props', () =>
+    attachAllProps(root, def, weaponItemId ?? null, null, false, offhandItemId ?? null),
+  );
   // The far LOD's material slots, captured HERE and nowhere else, off the SAME
   // filter (composedFarMeshes) the composed bake walks, so slot N here is group
   // N there. Resolving by material NAME could not promise that: `mod_skin` is on

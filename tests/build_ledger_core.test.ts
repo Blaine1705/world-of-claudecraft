@@ -62,6 +62,21 @@ describe('createBuildLedger', () => {
     expect(snap.slowest.map((s) => s.kind)).toEqual(['view:rig']);
   });
 
+  it('files a view-part sub-span under other: in kinds, out of the frame view spend', () => {
+    const ledger = createBuildLedger();
+    ledger.record('view:composed', 60, 1);
+    ledger.record('view-part:assemble', 40, 2);
+    ledger.record('view-part:assemble:parts', 25, 3);
+    expect(buildLedgerLane('view-part:assemble')).toBe('other');
+    const spend = ledger.frameSpend();
+    expect(spend.viewMs).toBe(60);
+    expect(spend.zoneMs).toBe(0);
+    expect(spend.totalMs).toBe(125);
+    const kinds = ledger.snapshot().kinds;
+    expect(kinds['view-part:assemble'].lastMs).toBe(40);
+    expect(kinds['view-part:assemble:parts'].maxMs).toBe(25);
+  });
+
   it('remembers the worst frame with its build count and first timestamp', () => {
     const ledger = createBuildLedger();
     ledger.record('view:rig', 5, 100);
