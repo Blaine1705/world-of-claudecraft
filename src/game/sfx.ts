@@ -206,8 +206,6 @@ class Sfx {
 
   /** Set SFX volume (0..1). Shares the `sfxVolume` slider with `audio`. */
   setVolume(v: number): void {
-    // The boot-mute flag wins over every caller: a per-cue gain or a settings
-    // push must not be able to raise the floor back off zero.
     this.vol = Math.min(1, Math.max(0, v));
     if (this.master) this.master.gain.value = SAMPLE_GAIN * this.vol;
   }

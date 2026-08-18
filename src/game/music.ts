@@ -5190,14 +5190,13 @@ export class MusicDirector {
     } catch {
       /* private mode */
     }
-
     if (this.ctx && this.master) {
       this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, 0.3);
     }
     this.applyBossPlayback();
     this.applySowfield();
     // re-enabling must revive paused streams now, not a keeper tick later
-    if (this._enabled) this.streamKeeper();
+    if (on) this.streamKeeper();
   }
 
   /** Fade out while the game menu is open; does not change the music toggle. */
