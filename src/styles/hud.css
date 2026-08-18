@@ -9336,6 +9336,16 @@ body.xhb-mode #stancebar {
 body.xhb-mode #player-frame {
   transform: translateY(calc(-1 * var(--xhb-lift, 56px)));
 }
+/* The cast bar rides up with it. It is pinned a fixed distance off the bottom, so
+   left alone the frame climbs into it exactly when the bar is tallest (a handheld
+   at a larger interface scale), which is the one case the lift has to handle. The
+   two move as one column instead.
+   Its own centring translate is repeated here on purpose: transform is a single
+   property, so naming only the lift would drop the -50% and shove the bar right by
+   half its width. */
+body.xhb-mode #castbar {
+  transform: translateX(-50%) translateY(calc(-1 * var(--xhb-lift, 56px)));
+}
 /* The pad has no cursor, so the keycap column the action bar shows would be noise
    here: the button under each cell is the d-pad or face button it sits on. */
 .xhb-slot .keybind {
