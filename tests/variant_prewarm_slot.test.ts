@@ -49,7 +49,10 @@ describe('createVariantPrewarmSlot', () => {
       'character-effect-variants:group',
       'character-effect-variants:compile',
     ]);
-    await units[1].run();
+    // The link unit REPORTS a missing artifact rather than passing quietly:
+    // the resume ledger records a failed unit, and a silent success there is
+    // how a slot whose re-stage threw was booked as warmed.
+    await expect(units[1].run()).rejects.toThrow('character-effect-variants');
     expect(h.compiled).toEqual([]);
     await units[0].run();
     await units[1].run();
@@ -114,8 +117,8 @@ describe('createPrewarmGroupSlot', () => {
       'weather.materials:stage',
       'weather.materials:units',
     ]);
-    // The pieces never run against an unstaged artifact.
-    await units[1].run();
+    // The pieces never run against an unstaged artifact, and say so.
+    await expect(units[1].run()).rejects.toThrow('weather.materials');
     expect(uploaded).toEqual([]);
     await units[0].run();
     await units[1].run();
@@ -165,10 +168,32 @@ describe('createPrewarmGroupSlot', () => {
     expect(slot.artifact).toEqual({ live: false });
     await units[1].run();
     slot.cleanup();
-    expect(events).toEqual(['stage', 'hide', 'upload', 'end']);
+    // No group to detach: the custom hide is the only thing that can take a
+    // group-less artifact out of the frame, so cleanup runs it too.
+    expect(events).toEqual(['stage', 'hide', 'upload', 'hide', 'end']);
     expect(slot.artifact).toBeNull();
     slot.cleanup();
-    expect(events).toEqual(['stage', 'hide', 'upload', 'end']);
+    expect(events).toEqual(['stage', 'hide', 'upload', 'hide', 'end']);
+  });
+
+  it('reports a throwing re-stage instead of warming nothing in silence', async () => {
+    const h = host();
+    let staged = 0;
+    const slot = createPrewarmGroupSlot(h.api, 'landmarks.impact-site', {
+      stage: () => {
+        staged++;
+        if (staged > 1) throw new Error('rebuild source gone');
+        return new THREE.Group();
+      },
+    });
+    slot.run();
+    slot.cleanup();
+    const units = slot.resumeUnits();
+    // The stage unit throws synchronously; the resume lane catches per unit.
+    expect(() => units[0].run()).toThrow('rebuild source gone');
+    // The link unit must not book a success for an artifact that never landed.
+    await expect(units[1].run()).rejects.toThrow('landmarks.impact-site');
+    expect(h.compiled).toEqual([]);
   });
 
   it('re-stages after a cleanup, so a resume still reaches the artifact', async () => {

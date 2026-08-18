@@ -274,7 +274,10 @@ export function createPrewarmPacing(search: string, clock: LinkRateBudgetClock):
       else budget.charge(normalizedLinks);
     },
     markSettled: (id) => {
-      submitStop.noteSettled(clock.now(), unitLinks.get(id) ?? 0);
+      // An id with no recorded delta (its markSyncEnd never landed) settles as
+      // UNMEASURED, never as zero: reading an accounting hole as a unit that
+      // linked nothing fed the stop rules evidence nobody observed.
+      submitStop.noteSettled(clock.now(), unitLinks.get(id));
       unitLinks.delete(id);
       adaptive?.markSettled(id);
     },

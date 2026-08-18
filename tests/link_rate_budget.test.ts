@@ -14,6 +14,7 @@ import {
 } from '../src/render/link_rate_budget';
 import {
   PREWARM_SUBMIT_LANE_MAX_MS,
+  PREWARM_SUBMIT_NO_USEFUL_LINK_MS,
   PREWARM_SUBMIT_ZERO_DELTA_STREAK_LIMIT,
 } from '../src/render/prewarm_submit_stop_core';
 
@@ -283,6 +284,31 @@ describe('submission pacing knobs', () => {
       ageMs: 0,
       units: PREWARM_SUBMIT_ZERO_DELTA_STREAK_LIMIT,
     });
+  });
+
+  it('never scores a settle whose sync prologue never reported a delta', async () => {
+    // The accounting hole: markSyncEnd never landed for that id (a duplicate
+    // id, a unit whose prologue threw), so the lane has no measurement for it.
+    // Scoring it as a zero-delta settle fed BOTH stop rules evidence nobody
+    // observed, and the lane latched dead on it.
+    const clock = virtualClock();
+    const pacing = createPrewarmPacing('?perf&linkmode=adaptive', clock);
+    for (let index = 0; index < 40; index++) {
+      const id = `unmeasured:${index}`;
+      pacing.markSubmitted(id);
+      pacing.markSettled(id);
+      expect(pacing.shouldStop().stop).toBe(false);
+    }
+    await clock.sleep(PREWARM_SUBMIT_NO_USEFUL_LINK_MS * 2);
+    expect(pacing.shouldStop().stop).toBe(false);
+    expect(pacing.receipt(16, 15_000).submitStop).toMatchObject({
+      usefulSettles: 0,
+      zeroDeltaSettles: 0,
+      zeroDeltaStreak: 0,
+      stopped: false,
+      reason: null,
+    });
+    expect(gpuPrepEventsSnapshot().counts['submit-stop']).toBe(0);
   });
 
   it('keeps a lane that links real programs running', () => {

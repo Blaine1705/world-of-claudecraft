@@ -257,6 +257,37 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(compiled).toEqual(['a', 'b']);
   });
 
+  it('mints ids that stay unique across calls sharing one dedupe store', async () => {
+    // The two passes of one logical compile pass ('programs.compile-submit'
+    // early, 'programs.compile' re-collecting the live scene) both mint units
+    // for the 'scene' group, and the lane's pacing accounts each unit BY ID.
+    // A per-call index restarting at 0 minted an id still IN FLIGHT from the
+    // early pass: the duplicate submission was dropped, its charge rewrote the
+    // in-flight unit's cost, and its settle was scored against the wrong unit.
+    const sharedDedupe = { seen: new Set<{ id: string }>(), seenKeys: new Set() };
+    const compile = async (): Promise<void> => {};
+    const early = buildPrewarmCompileUnits(
+      [{ id: 'scene', roots: [{ id: 'a' }, { id: 'b' }] }],
+      compile,
+      { sharedDedupe },
+    );
+    const tail = buildPrewarmCompileUnits(
+      [
+        { id: 'scene', roots: [{ id: 'c' }] },
+        { id: 'weapon-vfx', roots: [{ id: 'd' }] },
+      ],
+      compile,
+      { sharedDedupe },
+    );
+    expect(early.map((unit) => unit.id)).toEqual(['scene:0', 'scene:1']);
+    expect(tail.map((unit) => unit.id)).toEqual(['scene:2', 'weapon-vfx:0']);
+    const ids = [...early, ...tail].map((unit) => unit.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    // Without a shared store each call is its own id space, unchanged.
+    const standalone = buildPrewarmCompileUnits([{ id: 'scene', roots: [{ id: 'e' }] }], compile);
+    expect(standalone.map((unit) => unit.id)).toEqual(['scene:0']);
+  });
+
   it('batches roots into one unit that awaits its compiles together', async () => {
     // r165 compileAsync resolves after N x 10 ms of setTimeout polling: awaited
     // one by one, the floors stack; awaited together, they overlap. The batch

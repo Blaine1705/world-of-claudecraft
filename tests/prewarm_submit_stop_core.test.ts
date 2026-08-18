@@ -7,6 +7,7 @@ import { prewarmSubmitShouldStop } from '../src/render/prewarm_policy';
 import {
   createPrewarmSubmitStop,
   PREWARM_SUBMIT_LANE_MAX_MS,
+  PREWARM_SUBMIT_MIN_ZERO_DELTA_SETTLES,
   PREWARM_SUBMIT_NO_USEFUL_LINK_MS,
   PREWARM_SUBMIT_STOP_CONFIG,
   PREWARM_SUBMIT_ZERO_DELTA_STREAK_LIMIT,
@@ -29,7 +30,8 @@ describe('prewarm submit stop core', () => {
     expect(PREWARM_SUBMIT_STOP_CONFIG).toEqual({
       laneMaxMs: 6_000,
       noUsefulLinkMs: 1_500,
-      zeroDeltaStreakLimit: 8,
+      minZeroDeltaSettles: 3,
+      zeroDeltaStreakLimit: 16,
     });
     const stop = createPrewarmSubmitStop();
     // A lane that has not submitted anything has no wall clock yet: the
@@ -117,14 +119,15 @@ describe('prewarm submit stop core', () => {
     expect(stop.shouldStop(PREWARM_SUBMIT_LANE_MAX_MS).reason).toBe('lane-max');
   });
 
-  it('fires the time window when only zero-delta settles land', () => {
+  it('fires the time window when enough zero-delta settles land', () => {
     const stop = createPrewarmSubmitStop({
       laneMaxMs: 60_000,
       noUsefulLinkMs: PREWARM_SUBMIT_NO_USEFUL_LINK_MS,
+      minZeroDeltaSettles: PREWARM_SUBMIT_MIN_ZERO_DELTA_SETTLES,
       zeroDeltaStreakLimit: 1_000,
     });
     stop.noteSubmitted(1_000);
-    stop.noteSettled(1_000, 0);
+    for (let i = 0; i < PREWARM_SUBMIT_MIN_ZERO_DELTA_SETTLES; i++) stop.noteSettled(1_000, 0);
     expect(stop.shouldStop(1_000 + PREWARM_SUBMIT_NO_USEFUL_LINK_MS - 1).stop).toBe(false);
     expect(stop.shouldStop(1_000 + PREWARM_SUBMIT_NO_USEFUL_LINK_MS)).toMatchObject({
       stop: true,
@@ -132,10 +135,60 @@ describe('prewarm submit stop core', () => {
     });
   });
 
+  it('never stops on ONE zero-delta settle followed by a genuinely slow link', () => {
+    // The dedupe-shadow shape: signature dedupe is imperfect, so one unit
+    // whose roots were all already covered settles having linked nothing, and
+    // the very next unit is a real 1.6 s link. One zero-delta settle plus the
+    // window elapsing must NOT latch the lane dead while it is doing the work
+    // the manifest exists for.
+    const stop = createPrewarmSubmitStop();
+    stop.noteSubmitted(0);
+    stop.noteSyncEnd(0);
+    stop.noteSettled(0, 0);
+    stop.noteSubmitted(1);
+    stop.noteSyncEnd(24);
+    const slowMs = PREWARM_SUBMIT_NO_USEFUL_LINK_MS + 100;
+    expect(stop.shouldStop(slowMs).stop).toBe(false);
+    stop.noteSettled(slowMs, 24);
+    expect(stop.shouldStop(slowMs).stop).toBe(false);
+    expect(stop.snapshot()).toMatchObject({ usefulSettles: 1, zeroDeltaStreak: 0 });
+
+    // The evidence bar is a RUN of zero-delta settles: reaching it, the window
+    // still fires.
+    for (let i = 0; i < PREWARM_SUBMIT_MIN_ZERO_DELTA_SETTLES; i++) {
+      stop.noteSubmitted(slowMs);
+      stop.noteSettled(slowMs, 0);
+    }
+    expect(stop.shouldStop(slowMs + PREWARM_SUBMIT_NO_USEFUL_LINK_MS - 1).stop).toBe(false);
+    expect(stop.shouldStop(slowMs + PREWARM_SUBMIT_NO_USEFUL_LINK_MS)).toMatchObject({
+      stop: true,
+      reason: 'no-useful-link',
+    });
+  });
+
+  it('ignores a settle whose program delta was never measured', () => {
+    // markSyncEnd never landed for that unit, so its delta is unknown. An
+    // accounting hole is not evidence: counting it as a zero-delta settle
+    // would arm both stop rules on a number nobody observed.
+    const stop = createPrewarmSubmitStop({ ...PREWARM_SUBMIT_STOP_CONFIG, laneMaxMs: 600_000 });
+    stop.noteSubmitted(0);
+    for (let i = 0; i < PREWARM_SUBMIT_ZERO_DELTA_STREAK_LIMIT * 2; i++) {
+      stop.noteSubmitted(i);
+      stop.noteSettled(i, undefined);
+    }
+    expect(stop.snapshot()).toMatchObject({
+      zeroDeltaSettles: 0,
+      zeroDeltaStreak: 0,
+      usefulSettles: 0,
+    });
+    expect(stop.shouldStop(PREWARM_SUBMIT_NO_USEFUL_LINK_MS * 4).stop).toBe(false);
+  });
+
   it('normalizes a junk config and survives junk readings and deltas', () => {
     const stop = createPrewarmSubmitStop({
       laneMaxMs: Number.NaN,
       noUsefulLinkMs: -1,
+      minZeroDeltaSettles: 0,
       zeroDeltaStreakLimit: 0,
     });
     // A junk reading is not an observation: it can neither start the lane
@@ -145,9 +198,12 @@ describe('prewarm submit stop core', () => {
     expect(stop.snapshot()).toMatchObject({ submissions: 1, elapsedMs: 0, stopped: false });
     stop.noteSubmitted(0);
     stop.noteSyncEnd(Number.NaN);
+    // A junk DELTA is not an observation either; a finite nonsense one is.
     stop.noteSettled(0, Number.NEGATIVE_INFINITY);
+    expect(stop.snapshot().zeroDeltaSettles).toBe(0);
+    for (let i = 0; i < PREWARM_SUBMIT_MIN_ZERO_DELTA_SETTLES; i++) stop.noteSettled(0, -3);
     expect(stop.snapshot().zeroDeltaSyncEnds).toBe(1);
-    expect(stop.snapshot().zeroDeltaSettles).toBe(1);
+    expect(stop.snapshot().zeroDeltaSettles).toBe(PREWARM_SUBMIT_MIN_ZERO_DELTA_SETTLES);
     // The defaults replaced every junk knob, so the fallbacks still bound it.
     expect(stop.shouldStop(PREWARM_SUBMIT_LANE_MAX_MS - 1).reason).toBe('no-useful-link');
   });

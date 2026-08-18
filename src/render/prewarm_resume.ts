@@ -177,6 +177,15 @@ export interface PrewarmCompileUnitOptions<T> {
   batchSize?: number;
 }
 
+// Per-shared-store unit indices. Two calls that share a dedupe store are two
+// passes of ONE logical compile pass ('programs.compile-submit' early, then
+// 'programs.compile' re-collecting the live scene), and the submit lane
+// accounts every unit BY ID: an index restarting at 0 mints an id still in
+// flight from the earlier pass, whose in-flight cost the namesake's sync
+// prologue then rewrites and whose settle is scored against the wrong unit.
+// Keyed off the caller's store, so a call with no store keeps its own space.
+const sharedUnitIndices = new WeakMap<object, Map<string, number>>();
+
 /**
  * Turns materialized archetype roots into explicit resume units. Reference
  * deduplication prevents one shared root from being compiled twice when it is
@@ -190,17 +199,26 @@ export function buildPrewarmCompileUnits<T extends object>(
 ): PrewarmResumeUnit[] {
   const seen = options?.sharedDedupe?.seen ?? new Set<T>();
   const seenKeys = options?.sharedDedupe?.seenKeys ?? new Set<unknown>();
+  const store = options?.sharedDedupe;
+  let unitIndices = store ? sharedUnitIndices.get(store) : undefined;
+  if (store && !unitIndices) {
+    unitIndices = new Map<string, number>();
+    sharedUnitIndices.set(store, unitIndices);
+  }
+  const indices = unitIndices ?? new Map<string, number>();
   const batchSize = Math.max(1, options?.batchSize ?? 1);
   const units: PrewarmResumeUnit[] = [];
   for (const group of groups) {
-    let unitIndex = 0;
+    let unitIndex = indices.get(group.id) ?? 0;
     let batch: T[] = [];
     const flush = (): void => {
       if (batch.length === 0) return;
       const roots = batch;
       batch = [];
+      const id = `${group.id}:${unitIndex++}`;
+      indices.set(group.id, unitIndex);
       units.push({
-        id: `${group.id}:${unitIndex++}`,
+        id,
         run: async () => {
           // allSettled, then rethrow the first failure: Promise.all would
           // short-circuit the unit on one rejection and blur which of its

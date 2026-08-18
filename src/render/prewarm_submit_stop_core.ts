@@ -33,11 +33,17 @@ export interface PrewarmSubmitStopConfig {
    *  run at less than half of its 11.8 s. */
   laneMaxMs: number;
   /** How long the lane may keep submitting with no unit reporting a POSITIVE
-   *  program delta. Armed by evidence, never by silence: it can only fire once
-   *  at least one unit has settled having linked nothing, so a slow machine
-   *  whose first unit is still linking is never truncated by it (a genuinely
-   *  stuck lane is the adaptive budget's noProgress case). */
+   *  program delta. Armed by evidence, never by silence: it needs a RUN of
+   *  settles that linked nothing (minZeroDeltaSettles) before the clock can
+   *  fire it, so a slow machine whose units are still linking is never
+   *  truncated by it (a genuinely stuck lane is the adaptive budget's
+   *  noProgress case). */
   noUsefulLinkMs: number;
+  /** Zero-delta settles required since the last positive delta before the
+   *  noUsefulLinkMs window may fire. One is not a pattern: signature dedupe is
+   *  imperfect, so a single dedupe-shadowed unit followed by one genuinely
+   *  slow link would otherwise latch the lane dead while it does real work. */
+  minZeroDeltaSettles: number;
   /** Consecutive zero-delta settles that stop the lane without waiting out
    *  noUsefulLinkMs. The instant-settle runaway produces these back to back,
    *  so the streak catches it in the units it takes to prove the pattern. */
@@ -46,11 +52,18 @@ export interface PrewarmSubmitStopConfig {
 
 export const PREWARM_SUBMIT_LANE_MAX_MS = 6000;
 export const PREWARM_SUBMIT_NO_USEFUL_LINK_MS = 1500;
-export const PREWARM_SUBMIT_ZERO_DELTA_STREAK_LIMIT = 8;
+export const PREWARM_SUBMIT_MIN_ZERO_DELTA_SETTLES = 3;
+// A whole batch of compileBatchRoots roots that links nothing new is a window
+// of dedupe misses, not a slow driver: at 16 the streak still catches the
+// instant-settle runaway in well under a second, while a normal boot (where
+// the program signature dedupe is imperfect and one unit carries up to
+// compileBatchRoots roots) never reaches it.
+export const PREWARM_SUBMIT_ZERO_DELTA_STREAK_LIMIT = 16;
 
 export const PREWARM_SUBMIT_STOP_CONFIG: PrewarmSubmitStopConfig = {
   laneMaxMs: PREWARM_SUBMIT_LANE_MAX_MS,
   noUsefulLinkMs: PREWARM_SUBMIT_NO_USEFUL_LINK_MS,
+  minZeroDeltaSettles: PREWARM_SUBMIT_MIN_ZERO_DELTA_SETTLES,
   zeroDeltaStreakLimit: PREWARM_SUBMIT_ZERO_DELTA_STREAK_LIMIT,
 };
 
@@ -87,8 +100,11 @@ export interface PrewarmSubmitStop {
    *  Diagnostic only: the settle carries the same number and is the timed
    *  observation, so the decision is taken once, there. */
   noteSyncEnd(links: number): void;
-  /** One submitted unit settled, having created `links` programs. */
-  noteSettled(nowMs: number, links: number): void;
+  /** One submitted unit settled, having created `links` programs. An
+   *  unmeasured delta (no sync prologue reported one for that unit) is passed
+   *  as undefined and observed as nothing at all: an accounting hole must not
+   *  reach either stop rule as evidence. */
+  noteSettled(nowMs: number, links: number | undefined): void;
   shouldStop(nowMs: number): PrewarmSubmitStopVerdict;
   snapshot(): PrewarmSubmitStopSnapshot;
 }
@@ -104,10 +120,17 @@ const readingOf = (value: number): number | null => (Number.isFinite(value) ? va
 const linksOf = (value: number): number =>
   Number.isFinite(value) && value > 0 ? Math.floor(value) : 0;
 
+const measuredLinks = (value: number | undefined): number | null =>
+  value === undefined || !Number.isFinite(value) ? null : value;
+
 function normalizedConfig(config: PrewarmSubmitStopConfig): PrewarmSubmitStopConfig {
   return {
     laneMaxMs: positiveMs(config.laneMaxMs, PREWARM_SUBMIT_LANE_MAX_MS),
     noUsefulLinkMs: positiveMs(config.noUsefulLinkMs, PREWARM_SUBMIT_NO_USEFUL_LINK_MS),
+    minZeroDeltaSettles: positiveCount(
+      config.minZeroDeltaSettles,
+      PREWARM_SUBMIT_MIN_ZERO_DELTA_SETTLES,
+    ),
     zeroDeltaStreakLimit: positiveCount(
       config.zeroDeltaStreakLimit,
       PREWARM_SUBMIT_ZERO_DELTA_STREAK_LIMIT,
@@ -164,7 +187,9 @@ export function createPrewarmSubmitStop(
     },
     noteSettled(nowMs, links) {
       const at = observe(nowMs);
-      if (linksOf(links) > 0) {
+      const measured = measuredLinks(links);
+      if (measured === null) return;
+      if (linksOf(measured) > 0) {
         usefulSettles++;
         zeroDeltaStreak = 0;
         if (at !== null) lastUsefulAtMs = at;
@@ -180,8 +205,8 @@ export function createPrewarmSubmitStop(
           stopped = true;
           reason = 'lane-max';
         } else if (
-          zeroDeltaSettles > 0 &&
-          (zeroDeltaStreak >= config.zeroDeltaStreakLimit ||
+          zeroDeltaStreak >= config.zeroDeltaStreakLimit ||
+          (zeroDeltaStreak >= config.minZeroDeltaSettles &&
             sinceUsefulAt(at) >= config.noUsefulLinkMs)
         ) {
           stopped = true;

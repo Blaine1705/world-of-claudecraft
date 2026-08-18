@@ -90,10 +90,17 @@ export function createPrewarmGroupSlot<T>(
     stage();
     hide();
   };
+  // A resume unit whose artifact is missing (its re-stage threw) must REPORT
+  // that: the ledger records failed units, so returning quietly booked the
+  // slot as warmed while every later unit no-oped.
+  const stagedArtifact = (step: string): T => {
+    if (artifact === null) throw new Error(`prewarm slot ${stageId} has no artifact to ${step}`);
+    return artifact;
+  };
   const link = async (): Promise<void> => {
-    if (artifact === null) return;
+    const staged = stagedArtifact('link');
     if (options.link) {
-      await options.link(artifact);
+      await options.link(staged);
       return;
     }
     const group = groupNow();
@@ -103,8 +110,8 @@ export function createPrewarmGroupSlot<T>(
   // ledger fixes an entry's unit count when it is scheduled, so the pieces
   // run as ONE bounded unit rather than one unit each.
   const runUnits = async (): Promise<void> => {
-    if (artifact === null || !options.units) return;
-    for (const unit of options.units(artifact)) await unit.run();
+    if (!options.units) return;
+    for (const unit of options.units(stagedArtifact('run'))) await unit.run();
   };
   return {
     stageId,
@@ -134,7 +141,10 @@ export function createPrewarmGroupSlot<T>(
     cleanup: () => {
       if (artifact === null) return;
       const group = groupNow();
+      // Detaching the group is what makes a group slot undrawable; with no
+      // group the custom hide is the only thing that can, so it runs here too.
       if (group) host.scene.remove(group);
+      else options.hide?.(artifact);
       options.cleanup?.(artifact);
       artifact = null;
     },
