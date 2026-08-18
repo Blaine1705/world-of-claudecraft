@@ -15,6 +15,7 @@ process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_woc_marke
 
 import { describe, expect, it } from 'vitest';
 import { createWocMarketCustody, type WocCustodyGameHost } from '../../server/woc_market_custody';
+import { isCataloguedRelicItem } from '../../src/sim/content/reliquary';
 import { Sim } from '../../src/sim/sim';
 import type { InvSlot } from '../../src/sim/types';
 
@@ -160,6 +161,43 @@ describe('extractCopy requires the seller live in this realm process', () => {
       .filter((s) => s.itemId === 'rusty_hatchet')
       .reduce((n, s) => n + s.count, 0);
     expect(after, 'the extracted unit is restored, not lost').toBe(before);
+  });
+
+  it('restores as a RELOCATION: the Reliquary obtain tally does not move across the round trip', () => {
+    // The undo arm hands back a copy the seller already held. Every sibling
+    // relocation grant (grantCopies in item_instance_transfer.ts, the mail
+    // return rail) passes movement: true so noteRelicObtain stays silent; a
+    // restore that counted would let a seller inflate a catalogued relic's
+    // obtain tally by listing into a torn-down session and retrying. The
+    // fixture is a catalogued relic (a Reliquary page item) that clears the
+    // exchange lock predicate, so the counter is decisive: it moves on any
+    // grant that forgets the flag.
+    const RELIC = 'cryptbone_greaves';
+    expect(isCataloguedRelicItem(RELIC), 'the fixture must be a catalogued relic').toBe(true);
+    const { host } = makeHost({ serializeCharacterForPersist: () => null });
+    const pid = liveSession(host);
+    // The first grant is a real obtain: it seeds the tally at 1 (the carrier
+    // entry the saved blob rides on), which is the baseline the restore must
+    // leave alone.
+    host.sim.addItem(RELIC, 1, pid, { silent: true });
+    const meta = host.sim.players.get(pid);
+    if (!meta) throw new Error('no live player meta');
+    const tallyBefore = meta.reliquary.counts[RELIC] ?? 0;
+    expect(tallyBefore, 'the seed grant counts once').toBe(1);
+    const index = meta.inventory.findIndex((s) => s.itemId === RELIC);
+    expect(index).toBeGreaterThanOrEqual(0);
+    const custody = createWocMarketCustody(host);
+    expect(custody.extractCopy(7, 2, { index, itemId: RELIC })).toEqual({
+      ok: false,
+      reason: 'offline',
+    });
+    expect(
+      meta.inventory.filter((s) => s.itemId === RELIC).reduce((n, s) => n + s.count, 0),
+      'the copy is back in the bags',
+    ).toBe(1);
+    expect(meta.reliquary.counts[RELIC] ?? 0, 'a restored copy is not a new obtain').toBe(
+      tallyBefore,
+    );
   });
 
   it('refuses not_yours when the live character belongs to another account', () => {

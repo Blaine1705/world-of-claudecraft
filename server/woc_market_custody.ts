@@ -363,16 +363,21 @@ export function createWocMarketCustody(
  *  grantTradableCopy: compensation must never be refusable, so this skips
  *  the canGrantCopies capacity pre-check and appends past the modelled cap
  *  when the seller filled the freed slot mid-job (overfilling one slot beats
- *  losing the only copy; the extractCopy undo arm has room by construction). */
+ *  losing the only copy; the extractCopy undo arm has room by construction).
+ *  movement: true, like every relocation grant that shares the add hubs
+ *  (grantCopies, the mail return rail): the copy was already held, so the
+ *  Reliquary obtain tally must not count it again. */
 function restoreInto(host: WocCustodyGameHost, pid: number, slot: InvSlot): void {
   if (slot.instance) {
     host.sim.addItemInstance(slot.itemId, slot.instance, pid, slot.count, {
       silent: true,
+      movement: true,
       ...(slot.craftedRecipeId === undefined ? {} : { craftedRecipeId: slot.craftedRecipeId }),
     });
   } else {
     host.sim.addItem(slot.itemId, slot.count, pid, {
       silent: true,
+      movement: true,
       ...(slot.craftedRecipeId === undefined ? {} : { craftedRecipeId: slot.craftedRecipeId }),
     });
   }
