@@ -246,7 +246,7 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
             | 'hudChrome.wocMarket.quoteBurn'
             | 'hudChrome.wocMarket.quoteTreasury',
           value: number | null,
-        ) => (value === null ? '' : `<p>${esc(t(key, { tokens: tokens(value) }))}</p>`);
+        ) => (value == null ? '' : `<p>${esc(t(key, { tokens: tokens(value) }))}</p>`);
         // The Exchange's quote panel shows the same four legs for the same
         // server answer; two surfaces of one economy disclose the same amounts.
         const legs =

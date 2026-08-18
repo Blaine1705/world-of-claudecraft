@@ -3,6 +3,10 @@
 // running server with the dev economy, so the screenshots show a live
 // listing, the detail pane with the bid form, the sell tab, and the mobile
 // landscape sheet, none of which exist offline (the window is online-only).
+// The mobile arm also opens BOTH listing shapes' detail panes and asserts the
+// money-surface touch floors (40px consent label, terms link and buttons, 24px
+// checkbox, the bid field) plus the pre-bid disclosures' DOM order ahead of
+// Place bid, the pixel-geometry arm the DOM units cannot see.
 //
 // Dev-only, not wired into any npm script or CI gate. Needs:
 //   - a server started with WOC_MARKET_ENABLED=1 WOC_MARKET_DEV_SERVICE=1
@@ -73,7 +77,24 @@ async function linkThrowawayWallet(token) {
   if (link.status !== 200) {
     throw new Error(`link failed: ${link.status} ${JSON.stringify(link.body)}`);
   }
-  return address;
+  return { address, secret };
+}
+
+// The listing step-up (B6/R1): a server-built challenge signed by the linked
+// wallet rides beside the listing params (a bare create refuses
+// stepup_required since the step-up landed).
+async function stepUpFor(token, secret, params) {
+  const ch = await api(
+    '/api/woc-market/step-up/challenge',
+    { operation: 'create_listing', expectInstance: null, ...params },
+    token,
+  );
+  if (ch.status !== 200) {
+    throw new Error(`step-up challenge failed: ${ch.status} ${JSON.stringify(ch.body)}`);
+  }
+  const c = ch.body.challenge ?? ch.body;
+  const signature = bs58.encode(ed25519.sign(new TextEncoder().encode(c.message), secret));
+  return { nonce: c.nonce, signature };
 }
 
 async function registerAccount(prefix) {
@@ -91,7 +112,7 @@ async function registerAccount(prefix) {
 // epic via /dev give, then lists it on the Exchange through the real REST flow.
 async function seedSellerListing() {
   const { username, token } = await registerAccount('wocsell');
-  await linkThrowawayWallet(token);
+  const { secret } = await linkThrowawayWallet(token);
   const char = await api(
     '/api/characters',
     { name: `Aurelia${nameSuffix}`, class: 'warrior' },
@@ -101,20 +122,25 @@ async function seedSellerListing() {
   const characterId = char.body.id;
 
   const ws = new WebSocket(`${WS_BASE}/ws`);
+  // The delta-guarded self.inv rides the snapshot: the REAL bag index of each
+  // gift, so every listing costs one step-up plus one create (walking forty
+  // indexes trips the listing rate limiter now that the step-up doubles the
+  // calls per attempt).
+  let inv = null;
   await new Promise((resolve, reject) => {
     ws.on('open', () => {
       ws.send(JSON.stringify(worldAuthMessage(token, characterId)));
     });
     ws.on('message', (raw) => {
       const msg = JSON.parse(String(raw));
+      if (msg.self && Array.isArray(msg.self.inv)) inv = msg.self.inv;
       if (msg.t === 'hello') resolve(undefined);
       if (msg.t === 'error') reject(new Error(`seller join refused: ${msg.error}`));
     });
     ws.on('error', reject);
   });
   // The epics arrive by dev cheat (ALLOW_DEV_COMMANDS server), then the REAL
-  // listing flow escrows them out of the live bags. The inventory index is not
-  // knowable from out here, so walk indexes until the server accepts one.
+  // listing flow escrows them out of the live bags.
   for (const item of [EPIC_ITEM, BUY_NOW_ITEM]) {
     ws.send(JSON.stringify({ t: 'cmd', cmd: 'chat', text: `/dev give ${item}` }));
     await sleep(800);
@@ -127,25 +153,32 @@ async function seedSellerListing() {
     { itemId: EPIC_ITEM, format: 'auction', reserveCents: 10000, buyNowCents: null },
     { itemId: BUY_NOW_ITEM, format: 'buy_now', reserveCents: null, buyNowCents: 25000 },
   ];
+  for (
+    let i = 0;
+    i < 40 &&
+    !(inv && [EPIC_ITEM, BUY_NOW_ITEM].every((id) => inv.some((s) => s && s.itemId === id)));
+    i++
+  ) {
+    await sleep(300);
+  }
+  if (!inv) throw new Error('never saw self.inv on the wire');
   const listed = [];
   for (const shape of shapes) {
-    for (let index = 0; index < 40; index++) {
-      const out = await api(
-        '/api/woc-market/listings',
-        {
-          characterId,
-          itemIndex: index,
-          startCents: 2500,
-          durationHours: 24,
-          offerNext: true,
-          ...shape,
-        },
-        token,
-      );
-      if (out.status === 200) {
-        listed.push(shape.format);
-        break;
-      }
+    const index = inv.findIndex((s) => s && s.itemId === shape.itemId);
+    if (index < 0) throw new Error(`${shape.itemId} not in bags`);
+    const params = { startCents: 2500, durationHours: 24, offerNext: true, ...shape };
+    const stepUp = await stepUpFor(token, secret, params);
+    const out = await api(
+      '/api/woc-market/listings',
+      { characterId, itemIndex: index, ...params, stepUp },
+      token,
+    );
+    if (out.status === 200) {
+      listed.push(shape.format);
+      // Let the post-escrow inventory delta land before the next index read.
+      await sleep(1500);
+    } else {
+      console.log(`listing ${shape.format} refused: ${out.status} ${JSON.stringify(out.body)}`);
     }
   }
   ws.close();
@@ -434,10 +467,104 @@ async function main() {
   await openExchange(mobile);
   // No clip: the viewport IS the frame now that puppeteer owns the metrics.
   await shoot(mobile, 'after-mobile-browse.png', null);
+
+  // The money-surface floors, in a REAL phone viewport: open each listing
+  // shape's detail pane and measure what the DOM units cannot (rendered tap
+  // heights, on-screen after scroll, the disclosures' DOM order).
+  const fails = [];
+  const check = (cond, msg) => {
+    console.log(`${cond ? 'OK  ' : 'FAIL'}  ${msg}`);
+    if (!cond) fails.push(msg);
+  };
+  const openRow = async (needle) => {
+    const ok = await mobile.evaluate((n) => {
+      const row = [...document.querySelectorAll('#woc-market-window .wm-row')].find((r) =>
+        (r.textContent || '').includes(n),
+      );
+      if (row instanceof HTMLElement) {
+        row.click();
+        return true;
+      }
+      return false;
+    }, needle);
+    await sleep(1500);
+    return ok;
+  };
+  const measureDetail = async () =>
+    mobile.evaluate(() => {
+      const detail = document.querySelector('#woc-market-window .wm-detail');
+      const rect = (el) => {
+        if (!el) return null;
+        el.scrollIntoView({ block: 'nearest' });
+        const r = el.getBoundingClientRect();
+        return {
+          w: Math.round(r.width),
+          h: Math.round(r.height),
+          onScreen:
+            r.top >= 0 &&
+            r.bottom <= window.innerHeight &&
+            r.left >= 0 &&
+            r.right <= window.innerWidth,
+        };
+      };
+      const pick = (sel) => rect(detail?.querySelector(sel) ?? null);
+      const order = [...(detail?.querySelectorAll('p.wm-note, button[data-action]') ?? [])].map(
+        (el) =>
+          `${el.getAttribute('data-action') ?? 'note'}:${(el.textContent || '').trim().slice(0, 40)}`,
+      );
+      return {
+        termsLabel: pick('label.wm-terms'),
+        termsBox: pick('label.wm-terms input'),
+        termsLink: pick('a.wm-terms-link'),
+        buyNow: pick('button[data-action="buy-now"]'),
+        placeBid: pick('button[data-action="place-bid"]'),
+        bidUsd: pick('input[data-field="bid-usd"]'),
+        order,
+      };
+    });
+  const floors = (m, label) => {
+    check(m.termsLabel !== null, `${label}: the consent row renders (fresh account)`);
+    if (m.termsLabel) {
+      check(m.termsLabel.h >= 40, `${label}: consent label height ${m.termsLabel.h} >= 40`);
+      check(
+        m.termsBox && m.termsBox.w >= 24 && m.termsBox.h >= 24,
+        `${label}: consent checkbox ${m.termsBox?.w}x${m.termsBox?.h} >= 24`,
+      );
+      check(
+        m.termsLink && m.termsLink.h >= 40,
+        `${label}: terms link height ${m.termsLink?.h} >= 40`,
+      );
+      check(m.termsLabel.onScreen && m.termsLink?.onScreen, `${label}: consent row on screen`);
+    }
+  };
+  // The BUY-NOW pane (no bid form): the consent row plus the walk-away note.
+  check(await openRow('$250'), 'buy-now listing row opened');
+  const bn = await measureDetail();
+  floors(bn, 'buy-now');
+  check(bn.buyNow && bn.buyNow.h >= 40, `buy-now: Buy now button height ${bn.buyNow?.h} >= 40`);
+  const noteIdx = bn.order.findIndex((o) => o.startsWith('note:Buy now holds'));
+  const buyIdx = bn.order.findIndex((o) => o.startsWith('buy-now:'));
+  check(noteIdx >= 0 && noteIdx < buyIdx, 'buy-now: the walk-away note precedes the button');
+  await shoot(mobile, 'after-mobile-buy-now-consent.png', null);
+  // The AUCTION pane: the bid form with the disclosures BEFORE Place bid.
+  check(await openRow('No bids yet'), 'auction listing row opened');
+  const au = await measureDetail();
+  floors(au, 'auction');
+  const bindIdx = au.order.findIndex((o) => /binding/i.test(o));
+  const bidIdx = au.order.findIndex((o) => o.startsWith('place-bid:'));
+  check(bindIdx >= 0 && bindIdx < bidIdx, 'auction: the binding disclosure precedes Place bid');
+  check(au.placeBid && au.placeBid.h >= 40, `auction: Place bid height ${au.placeBid?.h} >= 40`);
+  check(au.bidUsd && au.bidUsd.h >= 40, `auction: bid field height ${au.bidUsd?.h} >= 40`);
+  await shoot(mobile, 'after-mobile-auction-disclosures.png', null);
   await mobile.close();
 
   await browser.close();
-  console.log('done');
+  console.log(
+    fails.length === 0
+      ? 'done: all mobile floor checks passed'
+      : `${fails.length} mobile floor check(s) FAILED:\n - ${fails.join('\n - ')}`,
+  );
+  process.exit(fails.length === 0 ? 0 : 1);
 }
 
 main().catch((err) => {

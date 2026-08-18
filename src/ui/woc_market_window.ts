@@ -824,7 +824,11 @@ export class WocMarketWindow {
     const overBuyNow = overWalletBalance(this.buyNowTokens, this.walletTokens());
     const buyNow =
       d.row.buyNowCents !== null && !d.row.mine
-        ? `<button type="button" class="wm-primary" data-action="buy-now" data-listing="${d.row.id}" ` +
+        ? // Buy now claims the listing and walking away has a cost (the
+          // re-claim cooldown and the hourly cap): said BEFORE the button, like
+          // the bid form's disclosures precede Place bid.
+          `<p class="wm-note">${esc(t('hudChrome.wocMarket.buyNowNote'))}</p>` +
+          `<button type="button" class="wm-primary" data-action="buy-now" data-listing="${d.row.id}" ` +
           `${model.paused || !model.walletLinked || d.row.buyNowLocked || overBuyNow ? 'disabled' : ''} ` +
           `aria-label="${esc(t('hudChrome.wocMarket.buyNowAria', { item: name, usd: this.usd(d.row.buyNowCents) }))}" data-focus-key="wm-buy-now">` +
           `${esc(t('hudChrome.wocMarket.buyNowButton', { usd: this.usd(d.row.buyNowCents) }))}</button>` +
@@ -832,11 +836,7 @@ export class WocMarketWindow {
             ? `<p class="wm-over-balance">${esc(
                 t('hudChrome.trade.woc.hintInsufficientBalance'),
               )}</p>`
-            : '') +
-          // Buy now claims the listing and walking away has a cost (the
-          // re-claim cooldown and the hourly cap): said BEFORE the click,
-          // like the bid form's disclosures.
-          `<p class="wm-note">${esc(t('hudChrome.wocMarket.buyNowNote'))}</p>`
+            : '')
         : '';
     // The shared cancel predicate (woc_market_view.ts canCancelListing): a
     // cancel-pending listing offers no second Cancel here either.

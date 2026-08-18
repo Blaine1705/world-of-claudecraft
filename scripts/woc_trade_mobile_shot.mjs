@@ -1,0 +1,302 @@
+// The trade window's $WOC arm, in a REAL viewport: renders every face the
+// money surface shows (the buyer's compose form with the consent row, the pay
+// face, the quote review, both review faces, the seller's waiting faces) by
+// driving the REAL woc_trade controller + panel + CSS in the offline game
+// (the controller state is stubbed the way trade_money_shot.mjs stubs
+// sim.tradeInfo: the arm is online-only, so no offline flow reaches it), then
+// MEASURES the mobile touch floors the stylesheet claims (40px consent label,
+// terms link and buttons, 24px checkbox), asserts each control is on screen and
+// the top-most element at its centre (tappable, not covered), and captures a
+// screenshot per face at the lowest graphics preset.
+//
+// Dev-only, not wired into any npm script or CI gate (the DOM units in
+// tests/trade_woc_panel.test.ts pin the markup; this is the pixel-geometry arm
+// they cannot see). Landscape phone by default (in-game mobile is landscape
+// only); DESKTOP=1 renders the desktop window instead. Needs `npm run dev`.
+//
+//   node scripts/woc_trade_mobile_shot.mjs
+//   GAME_URL=http://localhost:5188 OUT=tmp/woc-trade node scripts/woc_trade_mobile_shot.mjs
+import fs from 'node:fs';
+import puppeteer from 'puppeteer-core';
+import { BROWSER_PATH } from './browser_path.mjs';
+import { enterOfflineGame } from './enter_offline_game.mjs';
+import { suppressGpuNotice } from './lib/gpu_notice_suppress.mjs';
+
+const URL = process.env.GAME_URL ?? 'http://localhost:5173';
+const OUT = process.env.OUT ?? 'docs/screenshots/woc-market';
+const MOBILE = process.env.DESKTOP !== '1';
+fs.mkdirSync(OUT, { recursive: true });
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const fails = [];
+const check = (cond, msg) => {
+  console.log(`${cond ? 'OK  ' : 'FAIL'}  ${msg}`);
+  if (!cond) fails.push(msg);
+};
+
+const browser = await puppeteer.launch({
+  executablePath: BROWSER_PATH,
+  headless: 'new',
+  args: [
+    MOBILE ? '--window-size=900,440' : '--window-size=1400,900',
+    '--use-angle=swiftshader',
+    '--enable-unsafe-swiftshader',
+    '--no-sandbox',
+  ],
+});
+const page = await browser.newPage();
+await suppressGpuNotice(page);
+// The capture rule: lowest graphics preset, seeded before the document loads.
+await page.evaluateOnNewDocument(
+  `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.graphicsPreset = 1; s.graphicsDefaultApplied = true; localStorage.setItem(k, JSON.stringify(s)); } catch {}`,
+);
+if (MOBILE) {
+  await page.emulate({
+    name: 'phone-landscape',
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Mobile Safari/537.36',
+    viewport: {
+      width: 900,
+      height: 420,
+      deviceScaleFactor: 2,
+      isMobile: true,
+      hasTouch: true,
+      isLandscape: true,
+    },
+  });
+} else {
+  await page.setViewport({ width: 1400, height: 900, deviceScaleFactor: 1 });
+}
+page.on('pageerror', (e) => fails.push('PAGEERROR: ' + e.message));
+page.on('console', (m) => {
+  if (m.type() === 'error') console.log('CONSOLE-ERR:', m.text().slice(0, 200));
+});
+
+await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 40000 });
+await enterOfflineGame(page, { charClass: 'warrior', charName: 'Bramble', settleMs: 2500 });
+await page.evaluate(() => document.getElementById('mobile-preflight-continue')?.click());
+await sleep(500);
+const touchOn = await page.evaluate(() => document.body.classList.contains('mobile-touch'));
+console.log('mobile-touch active:', touchOn);
+if (MOBILE) check(touchOn, 'body.mobile-touch is active in the landscape phone viewport');
+
+// Stub the online-only pieces the arm needs, then drive the REAL controller.
+const staged = await page.evaluate(() => {
+  const hud = window.__game.hud;
+  const sim = window.__game.sim;
+  const ITEM = 'deathlord_warplate';
+  const TI = {
+    otherPid: 999,
+    otherName: 'Aldric',
+    myOffer: { items: [], copper: 0 },
+    theirOffer: { items: [{ itemId: ITEM, count: 1 }], copper: 0 },
+    myAccepted: false,
+    theirAccepted: false,
+  };
+  Object.defineProperty(sim, 'tradeInfo', { configurable: true, get: () => TI });
+  const hooks = {
+    client: {
+      status: async () => ({ ok: false }),
+      me: async () => ({ ok: false }),
+      offers: async () => ({ ok: false }),
+      tradePartner: async () => ({ name: 'Aldric', walletVerified: true }),
+    },
+    characterId: () => 1,
+    walletLinked: () => true,
+    signAndSendTransactionBase64: async () => 'sig',
+    signMessageBase58: async () => 'sig',
+  };
+  const ctl = hud.wocTrade;
+  Object.defineProperty(ctl, 'wocMarketHooks', { configurable: true, get: () => hooks });
+  ctl.updateTradeWindow(); // first open: resets the arm state
+  ctl.wocTradePartnerFor = 'Aldric';
+  ctl.wocTradePartner = { name: 'Aldric', walletVerified: true };
+  ctl.wocTradePartnerResolved = true;
+  ctl.wocTradeTermsAccepted = false;
+  ctl.wocTradeMinPriceCents = 100;
+  ctl.wocTradeDirectedHoldSeconds = 600;
+  ctl.wocTradeMode = 'woc';
+  ctl.wocTradeUsdCents = 1500;
+  ctl.wocTradeTokens = 1234.5;
+  ctl.wocTradeSplit = { sellerCents: 1350, burnCents: 75, treasuryCents: 75 };
+  ctl.lastTradeSig = '';
+  ctl.updateTradeWindow();
+  // The trade open also shows the bags window, which on the mobile sheet layout
+  // stacks OVER the trade window; hide it so the probe measures what a player
+  // who closed bags sees, and so elementFromPoint below judges tappability.
+  const bags = document.querySelector('#bags');
+  if (bags instanceof HTMLElement) bags.style.display = 'none';
+  return {
+    open: document.querySelector('#trade-window')?.style.display === 'block',
+    arm: !!document.querySelector('#trade-window .trade-woc-arm'),
+    terms: !!document.querySelector('#trade-window .trade-woc-terms'),
+    link: document.querySelector('#trade-window .trade-woc-terms-link')?.getAttribute('href'),
+  };
+});
+console.log('compose face:', JSON.stringify(staged));
+check(staged.open && staged.arm, 'trade window open with the $WOC arm');
+check(staged.terms, 'consent row renders on the buyer compose face');
+
+async function measure(label) {
+  const m = await page.evaluate(() => {
+    const win = document.querySelector('#trade-window');
+    const wr = win.getBoundingClientRect();
+    const rect = (el) => {
+      if (!el) return null;
+      el.scrollIntoView({ block: 'nearest' });
+      const r = el.getBoundingClientRect();
+      const cs = getComputedStyle(el);
+      const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      return {
+        w: Math.round(r.width),
+        h: Math.round(r.height),
+        top: Math.round(r.top),
+        bottom: Math.round(r.bottom),
+        onScreen:
+          r.top >= 0 &&
+          r.bottom <= window.innerHeight &&
+          r.left >= 0 &&
+          r.right <= window.innerWidth,
+        tappable: hit === el || el.contains(hit) || (hit !== null && hit.contains(el)),
+        display: cs.display,
+        fontSize: cs.fontSize,
+      };
+    };
+    const arm = document.querySelector('#trade-window .trade-woc-arm');
+    const controls = [...(arm?.querySelectorAll('button, a, input, label') ?? [])].map((el) => ({
+      tag: el.tagName.toLowerCase(),
+      cls: el.className,
+      key: el.getAttribute('data-focus-key'),
+      text: (el.textContent || el.value || '').trim().slice(0, 40),
+      disabled: el.disabled === true,
+      rect: rect(el),
+    }));
+    return {
+      viewport: `${window.innerWidth}x${window.innerHeight}`,
+      uiScale: getComputedStyle(document.documentElement).getPropertyValue('--ui-scale').trim(),
+      win: {
+        top: Math.round(wr.top),
+        h: Math.round(wr.height),
+        w: Math.round(wr.width),
+        scrollH: win.scrollHeight,
+        clientH: win.clientHeight,
+      },
+      armText: (arm?.innerText || '').replace(/\s+/g, ' ').slice(0, 400),
+      controls,
+    };
+  });
+  console.log(
+    `\n== ${label} == viewport ${m.viewport} ui-scale ${m.uiScale} win top ${m.win.top} h ${m.win.h} w ${m.win.w} scroll ${m.win.scrollH}/${m.win.clientH}`,
+  );
+  console.log('   text:', m.armText);
+  for (const c of m.controls) {
+    const r = c.rect;
+    console.log(
+      `   ${c.tag}${c.cls ? '.' + String(c.cls).split(' ').join('.') : ''} [${c.key ?? ''}] "${c.text}" ${r ? `${r.w}x${r.h} top ${r.top} display ${r.display} font ${r.fontSize} onScreen ${r.onScreen}` : 'NO RECT'}${c.disabled ? ' DISABLED' : ''}`,
+    );
+    if (!MOBILE) continue;
+    if (c.tag === 'button')
+      check(r.h >= 40, `${label}: button "${c.text}" tap height ${r.h} >= 40`);
+    if (c.tag === 'label' && String(c.cls).includes('trade-woc-terms'))
+      check(r.h >= 40, `${label}: consent label height ${r.h} >= 40`);
+    if (c.tag === 'a' && String(c.cls).includes('trade-woc-terms-link'))
+      check(r.h >= 40, `${label}: terms link tap height ${r.h} >= 40 (display ${r.display})`);
+    if (c.tag === 'input' && String(c.cls) === '' && c.key === 'trade-woc-terms')
+      check(r.w >= 24 && r.h >= 24, `${label}: consent checkbox ${r.w}x${r.h} >= 24`);
+    if (r) check(r.onScreen, `${label}: "${c.text || c.tag}" fully on screen after scrollIntoView`);
+    if (r)
+      check(
+        r.tappable,
+        `${label}: "${c.text || c.tag}" is the top-most element at its center (tappable)`,
+      );
+  }
+  return m;
+}
+
+async function shoot(name) {
+  await sleep(300);
+  const file = `${OUT}/after-${MOBILE ? 'mobile' : 'desktop'}-trade-${name}.png`;
+  await page.screenshot({ path: file });
+  console.log(`wrote ${file}`);
+}
+
+await measure('compose (consent row + Send)');
+await shoot('compose-consent');
+
+// Buyer pay face: offer accepted by both, goods in escrow, no quote yet.
+async function setOffer(offer, quote, extra = {}) {
+  await page.evaluate(
+    (offer, quote, extra) => {
+      const ctl = window.__game.hud.wocTrade;
+      ctl.wocTradeOffer = offer;
+      ctl.wocTradeQuote = quote;
+      Object.assign(ctl, extra);
+      ctl.lastTradeSig = '';
+      ctl.updateTradeWindow();
+    },
+    offer,
+    quote,
+    extra,
+  );
+  await sleep(200);
+}
+const now = Date.now();
+const base = {
+  id: 1,
+  usdCents: 1500,
+  tokens: 1234.5,
+  listingId: 7,
+  buyerAccepted: true,
+  sellerAccepted: true,
+  expiresAtMs: now + 600000,
+  settlementState: null,
+};
+await setOffer({ ...base, role: 'buyer', phase: 'awaiting_payment' }, null);
+await measure('buyer pay face (consent row + Pay)');
+await shoot('buyer-pay-consent');
+
+await setOffer(
+  { ...base, role: 'buyer', phase: 'awaiting_payment' },
+  {
+    offerId: 1,
+    totalTokens: 1234.5,
+    sellerTokens: 1111.05,
+    burnTokens: 86.415,
+    treasuryTokens: 37.035,
+    usdCents: 1500,
+    expiresAtMs: now + 120000,
+    reference: 'ref',
+    transactionBase64: 'dHg=',
+  },
+);
+await measure('buyer quote review (Sign / Not now)');
+await shoot('buyer-quote-review');
+
+await setOffer(
+  { ...base, role: 'buyer', phase: 'review', buyerAccepted: false, sellerAccepted: false },
+  null,
+);
+await measure('buyer review face (Withdraw + expiry)');
+await shoot('buyer-review-withdraw');
+
+await setOffer(
+  { ...base, role: 'seller', phase: 'review', buyerAccepted: false, sellerAccepted: false },
+  null,
+);
+await measure('seller review face (Decline)');
+await shoot('seller-review-decline');
+
+await setOffer({ ...base, role: 'seller', phase: 'awaiting_payment' }, null);
+await measure('seller awaiting payment (Cancel sale)');
+await shoot('seller-awaiting-cancel-sale');
+
+await setOffer({ ...base, role: 'seller', phase: 'paying', settlementState: 'confirming' }, null);
+await measure('seller paying (no cancel)');
+await shoot('seller-paying');
+
+await browser.close();
+console.log(
+  fails.length === 0
+    ? '\nALL CHECKS PASSED'
+    : `\n${fails.length} CHECK(S) FAILED:\n - ` + fails.join('\n - '),
+);
+process.exit(fails.length === 0 ? 0 : 1);

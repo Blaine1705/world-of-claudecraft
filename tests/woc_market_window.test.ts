@@ -1574,6 +1574,15 @@ describe('woc_market_window: informed commitment before the first charge (H13/R9
     expect(bidForm.indexOf('bidBindingNote')).toBeLessThan(bidForm.indexOf('place-bid'));
   });
 
+  it('buy now discloses its walk-away cost BEFORE its button', () => {
+    // Buy now claims the listing; leaving without paying pauses the buyer's
+    // Buy Now (the re-claim cooldown and the hourly cap). Said where the bid
+    // form says its own: ahead of the control that commits.
+    const detail = betweenCode('private detailPaneHtml(', 'private bidFormHtml(');
+    expect(detail).toContain('hudChrome.wocMarket.buyNowNote');
+    expect(detail.indexOf('buyNowNote')).toBeLessThan(detail.indexOf('data-action="buy-now"'));
+  });
+
   it('the consent checkbox LINKS the Marketplace terms at the moment of acceptance (10.3)', () => {
     expect(confirmFields).toContain('hudChrome.wocMarket.termsLabel');
     // The href comes from the shared shell-aware resolver (src/ui/terms_link.ts):
