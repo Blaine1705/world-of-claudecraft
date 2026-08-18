@@ -374,7 +374,9 @@ describe('gpu hitch capture CLI', () => {
     const renderer = codeWithoutLineComments(
       readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8'),
     );
-    const statsStart = renderer.indexOf('  perfStats(): {');
+    // The report type is named (renderer_perf_stats.ts RendererPerfStats), so
+    // the anchor is the method signature, not an inline return-type literal.
+    const statsStart = renderer.indexOf('  perfStats(): RendererPerfStats {');
     const statsEnd = renderer.indexOf('\n  private ', statsStart);
     expect(statsStart, 'perfStats was renamed; re-anchor this pin').toBeGreaterThan(-1);
     expect(statsEnd).toBeGreaterThan(statsStart);
