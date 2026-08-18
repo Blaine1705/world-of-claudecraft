@@ -28,6 +28,7 @@ import {
 import {
   clearPadFocus,
   focusFirstInWindow,
+  followDomFocus,
   hasPadFocus,
   moveDpadFocus,
   pressDpadFocus,
@@ -434,6 +435,10 @@ export class GamepadManager {
     }
 
     if (pointerMode) {
+      // Keep the mark on whatever the interface focused. A window that advances
+      // its own contents (the quest dialog moving to Accept) focuses the next
+      // control itself, and without this the pad's highlight stayed behind.
+      followDomFocus();
       // A modal surface owns the pad: clear any lingering stick movement (a
       // non-modal window like bags doesn't freeze movement on its own) and skip
       // camera/ability dispatch.

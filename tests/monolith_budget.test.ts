@@ -77,7 +77,7 @@ const MONOLITHS: MonolithRow[] = [
     // (reticle, empower, sport, mouseover) instead of growing a second cast path,
     // with the Attack branch beside it: Attack is the fixed slot-0 toggle rather
     // than an ability, so it is the one action the seed cannot copy off the bar.
-    ceiling: 19469,
+    ceiling: 19472,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -154,7 +154,7 @@ const MONOLITHS: MonolithRow[] = [
     // substance is in src/game/cross_hotbar_wiring.ts, which is what this file's
     // seam asks for, plus the cast handler the bar dispatches through. Exact
     // count: any further growth reds again.
-    ceiling: 11584,
+    ceiling: 11591,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   clearPadFocus,
   focusFirstInWindow,
+  followDomFocus,
   moveDpadFocus,
   pressDpadFocus,
   restorePadFocus,
@@ -33,6 +34,7 @@ interface FakeEl {
     height: number;
   };
   hasAttribute(name: string): boolean;
+  attrs?: Record<string, string>;
 }
 
 let active: FakeEl | null = null;
@@ -54,6 +56,7 @@ function el(
     visible: opts.visible ?? true,
     disabled: opts.disabled ?? false,
     clicks: 0,
+    attrs: undefined,
     classes: new Set<string>(),
     get classList() {
       return {
@@ -76,7 +79,8 @@ function el(
       width: node.rect.right - node.rect.left,
       height: node.rect.bottom - node.rect.top,
     }),
-    hasAttribute: (name: string) => name === 'disabled' && node.disabled,
+    hasAttribute: (name: string) =>
+      (name === 'disabled' && node.disabled) || node.attrs?.[name] !== undefined,
   };
   return node;
 }
@@ -458,5 +462,73 @@ describe('clearPadFocus', () => {
     clearPadFocus();
     expect(btn.classes.has('pad-focus')).toBe(false);
     expect(blurred).toBe(true);
+  });
+});
+
+describe('landing focus on a surface', () => {
+  it('skips the dismiss button', () => {
+    // Landing on the close X is worse than landing nowhere: the quest dialog
+    // advancing to its accept page put the selection on the X, so the player had
+    // to walk off it every time and a mistaken press dismissed what they were
+    // reading. FocusManager already applies this rule for the keyboard.
+    const dialog = el('DIV', 0, 0, { role: 'dialog' });
+    dialog.rect = { left: 0, top: 0, right: 300, bottom: 300 };
+    const close = el('BUTTON', 250, 4);
+    close.attrs = { 'data-close': '' };
+    const accept = el('BUTTON', 20, 200);
+    allEls = [dialog, close, accept];
+    install();
+
+    expect(focusFirstInWindow()).toBe(true);
+    expect(active).toBe(accept);
+    expect(accept.classes.has('pad-focus')).toBe(true);
+  });
+
+  it('falls back to the dismiss button when it is the only control', () => {
+    const dialog = el('DIV', 0, 0, { role: 'dialog' });
+    dialog.rect = { left: 0, top: 0, right: 300, bottom: 300 };
+    const close = el('BUTTON', 250, 4);
+    close.attrs = { 'data-close': '' };
+    allEls = [dialog, close];
+    install();
+    expect(focusFirstInWindow()).toBe(true);
+    expect(active).toBe(close);
+  });
+});
+
+describe('followDomFocus', () => {
+  it('takes the mark to focus the INTERFACE moved', () => {
+    // A window that advances its own contents focuses the control it wants next.
+    // The pad knew nothing about it, so the highlight stayed behind and the
+    // player, seeing nothing selected, pressed a direction until something lit up.
+    const a = el('BUTTON', 10, 10);
+    const b = el('BUTTON', 10, 60);
+    allEls = [a, b];
+    install();
+    moveDpadFocus('down');
+    const marked = a.classes.has('pad-focus') ? a : b;
+    const other = marked === a ? b : a;
+
+    active = other;
+    expect(followDomFocus()).toBe(true);
+    expect(other.classes.has('pad-focus')).toBe(true);
+    expect(marked.classes.has('pad-focus')).toBe(false);
+  });
+
+  it('does nothing when the pad already agrees', () => {
+    const only = el('BUTTON', 10, 10);
+    allEls = [only];
+    install();
+    moveDpadFocus('down');
+    active = only;
+    expect(followDomFocus()).toBe(false);
+  });
+
+  it('ignores focus on something the navigation could not reach', () => {
+    const stray = el('INPUT', 0, 0, { visible: false });
+    allEls = [stray];
+    install();
+    active = stray;
+    expect(followDomFocus()).toBe(false);
   });
 });

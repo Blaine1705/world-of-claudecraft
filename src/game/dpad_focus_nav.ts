@@ -25,6 +25,30 @@ function isVisible(el: HTMLElement): boolean {
 // the player in whichever one they are standing in.
 let spanWindows = false;
 
+/**
+ * Follow focus the INTERFACE moved, not just focus the pad moved.
+ *
+ * A window that advances its own contents focuses the control it wants next: the
+ * quest dialog puts focus straight on Accept when a quest is opened. The pad knew
+ * nothing about it, so the highlight and the cursor stayed where they were and the
+ * player, seeing nothing selected, pressed a direction until something lit up.
+ * Every one of those presses moved focus, which is what made reaching Accept feel
+ * like spamming a stick at it.
+ *
+ * Answers whether it moved the mark, and no-ops when the pad already agrees, which
+ * is every frame it moved focus itself.
+ */
+export function followDomFocus(): boolean {
+  if (typeof document === 'undefined') return false;
+  const active = document.activeElement as HTMLElement | null;
+  if (!active || active === marked || active === document.body) return false;
+  // Only something the navigation could have reached itself: a window that focuses
+  // its own text field should not drag the pointer onto it.
+  if (!focusables(activeRoot() ?? document).includes(active)) return false;
+  markPadFocus(active);
+  return true;
+}
+
 /** Whether the pad is holding a HUD selection right now. The d-pad reads this to
  *  decide between walking the interface and cycling targets: once the player is
  *  IN the HUD the arrows belong to it, and cancelling hands them back. */
@@ -65,6 +89,22 @@ function focusables(root: HTMLElement | Document): HTMLElement[] {
   return [...root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)].filter(
     (el) => !el.hasAttribute('disabled') && isVisible(el),
   );
+}
+
+/**
+ * The control a surface should land on: the first one that is not the dismiss X.
+ *
+ * The same rule FocusManager.focusFirst already follows for the keyboard, applied
+ * here because the pad has its own focus-first path. Landing on the close button
+ * is worse than landing nowhere: the quest dialog advancing to its accept page put
+ * the selection on the X, so the player had to walk off it every single time and
+ * a mistaken press dismissed the thing they were reading.
+ *
+ * Falls back to the X when it is genuinely the only thing there.
+ */
+function firstMeaningful(els: readonly HTMLElement[]): HTMLElement | null {
+  if (els.length === 0) return null;
+  return els.find((el) => !el.hasAttribute('data-close')) ?? els[0];
 }
 
 function toRect(el: HTMLElement): NavRect {
@@ -260,8 +300,10 @@ export function syncWindowFocus(): boolean {
   const active = document.activeElement as HTMLElement | null;
   const focusLost = !active || !els.includes(active);
   if (!rootChanged && !focusLost) return false;
-  els[0].focus();
-  markPadFocus(els[0]);
+  const landing = firstMeaningful(els);
+  if (!landing) return false;
+  landing.focus();
+  markPadFocus(landing);
   return true;
 }
 
