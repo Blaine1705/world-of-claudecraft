@@ -178,6 +178,10 @@ export class CrossHotbarController {
       const glyph = document.createElement('span');
       glyph.className = GLYPH_CLASS;
       els.btn.appendChild(glyph);
+      // The d-pad four share ONE glyph and differ only by rotation, which is the
+      // only way all four come out the same size (no font draws its four arrows
+      // alike). The face four keep their letters, which need no turning.
+      if (cell.cluster === 'dpad') glyph.classList.add(`${GLYPH_CLASS}-${cell.point}`);
       this.glyphs[cell.index] = glyph;
       this.cellEls[cell.index] = els.btn;
       cluster.appendChild(els.btn);

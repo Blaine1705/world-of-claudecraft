@@ -2180,8 +2180,10 @@ describe('client HTML shell', () => {
     // corpse-claim mirror online). The R40 confirm gate now trails the
     // nothing-to-interact string, with harvestStateReliable still an
     // explicit `undefined` (the default), never a live override.
+    // preferNpcId trails the confirm gate: the pad names the npc the player
+    // SELECTED, so a talk press cannot answer whoever happens to stand closer.
     expect(mainTs).toContain(
-      "t('errors.nothingInteract'),\n        undefined,\n        gatherEffectConfirm,\n      ),",
+      "t('errors.nothingInteract'),\n        undefined,\n        gatherEffectConfirm,\n        preferNpcId,\n      ),",
     );
     // The escort away line sits immediately before it (escort_interact.ts): an
     // escort run has no other client entry point, so an unwired argument here

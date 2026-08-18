@@ -169,12 +169,64 @@ const PAD_MODE_CLASS = 'xhb-mode';
 // toggles: each is a coherent look, and CSS owns the whole difference.
 export const CROSS_HOTBAR_DISPLAY_CLASSES = ['xhb-full', 'xhb-compact', 'xhb-minimal'] as const;
 
+/**
+ * Set the lift from the bar's MEASURED height rather than a constant.
+ *
+ * Three different constants were wrong in three different ways: tuned for the
+ * framed bar it left a gap on a desktop window, and every value that fitted one
+ * viewport pushed the player frame into the cast bar on another. The distance
+ * depends on how tall the bar actually renders, which depends on the interface
+ * scale, so it has to be read rather than guessed.
+ *
+ * A layout read, deliberately: it runs when the bar appears, its preset changes,
+ * or the window resizes. Never per frame.
+ */
+export function measureCrossHotbarLift(): void {
+  // Deferred a frame: every caller runs at the moment the bar is turned on or its
+  // preset changes, which is BEFORE the browser has laid it out. Measured there it
+  // reads zero, gives up, and leaves the CSS fallback in place, which is the whole
+  // problem this replaced.
+  const run = () => {
+    try {
+      measureNow();
+    } catch {
+      /* no DOM (headless/tests) */
+    }
+  };
+  if (typeof requestAnimationFrame === 'function') requestAnimationFrame(run);
+  else run();
+}
+
+function measureNow(): void {
+  const bar = document.getElementById('cross-hotbar');
+  const frame = document.getElementById('player-frame');
+  if (!bar || !frame) return;
+  const barRect = bar.getBoundingClientRect();
+  const frameRect = frame.getBoundingClientRect();
+  if (barRect.height <= 0 || frameRect.height <= 0) return;
+  // Undo the lift already applied, so the sum is computed from where the frame
+  // WOULD sit. Read off the live transform rather than the variable: the variable
+  // may still be unset and answering from the CSS fallback.
+  const applied = -new DOMMatrix(getComputedStyle(frame).transform).m42;
+  const restingBottom = frameRect.bottom + applied;
+  // What the frame has to clear: the bar, plus the hint sitting above it.
+  const hint = bar.querySelector<HTMLElement>('.xhb-hint');
+  const hintHeight = hint && getComputedStyle(hint).display !== 'none' ? hint.offsetHeight : 0;
+  const target = barRect.top - hintHeight - LIFT_GAP_PX;
+  const lift = Math.max(0, Math.round(restingBottom - target));
+  document.body.style.setProperty('--xhb-lift', `${lift}px`);
+}
+
+// Breathing room between the player frame and the topmost thing the bar draws.
+const LIFT_GAP_PX = 10;
+
 function applyDisplayClass(preset: number): void {
   try {
     const wanted = CROSS_HOTBAR_DISPLAY_CLASSES[preset] ?? CROSS_HOTBAR_DISPLAY_CLASSES[0];
     for (const cls of CROSS_HOTBAR_DISPLAY_CLASSES) {
       document.body.classList.toggle(cls, cls === wanted);
     }
+    measureCrossHotbarLift();
   } catch {
     /* no DOM (headless/tests) */
   }
@@ -208,6 +260,7 @@ export function createCrossHotbar(host: () => CrossHotbarOverlayHost): CrossHotb
       bindings.seedOnce(seed.bar, seed.extras);
     }
     ui.setCrossHotbar(on ? crossHotbarResting(bindings, pad.getKind()) : null);
+    if (on) measureCrossHotbarLift();
   };
   return {
     bindings,

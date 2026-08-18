@@ -9372,11 +9372,15 @@ body.xhb-mode #player-frame {
 .xhb-hint {
   position: absolute;
   left: 50%;
-  /* ABOVE the bar. Below it the line sat on top of the XP bar, which owns that
-     strip and is not ours to cover. */
+  /* Above the bar and pushed to its RIGHT edge. Below, it covered the XP bar,
+     which owns that strip; centred above, it sat in the channel between the bar
+     and the player frame, which is the busiest part of the screen. The right
+     shoulder of the bar is empty in every preset. */
   bottom: auto;
-  top: -16px;
-  transform: translateX(-50%);
+  top: -15px;
+  left: auto;
+  right: 0;
+  transform: none;
   font-family: var(--ui-font);
   font-size: 10px;
   letter-spacing: 0.04em;
@@ -9398,6 +9402,11 @@ body.xhb-mode #player-frame {
   display: block;
   bottom: auto;
   top: -16px;
+  /* Centred while arranging: this one is a sentence the player is reading, not a
+     reminder they are meant to stop noticing. */
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
   color: var(--gold);
   opacity: 1;
 }
@@ -9579,4 +9588,20 @@ body.xhb-minimal .xhb:not(.xhb-editing) .xhb-half:not(.xhb-armed) {
 }
 body.xhb-minimal .xhb.xhb-editing .xhb-half {
   visibility: visible;
+}
+
+/* The d-pad glyphs are one triangle turned four ways. Rotating a single glyph is
+   the only way the four read as the same size: measured, no font draws its four
+   arrows (or its four triangles) to matching widths. */
+.xhb-glyph-top {
+  transform: translateX(-50%) rotate(0deg);
+}
+.xhb-glyph-left {
+  transform: translateX(-50%) rotate(-90deg);
+}
+.xhb-glyph-right {
+  transform: translateX(-50%) rotate(90deg);
+}
+.xhb-glyph-bottom {
+  transform: translateX(-50%) rotate(180deg);
 }

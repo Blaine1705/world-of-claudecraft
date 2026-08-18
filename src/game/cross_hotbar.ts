@@ -73,15 +73,26 @@ export const CROSS_HOTBAR_LAYER_BUTTONS: readonly number[] = [
 // name ("D-pad up"), but under a 44px cell that is noise: the cell already SITS in
 // the diamond position it names, so the arrow alone reads faster and cannot crowd
 // its neighbours. Face buttons keep their silk-screen letter, which is already short.
-// Triangles, not arrows. The four arrow glyphs are not the same size in the UI
-// font (measured: the horizontal pair is nearly twice the width of the vertical
-// pair), so a row of them reads as mismatched. The triangles differ by less than
-// half a pixel.
+// ONE glyph, turned four ways. No two arrow (or triangle) characters in a font are
+// drawn to the same size, and swapping between character sets only trades one
+// mismatch for a smaller one; rotating a single glyph is the only way all four
+// come out identical. The direction lives in CROSS_HOTBAR_DPAD_TURNS, which the
+// overlay applies as a rotation.
+const DPAD_GLYPH = '\u25B2';
+
 export const CROSS_HOTBAR_DPAD_GLYPHS: Record<number, string> = {
-  [GP.DPAD_UP]: '\u25B2',
-  [GP.DPAD_LEFT]: '\u25C0',
-  [GP.DPAD_RIGHT]: '\u25B6',
-  [GP.DPAD_DOWN]: '\u25BC',
+  [GP.DPAD_UP]: DPAD_GLYPH,
+  [GP.DPAD_LEFT]: DPAD_GLYPH,
+  [GP.DPAD_RIGHT]: DPAD_GLYPH,
+  [GP.DPAD_DOWN]: DPAD_GLYPH,
+};
+
+/** Degrees to turn the shared glyph by, per d-pad direction. */
+export const CROSS_HOTBAR_DPAD_TURNS: Record<number, number> = {
+  [GP.DPAD_UP]: 0,
+  [GP.DPAD_LEFT]: -90,
+  [GP.DPAD_RIGHT]: 90,
+  [GP.DPAD_DOWN]: 180,
 };
 
 export const CROSS_HOTBAR_SLOTS_PER_LAYER = CROSS_HOTBAR_LAYER_BUTTONS.length;

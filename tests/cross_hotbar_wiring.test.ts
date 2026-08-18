@@ -75,14 +75,17 @@ describe('crossHotbarButtonLabels', () => {
     expect(labels.slice(0, 8)).toEqual(labels.slice(8));
   });
 
-  it('collapses the d-pad four to bare arrows so a 44px cell is not crowded', () => {
+  it('gives the d-pad four ONE glyph, which the overlay turns four ways', () => {
     // The options panel wants the full "D-pad up"; the on-screen cell already SITS
-    // in the position it names, so the arrow alone is what belongs under it.
+    // in the position it names, so a bare mark is what belongs under it.
+    // All four identical on purpose: no font draws its four arrows (or its four
+    // triangles) to the same size, so direction is a rotation the overlay applies
+    // rather than four different characters.
     expect(crossHotbarButtonLabels('xbox').slice(0, 4)).toEqual([
-      '\u2191',
-      '\u2190',
-      '\u2192',
-      '\u2193',
+      '\u25B2',
+      '\u25B2',
+      '\u25B2',
+      '\u25B2',
     ]);
     // Brand-independent: the d-pad is identical on every pad.
     expect(crossHotbarButtonLabels('playstation').slice(0, 4)).toEqual(

@@ -39,7 +39,7 @@ import {
 import { clientEnvBits, installPageStateTracking, pageStateBits } from './game/client_env';
 import { getClientSeed } from './game/client_seed';
 import { localPartyMemberIds } from './game/corpse_loot_availability';
-import { createCrossHotbar } from './game/cross_hotbar_wiring';
+import { createCrossHotbar, measureCrossHotbarLift } from './game/cross_hotbar_wiring';
 import { shouldClearAutorunOnDeath } from './game/death_input_reset';
 import { setDisplayChangeTarget } from './game/desktop_display_change';
 import {
@@ -138,7 +138,7 @@ import { mouselookReleaseFacing } from './game/mouselook_release';
 import { diagonalMovementVisualFacing } from './game/movement_visual';
 import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
-import { nextNpcTarget } from './game/npc_cycle';
+import { nearbyNpcs, nextNpcTarget } from './game/npc_cycle';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
 import { padReelItemId } from './game/pad_reel';
 import { openTargetSubcommands } from './game/pad_subcommands';
@@ -337,6 +337,7 @@ import {
   ALL_CLASSES,
   DT,
   dist2d,
+  INTERACT_RANGE,
   MELEE_RANGE,
   PLAYER_INTEREST_DROP_RADIUS,
   type PlayerClass,
@@ -827,6 +828,9 @@ preventMobileZoom();
 syncPhoneTouchClass();
 window.matchMedia(PHONE_TOUCH_QUERY).addEventListener?.('change', syncPhoneTouchClass);
 window.addEventListener('resize', syncAppViewport);
+// The cross hotbar's lift depends on how tall it renders, which changes with the
+// window and the interface scale, so it is re-measured rather than assumed.
+window.addEventListener('resize', measureCrossHotbarLift);
 window.addEventListener('orientationchange', () => {
   syncAppViewport();
   window.setTimeout(syncAppViewport, 250);
@@ -2242,7 +2246,7 @@ async function startGame(
           world.useItem(reelRod);
           break;
         }
-        interactKey();
+        padInteract();
         break;
       }
       case 'bags':
@@ -3442,7 +3446,7 @@ async function startGame(
     ask: (prompt: { effectId: string; charges: number }, proceed: (confirmed: boolean) => void) =>
       hud.confirmToolEffectUse(prompt, proceed),
   };
-  function interactKey(): void {
+  function interactKey(preferNpcId?: number | null): void {
     if (world.bgInfo?.match?.state === 'active') {
       world.bgFlagAction();
       return;
@@ -3459,10 +3463,30 @@ async function startGame(
         t('errors.nothingInteract'),
         undefined,
         gatherEffectConfirm,
+        preferNpcId,
       ),
       input,
       mobileControls,
     );
+  }
+
+  /**
+   * The pad's talk press. Selects before it talks, so the target frame shows who
+   * is being addressed and a press never answers a different npc from the one the
+   * player stepped onto with the d-pad. Everything else about interacting (loot,
+   * doors, nodes, fishing) is unchanged: this only decides WHICH npc.
+   */
+  function padInteract(): void {
+    const targeted = world.player.targetId ?? null;
+    const current = targeted !== null ? world.entities.get(targeted) : undefined;
+    const inReach = (e: { pos: { x: number; y: number; z: number } }) =>
+      dist2d(world.player.pos, e.pos) <= INTERACT_RANGE;
+    const prefer =
+      current?.kind === 'npc' && inReach(current)
+        ? targeted
+        : (nearbyNpcs(world.entities.values(), world.player.pos, INTERACT_RANGE)[0]?.id ?? null);
+    if (prefer !== null && prefer !== targeted) world.targetEntity(prefer);
+    interactKey(prefer);
   }
 
   function attackNearest(): void {

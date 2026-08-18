@@ -71,6 +71,12 @@ export function tryNearbyInteraction(
   harvestStateReliable = true,
   // The R40 per-use effect confirm gate, threaded to the node dispatch.
   effectConfirm?: GatherEffectConfirmGate,
+  // The npc the caller means, when it has one in mind. The scan is otherwise
+  // nearest-wins, which is right for a keypress aimed by walking up to someone and
+  // wrong for a pad, where the player SELECTS an npc and then presses talk: without
+  // this, pressing talk answered whoever happened to be standing closer. Only ever
+  // promotes an npc the scan would already have accepted, so no rule is bypassed.
+  preferNpcId?: number | null,
 ): InteractionOutcome {
   const player = world.player;
   const playerId = world.playerId ?? player.id;
@@ -133,12 +139,15 @@ export function tryNearbyInteraction(
         bestObjectDistance = distance;
       }
     }
-    if (entity.kind === 'npc' && distance < bestNpcDistance) {
+    const preferred = preferNpcId !== undefined && preferNpcId !== null && entity.id === preferNpcId;
+    if (entity.kind === 'npc' && (preferred || distance < bestNpcDistance)) {
       const isGhostHealer = entity.templateId === 'spirit_healer' && player.ghost;
       const isLivingNpc = entity.templateId !== 'spirit_healer' && !player.dead;
-      if (isGhostHealer || isLivingNpc) {
+      if ((isGhostHealer || isLivingNpc) && distance <= INTERACT_RANGE) {
         bestNpc = entity.id;
-        bestNpcDistance = distance;
+        // Out of reach of anything else, so a nearer npc later in the sweep cannot
+        // take the pick back off the one the player actually selected.
+        bestNpcDistance = preferred ? -1 : distance;
       }
     }
   }
