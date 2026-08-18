@@ -103,7 +103,11 @@ Gate: node scripts/gate_select.mjs (TEST_DATABASE_URL on the command line
 only) PASS at 12395705bb, all 12 steps green: full-suite fallback, 2891 test
 files / 41133 tests with 8 workers, browser 19 files / 129, freshness +
 malware + biome + tsc + every build; tree clean after. Pushed per R4 (no open
-PR on this branch; pre-push floor green).
+PR on this branch; pre-push floor green). Late coverage lane (the
+test-coverage-auditor reported after the push): 3 blocking + 8 should-fix +
+5 nits, all test gaps, applied in 58212e3475 (10/10 new-pin mutants BIT) or
+judged (three, in state.md); gate re-run on that tree PASS (all 12 steps,
+41139 tests, browser 129) and pushed per R4.
 
 ## 14 implement round (UX honesty on the money surface)
 

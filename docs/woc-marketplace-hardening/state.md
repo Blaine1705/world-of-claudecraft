@@ -1081,8 +1081,10 @@ Still open (a phase that hits one asks at session start):
     via Agent (frontend-seam with MOBILE in scope, cross-platform-sync,
     database-performance with a measured 200k-row rig, migration-safety with an
     empirical triple re-apply of the DDL, privacy-security, test-coverage: the
-    last one went silent and its dimension was covered by the two mutation
-    batteries) and the QA session's own mobile E2E arm. The adversarial verify
+    last one reported LATE, after the push; its dimension had been covered by
+    the two mutation batteries meanwhile, and its report is judged in the
+    LATE COVERAGE LANE paragraph at the end of this bullet) and the QA
+    session's own mobile E2E arm. The adversarial verify
     stage was stopped after 30 votes (29 confirmed, 1 severity refute) because
     at three lenses per finding it would have run for hours; every finding was
     judged in the main loop with the file open instead. Findings: roughly 150 across the lanes and reviewers (9 audit
@@ -1297,6 +1299,42 @@ Still open (a phase that hits one asks at session start):
     freshness, malware scan, ci:changed, tsc + every build; tree clean after.
     Pushed per R4 right after (this closing line is the only commit past the
     gated tip).
+    LATE COVERAGE LANE (same day, after the push): the test-coverage-auditor's
+    report (audited at 8c0370585c, before the fix rounds; 14 mutants, 8 BIT
+    6 SURVIVED there; 3 blocking + 8 should-fix + 5 nits, all TEST gaps, no
+    code defect) judged against the pushed tree with the files open. Already
+    closed by the fix rounds: the raw-message half of the controller payment
+    sink (the declined-quote test), the indexdef + EXPLAIN pins on the two
+    directed-offer indexes, the resolveOffer decline/withdraw route pin.
+    Applied in 58212e3475 (tests only, every new pin proven by a targeted
+    mutant that BIT, 10/10): the payment-FLAVOR pin on the controller sink
+    (an unknown wallet message renders signFailed, never signFailedConfirm)
+    and the Exchange sign-slice pins (kind bridge, flavor payment, no
+    err.message); the activity item join reached through TWO listings with
+    DIFFERENT items in both pg suites (a single-listing seed passed a
+    de-correlated lookup); the cooldown max-combiner in the direction where
+    the per-listing re-claim outlasts the cap drain, pg AND fake (every
+    prior both-arms case had the cap later, so cap-wins survived); the
+    Pay-in-flight repaint (wocTradePaying in the signature, the buyer twin
+    of the seller's Accept pin); the signature's structural quote projection
+    (figures yes, transactionBase64 never, all four in-flight flags); the
+    exact offerExpiresAt line (non-empty had accepted any note); the quote
+    review's quoteExpiresAt line present, and absent with no wire expiry,
+    plus the announced title; the role-correct paid-line negative (the buyer
+    arms had pinned the SELLER's phrase); the open-session check on every
+    closed arm; rel/target on the terms link; the usd_text sweep and the
+    wallet-bridge drift corpus on the shared single-pass stripper (the
+    block-first form hid about 2.7k chars of src/net from the sweep; no
+    offender surfaced once visible). JUDGED no change: the CSS-scan pin for
+    the consent link's color token (no sibling pin exists to mirror, the
+    mobile floor pins own the link's contract, a token-value pin freezes
+    styling); the WocMarketWindow source-text pins (the behavioral rig is
+    15's, already deferred above); the retryAfterSeconds <= 0 arm (unreachable
+    behind the service floor, the junk-value arm pinned). GATE re-run on the
+    committed tree at 58212e3475: PASS, all 12 steps green (full-suite
+    fallback, 2891 test files / 41139 tests, browser 19 / 129, freshness +
+    malware + ci:changed + tsc + every build; tree clean after); pushed per
+    R4 right after.
 - 13 listing-step-up (2026-08-16/17, GAME repo, session start 19e4cd87ce =
   the 12 QA docs tip, release sync a no-op at 0 behind origin/release/v0.39.0
   tip d2d1a8ad5c; ~16 code and doc commits to tip 813e2a51e0, LOCAL not pushed
