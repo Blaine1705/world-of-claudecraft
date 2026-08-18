@@ -7027,7 +7027,10 @@ export class Hud {
    */
   castCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
     // Attack is the fixed slot-0 toggle, not something the sim can cast by id.
-    if (action.id === CROSS_HOTBAR_ATTACK_ID) return this.activateFixedAttackSlot();
+    if (action.id === CROSS_HOTBAR_ATTACK_ID) {
+      this.activateFixedAttackSlot();
+      return;
+    }
     // Matched against the EFFECTIVE action of each slot, never the raw array: with
     // the Attack button on, slot 0 IS Attack and whatever the array holds at index
     // 0 is not reachable there, so delegating by array index fired auto-attack

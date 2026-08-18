@@ -9371,7 +9371,6 @@ body.xhb-mode #player-frame {
    so it explains itself without competing with the icons. */
 .xhb-hint {
   position: absolute;
-  left: 50%;
   /* A CHIP, matching the trigger labels, not a line of prose. The bar already has
      a language for naming buttons (the bordered LT/RT pills), and loose text beside
      them read as a debug string rather than part of the interface.

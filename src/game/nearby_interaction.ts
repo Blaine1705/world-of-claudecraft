@@ -139,7 +139,8 @@ export function tryNearbyInteraction(
         bestObjectDistance = distance;
       }
     }
-    const preferred = preferNpcId !== undefined && preferNpcId !== null && entity.id === preferNpcId;
+    const preferred =
+      preferNpcId !== undefined && preferNpcId !== null && entity.id === preferNpcId;
     if (entity.kind === 'npc' && (preferred || distance < bestNpcDistance)) {
       const isGhostHealer = entity.templateId === 'spirit_healer' && player.ghost;
       const isLivingNpc = entity.templateId !== 'spirit_healer' && !player.dead;
