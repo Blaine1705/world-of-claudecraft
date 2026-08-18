@@ -27,8 +27,12 @@ const ADAPTIVE_CONFIG: AdaptiveLinkBudgetConfig = {
 
 describe('prewarm submit stop core', () => {
   it('ships the constants the design measured, and never stops before a submission', () => {
+    // The lane wall clock is measured at 6 s but shipped DISARMED (see the
+    // constant's comment: it made the iGPU curtain 9 s longer by freeing the
+    // budget into the unsliced textures.scene block).
+    expect(PREWARM_SUBMIT_LANE_MAX_MS).toBe(6_000);
     expect(PREWARM_SUBMIT_STOP_CONFIG).toEqual({
-      laneMaxMs: 6_000,
+      laneMaxMs: Number.POSITIVE_INFINITY,
       noUsefulLinkMs: 1_500,
       minZeroDeltaSettles: 3,
       zeroDeltaStreakLimit: 16,
@@ -45,7 +49,10 @@ describe('prewarm submit stop core', () => {
   });
 
   it('runs its wall clock from the FIRST submission, not from creation', () => {
-    const stop = createPrewarmSubmitStop();
+    const stop = createPrewarmSubmitStop({
+      ...PREWARM_SUBMIT_STOP_CONFIG,
+      laneMaxMs: PREWARM_SUBMIT_LANE_MAX_MS,
+    });
     // 20 s of manifest ran before the lane's first unit; the lane owns none of it.
     stop.noteSubmitted(20_000);
     expect(stop.shouldStop(20_000 + PREWARM_SUBMIT_LANE_MAX_MS - 1).stop).toBe(false);
@@ -112,7 +119,10 @@ describe('prewarm submit stop core', () => {
     // A slow machine whose first unit is still linking has settled nothing, so
     // it reports no evidence of cheap work: only the lane max may stop it (a
     // genuinely stuck lane is the adaptive budget's noProgress case).
-    const stop = createPrewarmSubmitStop();
+    const stop = createPrewarmSubmitStop({
+      ...PREWARM_SUBMIT_STOP_CONFIG,
+      laneMaxMs: PREWARM_SUBMIT_LANE_MAX_MS,
+    });
     stop.noteSubmitted(0);
     stop.noteSyncEnd(24);
     expect(stop.shouldStop(PREWARM_SUBMIT_NO_USEFUL_LINK_MS * 3).stop).toBe(false);
@@ -211,7 +221,10 @@ describe('prewarm submit stop core', () => {
   it('bounds the lane on BOTH rules whatever finishFullManifestBeforeReveal says', () => {
     // The design's exemption rule: finishFull may exempt the manifest
     // DEADLINE clause, never the lane's own hard stop.
-    const laneMax = createPrewarmSubmitStop();
+    const laneMax = createPrewarmSubmitStop({
+      ...PREWARM_SUBMIT_STOP_CONFIG,
+      laneMaxMs: PREWARM_SUBMIT_LANE_MAX_MS,
+    });
     laneMax.noteSubmitted(0);
     const laneVerdict = laneMax.shouldStop(PREWARM_SUBMIT_LANE_MAX_MS);
     expect(prewarmSubmitShouldStop(0, Number.POSITIVE_INFINITY, true, laneVerdict)).toBe(true);

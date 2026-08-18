@@ -224,7 +224,10 @@ describe('submission pacing knobs', () => {
 
   it('stops the lane on its own wall clock and stamps the receipt with the reason', async () => {
     const clock = virtualClock();
-    const pacing = createPrewarmPacing('?perf&linkmode=adaptive', clock);
+    // The wall clock ships disarmed; arm it explicitly for this case.
+    const pacing = createPrewarmPacing('?perf&linkmode=adaptive', clock, {
+      laneMaxMs: PREWARM_SUBMIT_LANE_MAX_MS,
+    });
     // 20 s of manifest before the lane's first unit: the lane owns none of it.
     await clock.sleep(20_000);
     pacing.markSubmitted('scene:0');

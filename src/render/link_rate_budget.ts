@@ -8,6 +8,7 @@ import { recordGpuPrepEvent } from './gpu_prep_events';
 import {
   createPrewarmSubmitStop,
   PREWARM_SUBMIT_STOP_CONFIG,
+  type PrewarmSubmitStopConfig,
   type PrewarmSubmitStopSnapshot,
   type PrewarmSubmitStopVerdict,
 } from './prewarm_submit_stop_core';
@@ -240,7 +241,11 @@ export const ADAPTIVE_PREWARM_LINK_CONFIG: AdaptiveLinkBudgetConfig = {
   maxSleepMs: MAX_INTERRUPTIBLE_WAIT_MS,
 };
 
-export function createPrewarmPacing(search: string, clock: LinkRateBudgetClock): PrewarmPacing {
+export function createPrewarmPacing(
+  search: string,
+  clock: LinkRateBudgetClock,
+  stopOverride?: Partial<PrewarmSubmitStopConfig>,
+): PrewarmPacing {
   const knobs = parseSubmissionPacingKnobs(search);
   const budget = createLinkRateBudget(knobs, clock);
   const adaptive: AdaptiveLinkBudget | null =
@@ -251,7 +256,7 @@ export function createPrewarmPacing(search: string, clock: LinkRateBudgetClock):
   // The hard stop runs on EVERY mode: a static ?linkrate lane needs the same
   // bound the adaptive one does, and neither is exempted by the manifest's
   // finish-full-manifest arm.
-  const submitStop = createPrewarmSubmitStop(PREWARM_SUBMIT_STOP_CONFIG);
+  const submitStop = createPrewarmSubmitStop({ ...PREWARM_SUBMIT_STOP_CONFIG, ...stopOverride });
   // Each in-flight unit's own program delta, so the settle can report what the
   // unit actually linked; markSyncEnd is the only place that number exists.
   const unitLinks = new Map<string, number>();

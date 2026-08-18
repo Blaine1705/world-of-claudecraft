@@ -51,6 +51,14 @@ export interface PrewarmSubmitStopConfig {
 }
 
 export const PREWARM_SUBMIT_LANE_MAX_MS = 6000;
+// The lane wall clock is measured but NOT armed by default. On the iGPU bench
+// a healthy boot's compile-submit lane runs 12.9 s and the 6 s stop fired every
+// run: it moved 25 units to the post-reveal resume lane, and the budget it
+// freed ran straight into the manifest's unsliced `textures.scene` block, so
+// the curtain lasted 24.9 s instead of 15.5 s. Arm it once that block is
+// sliced (or from a boot policy that knows the machine); the no-useful-link
+// rules stay armed, they are what catch the instant-settle runaway.
+export const PREWARM_SUBMIT_LANE_MAX_ARMED = false;
 export const PREWARM_SUBMIT_NO_USEFUL_LINK_MS = 1500;
 export const PREWARM_SUBMIT_MIN_ZERO_DELTA_SETTLES = 3;
 // A whole batch of compileBatchRoots roots that links nothing new is a window
@@ -61,7 +69,7 @@ export const PREWARM_SUBMIT_MIN_ZERO_DELTA_SETTLES = 3;
 export const PREWARM_SUBMIT_ZERO_DELTA_STREAK_LIMIT = 16;
 
 export const PREWARM_SUBMIT_STOP_CONFIG: PrewarmSubmitStopConfig = {
-  laneMaxMs: PREWARM_SUBMIT_LANE_MAX_MS,
+  laneMaxMs: PREWARM_SUBMIT_LANE_MAX_ARMED ? PREWARM_SUBMIT_LANE_MAX_MS : Number.POSITIVE_INFINITY,
   noUsefulLinkMs: PREWARM_SUBMIT_NO_USEFUL_LINK_MS,
   minZeroDeltaSettles: PREWARM_SUBMIT_MIN_ZERO_DELTA_SETTLES,
   zeroDeltaStreakLimit: PREWARM_SUBMIT_ZERO_DELTA_STREAK_LIMIT,
@@ -109,8 +117,9 @@ export interface PrewarmSubmitStop {
   snapshot(): PrewarmSubmitStopSnapshot;
 }
 
+// POSITIVE_INFINITY is a legal reading: a disarmed rule, never a junk one.
 const positiveMs = (value: number, fallback: number): number =>
-  Number.isFinite(value) && value > 0 ? value : fallback;
+  !Number.isNaN(value) && value > 0 ? value : fallback;
 
 const positiveCount = (value: number, fallback: number): number =>
   Number.isFinite(value) && value > 0 ? Math.max(1, Math.floor(value)) : fallback;
