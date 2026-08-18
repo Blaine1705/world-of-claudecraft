@@ -2302,7 +2302,9 @@ export class Renderer {
         this.pmremGenerator ??= new THREE.PMREMGenerator(this.webgl);
         const envScene = new THREE.Scene();
         envScene.add(this.sky.clone());
-        const envRT = this.pmremGenerator.fromScene(envScene, 0.04, 0.1, 1100); // far must cover the 560u dome
+        // far covers the 560u dome; size 128 matches the 512-wide equirect
+        // prefilters (cubeUV height is a program-cache-key input)
+        const envRT = this.pmremGenerator.fromScene(envScene, 0.04, 0.1, 1100, { size: 128 });
         this.scene.environment = envRT.texture;
       }
       this.scene.environmentIntensity = this.envOutdoorIntensity;
